@@ -153,10 +153,20 @@ class SystemComponentBackendController extends Controller {
         $navigation = new \Cx\Core\Html\Sigma(\Env::get('cx')->getCodeBaseCorePath() . '/Core/View/Template/Backend');
         $navigation->loadTemplateFile('Navigation.html');
         
-        $commands = array_merge(
-                        array('' => array('permission' => $this->defaultPermission)), 
-                        $this->getCommands()
-                    );
+        $commands = $this->getCommands();
+        if ($this->showOverviewPage()) {
+            $commands = array_merge(
+                array('' => array('permission' => $this->defaultPermission)), 
+                $commands
+            );
+        }
+        // make sure first tab is shown if $cmd[0] is empty
+        if (empty($cmd[0])) {
+            $cmd[0] = reset($commands);
+            if (is_array($cmd[0])) {
+                $cmd[0] = key($commands);
+            }
+        }
         $this->checkAndModifyCmdByPermission($cmd, $commands);
         foreach ($commands as $key => $command) {
             $subNav         = array();
@@ -360,11 +370,21 @@ class SystemComponentBackendController extends Controller {
             $entityClassName = $repo->findBy($filter);
         }
         $view = new \Cx\Core\Html\Controller\ViewGenerator(
-            $entityClassName,
+            $this->getViewGeneratorParseObjectForEntityClass($entityClassName),
             $this->getViewGeneratorOptions($entityClassName, $classIdentifier)
         );
         $renderedContent = $view->render($isSingle);
         $template->setVariable('ENTITY_VIEW', $renderedContent);
+    }
+    
+    /**
+     * Returns the object to parse a wiew with
+     * 
+     * If you overwrite this and return anything else than string, filter will not work
+     * @return string|array|object An entity class name, entity, array of entities or DataSet
+     */
+    protected function getViewGeneratorParseObjectForEntityClass($entityClassName) {
+        return $entityClassName;
     }
     
     protected function getViewGeneratorOptions($entityClassName, $classIdentifier) {
@@ -387,5 +407,12 @@ class SystemComponentBackendController extends Controller {
             ),
         );
     }
+    
+    /**
+     * Return true here if you want the first tab to be an entity view
+     * @return boolean True if overview should be shown, false otherwise
+     */
+    protected function showOverviewPage() {
+        return true;
+    }
 }
-
