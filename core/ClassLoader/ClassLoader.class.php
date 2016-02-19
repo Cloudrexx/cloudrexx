@@ -248,7 +248,10 @@ class ClassLoader {
      */
     public function getFilePath($file, &$isCustomized = false, &$isWebsite = false, $webPath = false) {
         // make lookup algorithm work on Windows by replacing backslashes by forward slashes
-        $file = preg_replace('#\\\\#', '/', $file);
+// TODO: The path format is none of the ClassLoader's business.
+// If it is indeed necessary to fix it (it isn't), let some FileSystem*
+// class method handle it.
+//        $file = preg_replace('#\\\\#', '/', $file);
 
         // remove any URL arguments from the file path like '?foo=bar' or '#foo'
         if ($webPath) {
