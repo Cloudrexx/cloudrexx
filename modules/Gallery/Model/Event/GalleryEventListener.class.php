@@ -27,7 +27,7 @@
 
 /**
  * EventListener for Gallery
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
@@ -42,7 +42,7 @@ use Cx\Core\Event\Model\Entity\DefaultEventListener;
 /**
  * Class GalleryEventListener
  * EventListener for Gallery
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
@@ -86,10 +86,15 @@ class GalleryEventListener extends DefaultEventListener {
     {
         global $_ARRAYLANG;
         \Env::get('init')->loadLanguageData('Gallery');
-        $mediaType = new MediaSource('gallery',$_ARRAYLANG['TXT_THUMBNAIL_GALLERY'],array(
-            $this->cx->getWebsiteImagesGalleryPath(),
-            $this->cx->getWebsiteImagesGalleryWebPath(),array(12,67)
-        ));
+        $mediaType = new MediaSource('gallery',
+            $_ARRAYLANG['TXT_MODULE_GALLERY_THUMBNAIL'],
+            array(
+                $this->cx->getWebsiteImagesGalleryPath(),
+                $this->cx->getWebsiteImagesGalleryWebPath(),
+            ),
+// TODO: Presumably, these are the Access IDs
+            array(12, 67)
+        );
         $mediaBrowserConfiguration->addMediaType($mediaType);
     }
 

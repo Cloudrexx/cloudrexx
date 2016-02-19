@@ -1379,22 +1379,6 @@ class CommonFunctions
                 $statusMsg .= $_ARRLANG['TXT_COULD_NOT_ACTIVATE_CURRENT_LANGUAGE']."<br />";
             }
 
-            // set admin email
-            $query = "UPDATE `".$_SESSION['installer']['config']['dbTablePrefix']."settings`
-                         SET `setvalue` = '".$_SESSION['installer']['sysConfig']['adminEmail']."'
-                       WHERE `setname` = 'coreAdminEmail'";
-            if (!@$objDb->Execute($query)) {
-                $statusMsg .= $_ARRLANG['TXT_COULD_NOT_SET_ADMIN_EMAIL']."<br />";
-            }
-
-            // set admin name
-            $query = "UPDATE `".$_SESSION['installer']['config']['dbTablePrefix']."settings`
-                         SET `setvalue` = '".$_SESSION['installer']['sysConfig']['adminName']."'
-                       WHERE `setname` = 'coreAdminName'";
-            if (!@$objDb->Execute($query)) {
-                $statusMsg .= $_ARRLANG['TXT_COULD_NOT_SET_ADMIN_NAME']."<br />";
-            }
-
             if (($arrTables = $objDb->MetaTables('TABLES')) === false) {
                 $statusMsg .= $_ARRLANG['TXT_COULD_NOT_GATHER_ALL_DATABASE_TABLES']."<br />";
                 return $statusMsg;
@@ -1431,14 +1415,6 @@ class CommonFunctions
                 }
             }
 
-            // set contact email
-            $query = "UPDATE `".$_SESSION['installer']['config']['dbTablePrefix']."settings`
-                         SET `setvalue` = '".$_SESSION['installer']['sysConfig']['contactEmail']."'
-                       WHERE `setname` = 'contactFormEmail'";
-            if (!@$objDb->Execute($query)) {
-                $statusMsg .= $_ARRLANG['TXT_COULD_NOT_SET_CONTACT_EMAIL']."<br />";
-            }
-
             $query = "UPDATE `".$_SESSION['installer']['config']['dbTablePrefix']."module_contact_form`
                          SET `mails` = '".$_SESSION['installer']['sysConfig']['contactEmail']."'
                        WHERE `id` = 1";
@@ -1447,18 +1423,12 @@ class CommonFunctions
             }
 
             // set domain url
+// TODO: This is possibly pointless, as domainURL isn't stored anywhere.
             if (preg_match('#^https?://#', $_SESSION['installer']['sysConfig']['domainURL'])) {
                 $statusMsg .= $_ARRLANG['TXT_SET_VALID_DOMAIN_URL'];
             } else {
                 if (substr($_SESSION['installer']['sysConfig']['domainURL'], -1) == '/') {
                     $_SESSION['installer']['sysConfig']['domainURL'] = substr($_SESSION['installer']['sysConfig']['domainURL'], 0, -1);
-                }
-
-                $query = "UPDATE `".$_SESSION['installer']['config']['dbTablePrefix']."settings`
-                            SET `setvalue` = '".$_SESSION['installer']['sysConfig']['domainURL']."'
-                            WHERE `setname` = 'domainUrl'";
-                if (!@$objDb->Execute($query)) {
-                    $statusMsg .= $_ARRLANG['TXT_COULD_NOT_SET_DOMAIN_URL']."<br />";
                 }
             }
 
@@ -1490,21 +1460,6 @@ class CommonFunctions
             }
 
             $_SESSION['installer']['sysConfig']['iid'] = $this->updateCheck();
-
-            $query = "UPDATE `".$_SESSION['installer']['config']['dbTablePrefix']."settings`
-                         SET `setvalue` = '".$_SESSION['installer']['sysConfig']['iid']."'
-                       WHERE `setname` = 'installationId'";
-            if (!@$objDb->Execute($query)) {
-                $statusMsg .= $_ARRLANG['TXT_COULD_NOT_SET_INSTALLATIONID']."<br />";
-            }
-
-            $arrTimezones = timezone_identifiers_list();
-            $query = "UPDATE `".$_SESSION['installer']['config']['dbTablePrefix']."settings`
-                      SET `setvalue` = '".$arrTimezones[$_SESSION['installer']['config']['timezone']]."'
-                      WHERE `setname` = 'timezone'";
-            if (!@$objDb->Execute($query) || (!isset($_SESSION['installer']['config']['timezone']) && !isset($arrTimezones[$_SESSION['installer']['config']['timezone']]))) {
-                $statusMsg .= $_ARRLANG['TXT_COULD_NOT_SET_TIMEZONE']."<br />";
-            }
 
             /*
             // set rss title
@@ -1541,6 +1496,8 @@ class CommonFunctions
      * Configure the Cloudrexx caching so it fits the server configuration
      */
     protected function configureCaching() {
+// TODO: This method (or most of it) is pointless,
+// as the DBPREFIX_settings table is no longer used
         $_CONFIG = array();
 
         require_once ASCMS_CORE_MODULE_PATH . '/Cache/Controller/CacheLib.class.php';
@@ -1663,11 +1620,6 @@ class CommonFunctions
         } else {
             $_CONFIG['cacheDbStatus'] = 'on';
         }
-
-        $objDb = $this->_getDbObject($statusMsg);
-        foreach ($_CONFIG as $key => $value) {
-            $objDb->Execute("UPDATE `".$_SESSION['installer']['config']['dbTablePrefix']."settings` SET `setvalue` = '".$value."' WHERE `setname` = '".$key."'");
-        }
     }
 
     /**
@@ -1678,10 +1630,15 @@ class CommonFunctions
     {
         global $_ARRLANG;
 
+        $statusMsg = '';
         $objDb = $this->_getDbObject($statusMsg);
         if ($objDb === false) {
             return $statusMsg;
         } else {
+
+// TODO: Although the contents written here are bogus due to the DBPREFIX_settings table being obsolete,
+// the presence of the settings.php file is apparently required in order to proceed to the next step.
+
             $strSettingsFile = $_SESSION['installer']['config']['documentRoot'].$_SESSION['installer']['config']['offsetPath'].'/config/settings.php';
 
             if (   !\Cx\Lib\FileSystem\FileSystem::touch($strSettingsFile)
@@ -1699,46 +1656,10 @@ class CommonFunctions
 
                 $strFooter = "\n";
 
-            //Get module-names
-                $objResult = $objDb->Execute("SELECT id, name FROM `".$_SESSION['installer']['config']['dbTablePrefix']."modules`");
-                if ($objResult->RecordCount() > 0) {
-                    while (!$objResult->EOF) {
-                        $arrModules[$objResult->fields['id']] = $objResult->fields['name'];
-                        $objResult->MoveNext();
-                    }
-                }
-
-            //Get values
-                $objResult = $objDb->Execute("SELECT setname, setmodule, setvalue FROM `".$_SESSION['installer']['config']['dbTablePrefix']."settings` ORDER BY	setmodule ASC, setname ASC");
-                $intMaxLen = 0;
-                if ($objResult->RecordCount() > 0) {
-                    while (!$objResult->EOF) {
-                        $intMaxLen = (strlen($objResult->fields['setname']) > $intMaxLen) ? strlen($objResult->fields['setname']) : $intMaxLen;
-                        $arrValues[$objResult->fields['setmodule']][$objResult->fields['setname']] = $objResult->fields['setvalue'];
-                        $objResult->MoveNext();
-                    }
-                }
-                $intMaxLen += strlen('$_CONFIG[\'\']') + 1; //needed for formatted output
-
             //Write values
                 $data = $strHeader;
 
                 $strBody = '';
-                foreach ($arrValues as $intModule => $arrInner) {
-                    $strBody .= "/**\n";
-                    $strBody .= "* -------------------------------------------------------------------------\n";
-                    $strBody .= "* ".ucfirst(isset($arrModules[$intModule]) ? $arrModules[$intModule] : '')."\n";
-                    $strBody .= "* -------------------------------------------------------------------------\n";
-                    $strBody .= "*/\n";
-
-                    foreach($arrInner as $strName => $strValue) {
-                        $strBody .= sprintf("%-".$intMaxLen."s",'$_CONFIG[\''.$strName.'\']');
-                        $strBody .= "= ";
-                        $strBody .= (is_numeric($strValue) ? $strValue : '"'.str_replace('"', '\"', $strValue).'"').";\n";
-                    }
-                    $strBody .= "\n";
-                }
-
                 $data .= $strBody;
                 $data .= $strFooter;
 

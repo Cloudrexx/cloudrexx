@@ -74,7 +74,13 @@ class FileSystemFile implements FileInterface
             throw new FileSystemFileException('No file path specified!');
         }
         
+// TODO: This is a HACK. Determine the paths by proper means.
         // $file is specified by absolute file system path of operating system
+        //  - Windows: Absolute paths start with letter plus colon (i.e. "C:")
+        if ($file[1] === ':') {
+            $this->filePath = $file;
+        } else
+        //  - *nix: Absolute paths start with the document root
         if (   strpos($file, \Env::get('cx')->getWebsiteDocumentRootPath()) === 0
             || strpos($file, \Env::get('cx')->getCodeBaseDocumentRootPath()) === 0
         ) {

@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,10 +24,10 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Calendar Language variables
- * 
+ *
  * @package    cloudrexx
  * @subpackage module_calendar
  * @author     Cloudrexx <info@cloudrexx.com>
@@ -47,7 +47,7 @@ $_ARRAYLANG['TXT_CALENDAR_NAME'] = "Betreff";
 $_ARRAYLANG['TXT_CALENDAR_PLACE'] = "Ort";
 $_ARRAYLANG['TXT_CALENDAR_PRIORITY'] = "Priorität";
 $_ARRAYLANG['TXT_CALENDAR_START'] = "Beginnt um";
-$_ARRAYLANG['TXT_CALENDAR_END'] = "Endet um";                     
+$_ARRAYLANG['TXT_CALENDAR_END'] = "Endet um";
 $_ARRAYLANG['TXT_CALENDAR_INFO'] = "Link";
 $_ARRAYLANG['TXT_CALENDAR_SEARCH'] = "Suchen";
 $_ARRAYLANG['TXT_ENDDATE'] = "Bis:";
@@ -63,7 +63,7 @@ $_ARRAYLANG['TXT_CALENDAR_DAY_ARRAY'] = "So,Mo,Di,Mi,Do,Fr,Sa";
 $_ARRAYLANG['TXT_CALENDAR_EXPORT_ICAL'] = "Aktuelle Kategorie als iCalendar-Datei exportieren";
 $_ARRAYLANG['TXT_CALENDAR_EXPORT_ICAL_ALL'] = "Alle Termine als iCalendar-Datei exportieren";
 $_ARRAYLANG['TXT_CALENDAR_EXPORT_ICAL_EVENT'] = "Diese Veranstaltung exportieren";
-$_ARRAYLANG['TXT_CALENDAR_TERMIN'] = "Termin";  
+$_ARRAYLANG['TXT_CALENDAR_TERMIN'] = "Termin";
 $_ARRAYLANG['TXT_CALENDAR_ORGANIZER'] = "Veranstalter";
 $_ARRAYLANG['TXT_CALENDAR_OPTIONS'] = "Zusätzliche Angaben";
 $_ARRAYLANG['TXT_CALENDAR_THUMBNAIL'] = "Bild";
@@ -130,12 +130,12 @@ $_ARRAYLANG['TXT_CALENDAR_REGISTRATION_SUCCESSFULLY_ADDED_WAITLIST'] = "Ihre Anm
 $_ARRAYLANG['TXT_CALENDAR_OCLOCK'] = "Uhr";
 $_ARRAYLANG['TXT_CALENDAR_EVENT_SUCCESSFULLY_SAVED'] = "Veranstaltung erfolgreich gespeichert";
 $_ARRAYLANG['TXT_CALENDAR_EVENT_CORRUPT_SAVED'] = "Fehler beim Speichern der Veranstaltung";
-$_ARRAYLANG['TXT_CALENDAR_EVENT'] = "Veranstaltung"; 
-$_ARRAYLANG['TXT_CALENDAR_EVENT_DETAILS'] = "Einzelheiten";  
-$_ARRAYLANG['TXT_CALENDAR_SAVE'] = "Speichern";   
+$_ARRAYLANG['TXT_CALENDAR_EVENT'] = "Veranstaltung";
+$_ARRAYLANG['TXT_CALENDAR_EVENT_DETAILS'] = "Einzelheiten";
+$_ARRAYLANG['TXT_CALENDAR_SAVE'] = "Speichern";
 $_ARRAYLANG['TXT_CALENDAR_EXPAND'] = "Erweitert";
-$_ARRAYLANG['TXT_CALENDAR_MINIMIZE'] = "Vereinfacht";    
-$_ARRAYLANG['TXT_CALENDAR_EVENT_PLACE'] = "Ort"; 
+$_ARRAYLANG['TXT_CALENDAR_MINIMIZE'] = "Vereinfacht";
+$_ARRAYLANG['TXT_CALENDAR_EVENT_PLACE'] = "Ort";
 $_ARRAYLANG['TXT_CALENDAR_EVENT_STREET'] = "Strasse / Nr.";
 $_ARRAYLANG['TXT_CALENDAR_EVENT_ZIP'] = "PLZ";
 $_ARRAYLANG['TXT_CALENDAR_EVENT_CITY'] = "Stadt";
@@ -145,7 +145,7 @@ $_ARRAYLANG['TXT_CALENDAR_EVENT_USE_GOOGLEMAPS'] = "GoogleMaps verwenden";
 $_ARRAYLANG['TXT_CALENDAR_EVENT_LINK'] = "Link";
 $_ARRAYLANG['TXT_CALENDAR_EVENT_PRICE'] = "Eintrittspreis";
 $_ARRAYLANG['TXT_CALENDAR_EVENT_FREE_PLACES'] = "Freie Plätze";
-$_ARRAYLANG['TXT_CALENDAR_EVENT_PICTURE'] = "Bild";   
+$_ARRAYLANG['TXT_CALENDAR_EVENT_PICTURE'] = "Bild";
 $_ARRAYLANG['TXT_CALENDAR_EVENT_ATTACHMENT'] = "Anhang";
 $_ARRAYLANG['TXT_CALENDAR_EVENT_DESCRIPTION'] = "Beschreibung";
 $_ARRAYLANG['TXT_CALENDAR_EDIT'] = "bearbeiten";
@@ -174,8 +174,6 @@ $_ARRAYLANG['TXT_CALENDAR_TIME_TYPE_NOTHING'] = "Zeit nicht anzeigen";
 $_ARRAYLANG['TXT_CALENDAR_TIME_TYPE_TIME'] = "Start- und/oder Endzeit";
 $_ARRAYLANG['TXT_CALENDAR_TIME_TYPE_FULLTIME'] = "Ganztägig";
 $_ARRAYLANG['TXT_CALENDAR_MAP'] = "Karte anzeigen";
-
-
 $_ARRAYLANG['TXT_CALENDAR_SAME_AS_CONTACT'] = "gleiche Angaben wie Kontaktadresse";
 $_ARRAYLANG['TXT_CALENDAR_DEVIATES_FROM_CONTACT'] = "weicht von der Kontaktadresse ab";
 $_ARRAYLANG['TXT_CALENDAR_PLEASE_CHECK_INPUT'] = "Bitte überprüfen sie ihre Eingabe";
@@ -192,10 +190,15 @@ $_ARRAYLANG['TXT_CALENDAR_EVENT_TYPE'] = "Veranstaltungstyp";
 $_ARRAYLANG['TXT_CALENDAR_EVENT_TYPE_EVENT'] = "Veranstaltung";
 $_ARRAYLANG['TXT_CALENDAR_EVENT_TYPE_REDIRECT'] = "Weiterleitung";
 $_ARRAYLANG['TXT_CALENDAR_PLACE_DATA_DEFAULT'] = "Manuell erfassen";
-$_ARRAYLANG['TXT_CALENDAR_PLACE_DATA_FROM_MEDIADIR'] = "Eintrag aus dem Medienverzeichnis wählen";    
+$_ARRAYLANG['TXT_CALENDAR_PLACE_DATA_FROM_MEDIADIR'] = "Eintrag aus dem Medienverzeichnis wählen";
 $_ARRAYLANG['TXT_CALENDAR_PREV'] = "Zurück";
 $_ARRAYLANG['TXT_CALENDAR_NEXT'] = "Weiter";
 $_ARRAYLANG['TXT_CALENDAR_ACTIVE'] = "aktiv";
 $_ARRAYLANG['TXT_CALENDAR_COMMENT'] = "Beschreibung";
 $_ARRAYLANG['TXT_CALENDAR_HOST'] = "Host";
 $_ARRAYLANG['TXT_CALENDAR_NO_SERIES'] = "keine Wiederholung";
+
+// TODO: Verify the content of this entry.
+// TODO: The entry may be missing in the backend.
+// TODO: Add the entry to other languages.
+$_ARRAYLANG['TXT_CALENDAR'] = 'Veranstaltungen';
