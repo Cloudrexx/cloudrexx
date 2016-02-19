@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Cloudrexx Development Team <info@cloudrexx.com>
@@ -120,3 +120,8 @@ $_ARRAYLANG['TXT_ACCESS_SOCIALLOGIN_CONNECT'] = "Verbinden";
 $_ARRAYLANG['TXT_ACCESS_SOCIALLOGIN_CONNECTED'] = "verbunden";
 $_ARRAYLANG['TXT_ACCESS_SOCIALLOGIN_DISCONNECT'] = "Trennen";
 $_ARRAYLANG['TXT_ACCESS_SOCIALLOGIN_DISCONNECTED'] = "getrennt";
+
+// TODO: Verify the content of this entry.
+// TODO: The entry may be missing in the backend.
+// TODO: Add the entry to other languages.
+$_ARRAYLANG['TXT_ACCESS_USER_ADMINISTRATION'] = 'Benutzerverwaltung';
