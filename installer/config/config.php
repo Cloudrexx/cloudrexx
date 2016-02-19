@@ -138,6 +138,7 @@ $arrFiles = array(
 );
 
 $arrDatabaseTables = array(
+// TODO: Either update, or remove this outdated and incomplete list.
     'module_block_blocks',
     'module_block_rel_pages',
     'module_block_settings',
@@ -174,7 +175,6 @@ $arrDatabaseTables = array(
     'modules',
     'module_repository',
     'sessions',
-    'settings',
     'settings_smtp',
     'skins',
     'module_directory_categories',
