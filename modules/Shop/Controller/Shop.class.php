@@ -395,7 +395,7 @@ die("Failed to get Customer for ID $customer_id");
      * @global  array   $_ARRAYLANG
      * @global  array   $themesPages
      * @global  array   $_CONFIGURATION
-     * @staticvar string    $strContent Caches created content
+     * @staticvar array $content    Caches created content
      * @param   type    $template   Replaces the default template
      *                              ($themesPages['shopnavbar']) and sets
      *                              $use_cache to false unless empty.
@@ -409,12 +409,14 @@ die("Failed to get Customer for ID $customer_id");
     static function getNavbar($template=NULL, $use_cache=true)
     {
         global $_ARRAYLANG, $themesPages;
-        static $strContent = NULL;
+        static $content = array();
 
-        if (!$use_cache) $strContent = NULL;
+        $templateHash = md5($template);
         // Note: This is valid only as long as the content is the same every
         // time this method is called!
-        if ($strContent) return $strContent;
+        if ($use_cache && array_key_exists($templateHash, $content)) {
+            return $content[$templateHash];
+        }
         $objTpl = new \Cx\Core\Html\Sigma('.');
         $objTpl->setErrorHandling(PEAR_ERROR_DIE);
         $objTpl->setTemplate(empty($template)
@@ -518,8 +520,8 @@ die("Failed to get Customer for ID $customer_id");
 //        if ($objTpl->blockExists('shopJsCart')) {
 //            $objTpl->touchBlock('shopJsCart');
 //        }
-        $strContent = $objTpl->get();
-        return $strContent;
+        $content[$templateHash] = $objTpl->get();
+        return $content[$templateHash];
     }
 
 

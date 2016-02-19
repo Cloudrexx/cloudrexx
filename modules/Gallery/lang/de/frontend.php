@@ -64,4 +64,8 @@ $_ARRAYLANG['TXT_GALLERY_IMAGE_DESCRIPTION'] = "Beschreibung: ";
 $_ARRAYLANG['TXT_IMAGES'] = "Bilder";
 $_ARRAYLANG['TXT_GALLERY_CATEGORY_HINT_HIERARCHY'] = "Sie sind hier:";
 $_ARRAYLANG['TXT_GALLERY_CATEGORY_HINT_FLAT'] = "Weitere Galerien:";
-?>
+
+// TODO: Verify the content of this entry.
+// TODO: The entry may be missing in the backend.
+// TODO: Add the entry to other languages.
+$_ARRAYLANG['TXT_MODULE_GALLERY_THUMBNAIL'] = 'Vorschaubild';

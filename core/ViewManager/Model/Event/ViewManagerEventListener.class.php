@@ -52,12 +52,14 @@ class ViewManagerEventListener extends DefaultEventListener
     public function mediasourceLoad(MediaSourceManager $mediaSourceManager)
     {
         global $_ARRAYLANG;
-        $mediaType = new MediaSource(
-            'themes', $_ARRAYLANG['TXT_THEME_THEMES'],
+        \Env::get('init')->loadLanguageData('ViewManager');
+        $mediaType = new MediaSource('themes',
+            $_ARRAYLANG['TXT_THEME_THEMES'],
             array(
                 $this->cx->getWebsiteThemesPath(),
                 $this->cx->getWebsiteThemesWebPath(),
-            ), array(), '',
+            ),
+            array(), '',
             new ViewManagerFileSystem($this->cx->getWebsiteThemesPath())
         );
         $mediaSourceManager->addMediaType($mediaType);
