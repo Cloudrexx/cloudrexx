@@ -81,4 +81,8 @@ $_ARRAYLANG['TXT_BLOG_LIB_RATING'] = "Bewertung";
 $_ARRAYLANG['TXT_BLOG_LIB_ALL_CATEGORIES'] = "Alle Kategorien";
 $_ARRAYLANG['TXT_BLOG_LIB_RSS_MESSAGES_TITLE'] = "Blog Meldungen";
 $_ARRAYLANG['TXT_BLOG_LIB_RSS_COMMENTS_TITLE'] = "Blog Kommentare";
-?>
+
+// TODO: Verify the content of this entry.
+// TODO: The entry may be missing in the backend.
+// TODO: Add the entry to other languages.
+$_ARRAYLANG['TXT_MODULE_BLOG'] = 'Blog';

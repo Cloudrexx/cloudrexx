@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * class MediaSourceManager
  *
@@ -108,17 +108,14 @@ class MediaSourceManager extends EntityBase
      *
      * @return string The absolute Path
      */
-    public static function getAbsolutePath($virtualPath) {
-        if (self::isVirtualPath(
-            $virtualPath
-        )
-        ) {
+    public static function getAbsolutePath($virtualPath)
+    {
+        if (self::isVirtualPath($virtualPath)) {
             $pathArray = explode('/', $virtualPath);
             return realpath(Cx::instanciate()->getMediaSourceManager()
                 ->getMediaTypePathsbyNameAndOffset(array_shift($pathArray), 0)
-            . '/' . join(
-                '/', $pathArray
-            ));
+                . '/'
+                . join('/', $pathArray));
         }
         return $virtualPath;
     }
@@ -148,10 +145,9 @@ class MediaSourceManager extends EntityBase
      * @return bool
      */
     public static function checkPermissions($path) {
-        foreach (
-            Cx::instanciate()->getMediaSourceManager()->getMediaTypePaths() as
-            $virtualPathName => $mediatype
-        ) {
+        foreach (array_keys(
+                Cx::instanciate()->getMediaSourceManager()->getMediaTypePaths())
+                as $virtualPathName) {
             if (self::isSubdirectory($virtualPathName, $path)) {
                 return true;
             }
@@ -170,8 +166,13 @@ class MediaSourceManager extends EntityBase
      *
      * @return bool
      */
-    public static function isVirtualPath($path) {
-        return !(strpos($path, '/') === 0);
+    public static function isVirtualPath($path)
+    {
+        return
+            ($path[0] !== '/') // *nix
+            &&
+            ($path[1] !== ':') // win
+        ;
     }
 
     public function addMediaType(MediaSource $mediaType) {

@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Class BlogEventListener
  *
@@ -52,10 +52,15 @@ class BlogEventListener extends DefaultEventListener {
     public function mediasourceLoad(MediaSourceManager $mediaBrowserConfiguration)
     {
         global $_ARRAYLANG;
-        $mediaType = new MediaSource('blog',$_ARRAYLANG['TXT_BLOG_MODULE'],array(
-            $this->cx->getWebsiteImagesBlogPath(),
-            $this->cx->getWebsiteImagesBlogWebPath(),
-        ),array(119));
+        \Env::get('init')->loadLanguageData('Blog');
+        $mediaType = new MediaSource('blog',
+            $_ARRAYLANG['TXT_MODULE_BLOG'],
+            array(
+                $this->cx->getWebsiteImagesBlogPath(),
+                $this->cx->getWebsiteImagesBlogWebPath(),
+            ),
+            array(119)
+        );
         $mediaBrowserConfiguration->addMediaType($mediaType);
     }
 
