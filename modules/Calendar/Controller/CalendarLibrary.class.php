@@ -132,6 +132,13 @@ class CalendarLibrary
     public $arrSettings = array();
     
     /**
+     * Static settings array to cache the fetched data from the database
+     *
+     * @var array 
+     */
+    public static $settings = array();
+
+    /**
      * Community group array
      *
      * @access public
@@ -283,16 +290,16 @@ class CalendarLibrary
 
                 switch($strStatus) {
                     case 'no_access':
-                        \Cx\Core\Csrf\Controller\Csrf::header('Location: '.CONTREXX_SCRIPT_PATH.'?section=Login&cmd=noaccess');
+                        \Cx\Core\Csrf\Controller\Csrf::redirect(CONTREXX_SCRIPT_PATH.'?section=Login&cmd=noaccess');
                         exit();
                         break;
                     case 'login':
                         $link = base64_encode(CONTREXX_SCRIPT_PATH.'?'.$_SERVER['QUERY_STRING']);
-                        \Cx\Core\Csrf\Controller\Csrf::header("Location: ".CONTREXX_SCRIPT_PATH."?section=Login&redirect=".$link);
+                        \Cx\Core\Csrf\Controller\Csrf::redirect(CONTREXX_SCRIPT_PATH."?section=Login&redirect=".$link);
                         exit();
                         break;
                     case 'redirect':
-                        \Cx\Core\Csrf\Controller\Csrf::header('Location: '.CONTREXX_SCRIPT_PATH.'?section='.$this->moduleName);   
+                        \Cx\Core\Csrf\Controller\Csrf::redirect(CONTREXX_SCRIPT_PATH.'?section='.$this->moduleName);   
                         exit();
                         break;
                 }
@@ -317,6 +324,14 @@ class CalendarLibrary
             return;
         }
         
+        // hotfix: this fixes the issue that the settings are being fetch from the
+        // database over and over again.
+        // This is just workaround without having to refactor the whole implementation of CalendarLibrary::$arrSettings
+        if (isset(static::$settings[$this->moduleTablePrefix])) {
+            $this->arrSettings = static::$settings[$this->moduleTablePrefix];
+            return;
+        }
+
     	$arrSettings = array();
         $arrDateSettings =  array(
                             'separatorDateList','separatorDateTimeList', 'separatorSeveralDaysList', 'separatorTimeList',
@@ -348,6 +363,7 @@ class CalendarLibrary
             }
         }
         
+        static::$settings[$this->moduleTablePrefix] = $arrSettings;
         $this->arrSettings = $arrSettings;
     }
     
@@ -396,12 +412,8 @@ class CalendarLibrary
      */
     function getDateFormat($type=null)
     {
-        global $objDatabase;
-        
-        $objDateFormat = $objDatabase->Execute("SELECT value FROM  ".DBPREFIX."module_".$this->moduleTablePrefix."_settings WHERE name = 'dateFormat' LIMIT 1");
-        if ($objDateFormat !== false) {        
-            $dateFormat = $objDateFormat->fields['value'];      
-        }
+        self::getSettings();
+        $dateFormat = $this->arrSettings['dateFormat'];
         
         if($type == 1) {
             switch ($dateFormat) {

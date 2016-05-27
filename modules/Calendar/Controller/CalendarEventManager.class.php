@@ -549,8 +549,8 @@ class CalendarEventManager extends CalendarLibrary
         if($objEvent->seriesStatus == 1 && $objInit->mode == 'frontend') {
             self::_setNextSeriesElement($objEvent); 
         }
-        foreach ($this->eventList as $tmpKey => $tmpObjEvent) {  
-            if ($tmpObjEvent->startDate->getTimestamp() != $eventStartDate) {
+        foreach ($this->eventList as $tmpKey => $tmpObjEvent) {
+            if (!$tmpObjEvent->startDate || $tmpObjEvent->startDate->getTimestamp() != $eventStartDate) {
                 unset($this->eventList[$tmpKey]);
             }
         }
@@ -598,13 +598,13 @@ class CalendarEventManager extends CalendarLibrary
             $objEvent = $this->eventList[0];
             
             if(empty($objEvent)) {
-                \Cx\Core\Csrf\Controller\Csrf::header("Location: index.php?section=".$this->moduleName);
+                \Cx\Core\Csrf\Controller\Csrf::redirect("index.php?section=".$this->moduleName);
                 return;   
             }
             
             if($objEvent->access == 1 && !\FWUser::getFWUserObject()->objUser->login()){
                 $link = base64_encode(CONTREXX_SCRIPT_PATH.'?'.$_SERVER['QUERY_STRING']);           
-                \Cx\Core\Csrf\Controller\Csrf::header("Location: ".CONTREXX_SCRIPT_PATH."?section=Login&redirect=".$link);  
+                \Cx\Core\Csrf\Controller\Csrf::redirect(CONTREXX_SCRIPT_PATH."?section=Login&redirect=".$link);  
                 return;    
             }   
             
@@ -648,13 +648,22 @@ class CalendarEventManager extends CalendarLibrary
 
             $picThumb = file_exists(\Env::get('cx')->getWebsitePath().$objEvent->pic.".thumb") ? $objEvent->pic.".thumb" : $objEvent->pic;
                         
-            $numRegistrations  = (int) $objEvent->registrationCount;                         
-            $numDeregistration = (int) $objEvent->cancellationCount;
-            
-            $objEscortManager = new \Cx\Modules\Calendar\Controller\CalendarRegistrationManager($objEvent->id, true, false);         
+            $numRegistrations  = (int) $objEvent->getRegistrationCount();
+            $numDeregistration = (int) $objEvent->getCancellationCount();
+
+            $objEscortManager = new \Cx\Modules\Calendar\Controller\CalendarRegistrationManager($objEvent, true, false);
    
             $startDate = $objEvent->startDate;
             $endDate   = $objEvent->endDate;
+
+            if ($objEvent->numSubscriber) {
+                $freeSeats = \FWValidator::isEmpty($objEvent->getFreePlaces()) ? '0 ('.$_ARRAYLANG['TXT_CALENDAR_SAVE_IN_WAITLIST'].')' : $objEvent->getFreePlaces();
+            } else {
+                $freeSeats = $_ARRAYLANG['TXT_CALENDAR_YES'];
+            }
+            if (!$objEvent->registration) {
+                $freeSeats = $_ARRAYLANG['TXT_CALENDAR_NOT_SPECIFIED'];
+            }
 
             $objTpl->setVariable(array(
                 $this->moduleLangVar.'_EVENT_ID'                => $objEvent->id,
@@ -679,7 +688,7 @@ class CalendarEventManager extends CalendarLibrary
                 $this->moduleLangVar.'_EVENT_EXPORT_LINK'       => $hostUri.'index.php?section='.$this->moduleName.'&amp;export='.$objEvent->id,
                 $this->moduleLangVar.'_EVENT_EXPORT_ICON'       => '<a href="'.$hostUri.'index.php?section='.$this->moduleName.'&amp;export='.$objEvent->id.'"><img src="modules/Calendar/View/Media/ical_export.gif" border="0" title="'.$_ARRAYLANG['TXT_CALENDAR_EXPORT_ICAL_EVENT'].'" alt="'.$_ARRAYLANG['TXT_CALENDAR_EXPORT_ICAL_EVENT'].'" /></a>',
                 $this->moduleLangVar.'_EVENT_PRICE'             => $this->arrSettings['paymentCurrency'].' '.$objEvent->price,
-                $this->moduleLangVar.'_EVENT_FREE_PLACES'       => $objEvent->freePlaces == 0 ? $objEvent->freePlaces.' ('.$_ARRAYLANG['TXT_CALENDAR_SAVE_IN_WAITLIST'].')' : $objEvent->freePlaces,
+                $this->moduleLangVar.'_EVENT_FREE_PLACES'       => $freeSeats,
                 $this->moduleLangVar.'_EVENT_ACCESS'            => $_ARRAYLANG['TXT_CALENDAR_EVENT_ACCESS_'.$objEvent->access],
                 $this->moduleLangVar.'_EVENT_COUNT_REG'         => $numRegistrations,
                 $this->moduleLangVar.'_EVENT_COUNT_SIGNOFF'     => $numDeregistration,
@@ -736,7 +745,7 @@ class CalendarEventManager extends CalendarLibrary
                 }
             }
             
-            if (($this->arrSettings['placeData'] == 1) && $objEvent->place == '' && $objEvent->place_street == '' && $objEvent->place_zip == '' && $objEvent->place_city == '' && $objEvent->place_country == '') {
+            if (($this->arrSettings['placeData'] == 1) && $objEvent->place == '' && $objEvent->place_street == '' && $objEvent->place_zip == '' && $objEvent->place_city == '' && $objEvent->place_country == '' && $objEvent->place_website == '' && $objEvent->place_phone == '') {
                 $objTpl->hideBlock('calendarEventAddress');  
             } else {
                 /* if($objEvent->map == 1) { 
@@ -774,6 +783,8 @@ class CalendarEventManager extends CalendarLibrary
                 
                 $map_thumb_name = file_exists(\Env::get('cx')->getWebsitePath().$objEvent->place_map.".thumb") ? $objEvent->place_map.".thumb" : $objEvent->place_map;
 
+                $placeWebsite      = $objEvent->place_website != '' ? "<a href='".$objEvent->place_website."' target='_blank' >".$objEvent->place_website."</a>" : "";
+                $placeWebsiteSource= $objEvent->place_website;
                 
                 $placeLink         = $objEvent->place_link != '' ? "<a href='".$objEvent->place_link."' target='_blank' >".$objEvent->place_link."</a>" : "";
                 $placeLinkSource   = $objEvent->place_link;
@@ -784,20 +795,59 @@ class CalendarEventManager extends CalendarLibrary
                 
                 $objTpl->setVariable(array(                                                          
                     $this->moduleLangVar.'_EVENT_PLACE'           => $objEvent->place,
+                    $this->moduleLangVar.'_EVENT_LOCATION_PLACE'            => $objEvent->place,
                     $this->moduleLangVar.'_EVENT_LOCATION_ADDRESS'=> $objEvent->place_street,
                     $this->moduleLangVar.'_EVENT_LOCATION_ZIP'    => $objEvent->place_zip,
                     $this->moduleLangVar.'_EVENT_LOCATION_CITY'   => $objEvent->place_city,
                     $this->moduleLangVar.'_EVENT_LOCATION_COUNTRY'=> $objEvent->place_country,                                                  
+                    $this->moduleLangVar.'_EVENT_LOCATION_WEBSITE'          => $placeWebsite,
+                    $this->moduleLangVar.'_EVENT_LOCATION_WEBSITE_SOURCE'   => $placeWebsiteSource,
                     $this->moduleLangVar.'_EVENT_LOCATION_LINK'          => $placeLink,
                     $this->moduleLangVar.'_EVENT_LOCATION_LINK_SOURCE'   => $placeLinkSource,
+                    $this->moduleLangVar.'_EVENT_LOCATION_PHONE'            => $objEvent->place_phone,
                     $this->moduleLangVar.'_EVENT_LOCATION_MAP_LINK'        => $hasPlaceMap ? '<a href="'.$objEvent->place_map.'" onClick="window.open(this.href,\'\',\'resizable=no,location=no,menubar=no,scrollbars=no,status=no,toolbar=no,fullscreen=no,dependent=no,width='.$picWidth.',height='.$picHeight.',status\'); return false">'.$_ARRAYLANG['TXT_CALENDAR_MAP'].'</a>' : "",
                     $this->moduleLangVar.'_EVENT_LOCATION_MAP_THUMBNAIL'   => $hasPlaceMap ? '<a href="'.$objEvent->place_map.'" onClick="window.open(this.href,\'\',\'resizable=no,location=no,menubar=no,scrollbars=no,status=no,toolbar=no,fullscreen=no,dependent=no,width='.$picWidth.',height='.$picHeight.',status\'); return false"><img src="'.$map_thumb_name.'" border="0" alt="'.$objEvent->place_map.'" /></a>' : "",
                     $this->moduleLangVar.'_EVENT_LOCATION_MAP_SOURCE'      => $hasPlaceMap ? $objEvent->place_map : '',
                     //$this->moduleLangVar.'_EVENT_MAP'             => $googleMap,
                 ));
                 
+                if ($objTpl->blockExists('calendarEventAddressWebsite')) {
+                    if (empty($placeWebsite)) {
+                        $objTpl->hideBlock('calendarEventAddressWebsite');
+                    } else {
+                        $objTpl->touchBlock('calendarEventAddressWebsite');
+                    }
+                }
+                
+                if ($objTpl->blockExists('calendarEventAddressLink')) {
+                    if (empty($placeLink)) {
+                        $objTpl->hideBlock('calendarEventAddressLink');
+                    } else {
+                        $objTpl->touchBlock('calendarEventAddressLink');
+                    }
+                }
+
+                if ($objTpl->blockExists('calendarEventAddressPhone')) {
+                    if (empty($objEvent->place_phone)) {
+                        $objTpl->hideBlock('calendarEventAddressPhone');
+                    } else {
+                        $objTpl->touchBlock('calendarEventAddressPhone');
+                    }
+                }
+
+                if ($objTpl->blockExists('calendarEventAddressMap')) {
+                    if ($hasPlaceMap) {
+                        $objTpl->touchBlock('calendarEventAddressMap');
+                    } else {
+                        $objTpl->hideBlock('calendarEventAddressMap');
+                    }
+                }
+
                 $objTpl->parse('calendarEventAddress'); 
             }
+
+            $hostWebsite      = $objEvent->org_website != '' ? "<a href='".$objEvent->org_website."' target='_blank' >".$objEvent->org_website."</a>" : "";
+            $hostWebsiteSource= $objEvent->org_website;
             
             $hostLink         = $objEvent->org_link != '' ? "<a href='".$objEvent->org_link."' target='_blank' >".$objEvent->org_link."</a>" : "";
             $hostLinkSource   = $objEvent->org_link;
@@ -805,7 +855,7 @@ class CalendarEventManager extends CalendarLibrary
                 $objEvent->loadPlaceFromMediadir($objEvent->host_mediadir_id, 'host');
                 list($hostLink, $hostLinkSource) = $objEvent->loadPlaceLinkFromMediadir($objEvent->host_mediadir_id, 'host');                    
             }
-            if(($this->arrSettings['placeDataHost'] == 1) && $objEvent->org_name == '' && $objEvent->org_street == '' && $objEvent->org_zip == '' && $objEvent->org_city == '' && $objEvent->org_country == '') {
+            if(($this->arrSettings['placeDataHost'] == 1) && $objEvent->org_name == '' && $objEvent->org_street == '' && $objEvent->org_zip == '' && $objEvent->org_city == '' && $objEvent->org_country == '' && $objEvent->org_website == '' && $objEvent->org_phone == '') {
                 $objTpl->hideBlock('calendarEventHost');  
             } else {
                 $objTpl->setVariable(array(
@@ -814,19 +864,69 @@ class CalendarEventManager extends CalendarLibrary
                     $this->moduleLangVar.'_EVENT_HOST_ZIP'     => $objEvent->org_zip,
                     $this->moduleLangVar.'_EVENT_HOST_CITY'    => $objEvent->org_city,
                     $this->moduleLangVar.'_EVENT_HOST_COUNTRY' => $objEvent->org_country,
+                    $this->moduleLangVar.'_EVENT_HOST_WEBSITE'          => $hostWebsite,
+                    $this->moduleLangVar.'_EVENT_HOST_WEBSITE_SOURCE'   => $hostWebsiteSource,
                     $this->moduleLangVar.'_EVENT_HOST_LINK'    => $hostLink,
                     $this->moduleLangVar.'_EVENT_HOST_LINK_SOURCE'  => $hostLinkSource,
+                    $this->moduleLangVar.'_EVENT_HOST_PHONE'            => $objEvent->org_phone,
                     $this->moduleLangVar.'_EVENT_HOST_EMAIL'        => $objEvent->org_email != '' ? "<a href='mailto:".$objEvent->org_email."' >".$objEvent->org_email."</a>" : "",
                     $this->moduleLangVar.'_EVENT_HOST_EMAIL_SOURCE' => $objEvent->org_email,
                 ));    
                 
+                if ($objTpl->blockExists('calendarEventHostWebsite')) {
+                    if (empty($hostWebsite)) {
+                        $objTpl->hideBlock('calendarEventHostWebsite');
+                    } else {
+                        $objTpl->touchBlock('calendarEventHostWebsite');
+                    }
+                }
+                
+                if ($objTpl->blockExists('calendarEventHostLink')) {
+                    if (empty($hostLink)) {
+                        $objTpl->hideBlock('calendarEventHostLink');
+                    } else {
+                        $objTpl->touchBlock('calendarEventHostLink');
+                    }
+                }
+                
+                if ($objTpl->blockExists('calendarEventHostPhone')) {
+                    if (empty($objEvent->org_phone)) {
+                        $objTpl->hideBlock('calendarEventHostPhone');
+                    } else {
+                        $objTpl->touchBlock('calendarEventHostPhone');
+                    }
+                }
+
+                if ($objTpl->blockExists('calendarEventHostEmail')) {
+                    if (empty($objEvent->org_email)) {
+                        $objTpl->hideBlock('calendarEventHostEmail');
+                    } else {
+                        $objTpl->touchBlock('calendarEventHostEmail');
+                    }
+                }
+
                 $objTpl->parse('calendarEventHost');
             }
-             
-            if(($objEvent->registration == 1) && (time() <= $objEvent->startDate->getTimestamp())) {  
-                
-                if($numRegistrations < $objEvent->numSubscriber || $objEvent->external == 1) {
-                    $regLinkSrc = $hostUri. '/' .CONTREXX_DIRECTORY_INDEX.'?section='.$this->moduleName.'&amp;cmd=register&amp;id='.$objEvent->id.'&amp;date='.$objEvent->startDate->getTimestamp();
+
+            // Only link to registration form if event registration is set up and event lies in the future
+            if (($objEvent->registration == 1) && (time() <= $objEvent->startDate->getTimestamp())) {
+                // Only show registration form if event accepts registrations.
+                // Event accepts registrations, if
+                //     - no attendee limit is set
+                //     - or if there are still free places available
+                if (   empty($objEvent->numSubscriber)
+                    || !\FWValidator::isEmpty($objEvent->getFreePlaces())
+                ) {
+                    if ($hostUri) {
+                        $regLinkSrc = $hostUri. '/' .CONTREXX_DIRECTORY_INDEX.'?section='.$this->moduleName.'&amp;cmd=register&amp;id='.$objEvent->id.'&amp;date='.$objEvent->startDate->getTimestamp();
+                    } else {
+                        $params = array(
+                            'id'    => $objEvent->id,
+                            'date'  => $objEvent->startDate->getTimestamp(),
+                        );
+                        $regLinkSrc = \Cx\Core\Routing\Url::fromModuleAndCmd($this->moduleName, 'register', FRONTEND_LANG_ID, $params)->toString();
+                    }
+
                     $regLink = '<a href="'.$regLinkSrc.'" '.$hostTarget.'>'.$_ARRAYLANG['TXT_CALENDAR_REGISTRATION'].'</a>';
                     $objTpl->setVariable(array(
                         $this->moduleLangVar.'_EVENT_REGISTRATION_LINK'    => $regLink,
@@ -855,7 +955,100 @@ class CalendarEventManager extends CalendarLibrary
             } else {   
                 $objTpl->hideBlock('calendarEventRegistration');
             } 
+            if ($objTpl->placeholderExists('CALENDAR_EVENT_MONTH_BOX')) {
+                $objTpl->setVariable(
+                    'CALENDAR_EVENT_MONTH_BOX',
+                    $this->getDetailMonthBox($objEvent)
+                );
+            }
         }
+    }
+
+    /**
+     * Get Calendar month box for event detail view
+     *
+     * @param \Cx\Modules\Calendar\Controller\CalendarEvent $event
+     */
+    public function getDetailMonthBox(CalendarEvent $event)
+    {
+        global $_ARRAYLANG;
+
+        $monthnames = explode(",", $_ARRAYLANG['TXT_CALENDAR_MONTH_ARRAY']);
+        $daynames   = explode(',', $_ARRAYLANG['TXT_CALENDAR_DAY_ARRAY']);
+
+        $year  = !empty($_GET['yearID']) ? contrexx_input2int($_GET['yearID']) : 0;
+        $month = !empty($_GET['monthID']) ? contrexx_input2int($_GET['monthID']) : 0;
+
+        if (empty($year) && empty($month)) {
+            $startdate = $this->getUserDateTimeFromIntern($event->startDate);
+            $year      = $startdate->format('Y');
+            $month     = $startdate->format('m');
+        }
+
+        $eventList = array($event);
+        // If event series is enabled refresh the eventlist
+        if ($event->seriesStatus == 1) {
+            $endDate = new \DateTime('1-'.$month.'-'.$year);
+            $endDate->modify('+1 month');
+
+            $eventManager = new static(null, $endDate);
+            $objEvent     = new \Cx\Modules\Calendar\Controller\CalendarEvent(intval($event->id));
+            if ($eventManager->_addToEventList($objEvent)) {
+                $eventManager->eventList[] = $objEvent;
+            }
+            $eventManager->_setNextSeriesElement($objEvent);
+            $eventList = $eventManager->eventList;
+        }
+
+        $url = \Cx\Core\Core\Controller\Cx::instanciate()->getRequest()->getUrl();
+        $cal = new \activeCalendar($year, $month);
+        $cal->setMonthNames($monthnames);
+        $cal->setDayNames($daynames);
+        $cal->enableMonthNav($url->toString(false));
+
+        $currentTime = time();
+        $isNotIndependentSerieEventStarted = array();
+        foreach ($eventList as $objEvent) {
+            $eventDate  = $this->getUserDateTimeFromIntern($objEvent->startDate);
+            $eventYear  = $eventDate->format('Y');
+            $eventMonth = $eventDate->format('m');
+            if ($eventYear != $year && $eventMonth != $month) {
+                continue;
+            }
+
+            $eventDay                   = $eventDate->format('d');
+            $isSeriesByNotIndependent   = $objEvent->seriesStatus && !$objEvent->independentSeries;
+            $isEventStarted             = $currentTime >= $objEvent->startDate->getTimestamp();
+
+            // check if non-independent-serie-event did already start
+            if ($isSeriesByNotIndependent) {
+                // the first date of a non-independent-serie-event does determine if
+                // the event did already start
+                if (!isset($isNotIndependentSerieEventStarted[$objEvent->getId()])) {
+                    $isNotIndependentSerieEventStarted[$objEvent->getId()] = $isEventStarted;
+                }
+                // overwrite the started info from the serie data
+                $isEventStarted = $isNotIndependentSerieEventStarted[$objEvent->getId()];
+            }
+
+            $freePlaces                 = !$objEvent->registration || $isEventStarted || empty($objEvent->numSubscriber) || $isSeriesByNotIndependent ? 0 : $objEvent->getFreePlaces();
+            $eventClass                 = ' event_full';
+            $eventurl                   = false;
+            if (   !$isEventStarted
+                && (   !$objEvent->registration
+                    || empty($objEvent->numSubscriber)
+                    || !\FWValidator::isEmpty($objEvent->getFreePlaces())
+                )
+            ) {
+                $eventClass = ' event_open';
+                $eventurl   = $this->_getDetailLink($objEvent);
+            }
+
+            $seatsLeft = empty($freePlaces) ? '&nbsp;' : $freePlaces . ' ' . $_ARRAYLANG['TXT_CALENDAR_EVENT_FREE'];
+            $cal->setEvent($eventYear, $eventMonth, $eventDay, $eventClass, $eventurl);
+            $cal->setEventContent($eventYear, $eventMonth, $eventDay, $seatsLeft, $eventurl, 'free_places');
+        }
+        return $cal->showMonth(false, true);
     }
     
     /**
@@ -938,12 +1131,19 @@ class CalendarEventManager extends CalendarLibrary
                 }
                 $picThumb = file_exists(\Env::get('cx')->getWebsitePath()."{$objEvent->pic}.thumb") ? "{$objEvent->pic}.thumb" : ($objEvent->pic != '' ? $objEvent->pic : '');
                 
+                $placeWebsite      = $objEvent->place_website != '' ? "<a href='".$objEvent->place_website."' target='_blank' >".$objEvent->place_website."</a>" : "";
+                $placeWebsiteSource= $objEvent->place_website;
+
                 $placeLink         = $objEvent->place_link != '' ? "<a href='".$objEvent->place_link."' target='_blank' >".$objEvent->place_link."</a>" : "";
                 $placeLinkSource   = $objEvent->place_link;
                 if ($this->arrSettings['placeData'] > 1 && $objEvent->locationType == 2) {
                     $objEvent->loadPlaceFromMediadir($objEvent->place_mediadir_id, 'place');
                     list($placeLink, $placeLinkSource) = $objEvent->loadPlaceLinkFromMediadir($objEvent->place_mediadir_id, 'place');                    
                 }
+
+                $hostWebsite      = $objEvent->org_website != '' ? "<a href='".$objEvent->org_website."' target='_blank' >".$objEvent->org_website."</a>" : "";
+                $hostWebsiteSource= $objEvent->org_website;
+
                 $hostLink         = $objEvent->org_link != '' ? "<a href='".$objEvent->org_link."' target='_blank' >".$objEvent->org_link."</a>" : "";
                 $hostLinkSource   = $objEvent->org_link;
                 if ($this->arrSettings['placeDataHost'] > 1 && $objEvent->hostType == 2) {
@@ -953,6 +1153,15 @@ class CalendarEventManager extends CalendarLibrary
 
                 $startDate = $objEvent->startDate;
                 $endDate   = $objEvent->endDate;
+
+                if ($objEvent->numSubscriber) {
+                    $freeSeats = \FWValidator::isEmpty($objEvent->getFreePlaces()) ? '0 ('.$_ARRAYLANG['TXT_CALENDAR_SAVE_IN_WAITLIST'].')' : $objEvent->getFreePlaces();
+                } else {
+                    $freeSeats = $_ARRAYLANG['TXT_CALENDAR_YES'];
+                }
+                if (!$objEvent->registration) {
+                    $freeSeats = $_ARRAYLANG['TXT_CALENDAR_NOT_SPECIFIED'];
+                }
                 
                 $objTpl->setVariable(array(
                     $this->moduleLangVar.'_EVENT_ROW'            => $i%2==0 ? 'row1' : 'row2',
@@ -985,7 +1194,7 @@ class CalendarEventManager extends CalendarLibrary
                     $this->moduleLangVar.'_EVENT_EDIT_LINK'      => $editLink,                    
                     $this->moduleLangVar.'_EVENT_COPY_LINK'      => $copyLink,                    
                     $this->moduleLangVar.'_EVENT_SERIES'         => $objEvent->seriesStatus == 1 ? '<img src="'.ASCMS_MODULE_WEB_PATH.'/'.$this->moduleName.'/View/Media/Repeat.png" border="0"/>' : '<i>'.$_ARRAYLANG['TXT_CALENDAR_NO_SERIES'].'</i>',
-                    $this->moduleLangVar.'_EVENT_FREE_PLACES'    => $objEvent->freePlaces,
+                    $this->moduleLangVar.'_EVENT_FREE_PLACES'    => $freeSeats,
                     $this->moduleLangVar.'_EVENT_ACCESS'         => $_ARRAYLANG['TXT_CALENDAR_EVENT_ACCESS_'.$objEvent->access],
                 ));
           
@@ -1027,8 +1236,11 @@ class CalendarEventManager extends CalendarLibrary
                     $this->moduleLangVar.'_EVENT_LOCATION_ZIP'           => $objEvent->place_zip,
                     $this->moduleLangVar.'_EVENT_LOCATION_CITY'          => $objEvent->place_city,
                     $this->moduleLangVar.'_EVENT_LOCATION_COUNTRY'       => $objEvent->place_country,                                                  
+                    $this->moduleLangVar.'_EVENT_LOCATION_WEBSITE'       => $placeWebsite,
+                    $this->moduleLangVar.'_EVENT_LOCATION_WEBSITE_SOURCE'=> $placeWebsiteSource,
                     $this->moduleLangVar.'_EVENT_LOCATION_LINK'          => $placeLink,
                     $this->moduleLangVar.'_EVENT_LOCATION_LINK_SOURCE'   => $placeLinkSource,
+                    $this->moduleLangVar.'_EVENT_LOCATION_PHONE'         => $objEvent->place_phone,
                     $this->moduleLangVar.'_EVENT_LOCATION_MAP_LINK'      => $hasPlaceMap ? '<a href="'.$objEvent->place_map.'" onClick="window.open(this.href,\'\',\'resizable=no,location=no,menubar=no,scrollbars=no,status=no,toolbar=no,fullscreen=no,dependent=no,width='.$picWidth.',height='.$picHeight.',status\'); return false">'.$_ARRAYLANG['TXT_CALENDAR_MAP'].'</a>' : "",
                     $this->moduleLangVar.'_EVENT_LOCATION_MAP_THUMBNAIL' => $hasPlaceMap ? '<a href="'.$objEvent->place_map.'" onClick="window.open(this.href,\'\',\'resizable=no,location=no,menubar=no,scrollbars=no,status=no,toolbar=no,fullscreen=no,dependent=no,width='.$picWidth.',height='.$picHeight.',status\'); return false"><img src="'.$map_thumb_name.'" border="0" alt="'.$objEvent->place_map.'" /></a>' : "",
                     $this->moduleLangVar.'_EVENT_LOCATION_MAP_SOURCE'    => $hasPlaceMap ? $objEvent->place_map : '',
@@ -1038,17 +1250,84 @@ class CalendarEventManager extends CalendarLibrary
                     $this->moduleLangVar.'_EVENT_HOST_ZIP'          => $objEvent->org_zip,
                     $this->moduleLangVar.'_EVENT_HOST_CITY'         => $objEvent->org_city,
                     $this->moduleLangVar.'_EVENT_HOST_COUNTRY'      => $objEvent->org_country,
+                    $this->moduleLangVar.'_EVENT_HOST_WEBSITE'      => $hostWebsite,
+                    $this->moduleLangVar.'_EVENT_HOST_WEBSITE_SOURCE'=> $hostWebsiteSource,
                     $this->moduleLangVar.'_EVENT_HOST_LINK'         => $hostLink,
                     $this->moduleLangVar.'_EVENT_HOST_LINK_SOURCE'  => $hostLinkSource,
+                    $this->moduleLangVar.'_EVENT_HOST_PHONE'        => $objEvent->org_phone,
                     $this->moduleLangVar.'_EVENT_HOST_EMAIL'        => $objEvent->org_email != '' ? "<a href='mailto:".$objEvent->org_email."' >".$objEvent->org_email."</a>" : "",
                     $this->moduleLangVar.'_EVENT_HOST_EMAIL_SOURCE' => $objEvent->org_email,
                 ));
                 
+                if ($objTpl->blockExists('event_location_website')) {
+                    if (empty($placeWebsite)) {
+                        $objTpl->hideBlock('event_location_website');
+                    } else {
+                        $objTpl->touchBlock('event_location_website');
+                    }
+                }
+                
+                if ($objTpl->blockExists('event_location_link')) {
+                    if (empty($placeLink)) {
+                        $objTpl->hideBlock('event_location_link');
+                    } else {
+                        $objTpl->touchBlock('event_location_link');
+                    }
+                }
+                
+                if ($objTpl->blockExists('event_location_phone')) {
+                    if (empty($objEvent->place_phone)) {
+                        $objTpl->hideBlock('event_location_phone');
+                    } else {
+                        $objTpl->touchBlock('event_location_phone');
+                    }
+                }
+                
+                if ($objTpl->blockExists('event_location_map')) {
+                    if ($hasPlaceMap) {
+                        $objTpl->touchBlock('event_location_map');
+                    } else {
+                        $objTpl->hideBlock('event_location_map');
+                    }
+                }
+
+                if ($objTpl->blockExists('event_host_website')) {
+                    if (empty($hostWebsite)) {
+                        $objTpl->hideBlock('event_host_website');
+                    } else {
+                        $objTpl->touchBlock('event_host_website');
+                    }
+                }
+                
+                if ($objTpl->blockExists('event_host_link')) {
+                    if (empty($hostLink)) {
+                        $objTpl->hideBlock('event_host_link');
+                    } else {
+                        $objTpl->touchBlock('event_host_link');
+                    }
+                }
+                
+                if ($objTpl->blockExists('event_host_phone')) {
+                    if (empty($objEvent->org_phone)) {
+                        $objTpl->hideBlock('event_host_phone');
+                    } else {
+                        $objTpl->touchBlock('event_host_phone');
+                    }
+                }
+
+                if ($objTpl->blockExists('event_host_email')) {
+                    if (empty($objEvent->org_email)) {
+                        $objTpl->hideBlock('event_host_email');
+                    } else {
+                        $objTpl->touchBlock('event_host_email');
+                    }
+                }
+
                 if($objInit->mode == 'backend') {
                     $objTpl->setVariable(array(
-                        $this->moduleLangVar.'_EVENT_COUNT_REG'      => $objEvent->registrationCount,
-                        $this->moduleLangVar.'_EVENT_COUNT_DEREG'    => $objEvent->cancellationCount,
-                        $this->moduleLangVar.'_EVENT_COUNT_WAITLIST' => $objEvent->waitlistCount,                                                
+                        $this->moduleLangVar.'_EVENT_COUNT_REG'      => $objEvent->getRegistrationCount(),
+                        $this->moduleLangVar.'_EVENT_COUNT_DEREG'    => $objEvent->getCancellationCount(),
+                        $this->moduleLangVar.'_EVENT_COUNT_WAITLIST' => $objEvent->getWaitlistCount(),
                     ));    
                 }
                 

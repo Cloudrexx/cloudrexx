@@ -815,9 +815,21 @@
                 </td>
             </tr>
             <tr class="row1 event_place_manual">
+                <td valign="top">{TXT_CALENDAR_EVENT_WEBSITE}</td>
+                <td>
+                    <input name="placeWebsite" type="text" maxlength="255" value="{CALENDAR_EVENT_PLACE_WEBSITE}" style="width: 250px" />
+                </td>
+            </tr>
+            <tr class="row2 event_place_manual">
                 <td valign="top">{TXT_CALENDAR_EVENT_LINK}</td>
                 <td>
                     <input name="placeLink" type="text" maxlength="255" value="{CALENDAR_EVENT_PLACE_LINK}" style="width: 250px" />
+                </td>
+            </tr>
+            <tr class="row1 event_place_manual">
+                <td valign="top">{TXT_CALENDAR_EVENT_PHONE}</td>
+                <td>
+                    <input name="placePhone" type="text" maxlength="20" value="{CALENDAR_EVENT_PLACE_PHONE}" style="width: 250px" />
                 </td>
             </tr>
             <tr class="row2 event_place_manual">
@@ -882,9 +894,21 @@
                 </td>
             </tr>
             <tr class="row1 event_host_manual">
+                <td valign="top">{TXT_CALENDAR_EVENT_WEBSITE}</td>
+                <td>
+                    <input name="organizerWebsite" type="text" maxlength="255" value="{CALENDAR_EVENT_HOST_WEBSITE}" style="width: 250px" />
+                </td>
+            </tr>
+            <tr class="row2 event_host_manual">
                 <td valign="top">{TXT_CALENDAR_EVENT_LINK}</td>
                 <td>
                     <input name="organizerLink" type="text" maxlength="255" value="{CALENDAR_EVENT_HOST_LINK}" style="width: 250px" />
+                </td>
+            </tr>
+            <tr class="row1 event_host_manual">
+                <td valign="top">{TXT_CALENDAR_EVENT_PHONE}</td>
+                <td>
+                    <input name="organizerPhone" type="text" maxlength="20" value="{CALENDAR_EVENT_HOST_PHONE}" style="width: 250px" />
                 </td>
             </tr>
             <tr class="row2 event_host_manual">
@@ -1172,6 +1196,12 @@
                     <input type="text" name='seriesDouranceEvents' id="seriesDouranceEvents" maxlength="3" value="{CALENDAR_SERIES_PATTERN_ENDS_EVENTS}" style="width: 20px;" onkeypress="return modifyEvent._isNumber(event);" />&nbsp;{TXT_CALENDAR_SERIES_PATTERN_APPONTMENTS}<br />
                     <label style="width: 100px;float:left;"><input type="radio" name='seriesDouranceType' value="3" {CALENDAR_SERIES_PATTERN_DOURANCE_3}/>&nbsp;{TXT_CALENDAR_SERIES_PATTERN_ENDS}&nbsp;</label>
                     <input type="text" name="seriesDouranceDate"  id="{CALENDAR_SERIES_PATTERN_ENDS_INPUT_ID}" class="event_date" style="width: 140px;" value="{CALENDAR_SERIES_PATTERN_ENDS_DATE}" />      
+                </td>
+            </tr>
+            <tr class="row2">
+                <td valign="top" width="180">{TXT_CALENDAR_EVENT_TREAT_AS_INDEPENDENT}</td>
+                <td>
+                    <label><input type="checkbox" name='seriesIndependent' value="1" {CALENDAR_EVENT_SERIES_INDEPENDENT}/></label>
                 </td>
             </tr>
         </table>          

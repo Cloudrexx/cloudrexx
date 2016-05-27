@@ -79,25 +79,20 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     }
     
     /**
-     * Do GeoIp processing after content is loaded from DB
-     * 
-     * @param \Cx\Core\ContentManager\Model\Entity\Page $page the resolved page
+     * Hook - After resolving the page
+     *
+     * @param \Cx\Core\ContentManager\Model\Entity\Page $page  The resolved page
      */
-    public function postContentLoad(\Cx\Core\ContentManager\Model\Entity\Page $page)
+    public function postResolve(\Cx\Core\ContentManager\Model\Entity\Page $page)
     {
-        global $objCounter;
-        
-        //If the mode is not a frontend, skip the process
-        if ($this->cx->getMode() !== \Cx\Core\Core\Controller\Cx::MODE_FRONTEND) {
+        //skip the process incase mode is not frontend or GeoIp is deactivated
+        if (!$this->isGeoIpEnabled()) {
             return;
         }
 
-        //Get the GeoIp config option 'serviceStatus'
-        \Cx\Core\Setting\Controller\Setting::init('GeoIp', 'config', 'Yaml');
-        $serviceStatus = \Cx\Core\Setting\Controller\Setting::getValue('serviceStatus', 'GeoIp');
-
-        //If GeoIp processing is deactivated, skip the process
-        if (empty($serviceStatus)) {
+        // Get stats controller to get client ip
+        $statsComponentContoller = $this->getComponent('Stats');
+        if (!$statsComponentContoller) {
             return;
         }
 
@@ -107,13 +102,31 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         $locale       = in_array($activeLocale, $this->availableLocale) ? $activeLocale : $this->defaultLocale;
         try {
             $reader = new \GeoIp2\Database\Reader($countryDb, array($locale));
-            $this->clientRecord = $reader->country($objCounter->getClientIp());
-            $countryName = $this->clientRecord->country->name;
-            $countryCode = $this->clientRecord->country->isoCode;
+            $this->clientRecord = $reader->country($statsComponentContoller->getCounterInstance()->getClientIp());
         } catch (\Exception $e) {
             \DBG::log($e->getMessage());
             return;
         }
+
+    }
+
+    /**
+     * Do GeoIp processing after content is loaded from DB
+     *
+     * @param \Cx\Core\ContentManager\Model\Entity\Page $page the resolved page
+     */
+    public function postContentLoad(\Cx\Core\ContentManager\Model\Entity\Page $page)
+    {
+
+        //skip the process incase mode is not frontend or GeoIp is deactivated or client record not found
+        if (   !$this->isGeoIpEnabled()
+            || !$this->clientRecord
+        ) {
+            return;
+        }
+
+        $countryName = $this->clientRecord->country->name;
+        $countryCode = $this->clientRecord->country->isoCode;
 
         //Parse the country name and code
         $objTemplate = $this->cx->getTemplate();
@@ -128,6 +141,35 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             'countryName'   => $countryName,
             'countryCode'   => $countryCode
         ), 'geoIp');
+    }
+
+    /**
+     * Check and return status of GeoIp for Frontend
+     *
+     * @return boolean True|False
+     */
+    public function isGeoIpEnabled()
+    {
+        if (   $this->cx->getMode() == \Cx\Core\Core\Controller\Cx::MODE_FRONTEND
+            && $this->getGeoIpServiceStatus()
+        ) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Get the GeoIp status
+     *
+     * @return integer GeoIp setting
+     */
+    public function getGeoIpServiceStatus()
+    {
+        //Get the GeoIp config option 'serviceStatus'
+        \Cx\Core\Setting\Controller\Setting::init('GeoIp', 'config', 'Yaml');
+        $serviceStatus = \Cx\Core\Setting\Controller\Setting::getValue('serviceStatus', 'GeoIp');
+
+        return $serviceStatus;
     }
 
     /**

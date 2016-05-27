@@ -87,14 +87,16 @@ class AliasManager extends \Cx\Core_Modules\Alias\Controller\AliasLib
         \Cx\Core\Csrf\Controller\Csrf::add_placeholder($this->_objTpl);
         $this->_objTpl->setErrorHandling(PEAR_ERROR_DIE);        
     }
-    private function setNavigation()
+    
+    protected function setNavigation()
     {
         global $objTemplate, $_ARRAYLANG;
-
-        $objTemplate->setVariable("CONTENT_NAVIGATION",
-            ("<a href='index.php?cmd=Alias' class='".($this->act == '' || $this->act == 'delete' ? 'active' : '')."'>".$_ARRAYLANG['TXT_ALIAS_ALIASES']."</a>"
-            ."<a href='index.php?cmd=Alias&amp;act=modify' class='".($this->act == 'modify' ? 'active' : '')."'>".$_ARRAYLANG['TXT_ALIAS_ADD_ALIAS']."</a>")
-        );
+        
+        $navigation = '<a href="index.php?cmd=Alias" class="' . ($this->act == '' || $this->act == 'delete' ? 'active' : '') . '">' . $_ARRAYLANG['TXT_ALIAS_ALIASES'] . '</a>';
+        if (\Permission::checkAccess(78, 'static', true)) {
+            $navigation .= '<a href="index.php?cmd=Alias&amp;act=modify" class="' . ($this->act == 'modify' ? 'active' : '') . '">' . $_ARRAYLANG['TXT_ALIAS_ADD_ALIAS'] . '</a>';
+        }
+        $objTemplate->setVariable('CONTENT_NAVIGATION', $navigation);
     }
 
     /**
@@ -114,10 +116,12 @@ class AliasManager extends \Cx\Core_Modules\Alias\Controller\AliasLib
 
         switch ($_REQUEST['act']) {
             case 'modify':
+                \Permission::checkAccess(78, 'static');
                 $this->_modifyAlias($_POST);
                 break;
 
             case 'delete':
+                \Permission::checkAccess(78, 'static');
                 $this->_delete();
 
             default:
@@ -233,6 +237,12 @@ class AliasManager extends \Cx\Core_Modules\Alias\Controller\AliasLib
                     }
                     $this->_objTpl->hideBlock('alias_source_not_set');
                     $this->_objTpl->parse('alias_source_list');
+                    
+                if (\Permission::checkAccess(78, 'static', true)) {
+                    $this->_objTpl->touchBlock('alias_functions');
+                } else {
+                    $this->_objTpl->hideBlock('alias_functions');
+                }
                     
                 $this->_objTpl->setVariable(array(
                     // if target is local (target != targetURL) and target is empty: class is rowWarn

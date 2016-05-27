@@ -301,14 +301,30 @@ class CalendarRegistration extends CalendarLibrary
         $userId = intval($data['userid']);
         
         $objEvent = new \Cx\Modules\Calendar\Controller\CalendarEvent($eventId);
-        $query = 'SELECT `id`
-                    FROM `'.DBPREFIX.'module_'.$this->moduleTablePrefix.'_registration_form_field`
-                   WHERE `type` = "seating"
-                   LIMIT 1';
+
+        if (   $objInit->mode == \Cx\Core\Core\Controller\Cx::MODE_BACKEND
+            && $objEvent->seriesStatus
+            && $objEvent->independentSeries
+        ) {
+            $eventDate = isset($data['registrationEventDate']) ? contrexx_input2int($data['registrationEventDate']) : $eventDate;
+        }
+
+        $query = '
+            SELECT
+                `id`
+            FROM
+                `'.DBPREFIX.'module_'.$this->moduleTablePrefix.'_registration_form_field`
+            WHERE
+                `form` = '. $formId .'
+            AND
+                `type` = "seating"
+            LIMIT 1
+        ';
         $objResult = $objDatabase->Execute($query);
         
         $numSeating = intval($data['registrationField'][$objResult->fields['id']]);
-        $type = intval($objEvent->freePlaces - $numSeating) < 0 ? 2 : (isset($data['registrationType']) ? intval($data['registrationType']) : 1);
+        $type       =   empty($regId) && intval($objEvent->getFreePlaces() - $numSeating) < 0
+                      ? 2 : (isset($data['registrationType']) ? intval($data['registrationType']) : 1);
         $this->saveIn = intval($type);
         $paymentMethod = intval($data['paymentMethod']);
         $paid = intval($data['paid']);

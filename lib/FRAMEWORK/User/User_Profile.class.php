@@ -421,9 +421,9 @@ class User_Profile
 
 
             } elseif ($attribute == 'birthday_day') {
-                $arrConditions[] = "(FROM_UNIXTIME(tblP.`birthday`, '%e') = '".intval($condition)."')";
+                $arrConditions[] = "(DATE_FORMAT(DATE_ADD(FROM_UNIXTIME(0), interval `tblP`.`birthday` second), '%e') = '".intval($condition)."')";
             } elseif ($attribute == 'birthday_month') {
-                $arrConditions[] = "(FROM_UNIXTIME(tblP.`birthday`, '%c') = '".intval($condition)."')";
+                $arrConditions[] = "(DATE_FORMAT(DATE_ADD(FROM_UNIXTIME(0), interval `tblP`.`birthday` second), '%c') = '".intval($condition)."')";
             }
         }
 

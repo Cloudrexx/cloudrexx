@@ -183,6 +183,23 @@ namespace Cx\Core\Model {
                 )
             );
             $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT);
+
+            // disable ONLY_FULL_GROUP_BY, STRICT_TRANS_TABLES mode
+            // this is a temporary fix to ensure MySQL 5.7 compatability
+            $statement = $this->pdo->query('SELECT @@SESSION.sql_mode');
+            $modes = $statement->fetch(\PDO::FETCH_NUM);
+            $sqlModes = explode(',', $modes[0]);
+            $sqlModes = array_filter(
+                $sqlModes,
+                function($e) {
+                    if (in_array(trim($e), array('ONLY_FULL_GROUP_BY', 'STRICT_TRANS_TABLES'))) {
+                        return false;
+                    }
+                    return true;
+                }
+            );
+            $this->pdo->exec('SET SESSION sql_mode = \'' . implode(',', $sqlModes) . '\'');
+
             \Env::set('pdo', $this->pdo);
             return $this->pdo;
         }

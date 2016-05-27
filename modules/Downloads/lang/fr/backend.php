@@ -260,7 +260,6 @@ $_ARRAYLANG['TXT_DOWNLOADS_UPDATED_FILE_TIME_LIMIT'] = "Durée pendant laquelle 
 $_ARRAYLANG['TXT_DOWNLOADS_UPDATED_FILE_TIME_LIMIT_DESC'] = "Définit la durée en secondes pendant laquelle une ressource est considérée comme \"Récemment modifiée\".";
 $_ARRAYLANG['TXT_DOWNLOADS_SECONDS_COMB_EXAMPLES'] = "Exemples: 1 jour = 86400 secondes / 1 semaine = 604800 secondes";
 $_ARRAYLANG['TXT_DOWNLOADS_BLOCKS'] = "Briques";
-$_ARRAYLANG['TXT_DOWNLOADS_MISCELLANEOUS'] = "Divers";
 $_ARRAYLANG['TXT_DOWNLOADS_START'] = "Début";
 $_ARRAYLANG['TXT_DOWNLOADS_MORE'] = "plus";
 $_ARRAYLANG['TXT_DOWNLOADS_KBYTE'] = "Ko";
@@ -309,4 +308,5 @@ $_ARRAYLANG['TXT_DOWNLOADS_INTERFACES'] = "Interfaces";
 $_ARRAYLANG['TXT_DOWNLOADS_USER_ADMIN'] = "User Admin";
 $_ARRAYLANG['TXT_DOWNLOADS_AUTOMATIC_CATEGORY_CREATION'] = "Automatic Category Creation";
 $_ARRAYLANG['TXT_DOWNLOADS_AUTOMATIC_CATEGORY_CREATION_DESC'] = "Set the user groups to which a newly created user should be assigned to, if the option to automatically create a category within the Digital Asset Management module has been selected.";
-?>
+$_ARRAYLANG['TXT_DOWNLOADS_SETTINGS_LISTING'] = "Listing";
+$_ARRAYLANG['TXT_DOWNLOADS_SETTINGS_STATISTICS'] = "Statistiques";

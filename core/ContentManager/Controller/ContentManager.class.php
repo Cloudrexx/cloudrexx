@@ -145,14 +145,20 @@ class ContentManager extends \Module
         $this->template->addBlockfile('CONTENT_MANAGER_MEAT', 'content_manager_meat', 'Page.html');
         $this->template->touchBlock('content_manager_meat');
 
-        if (\Permission::checkAccess(78, 'static', true) &&
+        if (\Permission::checkAccess(78, 'static', true)) {
+            \JS::registerCode("var publishAllowed = true;");
+        } else {
+            \JS::registerCode("var publishAllowed = false;");
+        }
+        if (
+            \Permission::checkAccess(78, 'static', true) &&
             \Permission::checkAccess(115, 'static', true)
         ) {
-            \JS::registerCode("var publishAllowed = true;");
+            \JS::registerCode("var aliasManagementAllowed = true;");
             $alias_permission = "block";
             $alias_denial     = "none !important";
         } else {
-            \JS::registerCode("var publishAllowed = false;");
+            \JS::registerCode("var aliasManagementAllowed = false;");
             $alias_permission = "none !important";
             $alias_denial     = "block";
         }

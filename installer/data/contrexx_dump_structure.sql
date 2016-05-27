@@ -586,6 +586,7 @@ CREATE TABLE `contrexx_module_calendar_event` (
   `ticket_sales` tinyint(1) NOT NULL DEFAULT '0',
   `num_seating` text NOT NULL,
   `series_status` tinyint(4) NOT NULL DEFAULT '0',
+  `independent_series` tinyint(2) NOT NULL DEFAULT '1',
   `series_type` int(11) NOT NULL DEFAULT '0',
   `series_pattern_count` int(11) NOT NULL DEFAULT '0',
   `series_pattern_weekday` varchar(7) NOT NULL,
@@ -633,7 +634,7 @@ CREATE TABLE `contrexx_module_calendar_event_field` (
   `redirect` varchar(255) NOT NULL,
   KEY `lang_field` (`title`),
   KEY `fk_contrexx_module_calendar_note_field_contrexx_module_calend1` (`event_id`),
-  FULLTEXT KEY `eventIndex` (`title`,`description`)
+  FULLTEXT KEY `eventIndex` (`title`,`teaser`,`description`)
 ) ENGINE=MyISAM;
 CREATE TABLE `contrexx_module_calendar_host` (
   `id` int(1) NOT NULL AUTO_INCREMENT,

@@ -7,70 +7,94 @@ form > fieldset > div {
     width: 100%;
     padding: 0 0 10px 0;
 }
-
 /* Start old contact form structure */
 form p {
-    padding-left: 29%;
+    width: 100%;
+    margin-bottom: 0;
 }
-
 form p label {
-    margin: 0 0 0 -40%;
+    float: left;
+    font-weight: normal;
 }
-
+.fields p input[type="text"], .fields p textarea, .fields p input[type="file"] {
+    width: 100% !important;
+}
+#memberForm input, #memberForm select {
+    margin-bottom: 10px;
+}
+#memberForm select {
+    margin-bottom: 10px;
+    float: left;
+    margin-right: 10px;
+}
+#memberdir .search_form form#memberForm, #memberdir .breadcrumb, .egov-desc {
+    float: left;
+    width: 100%;
+}
+.char_list {word-wrap: break-word;}
+.label {
+    display: inline;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: .25em;
+    text-align: left;
+}
 form p label.description {
     margin: 0;
+    margin-left: 5px;
 }
 /* END old contact form structure */
-
 form .is_required {
     padding: 0 0 0 5px;
     color: #FF0000;
 }
-
+#female {
+    clear: both;
+}
 form .contactFormGroup {
     float: left;
-    width: 326px;
+    width: 100%;
+    margin-bottom: -3px;
 }
-
 form .contactFormGroup input[type=checkbox] {
     clear: left;
 }
-
 form #uploadFormField_uploadWidget {
-    padding: 0 0 0 40%;
+    padding: 0;
 }
-
+form #uploadFormField_uploadWidget ul {
+    padding-left: 0;
+    margin-left: 0;
+}
 form .contactFormUpload,
 form .formUploadedFiles,
 form .contactFormUpload div,
 form .formUploadedFiles div {
     float: left;
-    width: 326px;
+    width: 100%;
 }
-
 form .contactFormUpload ul,
 form .formUploadedFiles ul {
     float: left;
-    width: 326px;
+    width: 100%;
     padding: 0 0 5px 0;
 }
-
 form .contactFormUpload li,
 form .formUploadedFiles li {
     float: left;
-    width: 306px;
+    width: 100%;
     padding: 0 0 5px 20px;
     margin: 0 0 5px 0;
     border-bottom: 1px solid #DDDDDD;
 }
-
 form .contactFormUpload span,
 form .formUploadedFiles span {
     float: left;
     width: 280px;
     padding: 0 10px 0 0;
 }
-
 form .contactFormUpload .deleteIcon,
 form .formUploadedFiles .deleteIcon {
     float: left;
@@ -81,103 +105,119 @@ form .formUploadedFiles .deleteIcon {
     text-indent: 16px;
     background: url('../../cadmin/images/icons/delete.gif') no-repeat;
 }
-
+fieldset select {
+    color: #7d7d7d;
+}
 form label {
     float: left;
-    width: 40%;
+    width: 100%;
+    margin-bottom: 5px;
 }
-
+label[for="access_user_tos"] {
+    width: 95.5%;
+    float: right;
+    margin: 0;
+    cursor: pointer;
+}
+#access_user_tos {
+    float: left;
+    margin: 0;
+    margin-top: 3px;
+    padding: 0;
+    height: auto;
+}
 form input[type="submit"] {
     margin-right: 10px;
     float: left;
 }
-
+#calendarform input[type="submit"] {
+    width: auto !important;
+}
 form fieldset .ui-tabs,
 form fieldset .ui-tabs .ui-tabs-nav{
     border: 0px none;
 }
-
 form fieldset .ui-tabs .ui-tabs-nav{
     background: none;
     padding: 0 !important;
     width: 100%;
 }
-
 form fieldset .ui-tabs .ui-tabs-panel{
     border: 1px solid #ddd;
     padding: 10px 10px 10px 10px !important;
 }
-
 form fieldset .ui-tabs .ui-tabs-nav li{
     padding: 0 !important;
     margin: 0 5px 0 0 !important;
     border-radius: 2px 2px 0 0;
     border-bottom: 0px none;
 }
-
 form fieldset .ui-tabs .ui-tabs-nav li.ui-state-active{
     border-left: 0px none !important;
     border-top: 0px none !important;
     border-right: 0px none !important;
     border-bottom: 1px solid #0A85C8 !important;
 }
-
 form fieldset .ui-tabs .ui-tabs-nav li.ui-state-disabled{
     display: none;
 }
-
 form fieldset .ui-tabs .ui-tabs-nav li a{
     border-radius: 2px 2px 0 0;
     color: #0A85C8;
 }
-
 form fieldset .ui-tabs .ui-tabs-nav li.ui-state-active a{
     color: #fff;
     background: #0A85C8;
 }
-
 form fieldset .ui-tabs label{
     width: 240px;
 }
-
 form fieldset .ui-tabs .row{
     padding: 10px 0 0 0;
 }
-
 form fieldset .ui-tabs .row:first-child{
     padding: 0px;
 }
-
 form fieldset .ui-tabs .row .cke{
     margin: 10px 0 0 0;
 }
-
-#login form input.remember_me,
-#login form label.remember_me {
-    margin-left: 0;
-    border: 0 none;
-    padding-left: 0;
-}
-#login form .checkbox lavble {
-    width: 60%;
-}
 #login form input.remember_me {
-    margin-top: 4px;
-    height: 5px;
-    width: 5px;
-    position: static;
     margin-left: 0;
     padding: 0 0 21px 0;
     border: 0 none;
+}
+#login form label.remember_me {
+    margin-left: 0;
+    padding: 0;
+    border: 0 none;
+    display: block;
 }
 span.checkbox {
     margin-top: 7px;
     float: left;
 }
-#login p label.remember_me {
-    width: 165px;
+.login-bottom a {
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    float: left;
+    white-space: normal;
+    text-align: left;
 }
-
+.login-bottom > div {padding-left: 40px;}
+.login-bottom a:hover {
+    text-decoration: none;
+}
+#PASSWORD {
+    font-size: 13px;
+    color: #414141;
+}
+#login form input.remember_me {
+    margin-top: 4px;
+    height: auto;
+    width: auto;
+    position: static;
+}
 /***************************************************/
 /* CSS GLOBAL DEFINITIONS FOR TABLES IN MODULES    */
 /***************************************************/
@@ -185,43 +225,46 @@ table {
     float: left;
     width: 100%;
 }
-
 table th {
     padding: 6px 8px 6px 8px;
     color: #FFFFFF;
     text-align: left;
     font-weight: bold;
-    background-color: #528AA2;
+    background-color: #0A85C8;
 }
-
 table th a {
     color: #FFFFFF;
 }
-
 table tr.row1,
 table tr.marketRow2 {
     background-color: #FFFFFF;
+    /*    float: left;
+        width: 100%;*/
 }
-
+.voting td {
+    float: left;
+    width: 50%;
+}
 table tr.row2,
 table tr.marketRow3 {
     background-color: #F6F6F6;
+    padding: 0;
 }
-
+#tagelement td {
+    float: left;
+    width: 33%;
+}
 table tr.row3,
 table tr.marketRow1 {
     background-color: #FFEE9F;
 }
-
 table td {
     padding: 6px 8px 6px 8px;
     vertical-align:top;
 }
-
 table td.none {
     border: 0;
 }
-
 /***************************************************/
 /* CSS GLOBAL DEFINITIONS FOR LAYER RWO CLASS     */
 /***************************************************/
@@ -240,37 +283,36 @@ div.row2 {
 /***************************************************/
 #captcha {
     float: left !important;
-    /*width: auto !important; */
+    width: 100% !important;
     clear: none !important;
     margin: 0;
     padding: 0;
+    margin-bottom: 6px;
 }
 #captcha #coreCaptchaLabel {
     float: left;
-    width: 100%;
+    width: auto;
     clear: both;
-    margin: 2px 0 2px 0;
-    /* white-space: nowrap; */
+    margin: 0px 0 5px 0;
+    white-space: normal;
     font-weight: normal;
 }
 #captcha .row {
     clear: both;
     display: block;
-    margin-left: 0;
-    margin-right: 0;
+    margin: 0;
 }
 #captcha #coreCaptchaCode {
     float: left;
     width: 79px !important;
-    height: auto;
+    height: 31px;
     margin: 0 7px 0 0;
 }
 #captcha #coreCaptchaImage {
     float: left;
-    width: 93px;
+    width: 67px;
     height: 31px;
 }
-
 /***************************************************/
 /* CSS DEFINITIONS FOR CONTACT MODULE              */
 /***************************************************/
@@ -279,14 +321,12 @@ div.row2 {
     width: 100%;
     padding: 15px 0 0 0;
 }
-
 #contactFormError {
     display: none;
     width: 100%;
     padding: 15px 0 0 0;
-    color: #FF0000;
+    color: #a94442;
 }
-
 /***************************************************/
 /* CSS DEFINITIONS FOR VOTING MODULE               */
 /***************************************************/
@@ -308,7 +348,7 @@ div.row2 {
     float:left;
 }
 #voting div.message{
-    color: #ff0000;
+    color: #a94442;
     width: 100%;
     padding: 0px 0px 0px 0px;
     margin: 0px 0px 0px 0px;
@@ -316,13 +356,13 @@ div.row2 {
 }
 #voting input[type=radio],
 #voting  input.radio{
-    float: none;
+    float: left;
 }
 .voting label{
-    float: none
+    float: left;
+    width: auto;
+    cursor: pointer;
 }
-
-
 /***************************************************/
 /* CSS DEFINITIONS FOR GALLERY MODULE              */
 /***************************************************/
@@ -335,7 +375,6 @@ div.row2 {
 }
 #gallery div.category_tree,
 #gallery div.category_comment,
-#gallery div.category_images,
 #gallery div.show_image,
 #gallery div.image_navigation,
 #gallery div.category_paging {
@@ -345,12 +384,8 @@ div.row2 {
     float:left;
     height:auto !important;
 }
-#gallery div.category_image,
-#gallery div.category_informations {
-    float: left;
-    height:auto !important;
-    padding: 0px 0px 0px 0px;
-    margin: 0px 0px 0px 0px;
+.breadcrumb>li+li:before {
+    content: none;
 }
 #gallery div.category_informations h2 {
     padding: 0px 0px 0px 0px;
@@ -364,21 +399,13 @@ div.row2 {
     margin: 0px 0px 0px 0px;
     width: 100%;
 }
-#gallery div.category {
-    width: 100%;
-    padding: 10px 0px 10px 0px;
-    margin: 0px 0px 0px 0px;
-    float:left;
-    height:auto !important;
-}
-#gallery div.category_images div.image {
-    padding: 0px 0px 0px 0px;
-    margin: 0px 0px 0px 0px;
-    text-align:left;
-    float: left;
-}
-#gallery div.show_image img, #gallery div.category_image img, #gallery div.category_images img{
+#gallery div.show_image img, #gallery div.category_image img {
     margin: 0px 15px 0px 0px;
+    width: 100%;
+    height: auto;
+}
+.category.row_2.container-fluid {
+    border-bottom: 0;
 }
 #gallery div.show_image, #gallery div.image_navigation {
     text-align: center;
@@ -432,9 +459,9 @@ div.row2 {
     text-align:center;
     float:left;
 }
-#market div.type_selection input {
+/*#market div.type_selection input {
     float:none;
-}
+}*/
 /***************************************************/
 /* CSS DEFINITIONS FOR CALENDAR MODULE             */
 /***************************************************/
@@ -460,6 +487,10 @@ div.row2 {
     float: left;
     width: 100%;
     border-top: 1px solid #DDDDDD;
+    margin-left: 0;
+}
+form[name="registrationForm"] .row {
+    margin: 0;
 }
 #calendar div.note {
     float: left;
@@ -492,9 +523,7 @@ div.row2 {
     font-style: normal;
 }
 #calendar-boxes {
-    float: left;
-    width: 250px;
-    padding: 0 0 0 40px;
+    width: 232px;
 }
 #calendar-details {
     float: left;
@@ -523,35 +552,33 @@ div.row2 {
     float: left;
     width: 70%;
 }
-
-
 #calendar fieldset#place legend,
 #calendar fieldset#host legend,
 #calendar fieldset#additionalinfos legend{
     display: block;
 }
-
 #calendar fieldset#place,
 #calendar fieldset#host,
 #calendar fieldset#additionalinfos{
     border: 1px solid #DDDDDD;
     padding: 10px;
 }
-
 /* Calendar Headlines */
 .calendar-headlines .monthnavigation{
     display: none;
 }
-
 /***************************************************/
 /* CSS DEFINITIONS FOR ACCESS MODULE               */
 /***************************************************/
 #access {
     width: 100%;
-    padding: 0px 0px 0px 0px;
+    padding: 6px 0px 0px 0px;
     margin: 0px 0px 0px 0px;
     float:left;
     height:auto !important;
+}
+.reg {
+    padding: 0 15px;
 }
 #access div.message,
 #access div.message_ok,
@@ -564,11 +591,10 @@ div.row2 {
 #access div.functions {
     float: left;
     width: 100%;
-    padding: 0 0 15px 0;
 }
 #access div.message_error {
-    padding: 5px 0 10px 0;
-    color: #ff0000;
+    padding: 0;
+    color: #a94442;
 }
 #access div.message_ok {
     color: #029202;
@@ -604,7 +630,8 @@ div.row2 {
 }
 #podcast div.media {
     width: 100%;
-    padding: 10px 0px 10px 0px;
+    padding-top: 10px;
+    padding-bottom: 10px;
     margin: 0px 0px 0px 0px;
     float:left;
     height:auto !important;
@@ -615,8 +642,8 @@ div.row2 {
     margin: 0px 0px 0px 0px;
 }
 #podcast div.image img {
-    padding: 0px 0px 0px 0px;
-    margin: 0px 15px 15px 0px;
+    width: 100% !important;
+    height: auto !important;
 }
 #podcast div.description {
     padding: 0px 0px 0px 0px;
@@ -644,7 +671,7 @@ div.row2 {
     height:auto !important;
 }
 #recommend div.status {
-    color: #ff0000;
+    color: #a94442;
 }
 /***************************************************/
 /* CSS DEFINITIONS FOR DIRECTORY MODULE            */
@@ -655,6 +682,16 @@ div.row2 {
     margin: 0px 0px 0px 0px;
     float:left;
     height:auto !important;
+}
+.categorySelect {
+    padding-bottom: 10px;
+    margin-top: -10px;
+    float: left;
+    width: 100%;
+}
+.survey.table input, .survey.table select {
+    float: left;
+    width: 100% !important;
 }
 #directory div.search,
 #directory div.navtree,
@@ -671,12 +708,12 @@ div.row2 {
     margin: 0px 0px 15px 0px;
     float:left;
 }
-#directory div.feeds{
+.image, .infos, .image_default {
+    margin: 10px 0;
+}
+.image img {
     width: 100%;
-    padding: 10px 0px 10px 0px;
-    margin: 0px 0px 0px 0px;
-    float:left;
-    height:auto !important;
+    height: auto;
 }
 #directory div.insert_feeds,
 #directory div.paging {
@@ -689,23 +726,6 @@ div.row2 {
     margin: 0px 0px 5px 0px;
     border-bottom: 1px solid #ECEDF3;
 }
-#directory div.image {
-    float:left;
-    height:auto !important;
-    padding: 0px 0px 0px 0px;
-    margin: 0px 0px 0px 0px;
-    width: 20%;
-}
-#directory div.image img {
-    margin: 0px 15px 15px 0px;
-    box-shadow: 0 0 1px 0 rgba(0, 0, 0, 0.1);
-    padding: 8px;
-}
-#directory div.infos {
-    padding: 0px 0px 0px 0px;
-    margin: 0px 0px 0px 0px;
-    height:auto !important;
-}
 #directory div.infos h3 {
     padding: 0px 0px 0px 0px;
     margin: 0px 0px 5px 0px;
@@ -717,13 +737,12 @@ div.row2 {
 }
 #directory div.link {
     width: 100%;
-    padding: 5px 0px 0px 0px;
     margin: 5px 0px 0px 0px;
     float: left;
     border-top: 1px solid #ECEDF3;
+    padding-top: 5px;
 }
 #directory .selector {
-    /*clear: left;*/
     clear: left;
     margin-top: -15px;
     padding-left: 190px;
@@ -731,12 +750,8 @@ div.row2 {
 /***************************************************/
 /* CSS DEFINITIONS FOR LOGIN MODULE                */
 /***************************************************/
-#login {
-    width: 100%;
-    padding: 0px 0px 0px 0px;
-    margin: 0px 0px 0px 0px;
-    float:left;
-    height:auto !important;
+.login-content .login-social {
+    border-right: 1px solid #D8DCE0;
 }
 #login a.register{
     padding-left:18px;
@@ -766,14 +781,12 @@ div.row2 {
 #forum div.category,
 #forum div.navtree,
 #forum div.paging,
-#forum div.anchor,
 #forum div.threads,
 #forum div.addthread,
 #forum div.posts,
 #forum div.addpost,
 #forum div.forums,
 #forum div.searchform,
-#forum div.notification,
 #forum div.message_error,
 #forum div.message_ok,
 #forum div.text,
@@ -785,6 +798,9 @@ div.row2 {
     margin: 0px 0px 15px 0px;
     float:left;
 }
+#forum div.anchor, #forum div.anchor-polo {
+    margin-bottom: 15px;
+}
 #forum div.links {
     text-align: right;
 }
@@ -792,7 +808,7 @@ div.row2 {
     text-align: left;
 }
 #forum div.message_error {
-    color: #ff0000;
+    color: #a94442;
 }
 #forum div.message_ok {
     color: #029202;
@@ -826,11 +842,7 @@ div.row2 {
 }
 #forum div.notification_center {
     padding: 250px 0px 0px 0px;
-    margin: 0px 0px 15px 0px;
-    float:left;
-    width: 9%;
     text-align:center;
-    height: 281px;
 }
 .forumTagCloud {
     padding: 0px;
@@ -922,14 +934,14 @@ div.row2 {
 #blog div.entries h2 a{
     color: #222222;
 }
-#blog div.entries h2 a:hover{
-    color: #95A105;
+#blog div.entries h2 a:hover {
+    color: rgb(18, 146, 221);
 }
 .posted a{
     color:#777777
 }
 .posted a:hover{
-    color:#95A105
+    color: rgb(18, 146, 221);
 }
 #blog div.comments,
 #blog div.code,
@@ -939,9 +951,10 @@ div.row2 {
     background-color: #f9f9f9;
     border: 1px dotted #E6E6E6;
     clear:both;
+    color: #505050;
 }
 #blog div.message_error {
-    color: #ff0000;
+    color: #a94442;
 }
 #blog div.message_ok {
     color: #029202;
@@ -959,9 +972,15 @@ div.row2 {
     font-style: italic;
 }
 #blog div.comment_avatar {
-    float:right;
+    float: right;
     padding: 0px 0px 5px 5px;
     margin: 0px 0px 0px 0px;
+    height: auto;
+    width: 95px;
+}
+.comment_avatar img {
+    max-width: 100%;
+    height: auto;
 }
 #blog div.comment_text {
     padding: 10px 0px 0px 0px;
@@ -971,9 +990,11 @@ div.row2 {
     padding: 0px 0px 0px 0px;
     margin: 0px 0px 15px 0px;
     height:auto !important;
+    float : left;
 }
 #blog div.image {
     float:left;
+    width: 100%;
     height:auto !important;
     padding: 0px 0px 0px 0px;
     margin: 0px 0px 0px 0px;
@@ -983,8 +1004,8 @@ div.row2 {
     box-shadow: 0 0 1px 0 rgba(0, 0, 0, 0.1);
     margin: 0 0 19px;
     padding: 8px;
-    width: 634px;
-    height: 284px;
+    width: 100%;
+    height: auto;
     float: left;
 }
 #blog div.search_date {
@@ -1086,37 +1107,8 @@ div.row2 {
 #guestbook div.error_message {
     color:#FF0000;
 }
-#guestbook div.title {
-    float:left;
-    height: 27px;
-    padding: 0px 0px 0px 0px;
-    margin: 0px 0px 0px 0px;
-}
-#guestbook div.title h3{
-    padding: 0px 0px 5px 0px;
-    margin: 0px 0px 0px 0px;
-}
-#guestbook div.location {
-    float:left;
-    height: 22px;
-    padding: 5px 0px 0px 0px;
-    margin: 0px 0px 0px 0px;
-    font-style:italic;
-}
-#guestbook div.date {
-    float:left;
-    height: 22px;
-    padding: 5px 0px 0px 0px;
-    margin: 0px 0px 0px 0px;
-    text-align:right;
-}
-#guestbook div.message,
-#guestbook div.links {
-    padding: 0px 0px 0px 0px;
-    margin: 7px 0px 0px 0px;
-    height:auto !important;
-    float:left;
-    width:100%;
+#guestbook .radio, #guestbook .checkbox {
+    float :left;
 }
 /***************************************************/
 /* CSS DEFINITIONS FOR MEMBERDIR  MODULE           */
@@ -1147,34 +1139,36 @@ div.row2 {
     width: 100%;
     float: left;
 }
-
 #sitemap ul li {
-    padding: 0 0 5px;
+    padding: 0 0 4px;
     margin: 0 0 5px 0;
     border-bottom: 1px solid #F1F1F1;
     background: none;
 }
-
 #sitemap ul li.sitemap_level_1 {
     font-weight: bold;
 }
-
+#sitemap ul li.sitemap_level_1 a {
+    font-weight: bold;
+}
+#sitemap a:hover {
+    text-decoration: none;
+}
+#sitemap a {
+    padding: 0;
+}
 #sitemap ul li.sitemap_level_2 {
     padding-left: 25px;
 }
-
 #sitemap ul li.sitemap_level_3 {
     padding-left: 50px;
 }
-
 #sitemap ul li.sitemap_level_4 {
     padding-left: 75px;
 }
-
 #sitemap ul li.sitemap_level_5 {
     padding-left: 100px;
 }
-
 /***************************************************/
 /* CSS DEFINITIONS FOR DOCSYS MODULE               */
 /***************************************************/
@@ -1206,10 +1200,6 @@ div.row2 {
 #shop table tr.row2 {
     background: #FFFFFF;
 }
-#shop table tr.row3 {
-    border-bottom: 1px solid #FFFFFF;
-    background: #F6F6F6;
-}
 #shop div.menu,
 #shop div.cart_info,
 #shop div.informations,
@@ -1218,29 +1208,31 @@ div.row2 {
 #shop div.lsv_form,
 #shop div.cart_links,
 #shop div.message_error,
-#shop div.account_details,
 #shop div.order {
     float:left;
     width: 100%;
     padding: 0 0 20px 0;
 }
+#shop div.account_details {
+    float: left;
+    width: 100%;
+    padding: 0 0 5px 0;
+}
 #shop .customer_old {
     float: left;
-    width: 445px;
-    margin: 0 20px 0 0;
-    border-right: 1px solid #DDDDDD;
+    width: 100%;
+    margin: 0 0px 15px 0;
+    border-bottom: 1px solid #DDDDDD;
+}
+.customer_new input {
+    margin-bottom: 10px;
 }
 #shop .customer_old p {
-    width: auto;
-    padding-left: 150px;
-}
-#shop .customer_old p label {
-    width: 150px;
-    margin-left: -150px;
+    width: 100%;
 }
 #shop .customer_old p input[type=text],
 #shop .customer_old p input[type=password] {
-    width: 248px;
+    width: 100%;
 }
 #shop .customer_new {
     display: block;
@@ -1265,12 +1257,14 @@ div.row2 {
 #shop .a_center {
     text-align: center;
 }
-#shop .shop_cart_input {
+#shop .shop_cart_input, .a_right select {
     width: 150px !important;
+    float: right;
 }
 #shop .delete-icon {
     position: relative;
     top: 4px;
+    float: left;
 }
 #shop input.shop_quantity {
     width: 30px;
@@ -1279,10 +1273,6 @@ div.row2 {
 }
 #shop div.message_error {
     color:#FF0000;
-}
-#shop div.categories {
-    float: left;
-    width: 100%;
 }
 #shop div.category {
     padding: 0px 0px 0px 0px;
@@ -1317,18 +1307,6 @@ div.row2 {
     margin: 0;
     border: 0;
 }
-#shop div.images {
-    float: left;
-    width: 25%;
-}
-#shop div.images a img {
-    max-width: 90%;
-    max-height: 150px;
-}
-#shop div.info {
-    float: left;
-    width: 75%;
-}
 #shop div.short-description {
     float: left;
     width: 80%;
@@ -1342,6 +1320,7 @@ div.row2 {
     padding: 7px 10px 5px 10px;
     color: #FFFFFF;
     font-size: 15px;
+    margin-top: 10px;
     font-weight: bold;
     border-radius: 5px 0 0 5px;
     -moz-border-radius: 5px 0 0 5px;
@@ -1415,18 +1394,18 @@ div.row2 {
 }
 #shop div.functions {
     float: right;
-    padding: 20px 0 0 0;
+    padding: 20px 15px 0 0;
 }
 #shop div.functions input[type=submit] {
     margin: 0;
 }
 #shop div.message p {
-    padding-left: 362px;
+    margin-top: 10px;
 }
 #shop div.message p label {
-    width: 370px;
+    width: auto;
 }
-#shop div.vat {
+#shop div.vat, div#cke_message {
     float: left;
     width: 100%;
 }
@@ -1456,7 +1435,7 @@ div.row2 {
     float: left;
     width: 100%;
     padding: 0 0 10px 0;
-    color: red;
+    color: #a94442;
 }
 #shop input.error[type=radio] {
     background-color: red;
@@ -1474,18 +1453,16 @@ div.row2 {
     float: left;
     clear: left;
 }
-
 #shop figure a {
     float: left;
     width: 100%;
-    margin: 0 0 20px 0;
+    margin: 0 3% 20px 0;
     border: 1px solid #DDDDDD;
     box-shadow: 3px 3px 8px #DDDDDD;
     -moz-box-shadow: 3px 3px 8px #DDDDDD;
     -webkit-box-shadow: 3px 3px 8px #DDDDDD;
     -o-box-shadow: 3px 3px 8px #DDDDDD;
 }
-
 #shop figure a:hover {
     border: 1px solid #AAAAAA;
     box-shadow: 3px 3px 8px #AAAAAA;
@@ -1493,57 +1470,59 @@ div.row2 {
     -webkit-box-shadow: 3px 3px 8px #AAAAAA;
     -o-box-shadow: 3px 3px 8px #AAAAAA;
 }
-
 #shop figure a .categorie-image-wrapper {
     float: left;
     width: 100%;
-    height: 180px;
+    height: 225px;
     padding: 5%;
     text-align: center;
 }
-
-#shop figure a .categorie-image-wrapper img {
-    max-width: 100%;
-    max-height: 100%;
-    padding: 10%;
-}
-
 #shop figure a h3 {
     float: left;
     width: 100%;
-    height: 30px;
+    padding: 4px 5% 6px 5%;
     margin: 0;
     color: #FFFFFF;
     font-size: 15px;
     text-align: center;
     background: #0A85C8;
 }
-
+.menu input {
+    margin-right: 15px;
+    float: left;
+}
+#shop .cart-buttons input[type="submit"]{
+    margin: 0 0 0 10px;
+}
+#shop .continue-button {
+    margin: 0 0 0 10px;
+}
 #shop .continue-button {
     margin: 0;
 }
-
 #shop .cart-links {
     float: left;
     padding: 10px 0 0 8px;
 }
-
 #shop .cart-buttons {
     float: right;
     padding: 10px 8px 0 0;
 }
-
 #shop button.details-button {
     float: right;
     padding-right: 25px;
     color: #FFFFFF;
     font-weight: bold;
-    background: #0A85C8 url('images/arrow-right-white.png') no-repeat 62px 13px;
+    background-repeat: no-repeat;
+    background-image: url('images/arrow-right-white.png');
+    background-position: 62px 12px;
+    border-color: transparent;
+    background-color: #0A85C8;
 }
-
 #shop button.add-to-cart {
     float: right;
     height: 33px;
+    background-color: #0A85C8;
     padding: 5.5px 10px 7px 33px;
     color: #FFFFFF;
     font-weight: bold;
@@ -1555,29 +1534,70 @@ div.row2 {
     -webkit-border-bottom-left-radius: 0;
     -o-border-top-left-radius: 0;
     -o-border-bottom-left-radius: 0;
-    background: #0A85C8 url('images/cart-white.png') no-repeat 10px 7px;
+    background-image: url('images/cart-white.png');
+    background-position: 10px 7px;
+    background-repeat: no-repeat;
+    margin-top: 10px;
+    border-color: transparent;
 }
-
 #shop button.details-button:hover,
 #shop button.add-to-cart:hover {
     background-color: #1F97D8;
+}
+#shop form#card-tds-form .card-expiry-month {width: 50px}
+#shop form#card-tds-form .card-expiry-year {width: 75px}
+#shop form#card-tds-form .paymill-error-text {color: red;padding: 10px 0;}
+#shop .functions .order-quanity-container{
+    display: inline-block;
+    float: right;
+    margin-top: 10px;
+    margin-right: 10px;
+}
+#shop .functions .order-quanity-container .input-group{
+    width: 130px;
+    float: right;
+}
+#shop .functions .order-quanity-container .help-block{
+    text-align: right;
+}
+#shop input.min-order-quantity.not-valid{
+    border: 1px solid red;
+}
+/* Product order selection in list view */
+#shop .product_orders {
+    clear: both;
+}
+#shop .product_order {
+    padding: 3px 6px;
+    margin: 3px 6px 10px 0px;
+    float: left;
+    background-color: #aaaaaa;
+    color: #ffffff;
+    border: 0;
 }
 
 /***************************************************/
 /* CSS DEFINITIONS FOR E-CARD MODULE               */
 /***************************************************/
-.ecardColumn1 {
-    float:left;
-    width:33%;
+#charCounter {
+    width: 100% !important;
+    margin-bottom: 10px;
 }
-.ecardColumn2 {
-    float:left;
-    width:33%;
+.ecardColumn1, .ecardPreviewMessage, .ecardPreviewData, .livecamSearch input {
+    margin-bottom: 10px;
 }
-.ecardColumn3 {
-    float:left;
-    width:33%;
+/***************************************************/
+/* CSS DEFINITIONS FOR LIVECAM MODULE               */
+/***************************************************/
+.livecamSearch {
+    position: relative;
+    white-space: nowrap;
 }
+#livecam a img {
+    width: 90%;
+    height: auto;
+}
+.cam-error {float: left;width: 100%;}
 /***************************************************/
 /* CSS DEFINITIONS FOR NEWS MODULE                 */
 /***************************************************/
@@ -1588,56 +1608,48 @@ div.row2 {
     margin: 20px 0 0 0;
     border-top: 1px solid #DDD;
 }
-
 #news li {
     float: left;
     width: 100%;
-    padding: 10px 0 10px 0;
+    padding: 0 0 10px 0;
     border-bottom: 1px solid #D6D6D6;
     background: none;
 }
-
-.news-image {
+.news-image.col-md-2 {
     float: left;
-    width: 15%;
+    margin-right: -5px;
+    width: 14.2%;
+    padding-right: 0;
 }
-
 .news-image img {
-    max-width: 120px;
-    max-height: 120px;
+    width: 100%;
+    height: auto;
 }
-
 .news-text {
     float: left;
-    width: 85%;
 }
-
 .news-teaser {
     float: left;
     width: 100%;
     padding: 0 0 10px 0;
 }
-
 .news-info {
     float: left;
     width: 100%;
     color: #9C9C9C;
     font-size: 12px;
 }
-
 #news-date {
     float: left;
     width: 100%;
     padding: 0 0 5px 0;
     color: #9C9C9C;
 }
-
 #news-content {
     float: left;
     width: 100%;
     padding: 0 0 20px 0;
 }
-
 #news-links {
     float: left;
     width: 100%;
@@ -1646,12 +1658,11 @@ div.row2 {
     border-bottom: 1px solid #E3E4E5;
     background: #F5F6F7;
 }
-
 #news-links ul {
     float: left;
     padding: 0 10px 0 10px;
+    margin-left: 0;
 }
-
 #news-social-media {
     float: left;
     width: 100%;
@@ -1659,34 +1670,27 @@ div.row2 {
     margin: 0 0 20px 0;
     border-bottom: 1px solid #D6D6D6;
 }
-
 #news-social-media li {
     padding: 0 30px 0 0;
     margin: 0;
     background: none;
 }
-
 #news-social-media li.last {
     padding: 0;
     margin: 0;
 }
-
 #news-social-media .google-plus {
     width: 67px;
 }
-
 #news-social-media .facebook {
     width: 114px;
 }
-
 #news-social-media .twitter {
     width: 92px;
 }
-
 #news-social-media .xing {
     width: 82px;
 }
-
 #news-social-media .rss-feed a {
     position: relative;
     float: left;
@@ -1694,24 +1698,20 @@ div.row2 {
     height: 22px;
     background: url('images/feed-icon.png');
 }
-
 #news-no-comments {
     float: left;
     width: 100%;
     margin: 0 0 20px 0;
 }
-
 #news-toggle {
     margin: 0 0 20px 0;
 }
-
 #news-comment-form {
     display: none;
     float: left;
     width: 100%;
     padding: 0 0 20px 0;
 }
-
 .news-comment {
     float: left;
     width: 100%;
@@ -1719,17 +1719,267 @@ div.row2 {
     border-bottom: 1px solid #E3E4E5;
     background: #F5F6F7;
 }
-
 .news-comment-poster {
     color: #9C9C9C;
 }
-
 .news-comment-poster,
 .news-comment-title,
 .news-comment-message {
     padding: 0 10px 0 10px;
 }
+/*For tags*/
+.news-info .tagCont {
+    background-image: url('images/tag.png');
+    background-position: -4px -4px;
+    background-repeat: no-repeat;
+    padding-left: 16px;
+    background-size: 20px;
+}
+.news-info p {
+    width: auto;
+    float: left;
+    margin-right: 2px;
+    margin-right: 4px;
+}
+#tag-filter p {
+    width: auto;
+    float: left;
+    margin: 6px 0 6px 12px;
+    padding: 0;
+    color: #fff;
+    line-height: 20px;
+}
 
+#tag-filter {
+    float: left;
+    width: auto;
+    background-color: #0A85C8;
+}
+ul#newsTags:hover {
+    background: transparent;
+    border: 1px solid #BBBBBB;
+}
+ul#newsTags:focus {
+    border: 1px solid #BBBBBB;
+}
+.rel-news-field {
+    width: 300px;
+    float: left;
+}
+/** TAGS **/
+#newsFormTags input[type="text"] {
+    color: #7D7D7D !important;
+    font-size: inherit;
+    width:100%;
+}
+#newsFormTags ul.ui-widget-content {
+    float : left;
+    width : 95%;
+    padding: 3px 14px;
+}
+#newsFormTags {
+    float:left;
+}
+#newsFormTags ul.tagit li.tagit-new {
+    width:100%;
+    margin:0;
+    padding:0;
+}
+#newsFormTags ul.tagit li {
+    line-height: 18px;
+    font-size: 14px;
+    font-weight: normal;
+}
+#newsFormTags ul.tagit li.tagit-choice-editable {
+    border: 1px solid #CAD8F3;
+    background: #DEE7F8;
+    color: #333;
+    border-radius: 3px;
+    margin : 12px;
+    margin-left: 0;
+}
+#newsFormTags ul.ui-widget-content:focus {
+  border-color: #66afe9;
+  outline: 0;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, 0.6);
+  box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, 0.6);
+}
+.news-frm-full-width {
+    width:100%;
+    float:left;
+}
+.tag-filter-cont {
+    margin-top: 20px;
+}
+.news-frm-12 {
+    width:100%;
+    padding: 6px 12px;
+}
+p#remove-tag-filter {
+    font-size: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    background-image: url('images/close.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 14px;
+    float: left;
+    margin-right: 8px;
+    padding-right: 12px;
+}
+.cl-news-40 {
+    width: 40%;
+    float: left;
+    height: auto;
+}
+#newsFormTags ul.ui-widget-content
+{
+    background-color: #ffffff;
+    background-image: none;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    width: 100%;
+    padding: 0px 12px;
+    margin: 0;
+    color: #7D7D7D;
+    outline: 0;
+}
+/*//Styles for related News started here*/
+/*//Styles for next and previous news link blocks*/
+#link-blocks-cont {
+    float: left;
+    width: 100%;
+    border-bottom: 1px solid #D6D6D6;
+    padding: 20px 0;
+}
+#previous-link-block {
+    float: left;
+    width: 50%;
+    text-align: left;
+}
+#next-link-block {
+    float: right;
+    width: 50%;
+    text-align: right;
+}
+.link-label {
+    cursor: pointer;
+    width: auto;
+    color: #9C9C9C;
+    text-transform: uppercase;
+    font-size: 12px;
+}
+.title-label {
+    cursor: pointer;
+    width: 100%;
+    font-size: 15px;
+}
+.title-label.title-label-next,
+.link-label.link-label-next {
+    float: right;
+    text-align: right;
+}
+.title-label.title-label-prev,
+.link-label.link-label-prev {
+    float: left;
+    text-align: left;
+}
+.link-label-next small {
+    font-size: 20px;
+    margin-left: 5px;
+}
+.link-label-prev small {
+    font-size: 20px;
+    margin-right: 5px;
+}
+.title-label h6 {
+    padding: 5px 0;
+}
+/*//Styles for next and previous news link blocks Ends here*/
+div#related-news {
+    width: 100%;
+    float: left;
+}
+div#related-news h3 {
+    border-bottom: 1px solid #E3E4E5;
+    padding-bottom: 5px;
+}
+.rel-news-blocks {
+    width: 100%;
+    float: left;
+    height: auto;
+    border-bottom: 1px solid #E3E4E5;
+    padding-bottom: 12px;
+}
+#related-news-list ul li label {
+    margin: 1px;
+    float: left;
+    width: auto;
+    padding-left: 10px;
+}
+div#related-news-list {
+    padding: 0;
+}
+#related-news-list ul li {
+    background: none;
+    list-style-type: none;
+    border: 1px solid rgb(183, 188, 192);
+    padding: 0;
+    margin: 0 10px 10px 0;
+    width: auto;
+    float: left;
+    line-height: 33px;
+}
+#related-news-list ul li span.news_list_close {
+    padding: 1px 8px;
+    margin-bottom: 0px;
+    cursor: pointer;
+    margin-left: 8px;
+    background: rgb(183, 188, 192);
+    color: rgb(255, 255, 255);
+    position: relative;
+    float: right;
+}
+#related-news-list ul {
+    margin: 0;
+    padding: 0;
+    float: right;
+    width: 100%;
+}
+.rel-news-image {
+    height: 150px;
+    float: left;
+    width: auto;
+    margin: -12px -12px 12px;
+}
+.rel-news-image img {
+    float: left;
+    width: 100%;
+    height: auto;
+    overflow: hidden;
+}
+.rel-news-blocks:last-child {
+    margin: 0;
+    border-bottom: 1px solid #D6D6D6;
+}
+.rel-news-link {width:100%; float:right;}
+.rel-news-title {font-weight: bold;}
+
+input.live-search-news-input.ui-autocomplete-input {
+    line-height: 20px;
+    font-size: 14px;
+}
+input.live-search-news-input.ui-autocomplete-input.loading {
+    background: url('images/loading.gif') no-repeat 98% center;
+}
+span.live-search-user-info {
+    float: left;
+    font-size: 12px;
+    width: 100%;
+    font-style: italic;
+    color: #9C9C9C;
+}
+/*//Styles for related news ends here*/
 /***************************************************/
 /* CSS DEFINITIONS FOR NEWSLETTER MODULE           */
 /***************************************************/
@@ -1750,7 +2000,7 @@ div.row2 {
     height:auto !important;
 }
 #newsletter div.errorMessage {
-    color: #ff0000;
+    color: #a94442;
 }
 #newsletter_home input[type=radio],
 #newsletter_home input[type=checkbox]{
@@ -1758,6 +2008,7 @@ div.row2 {
 }
 #newsletter .newsletterFormGroup {
     float: left;
+    margin-bottom: -2px;
 }
 #newsletter .newsletterFormGroup input[type=radio] {
     clear: left;
@@ -1818,7 +2069,6 @@ div.row2 {
 #u2u div.functions table td {
     vertical-align: middle;
 }
-
 /***************************************************/
 /* CSS DEFINITIONS FOR KNOWLEGE MODULE             */
 /***************************************************/
@@ -1827,7 +2077,6 @@ div.row2 {
     padding: 0px;
     margin: 0px;
 }
-
 #knowledge li {
     padding: 0px;
     margin: 0px;
@@ -1835,26 +2084,23 @@ div.row2 {
     margin-bottom: 10px;
     position: relative;
 }
-
 #knowledge dd {
     margin: 0px;
     padding: 0px;
     padding-bottom: 20px;
     padding-top: 5px;
 }
-
 #knowledge dt {
     font-weight: bold;
 }
-
 #knowledge form {
     padding: 10px 0 0 0;
+    float: left;
+    width: 100%;
 }
-
 #knowledge #content_search {
     position: relative;
 }
-
 #knowledge .crumbtrail,
 #knowledge .answer,
 #knowledge .informations {
@@ -1862,46 +2108,38 @@ div.row2 {
     width: 100%;
     padding: 0 0 10px 0;
 }
-
 #knowledge .category_title {
     padding: 15px 0 10px 0;
 }
-
 #knowledge .articlelist li {
     margin: 0px;
     padding: 0px;
     border-bottom: solid 1px #C6C6C6;
 }
-
 #knowledge .articlelist .title_row {
     padding: 8px 8px 5px 8px;
     background: #F9F9F9;
 }
-
 #knowledge .articlelist .opener {
     float: left;
     width: 40px;
     padding: 2px 0 2px 0;
 }
-
 #knowledge .articlelist .question_active {
     background-color: #F5F5F5;
     font-weight: bold;
     border-bottom: solid 1px #C6C6C6;
 }
-
 #knowledge #overview {
     padding: 5px 0 0 0;
-}
-
-#knowledge #overview div.category {
     float: left;
-    width: 50%;
+    width: 100%;
 }
-
+#knowledge #overview div.category {
+    margin-bottom: 10px;
+}
 #knowledge #overview div.row {
 }
-
 #knowledge #overview div.row:after {
     content: ".";
     display: block;
@@ -1910,42 +2148,33 @@ div.row2 {
     visibility: hidden;
     margin-bottom: 1em;
 }
-
 /* FOR IE */
 * html #knowledge #overview div.row {
     height: 1%;
 }
-
 #knowledge #overview div div.title {
     font-weight: bold;
 }
-
 #knowledge #overview div div.title a {
     display: block;
 }
-
 #knowledge #overview div div.content {
     background-color: white;
 }
-
 #knowledge h2.category_list_title {
     padding: 3px;
 }
-
 #knowledge h2.article_list_title {
     clear: left;
     padding: 15px 0 10px 0;
 }
-
 #knowledge h2.article_list_title a {
     color: white;
 }
-
 #knowledge .most_read {
     background-color: #DAEDC6;
     font-weight: bold;
 }
-
 #knowledge .tags li, #knowledge .articlelist .tags li {
     margin: 0;
     padding: 0 3px 0 0;
@@ -1954,46 +2183,39 @@ div.row2 {
     border: none;
     background: none;
 }
-
 #knowledge_search_results {
     padding-left: 0px;
 }
-
 #knowledge_search_results ul {
     margin-left: 0px;
     padding-left: 0px;
     list-style-type: none;
 }
-
 #knowledge_search_results ul li {
     padding: 0px;
     margin: 0px;
     margin: 5px 5px;
     list-style-type: none;
 }
-
 .knowledge_sidebar {
     margin: 0px;
     padding: 0px;
 }
-
 .knowledge_sidebar ul {
     margin: 0px;
     padding: 0px;
     list-style: none;
 }
-
+select[name="catid"] {
+    margin-bottom: 6px;
+}
 .knowledge_sidebar li {
     width: 100%;
     display: block;
     margin: 0px;
 }
-
-.knowledge_sidebar li:hover {}
-
 /* FOR IE */
 * html .clearfix { height: 1%; }
-
 .clearfix:after {
     content: ".";
     display: block;
@@ -2001,7 +2223,6 @@ div.row2 {
     clear: both;
     visibility: hidden;
 }
-
 #resultbox {
     border: 1px solid #BBBBBB;
     position: absolute;
@@ -2013,13 +2234,11 @@ div.row2 {
     top: 43px;
     background-color: white;
 }
-
 #resultbox ul {
     list-style-type: none;
     padding: 2px;
     margin: 0px;
 }
-
 #resultbox li {
     list-style-type: none;
     display: block;
@@ -2027,22 +2246,18 @@ div.row2 {
     overflow: hidden;
     margin: 0px;
 }
-
 #resultbox li a {
     display: block;
 }
-
 #resultbox li:hover {
     background-color: #F0F8FA;
 }
-
 .cloud {
     margin: 0 0 1em 0;
     padding: 0px;
     list-style: none;
     border: none;
 }
-
 .cloud li {
     margin: 0px !important;
     padding: 0px 5px !important;
@@ -2052,15 +2267,12 @@ div.row2 {
     border: none !important;
     line-height: 1em !important;
 }
-
 .cloud li:hover {
     background-color: #cdcdcd;
 }
-
 .cloud li a{
     color: #646464;
 }
-
 /************************************/
 /* CSS DEFINITIONS FOR DATA-MODULE  */
 /************************************/
@@ -2124,17 +2336,20 @@ dl.data_module img {
     width: 100%;
 }
 #downloads div.breadcrumb {
-    margin: 20px 0 0 0;
+    margin: 0;
+    float: left;
+    width: 100%;
 }
 #downloads div.category {
 }
 #downloads div.overview div.row div.category {
     float: left;
-    width: 50%;
+    width: 100%;
     padding: 0 0 5px 0;
 }
 #downloads div.overview div.row div.category div.title {
     font-weight: bold;
+    width: 100%;
 }
 #downloads div.overview div.row div.category div.content a {
     color: black;
@@ -2175,6 +2390,8 @@ dl.data_module img {
 }
 #downloads div.image img {
     margin: 0px 0px 15px 0px;
+    width: 100%;
+    height: auto;
 }
 #downloads div.delete {
     clear: right;
@@ -2275,8 +2492,12 @@ dl.data_module img {
     float:left;
     height:auto !important;
 }
+#shop_acc_data input[type="reset"] {
+    float: left;
+    margin-right: 10px;
+}
 #downloads div.message_error {
-    color: #ff0000;
+    color: #a94442;
 }
 #downloads div.message_ok {
     color: #029202;
@@ -2409,10 +2630,9 @@ dl.data_module img {
     clear: both;
     margin-bottom: 15px;
     margin-top: -15px;
-    padding-left: 180px;
 }
 .mediadirSelectorCenter{
-    padding: 60px 25px 60px !important;
+    padding: 60px 5px 0 !important;
 }
 #mediadir .map{
     margin-top: 10px;
@@ -2442,7 +2662,7 @@ dl.data_module img {
 #mediadir .mapLarge{
     margin-top: 10px;
     border: 0px solid #CFCFCF;
-    width: 620px;
+    width: 70%;
     height: 600px;
 }
 #mediadir input[type="button"].active {
@@ -2478,33 +2698,22 @@ dl.data_module img {
 #mediadir .mediadirSearchForm {
     float: left;
     width: 100%;
-    padding: 0 0 20px 0;
+    padding-bottom: 20px;
 }
-#mediadir .mediadirButtonSearch, #access input[name="access_submit_search"] {
+#mediadir .mediadirButtonSearch {
     float: none;
     margin: 0 0 0 5px;
 }
 #mediadir .employee {
-    float: left;
-    width: 100%;
-    padding: 0 0 20px 0;
-    margin: 0 0 20px 0;
-    border-bottom: 1px solid #DDDDDD;
+    padding-bottom: 20px;
+    padding-top: 20px;
+    border-bottom: 1px solid #dddddd;
 }
 #mediadir .employee.last {
-    padding: 0;
-    margin: 0;
     border: 0;
 }
-#mediadir .employee-left {
-    float: left;
-}
-#mediadir .employee-left img {
-    float: left;
-    max-height: 200px;
-}
-#mediadir .employee-middle {
-    float: left;
+#mediadir .container-fluid:nth-child(2) .employee {
+    padding-top: 0;
 }
 #mediadir .employee-title {
     float: left;
@@ -2515,63 +2724,52 @@ dl.data_module img {
     float: left;
     clear: left;
 }
-#mediadir .employee-right {
-    float: left;
-}
 #mediadir .employee-more {
     float: left;
 }
 #mediadir .reference {
     float: left;
-    /*    width: 30%;*/
-    /* height: 185px; */
-    /*    margin: 0 3% 20px 0;*/
+    width: 100%;
+    height: 120px;
+    padding: 0 30px;
     text-align: center;
-    /*    border: 1px solid #DDDDDD;*/
-    margin-bottom: 24px;
-    margin-left: 15px;
-    outline: none;
-    /*    box-shadow: 3px 3px 8px #DDDDDD;
-        -moz-box-shadow: 3px 3px 8px #DDDDDD;
-        -webkit-box-shadow: 3px 3px 8px #DDDDDD;
-        -o-box-shadow: 3px 3px 8px #DDDDDD;*/
+    border: 1px solid #DDDDDD;
+    box-shadow: 3px 3px 8px #DDDDDD;
+    -moz-box-shadow: 3px 3px 8px #DDDDDD;
+    -webkit-box-shadow: 3px 3px 8px #DDDDDD;
+    -o-box-shadow: 3px 3px 8px #DDDDDD;
 }
 #mediadir .reference:hover {
-    /*    border: 1px solid #AAAAAA;*/
-    /*    box-shadow: 3px 3px 8px #AAAAAA;
-        -moz-box-shadow: 3px 3px 8px #AAAAAA;
-        -webkit-box-shadow: 3px 3px 8px #AAAAAA;
-        -o-box-shadow: 3px 3px 8px #AAAAAA;*/
+    border: 1px solid #AAAAAA;
+    box-shadow: 3px 3px 8px #AAAAAA;
+    -moz-box-shadow: 3px 3px 8px #AAAAAA;
+    -webkit-box-shadow: 3px 3px 8px #AAAAAA;
+    -o-box-shadow: 3px 3px 8px #AAAAAA;
 }
-#mediadir .reference img {
-    width: 203px;
-    max-height: 100%;
-    height : auto;
-    float :left;
+.mediadirVoteForm input {
+    float: left;
 }
-
-#mediadir .reference  a:first-element {
-    margin-left: 0px;
+.mediadirVoteForm input:hover, .mediadirButtonComment:hover {
+    background-color: #e6e6e6;
+    border-color: #adadad;
+    color: #414141;
 }
-
-#mediadir .reference  a {
-    width: 203px;
+td ul {
+    margin-left: 0;
 }
-
 #mediadir .reference-left {
-    /*  float: left;
-      width: 60%; */
+    float: left;
+    width: 60%;
 }
 #mediadir .reference-left h2 {
     border-bottom: 1px solid #DDDDDD;
 }
 #mediadir .reference-right {
-    /*float: left;
+    float: left;
     width: 33%;
     padding: 0 0 10px 3%;
     margin: 0 0 0 3%;
-    border-left: 1px solid #DDDDDD; */
-    padding-left: 2px;
+    border-left: 1px solid #DDDDDD;
 }
 #mediadir .reference-right img {
     max-width: 100%;
@@ -2600,33 +2798,25 @@ dl.data_module img {
     height:auto !important;
 }
 #media_div div.message_error {
-    color: #ff0000;
+    color: #a94442;
 }
 #media_div div.message_ok {
     color: #029202;
 }
-#media_div .mediaSearchForm {
-    float: left;
-    width: 100%;
-    padding-bottom: 20px;
-}
-#media_div .mediaSearchForm .mediaButtonSearch {
-    float: left;
-    width: auto !important;
-}
-
 /***************************************/
 /* CSS DEFINITIONS FOR CHECKOUT MODULE */
 /***************************************/
 #checkout .left {
-    width: 54%;
+    width: 50%;
     padding: 0;
+    float: left;
 }
-
 #checkout .right {
     padding: 0;
+    width: 50%;
+    padding-left: 20px;
+    float: left;
 }
-
 #checkout #ok_message,
 #checkout #error_message,
 #checkout #payment_methods,
@@ -2636,111 +2826,594 @@ dl.data_module img {
     display: inline-block;
     padding: 0 0 20px 0;
 }
-
 #checkout form {
-    width: 90%;
+    width: 100%;
 }
-
 #checkout #ok_message {
-    color: #008000;
+    color: #3c763d;
 }
-
 #checkout #error_message {
-    color: #ff0000;
+    color: #a94442;
 }
-
 #checkout #payment_methods img {
     float: left;
     width: 96px;
     height: 58px;
     margin: 0 10px 0 0;
 }
-
 #checkout form p {
     padding-left: 0;
     width: 100%;
 }
-
 #checkout form legend {
     display: block;
+    float: left;
 }
-
 #checkout form input[type=text],
 #checkout form input[type=password],
 #checkout form textarea {
-    width: 394px;
+    width: 100%;
     margin-right: 0;
     margin-left: 0;
 }
-
 #checkout form select {
     width: 100%;
 }
-
 #checkout form input.label,
 #checkout form select.label,
 #checkout form textarea.label {
     opacity: 0.6;
 }
-
 #checkout form input.highlight,
 #checkout form select.highlight,
 #checkout form textarea.highlight {
     border: 1px solid #ff0000;
 }
-
 #checkout form input#invoice_amount {
     float: left;
-    width: 264px;
+    width: 100%;
     margin-right: 10px;
+    margin-bottom: 10px;
 }
-
 #checkout form select#invoice_currency {
     float: left;
-    width: 120px;
+    width: 100%;
 }
-
 #checkout form input#contact_postcode  {
     float: left;
-    width: 94px;
+    width: 100%;
     margin-right: 10px;
+    margin-bottom: 10px;
 }
-
 #checkout form input#contact_place {
     float: left;
-    width: 264px;
+    width: 100%;
 }
-
 #checkout form #buttons {
     display: block;
     position: static;
-    margin: 20px 0 0 0;
+    margin: 6px 0 0 0;
+    float: left;
+    width: 100%;
 }
-
 #checkout form #buttons input {
     width: auto;
 }
-
 /***************************/
 /* HIDE UPLOADER EMBED TAG */
 /***************************/
 #deployJavaPlugin {
     display: none;
 }
-/*new*/
-select[name="catId"] {
-    width: 40%;
+.icon-info {
+    float: none;
+    display: inline-block;
+    width: 13px;
+    height: 12px;
+    background: url(../../core/ContentManager/View/Media/Info.png) no-repeat left center;
+}
+/* jquery tools tooltip */
+.tooltip-wrapper {
+    position: relative;
     display: inline-block;
 }
-.form-control {
-    width: 300px;
+.tooltip-message {
+    display: none;
+    float: left;
+    background: #d9edf7;
+    width: auto;
+    max-width: 250px;
+    min-width: 110px;
+    padding: 3px;
+    border: #3f91b9 1px solid;
+    font-size: 11px;
+    font-weight: normal;
+    line-height: 1.3;
+    white-space: normal;
+    z-index: 9999;
+    color: #25556d;
 }
-#directory .form-control {width: 100%;}
-select#deselectedCategories, select#selectedCategories, select#deselectedLevels, select#selectedLevels {
+.noCaption {
+    width: auto;
+    float: left;
+}
+#news-social-media li {
+    float: left;
+    margin-right: 10px;
+}
+.newsTypeRedirect {
+    clear: both;
+    float: left;
+    height: auto;
+    margin: 3px 0 0;
+    padding: 0;
+    width: auto;
+}
+form[name="downloads_search"] {
+    float: left;
+    width: 100%;
+    margin-bottom: 10px;
+}
+input[name="downloads_search_keyword"] {
+    width: 70%;
+    float: left;
+    margin-right: 10px;
+}
+#downloads form input[type="submit"] {
+    margin-right: 10px;
+    float: left;
+    min-width: 8%;
+}
+.shop_options_click select {
+    width: 100% !important;
+}
+form#search {
+    float: left;
+    width: 100%;
+    margin-bottom: 10px;
+}
+.searchbox, .directorySearch input[name='term'], #regkey, #podcast_category_menu {
+    width: 68%;
+    float: left;
+    margin-right: 10px;
+}
+.search .directorySearch form input[type="submit"] {
+    margin-right: 5px;
+}
+#login.pwdlost {
+    width: 100%;
+    border-right: 0;
+}
+input[name="downloads_category_name"] {
+    margin-bottom: 20px;
+}
+.file_info td {
+    float: left;
+    width: 50%;
+}
+.file_info tr {
+    float: left;
     width: 100%;
 }
-form p .checkbox label {
+.member_list .img-thumbnail {
+    max-width: 80px;
+}
+.file_info a {word-wrap: break-word;}
+input[name="search"] {
+    float: left;
+    margin-right: 10px;
+}
+select[name="catId"] {
+    float: left;
+    width: 40%;
+    margin-right: 15px;
+}
+.eachrow a {word-wrap: break-word;}
+/*Versandkonditionen page*/
+.shopterms {
+    float: left;
+    width: 100%;
+}
+#shop .row3 div {
+    display: table-cell;
+    float: left;
+    width: 50%;
+}
+#shop .row3 .shoprow:first-child {
+    width: 25%;
+    text-align: left;
+    padding-left: 10px;
+}
+#shop .row3 .shoprow:nth-child(2) {
+    width: 18%;
+    text-align: left;
+}
+#shop .row3 .shoprow:nth-child(3) {
+    width: 20%;
+}
+#shop .row3 .shoprow:nth-child(4) {
+    width: 22%;
+}
+#shop .row3 .shoprow:last-child {
+    width: 15%;
+    text-align: center;
+    padding-right: 10px;
+}
+.row2.first .shoprow:first-child {
+    width: 25%;
+    float: left;
+    padding-left: 10px;
+    word-wrap: break-word;
+    padding-right: 10px;
+}
+.row2.first .shoprow:nth-child(2) {
+    float: left;
+    width: 18.5%;
+}
+.row2 .shoprow:first-child {
+    float: left;
+    width: 43.5%;
+}
+.row2 .shoprow:nth-child(2) {
+    float: left;
+    width: 19%;
+}
+.row2 .shoprow:nth-child(3) {
+    float: left;
+    width: 22%;
+}
+/*cartlist*/
+#cartlist #th_bg {
+    background: #0A85C8;
+    color: #fff;
+    float: left;
+    width: 100%;
+}
+.cartrow {
+    padding: 6px 8px 6px 8px;
+    float: left;
+    width: 15%;
+}
+#th_bg .cartrow:first-child {
+    width: 35%;
+}
+#th_bg .cartrow:nth-child(2) {
+    width: 15%;
+}
+#th_bg .cartrow:nth-child(3) {
+    width: 14%;
+}
+#shop #th_bg .a_right.cartrow {
+    text-align: right;
+    width: 21%;
+}
+#cartlist #th_bg2 {
+    float: left;
+    width: 100%;
+}
+#cartlist #th_bg2 .cartrow:first-child {
+    width: 36%;
+}
+#cartlist #th_bg2 .cartrow {
+    float: left;
+    width: 9%;
+}
+#cartlist #th_bg2 .cartrow:nth-child(2) {
+    width: 15%;
+}
+#cartlist #th_bg2 .cartrow:nth-child(3) {
+    width: 14%;
+}
+#shop #th_bg2 .a_right {
+    text-align: right;
+    width: 17%;
+}
+#cartlist .row1 div {
+    float: left;
+    width: 50%;
+    padding: 7px 5px 6px 5px;
+}
+#cartlist .row1 {
+    float: left;
+    width: 100%;
+    background: #fff;
+}
+#shop #cartlist #th_bg_count {
+    float: left;
+    width: 100% !important;
+}
+#shop #cartlist #th_bg_count div {
+    float: left;
+    width: 50%;
+    padding: 7px 5px 6px 5px;
+}
+#cartlist #th_bg_lstbefore {
+    float: left;
+    width: 100% !important;
+}
+#shop #cartlist #th_bg_count {
+    float: left;
+    width: 100% !important;
+}
+#shop #cartlist #th_bg_count div {
+    float: left;
+    width: 50%;
+    padding: 7px 5px 6px 0px;
+}
+#cartlist #th_bg_lstbefore {
+    float: left;
+    width: 100% !important;
+    padding: 6px 5px;
+}
+#cartlist #th_bg_lstbefore div {
+    float: left;
+    width: 50%;
+}
+#cartlist #th_bg_lstbefore div.a_right {
+    float: right;
+    text-align: right;
+    width: 50%;
+}
+#shop .cart-buttons {
+    float: right;
+    padding: 10px 0px 0 0;
+    width:auto;
+}
+#cartlist {
+    float: left;
+    width: 100%;
+}
+#tagelement th {
+    float: left;
+    width: 33.3%;
+}
+input[name="bsubmit"] {
+    width: auto !important;
+}
+/*BLOGSEARCH*/
+#searchfield {
+    margin-bottom: 20px;
+}
+#searchfield p#fieldlast {
+    width: auto;
+    padding-top: 26px;
+}
+#searchfield p {
+    width: 33%;
+    margin-right: 10px;
+}
+input[name="recipient_save"] {
+    margin-top: 5px;
+}
+#sitemap ul {
     margin: 0;
+    padding: 0;
+}
+#shop table#bestelTable tr.row3, #shop_payment .row1, #shop_payment .row3 {
+    float: none;
+}
+#shop #bestelTable .row1 {
+    float: none;
+}
+#mediadir .mediadirSearchForm .mediadirButtonSearch {
+    float: left;
+    width: auto !important;
+}
+.search {
+    margin-bottom: 15px;
+}
+.search form input[type="submit"] {margin-right: 0;}
+#profile-left {
+    float: left;
+    margin-left: 130px;
+}
+#profile-left-button {
+    padding-left: 28.5%;
+}
+.profile.networks th {
+    float: none;
+    width: auto;
+}
+.profile.networks tr {
+    float: none;
     width: 100%;
 }
-#feed .news {float: left;}
+.profile.networks td {
+    float: none;
+    width: auto;
+}
+input[type="radio"],
+input[type="checkbox"] {
+    margin: 4px 5px 0 0px;
+    height: auto;
+    line-height: normal;
+}
+.nav li > a:hover,
+.nav li > a:focus {
+    text-decoration: none;
+    color: #000;
+    background-color: #eeeeee;
+}
+.modal-content {
+    width: 100%;
+}
+.search-form {
+    float: left;
+    width: 100%;
+    padding-bottom: 10px;
+}
+/*Calendar_add*/
+.show_in .checkbox {
+    margin-bottom: 0;
+}
+#calendarErrorMessage {
+    float: left;
+    width: 100%;
+    margin-top: 5px;
+}
+/*MediaDir_search*/
+#mediadir .form_search .mediadirButtonSearch {
+    margin-left: 0;
+}
+/*U2u*/
+.buttons input {
+    margin-bottom: 10px;
+}
+.radio .description {
+    height: auto;
+}
+/*survey*/
+.questionBlock_button input[type="reset"] {
+    float: left;
+    margin-left: 0 !important;
+}
+.questionBlock {
+    width: 100%;
+    float: left;
+    margin-bottom: 20px;
+}
+.questionBlock_button input {
+    float: left;
+    margin-right: 10px;
+}
+/*Directory_Add*/
+.selectorCenter, .mediadirSelectorCenter {
+    padding: 60px 10px 0px;
+    float: left;
+    height: 100px;
+    text-align: center;
+}
+.selectorCenter input, .notification_center input, .mediadirSelectorCenter input {
+    margin-bottom: 15px;
+}
+.notification {
+    margin-bottom: 15px;
+}
+.radio label, .checkbox label {
+    height: auto;
+}
+.thread-button input {
+    margin-bottom: 15px;
+}
+#forum .breadcrumb {
+    margin-bottom: 0;
+}
+#forum .text-danger, #forum .text-success {
+    float: left;
+    width: 90%;
+    margin-bottom: 10px;
+}
+.adv-search {
+    float: left;
+    width: 100%;
+    margin-top: 10px;
+}
+#hiddenSearch {
+    margin-top: 10px;
+    float: left;
+    width: 100%;
+}
+#regkey {margin-bottom: 10px;}
+.jobs-category > div {margin-bottom: 15px;}
+#registrationForm, #guestbook div.information, .resetForm {
+    margin-top: 5px;
+}
+.checkbox:last-child, .radio:last-child {
+    margin-bottom: 0;
+}
+.checkbox:first-child, .radio:first-child {
+    margin-top: 0;
+}
+.contact.row hr {
+    padding: 0;
+    margin: 6px 0 0px 0;
+}
+input[type="file"]{height: auto;float: left;}
+.radio label, .checkbox label {
+    height: 20px;
+}
+.btn.btn-default, .btn.btn-primary {
+    font-size: 13px;
+}
+fieldset .checkbox, fieldset .radio {
+    padding-left: 0;
+}
+/* Shop Start */
+.shop-box {
+    float: left;
+    width: 100%;
+    padding: 0 10px 20px 10px;
+    margin-left: 0;
+}
+#shopJsCart li {
+    padding: 0 0 5px 0;
+    margin: 0 0 5px 0;
+    border-bottom: 1px solid #DDDDDD;
+    background: none;
+}
+#shopJsCart li.empty,
+#shopJsCart li.loading,
+#shopJsCart li.not-loaded {
+    padding: 0;
+    margin: 0;
+    border: 0;
+}
+#shopJsCart li.total {
+    padding: 0 0 15px 0;
+    margin: 0;
+    border: 0;
+}
+#shopJsCart li.link {
+    padding: 0 0 2px 0;
+    margin: 0;
+    border: 0;
+}
+#shopJsCart li.link a {
+    padding: 1px 0 0 25px;
+    background-position: left top;
+    background-repeat: no-repeat;
+}
+#shopJsCart li.link.cart a {
+    background-image: url('images/cart.png');
+}
+#shopJsCart li.link.destroy a {
+    background-image: url('images/destroy.png');
+}
+#shop-currencies a {
+    padding: 0 10px 0 0;
+    margin: 0 10px 0 0;
+    background: url('images/divider.gif') no-repeat right 3px;
+}
+#shop-currencies a.active {
+    font-weight: bold;
+}
+#shop-currencies a.last {
+    padding: 0;
+    margin: 0;
+    background: none;
+}
+#shop-product-added-info-wrapper {
+    z-index: 1000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    float: left;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+}
+#shop-product-added-info-box {
+    position: fixed;
+    top: 40%;
+    left: 35%;
+    float: left;
+    width: 30%;
+    padding: 20px 0 20px 0;
+    color: #505050;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    border: 1px solid #DDDDDD;
+    background: #FFFFFF;
+}
+/* Shop End */

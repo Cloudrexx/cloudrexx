@@ -64,13 +64,17 @@ class XmlSitemapPageTree extends PageTree {
      * @param type $currentPage
      * @param type $skipInvisible
      * @param type $considerLogin
+     * @param boolean $skipInactive           Skip inactive pages
+     * @param boolean $considerSeoEnabledOnly Consider seo enabled pages alone
      */
     public function __construct($entityManager, $license, $maxDepth = 0, $rootNode = null, 
-                                $lang = null, $currentPage = null, $skipInvisible = true, 
-                                $considerLogin = false
+                                $lang = null, $currentPage = null, $skipInvisible = false,
+                                $considerLogin = false,
+                                $skipInactive = true,
+                                $considerSeoEnabledOnly = true
     ) {
         parent::__construct($entityManager, $license, $maxDepth, $rootNode, $lang,
-                            $currentPage, $skipInvisible, $considerLogin);
+                            $currentPage, $skipInvisible, $considerLogin, $skipInactive, $considerSeoEnabledOnly);
     }
     
     /**

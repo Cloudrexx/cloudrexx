@@ -89,9 +89,12 @@ class LoginManager {
         $endcode = $this->objTemplate->get();
         
         // replace links from before contrexx 3
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $ls = new \LinkSanitizer(
-            ASCMS_PATH_OFFSET.ASCMS_BACKEND_PATH.'/',
-            $endcode);
+            $cx,
+            $cx->getCodeBaseOffsetPath() . $cx->getBackendFolderName() . '/',
+            $endcode
+        );
         $endcode = $ls->replace();
         
         echo $endcode;

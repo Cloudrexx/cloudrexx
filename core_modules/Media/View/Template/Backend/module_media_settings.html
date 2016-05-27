@@ -49,12 +49,20 @@ function BeforeSubmit() {
     cx.jQuery(".group_div").find(".group_list:first").find("option:selected").removeAttr("selected").end().end()
     .find(".group_list:last").find("option").attr("selected", "selected");
 }
-
+function setArchiveTitle(archiveNumber) {
+    cx.jQuery("#media-archive-number-title").html(archiveNumber);
+}
 </script>
 <!-- BEGIN mediaarchive_section -->
+<ul id="tabmenu" class="media_settings">
+    <li><a id="messageTab_media1" class="active" href="javascript:{}" onclick="selectTab('media1');setArchiveTitle('1');" title="{TXT_MEDIA_ARCHIVE} #1">{TXT_MEDIA_ARCHIVE} #1</a></li>
+    <li><a id="messageTab_media2" href="javascript:{}" onclick="selectTab('media2');setArchiveTitle('2');" title="{TXT_MEDIA_ARCHIVE} #2">{TXT_MEDIA_ARCHIVE} #2</a></li>
+    <li><a id="messageTab_media3" href="javascript:{}" onclick="selectTab('media3');setArchiveTitle('3');" title="{TXT_MEDIA_ARCHIVE} #3">{TXT_MEDIA_ARCHIVE} #3</a></li>
+    <li><a id="messageTab_media4" href="javascript:{}" onclick="selectTab('media4');setArchiveTitle('4');" title="{TXT_MEDIA_ARCHIVE} #4">{TXT_MEDIA_ARCHIVE} #4</a></li>
+</ul>
 <table cellspacing="0" cellpadding="2" width="100%" border="0" class="adminlist">
 	<tr>
-		<th>{TXT_MEDIA_SETTINGS}</th>
+        <th>{TXT_MEDIA_ARCHIVE} #<span id="media-archive-number-title">1</span></th>
 	</tr>
 	<tr class="row3" style="font-weight: bold;">
 		<td>{TXT_MEDIA_FRONTEND_FILE_UPLOAD}</td>
@@ -63,13 +71,6 @@ function BeforeSubmit() {
 		<td>{TXT_MEDIA_FRONTEND_FILE_UPLOAD_DESC}</td>
     </tr>
 </table>
-<br />
-<ul id="tabmenu" class="media_settings">
-    <li><a id="messageTab_media1" class="active" href="javascript:{}" onclick="selectTab('media1')" title="{TXT_MEDIA_ARCHIVE} #1">{TXT_MEDIA_ARCHIVE} #1</a></li>
-    <li><a id="messageTab_media2" href="javascript:{}" onclick="selectTab('media2')" title="{TXT_MEDIA_ARCHIVE} #2">{TXT_MEDIA_ARCHIVE} #2</a></li>
-    <li><a id="messageTab_media3" href="javascript:{}" onclick="selectTab('media3')" title="{TXT_MEDIA_ARCHIVE} #3">{TXT_MEDIA_ARCHIVE} #3</a></li>
-    <li><a id="messageTab_media4" href="javascript:{}" onclick="selectTab('media4')" title="{TXT_MEDIA_ARCHIVE} #4">{TXT_MEDIA_ARCHIVE} #4</a></li>
-</ul>
 <form action="index.php?cmd=Media&amp;archive=archive1&amp;act=saveSettings" method="post" name="settings">
     <!-- BEGIN mediaAccessSection -->
 <div id="media{MEDIA_ARCHIVE_NUMBER}" class="messageTab" style="display:{MEDIA_TAB_STYLE}">
@@ -158,6 +159,25 @@ function BeforeSubmit() {
                        </tbody>
                     </table>
                 </div>
+            </td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+        </tr>
+        <tr class="row3">
+            <td>{TXT_CORE_MODULE_MEDIA_SEARCH_FUNCTION}</td>
+        </tr>
+        <tr class="row1">
+            <td>
+                <label>
+                    <input type="radio" {MEDIA_ALLOW_USER_SEARCH_ON} name="mediaSettings_Media{MEDIA_ARCHIVE_NUMBER}FrontendSearch" value="on" />
+                    {TXT_CORE_MODULE_MEDIA_ENABLE_SEARCH_FUNCTIONALITY}
+                </label>
+                <br />
+                <label>
+                    <input type="radio" {MEDIA_ALLOW_USER_SEARCH_OFF} name="mediaSettings_Media{MEDIA_ARCHIVE_NUMBER}FrontendSearch" value="off" />
+                    {TXT_CORE_MODULE_MEDIA_DISABLED}
+                </label>
             </td>
         </tr>
     </table>

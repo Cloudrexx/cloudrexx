@@ -52,8 +52,12 @@ class CalendarEventListener extends DefaultEventListener {
     public function SearchFindContent($search) {
         $term_db = $search->getTerm();
         $query = \Cx\Modules\Calendar\Controller\CalendarEvent::getEventSearchQuery($term_db);
-        $pageUrl = function($pageUri, $searchData) {
-            return $pageUri . '?id=' . $searchData['id'] . '&date=' . strtotime($searchData['startdate']);
+        $dateTime = $this->getComponent('DateTime');
+        $pageUrl = function($pageUri, $searchData) use ($dateTime) {
+            $date = $dateTime->createDateTimeForDb($searchData['startdate']);
+            $dateTime->db2user($date);
+            $timestamp = $date->getTimestamp();
+            return $pageUri . '?id=' . $searchData['id'] . '&date=' . $timestamp;
         };
         $result = new \Cx\Core_Modules\Listing\Model\Entity\DataSet($search->getResultArray($query, 'Calendar', 'detail', $pageUrl, $search->getTerm()));
         $search->appendResult($result);

@@ -56,9 +56,6 @@ class JsonData {
      * @var array List of adapter class names 
      */
     protected static $adapter_classes = array(
-        '\\Cx\\Core\\Json\\Adapter\\Block' => array(
-            'JsonBlock',
-        ),
         '\\Cx\\Core\\Json\\Adapter\\User' => array(
             'JsonUser',
         ),

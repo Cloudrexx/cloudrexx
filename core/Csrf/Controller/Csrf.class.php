@@ -335,7 +335,8 @@ class Csrf {
 
         $data = ($_SERVER['REQUEST_METHOD'] == 'GET' ? $_GET : $_POST);
         self::add_code();
-        $tpl = new \Cx\Core\Html\Sigma(\Env::get('cx')->getCodeBaseCorePath() . '/Csrf/View/Template/Generic/');
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $tpl = new \Cx\Core\Html\Sigma($cx->getCodeBaseCorePath() . '/Csrf/View/Template/Generic/');
         $tpl->setErrorHandling(PEAR_ERROR_DIE);
         $tpl->loadTemplateFile('Warning.html');
         $form = '';
@@ -373,8 +374,10 @@ class Csrf {
         
         // replace links from before contrexx 3
         $ls = new \LinkSanitizer(
-            ASCMS_PATH_OFFSET.ASCMS_BACKEND_PATH.'/',
-            $endcode);
+            $cx,
+            $cx->getCodeBaseOffsetPath() . $cx->getBackendFolderName() . '/',
+            $endcode
+        );
         $endcode = $ls->replace();
         
         echo $endcode;

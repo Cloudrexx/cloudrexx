@@ -125,6 +125,8 @@ class DropdownNavigationPageTree extends SigmaPageTree {
         $linkTarget = $page->getLinkTarget();
         $output = str_replace('{TARGET}', empty($linkTarget) ? '_self' : $linkTarget, $output);
         $output = str_replace('{CSS_NAME}', $page->getCssNavName(), $output);
+        $output = str_replace('{PAGE_ID}', $page->getId(), $output);
+        $output = str_replace('{PAGE_NODE_ID}', $page->getNode()->getId(), $output);
         $output = str_replace('{NAVIGATION_ID}', $this->navigationIds[$level], $output);
         $output = str_replace('{STYLE}', $style, $output);
 

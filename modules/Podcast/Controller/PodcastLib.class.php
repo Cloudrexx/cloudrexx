@@ -981,7 +981,7 @@ EOF;
             'PODCAST_SELECT_YOUTUBE_MEDIUM'     => $sourceType == 'youtube' ? 'checked="checked"' : '',
             'PODCAST_SELECT_YOUTUBE_MEDIUM_BOX' => $sourceType == 'youtube' ? 'block' : 'none',
             'PODCAST_LOCAL_SOURCE'              => $sourceType == 'local' ? $source : '',
-            'PODCAST_REMOTE_SOURCE'             => $sourceType == 'remote' ? $source : 'http://',
+            'PODCAST_REMOTE_SOURCE'             => $sourceType == 'remote' ? $source : 'https://',
             'PODCAST_YOUTUBE_SOURCE'            => $sourceType == 'youtube' ? $source : '',
             'PODCAST_YOUTUBE_ID_CHARACTERS'     => $this->_youTubeAllowedCharacters,
             'PODCAST_YOUTUBE_ID_LENGTH'         => $this->_youTubeIdLength,
@@ -1192,9 +1192,9 @@ EOF;
                 if ($_POST['podcast_medium_source_type'] == 'local') {
                     if (isset($_POST['podcast_medium_local_source'])) {
                         if (strpos($_POST['podcast_medium_local_source'], \Cx\Core\Core\Controller\Cx::instanciate()->getWebsiteOffsetPath()) === 0) {
-                            $mediumSource =  ASCMS_PROTOCOL.'://%domain%%offset%'.substr($_POST['podcast_medium_local_source'], strlen(\Cx\Core\Core\Controller\Cx::instanciate()->getWebsiteOffsetPath()));
+                            $mediumSource =  '//%domain%%offset%'.substr($_POST['podcast_medium_local_source'], strlen(\Cx\Core\Core\Controller\Cx::instanciate()->getWebsiteOffsetPath()));
                         } else {
-                            $mediumSource =  ASCMS_PROTOCOL.'://%domain%%offset%'.$_POST['podcast_medium_local_source'];
+                            $mediumSource =  '//%domain%%offset%'.$_POST['podcast_medium_local_source'];
                         }
                     }
                 } elseif ($_POST['podcast_medium_source_type'] == 'youtube') {

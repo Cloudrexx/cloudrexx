@@ -123,11 +123,28 @@ class CalendarForm extends CalendarLibrary
                              field.`required` AS `required`,
                              field.`order` AS `order`,
                              field.`affiliation` AS `affiliation`,
-                             name.`name` AS `name`,
-                             name.`default` AS `default`
-                        FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_registration_form_field AS field,
-                             ".DBPREFIX."module_".$this->moduleTablePrefix."_registration_form_field_name AS name
-                       WHERE (field.`id` = name.`field_id` AND name.`lang_id` = '".intval($_LANGID)."' AND field.`form` = '".intval($this->id)."' )
+                             (
+                                SELECT `fieldName`.`name`
+                                FROM `".DBPREFIX."module_".$this->moduleTablePrefix."_registration_form_field_name` AS `fieldName`
+                                WHERE `fieldName`.`field_id` = `field`.`id` AND `fieldName`.`form_id` = `field`.`form`
+                                ORDER BY CASE `fieldName`.`lang_id`
+                                            WHEN '$_LANGID' THEN 1
+                                            ELSE 2
+                                            END
+                                LIMIT 1
+                             ) AS `name`,
+                             (
+                                SELECT `fieldDefault`.`default`
+                                FROM `".DBPREFIX."module_".$this->moduleTablePrefix."_registration_form_field_name` AS `fieldDefault`
+                                WHERE `fieldDefault`.`field_id` = `field`.`id` AND `fieldDefault`.`form_id` = `field`.`form`
+                                ORDER BY CASE `fieldDefault`.`lang_id`
+                                            WHEN '$_LANGID' THEN 1
+                                            ELSE 2
+                                            END
+                                LIMIT 1
+                             ) AS `default`
+                        FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_registration_form_field AS field
+                       WHERE field.`form` = '".intval($this->id)."'
                     ORDER BY field.`order`";
 
             $objResultInputfield = $objDatabase->Execute($queryInputfield);
@@ -315,78 +332,104 @@ class CalendarForm extends CalendarLibrary
                 
         $this->getFrontendLanguages();
         
-        $objResult = $objDatabase->Execute("DELETE FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_registration_form_field_name WHERE form_id = '".$this->id."'");
-        if($objResult !== false) {
-            $objResult = $objDatabase->Execute("DELETE FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_registration_form_field WHERE form = '".$this->id."'"); 
-            if($objResult !== false) {
-	            foreach ($data['inputfield'] as $intFieldId => $arrField) {
-		            $query = "INSERT INTO ".DBPREFIX."module_".$this->moduleTablePrefix."_registration_form_field
-                                          (`id`,`form`,`type`,`required`,`order`,`affiliation`)  
-                                   VALUES ('".intval($intFieldId)."','".intval($this->id)."','".contrexx_addslashes($arrField['type'])."','".intval($arrField['required'])."','".intval($arrField['order'])."','".contrexx_addslashes($arrField['affiliation'])."')";
-		            
-		            $objResult = $objDatabase->Execute($query);
-		            
-		            if($objResult !== false) {
-		            	foreach ($this->arrFrontendLanguages as $key => $arrLang) {
-		            		if($arrLang['id'] == $_LANGID) {
-		            			if($arrField['name'][0] != $arrField['name'][$arrLang['id']]) {
-		            				if($arrField['name'][0] == $this->inputfields[$intFieldId]['name'][intval($arrLang['id'])]) {
-		            					$strFieldName = !empty($arrField['name'][intval($arrLang['id'])]) ? $arrField['name'][intval($arrLang['id'])] : $arrField['name'][0];
-		            				} else {
-		            					$strFieldName = $arrField['name'][0];
-		            				}
-		            			} else {
-		            				$strFieldName = $arrField['name'][0];
-		            			}
-		            		    if($arrField['default_value'][0] != $arrField['default_value'][$arrLang['id']]) {
-                                    if($arrField['default_value'][0] == $this->inputfields[$intFieldId]['default_value'][intval($arrLang['id'])]) {
-                                        $strFieldDefault = !empty($arrField['default_value'][intval($arrLang['id'])]) ? $arrField['default_value'][intval($arrLang['id'])] : $arrField['default_value'][0];
-                                    } else {
-                                        $strFieldDefault = $arrField['default_value'][0];
-                                    }
-                                } else {
-                                    $strFieldDefault = $arrField['default_value'][0];
-                                }
-		            		} else {
-		            			$strFieldName = !empty($arrField['name'][intval($arrLang['id'])]) ? $arrField['name'][intval($arrLang['id'])] : $arrField['name'][0];
-		            			$strFieldDefault = !empty($arrField['default_value'][intval($arrLang['id'])]) ? $arrField['default_value'][intval($arrLang['id'])] : $arrField['default_value'][0];
-		            		}
-                            
-                            if($arrField['type'] == 'select' || $arrField['type'] == 'radio') {
-                                $tmpFieldDefault = array();
-                                $tmpFieldDefault = explode(",", $strFieldDefault);
-                                $finalFieldDefault = array();       
-                                
-                                foreach($tmpFieldDefault as $key => $tmpValue) {
-                                    if($tmpValue != '' && $tmpValue != ' ') {
-                                       $finalFieldDefault[] = $tmpValue; 
-                                    }
-                                }
-                                
-                                $strFieldDefault = join(",", $finalFieldDefault); 
-                            }
-		            		
-		            		$query = "INSERT INTO ".DBPREFIX."module_".$this->moduleTablePrefix."_registration_form_field_name
-                                                  (`field_id`,`form_id`,`lang_id`,`name`,`default`)  
-                                           VALUES ('".intval($intFieldId)."',
-                                                   '".intval($this->id)."',
-                                                   '".intval($arrLang['id'])."',
-                                                   '".contrexx_addslashes($strFieldName)."',
-                                                   '".contrexx_addslashes($strFieldDefault)."')";
-                    
-                            $objResult = $objDatabase->Execute($query);
-		            	}
-		            } else {
-			            return false;
-			        }
-		        }
-            } else {
-	            return false;
-	        }
-        } else {
+        $query = '
+            DELETE
+                fn.*, ff.*
+            FROM
+                `'. DBPREFIX .'module_'. $this->moduleTablePrefix .'_registration_form_field_name` AS fn,
+                `'. DBPREFIX .'module_'. $this->moduleTablePrefix .'_registration_form_field` AS ff
+            WHERE
+                fn.`form_id` = '. contrexx_input2int($this->id) .'
+            AND
+                ff.`form` ='. contrexx_input2int($this->id) .'
+        ';
+        $objResult = $objDatabase->Execute($query);
+        if (!$objResult) {
             return false;
         }
-        
+
+        foreach ($data['inputfield'] as $intFieldId => $arrField) {
+            $query = '
+                INSERT INTO
+                    `'. DBPREFIX .'module_'. $this->moduleTablePrefix .'_registration_form_field`
+                SET
+                    `id`          =  '. contrexx_input2int($intFieldId) .',
+                    `form`        =  '. contrexx_input2int($this->id) .',
+                    `type`        = "'. contrexx_input2db($arrField['type']) .'",
+                    `required`    =  '. (isset($arrField['required']) ? 1 : 0) .',
+                    `order`       =  '. contrexx_input2int($arrField['order']) .',
+                    `affiliation` = "'. (isset($arrField['affiliation']) ? contrexx_input2db($arrField['affiliation']) : '') .'"
+            ';
+            $objResult = $objDatabase->Execute($query);
+
+            if ($objResult === false) {
+                continue;
+            }
+
+            foreach ($this->arrFrontendLanguages as $key => $arrLang) {
+                if (empty($arrField['name'][0])) {
+                    $arrField['name'][0] = '';
+                }
+                $strFieldName         = $arrField['name'][$arrLang['id']];
+                $strFieldDefaultValue = $arrField['default_value'][$arrLang['id']];
+
+                if ($arrLang['id'] == $_LANGID) {
+                    if (   $this->inputfields[$intFieldId]['name'][0] == $strFieldName
+                        && $this->inputfields[$intFieldId]['name'][$arrLang['id']] != $strFieldName
+                    ) {
+                        $strFieldName = $arrField['name'][$_LANGID];
+                    }
+                    if (   $this->inputfields[$intFieldId]['default_value'][0] == $strFieldDefaultValue
+                        && $this->inputfields[$intFieldId]['default_value'][$arrLang['id']] != $strFieldDefaultValue
+                    ) {
+                        $strFieldDefaultValue = $arrField['default_value'][$_LANGID];
+                    }
+                    if (   (   $this->inputfields[$intFieldId]['name'][0] != $arrField['name'][0]
+                            && $this->inputfields[$intFieldId]['name'][$arrLang['id']] == $strFieldName
+                           )
+                        || (   $this->inputfields[$intFieldId]['name'][0] != $arrField['name'][0]
+                            && $this->inputfields[$intFieldId]['name'][$arrLang['id']] != $strFieldName
+                           )
+                        || (   $this->inputfields[$intFieldId]['name'][0] == $arrField['name'][0]
+                            && $this->inputfields[$intFieldId]['name'][$arrLang['id']] == $strFieldName
+                           )
+                    ) {
+                        $strFieldName = $arrField['name'][0];
+                    }
+
+                    if (   (   $this->inputfields[$intFieldId]['default_value'][0] != $arrField['default_value'][0]
+                            && $this->inputfields[$intFieldId]['default_value'][$arrLang['id']] == $strFieldDefaultValue
+                           )
+                        || (   $this->inputfields[$intFieldId]['default_value'][0] != $arrField['default_value'][0]
+                            && $this->inputfields[$intFieldId]['default_value'][$arrLang['id']] != $strFieldDefaultValue
+                           )
+                        || (    $this->inputfields[$intFieldId]['default_value'][0] == $arrField['default_value'][0]
+                            && $this->inputfields[$intFieldId]['default_value'][$arrLang['id']] == $strFieldDefaultValue
+                           )
+                    ) {
+                        $strFieldDefaultValue = $arrField['default_value'][0];
+                    }
+                }
+                if (empty($strFieldName)) {
+                    $strFieldName = $arrField['name'][0];
+                }
+                if (empty($strFieldDefaultValue)) {
+                    $strFieldDefaultValue = $arrField['default_value'][0];
+                }
+                $query = '
+                    INSERT INTO
+                        `' . DBPREFIX . 'module_' . $this->moduleTablePrefix . '_registration_form_field_name`
+                    SET
+                        `field_id` =  '. contrexx_input2int($intFieldId) . ',
+                        `form_id`  =  '. contrexx_input2int($this->id) .',
+                        `lang_id`  =  '. contrexx_input2int($arrLang['id']) .',
+                        `name`     = "'. contrexx_input2db($strFieldName) .'",
+                        `default`  = "'. contrexx_input2db($strFieldDefaultValue) .'"';
+
+                $objResult = $objDatabase->Execute($query);
+            }
+        }
+
         return true;
     }        
     

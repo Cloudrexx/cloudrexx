@@ -274,9 +274,9 @@ class Url {
      */
     function getDefaultPort() {
         $mode = $this->getMode() == \Cx\Core\Core\Controller\Cx::MODE_BACKEND ? 'Backend' : 'Frontend';
-        \Cx\Core\Setting\Controller\Setting::init('Config', null, 'Yaml', null, \Cx\Core\Setting\Controller\Setting::POPULATE);
+        \Cx\Core\Setting\Controller\Setting::init('Config', null, 'Yaml', null, \Cx\Core\Setting\Controller\Setting::NOT_POPULATE);
         $protocol = strtoupper($this->getProtocol());
-        $port  =  \Cx\Core\Setting\Controller\Setting::getValue('port' . $mode . $protocol);
+        $port  =  \Cx\Core\Setting\Controller\Setting::getValue('port' . $mode . $protocol, 'Config');
         return $port;
     }    
 

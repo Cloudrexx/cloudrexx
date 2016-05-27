@@ -141,4 +141,6 @@ $_ARRAYLANG['TXT_MAIL_CONTENT'] = "Mail content";
 $_ARRAYLANG['TXT_MEDIA_FILE_DONT_EDIT'] = "You are not able to edit the requested file.";
 $_ARRAYLANG['TXT_MEDIA_FILE_DONT_DELETE'] = "You are not able to delete the requested file.";
 $_ARRAYLANG['TXT_MEDIA_FILE_DONT_DOWNLOAD'] = "You are not able to download the requested file.";
-?>
+$_ARRAYLANG['TXT_CORE_MODULE_MEDIA_SEARCH_FUNCTION'] = 'Frontend search functionality';
+$_ARRAYLANG['TXT_CORE_MODULE_MEDIA_ENABLE_SEARCH_FUNCTIONALITY'] = 'Enable file search functionality';
+$_ARRAYLANG['TXT_CORE_MODULE_MEDIA_DISABLED'] = 'Disabled';

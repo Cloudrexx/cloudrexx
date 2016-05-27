@@ -1130,8 +1130,24 @@ namespace Cx\Core\Core\Controller {
                 $filename = $this->getWebsiteConfigPath() . '/postInitHooks.yml';
                 $objDataSet = \Cx\Core_Modules\Listing\Model\Entity\DataSet::load($filename);
                 foreach ($objDataSet as $componentDefinition) {
+                    $this->eventManager->triggerEvent(
+                        'preComponent',
+                        array(
+                            'componentName' => $componentDefinition['name'],
+                            'component' => null,
+                            'hook' => 'postInit',
+                        )
+                    );
                     $componentController = $this->getComponentControllerByNameAndType($componentDefinition['name'], $componentDefinition['type']);
                     $componentController->postInit($this);
+                    $this->eventManager->triggerEvent(
+                        'postComponent',
+                        array(
+                            'componentName' => $componentDefinition['name'],
+                            'component' => null,
+                            'hook' => 'postInit',
+                        )
+                    );
                 }
             } catch (\Cx\Core_Modules\Listing\Model\Entity\DataSetException $e) {
                 throw new \Exception('Error in processing postInit-hooks: '.$e->getMessage());
@@ -1329,8 +1345,10 @@ namespace Cx\Core\Core\Controller {
 
             \DBG::set_adodb_debug_mode();
 
-            $this->eventManager = new \Cx\Core\Event\Controller\EventManager();
+            $this->eventManager = new \Cx\Core\Event\Controller\EventManager($this);
             new \Cx\Core\Event\Controller\ModelEventWrapper($this);
+            $this->eventManager->addEvent('preComponent');
+            $this->eventManager->addEvent('postComponent');
 
             // Initialize base system
             // TODO: Get rid of InitCMS class, merge it with this class instead
@@ -1675,6 +1693,7 @@ namespace Cx\Core\Core\Controller {
             global $_CONFIG;
 
             $content = str_replace('{PAGE_URL}',        htmlspecialchars(\Env::get('init')->getPageUri()), $content);
+            $content = str_replace('{PAGE_URL_ENCODED}',urlencode(\Env::get('init')->getPageUri()->toString()), $content);
             $content = str_replace('{STANDARD_URL}',    \Env::get('init')->getUriBy('smallscreen', 0),     $content);
             $content = str_replace('{MOBILE_URL}',      \Env::get('init')->getUriBy('smallscreen', 1),     $content);
             $content = str_replace('{PRINT_URL}',       \Env::get('init')->getUriBy('printview', 1),       $content);
@@ -1800,13 +1819,12 @@ namespace Cx\Core\Core\Controller {
          * @todo Remove usage of globals
          * @global array $_CONFIG
          * @global type $themesPages
-         * @global type $objCounter
          * @global type $objBanner
          * @global type $_CORELANG
          * @return type
          */
         protected function setPostContentLoadPlaceholders() {
-            global $_CONFIG, $themesPages, $objCounter, $objBanner, $_CORELANG;
+            global $_CONFIG, $themesPages, $objBanner, $_CORELANG;
 
             if ($this->mode == self::MODE_BACKEND) {
                 $formattedVersion = htmlentities(
@@ -1854,6 +1872,13 @@ namespace Cx\Core\Core\Controller {
                 return;
             }
 
+            $objCounter              = null;
+            $componentRepo           = $this->getDb()->getEntityManager()->getRepository('Cx\Core\Core\Model\Entity\SystemComponent');
+            $statsComponentContoller = $componentRepo->findOneBy(array('name' => 'Stats'));
+            if ($statsComponentContoller) {
+                $objCounter = $statsComponentContoller->getCounterInstance();
+            }
+
             // set global template variables
             $boolShop = \Cx\Modules\Shop\Controller\Shop::isInitialized();
             $objNavbar = new \Navigation($this->resolvedPage->getId(), $this->resolvedPage);
@@ -1881,6 +1906,7 @@ namespace Cx\Core\Core\Controller {
                 'APP_URL'                        => \Env::get('init')->getUriBy('appview', 1),
                 'LOGOUT_URL'                     => \Env::get('init')->getUriBy('section', 'logout'),
                 'PAGE_URL'                       => htmlspecialchars(\Env::get('init')->getPageUri()),
+                'PAGE_URL_ENCODED'               => urlencode(\Env::get('init')->getPageUri()->toString()),
                 'CURRENT_URL'                    => \Env::get('init')->getCurrentPageUri(),
                 'DATE'                           => showFormattedDate(),
                 'TIME'                           => date('H:i', time()),
@@ -1891,9 +1917,9 @@ namespace Cx\Core\Core\Controller {
                 'NAVBAR_FILE'                    => $objNavbar->getNavigation($themesPages['navbar'], $this->license, $boolShop),
                 'NAVBAR2_FILE'                   => $objNavbar->getNavigation($themesPages['navbar2'], $this->license, $boolShop),
                 'NAVBAR3_FILE'                   => $objNavbar->getNavigation($themesPages['navbar3'], $this->license, $boolShop),
-                'ONLINE_USERS'                   => $objCounter->getOnlineUsers(),
-                'VISITOR_NUMBER'                 => $objCounter->getVisitorNumber(),
-                'COUNTER'                        => $objCounter->getCounterTag(),
+                'ONLINE_USERS'                   => $objCounter ? $objCounter->getOnlineUsers() : '',
+                'VISITOR_NUMBER'                 => $objCounter ? $objCounter->getVisitorNumber() : '',
+                'COUNTER'                        => $objCounter ? $objCounter->getCounterTag() : '',
                 'BANNER'                         => isset($objBanner) ? $objBanner->getBannerJS() : '',
                 'VERSION'                        => contrexx_raw2xhtml($_CONFIG['coreCmsName']),
                 'LANGUAGE_NAVBAR'                => $objNavbar->getFrontendLangNavigation($this->resolvedPage, $this->request->getUrl()),
@@ -2062,8 +2088,10 @@ namespace Cx\Core\Core\Controller {
 
                 // replace links from before contrexx 3
                 $ls = new \LinkSanitizer(
-                    $this->codeBaseOffsetPath . \Env::get('virtualLanguageDirectory').'/',
-                    $endcode);
+                    $this,
+                    $this->getCodeBaseOffsetPath() . \Env::get('virtualLanguageDirectory') . '/',
+                    $endcode
+                );
                 $endcode = $ls->replace();
 
                 echo $endcode;
@@ -2172,8 +2200,10 @@ namespace Cx\Core\Core\Controller {
 
                 // replace links from before contrexx 3
                 $ls = new \LinkSanitizer(
-                    ASCMS_PATH_OFFSET.ASCMS_BACKEND_PATH.'/',
-                    $endcode);
+                    $this,
+                    $this->getCodeBaseOffsetPath() . $this->getBackendFolderName() . '/',
+                    $endcode
+                );
                 $endcode = $ls->replace();
 
                 echo $endcode;

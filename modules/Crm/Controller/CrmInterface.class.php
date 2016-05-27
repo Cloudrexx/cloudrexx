@@ -679,6 +679,7 @@ class CrmInterface extends CrmLibrary
             array("value" => 'role', 'title' => $_ARRAYLANG['TXT_CRM_ROLE'], 'Header' => false),
             array("value" => 'customertype', 'title' => $_ARRAYLANG['TXT_CRM_TITLE_CUSTOMERTYPE'], 'Header' => false),
             array("value" => 'industrytype', 'title' => $_ARRAYLANG['TXT_CRM_INDUSTRY_TYPE'], 'Header' => false),
+            array("value" => 'customerGroups', 'title' => $_ARRAYLANG['TXT_CRM_CUSTOMER_MEMBERSHIP'], 'Header' => false),
             array("value" => 'currency', 'title' => $_ARRAYLANG['TXT_CRM_TITLE_CURRENCY'], 'Header' => false),
             array("value" => 'customerId', 'title' => $_ARRAYLANG['TXT_CRM_TITLE_CUSTOMERID'], 'Header' => false),
             array("value" => 'language', 'title' => $_ARRAYLANG['TXT_CRM_TITLE_LANGUAGE'], 'Header' => false),            
@@ -826,7 +827,34 @@ class CrmInterface extends CrmLibrary
                         if (!$skip) {
                             $importedLines++;
                             $_SESSION[$fileName]['importedRows'] = $importedLines;
-                            
+
+                            //insert customer groups
+                            if (isset($customerGroups) && !empty($line[$customerGroups])) {
+                                $groupIds   = array();
+                                $groupNames = explode(', ', $line[$customerGroups]);
+                                $query = 'SELECT
+                                            `membership`.`id`
+                                          FROM
+                                            `'.DBPREFIX.'module_'. $this->moduleNameLC . '_memberships` AS membership
+                                          LEFT JOIN
+                                            `'.DBPREFIX.'module_' . $this->moduleNameLC . '_membership_local` AS memberLoc
+                                          ON
+                                            `membership`.`id` = `memberLoc`.`entry_id`
+                                          WHERE
+                                            `memberLoc`.`value` IN ("' . implode('" , "', contrexx_input2db($groupNames)) . '")
+                                        ';
+                                $objResult = $objDatabase->Execute($query);
+                                if ($objResult && $objResult->RecordCount() > 0) {
+                                    while (!$objResult->EOF) {
+                                        $groupIds[] = $objResult->fields['id'];
+                                        $objResult->MoveNext();
+                                    }
+                                }
+                                if ($groupIds) {
+                                    $this->updateCustomerMemberships($groupIds, $this->contact->id);
+                                }
+                            }
+
                             // insert Emails
                             $first  = true;
                             foreach ($this->emailOptions as $key => $emailValue) {

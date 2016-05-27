@@ -579,8 +579,26 @@ class cmsSession extends RecursiveArrayAccess implements SessionHandlerInterface
      * @return bool
      */
     function gc($maxlifetime) {
-        \Env::get('db')->Execute('DELETE s.*, v.* FROM `' . DBPREFIX . 'sessions` AS s, `' . DBPREFIX . 'session_variable` AS v WHERE s.sessionid = v.sessionid AND ((`s`.`remember_me` = 0) AND (`s`.`lastupdated` < ' . (time() - $this->defaultLifetime) . '))');
-        \Env::get('db')->Execute('DELETE s.*, v.* FROM `' . DBPREFIX . 'sessions` AS s, `' . DBPREFIX . 'session_variable` AS v WHERE s.sessionid = v.sessionid AND ((`s`.`remember_me` = 1) AND (`s`.`lastupdated` < ' . (time() - $this->defaultLifetimeRememberMe) . '))');
+        // clear expired sessions that were once valid
+        // note: those two queries might look obsolete when considering
+        //       that the below three queries will have the same effect.
+        //       However the last query below uses a heavy resource requiring
+        //       subquery which can be made lighter by first running those two
+        //       queries here 
+        \Env::get('db')->Execute(
+            'DELETE s.*, v.*
+             FROM   `' . DBPREFIX . 'sessions` AS s, `' . DBPREFIX . 'session_variable` AS v
+             WHERE  s.sessionid = v.sessionid AND (
+                           (`s`.`remember_me` = 0 AND `s`.`lastupdated` < ' . (time() - $this->defaultLifetime) . ')
+                        OR (`s`.`remember_me` = 1 AND `s`.`lastupdated` < ' . (time() - $this->defaultLifetimeRememberMe) . ')
+             )'
+        );
+
+        // clear expired sessions that were broken (no valid relation between
+        // contrexx_sessions and contrexx_session_variable
+        \Env::get('db')->Execute('DELETE FROM `' . DBPREFIX . 'sessions` WHERE `remember_me` = 0 AND `lastupdated` < ' . (time() - $this->defaultLifetime));
+        \Env::get('db')->Execute('DELETE FROM `' . DBPREFIX . 'sessions` WHERE `remember_me` = 1 AND `lastupdated` < ' . (time() - $this->defaultLifetimeRememberMe));
+        \Env::get('db')->Execute('DELETE FROM `' . DBPREFIX . 'session_variable` WHERE sessionid NOT IN (SELECT sessionid FROM `' . DBPREFIX . 'sessions`)');
         return true;
     }
 

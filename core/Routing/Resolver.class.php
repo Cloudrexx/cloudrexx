@@ -381,6 +381,14 @@ class Resolver {
                 $componentController->resolve($parts, $this->page);
             }
         }
+        $canonicalPage = $this->page;
+        if (
+            $this->urlPage &&
+            $this->urlPage->getType() == \Cx\Core\ContentManager\Model\Entity\Page::TYPE_SYMLINK
+        ) {
+            $canonicalPage = $this->pageRepo->getTargetPage($this->urlPage);
+        }
+        header('Link: <' . \Cx\Core\Routing\Url::fromPage($canonicalPage)->toString() . '>; rel="canonical"');
         return $this->page;
     }
 
@@ -515,6 +523,9 @@ class Resolver {
             $this->url->setParams($this->url->getSuggestedParams());
 
             $this->page = $result['page'];
+        }
+        if (!$this->urlPage) {
+            $this->urlPage = clone $this->page;
         }
         /*
           the page we found could be a redirection.

@@ -1032,19 +1032,6 @@ class Download {
                     $arrSortExpressions[] = $direction;
                 }
             }
-
-            if (!isset($arrSort['order'])) {
-                $arrSortExpressions[] = ($joinCategoryTbl ? 'tblRC' : 'tblD').'.`order`';
-                if ($joinCategoryTbl) {
-                    $arrSortExpressions[] = 'tblD.`order`';
-                }
-            }
-            if (!in_array('id', $arrSort)) {
-                $arrSortExpressions[] = 'tblD.`id`';
-            }
-        } else {
-            $arrSortExpressions[] = ($joinCategoryTbl ? 'tblRC' : 'tblD').'.`order`';
-            $arrSortExpressions[] = 'tblD.`id`';
         }
 
         $query = 'SELECT SQL_CALC_FOUND_ROWS DISTINCT tblD.`id`

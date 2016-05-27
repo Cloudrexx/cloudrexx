@@ -26,72 +26,97 @@
  */
  
 /**
- * JSON Adapter for Block module
+ * JSON Adapter for Block
+ * 
  * @copyright   Cloudrexx AG
- * @author      Michael Ritter <michael.ritter@comvation.com>
+ * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
- * @subpackage  core_json
+ * @subpackage  module_block
  */
 
-namespace Cx\Core\Json\Adapter\Block;
-use \Cx\Core\Json\JsonAdapter;
+namespace Cx\Modules\Block\Controller;
+
+/**
+ * Class JsonBlockException
+ * @package     cloudrexx
+ * @subpackage  module_block
+ */
+class JsonBlockException extends \Exception {}
 
 /**
  * Class NoPermissionException
  * @package     cloudrexx
- * @subpackage  core_json
+ * @subpackage  module_block
  */
-class NoPermissionException extends \Exception {}
+class NoPermissionException extends JsonBlockException {}
 
 /**
  * Class NotEnoughArgumentsException
  * @package     cloudrexx
- * @subpackage  core_json
+ * @subpackage  module_block
  */
-class NotEnoughArgumentsException extends \Exception {}
+class NotEnoughArgumentsException extends JsonBlockException {}
 
 /**
  * Class NoBlockFoundException
  * @package     cloudrexx
- * @subpackage  core_json
+ * @subpackage  module_block
  */
-class NoBlockFoundException extends \Exception {}
+class NoBlockFoundException extends JsonBlockException {}
 
 /**
  * Class BlockCouldNotBeSavedException
  * @package     cloudrexx
- * @subpackage  core_json
+ * @subpackage  module_block
  */
-class BlockCouldNotBeSavedException extends \Exception {}
+class BlockCouldNotBeSavedException extends JsonBlockException {}
 
 /**
- * JSON Adapter for Block module
+ * JSON Adapter for Block
+ * 
  * @copyright   Cloudrexx AG
- * @author      Michael Ritter <michael.ritter@comvation.com>
+ * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
- * @subpackage  core_json
+ * @subpackage  module_block
  */
-class JsonBlock implements JsonAdapter {
+class JsonBlockController extends \Cx\Core\Core\Model\Entity\Controller implements \Cx\Core\Json\JsonAdapter
+{
     /**
      * List of messages
-     * @var Array 
+     * @var Array
      */
-    private $messages = array();
-    
+    protected $messages = array();
+
     /**
      * Returns the internal name used as identifier for this adapter
      * @return String Name of this adapter
      */
-    public function getName() {
+    public function getName() 
+    {
         return 'Block';
+    }
+    
+    /**
+     * Returns default permission as object
+     * @return Object
+     */
+    public function getDefaultPermissions()
+    {
+        return new \Cx\Core_Modules\Access\Model\Entity\Permission(null, array('get'), true);
     }
     
     /**
      * Returns an array of method names accessable from a JSON request
      * @return array List of method names
      */
-    public function getAccessableMethods() {
-        return array('getBlocks', 'getBlockContent', 'saveBlockContent');
+    public function getAccessableMethods()
+    {
+        return array(
+            'getCountries',
+            'getBlocks',
+            'getBlockContent',
+            'saveBlockContent' => new \Cx\Core_Modules\Access\Model\Entity\Permission(null, array('post'), true)
+        );
     }
 
     /**
@@ -101,26 +126,48 @@ class JsonBlock implements JsonAdapter {
     public function getMessagesAsString() {
         return implode('<br />', $this->messages);
     }
-    
+
     /**
-     * Returns default permission as object
-     * @return Object
+     * Get countries from given name
+     * 
+     * @param array $params Get parameters, 
+     * 
+     * @return array Array of countries
      */
-    public function getDefaultPermissions() {
-        return null;
+    public function getCountries($params)
+    {
+        $countries = array();
+        $term = !empty($params['get']['term']) ? contrexx_input2raw($params['get']['term']) : '';
+        if (empty($term)) {
+            return array(
+                'countries' => $countries
+            );
+        }
+        $arrCountries = \Cx\Core\Country\Controller\Country::searchByName($term);
+        foreach ($arrCountries as $country) {
+            $countries[] = array(
+                'id'    => $country['id'],
+                'label' => $country['name'],
+                'val'   => $country['name'],
+            );
+        }
+        return array(
+            'countries' => $countries
+        );
     }
-    
+
     /**
      * Returns all available blocks for each language
+     *
      * @return array List of blocks (lang => id )
      */
     public function getBlocks() {
         global $objInit, $_CORELANG;
-        
+
         if (!\FWUser::getFWUserObject()->objUser->login() || $objInit->mode != 'backend') {
             throw new \Exception($_CORELANG['TXT_ACCESS_DENIED_DESCRIPTION']);
         }
-        
+
         $blockLib = new \Cx\Modules\Block\Controller\BlockLibrary();
         $blocks = $blockLib->getBlocks();
         $data = array();
@@ -134,37 +181,37 @@ class JsonBlock implements JsonAdapter {
         }
         return $data;
     }
-    
+
     /**
      * Get the block content as html
      * 
      * @param array $params all given params from http request
-     * @throws \Cx\Core\Json\Adapter\Block\NoPermissionException
-     * @throws \Cx\Core\Json\Adapter\Block\NotEnoughArgumentsException
-     * @throws \Cx\Core\Json\Adapter\Block\NoBlockFoundException
+     * @throws NoPermissionException
+     * @throws NotEnoughArgumentsException
+     * @throws NoBlockFoundException
      * @return string the html content of the block
      */
     public function getBlockContent($params) {
         global $_CORELANG, $objDatabase;
-        
+
         // security check
         if (   !\FWUser::getFWUserObject()->objUser->login()
             || !\Permission::checkAccess(76, 'static', true)) {
-            throw new \Cx\Core\Json\Adapter\Block\NoPermissionException($_CORELANG['TXT_ACCESS_DENIED_DESCRIPTION']);
+            throw new NoPermissionException($_CORELANG['TXT_ACCESS_DENIED_DESCRIPTION']);
         }
-        
+
         // check for necessary arguments
         if (empty($params['get']['block']) || empty($params['get']['lang'])) {
-            throw new \Cx\Core\Json\Adapter\Block\NotEnoughArgumentsException('not enough arguments');
+            throw new NotEnoughArgumentsException('not enough arguments');
         }
-        
+
         // get id and langugage id
         $id = intval($params['get']['block']);
         $lang = \FWLanguage::getLanguageIdByCode($params['get']['lang']);
         if (!$lang) {
             $lang = FRONTEND_LANG_ID;
         }
-        
+
         // database query to get the html content of a block by block id and
         // language id
         $query = "SELECT
@@ -180,39 +227,44 @@ class JsonBlock implements JsonAdapter {
                       (c.lang_id = ".$lang." AND c.active = 1)";
 
         $result = $objDatabase->Execute($query);
-        
+
         // nothing found
         if ($result === false || $result->RecordCount() == 0) {
-            throw new \Cx\Core\Json\Adapter\Block\NoBlockFoundException('no block content found with id: ' . $id);
+            throw new NoBlockFoundException('no block content found with id: ' . $id);
         }
-
-        $ls = new \LinkSanitizer(ASCMS_PATH_OFFSET.\Env::get('virtualLanguageDirectory').'/', $result->fields['content']);
+        
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $ls = new \LinkSanitizer(
+            $cx,
+            $cx->getCodeBaseOffsetPath() . \Env::get('virtualLanguageDirectory') . '/',
+            $result->fields['content']
+        );
         return array('content' => $ls->replace());
     }
-    
+
     /**
      * Save the block content
-     * 
+     *
      * @param array $params all given params from http request
-     * @throws \Cx\Core\Json\Adapter\Block\NoPermissionException
-     * @throws \Cx\Core\Json\Adapter\Block\NotEnoughArgumentsException
-     * @throws \Cx\Core\Json\Adapter\Block\BlockCouldNotBeSavedException
+     * @throws NoPermissionException
+     * @throws NotEnoughArgumentsException
+     * @throws BlockCouldNotBeSavedException
      * @return boolean true if everything finished with success
      */
     public function saveBlockContent($params) {
         global $_CORELANG, $objDatabase;
-        
+
         // security check
         if (   !\FWUser::getFWUserObject()->objUser->login()
             || !\Permission::checkAccess(76, 'static', true)) {
-            throw new \Cx\Core\Json\Adapter\Block\NoPermissionException($_CORELANG['TXT_ACCESS_DENIED_DESCRIPTION']);
+            throw new NoPermissionException($_CORELANG['TXT_ACCESS_DENIED_DESCRIPTION']);
         }
-        
+
         // check arguments
         if (empty($params['get']['block']) || empty($params['get']['lang'])) {
-            throw new \Cx\Core\Json\Adapter\Block\NotEnoughArgumentsException('not enough arguments');
+            throw new NotEnoughArgumentsException('not enough arguments');
         }
-        
+
         // get language and block id
         $id = intval($params['get']['block']);
         $lang = \FWLanguage::getLanguageIdByCode($params['get']['lang']);
@@ -220,23 +272,28 @@ class JsonBlock implements JsonAdapter {
             $lang = FRONTEND_LANG_ID;
         }
         $content = $params['post']['content'];
-        
+
         // query to update content in database
         $query = "UPDATE `".DBPREFIX."module_block_rel_lang_content`
                       SET content = '".\contrexx_input2db($content)."'
                   WHERE
                       block_id = ".$id." AND lang_id = ".$lang;
         $result = $objDatabase->Execute($query);
-        
+
         // error handling
         if ($result === false) {
-            throw new \Cx\Core\Json\Adapter\Block\BlockCouldNotBeSavedException('block could not be saved');
+            throw new BlockCouldNotBeSavedException('block could not be saved');
         }
         \LinkGenerator::parseTemplate($content);
         
-        $ls = new \LinkSanitizer(ASCMS_PATH_OFFSET.\Env::get('virtualLanguageDirectory').'/', $content);
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $ls = new \LinkSanitizer(
+            $cx,
+            $cx->getCodeBaseOffsetPath() . \Env::get('virtualLanguageDirectory') . '/',
+            $content
+        );
         $this->messages[] = $_CORELANG['TXT_CORE_SAVED_BLOCK'];
-        
+
         return array('content' => $ls->replace());
     }
 }

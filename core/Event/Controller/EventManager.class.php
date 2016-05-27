@@ -58,6 +58,11 @@ class EventManagerException extends \Exception {}
 
 class EventManager {
     protected $listeners = array();
+    protected $cx;
+    
+    public function __construct($cx) {
+        $this->cx = $cx;
+    }
     
     public function addEvent($eventName) {
         if (isset($this->listeners[$eventName])) {
@@ -71,10 +76,40 @@ class EventManager {
             throw new EventManagerException('No such event "' . $eventName . '"');
         }
         foreach ($this->listeners[$eventName] as $listener) {
+            $component = $listener['component'];
+            $listener = $listener['listener'];
             if (is_callable($listener)) {
                 $listener($eventName, $eventArgs);
             } else {
+                if (
+                    $component &&
+                    $eventName != 'preComponent' &&
+                    $eventName != 'postComponent'
+                ) {
+                    $this->triggerEvent(
+                        'preComponent',
+                        array(
+                            'componentName' => $component->getName(),
+                            'component' => $component,
+                            'hook' => 'event/' . $eventName,
+                        )
+                    );
+                }
                 $listener->onEvent($eventName, $eventArgs);
+                if (
+                    $component &&
+                    $eventName != 'preComponent' &&
+                    $eventName != 'postComponent'
+                ) {
+                    $this->triggerEvent(
+                        'postComponent',
+                        array(
+                            'componentName' => $component->getName(),
+                            'component' => $component,
+                            'hook' => 'event/' . $eventName,
+                        )
+                    );
+                }
             }
         }
     }
@@ -89,7 +124,23 @@ class EventManager {
         if (!is_callable($listener) && !($listener instanceof \Cx\Core\Event\Model\Entity\EventListener)) {
             throw new EventManagerException('Listener must be callable or implement EventListener interface!');
         }
-        $this->listeners[$eventName][] = $listener;
+        
+        // try to find component
+        $component = null;
+        if (!is_callable($listener)) {
+            $matches = array();
+            preg_match('/^\\\\?Cx\\\\(Core|Core_Modules|Modules)\\\\([a-zA-Z_0-9]+)\\\\/', get_class($listener), $matches);
+            if (isset($matches[2])) {
+                $em = $this->cx->getDb()->getEntityManager();
+                $componentRepo = $em->getRepository('Cx\Core\Core\Model\Entity\SystemComponent');
+                $component = $componentRepo->findOneBy(array('name' => $matches[2]));
+            }
+        }
+        
+        $this->listeners[$eventName][] = array(
+            'listener' => $listener,
+            'component' => $component,
+        );
     }
     
     public function addModelListener($eventName, $entityClass, $listener) {

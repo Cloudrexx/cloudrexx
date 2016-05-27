@@ -559,6 +559,8 @@ class CalendarManager extends CalendarLibrary
             'TXT_'.$this->moduleLangVar.'_EVENT_ZIP'                        => $_ARRAYLANG['TXT_CALENDAR_EVENT_ZIP'],
             'TXT_'.$this->moduleLangVar.'_EVENT_CITY'                       => $_ARRAYLANG['TXT_CALENDAR_EVENT_CITY'],
             'TXT_'.$this->moduleLangVar.'_EVENT_COUNTRY'                    => $_ARRAYLANG['TXT_CALENDAR_EVENT_COUNTRY'],
+            'TXT_'.$this->moduleLangVar.'_EVENT_WEBSITE'                    => $_ARRAYLANG['TXT_CALENDAR_EVENT_WEBSITE'],
+            'TXT_'.$this->moduleLangVar.'_EVENT_PHONE'                      => $_ARRAYLANG['TXT_CALENDAR_EVENT_PHONE'],
             'TXT_'.$this->moduleLangVar.'_EVENT_MAP'                        => $_ARRAYLANG['TXT_CALENDAR_EVENT_MAP'],
             'TXT_'.$this->moduleLangVar.'_EVENT_USE_GOOGLEMAPS'             => $_ARRAYLANG['TXT_CALENDAR_EVENT_USE_GOOGLEMAPS'],
             'TXT_'.$this->moduleLangVar.'_PLACE_DATA_DEFAULT'               => $_ARRAYLANG['TXT_CALENDAR_PLACE_DATA_DEFAULT'],
@@ -567,7 +569,8 @@ class CalendarManager extends CalendarLibrary
             'TXT_'.$this->moduleLangVar.'_NEXT'                             => $_ARRAYLANG['TXT_CALENDAR_NEXT'],
             'TXT_'.$this->moduleLangVar.'_EVENT_DETAIL_VIEW'                => $_ARRAYLANG['TXT_CALENDAR_EVENT_DETAIL_VIEW'],
             'TXT_'.$this->moduleLangVar.'_EVENT_DETAIL_VIEW_LABEL'          => $_ARRAYLANG['TXT_CALENDAR_EVENT_DETAIL_VIEW_LABEL'],
-            
+            'TXT_'.$this->moduleLangVar.'_EVENT_TREAT_AS_INDEPENDENT'       => $_ARRAYLANG['TXT_CALENDAR_EVENT_TREAT_AS_INDEPENDENT'],
+
             //show media browser button
             $this->moduleLangVar.'_EVENT_REDIRECT_BROWSE_BUTTON'            => self::showMediaBrowserButton('eventRedirect', 'sitestructure'),
             $this->moduleLangVar.'_EVENT_PICTURE_BROWSE_BUTTON'             => self::showMediaBrowserButton('eventPicture'),
@@ -608,7 +611,9 @@ class CalendarManager extends CalendarLibrary
             $this->moduleLangVar.'_EVENT_ZIP'                               => $eventId != 0 ? $objEvent->place_zip : '',
             $this->moduleLangVar.'_EVENT_CITY'                              => $eventId != 0 ? $objEvent->place_city : '',
             $this->moduleLangVar.'_EVENT_COUNTRY'                           => $eventId != 0 ? $objEvent->place_country : '',
+            $this->moduleLangVar.'_EVENT_PLACE_WEBSITE'                     => $eventId != 0 ? $objEvent->place_website : '',
             $this->moduleLangVar.'_EVENT_PLACE_LINK'                        => $eventId != 0 ? $objEvent->place_link : '', 
+            $this->moduleLangVar.'_EVENT_PLACE_PHONE'                       => $eventId != 0 ? $objEvent->place_phone : '',
             $this->moduleLangVar.'_PLACE_MAP_SOURCE'                        => $eventId != 0 ? $objEvent->place_map : '',    
             //$this->moduleLangVar.'_EVENT_MAP'                               => $objEvent->map == 1 ? 'checked="checked"' : '',    
             $this->moduleLangVar.'_EVENT_HOST_TYPE'                         => $this->arrSettings['placeDataHost'] == 3 ? ($eventId != 0 ? $objEvent->hostType : 1) : $this->arrSettings['placeDataHost'],
@@ -617,7 +622,9 @@ class CalendarManager extends CalendarLibrary
             $this->moduleLangVar.'_EVENT_HOST_ZIP'                          => $eventId != 0 ? $objEvent->org_zip : '',
             $this->moduleLangVar.'_EVENT_HOST_CITY'                         => $eventId != 0 ? $objEvent->org_city : '',
             $this->moduleLangVar.'_EVENT_HOST_COUNTRY'                      => $eventId != 0 ? $objEvent->org_country : '',
+            $this->moduleLangVar.'_EVENT_HOST_WEBSITE'                      => $eventId != 0 ? $objEvent->org_website : '',
             $this->moduleLangVar.'_EVENT_HOST_LINK'                         => $eventId != 0 ? $objEvent->org_link : '',
+            $this->moduleLangVar.'_EVENT_HOST_PHONE'                        => $eventId != 0 ? $objEvent->org_phone : '',
             $this->moduleLangVar.'_EVENT_HOST_EMAIL'                        => $eventId != 0 ? $objEvent->org_email : '',
             $this->moduleLangVar.'_EVENT_HOST_TYPE_MANUAL'                  => $eventId != 0 ? ($objEvent->hostType == 1 ? "checked='checked'" : '') : "checked='checked'",
             $this->moduleLangVar.'_EVENT_HOST_TYPE_MEDIADIR'                => $eventId != 0 ? ($objEvent->hostType == 2 ? "checked='checked'" : '') : "",            
@@ -754,8 +761,9 @@ class CalendarManager extends CalendarLibrary
         ));
         
         //parse series
-        $lastExeptionId = 4;
-        $seriesStatus = $objEvent->seriesStatus == 1 ? 'checked="checked"' : '';
+        $lastExeptionId    = 4;
+        $seriesStatus      = $objEvent->seriesStatus == 1 ? 'checked="checked"' : '';
+        $seriesIndependent = empty($eventId) || $objEvent->independentSeries == 1 ? 'checked="checked"' : '';
         
         $seriesPatternDailyDays   = 1;
         $seriesPatternWeeklyWeeks = 1;
@@ -835,6 +843,7 @@ class CalendarManager extends CalendarLibrary
         
         $this->_objTpl->setVariable(array(            
             $this->moduleLangVar.'_EVENT_SERIES_STATUS'             => $seriesStatus,
+            $this->moduleLangVar.'_EVENT_SERIES_INDEPENDENT'        => $seriesIndependent,
             $this->moduleLangVar.'_SERIES_PATTERN_DAILY'            => $seriesPatternDaily,
             $this->moduleLangVar.'_SERIES_PATTERN_WEEKLY'           => $seriesPatternWeekly,
             $this->moduleLangVar.'_SERIES_PATTERN_MONTHLY'          => $seriesPatternMonthly,
@@ -1328,7 +1337,7 @@ class CalendarManager extends CalendarLibrary
         global $_ARRAYLANG, $_LANGID;
         
         if (empty($eventId)) {
-            \Cx\Core\Csrf\Controller\Csrf::header("Location: index.php?cmd=".$this->moduleName);
+            \Cx\Core\Csrf\Controller\Csrf::redirect("index.php?cmd=".$this->moduleName);
             return;
         }   
         
@@ -1361,7 +1370,7 @@ class CalendarManager extends CalendarLibrary
         
         $filename = urlencode($objEvent->title).".csv"; 
         
-        $objRegistrationManager = new \Cx\Modules\Calendar\Controller\CalendarRegistrationManager($eventId, $getRegistrations, $getDeregistrations, $getWaitlist);  
+        $objRegistrationManager = new \Cx\Modules\Calendar\Controller\CalendarRegistrationManager($objEvent, $getRegistrations, $getDeregistrations, $getWaitlist);
         $objRegistrationManager->getRegistrationList(); 
         
         if(!empty($objRegistrationManager->registrationList)) {                 
@@ -1462,7 +1471,7 @@ class CalendarManager extends CalendarLibrary
             
             exit();   
        } else {   
-            \Cx\Core\Csrf\Controller\Csrf::header("Location: index.php?cmd=".$this->moduleName);
+            \Cx\Core\Csrf\Controller\Csrf::redirect("index.php?cmd=".$this->moduleName);
             return;
        }
     }
@@ -1570,8 +1579,33 @@ class CalendarManager extends CalendarLibrary
                 default:                    
                     break;
             }
+            $filterStartTimeStamp = $filterEndTimeStamp = false;
+            if (isset($_GET['date']) && $containerDisplay) {
+                $filterYear = $filterMonth = $filterDate = 0;
+                list($filterYear, $filterMonth, $filterDate) = explode('-', $_GET['date']);
 
-            $objRegistrationManager = new \Cx\Modules\Calendar\Controller\CalendarRegistrationManager($eventId, $r, $d, $w);
+                $filterStartYear  = !empty($filterYear) ? $filterYear : date('Y');
+                $filterStartMonth = !empty($filterMonth) ? $filterMonth : 1;
+                $filterStartDay   = !empty($filterDate) ? $filterDate : 1;
+                $filterStartDateTime = new \DateTime();
+                $filterStartDateTime->setDate($filterStartYear, $filterStartMonth, $filterStartDay);
+                $filterStartDateTime->setTime(0, 0, 0);
+
+                $filterEndYear  = !empty($filterYear) ? $filterYear : date('Y');
+                $filterEndMonth = !empty($filterMonth) ? $filterMonth : 12;
+                $filterEndDay   = !empty($filterDate) ? $filterDate : 1;
+                $filterEndDateTime = new \DateTime();
+                $filterEndDateTime->setDate($filterEndYear, $filterEndMonth, $filterEndDay);
+                if (empty($filterDate)) {
+                    $filterEndDateTime->modify('last day of this month');
+                }
+                $filterEndDateTime->setTime(23, 59, 59);
+
+                $filterStartTimeStamp = $filterStartDateTime->getTimestamp();
+                $filterEndTimeStamp   = $filterEndDateTime->getTimestamp();
+            }
+
+            $objRegistrationManager = new \Cx\Modules\Calendar\Controller\CalendarRegistrationManager($objEvent, $r, $d, $w, $filterStartTimeStamp, $filterEndTimeStamp, $containerDisplay);
             $objRegistrationManager->getRegistrationList();
             $objRegistrationManager->showRegistrationList($this->_objTpl, $tpl);
             
@@ -1614,7 +1648,7 @@ class CalendarManager extends CalendarLibrary
                     }
                     $tpl = !empty($_POST['regtpl']) ? $_POST['regtpl'] : $tpl;
                     $this->okMessage = $_ARRAYLANG['TXT_CALENDAR_REGISTRATION_SUCCESSFULLY_SAVED'];                    
-                    \Cx\Core\Csrf\Controller\Csrf::header('Location: index.php?cmd='.$this->moduleName.'&act=event_registrations&tpl='.$tpl.'&id='.$eventId);
+                    \Cx\Core\Csrf\Controller\Csrf::redirect('index.php?cmd='.$this->moduleName.'&act=event_registrations&tpl='.$tpl.'&id='.$eventId);
 	        } else {
                     $this->errMessage = $_ARRAYLANG['TXT_CALENDAR_REGISTRATION_CORRUPT_SAVED'];
 	        }
@@ -1633,9 +1667,8 @@ class CalendarManager extends CalendarLibrary
             $objRegistration = new \Cx\Modules\Calendar\Controller\CalendarRegistration($objEvent->registrationForm);
         }
         
-        $objRegistrationManager = new \Cx\Modules\Calendar\Controller\CalendarRegistrationManager($eventId, true, true, true);
-        $objRegistrationManager->getRegistrationList();
-        $objRegistrationManager->showRegistrationInputfields($objEvent->registrationForm, $regId, $this->_objTpl);
+        $objRegistrationManager = new \Cx\Modules\Calendar\Controller\CalendarRegistrationManager($objEvent, true, true, true);
+        $objRegistrationManager->showRegistrationInputfields($this->_objTpl, $regId);
         
         $this->getSettings();
         if ($this->arrSettings['paymentStatus'] == '1' && ($this->arrSettings['paymentBillStatus'] == '1' || $this->arrSettings['paymentYellowpayStatus'] == '1')) {

@@ -304,7 +304,14 @@ class CalendarEvent extends CalendarLibrary
      * @var integer 
      */
     public $seriesStatus;
-    
+
+    /**
+     * True when event is independent series
+     *
+     * @var boolean
+     */
+    public $independentSeries;
+
     /**
      * Event series data
      *
@@ -430,7 +437,7 @@ class CalendarEvent extends CalendarLibrary
      * @access public
      * @var integer
      */
-    public $freePlaces;
+    protected $freePlaces;
     
     /**
      * Event related websites
@@ -485,22 +492,28 @@ class CalendarEvent extends CalendarLibrary
      * 
      * @var integer
      */
-    public $registrationCount = 0;
+    protected $registrationCount = 0;
     
     /**
      * Waitlist members count for the event
      * 
      * @var integer
      */
-    public $waitlistCount = 0;
+    protected $waitlistCount = 0;
     
     /**
      * Cancellation members count for the event
      * 
      * @var integer
      */
-    public $cancellationCount = 0;
+    protected $cancellationCount = 0;
     
+    /**
+     * Array of language IDs the event has been fetched from the database from already
+     * @var array
+     */
+    protected $fetchedLangIds = array();
+
     /**
      * Event street
      * 
@@ -534,6 +547,14 @@ class CalendarEvent extends CalendarLibrary
     public $place_country;
     
     /**
+     * Event place website
+     * 
+     * @access public
+     * @var string
+     */
+    public $place_website;
+    
+    /**
      * Event map
      * 
      * @access public
@@ -548,6 +569,14 @@ class CalendarEvent extends CalendarLibrary
      * @var string
      */
     public $place_link;
+    
+    /**
+     * Event place phone
+     * 
+     * @access public
+     * @var string
+     */
+    public $place_phone;
     
     /**
      * Event organizer name
@@ -590,12 +619,28 @@ class CalendarEvent extends CalendarLibrary
     public $org_country;
     
     /**
+     * Event organizer website 
+     * 
+     * @access public
+     * @var string
+     */
+    public $org_website;
+    
+    /**
      * Event organizer link
      * 
      * @access public
      * @var string
      */
     public $org_link;
+    
+    /**
+     * Event organizer phone
+     * 
+     * @access public
+     * @var string
+     */
+    public $org_phone;
     
     /**
      * Event organizer email
@@ -606,6 +651,13 @@ class CalendarEvent extends CalendarLibrary
     public $org_email;
     
     /**
+     * Flag to check whether the registration is already calculated or not.
+     *
+     * @var boolean
+     */
+    protected $registrationCalculated = false;
+
+    /**
      * Constructor
      * 
      * Loads the event object of given id
@@ -615,7 +667,7 @@ class CalendarEvent extends CalendarLibrary
      */
     function __construct($id=null){
         if($id != null) {
-            self::get($id);
+            $this->get($id);
         }
         
         $this->uploadImgPath    = \Env::get('cx')->getWebsiteImagesPath().'/'.$this->moduleName.'/';
@@ -638,10 +690,8 @@ class CalendarEvent extends CalendarLibrary
         
         $this->getSettings();
         
-        if($objInit->mode == 'backend' || $langId == null) {
-            $lang_where = "AND field.lang_id = '".intval($_LANGID)."' ";
-        } else {
-            $lang_where = "AND field.lang_id = '".intval($langId)."' ";                             
+        if ($langId == null) {
+            $langId = $_LANGID;
         }
 
         $query = "SELECT event.id AS id,
@@ -686,6 +736,7 @@ class CalendarEvent extends CalendarLibrary
                          event.ticket_sales AS ticket_sales,
                          event.num_seating AS num_seating,
                          event.series_status AS series_status,
+                         event.independent_series,
                          event.series_type AS series_type,
                          event.series_pattern_count AS series_pattern_count,
                          event.series_pattern_weekday AS series_pattern_weekday,
@@ -705,7 +756,9 @@ class CalendarEvent extends CalendarLibrary
                          event.place_zip AS place_zip, 
                          event.place_city AS place_city, 
                          event.place_country AS place_country, 
+                         event.place_website AS place_website, 
                          event.place_link AS place_link, 
+                         event.place_phone AS place_phone, 
                          event.place_map AS place_map, 
                          event.host_type AS host_type,
                          event.org_name AS org_name, 
@@ -713,7 +766,9 @@ class CalendarEvent extends CalendarLibrary
                          event.org_zip AS org_zip, 
                          event.org_city AS org_city, 
                          event.org_country AS org_country, 
+                         event.org_website AS org_website, 
                          event.org_link AS org_link, 
+                         event.org_phone AS org_phone, 
                          event.org_email AS org_email, 
                          field.title AS title,
                          field.teaser AS teaser,
@@ -722,31 +777,27 @@ class CalendarEvent extends CalendarLibrary
                     FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_event AS event,
                          ".DBPREFIX."module_".$this->moduleTablePrefix."_event_field AS field
                    WHERE event.id = '".intval($eventId)."'  
-                     AND (event.id = field.event_id ".$lang_where.")                                          
+                     AND (    event.id = field.event_id
+                          AND field.lang_id = '".intval($langId)."'
+                          AND FIND_IN_SET('".intval($langId)."',event.show_in)>0)
                    LIMIT 1";
 
         
         $objResult = $objDatabase->Execute($query);  
 
-        if($this->arrSettings['showEventsOnlyInActiveLanguage'] == 2) {
+        $this->fetchedLangIds[] = $langId;
+
+        // check if events of all languages shall be listed (not only those available in the requested language)
+        if (   \Cx\Core\Core\Controller\Cx::instanciate()->getMode() == \Cx\Core\Core\Controller\Cx::MODE_BACKEND
+            || $this->arrSettings['showEventsOnlyInActiveLanguage'] == 2
+        ) {
+            // try to refetch the event in case it does not exist in the current requested language
             if($objResult->RecordCount() == 0) {
-                
-                if($langId == null) {
-                    $langId = 1;   
-                } else {
-                    $langId++;
-                }
-                
-                if($langId <= 99) {
-                    self::get($eventId,$eventStartDate,$langId); 
-                }
-            } else {
-                if($langId == null) {
-                    $langId = $_LANGID;   
+                $langIdsToFetch = array_diff(array_keys(\FWLanguage::getActiveFrontendLanguages()), $this->fetchedLangIds);
+                if ($langIdsToFetch) {
+                    $this->get($eventId,$eventStartDate,current($langIdsToFetch)); 
                 }
             }
-        } else {
-           $langId = $_LANGID;
         }
         
         if ($objResult !== false) {
@@ -788,7 +839,9 @@ class CalendarEvent extends CalendarLibrary
                 $this->place_zip    = htmlentities(stripslashes($objResult->fields['place_zip']), ENT_QUOTES, CONTREXX_CHARSET);
                 $this->place_city   = htmlentities(stripslashes($objResult->fields['place_city']), ENT_QUOTES, CONTREXX_CHARSET);
                 $this->place_country = htmlentities(stripslashes($objResult->fields['place_country']), ENT_QUOTES, CONTREXX_CHARSET);
+                $this->place_website= contrexx_raw2xhtml($objResult->fields['place_website']);
                 $this->place_link   = contrexx_raw2xhtml($objResult->fields['place_link']);
+                $this->place_phone  = contrexx_raw2xhtml($objResult->fields['place_phone']);
                 $this->place_map    = contrexx_raw2xhtml($objResult->fields['place_map']);
                 $this->hostType = (int) $objResult->fields['host_type'];
                 $this->host_mediadir_id = (int) $objResult->fields['host_mediadir_id'];
@@ -797,7 +850,9 @@ class CalendarEvent extends CalendarLibrary
                 $this->org_zip      = contrexx_raw2xhtml($objResult->fields['org_zip']);
                 $this->org_city     = contrexx_raw2xhtml($objResult->fields['org_city']);
                 $this->org_country  = contrexx_raw2xhtml($objResult->fields['org_country']);
+                $this->org_website  = contrexx_raw2xhtml($objResult->fields['org_website']);
                 $this->org_link     = contrexx_raw2xhtml($objResult->fields['org_link']);
+                $this->org_phone    = contrexx_raw2xhtml($objResult->fields['org_phone']);
                 $this->org_email    = contrexx_raw2xhtml($objResult->fields['org_email']);
                                 
                 $this->showIn = htmlentities($objResult->fields['show_in'], ENT_QUOTES, CONTREXX_CHARSET);
@@ -806,7 +861,8 @@ class CalendarEvent extends CalendarLibrary
                 $this->showDetailView = intval($objResult->fields['show_detail_view']);
                 $this->catId = intval($objResult->fields['catid']);
                 $this->map = intval($objResult->fields['google']);
-                $this->seriesStatus = intval($objResult->fields['series_status']);   
+                $this->seriesStatus = intval($objResult->fields['series_status']);
+                $this->independentSeries = intval($objResult->fields['independent_series']);
                      
                 if($this->seriesStatus == 1) {
                     $this->seriesData['seriesPatternCount'] = intval($objResult->fields['series_pattern_count']); 
@@ -821,7 +877,11 @@ class CalendarEvent extends CalendarLibrary
                     $this->seriesData['seriesPatternEnd'] = intval($objResult->fields['series_pattern_end']); 
                     $this->seriesData['seriesPatternEndDate'] = $this->getInternDateTimeFromDb($objResult->fields['series_pattern_end_date']);
                     $this->seriesData['seriesPatternBegin'] = intval($objResult->fields['series_pattern_begin']); 
-                    $this->seriesData['seriesPatternExceptions'] = array_map(array($this, 'getInternDateTimeFromDb'), (array) explode(",", $objResult->fields['series_pattern_exceptions']));
+                    $seriesPatternExceptions = array();
+                    if (!empty($objResult->fields['series_pattern_exceptions'])) {
+                        $seriesPatternExceptions = array_map(array($this, 'getInternDateTimeFromDb'), (array) explode(",", $objResult->fields['series_pattern_exceptions']));
+                    }
+                    $this->seriesData['seriesPatternExceptions'] = $seriesPatternExceptions;
                 }    
                   
                 
@@ -835,58 +895,6 @@ class CalendarEvent extends CalendarLibrary
                 $this->ticketSales = intval($objResult->fields['ticket_sales']);
                 $this->arrNumSeating = json_decode($objResult->fields['num_seating']);
                 $this->numSeating = !empty($this->arrNumSeating) ? implode(',', $this->arrNumSeating) : '';
-                
-                $queryCountRegistration = "SELECT 
-                                                COUNT(1) AS numSubscriber, 
-                                                `type` 
-                                            FROM 
-                                                `".DBPREFIX."module_".$this->moduleTablePrefix."_registration`
-                                            WHERE  
-                                                `event_id` = ". (int) $eventId ." 
-                                            GROUP BY 
-                                                `type`";
-                $objCountRegistration = $objDatabase->Execute($queryCountRegistration);
-                
-                if ($objCountRegistration) {
-                    while (!$objCountRegistration->EOF) {
-                        switch ($objCountRegistration->fields['type']) {
-                            case 1:
-                                $this->registrationCount = (int) $objCountRegistration->fields['numSubscriber'];
-                                break;
-                            case 2:
-                                $this->waitlistCount = (int) $objCountRegistration->fields['numSubscriber'];
-                                break;
-                            case 0:
-                                $this->cancellationCount = (int) $objCountRegistration->fields['numSubscriber'];
-                                break;
-                        }
-                        $objCountRegistration->MoveNext();
-                    }
-                }
-                                
-                $queryRegistrations = '
-                    SELECT `v`.`value` AS `reserved_seating`
-                    FROM `'.DBPREFIX.'module_'.$this->moduleTablePrefix.'_registration_form_field_value` AS `v`
-                    INNER JOIN `'.DBPREFIX.'module_'.$this->moduleTablePrefix.'_registration` AS `r`
-                    ON `v`.`reg_id` = `r`.`id`
-                    INNER JOIN `'.DBPREFIX.'module_'.$this->moduleTablePrefix.'_registration_form_field` AS `f`
-                    ON `v`.`field_id` = `f`.`id`
-                    WHERE `r`.`event_id` = '.intval($eventId).'
-                    AND `r`.`type` = 1
-                    AND `f`.`type` = "seating"
-                ';
-                $objResultRegistrations = $objDatabase->Execute($queryRegistrations);
-                
-                $reservedSeating = 0;
-                if ($objResultRegistrations !== false) {
-                    while (!$objResultRegistrations->EOF) {
-                        $reservedSeating += intval($objResultRegistrations->fields['reserved_seating']);
-                        $objResultRegistrations->MoveNext();
-                    }
-                }
-                
-                $freePlaces = intval($this->numSubscriber - $reservedSeating);
-                $this->freePlaces = $freePlaces < 0 ? 0 : $freePlaces;
                 
                 $queryHosts = '
                     SELECT host_id                            
@@ -903,7 +911,7 @@ class CalendarEvent extends CalendarLibrary
                     }
                 }
                 
-                self::getData(); 
+                $this->getData(); 
             }
         }
     }
@@ -1074,10 +1082,18 @@ class CalendarEvent extends CalendarLibrary
         $zip                       = isset($data['zip']) ? contrexx_input2db(contrexx_strip_tags($data['zip'])) : '';
         $city                      = isset($data['city']) ? contrexx_input2db(contrexx_strip_tags($data['city'])) : '';
         $country                   = isset($data['country']) ? contrexx_input2db(contrexx_strip_tags($data['country'])) : '';
+        $placeWebsite              = isset($data['placeWebsite']) ? contrexx_input2db($data['placeWebsite']) : '';
         $placeLink                 = isset($data['placeLink']) ? contrexx_input2db($data['placeLink']) : '';
+        $placePhone                = isset($data['placePhone']) ? contrexx_input2db($data['placePhone']) : '';
         $placeMap                  = isset($data['placeMap']) ? contrexx_input2db($data['placeMap']) : '';
         $update_invitation_sent    = ($send_invitation == 1);
         
+        if (!empty($placeWebsite)) {
+            if (!preg_match('%^(?:ftp|http|https):\/\/%', $placeWebsite)) {
+                $placeWebsite = "http://".$placeWebsite;
+            }
+        }
+
         if (!empty($placeLink)) {
             if (!preg_match('%^(?:ftp|http|https):\/\/%', $placeLink)) {
                 $placeLink = "http://".$placeLink;
@@ -1101,8 +1117,17 @@ class CalendarEvent extends CalendarLibrary
         $orgZip    = isset($data['organizerZip']) ? contrexx_input2db($data['organizerZip']) : '';
         $orgCity   = isset($data['organizerCity']) ? contrexx_input2db($data['organizerCity']) : '';
         $orgCountry= isset($data['organizerCountry']) ? contrexx_input2db($data['organizerCountry']) : '';
+        $orgWebsite= isset($data['organizerWebsite']) ? contrexx_input2db($data['organizerWebsite']) : '';
         $orgLink   = isset($data['organizerLink']) ? contrexx_input2db($data['organizerLink']) : '';
+        $orgPhone  = isset($data['organizerPhone']) ? contrexx_input2db($data['organizerPhone']) : '';
         $orgEmail  = isset($data['organizerEmail']) ? contrexx_input2db($data['organizerEmail']) : '';
+
+        if (!empty($orgWebsite)) {
+            if (!preg_match('%^(?:ftp|http|https):\/\/%', $orgWebsite)) {
+                $orgWebsite = "http://".$orgWebsite;
+            }
+        }
+
         if (!empty($orgLink)) {
             if (!preg_match('%^(?:ftp|http|https):\/\/%', $orgLink)) {
                 $orgLink = "http://".$orgLink;
@@ -1160,14 +1185,12 @@ class CalendarEvent extends CalendarLibrary
                 $objImage->_createThumb(dirname(\Env::get('cx')->getWebsitePath()."$pic")."/", '', basename($pic), 180);
             }
         }
-        
-        $seriesStatus = isset($data['seriesStatus']) ? intval($data['seriesStatus']) : 0; 
-        
-        
+
         //series pattern
-        $seriesStatus = isset($data['seriesStatus']) ? intval($data['seriesStatus']) : 0;
-        $seriesType   = isset($data['seriesType']) ? intval($data['seriesType']) : 0;
-        
+        $seriesStatus      = isset($data['seriesStatus']) ? intval($data['seriesStatus']) : 0;
+        $seriesType        = isset($data['seriesType']) ? intval($data['seriesType']) : 0;
+        $seriesIndependent = !empty($data['seriesIndependent']) ? 1 : 0;
+
         $seriesPatternCount             = 0;
         $seriesPatternWeekday           = 0;
         $seriesPatternDay               = 0;
@@ -1316,6 +1339,7 @@ class CalendarEvent extends CalendarLibrary
             'series_pattern_end'            => $seriesPatternEnd,
             'series_pattern_end_date'       => $seriesPatternEndDate,
             'series_pattern_exceptions'     => $seriesExeptions,
+            'independent_series'            => $seriesIndependent,
             'all_day'                       => $allDay,
             'location_type'                 => $locationType,
             'host_type'                     => $hostType,
@@ -1325,14 +1349,18 @@ class CalendarEvent extends CalendarLibrary
             'place_zip'                     => $zip,
             'place_city'                    => $city,
             'place_country'                 => $country,
+            'place_website'                 => $placeWebsite,
             'place_link'                    => $placeLink,
+            'place_phone'                   => $placePhone,
             'place_map'                     => $placeMap,
             'org_name'                      => $orgName,
             'org_street'                    => $orgStreet,
             'org_zip'                       => $orgZip,
             'org_city'                      => $orgCity,
             'org_country'                   => $orgCountry,
+            'org_website'                   => $orgWebsite,
             'org_link'                      => $orgLink,
+            'org_phone'                     => $orgPhone,
             'org_email'                     => $orgEmail,
             'invitation_sent'               => $update_invitation_sent ? 1 : 0,
         );
@@ -1837,6 +1865,8 @@ class CalendarEvent extends CalendarLibrary
         $place_zip     = '';
         $place_city    = '';
         $place_country = '';        
+        $place_website = '';        
+        $place_phone   = '';        
                 
         if (!empty($intMediaDirId)) {
             $objMediadirEntry = new \Cx\Modules\MediaDir\Controller\MediaDirectoryEntry('MediaDir');
@@ -1876,6 +1906,12 @@ class CalendarEvent extends CalendarLibrary
                                 case 'country':
                                     $place_country = end($arrInputfieldContent);
                                     break;
+                                case 'website':
+                                    $place_website = end($arrInputfieldContent);
+                                    break;
+                                case 'phone':
+                                    $place_phone = end($arrInputfieldContent);
+                                    break;
                             }
 
                         } catch (Exception $error) {
@@ -1892,6 +1928,8 @@ class CalendarEvent extends CalendarLibrary
             $this->place_zip     = $place_zip;
             $this->place_city    = $place_city;
             $this->place_country = $place_country;
+            $this->place_website = $place_website;
+            $this->place_phone   = $place_phone;
             $this->place_map     = '';
         } else {            
             $this->org_name   = $place;
@@ -1899,6 +1937,8 @@ class CalendarEvent extends CalendarLibrary
             $this->org_zip    = $place_zip;
             $this->org_city   = $place_city;
             $this->org_country= $place_country;
+            $this->org_website= $place_website;
+            $this->org_phone  = $place_phone;
             $this->org_email  = '';
         }
         
@@ -1961,11 +2001,178 @@ class CalendarEvent extends CalendarLibrary
     }
 
     /**
+     * Returns the number of free place of the event
+     * This will include the seating field of the registration form
+     *
+     * @return integer
+     */
+    public function getFreePlaces()
+    {
+        $this->calculateRegistrationCount();
+        return $this->freePlaces;
+    }
+
+    /**
+     * Returns the registration count of the event
+     *
+     * @return integer
+     */
+    public function getRegistrationCount()
+    {
+        $this->calculateRegistrationCount();
+        return $this->registrationCount;
+    }
+
+    /**
+     * Returns the waitlist registration count of the event
+     *
+     * @return integer
+     */
+    public function getWaitlistCount()
+    {
+        $this->calculateRegistrationCount();
+        return $this->waitlistCount;
+    }
+
+    /**
+     * Returns the cancelled registration count of the event
+     *
+     * @return integer
+     */
+    public function getCancellationCount()
+    {
+        $this->calculateRegistrationCount();
+        return $this->cancellationCount;
+    }
+
+    /**
+     * Calculate the registration count (register, deregister, waitlist) of the event
+     *
+     * @staticvar boolean $calculated   Flag to check whether the registration is already
+     *                                  calculated or not.
+     * @return null
+     */
+    protected function calculateRegistrationCount()
+    {
+        global $objDatabase, $objInit, $_LANGID;
+
+        if ($this->registrationCalculated) {
+            return;
+        }
+
+        $isIndependentSeries = $this->seriesStatus && $this->independentSeries;
+
+        $filterEventTime = '';
+        if ($objInit->mode != 'backend' && $isIndependentSeries) {
+            $filterEventTime = ' AND r.`date` = '. $this->startDate->getTimestamp();
+        }
+
+        $queryCountRegistration = 'SELECT
+                                        COUNT(1) AS numSubscriber,
+                                        r.`type`
+                                    FROM
+                                        `'.DBPREFIX.'module_'.$this->moduleTablePrefix.'_registration` AS `r`
+                                    WHERE
+                                        r.`event_id` = '. contrexx_input2int($this->id) .'
+                                        '. $filterEventTime .'
+                                    GROUP BY
+                                        r.`type`';
+        $objCountRegistration = $objDatabase->Execute($queryCountRegistration);
+
+        if ($objCountRegistration) {
+            while (!$objCountRegistration->EOF) {
+                switch ($objCountRegistration->fields['type']) {
+                    case 1:
+                        $this->registrationCount = (int) $objCountRegistration->fields['numSubscriber'];
+                        break;
+                    case 2:
+                        $this->waitlistCount = (int) $objCountRegistration->fields['numSubscriber'];
+                        break;
+                    case 0:
+                        $this->cancellationCount = (int) $objCountRegistration->fields['numSubscriber'];
+                        break;
+                }
+                $objCountRegistration->MoveNext();
+            }
+        }
+
+        $seatingOption = $objDatabase->getOne('
+            SELECT
+                `fn`.`default` AS `seating_option`
+            FROM
+                `'.DBPREFIX.'module_'.$this->moduleTablePrefix.'_registration_form` AS `f`
+            INNER JOIN
+                `'.DBPREFIX.'module_'.$this->moduleTablePrefix.'_registration_form_field` AS `ff`
+            ON
+                `f`.`id` = `ff`.`form`
+            INNER JOIN
+                `'.DBPREFIX.'module_'.$this->moduleTablePrefix.'_registration_form_field_name` AS `fn`
+            ON
+                `ff`.`id` = `fn`.`field_id`
+            WHERE
+                `f`.`id` = '. contrexx_input2int($this->registrationForm) .'
+            AND
+                `ff`.`type` = "seating"
+            ORDER BY CASE `fn`.lang_id
+                WHEN '. $_LANGID .' THEN 1
+                ELSE 2
+                END
+        ');
+
+        $reservedSeating = 0;
+        if ($seatingOption) {
+            $seatingOptionArray = explode(',', $seatingOption);
+            $queryRegistrations = '
+                SELECT `v`.`value` AS `reserved_seating`
+                FROM `'.DBPREFIX.'module_'.$this->moduleTablePrefix.'_registration_form_field_value` AS `v`
+                INNER JOIN `'.DBPREFIX.'module_'.$this->moduleTablePrefix.'_registration` AS `r`
+                ON `v`.`reg_id` = `r`.`id`
+                INNER JOIN `'.DBPREFIX.'module_'.$this->moduleTablePrefix.'_registration_form_field` AS `f`
+                ON `v`.`field_id` = `f`.`id`
+                WHERE `r`.`event_id` = '. contrexx_input2int($this->id) .'
+                    '. $filterEventTime .'
+                AND `r`.`type` = 1
+                AND `f`.`type` = "seating"
+            ';
+            $objResultRegistrations = $objDatabase->Execute($queryRegistrations);
+            if ($objResultRegistrations !== false && $objResultRegistrations->RecordCount()) {
+                while (!$objResultRegistrations->EOF) {
+                    $selectedSeat     = contrexx_input2int($objResultRegistrations->fields['reserved_seating']) - 1;
+                    $reservedSeating += !empty($seatingOptionArray[$selectedSeat]) ? $seatingOptionArray[$selectedSeat] : 1;
+                    $objResultRegistrations->MoveNext();
+                }
+            }
+        } else {
+            $reservedSeating = $this->registrationCount;
+        }
+
+        $freePlaces = intval($this->numSubscriber - $reservedSeating);
+        $this->freePlaces = $freePlaces < 0 ? 0 : $freePlaces;
+
+        $this->registrationCalculated = true;
+    }
+
+    /**
+     * Reset the registration count values.
+     */
+    public function resetRegistrationCount()
+    {
+        $this->registrationCount = 0;
+        $this->waitlistCount     = 0;
+        $this->cancellationCount = 0;
+        $this->freePlaces        = 0;
+    }
+
+    /**
      * PHP clone, clone the start and end dates on clone
      */
     public function __clone()
     {
         $this->startDate = clone $this->startDate;
         $this->endDate   = clone $this->endDate;
+        if ($this->seriesStatus && $this->independentSeries) {
+            $this->registrationCalculated = false;
+            $this->resetRegistrationCount();
+        }
     }
 }

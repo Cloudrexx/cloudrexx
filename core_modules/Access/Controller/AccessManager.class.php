@@ -667,6 +667,7 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
                 `areas`.`area_id`,
                 `areas`.`area_name`,
                 `areas`.`access_id`,
+                `areas`.`module_id`,
                 `areas`.`is_active`,
                 `areas`.`type`,
                 `areas`.`scope`,
@@ -706,6 +707,7 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
                     'access_id' => $objResult->fields['access_id'],
                     'status'    => $objResult->fields['is_active'],
                     'type'      => $objResult->fields['type'],
+                    'module_id' => $objResult->fields['module_id'],
                     'scope'     => $objResult->fields['scope'],
                     'group_id'  => $objResult->fields['parent_area_id'],
                     'allowed'   => in_array($objResult->fields['access_id'], $objGroup->getStaticPermissionIds()) ? 1 : 0
@@ -903,13 +905,23 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
     function _parsePermissionAreas($arrAreas, $areaId, $scope)
     {
         global $_CORELANG;
-
+        
+        // hide access areas of inactive modules
+        $em = \Cx\Core\Core\Controller\Cx::instanciate()->getDb()->getEntityManager();
+        $componentRepository = $em->getRepository('Cx\Core\Core\Model\Entity\SystemComponent');
+        $component = $componentRepository->findOneBy(array('id' => $arrAreas[$areaId]['module_id']));
+        $areaHidden = '';
+        if ($component && !$component->isActive()) {
+            $areaHidden = 'display:none;';
+        }
+        
         $this->_objTpl->setVariable(array(
             'ACCESS_AREA_ID'            => $arrAreas[$areaId]['access_id'],
             'ACCESS_AREA_NAME'          => isset($_CORELANG[$arrAreas[$areaId]['name']]) ? htmlentities($_CORELANG[$arrAreas[$areaId]['name']], ENT_QUOTES, CONTREXX_CHARSET) : $arrAreas[$areaId]['name'],
             'ACCESS_AREA_STYLE_NR'      => $arrAreas[$areaId]['type'] == 'group' ? 3 : ($arrAreas[$areaId]['type'] == 'navigation' ? 1 : 2),
             'ACCESS_AREA_TEXT_INDENT'   => $arrAreas[$areaId]['type'] == 'group' ? 0 : ($arrAreas[$areaId]['type'] == 'navigation' ? 20 : 40),
             'ACCESS_AREA_EXTRA_STYLE'   => $arrAreas[$areaId]['type'] == 'group' ? 'font-weight:bold;' : '',
+            'ACCESS_AREA_HIDDEN'        => $areaHidden,
         ));
 
         if ($arrAreas[$areaId]['scope'] == $scope || $arrAreas[$areaId]['scope'] == 'global') {

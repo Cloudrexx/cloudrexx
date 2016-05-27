@@ -362,14 +362,14 @@ class Calendar extends CalendarLibrary
         }
         $this->objEventManager = new \Cx\Modules\Calendar\Controller\CalendarEventManager($this->startDate,$this->endDate,$this->categoryId,$this->searchTerm,true,$this->needAuth,true,$this->startPos,$this->numEvents,$this->sortDirection,true,$this->author);
         
-        if($cmd != 'detail') {
-            $this->objEventManager->getEventList();  
-        } else { 
+        if (!in_array($cmd, array('detail', 'register'))) {
+            $this->objEventManager->getEventList();
+        } else {
             /* if($_GET['external'] == 1 && $this->arrSettings['publicationStatus'] == 1) {
                 $this->objEventManager->getExternalEvent(intval($_GET['id']), intval($_GET['date'])); 
             } else { */
-                $eventId = isset($_GET['id']) ? intval($_GET['id']) : 0;
-                $date    = isset($_GET['date']) ? intval($_GET['date']) : 0;
+                $eventId = isset($_REQUEST['id']) ? contrexx_input2int($_REQUEST['id']) : 0;
+                $date    = isset($_REQUEST['date']) ? contrexx_input2int($_REQUEST['date']) : 0;
 
                 $this->objEventManager->getEvent($eventId, $date);
             /* } */
@@ -599,6 +599,8 @@ UPLOADER;
             'TXT_'.$this->moduleLangVar.'_EVENT_ZIP'                => $_ARRAYLANG['TXT_CALENDAR_EVENT_ZIP'],
             'TXT_'.$this->moduleLangVar.'_EVENT_CITY'               => $_ARRAYLANG['TXT_CALENDAR_EVENT_CITY'],
             'TXT_'.$this->moduleLangVar.'_EVENT_COUNTRY'            => $_ARRAYLANG['TXT_CALENDAR_EVENT_COUNTRY'],
+            'TXT_'.$this->moduleLangVar.'_EVENT_WEBSITE'            => $_ARRAYLANG['TXT_CALENDAR_EVENT_WEBSITE'],
+            'TXT_'.$this->moduleLangVar.'_EVENT_PHONE'              => $_ARRAYLANG['TXT_CALENDAR_EVENT_PHONE'],
             'TXT_'.$this->moduleLangVar.'_EVENT_MAP'                => $_ARRAYLANG['TXT_CALENDAR_EVENT_MAP'],
             'TXT_'.$this->moduleLangVar.'_EVENT_USE_GOOGLEMAPS'     => $_ARRAYLANG['TXT_CALENDAR_EVENT_USE_GOOGLEMAPS'],
             'TXT_'.$this->moduleLangVar.'_EVENT_LINK'               => $_ARRAYLANG['TXT_CALENDAR_EVENT_LINK'],
@@ -636,15 +638,19 @@ UPLOADER;
             $this->moduleLangVar.'_EVENT_ZIP'                       => $objEvent->place_zip,
             $this->moduleLangVar.'_EVENT_CITY'                      => $objEvent->place_city,
             $this->moduleLangVar.'_EVENT_COUNTRY'                   => $objEvent->place_country,
+            $this->moduleLangVar.'_EVENT_PLACE_WEBSITE'             => $objEvent->place_website,
             $this->moduleLangVar.'_EVENT_PLACE_MAP'                 => $objEvent->place_map,
             $this->moduleLangVar.'_EVENT_PLACE_LINK'                => $objEvent->place_link,
+            $this->moduleLangVar.'_EVENT_PLACE_PHONE'               => $objEvent->place_phone,
             $this->moduleLangVar.'_EVENT_MAP'                       => $objEvent->map == 1 ? 'checked="checked"' : '',
             $this->moduleLangVar.'_EVENT_HOST'                      => $objEvent->org_name,
             $this->moduleLangVar.'_EVENT_HOST_ADDRESS'              => $objEvent->org_street,
             $this->moduleLangVar.'_EVENT_HOST_ZIP'                  => $objEvent->org_zip,
             $this->moduleLangVar.'_EVENT_HOST_CITY'                 => $objEvent->org_city,
             $this->moduleLangVar.'_EVENT_HOST_COUNTRY'              => $objEvent->org_country,
+            $this->moduleLangVar.'_EVENT_HOST_WEBSITE'              => $objEvent->org_website,
             $this->moduleLangVar.'_EVENT_HOST_LINK'                 => $objEvent->org_link,
+            $this->moduleLangVar.'_EVENT_HOST_PHONE'                => $objEvent->org_phone,
             $this->moduleLangVar.'_EVENT_HOST_EMAIL'                => $objEvent->org_email,
             $this->moduleLangVar.'_EVENT_LOCATION_TYPE_MANUAL'      => $eventId != 0 ? ($objEvent->locationType == 1 ? "checked='checked'" : '') : "checked='checked'",
             $this->moduleLangVar.'_EVENT_LOCATION_TYPE_MEDIADIR'    => $eventId != 0 ? ($objEvent->locationType == 2 ? "checked='checked'" : '') : "",
@@ -853,23 +859,35 @@ UPLOADER;
                 ));
             }
         }
-        
-        $objEvent = new \Cx\Modules\Calendar\Controller\CalendarEvent(intval($_REQUEST['id']));
-        
-        $numRegistrations = (int) $objEvent->registrationCount;
-        
-        if (isset($_GET['date'])) {
-            $dateFromGet = new \DateTime();
-            $dateFromGet->setTimestamp(intval($_GET['date']));
-            $dateForPageTitle = $dateFromGet;
-        } else {
-            $dateForPageTitle = $objEvent->startDate;
+
+        $objEvent = $this->objEventManager->eventList[0];
+
+        if(empty($objEvent)) {
+            \Cx\Core\Csrf\Controller\Csrf::redirect("index.php?section=".$this->moduleName);
+            return;
         }
+
+        if($objEvent->access == 1 && !\FWUser::getFWUserObject()->objUser->login()){
+            $link = base64_encode(CONTREXX_SCRIPT_PATH.'?'.$_SERVER['QUERY_STRING']);
+            \Cx\Core\Csrf\Controller\Csrf::redirect(CONTREXX_SCRIPT_PATH."?section=Login&redirect=".$link);
+            return;
+        }
+
+        $dateForPageTitle = $objEvent->startDate;
         $this->pageTitle = $this->format2userDate($dateForPageTitle)
                             . ": ".html_entity_decode($objEvent->title, ENT_QUOTES, CONTREXX_CHARSET);
 
-        if(time() <= intval($_REQUEST['date'])) {
-            if($numRegistrations < $objEvent->numSubscriber) {
+        // Only show registration form if event lies in the future
+        if(time() <= $objEvent->startDate->getTimestamp()) {
+            // Only show registration form if event accepts registrations.
+            // Event accepts registrations, if registration is set up and
+            //     - no attendee limit is set
+            //     - or if there are still free places available
+            if (   $objEvent->registration
+                && (   empty($objEvent->numSubscriber)
+                    || !\FWValidator::isEmpty($objEvent->getFreePlaces())
+                )
+            ) {
                 $this->_objTpl->setVariable(array(
                     $this->moduleLangVar.'_EVENT_ID'                   =>  intval($_REQUEST['id']),
                     $this->moduleLangVar.'_FORM_ID'                    =>  intval($objEvent->registrationForm),
@@ -879,11 +897,11 @@ UPLOADER;
                 ));
 
                 $objFormManager = new \Cx\Modules\Calendar\Controller\CalendarFormManager();
+                $objFormManager->setEvent($objEvent);
                 $objFormManager->getFormList();
                 //$objFormManager->showForm($this->_objTpl,intval($objEvent->registrationForm), 2, $objEvent->ticketSales);
                 // Made the ticket sales always true, because ticket functionality currently not implemented
-                $objFormManager->showForm($this->_objTpl,intval($objEvent->registrationForm), 2, true); 
-                
+                $objFormManager->showForm($this->_objTpl, intval($objEvent->registrationForm), 2, true);
 
                 /* if ($this->arrSettings['paymentStatus'] == '1' && $objEvent->ticketSales && ($this->arrSettings['paymentBillStatus'] == '1' || $this->arrSettings['paymentYellowpayStatus'] == '1')) {
                     $paymentMethods  = '<select class="calendarSelect" name="paymentMethod">';
@@ -1064,15 +1082,15 @@ UPLOADER;
                         $this->_objTpl->touchBlock("cancelMessage");
                         break;
                     default:
-                        \Cx\Core\Csrf\Controller\Csrf::header("Location: index.php?section=".$this->moduleName);
+                        \Cx\Core\Csrf\Controller\Csrf::redirect("index.php?section=".$this->moduleName);
                         break;
                 }
             } else {
-                \Cx\Core\Csrf\Controller\Csrf::header("Location: index.php?section=".$this->moduleName);
+                \Cx\Core\Csrf\Controller\Csrf::redirect("index.php?section=".$this->moduleName);
                 return;
             }            
         } else {
-            \Cx\Core\Csrf\Controller\Csrf::header("Location: index.php?section=".$this->moduleName);
+            \Cx\Core\Csrf\Controller\Csrf::redirect("index.php?section=".$this->moduleName);
             return;
         }
     }

@@ -90,7 +90,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
      */
     public function preContentLoad(\Cx\Core\ContentManager\Model\Entity\Page $page) {
-        global $arrMatches, $cl, $objDownloadLib, $downloadBlock, $matches, $objDownloadsModule;;
+        global $arrMatches, $cl, $objDownloadLib, $downloadBlock, $matches, $objDownloadsModule, $themesPages, $page_template;
         switch ($this->cx->getMode()) {
             case \Cx\Core\Core\Controller\Cx::MODE_FRONTEND:
                 // Set download groups
@@ -105,18 +105,11 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 //--------------------------------------------------------
                 // Parse the download block 'downloads_category_#ID_list'
                 //--------------------------------------------------------
-                $content = \Env::get('cx')->getPage()->getContent();
-                $downloadBlock = preg_replace_callback(
-                    "/<!--\s+BEGIN\s+downloads_category_(\d+)_list\s+-->(.*)<!--\s+END\s+downloads_category_\g1_list\s+-->/s",
-                    function($matches) {
-                        \Env::get('init')->loadLanguageData('Downloads');
-                        if (isset($matches[2])) {
-                            $objDownloadsModule = new Downloads($matches[2], array('category' => $matches[1]));
-                            return $objDownloadsModule->getPage();
-                        }
-                    },
-                    $content);
-                \Env::get('cx')->getPage()->setContent($downloadBlock);
+                $content = $this->cx->getPage()->getContent();
+                $this->cx->getPage()->setContent($this->parseDownloadsForTemplate($content));
+                $themesPages['index']   = $this->parseDownloadsForTemplate($themesPages['index']);
+                $themesPages['sidebar'] = $this->parseDownloadsForTemplate($themesPages['sidebar']);
+                $page_template          = $this->parseDownloadsForTemplate($page_template);
                 break;
 
             default:
@@ -124,6 +117,29 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         }
 
         
+    }
+
+    /**
+     * Parse the downloads by category, used to replace downloads in template
+     *
+     * @param string $content  Template Content to parse
+     *
+     * @return string
+     */
+    public function parseDownloadsForTemplate($content)
+    {
+        $downloadBlock = preg_replace_callback(
+            "/<!--\s+BEGIN\s+downloads_category_(\d+)_list\s+-->(.*)<!--\s+END\s+downloads_category_\g1_list\s+-->/s",
+            function($matches) {
+                \Env::get('init')->loadLanguageData('Downloads');
+                if (isset($matches[2])) {
+                    $downloads = new Downloads($matches[2], array('category' => $matches[1]));
+                    return $downloads->getPage();
+                }
+            },
+            $content
+        );
+        return $downloadBlock;
     }
 
     /**

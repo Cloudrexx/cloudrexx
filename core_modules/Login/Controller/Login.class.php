@@ -290,7 +290,7 @@ class Login
                 $objFWUser->objUser->reset();
                 $objFWUser->logoutAndDestroySession();
                 $sessionObj = \cmsSession::getInstance();
-            } else {
+            } elseif (isset($_POST['login'])) {
                 $_GET['relogin'] = 'true';
             }
         }

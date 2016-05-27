@@ -65,8 +65,10 @@ function alias_delete(id, title)
       </td>
       <td>{ALIAS_TARGET_TITLE}</td>
       <td style="text-align:right;">
+        <!-- BEGIN alias_functions -->
         <a href="index.php?cmd=Alias&amp;act=modify&amp;id={ALIAS_TARGET_ID}" title="{TXT_ALIAS_MODIFY}"><img src="../core/Core/View/Media/icons/edit.gif" width="16" height="16" border="0" alt="{TXT_ALIAS_MODIFY}" /></a>
         <a href="javascript:void(0);" onclick="alias_delete({ALIAS_TARGET_ID},'{ALIAS_TARGET_TITLE}')" title="{TXT_ALIAS_DELETE}"><img src="../core/Core/View/Media/icons/delete.gif" width="17" height="17" border="0" alt="{TXT_ALIAS_DELETE}" /></a>
+        <!-- END alias_functions -->
       </td>
     </tr>
     <!-- END aliases_list -->

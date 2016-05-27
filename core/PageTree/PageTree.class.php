@@ -61,6 +61,13 @@ abstract class PageTree {
     protected $skipInactive;
 
     /**
+     * Consider seo enabled pages alone
+     *
+     * @var Boolean
+     */
+    protected $considerSeoEnabledOnly;
+
+    /**
      * @param $entityManager the doctrine em
      * @param \Cx\Core_Modules\License\License $license License used to check if a module is allowed in frontend
      * @param int $maxDepth maximum depth to fetch, 0 means everything
@@ -69,8 +76,9 @@ abstract class PageTree {
      * @param \Cx\Core\ContentManager\Model\Entity\Page $currentPage if set, renderElement() will receive a correctly set $current flag.
      * @param bool $skipInvisible value to skip invisible pages
      * @param bool $considerLogin value to consider whether the user is logged in or not
+     * @param boolean $considerSeoEnabledOnly   Consider seo enabled pages alone
      */
-    public function __construct($entityManager, $license, $maxDepth = 0, $rootNode = null, $lang = null, $currentPage = null, $skipInvisible = true, $considerLogin = true, $skipInactive = true) {
+    public function __construct($entityManager, $license, $maxDepth = 0, $rootNode = null, $lang = null, $currentPage = null, $skipInvisible = true, $considerLogin = true, $skipInactive = true, $considerSeoEnabledOnly = false) {
         $this->lang = $lang;
         $this->depth = $maxDepth;
         $this->em = $entityManager;
@@ -80,6 +88,7 @@ abstract class PageTree {
         $this->skipInvisible = $skipInvisible;
         $this->considerLogin = $considerLogin;
         $this->skipInactive = $skipInactive;
+        $this->considerSeoEnabledOnly = $considerSeoEnabledOnly;
         $pageI = $currentPage;
         while ($pageI) {
             $this->pageIdsAtCurrentPath[] = $pageI->getId();
@@ -217,9 +226,10 @@ abstract class PageTree {
             }
             
             if (
-                !$page || 
-                ($this->skipInvisible && !$page->isVisible()) ||
-                ($this->skipInactive && !$page->isActive())
+                   !$page
+                || ($this->skipInvisible && !$page->isVisible())
+                || ($this->skipInactive && !$page->isActive())
+                || ($this->considerSeoEnabledOnly && !$page->getMetarobots())
             ) {
                 continue;
             }
