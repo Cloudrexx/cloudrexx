@@ -63,6 +63,7 @@ $_ARRAYLANG['TXT_NEWS_MESSAGES'] = "News messages";
 $_ARRAYLANG['TXT_NEWS_MESSAGE'] = "News Message";
 $_ARRAYLANG['TXT_EXTERNAL_SOURCE'] = "External sources";
 $_ARRAYLANG['TXT_LINK'] = "Link";
+$_ARRAYLANG['TXT_NEW_WINDOW'] = "New window";
 $_ARRAYLANG['TXT_NEWS_NEWS_CONTENT'] = "News content";
 $_ARRAYLANG['TXT_STORE'] = "Save";
 $_ARRAYLANG['TXT_PUBLISHING'] = "Publish";
