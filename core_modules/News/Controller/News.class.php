@@ -174,6 +174,7 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                                                         news.teaser_image_thumbnail_path AS newsThumbImg,
                                                         news.typeid             AS typeid,
                                                         news.allow_comments     AS commentactive,
+                                                        news.new_window         AS newWindow,
                                                         locale.text,
                                                         locale.title            AS title,
                                                         locale.teaser_text
@@ -199,7 +200,8 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
             exit;
         }
 
-        $newsCommentActive  = $objResult->fields['commentactive'];        
+        $newWindow          = $objResult->fields['newWindow'];
+        $newsCommentActive  = $objResult->fields['commentactive'];
         $lastUpdate         = $objResult->fields['changelog'];
         $text               = $objResult->fields['text'];
         $redirect           = contrexx_raw2xhtml($objResult->fields['redirect']);
@@ -351,7 +353,9 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
             if ($this->_objTpl->blockExists('news_text')) {
                 $this->_objTpl->parse('news_text');
             }
-            if ($this->_objTpl->blockExists('news_redirect')) {
+            if ($this->_objTpl->blockExists('news_redirect') && $newWindow) {
+                $this->_objTpl->parse('news_redirect');
+            } else {
                 $this->_objTpl->hideBlock('news_redirect');
             }
         } else {
@@ -705,8 +709,9 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                                     : \Cx\Core\Routing\Url::fromModuleAndCmd('News', $this->findCmdById('details', array_keys($newsCategories)), FRONTEND_LANG_ID, array('newsid' => $newsid)))
                                 : $objResult->fields['redirect'];
 
-            $htmlLink       = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml('['.$_ARRAYLANG['TXT_NEWS_MORE'].'...]'));
-            $htmlLinkTitle  = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml($newstitle));
+            $newWindow      = empty($objResult->fields['newWindow']) ? "_self" : "_blank";
+            $htmlLink       = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml('['.$_ARRAYLANG['TXT_NEWS_MORE'].'...]'), $newWindow);
+            $htmlLinkTitle  = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml($newstitle), $newWindow);
             // in case that the message is a stub, we shall just display the news title instead of a html-a-tag with no href target
             if (empty($htmlLinkTitle)) {
                 $htmlLinkTitle = contrexx_raw2xhtml($newstitle);
@@ -936,6 +941,7 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                                 n.author,
                                 n.author_id,
                                 n.allow_comments AS commentactive,
+                                n.new_window AS newWindow,
                                 n.enable_tags,
                                 nl.title            AS newstitle,
                                 nl.text NOT REGEXP \'^(<br type="_moz" />)?$\' AS newscontent,
@@ -1005,8 +1011,9 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                                     )
                                     : $objResult->fields['redirect'];
 
-                $htmlLink       = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml('['.$_ARRAYLANG['TXT_NEWS_MORE'].'...]'));
-                $htmlLinkTitle  = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml($newstitle));
+                $newWindow      = empty($objResult->fields['newWindow']) ? "_self" : "_blank";
+                $htmlLink       = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml('['.$_ARRAYLANG['TXT_NEWS_MORE'].'...]'), $newWindow);
+                $htmlLinkTitle  = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml($newstitle), $newWindow);
                 // in case that the message is a stub, we shall just display the news title instead of a html-a-tag with no href target
                 if (empty($htmlLinkTitle)) {
                     $htmlLinkTitle = contrexx_raw2xhtml($newstitle);
@@ -1037,6 +1044,7 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                    'NEWS_LINK_TITLE'     => $htmlLinkTitle,
                    'NEWS_LINK'           => $htmlLink,
                    'NEWS_LINK_URL'       => contrexx_raw2xhtml($newsUrl),
+                   'NEWS_LINK_TARGET'    => empty($objResult->fields['newWindow']) ? "_self" : "_blank",
                    'NEWS_CATEGORY'       => implode(', ', contrexx_raw2xhtml($arrNewsCategories)),
 // TODO: fetch typename from a newly to be created separate methode
                    //'NEWS_TYPE'          => ($this->arrSettings['news_use_types'] == 1 ? stripslashes($objResult->fields['typename']) : ''),
@@ -1258,8 +1266,9 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                                         : \Cx\Core\Routing\Url::fromModuleAndCmd('News', $this->findCmdById('details', array_keys($newsCategories)), FRONTEND_LANG_ID, array('newsid' => $newsid)))
                                     : $objResult->fields['redirect'];
 
-                $htmlLink       = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml('['.$_ARRAYLANG['TXT_NEWS_MORE'].'...]'));
-                $htmlLinkTitle  = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml($newstitle));
+                $newWindow      = empty($objResult->fields['newWindow']) ? "_self" : "_blank";
+                $htmlLink       = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml('['.$_ARRAYLANG['TXT_NEWS_MORE'].'...]'), $newWindow);
+                $htmlLinkTitle  = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml($newstitle), $newWindow);
                 // in case that the message is a stub, we shall just display the news title instead of a html-a-tag with no href target
                 if (empty($htmlLinkTitle)) {
                     $htmlLinkTitle = contrexx_raw2xhtml($newstitle);
@@ -1283,6 +1292,7 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                    'NEWS_LINK_TITLE'    => $htmlLinkTitle,
                    'NEWS_LINK'          => $htmlLink,
                    'NEWS_LINK_URL'      => contrexx_raw2xhtml($newsUrl),
+                   'NEWS_LINK_TARGET'   => empty($objResult->fields['newWindow']) ? "_self" : "_blank",
                    'NEWS_CATEGORY'      => implode(', ', contrexx_raw2xhtml($newsCategories)),
 // TODO: fetch typename from a newly to be created separate methode
                    //'NEWS_TYPE'          => ($this->arrSettings['news_use_types'] == 1 ? stripslashes($objResult->fields['typename']) : ''),
@@ -1561,6 +1571,7 @@ JSCODE;
         $data['newsCat'] = '';
         $data['newsType'] = '';
         $data['newsTypeRedirect'] = 0;
+        $data['newWindow'] = 0;
 
         if (!isset($_POST['submitNews'])) {
             return array(false, $data);
@@ -1587,6 +1598,7 @@ JSCODE;
         $data['newsTags'] = !empty($_POST['newsTags'])
             ? contrexx_input2raw($_POST['newsTags'])
             : array();
+        $data['newWindow'] = !empty($_POST['newWindow']) ? $_POST['newWindow'] : 0;
 
         return array(true, $data);
     }
@@ -1820,6 +1832,7 @@ EOF;
                 `changelog` = '$date',
                 `enable_tags`='" . $data['enableTags'] . "',
                 `enable_related_news`=" . $data['enableRelatedNews'] . ",
+                `new_window` = '" . $data['newWindow'] . "',
                 # the following are empty defaults for the text fields.
                 # text fields can't have a default and we need one in SQL_STRICT_TRANS_MODE
 
