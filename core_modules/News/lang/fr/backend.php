@@ -58,6 +58,7 @@ $_ARRAYLANG['TXT_NEWS_MESSAGE'] = "Article";
 $_ARRAYLANG['TXT_HYPERLINKS'] = "Liens hypertexte";
 $_ARRAYLANG['TXT_EXTERNAL_SOURCE'] = "Sources externes";
 $_ARRAYLANG['TXT_LINK'] = "Lien";
+$_ARRAYLANG['TXT_NEW_WINDOW'] = "Nouvelle fenetre";
 $_ARRAYLANG['TXT_NEWS_NEWS_CONTENT'] = "Contenu de l'article";
 $_ARRAYLANG['TXT_STORE'] = "Enregistrer";
 $_ARRAYLANG['TXT_PUBLISHING'] = "Publié";
