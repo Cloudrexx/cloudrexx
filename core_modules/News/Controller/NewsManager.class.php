@@ -970,7 +970,7 @@ class NewsManager extends \Cx\Core_Modules\News\Controller\NewsLibrary {
         $enableRelatedNews      = empty($_POST) || !empty($_POST['enableRelatedNews']) ? 1 : 0;
         $newsTags               = !empty($_POST['newsTags']) ? contrexx_input2raw($_POST['newsTags']) : array();
         $enableTags             = !empty($_POST['enableTags']) ? intval($_POST['enableTags']) : 0;
-        $newWindow             = !empty($_POST['newWindow']) ? intval($_POST['newWindow']) : 0;
+        $newWindow              = !empty($_POST['newWindow']) ? intval($_POST['newWindow']) : 0;
 
         if (isset($_POST['newsTeaserFramesAsso']) && count($_POST['newsTeaserFramesAsso'])>0) {
             foreach ($_POST['newsTeaserFramesAsso'] as $frameId) {
@@ -1311,7 +1311,8 @@ class NewsManager extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                 'TXT_SELECT_ALL'                => $_ARRAYLANG['TXT_SELECT_ALL'],
                 'TXT_DESELECT_ALL'              => $_ARRAYLANG['TXT_DESELECT_ALL'],
                 'TXT_ASSOCIATED_BOXES'          => $_ARRAYLANG['TXT_ASSOCIATED_BOXES'],
-                'TXT_NEW_WINDOW'                => $_ARRAYLANG['TXT_NEW_WINDOW'],
+                'TXT_NEW_WINDOW'                => $_ARRAYLANG['TXT_NEWS_NEW_WINDOW'],
+                'TXT_NEW_WINDOW_HELP'           => $_ARRAYLANG['TXT_NEWS_NEW_WINDOW_HELP'],
                 'NEWS_HEADLINES_TEASERS_TXT'    => $_ARRAYLANG['TXT_HEADLINES'].' / '.$_ARRAYLANG['TXT_TEASERS'],
                 'NEWS_USE_ONLY_TEASER_CHECKED'  => $newsTeaserOnly ? 'checked="checked"' : '',
                 'NEWS_TEASER_FRAMES'            => $frameIds,
@@ -1520,7 +1521,8 @@ class NewsManager extends \Cx\Core_Modules\News\Controller\NewsLibrary {
             'TXT_NEWS_TYPE'                 => $_ARRAYLANG['TXT_NEWS_TYPE'],            
             'TXT_EXTERNAL_SOURCE'           => $_ARRAYLANG['TXT_EXTERNAL_SOURCE'],
             'TXT_LINK'                      => $_ARRAYLANG['TXT_LINK'],
-            'TXT_NEW_WINDOW'                => $_ARRAYLANG['TXT_NEW_WINDOW'],
+            'TXT_NEW_WINDOW'                => $_ARRAYLANG['TXT_NEWS_NEW_WINDOW'],
+            'TXT_NEW_WINDOW_HELP'           => $_ARRAYLANG['TXT_NEWS_NEW_WINDOW_HELP'],
             'TXT_NEWS_NEWS_CONTENT'         => $_ARRAYLANG['TXT_NEWS_NEWS_CONTENT'],
             'TXT_PUBLISHING'                => $_ARRAYLANG['TXT_PUBLISHING'],
             'TXT_STARTDATE'                 => $_ARRAYLANG['TXT_STARTDATE'],
@@ -3142,8 +3144,7 @@ class NewsManager extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                                     'redirect'      => $redirect,
                                     'source'        => $objResult->fields['source'],
                                     'teaser_frames' => explode(';', $objResult->fields['teaser_frames']),
-                                    'categoryIds'   => $this->getNewsRelCategories($objResult->fields['id']),
-                                    'new_window'    => $objResult->fields['newWindow'],
+                                    'categoryIds'   => $this->getNewsRelCategories($objResult->fields['id'])
                                 );
                                 $objResult->MoveNext();
                             }

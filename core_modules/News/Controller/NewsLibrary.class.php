@@ -1217,7 +1217,7 @@ class NewsLibrary
         return array($image, $imageLink, $source);
     }
 
-    protected static function parseLink($href, $title, $innerHtml, $target)
+    protected static function parseLink($href, $title, $innerHtml, $target='_self')
     {
         static $htmlLinkTag = '<a href="%1$s" title="%2$s" target="%4$s">%3$s</a>';
 

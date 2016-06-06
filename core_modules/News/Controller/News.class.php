@@ -174,7 +174,6 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                                                         news.teaser_image_thumbnail_path AS newsThumbImg,
                                                         news.typeid             AS typeid,
                                                         news.allow_comments     AS commentactive,
-                                                        news.new_window         AS newWindow,
                                                         locale.text,
                                                         locale.title            AS title,
                                                         locale.teaser_text
@@ -199,8 +198,7 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
             header('Location: '.\Cx\Core\Routing\Url::fromModuleAndCmd('News'));
             exit;
         }
-
-        $newWindow          = $objResult->fields['newWindow'];
+        
         $newsCommentActive  = $objResult->fields['commentactive'];
         $lastUpdate         = $objResult->fields['changelog'];
         $text               = $objResult->fields['text'];
@@ -353,7 +351,7 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
             if ($this->_objTpl->blockExists('news_text')) {
                 $this->_objTpl->parse('news_text');
             }
-            if ($this->_objTpl->blockExists('news_redirect') && $newWindow) {
+            if ($this->_objTpl->blockExists('news_redirect')) {
                 $this->_objTpl->parse('news_redirect');
             } else {
                 $this->_objTpl->hideBlock('news_redirect');
@@ -709,7 +707,7 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                                     : \Cx\Core\Routing\Url::fromModuleAndCmd('News', $this->findCmdById('details', array_keys($newsCategories)), FRONTEND_LANG_ID, array('newsid' => $newsid)))
                                 : $objResult->fields['redirect'];
 
-            $newWindow      = empty($objResult->fields['newWindow']) ? "_self" : "_blank";
+            $newWindow      = empty($objResult->fields['newWindow']) ? '_self' : '_blank';
             $htmlLink       = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml('['.$_ARRAYLANG['TXT_NEWS_MORE'].'...]'), $newWindow);
             $htmlLinkTitle  = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml($newstitle), $newWindow);
             // in case that the message is a stub, we shall just display the news title instead of a html-a-tag with no href target
@@ -1011,7 +1009,7 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                                     )
                                     : $objResult->fields['redirect'];
 
-                $newWindow      = empty($objResult->fields['newWindow']) ? "_self" : "_blank";
+                $newWindow      = empty($objResult->fields['newWindow']) ? '_self' : '_blank';
                 $htmlLink       = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml('['.$_ARRAYLANG['TXT_NEWS_MORE'].'...]'), $newWindow);
                 $htmlLinkTitle  = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml($newstitle), $newWindow);
                 // in case that the message is a stub, we shall just display the news title instead of a html-a-tag with no href target
@@ -1044,7 +1042,7 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                    'NEWS_LINK_TITLE'     => $htmlLinkTitle,
                    'NEWS_LINK'           => $htmlLink,
                    'NEWS_LINK_URL'       => contrexx_raw2xhtml($newsUrl),
-                   'NEWS_LINK_TARGET'    => empty($objResult->fields['newWindow']) ? "_self" : "_blank",
+                   'NEWS_LINK_TARGET'    => empty($objResult->fields['newWindow']) ? '_self' : '_blank',
                    'NEWS_CATEGORY'       => implode(', ', contrexx_raw2xhtml($arrNewsCategories)),
 // TODO: fetch typename from a newly to be created separate methode
                    //'NEWS_TYPE'          => ($this->arrSettings['news_use_types'] == 1 ? stripslashes($objResult->fields['typename']) : ''),
@@ -1266,7 +1264,7 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                                         : \Cx\Core\Routing\Url::fromModuleAndCmd('News', $this->findCmdById('details', array_keys($newsCategories)), FRONTEND_LANG_ID, array('newsid' => $newsid)))
                                     : $objResult->fields['redirect'];
 
-                $newWindow      = empty($objResult->fields['newWindow']) ? "_self" : "_blank";
+                $newWindow      = empty($objResult->fields['newWindow']) ? '_self' : '_blank';
                 $htmlLink       = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml('['.$_ARRAYLANG['TXT_NEWS_MORE'].'...]'), $newWindow);
                 $htmlLinkTitle  = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml($newstitle), $newWindow);
                 // in case that the message is a stub, we shall just display the news title instead of a html-a-tag with no href target
@@ -1292,7 +1290,7 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                    'NEWS_LINK_TITLE'    => $htmlLinkTitle,
                    'NEWS_LINK'          => $htmlLink,
                    'NEWS_LINK_URL'      => contrexx_raw2xhtml($newsUrl),
-                   'NEWS_LINK_TARGET'   => empty($objResult->fields['newWindow']) ? "_self" : "_blank",
+                   'NEWS_LINK_TARGET'   => empty($objResult->fields['newWindow']) ? '_self' : '_blank',
                    'NEWS_CATEGORY'      => implode(', ', contrexx_raw2xhtml($newsCategories)),
 // TODO: fetch typename from a newly to be created separate methode
                    //'NEWS_TYPE'          => ($this->arrSettings['news_use_types'] == 1 ? stripslashes($objResult->fields['typename']) : ''),
@@ -1598,7 +1596,7 @@ JSCODE;
         $data['newsTags'] = !empty($_POST['newsTags'])
             ? contrexx_input2raw($_POST['newsTags'])
             : array();
-        $data['newWindow'] = !empty($_POST['newWindow']) ? $_POST['newWindow'] : 0;
+        $data['newWindow'] = !empty(contrexx_input2raw($_POST['redirect_new_window'])) ? contrexx_input2raw($_POST['redirect_new_window']) : 0;
 
         return array(true, $data);
     }
