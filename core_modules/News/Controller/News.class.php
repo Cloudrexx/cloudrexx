@@ -198,7 +198,7 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
             header('Location: '.\Cx\Core\Routing\Url::fromModuleAndCmd('News'));
             exit;
         }
-        
+
         $newsCommentActive  = $objResult->fields['commentactive'];
         $lastUpdate         = $objResult->fields['changelog'];
         $text               = $objResult->fields['text'];
@@ -353,8 +353,6 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
             }
             if ($this->_objTpl->blockExists('news_redirect')) {
                 $this->_objTpl->parse('news_redirect');
-            } else {
-                $this->_objTpl->hideBlock('news_redirect');
             }
         } else {
             if (\FWValidator::isUri($redirect)) {
@@ -938,8 +936,8 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                                 n.publisher_id,
                                 n.author,
                                 n.author_id,
-                                n.allow_comments AS commentactive,
-                                n.new_window AS newWindow,
+                                n.allow_comments    AS commentactive,
+                                n.new_window        AS newWindow,
                                 n.enable_tags,
                                 nl.title            AS newstitle,
                                 nl.text NOT REGEXP \'^(<br type="_moz" />)?$\' AS newscontent,
@@ -1042,7 +1040,7 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                    'NEWS_LINK_TITLE'     => $htmlLinkTitle,
                    'NEWS_LINK'           => $htmlLink,
                    'NEWS_LINK_URL'       => contrexx_raw2xhtml($newsUrl),
-                   'NEWS_LINK_TARGET'    => empty($objResult->fields['newWindow']) ? '_self' : '_blank',
+                   'NEWS_LINK_TARGET'    => $newWindow,
                    'NEWS_CATEGORY'       => implode(', ', contrexx_raw2xhtml($arrNewsCategories)),
 // TODO: fetch typename from a newly to be created separate methode
                    //'NEWS_TYPE'          => ($this->arrSettings['news_use_types'] == 1 ? stripslashes($objResult->fields['typename']) : ''),
@@ -1290,7 +1288,7 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                    'NEWS_LINK_TITLE'    => $htmlLinkTitle,
                    'NEWS_LINK'          => $htmlLink,
                    'NEWS_LINK_URL'      => contrexx_raw2xhtml($newsUrl),
-                   'NEWS_LINK_TARGET'   => empty($objResult->fields['newWindow']) ? '_self' : '_blank',
+                   'NEWS_LINK_TARGET'   => $newWindow,
                    'NEWS_CATEGORY'      => implode(', ', contrexx_raw2xhtml($newsCategories)),
 // TODO: fetch typename from a newly to be created separate methode
                    //'NEWS_TYPE'          => ($this->arrSettings['news_use_types'] == 1 ? stripslashes($objResult->fields['typename']) : ''),
@@ -1596,7 +1594,7 @@ JSCODE;
         $data['newsTags'] = !empty($_POST['newsTags'])
             ? contrexx_input2raw($_POST['newsTags'])
             : array();
-        $data['newWindow'] = !empty(contrexx_input2raw($_POST['redirect_new_window'])) ? contrexx_input2raw($_POST['redirect_new_window']) : 0;
+        $data['newWindow'] = !empty(contrexx_input2raw($_POST['redirect_new_window'])) ? contrexx_input2raw($_POST['redirect_new_window']) : $data['newWindow'];
 
         return array(true, $data);
     }

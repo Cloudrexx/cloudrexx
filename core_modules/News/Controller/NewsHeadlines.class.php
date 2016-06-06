@@ -106,6 +106,7 @@ class NewsHeadlines extends \Cx\Core_Modules\News\Controller\NewsLibrary
                        tblN.publisher_id,
                        tblN.author,
                        tblN.author_id,
+                       tblN.new_window AS newWindow,
                        tblL.text NOT REGEXP '^(<br type=\"_moz\" />)?\$' AS newscontent,
                        tblL.title AS title, 
                        tblL.teaser_text
@@ -139,7 +140,8 @@ class NewsHeadlines extends \Cx\Core_Modules\News\Controller\NewsLibrary
                                     ? ''
                                     : \Cx\Core\Routing\Url::fromModuleAndCmd('News', $this->findCmdById('details', self::sortCategoryIdByPriorityId(array_keys($newsCategories), array($catId))), FRONTEND_LANG_ID, array('newsid' => $newsid)))
                                 : $objResult->fields['redirect'];
-                $htmlLink   = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml($newstitle), 'headlineLink');
+                $newWindow      = empty($objResult->fields['newWindow']) ? '_self' : '_blank';
+                $htmlLink       = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml($newstitle), 'headlineLink');
                 $htmlLinkTitle  = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml($newstitle));
                 // in case that the message is a stub, we shall just display the news title instead of a html-a-tag with no href target
                 if (empty($htmlLinkTitle)) {
@@ -165,6 +167,7 @@ class NewsHeadlines extends \Cx\Core_Modules\News\Controller\NewsLibrary
                     'NEWS_LINK_TITLE'   => $htmlLinkTitle,
                     'NEWS_LINK'         => $htmlLink,
                     'NEWS_LINK_URL'     => contrexx_raw2xhtml($newsUrl),
+                    'NEWS_LINK_TARGET'  => $newWindow,
                     'NEWS_AUTHOR'       => contrexx_raw2xhtml($author),
                     'NEWS_PUBLISHER'    => contrexx_raw2xhtml($publisher),
 

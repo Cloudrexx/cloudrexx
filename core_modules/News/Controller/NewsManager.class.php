@@ -1826,7 +1826,7 @@ class NewsManager extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                                                                                   ),'SetUrl'),
                 'NEWS_RELATED_NEWS_ENABLED_CHECKED' => !empty($objResult->fields['enable_related_news']) ? 'checked="checked"' : '',
                 'NEWS_TAGS_ENABLED_CHECKED' => !empty($objResult->fields['enable_tags']) ? 'checked="checked"' : '',
-                'NEWS_WINDOW_CHECKED' => !empty($objResult->fields['new_window']) ? 'checked="checked"' : ''
+                'NEWS_NEW_WINDOW_CHECKED' => !empty($objResult->fields['new_window']) ? 'checked="checked"' : ''
             ));
 
             if ($this->arrSettings['news_message_protection'] == '1') {
@@ -2318,7 +2318,7 @@ class NewsManager extends \Cx\Core_Modules\News\Controller\NewsLibrary {
             $newsCategories         = !empty($_POST['newsCat']) ? contrexx_input2raw($_POST['newsCat']) : array();
             $typeId                 = !empty($_POST['newsType']) ? intval($_POST['newsType']) : 0;
             $newsScheduledActive    = !empty($_POST['newsScheduled']) ? intval($_POST['newsScheduled']) : 0;
-            $newWindow              = !empty($_POST['newWindow']) ? intval($_POST['newWindow']) : 0;
+            $newWindow              = !empty($_POST['redirect_new_window']) ? intval($_POST['redirect_new_window']) : 0;
 
             $status     = empty($_POST['status']) ? $status = 0 : intval($_POST['status']);
 

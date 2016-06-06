@@ -91,6 +91,7 @@
                 options = {cxMbViews: 'filebrowser', cxMbStartview: 'MediaBrowserList'};
                 break;
             case 'webpages':
+                options = {cxMbViews: 'sitestructure,filebrowser', cxMbStartview: 'Sitestrukture'};
                 break;
             case 'link':
                 options = {cxMbViews: 'filebrowser,sitestructure', cxMbStartview: 'MediaBrowserList'};
@@ -476,7 +477,7 @@
                         <input type="button" value="{TXT_BROWSE}" onClick="newsGetFileBrowser('news_redirect', 'webpages')" />&nbsp;
                         <span class="tooltip-trigger icon-warning"></span>
                         <span class="tooltip-message">{TXT_NEWS_TYPE_REDIRECT_HELP}</span>
-                        <input type="checkbox" name="redirect_new_window" value="1" {NEWS_WINDOW_CHECKED}>{TXT_NEW_WINDOW}
+                        <input type="checkbox" name="redirect_new_window" value="1" {NEWS_NEW_WINDOW_CHECKED}>{TXT_NEW_WINDOW}
                         <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_NEW_WINDOW_HELP}</span>
                     </td>
                 </tr>
