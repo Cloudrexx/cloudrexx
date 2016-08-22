@@ -1006,9 +1006,10 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                                     )
                                     : $objResult->fields['redirect'];
 
-                $redirectNewWindow = empty($objResult->fields['redirectNewWindow']) ? '_self' : '_blank';
-                $htmlLink       = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml('['.$_ARRAYLANG['TXT_NEWS_MORE'].'...]'), $redirectNewWindow);
-                $htmlLinkTitle  = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml($newstitle), $redirectNewWindow);
+                $redirectNewWindow = empty($objResult->fields['redirect']) && empty($objResult->fields['redirectNewWindow']) ? 0 : $objResult->fields['redirectNewWindow'];
+                $htmlLink = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml('[' . $_ARRAYLANG['TXT_NEWS_MORE'] . '...]'), $redirectNewWindow);
+                $htmlLinkTitle = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml($newstitle), $redirectNewWindow);
+                $linkTarget = $redirectNewWindow == 0 ? '_self' : '_blank';
                 // in case that the message is a stub, we shall just display the news title instead of a html-a-tag with no href target
                 if (empty($htmlLinkTitle)) {
                     $htmlLinkTitle = contrexx_raw2xhtml($newstitle);
@@ -1039,7 +1040,7 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                    'NEWS_LINK_TITLE'     => $htmlLinkTitle,
                    'NEWS_LINK'           => $htmlLink,
                    'NEWS_LINK_URL'       => contrexx_raw2xhtml($newsUrl),
-                   'NEWS_LINK_TARGET'    => $redirectNewWindow,
+                   'NEWS_LINK_TARGET'    => $linkTarget,
                    'NEWS_CATEGORY'       => implode(', ', contrexx_raw2xhtml($arrNewsCategories)),
 // TODO: fetch typename from a newly to be created separate methode
                    //'NEWS_TYPE'          => ($this->arrSettings['news_use_types'] == 1 ? stripslashes($objResult->fields['typename']) : ''),
@@ -1262,9 +1263,10 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                                         : \Cx\Core\Routing\Url::fromModuleAndCmd('News', $this->findCmdById('details', array_keys($newsCategories)), FRONTEND_LANG_ID, array('newsid' => $newsid)))
                                     : $objResult->fields['redirect'];
 
-                $redirectNewWindow = empty($objResult->fields['redirectNewWindow']) ? '_self' : '_blank';
-                $htmlLink       = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml('['.$_ARRAYLANG['TXT_NEWS_MORE'].'...]'), $redirectNewWindow);
-                $htmlLinkTitle  = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml($newstitle), $redirectNewWindow);
+                $redirectNewWindow = empty($objResult->fields['redirect']) && empty($objResult->fields['redirectNewWindow']) ? 0 : $objResult->fields['redirectNewWindow'];
+                $htmlLink = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml('[' . $_ARRAYLANG['TXT_NEWS_MORE'] . '...]'), $redirectNewWindow);
+                $htmlLinkTitle = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml($newstitle), $redirectNewWindow);
+                $linkTarget = $redirectNewWindow == 0 ? '_self' : '_blank';
                 // in case that the message is a stub, we shall just display the news title instead of a html-a-tag with no href target
                 if (empty($htmlLinkTitle)) {
                     $htmlLinkTitle = contrexx_raw2xhtml($newstitle);
@@ -1287,7 +1289,7 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                    'NEWS_TIME'          => date(ASCMS_DATE_FORMAT_TIME, $objResult->fields['newsdate']),
                    'NEWS_LINK_TITLE'    => $htmlLinkTitle,
                    'NEWS_LINK'          => $htmlLink,
-                   'NEWS_LINK_TARGET'   => $redirectNewWindow,
+                   'NEWS_LINK_TARGET'   => $linkTarget,
                    'NEWS_LINK_URL'      => contrexx_raw2xhtml($newsUrl),
                    'NEWS_LINK_TARGET'   => $redirectNewWindow,
                    'NEWS_CATEGORY'      => implode(', ', contrexx_raw2xhtml($newsCategories)),
@@ -2225,9 +2227,10 @@ RSS2JSCODE;
                                             : \Cx\Core\Routing\Url::fromModuleAndCmd('News', $this->findCmdById('details', self::sortCategoryIdByPriorityId(array_keys($newsCategories), $categories)), FRONTEND_LANG_ID, array('newsid' => $newsid)))
                                         : $news['newsredirect'];
 
-                    $redirectNewWindow = empty($news['redirectNewWindow']) ? '_self' : '_blank';
-                    $htmlLink = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml('['.$_ARRAYLANG['TXT_NEWS_MORE'].'...]'), $redirectNewWindow);
+                    $redirectNewWindow = empty($news['redirect']) && empty($news['redirectNewWindow']) ? 0 : $news['redirectNewWindow'];
+                    $htmlLink = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml('[' . $_ARRAYLANG['TXT_NEWS_MORE'] . '...]'), $redirectNewWindow);
                     $htmlLinkTitle = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml($newstitle), $redirectNewWindow);
+                    $linkTarget = $redirectNewWindow == 0 ? '_self' : '_blank';
                     // in case that the message is a stub, we shall just display the news title instead of a html-a-tag with no href target
                     if (empty($htmlLinkTitle)) {
                         $htmlLinkTitle = contrexx_raw2xhtml($newstitle);
@@ -2251,7 +2254,7 @@ RSS2JSCODE;
                        'NEWS_ARCHIVE_TIME'          => date(ASCMS_DATE_FORMAT_TIME, $news['date']),
                        'NEWS_ARCHIVE_LINK_TITLE'    => $htmlLinkTitle,
                        'NEWS_ARCHIVE_LINK'          => $htmlLink,
-                       'NEWS_ARCHIVE_LINK_TARGET'   => $redirectNewWindow,
+                       'NEWS_ARCHIVE_LINK_TARGET'   => $linkTarget,
                        'NEWS_ARCHIVE_LINK_URL'      => contrexx_raw2xhtml($newsUrl),
                        'NEWS_ARCHIVE_CATEGORY'      => stripslashes($news['name']),
                        'NEWS_ARCHIVE_AUTHOR'        => contrexx_raw2xhtml($author),
