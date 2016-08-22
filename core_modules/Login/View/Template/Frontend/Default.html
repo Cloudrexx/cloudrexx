@@ -5,13 +5,13 @@
             <div class="login-social col-md-6 col-sm-12 col-xs-12">
                 <div id="sociallogin">
                     <!-- BEGIN login_social_networks_facebook -->
-                    <a class="facebook loginbutton btn-social btn-facebook" href="{LOGIN_SOCIALLOGIN_FACEBOOK}"><i class="fa fa-facebook-square"></i>Facebook-Anmeldung</a>
+                    <a class="facebook loginbutton btn-social btn-facebook" href="{LOGIN_SOCIALLOGIN_FACEBOOK}"><i class="fa fa-facebook-square"></i>{TXT_ACCESS_SIGNUP_BY_FACEBOOK}</a>
                     <!-- END login_social_networks_facebook -->
                     <!-- BEGIN login_social_networks_google -->
-                    <a class="google loginbutton btn-social btn-google-plus" href="{LOGIN_SOCIALLOGIN_GOOGLE}"><i class="fa fa-google-plus"></i>Mit Google amelden</a>
+                    <a class="google loginbutton btn-social btn-google-plus" href="{LOGIN_SOCIALLOGIN_GOOGLE}"><i class="fa fa-google-plus"></i>{TXT_ACCESS_SIGNUP_BY_GOOGLE}</a>
                     <!-- END login_social_networks_google -->
                     <!-- BEGIN login_social_networks_twitter -->
-                    <a class="twitter loginbutton btn-social btn-twitter" href="{LOGIN_SOCIALLOGIN_TWITTER}"><i class="fa fa-twitter"></i>Mit Twitter anmelden</a>
+                    <a class="twitter loginbutton btn-social btn-twitter" href="{LOGIN_SOCIALLOGIN_TWITTER}"><i class="fa fa-twitter"></i>{TXT_ACCESS_SIGNUP_BY_TWITTER}</a>
                     <!-- END login_social_networks_twitter -->
                 </div>
             </div>
@@ -21,8 +21,8 @@
                     <p class="login-error-msg text-danger">{LOGIN_STATUS_MESSAGE}</p>
                     <form role="form" method="post" action="{NODE_LOGIN}" name="loginForm">
                         <input type="hidden" value="{LOGIN_REDIRECT}" name="redirect" />
-                        <p><label for="USERNAME">Benutzername</label><input id="USERNAME" name="USERNAME" value="" placeholder="E-Mail-Adresse oder Benutzername" type="text"></p>
-                        <p><label for="PASSWORD">{TXT_PASSWORD}</label><input id="PASSWORD" name="PASSWORD" value="" placeholder="Passwort" type="password"></p>
+                        <p><label for="USERNAME">{TXT_EMAIL}</label><input id="USERNAME" name="USERNAME" value="" placeholder="{TXT_EMAIL}" type="text"></p>
+                        <p><label for="PASSWORD">{TXT_PASSWORD}</label><input id="PASSWORD" name="PASSWORD" value="" placeholder="{TXT_PASSWORD}" type="password"></p>
                         <!-- BEGIN captcha -->
                         <p><label for="coreCaptchaCode">{TXT_CORE_CAPTCHA}</label>{CAPTCHA_CODE}</p>
                         <!-- END captcha -->
@@ -43,8 +43,8 @@
             <div class="container-fluid">
                 <div class="login-bottom">
                     <div class="col-md-6 col-md-offset-6">
-                        <a title="Jetzt kostenlos registrieren" href="{NODE_ACCESS_SIGNUP}" class="register btn btn-link">Haben Sie noch keinen Account? Jetzt registrieren</a><br />
-                        <a title="{TXT_LOST_PASSWORD}" href="{NODE_LOGIN_LOSTPW}" class="lostpw btn btn-link">{TXT_PASSWORD_LOST}</a>
+                        <a href="{NODE_LOGIN_LOSTPW}" class="lostpw btn btn-link">{TXT_PASSWORD_LOST}</a>
+                        <a href="{NODE_ACCESS_SIGNUP}" class="register btn btn-link">{TXT_CORE_SIGN_UP}</a><br />
                     </div>
                 </div>
             </div>

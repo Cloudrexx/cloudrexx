@@ -32,11 +32,11 @@
  * @package     cloudrexx
  * @subpackage  coremodule_search
  */
-$_ARRAYLANG['TXT_SEARCH_RESULTS'] = "Search results";
-$_ARRAYLANG['TXT_SEARCH_RESULTS_ORDER_BY_RELEVANCE'] = "Ihre Suche zu <strong>%s</strong>  ergab %d Treffer (sortiert nach Relevanz)";
-$_ARRAYLANG['TXT_RELEVANCE'] = "Relevance";
-$_ARRAYLANG['TXT_NO_SEARCH_RESULTS'] = "Mit dem Suchbegriff <strong>%s</strong> wurden keine Resultate gefunden.";
-$_ARRAYLANG['TXT_SEARCH'] = "Search";
-$_ARRAYLANG['TXT_PLEASE_ENTER_SEARCHTERM'] = "Please enter a search term.";
-$_ARRAYLANG['TXT_UNTITLED'] = "Untitled";
+$_ARRAYLANG['TXT_SEARCH_RESULTS'] = "risultati della ricerca";
+$_ARRAYLANG['TXT_SEARCH_RESULTS_ORDER_BY_RELEVANCE'] = "la sua ricerca per <strong>%s</strong>  ha prodotto %d risultati (elencati per rilevanza)";
+$_ARRAYLANG['TXT_RELEVANCE'] = "rilevanza";
+$_ARRAYLANG['TXT_NO_SEARCH_RESULTS'] = "la ricerca di <strong>%s</strong> non ha prodotto risultati";
+$_ARRAYLANG['TXT_SEARCH'] = "Cerca";
+$_ARRAYLANG['TXT_PLEASE_ENTER_SEARCHTERM'] = "Inserire un termine di ricerca";
+$_ARRAYLANG['TXT_UNTITLED'] = "Senza titolo";
 ?>

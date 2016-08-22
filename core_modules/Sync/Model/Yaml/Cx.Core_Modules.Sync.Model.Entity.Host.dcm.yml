@@ -1,0 +1,32 @@
+Cx\Core_Modules\Sync\Model\Entity\Host:
+  type: entity
+  table: core_module_sync_host
+  repositoryClass: Cx\Core_Modules\Sync\Model\Repository\HostRepository
+  id:
+    id:
+      type: integer
+      generator:
+        strategy: AUTO
+  fields:
+    host:
+      type: string
+    active:
+      type: boolean
+    apiKey:
+      type: string
+      length: 32
+      column: api_key
+    apiVersion:
+      type: integer
+      length: 1
+      column: api_version
+    urlTemplate:
+      type: string
+      column: url_template
+  uniqueConstraints:
+      host_UNIQUE:
+        columns: [ host ]
+  oneToMany: # inverse side
+      hostEntities:
+        targetEntity: Cx\Core_Modules\Sync\Model\Entity\HostEntity
+        mappedBy: host

@@ -918,6 +918,8 @@ class LanguageManager
         $cxjs->setVariable('waitText', $_ARRAYLANG['TXT_LANGUAGE_WAIT_TEXT'], 'language/lang');
         $cxjs->setVariable('yesOption', $_ARRAYLANG['TXT_YES'], 'language/lang');
         $cxjs->setVariable('noOption', $_ARRAYLANG['TXT_NO'], 'language/lang');
+        $cxjs->setVariable('langRemovalLabel', $_ARRAYLANG['TXT_LANGUAGE_MANAGER_LABEL_LANG_REMOVAL'], 'language/lang');
+        $cxjs->setVariable('langRemovalContent', $_ARRAYLANG['TXT_LANGUAGE_MANAGER_LANG_REMOVAL_CONTENT'], 'language/lang');
         
         $this->template->loadTemplateFile('language_langlist.html');
         $this->pageTitle = $_ARRAYLANG['TXT_LANGUAGE_LIST'];
@@ -960,6 +962,7 @@ class LanguageManager
             'TXT_WEB_PAGES'                  => $_ARRAYLANG['TXT_WEB_PAGES'],
             'TXT_SECTION'                    => $_ARRAYLANG['TXT_SECTION'],            
             'TXT_CORE_FALLBACK'              => $_ARRAYLANG['TXT_CORE_FALLBACK'],
+            'TXT_LANGUAGE_MANAGER_OK'        => $_ARRAYLANG['TXT_LANGUAGE_MANAGER_OK']
         ));
         $this->template->setGlobalVariable(array(
             'TXT_DEFAULT_LANGUAGE' => $_ARRAYLANG['TXT_STANDARD_LANGUAGE'],
@@ -975,7 +978,8 @@ class LanguageManager
             $this->template->setGlobalVariable(array('LANGUAGE_ADMIN_STYLE' => 'display: block'));
         }
                 
-        $arrLanguages = \FWLanguage::getActiveFrontendLanguages();
+        $arrLanguages  = \FWLanguage::getActiveFrontendLanguages();
+        $this->template->setVariable('LANGUAGE_MANAGER_ACTIVE_LANGIDS' , implode(', ', array_keys($arrLanguages)));
         $objResult = $objDatabase->Execute("SELECT * FROM ".DBPREFIX."languages ORDER BY id");
         if ($objResult !== false) {
             while (!$objResult->EOF) {
@@ -1050,6 +1054,7 @@ class LanguageManager
     {
         global $_ARRAYLANG, $_CONFIG, $objDatabase;
 
+        $langRemovalStatus = isset($_POST['removeLangVersion']) ? contrexx_input2raw($_POST['removeLangVersion']) : false;
         if (!empty($_POST['submit']) AND (isset($_POST['addLanguage']) && $_POST['addLanguage']=="true")) {
             //-----------------------------------------------
             // Add new language with all variables
@@ -1097,6 +1102,34 @@ class LanguageManager
                 }
             }
         } elseif (!empty($_POST['submit']) AND ( $_POST['modLanguage'] == "true")) {
+            $eventArgs       = array('langRemovalStatus' => $langRemovalStatus);
+            $frontendLangIds = array_keys(\FWLanguage::getActiveFrontendLanguages());
+            $postLangIds     = array_keys($_POST['langActiveStatus']);
+            foreach (array_keys(\FWLanguage::getLanguageArray()) as $langId) {
+                $isLangInPost     = in_array($langId, $postLangIds);
+                $isLangInFrontend = in_array($langId, $frontendLangIds);
+                if ($isLangInPost == $isLangInFrontend) {
+                    continue;
+                }
+                $eventArgs['langData'][] = array(
+                    'langId' => $langId,
+                    'status' => $isLangInPost && !$isLangInFrontend
+                );
+            }
+
+            //Trigger the event 'languageStatusUpdate' 
+            //if the language is activated/deactivated for frontend 
+            if (!empty($eventArgs)) {
+                $evm = \Cx\Core\Core\Controller\Cx::instanciate()->getEvents();
+                $evm->triggerEvent(
+                    'languageStatusUpdate',
+                    array(
+                        $eventArgs,
+                        new \Cx\Core\Model\RecursiveArrayAccess(array())
+                    )
+                );
+            }
+
             //-----------------------------------------------
             // Update languages
             //-----------------------------------------------

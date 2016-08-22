@@ -91,8 +91,14 @@ class AreaOption extends Option
     public function renderTheme($template)
     {
         $blockName = strtolower('TEMPLATE_EDITOR_' . $this->name);
-        if ($template->blockExists($blockName) && $this->active) {
+        if (!$template->blockExists($blockName)) {
+            return;
+        }
+
+        if ($this->active) {
             $template->touchBlock($blockName);
+        } else {
+            $template->hideBlock($blockName);
         }
     }
 

@@ -880,12 +880,17 @@ die("Cart::view(): ERROR: No template");
                             Currency::getActiveCurrencySymbol(),
                     ));
                 }
-                if (intval($arrProduct['minimum_order_quantity'])>0) {
+                if (intval($arrProduct['minimum_order_quantity']) > 0) {
                     $objTemplate->setVariable(array(
                         'SHOP_PRODUCT_MINIMUM_ORDER_QUANTITY' => $arrProduct['minimum_order_quantity'],
                     ));
-                } elseif ($objTemplate->blockExists('orderQuantity')) {
-                    $objTemplate->hideBlock('orderQuantity');
+                } else {
+                    if ($objTemplate->blockExists('orderQuantity')) {
+                        $objTemplate->hideBlock('orderQuantity');
+                    }
+                    if ($objTemplate->blockExists('minimumOrderQuantity')) {
+                        $objTemplate->hideBlock('minimumOrderQuantity');
+                    }
                 }
                 $objTemplate->parse('shopCartRow');
             }

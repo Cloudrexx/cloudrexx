@@ -1,0 +1,35 @@
+Cx\Core\DataSource\Model\Entity\DataSource:
+  type: entity
+  table: core_data_source
+  repositoryClass: Cx\Core\DataSource\Model\Repository\DataSourceRepository
+  inheritanceType: SINGLE_TABLE
+  discriminatorColumn:
+    name: type
+    type: string
+  discriminatorMap:
+    dataSource: DataSource
+    mediaSource: \Cx\Core\MediaSource\Model\Entity\MediaSource
+    ymlRepository: YmlRepository
+    jsonDataSource: JsonDataSource
+    doctrineRepository: DoctrineRepository
+    legacyDatabaseRepository: LegacyDatabaseRepository
+  id:
+    id:
+      type: integer
+      generator:
+        strategy: AUTO
+  fields:
+    identifier:
+      type: string
+    options:
+      type: text
+  uniqueConstraints:
+    key_UNIQUE:
+      columns: [ identifier ]
+  oneToMany:
+    dataAccesses:
+      targetEntity: Cx\Core_Modules\DataAccess\Model\Entity\DataAccess
+      mappedBy: dataSource
+      joinColumn:
+        name: id
+        referencedColumnName: data_source_id

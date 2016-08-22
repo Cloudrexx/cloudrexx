@@ -320,3 +320,5 @@ $_ARRAYLANG['TXT_CORE_EXTENSION_NOT_ALLOWED'] = "Die Dateiendung ist nicht erlau
 
 $_ARRAYLANG['TXT_LOGIN_WELCOME_PAGE'] = 'Weiter zur <a href="%s" title="Website">Website</a>';
 $_ARRAYLANG['TXT_BROWSE'] = 'Durchsuchen';
+
+$_ARRAYLANG['TXT_CORE_SIGN_UP'] = "Haben Sie noch kein Konto? Jetzt registrieren";

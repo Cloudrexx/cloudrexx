@@ -76,7 +76,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         }
     }
     
-    public function executeCommand($command, $arguments)
+    public function executeCommand($command, $arguments, $dataArguments = array())
     {
         require_once($this->getDirectory() . '/versioncheck.php');
         die();

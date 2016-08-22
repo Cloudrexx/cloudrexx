@@ -1,0 +1,59 @@
+Cx\Core_Modules\DataAccess\Model\Entity\DataAccess:
+    type: entity
+    table: core_module_data_access
+    repositoryClass: Cx\Core_Modules\DataAccess\Model\Repository\DataAccessRepository
+    indexes:
+        fk_DataAccess_Permission1_idx:
+            columns: [ read_permission ]
+        fk_DataAccess_Permission2_idx:
+            columns: [ write_permission ]
+    id:
+        id:
+            type: integer
+            generator:
+              strategy: AUTO
+    fields:
+        name:
+            type: string
+            length: 255
+        fieldList:
+            type: array
+            column: field_list
+        accessCondition:
+            type: array
+            column: access_condition
+        allowedOutputMethods:
+            type: array
+            column: allowed_output_methods
+    uniqueConstraints:
+        name_UNIQUE:
+            columns: [ name ]
+    oneToMany:
+        dataAccessApiKeys:
+            targetEntity: Cx\Core_Modules\DataAccess\Model\Entity\DataAccessApiKey
+            mappedBy: dataAccess
+        syncs:
+            targetEntity: Cx\Core_Modules\Sync\Model\Entity\Sync
+            mappedBy: dataAccess
+        relations:
+            targetEntity: Cx\Core_Modules\Sync\Model\Entity\Relation
+            mappedBy: foreignDataAccess
+    manyToOne:
+        readPermission:
+            targetEntity: Cx\Core_Modules\Access\Model\Entity\Permission
+            inversedBy: readDataAccesses
+            joinColumn:
+                name: read_permission
+                referencedColumnName: id
+        writePermission:
+            targetEntity: Cx\Core_Modules\Access\Model\Entity\Permission
+            inversedBy: writeDataAccesses
+            joinColumn:
+                name: write_permission
+                referencedColumnName: id
+        dataSource:
+            targetEntity: Cx\Core\DataSource\Model\Entity\DataSource
+            inversedBy: dataAccesses
+            joinColumn:
+                name: data_source_id
+                referencedColumnName: id

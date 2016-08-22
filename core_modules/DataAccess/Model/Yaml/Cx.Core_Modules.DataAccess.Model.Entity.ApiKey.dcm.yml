@@ -1,0 +1,24 @@
+Cx\Core_Modules\DataAccess\Model\Entity\ApiKey:
+    type: entity
+    table: core_module_data_access_apikey
+    repositoryClass: Cx\Core_Modules\DataAccess\Model\Repository\ApiKeyRepository
+    id:
+        id:
+            type: integer
+            generator:
+              strategy: AUTO
+    fields:
+        apiKey:
+            type: string
+            length: 32
+            column: api_key
+    uniqueConstraints:
+        key_UNIQUE:
+            columns: [ api_key ]
+    oneToMany:
+        dataAccessApiKeys:
+            targetEntity: Cx\Core_Modules\DataAccess\Model\Entity\DataAccessApiKey
+            mappedBy: apiKey
+            joinColumn:
+                name: id
+                referencedColumnName: api_key_id

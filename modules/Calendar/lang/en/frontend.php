@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Calendar Language variables
  * 
@@ -202,3 +202,5 @@ $_ARRAYLANG['TXT_CALENDAR_HOST'] = "website";
 $_ARRAYLANG['TXT_CALENDAR_NO_SERIES'] = "No repeat";
 $_ARRAYLANG['TXT_CALENDAR_NOT_SPECIFIED'] = "Not specified";
 $_ARRAYLANG['TXT_CALENDAR_EVENT_FREE'] = "free";
+$_ARRAYLANG['TXT_CALENDAR_MORE'] = "More";
+$_ARRAYLANG['TXT_CALENDAR_MINIMIZE'] = "Minimize";

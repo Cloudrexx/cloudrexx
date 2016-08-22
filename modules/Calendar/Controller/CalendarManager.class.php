@@ -358,6 +358,11 @@ class CalendarManager extends CalendarLibrary
         $this->_objTpl->loadTemplateFile('module_calendar_modify_event.html');
         \JS::registerJS("modules/{$this->moduleName}/View/Script/jquery.pagination.js");
         
+        \ContrexxJavascript::getInstance()->setVariable(array(
+            'language_id' => \FWLanguage::getDefaultLangId(),
+            'active_lang' => implode(',', \FWLanguage::getIdArray()),
+        ), 'calendar');
+
         $this->getSettings();
         $this->getFrontendLanguages();
         if(isset($_POST['submitModifyEvent']) || isset($_POST['save_and_publish'])) {
@@ -528,7 +533,7 @@ class CalendarManager extends CalendarLibrary
             'TXT_'.$this->moduleLangVar.'_EVENT_TYPE_REDIRECT'              => $_ARRAYLANG['TXT_CALENDAR_EVENT_TYPE_REDIRECT'],
             'TXT_'.$this->moduleLangVar.'_EVENT_REGISTRATION_FORM'          => $_ARRAYLANG['TXT_CALENDAR_REGISTRATION_FORM'],
             'TXT_'.$this->moduleLangVar.'_EVENT_MORE_INVITATIONS_INFO'      => $_ARRAYLANG['TXT_CALENDAR_EVENT_MORE_INVITATIONS_INFO'],
-            'TXT_'.$this->moduleLangVar.'_EVENT_NUM_SUBSCRIBER_INFO'        => $_ARRAYLANG['TXT_CALENDAR_EVENT_NUM_SUBSCRIBER_INFO'],
+            'TXT_'.$this->moduleLangVar.'_REGISTRATIONS_SUBSCRIBER_INFO'    => $_ARRAYLANG['TXT_CALENDAR_REGISTRATIONS_SUBSCRIBER_INFO'],
             'TXT_'.$this->moduleLangVar.'_EVENT_NOTIFICATION_TO_INFO'       => $_ARRAYLANG['TXT_CALENDAR_EVENT_NOTIFICATION_TO_INFO'],
             'TXT_'.$this->moduleLangVar.'_EVENT_EMAIL_TEMPLATE_INFO'        => $_ARRAYLANG['TXT_CALENDAR_EVENT_EMAIL_TEMPLATE_INFO'],
             'TXT_'.$this->moduleLangVar.'_EVENT_NUM_SEATING_INFO'           => $_ARRAYLANG['TXT_CALENDAR_EVENT_NUM_SEATING_INFO'],
@@ -570,6 +575,12 @@ class CalendarManager extends CalendarLibrary
             'TXT_'.$this->moduleLangVar.'_EVENT_DETAIL_VIEW'                => $_ARRAYLANG['TXT_CALENDAR_EVENT_DETAIL_VIEW'],
             'TXT_'.$this->moduleLangVar.'_EVENT_DETAIL_VIEW_LABEL'          => $_ARRAYLANG['TXT_CALENDAR_EVENT_DETAIL_VIEW_LABEL'],
             'TXT_'.$this->moduleLangVar.'_EVENT_TREAT_AS_INDEPENDENT'       => $_ARRAYLANG['TXT_CALENDAR_EVENT_TREAT_AS_INDEPENDENT'],
+            'TXT_'.$this->moduleLangVar.'_EVENT_REGISTRATION_NONE'          => $_ARRAYLANG['TXT_CALENDAR_EVENT_REGISTRATION_NONE'],
+            'TXT_'.$this->moduleLangVar.'_EVENT_REGISTRATION_INTERNAL'      => $_ARRAYLANG['TXT_CALENDAR_EVENT_REGISTRATION_INTERNAL'],
+            'TXT_'.$this->moduleLangVar.'_EVENT_REGISTRATION_EXTERNAL'      => $_ARRAYLANG['TXT_CALENDAR_EVENT_REGISTRATION_EXTERNAL'],
+            'TXT_'.$this->moduleLangVar.'_EVENT_REGISTRATION_FULL_BOOKED'   => $_ARRAYLANG['TXT_CALENDAR_EVENT_REGISTRATION_FULL_BOOKED'],
+            'TXT_'.$this->moduleLangVar.'_MORE'                             => $_ARRAYLANG['TXT_CALENDAR_MORE'],
+            'TXT_'.$this->moduleLangVar.'_MINIMIZE'                         => $_ARRAYLANG['TXT_CALENDAR_MINIMIZE'],
 
             //show media browser button
             $this->moduleLangVar.'_EVENT_REDIRECT_BROWSE_BUTTON'            => self::showMediaBrowserButton('eventRedirect', 'sitestructure'),
@@ -596,7 +607,6 @@ class CalendarManager extends CalendarLibrary
             $this->moduleLangVar.'_EVENT_PICTURE'                           => $eventId != 0 ? $objEvent->pic : '',
             $this->moduleLangVar.'_EVENT_ATTACHMENT'                        => $eventId != 0 ? $objEvent->attach : '',
             $this->moduleLangVar.'_EVENT_MORE_INVITATIONS'                  => $eventId != 0 ? $objEvent->invitedMails : '',
-            $this->moduleLangVar.'_EVENT_REGISTRATION'                      => $eventId != 0 ? ($objEvent->registration == 1 ? 'checked="checked"' : '') : '',
             $this->moduleLangVar.'_EVENT_NUM_SUBSCRIBER'                    => $eventId != 0 ? $objEvent->numSubscriber : '',
             $this->moduleLangVar.'_EVENT_NOTIFICATION_TO'                   => $eventId != 0 ? $objEvent->notificationTo : '',
             $this->moduleLangVar.'_EVENT_TICKET_SALES'                      => $eventId != 0 ? ($objEvent->ticketSales ? 'checked="checked"' : '') : '',
@@ -615,7 +625,7 @@ class CalendarManager extends CalendarLibrary
             $this->moduleLangVar.'_EVENT_PLACE_LINK'                        => $eventId != 0 ? $objEvent->place_link : '', 
             $this->moduleLangVar.'_EVENT_PLACE_PHONE'                       => $eventId != 0 ? $objEvent->place_phone : '',
             $this->moduleLangVar.'_PLACE_MAP_SOURCE'                        => $eventId != 0 ? $objEvent->place_map : '',    
-            //$this->moduleLangVar.'_EVENT_MAP'                               => $objEvent->map == 1 ? 'checked="checked"' : '',    
+            $this->moduleLangVar.'_EVENT_MAP'                               => $objEvent->google == 1 ? 'checked="checked"' : '',    
             $this->moduleLangVar.'_EVENT_HOST_TYPE'                         => $this->arrSettings['placeDataHost'] == 3 ? ($eventId != 0 ? $objEvent->hostType : 1) : $this->arrSettings['placeDataHost'],
             $this->moduleLangVar.'_EVENT_HOST'                              => $eventId != 0 ? $objEvent->org_name : '',
             $this->moduleLangVar.'_EVENT_HOST_ADDRESS'                      => $eventId != 0 ? $objEvent->org_street : '',
@@ -629,8 +639,18 @@ class CalendarManager extends CalendarLibrary
             $this->moduleLangVar.'_EVENT_HOST_TYPE_MANUAL'                  => $eventId != 0 ? ($objEvent->hostType == 1 ? "checked='checked'" : '') : "checked='checked'",
             $this->moduleLangVar.'_EVENT_HOST_TYPE_MEDIADIR'                => $eventId != 0 ? ($objEvent->hostType == 2 ? "checked='checked'" : '') : "",            
             $this->moduleLangVar.'_EVENT_COPY'                              => $copy ? 1 : 0,
+            $this->moduleLangVar.'_EVENT_REGISTRATION_NONE_SELECTED'        => !empty($eventId)
+                                                                              ? ($objEvent->registration == CalendarEvent::EVENT_REGISTRATION_NONE ? 'selected="selected"' : '')
+                                                                              : 'selected="selected"',
+            $this->moduleLangVar.'_EVENT_REGISTRATION_INTERNAL_SELECTED'    => !empty($eventId) && $objEvent->registration == CalendarEvent::EVENT_REGISTRATION_INTERNAL
+                                                                              ? 'selected="selected"' : '',
+            $this->moduleLangVar.'_EVENT_REGISTRATION_EXTERNAL_SELECTED'    => !empty($eventId) && $objEvent->registration == CalendarEvent::EVENT_REGISTRATION_EXTERNAL
+                                                                              ? 'selected="selected"' : '',
+            $this->moduleLangVar.'_EVENT_REGISTRATION_EXTERNAL_LINK'        => !empty($eventId) ? $objEvent->registrationExternalLink : '',
+            $this->moduleLangVar.'_EVENT_REGISTRATION_EXTERNAL_FULL_BOOKED' => !empty($eventId)
+                                                                              ? ($objEvent->registrationExternalFullyBooked ? 'checked="checked"' : '') : '',
         ));
-        
+
         // parse invitation E-mail template
         foreach ($this->arrFrontendLanguages as $language) {
             $this->_objTpl->setVariable(array(
@@ -889,15 +909,15 @@ class CalendarManager extends CalendarLibrary
             $this->moduleLangVar.'_EVENT_SELECTED_HOSTS'      => $selectetHosts,
         ));                
         
-        /*if($this->arrSettings['publicationStatus'] == 1 && !empty($objHostManager->hostList)) { 
+        if($this->arrSettings['publicationStatus'] == 1 && !empty($objHostManager->hostList)) { 
             $onsubmitPublications = "selectAll(document.formModifyEvent.elements['selectedHosts[]']);"; 
             $this->_objTpl->touchBlock('eventPublicateMenu');            
             $this->_objTpl->touchBlock('eventPublicateTab');
-        } else { */
+        } else { 
             $onsubmitPublications = "";   
             $this->_objTpl->hideBlock('eventPublicateMenu');               
             $this->_objTpl->hideBlock('eventPublicateTab');
-        /* } */   
+        }
         
         //parse ivited groups   
         $this->getCommunityGroups();       
@@ -979,12 +999,27 @@ class CalendarManager extends CalendarLibrary
             $this->_objTpl->hideBlock('eventHostSelect');  
             $this->_objTpl->hideBlock('eventHostTypeRadio');
         }
-        
+        $multiLingualFields = array(
+            'place',
+            'place_city',
+            'place_country',
+            'org_name',
+            'org_city',
+            'org_country',
+        );
+        $isOneActiveLanguage = count($this->arrFrontendLanguages) == 1;
+        foreach ($multiLingualFields as $inputField) {
+            if ($isOneActiveLanguage) {
+                $this->_objTpl->hideBlock('calendar_event_'. $inputField .'_expand');
+            } else {
+                $this->_objTpl->touchBlock('calendar_event_'. $inputField .'_expand');
+            }
+        }
         foreach ($this->arrFrontendLanguages as $key => $arrLang) {
             //parse globals
-        	$this->_objTpl->setGlobalVariable(array(
-                $this->moduleLangVar.'_EVENT_LANG_SHORTCUT'  => $arrLang['lang'],
-                $this->moduleLangVar.'_EVENT_LANG_ID'  => $arrLang['id'],
+            $this->_objTpl->setGlobalVariable(array(
+                $this->moduleLangVar.'_EVENT_LANG_SHORTCUT'     => $arrLang['lang'],
+                $this->moduleLangVar.'_EVENT_LANG_ID'           => $arrLang['id'],
                 'TXT_'.$this->moduleLangVar.'_EVENT_LANG_NAME'  => $arrLang['name'],
             ));
         	
@@ -1038,9 +1073,23 @@ class CalendarManager extends CalendarLibrary
                 $this->moduleLangVar.'_ONSUBMIT_PUBLICATION'            => $onsubmitPublications,     
             ));
             
-            $this->_objTpl->parse('eventDescTab');    
+            $this->_objTpl->parse('eventDescTab');
+
+            //parse eventLingualFields
+            foreach ($multiLingualFields as $inputField) {
+                $this->_objTpl->setVariable(
+                    $this->moduleLangVar.'_EVENT_'. strtoupper($inputField) .'_DEFAULT',
+                    $eventId != 0 ? $objEvent->{$inputField} : ''
+                );
+                $this->_objTpl->setVariable(array(
+                    $this->moduleLangVar.'_EVENT_VALUE' => !empty($objEvent->arrData[$inputField][$arrLang['id']])
+                                                          ? $objEvent->arrData[$inputField][$arrLang['id']]
+                                                          : ($eventId != 0 ? $objEvent->{$inputField} : ''),
+                ));
+                $this->_objTpl->parse('calendar_event_'. $inputField);
+            }
         }
-        
+
         if (isset($_GET['confirm']) && $_GET['confirm']) {
             $this->_objTpl->setGlobalVariable(array(
                 $this->moduleLangVar.'_SAVE_PUBLISH' => "<input type='submit' name='save_and_publish' value='{$_ARRAYLANG['TXT_CALENDAR_SAVE_AND_PUBLISH']}'>",

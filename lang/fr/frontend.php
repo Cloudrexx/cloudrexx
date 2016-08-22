@@ -174,7 +174,6 @@ $_ARRAYLANG['TXT_ACCESS_FAILED_TO_UPDATE_USER_ACCOUNT'] = "Erreur lors de la mis
 $_ARRAYLANG['TXT_ACCESS_FEMALE'] = "Féminin";
 $_ARRAYLANG['TXT_ACCESS_FILL_OUT_ALL_REQUIRED_FIELDS'] = "Veuillir saisir tous les champs requis!";
 $_ARRAYLANG['TXT_ACCESS_FIRSTNAME'] = "Prénom";
-$_ARRAYLANG['TXT_ACCESS_GENDER'] = "Sexe";
 $_ARRAYLANG['TXT_ACCESS_INTERESTS'] = "Domaines d'intérêts";
 $_ARRAYLANG['TXT_ACCESS_INVALID_EMAIL_ADDRESS'] = "Veuillir saisir une adresse E-mail valide!";
 $_ARRAYLANG['TXT_ACCESS_INVALID_PASSWORD'] = "The password is invalid. It must contain at least 6 characters.";

@@ -933,13 +933,33 @@ die("Failed to update the Cart!");
                 $parent_id = 0;
             } else {
                 // Show the parent ShopCategory's image, if available
+                $id = $objCategory->id();
+                $catName = contrexx_raw2xhtml($objCategory->name());
                 $imageName = $objCategory->picture();
+                $description = $objCategory->description();
+                $description = nl2br(contrexx_raw2xhtml($description));
+                $description = preg_replace('/[\n\r]/', '', $description);
+                self::$objTemplate->setVariable(array(
+                    'SHOP_CATEGORY_CURRENT_ID'          => $id,
+                    'SHOP_CATEGORY_CURRENT_NAME'        => $catName,
+                    'SHOP_CATEGORY_CURRENT_DESCRIPTION' => $description,
+                ));
                 if ($imageName) {
                     self::$objTemplate->setVariable(array(
-                        'SHOP_CATEGORY_CURRENT_IMAGE' =>
-                         $cx->getWebsiteImagesShopWebPath() . '/' . $imageName,
-                        'SHOP_CATEGORY_CURRENT_IMAGE_ALT' => $objCategory->name(),
+                        'SHOP_CATEGORY_CURRENT_IMAGE'       => $cx->getWebsiteImagesShopWebPath() . '/' . $imageName,
+                        'SHOP_CATEGORY_CURRENT_IMAGE_ALT'   => $catName,
                     ));
+                    if (file_exists(\ImageManager::getThumbnailFilename($cx->getWebsiteImagesShopPath() . '/' . $imageName))) {
+                        $thumbnailPath = \ImageManager::getThumbnailFilename(
+                            $cx->getWebsiteImagesShopWebPath() . '/' . $imageName
+                        );
+                        $arrSize = getimagesize($cx->getWebsitePath() . $thumbnailPath);
+                        self::scaleImageSizeToThumbnail($arrSize);
+                        self::$objTemplate->setVariable(array(
+                            'SHOP_CATEGORY_CURRENT_THUMBNAIL'       => contrexx_raw2encodedUrl($thumbnailPath),
+                            'SHOP_CATEGORY_CURRENT_THUMBNAIL_SIZE'  => $arrSize[3],
+                        ));
+                    }
                 }
             }
         }
@@ -1074,8 +1094,11 @@ die("Failed to update the Cart!");
         // Validate parameters
         if ($product_id && empty($category_id)) {
             $objProduct = Product::getById($product_id);
-            if ($objProduct) {
+            if ($objProduct && $objProduct->active()) {
                 $category_id = $objProduct->category_id();
+            } else {
+                \CSRF::redirect(
+                    Cx\Core\Routing\Url::fromModuleAndCmd('shop', ''));
             }
             if (isset($_SESSION['shop']['previous_category_id'])) {
                 $category_id_previous = $_SESSION['shop']['previous_category_id'];

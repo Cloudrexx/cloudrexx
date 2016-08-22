@@ -184,8 +184,17 @@ class LivecamManager extends LivecamLibrary
                 $shadowboxInctive = 'checked="checked"';
             }
 
+            try {
+                // fetch CMD specific livecam page
+                $camUrl = \Cx\Core\Routing\Url::fromModuleAndCmd('Livecam', $i, FRONTEND_LANG_ID, array(), '', false);
+            } catch (\Cx\Core\Routing\UrlException $e) {
+                // fetch generic livecam page
+                $camUrl = \Cx\Core\Routing\Url::fromModuleAndCmd('Livecam');
+            }
+
             $this->_objTpl->setVariable(array(
                 'CAM_NUMBER'             => $i,
+                'LIVECAM_CAM_URL'        => $camUrl,
                 'CURRENT_IMAGE_URL'      => $cams[$i]['currentImagePath'],
                 'ARCHIVE_PATH'           => $cams[$i]['archivePath'],
                 'THUMBNAIL_PATH'         => $cams[$i]['thumbnailPath'],

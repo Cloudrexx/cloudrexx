@@ -228,6 +228,19 @@ class DataBlocks extends \Cx\Modules\Data\Controller\DataLibrary
                     $target = "";
                 }
 
+                if ($entry['translation'][$_LANGID]['attachment']) {
+                    $this->_objTpl->setVariable(array(
+                        'ENTRY_ATTACHMENT_URL'  => $entry['translation'][$_LANGID]['attachment'],
+                        'TXT_DOWNLOAD'          => (empty($entry['translation'][$_LANGID]['attachment_desc'])
+                            ? $this->langVars['TXT_DATA_DOWNLOAD_ATTACHMENT']
+                            : $entry['translation'][$_LANGID]['attachment_desc']
+                        ),
+                    ));
+                    if ($this->_objTpl->blockExists('attachment')) {
+                        $this->_objTpl->parse('attachment');
+                    }
+                }
+
                 $title = $entry['translation'][$_LANGID]['subject'];
                 $content = $this->getIntroductionText($entry['translation'][$_LANGID]['content']);
                 $this->_objTpl->setVariable(array(

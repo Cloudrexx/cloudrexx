@@ -251,6 +251,58 @@ CREATE TABLE `contrexx_core_mail_template` (
   `protected` tinyint(1) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`key`(32),`section`(32))
 ) ENGINE=MyISAM;
+CREATE TABLE `contrexx_core_data_source` (
+  `id` int(11) AUTO_INCREMENT NOT NULL,
+  `identifier` varchar(255) NOT NULL,
+  `options` longtext NOT NULL,
+  `type` varchar(50) NOT NULL,
+  PRIMARY KEY(`id`),
+  UNIQUE KEY `identifier` (`identifier`)
+) ENGINE = InnoDB;
+CREATE TABLE `contrexx_core_modules_access_permission` (
+  `id` int(11) AUTO_INCREMENT NOT NULL,
+  `allowed_protocols` longtext NOT NULL,
+  `allowed_methods` longtext NOT NULL,
+  `requires_login` tinyint(1) DEFAULT NULL,
+  `valid_user_groups` longtext DEFAULT NULL,
+  `valid_access_ids` longtext DEFAULT NULL,
+  PRIMARY KEY(`id`)
+) ENGINE = InnoDB;
+CREATE TABLE `contrexx_core_module_data_access` (
+  `id` int(11) AUTO_INCREMENT NOT NULL,
+  `read_permission` int(11) DEFAULT NULL,
+  `write_permission` int(11) DEFAULT NULL,
+  `data_source_id` int(11) DEFAULT NULL,
+  `name` varchar(255) NOT NULL,
+  `field_list` longtext NOT NULL,
+  `access_condition` longtext NOT NULL,
+  `allowed_output_methods` longtext NOT NULL,
+  PRIMARY KEY(`id`),
+  UNIQUE KEY `name` (`name`),
+  KEY `read_permission` (`read_permission`),
+  KEY `write_permission` (`write_permission`),
+  KEY `data_source_id` (`data_source_id`),
+  CONSTRAINT `contrexx_core_module_data_access_ibfk_read_permission` FOREIGN KEY (`read_permission`) REFERENCES `contrexx_core_modules_access_permission` (`id`),
+  CONSTRAINT `contrexx_core_module_data_access_ibfk_write_permission` FOREIGN KEY (`write_permission`) REFERENCES `contrexx_core_modules_access_permission` (`id`),
+  CONSTRAINT `contrexx_core_module_data_access_ibfk_data_source_id` FOREIGN KEY (`data_source_id`) REFERENCES `contrexx_core_data_source` (`id`)
+) ENGINE = InnoDB;
+CREATE TABLE `contrexx_core_module_data_access_apikey` (
+  `id` int(11) AUTO_INCREMENT NOT NULL,
+  `api_key` varchar(32) NOT NULL,
+  PRIMARY KEY(`id`),
+  UNIQUE KEY `api_key` (`api_key`)
+) ENGINE = InnoDB;
+CREATE TABLE `contrexx_core_module_data_access_data_access_apikey` (
+  `id` int(11) AUTO_INCREMENT NOT NULL,
+  `api_key_id` int(11) DEFAULT NULL,
+  `data_access_id` int(11) DEFAULT NULL,
+  `read_only` tinyint(1) DEFAULT NULL,
+  PRIMARY KEY(id),
+  KEY `api_key_id` (`api_key_id`),
+  KEY `data_access_id` (`data_access_id`),
+  CONSTRAINT `contrexx_core_module_data_access_apikey_ibfk_api_key_id` FOREIGN KEY (`api_key_id`) REFERENCES `contrexx_core_module_data_access_apikey` (`id`),
+  CONSTRAINT `contrexx_core_module_data_access_apikey_ibfk_data_access_id` FOREIGN KEY (`data_access_id`) REFERENCES `contrexx_core_module_data_access` (`id`)
+) ENGINE = InnoDB;
 CREATE TABLE `contrexx_core_module_cron_job` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `active` tinyint(1) NOT NULL,
@@ -308,6 +360,61 @@ CREATE TABLE `contrexx_core_module_linkmanager_link` (
   `linkRecheck` tinyint(2) NOT NULL,
   `brokenLinkText` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
+) ENGINE=InnoDB;
+CREATE TABLE `contrexx_core_module_sync_id_mapping` (
+  `id` int(11) AUTO_INCREMENT NOT NULL,
+  `foreign_host` varchar(255) NOT NULL,
+  `entity_type` varchar(255) NOT NULL,
+  `foreign_id` int(11) NOT NULL,
+  `local_id` int(11) NOT NULL,
+  PRIMARY KEY(`id`)
+) ENGINE = InnoDB;
+CREATE TABLE `contrexx_core_module_sync` (
+  `id` int(11) AUTO_INCREMENT NOT NULL,
+  `data_access_id` int(11) DEFAULT NULL,
+  `to_uri` varchar(255) NOT NULL,
+  `api_key` varchar(32) NOT NULL,
+  `active` tinyint(1) NOT NULL,
+  KEY `data_access_id` (`data_access_id`),
+  PRIMARY KEY(`id`),
+  CONSTRAINT `contrexx_core_module_sync_ibfk_data_access_id` FOREIGN KEY (`data_access_id`) REFERENCES `contrexx_core_module_data_access` (`id`)
+) ENGINE = InnoDB;
+CREATE TABLE `contrexx_core_module_sync_relation` (
+  `id` int(11) AUTO_INCREMENT NOT NULL,
+  `parent_id` int(11) DEFAULT NULL,
+  `related_sync_id` int(11) NOT NULL,
+  `foreign_data_access_id` int(11) NOT NULL,
+  `lft` int(11) NOT NULL,
+  `rgt` int(11) NOT NULL,
+  `lvl` int(11) NOT NULL,
+  `local_field_name` varchar(50) NOT NULL,
+  `do_sync` tinyint(1) NOT NULL,
+  `default_entity_id` int(11) NOT NULL,
+  KEY `parent_id` (`parent_id`),
+  KEY `related_sync_id` (`related_sync_id`),
+  PRIMARY KEY(`id`),
+  CONSTRAINT `contrexx_core_module_sync_relation_ibfk_foreign_data_access_id` FOREIGN KEY (`foreign_data_access_id`) REFERENCES `contrexx_core_module_data_access` (`id`),
+  CONSTRAINT `contrexx_core_module_sync_relation_ibfk_parent_id` FOREIGN KEY (`parent_id`) REFERENCES `contrexx_core_module_sync_relation` (`id`),
+  CONSTRAINT `contrexx_core_module_sync_relation_ibfk_related_sync_id` FOREIGN KEY (`related_sync_id`) REFERENCES `contrexx_core_module_sync` (`id`)
+) ENGINE = InnoDB;
+CREATE TABLE `contrexx_core_module_sync_host` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `host` varchar(255) NOT NULL,
+  `active` tinyint(1) NOT NULL,
+  `api_key` varchar(32) NOT NULL,
+  `api_version` int(11) NOT NULL,
+  `url_template` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `host_UNIQUE` (`host`)
+) ENGINE=InnoDB;
+CREATE TABLE `contrexx_core_module_sync_host_entity` (
+  `sync_id` int(11) NOT NULL,
+  `host_id` int(11) NOT NULL,
+  `entity_id` varchar(255) NOT NULL,
+  KEY `host_id` (`host_id`),
+  PRIMARY KEY (`sync_id`,`host_id`,`entity_id`),
+  CONSTRAINT `contrexx_core_module_sync_host_entity_ibfk_sync_id` FOREIGN KEY (`sync_id`) REFERENCES `contrexx_core_module_sync` (`id`),
+  CONSTRAINT `contrexx_core_module_sync_host_entity_ibfk_host_id` FOREIGN KEY (`host_id`) REFERENCES `contrexx_core_module_sync_host` (`id`)
 ) ENGINE=InnoDB;
 CREATE TABLE `contrexx_core_rewrite_rule` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -461,6 +568,13 @@ CREATE TABLE `contrexx_module_block_settings` (
   `value` varchar(100) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM ;
+CREATE TABLE `contrexx_module_block_targeting_option` (
+  `block_id` int(11) NOT NULL,
+  `filter` enum('include','exclude') NOT NULL DEFAULT 'include',
+  `type` enum('country') NOT NULL DEFAULT 'country',
+  `value` text NOT NULL,
+  PRIMARY KEY (`block_id`,`type`)
+) ENGINE=InnoDB;
 CREATE TABLE `contrexx_module_blog_categories` (
   `category_id` int(4) unsigned NOT NULL DEFAULT '0',
   `lang_id` int(2) unsigned NOT NULL DEFAULT '0',
@@ -583,6 +697,8 @@ CREATE TABLE `contrexx_module_calendar_event` (
   `registration_num` varchar(45) DEFAULT NULL,
   `registration_notification` varchar(1024) DEFAULT NULL,
   `email_template` varchar(255) NOT NULL,
+  `registration_external_link` text NOT NULL,
+  `registration_external_fully_booked` tinyint(1) NOT NULL DEFAULT '0',
   `ticket_sales` tinyint(1) NOT NULL DEFAULT '0',
   `num_seating` text NOT NULL,
   `series_status` tinyint(4) NOT NULL DEFAULT '0',
@@ -605,22 +721,16 @@ CREATE TABLE `contrexx_module_calendar_event` (
   `author` varchar(255) NOT NULL,
   `all_day` tinyint(1) NOT NULL DEFAULT '0',
   `location_type` tinyint(1) NOT NULL DEFAULT '1',
-  `place` varchar(255) NOT NULL,
   `place_id` int(11) NOT NULL,
   `place_street` varchar(255) DEFAULT NULL,
   `place_zip` varchar(10) DEFAULT NULL,
-  `place_city` varchar(255) DEFAULT NULL,
-  `place_country` varchar(255) DEFAULT NULL,
   `place_website` varchar(255) NOT NULL DEFAULT '',
   `place_link` varchar(255) NOT NULL,
   `place_phone` varchar(20) NOT NULL DEFAULT '',
   `place_map` varchar(255) NOT NULL,
   `host_type` tinyint(1) NOT NULL DEFAULT '1',
-  `org_name` varchar(255) NOT NULL,
   `org_street` varchar(255) NOT NULL,
   `org_zip` varchar(10) NOT NULL,
-  `org_city` varchar(255) NOT NULL,
-  `org_country` varchar(255) NOT NULL,
   `org_website` varchar(255) NOT NULL DEFAULT '',
   `org_link` varchar(255) NOT NULL,
   `org_phone` varchar(20) NOT NULL DEFAULT '',
@@ -633,9 +743,15 @@ CREATE TABLE `contrexx_module_calendar_event_field` (
   `event_id` int(11) NOT NULL DEFAULT '0',
   `lang_id` varchar(225) DEFAULT NULL,
   `title` varchar(255) DEFAULT NULL,
-  `teaser` text,
+  `teaser` text DEFAULT NULL,
   `description` mediumtext,
   `redirect` varchar(255) NOT NULL,
+  `place` varchar(255) NOT NULL,
+  `place_city` varchar(255) NOT NULL,
+  `place_country` varchar(255) NOT NULL,
+  `org_name` varchar(255) NOT NULL,
+  `org_city` varchar(255) NOT NULL,
+  `org_country` varchar(255) NOT NULL,
   KEY `lang_field` (`title`),
   KEY `fk_contrexx_module_calendar_note_field_contrexx_module_calend1` (`event_id`),
   FULLTEXT KEY `eventIndex` (`title`,`teaser`,`description`)

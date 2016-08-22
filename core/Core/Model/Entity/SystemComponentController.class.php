@@ -131,7 +131,7 @@ class SystemComponentController extends Controller {
     protected function getControllerClassName($controllerClassShort) {
         $class = $controllerClassShort;
         if (strpos('\\', $class) != 1) {
-            if (!$this->cx->getClassLoader()->getFilePath($this->getDirectory().'/Controller/'.$class.'Controller.class.php')) {
+            if (!$this->cx->getClassLoader()->getFilePath($this->getDirectory(false).'/Controller/'.$class.'Controller.class.php')) {
                 $class = '\\Cx\\Core\\Core\\Model\\Entity\\SystemComponent' . $class . 'Controller';
             } else {
                 $class = $this->getNamespace() . '\\Controller\\' . $class . 'Controller';
@@ -254,9 +254,10 @@ class SystemComponentController extends Controller {
      * @see getCommandsForCommandMode()
      * @param string $command Name of command to execute
      * @param array $arguments List of arguments for the command
+     * @param array  $dataArguments (optional) List of data arguments for the command
      * @return void
      */
-    public function executeCommand($command, $arguments) {}
+    public function executeCommand($command, $arguments, $dataArguments = array()) {}
     
     /**
      * Check whether the command has access to execute or not.
