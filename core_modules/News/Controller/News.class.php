@@ -705,9 +705,8 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                                     : \Cx\Core\Routing\Url::fromModuleAndCmd('News', $this->findCmdById('details', array_keys($newsCategories)), FRONTEND_LANG_ID, array('newsid' => $newsid)))
                                 : $objResult->fields['redirect'];
 
-            $redirectNewWindow = empty($objResult->fields['redirectNewWindow']) ? '_self' : '_blank';
-            $htmlLink       = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml('['.$_ARRAYLANG['TXT_NEWS_MORE'].'...]'), $redirectNewWindow);
-            $htmlLinkTitle  = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml($newstitle), $redirectNewWindow);
+            $htmlLink       = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml('['.$_ARRAYLANG['TXT_NEWS_MORE'].'...]'));
+            $htmlLinkTitle  = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml($newstitle));
             // in case that the message is a stub, we shall just display the news title instead of a html-a-tag with no href target
             if (empty($htmlLinkTitle)) {
                 $htmlLinkTitle = contrexx_raw2xhtml($newstitle);
@@ -937,7 +936,7 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                                 n.author,
                                 n.author_id,
                                 n.allow_comments    AS commentactive,
-                                n.new_window        AS newWindow,
+                                n.redirect_new_window AS redirectNewWindow,
                                 n.enable_tags,
                                 nl.title            AS newstitle,
                                 nl.text NOT REGEXP \'^(<br type="_moz" />)?$\' AS newscontent,
@@ -1219,6 +1218,7 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                                 n.teaser_image_path,
                                 n.teaser_image_thumbnail_path,
                                 n.redirect,
+                                n.redirect_new_window AS redirectNewWindow,
                                 n.publisher,
                                 n.publisher_id,
                                 n.author,
@@ -1287,6 +1287,7 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                    'NEWS_TIME'          => date(ASCMS_DATE_FORMAT_TIME, $objResult->fields['newsdate']),
                    'NEWS_LINK_TITLE'    => $htmlLinkTitle,
                    'NEWS_LINK'          => $htmlLink,
+                   'NEWS_LINK_TARGET'   => $redirectNewWindow,
                    'NEWS_LINK_URL'      => contrexx_raw2xhtml($newsUrl),
                    'NEWS_LINK_TARGET'   => $redirectNewWindow,
                    'NEWS_CATEGORY'      => implode(', ', contrexx_raw2xhtml($newsCategories)),
@@ -2224,7 +2225,13 @@ RSS2JSCODE;
                                             : \Cx\Core\Routing\Url::fromModuleAndCmd('News', $this->findCmdById('details', self::sortCategoryIdByPriorityId(array_keys($newsCategories), $categories)), FRONTEND_LANG_ID, array('newsid' => $newsid)))
                                         : $news['newsredirect'];
 
-                    $htmlLink       = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml('['.$_ARRAYLANG['TXT_NEWS_MORE'].'...]'));
+                    $redirectNewWindow = empty($news['redirectNewWindow']) ? '_self' : '_blank';
+                    $htmlLink = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml('['.$_ARRAYLANG['TXT_NEWS_MORE'].'...]'), $redirectNewWindow);
+                    $htmlLinkTitle = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml($newstitle), $redirectNewWindow);
+                    // in case that the message is a stub, we shall just display the news title instead of a html-a-tag with no href target
+                    if (empty($htmlLinkTitle)) {
+                        $htmlLinkTitle = contrexx_raw2xhtml($newstitle);
+                    }
 
                     list($image, $htmlLinkImage, $imageSource) = self::parseImageThumbnail($news['teaser_image_path'],
                                                                                            $news['teaser_image_thumbnail_path'],
@@ -2242,8 +2249,9 @@ RSS2JSCODE;
                        'NEWS_ARCHIVE_LONG_DATE'     => date(ASCMS_DATE_FORMAT,$news['date']),
                        'NEWS_ARCHIVE_DATE'          => date(ASCMS_DATE_FORMAT_DATE, $news['date']),
                        'NEWS_ARCHIVE_TIME'          => date(ASCMS_DATE_FORMAT_TIME, $news['date']),
-                       'NEWS_ARCHIVE_LINK_TITLE'    => contrexx_raw2xhtml($newstitle),
+                       'NEWS_ARCHIVE_LINK_TITLE'    => $htmlLinkTitle,
                        'NEWS_ARCHIVE_LINK'          => $htmlLink,
+                       'NEWS_ARCHIVE_LINK_TARGET'   => $redirectNewWindow,
                        'NEWS_ARCHIVE_LINK_URL'      => contrexx_raw2xhtml($newsUrl),
                        'NEWS_ARCHIVE_CATEGORY'      => stripslashes($news['name']),
                        'NEWS_ARCHIVE_AUTHOR'        => contrexx_raw2xhtml($author),

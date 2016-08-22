@@ -107,6 +107,7 @@ class NewsTop extends \Cx\Core_Modules\News\Controller\NewsLibrary
                        tblN.teaser_image_path,
                        tblN.teaser_image_thumbnail_path,
                        tblN.redirect,
+                       tblN.redirectNewWindow,
                        tblN.publisher,
                        tblN.publisher_id,
                        tblN.author,
@@ -143,7 +144,13 @@ class NewsTop extends \Cx\Core_Modules\News\Controller\NewsLibrary
                 $newsUrl    = empty($objResult->fields['redirect'])
                                 ? \Cx\Core\Routing\Url::fromModuleAndCmd('News', $this->findCmdById('details', self::sortCategoryIdByPriorityId(array_keys($newsCategories), array($catId))), FRONTEND_LANG_ID, array('newsid' => $newsid))
                                 : $objResult->fields['redirect'];
-                $htmlLink   = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml($newstitle));
+                $redirectNewWindow = empty($objResult->fields['redirectNewWindow']) ? '_self' : '_blank';
+                $htmlLink = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml($newstitle), $redirectNewWindow);
+                $htmlLinkTitle = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml($newstitle), $redirectNewWindow);
+                // in case that the message is a stub, we shall just display the news title instead of a html-a-tag with no href target
+                if (empty($htmlLinkTitle)) {
+                    $htmlLinkTitle = contrexx_raw2xhtml($newstitle);
+                }
 
                 list($image, $htmlLinkImage, $imageSource) = self::parseImageThumbnail($objResult->fields['teaser_image_path'],
                                                                                        $objResult->fields['teaser_image_thumbnail_path'],
@@ -158,7 +165,9 @@ class NewsTop extends \Cx\Core_Modules\News\Controller\NewsLibrary
                     'NEWS_TIME'         => date(ASCMS_DATE_FORMAT_TIME, $objResult->fields['date']),
                     'NEWS_TITLE'        => contrexx_raw2xhtml($newstitle),
                     'NEWS_TEASER'       => nl2br($objResult->fields['teaser_text']),
+                    'NEWS_LINK_TITLE'   => $htmlLinkTitle,
                     'NEWS_LINK'         => $htmlLink,
+                    'NEWS_LINK_TARGET'  => $redirectNewWindow,
                     'NEWS_LINK_URL'     => contrexx_raw2xhtml($newsUrl),
                     'NEWS_AUTHOR'       => contrexx_raw2xhtml($author),
                     'NEWS_PUBLISHER'    => contrexx_raw2xhtml($publisher),

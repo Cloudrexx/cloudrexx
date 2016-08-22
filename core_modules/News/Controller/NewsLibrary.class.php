@@ -2005,7 +2005,7 @@ class NewsLibrary
 
                 $newstitle = $currentRelatedDetails['title'];
                 $redirectNewWindow = empty($currentRelatedDetails['redirectNewWindow']) ? '_self' : '_blank';
-                $htmlLink  = self::parseLink(
+                $htmlLink = self::parseLink(
                     $newsUrl,
                     $newstitle,
                     contrexx_raw2xhtml('[' . $_ARRAYLANG['TXT_NEWS_MORE'] . '...]'),
@@ -2069,6 +2069,7 @@ class NewsLibrary
                         'NEWS_RELATED_NEWS_ID'             => contrexx_raw2xhtml($relatedNewsId),
                         'NEWS_RELATED_NEWS_URL'            => contrexx_raw2xhtml($newsUrl),
                         'NEWS_RELATED_NEWS_LINK'           => $htmlLink,
+                        'NEWS_RELATED_NEWS_LINK_TARGET'    => $redirectNewWindow,
 
                         'NEWS_RELATED_NEWS_TITLE'          => contrexx_raw2xhtml($currentRelatedDetails['title']),
                         'NEWS_RELATED_NEWS_TITLE_SHORT'    =>
