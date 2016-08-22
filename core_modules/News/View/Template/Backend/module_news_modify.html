@@ -477,8 +477,9 @@
                         <input type="button" value="{TXT_BROWSE}" onClick="newsGetFileBrowser('news_redirect', 'webpages')" />&nbsp;
                         <span class="tooltip-trigger icon-warning"></span>
                         <span class="tooltip-message">{TXT_NEWS_TYPE_REDIRECT_HELP}</span>
-                        <input type="checkbox" name="redirect_new_window" value="1" {NEWS_NEW_WINDOW_CHECKED}>{TXT_NEW_WINDOW}
-                        <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_NEW_WINDOW_HELP}</span>
+                        <input type="checkbox" name="redirect_new_window" {NEWS_REDIRECT_NEW_WINDOW_CHECKED}>
+                        <label>{TXT_NEWS_REDIRECT_NEW_WINDOW}</label>
+                        <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_NEWS_REDIRECT_NEW_WINDOW_HELP}</span>
                     </td>
                 </tr>
             </table>

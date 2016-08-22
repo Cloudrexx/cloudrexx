@@ -155,8 +155,8 @@ class NewsLibrary
             
             $html  = '<ul class="news_archive">';
             foreach ($monthlyStats as $key => $value) {
-                $newWindow = empty($value['newWindow']) ? '_self' : '_blank';
-                $html .= '<li><a href="'.$newsArchiveLink.'#'.$key.'" title="'.$value['name'].'" target="'.$newWindow.'">'.$value['name'].'</a></li>';
+                $redirectNewWindow = empty($value['redirectNewWindow']) ? '_self' : '_blank';
+                $html .= '<li><a href="'.$newsArchiveLink.'#'.$key.'" title="'.$value['name'].'" target="'.$redirectNewWindow.'">'.$value['name'].'</a></li>';
             }
             $html .= '</ul>';
         }
@@ -1357,7 +1357,7 @@ class NewsLibrary
                                 n.author         AS author,
                                 n.author_id      AS author_id,
                                 n.allow_comments AS commentactive,
-                                n.new_window     AS newWindow,
+                                n.redirect_new_window AS redirectNewWindow,
                                 nl.title         AS newstitle,
                                 nl.text NOT REGEXP \'^(<br type="_moz" />)?$\' AS newscontent,
                                 nl.teaser_text
@@ -1820,7 +1820,7 @@ class NewsLibrary
                             tblNews.`author`,
                             tblNews.`author_id`,
                             tblNews.allow_comments AS commentactive,
-                            tblNews.new_window AS newWindow,
+                            tblNews.redirect_new_window AS redirectNewWindow,
                             tblLocale.`lang_id`,
                             tblLocale.`title`,
                             tblLocale.`text`,
@@ -2004,18 +2004,18 @@ class NewsLibrary
                     : $currentRelatedDetails['redirect'];
 
                 $newstitle = $currentRelatedDetails['title'];
-                $newWindow = empty($currentRelatedDetails['newWindow']) ? '_self' : '_blank';
+                $redirectNewWindow = empty($currentRelatedDetails['redirectNewWindow']) ? '_self' : '_blank';
                 $htmlLink  = self::parseLink(
                     $newsUrl,
                     $newstitle,
                     contrexx_raw2xhtml('[' . $_ARRAYLANG['TXT_NEWS_MORE'] . '...]'),
-                    $newWindow
+                    $redirectNewWindow
                 );
                 $htmlLinkTitle = self::parseLink(
                     $newsUrl,
                     $newstitle,
                     contrexx_raw2xhtml($newstitle),
-                    $newWindow
+                    $redirectNewWindow
                 );
 
                 // in case that the message is a stub,

@@ -705,9 +705,9 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                                     : \Cx\Core\Routing\Url::fromModuleAndCmd('News', $this->findCmdById('details', array_keys($newsCategories)), FRONTEND_LANG_ID, array('newsid' => $newsid)))
                                 : $objResult->fields['redirect'];
 
-            $newWindow      = empty($objResult->fields['newWindow']) ? '_self' : '_blank';
-            $htmlLink       = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml('['.$_ARRAYLANG['TXT_NEWS_MORE'].'...]'), $newWindow);
-            $htmlLinkTitle  = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml($newstitle), $newWindow);
+            $redirectNewWindow = empty($objResult->fields['redirectNewWindow']) ? '_self' : '_blank';
+            $htmlLink       = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml('['.$_ARRAYLANG['TXT_NEWS_MORE'].'...]'), $redirectNewWindow);
+            $htmlLinkTitle  = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml($newstitle), $redirectNewWindow);
             // in case that the message is a stub, we shall just display the news title instead of a html-a-tag with no href target
             if (empty($htmlLinkTitle)) {
                 $htmlLinkTitle = contrexx_raw2xhtml($newstitle);
@@ -1007,9 +1007,9 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                                     )
                                     : $objResult->fields['redirect'];
 
-                $newWindow      = empty($objResult->fields['newWindow']) ? '_self' : '_blank';
-                $htmlLink       = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml('['.$_ARRAYLANG['TXT_NEWS_MORE'].'...]'), $newWindow);
-                $htmlLinkTitle  = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml($newstitle), $newWindow);
+                $redirectNewWindow = empty($objResult->fields['redirectNewWindow']) ? '_self' : '_blank';
+                $htmlLink       = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml('['.$_ARRAYLANG['TXT_NEWS_MORE'].'...]'), $redirectNewWindow);
+                $htmlLinkTitle  = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml($newstitle), $redirectNewWindow);
                 // in case that the message is a stub, we shall just display the news title instead of a html-a-tag with no href target
                 if (empty($htmlLinkTitle)) {
                     $htmlLinkTitle = contrexx_raw2xhtml($newstitle);
@@ -1040,7 +1040,7 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                    'NEWS_LINK_TITLE'     => $htmlLinkTitle,
                    'NEWS_LINK'           => $htmlLink,
                    'NEWS_LINK_URL'       => contrexx_raw2xhtml($newsUrl),
-                   'NEWS_LINK_TARGET'    => $newWindow,
+                   'NEWS_LINK_TARGET'    => $redirectNewWindow,
                    'NEWS_CATEGORY'       => implode(', ', contrexx_raw2xhtml($arrNewsCategories)),
 // TODO: fetch typename from a newly to be created separate methode
                    //'NEWS_TYPE'          => ($this->arrSettings['news_use_types'] == 1 ? stripslashes($objResult->fields['typename']) : ''),
@@ -1262,9 +1262,9 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                                         : \Cx\Core\Routing\Url::fromModuleAndCmd('News', $this->findCmdById('details', array_keys($newsCategories)), FRONTEND_LANG_ID, array('newsid' => $newsid)))
                                     : $objResult->fields['redirect'];
 
-                $newWindow      = empty($objResult->fields['newWindow']) ? '_self' : '_blank';
-                $htmlLink       = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml('['.$_ARRAYLANG['TXT_NEWS_MORE'].'...]'), $newWindow);
-                $htmlLinkTitle  = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml($newstitle), $newWindow);
+                $redirectNewWindow = empty($objResult->fields['redirectNewWindow']) ? '_self' : '_blank';
+                $htmlLink       = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml('['.$_ARRAYLANG['TXT_NEWS_MORE'].'...]'), $redirectNewWindow);
+                $htmlLinkTitle  = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml($newstitle), $redirectNewWindow);
                 // in case that the message is a stub, we shall just display the news title instead of a html-a-tag with no href target
                 if (empty($htmlLinkTitle)) {
                     $htmlLinkTitle = contrexx_raw2xhtml($newstitle);
@@ -1288,7 +1288,7 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                    'NEWS_LINK_TITLE'    => $htmlLinkTitle,
                    'NEWS_LINK'          => $htmlLink,
                    'NEWS_LINK_URL'      => contrexx_raw2xhtml($newsUrl),
-                   'NEWS_LINK_TARGET'   => $newWindow,
+                   'NEWS_LINK_TARGET'   => $redirectNewWindow,
                    'NEWS_CATEGORY'      => implode(', ', contrexx_raw2xhtml($newsCategories)),
 // TODO: fetch typename from a newly to be created separate methode
                    //'NEWS_TYPE'          => ($this->arrSettings['news_use_types'] == 1 ? stripslashes($objResult->fields['typename']) : ''),
@@ -1567,7 +1567,7 @@ JSCODE;
         $data['newsCat'] = '';
         $data['newsType'] = '';
         $data['newsTypeRedirect'] = 0;
-        $data['newWindow'] = 0;
+        $data['redirectNewWindow'] = 0;
 
         if (!isset($_POST['submitNews'])) {
             return array(false, $data);
@@ -1594,7 +1594,7 @@ JSCODE;
         $data['newsTags'] = !empty($_POST['newsTags'])
             ? contrexx_input2raw($_POST['newsTags'])
             : array();
-        $data['newWindow'] = !empty(contrexx_input2raw($_POST['redirect_new_window'])) ? contrexx_input2raw($_POST['redirect_new_window']) : $data['newWindow'];
+        $data['redirectNewWindow'] = !empty(contrexx_input2raw($_POST['redirect_new_window'])) ? contrexx_input2raw($_POST['redirect_new_window']) : $data['redirectNewWindow'];
 
         return array(true, $data);
     }
@@ -1828,7 +1828,7 @@ EOF;
                 `changelog` = '$date',
                 `enable_tags`='" . $data['enableTags'] . "',
                 `enable_related_news`=" . $data['enableRelatedNews'] . ",
-                `new_window` = '" . $data['newWindow'] . "',
+                `redirect_new_window` = '" . $data['redirectNewWindow'] . "',
                 # the following are empty defaults for the text fields.
                 # text fields can't have a default and we need one in SQL_STRICT_TRANS_MODE
 

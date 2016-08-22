@@ -2574,7 +2574,7 @@ CREATE TABLE `contrexx_module_news` (
   `allow_comments` tinyint(1) NOT NULL DEFAULT '0',
   `enable_related_news` tinyint(1) NOT NULL DEFAULT '0',
   `enable_tags` tinyint(1) NOT NULL DEFAULT '0',
-  `new_window` tinyint(1) NOT NULL DEFAULT '0',
+  `redirect_new_window` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM ;
 CREATE TABLE `contrexx_module_news_categories` (
