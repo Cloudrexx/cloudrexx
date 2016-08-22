@@ -179,4 +179,12 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 break;
         }
     }
+
+    /**
+     * Register the events
+     */
+    public function registerEvents()
+    {
+        $this->cx->getEvents()->addEvent('languageStatusUpdate');
+    }
 }

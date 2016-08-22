@@ -673,7 +673,8 @@ class cmsSession extends RecursiveArrayAccess {
     {
         global $_DBCONFIG;
         
-        return $_DBCONFIG['database'].DBPREFIX."sessions_".$_SESSION->sessionid.'_'.$key;
+        // MySQL 5.7.5 and later enforces a maximum length on lock names of 64 characters. Previously, no limit was enforced.
+        return md5($_DBCONFIG['database'] . DBPREFIX . $_SESSION->sessionid) .md5($key);
     }
 
     /**

@@ -63,6 +63,8 @@ class Access extends \Cx\Core_Modules\Access\Controller\AccessLib
         $cmd = isset($_REQUEST['cmd']) ? explode('_', $_REQUEST['cmd']) : array(0 => null);
         $groupId = isset($cmd[1]) ? intval($cmd[1]) : null;
 
+        // add whole component's language data to every application page of component
+        $this->_objTpl->setVariable(\Env::get('init')->getComponentSpecificLanguageData('Access'));
         \Cx\Lib\SocialLogin::parseSociallogin($this->_objTpl, 'access_');
         \Cx\Core\Csrf\Controller\Csrf::add_code();
         switch ($cmd[0]) {

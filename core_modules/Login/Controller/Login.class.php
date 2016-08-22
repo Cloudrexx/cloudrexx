@@ -320,9 +320,21 @@ class Login
             $this->_objTpl->hideBlock('captcha');
         }
 
+        // TODO: loading the language data of component Access at this
+        //       point is a workaround as the integration of the Access
+        //       component's functionality itself is hard-coded too and
+        //       has not been implemented through the system component
+        //       framework.
+        $accessLang = \Env::get('init')->getComponentSpecificLanguageData('Access');
+
         $this->_objTpl->setVariable(array(
+            'TXT_ACCESS_SIGNUP_BY_FACEBOOK' => $accessLang['TXT_ACCESS_SIGNUP_BY_FACEBOOK'],
+            'TXT_ACCESS_SIGNUP_BY_GOOGLE' => $accessLang['TXT_ACCESS_SIGNUP_BY_GOOGLE'],
+            'TXT_ACCESS_SIGNUP_BY_TWITTER' => $accessLang['TXT_ACCESS_SIGNUP_BY_TWITTER'],
+            'TXT_CORE_SIGN_UP'      => $_CORELANG['TXT_CORE_SIGN_UP'],
             'TXT_LOGIN'             => $_CORELANG['TXT_LOGIN'],
             'TXT_USER_NAME'         => $_CORELANG['TXT_USER_NAME'],
+            'TXT_EMAIL'             => $_CORELANG['TXT_EMAIL'],
             'TXT_PASSWORD'          => $_CORELANG['TXT_PASSWORD'],
             'TXT_LOGIN_REMEMBER_ME' => $_CORELANG['TXT_CORE_REMEMBER_ME'],
             'TXT_PASSWORD_LOST'     => $_CORELANG['TXT_PASSWORD_LOST'],

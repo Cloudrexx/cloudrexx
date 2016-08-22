@@ -251,6 +251,58 @@ CREATE TABLE `contrexx_core_mail_template` (
   `protected` tinyint(1) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`key`(32),`section`(32))
 ) ENGINE=MyISAM;
+CREATE TABLE `contrexx_core_data_source` (
+  `id` int(11) AUTO_INCREMENT NOT NULL,
+  `identifier` varchar(255) NOT NULL,
+  `options` longtext NOT NULL,
+  `type` varchar(50) NOT NULL,
+  PRIMARY KEY(`id`),
+  UNIQUE KEY `identifier` (`identifier`)
+) ENGINE = InnoDB;
+CREATE TABLE `contrexx_core_modules_access_permission` (
+  `id` int(11) AUTO_INCREMENT NOT NULL,
+  `allowed_protocols` longtext NOT NULL,
+  `allowed_methods` longtext NOT NULL,
+  `requires_login` tinyint(1) DEFAULT NULL,
+  `valid_user_groups` longtext DEFAULT NULL,
+  `valid_access_ids` longtext DEFAULT NULL,
+  PRIMARY KEY(`id`)
+) ENGINE = InnoDB;
+CREATE TABLE `contrexx_core_module_data_access` (
+  `id` int(11) AUTO_INCREMENT NOT NULL,
+  `read_permission` int(11) DEFAULT NULL,
+  `write_permission` int(11) DEFAULT NULL,
+  `data_source_id` int(11) DEFAULT NULL,
+  `name` varchar(255) NOT NULL,
+  `field_list` longtext NOT NULL,
+  `access_condition` longtext NOT NULL,
+  `allowed_output_methods` longtext NOT NULL,
+  PRIMARY KEY(`id`),
+  UNIQUE KEY `name` (`name`),
+  KEY `read_permission` (`read_permission`),
+  KEY `write_permission` (`write_permission`),
+  KEY `data_source_id` (`data_source_id`),
+  CONSTRAINT `contrexx_core_module_data_access_ibfk_read_permission` FOREIGN KEY (`read_permission`) REFERENCES `contrexx_core_modules_access_permission` (`id`),
+  CONSTRAINT `contrexx_core_module_data_access_ibfk_write_permission` FOREIGN KEY (`write_permission`) REFERENCES `contrexx_core_modules_access_permission` (`id`),
+  CONSTRAINT `contrexx_core_module_data_access_ibfk_data_source_id` FOREIGN KEY (`data_source_id`) REFERENCES `contrexx_core_data_source` (`id`)
+) ENGINE = InnoDB;
+CREATE TABLE `contrexx_core_module_data_access_apikey` (
+  `id` int(11) AUTO_INCREMENT NOT NULL,
+  `api_key` varchar(32) NOT NULL,
+  PRIMARY KEY(`id`),
+  UNIQUE KEY `api_key` (`api_key`)
+) ENGINE = InnoDB;
+CREATE TABLE `contrexx_core_module_data_access_data_access_apikey` (
+  `id` int(11) AUTO_INCREMENT NOT NULL,
+  `api_key_id` int(11) DEFAULT NULL,
+  `data_access_id` int(11) DEFAULT NULL,
+  `read_only` tinyint(1) DEFAULT NULL,
+  PRIMARY KEY(id),
+  KEY `api_key_id` (`api_key_id`),
+  KEY `data_access_id` (`data_access_id`),
+  CONSTRAINT `contrexx_core_module_data_access_apikey_ibfk_api_key_id` FOREIGN KEY (`api_key_id`) REFERENCES `contrexx_core_module_data_access_apikey` (`id`),
+  CONSTRAINT `contrexx_core_module_data_access_apikey_ibfk_data_access_id` FOREIGN KEY (`data_access_id`) REFERENCES `contrexx_core_module_data_access` (`id`)
+) ENGINE = InnoDB;
 CREATE TABLE `contrexx_core_module_cron_job` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `active` tinyint(1) NOT NULL,
@@ -583,6 +635,8 @@ CREATE TABLE `contrexx_module_calendar_event` (
   `registration_num` varchar(45) DEFAULT NULL,
   `registration_notification` varchar(1024) DEFAULT NULL,
   `email_template` varchar(255) NOT NULL,
+  `registration_external_link` text NOT NULL,
+  `registration_external_fully_booked` tinyint(1) NOT NULL DEFAULT '0',
   `ticket_sales` tinyint(1) NOT NULL DEFAULT '0',
   `num_seating` text NOT NULL,
   `series_status` tinyint(4) NOT NULL DEFAULT '0',

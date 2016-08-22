@@ -883,7 +883,7 @@ UPLOADER;
             // Event accepts registrations, if registration is set up and
             //     - no attendee limit is set
             //     - or if there are still free places available
-            if (   $objEvent->registration
+            if (   $objEvent->registration == CalendarEvent::EVENT_REGISTRATION_INTERNAL
                 && (   empty($objEvent->numSubscriber)
                     || !\FWValidator::isEmpty($objEvent->getFreePlaces())
                 )

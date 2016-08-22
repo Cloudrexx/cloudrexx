@@ -1,0 +1,3 @@
+Cx\Core\DataSource\Model\Entity\DoctrineRepository:
+  type: entity
+  repositoryClass: Cx\Core\DataSource\Model\Repository\DoctrineRepositoryRepository

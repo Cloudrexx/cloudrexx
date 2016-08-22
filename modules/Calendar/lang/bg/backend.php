@@ -460,7 +460,6 @@ $_ARRAYLANG['TXT_CALENDAR_COPY'] = "kopieren";
 $_ARRAYLANG['TXT_CALENDAR_USE_DATEPICKER'] = "Plugin für Datumauswahl";
 $_ARRAYLANG['TXT_CALENDAR_DATEPICKER'] = "JS DatePickerControl";
 $_ARRAYLANG['TXT_CALENDAR_EVENT_MORE_INVITATIONS_INFO'] = "In diesem Feld kÃ¶nnen weitere E-Mail Adressen (Komma separiert) angegeben werden, an welche eine Einladung per E-Mail geschickt werden soll.";
-$_ARRAYLANG['TXT_CALENDAR_EVENT_NUM_SUBSCRIBER_INFO'] = "Die Anzahl Teilnehmer muss grÃ¶sser als \\\"0\\\" sein.";
 $_ARRAYLANG['TXT_CALENDAR_EVENT_NOTIFICATION_TO_INFO'] = "In diesem Feld kÃ¶nnen E-Mail Adressen (Komma separiert) angegeben werden, an welche eine Benachrichtigung bei An- und Abmeldungen per E-Mail geschickt werden soll.";
 $_ARRAYLANG['TXT_CALENDAR_STEP_BACK'] = "Back";
 ?>

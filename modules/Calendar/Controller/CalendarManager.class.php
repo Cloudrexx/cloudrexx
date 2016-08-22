@@ -528,7 +528,7 @@ class CalendarManager extends CalendarLibrary
             'TXT_'.$this->moduleLangVar.'_EVENT_TYPE_REDIRECT'              => $_ARRAYLANG['TXT_CALENDAR_EVENT_TYPE_REDIRECT'],
             'TXT_'.$this->moduleLangVar.'_EVENT_REGISTRATION_FORM'          => $_ARRAYLANG['TXT_CALENDAR_REGISTRATION_FORM'],
             'TXT_'.$this->moduleLangVar.'_EVENT_MORE_INVITATIONS_INFO'      => $_ARRAYLANG['TXT_CALENDAR_EVENT_MORE_INVITATIONS_INFO'],
-            'TXT_'.$this->moduleLangVar.'_EVENT_NUM_SUBSCRIBER_INFO'        => $_ARRAYLANG['TXT_CALENDAR_EVENT_NUM_SUBSCRIBER_INFO'],
+            'TXT_'.$this->moduleLangVar.'_REGISTRATIONS_SUBSCRIBER_INFO'    => $_ARRAYLANG['TXT_CALENDAR_REGISTRATIONS_SUBSCRIBER_INFO'],
             'TXT_'.$this->moduleLangVar.'_EVENT_NOTIFICATION_TO_INFO'       => $_ARRAYLANG['TXT_CALENDAR_EVENT_NOTIFICATION_TO_INFO'],
             'TXT_'.$this->moduleLangVar.'_EVENT_EMAIL_TEMPLATE_INFO'        => $_ARRAYLANG['TXT_CALENDAR_EVENT_EMAIL_TEMPLATE_INFO'],
             'TXT_'.$this->moduleLangVar.'_EVENT_NUM_SEATING_INFO'           => $_ARRAYLANG['TXT_CALENDAR_EVENT_NUM_SEATING_INFO'],
@@ -570,6 +570,10 @@ class CalendarManager extends CalendarLibrary
             'TXT_'.$this->moduleLangVar.'_EVENT_DETAIL_VIEW'                => $_ARRAYLANG['TXT_CALENDAR_EVENT_DETAIL_VIEW'],
             'TXT_'.$this->moduleLangVar.'_EVENT_DETAIL_VIEW_LABEL'          => $_ARRAYLANG['TXT_CALENDAR_EVENT_DETAIL_VIEW_LABEL'],
             'TXT_'.$this->moduleLangVar.'_EVENT_TREAT_AS_INDEPENDENT'       => $_ARRAYLANG['TXT_CALENDAR_EVENT_TREAT_AS_INDEPENDENT'],
+            'TXT_'.$this->moduleLangVar.'_EVENT_REGISTRATION_NONE'          => $_ARRAYLANG['TXT_CALENDAR_EVENT_REGISTRATION_NONE'],
+            'TXT_'.$this->moduleLangVar.'_EVENT_REGISTRATION_INTERNAL'      => $_ARRAYLANG['TXT_CALENDAR_EVENT_REGISTRATION_INTERNAL'],
+            'TXT_'.$this->moduleLangVar.'_EVENT_REGISTRATION_EXTERNAL'      => $_ARRAYLANG['TXT_CALENDAR_EVENT_REGISTRATION_EXTERNAL'],
+            'TXT_'.$this->moduleLangVar.'_EVENT_REGISTRATION_FULL_BOOKED'   => $_ARRAYLANG['TXT_CALENDAR_EVENT_REGISTRATION_FULL_BOOKED'],
 
             //show media browser button
             $this->moduleLangVar.'_EVENT_REDIRECT_BROWSE_BUTTON'            => self::showMediaBrowserButton('eventRedirect', 'sitestructure'),
@@ -596,7 +600,6 @@ class CalendarManager extends CalendarLibrary
             $this->moduleLangVar.'_EVENT_PICTURE'                           => $eventId != 0 ? $objEvent->pic : '',
             $this->moduleLangVar.'_EVENT_ATTACHMENT'                        => $eventId != 0 ? $objEvent->attach : '',
             $this->moduleLangVar.'_EVENT_MORE_INVITATIONS'                  => $eventId != 0 ? $objEvent->invitedMails : '',
-            $this->moduleLangVar.'_EVENT_REGISTRATION'                      => $eventId != 0 ? ($objEvent->registration == 1 ? 'checked="checked"' : '') : '',
             $this->moduleLangVar.'_EVENT_NUM_SUBSCRIBER'                    => $eventId != 0 ? $objEvent->numSubscriber : '',
             $this->moduleLangVar.'_EVENT_NOTIFICATION_TO'                   => $eventId != 0 ? $objEvent->notificationTo : '',
             $this->moduleLangVar.'_EVENT_TICKET_SALES'                      => $eventId != 0 ? ($objEvent->ticketSales ? 'checked="checked"' : '') : '',
@@ -629,8 +632,19 @@ class CalendarManager extends CalendarLibrary
             $this->moduleLangVar.'_EVENT_HOST_TYPE_MANUAL'                  => $eventId != 0 ? ($objEvent->hostType == 1 ? "checked='checked'" : '') : "checked='checked'",
             $this->moduleLangVar.'_EVENT_HOST_TYPE_MEDIADIR'                => $eventId != 0 ? ($objEvent->hostType == 2 ? "checked='checked'" : '') : "",            
             $this->moduleLangVar.'_EVENT_COPY'                              => $copy ? 1 : 0,
+            $this->moduleLangVar.'_EVENT_REGISTRATION_NONE_SELECTED'        => !empty($eventId)
+                                                                              ? ($objEvent->registration == CalendarEvent::EVENT_REGISTRATION_NONE ? 'selected="selected"' : '')
+                                                                              : 'selected="selected"',
+            $this->moduleLangVar.'_EVENT_REGISTRATION_INTERNAL_SELECTED'    => !empty($eventId) && $objEvent->registration == CalendarEvent::EVENT_REGISTRATION_INTERNAL
+                                                                              ? 'selected="selected"' : '',
+            $this->moduleLangVar.'_EVENT_REGISTRATION_EXTERNAL_SELECTED'    => !empty($eventId) && $objEvent->registration == CalendarEvent::EVENT_REGISTRATION_EXTERNAL
+                                                                              ? 'selected="selected"' : '',
+            $this->moduleLangVar.'_EVENT_REGISTRATION_EXTERNAL_LINK'        => !empty($eventId) ? $objEvent->registrationExternalLink : '',
+            $this->moduleLangVar.'_EVENT_REGISTRATION_EXTERNAL_FULL_BOOKED' => !empty($eventId)
+                                                                              ? ($objEvent->registrationExternalFullyBooked ? 'checked="checked"' : '') : '',
+
         ));
-        
+
         // parse invitation E-mail template
         foreach ($this->arrFrontendLanguages as $language) {
             $this->_objTpl->setVariable(array(

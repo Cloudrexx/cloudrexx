@@ -1,0 +1,30 @@
+Cx\Core_Modules\DataAccess\Model\Entity\DataAccessApiKey:
+    type: entity
+    table: core_module_data_access_data_access_apikey
+    repositoryClass: Cx\Core_Modules\DataAccess\Model\Repository\DataAccessApiKeyRepository
+    indexes:
+        fk_DataAccessApiKey_DataAccess_idx:
+            columns: [ data_access_id ]
+    id:
+        id:
+            type: integer
+            generator:
+              strategy: AUTO
+    fields:
+        readOnly:
+            type: boolean
+            nullable: true
+            column: read_only
+    manyToOne:
+        apiKey:
+            targetEntity: Cx\Core_Modules\DataAccess\Model\Entity\ApiKey
+            inversedBy: dataAccessApiKeys
+            joinColumn:
+                name: api_key_id
+                referencedColumnName: id
+        dataAccess:
+            targetEntity: Cx\Core_Modules\DataAccess\Model\Entity\DataAccess
+            inversedBy: dataAccessApiKeys
+            joinColumn:
+                name: data_access_id
+                referencedColumnName: id

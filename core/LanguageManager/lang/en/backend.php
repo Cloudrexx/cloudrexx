@@ -96,3 +96,6 @@ $_ARRAYLANG['TXT_LANGUAGE_ACTION_COPY'] = 'Copy contents from this language"s fa
 $_ARRAYLANG['TXT_LANGUAGE_ACTION_LINK'] = 'Link contents from this language"s fallback language to this language';
 $_ARRAYLANG['TXT_COULD_NOT_WRITE_TO_FILE'] = 'Could not write to file';
 $_ARRAYLANG['TXT_SUCCESSFULLY_EXPORTED_TO_FILES'] = 'Language variables successfully exported to files.';
+$_ARRAYLANG['TXT_LANGUAGE_MANAGER_OK'] = 'Ok';
+$_ARRAYLANG['TXT_LANGUAGE_MANAGER_LABEL_LANG_REMOVAL'] = 'Confirm language data removal';
+$_ARRAYLANG['TXT_LANGUAGE_MANAGER_LANG_REMOVAL_CONTENT'] = 'Remove all language related data of the deactivated language from all applications.';

@@ -282,4 +282,16 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         $this->cx->getEvents()->addEventListener('mediasource.load', $eventListener);
     }
     
+    /**
+     * Do something before main template gets parsed
+     *
+     * @param \Cx\Core\Html\Sigma                       $template   The main template
+     */
+    public function preFinalize(\Cx\Core\Html\Sigma $template) {
+        if ($this->cx->getMode() != \Cx\Core\Core\Controller\Cx::MODE_FRONTEND) {
+            return;
+        }
+        // make all language data of Access component globally available
+        $template->setVariable(\Env::get('init')->getComponentSpecificLanguageData($this->getName()));
+    }
 }

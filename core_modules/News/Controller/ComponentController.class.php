@@ -72,8 +72,9 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      * 
      * @param string $command Name of command to execute
      * @param array  $arguments List of arguments for the command
+     * @param array  $dataArguments (optional) List of data arguments for the command
      */
-    public function executeCommand($command, $arguments) {
+    public function executeCommand($command, $arguments, $dataArguments = array()) {
         $subcommand = null;
         if (!empty($arguments[0])) {
             $subcommand = $arguments[0];
@@ -291,5 +292,12 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      */
     public function preContentParse(\Cx\Core\ContentManager\Model\Entity\Page $page) {
         $this->cx->getEvents()->addEventListener('SearchFindContent', new \Cx\Core_Modules\News\Model\Event\NewsEventListener());
+    }
+
+    /**
+     * Register the Event listeners
+     */
+    public function registerEventListeners() {
+        $this->cx->getEvents()->addEventListener('languageStatusUpdate', new \Cx\Core_Modules\News\Model\Event\NewsEventListener());
     }
 }

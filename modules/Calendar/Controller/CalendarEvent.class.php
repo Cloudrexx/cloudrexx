@@ -658,6 +658,35 @@ class CalendarEvent extends CalendarLibrary
     protected $registrationCalculated = false;
 
     /**
+     * Registration type none
+     */
+    const EVENT_REGISTRATION_NONE = 0;
+
+    /**
+     * Registration type internal
+     */
+    const EVENT_REGISTRATION_INTERNAL = 1;
+
+    /**
+     * Registration type external
+     */
+    const EVENT_REGISTRATION_EXTERNAL = 2;
+
+    /**
+     * Registration link, when registration type is external
+     *
+     * @var string
+     */
+    public $registrationExternalLink;
+
+    /**
+     * True when external registration is fully booked
+     *
+     * @var boolean
+     */
+    public $registrationExternalFullyBooked;
+
+    /**
      * Constructor
      * 
      * Loads the event object of given id
@@ -732,6 +761,8 @@ class CalendarEvent extends CalendarLibrary
                          event.registration_form AS registration_form,
                          event.registration_num AS registration_num,
                          event.registration_notification AS registration_notification,
+                         event.registration_external_link,
+                         event.registration_external_fully_booked,
                          event.email_template AS email_template,
                          event.ticket_sales AS ticket_sales,
                          event.num_seating AS num_seating,
@@ -892,6 +923,8 @@ class CalendarEvent extends CalendarLibrary
                 $this->numSubscriber = intval($objResult->fields['registration_num']); 
                 $this->notificationTo = htmlentities($objResult->fields['registration_notification'], ENT_QUOTES, CONTREXX_CHARSET);
                 $this->emailTemplate = json_decode($objResult->fields['email_template'], true);
+                $this->registrationExternalLink = contrexx_raw2xhtml($objResult->fields['registration_external_link']);
+                $this->registrationExternalFullyBooked = contrexx_input2int($objResult->fields['registration_external_fully_booked']);
                 $this->ticketSales = intval($objResult->fields['ticket_sales']);
                 $this->arrNumSeating = json_decode($objResult->fields['num_seating']);
                 $this->numSeating = !empty($this->arrNumSeating) ? implode(',', $this->arrNumSeating) : '';
@@ -1067,11 +1100,14 @@ class CalendarEvent extends CalendarLibrary
         $invited_mails             = isset($data['invitedMails']) ? contrexx_addslashes(contrexx_strip_tags($data['invitedMails'])) : '';   
         $send_invitation           = isset($data['sendInvitation']) ? intval($data['sendInvitation']) : 0;        
         $invitationTemplate        = isset($data['invitationEmailTemplate']) ? contrexx_input2db($data['invitationEmailTemplate']) : 0;        
-        $registration              = isset($data['registration']) ? intval($data['registration']) : 0;      
+        $registration              =   isset($data['registration']) && in_array($data['registration'], array(self::EVENT_REGISTRATION_NONE, self::EVENT_REGISTRATION_INTERNAL, self::EVENT_REGISTRATION_EXTERNAL))
+                                     ? intval($data['registration']) : 0;
         $registration_form         = isset($data['registrationForm']) ? intval($data['registrationForm']) : 0;      
         $registration_num          = isset($data['numSubscriber']) ? intval($data['numSubscriber']) : 0;      
         $registration_notification = isset($data['notificationTo']) ? contrexx_addslashes(contrexx_strip_tags($data['notificationTo'])) : '';
         $email_template            = isset($data['emailTemplate']) ? contrexx_input2db($data['emailTemplate']) : 0;
+        $registrationExternalLink  = isset($data['registration_external_link']) ? contrexx_input2db($data['registration_external_link']) : '';
+        $registrationExternalFullyBooked = isset($data['registration_external_full_booked']) ? 1 : 0;
         $ticket_sales              = isset($data['ticketSales']) ? intval($data['ticketSales']) : 0;
         $num_seating               = isset($data['numSeating']) ? json_encode(explode(',', $data['numSeating'])) : '';
         $related_hosts             = isset($data['selectedHosts']) ? $data['selectedHosts'] : '';        
@@ -1325,6 +1361,8 @@ class CalendarEvent extends CalendarLibrary
             'registration_num'              => $registration_num, 
             'registration_notification'     => $registration_notification,
             'email_template'                => json_encode($email_template),
+            'registration_external_link'    => $registrationExternalLink,
+            'registration_external_fully_booked' => $registrationExternalFullyBooked,
             'ticket_sales'                  => $ticket_sales,
             'num_seating'                   => $num_seating,            
             'series_status'                 => $seriesStatus,
@@ -2161,6 +2199,17 @@ class CalendarEvent extends CalendarLibrary
         $this->waitlistCount     = 0;
         $this->cancellationCount = 0;
         $this->freePlaces        = 0;
+    }
+
+    /**
+     * Get unique identifier of event
+     *
+     * Note: Event reocurrences do share the same unique identifier
+     *
+     * @return  integer ID of event
+     */
+    public function getId() {
+        return $this->id;
     }
 
     /**

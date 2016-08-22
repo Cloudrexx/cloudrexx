@@ -1432,11 +1432,31 @@ namespace Cx\Core\Core\Controller {
                     $params = array();
                     if (isset($argv)) {
                         $params = array_slice($argv, 1);
+                        foreach ($params as $key=>$value) {
+                            $argParts = explode('=', $value, 2);
+                            if (count($argParts) == 2) {
+                                $params[$argParts[0]] = $argParts[1];
+                                unset($params[$key]);
+                            }
+                        }
                     } else {
                         $params = preg_replace('#' . $this->getWebsiteOffsetPath() . static::FOLDER_NAME_COMMAND_MODE . '(/)?#', '', $_GET['__cap']);
                         $params = explode('/', $params) + $_GET;
                         unset($params['__cap']);
                     }
+                    $params = contrexx_input2raw($params);
+                    
+                    // parse body arguments:
+                    // todo: this does not work for form-data encoded body (boundary...)
+                    $dataArguments = array();
+                    if (php_sapi_name() == 'cli') {
+                        // the following does block if there's no data:
+                        //$input = trim(stream_get_contents(STDIN));
+                    } else {
+                        $input = file_get_contents('php://input');
+                    }
+                    parse_str($input, $dataArguments);
+                    $dataArguments = contrexx_input2raw($dataArguments);
 
                     $this->getCommands();
 
@@ -1458,7 +1478,7 @@ namespace Cx\Core\Core\Controller {
                         throw new \Exception('The command ' . $command . ' has been rejected by not complying to the permission requirements of the requested method.');
                     }
                     // execute command
-                    $objCommand->executeCommand($command, $params);
+                    $objCommand->executeCommand($command, $params, $dataArguments);
                     return;
                 } catch (\Exception $e) {
                     throw new \Exception($e);

@@ -532,15 +532,12 @@
 
     function checkRegistration()
     {
-        var registrationMask = document.getElementById('registrationMore');
-        var registrationMaskSelect = document.getElementsByName('registration');
-        /*IE<9 has a problem on getElementByName if there are elements with an equal ID.
-         * so there may not only inputfields be found and we have to loop by*/
-        registrationMask.style.display = 'none';
-        for(var i = 0; i < registrationMaskSelect.length; i++){
-            if(registrationMaskSelect[i].checked == true){
-                registrationMask.style.display = 'block';
-            }
+        var registrationType = cx.jQuery( 'select[name=registration]' ).val();
+        cx.jQuery( '.registration_more' ).hide();
+        if (registrationType == '1') {
+            cx.jQuery( '#registration_intern' ).show();
+        } else if (registrationType == '2') {
+            cx.jQuery( '#registration_extern' ).show();
         }
     }
 
@@ -1055,11 +1052,15 @@
             <tr class="row2">
                 <td width="180" valign="top">{TXT_CALENDAR_EVENT_REGISTRATION}</td>
                 <td>
-                    <label><input name="registration" type="checkbox"  onclick="checkRegistration();" value="1" {CALENDAR_EVENT_REGISTRATION} />&nbsp;{TXT_CALENDAR_ACTIVATE}</label>
+                    <select name="registration" style="width: 258px" onchange="checkRegistration()">
+                        <option value="0" {CALENDAR_EVENT_REGISTRATION_NONE_SELECTED} >{TXT_CALENDAR_EVENT_REGISTRATION_NONE}</option>
+                        <option value="1" {CALENDAR_EVENT_REGISTRATION_INTERNAL_SELECTED} >{TXT_CALENDAR_EVENT_REGISTRATION_INTERNAL}</option>
+                        <option value="2" {CALENDAR_EVENT_REGISTRATION_EXTERNAL_SELECTED}>{TXT_CALENDAR_EVENT_REGISTRATION_EXTERNAL}</option>
+                    </select>
                 </td>
             </tr>
         </table>
-        <div id="registrationMore" style="display:none;">
+        <div class="registration_more" id="registration_intern" style="display:none;">
             <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist">
                 <tr class="row1">
                     <td width="180" valign="top">{TXT_CALENDAR_EVENT_REGISTRATION_FORM}</td>
@@ -1072,7 +1073,7 @@
                 <tr class="row2">
                     <td valign="top">{TXT_CALENDAR_EVENT_NUM_SUBSCRIBER}</td>
                     <td>
-                        <input name="numSubscriber" maxlength="45" type="text" style="width: 250px" value="{CALENDAR_EVENT_NUM_SUBSCRIBER}" />&nbsp;&nbsp;<span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_CALENDAR_EVENT_NUM_SUBSCRIBER_INFO}</span>
+                        <input name="numSubscriber" maxlength="45" type="text" style="width: 250px" value="{CALENDAR_EVENT_NUM_SUBSCRIBER}" />&nbsp;&nbsp;<span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_CALENDAR_REGISTRATIONS_SUBSCRIBER_INFO}</span>
                     </td>
                 </tr>
                 <tr class="row1">
@@ -1106,6 +1107,17 @@
                                         <input name="numSeating" type="text" style="width: 250px" value="{CALENDAR_EVENT_NUM_SEATING}" />&nbsp;&nbsp;<span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_CALENDAR_EVENT_NUM_SEATING_INFO}</span>
                                     </td>
                                 </tr>-->
+            </table>
+        </div>
+        <div class="registration_more" id="registration_extern" style="display:none;">
+            <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist">
+                <tr class="row1">
+                    <td width="180" valign="top">{TXT_CALENDAR_EVENT_LINK}</td>
+                    <td>
+                        <input name="registration_external_link" type="text" style="width: 250px" value="{CALENDAR_EVENT_REGISTRATION_EXTERNAL_LINK}" />&nbsp;&nbsp;
+                        <label><input type="checkbox" name='registration_external_full_booked' value="1" {CALENDAR_EVENT_REGISTRATION_EXTERNAL_FULL_BOOKED}/>&nbsp;{TXT_CALENDAR_EVENT_REGISTRATION_FULL_BOOKED}</label>
+                    </td>
+                </tr>
             </table>
         </div>
     </div>
