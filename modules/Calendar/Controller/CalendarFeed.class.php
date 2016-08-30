@@ -43,7 +43,7 @@ namespace Cx\Modules\Calendar\Controller;
  * @package     cloudrexx
  * @subpackage  module_calendar
  */
-class CalendarFeed extends \Cx\Modules\Calendar\Controller\CalendarLibrary {
+class CalendarFeed extends CalendarLibrary {
     /**
      * Object Event manager
      * 
@@ -75,8 +75,8 @@ class CalendarFeed extends \Cx\Modules\Calendar\Controller\CalendarLibrary {
     function creatFeed(){
         global $_CONFIG, $objDatabase;
         
-        parent::getFrontendLanguages();
-        parent::getSettings();
+        $this->getFrontendLanguages();
+        $this->getSettings();
         
         $this->objEventManager->getEventlist();
         
@@ -96,7 +96,7 @@ class CalendarFeed extends \Cx\Modules\Calendar\Controller\CalendarLibrary {
             }
             
             $objRSSWriter->channelWebMaster = $_CONFIG['coreAdminEmail'];
-            $objRSSWriter->channelLastBuildDate = date('r', mktime());
+            $objRSSWriter->channelLastBuildDate = date('r', time());
             
             foreach($this->objEventManager->eventList as $eventKey => $objEvent) {
                 $objFWUser = \FWUser::getFWUserObject();
@@ -125,7 +125,7 @@ class CalendarFeed extends \Cx\Modules\Calendar\Controller\CalendarLibrary {
                     $itemComments = null;
                     $itemEnclosure = array();
                     $itemGuid = array(); 
-                    $itemPubDate = contrexx_raw2xml($objEvent->startDate);
+                    $itemPubDate = $objEvent->startDate->getTimestamp();
                     $itemSource = array();
                     
                     

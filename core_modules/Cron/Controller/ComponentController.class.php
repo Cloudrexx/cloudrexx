@@ -81,9 +81,11 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     /**
      * Fetch all Job entities and check each of them if they need to be executed
      * 
-     * @param string $command
+     * @param string $command Name of command to execute
+     * @param array  $arguments List of arguments for the command
+     * @param array  $dataArguments (optional) List of data arguments for the command
      */
-    public function executeCommand($command, $arguments)
+    public function executeCommand($command, $arguments, $dataArguments = array())
     {
         switch ($command) {
             case 'Cron':

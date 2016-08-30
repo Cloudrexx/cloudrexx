@@ -45,7 +45,7 @@ namespace Cx\Modules\Calendar\Controller;
  * @copyright  CLOUDREXX CMS - CLOUDREXX AG
  * @version    1.00
  */
-class CalendarSettings extends \Cx\Modules\Calendar\Controller\CalendarLibrary
+class CalendarSettings extends CalendarLibrary
 {
     /**
      * Status message
@@ -77,7 +77,7 @@ class CalendarSettings extends \Cx\Modules\Calendar\Controller\CalendarLibrary
      * @see getFrontendLanguages();
      */
     function __construct(){
-        parent::getFrontendLanguages();
+        $this->getFrontendLanguages();
     }
     
     /**
@@ -707,7 +707,7 @@ class CalendarSettings extends \Cx\Modules\Calendar\Controller\CalendarLibrary
     {
         global $_ARRAYLANG, $objDatabase;
         
-        parent::getSettings();
+        $this->getSettings();
         
         $query = "SELECT id,title
                     FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_settings_section

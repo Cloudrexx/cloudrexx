@@ -98,8 +98,8 @@ function newsGetFileBrowser(elInsertBox, sType)
 
     if (sType == 'webpages') {
         cx.variables.get('jquery', 'mediabrowser')('#mediabrowser_button').trigger("click", {
-            cxMbViews: 'sitestructure',
-            cxMbStartview: 'MediaBrowserList'
+            cxMbViews: 'sitestructure,filebrowser',
+            cxMbStartview: 'Sitestructure'
         });
     } else {
         cx.variables.get('jquery', 'mediabrowser')('#mediabrowser_button').trigger("click", {

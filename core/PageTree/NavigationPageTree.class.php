@@ -135,6 +135,8 @@ class NavigationPageTree extends SigmaPageTree {
                 'TARGET' => empty($linkTarget) ? '_self' : $linkTarget,
                 'LEVEL_INFO' => $hasChilds ? '' : 'down',
                 'STYLE' => $style,
+                'PAGE_ID' => $page->getId(),
+                'PAGE_NODE_ID' => $page->getNode()->getId(),
                 'CSS_NAME' => $page->getCssNavName()
             ));
             $this->template->parse($blockName);

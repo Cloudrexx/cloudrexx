@@ -45,7 +45,7 @@ namespace Cx\Modules\Calendar\Controller;
  * @copyright  CLOUDREXX CMS - CLOUDREXX AG
  * @version    1.00
  */
-class CalendarHeadlines extends \Cx\Modules\Calendar\Controller\CalendarLibrary
+class CalendarHeadlines extends CalendarLibrary
 {    
     /**
      * Event manager object
@@ -62,7 +62,7 @@ class CalendarHeadlines extends \Cx\Modules\Calendar\Controller\CalendarLibrary
      */
     function __construct($pageContent) {
         parent::__construct('.');   
-        parent::getSettings();   
+        $this->getSettings();   
         
         $this->pageContent = $pageContent;    
         
@@ -77,8 +77,11 @@ class CalendarHeadlines extends \Cx\Modules\Calendar\Controller\CalendarLibrary
     function loadEventManager()
     {
         if($this->arrSettings['headlinesStatus'] == 1 && $this->_objTpl->blockExists('calendar_headlines_row')) {                        
-            $startDate = mktime(0, 0, 0, date("m", mktime()), date("d", mktime()), date("Y", mktime()));                                   
-            $endDate = mktime(23, 59, 59, date("m", mktime()), date("d", mktime()), date("Y", mktime())+10);       
+            $startDate = new \DateTime();
+            $startDate->setTime(0, 0, 0);
+            $endDate = new \DateTime();
+            $endDate->setTime(23, 59, 59);
+            $endDate->modify('+10 years');    
             $categoryId = intval($this->arrSettings['headlinesCategory']) != 0 ? intval($this->arrSettings['headlinesCategory']) : null;        
             
             $startPos = 0;   

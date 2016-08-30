@@ -113,11 +113,34 @@ function openWindow(theURL,winName,features)
 
 {CONTENT_SUBNAVIGATION}
 
+<!-- BEGIN media_archive_search_form -->
+<form method="get" action="index.php">
+    <input type="hidden" name="cmd" value="Media" />
+    <input type="hidden" name="archive" value="{MEDIA_ARCHIVE_NAME}" />
+    <input type="hidden" name="path" value="{MEDIA_ARCHIVE_PATH}" />
+    <table width="100%" cellspacing="0" cellpadding="5" border="0" align="center" class="adminlist">
+        <tr>
+            <th>{TXT_MEDIA_SEARCH}</th>
+        </tr>
+        <tr>
+            <td>
+                <input name="term" value="{MEDIA_SEARCH_TERM}" />
+                <input type="submit" value="{TXT_MEDIA_SEARCH}" />
+            </td>
+        </tr>
+    </table>
+    <br />
+</form>
+<!-- END media_archive_search_form -->
+
+<!-- BEGIN media_archive_actions_block -->
 <ul id="tabmenu">
   <li><a id="mediaTab_newdir" href="javascript:{}" onclick="selectTab('newdir')" title="">{TXT_MEDIA_NEW_DIRECTORY}</a></li>
   <li><a id="uploaderStarter" href="javascript:{}" title="">{TXT_MEDIA_UPLOAD_FILES}</a></li>
 </ul>
+<!-- END media_archive_actions_block -->
 
+<!-- BEGIN media_archive_newdir_block -->
 <div id="newdir" class="mediaTab" style="display:none;">
     <form name="create_dir" method="post" action="{MEDIA_CREATE_DIR_ACTION}" onsubmit="return mediaCheckNewDir();">
       <table width="100%" cellspacing="0" cellpadding="5" border="0" align="center" class="adminlist">
@@ -135,6 +158,7 @@ function openWindow(theURL,winName,features)
     </form>
     <br />&nbsp;
 </div>
+<!-- END media_archive_newdir_block -->
 
 <div id="loadfile" class="mediaTab" style="display:none;">
     <form name="upload_files" method="post" action="{MEDIA_UPLOAD_FILES_ACTION}" enctype="multipart/form-data" onsubmit="return mediaCheckUploadFiles();">
@@ -254,7 +278,7 @@ function openWindow(theURL,winName,features)
                 <a href="{MEDIA_FILE_FILESHARING_HREF}" title="{MEDIA_FILESHARING}"><img src="../core/Core/View/Media/icons/cloud{MEDIA_FILESHARING_STATE}.png" width="16" height="16" alt="filesharing" style="border: 0px;" /></a>
                 <!-- END mediaFilesharing -->
                 <a href="{MEDIA_FILE_RENAME_HREF}" title="{MEDIA_RENAME}"><img src="../core/Core/View/Media/icons/edit.gif" width="16" height="16" alt="rename" style="border: 0px;" /></a>&nbsp;
-                <a href="javascript:mediaConfirmDelete('{MEDIA_FILE_NAME}');" title="{MEDIA_DELETE}"><img src="../core/Core/View/Media/icons/delete.gif" width="16" height="16" alt="delete" style="border: 0px;" /></a>
+                <a onclick="return mediaConfirmDelete();" href="{MEDIA_FILE_DELETE_HREF}" title="{MEDIA_DELETE}"><img src="../core/Core/View/Media/icons/delete.gif" width="16" height="16" alt="delete" style="border: 0px;" /></a>
             </td>
         </tr>
       <!-- END mediaDirectoryTree -->

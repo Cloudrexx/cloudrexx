@@ -602,26 +602,4 @@ class CrmTask extends CrmLibrary
             \Cx\Core\Csrf\Controller\Csrf::header("Location:index.php?cmd=".$this->moduleName.base64_decode($redirect)."&mes=".  base64_encode('taskDeleted'));
         }
     }
-
-    /**
-     * Get username
-     *
-     * @param Integer $userId
-     *
-     * @return String
-     */
-    function getUserName($userId)
-    {
-        if (!empty ($userId)) {
-            $objFWUser  = \FWUser::getFWUserObject();
-            $objUser    = $objFWUser->objUser->getUser($userId);
-            $userName   = $objUser->getRealUsername();
-            if ($userName) {
-                return $userName;
-            } else {
-                return $objUser->getUsername();
-            }
-        }
-    }
-
 }

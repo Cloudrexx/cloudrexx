@@ -643,6 +643,19 @@ li.jstree-closed, li.jstree-leaf {
     background-position: -33px -209px;
 }
 
+#site-tree .page.symlink {
+    background-position: 1px -238px;
+}
+#site-tree .page.symlink.protected {
+    background-position: -33px -238px;
+}
+#site-tree .page.symlink.fallback {
+    background-position: 1px -267px;
+}
+#site-tree .page.symlink.fallback.protected {
+    background-position: -33px -267px;
+}
+
 #content-manager.edit_view #site-structure .translations,
 #content-manager.edit_view #site-structure .translation,
 #content-manager.edit_view #site-structure .module,
@@ -1293,14 +1306,13 @@ div.date img{
     margin: 0 5px 0 0;
 }
 
-#page #page_target_text_wrapper {
-    display: none;
+#page .page_target_text_wrapper {
     float: left;
     margin: 0 10px 0 0;
 }
 
 #page #page_target_wrapper .icon,
-#page #page_target_text_wrapper .icon {
+#page .page_target_text_wrapper .icon {
     float: left;
     width: 16px;
     height: 16px;
@@ -1311,7 +1323,7 @@ div.date img{
     display: none;
 }
 
-#page #page_target_text {
+#page .page_target_text {
     float: left;
     padding: 3px 0 0 0;
     margin: 0 5px 0 0;

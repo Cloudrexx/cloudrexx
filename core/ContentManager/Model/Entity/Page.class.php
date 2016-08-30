@@ -76,6 +76,7 @@ class Page extends \Cx\Model\Base\EntityBase implements \Serializable
     const TYPE_CONTENT = 'content';
     const TYPE_APPLICATION = 'application';
     const TYPE_REDIRECT = 'redirect';
+    const TYPE_SYMLINK = 'symlink';
     const TYPE_FALLBACK = 'fallback';
     const TYPE_ALIAS = 'alias';
 
@@ -830,6 +831,17 @@ class Page extends \Cx\Model\Base\EntityBase implements \Serializable
                 } catch (PageRepositoryException $e){
                     $status .= 'broken ';
                 }
+            }
+        } else if ($this->getType() == self::TYPE_SYMLINK) {
+            $status .= 'symlink ';
+            $pageRepo = \Env::get('em')->getRepository('Cx\Core\ContentManager\Model\Entity\Page');
+            try {
+                $targetPage = $pageRepo->getTargetPage($this);
+                if (!$targetPage->isActive()){
+                    throw new PageRepositoryException("Page is not active");
+                }
+            } catch (PageRepositoryException $e){
+                $status .= 'broken ';
             }
         }
         
@@ -1720,15 +1732,19 @@ class Page extends \Cx\Model\Base\EntityBase implements \Serializable
     /**
      * Copies the content from the other page given.
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page
+     * @param boolean $includeThemeOptions (optional) Wheter to adopt theme options as well (default false)
      */
-    public function getFallbackContentFrom($page) {
+    public function setContentOf($page, $includeThemeOptions = false) {
         $this->isVirtual = true;
         $this->content = $page->getContent();
         $this->module = $page->getModule();
         $this->cmd = $page->getCmd();
-        $this->skin = $page->getSkin();
-        $this->customContent = $page->getCustomContent();
-        $this->cssName = $page->getCssName();
+        if ($includeThemeOptions) {
+            $this->skin = $page->getSkin();
+            $this->customContent = $page->getCustomContent();
+            $this->applicationTemplate = $page->getApplicationTemplate();
+            $this->cssName = $page->getCssName();
+        }
         $this->cssNavName = $page->getCssNavName();
         
         $this->type = $page->getType();

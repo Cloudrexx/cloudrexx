@@ -164,8 +164,8 @@ class Knowledge extends KnowledgeLibrary
 
         try {
             $this->categories->readCategories();
-            $mostRead = $this->articles->getMostRead($_LANGID, $this->settings->get('most_read_sidebar_amount'));
-            $bestRated = $this->articles->getBestRated($_LANGID, $this->settings->get('best_rated_sidebar_amount'));
+            $mostRead = $this->articles->getMostRead($this->getLangId(), $this->settings->get('most_read_sidebar_amount'));
+            $bestRated = $this->articles->getBestRated($this->getLangId(), $this->settings->get('best_rated_sidebar_amount'));
         } catch (DatabaseError $e) {
             return;
         }
@@ -288,27 +288,25 @@ class Knowledge extends KnowledgeLibrary
      * Show the most read articles
      *
      * @global $_ARRAYLANG
-     * @global $_LANGID
      */
     private function mostRead()
     {
-        global $_LANGID, $_ARRAYLANG;
+        global $_ARRAYLANG;
 
-        $articles = $this->articles->getMostRead($_LANGID);
+        $articles = $this->articles->getMostRead($this->getLangId());
         $this->parseArticleList($articles, $_ARRAYLANG['TXT_KNOWLEDGE_MOST_READ_ARTICLES'], 0);
     }
 
     /**
      * Show the best rated articles
      *
-     * @global $_LANGID
      * @global $_ARRAYLANG
      */
     private function bestRated()
     {
-        global $_LANGID, $_ARRAYLANG;
+        global $_ARRAYLANG;
 
-        $articles = $this->articles->getBestRated($_LANGID);
+        $articles = $this->articles->getBestRated($this->getLangId());
         $this->parseArticleList($articles, $_ARRAYLANG['TXT_KNOWLEDGE_BEST_RATED_ARTICLES'], 0);
     }
 
@@ -330,10 +328,10 @@ class Knowledge extends KnowledgeLibrary
         }
 
         try {
-            $this->articles->readArticles(false, $_LANGID, $id);
+            $this->articles->readArticles(false, $this->getLangId(), $id);
             $this->categories->readCategories();
             $this->articles->hit($id);
-            $tags = $this->tags->getByArticle($id, $_LANGID);
+            $tags = $this->tags->getByArticle($id, $this->getLangId());
         } catch (DatabaseError $e) {
             return;
         }
@@ -447,34 +445,70 @@ class Knowledge extends KnowledgeLibrary
             foreach ($tag['articles'] as $articleid) {
                 $article = $this->articles->articles[$articleid];
                 if ($article['active']) {
-                    $average = ($article['votes'] > 0) ? $article['votevalue'] / $article['votes'] : 0;
-                    $amount = $article['votes'];
-                    $this->tpl->setVariable(array(
-                       "ARTICLE_ID"    => $articleid,
-                       "QUESTION"      => $article['content'][$_LANGID]['question'],
-                       "ANSWER"        => $article['content'][$_LANGID]['answer'],
-                       "AVERAGE"       => round($average, 2),
-                       "TXT_RATING"    => $_ARRAYLANG['TXT_KNOWLEDGE_YOUR_RATING'],
-                       "AMOUNT_OF_RATING" => $amount,
-                       "MAX_RATING"    => $this->settings->get("max_rating"),
-                       "LOCKED"        => $this->checkLocking($articleid),
-                       "TXT_TAGS"      => $_ARRAYLANG['TXT_KNOWLEDGE_TAGS'],
-                       "TXT_HITS"      => $_ARRAYLANG['TXT_KNOWLEDGE_HITS'],
-                       "TXT_CREATED"   => $_ARRAYLANG['TXT_KNOWLEDGE_CREATED'],
-                       "TXT_LAST_CHANGE"   => $_ARRAYLANG['TXT_KNOWLEDGE_UPDATED'],
-                       "TXT_AMOUNT_OF_RATING" => $_ARRAYLANG['TXT_KNOWLEDGE_AMOUNT_OF_RATING'],
-                       "TXT_AVERAGE_RATING"     => $_ARRAYLANG['TXT_KNOWLEDGE_AVERAGE_RATING'],
-                    ));
+                
+                    if ($this->isAllLangsActive()) {
+                        foreach ($article['content'] as $lang_id => $content) {
 
-                    try {
-                        $tags = $this->tags->getByArticle($articleid, $_LANGID);
-                    } catch (DatabaseError $e) {
-                        // nothing yet
+                            $average = ($article['votes'] > 0) ? $article['votevalue'] / $article['votes'] : 0;
+                            $amount = $article['votes'];
+                            $this->tpl->setVariable(array(
+                                "ARTICLE_ID" => $articleid,
+        	                    "QUESTION" => $content['question'],
+        	                    "ANSWER" => $content['answer'],
+                                'LANG_ID' => $lang_id,
+                                "AVERAGE" => round($average, 2),
+                                "TXT_RATING" => $_ARRAYLANG['TXT_KNOWLEDGE_YOUR_RATING'],
+                                "AMOUNT_OF_RATING" => $amount,
+                                "MAX_RATING" => $this->settings->get("max_rating"),
+                                "LOCKED" => $this->checkLocking($articleid),
+                                "TXT_TAGS" => $_ARRAYLANG['TXT_KNOWLEDGE_TAGS'],
+                                "TXT_HITS" => $_ARRAYLANG['TXT_KNOWLEDGE_HITS'],
+                                "TXT_CREATED" => $_ARRAYLANG['TXT_KNOWLEDGE_CREATED'],
+                                "TXT_LAST_CHANGE" => $_ARRAYLANG['TXT_KNOWLEDGE_UPDATED'],
+                                "TXT_AMOUNT_OF_RATING" => $_ARRAYLANG['TXT_KNOWLEDGE_AMOUNT_OF_RATING'],
+                                "TXT_AVERAGE_RATING" => $_ARRAYLANG['TXT_KNOWLEDGE_AVERAGE_RATING'],
+                            ));
+
+                            try {
+        	                	$tags = $this->tags->getByArticle($articleid, NULL);
+                            } catch (DatabaseError $e) {
+                                // nothing yet
+                            }
+
+                            $this->parseTags($tags);
+
+                            $this->tpl->parse("article");
+                        }
+                    } else {
+                        $average = ($article['votes'] > 0) ? $article['votevalue'] / $article['votes'] : 0;
+                        $amount = $article['votes'];
+                        $this->tpl->setVariable(array(
+                           "ARTICLE_ID"    => $articleid,
+                           "QUESTION"      => $article['content'][$_LANGID]['question'],
+                           "ANSWER"        => $article['content'][$_LANGID]['answer'],
+                           "AVERAGE"       => round($average, 2),
+                           "TXT_RATING"    => $_ARRAYLANG['TXT_KNOWLEDGE_YOUR_RATING'],
+                           "AMOUNT_OF_RATING" => $amount,
+                           "MAX_RATING"    => $this->settings->get("max_rating"),
+                           "LOCKED"        => $this->checkLocking($articleid),
+                           "TXT_TAGS"      => $_ARRAYLANG['TXT_KNOWLEDGE_TAGS'],
+                           "TXT_HITS"      => $_ARRAYLANG['TXT_KNOWLEDGE_HITS'],
+                           "TXT_CREATED"   => $_ARRAYLANG['TXT_KNOWLEDGE_CREATED'],
+                           "TXT_LAST_CHANGE"   => $_ARRAYLANG['TXT_KNOWLEDGE_UPDATED'],
+                           "TXT_AMOUNT_OF_RATING" => $_ARRAYLANG['TXT_KNOWLEDGE_AMOUNT_OF_RATING'],
+                           "TXT_AVERAGE_RATING"     => $_ARRAYLANG['TXT_KNOWLEDGE_AVERAGE_RATING'],
+                        ));
+
+                        try {
+                            $tags = $this->tags->getByArticle($articleid, $_LANGID);
+                        } catch (DatabaseError $e) {
+                            // nothing yet
+                        }
+
+                        $this->parseTags($tags);
+
+                        $this->tpl->parse("article");
                     }
-
-                    $this->parseTags($tags);
-
-                    $this->tpl->parse("article");
                 }
             }
             $this->tpl->setVariable(array(
@@ -511,39 +545,85 @@ class Knowledge extends KnowledgeLibrary
             //$this->parseArticleList($results, $_ARRAYLANG['TXT_SEARCH_RESULTS']);
             // this can currently not be done with the parseArticleList function because the
             // search engine only returns ids and not the whole content array
-            foreach ($results as $article) {
-                $articleid = $article['id'];
-                $article = $this->articles->articles[$articleid];
-                if ($article['active']) {
-                   $average = ($article['votes'] > 0) ? $article['votevalue'] / $article['votes'] : 0;
-                   $amount = $article['votes'];
-                   $this->tpl->setVariable(array(
-                       "ARTICLE_ID"    => $articleid,
-                       "QUESTION"      => $article['content'][$_LANGID]['question'],
-                       "ANSWER"        => $article['content'][$_LANGID]['answer'],
-                       "AVERAGE"       => round($average, 2),
-                       "TXT_RATING"    => $_ARRAYLANG['TXT_KNOWLEDGE_YOUR_RATING'],
-                       "AMOUNT_OF_RATING" => $amount,
-                       "HITS"          => $article['hits'],
-                       "TXT_AMOUNT_OF_RATING" => $_ARRAYLANG['TXT_KNOWLEDGE_AMOUNT_OF_RATING'],
-                       "TXT_AVERAGE_RATING"     => $_ARRAYLANG['TXT_KNOWLEDGE_AVERAGE_RATING'],
-                       "TXT_HITS"      => $_ARRAYLANG['TXT_KNOWLEDGE_HITS'],
-                       "TXT_CREATED"   => $_ARRAYLANG['TXT_KNOWLEDGE_CREATED'],
-                       "TXT_LAST_CHANGE"   => $_ARRAYLANG['TXT_KNOWLEDGE_UPDATED'],
-                       "TXT_TAGS"      => $_ARRAYLANG['TXT_KNOWLEDGE_TAGS'],
-                       "MAX_RATING"    => $this->settings->get("max_rating"),
-                       "LOCKED"        => $this->checkLocking($articleid),
-                       "DATE_CREATED"  => date(ASCMS_DATE_FORMAT_DATE, $article['date_created']),
-                       "DATE_UPDATED"  => date(ASCMS_DATE_FORMAT_DATE, $article['date_updated'])
-                   ));
+            if ($this->isAllLangsActive()) {
+                foreach ($results as $result) {
+                    $articleid = $result['id'];
+                    $article = $this->articles->articles[$articleid];
+                    if ($article['active']) {
 
-                   try {
-                       $tags = $this->tags->getByArticle($articleid, $_LANGID);
-                   } catch (DatabaseError $e) {
-                       // nothing yet
-                   }
-                   $this->parseTags($tags);
-                   $this->tpl->parse("article");
+                        $lang_id = $result['lang'];
+                        $content = $article['content'][$lang_id];
+
+                        $average = ($article['votes'] > 0) ? $article['votevalue'] / $article['votes'] : 0;
+                        $amount = $article['votes'];
+                        $this->tpl->setVariable(array(
+                            "ARTICLE_ID" => $articleid,
+                            "QUESTION" => $content['question'],
+                            "ANSWER" => $content['answer'],
+                            'LANG_ID' => $lang_id,
+
+                            "AVERAGE" => round($average, 2),
+                            "TXT_RATING" => $_ARRAYLANG['TXT_KNOWLEDGE_YOUR_RATING'],
+                            "AMOUNT_OF_RATING" => $amount,
+                            "HITS" => $article['hits'],
+                            "TXT_AMOUNT_OF_RATING" => $_ARRAYLANG['TXT_KNOWLEDGE_AMOUNT_OF_RATING'],
+                            "TXT_AVERAGE_RATING" => $_ARRAYLANG['TXT_KNOWLEDGE_AVERAGE_RATING'],
+                            "TXT_HITS" => $_ARRAYLANG['TXT_KNOWLEDGE_HITS'],
+                            "TXT_CREATED" => $_ARRAYLANG['TXT_KNOWLEDGE_CREATED'],
+                            "TXT_LAST_CHANGE" => $_ARRAYLANG['TXT_KNOWLEDGE_UPDATED'],
+                            "TXT_TAGS" => $_ARRAYLANG['TXT_KNOWLEDGE_TAGS'],
+                            "MAX_RATING" => $this->settings->get("max_rating"),
+                            "LOCKED" => $this->checkLocking($articleid),
+                            "DATE_CREATED" => date(ASCMS_DATE_FORMAT_DATE, $article['date_created']),
+                            "DATE_UPDATED" => date(ASCMS_DATE_FORMAT_DATE, $article['date_updated'])
+                        ));
+
+                        try {
+                            $tags = $this->tags->getByArticle($articleid, $lang_id);
+                        } catch (DatabaseError $e) {
+                            // nothing yet
+                        }
+
+                        $this->parseTags($tags);
+
+                        $this->tpl->parse("article");
+                    }
+                }
+            } else {
+                foreach ($results as $article) {
+                    $articleid = $article['id'];
+                    $article = $this->articles->articles[$articleid];
+                    if ($article['active']) {
+                       $average = ($article['votes'] > 0) ? $article['votevalue'] / $article['votes'] : 0;
+                       $amount = $article['votes'];
+                       $this->tpl->setVariable(array(
+                           "ARTICLE_ID"    => $articleid,
+                           "QUESTION"      => $article['content'][$_LANGID]['question'],
+                           "ANSWER"        => $article['content'][$_LANGID]['answer'],
+                           "AVERAGE"       => round($average, 2),
+                           "TXT_RATING"    => $_ARRAYLANG['TXT_KNOWLEDGE_YOUR_RATING'],
+                           "AMOUNT_OF_RATING" => $amount,
+                           "HITS"          => $article['hits'],
+                           "TXT_AMOUNT_OF_RATING" => $_ARRAYLANG['TXT_KNOWLEDGE_AMOUNT_OF_RATING'],
+                           "TXT_AVERAGE_RATING"     => $_ARRAYLANG['TXT_KNOWLEDGE_AVERAGE_RATING'],
+                           "TXT_HITS"      => $_ARRAYLANG['TXT_KNOWLEDGE_HITS'],
+                           "TXT_CREATED"   => $_ARRAYLANG['TXT_KNOWLEDGE_CREATED'],
+                           "TXT_LAST_CHANGE"   => $_ARRAYLANG['TXT_KNOWLEDGE_UPDATED'],
+                           "TXT_TAGS"      => $_ARRAYLANG['TXT_KNOWLEDGE_TAGS'],
+                           "MAX_RATING"    => $this->settings->get("max_rating"),
+                           "LOCKED"        => $this->checkLocking($articleid),
+                           "DATE_CREATED"  => date(ASCMS_DATE_FORMAT_DATE, $article['date_created']),
+                           "DATE_UPDATED"  => date(ASCMS_DATE_FORMAT_DATE, $article['date_updated'])
+                       ));
+
+                       try {
+                           $tags = $this->tags->getByArticle($articleid, $_LANGID);
+                       } catch (DatabaseError $e) {
+                           // nothing yet
+                       }
+                       $this->parseTags($tags);
+                       $this->tpl->parse("article");
+                    }
                 }
             }
         }
@@ -579,42 +659,86 @@ class Knowledge extends KnowledgeLibrary
         if (count($articles)) {
             foreach ($articles as $articleKey => $article) {
                 if ($article['active']) {
-                    $average = ($article['votes'] > 0) ? $article['votevalue'] / $article['votes'] : 0;
-                    $amount = $article['votes'];
-                    $this->tpl->setVariable(array(
-                       "ARTICLE_ID"    => $articleKey,
-                       "COUNTER"       => $counter++,
+                    if ($this->isAllLangsActive()) {
+                        foreach ($article['content'] as $lang_id => $content) {
 
-                       "TXT_RATING"    => $_ARRAYLANG['TXT_KNOWLEDGE_YOUR_RATING'],
-                       "TXT_TAGS"      => $_ARRAYLANG['TXT_KNOWLEDGE_TAGS'],
-                       "TXT_HITS"      => $_ARRAYLANG['TXT_KNOWLEDGE_HITS'],
-                       "TXT_CREATED"   => $_ARRAYLANG['TXT_KNOWLEDGE_CREATED'],
-                       "TXT_LAST_CHANGE"   => $_ARRAYLANG['TXT_KNOWLEDGE_UPDATED'],
-                       "TXT_AMOUNT_OF_RATING" => $_ARRAYLANG['TXT_KNOWLEDGE_AMOUNT_OF_RATING'],
-                       "TXT_AVERAGE_RATING"     => $_ARRAYLANG['TXT_KNOWLEDGE_AVERAGE_RATING'],
+                            $average = ($article['votes'] > 0) ? $article['votevalue'] / $article['votes'] : 0;
+                            $amount = $article['votes'];
+                            $this->tpl->setVariable(array(
+                                "ARTICLE_ID" => $articleKey,
+                                "COUNTER" => $counter++,
 
-                       "QUESTION"      => $article['content'][$_LANGID]['question'],
-                       "ANSWER"        => $article['content'][$_LANGID]['answer'],
-                       "AVERAGE"       => round($average, 2),
-                       "AMOUNT_OF_RATING" => $amount,
+                                "TXT_RATING" => $_ARRAYLANG['TXT_KNOWLEDGE_YOUR_RATING'],
+                                "TXT_TAGS" => $_ARRAYLANG['TXT_KNOWLEDGE_TAGS'],
+                                "TXT_HITS" => $_ARRAYLANG['TXT_KNOWLEDGE_HITS'],
+                                "TXT_CREATED" => $_ARRAYLANG['TXT_KNOWLEDGE_CREATED'],
+                                "TXT_LAST_CHANGE" => $_ARRAYLANG['TXT_KNOWLEDGE_UPDATED'],
+                                "TXT_AMOUNT_OF_RATING" => $_ARRAYLANG['TXT_KNOWLEDGE_AMOUNT_OF_RATING'],
+                                "TXT_AVERAGE_RATING" => $_ARRAYLANG['TXT_KNOWLEDGE_AVERAGE_RATING'],
 
-                       "MAX_RATING"    => $this->settings->get("max_rating"),
-                       "LOCKED"        => $this->checkLocking($articleKey),
-                       "HITS"          => $article['hits'],
+                                "QUESTION" => $content['question'],
+                                "ANSWER" => $content['answer'],
+                                'LANG_ID' => $lang_id,
 
-                       "DATE_CREATED"  => date(ASCMS_DATE_FORMAT_DATE, $article['date_created']),
-                       "DATE_UPDATED"  => date(ASCMS_DATE_FORMAT_DATE, $article['date_updated'])
-                    ));
+                                "AVERAGE" => round($average, 2),
+                                "AMOUNT_OF_RATING" => $amount,
 
-                    try {
-                        $tags = $this->tags->getByArticle($articleKey, $_LANGID);
-                    } catch (DatabaseError $e) {
-                        // nothing yet
+                                "MAX_RATING" => $this->settings->get("max_rating"),
+                                "LOCKED" => $this->checkLocking($articleKey),
+                                "HITS" => $article['hits'],
+
+                                "DATE_CREATED" => date(ASCMS_DATE_FORMAT_DATE, $article['date_created']),
+                                "DATE_UPDATED" => date(ASCMS_DATE_FORMAT_DATE, $article['date_updated'])
+                            ));
+
+                            try {
+                                $tags = $this->tags->getByArticle($articleKey, NULL);
+                            } catch (DatabaseError $e) {
+                                // nothing yet
+                            }
+
+
+                            $this->parseTags($tags);
+                            $this->tpl->parse("article");
+                        }
+                    } else {
+                        $average = ($article['votes'] > 0) ? $article['votevalue'] / $article['votes'] : 0;
+                        $amount = $article['votes'];
+                        $this->tpl->setVariable(array(
+                           "ARTICLE_ID"    => $articleKey,
+                           "COUNTER"       => $counter++,
+
+                           "TXT_RATING"    => $_ARRAYLANG['TXT_KNOWLEDGE_YOUR_RATING'],
+                           "TXT_TAGS"      => $_ARRAYLANG['TXT_KNOWLEDGE_TAGS'],
+                           "TXT_HITS"      => $_ARRAYLANG['TXT_KNOWLEDGE_HITS'],
+                           "TXT_CREATED"   => $_ARRAYLANG['TXT_KNOWLEDGE_CREATED'],
+                           "TXT_LAST_CHANGE"   => $_ARRAYLANG['TXT_KNOWLEDGE_UPDATED'],
+                           "TXT_AMOUNT_OF_RATING" => $_ARRAYLANG['TXT_KNOWLEDGE_AMOUNT_OF_RATING'],
+                           "TXT_AVERAGE_RATING"     => $_ARRAYLANG['TXT_KNOWLEDGE_AVERAGE_RATING'],
+
+                           "QUESTION"      => $article['content'][$_LANGID]['question'],
+                           "ANSWER"        => $article['content'][$_LANGID]['answer'],
+                           "AVERAGE"       => round($average, 2),
+                           "AMOUNT_OF_RATING" => $amount,
+
+                           "MAX_RATING"    => $this->settings->get("max_rating"),
+                           "LOCKED"        => $this->checkLocking($articleKey),
+                           "HITS"          => $article['hits'],
+
+                           "DATE_CREATED"  => date(ASCMS_DATE_FORMAT_DATE, $article['date_created']),
+                           "DATE_UPDATED"  => date(ASCMS_DATE_FORMAT_DATE, $article['date_updated'])
+                        ));
+
+                        try {
+                            $tags = $this->tags->getByArticle($articleKey, $_LANGID);
+                        } catch (DatabaseError $e) {
+                            // nothing yet
+                        }
+
+
+                        $this->parseTags($tags);
+                        $this->tpl->parse("article");
                     }
-
-
-                    $this->parseTags($tags);
-                    $this->tpl->parse("article");
                 }
             }
             $this->tpl->setVariable("TXT_ARTICLELIST", $title);

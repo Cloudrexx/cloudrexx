@@ -359,7 +359,11 @@ class MediaManager extends MediaLibrary
                 break;
             case 'delete':
                 $this->_deleteMedia();
-                $this->_overviewMedia();
+                if (!empty($_REQUEST['redirect'])) {
+                    $this->handleRedirect();
+                } else {
+                    $this->_overviewMedia();
+                }
                 break;
             case 'rename':
                 $this->_renameMedia();
@@ -380,7 +384,7 @@ class MediaManager extends MediaLibrary
                 break;
             case 'ren':
                 $this->renMedia();
-                $this->_overviewMedia();
+                $this->handleRedirect();
                 break;
             case 'getImage':
                 try {
@@ -495,6 +499,10 @@ class MediaManager extends MediaLibrary
                 break;
         }
 
+        $searchTerm =  !empty($_GET['term'])
+                      ? \FWValidator::getCleanFileName(contrexx_input2raw($_GET['term']))
+                      : '';
+
         // cut, copy and paste session
         if (isset($_SESSION['mediaCutFile'])) {
             $tmpArray = array();
@@ -562,31 +570,6 @@ class MediaManager extends MediaLibrary
             }
         }
 
-        //data we want to remember for handling the uploaded files
-        $data = array(
-            'path' => $this->path,
-            'webPath' => $this->webPath
-        );
-        
-        $uploader = new \Cx\Core_Modules\Uploader\Model\Entity\Uploader();
-        $uploader->setCallback('mediaCallbackJs');
-        $uploader->setFinishedCallback(array(
-            ASCMS_CORE_MODULE_PATH.'/Media/Controller/MediaLibrary.class.php',
-            '\Cx\Core_modules\Media\Controller\MediaLibrary',
-            'uploadFinished'
-        ));
-        $uploader->setOptions( //Set html attributes for styling or javascript.
-            array(
-            'id' => 'media_browse_button',
-            'type' => 'button'
-            )
-        );
-        $uploader->setData($data);
-        $this->_objTpl->setVariable(
-            'MEDIA_UPLOADER_BUTTON', $uploader->getXHtml($_ARRAYLANG['TXT_MEDIA_UPLOAD_FILES'])
-        );
-        //end of uploader button handling
-
         //check if a finished upload caused reloading of the page.
         //if yes, we know the added files and want to highlight them
         if (!empty($_GET['highlightUploadId'])) {
@@ -597,134 +580,172 @@ class MediaManager extends MediaLibrary
             //clean up session; we do only highlight once
             unset($_SESSION[$key]);
 
-            if(is_array($sessionHighlightCandidates)) //make sure we don't cause any unexpected behaviour if we lost the session data
+            if (is_array($sessionHighlightCandidates)) {
+                //make sure we don't cause any unexpected behaviour if we lost the session data
                 $this->highlightName = $sessionHighlightCandidates;
+            }
         }
         
         // Check if an image has been edited.
         // If yes, we know the edited file and want to highlight them.
         if (!empty($_GET['editedImage'])) {
-            \Cx\Core\Core\Controller\Cx::instanciate()->getMediaSourceManager()
+            \Cx\Core\Core\Controller\Cx::instanciate()
+                ->getMediaSourceManager()
                 ->getThumbnailGenerator()
-                ->createThumbnailFromPath(
-                $this->path . $_GET['editedImage'], true
-            );
+                ->createThumbnailFromPath($this->path . $_GET['editedImage'], true);
             $this->highlightName[] = $_GET['editedImage'];
+        }
+        if (!empty($_SESSION['media_highlight_name'])) {
+            $this->highlightName = $_SESSION['media_highlight_name']->toArray();
+            unset($_SESSION['media_highlight_name']);
         }
 
         // media directory tree
         $i       = 0;
-        $dirTree = $this->_dirTree($this->path);
+        $dirTree = array();
+        $this->getDirectoryTree($this->path, $searchTerm, $dirTree, !empty($searchTerm));
         $dirTree = $this->_sortDirTree($dirTree);
-        
-        foreach(array_keys($dirTree) as $key)
-        {
-            if(isset($dirTree[$key]['icon']) && is_array($dirTree[$key]['icon']))
-            {
-                for($x = 0; $x < count($dirTree[$key]['icon']); $x++)
-                {
-                    $fileName = $dirTree[$key]['name'][$x];
-                    if (MediaLibrary::isIllegalFileName($fileName)) {
-                        continue;
+
+        $deleteUrl  = clone \Cx\Core\Core\Controller\Cx::instanciate()->getRequest()->getUrl();
+        $deleteUrl->setParam('act', null);
+
+        $previewUrl = clone $deleteUrl;
+        $renameUrl  = clone $deleteUrl;
+        $editUrl    = clone $deleteUrl;
+
+        $redirect = urlencode(base64_encode($deleteUrl->toString(false)));
+        $renameUrl->setParam('redirect', $redirect);
+        $deleteUrl->setParam('redirect', $redirect);
+        $editUrl  ->setParam('redirect', $redirect);
+        $renameUrl->setParam('act', 'rename');
+        $deleteUrl->setParam('act', 'delete');
+        $editUrl  ->setParam('act', 'edit');
+
+        foreach (array_keys($dirTree) as $key) {
+            if(!is_array($dirTree[$key]['icon'])) {
+                continue;
+            }
+            $mediaCount = count($dirTree[$key]['icon']);
+            for ($x = 0; $x < $mediaCount; $x++) {
+                $fileName = $dirTree[$key]['name'][$x];
+                if (MediaLibrary::isIllegalFileName($fileName)) {
+                    continue;
+                }
+                // colors
+                $class = ($i % 2) ? 'row2' : 'row1';
+                if (in_array($fileName, $this->highlightName)) { // highlight
+                    $class .= '" style="background-color: ' . $this->highlightColor . ';';
+                }
+                if (   isset($_SESSION['mediaCutFile'])
+                    && !empty($_SESSION['mediaCutFile'])
+                    && $this->webPath == $_SESSION['mediaCutFile'][1]
+                    && in_array($fileName, $_SESSION['mediaCutFile'][2])
+                ) {  // cut
+                    $class .= '" style="background-color: ' . $this->highlightCCColor . ';';
+                }
+                if (   isset($_SESSION['mediaCopyFile'])
+                    && !empty($_SESSION['mediaCopyFile'])
+                    && $this->webPath == $_SESSION['mediaCopyFile'][1]
+                    && in_array($fileName, $_SESSION['mediaCopyFile'][2])
+                ) {  // copy
+                    $class .= '" style="background-color: ' . $this->highlightCCColor . ';';
+                }
+
+                $this->_objTpl->setVariable(array(// file
+                    'MEDIA_DIR_TREE_ROW'    => $class,
+                    'MEDIA_FILE_ICON'       => $dirTree[$key]['icon'][$x],
+                    'MEDIA_FILE_NAME'       => $fileName,
+                    'MEDIA_FILE_SIZE'       => $this->_formatSize($dirTree[$key]['size'][$x]),
+                    'MEDIA_FILE_TYPE'       => $this->_formatType($dirTree[$key]['type'][$x]),
+                    'MEDIA_FILE_DATE'       => $this->_formatDate($dirTree[$key]['date'][$x]),
+                    'MEDIA_FILE_PERM'       => $this->_formatPerm($dirTree[$key]['perm'][$x], $key)
+                ));
+                $image        = false;
+                $imagePreview = '';
+                $mediaPath    = $this->path;
+                $mediaWebPath = $this->webPath;
+                if (!empty($searchTerm)) {
+                    $mediaPath    = $dirTree[$key]['path'][$x] .'/';
+                    $mediaWebPath = $mediaPath;
+                    \Cx\Lib\FileSystem\FileSystem::path_relative_to_root($mediaWebPath);
+                    $mediaWebPath = '/'. $mediaWebPath; // Filesystem removes the beginning slash(/)
+                }
+                $file = rawurlencode($fileName);
+                if ($key == 'dir') {
+                    $path = rawurlencode($mediaWebPath . $fileName . '/');
+                    $previewUrl->setParam('act', null);
+                    $previewUrl->setParam('file', null);
+                } elseif ($key == 'file') {
+                    $path = rawurlencode($mediaWebPath);
+
+                    $filePath = $mediaPath . $fileName;
+                    if ($this->_isImage($filePath)) {
+                        $image        = true;
+                        $imagePreview = 'javascript:expandcontent(\'preview_' . $fileName . '\');';
+                    } else {
+                        $previewUrl->setParam('act', 'download');
+                        $previewUrl->setParam('file', $file);
                     }
-                    // colors
-                    $class = ($i % 2) ? 'row2' : 'row1';
-                    if(in_array($fileName, $this->highlightName)) // highlight
-                    {
-                        $class .= '" style="background-color: ' . $this->highlightColor . ';';
-                    }
-                    if(isset($_SESSION['mediaCutFile']) && !empty($_SESSION['mediaCutFile']))  // cut
-                    {
-                        if($this->webPath == $_SESSION['mediaCutFile'][1] && in_array($fileName, $_SESSION['mediaCutFile'][2]))
-                        {
-                            $class .= '" style="background-color: ' . $this->highlightCCColor . ';';
-                        }
-                    }
-                    if(isset($_SESSION['mediaCopyFile']) && !empty($_SESSION['mediaCopyFile']))  // copy
-                    {
-                        if($this->webPath == $_SESSION['mediaCopyFile'][1] && in_array($fileName, $_SESSION['mediaCopyFile'][2]))
-                        {
-                            $class .= '" style="background-color: ' . $this->highlightCCColor . ';';
-                        }
+                }
+                $deleteUrl->setParam('path', rawurlencode($mediaWebPath));
+                $deleteUrl->setParam('file', $file);
+
+                $renameUrl->setParam('path', rawurlencode($mediaWebPath));
+                $renameUrl->setParam('file', $file);
+
+                $editUrl->setParam('path', rawurlencode($mediaWebPath));
+                $editUrl->setParam('file', $file);
+
+                if (!$image) {
+                    $previewUrl->setParam('path', $path);
+                }
+
+                // show thumbnail
+                if ($image) {
+                    // make thumbnail if it doesn't exist
+                    $tmpSize    = @getimagesize($mediaPath . $fileName);
+                    $thumbnails = \Cx\Core\Core\Controller\Cx::instanciate()
+                                    ->getMediaSourceManager()
+                                    ->getThumbnailGenerator()
+                                    ->createThumbnailFromPath($mediaPath . $fileName);
+                    $thumb = $mediaWebPath . $thumbnails[0];
+                    if (in_array($fileName, $this->highlightName)) {
+                        $thumb .= '?lastAccess=' . fileatime($mediaPath . $fileName);
                     }
 
-                    $this->_objTpl->setVariable(array(  // file
-                        'MEDIA_DIR_TREE_ROW'  => $class,
-                        'MEDIA_FILE_ICON'     => $dirTree[$key]['icon'][$x],
-                        'MEDIA_FILE_NAME'     => $fileName,
-                        'MEDIA_FILE_SIZE'     => $this->_formatSize($dirTree[$key]['size'][$x]),
-                        'MEDIA_FILE_TYPE'     => $this->_formatType($dirTree[$key]['type'][$x]),
-                        'MEDIA_FILE_DATE'     => $this->_formatDate($dirTree[$key]['date'][$x]),
-                        'MEDIA_FILE_PERM'     => $this->_formatPerm($dirTree[$key]['perm'][$x], $key)
+                    $this->_objTpl->setVariable(array(// thumbnail
+                        'MEDIA_FILE_NAME_SIZE'      => $tmpSize[0] . ' x ' . $tmpSize[1],
+                        'MEDIA_FILE_NAME_PRE'       => 'preview_' . $fileName,
+                        'MEDIA_FILE_NAME_IMG_HREF'  => $mediaWebPath . $fileName,
+                        'MEDIA_FILE_NAME_IMG_SRC'   => $thumb,
+                        'MEDIA_FILE_NAME_IMG_SIZE'  => $thumbnails[0]['size']
                     ));
-                    // creates link
-                    if($key == 'dir'){
-                        $tmpHref= 'index.php?cmd=Media&amp;archive='.$this->archive.'&amp;path=' . $this->webPath . $fileName . '/';
-                    }
-                    elseif($key == 'file'){
-                        if($this->_isImage($this->path . $fileName)) {
-                            $tmpHref = 'javascript:expandcontent(\'preview_' . $fileName . '\');';
-                        }else{
-                            $tmpHref = 'index.php?cmd=Media&amp;archive='.$this->archive.'&amp;act=download&amp;path=' . $this->webPath . '&amp;file='. $fileName;
-                        }
-                    }
+                    $this->_objTpl->parse('mediaShowThumbnail');
 
                     $this->_objTpl->setVariable(array(
-                        'MEDIA_FILE_NAME_HREF'  => $tmpHref
+                        'MEDIA_FILE_EDIT_HREF' => $editUrl->toString(false),
+                        'MEDIA_EDIT'           => $_ARRAYLANG['TXT_MEDIA_EDIT'],
                     ));
-
-                    // show thumbnail
-                    if($this->_isImage($this->path . $fileName))
-                    {
-                        // make thumbnail if it doesn't exist
-                        $tmpSize = @getimagesize($this->path . $fileName);
-                        $thumbnails = \Cx\Core\Core\Controller\Cx::instanciate()
-                            ->getMediaSourceManager()
-                            ->getThumbnailGenerator()
-                            ->createThumbnailFromPath(
-                            $this->path . $fileName
-                            );
-                        $thumb      = $this->webPath . $thumbnails[0];
-                        if (in_array(
-                            $fileName, $this->highlightName
-                        )) {
-                            $thumb .= '?lastAccess=' . fileatime(
-                                    $this->path . $fileName
-                                );
-                        }
-
-                        $this->_objTpl->setVariable(array(  // thumbnail
-                            'MEDIA_FILE_NAME_SIZE'     => $tmpSize[0] . ' x ' . $tmpSize[1],
-                            'MEDIA_FILE_NAME_PRE'      =>'preview_' . $fileName,
-                            'MEDIA_FILE_NAME_IMG_HREF' => $this->webPath . $fileName,
-                            'MEDIA_FILE_NAME_IMG_SRC'  => $thumb,
-                            'MEDIA_FILE_NAME_IMG_SIZE' => $thumbnails[0]['size']
-                        ));
-                        $this->_objTpl->parse('mediaShowThumbnail');
-                        
-                        $this->_objTpl->setVariable(array(
-                            'MEDIA_FILE_EDIT_HREF'    => 'index.php?cmd=Media&amp;archive='.$this->archive.'&amp;act=edit&amp;path=' . $this->webPath . '&amp;file=' . $fileName,
-                            'MEDIA_EDIT'              => $_ARRAYLANG['TXT_MEDIA_EDIT'],
-                        ));
-                        $this->_objTpl->parse('mediaImageEdit');
-                    }
-                    $this->_objTpl->setVariable(array(  // action
-                        'MEDIA_FILE_RENAME_HREF'    => 'index.php?cmd=Media&amp;archive='.$this->archive.'&amp;act=rename&amp;path=' . $this->webPath . '&amp;file=' . $fileName,
-                        'MEDIA_RENAME'              => $_ARRAYLANG['TXT_MEDIA_RENAME'],
-                        'MEDIA_FILE_DELETE_HREF'    => 'index.php?cmd=Media&amp;archive='.$this->archive.'&amp;act=delete&amp;path=' . $this->webPath . '&amp;file=' . $fileName,
-                        'MEDIA_DELETE'              => $_ARRAYLANG['TXT_MEDIA_DELETE'],
-                        'MEDIA_FILE_FILESHARING_HREF' => 'index.php?cmd=Media&amp;archive='.$this->archive.'&amp;act=filesharing&amp;path=' . $this->webPath . '&amp;file=' . $fileName,
-                        'MEDIA_FILESHARING'         => $_ARRAYLANG['TXT_FILESHARING_MODULE'],
-                        'MEDIA_FILESHARING_STATE'   => (\Cx\Modules\FileSharing\Controller\FileSharingLib::isShared(null,(isset($_GET['path']) ? $_GET['path'] : ASCMS_FILESHARING_WEB_PATH . '/') . $fileName) ? '_green' : '_red'),
-                    ));
-                    if($this->archive == "FileSharing" && !is_dir($this->path . $fileName)) {
-                        $this->_objTpl->parse('mediaFilesharing');
-                    } else {
-                        $this->_objTpl->hideBlock('mediaFilesharing');
-                    }
-                    $this->_objTpl->parse('mediaDirectoryTree');
-                    $i++;
+                    $this->_objTpl->parse('mediaImageEdit');
                 }
+
+                $this->_objTpl->setVariable(array(// action
+                    'MEDIA_FILE_NAME_HREF'          => $image ? $imagePreview : $previewUrl->toString(false),
+                    'MEDIA_FILE_RENAME_HREF'        => $renameUrl->toString(false),
+                    'MEDIA_FILE_DELETE_HREF'        => $deleteUrl->toString(false),
+                    'MEDIA_FILE_FILESHARING_HREF'   => 'index.php?cmd=Media&amp;archive=' . $this->archive . '&amp;act=filesharing&amp;path=' . $mediaWebPath . '&amp;file=' . $fileName,
+                    'MEDIA_FILESHARING_STATE'       => (\Cx\Modules\FileSharing\Controller\FileSharingLib::isShared(null, (isset($_GET['path']) ? $_GET['path'] : ASCMS_FILESHARING_WEB_PATH . '/') . $fileName) ? '_green' : '_red'),
+                    'MEDIA_RENAME'                  => $_ARRAYLANG['TXT_MEDIA_RENAME'],
+                    'MEDIA_DELETE'                  => $_ARRAYLANG['TXT_MEDIA_DELETE'],
+                    'MEDIA_FILESHARING'             => $_ARRAYLANG['TXT_FILESHARING_MODULE'],
+                ));
+                if ($this->archive == "FileSharing" && !is_dir($mediaPath . $fileName)) {
+                    $this->_objTpl->parse('mediaFilesharing');
+                } else {
+                    $this->_objTpl->hideBlock('mediaFilesharing');
+                }
+                $this->_objTpl->parse('mediaDirectoryTree');
+                $i++;
             }
         }
 
@@ -739,8 +760,7 @@ class MediaManager extends MediaLibrary
                 'MEDIA_SELECT_STATUS'   => ' disabled',
             ));
             $this->_objTpl->parse('mediaEmptyDirectory');
-        } else {
-            // not empty dir (select action)
+        } elseif (empty ($searchTerm)) { // not empty dir and not search results
             $this->_objTpl->setVariable(array(
                 'TXT_SELECT_ALL'           => $_CORELANG['TXT_SELECT_ALL'],
                 'TXT_DESELECT_ALL'         => $_CORELANG['TXT_DESELECT_ALL'],
@@ -753,7 +773,7 @@ class MediaManager extends MediaLibrary
             $this->_objTpl->setVariable('MEDIA_ARCHIVE', $this->archive);
         }
         // paste media
-        if (isset($_SESSION['mediaCutFile']) or isset($_SESSION['mediaCopyFile'])) {
+        if (empty($searchTerm) && (isset($_SESSION['mediaCutFile']) || isset($_SESSION['mediaCopyFile']))) {
             $this->_objTpl->setVariable(array(
                 'MEDIDA_PASTE_ACTION'      => 'index.php?cmd=Media&amp;archive='.$this->archive.'&amp;act=paste&amp;path='.$this->webPath,
                 'TXT_MEDIA_PASTE'          => $_ARRAYLANG['TXT_MEDIA_PASTE']
@@ -761,33 +781,53 @@ class MediaManager extends MediaLibrary
             $this->_objTpl->parse('mediaActionPaste');
         }
 
+        if (empty($searchTerm)) {
+            //data we want to remember for handling the uploaded files
+            $data = array(
+                'path'    => $this->path,
+                'webPath' => $this->webPath
+            );
+
+            $uploader = new \Cx\Core_Modules\Uploader\Model\Entity\Uploader();
+            $uploader->setCallback('mediaCallbackJs');
+            $uploader->setFinishedCallback(array(
+                ASCMS_CORE_MODULE_PATH . '/Media/Controller/MediaLibrary.class.php',
+                '\Cx\Core_modules\Media\Controller\MediaLibrary',
+                'uploadFinished'
+            ));
+            $uploader->setOptions(//Set html attributes for styling or javascript.
+                array(
+                    'id'    => 'media_browse_button',
+                    'type'  => 'button'
+                )
+            );
+            $uploader->setData($data);
+            //end of uploader button handling
+
+            $this->_objTpl->setVariable(array(
+                // upload files
+                'MEDIA_UPLOADER_BUTTON'         => $uploader->getXHtml($_ARRAYLANG['TXT_MEDIA_UPLOAD_FILES']),
+                'MEDIA_UPLOAD_FILES_ACTION'     => 'index.php?cmd=Media&amp;archive='.$this->archive.'&amp;act=upload&amp;path=' . $this->webPath,
+                'TXT_MEDIA_UPLOAD_FILES'        => $_ARRAYLANG['TXT_MEDIA_UPLOAD_FILES'],
+                'TXT_MEDIA_UPLOAD'              => $_ARRAYLANG['TXT_MEDIA_UPLOAD'],
+                'TXT_MEDIA_FORCE_OVERWRITE'     => $_ARRAYLANG['TXT_MEDIA_FORCE_OVERWRITE'],
+                'TXT_MEDIA_MAKE_SELECTION'      => $_ARRAYLANG['TXT_MEDIA_MAKE_SELECTION'],
+                'TXT_MEDIA_SELECT_UPLOAD_FILE'  => $_ARRAYLANG['TXT_MEDIA_SELECT_UPLOAD_FILE'],
+                // create new directory
+                'MEDIA_CREATE_DIR_ACTION'       => 'index.php?cmd=Media&amp;archive='.$this->archive.'&amp;act=newDir&amp;path=' . $this->webPath,
+                'TXT_MEDIA_NEW_DIRECTORY'       => $_ARRAYLANG['TXT_MEDIA_NEW_DIRECTORY'],
+                'TXT_MEDIA_NAME'                => $_ARRAYLANG['TXT_MEDIA_NAME'],
+                'TXT_MEDIA_CREATE'              => $_ARRAYLANG['TXT_MEDIA_CREATE'],
+            ));
+        } else {
+            $this->_objTpl->hideBlock('media_archive_actions_block');
+            $this->_objTpl->hideBlock('media_archive_newdir_block');
+        }
+
         // parse variables
-        $tmpHref  = 'index.php?cmd=Media&amp;archive='.$this->archive.'&amp;path=' . $this->webPath;
+        $tmpHref  = 'index.php?cmd=Media&amp;archive='.$this->archive.'&amp;path=' . $this->webPath . (!empty($searchTerm) ? '&amp;term='. contrexx_raw2xhtml($searchTerm) : '');
         $tmpIcon  = $this->_sortingIcons();
-        $tmpClass  = $this->_sortingClass();
-
-        $this->_objTpl->setVariable(array(  // java script
-            'TXT_MEDIA_CHECK_NAME'      => $_ARRAYLANG['TXT_MEDIA_CHECK_NAME'],
-            'TXT_MEDIA_CONFIRM_DELETE_2'  => $_ARRAYLANG['TXT_MEDIA_CONFIRM_DELETE_2'],
-            'MEDIA_DO_ACTION_PATH'      => $this->webPath,
-            'TXT_MEDIA_MAKE_SELECTION'  => $_ARRAYLANG['TXT_MEDIA_MAKE_SELECTION'],
-            'TXT_MEDIA_SELECT_UPLOAD_FILE' => $_ARRAYLANG['TXT_MEDIA_SELECT_UPLOAD_FILE'],
-            'MEDIA_JAVA_SCRIPT_PREVIEW' => $this->_getJavaScriptCodePreview()
-        ));
-
-        $this->_objTpl->setVariable(array(  // create new directory
-            'TXT_MEDIA_NEW_DIRECTORY'   => $_ARRAYLANG['TXT_MEDIA_NEW_DIRECTORY'],
-            'MEDIA_CREATE_DIR_ACTION'   => 'index.php?cmd=Media&amp;archive='.$this->archive.'&amp;act=newDir&amp;path=' . $this->webPath,
-            'TXT_MEDIA_NAME'            => $_ARRAYLANG['TXT_MEDIA_NAME'],
-            'TXT_MEDIA_CREATE'          => $_ARRAYLANG['TXT_MEDIA_CREATE']
-        ));
-
-        $this->_objTpl->setVariable(array(  // upload files
-            'TXT_MEDIA_UPLOAD_FILES'    => $_ARRAYLANG['TXT_MEDIA_UPLOAD_FILES'],
-            'MEDIA_UPLOAD_FILES_ACTION' => 'index.php?cmd=Media&amp;archive='.$this->archive.'&amp;act=upload&amp;path=' . $this->webPath,
-            'TXT_MEDIA_UPLOAD'          => $_ARRAYLANG['TXT_MEDIA_UPLOAD'],
-            'TXT_MEDIA_FORCE_OVERWRITE' => $_ARRAYLANG['TXT_MEDIA_FORCE_OVERWRITE'],
-        ));
+        $tmpClass = $this->_sortingClass();
 
         $this->_objTpl->setVariable(array(  // parse dir content
             'MEDIA_NAME_HREF'          => $tmpHref . '&amp;sort=name&amp;sort_desc='. ($this->sortBy == 'name' && !$this->sortDesc),
@@ -801,6 +841,9 @@ class MediaManager extends MediaLibrary
             'TXT_MEDIA_FILE_DATE'      => $_ARRAYLANG['TXT_MEDIA_FILE_DATE'],
             'TXT_MEDIA_FILE_PERM'      => $_ARRAYLANG['TXT_MEDIA_FILE_PERM'],
             'TXT_MEDIA_FILE_FUNCTIONS' => $_ARRAYLANG['TXT_FUNCTIONS'],
+            'TXT_MEDIA_CHECK_NAME'          => $_ARRAYLANG['TXT_MEDIA_CHECK_NAME'],
+            'TXT_MEDIA_CONFIRM_DELETE_2'    => $_ARRAYLANG['TXT_MEDIA_CONFIRM_DELETE_2'],
+            'TXT_MEDIA_SEARCH'         => $_CORELANG['TXT_SEARCH'],
             'MEDIA_NAME_ICON'          => isset($tmpIcon['name']) ? $tmpIcon['name'] : '',
             'MEDIA_SIZE_ICON'          => isset($tmpIcon['size']) ? $tmpIcon['size'] : '',
             'MEDIA_TYPE_ICON'          => isset($tmpIcon['type']) ? $tmpIcon['type'] : '',
@@ -811,7 +854,13 @@ class MediaManager extends MediaLibrary
             'MEDIA_TYPE_CLASS'         => isset($tmpClass['type']) ? $tmpIcon['type'] : '',
             'MEDIA_DATE_CLASS'         => isset($tmpClass['date']) ? $tmpIcon['date'] : '',
             'MEDIA_PERM_CLASS'         => isset($tmpClass['perm']) ? $tmpIcon['perm'] : '',
+            'MEDIA_ARCHIVE_NAME'       => $this->archive,
+            'MEDIA_ARCHIVE_PATH'       => $this->webPath,
+            'MEDIA_SEARCH_TERM'        => contrexx_raw2xhtml(rawurldecode($searchTerm)),
             'CSRF'                     => \Cx\Core\Csrf\Controller\Csrf::param(),
+            // java script
+            'MEDIA_DO_ACTION_PATH'      => rawurlencode($this->webPath),
+            'MEDIA_JAVA_SCRIPT_PREVIEW' => $this->_getJavaScriptCodePreview(),
         ));
     }
 
@@ -846,8 +895,9 @@ class MediaManager extends MediaLibrary
                 'TXT_MEDIA_RENAME_EXT'   => $_ARRAYLANG['TXT_MEDIA_RENAME_EXT']
             ));
 
+            $redirect = !empty($_GET['redirect']) ? '&amp;redirect='. contrexx_raw2xhtml($_GET['redirect']) : '';
             $this->_objTpl->setVariable(array(  // txt
-                'MEDIA_EDIT_ACTION'         => 'index.php?cmd=Media&amp;archive='.$this->archive.'&amp;act=ren&amp;path=' . $this->webPath,
+                'MEDIA_EDIT_ACTION'         => 'index.php?cmd=Media&amp;archive='.$this->archive.'&amp;act=ren&amp;path=' . $this->webPath . $redirect,
                 'TXT_MEDIA_EDIT_FILE'       => $_ARRAYLANG['TXT_MEDIA_EDIT_FILE'],
                 'MEDIA_DIR'                 => $this->webPath,
                 'MEDIA_FILE'                => $this->getFile,
@@ -997,12 +1047,15 @@ class MediaManager extends MediaLibrary
             ));
             $this->_objTpl->parse('mediaErrorFile');
         }
-        
+        $redirect = '';
+        if (!empty($_REQUEST['redirect'])) {
+            $redirect = \FWUser::getRedirectUrl(urlencode(base64_decode(urldecode($_REQUEST['redirect']))));
+        }
         // Variables
         $this->_objTpl->setVariable(array(
-        	'CSRF'					 	 => \Cx\Core\Csrf\Controller\Csrf::param(),
+            'CSRF'                       => \Cx\Core\Csrf\Controller\Csrf::param(),
             'MEDIA_EDIT_AJAX_ACTION'     => 'index.php?cmd=Media&archive='.$this->archive.'&act=editImage&path='.$this->webPath,
-            'MEDIA_EDIT_REDIRECT'        => 'index.php?cmd=Media&archive='.$this->archive.'&path='.$this->webPath,
+            'MEDIA_EDIT_REDIRECT'        => $redirect,
             'MEDIA_BACK_HREF'            => 'index.php?cmd=Media&amp;archive='.$this->archive.'&amp;path='.$this->webPath,
             'MEDIA_FILE_IMAGE_SRC'       => 'index.php?cmd=Media&archive='.$this->archive.'&act=getImage&path='.$this->webPath.'&file='.$this->getFile.'&'.\Cx\Core\Csrf\Controller\Csrf::param(),
             'MEDIA_IMAGE_WIDTH'          => !empty($imageSize) ? intval($imageSize[0]) : 0,
@@ -1061,6 +1114,9 @@ class MediaManager extends MediaLibrary
             'TXT_MEDIA_CHECK_ALL'                   => $_ARRAYLANG['TXT_MEDIA_CHECK_ALL'],
             'TXT_MEDIA_UNCHECK_ALL'                 => $_ARRAYLANG['TXT_MEDIA_UNCHECK_ALL'],
             'TXT_BUTTON_SAVE'                       => $_ARRAYLANG['TXT_MEDIA_SAVE'],
+            'TXT_CORE_MODULE_MEDIA_SEARCH_FUNCTION' => $_ARRAYLANG['TXT_CORE_MODULE_MEDIA_SEARCH_FUNCTION'],
+            'TXT_CORE_MODULE_MEDIA_ENABLE_SEARCH_FUNCTIONALITY' => $_ARRAYLANG['TXT_CORE_MODULE_MEDIA_ENABLE_SEARCH_FUNCTIONALITY'],
+            'TXT_CORE_MODULE_MEDIA_DISABLED'        => $_ARRAYLANG['TXT_CORE_MODULE_MEDIA_DISABLED'],
         ));
 
         for ($k = 1; $k <= 4; $k++)
@@ -1139,6 +1195,8 @@ class MediaManager extends MediaLibrary
                     'MEDIA_MANAGE_DISPLAY'                  => (is_numeric($this->_arrSettings['media' . $k . '_frontend_managable'])) ? 'block' : 'none',
                     'MEDIA_MANAGE_ASSOCIATED_GROUPS'        => implode("\n", $arrAssociatedGroupManageOptions),
                     'MEDIA_MANAGE_NOT_ASSOCIATED_GROUPS'    => implode("\n", $arrNotAssociatedGroupManageOptions),
+                    'MEDIA_ALLOW_USER_SEARCH_ON'            => ($this->_arrSettings['media' . $k . '_frontend_search'] == 'on') ? 'checked="checked"' : '',
+                    'MEDIA_ALLOW_USER_SEARCH_OFF'           => ($this->_arrSettings['media' . $k . '_frontend_search'] == 'off') ? 'checked="checked"' : '',
             ));
             if ($this->_objTpl->blockExists("mediaAccessSection")) {
                 $this->_objTpl->parse("mediaAccessSection");
@@ -1158,6 +1216,18 @@ class MediaManager extends MediaLibrary
         $this->_arrSettings = $this->createSettingsArray();
         for ($i = 0; $i <=4; $i++)
         {
+            $frontendSearchkey     = 'mediaSettings_Media'. $i .'FrontendSearch';
+            $settingFrontendSearch = !empty($_POST[$frontendSearchkey]) && $_POST[$frontendSearchkey] == 'on'
+                                      ? 'on' : 'off';
+
+            $objDatabase->Execute('
+                UPDATE
+                    '.DBPREFIX.'module_media_settings
+                SET
+                    `value` = "' . $settingFrontendSearch . '"
+                WHERE
+                    `name` = "media' . $i . '_frontend_search"
+            ');
             $oldMediaSetting = $this->_arrSettings['media' . $i . '_frontend_changable'];
             $newMediaSetting = '';
             if (isset($_POST['mediaSettings_Media' . $i . 'FrontendChangable'])) {

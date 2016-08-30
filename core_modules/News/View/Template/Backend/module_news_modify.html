@@ -60,7 +60,7 @@
         
         switch (newsElType) {
             case 'image':
-            case 'webpages':
+            case 'mixed':
                 document.getElementById(newsElInsertBox).value = url;
                 break
             case 'link':
@@ -90,8 +90,8 @@
             case 'image':
                 options = {cxMbViews: 'filebrowser', cxMbStartview: 'MediaBrowserList'};
                 break;
-            case 'webpages':
-                options = {cxMbViews: 'sitestructure', cxMbStartview: 'MediaBrowserList'};
+            case 'mixed':
+                options = {cxMbViews: 'sitestructure,filebrowser', cxMbStartview: 'Sitestructure'};
                 break;
             case 'link':
                 options = {cxMbViews: 'filebrowser,sitestructure', cxMbStartview: 'MediaBrowserList'};
@@ -472,7 +472,7 @@
                 </tr>
                 <tr class="row1">
                     <td width="12%" nowrap="nowrap"><label for="news_redirect">{TXT_LINK}</label></td>
-                    <td width="88%"><input type="text" name="newsRedirect" id="news_redirect" value="{NEWS_REDIRECT}" style="width:400px;" />&nbsp;<input type="button" value="{TXT_BROWSE}" onClick="newsGetFileBrowser('news_redirect', 'webpages')" />&nbsp;<span class="tooltip-trigger icon-warning"></span><span class="tooltip-message">{TXT_NEWS_TYPE_REDIRECT_HELP}</span></td>
+                    <td width="88%"><input type="text" name="newsRedirect" id="news_redirect" value="{NEWS_REDIRECT}" style="width:400px;" />&nbsp;<input type="button" value="{TXT_BROWSE}" onClick="newsGetFileBrowser('news_redirect', 'mixed')" />&nbsp;<span class="tooltip-trigger icon-warning"></span><span class="tooltip-message">{TXT_NEWS_TYPE_REDIRECT_HELP}</span></td>
                 </tr>
             </table>
         </div>

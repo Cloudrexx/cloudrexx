@@ -1,6 +1,19 @@
 <div id="media_div">
-    <div class="text-success">{MEDIA_MSG_OK}</div>
-    <div class="text-danger">{MEDIA_MSG_ERROR}</div>
+
+    <!-- BEGIN messages -->
+    <div class="message_{MESSAGE_CLASS}">{MESSAGE_TEXT}</div>
+    <!-- END messages -->
+
+    <!-- BEGIN media_archive_search_form -->
+    <div class="mediaSearchForm">
+        <form method="get" action="index.php">
+            <input type="hidden" name="section" value="{MEDIA_ARCHIVE_NAME}" />
+            <input type="hidden" name="path" value="{MEDIA_ARCHIVE_PATH}" />
+            <input type="text" value="{MEDIA_SEARCH_TERM}" placeholder="{TXT_MEDIA_SEARCH_TERM}" name="term" class="mediaSearchBox searchbox" />
+            <input class="mediaButtonSearch" value="{TXT_MEDIA_SEARCH}" type="submit">
+        </form>
+    </div>
+    <!-- END media_archive_search_form -->
     <div class="table-responsive">
         <table id="media" class="table">
             <tbody>
@@ -28,7 +41,7 @@
                     <td style="white-space: nowrap; text-align: left;">&nbsp;{MEDIA_FILE_DATE}</td>
                     <!-- BEGIN manage_access_option -->
                     <td style="white-space: nowrap; text-align: left;">
-                        <a title="{MEDIA_RENAME_TITLE} {MEDIA_FILE_NAME}" class="rename_btn" href="javascript:void(0);">
+                        <a data-action-url="{MEDIA_FILE_RENAME_HREF}" title="{MEDIA_RENAME_TITLE} {MEDIA_FILE_NAME}" class="rename_btn" href="javascript:void(0);">
                             <img alt="" src="core_modules/Access/View/Media/edit.gif" />
                         </a>           
                         <a title="{MEDIA_DELETE_TITLE} {MEDIA_FILE_NAME}" onclick="return mediaConfirmDelete();" href="{MEDIA_FILE_DELETE_HREF}">

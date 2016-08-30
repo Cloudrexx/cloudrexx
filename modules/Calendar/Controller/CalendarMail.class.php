@@ -45,7 +45,7 @@ namespace Cx\Modules\Calendar\Controller;
  * @copyright  CLOUDREXX CMS - CLOUDREXX AG
  * @version    1.00
  */ 
-class CalendarMail extends \Cx\Modules\Calendar\Controller\CalendarLibrary
+class CalendarMail extends CalendarLibrary
 {
     /**
      * Mail Id
@@ -313,8 +313,8 @@ class CalendarMail extends \Cx\Modules\Calendar\Controller\CalendarLibrary
     function getTemplateDropdown($selectedId=null, $actionId=null, $languageId=null) {
         global $_ARRAYLANG;
         
-        parent::getSettings();
-        parent::getFrontendLanguages();
+        $this->getSettings();
+        $this->getFrontendLanguages();
                 
         if (empty($selectedId)) {
             if (empty($this->templateList[$actionId][$languageId])) {                

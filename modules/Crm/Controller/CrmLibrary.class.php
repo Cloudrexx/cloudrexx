@@ -3252,15 +3252,19 @@ class CrmLibrary
      */
     function getUserName($userId)
     {
-        if (!empty ($userId)) {
-            $objFWUser  = \FWUser::getFWUserObject();
-            $objUser    = $objFWUser->objUser->getUser($userId);
-            $userName   = $objUser->getRealUsername();
-            if ($userName) {
-                return $userName;
-            } else {
-                return $objUser->getUsername();
-            }
+        if (empty($userId)) {
+            return '';
+        }
+
+        $objUser = \FWUser::getFWUserObject()->objUser->getUser($userId);
+        if (!$objUser) {
+            return '';
+        }
+        $userName = $objUser->getRealUsername();
+        if ($userName) {
+            return $userName;
+        } else {
+            return $objUser->getUsername();
         }
     }
 

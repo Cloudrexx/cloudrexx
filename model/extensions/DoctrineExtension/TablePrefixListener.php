@@ -40,7 +40,9 @@ class TablePrefixListener
     public function loadClassMetadata(LoadClassMetadataEventArgs $eventArgs)
     {
         $classMetadata = $eventArgs->getClassMetadata();
-        $classMetadata->setTableName($this->prefix . $classMetadata->getTableName());
+        if (strpos($classMetadata->getTableName(), $this->prefix) === false) {
+            $classMetadata->setTableName($this->prefix . $classMetadata->getTableName());
+        }
         foreach ($classMetadata->getAssociationMappings() as $fieldName => $mapping) {
             if ($mapping['type'] == \Doctrine\ORM\Mapping\ClassMetadataInfo::MANY_TO_MANY) {
                 if (!isset($classMetadata->associationMappings[$fieldName]['joinTable'])) {

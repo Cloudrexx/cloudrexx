@@ -131,6 +131,16 @@ class Order
     }
 
     /**
+     * Set the Order id
+     *
+     * @param integer $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
+    /**
      * Returns the Customer ID
      *
      * Optionally sets the value first if the parameter value is an integer
@@ -1331,94 +1341,95 @@ class Order
 
     /**
      * Deletes the Order with the given ID
+     *
      * @param   integer   $order_id     The Order ID
+     * @param   boolean   $stockUpdate  True to update stock of the product
+     *
      * @return  boolean                 True on success, false otherwise
      */
-    static function deleteById($order_id)
+    static function deleteById($order_id, $stockUpdate = false)
     {
         global $objDatabase, $_ARRAYLANG;
 
-        $order_id = intval($order_id);
-        if (empty($order_id)) return false;
-        $arrItemId = self::getItemIdArray($order_id);
-        if (!empty($arrItemId)) {
-            foreach ($arrItemId as $item_id) {
-                // Delete files uploaded with the order
-                $query = "
-                    SELECT `option_name`
-                      FROM `".DBPREFIX."module_shop".MODULE_INDEX."_order_attributes`
-                     WHERE `item_id`=$item_id";
-                $objResult = $objDatabase->Execute($query);
-                if (!$objResult) {
-                    return self::errorHandler();
-                }
-                while (!$objResult->EOF) {
-                    $path =
-                        Order::UPLOAD_FOLDER.
-                        $objResult->fields['option_name'];
-                    if (\File::exists($path)) {
-                        if (!\File::delete_file($path)) {
-                            \Message::error(sprintf(
-                                $_ARRAYLANG['TXT_SHOP_ERROR_DELETING_FILE'], $path));
-                        }
-                    }
-                    $objResult->MoveNext();
-                }
-                $query = "
-                    DELETE FROM `".DBPREFIX."module_shop".MODULE_INDEX."_order_attributes`
-                     WHERE `item_id`=$item_id";
-                if (!$objDatabase->Execute($query)) {
-                    return \Message::error(
-                        $_ARRAYLANG['TXT_SHOP_ERROR_DELETING_ORDER_ATTRIBUTES']);
-                }
-            }
+        $order_id = contrexx_input2int($order_id);
+        if (empty($order_id)) {
+            return false;
         }
-        $query = "
-            DELETE FROM `".DBPREFIX."module_shop".MODULE_INDEX."_order_items`
-             WHERE `order_id`=$order_id";
-        if (!$objDatabase->Execute($query)) {
-            return \Message::error(
-                $_ARRAYLANG['TXT_SHOP_ERROR_DELETING_ORDER_ITEMS']);
-        }
-        $query = "
-            DELETE FROM `".DBPREFIX."module_shop".MODULE_INDEX."_lsv`
-             WHERE `order_id`=$order_id";
-        if (!$objDatabase->Execute($query)) {
-            return \Message::error(
-                $_ARRAYLANG['TXT_SHOP_ERROR_DELETING_ORDER_LSV']);
-        }
-        // Remove accounts autocreated for downloads
-// TODO: TEST!
+
+        // Deactivate accounts autocreated for downloads
         $objOrder = self::getById($order_id);
-        if ($objOrder) {
-            $customer_id = $objOrder->customer_id();
-            $objCustomer = Customer::getById($customer_id);
-            if ($objCustomer) {
-                $customer_email =
-                    Orders::usernamePrefix."_${order_id}_%-".
-                    $objCustomer->email();
-                $objUser = \FWUser::getFWUserObject()->objUser->getUsers(
-                    array('email' => $customer_email));
-                if ($objUser) {
-                    while (!$objUser->EOF) {
-                        if (!$objUser->delete()) {
-                            return false;
-                        }
-                        $objUser->next();
+        if (   $objOrder
+            && $objCustomer = Customer::getById($objOrder->customer_id())
+        ) {
+            $customer_email =
+                Orders::usernamePrefix."_${order_id}_%-" .
+                $objCustomer->email();
+            $objUser = \FWUser::getFWUserObject()->objUser->getUsers(
+                array('email' => $customer_email)
+            );
+            if ($objUser) {
+                while (!$objUser->EOF) {
+                    $objUser->setActiveStatus(false);
+                    if (!$objUser->store()) {
+                        return false;
                     }
+                    $objUser->next();
                 }
             }
         }
-        $query = "
-            DELETE FROM `".DBPREFIX."module_shop".MODULE_INDEX."_orders`
-             WHERE `id`=$order_id";
+
+        $objUser = \FWUser::getFWUserObject()->objUser;
+        $query = '
+            UPDATE
+                `' . DBPREFIX . 'module_shop' . MODULE_INDEX . '_orders`
+            SET
+                `status` = '. Order::STATUS_DELETED .',
+                `modified_by` = "' . contrexx_raw2db($objUser->getUsername()) . '",
+                `modified_on` = "' . date('Y-m-d H:i:s') . '"
+            WHERE
+                `id`='. $order_id;
         if (!$objDatabase->Execute($query)) {
-            return \Message::error(
-                $_ARRAYLANG['TXT_SHOP_ERROR_DELETING_ORDER']);
+            return \Message::error($_ARRAYLANG['TXT_SHOP_ERROR_DELETING_ORDER']);
+        }
+        if ($stockUpdate) {
+            $order = new static();
+            $order->setId($order_id);
+            $order->updateStock();
         }
         return true;
     }
 
+    /**
+     * Update related product stock
+     *
+     * @param boolean $increaseStock True to increase stock, false to decrease
+     */
+    public function updateStock($increaseStock = true)
+    {
+        global $_ARRAYLANG;
+
+        $arrItems  = $this->getItems();
+        foreach ($arrItems as $item) {
+
+            $product = Product::getById($item['product_id']);
+            if (!$product) {
+                \DBG::log(sprintf(
+                    $_ARRAYLANG['TXT_SHOP_PRODUCT_NOT_FOUND'],
+                    $item['product_id']
+                ));
+                continue;
+            }
+            $stock = $product->stock();
+            if ($increaseStock) {
+                $stock += $item['quantity'];
+            } else {
+                $stock -= $item['quantity'];
+            }
+
+            $product->stock($stock);
+            $product->store();
+        }
+    }
 
     /**
      * Returns an array of item IDs for the given Order ID
@@ -2409,4 +2420,33 @@ class Order
         return $items;
     }
 
+    /**
+     * Is given status can increase stock
+     *
+     * @param integer $oldStatus Old order status
+     * @param integer $newStatus New order status
+     *
+     * @return boolean True when given status can increase stock, False otherwise
+     */
+    public function isStockIncreasable($oldStatus, $newStatus)
+    {
+        $deletedStatus = array(self::STATUS_DELETED, self::STATUS_CANCELLED);
+        return   in_array($newStatus, $deletedStatus)
+              && !in_array($oldStatus, $deletedStatus);
+    }
+
+    /**
+     * Is given status can decrease stock
+     *
+     * @param integer $oldStatus Old order status
+     * @param integer $newStatus New order status
+     *
+     * @return boolean True when given status can decrease stock, False otherwise
+     */
+    public function isStockDecreasable($oldStatus, $newStatus)
+    {
+        $deletedStatus = array(self::STATUS_DELETED, self::STATUS_CANCELLED);
+        return   in_array($oldStatus, $deletedStatus)
+              && !in_array($newStatus, $deletedStatus);
+    }
 }

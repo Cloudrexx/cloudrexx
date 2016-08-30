@@ -93,7 +93,7 @@ class PodcastManager extends PodcastLib
     {
         global $objTemplate, $_ARRAYLANG;
 
-        $this->_objTpl = new \Cx\Core\Html\Sigma(ASCMS_MODULE_PATH.'/Podcast/View/Template/Backend');
+        $this->_objTpl = new \Cx\Core\Html\Sigma(\Cx\Core\Core\Controller\Cx::instanciate()->getCodeBaseModulePath().'/Podcast/View/Template/Backend');
         \Cx\Core\Csrf\Controller\Csrf::add_placeholder($this->_objTpl);
         $this->_objTpl->setErrorHandling(PEAR_ERROR_DIE);
         
@@ -838,7 +838,7 @@ class PodcastManager extends PodcastLib
             'PODCAST_SETTINGS_FEED_DESCRIPTION'             => $this->_arrSettings['feed_description'],
             'PODCAST_SETTINGS_FEED_IMAGE'                   => $this->_arrSettings['feed_image'],
             'PODCAST_SETTINGS_TAB'                          => $selectedTab,
-            'PODCAST_SETTINGS_FEED_URL'                     => ASCMS_PROTOCOL.'://'.$_CONFIG['domainUrl'].ASCMS_FEED_WEB_PATH.'/podcast.xml'
+            'PODCAST_SETTINGS_FEED_URL'                     => ASCMS_PROTOCOL.'://'.$_CONFIG['domainUrl'].\Cx\Core\Core\Controller\Cx::instanciate()->getWebsiteFeedWebPath().'/podcast.xml'
         ));
 
         if(!in_array($selectedTab, $arrSettingsTabs)){

@@ -1,0 +1,41 @@
+Cx\Core_Modules\Access\Model\Entity\Permission:
+    type: entity
+    table: core_modules_access_permission
+    repositoryClass: Cx\Core_Modules\Access\Model\Repository\PermissionRepository
+    id:
+        id:
+            type: integer
+            generator:
+              strategy: AUTO
+    fields:
+        allowedProtocols:
+            type: array
+            column: allowed_protocols
+        allowedMethods:
+            type: array
+            column: allowed_methods
+        requiresLogin:
+            type: boolean
+            column: requires_login
+            nullable: true
+        validUserGroups:
+            type: array
+            column: valid_user_groups
+            nullable: true
+        validAccessIds:
+            type: array
+            column: valid_access_ids
+            nullable: true
+    oneToMany:
+        readDataAccesses:
+            targetEntity: Cx\Core_Modules\DataAccess\Model\Entity\DataAccess
+            mappedBy: readPermission
+            joinColumn:
+                name: id
+                referencedColumnName: read_permission
+        writeDataAccesses:
+            targetEntity: Cx\Core_Modules\DataAccess\Model\Entity\DataAccess
+            mappedBy: writePermission
+            joinColumn:
+                name: id
+                referencedColumnName: write_permission

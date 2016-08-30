@@ -2605,6 +2605,15 @@ dl.data_module img {
 #media_div div.message_ok {
     color: #029202;
 }
+#media_div .mediaSearchForm {
+    float: left;
+    width: 100%;
+    padding-bottom: 20px;
+}
+#media_div .mediaSearchForm .mediaButtonSearch {
+    float: left;
+    width: auto !important;
+}
 
 /***************************************/
 /* CSS DEFINITIONS FOR CHECKOUT MODULE */

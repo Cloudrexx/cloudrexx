@@ -67,19 +67,33 @@ class NewsEventListener implements \Cx\Core\Event\Model\Entity\EventListener {
     private function SearchFindContent(array $eventArgs) {
     	$search = current($eventArgs);
         $term_db = contrexx_raw2db($search->getTerm());
-        $query = "SELECT id, text AS content, title, date, redirect,
-               MATCH (text,title,teaser_text) AGAINST ('%$term_db%') AS score
-          FROM " . DBPREFIX . "module_news AS tblN
-         INNER JOIN " . DBPREFIX . "module_news_locale AS tblL ON tblL.news_id = tblN.id
-         WHERE (   text LIKE ('%$term_db%')
-                OR title LIKE ('%$term_db%')
-                OR teaser_text LIKE ('%$term_db%'))
-           AND lang_id=" . FRONTEND_LANG_ID . "
-           AND status=1
-           AND is_active=1
-           AND (startdate<='" . date('Y-m-d') . "' OR startdate='0000-00-00')
-           AND (enddate>='" . date('Y-m-d') . "' OR enddate='0000-00-00')";
-        
+        $newsLib = new \Cx\Core_Modules\News\Controller\NewsLibrary();
+        $query = '
+            SELECT
+                `id`,
+                `text` AS `content`,
+                `title`,
+                `date`,
+                `redirect`,
+                `MATCH` (
+                    `text`,`title`,`teaser_text`
+                ) `AGAINST` (
+                    "%`' . $term_db . '`%"
+                ) AS `score`
+            FROM
+                `' . DBPREFIX  . 'module_news` AS `tblN`
+            INNER JOIN
+                `' . DBPREFIX  . 'module_news_locale` AS `tblL`
+            ON
+                `tblL`.`news_id` = `tblN`.`id`
+            WHERE
+                (
+                   `text` `LIKE` ("%`' . $term_db . '`%")
+                    OR `title` `LIKE` ("%`' . $term_db . '`%")
+                    OR `teaser_text` `LIKE` ("%`' . $term_db . '`%")
+                )' .
+            $newsLib->getNewsFilterQuery('tblN', '', '');
+                    
         $pageUrl = function($pageUri, $searchData) {
             static $objNewsLib = null;
             if (!$objNewsLib) {
@@ -104,5 +118,77 @@ class NewsEventListener implements \Cx\Core\Event\Model\Entity\EventListener {
         };
         $result = new \Cx\Core_Modules\Listing\Model\Entity\DataSet($search->getResultArray($query, 'News', '', $pageUrl, $search->getTerm()));
         $search->appendResult($result);
+    }
+
+    /**
+     * Update the news locales 
+     * while activate/deactivate a language in the Administrative -> Language
+     * 
+     * @param array $eventArgs Arguments for the event
+     * 
+     * @return boolean
+     */
+    protected function languageStatusUpdate(array $eventArgs)
+    {
+        global $objDatabase;
+
+        if (empty($eventArgs[0])) {
+            return;
+        }
+
+        $defaultLangId = \FWLanguage::getDefaultLangId();
+        foreach ($eventArgs[0]['langData'] as $args) {
+            $langId     = isset($args['langId']) ? $args['langId'] : 0;
+            $langStatus = isset($args['status']) ? $args['status'] : 0;
+
+            if (    empty($langId) 
+                ||  !isset($args['status']) 
+                ||  (    !$langStatus 
+                     &&  !$eventArgs[0]['langRemovalStatus']
+                    )
+            ) {
+                continue;
+            }
+
+            //Update the news locale
+            $newsQuery = $langStatus ?
+                            'INSERT IGNORE INTO 
+                                `' . DBPREFIX . 'module_news_locale` 
+                                (   `news_id`, 
+                                    `lang_id`, 
+                                    `is_active`, 
+                                    `title`, 
+                                    `text`, 
+                                    `teaser_text`
+                                )
+                                SELECT `news_id`, 
+                                        ' . $langId . ',
+                                        0,
+                                        `title`, 
+                                        `text`, 
+                                        `teaser_text` 
+                                    FROM `' . DBPREFIX . 'module_news_locale` 
+                                    WHERE lang_id = ' . $defaultLangId
+                        :   'DELETE FROM `' . DBPREFIX . 'module_news_locale` 
+                                WHERE lang_id = ' . $langId;
+            $objDatabase->Execute($newsQuery);
+
+            //Update the news category locale
+            $catQuery = $langStatus ?
+                            'INSERT IGNORE INTO 
+                                `' . DBPREFIX . 'module_news_categories_locale` 
+                                (   `category_id`, 
+                                    `lang_id`, 
+                                    `name` 
+                                )
+                                SELECT `category_id`, 
+                                        ' . $langId . ',
+                                        `name` 
+                                    FROM `' . DBPREFIX . 'module_news_categories_locale` 
+                                    WHERE lang_id = ' . $defaultLangId
+                        :   'DELETE FROM `' . DBPREFIX . 'module_news_categories_locale` 
+                                WHERE lang_id = ' . $langId;
+            $objDatabase->Execute($catQuery);
+        }
     }
 }

@@ -70,6 +70,11 @@ class Resolver {
     protected $page = null;
 
     /**
+     * @var Cx\Core\ContentManager\Model\Entity\Page
+     */
+    protected $urlPage = null;
+
+    /**
      * Doctrine Cx\Core\ContentManager\Model\Repository\PageRepository
      */
     protected $pageRepo = null;
@@ -381,6 +386,14 @@ class Resolver {
                 $componentController->resolve($parts, $this->page);
             }
         }
+        $canonicalPage = $this->page;
+        if (
+            $this->urlPage &&
+            $this->urlPage->getType() == \Cx\Core\ContentManager\Model\Entity\Page::TYPE_SYMLINK
+        ) {
+            $canonicalPage = $this->pageRepo->getTargetPage($this->urlPage);
+        }
+        header('Link: <' . \Cx\Core\Routing\Url::fromPage($canonicalPage)->toString() . '>; rel="canonical"');
         return $this->page;
     }
 
@@ -428,9 +441,11 @@ class Resolver {
             ($this->page->isTargetInternal() && preg_match('/[?&]external=permanent/', $this->page->getTarget()))
         ) {
             if ($this->page->isTargetInternal()) {
-                $params = array();
+                if (isset($params['external']) && $params['external'] == 'permanent') {
+                    unset($params['external']);
+                }
                 if (trim($this->page->getTargetQueryString()) != '') {
-                    $params = explode('&', $this->page->getTargetQueryString());
+                    $params = array_merge($params, explode('&', $this->page->getTargetQueryString()));
                 }
                 $target = \Cx\Core\Routing\Url::fromNodeId($this->page->getTargetNodeId(), $this->page->getTargetLangId(), $params);
             } else {
@@ -515,6 +530,9 @@ class Resolver {
             $this->url->setParams($this->url->getSuggestedParams());
 
             $this->page = $result['page'];
+        }
+        if (!$this->urlPage) {
+            $this->urlPage = clone $this->page;
         }
         /*
           the page we found could be a redirection.
@@ -750,7 +768,10 @@ class Resolver {
         // See bug-report #1536
         $page = $this->pageRepo->findOneById($page->getId());
 
-        if($page->getType() == \Cx\Core\ContentManager\Model\Entity\Page::TYPE_FALLBACK) {
+        if (
+            $page->getType() == \Cx\Core\ContentManager\Model\Entity\Page::TYPE_FALLBACK ||
+            $page->getType() == \Cx\Core\ContentManager\Model\Entity\Page::TYPE_SYMLINK
+        ) {
             // in case the first resolved page (= original requested page) is a fallback page
             // we must check here if this very page is active.
             // If we miss this check, we would only check if the referenced fallback page is active!
@@ -761,7 +782,11 @@ class Resolver {
             // if this page is protected, we do not follow fallback
             $this->checkPageFrontendProtection($page);
 
-            $fallbackPage = $this->getFallbackPage($page);
+            if ($page->getType() == \Cx\Core\ContentManager\Model\Entity\Page::TYPE_SYMLINK) {
+                $fallbackPage = $this->pageRepo->getTargetPage($page);
+            } else {
+                $fallbackPage = $this->getFallbackPage($page);
+            }
 
             // due that the fallback is located within a different language
             // we must set $this->lang to the fallback's language.
@@ -773,7 +798,11 @@ class Resolver {
 
             // now lets resolve the page that is referenced by our fallback page
             $this->resolvePage(true);
-            $page->getFallbackContentFrom($this->page);
+            // fallback pages use theme options of their target page, symlink use their own
+            $page->setContentOf(
+                $this->page,
+                $page->getType() == \Cx\Core\ContentManager\Model\Entity\Page::TYPE_FALLBACK
+            );
 
             // Important: We must assigne a copy of $page to $this->path here.
             // Otherwise, the virtual fallback page ($this->page) will also

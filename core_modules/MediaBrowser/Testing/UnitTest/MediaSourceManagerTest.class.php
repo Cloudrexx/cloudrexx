@@ -53,7 +53,7 @@ use Cx\Core\Test\Model\Entity\ContrexxTestCase;
 class MediaSourceManagerTest extends ContrexxTestCase
 {
 
-    public function testMediaSourceManager()
+    /*public function testMediaSourceManager()
     {
         $testCx = new TestCx();
         $name = "Test";
@@ -63,5 +63,5 @@ class MediaSourceManagerTest extends ContrexxTestCase
         $mediaTypes = $mediaSourceManger->getMediaTypes();
         $this->assertEquals($name,$mediaTypes['Test']->getName());
         $this->assertTrue(count($mediaSourceManger->getMediaTypes()) == 1);
-    }
+    }*/
 }

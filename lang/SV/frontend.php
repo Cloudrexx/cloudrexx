@@ -174,7 +174,6 @@ $_ARRAYLANG['TXT_ACCESS_FAILED_TO_UPDATE_USER_ACCOUNT'] = "An error occurred whi
 $_ARRAYLANG['TXT_ACCESS_FEMALE'] = "Female";
 $_ARRAYLANG['TXT_ACCESS_FILL_OUT_ALL_REQUIRED_FIELDS'] = "You need to fill every required field!";
 $_ARRAYLANG['TXT_ACCESS_FIRSTNAME'] = "First name";
-$_ARRAYLANG['TXT_ACCESS_GENDER'] = "Sex";
 $_ARRAYLANG['TXT_ACCESS_INTERESTS'] = "Interests";
 $_ARRAYLANG['TXT_ACCESS_INVALID_EMAIL_ADDRESS'] = "You need to enter a valid e-mail address";
 $_ARRAYLANG['TXT_ACCESS_INVALID_PASSWORD'] = "The password is invalid. It must contain at least 6 characters.";

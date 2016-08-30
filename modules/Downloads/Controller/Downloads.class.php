@@ -885,7 +885,8 @@ JS_CODE;
         $allowDeleteCategories = !$objCategory->getManageSubcategoriesAccessId()
                             || \Permission::checkAccess($objCategory->getManageSubcategoriesAccessId(), 'dynamic', true)
                             || $objCategory->getOwnerId() == $this->userId;
-        $objSubcategory = Category::getCategories(array('parent_id' => $objCategory->getId(), 'is_active' => true), null, array('order' => 'asc', 'name' => 'asc'), null, $categoryLimit);
+        $sortOrder      = $this->categoriesSortingOptions[$this->arrConfig['categories_sorting_order']];
+        $objSubcategory = Category::getCategories(array('parent_id' => $objCategory->getId(), 'is_active' => true), null, $sortOrder, null, $categoryLimit);
 
         if ($objSubcategory->EOF) {
             $this->objTemplate->hideBlock($arrCategoryBlocks[0]);
@@ -1057,7 +1058,8 @@ JS_CODE;
         }
 
         $objDownload = new Download();
-        $objDownload->loadDownloads($filter, $this->searchKeyword, null, null, $_CONFIG['corePagingLimit'], $limitOffset, $includeDownloadsOfSubcategories);
+        $sortOrder   = $this->downloadsSortingOptions[$this->arrConfig['downloads_sorting_order']];
+        $objDownload->loadDownloads($filter, $this->searchKeyword, $sortOrder, null, $_CONFIG['corePagingLimit'], $limitOffset, $includeDownloadsOfSubcategories);
         $categoryId = $objCategory->getId();
         $allowdDeleteFiles = false;
         if (!$objCategory->EOF) {
@@ -1301,7 +1303,8 @@ JS_CODE;
             return;
         }
 
-        $objRelatedDownload = $objDownload->getDownloads(array('download_id' => $objDownload->getId()), null, array('order' => 'ASC', 'name' => 'ASC', 'id' => 'ASC'));
+        $sortOrder          = $this->downloadsSortingOptions[$this->arrConfig['downloads_sorting_order']];
+        $objRelatedDownload = $objDownload->getDownloads(array('download_id' => $objDownload->getId()), null, $sortOrder);
 
         if ($objRelatedDownload) {
             $row = 1;

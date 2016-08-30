@@ -882,6 +882,9 @@
             if (!angular.isObject(input)) return input;
             var array = [];
             for (var objectKey in input) {
+                if (!input[objectKey].datainfo) {
+                    continue;
+                }
                 array.push(input[objectKey]);
             }
             array.sort(function (a, b) {

@@ -50,6 +50,26 @@ class DefaultEventListener implements EventListener {
     {
         $this->cx = $cx;
     }
+    
+    /**
+     * Get a component controller object
+     * 
+     * @param string $name  component name
+     * @return \Cx\Core\Core\Model\Entity\SystemComponentController 
+     * The requested component controller or null if no such component exists
+     */
+    public function getComponent($name)
+    {
+        if (empty($name)) {
+            return null;
+        }
+        $componentRepo = $this->cx->getDb()->getEntityManager()->getRepository('Cx\Core\Core\Model\Entity\SystemComponent');
+        $component     = $componentRepo->findOneBy(array('name' => $name));
+        if (!$component) {
+            return null;
+        }
+        return $component->getSystemComponentController();
+    }
 
     public function onEvent($eventName, array $eventArgs) {
         $methodName = $eventName;

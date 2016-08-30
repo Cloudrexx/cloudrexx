@@ -1,0 +1,66 @@
+Cx\Core_Modules\Sync\Model\Entity\Relation:
+  type: entity
+  table: core_module_sync_relation
+  repositoryClass: Cx\Core_Modules\Sync\Model\Repository\RelationRepository
+  gedmo:
+    tree:
+      type: nested
+  id: 
+    id:
+      type: integer
+      generator:
+        strategy: AUTO
+  fields:
+    lft:
+      type: integer
+      gedmo:
+        - treeLeft
+    rgt:
+      type: integer
+      gedmo:
+        - treeRight 
+    lvl:
+      type: integer
+      gedmo:
+        - treeLevel
+    localFieldName:
+      type: string
+      length: 50
+      column: local_field_name
+    doSync:
+      type: boolean
+      column: do_sync
+    defaultEntityId:
+      type: integer
+      column: default_entity_id
+  manyToOne: # owning side
+    parent:
+      targetEntity: Cx\Core_Modules\Sync\Model\Entity\Relation
+      inversedBy: children
+      joinColumn:
+        name: parent_id
+        referencedColumnName: id
+        cascade: [remove]
+      gedmo:
+        - treeParent
+    relatedSync:
+      targetEntity: Cx\Core_Modules\Sync\Model\Entity\Sync
+      inversedBy: relations
+      joinColumn:
+        name: related_sync_id
+        referencedColumnName: id
+        nullable: false
+        cascade: [remove]
+    foreignDataAccess:
+      targetEntity: Cx\Core_Modules\DataAccess\Model\Entity\DataAccess
+      inversedBy: relations
+      joinColumn:
+        name: foreign_data_access_id
+        referencedColumnName: id
+        nullable: false
+        cascade: [remove]
+  oneToMany: # inverse side
+    children:
+      fetch: LAZY #progressive fetching
+      targetEntity: Cx\Core_Modules\Sync\Model\Entity\Relation
+      mappedBy: parent

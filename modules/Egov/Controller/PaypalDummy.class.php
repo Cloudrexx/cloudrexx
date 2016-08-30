@@ -38,12 +38,21 @@ $ipn = false;
 
 foreach ($_POST as $name => $value) {
     if ($name == 'cancel_return') {
+        if (!FWValidator::isUri($value)) {
+            continue;
+        }
         $paypalUriNok = $value;
         continue;
     } elseif ($name == 'return') {
+        if (!FWValidator::isUri($value)) {
+            continue;
+        }
         $paypalUriOk  = $value;
         continue;
     } elseif ($name == 'notify_url') {
+        if (!FWValidator::isUri($value)) {
+            continue;
+        }
         $paypalUriIpn = $value;
         continue;
     } elseif ($name == 'cmd') {
@@ -58,7 +67,7 @@ foreach ($_POST as $name => $value) {
 function addParam($name, $value)
 {
     global $strForm;
-    $strForm .= "        <tr><td>$name</td><td><input type=\"text\" name=\"$name\" value=\"".urlencode($value)."\" /></td></tr>\n";
+    $strForm .= "        <tr><td>".contrexx_input2xhtml($name)."</td><td><input type=\"text\" name=\"".contrexx_input2xhtml($name)."\" value=\"".urlencode($value)."\" /></td></tr>\n";
 }
 
 die(

@@ -45,7 +45,7 @@ namespace Cx\Modules\Calendar\Controller;
  * @copyright  CLOUDREXX CMS - CLOUDREXX AG
  * @version    1.00
  */
-class CalendarHost extends \Cx\Modules\Calendar\Controller\CalendarLibrary
+class CalendarHost extends CalendarLibrary
 {
     /**
      * Host Id
@@ -167,7 +167,7 @@ class CalendarHost extends \Cx\Modules\Calendar\Controller\CalendarLibrary
         $confirmed  = intval(1);
         
         if(empty($key)) { 
-            $key = parent::generateKey();  
+            $key = $this->generateKey();  
         }
         
         if(intval($this->id) == 0) {

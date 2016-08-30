@@ -273,7 +273,7 @@ class cmsSession extends RecursiveArrayAccess implements SessionHandlerInterface
                     } else {
                         if ($this->isDirty($lockKey)) {
                             // is_callable() can return true for type array, so we need to check that it is not an array
-                            if (!is_array($sessionValue) && is_callable($sessionValue)) {
+                            if (!is_array($sessionValue) && !is_string($sessionValue) && is_callable($sessionValue)) {
                                 \DBG::dump('Function for session index '. $lockKey .' can not be stored, saving functions in session is not supported. Please use json instead');
                                 $this->releaseLock($lockKey);
                                 continue;
@@ -579,8 +579,26 @@ class cmsSession extends RecursiveArrayAccess implements SessionHandlerInterface
      * @return bool
      */
     function gc($maxlifetime) {
-        \Env::get('db')->Execute('DELETE s.*, v.* FROM `' . DBPREFIX . 'sessions` AS s, `' . DBPREFIX . 'session_variable` AS v WHERE s.sessionid = v.sessionid AND ((`s`.`remember_me` = 0) AND (`s`.`lastupdated` < ' . (time() - $this->defaultLifetime) . '))');
-        \Env::get('db')->Execute('DELETE s.*, v.* FROM `' . DBPREFIX . 'sessions` AS s, `' . DBPREFIX . 'session_variable` AS v WHERE s.sessionid = v.sessionid AND ((`s`.`remember_me` = 1) AND (`s`.`lastupdated` < ' . (time() - $this->defaultLifetimeRememberMe) . '))');
+        // clear expired sessions that were once valid
+        // note: those two queries might look obsolete when considering
+        //       that the below three queries will have the same effect.
+        //       However the last query below uses a heavy resource requiring
+        //       subquery which can be made lighter by first running those two
+        //       queries here 
+        \Env::get('db')->Execute(
+            'DELETE s.*, v.*
+             FROM   `' . DBPREFIX . 'sessions` AS s, `' . DBPREFIX . 'session_variable` AS v
+             WHERE  s.sessionid = v.sessionid AND (
+                           (`s`.`remember_me` = 0 AND `s`.`lastupdated` < ' . (time() - $this->defaultLifetime) . ')
+                        OR (`s`.`remember_me` = 1 AND `s`.`lastupdated` < ' . (time() - $this->defaultLifetimeRememberMe) . ')
+             )'
+        );
+
+        // clear expired sessions that were broken (no valid relation between
+        // contrexx_sessions and contrexx_session_variable
+        \Env::get('db')->Execute('DELETE FROM `' . DBPREFIX . 'sessions` WHERE `remember_me` = 0 AND `lastupdated` < ' . (time() - $this->defaultLifetime));
+        \Env::get('db')->Execute('DELETE FROM `' . DBPREFIX . 'sessions` WHERE `remember_me` = 1 AND `lastupdated` < ' . (time() - $this->defaultLifetimeRememberMe));
+        \Env::get('db')->Execute('DELETE FROM `' . DBPREFIX . 'session_variable` WHERE sessionid NOT IN (SELECT sessionid FROM `' . DBPREFIX . 'sessions`)');
         return true;
     }
 
@@ -694,7 +712,8 @@ class cmsSession extends RecursiveArrayAccess implements SessionHandlerInterface
     {
         global $_DBCONFIG;
         
-        return $_DBCONFIG['database'].DBPREFIX."sessions_".$_SESSION->sessionid.'_'.$key;
+        // MySQL 5.7.5 and later enforces a maximum length on lock names of 64 characters. Previously, no limit was enforced.
+        return md5($_DBCONFIG['database'] . DBPREFIX . $_SESSION->sessionid) .md5($key);
     }
 
     /**
@@ -861,7 +880,7 @@ class cmsSession extends RecursiveArrayAccess implements SessionHandlerInterface
                     $serializedValue = '';
                 } else {
                     // is_callable() can return true for type array, so we need to check that it is not an array
-                    if (!is_array($value) && is_callable($value)) {
+                    if (!is_array($value) && !is_string($value) && is_callable($value)) {
                         \DBG::dump('Function for session index '. $key .' can not be stored, saving functions in session is not supported. Please use json instead');
                         continue;
                     }

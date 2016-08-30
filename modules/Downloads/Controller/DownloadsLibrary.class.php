@@ -73,6 +73,47 @@ class DownloadsLibrary
         'associate_user_to_groups'      => ''
     );
 
+    /**
+     * Downloads setting option
+     * 
+     * @var array
+     */
+    protected $downloadsSortingOptions = array(
+        'custom' => array(
+            'order' => 'ASC',
+            'name'  => 'ASC',
+            'id'    => 'ASC'
+        ),
+        'alphabetic' => array(
+            'name' => 'ASC',
+            'id'   => 'ASC'
+        ),
+        'newestToOldest' => array(
+            'ctime' => 'DESC',
+            'id'    => 'ASC'
+        ),
+        'oldestToNewest' => array(
+            'ctime' => 'ASC',
+            'id'    => 'ASC'
+        )
+    );
+
+    /**
+     * Categories setting option
+     * 
+     * @var array
+     */
+    protected $categoriesSortingOptions = array(
+        'custom' => array(
+            'order' => 'ASC',
+            'name'  => 'ASC',
+            'id'    => 'ASC'
+        ),
+        'alphabetic' => array(
+            'name' => 'ASC',
+            'id'   => 'ASC'
+        )
+    );
 
     public function __construct()
     {
@@ -139,7 +180,8 @@ class DownloadsLibrary
     {
         global $_LANGID;
 
-        $objCategory = Category::getCategories(null, null, array('order' => 'ASC', 'name' => 'ASC', 'id' => 'ASC'));
+        $sortOrder   = $this->categoriesSortingOptions[$this->arrConfig['categories_sorting_order']];
+        $objCategory = Category::getCategories(null, null, $sortOrder);
         $arrCategories = array();
 
         switch ($accessType) {
@@ -222,7 +264,8 @@ class DownloadsLibrary
     {
         global $_LANGID;
 
-        $objCategory = Category::getCategories(null, null, array('order' => 'ASC', 'name' => 'ASC', 'id' => 'ASC'));
+        $sortOrder   = $this->categoriesSortingOptions[$this->arrConfig['categories_sorting_order']];
+        $objCategory = Category::getCategories(null, null, $sortOrder);
         $arrCategories = array();
 
         while (!$objCategory->EOF) {
@@ -335,11 +378,11 @@ class DownloadsLibrary
     {
         global $_LANGID;
 
-        $objGroup = Group::getGroups(array('id' => $arrGroups));
-
+        $objGroup  = Group::getGroups(array('id' => $arrGroups));
+        $sortOrder = $this->categoriesSortingOptions[$this->arrConfig['categories_sorting_order']];
         while (!$objGroup->EOF) {
             $output = "<ul>\n";
-            $objCategory = Category::getCategories(array('id' => $objGroup->getAssociatedCategoryIds()), null, array( 'order' => 'asc', 'name' => 'asc'));
+            $objCategory = Category::getCategories(array('id' => $objGroup->getAssociatedCategoryIds()), null, $sortOrder);
             while (!$objCategory->EOF) {
                 $output .= '<li><a href="'.CONTREXX_SCRIPT_PATH.'?section=Downloads&amp;category='.$objCategory->getId().'" title="'.htmlentities($objCategory->getName($_LANGID), ENT_QUOTES, CONTREXX_CHARSET).'">'.htmlentities($objCategory->getName($_LANGID), ENT_QUOTES, CONTREXX_CHARSET)."</a></li>\n";
                 $objCategory->next();
@@ -350,5 +393,37 @@ class DownloadsLibrary
             $objGroup->next();
         }
     }
+    
+    /**
+     * parse the settings dropdown
+     * 
+     * @param object $objTemplate   template object
+     * @param array  $settingValues array of setting values
+     * @param string $selected      selected dropdown value
+     * @param string $blockName     block name for template parsing
+     * 
+     * @return null
+     */
+    public function parseSettingsDropDown(  
+        \Cx\Core\Html\Sigma $objTemplate, 
+        $settingValues, 
+        $selected,
+        $blockName
+    ) {
+        global $_ARRAYLANG;
 
+        if (empty($settingValues)) {
+            return;
+        }
+
+        foreach (array_keys($settingValues) as $key) {
+            $selectedOption = ($selected == $key) ? 'selected="selected"' : '';
+            $objTemplate->setVariable(array(
+                'DOWNLOADS_SETTINGS_DROPDOWN_OPTION_VALUE'    => $key,
+                'DOWNLOADS_SETTINGS_DROPDOWN_OPTION_NAME'     => $_ARRAYLANG['TXT_DOWNLOADS_SETTINGS_'.  strtoupper($key).'_LABEL'],
+                'DOWNLOADS_SETTINGS_DROPDOWN_SELECTED_OPTION' => $selectedOption,
+            ));
+            $objTemplate->parse('downloads_settings_sorting_dropdown_' . $blockName);
+        }
+    }
 }

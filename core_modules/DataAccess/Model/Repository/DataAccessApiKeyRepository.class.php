@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,29 +24,26 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
-/**
- * @copyright   Cloudrexx AG 
- * @author Robin Glauser <robin.glauser@comvation.com>
- * @package     cloudrexx
- */
-
-namespace Cx\Core_Modules\MediaBrowser\Testing\UnitTest;
 
 /**
- * Class TestCx
+ * DataAccessApiKeyRepository
  *
  * @copyright   Cloudrexx AG
- * @author Robin Glauser <robin.glauser@comvation.com>
+ * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
+ * @subpackage  coremodule_dataaccess
  */
-class TestCx {
-    private $testEventManager;
 
-    public function getEvents(){
-        if (!$this->testEventManager){
-            $this->testEventManager = new TestEventManager();
-        }
-        return $this->testEventManager;
-    }
-}
+namespace Cx\Core_Modules\DataAccess\Model\Repository;
+
+use Doctrine\ORM\EntityRepository;
+
+/**
+ * DataAccessApiKeyRepository
+ *
+ * @copyright   Cloudrexx AG
+ * @author      Project Team SS4U <info@cloudrexx.com>
+ * @package     cloudrexx
+ * @subpackage  coremodule_dataaccess
+ */
+class DataAccessApiKeyRepository extends EntityRepository {}

@@ -384,6 +384,19 @@ class Product
     }
 
     /**
+     * Return product status based on the product stock and active settings
+     *
+     * @return boolean True when product is active, false otherwise
+     */
+    public function getStatus()
+    {
+        if ($this->stock_visible && $this->stock <= 0) {
+            return false;
+        }
+        return $this->active;
+    }
+
+    /**
      * The pictures
      * @param   string    $pictures     The optional encoded picture string
      * @return  string                  The Encoded picture string

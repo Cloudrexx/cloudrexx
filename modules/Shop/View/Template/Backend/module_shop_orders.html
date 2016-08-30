@@ -1,16 +1,30 @@
 <!-- start shop_orders.html -->
 <script type="text/javascript">//<![CDATA[
-function deleteOrder(order_id) {
-  if (confirm('{TXT_CONFIRM_DELETE_ORDER}\n{TXT_ACTION_IS_IRREVERSIBLE}'))
-    window.location.replace("{SHOP_ACTION_URI}&{CSRF_PARAM}&act=delorder&order_id="+order_id);
-}
+var shopOrder = {
+    jq: cx.jQuery,
+    deletedStatus: [2, 3],
+    isStockIncreasable: function(oldStatus, newStatus) {
+        return    this.jq.inArray(parseInt(oldStatus), this.deletedStatus) == -1
+               && this.jq.inArray(parseInt(newStatus), this.deletedStatus) != -1
+               && confirm('{TXT_SHOP_CONFIRM_RESET_STOCK}');
+    },
+    isStockDecreasable: function(oldStatus, newStatus) {
+       return     this.jq.inArray(parseInt(oldStatus), this.deletedStatus) != -1
+               && this.jq.inArray(parseInt(newStatus), this.deletedStatus) == -1
+               && confirm('{TXT_SHOP_CONFIRM_REDUCE_STOCK}');
+    }
+};
 function shopOrdersDoAction(strForm, strCheckbox, objSelect, strAct) {
   if (checkboxIsChecked(strForm, strCheckbox) == true) {
     switch (strAct) {
       case 'del':
         if (confirm('{TXT_CONFIRM_DELETE_ORDER}\n{TXT_ACTION_IS_IRREVERSIBLE}')) {
-          document.forms[strForm].action = "{SHOP_ACTION_URI}&{CSRF_PARAM}&act=delorder";
-          document.forms[strForm].submit();
+            var stockUpdate = false;
+            if (confirm('{TXT_SHOP_CONFIRM_RESET_STOCK}')) {
+                stockUpdate = true;
+            }
+            document.forms[strForm].action = "{SHOP_ACTION_URI}&{CSRF_PARAM}&act=delorder" + (stockUpdate ? '&stock_update=1' : '');
+            document.forms[strForm].submit();
         }
         break;
     }
@@ -36,11 +50,30 @@ function changeOrderStatus(order_id, status, new_status) {
         strURI += "&sendMail=1";
       }
     }
+    if (   shopOrder.isStockIncreasable(status, new_status)
+        || shopOrder.isStockDecreasable(status, new_status)) {
+        strURI += '&stock_update=1';
+    }
+
     window.location.replace(strURI);
   } else {
     document.getElementById("order_status-"+order_id).setAttribute("value", status);
   }
 }
+!(function($) {
+    $(function() {
+        $('form[name="form_orders"]').delegate('.delete-order', 'click', function(){
+            var order = $(this).data('order');
+            if (confirm('{TXT_CONFIRM_DELETE_ORDER}\n{TXT_ACTION_IS_IRREVERSIBLE}')) {
+                var stockUpdate = false;
+                if (shopOrder.isStockIncreasable(order.status, 2)) {
+                    stockUpdate = true;
+                }
+                window.location.replace("{SHOP_ACTION_URI}&{CSRF_PARAM}&act=delorder&order_id=" + order.id + (stockUpdate ? '&stock_update=1' : ''));
+            }
+        });
+    });
+})(cx.jQuery);
 //]]></script>
 <form name="search_orders" method="post" action="{SHOP_ACTION_URI_SEARCH_ENCODED}&amp;act=orders">
   <table width="100%" border="0" cellspacing="0" cellpadding="2" class="adminlist">
@@ -113,7 +146,7 @@ function changeOrderStatus(order_id, status, new_status) {
             title="{TXT_EDIT}">
           <img src="../core/Core/View/Media/icons/edit.gif" alt="{TXT_EDIT}" border="0" />
         </a>
-        <a href="javascript:deleteOrder('{SHOP_ORDERID}')" title="{TXT_DELETE}">
+        <a class='delete-order' data-order='{"id":"{SHOP_ORDERID}","status": "{SHOP_ORDER_STATUS_ID}"}' href="javascript:void(0)" title="{TXT_DELETE}">
           <img src="../core/Core/View/Media/icons/delete.gif" alt="{TXT_DELETE}" border="0" />
         </a>
       </td>

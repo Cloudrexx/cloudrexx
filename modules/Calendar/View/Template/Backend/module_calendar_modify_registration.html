@@ -1,4 +1,9 @@
 <!-- START module_calendar_modify_registration.html -->
+<style type="text/css">
+    .calendarRequired {
+        color: red;
+    }
+</style>
 <form action="index.php?cmd={CALENDAR_MODULE_NAME}&act=modify_registration&event_id={CALENDAR_EVENT_ID}&amp;reg_id={CALENDAR_REGISTRATION_ID}&{CALENDAR_CSRF}" id="formModifyRegistration" name="formModifyRegistration" method="post">
     <input type="hidden" name="regid" value="{CALENDAR_REGISTRATION_ID}" />
     <input type="hidden" name="regtpl" value="{CALENDAR_REGISTRATION_TPL}" />
@@ -14,7 +19,7 @@
         </tr>
         <!-- BEGIN calendar_registration_inputfield -->
         <tr class="{CALENDAR_ROW}">
-            <td width="180px" valign="top">{CALENDAR_REGISTRATION_INPUTFIELD_NAME}</td>
+            <td width="180px" valign="top">{CALENDAR_REGISTRATION_INPUTFIELD_NAME} {CALENDAR_REGISTRATION_INPUTFIELD_REQUIRED}</td>
             <td>{CALENDAR_REGISTRATION_INPUTFIELD_VALUE}</td>
         </tr>
         <!-- END calendar_registration_inputfield -->

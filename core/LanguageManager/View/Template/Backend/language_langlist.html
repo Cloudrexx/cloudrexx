@@ -14,6 +14,52 @@ cx.jQuery(function() {
     updateCurrent(true);
 });
 
+var deactiveLangs = [];
+cx.jQuery(document).ready(function() {
+    var activeLangs  = [{LANGUAGE_MANAGER_ACTIVE_LANGIDS}];
+    cx.jQuery('.langrow .langActiveFrontend input').click(function() {
+        var id = parseInt(cx.jQuery(this).parents('.langrow').first().attr('id'));
+        if (!cx.jQuery(this).is(":checked")) {
+            if (cx.jQuery.inArray(id, activeLangs) !== -1) {
+                deactiveLangs.push(id);
+            }
+        } else {
+            var index = cx.jQuery.inArray(id, deactiveLangs);
+            if (index !== -1) {
+                deactiveLangs.splice(index, 1);
+            }
+        }
+    });
+    cx.jQuery('form[name="languageForm"]').submit(formSubmit);
+});
+
+var formSubmit = function() {
+        if (deactiveLangs.length > 0) {
+            warningDialog();
+            return false;
+        }
+        return true;
+    },
+    warningDialog = function() {
+        cx.ui.dialog({
+            title: cx.variables.get('langRemovalLabel', 'language/lang'),
+            content: '<input type="checkbox" id="removeLangData" /> <label for="removeLangData">' + cx.variables.get('langRemovalContent', 'language/lang') +'</label>',
+            buttons: {
+                '{TXT_LANGUAGE_MANAGER_OK}': function() {
+                    deactiveLangs = [];
+                    cx.jQuery(this).dialog("close");
+                    cx.jQuery('form[name="languageForm"] input[name="submit"]').trigger('click');
+                }
+            },
+            modal: true,
+            width: 400,
+            autoOpen: true
+        });
+        cx.jQuery("#removeLangData").change(function() {
+            cx.jQuery('#removeLangVersion').val(cx.jQuery(this).is(':checked'));
+        });
+    };
+
 function updateCurrent(init) {
     cx.jQuery(".langrow").each(function(index, el) {
         var lang = cx.jQuery(el);
@@ -178,6 +224,7 @@ function showActionDialog(action, fromLang, toLang, yesAction, checkboxText) {
 </script>
 <form name="languageForm" method="post" action="index.php?cmd={CMD}&amp;act=modlang">
 <input type="hidden" name="modLanguage" value="true" />
+<input type="hidden" id="removeLangVersion" name="removeLangVersion" />
   <table summary="" width="100%" cellspacing="0" cellpadding="3" border="0" style="vertical-align: top;" class="adminlist">
     <tr>
       <th colspan="6">

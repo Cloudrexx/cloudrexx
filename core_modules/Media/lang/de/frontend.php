@@ -73,4 +73,4 @@ $_ARRAYLANG['TXT_MEDIA_FILE_EMPTY_NAME'] = "Dateiname kann nicht leer sein!";
 $_ARRAYLANG['TXT_MEDIA_FOLDER_DELETED_SUCESSFULLY'] = "Das Verzeichnis wurde erfolgreich gelöscht!";
 $_ARRAYLANG['TXT_MEDIA_DELETE'] = "Löschen";
 $_ARRAYLANG['TXT_MEDIA_CONFIRM_DELETE_2'] = "Wollen Sie diese Datei(n) wirklich löschen? ACHTUNG! Diese Änderung kann nicht mehr rückgängig gemacht werden!";
-?>
+$_ARRAYLANG['TXT_MEDIA_SEARCH_TERM'] = 'Suchbegriff';

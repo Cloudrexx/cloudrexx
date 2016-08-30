@@ -332,6 +332,81 @@ class Country
         );
     }
     
+    /**
+     * Returns matched array of Countries data for the given Name
+     *
+     * The array created is of the form
+     *  array(
+     *    'id'           => country ID,
+     *    'name'         => country name,
+     *    'alpha2'       => alpha-2 (two letter) code,
+     *    'alpha3'       => alpha-3 (three letter) code,
+     *    'active'       => boolean,
+     *    'ord'          => ordinal value,
+     *  ),
+     * The Countries are returned in the current frontend language
+     * as set in FRONTEND_LANG_ID, except if the optional $lang_id
+     * argument is not empty.
+     *
+     * @param   string    $term     The search term to get countries
+     * @param   integer   $lang_id  The optional language ID
+     * @return  array               The Country array on success,
+     *                              false otherwise
+     */
+    static function searchByName($term, $lang_id = null, $active = true)
+    {
+        global $objDatabase;
+
+        $lang_id = contrexx_input2int($lang_id);
+        if (empty($lang_id)) {
+            $lang_id = FRONTEND_LANG_ID;
+        }
+        $arrSqlName = \Text::getSqlSnippets('`country`.`id`', $lang_id,
+            'core', array('name' => self::TEXT_NAME));
+
+        $query = '
+            SELECT `country`.`id`,
+                   `country`.`alpha2`,
+                   `country`.`alpha3`,
+                   `country`.`ord`,
+                   `country`.`active`, 
+                   '. $arrSqlName['field'] .'
+              FROM `'. DBPREFIX .'core_country` AS `country`
+                  '. $arrSqlName['join'] .'
+             WHERE ' . $arrSqlName['alias']['name'] . ' LIKE "%'. contrexx_raw2db($term) .'%"';
+        $countries = $objDatabase->Execute($query);
+
+        if (!$countries) {
+            return array();
+        }
+
+        $arrCountries = array();
+        while (!$countries->EOF) {
+            $id      = $countries->fields['id'];
+            $strName = $countries->fields['name'];
+            if ($active && !$countries->fields['active']) {
+                $countries->MoveNext();
+                continue;
+            }
+            if ($strName === null) {
+                $objText = \Text::getById($id, 'core', self::TEXT_NAME);
+                if ($objText) {
+                    $strName = $objText->content();
+                }
+            }
+            $arrCountries[] = array(
+                'id'     => $id,
+                'name'   => $strName,
+                'ord'    => $countries->fields['ord'],
+                'alpha2' => $countries->fields['alpha2'],
+                'alpha3' => $countries->fields['alpha3'],
+                'active' => $countries->fields['active'],
+            );
+            $countries->MoveNext();
+        }
+
+        return $arrCountries;
+    }
 
     /**
      * Returns the current number of Country records present in the database

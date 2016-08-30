@@ -89,7 +89,7 @@ class SystemComponentBackendController extends Controller {
             $cmd = explode('/', contrexx_input2raw($_GET['act']));
         }
         
-        $actTemplate = new \Cx\Core\Html\Sigma($this->getDirectory(true) . '/View/Template/Backend');
+        $actTemplate = new \Cx\Core\Html\Sigma($this->getDirectory(false) . '/View/Template/Backend');
         $filename = $cmd[0] . '.html';
         $testFilename = $cmd[0];
         if (!\Env::get('ClassLoader')->getFilePath($actTemplate->getRoot() . '/' . $filename)) {

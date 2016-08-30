@@ -384,7 +384,7 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
 
     private function countNewsMessageView($newsMessageId)
     {
-        global $objDatabase, $objCounter;
+        global $objDatabase;
 
         /*
          * count stat if option "top news" is activated
@@ -400,7 +400,15 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
         $objDatabase->Execute(' DELETE FROM `'.DBPREFIX.'module_news_stats_view`
                                 WHERE `time` < "'.date_format(date_sub(date_create('now'), date_interval_create_from_date_string(intval($this->arrSettings['news_top_days']).' days')), 'Y-m-d H:i:s').'"');
         
-        $uniqueUserId = $objCounter->getUniqueUserId();
+        $componentRepo = \Cx\Core\Core\Controller\Cx::instanciate()
+                            ->getDb()
+                            ->getEntityManager()
+                            ->getRepository('Cx\Core\Core\Model\Entity\SystemComponent');
+        $statsComponentContoller = $componentRepo->findOneBy(array('name' => 'Stats'));
+        if (!$statsComponentContoller) {
+            return;
+        }
+        $uniqueUserId = $statsComponentContoller->getCounterInstance()->getUniqueUserId();
 
         $query = '
             SELECT 1

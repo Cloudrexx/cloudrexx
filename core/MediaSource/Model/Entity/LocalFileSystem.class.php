@@ -40,6 +40,7 @@ class LocalFileSystem extends EntityBase implements FileSystem
 {
 
     private $rootPath;
+    protected $fileListCache;
 
     function __construct($path) {
         if (!$path) {
@@ -60,6 +61,10 @@ class LocalFileSystem extends EntityBase implements FileSystem
     }
 
     public function getFileList($directory, $recursive = false, $readonly = false) {
+        if (isset($this->fileListCache[$directory][$recursive][$readonly])) {
+            return $this->fileListCache[$directory][$recursive][$readonly];
+        }
+
         $recursiveIteratorIterator = new \RegexIterator(
             new \RecursiveIteratorIterator(
                 new \RecursiveDirectoryIterator(
@@ -161,7 +166,28 @@ class LocalFileSystem extends EntityBase implements FileSystem
             }
             $jsonFileArray = $this->array_merge_recursive($jsonFileArray, $path);
         }
+        $jsonFileArray = $this->utf8EncodeArray($jsonFileArray);
+        $this->fileListCache[$directory][$recursive][$readonly] = $jsonFileArray;
         return $jsonFileArray;
+    }
+    
+    /**
+     * Applies utf8_encode() to keys and values of an array
+     * From: http://stackoverflow.com/questions/7490105/array-walk-recursive-modify-both-keys-and-values
+     * @param array $array Array to encode
+     * @return array UTF8 encoded array
+     */
+    public function utf8EncodeArray($array) {
+        $helper = array();
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $value = $this->utf8EncodeArray($value);
+            } else {
+                $value = utf8_encode($value);
+            }
+            $helper[utf8_encode($key)] = $value;
+        }
+        return $helper;
     }
 
     /**

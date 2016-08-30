@@ -92,21 +92,22 @@ class MediaDirectoryInputfield extends MediaDirectoryLibrary
 
     function getInputfields()
     {
-        global $_ARRAYLANG, $_CORELANG, $objDatabase, $_LANGID, $objInit;
+        global $_ARRAYLANG, $objDatabase, $_LANGID;
 
-        if(intval($this->intFormId)!=0) {
-            $whereFormId = "AND (input.form='".$this->intFormId."')";
-        } else {
-            $whereFormId = null;
+        $whereFormId  = 'AND (`form`.`active` = 1)';
+        $joinFormsTbl = 'LEFT JOIN `' . DBPREFIX .'module_' . $this->moduleTablePrefix . '_forms` as form
+                        ON (`form`.`id` = `input`.`form`)';
+        if (intval($this->intFormId) != 0) {
+            $joinFormsTbl = '';
+            $whereFormId  = 'AND (`input`.`form` = "' . $this->intFormId . '")';
         }
 
-        if($this->bolExpSearch) {
-            $whereExpSearch = "AND (input.search='1')";
-        } else {
-            $whereExpSearch = null;
+        $whereExpSearch = null;
+        if ($this->bolExpSearch) {
+            $whereExpSearch = 'AND (`input`.`search` = "1")';
         }
 
-        $objInputfields = $objDatabase->Execute("
+        $objInputfields = $objDatabase->Execute('
             SELECT
                 input.`id` AS `id`,
                 input.`order` AS `order`,
@@ -126,23 +127,21 @@ class MediaDirectoryInputfield extends MediaDirectoryLibrary
                 types.`dynamic` AS `type_dynamic`,
                 types.`exp_search` As `exp_search`
             FROM
-                ".DBPREFIX."module_".$this->moduleTablePrefix."_inputfields AS input,
-                ".DBPREFIX."module_".$this->moduleTablePrefix."_inputfield_names AS names,
-                ".DBPREFIX."module_".$this->moduleTablePrefix."_inputfield_verifications AS verifications,
-                ".DBPREFIX."module_".$this->moduleTablePrefix."_inputfield_types AS types
+                `' . DBPREFIX . 'module_' . $this->moduleTablePrefix . '_inputfields` AS input
+                ' . $joinFormsTbl . '
+                LEFT JOIN `' . DBPREFIX . 'module_' . $this->moduleTablePrefix . '_inputfield_names` AS names
+                    ON (`names`.`field_id` = `input`.`id`)
+                LEFT JOIN `' . DBPREFIX . 'module_' . $this->moduleTablePrefix . '_inputfield_verifications` AS verifications
+                    ON (`input`.`verification` = `verifications`.`id`)
+                LEFT JOIN `' . DBPREFIX . 'module_' . $this->moduleTablePrefix . '_inputfield_types` AS types
+                    ON (`input`.`type` = `types`.`id`)
             WHERE
-                (names.field_id=input.id)
-            AND
-                (input.verification=verifications.id)
-            AND
-                (input.type=types.id)
-                ".$whereFormId."
-                ".$whereExpSearch."
-            AND
-                (names.lang_id='".$_LANGID."')
+                (`names`.`lang_id` = ' . $_LANGID . ')
+                ' . $whereFormId . '
+                ' . $whereExpSearch . '
             ORDER BY
-                input.`order` ASC, input.`id` ASC
-        ");
+                `input`.`order` ASC, `input`.`id` ASC
+        ');
 
         if ($objInputfields !== false) {
             while (!$objInputfields->EOF) {
@@ -543,6 +542,10 @@ class MediaDirectoryInputfield extends MediaDirectoryLibrary
                                 }
 
                                 if(!empty($arrInputfieldContent)) {
+                                    if (\Cx\Core\Core\Controller\Cx::instanciate()->getMode() == \Cx\Core\Core\Controller\Cx::MODE_FRONTEND && \Cx\Core\Setting\Controller\Setting::getValue('blockStatus', 'Config')) {
+                                        $arrInputfieldContent[$this->moduleLangVar.'_INPUTFIELD_VALUE'] = preg_replace('/\\[\\[(BLOCK_[A-Z0-9_-]+)\\]\\]/', '{\\1}', $arrInputfieldContent[$this->moduleLangVar.'_INPUTFIELD_VALUE']);
+                                        \Cx\Modules\Block\Controller\Block::setBlocks($arrInputfieldContent[$this->moduleLangVar.'_INPUTFIELD_VALUE'], \Cx\Core\Core\Controller\Cx::instanciate()->getPage());
+                                    }
                                     foreach ($arrInputfieldContent as $strPlaceHolder => $strContent) {
                                         $objTpl->setVariable(array(
                                             strtoupper($strPlaceHolder) => $strContent

@@ -2,7 +2,6 @@
 <script language="JavaScript" type="text/javascript">
 // <![CDATA[    
     function selectMultiAction(containerForm) {
-        console.log(containerForm.find('.selectedRegistrationId:checked').length)
         if (containerForm.find('.selectedRegistrationId:checked').length)
         {            
             if (containerForm.find('.registrationAction').val() == "delete") {
@@ -40,6 +39,11 @@
             }
             return false;
         });
+        $J('.regTab .registration-date-filter').change(function(){
+            var selectedDateFilter = $J(this).val();
+            var url = "index.php?cmd={CALENDAR_MODULE_NAME}&act=event_registrations&tpl=" + $J('.registration-tab .active').data('registrationType') + "&id={CALENDAR_EVENT_ID}&date=" + selectedDateFilter + '&csrf=' + cx.variables.get('csrf', 'contrexx');
+            window.location.replace(url);
+        });
     });
 // ]]>
 </script>
@@ -49,10 +53,10 @@
     <li><a href='index.php?cmd={CALENDAR_MODULE_NAME}&amp;act=export_registrations&amp;id={CALENDAR_EVENT_ID}' title="{TXT_CALENDAR_EXPORT}">{TXT_CALENDAR_EXPORT}</a></li>
 </div>
 <br />
-<ul id="tabmenu">
-    <li><a id="regTab_registration" class="{CALENDAR_REGISTRATION_R_CONTAINER_CLASS}" href="javascript:{}" onclick="selectTab('registration');" title="{TXT_CALENDAR_REGISTRATIONS}">{TXT_CALENDAR_REGISTRATIONS}</a></li>
-    <li><a id="regTab_deregistration" class="{CALENDAR_REGISTRATION_D_CONTAINER_CLASS}" href="javascript:{}" onclick="selectTab('deregistration');" title="{TXT_CALENDAR_DEREGISTRATIONS}">{TXT_CALENDAR_DEREGISTRATIONS}</a></li>
-    <li><a id="regTab_waitlist" class="{CALENDAR_REGISTRATION_W_CONTAINER_CLASS}" href="javascript:{}" onclick="selectTab('waitlist');" title="{TXT_CALENDAR_WAITLIST}">{TXT_CALENDAR_WAITLIST}</a></li>    
+<ul id="tabmenu" class="registration-tab">
+    <li><a data-registration-type="r" id="regTab_registration" class="{CALENDAR_REGISTRATION_R_CONTAINER_CLASS}" href="javascript:{}" onclick="selectTab('registration');" title="{TXT_CALENDAR_REGISTRATIONS}">{TXT_CALENDAR_REGISTRATIONS}</a></li>
+    <li><a data-registration-type="d" id="regTab_deregistration" class="{CALENDAR_REGISTRATION_D_CONTAINER_CLASS}" href="javascript:{}" onclick="selectTab('deregistration');" title="{TXT_CALENDAR_DEREGISTRATIONS}">{TXT_CALENDAR_DEREGISTRATIONS}</a></li>
+    <li><a data-registration-type="w" id="regTab_waitlist" class="{CALENDAR_REGISTRATION_W_CONTAINER_CLASS}" href="javascript:{}" onclick="selectTab('waitlist');" title="{TXT_CALENDAR_WAITLIST}">{TXT_CALENDAR_WAITLIST}</a></li>    
 </ul>
 <!-- BEGIN calendar_registration_lists -->
 <div class="regTab" id="{CALENDAR_REGISTRATION_LIST_CONTAINER_ID}" style="display: {CALENDAR_REGISTRATION_LIST_CONTAINER_DISPLAY}">

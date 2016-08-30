@@ -36,6 +36,8 @@
  */
 namespace Cx\Modules\Calendar\Controller;
 
+class CalendarException extends \Exception { }
+
 /**
  * Calendar
  *
@@ -130,6 +132,13 @@ class CalendarLibrary
     public $arrSettings = array();
     
     /**
+     * Static settings array to cache the fetched data from the database
+     *
+     * @var array 
+     */
+    public static $settings = array();
+
+    /**
      * Community group array
      *
      * @access public
@@ -173,9 +182,9 @@ class CalendarLibrary
             $this->moduleLangVar.'_CSRF'         => 'csrf='.\Cx\Core\Csrf\Controller\Csrf::code(),     
             $this->moduleLangVar.'_DATE_FORMAT'  => self::getDateFormat(1),
             $this->moduleLangVar.'_JAVASCRIPT'   => self::getJavascript(),
-        ));        
-    }         
-    
+        ));
+    }
+
     /**
      * Checks the access level for the given action     
      *      
@@ -281,16 +290,16 @@ class CalendarLibrary
 
                 switch($strStatus) {
                     case 'no_access':
-                        \Cx\Core\Csrf\Controller\Csrf::header('Location: '.CONTREXX_SCRIPT_PATH.'?section=Login&cmd=noaccess');
+                        \Cx\Core\Csrf\Controller\Csrf::redirect(CONTREXX_SCRIPT_PATH.'?section=Login&cmd=noaccess');
                         exit();
                         break;
                     case 'login':
                         $link = base64_encode(CONTREXX_SCRIPT_PATH.'?'.$_SERVER['QUERY_STRING']);
-                        \Cx\Core\Csrf\Controller\Csrf::header("Location: ".CONTREXX_SCRIPT_PATH."?section=Login&redirect=".$link);
+                        \Cx\Core\Csrf\Controller\Csrf::redirect(CONTREXX_SCRIPT_PATH."?section=Login&redirect=".$link);
                         exit();
                         break;
                     case 'redirect':
-                        \Cx\Core\Csrf\Controller\Csrf::header('Location: '.CONTREXX_SCRIPT_PATH.'?section='.$this->moduleName);   
+                        \Cx\Core\Csrf\Controller\Csrf::redirect(CONTREXX_SCRIPT_PATH.'?section='.$this->moduleName);   
                         exit();
                         break;
                 }
@@ -315,6 +324,14 @@ class CalendarLibrary
             return;
         }
         
+        // hotfix: this fixes the issue that the settings are being fetch from the
+        // database over and over again.
+        // This is just workaround without having to refactor the whole implementation of CalendarLibrary::$arrSettings
+        if (isset(static::$settings[$this->moduleTablePrefix])) {
+            $this->arrSettings = static::$settings[$this->moduleTablePrefix];
+            return;
+        }
+
     	$arrSettings = array();
         $arrDateSettings =  array(
                             'separatorDateList','separatorDateTimeList', 'separatorSeveralDaysList', 'separatorTimeList',
@@ -346,6 +363,7 @@ class CalendarLibrary
             }
         }
         
+        static::$settings[$this->moduleTablePrefix] = $arrSettings;
         $this->arrSettings = $arrSettings;
     }
     
@@ -384,22 +402,18 @@ class CalendarLibrary
     
     /**
      * Return's the dataformat based on the type
-     * 
-     * Return's the dateformat by the given type 
-     * 1 => frontend else backend
-     *      
-     * @param integer $type type 1 => frontend else backend
-     * 
+     *
+     * Return's the dateformat by the given type
+     * 1 => frontend (javascript format alone) else backend
+     *
+     * @param integer $type type 1 => frontend (javascript format alone) else backend
+     *
      * @return string Date format
      */
     function getDateFormat($type=null)
     {
-        global $objDatabase;
-        
-        $objDateFormat = $objDatabase->Execute("SELECT value FROM  ".DBPREFIX."module_".$this->moduleTablePrefix."_settings WHERE name = 'dateFormat' LIMIT 1");
-        if ($objDateFormat !== false) {        
-            $dateFormat = $objDateFormat->fields['value'];      
-        }
+        self::getSettings();
+        $dateFormat = $this->arrSettings['dateFormat'];
         
         if($type == 1) {
             switch ($dateFormat) {
@@ -443,15 +457,22 @@ class CalendarLibrary
     }
     
     /**
-     * Return's the timestamp value from the given date
-     * 
-     * @param string  $date   Date
-     * @param integer $hour   Hours
+     * Returns a \DateTime object from a calendar date/time string.
+     * The format of a calendar date/time string can be configured
+     * in the settings section of the calendar component.
+     *
+     * Note: In constrast to this method, the method getUserDateTimeFromUser()
+     * expects a PHP date/time string.
+     *
+     * The SUPPLIED calendar date/time string must be in USER timezone.
+     * The RETURNED \DateTime object will be in INTERNAL timezone.
+     *
+     * @param string $date A calendar date/time string in user timezone
+     * @param integer $hour Hour value
      * @param integer $minute Minute value
-     * 
-     * @return integer Unix timestamp value
+     * @return \DateTime \DateTime object in internal timezone
      */
-    function getDateTimestamp($date, $hour=0, $minute=0)
+    function getDateTime($date, $hour = 0, $minute = 0)
     {
         self::getSettings();
         
@@ -490,12 +511,12 @@ class CalendarLibrary
         }
                                                                    
         $year = substr($date, $posYear,4);
-        $month = substr($date, $posMonth,2);
-        $day = substr($date, $posDay,2);      
-        
-        $timestamp = mktime($hour,$minute,0,$month,$day,$year);   
-        
-        return $timestamp;
+        $month = str_pad(substr($date, $posMonth,2), 2, '0', STR_PAD_LEFT);
+        $day = str_pad(substr($date, $posDay,2), 2, '0', STR_PAD_LEFT);
+        $hour = str_pad($hour, 2, '0', STR_PAD_LEFT);
+        $minute = str_pad($minute, 2, '0', STR_PAD_LEFT);
+
+        return $this->getInternDateTimeFromUser($year . '-' . $month . '-' . $day . ' ' .$hour . ':' . $minute . ':00');
     }
     
     /**
@@ -685,12 +706,158 @@ EOF;
         
         $dayArray = explode(',', $_CORELANG['TXT_CORE_DAY_ABBREV2_ARRAY']);
         foreach ($objEventManager->eventList as $event) {
-            $exceptionDates[date(self::getDateFormat(), $event->startDate)] = $event->startDate != $event->endDate 
-                                                                              ? $dayArray[date("w", $event->startDate)] .", " . date(self::getDateFormat(), $event->startDate).' - '. $dayArray[date("w", $event->endDate)] .", ". date(self::getDateFormat(), $event->endDate)
-                                                                              : $dayArray[date("w", $event->startDate)] .", " . date(self::getDateFormat(), $event->startDate);
+            $startDate = $event->startDate;
+            $endDate   = $event->endDate;
+            $exceptionDates[$this->format2userDate($startDate)] = $this->format2userDate($startDate) != $this->format2userDate($endDate)
+                                                                    ? $dayArray[$this->formatDateTime2user($startDate, "w")] .", " . $this->format2userDate($startDate) .' - ' . $dayArray[$this->formatDateTime2user($endDate, "w")] .", ". $this->format2userDate($endDate)
+                                                                    : $dayArray[$this->formatDateTime2user($startDate, "w")] .", " . $this->format2userDate($startDate);
         }
-        
-        return $exceptionDates;        
+
+        return $exceptionDates;
     }
-    
+
+    /**
+     * Get component controller object
+     *
+     * @param string $name  component name  
+     *
+     * @return \Cx\Core\Core\Model\Entity\SystemComponentController
+     * The requested component controller or null if no such component exists
+     */
+    public function getComponent($name)
+    {
+        if (empty($name)) {
+            return null;
+        }
+        $componentRepo = \Cx\Core\Core\Controller\Cx::instanciate()
+                            ->getDb()
+                            ->getEntityManager()
+                            ->getRepository('Cx\Core\Core\Model\Entity\SystemComponent');
+        $component     = $componentRepo->findOneBy(array('name' => $name));
+        if (!$component) {
+            throw new CalendarException('The component => '. $name .' not available');
+        }
+        return $component;
+    }
+
+    /**
+     * Returns the date/time string (according to the calendar's
+     * configuration) from a \DateTime object.
+     *
+     * The SUPPLIED \DateTime object must be in INTERNAL timezone.
+     * The RETURNED date/time string will be in USER timezone.
+     *
+     * @param \DateTime $dateTime DateTime object in internal timezone
+     * @return string A date/time string
+     */
+    public function format2userDateTime(\DateTime $dateTime)
+    {
+        return $this->formatDateTime2user($dateTime, $this->getDateFormat() .' H:i');
+    }
+
+    /**
+     * Returns the date string (according to the calendar's
+     * configuration) from a \DateTime object.
+     *
+     * The SUPPLIED \DateTime object must be in INTERNAL timezone.
+     * The RETURNED date string will be in USER timezone.
+     *
+     * @param \DateTime $dateTime DateTime object in internal timezone
+     * @return string A date string
+     */
+    public function format2userDate(\DateTime $dateTime)
+    {
+        return $this->formatDateTime2user($dateTime, $this->getDateFormat());
+    }
+
+    /**
+     * Returns the time string 'H:i' from a \DateTime object
+     *
+     * The SUPPLIED \DateTime object must be in INTERNAL timezone.
+     * The RETURNED time string will be in USER timezone.
+     *
+     * @param \DateTime $dateTime DateTime object in internal timezone
+     * @return string A time string
+     */
+    public function format2userTime(\DateTime $dateTime)
+    {
+        return $this->formatDateTime2user($dateTime, 'H:i');
+    }
+
+    /**
+     * Returns a date/time string from a \DateTime object.
+     *
+     * The SUPPLIED \DateTime object must be in INTERNAL timezone.
+     * The RETURNED date/time string will be in USER timezone.
+     *
+     * @param \DateTime $dateTime DateTime object in internal timezone
+     * @param string $format Format string
+     * @return string A date/time string formatted according to $format
+     */
+    public function formatDateTime2user(\DateTime $dateTime, $format)
+    {
+        return $this->getUserDateTimeFromIntern($dateTime)
+                    ->format($format);
+    }
+
+    /**
+     * Returns a \DateTime object in user timezone
+     *
+     * The SUPPLIED \DateTime object must be in INTERNAL timezone.
+     * The RETURNED \DateTime object will be in USER timezone.
+     *
+     * @param \DateTime $dateTime \DateTime object in internal timezone
+     * @return \DateTime \DateTime in user timezone
+     */
+    public function getUserDateTimeFromIntern(\DateTime $dateTime)
+    {
+        $dateTimeInUserTimezone = clone($dateTime);
+        return $this->getComponent('DateTime')->intern2user($dateTimeInUserTimezone);
+    }
+
+    /**
+     * Returns a \DateTime object from a date/time string.
+     *
+     * The SUPPLIED date/time string must be in USER timezone.
+     * The RETURNED \DateTime object will be in INTERNAL timezone.
+     * 
+     * @param string $time A date/time string in user timezone
+     * @return \DateTime \DateTime object in internal timezone
+     */
+    public function getInternDateTimeFromUser($time = 'now')
+    {
+        $dateTime = $this->getComponent('DateTime')->createDateTimeForUser($time);
+        return $this->getComponent('DateTime')->user2intern($dateTime);
+    }
+
+    /**
+     * Returns a \DateTime object from a date/time string.
+     *
+     * The SUPPLIED date/time string must be in DB timezone.
+     * The RETURNED \DateTime object will be in INTERNAL timezone.
+     * 
+     * @param string $time A date/time string in db timezone
+     * @return \DateTime \DateTime object in internal timezone
+     */
+    public function getInternDateTimeFromDb($time = 'now')
+    {
+        $dateTime = $this->getComponent('DateTime')->createDateTimeForDb($time);
+        return $this->getComponent('DateTime')->db2intern($dateTime);
+    }
+
+    /**
+     * Returns a \DateTime object in db timezone
+     *
+     * The SUPPLIED \DateTime object must be in INTERNAL timezone.
+     * The RETURNED \DateTime object will be in DB timezone.
+     *
+     * @param \DateTime $dateTime \DateTime object in internal timezone
+     * @return \DateTime \DateTime in db timezone
+     */
+    public function getDbDateTimeFromIntern(\DateTime $dateTime)
+    {
+        $dateTimeInDbTimezone = clone($dateTime);
+        return $this->getComponent('DateTime')
+                    ->intern2db($dateTimeInDbTimezone);
+    }
 }

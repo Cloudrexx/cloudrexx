@@ -160,7 +160,7 @@ class NewsletterLib
                         'email' => $email,
                     )
                 );
-                if ($user) {
+                if ($user && $user->getFrontendLanguage()) {
                     $userLanguage = $user->getFrontendLanguage();
                 }
                 break;
@@ -177,7 +177,7 @@ class NewsletterLib
                         `email` = \'' . contrexx_raw2db($email) . '\'
                 ';
                 $result = $objDatabase->Execute($query);
-                if (isset($result->fields['language'])) {
+                if (!empty($result->fields['language'])) {
                     $userLanguage = $result->fields['language'];
                 }
                 break;

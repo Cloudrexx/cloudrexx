@@ -290,6 +290,12 @@ namespace Cx\Core\Core\Controller {
         const FOLDER_NAME_THEMES = '/themes';
 
         /**
+         * The folder name used for the application feeds (/feed).
+         * @var string
+         */
+        const FOLDER_NAME_FEED = '/feed';
+
+        /**
          * @var string
          */
         const FOLDER_NAME_PUBLIC_TEMP = '/public';
@@ -896,7 +902,7 @@ namespace Cx\Core\Core\Controller {
             @ini_set('url_rewriter.tags', 'a=href,area=href,frame=src,iframe=src,input=src,form=,fieldset=');
 
             // Set timezone
-            @ini_set('date.timezone', (empty($_CONFIG['timezone'])?$_DBCONFIG['timezone']:$_CONFIG['timezone']));
+            @ini_set('date.timezone', $_CONFIG['timezone']);
         }
 
         /**
@@ -1124,8 +1130,24 @@ namespace Cx\Core\Core\Controller {
                 $filename = $this->getWebsiteConfigPath() . '/postInitHooks.yml';
                 $objDataSet = \Cx\Core_Modules\Listing\Model\Entity\DataSet::load($filename);
                 foreach ($objDataSet as $componentDefinition) {
+                    $this->eventManager->triggerEvent(
+                        'preComponent',
+                        array(
+                            'componentName' => $componentDefinition['name'],
+                            'component' => null,
+                            'hook' => 'postInit',
+                        )
+                    );
                     $componentController = $this->getComponentControllerByNameAndType($componentDefinition['name'], $componentDefinition['type']);
                     $componentController->postInit($this);
+                    $this->eventManager->triggerEvent(
+                        'postComponent',
+                        array(
+                            'componentName' => $componentDefinition['name'],
+                            'component' => null,
+                            'hook' => 'postInit',
+                        )
+                    );
                 }
             } catch (\Cx\Core_Modules\Listing\Model\Entity\DataSetException $e) {
                 throw new \Exception('Error in processing postInit-hooks: '.$e->getMessage());
@@ -1306,7 +1328,7 @@ namespace Cx\Core\Core\Controller {
             $objDb->setDbType($_DBCONFIG['dbType']);
             $objDb->setCharset($_DBCONFIG['charset']);
             $objDb->setCollation($_DBCONFIG['collation']);
-            $objDb->setTimezone((empty($_CONFIG['timezone'])?$_DBCONFIG['timezone']:$_CONFIG['timezone']));
+            $objDb->setTimezone($_DBCONFIG['timezone']);
 
             // Set database user details
             $objDbUser = new \Cx\Core\Model\Model\Entity\DbUser();
@@ -1323,8 +1345,10 @@ namespace Cx\Core\Core\Controller {
 
             \DBG::set_adodb_debug_mode();
 
-            $this->eventManager = new \Cx\Core\Event\Controller\EventManager();
+            $this->eventManager = new \Cx\Core\Event\Controller\EventManager($this);
             new \Cx\Core\Event\Controller\ModelEventWrapper($this);
+            $this->eventManager->addEvent('preComponent');
+            $this->eventManager->addEvent('postComponent');
 
             // Initialize base system
             // TODO: Get rid of InitCMS class, merge it with this class instead
@@ -1408,11 +1432,31 @@ namespace Cx\Core\Core\Controller {
                     $params = array();
                     if (isset($argv)) {
                         $params = array_slice($argv, 1);
+                        foreach ($params as $key=>$value) {
+                            $argParts = explode('=', $value, 2);
+                            if (count($argParts) == 2) {
+                                $params[$argParts[0]] = $argParts[1];
+                                unset($params[$key]);
+                            }
+                        }
                     } else {
                         $params = preg_replace('#' . $this->getWebsiteOffsetPath() . static::FOLDER_NAME_COMMAND_MODE . '(/)?#', '', $_GET['__cap']);
                         $params = explode('/', $params) + $_GET;
                         unset($params['__cap']);
                     }
+                    $params = contrexx_input2raw($params);
+                    
+                    // parse body arguments:
+                    // todo: this does not work for form-data encoded body (boundary...)
+                    $dataArguments = array();
+                    if (php_sapi_name() == 'cli') {
+                        // the following does block if there's no data:
+                        //$input = trim(stream_get_contents(STDIN));
+                    } else {
+                        $input = file_get_contents('php://input');
+                    }
+                    parse_str($input, $dataArguments);
+                    $dataArguments = contrexx_input2raw($dataArguments);
 
                     $this->getCommands();
 
@@ -1434,7 +1478,7 @@ namespace Cx\Core\Core\Controller {
                         throw new \Exception('The command ' . $command . ' has been rejected by not complying to the permission requirements of the requested method.');
                     }
                     // execute command
-                    $objCommand->executeCommand($command, $params);
+                    $objCommand->executeCommand($command, $params, $dataArguments);
                     return;
                 } catch (\Exception $e) {
                     throw new \Exception($e);
@@ -1668,22 +1712,24 @@ namespace Cx\Core\Core\Controller {
         public function parseGlobalPlaceholders(&$content) {
             global $_CONFIG;
 
-            $content = str_replace('{PAGE_URL}',        htmlspecialchars(\Env::get('init')->getPageUri()), $content);
-            $content = str_replace('{STANDARD_URL}',    \Env::get('init')->getUriBy('smallscreen', 0),     $content);
-            $content = str_replace('{MOBILE_URL}',      \Env::get('init')->getUriBy('smallscreen', 1),     $content);
-            $content = str_replace('{PRINT_URL}',       \Env::get('init')->getUriBy('printview', 1),       $content);
-            $content = str_replace('{PDF_URL}',         \Env::get('init')->getUriBy('pdfview', 1),         $content);
-            $content = str_replace('{APP_URL}',         \Env::get('init')->getUriBy('appview', 1),         $content);
-            $content = str_replace('{LOGOUT_URL}',      \Env::get('init')->getUriBy('section', 'logout'),  $content);
-            $content = str_replace('{CONTACT_EMAIL}',   isset($_CONFIG['contactFormEmail']) ? contrexx_raw2xhtml($_CONFIG['contactFormEmail']) : '', $content);
-            $content = str_replace('{CONTACT_COMPANY}', isset($_CONFIG['contactCompany'])   ? contrexx_raw2xhtml($_CONFIG['contactCompany'])   : '', $content);
-            $content = str_replace('{CONTACT_ADDRESS}', isset($_CONFIG['contactAddress'])   ? contrexx_raw2xhtml($_CONFIG['contactAddress'])   : '', $content);
-            $content = str_replace('{CONTACT_ZIP}',     isset($_CONFIG['contactZip'])       ? contrexx_raw2xhtml($_CONFIG['contactZip'])       : '', $content);
-            $content = str_replace('{CONTACT_PLACE}',   isset($_CONFIG['contactPlace'])     ? contrexx_raw2xhtml($_CONFIG['contactPlace'])     : '', $content);
-            $content = str_replace('{CONTACT_COUNTRY}', isset($_CONFIG['contactCountry'])   ? contrexx_raw2xhtml($_CONFIG['contactCountry'])   : '', $content);
-            $content = str_replace('{CONTACT_PHONE}',   isset($_CONFIG['contactPhone'])     ? contrexx_raw2xhtml($_CONFIG['contactPhone'])     : '', $content);
-            $content = str_replace('{CONTACT_FAX}',     isset($_CONFIG['contactFax'])       ? contrexx_raw2xhtml($_CONFIG['contactFax'])       : '', $content);
-            $content = str_replace('{CONTACT_NAME}',    isset($_CONFIG['coreAdminName'])    ? contrexx_raw2xhtml($_CONFIG['coreAdminName'])    : '', $content);
+            $content = str_replace('{PAGE_URL}',            htmlspecialchars(\Env::get('init')->getPageUri()), $content);
+            $content = str_replace('{PAGE_URL_ENCODED}',    urlencode(\Env::get('init')->getPageUri()->toString()), $content);
+            $content = str_replace('{STANDARD_URL}',        contrexx_raw2xhtml(\Env::get('init')->getUriBy('smallscreen', 0)),     $content);
+            $content = str_replace('{MOBILE_URL}',          contrexx_raw2xhtml(\Env::get('init')->getUriBy('smallscreen', 1)),     $content);
+            $content = str_replace('{PRINT_URL}',           contrexx_raw2xhtml(\Env::get('init')->getUriBy('printview', 1)),       $content);
+            $content = str_replace('{PDF_URL}',             contrexx_raw2xhtml(\Env::get('init')->getUriBy('pdfview', 1)),         $content);
+            $content = str_replace('{APP_URL}',             contrexx_raw2xhtml(\Env::get('init')->getUriBy('appview', 1)),         $content);
+            $content = str_replace('{LOGOUT_URL}',          contrexx_raw2xhtml(\Env::get('init')->getUriBy('section', 'logout')),  $content);
+            $content = str_replace('{CONTACT_EMAIL}',       isset($_CONFIG['contactFormEmail']) ? contrexx_raw2xhtml($_CONFIG['contactFormEmail']) : '', $content);
+            $content = str_replace('{CONTACT_COMPANY}',     isset($_CONFIG['contactCompany'])   ? contrexx_raw2xhtml($_CONFIG['contactCompany'])   : '', $content);
+            $content = str_replace('{CONTACT_ADDRESS}',     isset($_CONFIG['contactAddress'])   ? contrexx_raw2xhtml($_CONFIG['contactAddress'])   : '', $content);
+            $content = str_replace('{CONTACT_ZIP}',         isset($_CONFIG['contactZip'])       ? contrexx_raw2xhtml($_CONFIG['contactZip'])       : '', $content);
+            $content = str_replace('{CONTACT_PLACE}',       isset($_CONFIG['contactPlace'])     ? contrexx_raw2xhtml($_CONFIG['contactPlace'])     : '', $content);
+            $content = str_replace('{CONTACT_COUNTRY}',     isset($_CONFIG['contactCountry'])   ? contrexx_raw2xhtml($_CONFIG['contactCountry'])   : '', $content);
+            $content = str_replace('{CONTACT_PHONE}',       isset($_CONFIG['contactPhone'])     ? contrexx_raw2xhtml($_CONFIG['contactPhone'])     : '', $content);
+            $content = str_replace('{CONTACT_FAX}',         isset($_CONFIG['contactFax'])       ? contrexx_raw2xhtml($_CONFIG['contactFax'])       : '', $content);
+            $content = str_replace('{CONTACT_NAME}',        isset($_CONFIG['coreAdminName'])    ? contrexx_raw2xhtml($_CONFIG['coreAdminName'])    : '', $content);
+            $content = str_replace('{GOOGLE_MAPS_API_KEY}', isset($_CONFIG['googleMapsAPIKey']) ? contrexx_raw2xhtml($_CONFIG['googleMapsAPIKey']) : '', $content);
         }
 
         /**
@@ -1764,15 +1810,24 @@ namespace Cx\Core\Core\Controller {
                     $themeFolderName = $themeRepo->getDefaultTheme($themeType, $page->getLang())->getFoldername();
                 }
 
+                $cx = \Cx\Core\Core\Controller\Cx::instanciate();
                 // load custom application template from page's theme
-                $themePath = \Env::get('cx')->getWebsiteThemesPath() .'/'.$themeFolderName.'/'.$moduleFolderName.'/'.$component.'/Template/Frontend/'.$customAppTemplate;
-                if (file_exists($themePath)) {
+                $themePath = $cx->getClassLoader()->getFilePath($cx->getWebsiteThemesPath() .'/'.$themeFolderName.'/'.$moduleFolderName.'/'.$component.'/Template/Frontend/'.$customAppTemplate);
+                if ($themePath) {
                     return file_get_contents($themePath);
                 }
 
+                // load default application template from page's theme
+                if ($customAppTemplate != $cmd.'.html') {
+                    $themePath = $cx->getClassLoader()->getFilePath($cx->getWebsiteThemesPath() .'/'.$themeFolderName.'/'.$moduleFolderName.'/'.$component.'/Template/Frontend/'.$cmd.'.html');
+                    if ($themePath) {
+                        return file_get_contents($themePath);
+                    }
+                }
+
                 // load default application template from component
-                $modulePath = \Env::get('ClassLoader')->getFilePath(\Env::get('cx')->getCodeBaseDocumentRootPath() . '/'.$moduleFolderName.'/'.$component.'/View/Template/Frontend/'.$cmd.'.html');
-                if (file_exists($modulePath)) {
+                $modulePath = $cx->getClassLoader()->getFilePath($cx->getCodeBaseDocumentRootPath() . '/'.$moduleFolderName.'/'.$component.'/View/Template/Frontend/'.$cmd.'.html');
+                if ($modulePath) {
                     return file_get_contents($modulePath);
                 }
                 return;
@@ -1794,13 +1849,12 @@ namespace Cx\Core\Core\Controller {
          * @todo Remove usage of globals
          * @global array $_CONFIG
          * @global type $themesPages
-         * @global type $objCounter
          * @global type $objBanner
          * @global type $_CORELANG
          * @return type
          */
         protected function setPostContentLoadPlaceholders() {
-            global $_CONFIG, $themesPages, $objCounter, $objBanner, $_CORELANG;
+            global $_CONFIG, $themesPages, $objBanner, $_CORELANG;
 
             if ($this->mode == self::MODE_BACKEND) {
                 $formattedVersion = htmlentities(
@@ -1848,6 +1902,13 @@ namespace Cx\Core\Core\Controller {
                 return;
             }
 
+            $objCounter              = null;
+            $componentRepo           = $this->getDb()->getEntityManager()->getRepository('Cx\Core\Core\Model\Entity\SystemComponent');
+            $statsComponentContoller = $componentRepo->findOneBy(array('name' => 'Stats'));
+            if ($statsComponentContoller) {
+                $objCounter = $statsComponentContoller->getCounterInstance();
+            }
+
             // set global template variables
             $boolShop = \Cx\Modules\Shop\Controller\Shop::isInitialized();
             $objNavbar = new \Navigation($this->resolvedPage->getId(), $this->resolvedPage);
@@ -1868,14 +1929,15 @@ namespace Cx\Core\Core\Controller {
                 'CONTENT_TITLE'                  => $this->resolvedPage->getContentTitle(),
                 'CONTENT_TEXT'                   => $this->resolvedPage->getContent(),
                 'CSS_NAME'                       => contrexx_raw2xhtml($this->resolvedPage->getCssName()),
-                'STANDARD_URL'                   => \Env::get('init')->getUriBy('smallscreen', 0),
-                'MOBILE_URL'                     => \Env::get('init')->getUriBy('smallscreen', 1),
-                'PRINT_URL'                      => \Env::get('init')->getUriBy('printview', 1),
-                'PDF_URL'                        => \Env::get('init')->getUriBy('pdfview', 1),
-                'APP_URL'                        => \Env::get('init')->getUriBy('appview', 1),
-                'LOGOUT_URL'                     => \Env::get('init')->getUriBy('section', 'logout'),
+                'STANDARD_URL'                   => contrexx_raw2xhtml(\Env::get('init')->getUriBy('smallscreen', 0)),
+                'MOBILE_URL'                     => contrexx_raw2xhtml(\Env::get('init')->getUriBy('smallscreen', 1)),
+                'PRINT_URL'                      => contrexx_raw2xhtml(\Env::get('init')->getUriBy('printview', 1)),
+                'PDF_URL'                        => contrexx_raw2xhtml(\Env::get('init')->getUriBy('pdfview', 1)),
+                'APP_URL'                        => contrexx_raw2xhtml(\Env::get('init')->getUriBy('appview', 1)),
+                'LOGOUT_URL'                     => contrexx_raw2xhtml(\Env::get('init')->getUriBy('section', 'logout')),
                 'PAGE_URL'                       => htmlspecialchars(\Env::get('init')->getPageUri()),
-                'CURRENT_URL'                    => \Env::get('init')->getCurrentPageUri(),
+                'PAGE_URL_ENCODED'               => urlencode(\Env::get('init')->getPageUri()->toString()),
+                'CURRENT_URL'                    => contrexx_raw2xhtml(\Env::get('init')->getCurrentPageUri()),
                 'DATE'                           => showFormattedDate(),
                 'TIME'                           => date('H:i', time()),
                 'NAVTREE'                        => $objNavbar->getTrail(),
@@ -1885,9 +1947,9 @@ namespace Cx\Core\Core\Controller {
                 'NAVBAR_FILE'                    => $objNavbar->getNavigation($themesPages['navbar'], $this->license, $boolShop),
                 'NAVBAR2_FILE'                   => $objNavbar->getNavigation($themesPages['navbar2'], $this->license, $boolShop),
                 'NAVBAR3_FILE'                   => $objNavbar->getNavigation($themesPages['navbar3'], $this->license, $boolShop),
-                'ONLINE_USERS'                   => $objCounter->getOnlineUsers(),
-                'VISITOR_NUMBER'                 => $objCounter->getVisitorNumber(),
-                'COUNTER'                        => $objCounter->getCounterTag(),
+                'ONLINE_USERS'                   => $objCounter ? $objCounter->getOnlineUsers() : '',
+                'VISITOR_NUMBER'                 => $objCounter ? $objCounter->getVisitorNumber() : '',
+                'COUNTER'                        => $objCounter ? $objCounter->getCounterTag() : '',
                 'BANNER'                         => isset($objBanner) ? $objBanner->getBannerJS() : '',
                 'VERSION'                        => contrexx_raw2xhtml($_CONFIG['coreCmsName']),
                 'LANGUAGE_NAVBAR'                => $objNavbar->getFrontendLangNavigation($this->resolvedPage, $this->request->getUrl()),
@@ -1896,7 +1958,7 @@ namespace Cx\Core\Core\Controller {
                 'RANDOM'                         => md5(microtime()),
                 'TXT_SEARCH'                     => $_CORELANG['TXT_SEARCH'],
                 'MODULE_INDEX'                   => MODULE_INDEX,
-                'LOGIN_URL'                      => '<a href="' . \Env::get('init')->getUriBy('section', 'Login') . '" class="start-frontend-editing">' . $_CORELANG['TXT_FRONTEND_EDITING_LOGIN'] . '</a>',
+                'LOGIN_URL'                      => '<a href="' . contrexx_raw2xhtml(\Env::get('init')->getUriBy('section', 'Login')) . '" class="start-frontend-editing">' . $_CORELANG['TXT_FRONTEND_EDITING_LOGIN'] . '</a>',
                 'TXT_CORE_LAST_MODIFIED_PAGE'    => $_CORELANG['TXT_CORE_LAST_MODIFIED_PAGE'],
                 'LAST_MODIFIED_PAGE'             => date(ASCMS_DATE_FORMAT_DATE, $this->resolvedPage->getUpdatedAt()->getTimestamp()),
                 'CONTACT_EMAIL'                  => isset($_CONFIG['contactFormEmail']) ? contrexx_raw2xhtml($_CONFIG['contactFormEmail']) : '',
@@ -1908,6 +1970,7 @@ namespace Cx\Core\Core\Controller {
                 'CONTACT_COUNTRY'                => isset($_CONFIG['contactCountry'])   ? contrexx_raw2xhtml($_CONFIG['contactCountry'])   : '',
                 'CONTACT_PHONE'                  => isset($_CONFIG['contactPhone'])     ? contrexx_raw2xhtml($_CONFIG['contactPhone'])     : '',
                 'CONTACT_FAX'                    => isset($_CONFIG['contactFax'])       ? contrexx_raw2xhtml($_CONFIG['contactFax'])       : '',
+                'GOOGLE_MAPS_API_KEY'            => isset($_CONFIG['googleMapsAPIKey']) ? contrexx_raw2xhtml($_CONFIG['googleMapsAPIKey']) : '',
                 'FACEBOOK_LIKE_IFRAME'           => '<div id="fb-root"></div>
                                                     <script type="text/javascript">
                                                         (function(d, s, id) {
@@ -1918,8 +1981,8 @@ namespace Cx\Core\Core\Controller {
                                                             fjs.parentNode.insertBefore(js, fjs);
                                                         }(document, \'script\', \'facebook-jssdk\'));
                                                     </script>
-                                                    <div class="fb-like" data-href="'.ASCMS_PROTOCOL.'://'.$_CONFIG['domainUrl'].\Env::get('init')->getCurrentPageUri().'" data-send="false" data-layout="button_count" data-show-faces="false" data-font="segoe ui"></div>',
-                'GOOGLE_PLUSONE'                 => '<div class="g-plusone" data-href="'.ASCMS_PROTOCOL.'://'.$_CONFIG['domainUrl'].\Env::get('init')->getCurrentPageUri().'"></div>
+                                                    <div class="fb-like" data-href="'.ASCMS_PROTOCOL.'://'.$_CONFIG['domainUrl'].contrexx_raw2xhtml(\Env::get('init')->getCurrentPageUri()).'" data-send="false" data-layout="button_count" data-show-faces="false" data-font="segoe ui"></div>',
+                'GOOGLE_PLUSONE'                 => '<div class="g-plusone" data-href="'.ASCMS_PROTOCOL.'://'.$_CONFIG['domainUrl'].contrexx_raw2xhtml(\Env::get('init')->getCurrentPageUri()).'"></div>
                                                     <script type="text/javascript">
                                                         window.___gcfg = {lang: \''.\FWLanguage::getLanguageCodeById(LANG_ID).'\'};
 
@@ -1930,7 +1993,7 @@ namespace Cx\Core\Core\Controller {
                                                         })();
                                                     </script>',
                 'TWITTER_SHARE'                  => '<a href="https://twitter.com/share" class="twitter-share-button"
-                                                    data-url="'.ASCMS_PROTOCOL.'://'.$_CONFIG['domainUrl'].\Env::get('init')->getCurrentPageUri().'" data-lang="'.\FWLanguage::getLanguageCodeById(LANG_ID).'">Twittern</a>
+                                                    data-url="'.ASCMS_PROTOCOL.'://'.$_CONFIG['domainUrl'].contrexx_raw2xhtml(\Env::get('init')->getCurrentPageUri()).'" data-lang="'.\FWLanguage::getLanguageCodeById(LANG_ID).'">Twittern</a>
                                                     <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?\'http\':\'https\';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+\'://platform.twitter.com/widgets.js\';fjs.parentNode.insertBefore(js,fjs);}}(document, \'script\', \'twitter-wjs\');</script>',
                 'XING_SHARE'                     => '<div data-type="XING/Share" data-counter="right" data-lang="'.\FWLanguage::getLanguageCodeById(LANG_ID).'"></div>
                                                     <script>
@@ -2056,8 +2119,10 @@ namespace Cx\Core\Core\Controller {
 
                 // replace links from before contrexx 3
                 $ls = new \LinkSanitizer(
-                    $this->codeBaseOffsetPath . \Env::get('virtualLanguageDirectory').'/',
-                    $endcode);
+                    $this,
+                    $this->getCodeBaseOffsetPath() . \Env::get('virtualLanguageDirectory') . '/',
+                    $endcode
+                );
                 $endcode = $ls->replace();
 
                 echo $endcode;
@@ -2074,7 +2139,7 @@ namespace Cx\Core\Core\Controller {
                             foreach ($backendLanguage as $language) {
                                 $languageUrl = \Env::get('init')->getUriBy('setLang', $language['id']);
                                 $this->template->setVariable(array(
-                                    'LANGUAGE_URL' => $languageUrl,
+                                    'LANGUAGE_URL' => contrexx_raw2xhtml($languageUrl),
                                     'LANGUAGE_NAME' => $language['name'],
                                     'LANGUAGE_CSS' => \Env::get('init')->getBackendLangId() == $language['id'] ? 'active' : '',
                                 ));
@@ -2166,8 +2231,10 @@ namespace Cx\Core\Core\Controller {
 
                 // replace links from before contrexx 3
                 $ls = new \LinkSanitizer(
-                    ASCMS_PATH_OFFSET.ASCMS_BACKEND_PATH.'/',
-                    $endcode);
+                    $this,
+                    $this->getCodeBaseOffsetPath() . $this->getBackendFolderName() . '/',
+                    $endcode
+                );
                 $endcode = $ls->replace();
 
                 echo $endcode;
@@ -2560,7 +2627,8 @@ namespace Cx\Core\Core\Controller {
             $this->websiteTempWebPath           = $this->websiteOffsetPath       . self::FOLDER_NAME_TEMP;
             $this->websiteThemesPath            = $this->websiteDocumentRootPath . self::FOLDER_NAME_THEMES;
             $this->websiteThemesWebPath         = $this->websiteOffsetPath       . self::FOLDER_NAME_THEMES;
-            $this->websiteFeedPath              = $this->websiteDocumentRootPath . '/feed';
+            $this->websiteFeedPath              = $this->websiteDocumentRootPath . self::FOLDER_NAME_FEED;
+            $this->websiteFeedWebPath           = $this->websiteOffsetPath       . self::FOLDER_NAME_FEED;
 
             $this->websiteImagesPath            = $this->websiteDocumentRootPath . self::FOLDER_NAME_IMAGES;
             $this->websiteImagesWebPath         = $this->websiteOffsetPath       . self::FOLDER_NAME_IMAGES;
@@ -2729,6 +2797,16 @@ namespace Cx\Core\Core\Controller {
          */
         public function getWebsiteFeedPath() {
             return $this->websiteFeedPath;
+        }
+
+         /**
+         * Return the offset path to the feed storage location (/feed)
+         * of the associated Data repository of the website.
+         * Formerly known as ASCMS_FEED_WEB_PATH
+         * @return string
+         */
+        public function getWebsiteFeedWebPath() {
+            return $this->websiteFeedWebPath;
         }
 
         /**

@@ -55,12 +55,13 @@ define('DBG_LOG_FILE',          1<<9);
 define('DBG_LOG_FIREPHP',       1<<10);
 define('DBG_LOG_MEMORY',        1<<11);
 define('DBG_LOG',               1<<12);
+define('DBG_PROFILE',           1<<13);
 // Full debugging (quite pointless really)
 define('DBG_ALL',
       DBG_PHP
     | DBG_DB | DBG_DB_TRACE | DBG_DB_ERROR | DBG_DB_CHANGE
     | DBG_LOG_FILE | DBG_LOG_FIREPHP | DBG_LOG_MEMORY
-    | DBG_LOG);
+    | DBG_LOG | DBG_PROFILE);
 // Common debugging modes (add more as required)
 define('DBG_ERROR_FIREPHP',
       DBG_PHP | DBG_DB_ERROR | DBG_LOG_FIREPHP);
@@ -98,6 +99,7 @@ class DBG
     private static $mode         = 0;
     private static $sql_query_cache = null;
     private static $memory_logs = array();
+    protected static $enable_profiling = 0;
     protected static $logPrefix = '';
 
 
@@ -253,6 +255,13 @@ class DBG
         } else {
             self::disable_all();
         }
+
+        // set profiling mode
+        if (self::$mode & DBG_PROFILE) {
+            self::enable_profiling();
+        } else {
+            self::disable_profiling();
+        }
     }
 
 
@@ -341,6 +350,30 @@ class DBG
 
 
     /**
+     * Enable profiling
+     */
+    protected static function enable_profiling()
+    {
+        if (self::$enable_profiling) return;
+
+        self::$enable_profiling = true;
+        self::enable_time();
+    }
+
+
+    /**
+     * Disables profiling
+     */
+    protected static function disable_profiling()
+    {
+        if (!self::$enable_profiling) return;
+
+        self::disable_time();
+        self::$enable_profiling = false;
+    }
+
+
+    /**
      * Enables logging to memory
      *
      * Disables logging to a file and firephp in turn.
@@ -394,7 +427,7 @@ class DBG
             $f = self::_cleanfile($callers[0]['file']);
             $l = $callers[0]['line'];
             $d = date('H:i:s');
-            self::_log("TIME AT: $f:$l $d (diff: $diff_last, startdiff: $diff_start)".(!empty($comment) ? ' -- '.$comment : ''), 'info');
+            self::_log("TIME AT: $f:$l $d (diff: $diff_last, startdiff: $diff_start)".(!empty($comment) ? ' -- '.$comment : ''), 'info', null, false);
         }
     }
 
@@ -605,7 +638,7 @@ class DBG
             $callers = debug_backtrace();
             $f = self::_cleanfile($callers[$level]['file']);
             $l = $callers[$level]['line'];
-            self::_log("TRACE:  $f : $l");
+            self::_log("TRACE:  $f : $l", 'log', null, false);
         }
     }
 
@@ -680,17 +713,17 @@ class DBG
             // remove call to this method (DBG::stack())
             array_shift($callers);
 
-            self::_log("TRACE:  === STACKTRACE BEGIN ===");
+            self::_log("TRACE:  === STACKTRACE BEGIN ===", 'log', null, false);
             $err = error_reporting(E_ALL ^ E_NOTICE);
             foreach ($callers as $c) {
                 $file  = (isset($c['file']) ? self::_cleanfile($c['file']) : 'n/a');
                 $line  = (isset ($c['line']) ? $c['line'] : 'n/a');
                 $class = isset($c['class']) ? $c['class'] : null;
                 $func  = $c['function'];
-                self::_log("        $file : $line (".(empty($class) ? $func : "$class::$func").")");
+                self::_log("        $file : $line (".(empty($class) ? $func : "$class::$func").")", 'log', null, false);
             }
             error_reporting($err);
-            self::_log("        === STACKTRACE END ====");
+            self::_log("        === STACKTRACE END ====", 'log', null, false);
             if (!self::$log_file && !self::$log_firephp && !self::$log_memory) echo '</pre>';
         }
     }
@@ -783,9 +816,13 @@ class DBG
     }
 
 
-    private static function _log($text, $firephp_action='log', $additional_args=null)
+    private static function _log($text, $firephp_action='log', $additional_args=null, $profile=true)
     {
         if (!self::isLogWorthy($text)) return;
+
+        if ($profile && self::$enable_profiling) {
+            self::time();
+        }
 
         if (self::$logPrefix !== '') {
             $text = '(' . self::$logPrefix . ') ' . $text;

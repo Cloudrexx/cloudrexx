@@ -57,11 +57,13 @@ class KnowledgeArticles
      * @var string
      */
     private $basequery = "";
+    
+    protected $isAllLangsActive = false;
 
     /**
      * Save the base query
      */
-    public function __construct()
+    public function __construct($showAllLangs = false)
     {
         $this->basequery = "SELECT  articles.id as id,
                             articles.active as active,
@@ -77,6 +79,8 @@ class KnowledgeArticles
                     FROM `".DBPREFIX."module_knowledge_articles` AS articles
                     INNER JOIN `".DBPREFIX."module_knowledge_article_content`
                     AS content ON articles.id = content.article";
+        
+        $this->isAllLangsActive = $showAllLangs;
     }
 
     /**
@@ -110,18 +114,29 @@ class KnowledgeArticles
             $query = $alt_query;
         } else {
             $query = $this->basequery;
+            if ($this->isAllLangsActive) {
+                $query .= " WHERE content.answer!='' AND content.question!=''";
+            }
             // if only one article should be read add a where to the query
             if ($id > 0) {
                 $id = intval($id);
-                $query .= " WHERE articles.id = ".$id;
+                if ($this->isAllLangsActive) {
+                    $query .= " AND articles.id = ".$id;
+                } else {
+                    $query .= " WHERE articles.id = ".$id;
+                }
             }
 
             if ($lang > 0) {
                 // only get one language
-                if ($id > 0) {
+                if ($this->isAllLangsActive) {
                     $query .= " AND lang = ".$lang;
                 } else {
-                    $query .= " WHERE lang = ".$lang;
+                    if ($id > 0) {
+                        $query .= " AND lang = ".$lang;
+                    } else {
+                        $query .= " WHERE lang = ".$lang;
+                    }
                 }
             }
 
@@ -497,7 +512,13 @@ class KnowledgeArticles
         $lang = intval($lang);
 
         $query = $this->basequery;
-        $query .= " WHERE lang = ".$lang." ORDER BY hits DESC LIMIT ".$amount;
+        if ($this->isAllLangsActive) {
+            $query .= " WHERE content.answer!='' AND content.question!=''".
+                ($lang ? " AND lang=".intval($lang) : '').
+                " ORDER BY hits DESC LIMIT ".$amount;
+        } else {
+            $query .= " WHERE lang = ".$lang." ORDER BY hits DESC LIMIT ".$amount;
+        }
 
         $articles = $this->readArticles(true, 0, 0, $query);
         return $articles;
@@ -534,8 +555,14 @@ class KnowledgeArticles
                         ) AS articles
                     INNER JOIN  `".DBPREFIX."module_knowledge_article_content`
                                 AS content ON articles.id = content.article
-                    WHERE lang = ".$lang."
-                    ORDER BY rating DESC
+                    WHERE ";
+        if ($this->isAllLangsActive) {
+            $query .= "content.answer!='' AND content.question!=''".
+            ($lang ? " AND lang=".intval($lang) : '');
+        } else {
+            $query .= " lang = ".$lang;
+        }
+        $query .= " ORDER BY rating DESC
                     LIMIT ".$amount;
         $articles = $this->readArticles(true, 0, 0, $query);
         return $articles;

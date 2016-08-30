@@ -45,7 +45,7 @@ namespace Cx\Modules\Calendar\Controller;
  * @copyright  CLOUDREXX CMS - CLOUDREXX AG
  * @version    1.00
  */
-class CalendarHostManager extends \Cx\Modules\Calendar\Controller\CalendarLibrary 
+class CalendarHostManager extends CalendarLibrary 
 {
     /**
      * Host list

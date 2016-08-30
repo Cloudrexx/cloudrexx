@@ -228,7 +228,6 @@ EOF;
         global $_ARRAYLANG, $_CORELANG, $objDatabase, $_LANGID, $objInit;
 
         $arrSelect = array();
-        $arrFrom = array();
         $arrWhere = array();
         $arrOrder = array();
         $arrJoins = array();
@@ -269,18 +268,16 @@ EOF;
             }
         }
 
-        $arrFinalFrom = array();
+        $arrJoins[] = DBPREFIX.'module_'.$this->moduleTablePrefix.'_entries AS entry';
+        $arrJoins[] = 'INNER JOIN '.DBPREFIX.'module_'.$this->moduleTablePrefix.'_rel_entry_inputfields AS rel_inputfield ON rel_inputfield.`entry_id` = `entry`.`id`';
 
         //build level search query
         if (!empty($arrData['lid'])) {
             array_push($this->arrSearchLevels, intval($arrData['lid']));
             $this->getSearchLevelIds(intval($arrData['lid']));
 
-            $arrWhere[]         = '(rel_level.level_id IN ('.join(',', $this->arrSearchLevels).') AND rel_level.entry_id=rel_inputfield.entry_id)';
-            $levelFilterWhere   = '(rel_level.level_id IN ('.join(',', $this->arrSearchLevels).') AND rel_level.entry_id=rel_inputfield_final.entry_id)';
-            $levelFrom          = DBPREFIX.'module_'.$this->moduleTablePrefix.'_rel_entry_levels AS rel_level';
-            $arrFrom[]          = $levelFrom;
-            $arrFinalFrom[]     = $levelFrom;
+            $arrWhere[] = 'rel_level.level_id IN ('.join(',', $this->arrSearchLevels).')';
+            $arrJoins[] = 'INNER JOIN '.DBPREFIX.'module_'.$this->moduleTablePrefix.'_rel_entry_levels AS rel_level ON rel_level.entry_id=entry.id';
         }
 
         //build category search query
@@ -288,38 +285,27 @@ EOF;
             array_push($this->arrSearchCategories, intval($arrData['cid']));
             $this->getSearchCategoryIds(intval($arrData['cid']));
 
-            $arrWhere[]             = '(rel_category.category_id IN ('.join(',', $this->arrSearchCategories).') AND rel_category.entry_id=rel_inputfield.entry_id)';
-            $categoryFilterWhere    = '(rel_category.category_id IN ('.join(',', $this->arrSearchCategories).') AND rel_category.entry_id=rel_inputfield_final.entry_id)';
-            $categoryFrom           = DBPREFIX.'module_'.$this->moduleTablePrefix.'_rel_entry_categories AS rel_category';
-            $arrFrom[]              = $categoryFrom;
-            $arrFinalFrom[]         = $categoryFrom;
+            $arrWhere[] = 'rel_category.category_id IN ('.join(',', $this->arrSearchCategories).')';
+            $arrJoins[] = 'INNER JOIN '.DBPREFIX.'module_'.$this->moduleTablePrefix.'_rel_entry_categories AS rel_category ON rel_category.entry_id=entry.id';
         }
 
-        $arrFrom[]      = DBPREFIX.'module_'.$this->moduleNameLC.'_entries AS entry';
-        $arrWhere[]     = '(entry.`id` = rel_inputfield.`entry_id` AND entry.`confirmed` = 1 AND entry.`active` = 1)';
+        $arrSelect[]    = 'entry.id AS `entry_id`';
 
         if (!empty($arrData['term'])) {
             $strTerm        = contrexx_addslashes(trim($arrData['term']));
-
-            $arrSelect[]    = 'rel_inputfield.`entry_id` AS `entry_id`';
             $arrSelect[]    = 'MATCH (rel_inputfield.`value`) AGAINST ("%'.$strTerm.'%")  AS score';
-            
-            $arrFrom[]      = DBPREFIX.'module_'.$this->moduleNameLC.'_rel_entry_inputfields AS rel_inputfield';
-            $arrFrom[]      = DBPREFIX.'module_'.$this->moduleNameLC.'_inputfields AS inputfield';
-
+            $arrJoins[]     = 'INNER JOIN '.DBPREFIX.'module_'.$this->moduleTablePrefix.'_inputfields AS inputfield ON rel_inputfield.`field_id` = inputfield.`id`';
             $strReplace     = '%" AND rel_inputfield.`value` LIKE "%';
             $strReplace     = preg_replace('/\s+/', $strReplace, $strTerm);
-            
-            $arrWhere[]     = 'rel_inputfield.`entry_id` != 0';
-            $arrWhere[]     = '(rel_inputfield.`value` LIKE "%'.$strReplace.'%" AND (rel_inputfield.`field_id` = inputfield.`id` AND inputfield.`type` NOT IN (7,8,15,16,21)))';
-            
-            $arrOrder[]     = 'score DESC, rel_inputfield.`value` ASC';
-        } else {
-            $arrSelect[]    = 'rel_inputfield.`entry_id` AS `entry_id`';
-            $arrFrom[]      = DBPREFIX.'module_'.$this->moduleTablePrefix.'_rel_entry_inputfields AS rel_inputfield';
-            $arrWhere[]     = 'rel_inputfield.`entry_id` != 0';
-            $arrOrder[]     = 'rel_inputfield.`value` ASC';
+            $arrWhere[]     = 'rel_inputfield.`value` LIKE "%'.$strReplace.'%"';
+            $arrWhere[]     = 'inputfield.`type` NOT IN (7,8,15,16,21)';
+            $arrOrder[]     = 'score DESC';
         }
+
+        if ($this->arrSettings['settingsIndividualEntryOrder']) {
+            $arrOrder[] = 'entry.`order` ASC';
+        }
+        $arrOrder[]     = 'rel_inputfield.`value` ASC';
 
         //search levels and categorie names
         if (empty($arrData['cid']) && $arrData['type'] == 'exp') {
@@ -338,119 +324,88 @@ EOF;
         if($objInit->mode == 'frontend') {
             $intToday = time();
             $arrWhere[] = "(`duration_type` = 1 OR (`duration_type` = 2 AND (`duration_start` < '$intToday' AND `duration_end` > '$intToday')))";
+            $arrWhere[] = 'entry.`confirmed` = 1';
+            $arrWhere[] = 'entry.`active` = 1';
         }
 
-        if (!empty($arrSelect) && !empty($arrFrom) && !empty($arrWhere) && !empty($arrOrder)) {
-            $query = '
-                SELECT
-                    '.join(',', $arrSelect).'
-                FROM
-                    '.join(',', $arrFrom).'
-                    '.join(',', $arrJoins).'
-                WHERE
-                    '.join(' AND ', $arrWhere).'
-                GROUP BY
-                    rel_inputfield.`entry_id`
-                ORDER BY
-                    '.join(',', $arrOrder).'
-            ';
+        if (empty($arrSelect) || empty($arrWhere) || empty($arrOrder)) {
+            return;
+        }
 
-            if ($arrData['type'] == 'exp') {
-                //build expanded search query
-                $arrExternals = array('__cap', 'section', 'type', 'cmd', 'term', 'lid', 'cid', 'search', 'pos','scid','langId', 'csrf');
-                foreach ($arrData as $intInputfieldId => $strExpTerm) {
-                    if (!in_array($intInputfieldId, $arrExternals) && $strExpTerm != null) {
-                        $objInputfields = new MediaDirectoryInputfield(null, true, null, $this->moduleName);
-                        $intInputfieldType = $objInputfields->arrInputfields[$intInputfieldId]['type'];
-                        $strExpTerm = is_array($strExpTerm) ? contrexx_input2db(array_map('trim', $strExpTerm)) : contrexx_addslashes(trim($strExpTerm));
-                        $strTableName = 'rel_inputfield_'.intval($intInputfieldId);
-                        $arrExpJoin[]  = 'INNER JOIN '.DBPREFIX.'module_'.$this->moduleTablePrefix.'_rel_entry_inputfields AS '.$strTableName.' ON rel_inputfield_final.`entry_id` = '.$strTableName.'.`entry_id`';
-                        
-                        if ($intInputfieldType == '11') {
-                            switch ($this->arrSettings['settingsClassificationSearch']) {
-                                case 1:
-                                    $strSearchOperator = '>=';
-                                    break;
-                                case 2:
-                                    $strSearchOperator = '<=';
-                                    break;
-                                case 3:
-                                    $strSearchOperator = '=';
-                                    break;
-                            }
+        $order = join(',', $arrOrder);
 
-                            $arrExpWhere[] = '('.$strTableName.'.`field_id` = '.intval($intInputfieldId).' AND '.$strTableName.'.`value` '.$strSearchOperator.' "'.$strExpTerm.'")';
-                        } else if ($intInputfieldType == '3' || $intInputfieldType == '25') {
-                            $arrExpWhere[] = '('.$strTableName.'.`field_id` = '.$intInputfieldId.' AND '.$strTableName.'.`value` = "'.$strExpTerm.'")';
-                        } elseif ($intInputfieldType == '5') {
-                            $checkboxSearch = array();
-                            foreach ($strExpTerm as $value) {
-                                $checkboxSearch[] = ' FIND_IN_SET("'. $value .'",' . $strTableName . '.`value`) <> 0';
-                            }
-                            $arrExpWhere[] = '('.$strTableName.'.`field_id` = '.intval($intInputfieldId).' AND ('. implode(' AND ', $checkboxSearch) .'))';                        
-                        } else {
-                            $arrExpWhere[] = '('.$strTableName.'.`field_id` = '.intval($intInputfieldId).' AND '.$strTableName.'.`value` LIKE "%'.$strExpTerm.'%")';
-                        }
-                    }
+        if ($arrData['type'] == 'exp') {
+            //build extended search query
+            $objInputfields = null;
+            $arrExternals = array('__cap', 'section', 'type', 'cmd', 'term', 'lid', 'cid', 'search', 'pos','scid','langId', 'csrf');
+            foreach ($arrData as $intInputfieldId => $strExpTerm) {
+                if (in_array($intInputfieldId, $arrExternals) || empty($strExpTerm)) {
+                    continue;
                 }
 
-                if (!empty($arrExpJoin) && !empty($arrExpWhere)) {
-                    if (!empty($levelFilterWhere)) {
-                        $arrExpWhere[] = $levelFilterWhere;
-                    }
-                    if (!empty($categoryFilterWhere)) {
-                        $arrExpWhere[] = $categoryFilterWhere;
-                    }
-                    
-                    $finalFrom = !empty($arrFinalFrom) ? join(',', $arrFinalFrom).',' : '';
-                    
-                    $expJoin  = join(' ', $arrExpJoin);
-                    $expWhere = join(' AND ', $arrExpWhere);
-
-                    if (!empty($arrData['term'])) {  
-                        $query = '
-                            SELECT
-                                rel_inputfield_final.`entry_id` AS `entry_id`
-                            FROM
-                                '.$finalFrom.'
-                                '.DBPREFIX.'module_'.$this->moduleTablePrefix.'_rel_entry_inputfields AS rel_inputfield_final
-                            
-                            INNER JOIN
-                                 ('.$query.') AS rel_inputfield
-                            ON rel_inputfield_final.`entry_id` = rel_inputfield.`entry_id`
-                            
-                            '.$expJoin.'
-                            
-                            WHERE
-                                '.$expWhere.'
-                        ';
-                    } else {
-                        $query = '
-                            SELECT
-                                rel_inputfield_final.`entry_id` AS `entry_id`
-                            FROM
-                                '.$finalFrom.'
-                                '.DBPREFIX.'module_'.$this->moduleTablePrefix.'_rel_entry_inputfields AS rel_inputfield_final
-                            
-                            '.$expJoin.'
-                            
-                            WHERE
-                                '.$expWhere.'
-                        ';
-                   }
-                } 
-            }
-            
-            $objRsSearchEntries = $objDatabase->Execute($query);
-
-            if ($objRsSearchEntries !== false) {
-                while (!$objRsSearchEntries->EOF) {
-                    if (!in_array(intval($objRsSearchEntries->fields['entry_id']), $this->arrFoundIds)) {
-                        $this->arrFoundIds[] = intval($objRsSearchEntries->fields['entry_id']);
-                    }
-                    $objRsSearchEntries->MoveNext();
+                if (!$objInputfields) {
+                    $objInputfields = new MediaDirectoryInputfield(null, true, null, $this->moduleName);
                 }
+
+                if (!isset($objInputfields->arrInputfields[$intInputfieldId])) {
+                    continue;
+                }
+
+                $intInputfieldType = $objInputfields->arrInputfields[$intInputfieldId]['type'];
+                $strExpTerm = is_array($strExpTerm) ? contrexx_input2db(array_map('trim', $strExpTerm)) : contrexx_input2db(trim($strExpTerm));
+                $strTableName = 'rel_inputfield_'.intval($intInputfieldId);
+                $arrJoins[]  = 'INNER JOIN '.DBPREFIX.'module_'.$this->moduleTablePrefix.'_rel_entry_inputfields AS '.$strTableName.' ON '.$strTableName.'.`entry_id` = entry.id';
+                
+                if ($intInputfieldType == '11') { // 11 = classification
+                    switch ($this->arrSettings['settingsClassificationSearch']) {
+                        case 1:
+                            $strSearchOperator = '>=';
+                            break;
+                        case 2:
+                            $strSearchOperator = '<=';
+                            break;
+                        case 3:
+                            $strSearchOperator = '=';
+                            break;
+                    }
+
+                    $whereExp = $strTableName.'.`value` '.$strSearchOperator.' "'.$strExpTerm.'"';
+                } elseif ($intInputfieldType == '3' || $intInputfieldType == '25') { // 3 = dropdown, 25 = country
+                    $whereExp = $strTableName.'.`value` = "'.$strExpTerm.'"';
+                } elseif ($intInputfieldType == '5') { // 5 = checkbox
+                    $checkboxSearch = array();
+                    foreach ($strExpTerm as $value) {
+                        $checkboxSearch[] = ' FIND_IN_SET("'. $value .'",' . $strTableName . '.`value`) <> 0';
+                    }
+                    $whereExp = '('. implode(' AND ', $checkboxSearch) .')';
+                } else {
+                    $whereExp = $strTableName.'.`value` LIKE "%'.$strExpTerm.'%"';
+                }
+                $arrWhere[] = '('.$strTableName.'.`field_id` = '.intval($intInputfieldId).' AND '.$whereExp.')';
             }
+        }
+
+        $query = '
+            SELECT
+                '.join(",\n", $arrSelect).'
+            FROM
+                '.join("\n", $arrJoins).'
+            WHERE
+                '.join("\nAND ", $arrWhere).'
+            GROUP BY
+                entry.id
+            ORDER BY
+                '.$order.'
+        ';
+        
+        $objRsSearchEntries = $objDatabase->Execute($query);
+        if (!$objRsSearchEntries) {
+            return;
+        }
+
+        while (!$objRsSearchEntries->EOF) {
+            $this->arrFoundIds[] = $objRsSearchEntries->fields['entry_id'];
+            $objRsSearchEntries->MoveNext();
         }
     }
 

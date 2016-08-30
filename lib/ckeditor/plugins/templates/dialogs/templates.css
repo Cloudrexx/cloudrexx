@@ -36,6 +36,10 @@ For licensing, see LICENSE.md or http://ckeditor.com/license
 {
 	width: 100px;
 }
+.cke_tpl_preview .cke_tpl_preview_img img 
+{
+	width: inherit;
+}
 .cke_tpl_preview span
 {
 	white-space: normal;

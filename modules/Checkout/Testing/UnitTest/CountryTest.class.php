@@ -25,4 +25,35 @@
  * our trademarks remain entirely with us.
  */
 
-/** * CountryTest *  * @copyright   CLOUDREXX CMS - CLOUDREXX AG * @author      Cloudrexx Development Team <info@cloudrexx.com> * @author      SS4U <ss4u.comvation@gmail.com> * @version     1.0.0 * @package     cloudrexx * @subpackage  module_checkout */namespace Cx\Modules\Checkout\Testing\UnitTest;use Cx\Modules\Checkout\Controller\Countries;/** * CountryTest *  * @copyright   CLOUDREXX CMS - CLOUDREXX AG * @author      Cloudrexx Development Team <info@cloudrexx.com> * @author      SS4U <ss4u.comvation@gmail.com> * @version     1.0.0 * @package     cloudrexx * @subpackage  module_checkout */class CountryTest extends \Cx\Core\Test\Model\Entity\DoctrineTestCase {    public function testGetAll() {        $objCountries = new Countries(\Env::get('db'));        $this->assertNotEmpty($objCountries->getAll());    }}
+/**
+ * CountryTest
+ * 
+ * @copyright   CLOUDREXX CMS - CLOUDREXX AG
+ * @author      Cloudrexx Development Team <info@cloudrexx.com>
+ * @author      SS4U <ss4u.comvation@gmail.com>
+ * @version     1.0.0
+ * @package     cloudrexx
+ * @subpackage  module_checkout
+ */
+
+namespace Cx\Modules\Checkout\Testing\UnitTest;
+use Cx\Core\Country\Controller\Country;
+
+/**
+ * CountryTest
+ * 
+ * @copyright   CLOUDREXX CMS - CLOUDREXX AG
+ * @author      Cloudrexx Development Team <info@cloudrexx.com>
+ * @author      SS4U <ss4u.comvation@gmail.com>
+ * @version     1.0.0
+ * @package     cloudrexx
+ * @subpackage  module_checkout
+ */
+class CountryTest extends \Cx\Core\Test\Model\Entity\DoctrineTestCase {
+
+    public function testGetAll() {
+        $objCountries = Country::getNameArray();
+        $this->assertNotEmpty($objCountries);
+    }
+
+}

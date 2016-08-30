@@ -1,0 +1,34 @@
+Cx\Core_Modules\Sync\Model\Entity\Sync:
+  type: entity
+  table: core_module_sync
+  repositoryClass: Cx\Core_Modules\Sync\Model\Repository\SyncRepository
+  id: 
+    id:
+      type: integer
+      generator:
+        strategy: AUTO
+  fields:
+    toUri:
+      type: string
+      length: 255
+      column: to_uri
+    apiKey:
+      type: string
+      length: 32
+      column: api_key
+    active:
+      type: boolean
+  oneToMany: # inverse side
+    relations:
+      targetEntity: Cx\Core_Modules\Sync\Model\Entity\Relation
+      mappedBy: relatedSync
+    hostEntities:
+      targetEntity: Cx\Core_Modules\Sync\Model\Entity\HostEntity
+      mappedBy: sync
+  manyToOne: # owning side
+    dataAccess:
+      targetEntity: Cx\Core_Modules\DataAccess\Model\Entity\DataAccess
+      inversedBy: syncs
+      joinColumn:
+        name: data_access_id
+        referencedColumnName: id

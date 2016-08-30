@@ -35,26 +35,43 @@
 
             <div class="line big_space last" id="types">
                 <input type="hidden" name="page[type]" value="off" />
+                
                 <input type="radio" name="page[type]" value="content" id="type_content" class="radio" checked="checked" />
-
                 <label for="type_content">{TXT_CORE_CM_TYPE_CONTENT}</label>
                 <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_CORE_CM_TYPE_CONTENT_INFO}</span>
+                
                 <input type="radio" name="page[type]" value="redirect" id="type_redirect" class="radio" />
-
                 <label for="type_redirect">{TXT_CORE_CM_TYPE_REDIRECT}</label>
                 <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_CORE_CM_TYPE_REDIRECT_INFO}</span>
+                
+                <input type="radio" name="page[type]" value="symlink" id="type_symlink" class="radio" />
+                <label for="type_symlink">{TXT_CORE_CM_TYPE_SYMLINK}</label>
+                <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_CORE_CM_TYPE_SYMLINK_INFO}</span>
+                
                 <input type="radio" name="page[type]" value="application" id="type_application" class="radio" />
-
                 <label for="type_application">{TXT_CORE_CM_TYPE_APPLICATION}</label>
                 <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_CORE_CM_TYPE_APPLICATION_INFO}</span>
+                
                 <input type="radio" name="page[type]" value="fallback" id="type_fallback" class="radio hidable_nofallback" />
-
                 <label for="type_fallback" class="hidable_nofallback">{TXT_CORE_CM_TYPE_FALLBACK} <strong id="fallback"></strong></label>
                 <span class="icon-info tooltip-trigger hidable_nofallback"></span><span class="tooltip-message">{TXT_CORE_CM_TYPE_FALLBACK_INFO}</span>
             </div>
         </div>
         <div id="type_toggle" class="toggle {TYPE_TOGGLE_CLASS}"><div class="indicator"></div><label>{TXT_CORE_CM_TYPE}</label></div>
         <div id="type_container" class="container" style="{TYPE_DISPLAY_STYLE}">
+            <div class="container type_symlink type_hidable">
+                <div class="line small_space">
+                    <label for="page_target_button">{TXT_CORE_CM_TYPE_SYMLINK_TARGET}</label>
+                    <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_CORE_CM_TYPE_SYMLINK_INFO_ACTION}</span>
+                </div>
+                <div class="line big_space">
+                    <div id="page_target_text_wrapper_symlink" class="page_target_text_wrapper">
+                        <a id="page_target_text_symlink" class="page_target_text" href="#" target="_blank"></a>
+                    </div>
+                    <input type="hidden" id="page_target_backup_symlink" class="page_target_backup" />
+                    {CM_MEDIABROWSER_BUTTON}
+                </div>
+            </div>
             <div class="container type_redirect type_hidable">
                 <div class="line small_space">
                     <label for="page_target_button">{TXT_CORE_CM_TYPE_REDIRECT_TARGET}</label>
@@ -73,11 +90,11 @@
                         <a id="page_target_check" class="icon hide"></a>
                         <a id="page_target_cancel" class="icon hide"></a>
                     </div>
-                    <div id="page_target_text_wrapper">
-                        <a id="page_target_text" href="#" target="_blank"></a>
+                    <div id="page_target_text_wrapper_redirect" class="page_target_text_wrapper">
+                        <a id="page_target_text_redirect" class="page_target_text" href="#" target="_blank"></a>
                         <a id="page_target_edit" class="icon"></a>
                     </div>
-                    <input type="hidden" id="page_target_backup" />
+                    <input type="hidden" id="page_target_backup_redirect" class="page_target_backup" />
                     {CM_MEDIABROWSER_BUTTON}
                     {MEDIABROWSER_BUTTON_CKEDITOR}
                 </div>

@@ -30,7 +30,7 @@
 
                             <!-- Redirect all requests to non-existing files to Contrexx -->
                             <rule name="Capture all" stopProcessing="true">
-                                <match url="." ignoreCase="false" />
+                                <match url=".?" ignoreCase="false" />
                                 <conditions>
                                 <add input="{REQUEST_FILENAME}" matchType="IsFile" ignoreCase="false" negate="true" />
                                 </conditions>

@@ -61,13 +61,13 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      *     'message' => 'my log message',
      *     'data' => 'additional debugging data',
      * ));
-     * @param \Cx\Core\Core\Model\Entity\SystemComponent $systemComponent SystemComponent entity for this component
-     * @param \Cx\Core\Core\Controller\Cx $cx Current Cx class instance
      */
-    public function __construct(\Cx\Core\Core\Model\Entity\SystemComponent $systemComponent, \Cx\Core\Core\Controller\Cx $cx) {
-        parent::__construct($systemComponent, $cx);
-        $cx->getEvents()->addEvent(static::EVENT_NAME);
-        $cx->getEvents()->addEventListener(static::EVENT_NAME, $this);
+    public function registerEvents() {
+        $this->cx->getEvents()->addEvent(static::EVENT_NAME);
+    }
+    
+    public function registerEventListeners() {
+        $this->cx->getEvents()->addEventListener(static::EVENT_NAME, $this);
     }
     
     /**

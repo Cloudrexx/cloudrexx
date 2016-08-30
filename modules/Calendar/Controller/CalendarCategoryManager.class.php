@@ -44,7 +44,7 @@ namespace Cx\Modules\Calendar\Controller;
  * @package     cloudrexx
  * @subpackage  module_calendar
  */
-class CalendarCategoryManager extends \Cx\Modules\Calendar\Controller\CalendarLibrary
+class CalendarCategoryManager extends CalendarLibrary
 {
     /**
      * Category List
@@ -170,7 +170,7 @@ class CalendarCategoryManager extends \Cx\Modules\Calendar\Controller\CalendarLi
     function getCategoryDropdown($selectedId=null, $type) {
     	global $_ARRAYLANG;
     	
-        parent::getSettings();
+        $this->getSettings();
     	$arrOptions = array();
     	
     	foreach ($this->categoryList as $key => $objCategory) {
@@ -195,7 +195,7 @@ class CalendarCategoryManager extends \Cx\Modules\Calendar\Controller\CalendarLi
                 break;
     	}
     	
-    	$options .= parent::buildDropdownmenu($arrOptions, $selectedId);
+    	$options .= $this->buildDropdownmenu($arrOptions, $selectedId);
         
     	return $options;
     }

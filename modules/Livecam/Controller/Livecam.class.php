@@ -279,7 +279,7 @@ class Livecam extends LivecamLibrary
             'LIVECAM_IMAGE_TEXT'        => isset($_GET['file']) ? contrexx_strip_tags($_GET['file']) : 'Aktuelles Webcam Bild',
             'LIVECAM_IMAGE_SHADOWBOX'   => $this->camSettings['shadowboxActivate'] == 1 ? 'shadowboxgallery' : '',
             'LIVECAM_IMAGE_LINK'        => $imageLink,
-            'LIVECAM_IMAGE_SIZE'        => $this->camSettings['currentMaxSize'],
+            'LIVECAM_IMAGE_SIZE'        => $this->camSettings['maxImageWidth'],
         ));
     }
 

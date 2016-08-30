@@ -5,8 +5,103 @@
             updateContent(0, true);
             switchEditor();
         });
+        cx.jQuery( 'input[name=targeting_status]' ).change(function(){
+            toggleTargetingFilterBlock( cx.jQuery( this ).val() == '1' );
+        });
+        toggleTargetingFilterBlock( cx.jQuery('input[name=targeting_status]:checked').val() == '1' );
+        var cache = {},
+            selectedCountries = [],
+            availableCountries = [],
+            uiSelectedCountry = null;
+        cx.jQuery( '#selectedCoutries li' ).each(function( i ) {
+            selectedCountries.push( cx.jQuery( this ).data( 'id' ) );
+        });
+        cx.jQuery( '#selectedCoutries' ).tagit({
+            autocomplete: ({
+                source: function( request, response ) {
+                    var term = request.term;
+                    if ( term in cache ) {
+                      if ( !cache[ term ].length ) {
+                          cx.jQuery( 'ul.tagit li.tagit-new > input' ).addClass('error');
+                      }
+                      response( cache[ term ] );
+                      return;
+                    }
+                    cx.jQuery.getJSON( "index.php?cmd=JsonData&object=Block&act=getCountries", request, function( data, status, xhr ) {
+                        if ( data.status == 'success' ) {
+                            availableCountries = data.data.countries;
+                            cache[ term ] = availableCountries;
+                            if ( !availableCountries.length ) {
+                                cx.jQuery( 'ul.tagit li.tagit-new > input' ).addClass('error');
+                            }
+                            response( availableCountries );
+                        }
+                    });
+                },
+                select: function( event, ui ) {
+                    uiSelectedCountry = parseInt( ui.item.id );
+                    cx.jQuery( '#selectedCoutries' ).tagit( 'createTag', ui.item.value );
+                    return false;
+                }
+            }),
+            beforeTagAdded: function(event, ui) {
+                //Always return true during initialization
+                if ( ui.duringInitialization ) {
+                    // always add the first li, so set the data-id into the tag list
+                    var processLi = cx.jQuery( '#selectedCoutries li' ).eq(0);
+                    ui.tag.find( 'input.tagit-hidden-field' ).attr( 'data-id',  processLi.data( 'id' ) );
+                    return true;
+                }
+
+                if ( cx.jQuery.inArray( uiSelectedCountry, selectedCountries ) != -1 ) {
+                    return false;
+                }
+                var labelFound = false;
+                cx.jQuery.each( availableCountries, function(index, value) {
+                    if ( ui.tagLabel == value.label ) {
+                        labelFound = true;
+                        return false;
+                    }
+                });
+                if ( !labelFound ) {
+                    return false;
+                }
+                ui.tag.find( 'input.tagit-hidden-field' ).attr( 'data-id',  uiSelectedCountry );
+                selectedCountries.push(uiSelectedCountry);
+            },
+            beforeTagRemoved: function(event, ui) {
+                // remove the country in the selected countries list
+                var countryId = ui.tag.find( 'input.tagit-hidden-field' ).data( 'id' ),
+                    index     = selectedCountries.indexOf( countryId );
+                if (index > -1) {
+                    selectedCountries.splice( index, 1 );
+                }
+            },
+            fieldName: 'targeting[country][value][]',
+            placeholderText: '{TXT_BLOCK_TARGETING_TYPE_LOCATION}'
+        });
+        cx.jQuery( 'ul.tagit li.tagit-new > input' )
+            .keyup(function() {
+                cx.jQuery( this ).removeClass( 'error' );
+            })
+            .focusin(function() {
+                cx.jQuery( this ).removeClass( 'error' );
+            })
+            .blur(function() {
+                if ( cx.jQuery( this ).val() != '' ) {
+                    cx.jQuery( this ).addClass( 'error' );
+                }
+            });
         cx.jQuery("#blockLanguages li a:visible").first().click();
     });
+
+    function toggleTargetingFilterBlock( show ) {
+        if ( show ) {
+            cx.jQuery( '#targeting_filter_block' ).show();
+        } else {
+            cx.jQuery( '#targeting_filter_block' ).hide();
+        }
+    }
 
     function switchEditor() {
         if ($J('#wysiwyg_editor').prop('checked')) {
@@ -169,6 +264,11 @@
         changePageTitlesByLang($J('input[name*=pagesLang]:checked').val(), 'global');
         changePageTitlesByLang($J('input[name*=pagesLang]:checked').val(), 'direct');
         changePageTitlesByLang($J('input[name*=pagesLang]:checked').val(), 'category');
+        
+        cx.jQuery('input.tagit-hidden-field').each(function(i){
+            cx.jQuery( this ).val( cx.jQuery( this ).data( 'id' ) );
+        });
+        
         return true;
     }
     function disableButtons(from,dest,add,remove)
@@ -383,6 +483,36 @@
     }
     // ]]>
 </script>
+<style type="text/css">
+    #targeting_filter_block .pull-left {
+        float: left;
+    }
+    #targeting_filter_block .tagit {
+        background: none;
+        border: none;
+        float: left;
+        margin-top: 0;
+    }
+    #targeting_filter_block ul.tagit li.tagit-choice-editable,
+    #targeting_filter_block ul.tagit li.tagit-new {
+        margin-top: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+    #targeting_filter_block ul.tagit input[type="text"] {
+        width: 250px;
+    }
+    table.adminlist td.no-border {
+        border: none;
+    }
+    .ui-autocomplete-loading {
+      background: white url("../lib/javascript/jquery/ui/images/ui-anim_basic_16x16.gif") right center no-repeat;
+    }
+    #targeting_filter_block ul.tagit li.tagit-new input.error {
+        background: #fee;
+    }
+
+</style>
 {BLOCK_WYSIWYG_MEDIABROWSER}
 <form name="blockFormModifyBlock" action="index.php?cmd=Block&amp;act=modify" method="post" onsubmit="onSubmit();">
     <input type="hidden" name="blockId" value="{BLOCK_ID}" size="50" />
@@ -408,6 +538,7 @@
     <ul id="tabmenu">
         <li><a class="active" href="javascript:{}" id="data_{TXT_BLOCK_BASIC_DATA}" onclick="selectDataTab(this, '{TXT_BLOCK_BASIC_DATA}')" title="{TXT_BLOCK_BASIC_DATA}">{TXT_BLOCK_BASIC_DATA}</a></li>
         <li><a href="javascript:{}" id="data_{TXT_BLOCK_ADDITIONAL_OPTIONS}" onclick="selectDataTab(this, '{TXT_BLOCK_ADDITIONAL_OPTIONS}')" title="{TXT_BLOCK_ADDITIONAL_OPTIONS}">{TXT_BLOCK_ADDITIONAL_OPTIONS}</a></li>
+        <li><a href="javascript:{}" id="data_targeting" onclick="selectDataTab(this, 'targeting')" title="{TXT_BLOCK_TARGETING}">{TXT_BLOCK_TARGETING}</a></li>
     </ul>
     <div id="{TXT_BLOCK_BASIC_DATA}" class="data">
         <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist" summary="block list">
@@ -636,6 +767,51 @@
             </tbody>
         </table>
         <br />
+    </div>
+    <div id="targeting" class="data" style="display:none;">
+        <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist">
+            <tbody>
+                <tr>
+                    <th colspan="2">{TXT_BLOCK_TARGETING}</th>
+                </tr>
+                <tr class="row1">
+                    <td valign="top" width="250px">{TXT_BLOCK_TARGETING_SHOW_PANE}</td>
+                    <td>
+                        <label>
+                            <input type="radio" value="0" name="targeting_status" {BLOCK_TARGETING_ALL_USERS} />{TXT_BLOCK_TARGETING_ALL_USERS}
+                        </label>
+                        <br/>
+                        <label>
+                            <input type="radio" value="1" name="targeting_status" {BLOCK_TARGETING_VISITOR_CONDITION_BELOW} />{TXT_BLOCK_TARGETING_VISITOR_CONDITION_BELOW}
+                        </label>
+                        <div id="targeting_filter_block">
+                            <!-- BEGIN warning_geoip_disabled -->
+                            <div class="warningbox" style="margin-bottom: 5px;">
+                            {TXT_BLOCK_TARGETING_GEOIP_DISABLED_WARNING}
+                            </div>
+                            <!-- END warning_geoip_disabled -->
+                            <table cellspacing="0" cellpadding="3" width="100%" border="0" >
+                                <tr>
+                                    <td class="no-border" width="250px">
+                                        <select name="targeting[country][filter]">
+                                            <option value="include" {BLOCK_TARGETING_COUNTRY_INCLUDE} >{TXT_BLOCK_TARGETING_INCLUDE}</option>
+                                            <option value="exclude" {BLOCK_TARGETING_COUNTRY_EXCLUDE} >{TXT_BLOCK_TARGETING_EXCLUDE}</option>
+                                        </select>
+                                    </td>
+                                    <td class="no-border">
+                                        <ul id="selectedCoutries">
+                                            <!-- BEGIN block_targeting_country -->
+                                            <li data-id="{BLOCK_TARGET_COUNTRY_ID}">{BLOCK_TARGET_COUNTRY_NAME}</li>
+                                            <!-- END block_targeting_country -->
+                                        </ul>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 <br />
 <input type="submit" name="block_save_block" value="{TXT_BLOCK_SAVE}" />

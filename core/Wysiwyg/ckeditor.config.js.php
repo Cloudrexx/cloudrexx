@@ -62,7 +62,7 @@ $ymlOption = $wysiwyg->getCustomCSSVariables($skinId);
 ?>
 //if the wysiwyg css not defined in the session, then load the css variables and put it into the session
 if(!cx.variables.get('css', 'wysiwyg')) {
-    cx.variables.set('css', [<?php echo '\'' . implode($ymlOption['css'], '\',\'') . '\'' ?>], 'wysiwyg');
+    cx.variables.set('css', [<?php if (count($ymlOption['css'])) { echo '\'' . implode($ymlOption['css'], '\',\'') . '\''; } ?>], 'wysiwyg');
     cx.variables.set('bodyClass', <?php echo '\'' . $ymlOption['bodyClass'] . '\'' ?>, 'wysiwyg');
     cx.variables.set('bodyId', <?php echo '\'' . $ymlOption['bodyId'] . '\'' ?>, 'wysiwyg');
 }
@@ -92,10 +92,8 @@ CKEDITOR.editorConfig = function( config )
     config.protectedSource.push(/<a[^>]*><\/a>/g);
 
     config.tabSpaces = 4;
-    config.baseHref = '<?php echo $cx->getRequest()->getUrl()->getProtocol() . '://' . $mainDomain . $cx->getWebsiteOffsetPath(); ?>/';
-
+    config.baseHref = '<?php echo \Cx\Core\Routing\Url::fromCapturedRequest('', $cx->getWebsiteOffsetPath(), array())->toString(); ?>';
     config.templates_files = [ '<?php echo $defaultTemplateFilePath; ?>' ];
-    
     config.templates_replaceContent = <?php echo \Cx\Core\Setting\Controller\Setting::getValue('replaceActualContents','Wysiwyg')? 'true' : 'false' ?>;
 
     config.toolbar_Full = config.toolbar_Small = [

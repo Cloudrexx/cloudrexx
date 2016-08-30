@@ -265,7 +265,7 @@ class ViewGenerator {
             ) {
                 $storecallback = $this->options['fields'][$name]['storecallback'];
                 $postedValue = null;
-                if (isset($entityData['field'])) {
+                if (isset($entityData[$name])) {
                     $postedValue = contrexx_input2raw($entityData[$name]);
                 }
                 /* We use json to do the storecallback. The 'else if' is for backwards compatibility so you can declare

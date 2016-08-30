@@ -69,34 +69,75 @@
 </script>
 
 <ul id="tabmenu">
-    <li><a id="downloadsTab_settingsGeneral" class="active" href="javascript:void(0)" onclick="selectTab('settingsGeneral')" title="{TXT_DOWNLOADS_GENERAL}">{TXT_DOWNLOADS_GENERAL}</a></li>
+    <li><a id="downloadsTab_settingsSorting" class="active" href="javascript:void(0)" onclick="selectTab('settingsSorting')" title="{TXT_DOWNLOADS_SETTINGS_SORTING}">{TXT_DOWNLOADS_SETTINGS_SORTING}</a></li>
+    <li><a id="downloadsTab_settingsListing" href="javascript:void(0)" onclick="selectTab('settingsListing')" title="{TXT_DOWNLOADS_SETTINGS_LISTING}">{TXT_DOWNLOADS_SETTINGS_LISTING}</a></li>
+    <li><a id="downloadsTab_settingsStatistics" href="javascript:void(0)" onclick="selectTab('settingsStatistics')" title="{TXT_DOWNLOADS_SETTINGS_STATISTICS}">{TXT_DOWNLOADS_SETTINGS_STATISTICS}</a></li>
+    <li><a id="downloadsTab_settingsAttributes" href="javascript:void(0)" onclick="selectTab('settingsAttributes')" title="{TXT_DOWNLOADS_SETTINGS_ATTRIBUTES}">{TXT_DOWNLOADS_SETTINGS_ATTRIBUTES}</a></li>
     <li><a id="downloadsTab_settingsInterfaces" href="javascript:void(0)" onclick="selectTab('settingsInterfaces')" title="{TXT_DOWNLOADS_INTERFACES}">{TXT_DOWNLOADS_INTERFACES}</a></li>
 </ul>
 
 <form name="downloads_settings_form" id="downloads_settings_form" action="index.php?cmd=Downloads&amp;act=settings" method="post" onsubmit="downloadsSelectAll(); return true;">
-<!-- start div downloadsTab_settingsGeneral -->
-    <div id="settingsGeneral" class="downloadsTab">
+<!-- start div downloadsTab_settingsSorting -->
+    <div id="settingsSorting" class="downloadsTab">
         <table width="100%" cellspacing="0" cellpadding="3" border="0" class="adminlist" summary="downloads settings">
             <tbody style="vertical-align:top;">
                 <tr>
-                    <th colspan="2">{TXT_DOWNLOADS_SETTINGS}</th>
+                    <th colspan="2">{TXT_DOWNLOADS_SETTINGS_SORTING}</th>
+                </tr>
+                <tr class="row3">
+                    <td colspan="2">{TXT_DOWNLOADS_SETTINGS_OPTION_SORTING_DESC}</td>
+                </tr>
+                <tr class="row1">
+                    <td width="280">
+                        {TXT_DOWNLOADS_SETTINGS_OPTION_DOWNLOADS}
+                    </td>
+                    <td>
+                        <select name="downloads_settings_sorting_downloads" style="width:300px;">
+                            <!-- BEGIN downloads_settings_sorting_dropdown_downloads -->
+                            <option value="{DOWNLOADS_SETTINGS_DROPDOWN_OPTION_VALUE}" {DOWNLOADS_SETTINGS_DROPDOWN_SELECTED_OPTION}>{DOWNLOADS_SETTINGS_DROPDOWN_OPTION_NAME}</option>
+                            <!-- END downloads_settings_sorting_dropdown_downloads -->
+                        </select>
+                    </td>
+                </tr>
+                <tr class="row1">
+                    <td>
+                        {TXT_DOWNLOADS_SETTINGS_OPTION_CATEGORIES}
+                    </td>
+                    <td>
+                        <select name="downloads_settings_sorting_categories" style="width:300px;">
+                            <!-- BEGIN downloads_settings_sorting_dropdown_categories -->
+                            <option value="{DOWNLOADS_SETTINGS_DROPDOWN_OPTION_VALUE}" {DOWNLOADS_SETTINGS_DROPDOWN_SELECTED_OPTION}>{DOWNLOADS_SETTINGS_DROPDOWN_OPTION_NAME}</option>
+                            <!-- END downloads_settings_sorting_dropdown_categories -->
+                        </select>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+<!-- end div downloadsTab_settingsSorting -->
+<!-- start div downloadsTab_settingsListing -->
+    <div id="settingsListing" class="downloadsTab" style="display:none;">
+        <table width="100%" cellspacing="0" cellpadding="3" border="0" class="adminlist" summary="downloads settings">
+            <tbody style="vertical-align:top;">
+                <tr>
+                    <th colspan="2">{TXT_DOWNLOADS_SETTINGS_LISTING}</th>
                 </tr>
                 <tr class="row3">
                     <td colspan="2" style="font-weight:bold;">{TXT_DOWNLOADS_OVERVIEW_PAGE}</td>
                 </tr>
                 <tr class="row1">
-                    <td width="280">
+                    <td width="50%">
                         <strong>{TXT_DOWNLOADS_COL_COUNT}</strong><br />
                     {TXT_DOWNLOADS_COL_COUNT_DESC}
                     </td>
-                    <td><input type="text" name="downloads_settings_col_count" value="{DOWNLOADS_SETTINGS_COL_COUNT}" /></td>
+                    <td style="vertical-align:middle;"><input type="text" name="downloads_settings_col_count" value="{DOWNLOADS_SETTINGS_COL_COUNT}" /></td>
                 </tr>
                 <tr class="row2">
                     <td style="padding-bottom: 10px;">
                         <strong>{TXT_DOWNLOADS_SUBCAT_COUNT}</strong><br />
                         {TXT_DOWNLOADS_SUBCAT_COUNT_DESC}
                     </td>
-                    <td style="padding-bottom: 10px;"><input type="text" name="downloads_settings_subcat_count" value="{DOWNLOADS_SETTINGS_SUBCAT_COUNT}" /></td>
+                    <td style="vertical-align:middle;padding-bottom: 10px;"><input type="text" name="downloads_settings_subcat_count" value="{DOWNLOADS_SETTINGS_SUBCAT_COUNT}" /></td>
                 </tr>
                 <tr class="row3">
                     <td colspan="2" style="font-weight:bold;">{TXT_DOWNLOADS_BLOCKS}</td>
@@ -106,46 +147,54 @@
                         <strong>{TXT_DOWNLOADS_MOST_VIEWED_FILE_COUNT}</strong><br />
                         {TXT_DOWNLOADS_MOST_VIEWED_FILE_COUNT_DESC}
                     </td>
-                    <td><input type="text" name="downloads_settings_most_viewed_file_count" value="{DOWNLOADS_SETTINGS_MOST_VIEWED_FILE_COUNT}" /></td>
+                    <td style="vertical-align:middle;"><input type="text" name="downloads_settings_most_viewed_file_count" value="{DOWNLOADS_SETTINGS_MOST_VIEWED_FILE_COUNT}" /></td>
                 </tr>
                 <tr class="row2">
                     <td>
                         <strong>{TXT_DOWNLOADS_MOST_DOWNLOADED_FILE_COUNT}</strong><br />
                         {TXT_DOWNLOADS_MOST_DOWNLOADED_FILE_COUNT_DESC}
                     </td>
-                    <td><input type="text" name="downloads_settings_most_downloaded_file_count" value="{DOWNLOADS_SETTINGS_MOST_DOWNLOADED_FILE_COUNT}" /></td>
+                    <td style="vertical-align:middle;"><input type="text" name="downloads_settings_most_downloaded_file_count" value="{DOWNLOADS_SETTINGS_MOST_DOWNLOADED_FILE_COUNT}" /></td>
                 </tr>
                 <tr class="row1">
                     <td>
                         <strong>{TXT_DOWNLOADS_MOST_POPULAR_FILE_COUNT}</strong><br />
                         {TXT_DOWNLOADS_MOST_POPULAR_FILE_COUNT_DESC}
                     </td>
-                    <td><input type="text" name="downloads_settings_most_popular_file_count" value="{DOWNLOADS_SETTINGS_MOST_POPULAR_FILE_COUNT}" /></td>
+                    <td style="vertical-align:middle;"><input type="text" name="downloads_settings_most_popular_file_count" value="{DOWNLOADS_SETTINGS_MOST_POPULAR_FILE_COUNT}" /></td>
                 </tr>
                 <tr class="row2">
                     <td>
                         <strong>{TXT_DOWNLOADS_NEWEST_FILE_COUNT}</strong><br />
                         {TXT_DOWNLOADS_NEWEST_FILE_COUNT_DESC}
                     </td>
-                    <td><input type="text" name="downloads_settings_newest_file_count" value="{DOWNLOADS_SETTINGS_NEWEST_FILE_COUNT}" /></td>
+                    <td style="vertical-align:middle;"><input type="text" name="downloads_settings_newest_file_count" value="{DOWNLOADS_SETTINGS_NEWEST_FILE_COUNT}" /></td>
                 </tr>
                 <tr class="row1">
                     <td style="padding-bottom: 10px;">
                         <strong>{TXT_DOWNLOADS_UPDATE_FILE_COUNT}</strong><br />
                         {TXT_DOWNLOADS_UPDATE_FILE_COUNT_DESC}
                     </td>
-                    <td style="padding-bottom: 10px;"><input type="text" name="downloads_settings_updated_file_count" value="{DOWNLOADS_SETTINGS_UPDATED_FILE_COUNT}" /></td>
+                    <td style="vertical-align:middle;padding-bottom: 10px;"><input type="text" name="downloads_settings_updated_file_count" value="{DOWNLOADS_SETTINGS_UPDATED_FILE_COUNT}" /></td>
                 </tr>
-                <tr class="row3">
-                    <td colspan="2" style="font-weight:bold;">{TXT_DOWNLOADS_MISCELLANEOUS}</td>
+            </tbody>
+        </table>
+    </div>
+<!-- end div downloadsTab_settingsListing -->
+<!-- start div downloadsTab_settingsStatistics -->
+    <div id="settingsStatistics" class="downloadsTab" style="display:none;">
+        <table width="100%" cellspacing="0" cellpadding="3" border="0" class="adminlist" summary="downloads settings">
+            <tbody style="vertical-align:top;">
+                <tr>
+                    <th colspan="2">{TXT_DOWNLOADS_SETTINGS_STATISTICS}</th>
                 </tr>
                 <tr class="row1">
-                    <td>
+                    <td width="50%">
                         <strong>{TXT_DOWNLOADS_NEW_FILE_TIME_LIMIT}</strong><br />
                         {TXT_DOWNLOADS_NEW_FILE_TIME_LIMIT_DESC}<br />
                         {TXT_DOWNLOADS_SECONDS_COMB_EXAMPLES}
                     </td>
-                    <td><input type="text" name="downloads_settings_new_file_time_limit" value="{DOWNLOADS_SETTINGS_NEW_FILE_TIME_LIMIT}" /></td>
+                    <td style="vertical-align:middle;"><input type="text" name="downloads_settings_new_file_time_limit" value="{DOWNLOADS_SETTINGS_NEW_FILE_TIME_LIMIT}" /></td>
                 </tr>
                 <tr class="row2">
                     <td style="padding-bottom: 10px;">
@@ -153,13 +202,21 @@
                         {TXT_DOWNLOADS_UPDATED_FILE_TIME_LIMIT_DESC}<br />
                         {TXT_DOWNLOADS_SECONDS_COMB_EXAMPLES}
                     </td>
-                    <td style="padding-bottom: 10px;"><input type="text" name="downloads_settings_updated_file_time_limit" value="{DOWNLOADS_SETTINGS_UPDATEDED_FILE_TIME_LIMIT}" /></td>
+                    <td style="vertical-align:middle;padding-bottom: 10px;"><input type="text" name="downloads_settings_updated_file_time_limit" value="{DOWNLOADS_SETTINGS_UPDATEDED_FILE_TIME_LIMIT}" /></td>
                 </tr>
-                <tr class="row3">
-                    <td colspan="2" style="font-weight:bold;">{TXT_DOWNLOADS_ATTRIBUTES}</td>
+            </tbody>
+        </table>
+    </div>
+<!-- end div downloadsTab_settingsStatistics -->
+<!-- start div downloadsTab_settingsAttributes -->
+    <div id="settingsAttributes" class="downloadsTab" style="display:none;">
+        <table width="100%" cellspacing="0" cellpadding="3" border="0" class="adminlist" summary="downloads settings">
+            <tbody style="vertical-align:top;">
+                <tr>
+                    <th colspan="2">{TXT_DOWNLOADS_SETTINGS_ATTRIBUTES}</th>
                 </tr>
                 <tr class="row1">
-                    <td>{TXT_DOWNLOADS_ATTRIBUTES_DESC}</td>
+                    <td width="280">{TXT_DOWNLOADS_ATTRIBUTES_DESC}</td>
                     <td>
                         <input type="checkbox" name="downloads_settings_attribute_metakeys" id="downloads_settings_attribute_metakeys" value="1" {DOWNLOADS_SETTINGS_ATTRIBUTE_METAKEYS_CHECKED} /> <label for="downloads_settings_attribute_metakeys">{TXT_DOWNLOADS_METAKEYS}</label><br />
                         <input type="checkbox" name="downloads_settings_attribute_size" id="downloads_settings_attribute_size" value="1" {DOWNLOADS_SETTINGS_ATTRIBUTE_SIZE_CHECKED} /> <label for="downloads_settings_attribute_size">{TXT_DOWNLOADS_SIZE}</label><br />
@@ -172,7 +229,7 @@
             </tbody>
         </table>
     </div>
-<!-- end div downloadsTab_settingsGeneral -->
+<!-- end div downloadsTab_settingsAttributes -->
 <!-- start div downloadsTab_settingsInterfaces -->
     <div id="settingsInterfaces" class="downloadsTab" style="display:none;">
         <table width="100%" cellspacing="0" cellpadding="3" border="0" class="adminlist" summary="downloads settings interfaces">

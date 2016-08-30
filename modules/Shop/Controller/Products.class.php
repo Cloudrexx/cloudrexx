@@ -260,11 +260,11 @@ class Products
                     AND (`product`.`stock_visible`=0 OR `product`.`stock`>0)
                     '.($category_id ? '' : 'AND `category`.`active`=1' )/*only check if active when not in category view*/.'
                     AND (
-                        `product`.`date_start` < CURRENT_DATE()
+                        `product`.`date_start` <= CURRENT_DATE()
                      OR `product`.`date_start` = 0
                     )
                     AND (
-                        `product`.`date_end` > CURRENT_DATE()
+                        `product`.`date_end` >= CURRENT_DATE()
                      OR `product`.`date_end` = 0
                     )'
             ).
@@ -1223,29 +1223,6 @@ class Products
 //\DBG::log("Products::getNameArray(): Made ".var_export($arrName, true));
         return $arrName;
     }
-
-
-    /**
-     * Deactivate Products that are no longer available
-     *
-     * Affects Product records with stock_visible enabled and zero (or less,
-     * which may happen, unfortunately) stock
-     * @return  boolean                 True on success, false otherwise
-     * @since   3.0.0
-     * @static
-     */
-    static function deactivate_soldout()
-    {
-        global $objDatabase;
-
-        return (boolean)$objDatabase->Execute("
-            UPDATE `".DBPREFIX."module_shop".MODULE_INDEX."_products`
-               SET `active`=0
-             WHERE `active`=1
-               AND `stock_visible`=1
-               AND `stock`<=0");
-    }
-
 
     /**
      * Returns -1, 0, or 1 if the first Product title is smaller, equal to,

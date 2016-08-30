@@ -166,7 +166,8 @@ class FormUploader extends Uploader
         
         $tpl->setVariable('MAX_FILE_SIZE', \FWSystem::getMaxUploadFileSize()-1000);
         
-        $ls = new \LinkSanitizer(ASCMS_PATH_OFFSET, $tpl->get());
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $ls = new \LinkSanitizer($cx, $cx->getCodeBaseOffsetPath(), $tpl->get());
         return $ls->replace();
     }
 

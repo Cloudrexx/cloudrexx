@@ -37,7 +37,6 @@
  */
 
 namespace Cx\Modules\Block\Testing\UnitTest;
-use \Cx\Core\Json\Adapter\Block\JsonBlock as JsonBlock;
 
 /**
  * BlockTest
@@ -51,19 +50,19 @@ use \Cx\Core\Json\Adapter\Block\JsonBlock as JsonBlock;
  */
 class BlockTest extends \Cx\Core\Test\Model\Entity\DoctrineTestCase {
     /**
-     * @covers \Cx\Core\Json\Adapter\Block\JsonBlock::getBlockContent
-     * @expectedException \Cx\Core\Json\Adapter\Block\NoPermissionException
+     * @covers \Cx\Modules\Block\Controller\JsonBlockController::getBlockContent
+     * @expectedException \Cx\Modules\Block\Controller\NoPermissionException
      */
     public function testGetBlockContentNoPermission() {
         global $sessionObj;
         $sessionObj = !$sessionObj ? \cmsSession::getInstance() : $sessionObj;
-        $jsonBlock = new JsonBlock();
+        $jsonBlock = $this->getJsonBlockController();
         $jsonBlock->getBlockContent(array('get' => array('block' => 1, 'lang' => 'de')));
     }
     
     /**
-     * @covers \Cx\Core\Json\Adapter\Block\JsonBlock::getBlockContent
-     * @expectedException \Cx\Core\Json\Adapter\Block\NotEnoughArgumentsException
+     * @covers \Cx\Modules\Block\Controller\JsonBlockController::getBlockContent
+     * @expectedException \Cx\Modules\Block\Controller\NotEnoughArgumentsException
      */
     public function testGetBlockContentNotEnoughArguments() {
         global $sessionObj;
@@ -71,13 +70,13 @@ class BlockTest extends \Cx\Core\Test\Model\Entity\DoctrineTestCase {
         $user = \FWUser::getFWUserObject()->objUser->getUser(1);
         \FWUser::loginUser($user);
         
-        $jsonBlock = new JsonBlock();
+        $jsonBlock = $this->getJsonBlockController();
         $jsonBlock->getBlockContent(array());
     }
     
     /**
-     * @covers \Cx\Core\Json\Adapter\Block\JsonBlock::getBlockContent
-     * @expectedException \Cx\Core\Json\Adapter\Block\NoBlockFoundException
+     * @covers \Cx\Modules\Block\Controller\JsonBlockController::getBlockContent
+     * @expectedException \Cx\Modules\Block\Controller\NoBlockFoundException
      */
     public function testGetBlockContentNoBlockFound() {
         global $sessionObj;
@@ -85,12 +84,12 @@ class BlockTest extends \Cx\Core\Test\Model\Entity\DoctrineTestCase {
         $user = \FWUser::getFWUserObject()->objUser->getUser(1);
         \FWUser::loginUser($user);
         
-        $jsonBlock = new JsonBlock();
+        $jsonBlock = $this->getJsonBlockController();
         $jsonBlock->getBlockContent(array('get' => array('block' => 999, 'lang' => 'de')));
     }
     
     /**
-     * @covers \Cx\Core\Json\Adapter\Block\JsonBlock::getBlockContent
+     * @covers \Cx\Modules\Block\Controller\JsonBlockController::getBlockContent
      */
     public function testGetBlockContent() {
         global $sessionObj;
@@ -98,14 +97,14 @@ class BlockTest extends \Cx\Core\Test\Model\Entity\DoctrineTestCase {
         $user = \FWUser::getFWUserObject()->objUser->getUser(1);
         \FWUser::loginUser($user);
         
-        $jsonBlock = new JsonBlock();
+        $jsonBlock = $this->getJsonBlockController();
         $result = $jsonBlock->getBlockContent(array('get' => array('block' => 32, 'lang' => 'de')));
         $this->assertArrayHasKey('content', $result);
     }
     
     /**
-     * @covers \Cx\Core\Json\Adapter\Block\JsonBlock::saveBlockContent
-     * @expectedException \Cx\Core\Json\Adapter\Block\NotEnoughArgumentsException
+     * @covers \Cx\Modules\Block\Controller\JsonBlockController::saveBlockContent
+     * @expectedException \Cx\Modules\Block\Controller\NotEnoughArgumentsException
      */
     public function testSaveBlockContentNotEnoughArguments() {
         global $sessionObj;
@@ -113,12 +112,12 @@ class BlockTest extends \Cx\Core\Test\Model\Entity\DoctrineTestCase {
         $user = \FWUser::getFWUserObject()->objUser->getUser(1);
         \FWUser::loginUser($user);
         
-        $jsonBlock = new JsonBlock();
+        $jsonBlock = $this->getJsonBlockController();
         $jsonBlock->saveBlockContent(array());
     }
     
     /**
-     * @covers \Cx\Core\Json\Adapter\Block\JsonBlock::saveBlockContent
+     * @covers \Cx\Modules\Block\Controller\JsonBlockController::saveBlockContent
      */
     public function testSaveBlockContent() {
         global $sessionObj;
@@ -126,10 +125,28 @@ class BlockTest extends \Cx\Core\Test\Model\Entity\DoctrineTestCase {
         $user = \FWUser::getFWUserObject()->objUser->getUser(1);
         \FWUser::loginUser($user);
         
-        $jsonBlock = new JsonBlock();
+        $jsonBlock = $this->getJsonBlockController();
         $jsonBlock->saveBlockContent(array('get' => array('block' => 32, 'lang' => 'de'), 'post' => array('content' => 'bla')));
         
         $result = $jsonBlock->getBlockContent(array('get' => array('block' => 32, 'lang' => 'de')));
         $this->assertEquals('bla', $result['content']);
+    }
+
+    /**
+     * Get json block controller using repository
+     *
+     * @return \Cx\Modules\Block\Controller\JsonBlockController
+     */
+    public function getJsonBlockController()
+    {
+        $componentRepo = self::$cx
+                            ->getDb()
+                            ->getEntityManager()
+                            ->getRepository('Cx\Core\Core\Model\Entity\SystemComponent');
+        $componentContoller = $componentRepo->findOneBy(array('name' => 'Block'));
+        if (!$componentContoller) {
+            return;
+        }
+        return $componentContoller->getController('JsonBlock');
     }
 }

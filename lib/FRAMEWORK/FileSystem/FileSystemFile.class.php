@@ -94,7 +94,7 @@ class FileSystemFile implements FileInterface
     public function getFileOwner()
     {
         // get the user-ID of the user who owns the loaded file
-        $fileOwnerId = file_exists($this->filePath) && fileowner($this->filePath);
+        $fileOwnerId = file_exists($this->filePath) ? fileowner($this->filePath) : 0;
         if (!$fileOwnerId) {
             throw new FileSystemFileException('Unable to fetch file owner of '.$this->filePath);
         }
