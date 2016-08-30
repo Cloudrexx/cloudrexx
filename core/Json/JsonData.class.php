@@ -35,9 +35,10 @@
  */
 
 namespace Cx\Core\Json;
-use \Cx\Core\Json\Adapter\JsonNode;
-use \Cx\Core\Json\Adapter\JsonPage;
-use \Cx\Core\Json\Adapter\JsonContentManager;
+// Bogus
+//use \Cx\Core\Json\Adapter\JsonNode;
+//use \Cx\Core\Json\Adapter\JsonPage;
+//use \Cx\Core\Json\Adapter\JsonContentManager;
 
 /**
  * JSON Interface to Cloudrexx Doctrine Database

@@ -92,23 +92,16 @@ class ContrexxJavascript {
                 'theme_folder' => $objInit->getCurrentThemesPath(),
             ), 'contrexx'
         );
-
         //let i18n set it's variables
         $i18n = new ContrexxJavascriptI18n($langCode);
         $i18n->variablesTo($this);
-
         //determine the correct jquery ui css' path.
         //the user might have overridden the default css in the theme, so look out for this too.
         $jQUiCssPath = 'themes/'.$objInit->getCurrentThemesPath().'/jquery-ui.css'; //customized css would be here
         if($objInit->mode != 'frontend' || !file_exists(ASCMS_DOCUMENT_ROOT.'/'.$jQUiCssPath)) { //use standard css
             $jQUiCssPath = 'lib/javascript/jquery/ui/css/jquery-ui.css';
         }
-
-        $this->setVariable(array(
-            'jQueryUiCss' => $jQUiCssPath
-            ),
-            'contrexx-ui'
-        );
+        $this->setVariable(array('jQueryUiCss' => $jQUiCssPath), 'contrexx-ui');
     }
 
     /**

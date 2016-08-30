@@ -33,17 +33,6 @@
  * @version     2.3.0
  * @package     cloudrexx
  * @subpackage  lib_framework
- * @todo        Edit PHP DocBlocks!
- */
-
-/**
- * Framework language
- *
- * @copyright   CLOUDREXX CMS - CLOUDREXX AG
- * @author      Cloudrexx Development Team <info@cloudrexx.com>
- * @version     2.3.0
- * @package     cloudrexx
- * @subpackage  lib_framework
  */
 class FWLanguage
 {
@@ -122,10 +111,14 @@ class FWLanguage
      */
     static function getNameArray($mode='frontend')
     {
-        if (!isset(self::$arrLanguages)) self::init();
+        if (!isset(self::$arrLanguages)) {
+            self::init();
+        }
         $arrName = array();
         foreach (self::$arrLanguages as $lang_id => $arrLanguage) {
-            if (empty($arrLanguage[$mode])) continue;
+            if (empty($arrLanguage[$mode])) {
+                continue;
+            }
             $arrName[$lang_id] = $arrLanguage['name'];
         }
         return $arrName;
@@ -144,10 +137,14 @@ class FWLanguage
      */
     static function getIdArray($mode='frontend')
     {
-        if (!isset(self::$arrLanguages)) self::init();
+        if (!isset(self::$arrLanguages)) {
+            self::init();
+        }
         $arrId = array();
         foreach (self::$arrLanguages as $lang_id => $arrLanguage) {
-            if (empty($arrLanguage[$mode])) continue;
+            if (empty($arrLanguage[$mode])) {
+                continue;
+            }
             $arrId[$lang_id] = $lang_id;
         }
         return $arrId;
@@ -175,7 +172,9 @@ class FWLanguage
      */
     static function getLanguageArray()
     {
-        if (empty(self::$arrLanguages)) self::init();
+        if (empty(self::$arrLanguages)) {
+            self::init();
+        }
         return self::$arrLanguages;
     }
 
@@ -254,7 +253,9 @@ class FWLanguage
      */
     static function getLanguageParameter($id, $index)
     {
-        if (empty(self::$arrLanguages)) self::init();
+        if (empty(self::$arrLanguages)) {
+            self::init();
+        }
         return (isset(self::$arrLanguages[$id][$index])
             ? self::$arrLanguages[$id][$index] : false);
     }
@@ -322,12 +323,15 @@ class FWLanguage
      */
     static function getMenuoptions($selectedId=0, $flagInactive=false)
     {
-        if (empty(self::$arrLanguages)) self::init();
+        if (empty(self::$arrLanguages)) {
+            self::init();
+        }
         $menuoptions = '';
         foreach (self::$arrLanguages as $id => $arrLanguage) {
             // Skip inactive ones if desired
-            if (!$flagInactive && empty($arrLanguage['frontend']))
+            if (!$flagInactive && empty($arrLanguage['frontend'])) {
                 continue;
+            }
             $menuoptions .=
                 "<option value='$id'".
                 ($selectedId == $id ? ' selected="selected"' : '').
@@ -360,8 +364,9 @@ class FWLanguage
         global $objDatabase;
 
         // Don't bother if the "code" looks like an ID already
-        if (is_numeric($langCode)) return $langCode;
-
+        if (is_numeric($langCode)) {
+            return $langCode;
+        }
         // Something like "fr; q=1.0, en-gb; q=0.5"
         $arrLangCode = preg_split('/,\s*/', $langCode);
         $strLangCode = "'".join("','",
@@ -415,7 +420,6 @@ class FWLanguage
      */
     static function getLanguageCodeById($langId)
     {
-        if (empty(self::$arrLanguages)) self::init();
         return self::getLanguageParameter($langId, 'lang');
     }
 
@@ -430,9 +434,13 @@ class FWLanguage
      */
     static function getLanguageIdByCode($code)
     {
-        if (empty(self::$arrLanguages)) self::init();
+        if (empty(self::$arrLanguages)) {
+            self::init();
+        }
         foreach (self::$arrLanguages as $id => $arrLanguage) {
-            if ($arrLanguage['lang'] == $code) return $id;
+            if ($arrLanguage['lang'] == $code) {
+                return $id;
+            }
         }
         return false;
     }
@@ -498,11 +506,16 @@ class FWLanguage
      */
     static function getFallbackLanguageIdById($langId)
     {
-        if (empty(self::$arrLanguages)) self::init();
-        if ($langId == self::getDefaultLangId()) return false;
+        if ($langId == self::getDefaultLangId()) {
+            return false;
+        }
         $fallback_lang = self::getLanguageParameter($langId, 'fallback');
-        if ($fallback_lang == 0) $fallback_lang = intval(self::getDefaultLangId());;
-        if ($langId == $fallback_lang) return false;
+        if ($fallback_lang == 0) {
+            $fallback_lang = intval(self::getDefaultLangId());
+        }
+        if ($langId == $fallback_lang) {
+            return false;
+        }
         return $fallback_lang;
     }
 
