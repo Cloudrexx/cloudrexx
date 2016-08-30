@@ -1,6 +1,6 @@
 cx.ready(function () {
     if ($J(".live-search-news").length > 0) {
-        
+
         if ($J('#related-news-list ul li').length == 0) {
             $J('#related-news-list').hide();
         } else {
@@ -12,28 +12,28 @@ cx.ready(function () {
         $J('#related-news-list .relationNewsId').each(function () {
             relatedNewsIdList.push($J(this).val());
         });
-//      $J('.news_list_close').on('click', function(){ 
+//      $J('.news_list_close').on('click', function(){
 //Use the above line when the jquery version is 1.7 or higher instead of the next line
         $J('.news_list_close').live('click', function () {
             /**
-             * While removing the news relationship the id is removed from 
+             * While removing the news relationship the id is removed from
              * the related news list
-             * 
+             *
              * @type @call;$J@call;parent@call;find@call;val
              */
             var selectedId = $J(this).closest('li').find('.relationNewsId').val();
             relatedNewsIdList.splice(relatedNewsIdList.indexOf(selectedId), 1);
-            
+
             // If all the related news are removed then the row is hided
             $J(this).closest('li').remove();
             if ($J('#related-news-list ul li').length == 0) {
                 $J('#related-news-list').hide();
             }
         });
-    
+
         var noResultsMsg = cx.variables.get("noResultsMsg", 'news/news-live-search');
         var ajaxRequest  = false;
-        
+
         $J('.live-search-news-input').keyup(function(e){
             if(ajaxRequest) {
                 ajaxRequest.abort();
@@ -51,7 +51,7 @@ cx.ready(function () {
                 },
                 function (res) {
                     var newsList = new Array();
-                    if (res.status == 'success') {                        
+                    if (res.status == 'success') {
                         $J.each(res.data, function(id, value) {
                             //Checking the news is already in the related news list
                             if (relatedNewsIdList.indexOf(id) === -1) {
@@ -124,6 +124,6 @@ cx.ready(function () {
                     .append(formattedText)
                     .appendTo(ul);
         };
-        
+
     }
 });

@@ -12,9 +12,9 @@
     <p>
     {NEWS_DATE}&nbsp;{NEWS_TIME} | {NEWS_AUTHOR}<!-- BEGIN news_comments_count --> | {NEWS_COUNT_COMMENTS}<!-- END news_comments_count -->
     </p>
-    <!-- BEGIN tagsBlock --> 
+    <!-- BEGIN tagsBlock -->
     <p class="newsTags">
-        | 
+        |
         <span class="tagCont">
             <!-- BEGIN newsTagList -->
             {NEWS_TAG_LINK}
@@ -60,8 +60,8 @@
             </div>
         </a>
     </div>
-    <!-- END previousNewsLink --> 
-    
+    <!-- END previousNewsLink -->
+
      <!-- BEGIN nextNewsLink -->
     <div id="next-link-block" class="link-blocks">
         <a href="{NEWS_NEXT_LINK}" title="{NEWS_NEXT_TITLE}">
@@ -73,7 +73,7 @@
             </div>
         </a>
     </div>
-    <!-- END nextNewsLink --> 
+    <!-- END nextNewsLink -->
 </div>
 <!-- END previousNextLink -->
 
@@ -95,7 +95,7 @@
     <!-- BEGIN news_add_comment -->
         <input class="btn btn-default" id="news-toggle" type="submit" value="{TXT_NEWS_WRITE_COMMENT}" />
         <form role="form" id="news-comment-form" method="post" action="index.php?section=News&amp;cmd=details&amp;newsid={NEWS_ID}">
-            <fieldset> 
+            <fieldset>
                 <legend>{TXT_NEWS_ADD_COMMENT}</legend>
                 <!-- BEGIN news_add_comment_error -->
                 <div class="news-error text-danger">{NEWS_ADD_COMMENT_ERROR}</div>

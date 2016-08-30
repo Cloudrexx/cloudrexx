@@ -3,56 +3,56 @@
 <li><a id="refererTab_statsReferer1" class="active" href="javascript:{}" onclick="selectTab('statsReferer1')" title="{TXT_THE_LAST_REFERER}">{TXT_THE_LAST_REFERER}</a></li>
 <li><a id="refererTab_statsReferer2" href="javascript:{}" onclick="selectTab('statsReferer2')" title="{TXT_TOP_REFERER}">{TXT_TOP_REFERER}</a></li>
 </ul>
-<!-- start statsReferer1 div --> 
+<!-- start statsReferer1 div -->
 <div id="statsReferer1" class="refererTab" style="display:block">
-	<table cellspacing="0" cellpadding="1" width="100%" border="0" class="adminlist">
-		<tr>
-			<th colspan="2">&nbsp;{TXT_THE_LAST_REFERER}</th>
-		</tr>
-		<!-- BEGIN stats_referer -->
-			<tr class="row1">
-				<td nowrap="nowrap" width="15%"><b>{TXT_TIME}</b></td>
-				<td nowrap="nowrap" width="85%"><b>{TXT_REFERER}</b></td>
-			</tr>
-			<!-- BEGIN stats_referer_list -->
-				<tr class="{STATS_REFERER_ROW_CLASS}">
-					<td nowrap="nowrap" width="15%">{STATS_REFERER_TIME}&nbsp;</td>
-					<td width="85%">{STATS_REFERER_URI}&nbsp;</td>
-				</tr>
-			<!-- END stats_referer_list -->
-		<!-- END stats_referer -->
-		<!-- BEGIN stats_referer_nodata -->
-			<tr class="row1">
-				<td nowrap="nowrap" width="100%" colspan="2">{TXT_NO_DATA_AVAILABLE}</td>
-			</tr>
-		<!-- END stats_referer_nodata -->
-	</table>
+  <table cellspacing="0" cellpadding="1" width="100%" border="0" class="adminlist">
+    <tr>
+      <th colspan="2">&nbsp;{TXT_THE_LAST_REFERER}</th>
+    </tr>
+    <!-- BEGIN stats_referer -->
+      <tr class="row1">
+        <td nowrap="nowrap" width="15%"><b>{TXT_TIME}</b></td>
+        <td nowrap="nowrap" width="85%"><b>{TXT_REFERER}</b></td>
+      </tr>
+      <!-- BEGIN stats_referer_list -->
+        <tr class="{STATS_REFERER_ROW_CLASS}">
+          <td nowrap="nowrap" width="15%">{STATS_REFERER_TIME}&nbsp;</td>
+          <td width="85%">{STATS_REFERER_URI}&nbsp;</td>
+        </tr>
+      <!-- END stats_referer_list -->
+    <!-- END stats_referer -->
+    <!-- BEGIN stats_referer_nodata -->
+      <tr class="row1">
+        <td nowrap="nowrap" width="100%" colspan="2">{TXT_NO_DATA_AVAILABLE}</td>
+      </tr>
+    <!-- END stats_referer_nodata -->
+  </table>
 </div>
 <!-- end statsReferer1 div -->
-<!-- start statsReferer2 div --> 
+<!-- start statsReferer2 div -->
 <div id="statsReferer2" class="refererTab" style="display:none">
-	<table cellspacing="0" cellpadding="1" width="100%" border="0" class="adminlist">
-		<tr>
-			<th colspan="2">&nbsp;{TXT_TOP_REFERER}</th>
-		</tr>
-		<!-- BEGIN stats_referer_top -->
-			<tr class="row1">
-				<td nowrap="nowrap" width="15%"><b>{TXT_NUMBER}</b></td>
-				<td nowrap="nowrap" width="85%"><b>{TXT_REFERER}</b></td>
-			</tr>
-			<!-- BEGIN stats_referer_top_list -->
-				<tr class="{STATS_REFERER_TOP_ROW_CLASS}">
-					<td nowrap="nowrap" width="15%">{STATS_REFERER_TOP_COUNT}&nbsp;</td>
-					<td width="85%">{STATS_REFERER_TOP_URI}&nbsp;</td>
-				</tr>
-			<!-- END stats_referer_top_list -->
-		<!-- END stats_referer_top -->
-		<!-- BEGIN stats_referer_top_nodata -->
-			<tr class="row1">
-				<td nowrap="nowrap" width="100%" colspan="2">{TXT_NO_DATA_AVAILABLE}</td>
-			</tr>
-		<!-- END stats_referer_top_nodata -->
-	</table>
+  <table cellspacing="0" cellpadding="1" width="100%" border="0" class="adminlist">
+    <tr>
+      <th colspan="2">&nbsp;{TXT_TOP_REFERER}</th>
+    </tr>
+    <!-- BEGIN stats_referer_top -->
+      <tr class="row1">
+        <td nowrap="nowrap" width="15%"><b>{TXT_NUMBER}</b></td>
+        <td nowrap="nowrap" width="85%"><b>{TXT_REFERER}</b></td>
+      </tr>
+      <!-- BEGIN stats_referer_top_list -->
+        <tr class="{STATS_REFERER_TOP_ROW_CLASS}">
+          <td nowrap="nowrap" width="15%">{STATS_REFERER_TOP_COUNT}&nbsp;</td>
+          <td width="85%">{STATS_REFERER_TOP_URI}&nbsp;</td>
+        </tr>
+      <!-- END stats_referer_top_list -->
+    <!-- END stats_referer_top -->
+    <!-- BEGIN stats_referer_top_nodata -->
+      <tr class="row1">
+        <td nowrap="nowrap" width="100%" colspan="2">{TXT_NO_DATA_AVAILABLE}</td>
+      </tr>
+    <!-- END stats_referer_top_nodata -->
+  </table>
 </div>
 <!-- end statsReferer2 div -->
 <!-- END stats_referer.html -->

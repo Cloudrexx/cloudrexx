@@ -7,7 +7,7 @@
         if(confirm('{TXT_CRM_ARE_YOU_SURE_TO_DELETE_THE_ENTRY}'))
             window.location.replace("?cmd={MODULE_NAME}&{CSRF_PARAM}&act=deleteCustomers&id="+entryId+'{CRM_REDIRECT_LINK}');
     }
- 
+
     function selectMultiAction() {
         with (document.frmShowCustomersEntries) {
             var chks = document.getElementsByName('selectedEntriesId[]');
@@ -50,12 +50,12 @@
 
     $J(function()
     {
-        $J(".activity").click(function(){           
+        $J(".activity").click(function(){
            $J(this).css('z-index', 110);
            $J(this).parent().find('.activity-submenu').show();
            return false;
         });
-        $J(document).mouseup(function(){            
+        $J(document).mouseup(function(){
             $J(".activity").css('z-index', 0);
             $J(".activity-submenu").hide();
         });
@@ -78,7 +78,7 @@
         $J('#term').focusout(function(){
             $J(this).attr('placeholder',$J(this).data('holder'));
         });
-        
+
         $J(".advanced-search").click(function(){
             if ($J("#advanceSearchContainer").is(':visible')) {
                 $J(this).removeClass("arrow-up").addClass("arrow-down");
@@ -102,7 +102,7 @@
     table.adminlist table tr td {border: medium none;}
     .crm-watermark {
         color: #AAAAAA;
-    }    
+    }
     .advanced-search {
         padding: 0 13px 0 0;
     }
@@ -116,7 +116,7 @@
     .crm-tasks {background: url("../modules/Crm/View/Media/tasks.png") no-repeat left 3px transparent;}
     .crm-deals {background: url("../modules/Crm/View/Media/opportunity.png") no-repeat left 3px transparent;}
     .activity-dropdown {
-        color: #555;       
+        color: #555;
         width: 143px;
         position: relative;
         height: 17px;
@@ -128,7 +128,7 @@
         z-index: 100;
         width: 190px;
         display: none;
-        padding: 28px 0 5px;        
+        padding: 28px 0 5px;
         border: 1px solid #dedede;
     }
     .activity-dropdown li a {
@@ -157,8 +157,8 @@
         background: url('../core/Core/View/Media/icons/crm_arrow_down.gif') no-repeat 160px 5px #fff;
         border: 1px solid #dedede;
     }
-    .bordered {        
-               
+    .bordered {
+
     }
     .activity-root {
         list-style:none;
@@ -167,7 +167,7 @@
         font-size: 11px;
         padding: 11px 0 0 0px;
         border-top:1px solid #dedede;
-    }    
+    }
 </style>
 <div id="subnavbar_level2">
     <ul id="creation">
@@ -194,11 +194,11 @@
             <tr>
                 <td style="width: 550px;">
                     <input type='hidden' name="cmd" value="{MODULE_NAME}" />
-                    <input type='hidden' name="act" value="customers" />                    
+                    <input type='hidden' name="act" value="customers" />
                     <input type='text' name='term' placeholder="{TXT_CRM_ENTER_SEARCH_TERM}" class="crm-watermark" id='term'  style='width: 300px;' class='search-box' value='{CRM_SEARCH_TERM}' />
                     &nbsp;&nbsp;
                     <input type='submit' value='{TXT_CRM_SEARCH}'  id='searchButton'/>&nbsp;&nbsp;
-                    <span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_CRM_CUSTOMER_SEARCH_HINT}</span>                    
+                    <span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_CRM_CUSTOMER_SEARCH_HINT}</span>
                     &nbsp;<a href="javascript:void(0)" class="advanced-search {CRM_ADVANCED_SEARCH_CLASS}">{TXT_CRM_ADVANCED_SEARCH}</a>
                     <div>
                         <input type="checkbox" class="search-checkbox" name="contactSearch[]" {CRM_CUSTOMER_CHECKED} value="1" />&nbsp;{TXT_CRM_CUSTOMERS}&nbsp;
@@ -230,7 +230,7 @@
                 <tr class="row1">
                     <td width="10%">{TXT_CRM_TITLE_NAME}</td>
                     <td width="35%"> <input type="text" value="{CRM_SEARCH_NAME}" style="width: 255px;" id="s_name" name="s_name"></td>
-                    <td colspan="3">&nbsp;</td>                    
+                    <td colspan="3">&nbsp;</td>
                 </tr>
                 <tr class="row2">
                     <td width="10%">{TXT_CRM_PRIMARY_EMAIL}</td>
@@ -246,7 +246,7 @@
                     <td width="10%" style="vertical-align:top;">{TXT_CRM_POSTAL_CODE}</td>
                     <td width="35%" style="vertical-align:top;"> <input type="text" id="s_postal_code" name="s_postal_code" style="width: 255px;" value="{CRM_SEARCH_ZIP}"></td>
                 </tr>
-                <tr class="row2">                    
+                <tr class="row2">
                     <td width="10%" style="vertical-align:top;">{TXT_CRM_DESCRIPTION}</td>
                     <td width="35%">
                         <textarea rows="5" cols="50" style="width: 255px;" id="s_notes" name="s_notes">{CRM_SEARCH_NOTES}</textarea>
@@ -256,8 +256,8 @@
             </table>
             <br>
             <input type="submit" name="advanced-search" value="{TXT_CRM_SEARCH}" />
-        </div>                
-    </form>    
+        </div>
+    </form>
     <div style="float:left;width: 100%;padding: 10px 0;">
         <div style="float:left;width: 700px;">
             <!-- BEGIN module_crm_letter_index_list -->
@@ -265,7 +265,7 @@
             <!-- END module_crm_letter_index_list -->
         </div>
         <div align="right" style="float: right;">{ENTRIES_PAGING}</div>
-    </div>    
+    </div>
     <form style="clear:both;margin-top: 5px;" action="" method="post" name="frmShowCustomersEntries">
         <table cellspacing="0" cellpadding="3" border="0" width="100%" class="adminlist" id="customerOverview" >
             <tr>
@@ -314,8 +314,8 @@
                             <li>{CRM_CONTACT_DEALS_COUNT}</li>
                             </ul>
                         </div>
-                    </div>                    
-                </td>                
+                    </div>
+                </td>
                 <td valign="top" style="padding-top: 2px;">
                     <div class="contact-email crm-icons"><a href="mailto:{CRM_CONTACT_EMAIL}"> {CRM_CONTACT_EMAIL} </a></div>
                     <div class="contact-phone crm-icons">{CRM_CONTACT_PHONE}</div>
@@ -323,7 +323,7 @@
                 <td >{CRM_ADDED_DATE}</td>
                 <td nowrap="nowrap">
                     <div align="right">
-                        <a title="{TXT_CRM_DOWNLOAD_VCARD}" target="_self" href="index.php?cmd={MODULE_NAME}&amp;act=exportvcf&amp;id={ENTRY_ID}"><img border="0" title="{TXT_IMAGE_VCARD}" alt="{TXT_IMAGE_VCARD}" src="../core/Core/View/Media/icons/outlook_visitenkarte.png" /></a>                        
+                        <a title="{TXT_CRM_DOWNLOAD_VCARD}" target="_self" href="index.php?cmd={MODULE_NAME}&amp;act=exportvcf&amp;id={ENTRY_ID}"><img border="0" title="{TXT_IMAGE_VCARD}" alt="{TXT_IMAGE_VCARD}" src="../core/Core/View/Media/icons/outlook_visitenkarte.png" /></a>
                         <a title="{TXT_CRM_IMAGE_EDIT}" target="_self" href="index.php?cmd={MODULE_NAME}&act=customers&tpl=managecontact&amp;id={ENTRY_ID}{CRM_REDIRECT_LINK}"><img border="0" title="{TXT_CRM_IMAGE_EDIT}" alt="{TXT_CRM_IMAGE_EDIT}" src="../core/Core/View/Media/icons/edit.gif" /></a>
                         <a href="javascript:deleteEntry({ENTRY_ID});" target="_self" title="{TXT_CRM_IMAGE_DELETE}"><img src="../core/Core/View/Media/icons/delete.gif" border="0" alt="{TXT_CRM_IMAGE_DELETE}" title="{TXT_CRM_IMAGE_DELETE}" /></a>
                     </div>
@@ -340,7 +340,7 @@
                         <tr><td><strong>{CRM_CONTACT_NAME}&nbsp;&nbsp;&nbsp;&nbsp;{CRM_CONTACT_ADDED_NEW}</strong></td></tr>
                         <tr>
                             <td>
-                                {CRM_COMPNAY_NAME}                                
+                                {CRM_COMPNAY_NAME}
                             </td>
                         </tr>
                     </table>
@@ -357,7 +357,7 @@
                             </ul>
                         </div>
                     </div>
-                </td>                
+                </td>
                 <td valign="top" style="padding-top: 2px;">
                     <div class="contact-email crm-icons"><a href="mailto:{CRM_CONTACT_EMAIL}"> {CRM_CONTACT_EMAIL} </a></div>
                     <div class="contact-phone crm-icons">{CRM_CONTACT_PHONE}</div>
@@ -365,7 +365,7 @@
                 <td>{CRM_ADDED_DATE}</td>
                 <td nowrap="nowrap">
                     <div align="right">
-                        <a title="{TXT_CRM_DOWNLOAD_VCARD}" target="_self" href="index.php?cmd={MODULE_NAME}&amp;act=exportvcf&amp;id={ENTRY_ID}"><img border="0" title="{TXT_IMAGE_VCARD}" alt="{TXT_IMAGE_VCARD}" src="../core/Core/View/Media/icons/outlook_visitenkarte.png" /></a>                        
+                        <a title="{TXT_CRM_DOWNLOAD_VCARD}" target="_self" href="index.php?cmd={MODULE_NAME}&amp;act=exportvcf&amp;id={ENTRY_ID}"><img border="0" title="{TXT_IMAGE_VCARD}" alt="{TXT_IMAGE_VCARD}" src="../core/Core/View/Media/icons/outlook_visitenkarte.png" /></a>
                         <a title="{TXT_CRM_IMAGE_EDIT}" target="_self" href="index.php?cmd={MODULE_NAME}&act=customers&tpl=managecontact&type=contact&id={ENTRY_ID}{CRM_REDIRECT_LINK}"><img border="0" title="{TXT_CRM_IMAGE_EDIT}" alt="{TXT_CRM_IMAGE_EDIT}" src="../core/Core/View/Media/icons/edit.gif" /></a>
                         <a href="javascript:deleteEntry({ENTRY_ID});" target="_self" title="{TXT_CRM_IMAGE_DELETE}"><img src="../core/Core/View/Media/icons/delete.gif" border="0" alt="{TXT_CRM_IMAGE_DELETE}" title="{TXT_CRM_IMAGE_DELETE}" /></a>
                     </div>

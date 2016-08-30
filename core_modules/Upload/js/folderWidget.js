@@ -48,7 +48,7 @@ var FolderWidget = function(options) {
                             file: file,
                             folderWidgetId: id
                         },
-                        function() {                               
+                        function() {
                             if (restrictUpload2SingleFile) {
                                 container.empty();
                             } else {

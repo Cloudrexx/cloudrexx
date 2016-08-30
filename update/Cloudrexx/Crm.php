@@ -33,7 +33,7 @@ echo crmUpdates();
 function crmUpdates() {
     //Update the database changes
     try {
-        //update module name 
+        //update module name
         \Cx\Lib\UpdateUtil::sql("UPDATE `".DBPREFIX."modules` SET `name` = 'Crm' WHERE `id` = 69");
         //update navigation url
         \Cx\Lib\UpdateUtil::sql("UPDATE `".DBPREFIX."backend_areas` SET `uri` = 'index.php?cmd=Crm&act=customers' WHERE `area_id` = 191");
@@ -50,11 +50,11 @@ function crmUpdates() {
     } catch (\Cx\Lib\UpdateException $e) {
         return "Error: $e->sql";
     }
-    
+
     //Update script for moving the folder
     $crmImgPath   = ASCMS_DOCUMENT_ROOT . '/images';
     $crmMediaPath = ASCMS_DOCUMENT_ROOT . '/media';
-    
+
     try {
         if (file_exists($crmImgPath . '/crm') && !file_exists($crmImgPath . '/Crm')) {
             \Cx\Lib\FileSystem\FileSystem::makeWritable($crmImgPath . '/crm');
@@ -71,6 +71,6 @@ function crmUpdates() {
     } catch (\Cx\Lib\FileSystem\FileSystemException $e) {
         return $e->getMessage();
     }
-    
+
     return 'Crm updated successfully.';
 }

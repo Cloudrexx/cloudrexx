@@ -2,10 +2,10 @@
 <div id="memberdir">
     <div class="search_form">
         <form id="memberForm" role="form" action="index.php?section=MemberDir" method="get">
-            <input type="hidden" name="search" value="search" /> 
-            <input type="hidden" name="section" value="MemberDir" /> 
-            <input onclick="this.value = ''" name="keyword" value="{MEMBERDIR_KEYWORD}" /> 
-            {MEMBERDIR_DROPDOWN} 
+            <input type="hidden" name="search" value="search" />
+            <input type="hidden" name="section" value="MemberDir" />
+            <input onclick="this.value = ''" name="keyword" value="{MEMBERDIR_KEYWORD}" />
+            {MEMBERDIR_DROPDOWN}
             <input class="btn btn-default" type="submit" value="{MEMBERDIR_SEARCH}" />
         </form>
     </div>
@@ -41,7 +41,7 @@
             <div id="block_{MEMBERDIR_PARENT_ID}" style="display: none; padding-left: {MEMBERDIR_PADDING_LEFT}px;">
                 <!-- END div-block-beginning -->
                 <div class="directory col-md-6">
-                    <img id="memberdir_{MEMBERDIR_DIR_ID}" style="border: none; width: 11px; height: 11px; vertical-align:" onclick="openSubDir(this);" alt="Open subdir" src="/core/Core/View/Media/icons/{MEMBERDIR_IMAGE_SRC}" /> 
+                    <img id="memberdir_{MEMBERDIR_DIR_ID}" style="border: none; width: 11px; height: 11px; vertical-align:" onclick="openSubDir(this);" alt="Open subdir" src="/core/Core/View/Media/icons/{MEMBERDIR_IMAGE_SRC}" />
                     <img src="modules/MemberDir/View/Media/folder.gif" alt=" " style="position: relative; top: 4px;"/><a style="vertical-align: " title="{MEMBERDIR_DIR_NAME}" href="index.php?section=MemberDir&amp;id={MEMBERDIR_DIR_ID}">{MEMBERDIR_DIR_NAME}</a>
                 </div>
                 <!-- BEGIN div-block-ending -->

@@ -89,7 +89,7 @@ class MediaDirectoryInputfieldClassification extends \Cx\Modules\MediaDir\Contro
                 if(empty($strValue)) {
                     $strValue = empty($arrInputfield['default_value'][$_LANGID]) ? $arrInputfield['default_value'][0] : $arrInputfield['default_value'][$_LANGID];
                 }
-                
+
                 if(!empty($arrInputfield['info'][0])){
                     $strInfoValue = empty($arrInputfield['info'][$_LANGID]) ? 'title="'.$arrInputfield['info'][0].'"' : 'title="'.$arrInputfield['info'][$_LANGID].'"';
                     $strInfoClass = 'mediadirInputfieldHint';
@@ -263,8 +263,8 @@ EOF;
 EOF;
         return $strJavascriptCheck;
     }
-    
-    
+
+
     function getFormOnSubmit($intInputfieldId)
     {
         return null;

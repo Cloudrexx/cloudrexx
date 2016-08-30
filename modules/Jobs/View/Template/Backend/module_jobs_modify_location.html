@@ -1,37 +1,37 @@
 <table width="100%" cellspacing="0" cellpadding="3" border="0" class="adminlist">
-	<thead>
-		<tr>
-			<th colspan="4">{TXT_GENERAL}</th>
-		</tr>
-	</thead>
-	<tbody style="vertical-align:top;">
+  <thead>
+    <tr>
+      <th colspan="4">{TXT_GENERAL}</th>
+    </tr>
+  </thead>
+  <tbody style="vertical-align:top;">
 
-		<tr class="row1">
-			<td width="15%">{TXT_LOCATIONS}</td>
-			<td width="300">{TXT_AVAILABLE_LOCATIONS}<br />
-				<select name="access_group_not_associated_locations[]" id="access_group_not_associated_locations" size="15" style="width:300px;" multiple="multiple">
-				{NOT_ASSOCIATED_LOCATIONS}
-				</select>
-				<br />
-				<a href="javascript:void(0);" onclick="accessSelectAllLocations(document.getElementById('access_group_not_associated_locations'))" title="{TXT_ACCESS_CHECK_ALL}">{TXT_ACCESS_CHECK_ALL}</a>
-				<br />
-				<a href="javascript:void(0);" onclick="accessDeselectAllLocations(document.getElementById('access_group_not_associated_locations'))" title="{TXT_ACCESS_UNCHECK_ALL}">{TXT_ACCESS_UNCHECK_ALL}</a>
-			</td>
-			<td width="45" style="text-align:center;">
-				<br />
-				<input type="button" value="&gt;&gt;" name="adduser" onclick="accessAddLocationToList(document.getElementById('access_group_not_associated_locations'), document.getElementById('access_group_associated_locations'))" style="margin-bottom:2px;" />
-				<br />
-				<input type="button" value="&lt;&lt;" name="removeuser" onclick="accessRemoveLocationFromList(document.getElementById('access_group_not_associated_locations'), document.getElementById('access_group_associated_locations'))" />
-			</td>
-			<td width="100%">{TXT_ASSOCIATED_LOCATIONS}<br />
-				<select name="access_group_associated_locations[]" id="access_group_associated_locations" size="15" style="width:300px;" multiple="multiple">
-				{ASSOCIATED_LOCATIONS}
-				</select>
-				<br />
-				<a href="javascript:void(0);" onclick="accessSelectAllLocations(document.getElementById('access_group_associated_locations'))" title="{TXT_ACCESS_CHECK_ALL}">{TXT_ACCESS_CHECK_ALL}</a>
-				<br />
-				<a href="javascript:void(0);" onclick="accessDeselectAllLocations(document.getElementById('access_group_associated_locations'))" title="{TXT_ACCESS_UNCHECK_ALL}">{TXT_ACCESS_UNCHECK_ALL}</a>
-			</td>
-		</tr>
-	</tbody>
+    <tr class="row1">
+      <td width="15%">{TXT_LOCATIONS}</td>
+      <td width="300">{TXT_AVAILABLE_LOCATIONS}<br />
+        <select name="access_group_not_associated_locations[]" id="access_group_not_associated_locations" size="15" style="width:300px;" multiple="multiple">
+        {NOT_ASSOCIATED_LOCATIONS}
+        </select>
+        <br />
+        <a href="javascript:void(0);" onclick="accessSelectAllLocations(document.getElementById('access_group_not_associated_locations'))" title="{TXT_ACCESS_CHECK_ALL}">{TXT_ACCESS_CHECK_ALL}</a>
+        <br />
+        <a href="javascript:void(0);" onclick="accessDeselectAllLocations(document.getElementById('access_group_not_associated_locations'))" title="{TXT_ACCESS_UNCHECK_ALL}">{TXT_ACCESS_UNCHECK_ALL}</a>
+      </td>
+      <td width="45" style="text-align:center;">
+        <br />
+        <input type="button" value="&gt;&gt;" name="adduser" onclick="accessAddLocationToList(document.getElementById('access_group_not_associated_locations'), document.getElementById('access_group_associated_locations'))" style="margin-bottom:2px;" />
+        <br />
+        <input type="button" value="&lt;&lt;" name="removeuser" onclick="accessRemoveLocationFromList(document.getElementById('access_group_not_associated_locations'), document.getElementById('access_group_associated_locations'))" />
+      </td>
+      <td width="100%">{TXT_ASSOCIATED_LOCATIONS}<br />
+        <select name="access_group_associated_locations[]" id="access_group_associated_locations" size="15" style="width:300px;" multiple="multiple">
+        {ASSOCIATED_LOCATIONS}
+        </select>
+        <br />
+        <a href="javascript:void(0);" onclick="accessSelectAllLocations(document.getElementById('access_group_associated_locations'))" title="{TXT_ACCESS_CHECK_ALL}">{TXT_ACCESS_CHECK_ALL}</a>
+        <br />
+        <a href="javascript:void(0);" onclick="accessDeselectAllLocations(document.getElementById('access_group_associated_locations'))" title="{TXT_ACCESS_UNCHECK_ALL}">{TXT_ACCESS_UNCHECK_ALL}</a>
+      </td>
+    </tr>
+  </tbody>
 </table>

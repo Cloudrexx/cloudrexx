@@ -50,7 +50,7 @@ class Media extends MediaLibrary
     public $_objTpl;                       // var for the template object
     public $pageTitle;                     // var for the title of the active page
     public $statusMessage;                 // var for the status message
-    
+
     public $arrPaths;                      // array paths
     public $arrWebPaths;                   // array web paths
 
@@ -78,7 +78,7 @@ class Media extends MediaLibrary
         $this->_arrSettings =$this->createSettingsArray();
 
         $this->archive = (intval(substr($archive,-1,1)) == 0) ? 'Media1' : $archive;
-                
+
         $this->arrPaths = array(ASCMS_MEDIA1_PATH . '/',
                                     ASCMS_MEDIA2_PATH . '/',
                                     ASCMS_MEDIA3_PATH . '/',
@@ -205,7 +205,7 @@ class Media extends MediaLibrary
         if (!empty($_GET['highlightFiles'])) {
             $this->highlightName = array_merge($this->highlightName, array_map('basename', json_decode(contrexx_stripslashes(urldecode($_GET['highlightFiles'])))));
         }
-        
+
         // media directory tree
         $dirTree = array();
         $this->getDirectoryTree($this->path, $searchTerm, $dirTree, !empty($searchTerm));
@@ -406,10 +406,10 @@ class Media extends MediaLibrary
                 'MEDIA_CREATE_DIRECTORY_URL'        => CONTREXX_SCRIPT_PATH . '?section=' . $this->archive . $this->getCmd . '&amp;act=newDir&amp;path=' . rawurlencode($this->webPath)
             ));
             $this->_objTpl->parse('media_create_directory');
-            
+
             //custom uploader
             \JS::activate('cx'); // the uploader needs the framework
-            
+
             $uploader = new \Cx\Core_Modules\Uploader\Model\Entity\Uploader(); //create an uploader
             $uploadId = $uploader->getId();
             $uploader->setCallback('customUploader');
@@ -587,13 +587,13 @@ CODE;
     private function processFormUpload()
     {
         global $_ARRAYLANG;
-        
+
         $objSession = \cmsSession::getInstance();
         $uploaderId = isset($_POST['media_upload_file']) ? contrexx_input2raw($_POST['media_upload_file']) : 0;
         if (empty($uploaderId)) {
             return false;
         }
-        
+
         $tempPath = $objSession->getTempPath() .'/' . contrexx_input2raw($uploaderId);
         if (!\Cx\Lib\FileSystem\FileSystem::exists($tempPath)) {
             return false;
@@ -647,13 +647,13 @@ CODE;
     function _renameFiles()
     {
         global $_ARRAYLANG;
-        
+
         // check permissions
         if (!$this->manageAccessGranted()) {
             \Message::error($_ARRAYLANG['TXT_MEDIA_DIRCREATION_NOT_ALLOWED']);
             return $this->handleRedirect();
         }
-        
+
         if (MediaLibrary::isIllegalFileName($this->getFile)) {
             \Message::error($_ARRAYLANG['TXT_MEDIA_FILE_DONT_EDIT']);
             return $this->handleRedirect();

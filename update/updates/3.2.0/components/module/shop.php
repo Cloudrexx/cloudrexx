@@ -1235,7 +1235,7 @@ EOF
     catch (Cx\Lib\UpdateException $e) {
         return Cx\Lib\UpdateUtil::DefaultActionHandler($e);
     }
-    
+
     //update settingsDB for missing values
     if ($objUpdate->_isNewerVersion($_CONFIG['coreCmsVersion'], '3.0.0')) {
         try {
@@ -2029,7 +2029,7 @@ function _shopInstall()
                     (6, 2, 'shop', 'category_name', 'Lorem ipsum3'),
                     (6, 2, 'shop', 'category_description', 'lorem ipsum lorem ipsum lorem ipsum lorem ipsum'),
                     (12, 1, 'shop', 'product_short', 'Als eines der ersten Smartphones besitzt das HTC One X einen Quad-Core-Prozessor &ndash; d.h. die Leistung verteilt sich auf 4 Rechenkerne. Dies macht das HTC One X extrem schnell und leistungsf&auml;hig.'),
-                    (12, 1, 'shop', 'product_long', '<table border=\"0\">\r\n	<tbody>\r\n		<tr>\r\n			<td style=\"width: 120px;\">\r\n				<strong>Gr&ouml;&szlig;e:</strong></td>\r\n			<td>\r\n				134,36 x 69,9 x 8,9 mm</td>\r\n		</tr>\r\n		<tr>\r\n			<td>\r\n				<strong>Gewicht:</strong></td>\r\n			<td>\r\n				130 g mit Akku</td>\r\n		</tr>\r\n		<tr>\r\n			<td>\r\n				<strong>Display:</strong></td>\r\n			<td>\r\n				HD 720P Touchscreen</td>\r\n		</tr>\r\n		<tr>\r\n			<td>\r\n				<strong>Bildschirm:</strong></td>\r\n			<td>\r\n				4,7&ldquo; (1280 x 720 Aufl&ouml;sung)</td>\r\n		</tr>\r\n	</tbody>\r\n</table>'),
+                    (12, 1, 'shop', 'product_long', '<table border=\"0\">\r\n    <tbody>\r\n        <tr>\r\n            <td style=\"width: 120px;\">\r\n                <strong>Gr&ouml;&szlig;e:</strong></td>\r\n            <td>\r\n                134,36 x 69,9 x 8,9 mm</td>\r\n        </tr>\r\n        <tr>\r\n            <td>\r\n                <strong>Gewicht:</strong></td>\r\n            <td>\r\n                130 g mit Akku</td>\r\n        </tr>\r\n        <tr>\r\n            <td>\r\n                <strong>Display:</strong></td>\r\n            <td>\r\n                HD 720P Touchscreen</td>\r\n        </tr>\r\n        <tr>\r\n            <td>\r\n                <strong>Bildschirm:</strong></td>\r\n            <td>\r\n                4,7&ldquo; (1280 x 720 Aufl&ouml;sung)</td>\r\n        </tr>\r\n    </tbody>\r\n</table>'),
                     (12, 1, 'shop', 'product_keys', 'HTC, HTC One X'),
                     (12, 1, 'shop', 'product_code', ''),
                     (10, 1, 'shop', 'category_description', 'Alle Versionen des Contrexx Content Management Systems zur Verwaltung Ihrer Website.'),

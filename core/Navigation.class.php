@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Navigation
  * Note: modified 27/06/2006 by Sébastien Perret => sva.perret@bluewin.ch
@@ -81,7 +81,7 @@ class Navigation
     {
         return $this->parseNavigation($templateContent, $license, $boolShop, true);
     }
-    
+
 
     public function getNavigation($templateContent, $license, $boolShop=false)
     {
@@ -181,7 +181,7 @@ class Navigation
      * getFrontendLangNavigation()
      * @param \Cx\Core\Routing\Url $pageUrl
      * @param boolean $langNameContraction
-     * @return string 
+     * @return string
      */
     public function getFrontendLangNavigation($page, $pageUrl, $langNameContraction = false)
     {
@@ -210,7 +210,7 @@ class Navigation
     /**
      * Sets the language placeholders in the provided template
      * @param \Cx\Core\Routing\Url $pageUrl
-     * @param \Cx\Core\Html\Sigma $objTemplate 
+     * @param \Cx\Core\Html\Sigma $objTemplate
      */
     public function setLanguagePlaceholders($page, $pageUrl, $objTemplate)
     {
@@ -235,4 +235,3 @@ class Navigation
         $objTemplate->setVariable($placeholders);
     }
 }
-

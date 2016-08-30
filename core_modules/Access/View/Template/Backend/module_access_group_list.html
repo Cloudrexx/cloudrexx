@@ -3,15 +3,15 @@
 // <![CDATA[
 function accessDeleteGroup(id, name)
 {
-	strMsg = '{TXT_ACCESS_CONFIRM_DELETE_GROUP}';
-	if (confirm(strMsg.replace('%s', name)+'\n{TXT_ACCESS_OPERATION_IRREVERSIBLE}')) {
+  strMsg = '{TXT_ACCESS_CONFIRM_DELETE_GROUP}';
+  if (confirm(strMsg.replace('%s', name)+'\n{TXT_ACCESS_OPERATION_IRREVERSIBLE}')) {
         window.location.replace('index.php?cmd=Access&{CSRF_PARAM}&act=group&tpl=delete&group_type_filter={ACCESS_GROUP_TYPE_FILTER}&sort={ACCESS_SORT_STATUS}&by={ACCESS_SORT_BY}&id='+id);
     }
 }
 
 function accessChangeGroupStatus(id)
 {
-	window.location.replace('index.php?cmd=Access&{CSRF_PARAM}&act=group&tpl=changeStatus&group_type_filter={ACCESS_GROUP_TYPE_FILTER}&sort={ACCESS_SORT_STATUS}&by={ACCESS_SORT_BY}&id='+id);
+  window.location.replace('index.php?cmd=Access&{CSRF_PARAM}&act=group&tpl=changeStatus&group_type_filter={ACCESS_GROUP_TYPE_FILTER}&sort={ACCESS_SORT_STATUS}&by={ACCESS_SORT_BY}&id='+id);
 }
 // ]]>
 </script>
@@ -22,42 +22,42 @@ function accessChangeGroupStatus(id)
 
 </div>
 <table width="100%" cellspacing="0" cellpadding="3" border="0" class="adminlist">
-	<thead style="wihte-space: nowrap;">
-		<tr>
-			<th colspan="8">{TXT_ACCESS_GROUP_LIST}</th>
-		</tr>
-	</thead>
-	<tbody style="vertical-align:top;">
-		<tr class="row3" style="font-weight:bold; white-space:nowrap;">
-			<td width="1%"><a href="index.php?cmd=Access&amp;act=group&amp;group_type_filter={ACCESS_GROUP_TYPE_FILTER}&amp;sort={ACCESS_SORT_ID}&amp;by=group_id" title="{TXT_ACCESS_CHANGE_SORT_DIRECTION}">{ACCESS_ID}</a></td>
-			<td width="4%"><a href="index.php?cmd=Access&amp;act=group&amp;group_type_filter={ACCESS_GROUP_TYPE_FILTER}&amp;sort={ACCESS_SORT_STATUS}&amp;by=is_active" title="{TXT_ACCESS_CHANGE_SORT_DIRECTION}">{ACCESS_STATUS}</a></td>
-			<td width="30%"><a href="index.php?cmd=Access&amp;act=group&amp;group_type_filter={ACCESS_GROUP_TYPE_FILTER}&amp;sort={ACCESS_SORT_NAME}&amp;by=group_name" title="{TXT_ACCESS_CHANGE_SORT_DIRECTION}">{ACCESS_NAME}</a></td>
-			<td width="40%"><a href="index.php?cmd=Access&amp;act=group&amp;group_type_filter={ACCESS_GROUP_TYPE_FILTER}&amp;sort={ACCESS_SORT_DESCRIPTION}&amp;by=group_description" title="{TXT_ACCESS_CHANGE_SORT_DIRECTION}">{ACCESS_DESCRIPTION}</a></td>
-			<td width="10%"><a href="index.php?cmd=Access&amp;act=group&amp;group_type_filter={ACCESS_GROUP_TYPE_FILTER}&amp;sort={ACCESS_SORT_TYPE}&amp;by=type" title="{TXT_ACCESS_CHANGE_SORT_DIRECTION}">{ACCESS_TYPE}</a></td>
-			<td width="5%">{TXT_ACCESS_USERS}</td>
-			<td width="5%" style="white-space:nowrap;">
-			{TXT_EXPORT}
+  <thead style="wihte-space: nowrap;">
+    <tr>
+      <th colspan="8">{TXT_ACCESS_GROUP_LIST}</th>
+    </tr>
+  </thead>
+  <tbody style="vertical-align:top;">
+    <tr class="row3" style="font-weight:bold; white-space:nowrap;">
+      <td width="1%"><a href="index.php?cmd=Access&amp;act=group&amp;group_type_filter={ACCESS_GROUP_TYPE_FILTER}&amp;sort={ACCESS_SORT_ID}&amp;by=group_id" title="{TXT_ACCESS_CHANGE_SORT_DIRECTION}">{ACCESS_ID}</a></td>
+      <td width="4%"><a href="index.php?cmd=Access&amp;act=group&amp;group_type_filter={ACCESS_GROUP_TYPE_FILTER}&amp;sort={ACCESS_SORT_STATUS}&amp;by=is_active" title="{TXT_ACCESS_CHANGE_SORT_DIRECTION}">{ACCESS_STATUS}</a></td>
+      <td width="30%"><a href="index.php?cmd=Access&amp;act=group&amp;group_type_filter={ACCESS_GROUP_TYPE_FILTER}&amp;sort={ACCESS_SORT_NAME}&amp;by=group_name" title="{TXT_ACCESS_CHANGE_SORT_DIRECTION}">{ACCESS_NAME}</a></td>
+      <td width="40%"><a href="index.php?cmd=Access&amp;act=group&amp;group_type_filter={ACCESS_GROUP_TYPE_FILTER}&amp;sort={ACCESS_SORT_DESCRIPTION}&amp;by=group_description" title="{TXT_ACCESS_CHANGE_SORT_DIRECTION}">{ACCESS_DESCRIPTION}</a></td>
+      <td width="10%"><a href="index.php?cmd=Access&amp;act=group&amp;group_type_filter={ACCESS_GROUP_TYPE_FILTER}&amp;sort={ACCESS_SORT_TYPE}&amp;by=type" title="{TXT_ACCESS_CHANGE_SORT_DIRECTION}">{ACCESS_TYPE}</a></td>
+      <td width="5%">{TXT_ACCESS_USERS}</td>
+      <td width="5%" style="white-space:nowrap;">
+      {TXT_EXPORT}
              (<a href="index.php?cmd=Access&act=export">{TXT_USER_ALL}</a>)</td>
-			<td width="5%" style="text-align:right;">{TXT_ACCESS_FUNCTIONS}</td>
-		</tr>
-		<!-- BEGIN access_group_list -->
-			<tr class="row{ACCESS_ROW_CLASS_ID}">
-				<td>{ACCESS_GROUP_ID}</td>
-				<td><a href="javascript:accessChangeGroupStatus({ACCESS_GROUP_ID});" title="{ACCESS_CHANGE_GROUP_STATUS_MSG}"><img src="../core/Core/View/Media/icons/{ACCESS_GROUP_STATUS_IMG}" width="13" alt="{ACCESS_GROUP_STATUS}" height="13" border="0" /></a></td>
-				<td><a href="index.php?cmd=Access&amp;act=group&amp;tpl=modify&amp;id={ACCESS_GROUP_ID}" title="{TXT_ACCESS_MODIFY_GROUP}">{ACCESS_GROUP_NAME}</a></td>
-				<td>{ACCESS_GROUP_DESCRIPTION}</td>
-				<td>{ACCESS_GROUP_TYPE}</td>
-				<td><a href="index.php?cmd=Access&amp;act=user&amp;groupId={ACCESS_GROUP_ID}" title="{ACCESS_SHOW_USERS_OF_GROUP}">{ACCESS_GROUP_USER_COUNT}</a></td>
-				<td style="white-space: nowrap;">
-				   <img src="../core/Core/View/Media/icons/csv.gif" title="{TXT_EXPORT}" alt="{TXT_EXPORT}" align="absmiddle" />  <a href="index.php?cmd=Access&act=export&groupId={ACCESS_GROUP_ID}">{TXT_USER_ALL}</a><!-- BEGIN languages -->, <a href="index.php?cmd=Access&act=export&groupId={ACCESS_GROUP_ID}&langId={ACCESS_LANG_ID}">{ACCESS_LANG_NAME}</a><!-- END languages -->
-				</td>
-				<td style="text-align:right;">
-					<a href="index.php?cmd=Access&amp;act=group&amp;tpl=modify&amp;id={ACCESS_GROUP_ID}" title="{TXT_ACCESS_MODIFY_GROUP}"><img src="../core/Core/View/Media/icons/edit.gif" width="16" height="16 "border="0" alt="{TXT_ACCESS_MODIFY_GROUP}" /></a>
-					<a href="javascript:accessDeleteGroup({ACCESS_GROUP_ID},'{ACCESS_GROUP_NAME_ESCAPED}')" title="{ACCESS_DELETE_GROUP}"><img src="../core/Core/View/Media/icons/delete.gif" width="17" height="17" border="0" alt="{ACCESS_DELETE_GROUP}" /></a>
-				</td>
-			</tr>
-		<!-- END access_group_list -->
-	</tbody>
+      <td width="5%" style="text-align:right;">{TXT_ACCESS_FUNCTIONS}</td>
+    </tr>
+    <!-- BEGIN access_group_list -->
+      <tr class="row{ACCESS_ROW_CLASS_ID}">
+        <td>{ACCESS_GROUP_ID}</td>
+        <td><a href="javascript:accessChangeGroupStatus({ACCESS_GROUP_ID});" title="{ACCESS_CHANGE_GROUP_STATUS_MSG}"><img src="../core/Core/View/Media/icons/{ACCESS_GROUP_STATUS_IMG}" width="13" alt="{ACCESS_GROUP_STATUS}" height="13" border="0" /></a></td>
+        <td><a href="index.php?cmd=Access&amp;act=group&amp;tpl=modify&amp;id={ACCESS_GROUP_ID}" title="{TXT_ACCESS_MODIFY_GROUP}">{ACCESS_GROUP_NAME}</a></td>
+        <td>{ACCESS_GROUP_DESCRIPTION}</td>
+        <td>{ACCESS_GROUP_TYPE}</td>
+        <td><a href="index.php?cmd=Access&amp;act=user&amp;groupId={ACCESS_GROUP_ID}" title="{ACCESS_SHOW_USERS_OF_GROUP}">{ACCESS_GROUP_USER_COUNT}</a></td>
+        <td style="white-space: nowrap;">
+           <img src="../core/Core/View/Media/icons/csv.gif" title="{TXT_EXPORT}" alt="{TXT_EXPORT}" align="absmiddle" />  <a href="index.php?cmd=Access&act=export&groupId={ACCESS_GROUP_ID}">{TXT_USER_ALL}</a><!-- BEGIN languages -->, <a href="index.php?cmd=Access&act=export&groupId={ACCESS_GROUP_ID}&langId={ACCESS_LANG_ID}">{ACCESS_LANG_NAME}</a><!-- END languages -->
+        </td>
+        <td style="text-align:right;">
+          <a href="index.php?cmd=Access&amp;act=group&amp;tpl=modify&amp;id={ACCESS_GROUP_ID}" title="{TXT_ACCESS_MODIFY_GROUP}"><img src="../core/Core/View/Media/icons/edit.gif" width="16" height="16 "border="0" alt="{TXT_ACCESS_MODIFY_GROUP}" /></a>
+          <a href="javascript:accessDeleteGroup({ACCESS_GROUP_ID},'{ACCESS_GROUP_NAME_ESCAPED}')" title="{ACCESS_DELETE_GROUP}"><img src="../core/Core/View/Media/icons/delete.gif" width="17" height="17" border="0" alt="{ACCESS_DELETE_GROUP}" /></a>
+        </td>
+      </tr>
+    <!-- END access_group_list -->
+  </tbody>
 </table>
 <br />
 {ACCESS_GROUP_PAGING}

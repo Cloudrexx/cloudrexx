@@ -27,7 +27,7 @@
 
 /**
  * Search
- * 
+ *
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Cloudrexx Development Team <info@cloudrexx.com>
  * @author      Ueli Kramer <ueli.kramer@comvation.com>
@@ -40,7 +40,7 @@ namespace Cx\Core_Modules\Search\Controller;
 
 /**
  * Search manager
- * 
+ *
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Cloudrexx Development Team <info@cloudrexx.com>
  * @author      Ueli Kramer <ueli.kramer@comvation.com>
@@ -91,7 +91,7 @@ class SearchManager
     {
         global $_ARRAYLANG;
         $this->defaultAct = 'getSearchResults';
-        
+
         $this->em       = \Env::get('em');
         $this->act      = $act;
         $this->template = $tpl;
@@ -112,28 +112,28 @@ class SearchManager
     public function getPage() {
         $this->getSearchResults();
     }
-    
+
     /**
      * Gets the search results.
-     * 
+     *
      * @return  mixed  Parsed content.
      */
     public function getSearchResults()
     {
         global $_ARRAYLANG;
-        
+
         $this->template->addBlockfile('ADMIN_CONTENT', 'search', 'Default.html');
-        
+
         if (!empty($this->term)) {
             $pages      = $this->getSearchedPages();
             $countPages = $this->countSearchedPages();
 
             usort($pages, array($this, 'sortPages'));
-            
+
             if ($countPages > 0) {
                 $parameter = '&cmd=Search' . (empty($this->term) ? '' : '&term=' . contrexx_raw2encodedUrl($this->term));
                 $paging = \Paging::get($parameter, '', $countPages, 0, true, null, 'pos');
-                
+
                 $this->template->setVariable(array(
                     'TXT_SEARCH_RESULTS_COMMENT' => sprintf($_ARRAYLANG['TXT_SEARCH_RESULTS_COMMENT'], $this->term, $countPages),
                     'TXT_SEARCH_TITLE'           => $_ARRAYLANG['TXT_NAVIGATION_TITLE'],
@@ -181,7 +181,7 @@ class SearchManager
                         'SEARCH_RESULT_LANG'          => $aliasLanguages,
                         'SEARCH_RESULT_FRONTEND_LINK' => \Cx\Core\Routing\Url::fromPage($page),
                     ));
-                    
+
                     $this->template->parse('search_result_row');
                 }
             } else {
@@ -195,11 +195,11 @@ class SearchManager
             ));
         }
     }
-    
+
     /**
      * Gets the search query builder.
      * Searches for slug, title and content title by the given search term.
-     * 
+     *
      * @return  \Doctrine\ORM\QueryBuilder  $qb
      */
     private function getSearchQueryBuilder()
@@ -252,13 +252,13 @@ class SearchManager
             )
             ->setParameter('searchTerm', '%'.$this->term.'%')
             ->orderBy('p.title');
-        
+
         return $qb;
     }
-    
+
     /**
      * Gets the searched pages as array.
-     * 
+     *
      * @return  array  $pages  \Cx\Core\ContentManager\Model\Entity\Page
      */
     private function getSearchedPages()
@@ -268,10 +268,10 @@ class SearchManager
         $pages = $this->getSearchQueryBuilder()->select('p')->setFirstResult($this->pos)->setMaxResults($_CONFIG['corePagingLimit'])->getQuery()->getResult();
         return $pages;
     }
-    
+
     /**
      * Get amount of pages with search term in slug, title, content title, module name, command name or content
-     * 
+     *
      * @return int $countPages
      */
     private function countSearchedPages()

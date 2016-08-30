@@ -1,22 +1,22 @@
 <!-- START module_directory_settings_headlines.html -->
 <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
-	<tr>
-		<th colspan="2">{TXT_USEMENT}</th>
-	</tr>
-	<tr class="row1">
-		<td>{TXT_USEMENT_TEXT}</td>
-	</tr>
+  <tr>
+    <th colspan="2">{TXT_USEMENT}</th>
+  </tr>
+  <tr class="row1">
+    <td>{TXT_USEMENT_TEXT}</td>
+  </tr>
 </table>
 <br />
 <form name="settings" method="post" action="index.php?cmd=Directory&amp;act=settings&amp;tpl=homecontent">
 <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
-	<tr>
-		<th colspan="2">{TXT_SETTINGS}</th>
-	</tr>
-	<tr class="row1">
-		<td width="15%">{TXT_SHOW_HOME_CONTENT}</td>
-		<td width="85%"><input type="radio" name="setHomeContent" value="1" {SELECT_ACTIVATE}>&nbsp;{TXT_ACTIVATE}&nbsp;<input type="radio" name="setHomeContent" value="0" {SELECT_DEACTIVATE}>&nbsp;{TXT_DEACTIVATE}</td>
-	</tr>
+  <tr>
+    <th colspan="2">{TXT_SETTINGS}</th>
+  </tr>
+  <tr class="row1">
+    <td width="15%">{TXT_SHOW_HOME_CONTENT}</td>
+    <td width="85%"><input type="radio" name="setHomeContent" value="1" {SELECT_ACTIVATE}>&nbsp;{TXT_ACTIVATE}&nbsp;<input type="radio" name="setHomeContent" value="0" {SELECT_DEACTIVATE}>&nbsp;{TXT_DEACTIVATE}</td>
+  </tr>
 </table>
 <br />
 <input type="submit" value="{TXT_SAVE_CHANGES}" name="set_homecontent_submit">
@@ -24,12 +24,12 @@
 <br />
 <!-- BEGIN showExample -->
 <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
-	<tr>
-		<th>{TXT_EXAMPLE}</th>
-	</tr>
-	<tr class="row1">
-		<td>
-		<textarea name="content" style="height: 400px; width:100%;">
+  <tr>
+    <th>{TXT_EXAMPLE}</th>
+  </tr>
+  <tr class="row1">
+    <td>
+    <textarea name="content" style="height: 400px; width:100%;">
 [[DIRECTORY_SEARCH]]
 &lt;!-- BEGIN showCategories --&gt;
 &lt;br /&gt;
@@ -93,9 +93,9 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&lt;/tbody&gt;
 &lt;/table&gt;
 &lt;!-- END showInsertFeeds --&gt;
-		</textarea>
-		</td>
-	</tr>
+    </textarea>
+    </td>
+  </tr>
 </table>
 <!-- END showExample -->
 </form>

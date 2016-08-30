@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,10 +24,10 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Main controller for Security
- * 
+ *
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Gerben van der Lubbe <spoofedexistence@gmail.com>
  * @author      Ivan Schmid <ivan.schmid@comvation.com>
@@ -39,7 +39,7 @@ namespace Cx\Core\Security\Controller;
 
 /**
  * Main controller for Security
- * 
+ *
  * The security class checks for possible attacks to the server
  * and supports a few functions to make everything more secure.
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
@@ -49,7 +49,7 @@ namespace Cx\Core\Security\Controller;
  * @subpackage  core_security
  */
 class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentController {
-    
+
     /**
      * Title of the active page
      * @var boolean
@@ -85,7 +85,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         'SERVER_SOFTWARE',
         'argv',
     );
-    
+
     public function getControllerClasses() {
         // Return an empty array here to let the component handler know that there
         // does not exist a backend, nor a frontend controller of this component.
@@ -94,7 +94,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
 
     /**
      * Do something before resolving is done
-     * 
+     *
      * @param \Cx\Core\Routing\Url                      $request    The URL object for this request
      */
     public function preResolve(\Cx\Core\Routing\Url $request) {
@@ -105,7 +105,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 if ($config['coreIdsStatus']=='on') {
                     $this->reportingMode = true;
                 }
-                
+
                 $_GET     = $this->detectIntrusion($_GET);
                 $_POST    = $this->detectIntrusion($_POST);
                 $_COOKIE  = $this->detectIntrusion($_COOKIE);
@@ -113,7 +113,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 break;
         }
     }
-    
+
     /**
     * Get request info
     *

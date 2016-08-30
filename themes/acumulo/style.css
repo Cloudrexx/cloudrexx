@@ -90,10 +90,10 @@ h1,h2,h3,h4,h5,h6 {
 }
 h1 a,h2 a,h3 a,h4 a,h5 a,h6 a {font-weight:inherit;}
 h1 {font-size:28px; line-height:1.4em; font-weight: 300;}
-h2 {font-size:24px;	line-height:1.4em; font-weight: 300;}
-h3 {font-size:22px;	line-height:1.4em; font-weight: 300;}
+h2 {font-size:24px;  line-height:1.4em; font-weight: 300;}
+h3 {font-size:22px;  line-height:1.4em; font-weight: 300;}
 h4 {font-size:18px; line-height:1.4em;}
-h5 {font-size:16px;	line-height:1.4em;}
+h5 {font-size:16px;  line-height:1.4em;}
 h6 {
     font-size:12px;
     line-height:1.4em;
@@ -145,7 +145,7 @@ hr {
     padding: 0.3em 0.34em;
     font-size: 180%;
 }
-.dropcap2 {    
+.dropcap2 {
     -webkit-border-radius: 0.3em;
     -moz-border-radius: 0.3em;
     border-radius: 0.3em;
@@ -1011,7 +1011,7 @@ ul.cs-slidecontrols li {
     border-bottom: none;
     font-size: 13px;
 }
-.description-inner h4 a {	
+.description-inner h4 a {
     font-weight: bold;
 }
 .description-inner h4 a:hover {
@@ -1133,7 +1133,7 @@ ul#portfolio-filters {
     margin-right: 5px;
 }
 /* --------------------------- */
-/*        PRICING TABLES       
+/*        PRICING TABLES
 /* --------------------------- */
 .pricing-table {
     margin: 5px auto 20px;
@@ -1281,10 +1281,10 @@ ul#portfolio-filters {
 .team-single .team-member-wrap {
     margin-bottom: 0;
 }
-.team-member {	
+.team-member {
     text-align: center;
 }
-.team-single .team-member {	
+.team-single .team-member {
     text-align: left;
 }
 .team-member h5 {
@@ -1486,7 +1486,7 @@ cite.fn, cite.fn a {
     display: block;
     margin-bottom: 20px;
 }
-.comment-meta a {	
+.comment-meta a {
     font-size: 12px;
     font-style: italic;
     font-weight: normal;
@@ -1495,7 +1495,7 @@ div.comment-body {
     list-style: none;
     margin-top: 20px;
     padding: 20px 20px 10px;
-    position: relative;	
+    position: relative;
     line-height: 1.5em;
 }
 ul.commentlist {margin-bottom: 40px;}
@@ -1970,7 +1970,7 @@ p.form-submit {margin-bottom: 0;}
     #forum div.notification_center {
         padding: 0;
         margin: 0;
-        float: left; 
+        float: left;
         width: 100%;
         text-align: center;
         height: auto;
@@ -2256,7 +2256,7 @@ p.form-submit {margin-bottom: 0;}
         float: left;
         clear: both;
         width: 100%;
-    } 
+    }
     /*cart*/
     #cartlist #th_bg2 .cartrow:first-child {
         width: 100%;
@@ -2353,13 +2353,13 @@ p.form-submit {margin-bottom: 0;}
         content: "Gebührenfrei ab";
         font-weight: 700;
         position: absolute;
-        left: 15px; 
+        left: 15px;
     }
     .row2 .shoprow:last-child:before {
         content: "Gebühr";
         font-weight: 700;
         position: absolute;
-        left: 15px; 
+        left: 15px;
     }
     /*Medien*/
     head .eachrow:nth-child(2) {

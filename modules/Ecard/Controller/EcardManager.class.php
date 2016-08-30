@@ -63,7 +63,7 @@ class EcardManager
     public $strOkMessage = '';
 
     private $act = '';
-    
+
     /**
      * PHP5 constructor
      *
@@ -76,7 +76,7 @@ class EcardManager
 
         $this->_objTpl = new \Cx\Core\Html\Sigma(ASCMS_MODULE_PATH.'/Ecard/View/Template/Backend');
         \Cx\Core\Csrf\Controller\Csrf::add_placeholder($this->_objTpl);
-        $this->_objTpl->setErrorHandling(PEAR_ERROR_DIE);        
+        $this->_objTpl->setErrorHandling(PEAR_ERROR_DIE);
     }
     private function setNavigation()
     {
@@ -118,10 +118,10 @@ class EcardManager
             'ADMIN_CONTENT' => $this->_objTpl->get(),
             'CONTENT_TITLE' => $this->_pageTitle,
         ));
-        
+
         $this->act = $_REQUEST['act'];
         $this->setNavigation();
-        
+
         return $this->_objTpl->get();
     }
 
@@ -140,7 +140,7 @@ class EcardManager
                                 'type' => 'button',
                                 'data-cx-mb-views' => 'filebrowser',
                                 'id' => 'mediabrowser_button',
-                                'style' => 'display: none;'    
+                                'style' => 'display: none;'
                                 )
                             );
         /* Update progress */
@@ -155,7 +155,7 @@ class EcardManager
                        SET setting_value='".contrexx_addslashes($filename)."'
                      WHERE setting_name='motive_$i'";
                 $objResult = $objDatabase->Execute($query);
-                
+
                 /* Create optimized picture for e-card dispatch */
                 if ($filepath != '' && file_exists(\Env::get('cx')->getWebsitePath().$filepath)) {
                     $this->resizeMotive(2, \Env::get('cx')->getWebsitePath().$filepath, ASCMS_ECARD_OPTIMIZED_PATH.'/');
@@ -199,7 +199,7 @@ class EcardManager
                 $sourcePath = ASCMS_ECARD_OPTIMIZED_WEB_PATH.'/'.$motiveFilename;
                 $thumbnail = ASCMS_ECARD_THUMBNAIL_WEB_PATH.'/'.$motiveFilename;
             }
-            /* Initialize DATA placeholder */                        
+            /* Initialize DATA placeholder */
             $this->_objTpl->setVariable(array(
                 'MOTIVE_PATH' => $sourcePath,
                 'MOTIVE_THUMB_PATH' => $thumbnail,

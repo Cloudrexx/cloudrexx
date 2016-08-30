@@ -88,9 +88,9 @@ class MediaDirectoryInputfieldRadio extends \Cx\Modules\MediaDir\Controller\Medi
 
                 $strOptions = empty($arrInputfield['default_value'][$_LANGID]) ? $arrInputfield['default_value'][0] : $arrInputfield['default_value'][$_LANGID];
                 $arrOptions = explode(",", $strOptions);
-				$strInputfield = '';
-				
-				if(!empty($arrInputfield['info'][0])){
+                $strInputfield = '';
+
+                if(!empty($arrInputfield['info'][0])){
                     $strInfoValue = empty($arrInputfield['info'][$_LANGID]) ? 'title="'.$arrInputfield['info'][0].'"' : 'title="'.$arrInputfield['info'][$_LANGID].'"';
                     $strInfoClass = 'mediadirInputfieldHint';
                 } else {
@@ -216,8 +216,8 @@ class MediaDirectoryInputfieldRadio extends \Cx\Modules\MediaDir\Controller\Medi
 EOF;
         return $strJavascriptCheck;
     }
-    
-    
+
+
     function getFormOnSubmit($intInputfieldId)
     {
         return null;

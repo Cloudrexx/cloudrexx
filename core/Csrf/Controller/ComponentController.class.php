@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,10 +24,10 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Main controller for Csrf
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
@@ -38,7 +38,7 @@ namespace Cx\Core\Csrf\Controller;
 
 /**
  * Main controller for Csrf
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
@@ -46,7 +46,7 @@ namespace Cx\Core\Csrf\Controller;
  */
 
 
-class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentController 
+class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentController
 {
     public function getControllerClasses() {
         // Return an empty array here to let the component handler know that there
@@ -56,13 +56,13 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
 
     /**
      * Do something after resolving is done
-     * 
+     *
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
      */
     public function postResolve(\Cx\Core\ContentManager\Model\Entity\Page $page) {
         global $plainCmd, $cmd, $_CORELANG;
-        
-        
+
+
         // CSRF code needs to be even in the login form. otherwise, we
         // could not do a super-generic check later.. NOTE: do NOT move
         // this above the "new cmsSession" line!
@@ -89,18 +89,17 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             }
             Csrf::check_code();
         }
-                
+
     }
     /**
      * Do something after content is loaded from DB
-     * 
+     *
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
      */
     public function postContentLoad(\Cx\Core\ContentManager\Model\Entity\Page $page) {
         global $objTemplate;
-        
+
         Csrf::add_placeholder($objTemplate);
-               
+
     }
 }
-

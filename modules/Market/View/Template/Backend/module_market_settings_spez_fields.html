@@ -1,10 +1,10 @@
 <!-- START module_market_settings_spez_fields.html -->
 <form name="formSettings" method="post" action="?cmd=Market&act=settings&tpl=spez_fields">
   <table width="100%" cellspacing="0" cellpadding="3" border="0" align="top" class="adminlist">
-    <tr> 
+    <tr>
       <th colspan=5>{TXT_TITLE}</th>
     </tr>
-    <tr class="row3"> 
+    <tr class="row3">
       <td width="300" valign="top"><b>{TXT_NAME}</b></td>
       <td width="50"><b>{TXT_STATUS}</b></td>
       <td width="150"><b>{TXT_TYPE}</b></td>
@@ -13,7 +13,7 @@
     </tr>
     <!-- BEGIN spez_fields -->
     <input type="hidden" name="setname['{SPEZ_FIELD_ID}']" value="{SPEZ_FIELD_NAME}" />
-    <tr class="{SPEZ_FIELD_ROWCLASS}"> 
+    <tr class="{SPEZ_FIELD_ROWCLASS}">
       <td valign="top"><input type="text" size="40" name="settitle['{SPEZ_FIELD_ID}']" value="{SPEZ_FIELD_TITLE}" /></td>
       <td ><input type="checkbox" name="setstatus['{SPEZ_FIELD_ID}']" value="1" {SPEZ_FIELD_STATUS}/></td>
       <td>{SPEZ_FIELD_TYPE}</td>

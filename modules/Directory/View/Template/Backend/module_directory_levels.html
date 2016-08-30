@@ -25,12 +25,12 @@ function CheckForm() {
 }
 
 function setText(){
-	with(document.addForm )
-	{
-		var txtValue = name.value;
-		if(description.value == "")
-			description.value=txtValue;
-	}
+  with(document.addForm )
+  {
+    var txtValue = name.value;
+    if(description.value == "")
+      description.value=txtValue;
+  }
 }
 
 function levelIsChecked(fieldName){
@@ -55,58 +55,58 @@ function levelIsChecked(fieldName){
 
 
 function levelDoAction(){
-	if(levelIsChecked("formSelected[]") == true)
+  if(levelIsChecked("formSelected[]") == true)
     {
 
-	    if(document.orderForm.selectAction.value == "move")
-	    {
-	        obj = document.getElementById('showmove');
-    		obj.style.display = 'inline';
-	    }
+      if(document.orderForm.selectAction.value == "move")
+      {
+          obj = document.getElementById('showmove');
+        obj.style.display = 'inline';
+      }
         if(document.orderForm.selectAction.value == "delete")
-	    {
-	    	obj = document.getElementById('showmove');
-	    	obj.style.display = 'none';
-	    	if(confirm('{TXT_CONFIRM_DELETE_DATA}\n{TXT_ACTION_IS_IRREVERSIBLE}')) {
-        		document.orderForm.action = "index.php?cmd=Directory&act=dellevel";
-        		document.orderForm.submit();
-	    	}else{
-	    		document.displayForm.selectAction.value = "0";
-	    	}
-	    }
-	    if(document.orderForm.selectAction.value == "0")
-	    {
-	    	 obj = document.getElementById('showmove');
-	   		 obj.style.display = 'none';
-	    }
+      {
+        obj = document.getElementById('showmove');
+        obj.style.display = 'none';
+        if(confirm('{TXT_CONFIRM_DELETE_DATA}\n{TXT_ACTION_IS_IRREVERSIBLE}')) {
+            document.orderForm.action = "index.php?cmd=Directory&act=dellevel";
+            document.orderForm.submit();
+        }else{
+          document.displayForm.selectAction.value = "0";
+        }
+      }
+      if(document.orderForm.selectAction.value == "0")
+      {
+         obj = document.getElementById('showmove');
+          obj.style.display = 'none';
+      }
     }
     else
     {
         alert("{TXT_MAKE_SELECTION}");
         document.orderForm.selectAction.value = "0";
         obj = document.getElementById('showmove');
-	    obj.style.display = 'none';
+      obj.style.display = 'none';
     }
 }
 
 function levelDoMove(){
-	if(levelIsChecked("formSelected[]") == true)
+  if(levelIsChecked("formSelected[]") == true)
     {
-    	if(confirm('Wollen Sie diese Levels wirklich verschieben?')) {
-    		document.orderForm.action = "index.php?cmd=Directory&act=moveLevel";
+      if(confirm('Wollen Sie diese Levels wirklich verschieben?')) {
+        document.orderForm.action = "index.php?cmd=Directory&act=moveLevel";
             document.orderForm.submit();
-    	}else{
-    		document.displayForm.selectAction.value = "0";
-    		obj = document.getElementById('showmove');
-	        obj.style.display = 'none';
-    	}
+      }else{
+        document.displayForm.selectAction.value = "0";
+        obj = document.getElementById('showmove');
+          obj.style.display = 'none';
+      }
     }
     else
     {
         alert("{TXT_MAKE_SELECTION}");
         document.orderForm.selectAction.value = "0";
         obj = document.getElementById('showmove');
-	    obj.style.display = 'none';
+      obj.style.display = 'none';
     }
 }
 
@@ -222,7 +222,7 @@ function levelDoMove(){
     <td width="16" valign="top">
         <br />
     </td>
-  	<td width="100%" valign="top" colspan="6">
+    <td width="100%" valign="top" colspan="6">
         {NO_LEVEL_FOUND}
     </td>
   </tr>
@@ -232,27 +232,27 @@ function levelDoMove(){
 <!-- BEGIN importSelectAction -->
 <input type=submit value="{TXT_SAVE_CHANGES}" name=displaysubmit style="margin-left:65px;" />
 <table cellpadding="2" cellspacing="0" border="0">
-	<tr>
-		<td>
-			<img src="../core/Core/View/Media/icons/arrow.gif" border="0" width="38" height="22" alt="{TXT_MARKED}:" />
-			<a href="#" onclick="changeCheckboxes('orderForm','formSelected[]',true); return false;">{TXT_SELECT_ALL}</a> /
-			<a href="#" onclick="changeCheckboxes('orderForm','formSelected[]',false); return false;">{TXT_DESELECT_ALL}</a>
-			<img src="../core/Core/View/Media/icons/strike.gif" />
-			<select name="selectAction" onchange="levelDoAction();">
-			<option value="0" selected="selected">{TXT_SELECT_ACTION}</option>
-			<option value="move">{TXT_MOVE}</option>
-			<option value="delete">{TXT_DELETE}</option>
-		    </select>
-		    <span id="showmove" style="display:none;">
-		    <img src="../core/Core/View/Media/icons/strike.gif" />
-		    <select name="selectLevel" onchange="levelDoMove();">
-		    <option value="" selected="selected">{TXT_SELECT_LEVEL}</option>
-		    <option value="0">{TXT_MAIN_LEVEL}</option>
-			{LEVELS_MOVE}
-		    </select>
-		    </span>
-		</td>
-	</tr>
+  <tr>
+    <td>
+      <img src="../core/Core/View/Media/icons/arrow.gif" border="0" width="38" height="22" alt="{TXT_MARKED}:" />
+      <a href="#" onclick="changeCheckboxes('orderForm','formSelected[]',true); return false;">{TXT_SELECT_ALL}</a> /
+      <a href="#" onclick="changeCheckboxes('orderForm','formSelected[]',false); return false;">{TXT_DESELECT_ALL}</a>
+      <img src="../core/Core/View/Media/icons/strike.gif" />
+      <select name="selectAction" onchange="levelDoAction();">
+      <option value="0" selected="selected">{TXT_SELECT_ACTION}</option>
+      <option value="move">{TXT_MOVE}</option>
+      <option value="delete">{TXT_DELETE}</option>
+        </select>
+        <span id="showmove" style="display:none;">
+        <img src="../core/Core/View/Media/icons/strike.gif" />
+        <select name="selectLevel" onchange="levelDoMove();">
+        <option value="" selected="selected">{TXT_SELECT_LEVEL}</option>
+        <option value="0">{TXT_MAIN_LEVEL}</option>
+      {LEVELS_MOVE}
+        </select>
+        </span>
+    </td>
+  </tr>
 </table>
 <!-- END importSelectAction -->
 </form>

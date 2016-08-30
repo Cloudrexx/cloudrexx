@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -71,7 +71,7 @@ class ViewGenerator {
      * @var FormGenerator $formGenerator
      */
     protected $formGenerator = null;
-    
+
     /**
      *
      * @param mixed $object Array, instance of DataSet, instance of EntityBase, object
@@ -85,13 +85,13 @@ class ViewGenerator {
             $cx = \Cx\Core\Core\Controller\Cx::instanciate();
             \JS::registerCSS($cx->getCoreFolderName() . '/Html/View/Style/Backend.css');
             $entityWithNS = preg_replace('/^\\\/', '', $this->findEntityClass($object));
-            
+
             // this is a temporary "workaround" for combined keys, see todo
             $entityClassMetadata = \Env::get('em')->getClassMetadata($entityWithNS);
             if (count($entityClassMetadata->getIdentifierFieldNames()) > 1) {
                 throw new \Exception('Currently, view generator is not able to handle composite keys...');
             }
-            
+
             $this->options = array();
             if (isset($options[$entityWithNS]) && is_array($options[$entityWithNS])) {
                     $this->options = $options[$entityWithNS];
@@ -106,10 +106,10 @@ class ViewGenerator {
             if (empty($this->options)) {
                 $this->options = $options[''];
             }
-            
+
             //initialize the row sorting functionality
             $this->getSortingOption($entityWithNS);
-            
+
             if (
                 (!isset($_POST['vg_increment_number']) || $_POST['vg_increment_number'] != $this->viewId) &&
                 (!isset($_GET['vg_increment_number']) || $_GET['vg_increment_number'] != $this->viewId)
@@ -250,7 +250,7 @@ class ViewGenerator {
                               &&  isset($this->options['fields'][$sortByFieldName]['showDetail'])
                               &&  !$this->options['fields'][$sortByFieldName]['showDetail']
                              )
-                             ? true 
+                             ? true
                              : false;
         // Foreach possible attribute in the database we try to find the matching entry in the $entityData array and add it
         // as property to the object
@@ -309,7 +309,7 @@ class ViewGenerator {
 
             //While adding a new entity, if the view is sortable and 'sortBy' field is disabled in the edit view
             //then the new entity sort order gets automatically adjusted.
-            if (    $isSortSelfHealing  
+            if (    $isSortSelfHealing
                 &&  !empty($sortByFieldName)
                 &&  ($sortByFieldName === $name)
                 &&  !$entity->$fieldGetMethodName()
@@ -321,7 +321,7 @@ class ViewGenerator {
                     ->setMaxResults(1);
                 $result   = $qb->getQuery()->getResult();
                 $newValue = isset($result[0]) ? ($result[0]->$fieldGetMethodName() + 1) : 1;
-                // set the value as property of the current object, 
+                // set the value as property of the current object,
                 // so it is ready to be stored in the database
                 $entity->$fieldSetMethodName($newValue);
             }
@@ -339,9 +339,9 @@ class ViewGenerator {
             ) {
                 continue;
             }
-            
+
             // save it:
-            
+
             // case a) was open in form directly
             $firstOffset = str_replace('\\', '_', strtolower($associationMapping['sourceEntity']));
             $secondOffset = $associationMapping['fieldName'];
@@ -356,17 +356,17 @@ class ViewGenerator {
                 );
                 continue;
             }
-            
+
             // base b) was open in a modal form
             foreach ($_POST[$firstOffset] as $foreignEntityDataEncoded) {
                 $foreignEntityData = array();
                 parse_str($foreignEntityDataEncoded, $foreignEntityData);
-                
+
                 if (!isset($foreignEntityData[$secondOffset])) {
                     // todo: remove entity!
                     continue;
                 }
-                
+
                 // todo: add/save entity
                 $this->storeSingleValuedAssociation(
                     $associationMapping['targetEntity'],
@@ -382,9 +382,9 @@ class ViewGenerator {
 
     /**
      * Initialize the row sorting functionality
-     * 
+     *
      * @param string $entityNameSpace entity namespace
-     * 
+     *
      * @return boolean
      */
     protected function getSortingOption($entityNameSpace)
@@ -396,7 +396,7 @@ class ViewGenerator {
 
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $em = $cx->getDb()->getEntityManager();
-        $sortBy = (     isset($this->options['functions']['sortBy']) 
+        $sortBy = (     isset($this->options['functions']['sortBy'])
                     &&  is_array($this->options['functions']['sortBy'])
                   )
                   ? $this->options['functions']['sortBy']
@@ -406,13 +406,13 @@ class ViewGenerator {
         if (empty($sortBy)) {
             return;
         }
-        
-        //If the function array has 'order' option and the order by field 
+
+        //If the function array has 'order' option and the order by field
         //is not equal to 'sortBy' => 'field' then disable the row sorting
         $sortField   = key($this->options['functions']['sortBy']['field']);
-        $orderOption = (    isset($this->options['functions']['order']) 
+        $orderOption = (    isset($this->options['functions']['order'])
                         &&  is_array($this->options['functions']['order'])
-                       ) 
+                       )
                        ? key($this->options['functions']['order']) : array();
         if (!empty($orderOption) && stripos($orderOption, $sortField) === false) {
             return;
@@ -422,11 +422,11 @@ class ViewGenerator {
         $entityObject   = $em->getClassMetadata($entityNameSpace);
         $primaryKeyName = $entityObject->getSingleIdentifierFieldName();
 
-        //If the 'sortBy' option does not have 'jsonadapter', 
+        //If the 'sortBy' option does not have 'jsonadapter',
         //we need to get the component name and entity name for updating the sorting order in db
         $componentName = '';
         $entityName    = '';
-        if (    !isset($sortBy['jsonadapter']) 
+        if (    !isset($sortBy['jsonadapter'])
             ||  (    isset($sortBy['jsonadapter'])
                  &&  (    empty($sortBy['jsonadapter']['object'])
                       ||  empty($sortBy['jsonadapter']['act'])
@@ -441,7 +441,7 @@ class ViewGenerator {
         //If 'sorting' is applied and sorting field is not equal to
         //'sortBy' => 'field' then disable the row sorting.
         $orderParamName = $entityName . 'Order';
-        if (    isset($_GET[$orderParamName]) 
+        if (    isset($_GET[$orderParamName])
             &&  stripos($_GET[$orderParamName], $sortField) === false
         ) {
             return;
@@ -456,18 +456,18 @@ class ViewGenerator {
 
         //Get the paging position value
         $pagingPosName  = $entityName . 'Pos';
-        $pagingPosition = isset($_GET[$pagingPosName]) 
-                          ? contrexx_input2int($_GET[$pagingPosName]) 
+        $pagingPosition = isset($_GET[$pagingPosName])
+                          ? contrexx_input2int($_GET[$pagingPosName])
                           : 0;
 
-        //set the sorting parameters in the functions 'sortBy' array and 
+        //set the sorting parameters in the functions 'sortBy' array and
         //it should be used in the Backend::constructor
         $this->options['functions']['sortBy']['sortingKey'] = $primaryKeyName;
         $this->options['functions']['sortBy']['component']  = $componentName;
         $this->options['functions']['sortBy']['entity']     = $entityName;
         $this->options['functions']['sortBy']['sortOrder']  = $sortOrder;
         $this->options['functions']['sortBy']['pagingPosition'] = $pagingPosition;
-        
+
         //Register the script Backend.js and activate the jqueryui and cx for the row sorting
         \JS::registerJS(substr($cx->getCoreFolderName() . '/Html/View/Script/Backend.js', 1));
     }
@@ -527,7 +527,7 @@ class ViewGenerator {
         global $_ARRAYLANG;
 
         // this case is used to generate the add entry form, where we can create an new entry
-        if (!empty($_GET['add']) 
+        if (!empty($_GET['add'])
             && !empty($this->options['functions']['add'])) {
             $isSingle = true;
             return $this->renderFormForEntry(null);
@@ -558,7 +558,7 @@ class ViewGenerator {
                 if (isset($params['vg_increment_number'])) {
                     \Html::stripUriParam($actionUrl, 'vg_increment_number');
                 }
-                $addBtn = '<br /><br /><input type="button" name="addEtity" value="'.$_ARRAYLANG['TXT_ADD'].'" onclick="location.href='."'".$actionUrl."&csrf=".\Cx\Core\Csrf\Controller\Csrf::code()."'".'" />'; 
+                $addBtn = '<br /><br /><input type="button" name="addEtity" value="'.$_ARRAYLANG['TXT_ADD'].'" onclick="location.href='."'".$actionUrl."&csrf=".\Cx\Core\Csrf\Controller\Csrf::code()."'".'" />';
             }
             if (!count($renderObject) || !count(current($renderObject))) {
                 // make this configurable
@@ -690,7 +690,7 @@ class ViewGenerator {
             //var_dump($this->object->entryExists($entityId));
             throw new ViewGeneratorException('Tried to show form but neither add nor edit view can be shown');
         }
-        
+
         //sets the order of the fields
         if(!empty($this->options['order']['form'])) {
             $sortedData = array();
@@ -850,7 +850,7 @@ class ViewGenerator {
                     if (method_exists($associatedEntity, $method)) {
                         $associatedEntity->{$method}($entity);
                     }
-                    
+
                     // buffer entity, so we can persist it later
                     $associatedEntityToPersist[] = $associatedEntity;
                 }
@@ -917,7 +917,7 @@ class ViewGenerator {
         $actionUrl->setParam($param, null);
         \Cx\Core\Csrf\Controller\Csrf::redirect($actionUrl);
     }
-    
+
     /**
      * This function is used to delete an entry
      *
@@ -1059,10 +1059,10 @@ class ViewGenerator {
         }
         $this->options['cancelUrl']->setParam($parameterName, null);
     }
-    
+
     /**
      * Adds/sets a foreign entity (1:1 or n:1)
-     * 
+     *
      * @param string $targetEntity FQCN of foreign entity
      * @param array $criteria Criteria to fetch the entity to set
      * @param object $entity Entity to set foreign entity of

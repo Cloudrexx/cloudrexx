@@ -50,43 +50,43 @@ namespace Cx\Modules\Forum\Controller;
  */
 class ForumHomeContent extends ForumLibrary {
 
-	var $_pageContent;
-	var $_objTpl;
+    var $_pageContent;
+    var $_objTpl;
 
-	/**
-	 * Constructor php5
-	 */
-	function __construct($pageContent) {
-		global $_LANGID;
-	    $this->_pageContent = $pageContent;
-	    $this->_objTpl = new \Cx\Core\Html\Sigma('.');
+    /**
+     * Constructor php5
+     */
+    function __construct($pageContent) {
+        global $_LANGID;
+        $this->_pageContent = $pageContent;
+        $this->_objTpl = new \Cx\Core\Html\Sigma('.');
         \Cx\Core\Csrf\Controller\Csrf::add_placeholder($this->_objTpl);
-	    $this->_intLangId = $_LANGID;
-		$this->_arrSettings = $this->createSettingsArray();
-	}
+        $this->_intLangId = $_LANGID;
+        $this->_arrSettings = $this->createSettingsArray();
+    }
 
-	/**
-	 * Constructor php4
-	 */
+    /**
+     * Constructor php4
+     */
     function ForumHomeContent($pageContent) {
-    	$this->__construct($pageContent);
-	}
+        $this->__construct($pageContent);
+    }
 
-	/**
-	 * Fetch latest entries and parse forumtemplate
-	 *
-	 * @return string parsed latest entries
-	 */
-	function getContent()
-	{
-		global $_CONFIG, $objDatabase, $_ARRAYLANG;
-		$this->_objTpl->setTemplate($this->_pageContent,true,true);
-		$this->_showLatestEntries($this->_getLatestEntries());
-		return $this->_objTpl->get();
-	}
+    /**
+     * Fetch latest entries and parse forumtemplate
+     *
+     * @return string parsed latest entries
+     */
+    function getContent()
+    {
+        global $_CONFIG, $objDatabase, $_ARRAYLANG;
+        $this->_objTpl->setTemplate($this->_pageContent,true,true);
+        $this->_showLatestEntries($this->_getLatestEntries());
+        return $this->_objTpl->get();
+    }
 
 
-	/**
+    /**
      * Returns html-source for an tagcloud.  Just a wrapper-method.
      *
      * @return    string        html-source for the tagcloud.

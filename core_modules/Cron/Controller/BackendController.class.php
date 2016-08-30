@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Specific BackendController for this Component. Use this to easily create a backend view
  *
@@ -45,13 +45,13 @@ namespace Cx\Core_Modules\Cron\Controller;
  * @subpackage  coremodule_cron
  */
 class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBackendController {
-    
+
     /**
      * Template object
      */
     protected $template;
-    
-    
+
+
     /**
      * Returns a list of available commands (?act=XY)
      * @return array List of acts
@@ -59,10 +59,10 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
     public function getCommands() {
         return array('settings');
     }
-    
+
     /**
      * Use this to parse your backend page
-     * 
+     *
      * You will get the template located in /View/Template/{CMD}.html
      * You can access Cx class using $this->cx
      * To show messages, use \Message class
@@ -75,15 +75,15 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
         $this->cx;
         $this->template = $template;
         $act = $cmd[0];
-        
+
         $this->connectToController($act);
-        
+
         \Message::show();
     }
-    
+
     /**
      * Trigger a controller according the act param from the url
-     * 
+     *
      * @param   string $act
      */
     public function connectToController($act)
@@ -96,7 +96,7 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
             }
             //  instantiate the view specific controller
             $objController = new $controllerName($this->getSystemComponentController(), $this->cx);
-        } else { 
+        } else {
             // instantiate the default View Controller
             $objController = new DefaultController($this->getSystemComponentController(), $this->cx);
         }

@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * SitemapPageTree
  *
@@ -49,7 +49,7 @@ class SitemapPageTree extends SigmaPageTree {
     const cssPrefix = "sitemap_level";
     const subTagStart = "<ul>";
     const subTagEnd = "</ul>";
-    
+
     /**
      * Override the constructor from the PageTree
      * @see Cx\Core\PageTree::__construct()
@@ -69,10 +69,10 @@ class SitemapPageTree extends SigmaPageTree {
         parent::__construct($entityManager, $license, $maxDepth, $rootNode, $lang,
                             $currentPage, $skipInvisible, $considerLogin);
     }
-    
+
     protected function renderHeader($lang) {
     }
-    
+
     protected function renderElement($title, $level, $hasChilds, $lang, $path, $current, $page) {
         $width = $level*25;
         $spacer = "<img src='".ASCMS_CORE_MODULE_FOLDER."/Sitemap/View/Media/spacer.gif' width='$width' height='12' alt='' />";
@@ -84,35 +84,35 @@ class SitemapPageTree extends SigmaPageTree {
             'TARGET'    => empty($linkTarget) ? '_self' : $linkTarget,
             'URL'       => \Cx\Core\Core\Controller\Cx::instanciate()->getWebsiteOffsetPath().$this->virtualLanguageDirectory.$path
         ));
-        
+
         $this->template->parse('sitemap');
     }
-    
+
     public function preRenderLevel($level, $lang, $parentNode) {}
-    
+
     public function postRenderLevel($level, $lang, $parentNode) {}
-    
+
     protected function renderFooter($lang) {
     }
 
     protected function init() {
-        
+
     }
 
     protected function postRender($lang) {
-        
+
     }
 
     protected function postRenderElement($level, $hasChilds, $lang, $page) {
-        
+
     }
 
     protected function realPreRender($lang) {
-        
+
     }
 
     protected function preRenderElement($level, $hasChilds, $lang, $page) {
-        
+
     }
 
     protected function getFullNavigation(){

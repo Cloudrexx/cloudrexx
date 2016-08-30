@@ -1331,7 +1331,7 @@ p#loginerror {
 .mobile-reg:hover {
     background: url('images/user_register.png') no-repeat center #888;
 }
-.mobile-login:hover { 
+.mobile-login:hover {
     background: url('images/login.png') no-repeat center #888;
 }
 .navbar-toggle:hover {

@@ -81,7 +81,7 @@ class ContrexxJavascript {
         $backOrFrontend = $objInit->mode;
 // TODO: Unused
 //        global $objFWUser;
-//        $langId; 
+//        $langId;
         if($backOrFrontend == "frontend")
             $langId = $objInit->getFrontendLangId();
         else //backend

@@ -50,7 +50,7 @@ if (navigator.appName.indexOf("Explorer") == -1) {
                         </a>
                     </td>
                     <td style="padding-right: 15px; vertical-align: top;">
-                        <a class="article-edit-link" href="index.php?cmd=Knowledge{MODULE_INDEX}&amp;section=articles&amp;act=edit&amp;id={ARTICLEID}" 
+                        <a class="article-edit-link" href="index.php?cmd=Knowledge{MODULE_INDEX}&amp;section=articles&amp;act=edit&amp;id={ARTICLEID}"
                             onmouseover="hoverIn(this)" onmouseout="hoverOut(this)" style="cursor: pointer; color: #000099;">{QUESTION}</span>
                     </td>
                     <td style="width: 50px; vertical-align: top;">
@@ -62,13 +62,13 @@ if (navigator.appName.indexOf("Explorer") == -1) {
                        <div id="rating{ARTICLEID}"> </div>
                         <script type="text/javascript">
                             /* <![CDATA[ */
-                            
+
                             var rating{ARTICLEID} = new Rating({ARTICLEID}, {VOTEVALUE}, {
                                 stars : {MAX_RATING},
                                 locked : true,
                                 starPath : '../modules/Knowledge/View/Media/'
                             });
-                            
+
                             /* ]]> */
                         </script> -->
                     </td>
@@ -76,20 +76,20 @@ if (navigator.appName.indexOf("Explorer") == -1) {
                         <a class="article-edit-link" href="index.php?cmd=Knowledge{MODULE_INDEX}&amp;section=articles&amp;act=edit&amp;id={ARTICLEID}" title="{TXT_IMGALT_EDIT}">
                             <img src="../core/Core/View/Media/icons/edit.gif" border="0" alt="{TXT_IMGALT_EDIT}" title="{TXT_IMGALT_EDIT}" />
                         </a>
-                        
+
                         <a href="javascript:deleteArticle({ARTICLEID});" title="{TXT_DELETE_CATEGORY}">
                            <img src="../core/Core/View/Media/icons/delete.gif" border="0" alt="{TXT_DELETE_CATEGORY}" title="{TXT_DELETE_CATEGORY}" />
-                        </a> 
+                        </a>
                     </td>
                 </tr>
             </table>
             </li>
             <!-- END row -->
-            
+
             <!-- BEGIN no_articles -->
             <li>
                 {TXT_NO_ARTICLES}
-            </li>   
+            </li>
             <!-- END no_articles -->
         </ul>
     </div>

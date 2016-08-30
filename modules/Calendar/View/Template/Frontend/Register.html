@@ -4,21 +4,21 @@
     {TXT_CALENDAR_ERROR}
     <form role="form" name="registrationForm" id="registrationForm" method="post" action="index.php?section={CALENDAR_MODULE_NAME}&amp;cmd=register">
         <fieldset>
-            <legend>An- \ Abmeldeformular</legend>        
+            <legend>An- \ Abmeldeformular</legend>
             <input type="hidden" name="id" value="{CALENDAR_EVENT_ID}" />
             <input type="hidden" name="form" value="{CALENDAR_FORM_ID}" />
             <input type="hidden" name="date" value="{CALENDAR_EVENT_DATE}" />
             <input type="hidden" name="userid" value="{CALENDAR_USER_ID}" />
             <!-- BEGIN calendarRegistrationField -->
             {CALENDAR_REGISTRATION_FIELD}
-            <!-- END calendarRegistrationField -->            
+            <!-- END calendarRegistrationField -->
             <!-- BEGIN calendarRegistrationCaptcha -->
             <p>
                 <label>{TXT_CALENDAR_CAPTCHA}</label>
                 {CALENDAR_CAPTCHA_CODE}
             </p>
             <!-- END calendarRegistrationCaptcha -->
-            <p><input type="submit" class="btn btn-default" name="submitRegistration" value="{TXT_CALENDAR_REGISTRATION_SUBMIT}" /></p>    
+            <p><input type="submit" class="btn btn-default" name="submitRegistration" value="{TXT_CALENDAR_REGISTRATION_SUBMIT}" /></p>
         </fieldset>
     </form>
     <!-- END calendarRegistrationForm -->

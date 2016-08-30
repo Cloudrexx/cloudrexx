@@ -5,15 +5,15 @@ arrTabToDiv = new Object();
 {EDIT_JS_TAB_TO_DIV}
 
 function switchBoxAndTab(objElement, strTabId) {
-    
+
     if (countActiveLanguages() == 0) {
         //We just "unchecked" the last language, disallow this
-        objElement.checked = true;	
+        objElement.checked = true;
     } else {
         //There are more active languages, hide the tab
         switchTabVisibility(strTabId);
     }
-    
+
     //Now make sure that a possible div is shown
     activateAnyActiveDiv();
 }
@@ -29,7 +29,7 @@ function switchTabVisibility(strTabId) {
 
 function countActiveLanguages() {
     var activeLanguages = 0;
-    
+
     for (var h=0; h < document.forms.length;h++) {
         for (var i=0; i < document.forms[h].elements.length;i++) {
             //read out all form-elements with the loop
@@ -39,8 +39,8 @@ function countActiveLanguages() {
                 }
             }
         }
-    }	
-    
+    }
+
     return activeLanguages;
 }
 
@@ -50,7 +50,7 @@ function activateAnyActiveDiv() {
         document.getElementById(TabName).className = 'inactive';
         document.getElementById(arrTabToDiv[TabName]).style.display = 'none';
     }
-    
+
     //Activate the first possible div with an acitvated checkbox
     for (var TabName in arrTabToDiv) {
         if (document.getElementById(TabName).style.display == 'inline') {
@@ -58,16 +58,16 @@ function activateAnyActiveDiv() {
             document.getElementById(arrTabToDiv[TabName]).style.display = 'inline';
             break;
         }
-    }	
+    }
 }
 
 //media browser callback function
 function blogSetUrl(data) {
     if (data.type === 'file') {
-        if (data.data[0]) {      
+        if (data.data[0]) {
             document.getElementById(newsElInsertBox).value = data.data[0].datainfo.filepath;
         }
-    }    
+    }
 }
 //get media browser
 function newsGetMediaBrowser(elInsertBox) {

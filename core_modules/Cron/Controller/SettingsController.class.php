@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * SettingsController
  *
@@ -37,7 +37,7 @@
 namespace Cx\Core_Modules\Cron\Controller;
 
 /**
- * 
+ *
  * SettingsController for listing The last execution of the cron job
  *
  * @copyright   Cloudrexx AG
@@ -51,16 +51,16 @@ class SettingsController extends \Cx\Core\Core\Model\Entity\Controller {
      * @var \Doctrine\ORM\EntityManager em
      */
     protected $em;
-    
+
     /**
      * Sigma template instance
      * @var Cx\Core\Html\Sigma  $template
      */
     protected $template;
-    
+
     /**
      * Controller for the Backend Cron jobs  views
-     * 
+     *
      * @param \Cx\Core\Core\Model\Entity\SystemComponentController $systemComponentController the system component controller object
      * @param \Cx\Core\Core\Controller\Cx                          $cx                        the cx object
      * @param \Cx\Core\Html\Sigma                                  $template                  the template object
@@ -68,23 +68,23 @@ class SettingsController extends \Cx\Core\Core\Model\Entity\Controller {
      */
     public function __construct(\Cx\Core\Core\Model\Entity\SystemComponentController $systemComponentController, \Cx\Core\Core\Controller\Cx $cx) {
         parent::__construct($systemComponentController, $cx);
-        
+
         $this->em                = $this->cx->getDb()->getEntityManager();
     }
     /**
      * Use this to parse your backend page
-     * 
-     * @param \Cx\Core\Html\Sigma $template 
+     *
+     * @param \Cx\Core\Html\Sigma $template
      */
     public function parsePage(\Cx\Core\Html\Sigma $template) {
         $this->template = $template;
-        
+
         $this->showSettings();
     }
-    
+
     /**
      * Display the  time of the newest SysLog entry from Cron
-     * 
+     *
      * @global type $_ARRAYLANG
      */
     public function showSettings() {
@@ -97,18 +97,18 @@ class SettingsController extends \Cx\Core\Core\Model\Entity\Controller {
         $logger                  = implode('/', $nameSpace);
         $cronSysLogs             = $logRepo->findLatestLogEntryByLogger($logger);
         $lastSysLogExecutionTime = $_ARRAYLANG['TXT_CORE_MODULE_CRON_NEVER'];
-        
+
         if (!empty($cronSysLogs)) {
             $lastSysLogEntry         = current($cronSysLogs);
             $lastSysLogExecutionTime = $lastSysLogEntry->getTimestamp()->format(ASCMS_DATE_FORMAT_DATETIME);
         } else {
-            \Message::warning($_ARRAYLANG['TXT_CORE_MODULE_CRON_ERROR_MSG']);            
+            \Message::warning($_ARRAYLANG['TXT_CORE_MODULE_CRON_ERROR_MSG']);
         }
 
         $this->template->setVariable(array(
             'CRON_LAST_EXECUTION'      => $_ARRAYLANG['TXT_CORE_MODULE_CRON_LAST_EXECUTION'],
             'CRON_LAST_EXECUTION_TIME' => $lastSysLogExecutionTime,
-	    'CRON_SETTINGS'            => $_ARRAYLANG['TXT_CORE_MODULE_CRON_ACT_SETTINGS']
+        'CRON_SETTINGS'            => $_ARRAYLANG['TXT_CORE_MODULE_CRON_ACT_SETTINGS']
         ));
     }
 }

@@ -44,14 +44,14 @@ namespace Cx\Modules\MediaDir\Controller;
  * @package     cloudrexx
  * @subpackage  module_mediadir
  */
-class MediaDirectoryAccessIDs { 
+class MediaDirectoryAccessIDs {
     const MediaDirectory = 153; //use media directory
     const AddEntry = 154;
     const ModifyEntry = 155; //modify / delete entry
     const ManageLevels = 156; //add, modify / delete levels
     const ManageCategories = 157; //add, modify / delete categories
     const Interfaces = 158; //use the interfaces
-    const Settings = 159; //change module settings    
+    const Settings = 159; //change module settings
 }
 
 /**
@@ -64,7 +64,7 @@ class MediaDirectoryAccessIDs {
  */
 class MediaDirectoryLibrary
 {
-	public $_objTpl;
+    public $_objTpl;
     public $pageContent;
 
     public $arrFrontendLanguages = array();
@@ -72,13 +72,13 @@ class MediaDirectoryLibrary
     public $arrCommunityGroups = array();
 
     public $strJavascript;
-    
-    
-    
+
+
+
     public $moduleName             = '';
 
     public $moduleNameLC             = '';
-    
+
     public $moduleTablePrefix = "mediadir";
     public $moduleLangVar = "MEDIADIR";
     public $moduleConstVar = "MEDIADIR";
@@ -88,13 +88,13 @@ class MediaDirectoryLibrary
      */
     function __construct($tplPath, $name)
     {
-    	$this->_objTpl = new \Cx\Core\Html\Sigma($tplPath);
+        $this->_objTpl = new \Cx\Core\Html\Sigma($tplPath);
         $this->_objTpl->setErrorHandling(PEAR_ERROR_DIE);
-        
+
         $this->moduleName    = $name;
         $this->moduleNameLC  = strtolower($this->moduleName);
 
-    	$this->_objTpl->setGlobalVariable(array(
+        $this->_objTpl->setGlobalVariable(array(
             'MODULE_NAME' =>  $this->moduleName,
             'MODULE_NAME_LC' => $this->moduleNameLC,
             'CSRF' =>  'csrf='.\Cx\Core\Csrf\Controller\Csrf::code(),
@@ -107,25 +107,25 @@ class MediaDirectoryLibrary
 
         if($this->arrSettings['settingsEntryDisplaydurationNotification'] >= 1) {
 
-	        $objEntries = new MediaDirectoryEntry($this->moduleName);
-	        $objEntries->getEntries(null, null, null, null, null, null, true);
+            $objEntries = new MediaDirectoryEntry($this->moduleName);
+            $objEntries->getEntries(null, null, null, null, null, null, true);
 
             $intDaysbefore = intval($this->arrSettings['settingsEntryDisplaydurationNotification']);
             $intToday = mktime();
 
             foreach ($objEntries->arrEntries as $intEntryId => $arrEntry) {
                 $intWindowEnd =  $arrEntry['entryDurationEnd'];
-            	$intWindowEndDay =  date("d", $intWindowEnd);
+                $intWindowEndDay =  date("d", $intWindowEnd);
                 $intWindowEndMonth =  date("m", $intWindowEnd);
                 $intWindowEndYear =  date("Y", $intWindowEnd);
 
                 $intWindowStartDay = $intWindowEndDay-$intDaysbefore;
                 $intWindowStart = mktime(0,0,0,$intWindowEndMonth,$intWindowStartDay,$intWindowEndYear);
 
-	            if(($intWindowStart <= $intToday && $intToday <= $intWindowEnd) && $arrEntry['entryDurationNotification'] == 0) {
-	            	$objMail = new MediaDirectoryMail(9, $intEntryId, $this->moduleName);
-	            	$objEntries->setDisplaydurationNotificationStatus($intEntryId, 1);
-	            }
+                if(($intWindowStart <= $intToday && $intToday <= $intWindowEnd) && $arrEntry['entryDurationNotification'] == 0) {
+                    $objMail = new MediaDirectoryMail(9, $intEntryId, $this->moduleName);
+                    $objEntries->setDisplaydurationNotificationStatus($intEntryId, 1);
+                }
             }
         }
     }
@@ -145,7 +145,7 @@ class MediaDirectoryLibrary
             $objFWUser  = \FWUser::getFWUserObject();
 
             //get user attributes
-            $objUser 		= $objFWUser->objUser;
+            $objUser         = $objFWUser->objUser;
             $intUserId      = intval($objUser->getId());
             $bolUserLogin   = $objUser->login();
             $intUserIsAdmin = $objUser->getAdminStatus();
@@ -213,25 +213,25 @@ class MediaDirectoryLibrary
 
                                 //OSEC CUSTOMIZING
                                 if($intSelectedFormId == 5) {
-	                                // entry is not yet ready to get confirmed
-	                                $objEntries = new MediaDirectoryEntry($this->moduleName);
-	                                $objEntries->getEntries(null, null, null, null, null, true, null, null, 'n', $intUserId, null, $intSelectedFormId);
+                                    // entry is not yet ready to get confirmed
+                                    $objEntries = new MediaDirectoryEntry($this->moduleName);
+                                    $objEntries->getEntries(null, null, null, null, null, true, null, null, 'n', $intUserId, null, $intSelectedFormId);
 
-	                                if(count($objEntries->arrEntries) >= 1) {
-	                                	foreach ($objEntries->arrEntries as $intEntryId => $arrEntry) {
-	                                		$strStatus = 'osec'.$intEntryId;
-	                                	}
-	                                }
+                                    if(count($objEntries->arrEntries) >= 1) {
+                                        foreach ($objEntries->arrEntries as $intEntryId => $arrEntry) {
+                                            $strStatus = 'osec'.$intEntryId;
+                                        }
+                                    }
 
-	                                // entry is ready to get confirmed
-	                                $objEntries = new MediaDirectoryEntry($this->moduleName);
-	                                $objEntries->getEntries(null, null, null, null, null, null, null, null, 'n', $intUserId, null, $intSelectedFormId, true);
+                                    // entry is ready to get confirmed
+                                    $objEntries = new MediaDirectoryEntry($this->moduleName);
+                                    $objEntries->getEntries(null, null, null, null, null, null, null, null, 'n', $intUserId, null, $intSelectedFormId, true);
 
-	                                if(count($objEntries->arrEntries) >= 1) {
-	                                	foreach ($objEntries->arrEntries as $intEntryId => $arrEntry) {
-	                                		$strStatus = 'osec'.$intEntryId;
-	                                	}
-	                                }
+                                    if(count($objEntries->arrEntries) >= 1) {
+                                        foreach ($objEntries->arrEntries as $intEntryId => $arrEntry) {
+                                            $strStatus = 'osec'.$intEntryId;
+                                        }
+                                    }
                                 }
 
                                 //check from type
@@ -252,7 +252,7 @@ class MediaDirectoryLibrary
                             if($bolUserLogin) {
                                 $objEntries = new MediaDirectoryEntry($this->moduleName);
 
-	                            if(isset($_POST['submitEntryModfyForm'])) {
+                                if(isset($_POST['submitEntryModfyForm'])) {
                                     $intEntryId = intval($_POST['entryId']);
                                 } else {
                                     $intEntryId = intval($_GET['eid']);
@@ -299,7 +299,7 @@ class MediaDirectoryLibrary
 
                 //only run Permission::checkAccess if user is logged in.
                 //logged out users are redirected to a login page with redirect param
-                //a few lines below 
+                //a few lines below
                 if($bolUserLogin && $accessId)
                     \Permission::checkAccess($accessId, 'static');
 
@@ -322,10 +322,10 @@ class MediaDirectoryLibrary
                         exit;
                         break;
                     default:
-                    	if(substr($strStatus,0,4) == 'osec') {
-                    		header('Location: '.CONTREXX_SCRIPT_PATH.'?section='.$this->moduleName.'&cmd=edit5&eid='.intval(substr($strStatus,4)));
+                        if(substr($strStatus,0,4) == 'osec') {
+                            header('Location: '.CONTREXX_SCRIPT_PATH.'?section='.$this->moduleName.'&cmd=edit5&eid='.intval(substr($strStatus,4)));
                             exit;
-                    	}
+                        }
                         break;
                 }
             }
@@ -347,17 +347,17 @@ class MediaDirectoryLibrary
         $objLanguages = $objDatabase->Execute("SELECT id,lang,name,frontend,is_default FROM ".DBPREFIX."languages ORDER BY is_default ASC");
         if ($objLanguages !== false) {
             while (!$objLanguages->EOF) {
-            	if(in_array($objLanguages->fields['id'], $arrActiveLangs)) {
-	                $arrData = array();
+                if(in_array($objLanguages->fields['id'], $arrActiveLangs)) {
+                    $arrData = array();
 
-	                $arrData['id'] = intval($objLanguages->fields['id']);
-	                $arrData['lang'] = htmlspecialchars($objLanguages->fields['lang'], ENT_QUOTES, CONTREXX_CHARSET);
-	                $arrData['name'] = htmlspecialchars($objLanguages->fields['name'], ENT_QUOTES, CONTREXX_CHARSET);
-	                $arrData['frontend'] = intval($objLanguages->fields['frontend']);
-	                $arrData['is_default'] = htmlspecialchars($objLanguages->fields['is_default'], ENT_QUOTES, CONTREXX_CHARSET);
+                    $arrData['id'] = intval($objLanguages->fields['id']);
+                    $arrData['lang'] = htmlspecialchars($objLanguages->fields['lang'], ENT_QUOTES, CONTREXX_CHARSET);
+                    $arrData['name'] = htmlspecialchars($objLanguages->fields['name'], ENT_QUOTES, CONTREXX_CHARSET);
+                    $arrData['frontend'] = intval($objLanguages->fields['frontend']);
+                    $arrData['is_default'] = htmlspecialchars($objLanguages->fields['is_default'], ENT_QUOTES, CONTREXX_CHARSET);
 
                     $arrLanguages[$objLanguages->fields['id']] = $arrData;
-            	}
+                }
 
                 $objLanguages->MoveNext();
             }
@@ -497,13 +497,13 @@ class MediaDirectoryLibrary
 
         return $strOptions;
     }
-    
+
     /**
      * getQueryToFindFirstInputFieldId
-     * 
+     *
      * @return string
      */
-    public function getQueryToFindFirstInputFieldId() 
+    public function getQueryToFindFirstInputFieldId()
     {
         $query = "SELECT
                         first_rel_inputfield.`field_id` AS `id`
@@ -511,13 +511,13 @@ class MediaDirectoryLibrary
                         ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields AS first_rel_inputfield
                     LEFT JOIN
                         ".DBPREFIX."module_".$this->moduleTablePrefix."_inputfields AS inputfield
-                    ON 
+                    ON
                         first_rel_inputfield.`field_id` = inputfield.`id`
                     WHERE
                         (inputfield.`type` != 16 AND inputfield.`type` != 17 AND inputfield.`type` != 30)
                     AND
                         (first_rel_inputfield.`entry_id` = entry.`id`)
-                    AND 
+                    AND
                         (first_rel_inputfield.`form_id` = entry.`form_id`)
                     ORDER BY
                         inputfield.`order` ASC
@@ -532,8 +532,8 @@ class MediaDirectoryLibrary
         if($objInit->mode == 'frontend') {
             self::getSettings();
             if($this->arrSettings['settingsAddEntriesOnlyCommunity'] == 1) {
-                $objFWUser  	= \FWUser::getFWUserObject();
-                $objUser 		= $objFWUser->objUser;
+                $objFWUser      = \FWUser::getFWUserObject();
+                $objUser         = $objFWUser->objUser;
                 $intUserId      = intval($objUser->getId());
                 $bolUserLogin   = $objUser->login();
                 $bolUserIsAdmin = $objUser->getAdminStatus();
@@ -580,8 +580,8 @@ class MediaDirectoryLibrary
                     $strMaxLevelSelect = 'n';
                 }
             } else {
-	            $strMaxCategorySelect = 'n';
-	            $strMaxLevelSelect = 'n';
+                $strMaxCategorySelect = 'n';
+                $strMaxLevelSelect = 'n';
             }
         } else {
             $strMaxCategorySelect = 'n';
@@ -591,7 +591,7 @@ class MediaDirectoryLibrary
         //get languages
         self::getFrontendLanguages();
         foreach ($this->arrFrontendLanguages as $intKey => $arrLang) {
-        	$arrActiveLang[$arrLang['id']] = $arrLang['id'];
+            $arrActiveLang[$arrLang['id']] = $arrLang['id'];
         }
         $arrActiveLang = join(",", $arrActiveLang);
         $strModulName = $this->moduleName;
@@ -665,11 +665,11 @@ var activeLang = [$arrActiveLang];
         var id = \$J(this).data('id');
         var relatedFieldPrefix = \$J(this).data('relatedFieldPrefix') ? \$J(this).data('relatedFieldPrefix') : 'mediadirInputfield';
         \$J(this).data('lastDefaultValue', \$J(this).val());
-        
+
         \$J(this).keyup(function(){
             var that = \$J(this);
             var id = \$J(this).data('id');
-            
+
             var relatedFieldPrefix = \$J(this).data('relatedFieldPrefix') ? \$J(this).data('relatedFieldPrefix') : 'mediadirInputfield';
             \$J.each(activeLang, function(i, v) {
                 if (\$J('#'+ relatedFieldPrefix + '_' + id +'_'+ v).val() == that.data('lastDefaultValue')) {
@@ -681,10 +681,10 @@ var activeLang = [$arrActiveLang];
             });
             \$J(this).data('lastDefaultValue', \$J(this).val());
         });
-        
+
         \$J('#'+ relatedFieldPrefix + '_' + id +'_'+ defaultLang).keyup(function(){
             var id = \$J(this).data('id');
-            var relatedFieldPrefix = \$J(this).data('relatedFieldPrefix') ? \$J(this).data('relatedFieldPrefix') : 'mediadirInputfield';            
+            var relatedFieldPrefix = \$J(this).data('relatedFieldPrefix') ? \$J(this).data('relatedFieldPrefix') : 'mediadirInputfield';
             \$J('#'+ relatedFieldPrefix + '_' + id +'_0').val(\$J(this).val());
             if (\$J(this).data('isImage') && \$J('#'+ relatedFieldPrefix + '_' + id +'_0_preview')) {
                 changeImagePreview(\$J('#'+ relatedFieldPrefix + '_' + id +'_0_preview'), \$J(this).val());
@@ -695,25 +695,25 @@ var activeLang = [$arrActiveLang];
     \$J('.mediadirInputfieldDefaultDeleteFile').each(function(){
         id = \$J(this).data('id');
         \$J(this).data('isChecked', \$J(this).is( ":checked" ));
-        
+
         \$J(this).click(function(){
             var that = \$J(this);
             var id = \$J(this).data('id');
-            
+
             \$J.each(activeLang, function(i, v) {
-                if (\$J('#mediadirInputfield_delete_'+ id +'_'+ v).is( ":checked" ) == that.data('isChecked')) {                    
+                if (\$J('#mediadirInputfield_delete_'+ id +'_'+ v).is( ":checked" ) == that.data('isChecked')) {
                     \$J('#mediadirInputfield_delete_'+ id +'_'+ v).prop('checked', that.is( ":checked" ));
                 }
             });
             \$J(this).data('isChecked', \$J(this).is( ":checked" ));
         });
-        
+
         \$J('#mediadirInputfield_delete_'+ id +'_'+ defaultLang).click(function(){
             var id = \$J(this).data('id');
             \$J('#mediadirInputfield_delete_'+ id +'_0').prop('checked', \$J(this).is( ":checked" ));
             \$J('#mediadirInputfield_delete_'+ id +'_0').data('isChecked', \$J(this).is( ":checked" ));
         });
-    });                
+    });
 });
 
 function changeImagePreview(elm, src) {
@@ -730,16 +730,16 @@ function changeImagePreview(elm, src) {
 
 function rememberWysiwygFields(ev) {
     fieldArr   = ev.editor.name.split(/\[(\d+)\]/);
-    wysiwygId     = fieldArr[1];                
+    wysiwygId     = fieldArr[1];
     \$minimized = \$J('#mediadirInputfield_' + wysiwygId + '_ELEMENT_Minimized');
     instancesToManipulate = [];
-    if (\$minimized.is(":visible")) {                            
+    if (\$minimized.is(":visible")) {
         \$J.each(activeLang, function(i, v) {
             if (CKEDITOR.instances['mediadirInputfield['+ wysiwygId +']['+ v +']'].getData() === lastCKeditorValues[wysiwygId]) {
                 instancesToManipulate.push(CKEDITOR.instances['mediadirInputfield['+ wysiwygId +']['+ v +']']);
             }
         });
-    } 
+    }
 }
 
 function copyWysiwygFields(ev) {
@@ -764,7 +764,7 @@ if ( typeof(CKEDITOR) !== "undefined" ) {
             if (\$J.inArray(CKEDITOR.instances[instance].name, processedCKeditorInstances)) {
                 fieldArr = CKEDITOR.instances[instance].name.split(/\[(\d+)\]/);
                 id       = fieldArr[1];
-                langId   = fieldArr[3];                
+                langId   = fieldArr[3];
 
                 if (langId == '0') {
                     lastCKeditorValues[id] = CKEDITOR.instances[instance].getData();
@@ -780,21 +780,21 @@ if ( typeof(CKEDITOR) !== "undefined" ) {
                         }
                    });
                 }
-                if (langId == defaultLang) {           
-                   CKEDITOR.instances[instance].on('change', function (ev) {                
+                if (langId == defaultLang) {
+                   CKEDITOR.instances[instance].on('change', function (ev) {
                         fieldArr   = ev.editor.name.split(/\[(\d+)\]/);
                         var id     = fieldArr[1];
                         \$expand    = \$J('#mediadirInputfield_' + id + '_ELEMENT_Expanded');
                         if (\$expand.is(":visible")) {
                             CKEDITOR.instances['mediadirInputfield['+ id +'][0]'].setData(ev.editor.getData());
                             lastCKeditorValues[id] = ev.editor.getData();
-                        }                
+                        }
                    });
                 }
                 processedCKeditorInstances.push(CKEDITOR.instances[instance].name);
-            }        
+            }
         }
-    });       
+    });
 }
 
 function ExpandMinimize(toggle){
@@ -803,7 +803,7 @@ function ExpandMinimize(toggle){
 
     elm1.style.display = (elm1.style.display=='none') ? 'block' : 'none';
     elm2.style.display = (elm2.style.display=='none') ? 'block' : 'none';
-}                                                                          
+}
 
 function ExpandMinimizeMultiple(toggleId, toggleKey){
     if ( typeof(CKEDITOR) !== "undefined" ) {
@@ -812,12 +812,12 @@ function ExpandMinimizeMultiple(toggleId, toggleKey){
         });
     }
 
-    elm1 = document.getElementById('mediadirInputfield_' + toggleId +  '_' + toggleKey + '_Minimized');  
+    elm1 = document.getElementById('mediadirInputfield_' + toggleId +  '_' + toggleKey + '_Minimized');
     elm2 = document.getElementById('mediadirInputfield_' + toggleId +  '_' + toggleKey + '_Expanded');
-    
+
     elm1.style.display = (elm1.style.display=='none') ? 'block' : 'none';
     elm2.style.display = (elm2.style.display=='none') ? 'block' : 'none';
-}  
+}
 
 EOF;
 
@@ -826,11 +826,11 @@ EOF;
 
     function getFormOnSubmit($arrScripts){
         $strFormOnSubmit = '';
-    	foreach ($arrScripts as $intInputfieldId => $strScript) {
-    	   if(!empty($strScript) || $strScript != '') {
-    	       $strFormOnSubmit .= $strScript;
-    	   }
-    	}
+        foreach ($arrScripts as $intInputfieldId => $strScript) {
+           if(!empty($strScript) || $strScript != '') {
+               $strFormOnSubmit .= $strScript;
+           }
+        }
 
         $strFormOnSubmit   .= "return checkAllFields();";
 
@@ -844,7 +844,7 @@ EOF;
 
 
 
-    function getJavascript(){ 
+    function getJavascript(){
 // TODO: do we need the shadowbox every time?
         \JS::activate('shadowbox');
 
@@ -859,14 +859,14 @@ EOF;
 EOF;
         return $strJavascript;
     }
-    
+
     /**
      * Get mediabrowser button
-     * 
+     *
      * @param string $buttonValue Value of the button
-     * @param string $options     Input button options 
+     * @param string $options     Input button options
      * @param string $callback    Media browser callback function
-     * 
+     *
      * @return string html element of browse button
      */
     public function getMediaBrowserButton($buttonValue, $options = array(), $callback = '')
@@ -877,16 +877,16 @@ EOF;
         if ($callback) {
             $mediaBrowser->setCallback($callback);
         }
-        
-        return $mediaBrowser->getXHtml($buttonValue);        
+
+        return $mediaBrowser->getXHtml($buttonValue);
     }
-    
+
     /**
      * Get the Thumbnail image path from given file
      * Thumbnail will be created it is not exists
-     * 
+     *
      * @param string $path Relative path to the file
-     * 
+     *
      * @return string Thumbnail path
      */
     public function getThumbImage($path)
@@ -898,16 +898,16 @@ EOF;
                         ->getMediaSourceManager()
                         ->getThumbnailGenerator()
                         ->getThumbnailsFromFile(dirname($path), $path, true);
-        
+
         return current($thumbnails);
     }
 
     /**
     * Get uploaded file path by using uploader id and file name
-    * 
+    *
     * @param string $uploaderId Uploader id
     * @param string $fileName   File name
-    * 
+    *
     * @return boolean|string File path when File exists, false otherwise
     */
     public function getUploadedFilePath($uploaderId, $fileName)
@@ -931,7 +931,7 @@ EOF;
         if (!\Cx\Lib\FileSystem\FileSystem::exists($filePath)) {
             return false;
         }
-        
+
         return $filePath;
     }
 }

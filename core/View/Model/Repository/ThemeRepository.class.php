@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * ThemeRepository
  *
@@ -52,11 +52,11 @@ class ThemeRepository
      * @var \ADOConnection database connection
      */
     private $db;
-    
+
     public function __construct() {
         $this->db = \Env::get('db');
     }
-    
+
     /**
      * Get the default theme by device type and language
      * @param string $type the type of output device
@@ -81,14 +81,14 @@ class ThemeRepository
                 $dbField = 'themesid';
                 break;
         }
-        
+
         // select default theme of default language if no language id has been
         // provided
         $where = '`is_default` = "true"';
         if ($languageId) {
             $where = '`id` = ' . intval($languageId);
         }
-        
+
         $result = $this->db->SelectLimit('SELECT `'.$dbField.'` FROM `'.DBPREFIX.'languages` WHERE ' . $where, 1);
         if ($result !== false && $result->RecordCount() > 0) {
             $id = current($result->fields);
@@ -96,12 +96,12 @@ class ThemeRepository
         }
         return null;
     }
-    
+
     /**
      * get themes by its subtype
-     * 
+     *
      * @param string $type the sub type of the theme
-     * 
+     *
      * @return array array of themes filtered by the sub type
      */
     public function getThemesBySubType($type = \Cx\Core\View\Model\Entity\Theme::THEME_TYPE_WEB)
@@ -110,7 +110,7 @@ class ThemeRepository
         foreach($this->findAll() as $theme) {
             $subType = $theme->getSubtype();
             if (
-                   $type == $subType 
+                   $type == $subType
                 || (
                        empty($subType)
                     && in_array($type, array(\Cx\Core\View\Model\Entity\Theme::THEME_TYPE_WEB, \Cx\Core\View\Model\Entity\Theme::THEME_TYPE_MOBILE))
@@ -119,10 +119,10 @@ class ThemeRepository
                 $themes[] = $theme;
             }
         }
-        
+
         return $themes;
     }
-    
+
     /**
      * Get a theme by theme id
      * @param int $id the id of the theme
@@ -130,7 +130,7 @@ class ThemeRepository
      */
     public function findById($id) {
         $result = $this->db->SelectLimit('SELECT `id`, `themesname`, `foldername`, `expert` FROM `'.DBPREFIX.'skins` WHERE `id` = '.intval($id), 1);
-        if ($result !== false && !$result->EOF) {            
+        if ($result !== false && !$result->EOF) {
             return $this->getTheme(
                 $result->fields['id'],
                 $result->fields['themesname'],
@@ -141,11 +141,11 @@ class ThemeRepository
         }
         return null;
     }
-    
+
     /**
      * Get multiple themes
      * @param array $crit the criterias
-     * @param array $order the order, e.g. array( 'field' => 'ASC|DESC' ) 
+     * @param array $order the order, e.g. array( 'field' => 'ASC|DESC' )
      * @param int $languageId filter by language id
      * @return array theme objects
      */
@@ -156,7 +156,7 @@ class ThemeRepository
             foreach ($crit as $field => $value) {
                 $wheres[] = '`'.$field.'` = \''.contrexx_raw2db($value).'\'';
             }
-            
+
             $query .= ' WHERE ' . implode(' AND ', $wheres);
         }
         if (!empty($order)) {
@@ -178,17 +178,17 @@ class ThemeRepository
         }
         return $themes;
     }
-    
+
     /**
      * Find one theme by provided criterias and sort them in a defined order
      * @param array $crit the criterias
-     * @param array $order the order, e.g. array( 'field' => 'ASC|DESC' ) 
+     * @param array $order the order, e.g. array( 'field' => 'ASC|DESC' )
      * @return \Cx\Core\View\Model\Entity\Theme the theme object
      */
     public function findOneBy($crit = array(), $order = array()) {
         return current($this->findBy($crit, $order));
     }
-    
+
     /**
      * Get all themes as objects with a provided order and by language id
      * @param array $order the order, e.g. array( 'field' => 'ASC|DESC' )
@@ -203,25 +203,25 @@ class ThemeRepository
         $result = $this->db->Execute($query);
         $themes = array();
         if ($result !== false) {
-            while (!$result->EOF) {                
+            while (!$result->EOF) {
                 $themes[] = $this->getTheme(
                         $result->fields['id'],
                         $result->fields['themesname'],
                         $result->fields['foldername'],
                         $result->fields['expert'],
                         $languageId
-                    ); 
+                    );
                 $result->MoveNext();
             }
         }
         return $themes;
     }
-    
+
     /**
      * Get themes active themes
      */
     public function getActiveThemes() {
-        
+
         $objResult = $this->db->Execute('
             SELECT   `themesid`, `mobile_themes_id`, `print_themes_id`, `pdf_themes_id`, `app_themes_id`
             FROM     `'.DBPREFIX.'languages`
@@ -229,7 +229,7 @@ class ThemeRepository
             ORDER BY `id`
         ');
         $themesArray = array();
-        
+
         if ($objResult) {
             while (!$objResult->EOF) {
                 if (!empty($objResult->fields['themesid'])) {
@@ -247,24 +247,24 @@ class ThemeRepository
                 if (!empty($objResult->fields['app_themes_id'])) {
                     $themesArray[] = $objResult->fields['app_themes_id'];
                 }
-                
+
                 $objResult->MoveNext();
             }
         }
         $themesArray = array_unique($themesArray);
-        
+
         $themes = array();
-        
+
         foreach ($themesArray as $themeId) {
             $theme = $this->findById($themeId);
             if ($theme) {
                 $themes[] = $theme;
             }
         }
-        
-        return $themes;        
+
+        return $themes;
     }
-    
+
     /**
      * Removes a theme from database
      * @param \Cx\Core\View\Model\Entity\Theme $theme a theme object
@@ -273,21 +273,21 @@ class ThemeRepository
     public function remove($theme) {
         return $this->db->Execute('DELETE FROM `'.DBPREFIX.'skins` WHERE `id` = '.$theme->getId());
     }
-    
+
     /**
      * Writes the component.yml file with the data defined in component data array
-     * 
+     *
      * @param \Cx\Core\View\Model\Entity\Theme $theme the theme object
      */
     public function saveComponentData(\Cx\Core\View\Model\Entity\Theme $theme) {
         global $_ARRAYLANG;
-        
+
         if (!file_exists(\Env::get('cx')->getWebsiteThemesPath() . '/' . $theme->getFoldername())) {
             if (!\Cx\Lib\FileSystem\FileSystem::make_folder(\Env::get('cx')->getWebsiteThemesPath() . '/' . $theme->getFoldername())) {
                 \Message::add($theme->getFoldername() . " : " . $_ARRAYLANG['TXT_THEME_UNABLE_TO_CREATE']);
             }
         }
-        
+
         $filePath = \Env::get('cx')->getWebsiteThemesPath() . '/' . $theme->getFoldername() . '/component.yml';
         try {
             $file = new \Cx\Lib\FileSystem\File($filePath);
@@ -304,16 +304,16 @@ class ThemeRepository
             throw new $e;
         }
     }
-    
+
     /**
      * Load the component data from component.yml file
-     * 
+     *
      * @param \Cx\Core\View\Model\Entity\Theme $theme
      */
     public function loadComponentData(\Cx\Core\View\Model\Entity\Theme &$theme) {
         $websiteFilePath  = \Env::get('cx')->getWebsiteThemesPath() . '/' . $theme->getFoldername() . \Cx\Core\View\Model\Entity\Theme::THEME_COMPONENT_FILE;
         $codeBaseFilePath = \Env::get('cx')->getCodeBaseThemesPath() . '/' . $theme->getFoldername() . \Cx\Core\View\Model\Entity\Theme::THEME_COMPONENT_FILE;
-        $filePath         = file_exists($websiteFilePath) 
+        $filePath         = file_exists($websiteFilePath)
                             ? $websiteFilePath
                             : ( file_exists($codeBaseFilePath)
                                 ? $codeBaseFilePath
@@ -327,13 +327,13 @@ class ThemeRepository
                 $theme->setComponentData($themeInformation['DlcInfo']);
             } catch (\Exception $e) {
                 \DBG::log($e->getMessage());
-            }            
+            }
         }
     }
-    
+
     /**
      * Get a theme object with all his attributes
-     * 
+     *
      * Loads the component data from component.yml file or creates one from info.xml
      * or a new one from static array
      * @param int $id the id of a theme, used for delete
@@ -345,14 +345,14 @@ class ThemeRepository
      */
     protected function getTheme($id, $themesname, $foldername, $expert, $languageId = null) {
         $theme = new \Cx\Core\View\Model\Entity\Theme($id, $themesname, $foldername, $expert);
-        
+
         // select default theme of default language if no language id has been
         // provided
         $where = '`is_default` = "true"';
         if ($languageId) {
             $where = '`id` = ' . intval($languageId);
         }
-        
+
         $result = $this->db->SelectLimit('SELECT `themesid`, `pdf_themes_id`, `app_themes_id`, `mobile_themes_id`, `print_themes_id` FROM `'.DBPREFIX.'languages` WHERE ' . $where, 1);
         if ($result !== false && !$result->EOF) {
             if ($result->fields['themesid'] == $id) {
@@ -371,17 +371,17 @@ class ThemeRepository
                 $theme->addDefault(\Cx\Core\View\Model\Entity\Theme::THEME_TYPE_PRINT);
             }
         }
-        
-        $themePath =  file_exists(\Env::get('cx')->getWebsiteThemesPath() . '/' . $foldername) 
-                    ? \Env::get('cx')->getWebsiteThemesPath() . '/' . $foldername 
-                    : \Env::get('cx')->getCodeBaseThemesPath() . '/'. $foldername;        
-        
+
+        $themePath =  file_exists(\Env::get('cx')->getWebsiteThemesPath() . '/' . $foldername)
+                    ? \Env::get('cx')->getWebsiteThemesPath() . '/' . $foldername
+                    : \Env::get('cx')->getCodeBaseThemesPath() . '/'. $foldername;
+
         if (!file_exists($themePath)) {
             \DBG::log($foldername. ' :Theme folder not Exists');
             return $theme;
         }
-        
-        $this->loadComponentData($theme);        
+
+        $this->loadComponentData($theme);
         // create a new one if no component.yml exists
         if (!$theme->isComponent()) {
             try {
@@ -392,10 +392,10 @@ class ThemeRepository
             }
             $this->loadComponentData($theme);
         }
-        
+
         return $theme;
     }
-    
+
     /**
      * Generate a component.yml for each theme available on the system
      * only used in update process for fixing invalid themes
@@ -407,17 +407,17 @@ class ThemeRepository
             }
             try {
                 $this->convertThemeToComponent($theme);
-            } catch (\Exception $ex) {                
+            } catch (\Exception $ex) {
                 \DBG::log($ex->getMessage());
                 \DBG::log($theme->getThemesname() .' : Unable to convert theme to component');
             }
-            
-        }            
+
+        }
     }
-    
+
     /**
      * Generate a component.yml for one theme available on the system
-     * 
+     *
      * @param \Cx\Core\View\Model\Entity\Theme $theme
      */
     public function convertThemeToComponent(\Cx\Core\View\Model\Entity\Theme $theme) {
@@ -461,10 +461,10 @@ class ThemeRepository
                     'state' => 'stable',
                     'number' => '1.0.0',
                     'releaseDate' => '',
-                ),                
+                ),
             );
         }
-        
+
         // Add default dependencies
         $themeInformation['DlcInfo']['dependencies'] = array(
             array(
@@ -474,7 +474,7 @@ class ThemeRepository
                 'maximumVersionNumber' => '1.6.1'
             )
         );
-        
+
         // write components yaml
         $theme->setComponentData($themeInformation['DlcInfo']);
         try {
@@ -492,11 +492,11 @@ class ThemeRepository
             }
         }
     }
-    
+
     private $xmlDocument;
     private $currentXmlElement;
     private $arrParentXmlElement;
-    
+
     /**
      * get XML info of specified modulefolder
      * @param string $themes
@@ -577,4 +577,3 @@ class ThemeRepository
         unset($this->arrParentXmlElement[$name]);
     }
 }
-

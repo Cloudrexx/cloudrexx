@@ -1,54 +1,54 @@
 <!-- START module_memberdir_overview.html -->
 <script language="JavaScript" type="text/javascript">
 // <![CDATA[
-	function memberdirDelete(pageId){
-	    if(confirm('{TXT_CONFIRM_DELETE_DATA}\n{TXT_ACTION_IS_IRREVERSIBLE}'))
-	        window.location.replace("?cmd=MemberDir&{CSRF_PARAM}&act=deleteMember&id="+pageId+"&dirid={DIRID}");
-	}
+  function memberdirDelete(pageId){
+      if(confirm('{TXT_CONFIRM_DELETE_DATA}\n{TXT_ACTION_IS_IRREVERSIBLE}'))
+          window.location.replace("?cmd=MemberDir&{CSRF_PARAM}&act=deleteMember&id="+pageId+"&dirid={DIRID}");
+  }
 
-	function selectMultiAction()
-	{
-		with (document.memberdir) {
-			switch (memberdir_MultiAction.value) {
-				case 'export':
-					action='?cmd=MemberDir&act=export&singleMembers=1';
-					submit();
-				break;
-				case 'delete':
-					if (confirm('{TXT_DELETE_CATEGORY_ALL}')) {
-						action='?cmd=MemberDir&act=multiMemberDelete&id={DIRID}';
-						submit();
-					}
-				break;
-				default: //do nothing
-			}
-		}
-	}
+  function selectMultiAction()
+  {
+    with (document.memberdir) {
+      switch (memberdir_MultiAction.value) {
+        case 'export':
+          action='?cmd=MemberDir&act=export&singleMembers=1';
+          submit();
+        break;
+        case 'delete':
+          if (confirm('{TXT_DELETE_CATEGORY_ALL}')) {
+            action='?cmd=MemberDir&act=multiMemberDelete&id={DIRID}';
+            submit();
+          }
+        break;
+        default: //do nothing
+      }
+    }
+  }
 
 // ]]>
 </script>
 <table class="adminlist" cellspacing="0" cellpadding="3" width="100%" border="0">
-	<tr>
-		<th>
-			<div align="left">{TXT_FILTER}</div>
-		</th>
-	</tr>
-	<tr class="row1">
-		<td>
-		{MEMBERDIR_CHARLIST}
-		</td>
-	</tr>
-	<tr class="row2">
-		<td>
-			<form action="?cmd=MemberDir" method="get">
-				<input type="hidden" name="search" value="search" />
-				<input type="hidden" name="cmd" value="MemberDir" />
-				<input type="hidden" name="act" value="showdir" />
-				<input type="hidden" name="id" value="{DIRID}" />
-				<input type="text" name="keyword" value="{TXT_KEYWORD}" onclick="this.value=''"/> {DIRECTORY_LIST} <input type="submit" value="{TXT_SEARCH}" />
-			</form>
-		</td>
-	</tr>
+  <tr>
+    <th>
+      <div align="left">{TXT_FILTER}</div>
+    </th>
+  </tr>
+  <tr class="row1">
+    <td>
+    {MEMBERDIR_CHARLIST}
+    </td>
+  </tr>
+  <tr class="row2">
+    <td>
+      <form action="?cmd=MemberDir" method="get">
+        <input type="hidden" name="search" value="search" />
+        <input type="hidden" name="cmd" value="MemberDir" />
+        <input type="hidden" name="act" value="showdir" />
+        <input type="hidden" name="id" value="{DIRID}" />
+        <input type="text" name="keyword" value="{TXT_KEYWORD}" onclick="this.value=''"/> {DIRECTORY_LIST} <input type="submit" value="{TXT_SEARCH}" />
+      </form>
+    </td>
+  </tr>
 </table>
 <br /><br />
 <form method="post" name="memberdir" action="?cmd=MemberDir&amp;act=showdir&amp;id={DIRID}" name="memberlist" id="memberlist">
@@ -59,9 +59,9 @@
     </th>
   </tr>
   <tr class="row3">
-  	<td width="3%"><strong>#</strong></td>
-  	<td width="3%"><strong>{TXT_ID}</strong></td>
-  	<td width="10%"><strong>{TXT_MEMBERDIR_SORTING}</strong></td>
+    <td width="3%"><strong>#</strong></td>
+    <td width="3%"><strong>{TXT_ID}</strong></td>
+    <td width="10%"><strong>{TXT_MEMBERDIR_SORTING}</strong></td>
     <td width="23%"><strong>{TXT_FIELD_1} </strong></td>
     <td width="23%"><strong>{TXT_FIELD_2} </strong></td>
     <td width="23%"><strong>{TXT_FIELD_3} </strong></td>
@@ -69,30 +69,30 @@
   </tr>
   <!-- BEGIN memberdir_row -->
   <tr class="{MEMBERDIR_ROW}">
-  	<td valign="top"><input type="checkbox" name="selectedId[]" id="selectedId" value="{MEMBERDIR_ID}"></td>
+    <td valign="top"><input type="checkbox" name="selectedId[]" id="selectedId" value="{MEMBERDIR_ID}"></td>
     <td valign="top">{MEMBERDIR_ID}</td>
     <td valign="top"><input type="text" value="{MEMBERDIR_USER_DEFINED_SORT_NUMBER}" name="userDefinedSortNumber[{MEMBERDIR_ID}]" style="width:50px;" /></td>
     <td valign="top"><a href="index.php?cmd=MemberDir&amp;act=show&amp;id={MEMBERDIR_ID}">{MEMBERDIR_FIELD_1}</a></td>
-	<td valign="top">{MEMBERDIR_FIELD_2}</td>
+  <td valign="top">{MEMBERDIR_FIELD_2}</td>
     <td valign="top">{MEMBERDIR_FIELD_3}</td>
     <td valign="top" style="text-align: right"><a href="?cmd=MemberDir&amp;act=exportvcf&amp;id={MEMBERDIR_ID}"><img style="margin-bottom: 1px;" border="0" src="../core/Core/View/Media/icons/vcard.gif" title="{TXT_MEMBERDIR_EXPORT_CONTACT_AS_VCARD}" alt="{TXT_MEMBERDIR_EXPORT_CONTACT_AS_VCARD}" /></a> <a href="index.php?cmd=MemberDir&amp;act=editMember&amp;id={MEMBERDIR_ID}"><img src="../core/Core/View/Media/icons/edit.gif" border="0" alt="Eintrag editieren" /></a> <a href="javascript:memberdirDelete({MEMBERDIR_ID})"><img src="../core/Core/View/Media/icons/delete.gif" border="0" alt="Eintrag l&ouml;schen" /></a> </td>
   </tr>
   <!-- END memberdir_row -->
 </table>
 <table cellpadding="2" cellspacing="0" border="0">
-	<tr>
-		<td>
-			<img src="../core/Core/View/Media/icons/arrow.gif" border="0" width="38" height="22" alt="{TXT_MARKED}:" />
-			<a href="#" onClick="changeCheckboxes('memberlist','selectedId[]',true); return false;">{TXT_SELECT_ALL}</a> /
-			<a href="#" onClick="changeCheckboxes('memberlist','selectedId[]',false); return false;">{TXT_DESELECT_ALL}</a>
-			<img src="../core/Core/View/Media/icons/strike.gif">
-			<select name="memberdir_MultiAction" onchange="selectMultiAction();">
-				<option value="0">{TXT_SUBMIT_SELECT}</option>
-				<option value="delete">{TXT_SUBMIT_DELETE}</option>
-				<option value="export">{TXT_SUBMIT_EXPORT}</option>
-			</select>
-		</td>
-	</tr>
+  <tr>
+    <td>
+      <img src="../core/Core/View/Media/icons/arrow.gif" border="0" width="38" height="22" alt="{TXT_MARKED}:" />
+      <a href="#" onClick="changeCheckboxes('memberlist','selectedId[]',true); return false;">{TXT_SELECT_ALL}</a> /
+      <a href="#" onClick="changeCheckboxes('memberlist','selectedId[]',false); return false;">{TXT_DESELECT_ALL}</a>
+      <img src="../core/Core/View/Media/icons/strike.gif">
+      <select name="memberdir_MultiAction" onchange="selectMultiAction();">
+        <option value="0">{TXT_SUBMIT_SELECT}</option>
+        <option value="delete">{TXT_SUBMIT_DELETE}</option>
+        <option value="export">{TXT_SUBMIT_EXPORT}</option>
+      </select>
+    </td>
+  </tr>
 </table>
 <br />
 <input type="submit" name="memberdir_update_sorting" value="Sortierung speichern" />

@@ -50,15 +50,15 @@ function shopUpdateCart(data, textStatus, jqXHR) {
             cartProduct = cartProduct.replace('{SHOP_JS_TOTAL_PRICE_UNIT}', objCart.unit);
             cartProduct = cartProduct.replace('{SHOP_JS_PRODUCT_ID}', i.cart_id);
             cart += cartProduct;
-            
+
             //Update Quanity-Field for Minimum-Order-Quanity-Validation
             if(cx.jQuery('input[name="productId"]').length > 0){
-                
+
                 cx.jQuery('input[name="productId"]').each(function(){
                     var elProductId = cx.jQuery(this);
                     var elProductForm = elProductId.closest("form");
                     var elProductQuanity = elProductForm.find('input[name="orderQuanity"]');
-                    
+
                     if(elProductId.val() == i.id && elProductQuanity.length > 0){
                         var orderQuanity = elProductQuanity.val()
                         var effectiveMinimumQuanity = i.minimum_order_quantity - i.quantity;

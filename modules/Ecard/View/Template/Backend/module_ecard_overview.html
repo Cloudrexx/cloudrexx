@@ -4,7 +4,7 @@
 path = "";
 function ecardGetFileBrowser(motive_id) {
   path = motive_id;
-  cx.jQuery('#mediabrowser_button').trigger('click');  
+  cx.jQuery('#mediabrowser_button').trigger('click');
 }
 
 function ecardClearImage(motive_id) {
@@ -16,11 +16,11 @@ function ecardClearImage(motive_id) {
 function mbCallback(data) {
     if (data.type === "file" && path !== '' && data.data[0]) {
         var url = data.data[0].datainfo.filepath;
-        
+
         document.getElementById("motive_id_"+path).value = url;
         document.getElementById("motive_img_"+path).src  = url;
         document.getElementById("motive_img_"+path).alt  = url;
-    }  
+    }
 }
 
 /* ]]> */
@@ -44,12 +44,12 @@ function mbCallback(data) {
         </a>
       </td>
       <td nowrap="nowrap" valign="top">
-        <input type="text" id="motive_id_{MOTIVE_ID}" readonly="readonly" 
+        <input type="text" id="motive_id_{MOTIVE_ID}" readonly="readonly"
             name="motiveInputArray[]" value="{MOTIVE_PATH}" style="width:250px;" /></td>
       <td valign="top" nowrap="nowrap">
-        <input type="button" onclick="ecardGetFileBrowser({MOTIVE_ID})" 
+        <input type="button" onclick="ecardGetFileBrowser({MOTIVE_ID})"
             value="{TXT_BROWSE}" />
-        <input type="button" onclick="ecardClearImage({MOTIVE_ID});" 
+        <input type="button" onclick="ecardClearImage({MOTIVE_ID});"
             value="{TXT_DELETE}" />
       </td>
     </tr>

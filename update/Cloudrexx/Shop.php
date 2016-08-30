@@ -33,7 +33,7 @@ echo shopUpdates();
 function shopUpdates() {
     //Update the database changes
     try {
-        //update module name 
+        //update module name
         \Cx\Lib\UpdateUtil::sql("UPDATE `".DBPREFIX."modules` SET `name` = 'Shop' WHERE `id` = 16");
         //update navigation url
         \Cx\Lib\UpdateUtil::sql("UPDATE `".DBPREFIX."backend_areas` SET `uri` = 'index.php?cmd=Shop' WHERE `area_id` = 13");
@@ -49,11 +49,11 @@ function shopUpdates() {
     } catch (\Cx\Lib\UpdateException $e) {
         return "Error: $e->sql";
     }
-    
+
     //Update script for moving the folder
     $shopImgPath   = ASCMS_DOCUMENT_ROOT . '/images';
     $shopMediaPath = ASCMS_DOCUMENT_ROOT . '/media';
-    
+
     try {
         if (file_exists($shopImgPath . '/shop') && !file_exists($shopImgPath . '/Shop')) {
             \Cx\Lib\FileSystem\FileSystem::makeWritable($shopImgPath . '/shop');
@@ -70,6 +70,6 @@ function shopUpdates() {
     } catch (\Cx\Lib\FileSystem\FileSystemException $e) {
         return $e->getMessage();
     }
-    
+
     return 'Shop updated successfully.';
 }

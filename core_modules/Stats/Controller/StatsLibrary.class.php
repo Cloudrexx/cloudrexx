@@ -80,15 +80,15 @@ class StatsLibrary
     public $arrProxy = array();
     public $md5Id = 0;
     public $currentTime = 0;
-    
+
     /**
      * Instance of cloudrexx
-     * 
+     *
      * @var object \Cx\Core\Core\Controller\Cx
      */
     protected $cx;
-            
-    function __construct() {        
+
+    function __construct() {
         $this->cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $this->_initConfiguration();
     }
@@ -167,12 +167,12 @@ class StatsLibrary
     function checkForSpider()
     {
         global $arrRobots;
-        
+
         if ($this->arrConfig['count_spiders']['status']) {
             $arrRobots = array();
-            $this->cx->getClassLoader()->loadFile($this->cx->getCoreModuleFolderName().'/Stats/Data/spiders.inc.php');            
+            $this->cx->getClassLoader()->loadFile($this->cx->getCoreModuleFolderName().'/Stats/Data/spiders.inc.php');
             $useragent =  htmlspecialchars($_SERVER['HTTP_USER_AGENT'], ENT_QUOTES, CONTREXX_CHARSET);
-            $spiderAgent = false;                        
+            $spiderAgent = false;
             foreach ($arrRobots as $spider) {
                 $spiderName = trim($spider);
                 if (preg_match("=".$spiderName."=",$useragent)) {
@@ -268,9 +268,9 @@ class StatsLibrary
     function _getRequestedUrl()
     {
         global $arrBannedWords;
-        
+
         $arrBannedWords = array();
-        $this->cx->getClassLoader()->loadFile($this->cx->getCoreModuleFolderName().'/Stats/Data/banned.inc.php');        
+        $this->cx->getClassLoader()->loadFile($this->cx->getCoreModuleFolderName().'/Stats/Data/banned.inc.php');
         $uriString="";
 
         $completeUriString = substr(strstr($_SERVER['REQUEST_URI'], "?"),1);
@@ -744,7 +744,7 @@ class StatsLibrary
             $this->arrClient['useragent'] = "<b>p_h_p_i_n_f_o() Possible Hacking Attack</b>";
         }
 
-        $this->arrClient['language'] = isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) 
+        $this->arrClient['language'] = isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])
                                         ? htmlspecialchars($_SERVER['HTTP_ACCEPT_LANGUAGE'], ENT_QUOTES, CONTREXX_CHARSET) : '';
         $this->_getProxyInformations(); // get also the client ip
 
@@ -1055,7 +1055,7 @@ class StatsLibrary
             $countResolution = (boolean) isset($_POST['options']['count_screen_resolution']) ? $_POST['options']['count_screen_resolution'] : 0;
             $countColour = (boolean) isset($_POST['options']['count_colour_depth']) ? $_POST['options']['count_colour_depth'] : 0;
             $countJavascript = (boolean) isset($_POST['options']['count_javascript']) ? $_POST['options']['count_javascript'] : 0;
-			$excludeIdentifyingInfo = (boolean) isset($_POST['options']['exclude_identifying_info']) ? $_POST['options']['exclude_identifying_info'] : 0;
+            $excludeIdentifyingInfo = (boolean) isset($_POST['options']['exclude_identifying_info']) ? $_POST['options']['exclude_identifying_info'] : 0;
             $onlineTimeoutStatus = (boolean) isset($_POST['options']['online_timeout_status']) ? $_POST['options']['online_timeout_status'] : 0;
             $countVisitorNumber = (boolean) isset($_POST['options']['count_visitor_number']) ? $_POST['options']['count_visitor_number'] : 0;
             $onlineTimeout = (int) isset($_POST['options']['online_timeout']) ? $_POST['options']['online_timeout'] : $this->arrConfig['online_timeout']['value'];
@@ -1186,7 +1186,7 @@ class StatsLibrary
                 $query = "UPDATE `".DBPREFIX."stats_config` SET `status` = ".$countJavascript." WHERE `name` = 'count_javascript'";
                 $objDatabase->Execute($query);
             }
-			if ($excludeIdentifyingInfo != $this->arrConfig['exclude_identifying_info']['status']) {
+            if ($excludeIdentifyingInfo != $this->arrConfig['exclude_identifying_info']['status']) {
                 $query = "UPDATE `".DBPREFIX."stats_config` SET `status` = ".$excludeIdentifyingInfo." WHERE `name` = 'exclude_identifying_info'";
                 $objDatabase->Execute($query);
             }
@@ -1350,7 +1350,7 @@ class StatsLibrary
 
     /**
      * Get javascript code for the jqplot chart.
-     * 
+     *
      * @param   string  $id
      * @param   array   $data
      * @return  string  $code
@@ -1358,14 +1358,14 @@ class StatsLibrary
     protected function getChartJavascriptBy($id, $data, $renderer = '')
     {
         global $_ARRAYLANG;
-        
+
         \JS::activate('jquery-jqplot');
-        
+
         $ticks    = json_encode($data['ticks']);
         $dates    = json_encode($data['dates']);
         $visitors = json_encode($data['visitors']);
         $requests = json_encode($data['requests']);
-        
+
         if ($renderer == 'bar') {
             $seriesDefault = '
                 stackSeries: true,
@@ -1386,8 +1386,8 @@ class StatsLibrary
                 },
             ';
         }
-        
-        
+
+
         $code = '
             <!--[if lt IE 9]>
             <script type="text/javascript" src="../lib/javascript/jquery/plugins/jqplot/excanvas.min.js"></script>
@@ -1402,7 +1402,7 @@ class StatsLibrary
                 var data         = new Array();
                 data[\'dates\']  = dates;
                 data[\'labels\'] = labels;
-                
+
                 var plot = $J.jqplot(\''.$id.'\', [visitors, requests], {
                     '.$seriesDefault.'
                     seriesColors: [\'#4EAA09\', \'#0C90D0\'],
@@ -1440,14 +1440,14 @@ class StatsLibrary
             });
             </script>
         ';
-        
+
         return $code;
     }
 
 
     /**
      * Get hourly statistics data.
-     * 
+     *
      * @param   string  $param  (hour, day, month or year)
      * @return  array(
      *              ticks,
@@ -1459,27 +1459,27 @@ class StatsLibrary
     protected function getStatsDataBy($param)
     {
         global $_CORELANG, $objDatabase;
-        
+
         $arrRange = $this->getStatsRangeBy($param);
-        
+
         $arrMonths   = explode(',', $_CORELANG['TXT_MONTH_ARRAY']);
         $arrDays     = explode(',', $_CORELANG['TXT_DAY_ARRAY']);
         $arrDays[7]  = $arrDays[0];
         unset($arrDays[0]);
-        
+
         $statsData   = $this->getStatsDataSummaryBy($param);
         $arrVisitors = $statsData['visitors'];
         $arrRequests = $statsData['requests'];
-        
+
         $ticks       = array();
         $visitors    = array();
         $requests    = array();
         $i = 1;
-        
+
         foreach ($arrRange as $unit => $date) {
             $ticks[]   = $date['tick'];
             $timestamp = $date['timestamp'];
-            
+
             switch ($param) {
                 case 'day':
                     $dates[$i]  = $arrDays[date('N', $timestamp)].', '.date('j', $timestamp).'. '.$arrMonths[date('n', $timestamp) - 1].' '.date('Y', $timestamp);
@@ -1495,13 +1495,13 @@ class StatsLibrary
                     $dates[$i]  = date('H', $timestamp).':00';
                     break;
             }
-            
+
             $visitors[] = isset($arrVisitors[$unit]) ? intval($arrVisitors[$unit]) : 0;
             $requests[] = isset($arrRequests[$unit]) ? intval($arrRequests[$unit]) : 0;
-            
+
             $i++;
         }
-        
+
         return array(
             'ticks'    => $ticks,
             'dates'    => $dates,
@@ -1513,21 +1513,21 @@ class StatsLibrary
 
     /**
      * Get statistics range by parameter.
-     * 
+     *
      * @param   string  $param  (hour, day, month or year)
      * @return  array   $arrRange
      */
     private function getStatsRangeBy($param)
     {
         global $objDatabase;
-        
+
         switch ($param) {
             case 'day':
                 $rangeStart = date('j', strtotime('last month')) + 1;
                 $rangeStart = $rangeStart > 31 ? 1 : $rangeStart;
                 $rangeEnd   = date('j');
                 $arrRange   = array();
-                
+
                 if ($rangeStart >= $rangeEnd) {
                     $timestamp = strtotime('last month');
                     $first     = range($rangeStart, date('t', $timestamp));
@@ -1537,7 +1537,7 @@ class StatsLibrary
                         $arrRange[$day]['tick'] = $day.' '.$month;
                         $arrRange[$day]['timestamp'] = strtotime($day.' '.$month.' '.$year);
                     }
-                    
+
                     $second = range(1, $rangeEnd);
                     $month  = date('M');
                     $year   = date('Y');
@@ -1559,7 +1559,7 @@ class StatsLibrary
                 $rangeStart = date('n', strtotime('-23 months'));
                 $rangeEnd   = date('n');
                 $arrRange   = array();
-                
+
                 if ($rangeStart != 1) { // Range starts 2 years ago
                     $first = range($rangeStart, 12);
                     $year  = date('Y', strtotime('-2 years'));
@@ -1570,7 +1570,7 @@ class StatsLibrary
                         $arrRange[$month.'-'.$year]['timestamp'] = strtotime($monthName.' '.$year);
                     }
                 }
-                
+
                 $second = range(1, 12);
                 $year   = date('Y', strtotime('last year'));
                 foreach ($second as $month) {
@@ -1579,7 +1579,7 @@ class StatsLibrary
                     $arrRange[$month.'-'.$year]['tick']      = $monthName.' '.$year;
                     $arrRange[$month.'-'.$year]['timestamp'] = strtotime($monthName.' '.$year);
                 }
-                
+
                 $third = range(1, $rangeEnd);
                 $year  = date('Y');
                 foreach ($third as $month) {
@@ -1597,7 +1597,7 @@ class StatsLibrary
                 ';
                 $objResult = $objDatabase->Execute($query);
                 $arrRange = array();
-                
+
                 if ($objResult !== false) {
                     while (!$objResult->EOF) {
                         $year = date('Y', $objResult->fields['timestamp']);
@@ -1607,7 +1607,7 @@ class StatsLibrary
                     }
                     ksort($arrRange);
                 }
-                
+
                 if (empty($arrRange)) {
                     $year = date('Y');
                     $arrRange[$year]['tick']      = $year;
@@ -1619,7 +1619,7 @@ class StatsLibrary
                 $rangeStart = date('G', strtotime('-23 hours'));
                 $rangeEnd   = date('G');
                 $arrRange   = array();
-                
+
                 if ($rangeStart != 0) {
                     $first     = range($rangeStart, 23);
                     $timestamp = strtotime('-1 day');
@@ -1631,7 +1631,7 @@ class StatsLibrary
                         $arrRange[$hour]['tick']      = $hour.':00';
                         $arrRange[$hour]['timestamp'] = strtotime($day.' '.$month.' '.$year.' '.$hour.':00');
                     }
-                    
+
                     $second = range(0, $rangeEnd);
                     $day    = date('j');
                     $month  = date('M');
@@ -1654,14 +1654,14 @@ class StatsLibrary
                 }
                 break;
         }
-        
+
         return $arrRange;
     }
 
 
     /**
      * Get visitors and requests data.
-     * 
+     *
      * @param   string  $param  (hour, day, month or year)
      * @return  array(
      *              visitors,
@@ -1671,10 +1671,10 @@ class StatsLibrary
     private function getStatsDataSummaryBy($param)
     {
         global $objDatabase;
-        
+
         $select    = '';
         $timestamp = '';
-        
+
         switch ($param) {
             case 'day':
                 $format = 'j';
@@ -1707,7 +1707,7 @@ class StatsLibrary
                 ';
                 break;
         }
-        
+
         $query = '
             SELECT `timestamp`, `count`
             FROM `'.DBPREFIX.'stats_visitors_summary`
@@ -1715,7 +1715,7 @@ class StatsLibrary
             '.$timestamp.'
         ';
         $objResult = $objDatabase->Execute($query);
-        
+
         $arrVisitory = array();
         if ($objResult !== false) {
             if ($param == 'month') {
@@ -1733,7 +1733,7 @@ class StatsLibrary
                 }
             }
         }
-        
+
         $query = '
             SELECT `timestamp`, `count`
             FROM `'.DBPREFIX.'stats_requests_summary`
@@ -1741,7 +1741,7 @@ class StatsLibrary
             '.$timestamp.'
         ';
         $objResult = $objDatabase->Execute($query);
-        
+
         $arrRequests = array();
         if ($objResult !== false) {
             if ($param == 'month') {
@@ -1759,7 +1759,7 @@ class StatsLibrary
                 }
             }
         }
-        
+
         return array(
             'visitors' => $arrVisitors,
             'requests' => $arrRequests,

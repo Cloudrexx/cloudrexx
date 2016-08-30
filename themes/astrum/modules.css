@@ -2754,27 +2754,27 @@ li.category-nav a {
     margin-bottom: 10px;
 }
 #category-list li a{
-	color: #999;
-	font-size: 14px;
-	font-weight: 500;
-	display: block;
-	padding: 5px 10px;
-	margin: 0 0 0 5px;
-	border-radius: 3px;
-	background-color: #f2f2f2;
-	line-height: 20px;
-	box-shadow: inset 0px -1px 0px 0px rgba(0,0,0, 0.04);
-	-webkit-transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
-	-moz-transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
-	-o-transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
-	-ms-transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
-	transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
+  color: #999;
+  font-size: 14px;
+  font-weight: 500;
+  display: block;
+  padding: 5px 10px;
+  margin: 0 0 0 5px;
+  border-radius: 3px;
+  background-color: #f2f2f2;
+  line-height: 20px;
+  box-shadow: inset 0px -1px 0px 0px rgba(0,0,0, 0.04);
+  -webkit-transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
+  -moz-transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
+  -o-transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
+  -ms-transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
+  transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
 }
 #category-list li a:hover{
-	background-color: #73BB19 !important;
-	color: #fff !important;
-	box-shadow: inset 0px -1px 0px 0px rgba(0,0,0, 0.1);
-	text-decoration: none;
+  background-color: #73BB19 !important;
+  color: #fff !important;
+  box-shadow: inset 0px -1px 0px 0px rgba(0,0,0, 0.1);
+  text-decoration: none;
 }
 #category-list > span {
     color: #999999;
@@ -2958,7 +2958,7 @@ li.category-nav:first-child a, .category-list li:first-child a{
 #checkout form #buttons input:hover{
     background: #a0a0a0;
     transition: all 0.2s ease 0s;
-} 
+}
 #checkout form #buttons input:hover{
     transition: all 0.2s ease 0s;
 }
@@ -2978,7 +2978,7 @@ li.category-nav:first-child a, .category-list li:first-child a{
 }
 /*new styles*/
 .overview {
-	clear: both;
+  clear: both;
 }
 #news-user {
   float: left;
@@ -3057,8 +3057,8 @@ li.category-nav:first-child a, .category-list li:first-child a{
   margin: 0;
 }
 #shop .menu select, #shop .menu input[type="text"]{
-	float: left;
-	margin-right: 10px;
+  float: left;
+  margin-right: 10px;
 }
 /*new styles*/
 #shop-categories, #shopJsCart, #shop-currencies {
@@ -3082,7 +3082,7 @@ select#deselectedCategories, select#selectedCategories, select#deselectedLevels,
 }
 .checkbox label {margin: 0;}
 #survey .questionBlock .radio, #survey .questionBlock .radio label {width: 100%; word-wrap: break-word;}
-#directory select[name="notSelectedCat[]"], #directory select[name="selectedCat[]"], select[name="subscribed[]"], 
+#directory select[name="notSelectedCat[]"], #directory select[name="selectedCat[]"], select[name="subscribed[]"],
 select[name="unsubscribed[]"] {width: 100%;}
 #directory .selectorCenter {padding: 50px 25px;}
 #ecardForm span.radio label {margin: 0; float: left;}

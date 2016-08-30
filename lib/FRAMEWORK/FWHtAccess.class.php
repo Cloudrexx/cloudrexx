@@ -102,9 +102,9 @@ class FWHtAccess
      * @access private
      */
     private $objHtAccess;
-    
+
     private $document_root;
-    
+
     private $path_offset;
 
     /**

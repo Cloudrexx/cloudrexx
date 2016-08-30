@@ -49,7 +49,7 @@
             <input type="hidden" id="searchCheck" name="check" value="norm" />
             <input type="hidden" name="section" value="Market" />
             <input type="hidden" name="cmd" value="search" />
-            &nbsp;<input class="btn btn-default" type="submit" value="{TXT_MARKET_SEARCH}" name="search" />                  
+            &nbsp;<input class="btn btn-default" type="submit" value="{TXT_MARKET_SEARCH}" name="search" />
             <div class="adv-search">&nbsp;&raquo;&nbsp;<a href="javascript:toggle('hiddenSearch')">{TXT_MARKET_SEARCH_EXP}</a></div><br />
             <div style="display: none;" id="hiddenSearch"><br />
                 <table>
@@ -64,8 +64,8 @@
         <div class="row">
             <div class="col-md-2">{MARKET_PICTURE}</div>
             <div class="col-md-10"><b>{MARKET_TYPE}</b>&nbsp;<i>{MARKET_ENDDATE}&nbsp;</i><br /><br />{MARKET_DESCRIPTION}</div>
-        </div> 
-    </div> 
+        </div>
+    </div>
     <div class="data">
         <table>
             <tr>
@@ -82,7 +82,7 @@
         </table>
     </div>
     <div class="form">
-        <fieldset> 
+        <fieldset>
             <legend>{TXT_MARKET_MESSAGE}</legend>
             <form name="sendMessage" action="index.php?section=Market&amp;cmd=send&amp;id={MARKET_ID}" method="post" onsubmit="return CheckForm()">
                 <p><label for="title">{TXT_MARKET_TITLE}</label><input name="title"  value="{TXT_MARKET_MSG_TITLE}{MARKET_TITLE}" /></p>

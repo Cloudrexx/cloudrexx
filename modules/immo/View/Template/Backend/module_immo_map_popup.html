@@ -39,74 +39,74 @@ var address = null;
 var load = function() {
     if (GBrowserIsCompatible()) {
         map = new GMap2(document.getElementById("gmap"));
-    	map.addControl(new GLargeMapControl());
-    	map.addControl(new GMapTypeControl());
-    	map.addControl(new GOverviewMapControl(new GSize(200,200)));
-    	if(window.opener.document.getElementById('longitude').value != '' && window.opener.document.getElementById('latitude').value != ''){
-    		lon = window.opener.document.getElementById('longitude').value;
-    		lonf = window.opener.document.getElementById('longitude_fraction').value;
-    		lat = window.opener.document.getElementById('latitude').value;
-    		latf = window.opener.document.getElementById('latitude_fraction').value;
-    		zoom = parseInt(((window.opener.document.getElementById('map_zoom').value != '') ? window.opener.document.getElementById('map_zoom').value : 13));
-    		map.setCenter(new GLatLng(lon+'.'+lonf, lat+'.'+latf), zoom);
-    		point = map.getCenter();
-    		document.getElementById("loclayer").innerHTML = getStatusString(point.x.toString(), point.y.toString());
-    	}else{
-    		map.setCenter(new GLatLng({IMMO_MAP_LAT_BACKEND}, {IMMO_MAP_LON_BACKEND}), {IMMO_MAP_ZOOM_BACKEND});  //standard location: thun
-    		point = map.getCenter();
-    		document.getElementById("loclayer").innerHTML = getStatusString(point.x.toString(), point.y.toString());
-    	}
+      map.addControl(new GLargeMapControl());
+      map.addControl(new GMapTypeControl());
+      map.addControl(new GOverviewMapControl(new GSize(200,200)));
+      if(window.opener.document.getElementById('longitude').value != '' && window.opener.document.getElementById('latitude').value != ''){
+        lon = window.opener.document.getElementById('longitude').value;
+        lonf = window.opener.document.getElementById('longitude_fraction').value;
+        lat = window.opener.document.getElementById('latitude').value;
+        latf = window.opener.document.getElementById('latitude_fraction').value;
+        zoom = parseInt(((window.opener.document.getElementById('map_zoom').value != '') ? window.opener.document.getElementById('map_zoom').value : 13));
+        map.setCenter(new GLatLng(lon+'.'+lonf, lat+'.'+latf), zoom);
+        point = map.getCenter();
+        document.getElementById("loclayer").innerHTML = getStatusString(point.x.toString(), point.y.toString());
+      }else{
+        map.setCenter(new GLatLng({IMMO_MAP_LAT_BACKEND}, {IMMO_MAP_LON_BACKEND}), {IMMO_MAP_ZOOM_BACKEND});  //standard location: thun
+        point = map.getCenter();
+        document.getElementById("loclayer").innerHTML = getStatusString(point.x.toString(), point.y.toString());
+      }
 
-    	point = map.getCenter();
-    	map.addOverlay(new GMarker(point));
+      point = map.getCenter();
+      map.addOverlay(new GMarker(point));
 
-    	GEvent.addListener(map, "moveend", function() {
-    	      point = map.getCenter();
-    	      map.clearOverlays();
-    	      marker = new GMarker(point);
-    	      map.addOverlay(marker);
-    	      document.getElementById("loclayer").innerHTML = getStatusString(point.x.toString(), point.y.toString())
-    	});
+      GEvent.addListener(map, "moveend", function() {
+            point = map.getCenter();
+            map.clearOverlays();
+            marker = new GMarker(point);
+            map.addOverlay(marker);
+            document.getElementById("loclayer").innerHTML = getStatusString(point.x.toString(), point.y.toString())
+      });
 
         geocoder = new GClientGeocoder();
 
     }else{
-    	alert("{TXT_IMMO_BROWSER_NOT_SUPPORTED}");
+      alert("{TXT_IMMO_BROWSER_NOT_SUPPORTED}");
     }
 }
 
 var getStatusString = function(X, Y){
-	return '<span class="red">lat: </span>'+Y+'<br /><span class="red">lon: </span>'+X+'<span class="red"><br /> zoom: </span>'+map.getZoom();
+  return '<span class="red">lat: </span>'+Y+'<br /><span class="red">lon: </span>'+X+'<span class="red"><br /> zoom: </span>'+map.getZoom();
 }
 
 var passValues = function(){
-	lon=point.y.toString().split('.')[0];
-	lonfac=point.y.toString().split('.')[1];
-	lat=point.x.toString().split('.')[0];
-	latfac=point.x.toString().split('.')[1];
-	window.opener.document.getElementById('longitude').value = lon;
-	window.opener.document.getElementById('longitude_fraction').value = lonfac;
-	window.opener.document.getElementById('latitude').value = lat;
-	window.opener.document.getElementById('latitude_fraction').value = latfac;
-	window.opener.document.getElementById('map_zoom').value = map.getZoom();
-	window.opener.popUp = false; window.close(); window.opener.focus();
+  lon=point.y.toString().split('.')[0];
+  lonfac=point.y.toString().split('.')[1];
+  lat=point.x.toString().split('.')[0];
+  latfac=point.x.toString().split('.')[1];
+  window.opener.document.getElementById('longitude').value = lon;
+  window.opener.document.getElementById('longitude_fraction').value = lonfac;
+  window.opener.document.getElementById('latitude').value = lat;
+  window.opener.document.getElementById('latitude_fraction').value = latfac;
+  window.opener.document.getElementById('map_zoom').value = map.getZoom();
+  window.opener.popUp = false; window.close(); window.opener.focus();
 }
 
 var showAddress = function() {
-	address = document.getElementById("location").value;
-   	if (geocoder) {
-    	geocoder.getLocations(address, getGeoCodeData);
+  address = document.getElementById("location").value;
+     if (geocoder) {
+      geocoder.getLocations(address, getGeoCodeData);
     }
 }
 
 var getGeoCodeData = function(data){
-	if(data.Status.code == G_GEO_SUCCESS){
-		document.getElementById("status").innerHTML = reasons[data.Status.code];
-		point = new GLatLng(data.Placemark[0].Point.coordinates[1], data.Placemark[0].Point.coordinates[0]);
-		map.setCenter(point);
-	}else{
-		document.getElementById("status").innerHTML = address+" not found";
-	}
+  if(data.Status.code == G_GEO_SUCCESS){
+    document.getElementById("status").innerHTML = reasons[data.Status.code];
+    point = new GLatLng(data.Placemark[0].Point.coordinates[1], data.Placemark[0].Point.coordinates[0]);
+    map.setCenter(point);
+  }else{
+    document.getElementById("status").innerHTML = address+" not found";
+  }
 }
 
 
@@ -117,31 +117,31 @@ var getGeoCodeData = function(data){
 <link href="../core/Core/View/Style/base.css" rel="stylesheet" type="text/css" />
 <link href="template/ascms/css/calendar.css" rel="stylesheet" type="text/css" />
 <style type="text/css">
-	body{
-		border: 1px solid #DCE4FF;
-		background-color: #F4F7FF;
-	}
-	#info{
-		border: 1px solid #DCE4FF;
-		background-color: #F4F7FF;
-		text-align: center;
-	}
-	#loclayer{
-		filter: Alpha(opacity='90');
-		text-align: left;
-		-moz-opacity: 0.9;
-		position: absolute;
-		top: 100px;
-		right: 1px;
-		z-index: 100000;
-		background-color: #F4F7FF;
-		width: 140px;
-		height:	41px;
-		padding: 2px 4px 2px 2px;
-	}
-	.red{
-		color: #ab2222;
-	}
+  body{
+    border: 1px solid #DCE4FF;
+    background-color: #F4F7FF;
+  }
+  #info{
+    border: 1px solid #DCE4FF;
+    background-color: #F4F7FF;
+    text-align: center;
+  }
+  #loclayer{
+    filter: Alpha(opacity='90');
+    text-align: left;
+    -moz-opacity: 0.9;
+    position: absolute;
+    top: 100px;
+    right: 1px;
+    z-index: 100000;
+    background-color: #F4F7FF;
+    width: 140px;
+    height:  41px;
+    padding: 2px 4px 2px 2px;
+  }
+  .red{
+    color: #ab2222;
+  }
 </style>
 </head>
 
@@ -157,17 +157,17 @@ var getGeoCodeData = function(data){
 </div>
 
 <form action="?cmd=immo&amp;act=add" method="post">
-	<div id="gmap" style="width: 800px; height: 600px"></div>
+  <div id="gmap" style="width: 800px; height: 600px"></div>
 <table style="width: 100%; border: none;" cellpadding="0" cellspacing="0">
 <tr>
  <td style="width: 20%">
-	 <input type="submit" value="{TXT_IMMO_ACCEPT}" onclick="passValues();" />
+   <input type="submit" value="{TXT_IMMO_ACCEPT}" onclick="passValues();" />
  </td>
  <td style="width: 60%; text-align: center;">
    <span id="status">  </span>
  </td>
  <td style="width: 20%; float: right;">
- 	<input style="float: right;" type="submit" value="{TXT_IMMO_CLOSE}" onclick="window.opener.popUp = false; window.close(); window.opener.focus(); "/>
+   <input style="float: right;" type="submit" value="{TXT_IMMO_CLOSE}" onclick="window.opener.popUp = false; window.close(); window.opener.focus(); "/>
  </td>
 </tr>
 </table>

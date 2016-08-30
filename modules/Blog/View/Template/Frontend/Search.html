@@ -1,7 +1,7 @@
 <div id="blog">
-	{BLOG_SEARCH_JAVASCRIPT}
-	<div class="searchform">
-		<form role="form" action="index.php?section=Blog&amp;cmd=search" name="frmDoSearch" method="post">
+  {BLOG_SEARCH_JAVASCRIPT}
+  <div class="searchform">
+    <form role="form" action="index.php?section=Blog&amp;cmd=search" name="frmDoSearch" method="post">
             <fieldset id="searchfield">
                 <legend>Kategorien durchsuchen</legend>
                 <p><label>{TXT_SEARCH_MODUS_KEYWORD}</label><input type="text" value="{BLOG_SEARCH_KEYWORD_STRING}" name="frmDoSearch_Keyword_String" /></p>
@@ -12,26 +12,26 @@
                 <legend>Suche nach Datum</legend>
                 <div class="search_date">{BLOG_SEARCH_DATE_CALENDAR}</div>
             </fieldset>
-		</form>
-	</div>
-	<!-- BEGIN ResultPart -->
-		<h2>{TXT_SEARCH_RESULTS}</h2>
-		<!-- BEGIN showResults -->
-			<div class="entries">
-				<h2><a title="{BLOG_SEARCH_RESULTS_SUBJECT}" href="index.php?section=Blog&amp;cmd=details&amp;id={BLOG_SEARCH_RESULTS_MID}">{BLOG_SEARCH_RESULTS_SUBJECT}</a></h2>
-				<div class="content">
-					<div class="text">{BLOG_SEARCH_RESULTS_INTRODUCTION}</div>
-					<div class="link"><a href="index.php?section=Blog&amp;cmd=details&amp;id={BLOG_SEARCH_RESULTS_MID}">Weiter...</a></div>
-				</div>
-				<div class="statistics">
-					<strong>{TXT_SEARCH_RESULTS_DATE}:</strong>&nbsp;{BLOG_SEARCH_RESULTS_POSTED}<br />
-					<strong>{TXT_SEARCH_RESULTS_CATEGORY}:</strong>&nbsp;{BLOG_SEARCH_RESULTS_CATEGORIES}<br />
-					<strong>{TXT_SEARCH_RESULTS_KEYWORDS}:</strong>&nbsp; {BLOG_SEARCH_RESULTS_TAGS} 
-				</div>
-			</div>
-		<!-- END showResults -->
-		<!-- BEGIN showNoResults -->
-			<div class="text">{TXT_SEARCH_RESULTS_NONE}</div>
-		<!-- END showNoResults -->
-	<!-- END ResultPart -->
+    </form>
+  </div>
+  <!-- BEGIN ResultPart -->
+    <h2>{TXT_SEARCH_RESULTS}</h2>
+    <!-- BEGIN showResults -->
+      <div class="entries">
+        <h2><a title="{BLOG_SEARCH_RESULTS_SUBJECT}" href="index.php?section=Blog&amp;cmd=details&amp;id={BLOG_SEARCH_RESULTS_MID}">{BLOG_SEARCH_RESULTS_SUBJECT}</a></h2>
+        <div class="content">
+          <div class="text">{BLOG_SEARCH_RESULTS_INTRODUCTION}</div>
+          <div class="link"><a href="index.php?section=Blog&amp;cmd=details&amp;id={BLOG_SEARCH_RESULTS_MID}">Weiter...</a></div>
+        </div>
+        <div class="statistics">
+          <strong>{TXT_SEARCH_RESULTS_DATE}:</strong>&nbsp;{BLOG_SEARCH_RESULTS_POSTED}<br />
+          <strong>{TXT_SEARCH_RESULTS_CATEGORY}:</strong>&nbsp;{BLOG_SEARCH_RESULTS_CATEGORIES}<br />
+          <strong>{TXT_SEARCH_RESULTS_KEYWORDS}:</strong>&nbsp; {BLOG_SEARCH_RESULTS_TAGS}
+        </div>
+      </div>
+    <!-- END showResults -->
+    <!-- BEGIN showNoResults -->
+      <div class="text">{TXT_SEARCH_RESULTS_NONE}</div>
+    <!-- END showNoResults -->
+  <!-- END ResultPart -->
 </div>

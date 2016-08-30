@@ -91,12 +91,12 @@
     }
     $J(function(){
         setTableRow("entryList");
-        $J('.changestatus').click(function(e){ 
+        $J('.changestatus').click(function(e){
             var $elm = $J(this);
             url = $elm.attr("href");
             $J.get(url, function(data) {
                 image = $elm.find('img').attr('src').split('/').pop() == 'led_green.gif' ? 'led_red.gif' : 'led_green.gif';
-                $elm.find('img').attr('src', '../core/Core/View/Media/icons/'+image); 
+                $elm.find('img').attr('src', '../core/Core/View/Media/icons/'+image);
                 fadeOkbox('{TXT_CRM_CHANGE_STATUS}');
             });
             e.preventDefault();
@@ -120,7 +120,7 @@
         $J(".deleteEntry").click(function(){
             $elm  = $J(this);
             en_id = $J(this).attr('rel').split('_')[1];
-            
+
             if (confirm ("{TXT_CRM_ARE_YOU_SURE_DELETE_ENTRIES}")) {
                 $J.ajax({
                     url     : './index.php?cmd={MODULE_NAME}&act=settings&tpl=industry&actionType=deleteIndustryType&ajax=1&id='+en_id,
@@ -145,7 +145,7 @@
     function getOkBox(mes) {
         return '<div class="okBox-new">' + mes + '</div>';
     }
-    function fadeOkbox(msg) { 
+    function fadeOkbox(msg) {
         $J('.okBox-new').remove();
         $J('table#subnavbar_level1').after(getOkBox(msg));
         setTimeout(function () {

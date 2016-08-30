@@ -10,230 +10,230 @@ function mediaBrowserCallback(data)
 }
 
 var mySelectTab = function(divId){
-	document.getElementById("podcast_settings_tab").value = divId;
-	selectTab(divId);
+  document.getElementById("podcast_settings_tab").value = divId;
+  selectTab(divId);
 }
 
 // ]]>
 </script>
 
 <ul id="tabmenu">
-	<li><a id="settings_General" {PODCAST_SETTINGS_GENERAL_TAB_CLASS} href="javascript:{}" onclick="mySelectTab('General')" title="{TXT_PODCAST_GENERAL}">{TXT_PODCAST_GENERAL}</a></li>
-	<li><a id="settings_Block" {PODCAST_SETTINGS_BLOCK_TAB_CLASS} href="javascript:{}" onclick="mySelectTab('Block')" title="{TXT_PODCAST_BLOCK_TEMPLATE}">{TXT_PODCAST_BLOCK_TEMPLATE}</a></li>
+  <li><a id="settings_General" {PODCAST_SETTINGS_GENERAL_TAB_CLASS} href="javascript:{}" onclick="mySelectTab('General')" title="{TXT_PODCAST_GENERAL}">{TXT_PODCAST_GENERAL}</a></li>
+  <li><a id="settings_Block" {PODCAST_SETTINGS_BLOCK_TAB_CLASS} href="javascript:{}" onclick="mySelectTab('Block')" title="{TXT_PODCAST_BLOCK_TEMPLATE}">{TXT_PODCAST_BLOCK_TEMPLATE}</a></li>
 </ul>
 
 <form action="index.php?cmd=Podcast&amp;act=settings" method="post">
-	<div id="General" class="settings" {PODCAST_SETTINGS_GENERAL_DIV_DISPLAY}>
-		<table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
-			<thead>
-				<tr>
-					<th colspan="2">{TXT_PODCAST_SETTINGS}</th>
-				</tr>
-			</thead>
-			<tbody style="vertical-align:top;">
-				<!-- <tr class="row1">
-					<td width="15%">{TXT_PODCAST_AUTO_VALIDATE}</td>
-					<td width="85%">
-						<input id="autovalidate1" type="radio" name="podcast_settings_auto_validate" value="1" {PODCAST_SETTINGS_AUTO_VALIDATE_1} />
-						<label for="autovalidate1">{TXT_PODCAST_ACTIVATE}</label>
-						<input id="autovalidate0" type="radio" name="podcast_settings_auto_validate" value="0" {PODCAST_SETTINGS_AUTO_VALIDATE_0} />
-						<label for="autovalidate0">{TXT_PODCAST_DEACTIVATE}</label></td>
-				</tr> -->
-				<tr class="row1">
-					<td width="15%">{TXT_PODCAST_STANDARD_DIMENSIONS}</td>
-					<td width="85%">
-						<input type="text" name="podcast_settings_default_width" value="{PODCAST_SETTINGS_DEFAULT_WIDTH}" style="width:50px; margin-bottom:1px;" /> {TXT_PODCAST_PIXEL_WIDTH}<br />
-						<input type="text" name="podcast_settings_default_height" value="{PODCAST_SETTINGS_DEFAULT_HEIGHT}" style="width:50px; margin-bottom:1px;" />	{TXT_PODCAST_PIXEL_HEIGHT}
-					</td>
-				</tr>
-				<tr class="row2">
-					<td width="15%">{TXT_PODCAST_THUMB_MAX_SIZE}</td>
-					<td width="85%">
-						<input type="text" name="podcast_settings_thumb_max_size" value="{PODCAST_SETTINGS_THUMB_MAX_SIZE}" style="width:50px; margin-bottom:1px;" /> {TXT_PODCAST_PIXEL}<br />
-					</td>
-				</tr>
-				<tr class="row1">
-					<td>{TXT_PODCAST_FEED_TITLE}</td>
-					<td><input type="text" name="podcast_settings_feed_title" value="{PODCAST_SETTINGS_FEED_TITLE}" style="width:400px;" /></td>
-				</tr>
-				<tr class="row2">
-					<td>{TXT_PODCAST_FEED_DESCRIPTION}</td>
-					<td><input type="text" name="podcast_settings_feed_description" value="{PODCAST_SETTINGS_FEED_DESCRIPTION}" style="width:400px;" /></td>
-				</tr>
-				<tr class="row1">
-					<td>{TXT_PODCAST_FEED_IMAGE}</td>
-					<td>
+  <div id="General" class="settings" {PODCAST_SETTINGS_GENERAL_DIV_DISPLAY}>
+    <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
+      <thead>
+        <tr>
+          <th colspan="2">{TXT_PODCAST_SETTINGS}</th>
+        </tr>
+      </thead>
+      <tbody style="vertical-align:top;">
+        <!-- <tr class="row1">
+          <td width="15%">{TXT_PODCAST_AUTO_VALIDATE}</td>
+          <td width="85%">
+            <input id="autovalidate1" type="radio" name="podcast_settings_auto_validate" value="1" {PODCAST_SETTINGS_AUTO_VALIDATE_1} />
+            <label for="autovalidate1">{TXT_PODCAST_ACTIVATE}</label>
+            <input id="autovalidate0" type="radio" name="podcast_settings_auto_validate" value="0" {PODCAST_SETTINGS_AUTO_VALIDATE_0} />
+            <label for="autovalidate0">{TXT_PODCAST_DEACTIVATE}</label></td>
+        </tr> -->
+        <tr class="row1">
+          <td width="15%">{TXT_PODCAST_STANDARD_DIMENSIONS}</td>
+          <td width="85%">
+            <input type="text" name="podcast_settings_default_width" value="{PODCAST_SETTINGS_DEFAULT_WIDTH}" style="width:50px; margin-bottom:1px;" /> {TXT_PODCAST_PIXEL_WIDTH}<br />
+            <input type="text" name="podcast_settings_default_height" value="{PODCAST_SETTINGS_DEFAULT_HEIGHT}" style="width:50px; margin-bottom:1px;" />  {TXT_PODCAST_PIXEL_HEIGHT}
+          </td>
+        </tr>
+        <tr class="row2">
+          <td width="15%">{TXT_PODCAST_THUMB_MAX_SIZE}</td>
+          <td width="85%">
+            <input type="text" name="podcast_settings_thumb_max_size" value="{PODCAST_SETTINGS_THUMB_MAX_SIZE}" style="width:50px; margin-bottom:1px;" /> {TXT_PODCAST_PIXEL}<br />
+          </td>
+        </tr>
+        <tr class="row1">
+          <td>{TXT_PODCAST_FEED_TITLE}</td>
+          <td><input type="text" name="podcast_settings_feed_title" value="{PODCAST_SETTINGS_FEED_TITLE}" style="width:400px;" /></td>
+        </tr>
+        <tr class="row2">
+          <td>{TXT_PODCAST_FEED_DESCRIPTION}</td>
+          <td><input type="text" name="podcast_settings_feed_description" value="{PODCAST_SETTINGS_FEED_DESCRIPTION}" style="width:400px;" /></td>
+        </tr>
+        <tr class="row1">
+          <td>{TXT_PODCAST_FEED_IMAGE}</td>
+          <td>
                                           <input type="text" name="podcast_settings_feed_image" id="podcast_settings_feed_image" value="{PODCAST_SETTINGS_FEED_IMAGE}" style="width:287px;" />
                                           {PODCAST_BROWSE}
                                         </td>
-				</tr>
-				<tr class="row2">
-					<td>{TXT_PODCAST_FEED_LINK}</td>
-					<td><a href="{PODCAST_SETTINGS_FEED_URL}" title="{TXT_PODCAST_FEED_LINK}">{PODCAST_SETTINGS_FEED_URL}</a></td>
-				</tr>
-			</tbody>
-		</table>
-		<br />
-	</div>
+        </tr>
+        <tr class="row2">
+          <td>{TXT_PODCAST_FEED_LINK}</td>
+          <td><a href="{PODCAST_SETTINGS_FEED_URL}" title="{TXT_PODCAST_FEED_LINK}">{PODCAST_SETTINGS_FEED_URL}</a></td>
+        </tr>
+      </tbody>
+    </table>
+    <br />
+  </div>
 
-	<div id="Block" class="settings" {PODCAST_SETTINGS_BLOCK_DIV_DISPLAY}>
-		<table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
-			<tr>
-				<th colspan="4">{TXT_PODCAST_BLOCK_SETTINGS}</th>
-			</tr>
-			<tr class="row1">
-				<td width="30%">{TXT_PODCAST_SHOW_HOME_CONTENT}</td>
-				<td width="70%" colspan="3">
-				<input id="sethomecontent1" type="radio" name="setHomeContent" value="1" {PODCAST_SETTINGS_SHOW_HOMECONTENT_1} />
-				 <label for="sethomecontent1">{TXT_PODCAST_ACTIVATE}</label>
-				<input id="sethomecontent0" type="radio" name="setHomeContent" value="0" {PODCAST_SETTINGS_SHOW_HOMECONTENT_0} />
-				 <label for="sethomecontent0">{TXT_PODCAST_DEACTIVATE}</label></td>
-			</tr>
-			<tr class="row2">
-					<td>{TXT_PODCAST_LATEST_MEDIA_COUNT}</td>
-					<td colspan="3"><input type="text" name="podcast_settings_latest_media_count" value="{PODCAST_SETTINGS_LATEST_MEDIA_COUNT}" style="width:50px;" /></td>
-			</tr>
-			<tr class="row1">
-					<td>{TXT_PODCAST_THUMB_MAX_SIZE_HOMECONTENT}</td>
-					<td colspan="3">
-					<input type="text" name="podcast_settings_thumb_max_size_homecontent" value="{PODCAST_SETTINGS_THUMB_MAX_SIZE_HOMECONTENT}" style="width:50px; margin-bottom:1px;" /> {TXT_PODCAST_PIXEL}<br />
-					</td>
-			</tr>
+  <div id="Block" class="settings" {PODCAST_SETTINGS_BLOCK_DIV_DISPLAY}>
+    <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
+      <tr>
+        <th colspan="4">{TXT_PODCAST_BLOCK_SETTINGS}</th>
+      </tr>
+      <tr class="row1">
+        <td width="30%">{TXT_PODCAST_SHOW_HOME_CONTENT}</td>
+        <td width="70%" colspan="3">
+        <input id="sethomecontent1" type="radio" name="setHomeContent" value="1" {PODCAST_SETTINGS_SHOW_HOMECONTENT_1} />
+         <label for="sethomecontent1">{TXT_PODCAST_ACTIVATE}</label>
+        <input id="sethomecontent0" type="radio" name="setHomeContent" value="0" {PODCAST_SETTINGS_SHOW_HOMECONTENT_0} />
+         <label for="sethomecontent0">{TXT_PODCAST_DEACTIVATE}</label></td>
+      </tr>
+      <tr class="row2">
+          <td>{TXT_PODCAST_LATEST_MEDIA_COUNT}</td>
+          <td colspan="3"><input type="text" name="podcast_settings_latest_media_count" value="{PODCAST_SETTINGS_LATEST_MEDIA_COUNT}" style="width:50px;" /></td>
+      </tr>
+      <tr class="row1">
+          <td>{TXT_PODCAST_THUMB_MAX_SIZE_HOMECONTENT}</td>
+          <td colspan="3">
+          <input type="text" name="podcast_settings_thumb_max_size_homecontent" value="{PODCAST_SETTINGS_THUMB_MAX_SIZE_HOMECONTENT}" style="width:50px; margin-bottom:1px;" /> {TXT_PODCAST_PIXEL}<br />
+          </td>
+      </tr>
 
-			<tr class="row2" style="vertical-align:top;">
-				<td width="30%">{TXT_PODCAST_CATEGORIES}</td>
-				<td width="20%">
-					<!-- BEGIN podcast_medium_associated_category_0 -->
-						<input type="checkbox" name="podcast_medium_associated_category[{PODCAST_CATEGORY_ID}]" id="podcast_medium_associated_category_{PODCAST_CATEGORY_ID}" value="1" {PODCAST_CATEGORY_ASSOCIATED} /> <a href="index.php?cmd=Podcast&amp;categoryId={PODCAST_CATEGORY_ID}" target="_blank" title="{PODCAST_SHOW_MEDIA_OF_CATEGORY_TXT}">{PODCAST_CATEGORY_NAME}</a><br />
-					<!-- END podcast_medium_associated_category_0 -->
-				</td>
-				<td width="20%">
-					<!-- BEGIN podcast_medium_associated_category_1 -->
-						<input type="checkbox" name="podcast_medium_associated_category[{PODCAST_CATEGORY_ID}]" id="podcast_medium_associated_category_{PODCAST_CATEGORY_ID}" value="1" {PODCAST_CATEGORY_ASSOCIATED} /> <a href="index.php?cmd=Podcast&amp;categoryId={PODCAST_CATEGORY_ID}" target="_blank" title="{PODCAST_SHOW_MEDIA_OF_CATEGORY_TXT}">{PODCAST_CATEGORY_NAME}</a><br />
-					<!-- END podcast_medium_associated_category_1 -->
-				</td>
-				<td width="30%">
-					<!-- BEGIN podcast_medium_associated_category_2 -->
-						<input type="checkbox" name="podcast_medium_associated_category[{PODCAST_CATEGORY_ID}]" id="podcast_medium_associated_category_{PODCAST_CATEGORY_ID}" value="1" {PODCAST_CATEGORY_ASSOCIATED} /> <a href="index.php?cmd=Podcast&amp;categoryId={PODCAST_CATEGORY_ID}" target="_blank" title="{PODCAST_SHOW_MEDIA_OF_CATEGORY_TXT}">{PODCAST_CATEGORY_NAME}</a><br />
-					<!-- END podcast_medium_associated_category_2 -->
-				</td>
-			</tr>
-		</table>
-		<br />
-		<table width="100%" cellspacing="0" cellpadding="3" border="0" class="adminlist">
-			<tr>
-				<th colspan="4">{TXT_PODCAST_PLACEHOLDERS}</th>
-			</tr>
-			<tr class="row1">
-				<td width="10%" nowrap="nowrap">
-					[[TXT_PODCAST_PLAY]]
-				</td>
-				<td width="34%">
-					  "{TXT_PODCAST_PLAY}"
-				</td>
-				<td width="10%" nowrap="nowrap">
-					[[TXT_PODCAST_MEDIA_VIEWS]]
-				</td>
-				<td width="38%">
-					"{TXT_PODCAST_MEDIA_VIEWS}"
-				</td>
-			</tr>
-			<tr class="row2">
-				<td nowrap="nowrap">
-					[[PODCAST_MEDIA_TITLE]]
-				</td>
-				<td >
-					  {TXT_PODCAST_MEDIA_TITLE}
-				</td>
-				<td nowrap="nowrap">
-					[[PODCAST_MEDIA_PLAYLENGTH]]
-				</td>
-				<td >
-					  {TXT_PODCAST_MEDIA_PLAYLENGTH}
-				</td>
-			</tr>
-			<tr class="row1">
-				<td >
-					[[PODCAST_MEDIA_AUTHOR]]
-				</td>
-				<td >
-					{TXT_PODCAST_MEDIA_AUTHOR}
-				</td>
-				<td >
-					[[PODCAST_MEDIA_SHORT_PLAYLENGTH]]
-				</td>
-				<td >
-					{TXT_PODCAST_MEDIA_SHORT_PLAYLENGTH}
-				</td>
-			</tr>
-			<tr class="row2">
-				<td >
-					[[PODCAST_MEDIA_URL]]
-				</td>
-				<td >
-					{TXT_PODCAST_MEDIA_URL}
-				</td>
-				<td>
-					[[PODCAST_MEDIA_DATE]]
-				</td>
-				<td >
-					{TXT_PODCAST_MEDIA_DATE}
-				</td>
-			</tr>
-				<tr class="row1">
-				<td >
-					[[PODCAST_MEDIA_THUMBNAIL]]
-				</td>
-				<td >
-					{TXT_PODCAST_MEDIA_THUMBNAIL}
-				</td>
-				<td>
-					[[PODCAST_MEDIA_SHORT_DATE]]
-				</td>
-				<td >
-					{TXT_PODCAST_MEDIA_SHORT_DATE}
-				</td>
-			</tr>
-				<tr class="row2">
-				<td >
-					[[PODCAST_MEDIA_DESCRIPTION]]
-				</td>
-				<td >
-					{TXT_PODCAST_MEDIA_DESCRIPTION}
-				</td>
-				<td>
-					[[PODCAST_MEDIA_VIEWS]]
-				</td>
-				<td >
-					{TXT_PODCAST_MEDIA_VIEWS_COUNT}
-				</td>
-			</tr>
-			<tr>
-				<td class="row1">
-				<td >
-					[[PODCAST_MEDIA_ID]]
-				</td>
-				<td >
-					{TXT_PODCAST_MEDIA_ID}
-				</td>
-				<td>
-					&nbsp;
-				</td>
-				<td >
-					&nbsp;
-				</td>
-			</tr>
-		</table>
-		<br />
-		<div class="infobox_head">
-			{TXT_PODCAST_HOMECONTENT_USAGE}
-	    </div>
-	    <div class="infobox_body">
-	    	{TXT_PODCAST_HOMECONTENT_USAGE_TEXT}
-	    </div>
-	</div>
-	<br />
-	<input type="submit" value="{TXT_PODCAST_SAVE}" name="podcast_save_settings" />
-	<input type="hidden" id="podcast_settings_tab" name="podcast_settings_tab" value="{PODCAST_SETTINGS_TAB}"/>
+      <tr class="row2" style="vertical-align:top;">
+        <td width="30%">{TXT_PODCAST_CATEGORIES}</td>
+        <td width="20%">
+          <!-- BEGIN podcast_medium_associated_category_0 -->
+            <input type="checkbox" name="podcast_medium_associated_category[{PODCAST_CATEGORY_ID}]" id="podcast_medium_associated_category_{PODCAST_CATEGORY_ID}" value="1" {PODCAST_CATEGORY_ASSOCIATED} /> <a href="index.php?cmd=Podcast&amp;categoryId={PODCAST_CATEGORY_ID}" target="_blank" title="{PODCAST_SHOW_MEDIA_OF_CATEGORY_TXT}">{PODCAST_CATEGORY_NAME}</a><br />
+          <!-- END podcast_medium_associated_category_0 -->
+        </td>
+        <td width="20%">
+          <!-- BEGIN podcast_medium_associated_category_1 -->
+            <input type="checkbox" name="podcast_medium_associated_category[{PODCAST_CATEGORY_ID}]" id="podcast_medium_associated_category_{PODCAST_CATEGORY_ID}" value="1" {PODCAST_CATEGORY_ASSOCIATED} /> <a href="index.php?cmd=Podcast&amp;categoryId={PODCAST_CATEGORY_ID}" target="_blank" title="{PODCAST_SHOW_MEDIA_OF_CATEGORY_TXT}">{PODCAST_CATEGORY_NAME}</a><br />
+          <!-- END podcast_medium_associated_category_1 -->
+        </td>
+        <td width="30%">
+          <!-- BEGIN podcast_medium_associated_category_2 -->
+            <input type="checkbox" name="podcast_medium_associated_category[{PODCAST_CATEGORY_ID}]" id="podcast_medium_associated_category_{PODCAST_CATEGORY_ID}" value="1" {PODCAST_CATEGORY_ASSOCIATED} /> <a href="index.php?cmd=Podcast&amp;categoryId={PODCAST_CATEGORY_ID}" target="_blank" title="{PODCAST_SHOW_MEDIA_OF_CATEGORY_TXT}">{PODCAST_CATEGORY_NAME}</a><br />
+          <!-- END podcast_medium_associated_category_2 -->
+        </td>
+      </tr>
+    </table>
+    <br />
+    <table width="100%" cellspacing="0" cellpadding="3" border="0" class="adminlist">
+      <tr>
+        <th colspan="4">{TXT_PODCAST_PLACEHOLDERS}</th>
+      </tr>
+      <tr class="row1">
+        <td width="10%" nowrap="nowrap">
+          [[TXT_PODCAST_PLAY]]
+        </td>
+        <td width="34%">
+            "{TXT_PODCAST_PLAY}"
+        </td>
+        <td width="10%" nowrap="nowrap">
+          [[TXT_PODCAST_MEDIA_VIEWS]]
+        </td>
+        <td width="38%">
+          "{TXT_PODCAST_MEDIA_VIEWS}"
+        </td>
+      </tr>
+      <tr class="row2">
+        <td nowrap="nowrap">
+          [[PODCAST_MEDIA_TITLE]]
+        </td>
+        <td >
+            {TXT_PODCAST_MEDIA_TITLE}
+        </td>
+        <td nowrap="nowrap">
+          [[PODCAST_MEDIA_PLAYLENGTH]]
+        </td>
+        <td >
+            {TXT_PODCAST_MEDIA_PLAYLENGTH}
+        </td>
+      </tr>
+      <tr class="row1">
+        <td >
+          [[PODCAST_MEDIA_AUTHOR]]
+        </td>
+        <td >
+          {TXT_PODCAST_MEDIA_AUTHOR}
+        </td>
+        <td >
+          [[PODCAST_MEDIA_SHORT_PLAYLENGTH]]
+        </td>
+        <td >
+          {TXT_PODCAST_MEDIA_SHORT_PLAYLENGTH}
+        </td>
+      </tr>
+      <tr class="row2">
+        <td >
+          [[PODCAST_MEDIA_URL]]
+        </td>
+        <td >
+          {TXT_PODCAST_MEDIA_URL}
+        </td>
+        <td>
+          [[PODCAST_MEDIA_DATE]]
+        </td>
+        <td >
+          {TXT_PODCAST_MEDIA_DATE}
+        </td>
+      </tr>
+        <tr class="row1">
+        <td >
+          [[PODCAST_MEDIA_THUMBNAIL]]
+        </td>
+        <td >
+          {TXT_PODCAST_MEDIA_THUMBNAIL}
+        </td>
+        <td>
+          [[PODCAST_MEDIA_SHORT_DATE]]
+        </td>
+        <td >
+          {TXT_PODCAST_MEDIA_SHORT_DATE}
+        </td>
+      </tr>
+        <tr class="row2">
+        <td >
+          [[PODCAST_MEDIA_DESCRIPTION]]
+        </td>
+        <td >
+          {TXT_PODCAST_MEDIA_DESCRIPTION}
+        </td>
+        <td>
+          [[PODCAST_MEDIA_VIEWS]]
+        </td>
+        <td >
+          {TXT_PODCAST_MEDIA_VIEWS_COUNT}
+        </td>
+      </tr>
+      <tr>
+        <td class="row1">
+        <td >
+          [[PODCAST_MEDIA_ID]]
+        </td>
+        <td >
+          {TXT_PODCAST_MEDIA_ID}
+        </td>
+        <td>
+          &nbsp;
+        </td>
+        <td >
+          &nbsp;
+        </td>
+      </tr>
+    </table>
+    <br />
+    <div class="infobox_head">
+      {TXT_PODCAST_HOMECONTENT_USAGE}
+      </div>
+      <div class="infobox_body">
+        {TXT_PODCAST_HOMECONTENT_USAGE_TEXT}
+      </div>
+  </div>
+  <br />
+  <input type="submit" value="{TXT_PODCAST_SAVE}" name="podcast_save_settings" />
+  <input type="hidden" id="podcast_settings_tab" name="podcast_settings_tab" value="{PODCAST_SETTINGS_TAB}"/>
 </form>
 <!-- end module_podcast_settings.html -->

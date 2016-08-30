@@ -27,7 +27,7 @@
 
 /**
  * Main controller for Search
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
@@ -38,7 +38,7 @@ namespace Cx\Core_Modules\Search\Controller;
 
 /**
  * Main controller for Search
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
@@ -51,7 +51,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         // does not exist a backend, nor a frontend controller of this component.
         return array();
     }
-    
+
     /**
      * Register your events here
      *
@@ -66,7 +66,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
 
     /**
      * Load your component.
-     * 
+     *
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
      */
     public function load(\Cx\Core\ContentManager\Model\Entity\Page $page) {
@@ -82,11 +82,11 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 $this->cx->getTemplate()->addBlockfile('CONTENT_OUTPUT', 'content_master', 'LegacyContentMaster.html');
                 $cachedRoot = $this->cx->getTemplate()->getRoot();
                 $this->cx->getTemplate()->setRoot($this->getDirectory() . '/View/Template/Backend');
-                
+
                 $objSearchManager = new \Cx\Core_Modules\Search\Controller\SearchManager($act, $objTemplate, $this->cx->getLicense());
                 $objSearchManager->getPage();
-                
-                $this->cx->getTemplate()->setRoot($cachedRoot);        
+
+                $this->cx->getTemplate()->setRoot($cachedRoot);
                 break;
             default:
                 break;

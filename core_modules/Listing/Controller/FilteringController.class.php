@@ -45,8 +45,8 @@ namespace Cx\Core_Modules\Listing\Controller;
  * @subpackage  coremodule_listing
  */
 class FilteringController {
-	
-	public function handle($params, $config) {
-		return $params;
-	}
+
+    public function handle($params, $config) {
+        return $params;
+    }
 }

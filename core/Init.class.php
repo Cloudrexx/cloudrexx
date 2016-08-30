@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Initialize the CMS
  *
@@ -99,9 +99,9 @@ class InitCMS
      * @var   string
      */
     public $mode;
-    
+
     protected $themeRepository;
-    
+
     /**
      * @var array Language var cache
      */
@@ -258,7 +258,7 @@ class InitCMS
             $this->currentThemesId = $this->arrLang[$this->frontendLangId]['themesid'];
             $this->currentChannel  = \Cx\Core\View\Model\Entity\Theme::THEME_TYPE_WEB;
         }
-        
+
         $this->channelThemeId = $this->currentThemesId;
         // Set charset of frontend language
         $this->frontendLangCharset = $this->arrLang[$this->frontendLangId]['charset'];
@@ -354,7 +354,7 @@ class InitCMS
             $arrAcceptedLanguages[$language] = (float) $quality;
         }
         arsort($arrAcceptedLanguages, SORT_NUMERIC);
-        
+
         return $arrAcceptedLanguages;
     }
 
@@ -620,7 +620,7 @@ class InitCMS
     {
         $filePath = $themesPath.'/'.$file;
         $content = '';
-        
+
         if (file_exists(\Env::get('cx')->getWebsiteThemesPath().'/'.$filePath)) {
             $content = file_get_contents(\Env::get('cx')->getWebsiteThemesPath().'/'.$filePath);
         } elseif (file_exists(\Env::get('cx')->getCodeBaseThemesPath().'/'.$filePath)) {
@@ -636,7 +636,7 @@ class InitCMS
 
         // OPTION USE FOR OUTPUT CHANNEL
         $themeFolder = '';
-        $themeRepository   = new \Cx\Core\View\Model\Repository\ThemeRepository();        
+        $themeRepository   = new \Cx\Core\View\Model\Repository\ThemeRepository();
         if ($page->getUseCustomContentForAllChannels()) {
             $theme = $themeRepository->findById($page->getSkin());
             if (!$theme) {
@@ -653,14 +653,14 @@ class InitCMS
                 return true;
             }
         }
-        
+
         //only include the custom template if it really exists.
         //if the user selected custom_x.html as a page's custom template, a print-view request will
         //try to get the file "themes/<printtheme>/custom_x.html" - we do not know if this file
         //exists. trying to read a non-existant file would lead to an empty content-template.
         //to omit this, we read the standard print content template instead.
         //another possible behaviour would be to read the standard theme's custom content template instead.
-        //this is not done, because customcontent files are mostly used for sidebars etc. - 
+        //this is not done, because customcontent files are mostly used for sidebars etc. -
         //stuff that should not change the print representation of the content.
         $content = $this->getThemeFileContent($this->themesPath, $this->customContentTemplate);
         if ($content) {
@@ -748,8 +748,8 @@ class InitCMS
                         case 'ComponentManager':
                         case 'ViewManager':
                         case 'LanguageManager':
-                        case 'ContentWorkflow':    
-                        case 'Config':    
+                        case 'ContentWorkflow':
+                        case 'Config':
                         case 'SystemLog':
                         case 'NetManager':
                         case 'Wysiwyg':
@@ -830,7 +830,7 @@ class InitCMS
         }
         return $_CORELANG;
     }
-    
+
     /**
      * Get component specific language data
      * State of the init will be backedup and restored while loading the language
@@ -845,7 +845,7 @@ class InitCMS
         global $_ARRAYLANG;
 
         $mode = $frontend ? 'frontend' : 'backend';
-        
+
         if (!$languageId) {
             if ($frontend) {
                 $languageId = $this->frontendLangId;
@@ -857,14 +857,14 @@ class InitCMS
         if ($componentName == 'Core') {
             $componentName = lcfirst($componentName);
         }
-        
+
         if (!isset($this->moduleSpecificLanguageData[$languageId])) {
             $this->moduleSpecificLanguageData[$languageId] = array();
         }
         if (!isset($this->moduleSpecificLanguageData[$languageId][$frontend])) {
             $this->moduleSpecificLanguageData[$languageId][$frontend] = array();
         }
-        
+
         if (isset($this->moduleSpecificLanguageData[$languageId][$frontend][$componentName])) {
             return $this->moduleSpecificLanguageData[$languageId][$frontend][$componentName];
         }
@@ -906,7 +906,7 @@ class InitCMS
         if ($path) {
             return $path;
         }
-        
+
         // file path of default language (if not yet requested)
         if ($langId == $defaultLangId) {
             return '';
@@ -924,7 +924,7 @@ class InitCMS
     protected function loadLangFile($path)
     {
         global $_ARRAYLANG;
-        
+
         $isCustomized = false;
         $customizedPath = \Env::get('ClassLoader')->getFilePath($path, $isCustomized);
         if (file_exists($path) || !file_exists($customizedPath)) {
@@ -933,7 +933,7 @@ class InitCMS
         if ($isCustomized) {
             require_once $customizedPath;
         }
-        
+
         return $_ARRAYLANG;
     }
 
@@ -952,7 +952,7 @@ class InitCMS
 
         // set custom content template
         $this->customContentTemplate = $customContent;
-        
+
         //only set customized theme if not in printview AND no mobile devic
         if ($useThemeForAllChannels || (!isset($_GET['printview']) && !$this->isInMobileView())) {
             $themesId=intval($themesId);
@@ -1081,7 +1081,7 @@ class InitCMS
         $url = \Env::get('Resolver')->getUrl();
         $myUrl = clone $url;
         $myUrl->setParam($key, $value);
-        
+
         return $myUrl;
     }
 

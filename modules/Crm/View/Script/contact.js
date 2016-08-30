@@ -100,7 +100,7 @@ var resetAddressPrimaryInputs = function() {
 }
 cx.ready(function(){
     fn = function(objUser) {
-        $J.getJSON( 'index.php?cmd=Crm&act=checkAccountId&id='+objUser.id+'&email='+objUser.name, function( data ) { 
+        $J.getJSON( 'index.php?cmd=Crm&act=checkAccountId&id='+objUser.id+'&email='+objUser.name, function( data ) {
             $J.each(data, function(key, val) {
                 if (val.show) {
                     $J("#contact_email").val(val.email);
@@ -126,7 +126,7 @@ cx.ready(function(){
 }, true);
 
 $J(document).ready(function() {
-    
+
     $J("#assigned_memberships").chosen().change(function(){
         $assGrp  = $J(this);
         $mainGrp = $J("#main_membership");

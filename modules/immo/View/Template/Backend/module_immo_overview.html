@@ -2,304 +2,304 @@
 <script type="text/javascript">
 //<![CDATA[
 function deleteImmo(immoID) {
-	strConfirmTxt = '{TXT_IMMO_CONFIRM_DELETE_OBJECT}';
-	if (confirm(strConfirmTxt+'\n{TXT_IMMO_CANNOT_UNDO_OPERATION}')) {
-		window.location.href = "?cmd=immo&{CSRF_PARAM}&act=del&id="+immoID;
-	}
+  strConfirmTxt = '{TXT_IMMO_CONFIRM_DELETE_OBJECT}';
+  if (confirm(strConfirmTxt+'\n{TXT_IMMO_CANNOT_UNDO_OPERATION}')) {
+    window.location.href = "?cmd=immo&{CSRF_PARAM}&act=del&id="+immoID;
+  }
 }
 
 
 
 
 
-	/**
-	 *  DOM userlist sorting
-	 *	remote script by savino
-	 *	(c) 2006, CLOUDREXX AG
-	 */
+  /**
+   *  DOM userlist sorting
+   *  remote script by savino
+   *  (c) 2006, CLOUDREXX AG
+   */
 
-	Array.prototype.toString = function(){
-		str='';
-		for(i in this){
-			if(this.length-1 != i){
-				str += this[i]+",";
-			}else{
-				str += this[i];
-			}
-		}
-		return str;
-	}
+  Array.prototype.toString = function(){
+    str='';
+    for(i in this){
+      if(this.length-1 != i){
+        str += this[i]+",";
+      }else{
+        str += this[i];
+      }
+    }
+    return str;
+  }
 
 
-	var http;
-	var request_active = false;
-	var objects		= new Array();
-	var contacts 	= new Array();
-	var fields 		= new Array();
-	var arrField 	= new Array();
-	var arrOrder 	= new Array();
-	var comment 	= new Array();
-	fields[1] 		= new Array('immo_id', 'reference', 'ref_nr_note', 'visibility', 'address', 'location', 'object_type', 'new_building', 'property_type', 'foreigner_authorization', 'special_offer');
-	arrField[1]		= new Array();
-	arrOrder[1]		= new Array();
+  var http;
+  var request_active = false;
+  var objects    = new Array();
+  var contacts   = new Array();
+  var fields     = new Array();
+  var arrField   = new Array();
+  var arrOrder   = new Array();
+  var comment   = new Array();
+  fields[1]     = new Array('immo_id', 'reference', 'ref_nr_note', 'visibility', 'address', 'location', 'object_type', 'new_building', 'property_type', 'foreigner_authorization', 'special_offer');
+  arrField[1]    = new Array();
+  arrOrder[1]    = new Array();
 
-	var clearArrows = function(index){
-		for (i=0; i<fields[index].length; i++){
-			document.getElementById(fields[index][i]+"_order").innerHTML = '';
-		}
-	}
+  var clearArrows = function(index){
+    for (i=0; i<fields[index].length; i++){
+      document.getElementById(fields[index][i]+"_order").innerHTML = '';
+    }
+  }
 
-	if (document.ELEMENT_NODE == null) {
-	  document.ELEMENT_NODE = 1;
-	  document.TEXT_NODE = 3;
-	}
+  if (document.ELEMENT_NODE == null) {
+    document.ELEMENT_NODE = 1;
+    document.TEXT_NODE = 3;
+  }
 
-	function getXMLHttpRequestObj() {
-	  var objXHR;
-	  if(window.XMLHttpRequest) {
-	      objXHR = new XMLHttpRequest();
-	  } else if(window.ActiveXObject) {
-	      objXHR = new ActiveXObject("Microsoft.XMLHTTP");
-	  }
-	  return objXHR;
-	}
+  function getXMLHttpRequestObj() {
+    var objXHR;
+    if(window.XMLHttpRequest) {
+        objXHR = new XMLHttpRequest();
+    } else if(window.ActiveXObject) {
+        objXHR = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    return objXHR;
+  }
 
-	http = getXMLHttpRequestObj();
+  http = getXMLHttpRequestObj();
 
-	var imgEdit = new Image();
-	imgEdit.src = '../core/Core/View/Media/icons/edit.gif';
-	imgEdit.title = '{TXT_IMMO_EDIT}';
-	imgEdit.alt = '{TXT_IMMO_EDIT}';
-	imgEdit.border = '0';
+  var imgEdit = new Image();
+  imgEdit.src = '../core/Core/View/Media/icons/edit.gif';
+  imgEdit.title = '{TXT_IMMO_EDIT}';
+  imgEdit.alt = '{TXT_IMMO_EDIT}';
+  imgEdit.border = '0';
 
-	var imgDelete = new Image();
-	imgDelete.src = '../core/Core/View/Media/icons/delete.gif';
-	imgDelete.title = '{TXT_IMMO_DELETE}';
-	imgDelete.alt = '{TXT_IMMO_DELETE}';
-	imgDelete.border = '0';
+  var imgDelete = new Image();
+  imgDelete.src = '../core/Core/View/Media/icons/delete.gif';
+  imgDelete.title = '{TXT_IMMO_DELETE}';
+  imgDelete.alt = '{TXT_IMMO_DELETE}';
+  imgDelete.border = '0';
 
-	var imgCopy = new Image();
-	imgCopy.src = '../core/Core/View/Media/icons/copy.gif';
-	imgCopy.title = '{TXT_IMMO_COPY}';
-	imgCopy.alt = '{TXT_IMMO_COPY}';
-	imgCopy.border = '0';
+  var imgCopy = new Image();
+  imgCopy.src = '../core/Core/View/Media/icons/copy.gif';
+  imgCopy.title = '{TXT_IMMO_COPY}';
+  imgCopy.alt = '{TXT_IMMO_COPY}';
+  imgCopy.border = '0';
 
-	var addEvent, removeEvent;
-	addEvent = function(obj, type, fn){
-		if (obj.addEventListener){
-			addEvent = function(obj, type, fn){ //self-redeclaration
-				obj.addEventListener( type, fn, false );
-			}
-		}else if (obj.attachEvent){
-			addEvent = function(obj, type, fn){
-				obj["e"+type+fn] = fn;
-				obj[type+fn] = function() { obj["e"+type+fn]( window.event ); }
-				obj.attachEvent( "on"+type, obj[type+fn] );
-			}
-		}
-	}
-	//for completeness
-	removeEvent = function(obj, type, fn){
-		if (obj.removeEventListener){
-			removeEvent = function(obj, type, fn){
-				obj.removeEventListener( type, fn, false );
-			}
-		}else if (obj.detachEvent){
-			removeEvent = function(obj, type, fn){
-				obj.detachEvent( "on"+type, obj[type+fn] );
-				obj[type+fn] = null;
-				obj["e"+type+fn] = null;
-			}
-		}
-	}
-	function sendReq(field, type) {
-		if(request_active){
-			return false;
-		}else{
-			request_active = true;
-		}
-		limit 			= document.getElementById("paging_limit").value;
-		pos 			= document.getElementById("paging_pos").value;
-		orderspan 		= document.getElementById(field+"_order");
-		searchTerm		= document.getElementById("hsearchterm").value;
-		logo			= document.getElementById("hlogo").value;
-		hfield 			= document.getElementById("field");
-		hfield.value 	= field;
+  var addEvent, removeEvent;
+  addEvent = function(obj, type, fn){
+    if (obj.addEventListener){
+      addEvent = function(obj, type, fn){ //self-redeclaration
+        obj.addEventListener( type, fn, false );
+      }
+    }else if (obj.attachEvent){
+      addEvent = function(obj, type, fn){
+        obj["e"+type+fn] = fn;
+        obj[type+fn] = function() { obj["e"+type+fn]( window.event ); }
+        obj.attachEvent( "on"+type, obj[type+fn] );
+      }
+    }
+  }
+  //for completeness
+  removeEvent = function(obj, type, fn){
+    if (obj.removeEventListener){
+      removeEvent = function(obj, type, fn){
+        obj.removeEventListener( type, fn, false );
+      }
+    }else if (obj.detachEvent){
+      removeEvent = function(obj, type, fn){
+        obj.detachEvent( "on"+type, obj[type+fn] );
+        obj[type+fn] = null;
+        obj["e"+type+fn] = null;
+      }
+    }
+  }
+  function sendReq(field, type) {
+    if(request_active){
+      return false;
+    }else{
+      request_active = true;
+    }
+    limit       = document.getElementById("paging_limit").value;
+    pos       = document.getElementById("paging_pos").value;
+    orderspan     = document.getElementById(field+"_order");
+    searchTerm    = document.getElementById("hsearchterm").value;
+    logo      = document.getElementById("hlogo").value;
+    hfield       = document.getElementById("field");
+    hfield.value   = field;
 
-		if(orderspan.order == 'asc'){
-			orderspan.order = 'desc';
-		}else if(orderspan.order == 'desc'){
-			orderspan.order = 'asc';
-		}else{
-			orderspan.order = 'asc';
-		}
-		clearArrows(type);
-		if (orderspan.order == 'asc'){
-			orderspan.innerHTML = '\u2191';
-		}else{
-			orderspan.innerHTML = '\u2193';
-		}
+    if(orderspan.order == 'asc'){
+      orderspan.order = 'desc';
+    }else if(orderspan.order == 'desc'){
+      orderspan.order = 'asc';
+    }else{
+      orderspan.order = 'asc';
+    }
+    clearArrows(type);
+    if (orderspan.order == 'asc'){
+      orderspan.innerHTML = '\u2191';
+    }else{
+      orderspan.innerHTML = '\u2193';
+    }
 
-		arrField[1].unshift(field);
-		arrOrder[1].unshift(orderspan.order);
+    arrField[1].unshift(field);
+    arrOrder[1].unshift(orderspan.order);
 
-		if(arrField[1].length >= fields[1].length){
-			arrField[1].pop();
-			arrOrder[1].pop();
-		}
+    if(arrField[1].length >= fields[1].length){
+      arrField[1].pop();
+      arrOrder[1].pop();
+    }
 
-		if(type == 1){
-			http.open('get', '?cmd=immo&act=rpcov&field='+arrField.toString()+'&order='+arrOrder.toString()+'&limit='+limit+'&pos='+pos+'&logo='+logo+'&searchTerm='+searchTerm);
-			http.onreadystatechange = updateOverview;
-		}else{//if ..
-		    //more requests here...
-		}
-	    http.send(null);
-	}
+    if(type == 1){
+      http.open('get', '?cmd=immo&act=rpcov&field='+arrField.toString()+'&order='+arrOrder.toString()+'&limit='+limit+'&pos='+pos+'&logo='+logo+'&searchTerm='+searchTerm);
+      http.onreadystatechange = updateOverview;
+    }else{//if ..
+        //more requests here...
+    }
+      http.send(null);
+  }
 
-	function createTdWithText(text){
-		td = document.createElement("td");
-		td.style.whiteSpace = 'nowrap';
-		text = (text == '') ? 'N/A' : text;
-		textNode = document.createTextNode(text);
-		td.appendChild(textNode);
-		return td;
-	}
+  function createTdWithText(text){
+    td = document.createElement("td");
+    td.style.whiteSpace = 'nowrap';
+    text = (text == '') ? 'N/A' : text;
+    textNode = document.createTextNode(text);
+    td.appendChild(textNode);
+    return td;
+  }
 
-	var findPosX = function(obj){
-		var curleft = 0;
-		if (obj.offsetParent)
-		{
-			while (obj.offsetParent)
-			{
-				curleft += obj.offsetLeft
-				obj = obj.offsetParent;
-			}
-		}
-		else if (obj.x)
-			curleft += obj.x;
-		return curleft;
-	}
+  var findPosX = function(obj){
+    var curleft = 0;
+    if (obj.offsetParent)
+    {
+      while (obj.offsetParent)
+      {
+        curleft += obj.offsetLeft
+        obj = obj.offsetParent;
+      }
+    }
+    else if (obj.x)
+      curleft += obj.x;
+    return curleft;
+  }
 
-	var findPosY = function(obj){
-		var curtop = 0;
-		if (obj.offsetParent)
-		{
-			while (obj.offsetParent)
-			{
-				curtop += obj.offsetTop
-				obj = obj.offsetParent;
-			}
-		}
-		else if (obj.y)
-			curtop += obj.y;
-		return curtop;
-	}
+  var findPosY = function(obj){
+    var curtop = 0;
+    if (obj.offsetParent)
+    {
+      while (obj.offsetParent)
+      {
+        curtop += obj.offsetTop
+        obj = obj.offsetParent;
+      }
+    }
+    else if (obj.y)
+      curtop += obj.y;
+    return curtop;
+  }
 
-	var getInputPosition = function(obj){
-		try{
-			x = findPosX(obj);
-			y = findPosY(obj);
-		}catch(e){}
-		y-=25;
-		return {X: x+'px', Y: y+'px'};
-	}
+  var getInputPosition = function(obj){
+    try{
+      x = findPosX(obj);
+      y = findPosY(obj);
+    }catch(e){}
+    y-=25;
+    return {X: x+'px', Y: y+'px'};
+  }
 
-	function showTip(message, obj){
-		try{
-			pos = getInputPosition(obj);
-			div=document.createElement('div');
-			div.id="commentTip";
-			div.appendChild(document.createTextNode(message));
-			div.style.border='1px solid black';
-			div.style.padding='1px';
-			div.style.backgroundColor='ffffe1';
-			div.style.position='absolute';
-			div.style.top=pos.Y;
-			obj.parentNode.appendChild(div);
-		}catch(e){}
-	}
+  function showTip(message, obj){
+    try{
+      pos = getInputPosition(obj);
+      div=document.createElement('div');
+      div.id="commentTip";
+      div.appendChild(document.createTextNode(message));
+      div.style.border='1px solid black';
+      div.style.padding='1px';
+      div.style.backgroundColor='ffffe1';
+      div.style.position='absolute';
+      div.style.top=pos.Y;
+      obj.parentNode.appendChild(div);
+    }catch(e){}
+  }
 
-	function hideTip(){
-		try{
-			document.getElementById('commentTip').parentNode.removeChild(document.getElementById('commentTip'));
-		}catch(e){}
-	}
+  function hideTip(){
+    try{
+      document.getElementById('commentTip').parentNode.removeChild(document.getElementById('commentTip'));
+    }catch(e){}
+  }
 
-	function updateOverview() {
-	    if(http.readyState == 4 && http.status == 200){
-	    	requests = new Array();
-	        var response = http.responseText;
-	        eval(response); // create contacts array
-	        tbl = document.getElementById('overviewList');
-				tBody = tbl.tBodies[0];
-				for(i = tBody.childNodes.length-1; i>=0; i--){
-	            	try{
-	            		bin = tBody.removeChild(tBody.childNodes[i]);
-	            	}catch(e){}
-	            }
-	            for(i in objects){
-	            	row = document.createElement("tr");
-	            	row.className = 'row' + ((i%2) + 1);
-	            	row.appendChild(createTdWithText(unescape(objects[i].immo_id)));
+  function updateOverview() {
+      if(http.readyState == 4 && http.status == 200){
+        requests = new Array();
+          var response = http.responseText;
+          eval(response); // create contacts array
+          tbl = document.getElementById('overviewList');
+        tBody = tbl.tBodies[0];
+        for(i = tBody.childNodes.length-1; i>=0; i--){
+                try{
+                  bin = tBody.removeChild(tBody.childNodes[i]);
+                }catch(e){}
+              }
+              for(i in objects){
+                row = document.createElement("tr");
+                row.className = 'row' + ((i%2) + 1);
+                row.appendChild(createTdWithText(unescape(objects[i].immo_id)));
 
-	            	aOpen = document.createElement("a");
-					aOpen.href = '?cmd=immo&{CSRF_PARAM}&act=edit&id='+unescape(objects[i].immo_id);
-					aOpen.title = unescape(objects[i].location);
-					aOpen.target = '_self';
-	            	aOpen.appendChild(document.createTextNode(unescape(objects[i].reference)));
-	            	pageTD = document.createElement("td");
-	            	pageTD.appendChild(aOpen);
-	            	row.appendChild(pageTD);
+                aOpen = document.createElement("a");
+          aOpen.href = '?cmd=immo&{CSRF_PARAM}&act=edit&id='+unescape(objects[i].immo_id);
+          aOpen.title = unescape(objects[i].location);
+          aOpen.target = '_self';
+                aOpen.appendChild(document.createTextNode(unescape(objects[i].reference)));
+                pageTD = document.createElement("td");
+                pageTD.appendChild(aOpen);
+                row.appendChild(pageTD);
 
-	            	row.appendChild(createTdWithText(unescape(objects[i].ref_nr_note)));
-	            	row.appendChild(createTdWithText(unescape(objects[i].visibility)));
-	            	row.appendChild(createTdWithText(unescape(objects[i].address)));
-	            	row.appendChild(createTdWithText(unescape(objects[i].location)));
-	            	row.appendChild(createTdWithText(unescape(objects[i].otype)));
-	            	row.appendChild(createTdWithText(unescape(objects[i].newobj)));
-	            	row.appendChild(createTdWithText(unescape(objects[i].ptype)));
-	            	row.appendChild(createTdWithText(unescape(objects[i].fa)));
-	            	row.appendChild(createTdWithText(unescape(objects[i].so)));
+                row.appendChild(createTdWithText(unescape(objects[i].ref_nr_note)));
+                row.appendChild(createTdWithText(unescape(objects[i].visibility)));
+                row.appendChild(createTdWithText(unescape(objects[i].address)));
+                row.appendChild(createTdWithText(unescape(objects[i].location)));
+                row.appendChild(createTdWithText(unescape(objects[i].otype)));
+                row.appendChild(createTdWithText(unescape(objects[i].newobj)));
+                row.appendChild(createTdWithText(unescape(objects[i].ptype)));
+                row.appendChild(createTdWithText(unescape(objects[i].fa)));
+                row.appendChild(createTdWithText(unescape(objects[i].so)));
 
-	            	aEdit = document.createElement("a");
-					aEdit.href = '?cmd=immo&act=edit&id='+objects[i].immo_id;
-					aEdit.title = '{TXT_IMMO_EDIT}';
-	            	aEdit.appendChild(imgEdit.cloneNode(false));
+                aEdit = document.createElement("a");
+          aEdit.href = '?cmd=immo&act=edit&id='+objects[i].immo_id;
+          aEdit.title = '{TXT_IMMO_EDIT}';
+                aEdit.appendChild(imgEdit.cloneNode(false));
 
-	            	aCopy = document.createElement("a");
-					aCopy.href = '?cmd=immo&act=copy&id='+objects[i].immo_id;
-					aCopy.title = '{TXT_IMMO_EDIT}';
-	            	aCopy.appendChild(imgCopy.cloneNode(false));
+                aCopy = document.createElement("a");
+          aCopy.href = '?cmd=immo&act=copy&id='+objects[i].immo_id;
+          aCopy.title = '{TXT_IMMO_EDIT}';
+                aCopy.appendChild(imgCopy.cloneNode(false));
 
-	            	aDelete = document.createElement("a");
-					aDelete.href = 'javascript:deleteImmo('+ objects[i]['immo_id'] +')';
-					aDelete.title = '{TXT_IMMO_DELETE}'
-					aDelete.appendChild(imgDelete.cloneNode(false));
+                aDelete = document.createElement("a");
+          aDelete.href = 'javascript:deleteImmo('+ objects[i]['immo_id'] +')';
+          aDelete.title = '{TXT_IMMO_DELETE}'
+          aDelete.appendChild(imgDelete.cloneNode(false));
 
-					tdFunc = document.createElement("td");
-					tdFunc.style.textAlign = 'right';
-					tdFunc.appendChild(aEdit);
-					tdFunc.appendChild(aCopy);
-					tdFunc.appendChild(aDelete);
-					row.appendChild(tdFunc);
+          tdFunc = document.createElement("td");
+          tdFunc.style.textAlign = 'right';
+          tdFunc.appendChild(aEdit);
+          tdFunc.appendChild(aCopy);
+          tdFunc.appendChild(aDelete);
+          row.appendChild(tdFunc);
 
-					tBody.appendChild(row);
-	            }
+          tBody.appendChild(row);
+              }
 
-	            try{ // hide cloudrexx status message when redirected from a "not found" search query
-					document.getElementById('alertbox').style.display='none';
-				}catch(e){}
+              try{ // hide cloudrexx status message when redirected from a "not found" search query
+          document.getElementById('alertbox').style.display='none';
+        }catch(e){}
 
-				request_active = false;
+        request_active = false;
         }else{
-        	try{
-	        	if(http.statusText == 'OK'){
-	        		return false;
-	        	}else{
-		        	alert('error: ' + http.statusText);
-	        	}
-        	}catch(e){}
+          try{
+            if(http.statusText == 'OK'){
+              return false;
+            }else{
+              alert('error: ' + http.statusText);
+            }
+          }catch(e){}
         }
     }
 
@@ -312,12 +312,12 @@ function deleteImmo(immoID) {
     </tr>
     <tr>
         <td>
-        	<input type="text" name="searchterm" />
-        	<!--<select name="logo">
-        		<option value="logo1" {IMMO_LOGO_LOGO1_SELECTED}>Logo 1</option>
-        		<option value="logo2" {IMMO_LOGO_LOGO2_SELECTED}>Logo 2</option>
-        	</select>-->
-        	<input type="submit" value="{TXT_IMMO_SEARCH}" />
+          <input type="text" name="searchterm" />
+          <!--<select name="logo">
+            <option value="logo1" {IMMO_LOGO_LOGO1_SELECTED}>Logo 1</option>
+            <option value="logo2" {IMMO_LOGO_LOGO2_SELECTED}>Logo 2</option>
+          </select>-->
+          <input type="submit" value="{TXT_IMMO_SEARCH}" />
         </td>
     </tr>
 </table>
@@ -338,40 +338,40 @@ function deleteImmo(immoID) {
 <!-- BEGIN entriesList -->
 <tr class="row3">
     <td style="width: 2%;"><a id="immo_id" href="javascript:void(0);" onclick="sendReq('immo_id', 1);"><strong>ID</strong></a>
-		<span id="immo_id_order"> </span>
-	</td>
+    <span id="immo_id_order"> </span>
+  </td>
     <td style="width: 5%;"><a id="reference" href="javascript:void(0);" onclick="sendReq('reference', 1);"><strong>{TXT_IMMO_REF_ID}</strong></a>
-		<span id="reference_order"> </span>
-	</td>
+    <span id="reference_order"> </span>
+  </td>
     <td style="width: 25%;"><a id="ref_nr_note" href="javascript:void(0);" onclick="sendReq('ref_nr_note', 1);"><strong>{TXT_IMMO_REF_NOTE}</strong></a>
-		<span id="ref_nr_note_order"> </span>
-	</td>
+    <span id="ref_nr_note_order"> </span>
+  </td>
     <td style="width: 10%;"><a id="visibility" href="javascript:void(0);" onclick="sendReq('visibility', 1);"><strong>{TXT_IMMO_VISIBLE}</strong></a>
-		<span id="visibility_order"> </span>
-	</td>
-	<!--'reference', 'ref_nr_note', 'visibility', 'address', 'location', 'object_type', 'new_building', 'property_type', 'foreigner_authorization', 'special_offer'-->
+    <span id="visibility_order"> </span>
+  </td>
+  <!--'reference', 'ref_nr_note', 'visibility', 'address', 'location', 'object_type', 'new_building', 'property_type', 'foreigner_authorization', 'special_offer'-->
 
     <td style="width: 20%;"><a id="address" href="javascript:void(0);" onclick="sendReq('address', 1);"><strong>{TXT_IMMO_ADDRESS}</strong></a>
-		<span id="address_order"> </span>
-	</td>
+    <span id="address_order"> </span>
+  </td>
     <td style="width: 20%;"><a id="location" href="javascript:void(0);" onclick="sendReq('location', 1);"><strong>{TXT_IMMO_LOCATION}</strong></a>
-		<span id="location_order"> </span>
-	</td>
+    <span id="location_order"> </span>
+  </td>
     <td style="width: 3%;"><a id="object_type" href="javascript:void(0);" onclick="sendReq('object_type', 1);"><strong>{TXT_IMMO_OBJECT_TYPE}</strong></a>
-		<span id="object_type_order"> </span>
-	</td>
-	<td style="width: 3%;"><a id="new_building" href="javascript:void(0);" onclick="sendReq('new_building', 1);"><strong>{TXT_IMMO_NEW_BUILDING}</strong></a>
-		<span id="new_building_order"> </span>
-	</td>
+    <span id="object_type_order"> </span>
+  </td>
+  <td style="width: 3%;"><a id="new_building" href="javascript:void(0);" onclick="sendReq('new_building', 1);"><strong>{TXT_IMMO_NEW_BUILDING}</strong></a>
+    <span id="new_building_order"> </span>
+  </td>
     <td style="width: 3%;"><a id="property_type" href="javascript:void(0);" onclick="sendReq('property_type', 1);"><strong>{TXT_IMMO_PROPERTY_TYPE}</strong></a>
-		<span id="property_type_order"> </span>
-	</td>
+    <span id="property_type_order"> </span>
+  </td>
     <td style="width: 3%;"><a id="foreigner_authorization" href="javascript:void(0);" onclick="sendReq('foreigner_authorization', 1);"><strong>{TXT_IMMO_FOREIGNER_AUTHORIZATION}</strong></a>
-		<span id="foreigner_authorization_order"> </span>
-	</td>
+    <span id="foreigner_authorization_order"> </span>
+  </td>
     <td style="width: 3%;"><a id="special_offer" href="javascript:void(0);" onclick="sendReq('special_offer', 1);"><strong>{TXT_IMMO_SPECIAL_OFFER}</strong></a>
-		<span id="special_offer_order"> </span>
-	</td>
+    <span id="special_offer_order"> </span>
+  </td>
     <td style="text-align: right; width: 3%;">
         <strong>{TXT_IMMO_FUNCTIONS}</strong>
     </td>
@@ -396,8 +396,8 @@ function deleteImmo(immoID) {
         {IMMO_ADDRESS}
     </td>
     <td>
-	    {IMMO_LOCATION}
-	</td>
+      {IMMO_LOCATION}
+  </td>
     <td>
         {IMMO_OBJECT_TYPE}
     </td>

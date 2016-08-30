@@ -1246,7 +1246,7 @@ p#loginerror {
 .mobile-reg:hover {
     background: url('images/user_register.png') no-repeat center #888;
 }
-.mobile-login:hover { 
+.mobile-login:hover {
     background: url('images/login.png') no-repeat center #888;
 }
 
@@ -1346,7 +1346,7 @@ fieldset .checkbox, fieldset .radio {
 
 
 /* New Deign */
-#workbenchWarning { display: none;} 
+#workbenchWarning { display: none;}
 #fe_toolbar { display: none !important;}
 html, body {
     height: 100%;
@@ -1409,7 +1409,7 @@ h1, h2 { font-weight: 700 !important;}
     -webkit-box-sizing: border-box;
     outline: 0 none;
 }
-.navigation li a:hover, 
+.navigation li a:hover,
 .navigation li a.starter_active {
     color: #575756;
     text-decoration: none;
@@ -1481,7 +1481,7 @@ h1.first { margin-bottom: 28px;}
     margin: 0 auto;
 }
 /*Mobile navigation START here*/
-.toggle-menu { 
+.toggle-menu {
     display: none;
     border-bottom: 1px solid #575756;
     background: none;
@@ -1499,7 +1499,7 @@ h1.first { margin-bottom: 28px;}
     color: #929292;
     height: auto;
 }
-.mobile-nav .navigation li a:hover, 
+.mobile-nav .navigation li a:hover,
 .mobile-nav .navigation li a.starter_active {
     color: #fff;
 }
@@ -1520,11 +1520,11 @@ h1.first { margin-bottom: 28px;}
 /*Mobile navigation END here*/
 /* Kontakt form */
 #contactForm input[type=reset] { display: none;}
-.address { 
+.address {
     margin: 33px 0 75px;
 }
 .address a { color: #575756;}
-button, html input[type="button"], 
+button, html input[type="button"],
 html input[type="reset"], html input[type="submit"] {
     float: left;
     color: #666666;
@@ -1534,7 +1534,7 @@ html input[type="reset"], html input[type="submit"] {
     padding: 4px 12px;
     border-radius: 0;
 }
-button:hover, html input[type="button"]:hover, 
+button:hover, html input[type="button"]:hover,
 html input[type="reset"]:hover, html input[type="submit"]:hover {
     border: 1px solid #656565;
 }
@@ -1563,7 +1563,7 @@ html input[type="reset"]:hover, html input[type="submit"]:hover {
     width: 48.7%;
     margin: 10px 0;
 }
-.news-info, #news-date, 
+.news-info, #news-date,
 #news-links, .news-comment-poster {
     font-size: 17px;
 }
@@ -1579,4 +1579,3 @@ form input[type="submit"], form input[type="reset"], #podcast input[type="button
 #recommendForm p input[type="submit"], #guestbook p input[type="submit"],
 #livecam .livecamSearch input[type="submit"] {margin-right: 15px;}
 #podcast .categories {float: left; width: 100%;}
-

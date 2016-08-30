@@ -33,7 +33,7 @@ echo blogUpdates();
 function blogUpdates() {
     //Update the database changes
     try {
-        //update module name 
+        //update module name
         \Cx\Lib\UpdateUtil::sql("UPDATE `".DBPREFIX."modules` SET `name` = 'Blog' WHERE `id` = 47");
         //update navigation url
         \Cx\Lib\UpdateUtil::sql("UPDATE `".DBPREFIX."backend_areas` SET `uri` = 'index.php?cmd=Blog' WHERE `area_id` = 119");
@@ -48,19 +48,19 @@ function blogUpdates() {
         //update module name for frontend pages
         \Cx\Lib\UpdateUtil::sql("UPDATE `".DBPREFIX."content_page` SET `module` = 'Blog' WHERE `module` = 'blog'");
         //following queries for changing the path from images/blog into images/Blog
-        \Cx\Lib\UpdateUtil::sql("UPDATE `".DBPREFIX."module_blog_messages_lang` 
+        \Cx\Lib\UpdateUtil::sql("UPDATE `".DBPREFIX."module_blog_messages_lang`
                                         SET `image` = REPLACE(`image`, 'images/blog', 'images/Blog')
                                         WHERE `image` LIKE ('".ASCMS_PATH_OFFSET."/images/blog%')");
-        \Cx\Lib\UpdateUtil::sql("UPDATE `".DBPREFIX."module_blog_networks` 
+        \Cx\Lib\UpdateUtil::sql("UPDATE `".DBPREFIX."module_blog_networks`
                                         SET `icon` = REPLACE(`icon`, 'images/blog', 'images/Blog')
                                         WHERE `icon` LIKE ('".ASCMS_PATH_OFFSET."/images/blog%')");
     } catch (\Cx\Lib\UpdateException $e) {
         return "Error: $e->sql";
     }
-    
+
     //Update script for moving the folder
     $blogImgPath = ASCMS_DOCUMENT_ROOT . '/images';
-    
+
     try {
         if (file_exists($blogImgPath . '/blog') && !file_exists($blogImgPath . '/Blog')) {
             \Cx\Lib\FileSystem\FileSystem::makeWritable($blogImgPath . '/blog');
@@ -71,6 +71,6 @@ function blogUpdates() {
     } catch (\Cx\Lib\FileSystem\FileSystemException $e) {
         return $e->getMessage();
     }
-    
+
     return 'Blog updated successfully.';
 }

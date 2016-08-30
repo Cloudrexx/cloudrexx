@@ -81,14 +81,14 @@ function _newsletterUpdate()
 
 
     DBG::msg("Done checking tables.. going to check settings");
-    
+
 
     //the two values notifyOnUnsubscribe and notificationUnsubscribe have been merged into the latter.
     $unsubscribeVal=1;
     try {
         DBG::msg("Retrieving old unsubscribe value if set.");
         $res = \Cx\Lib\UpdateUtil::sql("SELECT setvalue FROM ".DBPREFIX."module_newsletter_settings WHERE setname='notifyOnUnsubscribe'");
-        
+
         if(!$res->EOF){
             $unsubscribeVal = $res->fields['setvalue'];
         }
@@ -104,7 +104,7 @@ function _newsletterUpdate()
     catch (\Cx\Lib\UpdateException $e) {
         return \Cx\Lib\UpdateUtil::DefaultActionHandler($e);
     }
-        
+
     $settings = array(
         'sender_mail'             => array('setid' =>  1, 'setname' => 'sender_mail',             'setvalue' => 'info@example.com', 'status' => 1),
         'sender_name'             => array('setid' =>  2, 'setname' => 'sender_name',             'setvalue' => 'admin',            'status' => 1),
@@ -334,7 +334,7 @@ function _newsletterUpdate()
         )) {
             // set user's SALUTATION based of previews updates
             \Cx\Lib\UpdateUtil::sql("UPDATE `".DBPREFIX."module_newsletter_user` SET `salutation` = `title`, `title` = '' WHERE `salutation` = '0' AND `title` REGEXP '^[0-9]+$'");
-            
+
             // clear all user's TITLE attribute that consist only of a number (it is most likely not the case that a user's TITLE is a number,
             // so we assume that it is a left over of the preview update bug, which did not migrate the user's TITLE attribute to the user's SALUTATION attribute
             \Cx\Lib\UpdateUtil::sql("UPDATE `".DBPREFIX."module_newsletter_user` SET `title` = '' WHERE `title` REGEXP '^[0-9]+$'");

@@ -1,97 +1,97 @@
 <!-- start module_podcast_modify_medium.html -->
 <form action="index.php?cmd=Podcast&amp;act=modifyMedium&amp;id={PODCAST_MEDIUM_ID}" method="post">
-	<table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
-		<tbody>
-			<tr>
-				<th colspan="4">{PODCAST_MODIFY_TITLE}</th>
-			</tr>
-			<tr class="row1">
-				<td width="15%">{TXT_PODCAST_TITLE}</td>
-				<td width="85%" colspan="3"><input type="text" value="{PODCAST_MEDIUM_TITLE}" name="podcast_medium_title" maxlength="255" style="width:450px;" /></td>
-			</tr>
-			<tr class="row2">
-				<td>{TXT_PODCAST_AUTHOR}</td>
-				<td colspan="3"><input type="text" value="{PODCAST_MEDIUM_AUTHOR}" name="podcast_medium_author" maxlength="255" style="width:450px;" /></td>
-			</tr>
-			<tr class="row1" style="vertical-align:top;">
-				<td>{TXT_PODCAST_DESCRIPTION}</td>
-				<td colspan="3"><textarea name="podcast_medium_description" cols="150" rows="10" style="width:450px; height:100px;">{PODCAST_MEDIUM_DESCRIPTION}</textarea></td>
-			</tr>
-			<tr class="row2">
-				<td>{TXT_PODCAST_SOURCE}</td>
-				<td colspan="3"><input type="hidden" value="{PODCAST_MEDIUM_SOURCE_URL}" name="podcast_medium_source" /><a href="{PODCAST_MEDIUM_SOURCE_URL}" target="_blank">{PODCAST_MEDIUM_SOURCE}</a></td>
-			</tr>
-			<tr class="row1">
-				<td>{TXT_PODCAST_TEMPLATE}</td>
-				<td colspan="3">{PODCAST_MEDIUM_TEMPLATE_MENU}</td>
-			</tr>
-			<tr class="row2" style="vertical-align:top;">
-				<td>{TXT_PODCAST_DIMENSIONS}</td>
-				<td colspan="3">
-					<input type="text" value="{PODCAST_MEDIUM_WIDTH}" name="podcast_medium_width" style="width:50px; text-align:right; margin-bottom:1px;" /> {TXT_PODCAST_PIXEL_WIDTH}<br />
-					<input type="text" value="{PODCAST_MEDIUM_HEIGHT}" name="podcast_medium_height" style="width:50px; text-align:right;" /> {TXT_PODCAST_PIXEL_HEIGHT}
-				</td>
-			</tr>
-			<tr class="row1">
-				<td>{TXT_PODCAST_PLAYLENGTH}</td>
-				<td colspan="3"><input type="text" value="{PODCAST_MEDIUM_PLAYLENGTH}" name="podcast_medium_playlength" style="width:50px; text-align:right;" /> {TXT_PODCAST_PLAYLENGTH_FORMAT}</td>
-			</tr>
-			<tr class="row2">
-				<td>{TXT_PODCAST_FILESIZE}</td>
-				<td colspan="3"><input {PODCAST_MEDIUM_YOUTUBE_DISABLED} type="text" value="{PODCAST_MEDIUM_FILESIZE}" name="podcast_medium_filesize" style="width:50px; text-align:right;" /> {TXT_PODCAST_BYTES}</td>
-			</tr>
-			<tr class="row1">
-				<td>{TXT_PODCAST_THUMBNAIL}</td>
-				<td colspan="3">
+  <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
+    <tbody>
+      <tr>
+        <th colspan="4">{PODCAST_MODIFY_TITLE}</th>
+      </tr>
+      <tr class="row1">
+        <td width="15%">{TXT_PODCAST_TITLE}</td>
+        <td width="85%" colspan="3"><input type="text" value="{PODCAST_MEDIUM_TITLE}" name="podcast_medium_title" maxlength="255" style="width:450px;" /></td>
+      </tr>
+      <tr class="row2">
+        <td>{TXT_PODCAST_AUTHOR}</td>
+        <td colspan="3"><input type="text" value="{PODCAST_MEDIUM_AUTHOR}" name="podcast_medium_author" maxlength="255" style="width:450px;" /></td>
+      </tr>
+      <tr class="row1" style="vertical-align:top;">
+        <td>{TXT_PODCAST_DESCRIPTION}</td>
+        <td colspan="3"><textarea name="podcast_medium_description" cols="150" rows="10" style="width:450px; height:100px;">{PODCAST_MEDIUM_DESCRIPTION}</textarea></td>
+      </tr>
+      <tr class="row2">
+        <td>{TXT_PODCAST_SOURCE}</td>
+        <td colspan="3"><input type="hidden" value="{PODCAST_MEDIUM_SOURCE_URL}" name="podcast_medium_source" /><a href="{PODCAST_MEDIUM_SOURCE_URL}" target="_blank">{PODCAST_MEDIUM_SOURCE}</a></td>
+      </tr>
+      <tr class="row1">
+        <td>{TXT_PODCAST_TEMPLATE}</td>
+        <td colspan="3">{PODCAST_MEDIUM_TEMPLATE_MENU}</td>
+      </tr>
+      <tr class="row2" style="vertical-align:top;">
+        <td>{TXT_PODCAST_DIMENSIONS}</td>
+        <td colspan="3">
+          <input type="text" value="{PODCAST_MEDIUM_WIDTH}" name="podcast_medium_width" style="width:50px; text-align:right; margin-bottom:1px;" /> {TXT_PODCAST_PIXEL_WIDTH}<br />
+          <input type="text" value="{PODCAST_MEDIUM_HEIGHT}" name="podcast_medium_height" style="width:50px; text-align:right;" /> {TXT_PODCAST_PIXEL_HEIGHT}
+        </td>
+      </tr>
+      <tr class="row1">
+        <td>{TXT_PODCAST_PLAYLENGTH}</td>
+        <td colspan="3"><input type="text" value="{PODCAST_MEDIUM_PLAYLENGTH}" name="podcast_medium_playlength" style="width:50px; text-align:right;" /> {TXT_PODCAST_PLAYLENGTH_FORMAT}</td>
+      </tr>
+      <tr class="row2">
+        <td>{TXT_PODCAST_FILESIZE}</td>
+        <td colspan="3"><input {PODCAST_MEDIUM_YOUTUBE_DISABLED} type="text" value="{PODCAST_MEDIUM_FILESIZE}" name="podcast_medium_filesize" style="width:50px; text-align:right;" /> {TXT_PODCAST_BYTES}</td>
+      </tr>
+      <tr class="row1">
+        <td>{TXT_PODCAST_THUMBNAIL}</td>
+        <td colspan="3">
                                   {PODCAST_THUMB_BROWSE}
                                   <a href="javascript:void(0);" id="podcast_thumbnail_link" title="{TXT_PODCAST_EDIT_OR_ADD_IMAGE}" onclick="openBrowser();" >{TXT_PODCAST_EDIT_OR_ADD_IMAGE}<br /> <img id="podcast_thumbnail"  style="border: none;" src="{PODCAST_MEDIUM_THUMBNAIL_SRC}" title="{TXT_IMMO_EDIT_OR_ADD_IMAGE}" alt="{TXT_IMMO_EDIT_OR_ADD_IMAGE}" /></a>
                                 </td>
-			</tr>
-			<tr class="row2" style="vertical-align:top;">
-				<td width="15%">{TXT_PODCAST_CATEGORIES}</td>
-				<td width="20%">
-					<!-- BEGIN podcast_medium_associated_category_0 -->
-						<input type="checkbox" name="podcast_medium_associated_category[{PODCAST_CATEGORY_ID}]" id="podcast_medium_associated_category_{PODCAST_CATEGORY_ID}" value="1" {PODCAST_CATEGORY_ASSOCIATED} /> <a href="index.php?cmd=Podcast&amp;categoryId={PODCAST_CATEGORY_ID}" target="_blank" title="{PODCAST_SHOW_MEDIA_OF_CATEGORY_TXT}">{PODCAST_CATEGORY_NAME}</a><br />
-					<!-- END podcast_medium_associated_category_0 -->
-				</td>
-				<td width="20%">
-					<!-- BEGIN podcast_medium_associated_category_1 -->
-						<input type="checkbox" name="podcast_medium_associated_category[{PODCAST_CATEGORY_ID}]" id="podcast_medium_associated_category_{PODCAST_CATEGORY_ID}" value="1" {PODCAST_CATEGORY_ASSOCIATED} /> <a href="index.php?cmd=Podcast&amp;categoryId={PODCAST_CATEGORY_ID}" target="_blank" title="{PODCAST_SHOW_MEDIA_OF_CATEGORY_TXT}">{PODCAST_CATEGORY_NAME}</a><br />
-					<!-- END podcast_medium_associated_category_1 -->
-				</td>
-				<td width="45%">
-					<!-- BEGIN podcast_medium_associated_category_2 -->
-						<input type="checkbox" name="podcast_medium_associated_category[{PODCAST_CATEGORY_ID}]" id="podcast_medium_associated_category_{PODCAST_CATEGORY_ID}" value="1" {PODCAST_CATEGORY_ASSOCIATED} /> <a href="index.php?cmd=Podcast&amp;categoryId={PODCAST_CATEGORY_ID}" target="_blank" title="{PODCAST_SHOW_MEDIA_OF_CATEGORY_TXT}">{PODCAST_CATEGORY_NAME}</a><br />
-					<!-- END podcast_medium_associated_category_2 -->
-				</td>
-			</tr>
-			<tr class="row1">
-				<td>{TXT_PODCAST_STATUS}</td>
-				<td colspan="3"><input type="checkbox" value="1" name="podcast_medium_status" id="podcast_medium_status" {PODCAST_MEDIUM_STATUS} /><label for="podcast_medium_status">{TXT_PODCAST_ACTIVE}</label></td>
-			</tr>
-		</tbody>
-	</table>
-	<br />
-	<input type="submit" name="podcast_medium_save" value="{TXT_PODCAST_SAVE}" />
-	<input type="hidden" name="podcast_medium_thumbnail" id="podcast_medium_thumbnail" value="{PODCAST_MEDIUM_THUMBNAIL_SRC}">
-	<input type="hidden" name="podcast_youtubeID" id="podcast_youtubeID" value="{PODCAST_MEDIUM_YOUTUBE_ID}">
+      </tr>
+      <tr class="row2" style="vertical-align:top;">
+        <td width="15%">{TXT_PODCAST_CATEGORIES}</td>
+        <td width="20%">
+          <!-- BEGIN podcast_medium_associated_category_0 -->
+            <input type="checkbox" name="podcast_medium_associated_category[{PODCAST_CATEGORY_ID}]" id="podcast_medium_associated_category_{PODCAST_CATEGORY_ID}" value="1" {PODCAST_CATEGORY_ASSOCIATED} /> <a href="index.php?cmd=Podcast&amp;categoryId={PODCAST_CATEGORY_ID}" target="_blank" title="{PODCAST_SHOW_MEDIA_OF_CATEGORY_TXT}">{PODCAST_CATEGORY_NAME}</a><br />
+          <!-- END podcast_medium_associated_category_0 -->
+        </td>
+        <td width="20%">
+          <!-- BEGIN podcast_medium_associated_category_1 -->
+            <input type="checkbox" name="podcast_medium_associated_category[{PODCAST_CATEGORY_ID}]" id="podcast_medium_associated_category_{PODCAST_CATEGORY_ID}" value="1" {PODCAST_CATEGORY_ASSOCIATED} /> <a href="index.php?cmd=Podcast&amp;categoryId={PODCAST_CATEGORY_ID}" target="_blank" title="{PODCAST_SHOW_MEDIA_OF_CATEGORY_TXT}">{PODCAST_CATEGORY_NAME}</a><br />
+          <!-- END podcast_medium_associated_category_1 -->
+        </td>
+        <td width="45%">
+          <!-- BEGIN podcast_medium_associated_category_2 -->
+            <input type="checkbox" name="podcast_medium_associated_category[{PODCAST_CATEGORY_ID}]" id="podcast_medium_associated_category_{PODCAST_CATEGORY_ID}" value="1" {PODCAST_CATEGORY_ASSOCIATED} /> <a href="index.php?cmd=Podcast&amp;categoryId={PODCAST_CATEGORY_ID}" target="_blank" title="{PODCAST_SHOW_MEDIA_OF_CATEGORY_TXT}">{PODCAST_CATEGORY_NAME}</a><br />
+          <!-- END podcast_medium_associated_category_2 -->
+        </td>
+      </tr>
+      <tr class="row1">
+        <td>{TXT_PODCAST_STATUS}</td>
+        <td colspan="3"><input type="checkbox" value="1" name="podcast_medium_status" id="podcast_medium_status" {PODCAST_MEDIUM_STATUS} /><label for="podcast_medium_status">{TXT_PODCAST_ACTIVE}</label></td>
+      </tr>
+    </tbody>
+  </table>
+  <br />
+  <input type="submit" name="podcast_medium_save" value="{TXT_PODCAST_SAVE}" />
+  <input type="hidden" name="podcast_medium_thumbnail" id="podcast_medium_thumbnail" value="{PODCAST_MEDIUM_THUMBNAIL_SRC}">
+  <input type="hidden" name="podcast_youtubeID" id="podcast_youtubeID" value="{PODCAST_MEDIUM_YOUTUBE_ID}">
 </form>
 
 <script type="text/javascript">
 //<![CDATA[
- 	var elInputThumbnailPath = document.getElementById("podcast_medium_thumbnail");
-	var elImgThumbnail = document.getElementById("podcast_thumbnail");
-	var thumbSizeMax = 90;
+   var elInputThumbnailPath = document.getElementById("podcast_medium_thumbnail");
+  var elImgThumbnail = document.getElementById("podcast_thumbnail");
+  var thumbSizeMax = 90;
 
-	var openBrowser = function openBrowser() {
+  var openBrowser = function openBrowser() {
           jQuery('#podcast_thumbnail_browser').trigger("click");
           return false;
-	}
+  }
 
-	var mediaBrowserCallback = function(data) {
+  var mediaBrowserCallback = function(data) {
           if (data.type=="file") {
             var url = data.data[0].datainfo.filepath;
-            
+
             elInputThumbnailPath.setAttribute('value', url);
             fileRegExp = /.+\/(.+)$/;
             fileRegExp.exec(url);
@@ -100,37 +100,37 @@
             var newImg = new Image();
             newImg.onload = function() {
               var height = newImg.height;
-              var width = newImg.width;              
-              setSize(width, height);            
+              var width = newImg.width;
+              setSize(width, height);
             };
             newImg.src = url;
           }
-	};
+  };
 
-	var setSize = function (width, height){
-		if(width > thumbSizeMax || height > thumbSizeMax){
-			if(width > height){
-					fact = thumbSizeMax / width;
-					elImgThumbnail.style.width = width*fact+'px';
-					elImgThumbnail.style.height = height*fact+'px';
-			}else{
-					fact = thumbSizeMax / height;
-					elImgThumbnail.style.height = height*fact+'px';
-					elImgThumbnail.style.width = width*fact+'px';
-			}
-		}else{
-			elImgThumbnail.style.height = height+'px';
-			elImgThumbnail.style.width = width+'px';
-		}
-	}
-	tmp = window.onload;
-	if(tmp == null){
-		tmp = function(){};
-	}
-	window.onload = function(){
-		tmp();
-		setSize(parseInt(elImgThumbnail.offsetWidth), parseInt(elImgThumbnail.offsetHeight));
-	}
+  var setSize = function (width, height){
+    if(width > thumbSizeMax || height > thumbSizeMax){
+      if(width > height){
+          fact = thumbSizeMax / width;
+          elImgThumbnail.style.width = width*fact+'px';
+          elImgThumbnail.style.height = height*fact+'px';
+      }else{
+          fact = thumbSizeMax / height;
+          elImgThumbnail.style.height = height*fact+'px';
+          elImgThumbnail.style.width = width*fact+'px';
+      }
+    }else{
+      elImgThumbnail.style.height = height+'px';
+      elImgThumbnail.style.width = width+'px';
+    }
+  }
+  tmp = window.onload;
+  if(tmp == null){
+    tmp = function(){};
+  }
+  window.onload = function(){
+    tmp();
+    setSize(parseInt(elImgThumbnail.offsetWidth), parseInt(elImgThumbnail.offsetHeight));
+  }
 
 
 

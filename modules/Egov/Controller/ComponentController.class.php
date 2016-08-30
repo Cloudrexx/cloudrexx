@@ -27,7 +27,7 @@
 
 /**
  * Main controller for Egov
- * 
+ *
  * @copyright  cloudrexx
  * @author     Project Team SS4U <info@cloudrexx.com>
  * @package    cloudrexx
@@ -38,7 +38,7 @@ namespace Cx\Modules\Egov\Controller;
 
 /**
  * Main controller for Egov
- * 
+ *
  * @copyright  cloudrexx
  * @author     Project Team SS4U <info@cloudrexx.com>
  * @package    cloudrexx
@@ -47,7 +47,7 @@ namespace Cx\Modules\Egov\Controller;
 class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentController {
     /**
      * getControllerClasses
-     * 
+     *
      * @return type
      */
     public function getControllerClasses() {
@@ -56,14 +56,14 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
 
      /**
      * Load the component Egov.
-     * 
+     *
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
      */
     public function load(\Cx\Core\ContentManager\Model\Entity\Page $page) {
         global $objTemplate, $_CORELANG, $subMenuTitle;
-                
+
         switch ($this->cx->getMode()) {
-            case \Cx\Core\Core\Controller\Cx::MODE_FRONTEND:               
+            case \Cx\Core\Core\Controller\Cx::MODE_FRONTEND:
                 $objEgov = new Egov(\Env::get('cx')->getPage()->getContent());
                 \Env::get('cx')->getPage()->setContent($objEgov->getPage());
                 break;

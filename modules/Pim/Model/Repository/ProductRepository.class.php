@@ -38,7 +38,7 @@ namespace Cx\Modules\Pim\Model\Repository;
 
 /**
  * Class ProductRepository
- * 
+ *
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Cloudrexx Development Team <info@cloudrexx.com>
  * @package     cloudrexx

@@ -2,7 +2,7 @@ function Tags(id, lang)
 {
     /**
      * The input field with the tags
-     */ 
+     */
     this.tags = $(id);
 
     /**
@@ -19,7 +19,7 @@ function Tags(id, lang)
      * Highlight those that are in the input field
      */
     this.typing();
-    
+
     /**
      * Array of available tags
      *
@@ -36,7 +36,7 @@ function Tags(id, lang)
      * The typing state
      */
     this.currently_tpying = false;
-    
+
     /**
      * The event handler
      */
@@ -56,7 +56,7 @@ Tags.prototype.getTags = function(sort)
     new Ajax.Request('index.php', {
         method: "get",
         parameters : {  cmd : "Knowledge",
-                        section : "articles", 
+                        section : "articles",
                         act : "getTags",
                         sort : sort,
                         lang : ref.lang
@@ -69,7 +69,7 @@ Tags.prototype.getTags = function(sort)
             ref.typing();
         }
     });
-    
+
 }
 
 /**
@@ -100,12 +100,12 @@ Tags.prototype.addTag = function(id, name, caller)
             } else {
                 this.tags.value = name;
             }
-            this.currently_typing = false;   
+            this.currently_typing = false;
         } else {
             this.tags.value = this.tags.value + ", "+name;
         }
     }
-    
+
     $('tag_'+id).addClassName("chosen");
     /*
     var ref = this;
@@ -124,7 +124,7 @@ Tags.prototype.removeTag = function(id, name, caller)
     var pattern = new RegExp(name+',?\\s*', 'gi');
     this.tags.value = this.tags.value.replace(pattern, "");
     this.tags.value = this.tags.value.replace(/,\s*$/, '');
-   
+
     /*
     var ref = this;
     caller.onclick = function() {
@@ -161,7 +161,7 @@ Tags.prototype.typing = function()
         }
     }
 };
- 
+
 /**
  * Documentation needed
  */
@@ -222,7 +222,7 @@ Tags.prototype.resetHighlights = function()
 /**
  * Remove trailing white spaces
  */
-Tags.prototype.trim = function(str) { 
-    str = str.replace(/^\s*/, '').replace(/\s*$/, ''); 
+Tags.prototype.trim = function(str) {
+    str = str.replace(/^\s*/, '').replace(/\s*$/, '');
     return str;
 }

@@ -37,7 +37,7 @@
 namespace Cx\Modules\Support\Controller;
 
 /**
- * 
+ *
  * DefaultController for support.
  *
  * @copyright   Cloudrexx AG
@@ -46,25 +46,25 @@ namespace Cx\Modules\Support\Controller;
  * @subpackage  module_support
  */
 class DefaultController extends \Cx\Core\Core\Model\Entity\Controller {
-    
+
     /**
      * Em instance
      * @var \Doctrine\ORM\EntityManager em
      */
     protected $em;
-    
+
     /**
      * Sigma template instance
      * @var Cx\Core\Html\Sigma  $template
      */
     protected $template;
-    
+
     /**
      * module name
      * @var string $moduleName
      */
     public $moduleName = 'Support';
-    
+
     /**
      * module name for language placeholder
      * @var string $moduleNameLang
@@ -73,38 +73,38 @@ class DefaultController extends \Cx\Core\Core\Model\Entity\Controller {
 
     /**
      * Controller for the Backend Orders views
-     * 
+     *
      * @param \Cx\Core\Core\Model\Entity\SystemComponentController $systemComponentController the system component controller object
      * @param \Cx\Core\Core\Controller\Cx                          $cx                        the cx object
      * @param \Cx\Core\Html\Sigma                                  $template                  the template object
      */
     public function __construct(\Cx\Core\Core\Model\Entity\SystemComponentController $systemComponentController, \Cx\Core\Core\Controller\Cx $cx) {
         parent::__construct($systemComponentController, $cx);
-        
+
         $this->em                = $this->cx->getDb()->getEntityManager();
     }
 
-    
+
     /**
      * Use this to parse your backend page
-     * 
-     * @param \Cx\Core\Html\Sigma $template 
+     *
+     * @param \Cx\Core\Html\Sigma $template
      */
     public function parsePage(\Cx\Core\Html\Sigma $template) {
         $this->template = $template;
-        
+
         $this->showFeedBackForm();
     }
-    
+
     /**
      * FeedBack Form
-     * 
+     *
      * @global array $_ARRAYLANG
      */
-    public function showFeedBackForm() 
+    public function showFeedBackForm()
     {
         global $_ARRAYLANG;
-        
+
         $objUser = \FWUser::getFWUserObject();
         //feed back types
         $feedBackTypes = array(
@@ -117,13 +117,13 @@ class DefaultController extends \Cx\Core\Core\Model\Entity\Controller {
         $faqUrl = \Cx\Core\Setting\Controller\Setting::getValue('faqUrl','Support');
         $recipientMailAddress = \Cx\Core\Setting\Controller\Setting::getValue('recipientMailAddress','Support');
         $faqLink = '<a target="_blank" title="click to FAQ page" href='.$faqUrl.'>'.$_ARRAYLANG['TXT_SUPPORT_FEEDBACK_FAQ'].'</a>';
-        
+
         //Get License information
         $license        = \Env::get('cx')->getLicense();
         $licenseName    = $license->getEditionName();
         $licenseValid   = date(ASCMS_DATE_FORMAT_DATE, $license->getValidToDate());
         $licenseVersion = $license->getVersion()->getNumber();
-        
+
         //get the input datas
         $feedBackType    = isset($_POST['feedBackType']) ? contrexx_input2raw($_POST['feedBackType']) : '';
         $feedBackSubject = isset($_POST['feedBackSubject']) ? contrexx_input2raw($_POST['feedBackSubject']) : '';
@@ -131,7 +131,7 @@ class DefaultController extends \Cx\Core\Core\Model\Entity\Controller {
         $customerName    = isset($_POST['customerName']) ? contrexx_input2raw($_POST['customerName']) : '';
         $customerEmailId = isset($_POST['customerEmailId']) ? contrexx_input2raw($_POST['customerEmailId']) : '';
         $feedBackUrl     = isset($_POST['feedBackUrl']) ? contrexx_input2raw($_POST['feedBackUrl']) : '';
-        
+
         if (isset($_POST['sendAndSave'])) {
             if (!empty($feedBackSubject) && !empty($feedBackComment)) {
                 //get the hostname domain
@@ -175,13 +175,13 @@ class DefaultController extends \Cx\Core\Core\Model\Entity\Controller {
              ));
             $this->template->parse('showFeedBackTypes');
         }
-        
+
         $this->template->setVariable(array(
             'SUPPORT_FEEDBACK_FAQ'                  => $faqLink,
             'SUPPORT_FEEDBACK_CUSTOMER_NAME'        => $objUser->objUser->getUsername(),
             'SUPPORT_FEEDBACK_CUSTOMER_EMAIL'       => $objUser->objUser->getEmail()
         ));
-        
+
         $this->template->setVariable(array(
             'TXT_SUPPORT_FEEDBACK'            => $_ARRAYLANG['TXT_SUPPORT_FEEDBACK'],
             'TXT_SUPPORT_FEEDBACK_SUBJECT'    => $_ARRAYLANG['TXT_SUPPORT_FEEDBACK_SUBJECT'],
@@ -191,17 +191,17 @@ class DefaultController extends \Cx\Core\Core\Model\Entity\Controller {
 
     /**
      * Send the FeedBack mail
-     * 
+     *
      * @param array $arrFields
-     * 
+     *
      * @global array $_CONFIG
      * @global array $_ARRAYLANG
-     * 
+     *
      * @return boolean
      */
     function sendMail($arrFields = array()) {
         global $_CONFIG, $_ARRAYLANG;
-        
+
         //plain text content
         $arrFields['message'] = "{$_ARRAYLANG['TXT_SUPPORT_CONTACT_TITLE']}: \n
                                        {$_ARRAYLANG['TXT_SUPPORT_USER_FIRST_NAME']}: {$arrFields['firstName']}\n
@@ -243,9 +243,9 @@ class DefaultController extends \Cx\Core\Core\Model\Entity\Controller {
             </tr>
         </tbody>
     </table>
-    
+
     <p><strong>'.$_ARRAYLANG['TXT_SUPPORT_LICENSE_TITLE'].'</strong></p>
-    
+
     <table cellpadding ="0" cellspacing ="0" style="width: 100%; font-size: 13px;">
         <tbody>
             <tr>
@@ -265,7 +265,7 @@ class DefaultController extends \Cx\Core\Core\Model\Entity\Controller {
                 <td>&nbsp;: ' . $arrFields['licenseVersion'] . '</td>
             </tr>
         </tbody>
-    
+
     </table>
 
     <p><strong>' . $_ARRAYLANG['TXT_SUPPORT_FEEDBACK_MAIL'] . '</strong></p>
@@ -287,10 +287,10 @@ class DefaultController extends \Cx\Core\Core\Model\Entity\Controller {
         </tbody>
     </table>
 </div>';
-        
+
         if (\Env::get('ClassLoader')->loadFile(ASCMS_LIBRARY_PATH . '/phpmailer/class.phpmailer.php')) {
             $objMail = new \PHPMailer();
-            
+
             if (!empty($_CONFIG['coreSmtpServer']) && \Env::get('ClassLoader')->loadFile(ASCMS_CORE_PATH . '/SmtpSettings.class.php')) {
                 if (($arrSmtp = \SmtpSettings::getSmtpAccount($_CONFIG['coreSmtpServer'])) !== false) {
                     $objMail->IsSMTP();
@@ -309,7 +309,7 @@ class DefaultController extends \Cx\Core\Core\Model\Entity\Controller {
             $objMail->IsHTML(true);
             $objMail->Body = $arrFields['message_html'];
             $objMail->AltBody = $arrFields['message'];
-            
+
             return $objMail->Send();
         }
         return false;

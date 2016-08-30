@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * JSON Adapter for User class
  * @copyright   Cloudrexx AG
@@ -48,7 +48,7 @@ class JsonUser implements JsonAdapter {
 
     /**
      * List of messages
-     * @var Array 
+     * @var Array
      */
     private $messages = array();
 
@@ -75,7 +75,7 @@ class JsonUser implements JsonAdapter {
     public function getMessagesAsString() {
         return implode('<br />', $this->messages);
     }
-    
+
     /**
      * Returns default permission as object
      * @return Object
@@ -87,7 +87,7 @@ class JsonUser implements JsonAdapter {
     /**
      * Returns the user with the given user id.
      * If the user does not exist then return the currently logged in user.
-     * 
+     *
      * @return array User id and title
      */
     public function getUserById() {
@@ -113,7 +113,7 @@ class JsonUser implements JsonAdapter {
 
     /**
      * Returns all users according to the given term.
-     * 
+     *
      * @return array List of users
      */
     public function getUsers() {
@@ -153,7 +153,7 @@ class JsonUser implements JsonAdapter {
 
     /**
      * Logs the current User in.
-     * 
+     *
      * @param string $_POST['USERNAME']
      * @param string $_POST['PASSWORD']
      * @return false on failure and array with userdata on success
@@ -173,7 +173,7 @@ class JsonUser implements JsonAdapter {
 
     /**
      * Logs the current User out.
-     * 
+     *
      * @return boolean
      */
     public function logoutUser() {
@@ -183,7 +183,7 @@ class JsonUser implements JsonAdapter {
 
     /**
      * Sends a Email with a new tomporary Password to the user with given email
-     * 
+     *
      * @param string $arguments['get']['email'] || $arguments['post']['email']
      * @return boolean
      */
@@ -201,7 +201,7 @@ class JsonUser implements JsonAdapter {
 
     /**
      * Set a new Password for a specific user if the admin has enough permissions
-     * 
+     *
      * @param string $arguments['get']['userId'] || $arguments['post']['userId']
      * @param string $arguments['get']['password'] || $arguments['post']['password']
      * @param string $arguments['get']['repeatPassword'] || $arguments['post']['repeatPassword']

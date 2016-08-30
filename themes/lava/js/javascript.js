@@ -1,5 +1,5 @@
-(function ($) {    
-    $(document).ready(function () {        
+(function ($) {
+    $(document).ready(function () {
         $('#header').carousel({
             interval: 6000
         });

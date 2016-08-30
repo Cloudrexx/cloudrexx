@@ -37,19 +37,19 @@ namespace Cx\Core_Modules\Workbench\Model\Entity;
  * @author Michael Ritter <michael.ritter@comvation.com>
  */
 class DbCommand extends Command {
-    
+
     /**
      * Command name
      * @var string
      */
     protected $name = 'db';
-    
+
     /**
      * Command description
      * @var string
      */
     protected $description = 'Allows access to doctrine command line tools and adds some handy shortcuts';
-    
+
     /**
      * Command synopsis
      * @var string
@@ -59,20 +59,20 @@ class DbCommand extends Command {
     cleanup|
     doctrine {doctrine syntax}
 ]';
-    
+
     /**
      * Command help text
      * @var string
      */
     protected $help = 'Gives access to doctrine command line tools and other db management commands. Use "help" to see what commands are available.';
-    
+
     /**
      * Execute this command
      * @param array $arguments Array of commandline arguments
      */
     public function execute(array $arguments) {
         $arguments = array_slice($arguments, 1);
-        
+
         switch ($arguments[1]) {
             // empty /tmp/workbench
             case 'cleanup':
@@ -83,7 +83,7 @@ class DbCommand extends Command {
             case 'update':
                 // empty /tmp/workbench
                 $this->cleanup();
-                
+
                 // prepare component filter
                 $componentFilter = '';
                 if (isset($arguments[2])) {
@@ -107,7 +107,7 @@ class DbCommand extends Command {
                 if (!empty($componentFilter)) {
                     $componentFilter = '--filter=' . $componentFilter;
                 }
-                
+
                 // doctrine orm:generate-entities --filter="{component filter}" entities
                 $doctrineArgs = array('', 'doctrine', 'orm:generate-entities');
                 if (!empty($componentFilter)) {
@@ -117,10 +117,10 @@ class DbCommand extends Command {
                 if ($this->executeDoctrine($doctrineArgs) != 0) {
                     return;
                 }
-                
+
                 // move entities to component directory and add .class extension
                 $modelMovedCompletely = $this->moveModel($this->cx->getWebsiteTempPath().'/workbench/Cx', $this->cx->getWebsiteDocumentRootPath());
-                
+
                 // if all files could be moved, cleanup
                 // if not: ask if moving should be forced (CAUTION!)
                 if (!$modelMovedCompletely) {
@@ -130,7 +130,7 @@ class DbCommand extends Command {
                         $modelMovedCompletely = $this->moveModel($this->cx->getWebsiteTempPath().'/workbench/Cx', $this->cx->getWebsiteDocumentRootPath(), true);
                     }
                 }
-                
+
                 // doctrine orm:generate-repositories --filter="{component filter}" repositories
                 $doctrineArgs = array('', 'doctrine', 'orm:generate-repositories');
                 if (!empty($componentFilter)) {
@@ -140,10 +140,10 @@ class DbCommand extends Command {
                 if ($this->executeDoctrine($doctrineArgs) != 0) {
                     return;
                 }
-                
+
                 // move repositories to component directory and add .class extension
                 $modelMovedCompletely = $modelMovedCompletely && $this->moveModel($this->cx->getWebsiteTempPath().'/workbench/Cx', $this->cx->getWebsiteDocumentRootPath());
-                
+
                 // if all files could be moved, cleanup
                 // if not: ask if moving should be forced (CAUTION!)
                 if (!$modelMovedCompletely) {
@@ -160,7 +160,7 @@ class DbCommand extends Command {
                 } else {
                     $this->cleanup();
                 }
-                
+
                 // doctrine orm:schema-tool:create --dump-sql
                 // print queries and ask if those should be executed (CAUTION!)
                 $schemaTool = new \Doctrine\ORM\Tools\SchemaTool($this->cx->getDb()->getEntityManager());
@@ -183,7 +183,7 @@ class DbCommand extends Command {
                     }
                     echo 'Wrote ' . $i . ' queries to DB'."\r\n";
                 }
-                
+
                 // doctrine orm:validate-schema
                 $this->validateSchema();
                 if ($this->validateSchema() != 0) {
@@ -204,10 +204,10 @@ class DbCommand extends Command {
         }
         echo "Done\r\n";
     }
-    
+
     public function executeDoctrine(array $arguments) {
         $_SERVER['argv'] = array_slice($arguments, 1);
-        
+
         $cli = new \Symfony\Component\Console\Application('Doctrine Command Line Interface', \Doctrine\Common\Version::VERSION);
         $cli->setCatchExceptions(true);
         $helperSet = $cli->getHelperSet();
@@ -242,18 +242,18 @@ class DbCommand extends Command {
         $cli->setAutoExit(false);
         return $cli->run();
     }
-    
+
     protected function cleanup() {
         \Cx\Lib\FileSystem\FileSystem::delete_folder($this->cx->getWebsiteTempPath().'/workbench', true);
         \Cx\Lib\FileSystem\FileSystem::make_folder($this->cx->getWebsiteTempPath().'/workbench');
     }
-    
+
     protected function moveModel($sourceFolder, $destinationFolder, $force = false) {
         $sourceDirectory = new \RecursiveDirectoryIterator($sourceFolder);
         $sourceDirectoryIterator = new \RecursiveIteratorIterator($sourceDirectory);
         $sourceDirectoryRegexIterator = new \RegexIterator($sourceDirectoryIterator, '/^.+\.php$/i', \RegexIterator::GET_MATCH);
         $retVal = true;
-        
+
         // foreach model class
         foreach ($sourceDirectoryRegexIterator as $sourceFile) {
             // move to correct location and add .class ending if necessary
@@ -294,7 +294,7 @@ class DbCommand extends Command {
         }
         return $retVal;
     }
-    
+
     protected function validateSchema() {
         $em = $this->cx->getDb()->getEntityManager();
 
@@ -324,4 +324,3 @@ class DbCommand extends Command {
         return $exit;
     }
 }
-

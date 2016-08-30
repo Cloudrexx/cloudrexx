@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,15 +24,15 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Create error pages
  *
- * @copyright	CLOUDREXX CMS - CLOUDREXX AG
- * @author		Cloudrexx Development Team <info@cloudrexx.com>
- * @package	    cloudrexx
+ * @copyright    CLOUDREXX CMS - CLOUDREXX AG
+ * @author        Cloudrexx Development Team <info@cloudrexx.com>
+ * @package        cloudrexx
  * @subpackage  core_error
- * @version		1.0.0
+ * @version        1.0.0
  * @todo        Edit PHP DocBlocks!
  */
 
@@ -41,12 +41,12 @@ namespace Cx\Core\Error\Controller;
 /**
  * Handles all errors.
  *
- * @copyright	CLOUDREXX CMS - CLOUDREXX AG
- * @author		Cloudrexx Development Team <info@cloudrexx.com>
- * @access		public
- * @package	    cloudrexx
+ * @copyright    CLOUDREXX CMS - CLOUDREXX AG
+ * @author        Cloudrexx Development Team <info@cloudrexx.com>
+ * @access        public
+ * @package        cloudrexx
  * @subpackage  core_error
- * @version		1.0.0
+ * @version        1.0.0
  * @todo        Declare and document class variable 'pageContent'
  */
 class Error
@@ -57,9 +57,9 @@ class Error
      */
     var $_objTpl;
 
-	/**
-	 * Error page constructor
-	 * @param  string $pageContent Page content
+    /**
+     * Error page constructor
+     * @param  string $pageContent Page content
      */
     function __construct($pageContent)
     {

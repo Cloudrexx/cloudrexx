@@ -27,7 +27,7 @@
 
 /**
  * Main controller for MediaDir
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
@@ -39,7 +39,7 @@ use Cx\Modules\MediaDir\Model\Event\MediaDirEventListener;
 
 /**
  * Main controller for MediaDir
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
@@ -54,7 +54,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
 
      /**
      * Load your component.
-     * 
+     *
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
      */
     public function load(\Cx\Core\ContentManager\Model\Entity\Page $page) {
@@ -74,11 +74,11 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                     if ($objMediaDirectory->getMetaTitle() != '') {
                         \Env::get('cx')->getPage()->setMetatitle($objMediaDirectory->getMetaTitle());
                     }
-                    
+
                 break;
 
             case \Cx\Core\Core\Controller\Cx::MODE_BACKEND:
-                
+
                 $this->cx->getTemplate()->addBlockfile('CONTENT_OUTPUT', 'content_master', 'LegacyContentMaster.html');
                 $objTemplate = $this->cx->getTemplate();
                 \Permission::checkAccess(153, 'static');
@@ -93,7 +93,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     }
     /**
      * Do something before content is loaded from DB
-     * 
+     *
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
      */
     public function preContentLoad(\Cx\Core\ContentManager\Model\Entity\Page $page) {
@@ -127,17 +127,17 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 if (preg_match('/{MEDIADIR_LATEST}/', $themesPages['sidebar'])) {
                     $themesPages['sidebar'] = str_replace('{MEDIADIR_LATEST}', $objMadiadirPlaceholders->getLatestPlacholder(), $themesPages['sidebar']);
                 }
-                        
+
                 break;
 
             default:
                 break;
         }
     }
-    
+
     /**
      * Do something after content is loaded from DB
-     * 
+     *
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
      */
     public function postContentLoad(\Cx\Core\ContentManager\Model\Entity\Page $page) {
@@ -152,7 +152,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 }
                 if ($mediadirCheck || $objTemplate->blockExists('mediadirLatest')) {
                     $objInit->loadLanguageData('MediaDir');
-                    
+
                     $objMediadir = new MediaDirectory('', $this->getName());
                     $objTemplate->setVariable('TXT_MEDIADIR_LATEST', $_CORELANG['TXT_DIRECTORY_LATEST']);
                 }

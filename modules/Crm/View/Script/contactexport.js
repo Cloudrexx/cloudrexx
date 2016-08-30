@@ -22,7 +22,7 @@ $J(function(){
         if (!$J(this).hasClass('disabled')) {
             $J('.ui-state-highlight p span.text_msg, .ui-state-error p span.text_msg').html('');
             $J('.ui-state-highlight, .ui-state-error').hide();
-           
+
             fileName = $J('#fileName').val();
             var ext = fileName.split('.').pop();
 
@@ -41,7 +41,7 @@ $J(function(){
 
     $J(".reNext a").click(function(){
         currentRow++;
-        
+
         if (currentRow == totalRows) {
             $J(".reNext").hide();
         }
@@ -91,8 +91,8 @@ $J(function(){
             dataType:  'json',
             beforeSend: function() {
                 $J('.import_step1 .actions').hide();
-                $J('.import_step1 .ajax_loading').show();                
-            },            
+                $J('.import_step1 .ajax_loading').show();
+            },
             success: function(json) {
                 var responseData = $J.parseJSON($J.base64Decode(json.data));
                 csvData   = $J.parseJSON($J.base64Decode(json.contactData));
@@ -104,9 +104,9 @@ $J(function(){
                     $J(".reNext").show();
                 }
                 var stepTwoArea = $J("#mapCSVColumn tbody");
-                                
+
                 stepTwoArea.html("");
-                
+
                 $J("#csvColumnTemplate").tmpl(responseData, {
                     renderSelectBox: function(rowIndex, csvColumn) {
                         var columnSelector = $J("#crm_contact_option_base").clone();
@@ -116,12 +116,12 @@ $J(function(){
                         columnSelector.show();
 
                         return $J("<div>").append(columnSelector).html();
-                    
+
                     }
                 }).appendTo(stepTwoArea);
 
                 var selectBox = $J("#mapCSVColumn select");
-                
+
                 selectBox.live("change", function() {
                     var curSelector = $J(this);
 
@@ -140,11 +140,11 @@ $J(function(){
                 });
 
                 selectBox.change();
-                
+
                 $J('#step1').fadeOut(function(){
                     $J('#step2').fadeIn('slow');
                 });
-                
+
             }
         });
 
@@ -163,7 +163,7 @@ $J(function(){
             beforeSend: function() {
                 $J('.import_step2 .actions').hide();
                 $J('.import_step2 .ajax_loading').show();
-                    
+
                 $J('#step2').fadeOut(function(){
                     $J('#step3').fadeIn('slow');
                 });
@@ -214,7 +214,7 @@ function getUploadProcess() {
         $J.ajax({
             dataType: "json",
             url     : "index.php?cmd=Crm&act=settings&tpl=interface&subTpl=getprogress&file="+fileUrl,
-            success : function (data) { 
+            success : function (data) {
                 var percent = (data.totalRows / totalRows) * 100;
                 progress(percent, $J('#progressBar'));
                 $J("#progressDetails .processed").text(data.totalRows);
@@ -225,7 +225,7 @@ function getUploadProcess() {
             }
         });
     }
-    
+
 }
 function progress(percent, $element) {
     percent = Math.round(percent);

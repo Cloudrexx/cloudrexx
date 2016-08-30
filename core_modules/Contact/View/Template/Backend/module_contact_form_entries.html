@@ -3,73 +3,73 @@
 <!--
 function confirmDeleteEntry(id)
 {
-	if (confirm('{TXT_CONTACT_CONFIRM_DELETE_ENTRY}\n{TXT_CONTACT_ACTION_IS_IRREVERSIBLE}')) {
-		document.location.href = 'index.php?cmd=Contact&{CSRF_PARAM}&act=forms&tpl=deleteEntry&formId={CONTACT_FORM_ID}&entryId='+id;
-	}
+  if (confirm('{TXT_CONTACT_CONFIRM_DELETE_ENTRY}\n{TXT_CONTACT_ACTION_IS_IRREVERSIBLE}')) {
+    document.location.href = 'index.php?cmd=Contact&{CSRF_PARAM}&act=forms&tpl=deleteEntry&formId={CONTACT_FORM_ID}&entryId='+id;
+  }
 }
 
 function selectMultiAction(order)
 {
-	with (document.frmContact)
-	{
-		switch (order) {
-		case 'delete':
-			if (confirm('{TXT_CONTACT_CONFIRM_DELETE_ENTRIES}\n{TXT_CONTACT_ACTION_IS_IRREVERSIBLE}')) {
-				submit();
-			}
-			break;
-		default: //do nothing
-		}
-	}
+  with (document.frmContact)
+  {
+    switch (order) {
+    case 'delete':
+      if (confirm('{TXT_CONTACT_CONFIRM_DELETE_ENTRIES}\n{TXT_CONTACT_ACTION_IS_IRREVERSIBLE}')) {
+        submit();
+      }
+      break;
+    default: //do nothing
+    }
+  }
 }
 // -->
 </script>
 <form name="frmContact" action="index.php?cmd=Contact&amp;act=forms&amp;tpl=deleteEntry&amp;formId={CONTACT_FORM_ID}" method="post">
 <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
-	<tbody>
-		<tr>
-			<th colspan="{CONTACT_FORM_COL_NUMBER}">{CONTACT_FORM_ENTRIES_TITLE}</th>
-		</tr>
-		<tr class="row3">
-			<td width="1%" style="text-align:center;"><b>#</b></td>
-			<td width="15%"><b>{TXT_CONTACT_DATE}</b></td>
-			<!-- BEGIN contact_col_names -->
-				<td width="15%"><b>{CONTACT_COL_NAME}</b></td>
-			<!-- END contact_col_names -->
-			<td width="39%" style="text-align:right;"><b>{TXT_CONTACT_FUNCTIONS}</b></td>
-		</tr>
-		<!-- BEGIN contact_form_entries -->
-			<tr class="{CONTACT_FORM_ENTRIES_ROW_CLASS}">
-				<td style="text-align:center;"><input type="checkbox" name="selectedEntries[]" id="selectedEntries" value="{CONTACT_FORM_ENTRY_ID}" /></td>
-				<td>
-				    {CONTACT_FORM_DATE}
-				    <!-- BEGIN contact_form_entry_attach -->
-				    <img src="../core/Core/View/Media/icons/attach.png" alt="Attach" style="position: relative; top: 3px;" />
-				    <!-- END contact_form_entry_attach -->
-				</td>
-				<!-- BEGIN contact_form_entry_data -->
-				<td>{CONTACT_FORM_ENTRIES_CELL_CONTENT}</td>
-				<!-- END contact_form_entry_data -->
-				<td style="text-align:right;"><a href="index.php?cmd=Contact&amp;act=entries&amp;formId={CONTACT_FORM_ID}&amp;entryId={CONTACT_FORM_ENTRY_ID}" title="{TXT_CONTACT_DETAILS}"><img src="../core/Core/View/Media/icons/details.gif" border="0" width="16" height="16" alt="{TXT_CONTACT_DETAILS}" /></a>
-				<a href="javascript:confirmDeleteEntry({CONTACT_FORM_ENTRY_ID})" title="{TXT_CONTACT_DELETE_ENTRY}"><img src="../core/Core/View/Media/icons/delete.gif" width="17" height="17" border="0" alt="{TXT_CONTACT_DELETE_ENTRY}" /></a></td>
-			</tr>
-		<!-- END contact_form_entries -->
-	</tbody>
+  <tbody>
+    <tr>
+      <th colspan="{CONTACT_FORM_COL_NUMBER}">{CONTACT_FORM_ENTRIES_TITLE}</th>
+    </tr>
+    <tr class="row3">
+      <td width="1%" style="text-align:center;"><b>#</b></td>
+      <td width="15%"><b>{TXT_CONTACT_DATE}</b></td>
+      <!-- BEGIN contact_col_names -->
+        <td width="15%"><b>{CONTACT_COL_NAME}</b></td>
+      <!-- END contact_col_names -->
+      <td width="39%" style="text-align:right;"><b>{TXT_CONTACT_FUNCTIONS}</b></td>
+    </tr>
+    <!-- BEGIN contact_form_entries -->
+      <tr class="{CONTACT_FORM_ENTRIES_ROW_CLASS}">
+        <td style="text-align:center;"><input type="checkbox" name="selectedEntries[]" id="selectedEntries" value="{CONTACT_FORM_ENTRY_ID}" /></td>
+        <td>
+            {CONTACT_FORM_DATE}
+            <!-- BEGIN contact_form_entry_attach -->
+            <img src="../core/Core/View/Media/icons/attach.png" alt="Attach" style="position: relative; top: 3px;" />
+            <!-- END contact_form_entry_attach -->
+        </td>
+        <!-- BEGIN contact_form_entry_data -->
+        <td>{CONTACT_FORM_ENTRIES_CELL_CONTENT}</td>
+        <!-- END contact_form_entry_data -->
+        <td style="text-align:right;"><a href="index.php?cmd=Contact&amp;act=entries&amp;formId={CONTACT_FORM_ID}&amp;entryId={CONTACT_FORM_ENTRY_ID}" title="{TXT_CONTACT_DETAILS}"><img src="../core/Core/View/Media/icons/details.gif" border="0" width="16" height="16" alt="{TXT_CONTACT_DETAILS}" /></a>
+        <a href="javascript:confirmDeleteEntry({CONTACT_FORM_ENTRY_ID})" title="{TXT_CONTACT_DELETE_ENTRY}"><img src="../core/Core/View/Media/icons/delete.gif" width="17" height="17" border="0" alt="{TXT_CONTACT_DELETE_ENTRY}" /></a></td>
+      </tr>
+    <!-- END contact_form_entries -->
+  </tbody>
 </table>
 </form>
 <table cellpadding="2" cellspacing="0" border="0">
-	<tr>
-		<td>
-			<img src="../core/Core/View/Media/icons/arrow.gif" border="0" width="38" height="22" alt="{TXT_MARKED}:" />
-			<a href="#" onclick="changeCheckboxes('frmContact','selectedEntries[]',true); return false;">{TXT_CONTACT_SELECT_ALL}</a> /
-			<a href="#" onclick="changeCheckboxes('frmContact','selectedEntries[]',false); return false;">{TXT_CONTACT_DESELECT_ALL}</a>
-			<img src="../core/Core/View/Media/icons/strike.gif" alt="design" />
-			<select name="frmContact_MultiAction" onchange="selectMultiAction(this.value);">
-				<option value="0">{TXT_CONTACT_SUBMIT_SELECT}</option>
-				<option value="delete">{TXT_CONTACT_SUBMIT_DELETE}</option>
-			</select>
-		</td>
-	</tr>
+  <tr>
+    <td>
+      <img src="../core/Core/View/Media/icons/arrow.gif" border="0" width="38" height="22" alt="{TXT_MARKED}:" />
+      <a href="#" onclick="changeCheckboxes('frmContact','selectedEntries[]',true); return false;">{TXT_CONTACT_SELECT_ALL}</a> /
+      <a href="#" onclick="changeCheckboxes('frmContact','selectedEntries[]',false); return false;">{TXT_CONTACT_DESELECT_ALL}</a>
+      <img src="../core/Core/View/Media/icons/strike.gif" alt="design" />
+      <select name="frmContact_MultiAction" onchange="selectMultiAction(this.value);">
+        <option value="0">{TXT_CONTACT_SUBMIT_SELECT}</option>
+        <option value="delete">{TXT_CONTACT_SUBMIT_DELETE}</option>
+      </select>
+    </td>
+  </tr>
 </table>
 {CONTACT_FORM_PAGING}
 <br />

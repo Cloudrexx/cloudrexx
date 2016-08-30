@@ -29,7 +29,7 @@
 namespace Cx\Core_Modules\Workbench\Model\Entity;
 
 abstract class NavCommand extends Command {
-    
+
     /**
      * Returns a recursive list of all backend navigation entries
      */
@@ -80,7 +80,7 @@ abstract class NavCommand extends Command {
         }
         return $entries;
     }
-    
+
     /**
      * Adds a new entry to the backend navigation
      * @param array $entry Entry info: array('area_name'=>{name}, 'uri'=>{uri}, 'module_id'=>{module id}, 'access_id'=>{access_id})
@@ -129,7 +129,7 @@ abstract class NavCommand extends Command {
         ';
         // revert moving later entries if insert has failed?
     }
-    
+
     /**
      * Removes the backend navigation entry with the given ID
      * (only if it's an entry of type 'navigation')

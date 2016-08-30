@@ -95,4 +95,3 @@ $_ARRAYLANG['TXT_CORE_MODULE_LINKMANAGER_SUCCESS_MSG'] = "Changes updated succes
 //Linkcrawler script specific values:
 $_ARRAYLANG['TXT_CORE_MODULE_LINKMANAGER_NO_IMAGE'] = "No Image";
 $_ARRAYLANG['TXT_CORE_MODULE_LINKMANAGER_NO_LINK'] = "No Link";
-

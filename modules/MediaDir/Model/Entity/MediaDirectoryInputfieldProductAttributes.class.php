@@ -62,7 +62,7 @@ class MediaDirectoryInputfieldProductAttributes extends \Cx\Modules\MediaDir\Con
     function getInputfield($intView, $arrInputfield, $intEntryId=null)
     {
         global $objDatabase, $_LANGID, $objInit, $_ARRAYLANG;
-        
+
         $intId = intval($arrInputfield['id']);
 
         switch ($intView) {
@@ -92,7 +92,7 @@ class MediaDirectoryInputfieldProductAttributes extends \Cx\Modules\MediaDir\Con
 
                 $strOptions = empty($arrInputfield['default_value'][$_LANGID]) ? $arrInputfield['default_value'][0] : $arrInputfield['default_value'][$_LANGID];
                 $arrOptions = explode(",", $strOptions);
-                
+
                 if(!empty($arrInputfield['info'][0])){
                     $strInfoValue = empty($arrInputfield['info'][$_LANGID]) ? 'title="'.$arrInputfield['info'][0].'"' : 'title="'.$arrInputfield['info'][$_LANGID].'"';
                     $strInfoClass = 'mediadirInputfieldHint';
@@ -273,8 +273,8 @@ class MediaDirectoryInputfieldProductAttributes extends \Cx\Modules\MediaDir\Con
 EOF;
         return $strJavascriptCheck;
     }
-    
-    
+
+
     function getFormOnSubmit($intInputfieldId)
     {
         return null;

@@ -67,7 +67,7 @@ class ComboUploader extends Uploader
 
     /**
      * @override
-     */     
+     */
     public function handleRequest()
     {
         //we do not care. requests are handled by the respective uploader instances
@@ -75,7 +75,7 @@ class ComboUploader extends Uploader
 
     /**
      * @override
-     */     
+     */
     public function getXHtml()
     {
         global $_CORELANG;
@@ -122,10 +122,10 @@ class ComboUploader extends Uploader
             $switchUrl = CONTREXX_SCRIPT_PATH.'?'.$cmdOrSection.'=Upload&'.$actOrCmd.'=ajaxUploaderCode';
             $responseUrl = CONTREXX_SCRIPT_PATH.'?'.$cmdOrSection.'=Upload&'.$actOrCmd.'=response';
         }
-                
+
         $tpl = new \Cx\Core\Html\Sigma(ASCMS_CORE_MODULE_PATH.'/Upload/template/uploaders');
         $tpl->setErrorHandling(PEAR_ERROR_DIE);
-        
+
         $tpl->loadTemplateFile('combo.html');
 
         $tpl->setVariable(array(
@@ -144,7 +144,7 @@ class ComboUploader extends Uploader
 
         //see Uploader::handleInstanceBusiness
         $this->handleInstanceBusiness($tpl,'cu');
-        
+
         return $tpl->get();
     }
 }

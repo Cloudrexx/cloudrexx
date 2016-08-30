@@ -36,7 +36,7 @@ var setRows = function()
 {
     var row = 1;
     var tb = jQuery('#settings_rows tr');
-    
+
     for (var i = 0; i<tb.length; i++) {
         if (tb[i].visible) {
             tb[i].className = "row"+((row % 2) + 1);
@@ -49,22 +49,22 @@ var setRows = function()
 //]]>
 </script>
 <form name="frmSettings" method="post" action="?cmd=Data&amp;act=saveSettings">
-	<table width="100%" cellspacing="0" cellpadding="3" border="0" class="adminlist">
-		<tr>
-			<th colspan="2">{TXT_GENERAL_TITLE}</th>
-		</tr>
-		<tbody  id="settings_rows">
-    		<tr>
-    		  <td>{TXT_USE_DATALIST}</td>
-    		  <td><input type="checkbox" {USE_DATALIST_CHECKED} name="frmSettings_useDatalist" /></td>
-    		</tr>
-    		<tr>
-    			<td width="15%">{TXT_GENERAL_INTRODUCTION}</td>
-    			<td width="85%">
+  <table width="100%" cellspacing="0" cellpadding="3" border="0" class="adminlist">
+    <tr>
+      <th colspan="2">{TXT_GENERAL_TITLE}</th>
+    </tr>
+    <tbody  id="settings_rows">
+        <tr>
+          <td>{TXT_USE_DATALIST}</td>
+          <td><input type="checkbox" {USE_DATALIST_CHECKED} name="frmSettings_useDatalist" /></td>
+        </tr>
+        <tr>
+          <td width="15%">{TXT_GENERAL_INTRODUCTION}</td>
+          <td width="85%">
                     <input type="text" name="frmSettings_GeneralIntroduction" value="{DATA_SETTINGS_GENERAL_INTRODUCTION}"  maxlength="50" style="width:400px;"  />&nbsp;
                     <span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_GENERAL_INTRODUCTION_HELP}</span>
                 </td>
-    		</tr>
+        </tr>
             <tr>
                 <td>{TXT_GENERAL_ACTION}</td>
                 <td colspan="3">
@@ -87,7 +87,7 @@ var setRows = function()
                     <input type="text" style="width: 400px;" value="{DATA_SETTINGS_BOX_HEIGHT}" name="frmSettings_shadowbox_height" />
                 </td>
             </tr>
-    		<tr style="display: {PAGE_SELECT_DISPLAY};" id="select_display">
+        <tr style="display: {PAGE_SELECT_DISPLAY};" id="select_display">
                 <td>{TXT_FRONTEND_PAGE}</td>
                 <td colspan="3">
                     <select name="frmSettings_frontendPage" style="width: 400px;">
@@ -96,29 +96,29 @@ var setRows = function()
                         <!-- END frontendPage -->
                     </select>
                 </td>
-    		</tr>
-    		<tr>
-    		  <td style="vertical-align: top;">{TXT_GENERAL_TEMPLATE_CATEGORY}</td>
-    		  <td>
-    		      <textarea cols="100" rows="15" style="width: 730px; height: 200px;" name="frmSettings_templateCategory">{DATA_SETTINGS_TEMPLATE_CATEGORY}</textarea>
-    		  </td>
-    		</tr>
-    	    <tr>
-    		  <td style="vertical-align: top;">{TXT_GENERAL_TEMPLATE_ENTRY}</td>
-    		  <td>
-    		      <textarea cols="100" rows="15" style="width: 730px; height: 200px;"  name="frmSettings_templateEntry">{DATA_SETTINGS_TEMPLATE_ENTRY}</textarea>
-    		  </td>
-    		</tr>
+        </tr>
+        <tr>
+          <td style="vertical-align: top;">{TXT_GENERAL_TEMPLATE_CATEGORY}</td>
+          <td>
+              <textarea cols="100" rows="15" style="width: 730px; height: 200px;" name="frmSettings_templateCategory">{DATA_SETTINGS_TEMPLATE_CATEGORY}</textarea>
+          </td>
+        </tr>
+          <tr>
+          <td style="vertical-align: top;">{TXT_GENERAL_TEMPLATE_ENTRY}</td>
+          <td>
+              <textarea cols="100" rows="15" style="width: 730px; height: 200px;"  name="frmSettings_templateEntry">{DATA_SETTINGS_TEMPLATE_ENTRY}</textarea>
+          </td>
+        </tr>
             <tr>
-    		  <td style="vertical-align: top;">{TXT_GENERAL_TEMPLATE_SHADOWBOX}</td>
-    		  <td>
-    		      <textarea cols="100" rows="15" style="width: 730px; height: 200px;"  name="frmSettings_templateShadowbox">{DATA_SETTINGS_TEMPLATE_SHADOWBOX}</textarea>
-    		  </td>
-    		</tr>
-    	</tbody>
-	</table>
-	<br />
-	<input type="submit" value="{TXT_BUTTON_SAVE}" name="set_homecontent_submit" />
+          <td style="vertical-align: top;">{TXT_GENERAL_TEMPLATE_SHADOWBOX}</td>
+          <td>
+              <textarea cols="100" rows="15" style="width: 730px; height: 200px;"  name="frmSettings_templateShadowbox">{DATA_SETTINGS_TEMPLATE_SHADOWBOX}</textarea>
+          </td>
+        </tr>
+      </tbody>
+  </table>
+  <br />
+  <input type="submit" value="{TXT_BUTTON_SAVE}" name="set_homecontent_submit" />
 </form>
 <script type="text/javascript">
 /* <![CDATA[ */

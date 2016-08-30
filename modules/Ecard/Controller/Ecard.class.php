@@ -345,7 +345,7 @@ class Ecard
             // Copy motive to new file with $code as filename
             $fileExtension = preg_replace('/^.+(\.[^\.]+)$/', '$1', $objResult->fields['setting_value']);
             $fileName = $objResult->fields['setting_value'];
-            
+
             $objFile = new \File();
             if ($objFile->copyFile(ASCMS_ECARD_OPTIMIZED_PATH.'/', $fileName, ASCMS_ECARD_SEND_ECARDS_PATH.'/', $code.$fileExtension)) {
                 $objMail = new \phpmailer();

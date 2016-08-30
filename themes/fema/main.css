@@ -200,7 +200,7 @@ body a:hover {
     font-size: 14px;
 }
 .navbar-inverse .nav .active > a, .navbar-inverse .nav .active > a:hover, .navbar-inverse .nav .active > a:focus {
-    background-color: transparent;    
+    background-color: transparent;
 }
 .brand {
     margin-top: 5px;
@@ -694,7 +694,7 @@ select, input[type="text"], input[type="password"], input[type="datetime"], inpu
     background-size: cover;
     padding-top: 120px;
     padding-bottom: 120px;
-} 
+}
 .signup {
     background: url(images/grid_noise.png) repeat;
     background-color: #ebebeb;
@@ -1269,7 +1269,7 @@ body .footerBlock a, body .footerBlock a:hover {
    Mobile styles
    ========================================================================== */
 /* Landscape phones and down */
-@media (max-width: 480px) { 
+@media (max-width: 480px) {
     body {
         padding-left: 0;
         padding-right: 0;
@@ -1354,7 +1354,7 @@ body .footerBlock a, body .footerBlock a:hover {
     textarea[name="code"]{width: 95% !important;}
 }
 /* Landscape phone to portrait tablet */
-@media (min-width: 481px) and (max-width: 767px) { 
+@media (min-width: 481px) and (max-width: 767px) {
     body {
         padding-left: 0;
         padding-right: 0;
@@ -1600,7 +1600,7 @@ input.input-block-level[type="text"]{width: 100%;}
 #fe_PreviewContent a:hover{color: #aaaaaa;}
 ul{
     margin-left: 20px;
-    list-style-type: bullet; 
+    list-style-type: bullet;
 }
 li {
 }
@@ -1720,7 +1720,7 @@ html body {
     font-size: 16px;
     line-height: 20px;
     color: #333333;
-} 
+}
 .carousel .carousel-control.right {left: auto;}
 body .navbar {
     -webkit-box-shadow: 0 1px 10px rgba(0,0,0,.1);

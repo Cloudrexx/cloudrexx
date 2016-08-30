@@ -52,14 +52,14 @@ class KnowledgeCategory
      * @var array
      */
     public $categories = null;
-    
+
     /**
      * The categories sorted as a tree
      *
      * @var array
      */
     public $categoryTree = null;
-    
+
     /**
      * Get categories from database
      *
@@ -78,31 +78,31 @@ class KnowledgeCategory
             // the cateogories are already read out and override is not given
             return;
         }
-        
+
         global $objDatabase;
-        
-        $query = "  SELECT  categories.id as id, 
+
+        $query = "  SELECT  categories.id as id,
                             categories.active as active,
                             categories.parent as parent,
                             content.name as name,
                             content.lang as lang
                     FROM ".DBPREFIX."module_knowledge_categories AS categories
-                    INNER JOIN ".DBPREFIX."module_knowledge_categories_content AS content 
+                    INNER JOIN ".DBPREFIX."module_knowledge_categories_content AS content
                     ON categories.id = content.category";
-        
+
         // if only one category should be read add a where to the query
         if ($id > 0) {
             $id = intval($id);
             $query .= " WHERE categories.id = ".$id;
         }
-        
+
         $query .= " ORDER BY sort ASC";
-        
+
         $objRs = $objDatabase->Execute($query);
         if ($objRs === false) {
             throw new DatabaseError("read categories failed");
         }
-        
+
         $categories = array();
         while (!$objRs->EOF) {
             $curId = $objRs->fields['id'];
@@ -122,14 +122,14 @@ class KnowledgeCategory
             }
             $objRs->MoveNext();
         }
-        
+
         $this->categories = $categories;
-        
+
         if ($id == 0) {
             $this->categoryTree = $this->buildCatTree($categories);
         }
     }
-    
+
     /**
      * Add a new category to the database
      *
@@ -140,33 +140,33 @@ class KnowledgeCategory
      * @throws DatabaseError
      * @return int id
      */
-    public function insertCategory($active, $parent) 
+    public function insertCategory($active, $parent)
     {
-    	global $objDatabase;
-    	
-    	$active = intval($active);
-    	$parent = intval($parent);
-    	
-    	$query = " SELECT MAX(sort) as sort FROM ".DBPREFIX."module_knowledge_categories";
-    	$rs = $objDatabase->Execute($query);
-    	if ($rs === false) {
-    	    throw new DatabaseError("getting the maximal sort failed");
-    	}
-    	
-    	$query = " INSERT INTO ".DBPREFIX."module_knowledge_categories
-    	               (active, parent, sort)
-    	           VALUES
-    	               (".$active.", ".$parent.", ".($rs->fields['sort']+1).")";
-    	if ($objDatabase->Execute($query) === false) {
-    	    throw new DatabaseError("insert category failed");
-    	}
-    	
-    	// the new id of the category
-    	$id = $objDatabase->Insert_Id();
-    	$this->insertCategoryContent($id);
-    	return $id;
+        global $objDatabase;
+
+        $active = intval($active);
+        $parent = intval($parent);
+
+        $query = " SELECT MAX(sort) as sort FROM ".DBPREFIX."module_knowledge_categories";
+        $rs = $objDatabase->Execute($query);
+        if ($rs === false) {
+            throw new DatabaseError("getting the maximal sort failed");
+        }
+
+        $query = " INSERT INTO ".DBPREFIX."module_knowledge_categories
+                       (active, parent, sort)
+                   VALUES
+                       (".$active.", ".$parent.", ".($rs->fields['sort']+1).")";
+        if ($objDatabase->Execute($query) === false) {
+            throw new DatabaseError("insert category failed");
+        }
+
+        // the new id of the category
+        $id = $objDatabase->Insert_Id();
+        $this->insertCategoryContent($id);
+        return $id;
     }
-    
+
     /**
      * Update a category
      *
@@ -179,27 +179,27 @@ class KnowledgeCategory
     public function updateCategory($id, $active, $parent)
     {
         global $objDatabase;
-        
+
         $active = intval($active);
         $parent = intval($parent);
-        
+
         $query = "  UPDATE ".DBPREFIX."module_knowledge_categories
-                    SET 
+                    SET
                         `active` = ".$active.",
                         `parent` = ".$parent."
                     WHERE id = ".$id;
         if ($objDatabase->Execute($query) === false) {
             throw new DatabaseError("updating category failed");
         }
-        
+
         $this->deleteCategoryData($id);
         $this->insertCategoryContent($id);
     }
-    
+
     /**
      * Add content data for a category
      *
-     * Add the content data for a category that later will be inserted  
+     * Add the content data for a category that later will be inserted
      * @param int $lang
      * @param string $name
      */
@@ -210,7 +210,7 @@ class KnowledgeCategory
             'name' => contrexx_addslashes($name)
         );
     }
-    
+
     /**
      * Delete a category
      *
@@ -235,7 +235,7 @@ class KnowledgeCategory
         $deleted[] = $id;
         return $deleted;
     }
-    
+
     /**
      * Activate a category
      *
@@ -246,7 +246,7 @@ class KnowledgeCategory
     public function activate($id)
     {
         global $objDatabase;
-        
+
         $id = intval($id);
         $query = "  UPDATE ".DBPREFIX."module_knowledge_categories
                     SET active = 1
@@ -255,7 +255,7 @@ class KnowledgeCategory
             throw new DatabaseError("failed to activate the category");
         }
     }
-    
+
     /**
      * Deactivate a category
      *
@@ -266,7 +266,7 @@ class KnowledgeCategory
     public function deactivate($id)
     {
         global $objDatabase;
-        
+
         $id = intval($id);
         $query = "  UPDATE ".DBPREFIX."module_knowledge_categories
                     SET active = 0
@@ -275,7 +275,7 @@ class KnowledgeCategory
             throw new DatabaseError("failed to deactivate the category");
         }
     }
-    
+
     /**
      * Return just one category
      *
@@ -287,7 +287,7 @@ class KnowledgeCategory
         $this->readCategories(true, $id);
         return array_pop($this->categories);
     }
-    
+
     /**
      * Get all categories of a parent
      *
@@ -297,17 +297,17 @@ class KnowledgeCategory
     public function getCategoriesByParent($parent)
     {
         $this->readCategories();
-        
+
         $retCat = array();
         foreach ($this->categories as $category) {
             if ($category['parent'] == $parent) {
                 $retCat[] = $category;
             }
         }
-        
+
         return $retCat;
     }
-    
+
     /**
      * Set the sort position of a category
      *
@@ -319,10 +319,10 @@ class KnowledgeCategory
     public function setSort($id, $position)
     {
         global $objDatabase;
-        
+
         $id = intval($id);
         $position = intval($position);
-        
+
         $query = "  UPDATE ".DBPREFIX."module_knowledge_categories
                     SET sort = ".$position."
                     WHERE id = ".$id;
@@ -330,7 +330,7 @@ class KnowledgeCategory
             throw new DatabaseError("error updating the order");
         }
     }
-    
+
     /**
      * Delete one category
      *
@@ -343,7 +343,7 @@ class KnowledgeCategory
     private function deleteOneCategory($id)
     {
         global $objDatabase;
-        
+
         $id = intval($id);
         $query = "  DELETE FROM ".DBPREFIX."module_knowledge_categories
                     WHERE id = ".$id;
@@ -351,7 +351,7 @@ class KnowledgeCategory
             throw new DatabaseError("failed to delete category content");
         }
     }
-    
+
     /**
      * Delete the category data
      *
@@ -362,14 +362,14 @@ class KnowledgeCategory
     private function deleteCategoryData($id)
     {
         global $objDatabase;
-        
+
         $query = "  DELETE FROM ".DBPREFIX."module_knowledge_categories_content
                     WHERE category = ".$id;
         if ($objDatabase->Execute($query) === false) {
             throw new DatabaseError("failed to delete a category");
         }
     }
-    
+
     /**
      * Build a category tree of ids
      *
@@ -384,7 +384,7 @@ class KnowledgeCategory
      * @return array
      */
     private function buildCatTree($array, $id=0)
-    {   
+    {
         $retarr = array();
         foreach ($array as $key => $value) {
             if ($value['parent'] == $id) {
@@ -394,7 +394,7 @@ class KnowledgeCategory
         }
         return $retarr;
     }
-    
+
     /**
      * Insert category content
      *
@@ -405,17 +405,17 @@ class KnowledgeCategory
     private function insertCategoryContent($id)
     {
         global $objDatabase;
-        
+
         foreach ($this->insertContent as $values) {
-    	    $name = $values['name'];
-    	    $lang = $values['lang'];
-    	    $query = "  INSERT INTO ".DBPREFIX."module_knowledge_categories_content
+            $name = $values['name'];
+            $lang = $values['lang'];
+            $query = "  INSERT INTO ".DBPREFIX."module_knowledge_categories_content
                             (`category`, `name`, `lang`)
                         VALUES
                             (".$id.", '".$name."', ".$lang.")";
             if ($objDatabase->Execute($query) === false) {
                 throw new DatabaseError("inserting category content failed");
             }
-    	}
+        }
     }
 }

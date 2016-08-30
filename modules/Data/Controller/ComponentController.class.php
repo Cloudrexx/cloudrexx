@@ -27,7 +27,7 @@
 
 /**
  * Main controller for Data
- * 
+ *
  * @copyright  cloudrexx
  * @author     Project Team SS4U <info@cloudrexx.com>
  * @package    cloudrexx
@@ -38,7 +38,7 @@ namespace Cx\Modules\Data\Controller;
 
 /**
  * Main controller for Data
- * 
+ *
  * @copyright  cloudrexx
  * @author     Project Team SS4U <info@cloudrexx.com>
  * @package    cloudrexx
@@ -47,7 +47,7 @@ namespace Cx\Modules\Data\Controller;
 class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentController {
     /**
      * getControllerClasses
-     * 
+     *
      * @return type
      */
     public function getControllerClasses() {
@@ -56,14 +56,14 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
 
      /**
      * Load the component Data.
-     * 
+     *
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
      */
     public function load(\Cx\Core\ContentManager\Model\Entity\Page $page) {
         global $subMenuTitle, $objTemplate, $_CORELANG;
-                
+
         switch ($this->cx->getMode()) {
-            case \Cx\Core\Core\Controller\Cx::MODE_FRONTEND:               
+            case \Cx\Core\Core\Controller\Cx::MODE_FRONTEND:
                 $objData = new \Cx\Modules\Data\Controller\Data(\Env::get('cx')->getPage()->getContent());
                 \Env::get('cx')->getPage()->setContent($objData->getPage());
                 break;
@@ -85,14 +85,14 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
 
     /**
     * Do something before content is loaded from DB
-    * 
+    *
     * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
     */
     public function preContentLoad(\Cx\Core\ContentManager\Model\Entity\Page $page) {
         global $_CONFIG, $cl, $lang, $objInit, $dataBlocks, $lang, $dataBlocks, $themesPages, $page_template;
         // Initialize counter and track search engine robot
         \Cx\Core\Setting\Controller\Setting::init('Config', 'component','Yaml');
-        
+
         if (\Cx\Core\Setting\Controller\Setting::getValue('dataUseModule') && $cl->loadFile(ASCMS_MODULE_PATH.'/Data/Controller/DataBlocks.class.php')) {
             $lang = $objInit->loadLanguageData('Data');
             $dataBlocks = new \Cx\Modules\Data\Controller\DataBlocks($lang);
@@ -100,7 +100,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             $themesPages = $dataBlocks->replace($themesPages);
             $page_template = $dataBlocks->replace($page_template);
         }
-  
+
     }
 
 }

@@ -43,8 +43,8 @@ folderWidgetApp.factory('mediabrowserFiles', function ($http, $q) {
   };
 });
 
-folderWidgetApp.controller('MediaBrowserFolderWidgetCtrl', ['$scope', 'mediabrowserFiles', 'folderWidgetConfig', 
-  function($scope, mediabrowserFiles, folderWidgetConfig){   
+folderWidgetApp.controller('MediaBrowserFolderWidgetCtrl', ['$scope', 'mediabrowserFiles', 'folderWidgetConfig',
+  function($scope, mediabrowserFiles, folderWidgetConfig){
   $scope.files = [];
   $scope.isEditable = false;
   $scope.refreshBrowser = function () {
@@ -53,7 +53,7 @@ folderWidgetApp.controller('MediaBrowserFolderWidgetCtrl', ['$scope', 'mediabrow
             $scope.files = data;
         }
     );
-  };  
+  };
   $scope.removeFile = function (file) {
     mediabrowserFiles.removeMedia(file, folderWidgetConfig.get('widgetId')).then(
         function loadFiles(data) {
@@ -70,12 +70,12 @@ jQuery(function () {
   jQuery('.mediaBrowserfolderWidget').each(function(){
     angular.bootstrap(jQuery(this), ['FolderWidget']);
     var scope = angular.element(jQuery(this)).injector();
-    
+
     var folderWidgetConfig = scope.get('folderWidgetConfig');
     var attrs = jQuery(this).data();
     folderWidgetConfig.set('widgetId', attrs.widgetId);
     folderWidgetConfig.set('isEditable', attrs.isEditable);
-    
+
     var controllerScope = angular.element(jQuery(this)).scope();
     controllerScope.$apply(function() {
       controllerScope.isEditable = folderWidgetConfig.get('isEditable');

@@ -57,7 +57,7 @@ class ModuleInterfaceException extends Exception {}
 abstract class ModuleInterface {
     //singleton functionality: instance
     static private $instances = array();
-    
+
     /**
      * Instance getter
      * @param string $moduleName the modules' interface you want

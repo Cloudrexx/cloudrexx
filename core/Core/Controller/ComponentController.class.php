@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -83,7 +83,7 @@ cx(.bat) uninstall [core|core_module|module|lib|theme] {component name}';
 
     public function executeCommand($command, $arguments, $dataArguments = array())
     {
-        
+
         switch ($command) {
             case 'help':
                 echo 'Cloudrexx command mode help.
@@ -197,4 +197,3 @@ Available commands:
         return 'normal';
     }
 }
-

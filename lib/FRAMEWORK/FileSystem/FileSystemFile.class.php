@@ -49,7 +49,7 @@ class FileSystemFileException extends \Exception {};
 /**
  * File System File
  *
- * This class provides an object based interface to a file that resides 
+ * This class provides an object based interface to a file that resides
  * on the local file system.
  *
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
@@ -73,7 +73,7 @@ class FileSystemFile implements FileInterface
         if (empty($file)) {
             throw new FileSystemFileException('No file path specified!');
         }
-        
+
         // $file is specified by absolute file system path of operating system
         if (   strpos($file, \Env::get('cx')->getWebsiteDocumentRootPath()) === 0
             || strpos($file, \Env::get('cx')->getCodeBaseDocumentRootPath()) === 0
@@ -90,7 +90,7 @@ class FileSystemFile implements FileInterface
             $this->filePath = \Env::get('cx')->getWebsiteDocumentRootPath() . '/'.$file;
         }
     }
-    
+
     public function getFileOwner()
     {
         // get the user-ID of the user who owns the loaded file
@@ -98,26 +98,26 @@ class FileSystemFile implements FileInterface
         if (!$fileOwnerId) {
             throw new FileSystemFileException('Unable to fetch file owner of '.$this->filePath);
         }
-        
+
         return $fileOwnerId;
     }
-    
+
     public function isWritable() {
         return is_writable($this->filePath);
     }
 
     public function write($data)
     {
-        // first try 
+        // first try
         $fp = @fopen($this->filePath, 'w');
         if (!$fp) {
             // try to set write access
             $this->makeWritable($this->filePath);
         }
 
-        // second try 
+        // second try
         $fp = @fopen($this->filePath, 'w');
-        if (!$fp) { 
+        if (!$fp) {
             throw new FileSystemFileException('Unable to open file '.$this->filePath.' for writting!');
         }
 
@@ -136,16 +136,16 @@ class FileSystemFile implements FileInterface
 
     public function append($data)
     {
-        // first try 
+        // first try
         $fp = @fopen($this->filePath, 'a');
         if (!$fp) {
             // try to set write access
             $this->makeWritable($this->filePath);
         }
 
-        // second try 
+        // second try
         $fp = @fopen($this->filePath, 'a');
-        if (!$fp) { 
+        if (!$fp) {
             throw new FileSystemFileException('Unable to open file '.$this->filePath.' for writting!');
         }
 
@@ -169,7 +169,7 @@ class FileSystemFile implements FileInterface
             throw new FileSystemFileException('Unable to touch file in file system!');
         }
     }
-    
+
     public function copy($dst)
     {
         if (!copy($this->filePath, $dst)) {
@@ -177,12 +177,12 @@ class FileSystemFile implements FileInterface
         }
         \Cx\Lib\FileSystem\FileSystem::makeWritable($dst);
     }
-    
+
     public function rename($dst)
     {
         $this->move($dst);
     }
-    
+
     public function move($dst)
     {
         if (!rename($this->filePath, $dst)) {
@@ -245,10 +245,10 @@ class FileSystemFile implements FileInterface
             throw new FileSystemFileException('Unable to delete file '.$this->filePath.'!');
         }
     }
-    
+
     /**
      * Get the absolute path of the file($this->file)
-     * 
+     *
      * @return string absolute path of the file
      */
     public function getAbsoluteFilePath()
@@ -256,4 +256,3 @@ class FileSystemFile implements FileInterface
         return $this->filePath;
     }
 }
-

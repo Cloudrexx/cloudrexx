@@ -212,7 +212,7 @@ div#container a.search {
 }
 div#container > header > a.header_icons {
     float: right;
-    display: none; 
+    display: none;
     position: relative;
     height: 28px;
     width: 31px;
@@ -229,7 +229,7 @@ div#container > header > a.header_icons {
     display: block;
     position: relative;
 
-    content: "";    
+    content: "";
     background-size: 21px auto;
 
 
@@ -446,7 +446,7 @@ article img.floatimage {
     margin: 4px 14px 6px 0px;
 }
 
-article h2, 
+article h2,
 section#main h2,
 section#main h3 {
     margin-bottom: 11px;
@@ -488,27 +488,27 @@ span.img-right {
 }
 
 
-img[width="176"] { 
+img[width="176"] {
     width: 104px;
     height: inherit !important;
 }
 
-.portrait img[width="352"] { 
+.portrait img[width="352"] {
     width: 288px;
     height: inherit !important;
 }
 
-.landscape img[width="352"] { 
+.landscape img[width="352"] {
     width: 448px;
     height: inherit !important;
 }
 
-.portrait img[width="544"] { 
+.portrait img[width="544"] {
     width: 288px;
     height: inherit !important;
 }
 
-.landscape img[width="544"] { 
+.landscape img[width="544"] {
     width: 448px;
     height: inherit !important;
 }
@@ -751,7 +751,7 @@ section#main article.linklist ul li div p {
     margin-bottom: 0;
 }
 
-section#main article.linklist ul li div p, 
+section#main article.linklist ul li div p,
 section#main article.linklist ul li div h2,
 section#main article.linklist ul li div span.meta {
     font-size: 12px;
@@ -1186,7 +1186,7 @@ table.table_nolayout tbody td a.contentlink {
     font-size: 14px;
 }
 
-thead th.first, 
+thead th.first,
 tbody td.first {
     border-left: none;
     padding-left: 9px;
@@ -1250,13 +1250,13 @@ div#container > nav {
 }
 
 div#container > nav li {
-    margin: 0 0 2px;    
-    background: -moz-linear-gradient(top,  #55595B 30%, #3F3F3F 100%); 
+    margin: 0 0 2px;
+    background: -moz-linear-gradient(top,  #55595B 30%, #3F3F3F 100%);
     background: -webkit-gradient(linear, left top, left bottom, color-stop(30%,#55595B), color-stop(100%,#3F3F3F)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(top,  #55595B 30%, #3F3F3F 100%); 
-    background: -o-linear-gradient(top,  #55595B 30%, #3F3F3F 100%); 
-    background: -ms-linear-gradient(top,  #55595B 30%, #3F3F3F 100%); 
-    background: linear-gradient(to bottom,  #55595B 30%, #3F3F3F 100%); 
+    background: -webkit-linear-gradient(top,  #55595B 30%, #3F3F3F 100%);
+    background: -o-linear-gradient(top,  #55595B 30%, #3F3F3F 100%);
+    background: -ms-linear-gradient(top,  #55595B 30%, #3F3F3F 100%);
+    background: linear-gradient(to bottom,  #55595B 30%, #3F3F3F 100%);
 }
 
 div#container > nav li a {
@@ -1285,10 +1285,10 @@ div#container > nav li a:after {
 div#container > nav li a.active {
     background: -moz-linear-gradient(center top , #313232 30%, #161616 100%) repeat scroll 0 0 transparent;
     background: -webkit-gradient(linear, left top, left bottom, color-stop(30%,#313232), color-stop(100%,#161616)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(top,  #313232 30%, #161616 100%); 
-    background: -o-linear-gradient(top,  #313232 30%, #161616 100%); 
-    background: -ms-linear-gradient(top,  #313232 30%, #161616 100%); 
-    background: linear-gradient(to bottom,  #313232 30%, #161616 100%); 
+    background: -webkit-linear-gradient(top,  #313232 30%, #161616 100%);
+    background: -o-linear-gradient(top,  #313232 30%, #161616 100%);
+    background: -ms-linear-gradient(top,  #313232 30%, #161616 100%);
+    background: linear-gradient(to bottom,  #313232 30%, #161616 100%);
 }
 
 
@@ -1369,7 +1369,7 @@ div#container > footer > a {
     color: #505050;
     text-align: center;
     padding: 7px 0;
-    margin: 0 -16px 0;    
+    margin: 0 -16px 0;
 }
 
 #nav-lang {
@@ -1451,9 +1451,9 @@ a.dwb, a.dwb:active, a.dwb:visited {
     a, a:visited { color: #444 !important; text-decoration: underline; }
     a[href]:after { content: " (" attr(href) ")"; }
     abbr[title]:after { content: " (" attr(title) ")"; }
-    .ir a:after, a[href^="javascript:"]:after, a[href^="#"]:after { content: ""; }  
+    .ir a:after, a[href^="javascript:"]:after, a[href^="#"]:after { content: ""; }
     pre, blockquote { border: 1px solid #999; page-break-inside: avoid; }
-    thead { display: table-header-group; } 
+    thead { display: table-header-group; }
     tr, img { page-break-inside: avoid; }
     @page { margin: 0.5cm; }
     p, h2, h3 { orphans: 3; widows: 3; }
@@ -1470,7 +1470,7 @@ div.fullWidth a img { width: auto; }
 section#main article.linklist ul li { display: block; }
 section#main article.linklist ul li a.small:after { top: 16px; }
 section#main article.linklist ul li a.small { padding-top: 16px !important; }
-section#main article.linklist ul li a.active h2 {    
+section#main article.linklist ul li a.active h2 {
 }
 section#main article.linklist ul li a.small h2 { margin-bottom: 6px !important; }
 section#main article a.ui-btn-right { font-size: 14px; float: right; }
@@ -1488,7 +1488,7 @@ section#main article header.title { padding: 12px 16px 0; }
 section#main article.tipp { border-bottom: 2px solid #EBE4D1; }
 section#main span.moreCategories { margin-top: -24px !important; }
 section#main span.moreTimetable { padding: 0; }
-section#main ul.labels li { padding-bottom: 4px; } 
+section#main ul.labels li { padding-bottom: 4px; }
 section#main div.rapics { padding: 20px 0px 21px; }
 section#main div.ravids { padding: 20px 0px 12px; margin-top: 32px; border-top: 1px solid #CCC; }
 section#main div.rapics h2 { font-size: 14px; font-weight: bold; margin-top: -20px; }

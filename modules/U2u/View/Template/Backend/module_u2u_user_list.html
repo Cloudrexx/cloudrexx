@@ -5,10 +5,10 @@
 
 function accessChangeUserStatus(id, name)
 {
-	msg = '{TXT_ACCESS_CONFIRM_USER_ACCOUNT_STATUS_CHANGED}';
+  msg = '{TXT_ACCESS_CONFIRM_USER_ACCOUNT_STATUS_CHANGED}';
     notify = confirm(msg.replace('%s', name));
     if(notify) {
-	   window.location.href = 'index.php?cmd=U2u&{CSRF_PARAM}&act=changeStatus&id='+id;
+     window.location.href = 'index.php?cmd=U2u&{CSRF_PARAM}&act=changeStatus&id='+id;
     }
 }
 // ]]>
@@ -21,44 +21,44 @@ function accessChangeUserStatus(id, name)
 <br />
 <br />
 <table width="100%" cellspacing="0" cellpadding="3" border="0" class="adminlist">
-	<thead>
-		<tr>
-			<th colspan="11">{TXT_ACCESS_USER_LIST}</th>
-		</tr>
-	</thead>
-	<tbody style="vertical-align:top;">
-		<!-- BEGIN access_has_users -->
-			<tr class="row3" style="font-weight:bold; white-space:nowrap;">
-				<td width="1%">{ACCESS_ID}</td>
-				<td width="4%">{ACCESS_STATUS}</td>
-				<td width="15%">{ACCESS_USERNAME}</td>
+  <thead>
+    <tr>
+      <th colspan="11">{TXT_ACCESS_USER_LIST}</th>
+    </tr>
+  </thead>
+  <tbody style="vertical-align:top;">
+    <!-- BEGIN access_has_users -->
+      <tr class="row3" style="font-weight:bold; white-space:nowrap;">
+        <td width="1%">{ACCESS_ID}</td>
+        <td width="4%">{ACCESS_STATUS}</td>
+        <td width="15%">{ACCESS_USERNAME}</td>
 
-				<td width="15%">{ACCESS_EMAIL}</a></td>
-				<td width="5%">{ACCESS_REGISTERED_SINCE}</a></td>
-				<td width="5%">{ACCESS_LAST_ACTIVITY}</a></td>
-				<td width="5%">{ACCESS_EXPIRATION}</a></td>
+        <td width="15%">{ACCESS_EMAIL}</a></td>
+        <td width="5%">{ACCESS_REGISTERED_SINCE}</a></td>
+        <td width="5%">{ACCESS_LAST_ACTIVITY}</a></td>
+        <td width="5%">{ACCESS_EXPIRATION}</a></td>
 
-			</tr>
-			<!-- BEGIN access_user_list -->
-				<tr class="row{ACCESS_ROW_CLASS_ID}">
-					<td>{ACCESS_USER_ID}</td>
-					<td><a href="javascript:accessChangeUserStatus({ACCESS_USER_ID},'{ACCESS_USER_USERNAME}');" title="{ACCESS_CHANGE_ACCOUNT_STATUS_MSG}"><img src="../core/Core/View/Media/icons/{ACCESS_USER_STATUS_IMG}" alt="{ACCESS_USER_STATUS}" width="13" height="13" border="0" /></a> <img src="../core/Core/View/Media/icons/{ACCESS_USER_ADMIN_IMG}" border="0" alt="{ACCESS_USER_ADMIN_TXT}" width="16" height="16" /></td>
-					<td><a href="index.php?cmd=Access&amp;act=user&amp;tpl=modify&amp;id={ACCESS_USER_ID}" title="{TXT_ACCESS_MODIFY_USER_ACCOUNT}">{ACCESS_USER_USERNAME}</a></td>
+      </tr>
+      <!-- BEGIN access_user_list -->
+        <tr class="row{ACCESS_ROW_CLASS_ID}">
+          <td>{ACCESS_USER_ID}</td>
+          <td><a href="javascript:accessChangeUserStatus({ACCESS_USER_ID},'{ACCESS_USER_USERNAME}');" title="{ACCESS_CHANGE_ACCOUNT_STATUS_MSG}"><img src="../core/Core/View/Media/icons/{ACCESS_USER_STATUS_IMG}" alt="{ACCESS_USER_STATUS}" width="13" height="13" border="0" /></a> <img src="../core/Core/View/Media/icons/{ACCESS_USER_ADMIN_IMG}" border="0" alt="{ACCESS_USER_ADMIN_TXT}" width="16" height="16" /></td>
+          <td><a href="index.php?cmd=Access&amp;act=user&amp;tpl=modify&amp;id={ACCESS_USER_ID}" title="{TXT_ACCESS_MODIFY_USER_ACCOUNT}">{ACCESS_USER_USERNAME}</a></td>
 
-					<td><a href="mailto:{ACCESS_USER_EMAIL}" title="{ACCESS_SEND_EMAIL_TO_USER}">{ACCESS_USER_EMAIL}</a></td>
-					<td style="white-space:nowrap;">{ACCESS_USER_REGDATE}</td>
-					<td style="white-space:nowrap;">{ACCESS_USER_LAST_ACTIVITY}</td>
-					<td style="white-space:nowrap;{ACCESS_USER_EXPIRATION_STYLE}">{ACCESS_USER_EXPIRATION}</td>
+          <td><a href="mailto:{ACCESS_USER_EMAIL}" title="{ACCESS_SEND_EMAIL_TO_USER}">{ACCESS_USER_EMAIL}</a></td>
+          <td style="white-space:nowrap;">{ACCESS_USER_REGDATE}</td>
+          <td style="white-space:nowrap;">{ACCESS_USER_LAST_ACTIVITY}</td>
+          <td style="white-space:nowrap;{ACCESS_USER_EXPIRATION_STYLE}">{ACCESS_USER_EXPIRATION}</td>
 
-				</tr>
-			<!-- END access_user_list -->
-		<!-- END access_has_users -->
-		<!-- BEGIN access_no_user -->
-			<tr class="row1">
-				<td colspan="11">{ACCESS_STATUS_MSG}</td>
-			</tr>
-		<!-- END access_no_user -->
-	</tbody>
+        </tr>
+      <!-- END access_user_list -->
+    <!-- END access_has_users -->
+    <!-- BEGIN access_no_user -->
+      <tr class="row1">
+        <td colspan="11">{ACCESS_STATUS_MSG}</td>
+      </tr>
+    <!-- END access_no_user -->
+  </tbody>
 </table>
 <br />
 {ACCESS_USER_PAGING}

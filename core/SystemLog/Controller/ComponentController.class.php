@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,10 +24,10 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Main controller for SystemLog
- * 
+ *
  * @copyright   cloudrexx
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package cloudrexx
@@ -38,36 +38,36 @@ namespace Cx\Core\SystemLog\Controller;
 
 /**
  * Main controller for SystemLog
- * 
+ *
  * @copyright   cloudrexx
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package cloudrexx
  * @subpackage core_systemlog
  */
 class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentController {
-    
+
     public function getControllerClasses() {
         return array();
     }
 
      /**
      * Load the component SystemLog.
-     * 
+     *
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
      */
     public function load(\Cx\Core\ContentManager\Model\Entity\Page $page) {
         global $_ARRAYLANG, $subMenuTitle;
         $subMenuTitle = $_ARRAYLANG['TXT_SYSTEM_LOGS'];
-        
+
         \Permission::checkAccess(55, 'static');
         $this->cx->getTemplate()->addBlockfile('CONTENT_OUTPUT', 'content_master', 'LegacyContentMaster.html');
         $cachedRoot = $this->cx->getTemplate()->getRoot();
         $this->cx->getTemplate()->setRoot($this->getDirectory() . '/View/Template/Backend');
-        
+
         $objSystemLog = new \Cx\Core\SystemLog\Controller\SystemLog();
-        $objSystemLog->getLogPage();  
-        
-        $this->cx->getTemplate()->setRoot($cachedRoot); 
+        $objSystemLog->getLogPage();
+
+        $this->cx->getTemplate()->setRoot($cachedRoot);
     }
 
 }

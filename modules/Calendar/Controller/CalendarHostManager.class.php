@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,10 +24,10 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
- * Calendar 
- * 
+ * Calendar
+ *
  * @package    cloudrexx
  * @subpackage module_calendar
  * @author     Cloudrexx <info@cloudrexx.com>
@@ -38,14 +38,14 @@
 namespace Cx\Modules\Calendar\Controller;
 /**
  * Calendar Class Host Manager
- * 
+ *
  * @package    cloudrexx
  * @subpackage module_calendar
  * @author     Cloudrexx <info@cloudrexx.com>
  * @copyright  CLOUDREXX CMS - CLOUDREXX AG
  * @version    1.00
  */
-class CalendarHostManager extends CalendarLibrary 
+class CalendarHostManager extends CalendarLibrary
 {
     /**
      * Host list
@@ -54,7 +54,7 @@ class CalendarHostManager extends CalendarLibrary
      * @var array
      */
     public $hostList = array();
-    
+
     /**
      * Category id
      *
@@ -62,7 +62,7 @@ class CalendarHostManager extends CalendarLibrary
      * @var integer
      */
     private $catId;
-    
+
     /**
      * only confirmes
      *
@@ -70,7 +70,7 @@ class CalendarHostManager extends CalendarLibrary
      * @var boolean
      */
     private $onlyConfirmed;
-    
+
     /**
      * only Active
      *
@@ -78,45 +78,45 @@ class CalendarHostManager extends CalendarLibrary
      * @var boolean
      */
     private $onlyActive;
-    
+
     /**
      * Host manager constructor
-     * 
+     *
      * @param integer $catId         Category Id
      * @param boolean $onlyConfirmed condition to get only confirmed
      * @param boolean $onlyActive    condition to get only active
      */
     function __construct($catId=null,$onlyConfirmed=false,$onlyActive=false){
-    	$this->catId = intval($catId);
+        $this->catId = intval($catId);
         $this->onlyConfirmed = intval($onlyConfirmed);
-        $this->onlyActive = intval($onlyActive);  
+        $this->onlyActive = intval($onlyActive);
     }
-    
+
     /**
      * Initialize the host list
-     * 
+     *
      * @return null
      */
     function getHostList() {
         global $objDatabase,$_ARRAYLANG,$_LANGID;
-        
-        if($this->catId != null) {                                                              
-            $catId_where = "AND cat_id = '".$this->catId."' ";  
-        } else {                                          
-            $catId_where = "";   
-        }  
-        
-        if($this->onlyActive) {                                                              
-            $active_where = "AND status = '1' ";  
-        } else {                                          
-            $active_where = "";   
-        }  
-        
+
+        if($this->catId != null) {
+            $catId_where = "AND cat_id = '".$this->catId."' ";
+        } else {
+            $catId_where = "";
+        }
+
+        if($this->onlyActive) {
+            $active_where = "AND status = '1' ";
+        } else {
+            $active_where = "";
+        }
+
         $query = "SELECT id
                     FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_host
                    WHERE id != 0 ".$catId_where." ".$active_where."
                 ORDER BY status DESC";
-        
+
         $objResult = $objDatabase->Execute($query);
 
         if ($objResult !== false) {
@@ -127,22 +127,22 @@ class CalendarHostManager extends CalendarLibrary
             }
         }
     }
-    
+
     /**
      * Sets the host list place holders to the template
-     * 
+     *
      * @param object $objTpl Template object
-     * 
+     *
      * @return null
      */
     function showHostList($objTpl) {
         global $_ARRAYLANG;
-        
+
         $i=0;
         foreach ($this->hostList as $key => $objHost) {
-        	$objCategory = new \Cx\Modules\Calendar\Controller\CalendarCategory(intval($objHost->catId));
-                
-        	$objTpl->setVariable(array(
+            $objCategory = new \Cx\Modules\Calendar\Controller\CalendarCategory(intval($objHost->catId));
+
+            $objTpl->setVariable(array(
                 $this->moduleLangVar.'_HOST_ROW'         => $i%2==0 ? 'row1' : 'row2',
                 $this->moduleLangVar.'_HOST_ID'          => $objHost->id,
                 $this->moduleLangVar.'_HOST_LED'         => $objHost->status==0 ? 'red' : 'green',
@@ -152,34 +152,34 @@ class CalendarHostManager extends CalendarLibrary
                 $this->moduleLangVar.'_HOST_CATEGORY'    => $objCategory->name,
                 $this->moduleLangVar.'_HOST_KEY'         => $objHost->key,
             ));
-            
+
             $i++;
             $objTpl->parse('hostList');
         }
-    
+
         if(count($this->hostList) == 0) {
             $objTpl->hideBlock('hostList');
-            
+
             $objTpl->setVariable(array(
                 'TXT_'.$this->moduleLangVar.'_NO_HOSTS_FOUND' => $_ARRAYLANG['TXT_CALENDAR_NO_HOSTS_FOUND'],
             ));
-                
+
             $objTpl->parse('emptyHostList');
         }
     }
-    
+
     /**
      * Sets the host place holder to the template
-     * 
+     *
      * @param object  $objTpl Html Template object
      * @param integer $hostId Host id
-     * 
+     *
      * @return null
      */
     function showHost($objTpl, $hostId) {
         $objHost = new \Cx\Modules\Calendar\Controller\CalendarHost(intval($hostId));
         $this->hostList[$hostId] = $objHost;
-        
+
         $objTpl->setVariable(array(
             $this->moduleLangVar.'_HOST_ID'          => $objHost->id,
             $this->moduleLangVar.'_HOST_STATUS'      => $objHost->status==0 ? '' : 'checked="checked"',

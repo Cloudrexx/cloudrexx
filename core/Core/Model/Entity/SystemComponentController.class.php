@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,10 +24,10 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * This is the superclass for all main Controllers for a Component
- * 
+ *
  * Decorator for SystemComponent
  * Every component needs a SystemComponentController for initialization
  *
@@ -42,7 +42,7 @@ namespace Cx\Core\Core\Model\Entity;
 
 /**
  * This is the superclass for all main Controllers for a Component
- * 
+ *
  * Decorator for SystemComponent
  * Every component needs a SystemComponentController for initialization
  *
@@ -58,13 +58,13 @@ class SystemComponentController extends Controller {
      * @var array List of Controller objects
      */
     private $controllers = array();
-    
+
     /**
      * Decorated SystemComponent
      * @var \Cx\Core\Core\Model\Entity\SystemComponent
      */
     protected $systemComponent;
-    
+
     /**
      * Initializes a controller
      * @param \Cx\Core\Core\Model\Entity\SystemComponent $systemComponent SystemComponent to decorate
@@ -74,7 +74,7 @@ class SystemComponentController extends Controller {
         $this->systemComponent = $systemComponent;
         $this->cx = $cx;
     }
-    
+
     /**
      * Returns the main controller
      * @return SystemComponentController Main controller for this system component
@@ -82,7 +82,7 @@ class SystemComponentController extends Controller {
     public function getSystemComponentController() {
         return $this;
     }
-    
+
     /**
      * Returns the SystemComponent this Controller decorates
      * @return \Cx\Core\Core\Model\Entity\SystemComponent
@@ -90,7 +90,7 @@ class SystemComponentController extends Controller {
     public function getSystemComponent() {
         return $this->systemComponent;
     }
-    
+
     /**
      * Registers a controller instance
      * @param Controller $controller Controller to register
@@ -102,7 +102,7 @@ class SystemComponentController extends Controller {
         }
         $this->controllers[get_class($controller)] = $controller;
     }
-    
+
     /**
      * Returns a list of controllers
      * @param boolean $loadedOnly (optional) If false, controller that did not register are instanciated, default true
@@ -122,7 +122,7 @@ class SystemComponentController extends Controller {
         }
         return $this->getControllers();
     }
-    
+
     /**
      * This finds the correct FQCN for a controller name
      * @param string $controllerClassShort Short name for controller
@@ -139,7 +139,7 @@ class SystemComponentController extends Controller {
         }
         return $this->adjustFullyQualifiedClassName($class);
     }
-    
+
     /**
      * Returns a controller instance if one already exists
      * @param $controllerClass Short or FQCN controller name
@@ -150,29 +150,29 @@ class SystemComponentController extends Controller {
         if (isset($this->controllers[$controllerClass])) {
             return $this->controllers[$controllerClass];
         }
-        
+
         $classes = $this->getControllerClasses();
         if (!in_array($controllerClass, $classes)) {
             return null;
         }
         $class = '\\' . $this->getControllerClassName($controllerClass);
         new $class($this, $this->cx);
-        
+
         if (!isset($this->controllers[preg_replace('/^\\\\/', '', $class)])) {
             throw new \Exception('Controller "' . $controllerClass . '" could not be loaded(' . preg_replace('/^\\\\/', '', $class) . ')');
         }
-        
+
         return $this->controllers[preg_replace('/^\\\\/', '', $class)];
     }
-    
+
     /**
      * Get component controller object
-     * 
-     * @param string $name  component name  
-     * 
-     * @return \Cx\Core\Core\Model\Entity\SystemComponentController 
+     *
+     * @param string $name  component name
+     *
+     * @return \Cx\Core\Core\Model\Entity\SystemComponentController
      * The requested component controller or null if no such component exists
-     * 
+     *
      */
     public function getComponent($name)
     {
@@ -186,7 +186,7 @@ class SystemComponentController extends Controller {
         }
         return $component->getSystemComponentController();
     }
-    
+
     /**
      * This makes sure a FQCN does not contain double backslashes
      * @param string $className FQCN of a controller
@@ -195,17 +195,17 @@ class SystemComponentController extends Controller {
     protected function adjustFullyQualifiedClassName($className) {
         return preg_replace('/^\\\\/', '', $className);
     }
-    
+
     /**
      * Returns all Controller class names for this component (except this)
-     * 
+     *
      * Be sure to return all your controller classes if you add your own
      * @return array List of Controller class names (without namespace)
      */
     public function getControllerClasses() {
         return array('Frontend', 'Backend');
     }
-    
+
     /**
      * Decoration: all methods that are not specified in this or child classes
      * call the corresponding method of the decorated SystemComponent
@@ -216,21 +216,21 @@ class SystemComponentController extends Controller {
     public function __call($methodName, $arguments) {
         return call_user_func_array(array($this->systemComponent, $methodName), $arguments);
     }
-    
+
     /**
      * Returns a list of JsonAdapter class names
-     * 
+     *
      * The array values might be a class name without namespace. In that case
      * the namespace \Cx\{component_type}\{component_name}\Controller is used.
      * If the array value starts with a backslash, no namespace is added.
-     * 
+     *
      * Avoid calculation of anything, just return an array!
      * @return array List of ComponentController classes
      */
     public function getControllersAccessableByJson() {
         return array();
     }
-    
+
     /**
      * Returns a list of command mode commands provided by this component
      * @return array List of command names
@@ -248,7 +248,7 @@ class SystemComponentController extends Controller {
     public function getCommandDescription($command, $short = false) {
         return '';
     }
-    
+
     /**
      * Execute one of the commands listed in getCommandsForCommandMode()
      * @see getCommandsForCommandMode()
@@ -258,20 +258,20 @@ class SystemComponentController extends Controller {
      * @return void
      */
     public function executeCommand($command, $arguments, $dataArguments = array()) {}
-    
+
     /**
      * Check whether the command has access to execute or not.
-     *  
+     *
      * @param string $command   name of the command to execute
      * @param array  $arguments list of arguments for the command
-     * 
+     *
      * @return boolean
      */
     public function hasAccessToExecuteCommand($command, $arguments)
     {
         $commands = $this->getCommandsForCommandMode();
         $method = (php_sapi_name() === 'cli') ? array('cli') : null;
-        
+
         $objPermission = new \Cx\Core_Modules\Access\Model\Entity\Permission(null, $method, false, null, null, null);
         if (isset($commands[$command]) && $commands[$command] instanceof \Cx\Core_Modules\Access\Model\Entity\Permission) {
             $objPermission = $commands[$command];
@@ -280,13 +280,13 @@ class SystemComponentController extends Controller {
         if ($objPermission->hasAccess($arguments)) {
             return true;
         }
-        
+
         return false;
     }
-    
+
     /**
      * Do something before system initialization
-     * 
+     *
      * USE CAREFULLY, DO NOT DO ANYTHING COSTLY HERE!
      * CALCULATE YOUR STUFF AS LATE AS POSSIBLE.
      * This event must be registered in the preInit-Hook definition
@@ -294,10 +294,10 @@ class SystemComponentController extends Controller {
      * @param \Cx\Core\Core\Controller\Cx   $cx The instance of \Cx\Core\Core\Controller\Cx
      */
     public function preInit(\Cx\Core\Core\Controller\Cx $cx) {}
-    
+
     /**
      * Do something after system initialization
-     * 
+     *
      * USE CAREFULLY, DO NOT DO ANYTHING COSTLY HERE!
      * CALCULATE YOUR STUFF AS LATE AS POSSIBLE.
      * This event must be registered in the postInit-Hook definition
@@ -305,18 +305,18 @@ class SystemComponentController extends Controller {
      * @param \Cx\Core\Core\Controller\Cx   $cx The instance of \Cx\Core\Core\Controller\Cx
      */
     public function postInit(\Cx\Core\Core\Controller\Cx $cx) {}
-    
+
     /**
      * Register your events here
-     * 
+     *
      * Do not do anything else here than list statements like
      * $this->cx->getEvents()->addEvent($eventName);
      */
     public function registerEvents() {}
-    
+
     /**
      * Register your event listeners here
-     * 
+     *
      * USE CAREFULLY, DO NOT DO ANYTHING COSTLY HERE!
      * CALCULATE YOUR STUFF AS LATE AS POSSIBLE.
      * Keep in mind, that you can also register your events later.
@@ -325,50 +325,50 @@ class SystemComponentController extends Controller {
      * $this->cx->getEvents()->addEventListener($eventName, $listener);
      */
     public function registerEventListeners() {}
-    
+
     /**
      * Called for additional, component specific resolving
-     * 
+     *
      * If /en/Path/to/Page is the path to a page for this component
      * a request like /en/Path/to/Page/with/some/parameters will
      * give an array like array('with', 'some', 'parameters') for $parts
-     * 
+     *
      * This may be used to redirect to another page
      * @param array $parts List of additional path parts
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page Resolved virtual page
      */
     public function resolve($parts, $page) {}
-    
+
     /**
      * Do something before resolving is done
-     * 
+     *
      * USE CAREFULLY, DO NOT DO ANYTHING COSTLY HERE!
      * CALCULATE YOUR STUFF AS LATE AS POSSIBLE
      * @param \Cx\Core\Routing\Url                      $request    The URL object for this request
      */
     public function preResolve(\Cx\Core\Routing\Url $request) {}
-    
+
     /**
      * Do something after resolving is done
-     * 
+     *
      * USE CAREFULLY, DO NOT DO ANYTHING COSTLY HERE!
      * CALCULATE YOUR STUFF AS LATE AS POSSIBLE
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
      */
     public function postResolve(\Cx\Core\ContentManager\Model\Entity\Page $page) {}
-    
+
     /**
      * Do something before content is loaded from DB
-     * 
+     *
      * USE CAREFULLY, DO NOT DO ANYTHING COSTLY HERE!
      * CALCULATE YOUR STUFF AS LATE AS POSSIBLE
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
      */
     public function preContentLoad(\Cx\Core\ContentManager\Model\Entity\Page $page) {}
-    
+
     /**
      * Do something before a module is loaded
-     * 
+     *
      * This method is called only if any module
      * gets loaded for content parsing
      * USE CAREFULLY, DO NOT DO ANYTHING COSTLY HERE!
@@ -376,10 +376,10 @@ class SystemComponentController extends Controller {
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
      */
     public function preContentParse(\Cx\Core\ContentManager\Model\Entity\Page $page){}
-    
+
     /**
      * Load your component. It is needed for this request.
-     * 
+     *
      * This loads your FrontendController or BackendController depending on the
      * mode Cx runs in. For modes other than frontend and backend, nothing is done.
      * If you you'd like to name your Controllers differently, or have another
@@ -393,7 +393,7 @@ class SystemComponentController extends Controller {
             \Cx\Core\Core\Controller\Cx::MODE_BACKEND => 'Backend',
             \Cx\Core\Core\Controller\Cx::MODE_COMMAND => 'Command',
         );
-        
+
         // Find controller short name for Cx mode
         if (!isset($knownModes[$this->cx->getMode()])) {
             // Unknown mode, something weird just happened:
@@ -401,14 +401,14 @@ class SystemComponentController extends Controller {
             // - Did you try to load a component in minimal mode?
             return;
         }
-        
+
         // Find long controller name for short controller name
         $controllerShort = $knownModes[$this->cx->getMode()];
         if (!in_array($controllerShort, $this->getControllerClasses())) {
             // No such controller for this component
             return;
         }
-        
+
         // Find controller instance
         $controller = $this->getController($controllerShort);
         if (!$controller) {
@@ -416,14 +416,14 @@ class SystemComponentController extends Controller {
             // instanciated. There's something wrong there...
             return;
         }
-        
+
         // Get content
         $controller->getPage($page);
     }
-    
+
     /**
      * Do something after a module is loaded
-     * 
+     *
      * This method is called only if any module
      * gets loaded for content parsing
      * USE CAREFULLY, DO NOT DO ANYTHING COSTLY HERE!
@@ -431,28 +431,28 @@ class SystemComponentController extends Controller {
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
      */
     public function postContentParse(\Cx\Core\ContentManager\Model\Entity\Page $page) {}
-    
+
     /**
      * Do something after content is loaded from DB
-     * 
+     *
      * USE CAREFULLY, DO NOT DO ANYTHING COSTLY HERE!
      * CALCULATE YOUR STUFF AS LATE AS POSSIBLE
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
      */
     public function postContentLoad(\Cx\Core\ContentManager\Model\Entity\Page $page) {}
-    
+
     /**
      * Do something before main template gets parsed
-     * 
+     *
      * USE CAREFULLY, DO NOT DO ANYTHING COSTLY HERE!
      * CALCULATE YOUR STUFF AS LATE AS POSSIBLE
      * @param \Cx\Core\Html\Sigma                       $template   The main template
      */
     public function preFinalize(\Cx\Core\Html\Sigma $template) {}
-    
+
     /**
      * Do something after main template got parsed
-     * 
+     *
      * USE CAREFULLY, DO NOT DO ANYTHING COSTLY HERE!
      */
     public function postFinalize() {}

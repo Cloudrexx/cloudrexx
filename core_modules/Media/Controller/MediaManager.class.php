@@ -49,7 +49,7 @@ class MediaManager extends MediaLibrary
 {
     public $_objTpl;                          // var for the template object
     public $pageTitle;                        // var for the title of the active page
-    
+
     public $arrPaths;                         // array paths
     public $arrWebPaths;                      // array web paths
 
@@ -80,8 +80,8 @@ class MediaManager extends MediaLibrary
     public $archive;
 
     public $shopEnabled;
-	public $_strOkMessage = '';
-    
+    public $_strOkMessage = '';
+
     public $arrImageQualityValues = array(5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100);
 
 
@@ -98,7 +98,7 @@ class MediaManager extends MediaLibrary
         $this->_objTpl = new \Cx\Core\Html\Sigma(ASCMS_CORE_MODULE_PATH.'/Media/View/Template/Backend');
         \Cx\Core\Csrf\Controller\Csrf::add_placeholder($this->_objTpl);
         $this->_objTpl->setErrorHandling(PEAR_ERROR_DIE);
-        
+
         $this->arrPaths     = array(ASCMS_MEDIA1_PATH.DIRECTORY_SEPARATOR,
                                     ASCMS_MEDIA2_PATH.DIRECTORY_SEPARATOR,
                                     ASCMS_MEDIA3_PATH.DIRECTORY_SEPARATOR,
@@ -227,7 +227,7 @@ class MediaManager extends MediaLibrary
                 $objTemplate->setVariable('CONTENT_NAVIGATION', '
                     <a href="index.php?cmd=Media&amp;archive=content">'. $_ARRAYLANG['TXT_IMAGE_CONTENT'] .'</a>
                     <a href="index.php?cmd=Media&amp;archive=attach" class="active">'. $_ARRAYLANG['TXT_MODULE'] .'</a>
-                    <a href="index.php?cmd=Media&amp;archive=themes">'. $_ARRAYLANG['TXT_MEDIA_LAYOUT'] .'</a>    
+                    <a href="index.php?cmd=Media&amp;archive=themes">'. $_ARRAYLANG['TXT_MEDIA_LAYOUT'] .'</a>
                 ');
                 break;
             case 'Blog':
@@ -285,7 +285,7 @@ class MediaManager extends MediaLibrary
                     <a href="index.php?cmd=Media&amp;archive=attach" class="active">'. $_ARRAYLANG['TXT_MODULE'] .'</a>
                     <a href="index.php?cmd=Media&amp;archive=themes">'. $_ARRAYLANG['TXT_MEDIA_LAYOUT'] .'</a>
                 ');
-                break; 
+                break;
             default:
                 \Permission::checkAccess(7, 'static');
                 $objTemplate->setVariable('CONTENT_NAVIGATION', '
@@ -316,13 +316,13 @@ class MediaManager extends MediaLibrary
      */
     private function checkModule($module) {
         global $objDatabase;
-        
+
         if (($objResult = $objDatabase->SelectLimit('SELECT `id` FROM `'.DBPREFIX.'modules` WHERE `name` = "'.$module.'" AND `status` = "y"', 1)) !== false) {
             if ($objResult->RecordCount() > 0) {
                 return true;
             }
         }
-        
+
         return false;
     }
 
@@ -432,7 +432,7 @@ class MediaManager extends MediaLibrary
         global $_ARRAYLANG, $_CONFIG, $_CORELANG, $objDatabase;
 
         \JS::activate('shadowbox');
-        
+
         $this->_objTpl->loadTemplateFile('module_media.html', true, true);
 
         switch ($this->archive) {
@@ -454,7 +454,7 @@ class MediaManager extends MediaLibrary
             case 'MediaDir':
             case 'Podcast':
             case 'Shop':
-                
+
                 $archives = array(
                     'attach' => 'TXT_FILE_UPLOADS',
                     'Shop' => 'TXT_IMAGE_SHOP',
@@ -469,7 +469,7 @@ class MediaManager extends MediaLibrary
                 $moduleMatchTable = array(
                     'attach' => 'core',
                 );
-                
+
                 $subnavigation = '
                     <div id="subnavbar_level2">
                         <ul>';
@@ -585,7 +585,7 @@ class MediaManager extends MediaLibrary
                 $this->highlightName = $sessionHighlightCandidates;
             }
         }
-        
+
         // Check if an image has been edited.
         // If yes, we know the edited file and want to highlight them.
         if (!empty($_GET['editedImage'])) {
@@ -960,24 +960,24 @@ class MediaManager extends MediaLibrary
 
         // Activate cx
         \JS::activate('cx');
-        
+
         // Activate jQuery and imgAreaSelect
         \JS::activate('jquery');
         \JS::activate('jquery-imgareaselect');
-        
+
         try {
             // Get quality options from the settings
             $arrImageSettings = $this->getImageSettings();
         } catch (\Exception $e) {
             \DBG::msg('Could not query image settings: '.$e->getMessage());
         }
-        
+
         $check = true;
         empty($this->getFile) ? $check = false : '';
         empty($this->getPath) ? $check = false : '';
         !file_exists($this->path.$this->getFile) ? $check = false : '';
-        
-        
+
+
         if ($check) { // File exists
             $this->_objTpl->setVariable(array(
                 'TXT_MEDIA_SAVE'       => $_ARRAYLANG['TXT_MEDIA_SAVE'],
@@ -1005,7 +1005,7 @@ class MediaManager extends MediaLibrary
 
             // Edit image
             $imageSize  = @getimagesize($this->path.$this->getFile);
-            
+
             $this->_objTpl->setVariable(array(
                 'TXT_MEDIA_IMAGE_MANIPULATION'    => $_ARRAYLANG['TXT_MEDIA_IMAGE_MANIPULATION'],
                 'TXT_MEDIA_WIDTH'                 => $_ARRAYLANG['TXT_MEDIA_WIDTH'],
@@ -1030,7 +1030,7 @@ class MediaManager extends MediaLibrary
                 'MEDIA_IMG_WIDTH'                 => $imageSize[0],
                 'MEDIA_IMG_HEIGHT'                => $imageSize[1],
             ));
-            
+
             foreach ($this->arrImageQualityValues as $value) {
                 $this->_objTpl->setVariable(array(
                     'IMAGE_QUALITY_VALUE'          => $value,
@@ -1256,10 +1256,10 @@ class MediaManager extends MediaLibrary
                 if (isset($_POST['media' . $i . '_access_associated_groups'])) {
                     $accessGroups = $_POST['media' . $i . '_access_associated_groups'];
                 }
-                
+
                 // add AccessID
                 $newMediaSetting = \Permission::createNewDynamicAccessId();
-                
+
                 // save AccessID
                 if (count($accessGroups)) {
                     \Permission::setAccess($newMediaSetting, 'dynamic', $accessGroups);

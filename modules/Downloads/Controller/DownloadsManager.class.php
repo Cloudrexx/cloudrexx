@@ -76,7 +76,7 @@ class DownloadsManager extends DownloadsLibrary
     private $parentCategoryId = 0;
 
     private $act = '';
-    
+
     /**
      * PHP5 constructor
      * @global object $objTemplate
@@ -88,7 +88,7 @@ class DownloadsManager extends DownloadsLibrary
 
         $this->objTemplate = new \Cx\Core\Html\Sigma(ASCMS_MODULE_PATH.'/Downloads/View/Template/Backend');
         \Cx\Core\Csrf\Controller\Csrf::add_placeholder($this->objTemplate);
-        $this->objTemplate->setErrorHandling(PEAR_ERROR_DIE);        
+        $this->objTemplate->setErrorHandling(PEAR_ERROR_DIE);
         parent::__construct();
     }
     private function setNavigation()
@@ -596,7 +596,7 @@ class DownloadsManager extends DownloadsLibrary
             'DOWNLOADS_GROUP_NOT_ASSOCIATED_CATEGORIES'  => implode("\n", $arrNotAssociatedCategoryOptions),
             'DOWNLOADS_MEDIA_BROWSER_BUTTON'             => self::getMediaBrowserButton(null, 'sitestructure')
         ));
-        
+
         return true;
     }
 
@@ -928,12 +928,12 @@ class DownloadsManager extends DownloadsLibrary
             'DOWNLOADS_CATEGORY_MENU'       => $this->getCategoryMenu('read', $objCategory->getId(), $_ARRAYLANG['TXT_DOWNLOADS_ALL_CATEGORIES']),
             'TXT_DOWNLOADS_SEARCH'          => $_ARRAYLANG['TXT_DOWNLOADS_SEARCH'],
         ));
-        
+
         $filter = null;
         if($objCategory->getId() > 0) {
             $filter = array('category_id' => $objCategory->getId());
         }
-        
+
         $objDownload = new Download();
         $objDownload->loadDownloads(
             $filter, $searchTerm, $arrOrder, null,
@@ -1763,31 +1763,31 @@ class DownloadsManager extends DownloadsLibrary
         ));
         return true;
     }
-    
+
     /**
      * Mediabrowser integrated into the downloads modules.
-     * 
+     *
      * @global array $_ARRAYLANG
      * @param string $view optional argument
      */
     public static function getMediaBrowserButton($id, $type = 'filebrowser')
     {
         global $_ARRAYLANG;
-        
+
         $mediaBrowser = new \Cx\Core_Modules\MediaBrowser\Model\Entity\MediaBrowser();
         $mediaBrowser->setCallback('mbCallback');
         $options = array(
             'type'             => 'button',
             'data-cx-mb-views' => $type,
         );
-        
+
         if (!empty($id)) {
             $options['id']    = $id;
             $options['style'] = 'display:none;';
         }
-        
+
         $mediaBrowser->setOptions($options);
-        
+
         return $mediaBrowser->getXHtml($_ARRAYLANG['TXT_DOWNLOADS_BROWSE']);
     }
 
@@ -2330,8 +2330,8 @@ class DownloadsManager extends DownloadsLibrary
                 'DOWNLOADS_CATEGORY_DOWNLOAD_OFFSET'        => $downloadLimitOffset
             ));
         }
-        
-        
+
+
         $this->objTemplate->setVariable(array(
             'TXT_DOWNLOADS_OPERATION_IRREVERSIBLE'      => $_ARRAYLANG['TXT_DOWNLOADS_OPERATION_IRREVERSIBLE'],
             'TXT_DOWNLOADS_DELETE_SUBCATEGORIES'        => $_ARRAYLANG['TXT_DOWNLOADS_DELETE_SUBCATEGORIES'],
@@ -2341,7 +2341,7 @@ class DownloadsManager extends DownloadsLibrary
             'TXT_DOWNLOADS_FUNCTIONS'                   => $_ARRAYLANG['TXT_DOWNLOADS_FUNCTIONS'],
             'DOWNLOADS_CATEGORY_COLSPAN'                => $minColspan + $operateOnSubcategories,
         ));
-        
+
 
         if ($objCategory->getId()) {
             $this->objTemplate->setVariable('TXT_DOWNLOADS_CATEGORIES_OF_CATEGORY', sprintf($_ARRAYLANG['TXT_DOWNLOADS_CATEGORIES_OF_CATEGORY'], '&bdquo;'.htmlentities($objCategory->getName($_LANGID), ENT_QUOTES, CONTREXX_CHARSET).'&ldquo;'));
@@ -2668,11 +2668,11 @@ class DownloadsManager extends DownloadsLibrary
             $this->arrConfig['new_file_time_limit']         = !empty($_POST['downloads_settings_new_file_time_limit']) ? intval($_POST['downloads_settings_new_file_time_limit']) : $this->arrConfig['new_file_time_limit'];
             $this->arrConfig['updated_file_time_limit']     = !empty($_POST['downloads_settings_updated_file_time_limit']) ? intval($_POST['downloads_settings_updated_file_time_limit']) : $this->arrConfig['updated_file_time_limit'];
             $this->arrConfig['associate_user_to_groups']    = !empty($_POST['downloads_settings_associate_user_to_groups_associated_groups']) ? implode(',', array_map('intval', $_POST['downloads_settings_associate_user_to_groups_associated_groups'])) : $this->arrConfig['associate_user_to_groups'];
-            $this->arrConfig['downloads_sorting_order']     = (     !empty($_POST['downloads_settings_sorting_downloads']) 
-                                                                && array_key_exists($_POST['downloads_settings_sorting_downloads'], $this->downloadsSortingOptions) 
+            $this->arrConfig['downloads_sorting_order']     = (     !empty($_POST['downloads_settings_sorting_downloads'])
+                                                                && array_key_exists($_POST['downloads_settings_sorting_downloads'], $this->downloadsSortingOptions)
                                                               ) ? contrexx_input2db($_POST['downloads_settings_sorting_downloads']) : $this->arrConfig['downloads_sorting_order'];
             $this->arrConfig['categories_sorting_order']    = (     !empty($_POST['downloads_settings_sorting_categories'])
-                                                                &&  array_key_exists($_POST['downloads_settings_sorting_categories'], $this->categoriesSortingOptions) 
+                                                                &&  array_key_exists($_POST['downloads_settings_sorting_categories'], $this->categoriesSortingOptions)
                                                               ) ? contrexx_input2db($_POST['downloads_settings_sorting_categories']) : $this->arrConfig['categories_sorting_order'];
 
             $this->updateSettings();
@@ -2698,7 +2698,7 @@ class DownloadsManager extends DownloadsLibrary
         //Parse the option 'Downloads' and 'Categories' dropdown in the 'Sorting' section
         $this->parseSettingsDropDown($this->objTemplate, $this->downloadsSortingOptions, $this->arrConfig['downloads_sorting_order'], 'downloads');
         $this->parseSettingsDropDown($this->objTemplate, $this->categoriesSortingOptions, $this->arrConfig['categories_sorting_order'], 'categories');
-        
+
         $this->objTemplate->setVariable(array(
             'TXT_DOWNLOADS_SETTINGS_LISTING'                => $_ARRAYLANG['TXT_DOWNLOADS_SETTINGS_LISTING'],
             'TXT_DOWNLOADS_OVERVIEW_PAGE'                   => $_ARRAYLANG['TXT_DOWNLOADS_OVERVIEW_PAGE'],

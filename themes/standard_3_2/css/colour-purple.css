@@ -1,21 +1,21 @@
 /*/////////////////////////////////////////////////////////////////////
- // 
+ //
  // Custom theme code styles
  // Written by Themelize.me (http://themelize.me)
- // 
+ //
  // This is an empty starter template for overriding styles
  // set by Bootstrap & the theme
- // 
+ //
  // ----------------------------------------------------
- // 
+ //
  // Remove unused code for better performances
- // 
+ //
  // ----------------------------------------------------
- // 
+ //
  // @see - Usefuls tools online for editing
  // 1. http://charliepark.org/bootstrap_buttons/ - Button style generator
  // 2. http://www.colorzilla.com/gradient-editor/ - CSS3 gradient maker
- // 
+ //
  // @note
  // To ensure custom styles are picked up
  // wrap definitions in body tag
@@ -23,7 +23,7 @@
  // body .navbar-inner {
  //   background: #ff0000;
  // }
- // 
+ //
  /////////////////////////////////////////////////////////////////////*/
 .clearfix {
   *zoom: 1;
@@ -60,7 +60,7 @@
 /*
  * --------------------------------------------------
  * 2. Colour overrides
- *-------------------------------------------------- 
+ *--------------------------------------------------
  */
 body a {
   color: #7f0046;
@@ -304,12 +304,12 @@ body #navigation ul#main-menu li.dropdown.open ul.dropdown-menu a {
 
 .menu {
   background-color: #750040;
-  border: none; 	
+  border: none;
 }
 
 #navigation ul#main-menu li.level-1.main-navigation:hover ul.menu {
-	border-top-color: #7f0046;
-	border-bottom-color: #7f0046;
+  border-top-color: #7f0046;
+  border-bottom-color: #7f0046;
 }
 
 body #highlighted {
@@ -859,5 +859,5 @@ a:hover .icon-inverse-80 {
 }
 
 #subnavigation ul li a{
-	color: #7f0046;
+  color: #7f0046;
 }

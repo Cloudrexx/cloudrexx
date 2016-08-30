@@ -37,7 +37,7 @@
 namespace Cx\Modules\Order\Controller;
 
 /**
- * 
+ *
  * SubscriptionController for displaying all the subscriptions.
  *
  * @copyright   Cloudrexx AG
@@ -46,28 +46,28 @@ namespace Cx\Modules\Order\Controller;
  * @subpackage  module_order
  */
 class SubscriptionController extends \Cx\Core\Core\Model\Entity\Controller {
-    
+
     /**
      * Em instance
      * @var \Doctrine\ORM\EntityManager em
      */
     protected $em;
-    
+
     /**
      * Sigma template instance
      * @var Cx\Core\Html\Sigma  $template
      */
     protected $template;
-    
+
     /**
-     * OrderRepository instance 
+     * OrderRepository instance
      * @var \Cx\Modules\Order\Model\Repository\SubscriptionRepository $subscriptionRepo
      */
     protected $subscriptionRepo;
-    
+
     /**
      * Controller for the Backend subscription views
-     * 
+     *
      * @param \Cx\Core\Core\Model\Entity\SystemComponentController $systemComponentController the system component controller object
      * @param \Cx\Core\Core\Controller\Cx                          $cx                        the cx object
      * @param \Cx\Core\Html\Sigma                                  $template                  the template object
@@ -75,33 +75,33 @@ class SubscriptionController extends \Cx\Core\Core\Model\Entity\Controller {
      */
     public function __construct(\Cx\Core\Core\Model\Entity\SystemComponentController $systemComponentController, \Cx\Core\Core\Controller\Cx $cx) {
         parent::__construct($systemComponentController, $cx);
-        
+
         $this->em                = $this->cx->getDb()->getEntityManager();
         $this->subscriptionRepo   = $this->em->getRepository('Cx\Modules\Order\Model\Entity\Subscription');
-        
+
     }
-    
+
     /**
      * Use this to parse your backend page
-     * 
-     * @param \Cx\Core\Html\Sigma $template 
+     *
+     * @param \Cx\Core\Html\Sigma $template
      */
     public function parsePage(\Cx\Core\Html\Sigma $template) {
         $this->template = $template;
-        
+
         $this->showSubscriptions();
     }
-    
-    public function showSubscriptions() 
+
+    public function showSubscriptions()
     {
         global $_ARRAYLANG;
-        
+
         $term          = isset($_GET['term']) ? contrexx_input2raw($_GET['term']) : '';
-        $filterProduct = isset($_GET['filter_product']) 
+        $filterProduct = isset($_GET['filter_product'])
                          ? contrexx_input2raw($_GET['filter_product']) : array();
-        $filterState   = isset($_GET['filter_state']) 
+        $filterState   = isset($_GET['filter_state'])
                          ? contrexx_input2raw($_GET['filter_state']) : array();
-        
+
         if (!empty($term) || !empty($filterProduct) || !empty($filterState)) {
             $filter    = array('term' => $term, 'filterProduct' => $filterProduct, 'filterState' => $filterState);
             $subscriptions = $this->subscriptionRepo->findSubscriptionsBySearchTerm($filter);
@@ -115,10 +115,10 @@ class SubscriptionController extends \Cx\Core\Core\Model\Entity\Controller {
 
         $products = \Env::get('em')->getRepository('Cx\Modules\Pim\Model\Entity\Product')->findAll();
         $this->getSearchFilterDropDown($products, $filterProduct, 'product');
-        
-        $subscriptionStates = array(\Cx\Modules\Order\Model\Entity\Subscription::STATE_ACTIVE, 
-                                    \Cx\Modules\Order\Model\Entity\Subscription::STATE_INACTIVE, 
-                                    \Cx\Modules\Order\Model\Entity\Subscription::STATE_TERMINATED, 
+
+        $subscriptionStates = array(\Cx\Modules\Order\Model\Entity\Subscription::STATE_ACTIVE,
+                                    \Cx\Modules\Order\Model\Entity\Subscription::STATE_INACTIVE,
+                                    \Cx\Modules\Order\Model\Entity\Subscription::STATE_TERMINATED,
                                     \Cx\Modules\Order\Model\Entity\Subscription::STATE_CANCELLED
                               );
         $this->getSearchFilterDropDown($subscriptionStates, $filterState, 'state');
@@ -137,13 +137,13 @@ class SubscriptionController extends \Cx\Core\Core\Model\Entity\Controller {
         }
         $this->template->setVariable('SUBSCRIPTIONS_CONTENT', $view->render());
     }
-    
+
     /**
      * Get search filter dropdown
-     * 
+     *
      * @param mixed   $filterDropDownValues
      * @param mixed   $selected
-     * @param string  $block       
+     * @param string  $block
      */
     public function getSearchFilterDropDown($filterDropDownValues, $selected, $block) {
 
@@ -153,7 +153,7 @@ class SubscriptionController extends \Cx\Core\Core\Model\Entity\Controller {
                 $filterDropDownName  = $filterDropDownValue->getName();
                 $filterDropDownValue = $filterDropDownValue->getId();
             }
-            
+
             $selectedVal = in_array($filterDropDownValue, $selected) ? 'selected' : '';
             $this->template->setVariable(array(
                 'ORDER_SUBSCRIPTION_'.strtoupper($block).'_NAME'         => contrexx_raw2xhtml($filterDropDownName),

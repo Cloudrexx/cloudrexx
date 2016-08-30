@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * This listener is done for the Log entry objects.
  *
@@ -56,7 +56,7 @@ class LogEntryEventListenerException extends \Exception {}
  */
 class LogEntryEventListener implements \Cx\Core\Event\Model\Entity\EventListener {
     public function onFlush($eventArgs) {}
-    
+
     public function onEvent($eventName, array $eventArgs) {
         $this->$eventName(current($eventArgs));
     }

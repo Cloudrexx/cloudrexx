@@ -64,7 +64,7 @@ class ExposedComboUploader extends ComboUploader
 
         $tpl = new \Cx\Core\Html\Sigma(ASCMS_CORE_MODULE_PATH.'/Upload/template/uploaders');
         $tpl->setErrorHandling(PEAR_ERROR_DIE);
-        
+
         $tpl->loadTemplateFile('exposedCombo.html');
 
         $tpl->setVariable(array(

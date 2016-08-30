@@ -12,4 +12,3 @@ function flowPlayerOpenFullScreen(config) {
 function flowPlayerExitFullScreen(config) {
   self.close();
 }
-

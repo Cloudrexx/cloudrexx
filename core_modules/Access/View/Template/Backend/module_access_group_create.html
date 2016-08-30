@@ -1,25 +1,25 @@
 <!-- start module_access_group_create.html -->
 <form action="index.php?cmd=Access&amp;act=group&amp;tpl=create" method="post">
-	<table width="100%" cellspacing="0" cellpadding="3" border="0" class="adminlist">
-		<thead style="wihte-space: nowrap;">
-			<tr>
-				<th>{TXT_ACCESS_CREATE_GROUP}</th>
-			</tr>
-		</thead>
-		<tbody style="vertical-align:top;">
-			<tr class="row3" style="font-weight:bold;">
-				<td>{TXT_ACCESS_CREATE_GROUP_TYPE_QUESTION}</td>
-			</tr>
-				<tr class="row1">
-					<td>
-						<input type="radio" name="access_group_type" value="frontend" id="access_group_type_frontend" checked="checked" /> <label for="access_group_type_frontend">{TXT_ACCESS_FRONTEND_DESC}</label><br />
-						<input type="radio" name="access_group_type" value="backend" id="access_group_type_backend" /> <label for="access_group_type_backend">{TXT_ACCESS_BACKEND_DESC}</label>
-					</td>
-				</tr>
-		</tbody>
-	</table>
-	<br />
-	<input type="button" name="access_cancel" value="{TXT_ACCESS_CANCEL}" onclick="window.location.href='index.php?cmd=Access&{CSRF_PARAM}&amp;act=group'" />
-	<input type="submit" name="access_create_group" value="{TXT_ACCESS_NEXT}" />
+  <table width="100%" cellspacing="0" cellpadding="3" border="0" class="adminlist">
+    <thead style="wihte-space: nowrap;">
+      <tr>
+        <th>{TXT_ACCESS_CREATE_GROUP}</th>
+      </tr>
+    </thead>
+    <tbody style="vertical-align:top;">
+      <tr class="row3" style="font-weight:bold;">
+        <td>{TXT_ACCESS_CREATE_GROUP_TYPE_QUESTION}</td>
+      </tr>
+        <tr class="row1">
+          <td>
+            <input type="radio" name="access_group_type" value="frontend" id="access_group_type_frontend" checked="checked" /> <label for="access_group_type_frontend">{TXT_ACCESS_FRONTEND_DESC}</label><br />
+            <input type="radio" name="access_group_type" value="backend" id="access_group_type_backend" /> <label for="access_group_type_backend">{TXT_ACCESS_BACKEND_DESC}</label>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+  <br />
+  <input type="button" name="access_cancel" value="{TXT_ACCESS_CANCEL}" onclick="window.location.href='index.php?cmd=Access&{CSRF_PARAM}&amp;act=group'" />
+  <input type="submit" name="access_create_group" value="{TXT_ACCESS_NEXT}" />
 </form>
 <!-- end module_access_group_create.html -->

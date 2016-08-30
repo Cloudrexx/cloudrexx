@@ -104,7 +104,7 @@ class Relation extends \Cx\Model\Base\EntityBase {
     {
         $this->children = new \Doctrine\Common\Collections\ArrayCollection();
     }
-    
+
     /**
      * Get id
      *

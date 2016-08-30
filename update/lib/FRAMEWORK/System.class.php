@@ -52,23 +52,23 @@
  */
 class FWSystem
 {
-	/**
-	* Returns the maximum file size in bytes that is allowed to upload
-	*
-	* @return string filesize
-	*/
+    /**
+    * Returns the maximum file size in bytes that is allowed to upload
+    *
+    * @return string filesize
+    */
     static public function getMaxUploadFileSize()
-	{
+    {
         $upload_max_filesize = self::getBytesOfLiteralSizeFormat(ini_get('upload_max_filesize'));
         $post_max_size = self::getBytesOfLiteralSizeFormat(ini_get('post_max_size'));
 
-		if ($upload_max_filesize < $post_max_size) {
-			$maxUploadFilesize = $upload_max_filesize;
-		} else {
-			$maxUploadFilesize = $post_max_size;
-		}
-		return $maxUploadFilesize;
-	}
+        if ($upload_max_filesize < $post_max_size) {
+            $maxUploadFilesize = $upload_max_filesize;
+        } else {
+            $maxUploadFilesize = $post_max_size;
+        }
+        return $maxUploadFilesize;
+    }
 
     /**
      * Return the literal size of $bytes with the appropriate suffix (bytes, KB, MB, GB)

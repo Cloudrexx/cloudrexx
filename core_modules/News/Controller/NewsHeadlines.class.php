@@ -98,7 +98,7 @@ class NewsHeadlines extends \Cx\Core_Modules\News\Controller\NewsLibrary
         } else {//fetch news
             $objResult = $objDatabase->SelectLimit("
                 SELECT DISTINCT(tblN.id) AS id,
-                       tblN.`date`, 
+                       tblN.`date`,
                        tblN.teaser_image_path,
                        tblN.teaser_image_thumbnail_path,
                        tblN.redirect,
@@ -107,7 +107,7 @@ class NewsHeadlines extends \Cx\Core_Modules\News\Controller\NewsLibrary
                        tblN.author,
                        tblN.author_id,
                        tblL.text NOT REGEXP '^(<br type=\"_moz\" />)?\$' AS newscontent,
-                       tblL.title AS title, 
+                       tblL.title AS title,
                        tblL.teaser_text
                   FROM ".DBPREFIX."module_news AS tblN
             INNER JOIN ".DBPREFIX."module_news_locale AS tblL ON tblL.news_id=tblN.id
@@ -196,10 +196,10 @@ class NewsHeadlines extends \Cx\Core_Modules\News\Controller\NewsLibrary
                         $this->_objTemplate->hideBlock('news_image');
                     }
                 }
-                
+
                 self::parseImageBlock($this->_objTemplate, $objResult->fields['teaser_image_thumbnail_path'], $newstitle, $newsUrl, 'image_thumbnail');
                 self::parseImageBlock($this->_objTemplate, $objResult->fields['teaser_image_path'], $newstitle, $newsUrl, 'image_detail');
-                
+
                 $this->_objTemplate->parse('headlines_row');
                 $i++;
                 $objResult->MoveNext();
@@ -211,4 +211,3 @@ class NewsHeadlines extends \Cx\Core_Modules\News\Controller\NewsLibrary
         return $this->_objTemplate->get();
     }
 }
-

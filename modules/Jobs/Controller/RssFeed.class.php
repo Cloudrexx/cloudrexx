@@ -110,7 +110,7 @@ class RssFeed
         if(is_writeable($this->filePath) AND is_dir($this->filePath)){
             return true;
         }
-        else{  
+        else{
             return false;
         }
     }
@@ -153,7 +153,7 @@ class RssFeed
 //                             ".DBPREFIX."access_users AS u
 //                        WHERE n.userid = u.id AND n.lang = ".$_LANGID."
 //                        ORDER BY n.id DESC";
-            
+
             $query = "SELECT n.id AS docId,
                                n.date,
                                n.title,
@@ -164,7 +164,7 @@ class RssFeed
                                u.id
                         FROM ".DBPREFIX."module_jobs AS n,
                              ".DBPREFIX."access_users AS u
-                        WHERE n.userid = u.id AND n.lang = ".$_LANGID." AND n.status = 1 AND (startdate<='".date('Y-m-d')."' OR startdate='0000-00-00 00:00:00') AND (enddate>='".date('Y-m-d')."' OR enddate='0000-00-00 00:00:00') 
+                        WHERE n.userid = u.id AND n.lang = ".$_LANGID." AND n.status = 1 AND (startdate<='".date('Y-m-d')."' OR startdate='0000-00-00 00:00:00') AND (enddate>='".date('Y-m-d')."' OR enddate='0000-00-00 00:00:00')
                         ORDER BY n.id DESC";
             $objResult = $objDatabase->SelectLimit($query, $this->limit);
 

@@ -3,8 +3,8 @@
 <script type="text/javascript">
 // needs prototype.js
 //<![CDATA[
-function deleteEntry(entryId){ 
-    if(confirm('{TXT_ENTRIES_DELETE_ENTRY_JS}')) 
+function deleteEntry(entryId){
+    if(confirm('{TXT_ENTRIES_DELETE_ENTRY_JS}'))
         window.location.replace("?cmd=Data&{CSRF_PARAM}&act=deleteEntry&id="+entryId);
 }
 
@@ -17,7 +17,7 @@ function selectMultiAction() {
                     submit();
                 }
             break;
-            default: //do nothing			
+            default: //do nothing
         }
     }
 }
@@ -125,7 +125,7 @@ $J(document).ready(function () {
                                 <div align="right">
                                     <a href="index.php?cmd=Data&amp;act=editEntry&amp;id={ENTRY_ID}" target="_self" title="{TXT_IMGALT_EDIT}"><img src="../core/Core/View/Media/icons/edit.gif" border="0" alt="{TXT_IMGALT_EDIT}" title="{TXT_IMGALT_EDIT}" /></a>
                                     <a href="index.php?cmd=Data&amp;act=copyEntry&amp;id={ENTRY_ID}" target="_self" title="{TXT_IMGALT_COPY}"><img src="../core/Core/View/Media/icons/copy.gif" border="0" alt="{TXT_IMGALT_EDIT}" title="{TXT_IMGALT_EDIT}" /></a>
-                                    <a href="javascript:deleteEntry({ENTRY_ID});" target="_self" title="{TXT_IMGALT_DELETE}"><img src="../core/Core/View/Media/icons/delete.gif" border="0" alt="{TXT_IMGALT_DELETE}" title="{TXT_IMGALT_DELETE}" /></a> 
+                                    <a href="javascript:deleteEntry({ENTRY_ID});" target="_self" title="{TXT_IMGALT_DELETE}"><img src="../core/Core/View/Media/icons/delete.gif" border="0" alt="{TXT_IMGALT_DELETE}" title="{TXT_IMGALT_DELETE}" /></a>
                                 </div>
                             </td>
                         </tr>
@@ -134,14 +134,14 @@ $J(document).ready(function () {
                     <!-- BEGIN noEntries -->
                     <tr class="row2">
                         <td colspan="10"><div align="center"><br />{TXT_ENTRIES_NO_ENTRIES_FOUND}<br /><br /></div></td>
-                    </tr>		
+                    </tr>
                     <!-- END noEntries -->
                 </table>
                 <table cellpadding="2" cellspacing="0" border="0">
                     <tr>
                         <td>
                             <img src="../core/Core/View/Media/icons/arrow.gif" border="0" width="38" height="22" alt="{TXT_ENTRIES_MARKED}:" />
-                            <a href="#" onclick="changeCheckboxes('frmShowEntries','selectedEntriesId[]',true); return false;">{TXT_ENTRIES_SELECT_ALL}</a> / 
+                            <a href="#" onclick="changeCheckboxes('frmShowEntries','selectedEntriesId[]',true); return false;">{TXT_ENTRIES_SELECT_ALL}</a> /
                             <a href="#" onclick="changeCheckboxes('frmShowEntries','selectedEntriesId[]',false); return false;">{TXT_ENTRIES_DESELECT_ALL}</a>
                             <img src="../core/Core/View/Media/icons/strike.gif" alt="" />
                             <select name="frmShowEntries_MultiAction" onchange="selectMultiAction();">

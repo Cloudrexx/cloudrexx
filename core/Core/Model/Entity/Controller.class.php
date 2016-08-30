@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,10 +24,10 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * This is the superclass for all Controller classes
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author      Michael Ritter <michael.ritter@comvation.com>
  * @package     cloudrexx
@@ -38,7 +38,7 @@ namespace Cx\Core\Core\Model\Entity;
 
 /**
  * This is the superclass for all Controller classes
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author      Michael Ritter <michael.ritter@comvation.com>
  * @package     cloudrexx
@@ -46,19 +46,19 @@ namespace Cx\Core\Core\Model\Entity;
  * @version     3.1.0
  */
 abstract class Controller {
-    
+
     /**
      * Main class instance
      * @var \Cx\Core\Core\Controller\Cx
      */
     protected $cx = null;
-    
+
     /**
      * SystemComponentController for this Component
      * @var \Cx\Core\Core\Model\Entity\SystemComponentController
      */
     private $systemComponentController = null;
-    
+
     /**
      * Creates new controller
      * @param SystemComponentController $systemComponentController Main controller for this system component
@@ -69,7 +69,7 @@ abstract class Controller {
         $this->systemComponentController = $systemComponentController;
         $this->systemComponentController->registerController($this);
     }
-    
+
     /**
      * Returns the main controller
      * @return SystemComponentController Main controller for this system component
@@ -77,7 +77,7 @@ abstract class Controller {
     public function getSystemComponentController() {
         return $this->systemComponentController;
     }
-    
+
     /**
      * Route methods like getName(), getType(), getDirectory(), etc.
      * @param string $methodName Name of method to call

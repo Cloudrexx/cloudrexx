@@ -214,8 +214,8 @@ class Product
      */
     private $arrRelations = null;
     /**
-     * Is defined, when a minimum order quantity should be checked 
-     * @var integer 
+     * Is defined, when a minimum order quantity should be checked
+     * @var integer
      */
     private $minimum_order_quantity = null;
 
@@ -709,7 +709,7 @@ class Product
 
     /**
      * The minimum order quantity
-     * @param   string    $minimum_order_quantity The optional minimum order quantity 
+     * @param   string    $minimum_order_quantity The optional minimum order quantity
      * @return  integer   minimum order quanity
      * @author  Kaleb Tschbaold <kaleb.tschabold@comvation.com>
      */
@@ -949,18 +949,18 @@ class Product
         if (!Attributes::removeFromProduct($this->id)) {
             return false;
         }
-        
+
         \Env::get('cx')->getEvents()->triggerEvent('model/preRemove', array(new \Doctrine\ORM\Event\LifecycleEventArgs($this, \Env::get('em'))));
-        
+
         $objResult = $objDatabase->Execute("
             DELETE FROM ".DBPREFIX."module_shop".MODULE_INDEX."_products
                 WHERE id=$this->id");
-        
+
         if (!$objResult) {
             return false;
         }
         \Env::get('cx')->getEvents()->triggerEvent('model/postRemove', array(new \Doctrine\ORM\Event\LifecycleEventArgs($this, \Env::get('em'))));
-        
+
         $objDatabase->Execute("
             OPTIMIZE TABLE ".DBPREFIX."module_shop".MODULE_INDEX."_products");
         return true;
@@ -1055,7 +1055,7 @@ class Product
     function update()
     {
         global $objDatabase;
-        
+
         \Env::get('cx')->getEvents()->triggerEvent('model/preUpdate', array(new \Doctrine\ORM\Event\LifecycleEventArgs($this, \Env::get('em'))));
         $args = array(
             $this->pictures,
@@ -1083,7 +1083,7 @@ class Product
             $this->minimum_order_quantity ? $this->minimum_order_quantity : '0',
             $this->id
         );
-        
+
         $query = '
             UPDATE
                 `' . DBPREFIX . 'module_shop' . MODULE_INDEX . '_products`
@@ -1136,7 +1136,7 @@ class Product
     function insert()
     {
         global $objDatabase;
-        
+
         \Env::get('cx')->getEvents()->triggerEvent('model/prePersist', array(new \Doctrine\ORM\Event\LifecycleEventArgs($this, \Env::get('em'))));
         $query = "
             INSERT INTO ".DBPREFIX."module_shop".MODULE_INDEX."_products (
@@ -1214,7 +1214,7 @@ class Product
                    `product`.`vat_id`,
                    `product`.`flags`,
                    `product`.`usergroup_ids`,
-                   `product`.`group_id`, `product`.`article_id`, 
+                   `product`.`group_id`, `product`.`article_id`,
                    `product`.`minimum_order_quantity`, ".
                    $arrSql['field']."
               FROM `".DBPREFIX."module_shop".MODULE_INDEX."_products` AS `product`".
@@ -1349,7 +1349,7 @@ class Product
     function decreaseStock($quantity)
     {
         global $objDatabase;
-        
+
         $query = "
             UPDATE ".DBPREFIX."module_shop".MODULE_INDEX."_products
                SET stock=stock-$quantity

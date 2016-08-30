@@ -38,30 +38,30 @@ namespace Cx\Modules\Order\Model\Repository;
 
 /**
  * Class PaymentRepository
- * 
+ *
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
  * @subpackage  module_order
  */
 class PaymentRepository extends \Doctrine\ORM\EntityRepository {
-    
+
     /**
      * Get the payment by criteria
-     * 
+     *
      * @param string $criteria
-     * 
+     *
      * @return object
      */
     public function findOneByCriteria($criteria) {
         if (empty($criteria)) {
             return;
         }
-        
+
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('p')
            ->from('\Cx\Modules\Order\Model\Entity\Payment', 'p');
-        
+
         $i = 1;
         foreach ($criteria as $key => $value) {
             switch ($key) {
@@ -91,7 +91,7 @@ class PaymentRepository extends \Doctrine\ORM\EntityRepository {
             }
             $i++;
         }
-        
+
         $result = $qb->getQuery()->getResult();
         if (!$result) {
             return;

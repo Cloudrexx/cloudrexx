@@ -93,7 +93,7 @@ class IndustryType
         $arrIndustries = array();
         $whereParentId = '';
         $whereActive   = '';
-        
+
         if (!empty($intIndustryId)) {
             $whereParentId = '';
         } else {
@@ -101,14 +101,14 @@ class IndustryType
                 $whereParentId = "AND parent_id = {$intParentId}";
             } else {
                 $whereParentId = "AND parent_id = 0";
-            }            
+            }
         }
 
         if ($status) {
             $whereActive = "AND (Intype.status = '1') ";
         } else {
             $whereActive = '';
-	}
+    }
         $sortOrder = 'ORDER BY sorting ASC';
 
         $objIndustries = $objDatabase->Execute("SELECT Intype.id,
@@ -147,7 +147,7 @@ class IndustryType
 
     /**
      * Set the variable if new
-     * 
+     *
      * @param String $name  variable name
      * @param String $value variable value
      *
@@ -160,7 +160,7 @@ class IndustryType
 
     /**
      * Get the variable value
-     * 
+     *
      * @param String $name variable name
      *
      * @return String

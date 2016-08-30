@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Core Mail and Template Management
  *
@@ -1018,8 +1018,8 @@ die("MailTemplate::init(): Empty section!");
         self::reset();
         return true;
     }
-    
-    
+
+
     /**
      * Show on adminview of the mail templates for the given section and group
      *
@@ -1036,7 +1036,7 @@ die("MailTemplate::init(): Empty section!");
         self::storeFromPost($section);
         if (!isset($_GET['key'])) {
             if (!empty($_GET['delete_mailtemplate_key'])) {
-               self::deleteTemplate($section); 
+               self::deleteTemplate($section);
             }
             return static::overview($section, $group, $limit, false, $act);
         } else {

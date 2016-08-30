@@ -76,7 +76,7 @@ class JobsManager extends JobsLibrary
         $this->pageTitle = $_ARRAYLANG["TXT_JOBS_MANAGER"];
         $this->_objTpl = new \Cx\Core\Html\Sigma(ASCMS_MODULE_PATH.'/Jobs/View/Template/Backend');
         \Cx\Core\Csrf\Controller\Csrf::add_placeholder($this->_objTpl);
-        $this->_objTpl->setErrorHandling(PEAR_ERROR_DIE);        
+        $this->_objTpl->setErrorHandling(PEAR_ERROR_DIE);
         $this->langId=$objInit->userFrontendLangId;
     }
     private function setNavigation()
@@ -750,7 +750,7 @@ class JobsManager extends JobsLibrary
             'changelog' => array('val' => $date, 'omitEmpty' => true),
             'catId' => array('val' => $catId, 'omitEmpty' => true),
         ))." WHERE id = $id;";
-      
+
         if (!$objDatabase->Execute($query) or $dberr) {
             $this->strErrMessage = $_ARRAYLANG['TXT_DATABASE_QUERY_ERROR'];
         } else {

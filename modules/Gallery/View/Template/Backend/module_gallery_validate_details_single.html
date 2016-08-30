@@ -14,196 +14,196 @@
 <script type="text/javascript">
 function disableSubmitButton()
 {
-	document.gallery_validate.submit_button.disabled = true;
-	document.gallery_validate.update_button.disabled = false;
+  document.gallery_validate.submit_button.disabled = true;
+  document.gallery_validate.update_button.disabled = false;
 }
 
 function enableAbs()
 {
-	with (document.gallery_validate)
-	{
-		validate_thumb_size_abs_width.disabled = false;
-		validate_thumb_size_abs_height.disabled = false;
-		validate_thumb_size.disabled = true;
-	}
+  with (document.gallery_validate)
+  {
+    validate_thumb_size_abs_width.disabled = false;
+    validate_thumb_size_abs_height.disabled = false;
+    validate_thumb_size.disabled = true;
+  }
 }
 
 function enableProz()
 {
-	with (document.gallery_validate)
-	{
-		validate_thumb_size_abs_width.disabled = true;
-		validate_thumb_size_abs_height.disabled = true;
-		validate_thumb_size.disabled = false;
-	}
+  with (document.gallery_validate)
+  {
+    validate_thumb_size_abs_width.disabled = true;
+    validate_thumb_size_abs_height.disabled = true;
+    validate_thumb_size.disabled = false;
+  }
 }
 
 function calculateHeight()
 {
-	with (document.gallery_validate)
-	{
-		if (validate_thumb_size_abs_width.value > 2000)
-		{
-			var new_width = 2000;
-			validate_thumb_size_abs_width.value = 2000;
-		}
-		else
-		{
-			if (validate_thumb_size_abs_width.value == '')
-			{
-				var new_width = 100;
-				validate_thumb_size_abs_width.value = 100;
-			}
-			else
-			{
-				var new_width = validate_thumb_size_abs_width.value;
-			}
-		}
-		var old_width = {DETAILS_WIDTH_ORIG};
-		var old_height = {DETAILS_HEIGHT_ORIG};
-		var new_height = Math.round((old_height * new_width) / old_width);
-		validate_thumb_size_abs_height.value = new_height;
-	}
+  with (document.gallery_validate)
+  {
+    if (validate_thumb_size_abs_width.value > 2000)
+    {
+      var new_width = 2000;
+      validate_thumb_size_abs_width.value = 2000;
+    }
+    else
+    {
+      if (validate_thumb_size_abs_width.value == '')
+      {
+        var new_width = 100;
+        validate_thumb_size_abs_width.value = 100;
+      }
+      else
+      {
+        var new_width = validate_thumb_size_abs_width.value;
+      }
+    }
+    var old_width = {DETAILS_WIDTH_ORIG};
+    var old_height = {DETAILS_HEIGHT_ORIG};
+    var new_height = Math.round((old_height * new_width) / old_width);
+    validate_thumb_size_abs_height.value = new_height;
+  }
 }
 
 function calculateWidth()
 {
-	with (document.gallery_validate)
-	{
-		if (validate_thumb_size_abs_height.value > 2000)
-		{
-			var new_height = 2000;
-			validate_thumb_size_abs_height.value = 2000;
-		}
-		else
-		{	
-			if (validate_thumb_size_abs_height.value == '')
-			{
-				var new_height = 100;
-				validate_thumb_size_abs_height.value = 100;
-			}
-			else
-			{
-				var new_height = validate_thumb_size_abs_height.value;
-			}
-		}
-		
-		var old_width = {DETAILS_WIDTH_ORIG};
-		var old_height = {DETAILS_HEIGHT_ORIG};
-		var new_width = Math.round((old_width * new_height) / old_height);
-		validate_thumb_size_abs_width.value = new_width;
-	}	
+  with (document.gallery_validate)
+  {
+    if (validate_thumb_size_abs_height.value > 2000)
+    {
+      var new_height = 2000;
+      validate_thumb_size_abs_height.value = 2000;
+    }
+    else
+    {
+      if (validate_thumb_size_abs_height.value == '')
+      {
+        var new_height = 100;
+        validate_thumb_size_abs_height.value = 100;
+      }
+      else
+      {
+        var new_height = validate_thumb_size_abs_height.value;
+      }
+    }
+
+    var old_width = {DETAILS_WIDTH_ORIG};
+    var old_height = {DETAILS_HEIGHT_ORIG};
+    var new_width = Math.round((old_width * new_height) / old_height);
+    validate_thumb_size_abs_width.value = new_width;
+  }
 }
 function showOrHide(strElement) {
-	if (document.getElementById(strElement).style.display == 'none') {
-		document.getElementById(strElement).style.display = 'block';
-	} else {
-		document.getElementById(strElement).style.display = 'none';
-	}
+  if (document.getElementById(strElement).style.display == 'none') {
+    document.getElementById(strElement).style.display = 'block';
+  } else {
+    document.getElementById(strElement).style.display = 'none';
+  }
 }
 
 function copyText(strType,strValue) {
-	for (var h=0; h < document.forms.length;h++) {
-		for (var i=0; i < document.forms[h].elements.length;i++) {
-			//read out all form-elements with the loop
-			if(document.forms[h].elements[i].name.search(strType) != -1) {
-				document.forms[h].elements[i].value = strValue;
-			}
-		}
-	}	
+  for (var h=0; h < document.forms.length;h++) {
+    for (var i=0; i < document.forms[h].elements.length;i++) {
+      //read out all form-elements with the loop
+      if(document.forms[h].elements[i].name.search(strType) != -1) {
+        document.forms[h].elements[i].value = strValue;
+      }
+    }
+  }
 }
 </script>
 
 <form name="gallery_validate" method="post" action="?cmd=Gallery&amp;act=validate_single_picture&amp;type=single">
 <table width="100%" cellspacing="0" cellpadding="3" border="0" align="top" class="adminlist">
 <tr>
-	  <th colspan="4"> 
+    <th colspan="4">
         <div align="left">{TXT_DETAILS_TITLE}</div>
       </th>
 </tr>
 <tr class="row2">
-	<td nowrap="nowrap" width="15%" valign="top">{TXT_DETAILS_NAME}</td>
-	<td colspan="3">
+  <td nowrap="nowrap" width="15%" valign="top">{TXT_DETAILS_NAME}</td>
+  <td colspan="3">
         <input type="text" name="imageName" onChange="copyText('imageName_',this.value);" value="{DETAILS_NAME}" />&nbsp;<a href="javascript:showOrHide('divLangName');">{TXT_EXTENDED}</a>
-		<div id="divLangName" style="display: none;">
-			<!-- BEGIN showNameFields -->
-			<input name="imageName_{NAMEFIELDS_LID}" value="{NAMEFIELDS_VALUE}" style="margin-top:1px;">&nbsp;<label for="imageName_{NAMEFIELDS_LID}">{NAMEFIELDS_LANGUAGE}</label> <br />
-			<!-- END showNameFields -->
-		</div>	
-	</td>
+    <div id="divLangName" style="display: none;">
+      <!-- BEGIN showNameFields -->
+      <input name="imageName_{NAMEFIELDS_LID}" value="{NAMEFIELDS_VALUE}" style="margin-top:1px;">&nbsp;<label for="imageName_{NAMEFIELDS_LID}">{NAMEFIELDS_LANGUAGE}</label> <br />
+      <!-- END showNameFields -->
+    </div>
+  </td>
 </tr>
 <tr class="row1">
-	<td nowrap="nowrap">{TXT_DETAILS_UPLOADDATE}</td>
-	<td colspan="3">{DETAILS_UPLOADDATE}</td>
+  <td nowrap="nowrap">{TXT_DETAILS_UPLOADDATE}</td>
+  <td colspan="3">{DETAILS_UPLOADDATE}</td>
 </tr>
 <tr>
-	<td nowrap="nowrap">{TXT_DETAILS_CATEGORY}</td>
-	<td colspan="3">
-		<select name="validate_category" {CAT_DROPDOWN_DISABLED}>
+  <td nowrap="nowrap">{TXT_DETAILS_CATEGORY}</td>
+  <td colspan="3">
+    <select name="validate_category" {CAT_DROPDOWN_DISABLED}>
             <option value="0">{TXT_DETAILS_CATEGORYSELECT}</option>
-			<option value="0">----------------------------</option>
+      <option value="0">----------------------------</option>
             <!-- BEGIN showCategories -->
             <option value="{CAT_DROPDOWN_VALUE}" {CAT_DROPDOWN_SELECTED}>{CAT_DROPDOWN_INDENT}{CAT_DROPDOWN_NAME}</option>
-		    <!-- END showCategories -->
-		</select>
-	</td>
+        <!-- END showCategories -->
+    </select>
+  </td>
 </tr>
 <tr class="row1">
-	<td norwap>{TXT_DETAILS_ACTIVE}</td>
-	<td colspan="3">
-		<input type="checkbox" id="validate_active" name="validate_active" value="1" {DETAILS_ACTIVE_SELECTED} /> <label for="validate_active">{TXT_DETAILS_ACTIVE}</label>
-	</td>
+  <td norwap>{TXT_DETAILS_ACTIVE}</td>
+  <td colspan="3">
+    <input type="checkbox" id="validate_active" name="validate_active" value="1" {DETAILS_ACTIVE_SELECTED} /> <label for="validate_active">{TXT_DETAILS_ACTIVE}</label>
+  </td>
 </tr>
 <tr>
-	<td width="15%" nowrap="nowrap">{TXT_DETAILS_SIZE_ORIG}:</td>
-	<td width="15%" nowrap="nowrap">{DETAILS_SIZE_ORIG} kB</td>
-	<td width="15%" nowrap="nowrap">{TXT_DETAILS_HEIGHT_WIDTH_ORIG}:</td>
-	<td width="55%" nowrap="nowrap">{DETAILS_WIDTH_ORIG} x {DETAILS_HEIGHT_ORIG}</td>
+  <td width="15%" nowrap="nowrap">{TXT_DETAILS_SIZE_ORIG}:</td>
+  <td width="15%" nowrap="nowrap">{DETAILS_SIZE_ORIG} kB</td>
+  <td width="15%" nowrap="nowrap">{TXT_DETAILS_HEIGHT_WIDTH_ORIG}:</td>
+  <td width="55%" nowrap="nowrap">{DETAILS_WIDTH_ORIG} x {DETAILS_HEIGHT_ORIG}</td>
 </tr>
 <tr class="row1">
-	<td nowrap="nowrap">{TXT_DETAILS_SIZE_THUMB}:</td>
-	<td nowrap="nowrap">{DETAILS_SIZE_THUMB} kB</td>
-	<td nowrap="nowrap">{TXT_DETAILS_HEIGHT_WIDTH_THUMB}:</td>
-	<td nowrap="nowrap">{DETAILS_WIDTH_THUMB} x {DETAILS_HEIGHT_THUMB}</td>
+  <td nowrap="nowrap">{TXT_DETAILS_SIZE_THUMB}:</td>
+  <td nowrap="nowrap">{DETAILS_SIZE_THUMB} kB</td>
+  <td nowrap="nowrap">{TXT_DETAILS_HEIGHT_WIDTH_THUMB}:</td>
+  <td nowrap="nowrap">{DETAILS_WIDTH_THUMB} x {DETAILS_HEIGHT_THUMB}</td>
 </tr>
 <tr>
-	<td nowrap="nowrap">{TXT_DETAILS_NEW_SIZE_THUMB}</td>
-	<td nowrap="nowrap">
-		<input type="radio" id="details_size_selection_abs" name="validate_thumb_size_selection" value="abs" {DETAILS_SIZE_SELECTION_ABS} onClick="disableSubmitButton();enableAbs();" /> <!--   -->
-		&nbsp;<label for="details_size_selection_abs">{TXT_DETAILS_THUMB_SIZE_ABS}</label>
-	</td>
-	<td nowrap="nowrap" colspan="2">
-		<input type="radio" id="details_size_selection_proz" name="validate_thumb_size_selection" value="proz" {DETAILS_SIZE_SELECTION_PROZ} onclick="disableSubmitButton();enableProz();" /> <!--  -->
-		&nbsp;<label for="details_size_selection_proz">{TXT_DETAILS_THUMB_SIZE_PROZ}</label>
-	</td>
+  <td nowrap="nowrap">{TXT_DETAILS_NEW_SIZE_THUMB}</td>
+  <td nowrap="nowrap">
+    <input type="radio" id="details_size_selection_abs" name="validate_thumb_size_selection" value="abs" {DETAILS_SIZE_SELECTION_ABS} onClick="disableSubmitButton();enableAbs();" /> <!--   -->
+    &nbsp;<label for="details_size_selection_abs">{TXT_DETAILS_THUMB_SIZE_ABS}</label>
+  </td>
+  <td nowrap="nowrap" colspan="2">
+    <input type="radio" id="details_size_selection_proz" name="validate_thumb_size_selection" value="proz" {DETAILS_SIZE_SELECTION_PROZ} onclick="disableSubmitButton();enableProz();" /> <!--  -->
+    &nbsp;<label for="details_size_selection_proz">{TXT_DETAILS_THUMB_SIZE_PROZ}</label>
+  </td>
 </tr>
 <tr>
-	<td>&nbsp;</td>
-	<td>
-		<input type="text" name="validate_thumb_size_abs_width" maxlength="4" size="5" value="{DETAILS_SIZE_ABS_WIDTH_VALUE}" {DETAILS_SIZE_ABS_WIDTH_DISABLED} onchange="calculateHeight();disableSubmitButton()" />&nbsp;{TXT_DETAILS_THUMB_SIZE_ABS_WIDTH}<br />
-		<input type="text" name="validate_thumb_size_abs_height" maxlength="4" size="5" value="{DETAILS_SIZE_ABS_HEIGHT_VALUE}" {DETAILS_SIZE_ABS_HEIGHT_DISABLED} onchange="calculateWidth();disableSubmitButton()" />&nbsp;{TXT_DETAILS_THUMB_SIZE_ABS_HEIGHT}<br />
-	</td>
-	<td nowrap="nowrap" valign="top" colspan="2">
-	<select name="validate_thumb_size" onchange="disableSubmitButton()" {DETAILS_SIZE_PROZ_WIDTH_DISABLED}>
-		<!-- BEGIN showThumbSize -->
-			<option value="{THUMB_SIZE_VALUE}" {THUMB_SIZE_SELECTED}>{THUMB_SIZE_VALUE}%</option>
-		<!-- END showThumbSize -->
-	</select>
-	</td>
+  <td>&nbsp;</td>
+  <td>
+    <input type="text" name="validate_thumb_size_abs_width" maxlength="4" size="5" value="{DETAILS_SIZE_ABS_WIDTH_VALUE}" {DETAILS_SIZE_ABS_WIDTH_DISABLED} onchange="calculateHeight();disableSubmitButton()" />&nbsp;{TXT_DETAILS_THUMB_SIZE_ABS_WIDTH}<br />
+    <input type="text" name="validate_thumb_size_abs_height" maxlength="4" size="5" value="{DETAILS_SIZE_ABS_HEIGHT_VALUE}" {DETAILS_SIZE_ABS_HEIGHT_DISABLED} onchange="calculateWidth();disableSubmitButton()" />&nbsp;{TXT_DETAILS_THUMB_SIZE_ABS_HEIGHT}<br />
+  </td>
+  <td nowrap="nowrap" valign="top" colspan="2">
+  <select name="validate_thumb_size" onchange="disableSubmitButton()" {DETAILS_SIZE_PROZ_WIDTH_DISABLED}>
+    <!-- BEGIN showThumbSize -->
+      <option value="{THUMB_SIZE_VALUE}" {THUMB_SIZE_SELECTED}>{THUMB_SIZE_VALUE}%</option>
+    <!-- END showThumbSize -->
+  </select>
+  </td>
 </tr>
 <tr class="row1">
-	<td nowrap="nowrap">{TXT_DETAILS_NEW_QUALITY_THUMB}</td>
-	<td nowrap="nowrap" colspan="3">
-	<select name="validate_thumb_quality" onchange="disableSubmitButton()">
-		<!-- BEGIN showThumbQuality -->
-			<option value="{THUMB_QUALITY_VALUE}" {THUMB_QUALITY_SELECTED}>{THUMB_QUALITY_VALUE}%</option>
-		<!-- END showThumbQuality -->
-	</select>
-	</td>
+  <td nowrap="nowrap">{TXT_DETAILS_NEW_QUALITY_THUMB}</td>
+  <td nowrap="nowrap" colspan="3">
+  <select name="validate_thumb_quality" onchange="disableSubmitButton()">
+    <!-- BEGIN showThumbQuality -->
+      <option value="{THUMB_QUALITY_VALUE}" {THUMB_QUALITY_SELECTED}>{THUMB_QUALITY_VALUE}%</option>
+    <!-- END showThumbQuality -->
+  </select>
+  </td>
 </tr>
 <tr>
-	<td nowrap="nowrap">{TXT_DETAILS_THUMB_PREVIEW}</td>
-	<td nowrap="nowrap" colspan="3"><img border="0" src="{DETAILS_THUMB_PREVIEW_PATH}" alt="" /></td>
+  <td nowrap="nowrap">{TXT_DETAILS_THUMB_PREVIEW}</td>
+  <td nowrap="nowrap" colspan="3"><img border="0" src="{DETAILS_THUMB_PREVIEW_PATH}" alt="" /></td>
 </tr>
 </table>
 <br />

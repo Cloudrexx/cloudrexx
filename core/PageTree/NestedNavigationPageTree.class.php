@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * NestedNavigationPageTree
  *
@@ -73,21 +73,21 @@ class NestedNavigationPageTree extends SigmaPageTree {
 
     protected $branchNodeIds = array(); //holds all ids of the $currentPage's Node and it's parents
 
-    public function __construct($entityManager, $license, $maxDepth = 0, $activeNode = null, $lang = null, $currentPage = null) { 
+    public function __construct($entityManager, $license, $maxDepth = 0, $activeNode = null, $lang = null, $currentPage = null) {
         parent::__construct($entityManager, $license, $maxDepth, $activeNode, $lang, $currentPage, false);
         $this->activeNode = $activeNode;
         if (!$this->activeNode) {
             $this->activeNode = \Env::get('em')->getRepository('\Cx\Core\ContentManager\Model\Entity\Node')->getRoot();
         }
-        
+
         //go up the branch and collect all node ids. used later in renderElement().
-        $node = $currentPage->getNode();        
+        $node = $currentPage->getNode();
         while ($node) {
             $this->branchNodeIds[] = $node->getId();
             $node = $node->getParent();
         }
     }
-    
+
     protected function getFirstLevel() {
         $match = array();
         if (preg_match('/levels_([1-9])([1-9\+]*)(_full|_branch)?/', trim($this->template->_blocks['nested_navigation']), $match)) {
@@ -95,7 +95,7 @@ class NestedNavigationPageTree extends SigmaPageTree {
         }
         return 1;
     }
-    
+
     protected function getLastLevel() {
         $match = array();
         if (preg_match('/levels_([1-9])([1-9\+]*)(_full|_branch)?/', trim($this->template->_blocks['nested_navigation']), $match)) {
@@ -104,7 +104,7 @@ class NestedNavigationPageTree extends SigmaPageTree {
         }
         return 0;
     }
-    
+
     protected function getFullNavigation() {
         $match = array();
         if (preg_match('/levels_([1-9])([1-9\+]*)(_full|_branch)?/', trim($this->template->_blocks['nested_navigation']), $match)) {
@@ -113,7 +113,7 @@ class NestedNavigationPageTree extends SigmaPageTree {
         }
         return false;
     }
-    
+
     protected function realPreRender($lang) {
         // checks which levels to use
         // default is 1+ (all)
@@ -125,7 +125,7 @@ class NestedNavigationPageTree extends SigmaPageTree {
             $this->listCompleteTree = !empty($match[3]);
         }
     }
-   
+
     protected function renderElement($title, $level, $hasChilds, $lang, $path, $current, $page) {
         //make sure the page to render is inside our branch
         if (!$this->isParentNodeInsideCurrentBranch($page->getNode())) {
@@ -136,7 +136,7 @@ class NestedNavigationPageTree extends SigmaPageTree {
         if (!$this->isLevelInsideLayerBound($level)) {
             return '';
         }
-        
+
         if (!$page->isVisible()) {
             return '';
         }
@@ -153,14 +153,14 @@ class NestedNavigationPageTree extends SigmaPageTree {
             $this->navigationIds[$level] = 0;
         else
             $this->navigationIds[$level]++;
-        
+
         $block = trim($this->template->_blocks['level']);
-        
+
         $output = "  <li>".$block;
 
         //check if we need to close any <ul>'s
         $this->lastLevel = $level;
-        
+
         $style = $current ? self::StyleNameActive : self::StyleNameNormal;
         $output = str_replace('{NAME}', contrexx_raw2xhtml($title), $output);
         $output = str_replace('<li>', '<li class="'.$style.'">', $output);
@@ -171,7 +171,7 @@ class NestedNavigationPageTree extends SigmaPageTree {
         $output = str_replace('{PAGE_ID}', $page->getId(), $output);
         $output = str_replace('{PAGE_NODE_ID}', $page->getNode()->getId(), $output);
         $output = str_replace('{NAVIGATION_ID}', $this->navigationIds[$level], $output);
-        
+
         return $output;
     }
     protected function postRenderElement($level, $hasChilds, $lang, $page)
@@ -185,7 +185,7 @@ class NestedNavigationPageTree extends SigmaPageTree {
         if (!$this->isLevelInsideLayerBound($level)) {
             return '';
         }
-        
+
         if (!$page->isVisible()) {
             return '';
         }
@@ -205,7 +205,7 @@ class NestedNavigationPageTree extends SigmaPageTree {
 
         return $output;
     }
-    
+
     public function preRenderLevel($level, $lang, $parentNode) {
         //make sure the node to render is inside our branch
         if (!$this->isNodeInsideCurrentBranch($parentNode)) {
@@ -216,7 +216,7 @@ class NestedNavigationPageTree extends SigmaPageTree {
         if (!$this->isLevelInsideLayerBound($level)) {
             return '';
         }
-        
+
         $node = $parentNode;
         reset($this->branchNodeIds);
         while ($node && $node->getId() != $this->activeNode->getId()) {
@@ -225,7 +225,7 @@ class NestedNavigationPageTree extends SigmaPageTree {
             }
             $node = $node->getParent();
         }
-        
+
         $visibleChildren = false;
         foreach ($parentNode->getChildren() as $child) {
             if ($child->getPage(FRONTEND_LANG_ID) && $child->getPage(FRONTEND_LANG_ID)->isVisible()) {
@@ -238,7 +238,7 @@ class NestedNavigationPageTree extends SigmaPageTree {
         }
         return "\n" . '<ul class="'.self::CssPrefix.$level.'">'."\n";
     }
-    
+
     public function postRenderLevel($level, $lang, $parentNode) {
         //make sure the node to render is inside our branch
         if (!$this->isNodeInsideCurrentBranch($parentNode)) {
@@ -252,7 +252,7 @@ class NestedNavigationPageTree extends SigmaPageTree {
         if ($level == $this->levelFrom) {
             return '</ul>' . "\n";
         }
-        
+
         $node = $parentNode;
         reset($this->branchNodeIds);
         while ($node && $node->getId() != $this->activeNode->getId()) {
@@ -261,7 +261,7 @@ class NestedNavigationPageTree extends SigmaPageTree {
             }
             $node = $node->getParent();
         }
-        
+
         $visibleChildren = false;
         foreach ($parentNode->getChildren() as $child) {
             if ($child->getPage(FRONTEND_LANG_ID) && $child->getPage(FRONTEND_LANG_ID)->isVisible()) {
@@ -284,7 +284,7 @@ class NestedNavigationPageTree extends SigmaPageTree {
                 $branch = true;
             }
         }
-        
+
         if ($branch) {
             while ($node->getLvl() >= $this->getFirstLevel() && $node->getParent()) {
                 $node = $node->getParent();
@@ -312,13 +312,13 @@ class NestedNavigationPageTree extends SigmaPageTree {
     }
 
     protected function renderHeader($lang) {}
-    
+
     protected function renderFooter($lang) {}
 
     protected function preRenderElement($level, $hasChilds, $lang, $page) {}
-    
+
     protected function postRender($lang) {}
-    
+
     /**
      * Called on construction. Override if you do not want to override the ctor.
      */

@@ -2,277 +2,277 @@
 <script type="text/javascript">
 <!-- //
 function insertTag(elInsertBox, sTag) {
-	try{
-		if(!elInsertBox){
-			elInsertBox = document.getElementById('forum_notification_template');
-		}
-	}catch(e){}
+  try{
+    if(!elInsertBox){
+      elInsertBox = document.getElementById('forum_notification_template');
+    }
+  }catch(e){}
 
-	elInsertBox.focus();
-	/* IE */
-	if (typeof document.selection != 'undefined') {
-		var range = document.selection.createRange();
-		var insText = range.text;
-		range.text = sTag;
-	}
-	/* Gecko compatibles */
-	else if (typeof elInsertBox.selectionStart != 'undefined') {
-		var start = elInsertBox.selectionStart;
-		var end = elInsertBox.selectionEnd;
-		elInsertBox.value = elInsertBox.value.substr(0, start) + sTag + elInsertBox.value.substr(end);
-	}
-	/* other browsers */
-	else {
-		var pos;
-		var re = new RegExp('^[0-9]{0,3}$');
-		while(!re.test(pos)) {
-			pos = prompt("{TXT_FORUM_INSERT_AT_POSITION} (0.." + elInsertBox.value.length + "):", "0");
-		}
-		if (pos > elInsertBox.value.length) {
-			pos = elInsertBox.value.length;
-		}
-		elInsertBox.value = elInsertBox.value.substr(0, pos) + sType + elInsertBox.value.substr(pos);
-	}
+  elInsertBox.focus();
+  /* IE */
+  if (typeof document.selection != 'undefined') {
+    var range = document.selection.createRange();
+    var insText = range.text;
+    range.text = sTag;
+  }
+  /* Gecko compatibles */
+  else if (typeof elInsertBox.selectionStart != 'undefined') {
+    var start = elInsertBox.selectionStart;
+    var end = elInsertBox.selectionEnd;
+    elInsertBox.value = elInsertBox.value.substr(0, start) + sTag + elInsertBox.value.substr(end);
+  }
+  /* other browsers */
+  else {
+    var pos;
+    var re = new RegExp('^[0-9]{0,3}$');
+    while(!re.test(pos)) {
+      pos = prompt("{TXT_FORUM_INSERT_AT_POSITION} (0.." + elInsertBox.value.length + "):", "0");
+    }
+    if (pos > elInsertBox.value.length) {
+      pos = elInsertBox.value.length;
+    }
+    elInsertBox.value = elInsertBox.value.substr(0, pos) + sType + elInsertBox.value.substr(pos);
+  }
 }
 // -->
 </script>
 
 <ul id="tabmenu">
-	<li><a id="settings_General" class="active" href="javascript:{}" onclick="selectTab('General')" title="{TXT_TITLE_GENERAL}">{TXT_TITLE_GENERAL}</a></li>
-	<li><a id="settings_Block" href="javascript:{}" onclick="selectTab('Block')" title="{TXT_FORUM_BLOCK_TEMPLATE}">{TXT_FORUM_BLOCK_TEMPLATE}</a></li>
-	<li><a id="settings_Notification" href="javascript:{}" onclick="selectTab('Notification')" title="{TXT_FORUM_EMAIL_NOTIFICATION}">{TXT_FORUM_EMAIL_NOTIFICATION}</a></li>
+  <li><a id="settings_General" class="active" href="javascript:{}" onclick="selectTab('General')" title="{TXT_TITLE_GENERAL}">{TXT_TITLE_GENERAL}</a></li>
+  <li><a id="settings_Block" href="javascript:{}" onclick="selectTab('Block')" title="{TXT_FORUM_BLOCK_TEMPLATE}">{TXT_FORUM_BLOCK_TEMPLATE}</a></li>
+  <li><a id="settings_Notification" href="javascript:{}" onclick="selectTab('Notification')" title="{TXT_FORUM_EMAIL_NOTIFICATION}">{TXT_FORUM_EMAIL_NOTIFICATION}</a></li>
 </ul>
 
 <form name="frmSettings_General" method="post" action="?cmd=Forum&amp;act=settings_update">
-	<div id="General" class="settings" style="display: block;">
-		<table width="100%" cellspacing="0" cellpadding="3" border="0" align="top" class="adminlist">
-			<tr>
-				<th colspan="2">{TXT_TITLE_GENERAL}</th>
-			</tr>
-			<tr class="row1">
-				<td width="20%">{TXT_GENERAL_THREAD_PAGING}&nbsp;</td>
-				<td width="80%"><input style="width:400px;" type="text" name="setvalue[1]" value="{SETTINGS_THREAD_PAGING}" size="70" maxlength="250" />&nbsp;<span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_GENERAL_THREAD_PAGING_HELP}</span></td>
-			</tr>
-			<tr class="row2">
-				<td>{TXT_GENERAL_POSTING_PAGING}&nbsp;</td>
-				<td><input style="width:400px;" type="text" name="setvalue[2]" value="{SETTINGS_POSTING_PAGING}" size="70" maxlength="250" />&nbsp;<span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_GENERAL_POSTING_PAGING_HELP}</span></td>
-			</tr>
-			<tr class="row1">
-				<td width="20%">{TXT_LATEST_ENTRIES_COUNT}&nbsp;</td>
-				<td width="80%"><input style="width:400px;" type="text" name="setvalue[3]" value="{SETTINGS_LATEST_ENTRIES_COUNT}" size="70" maxlength="250" />&nbsp;<span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_LATEST_ENTRIES_COUNT_HELP}</span></td>
-			</tr>
-			<tr class="row2">
-				<td width="20%">{TXT_FORUM_TAG_COUNT}&nbsp;</td>
-				<td width="80%"><input style="width:400px;" type="text" name="setvalue[11]" value="{FORUM_SETTINGS_TAG_COUNT}" size="70" maxlength="250" />&nbsp;<span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_FORUM_TAG_COUNT_HELP}</span></td>
-			</tr>
-			<tr class="row1">
-				<td width="20%">{TXT_FORUM_BANNED_WORDS}&nbsp;</td>
-				<td width="80%"><input style="width:400px;" type="text" name="setvalue[9]" value="{FORUM_SETTINGS_BANNED_WORDS}" size="70" maxlength="250" />&nbsp;<span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_FORUM_BANNED_WORDS_HELP}</span></td>
-			</tr>
-			<tr class="row2">
-				<td width="20%">{TXT_FORUM_ALLOWED_EXTENSIONS}&nbsp;</td>
-				<td width="80%"><textarea name="setvalue[13]" style="width:400px; height: 80px;">{FORUM_ALLOWED_EXTENSIONS}</textarea>&nbsp;<span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_FORUM_ALLOWED_EXTENSIONS_HELP}</span></td>
-			</tr>
-			<tr class="row1">
-				<td width="20%">{TXT_FORUM_WYSIWYG_EDITOR}&nbsp;</td>
-				<td width="80%"><input type="radio" name="setvalue[10]" value="1" {FORUM_SETTINGS_WYSIWYG_EDITOR_1} />&nbsp;{TXT_FORUM_ACTIVATE}&nbsp;<input type="radio" name="setvalue[10]" value="0" {FORUM_SETTINGS_WYSIWYG_EDITOR_0} />&nbsp;{TXT_FORUM_DEACTIVATE}&nbsp;<span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_FORUM_WYSIWYG_EDITOR_HELP}</span></td>
-			</tr>
-			<tr class="row2">
-				<td width="20%">{TXT_FORUM_LATEST_POST_PER_THREAD}&nbsp;</td>
-				<td width="80%"><input type="radio" name="setvalue[12]" value="1" {FORUM_LATEST_POST_PER_THREAD_1} />&nbsp;{TXT_FORUM_ACTIVATE}&nbsp;<input type="radio" name="setvalue[12]" value="0" {FORUM_LATEST_POST_PER_THREAD_0} />&nbsp;{TXT_FORUM_DEACTIVATE}&nbsp;<span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_FORUM_LATEST_POST_PER_THREAD_HELP}</span></td>
-			</tr>
-		</table>
-	</div>
+  <div id="General" class="settings" style="display: block;">
+    <table width="100%" cellspacing="0" cellpadding="3" border="0" align="top" class="adminlist">
+      <tr>
+        <th colspan="2">{TXT_TITLE_GENERAL}</th>
+      </tr>
+      <tr class="row1">
+        <td width="20%">{TXT_GENERAL_THREAD_PAGING}&nbsp;</td>
+        <td width="80%"><input style="width:400px;" type="text" name="setvalue[1]" value="{SETTINGS_THREAD_PAGING}" size="70" maxlength="250" />&nbsp;<span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_GENERAL_THREAD_PAGING_HELP}</span></td>
+      </tr>
+      <tr class="row2">
+        <td>{TXT_GENERAL_POSTING_PAGING}&nbsp;</td>
+        <td><input style="width:400px;" type="text" name="setvalue[2]" value="{SETTINGS_POSTING_PAGING}" size="70" maxlength="250" />&nbsp;<span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_GENERAL_POSTING_PAGING_HELP}</span></td>
+      </tr>
+      <tr class="row1">
+        <td width="20%">{TXT_LATEST_ENTRIES_COUNT}&nbsp;</td>
+        <td width="80%"><input style="width:400px;" type="text" name="setvalue[3]" value="{SETTINGS_LATEST_ENTRIES_COUNT}" size="70" maxlength="250" />&nbsp;<span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_LATEST_ENTRIES_COUNT_HELP}</span></td>
+      </tr>
+      <tr class="row2">
+        <td width="20%">{TXT_FORUM_TAG_COUNT}&nbsp;</td>
+        <td width="80%"><input style="width:400px;" type="text" name="setvalue[11]" value="{FORUM_SETTINGS_TAG_COUNT}" size="70" maxlength="250" />&nbsp;<span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_FORUM_TAG_COUNT_HELP}</span></td>
+      </tr>
+      <tr class="row1">
+        <td width="20%">{TXT_FORUM_BANNED_WORDS}&nbsp;</td>
+        <td width="80%"><input style="width:400px;" type="text" name="setvalue[9]" value="{FORUM_SETTINGS_BANNED_WORDS}" size="70" maxlength="250" />&nbsp;<span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_FORUM_BANNED_WORDS_HELP}</span></td>
+      </tr>
+      <tr class="row2">
+        <td width="20%">{TXT_FORUM_ALLOWED_EXTENSIONS}&nbsp;</td>
+        <td width="80%"><textarea name="setvalue[13]" style="width:400px; height: 80px;">{FORUM_ALLOWED_EXTENSIONS}</textarea>&nbsp;<span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_FORUM_ALLOWED_EXTENSIONS_HELP}</span></td>
+      </tr>
+      <tr class="row1">
+        <td width="20%">{TXT_FORUM_WYSIWYG_EDITOR}&nbsp;</td>
+        <td width="80%"><input type="radio" name="setvalue[10]" value="1" {FORUM_SETTINGS_WYSIWYG_EDITOR_1} />&nbsp;{TXT_FORUM_ACTIVATE}&nbsp;<input type="radio" name="setvalue[10]" value="0" {FORUM_SETTINGS_WYSIWYG_EDITOR_0} />&nbsp;{TXT_FORUM_DEACTIVATE}&nbsp;<span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_FORUM_WYSIWYG_EDITOR_HELP}</span></td>
+      </tr>
+      <tr class="row2">
+        <td width="20%">{TXT_FORUM_LATEST_POST_PER_THREAD}&nbsp;</td>
+        <td width="80%"><input type="radio" name="setvalue[12]" value="1" {FORUM_LATEST_POST_PER_THREAD_1} />&nbsp;{TXT_FORUM_ACTIVATE}&nbsp;<input type="radio" name="setvalue[12]" value="0" {FORUM_LATEST_POST_PER_THREAD_0} />&nbsp;{TXT_FORUM_DEACTIVATE}&nbsp;<span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_FORUM_LATEST_POST_PER_THREAD_HELP}</span></td>
+      </tr>
+    </table>
+  </div>
 
-	<div id="Notification" class="settings" style="display: none;">
-		<table width="100%" cellspacing="0" cellpadding="3" border="0" align="top" class="adminlist">
-			<tr>
-				<th colspan="4">{TXT_FORUM_PLACEHOLDERS}</th>
-			</tr>
-			<tr class="row1">
-				<td width="10%" nowrap="nowrap">
-					<a title="{TXT_FORUM_CLICK_TO_INSERT}" href="javascript:void(0)" onclick="insertTag(null, this.childNodes[0].data); return false;">[[FORUM_THREAD_SUBJECT]]</a>
-				</td>
-				<td width="34%">
-					&nbsp;&nbsp;  {TXT_FORUM_THREAD_NAME}
-				</td>
-				<td width="10%" nowrap="nowrap">
-					<a title="{TXT_FORUM_CLICK_TO_INSERT}" href="javascript:void(0)" onclick="insertTag(null, this.childNodes[0].data); return false;">[[FORUM_THREAD_STARTER]]</a>
-				</td>
-				<td width="38%">
-					&nbsp;&nbsp;  {TXT_FORUM_THREAD_STARTER}
-				</td>
-			</tr>
-			<tr class="row2">
-				<td width="10%" nowrap="nowrap">
-					<a title="{TXT_FORUM_CLICK_TO_INSERT}" href="javascript:void(0)" onclick="insertTag(null, this.childNodes[0].data); return false;">[[FORUM_LATEST_SUBJECT]]</a>
-				</td>
-				<td width="34%">
-					&nbsp;&nbsp;  {TXT_FORUM_LATEST_SUBJECT}
-				</td>
-				<td width="10%" nowrap="nowrap">
-					<a title="{TXT_FORUM_CLICK_TO_INSERT}" href="javascript:void(0)" onclick="insertTag(null, this.childNodes[0].data); return false;">[[FORUM_LATEST_MESSAGE]]</a>
-				</td>
-				<td width="38%">
-					&nbsp;&nbsp;  {TXT_FORUM_LATEST_MESSAGE}
-				</td>
-			</tr>
-			<tr class="row1">
-				<td width="10%" nowrap="nowrap">
-					<a title="{TXT_FORUM_CLICK_TO_INSERT}" href="javascript:void(0)" onclick="insertTag(null, this.childNodes[0].data); return false;">[[FORUM_USERNAME]]</a>
-				</td>
-				<td width="34%">
-					&nbsp;&nbsp;  {TXT_FORUM_USERNAME}
-				</td>
-				<td width="10%" nowrap="nowrap">
-					<a title="{TXT_FORUM_CLICK_TO_INSERT}" href="javascript:void(0)" onclick="insertTag(null, this.childNodes[0].data); return false;">[[FORUM_THREAD_URL]]</a>
-				</td>
-				<td width="38%">
-					&nbsp;&nbsp;  {TXT_FORUM_THREAD_URL}
-				</td>
-			</tr>
-		</table>
-		<br />
-		<table width="100%" cellspacing="0" cellpadding="3" border="0" align="top" class="adminlist">
-			<tr>
-				<th colspan="2">{TXT_FORUM_EMAIL_TEMPLATE}</th>
-			</tr>
-			<tr class="row1">
-				<td width="20%">{TXT_FORUM_EMAIL_TEMPLATE_FROM_NAME}&nbsp;</td>
-				<td width="80%"><input size="70" type="text" name="setvalue[8]" value="{SETTINGS_NOTIFICATION_FROM_NAME}" maxlength="250" /></td>
-			</tr>
-			<tr class="row2">
-				<td width="20%">{TXT_FORUM_EMAIL_TEMPLATE_FROM_EMAIL}&nbsp;</td>
-				<td width="80%"><input size="70" type="text" name="setvalue[7]" value="{SETTINGS_NOTIFICATION_FROM_EMAIL}" maxlength="250" /></td>
-			</tr>
-			<tr class="row1">
-				<td width="20%">{TXT_FORUM_EMAIL_TEMPLATE_SUBJECT}&nbsp;</td>
-				<td width="80%"><input size="70" type="text" name="setvalue[6]" value="{SETTINGS_NOTIFICATION_SUBJECT}" maxlength="250" /></td>
-			</tr>
-			<tr class="row2">
-				<td width="20%" style="vertical-align: top;">
-					{TXT_FORUM_EMAIL_TEMPLATE}&nbsp;
+  <div id="Notification" class="settings" style="display: none;">
+    <table width="100%" cellspacing="0" cellpadding="3" border="0" align="top" class="adminlist">
+      <tr>
+        <th colspan="4">{TXT_FORUM_PLACEHOLDERS}</th>
+      </tr>
+      <tr class="row1">
+        <td width="10%" nowrap="nowrap">
+          <a title="{TXT_FORUM_CLICK_TO_INSERT}" href="javascript:void(0)" onclick="insertTag(null, this.childNodes[0].data); return false;">[[FORUM_THREAD_SUBJECT]]</a>
+        </td>
+        <td width="34%">
+          &nbsp;&nbsp;  {TXT_FORUM_THREAD_NAME}
+        </td>
+        <td width="10%" nowrap="nowrap">
+          <a title="{TXT_FORUM_CLICK_TO_INSERT}" href="javascript:void(0)" onclick="insertTag(null, this.childNodes[0].data); return false;">[[FORUM_THREAD_STARTER]]</a>
+        </td>
+        <td width="38%">
+          &nbsp;&nbsp;  {TXT_FORUM_THREAD_STARTER}
+        </td>
+      </tr>
+      <tr class="row2">
+        <td width="10%" nowrap="nowrap">
+          <a title="{TXT_FORUM_CLICK_TO_INSERT}" href="javascript:void(0)" onclick="insertTag(null, this.childNodes[0].data); return false;">[[FORUM_LATEST_SUBJECT]]</a>
+        </td>
+        <td width="34%">
+          &nbsp;&nbsp;  {TXT_FORUM_LATEST_SUBJECT}
+        </td>
+        <td width="10%" nowrap="nowrap">
+          <a title="{TXT_FORUM_CLICK_TO_INSERT}" href="javascript:void(0)" onclick="insertTag(null, this.childNodes[0].data); return false;">[[FORUM_LATEST_MESSAGE]]</a>
+        </td>
+        <td width="38%">
+          &nbsp;&nbsp;  {TXT_FORUM_LATEST_MESSAGE}
+        </td>
+      </tr>
+      <tr class="row1">
+        <td width="10%" nowrap="nowrap">
+          <a title="{TXT_FORUM_CLICK_TO_INSERT}" href="javascript:void(0)" onclick="insertTag(null, this.childNodes[0].data); return false;">[[FORUM_USERNAME]]</a>
+        </td>
+        <td width="34%">
+          &nbsp;&nbsp;  {TXT_FORUM_USERNAME}
+        </td>
+        <td width="10%" nowrap="nowrap">
+          <a title="{TXT_FORUM_CLICK_TO_INSERT}" href="javascript:void(0)" onclick="insertTag(null, this.childNodes[0].data); return false;">[[FORUM_THREAD_URL]]</a>
+        </td>
+        <td width="38%">
+          &nbsp;&nbsp;  {TXT_FORUM_THREAD_URL}
+        </td>
+      </tr>
+    </table>
+    <br />
+    <table width="100%" cellspacing="0" cellpadding="3" border="0" align="top" class="adminlist">
+      <tr>
+        <th colspan="2">{TXT_FORUM_EMAIL_TEMPLATE}</th>
+      </tr>
+      <tr class="row1">
+        <td width="20%">{TXT_FORUM_EMAIL_TEMPLATE_FROM_NAME}&nbsp;</td>
+        <td width="80%"><input size="70" type="text" name="setvalue[8]" value="{SETTINGS_NOTIFICATION_FROM_NAME}" maxlength="250" /></td>
+      </tr>
+      <tr class="row2">
+        <td width="20%">{TXT_FORUM_EMAIL_TEMPLATE_FROM_EMAIL}&nbsp;</td>
+        <td width="80%"><input size="70" type="text" name="setvalue[7]" value="{SETTINGS_NOTIFICATION_FROM_EMAIL}" maxlength="250" /></td>
+      </tr>
+      <tr class="row1">
+        <td width="20%">{TXT_FORUM_EMAIL_TEMPLATE_SUBJECT}&nbsp;</td>
+        <td width="80%"><input size="70" type="text" name="setvalue[6]" value="{SETTINGS_NOTIFICATION_SUBJECT}" maxlength="250" /></td>
+      </tr>
+      <tr class="row2">
+        <td width="20%" style="vertical-align: top;">
+          {TXT_FORUM_EMAIL_TEMPLATE}&nbsp;
                     <span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_FORUM_NOTIFICATION_TEMPLATE_HELP}</span>
-				</td>
-				<td width="80%"><textarea id="forum_notification_template" name="setvalue[5]" style="width: 70%; height: 300px;">{SETTINGS_NOTIFICATION_TEMPLATE}</textarea>
-				</td>
-			</tr>
-		</table>
-	</div>
-	<div id="Block" class="settings" style="display: none;">
-		<table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
-			<tr>
-				<th colspan="2">{TXT_FORUM_SETTINGS}</th>
-			</tr>
-			<tr class="row1">
-				<td width="15%">{TXT_FORUM_SHOW_HOME_CONTENT}</td>
-				<td width="85%"><input type="radio" name="setHomeContent" value="1" {FORUM_SHOW_CONTENT_1} />&nbsp;{TXT_FORUM_ACTIVATE}&nbsp;<input type="radio" name="setHomeContent" value="0" {FORUM_SHOW_CONTENT_0} />&nbsp;{TXT_FORUM_DEACTIVATE}</td>
-			</tr>
-			<tr class="row2">
-				<td width="15%">{TXT_FORUM_SHOW_TAG_CONTENT}</td>
-				<td width="85%"><input type="radio" name="setTagContent" value="1" {FORUM_SHOW_TAG_CONTENT_1} />&nbsp;{TXT_FORUM_ACTIVATE}&nbsp;<input type="radio" name="setTagContent" value="0" {FORUM_SHOW_TAG_CONTENT_0} />&nbsp;{TXT_FORUM_DEACTIVATE}</td>
-			</tr>
-		</table>
-		<br />
-		<table width="100%" cellspacing="0" cellpadding="3" border="0" align="top" class="adminlist">
-			<tr>
-				<th colspan="4">{TXT_FORUM_PLACEHOLDERS}</th>
-			</tr>
-			<tr class="row2">
-				<td width="10%" nowrap="nowrap">
-					[[TXT_FORUM_LATEST_ENTRIES]]
-				</td>
-				<td width="34%">
-					&nbsp;&nbsp;  "{TXT_FORUM_LATEST_ENTRIES}"
-				</td>
-				<td width="10%" nowrap="nowrap">
-					[[FORUM_ROWCLASS]]
-				</td>
-				<td width="38%">
-					&nbsp;&nbsp;  {TXT_FORUM_ROWCLASS}
-				</td>
-			</tr>
-			<tr class="row1">
-				<td width="10%" nowrap="nowrap">
-					[[TXT_FORUM_THREAD]]
-				</td>
-				<td width="34%">
-					&nbsp;&nbsp;  "{TXT_FORUM_THREAD}"
-				</td>
-				<td width="10%" nowrap="nowrap">
-					[[FORUM_THREAD]]
-				</td>
-				<td width="38%">
-					&nbsp;&nbsp;  {TXT_FORUM_THREAD_NAME}
-				</td>
-			</tr>
-			<tr class="row2">
-				<td width="10%">
-					[[TXT_FORUM_OVERVIEW_FORUM]]
-				</td>
-				<td width="34%">
-					&nbsp;&nbsp;  "{TXT_FORUM_OVERVIEW_FORUM}"
-				</td>
-				<td width="10%">
-					[[FORUM_FORUM_NAME]]
-				</td>
-				<td width="38%">
-					&nbsp;&nbsp;  {TXT_FORUM_FORUM_NAME}
-				</td>
-			</tr>
-			<tr class="row1">
-				<td width="10%" nowrap="nowrap">
-					[[TXT_FORUM_THREAD_STRATER]]
-				</td>
-				<td width="34%">
-					&nbsp;&nbsp;  "{TXT_FORUM_THREAD_STRATER}"
-				</td>
-				<td width="10%" nowrap="nowrap">
-					[[FORUM_THREAD_STARTER]]
-				</td>
-				<td width="38%">
-					&nbsp;&nbsp;  {TXT_FORUM_THREAD_STARTER}
-				</td>
-			</tr>
-			<tr class="row2">
-				<td width="10%">
-					[[TXT_FORUM_POST_COUNT]]
-				</td>
-				<td width="34%">
-					&nbsp;&nbsp;  "{TXT_FORUM_POST_COUNT}"
-				</td>
-				<td width="10%">
-					[[FORUM_POST_COUNT]]
-				</td>
-				<td width="38%">
-					&nbsp;&nbsp;  {TXT_FORUM_POST_COUNT_INFO}
-				</td>
-			</tr>
-			<tr class="row1">
-				<td width="10%" nowrap="nowrap">
-					[[TXT_FORUM_THREAD_CREATE_DATE]]
-				</td>
-				<td width="34%">
-					&nbsp;&nbsp;  "{TXT_FORUM_THREAD_CREATE_DATE}"
-				</td>
-				<td width="10%" nowrap="nowrap">
-					[[FORUM_THREAD_CREATE_DATE]]
-				</td>
-				<td width="38%">
-					&nbsp;&nbsp;  {TXT_FORUM_THREAD_CREATE_DATE_INFO}
-				</td>
-			</tr>
-		</table>
-		<br />
-		<div class="infobox_head">
-			{TXT_FORUM_HOMECONTENT_USAGE}</th>
-	    </div>
-	    <div class="infobox_body">
-	    	{TXT_FORUM_HOMECONTENT_USAGE_TEXT}
-	    </div>
-	</div>
-	<br />
-	<input type="submit" value="{TXT_BUTTON_SAVE}" name="set_homecontent_submit" />
+        </td>
+        <td width="80%"><textarea id="forum_notification_template" name="setvalue[5]" style="width: 70%; height: 300px;">{SETTINGS_NOTIFICATION_TEMPLATE}</textarea>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div id="Block" class="settings" style="display: none;">
+    <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
+      <tr>
+        <th colspan="2">{TXT_FORUM_SETTINGS}</th>
+      </tr>
+      <tr class="row1">
+        <td width="15%">{TXT_FORUM_SHOW_HOME_CONTENT}</td>
+        <td width="85%"><input type="radio" name="setHomeContent" value="1" {FORUM_SHOW_CONTENT_1} />&nbsp;{TXT_FORUM_ACTIVATE}&nbsp;<input type="radio" name="setHomeContent" value="0" {FORUM_SHOW_CONTENT_0} />&nbsp;{TXT_FORUM_DEACTIVATE}</td>
+      </tr>
+      <tr class="row2">
+        <td width="15%">{TXT_FORUM_SHOW_TAG_CONTENT}</td>
+        <td width="85%"><input type="radio" name="setTagContent" value="1" {FORUM_SHOW_TAG_CONTENT_1} />&nbsp;{TXT_FORUM_ACTIVATE}&nbsp;<input type="radio" name="setTagContent" value="0" {FORUM_SHOW_TAG_CONTENT_0} />&nbsp;{TXT_FORUM_DEACTIVATE}</td>
+      </tr>
+    </table>
+    <br />
+    <table width="100%" cellspacing="0" cellpadding="3" border="0" align="top" class="adminlist">
+      <tr>
+        <th colspan="4">{TXT_FORUM_PLACEHOLDERS}</th>
+      </tr>
+      <tr class="row2">
+        <td width="10%" nowrap="nowrap">
+          [[TXT_FORUM_LATEST_ENTRIES]]
+        </td>
+        <td width="34%">
+          &nbsp;&nbsp;  "{TXT_FORUM_LATEST_ENTRIES}"
+        </td>
+        <td width="10%" nowrap="nowrap">
+          [[FORUM_ROWCLASS]]
+        </td>
+        <td width="38%">
+          &nbsp;&nbsp;  {TXT_FORUM_ROWCLASS}
+        </td>
+      </tr>
+      <tr class="row1">
+        <td width="10%" nowrap="nowrap">
+          [[TXT_FORUM_THREAD]]
+        </td>
+        <td width="34%">
+          &nbsp;&nbsp;  "{TXT_FORUM_THREAD}"
+        </td>
+        <td width="10%" nowrap="nowrap">
+          [[FORUM_THREAD]]
+        </td>
+        <td width="38%">
+          &nbsp;&nbsp;  {TXT_FORUM_THREAD_NAME}
+        </td>
+      </tr>
+      <tr class="row2">
+        <td width="10%">
+          [[TXT_FORUM_OVERVIEW_FORUM]]
+        </td>
+        <td width="34%">
+          &nbsp;&nbsp;  "{TXT_FORUM_OVERVIEW_FORUM}"
+        </td>
+        <td width="10%">
+          [[FORUM_FORUM_NAME]]
+        </td>
+        <td width="38%">
+          &nbsp;&nbsp;  {TXT_FORUM_FORUM_NAME}
+        </td>
+      </tr>
+      <tr class="row1">
+        <td width="10%" nowrap="nowrap">
+          [[TXT_FORUM_THREAD_STRATER]]
+        </td>
+        <td width="34%">
+          &nbsp;&nbsp;  "{TXT_FORUM_THREAD_STRATER}"
+        </td>
+        <td width="10%" nowrap="nowrap">
+          [[FORUM_THREAD_STARTER]]
+        </td>
+        <td width="38%">
+          &nbsp;&nbsp;  {TXT_FORUM_THREAD_STARTER}
+        </td>
+      </tr>
+      <tr class="row2">
+        <td width="10%">
+          [[TXT_FORUM_POST_COUNT]]
+        </td>
+        <td width="34%">
+          &nbsp;&nbsp;  "{TXT_FORUM_POST_COUNT}"
+        </td>
+        <td width="10%">
+          [[FORUM_POST_COUNT]]
+        </td>
+        <td width="38%">
+          &nbsp;&nbsp;  {TXT_FORUM_POST_COUNT_INFO}
+        </td>
+      </tr>
+      <tr class="row1">
+        <td width="10%" nowrap="nowrap">
+          [[TXT_FORUM_THREAD_CREATE_DATE]]
+        </td>
+        <td width="34%">
+          &nbsp;&nbsp;  "{TXT_FORUM_THREAD_CREATE_DATE}"
+        </td>
+        <td width="10%" nowrap="nowrap">
+          [[FORUM_THREAD_CREATE_DATE]]
+        </td>
+        <td width="38%">
+          &nbsp;&nbsp;  {TXT_FORUM_THREAD_CREATE_DATE_INFO}
+        </td>
+      </tr>
+    </table>
+    <br />
+    <div class="infobox_head">
+      {TXT_FORUM_HOMECONTENT_USAGE}</th>
+      </div>
+      <div class="infobox_body">
+        {TXT_FORUM_HOMECONTENT_USAGE_TEXT}
+      </div>
+  </div>
+  <br />
+  <input type="submit" value="{TXT_BUTTON_SAVE}" name="set_homecontent_submit" />
 </form>
 
 <!-- END settings.html -->

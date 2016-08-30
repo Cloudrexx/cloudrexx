@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Class XmlSitemapPageTree
  *
@@ -67,7 +67,7 @@ class XmlSitemapPageTree extends PageTree {
      * @param boolean $skipInactive           Skip inactive pages
      * @param boolean $considerSeoEnabledOnly Consider seo enabled pages alone
      */
-    public function __construct($entityManager, $license, $maxDepth = 0, $rootNode = null, 
+    public function __construct($entityManager, $license, $maxDepth = 0, $rootNode = null,
                                 $lang = null, $currentPage = null, $skipInvisible = false,
                                 $considerLogin = false,
                                 $skipInactive = true,
@@ -76,7 +76,7 @@ class XmlSitemapPageTree extends PageTree {
         parent::__construct($entityManager, $license, $maxDepth, $rootNode, $lang,
                             $currentPage, $skipInvisible, $considerLogin, $skipInactive, $considerSeoEnabledOnly);
     }
-    
+
     /**
      * Writes the XML-Sitemap in all langs (if activated in config)
      * @global type $_CONFIG
@@ -109,7 +109,7 @@ class XmlSitemapPageTree extends PageTree {
 
         return true;
     }
-    
+
     /**
      * Renders the PageTree element
      * @param type $title
@@ -119,19 +119,19 @@ class XmlSitemapPageTree extends PageTree {
      * @param type $path
      * @param type $current
      * @param type $page
-     * @return type 
+     * @return type
      */
     protected function renderElement($title, $level, $hasChilds, $lang, $path, $current, $page) {
-        return "\t" . '<url>' . 
-                "\n\t\t" . '<loc>' . \Cx\Core\Routing\Url::fromPage($page)->toString() . '</loc>' . 
-                "\n\t\t" . '<lastmod>' . $this->getLastModificationDate($page) . '</lastmod>' . 
+        return "\t" . '<url>' .
+                "\n\t\t" . '<loc>' . \Cx\Core\Routing\Url::fromPage($page)->toString() . '</loc>' .
+                "\n\t\t" . '<lastmod>' . $this->getLastModificationDate($page) . '</lastmod>' .
                 "\n\t\t" . '<changefreq>' . $this->getChangingFrequency($page) . '</changefreq>' .
                 "\n\t\t" . '<priority>0.5</priority>' .
                 "\n\t" . '</url>' . "\n";
     }
-    
+
     public function preRenderLevel($level, $lang, $parentNode) {}
-    
+
     public function postRenderLevel($level, $lang, $parentNode) {}
 
     /**
@@ -140,7 +140,7 @@ class XmlSitemapPageTree extends PageTree {
      * @param type $hasChilds
      * @param type $lang
      * @param type $page
-     * @return string 
+     * @return string
      */
     protected function postRenderElement($level, $hasChilds, $lang, $page) {
         return '';
@@ -149,32 +149,32 @@ class XmlSitemapPageTree extends PageTree {
     /**
      * Renders the head of the PageTree
      * @param type $lang
-     * @return type 
+     * @return type
      */
     protected function renderHeader($lang) {
         return '<?xml version="1.0" encoding="UTF-8"?>' . "\n" .
                 '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
     }
-    
+
     /**
      * Renders the foot of the PageTree
      * @param type $lang
-     * @return string 
+     * @return string
      */
     protected function renderFooter($lang) {
         return '</urlset>';
     }
-    
+
     /**
      * PageTree override (unused)
-     * @param type $lang 
+     * @param type $lang
      */
     protected function preRender($lang) {
     }
-    
+
     /**
      * PageTree override (unused)
-     * @param type $lang 
+     * @param type $lang
      */
     protected function postRender($lang) {
     }
@@ -192,7 +192,7 @@ class XmlSitemapPageTree extends PageTree {
         $filename = \FWLanguage::getLanguageCodeById($this->lang) ? sprintf(self::$strFileNameWithLang, \FWLanguage::getLanguageCodeById($this->lang)) : self::$strFileName;
 
         $xml = $this->render();
-        
+
         try {
             $filePath = \Env::get('cx')->getWebsiteDocumentRootPath();
             $objFile = new \Cx\Lib\FileSystem\File($filePath . self::$strFilePath . '/' . $filename);
@@ -210,10 +210,10 @@ class XmlSitemapPageTree extends PageTree {
      * Creates the modification-date of a page as a string which can be processed by google. The method uses
      * for module-pages the current date, for normale pages the date of last modification.
      *
-     * @param		integer		$intModule: value of the module-field in the database
-     * @param		string		$strCmd: value of the cmd-field in the database
-     * @param		integer		$intTimestamp: last update of the page as a timestamp
-     * @return		string		A date string which can be understood by google
+     * @param        integer        $intModule: value of the module-field in the database
+     * @param        string        $strCmd: value of the cmd-field in the database
+     * @param        integer        $intTimestamp: last update of the page as a timestamp
+     * @return        string        A date string which can be understood by google
      */
     protected function getLastModificationDate($page) {
         $date = $page->getLastModificationDateTime();
@@ -224,24 +224,23 @@ class XmlSitemapPageTree extends PageTree {
      * Returns the changing-frequency of the page depending on the database values. If the page is a module
      * page, the frequency is set to 'hourly', for normal pages to 'weekly'.
      *
-     * @param		integer		$intModule: value of the module-field in the database
-     * @param		string		$strCmd: value of the cmd-field in the database
-     * @return		string		true, if the page is a module page. Otherwise false.
+     * @param        integer        $intModule: value of the module-field in the database
+     * @param        string        $strCmd: value of the cmd-field in the database
+     * @return        string        true, if the page is a module page. Otherwise false.
      */
     protected function getChangingFrequency($page) {
         return $page->getChangeFrequency();
     }
 
     protected function init() {
-        
+
     }
 
     protected function preRenderElement($level, $hasChilds, $lang, $page) {
-        
+
     }
-    
+
     protected function getFullNavigation() {
         return true;
     }
 }
-

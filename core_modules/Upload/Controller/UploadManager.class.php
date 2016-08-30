@@ -77,7 +77,7 @@ class UploadManager extends UploadLib
             case 'response':
                 $this->response($_GET['upload']);
                 break;
-          
+
             //folderWidget
             case 'refreshFolder':
                 $this->refreshFolder();
@@ -85,6 +85,6 @@ class UploadManager extends UploadLib
             case 'deleteFile': //a folderWidget wants to delete something
                 $this->deleteFile();
                 break;
-        }        
+        }
     }
 }

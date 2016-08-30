@@ -31,10 +31,10 @@ form p label.description {
     display: inline;
     border-radius: 2px;
     border: 1px solid grey;
-    color: white;     
+    color: white;
     background-image: -webkit-gradient(  linear,  left top,  right bottom,  color-stop(0, #5BC0DE),  color-stop(1, #2F95B4) );
-    background-image: -o-linear-gradient(right bottom, #5BC0DE 0%, #2F95B4 100%); background-image: -moz-linear-gradient(right bottom, #5BC0DE 0%, #2F95B4 100%); 
-    background-image: -webkit-linear-gradient(right bottom, #5BC0DE 0%, #2F95B4 100%); background-image: -ms-linear-gradient(right bottom, #5BC0DE 0%, #2F95B4 100%); 
+    background-image: -o-linear-gradient(right bottom, #5BC0DE 0%, #2F95B4 100%); background-image: -moz-linear-gradient(right bottom, #5BC0DE 0%, #2F95B4 100%);
+    background-image: -webkit-linear-gradient(right bottom, #5BC0DE 0%, #2F95B4 100%); background-image: -ms-linear-gradient(right bottom, #5BC0DE 0%, #2F95B4 100%);
     background-image: linear-gradient(to right bottom, #5BC0DE 0%, #2F95B4 100%);
     font-size: 17px;
 }
@@ -200,7 +200,7 @@ form fieldset .ui-tabs .row .cke{
 }
 
 @media (max-width: 767px) {
-	#contactForm textarea, #contactForm input {
+  #contactForm textarea, #contactForm input {
         width: 96%;
         margin-left: 0;
     }
@@ -217,7 +217,7 @@ only screen and (min-device-pixel-ratio : 1.5) {
 }
 
 .form-horizontal#contactForm .control-label {
-	float: right;
+  float: right;
 }
 
 /*Custom Styles for Blog */
@@ -227,11 +227,11 @@ only screen and (min-device-pixel-ratio : 1.5) {
 }
 
 .addcomment form p input[type="submit"] {
-	width: 160px;
+  width: 160px;
 }
 
 .contact.row label {
-	margin-left: 30px;
+  margin-left: 30px;
 }
 
 /***************************************************/
@@ -1397,9 +1397,9 @@ div.row2 {
 }
 
 @media only screen and (max-width: 1200px) {
-	#shop div.details {
-        float: none;		
-	}
+  #shop div.details {
+        float: none;
+  }
 
 #shop div.price {
     float: right;
@@ -1558,8 +1558,8 @@ div.row2 {
 }
 
 /* Tablets */
-@media only screen 
-and (min-device-width : 768px) 
+@media only screen
+and (min-device-width : 768px)
 and (max-device-width : 1024px) {
     #shop figure a {
         width: 46.8%;
@@ -1614,65 +1614,65 @@ and (max-device-width : 1024px) {
 }
 
 #shop button.details-button {
-	height: 36px;
-	width: 115px;
-	padding: 0;
-	text-align: center;
-	border-radius: 5px;
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	-o-border-radius: 5px;
-	border: 1px solid grey;
-	color: #FFFFFF;
-	font-weight: bold;
-	background-image: -webkit-gradient(  linear,  left top,  right bottom,  color-stop(0, #5BC0DE),  color-stop(1, #2F95B4) );
-    background-image: -o-linear-gradient(right bottom, #5BC0DE 0%, #2F95B4 100%); background-image: -moz-linear-gradient(right bottom, #5BC0DE 0%, #2F95B4 100%); 
-    background-image: -webkit-linear-gradient(right bottom, #5BC0DE 0%, #2F95B4 100%); background-image: -ms-linear-gradient(right bottom, #5BC0DE 0%, #2F95B4 100%); 
+  height: 36px;
+  width: 115px;
+  padding: 0;
+  text-align: center;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -o-border-radius: 5px;
+  border: 1px solid grey;
+  color: #FFFFFF;
+  font-weight: bold;
+  background-image: -webkit-gradient(  linear,  left top,  right bottom,  color-stop(0, #5BC0DE),  color-stop(1, #2F95B4) );
+    background-image: -o-linear-gradient(right bottom, #5BC0DE 0%, #2F95B4 100%); background-image: -moz-linear-gradient(right bottom, #5BC0DE 0%, #2F95B4 100%);
+    background-image: -webkit-linear-gradient(right bottom, #5BC0DE 0%, #2F95B4 100%); background-image: -ms-linear-gradient(right bottom, #5BC0DE 0%, #2F95B4 100%);
     background-image: linear-gradient(to right bottom, #5BC0DE 0%, #2F95B4 100%);
 }
 
 #shop button.add-to-cart {
     float: right;
-	height: 50px;
-	width: 175px;
-	padding: 0;
-	text-align: center;
-	border-radius: 5px;
-	border-top-left-radius: 0;
-	border-bottom-left-radius: 0;
-	-moz-border-radius: 5px;
-	-moz-border-top-left-radius: 0;
-	-moz-border-bottom-left-radius: 0;
-	-webkit-border-radius: 5px;
+  height: 50px;
+  width: 175px;
+  padding: 0;
+  text-align: center;
+  border-radius: 5px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  -moz-border-radius: 5px;
+  -moz-border-top-left-radius: 0;
+  -moz-border-bottom-left-radius: 0;
+  -webkit-border-radius: 5px;
     -webkit-border-top-left-radius: 0;
     -webkit-border-bottom-left-radius: 0;
-	-o-border-radius: 5px;
-	-o-border-top-left-radius: 0;
-	-o-border-bottom-left-radius: 0;
-	border: 1px solid grey;
-	color: #FFFFFF;
-	font-weight: bold;
-	background-image: -webkit-gradient(  linear,  left top,  right bottom,  color-stop(0, #5BC0DE),  color-stop(1, #2F95B4) );
-    background-image: -o-linear-gradient(right bottom, #5BC0DE 0%, #2F95B4 100%); background-image: -moz-linear-gradient(right bottom, #5BC0DE 0%, #2F95B4 100%); 
-    background-image: -webkit-linear-gradient(right bottom, #5BC0DE 0%, #2F95B4 100%); background-image: -ms-linear-gradient(right bottom, #5BC0DE 0%, #2F95B4 100%); 
+  -o-border-radius: 5px;
+  -o-border-top-left-radius: 0;
+  -o-border-bottom-left-radius: 0;
+  border: 1px solid grey;
+  color: #FFFFFF;
+  font-weight: bold;
+  background-image: -webkit-gradient(  linear,  left top,  right bottom,  color-stop(0, #5BC0DE),  color-stop(1, #2F95B4) );
+    background-image: -o-linear-gradient(right bottom, #5BC0DE 0%, #2F95B4 100%); background-image: -moz-linear-gradient(right bottom, #5BC0DE 0%, #2F95B4 100%);
+    background-image: -webkit-linear-gradient(right bottom, #5BC0DE 0%, #2F95B4 100%); background-image: -ms-linear-gradient(right bottom, #5BC0DE 0%, #2F95B4 100%);
     background-image: linear-gradient(to right bottom, #5BC0DE 0%, #2F95B4 100%);
 }
 
 @media only screen and (max-width: 455px) {
-	#shop button.add-to-cart {
-		border-radius: 5px;
-		border-top-left-radius: 5px;
-		border-bottom-left-radius: 5px;
-		-moz-border-radius: 5px;
-		-moz-border-top-left-radius: 5px;
-		-moz-border-bottom-left-radius: 5px;
-		-webkit-border-radius: 5px;
-	    -webkit-border-top-left-radius: 5px;
-	    -webkit-border-bottom-left-radius: 5px;
-		-o-border-radius: 5px;
-		-o-border-top-left-radius: 5px;
-		-o-border-bottom-left-radius: 5px;
-	}
+  #shop button.add-to-cart {
+    border-radius: 5px;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    -moz-border-radius: 5px;
+    -moz-border-top-left-radius: 5px;
+    -moz-border-bottom-left-radius: 5px;
+    -webkit-border-radius: 5px;
+      -webkit-border-top-left-radius: 5px;
+      -webkit-border-bottom-left-radius: 5px;
+    -o-border-radius: 5px;
+    -o-border-top-left-radius: 5px;
+    -o-border-bottom-left-radius: 5px;
+  }
 }
 
 #shop button.details-button:hover,
@@ -1771,15 +1771,15 @@ and (max-device-width : 1024px) {
 
 #news-links ul {
     margin: 0 20%;
-	float: left;
-	padding: 0 10px 0 10px;
-	width: 60%;
-	list-style-type: none
+  float: left;
+  padding: 0 10px 0 10px;
+  width: 60%;
+  list-style-type: none
 }
 
 #news-links ul li {
-	display: inline-block;
-	padding-right: 5px;
+  display: inline-block;
+  padding-right: 5px;
 }
 
 #news-social-media {
@@ -2872,6 +2872,3 @@ dl.data_module img {
     z-index: 9999;
     color: #25556d;
 }
-
-
-

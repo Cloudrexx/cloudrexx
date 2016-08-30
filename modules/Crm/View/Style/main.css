@@ -77,7 +77,7 @@ table#mapCSVColumn tbody tr td.not_match {background-color: whiteSmoke;}
 #taskStatusPanel {background: #fff;min-width: 70px;padding: 0}
 #content #taskStatusPanel a {
     padding: 5px 0;
-    background-color: #fff;    
+    background-color: #fff;
 }
 #taskStatusPanel a span {
     margin-left: 10px;
@@ -176,7 +176,7 @@ table#mapCSVColumn tbody tr td.not_match {background-color: whiteSmoke;}
 .taskTypeItem_18 {background-image: url('../../../../modules/Crm/View/Media/task_thank_you.png');}
 .taskStatusLink a {float: left;width: 23px;}
 #task_overview tr.task_expired {
-    background-color: #ffe7e7 !important;    
+    background-color: #ffe7e7 !important;
 }
 .task_status_wrapper {
     width: 55px;
@@ -187,7 +187,7 @@ table#mapCSVColumn tbody tr td.not_match {background-color: whiteSmoke;}
     width: 100%;
     padding: 10px 0;
     margin-bottom: 2px;
-    color: #444;    
+    color: #444;
 }
 #notesCategoriesPanel a:hover, .CategoriesDropDownPanel a:hover, #taskStatusPanel a {
     background-color: #F2F2F2;

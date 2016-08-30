@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,10 +24,10 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
- * Calendar 
- * 
+ * Calendar
+ *
  * @package    cloudrexx
  * @subpackage module_calendar
  * @author     Cloudrexx <info@cloudrexx.com>
@@ -38,7 +38,7 @@ namespace Cx\Modules\Calendar\Controller;
 
 /**
  * Calendar Class WebserviceClient
- * 
+ *
  * @package    cloudrexx
  * @subpackage module_calendar
  * @author     Cloudrexx <info@cloudrexx.com>
@@ -46,7 +46,7 @@ namespace Cx\Modules\Calendar\Controller;
  * @version    1.00
  */
 class CalendarWebserviceClient
-{        
+{
     /**
      * SOAP Client object
      *
@@ -54,37 +54,37 @@ class CalendarWebserviceClient
      * @var object
      */
     private $SOAPClient;
-    
+
     /**
      * CalendarWebserviceClient Constructor
-     * 
+     *
      * @param string $location the URL of the SOAP server to send the request
-     * @param string $uri      the target namespace of the SOAP service          
+     * @param string $uri      the target namespace of the SOAP service
      */
-    public function __construct($location, $uri) {  
+    public function __construct($location, $uri) {
         $options = array(
             'location' => $location,
             'uri'      => $uri
         );
 
-        $this->SOAPClient = new \SoapClient(null, $options); 
-    }       
-    
+        $this->SOAPClient = new \SoapClient(null, $options);
+    }
+
     /**
      * verify the host name, if its exists returns the host data
-     * 
+     *
      * @param string $myHost     host name
      * @param string $foreignKey reference Key
-     * 
+     *
      * @return mixed host details on success, false otherwise
      */
-    public function verifyHost($myHost,$foreignKey) { 
+    public function verifyHost($myHost,$foreignKey) {
         return $this->SOAPClient->verifyHost($myHost,$foreignKey);
     }
-    
+
     /**
      * Get the event list
-     * 
+     *
      * @param integer $start_date                     Start date
      * @param integer $end_date                       End date
      * @param boolean $auth                           Authorization
@@ -92,12 +92,12 @@ class CalendarWebserviceClient
      * @param integer $langId                         Language id
      * @param integer $foreignHostId                  Foreign Host id
      * @param integer $myHostId                       Host id
-     * @param boolean $showEventsOnlyInActiveLanguage get event only active 
+     * @param boolean $showEventsOnlyInActiveLanguage get event only active
      *                                                frontend language
-     * 
+     *
      * @return array Event list object
      */
     function getEventList($start_date, $end_date, $auth, $term, $langId, $foreignHostId, $myHostId, $showEventsOnlyInActiveLanguage) {
-       return $this->SOAPClient->getEventList($start_date, $end_date, $auth, $term, $langId, $foreignHostId, $myHostId, $showEventsOnlyInActiveLanguage);        
-    } 
+       return $this->SOAPClient->getEventList($start_date, $end_date, $auth, $term, $langId, $foreignHostId, $myHostId, $showEventsOnlyInActiveLanguage);
+    }
 }

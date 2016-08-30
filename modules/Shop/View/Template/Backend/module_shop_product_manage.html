@@ -33,7 +33,7 @@ var setSelectedImage = function(data) {
       return;
     }
     var url = data.data[0].datainfo.filepath;
-    
+
     notDefined[fieldID] = true;
     var elInput = document.getElementById("hi_"+fieldID);
     elInput.setAttribute('name', 'productImage'+fieldID);
@@ -51,12 +51,12 @@ var setSelectedImage = function(data) {
     var img = document.getElementById("img"+fieldID);
     img.src = '/'+url;
     var fact = 1;
-    
+
     var newImg = new Image()
-    newImg.onload = function() {      
+    newImg.onload = function() {
       var height = newImg.height;
       var width  = newImg.width;
-      
+
       if (width > height) {
         fact = 80 / width;
       } else {
@@ -97,7 +97,7 @@ var setSelectedImage = function(data) {
       }
     }
     newImg.src = url;
-  }  
+  }
 }
 function toggleOptions(checkboxId) {
   if (document.getElementById('productOptions'+checkboxId).checked) {

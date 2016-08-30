@@ -27,7 +27,7 @@
 
 /**
  * Main controller for Voting
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
@@ -38,7 +38,7 @@ namespace Cx\Modules\Voting\Controller;
 
 /**
  * Main controller for Voting
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
@@ -47,7 +47,7 @@ namespace Cx\Modules\Voting\Controller;
 class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentController {
     /**
      * getControllerClasses
-     * 
+     *
      * @return type
      */
     public function getControllerClasses() {
@@ -56,16 +56,16 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
 
     /**
      * Load the component Voting.
-     * 
+     *
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
      */
     public function load(\Cx\Core\ContentManager\Model\Entity\Page $page) {
         global $subMenuTitle, $objTemplate, $_CORELANG;
-                
+
         switch ($this->cx->getMode()) {
-            case \Cx\Core\Core\Controller\Cx::MODE_FRONTEND:               
+            case \Cx\Core\Core\Controller\Cx::MODE_FRONTEND:
                 \Env::get('cx')->getPage()->setContent(votingShowCurrent(\Env::get('cx')->getPage()->getContent()));
-                break;                
+                break;
 
             case \Cx\Core\Core\Controller\Cx::MODE_BACKEND:
                 $this->cx->getTemplate()->addBlockfile('CONTENT_OUTPUT', 'content_master', 'LegacyContentMaster.html');
@@ -84,7 +84,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
 
     /**
      * Do something before content is loaded from DB
-     * 
+     *
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
      */
     public function preContentLoad(\Cx\Core\ContentManager\Model\Entity\Page $page) {
@@ -108,7 +108,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             if (preg_match('@<!--\s+BEGIN\s+(voting_result)\s+-->(.*)<!--\s+END\s+\1\s+-->@m', $page_template, $arrMatches)) {
                 $page_template = preg_replace('@(<!--\s+BEGIN\s+(voting_result)\s+-->.*<!--\s+END\s+\2\s+-->)@m', setVotingResult($arrMatches[2]), $page_template);
             }
-        }    
+        }
     }
 
 }

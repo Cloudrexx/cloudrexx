@@ -12,17 +12,17 @@ var notAllowedMsg = "{NOT_ALLOWED_MSG}";
 
 function selectMultiAction()
 {
-	with (document.frmShowEntries) {
-		switch (frmShowEntries_MultiAction.value) {
-			case 'delete':
-				if (confirm('{TXT_ENTRIES_SUBMIT_DELETE_JS}')) {
-					action='?cmd=Knowledge{MODULE_INDEX}&act=multiactionEntry';
-					submit();
-				}
-			break;
-			default: //do nothing
-		}
-	}
+  with (document.frmShowEntries) {
+    switch (frmShowEntries_MultiAction.value) {
+      case 'delete':
+        if (confirm('{TXT_ENTRIES_SUBMIT_DELETE_JS}')) {
+          action='?cmd=Knowledge{MODULE_INDEX}&act=multiactionEntry';
+          submit();
+        }
+      break;
+      default: //do nothing
+    }
+  }
 }
 
 /**
@@ -276,16 +276,16 @@ var updateSort = function(id)
                                 </td>
                                 <td style="width: 40px;">
                                     <a href="?cmd=Knowledge{MODULE_INDEX}&amp;section=categories&amp;act=edit&amp;id={CATEGORY_ID}" target="_self" title="{TXT_IMGALT_EDIT}"><img src="../core/Core/View/Media/icons/edit.gif" border="0" alt="{TXT_IMGALT_EDIT}" title="{TXT_IMGALT_EDIT}" /></a>
-                					<a href="javascript:deleteCategory({CATEGORY_ID}, {ENTRIES_AMOUNT});" target="_self" title="{TXT_DELETE_CATEGORY}">
-                					   <img src="../core/Core/View/Media/icons/delete.gif" border="0" alt="{TXT_DELETE_CATEGORY}" title="{TXT_DELETE_CATEGORY}" />
-                				    </a>
+                          <a href="javascript:deleteCategory({CATEGORY_ID}, {ENTRIES_AMOUNT});" target="_self" title="{TXT_DELETE_CATEGORY}">
+                             <img src="../core/Core/View/Media/icons/delete.gif" border="0" alt="{TXT_DELETE_CATEGORY}" title="{TXT_DELETE_CATEGORY}" />
+                            </a>
                                 </td>
                             </tr>
                         </table>
 
-    				    <div class="subcategories">
-    				        {SUB}
-    				    </div>
+                <div class="subcategories">
+                    {SUB}
+                </div>
                     </li>
                     <!-- END row -->
                     {ROWS}

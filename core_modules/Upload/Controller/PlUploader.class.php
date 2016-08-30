@@ -48,9 +48,9 @@ class PlUploader extends Uploader
 {
     /**
      * @override
-     */     
+     */
     public function handleRequest()
-    {    
+    {
         // HTTP headers for no cache etc
         header('Content-type: text/plain; charset=UTF-8');
         header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
@@ -65,7 +65,7 @@ class PlUploader extends Uploader
         $fileName = isset($_REQUEST["name"]) ? $_REQUEST["name"] : '';
         $fileCount = $_GET['files'];
 
-       
+
         if (\FWValidator::is_file_ending_harmless($fileName)) {
             try {
                 $this->addChunk($fileName, $chunk, $chunks);
@@ -90,7 +90,7 @@ class PlUploader extends Uploader
 
     /**
      * @override
-     */     
+     */
     public function getXHtml()
     {
       global $_CORELANG;
@@ -101,13 +101,13 @@ class PlUploader extends Uploader
 
       $tpl = new \Cx\Core\Html\Sigma(ASCMS_CORE_MODULE_PATH.'/Upload/template/uploaders');
       $tpl->setErrorHandling(PEAR_ERROR_DIE);
-      
+
       $tpl->loadTemplateFile('pl.html');
       $tpl->setVariable('UPLOAD_FLASH_URL', ASCMS_CORE_MODULE_WEB_PATH.'/Upload/ressources/uploaders/pl/plupload.flash.swf');
       $tpl->setVariable('UPLOAD_CHUNK_LENGTH', \FWSystem::getLiteralSizeFormat(\FWSystem::getMaxUploadFileSize()-1000));
       $tpl->setVariable('UPLOAD_URL', $uploadPath);
       $tpl->setVariable('UPLOAD_ID', $this->uploadId);
-      
+
       //I18N
       $tpl->setVariable(array(
           'UPLOAD' => $_CORELANG['UPLOAD'],
@@ -126,7 +126,7 @@ class PlUploader extends Uploader
           'STOP_CURRENT_UPLOAD' => $_CORELANG['STOP_CURRENT_UPLOAD'],
           'DRAG_FILES_HERE' => $_CORELANG['DRAG_FILES_HERE']
       ));
-      
+
       return $tpl->get();
     }
 }

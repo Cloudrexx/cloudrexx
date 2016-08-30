@@ -306,13 +306,13 @@ cx.fe.startBlockEditing = function(editor) {
     cx.jQuery("#fe_toolbar_startEditMode").html(cx.fe.langVars.TXT_FRONTEND_EDITING_CANCEL_EDIT);
     // show buttons for block editing
     cx.fe.actionButtons.showBlockButtons();
-    
+
     if (!cx.fe.currentEditor) {
         // load html version of data
         editor.setData(cx.fe.publishedBlocks[editor.name].contentRaw);
     }
     cx.fe.currentEditor = editor;
-    
+
     // remove content page ckeditors
     cx.fe.contentEditor.destroyAllCkEditorsExcept(editor);
 };
@@ -362,7 +362,7 @@ cx.fe.contentEditor.stop = function() {
         }
     });
     }
-    
+
     // load html format
     cx.jQuery(".fe_block").each(function() {
         var blockId = cx.jQuery(this).attr("data-id");
@@ -372,7 +372,7 @@ cx.fe.contentEditor.stop = function() {
     // hide action buttons
     cx.fe.actionButtons.hidePageButtons();
     cx.fe.actionButtons.hideBlockButtons();
-    
+
     // hide all destroys
     cx.jQuery.each(CKEDITOR.instances, function(index, element) {
         element.destroy();
@@ -462,7 +462,7 @@ cx.fe.toolbar = function() {
                 cx.jQuery("#fe_state_wrapper").hide();
                     return;
             }
-            
+
             if (cx.fe.currentEditor.name.indexOf("fe_block") < 0) {
                 cx.fe.stopPageEditing();
             } else {
@@ -516,7 +516,7 @@ cx.fe.toolbar = function() {
             cx.jQuery("#fe_toolbar_startEditMode").show();
         }
     });
-    
+
     if (cx.jQuery(".fe_block").length > 0) {
         cx.jQuery("#fe_toolbar_startEditMode").show();
     }
@@ -550,7 +550,7 @@ cx.fe.toolbar = function() {
 cx.fe.toolbar.hide = function() {
     // hide anchor boxes
     cx.fe.toolbar.hideBoxes();
-    
+
     if (cx.fe.toolbar_opened) {
         var toolbarOffset = parseInt(cx.jQuery("#fe_toolbar").css("top"));
     } else {
@@ -577,12 +577,12 @@ cx.fe.toolbar.hide = function() {
  */
 cx.fe.toolbar.show = function() {
     // do the css
-    
+
     var toolbarOffset = parseInt(cx.jQuery("body").css("padding-top"));
     if (!toolbarOffset) {
         toolbarOffset = 0;
     }
-    
+
     cx.jQuery("body").css("padding-top", (parseInt(cx.jQuery("#fe_toolbar").height()) + toolbarOffset) + "px");
     cx.jQuery("#fe_toolbar").css({
         top: toolbarOffset + "px"
@@ -827,7 +827,7 @@ cx.fe.actionButtons = function() {
             e.preventDefault();
             cx.fe.savePage();
         });
-        
+
     // init save block button and hide it
     cx.jQuery("#fe_toolbar_saveBlock").click(function(e) {
             e.preventDefault();
@@ -993,7 +993,7 @@ cx.fe.saveBlock = function(editorInstance) {
                 className = "error";
             }
             cx.tools.StatusMessage.showMessage(response.message, className, 5000);
-            
+
             if (response.data != null) {
                 cx.fe.publishedBlocks[editorInstance.name].contentHtml = response.data.content;
                 cx.fe.publishedBlocks[editorInstance.name].contentRaw = editorInstance.getData();

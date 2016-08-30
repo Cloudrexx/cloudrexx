@@ -30,8 +30,8 @@ function _media1Update()
 {
     global $_ARRAYLANG, $_CORELANG;
 
-    /*	require_once ASCMS_FRAMEWORK_PATH.'/File.class.php';
-	$objFile = new File();
+    /*    require_once ASCMS_FRAMEWORK_PATH.'/File.class.php';
+    $objFile = new File();
 
     $paths = glob(ASCMS_DOCUMENT_ROOT.'/media/archive*');
     foreach ($paths as $path) {
@@ -79,8 +79,8 @@ function _media1Update()
         // we COULD do something else here..
         return \Cx\Lib\UpdateUtil::DefaultActionHandler($e);
     }
-    
-    
+
+
     $arrContentSites = array(
         'media1', 'media2', 'media3', 'media4',
     );
@@ -98,7 +98,6 @@ function _media1Update()
             return \Cx\Lib\UpdateUtil::DefaultActionHandler($e);
         }
     }
-      
+
     return true;
 }
-

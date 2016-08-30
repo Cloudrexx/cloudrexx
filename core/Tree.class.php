@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Content Tree
  *
@@ -43,10 +43,10 @@
  * content array provider
  *
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
- * @author	Cloudrexx Development Team <info@cloudrexx.com>
+ * @author    Cloudrexx Development Team <info@cloudrexx.com>
  * @author      Michael Ritter <michael.ritter@comvation.com>
- * @access	public
- * @version	1.0.0
+ * @access    public
+ * @version    1.0.0
  * @package     cloudrexx
  * @deprecated  Use PageTree instead
  * @subpackage  core
@@ -82,7 +82,7 @@ class ContentTree {
     function convert($page, $alias) {
 //TODO: this conversion is a hack. in the final dump, we'll have module names instead of ids in the module attribute.
 //TODO: this means we will need to do exactly the opposite conversion (module2id)
-        
+
         /*$m2i = array();
         $rs = $db->Query('SELECT id, name FROM '.DBPREFIX.'modules');
         if ($rs) {

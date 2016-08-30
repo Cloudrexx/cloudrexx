@@ -272,7 +272,7 @@
     border: 0 !important;
 }
 #subnavigation li {
-    float: left;    
+    float: left;
     background: none;
 }
 #subnavigation li a {
@@ -288,7 +288,7 @@
     width: 205px;
     padding: 0 5px 1px 15px;
     font-size: 13px;
-    border: 0;   
+    border: 0;
     background-position: 16px 7px;
 }
 #subnavigation li.level-4 a {
@@ -496,7 +496,7 @@
 }
 #page-right {
     float: left;
-    width: 280px;    
+    width: 280px;
 }
 #page-right h3 {
     float: left;
@@ -592,23 +592,23 @@
   color: #555555;
 }
 .button, button, .wpcf7-form input[type="submit"], .portfolio-navigation div a, #commentform input#submit {
-	color: #fff;
-	padding: 4px 12px;
-	-moz-border-radius: 2px;
-	-webkit-border-radius: 2px;
-	border-radius: 2px;
-	border: none;
-	display: inline-block;
-	font-size: 11px;
-	font-weight: bold;
-	text-decoration: none;
-	text-shadow: 0 -1px rgba(0,0,0,.2);
-	cursor: pointer;
-	margin: 0 2px 20px;
-	line-height: 21px;
-	-webkit-transition: background .2s ease;
-	-moz-transition: background .2s ease;
-	-ms-transition: background .2s ease;
-	-o-transition: background .2s ease;
-	transition: background .2s ease;
+  color: #fff;
+  padding: 4px 12px;
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
+  border-radius: 2px;
+  border: none;
+  display: inline-block;
+  font-size: 11px;
+  font-weight: bold;
+  text-decoration: none;
+  text-shadow: 0 -1px rgba(0,0,0,.2);
+  cursor: pointer;
+  margin: 0 2px 20px;
+  line-height: 21px;
+  -webkit-transition: background .2s ease;
+  -moz-transition: background .2s ease;
+  -ms-transition: background .2s ease;
+  -o-transition: background .2s ease;
+  transition: background .2s ease;
 }

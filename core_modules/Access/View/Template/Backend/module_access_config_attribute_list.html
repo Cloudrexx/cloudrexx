@@ -3,10 +3,10 @@
 // <![CDATA[
 function accessDeleteAttribute(id,name)
 {
-	msg = '{TXT_ACCESS_CONFIRM_DELETE_ATTRIBUTE_MSG}';
-	if (confirm(msg.replace('%s', name)+'\n\n{TXT_ACCESS_OPERATION_IRREVERSIBLE}')) {
-		window.location.href = 'index.php?cmd=Access&{CSRF_PARAM}&act=config&tpl=deleteAttribute&id='+id;
-	}
+  msg = '{TXT_ACCESS_CONFIRM_DELETE_ATTRIBUTE_MSG}';
+  if (confirm(msg.replace('%s', name)+'\n\n{TXT_ACCESS_OPERATION_IRREVERSIBLE}')) {
+    window.location.href = 'index.php?cmd=Access&{CSRF_PARAM}&act=config&tpl=deleteAttribute&id='+id;
+  }
 }
 // ]]>
 </script>
@@ -36,35 +36,35 @@ function accessDeleteAttribute(id,name)
 }
 </style>
 <form action="index.php?cmd=Access&amp;act=config&amp;tpl=attributes" method="post" id="access">
-	<table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
-		<thead>
-			<tr>
-				<th colspan="3">{TXT_ACCESS_PROFILE_ATTRIBUTES}</th>
-			</tr>
-			<tr class="row3" style="font-weight:bold;">
-				<td width="15%">{TXT_ACCESS_NAME} ({TXT_ACCESS_ID})</td>
-				<td width="80%">{TXT_ACCESS_ATTRIBUTE} ({TXT_ACCESS_PREVIEW})</td>
-				<td width="5%" style="text-align:right;">{TXT_ACCESS_FUNCTIONS}</td>
-			</tr>
-		</thead>
-		<tbody style="vertical-align:top;">
-			<!-- BEGIN access_attribute_list -->
-			<tr class="row{ACCESS_ATTRIBUTE_ROW_CLASS}">
-				<td>{ACCESS_ATTRIBUTE_NAME} ({ACCESS_ATTRIBUTE_ID})</td>
-				<td>{ACCESS_ATTRIBUTE}</td>
-				<td>
-					<!-- BEGIN access_attribute_delete_function -->
-					<a href="javascript:accessDeleteAttribute({ACCESS_ATTRIBUTE_ID},'{ACCESS_ATTRIBUTE_NAME_JS}')" title="{TXT_ACCESS_DELETE_ATTRIBUTE}" style="float: right; margin-left: 5px;"><img src="../core/Core/View/Media/icons/delete.gif" width="17" height="17" border="0" alt="{TXT_ACCESS_DELETE_ATTRIBUTE}" /></a>
-					<!-- END access_attribute_delete_function -->
-					<!-- BEGIN access_attribute_modify_function -->
-					<a href="index.php?cmd=Access&amp;act=config&amp;tpl=modifyAttribute&amp;id={ACCESS_ATTRIBUTE_ID}" title="{TXT_ACCESS_MODIFY_ATTRIBUTE}" style="float: right;"><img src="../core/Core/View/Media/icons/edit.gif" width="16" height="16" border="0" alt="{TXT_ACCESS_MODIFY_ATTRIBUTE}" /></a>
-					<!-- END access_attribute_modify_function -->
-				</td>
-			</tr>
-			<!-- END access_attribute_list -->
-		</tbody>
-	</table>
-	<br />
+  <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
+    <thead>
+      <tr>
+        <th colspan="3">{TXT_ACCESS_PROFILE_ATTRIBUTES}</th>
+      </tr>
+      <tr class="row3" style="font-weight:bold;">
+        <td width="15%">{TXT_ACCESS_NAME} ({TXT_ACCESS_ID})</td>
+        <td width="80%">{TXT_ACCESS_ATTRIBUTE} ({TXT_ACCESS_PREVIEW})</td>
+        <td width="5%" style="text-align:right;">{TXT_ACCESS_FUNCTIONS}</td>
+      </tr>
+    </thead>
+    <tbody style="vertical-align:top;">
+      <!-- BEGIN access_attribute_list -->
+      <tr class="row{ACCESS_ATTRIBUTE_ROW_CLASS}">
+        <td>{ACCESS_ATTRIBUTE_NAME} ({ACCESS_ATTRIBUTE_ID})</td>
+        <td>{ACCESS_ATTRIBUTE}</td>
+        <td>
+          <!-- BEGIN access_attribute_delete_function -->
+          <a href="javascript:accessDeleteAttribute({ACCESS_ATTRIBUTE_ID},'{ACCESS_ATTRIBUTE_NAME_JS}')" title="{TXT_ACCESS_DELETE_ATTRIBUTE}" style="float: right; margin-left: 5px;"><img src="../core/Core/View/Media/icons/delete.gif" width="17" height="17" border="0" alt="{TXT_ACCESS_DELETE_ATTRIBUTE}" /></a>
+          <!-- END access_attribute_delete_function -->
+          <!-- BEGIN access_attribute_modify_function -->
+          <a href="index.php?cmd=Access&amp;act=config&amp;tpl=modifyAttribute&amp;id={ACCESS_ATTRIBUTE_ID}" title="{TXT_ACCESS_MODIFY_ATTRIBUTE}" style="float: right;"><img src="../core/Core/View/Media/icons/edit.gif" width="16" height="16" border="0" alt="{TXT_ACCESS_MODIFY_ATTRIBUTE}" /></a>
+          <!-- END access_attribute_modify_function -->
+        </td>
+      </tr>
+      <!-- END access_attribute_list -->
+    </tbody>
+  </table>
+  <br />
 </form>
 <input type="button" value="{TXT_ACCESS_ADD_NEW_PROFILE_ATTRIBUTE}" onclick="window.location.href='index.php?cmd=Access&{CSRF_PARAM}&amp;act=config&amp;tpl=modifyAttribute'" />
 <!-- end module_access_config_attribute_list.html -->

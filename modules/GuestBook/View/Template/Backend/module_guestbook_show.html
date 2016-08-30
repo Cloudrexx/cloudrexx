@@ -1,4 +1,4 @@
-<!-- START module_guestbook_show.html --> 
+<!-- START module_guestbook_show.html -->
 <script language="JavaScript" type="text/javascript">
 // <![CDATA[
 function guestbookDelete(pageId){
@@ -8,36 +8,36 @@ function guestbookDelete(pageId){
 
 function selectMultiAction()
 {
-	with (document.guestbook) {
-		switch (guestbook_MultiAction.value) {
-			case 'activate':
-				action='?cmd=GuestBook&act=multi_activate';
-				submit();
-			break;
-			case 'deactivate':
-				action='?cmd=GuestBook&act=multi_deactivate';
-				submit();
-			break;
-			case 'delete':
-				if (confirm('{TXT_DELETE_CATEGORY_ALL}')) {
-					action='?cmd=GuestBook&act=multi_delete';
-					submit();
-				}
-			break;
-			default: //do nothing			
-		}
-	}
+  with (document.guestbook) {
+    switch (guestbook_MultiAction.value) {
+      case 'activate':
+        action='?cmd=GuestBook&act=multi_activate';
+        submit();
+      break;
+      case 'deactivate':
+        action='?cmd=GuestBook&act=multi_deactivate';
+        submit();
+      break;
+      case 'delete':
+        if (confirm('{TXT_DELETE_CATEGORY_ALL}')) {
+          action='?cmd=GuestBook&act=multi_delete';
+          submit();
+        }
+      break;
+      default: //do nothing
+    }
+  }
 }
 // ]]>
 </script>
 <form method="post" name="guestbook">
 <table class="adminlist" cellspacing="0" cellpadding="3" width="100%" border="0">
-  <tr> 
+  <tr>
     <th colspan="5">
       <div align="left">{TXT_MANAGE_ENTRIES}</div>
     </th>
   </tr>
-  <tr class="row1"> 
+  <tr class="row1">
     <td width="1%"><strong>#</strong></td>
     <td width="4%"><strong>Status</strong></td>
     <td width="21%"><strong>{TXT_NAME}</strong></td>
@@ -45,8 +45,8 @@ function selectMultiAction()
     <td width="4%" style="text-align: right;"><strong>{TXT_ACTION}</strong></td>
   </tr>
   <!-- BEGIN guestbook_row -->
-  <tr class="{GUESTBOOK_ROWCLASS}"> 
-    <td valign="top"><input type="checkbox" name="selectedId[]" id="selectedId" value="{GUESTBOOK_ID}"></td>     
+  <tr class="{GUESTBOOK_ROWCLASS}">
+    <td valign="top"><input type="checkbox" name="selectedId[]" id="selectedId" value="{GUESTBOOK_ID}"></td>
     <td valign="top"><a href="?cmd=GuestBook&amp;act=activate&amp;id={GUESTBOOK_ID}" target="_self"><img src="../core/Core/View/Media/icons/{GUESTBOOK_STATUS}.gif" border="0" alt="Status" /></a></td>
     <td valign="top"><strong>{GUESTBOOK_FORENAME} {GUESTBOOK_NAME}</strong>{GUESTBOOK_GENDER} <i>{GUESTBOOK_IP}</i><br />{GUESTBOOK_LOCATION}<br /><div style="margin-top: 5px">{GUESTBOOK_MAIL} {GUESTBOOK_URL}</div></td>
     <td valign="top"><img alt="" hspace="0" src="../core/Core/View/Media/icons/profile_edit.gif" border="0" style="float: left"/><div style="margin-left: 22px;">{GUESTBOOK_DATE}</div><br /><div style="margin-left: 22px;">{GUESTBOOK_COMMENT}</div></td>
@@ -55,20 +55,20 @@ function selectMultiAction()
   <!-- END guestbook_row -->
 </table>
 <table cellpadding="2" cellspacing="0" border="0">
-	<tr>
-		<td>
-			<img src="../core/Core/View/Media/icons/arrow.gif" border="0" width="38" height="22" alt="{TXT_MARKED}:" />
-			<a href="#" onclick="changeCheckboxes('guestbook','selectedId[]',true); return false;">{TXT_SELECT_ALL}</a> / 
-			<a href="#" onclick="changeCheckboxes('guestbook','selectedId[]',false); return false;">{TXT_DESELECT_ALL}</a>
-			<img src="../core/Core/View/Media/icons/strike.gif">
-			<select name="guestbook_MultiAction" onchange="selectMultiAction();">
-				<option value="0">{TXT_SUBMIT_SELECT}</option>
-				<option value="delete">{TXT_SUBMIT_DELETE}</option>
-				<option value="activate">{TXT_SUBMIT_ACTIVATE}</option>
-				<option value="deactivate">{TXT_SUBMIT_DEACTIVATE}</option>
-			</select>
-		</td>
-	</tr>
+  <tr>
+    <td>
+      <img src="../core/Core/View/Media/icons/arrow.gif" border="0" width="38" height="22" alt="{TXT_MARKED}:" />
+      <a href="#" onclick="changeCheckboxes('guestbook','selectedId[]',true); return false;">{TXT_SELECT_ALL}</a> /
+      <a href="#" onclick="changeCheckboxes('guestbook','selectedId[]',false); return false;">{TXT_DESELECT_ALL}</a>
+      <img src="../core/Core/View/Media/icons/strike.gif">
+      <select name="guestbook_MultiAction" onchange="selectMultiAction();">
+        <option value="0">{TXT_SUBMIT_SELECT}</option>
+        <option value="delete">{TXT_SUBMIT_DELETE}</option>
+        <option value="activate">{TXT_SUBMIT_ACTIVATE}</option>
+        <option value="deactivate">{TXT_SUBMIT_DEACTIVATE}</option>
+      </select>
+    </td>
+  </tr>
 </table>
 </form>
 <br />

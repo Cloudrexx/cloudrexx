@@ -30,7 +30,7 @@
  *
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Thomas Kaelin <thomas.kaelin@comvation.com>
- * @version	   $Id: index.inc.php,v 1.00 $
+ * @version       $Id: index.inc.php,v 1.00 $
  * @package     cloudrexx
  * @subpackage  module_survey
  * @todo        Edit PHP DocBlocks!
@@ -41,7 +41,7 @@ namespace Cx\Modules\Survey\Controller;
  *
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Thomas Kaelin <thomas.kaelin@comvation.com>
- * @version	   $Id: index.inc.php,v 1.00 $
+ * @version       $Id: index.inc.php,v 1.00 $
  * @package     cloudrexx
  * @subpackage  module_survey
  * @todo        Edit PHP DocBlocks!
@@ -49,7 +49,7 @@ namespace Cx\Modules\Survey\Controller;
 class SurveyQuestion
 {
     public $id;
-    public $surveyId;    
+    public $surveyId;
     public $questionType;
     public $isCommentable;
     public $question;
@@ -57,23 +57,23 @@ class SurveyQuestion
     public $questionChoice;
     public $questionAnswers;
     public $position;
-            
+
     function get()
     {
         global $objDatabase;
-        
+
         if (empty($this->id)) {
             return false;
         }
-        
-        $query = "SELECT 
-                        * 
-                      FROM 
+
+        $query = "SELECT
+                        *
+                      FROM
                         `".DBPREFIX."module_survey_surveyQuestions`
-                      WHERE 
+                      WHERE
                         `id` = {$this->id}";
         $objResult = $objDatabase->Execute($query);
-        
+
         if ($objResult) {
             $this->surveyId      = (int) $objResult->fields['survey_id'];
             $this->questionType  = (int) $objResult->fields['QuestionType'];
@@ -81,57 +81,57 @@ class SurveyQuestion
             $this->question      = $this->questionType != 7 ? $objResult->fields['Question'] : '';
             $this->questionRow   = $this->questionType == 7 ? $objResult->fields['Question'] : '';
         }
-        
-        $query = "SELECT 
-                        * 
-                      FROM 
+
+        $query = "SELECT
+                        *
+                      FROM
                         `".DBPREFIX."module_survey_surveyAnswers`
-                      WHERE 
+                      WHERE
                         `question_id` = {$this->id}";
         $objResult = $objDatabase->Execute($query);
         $answers   = array();
         if ($objResult) {
             while (!$objResult->EOF) {
                 $answers[] = $objResult->fields['answer'];
-                $objResult->MoveNext();                
+                $objResult->MoveNext();
             }
         }
         $this->questionAnswers = implode(PHP_EOL, $answers);
-        
-        $query = "SELECT 
-                        * 
-                      FROM 
+
+        $query = "SELECT
+                        *
+                      FROM
                         `".DBPREFIX."module_survey_columnChoices`
-                      WHERE 
+                      WHERE
                         `question_id` = {$this->id}";
         $objResult = $objDatabase->Execute($query);
         $choices   = array();
         if ($objResult) {
-            while (!$objResult->EOF) {                
+            while (!$objResult->EOF) {
                 $choices[] = $objResult->fields['choice'];
-                $objResult->MoveNext();                
+                $objResult->MoveNext();
             }
         }
         $this->questionChoice = implode(PHP_EOL, $choices);
-                        
+
     }
-    
+
     function save()
     {
         global $objDatabase;
-        
+
         if (empty($this->surveyId)) {
             return false;
         }
-        
+
         $this->question = $this->questionType != 7 ? $this->question : $this->questionRow;
-        
+
         if (in_array($this->questionType, array(3, 4))) {
             $options    = explode ("\n", $this->questionChoice);
             $choices    = explode ("\n", $this->questionAnswers);
             $colChoices = implode($choices, ";");
             $vote       = json_encode($colChoices);
-            
+
             $vote = array();
             foreach ($colChoices as $key => $value) {
                 $vote[$key] = 0;
@@ -141,40 +141,40 @@ class SurveyQuestion
             $options    = explode ("\n", $this->questionAnswers);
             $choices    = explode ("\n", $this->questionChoice);
             $colChoices = "";
-            $vote       = 0;            
+            $vote       = 0;
         }
-        
+
         if(in_array($this->questionType, array(5, 7))) {
             $options[0] = "Answer";
         }
-        
+
         $arrFields = array(
             'survey_id'     => $this->surveyId,
             'isCommentable' => $this->isCommentable,
             'QuestionType'  => $this->questionType,
-            'Question'      => $this->question,            
+            'Question'      => $this->question,
             'column_choice' => $colChoices
         );
-        
+
         if (empty($this->id)) {
             $arrFields['pos'] = 0;
             $query = \SQL::insert('module_survey_surveyQuestions', $arrFields, array('escape' => true));
         } else {
             $query = \SQL::update('module_survey_surveyQuestions', $arrFields, array('escape' => true))." WHERE `id` = {$this->id}";
         }
-        
+
         if ($objDatabase->Execute($query)) {
             if (empty($this->id)) {
                 $this->id = $objDatabase->INSERT_ID();
             }
         }
-        
+
         $deleteQuery = 'DELETE FROM `'.DBPREFIX.'module_survey_surveyAnswers` WHERE question_id = '.$this->id;
         $objDatabase->Execute($deleteQuery);
 
         $deleteQuery = 'DELETE FROM `'.DBPREFIX.'module_survey_columnChoices` WHERE question_id = '.$this->id;
         $objDatabase->Execute($deleteQuery);
-            
+
         if (!empty($options)) {
             foreach (array_filter($options) as $option) {
                 $arrFields = array(
@@ -186,7 +186,7 @@ class SurveyQuestion
                 $objDatabase->Execute($query);
             }
         }
-        
+
         if (!empty($colChoices)) {
             foreach (array_filter($colChoices) as $choice) {
                 $arrFields = array(
@@ -197,28 +197,28 @@ class SurveyQuestion
                 $objDatabase->Execute($query);
             }
         }
-         
+
     }
-    
+
     function updatePosition()
     {
         global $objDatabase;
-        
+
         $query = \SQL::update('module_survey_surveyQuestions', array('pos' => $this->position), array('escape' => true))." WHERE `id` = {$this->id}";
         $objDatabase->Execute($query);
     }
-    
+
     function delete()
-    {             
+    {
         global $objDatabase;
-        
+
         if (!empty($this->id)) {
             $deleteQuery = 'DELETE FROM `'.DBPREFIX.'module_survey_surveyQuestions` WHERE id = '.$this->id;
             $objDatabase->Execute($deleteQuery);
-            
+
             $deleteQuery = 'DELETE FROM `'.DBPREFIX.'module_survey_surveyAnswers` WHERE question_id = '.$this->id;
             $objDatabase->Execute($deleteQuery);
-            
+
             $deleteQuery = 'DELETE FROM `'.DBPREFIX.'module_survey_columnChoices` WHERE question_id = '.$this->id;
             $objDatabase->Execute($deleteQuery);
         }

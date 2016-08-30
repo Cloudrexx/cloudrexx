@@ -49,7 +49,7 @@ class FileSharingManager extends FileSharingLib
     public function __construct(&$objTpl)
     {
         global $_ARRAYLANG, $objInit;
-        
+
         $_ARRAYLANG = array_merge($_ARRAYLANG, $objInit->loadLanguageData('FileSharing'));
 
         $this->_objTpl = $objTpl;

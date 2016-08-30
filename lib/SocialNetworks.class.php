@@ -97,7 +97,7 @@ class SocialNetworks
     }
 
     /**
-     * Get a Facebook "Share"-Button. 
+     * Get a Facebook "Share"-Button.
      * This is not the way to do it, facebook suggests using the "Like"-Button (you can write a comment there too).
      * @param String $type 'icon', 'button' or 'icon_link' (defaults to 'icon')
      * @access public
@@ -106,15 +106,15 @@ class SocialNetworks
      */
     public function getFacebookShareButton($type='icon')
     {
-	$xhtml = '<a name="fb_share"
+    $xhtml = '<a name="fb_share"
                     share_url="'.$this->url.'"
                     type="'.$type.'"
                     >
-                  </a> 
-                  <script src="http://static.ak.fbcdn.net/connect.php/js/FB.Share" 
+                  </a>
+                  <script src="http://static.ak.fbcdn.net/connect.php/js/FB.Share"
                     type="text/javascript">
                   </script>';
-	return $xhtml;
+    return $xhtml;
     }
 
     /**

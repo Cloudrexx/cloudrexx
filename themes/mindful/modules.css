@@ -75,7 +75,7 @@ form label {
     width: 250px;
 }
 form input[type="submit"] {
-    margin-right: 10px;    
+    margin-right: 10px;
 }
 #login form input.remember_me,
 #login form label.remember_me {
@@ -84,7 +84,7 @@ form input[type="submit"] {
     padding: 0 0 21px 0;
     border: 0 none;
 }
-#login form input.remember_me {    
+#login form input.remember_me {
     margin-top: 5px;
     float: left;
     position: relative;
@@ -100,7 +100,7 @@ table th {
     padding: 6px 8px 6px 8px;
     color: #FFFFFF;
     text-align: left;
-    font-weight: bold;    
+    font-weight: bold;
     background-color: #202020;
 }
 table th a {
@@ -144,7 +144,7 @@ div.row2 {
 #captcha {
     float: left !important;
     width: 430px !important;
-    clear: none !important;    
+    clear: none !important;
     padding: 0;
     margin-bottom: 10px;
 }
@@ -356,9 +356,9 @@ div.row2 {
 }
 #calendar ul.event-list {
     float: left;
-    width: 100%;   
+    width: 100%;
     list-style-type: none;
-    margin-left: 0 !important; 
+    margin-left: 0 !important;
 }
 #calendar div.registration  {
     text-align: right;
@@ -607,7 +607,7 @@ div.row2 {
     float: left;
     border-top: 1px solid #ECEDF3;
 }
-#directory .selector {    
+#directory .selector {
     clear: left;
     margin-top: -15px;
     padding-left: 190px;
@@ -1365,7 +1365,7 @@ div.row2 {
 }
 .ie7 #container #shop figure a,
 .ie8 #container #shop figure a ,
-.ie9 #container #shop figure a {width: 29% !important;} 
+.ie9 #container #shop figure a {width: 29% !important;}
 #shop figure a:hover {
     border: 1px solid #AAAAAA;
     box-shadow: 3px 3px 8px #AAAAAA;
@@ -1392,7 +1392,7 @@ div.row2 {
     margin: 0;
     color: #FFFFFF;
     font-size: 15px;
-    text-align: center;    
+    text-align: center;
     background: #202020;
 }
 #shop .continue-button {
@@ -1405,8 +1405,8 @@ div.row2 {
 #shop .cart-buttons {
     float: right;
     padding: 10px 8px 0 0;
-}   
-#shop button.details-button {   
+}
+#shop button.details-button {
     background: url("images/arrowrightwhite.png") no-repeat scroll 62px 13px #202020;
     border: medium none;
     color: white;
@@ -1434,13 +1434,13 @@ div.row2 {
     -webkit-border-top-left-radius: 0;
     -webkit-border-bottom-left-radius: 0;
     -o-border-top-left-radius: 0;
-    -o-border-bottom-left-radius: 0;    
+    -o-border-bottom-left-radius: 0;
     background:url("images/cartwhite.png") no-repeat scroll 10px 7px #202020;
     border: none;
     margin: 0;
 }
 #shop button.details-button:hover,
-#shop button.add-to-cart:hover {    
+#shop button.add-to-cart:hover {
     background-color: #595959;
 }
 /***************************************************/
@@ -1462,7 +1462,7 @@ div.row2 {
     float: left;
     width: 100%;
     padding: 0 0 10px 0;
-    margin: 20px 0 0 0 !important;    
+    margin: 20px 0 0 0 !important;
 }
 #news li {
     float: left;
@@ -1473,7 +1473,7 @@ div.row2 {
     list-style-type:none;
 }
 .news-image {
-    float: left;    
+    float: left;
     width: 20%;
 }
 .news-image img {
@@ -1481,7 +1481,7 @@ div.row2 {
     max-height: 120px;
 }
 .news-text {
-    float: left;    
+    float: left;
     width: 80%;
 }
 .news-teaser {
@@ -2294,7 +2294,7 @@ dl.data_module img {
     border: 0;
 }
 #mediadir .employee-left {
-    float: left;   
+    float: left;
 }
 #mediadir .employee-left img {
     float: left;
@@ -2302,7 +2302,7 @@ dl.data_module img {
     max-height: 200px;
 }
 #mediadir .employee-middle {
-    float: left;    
+    float: left;
 }
 #mediadir .employee-title {
     float: left;
@@ -2314,7 +2314,7 @@ dl.data_module img {
     clear: left;
 }
 #mediadir .employee-right {
-    float: left;   
+    float: left;
 }
 .ie7 #container #mediadir .employee-right {width: 44% !important;}
 #mediadir .employee-more {
@@ -2322,7 +2322,7 @@ dl.data_module img {
 }
 .ie7 #container #mediadir .reference{width: 29% !important;}
 #mediadir .reference {
-    float: left;    
+    float: left;
     height: 120px;
     margin: 0 0 20px 0;
     text-align: center;
@@ -2534,8 +2534,8 @@ dl.data_module img {
     background-image: url('images/contact-button.jpg') !important;
     background-repeat: no-repeat !important;
 }
-.ie7 body #container .sidebar-block.contact-us a:hover, 
-.ie8 body #container .sidebar-block.contact-us a:hover, 
+.ie7 body #container .sidebar-block.contact-us a:hover,
+.ie8 body #container .sidebar-block.contact-us a:hover,
 .ie9 body #container .sidebar-block.contact-us a:hover{
     background-image: url('images/contact-button-hover.jpg') !important;
     background-repeat: no-repeat !important;

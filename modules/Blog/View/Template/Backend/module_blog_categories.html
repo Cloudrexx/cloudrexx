@@ -2,131 +2,131 @@
 <script language="JavaScript" type="text/javascript">
 //<![CDATA[
 function showOrHide(strElement) {
-	if (document.getElementById(strElement).style.display == 'none') {
-		document.getElementById(strElement).style.display = 'block';
-	} else {
-		document.getElementById(strElement).style.display = 'none';
-	}
+  if (document.getElementById(strElement).style.display == 'none') {
+    document.getElementById(strElement).style.display = 'block';
+  } else {
+    document.getElementById(strElement).style.display = 'none';
+  }
 }
 
 function copyText(strField) {
-	for (var h=0; h < document.forms.length;h++) {
-		for (var i=0; i < document.forms[h].elements.length;i++) {
-			//read out all form-elements with the loop
-			if(document.forms[h].elements[i].name.search(strField) != -1) {
-				switch (strField) {
-					case 'frmAddCategory_Name_':
-						document.forms[h].elements[i].value = document.frmAddCategory.frmAddCategory_Name.value;
-					break;
-				}
-			}
-		}
-	}	
+  for (var h=0; h < document.forms.length;h++) {
+    for (var i=0; i < document.forms[h].elements.length;i++) {
+      //read out all form-elements with the loop
+      if(document.forms[h].elements[i].name.search(strField) != -1) {
+        switch (strField) {
+          case 'frmAddCategory_Name_':
+            document.forms[h].elements[i].value = document.frmAddCategory.frmAddCategory_Name.value;
+          break;
+        }
+      }
+    }
+  }
 }
 
-function deleteCategory(catId){ 
-    if(confirm('{TXT_OVERVIEW_DELETE_CATEGORY_JS}')) 
+function deleteCategory(catId){
+    if(confirm('{TXT_OVERVIEW_DELETE_CATEGORY_JS}'))
         window.location.replace("index.php?cmd=Blog&{CSRF_PARAM}&act=deleteCategory&id="+catId);
 }
 
 function selectMultiAction() {
-	with (document.frmShowCategories) {
-		switch (frmShowCategories_MultiAction.value) {
-			case 'delete':
-				if (confirm('{TXT_OVERVIEW_SUBMIT_DELETE_JS}')) {
-					action='index.php?cmd=Blog&{CSRF_PARAM}&act=multiactionCategory';
-					submit();
-				}
-			break;
-			default: //do nothing			
-		}
-	}
+  with (document.frmShowCategories) {
+    switch (frmShowCategories_MultiAction.value) {
+      case 'delete':
+        if (confirm('{TXT_OVERVIEW_SUBMIT_DELETE_JS}')) {
+          action='index.php?cmd=Blog&{CSRF_PARAM}&act=multiactionCategory';
+          submit();
+        }
+      break;
+      default: //do nothing
+    }
+  }
 }
 //]]>
 </script>
 <ul id="tabmenu">
-	<li><a id="categories_Overview" class="active" href="javascript:{}" onclick="selectTab('Overview')" title="{TXT_OVERVIEW_TITLE}">{TXT_OVERVIEW_TITLE}</a></li>
-	<li><a id="categories_AddCategory" class="inactive" href="javascript:{}" onclick="selectTab('AddCategory')" title="{TXT_ADD_TITLE}">{TXT_ADD_TITLE}</a></li>
+  <li><a id="categories_Overview" class="active" href="javascript:{}" onclick="selectTab('Overview')" title="{TXT_OVERVIEW_TITLE}">{TXT_OVERVIEW_TITLE}</a></li>
+  <li><a id="categories_AddCategory" class="inactive" href="javascript:{}" onclick="selectTab('AddCategory')" title="{TXT_ADD_TITLE}">{TXT_ADD_TITLE}</a></li>
 </ul>
 
 <div id="Overview" class="categories" style="display: block;">
-	<form name="frmShowCategories" method="post" action="">
-		<table width="100%" cellspacing="0" cellpadding="3" border="0" class="adminlist">
-			<tr>
-				<th colspan="4">{TXT_OVERVIEW_TITLE}</th>
-			</tr>
-			<tr class="row3">
-				<td nowrap="nowrap" width="2%"><span style="font-weight:bold;">&nbsp;&nbsp;#</span></td>
-				<td nowrap="nowrap" width="20%"><span style="font-weight:bold;">{TXT_OVERVIEW_SUBTITLE_NAME}</span></td>
-				<td nowrap="nowrap" width="77%"><span style="font-weight:bold;">{TXT_OVERVIEW_SUBTITLE_ACTIVE}</span></td>
-				<td nowrap="nowrap" width="1%"><div align="right"><span style="font-weight:bold;">{TXT_OVERVIEW_SUBTITLE_ACTIONS}</span></div></td>
-			</tr>
-			<!-- BEGIN showCategories -->
-			<tr class="{OVERVIEW_CATEGORY_ROWCLASS}">
-				<td><input type="checkbox" name="selectedCategoryId[]" value="{OVERVIEW_CATEGORY_ID}" /></td>
-				<td><a href="?cmd=Blog&amp;act=editCategory&amp;id={OVERVIEW_CATEGORY_ID}" target="_self" title="{TXT_OVERVIEW_IMGALT_EDIT}">{OVERVIEW_CATEGORY_NAME}</a></td>
-				<td>{OVERVIEW_CATEGORY_LANGUAGES}</td>
-				<td nowrap="nowrap">
-					<div align="right">
-						<a href="index.php?cmd=Blog&amp;catId={OVERVIEW_CATEGORY_ID}" target="_self" title="{TXT_OVERVIEW_IMGALT_MESSAGES}"><img src="../core/Core/View/Media/icons/details.gif" border="0" alt="{TXT_OVERVIEW_IMGALT_MESSAGES}" title="{TXT_OVERVIEW_IMGALT_MESSAGES}" /></a>
-						<a href="index.php?cmd=Blog&amp;act=editCategory&amp;id={OVERVIEW_CATEGORY_ID}" target="_self" title="{TXT_OVERVIEW_IMGALT_EDIT}"><img src="../core/Core/View/Media/icons/edit.gif" border="0" alt="{TXT_OVERVIEW_IMGALT_EDIT}" title="{TXT_OVERVIEW_IMGALT_EDIT}" /></a>
-						<a href="javascript:deleteCategory({OVERVIEW_CATEGORY_ID});" target="_self" title="{TXT_OVERVIEW_IMGALT_DELETE}"><img src="../core/Core/View/Media/icons/delete.gif" border="0" alt="{TXT_OVERVIEW_IMGALT_DELETE}" title="{TXT_OVERVIEW_IMGALT_DELETE}" /></a> 
-					</div>
-				</td>
-			</tr>
-			<!-- END showCategories -->
-			<!-- BEGIN noCategories -->
-			<tr class="row2">
-				<td colspan="4"><div align="center"><br />{TXT_OVERVIEW_NO_CATEGORIES_FOUND}<br /><br /></div></td>
-			</tr>
-			<!-- END noCategories -->
-		</table>
-		<br />
-		<table cellpadding="2" cellspacing="0" border="0">
-			<tr>
-				<td>
-					<img src="../core/Core/View/Media/icons/arrow.gif" border="0" width="38" height="22" alt="{TXT_OVERVIEW_MARKED}:" />
-					<a href="#" onclick="changeCheckboxes('frmShowCategories','selectedCategoryId[]',true); return false;">{TXT_OVERVIEW_SELECT_ALL}</a> / 
-					<a href="#" onclick="changeCheckboxes('frmShowCategories','selectedCategoryId[]',false); return false;">{TXT_OVERVIEW_DESELECT_ALL}</a>
-					<img src="../core/Core/View/Media/icons/strike.gif" alt="" />
-					<select name="frmShowCategories_MultiAction" onchange="selectMultiAction();">
-						<option value="0">{TXT_OVERVIEW_SUBMIT_SELECT}</option>
-						<option value="delete">{TXT_OVERVIEW_SUBMIT_DELETE}</option>
-					</select>
-				</td>
-			</tr>
-		</table>
-	</form>
-	<br />
-	<div align="center">{OVERVIEW_PAGING}</div>	
+  <form name="frmShowCategories" method="post" action="">
+    <table width="100%" cellspacing="0" cellpadding="3" border="0" class="adminlist">
+      <tr>
+        <th colspan="4">{TXT_OVERVIEW_TITLE}</th>
+      </tr>
+      <tr class="row3">
+        <td nowrap="nowrap" width="2%"><span style="font-weight:bold;">&nbsp;&nbsp;#</span></td>
+        <td nowrap="nowrap" width="20%"><span style="font-weight:bold;">{TXT_OVERVIEW_SUBTITLE_NAME}</span></td>
+        <td nowrap="nowrap" width="77%"><span style="font-weight:bold;">{TXT_OVERVIEW_SUBTITLE_ACTIVE}</span></td>
+        <td nowrap="nowrap" width="1%"><div align="right"><span style="font-weight:bold;">{TXT_OVERVIEW_SUBTITLE_ACTIONS}</span></div></td>
+      </tr>
+      <!-- BEGIN showCategories -->
+      <tr class="{OVERVIEW_CATEGORY_ROWCLASS}">
+        <td><input type="checkbox" name="selectedCategoryId[]" value="{OVERVIEW_CATEGORY_ID}" /></td>
+        <td><a href="?cmd=Blog&amp;act=editCategory&amp;id={OVERVIEW_CATEGORY_ID}" target="_self" title="{TXT_OVERVIEW_IMGALT_EDIT}">{OVERVIEW_CATEGORY_NAME}</a></td>
+        <td>{OVERVIEW_CATEGORY_LANGUAGES}</td>
+        <td nowrap="nowrap">
+          <div align="right">
+            <a href="index.php?cmd=Blog&amp;catId={OVERVIEW_CATEGORY_ID}" target="_self" title="{TXT_OVERVIEW_IMGALT_MESSAGES}"><img src="../core/Core/View/Media/icons/details.gif" border="0" alt="{TXT_OVERVIEW_IMGALT_MESSAGES}" title="{TXT_OVERVIEW_IMGALT_MESSAGES}" /></a>
+            <a href="index.php?cmd=Blog&amp;act=editCategory&amp;id={OVERVIEW_CATEGORY_ID}" target="_self" title="{TXT_OVERVIEW_IMGALT_EDIT}"><img src="../core/Core/View/Media/icons/edit.gif" border="0" alt="{TXT_OVERVIEW_IMGALT_EDIT}" title="{TXT_OVERVIEW_IMGALT_EDIT}" /></a>
+            <a href="javascript:deleteCategory({OVERVIEW_CATEGORY_ID});" target="_self" title="{TXT_OVERVIEW_IMGALT_DELETE}"><img src="../core/Core/View/Media/icons/delete.gif" border="0" alt="{TXT_OVERVIEW_IMGALT_DELETE}" title="{TXT_OVERVIEW_IMGALT_DELETE}" /></a>
+          </div>
+        </td>
+      </tr>
+      <!-- END showCategories -->
+      <!-- BEGIN noCategories -->
+      <tr class="row2">
+        <td colspan="4"><div align="center"><br />{TXT_OVERVIEW_NO_CATEGORIES_FOUND}<br /><br /></div></td>
+      </tr>
+      <!-- END noCategories -->
+    </table>
+    <br />
+    <table cellpadding="2" cellspacing="0" border="0">
+      <tr>
+        <td>
+          <img src="../core/Core/View/Media/icons/arrow.gif" border="0" width="38" height="22" alt="{TXT_OVERVIEW_MARKED}:" />
+          <a href="#" onclick="changeCheckboxes('frmShowCategories','selectedCategoryId[]',true); return false;">{TXT_OVERVIEW_SELECT_ALL}</a> /
+          <a href="#" onclick="changeCheckboxes('frmShowCategories','selectedCategoryId[]',false); return false;">{TXT_OVERVIEW_DESELECT_ALL}</a>
+          <img src="../core/Core/View/Media/icons/strike.gif" alt="" />
+          <select name="frmShowCategories_MultiAction" onchange="selectMultiAction();">
+            <option value="0">{TXT_OVERVIEW_SUBMIT_SELECT}</option>
+            <option value="delete">{TXT_OVERVIEW_SUBMIT_DELETE}</option>
+          </select>
+        </td>
+      </tr>
+    </table>
+  </form>
+  <br />
+  <div align="center">{OVERVIEW_PAGING}</div>
 </div>
 
 <div id="AddCategory" class="categories" style="display: none;">
-	<form name="frmAddCategory" method="post" action="?cmd=Blog&amp;act=insertCategory">
-		<table width="100%" cellspacing="0" cellpadding="3" border="0" class="adminlist">
-			<tr>
-				<th colspan="4">{TXT_ADD_TITLE}</th>
-			</tr>
-			<tr class="row1">
-				<td valign="top">{TXT_ADD_NAME}</td>
-				<td colspan="3">
-					<input type="text" name="frmAddCategory_Name" value="" maxlength="100" onchange="copyText('frmAddCategory_Name_');" style="width:30%;" />&nbsp;<a href="javascript:showOrHide('divAddCategoryLang_Name');">{TXT_ADD_EXTENDED}</a>
-					<div id="divAddCategoryLang_Name" style="display: none;">
-						<!-- BEGIN addCategoryNameFields -->
-						<input type="text" name="frmAddCategory_Name_{ADD_NAME_LANGID}" value="" maxlength="100" style="width:30%; margin-top:1px;" />&nbsp;<label for="frmAddCategory_Name_{ADD_NAME_LANGID}">{ADD_NAME_LANG}</label><br />
-						<!-- END addCategoryNameFields -->
-					</div>	
-				</td>
-			</tr>
-			<tr class="row1">
-				<td width="10%">{TXT_ADD_LANGUAGES}</td>
-				<td width="10%" valign="top">{ADD_LANGUAGES_1}</td>
-				<td width="10%" valign="top">{ADD_LANGUAGES_2}</td>
-				<td width="70%" valign="top">{ADD_LANGUAGES_3}</td>
-			</tr>
-		</table>
-		<br />
-		<input type="submit" value="{TXT_ADD_SUBMIT}" name="frmAddCategory_Submit" />
-	</form>
+  <form name="frmAddCategory" method="post" action="?cmd=Blog&amp;act=insertCategory">
+    <table width="100%" cellspacing="0" cellpadding="3" border="0" class="adminlist">
+      <tr>
+        <th colspan="4">{TXT_ADD_TITLE}</th>
+      </tr>
+      <tr class="row1">
+        <td valign="top">{TXT_ADD_NAME}</td>
+        <td colspan="3">
+          <input type="text" name="frmAddCategory_Name" value="" maxlength="100" onchange="copyText('frmAddCategory_Name_');" style="width:30%;" />&nbsp;<a href="javascript:showOrHide('divAddCategoryLang_Name');">{TXT_ADD_EXTENDED}</a>
+          <div id="divAddCategoryLang_Name" style="display: none;">
+            <!-- BEGIN addCategoryNameFields -->
+            <input type="text" name="frmAddCategory_Name_{ADD_NAME_LANGID}" value="" maxlength="100" style="width:30%; margin-top:1px;" />&nbsp;<label for="frmAddCategory_Name_{ADD_NAME_LANGID}">{ADD_NAME_LANG}</label><br />
+            <!-- END addCategoryNameFields -->
+          </div>
+        </td>
+      </tr>
+      <tr class="row1">
+        <td width="10%">{TXT_ADD_LANGUAGES}</td>
+        <td width="10%" valign="top">{ADD_LANGUAGES_1}</td>
+        <td width="10%" valign="top">{ADD_LANGUAGES_2}</td>
+        <td width="70%" valign="top">{ADD_LANGUAGES_3}</td>
+      </tr>
+    </table>
+    <br />
+    <input type="submit" value="{TXT_ADD_SUBMIT}" name="frmAddCategory_Submit" />
+  </form>
 </div>
 <!-- END module_blog_categories.html -->

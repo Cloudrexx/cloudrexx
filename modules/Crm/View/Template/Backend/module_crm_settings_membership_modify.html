@@ -4,7 +4,7 @@
     function ExpandMinimize(toggle){
         elm1 = document.getElementById('Inputfield_' + toggle + '_Minimized');
         elm2 = document.getElementById('Inputfield_' + toggle + '_Expanded');
-        
+
         activeLang = new Array({LANG_ARRAY});
 
         elmMaster = document.getElementById('Inputfield_' + toggle + '_0');
@@ -41,11 +41,11 @@
              var errors =new  Array();
              var errChk;
 
-            
+
             if ($J.trim($J("#Inputfield_0_"+defaultLang).val()) == "") {
                 errChk = 1;
-                
-                $J("input[id^=Inputfield_0_]").each(function(){                    
+
+                $J("input[id^=Inputfield_0_]").each(function(){
                    if ($J.trim($J(this).val()) == "")
                        $J(this).css('border','1px solid red');
                 });

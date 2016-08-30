@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,10 +24,10 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
- * Calendar 
- * 
+ * Calendar
+ *
  * @package    cloudrexx
  * @subpackage module_calendar
  * @author     Cloudrexx <info@cloudrexx.com>
@@ -38,7 +38,7 @@ namespace Cx\Modules\Calendar\Controller;
 
 /**
  * Calendar Class EventManager
- * 
+ *
  * @package    cloudrexx
  * @subpackage module_calendar
  * @author     Cloudrexx <info@cloudrexx.com>
@@ -46,47 +46,47 @@ namespace Cx\Modules\Calendar\Controller;
  * @version    1.00
  */
 class CalendarEventManager extends CalendarLibrary
-{   
+{
     /**
      * Start date
      *
      * @access private
-     * @var integer 
+     * @var integer
      */
     private $startDate;
-    
+
     /**
      * End date
      *
      * @access private
-     * @var integer 
+     * @var integer
      */
     private $endDate;
-    
+
     /**
      * Date
      *
      * @access private
-     * @var string 
+     * @var string
      */
     private $date;
-    
+
     /**
      * Seprator date time
      *
      * @access private
-     * @var string 
+     * @var string
      */
     private $sepDateTime;
-    
+
     /**
      * Time
-     * 
+     *
      * @access private
      * @var string
      */
     private $time;
-    
+
     /**
      * Clock
      *
@@ -94,7 +94,7 @@ class CalendarEventManager extends CalendarLibrary
      * @var string
      */
     private $clock;
-    
+
     /**
      * Category id
      *
@@ -102,15 +102,15 @@ class CalendarEventManager extends CalendarLibrary
      * @var integer
      */
     private $categoryId;
-    
+
     /**
      * show series
-     * 
+     *
      * @access private
      * @var boolean
      */
     private $showSeries;
-    
+
     /**
      * Search term
      *
@@ -118,23 +118,23 @@ class CalendarEventManager extends CalendarLibrary
      * @var string
      */
     private $searchTerm;
-    
+
     /**
      * Need authorization
      *
      * @access private
-     * @var boolean 
+     * @var boolean
      */
     private $needAuth;
-    
+
     /**
      * Only active
      *
      * @access public
-     * @var boolean 
+     * @var boolean
      */
     private $onlyActive;
-    
+
     /**
      * Start position
      *
@@ -142,7 +142,7 @@ class CalendarEventManager extends CalendarLibrary
      * @var integer
      */
     private $startPos;
-    
+
     /**
      * Num Events
      *
@@ -150,7 +150,7 @@ class CalendarEventManager extends CalendarLibrary
      * @var integer
      */
     private $numEvents;
-    
+
     /**
      * Sort Direction
      *
@@ -158,7 +158,7 @@ class CalendarEventManager extends CalendarLibrary
      * @var string
      */
     private $sortDirection;
-    
+
     /**
      * Only confirmed
      *
@@ -166,7 +166,7 @@ class CalendarEventManager extends CalendarLibrary
      * @var boolean
      */
     private $onlyConfirmed;
-    
+
     /**
      * Author name
      *
@@ -174,7 +174,7 @@ class CalendarEventManager extends CalendarLibrary
      * @var string
      */
     private $author;
-    
+
     /**
      * Event list
      *
@@ -182,28 +182,28 @@ class CalendarEventManager extends CalendarLibrary
      * @var array
      */
     public $eventList = array();
-    
+
     /**
      * Event count
      *
      * @access private
      * @var integer
      */
-    public $countEvents; 
-    
+    public $countEvents;
+
     /**
      * show only upcoming events or all events
      * possible options are all or upcoming
-     * 
+     *
      * default is all
      *
-     * @var string 
+     * @var string
      */
     public $listType;
-    
+
     /**
      * Loads the event manager configuration
-     * 
+     *
      * @param integer $startDate     Start date Unix timestamp
      * @param integer $endDate       End date timestamp
      * @param integer $categoryId    Category Id
@@ -227,45 +227,45 @@ class CalendarEventManager extends CalendarLibrary
         $this->onlyActive = $onlyActive;
         $this->startPos = $startPos;
         $this->numEvents = $numEvents;
-        $this->sortDirection = $sortDirection;   
-        $this->onlyConfirmed = $onlyConfirmed;                  
-        $this->author = $author;                  
+        $this->sortDirection = $sortDirection;
+        $this->onlyConfirmed = $onlyConfirmed;
+        $this->author = $author;
         $this->listType = $listType;
     }
-    
+
     /**
      * Get's list of event and assign into $this->eventList
-     * 
+     *
      * @return null
      */
     function getEventList() {
-        global $objDatabase, $_ARRAYLANG, $_LANGID, $objInit; 
-        
+        global $objDatabase, $_ARRAYLANG, $_LANGID, $objInit;
+
         $this->getSettings();
-        
+
         // need for database TIMESTAMP
         $startDate = $this->startDate ? $this->getDbDateTimeFromIntern($this->startDate)->format('Y-m-d H:i:s') : '0000-00-00 00:00:00';
         $endDate   = $this->endDate ? $this->getDbDateTimeFromIntern($this->endDate)->format("Y-m-d H:i:s") : '0000-00-00 00:00:00';
-        
-        $onlyActive_where = ($this->onlyActive == true ? ' AND event.status=1' : '');  
-        $categoryId_where = ($this->categoryId != 0 ? ' AND event.catid='.$this->categoryId : '');  
-        
-        if($objInit->mode == 'backend') {                                             
-            $showIn_where = "";     
+
+        $onlyActive_where = ($this->onlyActive == true ? ' AND event.status=1' : '');
+        $categoryId_where = ($this->categoryId != 0 ? ' AND event.catid='.$this->categoryId : '');
+
+        if($objInit->mode == 'backend') {
+            $showIn_where = "";
         } else {
             if($this->arrSettings['showEventsOnlyInActiveLanguage'] == 1) {
-                $showIn_where = "AND FIND_IN_SET('".$_LANGID."',event.show_in)>0 ";  
-            } else {                                      
-                $showIn_where = "";     
-            }  
-            
-            $objFWUser = \FWUser::getFWUserObject();   
+                $showIn_where = "AND FIND_IN_SET('".$_LANGID."',event.show_in)>0 ";
+            } else {
+                $showIn_where = "";
+            }
+
+            $objFWUser = \FWUser::getFWUserObject();
             if ($objFWUser->objUser->login()) {
-                $needAuth_where = '';     
+                $needAuth_where = '';
             } else {
                 $needAuth_where = ' AND event.access=0';
-            } 
-        }                                                                                        
+            }
+        }
 
         if ($this->endDate !== null) {
             $dateScope_where = '((
@@ -277,7 +277,7 @@ class CalendarEventManager extends CalendarLibrary
                 (event.series_status = 1) AND (event.startdate <= "'.$endDate.'")
             ))';
 
-        } else {                                        
+        } else {
             $dateScope_where = '((
                 ((event.enddate >= "'.$startDate.'") AND (event.startdate <= "'.$startDate.'")) OR
                 ((event.startdate >= "'.$startDate.'") AND (event.enddate >= "'.$startDate.'"))
@@ -285,25 +285,25 @@ class CalendarEventManager extends CalendarLibrary
                 (event.series_status = 1)
             ))';
         }
-        
+
         if(!empty($this->searchTerm) && $this->searchTerm != $_ARRAYLANG['TXT_CALENDAR_KEYWORD']) {
             $searchTerm_DB = ", ".DBPREFIX."module_".$this->moduleTablePrefix."_event_field AS field";
             $searchTerm_where = " AND ((field.title LIKE '%".$this->searchTerm."%' OR field.teaser LIKE '%".$this->searchTerm."%' OR field.description LIKE '%".$this->searchTerm."%' OR field.place LIKE '%".$this->searchTerm."%') AND field.event_id = event.id)";
         } else {
-            $searchTerm_where = $searchTerm_DB = '';            
+            $searchTerm_where = $searchTerm_DB = '';
         }
-        
+
         if($this->onlyConfirmed) {
             $confirmed_where =' AND (event.confirmed = 1)';
         } else {
             $confirmed_where =' AND (event.confirmed = 0)';
         }
-        
+
         $author_where = '';
         if(intval($this->author) != 0) {
             $author_where =' AND (event.author = '.intval($this->author).')';
-        }  
-                                                   
+        }
+
         $query = "SELECT event.id AS id
                     FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_event AS event
                          ".$searchTerm_DB."
@@ -316,10 +316,10 @@ class CalendarEventManager extends CalendarLibrary
                          ".$confirmed_where."
                          ".$author_where."
                 GROUP BY event.id
-                ORDER BY event.startdate";    
-        
+                ORDER BY event.startdate";
+
         $objResult = $objDatabase->Execute($query);
-        
+
         if ($objResult !== false) {
             while (!$objResult->EOF) {
                 $objEvent = new \Cx\Modules\Calendar\Controller\CalendarEvent(intval($objResult->fields['id']));
@@ -339,7 +339,7 @@ class CalendarEventManager extends CalendarLibrary
                 } else {
                     $this->eventList[] = $objEvent;
                 }
-                
+
                 //if ($this->numEvents != 'n' && count($this->eventList) > $this->numEvents && $objInit->mode == 'frontend') {
                 //     break;
                 //} else {
@@ -347,78 +347,78 @@ class CalendarEventManager extends CalendarLibrary
 //              //  }
             }
         }
-        
+
         /* if($this->arrSettings['publicationStatus'] == 1) {
-            self::_importEvents();  
+            self::_importEvents();
         } */
-        
-        self::_clearEmptyEvents();  
+
+        self::_clearEmptyEvents();
         self::_sortEventList();
-        
+
         $this->countEvents = count($this->eventList);
-        
-        
-        if ($this->numEvents != 'n' && $this->numEvents != 0) { 
-            $this->eventList = array_slice($this->eventList, $this->startPos, $this->numEvents);    
+
+
+        if ($this->numEvents != 'n' && $this->numEvents != 0) {
+            $this->eventList = array_slice($this->eventList, $this->startPos, $this->numEvents);
         }
     }
-         
+
     /**
      * Import Events
-     * 
+     *
      * @return null
      */
-    function _importEvents() 
-    {      
-        global $objDatabase, $objInit, $_LANGID, $_CONFIG;               
-        
+    function _importEvents()
+    {
+        global $objDatabase, $objInit, $_LANGID, $_CONFIG;
+
         if($objInit->mode == 'frontend') {
             $this->getSettings();
-            
+
             $objHostManager = new \Cx\Modules\Calendar\Controller\CalendarHostManager($this->categoryId, true, true);
-            $objHostManager->getHostList();  
-             
-            
+            $objHostManager->getHostList();
+
+
             foreach($objHostManager->hostList as $key => $objHost)  {
-                $id = $objHost->id;       
-                $name = $objHost->title;       
-                $key = $objHost->key;    
-                
+                $id = $objHost->id;
+                $name = $objHost->title;
+                $key = $objHost->key;
+
                 if(substr($objHost->uri,-1) != '/') {
-                    $uri = $objHost->uri.'/'; 
+                    $uri = $objHost->uri.'/';
                 } else {
                     $uri = $objHost->uri;
                 }
-                
+
                 if(substr($objHost->uri,0,7) != 'http://') {
-                    $protocol = 'http://';  
+                    $protocol = 'http://';
                 } else {
-                    $protocol = '';  
-                }        
-                
+                    $protocol = '';
+                }
+
                 $location = $protocol.$uri."modules/Calendar/Controller/CalendarWebserviceServer.class.php";
-              
+
                 if(self::urlfind($protocol.$uri)){
                     $connection = true;
-                } else { 
+                } else {
                     $connection = false;
-                }                     
-                
-                if($connection) {         
-                    if($objWebserviceClient = new \Cx\Modules\Calendar\Controller\CalendarWebserviceClient($location, $uri)) {      
-                        $myHost = $_CONFIG['domainUrl'].ASCMS_PATH_OFFSET;   
-                        
+                }
+
+                if($connection) {
+                    if($objWebserviceClient = new \Cx\Modules\Calendar\Controller\CalendarWebserviceClient($location, $uri)) {
+                        $myHost = $_CONFIG['domainUrl'].ASCMS_PATH_OFFSET;
+
                         if(substr($myHost,-1) != '/') {
-                            $myHost = $myHost.'/'; 
+                            $myHost = $myHost.'/';
                         }
-                        
+
                         $catId = $objHost->catId;
-                        $key = $objHost->key;           
-                                                
-                        $foreignHostData = $objWebserviceClient->verifyHost($myHost,$key); 
-                        
-                        if($foreignHostData != false) {  
-                            $arrEvents = $objWebserviceClient->getEventList($this->startDate->getTimestamp(), $this->endDate->getTimestamp(), $this->needAuth, $this->searchTerm, $_LANGID, $foreignHostData['id'], $id, $this->arrSettings['showEventsOnlyInActiveLanguage']); 
+                        $key = $objHost->key;
+
+                        $foreignHostData = $objWebserviceClient->verifyHost($myHost,$key);
+
+                        if($foreignHostData != false) {
+                            $arrEvents = $objWebserviceClient->getEventList($this->startDate->getTimestamp(), $this->endDate->getTimestamp(), $this->needAuth, $this->searchTerm, $_LANGID, $foreignHostData['id'], $id, $this->arrSettings['showEventsOnlyInActiveLanguage']);
 
                             if(!empty($arrEvents[0])) {
                                 foreach ($arrEvents as $key => $objExternalEvent) {
@@ -436,42 +436,42 @@ class CalendarEventManager extends CalendarLibrary
                                     $objExternalEvent->endDate   = $this->getInternDateTimeFromDb($objExternalEvent->endDate);
 
                                     if($objExternalEvent->seriesStatus == 1 && $_GET['cmd'] != 'my_events') {
-                                        self::_setNextSeriesElement($objExternalEvent); 
-                                    }  
-                                    
+                                        self::_setNextSeriesElement($objExternalEvent);
+                                    }
+
                                     $this->eventList[] = $objExternalEvent;
-                                }   
-                            }  
-                        }          
+                                }
+                            }
+                        }
                     }
-                }  
+                }
             }
-        }     
+        }
     }
-    
+
     /**
      * Clears the empty events
-     * 
+     *
      * Empty events will be found if event title is empty
-     * 
+     *
      * @return null
      */
-    function _clearEmptyEvents() { 
+    function _clearEmptyEvents() {
          foreach($this->eventList as $key => $objEvent) {
              if(empty($objEvent->title)) {
-                unset($this->eventList[$key]); 
+                unset($this->eventList[$key]);
              }
          }
     }
-   
+
     /**
      * Checks the event for adding it into eventlist
-     * 
-     * This will used the check the whether the gievn event object is valid to 
+     *
+     * This will used the check the whether the gievn event object is valid to
      * add into event list
-     * 
+     *
      * @param object $objEvent Event object
-     * 
+     *
      * @return boolean true if the event is valid, false oterwise
      */
     function _addToEventList($objEvent) {
@@ -481,7 +481,7 @@ class CalendarEventManager extends CalendarLibrary
             } else {
                 return false;
             }
-        } else { 
+        } else {
             if ($this->endDate == null) {
                 if(($objEvent->endDate >= $this->startDate) || ($objEvent->startDate >= $this->startDate)) {
                     return true;
@@ -491,7 +491,7 @@ class CalendarEventManager extends CalendarLibrary
             } else {
                 if(
                      ($objEvent->startDate >= $this->startDate && $objEvent->startDate <= $this->endDate)
-                  || ($objEvent->endDate >= $this->startDate && $objEvent->endDate <= $this->endDate)  
+                  || ($objEvent->endDate >= $this->startDate && $objEvent->endDate <= $this->endDate)
                 ) {
                     return true;
                 } else {
@@ -500,10 +500,10 @@ class CalendarEventManager extends CalendarLibrary
             }
         }
     }
-    
+
     /**
      * Sort the event list
-     * 
+     *
      * @return null
      */
     function _sortEventList(){
@@ -512,10 +512,10 @@ class CalendarEventManager extends CalendarLibrary
 
     /**
      * Compare function
-     * 
+     *
      * @param array $a first array
      * @param array $b second array
-     * 
+     *
      * @return bool TRUE on success or FALSE on failure.
      */
     function cmp($a, $b)
@@ -523,17 +523,17 @@ class CalendarEventManager extends CalendarLibrary
         if ($a->startDate == $b->startDate) {
             return 0;
         }
-        
+
         if($this->sortDirection == 'DESC') {
             return ($a->startDate > $b->startDate) ? -1 : 1;
         } else {
             return ($a->startDate < $b->startDate) ? -1 : 1;
         }
     }
-    
+
     /**
      * Get the event using calendar event class and assign it into $this->eventList
-     * 
+     *
      * @param mixed   $event         \Cx\Modules\Calendar\Controller\CalendarEvent
      *                                or Event id
      * @param integer $eventStartDate Unix timestamp of start date
@@ -565,46 +565,46 @@ class CalendarEventManager extends CalendarLibrary
 
         sort($this->eventList);
     }
-    
+
     /**
      * Import events
-     * 
+     *
      * @param integer $eventId        Event id
      * @param integer $eventStartDate Unix timestamp of start date
-     * 
+     *
      * @return null
      */
     function getExternalEvent($eventId, $eventStartDate) {
         global $objInit;
-        
-        self::_importEvents();  
 
-        foreach ($this->eventList as $tmpKey => $tmpObjEvent) {          
+        self::_importEvents();
+
+        foreach ($this->eventList as $tmpKey => $tmpObjEvent) {
             if ($tmpObjEvent->startDate->getTimestamp() != $eventStartDate) {
                 unset($this->eventList[$tmpKey]);
             }
         }
-        
+
         sort($this->eventList);
     }
-    
+
     /**
      * Sets the placeholders used for the event
-     * 
+     *
      * @param object  $objTpl         Template object
      * @param integer $eventId        Event Id
      * @param integer $eventStartDate Description
-     * 
+     *
      * @return null
      */
-    function showEvent($objTpl, $eventId, $eventStartDate) {   
+    function showEvent($objTpl, $eventId, $eventStartDate) {
         global $objInit, $_ARRAYLANG, $_LANGID, $_CONFIG;
-        
+
         $this->getSettings();
-        
-        if($objInit->mode == 'frontend' && ($eventId != null && $eventStartDate != null)) {   
+
+        if($objInit->mode == 'frontend' && ($eventId != null && $eventStartDate != null)) {
             $objEvent = $this->eventList[0];
-            
+
             if (empty($objEvent)) {
                 \Cx\Core\Csrf\Controller\Csrf::redirect(\Cx\Core\Routing\Url::fromModuleAndCmd($this->moduleName, ''));
                 return;
@@ -612,19 +612,19 @@ class CalendarEventManager extends CalendarLibrary
 
             if (!$objEvent->status) {
                 \Cx\Core\Csrf\Controller\Csrf::redirect(\Cx\Core\Routing\Url::fromModuleAndCmd($this->moduleName, ''));
-                return;   
+                return;
             }
-            
+
             if($objEvent->access == 1 && !\FWUser::getFWUserObject()->objUser->login()){
-                $link = base64_encode(CONTREXX_SCRIPT_PATH.'?'.$_SERVER['QUERY_STRING']);           
-                \Cx\Core\Csrf\Controller\Csrf::redirect(CONTREXX_SCRIPT_PATH."?section=Login&redirect=".$link);  
-                return;    
-            }   
-            
-            $objCategory = new \Cx\Modules\Calendar\Controller\CalendarCategory($objEvent->catId);     
-            
+                $link = base64_encode(CONTREXX_SCRIPT_PATH.'?'.$_SERVER['QUERY_STRING']);
+                \Cx\Core\Csrf\Controller\Csrf::redirect(CONTREXX_SCRIPT_PATH."?section=Login&redirect=".$link);
+                return;
+            }
+
+            $objCategory = new \Cx\Modules\Calendar\Controller\CalendarCategory($objEvent->catId);
+
             list ($priority, $priorityImg) = $this->getPriorityImage($objEvent);
-            
+
             $plainDescription = contrexx_html2plaintext($objEvent->description);
             if (strlen($plainDescription) > 100) {
                 $points = '...';
@@ -636,31 +636,31 @@ class CalendarEventManager extends CalendarLibrary
             $attachNamePos  = strrpos($objEvent->attach, '/');
             $attachNamelength = strlen($objEvent->attach);
             $attachName        = substr($objEvent->attach, $attachNamePos+1, $attachNamelength);
-            
+
             $hostUri    = '';
             $hostTarget = '';
-            if($objEvent->external) {   
-                $objHost = new \Cx\Modules\Calendar\Controller\CalendarHost($objEvent->hostId);    
-                
-                if(substr($objHost->uri,-1) != '/') {   
-                     $hostUri = $objHost->uri.'/';  
-                } else {         
-                     $hostUri = $objHost->uri; 
-                }     
-                
+            if($objEvent->external) {
+                $objHost = new \Cx\Modules\Calendar\Controller\CalendarHost($objEvent->hostId);
+
+                if(substr($objHost->uri,-1) != '/') {
+                     $hostUri = $objHost->uri.'/';
+                } else {
+                     $hostUri = $objHost->uri;
+                }
+
                 if(substr($hostUri,0,7) != 'http://') {
                     $hostUri = "http://".$hostUri;
                 }
-                        
-                $hostTarget = 'target="_blank"';    
-            }     
-        
+
+                $hostTarget = 'target="_blank"';
+            }
+
             if($this->arrSettings['showEventsOnlyInActiveLanguage'] == 2) {
-                $_LANGID = $objEvent->availableLang;       
-            }            
+                $_LANGID = $objEvent->availableLang;
+            }
 
             $picThumb = file_exists(\Env::get('cx')->getWebsitePath().$objEvent->pic.".thumb") ? $objEvent->pic.".thumb" : $objEvent->pic;
-   
+
             $startDate = $objEvent->startDate;
             $endDate   = $objEvent->endDate;
 
@@ -681,19 +681,19 @@ class CalendarEventManager extends CalendarLibrary
                 $this->moduleLangVar.'_EVENT_END'               => $this->format2userDateTime($endDate),
                 $this->moduleLangVar.'_EVENT_END_DATE'          => $this->format2userDate($endDate),
                 $this->moduleLangVar.'_EVENT_END_TIME'          => $this->format2userTime($endDate),
-                $this->moduleLangVar.'_EVENT_TITLE'             => $objEvent->title,                                                      
+                $this->moduleLangVar.'_EVENT_TITLE'             => $objEvent->title,
                 $this->moduleLangVar.'_EVENT_TEASER'            => $objEvent->teaser,
-                $this->moduleLangVar.'_EVENT_ATTACHMENT'        => $objEvent->attach != '' ? '<a href="'.$hostUri.$objEvent->attach.'" target="_blank" >'.$attachName.'</a>' : '',                             
+                $this->moduleLangVar.'_EVENT_ATTACHMENT'        => $objEvent->attach != '' ? '<a href="'.$hostUri.$objEvent->attach.'" target="_blank" >'.$attachName.'</a>' : '',
                 $this->moduleLangVar.'_EVENT_ATTACHMENT_SOURCE' => $objEvent->attach,
-                $this->moduleLangVar.'_EVENT_PICTURE'           => $objEvent->pic != '' ? '<img src="'.$hostUri.$objEvent->pic.'" alt="'.$objEvent->title.'" title="'.$objEvent->title.'" />' : '',                                                          
+                $this->moduleLangVar.'_EVENT_PICTURE'           => $objEvent->pic != '' ? '<img src="'.$hostUri.$objEvent->pic.'" alt="'.$objEvent->title.'" title="'.$objEvent->title.'" />' : '',
                 $this->moduleLangVar.'_EVENT_PICTURE_SOURCE'    => $objEvent->pic,
-                $this->moduleLangVar.'_EVENT_THUMBNAIL'         => $picThumb != '' ? '<img src="'.$hostUri.$picThumb.'" alt="'.$objEvent->title.'" title="'.$objEvent->title.'" />' : '',   
-                $this->moduleLangVar.'_EVENT_DESCRIPTION'       => $objEvent->description,    
+                $this->moduleLangVar.'_EVENT_THUMBNAIL'         => $picThumb != '' ? '<img src="'.$hostUri.$picThumb.'" alt="'.$objEvent->title.'" title="'.$objEvent->title.'" />' : '',
+                $this->moduleLangVar.'_EVENT_DESCRIPTION'       => $objEvent->description,
                 $this->moduleLangVar.'_EVENT_SHORT_DESCRIPTION' => $parts[0].$points,
                 $this->moduleLangVar.'_EVENT_LINK'              => $objEvent->link ? "<a href='".$objEvent->link."' target='_blank' >".$objEvent->link."</a>" : "",
                 $this->moduleLangVar.'_EVENT_LINK_SOURCE'       => $objEvent->link,
-                $this->moduleLangVar.'_EVENT_PRIORITY'          => $priority,                                                           
-                $this->moduleLangVar.'_EVENT_PRIORITY_IMG'      => $priorityImg,                                                           
+                $this->moduleLangVar.'_EVENT_PRIORITY'          => $priority,
+                $this->moduleLangVar.'_EVENT_PRIORITY_IMG'      => $priorityImg,
                 $this->moduleLangVar.'_EVENT_CATEGORY'          => $objCategory->name,
                 $this->moduleLangVar.'_EVENT_EXPORT_LINK'       => $hostUri.'index.php?section='.$this->moduleName.'&amp;export='.$objEvent->id,
                 $this->moduleLangVar.'_EVENT_EXPORT_ICON'       => '<a href="'.$hostUri.'index.php?section='.$this->moduleName.'&amp;export='.$objEvent->id.'"><img src="modules/Calendar/View/Media/ical_export.gif" border="0" title="'.$_ARRAYLANG['TXT_CALENDAR_EXPORT_ICAL_EVENT'].'" alt="'.$_ARRAYLANG['TXT_CALENDAR_EXPORT_ICAL_EVENT'].'" /></a>',
@@ -705,26 +705,26 @@ class CalendarEventManager extends CalendarLibrary
 
             //show date and time by user settings
             if($objTpl->blockExists('calendarDateDetail')) {
-                
+
                 $showStartDateDetail  = $objEvent->useCustomDateDisplay ? $objEvent->showStartDateDetail : ($this->arrSettings['showStartDateDetail'] == 1);
                 $showEndDateDetail    = $objEvent->useCustomDateDisplay ? $objEvent->showEndDateDetail : ($this->arrSettings['showEndDateDetail'] == 1);
                 $showStartTimeDetail  = ($objEvent->all_day) ? false : ($objEvent->useCustomDateDisplay ? $objEvent->showStartTimeDetail : ($this->arrSettings['showStartTimeDetail'] == 1));
                 $showEndTimeDetail    = ($objEvent->all_day) ? false : ($objEvent->useCustomDateDisplay ? $objEvent->showEndTimeDetail : ($this->arrSettings['showEndTimeDetail'] == 1));
                 $showTimeTypeDetail   = $objEvent->useCustomDateDisplay ? $objEvent->showTimeTypeDetail : 1;
-                
+
                 // get date for several days format > show starttime with startdate and endtime with enddate > only if several days event and all values (dates/times) are displayed
                 if($this->format2userDate($startDate) != $this->format2userDate($endDate) && ($showStartDateDetail && $showEndDateDetail && $showStartTimeDetail && $showEndTimeDetail)) {
                     //part 1
                     $part = 1;
                     $this->getMultiDateBlock($objEvent, $this->arrSettings['separatorDateTimeDetail'], $this->arrSettings['separatorSeveralDaysDetail'], ($this->arrSettings['showClockDetail'] == 1), $part);
-                    
+
                     $objTpl->setVariable(array(
                         $this->moduleLangVar.'_DATE_DETAIL'                => $this->date,
                         $this->moduleLangVar.'_SEP_DATE_TIME_DETAIL'       => $this->sepDateTime,
                         $this->moduleLangVar.'_TIME_DETAIL'                => $this->time,
                         'TXT_'.$this->moduleLangVar.'_CLOCK_DETAIL'        => $this->clock,
                     ));
-                    
+
                     $objTpl->parse('calendarDateDetail');
 
                     //part 2
@@ -751,27 +751,27 @@ class CalendarEventManager extends CalendarLibrary
                     $objTpl->parse('calendarDateDetail');
                 }
             }
-            
+
             if (($this->arrSettings['placeData'] == 1) && $objEvent->place == '' && $objEvent->place_street == '' && $objEvent->place_zip == '' && $objEvent->place_city == '' && $objEvent->place_country == '' && $objEvent->place_website == '' && $objEvent->place_phone == '') {
-                $objTpl->hideBlock('calendarEventAddress');  
+                $objTpl->hideBlock('calendarEventAddress');
             } else {
-                if($objEvent->google) { 
+                if($objEvent->google) {
 // TODO: implement with new Google Maps Embed API. see https://developers.google.com/maps/documentation/embed/guide
                     /*$googleCoordinates = self::_getCoorinates($objEvent->place_street, $objEvent->place_zip, $objEvent->place_city);
                     if($googleCoordinates != false) {
                         $lat = $googleCoordinates[0];
-                        $lon = $googleCoordinates[1];  
-                                             
+                        $lon = $googleCoordinates[1];
+
                         $objGoogleMap = new googleMap();
                         $objGoogleMap->setMapId($this->moduleName.'GoogleMap');
                         $objGoogleMap->setMapStyleClass('mapLarge');
-                        $objGoogleMap->setMapType(0);                                                          
+                        $objGoogleMap->setMapType(0);
                         $objGoogleMap->setMapZoom(12);
-                        $objGoogleMap->setMapCenter($lon, $lat);   
-                        
-                        $strValueClick = 'marker'.$objEvent->id.'.openInfoWindowHtml(info'.$objEvent->id.');';   
-                        $objGoogleMap->addMapMarker($objEvent->id, $lon, $lat, "<b>".$objEvent->place."</b><br />".$objEvent->place_street."<br />".$objEvent->place_zip." ".$objEvent->place_city."<br />".$objEvent->place_country,true, null, true, $strValueClick, null, null);   
-                        
+                        $objGoogleMap->setMapCenter($lon, $lat);
+
+                        $strValueClick = 'marker'.$objEvent->id.'.openInfoWindowHtml(info'.$objEvent->id.');';
+                        $objGoogleMap->addMapMarker($objEvent->id, $lon, $lat, "<b>".$objEvent->place."</b><br />".$objEvent->place_street."<br />".$objEvent->place_zip." ".$objEvent->place_city."<br />".$objEvent->place_country,true, null, true, $strValueClick, null, null);
+
                         $googleMap = $objGoogleMap->getMap();
                     } else {*/
                     //}
@@ -779,8 +779,8 @@ class CalendarEventManager extends CalendarLibrary
                 } else {
                     $googleMapLink = '';
                 }
-                
-                
+
+
                 //place map
                 $hasPlaceMap = !empty($objEvent->place_map) && file_exists(\Env::get('cx')->getWebsitePath().$objEvent->place_map);
                 if ($hasPlaceMap) {
@@ -788,26 +788,26 @@ class CalendarEventManager extends CalendarLibrary
                     $picWidth  = $arrInfo[0]+20;
                     $picHeight = $arrInfo[1]+20;
                 }
-                
+
                 $map_thumb_name = file_exists(\Env::get('cx')->getWebsitePath().$objEvent->place_map.".thumb") ? $objEvent->place_map.".thumb" : $objEvent->place_map;
 
                 $placeWebsite      = $objEvent->place_website != '' ? "<a href='".$objEvent->place_website."' target='_blank' >".$objEvent->place_website."</a>" : "";
                 $placeWebsiteSource= $objEvent->place_website;
-                
+
                 $placeLink         = $objEvent->place_link != '' ? "<a href='".$objEvent->place_link."' target='_blank' >".$objEvent->place_link."</a>" : "";
                 $placeLinkSource   = $objEvent->place_link;
                 if ($this->arrSettings['placeData'] > 1 && $objEvent->locationType == 2) {
                     $objEvent->loadPlaceFromMediadir($objEvent->place_mediadir_id, 'place');
-                    list($placeLink, $placeLinkSource) = $objEvent->loadPlaceLinkFromMediadir($objEvent->place_mediadir_id, 'place');                    
+                    list($placeLink, $placeLinkSource) = $objEvent->loadPlaceLinkFromMediadir($objEvent->place_mediadir_id, 'place');
                 }
-                
-                $objTpl->setVariable(array(                                                          
+
+                $objTpl->setVariable(array(
                     $this->moduleLangVar.'_EVENT_PLACE'           => $objEvent->place,
                     $this->moduleLangVar.'_EVENT_LOCATION_PLACE'            => $objEvent->place,
                     $this->moduleLangVar.'_EVENT_LOCATION_ADDRESS'=> $objEvent->place_street,
                     $this->moduleLangVar.'_EVENT_LOCATION_ZIP'    => $objEvent->place_zip,
                     $this->moduleLangVar.'_EVENT_LOCATION_CITY'   => $objEvent->place_city,
-                    $this->moduleLangVar.'_EVENT_LOCATION_COUNTRY'=> $objEvent->place_country,                                                  
+                    $this->moduleLangVar.'_EVENT_LOCATION_COUNTRY'=> $objEvent->place_country,
                     $this->moduleLangVar.'_EVENT_LOCATION_WEBSITE'          => $placeWebsite,
                     $this->moduleLangVar.'_EVENT_LOCATION_WEBSITE_SOURCE'   => $placeWebsiteSource,
                     $this->moduleLangVar.'_EVENT_LOCATION_LINK'          => $placeLink,
@@ -818,7 +818,7 @@ class CalendarEventManager extends CalendarLibrary
                     $this->moduleLangVar.'_EVENT_LOCATION_MAP_SOURCE'      => $hasPlaceMap ? $objEvent->place_map : '',
                     $this->moduleLangVar.'_EVENT_LOCATION_GOOGLE_MAP_LINK' => $googleMapLink,
                 ));
-                
+
                 if ($objTpl->blockExists('calendarEventAddressWebsite')) {
                     if (empty($placeWebsite)) {
                         $objTpl->hideBlock('calendarEventAddressWebsite');
@@ -826,7 +826,7 @@ class CalendarEventManager extends CalendarLibrary
                         $objTpl->touchBlock('calendarEventAddressWebsite');
                     }
                 }
-                
+
                 if ($objTpl->blockExists('calendarEventAddressLink')) {
                     if (empty($placeLink)) {
                         $objTpl->hideBlock('calendarEventAddressLink');
@@ -851,20 +851,20 @@ class CalendarEventManager extends CalendarLibrary
                     }
                 }
 
-                $objTpl->parse('calendarEventAddress'); 
+                $objTpl->parse('calendarEventAddress');
             }
 
             $hostWebsite      = $objEvent->org_website != '' ? "<a href='".$objEvent->org_website."' target='_blank' >".$objEvent->org_website."</a>" : "";
             $hostWebsiteSource= $objEvent->org_website;
-            
+
             $hostLink         = $objEvent->org_link != '' ? "<a href='".$objEvent->org_link."' target='_blank' >".$objEvent->org_link."</a>" : "";
             $hostLinkSource   = $objEvent->org_link;
             if ($this->arrSettings['placeDataHost'] > 1 && $objEvent->hostType == 2) {
                 $objEvent->loadPlaceFromMediadir($objEvent->host_mediadir_id, 'host');
-                list($hostLink, $hostLinkSource) = $objEvent->loadPlaceLinkFromMediadir($objEvent->host_mediadir_id, 'host');                    
+                list($hostLink, $hostLinkSource) = $objEvent->loadPlaceLinkFromMediadir($objEvent->host_mediadir_id, 'host');
             }
             if(($this->arrSettings['placeDataHost'] == 1) && $objEvent->org_name == '' && $objEvent->org_street == '' && $objEvent->org_zip == '' && $objEvent->org_city == '' && $objEvent->org_country == '' && $objEvent->org_website == '' && $objEvent->org_phone == '') {
-                $objTpl->hideBlock('calendarEventHost');  
+                $objTpl->hideBlock('calendarEventHost');
             } else {
                 $objTpl->setVariable(array(
                     $this->moduleLangVar.'_EVENT_HOST'         => $objEvent->org_name,
@@ -879,8 +879,8 @@ class CalendarEventManager extends CalendarLibrary
                     $this->moduleLangVar.'_EVENT_HOST_PHONE'            => $objEvent->org_phone,
                     $this->moduleLangVar.'_EVENT_HOST_EMAIL'        => $objEvent->org_email != '' ? "<a href='mailto:".$objEvent->org_email."' >".$objEvent->org_email."</a>" : "",
                     $this->moduleLangVar.'_EVENT_HOST_EMAIL_SOURCE' => $objEvent->org_email,
-                ));    
-                
+                ));
+
                 if ($objTpl->blockExists('calendarEventHostWebsite')) {
                     if (empty($hostWebsite)) {
                         $objTpl->hideBlock('calendarEventHostWebsite');
@@ -888,7 +888,7 @@ class CalendarEventManager extends CalendarLibrary
                         $objTpl->touchBlock('calendarEventHostWebsite');
                     }
                 }
-                
+
                 if ($objTpl->blockExists('calendarEventHostLink')) {
                     if (empty($hostLink)) {
                         $objTpl->hideBlock('calendarEventHostLink');
@@ -896,7 +896,7 @@ class CalendarEventManager extends CalendarLibrary
                         $objTpl->touchBlock('calendarEventHostLink');
                     }
                 }
-                
+
                 if ($objTpl->blockExists('calendarEventHostPhone')) {
                     if (empty($objEvent->org_phone)) {
                         $objTpl->hideBlock('calendarEventHostPhone');
@@ -1106,28 +1106,28 @@ class CalendarEventManager extends CalendarLibrary
         }
         return $cal->showMonth(false, true);
     }
-    
+
     /**
      * Sets the placeholders used for the event list view
-     * 
+     *
      * @param object  $objTpl Template object
      * @param integer $type   Event type
-     * 
+     *
      * @return null
      */
     function showEventList($objTpl, $type='') {
         global $objInit, $_ARRAYLANG, $_LANGID;
-        
+
         $this->getFrontendLanguages();
-        
+
         //if($objInit->mode == 'backend') {
             $i=0;
             foreach ($this->eventList as $key => $objEvent) {
-                
-                $objCategory = new \Cx\Modules\Calendar\Controller\CalendarCategory(intval($objEvent->catId));   
-                
+
+                $objCategory = new \Cx\Modules\Calendar\Controller\CalendarCategory(intval($objEvent->catId));
+
                 $showIn = explode(",",$objEvent->showIn);
-                
+
                 $languages = '';
                 if (count(\FWLanguage::getActiveFrontendLanguages()) > 1) {
                     $langState = array();
@@ -1137,7 +1137,7 @@ class CalendarEventManager extends CalendarLibrary
                         }
                     }
                     $languages = \Html::getLanguageIcons($langState, 'index.php?cmd=Calendar&amp;act=modify_event&amp;id=' . $objEvent->id . '&amp;langId=%1$d'.($type == 'confirm' ? "&amp;confirm=1" : ""));
-                    
+
                     if($type == 'confirm' && $objTpl->blockExists('txt_languages_block_confirm_list')) {
                         $objTpl->touchBlock('txt_languages_block_confirm_list');
                     } elseif ($objTpl->blockExists('txt_languages_block')) {
@@ -1150,9 +1150,9 @@ class CalendarEventManager extends CalendarLibrary
                         $objTpl->hideBlock('txt_languages_block');
                     }
                 }
-                
+
                 list ($priority, $priorityImg) = $this->getPriorityImage($objEvent);
-                
+
                 $plainDescription = contrexx_html2plaintext($objEvent->description);
                 if (strlen($plainDescription) > 100) {
                     $points = '...';
@@ -1160,7 +1160,7 @@ class CalendarEventManager extends CalendarLibrary
                     $points = '';
                 }
                 $parts= explode("\n", wordwrap($plainDescription, 100, "\n"));
-                
+
                 $attachNamePos    = strrpos($objEvent->attach, '/');
                 $attachNamelength = strlen($objEvent->attach);
                 $attachName       = substr($objEvent->attach, $attachNamePos+1, $attachNamelength);
@@ -1168,13 +1168,13 @@ class CalendarEventManager extends CalendarLibrary
                 $hostUri    = '';
                 $hostTarget = '';
                 if($objEvent->external) {
-                    $objHost = new \Cx\Modules\Calendar\Controller\CalendarHost($objEvent->hostId);    
+                    $objHost = new \Cx\Modules\Calendar\Controller\CalendarHost($objEvent->hostId);
 
-                    if(substr($objHost->uri,-1) != '/') {   
-                         $hostUri = $objHost->uri.'/';  
-                    } else {         
-                         $hostUri = $objHost->uri; 
-                    }     
+                    if(substr($objHost->uri,-1) != '/') {
+                         $hostUri = $objHost->uri.'/';
+                    } else {
+                         $hostUri = $objHost->uri;
+                    }
 
                     if(substr($hostUri,0,7) != 'http://') {
                         $hostUri = "http://".$hostUri;
@@ -1189,7 +1189,7 @@ class CalendarEventManager extends CalendarLibrary
                     $editLink = CONTREXX_DIRECTORY_INDEX.'?section='.$this->moduleName.'&amp;cmd=edit&id='.$objEvent->id;
                 }
                 $picThumb = file_exists(\Env::get('cx')->getWebsitePath()."{$objEvent->pic}.thumb") ? "{$objEvent->pic}.thumb" : ($objEvent->pic != '' ? $objEvent->pic : '');
-                
+
                 $placeWebsite      = $objEvent->place_website != '' ? "<a href='".$objEvent->place_website."' target='_blank' >".$objEvent->place_website."</a>" : "";
                 $placeWebsiteSource= $objEvent->place_website;
 
@@ -1197,7 +1197,7 @@ class CalendarEventManager extends CalendarLibrary
                 $placeLinkSource   = $objEvent->place_link;
                 if ($this->arrSettings['placeData'] > 1 && $objEvent->locationType == 2) {
                     $objEvent->loadPlaceFromMediadir($objEvent->place_mediadir_id, 'place');
-                    list($placeLink, $placeLinkSource) = $objEvent->loadPlaceLinkFromMediadir($objEvent->place_mediadir_id, 'place');                    
+                    list($placeLink, $placeLinkSource) = $objEvent->loadPlaceLinkFromMediadir($objEvent->place_mediadir_id, 'place');
                 }
 
                 $hostWebsite      = $objEvent->org_website != '' ? "<a href='".$objEvent->org_website."' target='_blank' >".$objEvent->org_website."</a>" : "";
@@ -1207,7 +1207,7 @@ class CalendarEventManager extends CalendarLibrary
                 $hostLinkSource   = $objEvent->org_link;
                 if ($this->arrSettings['placeDataHost'] > 1 && $objEvent->hostType == 2) {
                     $objEvent->loadPlaceFromMediadir($objEvent->host_mediadir_id, 'host');
-                    list($hostLink, $hostLinkSource) = $objEvent->loadPlaceLinkFromMediadir($objEvent->host_mediadir_id, 'host');                    
+                    list($hostLink, $hostLinkSource) = $objEvent->loadPlaceLinkFromMediadir($objEvent->host_mediadir_id, 'host');
                 }
 
                 $startDate = $objEvent->startDate;
@@ -1221,19 +1221,19 @@ class CalendarEventManager extends CalendarLibrary
                 if (in_array($objEvent->registration, array(CalendarEvent::EVENT_REGISTRATION_NONE, CalendarEvent::EVENT_REGISTRATION_EXTERNAL))) {
                     $freeSeats = $_ARRAYLANG['TXT_CALENDAR_NOT_SPECIFIED'];
                 }
-                
+
                 $objTpl->setVariable(array(
                     $this->moduleLangVar.'_EVENT_ROW'            => $i%2==0 ? 'row1' : 'row2',
                     $this->moduleLangVar.'_EVENT_LED'            => $objEvent->status==0 ? 'red' : 'green',
                     $this->moduleLangVar.'_EVENT_STATUS'         => $objEvent->status==0 ? $_ARRAYLANG['TXT_CALENDAR_INACTIVE'] : $_ARRAYLANG['TXT_CALENDAR_ACTIVE'],
-                    $this->moduleLangVar.'_EVENT_ID'             => $objEvent->id,                                        
-                    $this->moduleLangVar.'_EVENT_TITLE'          => $objEvent->title,                                                         
+                    $this->moduleLangVar.'_EVENT_ID'             => $objEvent->id,
+                    $this->moduleLangVar.'_EVENT_TITLE'          => $objEvent->title,
                     $this->moduleLangVar.'_EVENT_TEASER'         => $objEvent->teaser,
-                    $this->moduleLangVar.'_EVENT_PICTURE'        => $objEvent->pic != '' ? '<img src="'.$objEvent->pic.'" alt="'.$objEvent->title.'" title="'.$objEvent->title.'" />' : '',                                                          
+                    $this->moduleLangVar.'_EVENT_PICTURE'        => $objEvent->pic != '' ? '<img src="'.$objEvent->pic.'" alt="'.$objEvent->title.'" title="'.$objEvent->title.'" />' : '',
                     $this->moduleLangVar.'_EVENT_PICTURE_SOURCE' => $objEvent->pic,
-                    $this->moduleLangVar.'_EVENT_THUMBNAIL'      => $objEvent->pic != '' ? '<img src="'.$picThumb.'" alt="'.$objEvent->title.'" title="'.$objEvent->title.'" />' : '',                                                               
-                    $this->moduleLangVar.'_EVENT_PRIORITY'       => $priority,                                                           
-                    $this->moduleLangVar.'_EVENT_PRIORITY_IMG'   => $priorityImg, 
+                    $this->moduleLangVar.'_EVENT_THUMBNAIL'      => $objEvent->pic != '' ? '<img src="'.$picThumb.'" alt="'.$objEvent->title.'" title="'.$objEvent->title.'" />' : '',
+                    $this->moduleLangVar.'_EVENT_PRIORITY'       => $priority,
+                    $this->moduleLangVar.'_EVENT_PRIORITY_IMG'   => $priorityImg,
                     $this->moduleLangVar.'_EVENT_PLACE'          => $objEvent->place,
                     $this->moduleLangVar.'_EVENT_DESCRIPTION'    => $objEvent->description,
                     $this->moduleLangVar.'_EVENT_SHORT_DESCRIPTION' => $parts[0].$points,
@@ -1252,13 +1252,13 @@ class CalendarEventManager extends CalendarLibrary
                     $this->moduleLangVar.'_EVENT_CATEGORY'       => $objCategory->name,
                     $this->moduleLangVar.'_EVENT_EXPORT_LINK'    => $hostUri.'index.php?section='.$this->moduleName.'&amp;export='.$objEvent->id,
                     $this->moduleLangVar.'_EVENT_EXPORT_ICON'    => '<a href="'.$hostUri.'index.php?section='.$this->moduleName.'&amp;export='.$objEvent->id.'"><img src="modules/Calendar/View/Media/ical_export.gif" border="0" title="'.$_ARRAYLANG['TXT_CALENDAR_EXPORT_ICAL_EVENT'].'" alt="'.$_ARRAYLANG['TXT_CALENDAR_EXPORT_ICAL_EVENT'].'" /></a>',
-                    $this->moduleLangVar.'_EVENT_EDIT_LINK'      => $editLink,                    
-                    $this->moduleLangVar.'_EVENT_COPY_LINK'      => $copyLink,                    
+                    $this->moduleLangVar.'_EVENT_EDIT_LINK'      => $editLink,
+                    $this->moduleLangVar.'_EVENT_COPY_LINK'      => $copyLink,
                     $this->moduleLangVar.'_EVENT_SERIES'         => $objEvent->seriesStatus == 1 ? '<img src="'.ASCMS_MODULE_WEB_PATH.'/'.$this->moduleName.'/View/Media/Repeat.png" border="0"/>' : '<i>'.$_ARRAYLANG['TXT_CALENDAR_NO_SERIES'].'</i>',
                     $this->moduleLangVar.'_EVENT_FREE_PLACES'    => $freeSeats,
                     $this->moduleLangVar.'_EVENT_ACCESS'         => $_ARRAYLANG['TXT_CALENDAR_EVENT_ACCESS_'.$objEvent->access],
                 ));
-          
+
                 if ($objEvent->showDetailView) {
                     $objTpl->setVariable(array(
                         $this->moduleLangVar.'_EVENT_DETAIL_LINK'    => $objEvent->type==0 ? self::_getDetailLink($objEvent) : $objEvent->arrData['redirect'][$_LANGID],
@@ -1289,14 +1289,14 @@ class CalendarEventManager extends CalendarLibrary
                     $picWidth  = $arrInfo[0]+20;
                     $picHeight = $arrInfo[1]+20;
                 }
-                
+
                 $map_thumb_name = file_exists(\Env::get('cx')->getWebsitePath().$objEvent->place_map.".thumb") ? $objEvent->place_map.".thumb" : $objEvent->place_map;
-                $objTpl->setVariable(array(                                                          
+                $objTpl->setVariable(array(
                     $this->moduleLangVar.'_EVENT_LOCATION_PLACE'         => $objEvent->place,
                     $this->moduleLangVar.'_EVENT_LOCATION_ADDRESS'       => $objEvent->place_street,
                     $this->moduleLangVar.'_EVENT_LOCATION_ZIP'           => $objEvent->place_zip,
                     $this->moduleLangVar.'_EVENT_LOCATION_CITY'          => $objEvent->place_city,
-                    $this->moduleLangVar.'_EVENT_LOCATION_COUNTRY'       => $objEvent->place_country,                                                  
+                    $this->moduleLangVar.'_EVENT_LOCATION_COUNTRY'       => $objEvent->place_country,
                     $this->moduleLangVar.'_EVENT_LOCATION_WEBSITE'       => $placeWebsite,
                     $this->moduleLangVar.'_EVENT_LOCATION_WEBSITE_SOURCE'=> $placeWebsiteSource,
                     $this->moduleLangVar.'_EVENT_LOCATION_LINK'          => $placeLink,
@@ -1305,7 +1305,7 @@ class CalendarEventManager extends CalendarLibrary
                     $this->moduleLangVar.'_EVENT_LOCATION_MAP_LINK'      => $hasPlaceMap ? '<a href="'.$objEvent->place_map.'" onClick="window.open(this.href,\'\',\'resizable=no,location=no,menubar=no,scrollbars=no,status=no,toolbar=no,fullscreen=no,dependent=no,width='.$picWidth.',height='.$picHeight.',status\'); return false">'.$_ARRAYLANG['TXT_CALENDAR_MAP'].'</a>' : "",
                     $this->moduleLangVar.'_EVENT_LOCATION_MAP_THUMBNAIL' => $hasPlaceMap ? '<a href="'.$objEvent->place_map.'" onClick="window.open(this.href,\'\',\'resizable=no,location=no,menubar=no,scrollbars=no,status=no,toolbar=no,fullscreen=no,dependent=no,width='.$picWidth.',height='.$picHeight.',status\'); return false"><img src="'.$map_thumb_name.'" border="0" alt="'.$objEvent->place_map.'" /></a>' : "",
                     $this->moduleLangVar.'_EVENT_LOCATION_MAP_SOURCE'    => $hasPlaceMap ? $objEvent->place_map : '',
-                    
+
                     $this->moduleLangVar.'_EVENT_HOST'              => $objEvent->org_name,
                     $this->moduleLangVar.'_EVENT_HOST_ADDRESS'      => $objEvent->org_street,
                     $this->moduleLangVar.'_EVENT_HOST_ZIP'          => $objEvent->org_zip,
@@ -1319,7 +1319,7 @@ class CalendarEventManager extends CalendarLibrary
                     $this->moduleLangVar.'_EVENT_HOST_EMAIL'        => $objEvent->org_email != '' ? "<a href='mailto:".$objEvent->org_email."' >".$objEvent->org_email."</a>" : "",
                     $this->moduleLangVar.'_EVENT_HOST_EMAIL_SOURCE' => $objEvent->org_email,
                 ));
-                
+
                 if ($objTpl->blockExists('event_location_website')) {
                     if (empty($placeWebsite)) {
                         $objTpl->hideBlock('event_location_website');
@@ -1327,7 +1327,7 @@ class CalendarEventManager extends CalendarLibrary
                         $objTpl->touchBlock('event_location_website');
                     }
                 }
-                
+
                 if ($objTpl->blockExists('event_location_link')) {
                     if (empty($placeLink)) {
                         $objTpl->hideBlock('event_location_link');
@@ -1335,7 +1335,7 @@ class CalendarEventManager extends CalendarLibrary
                         $objTpl->touchBlock('event_location_link');
                     }
                 }
-                
+
                 if ($objTpl->blockExists('event_location_phone')) {
                     if (empty($objEvent->place_phone)) {
                         $objTpl->hideBlock('event_location_phone');
@@ -1343,7 +1343,7 @@ class CalendarEventManager extends CalendarLibrary
                         $objTpl->touchBlock('event_location_phone');
                     }
                 }
-                
+
                 if ($objTpl->blockExists('event_location_map')) {
                     if ($hasPlaceMap) {
                         $objTpl->touchBlock('event_location_map');
@@ -1359,7 +1359,7 @@ class CalendarEventManager extends CalendarLibrary
                         $objTpl->touchBlock('event_host_website');
                     }
                 }
-                
+
                 if ($objTpl->blockExists('event_host_link')) {
                     if (empty($hostLink)) {
                         $objTpl->hideBlock('event_host_link');
@@ -1367,7 +1367,7 @@ class CalendarEventManager extends CalendarLibrary
                         $objTpl->touchBlock('event_host_link');
                     }
                 }
-                
+
                 if ($objTpl->blockExists('event_host_phone')) {
                     if (empty($objEvent->org_phone)) {
                         $objTpl->hideBlock('event_host_phone');
@@ -1389,23 +1389,23 @@ class CalendarEventManager extends CalendarLibrary
                         $this->moduleLangVar.'_EVENT_COUNT_REG'      => $objEvent->getRegistrationCount(),
                         $this->moduleLangVar.'_EVENT_COUNT_DEREG'    => $objEvent->getCancellationCount(),
                         $this->moduleLangVar.'_EVENT_COUNT_WAITLIST' => $objEvent->getWaitlistCount(),
-                    ));    
+                    ));
                 }
-                
+
                 $i++;
 
                 // show date block
                 if($objTpl->blockExists('calendarDateList')) {
-                    
+
                     $showStartDateList  = $objEvent->useCustomDateDisplay ? $objEvent->showStartDateList : ($this->arrSettings['showStartDateList'] == 1);
                     $showEndDateList    = $objEvent->useCustomDateDisplay ? $objEvent->showEndDateList : ($this->arrSettings['showEndDateList'] == 1);
                     $showStartTimeList  = ($objEvent->all_day) ? false : ($objEvent->useCustomDateDisplay ? $objEvent->showStartTimeList : ($this->arrSettings['showStartTimeList'] == 1));
                     $showEndTimeList    = ($objEvent->all_day) ? false : ($objEvent->useCustomDateDisplay ? $objEvent->showEndTimeList : ($this->arrSettings['showEndTimeList'] == 1));
                     $showTimeTypeList   = $objEvent->useCustomDateDisplay ? $objEvent->showTimeTypeList : 1;
-                    
+
                     // get date for several days format > show starttime with startdate and endtime with enddate > only if several days event and all values (dates/times) are displayed
                     if ($this->format2userDate($startDate) != $this->format2userDate($endDate) && ($showStartDateList && $showEndDateList && $showStartTimeList && $showEndTimeList)) {
-                        
+
                         //part 1
                         $part = 1;
                         $this->getMultiDateBlock($objEvent, $this->arrSettings['separatorDateTimeList'], $this->arrSettings['separatorSeveralDaysList'], ($this->arrSettings['showClockList'] == 1), $part);
@@ -1428,10 +1428,10 @@ class CalendarEventManager extends CalendarLibrary
                             'TXT_'.$this->moduleLangVar.'_CLOCK_LIST'        => $this->clock,
                         ));
                         $objTpl->parse('calendarDateList');
-                    } else {          
+                    } else {
                         // get date for single day format
                        $this->getSingleDateBlock($objEvent, $showStartDateList, $showEndDateList, $this->arrSettings['separatorDateList'], $showTimeTypeList, $showStartTimeList, $showEndTimeList, $this->arrSettings['separatorDateTimeList'], $this->arrSettings['separatorTimeList'], ($this->arrSettings['showClockList'] == 1));
-                        
+
                         $objTpl->setVariable(array(
                             $this->moduleLangVar.'_DATE_LIST'                => $this->date,
                             $this->moduleLangVar.'_SEP_DATE_TIME_LIST'       => $this->sepDateTime,
@@ -1453,20 +1453,20 @@ class CalendarEventManager extends CalendarLibrary
                     if($objTpl->blockExists('eventList')) {
                         $objTpl->parse('eventList');
                     }
-                    
+
                     if($objTpl->blockExists('calendar_headlines_row')) {
                         $objTpl->parse('calendar_headlines_row');
-                    }   
+                    }
                 }
-                
+
             }
             if(count($this->eventList) == 0 && $type != 'confirm') {
                 $objTpl->hideBlock('eventList');
-                
+
                 $objTpl->setVariable(array(
                     'TXT_'.$this->moduleLangVar.'_NO_EVENTS'        => $_ARRAYLANG['TXT_CALENDAR_EVENTS_NO'],
                 ));
-                
+
                 $objTpl->parse('emptyEventList');
             }
         //}
@@ -1474,7 +1474,7 @@ class CalendarEventManager extends CalendarLibrary
 
     /**
      * Returns the events with date
-     * 
+     *
      * @return array Events list
      */
     function getEventsWithDate() {
@@ -1489,12 +1489,12 @@ class CalendarEventManager extends CalendarLibrary
         }
         return $arrEvents;
     }
-    
+
     /**
      * Returns the Event detail page link
-     * 
+     *
      * @param object $objEvent Event object
-     * 
+     *
      * @return string link for the detail page
      */
     function _getDetailLink($objEvent)
@@ -1504,33 +1504,33 @@ class CalendarEventManager extends CalendarLibrary
             'id' => $objEvent->id,
             'date' => $objEvent->startDate->getTimestamp()
         ));
-        
+
         if($objEvent->external) {
             $url->setParam('external', 1);
         }
         return (string)$url;
     }
-    
+
     /**
      * Find the url exists or not
-     * 
+     *
      * @param string $url url
-     * 
+     *
      * @return boolean true on url exists, false otherwise
      */
     function urlfind($url){
         if (!ini_get('allow_url_fopen')) {
             ini_set('allow_url_fopen', 'On');
-        } 
-        
-        if (ini_get('allow_url_fopen')) {  
+        }
+
+        if (ini_get('allow_url_fopen')) {
             if($url) {
                 $file = @fopen ($url.'/modules/Calendar/Controller/CalendarWebserviceServer.class.php', "r");
-            }                                                    
-            
+            }
+
             if($file){
                 fclose($file);
-                return true;  
+                return true;
             } else {
                 return false;
             }
@@ -1543,7 +1543,7 @@ class CalendarEventManager extends CalendarLibrary
                 } else {
                     return true;
                 }
-            } catch (Exception $e) {                
+            } catch (Exception $e) {
                 \DBG::msg($e->getMessage());
                 return false;
             }
@@ -1552,9 +1552,9 @@ class CalendarEventManager extends CalendarLibrary
 
     /**
      * _setNextSeriesElement
-     * 
+     *
      * @param object $objEvent Event object
-     * 
+     *
      * @return null
      */
     function _setNextSeriesElement($objEvent) {
@@ -1680,7 +1680,7 @@ class CalendarEventManager extends CalendarLibrary
 
         $isAllowedEvent = true;
         switch($objCloneEvent->seriesData['seriesPatternDouranceType']) {
-            case 1:                                
+            case 1:
                 $getNextEvent = false;
 
                 if ($this->startDate != null) {
@@ -1708,7 +1708,7 @@ class CalendarEventManager extends CalendarLibrary
                     $getNextEvent = false;
                 }
                 // If pattern end count is true, then a event will be allowed to add in event list
-                $isAllowedEvent = (boolean) $objCloneEvent->seriesData['seriesPatternEnd']; 
+                $isAllowedEvent = (boolean) $objCloneEvent->seriesData['seriesPatternEnd'];
                 break;
             case 3:
                 if ($objCloneEvent->startDate <= $objCloneEvent->seriesData['seriesPatternEndDate']) {
@@ -1719,26 +1719,26 @@ class CalendarEventManager extends CalendarLibrary
                 }
                 break;
         }
-        
+
         $objCloneEvent->registrationExternalLink = str_replace(
             '[[SERIES_ELEMENT_STARTDATE]]',
             $objCloneEvent->startDate->getTimestamp(),
             $objCloneEvent->registrationExternalLink
         );
-        
+
         if (   $isAllowedEvent
             && !$this->isDateExists($objCloneEvent->startDate, $objCloneEvent->seriesData['seriesPatternExceptions'])
             && self::_addToEventList($objCloneEvent)
         ) {
-            array_push($this->eventList, $objCloneEvent);              
+            array_push($this->eventList, $objCloneEvent);
             if ($this->listType == 'upcoming') {
                 // if list type is set to upcoming the the will be shown only once
                 $getNextEvent = false;
             }
         }
-        
+
         if ($getNextEvent) {
-            self::_setNextSeriesElement($objCloneEvent);    
+            self::_setNextSeriesElement($objCloneEvent);
         }
     }
 
@@ -1760,50 +1760,50 @@ class CalendarEventManager extends CalendarLibrary
         }
         return false;
     }
-    
+
     /**
      * Return Coorinates
-     *      
+     *
      * @param string $street  Street addres
      * @param string $zipcode postal code
      * @param string $city    Name of the city
-     * 
+     *
      * @return boolean true or false
      */
     function _getCoorinates($street,$zipcode,$city) {
         global $_CONFIG;
-        
-        if (!ini_get('allow_url_fopen')) {     
+
+        if (!ini_get('allow_url_fopen')) {
             ini_set('allow_url_fopen', 'On');
-        } 
-        
-        if(ini_get('allow_url_fopen')) { 
+        }
+
+        if(ini_get('allow_url_fopen')) {
             $address = '';
             $address .= $street;
             $address .= ', ';
             $address .= $city;
             $address .= ', ';
-            $address .= $zipcode;             
-                                                    
+            $address .= $zipcode;
+
             $key = $_CONFIG['googleMapsAPIKey'];
-                                  
-            $url='http://maps.google.com/maps/geo?output=xml&q=';    
-            $urlcontent = file_get_contents($url . urlencode($address));  
-            $urlcontent = utf8_encode($urlcontent);     
+
+            $url='http://maps.google.com/maps/geo?output=xml&q=';
+            $urlcontent = file_get_contents($url . urlencode($address));
+            $urlcontent = utf8_encode($urlcontent);
             $xml = new \SimpleXMLElement($urlcontent);
-            
-            $arrCoordinates = explode (",",$xml->Response->Placemark->Point->coordinates);       
+
+            $arrCoordinates = explode (",",$xml->Response->Placemark->Point->coordinates);
         } else {
             //echo "please check your Google Maps API Key or activate 'allow_url_fopen' or deactivate Goope Maps in this Event.";
             $arrCoordinates   = false;
-        }   
-        
+        }
+
         return $arrCoordinates;
     }
 
     /**
      * show date and time by user settings > single day view > start-/endtime separated by start-/enddate
-     *      
+     *
      * @param object  $objEvent          Event object
      * @param boolean $showStartDate     true to show start date, false to hide
      * @param boolean $showEndDate       true to show clock, false to hide
@@ -1814,12 +1814,12 @@ class CalendarEventManager extends CalendarLibrary
      * @param string  $separatorDateTime Date time separator
      * @param string  $separatorTime     Time separator
      * @param boolean $showClock         true to show clock, false to hide
-     * 
+     *
      * @return null
      */
     function getSingleDateBlock($objEvent, $showStartDate, $showEndDate, $separatorDate, $showTimeType, $showStartTime, $showEndTime, $separatorDateTime, $separatorTime, $showClock) {
         global $_ARRAYLANG;
-        
+
         $startDate = $objEvent->startDate;
         $endDate   = $objEvent->endDate;
 
@@ -1865,13 +1865,13 @@ class CalendarEventManager extends CalendarLibrary
 
     /**
      * show date and time by user settings > several day view
-     *      
+     *
      * @param object  $objEvent             Event object
      * @param string  $separatorDateTime    Date time separator
      * @param string  $separatorSeveralDays SeveralDays separator
      * @param boolean $showClock            true to show clock, false to hide
      * @param integer $part                 Part of the multi date event
-     * 
+     *
      * @return null
      */
     function getMultiDateBlock($objEvent, $separatorDateTime, $separatorSeveralDays, $showClock, $part) {
@@ -1908,13 +1908,13 @@ class CalendarEventManager extends CalendarLibrary
 
     /**
      * Returns the calendar boxes
-     *      
+     *
      * @param  integer $boxes  Number of boxes
      * @param  year    $year   Year
      * @param  integer $month  month
      * @param  integer $day    day
      * @param  integer $catid  category id
-     * 
+     *
      * @return string  calendar boxes
      */
     function getBoxes($boxes, $year, $month=0, $day=0, $catid=0)
@@ -1956,7 +1956,7 @@ class CalendarEventManager extends CalendarLibrary
 
             //load events
             foreach ($this->eventList as $objEvent) {
-                
+
                 if ($objEvent->access && $objInit->mode == 'frontend' && !\Permission::checkAccess(116, 'static', true)) {
                     continue;
                 }
@@ -2019,18 +2019,18 @@ class CalendarEventManager extends CalendarLibrary
             $day = 0;
             $firstblock = false;
         }
-        
+
         return $calenderBoxes;
     }
-    
+
     /**
      * Returns the javascript used for the calendar boxes
-     * 
+     *
      * @return string javascript
      */
     function getCalendarBoxJS()
     {
-            return 	'<script type="text/javascript">
+            return     '<script type="text/javascript">
                             /* <![CDATA[ */
                             function changecat()
                             {
@@ -2038,13 +2038,13 @@ class CalendarEventManager extends CalendarLibrary
                                     var catid = $J("#selectcat").val();
                                     href = href.replace(/&catid=[0-9]+/g, \'\');
                                     href = href.replace(/&act=search/g, \'\');
-                                    href += "&catid=" + catid;                                    
+                                    href += "&catid=" + catid;
                                     window.location.href = href;
                             }
                             /* ]]> */
                             </script>';
-    }    
-    
+    }
+
     function getPriorityImage($objEvent)
     {
         global $_ARRAYLANG;
@@ -2073,7 +2073,7 @@ class CalendarEventManager extends CalendarLibrary
                 $priorityImg = "<img src='modules/Calendar/View/Media/very_low.gif' border='0' title='".$_ARRAYLANG['TXT_CALENDAR_PRIORITY_VERY_LOW']."' alt='".$_ARRAYLANG['TXT_CALENDAR_PRIORITY_VERY_LOW']."' />";
                 break;
         }
-        
+
         return array($priority, $priorityImg);
     }
 }

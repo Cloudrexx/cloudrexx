@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /*
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -128,7 +128,7 @@ abstract class FileCache extends \Cx\Core_Modules\Cache\Controller\Doctrine\Cach
         $path = implode(str_split($hash, 16), DIRECTORY_SEPARATOR);
         $path = $this->directory . DIRECTORY_SEPARATOR . $path;
         $id   = preg_replace('@[\\\/:"*?<>|]+@', '', $id);
-        
+
         return $path . DIRECTORY_SEPARATOR . $id . $this->extension;
     }
 
@@ -136,7 +136,7 @@ abstract class FileCache extends \Cx\Core_Modules\Cache\Controller\Doctrine\Cach
      * {@inheritdoc}
      */
     protected function doDelete($id)
-    {       
+    {
         return @unlink($this->getFilename($id));
     }
 

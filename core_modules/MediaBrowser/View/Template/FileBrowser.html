@@ -63,7 +63,7 @@
                     data-ng-class="{active: true === file.datainfo.active}"
                     data-ng-if="file.datainfo"
                     class="data-row files animation">
-             
+
                     <td width="2%" class="col_1"><i class="icon-fileType icon-fileType{{file.datainfo.extension}}"></i>
                     </td>
                     <td width="50%" class="col_2">
@@ -80,7 +80,7 @@
                     <td class="actions col_3" width="5%">
                         <div ng-hide="file.datainfo.readonly">
                             <a data-ng-click="renameFile(file, $index)" class="renameFile">
-    
+
                             </a>
                             <a data-ng-click="removeFile(file, $index)" class="removeFile">
                             </a>

@@ -27,7 +27,7 @@
 
 /**
  * EventListener for Podcast
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
@@ -42,14 +42,14 @@ use Cx\Core\Event\Model\Entity\DefaultEventListener;
 /**
  * Class PodcastEventListener
  * EventListener for Podcast
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
  * @subpackage  module_podcast
  */
 class PodcastEventListener extends DefaultEventListener {
-   
+
     public function SearchFindContent($search) {
         $term_db = $search->getTerm();
 

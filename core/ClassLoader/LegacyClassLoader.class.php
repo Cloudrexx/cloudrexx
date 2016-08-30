@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * LegacyClassLoader
  *
@@ -64,7 +64,7 @@ class LegacyClassLoader {
         $this->userClassCacheFile  = $this->cx->getWebsiteTempPath().'/LegacyClassCache.dat';
 
         $userClassArr = $extraClassArr = array();
-        
+
         $extraClassRepositoryFile = $classLoader->getFilePath($this->extraClassRepositoryFile);
         if (file_exists($extraClassRepositoryFile)) {
             $fh = fopen($extraClassRepositoryFile, 'r');
@@ -79,7 +79,7 @@ class LegacyClassLoader {
             $userClassArr = unserialize(file_get_contents($userClassCacheFile));
             fclose($fh);
         }
-        
+
         $this->mapTable = !empty($userClassArr) ? array_merge($extraClassArr, $userClassArr) : $extraClassArr;
     }
 
@@ -368,4 +368,3 @@ class LegacyClassLoader {
         return $this->bytes;
     }
 }
-

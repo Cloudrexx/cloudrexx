@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Event manager
  *
@@ -59,18 +59,18 @@ class EventManagerException extends \Exception {}
 class EventManager {
     protected $listeners = array();
     protected $cx;
-    
+
     public function __construct($cx) {
         $this->cx = $cx;
     }
-    
+
     public function addEvent($eventName) {
         if (isset($this->listeners[$eventName])) {
             throw new EventManagerException('An event with this name is already added (' . $eventName . ')');
         }
         $this->listeners[$eventName] = array();
     }
-    
+
     public function triggerEvent($eventName, $eventArgs = array()) {
         if (!isset($this->listeners[$eventName])) {
             throw new EventManagerException('No such event "' . $eventName . '"');
@@ -113,7 +113,7 @@ class EventManager {
             }
         }
     }
-    
+
     public function addEventListener($eventName, $listener) {
         if (!isset($this->listeners[$eventName])) {
             throw new EventManagerException('No such event "' . $eventName . '"');
@@ -124,7 +124,7 @@ class EventManager {
         if (!is_callable($listener) && !($listener instanceof \Cx\Core\Event\Model\Entity\EventListener)) {
             throw new EventManagerException('Listener must be callable or implement EventListener interface!');
         }
-        
+
         // try to find component
         $component = null;
         if (!is_callable($listener)) {
@@ -136,13 +136,13 @@ class EventManager {
                 $component = $componentRepo->findOneBy(array('name' => $matches[2]));
             }
         }
-        
+
         $this->listeners[$eventName][] = array(
             'listener' => $listener,
             'component' => $component,
         );
     }
-    
+
     public function addModelListener($eventName, $entityClass, $listener) {
         $this->addEventListener('model/' . $eventName, new \Cx\Core\Event\Model\Entity\ModelEventListener($eventName, $entityClass, $listener));
     }

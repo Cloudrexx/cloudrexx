@@ -449,7 +449,7 @@ body a:hover {text-decoration: none;}
     background-image: url('images/nav-2-inactive.png');
     background-position: 15px 15.5px;
     background-repeat: no-repeat;
-    outline: 0 none;   
+    outline: 0 none;
 }
 #subnavigation li a.no-border {
     border: 0;
@@ -565,7 +565,7 @@ body a:hover {text-decoration: none;}
     background: url('images/contact-us-button.jpg') no-repeat;
     background-size: 100%;
     text-align: center;
-    background-position: center;    
+    background-position: center;
 }
 .contact-company,
 .contact-address,
@@ -725,7 +725,7 @@ body a:hover {text-decoration: none;}
     font-size: 15px;
     font-weight: bold;
     font-family: Arial;
-    background: #5BA11C;    
+    background: #5BA11C;
 }
 #page-header {
     float: left;
@@ -1321,7 +1321,7 @@ p#loginerror {
 #subnavigation li li ul {
     border-bottom: 1px solid #cecece;
     width: 100%;
-    float: left;    
+    float: left;
 }
 .login-content {
     float: left;
@@ -1376,7 +1376,7 @@ p#loginerror {
 }
 #login p.login-error-msg {
     margin: -15px 0 5px 0;
-    float: left;    
+    float: left;
 }
 #profilemain {
     margin: 0;
@@ -1421,7 +1421,7 @@ p#loginerror {
 .mobile-reg:hover {
     background: url('images/user_register.png') no-repeat center #888;
 }
-.mobile-login:hover { 
+.mobile-login:hover {
     background: url('images/login.png') no-repeat center #888;
 }
 .navbar-toggle:hover {

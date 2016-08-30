@@ -1,13 +1,13 @@
 <!-- START module_calendar_settings_date.html -->
-<script language="JavaScript" type="text/javascript">    
+<script language="JavaScript" type="text/javascript">
     var dateSettings = {
-        options : {            
+        options : {
             dateFormat          : 'dateFormat',
             date                : '',
             sepDateTime         : '',
             time                : '',
             clock               : '',
-                        
+
             list       : {
                 separatorDate       : 'separatorDateList',
                 separatorTime       : 'separatorTimeList',
@@ -39,20 +39,20 @@
                 separatorSeveralDaysValues: {CALENDAR_SEPARATOR_SEVERAL_DAYS_LIST},
             }
         },
-        _formatDateTime: function(format, d) {   
+        _formatDateTime: function(format, d) {
             // inspired from jquery ui datetimepicker
             t = {year : d.getFullYear(), month: d.getMonth(), date : d.getDate(), hour : d.getHours(), minute : d.getMinutes()};
             var tmptime = format;
-            
+
             tmptime = tmptime.toString()
                     .replace(/YYYY/g, t.year)
                     .replace(/MM/g, ((t.month < 10) ? '0' : '') + (t.month + 1))
                     .replace(/DD/g, ((t.date < 10) ? '0' : '') + t.date)
-                    .replace(/H/g, ((t.hour < 10) ? '0' : '') + t.hour)                   
+                    .replace(/H/g, ((t.hour < 10) ? '0' : '') + t.hour)
                     .replace(/i/g, ((t.minute < 10) ? '0' : '') + t.minute);
-            return tmptime;                        
+            return tmptime;
         },
-        _getDateFormat: function() {            
+        _getDateFormat: function() {
             return $J("select[name='settings\["+ this.options.dateFormat +"\]'] option:selected").text();
         },
         _getSingleDate : function( date, showStartDate, showEndDate, separatorDate, showTimeType, showStartTime, showEndTime, showClock ) {
@@ -66,7 +66,7 @@
             } else {
                 this.options.date = '';
             }
-            
+
             this.options.sepDateTime = '';
             //time
             if(showTimeType == 1) {
@@ -130,37 +130,37 @@
             d           = new Date();
             d1          = new Date(d.getTime() + 25*60*60*1000);
             var date    = {startDate: d, endDate : d1};
-            
+
             $J.each(preview, function(index, value){
                 output = '';
                 showStartDate       = $J("input[name='settings\["+ that.options[value].showStartDate +"\]']:checked").val() == '1' ? true : false;
-                showEndDate         = $J("input[name='settings\["+ that.options[value].showEndDate +"\]']:checked").val() == '1' ? true : false; 
+                showEndDate         = $J("input[name='settings\["+ that.options[value].showEndDate +"\]']:checked").val() == '1' ? true : false;
                 showStartTime       = $J("input[name='settings\["+ that.options[value].showStartTime +"\]']:checked").val() == '1' ? true : false;
                 showEndTime         = $J("input[name='settings\["+ that.options[value].showEndTime +"\]']:checked").val() == '1' ? true : false;
                 showClock           = $J("input[name='settings\["+ that.options[value].showClock +"\]']:checked").val() == '1' ? true : false;
-                
+
                 separatorDate       = $J("select[name='settings\["+ that.options[value].separatorDate +"\]']").val();
                 separatorTime       = $J("select[name='settings\["+ that.options[value].separatorTime +"\]']").val();
                 separatorDateTime   = $J("select[name='settings\["+ that.options[value].separatorDateTime +"\]']").val();
                 separatorSeveralDays= $J("select[name='settings\["+ that.options[value].separatorSeveralDays +"\]']").val();
-                
+
                 separatorDate       = that.options[value].separatorDateValues[separatorDate];
                 separatorTime       = that.options[value].separatorTimeValues[separatorTime];
                 separatorDateTime   = that.options[value].separatorDateTimeValues[separatorDateTime];
                 separatorSeveralDays= that.options[value].separatorSeveralDaysValues[separatorSeveralDays];
-                            
-                if ( showStartDate && showEndDate && showStartTime && showEndTime ) { 
+
+                if ( showStartDate && showEndDate && showStartTime && showEndTime ) {
                    that._getMultiDateBlock( date, separatorDateTime, separatorSeveralDays, showClock, 1);
                    output += that.options.date + that.options.sepDateTime + that.options.time + that.options.clock;
-                   
+
                    that._getMultiDateBlock( date, separatorDateTime, separatorSeveralDays, showClock, 2);
                    output += that.options.date + that.options.sepDateTime + that.options.time + that.options.clock;
                 } else {
                    that._getSingleDate( date, showStartDate, showEndDate, separatorDate, 1, showStartTime, showEndTime, showClock );
                    output += that.options.date + that.options.sepDateTime + that.options.time + that.options.clock;
-                } 
+                }
                 $J("#"+value+"Preview").html(output);
-            });            
+            });
         }
     };
     $J(function(){
@@ -172,25 +172,25 @@
        });
        dateSettings._changeDatePreview();
     });
-    
-{CALENDAR_SETTING_INFO_JS}    
+
+{CALENDAR_SETTING_INFO_JS}
 </script>
 
 
 <!--   &nbsp;&nbsp;<img src="../core/Core/View/Media/icons/note.gif" width="12" height="12" onmouseout="htm()" onmouseover="stm(Text[11],Style[0])" />-->
 
 <form name="formSettingsDate" id="formSettingsDate" method="post" action="index.php?cmd={CALENDAR_MODULE_NAME}&act=settings&tpl=date">
-	<!--  BEGIN sectionList -->
-	<table style="width: 100%; border-spacing: 0px;" class="adminlist" cellspacing="0" cellpadding="3">
-	    <tr>
-	        <th colspan="2">{TXT_CALENDAR_SECTION_NAME}</th>
-	    </tr>
-	    <!--  BEGIN settingsList -->
-		<tr class="{CALENDAR_SETTING_ROW}">
-		  <td style="width: 200px">{TXT_CALENDAR_SETTING_NAME}</td>
-		  <td>{CALENDAR_SETTING_VALUE}{CALENDAR_SETTING_INFO}</td>
-		</tr>
-		<!-- END settingsList -->
+  <!--  BEGIN sectionList -->
+  <table style="width: 100%; border-spacing: 0px;" class="adminlist" cellspacing="0" cellpadding="3">
+      <tr>
+          <th colspan="2">{TXT_CALENDAR_SECTION_NAME}</th>
+      </tr>
+      <!--  BEGIN settingsList -->
+    <tr class="{CALENDAR_SETTING_ROW}">
+      <td style="width: 200px">{TXT_CALENDAR_SETTING_NAME}</td>
+      <td>{CALENDAR_SETTING_VALUE}{CALENDAR_SETTING_INFO}</td>
+    </tr>
+    <!-- END settingsList -->
     </table>
     <br />
     <!-- END sectionList -->

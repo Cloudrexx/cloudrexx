@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 /**
  * Cloudrexx
@@ -135,7 +135,7 @@ function getFormData(goBack)
       }
     }
   }
-  
+
   aFormData = new Array();
   for (i in oFormData) {
     aFormData.push(i+':'+((typeof(oFormData[i]) == 'object') ? '["'+oFormData[i].join('","')+'"]' : '"'+oFormData[i]+'"'));
@@ -151,7 +151,7 @@ function getFormData(goBack)
   var delInAcLangs     = $J("#delInAcLangs:checked").length ? ",delInAcLangs:"       + $J("#delInAcLangs:checked").val() : "";
 
   var parameters = doGroup + pgUsername + pgPassword + pgCmsVersion + pgMigrateLangIds + similarPages + removePages + delInAcLangs;
-  
+
   return '{' + aFormData.join(',') + parameters + '}';
 }
 
@@ -165,10 +165,10 @@ function parseResponse(response)
         }
         if (oResponse.dialog) {
             similarPages = oResponse.dialog.similarPages;
-            
+
             setContent('<div style="margin: 180px 0 0 155px;">Bitte haben Sie einen Moment Geduld.<br /><?php $txt = 'Das Update wird durchgeführt...';print UPDATE_UTF8 ? $txt : utf8_decode($txt);?><br /><br /><img src="template/contrexx/images/content/loading_animation.gif" width="208" height="13" alt="" /></div>');
             setNavigation('');
-            
+
             cx.ui.dialog({
                 width:         1020,
                 height:        830,
@@ -177,7 +177,7 @@ function parseResponse(response)
                 dialogClass:   "content-migration-dialog",
                 title:         "Inhaltsseiten gruppieren",
                 content:       oResponse.content,
-                
+
                 close: function() {
                     executeGrouping();
                 },

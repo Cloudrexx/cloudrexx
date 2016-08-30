@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -27,7 +27,7 @@
 
 /**
  * This is the controllers for GeoIp
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
@@ -39,7 +39,7 @@ namespace Cx\Core_Modules\GeoIp\Controller;
 
 /**
  * This is the main controller for GeoIp
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
@@ -47,37 +47,37 @@ namespace Cx\Core_Modules\GeoIp\Controller;
  * @version     1.0.0
  */
 class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentController {
-    
+
     /**
      * List of available locales (as IETF language tags)
-     * 
+     *
      * @var array
      */
     protected $availableLocale = array('de', 'en', 'fr', 'ru', 'es', 'ja', 'pt-BR', 'zh-CN');
 
     /**
      * Default locale, specified as IETF language tag
-     * 
+     *
      * @var string
      */
     protected $defaultLocale = 'en';
-    
+
     /**
      * Client record
-     * 
+     *
      * @var \GeoIp2\Model\Country
      */
     protected $clientRecord;
 
     /**
      * Returns all Controller class names for this component (except this)
-     * 
+     *
      * @return array List of Controller class names (without namespace)
      */
     public function getControllerClasses() {
         return array('Backend', 'Default');
     }
-    
+
     /**
      * Hook - After resolving the page
      *
@@ -174,7 +174,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
 
     /**
      * Get the client record
-     * 
+     *
      * @return GeoIp2\Model\Country
      */
     public function getClientRecord() {

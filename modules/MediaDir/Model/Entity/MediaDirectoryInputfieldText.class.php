@@ -55,7 +55,7 @@ class MediaDirectoryInputfieldText extends \Cx\Modules\MediaDir\Controller\Media
     function __construct($name)
     {
 //        $name = 'MediaDir';
-        
+
         parent::__construct('.',$name);
         parent::getFrontendLanguages();
         parent::getSettings();
@@ -108,13 +108,13 @@ class MediaDirectoryInputfieldText extends \Cx\Modules\MediaDir\Controller\Media
 
                 $arrInfoValue = array();
                 if(!empty($arrInputfield['info'][0])){
-                	$arrInfoValue[0] = 'title="'.$arrInputfield['info'][0].'"';
-	                foreach($arrInputfield['info'] as $intLangKey => $strInfoValue) {
-	                	$strInfoClass = 'mediadirInputfieldHint';
-	                    $arrInfoValue[$intLangKey] = empty($strInfoValue) ? 'title="'.$arrInputfield['info'][0].'"' : 'title="'.$strInfoValue.'"';
-	                }
+                    $arrInfoValue[0] = 'title="'.$arrInputfield['info'][0].'"';
+                    foreach($arrInputfield['info'] as $intLangKey => $strInfoValue) {
+                        $strInfoClass = 'mediadirInputfieldHint';
+                        $arrInfoValue[$intLangKey] = empty($strInfoValue) ? 'title="'.$arrInputfield['info'][0].'"' : 'title="'.$strInfoValue.'"';
+                    }
                 } else {
-                	$arrInfoValue = null;
+                    $arrInfoValue = null;
                     $strInfoClass = '';
                 }
 
@@ -130,30 +130,30 @@ class MediaDirectoryInputfieldText extends \Cx\Modules\MediaDir\Controller\Media
                         } else {
                             $minimize = "";
                         }
-                        
+
                         $value = isset($arrValue[$intLangId]) ? $arrValue[$intLangId] : '';
                         $strInputfield .= '<input type="text" data-id="'.$intId.'" name="'.$this->moduleNameLC.'Inputfield['.$intId.']['.$intLangId.']" id="'.$this->moduleNameLC.'Inputfield_'.$intId.'_'.$intLangId.'" value="'. $value .'" style="width: 279px; margin-bottom: 2px; padding-left: 21px; background: #ffffff url(\''. \Env::get('cx')->getCodeBaseOffsetPath() . \Env::get('cx')->getCoreFolderName().'/Country/View/Media/Flag/flag_'.$arrLang['lang'].'.gif\') no-repeat 3px 3px;" onfocus="this.select();" />&nbsp;'.$arrLang['name'].'&nbsp;'.$minimize.'<br />';
-                    }                    
+                    }
                     $strInputfield .= '</div>';
                 } else {
                     if($this->arrSettings['settingsFrontendUseMultilang'] == 1) {
-	                    $strInputfield = '<div id="'.$this->moduleNameLC.'Inputfield_'.$intId.'_Minimized" style="display: block; float: left;" class="'.$this->moduleNameLC.'GroupMultilang"><input type="text" data-id="'.$intId.'" class="'.$this->moduleNameLC.'InputfieldDefault" name="'.$this->moduleNameLC.'Inputfield['.$intId.'][0]" id="'.$this->moduleNameLC.'Inputfield_'.$intId.'_0" value="'.$arrValue[0].'" class="'.$this->moduleNameLC.'InputfieldText '.$strInfoClass.'" '.$arrInfoValue[0].'/>&nbsp;<a href="javascript:ExpandMinimize(\''.$intId.'\');">'.$_ARRAYLANG['TXT_MEDIADIR_MORE'].'&nbsp;&raquo;</a></div>';
+                        $strInputfield = '<div id="'.$this->moduleNameLC.'Inputfield_'.$intId.'_Minimized" style="display: block; float: left;" class="'.$this->moduleNameLC.'GroupMultilang"><input type="text" data-id="'.$intId.'" class="'.$this->moduleNameLC.'InputfieldDefault" name="'.$this->moduleNameLC.'Inputfield['.$intId.'][0]" id="'.$this->moduleNameLC.'Inputfield_'.$intId.'_0" value="'.$arrValue[0].'" class="'.$this->moduleNameLC.'InputfieldText '.$strInfoClass.'" '.$arrInfoValue[0].'/>&nbsp;<a href="javascript:ExpandMinimize(\''.$intId.'\');">'.$_ARRAYLANG['TXT_MEDIADIR_MORE'].'&nbsp;&raquo;</a></div>';
 
-	                    $strInputfield .= '<div id="'.$this->moduleNameLC.'Inputfield_'.$intId.'_Expanded" style="display: none;  float: left;" class="'.$this->moduleNameLC.'GroupMultilang">';
-	                    foreach ($this->arrFrontendLanguages as $key => $arrLang) {
-	                        $intLangId = $arrLang['id'];
+                        $strInputfield .= '<div id="'.$this->moduleNameLC.'Inputfield_'.$intId.'_Expanded" style="display: none;  float: left;" class="'.$this->moduleNameLC.'GroupMultilang">';
+                        foreach ($this->arrFrontendLanguages as $key => $arrLang) {
+                            $intLangId = $arrLang['id'];
 
-	                        if(($key+1) == count($this->arrFrontendLanguages)) {
-	                            $minimize = "&nbsp;<a href=\"javascript:ExpandMinimize('".$intId."');\">&laquo;&nbsp;".$_ARRAYLANG['TXT_MEDIADIR_MINIMIZE']."</a>";
-	                        } else {
-	                            $minimize = "";
-	                        }
+                            if(($key+1) == count($this->arrFrontendLanguages)) {
+                                $minimize = "&nbsp;<a href=\"javascript:ExpandMinimize('".$intId."');\">&laquo;&nbsp;".$_ARRAYLANG['TXT_MEDIADIR_MINIMIZE']."</a>";
+                            } else {
+                                $minimize = "";
+                            }
                                 $value = isset($arrValue[$intLangId]) ? $arrValue[$intLangId] : '';
-	                        $strInputfield .= '<input type="text" data-id="'.$intId.'" name="'.$this->moduleNameLC.'Inputfield['.$intId.']['.$intLangId.']" id="'.$this->moduleNameLC.'Inputfield_'.$intId.'_'.$intLangId.'" value="' . $value . '" class="'.$this->moduleNameLC.'InputfieldText '.$strInfoClass.'" '.$arrInfoValue[$intLangId].' onfocus="this.select();" />&nbsp;'.$arrLang['name'].'&nbsp;'.$minimize.'<br />';
-	                    }	                    
-	                    $strInputfield .= '</div>';
+                            $strInputfield .= '<input type="text" data-id="'.$intId.'" name="'.$this->moduleNameLC.'Inputfield['.$intId.']['.$intLangId.']" id="'.$this->moduleNameLC.'Inputfield_'.$intId.'_'.$intLangId.'" value="' . $value . '" class="'.$this->moduleNameLC.'InputfieldText '.$strInfoClass.'" '.$arrInfoValue[$intLangId].' onfocus="this.select();" />&nbsp;'.$arrLang['name'].'&nbsp;'.$minimize.'<br />';
+                        }
+                        $strInputfield .= '</div>';
                     } else {
-                    	$strInputfield = '<input type="text" name="'.$this->moduleNameLC.'Inputfield['.$intId.'][0]" id="'.$this->moduleNameLC.'Inputfield_'.$intId.'_0" value="'.$arrValue[0].'" class="'.$this->moduleNameLC.'InputfieldText '.$strInfoClass.'" '.$arrInfoValue[0].'/>';
+                        $strInputfield = '<input type="text" name="'.$this->moduleNameLC.'Inputfield['.$intId.'][0]" id="'.$this->moduleNameLC.'Inputfield_'.$intId.'_0" value="'.$arrValue[0].'" class="'.$this->moduleNameLC.'InputfieldText '.$strInfoClass.'" '.$arrInfoValue[0].'/>';
                     }
                 }
                 return $strInputfield;
@@ -195,13 +195,13 @@ class MediaDirectoryInputfieldText extends \Cx\Modules\MediaDir\Controller\Media
         $intEntryDefaultLang = intval($objEntryDefaultLang->fields['lang_id']);
 
         if($this->arrSettings['settingsTranslationStatus'] == 1) {
-	        if(in_array($_LANGID, $arrTranslationStatus)) {
-	        	$intLangId = $_LANGID;
-	        } else {
-	        	$intLangId = $intEntryDefaultLang;
-	        }
+            if(in_array($_LANGID, $arrTranslationStatus)) {
+                $intLangId = $_LANGID;
+            } else {
+                $intLangId = $intEntryDefaultLang;
+            }
         } else {
-        	$intLangId = $_LANGID;
+            $intLangId = $_LANGID;
         }
 
         $objInputfieldValue = $objDatabase->Execute("
@@ -219,19 +219,19 @@ class MediaDirectoryInputfieldText extends \Cx\Modules\MediaDir\Controller\Media
         ");
 
         if(empty($objInputfieldValue->fields['value'])) {
-        	$objInputfieldValue = $objDatabase->Execute("
-	            SELECT
-	                `value`
-	            FROM
-	                ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields
-	            WHERE
-	                field_id=".$intId."
-	            AND
-	                entry_id=".intval($intEntryId)."
-	            AND
-	                lang_id=".intval($intEntryDefaultLang)."
-	            LIMIT 1
-	        ");
+            $objInputfieldValue = $objDatabase->Execute("
+                SELECT
+                    `value`
+                FROM
+                    ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields
+                WHERE
+                    field_id=".$intId."
+                AND
+                    entry_id=".intval($intEntryId)."
+                AND
+                    lang_id=".intval($intEntryDefaultLang)."
+                LIMIT 1
+            ");
         }
 
         $strValue = strip_tags(htmlspecialchars($objInputfieldValue->fields['value'], ENT_QUOTES, CONTREXX_CHARSET));
@@ -249,19 +249,19 @@ class MediaDirectoryInputfieldText extends \Cx\Modules\MediaDir\Controller\Media
 
     function getJavascriptCheck()
     {
-    	$fieldName = $this->moduleNameLC."Inputfield_";
+        $fieldName = $this->moduleNameLC."Inputfield_";
         $strJavascriptCheck = <<<EOF
 
             case 'text':
                 value = document.getElementById('$fieldName' + field + '_0').value;
                 if (value == "" && isRequiredGlobal(inputFields[field][1], value)) {
-                	isOk = false;
-                	document.getElementById('$fieldName' + field + '_0').style.border = "#ff0000 1px solid";
+                    isOk = false;
+                    document.getElementById('$fieldName' + field + '_0').style.border = "#ff0000 1px solid";
                 } else if (value != "" && !matchType(inputFields[field][2], value)) {
-                	isOk = false;
-                	document.getElementById('$fieldName' + field + '_0').style.border = "#ff0000 1px solid";
+                    isOk = false;
+                    document.getElementById('$fieldName' + field + '_0').style.border = "#ff0000 1px solid";
                 } else {
-                	document.getElementById('$fieldName' + field + '_0').style.borderColor = '';
+                    document.getElementById('$fieldName' + field + '_0').style.borderColor = '';
                 }
                 break;
 

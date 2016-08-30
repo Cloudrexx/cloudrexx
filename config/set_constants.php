@@ -71,7 +71,7 @@ if (
     file_exists(ASCMS_CUSTOMIZING_PATH.'/config/SetCustomizableConstants.php')
 ) {
     require_once ASCMS_CUSTOMIZING_PATH.'/config/SetCustomizableConstants.php';
-    
+
     // load constants from basepath
 } else if (file_exists(ASCMS_DOCUMENT_ROOT.'/config/SetCustomizableConstants.php')) {
     require_once ASCMS_DOCUMENT_ROOT.'/config/SetCustomizableConstants.php';

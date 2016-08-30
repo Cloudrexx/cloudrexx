@@ -33,141 +33,141 @@ function _updateSettings()
 //    $setVars = false;
 
     $arrSettings = array(
-		3	=> array(
-			'setname'	=> 'dnsServer',
-			'setvalue'	=> 'ns1.contrexxdns.net',
-			'setmodule'	=> 1
-		),
-		4	=> array(
-			'setname'	=> 'bannerStatus',
-			'setvalue'	=> '0',
-			'setmodule'	=> 28
-		),
-		5	=> array(
-			'setname'	=> 'spamKeywords',
-			'setvalue'	=> 'sex, viagra',
-			'setmodule'	=> 1
-		),
-		11	=> array(
-			'setname'	=> 'coreAdminName',
-			'setvalue'	=> 'Webmaster',
-			'setmodule'	=> 1
-		),
-		18	=> array(
-			'setname'	=> 'corePagingLimit',
-			'setvalue'	=> '30',
-			'setmodule'	=> 1
-		),
-		19	=> array(
-			'setname'	=> 'searchDescriptionLength',
-			'setvalue'	=> '150',
-			'setmodule'	=> 5
-		),
-		23	=> array(
-			'setname'	=> 'coreIdsStatus',
-			'setvalue'	=> 'off',
-			'setmodule'	=> 1
-		),
-		24	=> array(
-			'setname'	=> 'coreAdminEmail',
-			'setvalue'	=> 'helpdesk@comvation.com',
-			'setmodule'	=> 1
-		),
-		29	=> array(
-			'setname'	=> 'contactFormEmail',
-			'setvalue'	=> 'helpdesk@comvation.com',
-			'setmodule'	=> 6
-		),
-		34	=> array(
-			'setname'	=> 'sessionLifeTime',
-			'setvalue'	=> '3600',
-			'setmodule'	=> 1
-		),
-		35	=> array(
-			'setname'	=> 'lastAccessId',
-			'setvalue'	=> '1',
-			'setmodule'	=> 1
-		),
-		37	=> array(
-			'setname'	=> 'newsTeasersStatus',
-			'setvalue'	=> '0',
-			'setmodule'	=> 8
-		),
-		39	=> array(
-			'setname'	=> 'feedNewsMLStatus',
-			'setvalue'	=> '0',
-			'setmodule'	=> 22
-		),
-		40	=> array(
-			'setname'	=> 'calendarheadlines',
-			'setvalue'	=> '1',
-			'setmodule'	=> 21
-		),
-		41	=> array(
-			'setname'	=> 'calendarheadlinescount',
-			'setvalue'	=> '5',
-			'setmodule'	=> 21
-		),
-		42	=> array(
-			'setname'	=> 'blockStatus',
-			'setvalue'	=> '1',
-			'setmodule'	=> 7
-		),
-		44	=> array(
-			'setname'	=> 'calendarheadlinescat',
-			'setvalue'	=> '0',
-			'setmodule'	=> 21
-		),
-		45	=> array(
-			'setname'	=> 'calendardefaultcount',
-			'setvalue'	=> '16',
-			'setmodule'	=> 21
-		),
-		48	=> array(
-			'setname'	=> 'blockRandom',
-			'setvalue'	=> '1',
-			'setmodule'	=> 7
-		),
-		49	=> array(
-			'setname'	=> 'directoryHomeContent',
-			'setvalue'	=> '0',
-			'setmodule'	=> 12
-		),
-		50	=> array(
-			'setname'	=> 'cacheEnabled',
-			'setvalue'	=> 'off',
-			'setmodule'	=> 1
-		),
-		51	=> array(
-			'setname'	=> 'coreGlobalPageTitle',
-			'setvalue'	=> 'Contrexx Example Page',
-			'setmodule'	=> 1
-		),
-		52	=> array(
-			'setname'	=> 'cacheExpiration',
-			'setvalue'	=> '86400',
-			'setmodule'	=> 1
-		),
-		53	=> array(
-			'setname'	=> 'domainUrl',
-			'setvalue'	=> 'localhost',
-			'setmodule'	=> 1
-		),
-		54	=> array(
-			'setname'	=> 'xmlSitemapStatus',
-			'setvalue'	=> 'off',
-			'setmodule'	=> 1
-		),
-		55	=> array(
-			'setname'	=> 'systemStatus',
-			'setvalue'	=> 'on',
-			'setmodule'	=> 1
-		),
-		56	=> array(
-			'setname'	=> 'searchVisibleContentOnly',
-			'setvalue'	=> 'on',
-			'setmodule'	=> 1
-		),
+        3    => array(
+            'setname'    => 'dnsServer',
+            'setvalue'    => 'ns1.contrexxdns.net',
+            'setmodule'    => 1
+        ),
+        4    => array(
+            'setname'    => 'bannerStatus',
+            'setvalue'    => '0',
+            'setmodule'    => 28
+        ),
+        5    => array(
+            'setname'    => 'spamKeywords',
+            'setvalue'    => 'sex, viagra',
+            'setmodule'    => 1
+        ),
+        11    => array(
+            'setname'    => 'coreAdminName',
+            'setvalue'    => 'Webmaster',
+            'setmodule'    => 1
+        ),
+        18    => array(
+            'setname'    => 'corePagingLimit',
+            'setvalue'    => '30',
+            'setmodule'    => 1
+        ),
+        19    => array(
+            'setname'    => 'searchDescriptionLength',
+            'setvalue'    => '150',
+            'setmodule'    => 5
+        ),
+        23    => array(
+            'setname'    => 'coreIdsStatus',
+            'setvalue'    => 'off',
+            'setmodule'    => 1
+        ),
+        24    => array(
+            'setname'    => 'coreAdminEmail',
+            'setvalue'    => 'helpdesk@comvation.com',
+            'setmodule'    => 1
+        ),
+        29    => array(
+            'setname'    => 'contactFormEmail',
+            'setvalue'    => 'helpdesk@comvation.com',
+            'setmodule'    => 6
+        ),
+        34    => array(
+            'setname'    => 'sessionLifeTime',
+            'setvalue'    => '3600',
+            'setmodule'    => 1
+        ),
+        35    => array(
+            'setname'    => 'lastAccessId',
+            'setvalue'    => '1',
+            'setmodule'    => 1
+        ),
+        37    => array(
+            'setname'    => 'newsTeasersStatus',
+            'setvalue'    => '0',
+            'setmodule'    => 8
+        ),
+        39    => array(
+            'setname'    => 'feedNewsMLStatus',
+            'setvalue'    => '0',
+            'setmodule'    => 22
+        ),
+        40    => array(
+            'setname'    => 'calendarheadlines',
+            'setvalue'    => '1',
+            'setmodule'    => 21
+        ),
+        41    => array(
+            'setname'    => 'calendarheadlinescount',
+            'setvalue'    => '5',
+            'setmodule'    => 21
+        ),
+        42    => array(
+            'setname'    => 'blockStatus',
+            'setvalue'    => '1',
+            'setmodule'    => 7
+        ),
+        44    => array(
+            'setname'    => 'calendarheadlinescat',
+            'setvalue'    => '0',
+            'setmodule'    => 21
+        ),
+        45    => array(
+            'setname'    => 'calendardefaultcount',
+            'setvalue'    => '16',
+            'setmodule'    => 21
+        ),
+        48    => array(
+            'setname'    => 'blockRandom',
+            'setvalue'    => '1',
+            'setmodule'    => 7
+        ),
+        49    => array(
+            'setname'    => 'directoryHomeContent',
+            'setvalue'    => '0',
+            'setmodule'    => 12
+        ),
+        50    => array(
+            'setname'    => 'cacheEnabled',
+            'setvalue'    => 'off',
+            'setmodule'    => 1
+        ),
+        51    => array(
+            'setname'    => 'coreGlobalPageTitle',
+            'setvalue'    => 'Contrexx Example Page',
+            'setmodule'    => 1
+        ),
+        52    => array(
+            'setname'    => 'cacheExpiration',
+            'setvalue'    => '86400',
+            'setmodule'    => 1
+        ),
+        53    => array(
+            'setname'    => 'domainUrl',
+            'setvalue'    => 'localhost',
+            'setmodule'    => 1
+        ),
+        54    => array(
+            'setname'    => 'xmlSitemapStatus',
+            'setvalue'    => 'off',
+            'setmodule'    => 1
+        ),
+        55    => array(
+            'setname'    => 'systemStatus',
+            'setvalue'    => 'on',
+            'setmodule'    => 1
+        ),
+        56    => array(
+            'setname'    => 'searchVisibleContentOnly',
+            'setvalue'    => 'on',
+            'setmodule'    => 1
+        ),
         57 => array(
             'setname'   => 'protocolHttpsFrontend',
             'setvalue'  => 'off',
@@ -183,282 +183,282 @@ function _updateSettings()
             'setvalue'  => 'off',
             'setmodule' => 1
         ),
-		60	=> array(
-			'setname'	=> 'forumHomeContent',
-			'setvalue'	=> '0',
-			'setmodule'	=> 20
-		),
-		62	=> array(
-			'setname'	=> 'coreSmtpServer',
-			'setvalue'	=> '0',
-			'setmodule'	=> 1
-		),
-		63	=> array(
-			'setname'	=> 'languageDetection',
-			'setvalue'	=> 'on',
-			'setmodule'	=> 1
-		),
-		64	=> array(
-			'setname'	=> 'podcastHomeContent',
-			'setvalue'	=> '0',
-			'setmodule'	=> 35
-		),
-		65	=> array(
-			'setname'	=> 'googleMapsAPIKey',
-			'setvalue'	=> '',
-			'setmodule'	=> 1
-		),
-		66	=> array(
-			'setname'	=> 'forumTagContent',
-			'setvalue'	=> '0',
-			'setmodule'	=> 20
-		),
-		68	=> array(
-			'setname'	=> 'dataUseModule',
-			'setvalue'	=> '0',
-			'setmodule'	=> 48
-		),
-		69	=> array(
-			'setname'	=> 'frontendEditingStatus',
-			'setvalue'	=> 'off',
-			'setmodule'	=> 1
-		),
-		71	=> array(
-			'setname'	=> 'coreListProtectedPages',
-			'setvalue'	=> 'on',
-			'setmodule'	=> 1
-		),
-		72	=> array(
-			'setname'	=> 'useKnowledgePlaceholders',
-			'setvalue'	=> '0',
-			'setmodule'	=> 56
-		),
-		73	=> array(
-			'setname'	=> 'advancedUploadFrontend',
-			'setvalue'	=> 'off',
-			'setmodule'	=> 52
-		),
-		74	=> array(
-			'setname'	=> 'advancedUploadBackend',
-			'setvalue'	=> 'on',
-			'setmodule'	=> 52
-		),
-		75	=> array(
-			'setname'	=> 'installationId',
-			'setvalue'	=> '',
-			'setmodule'	=> 1
-		),
-		76	=> array(
-			'setname'	=> 'licenseKey',
-			'setvalue'	=> '',
-			'setmodule'	=> 1
-		),
-		77	=> array(
-			'setname'	=> 'contactCompany',
-			'setvalue'	=> 'Ihr Firmenname',
-			'setmodule'	=> 1
-		),
-		78	=> array(
-			'setname'	=> 'contactAddress',
-			'setvalue'	=> 'Musterstrasse 12',
-			'setmodule'	=> 1
-		),
-		79	=> array(
-			'setname'	=> 'contactZip',
-			'setvalue'	=> '3600',
-			'setmodule'	=> 1
-		),
-		80	=> array(
-			'setname'	=> 'contactPlace',
-			'setvalue'	=> 'Musterhausen',
-			'setmodule'	=> 1
-		),
-		81	=> array(
-			'setname'	=> 'contactCountry',
-			'setvalue'	=> 'Musterland',
-			'setmodule'	=> 1
-		),
-		82	=> array(
-			'setname'	=> 'contactPhone',
-			'setvalue'	=> '033 123 45 67',
-			'setmodule'	=> 1
-		),
-		83	=> array(
-			'setname'	=> 'contactFax',
-			'setvalue'	=> '033 123 45 68',
-			'setmodule'	=> 1
-		),
-		84	=> array(
-			'setname'	=> 'sessionLifeTimeRememberMe',
-			'setvalue'	=> '1209600',
-			'setmodule'	=> 1
-		),
-		85	=> array(
-			'setname'	=> 'dashboardNews',
-			'setvalue'	=> 'on',
-			'setmodule'	=> 1
-		),
-		86	=> array(
-			'setname'	=> 'dashboardStatistics',
-			'setvalue'	=> 'on',
-			'setmodule'	=> 1
-		),
-		87	=> array(
-			'setname'	=> 'timezone',
-			'setvalue'	=> 'Europe/Zurich',
-			'setmodule'	=> 1
-		),
-		88	=> array(
-			'setname'	=> 'googleAnalyticsTrackingId',
-			'setvalue'	=> '',
-			'setmodule'	=> 1
-		),
-		89	=> array(
-			'setname'	=> 'passwordComplexity',
-			'setvalue'	=> 'off',
-			'setmodule'	=> 1
-		),
-		90	=> array(
-			'setname'	=> 'licenseState',
-			'setvalue'	=> 'OK',
-			'setmodule'	=> 66
-		),
-		91	=> array(
-			'setname'	=> 'licenseValidTo',
-			'setvalue'	=> '',
-			'setmodule'	=> 66
-		),
-		92	=> array(
-			'setname'	=> 'coreCmsEdition',
-			'setvalue'	=> 'Trial',
-			'setmodule'	=> 66
-		),
-		93	=> array(
-			'setname'	=> 'licenseMessage',
-			'setvalue'	=> '',
-			'setmodule'	=> 66
-		),
-		94	=> array(
-			'setname'	=> 'licenseCreatedAt',
-			'setvalue'	=> '',
-			'setmodule'	=> 66
-		),
-		95	=> array(
-			'setname'	=> 'licenseDomains',
-			'setvalue'	=> '',
-			'setmodule'	=> 66
-		),
-		96	=> array(
-			'setname'	=> 'licenseGrayzoneMessages',
-			'setvalue'	=> '',
-			'setmodule'	=> 66
-		),
-		97	=> array(
-			'setname'	=> 'coreCmsVersion',
-			'setvalue'	=> '3.0.4',
-			'setmodule'	=> 66
-		),
-		98	=> array(
-			'setname'	=> 'coreCmsCodeName',
-			'setvalue'	=> 'Nikola Tesla',
-			'setmodule'	=> 66
-		),
-		99	=> array(
-			'setname'	=> 'coreCmsStatus',
-			'setvalue'	=> 'Stable',
-			'setmodule'	=> 66
-		),
-		100	=> array(
-			'setname'	=> 'coreCmsReleaseDate',
-			'setvalue'	=> '12.04.2013',
-			'setmodule'	=> 66
-		),
-		101	=> array(
-			'setname'	=> 'licensePartner',
-			'setvalue'	=> '',
-			'setmodule'	=> 66
-		),
-		102	=> array(
-			'setname'	=> 'licenseCustomer',
-			'setvalue'	=> '',
-			'setmodule'	=> 66
-		),
-		103	=> array(
-			'setname'	=> 'availableComponents',
-			'setvalue'	=> '',
-			'setmodule'	=> 66
-		),
-		104	=> array(
-			'setname'	=> 'upgradeUrl',
-			'setvalue'	=> 'http://license.contrexx.com/',
-			'setmodule'	=> 66
-		),
-		105	=> array(
-			'setname'	=> 'isUpgradable',
-			'setvalue'	=> 'off',
-			'setmodule'	=> 66
-		),
-		106	=> array(
-			'setname'	=> 'dashboardMessages',
-			'setvalue'	=> 'YToxOntzOjI6ImRlIjtPOjMxOiJDeFxDb3JlX01vZHVsZXNcTGljZW5zZVxNZXNzYWdlIjo2OntzOjQxOiIAQ3hcQ29yZV9Nb2R1bGVzXExpY2Vuc2VcTWVzc2FnZQBsYW5nQ29kZSI7czoyOiJkZSI7czozNzoiAEN4XENvcmVfTW9kdWxlc1xMaWNlbnNlXE1lc3NhZ2UAdGV4dCI7czo5MjoiU2llIGJlbnV0emVuIGRlbiBSZWxlYXNlIENhbmRpZGF0ZSB2b24gQ29udHJleHggMy4gS2xpY2tlbiBTaWUgaGllciB1bSBOZXVpZ2tlaXRlbiB6dSBzZWhlbiEiO3M6Mzc6IgBDeFxDb3JlX01vZHVsZXNcTGljZW5zZVxNZXNzYWdlAHR5cGUiO3M6MTA6Indhcm5pbmdib3giO3M6Mzc6IgBDeFxDb3JlX01vZHVsZXNcTGljZW5zZVxNZXNzYWdlAGxpbmsiO3M6MjE6ImluZGV4LnBocD9jbWQ9bGljZW5zZSI7czo0MzoiAEN4XENvcmVfTW9kdWxlc1xMaWNlbnNlXE1lc3NhZ2UAbGlua1RhcmdldCI7czo1OiJfc2VsZiI7czo0ODoiAEN4XENvcmVfTW9kdWxlc1xMaWNlbnNlXE1lc3NhZ2UAc2hvd0luRGFzaGJvYXJkIjtiOjE7fX0=',
-			'setmodule'	=> 66
-		),
-		112	=> array(
-			'setname'	=> 'coreCmsName',
-			'setvalue'	=> 'Contrexx',
-			'setmodule'	=> 66
-		),
-		113	=> array(
-			'setname'	=> 'useCustomizings',
-			'setvalue'	=> 'off',
-			'setmodule'	=> 1
-		),
-		114	=> array(
-			'setname'	=> 'licenseGrayzoneTime',
-			'setvalue'	=> '14',
-			'setmodule'	=> 66
-		),
-		115	=> array(
-			'setname'	=> 'licenseLockTime',
-			'setvalue'	=> '10',
-			'setmodule'	=> 66
-		),
-		116	=> array(
-			'setname'	=> 'licenseUpdateInterval',
-			'setvalue'	=> '24',
-			'setmodule'	=> 66
-		),
-		117	=> array(
-			'setname'	=> 'licenseFailedUpdate',
-			'setvalue'	=> '0',
-			'setmodule'	=> 66
-		),
-		118	=> array(
-			'setname'	=> 'licenseSuccessfulUpdate',
-			'setvalue'	=> '0',
-			'setmodule'	=> 66
-		),
+        60    => array(
+            'setname'    => 'forumHomeContent',
+            'setvalue'    => '0',
+            'setmodule'    => 20
+        ),
+        62    => array(
+            'setname'    => 'coreSmtpServer',
+            'setvalue'    => '0',
+            'setmodule'    => 1
+        ),
+        63    => array(
+            'setname'    => 'languageDetection',
+            'setvalue'    => 'on',
+            'setmodule'    => 1
+        ),
+        64    => array(
+            'setname'    => 'podcastHomeContent',
+            'setvalue'    => '0',
+            'setmodule'    => 35
+        ),
+        65    => array(
+            'setname'    => 'googleMapsAPIKey',
+            'setvalue'    => '',
+            'setmodule'    => 1
+        ),
+        66    => array(
+            'setname'    => 'forumTagContent',
+            'setvalue'    => '0',
+            'setmodule'    => 20
+        ),
+        68    => array(
+            'setname'    => 'dataUseModule',
+            'setvalue'    => '0',
+            'setmodule'    => 48
+        ),
+        69    => array(
+            'setname'    => 'frontendEditingStatus',
+            'setvalue'    => 'off',
+            'setmodule'    => 1
+        ),
+        71    => array(
+            'setname'    => 'coreListProtectedPages',
+            'setvalue'    => 'on',
+            'setmodule'    => 1
+        ),
+        72    => array(
+            'setname'    => 'useKnowledgePlaceholders',
+            'setvalue'    => '0',
+            'setmodule'    => 56
+        ),
+        73    => array(
+            'setname'    => 'advancedUploadFrontend',
+            'setvalue'    => 'off',
+            'setmodule'    => 52
+        ),
+        74    => array(
+            'setname'    => 'advancedUploadBackend',
+            'setvalue'    => 'on',
+            'setmodule'    => 52
+        ),
+        75    => array(
+            'setname'    => 'installationId',
+            'setvalue'    => '',
+            'setmodule'    => 1
+        ),
+        76    => array(
+            'setname'    => 'licenseKey',
+            'setvalue'    => '',
+            'setmodule'    => 1
+        ),
+        77    => array(
+            'setname'    => 'contactCompany',
+            'setvalue'    => 'Ihr Firmenname',
+            'setmodule'    => 1
+        ),
+        78    => array(
+            'setname'    => 'contactAddress',
+            'setvalue'    => 'Musterstrasse 12',
+            'setmodule'    => 1
+        ),
+        79    => array(
+            'setname'    => 'contactZip',
+            'setvalue'    => '3600',
+            'setmodule'    => 1
+        ),
+        80    => array(
+            'setname'    => 'contactPlace',
+            'setvalue'    => 'Musterhausen',
+            'setmodule'    => 1
+        ),
+        81    => array(
+            'setname'    => 'contactCountry',
+            'setvalue'    => 'Musterland',
+            'setmodule'    => 1
+        ),
+        82    => array(
+            'setname'    => 'contactPhone',
+            'setvalue'    => '033 123 45 67',
+            'setmodule'    => 1
+        ),
+        83    => array(
+            'setname'    => 'contactFax',
+            'setvalue'    => '033 123 45 68',
+            'setmodule'    => 1
+        ),
+        84    => array(
+            'setname'    => 'sessionLifeTimeRememberMe',
+            'setvalue'    => '1209600',
+            'setmodule'    => 1
+        ),
+        85    => array(
+            'setname'    => 'dashboardNews',
+            'setvalue'    => 'on',
+            'setmodule'    => 1
+        ),
+        86    => array(
+            'setname'    => 'dashboardStatistics',
+            'setvalue'    => 'on',
+            'setmodule'    => 1
+        ),
+        87    => array(
+            'setname'    => 'timezone',
+            'setvalue'    => 'Europe/Zurich',
+            'setmodule'    => 1
+        ),
+        88    => array(
+            'setname'    => 'googleAnalyticsTrackingId',
+            'setvalue'    => '',
+            'setmodule'    => 1
+        ),
+        89    => array(
+            'setname'    => 'passwordComplexity',
+            'setvalue'    => 'off',
+            'setmodule'    => 1
+        ),
+        90    => array(
+            'setname'    => 'licenseState',
+            'setvalue'    => 'OK',
+            'setmodule'    => 66
+        ),
+        91    => array(
+            'setname'    => 'licenseValidTo',
+            'setvalue'    => '',
+            'setmodule'    => 66
+        ),
+        92    => array(
+            'setname'    => 'coreCmsEdition',
+            'setvalue'    => 'Trial',
+            'setmodule'    => 66
+        ),
+        93    => array(
+            'setname'    => 'licenseMessage',
+            'setvalue'    => '',
+            'setmodule'    => 66
+        ),
+        94    => array(
+            'setname'    => 'licenseCreatedAt',
+            'setvalue'    => '',
+            'setmodule'    => 66
+        ),
+        95    => array(
+            'setname'    => 'licenseDomains',
+            'setvalue'    => '',
+            'setmodule'    => 66
+        ),
+        96    => array(
+            'setname'    => 'licenseGrayzoneMessages',
+            'setvalue'    => '',
+            'setmodule'    => 66
+        ),
+        97    => array(
+            'setname'    => 'coreCmsVersion',
+            'setvalue'    => '3.0.4',
+            'setmodule'    => 66
+        ),
+        98    => array(
+            'setname'    => 'coreCmsCodeName',
+            'setvalue'    => 'Nikola Tesla',
+            'setmodule'    => 66
+        ),
+        99    => array(
+            'setname'    => 'coreCmsStatus',
+            'setvalue'    => 'Stable',
+            'setmodule'    => 66
+        ),
+        100    => array(
+            'setname'    => 'coreCmsReleaseDate',
+            'setvalue'    => '12.04.2013',
+            'setmodule'    => 66
+        ),
+        101    => array(
+            'setname'    => 'licensePartner',
+            'setvalue'    => '',
+            'setmodule'    => 66
+        ),
+        102    => array(
+            'setname'    => 'licenseCustomer',
+            'setvalue'    => '',
+            'setmodule'    => 66
+        ),
+        103    => array(
+            'setname'    => 'availableComponents',
+            'setvalue'    => '',
+            'setmodule'    => 66
+        ),
+        104    => array(
+            'setname'    => 'upgradeUrl',
+            'setvalue'    => 'http://license.contrexx.com/',
+            'setmodule'    => 66
+        ),
+        105    => array(
+            'setname'    => 'isUpgradable',
+            'setvalue'    => 'off',
+            'setmodule'    => 66
+        ),
+        106    => array(
+            'setname'    => 'dashboardMessages',
+            'setvalue'    => 'YToxOntzOjI6ImRlIjtPOjMxOiJDeFxDb3JlX01vZHVsZXNcTGljZW5zZVxNZXNzYWdlIjo2OntzOjQxOiIAQ3hcQ29yZV9Nb2R1bGVzXExpY2Vuc2VcTWVzc2FnZQBsYW5nQ29kZSI7czoyOiJkZSI7czozNzoiAEN4XENvcmVfTW9kdWxlc1xMaWNlbnNlXE1lc3NhZ2UAdGV4dCI7czo5MjoiU2llIGJlbnV0emVuIGRlbiBSZWxlYXNlIENhbmRpZGF0ZSB2b24gQ29udHJleHggMy4gS2xpY2tlbiBTaWUgaGllciB1bSBOZXVpZ2tlaXRlbiB6dSBzZWhlbiEiO3M6Mzc6IgBDeFxDb3JlX01vZHVsZXNcTGljZW5zZVxNZXNzYWdlAHR5cGUiO3M6MTA6Indhcm5pbmdib3giO3M6Mzc6IgBDeFxDb3JlX01vZHVsZXNcTGljZW5zZVxNZXNzYWdlAGxpbmsiO3M6MjE6ImluZGV4LnBocD9jbWQ9bGljZW5zZSI7czo0MzoiAEN4XENvcmVfTW9kdWxlc1xMaWNlbnNlXE1lc3NhZ2UAbGlua1RhcmdldCI7czo1OiJfc2VsZiI7czo0ODoiAEN4XENvcmVfTW9kdWxlc1xMaWNlbnNlXE1lc3NhZ2UAc2hvd0luRGFzaGJvYXJkIjtiOjE7fX0=',
+            'setmodule'    => 66
+        ),
+        112    => array(
+            'setname'    => 'coreCmsName',
+            'setvalue'    => 'Contrexx',
+            'setmodule'    => 66
+        ),
+        113    => array(
+            'setname'    => 'useCustomizings',
+            'setvalue'    => 'off',
+            'setmodule'    => 1
+        ),
+        114    => array(
+            'setname'    => 'licenseGrayzoneTime',
+            'setvalue'    => '14',
+            'setmodule'    => 66
+        ),
+        115    => array(
+            'setname'    => 'licenseLockTime',
+            'setvalue'    => '10',
+            'setmodule'    => 66
+        ),
+        116    => array(
+            'setname'    => 'licenseUpdateInterval',
+            'setvalue'    => '24',
+            'setmodule'    => 66
+        ),
+        117    => array(
+            'setname'    => 'licenseFailedUpdate',
+            'setvalue'    => '0',
+            'setmodule'    => 66
+        ),
+        118    => array(
+            'setname'    => 'licenseSuccessfulUpdate',
+            'setvalue'    => '0',
+            'setmodule'    => 66
+        ),
                 119     => array(
-			'setname'	=> 'cacheUserCache',
-			'setvalue'	=> 'off',
-			'setmodule'	=> 1
+            'setname'    => 'cacheUserCache',
+            'setvalue'    => 'off',
+            'setmodule'    => 1
                 ),
                 120     => array(
-			'setname'	=> 'cacheOPCache',
-			'setvalue'	=> 'off',
-			'setmodule'	=> 1
+            'setname'    => 'cacheOPCache',
+            'setvalue'    => 'off',
+            'setmodule'    => 1
                 ),
                 121     => array(
-			'setname'	=> 'cacheUserCacheMemcacheConfig',
-			'setvalue'	=> '{\"ip":\"127.0.0.1\",\"port\":11211}',
-			'setmodule'	=> 1
+            'setname'    => 'cacheUserCacheMemcacheConfig',
+            'setvalue'    => '{\"ip":\"127.0.0.1\",\"port\":11211}',
+            'setmodule'    => 1
                 ),
                 122     => array(
-			'setname'	=> 'cacheProxyCacheVarnishConfig',
-			'setvalue'	=> '{\"ip":\"127.0.0.1\",\"port\":8080}',
-			'setmodule'	=> 1
+            'setname'    => 'cacheProxyCacheVarnishConfig',
+            'setvalue'    => '{\"ip":\"127.0.0.1\",\"port\":8080}',
+            'setmodule'    => 1
                 ),
-	);
+    );
 
     $arrSettingsByName = array();
     foreach ($arrSettings as $setid => $data) {

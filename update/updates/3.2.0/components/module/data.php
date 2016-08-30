@@ -225,10 +225,10 @@ INSERT INTO `".DBPREFIX."module_data_settings` (`name`, `value`) VALUES
 
 
 
-	/*********************************************************
-	* EXTENSION:	Thunbmail Image & Attachment description *
-	* ADDED:		Contrexx v2.1.0					         *
-	*********************************************************/
+    /*********************************************************
+    * EXTENSION:    Thunbmail Image & Attachment description *
+    * ADDED:        Contrexx v2.1.0                             *
+    *********************************************************/
     try {
         \Cx\Lib\UpdateUtil::table(
             DBPREFIX.'module_data_messages_lang',

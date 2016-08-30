@@ -82,7 +82,7 @@
             });
         });
 
-        $J('.profile_expanded .hide').click(function(){ 
+        $J('.profile_expanded .hide').click(function(){
             $elm     = $J(this);
             $closest = $elm.closest('td');
             $elm.closest('.profile_expanded').fadeOut('slow', function(){
@@ -137,24 +137,24 @@
 
         var page = 0;
         $J(window).scroll ( function()
-        { 
+        {
             tab  = $J("#tabs ul li.ui-tabs-selected a").attr("rel").split('_')[0];
             if ($J(document).height() <= ($J(window).height() + $J(window).scrollTop()+100) && $J("#"+tab).is(":visible"))
             {
                 new_req = getReq(tabLinks, tab);
                 if (new_req!=false)
-                { 
+                {
                     $J('#favloader_'+tab).css('display', 'table-row');
 
                     var $this = $J("#"+tab);
                     if ($this.data('executing'))
                         return;
                     $this.data('executing', true).attr("src", "AJax in progress");
-                    url  = getLink(tabLinks, tab); 
+                    url  = getLink(tabLinks, tab);
                     page = getPage(tabLinks, tab);
-                    
-                    var ajaxCall = function(tabSelected) { 
-                        var tab = tabSelected;                       
+
+                    var ajaxCall = function(tabSelected) {
+                        var tab = tabSelected;
                         $J.ajax({
                             dataType: "JSON",
                             type: "GET",
@@ -184,7 +184,7 @@
                             }
                         });
                     }
-                    ajaxCall(tab);                    
+                    ajaxCall(tab);
                 }
 
             }

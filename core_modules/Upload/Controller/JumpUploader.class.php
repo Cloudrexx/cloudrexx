@@ -48,9 +48,9 @@ class JumpUploader extends Uploader
 {
     /**
      * @override
-     */     
+     */
     public function handleRequest()
-    {    
+    {
         // Get parameters
         $chunk = $_POST['partitionIndex'];
         $chunks = $_POST['partitionCount'];
@@ -73,12 +73,12 @@ class JumpUploader extends Uploader
             $this->addHarmfulFileToResponse($fileName);
         }
 
-        die(0); 
+        die(0);
     }
 
     /**
      * @override
-     */     
+     */
     public function getXHtml($backend = false)
     {
       global $objInit;
@@ -86,11 +86,11 @@ class JumpUploader extends Uploader
 
       $tpl = new \Cx\Core\Html\Sigma(ASCMS_CORE_MODULE_PATH.'/Upload/template/uploaders');
       $tpl->setErrorHandling(PEAR_ERROR_DIE);
-      
+
       $tpl->loadTemplateFile('jump.html');
 
       $basePath = 'index.php?';
-      $basePath .= ($this->isBackendRequest ? 'cmd=Upload&act' : 'section=Upload&cmd'); //act and cmd vary 
+      $basePath .= ($this->isBackendRequest ? 'cmd=Upload&act' : 'section=Upload&cmd'); //act and cmd vary
       $appletPath = $basePath.'=jumpUploaderApplet';
       $l10nPath = $basePath.'=jumpUploaderL10n';
 
@@ -110,7 +110,7 @@ class JumpUploader extends Uploader
       $tpl->setVariable('UPLOAD_LANG_URL', $l10nPath);
       $tpl->setVariable('UPLOAD_URL', $uploadPath);
       $tpl->setVariable('UPLOAD_ID', $this->uploadId);
-      
+
       return $tpl->get();
     }
 }

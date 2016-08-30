@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,15 +24,15 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Create error pages
  *
- * @copyright	CLOUDREXX CMS - CLOUDREXX AG
- * @author		Cloudrexx Development Team <info@cloudrexx.com>
- * @package	    cloudrexx
+ * @copyright    CLOUDREXX CMS - CLOUDREXX AG
+ * @author        Cloudrexx Development Team <info@cloudrexx.com>
+ * @package        cloudrexx
  * @subpackage  core_error
- * @version		1.0.0
+ * @version        1.0.0
  */
 
 namespace Cx\Core\Error\Model\Entity;
@@ -40,11 +40,11 @@ namespace Cx\Core\Error\Model\Entity;
 /**
  * Display a exception as a human readable error message
  *
- * @copyright	CLOUDREXX CMS - CLOUDREXX AG
- * @author		Cloudrexx Development Team <info@cloudrexx.com>
- * @package	    cloudrexx
+ * @copyright    CLOUDREXX CMS - CLOUDREXX AG
+ * @author        Cloudrexx Development Team <info@cloudrexx.com>
+ * @package        cloudrexx
  * @subpackage  core_error
- * @version		1.0.0
+ * @version        1.0.0
  */
 class ShinyException extends \Exception
 {
@@ -82,4 +82,3 @@ class ShinyException extends \Exception
         return $template->get();
     }
 }
-

@@ -1,4 +1,4 @@
-//(function ($) {    
+//(function ($) {
 $J19(document).ready(function() {
     $('ul.sf-menu').superfish({
         delay: 100

@@ -14,14 +14,14 @@ $J(function(){
 function resetContextFields() {
     var contexts = ['title', 'address', 'zip', 'city', 'country'];
     $J(".inputfieldContext").each(function(){
-        if ($J(this).val() != 'none') {            
+        if ($J(this).val() != 'none') {
             $J(".inputfieldContext option[value="+ $J(this).val() +"]")
                     .not(":selected")
                     .attr('disabled', 'disabled');
             contexts = cx.jQuery.removeFromArray($J(this).val(), contexts);
         }
     });
-    
+
     $J.each(contexts, function(i, context){
         $J(".inputfieldContext option[value="+ context +"]").removeAttr('disabled');
     });
@@ -43,25 +43,25 @@ function ExpandMinimizeInputfields(toggle, id) {
 
         var reg = new RegExp(toggle + '\\[' + id + '\\]');
 
-    	for (i = 0; i < document.settingsInputfieldsForm.elements.length; ++i) {
+      for (i = 0; i < document.settingsInputfieldsForm.elements.length; ++i) {
             var field = document.settingsInputfieldsForm.elements[i];
 
             if (field.name.match(reg)) {
-    			if (field.value == '') {
-    			    field.value = masterValue;
-    			}
+          if (field.value == '') {
+              field.value = masterValue;
+          }
 
-    			var regDefaultLang = new RegExp(toggle + '\\[' + id + '\\]\\[{MEDIADIR_SETTINGS_INPUTFIELDS_DEFAULT_LANG_ID}\\]');
+          var regDefaultLang = new RegExp(toggle + '\\[' + id + '\\]\\[{MEDIADIR_SETTINGS_INPUTFIELDS_DEFAULT_LANG_ID}\\]');
 
-    			if (field.name.match(regDefaultLang)) {
-    			    field.value = masterValue;
-    			}
+          if (field.name.match(regDefaultLang)) {
+              field.value = masterValue;
+          }
 
-    			var regMaster = new RegExp(toggle + '\\[' + id + '\\]\\[0\\]');
+          var regMaster = new RegExp(toggle + '\\[' + id + '\\]\\[0\\]');
 
-    			if (field.name.match(regMaster)) {
-    			    field.value = defaultValue;
-    			}
+          if (field.name.match(regMaster)) {
+              field.value = defaultValue;
+          }
             }
         }
     }
@@ -85,25 +85,25 @@ function ExpandMinimizeForm(toggle){
     var masterValue = document.getElementsByName(toggle + '[0]')[0].value;
     var defaultValue = document.getElementsByName(toggle + '[{MEDIADIR_SETTINGS_FORM_DEFAULT_LANG_ID}]')[0].value;
 
-	for (i = 0; i < document.settingsInputfieldsForm.elements.length; ++i) {
+  for (i = 0; i < document.settingsInputfieldsForm.elements.length; ++i) {
         var field = document.settingsInputfieldsForm.elements[i];
 
         if (field.name.match(reg)) {
-			if (field.value == '') {
-			    field.value = masterValue;
-			}
+      if (field.value == '') {
+          field.value = masterValue;
+      }
 
-			var regDefaultLang = new RegExp(toggle + '\\[{MEDIADIR_SETTINGS_FORM_DEFAULT_LANG_ID}\\]');
+      var regDefaultLang = new RegExp(toggle + '\\[{MEDIADIR_SETTINGS_FORM_DEFAULT_LANG_ID}\\]');
 
-			if (field.name.match(regDefaultLang)) {
-			    field.value = masterValue;
-			}
+      if (field.name.match(regDefaultLang)) {
+          field.value = masterValue;
+      }
 
-			var regMaster = new RegExp(toggle + '\\[0\\]');
+      var regMaster = new RegExp(toggle + '\\[0\\]');
 
-			if (field.name.match(regMaster)) {
-			    field.value = defaultValue;
-			}
+      if (field.name.match(regMaster)) {
+          field.value = defaultValue;
+      }
         }
     }
 
@@ -117,7 +117,7 @@ var mediaBrowseInputBox;
 var mediaBrowserCallback = function(data) {
     if (data.type=="file") {
       var path = data.data[0].datainfo.filepath;
-      mediaBrowseInputBox.val(path);      
+      mediaBrowseInputBox.val(path);
     }
 };
 
@@ -208,9 +208,9 @@ var refreshInputfields = function(formId)
             <tr class="row2">
                 <td valign="top">{TXT_MEDIADIR_USE_LEVEL}</td>
                 <td>
-		            <input type="radio" name="formUseLevel" value="1" {MEDIADIR_USE_LEVEL_ON} /> {TXT_MEDIADIR_ACTIVATE} &nbsp;<input type="radio" name="formUseLevel" value="0" {MEDIADIR_USE_LEVEL_OFF} /> {TXT_MEDIADIR_DEACTIVATE}&nbsp;
+                <input type="radio" name="formUseLevel" value="1" {MEDIADIR_USE_LEVEL_ON} /> {TXT_MEDIADIR_ACTIVATE} &nbsp;<input type="radio" name="formUseLevel" value="0" {MEDIADIR_USE_LEVEL_OFF} /> {TXT_MEDIADIR_DEACTIVATE}&nbsp;
                     <span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_MEDIADIR_USE_LEVEL_INFO}</span>
-		        </td>
+            </td>
             </tr>
             <!-- END mediadirFormUseLevel -->
             <!-- BEGIN mediadirFormUseReadyToConfirm -->

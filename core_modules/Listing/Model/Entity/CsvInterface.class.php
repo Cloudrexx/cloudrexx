@@ -47,7 +47,7 @@ namespace Cx\Core_Modules\Listing\Model;
 class CsvInterface implements Exportable, Importable {
     protected $lineEnding;
     protected $separator;
-    
+
     public function __construct($separator = ',', $lineEnding = "\n") {
         $this->lineEnding = $lineEnding;
         $this->separator = $separator;
@@ -58,7 +58,7 @@ class CsvInterface implements Exportable, Importable {
      * @todo Add support for different charsets, since CSV does not declare which one to use
      * Please note that Excel uses tab as delimiter if charset is unicode and semikolon for ANSI charsets
      * @param type $twoDimensionalArray
-     * @return type 
+     * @return type
      */
     public function export($twoDimensionalArray) {
         $content = '';
@@ -74,7 +74,7 @@ class CsvInterface implements Exportable, Importable {
      * @todo Add support for different charsets, since CSV does not declare which one to use
      * Please note that Excel uses tab as delimiter if charset is unicode and semikolon for ANSI charsets
      * @param type $dataAsString
-     * @return type 
+     * @return type
      */
     public function import($dataAsString) {
         $array = array();

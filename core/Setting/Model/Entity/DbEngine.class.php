@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Specific Setting for this Component. Use this to interact with the Setting.class.php
  *
@@ -93,7 +93,7 @@ class DbEngine extends Engine{
         $this->arrSettings = array();
         while (!$objResult->EOF) {
             $this->arrSettings[$objResult->fields['name']] = array(
-            	'name' => $objResult->fields['name'],
+                'name' => $objResult->fields['name'],
                 'section' => $section,
                 'group' => $objResult->fields['group'],
                 'value' => $objResult->fields['value'],

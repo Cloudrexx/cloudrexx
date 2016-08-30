@@ -69,7 +69,7 @@ class GuestBookManager extends GuestBookLibrary
         \Cx\Core\Csrf\Controller\Csrf::add_placeholder($this->_objTpl);
         $this->_objTpl->setErrorHandling(PEAR_ERROR_DIE);
         $this->imagePath = ASCMS_MODULE_FOLDER;
-        $this->langId=$objInit->userFrontendLangId;        
+        $this->langId=$objInit->userFrontendLangId;
         $objDatabase->Execute("OPTIMIZE TABLE ".DBPREFIX."module_guestbook");
         $this->getSettings();
     }

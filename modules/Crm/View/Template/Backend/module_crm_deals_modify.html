@@ -22,14 +22,14 @@
             var errors   = new  Array();
             var errChk   = 0;
             var quoteErr = "{TXT_CRM_OPPORTUNITY_QUOTE_PRICE_ERROR}";
-            
+
             if ($J.trim($J("#title").val()) == '') {
                 errChk = 1;
                 $J("#title").css("border","1px solid red");
-                $J("#title").val("");                
-            }            
+                $J("#title").val("");
+            }
             if ($J('#domainName').length && $J.trim($J('#domainName').val()) == "") {
-                errChk = 1;                
+                errChk = 1;
                 document.getElementById("domainName").style.border = "1px solid red";
                 document.getElementById("domainName").value = "";
             }
@@ -83,10 +83,10 @@
                 $J('#formerr').html('');
                 $J('#formerr').css('display', 'none');
                 return true;
-            }            
+            }
         });
         $J( ".date" ).datepicker({ dateFormat: 'yy-mm-dd' });
-         
+
         var cache = {},
         lastXhr;
         var optionsCustomer = {
@@ -110,7 +110,7 @@
             minLength: 1,
             source: function( request, response ) {
                 var term = request.term;
-                
+
                 lastXhr = $J.getJSON( "./index.php?cmd={MODULE_NAME}&act=getcustomers", request, function( data, status, xhr ) {
                     cache[ term ] = data;
                     if ( xhr === lastXhr ) {
@@ -118,17 +118,17 @@
                     }
                 });
             },
-            select: function(event, ui) {                
+            select: function(event, ui) {
                 $J('#customer').val(ui.item.id);
                 $J('#customer').trigger('change');
             }
-        });   
+        });
         $J('#customer').change(function() {
             customer_id = $J('#customer').val();
-            
+
             $J('#customer_contact option').remove();
             $J.getJSON('./index.php?cmd={MODULE_NAME}&act=autosuggest&json=true&id='+customer_id, function(data) {
-                $J.each(data.customer, function(index, value){                    
+                $J.each(data.customer, function(index, value){
                     $J('#customer_contact').append('<option value="'+value.id+'">'+value.name+'</option>');
                 });
             });
@@ -174,18 +174,18 @@
                 $J('#customer').trigger('change');
             }
         }
-                    
+
     });
 </script>
 <div id="dealsModify">
     <div id="subnavbar_level2">
         <ul>
             <li><a title="{TXT_CRM_DEALS_OVERVIEW}"  href="index.php?cmd={MODULE_NAME}&amp;act=deals" >
-                    {TXT_CRM_DEALS_OVERVIEW}</a></li>            
+                    {TXT_CRM_DEALS_OVERVIEW}</a></li>
         </ul>
     </div>
     <div id="formerr"></div>
-    
+
     <form action="" method="post" enctype="multipart/form-data" name="addDeal" id="addDeal">
         <table class="adminlist" width="100%" cellpadding="3" cellspacing="0">
             <thead>
@@ -203,7 +203,7 @@
                     <td rowspan="8" width="60%" valign="top">
                         {CRM_DEALS_DESCRIPTION}
                     </td>
-                </tr>                
+                </tr>
                 <tr class="row1">
                     <td>{TXT_CRM_DEALS_CUSTOMER_NAME}&nbsp;<font color="red">*</font></td>
                     <td  >
@@ -255,7 +255,7 @@
                     </td>
                 </tr>
                 <tr class="row1"><td style="height:auto;" colspan="2">&nbsp;</td></tr>
-                <!-- BEGIN projectEntryBlock -->                
+                <!-- BEGIN projectEntryBlock -->
                 <tr>
                     <th colspan="3">{TXT_CRM_ADDITIONAL_INFO}</th>
                 </tr>

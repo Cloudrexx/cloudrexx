@@ -68,7 +68,7 @@ class Stats extends StatsLibrary
 
 
     private $act = '';
-    
+
     /**
     * constructor
     *
@@ -78,14 +78,14 @@ class Stats extends StatsLibrary
     function __construct()
     {
         parent::__construct();
-        
+
         $this->_objTpl = new \Cx\Core\Html\Sigma($this->cx->getCodeBaseCoreModulePath().'/Stats/View/Template/Backend');
         \Cx\Core\Csrf\Controller\Csrf::add_placeholder($this->_objTpl);
-        $this->_objTpl->setErrorHandling(PEAR_ERROR_DIE);       
+        $this->_objTpl->setErrorHandling(PEAR_ERROR_DIE);
 
-        $this->firstDate = time();        
+        $this->firstDate = time();
     }
-    
+
     private function setNavigation()
     {
         global $objTemplate, $_ARRAYLANG;
@@ -407,7 +407,7 @@ class Stats extends StatsLibrary
         if (count($this->arrCountries)>0) {
             $rowClass = 0;
 
-            // get country names from xml file            
+            // get country names from xml file
             $xmlCountryFilePath  = $this->cx->getClassLoader()->getFilePath($this->cx->getCoreModuleFolderName() . '/Stats/Data/countries.xml');
             $xml_parser = xml_parser_create();
             xml_set_object($xml_parser,$this);
@@ -954,7 +954,7 @@ class Stats extends StatsLibrary
 
         $this->_objTpl->loadTemplateFile('module_stats_spiders.html',true,true);
         $this->pageTitle = $_ARRAYLANG['TXT_SEARCH_ENGINES'];
-        
+
         $this->_initSpiders();
 
         // set language variables
@@ -1152,7 +1152,7 @@ class Stats extends StatsLibrary
             'TXT_COLOUR_DEPTH'                => $_ARRAYLANG['TXT_COLOUR_DEPTH'],
             'TXT_JAVASCRIPT_SUPPORT'        => $_ARRAYLANG['TXT_JAVASCRIPT_SUPPORT'],
             'TXT_REMOVE_REQUESTS'            => $_ARRAYLANG['TXT_REMOVE_REQUESTS'],
-            'TXT_EXCLUDE_IDENTIFYING_INFO'	 => $_ARRAYLANG['TXT_EXCLUDE_IDENTIFYING_INFO'],
+            'TXT_EXCLUDE_IDENTIFYING_INFO'     => $_ARRAYLANG['TXT_EXCLUDE_IDENTIFYING_INFO'],
             'TXT_REMOVE_REQUESTS_INTERVAL'    => $_ARRAYLANG['TXT_REMOVE_REQUESTS_INTERVAL'],
             'TXT_STATS_COUNT_VISIOTR_NUMBER'    => $_ARRAYLANG['TXT_STATS_COUNT_VISIOTR_NUMBER'],
             'TXT_ONLINE_TIMEOUT'            => $_ARRAYLANG['TXT_ONLINE_TIMEOUT'],

@@ -8,16 +8,16 @@
 {CALENDAR_SETTING_INFO_JS}
 $J(function(){
    $J("input[name='settings[headlinesStatus]']").click(function(){
-       showOrHideHeadLines($J(this).val());      
+       showOrHideHeadLines($J(this).val());
    });
    showOrHideHeadLines($J("input[name='settings[headlinesStatus]']:checked").val());
-   
+
    $addEventFrontend = $J("select[name='settings[addEventsFrontend]']");
    $addEventFrontend.change(function(){
        showOrHideFrSubmission($J(this).val());
    });
    showOrHideFrSubmission($addEventFrontend.val());
-      
+
    $J("input[name='settings[placeData]']").click(function(){
        showOrHideMediaDirForm('placeData', 'placeDataForm');
    });
@@ -29,14 +29,14 @@ $J(function(){
 });
 function showOrHideMediaDirForm(dataField, formField) {
    inputVal = $J("input[name='settings["+dataField+"]']:checked").val();
-   
+
    if (parseInt(inputVal) > 1) {
-        $J("select[name='settings["+formField+"]']").closest('tr').show();    
+        $J("select[name='settings["+formField+"]']").closest('tr').show();
         $J("input[name='settings["+dataField+"]']").closest('tr').addClass('no-border');
     } else {
-        $J("select[name='settings["+formField+"]']").closest('tr').hide();        
+        $J("select[name='settings["+formField+"]']").closest('tr').hide();
         $J("input[name='settings["+dataField+"]']").closest('tr').removeClass('no-border');
-    } 
+    }
 }
 function showOrHideFrSubmission(inputVal) {
     if (parseInt(inputVal)) {
@@ -51,7 +51,7 @@ function showOrHideHeadLines(inputVal) {
         $J("select[name='settings[headlinesCategory]']").closest('tr').show();
     } else {
         $J("input[name='settings[headlinesNum]']").closest('tr').hide();
-        $J("select[name='settings[headlinesCategory]']").closest('tr').hide();          
+        $J("select[name='settings[headlinesCategory]']").closest('tr').hide();
     }
 }
 </script>
@@ -60,12 +60,12 @@ function showOrHideHeadLines(inputVal) {
 <!--   &nbsp;&nbsp;<img src="../core/Core/View/Media/icons/note.gif" width="12" height="12" onmouseout="htm()" onmouseover="stm(Text[11],Style[0])" />-->
 
 <form name="formSettingsGeneral" method="post" action="index.php?cmd={CALENDAR_MODULE_NAME}&act=settings">
-	<!--  BEGIN sectionList -->
-	<table style="width: 100%; border-spacing: 0px;" class="adminlist" cellspacing="0" cellpadding="3">
-	    <tr>
-	        <th colspan="2">{TXT_CALENDAR_SECTION_NAME}</th>
-	    </tr>
-	    <!--  BEGIN settingsList -->
+  <!--  BEGIN sectionList -->
+  <table style="width: 100%; border-spacing: 0px;" class="adminlist" cellspacing="0" cellpadding="3">
+      <tr>
+          <th colspan="2">{TXT_CALENDAR_SECTION_NAME}</th>
+      </tr>
+      <!--  BEGIN settingsList -->
             <tr class="{CALENDAR_SETTING_ROW} {CALENDAR_SETTING_NAME}">
               <td style="width: 200px">{TXT_CALENDAR_SETTING_NAME}</td>
               <td>{CALENDAR_SETTING_VALUE}{CALENDAR_SETTING_INFO}</td>

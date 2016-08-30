@@ -18,8 +18,8 @@ Element.addMethods({
     for (var property in styles)
       if (property == 'opacity') element.setOpacity(styles[property]);
       else {
-        var prop_name = (property == 'float' || property == 'cssFloat') 
-          ? (Object.isUndefined(elementStyle.styleFloat) ? 'cssFloat' : 'styleFloat') 
+        var prop_name = (property == 'float' || property == 'cssFloat')
+          ? (Object.isUndefined(elementStyle.styleFloat) ? 'cssFloat' : 'styleFloat')
           : property ;
 
         if(styles[property] != null && styles[property] != '')
@@ -28,4 +28,3 @@ Element.addMethods({
     return element;
   }
 });
-

@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * This listener ensures tree consistency on Node objects.
  *
@@ -58,7 +58,7 @@ class NodeEventListenerException extends \Exception {}
  * @subpackage  core_contentmanager
  */
 class NodeEventListener implements \Cx\Core\Event\Model\Entity\EventListener {
-    
+
     public function preRemove($eventArgs) {
         $em      = $eventArgs->getEntityManager();
         $uow     = $em->getUnitOfWork();
@@ -80,14 +80,14 @@ class NodeEventListener implements \Cx\Core\Event\Model\Entity\EventListener {
         //       Additionally, it will detach/remove $entity from UnitOfWork,
         //       which will UnitOfWork cause to skip the final remove() operation on $entity
         //       to prevent causing an issue with the already removed $entity.
-        
+
         // remove all child nodes
         foreach ($entity->getChildren() as $childNode) {
             $em->remove($childNode);
         }
         $nodeRepo->removeFromTree($entity);
     }
-    
+
     public function onFlush($eventArgs) {}
 
     public function onEvent($eventName, array $eventArgs) {

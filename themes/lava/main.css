@@ -3,7 +3,7 @@ body h1,body h2,body h3,body h4,body h5,body h6 {
     margin: 10px 0;
     font-weight: 700;
 }
-body p { 
+body p {
     font-family: 'Open Sans', sans-serif;
     margin: 0 0 10px;
 }
@@ -179,7 +179,7 @@ body .navbar-inverse {
     font-size: 14px;
 }
 .navbar-inverse .nav .active > a, .navbar-inverse .nav .active > a:hover, .navbar-inverse .nav .active > a:focus {
-    background-color: transparent;    
+    background-color: transparent;
 }
 .navbar-brand {
     margin-top: 10px;
@@ -661,7 +661,7 @@ select, input[type="text"], input[type="password"], input[type="datetime"], inpu
     background-size: cover;
     padding-top: 120px;
     padding-bottom: 120px;
-} 
+}
 .signup {
     background: url(images/grid_noise.png) repeat;
     background-color: #ebebeb;
@@ -963,7 +963,7 @@ ul.social-icons li a:hover {
    Mobile styles
    ========================================================================== */
 /* Landscape phones and down */
-@media (max-width: 480px) { 
+@media (max-width: 480px) {
     body {
         padding-left: 0;
         padding-right: 0;
@@ -1049,7 +1049,7 @@ ul.social-icons li a:hover {
     textarea[name="code"]{width: 95% !important;}
 }
 /* Landscape phone to portrait tablet */
-@media (min-width: 481px) and (max-width: 767px) { 
+@media (min-width: 481px) and (max-width: 767px) {
     body {
         padding-left: 0;
         padding-right: 0;
@@ -1196,12 +1196,12 @@ ul.social-icons li a:hover {
 }
 /* Desktops and laptops ----------- */
 @media (min-width: 980px) and (max-width: 1699px) {
-}    
+}
 /* Large screens ----------- */
 @media (min-width: 1700px) and (max-width: 2200px) {
 }
 @media (max-width: 1169px){
-    body{padding-top: 0;}  
+    body{padding-top: 0;}
     body .navbar-fixed-top,body .navbar-fixed-bottom {
         position: static;
         margin-bottom: 0;
@@ -1270,8 +1270,8 @@ ul.social-icons li a:hover {
     .nav-collapse .nav .nav-header{color:#777777;text-shadow:none;}
     .nav-collapse .nav>li>a,.nav-collapse .dropdown-menu a{padding:9px 15px;font-weight:bold;color:#777777;-webkit-border-radius:3px;-moz-border-radius:3px;border-radius:3px;}
     .nav-collapse .btn{padding:4px 10px 4px;font-weight:normal;-webkit-border-radius:4px;-moz-border-radius:4px;border-radius:4px;}
-    .nav-collapse .dropdown-menu li+li a{margin-bottom:2px;}    
-    .nav-collapse.in .btn-group{margin-top:5px;padding:0;}    
+    .nav-collapse .dropdown-menu li+li a{margin-bottom:2px;}
+    .nav-collapse.in .btn-group{margin-top:5px;padding:0;}
     .nav-collapse .open>.dropdown-menu{display:block;}
     .nav-collapse .dropdown-menu:before,.nav-collapse .dropdown-menu:after{display:none;}
     .nav-collapse .dropdown-menu .divider{display:none;}
@@ -1280,7 +1280,7 @@ ul.social-icons li a:hover {
         margin-top: 20px;
         padding: 3px 16px;
         display: inline-block;
-    }    
+    }
     .navbar-inverse .nav-collapse .nav > li > a, .navbar-inverse .nav-collapse .dropdown-menu a {
         color: #FFFFFF;
     }
@@ -1306,7 +1306,7 @@ ul.social-icons li a:hover {
         padding: 0;
         position: static;
         top: auto;
-    }        
+    }
     /*navigation styles*/
     .sf-menu ul {
         background-clip: padding-box !important;

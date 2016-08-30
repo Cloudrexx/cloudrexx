@@ -13,12 +13,12 @@
         <meta name="description" content="{METADESC}" />
         <meta charset="{CHARSET}" />
         <link type="images/x-icon" rel="icon" href="favicon.ico">
-        
-        {JAVASCRIPT}       
+
+        {JAVASCRIPT}
         {STYLE_FILE}
         <link type="text/css" rel="stylesheet" href="themes/mindful/text.css" />
         <link type="text/css" rel="stylesheet" href="themes/mindful/style.css" />
-        <link type="text/css" rel="stylesheet" href="themes/mindful/layout.css" />        
+        <link type="text/css" rel="stylesheet" href="themes/mindful/layout.css" />
         <link type="text/css" rel="stylesheet" href="themes/mindful/modules.css" />
         <link type="text/css" rel="stylesheet" href="themes/mindful/responsive.css" />
         {LOGIN_INCLUDE}
@@ -37,23 +37,23 @@
                 }
             });
         </script>
-        
-        
+
+
         <script type="text/javascript" src="themes/mindful/js/modernizr.js"></script>
         <script type="text/javascript" src="themes/mindful/js/javascript.js"></script>
-        
-       
+
+
         <script type='text/javascript' src="themes/mindful/js/jflickrfeed.js"></script>
         <script type='text/javascript' src="themes/mindful/js/jquery.fitvids.js"></script>
         <script type='text/javascript' src="themes/mindful/js/jquery.isotope.min.js"></script>
         <script type='text/javascript' src="themes/mindful/js/jquery.flexslider-min.js"></script>
         <script type='text/javascript' src="themes/mindful/js/jquery.js"></script>
-         
+
             <script type="text/javascript">
             //<![CDATA[
             var j = jQuery.noConflict();
              j(document).ready(function(){
-                
+
                 $status = j(".status");
                 var options = {
                     autoPlayDelay: 6000,
@@ -71,7 +71,7 @@
                         speed: 500
                     }
                 };
-                if (jQuery("#sequence").length) 
+                if (jQuery("#sequence").length)
                 {
                 var sequence = j("#sequence").sequence(options).data("sequence");
                 sequence.afterLoaded = function(){
@@ -86,12 +86,12 @@
                     j(this).removeClass("active").addClass("active");
                     sequence.nextFrameID = j(this).index()+1;
                     sequence.goTo(sequence.nextFrameID);
-                }); 
+                });
                 j('ul.sf-menu').superfish();
             }
             });
             //]]>
-        </script>                        
+        </script>
         <!--[if IE 6]>
         <script type="text/javascript" src="themes/mindful/js/DD_belatedPNG.js"></script>
         <script type="text/javascript">
@@ -114,7 +114,7 @@
         </script>
         <![endif]-->
     </head>
-    <body>        
+    <body>
         <div id="container">
             <div id="fixed-top">
                 <div id="header">
@@ -123,12 +123,12 @@
                             <h1 class="logo"><a href="{NODE_HOME}"><img src="themes/mindful/images/logo.png" alt="Mindful" /></a></h1>
                         </div>
                         <div id="mainNav" class="clearfix">
-                            {NAVBAR_FILE}                            
+                            {NAVBAR_FILE}
                         </div>
                     </div>
                 </div>
             </div>
-            {CONTENT_FILE}            
+            {CONTENT_FILE}
             <div id="footer">
                 <div class="inside">
                     <div class="main clearfix">
@@ -138,7 +138,7 @@
                                 <li><a href="#" target="_blank"><span class="icon-twitter">&nbsp;</span></a></li>
                                 <li><a href="#" target="_blank"><span class="icon-vimeo">&nbsp;</span></a></li>
                             </ul>
-                        </div>                        
+                        </div>
                         <div id="mindful_recent_posts-2" class="oneThird mindful_recent_posts footerBox menu_group_Box">
                             <h3>From the Blog</h3>
                             {HEADLINES_FILE}

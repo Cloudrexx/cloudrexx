@@ -151,7 +151,7 @@ abstract class DataSource extends \Cx\Model\Base\EntityBase {
     {
         return $this->dataAccesses;
     }
-    
+
     /**
      * Gets one or more entries from this DataSource
      *
@@ -176,14 +176,14 @@ abstract class DataSource extends \Cx\Model\Base\EntityBase {
         $offset = 0,
         $fieldList = array()
     );
-    
+
     /**
      * Adds a new entry to this DataSource
      * @param array $data Field=>value-type array. Not all fields may be required.
      * @throws \Exception If something did not go as planned
      */
     public abstract function add($data);
-    
+
     /**
      * Updates an existing entry of this DataSource
      * @param string $elementId ID of the element to update
@@ -191,7 +191,7 @@ abstract class DataSource extends \Cx\Model\Base\EntityBase {
      * @throws \Exception If something did not go as planned
      */
     public abstract function update($elementId, $data);
-    
+
     /**
      * Drops an entry from this DataSource
      * @param string $elementId ID of the element to update
@@ -199,4 +199,3 @@ abstract class DataSource extends \Cx\Model\Base\EntityBase {
      */
     public abstract function remove($elementId);
 }
-

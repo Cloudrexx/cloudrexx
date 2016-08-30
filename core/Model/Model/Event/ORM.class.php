@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Wrapper class for the Gedmo\Loggable\Mapping\Event\Adapter\ORM
  *
@@ -32,7 +32,7 @@
  * @author      ss4u <ss4u.comvation@gmail.com>
  * @version     3.1.2
  * @package     cloudrexx
- * @subpackage  core 
+ * @subpackage  core
  */
 
 namespace Cx\Core\Model\Model\Event;
@@ -61,9 +61,9 @@ final class ORM extends BaseAdapterORM implements LoggableAdapter
 
     /**
      * {@inheritDoc}
-     */    
+     */
     public function getNewVersion($meta, $object) {
-        
+
         $em = $this->getObjectManager();
         $objectMeta = $em->getClassMetadata(get_class($object));
         $identifierField = $this->getSingleIdentifierFieldName($objectMeta);
@@ -79,8 +79,8 @@ final class ORM extends BaseAdapterORM implements LoggableAdapter
             'objectClass' => $objectMeta->name
         ));
         $q->useResultCache(false);
-        
+
         return $q->getSingleScalarResult() + 1;
-        
+
     }
 }

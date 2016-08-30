@@ -55,18 +55,18 @@ class CrmCrmContactEventListenerException extends \Exception {}
  * @subpackage  module_order
  */
 class CrmCrmContactEventListener implements \Cx\Core\Event\Model\Entity\EventListener {
-    
+
     /**
      * preRemove event
-     * 
+     *
      * @param \Doctrine\ORM\Event\LifecycleEventArgs $eventArgs
      */
     public function preRemove($eventArgs) {
         global $objInit, $_ARRAYLANG;
-        
+
         $langData = $objInit->loadLanguageData('Order');
         $_ARRAYLANG = array_merge($_ARRAYLANG, $langData);
-        
+
         $em = $eventArgs->getEntityManager();
         $crmEntity = $eventArgs->getEntity();
         if ($crmEntity->contactType == 2) {
@@ -75,7 +75,7 @@ class CrmCrmContactEventListener implements \Cx\Core\Event\Model\Entity\EventLis
                 throw new \Cx\Core\Error\Model\Entity\ShinyException($_ARRAYLANG['TXT_MODULE_ORDER_DELETE_USER_ERROR_MSG']);
             }
         }
-        
+
     }
 
     public function onEvent($eventName, array $eventArgs) {

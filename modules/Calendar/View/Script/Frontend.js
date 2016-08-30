@@ -1,10 +1,10 @@
 var calendarFrontend = {
-    
+
     _validation : function(form) {
         $form = form;
         that  = this;
         var frmError = false;
-        
+
         $form.find('[class*=validate]').each(function(){
             $field = $J(this);
             if ( !that._validateField($field) ) {
@@ -15,11 +15,11 @@ var calendarFrontend = {
                 $field.css('border', '');
             }
         });
-        
+
         if ( frmError ) {
             return false;
         }
-        
+
         return true;
     },
     _validateField : function(field) {
@@ -41,15 +41,15 @@ var calendarFrontend = {
                     delete rules[i];
             }
         }
-        
-        for (var i = 0; i < rules.length; i++) {            
+
+        for (var i = 0; i < rules.length; i++) {
             switch (rules[i]) {
                 case "event_title":
-                    language = field.attr("data-id");        
+                    language = field.attr("data-id");
                     if ($J("#showIn_"+language).is(":checked")) {
                         var field_val      = $J.trim( field.val() );
                         if (
-                                   ( !field_val )                            
+                                   ( !field_val )
                         ) {
                                 return false;
                         }
@@ -66,9 +66,9 @@ var calendarFrontend = {
                         case "select-one":
                         case "select-multiple":
                         default:
-                                var field_val      = $J.trim( field.val() );                    
+                                var field_val      = $J.trim( field.val() );
                                 if (
-                                           ( !field_val )                            
+                                           ( !field_val )
                                 ) {
                                         return false;
                                 }
@@ -84,12 +84,12 @@ var calendarFrontend = {
                                         else
                                                 return false;
                                 }
-                                break;                            
+                                break;
                     }
                     break;
             }
         }
-        
+
 
     }
 };
@@ -133,7 +133,7 @@ $J(function(){
     var $eventTab = $J("#event-tabs");
     $eventTab.tabs();
     $eventTab.tabs( "select", "#event-tab-"+$J(".lang_check:checked").first().data('id') );
-    
+
     $J("#formModifyEvent").submit(function(){
         form = $J(this);
         return calendarFrontend._validation(form);
@@ -174,7 +174,7 @@ $J(function(){
     });
     $J( ".eventLocationType" ).click(function(){
         showOrHidePlaceFields($J(this).val(), 'place');
-    });    
+    });
     $J( ".eventHostType" ).click(function(){
         showOrHidePlaceFields($J(this).val(), 'host');
     });
@@ -213,7 +213,7 @@ function ExpandMinimize(toggle){
     elm1.style.display = (elm1.style.display=='none') ? 'block' : 'none';
     elm2.style.display = (elm2.style.display=='none') ? 'block' : 'none';
 }
-function showOrHidePlaceFields(inputValue, type) {        
+function showOrHidePlaceFields(inputValue, type) {
     if (inputValue == '1') {
         $J( "div.event_"+type+"_manual" ).css("display", "table-row");
         $J( "div.event_"+type+"_mediadir" ).css("display", "none");

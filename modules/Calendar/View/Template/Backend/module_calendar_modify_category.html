@@ -1,17 +1,17 @@
 <!-- START module_calendar_modify_categories.html -->
 <script language="JavaScript" type="text/javascript">
-	function formCheck()
-	{
+  function formCheck()
+  {
         /*if(document.formModifyCategory.name.value == "")
         {
             alert("{TXT_CALENDAR_FORMCHECK_NAME}");
-	        document.formModifyCategory.name.focus();
+          document.formModifyCategory.name.focus();
             return false;
         }*/
-		return true;
+    return true;
     }
 
-	function moveElement(from, dest, add, remove) {
+  function moveElement(from, dest, add, remove) {
         if (from.selectedIndex < 0) {
             if (from.options[0] != null) from.options[0].selected = true;
                 from.focus();
@@ -27,82 +27,82 @@
                     from.options[i] = null;
                 }
             }
-        } 
-	}
+        }
+  }
 
-	function selectAll(control){
-	    for (i = 0; i < control.length; ++i) {
-	        control.options[i].selected = true;
-	    }
-	}
+  function selectAll(control){
+      for (i = 0; i < control.length; ++i) {
+          control.options[i].selected = true;
+      }
+  }
 
-	function deselectAll(control){
-	    for (i = 0; i < control.length; ++i) {
-	        control.options[i].selected = false;
-	    }
-	}
+  function deselectAll(control){
+      for (i = 0; i < control.length; ++i) {
+          control.options[i].selected = false;
+      }
+  }
 
-	function ExpandMinimize(toggle){
+  function ExpandMinimize(toggle){
 
-	    var pattern = /^name/;
-	    var reg = new RegExp(pattern);
+      var pattern = /^name/;
+      var reg = new RegExp(pattern);
 
-	    var masterValue = document.getElementsByName(toggle + '[0]')[0].value;
-	    var defaultValue = document.getElementsByName(toggle + '[{CALENDAR_CATEGORY_DEFAULT_LANG_ID}]')[0].value;
+      var masterValue = document.getElementsByName(toggle + '[0]')[0].value;
+      var defaultValue = document.getElementsByName(toggle + '[{CALENDAR_CATEGORY_DEFAULT_LANG_ID}]')[0].value;
 
-	    for (i = 0; i < document.formModifyCategory.elements.length; ++i) {
-	        var field = document.formModifyCategory.elements[i];
+      for (i = 0; i < document.formModifyCategory.elements.length; ++i) {
+          var field = document.formModifyCategory.elements[i];
 
-	        if (field.name.match(reg)) {
-	            if (field.value == '') {
-	                field.value = masterValue;
-	            }
+          if (field.name.match(reg)) {
+              if (field.value == '') {
+                  field.value = masterValue;
+              }
 
-	            var regDefaultLang = new RegExp(toggle + '\\[{CALENDAR_CATEGORY_DEFAULT_LANG_ID}\\]');
+              var regDefaultLang = new RegExp(toggle + '\\[{CALENDAR_CATEGORY_DEFAULT_LANG_ID}\\]');
 
-	            if (field.name.match(regDefaultLang)) {
-	                field.value = masterValue;
-	            }
+              if (field.name.match(regDefaultLang)) {
+                  field.value = masterValue;
+              }
 
-	            var regMaster = new RegExp(toggle + '\\[0\\]');
+              var regMaster = new RegExp(toggle + '\\[0\\]');
 
-	            if (field.name.match(regMaster)) {
-	                field.value = defaultValue;
-	            }
-	        }
-	    }
+              if (field.name.match(regMaster)) {
+                  field.value = defaultValue;
+              }
+          }
+      }
 
-	    elm1 = document.getElementById(toggle + 'Minimized');
-	    elm2 = document.getElementById(toggle + 'Expanded');
+      elm1 = document.getElementById(toggle + 'Minimized');
+      elm2 = document.getElementById(toggle + 'Expanded');
 
-	    elm1.style.display = (elm1.style.display=='none') ? 'block' : 'none';
-	    elm2.style.display = (elm2.style.display=='none') ? 'block' : 'none';
-	}
+      elm1.style.display = (elm1.style.display=='none') ? 'block' : 'none';
+      elm2.style.display = (elm2.style.display=='none') ? 'block' : 'none';
+  }
 </script>
 
 <form action="index.php?cmd={CALENDAR_MODULE_NAME}&act=categories" name="formModifyCategory" method="post" onsubmit="selectAll(document.formModifyCategory.elements['selectedHosts[]']); return formCheck();">
-	<input type="hidden" name="id" value="{CALENDAR_CATEGORY_ID}" />
-	<table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist">
-	    <tr>
-	    	<th colspan="2">{TXT_CALENDAR_CATEGORY}</th>
-	    </tr>
-	    <tr class="row1">
-	    	<td width="200" valign="top">{TXT_CALENDAR_CATEGORY_NAME}</td>
-	    	<td>
-				<div id="nameMinimized" style="display: block;">
-				    <input name="name[0]" type="text" style="width: 250px" value="{CALENDAR_CATEGORY_NAME_MASTER}" />
+  <input type="hidden" name="id" value="{CALENDAR_CATEGORY_ID}" />
+  <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist">
+      <tr>
+        <th colspan="2">{TXT_CALENDAR_CATEGORY}</th>
+      </tr>
+      <tr class="row1">
+        <td width="200" valign="top">{TXT_CALENDAR_CATEGORY_NAME}</td>
+        <td>
+        <div id="nameMinimized" style="display: block;">
+            <input name="name[0]" type="text" style="width: 250px" value="{CALENDAR_CATEGORY_NAME_MASTER}" />
                                     <!-- BEGIN categoryNameExpand -->
                                     &nbsp;<a href="javascript:ExpandMinimize('name');">{TXT_CALENDAR_MORE}&nbsp;&raquo;</a><br />
                                     <!-- END categoryNameExpand -->
-				</div>
-				<div id="nameExpanded" style="display: none;">
-				    <!-- BEGIN categoryNameList -->
-				    <input name="name[{CALENDAR_CATEGORY_NAME_LANG_ID}]" type="text" style="width: 229px; margin-bottom: 2px; padding-left: 21px; background: #ffffff url('../core/Country/View/Media/Flag/flag_{CALENDAR_CATEGORY_NAME_LANG_SHORTCUT}.gif') no-repeat 3px 3px;" title="{TXT_CALENDAR_CATEGORY_NAME_LANG_NAME}" value="{CALENDAR_CATEGORY_NAME}" />&nbsp;{TXT_CALENDAR_CATEGORY_NAME_LANG_NAME}&nbsp;&nbsp;&nbsp;{CALENDAR_MINIMIZE}<br />
-				    <!-- END categoryNameList -->
-				</div>
-	    	</td>
-	    </tr>
-	    <!-- BEGIN hostSelector -->
+        </div>
+        <div id="nameExpanded" style="display: none;">
+            <!-- BEGIN categoryNameList -->
+            <input name="name[{CALENDAR_CATEGORY_NAME_LANG_ID}]" type="text" style="width: 229px; margin-bottom: 2px; padding-left: 21px; background: #ffffff url('../core/Country/View/Media/Flag/flag_{CALENDAR_CATEGORY_NAME_LANG_SHORTCUT}.gif') no-repeat 3px 3px;" title="{TXT_CALENDAR_CATEGORY_NAME_LANG_NAME}" value="{CALENDAR_CATEGORY_NAME}" />&nbsp;{TXT_CALENDAR_CATEGORY_NAME_LANG_NAME}&nbsp;&nbsp;&nbsp;{CALENDAR_MINIMIZE}<br />
+            <!-- END categoryNameList -->
+        </div>
+        </td>
+      </tr>
+      <!-- BEGIN hostSelector -->
         <tr class="row2">
             <td valign="top">{TXT_CALENDAR_CATEGORY_HOSTS}<br /><br /><i>{TXT_CALENDAR_CATEGORY_HOSTS_INFO}</i></td>
             <td>
@@ -125,9 +125,8 @@
             </td>
         </tr>
         <!-- END hostSelector -->
-	</table>
-	<br />
-	<input type="submit" name="submitModifyCategory"  value="{TXT_CALENDAR_SAVE}" />
+  </table>
+  <br />
+  <input type="submit" name="submitModifyCategory"  value="{TXT_CALENDAR_SAVE}" />
 </form>
 <!-- END module_calendar_modify_categories.html -->
-

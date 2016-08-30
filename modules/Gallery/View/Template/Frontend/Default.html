@@ -13,8 +13,8 @@
             </div>
         </div>
     </div>
-    <!-- END galleryCategoryList --> 	
-    <!-- BEGIN galleryImageBlock -->  	
+    <!-- END galleryCategoryList -->
+    <!-- BEGIN galleryImageBlock -->
     {GALLERY_JAVASCRIPT}
     <div class="category_comment text-muted">{GALLERY_CATEGORY_COMMENT}</div>
     <!-- BEGIN galleryShowImages -->
@@ -25,8 +25,8 @@
         </div></div>
     <!-- END galleryShowImages -->
     <div class="category_paging">{GALLERY_PAGING}</div>
-    <!-- END galleryImageBlock --> 
-    <!-- END galleryCategories -->   	
+    <!-- END galleryImageBlock -->
+    <!-- END galleryCategories -->
     <!-- BEGIN galleryImage -->
     <div class="breadcrumb">Sie sind hier: <li>{GALLERY_CATEGORY_TREE}</li></div>
     <div class="show_image" style="overflow-y:auto;">
@@ -34,7 +34,7 @@
         {GALLERY_IMAGE_TITLE} {GALLERY_IMAGE_FILESIZE}<br />{GALLERY_IMAGE_DESCRIPTION}
     </div>
     <div class="image_navigation">
-        <a title="{TXT_GALLERY__PREVIOUS_IMAGE}" href="{GALLERY_IMAGE_PREVIOUS}"><img alt="{TXT_GALLERY__PREVIOUS_IMAGE}" style="border: 0px none ; margin-left: 10px; margin-right: 5px; width: 18px; height: 18px;" src="modules/Gallery/View/Media/previous.gif" /></a>&nbsp; 		<a title="{TXT_GALLERY__NEXT_IMAGE}" href="{GALLERY_IMAGE_NEXT}"><img alt="{TXT_GALLERY__NEXT_IMAGE}" style="border: 0px none ; margin-left: 5px; margin-right: 10px; width: 18px; height: 18px;" src="modules/Gallery/View/Media/next.gif" /></a>
+        <a title="{TXT_GALLERY__PREVIOUS_IMAGE}" href="{GALLERY_IMAGE_PREVIOUS}"><img alt="{TXT_GALLERY__PREVIOUS_IMAGE}" style="border: 0px none ; margin-left: 10px; margin-right: 5px; width: 18px; height: 18px;" src="modules/Gallery/View/Media/previous.gif" /></a>&nbsp;     <a title="{TXT_GALLERY__NEXT_IMAGE}" href="{GALLERY_IMAGE_NEXT}"><img alt="{TXT_GALLERY__NEXT_IMAGE}" style="border: 0px none ; margin-left: 5px; margin-right: 10px; width: 18px; height: 18px;" src="modules/Gallery/View/Media/next.gif" /></a>
     </div>
     <!-- BEGIN votingTab -->
     <div class="image_voting">
@@ -50,10 +50,10 @@
                 <tbody>
                     <tr>
                         <td>
-                            <!-- BEGIN showVotingBar --> 						
-                            <a href="index.php?section=Gallery&amp;cid={VOTING_BAR_CID}&amp;pId={VOTING_BAR_PICID}&amp;mark={VOTING_BAR_MARK}" title="{VOTING_BAR_ALT}"><img align="bottom" src="{VOTING_BAR_SRC}" alt="{VOTING_BAR_ALT}" style="border: 0px none ; margin-left: 1px; margin-top: 3px;" /></a> 												
+                            <!-- BEGIN showVotingBar -->
+                            <a href="index.php?section=Gallery&amp;cid={VOTING_BAR_CID}&amp;pId={VOTING_BAR_PICID}&amp;mark={VOTING_BAR_MARK}" title="{VOTING_BAR_ALT}"><img align="bottom" src="{VOTING_BAR_SRC}" alt="{VOTING_BAR_ALT}" style="border: 0px none ; margin-left: 1px; margin-top: 3px;" /></a>
                             <!-- END showVotingBar -->
-                            {TXT_VOTING_ALREADY_VOTED}&nbsp;{TXT_VOTING_STATS_ACTUAL}:&nbsp;&Oslash;&nbsp;<strong>{VOTING_STATS_MARK}</strong>&nbsp;{TXT_VOTING_STATS_WITH}&nbsp;<strong>{VOTING_STATS_VOTES}</strong>&nbsp;{TXT_VOTING_STATS_VOTES} 					
+                            {TXT_VOTING_ALREADY_VOTED}&nbsp;{TXT_VOTING_STATS_ACTUAL}:&nbsp;&Oslash;&nbsp;<strong>{VOTING_STATS_MARK}</strong>&nbsp;{TXT_VOTING_STATS_WITH}&nbsp;<strong>{VOTING_STATS_VOTES}</strong>&nbsp;{TXT_VOTING_STATS_VOTES}
                         </td>
                     </tr>
                 </tbody>
@@ -81,7 +81,7 @@
                             <td width="20%" valign="top" nowrap="nowrap">
                                 <strong>{COMMENTS_NAME}</strong><br />
                                 <em>{COMMENTS_DATE}</em><br />
-                                {COMMENTS_EMAIL}&nbsp;{COMMENTS_WWW}		
+                                {COMMENTS_EMAIL}&nbsp;{COMMENTS_WWW}
                             </td>
                             <td width="80%" valign="top" class="row_{COMMENTS_ROWCLASS}">{COMMENTS_TEXT}</td>
                         </tr>
@@ -99,7 +99,7 @@
     </div>
     <!-- END commentTab -->
     <script language="javascript" type="text/javascript">
-        <!-- 
+        <!--
         // show and hide blocks
         function showOrHide(strElement)
         {
@@ -110,7 +110,7 @@
             }
         }
         //-->
-    </script>  
+    </script>
     <!-- END galleryImage -->
     <span>{GALLERY_CATEGORY_PAGING}</span>
     <span>{GALLERY_PAGING}</span>

@@ -33,10 +33,10 @@ function _blogUpdate() {
      * Check for missing setting "blog_comments_editor" in database. In the update-package for 1.2 this value somehow
      * got lost.
      */
-    $query = '	SELECT 	name
-				FROM	`' . DBPREFIX . 'module_blog_settings`
-				WHERE	name="blog_comments_editor"
-				LIMIT	1';
+    $query = '    SELECT     name
+                FROM    `' . DBPREFIX . 'module_blog_settings`
+                WHERE    name="blog_comments_editor"
+                LIMIT    1';
 
     $objResult = $objDatabase->Execute($query);
 

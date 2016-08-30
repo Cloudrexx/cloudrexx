@@ -1,112 +1,112 @@
 <!-- START category_edit.html -->
 <script language="JavaScript" type="text/javascript">
 function showOrHide(strElement) {
-	if (document.getElementById(strElement).style.display == 'none') {
-		document.getElementById(strElement).style.display = 'block';
-	} else {
-		document.getElementById(strElement).style.display = 'none';
-	}
+  if (document.getElementById(strElement).style.display == 'none') {
+    document.getElementById(strElement).style.display = 'block';
+  } else {
+    document.getElementById(strElement).style.display = 'none';
+  }
 }
 
 function copyText(strType) {
-	for (var h=0; h < document.forms.length;h++) {
-		for (var i=0; i < document.forms[h].elements.length;i++) {
-			//read out all form-elements with the loop
-			if(document.forms[h].elements[i].name.search(strType) != -1) {
-				if (strType == 'frmUpdateCategory_Name_') {
-					document.forms[h].elements[i].value = document.frmUpdateCategory.frmUpdateCategory_Name.value;
-				} else {
-					document.forms[h].elements[i].value = document.frmUpdateCategory.frmUpdateCategory_Desc.value;
-				}
-			}
-		}
-	}	
+  for (var h=0; h < document.forms.length;h++) {
+    for (var i=0; i < document.forms[h].elements.length;i++) {
+      //read out all form-elements with the loop
+      if(document.forms[h].elements[i].name.search(strType) != -1) {
+        if (strType == 'frmUpdateCategory_Name_') {
+          document.forms[h].elements[i].value = document.frmUpdateCategory.frmUpdateCategory_Name.value;
+        } else {
+          document.forms[h].elements[i].value = document.frmUpdateCategory.frmUpdateCategory_Desc.value;
+        }
+      }
+    }
+  }
 }
 
 
 function markCheckboxes(intSelected) {
-	strCategories = '';
-	for (var h=0; h < document.forms.length;h++) {
-		for (var i=0; i < document.forms[h].elements.length;i++) {
-			//read out all form-elements with the loop
-			if(document.forms[h].elements[i].name.search('frmUpdateCategory_ParCat_'+intSelected) != -1) {
-				strCategories = document.forms[h].elements[i].value;
-			}
-			
-			if (document.forms[h].elements[i].name.search('frmUpdateCategory_Languages') != -1) {
-				document.forms[h].elements[i].disabled = true;
-				document.forms[h].elements[i].checked = false;
-			}
-		}
-	}
-	
-	if (strCategories != '') {
-		arrTemp = strCategories.split(',');
-		for (var j = 0; j < arrTemp.length; j++) {
-			for (var h=0; h < document.forms.length;h++) {
-				for (var i=0; i < document.forms[h].elements.length;i++) {
-					//read out all form-elements with the loop
-					if(	document.forms[h].elements[i].name.search('frmUpdateCategory_Languages') != -1	&& document.forms[h].elements[i].value == arrTemp[j]) {
-						document.forms[h].elements[i].disabled = false;
-						document.forms[h].elements[i].checked = true;
-					}
-				}
-			}		
-		}
-	}
+  strCategories = '';
+  for (var h=0; h < document.forms.length;h++) {
+    for (var i=0; i < document.forms[h].elements.length;i++) {
+      //read out all form-elements with the loop
+      if(document.forms[h].elements[i].name.search('frmUpdateCategory_ParCat_'+intSelected) != -1) {
+        strCategories = document.forms[h].elements[i].value;
+      }
+
+      if (document.forms[h].elements[i].name.search('frmUpdateCategory_Languages') != -1) {
+        document.forms[h].elements[i].disabled = true;
+        document.forms[h].elements[i].checked = false;
+      }
+    }
+  }
+
+  if (strCategories != '') {
+    arrTemp = strCategories.split(',');
+    for (var j = 0; j < arrTemp.length; j++) {
+      for (var h=0; h < document.forms.length;h++) {
+        for (var i=0; i < document.forms[h].elements.length;i++) {
+          //read out all form-elements with the loop
+          if(  document.forms[h].elements[i].name.search('frmUpdateCategory_Languages') != -1  && document.forms[h].elements[i].value == arrTemp[j]) {
+            document.forms[h].elements[i].disabled = false;
+            document.forms[h].elements[i].checked = true;
+          }
+        }
+      }
+    }
+  }
 }
 </script>
 <form name="frmUpdateCategory" method="post" action="?cmd=Forum&amp;act=category_update">
-	<input type="hidden" name="frmUpdateCategory_CategoryId" value="{VALUE_CATEGORY_ID}" />
-	<table width="100%" cellspacing="0" cellpadding="3" border="0" align="top" class="adminlist">
-		<tr>
-			<th colspan="4">{TXT_TITLE_EDIT_CATEGORY}</th>
-		</tr>
-		<!-- BEGIN isCategory -->
-		<input type="hidden" name="frmUpdateCategory_ParentId" value="{VALUE_CATEGORY_NOPARCAT}" />
-		<!-- END isCategory -->
-		<!-- BEGIN isForum -->
-		<tr class="row1">
-			<td>{TXT_CATEGORY_ADD_FORUM_PARCAT}</td>
-			<td colspan="3">
-				{VALUE_CATEGORY_DD}
-				<!-- BEGIN forumAllowedParcats -->
-				<input type="hidden" name="frmUpdateCategory_ParCat_{FORUM_EDIT_PARCAT_ID}" value="{FORUM_EDIT_PARCAT_VALUES}">
-				<!-- END forumAllowedParcats -->			
-			</td>
-		</tr>		
-		<!-- END isForum -->
-		<tr class="row1">
-			<td valign="top">{TXT_CATEGORY_EDIT_CATEGORY_NAME}</td>
-			<td colspan="3">
-				<input type="text" name="frmUpdateCategory_Name" maxlength="100" style="width:30%;" value="{VALUE_NAME}" onChange="copyText('frmUpdateCategory_Name_');" />&nbsp;<a href="javascript:showOrHide('divEditCategoryLang_Name');">{TXT_CATEGORY_EDIT_EXTENDED}</a>
-				<div id="divEditCategoryLang_Name" style="display: none;">
-					<!-- BEGIN categoryNameFields -->
-					<input type="text" name="frmUpdateCategory_Name_{CATEGORY_EDIT_NAME_LANGID}" value="{CATEGORY_EDIT_NAME_VALUE}" style="width:30%; margin-top:1px;" />&nbsp;<label for="frmUpdateCategory_Name_{CATEGORY_EDIT_NAME_LANGID}">{CATEGORY_EDIT_NAME_LANG}</label><br />
-					<!-- END categoryNameFields -->
-				</div>	
-			</td>
-		</tr>
-		<tr class="row1">
-			<td valign="top">{TXT_CATEGORY_EDIT_CATEGORY_DESC}</td>
-			<td colspan="3">
-				<textarea name="frmUpdateCategory_Desc" rows="3" style="width:30%;" onChange="copyText('frmUpdateCategory_Desc_');">{VALUE_DESC}</textarea>&nbsp;<a href="javascript:showOrHide('divEditCategoryLang_Desc');">{TXT_CATEGORY_EDIT_EXTENDED}</a>
-					<div id="divEditCategoryLang_Desc" style="display: none;">
-						<!-- BEGIN categoryDescFields -->
-						<textarea name="frmUpdateCategory_Desc_{CATEGORY_EDIT_DESC_LANGID}" rows="3" style="width:30%; margin-top: 1px;">{CATEGORY_EDIT_DESC_VALUE}</textarea>&nbsp;<label for="divEditCategoryLang_Desc_{CATEGORY_EDIT_DESC_LANGID}">{CATEGORY_EDIT_DESC_LANG}</label><br />
-						<!-- END categoryDescFields -->
-					</div>
-			
-			</td>
-		</tr>
-		<tr class="row1">
-			<td width="10%">{TXT_CATEGORY_EDIT_CATEGORY_LANGUAGES}</td>
-			<td width="10%" valign="top">{CATEGORY_EDIT_LANGUAGES_1}</td>
-			<td width="10%" valign="top">{CATEGORY_EDIT_LANGUAGES_2}</td>
-			<td width="70%" valign="top">{CATEGORY_EDIT_LANGUAGES_3}</td>
-		</tr>
-	</table>
-	<br />
-	<input type="submit" value="{TXT_CATEGORY_EDIT_CATEGORY_BUTTON}" />
+  <input type="hidden" name="frmUpdateCategory_CategoryId" value="{VALUE_CATEGORY_ID}" />
+  <table width="100%" cellspacing="0" cellpadding="3" border="0" align="top" class="adminlist">
+    <tr>
+      <th colspan="4">{TXT_TITLE_EDIT_CATEGORY}</th>
+    </tr>
+    <!-- BEGIN isCategory -->
+    <input type="hidden" name="frmUpdateCategory_ParentId" value="{VALUE_CATEGORY_NOPARCAT}" />
+    <!-- END isCategory -->
+    <!-- BEGIN isForum -->
+    <tr class="row1">
+      <td>{TXT_CATEGORY_ADD_FORUM_PARCAT}</td>
+      <td colspan="3">
+        {VALUE_CATEGORY_DD}
+        <!-- BEGIN forumAllowedParcats -->
+        <input type="hidden" name="frmUpdateCategory_ParCat_{FORUM_EDIT_PARCAT_ID}" value="{FORUM_EDIT_PARCAT_VALUES}">
+        <!-- END forumAllowedParcats -->
+      </td>
+    </tr>
+    <!-- END isForum -->
+    <tr class="row1">
+      <td valign="top">{TXT_CATEGORY_EDIT_CATEGORY_NAME}</td>
+      <td colspan="3">
+        <input type="text" name="frmUpdateCategory_Name" maxlength="100" style="width:30%;" value="{VALUE_NAME}" onChange="copyText('frmUpdateCategory_Name_');" />&nbsp;<a href="javascript:showOrHide('divEditCategoryLang_Name');">{TXT_CATEGORY_EDIT_EXTENDED}</a>
+        <div id="divEditCategoryLang_Name" style="display: none;">
+          <!-- BEGIN categoryNameFields -->
+          <input type="text" name="frmUpdateCategory_Name_{CATEGORY_EDIT_NAME_LANGID}" value="{CATEGORY_EDIT_NAME_VALUE}" style="width:30%; margin-top:1px;" />&nbsp;<label for="frmUpdateCategory_Name_{CATEGORY_EDIT_NAME_LANGID}">{CATEGORY_EDIT_NAME_LANG}</label><br />
+          <!-- END categoryNameFields -->
+        </div>
+      </td>
+    </tr>
+    <tr class="row1">
+      <td valign="top">{TXT_CATEGORY_EDIT_CATEGORY_DESC}</td>
+      <td colspan="3">
+        <textarea name="frmUpdateCategory_Desc" rows="3" style="width:30%;" onChange="copyText('frmUpdateCategory_Desc_');">{VALUE_DESC}</textarea>&nbsp;<a href="javascript:showOrHide('divEditCategoryLang_Desc');">{TXT_CATEGORY_EDIT_EXTENDED}</a>
+          <div id="divEditCategoryLang_Desc" style="display: none;">
+            <!-- BEGIN categoryDescFields -->
+            <textarea name="frmUpdateCategory_Desc_{CATEGORY_EDIT_DESC_LANGID}" rows="3" style="width:30%; margin-top: 1px;">{CATEGORY_EDIT_DESC_VALUE}</textarea>&nbsp;<label for="divEditCategoryLang_Desc_{CATEGORY_EDIT_DESC_LANGID}">{CATEGORY_EDIT_DESC_LANG}</label><br />
+            <!-- END categoryDescFields -->
+          </div>
+
+      </td>
+    </tr>
+    <tr class="row1">
+      <td width="10%">{TXT_CATEGORY_EDIT_CATEGORY_LANGUAGES}</td>
+      <td width="10%" valign="top">{CATEGORY_EDIT_LANGUAGES_1}</td>
+      <td width="10%" valign="top">{CATEGORY_EDIT_LANGUAGES_2}</td>
+      <td width="70%" valign="top">{CATEGORY_EDIT_LANGUAGES_3}</td>
+    </tr>
+  </table>
+  <br />
+  <input type="submit" value="{TXT_CATEGORY_EDIT_CATEGORY_BUTTON}" />
 </form>
 <!-- END category_edit.html -->

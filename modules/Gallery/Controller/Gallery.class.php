@@ -73,7 +73,7 @@ class Gallery
 
         $this->pageContent = $pageContent;
         $this->langId= $_LANGID;
-        
+
         $this->_objTpl = new \Cx\Core\Html\Sigma('.');
         \Cx\Core\Csrf\Controller\Csrf::add_placeholder($this->_objTpl);
         $this->_objTpl->setErrorHandling(PEAR_ERROR_DIE);
@@ -243,7 +243,7 @@ class Gallery
         if ($this->arrSettings['show_ext'] == 'off') {
             $strImageTitle = substr($strImageTitle, 0, strrpos($strImageTitle, '.'));
         }
-        
+
         if ($this->arrSettings['show_file_name'] == 'off') {
             $strImageTitle = "";
             $imageSize="";
@@ -462,7 +462,7 @@ class Gallery
             $boolComment = $objResult->fields['comment'];
             $boolVoting = $objResult->fields['voting'];
         }
-        
+
         // get picture informations
         $objResult = $objDatabase->Execute(
             "SELECT id, path, link, size_show ".
@@ -482,7 +482,7 @@ class Gallery
             $strImageWebPath = ASCMS_PROTOCOL .'://'.$_SERVER['SERVER_NAME'].CONTREXX_SCRIPT_PATH.'?section=Gallery'.$this->strCmd.'&amp;cid='.$intCatId.'&amp;pId='.$intPicId;
             $objResult->MoveNext();
         }
-        
+
         // get pictures of the current category
         $objResult = $objDatabase->Execute(
             "SELECT id FROM ".DBPREFIX."module_gallery_pictures ".
@@ -494,7 +494,7 @@ class Gallery
                 $objResult->MoveNext();
             }
         }
-        
+
         // get next picture id
         if (array_key_exists(array_search($intPicId,$arrPictures)+1,$arrPictures)) {
             $intPicIdNext = $arrPictures[array_search($intPicId,$arrPictures)+1];
@@ -526,7 +526,7 @@ class Gallery
             'TXT_NEXT_IMAGE'      => $_ARRAYLANG['TXT_NEXT_IMAGE'],
             'TXT_USER_DEFINED'    => $_ARRAYLANG['TXT_USER_DEFINED']
         ));
-        
+
         $imageSize     = ($showImageSize) ? $_ARRAYLANG['TXT_FILESIZE'].': '.$imageSize.' kB<br />' : '';
         // set variables
         $objTpl->setVariable(array(
@@ -548,7 +548,7 @@ class Gallery
                                        . $_ARRAYLANG['TXT_RESOLUTION'].': '.$imageReso[0].'x'.$imageReso[1].' Pixel',
             'IMAGE_DESC'            => (!empty($imageDesc)) ? $imageDesc.'<br /><br />' : '',
         ));
-        
+
         $objTpl->setGlobalVariable('CONTREXX_DIRECTORY_INDEX', CONTREXX_DIRECTORY_INDEX);
 
         //voting
@@ -841,7 +841,7 @@ class Gallery
         $objResult = $objDatabase->Execute(
             "SELECT id, catid, path FROM ".DBPREFIX."module_gallery_pictures ".
             "ORDER BY catimg ASC, sorting ASC, id ASC");
-        
+
         $showImageSizeOverview   = $this->arrSettings['show_image_size'] == 'on';
         while (!$objResult->EOF) {
             $arrImageSizes[$objResult->fields['catid']][$objResult->fields['id']] = ($showImageSizeOverview) ? round(filesize($this->strImagePath.$objResult->fields['path'])/1024,2) : '';
@@ -906,7 +906,7 @@ class Gallery
                     $arrCategoryLang[$objSubResult->fields['name']] = $objSubResult->fields['value'];
                     $objSubResult->MoveNext();
                 }
-                
+
                 if (empty($arrCategoryImages[$objResult->fields['id']])) {
                     // no pictures in this gallery, show the empty-image
                     $strName     = $arrCategoryLang['name'];
@@ -986,7 +986,7 @@ class Gallery
                 $objSubResult = $objDatabase->Execute(
                     "SELECT p.name, p.desc FROM ".DBPREFIX."module_gallery_language_pics p ".
                     "WHERE picture_id=".$objResult->fields['id']." AND lang_id=$this->langId LIMIT 1");
-                
+
 // Never used
 //                $imageReso = getimagesize($this->strImagePath.$objResult->fields['path']);
                 $strImagePath = $this->strImageWebPath.$objResult->fields['path'];
@@ -1042,7 +1042,7 @@ class Gallery
                                 $imageData[] = $imageFileName;
                             }
                         }
-                        
+
                         if (!empty($imageData)) {
                             $imageTitleTag .= ' ('.join(' ', $imageData).')';
                         }

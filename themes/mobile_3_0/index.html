@@ -2,26 +2,26 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="de" xml:lang="de" class="no-js">
     <head>
         <title>{GLOBAL_TITLE} - {METATITLE} - powered by {VERSION}</title>
-        
+
         <meta name="description" content="{METADESC}"/>
         <meta name="keywords" content="{METAKEYS}"/>
-        <meta http-equiv="Content-Type" content="text/html; charset={CHARSET}" />        
+        <meta http-equiv="Content-Type" content="text/html; charset={CHARSET}" />
         <meta name="robots" content="{METAROBOTS}"/>
-        <meta name="generator" content="{VERSION}"/>        
+        <meta name="generator" content="{VERSION}"/>
         <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;" />
-        
+
         <link type="images/x-icon" rel="icon" href="favicon.ico">
         <link rel="stylesheet" type="text/css" href="themes/mobile_3_0/style.css" />
         <link rel="alternate" type="application/rss+xml" title="{GLOBAL_TITLE}" href="{BASE_URL}/feed/news_headlines_de.xml" />
-        
+
         {JAVASCRIPT}
         {STYLE_FILE}
         {LOGIN_INCLUDE}
-        
+
         <script type="text/javascript" src="themes/mobile_3_0/langnavbar.js"></script>
         <script type="text/javascript" src="themes/mobile_3_0/js/mobile-javascript-default.js"></script>
         <script type="text/javascript" src="themes/mobile_3_0/js/webtrends.js"></script>
-        
+
         <script>
             $J(document).ready(function(){
                 $J('#back-to-top').click(function () {
@@ -30,16 +30,16 @@
                 });
             });
         </script>
-           
+
         <!--[if lte IE 7]><link rel="stylesheet" type="text/css" href="themes/mobile_3_0/ie.css" /><![endif]-->
     </head>
     <body>
         <div  data-theme="e" data-role="page" >
             <div id="container">
                 <header>
-                    <a href="{NODE_HOME}" class="logo" data-role="none"> <img alt="" src="themes/mobile_3_0/images/logo.png"></a>                    
+                    <a href="{NODE_HOME}" class="logo" data-role="none"> <img alt="" src="themes/mobile_3_0/images/logo.png"></a>
                     <a href="#address" id="contact-button" class="contact header_icons">Kontakt</a>
-                    <a href="#search" id="search-button" class="search header_icons">Suche</a>                   
+                    <a href="#search" id="search-button" class="search header_icons">Suche</a>
                 </header>
                 <section id="search" >
                     <form method="GET" action="{NODE_SEARCH}">
@@ -50,29 +50,29 @@
                         </fieldset>
                     </form>
                 </section>
-                <section id="address">                   
+                <section id="address">
                     <address>
                         {CONTACT_COMPANY}<br>
                         <a class="telephone" href="tel:{CONTACT_PHONE}">{CONTACT_PHONE}</a><br>
                         <a href="#" title="E-Mail">{CONTACT_EMAIL}</a><br>
                     </address>
                 </section>
-                {CONTENT_FILE}                
-                <footer data-role="footer">                   
+                {CONTENT_FILE}
+                <footer data-role="footer">
                     <ul role="navigation" class="noprint ">
                         <li>
                             <a rel="external" title="Rechtliche Hinweise" href="{NODE_PRIVACY}"><span class="link">Rechtliche Hinweise</span></a>
-                        </li>	
+                        </li>
                         <li>
                             <a rel="external" title="Impressum" href="{NODE_IMPRINT}" ><span class="link">Impressum</span></a>
-                        </li>	
+                        </li>
                     </ul>
                     <div id="nav-lang">
                         {LANGUAGE_NAVBAR_SHORT}
                     </div>
                     <img src="https://chart.googleapis.com/chart?cht=qr&amp;chs=90x90&amp;chl=http://{DOMAIN_URL}{PAGE_URL}" alt="QR-Code" id="qr-code" />
-                    <a href="{STANDARD_URL}">Zur klassischen Ansicht wechseln</a>                    
-                </footer>               
+                    <a href="{STANDARD_URL}">Zur klassischen Ansicht wechseln</a>
+                </footer>
             </div>
         </div>
         {COUNTER}

@@ -2,35 +2,35 @@
 <script type="text/javascript">
 function disableCategorySelection()
 {
-	document.newcat.select_category_id.disabled = true;
+  document.newcat.select_category_id.disabled = true;
 }
 
 function enableCategorySelection()
 {
-	document.newcat.select_category_id.disabled = false;
+  document.newcat.select_category_id.disabled = false;
 }
-function showOrHide(strElement) 
+function showOrHide(strElement)
 {
-	if (document.getElementById(strElement).style.display == 'none') {
-		document.getElementById(strElement).style.display = 'block';
-	} else {
-		document.getElementById(strElement).style.display = 'none';
-	}
+  if (document.getElementById(strElement).style.display == 'none') {
+    document.getElementById(strElement).style.display = 'block';
+  } else {
+    document.getElementById(strElement).style.display = 'none';
+  }
 }
-function copyText(strType) 
+function copyText(strType)
 {
-	for (var h=0; h < document.forms.length;h++) {
-		for (var i=0; i < document.forms[h].elements.length;i++) {
-			//read out all form-elements with the loop
-			if(document.forms[h].elements[i].name.search(strType) != -1) {
-				if (strType == 'category_name_') {
-					document.forms[h].elements[i].value = document.newcat.category_name.value;
-				} else {
-					document.forms[h].elements[i].value = document.newcat.category_desc.value;
-				}
-			}
-		}
-	}	
+  for (var h=0; h < document.forms.length;h++) {
+    for (var i=0; i < document.forms[h].elements.length;i++) {
+      //read out all form-elements with the loop
+      if(document.forms[h].elements[i].name.search(strType) != -1) {
+        if (strType == 'category_name_') {
+          document.forms[h].elements[i].value = document.newcat.category_name.value;
+        } else {
+          document.forms[h].elements[i].value = document.newcat.category_desc.value;
+        }
+      }
+    }
+  }
 }
 
 /*
@@ -59,17 +59,17 @@ var addToList = function(src, dst)
 /*
     Make the whole list selected before submitting
 */
-var selectWholeList = function(boxName) 
+var selectWholeList = function(boxName)
 {
     var box = document.getElementById(boxName);
-	for(var i = 0;i < box.length;i++) {
-		box.options[i].selected = true;
-	}
+  for(var i = 0;i < box.length;i++) {
+    box.options[i].selected = true;
+  }
 }
 
 var pre_submit = function()
 {
-    selectWholeList('existingFrontendGroups'); 
+    selectWholeList('existingFrontendGroups');
     selectWholeList('assignedFrontendGroups');
     selectWholeList('existingBackendGroups');
     selectWholeList('assignedBackendGroups');
@@ -78,140 +78,140 @@ var pre_submit = function()
 </script>
 
 <ul id="tabmenu">
-	<li><a id="category_generalTab" class="active" href="javascript:{}" onclick="selectTab('generalTab')" title="{TXT_TAB_GENERAL}">{TXT_TAB_GENERAL}</a></li>
-	<li><a id="category_frontendAccessTab" href="javascript:{}" onclick="selectTab('frontendAccessTab')" title="{TXT_TAB_FRONTEND_ACCESS}">{TXT_TAB_FRONTEND_ACCESS}</a></li>
-	<li><a id="category_backendAccessTab" href="javascript:{}" onclick="selectTab('backendAccessTab')" title="{TXT_TAB_BACKEND_ACCESS}">{TXT_TAB_BACKEND_ACCESS}</a></li>
+  <li><a id="category_generalTab" class="active" href="javascript:{}" onclick="selectTab('generalTab')" title="{TXT_TAB_GENERAL}">{TXT_TAB_GENERAL}</a></li>
+  <li><a id="category_frontendAccessTab" href="javascript:{}" onclick="selectTab('frontendAccessTab')" title="{TXT_TAB_FRONTEND_ACCESS}">{TXT_TAB_FRONTEND_ACCESS}</a></li>
+  <li><a id="category_backendAccessTab" href="javascript:{}" onclick="selectTab('backendAccessTab')" title="{TXT_TAB_BACKEND_ACCESS}">{TXT_TAB_BACKEND_ACCESS}</a></li>
 </ul>
 
 <form name="newcat" method="post" action="?cmd=Gallery&amp;act={FORM_ACT}&amp;id={VALUE_ID}">
 <div id="generalTab" class="category">
-	<table width="100%" cellspacing="0" cellpadding="3" border="0" align="top" class="adminlist">
-		<tr>
-			<th colspan="2" align="left">{TXT_TAB_GENERAL}</th>
-		</tr>
-		<tr class="row1">
-			<td nowrap="nowrap" width="10%" valign="top">{TXT_NAME}</td>
-			<td>
-				<input type="text" name="category_name" onchange="copyText('category_name_');" value="{VALUE_NAME}" style="width:30%;" />&nbsp;<a href="javascript:showOrHide('divLang_Name');">{TXT_EXTENDED}</a>
-				<div id="divLang_Name" style="display: none;">
-					<!-- BEGIN showNameFields -->
-					<input name="category_name_{NAMEFIELDS_LID}" value="{NAMEFIELDS_VALUE}" style="margin-top:1px; width:30%;">&nbsp;<label for="category_name_{NAMEFIELDS_LID}">{NAMEFIELDS_LANGUAGE}</label> <br />
-					<!-- END showNameFields -->			
-				</div>
-			</td>
-		</tr>
-		<tr class="row2">
-			<td nowrap="nowrap" valign="top">{TXT_DESCRIPTION}</td>
-			<td>
-				<textarea name="category_desc" onchange="copyText('category_desc_');" rows="3" style="width:30%;">{VALUE_DESC}</textarea>&nbsp;<a href="javascript:showOrHide('divLang_Desc');">{TXT_EXTENDED}</a>
-				<div id="divLang_Desc" style="display: none;">
-					<!-- BEGIN showDescFields -->
-					<textarea name="category_desc_{DESCFIELDS_LID}" rows="3" style="margin-top:1px; width:30%;">{DESCFIELDS_VALUE}</textarea>&nbsp;<label for="category_name_{DESCFIELDS_LID}">{DESCFIELDS_LANGUAGE}</label> <br />
-					<!-- END showDescFields -->
-				</div>
-			</td>
-		</tr>
-		<tr class="row1">
-			<td nowrap="nowrap">{TXT_CATEGORYTYPE}</td>
-			<td>
-				<input type="radio" name="category_type" value="main" onclick="disableCategorySelection()" {VALUE_TYPE_MAIN} id="category_type_main"/>&nbsp;<label for="category_type_main">{TXT_CATEGORYTYPE_NEW}</label><br />
-				<input type="radio" name="category_type" value="sub" onclick="enableCategorySelection()" {VALUE_TYPE_SUB} id="category_type_sub" />&nbsp;<label for="category_type_sub">{TXT_CATEGORYTYPE_SUB}</label>
-				<select name="select_category_id" {CAT_DROPDOWN_DISABLED}>
-					<!-- BEGIN showCategories -->
-					<option value="{CAT_DROPDOWN_VALUE}" {CAT_DROPDOWN_SELECTED}>{CAT_DROPDOWN_INDENT}{CAT_DROPDOWN_NAME}</option>
-					<!-- END showCategories -->
-				</select>
-			</td>
-		</tr>
-		<tr class="row2">
-			<td nowrap="nowrap">{TXT_STATUS}</td>
-			<td>
-				<input type="radio" name="category_status" value="1" {VALUE_STATE_ON} id="category_status_on" />&nbsp;<label for="category_status_on">{TXT_STATUS_ON}</label>
-				<input type="radio" name="category_status" value="0" {VALUE_STATE_OFF} id="category_status_off" />&nbsp;<label for="category_status_off">{TXT_STATUS_OFF}</label>
-			</td>
-		</tr>
-		<tr class="row1">
-			<td nowrap="nowrap">{TXT_COMMENT}</td>
-			<td>
-				<input type="radio" name="category_comment" value="1" {VALUE_COMMENT_ON} id="category_comment_on" />&nbsp;<label for="category_comment_on">{TXT_STATUS_ON}</label>
-				<input type="radio" name="category_comment" value="0" {VALUE_COMMENT_OFF} id="category_comment_off" />&nbsp;<label for="category_comment_off">{TXT_STATUS_OFF}</label>
-			</td>
-		</tr>
-		<tr class="row2">
-			<td nowrap="nowrap">{TXT_VOTING}</td>
-			<td>
-				<input type="radio" name="category_voting" value="1" {VALUE_VOTING_ON} id="category_voting_on" />&nbsp;<label for="category_voting_on">{TXT_STATUS_ON}</label>
-				<input type="radio" name="category_voting" value="0" {VALUE_VOTING_OFF} id="category_voting_off" />&nbsp;<label for="category_voting_off">{TXT_STATUS_OFF}</label>
-			</td>
-		</tr>
-	</table>
-	</div>
-	
-	<div id="frontendAccessTab" class="category" style="display: none;">
-	   <table style="width: 100%;" cellspacing="0" cellpadding="3" border="0" align="top" class="adminlist">
-	       <tr>
-	           <th colspan="3">{TXT_FRONTEND_ACCESS}</th>
-	       </tr>
-	       <tr class="row1">
-	           <td colspan="3">
-	               <input type="radio" id="radioPublicAccessFrontend" name="category_protected_frontend" value="0" {PUBLIC_ACCESS_CHECKED_FRONTEND} onclick="swapAccessMapping('frontend', false)" />
-	               <label for="radioPublicAccessFrontend">{TXT_PUBLIC_ACCESS}</label ><br />
-	               <input type="radio" id="radioRestrictedAccessFrontend"  name="category_protected_frontend" value="1" {RESTRICTED_ACCESS_CHECKED_FRONTEND} onclick="swapAccessMapping('frontend', true)" />
-	               <label for="radioRestrictedAccessFrontend">{TXT_RESTRICTED_ACCESS}</label>
-	           </td>
-	       </tr>
-	       <tr id="frontendGroupMapping" style="display: {FRONTEND_MAPPING_DISPLAY}" class="row2">
+  <table width="100%" cellspacing="0" cellpadding="3" border="0" align="top" class="adminlist">
+    <tr>
+      <th colspan="2" align="left">{TXT_TAB_GENERAL}</th>
+    </tr>
+    <tr class="row1">
+      <td nowrap="nowrap" width="10%" valign="top">{TXT_NAME}</td>
+      <td>
+        <input type="text" name="category_name" onchange="copyText('category_name_');" value="{VALUE_NAME}" style="width:30%;" />&nbsp;<a href="javascript:showOrHide('divLang_Name');">{TXT_EXTENDED}</a>
+        <div id="divLang_Name" style="display: none;">
+          <!-- BEGIN showNameFields -->
+          <input name="category_name_{NAMEFIELDS_LID}" value="{NAMEFIELDS_VALUE}" style="margin-top:1px; width:30%;">&nbsp;<label for="category_name_{NAMEFIELDS_LID}">{NAMEFIELDS_LANGUAGE}</label> <br />
+          <!-- END showNameFields -->
+        </div>
+      </td>
+    </tr>
+    <tr class="row2">
+      <td nowrap="nowrap" valign="top">{TXT_DESCRIPTION}</td>
+      <td>
+        <textarea name="category_desc" onchange="copyText('category_desc_');" rows="3" style="width:30%;">{VALUE_DESC}</textarea>&nbsp;<a href="javascript:showOrHide('divLang_Desc');">{TXT_EXTENDED}</a>
+        <div id="divLang_Desc" style="display: none;">
+          <!-- BEGIN showDescFields -->
+          <textarea name="category_desc_{DESCFIELDS_LID}" rows="3" style="margin-top:1px; width:30%;">{DESCFIELDS_VALUE}</textarea>&nbsp;<label for="category_name_{DESCFIELDS_LID}">{DESCFIELDS_LANGUAGE}</label> <br />
+          <!-- END showDescFields -->
+        </div>
+      </td>
+    </tr>
+    <tr class="row1">
+      <td nowrap="nowrap">{TXT_CATEGORYTYPE}</td>
+      <td>
+        <input type="radio" name="category_type" value="main" onclick="disableCategorySelection()" {VALUE_TYPE_MAIN} id="category_type_main"/>&nbsp;<label for="category_type_main">{TXT_CATEGORYTYPE_NEW}</label><br />
+        <input type="radio" name="category_type" value="sub" onclick="enableCategorySelection()" {VALUE_TYPE_SUB} id="category_type_sub" />&nbsp;<label for="category_type_sub">{TXT_CATEGORYTYPE_SUB}</label>
+        <select name="select_category_id" {CAT_DROPDOWN_DISABLED}>
+          <!-- BEGIN showCategories -->
+          <option value="{CAT_DROPDOWN_VALUE}" {CAT_DROPDOWN_SELECTED}>{CAT_DROPDOWN_INDENT}{CAT_DROPDOWN_NAME}</option>
+          <!-- END showCategories -->
+        </select>
+      </td>
+    </tr>
+    <tr class="row2">
+      <td nowrap="nowrap">{TXT_STATUS}</td>
+      <td>
+        <input type="radio" name="category_status" value="1" {VALUE_STATE_ON} id="category_status_on" />&nbsp;<label for="category_status_on">{TXT_STATUS_ON}</label>
+        <input type="radio" name="category_status" value="0" {VALUE_STATE_OFF} id="category_status_off" />&nbsp;<label for="category_status_off">{TXT_STATUS_OFF}</label>
+      </td>
+    </tr>
+    <tr class="row1">
+      <td nowrap="nowrap">{TXT_COMMENT}</td>
+      <td>
+        <input type="radio" name="category_comment" value="1" {VALUE_COMMENT_ON} id="category_comment_on" />&nbsp;<label for="category_comment_on">{TXT_STATUS_ON}</label>
+        <input type="radio" name="category_comment" value="0" {VALUE_COMMENT_OFF} id="category_comment_off" />&nbsp;<label for="category_comment_off">{TXT_STATUS_OFF}</label>
+      </td>
+    </tr>
+    <tr class="row2">
+      <td nowrap="nowrap">{TXT_VOTING}</td>
+      <td>
+        <input type="radio" name="category_voting" value="1" {VALUE_VOTING_ON} id="category_voting_on" />&nbsp;<label for="category_voting_on">{TXT_STATUS_ON}</label>
+        <input type="radio" name="category_voting" value="0" {VALUE_VOTING_OFF} id="category_voting_off" />&nbsp;<label for="category_voting_off">{TXT_STATUS_OFF}</label>
+      </td>
+    </tr>
+  </table>
+  </div>
+
+  <div id="frontendAccessTab" class="category" style="display: none;">
+     <table style="width: 100%;" cellspacing="0" cellpadding="3" border="0" align="top" class="adminlist">
+         <tr>
+             <th colspan="3">{TXT_FRONTEND_ACCESS}</th>
+         </tr>
+         <tr class="row1">
+             <td colspan="3">
+                 <input type="radio" id="radioPublicAccessFrontend" name="category_protected_frontend" value="0" {PUBLIC_ACCESS_CHECKED_FRONTEND} onclick="swapAccessMapping('frontend', false)" />
+                 <label for="radioPublicAccessFrontend">{TXT_PUBLIC_ACCESS}</label ><br />
+                 <input type="radio" id="radioRestrictedAccessFrontend"  name="category_protected_frontend" value="1" {RESTRICTED_ACCESS_CHECKED_FRONTEND} onclick="swapAccessMapping('frontend', true)" />
+                 <label for="radioRestrictedAccessFrontend">{TXT_RESTRICTED_ACCESS}</label>
+             </td>
+         </tr>
+         <tr id="frontendGroupMapping" style="display: {FRONTEND_MAPPING_DISPLAY}" class="row2">
                 <td style="width: 320px;">
-	               <select  style="width:300px; height: 100px;" multiple="multiple" name="existingFrontendGroups[]" id="existingFrontendGroups">
-	                   {VALUE_FRONTEND_EXISTING_GROUPS}
-	               </select>
+                 <select  style="width:300px; height: 100px;" multiple="multiple" name="existingFrontendGroups[]" id="existingFrontendGroups">
+                     {VALUE_FRONTEND_EXISTING_GROUPS}
+                 </select>
                 </td>
                 <td style="width: 50px;">
-						<input type="button" value="&gt;&gt;" name="adduser" onclick="addToList('existingFrontendGroups','assignedFrontendGroups');" style="margin-bottom:1px;" /><br />
-						<input type="button" value="&lt;&lt;" name="removeuser" onclick="addToList('assignedFrontendGroups', 'existingFrontendGroups');" />
+            <input type="button" value="&gt;&gt;" name="adduser" onclick="addToList('existingFrontendGroups','assignedFrontendGroups');" style="margin-bottom:1px;" /><br />
+            <input type="button" value="&lt;&lt;" name="removeuser" onclick="addToList('assignedFrontendGroups', 'existingFrontendGroups');" />
                 </td>
                 <td>
                     <select style="width: 300px; height: 100px;" multiple="multiple" name="assignedFrontendGroups[]" id="assignedFrontendGroups">
                         {VALUE_FRONTEND_ASSIGNED_GROUPS}
                     </select>
                 </td>
-	       </tr>
-	   </table>
-	</div>
-	
-	
-	<div id="backendAccessTab" class="category" style="display: none;">
-	   <table style="width: 100%;" cellspacing="0" cellpadding="3" border="0" align="top" class="adminlist">
-	       <tr>
-	           <th colspan="3">{TXT_BACKEND_ACCESS}</th>
-	       </tr>
-	       <tr class="row1">
-	           <td colspan="3">
-	               <input type="radio" id="radioPublicAccessBackend" name="category_protected_backend" value="0" {PUBLIC_ACCESS_CHECKED_BACKEND} onclick="swapAccessMapping('backend', false)" />
-	               <label for="radioPublicAccessBackend" >{TXT_NO_RESTRICTIONS}</label><br />
-	               <input type="radio" id="radioRestrictedAccessBackend" name="category_protected_backend" value="1" {RESTRICTED_ACCESS_CHECKED_BACKEND} onclick="swapAccessMapping('backend', true)" />
-	               <label for="radioRestrictedAccessBackend" >{TXT_RESTRICTED_ACCESS_BACKEND}</label>
-	           </td>
-	       </tr>
-	       <tr id="backendGroupMapping" style="display: {BACKEND_MAPPING_DISPLAY}">
-	           <td style="width: 320px;">
-	               <select style="width: 300px; height: 100px;" multiple="multiple" name="existingBackendGroups[]" id="existingBackendGroups">
-	                   {VALUE_BACKEND_EXISTING_GROUPS}
-	               </select>
-	           </td>
-	           <td style="width: 50px;">
+         </tr>
+     </table>
+  </div>
+
+
+  <div id="backendAccessTab" class="category" style="display: none;">
+     <table style="width: 100%;" cellspacing="0" cellpadding="3" border="0" align="top" class="adminlist">
+         <tr>
+             <th colspan="3">{TXT_BACKEND_ACCESS}</th>
+         </tr>
+         <tr class="row1">
+             <td colspan="3">
+                 <input type="radio" id="radioPublicAccessBackend" name="category_protected_backend" value="0" {PUBLIC_ACCESS_CHECKED_BACKEND} onclick="swapAccessMapping('backend', false)" />
+                 <label for="radioPublicAccessBackend" >{TXT_NO_RESTRICTIONS}</label><br />
+                 <input type="radio" id="radioRestrictedAccessBackend" name="category_protected_backend" value="1" {RESTRICTED_ACCESS_CHECKED_BACKEND} onclick="swapAccessMapping('backend', true)" />
+                 <label for="radioRestrictedAccessBackend" >{TXT_RESTRICTED_ACCESS_BACKEND}</label>
+             </td>
+         </tr>
+         <tr id="backendGroupMapping" style="display: {BACKEND_MAPPING_DISPLAY}">
+             <td style="width: 320px;">
+                 <select style="width: 300px; height: 100px;" multiple="multiple" name="existingBackendGroups[]" id="existingBackendGroups">
+                     {VALUE_BACKEND_EXISTING_GROUPS}
+                 </select>
+             </td>
+             <td style="width: 50px;">
                     <input type="button" value="&gt;&gt;" name="adduser" onclick="addToList('existingBackendGroups','assignedBackendGroups');" style="margin-bottom:1px;" /><br />
                     <input type="button" value="&lt;&lt;" name="removeuser" onclick="addToList('assignedBackendGroups', 'existingBackendGroups');" />
-	           </td>
-	           <td>
-	               <select style="width: 300px; height: 100px;" multiple="multiple" name="assignedBackendGroups[]" id="assignedBackendGroups">
-	                   {VALUE_BACKEND_ASSIGNED_GROUPS}
-	               </select>
-	           </td>
-	       </tr>
-	   </table>
-	</div>
-	<br />
-	<input type="submit" value="{TXT_BUTTON_SUBMIT}" onclick="pre_submit()" />
+             </td>
+             <td>
+                 <select style="width: 300px; height: 100px;" multiple="multiple" name="assignedBackendGroups[]" id="assignedBackendGroups">
+                     {VALUE_BACKEND_ASSIGNED_GROUPS}
+                 </select>
+             </td>
+         </tr>
+     </table>
+  </div>
+  <br />
+  <input type="submit" value="{TXT_BUTTON_SUBMIT}" onclick="pre_submit()" />
 </form>
 <!-- END gallery_edit_category.html -->

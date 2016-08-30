@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,10 +24,10 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Response for a request to API
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author Michael Ritter <michael.ritter@cloudrexx.com>
  * @package cloudrexx
@@ -38,64 +38,64 @@ namespace Cx\Core_Modules\DataAccess\Model\Entity;
 
 /**
  * Response for a request to API
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author Michael Ritter <michael.ritter@cloudrexx.com>
  * @package cloudrexx
  * @subpackage core_modules_dataaccess
  */
 class ApiResponse extends \Cx\Model\Base\EntityBase implements \JsonSerializable {
-    
+
     /**
      * @var string Error status
      */
     const STATUS_ERROR = 'error';
-    
+
     /**
      * @var string Success status
      */
     const STATUS_OK = 'ok';
-    
+
     /**
      * @var string Message type success
      */
     const MESSAGE_TYPE_SUCCESS = 'success';
-    
+
     /**
      * @var string Message type error
      */
     const MESSAGE_TYPE_ERROR = 'error';
-    
+
     /**
      * @var string Message type info
      */
     const MESSAGE_TYPE_INFO = 'info';
-    
+
     /**
      * @var \Cx\Core\Routing\Model\Entity\Request Request object
      */
     protected $request;
-    
+
     /**
      * @var string one of STATUS_ERROR, STATUS_OK
      */
     protected $status;
-    
+
     /**
      * @var int HTTP status code
      */
     protected $statusCode = 0;
-    
+
     /**
      * @var two dimensional array: $messages[<type>][] = <messageText>
      */
     protected $messages = array();
-    
+
     /**
      * @var array of data
      */
     protected $data = array();
-    
+
     /**
      * Creates an ApiResponse
      *
@@ -110,7 +110,7 @@ class ApiResponse extends \Cx\Model\Base\EntityBase implements \JsonSerializable
         $this->messages = $messages;
         $this->data = $data;
     }
-    
+
     /**
      * Adds a message
      * @param string $type Message type, one of MESSAGE_TYPE_*
@@ -122,7 +122,7 @@ class ApiResponse extends \Cx\Model\Base\EntityBase implements \JsonSerializable
         }
         $this->messages[$type][] = $text;
     }
-    
+
     /**
      * Sets response data
      * @param array $data Data for this response
@@ -130,7 +130,7 @@ class ApiResponse extends \Cx\Model\Base\EntityBase implements \JsonSerializable
     public function setData($data) {
         $this->data = $data;
     }
-    
+
     /**
      * Sets response status
      *
@@ -145,7 +145,7 @@ class ApiResponse extends \Cx\Model\Base\EntityBase implements \JsonSerializable
         }
         $this->status = $status;
     }
-    
+
     /**
      * Sets the HTTP status code
      * @param int Status code (as specified in https://tools.ietf.org/html/rfc7231#section-6)
@@ -157,7 +157,7 @@ class ApiResponse extends \Cx\Model\Base\EntityBase implements \JsonSerializable
         }
         $this->statusCode = $statusCode;
     }
-    
+
     /**
      * Returns the HTTP status code for this response
      * @return int Status code (as specified in https://tools.ietf.org/html/rfc7231#section-6)
@@ -165,7 +165,7 @@ class ApiResponse extends \Cx\Model\Base\EntityBase implements \JsonSerializable
     public function getStatusCode() {
         return $this->statusCode;
     }
-    
+
     /**
      * Returns the status for this response
      * @return string One of STATUS_ERROR, STATUS_OK
@@ -173,7 +173,7 @@ class ApiResponse extends \Cx\Model\Base\EntityBase implements \JsonSerializable
     public function getStatus() {
         return $this->status;
     }
-    
+
     /**
      * Returns data of this response
      * @return array Set of data
@@ -181,7 +181,7 @@ class ApiResponse extends \Cx\Model\Base\EntityBase implements \JsonSerializable
     public function getData() {
         $this->data;
     }
-    
+
     /**
      * Returns a list of messages for this request
      * @param string $type (optional) Limits the result to a type of messages
@@ -197,7 +197,7 @@ class ApiResponse extends \Cx\Model\Base\EntityBase implements \JsonSerializable
         }
         return $this->messages[$type];
     }
-    
+
     /**
      * Removes a message
      * @param string $type Message type, one of MESSAGE_TYPE_*
@@ -215,7 +215,7 @@ class ApiResponse extends \Cx\Model\Base\EntityBase implements \JsonSerializable
         unset($this->messages[$text][$index]);
         return true;
     }
-    
+
     /**
      * Serializes this object for JSON, we use it for all output modules
      * This is used in order to avoid public member variables
@@ -231,7 +231,7 @@ class ApiResponse extends \Cx\Model\Base\EntityBase implements \JsonSerializable
             'data' => $this->data,
         );
     }
-    
+
     /**
      * Sets HTTP status code and writes this object to output buffer
      * @param \Cx\Core_Modules\DataAccess\Controller\OutputController $outputModule Output module to use for parsing
@@ -244,4 +244,3 @@ class ApiResponse extends \Cx\Model\Base\EntityBase implements \JsonSerializable
         echo $outputModule->parse($this->jsonSerialize());
     }
 }
-

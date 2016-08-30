@@ -136,11 +136,11 @@ class NewsletterLib
         }
         return $arrLists;
     }
-    
-    
+
+
     /**
      * Returns the Language ID for a newsletter user
-     * 
+     *
      * If the user's preferred language can not be found, the default language
      * ID is returned.
      * @param string $email E-mail address of the user
@@ -149,7 +149,7 @@ class NewsletterLib
      */
     public function getUsersPreferredLanguageId($email, $type) {
         global $objDatabase;
-        
+
         $userLanguage = \FWLanguage::getDefaultLangId();
         switch ($type) {
             case self::USER_TYPE_CORE:
@@ -425,9 +425,9 @@ class NewsletterLib
     {
         global $objDatabase;
 
-        //reset the $recipientId on copy function 
+        //reset the $recipientId on copy function
         $recipientId = $copy ? 0 : $recipientId;
-        
+
         $objRecipient = $objDatabase->SelectLimit("SELECT id FROM ".DBPREFIX."module_newsletter_user WHERE email='".contrexx_addslashes($email)."' AND id!=".$recipientId, 1);
         if ($objRecipient !== false && $objRecipient->RecordCount() == 0) {
             return true;

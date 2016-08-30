@@ -170,7 +170,7 @@ cx.jQuery(document).ready(function(){
                      ),
                 ),
                 '1.6.1' => array(
-            		'jsfiles'       => array(
+                    'jsfiles'       => array(
                         'lib/javascript/jquery/1.6.1/js/jquery.min.js',
                      ),
                 ),
@@ -847,7 +847,7 @@ Caution: JS/ALL files are missing. Also, this should probably be loaded through 
 
             // set cx.variables with lazy loading file paths
             ContrexxJavascript::getInstance()->setVariable('lazyLoadingFiles', $lazyLoadingFiles, 'contrexx');
-            
+
             // Note the "reverse" here.  Dependencies are at the end of the
             // array, and must be loaded first!
             foreach (array_reverse(self::$active) as $name) {
@@ -881,13 +881,13 @@ Caution: JS/ALL files are missing. Also, this should probably be loaded through 
         }
 
         $jsScripts[] = self::makeJSFiles(self::$customJS);
-        
+
         // if jquery is activated, do a noConflict
         if (array_search('jquery', self::$active) !== false) {
             $jsScripts[] = self::makeSpecialCode('if (typeof jQuery != "undefined") { jQuery.noConflict(); }');
         }
         $jsScripts[] = self::makeJSFiles(self::$templateJS);
-        
+
         // no conflict for normal jquery version which has been included in template or by theme dependency
         $jsScripts[] = self::makeSpecialCode('if (typeof jQuery != "undefined") { jQuery.noConflict(); }');
         $retstring .= self::makeCSSFiles($cssfiles);
@@ -992,7 +992,7 @@ Caution: JS/ALL files are missing. Also, this should probably be loaded through 
         if (empty($code)) {
             return '';
         }
-        
+
         $retcode = "<script type=\"text/javascript\">\n/* <![CDATA[ */\n";
         if (is_array($code)) {
             $retcode .= implode("\r\n", $code);
@@ -1037,7 +1037,7 @@ Caution: JS/ALL files are missing. Also, this should probably be loaded through 
         $content = preg_replace_callback('/<script .*?src=(?:"|\')([^"\']*)(?:"|\').*?\/?>(?:<\/script>)?/i', array('JS', 'registerFromRegex'), $content);
         JS::restoreComments($content);
     }
-    
+
     /**
      * Finds all <link>-Tags in the passed HTML content, strips them out
      * and puts them in the internal CSS placeholder store.
@@ -1063,7 +1063,7 @@ Caution: JS/ALL files are missing. Also, this should probably be loaded through 
         JS::restoreComments($content);
         return $css;
     }
-    
+
     /**
      * Get an array of libraries which are ready to load in different versions
      * @return array the libraries which are ready to configure for skin

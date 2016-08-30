@@ -1,28 +1,28 @@
 <!-- START module_newsletter_email_feedback.html -->
 <table width="100%" border="0" cellpadding="3" cellspacing="0" class="adminlist">
-	<tr>
-		<th colspan="2">{TXT_NEWSLETTER_EMAIL_FEEDBACK}</th>
-	</tr>
-	<tr class="row3">
-		<td style="font-weight:bold; width: 35%;">{TXT_NEWSLETTER_LINK_TITLE}</td>
-		<td style="font-weight:bold; width: 65%;">{TXT_NEWSLETTER_FEEDBACK_RECIPIENTS}</td>
-		<!-- <td style="white-space:nowrap; font-weight:bold; text-align:right; width: 10%;">{TXT_NEWSLETTER_FUNCTIONS}</td> -->
-	</tr>
-	<!-- BEGIN link_list -->
-	<tr class="{NEWSLETTER_LINK_ROW_CLASS}">
-		<td>
+  <tr>
+    <th colspan="2">{TXT_NEWSLETTER_EMAIL_FEEDBACK}</th>
+  </tr>
+  <tr class="row3">
+    <td style="font-weight:bold; width: 35%;">{TXT_NEWSLETTER_LINK_TITLE}</td>
+    <td style="font-weight:bold; width: 65%;">{TXT_NEWSLETTER_FEEDBACK_RECIPIENTS}</td>
+    <!-- <td style="white-space:nowrap; font-weight:bold; text-align:right; width: 10%;">{TXT_NEWSLETTER_FUNCTIONS}</td> -->
+  </tr>
+  <!-- BEGIN link_list -->
+  <tr class="{NEWSLETTER_LINK_ROW_CLASS}">
+    <td>
             <a href="{NEWSLETTER_LINK_URL}" title="{TXT_NEWSLETTER_OPEN_LINK_IN_NEW_TAB}" target="_blank">{NEWSLETTER_LINK_URL}
                 <img src="../core/ContentManager/View/Media/Preview.png" width="13" height="13" />
             </a>
         </td>
-		<td style="white-space:nowrap;">
+    <td style="white-space:nowrap;">
             <!-- <a href="index.php?cmd=Newsletter&amp;act=feedback&amp;link_id={NEWSLETTER_LINK_ID}" title="{TXT_NEWSLETTER_LINK_FEEDBACK_ANALYZE}"> -->{NEWSLETTER_MAIL_USERS} ({NEWSLETTER_LINK_FEEDBACK}%)<!-- </a> -->
         </td>
-		<!-- <td style="white-space:nowrap; text-align:right;">
-			<a href="index.php?cmd=Newsletter&amp;act=feedback&amp;link_id={NEWSLETTER_LINK_ID}" title="{TXT_NEWSLETTER_LINK_FEEDBACK_ANALYZE}"><img src="../core/Core/View/Media/icons/analyze_on.gif" border="0" width="16" height="16" alt="{TXT_NEWSLETTER_LINK_FEEDBACK_ANALYZE}" /></a>
-		</td> -->
-	</tr>
-	<!-- END link_list -->
+    <!-- <td style="white-space:nowrap; text-align:right;">
+      <a href="index.php?cmd=Newsletter&amp;act=feedback&amp;link_id={NEWSLETTER_LINK_ID}" title="{TXT_NEWSLETTER_LINK_FEEDBACK_ANALYZE}"><img src="../core/Core/View/Media/icons/analyze_on.gif" border="0" width="16" height="16" alt="{TXT_NEWSLETTER_LINK_FEEDBACK_ANALYZE}" /></a>
+    </td> -->
+  </tr>
+  <!-- END link_list -->
 </table>
 {NEWSLETTER_LINKS_PAGING}
 <form>

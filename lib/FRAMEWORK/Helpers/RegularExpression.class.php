@@ -48,14 +48,14 @@ class RegularExpression
 {
     /**
      * Regex
-     * 
-     * @var string 
+     *
+     * @var string
      */
     protected $regex = '';
-    
+
     /**
      * Replacement string
-     * 
+     *
      * @var string
      */
     protected $replacement;
@@ -66,24 +66,24 @@ class RegularExpression
      * @var boolean
      */
     protected $hasReplacement = false;
-    
+
     /**
      * Delimiter
-     * 
-     * @var string 
+     *
+     * @var string
      */
     protected $delimiter = '/';
-    
+
     /**
      * Flags
-     * 
+     *
      * @var array
      */
     protected $flags = array();
 
     /**
      * Contructor for RegularExpression
-     * 
+     *
      * @param string $regex Regular expression
      */
     public function __construct($regex = '')
@@ -110,7 +110,7 @@ class RegularExpression
 
     /**
      * Getter for $regex
-     * 
+     *
      * @return string
      */
     function getRegex()
@@ -120,17 +120,17 @@ class RegularExpression
 
     /**
      * Getter for $replacement
-     * 
+     *
      * @return string
      */
     function getReplacement()
     {
         return $this->replacement;
     }
-    
+
     /**
      * Getter for Delimiter
-     * 
+     *
      * @return string
      */
     function getDelimiter()
@@ -140,27 +140,27 @@ class RegularExpression
 
     /**
      * Getter for flags
-     * 
+     *
      * @return array
      */
     function getFlags()
     {
         return $this->flags;
     }
-    
+
     /**
      * Set the regular expression
-     * 
+     *
      * @param string $regex
      */
     function setRegex($regex)
     {
         $this->regex = $regex;
     }
-    
+
     /**
      * Set the replacement string
-     * 
+     *
      * @param string $replacement
      */
     function setReplacement($replacement)
@@ -168,10 +168,10 @@ class RegularExpression
         $this->replacement = $replacement;
         $this->hasReplacement = true;
     }
-    
+
     /**
      * Set the delimiter
-     * 
+     *
      * @param string $delimiter
      */
     function setDelimiter($delimiter)
@@ -181,31 +181,31 @@ class RegularExpression
 
     /**
      * Set the flags
-     * 
+     *
      * @param array $flags
      */
     function setFlags($flags)
     {
         $this->flags = $flags;
     }
-    
+
     /**
      * Match the input string with regular expression
-     * 
+     *
      * @param string $input Input string
-     * 
+     *
      * @return boolean True|False True on regular expression matches the string
      */
     function match($input)
     {
         return preg_match($this->delimiter . $this->regex . $this->delimiter, $input, $matches);
     }
-    
+
     /**
      * Search and replace in the Input string
-     * 
+     *
      * @param string $input Input string
-     * 
+     *
      * @return string Replaced string
      */
     function replace($input)
@@ -215,10 +215,10 @@ class RegularExpression
         }
         return preg_replace($this->delimiter . $this->regex . $this->delimiter, $this->replacement, $input);
     }
-    
+
     /**
      * Return the regular expression concatenated by delimiter
-     * 
+     *
      * @return string Return the regular expression concatenated by delimiter
      */
     function __toString()

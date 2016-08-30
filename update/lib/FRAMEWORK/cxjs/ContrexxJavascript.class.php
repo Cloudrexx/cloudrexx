@@ -78,7 +78,7 @@ class ContrexxJavascript {
 
         $backOrFrontend = $objInit->mode;
         global $objFWUser;
-        $langId; 
+        $langId;
         if($backOrFrontend == "frontend")
             $langId = $objInit->getFrontendLangId();
         else //backend
@@ -101,7 +101,7 @@ class ContrexxJavascript {
         //let i18n set it's variables
         $i18n = new ContrexxJavascriptI18n($langCode);
         $i18n->variablesTo($this);
-        
+
         //determine the correct jquery ui css' path.
         //the user might have overridden the default css in the theme, so look out for this too.
         $jQUiCssPath = 'themes/'.$objInit->getCurrentThemesPath().'/jquery-ui.css'; //customized css would be here
@@ -134,7 +134,7 @@ class ContrexxJavascript {
         //   => in this case, the scope is in parameter value
         //b) no scope was specified
         //   => in this case, we use the default scope 'global'
-        //c) a) and b) occur  
+        //c) a) and b) occur
 
         $multipleValues = is_array($key);
         if(is_null($scope)) {
@@ -148,7 +148,7 @@ class ContrexxJavascript {
         if(!isset($this->variables[$scope])) {
             $this->variables[$scope] = array();
         }
-        
+
         if(!$multipleValues) {
             $this->variables[$scope][$key] = $value;
         }
@@ -184,7 +184,7 @@ class ContrexxJavascript {
      */
     protected function variableConfigJs() {
         $js='';
-        foreach($this->variables as $scope => $variables) {          
+        foreach($this->variables as $scope => $variables) {
             $js  .= 'cx.variables.set(';
             $js .= json_encode($variables);
             $js .= ",'$scope');\n";

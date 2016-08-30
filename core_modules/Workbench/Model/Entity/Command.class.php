@@ -48,46 +48,46 @@ abstract class Command {
      * @var UserInterface
      */
     protected $interface;
-    
+
     /**
      * Command name
      * @var string
      */
     protected $name;
-    
+
     /**
      * Command description
      * @var string
      */
     protected $description;
-    
+
     /**
      * Command synopsis
      * @var string
      */
     protected $synopsis;
-    
+
     /**
      * Command help text
      * @var string
      */
     protected $help;
-    
+
     /**
      * Reference to Cx instance
      * @var \Cx\Core\Core\Controller\Cx
      */
     protected $cx;
-    
+
     /**
      * Loads a command
-     * @param UserInterface $owner 
+     * @param UserInterface $owner
      */
     public function __construct(UserInterface $owner) {
         $this->interface = $owner;
         $this->cx = \Env::get('cx');//\Cx\Core\Core\Controller\Cx::instanciate();
     }
-    
+
     /**
      * Returns the name of this command
      * @return string Command name
@@ -95,7 +95,7 @@ abstract class Command {
     public function getName() {
         return $this->name;
     }
-    
+
     /**
      * Returns the description for this command
      * @return string Command description
@@ -103,7 +103,7 @@ abstract class Command {
     public function getDescription() {
         return $this->description;
     }
-    
+
     /**
      * Returns the synopsis for this command
      * @return string Command synopsis
@@ -111,7 +111,7 @@ abstract class Command {
     public function getSynopsis() {
         return $this->synopsis;
     }
-    
+
     /**
      * Returns the help text for this command
      * @return string Command help text
@@ -119,7 +119,7 @@ abstract class Command {
     public function getHelp() {
         return $this->help;
     }
-    
+
     /**
      * Execute this command
      * @param array $arguments Array of commandline arguments

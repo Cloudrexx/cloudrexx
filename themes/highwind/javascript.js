@@ -108,7 +108,7 @@
         });
         // Add .parent class to appropriate menu items
         $('ul.menu').parent().addClass('parent');
-        
+
         // Add the 'show-nav' class to the body when the nav toggle is clicked
     jQuery( '.nav-toggle' ).click(function(e) {
 
@@ -130,7 +130,7 @@
         // Remove the 'show-nav' class
         jQuery( 'body' ).removeClass( 'show-nav' );
     });
-    
+
     // Remove the 'show-nav' class from the body when the use clicks (taps) outside #navigation
     var hasParent = function(el, id) {
         if (el) {
@@ -146,7 +146,7 @@
         }
         return false;
     };
-    
+
     if (jQuery(window).width() < 991) {
         if (jQuery('body')[0].addEventListener){
             document.addEventListener('touchstart', function(e) {

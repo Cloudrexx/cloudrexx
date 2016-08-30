@@ -142,7 +142,7 @@ EOF;
             $bolShowLevelSelector = false;
             $bolShowCategorySelector = false;
 
-            $arrIds = explode('-', $_GET['cmd']);  
+            $arrIds = explode('-', $_GET['cmd']);
 
             if ($arrIds[0] != 'search' && $arrIds[0] != 'alphabetical'){
                 $objForms = new MediaDirectoryForm(null, $this->moduleName);
@@ -207,7 +207,7 @@ EOF;
         $intCategoryId = isset($_GET['cid']) ? intval($_GET['cid']) : $intCategoryId;
 
         if ($bolShowCategorySelector) {
-        	$objCategories = new MediaDirectoryCategory(null, null, 1, $this->moduleName);
+            $objCategories = new MediaDirectoryCategory(null, null, 1, $this->moduleName);
             $strCategoryDropdown = $objCategories->listCategories($this->_objTpl, 3, $intCategoryId);
             $strCategoryName = $_ARRAYLANG['TXT_MEDIADIR_CATEGORY'];
 
@@ -312,15 +312,15 @@ EOF;
             $arrFoundLevelsCategories = $this->searchLevelsCategories(1, $strTerm, $intCmdFormId);
         }
         $arrFoundIds = array_merge($arrFoundIds, $arrFoundLevelsCategories);
-        
+
         //search countries
         $arrFoundCountries = $this->searchCountries($strTerm, $intCmdFormId);
         $arrFoundIds = array_merge($arrFoundIds, $arrFoundCountries);
-        
+
         if ($intCmdFormId != 0) {
             $arrWhere[] = "rel_inputfield.`form_id` = '".$intCmdFormId."'";
         }
-        
+
         if($objInit->mode == 'frontend') {
             $intToday = time();
             $arrWhere[] = "(`duration_type` = 1 OR (`duration_type` = 2 AND (`duration_start` < '$intToday' AND `duration_end` > '$intToday')))";
@@ -355,7 +355,7 @@ EOF;
                 $strExpTerm = is_array($strExpTerm) ? contrexx_input2db(array_map('trim', $strExpTerm)) : contrexx_input2db(trim($strExpTerm));
                 $strTableName = 'rel_inputfield_'.intval($intInputfieldId);
                 $arrJoins[]  = 'INNER JOIN '.DBPREFIX.'module_'.$this->moduleTablePrefix.'_rel_entry_inputfields AS '.$strTableName.' ON '.$strTableName.'.`entry_id` = entry.id';
-                
+
                 if ($intInputfieldType == '11') { // 11 = classification
                     switch ($this->arrSettings['settingsClassificationSearch']) {
                         case 1:
@@ -397,7 +397,7 @@ EOF;
             ORDER BY
                 '.$order.'
         ';
-        
+
         $objRsSearchEntries = $objDatabase->Execute($query);
         if (!$objRsSearchEntries) {
             return;
@@ -434,7 +434,7 @@ EOF;
     function getSearchCategoryIds($intCatId)
     {
         global $objDatabase;
-        
+
         $objResultSearchCategories = $objDatabase->Execute("SELECT id FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_categories WHERE parent_id='$intCatId'");
 
         if ($objResultSearchCategories) {
@@ -448,31 +448,31 @@ EOF;
             }
         }
     }
-    
+
     //OSEC CUSTOMIZING (ev. �bernehmen und f�r levels ausbauen)
     function searchLevelsCategories($intType, $strTerm, $intCmdFormId)
     {
         global $objDatabase;
-        
+
         $arrFoundIds = array();
         $strWhereForm = $intCmdFormId ? "AND ".DBPREFIX."module_".$this->moduleTablePrefix."_entries.form_id = '".$intCmdFormId."'" : '';
-                        
+
         $objResultSearchCategories = $objDatabase->Execute("
         SELECT
             ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_categories.entry_id AS entry_id
         FROM
             ".DBPREFIX."module_".$this->moduleTablePrefix."_categories_names
-        INNER JOIN 
-            ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_categories 
-        ON 
-            ".DBPREFIX."module_".$this->moduleTablePrefix."_categories_names.category_id = ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_categories.category_id 
-        INNER JOIN 
-            ".DBPREFIX."module_".$this->moduleTablePrefix."_entries 
-        ON 
+        INNER JOIN
+            ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_categories
+        ON
+            ".DBPREFIX."module_".$this->moduleTablePrefix."_categories_names.category_id = ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_categories.category_id
+        INNER JOIN
+            ".DBPREFIX."module_".$this->moduleTablePrefix."_entries
+        ON
             ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_categories.entry_id = ".DBPREFIX."module_".$this->moduleTablePrefix."_entries.id
         WHERE
             ".DBPREFIX."module_".$this->moduleTablePrefix."_categories_names.category_name LIKE '%".$strTerm."%'
-        AND 
+        AND
             ".DBPREFIX."module_".$this->moduleTablePrefix."_entries.active = '1'
             ".$strWhereForm."
         GROUP BY
@@ -484,34 +484,34 @@ EOF;
                 if (!empty($objResultSearchCategories->fields['entry_id'])) {
                     array_push($arrFoundIds, $objResultSearchCategories->fields['entry_id']);
                 }
-                
+
                 $objResultSearchCategories->MoveNext();
             }
         }
-        
+
         return $arrFoundIds;
     }
-    
+
     //OSEC CUSTOMIZING (ev. �bernehmen)
     function searchCountries($strTerm, $intCmdFormId)
     {
         global $objDatabase;
-        
+
         $arrFoundIds = array();
         $strWhereForm = $intCmdFormId ? "AND ".DBPREFIX."module_".$this->moduleTablePrefix."_entries.form_id = '".$intCmdFormId."'" : '';
-        
+
         $objResultSearchCountry = $objDatabase->Execute("
         SELECT
             ".DBPREFIX."module_".$this->moduleTablePrefix."_entries.id AS entry_id
-		FROM
-			".DBPREFIX."module_".$this->moduleTablePrefix."_inputfields
-			INNER JOIN 
-                ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields 
-			ON 
-			    ".DBPREFIX."module_".$this->moduleTablePrefix."_inputfields.id = ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields.field_id
-			INNER JOIN 
-		        ".DBPREFIX."core_country 
-                        ON 
+        FROM
+            ".DBPREFIX."module_".$this->moduleTablePrefix."_inputfields
+            INNER JOIN
+                ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields
+            ON
+                ".DBPREFIX."module_".$this->moduleTablePrefix."_inputfields.id = ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields.field_id
+            INNER JOIN
+                ".DBPREFIX."core_country
+                        ON
                             ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields.value = ".DBPREFIX."core_country.id
                         INNER JOIN
                         ".DBPREFIX."core_text
@@ -519,15 +519,15 @@ EOF;
                             ".DBPREFIX."core_text.id = ".DBPREFIX."core_country.id
                         AND
                             ".DBPREFIX."core_text.key = 'core_country_name'
-                        INNER JOIN 
-                            ".DBPREFIX."module_".$this->moduleTablePrefix."_entries 
-                        ON 
+                        INNER JOIN
+                            ".DBPREFIX."module_".$this->moduleTablePrefix."_entries
+                        ON
                             ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields.entry_id = ".DBPREFIX."module_".$this->moduleTablePrefix."_entries.id
                             WHERE
-                        ".DBPREFIX."module_".$this->moduleTablePrefix."_inputfields.type = '25' 
-                            AND 
-                                ".DBPREFIX."core_text.text LIKE '%".$strTerm."%' 
-                            AND 
+                        ".DBPREFIX."module_".$this->moduleTablePrefix."_inputfields.type = '25'
+                            AND
+                                ".DBPREFIX."core_text.text LIKE '%".$strTerm."%'
+                            AND
                                 ".DBPREFIX."module_".$this->moduleTablePrefix."_entries.active = '1'
                         ".$strWhereForm."
                             GROUP BY
@@ -539,11 +539,11 @@ EOF;
                 if (!empty($objResultSearchCountry->fields['entry_id'])) {
                     array_push($arrFoundIds, $objResultSearchCountry->fields['entry_id']);
                 }
-                
+
                 $objResultSearchCountry->MoveNext();
             }
         }
-        
+
         return array_unique($arrFoundIds);
     }
 }

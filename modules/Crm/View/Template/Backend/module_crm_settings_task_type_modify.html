@@ -1,12 +1,12 @@
 <script type="text/javascript">
-    $J(function(){        
+    $J(function(){
         $J("#addTasktype").submit(function(){
             var errChk;
             if ($J.trim($J("#type_name").val()) == '') {
                 errChk = 1;
                 $J("#type_name").css('border','1px solid red');
             }
-            
+
             if (errChk == 1) {
                 $J('#formerr').html("{TXT_CRM_MANDATORY_FIELDS_NOT_FILLED_OUT}");
                 $J('#formerr').css('display','block');

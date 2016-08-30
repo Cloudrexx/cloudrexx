@@ -52,7 +52,7 @@ class OrderException extends \Exception {}
  * @subpackage  module_order
  */
 class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentController {
-    
+
     const ORDER_ACCESS_ID        = 184;
     const SUBSCRIPTION_ACCESS_ID  = 185;
     const INVOICE_ACCESS_ID       = 186;
@@ -64,36 +64,36 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     public function __construct(\Cx\Core\Core\Model\Entity\SystemComponent $systemComponent, \Cx\Core\Core\Controller\Cx $cx) {
         parent::__construct($systemComponent, $cx);
     }
-    
+
     public function getControllerClasses() {
         return array('Backend', 'Default', 'Invoice', 'Payment', 'Subscription');
     }
-    
+
     public function postResolve(\Cx\Core\ContentManager\Model\Entity\Page $page) {
         $evm = \Env::get('cx')->getEvents();
-        
+
         $crmCrmContactEventListener = new \Cx\Modules\Order\Model\Event\CrmCrmContactEventListener();
         $evm->addModelListener(\Doctrine\ORM\Events::preRemove, 'Cx\\Modules\\Crm\\Model\\Entity\\CrmContact', $crmCrmContactEventListener);
     }
-    
+
     /**
      * get command mode
-     * 
+     *
      * @return type array
      */
-    public function getCommandsForCommandMode() 
+    public function getCommandsForCommandMode()
     {
         return array('Order');
     }
-    
+
     /**
      * execute the command
-     * 
+     *
      * @param string $command Name of command to execute
      * @param array  $arguments List of arguments for the command
      * @param array  $dataArguments (optional) List of data arguments for the command
      */
-    public function executeCommand($command, $arguments, $dataArguments = array()) 
+    public function executeCommand($command, $arguments, $dataArguments = array())
     {
         $subcommand = null;
         if (!empty($arguments[0])) {
@@ -113,10 +113,10 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 break;
         }
     }
-    
+
     /**
      * Api Cron command
-     * 
+     *
      * @return type null
      */
     public function executeCommandCron()
@@ -128,7 +128,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         //  Terminate the active and expired subscription.
         $this->terminateExpiredSubscriptions();
     }
-    
+
     /**
      * Inform the product entities that their associated Subscription has expired
      *
@@ -140,7 +140,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     {
         $subscriptionRepo = \Env::get('em')->getRepository('Cx\Modules\Order\Model\Entity\Subscription');
         $subscriptions    = $subscriptionRepo->getExpiredSubscriptions();
-        
+
         if (\FWValidator::isEmpty($subscriptions)) {
             return;
         }
@@ -169,17 +169,17 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         $subscriptions    = $subscriptionRepo->getExpiredSubscriptions(array(
                                 \Cx\Modules\Order\Model\Entity\Subscription::STATE_ACTIVE,
                                 \Cx\Modules\Order\Model\Entity\Subscription::STATE_CANCELLED));
-        
+
         if (\FWValidator::isEmpty($subscriptions)) {
             return;
         }
-        
+
         foreach ($subscriptions as $subscription) {
             $subscription->terminate();
         }
         \Env::get('em')->flush();
     }
-    
+
     /**
      * Register model events related to Order component
      */

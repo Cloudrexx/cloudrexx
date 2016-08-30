@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 
 namespace Cx\Core_Modules\TemplateEditor\Controller;
 
@@ -131,7 +131,7 @@ class JsonController extends \Cx\Core\Core\Model\Entity\Controller implements Js
 
     /**
      * Update the value of a option for a specific template.
-     * 
+     *
      * @param array $params List of get and post parameters which were sent to
      *                      the json adapter.
      *
@@ -198,7 +198,7 @@ class JsonController extends \Cx\Core\Core\Model\Entity\Controller implements Js
             return;
         }
         $presetName            =  $params['post']['preset'];
-        $themeID               = isset($params['post']['tid']) ? 
+        $themeID               = isset($params['post']['tid']) ?
             intval($params['post']['tid']) : 1;
         $themeRepository       = new ThemeRepository();
         $theme                 = $themeRepository->findById($themeID);
@@ -241,7 +241,7 @@ class JsonController extends \Cx\Core\Core\Model\Entity\Controller implements Js
         if (isset($params['post']['presetpreset']) && Preset::isValidPresetName($params['post']['presetpreset'])) {
             $presetPresetName =  $params['post']['presetpreset'];
         }
-        $themeID               = isset($params['post']['tid']) ? 
+        $themeID               = isset($params['post']['tid']) ?
             intval($params['post']['tid']) : 1;
         $themeRepository       = new ThemeRepository();
         $theme                 = $themeRepository->findById($themeID);
@@ -272,11 +272,11 @@ class JsonController extends \Cx\Core\Core\Model\Entity\Controller implements Js
         global $_ARRAYLANG;
 
         \Env::get('init')->loadLanguageData('TemplateEditor');
-     
+
         if (!Preset::isValidPresetName($params['post']['preset'])) {
             return;
-        }   
-        
+        }
+
         $presetName = $params['post']['preset'];
         /**
          * Default shouldn't be deletable
@@ -284,7 +284,7 @@ class JsonController extends \Cx\Core\Core\Model\Entity\Controller implements Js
         if ($presetName == 'Default') {
             throw new \LogicException($_ARRAYLANG['TXT_CORE_MODULE_TEMPLATEEDITOR_REMOVE_PRESET_DEFAULT_WARNING']);
         }
-        $themeID               = isset($params['post']['tid']) ? 
+        $themeID               = isset($params['post']['tid']) ?
             intval($params['post']['tid']) : 1;
         $themeRepository       = new ThemeRepository();
         $theme                 = $themeRepository->findById($themeID);
@@ -314,7 +314,7 @@ class JsonController extends \Cx\Core\Core\Model\Entity\Controller implements Js
      *                      the json adapter.
      */
     public function resetPreset($params) {
-        $themeID               = isset($params['post']['tid']) ? 
+        $themeID               = isset($params['post']['tid']) ?
             intval($params['post']['tid']) : 1;
         $activePreset = $_SESSION['TemplateEditor'][$themeID]['activePreset'];
         $_SESSION['TemplateEditor'][$themeID] = array();

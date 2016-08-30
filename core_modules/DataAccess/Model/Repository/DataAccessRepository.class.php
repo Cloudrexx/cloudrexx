@@ -47,7 +47,7 @@ use Doctrine\ORM\EntityRepository;
  * @subpackage  coremodule_dataaccess
  */
 class DataAccessRepository extends EntityRepository {
-    
+
     /**
      * Tries to find a matching DataAccess entity for the given criteria
      * @param \Cx\Core_Modules\DataAccess\Controller\OutputController $outputModule Output module to use for parsing
@@ -58,14 +58,14 @@ class DataAccessRepository extends EntityRepository {
      */
     public function getAccess($outputModule, $dataSource, $method, $requestApiKey) {
         $requestReadonly = in_array($method, array('options', 'head', 'get'));
-        
+
         // do we have a DataAccess for this DataSource?
         $dataAccesses = $dataSource->getDataAccesses();
         if (!$dataAccesses->count()) {
             \DBG::msg('This DataSource has no DataAccess!');
             return null;
         }
-        
+
         // does our apiKey match with one or more of the DataAccesses?
         $validApiKeys = array();
         foreach ($dataAccesses as $dataAccess) {
@@ -75,15 +75,15 @@ class DataAccessRepository extends EntityRepository {
                 if (!$requestReadonly && $apiKey->getReadOnly()) {
                     continue;
                 }
-                
+
                 if ($apiKey->getApiKey()->getApiKey() != $requestApiKey) {
                     continue;
                 }
-                
+
                 $validApiKeys[] = $apiKey;
             }
         }
-        
+
         // $validApiKeys now contains all DataAccessApiKey entities that allow
         // this request. If there's at least one, this user has access to this
         // DataAccess object.
@@ -91,12 +91,12 @@ class DataAccessRepository extends EntityRepository {
             \DBG::msg('There\'s no DataAccess with a matching API key!');
             return null;
         }
-        
+
         // Now let's check if one of the remaining data access objects allow
         // access:
         foreach ($validApiKeys as $apiKey) {
             $dataAccess = $apiKey->getDataAccess();
-            
+
             $permission = null;
             if ($requestReadonly) {
                 $permission = $dataAccess->getReadPermission();
@@ -110,7 +110,7 @@ class DataAccessRepository extends EntityRepository {
         \DBG::msg('Your API key does not allow access to this DataSource!');
         return null;
     }
-    
+
     /**
      * Returns the HTTP method names you're allowed to use for this DataSource with this API key
      * @param \Cx\Core\DataSource\Model\Entity\DataSource $dataSource Requested DataSource
@@ -121,11 +121,11 @@ class DataAccessRepository extends EntityRepository {
         $baseMethods = array('OPTIONS');
         $readMethods = array('HEAD', 'GET');
         $writeMethods = array('PUT', 'PATCH', 'POST', 'DELETE');
-        
+
         $hasAccess = false;
         $canRead = false;
         $canWrite = false;
-        
+
         foreach ($dataSource->getDataAccesses() as $dataAccess) {
             $apiKeys = $dataAccess->getDataAccessApiKeys();
             foreach ($apiKeys as $apiKey) {
@@ -133,14 +133,14 @@ class DataAccessRepository extends EntityRepository {
                     continue;
                 }
                 $hasAccess = true;
-                
+
                 if (
                     !$dataAccess->getReadPermission() ||
                     $dataAccess->getReadPermission()->hasAccess()
                 ) {
                     $canRead = true;
                 }
-                
+
                 if (
                     !$apiKey->getReadOnly() &&
                     (
@@ -152,7 +152,7 @@ class DataAccessRepository extends EntityRepository {
                 }
             }
         }
-        
+
         $allowedMethods = array();
         if ($hasAccess) {
             $allowedMethods = array_merge($allowedMethods, $baseMethods);
@@ -166,4 +166,3 @@ class DataAccessRepository extends EntityRepository {
         return $allowedMethods;
     }
 }
-

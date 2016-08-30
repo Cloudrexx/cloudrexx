@@ -35,23 +35,23 @@
 
             <div class="line big_space last" id="types">
                 <input type="hidden" name="page[type]" value="off" />
-                
+
                 <input type="radio" name="page[type]" value="content" id="type_content" class="radio" checked="checked" />
                 <label for="type_content">{TXT_CORE_CM_TYPE_CONTENT}</label>
                 <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_CORE_CM_TYPE_CONTENT_INFO}</span>
-                
+
                 <input type="radio" name="page[type]" value="redirect" id="type_redirect" class="radio" />
                 <label for="type_redirect">{TXT_CORE_CM_TYPE_REDIRECT}</label>
                 <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_CORE_CM_TYPE_REDIRECT_INFO}</span>
-                
+
                 <input type="radio" name="page[type]" value="symlink" id="type_symlink" class="radio" />
                 <label for="type_symlink">{TXT_CORE_CM_TYPE_SYMLINK}</label>
                 <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_CORE_CM_TYPE_SYMLINK_INFO}</span>
-                
+
                 <input type="radio" name="page[type]" value="application" id="type_application" class="radio" />
                 <label for="type_application">{TXT_CORE_CM_TYPE_APPLICATION}</label>
                 <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_CORE_CM_TYPE_APPLICATION_INFO}</span>
-                
+
                 <input type="radio" name="page[type]" value="fallback" id="type_fallback" class="radio hidable_nofallback" />
                 <label for="type_fallback" class="hidable_nofallback">{TXT_CORE_CM_TYPE_FALLBACK} <strong id="fallback"></strong></label>
                 <span class="icon-info tooltip-trigger hidable_nofallback"></span><span class="tooltip-message">{TXT_CORE_CM_TYPE_FALLBACK_INFO}</span>
@@ -148,7 +148,7 @@
                 <span id="page_slug_base_url">{CONTREXX_BASE_URL}</span><span id="page_slug_breadcrumb">{CONTREXX_LANG}/</span>
                 <input type="text" name="page[slug]" id="page_slug" />
             </div>
-            
+
             <div class="line small_space">
                 <label for="page_alias">{TXT_CORE_CM_ALIAS}</label>
                 <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_CORE_CM_ALIAS_INFO}</span>
@@ -271,7 +271,7 @@
                 <select class="select_small" id="page_skin" name="page[skin]">
                     <option value="0">(Default)</option>
                     {SKIN_OPTIONS}
-                </select>                
+                </select>
                 <label><input type="checkbox" name="page[useSkinForAllChannels]" value="1" id="use-skin-all-channels" />{TXT_CORE_CM_USE_ALL_CHANNELS}</label>
                 <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_CORE_CM_USE_SKIN_ALL_CHANNELS_INFO}</span>
                 <div class="inherit">
@@ -287,7 +287,7 @@
             <div class="line big_space">
                 <select class="select_small" id="page_custom_content" name="page[customContent]">
                     <option value="">(Default)</option>
-                </select> 
+                </select>
                 <label><input type="checkbox" name="page[useCustomContentForAllChannels]" value="1" id="use-custom-content-all-channels" />{TXT_CORE_CM_USE_ALL_CHANNELS}</label>
                 <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_CORE_CM_USE_CUSTOM_CONTENT_ALL_CHANNELS_INFO}</span>
                 <div class="inherit">
@@ -302,7 +302,7 @@
             <div class="line big_space">
                 <select class="select_small" id="page_application_template" name="page[applicationTemplate]">
                     <option value="">(Default)</option>
-                </select>                
+                </select>
                 <label><input type="checkbox" name="page[useCustomApplicationTemplateForAllChannels]" value="1" id="use-custom-application-template-for-all-channels" />{TXT_CORE_CM_USE_ALL_CHANNELS}</label>
                 <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_CORE_CM_USE_APPLICATION_TEMPLATE_ALL_CHANNELS_INFO}</span>
             </div>

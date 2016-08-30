@@ -33,7 +33,7 @@ echo marketUpdates();
 function marketUpdates() {
     //Update the database changes
     try {
-        //update module name 
+        //update module name
         \Cx\Lib\UpdateUtil::sql("UPDATE `".DBPREFIX."modules` SET `name` = 'Market' WHERE `id` = 33");
         //update navigation url
         \Cx\Lib\UpdateUtil::sql("UPDATE `".DBPREFIX."backend_areas` SET `uri` = 'index.php?cmd=Market' WHERE `area_id` = 98");
@@ -44,10 +44,10 @@ function marketUpdates() {
     } catch (\Cx\Lib\UpdateException $e) {
         return "Error: $e->sql";
     }
-    
+
     //Update script for moving the folder
     $marketMediaPath = ASCMS_DOCUMENT_ROOT . '/media';
-    
+
     try {
         if (file_exists($marketMediaPath . '/market') && !file_exists($marketMediaPath . '/Market')) {
             \Cx\Lib\FileSystem\FileSystem::makeWritable($marketMediaPath . '/market');
@@ -58,6 +58,6 @@ function marketUpdates() {
     } catch (\Cx\Lib\FileSystem\FileSystemException $e) {
         return $e->getMessage();
     }
-    
+
     return 'Market updated successfully.';
 }

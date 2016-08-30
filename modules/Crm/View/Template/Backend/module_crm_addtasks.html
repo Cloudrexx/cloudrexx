@@ -37,13 +37,13 @@
             }
         });
     });
-    function changeCustomer(customerId, customerName) { 
+    function changeCustomer(customerId, customerName) {
        $J('#customerId').val(customerId);
        $J('#customer_name').val(customerName);
 
        // trigger the change event to update the customer contact option
        $J('#customer_name').trigger('change');
-   }    
+   }
     /* ]]> */
 </script>
 <script language="JavaScript" type="text/javascript">
@@ -65,7 +65,7 @@
         $J('input[name=date]').datetimepicker(dpOptions);
 
     }, true);
-    $J(function(){     
+    $J(function(){
         if ($J('#assigned_to').val() == 0 || $J('#assigned_to').val() == logged_in_user) {
             $J('#notify').attr('disabled', 'disabled');
         }
@@ -80,24 +80,24 @@
     });
 
     function checkValidations() {
-        $J("input, select").css("border","1px solid #0A50A1"); 
+        $J("input, select").css("border","1px solid #0A50A1");
         var errors =new  Array();
-        var errChk;        
+        var errChk;
         if(document.getElementById("taskTitle").value.trim() == "") {
             errChk = 1;
-            document.getElementById("taskTitle").style.border = "1px solid red";            
-        }        
+            document.getElementById("taskTitle").style.border = "1px solid red";
+        }
         if(document.getElementById("taskType").value.trim() == "") {
             errChk = 1;
-            document.getElementById("taskType").style.border = "1px solid red";            
-        }        
+            document.getElementById("taskType").style.border = "1px solid red";
+        }
         if(document.getElementById("customerId").value == "0") {
             errChk = 1;
-            document.getElementById("customer_name").style.border = "1px solid red";         
+            document.getElementById("customer_name").style.border = "1px solid red";
         }
-        return showErrors(errors, errChk);       
+        return showErrors(errors, errChk);
     }
-    
+
     function showErrors(errors,  errChk) {
         if ( errors.length >= 1 || errChk == 1) {
             if (errChk == 1 && errors.length >= 1) {
@@ -169,7 +169,7 @@
                 <div class="taskTypeTitle">{TXT_TASKTYPE_NAME}</div>
             </div>
         </a>
-        <!-- END Tasktype -->        
+        <!-- END Tasktype -->
     </div>
 </div>
 <br>

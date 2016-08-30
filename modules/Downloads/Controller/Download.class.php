@@ -76,21 +76,21 @@ class Download {
      * @var array
      */
     private $source_names;
-    
+
     /**
      * Filetype in loaded interface language (LANG_ID)
-     * 
-     * @var string 
+     *
+     * @var string
      */
     private $fileType;
-    
+
     /**
      * Filetypes of all languages
-     * 
-     * @var string 
+     *
+     * @var string
      */
     private $fileTypes;
-    
+
     private $size;
     private $image;
     private $owner_id;
@@ -462,12 +462,12 @@ class Download {
         }
         return isset($this->metakeys[$langId]) ? $this->metakeys[$langId] : '';
     }
-    
+
     /**
      * Get the File type using interface language
-     * 
+     *
      * @param  integer $langId The language ID
-     * 
+     *
      * @return string          Filetype in loaded interface language (LANG_ID)
      */
     public function getFileType($langId = LANG_ID)
@@ -1272,24 +1272,24 @@ class Download {
 
         foreach ($arrNewLocales as $langId) {
             if ($objDatabase->Execute(
-                    "INSERT INTO `".DBPREFIX."module_downloads_download_locale` 
+                    "INSERT INTO `".DBPREFIX."module_downloads_download_locale`
                     (
-                        `lang_id`, 
-                        `download_id`, 
-                        `name`, 
-                        `description`, 
-                        `metakeys`, 
-                        `source`, 
-                        `source_name`, 
+                        `lang_id`,
+                        `download_id`,
+                        `name`,
+                        `description`,
+                        `metakeys`,
+                        `source`,
+                        `source_name`,
                         `file_type`
-                    ) 
+                    )
                     VALUES (
-                        ".$langId.", 
-                        ".$this->id.", 
+                        ".$langId.",
+                        ".$this->id.",
                         '".addslashes($this->names[$langId])."',
-                        '".addslashes($this->descriptions[$langId])."', 
-                        '".addslashes($this->metakeys[$langId])."', 
-                        '".addslashes($this->sources[$langId])."', 
+                        '".addslashes($this->descriptions[$langId])."',
+                        '".addslashes($this->metakeys[$langId])."',
+                        '".addslashes($this->sources[$langId])."',
                         '".addslashes($this->source_names[$langId])."',
                         '".addslashes($this->fileTypes[$langId])."'
                     )"
@@ -1313,12 +1313,12 @@ class Download {
                 $this->fileTypes[$langId] != $arrOldLocales[$langId]['file_type']
             ) {
                 if ($objDatabase->Execute(
-                "UPDATE `".DBPREFIX."module_downloads_download_locale` 
-                    SET 
-                        `name`        = '".addslashes($this->names[$langId])."', 
+                "UPDATE `".DBPREFIX."module_downloads_download_locale`
+                    SET
+                        `name`        = '".addslashes($this->names[$langId])."',
                         `description` = '".addslashes($this->descriptions[$langId])."',
                         `metakeys`    = '".addslashes($this->metakeys[$langId])."',
-                        `source`      = '".addslashes($this->sources[$langId])."', 
+                        `source`      = '".addslashes($this->sources[$langId])."',
                         `source_name` = '".addslashes($this->source_names[$langId])."',
                         `file_type`   = '".addslashes($this->fileTypes[$langId]).
                         "' WHERE `download_id` = ".$this->id." AND `lang_id` = ".$langId
@@ -1555,15 +1555,15 @@ class Download {
 
     /**
      * Get the File Type Icon
-     * 
-     * @return string 
+     *
+     * @return string
      */
     public function getFileIcon()
     {
-        $source = ($this->type == 'url') 
-                    ? $this->getSource() 
-                    : \Cx\Core\Core\Controller\Cx::instanciate()->getWebsiteDocumentRootPath() . '/' . $this->getSource(); 
-        
+        $source = ($this->type == 'url')
+                    ? $this->getSource()
+                    : \Cx\Core\Core\Controller\Cx::instanciate()->getWebsiteDocumentRootPath() . '/' . $this->getSource();
+
         return \Cx\Core_Modules\Media\Controller\MediaLibrary::getFileTypeIconWebPath($source, $this->getFileType());
     }
 

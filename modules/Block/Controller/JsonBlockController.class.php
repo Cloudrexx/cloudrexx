@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,10 +24,10 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * JSON Adapter for Block
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
@@ -73,7 +73,7 @@ class BlockCouldNotBeSavedException extends JsonBlockException {}
 
 /**
  * JSON Adapter for Block
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
@@ -91,11 +91,11 @@ class JsonBlockController extends \Cx\Core\Core\Model\Entity\Controller implemen
      * Returns the internal name used as identifier for this adapter
      * @return String Name of this adapter
      */
-    public function getName() 
+    public function getName()
     {
         return 'Block';
     }
-    
+
     /**
      * Returns default permission as object
      * @return Object
@@ -104,7 +104,7 @@ class JsonBlockController extends \Cx\Core\Core\Model\Entity\Controller implemen
     {
         return new \Cx\Core_Modules\Access\Model\Entity\Permission(null, array('get'), true);
     }
-    
+
     /**
      * Returns an array of method names accessable from a JSON request
      * @return array List of method names
@@ -129,9 +129,9 @@ class JsonBlockController extends \Cx\Core\Core\Model\Entity\Controller implemen
 
     /**
      * Get countries from given name
-     * 
-     * @param array $params Get parameters, 
-     * 
+     *
+     * @param array $params Get parameters,
+     *
      * @return array Array of countries
      */
     public function getCountries($params)
@@ -184,7 +184,7 @@ class JsonBlockController extends \Cx\Core\Core\Model\Entity\Controller implemen
 
     /**
      * Get the block content as html
-     * 
+     *
      * @param array $params all given params from http request
      * @throws NoPermissionException
      * @throws NotEnoughArgumentsException
@@ -232,7 +232,7 @@ class JsonBlockController extends \Cx\Core\Core\Model\Entity\Controller implemen
         if ($result === false || $result->RecordCount() == 0) {
             throw new NoBlockFoundException('no block content found with id: ' . $id);
         }
-        
+
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $ls = new \LinkSanitizer(
             $cx,
@@ -285,7 +285,7 @@ class JsonBlockController extends \Cx\Core\Core\Model\Entity\Controller implemen
             throw new BlockCouldNotBeSavedException('block could not be saved');
         }
         \LinkGenerator::parseTemplate($content);
-        
+
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $ls = new \LinkSanitizer(
             $cx,

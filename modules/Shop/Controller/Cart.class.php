@@ -1001,7 +1001,7 @@ die("Cart::view(): ERROR: No template");
                 ));
             }
         }
-        if (self::needs_shipment()) { 
+        if (self::needs_shipment()) {
             $objTemplate->setVariable(array(
                 'TXT_SHIP_COUNTRY' => $_ARRAYLANG['TXT_SHIP_COUNTRY'],
                 // Old, obsolete

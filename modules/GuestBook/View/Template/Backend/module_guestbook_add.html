@@ -2,59 +2,59 @@
 {GUESTBOOK_JAVASCRIPT}
 <form name="guestbookForm" action="?cmd=GuestBook&amp;act=store" method="post" onsubmit="return validate()">
   <table class="adminlist" width="100%" cellpadding="3" cellspacing="0">
-    <tr> 
+    <tr>
       <th nowrap="nowrap" colspan="2">{TXT_ADD_ENTRY}</th>
     </tr>
-    <tr class="row1" valign="top"> 
+    <tr class="row1" valign="top">
       <td nowrap="nowrap">{TXT_FORENAME}/{TXT_NAME}&nbsp;<span class="status"><b />*<b /></span></td>
-      <td> 
+      <td>
         <input style="width: 172px;" maxlength="255" name="forename" id="forename" value="{GUESTBOOK_FORENAME}" size="40" />
         <input style="width: 172px;" maxlength="255" name="name" id="name" value="{GUESTBOOK_NAME}" size="40" />
       </td>
     </tr>
-    <tr class="row2" valign="top"> 
+    <tr class="row2" valign="top">
       <td nowrap="nowrap">{TXT_COMMENT}&nbsp;<span class="status"><b>*</b></span></td>
-      <td> 
+      <td>
         <textarea style="width: 350px;" name="comment" id="comment" rows="6" cols="60">{GUESTBOOK_COMMENT}</textarea>
       </td>
     </tr>
-    <tr class="row1" valign="top"> 
+    <tr class="row1" valign="top">
       <td nowrap="nowrap">{TXT_LOCATION}&nbsp;<span class="status"><b>*</b></span></td>
-      <td> 
+      <td>
         <input style="width: 350px;" maxlength="255" name="location" id="location" value="{GUESTBOOK_LOCATION}" size="40" />
       </td>
     </tr>
-    <tr class="row2" valign="top"> 
+    <tr class="row2" valign="top">
       <td nowrap="nowrap">{TXT_SEX}&nbsp;<span class="status"><b>*</b></span></td>
-      <td> 
+      <td>
         <input type="radio" value="F" name="malefemale" {GUESTBOOK_CHECKED_F} />
-        {TXT_FEMALE}      
+        {TXT_FEMALE}
         <input type="radio" value="M" name="malefemale" {GUESTBOOK_CHECKED_M} />
         {TXT_MALE}
       </td>
     </tr>
-    <tr class="row1" valign="top"> 
+    <tr class="row1" valign="top">
       <td nowrap="nowrap">{TXT_EMAIL}l&nbsp;<span class="status"><b>*</b></span></td>
       <td>
         <input style="width: 350px;" maxlength="255" size="40" name="email" id="email" value="{GUESTBOOK_MAIL}" />
       </td>
     </tr>
-    <tr class="row2" valign="top"> 
+    <tr class="row2" valign="top">
       <td nowrap="nowrap">{TXT_HOMEPAGE}</td>
-      <td> 
+      <td>
         <input style="width: 350px;" maxlength="255" size="40" name="url" value="http://{GUESTBOOK_URL}" />
       </td>
     </tr>
-    <tr class="row1" valign="top"> 
+    <tr class="row1" valign="top">
       <td nowrap="nowrap">{TXT_IP_ADDRESS}</td>
-      <td> 
+      <td>
         <input style="width: 350px;" maxlength="255" size="40" name="ip" value="{GUESTBOOK_IP}" />
       </td>
     </tr>
   </table>
   <br />
   <input type="reset" value="{TXT_RESET}" name="Submit" />
-  <input type="submit" value="{TXT_STORE}" name="Submit" />  
+  <input type="submit" value="{TXT_STORE}" name="Submit" />
   <br />
 </form>
 <!-- END guestbook_add.html -->

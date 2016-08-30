@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Cloudrexx ClassLoader
  *
@@ -33,7 +33,7 @@
  * @package     cloudrexx
  * @subpackage  core_classloader
  */
- 
+
 namespace Cx\Core\ClassLoader;
 
 /**
@@ -49,7 +49,7 @@ class ClassLoader {
     private $customizingPath;
     private $legacyClassLoader = null;
     private $cx = null;
-    
+
     /**
      * To use LegacyClassLoader config.php and set_constants.php must be loaded
      * If they are not present, set $useLegacyAsFallback to false!
@@ -73,12 +73,12 @@ class ClassLoader {
             }
         }
         spl_autoload_register(array($this, 'autoload'));
-        
+
         if ($useLegacyAsFallback) {
             $this->legacyClassLoader = new LegacyClassLoader($this, $cx);
         }
     }
-    
+
     /**
      * This needs to be public because Doctrine tries to load a class using all
      * registered autoloaders.
@@ -95,7 +95,7 @@ class ClassLoader {
         }
         $this->loadLegacy($name);
     }
-    
+
     private function load($name, &$resolvedPath) {
         if (substr($name, 0, 1) == '\\') {
             $name = substr($name, 1);
@@ -108,7 +108,7 @@ class ClassLoader {
         if (substr($name, 0, 8) == 'PHPUnit_') {
             return false;
         }
-        
+
         $suffix = '.class';
         if ($parts[0] == 'Cx') {
             // Exception for model, its within /model/[entities|events]/cx/model/
@@ -122,14 +122,14 @@ class ClassLoader {
                     $suffix = '';
                 }
                 $parts = array_merge(array('Cx', 'Model', $third), $parts);
-                
+
             // Exception for lib, its within /model/FRAMEWORK/
             } else if ($parts[1] == 'Lib') {
                 unset($parts[0]);
                 unset($parts[1]);
                 $parts = array_merge(array('Cx', 'Lib', 'FRAMEWORK'), $parts);
             }
-        
+
         // Exception for overwritten gedmo classes, they are within /model/entities/Gedmo
         // This is not ideal, maybe move the classes somewhere
         } else if ($parts[0] == 'Gedmo') {
@@ -150,7 +150,7 @@ class ClassLoader {
             $suffix = '';
             $parts = array_merge(array('Cx', 'Lib', 'doctrine', 'vendor'), $parts);
         }
-        
+
         // we don't need the Cx part
         unset($parts[0]);
         // core, lib, model, etc. are lowercase by design
@@ -168,7 +168,7 @@ class ClassLoader {
             }
             $path .= $part;
         }
-        
+
         $resolvedPath = $path . '/' . $className . $suffix . '.php';
         if (preg_match('/Exception/', $className) && !$this->loadFile($resolvedPath)) {
             $className = preg_replace('/Exception/', '', $className);
@@ -182,9 +182,9 @@ class ClassLoader {
         //echo '<span style="color: red;">' . implode('\\', $parts) . '</span>';
         return false;
     }
-    
+
     public function loadFile($path) {
-        
+
         $path = $this->getFilePath($path);
         if (!$path) {
             return false;
@@ -201,7 +201,7 @@ class ClassLoader {
      *
      * 1. If we are in FRONTEND mode and the file is part of the 'view' layer
      *      (it is located within the 'View' folder of its component), then it
-     *      will return the path to the customized version of the file in the 
+     *      will return the path to the customized version of the file in the
      *      currently active design theme (if it does exist at all).
      *      Note that the folder 'View' is being left out in the design theme as
      *      only files of the 'View' folder can be loaded from the design theme.
@@ -230,7 +230,7 @@ class ClassLoader {
      *                                  Otherwise it is set to FALSE.
      * @param   boolean $webPath        Whether or not to return the absolute
      *                                  file system path of the customized file.
-     *                                  IMPORTANT: This will cause the algorithm 
+     *                                  IMPORTANT: This will cause the algorithm
      *                                  to cut of any URL arguments from the
      *                                  file path like '?foo=bar' or '#foo', to
      *                                  be able to successfully locate dynamic
@@ -319,7 +319,7 @@ class ClassLoader {
             return false;
         }
 
-        // check if InitCMS has been initialized yet 
+        // check if InitCMS has been initialized yet
         $objInit = \Env::get('init');
         if (!$objInit) {
             return false;
@@ -435,13 +435,13 @@ class ClassLoader {
     public function getWebFilePath($file, &$isCustomized = false, &$isWebsite = false) {
         return $this->getFilePath($file, $isCustomized, $isWebsite, true);
     }
-    
+
     private function loadLegacy($name) {
         if ($this->legacyClassLoader) {
             $this->legacyClassLoader->autoload($name);
         }
     }
-    
+
     /**
      * Tests if a class is available. You may specify if legacy and customizing
      * can be used to load it if necessary.
@@ -449,7 +449,7 @@ class ClassLoader {
      * @param string $class Class name to look for
      * @param boolean $useLegacy (optional) Wheter to allow usage of legacy class loader or not (default false)
      * @param boolean $useCustomizing (optional) Wheter to allow usage of customizings or not (default true)
-     * @return boolean True if class could be found using the allowed methods, false otherwise 
+     * @return boolean True if class could be found using the allowed methods, false otherwise
      */
     public function classExists($class, $useLegacy = false, $useCustomizing = true) {
         if ($useLegacy) {
@@ -467,4 +467,3 @@ class ClassLoader {
         return $ret;
     }
 }
-

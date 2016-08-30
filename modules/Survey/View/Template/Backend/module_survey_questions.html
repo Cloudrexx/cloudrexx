@@ -1,17 +1,17 @@
 <!-- BEGIN ShowQuestions -->
-<tr class="{ENTRY_ROWCLASS} questions-ui-sortable-row" id="questions_{SURVEY_ID}">                
+<tr class="{ENTRY_ROWCLASS} questions-ui-sortable-row" id="questions_{SURVEY_ID}">
      <td>
          <span class="ui-icon ui-icon-arrowthick-2-n-s"></span>&nbsp;&nbsp;{SURVEY_QUESTION}
      </td>
      <td>{SURVEY_QUESTION_CREATED_AT}</td>
      <td style="text-align:left;padding-left:2px;">{SURVEY_QUESTION_TYPE}</td>
-     <td>{SURVEY_QUESTION_COMMENTABLE}</td>    
-     <td>{SURVEY_COUNTER}</td>                     
+     <td>{SURVEY_QUESTION_COMMENTABLE}</td>
+     <td>{SURVEY_COUNTER}</td>
      <td nowrap="nowrap">
           <div align="right" style="padding-right:5px;">
             <a href="../index.php?section=Survey&cmd=questionpreview&id={SURVEY_ID}" title="{TXT_ANALYSE_QUESTION_PREVIEW}" target="_blank" rel="gb_page_fs[]">
               <img src="../core/Core/View/Media/icons/preview.png" border="0" alt="{TXT_ANALYSE_QUESTION_PREVIEW}" title="{TXT_ANALYSE_QUESTION_PREVIEW}" />
-            </a>		 
+            </a>
             <a href="javascript:void(0);" class="edit_question" data-id="{SURVEY_ID}" target="_self" title="{TXT_IMAGE_EDIT}">
               <img src="../core/Core/View/Media/icons/edit.gif" border="0" alt="{TXT_IMAGE_EDIT}" title="{TXT_SURVEY_EDIT_TXT}" />
             </a>
@@ -21,9 +21,9 @@
           </div>
       </td>
 </tr>
-<!-- END ShowQuestions -->	
-<!-- BEGIN noSurveyQuestions -->	
+<!-- END ShowQuestions -->
+<!-- BEGIN noSurveyQuestions -->
 <tr>
     <td colspan="8"><i>{TXT_SERVEY_NO_QUESTIONS}</i></td>
 </tr>
-<!-- END noSurveyQuestions -->	            
+<!-- END noSurveyQuestions -->

@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Class Job
  *
@@ -40,7 +40,7 @@ class JobException extends \Exception {}
 
 /**
  * Class Job
- * 
+ *
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
@@ -53,28 +53,28 @@ class Job extends \Cx\Model\Base\EntityBase {
     protected $id;
     /**
      *
-     * @var boolean $active 
+     * @var boolean $active
      */
     protected $active;
     /**
      *
-     * @var string $expression 
+     * @var string $expression
      */
     protected $expression;
     /**
      *
-     * @var string $command 
+     * @var string $command
      */
     protected $command;
     /**
      *
-     * @var datetime $lastRan 
+     * @var datetime $lastRan
      */
     protected $lastRan;
-    
+
     /**
      * Get the id
-     * 
+     *
      * @return integer $id
      */
     public function getId() {
@@ -83,16 +83,16 @@ class Job extends \Cx\Model\Base\EntityBase {
 
     /**
      * Set the id
-     * 
+     *
      * @param integer $id
      */
     public function setId($id) {
         $this->id = $id;
     }
-    
+
     /**
      * Get the active
-     * 
+     *
      * @return boolean $active
      */
     public function getActive() {
@@ -100,7 +100,7 @@ class Job extends \Cx\Model\Base\EntityBase {
     }
     /**
      * Set the active
-     * 
+     *
      * @param boolean $active
      */
     public function setActive($active) {
@@ -108,7 +108,7 @@ class Job extends \Cx\Model\Base\EntityBase {
     }
     /**
      * Get the expression
-     * 
+     *
      * @return string expression
      */
     public function getExpression() {
@@ -116,7 +116,7 @@ class Job extends \Cx\Model\Base\EntityBase {
     }
     /**
      * Set the expression
-     * 
+     *
      * @param string $expression
      */
     public function setExpression($expression) {
@@ -124,7 +124,7 @@ class Job extends \Cx\Model\Base\EntityBase {
     }
     /**
      * Get the command
-     * 
+     *
      * @return string command
      */
     public function getCommand() {
@@ -132,7 +132,7 @@ class Job extends \Cx\Model\Base\EntityBase {
     }
     /**
      * Set the command
-     * 
+     *
      * @param string $command
      */
     public function setCommand($command) {
@@ -140,7 +140,7 @@ class Job extends \Cx\Model\Base\EntityBase {
     }
     /**
      * Get the lastRan
-     * 
+     *
      * @return type lastRan
      */
     public function getLastRan() {
@@ -148,7 +148,7 @@ class Job extends \Cx\Model\Base\EntityBase {
     }
     /**
      * Set the lastRan
-     * 
+     *
      * @param type $lastRan
      */
     public function setLastRan($lastRan) {
@@ -156,14 +156,14 @@ class Job extends \Cx\Model\Base\EntityBase {
     }
     /**
      * check and execute cron job
-     * 
+     *
      * @return boolean
      */
     public function execute() {
         if (!$this->getActive()) {
             return false;
         }
-        
+
         try {
             // check if cron job needs to be executed
             $cron = \Cron\CronExpression::factory($this->expression);

@@ -38,11 +38,10 @@ namespace Cx\Modules\Order\Model\Repository;
 
 /**
  * Class InvoiceItemRepository
- * 
+ *
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
  * @subpackage  module_order
  */
 class InvoiceItemRepository extends \Doctrine\ORM\EntityRepository {}
-

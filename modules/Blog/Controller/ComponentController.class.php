@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,10 +24,10 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Main controller for Blog
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
@@ -39,7 +39,7 @@ use Cx\Modules\Blog\Model\Event\BlogEventListener;
 
 /**
  * Main controller for Blog
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
@@ -54,12 +54,12 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
 
      /**
      * Load your component.
-     * 
+     *
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
      */
     public function load(\Cx\Core\ContentManager\Model\Entity\Page $page) {
         global $_CORELANG, $subMenuTitle, $objTemplate;
-        
+
         switch ($this->cx->getMode()) {
             case \Cx\Core\Core\Controller\Cx::MODE_FRONTEND:
                 $objBlog = new \Cx\Modules\Blog\Controller\Blog(\Env::get('cx')->getPage()->getContent());
@@ -83,7 +83,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
 
     /**
      * Do something before content is loaded from DB
-     * 
+     *
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
      */
     public function preContentLoad(\Cx\Core\ContentManager\Model\Entity\Page $page) {
@@ -94,7 +94,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                $blogHomeTagHitlistInContent, $blogHomeTagHitlistInTemplate, $blogHomeTagHitlistInTheme, $blogHomeTagHitlistInSidebar, $strTagHitlistSource,
                $blogHomeCategorySelectInContent, $blogHomeCategorySelectInTemplate, $blogHomeCategorySelectInTheme, $blogHomeCategorySelectInSidebar, $strCategoriesSelect,
                $blogHomeCategoryListInContent, $blogHomeCategoryListInTemplate, $blogHomeCategoryListInTheme, $blogHomeCategoryListInSidebar, $strCategoriesList;
-        
+
         switch ($this->cx->getMode()) {
             case \Cx\Core\Core\Controller\Cx::MODE_FRONTEND:
                 // Get content for the blog-module.
@@ -177,7 +177,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 break;
         }
     }
-    
+
     /**
      * Register your event listeners here
      *

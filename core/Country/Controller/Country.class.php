@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Core Country and Region class
  *
@@ -160,9 +160,9 @@ class Country
         &$count, $lang_id=null, $limit=-1, $offset=0, $order='`name` ASC'
     ) {
         global $objDatabase;
-        
+
         $lang_id = (int)$lang_id;
-        if (empty($lang_id)) $lang_id = FRONTEND_LANG_ID; 
+        if (empty($lang_id)) $lang_id = FRONTEND_LANG_ID;
         $arrSqlName = \Text::getSqlSnippets('`country`.`id`', $lang_id,
             'core', array('name' => self::TEXT_NAME));
         if (empty($limit)) $limit  = -1;
@@ -233,7 +233,7 @@ class Country
     static function getById($country_id, $lang_id=null)
     {
         global $objDatabase;
-        
+
         $lang_id = (int)$lang_id;
         if (empty($lang_id)) {
 //die("Country::getById(): ERROR: Empty language ID");
@@ -295,7 +295,7 @@ class Country
     static function getByName($country_name, $lang_id=null)
     {
         global $objDatabase;
-        
+
         $lang_id = (int)$lang_id;
         if (empty($lang_id)) {
             $lang_id = FRONTEND_LANG_ID;
@@ -331,7 +331,7 @@ class Country
             'active' => $objResult->fields['active'],
         );
     }
-    
+
     /**
      * Returns matched array of Countries data for the given Name
      *
@@ -369,7 +369,7 @@ class Country
                    `country`.`alpha2`,
                    `country`.`alpha3`,
                    `country`.`ord`,
-                   `country`.`active`, 
+                   `country`.`active`,
                    '. $arrSqlName['field'] .'
               FROM `'. DBPREFIX .'core_country` AS `country`
                   '. $arrSqlName['join'] .'
@@ -924,7 +924,7 @@ class Country
     static function settings()
     {
         global $_CORELANG;
-        
+
         $objTemplateCountry = new \Cx\Core\Html\Sigma(\Env::get('cx')->getCodeBaseCorePath() . '/Country/View/Template/Generic');
         $objTemplateCountry->loadTemplateFile('Overview.html');
 

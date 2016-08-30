@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Validator
  *
@@ -286,12 +286,12 @@ function contrexx_raw2db($raw)
         }
         return $arr;
     }
-    
+
     $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-    $db = $cx->getDb(); 
+    $db = $cx->getDb();
     if (!isset($db)) {
         throw new \Cx\Core\Model\DbException('Database not yet initialized!');
-    } 
+    }
     $pdo = $db->getPdoConnection();
     $rawQuoted = $pdo->quote($raw);
     //addslashes did not add quotes, but pdo:quote does

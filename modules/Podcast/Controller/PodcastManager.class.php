@@ -82,7 +82,7 @@ class PodcastManager extends PodcastLib
     var $_strOkMessage = '';
 
     private $act = '';
-    
+
     /**
     * PHP5 constructor
     *
@@ -96,7 +96,7 @@ class PodcastManager extends PodcastLib
         $this->_objTpl = new \Cx\Core\Html\Sigma(\Cx\Core\Core\Controller\Cx::instanciate()->getCodeBaseModulePath().'/Podcast/View/Template/Backend');
         \Cx\Core\Csrf\Controller\Csrf::add_placeholder($this->_objTpl);
         $this->_objTpl->setErrorHandling(PEAR_ERROR_DIE);
-        
+
         $this->_youTubeIdRegex = '#.*[\?&]v=('.$this->_youTubeAllowedCharacters.'{'.$this->_youTubeIdLength.'}).*#';
         parent::__construct();
     }
@@ -756,7 +756,7 @@ class PodcastManager extends PodcastLib
             'TXT_PODCAST_LATEST_MEDIA_COUNT'    => $_ARRAYLANG['TXT_PODCAST_LATEST_MEDIA_COUNT'],
             'TXT_PODCAST_FEED_TITLE'            => $_ARRAYLANG['TXT_PODCAST_FEED_TITLE'],
             'TXT_PODCAST_FEED_DESCRIPTION'      => $_ARRAYLANG['TXT_PODCAST_FEED_DESCRIPTION'],
-            'TXT_PODCAST_FEED_IMAGE'            => $_ARRAYLANG['TXT_PODCAST_FEED_IMAGE'],            
+            'TXT_PODCAST_FEED_IMAGE'            => $_ARRAYLANG['TXT_PODCAST_FEED_IMAGE'],
             'TXT_PODCAST_FEED_LINK'             => $_ARRAYLANG['TXT_PODCAST_FEED_LINK'],
             'TXT_PODCAST_SAVE'                  => $_ARRAYLANG['TXT_PODCAST_SAVE'],
             'TXT_PODCAST_PLACEHOLDERS'          => $_ARRAYLANG['TXT_PODCAST_PLACEHOLDERS'],
@@ -892,7 +892,7 @@ class PodcastManager extends PodcastLib
         if (isset($_POST['setHomeContent'])) {
             $setHomeContent = intval($_POST['setHomeContent']);
             if (!\Cx\Core\Setting\Controller\Setting::isDefined('podcastHomeContent')) {
-                $status = \Cx\Core\Setting\Controller\Setting::add('podcastHomeContent', $setHomeContent, 1, 
+                $status = \Cx\Core\Setting\Controller\Setting::add('podcastHomeContent', $setHomeContent, 1,
                     \Cx\Core\Setting\Controller\Setting::TYPE_RADIO, '1:TXT_ACTIVATED,0:TXT_DEACTIVATED', 'component');
             } else {
                 \Cx\Core\Setting\Controller\Setting::set('podcastHomeContent', $setHomeContent);

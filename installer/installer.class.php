@@ -515,7 +515,7 @@ class Installer
         $gdVersion    = $objCommon->checkGDSupport();
         $ftpSupport   = $objCommon->checkFTPSupport();
         $apcSupport   = $objCommon->enableApc();
-        
+
         if ($apcSupport) {
             $memoryLimit = $objCommon->checkMemoryLimit(32);
         } else {
@@ -839,7 +839,7 @@ class Installer
         if (isset($_SESSION['installer']['setPermissions']) && $_SESSION['installer']['setPermissions']) {
             $this->configGeneral = true;
         } else {
-            if (isset($_SESSION['installer']['config']['documentRoot'])	&& isset($_SESSION['installer']['config']['offsetPath'])) {
+            if (isset($_SESSION['installer']['config']['documentRoot'])    && isset($_SESSION['installer']['config']['offsetPath'])) {
                 $result = $objCommon->checkCMSPath();
                 if ($result !== true) {
                     $this->arrStatusMsg['general'] .= $result;
@@ -1095,7 +1095,7 @@ class Installer
                 $dbDatabaseName = $_SESSION['installer']['config']['dbDatabaseName'];
                 $dbTablePrefix = $_SESSION['installer']['config']['dbTablePrefix'];
                 $dbCollation = !empty($_SESSION['installer']['config']['dbCollation']) ? $_SESSION['installer']['config']['dbCollation'] : '';
-                
+
                 $timezones = timezone_identifiers_list();
                 $timezone = $timezones[$_SESSION['installer']['config']['timezone']];
                 $dateTimeZone = new DateTimeZone($timezone);
@@ -1167,7 +1167,7 @@ class Installer
             // set general error message
             if (isset($this->arrStatusMsg['general']) && !empty($this->arrStatusMsg['general'])) {
                 $objTpl->setVariable(array(
-                    'GENERAL_ERROR_MSG'	=> $this->arrStatusMsg['general']
+                    'GENERAL_ERROR_MSG'    => $this->arrStatusMsg['general']
                 ));
                 $objTpl->parse('generalErrorMsg');
             } else {
@@ -1177,7 +1177,7 @@ class Installer
             // set database error message
             if (isset($this->arrStatusMsg['database']) && !empty($this->arrStatusMsg['database'])) {
                 $objTpl->setVariable(array(
-                    'DATABASE_ERROR_MSG'	=> $this->arrStatusMsg['database']
+                    'DATABASE_ERROR_MSG'    => $this->arrStatusMsg['database']
                 ));
                 $objTpl->parse('databaseErrorMsg');
             } else {
@@ -1500,10 +1500,10 @@ class Installer
             }
         }
     }
-        
+
         /**
          * create htaccess file
-         * 
+         *
          * @access      private
          * @global      object  $objCommon
          * @return      mixed   true on success, error message on failure
@@ -1933,7 +1933,7 @@ class Installer
             $documentRoot = realpath(dirname($basePath));
             require_once($documentRoot.'/core/Core/init.php');
             init('minimal', false);
-            
+
             if (!isset($sessionObj) || !is_object($sessionObj)) $sessionObj = cmsSession::getInstance();
 
             $userId = 1;

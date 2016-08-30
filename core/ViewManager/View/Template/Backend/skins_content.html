@@ -9,18 +9,18 @@
                 $J(window).trigger('resize');
             }
         });
-    
+
         $J('.js-tree li a').bind('click', function(event) {
             var target = $J( event.target );
             if (target.is("img.theme_action_img")) {
                 return false;
             }
-            
+
             if (!$J(this).hasClass('folder')) { // reload the theme page when user clicks the file
                 $J('#themesPage').val($J(this).attr('data-rel'));
                 cx.vm.reloadThemesPage();
-            }            
-        });        
+            }
+        });
         $J(".js-tree")
             .bind("loaded.jstree", function (event, data) {
                 $J('.js-tree li > ins.jstree-icon').each(function(index, node) {
@@ -30,10 +30,10 @@
                     }
                 });
                 if ($J(event.currentTarget).hasClass('theme-files')) {
-                    
+
                     $J(event.currentTarget).find('li a').each(function(key, val) {
                         var editImg;
-                        
+
                         if (!$J(this).hasClass('protected')) {
                             if ($J.inArray( $J.trim($J(this).text()), ['module', 'core', 'core_module'] ) === -1) {
                                 editImg = $J('<span/>')
@@ -73,7 +73,7 @@
                         );
                     });
                     $J(window).trigger('resize');
-                }                
+                }
             })
             .jstree({
                 "ui": {
@@ -87,14 +87,14 @@
                 $J.jstree._reference(this).close_node(this, false, false);
             }).delegate(".jstree-closed>a", "click.jstree", function(event) {
                 $J.jstree._reference(this).open_node(this, false, false);
-            }); 
+            });
     });
     $J(window).resize(function(){
         otherElmHeight = 440;
         if (($J('body').height() - otherElmHeight) > 300) {
             $J('.js-tree').css('height', ($J('body').height() - otherElmHeight) + 'px');
-            $J('.js-tree.theme-files').css('height', 
-                  (($J('body').height() - otherElmHeight) > $J('.js-tree.theme-files > ul').height() 
+            $J('.js-tree.theme-files').css('height',
+                  (($J('body').height() - otherElmHeight) > $J('.js-tree.theme-files > ul').height()
                 ? $J('.theme-files > ul').height() + 10
                 : $J('body').height() - otherElmHeight) + 'px'
             );
@@ -113,14 +113,14 @@
         box-sizing: border-box;
     }
     .jstree-container .jstree ins {
-        width: 11px;        
+        width: 11px;
     }
     .jstree-container .jstree ul li > ins {
         display: none;
     }
     .jstree-container .jstree-leaf a > ins {
         background-position: -39px 0;
-    }    
+    }
     .js-tree {
         height: 300px;
         overflow: auto;
@@ -131,12 +131,12 @@
         display: block;
         line-height: 31px;
         white-space: nowrap;
-        margin-left: 18px;        
+        margin-left: 18px;
     }
     .jstree-container .js-tree > ul {
-        position: relative;        
+        position: relative;
     }
-    
+
     li.jstree-open > ul {
         display: block;
         clear: both;
@@ -149,7 +149,7 @@
     .jstree ul, .jstree li {
         display: block;
         list-style-type: none;
-        padding: 0;        
+        padding: 0;
     }
     .js-tree .jstree-icon {
         clear: none;
@@ -162,14 +162,14 @@
         display: block;
     }
     .jstree-default a .jstree-icon {
-        background-position: -59px 0;        
+        background-position: -59px 0;
     }
     li.jstree-closed, li.jstree-leaf {
         height: 25px;
     }
     .jstree a {
         display: block;
-        float: none;        
+        float: none;
         padding-left: 0;
         text-indent: 5px;
         height: 24px;
@@ -189,7 +189,7 @@
     .icon{
         margin-top: 6px;
         float: left;
-    }    
+    }
     #themes_list {
         width: 300px;
         float: left;
@@ -198,7 +198,7 @@
     #themes_list td {
         padding: 0;
     }
-    
+
     .theme_action.rename {
         right: 18px;
     }
@@ -217,7 +217,7 @@
         position: absolute;
         right: 0;
         height: 30px;
-        z-index: auto;                
+        z-index: auto;
         width: 100%;
     }
     .ui-dialog.noTitle .ui-dialog-titlebar {
@@ -315,7 +315,7 @@
     table.adminlist tr td.editor-area {
         padding: 0 0 0 15px;
     }
-      
+
     .ace_editor {
         border: 1px solid lightgray;
         margin: auto;
@@ -324,7 +324,7 @@
         position: relative !important
     }
 
-    .fullScreen .fullScreen-editor{ 
+    .fullScreen .fullScreen-editor{
         height: auto!important;
         width: auto!important;
         border: 0;
@@ -363,7 +363,7 @@
                     </tr>
                     <tr valign="top">
                         <td style="border:0">
-                            <select name="themes" size="0" onChange="cx.vm.reloadThemesPage()" style="width: 300px;background: white;margin-top: 15px;"> 
+                            <select name="themes" size="0" onChange="cx.vm.reloadThemesPage()" style="width: 300px;background: white;margin-top: 15px;">
                                 {THEMES_MENU}
                             </select>
                         </td>
@@ -380,12 +380,12 @@
                                 <div id="tab-files">
                                     <div class="jstree-container">
                                         <div class="js-tree theme-files">
-                                            {THEME_FILES_TAB}                                            
+                                            {THEME_FILES_TAB}
                                         </div>
                                     </div>
                                     <div id="file-operation">
                                         <div class="file-action new_file file">
-                                            <a href="javascript:void(0);" class="file" title="{TXT_THEME_NEW_FILE}"><img src="../core/ViewManager/View/Media/newFileIcon.png" alt="{TXT_THEME_NEW_FILE}"/>&nbsp;{TXT_THEME_NEW_FILE}</a> 
+                                            <a href="javascript:void(0);" class="file" title="{TXT_THEME_NEW_FILE}"><img src="../core/ViewManager/View/Media/newFileIcon.png" alt="{TXT_THEME_NEW_FILE}"/>&nbsp;{TXT_THEME_NEW_FILE}</a>
                                         </div>
                                         <div class="file-action new_file folder">
                                             <a href="javascript:void(0);" class="folder" title="{TXT_THEME_NEW_FOLDER}"><img src="../core/ViewManager/View/Media/newFileIcon.png" alt="{TXT_THEME_NEW_FOLDER}"/>&nbsp;{TXT_THEME_NEW_FOLDER}</a>
@@ -413,18 +413,18 @@
                                     </select><br />
                                     <!-- END theme_library -->
                                     <input type="submit" name="save_libraries" value="{TXT_SAVE}" />
-                                    <!-- END theme_libraries -->  
+                                    <!-- END theme_libraries -->
                                 </div>
                             </div>
 
                         </td>
-                    </tr>                    
+                    </tr>
                 </table>
                 <input type="hidden" name="themesPage" id="themesPage" value="{THEMES_SELECTED_PAGENAME}"/>
                 <input type="hidden" name="newFileName" id="newFileName"/>
                 <input type="hidden" name="isFolder" id="isFolder"/>
                 <input type="hidden" name="selectedTab" id="selectedTab" />
-                
+
             </form>
         </td>
         <!-- BEGIN theme_editor -->
@@ -447,14 +447,14 @@
                             <input type="hidden" name="themes" value="{THEMES_SELECTED_THEME}" />
                             <input type="hidden" name="themesPage" value="{THEMES_SELECTED_PAGENAME}" />
                             <textarea id="editorContent" name="content" style="display: none;" >{CONTENT_HTML}</textarea>
-                            
+
                             <!-- BEGIN template_content -->
                             <pre id="editor" style="height: 377px; width:100%;">{CONTENT_HTML}</pre>
                             <!-- END template_content -->
-                            
+
                             <!-- BEGIN template_image -->
                             <div class="content_image"><img src="{THEMES_CONTENT_IMAGE_PATH}" alt="image" /></div>
-                            <!-- END template_image --> 
+                            <!-- END template_image -->
                         </td>
                     </tr>
                 </table>
@@ -466,7 +466,7 @@
                     <a href="{CONTREXX_BASE_URL}index.php?preview={THEME_ID}" target="_blank" class="themePreview">
                         <input type="button" name="themesPreview" value="{TXT_THEME_PREVIEW}" />
                     </a>
-                    <input  type=button value='{TXT_SELECT_ALL}' class="select_all"/>                    
+                    <input  type=button value='{TXT_SELECT_ALL}' class="select_all"/>
                     <input type="submit" value='{TXT_STORE}' name="Submit" />
                     <!-- END file_actions_bottom -->
                 </div>

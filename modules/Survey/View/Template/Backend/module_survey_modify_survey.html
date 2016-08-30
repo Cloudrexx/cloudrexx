@@ -31,7 +31,7 @@
     table.survey_questions_container tbody tr td:not(:last-child) {
         cursor: move;
     }
-    #help1, #help2, #help3, help4, #help5, #help6, #help7, #help8 {display: none;padding-left: 5px;} 
+    #help1, #help2, #help3, help4, #help5, #help6, #help7, #help8 {display: none;padding-left: 5px;}
 </style>
 <script type="text/javascript">
 var modifySurvey = {
@@ -59,37 +59,37 @@ $J(function(){
     });
     $J("#questionType").change(function(){
         matrix = parseInt($J(this).val());
-        
+
         $answer  = $J("#modifyQuestionsForm .answer");
         $comment = $J("#modifyQuestionsForm .addComent");
         $row     = $J("#modifyQuestionsForm .RowTextfield");
         $qTxt    = $J("#modifyQuestionsForm .qTextfield");
-        
+
         if (matrix == 3 || matrix == 4) {
-            $J("#modifyQuestionsForm .col").css("display", "table-row");            
+            $J("#modifyQuestionsForm .col").css("display", "table-row");
         } else {
-            $J("#modifyQuestionsForm .col").css("display", "none"); 
+            $J("#modifyQuestionsForm .col").css("display", "none");
         }
         if (matrix == 5) {
             $answer.css("display", "none");
             $comment.css("display", "table-row");
             $row.css("display", "none");
-            $qTxt.css("display", "table-row");            
+            $qTxt.css("display", "table-row");
         } else if (matrix == 7) {
             $answer.css("display", "none");
             $comment.css("display", "none");
             $row.css("display", "none");
-            $qTxt.css("display", "table-row");            
+            $qTxt.css("display", "table-row");
         } else {
             $answer.css("display", "table-row");
             $comment.css("display", "table-row");
             $row.css("display", "none");
-            $qTxt.css("display", "table-row");            
+            $qTxt.css("display", "table-row");
         }
-        
+
         $J(".info-image").parent().hide();
         $J("#help"+matrix).show();
-    }); 
+    });
     $J("#questionType").trigger('change');
 });
 cx.ready(function(){
@@ -109,7 +109,7 @@ cx.ready(function(){
                     url      : "index.php?cmd=JsonData&object=Survey&act=modifyQuestions&surveyId={SURVEY_ID}",
                     type     : "post",
                     data     : $J( "#addsurvey" ).serialize(),
-                    dataType : "json",                    
+                    dataType : "json",
                     beforeSend: function() {
                         cx.tools.StatusMessage.showMessage("<div id=\"loading\">" + cx.jQuery('#loading').html() + "</div>");
                     },
@@ -142,24 +142,24 @@ cx.ready(function(){
     $J( ".edit_question" ).live('click', function(){
         var id = $J(this).attr("data-id");
         cx.tools.StatusMessage.showMessage("<div id=\"loading\">" + cx.jQuery('#loading').html() + "</div>");
-        $J.getJSON('index.php', {cmd : 'JsonData', object : 'Survey' ,act : 'getSurveyQuestion', id : id }, function(data){            
+        $J.getJSON('index.php', {cmd : 'JsonData', object : 'Survey' ,act : 'getSurveyQuestion', id : id }, function(data){
             $J("#addsurvey #questionId").val(data.data.id);
             $J("#addsurvey #questionType").val(data.data.questionType);
             $J("#addsurvey #Question").val(data.data.question);
             $J("#addsurvey #QuestionRow").val(data.data.questionRow);
-            $J("#addsurvey #ColumnChoices").val(data.data.questionChoice); 
-            $J("#addsurvey #QuestionAnswers").val(data.data.questionAnswers); 
-            $J("#addsurvey #QuestionAnswers").val(data.data.questionAnswers); 
+            $J("#addsurvey #ColumnChoices").val(data.data.questionChoice);
+            $J("#addsurvey #QuestionAnswers").val(data.data.questionAnswers);
+            $J("#addsurvey #QuestionAnswers").val(data.data.questionAnswers);
             $J("#addsurvey input:radio[name=Iscomment]").filter("[value="+data.data.isCommentable+"]").prop("checked", true);
             $J("#questionType").trigger('change');
             d.open();
-            
+
             cx.tools.StatusMessage.removeAllDialogs();
         });
     });
     $J( ".delete_question" ).live('click', function(){
         var id = $J(this).attr("data-id");
-        
+
         cx.tools.StatusMessage.showMessage("<div id=\"loading\">" + cx.jQuery('#loading').html() + "</div>");
         $J.getJSON('index.php', {cmd : 'JsonData', object : 'Survey' ,act : 'deleteQuestion', id : id }, function(data){
             getSurveyQuestions();
@@ -168,20 +168,20 @@ cx.ready(function(){
     });
     $J("table.survey_questions_container tbody").sortable({
         stop: function( event, ui ) {
-            
-            var sortFields = $J(this).sortable('serialize');            
+
+            var sortFields = $J(this).sortable('serialize');
             $J.ajax({
                 url      : "index.php?cmd=JsonData&object=Survey&act=saveSorting&surveyId={SURVEY_ID}",
                 type     : "post",
                 data     : sortFields,
-                dataType : "json",                    
+                dataType : "json",
                 beforeSend: function() {
                     cx.tools.StatusMessage.showMessage("<div id=\"loading\">" + cx.jQuery('#loading').html() + "</div>");
                 },
                 complete: function() {
                     cx.tools.StatusMessage.removeAllDialogs();
                 }
-             });                             
+             });
         }
     });
 });
@@ -205,13 +205,13 @@ function getSurveyQuestions() {
         <table width="100%" cellspacing="0" cellpadding="3" border="0" class="adminlist">
             <tr>
                 <th colspan="2">{TXT_SURVEY_GENERAL}</th>
-            </tr> 
+            </tr>
             <tr class="row1">
                 <td width="250">{TXT_TITLE}&nbsp;<font color="red">*</font></td>
                 <td><input type="text" name="title" id="title" style="width: 250px;" value="{SURVEY_TITLE}"></td>
             </tr>
             <tr class="row2">
-                <td valign="top" >{TXT_DESCRIPTION}</td>                
+                <td valign="top" >{TXT_DESCRIPTION}</td>
                 <td>
                     <textarea name="Description" style="width: 250px; height: 60px;">{SURVEY_DESCRIPTION}</textarea>
                 </td>
@@ -231,33 +231,33 @@ function getSurveyQuestions() {
                 <th>{TXT_SURVEY_START}</th>
             </tr>
             <tr class="row1">
-                <td>{TXT_BEGINNING_SURVEY}</td>                
+                <td>{TXT_BEGINNING_SURVEY}</td>
             </tr>
             <tr>
                 <td>
-                    {SURVEY_BEGIN_SURVEY}                    
+                    {SURVEY_BEGIN_SURVEY}
                 </td>
             </tr>
         </table>
     </div>
-    <div class="surveyTab" id="questions" style="display: none;">        
+    <div class="surveyTab" id="questions" style="display: none;">
         <table width="100%" cellspacing="0" cellpadding="3" border="0" class="adminlist survey_questions_container">
             <thead>
                 <tr>
                     <th colspan="8">{TXT_SURVEY_QUESTIONS}</th>
-                </tr>           
-                <tr class="row3">                                
+                </tr>
+                <tr class="row3">
                      <td width="20%">{TXT_SURVEY_QUESTION}</td>
-                     <td width="15%">{TXT_SURVEY_CREATED_AT}</td>            
-                     <td width="20%">{TXT_SURVEY_QUESTION_TYPE}</td>    
+                     <td width="15%">{TXT_SURVEY_CREATED_AT}</td>
+                     <td width="20%">{TXT_SURVEY_QUESTION_TYPE}</td>
                      <td width="15%">{TXT_SURVEY_IS_COMMENTABLE}</td>
-                     <td width="5%">{TXT_SURVEY_COUNTER}</td>                      
+                     <td width="5%">{TXT_SURVEY_COUNTER}</td>
                      <td style="text-align:right;" width="15%">{TXT_SURVEY_FUNCTIONS}</td>
                 </tr>
-            </thead>                
+            </thead>
             <tbody>
                 {SURVEY_QUESTIONS}
-            </tbody>	            
+            </tbody>
         </table>
         <br />
         <input class="add_question" type="button" value="{TXT_SURVEY_ADD_QUESTION}">
@@ -270,19 +270,19 @@ function getSurveyQuestions() {
                 <th colspan="2">{TXT_SURVEY_FINISH}</th>
             </tr>
             <tr class="row1">
-                <td colspan="2">{TXT_ADDITIONALINFO_SURVEY}</td> 
+                <td colspan="2">{TXT_ADDITIONALINFO_SURVEY}</td>
             </tr>
             <tr class="row2">
-                <td colspan="2">                   
-                    {SURVEY_BEFORE_SUB_INFO}                    
+                <td colspan="2">
+                    {SURVEY_BEFORE_SUB_INFO}
                 </td>
             </tr>
             <tr class="row1">
-                <td colspan="2">{TXT_BELOW_SUBMIT}</td>                
+                <td colspan="2">{TXT_BELOW_SUBMIT}</td>
             </tr>
             <tr class="row2">
-                <td colspan="2">                    
-                    {SURVEY_BELOW_SUBMIT}                    
+                <td colspan="2">
+                    {SURVEY_BELOW_SUBMIT}
                 </td>
             </tr>
             <tr class="row1">
@@ -309,11 +309,11 @@ function getSurveyQuestions() {
             </tr>
             <tr class="row2">
                 <td>
-                   {SURVEY_FEEDBACK_MSG}                    
+                   {SURVEY_FEEDBACK_MSG}
                 </td>
-            </tr> 
+            </tr>
         </table>
-    </div>    
+    </div>
     <br />
     <input type="button" onclick="location.href = 'index.php?cmd=Survey&{CSRF_PARAM}';" value="{TXT_SURVEY_CANCEL}" />
     &nbsp;<input class="tab-next" type="button" onclick="modifySurvey._moveToNextTab($J(this));" value="{TXT_SURVEY_NEXT}" />
@@ -322,7 +322,7 @@ function getSurveyQuestions() {
 
 <div id="modifyQuestionsForm" style="display: none;">
     <form id="addsurvey" name="addsurvey" method="post" action="">
-        <table width="100%" cellspacing="0" cellpadding="3" border="0" class="adminlist">            
+        <table width="100%" cellspacing="0" cellpadding="3" border="0" class="adminlist">
             <tr class="row1">
                 <td>{TXT_SELECT_QUESTION}&nbsp;<font color="red">*</font></td>
             </tr>
@@ -357,7 +357,7 @@ function getSurveyQuestions() {
                 <td>
                     <input type="text" name="Question" id="Question" style="width: 440px;" />
                 </td>
-            </tr>            
+            </tr>
             <tr class="row1 RowTextfield">
                 <td >
                     <span id="labelid">{TXT_TEXT_ROW}</span>&nbsp;<font color="red">*</font>
@@ -365,7 +365,7 @@ function getSurveyQuestions() {
             </tr>
             <tr class="row2 RowTextfield">
                 <td >
-                    <textarea style="width: 440px;" rows="6" name="QuestionRow" id="QuestionRow">{DB_QUESTION_TITLE}</textarea>  
+                    <textarea style="width: 440px;" rows="6" name="QuestionRow" id="QuestionRow">{DB_QUESTION_TITLE}</textarea>
                 </td>
             </tr>
             <tr class="row1 col">
@@ -384,7 +384,7 @@ function getSurveyQuestions() {
                 </td>
             </tr>
             <tr class="row2 answer">
-                <td>                    
+                <td>
                     <textarea style="width: 440px;" rows="6" name="QuestionAnswers" id="QuestionAnswers">{DB_QUESTION_OPTIONS}</textarea>
                 </td>
             </tr>
@@ -404,6 +404,6 @@ function getSurveyQuestions() {
                     </label>
                 </td>
             </tr>
-        </table>        
+        </table>
     </form>
 </div>

@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Manages settings stored in the database or file system
  *
@@ -120,9 +120,9 @@ class Setting{
 
     public static $arrSettings = array();
     protected static $engines = array(
-	'Database' => '\Cx\Core\Setting\Model\Entity\DbEngine',
-	'FileSystem' => '\Cx\Core\Setting\Model\Entity\FileSystem',
-	'Yaml'	=> '\Cx\Core\Setting\Model\Entity\YamlEngine',
+    'Database' => '\Cx\Core\Setting\Model\Entity\DbEngine',
+    'FileSystem' => '\Cx\Core\Setting\Model\Entity\FileSystem',
+    'Yaml'    => '\Cx\Core\Setting\Model\Entity\YamlEngine',
     );
 
     protected static $engine = 'Database';
@@ -1180,8 +1180,8 @@ class Setting{
                 self::$arrSettings[self::getInstanceId()][$section]['default_engine'] = $engine;
             }
             return true;
-	}
-	return false;
+    }
+    return false;
     }
 
     /**

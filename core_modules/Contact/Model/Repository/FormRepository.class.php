@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Class FormRepository
  *
@@ -38,11 +38,10 @@ namespace Cx\Core_Modules\Contact\Model\Repository;
 
 /**
  * Class FormRepository
- * 
+ *
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      ss4u <ss4ugroup@gmail.com>
  * @package     cloudrexx
  * @subpackage  coremodule_contact
  */
 class FormRepository extends \Doctrine\ORM\EntityRepository {}
-

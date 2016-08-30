@@ -1,82 +1,82 @@
 <!-- start module_podcast_select_medium_source.html -->
 <form action="index.php?cmd=Podcast&amp;act=selectSource" method="post" id="frmSelectSrc">
-	<table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
-		<thead>
-			<tr>
-				<th>{TXT_PODCAST_ADD_MEDIUM} ({TXT_PODCAST_STEP} 1: {TXT_PODCAST_SELECT_SOURCE})</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr class="row1" style="font-weight:normal;">
-				<td>{TXT_PODCAST_SELECT_SOURCE_TXT}</td>
-			</tr>
-			<tr class="row2">
-				<td>
-					<input type="radio" name="podcast_medium_source_type" id="podcast_medium_source_local" value="local" onclick="podcast_change_source()" {PODCAST_SELECT_LOCAL_MEDIUM} />
-						<label for="podcast_medium_source_local">
-							{TXT_PODCAST_LOCAL}
-						</label>
-					<input type="radio" name="podcast_medium_source_type" id="podcast_medium_source_remote" value="remote" onclick="podcast_change_source()" {PODCAST_SELECT_REMOTE_MEDIUM} />
-						<label for="podcast_medium_source_remote">
-							{TXT_PODCAST_REMOTE}
-						</label>
-					<input type="radio" name="podcast_medium_source_type" id="podcast_medium_source_youtube" value="youtube" onclick="podcast_change_source()" {PODCAST_SELECT_YOUTUBE_MEDIUM} />
-						<label for="podcast_medium_source_youtube">
-							{TXT_PODCAST_YOUTUBE}
-						</label>
-					<br /><br />
-					<div id="podcast_medium_source_local_box" style="display:{PODCAST_SELECT_LOCAL_MEDIUM_BOX};">
-						<input type="text" value="{PODCAST_LOCAL_SOURCE}" name="podcast_medium_local_source" id="podcast_medium_local_source" style="width:350px;" />
-						{PODCAST_BROWSE}
-					</div>
-					<div id="podcast_medium_source_remote_box" style="display:{PODCAST_SELECT_REMOTE_MEDIUM_BOX};">
-						<input type="text" value="{PODCAST_REMOTE_SOURCE}" name="podcast_medium_remote_source" style="width:435px;" />
-					</div>
-					<div id="podcast_medium_source_youtube_box" style="display:{PODCAST_SELECT_YOUTUBE_MEDIUM_BOX};">
-						<img alt="{TXT_PODCAST_YOUTUBE_ID_INVALID}" title="{TXT_PODCAST_YOUTUBE_ID_INVALID}" src="../core/Core/View/Media/icons/delete.gif" id="youtube_invalid" style="vertical-align: middle; margin-bottom: 2px;" />
-						<img alt="{TXT_PODCAST_YOUTUBE_ID_VALID}" title="{TXT_PODCAST_YOUTUBE_ID_VALID}" src="../core/Core/View/Media/icons/check.gif" id="youtube_valid" style="vertical-align: middle; display: none; margin-bottom: 2px;" />
-						<span id="youtubeIDverification"></span><br />
-						<textarea onkeyup="checkYoutubeSource();" name="podcast_medium_youtube_source" id="podcast_medium_youtube_source" style="width:635px; height: 172px;" />{PODCAST_YOUTUBE_SOURCE}</textarea>
-						<input id="youtubeID" name="youtubeID" type="hidden" />
-					</div>
-				</td>
-			</tr>
-		</tbody>
-	</table>
-	<br />
-	<input type="submit" name="podcast_select_source" id="srcSubmit" value="{TXT_PODCAST_NEXT}" />
+  <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
+    <thead>
+      <tr>
+        <th>{TXT_PODCAST_ADD_MEDIUM} ({TXT_PODCAST_STEP} 1: {TXT_PODCAST_SELECT_SOURCE})</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="row1" style="font-weight:normal;">
+        <td>{TXT_PODCAST_SELECT_SOURCE_TXT}</td>
+      </tr>
+      <tr class="row2">
+        <td>
+          <input type="radio" name="podcast_medium_source_type" id="podcast_medium_source_local" value="local" onclick="podcast_change_source()" {PODCAST_SELECT_LOCAL_MEDIUM} />
+            <label for="podcast_medium_source_local">
+              {TXT_PODCAST_LOCAL}
+            </label>
+          <input type="radio" name="podcast_medium_source_type" id="podcast_medium_source_remote" value="remote" onclick="podcast_change_source()" {PODCAST_SELECT_REMOTE_MEDIUM} />
+            <label for="podcast_medium_source_remote">
+              {TXT_PODCAST_REMOTE}
+            </label>
+          <input type="radio" name="podcast_medium_source_type" id="podcast_medium_source_youtube" value="youtube" onclick="podcast_change_source()" {PODCAST_SELECT_YOUTUBE_MEDIUM} />
+            <label for="podcast_medium_source_youtube">
+              {TXT_PODCAST_YOUTUBE}
+            </label>
+          <br /><br />
+          <div id="podcast_medium_source_local_box" style="display:{PODCAST_SELECT_LOCAL_MEDIUM_BOX};">
+            <input type="text" value="{PODCAST_LOCAL_SOURCE}" name="podcast_medium_local_source" id="podcast_medium_local_source" style="width:350px;" />
+            {PODCAST_BROWSE}
+          </div>
+          <div id="podcast_medium_source_remote_box" style="display:{PODCAST_SELECT_REMOTE_MEDIUM_BOX};">
+            <input type="text" value="{PODCAST_REMOTE_SOURCE}" name="podcast_medium_remote_source" style="width:435px;" />
+          </div>
+          <div id="podcast_medium_source_youtube_box" style="display:{PODCAST_SELECT_YOUTUBE_MEDIUM_BOX};">
+            <img alt="{TXT_PODCAST_YOUTUBE_ID_INVALID}" title="{TXT_PODCAST_YOUTUBE_ID_INVALID}" src="../core/Core/View/Media/icons/delete.gif" id="youtube_invalid" style="vertical-align: middle; margin-bottom: 2px;" />
+            <img alt="{TXT_PODCAST_YOUTUBE_ID_VALID}" title="{TXT_PODCAST_YOUTUBE_ID_VALID}" src="../core/Core/View/Media/icons/check.gif" id="youtube_valid" style="vertical-align: middle; display: none; margin-bottom: 2px;" />
+            <span id="youtubeIDverification"></span><br />
+            <textarea onkeyup="checkYoutubeSource();" name="podcast_medium_youtube_source" id="podcast_medium_youtube_source" style="width:635px; height: 172px;" />{PODCAST_YOUTUBE_SOURCE}</textarea>
+            <input id="youtubeID" name="youtubeID" type="hidden" />
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <br />
+  <input type="submit" name="podcast_select_source" id="srcSubmit" value="{TXT_PODCAST_NEXT}" />
 </form>
 
 <script type="text/javascript">
 //<![CDATA[
 
 var selectSourceInit = function(){
-	radioLocal 	    = document.getElementById('podcast_medium_source_local');
-	divLocal 		= document.getElementById('podcast_medium_source_local_box');
+  radioLocal       = document.getElementById('podcast_medium_source_local');
+  divLocal     = document.getElementById('podcast_medium_source_local_box');
 
-	radioRemote 	= document.getElementById('podcast_medium_source_remote');
-	divRemote		= document.getElementById('podcast_medium_source_remote_box');
+  radioRemote   = document.getElementById('podcast_medium_source_remote');
+  divRemote    = document.getElementById('podcast_medium_source_remote_box');
 
-	radioYoutube	= document.getElementById('podcast_medium_source_youtube');
-	divYoutube		= document.getElementById('podcast_medium_source_youtube_box');
+  radioYoutube  = document.getElementById('podcast_medium_source_youtube');
+  divYoutube    = document.getElementById('podcast_medium_source_youtube_box');
 
-	sources =       [
-	                  [radioLocal,    divLocal],
-	                  [radioRemote,   divRemote],
-	                  [radioYoutube,  divYoutube]
-	                ];
-	youtubeIdCharacters = '{PODCAST_YOUTUBE_ID_CHARACTERS}'; //Allowed characters in youtube ID							   vvvvvvvvvvv
-	youtubeIdLength = {PODCAST_YOUTUBE_ID_LENGTH}; //Length of youtube ID (for validation, e.g. http://youtube.com/watch?v=ZqpWFzLWWBQ&mode=user&search=)
+  sources =       [
+                    [radioLocal,    divLocal],
+                    [radioRemote,   divRemote],
+                    [radioYoutube,  divYoutube]
+                  ];
+  youtubeIdCharacters = '{PODCAST_YOUTUBE_ID_CHARACTERS}'; //Allowed characters in youtube ID                 vvvvvvvvvvv
+  youtubeIdLength = {PODCAST_YOUTUBE_ID_LENGTH}; //Length of youtube ID (for validation, e.g. http://youtube.com/watch?v=ZqpWFzLWWBQ&mode=user&search=)
                                                                                                      //                    ^^^^^^^^^^^
-	strRegex = "{PODCAST_YOUTUBE_REGEX_JS}";
-	urlRegex = new RegExp(strRegex, "i");
+  strRegex = "{PODCAST_YOUTUBE_REGEX_JS}";
+  urlRegex = new RegExp(strRegex, "i");
 
-	elInputSubmit        = document.getElementById("srcSubmit");
-	elInputYoutubeSource = document.getElementById("podcast_medium_youtube_source");
-	elSpanYoutubeId      = document.getElementById("youtubeIDverification");
-	elImgValid           = document.getElementById("youtube_valid");
-	elImgInvalid         = document.getElementById("youtube_invalid");
-	elInputYoutubeId     = document.getElementById("youtubeID");
+  elInputSubmit        = document.getElementById("srcSubmit");
+  elInputYoutubeSource = document.getElementById("podcast_medium_youtube_source");
+  elSpanYoutubeId      = document.getElementById("youtubeIDverification");
+  elImgValid           = document.getElementById("youtube_valid");
+  elImgInvalid         = document.getElementById("youtube_invalid");
+  elInputYoutubeId     = document.getElementById("youtubeID");
 }
 
 function podcast_change_source()
@@ -121,13 +121,13 @@ var checkYoutubeSource = function(){
 
 tmp = window.onload;
 if(tmp == null){
-	tmp = function(){};
+  tmp = function(){};
 }
 window.onload = function(){
-	tmp();
-	selectSourceInit();
-	checkYoutubeSource();
-	if(radioYoutube.checked == false){
+  tmp();
+  selectSourceInit();
+  checkYoutubeSource();
+  if(radioYoutube.checked == false){
         elInputSubmit.disabled = false;
     }
 }

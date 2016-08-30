@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,10 +24,10 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * BlockTest
- * 
+ *
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Cloudrexx Development Team <info@cloudrexx.com>
  * @author      SS4U <ss4u.comvation@gmail.com>
@@ -40,7 +40,7 @@ namespace Cx\Modules\Block\Testing\UnitTest;
 
 /**
  * BlockTest
- * 
+ *
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Cloudrexx Development Team <info@cloudrexx.com>
  * @author      SS4U <ss4u.comvation@gmail.com>
@@ -59,7 +59,7 @@ class BlockTest extends \Cx\Core\Test\Model\Entity\DoctrineTestCase {
         $jsonBlock = $this->getJsonBlockController();
         $jsonBlock->getBlockContent(array('get' => array('block' => 1, 'lang' => 'de')));
     }
-    
+
     /**
      * @covers \Cx\Modules\Block\Controller\JsonBlockController::getBlockContent
      * @expectedException \Cx\Modules\Block\Controller\NotEnoughArgumentsException
@@ -69,11 +69,11 @@ class BlockTest extends \Cx\Core\Test\Model\Entity\DoctrineTestCase {
         $sessionObj = !$sessionObj ? \cmsSession::getInstance() : $sessionObj;
         $user = \FWUser::getFWUserObject()->objUser->getUser(1);
         \FWUser::loginUser($user);
-        
+
         $jsonBlock = $this->getJsonBlockController();
         $jsonBlock->getBlockContent(array());
     }
-    
+
     /**
      * @covers \Cx\Modules\Block\Controller\JsonBlockController::getBlockContent
      * @expectedException \Cx\Modules\Block\Controller\NoBlockFoundException
@@ -83,11 +83,11 @@ class BlockTest extends \Cx\Core\Test\Model\Entity\DoctrineTestCase {
         $sessionObj = !$sessionObj ? \cmsSession::getInstance() : $sessionObj;
         $user = \FWUser::getFWUserObject()->objUser->getUser(1);
         \FWUser::loginUser($user);
-        
+
         $jsonBlock = $this->getJsonBlockController();
         $jsonBlock->getBlockContent(array('get' => array('block' => 999, 'lang' => 'de')));
     }
-    
+
     /**
      * @covers \Cx\Modules\Block\Controller\JsonBlockController::getBlockContent
      */
@@ -96,12 +96,12 @@ class BlockTest extends \Cx\Core\Test\Model\Entity\DoctrineTestCase {
         $sessionObj = !$sessionObj ? \cmsSession::getInstance() : $sessionObj;
         $user = \FWUser::getFWUserObject()->objUser->getUser(1);
         \FWUser::loginUser($user);
-        
+
         $jsonBlock = $this->getJsonBlockController();
         $result = $jsonBlock->getBlockContent(array('get' => array('block' => 32, 'lang' => 'de')));
         $this->assertArrayHasKey('content', $result);
     }
-    
+
     /**
      * @covers \Cx\Modules\Block\Controller\JsonBlockController::saveBlockContent
      * @expectedException \Cx\Modules\Block\Controller\NotEnoughArgumentsException
@@ -111,11 +111,11 @@ class BlockTest extends \Cx\Core\Test\Model\Entity\DoctrineTestCase {
         $sessionObj = !$sessionObj ? \cmsSession::getInstance() : $sessionObj;
         $user = \FWUser::getFWUserObject()->objUser->getUser(1);
         \FWUser::loginUser($user);
-        
+
         $jsonBlock = $this->getJsonBlockController();
         $jsonBlock->saveBlockContent(array());
     }
-    
+
     /**
      * @covers \Cx\Modules\Block\Controller\JsonBlockController::saveBlockContent
      */
@@ -124,10 +124,10 @@ class BlockTest extends \Cx\Core\Test\Model\Entity\DoctrineTestCase {
         $sessionObj = !$sessionObj ? \cmsSession::getInstance() : $sessionObj;
         $user = \FWUser::getFWUserObject()->objUser->getUser(1);
         \FWUser::loginUser($user);
-        
+
         $jsonBlock = $this->getJsonBlockController();
         $jsonBlock->saveBlockContent(array('get' => array('block' => 32, 'lang' => 'de'), 'post' => array('content' => 'bla')));
-        
+
         $result = $jsonBlock->getBlockContent(array('get' => array('block' => 32, 'lang' => 'de')));
         $this->assertEquals('bla', $result['content']);
     }

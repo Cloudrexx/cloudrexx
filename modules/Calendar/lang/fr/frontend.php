@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,10 +24,10 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Calendar Language variables
- * 
+ *
  * @package    cloudrexx
  * @subpackage module_calendar
  * @author     Cloudrexx <info@cloudrexx.com>
@@ -127,9 +127,9 @@ $_ARRAYLANG['TXT_CALENDAR_UPLOAD_ERROR_ATTACHMENT'] = "Envoyer une annexe";
 $_ARRAYLANG['TXT_CALENDAR_REGISTRATION_SUBMIT'] = "Envoyer";
 $_ARRAYLANG['TXT_CALENDAR_INVALID_CAPTCHA_CODE'] = "S'il vous plaît tapez de nouveau le code Captcha.";
 $_ARRAYLANG['TXT_CALENDAR_TYPE'] = "Type";
-$_ARRAYLANG['TXT_CALENDAR_EVENT_FULLY_BLOCKED'] = "We are afraid this event is already fully booked. There can not be any further registrations.";           
-$_ARRAYLANG['TXT_CALENDAR_REGISTRATION_SUCCESSFULLY_ADDED'] = "Votre inscription a été correctement enregistrée dans notre système.";    
-$_ARRAYLANG['TXT_CALENDAR_PLEASE_CHOOSE'] = "sélectionnez svp.";  
+$_ARRAYLANG['TXT_CALENDAR_EVENT_FULLY_BLOCKED'] = "We are afraid this event is already fully booked. There can not be any further registrations.";
+$_ARRAYLANG['TXT_CALENDAR_REGISTRATION_SUCCESSFULLY_ADDED'] = "Votre inscription a été correctement enregistrée dans notre système.";
+$_ARRAYLANG['TXT_CALENDAR_PLEASE_CHOOSE'] = "sélectionnez svp.";
 $_ARRAYLANG['TXT_CALENDAR_EVENT_IN_PAST'] = "Il ne peut pas accepter d'autres applications, comme cet événement est dans le passé.";
 $_ARRAYLANG['TXT_CALENDAR_TIME_TYPE_FULLTIME'] = "Toute la journée";
 

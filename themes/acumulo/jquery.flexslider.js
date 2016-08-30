@@ -300,14 +300,14 @@
             e.preventDefault();
           } else if (e.touches.length === 1) {
             slider.pause();
-            // CAROUSEL: 
+            // CAROUSEL:
             cwidth = (vertical) ? slider.h : slider. w;
             startT = Number(new Date());
             // CAROUSEL:
             offset = (carousel && reverse && slider.animatingTo === slider.last) ? 0 :
                      (carousel && reverse) ? slider.limit - (((slider.itemW + vars.itemMargin) * slider.move) * slider.animatingTo) :
                      (carousel && slider.currentSlide === slider.last) ? slider.limit :
-                     (carousel) ? ((slider.itemW + vars.itemMargin) * slider.move) * slider.currentSlide : 
+                     (carousel) ? ((slider.itemW + vars.itemMargin) * slider.move) * slider.currentSlide :
                      (reverse) ? (slider.last - slider.currentSlide + slider.cloneOffset) * cwidth : (slider.currentSlide + slider.cloneOffset) * cwidth;
             startX = (vertical) ? e.touches[0].pageY : e.touches[0].pageX;
             startY = (vertical) ? e.touches[0].pageX : e.touches[0].pageY;
@@ -466,7 +466,7 @@
         // SMOOTH HEIGHT:
         if (vars.smoothHeight) methods.smoothHeight(vars.animationSpeed);
       }
-    } 
+    }
     slider.wrapup = function(dimension) {
       // SLIDE:
       if (!fade && !carousel) {
@@ -514,7 +514,7 @@
              true;
     }
     slider.getTarget = function(dir) {
-      slider.direction = dir; 
+      slider.direction = dir;
       if (dir === "next") {
         return (slider.currentSlide === slider.last) ? 0 : slider.currentSlide + 1;
       } else {
@@ -596,7 +596,7 @@
             if (vars.smoothHeight) methods.smoothHeight();
           }, (type === "init") ? 100 : 0);
         }
-      } else { // FADE: 
+      } else { // FADE:
         slider.slides.css({"width": "100%", "float": "left", "marginRight": "-100%", "position": "relative"});
         if (type === "init") slider.slides.eq(slider.currentSlide).fadeIn(vars.animationSpeed, vars.easing);
         // SMOOTH HEIGHT:
@@ -713,7 +713,7 @@
     direction: "horizontal",        //String: Select the sliding direction, "horizontal" or "vertical"
     reverse: false,                 //{NEW} Boolean: Reverse the animation direction
     animationLoop: true,             //Boolean: Should the animation loop? If false, directionNav will received "disable" classes at either end
-    smoothHeight: false,            //{NEW} Boolean: Allow height of the slider to animate smoothly in horizontal mode  
+    smoothHeight: false,            //{NEW} Boolean: Allow height of the slider to animate smoothly in horizontal mode
     startAt: 0,                     //Integer: The slide that the slider should start on. Array notation (0 = first slide)
     slideshow: true,                //Boolean: Animate slider automatically
     slideshowSpeed: 7000,           //Integer: Set the speed of the slideshow cycling, in milliseconds
@@ -784,5 +784,5 @@
         default: if (typeof options === "number") $slider.flexAnimate(options, true);
       }
     }
-  }  
+  }
 })(jQuery);

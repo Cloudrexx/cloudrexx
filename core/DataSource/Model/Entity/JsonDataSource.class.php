@@ -46,7 +46,7 @@ namespace Cx\Core\DataSource\Model\Entity;
  */
 
 class JsonDataSource extends DataSource {
-    
+
     /**
      * Gets one or more entries from this DataSource
      *
@@ -73,7 +73,7 @@ class JsonDataSource extends DataSource {
     ) {
         throw new \Exception('Not yet implemented');
     }
-    
+
     /**
      * Adds a new entry to this DataSource
      * @param array $data Field=>value-type array. Not all fields may be required.
@@ -82,7 +82,7 @@ class JsonDataSource extends DataSource {
     public function add($data) {
         throw new \Exception('Not yet implemented');
     }
-    
+
     /**
      * Updates an existing entry of this DataSource
      * @param string $elementId ID of the element to update
@@ -92,7 +92,7 @@ class JsonDataSource extends DataSource {
     public function update($elementId, $data) {
         throw new \Exception('Not yet implemented');
     }
-    
+
     /**
      * Drops an entry from this DataSource
      * @param string $elementId ID of the element to update
@@ -102,4 +102,3 @@ class JsonDataSource extends DataSource {
         throw new \Exception('Not yet implemented');
     }
 }
-

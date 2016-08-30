@@ -8,14 +8,14 @@ function appendField(){
     lastId = lastId + 1;
 
     if(lastRow == 'row1') {
-    	lastRow = 'row2';
+      lastRow = 'row2';
     } else {
-    	lastRow = 'row1';
-    }    
-    
+      lastRow = 'row1';
+    }
+
     var tmpBlankField1 = BlankField.replace(/FIELD_ID/g, lastId);
     var tmpBlankField2 = tmpBlankField1.replace(/FIELD_ROW/g, lastRow);
-    
+
     $J('#inputfields').append(tmpBlankField2);
     $J('#inputfield_'+lastId).css('display', 'none');
     $J('#inputfield_'+lastId).fadeIn("slow");
@@ -26,14 +26,14 @@ function deleteField(fieldId){
 }
 
 function ExpandMinimize(toggle, id) {
-        
+
     if (toggle != "lang_name") {
         var masterValue = $J("tr#inputfield_"+id+" .lang_"+toggle+"_master").val();
         $J("tr#inputfield_"+id+" #inputfield_"+id+"_"+toggle+"_Expanded input").each(function(){
             if ($J(this).val() == '') {
                 $J(this).val(masterValue);
             }
-        });        
+        });
     }
 
     elm1 = document.getElementById('inputfield_' + id + '_' + toggle + '_Minimized');
@@ -42,11 +42,11 @@ function ExpandMinimize(toggle, id) {
     elm1.style.display = (elm1.style.display=='none') ? 'block' : 'none';
     elm2.style.display = (elm2.style.display=='none') ? 'block' : 'none';
 }
-$J(function(){    
+$J(function(){
     var formData = {CALENDAR_FORM_DATA};
     BlankField = $J("#blankField").html();
-    
-    $J(formData).each(function(index, data){        
+
+    $J(formData).each(function(index, data){
         $J('#inputfields').append(getField(data));
     });
 });
@@ -63,22 +63,22 @@ function getField(data) {
         $field.find('.field_req').attr('checked', 'checked');
     }
     $field.find('.field_afflications').val(data.affiliation);
-    
-    var lang_name = $J.parseJSON(data.field_value);    
-    $J.each(lang_name, function(index, value){        
+
+    var lang_name = $J.parseJSON(data.field_value);
+    $J.each(lang_name, function(index, value){
         $field.find('.inputNamefield_'+index).val(value);
     });
-    
-    var lang_default_value = $J.parseJSON(data.default_field_value);    
+
+    var lang_default_value = $J.parseJSON(data.default_field_value);
     $J.each(lang_default_value, function(index, value){
         $field.find('.inputDefaultfield_'+index).val(value);
     });
-    
+
     changeFieldType($field);
-    
+
     return $field;
 }
-function changeFieldType(container) {    
+function changeFieldType(container) {
     switch(container.find('.field_type').val()) {
         case 'fieldset':
             container.find(".field_req").attr('disabled', 'disabled').hide();
@@ -144,10 +144,10 @@ function changeFieldType(container) {
             <!-- END fieldAfflications -->
         </select -->
     </td>
-    <td valign="top" style="line-height: 19px;" nowrap="nowrap">        
+    <td valign="top" style="line-height: 19px;" nowrap="nowrap">
         <div id="inputfield_FIELD_ID_lang_name_Minimized" style="display: {CALENDAR_DISPLAY_EXPAND};">
             <a href="javascript:ExpandMinimize('name', 'FIELD_ID'); ExpandMinimize('default_value', 'FIELD_ID'); javascript:ExpandMinimize('lang_name', 'FIELD_ID');" >{TXT_CALENDAR_EXPAND}&nbsp;&raquo;</a>
-        </div>        
+        </div>
         <div id="inputfield_FIELD_ID_lang_name_Expanded" style="display: none;">
             <div class="pull-left width-50">
             <!-- BEGIN inputfieldLanguagesList -->
@@ -167,27 +167,27 @@ function changeFieldType(container) {
     .width-50{width: 50%;}
 </style>
 <form name="formModifyForm" method="post" action="index.php?cmd={CALENDAR_MODULE_NAME}&act=settings&tpl=forms">
-    <input name="formId" type="hidden" value="{CALENDAR_FORM_ID}" />  
-	<table id="form" style="width: 100%; border-spacing: 0px;" class="adminlist" cellspacing="0" cellpadding="3">
-	    <tr>
-	        <th colspan="2">{TXT_CALENDAR_REGISTRATION_FORM_TITLE}</th>
-	    </tr>
-        <tr class="row1">  
+    <input name="formId" type="hidden" value="{CALENDAR_FORM_ID}" />
+  <table id="form" style="width: 100%; border-spacing: 0px;" class="adminlist" cellspacing="0" cellpadding="3">
+      <tr>
+          <th colspan="2">{TXT_CALENDAR_REGISTRATION_FORM_TITLE}</th>
+      </tr>
+        <tr class="row1">
             <td width="87">{TXT_CALENDAR_TITLE}</td>
-            <td><input name="formTitle" maxlength="255" style="width: 200px;" type="text" value="{CALENDAR_FORM_TITLE}" /></td>      
+            <td><input name="formTitle" maxlength="255" style="width: 200px;" type="text" value="{CALENDAR_FORM_TITLE}" /></td>
         </tr>
     </table>
-    <table id="inputfields" style="width: 100%; border-spacing: 0px;" class="adminlist" cellspacing="0" cellpadding="3">    
-	    <tr class="row3">
+    <table id="inputfields" style="width: 100%; border-spacing: 0px;" class="adminlist" cellspacing="0" cellpadding="3">
+      <tr class="row3">
             <td style="text-align: center; font-weight: bold" width="1%" nowrap="nowrap">&nbsp;ID&nbsp;</td>
             <td style="text-align: center; font-weight: bold" width="1%" nowrap="nowrap">&nbsp;{TXT_CALENDAR_SORT}&nbsp;</td>
             <td style="text-align: left; font-weight: bold" width="1%" nowrap="nowrap">{TXT_CALENDAR_FIELD_NAME}</td>
             <td style="text-align: left; font-weight: bold" width="1%" nowrap="nowrap">{TXT_CALENDAR_FIELD_TYPE}</td>
             <td style="text-align: left; font-weight: bold" width="1%" nowrap="nowrap">{TXT_CALENDAR_DEFAULT_VALUES}</td>
             <td style="text-align: left; font-weight: bold" width="1%" nowrap="nowrap">&nbsp;&nbsp;{TXT_CALENDAR_FIELD_REQUIRED}&nbsp;&nbsp;</td>
-            <td style="text-align: left; font-weight: bold" width="1%" nowrap="nowrap"><!-- {TXT_CALENDAR_FIELD_AFFILIATION} --></td>            
+            <td style="text-align: left; font-weight: bold" width="1%" nowrap="nowrap"><!-- {TXT_CALENDAR_FIELD_AFFILIATION} --></td>
             <td colspan="2" style="text-align: right; font-weight: bold" width="90%" nowrap="nowrap">{TXT_CALENDAR_ACTIONS}</td>
-        </tr>        
+        </tr>
     </table>
     <input type="button" onclick="appendField();" name="newInputfiels" value="{TXT_CALENDAR_NEW_INPUTFIELD}" style="margin-left: 96px; margin-top: 6px;" />
     <br />

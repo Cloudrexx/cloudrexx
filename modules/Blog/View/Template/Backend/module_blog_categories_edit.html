@@ -2,54 +2,54 @@
 <script language="JavaScript" type="text/javascript">
 //<![CDATA[
 function showOrHide(strElement) {
-	if (document.getElementById(strElement).style.display == 'none') {
-		document.getElementById(strElement).style.display = 'block';
-	} else {
-		document.getElementById(strElement).style.display = 'none';
-	}
+  if (document.getElementById(strElement).style.display == 'none') {
+    document.getElementById(strElement).style.display = 'block';
+  } else {
+    document.getElementById(strElement).style.display = 'none';
+  }
 }
 
 function copyText(strField) {
-	for (var h=0; h < document.forms.length;h++) {
-		for (var i=0; i < document.forms[h].elements.length;i++) {
-			//read out all form-elements with the loop
-			if(document.forms[h].elements[i].name.search(strField) != -1) {
-				switch (strField) {
-					case 'frmEditCategory_Name_':
-						document.forms[h].elements[i].value = document.frmEditCategory.frmEditCategory_Name.value;
-					break;
-				}
-			}
-		}
-	}	
+  for (var h=0; h < document.forms.length;h++) {
+    for (var i=0; i < document.forms[h].elements.length;i++) {
+      //read out all form-elements with the loop
+      if(document.forms[h].elements[i].name.search(strField) != -1) {
+        switch (strField) {
+          case 'frmEditCategory_Name_':
+            document.forms[h].elements[i].value = document.frmEditCategory.frmEditCategory_Name.value;
+          break;
+        }
+      }
+    }
+  }
 }
 //]]>
 </script>
 <form name="frmEditCategory" method="post" action="?cmd=Blog&amp;act=updateCategory">
-	<table width="100%" cellspacing="0" cellpadding="3" border="0" class="adminlist">
-		<tr>
-			<th colspan="4">{TXT_EDIT_TITLE}</th>
-		</tr>
-		<tr class="row1">
-			<td valign="top">{TXT_EDIT_NAME}</td>
-			<td colspan="3">
-				<input type="text" name="frmEditCategory_Name" value="{EDIT_NAME}" maxlength="100" onchange="copyText('frmEditCategory_Name_');" style="width:30%;" />&nbsp;<a href="javascript:showOrHide('divEditCategoryLang_Name');">{TXT_EDIT_EXTENDED}</a>
-				<div id="divEditCategoryLang_Name" style="display: none;">
-					<!-- BEGIN editCategoryNameFields -->
-					<input type="text" name="frmEditCategory_Name_{EDIT_NAME_LANGID}" value="{EDIT_NAME_VALUE}" maxlength="100" style="width:30%; margin-top:1px;" />&nbsp;<label for="frmEditCategory_Name_{EDIT_NAME_LANGID}">{EDIT_NAME_LANG}</label><br />
-					<!-- END editCategoryNameFields -->
-				</div>	
-			</td>
-		</tr>
-		<tr class="row1">
-			<td width="10%">{TXT_EDIT_LANGUAGES}</td>
-			<td width="10%" valign="top">{EDIT_LANGUAGES_1}</td>
-			<td width="10%" valign="top">{EDIT_LANGUAGES_2}</td>
-			<td width="70%" valign="top">{EDIT_LANGUAGES_3}</td>
-		</tr>
-	</table>
-	<br />
-	<input type="hidden" value="{EDIT_CATEGORY_ID}" name="frmEditCategory_Id" />
-	<input type="submit" value="{TXT_EDIT_SUBMIT}" name="frmEditCategory_Submit" />
+  <table width="100%" cellspacing="0" cellpadding="3" border="0" class="adminlist">
+    <tr>
+      <th colspan="4">{TXT_EDIT_TITLE}</th>
+    </tr>
+    <tr class="row1">
+      <td valign="top">{TXT_EDIT_NAME}</td>
+      <td colspan="3">
+        <input type="text" name="frmEditCategory_Name" value="{EDIT_NAME}" maxlength="100" onchange="copyText('frmEditCategory_Name_');" style="width:30%;" />&nbsp;<a href="javascript:showOrHide('divEditCategoryLang_Name');">{TXT_EDIT_EXTENDED}</a>
+        <div id="divEditCategoryLang_Name" style="display: none;">
+          <!-- BEGIN editCategoryNameFields -->
+          <input type="text" name="frmEditCategory_Name_{EDIT_NAME_LANGID}" value="{EDIT_NAME_VALUE}" maxlength="100" style="width:30%; margin-top:1px;" />&nbsp;<label for="frmEditCategory_Name_{EDIT_NAME_LANGID}">{EDIT_NAME_LANG}</label><br />
+          <!-- END editCategoryNameFields -->
+        </div>
+      </td>
+    </tr>
+    <tr class="row1">
+      <td width="10%">{TXT_EDIT_LANGUAGES}</td>
+      <td width="10%" valign="top">{EDIT_LANGUAGES_1}</td>
+      <td width="10%" valign="top">{EDIT_LANGUAGES_2}</td>
+      <td width="70%" valign="top">{EDIT_LANGUAGES_3}</td>
+    </tr>
+  </table>
+  <br />
+  <input type="hidden" value="{EDIT_CATEGORY_ID}" name="frmEditCategory_Id" />
+  <input type="submit" value="{TXT_EDIT_SUBMIT}" name="frmEditCategory_Submit" />
 </form>
 <!-- END module_blog_categories_edit.html -->

@@ -22,39 +22,39 @@ return true;
 }
 
 function copyValues(id, strValue){
-	if(id > 1){
-		for(i=id;i<{LAST_ID};i++){
-			try{
-				if(document.getElementsByName('content['+i+']')[0].value == ''){
-					document.getElementsByName('content['+i+']')[0].value = strValue
-				}
+  if(id > 1){
+    for(i=id;i<{LAST_ID};i++){
+      try{
+        if(document.getElementsByName('content['+i+']')[0].value == ''){
+          document.getElementsByName('content['+i+']')[0].value = strValue
+        }
 
-			}catch(e){}
-		}
-	}
+      }catch(e){}
+    }
+  }
 }
 
 function check(id){
-	if(id > 1){
-		for(i=id; i<{LAST_ID}; i++){
-			try{
-				if(document.getElementsByName('status['+i+']')[0].checked == true){
-					document.getElementsByName('status['+i+']')[0].checked = false;
-				}else{
-					document.getElementsByName('status['+i+']')[0].checked = true;
-				}
-			}catch(e){}
-		}
-		document.getElementsByName('status['+id+']')[0].checked = document.getElementsByName('status['+id+']')[0].checked ? false : true;
-	}
+  if(id > 1){
+    for(i=id; i<{LAST_ID}; i++){
+      try{
+        if(document.getElementsByName('status['+i+']')[0].checked == true){
+          document.getElementsByName('status['+i+']')[0].checked = false;
+        }else{
+          document.getElementsByName('status['+i+']')[0].checked = true;
+        }
+      }catch(e){}
+    }
+    document.getElementsByName('status['+id+']')[0].checked = document.getElementsByName('status['+id+']')[0].checked ? false : true;
+  }
 }
 
 function clearInputs(){
-	for(i=2;i<{LAST_ID};i++){
-		try{
-			document.getElementsByName('content['+i+']')[0].value = '';
-		}catch(e){}
-	}
+  for(i=2;i<{LAST_ID};i++){
+    try{
+      document.getElementsByName('content['+i+']')[0].value = '';
+    }catch(e){}
+  }
 }
 
 
@@ -98,7 +98,7 @@ function clearInputs(){
 <table summary="" cellspacing="0" cellpadding="3" border="0" style="vertical-align:top;" width="100%" class="adminlist">
 <tr>
 <th colspan="2">
-	Sprachvariablen von $_ARRAYLANG[] importieren
+  Sprachvariablen von $_ARRAYLANG[] importieren
 </th>
 </tr>
 <tr class="row2">

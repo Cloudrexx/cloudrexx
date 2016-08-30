@@ -43,7 +43,7 @@ class Message {
     private $link;
     private $linkTarget;
     private $showInDashboard = true;
-    
+
     public function __construct($langCode = null, $text = '', $type = 'alertbox', $link = '', $linkTarget = '_blank', $showInDashboard = true) {
         $this->langCode = $langCode ? $langCode : \FWLanguage::getLanguageCodeById(LANG_ID);
         $this->text = $text;
@@ -52,27 +52,27 @@ class Message {
         $this->linkTarget = $linkTarget;
         $this->showInDashboard = $showInDashboard;
     }
-    
+
     public function getLangCode() {
         return $this->langCode;
     }
-    
+
     public function getText() {
         return $this->text;
     }
-    
+
     public function getType() {
         return $this->type;
     }
-    
+
     public function getLink() {
         return $this->link;
     }
-    
+
     public function getLinkTarget() {
         return $this->linkTarget;
     }
-    
+
     public function showInDashboard() {
         return $this->showInDashboard;
     }

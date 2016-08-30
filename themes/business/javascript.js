@@ -1,6 +1,6 @@
 (function($) {
     $(document).ready(function() {
-        
+
         var count = $("#mediadir  .reference").size();
         for (var i = count; i < 12; i++) {
             $(".reference").last().after('<div class="reference grid3 graybox_entry"></div>');
@@ -13,7 +13,7 @@
                  $(this).hide();
                 });
         });
-//Resize Grey box image based on real image 
+//Resize Grey box image based on real image
 $(window).load(function() {
   var Image_height = $('#mediadir .reference img').height();
     if (Image_height > 0) {
@@ -33,8 +33,8 @@ $(window).load(function() {
 
         for (var i = 0; i < entries.length; i += 4) {
             entries.slice(i, i + 4).wrapAll('<div class="full-width"></div>');
-        } 
-        
+        }
+
         /* Metanavigation Start */
         if ($('#select-language a').length > 1) {
             var activeLanguage = $('#select-language a.active');

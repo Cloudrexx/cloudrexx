@@ -42,7 +42,7 @@
 <script src='../lib/javascript/twitter-bootstrap/3.1.0/js/bootstrap.min.js'></script>
 <script src='../lib/javascript/bootbox.min.js'></script>
 
-<script>  
+<script>
     var template = '{CONFIG_THUMBNAIL_NEW_TEMPLATE}';
 
     function deleteThumbnail(entryId) {
@@ -54,13 +54,13 @@
     }
 
     function regenerateThumbnails() {
-      
+
         var refreshId;
         var key = Math.random().toString(36).substr(2, 5);
-        cx.jQuery.get('index.php?cmd=Config&act=generateThumbnail&key=' + key, function (progress) {          
+        cx.jQuery.get('index.php?cmd=Config&act=generateThumbnail&key=' + key, function (progress) {
             //cx.jQuery('.progress-bar').css('width','100%');
             clearInterval(refreshId);
-            
+
             $jq19(refreshModal).modal('hide');
             bootbox.dialog({
                 title: "Generierung fertig.",
@@ -98,7 +98,7 @@
         });
 
         refreshId = function()
-        {          
+        {
           cx.jQuery.ajax({
               url : 'index.php?cmd=Config&act=getThumbProgress&key=' + key,
               tryCount : 0,
@@ -118,7 +118,7 @@
                       setTimeout(refreshId, 500);
                   }
               },
-              error : function(xhr, textStatus, errorThrown ) {                
+              error : function(xhr, textStatus, errorThrown ) {
                 this.tryCount++;
                 if (this.tryCount <= this.retryLimit) {
                     //try again

@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,10 +24,10 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Main controller for Language Manager
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
@@ -38,29 +38,29 @@ namespace Cx\Core\LanguageManager\Controller;
 
 /**
  * Main controller for Language Manager
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
  * @subpackage  core_languagemanager
  */
 class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentController implements \Cx\Core\Event\Model\Entity\EventListener {
-    
+
     /**
      * @var array List of components who's language already is in $_ARRAYLANG
      */
     protected $componentsWithLoadedLang = array();
-    
+
     public function getControllerClasses() {
         // Return an empty array here to let the component handler know that there
         // does not exist a backend, nor a frontend controller of this component.
         return array();
     }
-    
+
     public function registerEventListeners() {
         $this->cx->getEvents()->addEventListener('preComponent', $this);
     }
-    
+
     /**
      * Event handler to load component language
      * @param string $eventName Name of triggered event, should always be static::EVENT_NAME
@@ -68,12 +68,12 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      */
     public function onEvent($eventName, array $eventArgs) {
         global $_ARRAYLANG;
-        
+
         // we might be in a hook where lang is not yet initialized (before resolve)
         if (!count($_ARRAYLANG)) {
             $_ARRAYLANG = array();
         }
-        
+
         $frontend = $this->cx->getMode() == \Cx\Core\Core\Controller\Cx::MODE_FRONTEND;
         $objInit = \Env::get('init');
         switch ($eventName) {
@@ -87,7 +87,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 ) {
                     return;
                 }
-                
+
                 $_ARRAYLANG = array_merge(
                     $_ARRAYLANG,
                     $objInit->getComponentSpecificLanguageData(
@@ -102,7 +102,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
 
      /**
      * Load your component.
-     * 
+     *
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
      */
     public function load(\Cx\Core\ContentManager\Model\Entity\Page $page) {
@@ -115,13 +115,13 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         \Permission::checkAccess(22, 'static');
         $objLanguageManager = new \Cx\Core\LanguageManager\Controller\LanguageManager();
         $objLanguageManager->getLanguagePage();
-                
-        $this->cx->getTemplate()->setRoot($cachedRoot);        
+
+        $this->cx->getTemplate()->setRoot($cachedRoot);
     }
-    
+
     /**
      * Do something after resolving is done
-     * 
+     *
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
      */
     public function postResolve(\Cx\Core\ContentManager\Model\Entity\Page $page) {

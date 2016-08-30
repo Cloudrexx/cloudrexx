@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Db Class
  *
@@ -39,12 +39,12 @@
 namespace {
     /**
      * Factory callback for AdoDB NewConnection
-     * 
+     *
      * This is in global namespace for backwards compatibility to PHP 5.3
      * $ADODB_NEWCONNECTION = array($this, 'adodbPdoConnectionFactory');
      * leads to a "function name must be a string"
      * @deprecated Use Doctrine!
-     * @return \Cx\Core\Model\CustomAdodbPdo 
+     * @return \Cx\Core\Model\CustomAdodbPdo
      */
     function cxAdodbPdoConnectionFactory() {
         $obj = new \Cx\Core\Model\CustomAdodbPdo(\Env::get('pdo'));
@@ -74,43 +74,43 @@ namespace Cx\Core\Model {
      * @subpackage  core_db
      */
     class Db {
-        
+
         /**
          * Cloudrexx instance
          * @var \Cx\Core\Core\Controller\Cx
          */
         protected $cx = null;
-        
+
         /**
          * PDO instance
          * @var \PDO
          */
         protected $pdo = null;
-        
+
         /**
          * AdoDB instance
-         * @var \ADONewConnection 
+         * @var \ADONewConnection
          */
         protected $adodb = null;
-        
+
         /**
          * Doctrine entity manager instance
-         * @var \Doctrine\ORM\EntityManager 
+         * @var \Doctrine\ORM\EntityManager
          */
         protected $em = null;
-        
+
         /**
          * Doctrine LoggableListener instance
-         * @var \Gedmo\Loggable\LoggableListener 
+         * @var \Gedmo\Loggable\LoggableListener
          */
         protected $loggableListener = null;
-        
+
         /*
          * db instance
          * @var \Cx\Core\Model\Model\Entity/Db
          * */
         protected $db;
-        
+
          /*
          * db user instance
          * @var \Cx\Core\Model\Model\Entity/DbUser
@@ -146,7 +146,7 @@ namespace Cx\Core\Model {
             $db->setEntityManager($em);
             return $db;
         }
-        
+
         /**
          * Sets the username for loggable listener
          * @param string $username Username data as string
@@ -166,11 +166,11 @@ namespace Cx\Core\Model {
             $objDateTimeZone = new \DateTimeZone($this->db->getTimezone());
             $objDateTime = new \DateTime('now', $objDateTimeZone);
             $offset = $objDateTimeZone->getOffset($objDateTime);
-            $offsetHours = floor(abs($offset)/3600); 
-            $offsetMinutes = round((abs($offset)-$offsetHours*3600) / 60); 
+            $offsetHours = floor(abs($offset)/3600);
+            $offsetMinutes = round((abs($offset)-$offsetHours*3600) / 60);
             $offsetString = ($offset > 0 ? '+' : '-').($offsetHours < 10 ? '0' : '').$offsetHours.':'.($offsetMinutes < 10 ? '0' : '').$offsetMinutes;
 
-            $dbCharSet = $this->db->getCharset();    
+            $dbCharSet = $this->db->getCharset();
             $this->pdo = new \PDO(
                 'mysql:dbname=' . $this->db->getName() . ';charset=' . $dbCharSet . ';host=' . preg_replace('/:/', ';port=', $this->db->getHost()),
                 $this->dbUser->getName(),
@@ -218,7 +218,7 @@ namespace Cx\Core\Model {
          * Returns the AdoDB connection
          * @deprecated Use Doctrine (getEntityManager()) instead
          * @global string $ADODB_FETCH_MODE
-         * @return \ADONewConnection 
+         * @return \ADONewConnection
          */
         public function getAdoDb() {
             if ($this->adodb) {
@@ -264,7 +264,7 @@ namespace Cx\Core\Model {
         public function getDb() {
             return $this->db;
         }
-        
+
         /**
          * Adds YAML directories to entity manager
          * @param array $paths List of paths
@@ -273,14 +273,14 @@ namespace Cx\Core\Model {
             if (!$this->em) {
                 $this->getEntityManager();
             }
-            
+
             $drivers = $this->em->getConfiguration()->getMetadataDriverImpl()->getDrivers();
             $drivers['Cx']->addPaths($paths);
         }
 
         /**
          * Returns the doctrine entity manager
-         * @return \Doctrine\ORM\EntityManager 
+         * @return \Doctrine\ORM\EntityManager
          */
         public function getEntityManager() {
             if ($this->em) {
@@ -318,7 +318,7 @@ namespace Cx\Core\Model {
                     $cache->setNamespace($this->db->getName() . '.' . $this->db->getTablePrefix());
                     break;
                 case \Cx\Core_Modules\Cache\Controller\Cache::CACHE_ENGINE_FILESYSTEM:
-                    $cache = new \Cx\Core_Modules\Cache\Controller\Doctrine\CacheDriver\FileSystemCache(ASCMS_CACHE_PATH);                    
+                    $cache = new \Cx\Core_Modules\Cache\Controller\Doctrine\CacheDriver\FileSystemCache(ASCMS_CACHE_PATH);
                     break;
                 default:
                     $cache = $arrayCache;
@@ -331,7 +331,7 @@ namespace Cx\Core\Model {
 
             $config->setProxyDir(ASCMS_MODEL_PROXIES_PATH);
             $config->setProxyNamespace('Cx\Model\Proxies');
-            
+
             /**
              * This should be set to true if workbench is present and active.
              * Just checking for workbench.config is not really a good solution.
@@ -339,7 +339,7 @@ namespace Cx\Core\Model {
              * config value, there's no possibility to set this later.
              */
             $config->setAutoGenerateProxyClasses(file_exists(ASCMS_DOCUMENT_ROOT.'/workbench.config'));
-            
+
             $connectionOptions = array(
                 'pdo'       => $this->getPdoConnection(),
                 'dbname'    => $this->db->getName(),
@@ -380,10 +380,10 @@ namespace Cx\Core\Model {
 
             //resolve enum, set errors
             $conn = $em->getConnection();
-            $conn->setCharset($this->db->getCharset()); 
+            $conn->setCharset($this->db->getCharset());
             $conn->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
             $conn->getDatabasePlatform()->registerDoctrineTypeMapping('set', 'string');
-            
+
             $this->em = $em;
             return $this->em;
         }

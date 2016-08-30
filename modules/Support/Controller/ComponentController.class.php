@@ -27,7 +27,7 @@
 
 /**
  * Main controller for Support
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
@@ -38,17 +38,17 @@ namespace Cx\Modules\Support\Controller;
 
 /**
  * Main controller for Support
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
  * @subpackage  module_support
  */
 class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentController {
-    
+
     /**
      * Get the Controller classes
-     * 
+     *
      * @return array name of the controller classes
      */
     public function getControllerClasses() {

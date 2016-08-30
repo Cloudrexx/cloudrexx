@@ -29,7 +29,7 @@
  * Cloudrexx Update System
  *
  * This class is used to update the system to a newer version of Cloudrexx.
- * 
+ *
  * @copyright   Cloudrexx WMS - Cloudrexx AG
  * @author      Cloudrexx Development Team <info@cloudrexx.com>
  * @package     cloudrexx
@@ -153,7 +153,7 @@ if (!$objDatabase) {
 }
 Env::set('db', $objDatabase);
 
-if (!\Cx\Lib\UpdateUtil::table_exist(DBPREFIX.'session_variable')) {    
+if (!\Cx\Lib\UpdateUtil::table_exist(DBPREFIX.'session_variable')) {
     require_once(UPDATE_CORE . '/session.class.php');
     // Start session
     $sessionObj = new cmsSession();
@@ -228,9 +228,9 @@ function fixPaths(&$documentRoot, &$rootOffset) {
     $rootOffset = $nonOffset;//preg_replace('#' . $nonOffset . '#', '', $rootOffset);
 
     $documentRoot = preg_replace('#' . $rootOffset . '#', '', $fileRoot);
-	$documentRoot = str_replace('\\', '/', $documentRoot);
-	$rootOffset = preg_replace('#' . $documentRoot . '#', '', $rootOffset);
-	
+    $documentRoot = str_replace('\\', '/', $documentRoot);
+    $rootOffset = preg_replace('#' . $documentRoot . '#', '', $rootOffset);
+
     /*echo $documentRoot;
     // calculate correct document root
     // turning '/var/www/myoffset' into '/var/www'

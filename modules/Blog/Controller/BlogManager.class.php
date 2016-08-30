@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Blog
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
@@ -75,27 +75,27 @@ class BlogManager extends \Cx\Modules\Blog\Controller\BlogLibrary {
 
         $isAdmin = $objFWUser->objUser->getAdminStatus();
         //if(in_array(120, $objFWUser->objUser->getStaticPermissionIds()) || $isAdmin) {
-        	$strNavigation .= '<a href="index.php?cmd=Blog" 
+            $strNavigation .= '<a href="index.php?cmd=Blog"
                     class="'.($_GET['act'] == '' ? 'active' : '').'">'
                         .$_CORELANG['TXT_BLOG_ENTRY_MANAGE_TITLE'].'</a>';
         //}
         if(in_array(121, $objFWUser->objUser->getStaticPermissionIds()) || $isAdmin) {
-        	$strNavigation .= '<a href="index.php?cmd=Blog&amp;act=addEntry" 
+            $strNavigation .= '<a href="index.php?cmd=Blog&amp;act=addEntry"
                     class="'.(in_array($_GET['act'], array('addEntry', 'editEntry')) ? 'active' : '').'">'
                         .$_CORELANG['TXT_BLOG_ENTRY_ADD_TITLE'].'</a>';
         }
         if(in_array(122, $objFWUser->objUser->getStaticPermissionIds()) || $isAdmin) {
-        	$strNavigation .= '<a href="index.php?cmd=Blog&amp;act=manageCategory" 
+            $strNavigation .= '<a href="index.php?cmd=Blog&amp;act=manageCategory"
                     class="'.(in_array($_GET['act'], array('manageCategory', 'manageCategory')) ? 'active' : '').'">'
                         .$_CORELANG['TXT_BLOG_CATEGORY_MANAGE_TITLE'].'</a>';
         }
         if(in_array(125, $objFWUser->objUser->getStaticPermissionIds()) || $isAdmin) {
-        	$strNavigation .= '<a href="index.php?cmd=Blog&amp;act=networks" 
+            $strNavigation .= '<a href="index.php?cmd=Blog&amp;act=networks"
                     class="'.(in_array($_GET['act'], array('networks', 'editNetwork')) ? 'active' : '').'">'
                         .$_CORELANG['TXT_BLOG_NETWORKS_TITLE'].'</a>';
         }
         if(in_array(124, $objFWUser->objUser->getStaticPermissionIds()) || $isAdmin) {
-        	$strNavigation .= '<a href="index.php?cmd=Blog&amp;act=settings" 
+            $strNavigation .= '<a href="index.php?cmd=Blog&amp;act=settings"
                     class="'.(in_array($_GET['act'], array('settings'))? 'active' : '').'">'
                         .$_CORELANG['TXT_BLOG_SETTINGS_TITLE'].'</a>';
         }
@@ -652,7 +652,7 @@ class BlogManager extends \Cx\Modules\Blog\Controller\BlogLibrary {
                 } else {
                     $this->_objTpl->hideBlock('txt_languages_block');
                 }
-                
+
                 $this->_objTpl->setVariable(array(
                     'ENTRY_ROWCLASS'        =>  ($intRowClass % 2 == 0) ? 'row1' : 'row2',
                     'ENTRY_ID'              =>  $intEntryId,
@@ -700,14 +700,14 @@ class BlogManager extends \Cx\Modules\Blog\Controller\BlogLibrary {
         $this->_objTpl->loadTemplateFile('module_blog_entries_edit.html',true,true);
 
         $options = array(
-            'type'                      => 'button', 
-            'data-cx-mb-views'          => 'filebrowser', 
+            'type'                      => 'button',
+            'data-cx-mb-views'          => 'filebrowser',
             'data-cx-mb-startmediatype' => 'blog',
             'id'                        => 'mediabrowser_button',
             'style'                     => 'display:none'
         );
         $mediaBrowser = self::getMediaBrowserButton($_ARRAYLANG['TXT_BLOG_ENTRY_ADD_IMAGE_BROWSE'], $options, 'blogSetUrl');
-        
+
         $this->_objTpl->setVariable(array(
             'TXT_EDIT_LANGUAGES'    =>  $_ARRAYLANG['TXT_BLOG_CATEGORY_ADD_LANGUAGES'],
             'TXT_EDIT_SUBMIT'       =>  $_ARRAYLANG['TXT_BLOG_SAVE'],
@@ -738,7 +738,7 @@ class BlogManager extends \Cx\Modules\Blog\Controller\BlogLibrary {
 
                 ));
                 $this->_objTpl->parse('showLanguageTabs');
-                
+
                 //Parse the DIVS for every language
                 $this->_objTpl->setVariable(array(
                     'TXT_DIV_SUBJECT'       =>  $_ARRAYLANG['TXT_BLOG_ENTRY_ADD_SUBJECT'],
@@ -894,16 +894,16 @@ class BlogManager extends \Cx\Modules\Blog\Controller\BlogLibrary {
 
         $this->_strPageTitle = $_ARRAYLANG['TXT_BLOG_ENTRY_EDIT_TITLE'];
         $this->_objTpl->loadTemplateFile('module_blog_entries_edit.html',true,true);
-        
+
         $options = array(
-            'type'                      => 'button', 
-            'data-cx-mb-views'          => 'filebrowser', 
+            'type'                      => 'button',
+            'data-cx-mb-views'          => 'filebrowser',
             'data-cx-mb-startmediatype' => 'blog',
             'id'                        => 'mediabrowser_button',
             'style'                     => 'display:none'
         );
         $mediaBrowser = self::getMediaBrowserButton($_ARRAYLANG['TXT_BLOG_ENTRY_ADD_IMAGE_BROWSE'], $options, 'blogSetUrl');
-                    
+
         $this->_objTpl->setVariable(array(
             'TXT_EDIT_LANGUAGES'    =>  $_ARRAYLANG['TXT_BLOG_CATEGORY_ADD_LANGUAGES'],
             'TXT_EDIT_SUBMIT'       =>  $_ARRAYLANG['TXT_BLOG_SAVE'],
@@ -914,7 +914,7 @@ class BlogManager extends \Cx\Modules\Blog\Controller\BlogLibrary {
         $arrEntries = $this->createEntryArray();
 
         $intEntryId = intval($intEntryId);
-        
+
         $forcedLanguage = null;
         if (isset($_GET['langId']) && in_array(contrexx_input2raw($_GET['langId']), \FWLanguage::getIdArray())) {
             $forcedLanguage = contrexx_input2raw($_GET['langId']);
@@ -936,7 +936,7 @@ class BlogManager extends \Cx\Modules\Blog\Controller\BlogLibrary {
 
                     $arrLanguages[$intLanguageCounter%3] .= '<input '.(($boolLanguageIsActive) ? 'checked="checked"' : '').' type="checkbox" name="frmEditEntry_Languages[]" value="'.$intLanguageId.'" onclick="switchBoxAndTab(this, \'addEntry_'.$arrTranslations['long'].'\');" />'.$arrTranslations['long'].' ['.$arrTranslations['short'].']<br />';
                     $strJsTabToDiv .= 'arrTabToDiv["addEntry_'.$arrTranslations['long'].'"] = "'.$arrTranslations['long'].'";'."\n";
-                    
+
                     $activeTab = $boolFirstLanguage;
                     if ($forcedLanguage) {
                         $activeTab = $forcedLanguage == $intLanguageId;
@@ -952,7 +952,7 @@ class BlogManager extends \Cx\Modules\Blog\Controller\BlogLibrary {
 
                     ));
                     $this->_objTpl->parse('showLanguageTabs');
-                    
+
                     //Parse the DIVS for every language
                     $this->_objTpl->setVariable(array(
                         'TXT_DIV_SUBJECT'       =>  $_ARRAYLANG['TXT_BLOG_ENTRY_ADD_SUBJECT'],
@@ -971,7 +971,7 @@ class BlogManager extends \Cx\Modules\Blog\Controller\BlogLibrary {
                             ++$intCategoriesCounter;
                         }
                     }
-                   
+
                     $this->_objTpl->setVariable(array(
                         'DIV_ID'            =>  $arrTranslations['long'],
                         'DIV_LANGUAGE_ID'   =>  $intLanguageId,
@@ -983,7 +983,7 @@ class BlogManager extends \Cx\Modules\Blog\Controller\BlogLibrary {
                         'DIV_CATEGORIES_1'  =>  $arrCategoriesContent[0],
                         'DIV_CATEGORIES_2'  =>  $arrCategoriesContent[1],
                         'DIV_CATEGORIES_3'  =>  $arrCategoriesContent[2],
-                        'DIV_CONTENT'       =>  new \Cx\Core\Wysiwyg\Wysiwyg('frmEditEntry_Content_'.$intLanguageId, $arrEntries[$intEntryId]['translation'][$intLanguageId]['content'], 'full', $intLanguageId),                        
+                        'DIV_CONTENT'       =>  new \Cx\Core\Wysiwyg\Wysiwyg('frmEditEntry_Content_'.$intLanguageId, $arrEntries[$intEntryId]['translation'][$intLanguageId]['content'], 'full', $intLanguageId),
                     ));
 
                     $this->_objTpl->parse('showLanguageDivs');
@@ -1854,13 +1854,13 @@ class BlogManager extends \Cx\Modules\Blog\Controller\BlogLibrary {
         //Show ADD form
         //Get media browser code.
         $options = array(
-                        'type'                      => 'button', 
+                        'type'                      => 'button',
                         'id'                        => 'mediabrowser_button',
-                        'data-cx-mb-views'          => 'filebrowser', 
+                        'data-cx-mb-views'          => 'filebrowser',
                         'data-cx-mb-startmediatype' => 'blog'
                     );
         $mediaBrowser = self::getMediaBrowserButton($_ARRAYLANG['TXT_BLOG_NETWORKS_ADD_BROWSE'], $options, 'blogSetUrl');
-        
+
         $this->_objTpl->setVariable(array(
             'TXT_ADD_TITLE'                     =>  $_ARRAYLANG['TXT_BLOG_NETWORKS_ADD_TITLE'],
             'TXT_ADD_NAME'                      =>  $_ARRAYLANG['TXT_BLOG_NETWORKS_ADD_NAME'],
@@ -1940,8 +1940,8 @@ class BlogManager extends \Cx\Modules\Blog\Controller\BlogLibrary {
             $this->_strErrMessage = $_ARRAYLANG['TXT_BLOG_NETWORKS_INSERT_ERROR'];
         }
     }
-    
-    
+
+
     /**
      * Shows the edit-page for the network with the id $intNetworkId. If there is no entry with this id an error
      * message will be shown.
@@ -1954,16 +1954,16 @@ class BlogManager extends \Cx\Modules\Blog\Controller\BlogLibrary {
 
         $this->_strPageTitle = $_ARRAYLANG['TXT_BLOG_NETWORKS_EDIT_TITLE'];
         $this->_objTpl->loadTemplateFile('module_blog_networks_edit.html',true,true);
-        
+
         //Get media browser code.
         $options = array(
-                        'type'                      => 'button', 
+                        'type'                      => 'button',
                         'id'                        => 'mediabrowser_button',
-                        'data-cx-mb-views'          => 'filebrowser', 
+                        'data-cx-mb-views'          => 'filebrowser',
                         'data-cx-mb-startmediatype' => 'blog'
                     );
         $mediaBrowser = self::getMediaBrowserButton($_ARRAYLANG['TXT_BLOG_NETWORKS_ADD_BROWSE'], $options, 'blogSetUrl');
-        
+
         $this->_objTpl->setVariable(array(
             'TXT_EDIT_TITLE'        =>  $_ARRAYLANG['TXT_BLOG_NETWORKS_EDIT_TITLE'],
             'TXT_EDIT_NAME'         =>  $_ARRAYLANG['TXT_BLOG_NETWORKS_ADD_NAME'],

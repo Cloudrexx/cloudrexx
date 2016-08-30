@@ -40,7 +40,7 @@ class FileSystemFileException extends \Exception {};
 /**
  * File System File
  *
- * This class provides an object based interface to a file that resides 
+ * This class provides an object based interface to a file that resides
  * on the local file system.
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Thomas Däppen <thomas.daeppen@comvation.com>
@@ -74,7 +74,7 @@ class FileSystemFile implements FileInterface
             $this->filePath = ASCMS_DOCUMENT_ROOT.'/'.$file;
         }
     }
-    
+
     public function getFileOwner()
     {
         // get the user-ID of the user who owns the loaded file
@@ -82,26 +82,26 @@ class FileSystemFile implements FileInterface
         if (!$fileOwnerId) {
             throw new FileSystemFileException('Unable to fetch file owner of '.$this->filePath);
         }
-        
+
         return $fileOwnerId;
     }
-    
+
     public function isWritable() {
         return is_writable($this->filePath);
     }
 
     public function write($data)
     {
-        // first try 
+        // first try
         $fp = @fopen($this->filePath, 'w');
         if (!$fp) {
             // try to set write access
             $this->makeWritable($this->filePath);
         }
 
-        // second try 
+        // second try
         $fp = @fopen($this->filePath, 'w');
-        if (!$fp) { 
+        if (!$fp) {
             throw new FileSystemFileException('Unable to open file '.$this->filePath.' for writting!');
         }
 
@@ -120,16 +120,16 @@ class FileSystemFile implements FileInterface
 
     public function append($data)
     {
-        // first try 
+        // first try
         $fp = @fopen($this->filePath, 'a');
         if (!$fp) {
             // try to set write access
             $this->makeWritable($this->filePath);
         }
 
-        // second try 
+        // second try
         $fp = @fopen($this->filePath, 'a');
-        if (!$fp) { 
+        if (!$fp) {
             throw new FileSystemFileException('Unable to open file '.$this->filePath.' for writting!');
         }
 
@@ -153,7 +153,7 @@ class FileSystemFile implements FileInterface
             throw new FileSystemFileException('Unable to touch file in file system!');
         }
     }
-    
+
     public function copy($dst)
     {
         if (!copy($this->filePath, $dst)) {
@@ -217,4 +217,3 @@ class FileSystemFile implements FileInterface
         }
     }
 }
-

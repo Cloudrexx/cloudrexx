@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Model event wrapper
  *
@@ -47,7 +47,7 @@ namespace Cx\Core\Event\Controller;
 
 class ModelEventWrapper {
     protected $cx = null;
-    
+
     public function __construct(\Cx\Core\Core\Controller\Cx $cx) {
         $this->cx = $cx;
         $this->cx->getEvents()->addEvent('model/prePersist');
@@ -68,31 +68,31 @@ class ModelEventWrapper {
         $evm->addEventListener(\Doctrine\ORM\Events::onFlush,     $this);
         $evm->addEventListener(\Doctrine\ORM\Events::postFlush,     $this);
     }
-    
+
     public function prePersist(\Doctrine\ORM\Event\LifecycleEventArgs $eventArgs) {
         $this->cx->getEvents()->triggerEvent('model/prePersist', array($eventArgs));
     }
-    
+
     public function postPersist(\Doctrine\ORM\Event\LifecycleEventArgs $eventArgs) {
         $this->cx->getEvents()->triggerEvent('model/postPersist', array($eventArgs));
     }
-    
+
     public function preUpdate(\Doctrine\ORM\Event\LifecycleEventArgs $eventArgs) {
         $this->cx->getEvents()->triggerEvent('model/preUpdate', array($eventArgs));
     }
-    
+
     public function postUpdate(\Doctrine\ORM\Event\LifecycleEventArgs $eventArgs) {
         $this->cx->getEvents()->triggerEvent('model/postUpdate', array($eventArgs));
     }
-    
+
     public function preRemove(\Doctrine\ORM\Event\LifecycleEventArgs $eventArgs) {
         $this->cx->getEvents()->triggerEvent('model/preRemove', array($eventArgs));
     }
-    
+
     public function postRemove(\Doctrine\ORM\Event\LifecycleEventArgs $eventArgs) {
         $this->cx->getEvents()->triggerEvent('model/postRemove', array($eventArgs));
     }
-    
+
     public function onFlush(\Doctrine\Common\EventArgs $eventArgs) {
         $this->cx->getEvents()->triggerEvent('model/onFlush', array($eventArgs));
     }

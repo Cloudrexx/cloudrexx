@@ -7,12 +7,12 @@
        <tr class="row3">
             <td width="2%">&nbsp;&nbsp;{TXT_SYMBOL}</td>
             <td style="text-align:center;" width="6%">{TXT_STATUS}</td>
-            <td style="text-align:center;" width="7%">Standard</td>		
+            <td style="text-align:center;" width="7%">Standard</td>
             <td width="17%">{TXT_SURVEY_TITLE}</td>
-            <td width="20%">{TXT_DESCRIPTION}</td>            
+            <td width="20%">{TXT_DESCRIPTION}</td>
             <td width="15%">{TXT_CREATED_AT}</td>
-            <td width="15%">{TXT_MODIFIED_AT}</td>    
-            <td width="5%">{TXT_COUNTER}</td>           
+            <td width="15%">{TXT_MODIFIED_AT}</td>
+            <td width="5%">{TXT_COUNTER}</td>
             <td style="text-align:right;" width="15%">{TXT_FUNCTIONS}</td>
        </tr>
        <!-- BEGIN showEntries -->
@@ -26,78 +26,77 @@
               </a>
             </td>
             <td style="text-align:center">
-               	  <input type="radio" value="{TXT_SURVEY_ID}" id="Yeshome" onclick="activateSurvey()" name="Yeshome" {DB_YES_SURVEY_HOMEBOX}/>              
+                   <input type="radio" value="{TXT_SURVEY_ID}" id="Yeshome" onclick="activateSurvey()" name="Yeshome" {DB_YES_SURVEY_HOMEBOX}/>
             </td>
             <td>{TXT_SURVEY_TITLE_LABEL}</td>
-            <td>{TXT_SURVEY_DESCRIPTION}</td>            
+            <td>{TXT_SURVEY_DESCRIPTION}</td>
             <td>{TXT_SURVEY_CREATED_AT}</td>
             <td>{TXT_SURVEY_UPDATED_AT}</td>
             <td style="text-align:left;padding-left:2px;">{TXT_SURVEY_COUNTER}</td>
             <td nowrap="nowrap">
-		 <div align="right" style="padding-right:5px;">
-		   <a href="index.php?cmd=Survey&act=analyseSurvey&id={TXT_SURVEY_ID}" target="_self" title="{TXT_SURVEY_ANALYSE_TXT}">
-		     <img src="../core/Core/View/Media/icons/stats.png" border="0" alt="{TXT_SURVEY_ANALYSE_TXT}" title="{TXT_SURVEY_ANALYSE_TXT}" />
-		   </a>		 
-		   <a href="../index.php?section=Survey&cmd=surveypreview&id={TXT_SURVEY_ID}" title="{TXT_SURVEY_PREVIEW_TXT}" target="_blank" rel="gb_page_fs[]">
-		     <img src="../core/Core/View/Media/icons/preview.png" border="0" alt="{TXT_SURVEY_PREVIEW_TXT}" title="{TXT_SURVEY_PREVIEW_TXT}" />
-		   </a>	
+     <div align="right" style="padding-right:5px;">
+       <a href="index.php?cmd=Survey&act=analyseSurvey&id={TXT_SURVEY_ID}" target="_self" title="{TXT_SURVEY_ANALYSE_TXT}">
+         <img src="../core/Core/View/Media/icons/stats.png" border="0" alt="{TXT_SURVEY_ANALYSE_TXT}" title="{TXT_SURVEY_ANALYSE_TXT}" />
+       </a>
+       <a href="../index.php?section=Survey&cmd=surveypreview&id={TXT_SURVEY_ID}" title="{TXT_SURVEY_PREVIEW_TXT}" target="_blank" rel="gb_page_fs[]">
+         <img src="../core/Core/View/Media/icons/preview.png" border="0" alt="{TXT_SURVEY_PREVIEW_TXT}" title="{TXT_SURVEY_PREVIEW_TXT}" />
+       </a>
                <!--  This is the reset button -->
-		   <a href="index.php?cmd=Survey&act=resetSurvey&id={TXT_SURVEY_ID}" target="_self" title="{TXT_SURVEY_REFRESH_TXT}">
-		     <img src="../core/Core/View/Media/icons/reset.png" border="0" alt="{TXT_IMAGE_EDIT}" title="{TXT_SURVEY_REFRESH_TXT}" />
-		   </a>
-	  <!--  end the reset button -->
-	  
-	  <!--  This is the CSV button -->
-		   <a href="index.php?cmd=Survey&act=csvSurvey&id={TXT_SURVEY_ID}" target="_self" title="{TXT_SURVEY_CSV_TXT}">
-		     <img src="../core/Core/View/Media/icons/csv.gif" border="0" alt="{TXT_IMAGE_EDIT}" title="Auswertung exportieren" />
-		   </a>
-	  <!--  end the CSV button -->
-	  
-	   <!--  This is the CSV button additional Export-->
-		   <a href="index.php?cmd=Survey&act=csvAdditionalinfo&id={TXT_SURVEY_ID}" target="_self" title="{TXT_SURVEY_CSV_TXT}">
-		     <img src="../core/Core/View/Media/icons/csv.gif" border="0" alt="{TXT_IMAGE_EDIT}" title="Teilnehmer Exportieren" />
-		   </a>
-	  <!--  end CSV button additional Export-->
-	  
-	  
-	  <!--  This is the CSV button additional Export-->
-		   <!--<a href="index.php?cmd=Survey&act=Detailexport&id={TXT_SURVEY_ID}" target="_self" title="{TXT_SURVEY_CSV_TXT}">
-		     <img src="../core/Core/View/Media/icons/csv.gif" border="0" alt="{TXT_IMAGE_EDIT}" title="Detailexport pro Teilnehmer" />
-		   </a>-->
-	  <!--  end CSV button additional Export-->
-	  
-	  
-	  
-	  
-	  
-		   <a href="index.php?cmd=Survey&act=editSurvey&id={TXT_SURVEY_ID}" target="_self" title="{TXT_IMAGE_EDIT}">
-		     <img src="../core/Core/View/Media/icons/edit.gif" border="0" alt="{TXT_IMAGE_EDIT}" title="{TXT_SURVEY_EDIT_TXT}" />
-		   </a>
-		   <a href="javascript:deleteEntry({TXT_SURVEY_ID});" target="_self" title="{TXT_IMGALT_DELETE}">
-		     <img src="../core/Core/View/Media/icons/delete.gif" border="0" alt="{TXT_IMGALT_DELETE}" title="{TXT_SURVEY_DELETE_TXT}" />
-		   </a>
-		 </div>
-	     </td>
+       <a href="index.php?cmd=Survey&act=resetSurvey&id={TXT_SURVEY_ID}" target="_self" title="{TXT_SURVEY_REFRESH_TXT}">
+         <img src="../core/Core/View/Media/icons/reset.png" border="0" alt="{TXT_IMAGE_EDIT}" title="{TXT_SURVEY_REFRESH_TXT}" />
+       </a>
+    <!--  end the reset button -->
+
+    <!--  This is the CSV button -->
+       <a href="index.php?cmd=Survey&act=csvSurvey&id={TXT_SURVEY_ID}" target="_self" title="{TXT_SURVEY_CSV_TXT}">
+         <img src="../core/Core/View/Media/icons/csv.gif" border="0" alt="{TXT_IMAGE_EDIT}" title="Auswertung exportieren" />
+       </a>
+    <!--  end the CSV button -->
+
+     <!--  This is the CSV button additional Export-->
+       <a href="index.php?cmd=Survey&act=csvAdditionalinfo&id={TXT_SURVEY_ID}" target="_self" title="{TXT_SURVEY_CSV_TXT}">
+         <img src="../core/Core/View/Media/icons/csv.gif" border="0" alt="{TXT_IMAGE_EDIT}" title="Teilnehmer Exportieren" />
+       </a>
+    <!--  end CSV button additional Export-->
+
+
+    <!--  This is the CSV button additional Export-->
+       <!--<a href="index.php?cmd=Survey&act=Detailexport&id={TXT_SURVEY_ID}" target="_self" title="{TXT_SURVEY_CSV_TXT}">
+         <img src="../core/Core/View/Media/icons/csv.gif" border="0" alt="{TXT_IMAGE_EDIT}" title="Detailexport pro Teilnehmer" />
+       </a>-->
+    <!--  end CSV button additional Export-->
+
+
+
+
+
+       <a href="index.php?cmd=Survey&act=editSurvey&id={TXT_SURVEY_ID}" target="_self" title="{TXT_IMAGE_EDIT}">
+         <img src="../core/Core/View/Media/icons/edit.gif" border="0" alt="{TXT_IMAGE_EDIT}" title="{TXT_SURVEY_EDIT_TXT}" />
+       </a>
+       <a href="javascript:deleteEntry({TXT_SURVEY_ID});" target="_self" title="{TXT_IMGALT_DELETE}">
+         <img src="../core/Core/View/Media/icons/delete.gif" border="0" alt="{TXT_IMGALT_DELETE}" title="{TXT_SURVEY_DELETE_TXT}" />
+       </a>
+     </div>
+       </td>
        </tr>
-       <!-- END showEntries -->       
+       <!-- END showEntries -->
 </table>
 
 <table cellpadding="2" cellspacing="0" border="0" >
-		<tr>
-			<td>
-				<img src="../core/Core/View/Media/icons/arrow.gif" border="0" width="38" height="22" alt="{TXT_ENTRIES_MARKED}:" />
-				<a href="#" onclick="changeCheckboxes('frmShowSurveyEntries','selectedEntriesId[]',true); return false;">{TXT_SELECT_ALL}</a> /
-				<a href="#" onclick="changeCheckboxes('frmShowSurveyEntries','selectedEntriesId[]',false); return false;">{TXT_DESELECT_ALL}</a>
-				<img src="../core/Core/View/Media/icons/strike.gif" alt="" />
-				<select name="frmShowEntries_MultiAction" onchange="selectMultiAction();">
-					<option value="0">{TXT_SELECT_ACTION}</option>
-					<option value="activate">{TXT_ACTIVATE}</option>
-					<option value="deactivate">{TXT_DEACTIVATE}</option>
-					<option value="delete">{TXT_DELETE_SELECTED}</option>
-		 		</select>
-			</td>
-   		</tr>
-	</table>
+    <tr>
+      <td>
+        <img src="../core/Core/View/Media/icons/arrow.gif" border="0" width="38" height="22" alt="{TXT_ENTRIES_MARKED}:" />
+        <a href="#" onclick="changeCheckboxes('frmShowSurveyEntries','selectedEntriesId[]',true); return false;">{TXT_SELECT_ALL}</a> /
+        <a href="#" onclick="changeCheckboxes('frmShowSurveyEntries','selectedEntriesId[]',false); return false;">{TXT_DESELECT_ALL}</a>
+        <img src="../core/Core/View/Media/icons/strike.gif" alt="" />
+        <select name="frmShowEntries_MultiAction" onchange="selectMultiAction();">
+          <option value="0">{TXT_SELECT_ACTION}</option>
+          <option value="activate">{TXT_ACTIVATE}</option>
+          <option value="deactivate">{TXT_DEACTIVATE}</option>
+          <option value="delete">{TXT_DELETE_SELECTED}</option>
+         </select>
+      </td>
+       </tr>
+  </table>
 {ENTRIES_PAGING}
-	</form>
-
+  </form>

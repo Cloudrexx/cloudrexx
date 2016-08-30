@@ -64,11 +64,11 @@ a{
         showImage();
     }
 
-	var resize = function(){
-		window.resizeTo(parseInt(arrImages[index]['width'])+100, parseInt(arrImages[index]['height'])+200);
-	}
+  var resize = function(){
+    window.resizeTo(parseInt(arrImages[index]['width'])+100, parseInt(arrImages[index]['height'])+200);
+  }
 
-	var showImage = function(){
+  var showImage = function(){
         oImage.src = arrImages[index]['src'];
         oImage.alt = arrImages[index]['name'];
         oImage.title = arrImages[index]['name'];
@@ -77,29 +77,29 @@ a{
         oSpanImgContent.removeChild(oSpanImgContent.childNodes[0]);
         oSpanImgContent.appendChild(document.createTextNode(arrImages[index]['content']));
         resize();
-	}
+  }
 
-	var nextImage = function(){
+  var nextImage = function(){
         index=getArrayKeyFromValue(index, arrIndex);
         if(index < arrIndex.length - 1){
           index = arrIndex[++index];
         }else{
           index = arrIndex[0];
         }
-	    showImage();
-	}
+      showImage();
+  }
 
-	var prevImage = function(){
+  var prevImage = function(){
         index = getArrayKeyFromValue(index, arrIndex);
         if(index > 0){
           index = arrIndex[--index];
         }else{
           index = arrIndex[arrIndex.length-1];
         }
-	    showImage();
-	}
+      showImage();
+  }
 
-	var getArrayKeyFromValue = function(searchS, arraySA){
+  var getArrayKeyFromValue = function(searchS, arraySA){
         var I = 0;
         var minI = 0;
         var maxI = arraySA.length - 1;
@@ -134,9 +134,9 @@ a{
 
 
     <div class="center">
-    	<span id="imgName">&nbsp;</span><br />
-    	<img  src="." alt="foo" title="foo" id="theImage" />	<br />
-    	<span id="imgContent">&nbsp;</span> <br />
+      <span id="imgName">&nbsp;</span><br />
+      <img  src="." alt="foo" title="foo" id="theImage" />  <br />
+      <span id="imgContent">&nbsp;</span> <br />
     </div>
 </div>
 </body>

@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Wrapper class for PHPUnit_TextUI_TestRunner
  *
@@ -36,7 +36,7 @@
  */
 
 namespace Cx\Core\Model\Controller;
-        
+
 /**
  * Wrapper class for PHPUnit_TextUI_TestRunner
  *
@@ -44,20 +44,20 @@ namespace Cx\Core\Model\Controller;
  * @author      ss4u <ss4u.comvation@gmail.com>
  * @version     $Id:    Exp $
  * @package     cloudrexx
- * @subpackage  core 
+ * @subpackage  core
  */
 class PHPUnitTextUITestRunner extends \PHPUnit_TextUI_TestRunner {
-    
+
     /**
      * Set the loader to be used.
-     * 
+     *
      * @param \PHPUnit_Runner_TestSuiteLoader $loader
      */
     public function setLoader(\PHPUnit_Runner_TestSuiteLoader $loader = NULL)
     {
         $this->loader = $loader;
     }
-    
+
     /**
      * Reset the printer value from the class
      */

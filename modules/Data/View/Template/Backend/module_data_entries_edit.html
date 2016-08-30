@@ -296,13 +296,13 @@ function fillSelects() {
     <ul id="tabmenu">
         <!-- BEGIN showLanguageTabs -->
         <li>
-            <a id="{TABS_LINK_ID}" class="{TABS_CLASS}" href="javascript:{}" 
+            <a id="{TABS_LINK_ID}" class="{TABS_CLASS}" href="javascript:{}"
             onclick="selectDataTab('{TABS_DIV_ID}')" title="{TABS_NAME}" style="{TABS_DISPLAY_STYLE}">{TABS_NAME}</a>
         </li>
         <!-- END showLanguageTabs -->
         <li>
-            <a id="addEntry_advSettings" class="inactive" href="javascript:{}" 
-                onclick="selectDataTab('advSettings')" title="{TXT_ADV_SETTINGS}" 
+            <a id="addEntry_advSettings" class="inactive" href="javascript:{}"
+                onclick="selectDataTab('advSettings')" title="{TXT_ADV_SETTINGS}"
                 style="display: inline;">{TXT_ADV_SETTINGS}
             </a>
         </li>
@@ -321,7 +321,7 @@ function fillSelects() {
                     {TXT_DIV_SUBJECT}
                 </td>
                 <td colspan="3">
-                    <input type="text" name="frmEditEntry_Subject_{DIV_LANGUAGE_ID}" 
+                    <input type="text" name="frmEditEntry_Subject_{DIV_LANGUAGE_ID}"
                         value="{DIV_SUBJECT}" maxlength="250" style="width:30%;" />
                 </td>
             </tr>
@@ -340,38 +340,38 @@ function fillSelects() {
                     {TXT_DIV_THUMBNAIL}
                 </td>
                 <td colspan="3">
-                    <input type="radio" name="frmEditEntry_Thumbnail_Method_{DIV_LANGUAGE_ID}" 
-                        id="frmEditEntry_Thumbnail_Method_Original_{DIV_LANGUAGE_ID}" 
-                        value="original" onchange="showSelectedThumbnailMethod(this.value,{DIV_LANGUAGE_ID})" 
-                        {THUMBNAIL_METHOD_ORI_CHECKED} /> 
+                    <input type="radio" name="frmEditEntry_Thumbnail_Method_{DIV_LANGUAGE_ID}"
+                        id="frmEditEntry_Thumbnail_Method_Original_{DIV_LANGUAGE_ID}"
+                        value="original" onchange="showSelectedThumbnailMethod(this.value,{DIV_LANGUAGE_ID})"
+                        {THUMBNAIL_METHOD_ORI_CHECKED} />
                     <label for="frmEditEntry_Thumbnail_Method_Original_{DIV_LANGUAGE_ID}">
                         {TXT_DATA_THUMBNAIL_ORI_DESC}</label><br />
 
-                    <input type="radio" name="frmEditEntry_Thumbnail_Method_{DIV_LANGUAGE_ID}" 
-                        id="frmEditEntry_Thumbnail_Method_Different_{DIV_LANGUAGE_ID}" 
-                        value="different" onchange="showSelectedThumbnailMethod(this.value,{DIV_LANGUAGE_ID})" 
+                    <input type="radio" name="frmEditEntry_Thumbnail_Method_{DIV_LANGUAGE_ID}"
+                        id="frmEditEntry_Thumbnail_Method_Different_{DIV_LANGUAGE_ID}"
+                        value="different" onchange="showSelectedThumbnailMethod(this.value,{DIV_LANGUAGE_ID})"
                         {THUMBNAIL_METHOD_DIFF_CHECKED} />
                     <label for="frmEditEntry_Thumbnail_Method_Different_{DIV_LANGUAGE_ID}">
                         {TXT_DATA_THUMBNAIL_DIFF_DESC}</label> <br />
 
                     <div id="thumbnail_ori_{DIV_LANGUAGE_ID}" style="margin-top:15px; display:{DIV_THUMBNAIL_ORI_DISPLAY};">
                         {TXT_DATA_THUMBNAIL_SIZE}<br />
-                        {TXT_DATA_WIDTH} 
-                        <input type="text" name="frmEditEntry_Thumbnail_Width_{DIV_LANGUAGE_ID}" 
-                            value="{THUMBNAIL_ORI_WIDTH}" /> 
-                            {TXT_DATA_HEIGHT} <input type="text" 
-                            name="frmEditEntry_Thumbnail_Height_{DIV_LANGUAGE_ID}" 
+                        {TXT_DATA_WIDTH}
+                        <input type="text" name="frmEditEntry_Thumbnail_Width_{DIV_LANGUAGE_ID}"
+                            value="{THUMBNAIL_ORI_WIDTH}" />
+                            {TXT_DATA_HEIGHT} <input type="text"
+                            name="frmEditEntry_Thumbnail_Height_{DIV_LANGUAGE_ID}"
                             value="{THUMBNAIL_ORI_HEIGHT}" />
                     </div>
 
                     <div id="thumbnail_diff_{DIV_LANGUAGE_ID}"
                         style="margin-top:15px; display:{DIV_THUMBNAIL_DIFF_DISPLAY};">
 
-                        <input type="text" name="frmEditEntry_Thumbnail_{DIV_LANGUAGE_ID}" 
-                            id="frmEditEntry_Thumbnail_{DIV_LANGUAGE_ID}" style="width:30%;" 
+                        <input type="text" name="frmEditEntry_Thumbnail_{DIV_LANGUAGE_ID}"
+                            id="frmEditEntry_Thumbnail_{DIV_LANGUAGE_ID}" style="width:30%;"
                             value="{DIV_THUMBNAIL}" />&nbsp;
 
-                        <input type="button" value="{TXT_DIV_THUMBNAIL_BROWSE}" 
+                        <input type="button" value="{TXT_DIV_THUMBNAIL_BROWSE}"
                             onclick="newsGetFileBrowser('frmEditEntry_Thumbnail_{DIV_LANGUAGE_ID}', 'image')" />
                             <br /><br />
 
@@ -387,10 +387,10 @@ function fillSelects() {
             <tr class="row1">
               <td>{TXT_DIV_ATTACHMENT}</td>
               <td colspan="3">
-                  <input type="text" name="frmEditEntry_Attachment_{DIV_LANGUAGE_ID}" 
-                      id="frmEditEntry_Attachment_{DIV_LANGUAGE_ID}" style="width: 30%;" 
+                  <input type="text" name="frmEditEntry_Attachment_{DIV_LANGUAGE_ID}"
+                      id="frmEditEntry_Attachment_{DIV_LANGUAGE_ID}" style="width: 30%;"
                       value="{DIV_ATTACHMENT}" />&nbsp;
-                  <input type="button" value="{TXT_DIV_IMAGE_BROWSE}" 
+                  <input type="button" value="{TXT_DIV_IMAGE_BROWSE}"
                       onclick="newsGetFileBrowser('frmEditEntry_Attachment_{DIV_LANGUAGE_ID}', 'image')" />
               </td>
               </td>
@@ -438,14 +438,14 @@ function fillSelects() {
                                 <script type="text/javascript">
                                     selectsToFill[{DIV_LANGUAGE_ID}] = document.frmEditEntry.elements['assignedBlocks_{DIV_LANGUAGE_ID}[]'];
                                 </script>
-                                
+
                                 <br />
                                 <font>
                                     <a href="javascript:void(0);" onclick="SelectAllList(document.frmEditEntry.elements['assignedBlocks_{DIV_LANGUAGE_ID}[]'])">Alles markieren</a> <br />
                                     <a href="javascript:void(0);" onclick="DeselectAllList(document.frmEditEntry.elements['assignedBlocks_{DIV_LANGUAGE_ID}[]'])">Markierung löschen</a>
                                 </font>
                             </td>
-                            
+
                         </tr>
                     </table>
                 </td>
@@ -515,7 +515,7 @@ function fillSelects() {
                 <input type="text" name="release_date_end" id="release_date_end" value="{RELEASE_DATE_END}" style="width: 100px; color: {RELEASE_COLOR};" {RELEASE_DISPLAY} />
                 <select id="release_hour_end" name="release_hour_end" style=" color: {RELEASE_COLOR};" {RELEASE_DISPLAY}>{RELEASE_HOUR_OPTIONS_END}</select> : <select style=" color: {RELEASE_COLOR};" id="release_minute_end" name="release_minute_end" {RELEASE_DISPLAY}>{RELEASE_MINUTES_OPTIONS_END}</select>
                 <input type="checkbox" name="endless" id="endless" {ENDLESS_CHECKED} onclick="updateEndDate(this)" /> <label for="endless">{TXT_ENDDATE_ENDLESS}</label>
-                
+
             </td>
         </tr>
     </table>

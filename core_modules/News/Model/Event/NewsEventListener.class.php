@@ -27,7 +27,7 @@
 
 /**
  * EventListener for News
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
@@ -38,7 +38,7 @@ namespace Cx\Core_Modules\News\Model\Event;
 
 /**
  * EventListener for News
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
@@ -48,7 +48,7 @@ class NewsEventListener implements \Cx\Core\Event\Model\Entity\EventListener {
 
     /**
      * Callable on trigger Event
-     * 
+     *
      * @param string $eventName Event name
      * @param array  $eventArgs Arguments for the event
      */
@@ -61,11 +61,11 @@ class NewsEventListener implements \Cx\Core\Event\Model\Entity\EventListener {
     /**
      * Global search event listener
      * Appends the News search results to the search object
-     * 
+     *
      * @param array $eventArgs
      */
     private function SearchFindContent(array $eventArgs) {
-    	$search = current($eventArgs);
+        $search = current($eventArgs);
         $term_db = contrexx_raw2db($search->getTerm());
         $newsLib = new \Cx\Core_Modules\News\Controller\NewsLibrary();
         $query = '
@@ -93,7 +93,7 @@ class NewsEventListener implements \Cx\Core\Event\Model\Entity\EventListener {
                     OR `teaser_text` `LIKE` ("%`' . $term_db . '`%")
                 )' .
             $newsLib->getNewsFilterQuery('tblN', '', '');
-                    
+
         $pageUrl = function($pageUri, $searchData) {
             static $objNewsLib = null;
             if (!$objNewsLib) {
@@ -121,11 +121,11 @@ class NewsEventListener implements \Cx\Core\Event\Model\Entity\EventListener {
     }
 
     /**
-     * Update the news locales 
+     * Update the news locales
      * while activate/deactivate a language in the Administrative -> Language
-     * 
+     *
      * @param array $eventArgs Arguments for the event
-     * 
+     *
      * @return boolean
      */
     protected function languageStatusUpdate(array $eventArgs)
@@ -141,9 +141,9 @@ class NewsEventListener implements \Cx\Core\Event\Model\Entity\EventListener {
             $langId     = isset($args['langId']) ? $args['langId'] : 0;
             $langStatus = isset($args['status']) ? $args['status'] : 0;
 
-            if (    empty($langId) 
-                ||  !isset($args['status']) 
-                ||  (    !$langStatus 
+            if (    empty($langId)
+                ||  !isset($args['status'])
+                ||  (    !$langStatus
                      &&  !$eventArgs[0]['langRemovalStatus']
                     )
             ) {
@@ -152,41 +152,41 @@ class NewsEventListener implements \Cx\Core\Event\Model\Entity\EventListener {
 
             //Update the news locale
             $newsQuery = $langStatus ?
-                            'INSERT IGNORE INTO 
-                                `' . DBPREFIX . 'module_news_locale` 
-                                (   `news_id`, 
-                                    `lang_id`, 
-                                    `is_active`, 
-                                    `title`, 
-                                    `text`, 
+                            'INSERT IGNORE INTO
+                                `' . DBPREFIX . 'module_news_locale`
+                                (   `news_id`,
+                                    `lang_id`,
+                                    `is_active`,
+                                    `title`,
+                                    `text`,
                                     `teaser_text`
                                 )
-                                SELECT `news_id`, 
+                                SELECT `news_id`,
                                         ' . $langId . ',
                                         0,
-                                        `title`, 
-                                        `text`, 
-                                        `teaser_text` 
-                                    FROM `' . DBPREFIX . 'module_news_locale` 
+                                        `title`,
+                                        `text`,
+                                        `teaser_text`
+                                    FROM `' . DBPREFIX . 'module_news_locale`
                                     WHERE lang_id = ' . $defaultLangId
-                        :   'DELETE FROM `' . DBPREFIX . 'module_news_locale` 
+                        :   'DELETE FROM `' . DBPREFIX . 'module_news_locale`
                                 WHERE lang_id = ' . $langId;
             $objDatabase->Execute($newsQuery);
 
             //Update the news category locale
             $catQuery = $langStatus ?
-                            'INSERT IGNORE INTO 
-                                `' . DBPREFIX . 'module_news_categories_locale` 
-                                (   `category_id`, 
-                                    `lang_id`, 
-                                    `name` 
+                            'INSERT IGNORE INTO
+                                `' . DBPREFIX . 'module_news_categories_locale`
+                                (   `category_id`,
+                                    `lang_id`,
+                                    `name`
                                 )
-                                SELECT `category_id`, 
+                                SELECT `category_id`,
                                         ' . $langId . ',
-                                        `name` 
-                                    FROM `' . DBPREFIX . 'module_news_categories_locale` 
+                                        `name`
+                                    FROM `' . DBPREFIX . 'module_news_categories_locale`
                                     WHERE lang_id = ' . $defaultLangId
-                        :   'DELETE FROM `' . DBPREFIX . 'module_news_categories_locale` 
+                        :   'DELETE FROM `' . DBPREFIX . 'module_news_categories_locale`
                                 WHERE lang_id = ' . $langId;
             $objDatabase->Execute($catQuery);
         }

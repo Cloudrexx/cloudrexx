@@ -119,7 +119,7 @@ $_ARRAYLANG['TXT_IMMO_SETTINGS_ICON_MESSAGE_DESC'] = "Se pueden usar las siguien
 %OBJECT_TYPE% (tipo),<br/>
 %NEW_BUILDING% (nueva construcci&oacute;n),<br/>
 %PROPERTY_TYPE% (propiedad),<br/>
-%LONGITUDE% (longitud),<br/> 
+%LONGITUDE% (longitud),<br/>
 %LATITUDE% (latitud).";
 $_ARRAYLANG['TXT_IMMO_SPECIAL_OFFER'] = "Oferta Especial";
 $_ARRAYLANG['TXT_IMMO_SPECIAL_OFFER_SHORT'] = "Ofer.Esp.";

@@ -1,42 +1,42 @@
 <!-- start module_podcast_modify_category.html -->
 <form action="index.php?cmd=Podcast&amp;act=modifyCategory&amp;id={PODCAST_CATEGORY_ID}" method="post">
-	<table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
-		<tr>
-			<th colspan="4">{PODCAST_CATEGORY_MODIFY_TITLE}</th>
-		</tr>
-		<tr class="row1">
-			<td width="15%">{TXT_PODCAST_TITLE}</td>
-			<td width="85%" colspan="3"><input type="text" name="podcast_category_title" value="{PODCAST_CATEGORY_TITLE}" maxlength="255" style="width:300px;" /></td>
-		</tr>
-		<tr class="row2">
-			<td>{TXT_PODCAST_DESCRIPTION}</td>
-			<td colspan="3"><input type="text" name="podcast_category_description" value="{PODCAST_CATEGORY_DESCRIPTION}" maxlength="255" style="width:300px;" /></td>
-		</tr>
-		<tr class="row1" style="vertical-align:top;">
-			<td width="15%">{TXT_PODCAST_FRONTEND_LANGUAGES}</td>
-			<td width="20%">
-				<!-- BEGIN podcast_category_associated_language_0 -->
-					<input type="checkbox" name="podcast_category_associated_language[{PODCAST_LANG_ID}]" id="podcast_category_associated_language_{PODCAST_LANG_ID}" value="1" {PODCAST_LANG_ASSOCIATED} /><label for="podcast_category_associated_language_{PODCAST_LANG_ID}">{PODCAST_LANG_NAME}</label><br />
-				<!-- END podcast_category_associated_language_0 -->
-			</td>
-			<td width="20%">
-				<!-- BEGIN podcast_category_associated_language_1 -->
-					<input type="checkbox" name="podcast_category_associated_language[{PODCAST_LANG_ID}]" id="podcast_category_associated_language_{PODCAST_LANG_ID}" value="1" {PODCAST_LANG_ASSOCIATED} /><label for="podcast_category_associated_language_{PODCAST_LANG_ID}">{PODCAST_LANG_NAME}</label><br />
-				<!-- END podcast_category_associated_language_1 -->
-			</td>
-			<td width="45%">
-				<!-- BEGIN podcast_category_associated_language_2 -->
-					<input type="checkbox" name="podcast_category_associated_language[{PODCAST_LANG_ID}]" id="podcast_category_associated_language_{PODCAST_LANG_ID}" value="1" {PODCAST_LANG_ASSOCIATED} /><label for="podcast_category_associated_language_{PODCAST_LANG_ID}">{PODCAST_LANG_NAME}</label><br />
-				<!-- END podcast_category_associated_language_2 -->
-			</td>
-		</tr>
-		<tr class="row2">
-			<td>{TXT_PODCAST_STATUS}</td>
-			<td colspan="3"><input type="checkbox" name="podcast_category_status" id="podcast_category_status" value="1" {PODCAST_CATEGORY_STATUS} /><label for="podcast_category_status">{TXT_PODCAST_ACTIVE}</label></td>
-		</tr>
-	</table>
-	<br />
-	<input type="button" onclick="window.location.href='index.php?cmd=Podcast&{CSRF_PARAM}&amp;act=categories'" value="{TXT_PODCAST_BACK}" />
-	<input type="submit" name="podcast_category_save" value="{TXT_PODCAST_SAVE}" />
+  <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
+    <tr>
+      <th colspan="4">{PODCAST_CATEGORY_MODIFY_TITLE}</th>
+    </tr>
+    <tr class="row1">
+      <td width="15%">{TXT_PODCAST_TITLE}</td>
+      <td width="85%" colspan="3"><input type="text" name="podcast_category_title" value="{PODCAST_CATEGORY_TITLE}" maxlength="255" style="width:300px;" /></td>
+    </tr>
+    <tr class="row2">
+      <td>{TXT_PODCAST_DESCRIPTION}</td>
+      <td colspan="3"><input type="text" name="podcast_category_description" value="{PODCAST_CATEGORY_DESCRIPTION}" maxlength="255" style="width:300px;" /></td>
+    </tr>
+    <tr class="row1" style="vertical-align:top;">
+      <td width="15%">{TXT_PODCAST_FRONTEND_LANGUAGES}</td>
+      <td width="20%">
+        <!-- BEGIN podcast_category_associated_language_0 -->
+          <input type="checkbox" name="podcast_category_associated_language[{PODCAST_LANG_ID}]" id="podcast_category_associated_language_{PODCAST_LANG_ID}" value="1" {PODCAST_LANG_ASSOCIATED} /><label for="podcast_category_associated_language_{PODCAST_LANG_ID}">{PODCAST_LANG_NAME}</label><br />
+        <!-- END podcast_category_associated_language_0 -->
+      </td>
+      <td width="20%">
+        <!-- BEGIN podcast_category_associated_language_1 -->
+          <input type="checkbox" name="podcast_category_associated_language[{PODCAST_LANG_ID}]" id="podcast_category_associated_language_{PODCAST_LANG_ID}" value="1" {PODCAST_LANG_ASSOCIATED} /><label for="podcast_category_associated_language_{PODCAST_LANG_ID}">{PODCAST_LANG_NAME}</label><br />
+        <!-- END podcast_category_associated_language_1 -->
+      </td>
+      <td width="45%">
+        <!-- BEGIN podcast_category_associated_language_2 -->
+          <input type="checkbox" name="podcast_category_associated_language[{PODCAST_LANG_ID}]" id="podcast_category_associated_language_{PODCAST_LANG_ID}" value="1" {PODCAST_LANG_ASSOCIATED} /><label for="podcast_category_associated_language_{PODCAST_LANG_ID}">{PODCAST_LANG_NAME}</label><br />
+        <!-- END podcast_category_associated_language_2 -->
+      </td>
+    </tr>
+    <tr class="row2">
+      <td>{TXT_PODCAST_STATUS}</td>
+      <td colspan="3"><input type="checkbox" name="podcast_category_status" id="podcast_category_status" value="1" {PODCAST_CATEGORY_STATUS} /><label for="podcast_category_status">{TXT_PODCAST_ACTIVE}</label></td>
+    </tr>
+  </table>
+  <br />
+  <input type="button" onclick="window.location.href='index.php?cmd=Podcast&{CSRF_PARAM}&amp;act=categories'" value="{TXT_PODCAST_BACK}" />
+  <input type="submit" name="podcast_category_save" value="{TXT_PODCAST_SAVE}" />
 </form>
 <!-- end module_podcast_modify_category.html -->

@@ -50,13 +50,13 @@ class SupportException extends \Exception {}
  * @subpackage  module_support
  */
 class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBackendController {
-    
+
     /**
      * Template object
      */
     protected $template;
-    
-    
+
+
     /**
      * Returns a list of available commands (?act=XY)
      * @return array List of acts
@@ -64,10 +64,10 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
     public function getCommands() {
         return array();
     }
-    
+
     /**
      * Use this to parse your backend page
-     * 
+     *
      * You will get the template located in /View/Template/{CMD}.html
      * You can access Cx class using $this->cx
      * To show messages, use \Message class
@@ -80,17 +80,17 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
         $this->cx;
         $this->template = $template;
         $act = $cmd[0];
-        
+
         //support configuration setting
         self::errorHandler();
         $this->connectToController($act);
-        
+
         \Message::show();
     }
-    
+
     /**
      * Trigger a controller according the act param from the url
-     * 
+     *
      * @param   string $act
      */
     public function connectToController($act)
@@ -103,27 +103,27 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
             }
             //  instantiate the view specific controller
             $objController = new $controllerName($this->getSystemComponentController(), $this->cx);
-        } else { 
+        } else {
             // instantiate the default View Controller
             $objController = new DefaultController($this->getSystemComponentController(), $this->cx);
         }
         $objController->parsePage($this->template);
-    }   
-    
+    }
+
     /**
-     * Fixes database errors.   
-     * 
+     * Fixes database errors.
+     *
      * @global array $_CONFIG
-     * 
+     *
      * @return boolean
      * @throws SupportException
      */
     static function errorHandler() {
         global $_CONFIG;
-        
+
         try {
             \Cx\Core\Setting\Controller\Setting::init('Support', '', 'Yaml');
-            
+
             //setup group
             \Cx\Core\Setting\Controller\Setting::init('Support', 'setup', 'Yaml');
             if (!\Cx\Core\Setting\Controller\Setting::isDefined('faqUrl') && !\Cx\Core\Setting\Controller\Setting::add('faqUrl', 'https://www.cloudrexx.com/FAQ', 1, \Cx\Core\Setting\Controller\Setting::TYPE_TEXT, null, 'setup')) {
@@ -135,7 +135,7 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
         } catch (\Exception $e) {
             \DBG::msg($e->getMessage());
         }
-        
+
         // Always!
         return false;
     }

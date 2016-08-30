@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Component Manager
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
@@ -58,7 +58,7 @@ class ComponentManager
     var $defaultOrderValue = 111;
 
     private $act = '';
-        
+
     /**
      * Constructor
      */
@@ -82,7 +82,7 @@ class ComponentManager
 
     function getModulesPage()
     {
-        global $_ARRAYLANG, $objTemplate;        
+        global $_ARRAYLANG, $objTemplate;
 
         $objTemplate->addBlockfile('ADMIN_CONTENT', 'module_manager', 'module_manager.html');
 
@@ -141,32 +141,32 @@ class ComponentManager
     function changeModuleStatus()
     {
         global $objDatabase, $_ARRAYLANG;
-        
+
         $moduleId = isset($_GET['id']) ? contrexx_input2raw($_GET['id']) : 0;
         $status   = isset($_GET['status']) ? contrexx_input2raw($_GET['status']) : 0;
-        
-        $query = "UPDATE 
+
+        $query = "UPDATE
                     `".DBPREFIX."modules`
                   SET
                     `is_active` = '". contrexx_raw2db($status) ."'
-                  WHERE 
+                  WHERE
                     `id` = '" . contrexx_raw2db($moduleId) . "'";
         $objResult = $objDatabase->Execute($query);
-        
-        if ($objResult) {            
+
+        if ($objResult) {
             $this->strOkMessage = $status ? $_ARRAYLANG['TXT_MODULE_ACTIVATED_SUCCESSFULLY'] : $_ARRAYLANG['TXT_MODULE_DEACTIVATED_SUCCESSFULLY'];
         } else {
             $this->errorHandling();
             return false;
         }
     }
-    
+
     function getModules()
     {
         global $objDatabase;
 
         $arrayInstalledModules = array();
-        
+
         $qb = \Env::get('em')->createQueryBuilder();
 
         $qb->addSelect('p')
@@ -174,7 +174,7 @@ class ComponentManager
                 ->where('p.module IS NOT NULL');
 //                ->andWhere($qb->expr()->eq('p.lang', $this->langId));
         $pages   = $qb->getQuery()->getResult();
-        
+
         foreach ($pages as $page) {
             if (!in_array($page->getModule(), $arrayInstalledModules)) {
                 $query = "
@@ -194,7 +194,7 @@ class ComponentManager
                 $arrayInstalledModules[] = $module_id;
             }
         }
-        
+
         return $arrayInstalledModules;
     }
 
@@ -224,10 +224,10 @@ class ComponentManager
         ';
         $i = 0;
         $objResult = $objDatabase->Execute($query);
-        
+
         $statusLink = '<a href="index.php?cmd=ComponentManager&amp;act=changestatus&amp;id=%d&amp;status=%d"> %s </a>';
         $statusIcon = '<img src="../core/Core/View/Media/icons/%s" alt="" />';
-        
+
         $moduleLink = '<a href="index.php?cmd=%s"> %s </a>';
         $moduleArchiveLink = '<a href="index.php?cmd=%s&amp;archive=%s"> %s </a>';
 
@@ -237,18 +237,18 @@ class ComponentManager
                 if (   in_array($objResult->fields['id'], $arrayInstalledModules)
                     || in_array($objResult->fields['id'], array(6, 100, 101, 102, 103, 104, 105, 106, 107))
                 ) {
-                    $moduleStatusLink = $objResult->fields['is_active'] 
+                    $moduleStatusLink = $objResult->fields['is_active']
                                         ? sprintf($statusLink, (int) $objResult->fields['id'], 0, sprintf($statusIcon, 'led_green.gif'))
                                         : sprintf($statusLink, (int) $objResult->fields['id'], 1, sprintf($statusIcon, 'led_red.gif'));
-                    
+
                     $objTemplate->setVariable(array(
                         'MODULE_REMOVE'  => "<input type='checkbox' name='removeModule[".$objResult->fields['id']."]' value='0' />",
                         'MODULE_INSTALL' => "&nbsp;",
                         'MODULE_STATUS'  => $moduleStatusLink
                     ));
                 } else  {
-                    $moduleStatusLink = $objResult->fields['is_licensed'] 
-                                        ? ( $objResult->fields['is_active'] 
+                    $moduleStatusLink = $objResult->fields['is_licensed']
+                                        ? ( $objResult->fields['is_active']
                                            ? sprintf($statusLink, $objResult->fields['id'], 0, sprintf($statusIcon, 'led_green.gif'))
                                            : sprintf($statusLink, $objResult->fields['id'], 1, sprintf($statusIcon, 'led_red.gif'))
                                           )
@@ -257,7 +257,7 @@ class ComponentManager
                         'MODULE_INSTALL' => ($objResult->fields['is_active'] ? "<input type='checkbox' name='installModule[".$objResult->fields['id']."]' value='1' />" : ''),
                         'MODULE_REMOVE'  => "&nbsp;",
                         'MODULE_STATUS'  => $moduleStatusLink
-                    ));                                       
+                    ));
                 }
 
                 /*
@@ -278,7 +278,7 @@ class ComponentManager
                 } else {
                     $literalName = ucfirst($objResult->fields['name']);
                 }
-                
+
                 if (!in_array($objResult->fields['name'], array('Agb', 'Error', 'Home', 'Ids', 'Imprint', 'Login', 'Privacy', 'Search', 'Sitemap'))
                     && (   in_array($objResult->fields['id'], $arrayInstalledModules)
                         || $objResult->fields['id'] == 6)
@@ -296,7 +296,7 @@ class ComponentManager
                                 break;
                         }
                 }
-                
+
                 $objTemplate->setVariable('MODULE_NAME', $literalName . ' (' . $objResult->fields['name'] . ')');
 
                 // Required Modules
@@ -384,7 +384,7 @@ class ComponentManager
                 $this->errorHandling();
                 return false;
             }
-            
+
             // get content from repo
             $query = "SELECT *
             FROM ".DBPREFIX."module_repository
@@ -405,7 +405,7 @@ class ComponentManager
                     }
                     $this->arrayInstalledModules[$module_name] = true;
                     $sourceMode = (!empty($objResult->fields['expertmode']) && ($objResult->fields['expertmode'] == 'y')) ? true : false;
-                    
+
                     // create node
                     $newnode = new \Cx\Core\ContentManager\Model\Entity\Node();
                     $newnode->setParent($parcat); // replace root node by parent!
@@ -413,7 +413,7 @@ class ComponentManager
                     $em->flush();
                     $nodeRepo->moveDown($newnode, true); // move to the end of this level
                     $paridarray[$objResult->fields['id']] = $newnode;
-                    
+
                     // add content to default lang
                     // add content to all langs without fallback
                     // link content to all langs with fallback
@@ -485,7 +485,7 @@ class ComponentManager
 
         if (isset($_POST['removeModule']) && is_array($_POST['removeModule'])) {
             foreach (array_keys($_POST['removeModule']) as $moduleId) {
-                
+
                 $query = "
                     SELECT name
                     FROM ".DBPREFIX."modules

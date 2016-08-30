@@ -393,10 +393,10 @@ function _mediadirUpdate()
               'vote'           => array('type' => 'INT(11)', 'after' => 'ip')
           )
       );
-      
+
         // remove the script tag at the beginning of the mediadir pages
         \Cx\Lib\UpdateUtil::migrateContentPageUsingRegex(array('module' => 'mediadir'), '/^\s*(<script[^>]+>.+?Shadowbox.+?<\/script>)+/sm', '', array('content'), '3.0.4');
-        
+
     } catch (\Cx\Lib\UpdateException $e) {
         return \Cx\Lib\UpdateUtil::DefaultActionHandler($e);
     }
@@ -466,7 +466,7 @@ function _mediadirUpdate()
             \Cx\Lib\UpdateUtil::sql("INSERT INTO `".DBPREFIX."module_mediadir_mails` (`id`, `title`, `content`, `recipients`, `lang_id`, `action_id`, `is_default`, `active`) VALUES
 ('23', '[[URL]] - Eintrag erfolgreich bearbeitet', 'Hallo [[FIRSTNAME]] [[LASTNAME]] ([[USERNAME]])
 
-Ihr Eintrag mit dem Titel \"[[TITLE]]\" auf [[URL]] wurde erfolgreich bearbeitet. 
+Ihr Eintrag mit dem Titel \"[[TITLE]]\" auf [[URL]] wurde erfolgreich bearbeitet.
 
 Benutzen Sie folgenden Link um direkt zu Ihrem Eintrag zu gelangen:
 [[LINK]]
@@ -474,20 +474,20 @@ Benutzen Sie folgenden Link um direkt zu Ihrem Eintrag zu gelangen:
 Freundliche Grüsse
 [[URL]]-Team
 
--- 
+--
 Diese Nachricht wurde am [[DATE]] automatisch von Contrexx auf http://[[URL]] generiert.', '', '1', '6', '1', '0'),
 ('22', '[[URL]] - Eintrag erfolgreich gelöscht', 'Hallo [[FIRSTNAME]] [[LASTNAME]] ([[USERNAME]])
 
-Ihr Eintrag mit dem Titel \"[[TITLE]]\" auf [[URL]] wurde erfolgreich gelöscht. 
+Ihr Eintrag mit dem Titel \"[[TITLE]]\" auf [[URL]] wurde erfolgreich gelöscht.
 
 Freundliche Grüsse
 Ihr [[URL]]-Team
 
--- 
+--
 Diese Nachricht wurde am [[DATE]] automatisch von Contrexx auf http://[[URL]] generiert.', '', '1', '5', '1', '0'),
 ('21', '[[URL]] - Eintrag wurde bewertet', 'Hallo [[FIRSTNAME]] [[LASTNAME]] ([[USERNAME]])
 
-Zu Ihrem Eintrag mit dem Titel \"[[TITLE]]\" auf [[URL]] wurde eine Bewertung abgegeben. 
+Zu Ihrem Eintrag mit dem Titel \"[[TITLE]]\" auf [[URL]] wurde eine Bewertung abgegeben.
 
 Benutzen Sie folgenden Link um direkt zu Ihrem Eintrag zu gelangen:
 [[LINK]]
@@ -495,7 +495,7 @@ Benutzen Sie folgenden Link um direkt zu Ihrem Eintrag zu gelangen:
 Freundliche Grüsse
 Ihr [[URL]]-Team
 
--- 
+--
 Diese Nachricht wurde am [[DATE]] automatisch von Contrexx auf http://[[URL]] generiert.', '', '1', '4', '1', '0'),
 ('20', '[[URL]] - Ihr Eintrag wurde aufgeschaltet', 'Guten Tag,
 
@@ -509,21 +509,21 @@ Freundliche Grüsse
 Ihr [[URL]]-Team
 
 
--- 
+--
 Diese Nachricht wurde am [[DATE]] automatisch von Contrexx auf http://[[URL]] generiert.', '', '1', '3', '1', '0'),
 ('19', '[[URL]] - Eintrag erfolgteich eingetragen', 'Hallo [[FIRSTNAME]] [[LASTNAME]] ([[USERNAME]])
 
-Ihr Eintrag mit dem Titel \"[[TITLE]]\" wurde auf [[URL]] erfolgreich eingetragen. 
+Ihr Eintrag mit dem Titel \"[[TITLE]]\" wurde auf [[URL]] erfolgreich eingetragen.
 
 
 Freundliche Grüsse
 Ihr [[URL]]-Team
 
--- 
+--
 Diese Nachricht wurde am [[DATE]] automatisch von Contrexx auf http://[[URL]] generiert.', '', '1', '2', '1', '0'),
 ('24', '[[URL]] - Neuer Kommentar hinzugefügt', 'Hallo [[FIRSTNAME]] [[LASTNAME]] ([[USERNAME]])
 
-Zu Ihrem Eintrag mit dem Titel \"[[TITLE]]\" auf [[URL]] wurde ein neuer Kommentar hinzugefügt. 
+Zu Ihrem Eintrag mit dem Titel \"[[TITLE]]\" auf [[URL]] wurde ein neuer Kommentar hinzugefügt.
 
 Benutzen Sie folgenden Link um direkt zu Ihrem Eintrag zu gelangen:
 [[LINK]]
@@ -532,14 +532,14 @@ Freundliche Grüsse
 Ihr [[URL]]-Team
 
 
--- 
+--
 Diese Nachricht wurde am [[DATE]] automatisch von Contrexx auf http://[[URL]] generiert.', '', '1', '8', '1', '0'),
 ('32', '[[URL]] - Neuer Eintrag zur Prüfung freigegeben', 'Guten Tag,
 
 Auf http://[[URL]] wurde ein neuer Eintrag mit dem Titel \"[[TITLE]]\" erfasst. Bitte prüfen Sie diesen und geben Sie ihn gegebenenfalls frei.
 
 
--- 
+--
 Diese Nachricht wurde am [[DATE]] automatisch von Contrexx auf http://[[URL]] generiert.', '', '1', '1', '1', '0'),
 ('33', '[[URL]] - Die Anzeigedauer eines Eintrages läuft ab', 'Hallo Admin
 
@@ -548,7 +548,7 @@ Auf [[URL]] läuft in Kürze die Anzeigedauer des Eintrages \"[[TITLE]]\" ab.
 Freundliche Grüsse
 Ihr [[URL]]-Team
 
--- 
+--
 Diese Nachricht wurde am [[DATE]] automatisch von Contrexx auf http://[[URL]] generiert.', '', '1', '9', '1', '0');");
         }
     }
@@ -558,7 +558,7 @@ Diese Nachricht wurde am [[DATE]] automatisch von Contrexx auf http://[[URL]] ge
     }
 
     if ($objUpdate->_isNewerVersion($_CONFIG['coreCmsVersion'], '2.2.0')) {
-        //insert demo values   
+        //insert demo values
         tryButDontWorry("INSERT INTO `".DBPREFIX."module_mediadir_categories` VALUES (167,0,0,1,1,'',1),(168,0,0,1,1,'',1),(169,0,0,0,1,'',1),(166,0,0,1,1,'',1),(165,0,0,1,1,'',1),(164,0,0,1,1,'',1);");
         tryButDontWorry("INSERT INTO `".DBPREFIX."module_mediadir_categories_names` VALUES (2,169,'Audio, Video ','test'),(2,165,'Foto',''),(3,165,'Foto',''),(1,166,'Telekommunikation',''),(2,166,'Telekommunikation',''),(3,166,'Telekommunikation',''),(1,167,'Internet',''),(2,167,'Internet',''),(3,167,'Internet',''),(1,168,'Elektronik   ',''),(2,168,'Elektronik   ',''),(3,168,'Elektronik   ',''),(1,169,'Audio, Video ','test'),(1,165,'Foto',''),(1,164,'Computer & Software',''),(2,164,'Computer & Software',''),(3,164,'Computer & Software',''),(3,169,'Audio, Video ','test');");
         tryButDontWorry("INSERT INTO `".DBPREFIX."module_mediadir_entries` VALUES (367,0,18,1300357796,0,1300357796,1,0,1,0,0,'','::1',1,1,1,1,1300316400,1308261600,0,'2'),(368,0,18,1300358208,1301485252,1300358208,1,1,1,2,2,'1301436000','192.168.99.160',1,1,1,1,1301436000,1301436000,0,'2');");

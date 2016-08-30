@@ -9,10 +9,10 @@ $J(document).ready(function() {
             $J(this).next().addClass('spacer');
         }
     });
-    
+
     $J('#news_delete, #stats_delete').click(function(event) {
         event.preventDefault();
-        
+
         var elementId = $J(this).attr('id');
         if (elementId == 'news_delete') {
             var id = 'dashboardNews';
@@ -49,7 +49,7 @@ $J(document).ready(function() {
     $J('#last_session_box').click(function() {
         location.href = 'index.php?cmd=SystemLog&{CSRF}';
     });
-    
+
     var ticks      = {STATS_TICKS};
     var dates      = {STATS_DATES};
     var visitors   = {STATS_VISITORS};
@@ -58,7 +58,7 @@ $J(document).ready(function() {
     var data       = new Array();
     data['dates']  = dates;
     data['labels'] = labels;
-    
+
     var plot = $J.jqplot('chart', [visitors, requests], {
         seriesColors: ['#4EAA09', '#0C90D0'],
         seriesDefaults: {
@@ -110,7 +110,7 @@ $J(document).ready(function() {
         </a>
     </div>
     <!-- END message -->
-    
+
     <!-- BEGIN news -->
     <div class="bs-callout bs-callout-info">
         <a href="{NEWS_LINK}" target="_blank">
@@ -126,11 +126,11 @@ $J(document).ready(function() {
         </a>
     </div>
     <!-- END news -->
-    
+
     <div id="alert_news_wrapper">
         <div id="alert_news" class="alert alert-info">{TXT_DASHBOARD_NEWS_ALERT}</div>
     </div>
-    
+
     <div class="left">
         <div id="box_1" class="box">
             <h2>{TXT_CREATING_AND_PUBLISHING}</h2>
@@ -169,7 +169,7 @@ $J(document).ready(function() {
             <div class="icon"></div>
         </div>
     </div>
-    
+
     <!-- BEGIN stats -->
     <div id="stats_wrapper">
         <h1 class="stats_title">
@@ -178,20 +178,20 @@ $J(document).ready(function() {
             <a href="#" id="stats_delete" class="close">&times;</a>
             <!-- END stats_delete -->
         </h1>
-        
+
         <!-- Inline style definitions (width & height) are necessary for the jqplot plugin -->
         <div id="chart" style="width: 671px; height: 250px;"></div>
-        
+
         <div id="visitors_box" class="stat_box">
             <h2>{TXT_VISITORS}</h2>
             <span>{STATS_TOTAL_VISITORS}</span>
         </div>
-        
+
         <div id="requests_box" class="stat_box">
             <h2>{TXT_REQUESTS}</h2>
             <span>{STATS_TOTAL_REQUESTS}</span>
         </div>
-        
+
         <div id="last_session_box" class="stat_box">
             <!-- BEGIN last_login -->
             <h2>{TXT_LAST_LOGIN}</h2>
@@ -200,7 +200,7 @@ $J(document).ready(function() {
         </div>
     </div>
     <!-- END stats -->
-    
+
     <div id="alert_stats" class="alert alert-info">
         {TXT_DASHBOARD_STATS_ALERT}
     </div>

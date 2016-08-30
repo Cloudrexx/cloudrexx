@@ -1,121 +1,121 @@
 <!-- START module_ecard_settings.html -->
 <ul id="tabmenu">
-	<li><a id="generalTab_ecardSettings" class="active" href="javascript:{}" onclick="selectTab('ecardSettings')" title="{TXT_SETTINGS}">{TXT_SETTINGS}</a></li>
-	<li><a id="generalTab_ecardPlaceholder" href="javascript:{}" onclick="selectTab('ecardPlaceholder')" title="{TXT_PLACEHOLDER}">{TXT_PLACEHOLDER}</a></li>
+  <li><a id="generalTab_ecardSettings" class="active" href="javascript:{}" onclick="selectTab('ecardSettings')" title="{TXT_SETTINGS}">{TXT_SETTINGS}</a></li>
+  <li><a id="generalTab_ecardPlaceholder" href="javascript:{}" onclick="selectTab('ecardPlaceholder')" title="{TXT_PLACEHOLDER}">{TXT_PLACEHOLDER}</a></li>
 </ul>
 
 <!-- start ecardSettings div -->
 <div id="ecardSettings" class="generalTab" style="display:block">
-	<form id="ecardSettings" method="post" action="index.php?cmd=Ecard&amp;act=settings">
-		<table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist" summary="block list">
-			<tbody>
-				<tr>
-					<th colspan="2">{TXT_ECARD_SETTINGS}</th>
-				</tr>
-				<tr class="row2">
-					<td width="15%">{TXT_VALID_TIME_OF_ECARD}</td>
-					<td width="85%"><input style="width:550px;" type="text" name="settingsArray[validdays]" value="{VALID_DAYS}" /></td>
-				</tr>
-				<tr class="row1">
-					<td width="15%">{TXT_NOTIFICATION_SUBJECT}</td>
-					<td width="85%"><input style="width:550px;" type="text" name="settingsArray[subject]" value="{SUBJECT}" /></td>
-				</tr>
-				<tr class="row2">
-					<td width="15%" valign="top">{TXT_NOTIFICATION_CONTENT}</td>
-					<td width="85%"><textarea style="width:550px;" name="settingsArray[emailText]" cols="45" rows="8">{EMAIL_TEXT}</textarea></td>
-				</tr>
-				<tr>
-					<th colspan="2">{TXT_TEXTBOX}</th>
-				</tr>
-				<tr class="row1">
-					<td width="15%" valign="top">{TXT_NUMBER_OF_CHARS_ROW}</td>
-					<td width="85%"><input style="width:550px;" type="text" name="settingsArray[maxCharacters]" value="{MAX_CHARACTERS}" /></td>
-				</tr>
-				<tr class="row2">
-					<td width="15%" valign="top">{TXT_NUMBER_OF_ROWS_MESSAGE}</td>
-					<td width="85%"><input style="width:550px;" type="text" name="settingsArray[maxLines]" value="{MAX_LINES}" /></td>
-				</tr>
-				<tr>
-					<th colspan="2">{TXT_SPECIFICATIONS_MOTIVE}</th>
-				</tr>
-				<tr class="row1">
-					<td width="15%">{TXT_MAX_WIDTH_OF_MOTIVE}</td>
-					<td width="85%"><input style="width:550px;" type="text" name="settingsArray[maxWidth]" value="{MAX_WIDTH}" /> Pixel</td>
-				</tr>
-				<tr class="row2">
-					<td width="15%">{TXT_MAX_HEIGHT_OF_MOTIVE}</td>
-					<td width="85%"><input style="width:550px;" style="width:550px;" type="text" name="settingsArray[maxHeight]" value="{MAX_HEIGHT}" /> Pixel</td>
-				</tr>
-				<tr>
-					<th colspan="2">{TXT_SPECIFICATIONS_THUMBNAILS}</th>
-				</tr>
-				<tr class="row1">
-					<td width="15%">{TXT_MAX_WIDHT_OF_THUMBNAIL}</td>
-					<td width="85%"><input style="width:550px;" type="text" name="settingsArray[maxWidthThumb]" value="{MAX_WIDTH_THUMB}" /> Pixel</td>
-				</tr>
-				<tr class="row2">
-					<td width="15%">{TXT_MAX_HEIGHT_OF_THUMBNAIL}</td>
-					<td width="85%"><input style="width:550px;" type="text" name="settingsArray[maxHeightThumb]" value="{MAX_HEIGHT_THUMB}" /> Pixel</td>
-				</tr>
-				<tr>
-					<th colspan="2">{TXT_SENT_ECARDS}</th>
-				</tr>
-				<tr class="row1">
-					<td width="15%" valign="top">{TXT_DELETE_EXPIRED_ECARDS}</td>
-					<td width="85%"><input type="checkbox" name="deleteEcards" /> {TXT_CLICK_HERE_DELETE_EXPIRED_ECARDS}</td>
-				</tr>
-			</tbody>
-		</table>
-		<br />
-		<input type="submit" name="saveSettings" value="{TXT_SAVE}" />
-	</form>
+  <form id="ecardSettings" method="post" action="index.php?cmd=Ecard&amp;act=settings">
+    <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist" summary="block list">
+      <tbody>
+        <tr>
+          <th colspan="2">{TXT_ECARD_SETTINGS}</th>
+        </tr>
+        <tr class="row2">
+          <td width="15%">{TXT_VALID_TIME_OF_ECARD}</td>
+          <td width="85%"><input style="width:550px;" type="text" name="settingsArray[validdays]" value="{VALID_DAYS}" /></td>
+        </tr>
+        <tr class="row1">
+          <td width="15%">{TXT_NOTIFICATION_SUBJECT}</td>
+          <td width="85%"><input style="width:550px;" type="text" name="settingsArray[subject]" value="{SUBJECT}" /></td>
+        </tr>
+        <tr class="row2">
+          <td width="15%" valign="top">{TXT_NOTIFICATION_CONTENT}</td>
+          <td width="85%"><textarea style="width:550px;" name="settingsArray[emailText]" cols="45" rows="8">{EMAIL_TEXT}</textarea></td>
+        </tr>
+        <tr>
+          <th colspan="2">{TXT_TEXTBOX}</th>
+        </tr>
+        <tr class="row1">
+          <td width="15%" valign="top">{TXT_NUMBER_OF_CHARS_ROW}</td>
+          <td width="85%"><input style="width:550px;" type="text" name="settingsArray[maxCharacters]" value="{MAX_CHARACTERS}" /></td>
+        </tr>
+        <tr class="row2">
+          <td width="15%" valign="top">{TXT_NUMBER_OF_ROWS_MESSAGE}</td>
+          <td width="85%"><input style="width:550px;" type="text" name="settingsArray[maxLines]" value="{MAX_LINES}" /></td>
+        </tr>
+        <tr>
+          <th colspan="2">{TXT_SPECIFICATIONS_MOTIVE}</th>
+        </tr>
+        <tr class="row1">
+          <td width="15%">{TXT_MAX_WIDTH_OF_MOTIVE}</td>
+          <td width="85%"><input style="width:550px;" type="text" name="settingsArray[maxWidth]" value="{MAX_WIDTH}" /> Pixel</td>
+        </tr>
+        <tr class="row2">
+          <td width="15%">{TXT_MAX_HEIGHT_OF_MOTIVE}</td>
+          <td width="85%"><input style="width:550px;" style="width:550px;" type="text" name="settingsArray[maxHeight]" value="{MAX_HEIGHT}" /> Pixel</td>
+        </tr>
+        <tr>
+          <th colspan="2">{TXT_SPECIFICATIONS_THUMBNAILS}</th>
+        </tr>
+        <tr class="row1">
+          <td width="15%">{TXT_MAX_WIDHT_OF_THUMBNAIL}</td>
+          <td width="85%"><input style="width:550px;" type="text" name="settingsArray[maxWidthThumb]" value="{MAX_WIDTH_THUMB}" /> Pixel</td>
+        </tr>
+        <tr class="row2">
+          <td width="15%">{TXT_MAX_HEIGHT_OF_THUMBNAIL}</td>
+          <td width="85%"><input style="width:550px;" type="text" name="settingsArray[maxHeightThumb]" value="{MAX_HEIGHT_THUMB}" /> Pixel</td>
+        </tr>
+        <tr>
+          <th colspan="2">{TXT_SENT_ECARDS}</th>
+        </tr>
+        <tr class="row1">
+          <td width="15%" valign="top">{TXT_DELETE_EXPIRED_ECARDS}</td>
+          <td width="85%"><input type="checkbox" name="deleteEcards" /> {TXT_CLICK_HERE_DELETE_EXPIRED_ECARDS}</td>
+        </tr>
+      </tbody>
+    </table>
+    <br />
+    <input type="submit" name="saveSettings" value="{TXT_SAVE}" />
+  </form>
 </div>
 <!-- end ecardSettings div -->
 
 <!-- end ecardPlaceholder div -->
 <div id="ecardPlaceholder" class="generalTab" style="display:none;">
-	<table cellspacing="0" cellpadding="5" width="100%" border="0" class="adminlist" summary="block list">
-		<tbody>
-			<tr>
-				<th colspan="2">{TXT_PLACEHOLDER_OVERVIEW_FRONTEND_BACKEND}</th>
-			</tr>
-			<tr class="row2">
-				<td width="15%">[[ECARD_RECIPIENT_SALUTATION]]</td>
-				<td width="85%">{TXT_REPLACE_SALUTATION_RECIPIENT}</td>
-			</tr>
-			<tr class="row1">
-				<td width="15%">[[ECARD_RECIPIENT_NAME]]</td>
-				<td width="85%">{TXT_REPLACE_NAME_RECIPIENT}</td>
-			</tr>
-			<tr class="row2">
-				<td width="15%">[[ECARD_ECARD_RECIPIENT_EMAIL]]</td>
-				<td width="85%">{TXT_REPLACE_EMAIL_RECIPIENT}</td>
-			</tr>
-			<tr class="row1">
-				<td width="15%">[[ECARD_SENDER_NAME]]</td>
-				<td width="85%">{TXT_REPLACE_NAME_SENDER}</td>
-			</tr>
-			<tr class="row2">
-				<td width="15%">[[ECARD_SENDER_EMAIL]]</td>
-				<td width="85%">{TXT_REPLACE_EMAIL_SENDER}</td>
-			</tr>
-			<tr class="row1">
-				<td width="15%">[[ECARD_VALID_DAYS]]</td>
-				<td width="85%">{TXT_REPLACE_VALID_DAYS}</td>
-			</tr>
-			<tr class="row2">
-				<td width="15%">[[ECARD_URL]]</td>
-				<td width="85%">{TXT_REPLACE_URL}</td>
-			</tr>
-			<tr>
-				<th colspan="2">{TXT_PLACEHOLDER_OVERVIEW_FRONTEND}</th>
-			</tr>
-			<tr class="row1">
-				<td width="15%">[[ECARD_MESSAGE]]</td>
-				<td width="85%">{TXT_REPLACE_MESSAGE}</td>
-			</tr>
-		</tbody>
-	</table>
+  <table cellspacing="0" cellpadding="5" width="100%" border="0" class="adminlist" summary="block list">
+    <tbody>
+      <tr>
+        <th colspan="2">{TXT_PLACEHOLDER_OVERVIEW_FRONTEND_BACKEND}</th>
+      </tr>
+      <tr class="row2">
+        <td width="15%">[[ECARD_RECIPIENT_SALUTATION]]</td>
+        <td width="85%">{TXT_REPLACE_SALUTATION_RECIPIENT}</td>
+      </tr>
+      <tr class="row1">
+        <td width="15%">[[ECARD_RECIPIENT_NAME]]</td>
+        <td width="85%">{TXT_REPLACE_NAME_RECIPIENT}</td>
+      </tr>
+      <tr class="row2">
+        <td width="15%">[[ECARD_ECARD_RECIPIENT_EMAIL]]</td>
+        <td width="85%">{TXT_REPLACE_EMAIL_RECIPIENT}</td>
+      </tr>
+      <tr class="row1">
+        <td width="15%">[[ECARD_SENDER_NAME]]</td>
+        <td width="85%">{TXT_REPLACE_NAME_SENDER}</td>
+      </tr>
+      <tr class="row2">
+        <td width="15%">[[ECARD_SENDER_EMAIL]]</td>
+        <td width="85%">{TXT_REPLACE_EMAIL_SENDER}</td>
+      </tr>
+      <tr class="row1">
+        <td width="15%">[[ECARD_VALID_DAYS]]</td>
+        <td width="85%">{TXT_REPLACE_VALID_DAYS}</td>
+      </tr>
+      <tr class="row2">
+        <td width="15%">[[ECARD_URL]]</td>
+        <td width="85%">{TXT_REPLACE_URL}</td>
+      </tr>
+      <tr>
+        <th colspan="2">{TXT_PLACEHOLDER_OVERVIEW_FRONTEND}</th>
+      </tr>
+      <tr class="row1">
+        <td width="15%">[[ECARD_MESSAGE]]</td>
+        <td width="85%">{TXT_REPLACE_MESSAGE}</td>
+      </tr>
+    </tbody>
+  </table>
 </div>
 <!-- end ecardPlaceholder div -->
 <!-- END module_ecard_settings.html -->

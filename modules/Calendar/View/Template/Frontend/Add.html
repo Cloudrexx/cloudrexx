@@ -23,14 +23,14 @@
         <br />
         <fieldset>
             <legend>{TXT_CALENDAR_EVENT}</legend>
-            <div> 
+            <div>
                 <label>{TXT_CALENDAR_EVENT_START} <font color="#ff0000">*</font></label>
                 <input type="text"  name="startDate" class="startDate validate[required]" id="startDate" value="{CALENDAR_EVENT_START_DATE}" />
                 <div class="checkbox"><label style="float: none;">
                         <input style="float: none;" type="checkbox" class="all_day" name="all_day" {CALENDAR_EVENT_ALL_DAY} value="1" /> {TXT_CALENDAR_EVENT_ALL_DAY} </label>
                 </div>
             </div>
-            <div> 
+            <div>
                 <label>{TXT_CALENDAR_EVENT_END} <font color="#ff0000">*</font></label>
                 <input type="text" name="endDate" class="endDate validate[required]" id="endDate" value="{CALENDAR_EVENT_END_DATE}" />
             </div>
@@ -38,10 +38,10 @@
                 <label>{TXT_CALENDAR_EVENT_TYPE}</label>
                 <select class="form-control" id="event-type" name="type">
                     <option value="0" {CALENDAR_EVENT_TYPE_EVENT}>{TXT_CALENDAR_EVENT_TYPE_EVENT}</option>
-                    <option value="1" {CALENDAR_EVENT_TYPE_REDIRECT}>{TXT_CALENDAR_EVENT_TYPE_REDIRECT}</option>                                                                            
+                    <option value="1" {CALENDAR_EVENT_TYPE_REDIRECT}>{TXT_CALENDAR_EVENT_TYPE_REDIRECT}</option>
                 </select>
             </div>
-            <div id="event-tabs"> 
+            <div id="event-tabs">
                 <ul style="{CALENDAR_HIDE_ON_SINGLE_LANG}">
                     <!-- BEGIN eventTabMenuDescTab -->
                     <li id="eventDescTab_{CALENDAR_EVENT_LANG_ID}"><a class="{CALENDAR_EVENT_TAB_CLASS}" href="#event-tab-{CALENDAR_EVENT_LANG_ID}" title="{TXT_CALENDAR_EVENT_LANG_NAME}">{TXT_CALENDAR_EVENT_LANG_NAME}</a></li>
@@ -49,7 +49,7 @@
                 </ul>
                 <!-- BEGIN eventDescTab -->
                 <div class="event-tabs-des-box" id="event-tab-{CALENDAR_EVENT_LANG_ID}">
-                    <div> 
+                    <div>
                         <label>{TXT_CALENDAR_EVENT_TITLE} <font color="#ff0000">*</font></label><input data-id="{CALENDAR_EVENT_LANG_ID}" name="title[{CALENDAR_EVENT_LANG_ID}]" class="validate[event_title]" type="text" value="{CALENDAR_EVENT_TITLE}" />
                     </div>
                     <div class="event-description" style="display: {CALENDAR_EVENT_TYPE_EVENT_DISPLAY};">
@@ -62,7 +62,7 @@
                     </div>
                 </div>
                 <!-- END eventDescTab -->
-            </div>            
+            </div>
         </fieldset>
         <br />
         <fieldset id="place">
@@ -73,13 +73,13 @@
                 <div>
                     <div class="radio">
                         <label for="eventLocationTypeManual">
-                            <input type="radio" name="eventLocationType" class="eventLocationType" id ="eventLocationTypeManual" value="1" {CALENDAR_EVENT_LOCATION_TYPE_MANUAL} /> 
+                            <input type="radio" name="eventLocationType" class="eventLocationType" id ="eventLocationTypeManual" value="1" {CALENDAR_EVENT_LOCATION_TYPE_MANUAL} />
                             {TXT_CALENDAR_PLACE_DATA_DEFAULT}
                         </label>
                     </div>
                     <div class="radio">
                         <label for="eventLocationTypeMediadir">
-                            <input type="radio" name="eventLocationType" class="eventLocationType" id ="eventLocationTypeMediadir" value="2" {CALENDAR_EVENT_LOCATION_TYPE_MEDIADIR} /> 
+                            <input type="radio" name="eventLocationType" class="eventLocationType" id ="eventLocationTypeMediadir" value="2" {CALENDAR_EVENT_LOCATION_TYPE_MEDIADIR} />
                             {TXT_CALENDAR_PLACE_DATA_FROM_MEDIADIR}
                         </label>
                     </div>
@@ -176,7 +176,7 @@
             </div>
             <div class="event_place_manual">
                 <label>{TXT_CALENDAR_EVENT_LINK}</label>
-                <input name="placeLink" type="text" value="{CALENDAR_EVENT_PLACE_LINK}" />                 
+                <input name="placeLink" type="text" value="{CALENDAR_EVENT_PLACE_LINK}" />
             </div>
             <div class="event_place_manual">
                 <label>{TXT_CALENDAR_EVENT_PHONE}</label>
@@ -190,7 +190,7 @@
                     <input type="hidden" name="placeMap" value="{CALENDAR_EVENT_PLACE_MAP}" />
                 </div>
             </div>
-            <!-- END eventPlaceInput -->            
+            <!-- END eventPlaceInput -->
         </fieldset>
         <br/>
         <fieldset id="host">
@@ -207,7 +207,7 @@
                     </div>
                     <div class="radio">
                         <label for="eventHostTypeMediadir">
-                            <input type="radio" name="eventHostType" class="eventHostType" id ="eventHostTypeMediadir" value="2" {CALENDAR_EVENT_HOST_TYPE_MEDIADIR} /> 
+                            <input type="radio" name="eventHostType" class="eventHostType" id ="eventHostTypeMediadir" value="2" {CALENDAR_EVENT_HOST_TYPE_MEDIADIR} />
                             {TXT_CALENDAR_PLACE_DATA_FROM_MEDIADIR}
                         </label>
                     </div>
@@ -312,7 +312,7 @@
             </div>
             <div class="event_host_manual">
                 <label>{TXT_CALENDAR_EVENT_EMAIL}</label>
-                <input name="organizerEmail" type="text" value="{CALENDAR_EVENT_HOST_EMAIL}" />                 
+                <input name="organizerEmail" type="text" value="{CALENDAR_EVENT_HOST_EMAIL}" />
             </div>
             <!-- END eventHostInput -->
         </fieldset>
@@ -344,7 +344,7 @@
                 <select id="category" name="category" class="form-control validate[required]">
                     {CALENDAR_EVENT_CATEGORIES}
                 </select>
-            </div>            
+            </div>
         </fieldset>
         <br />
         <div style="margin-top: 15px;float: left;"><input class="btn btn-default" type="submit" value="{TXT_CALENDAR_SAVE}" name="submitFormModifyEvent" /></div>

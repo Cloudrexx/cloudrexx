@@ -115,7 +115,7 @@ var cxDataList = function() {
             success: updateUserlist
         });
     }
-    
+
     var setFilterParamsInUrl = function() {
         $('#tbluserlist tbody tr').each(function(){
             var endOfNormalUrl;
@@ -125,7 +125,7 @@ var cxDataList = function() {
                 endOfNormalUrl = $(this).find('td:last a:first').attr('href').length;
             }
             $(this).find('td:last a:first').attr(
-                'href', 
+                'href',
                 $(this).find('td:last a:first').attr('href').substring(0, endOfNormalUrl)+
                     '&newsletterListId='+listId+
                     '&filterkeyword='+searchKeyword+
@@ -146,14 +146,14 @@ var cxDataList = function() {
         $(response.user).each(function(i){
             user = response.user[i];
             userFunctions = $(htmlUserFunctions);
-    
+
             if (user.type == 'newsletter') {
                 userFunctions.append($(htmlACopyUser.replace('[id]', user.id)).append($(htmlImageCopy)));
-                userFunctions.append($(htmlAEditNewsletter.replace('[id]', user.id)).append($(htmlImageEdit)));                                
+                userFunctions.append($(htmlAEditNewsletter.replace('[id]', user.id)).append($(htmlImageEdit)));
                 userFunctions.append($(htmlADelete.replace('[id]', user.id).replace('[email]', user.email)).append($(htmlImageDelete)));
             } else {
                 userFunctions.append($(htmlACopyUser.replace('[id]', user.id)).append($(htmlImageCopy)));
-                userFunctions.append($(htmlAEditAccess.replace('[id]', user.id)).append($(htmlImageEdit)));                
+                userFunctions.append($(htmlAEditAccess.replace('[id]', user.id)).append($(htmlImageEdit)));
                 userFunctions.append($(htmlImageIconSpacer));
             }
 
@@ -180,7 +180,7 @@ var cxDataList = function() {
 
         $('#newsletterListLoading').css({display: 'none'});
         $('#recipientList').css({display: ''});
-        
+
         setFilterParamsInUrl();
     }
 
@@ -264,7 +264,7 @@ var cxDataList = function() {
             }
 
             return pages.join('&nbsp;');
-        }    
+        }
 
         var setEntryPositionStartLabel = function() {
             if (entryPositionEndLabel != 0) {
@@ -273,7 +273,7 @@ var cxDataList = function() {
                 entryPositionStartLabel = 0;
             }
         }
-    
+
         var setEntryPositionEndLabel = function() {
             entryPositionEndLabel = entryPosition + entryLimit;
             if (entryPositionEndLabel > entryCount) {
@@ -289,13 +289,13 @@ var cxDataList = function() {
             entryLimit = limit;
         }
 
-        return { 
+        return {
             setPage: setPageFunc,
             setEntryCount: setEntryCountFunc,
             setEntryLimit: setEntryLimitFunc
         }
     }
-    
+
     var setFilterInputsByVars = function(){
         $('#newsletterListId').val(listId);
         $('#newsletterRecipientSearchKeyword').val(searchKeyword);
@@ -307,7 +307,7 @@ var cxDataList = function() {
     registerSortButtons();
     setSortOrderDirection();
 
-    listPaging = new Paging(entryCount, entryLimit); 
+    listPaging = new Paging(entryCount, entryLimit);
 
     sortFunc(orderByField);
 

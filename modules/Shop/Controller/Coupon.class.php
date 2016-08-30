@@ -55,7 +55,7 @@ namespace Cx\Modules\Shop\Controller;
 class Coupon
 {
     const USES_UNLIMITED = 1e10;
-    
+
     /**
      * This ensures that only one error message per type is shown
      * @var array
@@ -344,7 +344,7 @@ class Coupon
         $objCoupon->used = $objCoupon->getUsedCount();
         return $objCoupon;
     }
-    
+
     /**
      * This ensures that for every message type, only the first one is shown
      * @todo Move this behavior to Message class

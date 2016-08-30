@@ -56,7 +56,7 @@ class UserEventListenerException extends \Exception {}
  * @subpackage  module_crm
  */
 class UserEventListener implements \Cx\Core\Event\Model\Entity\EventListener {
-    
+
     public function postUpdate($eventArgs) {
         $objUser = $eventArgs->getEntity();
         $crmId = $objUser->getCrmUserId();
@@ -69,12 +69,12 @@ class UserEventListener implements \Cx\Core\Event\Model\Entity\EventListener {
             $arrProfile[$objUser->objAttribute->getId()][] = $objUser->getProfileAttribute($objUser->objAttribute->getId());
             $objUser->objAttribute->next();
         }
-        
+
         $objCrmLib = new \Cx\Modules\Crm\Controller\CrmLibrary('Crm');
         $objCrmLib->setContactPersonProfile($arrProfile, $objUser->getId(), $objUser->getFrontendLanguage());
     }
 
-    public function onEvent($eventName, array $eventArgs) {        
+    public function onEvent($eventName, array $eventArgs) {
         $this->$eventName(current($eventArgs));
     }
 }

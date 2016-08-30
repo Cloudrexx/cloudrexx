@@ -3,10 +3,10 @@
 
 <div id="editcurrencys" class="Entries" style="display: block;">
    <form name="currency" method="post" action="">
- 	<table width="100%" cellspacing="0" cellpadding="3" border="0" class="adminlist">
-		<tr>
-			<th colspan="15">{TXT_CRM_EDIT_CURRENCY}</th>
-		</tr>
+   <table width="100%" cellspacing="0" cellpadding="3" border="0" class="adminlist">
+    <tr>
+      <th colspan="15">{TXT_CRM_EDIT_CURRENCY}</th>
+    </tr>
 
      <tr class="row1">
    <td width="13%" nowrap>{TXT_CRM_NAME}&nbsp;<font color="red">*</font></td>
@@ -45,19 +45,19 @@
                 </td>
             </tr>
 <!-- END show-rates -->
-  	</table>
-	<br />
-	<table cellpadding="2" cellspacing="0" border="0">
-		<tr>
-			<td>
+    </table>
+  <br />
+  <table cellpadding="2" cellspacing="0" border="0">
+    <tr>
+      <td>
 
    <input type="hidden" name="currencyid" value="{TXT_CURRENCY_ID}" />
    <input type="button" name="back_button" value="{TXT_CRM_BACK}" onClick="window.location.replace('index.php?cmd={MODULE_NAME}&act=settings&tpl=currency&{CSRF_PARAM}');" />
    &nbsp;&nbsp;
    <input type="submit" name="currency_submit" value="{TXT_CRM_SAVE}" onClick="return checkValidationsEdit();" />
-			</td>
-   		</tr>
-	</table>
+      </td>
+       </tr>
+  </table>
    </form>
 <br />
 </div>

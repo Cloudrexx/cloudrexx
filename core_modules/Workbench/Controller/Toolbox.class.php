@@ -30,7 +30,7 @@ namespace Cx\Core_Modules\Workbench\Controller;
 
 class Toolbox {
     protected $template = null;
-    
+
     public function __construct(&$language, $mode, &$arguments) {
         $this->template = new \Cx\Core\Html\Sigma(ASCMS_CORE_MODULE_PATH . '/Workbench/View/Template/Backend');
         switch ($mode) {
@@ -38,7 +38,7 @@ class Toolbox {
                 \JS::activate('ace');
                 \Message::add('YAML toolbox is currently not working.', \Message::CLASS_WARN);
                 \Message::add('Implement in '.__METHOD__.' ('.__FILE__.')', \Message::CLASS_WARN);
-                $this->template->loadTemplateFile('Yaml.html');                
+                $this->template->loadTemplateFile('Yaml.html');
                 $res = \Env::get('db')->Execute('SHOW TABLES');
                 while (!$res->EOF) {
                     $this->template->setVariable('TABLE', current($res->fields));
@@ -106,35 +106,35 @@ class Toolbox {
                             $type,
                             $name
                         ),
-                    	'skeleton_version' => '3.1.0',
+                        'skeleton_version' => '3.1.0',
                     );
                 }
                 foreach (array(
-                	ASCMS_CORE_FOLDER,
-                	ASCMS_CORE_MODULE_FOLDER,
-                	ASCMS_MODULE_FOLDER,
+                    ASCMS_CORE_FOLDER,
+                    ASCMS_CORE_MODULE_FOLDER,
+                    ASCMS_MODULE_FOLDER,
                 ) as $basedir) {
-	                $dh = opendir(ASCMS_DOCUMENT_ROOT . $basedir);
-	                while ($file = readdir($dh)) {
-	                	if (substr($file, 0, 1) == '.') {
-	                		continue;
-	                	}
-	                	if (!is_dir(ASCMS_DOCUMENT_ROOT . $basedir . '/' . $file)) {
-	                		continue;
-	                	}
-	                	if (isset($modules[$file])) {
-	                		continue;
-	                	}
-	                    $modules[$file] = array(
-	                        'id' => '<span style="color:red;">(none)</span>',
-	                        'name' => $file,
-	                        'type' => preg_replace('/s/', '', substr(strtolower($basedir), 1)),
-	                        'exists_db' => '<span style="color:red;">false</span>',
-	                        'exists_filesystem' => '.' . $basedir . '/' . $file,
-	                    	'skeleton_version' => '<span style="color:red;">&lt;= 2.2.6</span>',
-	                    );
-	                }
-	                closedir($dh);
+                    $dh = opendir(ASCMS_DOCUMENT_ROOT . $basedir);
+                    while ($file = readdir($dh)) {
+                        if (substr($file, 0, 1) == '.') {
+                            continue;
+                        }
+                        if (!is_dir(ASCMS_DOCUMENT_ROOT . $basedir . '/' . $file)) {
+                            continue;
+                        }
+                        if (isset($modules[$file])) {
+                            continue;
+                        }
+                        $modules[$file] = array(
+                            'id' => '<span style="color:red;">(none)</span>',
+                            'name' => $file,
+                            'type' => preg_replace('/s/', '', substr(strtolower($basedir), 1)),
+                            'exists_db' => '<span style="color:red;">false</span>',
+                            'exists_filesystem' => '.' . $basedir . '/' . $file,
+                            'skeleton_version' => '<span style="color:red;">&lt;= 2.2.6</span>',
+                        );
+                    }
+                    closedir($dh);
                 }
                 // add all not-yet-listed components existing in filesystem
                 $tableDefinition = array(
@@ -164,7 +164,7 @@ class Toolbox {
                 break;
         }
     }
-    
+
     protected function componentExistsInFileSystem(&$type, &$name) {
         $path = ASCMS_MODULE_FOLDER;
         $name = preg_replace('/[0-9]$/', '', $name);
@@ -197,7 +197,7 @@ class Toolbox {
                 return './customizing' . $path . ucfirst($name);
             } else if (is_dir(ASCMS_DOCUMENT_ROOT . $path . $name)) {
                 $type = 'core';
-	            return '.' . $path . ucfirst($name);
+                return '.' . $path . ucfirst($name);
             }
             if (is_dir(ASCMS_CUSTOMIZING_PATH . $path . ucfirst($name))) {
                 $name = ucfirst($name);
@@ -206,12 +206,12 @@ class Toolbox {
             } else if (is_dir(ASCMS_DOCUMENT_ROOT . $path . ucfirst($name))) {
                 $name = ucfirst($name);
                 $type = 'core';
-	            return '.' . $path . ucfirst($name);
+                return '.' . $path . ucfirst($name);
             }
         }
         return '<span style="color:red;">false</span>';
     }
-    
+
     protected function getComponentStyle($core, $name) {
         if ($this->componentExists($name)) {
             return '3.1.0';
@@ -232,17 +232,17 @@ class Toolbox {
         }
         return '<span style="color:red;">&lt;= 2.2.6</span>';
     }
-    
+
     protected function componentExists($name) {
         $componentRepo = \Env::get('em')->getRepository('Cx\Core\Core\Model\Entity\SystemComponent');
         return (bool) $componentRepo->findOneBy(array('name' => $name));
     }
-    
+
     protected function loadSql($table) {
         $res = \Env::get('db')->Execute('SHOW CREATE TABLE `' . $table . '`');
         return $res->fields['Create Table'];
     }
-    
+
     protected function sql2Yaml($sql) {
         \DBG::activate(DBG_PHP);
         $em = \Env::get('em');
@@ -261,7 +261,7 @@ $exporter = $cme->getExporter('yml', '/path/to/export/yml');
 $exporter->setMetadata($metadata);
 return $exporter->export();
     }
-    
+
     public function __toString() {
         return $this->template->get();
     }

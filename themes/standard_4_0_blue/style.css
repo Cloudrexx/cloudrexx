@@ -259,7 +259,7 @@
         float: left;
         clear: both;
         width: 100%;
-    } 
+    }
     /*cart*/
     #cartlist #th_bg2 .cartrow:first-child {
         width: 100%;
@@ -356,13 +356,13 @@
         content: "Gebührenfrei ab";
         font-weight: 700;
         position: absolute;
-        left: 15px; 
+        left: 15px;
     }
     .row2 .shoprow:last-child:before {
         content: "Gebühr";
         font-weight: 700;
         position: absolute;
-        left: 15px; 
+        left: 15px;
     }
     /*Medien*/
     head .eachrow:nth-child(2) {

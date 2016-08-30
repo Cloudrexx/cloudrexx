@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,10 +24,10 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Main controller for Component Manager
- * 
+ *
  * @copyright   cloudrexx
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package cloudrexx
@@ -38,7 +38,7 @@ namespace Cx\Core\ComponentManager\Controller;
 
 /**
  * Main controller for Component Manager
- * 
+ *
  * @copyright   cloudrexx
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package cloudrexx
@@ -47,7 +47,7 @@ namespace Cx\Core\ComponentManager\Controller;
 class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentController {
     /**
      * getControllerClasses
-     * 
+     *
      * @return type
      */
     public function getControllerClasses() {
@@ -56,22 +56,22 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
 
      /**
      * Load the component Component Manager.
-     * 
+     *
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
      */
     public function load(\Cx\Core\ContentManager\Model\Entity\Page $page) {
         global $_ARRAYLANG, $subMenuTitle;
         $subMenuTitle = $_ARRAYLANG['TXT_MODULE_MANAGER'];
-        
+
         \Permission::checkAccess(23, 'static');
         $this->cx->getTemplate()->addBlockfile('CONTENT_OUTPUT', 'content_master', 'LegacyContentMaster.html');
         $cachedRoot = $this->cx->getTemplate()->getRoot();
         $this->cx->getTemplate()->setRoot($this->getDirectory() . '/View/Template/Backend');
-        
+
         $objComponentManager = new \Cx\Core\ComponentManager\Controller\ComponentManager();
-        $objComponentManager->getModulesPage();  
-        
-        $this->cx->getTemplate()->setRoot($cachedRoot); 
+        $objComponentManager->getModulesPage();
+
+        $this->cx->getTemplate()->setRoot($cachedRoot);
     }
 
 }

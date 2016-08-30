@@ -52,7 +52,7 @@ class KnowledgeTags
      * @var array
      */
     private $tags = array();
-    
+
     /**
      * Wrapper function for getAllOrderAlphabetically()
      *
@@ -62,13 +62,13 @@ class KnowledgeTags
     {
         return $this->getAllOrderAlphabetically($lang, $inUseOnly);
     }
-    
+
     /**
      * Return all tags ordered by popularity
-     * 
+     *
      * Return all available tags for the current language and order
      * it by their popularity.
-     * @param $lang 
+     * @param $lang
      * @global $objDatabase
      * @return array
      */
@@ -77,14 +77,14 @@ class KnowledgeTags
         if (count($this->tags) != 0) {
             return $this->tags;
         }
-        
+
         global $objDatabase;
-        
+
         $lang = intval($lang);
-        
-        $query = "  SELECT 
-                        tags.id AS id, 
-                        tags.name AS name, 
+
+        $query = "  SELECT
+                        tags.id AS id,
+                        tags.name AS name,
                         count( tags_articles.article ) AS popularity
                     FROM ".DBPREFIX."module_knowledge_tags AS tags
                     ".($inUseOnly ? "INNER JOIN" : "LEFT OUTER JOIN")." ".DBPREFIX."module_knowledge_tags_articles AS tags_articles
@@ -107,7 +107,7 @@ class KnowledgeTags
                 $rs->MoveNext();
             }
         }
-        
+
         return $arr;
     }
 
@@ -124,11 +124,11 @@ class KnowledgeTags
         if (count($this->tags) != 0) {
             return $this->tags;
         }
-        
+
         global $objDatabase;
-        
+
         $lang = intval($lang);
-        $query = "  SELECT  tags.id AS id, 
+        $query = "  SELECT  tags.id AS id,
                             tags.name AS name,
                             count( tags_articles.article ) AS popularity
                     FROM ".DBPREFIX."module_knowledge_tags AS tags
@@ -153,10 +153,10 @@ class KnowledgeTags
                 $rs->MoveNext();
             }
         }
-        
+
         return $arr;
     }
-       
+
     /**
      * Get tags by article id
      *
@@ -169,15 +169,15 @@ class KnowledgeTags
      */
     public function getByArticle($id, $lang=0)
     {
-        global $objDatabase;   
+        global $objDatabase;
 
-        $id = intval($id); 
-        
-        $query = "  SELECT  tags.id as id, 
+        $id = intval($id);
+
+        $query = "  SELECT  tags.id as id,
                             tags.name as name,
                             tags.lang as lang
-                    FROM `".DBPREFIX."module_knowledge_tags_articles` as relation 
-                    INNER JOIN `".DBPREFIX."module_knowledge_tags` as tags 
+                    FROM `".DBPREFIX."module_knowledge_tags_articles` as relation
+                    INNER JOIN `".DBPREFIX."module_knowledge_tags` as tags
                     ON relation.tag = tags.id
                     WHERE relation.article = ".$id;
         if ($lang != 0) {
@@ -187,7 +187,7 @@ class KnowledgeTags
         if ($rs === false) {
             throw new DatabaseError("error getting tags by article id");
         }
-        
+
         $tags = array();
         while(!$rs->EOF) {
             $tags[$rs->fields['id']] = array(
@@ -197,7 +197,7 @@ class KnowledgeTags
         }
         return $tags;
     }
-    
+
     /**
      * Get all article ids of a tag
      *
@@ -211,37 +211,37 @@ class KnowledgeTags
     public function getArticlesByTag($id)
     {
         global $objDatabase;
-        
+
         $query = "  SELECT  tags.name as tagname,
                             relation.article as articleid
                     FROM `".DBPREFIX."module_knowledge_tags_articles` as relation
                     INNER JOIN `".DBPREFIX."module_knowledge_tags` as tags
                     ON relation.tag = tags.id
                     WHERE tags.id = ".$id;
-        
+
         $rs = $objDatabase->Execute($query);
         if ($rs === false) {
             throw new DatabaseError("error getting articleids by tagid");
         }
-        
+
         $articles = array();
         if (count($rs->RecordCount()) > 0) {
             $tagname = $rs->fields['tagname'];
-            
+
             while(!$rs->EOF) {
                 $articles[] = $rs->fields['articleid'];
                 $rs->MoveNext();
-                
+
             }
             return array(
                 "name" => $tagname,
                 "articles" => $articles);
         }
     }
-    
+
     /**
      * Insert tags from a string
-     * 
+     *
      * @param   int     $article_id
      * @param   int     $string
      * @param   int     $lang
@@ -272,7 +272,7 @@ class KnowledgeTags
             }
         }
     }
-    
+
     /**
      * Insert a tag
      *
@@ -285,9 +285,9 @@ class KnowledgeTags
     public function insert($tag, $lang)
     {
         global $objDatabase;
-        
+
         $tag = contrexx_addslashes($tag);
-        
+
         $query = "  INSERT INTO ".DBPREFIX."module_knowledge_tags
                     (name, lang)
                     VALUES
@@ -295,10 +295,10 @@ class KnowledgeTags
         if ($objDatabase->Execute($query) === false) {
             throw new DatabaseError("error inserting new tag");
         }
-        
+
         return $objDatabase->Insert_ID();
     }
-    
+
     /**
      * Search tags
      *
@@ -316,7 +316,7 @@ class KnowledgeTags
                 return $compare['id'];
             }
         }
-        
+
         return false;
     }
 
@@ -380,7 +380,7 @@ class KnowledgeTags
             throw new DatabaseError("error deleting all references of an article");
         }
     }
-    
+
     /**
      * Remove all Tags that are not used
      *
@@ -391,7 +391,7 @@ class KnowledgeTags
     {
         global $objDatabase;
 
-        $query = "  SELECT tags.id 
+        $query = "  SELECT tags.id
                     FROM ".DBPREFIX."module_knowledge_tags_articles AS relation
                     RIGHT JOIN ".DBPREFIX."module_knowledge_tags AS tags ON tags.id = relation.tag
                     WHERE relation.tag IS NULL";

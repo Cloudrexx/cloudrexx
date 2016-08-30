@@ -31,7 +31,7 @@ echo calendarUpdate();
 
 function calendarUpdate() {
     try {
-        //update module name 
+        //update module name
         \Cx\Lib\UpdateUtil::sql("UPDATE `" . DBPREFIX . "modules` SET `name` = 'Calendar' WHERE `id` = 21");
         //update navigation url
         \Cx\Lib\UpdateUtil::sql("UPDATE `" . DBPREFIX . "backend_areas` SET `uri` = 'index.php?cmd=Calendar' WHERE `area_id` = 16");
@@ -44,7 +44,7 @@ function calendarUpdate() {
                                                                                     `attach` = REPLACE(`attach`, 'images/calendar', 'images/Calendar'),
                                                                                     `place_map` = REPLACE(`place_map`, 'images/calendar', 'images/Calendar')
                                                                                      WHERE `pic` LIKE ('" . ASCMS_PATH_OFFSET . "/images/calendar%') ");
-        
+
     } catch (\Cx\Lib\UpdateException $e) {
         return "Error: $e->sql";
     }
@@ -56,7 +56,7 @@ function calendarUpdate() {
             if (!\Cx\Lib\FileSystem\FileSystem::move($sourcePath, $targetPath)) {
                 return 'Failed to Moved the files from '.$sourcePath.' to '.$targetPath.'.<br>';
             }
-        } 
+        }
     } catch (\Cx\Lib\FileSystem\FileSystemException $e) {
         return $e->getMessage();
     }

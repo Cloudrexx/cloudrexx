@@ -132,7 +132,7 @@ h1{ font-size: 20px }
 }
 
 #site-structure th.lastupdate {
-    text-align: right; 
+    text-align: right;
 }
 
 #content-manager.edit_view #site-structure {
@@ -499,8 +499,8 @@ h1{ font-size: 20px }
     background: #FFFFD6 url(../Media/Move.png) no-repeat right bottom;
 }
 
-li.jstree-closed, li.jstree-leaf { 
-    height: auto !important; 
+li.jstree-closed, li.jstree-leaf {
+    height: auto !important;
 }
 
 *+html #site-tree .jstree-move {
@@ -567,11 +567,11 @@ li.jstree-closed, li.jstree-leaf {
 }
 #site-tree .publishing.unpublished.draft.waiting,
 #page_history .publishing.unpublished.draft.waiting {
-    background-position: -5px -63px; 
+    background-position: -5px -63px;
 }
 #site-tree .publishing.unpublished.draft.waiting.locked,
 #page_history .publishing.unpublished.draft.waiting.locked {
-    background-position: -4px -62px; 
+    background-position: -4px -62px;
 }
 
 
@@ -884,7 +884,7 @@ div.date img{
 }
 
 .additionalInfo div.oneCol{
-    
+
 }
 .additionalInfo label.oneCol{
     display:block;

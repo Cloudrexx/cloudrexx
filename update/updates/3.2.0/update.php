@@ -34,7 +34,7 @@ require_once UPDATE_PATH . '/lib/FRAMEWORK/FileSystem/FTPFile.class.php';
 
 function executeContrexxUpdate() {
     global $_CORELANG, $_CONFIG, $objDatabase, $objUpdate, $_DBCONFIG;
-    
+
     /**
      * These are the modules which MUST have new template in order for Cloudrexx
      * to work correctly. CSS definitions for these modules will get updated too.
@@ -111,7 +111,7 @@ function executeContrexxUpdate() {
             'dependencies'  => array (),
         ),
     );
-            
+
     $_SESSION['contrexx_update']['copyFilesFinished'] = !empty($_SESSION['contrexx_update']['copyFilesFinished']) ? $_SESSION['contrexx_update']['copyFilesFinished'] : false;
 
     // Copy cx files to the root directory
@@ -166,7 +166,7 @@ function executeContrexxUpdate() {
     if (!isset($_SESSION['contrexx_update']['update']['done'])) {
         $_SESSION['contrexx_update']['update']['done'] = array();
     }
-    
+
 
     /////////////////////
     // UTF-8 MIGRATION //
@@ -209,7 +209,7 @@ function executeContrexxUpdate() {
     }
     /////////////////////
 
-    
+
     /////////////////////////////
     // Session Table MIGRATION //
     /////////////////////////////
@@ -238,7 +238,7 @@ function executeContrexxUpdate() {
     $loggableListener->setUsername(json_encode($userData));
     /////////////////////
 
-    
+
     if ($objUpdate->_isNewerVersion($_CONFIG['coreCmsVersion'], '3.0.0')) {
         //////////////////////////////
         // BEGIN: CONTENT MIGRATION //
@@ -418,7 +418,7 @@ function executeContrexxUpdate() {
             return false;
         } else {
             try {
-                \Cx\Lib\UpdateUtil::sql('UPDATE `'.DBPREFIX.'log_entry` 
+                \Cx\Lib\UpdateUtil::sql('UPDATE `'.DBPREFIX.'log_entry`
                     SET `object_class` = \'Cx\\\\Core\\\\ContentManager\\\\Model\\\\Entity\\\\Page\'
                     WHERE object_class = \'Cx\\\\Model\\\\ContentManager\\\\Page\'');
             } catch (\Cx\Lib\UpdateException $e) {
@@ -484,12 +484,12 @@ function executeContrexxUpdate() {
 
             if (_convertThemes2Component() === false) {
                 if (empty($objUpdate->arrStatusMsg['title'])) {
-                    DBG::msg('unable to convert themes to component');                
+                    DBG::msg('unable to convert themes to component');
                     setUpdateMsg(sprintf($_CORELANG['TXT_UPDATE_COMPONENT_BUG'], $_CORELANG['TXT_UPDATE_CONVERT_TEMPLATES']), 'title');
                 }
                 return false;
-            }            
-            
+            }
+
             if (_updateModulePages($viewUpdateTable) === false) {
                 if (empty($objUpdate->arrStatusMsg['title'])) {
                     DBG::msg('unable to update module templates');
@@ -514,7 +514,7 @@ function executeContrexxUpdate() {
             setUpdateMsg(sprintf($_CORELANG['TXT_UPDATE_UNABLE_LOAD_UPDATE_COMPONENT'], dirname(__FILE__) . '/update3.php'));
             return false;
         }
-        
+
         if (!createHtAccess()) {
             $webServerSoftware = !empty($_SERVER['SERVER_SOFTWARE']) && stristr($_SERVER['SERVER_SOFTWARE'], 'apache') ? 'apache' : (stristr($_SERVER['SERVER_SOFTWARE'], 'iis') ? 'iis' : '');
             $file = $webServerSoftware == 'iis' ? 'web.config' : '.htaccess';
@@ -522,7 +522,7 @@ function executeContrexxUpdate() {
             setUpdateMsg('Die Datei \'' . $file . '\' konnte nicht erstellt/aktualisiert werden.');
             return false;
         }
-        
+
         // Update configuration.php
         if (!_writeNewConfigurationFile()) {
             return false;
@@ -737,7 +737,7 @@ function executeContrexxUpdate() {
         $result = _convertThemes2Component();
         if ($result === false) {
             if (empty($objUpdate->arrStatusMsg['title'])) {
-                DBG::msg('unable to convert themes to component');                
+                DBG::msg('unable to convert themes to component');
                 setUpdateMsg(sprintf($_CORELANG['TXT_UPDATE_COMPONENT_BUG'], $_CORELANG['TXT_UPDATE_CONVERT_TEMPLATES']), 'title');
             }
             return false;
@@ -745,7 +745,7 @@ function executeContrexxUpdate() {
             $_SESSION['contrexx_update']['update']['done'][] = 'convertTemplates';
         }
     }
-    
+
     if (!in_array('moduleTemplates', ContrexxUpdate::_getSessionArray($_SESSION['contrexx_update']['update']['done']))) {
         if (_updateModulePages($viewUpdateTable) === false) {
             if (empty($objUpdate->arrStatusMsg['title'])) {
@@ -768,7 +768,7 @@ function executeContrexxUpdate() {
             $_SESSION['contrexx_update']['update']['done'][] = 'moduleStyles';
         }
     }
-    
+
     if (!in_array('navigations', ContrexxUpdate::_getSessionArray($_SESSION['contrexx_update']['update']['done']))) {
         if (_updateNavigations() === false) {
             if (empty($objUpdate->arrStatusMsg['title'])) {
@@ -779,7 +779,7 @@ function executeContrexxUpdate() {
             $_SESSION['contrexx_update']['update']['done'][] = 'navigations';
         }
     }
-    
+
     if (!createHtAccess()) {
         $webServerSoftware = !empty($_SERVER['SERVER_SOFTWARE']) && stristr($_SERVER['SERVER_SOFTWARE'], 'apache') ? 'apache' : (stristr($_SERVER['SERVER_SOFTWARE'], 'iis') ? 'iis' : '');
         $file = $webServerSoftware == 'iis' ? 'web.config' : '.htaccess';
@@ -1204,7 +1204,7 @@ function _updateModuleRepository() {
 
 function _updateModulePages(&$viewUpdateTable) {
     global $objUpdate, $_CONFIG, $objDatabase;
-    
+
     foreach ($viewUpdateTable as $module=>$data) {
         $version = $data['version'];
         // only update templates if the installed version is older than $version
@@ -1262,14 +1262,14 @@ function _updateModulePages(&$viewUpdateTable) {
 
 function _updateCssDefinitions(&$viewUpdateTable, $objUpdate) {
     global $objDatabase, $_CORELANG;
-    
+
     // Find all themes
     $result = $objDatabase->Execute('SELECT `themesname`, `foldername` FROM `' . DBPREFIX . 'skins`');
     if ($result->EOF) {
         \DBG::msg('No themes, really?');
         return false;
     }
-    
+
     // Find type for theme and update its CSS definitions
     $errorMessages = '';
     while (!$result->EOF) {
@@ -1308,20 +1308,20 @@ function _updateCssDefinitions(&$viewUpdateTable, $objUpdate) {
 
 function _updateCssDefinitionsForTemplate($templatePath, $templateType, &$viewUpdateTable, $objUpdate) {
     global $objUpdate;
-    
+
     \DBG::msg('Loading new module style definitions');
     $moduleStyles = _readNewCssDefinitions($templateType, $objUpdate->getLoadedVersionInfo());
-    
+
     if ($moduleStyles === false) {
         return false;
     } else if ($moduleStyles === true) {
         // Skip if no source CSS file was found
         return true;
     }
-    
+
     \DBG::msg('Calculating new module style definitions');
     $additionalCss = _calculateNewCss($viewUpdateTable, $moduleStyles, $objUpdate);
-    
+
     if ($additionalCss === false) {
         return false;
     }
@@ -1342,7 +1342,7 @@ function _updateCssDefinitionsForTemplate($templatePath, $templateType, &$viewUp
  * @return mixed Module styles as array({module_name}=>{css}), true if source file was not found or false on error
  */
 function _readNewCssDefinitions($templateType, &$arrUpdate) {
-    
+
     // Read and parse new modules.css
     try {
         $modulesCss = new \Cx\Lib\FileSystem\File(UPDATE_PATH.'/updates/' . $arrUpdate['cmsVersion'] . '/data/' . $templateType . '.css');
@@ -1377,7 +1377,7 @@ function _readNewCssDefinitions($templateType, &$arrUpdate) {
  */
 function _calculateNewCss(&$viewUpdateTable, &$moduleStyles, $objUpdate) {
     global $_CONFIG;
-    
+
     // Calculate new CSS definitions
     $additionalCss = array ();
     foreach ($viewUpdateTable as $module=>$data) {
@@ -1412,7 +1412,7 @@ function _calculateNewCss(&$viewUpdateTable, &$moduleStyles, $objUpdate) {
  * @return boolean True on success, false otherwise
  */
 function _writeNewCss($templatePath, $newCss, &$arrUpdate) {
-    
+
     // Write the CSS first
     $filename = 'modules_' . preg_replace('/\./', '_', $arrUpdate['cmsVersion']) . '.css';
     try {
@@ -1422,10 +1422,10 @@ function _writeNewCss($templatePath, $newCss, &$arrUpdate) {
         \DBG::msg($e->getMessage());
         return false;
     }
-    
+
     // Generate include tag
     $cssInclusion = '<link rel="stylesheet" type="text/css" href="themes/' . $templatePath . '/' . $filename . '" />'."\r\n";
-    
+
     // Read index.html
     try {
         $objFile = new \Cx\Lib\FileSystem\File(ASCMS_THEMES_PATH . '/' . $templatePath . '/index.html');
@@ -1434,14 +1434,14 @@ function _writeNewCss($templatePath, $newCss, &$arrUpdate) {
         \DBG::msg($e->getMessage());
         return false;
     }
-    
+
     // Search write position. CSS inclusion tag is added before
     // style placeholder. If the placeholder is not present in
     // index.html the CSS inclusion tag is inserted before </head>
     // Search for style placeholder ({STYLE_FILE})
     if (($pos = strpos($indexHtml, '{STYLE_FILE}')) === false) {
         $matches = array();
-        
+
         // Search for head end tag
         if (!preg_match('#</head>#', $indexHtml, $matches, PREG_OFFSET_CAPTURE)) {
             \DBG::msg('No style tag or </head> found, skip template');
@@ -1449,7 +1449,7 @@ function _writeNewCss($templatePath, $newCss, &$arrUpdate) {
         }
         $pos = $matches[0][1];
     }
-    
+
     // Finally add the include statement before $pos and write out
     $indexHtml = substr_replace($indexHtml, $cssInclusion, $pos, 0);
     try {
@@ -1485,24 +1485,24 @@ function _writeNewCss($templatePath, $newCss, &$arrUpdate) {
  * http://bugs.contrexx.com/contrexx/ticket/1412
  * http://bugs.contrexx.com/contrexx/ticket/1043
  * @see http://helpdesk.comvation.com/131276-Die-Navigation-meiner-Seite-wird-nicht-mehr-korrekt-angezeigt
- * 
+ *
  * Adds placeholder {LEVELS_FULL} to all non-empty subnavbars
  * Adds placeholder {LEVELS_BRANCH} to all navbars having a block named 'navigation' but none 'level_1'
  */
 function _updateNavigations()
 {
     global $objDatabase, $_CORELANG;
-    
+
     $navbars = array('navbar', 'navbar2', 'navbar3');
     $subnavbars = array('subnavbar', 'subnavbar2', 'subnavbar3');
-    
+
     // Find all themes
     $result = $objDatabase->Execute('SELECT `themesname`, `foldername` FROM `' . DBPREFIX . 'skins`');
     if ($result->EOF) {
         \DBG::msg('No themes, really?');
         return false;
     }
-    
+
     // Update navigations for all themes
     $errorMessages = '';
     while (!$result->EOF) {
@@ -1512,9 +1512,9 @@ function _updateNavigations()
             $result->moveNext();
             continue;
         }
-        
+
         \DBG::msg('Updating navigations for theme "' . $result->fields['themesname'] . '" (' . $type . ')');
-        
+
         // add {LEVELS_FULL} to all non-empty subnavbars
         foreach ($subnavbars as $subnavbar) {
             try {
@@ -1568,7 +1568,7 @@ function _updateNavigations()
             }
             \DBG::msg('Updated file ' . $navbar . '.html for theme '  . $result->fields['themesname']);
         }
-        
+
         $result->moveNext();
     }
     if (!empty($errorMessages)) {
@@ -1647,7 +1647,7 @@ function loadMd5SumOfOriginalCxFiles()
 function backupModifiedFile($file)
 {
     global $_CONFIG;
-            
+
     $cxFilePath = dirname(substr($file, strlen(ASCMS_DOCUMENT_ROOT)));
     if ($cxFilePath == '/') {
         $cxFilePath = '';
@@ -1665,7 +1665,7 @@ function backupModifiedFile($file)
             $idx++;
             $suffix = '_'.$idx;
         }
-    
+
         $customizingFile .= $suffix;
     }
 
@@ -1731,7 +1731,7 @@ function verifyMd5SumOfFile($file, $newFile, $allowSkip = true)
             return true;
         }
     }
-    
+
     $md5SumOfNewFile = md5_file($newFile);
     if ($md5 == $md5SumOfNewFile) {
         \DBG::msg('MD5 comparision complete, file equals new one');
@@ -1787,12 +1787,12 @@ function copyCxFilesToRoot($src, $dst)
             $_SESSION['contrexx_update']['copiedCxFilesTotal'] = $_SESSION['contrexx_update']['copiedCxFilesTotal'] + 1;
 
             try {
-                
+
                 // rename the file if its exists on customizing
                 if (!renameCustomizingFile($dstPath)) {
                     return false;
                 }
-                    
+
                 if (!verifyMd5SumOfFile($dstPath, $srcPath)) {
                     if (!backupModifiedFile($dstPath)) {
                         return false;
@@ -1817,29 +1817,29 @@ function copyCxFilesToRoot($src, $dst)
     return true;
 }
 
-function renameCustomizingFile($file) 
+function renameCustomizingFile($file)
 {
     global $_CONFIG;
-    
+
     $cxFilePath = dirname(substr($file, strlen(ASCMS_DOCUMENT_ROOT)));
     if ($cxFilePath == '/') {
         $cxFilePath = '';
     }
 
     $customizingPath = ASCMS_DOCUMENT_ROOT.'/customizing'.$cxFilePath;
-    
+
     $customizingFile = $customizingPath . '/'. basename($file);
 
     if (file_exists($customizingFile)) {
         $customizingFile .= "_".$_CONFIG['coreCmsVersion'];
-        
+
         $suffix = '';
         $idx = 0;
         while (file_exists($customizingFile.$suffix)) {
             $idx++;
             $suffix = '_'.$idx;
         }
-    
+
         $customizingFile .= $suffix;
     } else {
         return true;
@@ -1847,7 +1847,7 @@ function renameCustomizingFile($file)
 
     try {
         $objFile = new \Cx\Lib\FileSystem\File($file);
-        $objFile->move($customizingFile);        
+        $objFile->move($customizingFile);
     } catch (\Exception $e) {
         setUpdateMsg('Error on renaming customizing file:<br />' . $file);
         setUpdateMsg('Error: ' . $e->getMessage());
@@ -1941,26 +1941,26 @@ function createOrAlterSessionVariableTable()
 function migrateSessionTable()
 {
     global $sessionObj;
-    
+
     try {
         createOrAlterSessionVariableTable();
         \Cx\Lib\UpdateUtil::sql('TRUNCATE TABLE `'. DBPREFIX .'session_variable`');
 
-        $objResult = \Cx\Lib\UpdateUtil::sql('SELECT 
+        $objResult = \Cx\Lib\UpdateUtil::sql('SELECT
                                                 `sessionid`,
                                                 `datavalue`
                                               FROM
-                                                 `' . DBPREFIX . 'sessions`');        
+                                                 `' . DBPREFIX . 'sessions`');
         if ($objResult) {
             while (!$objResult->EOF) {
                 $sessionId = $objResult->fields['sessionid'];
-                
+
                 if ($sessionId == $sessionObj->sessionid) {
                     $sessionArray = $_SESSION; // migrate the current state into database.
                 } else {
                     $sessionArray = unserializesession($objResult->fields['datavalue']);
                 }
-                
+
                 insertSessionArray($sessionId, $sessionArray);
                 $objResult->MoveNext();
             }
@@ -1973,7 +1973,7 @@ function migrateSessionTable()
                 'startdate'      => array('type' => 'VARCHAR(14)', 'notnull' => true, 'default' => '', 'after' => 'remember_me'),
                 'lastupdated'    => array('type' => 'VARCHAR(14)', 'notnull' => true, 'default' => '', 'after' => 'startdate'),
                 'status'         => array('type' => 'VARCHAR(20)', 'notnull' => true, 'default' => '', 'after' => 'lastupdated'),
-                'user_id'        => array('type' => 'INT(10)', 'unsigned' => true, 'notnull' => true, 'default' => '0', 'after' => 'status'),                
+                'user_id'        => array('type' => 'INT(10)', 'unsigned' => true, 'notnull' => true, 'default' => '0', 'after' => 'status'),
             ),
             array(
                 'LastUpdated'    => array('fields' => array('lastupdated')),
@@ -1982,7 +1982,7 @@ function migrateSessionTable()
     } catch (\Cx\Lib\UpdateException $e) {
             return \Cx\Lib\UpdateUtil::DefaultActionHandler($e);
     }
-        
+
     return true;
 }
 
@@ -1991,17 +1991,17 @@ function insertSessionArray($sessionId, $sessionArr, $parentId = 0)
     global $objDatabase;
 
     foreach ($sessionArr as $key => $value) {
-        \Cx\Lib\UpdateUtil::sql('INSERT INTO 
+        \Cx\Lib\UpdateUtil::sql('INSERT INTO
                                     '. DBPREFIX .'session_variable
-                                SET 
+                                SET
                                 `parent_id` = "'. intval($parentId) .'",
                                 `sessionid` = "'. $sessionId .'",
                                 `key` = "'. contrexx_input2db($key) .'",
                                 `value` = "'. (is_array($value) ? '' : contrexx_input2db(serialize($value)))  .'"
-                              ON DUPLICATE KEY UPDATE 
+                              ON DUPLICATE KEY UPDATE
                                 `value` = "'. (is_array($value) ? '' : contrexx_input2db(serialize($value))) .'"');
         $insertId = $objDatabase->Insert_ID();
-        
+
         if (is_array($value)) {
             insertSessionArray($sessionId, $value, $insertId);
         }
@@ -2014,7 +2014,7 @@ function unserializesession( $data )
     {
         return array();
     }
-    
+
     // match all the session keys and offsets
     preg_match_all('/(^|;|\})([a-zA-Z0-9_]+)\|/i', $data, $matchesarray, PREG_OFFSET_CAPTURE);
 
@@ -2037,32 +2037,32 @@ function unserializesession( $data )
 
     $valueText = substr($data, $lastOffset );
     $returnArray[$currentKey] = unserialize($valueText);
-    
+
     return $returnArray;
 }
 
 function _convertThemes2Component()
 {
     global $objDatabase, $_CORELANG;
-    
+
     // Find all themes
     $result = $objDatabase->Execute('SELECT `themesname`, `foldername` FROM `' . DBPREFIX . 'skins`');
     if ($result->EOF) {
         \DBG::msg('No themes found!');
         return false;
     }
-    
+
     $errorMessages = '';
     $themeRepository = new \Cx\Core\View\Model\Repository\ThemeRepository();
     while (!$result->EOF) {
-        $themePath = ASCMS_THEMES_PATH . '/' . $result->fields['foldername']; 
+        $themePath = ASCMS_THEMES_PATH . '/' . $result->fields['foldername'];
         if (!is_dir($themePath)) {
             \DBG::msg('Skipping theme "' . $result->fields['themesname'] . '"; No such folder!');
             $errorMessages .= '<div class="message-warning">' . sprintf($_CORELANG['TXT_CSS_UPDATE_MISSING_FOLDER'], $result->fields['themesname']) . '</div>';
             $result->MoveNext();
             continue;
         }
-        
+
         // create a new one if no component.yml exists
         if (!file_exists($themePath . '/component.yml')) {
             \DBG::msg('Converting theme "' . $result->fields['themesname'] . ' to component');
@@ -2071,7 +2071,7 @@ function _convertThemes2Component()
 
         $result->MoveNext();
     }
-    
+
     if (!empty($errorMessages)) {
         setUpdateMsg($errorMessages, 'msg');
         setUpdateMsg('<input type="submit" value="'.$_CORELANG['TXT_CONTINUE_UPDATE'].'" name="updateNext" /><input type="hidden" name="processUpdate" id="processUpdate" />', 'button');
@@ -2102,7 +2102,7 @@ class License {
                 $_CONFIG['installationId'] = '';
                 $_CONFIG['licenseKey'] = '';
             }
-            
+
             $objUser = \FWUser::getFWUserObject()->objUser;
             $license = \Cx\Core_Modules\License\License::getCached($_CONFIG, $objDatabase);
 

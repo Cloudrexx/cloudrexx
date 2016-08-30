@@ -31,7 +31,7 @@ echo galleryUpdate();
 
 function galleryUpdate() {
     try {
-        //update module name 
+        //update module name
         \Cx\Lib\UpdateUtil::sql("UPDATE `" . DBPREFIX . "modules` SET `name` = 'Gallery' WHERE `id` = 3");
         //update navigation url
         \Cx\Lib\UpdateUtil::sql("UPDATE `" . DBPREFIX . "backend_areas` SET `uri` = 'index.php?cmd=Gallery' WHERE `area_id` = 12");
@@ -50,7 +50,7 @@ function galleryUpdate() {
             if (!\Cx\Lib\FileSystem\FileSystem::move($sourcePath, $targetPath)) {
                 return 'Failed to Moved the files from '.$sourcePath.' to '.$targetPath.'.<br>';
             }
-        } 
+        }
     } catch (\Cx\Lib\FileSystem\FileSystemException $e) {
         return $e->getMessage();
     }

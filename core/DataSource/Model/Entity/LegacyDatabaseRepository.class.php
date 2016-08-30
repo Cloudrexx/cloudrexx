@@ -45,7 +45,7 @@ namespace Cx\Core\DataSource\Model\Entity;
  * @subpackage  core_datasource
  */
 class LegacyDatabaseRepository extends DataSource {
-    
+
     /**
      * Gets one or more entries from this DataSource
      *
@@ -71,13 +71,13 @@ class LegacyDatabaseRepository extends DataSource {
         $fieldList = array()
     ) {
         $tableName = DBPREFIX . $this->getIdentifier();
-        
+
         // $elementId
         $whereList = array();
         if (isset($elementId)) {
             $whereList[] = '`id` = "' . contrexx_raw2db($elementId) . '"';
         }
-        
+
         // $filter
         if (count($filter)) {
             foreach ($filter as $field => $value) {
@@ -87,7 +87,7 @@ class LegacyDatabaseRepository extends DataSource {
                 $whereList[] = '`' . contrexx_raw2db($field) . '` = "' . contrexx_raw2db($value) . '"';
             }
         }
-        
+
         // $order
         $orderList = array();
         if (count($order)) {
@@ -101,7 +101,7 @@ class LegacyDatabaseRepository extends DataSource {
                 $orderList[] = '`' . contrexx_raw2db($field) . '` ' . $ascdesc;
             }
         }
-        
+
         // $limit, $offset
         $limitQuery = '';
         if ($limit) {
@@ -110,13 +110,13 @@ class LegacyDatabaseRepository extends DataSource {
                 $limitQuery .= ',' . intval($offset);
             }
         }
-        
+
         // $fieldList
         $fieldListQuery = '*';
         if (count($fieldList)) {
             $fieldListQuery = '`' . implode('`, `', $fieldList) . '`';
         }
-        
+
         // query parsing
         $whereQuery = '';
         if (count($whereList)) {
@@ -135,17 +135,17 @@ class LegacyDatabaseRepository extends DataSource {
             ' . $orderQuery . '
             ' . $limitQuery . '
         ';
-        
+
         $result = $this->cx->getDb()->getAdoDb()->query($query);
         $data = array();
         while (!$result->EOF) {
             $data[] = $result->fields;
             $result->MoveNext();
         }
-        
+
         return $data;//new \Cx\Core_Modules\Listing\Model\Entity\DataSet($data);//array($query);
     }
-    
+
     /**
      * Adds a new entry to this DataSource
      * @param array $data Field=>value-type array. Not all fields may be required.
@@ -154,7 +154,7 @@ class LegacyDatabaseRepository extends DataSource {
     public function add($data) {
         throw new \BadMethodCallException('Access denied');
     }
-    
+
     /**
      * Updates an existing entry of this DataSource
      * @param string $elementId ID of the element to update
@@ -164,7 +164,7 @@ class LegacyDatabaseRepository extends DataSource {
     public function update($elementId, $data) {
         throw new \BadMethodCallException('Access denied');
     }
-    
+
     /**
      * Drops an entry from this DataSource
      * @param string $elementId ID of the element to update
@@ -174,4 +174,3 @@ class LegacyDatabaseRepository extends DataSource {
         throw new \BadMethodCallException('Access denied');
     }
 }
-

@@ -5,14 +5,14 @@
 
 function deleteLocations()
 {
-	with (document.form2){
-		if(confirm('{TXT_CONFIRM_DELETE_DATA}\n{TXT_ACTION_IS_IRREVERSIBLE}')) {									
-		 	action = "index.php?cmd=Jobs&act=delloc"; 
-			method = "post";
-			submit();
-			return true;
-		} 
-	}
+  with (document.form2){
+    if(confirm('{TXT_CONFIRM_DELETE_DATA}\n{TXT_ACTION_IS_IRREVERSIBLE}')) {
+       action = "index.php?cmd=Jobs&act=delloc";
+      method = "post";
+      submit();
+      return true;
+    }
+  }
 }
 
 /**
@@ -25,24 +25,24 @@ function deleteLocations()
  */
 function setCheckboxes(do_check)
 {
-	with (document.form2){	
-	    var box      = elements['selectedId[]'];
-	                  
-	    var box_cnt  = (typeof(box.length) != 'undefined')
-	                  ? box.length
+  with (document.form2){
+      var box      = elements['selectedId[]'];
 
-	                  : 0;
-	                  
-	    if (box_cnt) {
-	        for (var i = 0; i < box_cnt; i++) 
-	        {
-	            box[i].checked = do_check;
-	        }
-	    } else {
-	        box.checked = do_check;
-	    }	
-	    return true;
-	}	    
+      var box_cnt  = (typeof(box.length) != 'undefined')
+                    ? box.length
+
+                    : 0;
+
+      if (box_cnt) {
+          for (var i = 0; i < box_cnt; i++)
+          {
+              box[i].checked = do_check;
+          }
+      } else {
+          box.checked = do_check;
+      }
+      return true;
+  }
 }
 
 function deleteLocation(id)
@@ -79,7 +79,7 @@ function deleteLocation(id)
       </th>
     </tr>
     <tr class="row2">
-        <td width="1%" valign="top" nowrap="nowrap"><b>#</b></td> 
+        <td width="1%" valign="top" nowrap="nowrap"><b>#</b></td>
         <td width="2%" nowrap><b>{TXT_ID}</b></td>
         <td width="100%"><b>{TXT_NAME}</b></td>
         <td width="5%" nowrap>

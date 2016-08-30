@@ -44,7 +44,7 @@ namespace Cx\Core_Modules\Stats\Controller;
  * @subpackage  coremodule_stats
  * @todo        Edit PHP DocBlocks!
  */
- 
+
 class MakeGraph
 {
     public $stats = '';
@@ -374,9 +374,9 @@ class MakeGraph
     function _generateGraph()
     {
         global $_ARRAYLANG;
-        
+
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-        
+
         $graph = new \ykcee;
         $graph->SetImageSize($this->graphWidth, $this->graphHeight);
         $graph->SetTitleFont($cx->getCodeBaseLibraryPath().'/ykcee/VERDANA.TTF');

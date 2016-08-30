@@ -72,7 +72,7 @@ class CrmSettings extends CrmLibrary
 
     /**
      * Template object
-     *     
+     *
      * @param object
      */
     public $_objTpl;
@@ -100,7 +100,7 @@ class CrmSettings extends CrmLibrary
     public function showCustomerSettings()
     {
         global $_CORELANG, $_ARRAYLANG, $objDatabase ,$objJs;
-        
+
         $fn = isset($_REQUEST['fn']) ? $_REQUEST['fn'] : '';
         if (!empty($fn)) {
             switch ($fn) {
@@ -123,7 +123,7 @@ class CrmSettings extends CrmLibrary
             $_SESSION['strErrMessage'] = $_ARRAYLANG['TXT_CRM_DEFAULT_CUSTOMER_TYPE_STATUS_ERROR'];
             break;
         }
-        
+
         $this->_objTpl->addBlockfile('CRM_SETTINGS_FILE', 'settings_block', 'module_'.$this->moduleNameLC.'_settings_customers.html');
         $this->_objTpl->setGlobalVariable('MODULE_NAME', $this->moduleName);
 
@@ -156,13 +156,13 @@ class CrmSettings extends CrmLibrary
                 $objDatabase->Execute($query);
             }
 
-            $defaultTypeId = intval($_POST['default']);            
+            $defaultTypeId = intval($_POST['default']);
             $statusArr     = array();
             $x             = 0;
             foreach ($_POST['form_id'] as $id) {
                 $statusArr[$id]['id']     = intval($id);
                 $statusArr[$id]['status'] = ($defaultTypeId == $id) ? 1 : 0;
-                $statusArr[$id]['pos']    = intval($_POST['form_pos'][$x]);                
+                $statusArr[$id]['pos']    = intval($_POST['form_pos'][$x]);
                 $x++;
             }
 
@@ -216,7 +216,7 @@ class CrmSettings extends CrmLibrary
             while (!$objResult->EOF) {
                 $activeImage = ($objResult->fields['active']) ? "../core/Core/View/Media/icons/led_green.gif" : "../core/Core/View/Media/icons/led_red.gif";
                 $activeTitle = ($objResult->fields['active']) ? $_ARRAYLANG['TXT_CRM_ACTIVE'] : $_ARRAYLANG['TXT_CRM_INACTIVE'];
-                
+
                 $customerTypeOverview[$row] = array(
                         'pos'            => $objResult->fields['pos'],
                         'active'         => $objResult->fields['active'],
@@ -239,12 +239,12 @@ class CrmSettings extends CrmLibrary
             foreach ($customerTypeOverview as $customerTypeValues) {
 
                 $this->_objTpl->setVariable(array(
-                        'TXT_CUSTOMER_TYPE_ID'		=>  $customerTypeValues['customerTypeId'],
-                        'TXT_CUSTOMER_TYPE_LABEL'	=>  contrexx_raw2xhtml($customerTypeValues['label'], ENT_QUOTES),
+                        'TXT_CUSTOMER_TYPE_ID'        =>  $customerTypeValues['customerTypeId'],
+                        'TXT_CUSTOMER_TYPE_LABEL'    =>  contrexx_raw2xhtml($customerTypeValues['label'], ENT_QUOTES),
                         'TXT_PROJECT_ACTIVE_IMAGE'      =>  $customerTypeValues['activeImage'],
                         'TXT_PROJECT_ACTIVE_TITLE'      =>  $customerTypeValues['activeTitle'],
-                        'TXT_CUSTOMER_ACTIVE'		=>  $customerTypeValues['active'],
-                        'TXT_CUSTOMER_POS_SORT'		=>  $customerTypeValues['pos'],
+                        'TXT_CUSTOMER_ACTIVE'        =>  $customerTypeValues['active'],
+                        'TXT_CUSTOMER_POS_SORT'        =>  $customerTypeValues['pos'],
                         'ENTRY_ROWCLASS'                =>  ($row % 2 == 0) ? 'row1' : 'row2',
                         'TXT_CRM_IMAGE_DELETE'              =>  $_ARRAYLANG['TXT_CRM_IMAGE_DELETE'],
                         'TXT_CRM_IMAGE_EDIT'                =>  $_ARRAYLANG['TXT_CRM_IMAGE_EDIT'],
@@ -287,7 +287,7 @@ class CrmSettings extends CrmLibrary
                 'TXT_CRM_GENERAL'                    => $_ARRAYLANG['TXT_CRM_GENERAL'],
                 'TXT_CRM_NOTES'                      => $_ARRAYLANG['TXT_CRM_NOTES'],
                 'TXT_CRM_SAVE'                       => $_ARRAYLANG['TXT_CRM_SAVE'],
-                
+
         ));
     }
 
@@ -295,7 +295,7 @@ class CrmSettings extends CrmLibrary
      * Edit page of cutomer types
      *
      * @param string $labelValue label value
-     * 
+     *
      * @global array $_ARRAYLANG
      * @global object $objDatabase
      * @return true
@@ -359,7 +359,7 @@ class CrmSettings extends CrmLibrary
         $this->_objTpl->setVariable(array(
                 'CUSTOMER_TYPES_JAVASCRIPT'         => $objJs->editCustomerTypeJavascript(),
                 'TXT_CUSTOMER_TYPE_ID'              => (int) $id,
-                'TXT_LABEL_VALUE'		    => contrexx_raw2xhtml($customerLabel),
+                'TXT_LABEL_VALUE'            => contrexx_raw2xhtml($customerLabel),
                 'CRM_CUSTOMER_TYPE_SORTING_NUMBER'  => (int) $customerSorting,
                 'TXT_ACTIVATED_VALUE'               => $customerStatus ? 'checked' : '',
 
@@ -398,7 +398,7 @@ class CrmSettings extends CrmLibrary
         $customerLabel      = isset($_POST['label']) ? contrexx_input2raw($_POST['label']) : '';
         $customerSorting    = isset($_POST['sortingNumber']) ? intval($_POST['sortingNumber']) : '';
         $customerStatus     = isset($_POST['activeStatus']) || !isset ($_POST['customer_type_submit']) ? 1 : 0;
-        
+
         $searchingQuery = "SELECT label FROM `".DBPREFIX."module_{$this->moduleNameLC}_customer_types`
                                WHERE  label = '".contrexx_raw2db($customerLabel)."'";
         $objResult = $objDatabase->Execute($searchingQuery);
@@ -438,7 +438,7 @@ class CrmSettings extends CrmLibrary
     public function currencyoverview()
     {
         global $_CORELANG, $_ARRAYLANG, $objDatabase, $objJs;
-        
+
         $fn = isset($_REQUEST['fn']) ? $_REQUEST['fn'] : '';
         if (!empty($fn)) {
             switch ($fn) {
@@ -448,7 +448,7 @@ class CrmSettings extends CrmLibrary
             }
             return;
         }
-        
+
         $this->_objTpl->addBlockfile('CRM_SETTINGS_FILE', 'settings_block', 'module_'.$this->moduleNameLC.'_settings_currency.html');
         $this->_pageTitle = $_ARRAYLANG['TXT_CRM_SETTINGS'];
 
@@ -496,7 +496,7 @@ class CrmSettings extends CrmLibrary
         }
 
         if (isset($_POST['currencyfield_submit'])) {
-            
+
             for ($x = 0; $x < count($_POST['form_id']); $x++) {
                 $default = ($_POST['form_id'][$x] == $_POST['default']) ? 1 : 0;
                 $query = "UPDATE ".DBPREFIX."module_".$this->moduleNameLC."_currency
@@ -514,7 +514,7 @@ class CrmSettings extends CrmLibrary
         $currencyeOverview   = array();
         $numeric             = array('pos');
         $key                 = 0;
-        
+
         $objData = $objDatabase->Execute('SELECT id, name, active, pos, default_currency FROM `'.DBPREFIX.'module_'.$this->moduleNameLC.'_currency`');
 
         $row = "row2";
@@ -547,7 +547,7 @@ class CrmSettings extends CrmLibrary
             foreach ($currencyeOverview as $key => $currency) {
                 $activeImage = $currencyeOverview[$key]['active'] ? "../core/Core/View/Media/icons/led_green.gif" : "../core/Core/View/Media/icons/led_red.gif";
                 $activeTitle = $currencyeOverview[$key]['active'] ? $_ARRAYLANG['TXT_CRM_ACTIVE']    : $_ARRAYLANG['TXT_CRM_INACTIVE'];
-                
+
                 $this->_objTpl->setVariable(array(
                         'TXT_CURRENCY_NAME'            => contrexx_raw2xhtml($currency['name']),
                         'TXT_CURRENCY_ID'              => $currency['id'],
@@ -578,10 +578,10 @@ class CrmSettings extends CrmLibrary
             $this->_objTpl->parse("hourlyRate");
             $objResult->MoveNext();
         }
-        
+
         $settings = $this->getSettings();
         $settings['allow_pm'] ? $this->_objTpl->touchBlock("show-rates") : $this->_objTpl->hideBlock("show-rates");
-        
+
         $this->_objTpl->setVariable(array(
                 'PM_CURRENCY_ORDER_SORT'             => '&sortf=0&sorto='.($sortOrder?0:1),
                 'PM_CURRENCY_NAME_SORT'              => '&sortf=1&sorto='.($sortOrder?0:1),
@@ -615,7 +615,7 @@ class CrmSettings extends CrmLibrary
      * get the edit currency page
      *
      * @param integer $labelValue label value
-     * 
+     *
      * @global array $_ARRAYLANG
      * @global object $objDatabase
      * @return true
@@ -659,7 +659,7 @@ class CrmSettings extends CrmLibrary
                 $_SESSION['strErrMessage'] = $_ARRAYLANG['TXT_CRM_CURRENCY_ALREADY_EXISTS'];
             } else {
                 $updateProjectTypes = "UPDATE `".DBPREFIX."module_{$this->moduleNameLC}_currency`
-    							     SET  `name`  = '$label',
+                                     SET  `name`  = '$label',
                                           `pos`   = '$sorting',
                                           `active`= '$status',
                                           `hourly_rate` = '".json_encode($hrlyRate)."'
@@ -696,8 +696,8 @@ class CrmSettings extends CrmLibrary
         $settings['allow_pm'] ? $this->_objTpl->touchBlock("show-rates") : $this->_objTpl->hideBlock("show-rates");
         $this->_objTpl->setVariable(array(
             'TXT_SORTINGNUMBER'       => (int) $sorting,
-            'TXT_CURRENCY_ID'	      => (int) $id,
-            'TXT_NAME_VALUE'	      => contrexx_raw2xhtml($label),
+            'TXT_CURRENCY_ID'          => (int) $id,
+            'TXT_NAME_VALUE'          => contrexx_raw2xhtml($label),
             'TXT_ACTIVATED_VALUE'     => $status ? 'checked' : '',
 
             'TXT_CRM_EDIT_CURRENCY'   => $_ARRAYLANG['TXT_CRM_EDIT_CURRENCY'],
@@ -746,7 +746,7 @@ class CrmSettings extends CrmLibrary
                     $hrlyRate[$customerTypeId] = (isset($_POST['rateValue_'.$customerTypeId])) ? intval($_POST['rateValue_'.$customerTypeId]) : 0;
                 }
             }
-        
+
             if (!$objResult->EOF) {
                 $_SESSION['strErrMessage'] = $_ARRAYLANG['TXT_CRM_CURRENCY_ALREADY_EXISTS'];
                 return;
@@ -812,7 +812,7 @@ class CrmSettings extends CrmLibrary
             }
             return;
         }
-        
+
         $objTpl = $this->_objTpl;
         $objTpl->addBlockfile('CRM_SETTINGS_FILE', 'settings_block', 'module_'.$this->moduleNameLC.'_settings_task_types.html');
         $this->_pageTitle = $_ARRAYLANG['TXT_CRM_SETTINGS'];
@@ -943,7 +943,7 @@ class CrmSettings extends CrmLibrary
      *
      * @param array $tasktypeIds asd
      * @param bool  $deactivate  dedd
-     * 
+     *
      * @global  object   $objDatabase
      * @global  array    $_ARRAYLANG
      * @return true
@@ -972,7 +972,7 @@ class CrmSettings extends CrmLibrary
      * activate the task type
      *
      * @param integer $tasktypeId id
-     * 
+     *
      * @global object $objDatabase
      * @return true
      */
@@ -1017,7 +1017,7 @@ class CrmSettings extends CrmLibrary
      * delete task type
      *
      * @param array $tasktypeIds id
-     * 
+     *
      * @global object $objDatabase
      * @global array $_ARRAYLANG
      * @return true
@@ -1037,13 +1037,13 @@ class CrmSettings extends CrmLibrary
         }
     }
 
-    /**    
+    /**
      * delete task type
-     * 
+     *
      * @param integer $tasktypeId Id of tasktype
      *
      * @global object $objDatabase
-     * @global array $_ARRAYLANG     
+     * @global array $_ARRAYLANG
      * @return true
      */
 
@@ -1058,7 +1058,7 @@ class CrmSettings extends CrmLibrary
 
     /**
      * settings general
-     * 
+     *
      * @global <type> $objDatabase
      * @global <type> $_ARRAYLANG
      * @return true
@@ -1071,7 +1071,7 @@ class CrmSettings extends CrmLibrary
         $objTpl = $this->_objTpl;
         $objTpl->hideBlock('insufficient-warning');
         if (isset($_POST['save'])) {
-                                    
+
             $settings = array(
                     'allow_pm'                             => (!$this->isPmInstalled ? 0 : (isset($_POST['allowPm']) ? 1 : 0)),
                     'create_user_account'                  => isset($_POST['create_user_account']) ? 1 : 0,
@@ -1160,7 +1160,7 @@ class CrmSettings extends CrmLibrary
                 $objLanguages->MoveNext();
             }
         }
-        
+
         $objFWUser      = \FWUser::getFWUserObject();
         $objGroupIds    = $objFWUser->objGroup->getGroups($filter = array('is_active' => true));
         if ($objGroupIds) {
@@ -1174,7 +1174,7 @@ class CrmSettings extends CrmLibrary
                 $objGroupIds->next();
             }
         }
-        
+
         //show backend groups
         $objBackendGroupIds    = $objFWUser->objGroup->getGroups($filter = array('is_active' => true, 'type' => 'backend'));
         if ($objBackendGroupIds) {
@@ -1203,14 +1203,14 @@ class CrmSettings extends CrmLibrary
             ));
             $objTpl->parse("default_country");
         }
-        
+
         $objTpl->setVariable(array(
             'CRM_ALLOW_PM'                   => ($settings['allow_pm']) ? "checked='checked'" : '',
             'CRM_CREATE_ACCOUNT_USER'        => ($settings['create_user_account']) ? "checked='checked'" : '',
             'CRM_ACCOUNT_MANTATORY'          => ($settings['user_account_mantatory']) ? "checked='checked'" : '',
         ));
-        
-        $objTpl->setVariable(array(                
+
+        $objTpl->setVariable(array(
                 'TXT_CRM_ALLOW_PM'               => $_ARRAYLANG["TXT_CRM_ALLOW_PM"],
                 'TXT_CRM_DEFAULT_COUNTRY'        => $_ARRAYLANG["TXT_CRM_DEFAULT_COUNTRY"],
                 'TXT_CRM_SELECT_COUNTRY'         => $_ARRAYLANG["TXT_CRM_SELECT_COUNTRY"],
@@ -1253,7 +1253,7 @@ class CrmSettings extends CrmLibrary
                                                                 \Cx\Core\Setting\Controller\Setting::getValue('user_profile_attribute_customer_type', 'Crm'),
                                                                 '', '', 'tabindex="0" style="width: 270px;"'),
         ));
-        
+
         if (!$this->isPmInstalled)
             $objTpl->hideBlock('allowPmModule');
     }
@@ -1362,7 +1362,7 @@ class CrmSettings extends CrmLibrary
                 \Cx\Core\Setting\Controller\Setting::getValue('numof_mailtemplate_per_page_backend', 'Crm')
             )->get()
         );
-        
+
         $result &= \Cx\Core\Setting\Controller\Setting::show_external(
             $objTemplate,
             (empty($_REQUEST['key'])
@@ -1380,7 +1380,7 @@ class CrmSettings extends CrmLibrary
         $this->_objTpl->addBlock('CRM_MAIL_SETTINGS_FILE',
             'settings_block', $objTemplate->get());
         $this->_objTpl->touchBlock('settings_block');
-        
+
     }
     /**
      * get crm module placeholders
@@ -1395,7 +1395,7 @@ class CrmSettings extends CrmLibrary
         $objTemplate->setErrorHandling(PEAR_ERROR_DIE);
         if (!$objTemplate->loadTemplateFile('module_'.$this->moduleNameLC.'_settings_placeholders.html'))
             die("Failed to load template 'module_'.$this->moduleNameLC.'_settings_placeholders.html'");
-        
+
         $objTemplate->setVariable(array(
             'TXT_CRM_PLACEHOLDERS'                  => $_ARRAYLANG['TXT_CRM_PLACEHOLDERS'],
             'TXT_CRM_GENERAL'                       => $_ARRAYLANG['TXT_CRM_GENERAL'],
@@ -1427,13 +1427,13 @@ class CrmSettings extends CrmLibrary
 
         return $objTemplate->get();
     }
-    
+
     /**
     * show all company size
-    * 
+    *
     * @global array  $_ARRAYLANG
     * @global object $objDatabase
-    * 
+    *
     * @return null
     */
     function showCompanySize() {
@@ -1442,15 +1442,15 @@ class CrmSettings extends CrmLibrary
         \JS::activate("jquery");
 
         $subTpl = isset($_GET['subTpl']) ? $_GET['subTpl'] : '';
-        
+
         $this->settingsController = new CrmSettings($this->_objTpl, $this->moduleName);
-        
+
         $fields = array(
             'company_size' => isset($_POST['companySize']) ? contrexx_input2raw($_POST['companySize']) : '',
             'sorting'      => isset($_POST['sorting']) ? contrexx_input2raw($_POST['sorting']) : '',
             'status'       => isset($_POST['status']) ? 1 : (empty($_POST) ? 1 : 0)
         );
-        
+
         if (!empty($subTpl)) {
             switch ($subTpl) {
                 case 'modifyCompanySize':
@@ -1511,27 +1511,27 @@ class CrmSettings extends CrmLibrary
 
     /**
      * update the company size
-     * 
+     *
      * @global object $objDatabase
      * @global array  $_ARRAYLANG
      * @param  array  $fields  post values
-     * 
+     *
      * @return null
      */
     function modifyCompanySize($fields) {
         global $objDatabase, $_ARRAYLANG;
         $objTpl = $this->_objTpl;
         $objTpl->addBlockfile('CRM_SETTINGS_FILE', 'settings_block', 'module_'.$this->moduleNameLC.'_settings_modify_company_size.html');
-        
+
         $id = isset($_GET['id']) ? $_GET['id'] : 0;
-        
+
         //Get the company size
         $this->getCompanySize($id);
         //parse the placeholders
         $this->parseCompanySizePlaceholders();
         if($_POST['save']) {
             if(!empty($id)){
-                //update 
+                //update
                 $query  = \SQL::update('module_'.$this->moduleNameLC.'_company_size', $fields, array('escape' => true)).' WHERE `id` = '.$id;
             }
             $objResult = $objDatabase->Execute($query);
@@ -1543,15 +1543,15 @@ class CrmSettings extends CrmLibrary
                 $_SESSION['strErrMessage'] = $_ARRAYLANG['TXT_CRM_ENTRY_UPDATE_ERROR'];
             }
         }
-        
+
     }
-    
+
     /**
      * Get the all company sizes / get specific company size by id
-     * 
+     *
      * @global object  $objDatabase
      * @param  integer $id company size id
-     * 
+     *
      * @return null
      */
     function getCompanySize($id = 0) {
@@ -1585,7 +1585,7 @@ class CrmSettings extends CrmLibrary
 
     /**
      * parse the company size place holders
-     * 
+     *
      * @global array $_ARRAYLANG
      */
     function parseCompanySizePlaceholders() {
@@ -1608,7 +1608,7 @@ class CrmSettings extends CrmLibrary
             'TXT_CRM_ACTIVATESELECTED'                   => $_ARRAYLANG['TXT_CRM_ACTIVATESELECTED'],
             'TXT_CRM_DEACTIVATESELECTED'                 => $_ARRAYLANG['TXT_CRM_DEACTIVATESELECTED'],
             'TXT_CRM_DELETE_SELECTED'                    => $_ARRAYLANG['TXT_CRM_DELETE_SELECTED'],
-            'TXT_CRM_ENTRY_DELETED_SUCCESS'              => $_ARRAYLANG['TXT_CRM_ENTRY_DELETED_SUCCESS'],   
+            'TXT_CRM_ENTRY_DELETED_SUCCESS'              => $_ARRAYLANG['TXT_CRM_ENTRY_DELETED_SUCCESS'],
             'TXT_CRM_NOTHING_SELECTED'                   => $_ARRAYLANG['TXT_CRM_NOTHING_SELECTED'],
             'TXT_CRM_ACTIVATED_SUCCESSFULLY'             => $_ARRAYLANG['TXT_CRM_ACTIVATED_SUCCESSFULLY'],
             'TXT_CRM_DEACTIVATED_SUCCESSFULLY'           => $_ARRAYLANG['TXT_CRM_DEACTIVATED_SUCCESSFULLY'],
@@ -1617,5 +1617,5 @@ class CrmSettings extends CrmLibrary
             'TXT_CRM_ARE_YOU_SURE_DELETE_SELECTED_ENTRIES'  => $_ARRAYLANG['TXT_CRM_ARE_YOU_SURE_DELETE_SELECTED_ENTRIES']
         ));
     }
-    
+
 }

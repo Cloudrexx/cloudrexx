@@ -25,7 +25,7 @@
  * our trademarks remain entirely with us.
  */
 
-/* 
+/*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
@@ -76,7 +76,7 @@ class License {
     private $lastSuccessfulUpdate;
     private $isUpgradable = false;
     private $dashboardMessages;
-    
+
     public function __construct(
             $state = self::LICENSE_DEMO,
             $editionName = '',
@@ -115,7 +115,7 @@ class License {
 
         if ($partner instanceof Person) {
             $this->partner = $partner;
-        } else { 
+        } else {
             $this->partner = new Person();
         }
 
@@ -135,19 +135,19 @@ class License {
         $this->setFirstFailedUpdateTime($firstFailedUpdate);
         $this->setLastSuccessfulUpdateTime($lastSuccessfulUpdate);
     }
-    
+
     /**
      * Load the component's addtional data from the argument $legalComponents
-     * 
+     *
      * @param array $legalComponents
-     * 
+     *
      * @return mixed array | boolean
      */
     public function loadComponentsAdditionalData($legalComponents = array()) {
         if (empty($legalComponents)) {
             return;
         }
-        
+
         $this->legalComponents = array();
         foreach ($legalComponents as $key => $legalComponent) {
             if (is_array($legalComponent)) {
@@ -163,34 +163,34 @@ class License {
     public function getState() {
         return $this->state;
     }
-    
+
     public function setState($state) {
         $this->state = $state;
         if ($this->state == self::LICENSE_ERROR) {
             $this->setFirstFailedUpdateTime(time());
         }
     }
-    
+
     public function isFrontendLocked() {
         return $this->frontendLocked;
     }
-    
+
     public function getEditionName() {
         return $this->editionName;
     }
-    
+
     public function setEditionName($editionName) {
         $this->editionName = $editionName;
     }
-    
+
     public function getAvailableComponents() {
         return $this->availableComponents;
     }
-    
+
     public function setAvailableComponents($availableComponents) {
         $this->availableComponents = $availableComponents;
     }
-    
+
     public function getLegalComponentsList() {
         return $this->legalComponents;
     }
@@ -200,16 +200,16 @@ class License {
     }
     /**
      * get the legal components additional data
-     * 
+     *
      * @return array
      */
     public function getLegalComponentsAdditionalData() {
         return $this->legalComponentsAdditionalData;
     }
-    
+
     /**
      * Set the legal Components additional data
-     * 
+     *
      * @param array $legalComponentsAdditionalData
      */
     public function setLegalComponentsAdditionalData($legalComponentsAdditionalData) {
@@ -219,46 +219,46 @@ class License {
     public function isInLegalComponents($componentName) {
         return in_array($componentName, $this->legalComponents);
     }
-    
+
     public function getLegalFrontendComponentsList() {
         if (!$this->legalFrontendComponents) {
             return $this->getLegalComponentsList();
         }
         return $this->legalFrontendComponents;
     }
-    
+
     public function isInLegalFrontendComponents($componentName) {
         return in_array($componentName, $this->getLegalFrontendComponentsList());
     }
-    
+
     public function getValidToDate() {
         return $this->validTo;
     }
-    
+
     public function setValidToDate($timestamp) {
         $this->validTo = $timestamp;
     }
-    
+
     public function getUpgradeUrl() {
         return $this->upgradeUrl;
     }
-    
+
     public function setUpgradeUrl($upgradeUrl) {
         $this->upgradeUrl = $upgradeUrl;
     }
-    
+
     public function getCreatedAtDate() {
         return $this->createdAt;
     }
-    
+
     public function setCreatedAtDate($createdAt) {
         $this->createdAt = $createdAt;
     }
-    
+
     public function getRegisteredDomains() {
         return $this->registeredDomains;
     }
-    
+
     public function setRegisteredDomains($registeredDomains) {
         $this->registeredDomains = $registeredDomains;
     }
@@ -269,19 +269,19 @@ class License {
     public function setInstallationId($insId) {
         $this->instId = $insId;
     }
-    
+
     public function getLicenseKey() {
         return $this->licenseKey;
     }
-    
+
     public function setLicenseKey($key) {
         $this->licenseKey = $key;
     }
-    
+
     public function getMessages() {
         return $this->messages;
     }
-    
+
     public function getDashboardMessages() {
         return $this->dashboardMessages;
     }
@@ -289,22 +289,22 @@ class License {
     public function setDashboardMessages($dashboardMessages) {
         $this->dashboardMessages = $dashboardMessages;
     }
-    
+
     public function getIsUpgradable() {
         return $this->isUpgradable;
     }
-    
+
     public function setIsUpgradable($isUpgradable) {
         $this->isUpgradable = $isUpgradable;
     }
 
     public function setMessages($messages) {
         $this->messages = $messages;
-    }    
+    }
 
     public function setGrayZoneMessages($grayzoneMessages) {
         $this->grayzoneMessages = $grayzoneMessages;
-    }    
+    }
 
     /**
      *
@@ -351,11 +351,11 @@ class License {
         reset($messages);
         return current($messages);
     }
-    
+
     public function isUpgradable() {
         return $this->isUpgradable;
     }
-    
+
     /**
      *
      * @return Version
@@ -363,27 +363,27 @@ class License {
     public function getVersion() {
         return $this->version;
     }
-    
+
     public function getPartner() {
         return $this->partner;
     }
-    
+
     public function getCustomer() {
         return $this->customer;
     }
-    
+
     public function getGrayzoneTime() {
         return $this->grayzoneTime;
     }
-    
+
     public function setGrayzoneTime($grayzoneTime) {
         $this->grayzoneTime = $grayzoneTime;
     }
-    
+
     public function getGrayzoneMessages() {
         return $this->grayzoneMessages;
     }
-    
+
     /**
      *
      * @return Message
@@ -396,48 +396,48 @@ class License {
         // return message in prefered localized version
         return $this->getMessageInPreferedLanguage($this->grayzoneMessages, $langCode);
     }
-    
+
     public function getFrontendLockTime() {
         return $this->frontendLockTime;
     }
-    
+
     public function setFrontendLockTime($frontendLockTime) {
         $this->frontendLockTime = $frontendLockTime;
     }
-    
+
     public function setUpdateInterval($requestInterval) {
         $this->requestInterval = $requestInterval;
     }
-    
+
     public function getRequestInterval() {
         return $this->requestInterval;
     }
-    
+
     public function setRequestInterval($requestInterval) {
         $this->requestInterval = $requestInterval;
     }
-    
+
     public function getFirstFailedUpdateTime() {
         return $this->firstFailedUpdate;
     }
-    
+
     public function setFirstFailedUpdateTime($time) {
         if ($this->firstFailedUpdate == 0) {
             $this->firstFailedUpdate = $time;
         }
     }
-    
+
     public function getLastSuccessfulUpdateTime() {
         return $this->lastSuccessfulUpdate;
     }
-    
+
     public function setLastSuccessfulUpdateTime($time) {
         if ($time > $this->firstFailedUpdate) {
             $this->firstFailedUpdate = 0;
             $this->lastSuccessfulUpdate = $time;
         }
     }
-    
+
     public function check() {
         // check checksum
         if (!$this->checkSum($this->instId, false) || !$this->checkSum($this->licenseKey)) {
@@ -472,7 +472,7 @@ class License {
         }
         $this->setValidToDate($validTo);
     }
-    
+
     public function checkSum($key, $id = true) {
         $length = 40;
         if ($id) {
@@ -488,12 +488,12 @@ class License {
         $realChecksum = str_pad(dechex(crc32($realKey)), 8, '0', STR_PAD_LEFT);
         return $key === $realKey.$realChecksum;
     }
-    
+
     /**
      *
      * @global type $_POST
      * @param \settingsManager $settingsManager
-     * @param \ADONewConnection $objDb 
+     * @param \ADONewConnection $objDb
      */
     public function save($objDb) {
         \Cx\Core\Setting\Controller\Setting::init('Config', 'license','Yaml');
@@ -505,7 +505,7 @@ class License {
             \Cx\Core\Setting\Controller\Setting::set('installationId', $this->getInstallationId());
         }
 
-        // license    
+        // license
         if (!\Cx\Core\Setting\Controller\Setting::isDefined('licenseKey')) {
             \Cx\Core\Setting\Controller\Setting::add('licenseKey', $this->getLicenseKey(), 1, \Cx\Core\Setting\Controller\Setting::TYPE_TEXT, null, 'license');
         } else {
@@ -660,7 +660,7 @@ class License {
             UPDATE
                 '.DBPREFIX.'modules
             SET
-                `is_licensed` = \'0\' , 
+                `is_licensed` = \'0\' ,
                 `additional_data` = NULL
             WHERE
                 `distributor` = \'Cloudrexx AG\'
@@ -675,7 +675,7 @@ class License {
                 `name` IN(\'' . implode('\', \'', $this->getLegalComponentsList()) . '\')
         ';
         $objDb->Execute($query);
-        
+
         //Save legal components additional data values.
         if (!\FWValidator::isEmpty($this->getLegalComponentsAdditionalData())) {
 
@@ -684,28 +684,28 @@ class License {
                     continue;
                 }
                 $query = "
-                    UPDATE 
+                    UPDATE
                         " . DBPREFIX . "modules
-                    SET 
+                    SET
                         `additional_data` = '" . contrexx_raw2db(json_encode($additionalData)) . "'
-                    WHERE 
+                    WHERE
                         `name` = '" . contrexx_raw2db($componentName) . "'
                     ";
                 $objDb->Execute($query);
             }
         }
     }
-    
+
     /**
      * Get the licensed components with their additional data's
-     * 
+     *
      * @global type $objDatabase
-     * 
+     *
      * @return array
      */
     public function getLicensedComponentsWithAdditionalData() {
         global $objDatabase;
-        
+
         $query = '
             SELECT
                 `name`, `additional_data`
@@ -715,11 +715,11 @@ class License {
             `is_licensed` = \'1\'
         ';
         $objResult = $objDatabase->execute($query);
-        
+
         $licensedComponents = array();
         if ($objResult) {
             while (!$objResult->EOF) {
-                $licensedComponents[] = !empty($objResult->fields['additional_data']) 
+                $licensedComponents[] = !empty($objResult->fields['additional_data'])
                                         ? array($objResult->fields['name'] => json_decode($objResult->fields['additional_data'], true))
                                         : $objResult->fields['name'];
                 $objResult->MoveNext();
@@ -727,7 +727,7 @@ class License {
         }
         return $licensedComponents;
     }
-    
+
     /**
      * @param array             $_CONFIG    Reference to the basic settings ($_CONFIG)
      * @param ADONewConnection  $objDb      Database connection object
@@ -739,25 +739,25 @@ class License {
         $editionName = isset($_CONFIG['coreCmsEdition']) ? htmlspecialchars_decode($_CONFIG['coreCmsEdition']) : null;
         $instId = isset($_CONFIG['installationId']) ? htmlspecialchars_decode($_CONFIG['installationId']) : null;
         $licenseKey = isset($_CONFIG['licenseKey']) ? htmlspecialchars_decode($_CONFIG['licenseKey']) : null;
-        
+
         $messages = isset($_CONFIG['licenseMessage']) ? unserialize(base64_decode(htmlspecialchars_decode($_CONFIG['licenseMessage']))) : array();
-        
+
         $createdAt = isset($_CONFIG['licenseCreatedAt']) ? htmlspecialchars_decode($_CONFIG['licenseCreatedAt']) : null;
         $registeredDomains = isset($_CONFIG['licenseDomains']) ? unserialize(base64_decode(htmlspecialchars_decode($_CONFIG['licenseDomains']))) : array();
-        
+
         $grayzoneMessages = isset($_CONFIG['licenseGrayzoneMessages']) ? unserialize(base64_decode(htmlspecialchars_decode($_CONFIG['licenseGrayzoneMessages']))) : array();
         $dashboardMessages = isset($_CONFIG['dashboardMessages']) ? unserialize(base64_decode(htmlspecialchars_decode($_CONFIG['dashboardMessages']))) : array();
-        
+
         $partner = isset($_CONFIG['licensePartner']) ? unserialize(base64_decode(htmlspecialchars_decode($_CONFIG['licensePartner']))) : new Person();
         $customer = isset($_CONFIG['licenseCustomer']) ? unserialize(base64_decode(htmlspecialchars_decode($_CONFIG['licenseCustomer']))) : new Person();
-        
+
         $versionNumber = isset($_CONFIG['coreCmsVersion']) ? htmlspecialchars_decode($_CONFIG['coreCmsVersion']) : null;
         $versionName = isset($_CONFIG['coreCmsName']) ? htmlspecialchars_decode($_CONFIG['coreCmsName']) : null;
         $versionCodeName = isset($_CONFIG['coreCmsCodeName']) ? htmlspecialchars_decode($_CONFIG['coreCmsCodeName']) : null;
         $versionState = isset($_CONFIG['coreCmsStatus']) ? htmlspecialchars_decode($_CONFIG['coreCmsStatus']) : null;
         $versionReleaseDate = isset($_CONFIG['coreCmsReleaseDate']) ? htmlspecialchars_decode($_CONFIG['coreCmsReleaseDate']) : null;
         $version = new Version($versionNumber, $versionName, $versionCodeName, $versionState, $versionReleaseDate);
-        
+
         $grayzoneTime = isset($_CONFIG['licenseGrayzoneTime']) ? htmlspecialchars_decode($_CONFIG['licenseGrayzoneTime']) : null;
         $lockTime = isset($_CONFIG['licenseLockTime']) ? htmlspecialchars_decode($_CONFIG['licenseLockTime']) : null;
         $updateInterval = isset($_CONFIG['licenseUpdateInterval']) ? htmlspecialchars_decode($_CONFIG['licenseUpdateInterval']) : null;
@@ -765,9 +765,9 @@ class License {
         $successfulUpdate = isset($_CONFIG['licenseSuccessfulUpdate']) ? htmlspecialchars_decode($_CONFIG['licenseSuccessfulUpdate']) : null;
         $upgradeUrl = isset($_CONFIG['upgradeUrl']) ? htmlspecialchars_decode($_CONFIG['upgradeUrl']) : null;
         $isUpgradable = isset($_CONFIG['isUpgradable']) ? $_CONFIG['isUpgradable'] == 'on' : false;
-        
+
         $availableComponents = isset($_CONFIG['availableComponents']) ? unserialize(base64_decode(htmlspecialchars_decode($_CONFIG['availableComponents']))) : array();
-        
+
         $query = '
             SELECT
                 `name`

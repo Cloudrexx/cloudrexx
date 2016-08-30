@@ -265,7 +265,7 @@ class PaymentProcessing
         switch (self::getPaymentProcessorName()) {
             case 'internal':
                 \Cx\Core\Csrf\Controller\Csrf::redirect(
-                    \Cx\Core\Routing\Url::fromModuleAndCmd('Shop'.MODULE_INDEX, 'success', '', 
+                    \Cx\Core\Routing\Url::fromModuleAndCmd('Shop'.MODULE_INDEX, 'success', '',
                         array('result' => 1, 'handler' => 'internal')
                     )
                 );
@@ -331,11 +331,11 @@ foreach (\PostfinanceMobile::getErrors() as $error) {
                 $return = \PayPal::getForm($account_email, $order_id,
                     $currency_code, $amount, $item_name);
                 break;
-            case 'paymill_cc':    
+            case 'paymill_cc':
             case 'paymill_elv':
             case 'paymill_iban':
                 $return =  self::_PaymillProcessor(self::getPaymentProcessorName());
-                break;                
+                break;
             case 'dummy':
                 $return = \Dummy::getForm();
                 break;
@@ -367,7 +367,7 @@ foreach (\PostfinanceMobile::getErrors() as $error) {
             '<br /><br /><img src="'.
             // Is there a language dependent version?
             (file_exists(\Cx\Core\Core\Controller\Cx::instanciate()->getCodeBaseModulePath() . '/Shop/View/Media/payments/' .$imageName_lang)
-              ? \Cx\Core\Core\Controller\Cx::instanciate()->getCodeBaseModuleWebPath() . '/Shop/View/Media/payments/' . $imageName_lang 
+              ? \Cx\Core\Core\Controller\Cx::instanciate()->getCodeBaseModuleWebPath() . '/Shop/View/Media/payments/' . $imageName_lang
               : \Cx\Core\Core\Controller\Cx::instanciate()->getCodeBaseModuleWebPath() . '/Shop/View/Media/payments/' . $imageName) .
             '" alt="" title="" /><br /><br />';
     }
@@ -388,16 +388,16 @@ foreach (\PostfinanceMobile::getErrors() as $error) {
             'CURRENCY'      => Currency::getActiveCurrencyCode(),
             'ORDERID'       => $_SESSION['shop']['order_id'],
             'ACCOUNTID'     => \Cx\Core\Setting\Controller\Setting::getValue('saferpay_id','Shop'),
-            'SUCCESSLINK'   => \Cx\Core\Routing\Url::fromModuleAndCmd('Shop'.MODULE_INDEX, 'success', '', 
+            'SUCCESSLINK'   => \Cx\Core\Routing\Url::fromModuleAndCmd('Shop'.MODULE_INDEX, 'success', '',
                                    array('result' => 1, 'handler' => 'saferpay'))->toString(),
-            'FAILLINK'      => \Cx\Core\Routing\Url::fromModuleAndCmd('Shop'.MODULE_INDEX, 'success', '', 
+            'FAILLINK'      => \Cx\Core\Routing\Url::fromModuleAndCmd('Shop'.MODULE_INDEX, 'success', '',
                                    array('result' => 0, 'handler' => 'saferpay'))->toString(),
-            'BACKLINK'      => \Cx\Core\Routing\Url::fromModuleAndCmd('Shop'.MODULE_INDEX, 'success', '', 
+            'BACKLINK'      => \Cx\Core\Routing\Url::fromModuleAndCmd('Shop'.MODULE_INDEX, 'success', '',
                                    array('result' => 2, 'handler' => 'saferpay'))->toString(),
             'DESCRIPTION'   => '"'.$_ARRAYLANG['TXT_ORDER_NR'].
                                 ' '.$_SESSION['shop']['order_id'].'"',
             'LANGID'        => \FWLanguage::getLanguageCodeById(FRONTEND_LANG_ID),
-            'NOTIFYURL'     => \Cx\Core\Routing\Url::fromModuleAndCmd('Shop'.MODULE_INDEX, 'success', '', 
+            'NOTIFYURL'     => \Cx\Core\Routing\Url::fromModuleAndCmd('Shop'.MODULE_INDEX, 'success', '',
                                    array('result' => '-1', 'handler' => 'saferpay'))->toString(),
             'ALLOWCOLLECT'  => 'no',
             'DELIVERY'      => 'no',
@@ -455,15 +455,15 @@ foreach (\PostfinanceMobile::getErrors() as $error) {
 
     /**
      * Returns the HTML code for the Paymill payment method.
-     * 
+     *
      * @return  string  HTML code
      */
     static function _PaymillProcessor($processMethod)
     {
         global $_ARRAYLANG;
-        
+
         $landingPage = \Env::get('em')->getRepository('Cx\Core\ContentManager\Model\Entity\Page')->findOneByModuleCmdLang('Shop'.MODULE_INDEX, 'success', FRONTEND_LANG_ID);
-        
+
         $arrShopOrder = array(
             'order_id'  => $_SESSION['shop']['order_id'],
             'amount'    => intval($_SESSION['shop']['grand_total_price']*100),
@@ -481,7 +481,7 @@ foreach (\PostfinanceMobile::getErrors() as $error) {
                 $return = \PaymillIBANHandler::getForm($arrShopOrder, $landingPage);
                 break;
         }
-        
+
         if (_PAYMENT_DEBUG && \PaymillHandler::$arrError) {
             $strError =
                 '<font color="red"><b>'.
@@ -497,10 +497,10 @@ foreach (\PostfinanceMobile::getErrors() as $error) {
                 \DBG::log("Paymill Error: $error");
             }
         }
-        
+
         return $return;
     }
-    
+
     /**
      * Returns the HTML code for the Yellowpay payment method.
      * @return  string  HTML code
@@ -646,7 +646,7 @@ if (empty ($return)) {
                     \DBG::log("PaymentProcessing::checkIn(): WARNING: paymill: Payment verification failed; errors: ".var_export($response, true));
                     return false;
                 }
-                
+
             case 'saferpay':
                 $arrShopOrder = array(
                     'ACCOUNTID' => \Cx\Core\Setting\Controller\Setting::getValue('saferpay_id','Shop'));

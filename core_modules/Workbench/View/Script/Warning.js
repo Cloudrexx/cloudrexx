@@ -15,7 +15,7 @@ cx.ready(function() {
     if (!toolbarOffset) {
         toolbarOffset = 0;
     }
-    
+
     // position the body and the workbench-warning-bar
     cx.jQuery("body").css("padding-top", (parseInt(cx.jQuery("#workbenchWarning").outerHeight()) + toolbarOffset) + "px");
     cx.jQuery("#workbenchWarning").css({

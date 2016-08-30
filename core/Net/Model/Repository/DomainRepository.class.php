@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Domain Repository
  *
@@ -65,7 +65,7 @@ class DomainRepository extends \Cx\Core\Model\Controller\YamlRepository {
      */
     public function __construct() {
         parent::__construct(\Env::get('cx')->getWebsiteConfigPath() . '/DomainRepository.yml');
-        
+
         //Initialize the Hostname Domain
         $hostName = $this->findOneBy(array('name' => $_SERVER['SERVER_NAME']));
         if (!$hostName) {
@@ -74,7 +74,7 @@ class DomainRepository extends \Cx\Core\Model\Controller\YamlRepository {
             //attach the hostname domain entity to repository
             $this->add($hostName);
         }
-        
+
         // Since YamlRepo handles virtual entities wrong, we can not change the
         // ID of an existing entry (see
         // http://bugs.cloudrexx.com/cloudrexx/ticket/2762 and
@@ -84,15 +84,15 @@ class DomainRepository extends \Cx\Core\Model\Controller\YamlRepository {
         else {
             throw new \Exception('Duplicate entry for this domain, see http://bugs.cloudrexx.com/cloudrexx/ticket/2763');
         }
-        
+
         $hostName->setVirtual(true);
         // set ID to 0 to make it having the same ID constantly
         $hostName->setId(0);
     }
-    
+
     public function getMainDomain() {
         $config = \Env::get('config');
-        
+
         if (!empty($config['mainDomainId']) && isset($this->entities[$config['mainDomainId']])) {
             return $this->entities[$config['mainDomainId']];
         }
@@ -101,4 +101,3 @@ class DomainRepository extends \Cx\Core\Model\Controller\YamlRepository {
         return $objDomain[0];
     }
 }
-

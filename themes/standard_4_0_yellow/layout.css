@@ -499,7 +499,7 @@ body a:hover {text-decoration: none;}
     float: left;
     padding: 5px 0 5px 0;
 }
-#subnavigation li a:hover, 
+#subnavigation li a:hover,
 #subnavigation li a.active {
     color: #000;
 }
@@ -1376,7 +1376,7 @@ p#loginerror {
 }
 #login p.login-error-msg {
     margin: -15px 0 5px 0;
-    float: left;   
+    float: left;
 }
 #profilemain {
     margin: 0;
@@ -1421,7 +1421,7 @@ p#loginerror {
 .mobile-reg:hover {
     background: url('images/user_register.png') no-repeat center #888;
 }
-.mobile-login:hover { 
+.mobile-login:hover {
     background: url('images/login.png') no-repeat center #888;
 }
 .navbar-toggle:hover {

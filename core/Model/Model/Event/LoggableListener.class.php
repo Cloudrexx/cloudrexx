@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Wrapper class for the Gedmo\Loggable\LoggableListener
  *
@@ -32,7 +32,7 @@
  * @author      ss4u <ss4u.comvation@gmail.com>
  * @version     3.1.2
  * @package     cloudrexx
- * @subpackage  core 
+ * @subpackage  core
  */
 
 namespace Cx\Core\Model\Model\Event;
@@ -50,13 +50,13 @@ class LoggableListenerException extends \Exception { }
  * @subpackage  core
  */
 class LoggableListener extends \Gedmo\Loggable\LoggableListener {
-    
+
     /**
      * {@inheritDoc}
      */
     protected function getEventAdapter(\Doctrine\Common\EventArgs $args) {
         parent::getEventAdapter($args);
-        
+
         $class = get_class($args);
         if (preg_match('@Doctrine\\\([^\\\]+)@', $class, $m) && $m[1] == 'ORM') {
             $this->adapters[$m[1]] = new ORM();

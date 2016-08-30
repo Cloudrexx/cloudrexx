@@ -51,9 +51,9 @@ class U2uLibrary {
     var $_intCurrentUserId;
     var $_arrSettings           = array();
     var $_arrLanguages          = array();
-   	var $_arrlistLevel = null;
-   	var $PaginactionCount;
-   	var $orderedResults,$orderofResult;
+       var $_arrlistLevel = null;
+       var $PaginactionCount;
+       var $orderedResults,$orderofResult;
     var $paginationCount,$counter;
 
     /**
@@ -153,7 +153,7 @@ class U2uLibrary {
       $count = $objResult->RecordCount();
       $this->counter=$count;
 
-	  $paging = getPaging($count, $pos, "&section=U2u&cmd=".$_REQUEST['cmd'],$pagingText, true);
+      $paging = getPaging($count, $pos, "&section=U2u&cmd=".$_REQUEST['cmd'],$pagingText, true);
 
       $selMessage ='SELECT
                         Log.message_text,
@@ -221,7 +221,7 @@ class U2uLibrary {
       $objResult = $objDatabase->Execute($selMessage);
       $count = $objResult->RecordCount();
       $this->counter=$count;
-	  $paging = getPaging($count, $pos, "&section=U2u&cmd=outbox", "<b>".$_ARRAYLANG['TXT_OUTBOX_PAGING']."</b>", true);
+      $paging = getPaging($count, $pos, "&section=U2u&cmd=outbox", "<b>".$_ARRAYLANG['TXT_OUTBOX_PAGING']."</b>", true);
 
       $selMessage ='SELECT
                         Log.message_text,

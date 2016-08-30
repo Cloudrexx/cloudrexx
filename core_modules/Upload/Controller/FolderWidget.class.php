@@ -47,7 +47,7 @@ namespace Cx\Core_Modules\Upload\Controller;
 class FolderWidgetException extends \Exception {}
 
 /**
- * A folder widget (obviously). Use this to display a list of the files contained in a 
+ * A folder widget (obviously). Use this to display a list of the files contained in a
  * certain folder and let the user modify them (currently only deletion possible).
  *
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
@@ -85,15 +85,15 @@ class FolderWidget {
 
         $tpl = new \Cx\Core\Html\Sigma(ASCMS_CORE_MODULE_PATH.'/Upload/template/');
         $tpl->setErrorHandling(PEAR_ERROR_DIE);
-        
+
         $tpl->loadTemplateFile('folderWidget.html');
         $tpl->setVariable('ID', $this->id);
 
         //from where the combouploader gets the code on an uploader switch
         $cmdOrSection = $this->isBackendRequest ? 'cmd' : 'section';
         $actOrCmd = $this->isBackendRequest ? 'act' : 'cmd';
-        $refreshUrl = ($this->isBackendRequest ? ASCMS_ADMIN_WEB_PATH : ASCMS_PATH_OFFSET).\Env::get('virtualLanguageDirectory').'/index.php?'.$cmdOrSection.'=Upload&'.$actOrCmd.'=refreshFolder'; 
-        $deleteUrl = ($this->isBackendRequest ? ASCMS_ADMIN_WEB_PATH : ASCMS_PATH_OFFSET).\Env::get('virtualLanguageDirectory').'/index.php?'.$cmdOrSection.'=Upload&'.$actOrCmd.'=deleteFile'; 
+        $refreshUrl = ($this->isBackendRequest ? ASCMS_ADMIN_WEB_PATH : ASCMS_PATH_OFFSET).\Env::get('virtualLanguageDirectory').'/index.php?'.$cmdOrSection.'=Upload&'.$actOrCmd.'=refreshFolder';
+        $deleteUrl = ($this->isBackendRequest ? ASCMS_ADMIN_WEB_PATH : ASCMS_PATH_OFFSET).\Env::get('virtualLanguageDirectory').'/index.php?'.$cmdOrSection.'=Upload&'.$actOrCmd.'=deleteFile';
 
         \ContrexxJavascript::getInstance()->setVariable(array(
                 'refreshUrl' => $refreshUrl,

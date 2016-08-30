@@ -27,7 +27,7 @@
 
 /**
  * EventListener for Gallery
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
@@ -42,7 +42,7 @@ use Cx\Core\Event\Model\Entity\DefaultEventListener;
 /**
  * Class GalleryEventListener
  * EventListener for Gallery
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx

@@ -102,8 +102,8 @@ class MediaDirectoryInputfieldLabel implements Inputfield
     {
          return null;
     }
-    
-    
+
+
     function getFormOnSubmit($intInputfieldId)
     {
         return null;

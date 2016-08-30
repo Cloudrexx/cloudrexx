@@ -1,6 +1,6 @@
 <!-- START module_mediadir_interfaces_export.html -->
 <script type="text/javascript">
-function moveElement(from, dest, add, remove) { 
+function moveElement(from, dest, add, remove) {
     if (from.selectedIndex < 0) {
         if (from.options[0] != null) from.options[0].selected = true;
             from.focus();
@@ -16,8 +16,8 @@ function moveElement(from, dest, add, remove) {
                 from.options[i] = null;
             }
         }
-    }    
-}       
+    }
+}
 
 function selectAll(control){
     for (i = 0; i < control.length; ++i) {
@@ -30,7 +30,7 @@ function deselectAll(control){
         control.options[i].selected = false;
     }
 }
-</script> 
+</script>
 
 
 <form name="interfacesExportForm" action="index.php?cmd={MODULE_NAME}&act=interfaces&tpl=export&amp;step=exportCSV" onsubmit="{MEDIADIR_FORM_ONSUBMIT}" method="post" >
@@ -38,40 +38,40 @@ function deselectAll(control){
     <tr>
         <th colspan="2">{TXT_MEDIADIR_EXPORT}</th>
     </tr>
-    <tr class="row1"> 
+    <tr class="row1">
         <td width="200">
-            {TXT_MEDIADIR_EXPORT_FORMAT}          
-        </td>                                        
+            {TXT_MEDIADIR_EXPORT_FORMAT}
+        </td>
         <td>
             <select name="step" style="width: 302px">
                 <option value="exportCSV">CSV (Comma Separated Values)</option>
-            </select>                                                                                 
-        </td>  
-    </tr>    
-    <tr class="row2"> 
+            </select>
+        </td>
+    </tr>
+    <tr class="row2">
         <td width="200">
-            {TXT_MEDIADIR_FORM_TEMPLATE}           
-        </td>                                        
+            {TXT_MEDIADIR_FORM_TEMPLATE}
+        </td>
         <td>
             <select name="interfacesExportForm" style="width: 302px">
                 {MEDIADIR_INTERFACES_EXPORT_FORMS}
-            </select>                                                                                 
-        </td>  
-    </tr>                                                                                    
-    <tr class="row1"> 
+            </select>
+        </td>
+    </tr>
+    <tr class="row1">
         <td width="200">
-            {TXT_MEDIADIR_EXPORT_MASK}             
-        </td>                                        
+            {TXT_MEDIADIR_EXPORT_MASK}
+        </td>
         <td>
             <select name="interfacesExportMask" style="width: 302px">
-                {MEDIADIR_INTERFACES_EXPORT_MASKS}    
-            </select>                                                                                 
-        </td>  
-    </tr>                                                                               
-    <tr class="row2"> 
+                {MEDIADIR_INTERFACES_EXPORT_MASKS}
+            </select>
+        </td>
+    </tr>
+    <tr class="row2">
         <td width="200" valign="top">
-            {TXT_MEDIADIR_CATEGORIES}            
-        </td>                                        
+            {TXT_MEDIADIR_CATEGORIES}
+        </td>
         <td>
             <div class="mediadirSelector" style="float: left; height: auto !important;">
                 <div class="mediadirSelectorLeft" style="float: left; height: auto !important;">
@@ -87,14 +87,14 @@ function deselectAll(control){
                     <select id="selectedCategories" name="interfacesExportSelectedCategories[]" size="12" multiple="multiple" style="width: 180px;">
                     </select>
                 </div>
-            </div>                                                                              
-        </td>  
-    </tr>                               
-    <!-- BEGIN mediadirInterfacesExportSelectLevels -->                                                                                   
-    <tr class="row1"> 
+            </div>
+        </td>
+    </tr>
+    <!-- BEGIN mediadirInterfacesExportSelectLevels -->
+    <tr class="row1">
         <td width="200" valign="top">
-            {TXT_MEDIADIR_LEVELS}              
-        </td>                                        
+            {TXT_MEDIADIR_LEVELS}
+        </td>
         <td>
             <div class="mediadirSelector" style="float: left; height: auto !important;">
                 <div class="mediadirSelectorLeft" style="float: left; height: auto !important;">
@@ -110,13 +110,13 @@ function deselectAll(control){
                     <select id="selectedLevels" name="interfacesExportSelectedLevels[]" size="12" multiple="multiple" style="width: 180px;">
                     </select>
                 </div>
-            </div>                                                                              
-        </td>  
-    </tr>                        
-    <!-- END mediadirInterfacesExportSelectLevels -->  
-</table>        
+            </div>
+        </td>
+    </tr>
+    <!-- END mediadirInterfacesExportSelectLevels -->
+</table>
 
-<br />             
+<br />
 <input type="submit" name="submitInterfacesForm" value="{TXT_MEDIADIR_DO_EXPORT}" />
 </form>
 <!-- END module_mediadir_interfaces_export.html -->

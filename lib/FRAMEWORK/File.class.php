@@ -55,4 +55,3 @@
  * @subpackage  lib_filesystem
  */
 class File extends Cx\Lib\FileSystem\FileSystem{}
-

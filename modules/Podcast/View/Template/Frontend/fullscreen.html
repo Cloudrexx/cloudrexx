@@ -1,51 +1,51 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-		"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-	<title>Podcast Fullscreen</title>
-	<meta name="description" content="Podcast"/>
-	<meta name="keywords" content="Podcast"/>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-	<meta name="robots" content="index"/>
-	<meta name="generator" content=""/>
-	<script type="text/javascript" src="../../Script/swfobject.js"></script>
-	<style type="text/css">
-		html, object, embed {
-			width: 100%;
-			height: 100%;
-			margin: 0px;
-			padding: 0px;
-		}
+  <title>Podcast Fullscreen</title>
+  <meta name="description" content="Podcast"/>
+  <meta name="keywords" content="Podcast"/>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="robots" content="index"/>
+  <meta name="generator" content=""/>
+  <script type="text/javascript" src="../../Script/swfobject.js"></script>
+  <style type="text/css">
+    html, object, embed {
+      width: 100%;
+      height: 100%;
+      margin: 0px;
+      padding: 0px;
+    }
 
-		body {
-			min-width: 120px;
-			height: 100%;
-			padding: 0px;
-			margin: 0px;
-			background-color: white;
-		}
+    body {
+      min-width: 120px;
+      height: 100%;
+      padding: 0px;
+      margin: 0px;
+      background-color: white;
+    }
 
-		#flowplayer {
-			width: 100%;
-			height: 100%;
-		}
-	</style>
+    #flowplayer {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
 </head>
 <body>
 <div id="flowplayer" class="column">Loading...</div>
 <script type="text/javascript">
-	// <![CDATA[
-	// parse config object from the URL
-	var regexS = "[\\?]config=([^#]*)";
-	var regex = new RegExp(regexS);
-	var tmpURL = window.location.href;
-	var config = regex.exec(tmpURL)[1];
-	var fo = new SWFObject("../../Script/FlowPlayer.swf", "FlowPlayer", "100%", "100%", "7", "#ffffff", true);
-	// need this next line for local testing, it's optional if your swf is on the same domain as your html page
-	fo.addParam("AllowScriptAccess", "always");
-	fo.addVariable("config", config);
-	fo.write("flowplayer");
-	// ]]>
+  // <![CDATA[
+  // parse config object from the URL
+  var regexS = "[\\?]config=([^#]*)";
+  var regex = new RegExp(regexS);
+  var tmpURL = window.location.href;
+  var config = regex.exec(tmpURL)[1];
+  var fo = new SWFObject("../../Script/FlowPlayer.swf", "FlowPlayer", "100%", "100%", "7", "#ffffff", true);
+  // need this next line for local testing, it's optional if your swf is on the same domain as your html page
+  fo.addParam("AllowScriptAccess", "always");
+  fo.addVariable("config", config);
+  fo.write("flowplayer");
+  // ]]>
 </script>
 </body>
-</html> 
+</html>

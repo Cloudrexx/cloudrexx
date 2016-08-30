@@ -31,7 +31,7 @@
  * In old code, use this instead of global variables - allows central tracking
  * of dependencies.
  * Do *NOT* use this in new code, inject dependencies instead.
- * Example: 
+ * Example:
  * WRONG:
  * public function __construct() {
  *     $this->entityManager = Env::get('em');
@@ -62,7 +62,7 @@ class Env {
     }
     /**
      * Retrieves the Doctrine EntityManager
-     * 
+     *
      * @return \Doctrine\ORM\EntityManager
      */
     public static function em()

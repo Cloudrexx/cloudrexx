@@ -85,9 +85,9 @@ class LoginManager {
         }
 
         $this->objTemplate->setVariable('CONTREXX_CHARSET', CONTREXX_CHARSET);
-        
+
         $endcode = $this->objTemplate->get();
-        
+
         // replace links from before contrexx 3
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $ls = new \LinkSanitizer(
@@ -96,7 +96,7 @@ class LoginManager {
             $endcode
         );
         $endcode = $ls->replace();
-        
+
         echo $endcode;
         exit();
     }
@@ -254,12 +254,12 @@ class LoginManager {
     private function showLogin()
     {
         global $_CORELANG, $_ARRAYLANG;
-        
+
         $this->objTemplate->addBlockfile('CONTENT_FILE', 'CONTENT_BLOCK', '/core_modules/Login/View/Template/Backend/login.html');
         $frontendLink = ASCMS_INSTANCE_OFFSET;
         if (empty($frontendLink)) {
             $frontendLink = '/';
-        }        
+        }
         $this->objTemplate->setVariable(array(
             'TITLE'                         => $_ARRAYLANG['TXT_LOGIN_LOGIN'],
             'TXT_LOGIN_LOGIN'               => $_ARRAYLANG['TXT_LOGIN_LOGIN'],

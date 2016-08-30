@@ -63,7 +63,7 @@ class Banner extends bannerLibrary {
     public $_objTeaser;
 
     private $act = '';
-    
+
     /**
     * Constructor
     *
@@ -76,7 +76,7 @@ class Banner extends bannerLibrary {
 
         $this->_objTpl = new \Cx\Core\Html\Sigma(ASCMS_CORE_MODULE_PATH.'/banner/View/Template/Backend');
         \Cx\Core\Csrf\Controller\Csrf::add_placeholder($this->_objTpl);
-        $this->_objTpl->setErrorHandling(PEAR_ERROR_DIE);     
+        $this->_objTpl->setErrorHandling(PEAR_ERROR_DIE);
         $this->pageTitle = $_ARRAYLANG['TXT_BANNER_ADMINISTRATION'];
         $this->langId=$objInit->userFrontendLangId;
         $this->getSettings();

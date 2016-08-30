@@ -26,8 +26,8 @@
  */
 
 /**
- * Permission 
- * 
+ * Permission
+ *
  * @copyright   Cloudrexx AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
@@ -38,7 +38,7 @@ namespace Cx\Core_Modules\Access\Model\Entity;
 
 /**
  * PermissionException
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
@@ -49,7 +49,7 @@ class PermissionException extends \Exception {}
 
 /**
  * Permission
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
@@ -66,35 +66,35 @@ class Permission extends \Cx\Model\Base\EntityBase {
 
     /**
      * Allowed protocols
-     * 
+     *
      * @var array
      */
     protected $allowedProtocols = array();
-    
+
     /**
      * Allowed access methods
-     * 
+     *
      * @var array
      */
     protected $allowedMethods   = array();
-    
+
     /**
      * is Login required or not
-     * 
+     *
      * @var boolean
      */
     protected $requiresLogin    = false;
-    
+
     /**
      * Valid User Groups
-     * 
-     * @var array 
+     *
+     * @var array
      */
     protected $validUserGroups  = array();
 
     /**
      * valid Access ids
-     * 
+     *
      * @var array
      */
     protected $validAccessIds   = array();
@@ -111,11 +111,11 @@ class Permission extends \Cx\Model\Base\EntityBase {
 
     /**
      * Callback function name
-     * 
+     *
      * @var string
      */
     protected $callback = null;
-    
+
     /**
      * Constructor
      * Calback may only be used for virtual instances
@@ -336,7 +336,7 @@ class Permission extends \Cx\Model\Base\EntityBase {
 
     /**
      * Check the permissions(Is allowed protocol, Is allowed method, user's group access, user's login status)
-     * 
+     *
      * @return boolean
      */
     public function hasAccess(array $params = array()) {
@@ -345,64 +345,64 @@ class Permission extends \Cx\Model\Base\EntityBase {
         if (php_sapi_name() === 'cli') {
             $method = 'cli';
         }
-        
+
         //protocol check
         if ($method != 'cli' && !empty($this->allowedProtocols) && !in_array($protocol, $this->allowedProtocols)) {
             return false;
         }
-        
+
         //access method check
         if (!empty($this->allowedMethods) && !in_array($method, $this->allowedMethods)) {
             return false;
         }
-        
-        // user loggedin or not (OR) user's group access check 
+
+        // user loggedin or not (OR) user's group access check
         if (!empty($this->requiresLogin) && !$this->checkLoginAndUserAccess()) {
             return false;
         }
-        
+
         //callback function check
         if (isset($this->callback) && call_user_func($this->callback, $params) !== true) {
             return false;
         }
-        
+
         return true;
     }
-    
+
     /**
      * Check the user's login status and user's group access
-     * 
+     *
      * @return boolean
      */
     protected function checkLoginAndUserAccess() {
-        
+
         if (!$this->requiresLogin) {
             return true;
         }
-        
+
         //check user logged in or not
         if (!\FWUser::getFWUserObject()->objUser->login()) {
             return false;
         }
-        
+
         //check user's group access
-        if (   !empty($this->validUserGroups) 
+        if (   !empty($this->validUserGroups)
             && !count(array_intersect($this->validUserGroups, \FWUser::getFWUserObject()->objUser->getAssociatedGroupIds()))
            ) {
             return false;
         }
-        
+
         if (empty($this->validAccessIds)) {
             return true;
         }
-        
+
         //check valid access ids
         foreach ($this->validAccessIds as $accessId) {
             if (\Permission::checkAccess($accessId, 'static', true)) {
                 return true;
             }
         }
-        
+
         return false;
     }
 }

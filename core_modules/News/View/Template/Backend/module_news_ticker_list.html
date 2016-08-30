@@ -3,70 +3,70 @@
 // <[CDATA[
 function newsDeleteTicker(id, name)
 {
-	strMsg = '{TXT_NEWS_CONFIRM_DELETE_TICKER}';
-	if (confirm(strMsg.replace('%s', name)+'\n{TXT_NEWS_ACTION_IS_IRREVERSIBLE}')) {
-		window.location.href = 'index.php?cmd=News&{CSRF_PARAM}&act=settings&tpl=ticker&tpl2=delete&id='+id;
-	}
+  strMsg = '{TXT_NEWS_CONFIRM_DELETE_TICKER}';
+  if (confirm(strMsg.replace('%s', name)+'\n{TXT_NEWS_ACTION_IS_IRREVERSIBLE}')) {
+    window.location.href = 'index.php?cmd=News&{CSRF_PARAM}&act=settings&tpl=ticker&tpl2=delete&id='+id;
+  }
 }
 
 function newsDeleteTickers(action) {
-	if (checkboxIsChecked('news_ticker_form', 'news_ticker_id[]')) {
-		if (confirm('{TXT_NEWS_CONFIRM_DELETE_TICKERS_MSG}\n{TXT_NEWS_ACTION_IS_IRREVERSIBLE}')) {
-			document.getElementById('news_ticker_form').submit();
-			return true;
-		}
-	}
-	document.getElementById('news_ticker_select_action').value=0;
+  if (checkboxIsChecked('news_ticker_form', 'news_ticker_id[]')) {
+    if (confirm('{TXT_NEWS_CONFIRM_DELETE_TICKERS_MSG}\n{TXT_NEWS_ACTION_IS_IRREVERSIBLE}')) {
+      document.getElementById('news_ticker_form').submit();
+      return true;
+    }
+  }
+  document.getElementById('news_ticker_select_action').value=0;
 }
 // ]]>
 </script>
 <form action="index.php?cmd=News&amp;act=settings&amp;tpl=ticker&amp;tpl2=delete" method="post" name="news_ticker_form" id="news_ticker_form">
-	<table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
-		<thead>
-			<tr>
-				<th colspan="5">{TXT_NEWS_TICKERS}</th>
-			</tr>
-		</thead>
-		<tbody style="vertical-align:top;">
-			<!-- BEGIN news_ticker_data -->
-			<tr class="row3" style="font-weight:bold;">
-				<td width="1%">#</td>
-				<td width="39%">{TXT_NEWS_TICKER}</td>
-				<td width="50%">{TXT_NEWS_CONTENT}</td>
-				<td width="5%" style="text-align:center;">{TXT_NEWS_CHARSET}</td>
-				<td width="5%" style="text-align:right;">{TXT_NEWS_FUNCTIONS}</td>
-			</tr>
-			<!-- BEGIN news_ticker_list -->
-			<tr class="row{NEWS_TICKER_ROW_CLASS}">
-				<td width="1%"><input type="checkbox" name="news_ticker_id[]" value="{NEWS_TICKER_ID}" /></td>
-				<td width="39%"><a href="{NEWS_TICKER_ADDRESS}" title="{TXT_NEWS_SHOW_TICKER_FILE}" id="newsTickerAddress" target="_blank">{NEWS_TICKER_ADDRESS}</a></td>
-				<td width="50%">{NEWS_TICKER_CONTENT}</td>
-				<td width="5%" style="text-align:center;">{NEWS_TICKER_CHARSET}</td>
-				<td width="5%" style="text-align:right;">
-					<a href="index.php?cmd=News&amp;act=settings&amp;tpl=ticker&amp;tpl2=modify&amp;id={NEWS_TICKER_ID}&amp;pos={NEWS_TICKER_POS}" title="{TXT_NEWS_MODIFY_TICKER}"><img src="../core/Core/View/Media/icons/edit.gif" width="16" height="16" border="0" alt="{TXT_NEWS_MODIFY_TICKER}" /></a>
-					<a href="javascript:newsDeleteTicker({NEWS_TICKER_ID},'{NEWS_TICKER_NAME}')" title="{NEWS_DELETE_TICKER_TXT}"><img src="../core/Core/View/Media/icons/delete.gif" width="17" height="17" border="0" alt="{NEWS_DELETE_TICKER_TXT}" /></a>
-				</td>
-			</tr>
-			<!-- END news_ticker_list -->
-			<!-- END news_ticker_data -->
-			<!-- BEGIN news_ticker_no_data -->
-			<tr class="row1">
-				<td colspan="5">{TXT_NEWS_NO_TICKER_AVAILABLE}</td>
-			</tr>
-			<!-- END news_ticker_no_data -->
-		</tbody>
-	</table>
-	<!-- BEGIN news_ticker_multi_select_action -->
-	<img src="../core/Core/View/Media/icons/arrow.gif" width="38" height="22" style="margin-left:5px;" alt="arrow" />
-	<a href="javascript:void(0);" onclick="changeCheckboxes('news_ticker_form','news_ticker_id[]',true); return false;" title="{TXT_NEWS_CHECK_ALL}">{TXT_NEWS_CHECK_ALL}</a> /
-	<a href="javascript:void(0);" onclick="changeCheckboxes('news_ticker_form','news_ticker_id[]',false); return false;" title="{TXT_NEWS_UNCHECK_ALL}">{TXT_NEWS_UNCHECK_ALL}</a>
-	<img src="../core/Core/View/Media/icons/strike.gif" width="34" height="22" alt="design" />
-	<select name="news_ticker_select_action" id="news_ticker_select_action" onchange="newsDeleteTickers(this.value)">
-		<option value="0" selected="selected">{TXT_NEWS_WITH_SELECTED}:</option>
-		<option value="delete">{TXT_NEWS_DELETE}</option>
-	</select>
-	<br />
-	<!-- END news_ticker_multi_select_action -->
+  <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
+    <thead>
+      <tr>
+        <th colspan="5">{TXT_NEWS_TICKERS}</th>
+      </tr>
+    </thead>
+    <tbody style="vertical-align:top;">
+      <!-- BEGIN news_ticker_data -->
+      <tr class="row3" style="font-weight:bold;">
+        <td width="1%">#</td>
+        <td width="39%">{TXT_NEWS_TICKER}</td>
+        <td width="50%">{TXT_NEWS_CONTENT}</td>
+        <td width="5%" style="text-align:center;">{TXT_NEWS_CHARSET}</td>
+        <td width="5%" style="text-align:right;">{TXT_NEWS_FUNCTIONS}</td>
+      </tr>
+      <!-- BEGIN news_ticker_list -->
+      <tr class="row{NEWS_TICKER_ROW_CLASS}">
+        <td width="1%"><input type="checkbox" name="news_ticker_id[]" value="{NEWS_TICKER_ID}" /></td>
+        <td width="39%"><a href="{NEWS_TICKER_ADDRESS}" title="{TXT_NEWS_SHOW_TICKER_FILE}" id="newsTickerAddress" target="_blank">{NEWS_TICKER_ADDRESS}</a></td>
+        <td width="50%">{NEWS_TICKER_CONTENT}</td>
+        <td width="5%" style="text-align:center;">{NEWS_TICKER_CHARSET}</td>
+        <td width="5%" style="text-align:right;">
+          <a href="index.php?cmd=News&amp;act=settings&amp;tpl=ticker&amp;tpl2=modify&amp;id={NEWS_TICKER_ID}&amp;pos={NEWS_TICKER_POS}" title="{TXT_NEWS_MODIFY_TICKER}"><img src="../core/Core/View/Media/icons/edit.gif" width="16" height="16" border="0" alt="{TXT_NEWS_MODIFY_TICKER}" /></a>
+          <a href="javascript:newsDeleteTicker({NEWS_TICKER_ID},'{NEWS_TICKER_NAME}')" title="{NEWS_DELETE_TICKER_TXT}"><img src="../core/Core/View/Media/icons/delete.gif" width="17" height="17" border="0" alt="{NEWS_DELETE_TICKER_TXT}" /></a>
+        </td>
+      </tr>
+      <!-- END news_ticker_list -->
+      <!-- END news_ticker_data -->
+      <!-- BEGIN news_ticker_no_data -->
+      <tr class="row1">
+        <td colspan="5">{TXT_NEWS_NO_TICKER_AVAILABLE}</td>
+      </tr>
+      <!-- END news_ticker_no_data -->
+    </tbody>
+  </table>
+  <!-- BEGIN news_ticker_multi_select_action -->
+  <img src="../core/Core/View/Media/icons/arrow.gif" width="38" height="22" style="margin-left:5px;" alt="arrow" />
+  <a href="javascript:void(0);" onclick="changeCheckboxes('news_ticker_form','news_ticker_id[]',true); return false;" title="{TXT_NEWS_CHECK_ALL}">{TXT_NEWS_CHECK_ALL}</a> /
+  <a href="javascript:void(0);" onclick="changeCheckboxes('news_ticker_form','news_ticker_id[]',false); return false;" title="{TXT_NEWS_UNCHECK_ALL}">{TXT_NEWS_UNCHECK_ALL}</a>
+  <img src="../core/Core/View/Media/icons/strike.gif" width="34" height="22" alt="design" />
+  <select name="news_ticker_select_action" id="news_ticker_select_action" onchange="newsDeleteTickers(this.value)">
+    <option value="0" selected="selected">{TXT_NEWS_WITH_SELECTED}:</option>
+    <option value="delete">{TXT_NEWS_DELETE}</option>
+  </select>
+  <br />
+  <!-- END news_ticker_multi_select_action -->
 </form>
 {PAGING}
 <br />

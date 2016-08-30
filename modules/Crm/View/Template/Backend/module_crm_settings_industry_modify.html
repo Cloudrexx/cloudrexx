@@ -4,7 +4,7 @@
     function ExpandMinimize(toggle){
         elm1 = document.getElementById('Inputfield_' + toggle + '_Minimized');
         elm2 = document.getElementById('Inputfield_' + toggle + '_Expanded');
-        
+
         activeLang = new Array({LANG_ARRAY});
 
         elmMaster = document.getElementById('Inputfield_' + toggle + '_0');
@@ -41,11 +41,11 @@
              var errors =new  Array();
              var errChk;
 
-            
+
             if ($J.trim($J("#Inputfield_0_"+defaultLang).val()) == "") {
                 errChk = 1;
-                
-                $J("input[id^=Inputfield_0_]").each(function(){                    
+
+                $J("input[id^=Inputfield_0_]").each(function(){
                    if ($J.trim($J(this).val()) == "")
                        $J(this).css('border','1px solid red');
                 });
@@ -86,7 +86,7 @@
                             <input type="text" name="Inputfield[0]" id="Inputfield_0_0" value="{CRM_INDUSTRY_NAME_DEFAULT_VALUE}" style="width: 300px" onfocus="this.select();">&nbsp;<a href="javascript:ExpandMinimize('0');">{TXT_CRM_MORE}&nbsp;»</a>
                         </div>
                         <div id="Inputfield_0_Expanded" style="display: none; ">
-                            <!-- BEGIN industryTypeNames -->                            
+                            <!-- BEGIN industryTypeNames -->
                             <input type="text" name="Inputfield[{LANG_ID}]" id="Inputfield_0_{LANG_ID}" value="{CRM_INDUSTRY_NAME_VALUE}" style="width: 280px; margin-bottom: 2px; padding-left: 21px; background: #ffffff url('../core/Country/View/Media/Flag/flag_{LANG_SHORT_NAME}.gif') no-repeat 3px 3px;" onfocus="this.select();">&nbsp;{LANG_LONG_NAME}&nbsp;&nbsp;
                             <!-- BEGIN minimize -->
                             <a href="javascript:ExpandMinimize('0');">«&nbsp;{TXT_CRM_MINIMIZE}</a>

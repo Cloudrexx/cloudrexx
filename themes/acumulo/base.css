@@ -10,7 +10,7 @@
 ================================================== */
     .container                                  { position: relative; width: 960px; margin: 0 auto; padding: 0; }
     .column, .columns                           { float: left; display: inline; margin-left: 10px; margin-right: 10px; }
-    .page-content								{ float: left; width: 960px; }
+    .page-content                { float: left; width: 960px; }
     .row                                        { margin-bottom: 40px; }
     /* Nested Column Classes */
     .column.alpha, .columns.alpha               { margin-left: 0; }
@@ -50,13 +50,13 @@
     .container .offset-by-thirteen              { padding-left: 780px; }
     .container .offset-by-fourteen              { padding-left: 840px; }
     .container .offset-by-fifteen               { padding-left: 900px; }
-    .container .page-content.with-sidebar					  { width: 68.7%;padding: 0 10px;min-height: 400px;}
+    .container .page-content.with-sidebar            { width: 68.7%;padding: 0 10px;min-height: 400px;}
     .container .with-sidebar .four.columns                    { width: 145px; }
-	.container .with-sidebar .eight.columns                   { width: 310px; }
-	.container .with-sidebar .twelve.columns                  { width: 475px; }
-	.container .with-sidebar .sixteen.columns                 { width: 640px; }
-	.container .with-sidebar .one-third.column                { width: 200px; }
-	.container .with-sidebar .two-thirds.column               { width: 420px; }
+  .container .with-sidebar .eight.columns                   { width: 310px; }
+  .container .with-sidebar .twelve.columns                  { width: 475px; }
+  .container .with-sidebar .sixteen.columns                 { width: 640px; }
+  .container .with-sidebar .one-third.column                { width: 200px; }
+  .container .with-sidebar .two-thirds.column               { width: 420px; }
 /* #Clearing
 ================================================== */
     /* Self Clearing Goodness */
@@ -90,81 +90,81 @@
     }
 /* Table of Content
 ==================================================
-	#Reset & Basics
-	#Basic Styles
-	#Links
-	#Images
-	#Tabs
-	#Forms
-	#Misc */
+  #Reset & Basics
+  #Basic Styles
+  #Links
+  #Images
+  #Tabs
+  #Forms
+  #Misc */
 /* #Reset & Basics (Inspired by E. Meyers)
 ================================================== */
-	html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
-		margin: 0;
-		padding: 0;
-		border: 0;
-		font-size: 100%;
-		font: inherit;
-		vertical-align: baseline; }
-	article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
-		display: block; }
-	body {
-		line-height: 1; }
-	ol, ul {
-		list-style: none; }
-	blockquote, q {
-		quotes: none; }
-	blockquote:before, blockquote:after,
-	q:before, q:after {
-		content: '';
-		content: none; }
-	table {
-		border-collapse: collapse;
-		border-spacing: 0; }
+  html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline; }
+  article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
+    display: block; }
+  body {
+    line-height: 1; }
+  ol, ul {
+    list-style: none; }
+  blockquote, q {
+    quotes: none; }
+  blockquote:before, blockquote:after,
+  q:before, q:after {
+    content: '';
+    content: none; }
+  table {
+    border-collapse: collapse;
+    border-spacing: 0; }
 /* #Basic Styles
 ================================================== */
 body {
-	-webkit-font-smoothing: antialiased; /* Fix for webkit rendering */
-	-webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased; /* Fix for webkit rendering */
+  -webkit-text-size-adjust: 100%;
  }
 /* #Links
 ================================================== */
-	p a, p a:visited { line-height: inherit; }
+  p a, p a:visited { line-height: inherit; }
 /* #Images
 ================================================== */
-	img.scale-with-grid {
-		max-width: 100%;
-		height: auto; }
+  img.scale-with-grid {
+    max-width: 100%;
+    height: auto; }
 /* #Forms
 ================================================== */
-	form {
-		margin-bottom: 20px; }
-	fieldset {
-		margin-bottom: 20px; }
-	input[type="text"]:focus,
-	input[type="password"]:focus,
-	input[type="email"]:focus,
-	textarea:focus {
- 		-moz-box-shadow: 0 0 3px rgba(0,0,0,.2);
-		-webkit-box-shadow: 0 0 3px rgba(0,0,0,.2);
-		box-shadow:  0 0 3px rgba(0,0,0,.2); }
-	textarea {
-		min-height: 60px; }
-	label,
-	legend {
-		display: block;
-		font-weight: bold;
-		font-size: 13px;  }
-	select {
-		width: 220px; }
-	input[type="checkbox"] {
-		display: inline; }
-	label span,
-	legend span {
-		font-weight: normal;
-		font-size: 13px;}
+  form {
+    margin-bottom: 20px; }
+  fieldset {
+    margin-bottom: 20px; }
+  input[type="text"]:focus,
+  input[type="password"]:focus,
+  input[type="email"]:focus,
+  textarea:focus {
+     -moz-box-shadow: 0 0 3px rgba(0,0,0,.2);
+    -webkit-box-shadow: 0 0 3px rgba(0,0,0,.2);
+    box-shadow:  0 0 3px rgba(0,0,0,.2); }
+  textarea {
+    min-height: 60px; }
+  label,
+  legend {
+    display: block;
+    font-weight: bold;
+    font-size: 13px;  }
+  select {
+    width: 220px; }
+  input[type="checkbox"] {
+    display: inline; }
+  label span,
+  legend span {
+    font-weight: normal;
+    font-size: 13px;}
 /* #Misc
 ================================================== */
-	.remove-bottom { margin-bottom: 0 !important; }
-	.half-bottom { margin-bottom: 10px !important; }
-	.add-bottom { margin-bottom: 20px !important; }
+  .remove-bottom { margin-bottom: 0 !important; }
+  .half-bottom { margin-bottom: 10px !important; }
+  .add-bottom { margin-bottom: 20px !important; }

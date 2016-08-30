@@ -1,5 +1,5 @@
 if (document.body) {
-	document.write('<div id="news_rss_feeds"></div>');
+  document.write('<div id="news_rss_feeds"></div>');
 }
 fnWinOnload = window.onload;
 window.onload = function() {

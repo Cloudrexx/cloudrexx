@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,10 +24,10 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
- * Calendar 
- * 
+ * Calendar
+ *
  * @package    cloudrexx
  * @subpackage module_calendar
  * @author     Cloudrexx <info@cloudrexx.com>
@@ -38,7 +38,7 @@ namespace Cx\Modules\Calendar\Controller;
 
 /**
  * Calendar Class Payment
- * 
+ *
  * @package    cloudrexx
  * @subpackage module_calendar
  * @author     Cloudrexx <info@cloudrexx.com>
@@ -48,9 +48,9 @@ namespace Cx\Modules\Calendar\Controller;
 class CalendarPayment {
     /**
      * Returns the HTML code for the Yellowpay payment method.
-     * 
+     *
      * @param array $data post data from the user
-     * 
+     *
      * @return  string  HTML code
      */
     function _yellowpay($data = array())
@@ -60,7 +60,7 @@ class CalendarPayment {
         $arrCalendarSettings = $objSettings->getYellowpaySettings();
 
         $arrOrder = array(
-            'ORDERID'   => $data['orderID'],            
+            'ORDERID'   => $data['orderID'],
             'AMOUNT'    => $data['amount'],
             'CURRENCY'  => $data['currency'],
             'PARAMPLUS' => "section=Calendar&cmd=success&handler=yellowpay",

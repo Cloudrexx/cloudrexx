@@ -36,46 +36,46 @@ function _statsUpdate()
 
     foreach (array(
         'stats_browser' => array(
-            'obsoleteIndex'	=> 'name',
+            'obsoleteIndex'    => 'name',
             'unique' => array('name'),
             'change' => "`name` `name` VARCHAR(255) BINARY NOT NULL DEFAULT ''"
         ),
         'stats_colourdepth' => array(
-            'obsoleteIndex'	=> 'depth',
+            'obsoleteIndex'    => 'depth',
             'unique' => array('depth')
         ),
         'stats_country' => array(
-            'obsoleteIndex'	=> 'country',
+            'obsoleteIndex'    => 'country',
             'unique' => array('country'),
             'change' => "`country` `country` VARCHAR(100) BINARY NOT NULL DEFAULT ''"
         ),
         'stats_hostname' => array(
-            'obsoleteIndex'	=> 'hostname',
+            'obsoleteIndex'    => 'hostname',
             'unique' => array('hostname'),
             'change' => "`hostname` `hostname` VARCHAR(255) BINARY NOT NULL DEFAULT ''"
         ),
         'stats_operatingsystem' => array(
-            'obsoleteIndex'	=> 'name',
+            'obsoleteIndex'    => 'name',
             'unique' => array('name'),
             'change' => "`name` `name` VARCHAR(255) BINARY NOT NULL DEFAULT ''"
         ),
         'stats_referer' => array(
-            'obsoleteIndex'	=> 'uri',
+            'obsoleteIndex'    => 'uri',
             'unique' => array('uri'),
             'change' => "`uri` `uri` VARCHAR(255) BINARY NOT NULL DEFAULT ''"
         ),
         'stats_requests' => array(
-            'obsoleteIndex'	=> 'page',
+            'obsoleteIndex'    => 'page',
             'unique' => array('page'),
             'count' => 'visits',
             'change' => "`page` `page` VARCHAR(255) BINARY NOT NULL DEFAULT ''"
         ),
         'stats_requests_summary' => array(
-            'obsoleteIndex'	=> 'type',
+            'obsoleteIndex'    => 'type',
             'unique' => array('type', 'timestamp')
         ),
         'stats_screenresolution' => array(
-            'obsoleteIndex'	=> 'resolution',
+            'obsoleteIndex'    => 'resolution',
             'unique' => array('resolution')
         ),
         'stats_search' => array(
@@ -83,26 +83,26 @@ function _statsUpdate()
             'unique' => array('name')
         ),
         'stats_spiders' => array(
-            'obsoleteIndex'	=> 'page',
+            'obsoleteIndex'    => 'page',
             'unique' => array('page'),
             'change' => "`page` `page` VARCHAR(100) BINARY DEFAULT NULL"
         ),
-        'stats_spiders_summary'	=> array(
-            'obsoleteIndex'	=> 'unqiue',
+        'stats_spiders_summary'    => array(
+            'obsoleteIndex'    => 'unqiue',
             'unique' => array('name'),
             'change' => "`name` `name` VARCHAR(255) BINARY NOT NULL DEFAULT ''"
         ),
         'stats_visitors_summary' => array(
-            'obsoleteIndex'	=> 'type',
+            'obsoleteIndex'    => 'type',
             'unique' => array('type', 'timestamp')
         ),
         /************************************************
         * EXTENSION:    Unique key on sid attribte of   *
         *               table contrexx_statis_visitors  *
-        * ADDED:		Contrexx v2.1.0					*
+        * ADDED:        Contrexx v2.1.0                    *
         ************************************************/
         'stats_visitors' => array(
-            'obsoleteIndex'	=> 'sid',
+            'obsoleteIndex'    => 'sid',
             'unique' => array('sid'),
             'count'  => 'timestamp'
         )
@@ -251,7 +251,7 @@ function _statsUpdate()
     catch (\Cx\Lib\UpdateException $e) {
         return \Cx\Lib\UpdateUtil::DefaultActionHandler($e);
     }
-        
+
     try {
         //2.2.0: new config option 'exclude_identifying_info'
         \Cx\Lib\UpdateUtil::sql('

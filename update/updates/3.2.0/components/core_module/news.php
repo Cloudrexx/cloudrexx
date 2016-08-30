@@ -29,7 +29,7 @@
 ////////////////////////////////////////////////////
 //BEGIN OF NEWS CONVERTING STUFF
 /*
-    this was c&ped together from news/admin.class.php and news/lib/newsLib.class.php 
+    this was c&ped together from news/admin.class.php and news/lib/newsLib.class.php
 */
 
 class HackyFeedRepublisher {
@@ -38,11 +38,11 @@ class HackyFeedRepublisher {
 
     public function runRepublishing() {
         $this->initRepublishing();
-    
+
         FWLanguage::init();
 
         $langIds = array_keys(FWLanguage::getLanguageArray());
-        
+
         foreach($langIds as $id) {
             $this->createRSS($id);
         }
@@ -63,7 +63,7 @@ class HackyFeedRepublisher {
     }
 
     protected function createRSS($langId){
-        global $_CONFIG, $objDatabase; 
+        global $_CONFIG, $objDatabase;
         $_FRONTEND_LANGID = $langId;
 
 
@@ -190,9 +190,9 @@ function _newsUpdate() {
 
 
     /************************************************
-    * EXTENSION:	Placeholder NEWS_LINK replaced	*
-    *				by NEWS_LINK_TITLE				*
-    * ADDED:		Contrexx v2.1.0					*
+    * EXTENSION:    Placeholder NEWS_LINK replaced    *
+    *                by NEWS_LINK_TITLE                *
+    * ADDED:        Contrexx v2.1.0                    *
     ************************************************/
     if ($objUpdate->_isNewerVersion($_CONFIG['coreCmsVersion'], '2.1.0')) {
         try {
@@ -205,8 +205,8 @@ function _newsUpdate() {
 
 
     /************************************************
-    * EXTENSION:	Front- and backend permissions  *
-    * ADDED:		Contrexx v2.1.0					*
+    * EXTENSION:    Front- and backend permissions  *
+    * ADDED:        Contrexx v2.1.0                    *
     ************************************************/
     $query = "SELECT 1 FROM `".DBPREFIX."module_news_settings` WHERE `name` = 'news_message_protection'";
     $objResult = $objDatabase->SelectLimit($query, 1);
@@ -258,8 +258,8 @@ function _newsUpdate() {
 
 
     /************************************************
-    * EXTENSION:	Thunbmail Image                 *
-    * ADDED:		Contrexx v2.1.0					*
+    * EXTENSION:    Thunbmail Image                 *
+    * ADDED:        Contrexx v2.1.0                    *
     ************************************************/
     $arrColumns = $objDatabase->MetaColumnNames(DBPREFIX.'module_news');
     if ($arrColumns === false) {
@@ -804,7 +804,7 @@ NEWS;
                         if (!empty($page) && !preg_match('/<!--\s+BEGIN\s+news_use_teaser_text\s+-->.*<!--\s+END\s+news_use_teaser_text\s+-->/ms', $page)) {
                             $page = preg_replace('/\\{NEWS_TEASER_TEXT\\}/', '<!-- BEGIN news_use_teaser_text -->\0<!-- END news_use_teaser_text -->', $page);
                         }
-                        
+
                         return $page;
                     }, array('content'), '3.1.0');
 

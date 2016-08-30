@@ -29,7 +29,7 @@
                     <input name="inputfieldOrder[{MEDIADIR_SETTINGS_INPUTFIELD_ID}]" type="hidden" value="{MEDIADIR_SETTINGS_INPUTFIELD_ORDER}" onfocus="this.select();" />&nbsp;
                     <a href="javascript:saveInputfield(function() { moveInputfield('{MEDIADIR_SETTINGS_INPUTFIELD_FORM_ID}', '{MEDIADIR_SETTINGS_INPUTFIELD_ID}', '1') });" id="" title=""><img style="vertical-align: middle;" src="../core/Core/View/Media/icons/up.gif" alt="" width="14" border="0" height="12"></a>
                     <a href="javascript:saveInputfield(function() { moveInputfield('{MEDIADIR_SETTINGS_INPUTFIELD_FORM_ID}', '{MEDIADIR_SETTINGS_INPUTFIELD_ID}', '2') });" id="" title=""><img style="vertical-align: middle;" src="../core/Core/View/Media/icons/down.gif" alt="" width="14" border="0" height="12"></a>
-        		</td>
+            </td>
                 <td valign="top" nowrap="nowrap">
                     <div id="inputfieldName_{MEDIADIR_SETTINGS_INPUTFIELD_ID}_Minimized" style="display: block;">
                         <input name="inputfieldName[{MEDIADIR_SETTINGS_INPUTFIELD_ID}][0]" maxlength="255" type="text" style="width: 200px;" value="{MEDIADIR_SETTINGS_INPUTFIELD_NAME_MASTER}" />
@@ -104,24 +104,24 @@
                 <!-- END mediadirInputfield -->
 
                 <!-- BEGIN mediadirSelector -->
-			    <td valign="top">
-			        <input name="selectorId[{MEDIADIR_SETTINGS_SELECTOR_ID}]" style="width: 20px;" readonly="readonly" type="text" value="{MEDIADIR_SETTINGS_SELECTOR_ID}" />
-			    </td>
-			    <td valign="top" style="text-align: center;">
-			        <input name="selectorOrder[{MEDIADIR_SETTINGS_SELECTOR_ID}]" type="hidden" value="{MEDIADIR_SETTINGS_SELECTOR_ORDER}" onfocus="this.select();" />&nbsp;
-			        <a href="javascript:saveInputfield(function() { moveInputfield('{MEDIADIR_SETTINGS_INPUTFIELD_FORM_ID}', '{MEDIADIR_SETTINGS_SELECTOR_ID}', '1') });" id="" title=""><img style="vertical-align: middle;" src="../core/Core/View/Media/icons/up.gif" alt="" width="14" border="0" height="12"></a>
-			        <a href="javascript:saveInputfield(function() { moveInputfield('{MEDIADIR_SETTINGS_INPUTFIELD_FORM_ID}', '{MEDIADIR_SETTINGS_SELECTOR_ID}', '2') });" id="" title=""><img style="vertical-align: middle;" src="../core/Core/View/Media/icons/down.gif" alt="" width="14" border="0" height="12"></a>
-			    </td>
-			    <td valign="top" nowrap="nowrap" colspan="8">
-			        {MEDIADIR_SETTINGS_SELECTOR_NAME}
-			    </td>
-			    <td valign="top" style="text-align: center;" >
-			        <input name="selectorExpSearch[{MEDIADIR_SETTINGS_SELECTOR_ID}]" {MEDIADIR_SETTINGS_SELECTOR_EXP_SEARCH} type="checkbox" value="1" />
-			    </td>
-			    <td valign="top" colspan="2">
-			        <br />
-			    </td>
-			    <!-- END mediadirSelector -->
+          <td valign="top">
+              <input name="selectorId[{MEDIADIR_SETTINGS_SELECTOR_ID}]" style="width: 20px;" readonly="readonly" type="text" value="{MEDIADIR_SETTINGS_SELECTOR_ID}" />
+          </td>
+          <td valign="top" style="text-align: center;">
+              <input name="selectorOrder[{MEDIADIR_SETTINGS_SELECTOR_ID}]" type="hidden" value="{MEDIADIR_SETTINGS_SELECTOR_ORDER}" onfocus="this.select();" />&nbsp;
+              <a href="javascript:saveInputfield(function() { moveInputfield('{MEDIADIR_SETTINGS_INPUTFIELD_FORM_ID}', '{MEDIADIR_SETTINGS_SELECTOR_ID}', '1') });" id="" title=""><img style="vertical-align: middle;" src="../core/Core/View/Media/icons/up.gif" alt="" width="14" border="0" height="12"></a>
+              <a href="javascript:saveInputfield(function() { moveInputfield('{MEDIADIR_SETTINGS_INPUTFIELD_FORM_ID}', '{MEDIADIR_SETTINGS_SELECTOR_ID}', '2') });" id="" title=""><img style="vertical-align: middle;" src="../core/Core/View/Media/icons/down.gif" alt="" width="14" border="0" height="12"></a>
+          </td>
+          <td valign="top" nowrap="nowrap" colspan="8">
+              {MEDIADIR_SETTINGS_SELECTOR_NAME}
+          </td>
+          <td valign="top" style="text-align: center;" >
+              <input name="selectorExpSearch[{MEDIADIR_SETTINGS_SELECTOR_ID}]" {MEDIADIR_SETTINGS_SELECTOR_EXP_SEARCH} type="checkbox" value="1" />
+          </td>
+          <td valign="top" colspan="2">
+              <br />
+          </td>
+          <!-- END mediadirSelector -->
         </tr>
         <!-- END mediadirInputfieldList -->
     </tbody>

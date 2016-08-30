@@ -1,57 +1,57 @@
 <!-- START module_feed_category_edit.html -->
 <script language="JavaScript">
-	function formCheck()
-	{
+  function formCheck()
+  {
         if(document.form.form_name.value == "")
         {
             alert("{TXT_FEED_FORMCHECK_NAME}");
-	        document.form.form_name.focus();
+          document.form.form_name.focus();
             return false;
         }
         if(document.form.form_lang.value == "")
         {
             alert("{TXT_FEED_FORMCHECK_LANGUAGE}");
-	        document.form.form_lang.focus();
+          document.form.form_lang.focus();
             return false;
         }
         if(document.form.form_status.value == "")
         {
             alert("{TXT_FEED_FORMCHECK_STATUS}");
-	        document.form.form_status.focus();
+          document.form.form_status.focus();
             return false;
         }
     }
 </script>
 <form action="?cmd=Feed&act=catedit&set=1" name="form" method="POST" style="padding:0px; margin:0px;" onSubmit="return formCheck();">
-	<input type="hidden" name="form_id" value="{FEED_ID}">
-	<table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist">
-	    <tr>
-	    	<th colspan="2">{TXT_FEED_EDIT_CAT}</th>
-	    </tr>
-	    <tr class="row1">
-	    	<td width="180">{TXT_FEED_NAME}:</td>
-	    	<td><input type="text" name="form_name" style="width: 300px;" value="{FEED_NAME}"></td>
-	    </tr>
-	    <tr class="row2">
-	    	<td>{TXT_FEED_LANGUAGE}:</td>
-	    	<td>
-	    		<select name="form_lang" style="width: 302px;">
-				 	<!-- BEGIN feed_lang -->
-				    <option value="{FEED_LANG_ID}"{FEED_LANG_SELECTED}>{FEED_LANG_NAME}</option>
-				    <!-- END feed_lang -->
-				</select>
-			</td>
-		</tr>
-		<tr class="row1">
-			<td>{TXT_FEED_STATUS}:</td>
-			<td>
-				<select name="form_status" style="width: 302px;">
-		            <option value="0"{FEED_STATUS0}>{TXT_FEED_INACTIVE}</option>
-		            <option value="1"{FEED_STATUS1}>{TXT_FEED_ACTIVE}</option>
+  <input type="hidden" name="form_id" value="{FEED_ID}">
+  <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist">
+      <tr>
+        <th colspan="2">{TXT_FEED_EDIT_CAT}</th>
+      </tr>
+      <tr class="row1">
+        <td width="180">{TXT_FEED_NAME}:</td>
+        <td><input type="text" name="form_name" style="width: 300px;" value="{FEED_NAME}"></td>
+      </tr>
+      <tr class="row2">
+        <td>{TXT_FEED_LANGUAGE}:</td>
+        <td>
+          <select name="form_lang" style="width: 302px;">
+           <!-- BEGIN feed_lang -->
+            <option value="{FEED_LANG_ID}"{FEED_LANG_SELECTED}>{FEED_LANG_NAME}</option>
+            <!-- END feed_lang -->
+        </select>
+      </td>
+    </tr>
+    <tr class="row1">
+      <td>{TXT_FEED_STATUS}:</td>
+      <td>
+        <select name="form_status" style="width: 302px;">
+                <option value="0"{FEED_STATUS0}>{TXT_FEED_INACTIVE}</option>
+                <option value="1"{FEED_STATUS1}>{TXT_FEED_ACTIVE}</option>
                 </select>
             </td>
         </tr>
-	</table>
-	<br><input type="reset" value="{TXT_FEED_RESET}"> <input type="submit" value="{TXT_FEED_SAVE}">
+  </table>
+  <br><input type="reset" value="{TXT_FEED_RESET}"> <input type="submit" value="{TXT_FEED_SAVE}">
 </form>
 <!-- END module_feed_category_edit.html -->

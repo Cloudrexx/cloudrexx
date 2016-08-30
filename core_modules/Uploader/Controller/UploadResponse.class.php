@@ -39,7 +39,7 @@ namespace Cx\Core_Modules\Uploader\Controller;
 /**
  * UploadResponses result from an upload request.
  * They carry information about problems concerning uploaded files.
- * 
+ *
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
@@ -74,13 +74,13 @@ class UploadResponse {
 
     /**
      * The worstStatus is indentifying status of the upload files.
-     * @var integer 
+     * @var integer
      */
     protected $worstStatus = 0;
 
     /**
      *
-     * @var array 
+     * @var array
      */
     protected $statusTexts = array(
         self::STATUS_OK => 'ok',
@@ -90,12 +90,12 @@ class UploadResponse {
     );
 
     public function __construct() {
-        
+
     }
 
     /**
      * Adds a log message concerning a file to the response.
-     * 
+     *
      * @param string $status  one of UploadResponse::STATUS_(OK|WARNING|ERROR|INFO)
      * @param string $message message
      */
@@ -111,7 +111,7 @@ class UploadResponse {
 
     /**
      * get the response
-     * 
+     *
      * @return array
      */
     public function getResponse() {
@@ -123,7 +123,7 @@ class UploadResponse {
 
     /**
      * get the worst status
-     * 
+     *
      * @return integer
      */
     public function getWorstStatus() {
@@ -131,4 +131,3 @@ class UploadResponse {
     }
 
 }
-

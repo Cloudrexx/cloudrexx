@@ -83,7 +83,7 @@ class Sitemap
             $sm->setTemplate($this->_objTpl);
             $sm->render();
         }
-        
+
         /*        if (isset($this->_objTpl->_blocks['sitemap'])) {
             $this->_initialize();
             $this->_doSitemapArray();
@@ -132,7 +132,7 @@ class Sitemap
     */
     function doSitemap()
     {
-        
+
         if ($this->_doSitemap && is_array($this->_sitemapPageName)) {
             $this->_sitemapBlock = trim($this->_objTpl->_blocks['sitemap']);
             if (ereg('.*{SUB_MENU}.*', $this->_sitemapBlock)) {

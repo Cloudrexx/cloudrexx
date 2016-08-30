@@ -184,14 +184,14 @@ class ThumbnailGenerator extends EntityBase
         return $this->thumbnails;
     }
 
-    
+
     /**
      * Get the Thumbnails name, create new thumbnails if not exists
-     * 
+     *
      * @param string  $path     Directory path to the file
      * @param string  $filename Name of the file
      * @param boolean $create   TRUE|FALSE when True it creates thumbnail if thumbnail not exists
-     * 
+     *
      * @return array thumbnail name array
      */
     public function getThumbnailsFromFile($path, $filename, $create = false)
@@ -257,4 +257,4 @@ class ThumbnailGenerator extends EntityBase
         return $thumbnail;
     }
 
-} 
+}

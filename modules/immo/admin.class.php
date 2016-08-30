@@ -28,8 +28,8 @@
 /**
  * Immo
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
- * @author		Cloudrexx Development Team <info@cloudrexx.com>
- * @version		1.0.0
+ * @author        Cloudrexx Development Team <info@cloudrexx.com>
+ * @version        1.0.0
  * @package     cloudrexx
  * @subpackage  module_immo
  * @todo        Edit PHP DocBlocks!
@@ -40,9 +40,9 @@
  *
  * Immo backend
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
- * @author		Cloudrexx Development Team <info@cloudrexx.com>
- * @access		public
- * @version		1.0.0
+ * @author        Cloudrexx Development Team <info@cloudrexx.com>
+ * @access        public
+ * @version        1.0.0
  * @package     cloudrexx
  * @subpackage  module_immo
  */
@@ -115,7 +115,7 @@ class Immo extends ImmoLib
         if(function_exists('mysql_set_charset')) {
             mysql_set_charset("utf8"); //this is important for umlauts
         }
-        
+
         // initialise the session array
         if (!isset($_SESSION['immo'])) {
             $_SESSION['immo'] = array();
@@ -127,7 +127,7 @@ class Immo extends ImmoLib
     private function setNavigation()
     {
         global $objTemplate, $_ARRAYLANG;
-        
+
         $objTemplate->setVariable("CONTENT_NAVIGATION","
             <a href='?cmd=immo' class='".($this->act == '' ? 'active' : '')."'>".$_ARRAYLANG['TXT_IMMO_OVERVIEW']."</a>
             <a href='?cmd=immo&amp;act=add' class='".($this->act == 'add' ? 'active' : '')."'>".$_ARRAYLANG['TXT_IMMO_ADD']."</a>
@@ -244,10 +244,10 @@ class Immo extends ImmoLib
         }
 
         $objTemplate->setVariable(array(
-                'CONTENT_TITLE'				=> $this->_pageTitle,
-                'CONTENT_OK_MESSAGE'		=> $this->_strOkMessage,
-                'CONTENT_STATUS_MESSAGE'	=> $this->_strErrMessage,
-                'ADMIN_CONTENT'				=> $this->_objTpl->get()
+                'CONTENT_TITLE'                => $this->_pageTitle,
+                'CONTENT_OK_MESSAGE'        => $this->_strOkMessage,
+                'CONTENT_STATUS_MESSAGE'    => $this->_strErrMessage,
+                'ADMIN_CONTENT'                => $this->_objTpl->get()
         ));
 
         $this->act = $_REQUEST['act'];
@@ -275,33 +275,33 @@ class Immo extends ImmoLib
         $searchTerm = (!empty($_REQUEST['search']) && !empty($_REQUEST['searchField'])) ? " LIKE '%".contrexx_addslashes($_REQUEST['search'])."%'" : ' TRUE';
         $searchField = (!empty($_REQUEST['searchField']) && !empty($_REQUEST['search'])) ? ' WHERE '.contrexx_addslashes($_REQUEST['searchField']) : ' WHERE ';
 
-        $query = "	SELECT 	`interest`.`id` as contact_id , `email` , `name` , `firstname` , `street` , `zip` , `location` ,
-							`phone_home`, `comment` , `interest`.`immo_id` , `time`, content1.fieldvalue AS immo_header, content2.fieldvalue AS immo_address, content3.fieldvalue AS immo_location
-					FROM `".DBPREFIX."module_immo_interest` AS interest
-					LEFT JOIN `".DBPREFIX."module_immo_content` AS content1 ON content1.immo_id = interest.immo_id
-						AND content1.lang_id =1
-						AND content1.field_id = (
-							SELECT field_id
-							FROM `".DBPREFIX."module_immo_fieldname` AS fname
-							WHERE lower( name ) = '".$this->_headline."'
-							AND fname.lang_id =1
-						)
-					LEFT JOIN `".DBPREFIX."module_immo_content` AS content2 ON content2.immo_id = interest.immo_id
-						AND content2.lang_id =1
-						AND content2.field_id = (
-							SELECT field_id
-							FROM `".DBPREFIX."module_immo_fieldname` AS fname
-							WHERE lower( name ) = 'adresse'
-							AND fname.lang_id =1
-						)
-					LEFT JOIN `".DBPREFIX."module_immo_content` AS content3 ON content3.immo_id = interest.immo_id
-						AND content3.lang_id =1
-						AND content3.field_id = (
-							SELECT field_id
-							FROM `".DBPREFIX."module_immo_fieldname` AS fname
-							WHERE lower( name ) = 'ort'
-							AND fname.lang_id =1
-						)"
+        $query = "    SELECT     `interest`.`id` as contact_id , `email` , `name` , `firstname` , `street` , `zip` , `location` ,
+                            `phone_home`, `comment` , `interest`.`immo_id` , `time`, content1.fieldvalue AS immo_header, content2.fieldvalue AS immo_address, content3.fieldvalue AS immo_location
+                    FROM `".DBPREFIX."module_immo_interest` AS interest
+                    LEFT JOIN `".DBPREFIX."module_immo_content` AS content1 ON content1.immo_id = interest.immo_id
+                        AND content1.lang_id =1
+                        AND content1.field_id = (
+                            SELECT field_id
+                            FROM `".DBPREFIX."module_immo_fieldname` AS fname
+                            WHERE lower( name ) = '".$this->_headline."'
+                            AND fname.lang_id =1
+                        )
+                    LEFT JOIN `".DBPREFIX."module_immo_content` AS content2 ON content2.immo_id = interest.immo_id
+                        AND content2.lang_id =1
+                        AND content2.field_id = (
+                            SELECT field_id
+                            FROM `".DBPREFIX."module_immo_fieldname` AS fname
+                            WHERE lower( name ) = 'adresse'
+                            AND fname.lang_id =1
+                        )
+                    LEFT JOIN `".DBPREFIX."module_immo_content` AS content3 ON content3.immo_id = interest.immo_id
+                        AND content3.lang_id =1
+                        AND content3.field_id = (
+                            SELECT field_id
+                            FROM `".DBPREFIX."module_immo_fieldname` AS fname
+                            WHERE lower( name ) = 'ort'
+                            AND fname.lang_id =1
+                        )"
                 .$searchField." ".$searchTerm;
         if($_REQUEST['ignore_timespan'] !== 'on' && !empty($_SESSION['immo']['startDate'])) {
             $query .= " AND `time` BETWEEN ".strtotime($_SESSION['immo']['startDate'])." AND ".strtotime($_SESSION['immo']['endDate']);
@@ -354,8 +354,8 @@ class Immo extends ImmoLib
         $this->_objTpl->loadTemplateFile('module_immo_interests.html');
 
         $immoID = !empty($_REQUEST['id']) ? intval($_REQUEST['id']) : 0;
-        $_SESSION['immo']['startDate']	= !empty($_REQUEST['inputStartDate']) ? contrexx_addslashes($_REQUEST['inputStartDate'])  : $_SESSION['immo']['startDate'];
-        $_SESSION['immo']['endDate']	= !empty($_REQUEST['inputEndDate']) ? contrexx_addslashes($_REQUEST['inputEndDate'])  : $_SESSION['immo']['endDate'];
+        $_SESSION['immo']['startDate']    = !empty($_REQUEST['inputStartDate']) ? contrexx_addslashes($_REQUEST['inputStartDate'])  : $_SESSION['immo']['startDate'];
+        $_SESSION['immo']['endDate']    = !empty($_REQUEST['inputEndDate']) ? contrexx_addslashes($_REQUEST['inputEndDate'])  : $_SESSION['immo']['endDate'];
         $limit = !empty($_REQUEST['limit']) ? intval($_REQUEST['limit']) : $_CONFIG['corePagingLimit'];
         $pos = !empty($_REQUEST['pos']) ? intval($_REQUEST['pos']) : 0;
         $field = (!empty($_REQUEST['field'])) ? contrexx_addslashes($_REQUEST['field']) : 'visits';
@@ -364,42 +364,42 @@ class Immo extends ImmoLib
         $hsearch = !empty($_REQUEST['search']) ? contrexx_addslashes($_REQUEST['search']) : '' ;
 
         $this->_objTpl->setGlobalVariable(array(
-                'TXT_IMMO_IMMO_ID'					 => $_ARRAYLANG['TXT_IMMO_IMMO_ID'],
-                'TXT_IMMO_INTERESTS'				 => $_ARRAYLANG['TXT_IMMO_INTERESTS'],
-                'TXT_IMMO_INTEREST_SEARCH'			 => $_ARRAYLANG['TXT_IMMO_INTEREST_SEARCH'],
-                'TXT_IMMO_EXPORT'             		 =>	$_ARRAYLANG['TXT_IMMO_EXPORT'],
-                'TXT_IMMO_TIMESPAN'    		 		 =>	$_ARRAYLANG['TXT_IMMO_TIMESPAN'],
-                'TXT_IMMO_FROM'  	  		 		 =>	$_ARRAYLANG['TXT_IMMO_FROM'],
-                'TXT_IMMO_TO'	    		 		 =>	$_ARRAYLANG['TXT_IMMO_TO'],
-                'TXT_IMMO_INTERESTS'	    		 =>	$_ARRAYLANG['TXT_IMMO_INTERESTS'],
-                'TXT_IMMO_DOWNLOAD_LIST'     		 =>	$_ARRAYLANG['TXT_IMMO_DOWNLOAD_LIST'],
-                'TXT_IMMO_INTEREST_SEARCH'     		 =>	$_ARRAYLANG['TXT_IMMO_INTEREST_SEARCH'],
-                'TXT_IMMO_SHOW_TIMESPAN_DETAILS'     =>	$_ARRAYLANG['TXT_IMMO_SHOW_TIMESPAN_DETAILS'],
-                'TXT_IMMO_IGNORE_TIMESPAN'    		 =>	$_ARRAYLANG['TXT_IMMO_IGNORE_TIMESPAN'],
-                'TXT_IMMO_REFRESH'		    		 =>	$_ARRAYLANG['TXT_IMMO_REFRESH'],
-                'TXT_IMMO_SEARCH'				     =>	$_ARRAYLANG['TXT_IMMO_SEARCH'],
-                'TXT_IMMO_EMAIL'				     =>	$_ARRAYLANG['TXT_IMMO_EMAIL'],
-                'TXT_IMMO_NAME'					     =>	$_ARRAYLANG['TXT_IMMO_NAME'],
-                'TXT_IMMO_FIRSTNAME'			     =>	$_ARRAYLANG['TXT_IMMO_FIRSTNAME'],
-                'TXT_IMMO_COMPANY'				     =>	$_ARRAYLANG['TXT_IMMO_COMPANY'],
-                'TXT_IMMO_STREET'				     =>	$_ARRAYLANG['TXT_IMMO_STREET'],
-                'TXT_IMMO_ZIP'					     =>	$_ARRAYLANG['TXT_IMMO_ZIP'],
-                'TXT_IMMO_LOCATION'				     =>	$_ARRAYLANG['TXT_IMMO_LOCATION'],
-                'TXT_IMMO_TELEPHONE'			     =>	$_ARRAYLANG['TXT_IMMO_TELEPHONE'],
-                'TXT_IMMO_TELEPHONE_OFFICE'		     =>	$_ARRAYLANG['TXT_IMMO_TELEPHONE_OFFICE'],
-                'TXT_IMMO_TELEPHONE_MOBILE'		     =>	$_ARRAYLANG['TXT_IMMO_TELEPHONE_MOBILE'],
-                'TXT_IMMO_PURCHASE'				     =>	$_ARRAYLANG['TXT_IMMO_PURCHASE'],
-                'TXT_IMMO_FUNDING'				     =>	$_ARRAYLANG['TXT_IMMO_FUNDING'],
-                'TXT_IMMO_COMMENT'				     =>	$_ARRAYLANG['TXT_IMMO_COMMENT'],
-                'TXT_IMMO_TIMESTAMP'			     =>	$_ARRAYLANG['TXT_IMMO_TIMESTAMP'],
-                'TXT_IMMO_EXPORT'	   	           	 =>	$_ARRAYLANG['TXT_IMMO_EXPORT'],
-                'TXT_IMMO_FUNCTIONS'	   	         =>	$_ARRAYLANG['TXT_IMMO_FUNCTIONS'],
-                'TXT_IMMO_CONFIRM_DELETE_CONTACT'    =>	$_ARRAYLANG['TXT_IMMO_CONFIRM_DELETE_CONTACT'],
-                'TXT_IMMO_CANNOT_UNDO_OPERATION'    =>	$_ARRAYLANG['TXT_IMMO_CANNOT_UNDO_OPERATION'],
-                'CALENDAR_TODAY'					 => !empty($_SESSION['immo']['startDate']) ? $_SESSION['immo']['startDate'] : date('Y-m-d', strtotime('-1 month')),
-                'CALENDAR_NEXT_MONTH'				 => !empty($_SESSION['immo']['endDate']) ? $_SESSION['immo']['endDate'] : date('Y-m-d'),
-                'IMMO_FORM_ACTION_ID'				 => $immoID,
-                'IMMO_ID'							 => $immoID,
+                'TXT_IMMO_IMMO_ID'                     => $_ARRAYLANG['TXT_IMMO_IMMO_ID'],
+                'TXT_IMMO_INTERESTS'                 => $_ARRAYLANG['TXT_IMMO_INTERESTS'],
+                'TXT_IMMO_INTEREST_SEARCH'             => $_ARRAYLANG['TXT_IMMO_INTEREST_SEARCH'],
+                'TXT_IMMO_EXPORT'                      =>    $_ARRAYLANG['TXT_IMMO_EXPORT'],
+                'TXT_IMMO_TIMESPAN'                      =>    $_ARRAYLANG['TXT_IMMO_TIMESPAN'],
+                'TXT_IMMO_FROM'                          =>    $_ARRAYLANG['TXT_IMMO_FROM'],
+                'TXT_IMMO_TO'                          =>    $_ARRAYLANG['TXT_IMMO_TO'],
+                'TXT_IMMO_INTERESTS'                 =>    $_ARRAYLANG['TXT_IMMO_INTERESTS'],
+                'TXT_IMMO_DOWNLOAD_LIST'              =>    $_ARRAYLANG['TXT_IMMO_DOWNLOAD_LIST'],
+                'TXT_IMMO_INTEREST_SEARCH'              =>    $_ARRAYLANG['TXT_IMMO_INTEREST_SEARCH'],
+                'TXT_IMMO_SHOW_TIMESPAN_DETAILS'     =>    $_ARRAYLANG['TXT_IMMO_SHOW_TIMESPAN_DETAILS'],
+                'TXT_IMMO_IGNORE_TIMESPAN'             =>    $_ARRAYLANG['TXT_IMMO_IGNORE_TIMESPAN'],
+                'TXT_IMMO_REFRESH'                     =>    $_ARRAYLANG['TXT_IMMO_REFRESH'],
+                'TXT_IMMO_SEARCH'                     =>    $_ARRAYLANG['TXT_IMMO_SEARCH'],
+                'TXT_IMMO_EMAIL'                     =>    $_ARRAYLANG['TXT_IMMO_EMAIL'],
+                'TXT_IMMO_NAME'                         =>    $_ARRAYLANG['TXT_IMMO_NAME'],
+                'TXT_IMMO_FIRSTNAME'                 =>    $_ARRAYLANG['TXT_IMMO_FIRSTNAME'],
+                'TXT_IMMO_COMPANY'                     =>    $_ARRAYLANG['TXT_IMMO_COMPANY'],
+                'TXT_IMMO_STREET'                     =>    $_ARRAYLANG['TXT_IMMO_STREET'],
+                'TXT_IMMO_ZIP'                         =>    $_ARRAYLANG['TXT_IMMO_ZIP'],
+                'TXT_IMMO_LOCATION'                     =>    $_ARRAYLANG['TXT_IMMO_LOCATION'],
+                'TXT_IMMO_TELEPHONE'                 =>    $_ARRAYLANG['TXT_IMMO_TELEPHONE'],
+                'TXT_IMMO_TELEPHONE_OFFICE'             =>    $_ARRAYLANG['TXT_IMMO_TELEPHONE_OFFICE'],
+                'TXT_IMMO_TELEPHONE_MOBILE'             =>    $_ARRAYLANG['TXT_IMMO_TELEPHONE_MOBILE'],
+                'TXT_IMMO_PURCHASE'                     =>    $_ARRAYLANG['TXT_IMMO_PURCHASE'],
+                'TXT_IMMO_FUNDING'                     =>    $_ARRAYLANG['TXT_IMMO_FUNDING'],
+                'TXT_IMMO_COMMENT'                     =>    $_ARRAYLANG['TXT_IMMO_COMMENT'],
+                'TXT_IMMO_TIMESTAMP'                 =>    $_ARRAYLANG['TXT_IMMO_TIMESTAMP'],
+                'TXT_IMMO_EXPORT'                           =>    $_ARRAYLANG['TXT_IMMO_EXPORT'],
+                'TXT_IMMO_FUNCTIONS'                    =>    $_ARRAYLANG['TXT_IMMO_FUNCTIONS'],
+                'TXT_IMMO_CONFIRM_DELETE_CONTACT'    =>    $_ARRAYLANG['TXT_IMMO_CONFIRM_DELETE_CONTACT'],
+                'TXT_IMMO_CANNOT_UNDO_OPERATION'    =>    $_ARRAYLANG['TXT_IMMO_CANNOT_UNDO_OPERATION'],
+                'CALENDAR_TODAY'                     => !empty($_SESSION['immo']['startDate']) ? $_SESSION['immo']['startDate'] : date('Y-m-d', strtotime('-1 month')),
+                'CALENDAR_NEXT_MONTH'                 => !empty($_SESSION['immo']['endDate']) ? $_SESSION['immo']['endDate'] : date('Y-m-d'),
+                'IMMO_FORM_ACTION_ID'                 => $immoID,
+                'IMMO_ID'                             => $immoID,
         ));
 
 
@@ -407,34 +407,34 @@ class Immo extends ImmoLib
 
         $searchTerm = (!empty($_REQUEST['search'])) ? " LIKE '%".contrexx_addslashes($_REQUEST['search'])."%'" : ' TRUE';
         $searchField = (!empty($_REQUEST['searchField']) && !empty($_REQUEST['search'])) ? ' WHERE '.contrexx_addslashes($_REQUEST['searchField']) : ' WHERE ';
-        $query = "	SELECT 	`interest`.`id` , `email` , `name` , `firstname` , `street` , `zip` , `location` ,
-							`phone_home` , `phone_office` , `phone_mobile` , `comment` , `interest`.`immo_id` , `time` as `timestamp`,
-							content1.fieldvalue AS immo_header, content2.fieldvalue AS immo_address, content3.fieldvalue AS immo_location
-					FROM `".DBPREFIX."module_immo_interest` AS interest
-					LEFT JOIN `".DBPREFIX."module_immo_content` AS content1 ON content1.immo_id = interest.id
-						AND content1.lang_id =1
-						AND content1.field_id = (
-							SELECT field_id
-							FROM `".DBPREFIX."module_immo_fieldname` AS fname
-							WHERE lower( name ) = '".$this->_headline."'
-							AND fname.lang_id =1
-						)
-					LEFT JOIN `".DBPREFIX."module_immo_content` AS content2 ON content2.immo_id = interest.id
-						AND content2.lang_id =1
-						AND content2.field_id = (
-							SELECT field_id
-							FROM `".DBPREFIX."module_immo_fieldname` AS fname
-							WHERE lower( name ) = 'adresse'
-							AND fname.lang_id =1
-						)
-					LEFT JOIN `".DBPREFIX."module_immo_content` AS content3 ON content3.immo_id = interest.id
-						AND content3.lang_id =1
-						AND content3.field_id = (
-							SELECT field_id
-							FROM `".DBPREFIX."module_immo_fieldname` AS fname
-							WHERE lower( name ) = 'ort'
-							AND fname.lang_id =1
-						)"
+        $query = "    SELECT     `interest`.`id` , `email` , `name` , `firstname` , `street` , `zip` , `location` ,
+                            `phone_home` , `phone_office` , `phone_mobile` , `comment` , `interest`.`immo_id` , `time` as `timestamp`,
+                            content1.fieldvalue AS immo_header, content2.fieldvalue AS immo_address, content3.fieldvalue AS immo_location
+                    FROM `".DBPREFIX."module_immo_interest` AS interest
+                    LEFT JOIN `".DBPREFIX."module_immo_content` AS content1 ON content1.immo_id = interest.id
+                        AND content1.lang_id =1
+                        AND content1.field_id = (
+                            SELECT field_id
+                            FROM `".DBPREFIX."module_immo_fieldname` AS fname
+                            WHERE lower( name ) = '".$this->_headline."'
+                            AND fname.lang_id =1
+                        )
+                    LEFT JOIN `".DBPREFIX."module_immo_content` AS content2 ON content2.immo_id = interest.id
+                        AND content2.lang_id =1
+                        AND content2.field_id = (
+                            SELECT field_id
+                            FROM `".DBPREFIX."module_immo_fieldname` AS fname
+                            WHERE lower( name ) = 'adresse'
+                            AND fname.lang_id =1
+                        )
+                    LEFT JOIN `".DBPREFIX."module_immo_content` AS content3 ON content3.immo_id = interest.id
+                        AND content3.lang_id =1
+                        AND content3.field_id = (
+                            SELECT field_id
+                            FROM `".DBPREFIX."module_immo_fieldname` AS fname
+                            WHERE lower( name ) = 'ort'
+                            AND fname.lang_id =1
+                        )"
                 .$searchField." ".$searchTerm;
 
         if($immoID > 0) {
@@ -450,24 +450,24 @@ class Immo extends ImmoLib
             $objRS = $objDatabase->SelectLimit($query, $limit, $pos);
             while(!$objRS->EOF) {
                 $this->_objTpl->setVariable(array(
-                        'IMMO_CONTACT_ID'		=>	intval($objRS->fields['id']),
-                        'IMMO_IMMO_ID'			=>	htmlspecialchars($objRS->fields['immo_id']),
-                        'IMMO_OBJECT_HEADER'	=>	htmlspecialchars($objRS->fields['immo_header']),
-                        'IMMO_OBJECT_ADDRESS'	=>	htmlspecialchars($objRS->fields['immo_address']),
-                        'IMMO_OBJECT_LOCATION'	=>	htmlspecialchars($objRS->fields['immo_location']),
-                        'IMMO_EMAIL'			=>	htmlspecialchars($objRS->fields['email']),
-                        'IMMO_NAME'				=>	htmlspecialchars($objRS->fields['name']),
-                        'IMMO_FIRSTNAME'		=>	htmlspecialchars($objRS->fields['firstname']),
-                        'IMMO_STREET'			=>	htmlspecialchars($objRS->fields['street']),
-                        'IMMO_ZIP'				=>	htmlspecialchars($objRS->fields['zip']),
-                        'IMMO_LOCATION'			=>	htmlspecialchars($objRS->fields['location']),
-                        'IMMO_TELEPHONE'		=>	htmlspecialchars($objRS->fields['phone_home']),
-                        'IMMO_TELEPHONE_OFFICE'	=>	htmlspecialchars($objRS->fields['phone_office']),
-                        'IMMO_TELEPHONE_MOBILE'	=>	htmlspecialchars($objRS->fields['phone_mobile']),
-                        'IMMO_COMMENT'			=>	str_replace(array("\r\n", "\n"), '<br />', htmlspecialchars($objRS->fields['comment'])),
-                        'IMMO_COMMENT_TEXT'		=>	str_replace(array("\r\n", "\n"), '<br />', htmlspecialchars($objRS->fields['comment'])),
-                        'IMMO_TIMESTAMP'		=>	date(ASCMS_DATE_FORMAT, $objRS->fields['timestamp']),
-                        'ROW_CLASS'				=>	($rowclass++ % 2 == 0) ? 'row1' : 'row2',
+                        'IMMO_CONTACT_ID'        =>    intval($objRS->fields['id']),
+                        'IMMO_IMMO_ID'            =>    htmlspecialchars($objRS->fields['immo_id']),
+                        'IMMO_OBJECT_HEADER'    =>    htmlspecialchars($objRS->fields['immo_header']),
+                        'IMMO_OBJECT_ADDRESS'    =>    htmlspecialchars($objRS->fields['immo_address']),
+                        'IMMO_OBJECT_LOCATION'    =>    htmlspecialchars($objRS->fields['immo_location']),
+                        'IMMO_EMAIL'            =>    htmlspecialchars($objRS->fields['email']),
+                        'IMMO_NAME'                =>    htmlspecialchars($objRS->fields['name']),
+                        'IMMO_FIRSTNAME'        =>    htmlspecialchars($objRS->fields['firstname']),
+                        'IMMO_STREET'            =>    htmlspecialchars($objRS->fields['street']),
+                        'IMMO_ZIP'                =>    htmlspecialchars($objRS->fields['zip']),
+                        'IMMO_LOCATION'            =>    htmlspecialchars($objRS->fields['location']),
+                        'IMMO_TELEPHONE'        =>    htmlspecialchars($objRS->fields['phone_home']),
+                        'IMMO_TELEPHONE_OFFICE'    =>    htmlspecialchars($objRS->fields['phone_office']),
+                        'IMMO_TELEPHONE_MOBILE'    =>    htmlspecialchars($objRS->fields['phone_mobile']),
+                        'IMMO_COMMENT'            =>    str_replace(array("\r\n", "\n"), '<br />', htmlspecialchars($objRS->fields['comment'])),
+                        'IMMO_COMMENT_TEXT'        =>    str_replace(array("\r\n", "\n"), '<br />', htmlspecialchars($objRS->fields['comment'])),
+                        'IMMO_TIMESTAMP'        =>    date(ASCMS_DATE_FORMAT, $objRS->fields['timestamp']),
+                        'ROW_CLASS'                =>    ($rowclass++ % 2 == 0) ? 'row1' : 'row2',
                 ));
                 $this->_objTpl->parse('commentsArray');
                 $this->_objTpl->parse('downloads');
@@ -478,7 +478,7 @@ class Immo extends ImmoLib
 
 
         $this->_objTpl->setVariable(array(
-                'IMMO_STATS_INTERESTS_PAGING'	=> getPaging($count, $pos, '&amp;cmd=immo&amp;act=interests&amp;limit='.$limit, '', true),
+                'IMMO_STATS_INTERESTS_PAGING'    => getPaging($count, $pos, '&amp;cmd=immo&amp;act=interests&amp;limit='.$limit, '', true),
         ));
     }
 
@@ -494,9 +494,9 @@ class Immo extends ImmoLib
         switch($_REQUEST['type']) {
             case 'downloads':
                 $query = "  SELECT  `email`, `name`, `firstname`, `company`, `street`, `zip`, `location`,
-			    					`telephone`, `telephone_office`, `telephone_mobile`, `purchase`, `funding`,
-			    					`comment`, `timestamp`
-		                    FROM `".DBPREFIX."module_immo_contact`";
+                                    `telephone`, `telephone_office`, `telephone_mobile`, `purchase`, `funding`,
+                                    `comment`, `timestamp`
+                            FROM `".DBPREFIX."module_immo_contact`";
                 if(!empty($_SESSION['immo']['startDate'])) {
                     $query .= " WHERE `timestamp` BETWEEN ".strtotime($_SESSION['immo']['startDate'])." AND ".strtotime($_SESSION['immo']['endDate']);
                 }
@@ -507,15 +507,15 @@ class Immo extends ImmoLib
 
                 $query .=  " ORDER BY `timestamp`";
                 $CSVfields = $fields = '';
-                $cols = array(		'email', 'name', 'firstname', 'company', 'street', 'zip', 'location',
+                $cols = array(        'email', 'name', 'firstname', 'company', 'street', 'zip', 'location',
                         'telephone', 'telephone_office', 'telephone_mobile', 'purchase', 'funding',
                         'comment','timestamp');
 
                 break;
             case 'interests':
-                $query = "  SELECT 	`immo`.`reference`, `name`, `firstname`, `street`, `zip`, `location` ,
-	    							`email`, `phone_office`, `phone_home`, `phone_mobile`, `doc_via_mail`,
-	    							`funding_advice`, `inspection`, `contact_via_phone`, `comment` ,`time`
+                $query = "  SELECT     `immo`.`reference`, `name`, `firstname`, `street`, `zip`, `location` ,
+                                    `email`, `phone_office`, `phone_home`, `phone_mobile`, `doc_via_mail`,
+                                    `funding_advice`, `inspection`, `contact_via_phone`, `comment` ,`time`
                             FROM `".DBPREFIX."module_immo_interest` AS `interest`
                             LEFT JOIN `".DBPREFIX."module_immo` AS `immo` ON `interest`.`immo_id` = `immo`.`id`";
                 if(!empty($_SESSION['immo']['startDate'])) {
@@ -529,7 +529,7 @@ class Immo extends ImmoLib
 
                 $query .= " ORDER BY `time`";
                 $CSVfields = $fields = '';
-                $cols = array(		'reference', 'name', 'firstname', 'street', 'zip', 'location',
+                $cols = array(        'reference', 'name', 'firstname', 'street', 'zip', 'location',
                         'email', 'phone_office', 'phone_home', 'phone_mobile', 'doc_via_mail',
                         'funding_advice', 'inspection', 'contact_via_phone', 'comment', 'time' );
                 break;
@@ -574,79 +574,79 @@ class Immo extends ImmoLib
         $this->_objTpl->loadTemplateFile('module_immo_interest_details.html');
         $interestID = intval($_GET['id']);
         $this->_objTpl->setVariable(array(
-                'TXT_IMMO_CONTACT_DETAILS'		     =>	$_ARRAYLANG['TXT_IMMO_CONTACT_DETAILS'],
-                'TXT_IMMO_EMAIL'				     =>	$_ARRAYLANG['TXT_IMMO_EMAIL'],
-                'TXT_IMMO_NAME'					     =>	$_ARRAYLANG['TXT_IMMO_NAME'],
-                'TXT_IMMO_FIRSTNAME'			     =>	$_ARRAYLANG['TXT_IMMO_FIRSTNAME'],
-                'TXT_IMMO_COMPANY'				     =>	$_ARRAYLANG['TXT_IMMO_COMPANY'],
-                'TXT_IMMO_STREET'				     =>	$_ARRAYLANG['TXT_IMMO_STREET'],
-                'TXT_IMMO_ZIP'					     =>	$_ARRAYLANG['TXT_IMMO_ZIP'],
-                'TXT_IMMO_LOCATION'				     =>	$_ARRAYLANG['TXT_IMMO_LOCATION'],
-                'TXT_IMMO_TELEPHONE'			     =>	$_ARRAYLANG['TXT_IMMO_TELEPHONE'],
-                'TXT_IMMO_TELEPHONE_OFFICE'		     =>	$_ARRAYLANG['TXT_IMMO_TELEPHONE_OFFICE'],
-                'TXT_IMMO_TELEPHONE_MOBILE'		     =>	$_ARRAYLANG['TXT_IMMO_TELEPHONE_MOBILE'],
-                'TXT_IMMO_DOC_VIA_MAIL'				 =>	$_ARRAYLANG['TXT_IMMO_DOC_VIA_MAIL'],
-                'TXT_IMMO_FUNDING_ADVICE'		     =>	$_ARRAYLANG['TXT_IMMO_FUNDING_ADVICE'],
-                'TXT_IMMO_INSPECTION'			     =>	$_ARRAYLANG['TXT_IMMO_INSPECTION'],
-                'TXT_IMMO_CONTACT_VIA_PHONE'		 =>	$_ARRAYLANG['TXT_IMMO_CONTACT_VIA_PHONE'],
-                'TXT_IMMO_COMMENT'				     =>	$_ARRAYLANG['TXT_IMMO_COMMENT'],
-                'TXT_IMMO_TIMESTAMP'			     =>	$_ARRAYLANG['TXT_IMMO_TIMESTAMP'],
-                'TXT_IMMO_BACK'					     =>	$_ARRAYLANG['TXT_IMMO_BACK'],
-                'TXT_IMMO_OBJECT_DETAILS'			 =>	$_ARRAYLANG['TXT_IMMO_OBJECT_DETAILS'],
+                'TXT_IMMO_CONTACT_DETAILS'             =>    $_ARRAYLANG['TXT_IMMO_CONTACT_DETAILS'],
+                'TXT_IMMO_EMAIL'                     =>    $_ARRAYLANG['TXT_IMMO_EMAIL'],
+                'TXT_IMMO_NAME'                         =>    $_ARRAYLANG['TXT_IMMO_NAME'],
+                'TXT_IMMO_FIRSTNAME'                 =>    $_ARRAYLANG['TXT_IMMO_FIRSTNAME'],
+                'TXT_IMMO_COMPANY'                     =>    $_ARRAYLANG['TXT_IMMO_COMPANY'],
+                'TXT_IMMO_STREET'                     =>    $_ARRAYLANG['TXT_IMMO_STREET'],
+                'TXT_IMMO_ZIP'                         =>    $_ARRAYLANG['TXT_IMMO_ZIP'],
+                'TXT_IMMO_LOCATION'                     =>    $_ARRAYLANG['TXT_IMMO_LOCATION'],
+                'TXT_IMMO_TELEPHONE'                 =>    $_ARRAYLANG['TXT_IMMO_TELEPHONE'],
+                'TXT_IMMO_TELEPHONE_OFFICE'             =>    $_ARRAYLANG['TXT_IMMO_TELEPHONE_OFFICE'],
+                'TXT_IMMO_TELEPHONE_MOBILE'             =>    $_ARRAYLANG['TXT_IMMO_TELEPHONE_MOBILE'],
+                'TXT_IMMO_DOC_VIA_MAIL'                 =>    $_ARRAYLANG['TXT_IMMO_DOC_VIA_MAIL'],
+                'TXT_IMMO_FUNDING_ADVICE'             =>    $_ARRAYLANG['TXT_IMMO_FUNDING_ADVICE'],
+                'TXT_IMMO_INSPECTION'                 =>    $_ARRAYLANG['TXT_IMMO_INSPECTION'],
+                'TXT_IMMO_CONTACT_VIA_PHONE'         =>    $_ARRAYLANG['TXT_IMMO_CONTACT_VIA_PHONE'],
+                'TXT_IMMO_COMMENT'                     =>    $_ARRAYLANG['TXT_IMMO_COMMENT'],
+                'TXT_IMMO_TIMESTAMP'                 =>    $_ARRAYLANG['TXT_IMMO_TIMESTAMP'],
+                'TXT_IMMO_BACK'                         =>    $_ARRAYLANG['TXT_IMMO_BACK'],
+                'TXT_IMMO_OBJECT_DETAILS'             =>    $_ARRAYLANG['TXT_IMMO_OBJECT_DETAILS'],
         ));
 
 
-        $query = "	SELECT 	`interest`.`id`, `interest`.`immo_id`, `name`, `firstname`, `street`, `zip`, `location`, `email`,
-							`phone_office`, `phone_home`, `phone_mobile`, `doc_via_mail`, `funding_advice`,
-							`inspection`, `contact_via_phone`, `comment`, `time`, content1.fieldvalue AS immo_header,
-							content2.fieldvalue AS immo_address, content3.fieldvalue AS immo_location
-					FROM `".DBPREFIX."module_immo_interest` AS interest
-					LEFT JOIN `".DBPREFIX."module_immo_content` AS content1 ON content1.immo_id = interest.immo_id
-						AND content1.lang_id =1
-						AND content1.field_id = (
-							SELECT field_id
-							FROM `".DBPREFIX."module_immo_fieldname` AS fname
-							WHERE lower( name ) = '".$this->_headline."'
-							AND fname.lang_id =1
-						)
-					LEFT JOIN `".DBPREFIX."module_immo_content` AS content2 ON content2.immo_id = interest.immo_id
-						AND content2.lang_id =1
-						AND content2.field_id = (
-							SELECT field_id
-							FROM `".DBPREFIX."module_immo_fieldname` AS fname
-							WHERE lower( name ) = 'adresse'
-							AND fname.lang_id =1
-						)
-					LEFT JOIN `".DBPREFIX."module_immo_content` AS content3 ON content3.immo_id = interest.immo_id
-						AND content3.lang_id =1
-						AND content3.field_id = (
-							SELECT field_id
-							FROM `".DBPREFIX."module_immo_fieldname` AS fname
-							WHERE lower( name ) = 'ort'
-							AND fname.lang_id =1
-						)
-					WHERE interest.id = $interestID";
+        $query = "    SELECT     `interest`.`id`, `interest`.`immo_id`, `name`, `firstname`, `street`, `zip`, `location`, `email`,
+                            `phone_office`, `phone_home`, `phone_mobile`, `doc_via_mail`, `funding_advice`,
+                            `inspection`, `contact_via_phone`, `comment`, `time`, content1.fieldvalue AS immo_header,
+                            content2.fieldvalue AS immo_address, content3.fieldvalue AS immo_location
+                    FROM `".DBPREFIX."module_immo_interest` AS interest
+                    LEFT JOIN `".DBPREFIX."module_immo_content` AS content1 ON content1.immo_id = interest.immo_id
+                        AND content1.lang_id =1
+                        AND content1.field_id = (
+                            SELECT field_id
+                            FROM `".DBPREFIX."module_immo_fieldname` AS fname
+                            WHERE lower( name ) = '".$this->_headline."'
+                            AND fname.lang_id =1
+                        )
+                    LEFT JOIN `".DBPREFIX."module_immo_content` AS content2 ON content2.immo_id = interest.immo_id
+                        AND content2.lang_id =1
+                        AND content2.field_id = (
+                            SELECT field_id
+                            FROM `".DBPREFIX."module_immo_fieldname` AS fname
+                            WHERE lower( name ) = 'adresse'
+                            AND fname.lang_id =1
+                        )
+                    LEFT JOIN `".DBPREFIX."module_immo_content` AS content3 ON content3.immo_id = interest.immo_id
+                        AND content3.lang_id =1
+                        AND content3.field_id = (
+                            SELECT field_id
+                            FROM `".DBPREFIX."module_immo_fieldname` AS fname
+                            WHERE lower( name ) = 'ort'
+                            AND fname.lang_id =1
+                        )
+                    WHERE interest.id = $interestID";
         if(($objRS = $objDatabase->SelectLimit($query, 1))) {
             $this->_objTpl->setVariable(array(
-                    'IMMO_OBJECT_DETAILS'		=>  htmlspecialchars($objRS->fields['immo_header']
+                    'IMMO_OBJECT_DETAILS'        =>  htmlspecialchars($objRS->fields['immo_header']
                     .', '.htmlspecialchars($objRS->fields['immo_address'])
                     .', '.htmlspecialchars($objRS->fields['immo_location'])),
-                    'IMMO_EMAIL'				=>	htmlspecialchars($objRS->fields['email']),
-                    'IMMO_NAME'					=>	htmlspecialchars($objRS->fields['name']),
-                    'IMMO_FIRSTNAME'			=>	htmlspecialchars($objRS->fields['firstname']),
-                    'IMMO_STREET'				=>	htmlspecialchars($objRS->fields['street']),
-                    'IMMO_ZIP'					=>	htmlspecialchars($objRS->fields['zip']),
-                    'IMMO_LOCATION'				=>	htmlspecialchars($objRS->fields['location']),
-                    'IMMO_TELEPHONE'			=>	htmlspecialchars($objRS->fields['phone_home']),
-                    'IMMO_TELEPHONE_OFFICE'		=>	htmlspecialchars($objRS->fields['phone_office']),
-                    'IMMO_TELEPHONE_MOBILE'		=>	htmlspecialchars($objRS->fields['phone_mobile']),
-                    'IMMO_DOC_VIA_MAIL'			=>	$objRS->fields['doc_via_mail'] == 1 ? $_ARRAYLANG['TXT_IMMO_YES'] : $_ARRAYLANG['TXT_IMMO_NO'],
-                    'IMMO_FUNDING_ADVICE'		=>	$objRS->fields['funding_advice'] == 1 ? $_ARRAYLANG['TXT_IMMO_YES'] : $_ARRAYLANG['TXT_IMMO_NO'],
-                    'IMMO_INSPECTION'			=>	$objRS->fields['inspection'] == 1 ? $_ARRAYLANG['TXT_IMMO_YES'] : $_ARRAYLANG['TXT_IMMO_NO'],
-                    'IMMO_CONTACT_VIA_PHONE'	=>	$objRS->fields['contact_via_phone'] == 1 ? $_ARRAYLANG['TXT_IMMO_YES'] : $_ARRAYLANG['TXT_IMMO_NO'],
-                    'IMMO_COMMENT'				=>	nl2br(htmlspecialchars($objRS->fields['comment'])),
-                    'IMMO_TIMESTAMP'			=>	date(ASCMS_DATE_FORMAT ,$objRS->fields['time']),
-                    'ROW_CLASS'					=>	($rowclass++ % 2 == 0) ? 'row1' : 'row2',
+                    'IMMO_EMAIL'                =>    htmlspecialchars($objRS->fields['email']),
+                    'IMMO_NAME'                    =>    htmlspecialchars($objRS->fields['name']),
+                    'IMMO_FIRSTNAME'            =>    htmlspecialchars($objRS->fields['firstname']),
+                    'IMMO_STREET'                =>    htmlspecialchars($objRS->fields['street']),
+                    'IMMO_ZIP'                    =>    htmlspecialchars($objRS->fields['zip']),
+                    'IMMO_LOCATION'                =>    htmlspecialchars($objRS->fields['location']),
+                    'IMMO_TELEPHONE'            =>    htmlspecialchars($objRS->fields['phone_home']),
+                    'IMMO_TELEPHONE_OFFICE'        =>    htmlspecialchars($objRS->fields['phone_office']),
+                    'IMMO_TELEPHONE_MOBILE'        =>    htmlspecialchars($objRS->fields['phone_mobile']),
+                    'IMMO_DOC_VIA_MAIL'            =>    $objRS->fields['doc_via_mail'] == 1 ? $_ARRAYLANG['TXT_IMMO_YES'] : $_ARRAYLANG['TXT_IMMO_NO'],
+                    'IMMO_FUNDING_ADVICE'        =>    $objRS->fields['funding_advice'] == 1 ? $_ARRAYLANG['TXT_IMMO_YES'] : $_ARRAYLANG['TXT_IMMO_NO'],
+                    'IMMO_INSPECTION'            =>    $objRS->fields['inspection'] == 1 ? $_ARRAYLANG['TXT_IMMO_YES'] : $_ARRAYLANG['TXT_IMMO_NO'],
+                    'IMMO_CONTACT_VIA_PHONE'    =>    $objRS->fields['contact_via_phone'] == 1 ? $_ARRAYLANG['TXT_IMMO_YES'] : $_ARRAYLANG['TXT_IMMO_NO'],
+                    'IMMO_COMMENT'                =>    nl2br(htmlspecialchars($objRS->fields['comment'])),
+                    'IMMO_TIMESTAMP'            =>    date(ASCMS_DATE_FORMAT ,$objRS->fields['time']),
+                    'ROW_CLASS'                    =>    ($rowclass++ % 2 == 0) ? 'row1' : 'row2',
             ));
         }
     }
@@ -665,76 +665,76 @@ class Immo extends ImmoLib
 
         $this->_objTpl->setVariable(array(
 
-                'TXT_IMMO_OBJECT_DETAILS'		     =>	$_ARRAYLANG['TXT_IMMO_OBJECT_DETAILS'],
-                'TXT_IMMO_CONTACT_DETAILS'		     =>	$_ARRAYLANG['TXT_IMMO_CONTACT_DETAILS'],
-                'TXT_IMMO_EMAIL'				     =>	$_ARRAYLANG['TXT_IMMO_EMAIL'],
-                'TXT_IMMO_NAME'					     =>	$_ARRAYLANG['TXT_IMMO_NAME'],
-                'TXT_IMMO_FIRSTNAME'			     =>	$_ARRAYLANG['TXT_IMMO_FIRSTNAME'],
-                'TXT_IMMO_COMPANY'				     =>	$_ARRAYLANG['TXT_IMMO_COMPANY'],
-                'TXT_IMMO_STREET'				     =>	$_ARRAYLANG['TXT_IMMO_STREET'],
-                'TXT_IMMO_ZIP'					     =>	$_ARRAYLANG['TXT_IMMO_ZIP'],
-                'TXT_IMMO_LOCATION'				     =>	$_ARRAYLANG['TXT_IMMO_LOCATION'],
-                'TXT_IMMO_TELEPHONE'			     =>	$_ARRAYLANG['TXT_IMMO_TELEPHONE'],
-                'TXT_IMMO_TELEPHONE_OFFICE'		     =>	$_ARRAYLANG['TXT_IMMO_TELEPHONE_OFFICE'],
-                'TXT_IMMO_TELEPHONE_MOBILE'		     =>	$_ARRAYLANG['TXT_IMMO_TELEPHONE_MOBILE'],
-                'TXT_IMMO_PURCHASE'				     =>	$_ARRAYLANG['TXT_IMMO_PURCHASE'],
-                'TXT_IMMO_FUNDING'				     =>	$_ARRAYLANG['TXT_IMMO_FUNDING'],
-                'TXT_IMMO_COMMENT'				     =>	$_ARRAYLANG['TXT_IMMO_COMMENT'],
-                'TXT_IMMO_TIMESTAMP'			     =>	$_ARRAYLANG['TXT_IMMO_TIMESTAMP'],
-                'TXT_IMMO_BACK'					     =>	$_ARRAYLANG['TXT_IMMO_BACK'],
+                'TXT_IMMO_OBJECT_DETAILS'             =>    $_ARRAYLANG['TXT_IMMO_OBJECT_DETAILS'],
+                'TXT_IMMO_CONTACT_DETAILS'             =>    $_ARRAYLANG['TXT_IMMO_CONTACT_DETAILS'],
+                'TXT_IMMO_EMAIL'                     =>    $_ARRAYLANG['TXT_IMMO_EMAIL'],
+                'TXT_IMMO_NAME'                         =>    $_ARRAYLANG['TXT_IMMO_NAME'],
+                'TXT_IMMO_FIRSTNAME'                 =>    $_ARRAYLANG['TXT_IMMO_FIRSTNAME'],
+                'TXT_IMMO_COMPANY'                     =>    $_ARRAYLANG['TXT_IMMO_COMPANY'],
+                'TXT_IMMO_STREET'                     =>    $_ARRAYLANG['TXT_IMMO_STREET'],
+                'TXT_IMMO_ZIP'                         =>    $_ARRAYLANG['TXT_IMMO_ZIP'],
+                'TXT_IMMO_LOCATION'                     =>    $_ARRAYLANG['TXT_IMMO_LOCATION'],
+                'TXT_IMMO_TELEPHONE'                 =>    $_ARRAYLANG['TXT_IMMO_TELEPHONE'],
+                'TXT_IMMO_TELEPHONE_OFFICE'             =>    $_ARRAYLANG['TXT_IMMO_TELEPHONE_OFFICE'],
+                'TXT_IMMO_TELEPHONE_MOBILE'             =>    $_ARRAYLANG['TXT_IMMO_TELEPHONE_MOBILE'],
+                'TXT_IMMO_PURCHASE'                     =>    $_ARRAYLANG['TXT_IMMO_PURCHASE'],
+                'TXT_IMMO_FUNDING'                     =>    $_ARRAYLANG['TXT_IMMO_FUNDING'],
+                'TXT_IMMO_COMMENT'                     =>    $_ARRAYLANG['TXT_IMMO_COMMENT'],
+                'TXT_IMMO_TIMESTAMP'                 =>    $_ARRAYLANG['TXT_IMMO_TIMESTAMP'],
+                'TXT_IMMO_BACK'                         =>    $_ARRAYLANG['TXT_IMMO_BACK'],
         ));
 
 
-        $query = "	SELECT 	`contact`.`id` , `email` , `name` , `firstname` , `street` , `zip` , `location` ,
-							`company` , `telephone` , `telephone_office` , `telephone_mobile` , `purchase` ,
-							`funding` ,  `comment` , `contact`.`immo_id` , `timestamp`, content1.fieldvalue AS immo_header,
-							content2.fieldvalue AS immo_address, content3.fieldvalue AS immo_location
-					FROM `".DBPREFIX."module_immo_contact` AS contact
-					LEFT JOIN `".DBPREFIX."module_immo_content` AS content1 ON content1.immo_id = contact.immo_id
-						AND content1.lang_id =1
-						AND content1.field_id = (
-							SELECT field_id
-							FROM `".DBPREFIX."module_immo_fieldname` AS fname
-							WHERE lower( name ) = '".$this->_headline."'
-							AND fname.lang_id =1
-						)
-					LEFT JOIN `".DBPREFIX."module_immo_content` AS content2 ON content2.immo_id = contact.immo_id
-						AND content2.lang_id =1
-						AND content2.field_id = (
-							SELECT field_id
-							FROM `".DBPREFIX."module_immo_fieldname` AS fname
-							WHERE lower( name ) = 'adresse'
-							AND fname.lang_id =1
-						)
-					LEFT JOIN `".DBPREFIX."module_immo_content` AS content3 ON content3.immo_id = contact.immo_id
-						AND content3.lang_id =1
-						AND content3.field_id = (
-							SELECT field_id
-							FROM `".DBPREFIX."module_immo_fieldname` AS fname
-							WHERE lower( name ) = 'ort'
-							AND fname.lang_id =1
-						)
-					WHERE contact.id = $contactID";
+        $query = "    SELECT     `contact`.`id` , `email` , `name` , `firstname` , `street` , `zip` , `location` ,
+                            `company` , `telephone` , `telephone_office` , `telephone_mobile` , `purchase` ,
+                            `funding` ,  `comment` , `contact`.`immo_id` , `timestamp`, content1.fieldvalue AS immo_header,
+                            content2.fieldvalue AS immo_address, content3.fieldvalue AS immo_location
+                    FROM `".DBPREFIX."module_immo_contact` AS contact
+                    LEFT JOIN `".DBPREFIX."module_immo_content` AS content1 ON content1.immo_id = contact.immo_id
+                        AND content1.lang_id =1
+                        AND content1.field_id = (
+                            SELECT field_id
+                            FROM `".DBPREFIX."module_immo_fieldname` AS fname
+                            WHERE lower( name ) = '".$this->_headline."'
+                            AND fname.lang_id =1
+                        )
+                    LEFT JOIN `".DBPREFIX."module_immo_content` AS content2 ON content2.immo_id = contact.immo_id
+                        AND content2.lang_id =1
+                        AND content2.field_id = (
+                            SELECT field_id
+                            FROM `".DBPREFIX."module_immo_fieldname` AS fname
+                            WHERE lower( name ) = 'adresse'
+                            AND fname.lang_id =1
+                        )
+                    LEFT JOIN `".DBPREFIX."module_immo_content` AS content3 ON content3.immo_id = contact.immo_id
+                        AND content3.lang_id =1
+                        AND content3.field_id = (
+                            SELECT field_id
+                            FROM `".DBPREFIX."module_immo_fieldname` AS fname
+                            WHERE lower( name ) = 'ort'
+                            AND fname.lang_id =1
+                        )
+                    WHERE contact.id = $contactID";
         if(($objRS = $objDatabase->SelectLimit($query, 1))) {
             $this->_objTpl->setVariable(array(
-                    'IMMO_OBJECT_DETAILS'	=>  htmlspecialchars($objRS->fields['immo_header']
+                    'IMMO_OBJECT_DETAILS'    =>  htmlspecialchars($objRS->fields['immo_header']
                     .', '.htmlspecialchars($objRS->fields['immo_address'])
                     .', '.htmlspecialchars($objRS->fields['immo_location'])),
-                    'IMMO_EMAIL'			=>	htmlspecialchars($objRS->fields['email']),
-                    'IMMO_NAME'				=>	htmlspecialchars($objRS->fields['name']),
-                    'IMMO_FIRSTNAME'		=>	htmlspecialchars($objRS->fields['firstname']),
-                    'IMMO_COMPANY'			=>	htmlspecialchars($objRS->fields['company']),
-                    'IMMO_STREET'			=>	htmlspecialchars($objRS->fields['street']),
-                    'IMMO_ZIP'				=>	htmlspecialchars($objRS->fields['zip']),
-                    'IMMO_LOCATION'			=>	htmlspecialchars($objRS->fields['location']),
-                    'IMMO_TELEPHONE'		=>	htmlspecialchars($objRS->fields['telephone']),
-                    'IMMO_TELEPHONE_OFFICE'	=>	htmlspecialchars($objRS->fields['telephone_office']),
-                    'IMMO_TELEPHONE_MOBILE'	=>	htmlspecialchars($objRS->fields['telephone_mobile']),
-                    'IMMO_PURCHASE'			=>	$objRS->fields['purchase'] == 1 ? $_ARRAYLANG['TXT_IMMO_YES'] : $_ARRAYLANG['TXT_IMMO_NO'],
-                    'IMMO_FUNDING'			=>	$objRS->fields['funding'] == 1 ? $_ARRAYLANG['TXT_IMMO_YES'] : $_ARRAYLANG['TXT_IMMO_NO'],
-                    'IMMO_COMMENT'			=>	htmlspecialchars($objRS->fields['comment']),
-                    'IMMO_TIMESTAMP'		=>	date(ASCMS_DATE_FORMAT ,$objRS->fields['timestamp']),
-                    'ROW_CLASS'				=>	($rowclass++ % 2 == 0) ? 'row1' : 'row2',
+                    'IMMO_EMAIL'            =>    htmlspecialchars($objRS->fields['email']),
+                    'IMMO_NAME'                =>    htmlspecialchars($objRS->fields['name']),
+                    'IMMO_FIRSTNAME'        =>    htmlspecialchars($objRS->fields['firstname']),
+                    'IMMO_COMPANY'            =>    htmlspecialchars($objRS->fields['company']),
+                    'IMMO_STREET'            =>    htmlspecialchars($objRS->fields['street']),
+                    'IMMO_ZIP'                =>    htmlspecialchars($objRS->fields['zip']),
+                    'IMMO_LOCATION'            =>    htmlspecialchars($objRS->fields['location']),
+                    'IMMO_TELEPHONE'        =>    htmlspecialchars($objRS->fields['telephone']),
+                    'IMMO_TELEPHONE_OFFICE'    =>    htmlspecialchars($objRS->fields['telephone_office']),
+                    'IMMO_TELEPHONE_MOBILE'    =>    htmlspecialchars($objRS->fields['telephone_mobile']),
+                    'IMMO_PURCHASE'            =>    $objRS->fields['purchase'] == 1 ? $_ARRAYLANG['TXT_IMMO_YES'] : $_ARRAYLANG['TXT_IMMO_NO'],
+                    'IMMO_FUNDING'            =>    $objRS->fields['funding'] == 1 ? $_ARRAYLANG['TXT_IMMO_YES'] : $_ARRAYLANG['TXT_IMMO_NO'],
+                    'IMMO_COMMENT'            =>    htmlspecialchars($objRS->fields['comment']),
+                    'IMMO_TIMESTAMP'        =>    date(ASCMS_DATE_FORMAT ,$objRS->fields['timestamp']),
+                    'ROW_CLASS'                =>    ($rowclass++ % 2 == 0) ? 'row1' : 'row2',
             ));
         }
     }
@@ -779,72 +779,72 @@ class Immo extends ImmoLib
             $_REQUEST['tab'] = 'immo_downloads';
         }
 
-        $_SESSION['immo']['startDate']	= !empty($_REQUEST['inputStartDate']) ? contrexx_addslashes($_REQUEST['inputStartDate'])  : $_SESSION['immo']['startDate'];
-        $_SESSION['immo']['endDate']	= !empty($_REQUEST['inputEndDate']) ? contrexx_addslashes($_REQUEST['inputEndDate'])  : $_SESSION['immo']['endDate'];
+        $_SESSION['immo']['startDate']    = !empty($_REQUEST['inputStartDate']) ? contrexx_addslashes($_REQUEST['inputStartDate'])  : $_SESSION['immo']['startDate'];
+        $_SESSION['immo']['endDate']    = !empty($_REQUEST['inputEndDate']) ? contrexx_addslashes($_REQUEST['inputEndDate'])  : $_SESSION['immo']['endDate'];
 
         $this->_objTpl->setGlobalVariable(array(
-                'TXT_IMMO_PAGE_VIEWS'                =>	$_ARRAYLANG['TXT_IMMO_PAGE_VIEWS'],
-                'TXT_IMMO_DOWNLOADS'                 =>	$_ARRAYLANG['TXT_IMMO_DOWNLOADS'],
-                'TXT_IMMO_OBJECT'				     =>	$_ARRAYLANG['TXT_IMMO_OBJECT'],
-                'TXT_IMMO_VISITS'				     =>	$_ARRAYLANG['TXT_IMMO_VISITS'],
-                'TXT_IMMO_HEADER'				     =>	$_ARRAYLANG['TXT_IMMO_HEADER'],
-                'TXT_IMMO_LOCATION'				     =>	$_ARRAYLANG['TXT_IMMO_LOCATION'],
-                'TXT_IMMO_SEARCH'				     =>	$_ARRAYLANG['TXT_IMMO_SEARCH'],
-                'TXT_IMMO_DOWNLOAD_SEARCH'		     =>	$_ARRAYLANG['TXT_IMMO_DOWNLOAD_SEARCH'],
-                'TXT_IMMO_SORT'					     =>	$_ARRAYLANG['TXT_IMMO_SORT'],
-                'TXT_IMMO_IMMO_ID'				     =>	$_ARRAYLANG['TXT_IMMO_IMMO_ID'],
-                'TXT_IMMO_EMAIL'				     =>	$_ARRAYLANG['TXT_IMMO_EMAIL'],
-                'TXT_IMMO_NAME'					     =>	$_ARRAYLANG['TXT_IMMO_NAME'],
-                'TXT_IMMO_FIRSTNAME'			     =>	$_ARRAYLANG['TXT_IMMO_FIRSTNAME'],
-                'TXT_IMMO_COMPANY'				     =>	$_ARRAYLANG['TXT_IMMO_COMPANY'],
-                'TXT_IMMO_STREET'				     =>	$_ARRAYLANG['TXT_IMMO_STREET'],
-                'TXT_IMMO_ZIP'					     =>	$_ARRAYLANG['TXT_IMMO_ZIP'],
-                'TXT_IMMO_LOCATION'				     =>	$_ARRAYLANG['TXT_IMMO_LOCATION'],
-                'TXT_IMMO_TELEPHONE'			     =>	$_ARRAYLANG['TXT_IMMO_TELEPHONE'],
-                'TXT_IMMO_TELEPHONE_OFFICE'		     =>	$_ARRAYLANG['TXT_IMMO_TELEPHONE_OFFICE'],
-                'TXT_IMMO_TELEPHONE_MOBILE'		     =>	$_ARRAYLANG['TXT_IMMO_TELEPHONE_MOBILE'],
-                'TXT_IMMO_PURCHASE'				     =>	$_ARRAYLANG['TXT_IMMO_PURCHASE'],
-                'TXT_IMMO_FUNDING'				     =>	$_ARRAYLANG['TXT_IMMO_FUNDING'],
-                'TXT_IMMO_COMMENT'				     =>	$_ARRAYLANG['TXT_IMMO_COMMENT'],
-                'TXT_IMMO_TIMESTAMP'			     =>	$_ARRAYLANG['TXT_IMMO_TIMESTAMP'],
-                'TXT_IMMO_EXPORT'	   	           	 =>	$_ARRAYLANG['TXT_IMMO_EXPORT'],
-                'TXT_IMMO_FUNCTIONS'	   	         =>	$_ARRAYLANG['TXT_IMMO_FUNCTIONS'],
-                'TXT_IMMO_SEPARATOR'	   	         =>	$_ARRAYLANG['TXT_IMMO_SEPARATOR'],
-                'TXT_IMMO_EDIT'	   	                 =>	$_ARRAYLANG['TXT_IMMO_EDIT'],
-                'TXT_IMMO_DELETE'    	   	         =>	$_ARRAYLANG['TXT_IMMO_DELETE'],
-                'TXT_IMMO_SHOW_OBJECT_IN_NEW_WINDOW' =>	$_ARRAYLANG['TXT_IMMO_SHOW_OBJECT_IN_NEW_WINDOW'],
-                'TXT_IMMO_CONFIRM_DELETE_CONTACT'    =>	$_ARRAYLANG['TXT_IMMO_CONFIRM_DELETE_CONTACT'],
-                'TXT_IMMO_CANNOT_UNDO_OPERATION'     =>	$_ARRAYLANG['TXT_IMMO_CANNOT_UNDO_OPERATION'],
-                'TXT_IMMO_COUNT'     				 =>	$_ARRAYLANG['TXT_IMMO_COUNT'],
-                'TXT_IMMO_REF_NOTE'     			 =>	$_ARRAYLANG['TXT_IMMO_REF_NOTE'],
-                'TXT_IMMO_REFERENCE_NUMBER'    	 	 =>	$_ARRAYLANG['TXT_IMMO_REFERENCE_NUMBER'],
-                'TXT_IMMO_HEADER'    		 		 =>	$_ARRAYLANG['TXT_IMMO_HEADER'],
-                'TXT_IMMO_LINKNAME'    		 		 =>	$_ARRAYLANG['TXT_IMMO_LINKNAME'],
-                'TXT_IMMO_TIMESPAN'    		 		 =>	$_ARRAYLANG['TXT_IMMO_TIMESPAN'],
-                'TXT_IMMO_FROM'  	  		 		 =>	$_ARRAYLANG['TXT_IMMO_FROM'],
-                'TXT_IMMO_TO'	    		 		 =>	$_ARRAYLANG['TXT_IMMO_TO'],
-                'TXT_IMMO_INTERESTS'	    		 =>	$_ARRAYLANG['TXT_IMMO_INTERESTS'],
-                'TXT_IMMO_DOWNLOAD_LIST'     		 =>	$_ARRAYLANG['TXT_IMMO_DOWNLOAD_LIST'],
-                'TXT_IMMO_INTEREST_SEARCH'     		 =>	$_ARRAYLANG['TXT_IMMO_INTEREST_SEARCH'],
-                'TXT_IMMO_SHOW_TIMESPAN_DETAILS'     =>	$_ARRAYLANG['TXT_IMMO_SHOW_TIMESPAN_DETAILS'],
-                'TXT_IMMO_IGNORE_TIMESPAN'    		 =>	$_ARRAYLANG['TXT_IMMO_IGNORE_TIMESPAN'],
-                'TXT_IMMO_REFRESH'		    		 =>	$_ARRAYLANG['TXT_IMMO_REFRESH'],
-                'CALENDAR_TODAY'					 => !empty($_SESSION['immo']['startDate']) ? $_SESSION['immo']['startDate'] : date('Y-m-d', strtotime('-1 month')),
-                'CALENDAR_NEXT_MONTH'				 => !empty($_SESSION['immo']['endDate']) ? $_SESSION['immo']['endDate'] : date('Y-m-d'),
-                'IMMO_IGNORE_TIMESPAN_CHECKED'		 => empty($_REQUEST['ignore_timespan']) ? '' : 'checked="checked"',
-                'PATH_OFFSET'						 => ASCMS_PATH_OFFSET,
-                'IMMO_PAGING_LIMIT'				     =>	$limit,
-                'IMMO_PAGING_POS'				     =>	$pos,
-                'IMMO_PAGING_FIELD'				     =>	$field,
-                'IMMO_HSEARCH_FIELD'			     =>	$hsearchField,
-                'IMMO_HSEARCH'					     =>	$hsearch,
-                'IMMO_VISIBLE_TAB'					 =>	$_REQUEST['tab'],
-                'IMMO_DOWNLOADS_VISIBLE'		     =>	($_REQUEST['tab'] == 'immo_downloads') ? 'style="display: block;"' : 'style="display: none;"',
-                'IMMO_INTERESTS_VISIBLE'		     =>	($_REQUEST['tab'] == 'immo_interests') ? 'style="display: block;"' : 'style="display: none;"',
-                'IMMO_PAGEVIEWS_VISIBLE'		     =>	($_REQUEST['tab'] == 'immo_pageviews') ? 'style="display: block;"' : 'style="display: none;"',
-                'IMMO_DOWNLOADS_TAB_ACTIVE'			 => ($_REQUEST['tab'] == 'immo_downloads') ? 'class="active"' : '',
-                'IMMO_INTERESTS_TAB_ACTIVE'			 => ($_REQUEST['tab'] == 'immo_interests') ? 'class="active"' : '',
-                'IMMO_PAGEVIEWS_TAB_ACTIVE'			 => ($_REQUEST['tab'] == 'immo_pageviews') ? 'class="active"' : '',
+                'TXT_IMMO_PAGE_VIEWS'                =>    $_ARRAYLANG['TXT_IMMO_PAGE_VIEWS'],
+                'TXT_IMMO_DOWNLOADS'                 =>    $_ARRAYLANG['TXT_IMMO_DOWNLOADS'],
+                'TXT_IMMO_OBJECT'                     =>    $_ARRAYLANG['TXT_IMMO_OBJECT'],
+                'TXT_IMMO_VISITS'                     =>    $_ARRAYLANG['TXT_IMMO_VISITS'],
+                'TXT_IMMO_HEADER'                     =>    $_ARRAYLANG['TXT_IMMO_HEADER'],
+                'TXT_IMMO_LOCATION'                     =>    $_ARRAYLANG['TXT_IMMO_LOCATION'],
+                'TXT_IMMO_SEARCH'                     =>    $_ARRAYLANG['TXT_IMMO_SEARCH'],
+                'TXT_IMMO_DOWNLOAD_SEARCH'             =>    $_ARRAYLANG['TXT_IMMO_DOWNLOAD_SEARCH'],
+                'TXT_IMMO_SORT'                         =>    $_ARRAYLANG['TXT_IMMO_SORT'],
+                'TXT_IMMO_IMMO_ID'                     =>    $_ARRAYLANG['TXT_IMMO_IMMO_ID'],
+                'TXT_IMMO_EMAIL'                     =>    $_ARRAYLANG['TXT_IMMO_EMAIL'],
+                'TXT_IMMO_NAME'                         =>    $_ARRAYLANG['TXT_IMMO_NAME'],
+                'TXT_IMMO_FIRSTNAME'                 =>    $_ARRAYLANG['TXT_IMMO_FIRSTNAME'],
+                'TXT_IMMO_COMPANY'                     =>    $_ARRAYLANG['TXT_IMMO_COMPANY'],
+                'TXT_IMMO_STREET'                     =>    $_ARRAYLANG['TXT_IMMO_STREET'],
+                'TXT_IMMO_ZIP'                         =>    $_ARRAYLANG['TXT_IMMO_ZIP'],
+                'TXT_IMMO_LOCATION'                     =>    $_ARRAYLANG['TXT_IMMO_LOCATION'],
+                'TXT_IMMO_TELEPHONE'                 =>    $_ARRAYLANG['TXT_IMMO_TELEPHONE'],
+                'TXT_IMMO_TELEPHONE_OFFICE'             =>    $_ARRAYLANG['TXT_IMMO_TELEPHONE_OFFICE'],
+                'TXT_IMMO_TELEPHONE_MOBILE'             =>    $_ARRAYLANG['TXT_IMMO_TELEPHONE_MOBILE'],
+                'TXT_IMMO_PURCHASE'                     =>    $_ARRAYLANG['TXT_IMMO_PURCHASE'],
+                'TXT_IMMO_FUNDING'                     =>    $_ARRAYLANG['TXT_IMMO_FUNDING'],
+                'TXT_IMMO_COMMENT'                     =>    $_ARRAYLANG['TXT_IMMO_COMMENT'],
+                'TXT_IMMO_TIMESTAMP'                 =>    $_ARRAYLANG['TXT_IMMO_TIMESTAMP'],
+                'TXT_IMMO_EXPORT'                           =>    $_ARRAYLANG['TXT_IMMO_EXPORT'],
+                'TXT_IMMO_FUNCTIONS'                    =>    $_ARRAYLANG['TXT_IMMO_FUNCTIONS'],
+                'TXT_IMMO_SEPARATOR'                    =>    $_ARRAYLANG['TXT_IMMO_SEPARATOR'],
+                'TXT_IMMO_EDIT'                            =>    $_ARRAYLANG['TXT_IMMO_EDIT'],
+                'TXT_IMMO_DELETE'                        =>    $_ARRAYLANG['TXT_IMMO_DELETE'],
+                'TXT_IMMO_SHOW_OBJECT_IN_NEW_WINDOW' =>    $_ARRAYLANG['TXT_IMMO_SHOW_OBJECT_IN_NEW_WINDOW'],
+                'TXT_IMMO_CONFIRM_DELETE_CONTACT'    =>    $_ARRAYLANG['TXT_IMMO_CONFIRM_DELETE_CONTACT'],
+                'TXT_IMMO_CANNOT_UNDO_OPERATION'     =>    $_ARRAYLANG['TXT_IMMO_CANNOT_UNDO_OPERATION'],
+                'TXT_IMMO_COUNT'                      =>    $_ARRAYLANG['TXT_IMMO_COUNT'],
+                'TXT_IMMO_REF_NOTE'                  =>    $_ARRAYLANG['TXT_IMMO_REF_NOTE'],
+                'TXT_IMMO_REFERENCE_NUMBER'              =>    $_ARRAYLANG['TXT_IMMO_REFERENCE_NUMBER'],
+                'TXT_IMMO_HEADER'                      =>    $_ARRAYLANG['TXT_IMMO_HEADER'],
+                'TXT_IMMO_LINKNAME'                      =>    $_ARRAYLANG['TXT_IMMO_LINKNAME'],
+                'TXT_IMMO_TIMESPAN'                      =>    $_ARRAYLANG['TXT_IMMO_TIMESPAN'],
+                'TXT_IMMO_FROM'                          =>    $_ARRAYLANG['TXT_IMMO_FROM'],
+                'TXT_IMMO_TO'                          =>    $_ARRAYLANG['TXT_IMMO_TO'],
+                'TXT_IMMO_INTERESTS'                 =>    $_ARRAYLANG['TXT_IMMO_INTERESTS'],
+                'TXT_IMMO_DOWNLOAD_LIST'              =>    $_ARRAYLANG['TXT_IMMO_DOWNLOAD_LIST'],
+                'TXT_IMMO_INTEREST_SEARCH'              =>    $_ARRAYLANG['TXT_IMMO_INTEREST_SEARCH'],
+                'TXT_IMMO_SHOW_TIMESPAN_DETAILS'     =>    $_ARRAYLANG['TXT_IMMO_SHOW_TIMESPAN_DETAILS'],
+                'TXT_IMMO_IGNORE_TIMESPAN'             =>    $_ARRAYLANG['TXT_IMMO_IGNORE_TIMESPAN'],
+                'TXT_IMMO_REFRESH'                     =>    $_ARRAYLANG['TXT_IMMO_REFRESH'],
+                'CALENDAR_TODAY'                     => !empty($_SESSION['immo']['startDate']) ? $_SESSION['immo']['startDate'] : date('Y-m-d', strtotime('-1 month')),
+                'CALENDAR_NEXT_MONTH'                 => !empty($_SESSION['immo']['endDate']) ? $_SESSION['immo']['endDate'] : date('Y-m-d'),
+                'IMMO_IGNORE_TIMESPAN_CHECKED'         => empty($_REQUEST['ignore_timespan']) ? '' : 'checked="checked"',
+                'PATH_OFFSET'                         => ASCMS_PATH_OFFSET,
+                'IMMO_PAGING_LIMIT'                     =>    $limit,
+                'IMMO_PAGING_POS'                     =>    $pos,
+                'IMMO_PAGING_FIELD'                     =>    $field,
+                'IMMO_HSEARCH_FIELD'                 =>    $hsearchField,
+                'IMMO_HSEARCH'                         =>    $hsearch,
+                'IMMO_VISIBLE_TAB'                     =>    $_REQUEST['tab'],
+                'IMMO_DOWNLOADS_VISIBLE'             =>    ($_REQUEST['tab'] == 'immo_downloads') ? 'style="display: block;"' : 'style="display: none;"',
+                'IMMO_INTERESTS_VISIBLE'             =>    ($_REQUEST['tab'] == 'immo_interests') ? 'style="display: block;"' : 'style="display: none;"',
+                'IMMO_PAGEVIEWS_VISIBLE'             =>    ($_REQUEST['tab'] == 'immo_pageviews') ? 'style="display: block;"' : 'style="display: none;"',
+                'IMMO_DOWNLOADS_TAB_ACTIVE'             => ($_REQUEST['tab'] == 'immo_downloads') ? 'class="active"' : '',
+                'IMMO_INTERESTS_TAB_ACTIVE'             => ($_REQUEST['tab'] == 'immo_interests') ? 'class="active"' : '',
+                'IMMO_PAGEVIEWS_TAB_ACTIVE'             => ($_REQUEST['tab'] == 'immo_pageviews') ? 'class="active"' : '',
 
 
         ));
@@ -852,31 +852,31 @@ class Immo extends ImmoLib
 
         $rowclass = 2;
         //get object request stats
-        $query = "	SELECT page, visits, content1.fieldvalue AS header, content2.fieldvalue AS location, immo.reference as reference, immo.ref_nr_note as ref_note
-					FROM `".DBPREFIX."stats_requests`
-					LEFT JOIN `".DBPREFIX."module_immo_content` AS content1 ON content1.immo_id = CAST(MID(`page`, 40, 8 ) AS UNSIGNED)
-						AND content1.lang_id =1
-						AND content1.field_id = (
-							SELECT field_id
-							FROM `".DBPREFIX."module_immo_fieldname` AS fname
-							WHERE lower( name ) = '".$this->_headline."'
-							AND fname.lang_id =1
-						)
-					LEFT JOIN `".DBPREFIX."module_immo_content` AS content2 ON content2.immo_id = CAST(MID(`page`, 40, 8) AS UNSIGNED)
-						AND content2.lang_id =1
-						AND content2.field_id = (
-							SELECT field_id
-							FROM `".DBPREFIX."module_immo_fieldname` AS fname
-							WHERE lower( name ) = 'ort'
-							AND fname.lang_id =1
-						)
-					LEFT JOIN `".DBPREFIX."module_immo` AS immo ON immo.id = CAST(MID(`page`, 40, 8) AS UNSIGNED)
-					WHERE page LIKE '/index.php?section=immo&cmd=showObj&id=%'";
+        $query = "    SELECT page, visits, content1.fieldvalue AS header, content2.fieldvalue AS location, immo.reference as reference, immo.ref_nr_note as ref_note
+                    FROM `".DBPREFIX."stats_requests`
+                    LEFT JOIN `".DBPREFIX."module_immo_content` AS content1 ON content1.immo_id = CAST(MID(`page`, 40, 8 ) AS UNSIGNED)
+                        AND content1.lang_id =1
+                        AND content1.field_id = (
+                            SELECT field_id
+                            FROM `".DBPREFIX."module_immo_fieldname` AS fname
+                            WHERE lower( name ) = '".$this->_headline."'
+                            AND fname.lang_id =1
+                        )
+                    LEFT JOIN `".DBPREFIX."module_immo_content` AS content2 ON content2.immo_id = CAST(MID(`page`, 40, 8) AS UNSIGNED)
+                        AND content2.lang_id =1
+                        AND content2.field_id = (
+                            SELECT field_id
+                            FROM `".DBPREFIX."module_immo_fieldname` AS fname
+                            WHERE lower( name ) = 'ort'
+                            AND fname.lang_id =1
+                        )
+                    LEFT JOIN `".DBPREFIX."module_immo` AS immo ON immo.id = CAST(MID(`page`, 40, 8) AS UNSIGNED)
+                    WHERE page LIKE '/index.php?section=immo&cmd=showObj&id=%'";
         if(empty($_REQUEST['ignore_timespan']) && !empty($_SESSION['immo']['startDate'])) {
             $query .= " AND `timestamp` BETWEEN ".strtotime($_SESSION['immo']['startDate'])." AND ".strtotime($_SESSION['immo']['endDate']);
         }
         $query .= " GROUP BY reference
-					ORDER BY ".$field." DESC";
+                    ORDER BY ".$field." DESC";
         if(($objRS = $objDatabase->Execute($query)) !== false) {
             $count = $objRS->RecordCount();
             $objRS = $objDatabase->SelectLimit($query, $limit, $pos);
@@ -886,13 +886,13 @@ class Immo extends ImmoLib
                 $immoID = intval($split[0]);
 
                 $this->_objTpl->setVariable(array(
-                        'IMMO_OBJECT_NAME'		=>	htmlspecialchars($objRS->fields['page']),
-                        'IMMO_VISITS'			=>	$objRS->fields['visits'],
-                        'IMMO_OBJECT_HEADER'	=>	htmlspecialchars($objRS->fields['header']),
-                        'IMMO_OBJECT_LOCATION'	=>	htmlspecialchars($objRS->fields['location']),
-                        'IMMO_OBJECT_REFERENCE'	=>	!empty($objRS->fields['reference']) ? htmlspecialchars($objRS->fields['reference']) : 'N/A',
-                        'IMMO_OBJECT_REF_NOTE'	=>	!empty($objRS->fields['ref_note']) ? htmlspecialchars($objRS->fields['ref_note']) : 'N/A',
-                        'ROW_CLASS'				=>	($rowclass++ % 2 == 0) ? 'row1' : 'row2',
+                        'IMMO_OBJECT_NAME'        =>    htmlspecialchars($objRS->fields['page']),
+                        'IMMO_VISITS'            =>    $objRS->fields['visits'],
+                        'IMMO_OBJECT_HEADER'    =>    htmlspecialchars($objRS->fields['header']),
+                        'IMMO_OBJECT_LOCATION'    =>    htmlspecialchars($objRS->fields['location']),
+                        'IMMO_OBJECT_REFERENCE'    =>    !empty($objRS->fields['reference']) ? htmlspecialchars($objRS->fields['reference']) : 'N/A',
+                        'IMMO_OBJECT_REF_NOTE'    =>    !empty($objRS->fields['ref_note']) ? htmlspecialchars($objRS->fields['ref_note']) : 'N/A',
+                        'ROW_CLASS'                =>    ($rowclass++ % 2 == 0) ? 'row1' : 'row2',
                 ));
                 $this->_objTpl->parse('pageVisits');
                 $objRS->MoveNext();
@@ -901,47 +901,47 @@ class Immo extends ImmoLib
             die("db error.".$objDatabase->ErrorMsg());
         }
         $this->_objTpl->setVariable(array(
-                'IMMO_STATS_PAGEVIEW_PAGING'	=> getPaging($count, $pos, '&amp;cmd=immo&amp;act=stats&amp;tab=1&amp;limit='.$limit, '', true),
+                'IMMO_STATS_PAGEVIEW_PAGING'    => getPaging($count, $pos, '&amp;cmd=immo&amp;act=stats&amp;tab=1&amp;limit='.$limit, '', true),
         ));
 
         $rowclass = 2;
         //get protected link donload stats
-        $query = "	SELECT count( 1 ) AS cnt, immo.id as immo_id, immo.reference, immo.ref_nr_note, a.fieldvalue AS header, b.name AS linkname
-					FROM `".DBPREFIX."module_immo_contact`
-						AS contact
-					LEFT JOIN ".DBPREFIX."module_immo
-						AS immo
-						ON ( contact.immo_id = immo.id )
-					LEFT JOIN ".DBPREFIX."module_immo_content
-						AS a
-						ON ( a.immo_id = contact.immo_id )
-					LEFT JOIN ".DBPREFIX."module_immo_fieldname
-						AS fn
-						ON ( a.field_id = fn.field_id )
-					LEFT JOIN ".DBPREFIX."module_immo_fieldname
-						AS b
-						ON ( b.field_id = contact.field_id )
-					WHERE lower( fn.name ) = '".$this->_headline."'
-					AND fn.lang_id = 1
-					AND a.lang_id = 1
-					AND b.lang_id = 1";
+        $query = "    SELECT count( 1 ) AS cnt, immo.id as immo_id, immo.reference, immo.ref_nr_note, a.fieldvalue AS header, b.name AS linkname
+                    FROM `".DBPREFIX."module_immo_contact`
+                        AS contact
+                    LEFT JOIN ".DBPREFIX."module_immo
+                        AS immo
+                        ON ( contact.immo_id = immo.id )
+                    LEFT JOIN ".DBPREFIX."module_immo_content
+                        AS a
+                        ON ( a.immo_id = contact.immo_id )
+                    LEFT JOIN ".DBPREFIX."module_immo_fieldname
+                        AS fn
+                        ON ( a.field_id = fn.field_id )
+                    LEFT JOIN ".DBPREFIX."module_immo_fieldname
+                        AS b
+                        ON ( b.field_id = contact.field_id )
+                    WHERE lower( fn.name ) = '".$this->_headline."'
+                    AND fn.lang_id = 1
+                    AND a.lang_id = 1
+                    AND b.lang_id = 1";
         if(empty($_REQUEST['ignore_timespan']) && !empty($_SESSION['immo']['startDate'])) {
             $query .= " AND `timestamp` BETWEEN ".strtotime($_SESSION['immo']['startDate'])." AND ".strtotime($_SESSION['immo']['endDate']);
         }
         $query .= " GROUP BY contact.immo_id
-					ORDER BY cnt DESC";
+                    ORDER BY cnt DESC";
         if(($objRS = $objDatabase->Execute($query)) !== false) {
             $count = $objRS->RecordCount();
             $objRS = $objDatabase->SelectLimit($query, $limit, $pos);
             while(!$objRS->EOF) {
                 $this->_objTpl->setVariable(array(
-                        'IMMO_DL_COUNT'			=>	intval($objRS->fields['cnt']),
-                        'IMMO_DL_REF_NOTE'		=>	htmlspecialchars($objRS->fields['ref_nr_note']),
-                        'IMMO_DL_REFERENCE'		=>	htmlspecialchars($objRS->fields['reference']),
-                        'IMMO_DL_HEADER'		=>	htmlspecialchars($objRS->fields['header']),
-                        'IMMO_DL_LINKNAME'		=>	htmlspecialchars($objRS->fields['linkname']),
-                        'IMMO_DL_IMMO_ID'		=>	intval($objRS->fields['immo_id']),
-                        'ROW_CLASS'				=>	($rowclass++ % 2 == 0) ? 'row1' : 'row2',
+                        'IMMO_DL_COUNT'            =>    intval($objRS->fields['cnt']),
+                        'IMMO_DL_REF_NOTE'        =>    htmlspecialchars($objRS->fields['ref_nr_note']),
+                        'IMMO_DL_REFERENCE'        =>    htmlspecialchars($objRS->fields['reference']),
+                        'IMMO_DL_HEADER'        =>    htmlspecialchars($objRS->fields['header']),
+                        'IMMO_DL_LINKNAME'        =>    htmlspecialchars($objRS->fields['linkname']),
+                        'IMMO_DL_IMMO_ID'        =>    intval($objRS->fields['immo_id']),
+                        'ROW_CLASS'                =>    ($rowclass++ % 2 == 0) ? 'row1' : 'row2',
                 ));
                 $this->_objTpl->parse('downloads');
                 $i++;
@@ -949,34 +949,34 @@ class Immo extends ImmoLib
             }
         }
         $this->_objTpl->setVariable(array(
-                'IMMO_STATS_DOWNLOADS_PAGING'	=> getPaging($count, $pos, '&amp;cmd=immo&amp;act=stats&amp;limit='.$limit, '', true),
+                'IMMO_STATS_DOWNLOADS_PAGING'    => getPaging($count, $pos, '&amp;cmd=immo&amp;act=stats&amp;limit='.$limit, '', true),
         ));
 
 
-        $query = "	SELECT count( `interest`.`immo_id` ) AS cnt, immo.id AS immo_id, immo.reference, immo.ref_nr_note, a.fieldvalue AS header
-					FROM `".DBPREFIX."module_immo_interest` AS interest
-					LEFT JOIN ".DBPREFIX."module_immo AS immo ON ( interest.immo_id = immo.id )
-					LEFT JOIN ".DBPREFIX."module_immo_content AS a ON ( a.immo_id = interest.immo_id )
-					LEFT JOIN ".DBPREFIX."module_immo_fieldname AS fn ON ( a.field_id = fn.field_id )
-					WHERE lower( fn.name ) = '".$this->_headline."'
-					AND fn.lang_id =1
-					AND a.lang_id =1";
+        $query = "    SELECT count( `interest`.`immo_id` ) AS cnt, immo.id AS immo_id, immo.reference, immo.ref_nr_note, a.fieldvalue AS header
+                    FROM `".DBPREFIX."module_immo_interest` AS interest
+                    LEFT JOIN ".DBPREFIX."module_immo AS immo ON ( interest.immo_id = immo.id )
+                    LEFT JOIN ".DBPREFIX."module_immo_content AS a ON ( a.immo_id = interest.immo_id )
+                    LEFT JOIN ".DBPREFIX."module_immo_fieldname AS fn ON ( a.field_id = fn.field_id )
+                    WHERE lower( fn.name ) = '".$this->_headline."'
+                    AND fn.lang_id =1
+                    AND a.lang_id =1";
         if(empty($_REQUEST['ignore_timespan']) && !empty($_SESSION['immo']['startDate'])) {
             $query .= " AND `time` BETWEEN ".strtotime($_SESSION['immo']['startDate'])." AND ".strtotime($_SESSION['immo']['endDate']);
         }
         $query .= " GROUP BY `interest`.`immo_id`
-					ORDER BY cnt DESC ";
+                    ORDER BY cnt DESC ";
         if(($objRS = $objDatabase->Execute($query)) !== false) {
             $count = $objRS->RecordCount();
             $objRS = $objDatabase->SelectLimit($query, $limit, $pos);
             while(!$objRS->EOF) {
                 $this->_objTpl->setVariable(array(
-                        'IMMO_INTEREST_COUNT'		=>	intval($objRS->fields['cnt']),
-                        'IMMO_INTEREST_REF_NOTE'	=>	htmlspecialchars($objRS->fields['ref_nr_note']),
-                        'IMMO_INTEREST_REFERENCE'	=>	htmlspecialchars($objRS->fields['reference']),
-                        'IMMO_INTEREST_HEADER'		=>	htmlspecialchars($objRS->fields['header']),
-                        'IMMO_INTEREST_IMMO_ID'		=>	intval($objRS->fields['immo_id']),
-                        'ROW_CLASS'					=>	($rowclass++ % 2 == 0) ? 'row1' : 'row2',
+                        'IMMO_INTEREST_COUNT'        =>    intval($objRS->fields['cnt']),
+                        'IMMO_INTEREST_REF_NOTE'    =>    htmlspecialchars($objRS->fields['ref_nr_note']),
+                        'IMMO_INTEREST_REFERENCE'    =>    htmlspecialchars($objRS->fields['reference']),
+                        'IMMO_INTEREST_HEADER'        =>    htmlspecialchars($objRS->fields['header']),
+                        'IMMO_INTEREST_IMMO_ID'        =>    intval($objRS->fields['immo_id']),
+                        'ROW_CLASS'                    =>    ($rowclass++ % 2 == 0) ? 'row1' : 'row2',
                 ));
                 $this->_objTpl->parse('interests');
                 $i++;
@@ -984,7 +984,7 @@ class Immo extends ImmoLib
             }
         }
         $this->_objTpl->setVariable(array(
-                'IMMO_STATS_INTERESTS_PAGING'	=> getPaging($count, $pos, '&amp;cmd=immo&amp;act=stats&amp;limit='.$limit, '', true),
+                'IMMO_STATS_INTERESTS_PAGING'    => getPaging($count, $pos, '&amp;cmd=immo&amp;act=stats&amp;limit='.$limit, '', true),
         ));
     }
 
@@ -1011,8 +1011,8 @@ class Immo extends ImmoLib
 
         $immoID = !empty($_REQUEST['id']) ? intval($_REQUEST['id']) : 0;
 
-        $_SESSION['immo']['startDate']	= !empty($_REQUEST['inputStartDate']) ? contrexx_addslashes($_REQUEST['inputStartDate'])  : $_SESSION['immo']['startDate'];
-        $_SESSION['immo']['endDate']	= !empty($_REQUEST['inputEndDate']) ? contrexx_addslashes($_REQUEST['inputEndDate'])  : $_SESSION['immo']['endDate'];
+        $_SESSION['immo']['startDate']    = !empty($_REQUEST['inputStartDate']) ? contrexx_addslashes($_REQUEST['inputStartDate'])  : $_SESSION['immo']['startDate'];
+        $_SESSION['immo']['endDate']    = !empty($_REQUEST['inputEndDate']) ? contrexx_addslashes($_REQUEST['inputEndDate'])  : $_SESSION['immo']['endDate'];
         //paging data
         $limit = !empty($_REQUEST['limit']) ? intval($_REQUEST['limit']) : $_CONFIG['corePagingLimit'];
         $pos = !empty($_REQUEST['pos']) ? intval($_REQUEST['pos']) : 0;
@@ -1022,57 +1022,57 @@ class Immo extends ImmoLib
         $hsearch = !empty($_REQUEST['search']) ? contrexx_addslashes($_REQUEST['search']) : '' ;
 
         $this->_objTpl->setGlobalVariable(array(
-                'TXT_IMMO_EXPORT'             		 =>	$_ARRAYLANG['TXT_IMMO_EXPORT'],
-                'TXT_IMMO_DOWNLOADS'                 =>	$_ARRAYLANG['TXT_IMMO_DOWNLOADS'],
-                'TXT_IMMO_OBJECT'				     =>	$_ARRAYLANG['TXT_IMMO_OBJECT'],
-                'TXT_IMMO_VISITS'				     =>	$_ARRAYLANG['TXT_IMMO_VISITS'],
-                'TXT_IMMO_HEADER'				     =>	$_ARRAYLANG['TXT_IMMO_HEADER'],
-                'TXT_IMMO_LOCATION'				     =>	$_ARRAYLANG['TXT_IMMO_LOCATION'],
-                'TXT_IMMO_SEARCH'				     =>	$_ARRAYLANG['TXT_IMMO_SEARCH'],
-                'TXT_IMMO_DOWNLOAD_SEARCH'		     =>	$_ARRAYLANG['TXT_IMMO_DOWNLOAD_SEARCH'],
-                'TXT_IMMO_SORT'					     =>	$_ARRAYLANG['TXT_IMMO_SORT'],
-                'TXT_IMMO_IMMO_ID'				     =>	$_ARRAYLANG['TXT_IMMO_IMMO_ID'],
-                'TXT_IMMO_EMAIL'				     =>	$_ARRAYLANG['TXT_IMMO_EMAIL'],
-                'TXT_IMMO_NAME'					     =>	$_ARRAYLANG['TXT_IMMO_NAME'],
-                'TXT_IMMO_FIRSTNAME'			     =>	$_ARRAYLANG['TXT_IMMO_FIRSTNAME'],
-                'TXT_IMMO_COMPANY'				     =>	$_ARRAYLANG['TXT_IMMO_COMPANY'],
-                'TXT_IMMO_STREET'				     =>	$_ARRAYLANG['TXT_IMMO_STREET'],
-                'TXT_IMMO_ZIP'					     =>	$_ARRAYLANG['TXT_IMMO_ZIP'],
-                'TXT_IMMO_LOCATION'				     =>	$_ARRAYLANG['TXT_IMMO_LOCATION'],
-                'TXT_IMMO_TELEPHONE'			     =>	$_ARRAYLANG['TXT_IMMO_TELEPHONE'],
-                'TXT_IMMO_TELEPHONE_OFFICE'		     =>	$_ARRAYLANG['TXT_IMMO_TELEPHONE_OFFICE'],
-                'TXT_IMMO_TELEPHONE_MOBILE'		     =>	$_ARRAYLANG['TXT_IMMO_TELEPHONE_MOBILE'],
-                'TXT_IMMO_PURCHASE'				     =>	$_ARRAYLANG['TXT_IMMO_PURCHASE'],
-                'TXT_IMMO_FUNDING'				     =>	$_ARRAYLANG['TXT_IMMO_FUNDING'],
-                'TXT_IMMO_COMMENT'				     =>	$_ARRAYLANG['TXT_IMMO_COMMENT'],
-                'TXT_IMMO_TIMESTAMP'			     =>	$_ARRAYLANG['TXT_IMMO_TIMESTAMP'],
-                'TXT_IMMO_EXPORT'	   	           	 =>	$_ARRAYLANG['TXT_IMMO_EXPORT'],
-                'TXT_IMMO_FUNCTIONS'	   	         =>	$_ARRAYLANG['TXT_IMMO_FUNCTIONS'],
-                'TXT_IMMO_SEPARATOR'	   	         =>	$_ARRAYLANG['TXT_IMMO_SEPARATOR'],
-                'TXT_IMMO_EDIT'	   	                 =>	$_ARRAYLANG['TXT_IMMO_EDIT'],
-                'TXT_IMMO_DELETE'    	   	         =>	$_ARRAYLANG['TXT_IMMO_DELETE'],
-                'TXT_IMMO_CONFIRM_DELETE_CONTACT'    =>	$_ARRAYLANG['TXT_IMMO_CONFIRM_DELETE_CONTACT'],
-                'TXT_IMMO_CANNOT_UNDO_OPERATION'     =>	$_ARRAYLANG['TXT_IMMO_CANNOT_UNDO_OPERATION'],
-                'TXT_IMMO_DETAILS'     				 =>	$_ARRAYLANG['TXT_IMMO_DETAILS'],
-                'TXT_IMMO_TIMESPAN'    		 		 =>	$_ARRAYLANG['TXT_IMMO_TIMESPAN'],
-                'TXT_IMMO_FROM'  	  		 		 =>	$_ARRAYLANG['TXT_IMMO_FROM'],
-                'TXT_IMMO_TO'	    		 		 =>	$_ARRAYLANG['TXT_IMMO_TO'],
-                'TXT_IMMO_INTERESTS'	    		 =>	$_ARRAYLANG['TXT_IMMO_INTERESTS'],
-                'TXT_IMMO_DOWNLOAD_LIST'     		 =>	$_ARRAYLANG['TXT_IMMO_DOWNLOAD_LIST'],
-                'TXT_IMMO_INTEREST_SEARCH'     		 =>	$_ARRAYLANG['TXT_IMMO_INTEREST_SEARCH'],
-                'TXT_IMMO_SHOW_TIMESPAN_DETAILS'     =>	$_ARRAYLANG['TXT_IMMO_SHOW_TIMESPAN_DETAILS'],
-                'TXT_IMMO_IGNORE_TIMESPAN'    		 =>	$_ARRAYLANG['TXT_IMMO_IGNORE_TIMESPAN'],
-                'TXT_IMMO_REFRESH'		    		 =>	$_ARRAYLANG['TXT_IMMO_REFRESH'],
-                'CALENDAR_TODAY'					 => !empty($_SESSION['immo']['startDate']) ? $_SESSION['immo']['startDate'] : date('Y-m-d', strtotime('-1 month')),
-                'CALENDAR_NEXT_MONTH'				 => !empty($_SESSION['immo']['endDate']) ? $_SESSION['immo']['endDate'] : date('Y-m-d'),
-                'PATH_OFFSET'						 => ASCMS_PATH_OFFSET,
-                'IMMO_FORM_ACTION_ID'				 => $immoID,
-                'IMMO_ID'							 => $immoID,
-                'IMMO_PAGING_LIMIT'				     =>	$limit,
-                'IMMO_PAGING_POS'				     =>	$pos,
-                'IMMO_PAGING_FIELD'				     =>	$field,
-                'IMMO_HSEARCH_FIELD'			     =>	$hsearchField,
-                'IMMO_HSEARCH'					     =>	$hsearch,
+                'TXT_IMMO_EXPORT'                      =>    $_ARRAYLANG['TXT_IMMO_EXPORT'],
+                'TXT_IMMO_DOWNLOADS'                 =>    $_ARRAYLANG['TXT_IMMO_DOWNLOADS'],
+                'TXT_IMMO_OBJECT'                     =>    $_ARRAYLANG['TXT_IMMO_OBJECT'],
+                'TXT_IMMO_VISITS'                     =>    $_ARRAYLANG['TXT_IMMO_VISITS'],
+                'TXT_IMMO_HEADER'                     =>    $_ARRAYLANG['TXT_IMMO_HEADER'],
+                'TXT_IMMO_LOCATION'                     =>    $_ARRAYLANG['TXT_IMMO_LOCATION'],
+                'TXT_IMMO_SEARCH'                     =>    $_ARRAYLANG['TXT_IMMO_SEARCH'],
+                'TXT_IMMO_DOWNLOAD_SEARCH'             =>    $_ARRAYLANG['TXT_IMMO_DOWNLOAD_SEARCH'],
+                'TXT_IMMO_SORT'                         =>    $_ARRAYLANG['TXT_IMMO_SORT'],
+                'TXT_IMMO_IMMO_ID'                     =>    $_ARRAYLANG['TXT_IMMO_IMMO_ID'],
+                'TXT_IMMO_EMAIL'                     =>    $_ARRAYLANG['TXT_IMMO_EMAIL'],
+                'TXT_IMMO_NAME'                         =>    $_ARRAYLANG['TXT_IMMO_NAME'],
+                'TXT_IMMO_FIRSTNAME'                 =>    $_ARRAYLANG['TXT_IMMO_FIRSTNAME'],
+                'TXT_IMMO_COMPANY'                     =>    $_ARRAYLANG['TXT_IMMO_COMPANY'],
+                'TXT_IMMO_STREET'                     =>    $_ARRAYLANG['TXT_IMMO_STREET'],
+                'TXT_IMMO_ZIP'                         =>    $_ARRAYLANG['TXT_IMMO_ZIP'],
+                'TXT_IMMO_LOCATION'                     =>    $_ARRAYLANG['TXT_IMMO_LOCATION'],
+                'TXT_IMMO_TELEPHONE'                 =>    $_ARRAYLANG['TXT_IMMO_TELEPHONE'],
+                'TXT_IMMO_TELEPHONE_OFFICE'             =>    $_ARRAYLANG['TXT_IMMO_TELEPHONE_OFFICE'],
+                'TXT_IMMO_TELEPHONE_MOBILE'             =>    $_ARRAYLANG['TXT_IMMO_TELEPHONE_MOBILE'],
+                'TXT_IMMO_PURCHASE'                     =>    $_ARRAYLANG['TXT_IMMO_PURCHASE'],
+                'TXT_IMMO_FUNDING'                     =>    $_ARRAYLANG['TXT_IMMO_FUNDING'],
+                'TXT_IMMO_COMMENT'                     =>    $_ARRAYLANG['TXT_IMMO_COMMENT'],
+                'TXT_IMMO_TIMESTAMP'                 =>    $_ARRAYLANG['TXT_IMMO_TIMESTAMP'],
+                'TXT_IMMO_EXPORT'                           =>    $_ARRAYLANG['TXT_IMMO_EXPORT'],
+                'TXT_IMMO_FUNCTIONS'                    =>    $_ARRAYLANG['TXT_IMMO_FUNCTIONS'],
+                'TXT_IMMO_SEPARATOR'                    =>    $_ARRAYLANG['TXT_IMMO_SEPARATOR'],
+                'TXT_IMMO_EDIT'                            =>    $_ARRAYLANG['TXT_IMMO_EDIT'],
+                'TXT_IMMO_DELETE'                        =>    $_ARRAYLANG['TXT_IMMO_DELETE'],
+                'TXT_IMMO_CONFIRM_DELETE_CONTACT'    =>    $_ARRAYLANG['TXT_IMMO_CONFIRM_DELETE_CONTACT'],
+                'TXT_IMMO_CANNOT_UNDO_OPERATION'     =>    $_ARRAYLANG['TXT_IMMO_CANNOT_UNDO_OPERATION'],
+                'TXT_IMMO_DETAILS'                      =>    $_ARRAYLANG['TXT_IMMO_DETAILS'],
+                'TXT_IMMO_TIMESPAN'                      =>    $_ARRAYLANG['TXT_IMMO_TIMESPAN'],
+                'TXT_IMMO_FROM'                          =>    $_ARRAYLANG['TXT_IMMO_FROM'],
+                'TXT_IMMO_TO'                          =>    $_ARRAYLANG['TXT_IMMO_TO'],
+                'TXT_IMMO_INTERESTS'                 =>    $_ARRAYLANG['TXT_IMMO_INTERESTS'],
+                'TXT_IMMO_DOWNLOAD_LIST'              =>    $_ARRAYLANG['TXT_IMMO_DOWNLOAD_LIST'],
+                'TXT_IMMO_INTEREST_SEARCH'              =>    $_ARRAYLANG['TXT_IMMO_INTEREST_SEARCH'],
+                'TXT_IMMO_SHOW_TIMESPAN_DETAILS'     =>    $_ARRAYLANG['TXT_IMMO_SHOW_TIMESPAN_DETAILS'],
+                'TXT_IMMO_IGNORE_TIMESPAN'             =>    $_ARRAYLANG['TXT_IMMO_IGNORE_TIMESPAN'],
+                'TXT_IMMO_REFRESH'                     =>    $_ARRAYLANG['TXT_IMMO_REFRESH'],
+                'CALENDAR_TODAY'                     => !empty($_SESSION['immo']['startDate']) ? $_SESSION['immo']['startDate'] : date('Y-m-d', strtotime('-1 month')),
+                'CALENDAR_NEXT_MONTH'                 => !empty($_SESSION['immo']['endDate']) ? $_SESSION['immo']['endDate'] : date('Y-m-d'),
+                'PATH_OFFSET'                         => ASCMS_PATH_OFFSET,
+                'IMMO_FORM_ACTION_ID'                 => $immoID,
+                'IMMO_ID'                             => $immoID,
+                'IMMO_PAGING_LIMIT'                     =>    $limit,
+                'IMMO_PAGING_POS'                     =>    $pos,
+                'IMMO_PAGING_FIELD'                     =>    $field,
+                'IMMO_HSEARCH_FIELD'                 =>    $hsearchField,
+                'IMMO_HSEARCH'                         =>    $hsearch,
 
         ));
         $rowclass = 2;
@@ -1080,34 +1080,34 @@ class Immo extends ImmoLib
         //get contact and download stats
         $searchTerm = (!empty($_REQUEST['search'])) ? " LIKE '%".contrexx_addslashes($_REQUEST['search'])."%'" : ' TRUE';
         $searchField = (!empty($_REQUEST['searchField']) && !empty($_REQUEST['search'])) ? ' WHERE '.contrexx_addslashes($_REQUEST['searchField']) : ' WHERE ';
-        $query = "	SELECT 	`contact`.`id` , `email` , `name` , `firstname` , `street` , `zip` , `location` ,
-							`company` , `telephone` , `telephone_office` , `telephone_mobile` , `purchase` ,
-							`funding` ,  `comment` , `contact`.`immo_id` , `timestamp`, content1.fieldvalue AS immo_header, content2.fieldvalue AS immo_address, content3.fieldvalue AS immo_location
-					FROM `".DBPREFIX."module_immo_contact` AS contact
-					LEFT JOIN `".DBPREFIX."module_immo_content` AS content1 ON content1.immo_id = contact.id
-						AND content1.lang_id =1
-						AND content1.field_id = (
-							SELECT field_id
-							FROM `".DBPREFIX."module_immo_fieldname` AS fname
-							WHERE lower( name ) = '".$this->_headline."'
-							AND fname.lang_id =1
-						)
-					LEFT JOIN `".DBPREFIX."module_immo_content` AS content2 ON content2.immo_id = contact.id
-						AND content2.lang_id =1
-						AND content2.field_id = (
-							SELECT field_id
-							FROM `".DBPREFIX."module_immo_fieldname` AS fname
-							WHERE lower( name ) = 'adresse'
-							AND fname.lang_id =1
-						)
-					LEFT JOIN `".DBPREFIX."module_immo_content` AS content3 ON content3.immo_id = contact.id
-						AND content3.lang_id =1
-						AND content3.field_id = (
-							SELECT field_id
-							FROM `".DBPREFIX."module_immo_fieldname` AS fname
-							WHERE lower( name ) = 'ort'
-							AND fname.lang_id =1
-						)"
+        $query = "    SELECT     `contact`.`id` , `email` , `name` , `firstname` , `street` , `zip` , `location` ,
+                            `company` , `telephone` , `telephone_office` , `telephone_mobile` , `purchase` ,
+                            `funding` ,  `comment` , `contact`.`immo_id` , `timestamp`, content1.fieldvalue AS immo_header, content2.fieldvalue AS immo_address, content3.fieldvalue AS immo_location
+                    FROM `".DBPREFIX."module_immo_contact` AS contact
+                    LEFT JOIN `".DBPREFIX."module_immo_content` AS content1 ON content1.immo_id = contact.id
+                        AND content1.lang_id =1
+                        AND content1.field_id = (
+                            SELECT field_id
+                            FROM `".DBPREFIX."module_immo_fieldname` AS fname
+                            WHERE lower( name ) = '".$this->_headline."'
+                            AND fname.lang_id =1
+                        )
+                    LEFT JOIN `".DBPREFIX."module_immo_content` AS content2 ON content2.immo_id = contact.id
+                        AND content2.lang_id =1
+                        AND content2.field_id = (
+                            SELECT field_id
+                            FROM `".DBPREFIX."module_immo_fieldname` AS fname
+                            WHERE lower( name ) = 'adresse'
+                            AND fname.lang_id =1
+                        )
+                    LEFT JOIN `".DBPREFIX."module_immo_content` AS content3 ON content3.immo_id = contact.id
+                        AND content3.lang_id =1
+                        AND content3.field_id = (
+                            SELECT field_id
+                            FROM `".DBPREFIX."module_immo_fieldname` AS fname
+                            WHERE lower( name ) = 'ort'
+                            AND fname.lang_id =1
+                        )"
                 .$searchField." ".$searchTerm;
 
         if($immoID > 0) {
@@ -1123,34 +1123,34 @@ class Immo extends ImmoLib
             $objRS = $objDatabase->SelectLimit($query, $limit, $pos);
             while(!$objRS->EOF) {
                 $this->_objTpl->setVariable(array(
-                        'IMMO_CONTACT_ID'		=>	intval($objRS->fields['id']),
-                        'IMMO_IMMO_ID'			=>	htmlspecialchars($objRS->fields['immo_id']),
-                        'IMMO_OBJECT_HEADER'	=>	htmlspecialchars($objRS->fields['immo_header']),
-                        'IMMO_OBJECT_ADDRESS'	=>	htmlspecialchars($objRS->fields['immo_address']),
-                        'IMMO_OBJECT_LOCATION'	=>	htmlspecialchars($objRS->fields['immo_location']),
-                        'IMMO_EMAIL'			=>	htmlspecialchars($objRS->fields['email']),
-                        'IMMO_NAME'				=>	htmlspecialchars($objRS->fields['name']),
-                        'IMMO_FIRSTNAME'		=>	htmlspecialchars($objRS->fields['firstname']),
-                        'IMMO_COMPANY'			=>	htmlspecialchars($objRS->fields['company']),
-                        'IMMO_STREET'			=>	htmlspecialchars($objRS->fields['street']),
-                        'IMMO_ZIP'				=>	htmlspecialchars($objRS->fields['zip']),
-                        'IMMO_LOCATION'			=>	htmlspecialchars($objRS->fields['location']),
-                        'IMMO_TELEPHONE'		=>	htmlspecialchars($objRS->fields['telephone']),
-                        'IMMO_TELEPHONE_OFFICE'	=>	htmlspecialchars($objRS->fields['telephone_office']),
-                        'IMMO_TELEPHONE_MOBILE'	=>	htmlspecialchars($objRS->fields['telephone_mobile']),
-                        'IMMO_PURCHASE'			=>	htmlspecialchars($objRS->fields['purchase']),
-                        'IMMO_FUNDING'			=>	htmlspecialchars($objRS->fields['funding']),
-                        'IMMO_COMMENT'			=>	str_replace(array("\r\n", "\n"), '<br />', htmlspecialchars($objRS->fields['comment'])),
-                        'IMMO_COMMENT_TEXT'		=>	str_replace(array("\r\n", "\n"), '<br />', htmlspecialchars($objRS->fields['comment'])),
-                        'IMMO_TIMESTAMP'		=>	date(ASCMS_DATE_FORMAT ,$objRS->fields['timestamp']),
-                        'ROW_CLASS'				=>	($rowclass++ % 2 == 0) ? 'row1' : 'row2',
+                        'IMMO_CONTACT_ID'        =>    intval($objRS->fields['id']),
+                        'IMMO_IMMO_ID'            =>    htmlspecialchars($objRS->fields['immo_id']),
+                        'IMMO_OBJECT_HEADER'    =>    htmlspecialchars($objRS->fields['immo_header']),
+                        'IMMO_OBJECT_ADDRESS'    =>    htmlspecialchars($objRS->fields['immo_address']),
+                        'IMMO_OBJECT_LOCATION'    =>    htmlspecialchars($objRS->fields['immo_location']),
+                        'IMMO_EMAIL'            =>    htmlspecialchars($objRS->fields['email']),
+                        'IMMO_NAME'                =>    htmlspecialchars($objRS->fields['name']),
+                        'IMMO_FIRSTNAME'        =>    htmlspecialchars($objRS->fields['firstname']),
+                        'IMMO_COMPANY'            =>    htmlspecialchars($objRS->fields['company']),
+                        'IMMO_STREET'            =>    htmlspecialchars($objRS->fields['street']),
+                        'IMMO_ZIP'                =>    htmlspecialchars($objRS->fields['zip']),
+                        'IMMO_LOCATION'            =>    htmlspecialchars($objRS->fields['location']),
+                        'IMMO_TELEPHONE'        =>    htmlspecialchars($objRS->fields['telephone']),
+                        'IMMO_TELEPHONE_OFFICE'    =>    htmlspecialchars($objRS->fields['telephone_office']),
+                        'IMMO_TELEPHONE_MOBILE'    =>    htmlspecialchars($objRS->fields['telephone_mobile']),
+                        'IMMO_PURCHASE'            =>    htmlspecialchars($objRS->fields['purchase']),
+                        'IMMO_FUNDING'            =>    htmlspecialchars($objRS->fields['funding']),
+                        'IMMO_COMMENT'            =>    str_replace(array("\r\n", "\n"), '<br />', htmlspecialchars($objRS->fields['comment'])),
+                        'IMMO_COMMENT_TEXT'        =>    str_replace(array("\r\n", "\n"), '<br />', htmlspecialchars($objRS->fields['comment'])),
+                        'IMMO_TIMESTAMP'        =>    date(ASCMS_DATE_FORMAT ,$objRS->fields['timestamp']),
+                        'ROW_CLASS'                =>    ($rowclass++ % 2 == 0) ? 'row1' : 'row2',
                 ));
                 $this->_objTpl->parse('downloads');
                 $objRS->MoveNext();
             }
         }
         $this->_objTpl->setVariable(array(
-                'IMMO_STATS_DOWNLOADS_PAGING'	=> getPaging($count, $pos, '&amp;cmd=immo&amp;act=downloads&amp;limit='.$limit, '', true),
+                'IMMO_STATS_DOWNLOADS_PAGING'    => getPaging($count, $pos, '&amp;cmd=immo&amp;act=downloads&amp;limit='.$limit, '', true),
         ));
     }
 
@@ -1170,31 +1170,31 @@ class Immo extends ImmoLib
         if(!in_array($field, $fieldValues) && ( $order != 'asc' || $order != 'desc' )) {
             die();
         }
-        $query = "	SELECT count( 1 ) AS int_count, immo.reference as int_reference, immo.ref_nr_note as int_ref_note, a.fieldvalue AS int_header, immo.id as int_immoid
-					FROM `".DBPREFIX."module_immo_interest`
-						AS interest
-					LEFT JOIN ".DBPREFIX."module_immo
-						AS immo
-						ON ( interest.immo_id = immo.id )
-					LEFT JOIN ".DBPREFIX."module_immo_content
-						AS a
-						ON ( a.immo_id = interest.immo_id )
-					LEFT JOIN ".DBPREFIX."module_immo_fieldname
-						AS fn
-						ON ( a.field_id = fn.field_id )
-					WHERE lower( fn.name ) = '".$this->_headline."'";
+        $query = "    SELECT count( 1 ) AS int_count, immo.reference as int_reference, immo.ref_nr_note as int_ref_note, a.fieldvalue AS int_header, immo.id as int_immoid
+                    FROM `".DBPREFIX."module_immo_interest`
+                        AS interest
+                    LEFT JOIN ".DBPREFIX."module_immo
+                        AS immo
+                        ON ( interest.immo_id = immo.id )
+                    LEFT JOIN ".DBPREFIX."module_immo_content
+                        AS a
+                        ON ( a.immo_id = interest.immo_id )
+                    LEFT JOIN ".DBPREFIX."module_immo_fieldname
+                        AS fn
+                        ON ( a.field_id = fn.field_id )
+                    WHERE lower( fn.name ) = '".$this->_headline."'";
 
 
         if(empty($_REQUEST['ignore_timespan']) && !empty($_SESSION['immo']['startDate'])) {
             $query .= " AND `time` BETWEEN ".strtotime($_SESSION['immo']['startDate'])." AND ".strtotime($_SESSION['immo']['endDate']);
         }
         $query .= " AND fn.lang_id =1
-					AND a.lang_id = 1
-					GROUP BY interest.immo_id
-					ORDER BY ".$field." ".$order;
-        $objRS		= $objDatabase->SelectLimit($query, $limit, $pos);
-        $limit 		= ($limit > $objRS->RecordCount()) ? $objRS->RecordCount() : $limit;
-        $interests	= '';
+                    AND a.lang_id = 1
+                    GROUP BY interest.immo_id
+                    ORDER BY ".$field." ".$order;
+        $objRS        = $objDatabase->SelectLimit($query, $limit, $pos);
+        $limit         = ($limit > $objRS->RecordCount()) ? $objRS->RecordCount() : $limit;
+        $interests    = '';
         for($i=0; $i<$limit; $i++) {
             $interests .= 'interests['.$i.'] = { ';
             //escape string and replace space escape
@@ -1230,34 +1230,34 @@ class Immo extends ImmoLib
         $searchTerm = (!empty($_REQUEST['search']) && !empty($_REQUEST['searchField'])) ? " LIKE '%".contrexx_addslashes($_REQUEST['search'])."%'" : ' TRUE';
         $searchField = (!empty($_REQUEST['searchField']) && !empty($_REQUEST['search'])) ? ' WHERE '.contrexx_addslashes($_REQUEST['searchField']) : ' WHERE ';
 
-        $query = "	SELECT 	`contact`.`id` as contact_id , `email` , `name` , `firstname` , `street` , `zip` , `location` ,
-							`company` , `telephone` , `telephone_office` , `telephone_mobile` , `purchase` ,
-							`funding` ,  `comment` , `contact`.`immo_id` , `timestamp`, content1.fieldvalue AS immo_header, content2.fieldvalue AS immo_address, content3.fieldvalue AS immo_location
-					FROM `".DBPREFIX."module_immo_contact` AS contact
-					LEFT JOIN `".DBPREFIX."module_immo_content` AS content1 ON content1.immo_id = contact.immo_id
-						AND content1.lang_id =1
-						AND content1.field_id = (
-							SELECT field_id
-							FROM `".DBPREFIX."module_immo_fieldname` AS fname
-							WHERE lower( name ) = '".$this->_headline."'
-							AND fname.lang_id =1
-						)
-					LEFT JOIN `".DBPREFIX."module_immo_content` AS content2 ON content2.immo_id = contact.immo_id
-						AND content2.lang_id =1
-						AND content2.field_id = (
-							SELECT field_id
-							FROM `".DBPREFIX."module_immo_fieldname` AS fname
-							WHERE lower( name ) = 'adresse'
-							AND fname.lang_id =1
-						)
-					LEFT JOIN `".DBPREFIX."module_immo_content` AS content3 ON content3.immo_id = contact.immo_id
-						AND content3.lang_id =1
-						AND content3.field_id = (
-							SELECT field_id
-							FROM `".DBPREFIX."module_immo_fieldname` AS fname
-							WHERE lower( name ) = 'ort'
-							AND fname.lang_id =1
-						)"
+        $query = "    SELECT     `contact`.`id` as contact_id , `email` , `name` , `firstname` , `street` , `zip` , `location` ,
+                            `company` , `telephone` , `telephone_office` , `telephone_mobile` , `purchase` ,
+                            `funding` ,  `comment` , `contact`.`immo_id` , `timestamp`, content1.fieldvalue AS immo_header, content2.fieldvalue AS immo_address, content3.fieldvalue AS immo_location
+                    FROM `".DBPREFIX."module_immo_contact` AS contact
+                    LEFT JOIN `".DBPREFIX."module_immo_content` AS content1 ON content1.immo_id = contact.immo_id
+                        AND content1.lang_id =1
+                        AND content1.field_id = (
+                            SELECT field_id
+                            FROM `".DBPREFIX."module_immo_fieldname` AS fname
+                            WHERE lower( name ) = '".$this->_headline."'
+                            AND fname.lang_id =1
+                        )
+                    LEFT JOIN `".DBPREFIX."module_immo_content` AS content2 ON content2.immo_id = contact.immo_id
+                        AND content2.lang_id =1
+                        AND content2.field_id = (
+                            SELECT field_id
+                            FROM `".DBPREFIX."module_immo_fieldname` AS fname
+                            WHERE lower( name ) = 'adresse'
+                            AND fname.lang_id =1
+                        )
+                    LEFT JOIN `".DBPREFIX."module_immo_content` AS content3 ON content3.immo_id = contact.immo_id
+                        AND content3.lang_id =1
+                        AND content3.field_id = (
+                            SELECT field_id
+                            FROM `".DBPREFIX."module_immo_fieldname` AS fname
+                            WHERE lower( name ) = 'ort'
+                            AND fname.lang_id =1
+                        )"
                 .$searchField." ".$searchTerm;
         if($_REQUEST['ignore_timespan'] !== 'on' && !empty($_SESSION['immo']['startDate'])) {
             $query .= " AND `timestamp` BETWEEN ".strtotime($_SESSION['immo']['startDate'])." AND ".strtotime($_SESSION['immo']['endDate']);
@@ -1338,26 +1338,26 @@ class Immo extends ImmoLib
                         c.fieldvalue AS address
                     FROM ".DBPREFIX."module_immo AS immo
                     LEFT JOIN ".DBPREFIX."module_immo_content AS a ON ( immo.id = a.immo_id
-    																AND a.field_id = (
-    																	SELECT field_id
-    																	FROM ".DBPREFIX."module_immo_fieldname
-    																	WHERE name = 'ausl�nder-bewilligung'
-    																	AND lang_id = 1 )
-    																AND a.lang_id = 1 )
+                                                                    AND a.field_id = (
+                                                                        SELECT field_id
+                                                                        FROM ".DBPREFIX."module_immo_fieldname
+                                                                        WHERE name = 'ausl�nder-bewilligung'
+                                                                        AND lang_id = 1 )
+                                                                    AND a.lang_id = 1 )
                     LEFT JOIN ".DBPREFIX."module_immo_content AS b ON ( immo.id = b.immo_id
-    																AND b.field_id = (
-    																	SELECT field_id
-    																	FROM ".DBPREFIX."module_immo_fieldname
-    																	WHERE name = 'ort'
-    																	AND lang_id = 1 )
-    																AND b.lang_id = 1 )
-               	    LEFT JOIN ".DBPREFIX."module_immo_content AS c ON ( immo.id = c.immo_id
-    																AND c.field_id = (
-    																	SELECT field_id
-    																	FROM ".DBPREFIX."module_immo_fieldname
-    																	WHERE name = 'adresse'
-    																	AND lang_id = 1 )
-    																AND c.lang_id = 1 )
+                                                                    AND b.field_id = (
+                                                                        SELECT field_id
+                                                                        FROM ".DBPREFIX."module_immo_fieldname
+                                                                        WHERE name = 'ort'
+                                                                        AND lang_id = 1 )
+                                                                    AND b.lang_id = 1 )
+                       LEFT JOIN ".DBPREFIX."module_immo_content AS c ON ( immo.id = c.immo_id
+                                                                    AND c.field_id = (
+                                                                        SELECT field_id
+                                                                        FROM ".DBPREFIX."module_immo_fieldname
+                                                                        WHERE name = 'adresse'
+                                                                        AND lang_id = 1 )
+                                                                    AND c.lang_id = 1 )
                     ORDER BY $orderby";
 
         $keys1 = array_filter(array_keys($_ARRAYLANG), array(&$this,"filterImmoType"));
@@ -1370,26 +1370,26 @@ class Immo extends ImmoLib
                         FROM ".DBPREFIX."module_immo AS immo
                         LEFT JOIN ".DBPREFIX."module_immo_content AS content on ( content.immo_id = immo.id )
                         LEFT JOIN ".DBPREFIX."module_immo_content AS a ON ( immo.id = a.immo_id
-        																AND a.field_id = (
-        																	SELECT field_id
-        																	FROM ".DBPREFIX."module_immo_fieldname
-        																	WHERE name = 'ausl�nder-bewilligung'
-        																	AND lang_id = 1 )
-        																AND a.lang_id = 1 )
+                                                                        AND a.field_id = (
+                                                                            SELECT field_id
+                                                                            FROM ".DBPREFIX."module_immo_fieldname
+                                                                            WHERE name = 'ausl�nder-bewilligung'
+                                                                            AND lang_id = 1 )
+                                                                        AND a.lang_id = 1 )
                         LEFT JOIN ".DBPREFIX."module_immo_content AS b ON ( immo.id = b.immo_id
-        																AND b.field_id = (
-        																	SELECT field_id
-        																	FROM ".DBPREFIX."module_immo_fieldname
-        																	WHERE name = 'ort'
-        																	AND lang_id = 1 )
-        																AND b.lang_id = 1 )
+                                                                        AND b.field_id = (
+                                                                            SELECT field_id
+                                                                            FROM ".DBPREFIX."module_immo_fieldname
+                                                                            WHERE name = 'ort'
+                                                                            AND lang_id = 1 )
+                                                                        AND b.lang_id = 1 )
                         LEFT JOIN ".DBPREFIX."module_immo_content AS c ON ( immo.id = c.immo_id
-        																AND c.field_id = (
-        																	SELECT field_id
-        																	FROM ".DBPREFIX."module_immo_fieldname
-        																	WHERE name = 'adresse'
-        																	AND lang_id = 1 )
-        																AND c.lang_id = 1 )
+                                                                        AND c.field_id = (
+                                                                            SELECT field_id
+                                                                            FROM ".DBPREFIX."module_immo_fieldname
+                                                                            WHERE name = 'adresse'
+                                                                            AND lang_id = 1 )
+                                                                        AND c.lang_id = 1 )
                         WHERE TRUE ";
 
             if(!empty($searchterm) && intval($searchterm) == 0) {
@@ -1446,36 +1446,36 @@ class Immo extends ImmoLib
             die();
         }
 
-        $query = "	SELECT page, visits, content1.fieldvalue AS header, content2.fieldvalue AS location, immo.reference as reference, immo.ref_nr_note as ref_note
-					FROM `".DBPREFIX."stats_requests`
-					LEFT JOIN `".DBPREFIX."module_immo_content` AS content1 ON content1.immo_id = CAST(MID(`page`, 40, 8 ) AS UNSIGNED)
-						AND content1.lang_id =1
-						AND content1.field_id = (
-							SELECT field_id
-							FROM `".DBPREFIX."module_immo_fieldname` AS fname
-							WHERE lower( name ) = '".$this->_headline."'
-							AND fname.lang_id =1
-						)
-					LEFT JOIN `".DBPREFIX."module_immo_content` AS content2 ON content2.immo_id = CAST(MID(`page`, 40, 8) AS UNSIGNED)
-						AND content2.lang_id =1
-						AND content2.field_id = (
-							SELECT field_id
-							FROM `".DBPREFIX."module_immo_fieldname` AS fname
-							WHERE lower( name ) = 'ort'
-							AND fname.lang_id =1
-						)
-					LEFT JOIN `".DBPREFIX."module_immo` AS immo ON immo.id = CAST(MID(`page`, 40, 8) AS UNSIGNED)
-					WHERE page LIKE '/index.php?section=immo&cmd=showObj&id=%'";
+        $query = "    SELECT page, visits, content1.fieldvalue AS header, content2.fieldvalue AS location, immo.reference as reference, immo.ref_nr_note as ref_note
+                    FROM `".DBPREFIX."stats_requests`
+                    LEFT JOIN `".DBPREFIX."module_immo_content` AS content1 ON content1.immo_id = CAST(MID(`page`, 40, 8 ) AS UNSIGNED)
+                        AND content1.lang_id =1
+                        AND content1.field_id = (
+                            SELECT field_id
+                            FROM `".DBPREFIX."module_immo_fieldname` AS fname
+                            WHERE lower( name ) = '".$this->_headline."'
+                            AND fname.lang_id =1
+                        )
+                    LEFT JOIN `".DBPREFIX."module_immo_content` AS content2 ON content2.immo_id = CAST(MID(`page`, 40, 8) AS UNSIGNED)
+                        AND content2.lang_id =1
+                        AND content2.field_id = (
+                            SELECT field_id
+                            FROM `".DBPREFIX."module_immo_fieldname` AS fname
+                            WHERE lower( name ) = 'ort'
+                            AND fname.lang_id =1
+                        )
+                    LEFT JOIN `".DBPREFIX."module_immo` AS immo ON immo.id = CAST(MID(`page`, 40, 8) AS UNSIGNED)
+                    WHERE page LIKE '/index.php?section=immo&cmd=showObj&id=%'";
         if(empty($_REQUEST['ignore_timespan']) && !empty($_SESSION['immo']['startDate'])) {
             $query .= " AND `timestamp` BETWEEN ".strtotime($_SESSION['immo']['startDate'])." AND ".strtotime($_SESSION['immo']['endDate']);
         }
         $query .= "
-					GROUP BY reference
-					ORDER BY ".$field." ".$order;
+                    GROUP BY reference
+                    ORDER BY ".$field." ".$order;
 
-        $objRS		= $objDatabase->SelectLimit($query, $limit, $pos);
-        $limit 		= ($limit > $objRS->RecordCount()) ? $objRS->RecordCount() : $limit;
-        $requests	= '';
+        $objRS        = $objDatabase->SelectLimit($query, $limit, $pos);
+        $limit         = ($limit > $objRS->RecordCount()) ? $objRS->RecordCount() : $limit;
+        $requests    = '';
         for($i=0; $i<$limit; $i++) {
             $requests .= 'requests['.$i.'] = { ';
             //escape string and replace space escape
@@ -1506,35 +1506,35 @@ class Immo extends ImmoLib
         if(!in_array($field, $fieldValues) && ( $order != 'asc' || $order != 'desc' )) {
             die();
         }
-        $query = "	SELECT count( 1 ) AS dl_count, immo.reference as dl_reference, immo.ref_nr_note as dl_ref_note, a.fieldvalue AS dl_header, b.name AS dl_linkname, immo.id as dl_immoid
-					FROM `".DBPREFIX."module_immo_contact`
-						AS contact
-					LEFT JOIN ".DBPREFIX."module_immo
-						AS immo
-						ON ( contact.immo_id = immo.id )
-					LEFT JOIN ".DBPREFIX."module_immo_content
-						AS a
-						ON ( a.immo_id = contact.immo_id )
-					LEFT JOIN ".DBPREFIX."module_immo_fieldname
-						AS fn
-						ON ( a.field_id = fn.field_id )
-					LEFT JOIN ".DBPREFIX."module_immo_fieldname
-						AS b
-						ON ( b.field_id = contact.field_id )
-					WHERE lower( fn.name ) = '".$this->_headline."'";
+        $query = "    SELECT count( 1 ) AS dl_count, immo.reference as dl_reference, immo.ref_nr_note as dl_ref_note, a.fieldvalue AS dl_header, b.name AS dl_linkname, immo.id as dl_immoid
+                    FROM `".DBPREFIX."module_immo_contact`
+                        AS contact
+                    LEFT JOIN ".DBPREFIX."module_immo
+                        AS immo
+                        ON ( contact.immo_id = immo.id )
+                    LEFT JOIN ".DBPREFIX."module_immo_content
+                        AS a
+                        ON ( a.immo_id = contact.immo_id )
+                    LEFT JOIN ".DBPREFIX."module_immo_fieldname
+                        AS fn
+                        ON ( a.field_id = fn.field_id )
+                    LEFT JOIN ".DBPREFIX."module_immo_fieldname
+                        AS b
+                        ON ( b.field_id = contact.field_id )
+                    WHERE lower( fn.name ) = '".$this->_headline."'";
 
 
         if(empty($_REQUEST['ignore_timespan']) && !empty($_SESSION['immo']['startDate'])) {
             $query .= " AND `timestamp` BETWEEN ".strtotime($_SESSION['immo']['startDate'])." AND ".strtotime($_SESSION['immo']['endDate']);
         }
         $query .= " AND fn.lang_id =1
-					AND a.lang_id = 1
-					AND b.lang_id = 1
-					GROUP BY contact.immo_id
-					ORDER BY ".$field." ".$order;
-        $objRS		= $objDatabase->SelectLimit($query, $limit, $pos);
-        $limit 		= ($limit > $objRS->RecordCount()) ? $objRS->RecordCount() : $limit;
-        $requests	= '';
+                    AND a.lang_id = 1
+                    AND b.lang_id = 1
+                    GROUP BY contact.immo_id
+                    ORDER BY ".$field." ".$order;
+        $objRS        = $objDatabase->SelectLimit($query, $limit, $pos);
+        $limit         = ($limit > $objRS->RecordCount()) ? $objRS->RecordCount() : $limit;
+        $requests    = '';
         for($i=0; $i<$limit; $i++) {
             $requests .= 'requests['.$i.'] = { ';
             //escape string and replace space escape
@@ -1581,26 +1581,26 @@ class Immo extends ImmoLib
                             c.fieldvalue AS address
                         FROM ".DBPREFIX."module_immo AS immo
                         LEFT JOIN ".DBPREFIX."module_immo_content AS a ON ( immo.id = a.immo_id
-        																AND a.field_id = (
-        																	SELECT field_id
-        																	FROM ".DBPREFIX."module_immo_fieldname
-        																	WHERE name = 'ausl�nder-bewilligung'
-        																	AND lang_id = 1 )
-        																AND a.lang_id = 1 )
+                                                                        AND a.field_id = (
+                                                                            SELECT field_id
+                                                                            FROM ".DBPREFIX."module_immo_fieldname
+                                                                            WHERE name = 'ausl�nder-bewilligung'
+                                                                            AND lang_id = 1 )
+                                                                        AND a.lang_id = 1 )
                         LEFT JOIN ".DBPREFIX."module_immo_content AS b ON ( immo.id = b.immo_id
-        																AND b.field_id = (
-        																	SELECT field_id
-        																	FROM ".DBPREFIX."module_immo_fieldname
-        																	WHERE name = 'ort'
-        																	AND lang_id = 1 )
-        																AND b.lang_id = 1 )
-                   	    LEFT JOIN ".DBPREFIX."module_immo_content AS c ON ( immo.id = c.immo_id
-        																AND c.field_id = (
-        																	SELECT field_id
-        																	FROM ".DBPREFIX."module_immo_fieldname
-        																	WHERE name = 'adresse'
-        																	AND lang_id = 1 )
-        																AND c.lang_id = 1 )
+                                                                        AND b.field_id = (
+                                                                            SELECT field_id
+                                                                            FROM ".DBPREFIX."module_immo_fieldname
+                                                                            WHERE name = 'ort'
+                                                                            AND lang_id = 1 )
+                                                                        AND b.lang_id = 1 )
+                           LEFT JOIN ".DBPREFIX."module_immo_content AS c ON ( immo.id = c.immo_id
+                                                                        AND c.field_id = (
+                                                                            SELECT field_id
+                                                                            FROM ".DBPREFIX."module_immo_fieldname
+                                                                            WHERE name = 'adresse'
+                                                                            AND lang_id = 1 )
+                                                                        AND c.lang_id = 1 )
 
                         ORDER BY immo.id DESC";
 
@@ -1616,26 +1616,26 @@ class Immo extends ImmoLib
                         FROM ".DBPREFIX."module_immo AS immo
                         LEFT JOIN ".DBPREFIX."module_immo_content AS content on ( content.immo_id = immo.id )
                         LEFT JOIN ".DBPREFIX."module_immo_content AS a ON ( immo.id = a.immo_id
-        																AND a.field_id = (
-        																	SELECT field_id
-        																	FROM ".DBPREFIX."module_immo_fieldname
-        																	WHERE name = 'ausl�nder-bewilligung'
-        																	AND lang_id = 1 )
-        																AND a.lang_id = 1 )
+                                                                        AND a.field_id = (
+                                                                            SELECT field_id
+                                                                            FROM ".DBPREFIX."module_immo_fieldname
+                                                                            WHERE name = 'ausl�nder-bewilligung'
+                                                                            AND lang_id = 1 )
+                                                                        AND a.lang_id = 1 )
                         LEFT JOIN ".DBPREFIX."module_immo_content AS b ON ( immo.id = b.immo_id
-        																AND b.field_id = (
-        																	SELECT field_id
-        																	FROM ".DBPREFIX."module_immo_fieldname
-        																	WHERE name = 'ort'
-        																	AND lang_id = 1 )
-        																AND b.lang_id = 1 )
+                                                                        AND b.field_id = (
+                                                                            SELECT field_id
+                                                                            FROM ".DBPREFIX."module_immo_fieldname
+                                                                            WHERE name = 'ort'
+                                                                            AND lang_id = 1 )
+                                                                        AND b.lang_id = 1 )
                         LEFT JOIN ".DBPREFIX."module_immo_content AS c ON ( immo.id = c.immo_id
-        																AND c.field_id = (
-        																	SELECT field_id
-        																	FROM ".DBPREFIX."module_immo_fieldname
-        																	WHERE name = 'adresse'
-        																	AND lang_id = 1 )
-        																AND c.lang_id = 1 )
+                                                                        AND c.field_id = (
+                                                                            SELECT field_id
+                                                                            FROM ".DBPREFIX."module_immo_fieldname
+                                                                            WHERE name = 'adresse'
+                                                                            AND lang_id = 1 )
+                                                                        AND c.lang_id = 1 )
                         WHERE TRUE ";
 
             if(intval($searchterm) == 0) {
@@ -1645,7 +1645,7 @@ class Immo extends ImmoLib
             }
 
             $query .= " AND immo.logo = '$logo'
-						AND content.lang_id =1
+                        AND content.lang_id =1
                         GROUP BY immo.id
                         ORDER BY immo.id DESC";
 
@@ -1674,29 +1674,29 @@ class Immo extends ImmoLib
         // If entries should be shown
         if ($objResult->RecordCount() > 0) {
             $this->_objTpl->setVariable(array(
-                    'TXT_IMMO_REF_ID'         		  	=>	$_ARRAYLANG['TXT_IMMO_REFERENCE_NUMBER_SHORT'],
-                    'TXT_IMMO_OBJECT_TYPE'    		  	=>	$_ARRAYLANG['TXT_IMMO_OBJECT_TYPE'],
-                    'TXT_IMMO_NEW_BUILDING'   		  	=>	$_ARRAYLANG['TXT_IMMO_NEW_BUILDING_SHORT'],
-                    'TXT_IMMO_PROPERTY_TYPE'  		 	=>	$_ARRAYLANG['TXT_IMMO_PROPERTY_TYPE_SHORT'],
-                    'TXT_IMMO_REF_NOTE'  		     	=>	$_ARRAYLANG['TXT_IMMO_REF_NOTE'],
-                    'TXT_IMMO_ADDRESS'					=>	$_ARRAYLANG['TXT_IMMO_ADDRESS'],
-                    'TXT_IMMO_FUNCTIONS'     		 	=>	$_ARRAYLANG['TXT_IMMO_FUNCTIONS'],
-                    'TXT_IMMO_DELETE'					=>	$_ARRAYLANG['TXT_IMMO_DELETE'],
-                    'TXT_IMMO_EDIT'						=>	$_ARRAYLANG['TXT_IMMO_EDIT'],
-                    'TXT_IMMO_COPY'						=>	$_ARRAYLANG['TXT_IMMO_COPY'],
-                    'TXT_IMMO_CONFIRM_DELETE_OBJECT'	=>	$_ARRAYLANG['TXT_IMMO_CONFIRM_DELETE_OBJECT'],
-                    'TXT_IMMO_CANNOT_UNDO_OPERATION'	=>	$_ARRAYLANG['TXT_IMMO_CANNOT_UNDO_OPERATION'],
-                    'TXT_IMMO_LOCATION'					=>	$_ARRAYLANG['TXT_IMMO_LOCATION'],
-                    'TXT_IMMO_VISIBLE'				    =>	$_ARRAYLANG['TXT_IMMO_VISIBLE'],
-                    'TXT_IMMO_FOREIGNER_AUTHORIZATION'	=>	$_ARRAYLANG['TXT_IMMO_FOREIGNER_AUTHORIZATION'],
-                    'TXT_IMMO_SPECIAL_OFFER'			=>	$_ARRAYLANG['TXT_IMMO_SPECIAL_OFFER_SHORT'],
-                    'IMMO_LOGO_'.strtoupper($logo).'_SELECTED'	=>	'selected="selected"',
-                    'IMMO_PAGING_LIMIT'				     =>	$limit,
-                    'IMMO_PAGING_POS'				     =>	$pos,
-                    'IMMO_PAGING_FIELD'				     =>	$field,
-                    'IMMO_HSEARCH_FIELD'			     =>	$hsearchField,
-                    'IMMO_HSEARCH'					     =>	$searchterm,
-                    'IMMO_HLOGO'					     =>	$logo,
+                    'TXT_IMMO_REF_ID'                       =>    $_ARRAYLANG['TXT_IMMO_REFERENCE_NUMBER_SHORT'],
+                    'TXT_IMMO_OBJECT_TYPE'                  =>    $_ARRAYLANG['TXT_IMMO_OBJECT_TYPE'],
+                    'TXT_IMMO_NEW_BUILDING'                 =>    $_ARRAYLANG['TXT_IMMO_NEW_BUILDING_SHORT'],
+                    'TXT_IMMO_PROPERTY_TYPE'               =>    $_ARRAYLANG['TXT_IMMO_PROPERTY_TYPE_SHORT'],
+                    'TXT_IMMO_REF_NOTE'                   =>    $_ARRAYLANG['TXT_IMMO_REF_NOTE'],
+                    'TXT_IMMO_ADDRESS'                    =>    $_ARRAYLANG['TXT_IMMO_ADDRESS'],
+                    'TXT_IMMO_FUNCTIONS'                  =>    $_ARRAYLANG['TXT_IMMO_FUNCTIONS'],
+                    'TXT_IMMO_DELETE'                    =>    $_ARRAYLANG['TXT_IMMO_DELETE'],
+                    'TXT_IMMO_EDIT'                        =>    $_ARRAYLANG['TXT_IMMO_EDIT'],
+                    'TXT_IMMO_COPY'                        =>    $_ARRAYLANG['TXT_IMMO_COPY'],
+                    'TXT_IMMO_CONFIRM_DELETE_OBJECT'    =>    $_ARRAYLANG['TXT_IMMO_CONFIRM_DELETE_OBJECT'],
+                    'TXT_IMMO_CANNOT_UNDO_OPERATION'    =>    $_ARRAYLANG['TXT_IMMO_CANNOT_UNDO_OPERATION'],
+                    'TXT_IMMO_LOCATION'                    =>    $_ARRAYLANG['TXT_IMMO_LOCATION'],
+                    'TXT_IMMO_VISIBLE'                    =>    $_ARRAYLANG['TXT_IMMO_VISIBLE'],
+                    'TXT_IMMO_FOREIGNER_AUTHORIZATION'    =>    $_ARRAYLANG['TXT_IMMO_FOREIGNER_AUTHORIZATION'],
+                    'TXT_IMMO_SPECIAL_OFFER'            =>    $_ARRAYLANG['TXT_IMMO_SPECIAL_OFFER_SHORT'],
+                    'IMMO_LOGO_'.strtoupper($logo).'_SELECTED'    =>    'selected="selected"',
+                    'IMMO_PAGING_LIMIT'                     =>    $limit,
+                    'IMMO_PAGING_POS'                     =>    $pos,
+                    'IMMO_PAGING_FIELD'                     =>    $field,
+                    'IMMO_HSEARCH_FIELD'                 =>    $hsearchField,
+                    'IMMO_HSEARCH'                         =>    $searchterm,
+                    'IMMO_HLOGO'                         =>    $logo,
             ));
 
             while (!$objResult->EOF) {
@@ -1708,17 +1708,17 @@ class Immo extends ImmoLib
                         'IMMO_NEW_BUILDING'             => ($objResult->fields['new']) ? $_ARRAYLANG['TXT_IMMO_YES'] : $_ARRAYLANG['TXT_IMMO_NO'],
                         'IMMO_PROPERTY_TYPE'            => $_ARRAYLANG['TXT_IMMO_PROPERTYTYPE_'.strtoupper($objResult->fields['ptype'])],
                         'IMMO_ADDRESS'                  => $objResult->fields['address'],
-                        'IMMO_LOCATION'			        => $objResult->fields['location'],
-                        'IMMO_VISIBILITY'		        => $_ARRAYLANG['TXT_IMMO_'.strtoupper($objResult->fields['visibility'])],
-                        'IMMO_LOCATION'			        => !empty($objResult->fields['location']) ? $objResult->fields['location'] : '&nbsp;',
-                        'IMMO_SPECIAL_OFFER'	        => $objResult->fields['special_offer'] == 1 ? $_ARRAYLANG['TXT_IMMO_YES'] : $_ARRAYLANG['TXT_IMMO_NO'],
-                        'IMMO_FOREIGNER_AUTHORIZATION'	=> !empty($objResult->fields['foreigner_authorization']) ? $objResult->fields['foreigner_authorization'] : '&nbsp;',
-                        'ROW_CLASS'				        => 'row'.(($rowclass++ % 2 == 0) ? 1 : 2),
+                        'IMMO_LOCATION'                    => $objResult->fields['location'],
+                        'IMMO_VISIBILITY'                => $_ARRAYLANG['TXT_IMMO_'.strtoupper($objResult->fields['visibility'])],
+                        'IMMO_LOCATION'                    => !empty($objResult->fields['location']) ? $objResult->fields['location'] : '&nbsp;',
+                        'IMMO_SPECIAL_OFFER'            => $objResult->fields['special_offer'] == 1 ? $_ARRAYLANG['TXT_IMMO_YES'] : $_ARRAYLANG['TXT_IMMO_NO'],
+                        'IMMO_FOREIGNER_AUTHORIZATION'    => !empty($objResult->fields['foreigner_authorization']) ? $objResult->fields['foreigner_authorization'] : '&nbsp;',
+                        'ROW_CLASS'                        => 'row'.(($rowclass++ % 2 == 0) ? 1 : 2),
                 ));
 
                 $this->_objTpl->parse("row");
                 $objResult->MoveNext();
-//		        $objRSLoc->MoveNext();
+//                $objRSLoc->MoveNext();
             }
 
             $this->_objTpl->parse("entriesList");
@@ -1738,24 +1738,24 @@ class Immo extends ImmoLib
         if(empty($immoID)) {
             $this->_strErrMessage = $_ARRAYLANG['TXT_IMMO_NO_ID_SPECIFIED'];
         }else {
-            $query = "	INSERT INTO ".DBPREFIX."module_immo(
+            $query = "    INSERT INTO ".DBPREFIX."module_immo(
 SELECT '', reference, ref_nr_note, logo, special_offer, visibility, object_type, new_building, property_type, longitude, latitude, zoom
 FROM ".DBPREFIX."module_immo
 WHERE id = $immoID )";
             if($objDatabase->Execute($query)) {
                 $lastInsertedID = $objDatabase->Insert_ID();
-                $objDatabase->Execute("	UPDATE ".DBPREFIX."module_immo_settings set setvalue = $lastInsertedID
-                    						WHERE setname = 'last_inserted_immo_id'");
-                $query = "	INSERT INTO ".DBPREFIX."module_immo_content	(
-								SELECT '', '$lastInsertedID', lang_id, field_id, fieldvalue, `active`
-								FROM ".DBPREFIX."module_immo_content WHERE immo_id = $immoID
-							)";
+                $objDatabase->Execute("    UPDATE ".DBPREFIX."module_immo_settings set setvalue = $lastInsertedID
+                                            WHERE setname = 'last_inserted_immo_id'");
+                $query = "    INSERT INTO ".DBPREFIX."module_immo_content    (
+                                SELECT '', '$lastInsertedID', lang_id, field_id, fieldvalue, `active`
+                                FROM ".DBPREFIX."module_immo_content WHERE immo_id = $immoID
+                            )";
                 $objDatabase->Execute($query);
 
-                $query = "	INSERT INTO ".DBPREFIX."module_immo_image (
-								SELECT '', '$lastInsertedID', field_id, uri
-								FROM ".DBPREFIX."module_immo_image
-								WHERE immo_id = $immoID )";
+                $query = "    INSERT INTO ".DBPREFIX."module_immo_image (
+                                SELECT '', '$lastInsertedID', field_id, uri
+                                FROM ".DBPREFIX."module_immo_image
+                                WHERE immo_id = $immoID )";
                 if($objDatabase->Execute($query)) {
                     if(!file_exists(ASCMS_CONTENT_IMAGE_PATH.DS.'immo'.DS.'images'.DS.($lastInsertedID+1))) {
                         $this->_objFile->mkDir(ASCMS_CONTENT_IMAGE_PATH.DS.'immo'.DS.'images'.DS, ASCMS_CONTENT_IMAGE_WEB_PATH.DS.'immo'.DS.'images'.DS, ($lastInsertedID+1));
@@ -1811,8 +1811,8 @@ WHERE id = $immoID )";
             $fieldID = intval($_GET['id']);
         }
 
-        $query = "	SELECT field_id from ".DBPREFIX."module_immo_fieldname
-					WHERE `name` = 'Adresse' LIMIT 1";
+        $query = "    SELECT field_id from ".DBPREFIX."module_immo_fieldname
+                    WHERE `name` = 'Adresse' LIMIT 1";
         $objRS = $objDatabase->Execute($query);
         if(!$objRS) {
             $this->_strErrMessage = $_ARRAYLANG['TXT_IMMO_DB_ERROR'] ." ".$objDatabase->ErrorMsg();
@@ -1833,17 +1833,17 @@ WHERE id = $immoID )";
             return false;
         }
         if(
-        $objDatabase->Execute("	DELETE FROM ".DBPREFIX."module_immo_field
-									WHERE id=$fieldID")
+        $objDatabase->Execute("    DELETE FROM ".DBPREFIX."module_immo_field
+                                    WHERE id=$fieldID")
                 !== false
-                &&	$objDatabase->Execute("	DELETE FROM ".DBPREFIX."module_immo_fieldname
-									WHERE field_id=$fieldID")
+                &&    $objDatabase->Execute("    DELETE FROM ".DBPREFIX."module_immo_fieldname
+                                    WHERE field_id=$fieldID")
                 !== false
-                &&	$objDatabase->Execute("	DELETE FROM ".DBPREFIX."module_immo_image
-									WHERE field_id=$fieldID")
+                &&    $objDatabase->Execute("    DELETE FROM ".DBPREFIX."module_immo_image
+                                    WHERE field_id=$fieldID")
                 !== false
-                &&	$objDatabase->Execute("	DELETE FROM ".DBPREFIX."module_immo_content
-									WHERE field_id=$fieldID")
+                &&    $objDatabase->Execute("    DELETE FROM ".DBPREFIX."module_immo_content
+                                    WHERE field_id=$fieldID")
                 !== false) {
 //TODO: _strOkMessage
             $this->_strOkMessage = $_ARRAYLANG['TXT_IMMO_SUCCESSFULLY_DELETED'];
@@ -1868,12 +1868,12 @@ WHERE id = $immoID )";
         $value = contrexx_addslashes($_GET['value']);
         $ID = contrexx_addslashes($_GET['ID']);
         $objRS = $objDatabase->SelectLimit("SELECT fieldvalue AS suggestion
-										FROM ".DBPREFIX."module_immo_content
-										WHERE field_id = $fieldID
-										AND lang_id = $langID
-										AND fieldvalue LIKE '%$value%'
-										GROUP BY fieldvalue
-										ORDER BY fieldvalue", 30, 0);
+                                        FROM ".DBPREFIX."module_immo_content
+                                        WHERE field_id = $fieldID
+                                        AND lang_id = $langID
+                                        AND fieldvalue LIKE '%$value%'
+                                        GROUP BY fieldvalue
+                                        ORDER BY fieldvalue", 30, 0);
         if($objRS) {
             $i = 0;
             //build JSON object with suggestions and needed IDs
@@ -2000,7 +2000,7 @@ WHERE id = $immoID )";
                         }
 
                         /***
-                                	type: LINKS
+                                    type: LINKS
                                 ***/
 
 
@@ -2024,14 +2024,14 @@ WHERE id = $immoID )";
                             }
                             if($objDatabase->Affected_Rows() == 0) { // field doesnt exists yet
                                 $query = "  INSERT INTO ".DBPREFIX."module_immo_image
-		                                        (   `immo_id`,
-		                                            `field_id`,
-		                                            `uri`
-		                                        ) VALUES (
-		                                            '".$immoID."',
-		                                            '".$fieldkey."',
-		                                            '".$value."'
-		                                        )";
+                                                (   `immo_id`,
+                                                    `field_id`,
+                                                    `uri`
+                                                ) VALUES (
+                                                    '".$immoID."',
+                                                    '".$fieldkey."',
+                                                    '".$value."'
+                                                )";
                                 //immoid?
                                 if (!$objDatabase->Execute($query)) {
                                     $error = true;
@@ -2077,8 +2077,8 @@ WHERE id = $immoID )";
 
                 if ($objDatabase->Execute($query)) {
                     $insertId = $objDatabase->Insert_ID();
-                    $objDatabase->Execute("	UPDATE ".DBPREFIX."module_immo_settings set setvalue = $insertId
-                    						WHERE setname = 'last_inserted_immo_id'");
+                    $objDatabase->Execute("    UPDATE ".DBPREFIX."module_immo_settings set setvalue = $insertId
+                                            WHERE setname = 'last_inserted_immo_id'");
                     $this->_getFieldNames();
 
                     foreach ($this->fieldNames as $fieldkey => $field) {
@@ -2152,7 +2152,7 @@ WHERE id = $immoID )";
             }
             if(is_dir(ASCMS_CONTENT_IMAGE_PATH.DS.'immo'.DS.'images'.DS.intval($file))) {
                 $objRS = $objDatabase->Execute("SELECT id FROM ".DBPREFIX."module_immo
-												WHERE id = $file");
+                                                WHERE id = $file");
                 if($objRS->RecordCount() == 0) {
                     $this->_objFile->delDir(ASCMS_CONTENT_IMAGE_PATH.DS.'immo'.DS.'images'.DS, ASCMS_CONTENT_IMAGE_WEB_PATH.DS.'immo'.DS.'images'.DS, $file);
                     $this->_objFile->delDir(ASCMS_CONTENT_IMAGE_PATH.DS.'immo'.DS.'pdfs'.DS, ASCMS_CONTENT_IMAGE_WEB_PATH.DS.'immo'.DS.'pdfs'.DS, $file);
@@ -2183,56 +2183,56 @@ WHERE id = $immoID )";
         $this->_pageTitle = $_ARRAYLANG['TXT_IMMO_ADD'];
         $this->_objTpl->loadTemplateFile('module_immo_add.html');
         $this->_objTpl->setGlobalVariable(array(
-                'TXT_IMMO_CREATE_OBJECT'			=>	$_ARRAYLANG['TXT_IMMO_CREATE_OBJECT'],
-                'TXT_IMMO_NAME' 					=>	$_ARRAYLANG['TXT_IMMO_NAME'],
-                'TXT_IMMO_IMAGE' 					=>	$_ARRAYLANG['TXT_IMMO_IMAGE'],
-                'TXT_IMMO_CLICK_HERE'				=> 	$_ARRAYLANG['TXT_IMMO_CLICK_HERE'],
-                'TXT_IMMO_OBJECTTYPE_FLAT'			=> 	$_ARRAYLANG['TXT_IMMO_OBJECTTYPE_FLAT'],
-                'TXT_IMMO_OBJECTTYPE_HOUSE'			=> 	$_ARRAYLANG['TXT_IMMO_OBJECTTYPE_HOUSE'],
-                'TXT_IMMO_OBJECTTYPE_MULTIFAMILY'	=> 	$_ARRAYLANG['TXT_IMMO_OBJECTTYPE_MULTIFAMILY'],
-                'TXT_IMMO_OBJECTTYPE_ESTATE'		=> 	$_ARRAYLANG['TXT_IMMO_OBJECTTYPE_ESTATE'],
-                'TXT_IMMO_OBJECTTYPE_INDUSTRY'		=> 	$_ARRAYLANG['TXT_IMMO_OBJECTTYPE_INDUSTRY'],
-                'TXT_IMMO_OBJECTTYPE_PARKING'		=> 	$_ARRAYLANG['TXT_IMMO_OBJECTTYPE_PARKING'],
-                'TXT_IMMO_OBJECT_TYPE'				=>	$_ARRAYLANG['TXT_IMMO_OBJECT_TYPE'],
-                'TXT_IMMO_REFERENCE_NUMBER'			=>	$_ARRAYLANG['TXT_IMMO_REFERENCE_NUMBER'],
-                'TXT_IMMO_PROPERTYTYPE_PURCHASE'	=>	$_ARRAYLANG['TXT_IMMO_PROPERTYTYPE_PURCHASE'],
-                'TXT_IMMO_PROPERTYTYPE_RENT'		=>	$_ARRAYLANG['TXT_IMMO_PROPERTYTYPE_RENT'],
-                'TXT_IMMO_PROPERTY_TYPE'			=>	$_ARRAYLANG['TXT_IMMO_PROPERTY_TYPE'],
-                'TXT_IMMO_NEW_BUILDING'				=>	$_ARRAYLANG['TXT_IMMO_NEW_BUILDING'],
-                'TXT_IMMO_YES'						=>	$_ARRAYLANG['TXT_IMMO_YES'],
-                'TXT_IMMO_NO'						=>	$_ARRAYLANG['TXT_IMMO_NO'],
-                'TXT_IMMO_PROPERTY_TYPE'			=>	$_ARRAYLANG['TXT_IMMO_PROPERTY_TYPE'],
-                'TXT_IMMO_DEFINE_TEXT'				=>	$_ARRAYLANG['TXT_IMMO_DEFINE_TEXT'],
+                'TXT_IMMO_CREATE_OBJECT'            =>    $_ARRAYLANG['TXT_IMMO_CREATE_OBJECT'],
+                'TXT_IMMO_NAME'                     =>    $_ARRAYLANG['TXT_IMMO_NAME'],
+                'TXT_IMMO_IMAGE'                     =>    $_ARRAYLANG['TXT_IMMO_IMAGE'],
+                'TXT_IMMO_CLICK_HERE'                =>     $_ARRAYLANG['TXT_IMMO_CLICK_HERE'],
+                'TXT_IMMO_OBJECTTYPE_FLAT'            =>     $_ARRAYLANG['TXT_IMMO_OBJECTTYPE_FLAT'],
+                'TXT_IMMO_OBJECTTYPE_HOUSE'            =>     $_ARRAYLANG['TXT_IMMO_OBJECTTYPE_HOUSE'],
+                'TXT_IMMO_OBJECTTYPE_MULTIFAMILY'    =>     $_ARRAYLANG['TXT_IMMO_OBJECTTYPE_MULTIFAMILY'],
+                'TXT_IMMO_OBJECTTYPE_ESTATE'        =>     $_ARRAYLANG['TXT_IMMO_OBJECTTYPE_ESTATE'],
+                'TXT_IMMO_OBJECTTYPE_INDUSTRY'        =>     $_ARRAYLANG['TXT_IMMO_OBJECTTYPE_INDUSTRY'],
+                'TXT_IMMO_OBJECTTYPE_PARKING'        =>     $_ARRAYLANG['TXT_IMMO_OBJECTTYPE_PARKING'],
+                'TXT_IMMO_OBJECT_TYPE'                =>    $_ARRAYLANG['TXT_IMMO_OBJECT_TYPE'],
+                'TXT_IMMO_REFERENCE_NUMBER'            =>    $_ARRAYLANG['TXT_IMMO_REFERENCE_NUMBER'],
+                'TXT_IMMO_PROPERTYTYPE_PURCHASE'    =>    $_ARRAYLANG['TXT_IMMO_PROPERTYTYPE_PURCHASE'],
+                'TXT_IMMO_PROPERTYTYPE_RENT'        =>    $_ARRAYLANG['TXT_IMMO_PROPERTYTYPE_RENT'],
+                'TXT_IMMO_PROPERTY_TYPE'            =>    $_ARRAYLANG['TXT_IMMO_PROPERTY_TYPE'],
+                'TXT_IMMO_NEW_BUILDING'                =>    $_ARRAYLANG['TXT_IMMO_NEW_BUILDING'],
+                'TXT_IMMO_YES'                        =>    $_ARRAYLANG['TXT_IMMO_YES'],
+                'TXT_IMMO_NO'                        =>    $_ARRAYLANG['TXT_IMMO_NO'],
+                'TXT_IMMO_PROPERTY_TYPE'            =>    $_ARRAYLANG['TXT_IMMO_PROPERTY_TYPE'],
+                'TXT_IMMO_DEFINE_TEXT'                =>    $_ARRAYLANG['TXT_IMMO_DEFINE_TEXT'],
                 'TXT_IMMO_DEFINE_IMAGE'             =>  $_ARRAYLANG['TXT_IMMO_DEFINE_IMAGE'],
-                'TXT_IMMO_LONGITUDE'				=>	$_ARRAYLANG['TXT_IMMO_LONGITUDE'],
-                'TXT_IMMO_LATITUDE'					=>	$_ARRAYLANG['TXT_IMMO_LATITUDE'],
-                'TXT_IMMO_ZOOM'						=>	$_ARRAYLANG['TXT_IMMO_ZOOM'],
-                'TXT_IMMO_ENTER_ADDRESS'			=>	$_ARRAYLANG['TXT_IMMO_ENTER_ADDRESS'],
-                'TXT_IMMO_SEARCH_ADDRESS'			=>	$_ARRAYLANG['TXT_IMMO_SEARCH_ADDRESS'],
-                'TXT_IMMO_BROWSER_NOT_SUPPORTED'	=>	$_ARRAYLANG['TXT_IMMO_BROWSER_NOT_SUPPORTED'],
-                'TXT_IMMO_DELETE'					=>  $_ARRAYLANG['TXT_IMMO_DELETE'],
-                'IMMO_COLUMN_NUMBER'       			=>  $this->langCount+2,
-                'IMMO_COLUMN_NUMBER2'				=>	$this->langCount+1,
-                'IMMO_COLUMN_NUMBER3'				=>	$this->langCount,
-                'TXT_IMMO_SUBMIT'					=>	($immoID > 0) ? $_ARRAYLANG['TXT_IMMO_SAVE'] : $_ARRAYLANG['TXT_IMMO_ADD'],
+                'TXT_IMMO_LONGITUDE'                =>    $_ARRAYLANG['TXT_IMMO_LONGITUDE'],
+                'TXT_IMMO_LATITUDE'                    =>    $_ARRAYLANG['TXT_IMMO_LATITUDE'],
+                'TXT_IMMO_ZOOM'                        =>    $_ARRAYLANG['TXT_IMMO_ZOOM'],
+                'TXT_IMMO_ENTER_ADDRESS'            =>    $_ARRAYLANG['TXT_IMMO_ENTER_ADDRESS'],
+                'TXT_IMMO_SEARCH_ADDRESS'            =>    $_ARRAYLANG['TXT_IMMO_SEARCH_ADDRESS'],
+                'TXT_IMMO_BROWSER_NOT_SUPPORTED'    =>    $_ARRAYLANG['TXT_IMMO_BROWSER_NOT_SUPPORTED'],
+                'TXT_IMMO_DELETE'                    =>  $_ARRAYLANG['TXT_IMMO_DELETE'],
+                'IMMO_COLUMN_NUMBER'                   =>  $this->langCount+2,
+                'IMMO_COLUMN_NUMBER2'                =>    $this->langCount+1,
+                'IMMO_COLUMN_NUMBER3'                =>    $this->langCount,
+                'TXT_IMMO_SUBMIT'                    =>    ($immoID > 0) ? $_ARRAYLANG['TXT_IMMO_SAVE'] : $_ARRAYLANG['TXT_IMMO_ADD'],
                 'IMMO_ID'                           =>  ($immoID > 0) ? $immoID : "",
                 'LAST_IMMO_ID'                      =>  ($immoID > 0) ? $immoID : ($this->arrSettings['last_inserted_immo_id']+1),
                 'TXT_IMMO_TAB_IMAGES'               =>  $_ARRAYLANG['TXT_IMMO_TAB_IMAGES'],
-                'TXT_IMMO_TAB_LINK'           	    =>  $_ARRAYLANG['TXT_IMMO_TAB_LINK'],
+                'TXT_IMMO_TAB_LINK'                   =>  $_ARRAYLANG['TXT_IMMO_TAB_LINK'],
                 'TXT_IMMO_TAB_TEXT'                 =>  $_ARRAYLANG['TXT_IMMO_TAB_TEXT'],
-                'TXT_IMMO_LOGO'						=>	$_ARRAYLANG['TXT_IMMO_LOGO'],
-                'TXT_IMMO_SPECIAL_OFFER'			=>	$_ARRAYLANG['TXT_IMMO_SPECIAL_OFFER'],
-                'TXT_IMMO_VISIBLE'					=>	$_ARRAYLANG['TXT_IMMO_VISIBLE'],
-                'TXT_IMMO_DISABLED'					=>	$_ARRAYLANG['TXT_IMMO_DISABLED'],
-                'TXT_IMMO_REFERENCE'				=>	$_ARRAYLANG['TXT_IMMO_REFERENCE'],
-                'TXT_IMMO_LISTING'					=>	$_ARRAYLANG['TXT_IMMO_LISTING'],
-                'TXT_IMMO_DISABLED'					=>	$_ARRAYLANG['TXT_IMMO_DISABLED'],
-                'TXT_IMMO_DEFINE_LINK'				=>	$_ARRAYLANG['TXT_IMMO_DEFINE_LINK'],
-                'TXT_IMMO_BROWSE'					=>	$_ARRAYLANG['TXT_IMMO_BROWSE'],
-                'TXT_IMMO_NO_RESULTS'				=>	$_ARRAYLANG['TXT_IMMO_NO_RESULTS'],
-                'TXT_IMMO_GET_PROPOSAL_LIST'		=>	$_ARRAYLANG['TXT_IMMO_GET_PROPOSAL_LIST'],
-                'TXT_IMMO_MANDATORY_FIELDS_ARE_EMPTY' 	=>	$_ARRAYLANG['TXT_IMMO_MANDATORY_FIELDS_ARE_EMPTY'],
-                'TXT_IMMO_EDIT_OR_ADD_IMAGE' 	    =>	$_ARRAYLANG['TXT_IMMO_EDIT_OR_ADD_IMAGE'],
+                'TXT_IMMO_LOGO'                        =>    $_ARRAYLANG['TXT_IMMO_LOGO'],
+                'TXT_IMMO_SPECIAL_OFFER'            =>    $_ARRAYLANG['TXT_IMMO_SPECIAL_OFFER'],
+                'TXT_IMMO_VISIBLE'                    =>    $_ARRAYLANG['TXT_IMMO_VISIBLE'],
+                'TXT_IMMO_DISABLED'                    =>    $_ARRAYLANG['TXT_IMMO_DISABLED'],
+                'TXT_IMMO_REFERENCE'                =>    $_ARRAYLANG['TXT_IMMO_REFERENCE'],
+                'TXT_IMMO_LISTING'                    =>    $_ARRAYLANG['TXT_IMMO_LISTING'],
+                'TXT_IMMO_DISABLED'                    =>    $_ARRAYLANG['TXT_IMMO_DISABLED'],
+                'TXT_IMMO_DEFINE_LINK'                =>    $_ARRAYLANG['TXT_IMMO_DEFINE_LINK'],
+                'TXT_IMMO_BROWSE'                    =>    $_ARRAYLANG['TXT_IMMO_BROWSE'],
+                'TXT_IMMO_NO_RESULTS'                =>    $_ARRAYLANG['TXT_IMMO_NO_RESULTS'],
+                'TXT_IMMO_GET_PROPOSAL_LIST'        =>    $_ARRAYLANG['TXT_IMMO_GET_PROPOSAL_LIST'],
+                'TXT_IMMO_MANDATORY_FIELDS_ARE_EMPTY'     =>    $_ARRAYLANG['TXT_IMMO_MANDATORY_FIELDS_ARE_EMPTY'],
+                'TXT_IMMO_EDIT_OR_ADD_IMAGE'         =>    $_ARRAYLANG['TXT_IMMO_EDIT_OR_ADD_IMAGE'],
                 "TXT_IMMO_HEADLINER"                =>  $_ARRAYLANG['TXT_IMMO_HEADLINER']
 
         ));
@@ -2254,7 +2254,7 @@ WHERE id = $immoID )";
 
         if ($immoID > 0) {
             $query = "    SELECT * FROM ".DBPREFIX."module_immo
-		                  WHERE `id` = '".$immoID."'";
+                          WHERE `id` = '".$immoID."'";
             $objResult = $objDatabase->Execute($query);
 
             if ($objResult) {
@@ -2303,9 +2303,9 @@ WHERE id = $immoID )";
                         $this->_objTpl->setVariable(array(
                                 "IMMO_FIELD_TEXT_NAME"      => "field_".$fieldkey."_".$langid,
                                 "IMMO_FIELD_TEXT_VALUE"     => ($immoID > 0) /*If we're editing*/ ? $field['content'][$langid] : "",
-                                "IMMO_DECIMAL_ONLY"			=> ($field['type'] == 'digits_only') ? 'onchange="this.value=decimalOnly(this.value)"' : '',
-                                'IMMO_FIELD_ID'				=>	$fieldkey,
-                                'IMMO_FIELD_LANG_ID'		=>	$langid,
+                                "IMMO_DECIMAL_ONLY"            => ($field['type'] == 'digits_only') ? 'onchange="this.value=decimalOnly(this.value)"' : '',
+                                'IMMO_FIELD_ID'                =>    $fieldkey,
+                                'IMMO_FIELD_LANG_ID'        =>    $langid,
                         ));
                         $this->_objTpl->parse("text-column");
                     }
@@ -2313,9 +2313,9 @@ WHERE id = $immoID )";
                     $this->_objTpl->setVariable(array(
                             "IMMO_FIELD_TEXT_CAPTION"   => $field['names'][1],
                             "IMMO_ROW"                  => $rowClassText,
-                            'IMMO_FIELD_TEXT_ID'		=> $fieldkey,
-                            'IMMO_CHECKED'				=> ($immoID > 0) ? (($field['content']['active']) ? 'checked="checked"' : '' ) : ($field['mandatory'] == 1) ? 'checked="checked"' : '',
-                            'IMMO_DISABLED'				=> ($field['mandatory'] == 1) ? $strDisabled : '',
+                            'IMMO_FIELD_TEXT_ID'        => $fieldkey,
+                            'IMMO_CHECKED'                => ($immoID > 0) ? (($field['content']['active']) ? 'checked="checked"' : '' ) : ($field['mandatory'] == 1) ? 'checked="checked"' : '',
+                            'IMMO_DISABLED'                => ($field['mandatory'] == 1) ? $strDisabled : '',
                     ));
                     $this->_objTpl->parse("fieldRowText");
 
@@ -2328,17 +2328,17 @@ WHERE id = $immoID )";
                         $this->_objTpl->setVariable(array(
                                 "IMMO_FIELD_TEXTAREA_NAME"      => "field_".$fieldkey."_".$langid,
                                 "IMMO_FIELD_TEXTAREA_VALUE"     => ($immoID > 0) ? $field['content'][$langid] : "", // If we're editing
-                                'IMMO_FIELD_ID'				=>	$fieldkey,
-                                'IMMO_FIELD_LANG_ID'		=>	$langid,
+                                'IMMO_FIELD_ID'                =>    $fieldkey,
+                                'IMMO_FIELD_LANG_ID'        =>    $langid,
                         ));
                         $this->_objTpl->parse("textarea-column");
                     }
                     $this->_objTpl->setVariable(array(
                             "IMMO_FIELD_TEXTAREA_CAPTION"   => $field['names'][1],
                             "IMMO_ROW"                      => $rowClassText,
-                            'IMMO_FIELD_TEXTAREA_ID'		=> $fieldkey,
-                            'IMMO_CHECKED'				    => ($immoID > 0) ? (($field['content']['active']) ? 'checked="checked"' : '' ) : ($field['mandatory'] == 1) ? 'checked="checked"' : '',
-                            'IMMO_DISABLED'					=> ($field['mandatory'] == 1) ? $strDisabled : '',
+                            'IMMO_FIELD_TEXTAREA_ID'        => $fieldkey,
+                            'IMMO_CHECKED'                    => ($immoID > 0) ? (($field['content']['active']) ? 'checked="checked"' : '' ) : ($field['mandatory'] == 1) ? 'checked="checked"' : '',
+                            'IMMO_DISABLED'                    => ($field['mandatory'] == 1) ? $strDisabled : '',
                     ));
 
                     $this->_objTpl->parse("fieldRowTextarea");
@@ -2349,26 +2349,26 @@ WHERE id = $immoID )";
                     $rowClassImg = ($rowClassImg == 2) ? 1 : 2;
                     foreach ($this->languages as $langid => $language) {
                         $this->_objTpl->setVariable(array(
-                                "IMMO_FIELD_IMG_NAME"	=> "field_".$fieldkey."_".$langid,
-                                'IMMO_FIELD_IMG_VALUE'	=> ($immoID > 0) ? $field['content'][$langid] : "", // If we're editings
+                                "IMMO_FIELD_IMG_NAME"    => "field_".$fieldkey."_".$langid,
+                                'IMMO_FIELD_IMG_VALUE'    => ($immoID > 0) ? $field['content'][$langid] : "", // If we're editings
                         ));
                         $this->_objTpl->parse("img-column");
                     }
 
                     $this->_objTpl->setVariable(array(
-                            "IMMO_FIELD_IMG_CAPTION"   	=> $field['names'][1],
+                            "IMMO_FIELD_IMG_CAPTION"       => $field['names'][1],
                             "IMMO_ROW"                  => $rowClassImg,
-                            'IMMO_FIELD_IMG_ID'			=> $fieldkey,
-                            'IMMO_CHECKED'				=> ($immoID > 0) ? (($field['content']['active']) ? 'checked="checked"' : '' ) : ($field['mandatory'] == 1) ? 'checked="checked"' : '',
-                            'IMMO_DISABLED'					=> ($field['mandatory'] == 1) ? $strDisabled : '',
-                            'IMMO_FIELD_IMG_SRC'		=> (!empty($field['img']) && is_file(ASCMS_PATH.$field['img'])) ? $field['img'] : $this->_defaultImage,
+                            'IMMO_FIELD_IMG_ID'            => $fieldkey,
+                            'IMMO_CHECKED'                => ($immoID > 0) ? (($field['content']['active']) ? 'checked="checked"' : '' ) : ($field['mandatory'] == 1) ? 'checked="checked"' : '',
+                            'IMMO_DISABLED'                    => ($field['mandatory'] == 1) ? $strDisabled : '',
+                            'IMMO_FIELD_IMG_SRC'        => (!empty($field['img']) && is_file(ASCMS_PATH.$field['img'])) ? $field['img'] : $this->_defaultImage,
                             'TXT_IMMO_EDIT_OR_ADD_IMAGE' => $_ARRAYLANG['TXT_IMMO_EDIT_OR_ADD_IMAGE'],
                     ));
                     $this->_objTpl->parse("fieldRowImg");
 
                     $this->_objTpl->setVariable(array(
-                            'IMMO_IMG_ID'	=>	$fieldkey,
-                            'IMMO_IMG_URL'	=> 	$field['img'],
+                            'IMMO_IMG_ID'    =>    $fieldkey,
+                            'IMMO_IMG_URL'    =>     $field['img'],
                     ));
                     $this->_objTpl->parse("hiddenFields");
 
@@ -2377,26 +2377,26 @@ WHERE id = $immoID )";
                     $rowClassImg = ($rowClassImg == 2) ? 1 : 2;
                     foreach ($this->languages as $langid => $language) {
                         $this->_objTpl->setVariable(array(
-                                "IMMO_FIELD_PANO_NAME"	=> "field_".$fieldkey."_".$langid,
-                                'IMMO_FIELD_PANO_VALUE'	=> ($immoID > 0) ? $field['content'][$langid] : "", // If we're editings
+                                "IMMO_FIELD_PANO_NAME"    => "field_".$fieldkey."_".$langid,
+                                'IMMO_FIELD_PANO_VALUE'    => ($immoID > 0) ? $field['content'][$langid] : "", // If we're editings
                         ));
                         $this->_objTpl->parse("panorama-column");
                     }
 
                     $this->_objTpl->setVariable(array(
-                            "IMMO_FIELD_PANO_CAPTION"   	=> $field['names'][1],
+                            "IMMO_FIELD_PANO_CAPTION"       => $field['names'][1],
                             "IMMO_ROW"                  => $rowClassImg,
-                            'IMMO_FIELD_PANO_ID'			=> $fieldkey,
-                            'IMMO_CHECKED'				=> ($immoID > 0) ? (($field['content']['active']) ? 'checked="checked"' : '' ) : ($field['mandatory'] == 1) ? 'checked="checked"' : '',
-                            'IMMO_DISABLED'					=> ($field['mandatory'] == 1) ? $strDisabled : '',
-                            'IMMO_FIELD_PANO_SRC'		=> (!empty($field['img']) && is_file(ASCMS_PATH.$field['img'])) ? $field['img'] : $this->_defaultImage,
+                            'IMMO_FIELD_PANO_ID'            => $fieldkey,
+                            'IMMO_CHECKED'                => ($immoID > 0) ? (($field['content']['active']) ? 'checked="checked"' : '' ) : ($field['mandatory'] == 1) ? 'checked="checked"' : '',
+                            'IMMO_DISABLED'                    => ($field['mandatory'] == 1) ? $strDisabled : '',
+                            'IMMO_FIELD_PANO_SRC'        => (!empty($field['img']) && is_file(ASCMS_PATH.$field['img'])) ? $field['img'] : $this->_defaultImage,
                     ));
 
                     $this->_objTpl->parse("fieldRowPanorama");
 
                     $this->_objTpl->setVariable(array(
-                            'IMMO_IMG_ID'	=>	$fieldkey,
-                            'IMMO_IMG_URL'	=> 	$field['img'],
+                            'IMMO_IMG_ID'    =>    $fieldkey,
+                            'IMMO_IMG_URL'    =>     $field['img'],
                     ));
                     $this->_objTpl->parse("hiddenFields");
 
@@ -2407,20 +2407,20 @@ WHERE id = $immoID )";
                     $rowClassLnk = ($rowClassLnk == 2) ? 1 : 2;
                     foreach ($this->languages as $langid => $language) {
                         $this->_objTpl->setVariable(array(
-                                "IMMO_FIELD_LNK_NAME"	=> "field_".$fieldkey."_".$langid,
-                                'IMMO_FIELD_LNK_VALUE'	=> ($immoID > 0) ? $field['content'][$langid] : "", // we're editing?
+                                "IMMO_FIELD_LNK_NAME"    => "field_".$fieldkey."_".$langid,
+                                'IMMO_FIELD_LNK_VALUE'    => ($immoID > 0) ? $field['content'][$langid] : "", // we're editing?
                         ));
                         $this->_objTpl->parse("lnk-column");
                     }
 
                     $this->_objTpl->setVariable(array(
-                            "IMMO_FIELD_LNK_CAPTION"   	=> $field['names'][1],
+                            "IMMO_FIELD_LNK_CAPTION"       => $field['names'][1],
                             "IMMO_ROW"                  => $rowClassLnk,
-                            'IMMO_FIELD_LNK_ID'			=> $fieldkey,
-                            'IMMO_CHECKED'				=> ($immoID > 0) ? (($field['content']['active']) ? 'checked="checked"' : '' ) : ($field['mandatory'] == 1) ? 'checked="checked"' : '',
-                            'IMMO_DISABLED'				=> ($field['mandatory'] == 1) ? $strDisabled : '',
-                            'IMMO_PROTECTED_ICON'		=> ($field['type'] == 'protected_link') ? '../core/Core/View/Media/icons/lock_closed.gif' : '../core/Core/View/Media/icons/lock_open.gif',
-                            'TXT_IMMO_PROTECTED'		=> ($field['type'] == 'protected_link') ? $_ARRAYLANG['TXT_IMMO_PROTECTED'] : $_ARRAYLANG['TXT_IMMO_NOT_PROTECTED'],
+                            'IMMO_FIELD_LNK_ID'            => $fieldkey,
+                            'IMMO_CHECKED'                => ($immoID > 0) ? (($field['content']['active']) ? 'checked="checked"' : '' ) : ($field['mandatory'] == 1) ? 'checked="checked"' : '',
+                            'IMMO_DISABLED'                => ($field['mandatory'] == 1) ? $strDisabled : '',
+                            'IMMO_PROTECTED_ICON'        => ($field['type'] == 'protected_link') ? '../core/Core/View/Media/icons/lock_closed.gif' : '../core/Core/View/Media/icons/lock_open.gif',
+                            'TXT_IMMO_PROTECTED'        => ($field['type'] == 'protected_link') ? $_ARRAYLANG['TXT_IMMO_PROTECTED'] : $_ARRAYLANG['TXT_IMMO_NOT_PROTECTED'],
 
                     ));
 
@@ -2451,10 +2451,10 @@ WHERE id = $immoID )";
         $objTpl->loadTemplateFile('module_immo_map_popup.html');
         $googlekey = (!empty($this->arrSettings['GOOGLE_API_KEY_'.$_SERVER['SERVER_NAME']])) ? $this->arrSettings['GOOGLE_API_KEY_'.$_SERVER['SERVER_NAME']] : '';
         $objTpl->setVariable(array(
-                'CONTREXX_CHARSET'					=> CONTREXX_CHARSET,
-                'TXT_IMMO_BROWSER_NOT_SUPPORTED'	=> $_ARRAYLANG['TXT_IMMO_BROWSER_NOT_SUPPORTED'],
-                'TXT_IMMO_CLOSE'					=> $_ARRAYLANG['TXT_IMMO_CLOSE'],
-                'TXT_IMMO_DBLCLICK_TO_SET_POINT'	=> $_ARRAYLANG['TXT_IMMO_DBLCLICK_TO_SET_POINT'],
+                'CONTREXX_CHARSET'                    => CONTREXX_CHARSET,
+                'TXT_IMMO_BROWSER_NOT_SUPPORTED'    => $_ARRAYLANG['TXT_IMMO_BROWSER_NOT_SUPPORTED'],
+                'TXT_IMMO_CLOSE'                    => $_ARRAYLANG['TXT_IMMO_CLOSE'],
+                'TXT_IMMO_DBLCLICK_TO_SET_POINT'    => $_ARRAYLANG['TXT_IMMO_DBLCLICK_TO_SET_POINT'],
                 'TXT_IMMO_ACCEPT'                   => $_ARRAYLANG['TXT_IMMO_ACCEPT'],
                 'IMMO_MAP_LAT_BACKEND'              => $this->arrSettings['lat_backend'],
                 'IMMO_MAP_LON_BACKEND'              => $this->arrSettings['lon_backend'],
@@ -2482,29 +2482,29 @@ WHERE id = $immoID )";
         $this->_pageTitle = $_ARRAYLANG['TXT_IMMO_SETTINGS'];
         $this->_objTpl->loadTemplateFile('module_immo_settings.html');
         $this->_objTpl->setGlobalVariable(array(
-                'TXT_IMMO_TYPE'					=> $_ARRAYLANG['TXT_IMMO_TYPE'],
-                'TXT_IMMO_ORDER'				=> $_ARRAYLANG['TXT_IMMO_ORDER'],
-                'TXT_IMMO_TYPE_TEXT'			=> $_ARRAYLANG['TXT_IMMO_TYPE_TEXT'],
-                'TXT_IMMO_TYPE_TEXTAREA'		=> $_ARRAYLANG['TXT_IMMO_TYPE_TEXTAREA'],
-                'TXT_IMMO_TYPE_IMG'				=> $_ARRAYLANG['TXT_IMMO_TYPE_IMG'],
-                'TXT_IMMO_CLONEROW'				=> $_ARRAYLANG['TXT_IMMO_CLONEROW'],
-                'TXT_IMMO_DELETE'				=> $_ARRAYLANG['TXT_IMMO_DELETE'],
-                'TXT_IMMO_DELETEROW'			=> $_ARRAYLANG['TXT_IMMO_DELETEROW'],
-                'TXT_IMMO_DEFINE_FIELDS'		=> $_ARRAYLANG['TXT_IMMO_DEFINE_FIELDS'],
-                'TXT_IMMO_LANGUAGES'			=> $_ARRAYLANG['TXT_IMMO_LANGUAGES'],
-                'TXT_IMMO_IMAGES'				=> $_ARRAYLANG['TXT_IMMO_IMAGES'],
-                'TXT_IMMO_DELETE_UNUSED_IMAGES'	=> $_ARRAYLANG['TXT_IMMO_DELETE_UNUSED_IMAGES'],
-                'TXT_IMMO_DELETE_IMAGES'		=> $_ARRAYLANG['TXT_IMMO_DELETE_IMAGES'],
-                'TXT_IMMO_SAVE'					=> $_ARRAYLANG['TXT_IMMO_SAVE'],
-                'TXT_IMMO_AVAILABLE_LANGUAGES'	=> $_ARRAYLANG['TXT_IMMO_AVAILABLE_LANGUAGES'],
-                'TXT_IMMO_NEW_LANGUAGE'			=> $_ARRAYLANG['TXT_IMMO_NEW_LANGUAGE'],
-                'TXT_IMMO_ADD'					=> $_ARRAYLANG['TXT_IMMO_ADD'],
-                'TXT_IMMO_AVAILABLE_FIELDS'		=> $_ARRAYLANG['TXT_IMMO_AVAILABLE_FIELDS'],
-                'TXT_IMMO_ID'					=> $_ARRAYLANG['TXT_IMMO_ID'],
-                'TXT_IMMO_TYPE'					=> $_ARRAYLANG['TXT_IMMO_TYPE'],
-                'TXT_IMMO_FUNCTIONS'			=> $_ARRAYLANG['TXT_IMMO_FUNCTIONS'],
-                'TXT_CONFIRM_DELETE'			=> $_ARRAYLANG['TXT_CONFIRM_DELETE'],
-                'TXT_IMMO_SHOW_FILE'			=> $_ARRAYLANG['TXT_IMMO_SHOW_FILE'],
+                'TXT_IMMO_TYPE'                    => $_ARRAYLANG['TXT_IMMO_TYPE'],
+                'TXT_IMMO_ORDER'                => $_ARRAYLANG['TXT_IMMO_ORDER'],
+                'TXT_IMMO_TYPE_TEXT'            => $_ARRAYLANG['TXT_IMMO_TYPE_TEXT'],
+                'TXT_IMMO_TYPE_TEXTAREA'        => $_ARRAYLANG['TXT_IMMO_TYPE_TEXTAREA'],
+                'TXT_IMMO_TYPE_IMG'                => $_ARRAYLANG['TXT_IMMO_TYPE_IMG'],
+                'TXT_IMMO_CLONEROW'                => $_ARRAYLANG['TXT_IMMO_CLONEROW'],
+                'TXT_IMMO_DELETE'                => $_ARRAYLANG['TXT_IMMO_DELETE'],
+                'TXT_IMMO_DELETEROW'            => $_ARRAYLANG['TXT_IMMO_DELETEROW'],
+                'TXT_IMMO_DEFINE_FIELDS'        => $_ARRAYLANG['TXT_IMMO_DEFINE_FIELDS'],
+                'TXT_IMMO_LANGUAGES'            => $_ARRAYLANG['TXT_IMMO_LANGUAGES'],
+                'TXT_IMMO_IMAGES'                => $_ARRAYLANG['TXT_IMMO_IMAGES'],
+                'TXT_IMMO_DELETE_UNUSED_IMAGES'    => $_ARRAYLANG['TXT_IMMO_DELETE_UNUSED_IMAGES'],
+                'TXT_IMMO_DELETE_IMAGES'        => $_ARRAYLANG['TXT_IMMO_DELETE_IMAGES'],
+                'TXT_IMMO_SAVE'                    => $_ARRAYLANG['TXT_IMMO_SAVE'],
+                'TXT_IMMO_AVAILABLE_LANGUAGES'    => $_ARRAYLANG['TXT_IMMO_AVAILABLE_LANGUAGES'],
+                'TXT_IMMO_NEW_LANGUAGE'            => $_ARRAYLANG['TXT_IMMO_NEW_LANGUAGE'],
+                'TXT_IMMO_ADD'                    => $_ARRAYLANG['TXT_IMMO_ADD'],
+                'TXT_IMMO_AVAILABLE_FIELDS'        => $_ARRAYLANG['TXT_IMMO_AVAILABLE_FIELDS'],
+                'TXT_IMMO_ID'                    => $_ARRAYLANG['TXT_IMMO_ID'],
+                'TXT_IMMO_TYPE'                    => $_ARRAYLANG['TXT_IMMO_TYPE'],
+                'TXT_IMMO_FUNCTIONS'            => $_ARRAYLANG['TXT_IMMO_FUNCTIONS'],
+                'TXT_CONFIRM_DELETE'            => $_ARRAYLANG['TXT_CONFIRM_DELETE'],
+                'TXT_IMMO_SHOW_FILE'            => $_ARRAYLANG['TXT_IMMO_SHOW_FILE'],
                 'TXT_IMMO_EDIT'                 => $_ARRAYLANG['TXT_IMMO_EDIT'],
                 'TXT_SETTINGS'                  => $_ARRAYLANG['TXT_SETTINGS'],
                 'TXT_IMMO_LATEST_ENTRIES_COUNT' => $_ARRAYLANG['TXT_IMMO_LATEST_ENTRIES_COUNT'],
@@ -2516,39 +2516,39 @@ WHERE id = $immoID )";
                 'TXT_IMMO_SETTINGS_ICON_MESSAGE_DESC'   => $_ARRAYLANG['TXT_IMMO_SETTINGS_ICON_MESSAGE_DESC'],
                 'IMMO_SETTINGS_DOMAIN1'         => $domain1,
                 'IMMO_SETTINGS_DOMAIN2'         => $domain2,
-                'TXT_IMMO_TYPE_LINK'			=>	$_ARRAYLANG['TXT_IMMO_TYPE_LINK'],
-                'TXT_IMMO_TYPE_PROTECTED_LINK'	=>	$_ARRAYLANG['TXT_IMMO_TYPE_PROTECTED_LINK'],
-                'TXT_IMMO_TYPE_PANORAMA'	=>	$_ARRAYLANG['TXT_IMMO_TYPE_PANORAMA'],
-                'TXT_IMMO_TYPE_DIGITS_ONLY'	=>	$_ARRAYLANG['TXT_IMMO_TYPE_DIGITS_ONLY'],
-                'TXT_IMMO_TYPE_PRICE'		=>	$_ARRAYLANG['TXT_IMMO_TYPE_PRICE'],
-                'TXT_IMMO_MANDATORY'			=> $_ARRAYLANG['TXT_IMMO_MANDATORY'],
-                'TXT_IMMO_NO'					=> $_ARRAYLANG['TXT_IMMO_NO'],
-                'TXT_IMMO_YES'					=> $_ARRAYLANG['TXT_IMMO_YES'],
-                'TXT_IMMO_CURRENCY'				=> $_ARRAYLANG['TXT_IMMO_CURRENCY'],
-                'TXT_IMMO_PROTECTED_LINK_EMAIL_MESSAGE_BODY'		=> $_ARRAYLANG['TXT_IMMO_PROTECTED_LINK_EMAIL_MESSAGE_BODY'],
-                'TXT_IMMO_PROTECTED_LINK_EMAIL_MESSAGE_SUBJECT'		=> $_ARRAYLANG['TXT_IMMO_PROTECTED_LINK_EMAIL_MESSAGE_SUBJECT'],
-                'TXT_IMMO_PROTECTED_LINK_SENDER_NAME'		=> $_ARRAYLANG['TXT_IMMO_PROTECTED_LINK_SENDER_NAME'],
-                'TXT_IMMO_PROTECTED_LINK_SENDER_EMAIL'		=> $_ARRAYLANG['TXT_IMMO_PROTECTED_LINK_SENDER_EMAIL'],
-                'TXT_IMMO_PROTECTED_LINK_EMAIL_MESSAGE_BODY_INFO'		=> $_ARRAYLANG['TXT_IMMO_PROTECTED_LINK_EMAIL_MESSAGE_BODY_INFO'],
-                'TXT_IMMO_CONTACT_RECEIVERS'		=> $_ARRAYLANG['TXT_IMMO_CONTACT_RECEIVERS'],
-                'TXT_IMMO_CONTACT_RECEIVERS_INFO'		=> $_ARRAYLANG['TXT_IMMO_CONTACT_RECEIVERS_INFO'],
-                'TXT_IMMO_INTEREST_CONFIRM_SUBJECT'		=> $_ARRAYLANG['TXT_IMMO_INTEREST_CONFIRM_SUBJECT'],
-                'TXT_IMMO_INTEREST_CONFIRM_MESSAGE'		=> $_ARRAYLANG['TXT_IMMO_INTEREST_CONFIRM_MESSAGE'],
-                'TXT_IMMO_INTEREST_INFO'			=> $_ARRAYLANG['TXT_IMMO_INTEREST_INFO'],
+                'TXT_IMMO_TYPE_LINK'            =>    $_ARRAYLANG['TXT_IMMO_TYPE_LINK'],
+                'TXT_IMMO_TYPE_PROTECTED_LINK'    =>    $_ARRAYLANG['TXT_IMMO_TYPE_PROTECTED_LINK'],
+                'TXT_IMMO_TYPE_PANORAMA'    =>    $_ARRAYLANG['TXT_IMMO_TYPE_PANORAMA'],
+                'TXT_IMMO_TYPE_DIGITS_ONLY'    =>    $_ARRAYLANG['TXT_IMMO_TYPE_DIGITS_ONLY'],
+                'TXT_IMMO_TYPE_PRICE'        =>    $_ARRAYLANG['TXT_IMMO_TYPE_PRICE'],
+                'TXT_IMMO_MANDATORY'            => $_ARRAYLANG['TXT_IMMO_MANDATORY'],
+                'TXT_IMMO_NO'                    => $_ARRAYLANG['TXT_IMMO_NO'],
+                'TXT_IMMO_YES'                    => $_ARRAYLANG['TXT_IMMO_YES'],
+                'TXT_IMMO_CURRENCY'                => $_ARRAYLANG['TXT_IMMO_CURRENCY'],
+                'TXT_IMMO_PROTECTED_LINK_EMAIL_MESSAGE_BODY'        => $_ARRAYLANG['TXT_IMMO_PROTECTED_LINK_EMAIL_MESSAGE_BODY'],
+                'TXT_IMMO_PROTECTED_LINK_EMAIL_MESSAGE_SUBJECT'        => $_ARRAYLANG['TXT_IMMO_PROTECTED_LINK_EMAIL_MESSAGE_SUBJECT'],
+                'TXT_IMMO_PROTECTED_LINK_SENDER_NAME'        => $_ARRAYLANG['TXT_IMMO_PROTECTED_LINK_SENDER_NAME'],
+                'TXT_IMMO_PROTECTED_LINK_SENDER_EMAIL'        => $_ARRAYLANG['TXT_IMMO_PROTECTED_LINK_SENDER_EMAIL'],
+                'TXT_IMMO_PROTECTED_LINK_EMAIL_MESSAGE_BODY_INFO'        => $_ARRAYLANG['TXT_IMMO_PROTECTED_LINK_EMAIL_MESSAGE_BODY_INFO'],
+                'TXT_IMMO_CONTACT_RECEIVERS'        => $_ARRAYLANG['TXT_IMMO_CONTACT_RECEIVERS'],
+                'TXT_IMMO_CONTACT_RECEIVERS_INFO'        => $_ARRAYLANG['TXT_IMMO_CONTACT_RECEIVERS_INFO'],
+                'TXT_IMMO_INTEREST_CONFIRM_SUBJECT'        => $_ARRAYLANG['TXT_IMMO_INTEREST_CONFIRM_SUBJECT'],
+                'TXT_IMMO_INTEREST_CONFIRM_MESSAGE'        => $_ARRAYLANG['TXT_IMMO_INTEREST_CONFIRM_MESSAGE'],
+                'TXT_IMMO_INTEREST_INFO'            => $_ARRAYLANG['TXT_IMMO_INTEREST_INFO'],
 
                 // Settings
                 'IMMO_SETTINGS_LATEST_ENTRIES_COUNT' => $this->arrSettings['latest_entries_count'],
                 'IMMO_SETTINGS_GOOGLE_KEY_DOMAIN1' => $this->arrSettings['GOOGLE_API_KEY_'.$domain1],
                 'IMMO_SETTINGS_GOOGLE_KEY_DOMAIN2' => $this->arrSettings['GOOGLE_API_KEY_'.$domain2],
                 'IMMO_SETTINGS_ICON_MESSAGE'       => htmlspecialchars($this->arrSettings['message']),
-                'TXT_IMMO_GOOGLE_KEY_INFO'		=> $_ARRAYLANG['TXT_IMMO_GOOGLE_KEY_INFO'],
-                'IMMO_LON_FRONTEND'				=> $this->arrSettings['lon_frontend'],
-                'IMMO_LAT_FRONTEND'				=> $this->arrSettings['lat_frontend'],
-                'IMMO_ZOOM_FRONTEND'			=> $this->arrSettings['zoom_frontend'],
-                'IMMO_LON_BACKEND'				=> $this->arrSettings['lon_backend'],
-                'IMMO_LAT_BACKEND'				=> $this->arrSettings['lat_backend'],
-                'IMMO_ZOOM_BACKEND'				=> $this->arrSettings['zoom_backend'],
-                'IMMO_PROT_LINK_MESSAGE_SUBJECT'	=> $this->arrSettings['prot_link_message_subject'],
+                'TXT_IMMO_GOOGLE_KEY_INFO'        => $_ARRAYLANG['TXT_IMMO_GOOGLE_KEY_INFO'],
+                'IMMO_LON_FRONTEND'                => $this->arrSettings['lon_frontend'],
+                'IMMO_LAT_FRONTEND'                => $this->arrSettings['lat_frontend'],
+                'IMMO_ZOOM_FRONTEND'            => $this->arrSettings['zoom_frontend'],
+                'IMMO_LON_BACKEND'                => $this->arrSettings['lon_backend'],
+                'IMMO_LAT_BACKEND'                => $this->arrSettings['lat_backend'],
+                'IMMO_ZOOM_BACKEND'                => $this->arrSettings['zoom_backend'],
+                'IMMO_PROT_LINK_MESSAGE_SUBJECT'    => $this->arrSettings['prot_link_message_subject'],
                 'IMMO_PROT_LINK_MESSAGE_BODY' => $this->arrSettings['prot_link_message_body'],
                 'IMMO_PROT_LINK_SENDER_EMAIL' => $this->arrSettings['sender_email'],
                 'IMMO_PROT_LINK_SENDER_NAME'  => $this->arrSettings['sender_name'],
@@ -2556,9 +2556,9 @@ WHERE id = $immoID )";
                 'IMMO_INTEREST_CONFIRM_SUBJECT'      => $this->arrSettings['interest_confirm_subject'],
                 'IMMO_INTEREST_CONFIRM_MESSAGE'      => $this->arrSettings['interest_confirm_message'],
 
-                'IMMO_DEFINE_FIELDS_COLSPAN' 	=> $this->langCount+4,
-                'IMMO_LANG_COUNT'				=> $this->langCount,
-                'IMMO_LANG_COUNT_PLUS1'			=> $this->langCount+1,
+                'IMMO_DEFINE_FIELDS_COLSPAN'     => $this->langCount+4,
+                'IMMO_LANG_COUNT'                => $this->langCount,
+                'IMMO_LANG_COUNT_PLUS1'            => $this->langCount+1,
         ));
 
         $rowid = 2;
@@ -2572,10 +2572,10 @@ WHERE id = $immoID )";
                 $this->_objTpl->parse('langRow4');
             }
             $this->_objTpl->setVariable(array(
-                    'IMMO_FIELD_ID'		=>	$fieldID,
-                    'IMMO_FIELD_TYPE'	=>	$_ARRAYLANG['TXT_IMMO_TYPE_'.strtoupper($field['type'])],
+                    'IMMO_FIELD_ID'        =>    $fieldID,
+                    'IMMO_FIELD_TYPE'    =>    $_ARRAYLANG['TXT_IMMO_TYPE_'.strtoupper($field['type'])],
                     'IMMO_FIELD_TYPE_LIST' => $this->_getFieldTypeList($fieldID, $field['type']),
-                    'TXT_MANDATORY'		=> ($field['mandatory']) ? $_ARRAYLANG['TXT_IMMO_YES'] : $_ARRAYLANG['TXT_IMMO_NO'],
+                    'TXT_MANDATORY'        => ($field['mandatory']) ? $_ARRAYLANG['TXT_IMMO_YES'] : $_ARRAYLANG['TXT_IMMO_NO'],
                     'IMMO_ORDER'         =>  $field['order'],
                     'IMMO_ROW'          => ($rowid == 2) ? $rowid-- : $rowid++,
                     'IMMO_SELECTED_'.(($field['mandatory']) ? "YES" : "NO") => "selected=\"selected\""
@@ -2585,14 +2585,14 @@ WHERE id = $immoID )";
 
         foreach ($this->languages as $id => $lang) {
             $this->_objTpl->setVariable(array(
-                    'IMMO_LANGUAGE_ID' 		=>	$id,
-                    'IMMO_LANGUAGE_NAME'	=>	$_ARRAYLANG[$lang],
-                    'IMMO_LANGUAGE_ID2' 	=>	$id,
-                    'IMMO_LANGUAGE_NAME2'	=>	$_ARRAYLANG[$lang],
-                    'IMMO_LANGUAGE_NAME3'	=>  $_ARRAYLANG[$lang],
-                    'IMMO_LANGUAGE_NAME5'	=>  $_ARRAYLANG[$lang],
-                    'IMMO_LANGUAGE_ID5'		=>  $id,
-                    'IMMO_CURRENCY'			=>	$this->arrSettings['currency_lang_'.$id]
+                    'IMMO_LANGUAGE_ID'         =>    $id,
+                    'IMMO_LANGUAGE_NAME'    =>    $_ARRAYLANG[$lang],
+                    'IMMO_LANGUAGE_ID2'     =>    $id,
+                    'IMMO_LANGUAGE_NAME2'    =>    $_ARRAYLANG[$lang],
+                    'IMMO_LANGUAGE_NAME3'    =>  $_ARRAYLANG[$lang],
+                    'IMMO_LANGUAGE_NAME5'    =>  $_ARRAYLANG[$lang],
+                    'IMMO_LANGUAGE_ID5'        =>  $id,
+                    'IMMO_CURRENCY'            =>    $this->arrSettings['currency_lang_'.$id]
             ));
             $this->_objTpl->parse('langRow');
             $this->_objTpl->parse('langRow2');
@@ -2790,18 +2790,18 @@ WHERE id = $immoID )";
         $dberror=false;
 
         for($i=0; $i<count($_REQUEST['type']) && !$dberror; $i++) {
-            $query = "	INSERT INTO ".DBPREFIX."module_immo_field
-							(id,
-							type,
-							`order`,
-							`mandatory`
-							)
-						VALUES
-							(NULL,
-							'".addslashes(strip_tags($_REQUEST['type'][$i]))."',
-							'".((isset($_REQUEST['order'][$i])) ? intval($_REQUEST['order'][$i]) : 9999 )."',
-							'".((isset($_REQUEST['mandatory'][$i])) ? intval($_REQUEST['mandatory'][$i]) : 0)."'
-							)";
+            $query = "    INSERT INTO ".DBPREFIX."module_immo_field
+                            (id,
+                            type,
+                            `order`,
+                            `mandatory`
+                            )
+                        VALUES
+                            (NULL,
+                            '".addslashes(strip_tags($_REQUEST['type'][$i]))."',
+                            '".((isset($_REQUEST['order'][$i])) ? intval($_REQUEST['order'][$i]) : 9999 )."',
+                            '".((isset($_REQUEST['mandatory'][$i])) ? intval($_REQUEST['mandatory'][$i]) : 0)."'
+                            )";
             if($objDatabase->Execute($query) === false) {
                 $objDatabase->ErrorMsg();
                 $dberror=true;
@@ -2810,16 +2810,16 @@ WHERE id = $immoID )";
 
             foreach ($this->languages as $langID => $language) {
                 if(!$dberror) {
-                    $query="	INSERT INTO ".DBPREFIX."module_immo_fieldname
-												(id,
-												field_id,
-												lang_id,
-												name)
-											VALUES
-												(NULL,
-												'".$lastFieldID."',
-												'".$langID."',
-												'".$_REQUEST['lang_'.$langID][$i]."')";
+                    $query="    INSERT INTO ".DBPREFIX."module_immo_fieldname
+                                                (id,
+                                                field_id,
+                                                lang_id,
+                                                name)
+                                            VALUES
+                                                (NULL,
+                                                '".$lastFieldID."',
+                                                '".$langID."',
+                                                '".$_REQUEST['lang_'.$langID][$i]."')";
                     if($objDatabase->Execute($query) === false) {
                         $dberror=true;
                     }

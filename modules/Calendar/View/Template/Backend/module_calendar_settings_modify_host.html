@@ -1,29 +1,29 @@
 <!-- START module_calendar_settings_modify_host.html -->
 <script language="JavaScript" type="text/javascript">
-	function formCheck()
-	{
+  function formCheck()
+  {
         /*if(document.formModifyCategory.name.value == "")
         {
             alert("{TXT_CALENDAR_FORMCHECK_NAME}");
-	        document.formModifyCategory.name.focus();
+          document.formModifyCategory.name.focus();
             return false;
         }*/
-		return true;
+    return true;
     }
 </script>
 
 <form action="index.php?cmd={CALENDAR_MODULE_NAME}&act=settings&tpl=hosts" name="formModifyHost" method="post" onsubmit="return formCheck();">
-	<input type="hidden" name="id" value="{CALENDAR_HOST_ID}" />
-	<table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist">
-	    <tr>
-	    	<th colspan="2">{TXT_CALENDAR_HOST}</th>
-	    </tr>
-	    <tr class="row1">
-	    	<td width="200" valign="top">{TXT_CALENDAR_HOST_TITLE}</td>
-	    	<td>
+  <input type="hidden" name="id" value="{CALENDAR_HOST_ID}" />
+  <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist">
+      <tr>
+        <th colspan="2">{TXT_CALENDAR_HOST}</th>
+      </tr>
+      <tr class="row1">
+        <td width="200" valign="top">{TXT_CALENDAR_HOST_TITLE}</td>
+        <td>
                 <input name="title" type="text" maxlength="255" style="width: 250px" value="{CALENDAR_HOST_TITLE}" />
-	    	</td>
-	    </tr>
+        </td>
+      </tr>
         <tr class="row2">
             <td width="200" valign="top">{TXT_CALENDAR_HOST_URI}</td>
             <td>
@@ -48,9 +48,8 @@
                 <input name="status" type="checkbox" value="1" {CALENDAR_HOST_STATUS}/>
             </td>
         </tr>
-	</table>
-	<br />
-	<input type="submit" name="submitModifyHost"  value="{TXT_CALENDAR_SAVE}" />
+  </table>
+  <br />
+  <input type="submit" name="submitModifyHost"  value="{TXT_CALENDAR_SAVE}" />
 </form>
 <!-- END module_calendar_settings_modify_host.html -->
-

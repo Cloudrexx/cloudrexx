@@ -12,7 +12,7 @@
                 <td width="25%">{TXT_CRM_NOTES_TYPE}</td>
                 <td width="15%">{TXT_CRM_ADDED_BY}</td>
                 <td width="15%">{TXT_CRM_LAST_UPDATED_BY}</td>
-                <td width="15%">{TXT_CRM_DUE_DATE}</td>                
+                <td width="15%">{TXT_CRM_DUE_DATE}</td>
                 <td width="10%" style="text-align: right;">{TXT_CRM_TASK_FUNCTIONS}</td>
             </tr>
         </thead>
@@ -36,7 +36,7 @@
                     <div>{CRM_UPDATED_USER}</div>
                     <div>{CRM_COMMENT_UPDATEDDATETIME}</div>
                 </td>
-                <td>{CRM_COMMENT_DATE}</td>                
+                <td>{CRM_COMMENT_DATE}</td>
                 <td style="text-align: right;">
                     <a title="{TXT_CRM_IMAGE_EDIT}" target="_self" href="index.php?cmd={MODULE_NAME}&amp;act=customers&tpl=addnote&{CSRF_PARAM}&id={TXT_COMMENT_ID}&cust_id={TXT_CUST_ID}{CRM_REDIRECT}"><img border="0" title="{TXT_CRM_IMAGE_EDIT}" alt="{TXT_CRM_IMAGE_EDIT}" src="../core/Core/View/Media/icons/edit.gif" /></a>
                     <a title="{TXT_CRM_IMAGE_DELETE}" target="_self" href="javascript:deleteCommentEntry({TXT_COMMENT_ID},{TXT_CUST_ID});"><img border="0" title="{TXT_CRM_IMAGE_DELETE}" alt="{TXT_CRM_IMAGE_DELETE}" src="../core/Core/View/Media/icons/delete.gif" /></a>
@@ -52,7 +52,7 @@
             <!-- BEGIN skipAjaxBlock1 -->
         </tbody>
     </table>
-    <br>    
+    <br>
     <input onclick="window.location='./index.php?cmd={MODULE_NAME}&act=customers&tpl=addnote&cust_id={CRM_CUST_ID}&csrf='+cx.variables.get('csrf', 'contrexx')" type="button" name="{TXT_CRM_ADD_NOTE}" value="{TXT_CRM_ADD_NOTE}" />
 </div>
 <!-- END skipAjaxBlock1 -->

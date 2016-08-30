@@ -464,7 +464,7 @@ body a:hover {text-decoration: none;}
     border: 0;
     background-image: url('images/nav-3-inactive.png');
     background-position: 30px 7px;
-    word-wrap: break-word;    
+    word-wrap: break-word;
 }
 #subnavigation li.level-4 a {
     font-size: 12px;
@@ -893,7 +893,7 @@ span.disconnected {
     float: left;
 }
 .navigation li a:hover {
-    color: #fff;    
+    color: #fff;
     text-decoration: none;
     background: #0372AB;
 }
@@ -928,7 +928,7 @@ span.disconnected {
     background-size: cover;
     margin-top: -14px;
     margin-bottom: 9px;
-    background-position: 70% 100%; 
+    background-position: 70% 100%;
 }
 .right > form {
     float: left;
@@ -976,7 +976,7 @@ span.disconnected {
     position: absolute;
     left: 50px;
     bottom: 127px;
-    font-size: 50px;   
+    font-size: 50px;
     background: #0372ab;
     padding-left: 10px;
     padding-right: 10px;
@@ -1421,7 +1421,7 @@ p#loginerror {
 .mobile-reg:hover {
     background: url('images/user_register.png') no-repeat center #888;
 }
-.mobile-login:hover { 
+.mobile-login:hover {
     background: url('images/login.png') no-repeat center #888;
 }
 .navbar-toggle:hover {

@@ -82,7 +82,7 @@ class cmsSession
 
             //earliest possible point to set debugging according to session.
             $this->restoreDebuggingParams();
-            
+
             $this->cmsSessionExpand();
         } else {
             $this->cmsSessionError();
@@ -98,7 +98,7 @@ class cmsSession
     {
         $errorMsg = '';
         $this->_objDb = getDatabaseObject($errorMsg, true);
-        
+
         $this->setAdodbDebugMode();
         $this->compatibilityMode = ($arrColumns = $this->_objDb->MetaColumnNames(DBPREFIX.'sessions')) && in_array('username', $arrColumns);
     }
@@ -292,7 +292,7 @@ class cmsSession
      * Gets a web temp path.
      * This path is needed to work with the File-class from the framework.
      *
-     * @return string 
+     * @return string
      */
     public function getWebTempPath() {
         $tp = $this->getTempPath();

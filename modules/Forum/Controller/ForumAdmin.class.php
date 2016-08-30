@@ -53,10 +53,10 @@ class ForumAdmin extends ForumLibrary {
     var $_strOkMessage     = '';
 
     private $act = '';
-    
+
     /**
      * Constructor    -> Create the module-menu and an internal template-object
-     * @global    InitCMS 
+     * @global    InitCMS
      * @global    \Cx\Core\Html\Sigma
      * @global    array
      */
@@ -67,7 +67,7 @@ class ForumAdmin extends ForumLibrary {
         $this->_objTpl = new \Cx\Core\Html\Sigma(ASCMS_MODULE_PATH.'/Forum/View/Template/Backend');
         \Cx\Core\Csrf\Controller\Csrf::add_placeholder($this->_objTpl);
         $this->_objTpl->setErrorHandling(PEAR_ERROR_DIE);
-        $this->_intLangId = $objInit->userFrontendLangId;        
+        $this->_intLangId = $objInit->userFrontendLangId;
     }
     private function setNavigation()
     {
@@ -231,7 +231,7 @@ class ForumAdmin extends ForumLibrary {
                         }
                     }
                 $strLanguages = count($this->_arrLanguages) > 1 ? \Html::getLanguageIcons($langState, 'index.php?cmd=Forum&amp;act=category_edit&amp;id=' . $arrValues['id']) : '';
-                
+
                 $this->_objTpl->setVariable(array(
                        'CATEGORY_ROWCLASS'            =>    'row'.($index % 2),
                        'CATEGORY_ID'                =>    $arrValues['id'],
@@ -796,7 +796,7 @@ class ForumAdmin extends ForumLibrary {
     /**
      * Show "access rights"-form for a selected category.
      *
-     * @global    ADONewConnection 
+     * @global    ADONewConnection
      * @global     array
      * @param    integer        $intCategoryId: The category / forum with this id should be edited
      */

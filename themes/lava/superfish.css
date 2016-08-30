@@ -39,7 +39,7 @@
     min-width: 12em; /* allow long menu items to determine submenu width */
     *width: 12em; /* no auto sub width for IE7, see white-space comment below */
 }
-.sf-menu a {    
+.sf-menu a {
     padding: .75em 1em;
     text-decoration: none;
     zoom: 1; /* IE7 */
@@ -79,7 +79,7 @@
     background: transparent;
     /* only transition out, not in */
     -webkit-transition: none;
-    transition: none;    
+    transition: none;
 }
 .sf-menu li ul li a:hover{color: #ff755a;}
 /*** arrows (for all except IE7) **/

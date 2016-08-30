@@ -204,7 +204,7 @@ class Livecam extends LivecamLibrary
             \LinkGenerator::parseTemplate($applicationTemplate);
             $this->_objTpl->addBlock('APPLICATION_DATA', 'application_data', $applicationTemplate);
         }
-        
+
         $this->_objTpl->setVariable(array(
             "CMD"                   => $this->cam
         ));
@@ -311,7 +311,7 @@ class Livecam extends LivecamLibrary
      */
     function _showArchive($date)
     {
-		global $_ARRAYLANG;
+        global $_ARRAYLANG;
 
         \JS::activate("shadowbox", array('players' => array('img')));
         \JS::activate('jqueryui');

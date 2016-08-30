@@ -47,4 +47,3 @@ namespace Cx\Modules\Knowledge\Controller;
 abstract class SearchInterface {
     abstract public function search($term);
 }
-

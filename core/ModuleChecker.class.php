@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Module Checker
  *
@@ -66,10 +66,10 @@ namespace Cx\Core
          * @var     ADONewConnection
          */
         private $db = null;
-        
+
         /**
          * ClassLoader
-         * 
+         *
          * @access  private
          * @var     \Cx\Core\ClassLoader\ClassLoader
          */
@@ -93,7 +93,7 @@ namespace Cx\Core
 
         /**
          * Names of active modules
-         * 
+         *
          * @access  private
          * @var     array
          */
@@ -101,7 +101,7 @@ namespace Cx\Core
 
         /**
          * Names of installed modules
-         * 
+         *
          * @access  private
          * @var     array
          */
@@ -188,7 +188,7 @@ namespace Cx\Core
                         $objResult->MoveNext();
                         continue;
                     }
-                    
+
                     if (!empty($moduleName)) {
                         $isCore = $objResult->fields['is_core'];
 

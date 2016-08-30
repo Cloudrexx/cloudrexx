@@ -113,7 +113,7 @@ function mbCallback(data)
         var thumbImage = data.data[0].datainfo.thumbnail[150];
 
         downloadsElInsertBox.value = url;
-        
+
         $J.ajax({
             type: "GET",
             url: "index.php?cmd=jsondata&object=MediaBrowser&act=createThumbnails&file=" + data.data[0].datainfo.filepath,
@@ -122,7 +122,7 @@ function mbCallback(data)
                     downloadsElImagePreview.src = thumbImage;
                 }
             }
-        });        
+        });
         if (downloadsElRemoveButton != null) {
            downloadsElRemoveButton.style.display = '';
         }
@@ -154,198 +154,198 @@ function downloadsAdjustSourceConfig()
 }
 
 
-		/* ----------------------------------------- */
+    /* ----------------------------------------- */
 
 
-		arrTabToDiv = new Array();
-		{JS_ARR}
+    arrTabToDiv = new Array();
+    {JS_ARR}
 
-		function switchBoxAndTab(objElement, strTabId) {
+    function switchBoxAndTab(objElement, strTabId) {
 
-			if (countActiveLanguages() == 0) {
-				//We just "unchecked" the last language, disallow this
-				objElement.checked = true;
-			} else {
-				//There are more active languages, hide the tab
-				switchTabVisibility(strTabId);
-			}
+      if (countActiveLanguages() == 0) {
+        //We just "unchecked" the last language, disallow this
+        objElement.checked = true;
+      } else {
+        //There are more active languages, hide the tab
+        switchTabVisibility(strTabId);
+      }
 
-			//Now make sure that a possible div is shown
-			activateAnyActiveDiv();
-		}
+      //Now make sure that a possible div is shown
+      activateAnyActiveDiv();
+    }
 
-		function switchTabVisibility(strTabId) {
-			if (document.getElementById(strTabId).style.display == 'none') {
-				document.getElementById(strTabId).style.display = 'inline';
-			} else {
-				document.getElementById(strTabId).style.display = 'none';
-			}
-		}
+    function switchTabVisibility(strTabId) {
+      if (document.getElementById(strTabId).style.display == 'none') {
+        document.getElementById(strTabId).style.display = 'inline';
+      } else {
+        document.getElementById(strTabId).style.display = 'none';
+      }
+    }
 
 
-		function countActiveLanguages() {
-			var activeLanguages = 0;
+    function countActiveLanguages() {
+      var activeLanguages = 0;
 
-			for (var h=0; h < document.forms.length;h++) {
-				for (var i=0; i < document.forms[h].elements.length;i++) {
-					//read out all form-elements with the loop
-					if(document.forms[h].elements[i].name.search('frmEditEntry_Languages') != -1) {
-						if(document.forms[h].elements[i].checked) {
-							activeLanguages++;
-						}
-					}
-				}
-			}
+      for (var h=0; h < document.forms.length;h++) {
+        for (var i=0; i < document.forms[h].elements.length;i++) {
+          //read out all form-elements with the loop
+          if(document.forms[h].elements[i].name.search('frmEditEntry_Languages') != -1) {
+            if(document.forms[h].elements[i].checked) {
+              activeLanguages++;
+            }
+          }
+        }
+      }
 
-			return activeLanguages;
-		}
+      return activeLanguages;
+    }
 
-		function activateAnyActiveDiv() {
-			//Deactivate every div first first
-			for (var TabName in arrTabToDiv) {
-				document.getElementById(TabName).className = 'inactive';
-				document.getElementById(arrTabToDiv[TabName]).style.display = 'none';
-			}
+    function activateAnyActiveDiv() {
+      //Deactivate every div first first
+      for (var TabName in arrTabToDiv) {
+        document.getElementById(TabName).className = 'inactive';
+        document.getElementById(arrTabToDiv[TabName]).style.display = 'none';
+      }
 
-			//Activate the first possible div with an acitvated checkbox
-			for (var TabName in arrTabToDiv) {
-				if (document.getElementById(TabName).style.display == 'inline') {
-					document.getElementById(TabName).className = 'active';
-					document.getElementById(arrTabToDiv[TabName]).style.display = 'inline';
-					break;
-				}
-			}
-		}
+      //Activate the first possible div with an acitvated checkbox
+      for (var TabName in arrTabToDiv) {
+        if (document.getElementById(TabName).style.display == 'inline') {
+          document.getElementById(TabName).className = 'active';
+          document.getElementById(arrTabToDiv[TabName]).style.display = 'inline';
+          break;
+        }
+      }
+    }
 
-		// ---------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------
 
-		function AddToTheList(from,dest,add,remove) {
-		    if ( from.selectedIndex < 0){
-				if (from.options[0] != null)
-					from.options[0].selected = true;
-				from.focus();
-				return false;
-			}else{
-				for (var i=0; i<from.length; i++) {
-					if (from.options[i].selected)
-					{
-				    	dest.options[dest.length] = new Option( from.options[i].text, from.options[i].value, false, false);
-		   			}
-				}
-			    for (var i=from.length-1; i>=0; i--) {
-					if (from.options[i].selected)
-					{
-				       from.options[i] = null;
-		   			}
-				}
-			}
-		    disapleButtons(from,dest,add,remove);
-		}
+    function AddToTheList(from,dest,add,remove) {
+        if ( from.selectedIndex < 0){
+        if (from.options[0] != null)
+          from.options[0].selected = true;
+        from.focus();
+        return false;
+      }else{
+        for (var i=0; i<from.length; i++) {
+          if (from.options[i].selected)
+          {
+              dest.options[dest.length] = new Option( from.options[i].text, from.options[i].value, false, false);
+             }
+        }
+          for (var i=from.length-1; i>=0; i--) {
+          if (from.options[i].selected)
+          {
+               from.options[i] = null;
+             }
+        }
+      }
+        disapleButtons(from,dest,add,remove);
+    }
 
-		function RemoveFromTheList(from,dest,add,remove) {
-			if ( dest.selectedIndex < 0){
-				if (dest.options[0] != null)
-					dest.options[0].selected = true;
-				dest.focus();
-				return false;
-			}
-			else{
-				for (var i=0; i<dest.options.length; i++)
-				{
-					if (dest.options[i].selected)
-					{
-				    	from.options[from.options.length] = new Option( dest.options[i].text, dest.options[i].value, false, false);
-		   			}
-				}
-			    for (var i=dest.options.length-1; i>=0; i--)
-				{
-					if (dest.options[i].selected)
-					{
-				       dest.options[i] = null;
-		   			}
-				}
-			}
-			disapleButtons(from,dest,add,remove);
-		}
+    function RemoveFromTheList(from,dest,add,remove) {
+      if ( dest.selectedIndex < 0){
+        if (dest.options[0] != null)
+          dest.options[0].selected = true;
+        dest.focus();
+        return false;
+      }
+      else{
+        for (var i=0; i<dest.options.length; i++)
+        {
+          if (dest.options[i].selected)
+          {
+              from.options[from.options.length] = new Option( dest.options[i].text, dest.options[i].value, false, false);
+             }
+        }
+          for (var i=dest.options.length-1; i>=0; i--)
+        {
+          if (dest.options[i].selected)
+          {
+               dest.options[i] = null;
+             }
+        }
+      }
+      disapleButtons(from,dest,add,remove);
+    }
 
-		function disapleButtons(from,dest,add,remove) {
-			if (from.options.length > 0 )
-			{
-				add.disabled = 0;
-			}
-			else
-				add.disabled = 1;
+    function disapleButtons(from,dest,add,remove) {
+      if (from.options.length > 0 )
+      {
+        add.disabled = 0;
+      }
+      else
+        add.disabled = 1;
 
-			if (dest.options.length > 0)
-				remove.disabled = 0;
-			else
-				remove.disabled = 1;
-		}
+      if (dest.options.length > 0)
+        remove.disabled = 0;
+      else
+        remove.disabled = 1;
+    }
 
-		function SelectAllList(CONTROL) {
-//			for(var i = 0;i < CONTROL.length;i++)
-//			{
-//				CONTROL.options[i].selected = true;
-//			}
+    function SelectAllList(CONTROL) {
+//      for(var i = 0;i < CONTROL.length;i++)
+//      {
+//        CONTROL.options[i].selected = true;
+//      }
 
-			CONTROL1 = document.AddFileForm.elements['assignedCategories[]'];
-			for(var i = 0;i < CONTROL1.length;i++)
-			{
-				CONTROL1.options[i].selected = true;
-			}
+      CONTROL1 = document.AddFileForm.elements['assignedCategories[]'];
+      for(var i = 0;i < CONTROL1.length;i++)
+      {
+        CONTROL1.options[i].selected = true;
+      }
 
-			CONTROL2 = document.AddFileForm.elements['assignedGroups[]'];
-			for(var i = 0;i < CONTROL2.length;i++)
-			{
-				CONTROL2.options[i].selected = true;
-			}
+      CONTROL2 = document.AddFileForm.elements['assignedGroups[]'];
+      for(var i = 0;i < CONTROL2.length;i++)
+      {
+        CONTROL2.options[i].selected = true;
+      }
 
-			CONTROL3 = document.AddFileForm.elements['assignedDownloads[]'];
-			for(var i = 0;i < CONTROL3.length;i++)
-			{
-				CONTROL3.options[i].selected = true;
-			}
-		}
+      CONTROL3 = document.AddFileForm.elements['assignedDownloads[]'];
+      for(var i = 0;i < CONTROL3.length;i++)
+      {
+        CONTROL3.options[i].selected = true;
+      }
+    }
 
-		// ----------------------------------------------------------------------------------- //
+    // ----------------------------------------------------------------------------------- //
 
-		function downloadsFilesDoAction(strForm,strCheckbox,objSelect,strAct)
-		{
-			if(checkboxIsChecked(strForm,strCheckbox) == true){
-				switch(strAct){
-					case 'del':
-						if(confirm('{TXT_CONFIRM_DELETE}\n{TXT_ACTION_IS_IRREVERSIBLE}')){
-							document.forms[strForm].action = "index.php?cmd=Downloads&act=files&deletefiles=exe";
-							document.forms[strForm].submit();
-						}
-						break;
-				}
-			} else {
-				alert("{TXT_MAKE_SELECTION}");
-			}
-			objSelect.value = 0;
-		}
+    function downloadsFilesDoAction(strForm,strCheckbox,objSelect,strAct)
+    {
+      if(checkboxIsChecked(strForm,strCheckbox) == true){
+        switch(strAct){
+          case 'del':
+            if(confirm('{TXT_CONFIRM_DELETE}\n{TXT_ACTION_IS_IRREVERSIBLE}')){
+              document.forms[strForm].action = "index.php?cmd=Downloads&act=files&deletefiles=exe";
+              document.forms[strForm].submit();
+            }
+            break;
+        }
+      } else {
+        alert("{TXT_MAKE_SELECTION}");
+      }
+      objSelect.value = 0;
+    }
 
-		// ----------------------------------------------------------------------------------- //
+    // ----------------------------------------------------------------------------------- //
 
-		function FileSwitch(IDname1, IDname2){
-			document.getElementById(IDname1).style.display = 'block';
-			document.getElementById(IDname2).style.display = 'none';
-		}
+    function FileSwitch(IDname1, IDname2){
+      document.getElementById(IDname1).style.display = 'block';
+      document.getElementById(IDname2).style.display = 'none';
+    }
 
-		function ShowGroupSelect(){
-			document.getElementById('DIVgroupSelect').style.display = 'block';
-		}
+    function ShowGroupSelect(){
+      document.getElementById('DIVgroupSelect').style.display = 'block';
+    }
 
-		function HideGroupSelect(){
-			document.getElementById('DIVgroupSelect').style.display = 'none';
-		}
+    function HideGroupSelect(){
+      document.getElementById('DIVgroupSelect').style.display = 'none';
+    }
 
-		function deleteFile(FileID){
-			if(confirm('{TXT_CONFIRM_DELETE}\n{TXT_ACTION_IS_IRREVERSIBLE}')){
-				document.location.href = 'index.php?cmd=Downloads&{CSRF_PARAM}&act=files&mode=delete&download='+FileID;
-			}
-		}
+    function deleteFile(FileID){
+      if(confirm('{TXT_CONFIRM_DELETE}\n{TXT_ACTION_IS_IRREVERSIBLE}')){
+        document.location.href = 'index.php?cmd=Downloads&{CSRF_PARAM}&act=files&mode=delete&download='+FileID;
+      }
+    }
 
 // ]]>
 </script>

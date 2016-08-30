@@ -46,10 +46,10 @@ use \Cx\Core\Json\JsonAdapter;
 class JsonSurvey implements JsonAdapter {
     /**
      * List of messages
-     * @var Array 
+     * @var Array
      */
     private $messages = array();
-    
+
     /**
      * Returns the internal name used as identifier for this adapter
      * @return String Name of this adapter
@@ -57,7 +57,7 @@ class JsonSurvey implements JsonAdapter {
     public function getName() {
         return 'Survey';
     }
-    
+
     /**
      * Returns an array of method names accessable from a JSON request
      * @return array List of method names
@@ -73,7 +73,7 @@ class JsonSurvey implements JsonAdapter {
     public function getMessagesAsString() {
         return implode('<br />', $this->messages);
     }
-    
+
     /**
      * Returns default permission as object
      * @return Object
@@ -81,38 +81,38 @@ class JsonSurvey implements JsonAdapter {
     public function getDefaultPermissions() {
         return null;
     }
-    
-    public function modifyQuestions() {        
-        
+
+    public function modifyQuestions() {
+
         $objQuestion = new SurveyQuestion();
-        
+
         $objQuestion->id              = isset($_REQUEST['id']) ? (int) $_REQUEST['id'] : 0;
         $objQuestion->surveyId        = isset($_GET['surveyId']) ? (int) $_GET['surveyId'] : 0;
         $objQuestion->questionType    = isset($_POST['questionType']) ? (int) $_POST['questionType'] : 0;
         $objQuestion->question        = isset($_POST['Question']) ? contrexx_input2raw($_POST['Question']) : '';
         $objQuestion->questionRow     = isset($_POST['QuestionRow']) ? contrexx_input2raw($_POST['QuestionRow']) : '';
         $objQuestion->questionChoice  = isset($_POST['ColumnChoices']) ? contrexx_input2raw($_POST['ColumnChoices']) : '';
-        $objQuestion->questionAnswers = isset($_POST['QuestionAnswers']) ? contrexx_input2raw($_POST['QuestionAnswers']) : '';        
+        $objQuestion->questionAnswers = isset($_POST['QuestionAnswers']) ? contrexx_input2raw($_POST['QuestionAnswers']) : '';
         $objQuestion->isCommentable   = isset($_POST['Iscomment']) ? (int) $_POST['Iscomment'] : 0;
-                
+
         $objQuestion->save();
-        
+
     }
-    
-    public function getSurveyQuestions() 
+
+    public function getSurveyQuestions()
     {
         $objQuestionManager = new SurveyQuestionManager((int) $_GET['surveyId']);
         return $objQuestionManager->showQuestions();
     }
-    
+
     public function getSurveyQuestion()
     {
         $objQuestion = new SurveyQuestion();
-        
+
         $objQuestion->id = isset($_REQUEST['id']) ? (int) $_REQUEST['id'] : 0;
-        
+
         $objQuestion->get();
-        
+
         return array(
             'id'              => (int) $objQuestion->id,
             'surveyId'        => (int) $objQuestion->surveyId,
@@ -123,22 +123,22 @@ class JsonSurvey implements JsonAdapter {
             'questionAnswers' => $objQuestion->questionAnswers,
             'isCommentable'   => (int) $objQuestion->isCommentable
         );
-        
+
     }
-    
+
     public function deleteQuestion()
     {
         $objQuestion = new SurveyQuestion();
-        
+
         $objQuestion->id = isset($_REQUEST['id']) ? (int) $_REQUEST['id'] : 0;
-        
+
         $objQuestion->delete();
     }
-    
+
     public function saveSorting()
     {
         $objQuestion = new SurveyQuestion();
-        
+
         if (!empty($_POST['questions'])) {
             foreach ($_POST['questions'] as $key => $questionId) {
                 $objQuestion->id       = (int) $questionId;
@@ -147,7 +147,6 @@ class JsonSurvey implements JsonAdapter {
                 $objQuestion->updatePosition();
             }
         }
-        
+
     }
 }
-

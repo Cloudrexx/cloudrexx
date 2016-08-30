@@ -80,7 +80,7 @@ class DataSet implements \Iterator {
             $this->data = $this->convert($data);
         }
     }
-    
+
     /**
      * Set data-attribute $key to $value
      */
@@ -102,7 +102,7 @@ class DataSet implements \Iterator {
              throw new DataSetException('Supplied argument could not be converted to DataSet');
         }
     }
-    
+
     /**
      * Try to remove the declared key from the dataset
      * @param string $key
@@ -177,10 +177,10 @@ class DataSet implements \Iterator {
             } else {
                 $data[$attribute] = $property;
             }
-        } 
+        }
         return $data;
     }
-    
+
     protected static function getYamlInterface() {
         if (empty(self::$yamlInterface)) {
             self::$yamlInterface = new \Cx\Core_Modules\Listing\Model\Entity\YamlInterface();
@@ -206,7 +206,7 @@ class DataSet implements \Iterator {
      * @param Cx\Core_Modules\Listing\Model\ImportInterface $importInterface
      * @param type $filename
      * @throws \Cx\Lib\FileSystem\FileSystemException
-     * @return type 
+     * @return type
      */
     public static function importFromFile(\Cx\Core_Modules\Listing\Model\Entity\Importable $importInterface, $filename) {
         try {
@@ -230,7 +230,7 @@ class DataSet implements \Iterator {
     /**
      *
      * @param Cx\Core_Modules\Listing\Model\ExportInterface $exportInterface
-     * @param type $filename 
+     * @param type $filename
      * @throws \Cx\Lib\FileSystem\FileSystemException
      */
     public function exportToFile(\Cx\Core_Modules\Listing\Model\Entity\Exportable $exportInterface, $filename) {
@@ -246,7 +246,7 @@ class DataSet implements \Iterator {
 
     /**
      *
-     * @param type $filename 
+     * @param type $filename
      * @throws \Cx\Lib\FileSystem\FileSystemException
      */
     public function save($filename) {
@@ -261,12 +261,12 @@ class DataSet implements \Iterator {
      *
      * @param type $filename
      * @throws \Cx\Lib\FileSystem\FileSystemException
-     * @return type 
+     * @return type
      */
     public static function load($filename) {
         return self::importFromFile(self::getYamlInterface(), $filename);
     }
-    
+
     public function getDataType() {
         return $this->dataType;
     }
@@ -280,18 +280,18 @@ class DataSet implements \Iterator {
     public function setDataType($dataType) {
         $this->dataType = $dataType;
     }
-    
+
     public function entryExists($key) {
         return isset($this->data[$key]);
     }
-    
+
     public function getEntry($key) {
         if (!$this->entryExists($key)) {
             throw new DataSetException('No such entry');
         }
         return $this->data[$key];
     }
-    
+
     public function toArray() {
         if (count($this->data) == 1) {
             return current($this->data);
@@ -318,19 +318,19 @@ class DataSet implements \Iterator {
     public function rewind() {
         return reset($this->data);
     }
-    
+
     public function count() {
         return $this->size();
     }
-    
+
     public function length() {
         return $this->size();
     }
-    
+
     public function size() {
         return count($this->data);
     }
-    
+
     public function limit($length, $offset) {
         $i = 0;
         $result = new static();
@@ -344,10 +344,10 @@ class DataSet implements \Iterator {
         }
         return $result;
     }
-    
+
     /**
      * Sort this DataSet by the fields and in the order specified
-     * 
+     *
      * $order has the following syntax:
      * array(
      *     {fieldname} => SORT_ASC|SORT_DESC,
@@ -359,7 +359,7 @@ class DataSet implements \Iterator {
      */
     public function sort($order) {
         $data = $this->data;
-        
+
         $dateTimeTools = new \DateTimeTools();
         uasort($data, function($a, $b) use($order, $dateTimeTools) {
             $diff = 1;
@@ -375,10 +375,10 @@ class DataSet implements \Iterator {
             }
             return ($diff ? -1 : 1) * $orderMultiplier;
         });
-        
+
         return new static($data);
     }
-    
+
     /**
      * Tell if the supplied argument is iterable
      * @todo Rethink this method, DataSet is always iterable, this is a general helper method
@@ -388,7 +388,7 @@ class DataSet implements \Iterator {
     private function is_iterable($var) {
         return (is_array($var) || $var instanceof Traversable || $var instanceof stdClass);
     }
-    
+
     /**
      * Returns a flipped version of this DataSet
      * @param array $arr Array to flip
@@ -396,7 +396,7 @@ class DataSet implements \Iterator {
      */
     public function flip() {
         $result = array();
-        
+
         foreach ($this as $key => $subarr) {
             if (!$this->is_iterable($subarr)) {
                 $result[0][$key] = $subarr;
@@ -409,7 +409,7 @@ class DataSet implements \Iterator {
 
         return new static($result);
     }
-    
+
     /**
      * Sort the columns after the given array.
      * Not defined columns are sorted after the default
@@ -449,4 +449,3 @@ class DataSet implements \Iterator {
         $this->identifier = $identifier;
     }
 }
-

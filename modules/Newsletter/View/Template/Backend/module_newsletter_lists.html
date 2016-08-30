@@ -2,111 +2,111 @@
 <script type="text/javascript">
 // <![CDATA[
 function deleteList(listId, listName) {
-	strConfirmTxt = '{TXT_NEWSLETTER_CONFIRM_DELETE_LIST}';
-	if (confirm(strConfirmTxt.replace('%s', listName)+'\n{TXT_NEWSLETTER_CANNOT_UNDO_OPERATION}')) {
-		window.location.href = "index.php?cmd=Newsletter&{CSRF_PARAM}&act=deleteList&id="+listId;
-	}
+  strConfirmTxt = '{TXT_NEWSLETTER_CONFIRM_DELETE_LIST}';
+  if (confirm(strConfirmTxt.replace('%s', listName)+'\n{TXT_NEWSLETTER_CANNOT_UNDO_OPERATION}')) {
+    window.location.href = "index.php?cmd=Newsletter&{CSRF_PARAM}&act=deleteList&id="+listId;
+  }
 }
 
 function flushList(listId, listName) {
-	strConfirmTxt = '{TXT_NEWSLETTER_CONFIRM_FLUSH_LIST}';
-	if (confirm(strConfirmTxt.replace('%s', listName)+'\n{TXT_NEWSLETTER_CANNOT_UNDO_OPERATION}')) {
-		window.location.href = "index.php?cmd=Newsletter&{CSRF_PARAM}&act=flushList&id="+listId;
-	}
+  strConfirmTxt = '{TXT_NEWSLETTER_CONFIRM_FLUSH_LIST}';
+  if (confirm(strConfirmTxt.replace('%s', listName)+'\n{TXT_NEWSLETTER_CANNOT_UNDO_OPERATION}')) {
+    window.location.href = "index.php?cmd=Newsletter&{CSRF_PARAM}&act=flushList&id="+listId;
+  }
 }
 
 function changeListStatus(listId, listName) {
-	strConfirmTxt = '{TXT_NEWSLETTER_CONFIRM_CHANGE_LIST_STATUS}';
-	if (confirm(strConfirmTxt.replace('%s', listName))) {
-		window.location.href = 'index.php?cmd=Newsletter&{CSRF_PARAM}&act=changeListStatus&id='+listId;
-	}
+  strConfirmTxt = '{TXT_NEWSLETTER_CONFIRM_CHANGE_LIST_STATUS}';
+  if (confirm(strConfirmTxt.replace('%s', listName))) {
+    window.location.href = 'index.php?cmd=Newsletter&{CSRF_PARAM}&act=changeListStatus&id='+listId;
+  }
 }
 
 function MultiAction(){
-	with (document.listslist){
-		switch (listslist_MultiAction.value) {
-			case 'delete':
-				if (confirm('{TXT_CONFIRM_DELETE_DATA}')) {
-					submit();
-				}
-			break;
-			default: //do nothing
-		}
-	}
+  with (document.listslist){
+    switch (listslist_MultiAction.value) {
+      case 'delete':
+        if (confirm('{TXT_CONFIRM_DELETE_DATA}')) {
+          submit();
+        }
+      break;
+      default: //do nothing
+    }
+  }
 }
 // ]]>
 </script>
 <div style="width: 100%; text-align: right;">
-	<form action="index.php?cmd=Newsletter&amp;act=editlist&amp;id=0" method="post" style="float: left;">
-		<input type="submit" value="{TXT_NEWSLETTER_ADD_NEW_LIST}" />
-	</form>
-	<span>
-		<a href="index.php?cmd=Newsletter&amp;act=users&amp;tpl=export&amp;listId=0">
-			<img alt="" title="{TXT_NEWSLETTER_EXPORT_ALL_LISTS}" src="../core/Core/View/Media/icons/csv.gif" />
-			{TXT_NEWSLETTER_EXPORT_ALL_LISTS}
-		</a>
-	</span>
+  <form action="index.php?cmd=Newsletter&amp;act=editlist&amp;id=0" method="post" style="float: left;">
+    <input type="submit" value="{TXT_NEWSLETTER_ADD_NEW_LIST}" />
+  </form>
+  <span>
+    <a href="index.php?cmd=Newsletter&amp;act=users&amp;tpl=export&amp;listId=0">
+      <img alt="" title="{TXT_NEWSLETTER_EXPORT_ALL_LISTS}" src="../core/Core/View/Media/icons/csv.gif" />
+      {TXT_NEWSLETTER_EXPORT_ALL_LISTS}
+    </a>
+  </span>
 </div>
 <br />
 <form name="listslist" action="?cmd=Newsletter&amp;act=lists&amp;bulkdelete=1" method="post">
 <table border="0" cellpadding="2" cellspacing="0" width="100%" class="adminlist">
-	<tbody>
-		<tr>
-			<th colspan="7">{TXT_NEWSLETTER_LISTS}</th>
-		</tr>
-		<tr style="height:20px; font-weight:bold;" class="row3">
-			<td width="5%">{TXT_NEWSLETTER_ID_UC}</td>
-			<td width="5%">{TXT_NEWSLETTER_STATUS}</td>
-			<td width="15%">{TXT_NEWSLETTER_NAME}</td>
-			<td width="10%">{TXT_NEWSLETTER_RECIPIENTS}</td>
-			<td width="30%">{TXT_NEWSLETTER_LAST_EMAIL}</td>
-			<td width="30%">{TXT_NEWSLETTER_NOTIFY_ON_UNSUBSCRIBE}</td>
-			<td width="5%" style="text-align:right;">{TXT_NEWSLETTER_FUNCTIONS}</td>
-		</tr>
-		<!-- BEGIN newsletter_lists -->
-		<tr style="height:20px;" class="{NEWSLETTER_ROW_CLASS}">
-			<td><input style="position:relative;top:2px;" name="listid[]" type="checkbox" value="{NEWSLETTER_LIST_ID}" title="{NEWSLETTER_LIST_ID}" /> {NEWSLETTER_LIST_ID}</td>
-			<td><a href="javascript:void(0);" onclick="changeListStatus({NEWSLETTER_LIST_ID}, '{NEWSLETTER_LIST_NAME}')" title="{NEWSLETTER_LIST_STATUS_MSG}"><img src="../core/Core/View/Media/icons/{NEWSLETTER_LIST_STATUS_IMG}" alt="{NEWSLETTER_LIST_STATUS_MSG}" border="0" /></a></td>
-			<td><a href="index.php?cmd=Newsletter&amp;act=editlist&amp;id={NEWSLETTER_LIST_ID}" title="{TXT_NEWSLETTER_MODIFY}">{NEWSLETTER_LIST_NAME}</a></td>
-			<td>{NEWSLETTER_LIST_RECIPIENT}</td>
-			<td>
-				<!-- BEGIN newsletter_list_last_mail -->
-					<a href="index.php?cmd=Newsletter&amp;act=showMail&amp;id={NEWSLETTER_LAST_MAIL_ID}" title="{TXT_NEWSLETTER_SHOW_LAST_SENT_EMAIL}">{NEWSLETTER_LIST_LAST_MAIL}</a>
-				<!-- END newsletter_list_last_mail -->
-				<!-- BEGIN newsletter_list_no_last_mail -->
-					<a href="index.php?cmd=Newsletter&amp;act=editMail&amp;id=0" title="{TXT_NEWSLETTER_CREATE_NEW_EMAIL}">-</a>
-				<!-- END newsletter_list_no_last_mail -->
-			</td>
+  <tbody>
+    <tr>
+      <th colspan="7">{TXT_NEWSLETTER_LISTS}</th>
+    </tr>
+    <tr style="height:20px; font-weight:bold;" class="row3">
+      <td width="5%">{TXT_NEWSLETTER_ID_UC}</td>
+      <td width="5%">{TXT_NEWSLETTER_STATUS}</td>
+      <td width="15%">{TXT_NEWSLETTER_NAME}</td>
+      <td width="10%">{TXT_NEWSLETTER_RECIPIENTS}</td>
+      <td width="30%">{TXT_NEWSLETTER_LAST_EMAIL}</td>
+      <td width="30%">{TXT_NEWSLETTER_NOTIFY_ON_UNSUBSCRIBE}</td>
+      <td width="5%" style="text-align:right;">{TXT_NEWSLETTER_FUNCTIONS}</td>
+    </tr>
+    <!-- BEGIN newsletter_lists -->
+    <tr style="height:20px;" class="{NEWSLETTER_ROW_CLASS}">
+      <td><input style="position:relative;top:2px;" name="listid[]" type="checkbox" value="{NEWSLETTER_LIST_ID}" title="{NEWSLETTER_LIST_ID}" /> {NEWSLETTER_LIST_ID}</td>
+      <td><a href="javascript:void(0);" onclick="changeListStatus({NEWSLETTER_LIST_ID}, '{NEWSLETTER_LIST_NAME}')" title="{NEWSLETTER_LIST_STATUS_MSG}"><img src="../core/Core/View/Media/icons/{NEWSLETTER_LIST_STATUS_IMG}" alt="{NEWSLETTER_LIST_STATUS_MSG}" border="0" /></a></td>
+      <td><a href="index.php?cmd=Newsletter&amp;act=editlist&amp;id={NEWSLETTER_LIST_ID}" title="{TXT_NEWSLETTER_MODIFY}">{NEWSLETTER_LIST_NAME}</a></td>
+      <td>{NEWSLETTER_LIST_RECIPIENT}</td>
+      <td>
+        <!-- BEGIN newsletter_list_last_mail -->
+          <a href="index.php?cmd=Newsletter&amp;act=showMail&amp;id={NEWSLETTER_LAST_MAIL_ID}" title="{TXT_NEWSLETTER_SHOW_LAST_SENT_EMAIL}">{NEWSLETTER_LIST_LAST_MAIL}</a>
+        <!-- END newsletter_list_last_mail -->
+        <!-- BEGIN newsletter_list_no_last_mail -->
+          <a href="index.php?cmd=Newsletter&amp;act=editMail&amp;id=0" title="{TXT_NEWSLETTER_CREATE_NEW_EMAIL}">-</a>
+        <!-- END newsletter_list_no_last_mail -->
+      </td>
             <td>
-				<a href="index.php?cmd=Newsletter&amp;act=editlist&amp;id={NEWSLETTER_LIST_ID}" title="{TXT_NEWSLETTER_NOTIFY_ON_UNSUBSCRIBE}">&nbsp;{NEWSLETTER_NOTIFICATION_EMAIL}</a>
-			</td>
-			<td style="text-align:right; white-space:nowrap;">
-				<a href="index.php?cmd=Newsletter&amp;act=users&amp;tpl=export&amp;listId={NEWSLETTER_LIST_ID}" title="{TXT_NEWSLETTER_EXPORT}"><img src="../core/Core/View/Media/icons/csv.gif" border="0" alt="{TXT_NEWSLETTER_EXPORT}" /> </a>
-				<a href="index.php?cmd=Newsletter&amp;act=gethtml&amp;id={NEWSLETTER_LIST_ID}" title="{TXT_NEWSLETTER_GENERATE_HTML_SOURCE_CODE}"><img src="../core/Core/View/Media/icons/html.gif" border="0" alt="{TXT_NEWSLETTER_GENERATE_HTML_SOURCE_CODE}" /></a>
-				<a href="index.php?cmd=Newsletter&amp;act=editlist&amp;id={NEWSLETTER_LIST_ID}" title="{TXT_NEWSLETTER_MODIFY}"><img src="../core/Core/View/Media/icons/edit.gif" border="0" alt="{TXT_NEWSLETTER_MODIFY}" /></a>
-				<a href="javascript:void(0);" onclick="flushList({NEWSLETTER_LIST_ID}, '{NEWSLETTER_LIST_NAME}');" title="{TXT_NEWSLETTER_FLUSH}"><img src="../core/Core/View/Media/icons/empty.gif" border="0" alt="{TXT_NEWSLETTER_FLUSH}" /></a>
-				<a href="javascript:void(0);" onclick="deleteList({NEWSLETTER_LIST_ID}, '{NEWSLETTER_LIST_NAME}');" title="{TXT_NEWSLETTER_DELETE}"><img src="../core/Core/View/Media/icons/delete.gif" border="0" alt="{TXT_NEWSLETTER_DELETE}" /></a>
-			</td>
-		</tr>
-		<!-- END newsletter_lists -->
-		<!-- BEGIN newsletter_no_lists -->
-		<tr>
-		    <td colspan="7">{TXT_NEWSLETTER_NO_LISTS}</td>
-		</tr>
-		<!-- END newsletter_no_lists -->
-	</tbody>
+        <a href="index.php?cmd=Newsletter&amp;act=editlist&amp;id={NEWSLETTER_LIST_ID}" title="{TXT_NEWSLETTER_NOTIFY_ON_UNSUBSCRIBE}">&nbsp;{NEWSLETTER_NOTIFICATION_EMAIL}</a>
+      </td>
+      <td style="text-align:right; white-space:nowrap;">
+        <a href="index.php?cmd=Newsletter&amp;act=users&amp;tpl=export&amp;listId={NEWSLETTER_LIST_ID}" title="{TXT_NEWSLETTER_EXPORT}"><img src="../core/Core/View/Media/icons/csv.gif" border="0" alt="{TXT_NEWSLETTER_EXPORT}" /> </a>
+        <a href="index.php?cmd=Newsletter&amp;act=gethtml&amp;id={NEWSLETTER_LIST_ID}" title="{TXT_NEWSLETTER_GENERATE_HTML_SOURCE_CODE}"><img src="../core/Core/View/Media/icons/html.gif" border="0" alt="{TXT_NEWSLETTER_GENERATE_HTML_SOURCE_CODE}" /></a>
+        <a href="index.php?cmd=Newsletter&amp;act=editlist&amp;id={NEWSLETTER_LIST_ID}" title="{TXT_NEWSLETTER_MODIFY}"><img src="../core/Core/View/Media/icons/edit.gif" border="0" alt="{TXT_NEWSLETTER_MODIFY}" /></a>
+        <a href="javascript:void(0);" onclick="flushList({NEWSLETTER_LIST_ID}, '{NEWSLETTER_LIST_NAME}');" title="{TXT_NEWSLETTER_FLUSH}"><img src="../core/Core/View/Media/icons/empty.gif" border="0" alt="{TXT_NEWSLETTER_FLUSH}" /></a>
+        <a href="javascript:void(0);" onclick="deleteList({NEWSLETTER_LIST_ID}, '{NEWSLETTER_LIST_NAME}');" title="{TXT_NEWSLETTER_DELETE}"><img src="../core/Core/View/Media/icons/delete.gif" border="0" alt="{TXT_NEWSLETTER_DELETE}" /></a>
+      </td>
+    </tr>
+    <!-- END newsletter_lists -->
+    <!-- BEGIN newsletter_no_lists -->
+    <tr>
+        <td colspan="7">{TXT_NEWSLETTER_NO_LISTS}</td>
+    </tr>
+    <!-- END newsletter_no_lists -->
+  </tbody>
 </table>
 <br />
 
 <div>
-		<img src="../core/Core/View/Media/icons/arrow.gif" border="0" width="38" height="22" alt="arrow" />
-		<a href="javascript:void(0)" onclick="changeCheckboxes('listslist','listid[]',true); return false;">{TXT_NEWSLETTER_CHECK_ALL}</a> /
-		<a href="javascript:void(0)" onclick="changeCheckboxes('listslist','listid[]',false); return false;">{TXT_NEWSLETTER_UNCHECK_ALL}</a>
-		<img src="../core/Core/View/Media/icons/strike.gif" alt="strike" title="strike" />
-		<select name="listslist_MultiAction" onchange="MultiAction();">
-			<option value="0">{TXT_NEWSLETTER_WITH_SELECTED}:</option>
-			<option value="delete">{TXT_NEWSLETTER_DELETE}</option>
-		</select>
+    <img src="../core/Core/View/Media/icons/arrow.gif" border="0" width="38" height="22" alt="arrow" />
+    <a href="javascript:void(0)" onclick="changeCheckboxes('listslist','listid[]',true); return false;">{TXT_NEWSLETTER_CHECK_ALL}</a> /
+    <a href="javascript:void(0)" onclick="changeCheckboxes('listslist','listid[]',false); return false;">{TXT_NEWSLETTER_UNCHECK_ALL}</a>
+    <img src="../core/Core/View/Media/icons/strike.gif" alt="strike" title="strike" />
+    <select name="listslist_MultiAction" onchange="MultiAction();">
+      <option value="0">{TXT_NEWSLETTER_WITH_SELECTED}:</option>
+      <option value="delete">{TXT_NEWSLETTER_DELETE}</option>
+    </select>
 </div>
 </form>
 <br />

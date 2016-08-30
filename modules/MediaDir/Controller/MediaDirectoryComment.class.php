@@ -67,7 +67,7 @@ class MediaDirectoryComment extends MediaDirectoryLibrary
 
         $strOkMessage = $_ARRAYLANG['TXT_MEDIADIR_COMMENT_ADD_SUCCESSFULL'];
         $strErrMessage = $_ARRAYLANG['TXT_MEDIADIR_COMMENT_ADD_CORRUPT'];
-        
+
         $strFunctionComment = $this->moduleNameLC.'Comment';
         $strFunctionRefreshComment = $this->moduleNameLC.'RefreshComments';
         $strFunctionCheckCommentForm = $this->moduleNameLC.'CheckCommentForm';
@@ -79,7 +79,7 @@ class MediaDirectoryComment extends MediaDirectoryLibrary
         $strCommentErrMessage = $this->moduleNameLC.'ErrorMessage';
 
         $strCommentsJavascript  =  <<<EOF
-        
+
 var $strFunctionComment = function(entry)
 {
     var elEntry = cx.jQuery('#commentForm_'+entry);
@@ -129,24 +129,24 @@ var $strFunctionCheckCommentForm = function(entry)
     errorCSSBorderStyle = '#ff0000 1px solid';
 
     if (commentName == '') {
-    	isOk = false;
-    	cx.jQuery('#commentName').css({'border': errorCSSBorderStyle});
+        isOk = false;
+        cx.jQuery('#commentName').css({'border': errorCSSBorderStyle});
     } else {
         cx.jQuery('#commentName').css({'border': ''});
     }
 
     if(commentComment == '') {
-    	isOk = false;
-    	cx.jQuery('#commentComment').css({'border': errorCSSBorderStyle});
+        isOk = false;
+        cx.jQuery('#commentComment').css({'border': errorCSSBorderStyle});
     } else {
         cx.jQuery('#commentComment').css({'border': ''});
     }
 
     if (!isOk) {
-		cx.jQuery('#$strCommentErrMessage').css({'display': 'block'});
-	} else {
-	   $strFunctionComment(entry);
-	}
+        cx.jQuery('#$strCommentErrMessage').css({'display': 'block'});
+    } else {
+       $strFunctionComment(entry);
+    }
 }
 
 EOF;

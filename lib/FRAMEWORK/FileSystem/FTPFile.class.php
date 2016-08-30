@@ -51,7 +51,7 @@ class FTPFileException extends \Exception {};
 /**
  * FTP File
  *
- * This class provides an object based interface to a file located 
+ * This class provides an object based interface to a file located
  * on an FTP server.
  * In general, do no use this class. Instead use the class Cx\Lib\FileSystem\File
  * which is a wrapper that uses either this class or
@@ -167,7 +167,7 @@ class FTPFile implements FileInterface
         $this->uploadTempFile();
         $this->deleteTempFile();
     }
-    
+
     public function append($data)
     {
         $this->write($data);
@@ -182,54 +182,54 @@ class FTPFile implements FileInterface
 
         $this->write('');
     }
-    
+
     public function copy($dst)
     {
         $this->initConnection();
-        
+
         try {
             $src = fopen($this->passedFilePath, 'r');
-            
+
             $pathInfo = pathinfo($dst);
             $path     = $pathInfo['dirname'];
             $file     = $pathInfo['basename'];
             $filePath = $this->getValidFilePath($file, $path);
             $dst      = $filePath . '/' . $file;
-            
+
             ftp_set_option($this->connection, FTP_TIMEOUT_SEC, 600);
-            
+
             if (!ftp_fput($this->connection, $dst, $src, FTP_BINARY)) {
                 throw new FTPFileException('FTP upload from ' . $this->passedFilePath . ' to ' . $dst . ' failed.');
             }
         } catch (FTPFileException $e) {
             throw new FTPFileException($e->getMessage());
         }
-        
+
     }
-    
+
     public function rename($dst)
     {
         $this->move($dst);
     }
-    
+
     public function move($dst)
     {
         $this->initConnection();
-        
+
         try {
             $pathInfo = pathinfo($dst);
             $path     = $pathInfo['dirname'];
             $file     = $pathInfo['basename'];
             $filePath = $this->getValidFilePath($file, $path);
             $dst      = $filePath . '/' . $file;
-            
+
             if (!ftp_rename($this->connection, $this->passedFilePath, $dst)) {
                 throw new FTPFileException('FTP rename from ' . $this->passedFilePath . ' to ' . $dst . ' failed.');
             }
         } catch (FTPFileException $e) {
             throw new FTPFileException($e->getMessage());
         }
-        
+
     }
 
     public function makeWritable()
@@ -305,13 +305,13 @@ class FTPFile implements FileInterface
     }
 
     private function openTempFileHandler()
-    {        
+    {
         global $sessionObj;
-        
+
         // try memory first
         if (($this->tempFileHandler = fopen("php://memory", 'r+')) === false) {
             // unable to use memory as temporary storage location,
-            // try to create file in the session temp path 
+            // try to create file in the session temp path
             if (empty($sessionObj)) { //session hasn't been initialized so far
                 $sessionObj = \cmsSession::getInstance();
             }
@@ -371,17 +371,17 @@ class FTPFile implements FileInterface
         if (!$this->connection) {
             throw new FTPFileException('Unable to establish FTP connection. Probably wrong FTP host info specified in config/configuration.php');
         }
-    
+
         if (!ftp_login($this->connection, $this->ftpConfig['username'], $this->ftpConfig['password'])) {
             throw new FTPFileException('Unable to authenticate on FTP server. Probably wrong FTP login credentials specified in config/configuration.php');
         }
-    
+
         $this->connected = true;
     }
-    
+
     /**
      * Get the absolute path of the file($this->file)
-     * 
+     *
      * @return string absolute path of the file
      */
     public function getAbsoluteFilePath()
@@ -389,4 +389,3 @@ class FTPFile implements FileInterface
         return $this->filePath;
     }
 }
-

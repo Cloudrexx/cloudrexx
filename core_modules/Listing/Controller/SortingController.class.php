@@ -45,21 +45,21 @@ namespace Cx\Core_Modules\Listing\Controller;
  * @subpackage  coremodule_listing
  */
 class SortingController {
-	
-	public function handle($params, $config) {
+
+    public function handle($params, $config) {
             $paramName = !empty($params['entity']) ? $params['entity'] . 'Order' : 'order';
-	    if (!isset($config[$paramName])) {
-	        return $params;
-	    }
-	    $order = explode('/', $config[$paramName]);
-	    $sortField = current($order);
-	    $sortOrder = SORT_ASC;
-	    if (count($order) > 1) {
-	        if ($order[1] == 'DESC') {
-	            $sortOrder = SORT_DESC;
-	        }
-	    }
-	    $params['order'] = array($sortField => $sortOrder);
-	    return $params;
-	}
+        if (!isset($config[$paramName])) {
+            return $params;
+        }
+        $order = explode('/', $config[$paramName]);
+        $sortField = current($order);
+        $sortOrder = SORT_ASC;
+        if (count($order) > 1) {
+            if ($order[1] == 'DESC') {
+                $sortOrder = SORT_DESC;
+            }
+        }
+        $params['order'] = array($sortField => $sortOrder);
+        return $params;
+    }
 }
