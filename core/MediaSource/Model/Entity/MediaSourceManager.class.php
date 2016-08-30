@@ -225,7 +225,11 @@ class MediaSourceManager extends EntityBase
      * @return array
      */
     public function getMediaTypePathsbyNameAndOffset($name, $offset) {
-        return $this->mediaTypePaths[$name][$offset];
+// TODO: Holy C: will cause a PHP warning, resulting in an invalid path
+//\DBG::log("MediaSourceManager::getMediaTypePathsbyNameAndOffset($name, $offset): DEBUG: Entered");
+        return (array_key_exists($name, $this->mediaTypePaths)
+            && array_key_exists($offset, $this->mediaTypePaths[$name])
+            ? $this->mediaTypePaths[$name][$offset] : null);
     }
 
     public function getAllMediaTypePaths() {

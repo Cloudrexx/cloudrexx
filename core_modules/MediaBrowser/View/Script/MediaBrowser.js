@@ -1,13 +1,16 @@
-!function (jQuery) {
-    var $ = jQuery;
-
-    var mediaBrowserApp = angular.module('MediaBrowser', ['plupload.module', 'ngAnimate', 'ui.bootstrap', 'ui.bootstrap.tpls']);
-
+// TODO: Properly inject bootbox, pluploader into angular
+// TODO: Split single Controllers, Services, etc. into individual files
+/* global cx, bootbox, plupload */
+(function(cx) {
+// TODO: Why not simply use cx.jQuery?
+  var jQuery = cx.variables.get('jquery', 'mediabrowser');
+  // Lexicon Entries cache
+  var entries = null;
     angular.module('plupload.module', []).config(['$httpProvider', function ($httpProvider) {
         $httpProvider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
         $httpProvider.defaults.headers.common["Check-CSRF"] = 'false';
     }]);
-
+  var mediaBrowserApp = angular.module('MediaBrowser', ['plupload.module', 'ngAnimate', 'ui.bootstrap', 'ui.bootstrap.tpls']);
     mediaBrowserApp.config(['$provide', function ($provide) {
         $provide.decorator('$browser', ['$delegate', function ($delegate) {
             $delegate.onUrlChange = function (a) {
@@ -19,34 +22,31 @@
             return $delegate;
         }]);
     }]);
-
     mediaBrowserApp.filter('translate', function () {
         return function (key) {
             return cx.variables.get(key, 'mediabrowser');
-        }
+    };
     });
-
     mediaBrowserApp.config(['$httpProvider', function ($httpProvider) {
         $httpProvider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
         $httpProvider.defaults.headers.common["Check-CSRF"] = 'false';
     }]);
-
     mediaBrowserApp.config(['$compileProvider', function ($compileProvider) {
         $compileProvider.debugInfoEnabled(false);
     }]);
-
     mediaBrowserApp.factory('mediabrowserFiles', function ($http, $q) {
         return {
             get: function (type) {
                 var deferred = $q.defer();
-                $http.get(cx.variables.get("cadminPath", "contrexx") + 'index.php?cmd=jsondata&object=MediaBrowser&act=' + type + '&csrf=' + cx.variables.get('csrf')).success(function (jsonadapter, status, headers) {
+        $http.get(cx.variables.get("cadminPath", "contrexx") +
+          'index.php?cmd=jsondata&object=MediaBrowser&act=' + type +
+          '&csrf=' + cx.variables.get('csrf'))
+          .success(function(jsonadapter, status, headers) {
                     if (jsonadapter.data instanceof Object) {
                         deferred.resolve(jsonadapter.data);
-                    }
-                    else if (jsonadapter.match(/login_form/)){
+            } else if (jsonadapter.match(/login_form/)) {
                         deferred.reject(cx.variables.get('TXT_FILEBROWSER_LOGGED_OUT', 'mediabrowser'));
-                    }
-                    else {
+            } else {
                         deferred.reject("An error occured while fetching items for " + type);
                     }
                 }).error(function () {
@@ -55,11 +55,10 @@
                 return deferred.promise;
             },
             getByMediaType: function (mediatype) {
-                return this.get('getFiles&mediatype=' + mediatype)
+        return this.get('getFiles&mediatype=' + mediatype);
             }
-        }
+    };
     });
-
     mediaBrowserApp.factory('mediabrowserConfig', function () {
         var config = {};
         return {
@@ -74,13 +73,13 @@
             }
         };
     });
-
-    /* CONTROLLERS */
-    mediaBrowserApp.controller('MainCtrl', ['$scope', '$modalInstance', '$modal', '$location', '$http', 'mediabrowserConfig', 'mediabrowserFiles', '$timeout',
-        function ($scope, $modalInstance, $modal, $location, $http, mediabrowserConfig, mediabrowserFiles, $timeout) {
-            /**
-             * Sorting and searching
-             */
+  // CONTROLLERS
+  mediaBrowserApp.controller('MainCtrl', [
+    '$scope', '$modalInstance', '$location', '$timeout',
+    'mediabrowserConfig', 'mediabrowserFiles',
+    function($scope, $modalInstance, $location, $timeout,
+      mediabrowserConfig, mediabrowserFiles) {
+      // Sorting and searching
             $scope.sorting = 'cleansize';
             $scope.searchString = '';
             $scope.reverse = false;
@@ -90,41 +89,42 @@
             $scope.dataFiles = [];
             $scope.sites = [];
             $scope.loadingSources = true;
-
-
             $scope.path = [
                 {name: cx.variables.get('TXT_FILEBROWSER_FILES', 'mediabrowser'), path: 'files', standard: true}
             ];
-
             $scope.activeController = mediabrowserConfig.get('startView');
-
+// TODO: Move data requests to separate Services, and call on demand!
+// These should not be in the MainController's scope.
             $scope.loadSites = function() {
-                mediabrowserFiles.get('getSites').then(
-                    function getSites(data) {
+        // Mind that get() returns a Promise
+        return mediabrowserFiles.get('getSites').then(
+          function(data) {
                         $scope.sites = data;
                     }
                 );
             };
-
-            var attempts = 0;
+// TODO: If there's a problem with that request, fix its cause.
+// What do you expect to change after the first failed request?
+// (Schizophrenia is defined by doing the same thing repeatedly,
+// and expecting different results...)
+//      var attempts = 0;
             $scope.loadSources = function(){
-                mediabrowserFiles.get('getSources').then(
-                    function getSources(data) {
+        // Mind that get() returns a Promise
+        return mediabrowserFiles.get('getSources').then(
+          function(data) {
                         $scope.sources = data;
-
                         if (mediabrowserConfig.get('startMedia')) {
                             data.forEach(function (source) {
-                                if (source.value == mediabrowserConfig.get('startMedia')) {
+                if (source.value === mediabrowserConfig.get('startMedia')) {
                                     $scope.selectedSource = source;
                                     return false;
                                 }
                             });
-                        }
-                        else {
+            } else {
                             $scope.selectedSource = data[0];
                         }
                         $scope.path[0].path = $scope.selectedSource.value;
-                        if (mediabrowserConfig.get('mediatypes') != 'all') {
+            if (mediabrowserConfig.get('mediatypes') !== 'all') {
                             var i = data.length;
                             while (i--) {
                                 if (!(mediabrowserConfig.get('mediatypes').indexOf(data[i].value) > -1)) {
@@ -132,70 +132,62 @@
                                 }
                             }
                         }
-
                         mediabrowserFiles.getByMediaType($scope.selectedSource.value).then(
-                            function getFiles(data) {
+              function(data) {
                                 $scope.loadingSources = false;
                                 $scope.dataFiles = data;
                                 $scope.files = $scope.dataFiles;
                                 if (!mediabrowserConfig.isset('lastPath')){
                                     mediabrowserConfig.set('lastPath',$scope.path);
-                                }
-                                else {
+                } else {
                                     var oldpath = mediabrowserConfig.get('lastPath');
                                     for (var i in oldpath){
                                         if (i > 0){
                                             $scope.extendPath(oldpath[i].path);
                                         }
                                     }
-                                    $scope.inRootDirectory = ($scope.path.length == 1);
+                  $scope.inRootDirectory = ($scope.path.length === 1);
                                     jQuery(".filelist").fadeIn();
                                 }
                             }
                         );
                     }, function (reason) {
                         // If the request fails, try it 3 more times.
-                        attempts++;
-                        if (attempts < 4){
-                            $scope.loadSources();
-                        }
-                        else {
+//          attempts++;
+//          if (attempts < 4) {
+//            $scope.loadSources();
+//          } else {
                             console.error(reason);
                             bootbox.dialog({
                                 className: "media-browser-modal-window",
                                 title: cx.variables.get('TXT_FILEBROWSER_ERROR_HAS_HAPPEND', 'mediabrowser'),
                                 message: reason
                             });
+//          }
                         }
-                    }
                 );
             };
-
-            setTimeout(function () {
-                $scope.initialize = function(){
-                    $scope.loadSites();
+//      setTimeout(function() {
+// If you don't load data on demand, at least distribute the load sequentially:
+      $scope.loadSites()
+        .finally(function() {
                     $scope.loadSources();
-                }();
-            },400);
-
+        });
+//      }, 400);
             $scope.ok = function () {
                 $modalInstance.close();
             };
-
             $scope.cancel = function () {
                 $scope.closeModal();
             };
-
             $scope.changeSorting = function (newSorting) {
-                if (newSorting == $scope.sorting) {
+        if (newSorting === $scope.sorting) {
                     $scope.reverse = !$scope.reverse;
-                }
-                else {
+        } else {
                     $scope.sorting = newSorting;
                     $scope.reverse = false;
                 }
             };
-
             $scope.closeModal = function () {
                 $modalInstance.dismiss('cancel');
                 var fn = mediabrowserConfig.get('callbackWrapper');
@@ -204,8 +196,11 @@
                     $scope.selectedFiles = [];
                 }
             };
-
-
+// TODO: In order to make the browser window extensible, inject the data tabs.
+// TODO: Use proper services (factories) for retrieving data.
+// NOTE: To add a "tab" here, you must also add its name to at least one
+// of the "cxMbViews" lists. See MediaBrowserCkeditorPlugin.js
+// TODO: Find a better way of controlling the view than "cxMbViews".
             $scope.dataTabs = [
                 {
                     label: cx.variables.get('TXT_FILEBROWSER_UPLOADER', 'mediabrowser'),
@@ -224,14 +219,18 @@
                     icon: 'icon-sitestructure',
                     controller: 'SitestructureCtrl',
                     name: 'sitestructure'
+        },
+        {
+          label: cx.variables.get('TXT_FILEBROWSER_LEXICON', 'mediabrowser'),
+          icon: 'icon-lexicon',
+          controller: 'LexiconEntryController',
+          name: 'lexicon'
                 }
             ];
             $scope.tabs = $scope.dataTabs;
-
             $scope.go = function (path) {
                 $scope.activeController = path;
             };
-
             $scope.getPathAsString = function () {
                 var pathstring = '';
                 $scope.path.forEach(function (path) {
@@ -239,19 +238,17 @@
                 });
                 return pathstring;
             };
-
-            //// cx-mb-views
-            if (mediabrowserConfig.get('views') != 'all') {
+      // cx-mb-views
+      if (mediabrowserConfig.get('views')
+        && mediabrowserConfig.get('views') !== 'all') {
                 var isStartviewInViews = false;
                 var newTabNames = mediabrowserConfig.get('views');
-
                 if(newTabNames.indexOf("filebrowser") !== -1 && newTabNames.indexOf("uploader") === -1){
                     newTabNames.push("uploader");
                 }
                 if(newTabNames.indexOf("filebrowser") === -1 && newTabNames.indexOf("uploader") !== -1){
                     newTabNames.push("filebrowser");
                 }
-
                 var newTabs = [];
                 var tabStartViewName;
                 var tabName;
@@ -272,12 +269,10 @@
                     $scope.go($scope.tabs[0].controller);
                 }
             }
-
             $scope.selectedTab = $scope.tabs[0];
             $scope.setSelectedTab = function (tab) {
                 $scope.activeController = tab.controller;
             };
-
             $scope.updateSource = function () {
                 var oldpath = $scope.path;
                 var oldSource = $scope.path[0].path;
@@ -285,13 +280,13 @@
                     {name: "" + $scope.selectedSource.name, path: $scope.selectedSource.value, standard: true}
                 ];
                 $scope.loadingSources = true;
-                mediabrowserFiles.getByMediaType($scope.selectedSource.value).then(
-                    function getFiles(data) {
+        return mediabrowserFiles.getByMediaType($scope.selectedSource.value).then(
+          function(data) {
                         $scope.loadingSources = false;
                         $scope.dataFiles = data;
                         $scope.files = data;
                         $timeout(function () {
-                            if (oldSource == $scope.selectedSource.value){
+              if (oldSource === $scope.selectedSource.value) {
                                 for (var i in oldpath){
                                     if (i > 0){
                                         $scope.extendPath(oldpath[i].path);
@@ -304,7 +299,6 @@
                     }
                 );
             };
-
             $scope.refreshBrowser = function () {
                 mediabrowserConfig.set('lastPath',$scope.path);
                 var files = $scope.dataFiles;
@@ -328,7 +322,6 @@
                 $scope.searchString = '';
                 $scope.refreshBrowser();
             };
-
             /**
              * Move down in the directory structure
              * @param countDirs
@@ -342,59 +335,49 @@
                 }
                 $scope.refreshBrowser();
             };
-
             $scope.setFiles = function (files) {
                 $scope.files = files;
             };
-
             $scope.changeLocation = function (url, forceReload) {
                 $scope = $scope || angular.element(document).scope();
                 if (forceReload || $scope.$$phase) {
                     window.location = url;
-                }
-                else {
+        } else {
                     $location.path(url);
                     $scope.$apply();
                 }
             };
-
-
-
             $scope.afterUpload = function () {
                 $scope.updateSource();
             };
-
             $scope.length = function (obj) {
+// TODO: Fix length calculation
+// For directories, the size calculated is plain wrong,
+// as the "datainfo" property is counted as well.
+// Why not just subtract 1 (or rather 2) from the total object length?
                 var size = 0, key;
                 for (key in obj) {
                     /* Angularjs */
-                    if (key != '$$hashKey'){
+          if (key !== '$$hashKey') {
                         if (obj.hasOwnProperty(key)) size++;
                     }
                 }
                 return size;
             };
-
         }]);
-
-
     mediaBrowserApp.controller('UploaderCtrl', ['$scope',
         function ($scope) {
-
             $scope.uploaderData = {
                 filesToUpload: []
             };
-
             $scope.progress = 0;
             $scope.progressMessage = '';
             $scope.finishedUpload = false;
             $scope.uploadPending = false;
             $scope.showUploadedHint = false;
-
             $scope.template = {
                 url: cx.variables.get('basePath','contrexx')+'core_modules/MediaBrowser/View/Template/Uploader.html'
             };
-
             $scope.loadedTemplate = function () {
                 // PLUPLOADER INTEGRATION
                 $scope.uploader = new plupload.Uploader({
@@ -415,7 +398,9 @@
                     },
                     init: {
                         Init: function(){
-                            $J('#selectFileFromComputer').prop("disabled", false);
+// TODO: $J is not supposed to be used here
+//              $J('#selectFileFromComputer').prop("disabled", false);
+              jQuery('#selectFileFromComputer').prop("disabled", false);
                         },
                         FilesAdded: function (up, files) {
                             if ($scope.finishedUpload) {
@@ -428,7 +413,6 @@
                                 }
                             }
                             $scope.uploader.settings.multipart_params.path = $scope.getPathAsString();
-
                             $scope.$digest();
                         },
                         UploadProgress: function () {
@@ -438,12 +422,11 @@
                             $scope.finishedUpload = true;
                             $scope.uploadPending = false;
                             $scope.showUploadedHint = true;
-
                             $scope.$digest();
                             $scope.afterUpload();
                         },
                         Error: function (up, err) {
-                            var mediaUploaderListCtrl = $('.mediaUploaderListCtrl');
+              var mediaUploaderListCtrl = jQuery('.mediaUploaderListCtrl');
                             mediaUploaderListCtrl.find('.uploadPlatform').addClass('fileError');
                             mediaUploaderListCtrl.find('.uploadPlatform .error').html(cx.variables.get('TXT_CORE_MODULE_UPLOADER_ERROR_' + /[0-9]+/.exec(err.code), 'mediabrowser'));
                             setTimeout(function () {
@@ -454,22 +437,18 @@
                     }
                 });
                 $scope.uploader.init();
-
                 jQuery( ".uploadPlatform" ).mouseenter(function() {
                     $scope.uploader.refresh();
                 });
             };
-
             $scope.startUpload = function () {
                 $scope.uploader.start();
                 $scope.uploadPending = true;
                 jQuery('.uploadFilesAdded').show();
             };
-
             $scope.closeUploadedHint = function () {
                 $scope.showUploadedHint = false;
             };
-
             $scope.removeFile = function (file) {
                 jQuery.each($scope.uploaderData.filesToUpload, function (i) {
                     if ($scope.uploaderData.filesToUpload[i] === file) {
@@ -479,28 +458,20 @@
                     }
                 });
             };
-
         }]);
-
     mediaBrowserApp.controller('MediaBrowserListCtrl', ['$scope', '$http', 'mediabrowserConfig',
         function ($scope, $http, mediabrowserConfig) {
-
             $scope.lastActiveFile = {};
             $scope.noFileSelected = true;
             $scope.selectedFiles = [];
-
             $scope.searchConfig = {
                 isRegex: false,
                 string: ""
             };
-
             $scope.template = {
                 url: cx.variables.get('basePath','contrexx')+'core_modules/MediaBrowser/View/Template/FileBrowser.html'
             };
             // __construct
-
-
-
             /**
              * Get the full path string.
              * @returns {string}
@@ -512,36 +483,29 @@
                 });
                 return returnValue;
             };
-
-
-
             /**
-             * @param file Array The clicked file.
-             * @param file.datainfo Array
-             * @param index Integer Index of the file
-             * @param selectFile Boolean If the file has been double clicked, this is true.
+       * @param   {array}     file        The clicked file
+       * @param   {integer}   index       Index of the file
+       * @param   {boolean}   selectFile  True on dblclick
+       * @todo    Remove the unused index parameter
              */
             $scope.clickFile = function (file, index, selectFile) {
-                if (file.datainfo.extension == 'Dir') {
+        if (file.datainfo.extension === 'Dir') {
                     $scope.extendPath(file.datainfo.name);
-                }
-                else {
+        } else {
                     if (file.datainfo.active === true && !selectFile) {
                         for (var i = 0; i < $scope.selectedFiles.length; i++) {
-                            if ($scope.selectedFiles[i].datainfo.filepath == file.datainfo.filepath) {
+              if ($scope.selectedFiles[i].datainfo.filepath === file.datainfo.filepath) {
                                 $scope.selectedFiles.splice(i, 1);
                             }
                         }
                         file.datainfo.active = false;
-                    }
-                    else {
+          } else {
                         file.datainfo.active = true;
                         if (selectFile) {
                             $scope.selectedFiles.push(file);
                             file.datainfo.active = false;
-
                             var fn = mediabrowserConfig.get('callbackWrapper');
-
                             if (typeof fn === 'function') {
                                 fn({type: 'file', data: [file]});
                             }
@@ -549,45 +513,42 @@
                                 $scope.lastActiveFile.datainfo.active = false;
                             }
                             $scope.closeModal();
-                        }
-                        else if (!mediabrowserConfig.get('multipleSelect')){
+            } else if (!mediabrowserConfig.get('multipleSelect')) {
                             $scope.selectedFiles = [];
                             if (!jQuery.isEmptyObject($scope.lastActiveFile)) {
                                 $scope.lastActiveFile.datainfo.active = false;
                             }
                             $scope.lastActiveFile = file;
                             $scope.selectedFiles.push(file);
-                        }
-                        else if (mediabrowserConfig.get('multipleSelect')){
+            } else if (mediabrowserConfig.get('multipleSelect')) {
                             $scope.selectedFiles.push(file);
                         }
                     }
-                    $scope.noFileSelected = $scope.selectedFiles.length == 0;
+          $scope.noFileSelected = $scope.selectedFiles.length === 0;
                 }
             };
-
             $scope.escapeString = function(string){
+// TODO: What about character 0x7f?
+// TODO: What about characters 0x80 thru 0x9f?
+// TODO: What about characters 0x9999 thru 0xffff?
+// TODO: What about characters 0x00 thru 0x1f?
+// TODO: The /m modifier is superficial here
                 return string.replace(/[\u00A0-\u9999<>\&]/gim, function(i) {
                     return '&#'+i.charCodeAt(0)+';';
                 });
             };
-
             $scope.renameFile = function (file, index) {
                 var splittedFileName = [];
-
                 splittedFileName[0] = file.datainfo.name;
                 if (file.datainfo.extension !== 'Dir') {
                     splittedFileName = file.datainfo.name.split('.');
                 }
-
                 var fileExtension = '';
                 var fileName = file.datainfo.name;
-                if (splittedFileName.length != 1) {
+        if (splittedFileName.length !== 1) {
                     fileExtension = splittedFileName.pop();
                     fileName = splittedFileName.join('.');
                 }
-
-
                 var renameForm = '<div id="mediabrowser-renamefile">' +
                     '<div class="file-name"><input type="text" class="form-control" value="' + $scope.escapeString(fileName) + '"/></div>' +
                     '<div class="file-dot">.</div>' +
@@ -601,21 +562,19 @@
                             label: cx.variables.get('TXT_FILEBROWSER_CANCEL', 'mediabrowser'),
                             className: "btn-danger",
                             callback: function () {
-
                             }
                         },
                         success: {
                             label: cx.variables.get('TXT_FILEBROWSER_FILE_RENAME', 'mediabrowser'),
                             className: "btn-success",
                             callback: function () {
-                                var newName = $('#mediabrowser-renamefile').find('.file-name input').val();
+                var newName = jQuery('#mediabrowser-renamefile').find('.file-name input').val();
                                 if (newName === null) {
-
                                 } else {
                                     $http({
                                         method: 'POST',
                                         url: 'index.php?cmd=jsondata&object=MediaBrowser&act=renameFile&path=' + encodeURI($scope.getPathAsString()) + '&csrf=' + cx.variables.get('csrf'),
-                                        data: $.param({
+                    data: jQuery.param({
                                             oldName: file.datainfo.name,
                                             newName: newName
                                         }),
@@ -623,7 +582,6 @@
                                             'Content-Type': 'application/x-www-form-urlencoded',
                                             'X-Requested-With': 'XMLHttpRequest'
                                         }
-
                                     }).success(function (jsonadapter) {
                                         if (!jsonadapter.message) {
                                             bootbox.alert({
@@ -645,7 +603,7 @@
                 });
                 renameDialog.bind('shown.bs.modal', function(){
                     renameDialog.find("input").select().keypress(function (e) {
-                        if (e.which == 13) {
+            if (e.which === 13) {
                             e.preventDefault();
                             jQuery(this).blur();
                             jQuery(renameDialog).find('.btn-success').focus().click();
@@ -653,8 +611,6 @@
                     });
                 });
             };
-
-
             $scope.removeFile = function (file, index) {
                 var removeDialog = bootbox.dialog({
                     className: "media-browser-modal-window",
@@ -665,7 +621,6 @@
                             label: cx.variables.get('TXT_FILEBROWSER_CANCEL', 'mediabrowser'),
                             className: "btn-default",
                             callback: function () {
-
                             }
                         },
                         success: {
@@ -675,7 +630,7 @@
                                 $http({
                                     method: 'POST',
                                     url: 'index.php?cmd=jsondata&object=MediaBrowser&act=removeFile&path=' + encodeURI($scope.getPathAsString())  + '&csrf=' + cx.variables.get('csrf'),
-                                    data: $.param({
+                  data: jQuery.param({
                                         file: file
                                     }),
                                     headers: {
@@ -690,7 +645,6 @@
                                         title:cx.variables.get('TXT_FILEBROWSER_ERROR_HAS_HAPPEND', 'mediabrowser')
                                     });
                                 });
-
                                 $scope.refreshBrowser();
                             }
                         }
@@ -700,15 +654,12 @@
                     removeDialog.find(".btn-danger").focus();
                 });
             };
-
-
             $scope.clickPath = function (index) {
                 var shrinkby = $scope.path.length - index - 1;
                 if (shrinkby > 0) {
                     $scope.shrinkPath(shrinkby);
                 }
             };
-
             $scope.createFolder = function () {
                 bootbox.prompt(
                     {
@@ -716,12 +667,11 @@
                         title: cx.variables.get('TXT_FILEBROWSER_DIRECTORY_NAME', 'mediabrowser'),
                         callback: function (dirName) {
                             if (dirName === null) {
-
                             } else {
                                 $http({
                                     method: 'POST',
                                     url: 'cadmin/index.php?cmd=jsondata&object=MediaBrowser&act=createDir&path=' + encodeURI($scope.getPathAsString()) + '&csrf=' + cx.variables.get('csrf'),
-                                    data: $.param({dir: dirName}),
+                  data: jQuery.param({dir: dirName}),
                                     headers: {'Content-Type': 'application/x-www-form-urlencoded'}
                                 }).success(function (jsonadapter) {
                                     $scope.updateSource();
@@ -736,7 +686,6 @@
                     }
                 );
             };
-
             $scope.choosePictures = function () {
                 var fn = mediabrowserConfig.get('callbackWrapper');
                 $scope.closeModal();
@@ -748,60 +697,115 @@
                     fn({type: 'file', data: $scope.selectedFiles});
                     $scope.selectedFiles = [];
                 }
-
-
             };
         }
     ]);
-
     mediaBrowserApp.controller('SitestructureCtrl', ['$scope', 'mediabrowserConfig',
         function ($scope, mediabrowserConfig) {
-
             $scope.activeLanguage = cx.variables.get('language','mediabrowser');
             $scope.activeLanguages = cx.variables.get('languages','mediabrowser');
-
             $scope.template = {
                 url: cx.variables.get('basePath','contrexx')+'core_modules/MediaBrowser/View/Template/Sitestructure.html'
             };
-
             $scope.clickPage = function (site) {
-
                 var fn = mediabrowserConfig.get('callbackWrapper');
                 if (typeof fn === 'function') {
                     fn({type: 'page', data: [site]});
                 }
                 $scope.closeModal();
             };
-
             $scope.isActive = function (lang) {
-                return $scope.activeLanguage == lang;
+        return $scope.activeLanguage === lang;
             };
-
             $scope.setLang = function (lang) {
                 $scope.activeLanguage = lang;
             };
-
-
         }
     ]);
-
-
-    /* DIRECTIVES */
-    /* preview function */
+  mediaBrowserApp.service('LexiconEntryService', ['$http', '$q',
+    function($http, $q) {
+      return {
+        refresh: refresh
+      };
+      function refresh() {
+        var deferred = $q.defer();
+        $http.get(cx.variables.get("cadminPath", "contrexx") +
+          'index.php?cmd=jsondata&object=Lexicon&act=getEntries' +
+          '&csrf=' + cx.variables.get('csrf'))
+          .success(function(response, status, headers) {
+            if (response.data instanceof Object) {
+              deferred.resolve(response.data);
+            } else if (response.match(/login_form/)) {
+              deferred.reject(cx.variables.get(
+                'TXT_FILEBROWSER_LOGGED_OUT', 'mediabrowser'));
+            } else {
+              deferred.reject("An error occured while fetching Lexicon Entries");
+            }
+          }).error(function() {
+          deferred.reject("An error occured while fetching Lexicon Entries");
+        });
+        return deferred.promise;
+      }
+    }]);
+  mediaBrowserApp.controller('LexiconEntryController', [
+    '$scope', 'mediabrowserConfig', 'LexiconEntryService',
+    function(
+      $scope, mediabrowserConfig, LexiconEntryService
+      ) {
+      console.log("LexiconEntryController: DEBUG: Entered");
+      // Where is that variable set?
+      // I couldn't find it anywhere.
+      $scope.activeLanguages = cx.variables.get('languages', 'mediabrowser');
+      console.log("LexiconEntryController: DEBUG: Locale:", $scope.activeLocale, ", languages:", $scope.activeLanguages);
+      $scope.searchterm = "";
+      $scope.template = {
+        url: cx.variables.get('basePath', 'contrexx') +
+          'core_modules/MediaBrowser/View/Template/LexiconEntries.html'
+      };
+      $scope.dblclick = dblclick;
+      $scope.isLocaleActive = isLocaleActive;
+      $scope.setLocale = setLocale;
+//      var entries = null;
+      if (entries === null) {
+        LexiconEntryService.refresh().then(function(entities) {
+          entries = entities;
+          setLocale(cx.variables.get('language', 'mediabrowser'));
+        });
+      }
+      setLocale(cx.variables.get('language', 'mediabrowser'));
+      function dblclick(slug) {
+        var fn = mediabrowserConfig.get('callbackWrapper');
+        if (typeof fn === 'function') {
+          fn({type: 'LexiconEntry', data: [{datainfo: {filepath: slug}}]});
+        }
+        $scope.closeModal();
+      }
+      function isLocaleActive(lang) {
+        return $scope.activeLocale === lang;
+      }
+      function setLocale(locale) {
+        $scope.activeLocale = locale;
+        if (entries) {
+          $scope.entries = entries[locale];
+        }
+      }
+    }
+  ]);
+  // DIRECTIVES
+  // Image preview
     mediaBrowserApp.directive('previewImage', ['$http', function ($http) {
         return {
             restrict: 'A',
             link: function (scope, el, attrs) {
                 if (attrs.previewImage !== 'none') {
-                    if (attrs.hasPreviewImage == 'true'){
+            if (attrs.hasPreviewImage === 'true') {
                         jQuery(el).popover({
                             trigger: 'hover',
                             html: true,
                             content: '<img src="' + attrs.previewImage.replace(/<[^>]*>/g, '') + '"  />',
                             placement: 'right'
                         });
-                    }
-                    else {
+            } else {
                         $http.get('index.php?cmd=jsondata&object=MediaBrowser&act=createThumbnails&file=' + attrs.previewImage).
                             success(function (data, status, headers, config) {
                                 jQuery(el).popover({
@@ -810,19 +814,16 @@
                                     content: '<img src="' + attrs.previewImage.replace(/<[^>]*>/g, '') + '"  />',
                                     placement: 'right'
                                 });
-                            })
+                });
                     }
                 }
             }
         };
     }]);
-
-
     mediaBrowserApp.factory('Thumbnail', function ($q) {
         return {
             isImage: function (src) {
                 var deferred = $q.defer();
-
                 var image = new Image();
                 image.onerror = function () {
                     deferred.resolve(false);
@@ -835,7 +836,6 @@
             }
         };
     });
-
     mediaBrowserApp.directive('sglclick', ['$parse', function ($parse) {
         return {
             restrict: 'A',
@@ -859,7 +859,6 @@
             }
         };
     }]);
-
     mediaBrowserApp.filter('findPage', function () {
         return function (items, search,activeLanguage) {
             if (!items) {
@@ -876,7 +875,6 @@
             return filtered;
         };
     });
-
     mediaBrowserApp.filter('orderAndSearchFiles', function () {
         return function (input, attribute, reverse, searchFile, isRegex) {
             if (!angular.isObject(input)) return input;
@@ -894,97 +892,79 @@
                     if (reverse) {
                         if (a < b) return -1;
                         if (a > b) return 1;
-                    }
-                    else {
+          } else {
                         if (a < b) return 1;
                         if (a > b) return -1;
                     }
                 }
                 return 0;
             });
-            if (searchFile != '') {
+      if (searchFile !== '') {
                 var searchObject;
                 if (isRegex) {
                     try {
-                        searchObject = function () {
                             var regex = new RegExp(searchFile, 'i');
-                            return function (string) {
+            searchObject = function(string) {
                                 return regex.test(string);
-                            }
-                        }();
-                    }
-                    catch (e) {
+            };
+          } catch (e) {
                         return [];
                     }
-                }
-                else {
-                    searchObject = function () {
-                        var fileSearchWords = searchFile.split(" ");
-                        return function (string) {
+        } else {
+          var fileSearchWords = searchFile.toLowerCase().split(" ");
+          searchObject = function(string) {
                             for (var i = 0; i < fileSearchWords.length; i++) {
-                                if (!(string.toLowerCase().indexOf(fileSearchWords[i].toLowerCase()) >= 0)) {
+              if (string.toLowerCase().indexOf(fileSearchWords[i]) === -1) {
                                     return false;
                                 }
                             }
                             return true;
+          };
                         }
-                    }()
-                }
                 return recursiveSearch(searchObject, array, 0);
             }
             return array;
-        }
-
+    };
     });
-
-
     function recursiveSearch(searchObject, searchArray, level) {
-        if (level > 6) { //TODO Is this really necessary?
-            return [];
-        }
         var resultArray = [];
         for (var key in searchArray) {
-            if (key == 'datainfo') {
+      if (key === 'datainfo') {
                 continue;
             }
-            if (searchArray[key]['datainfo'] != undefined
-                && searchArray[key]['datainfo']['name'] != undefined
-                && searchArray[key]['datainfo']['extension'] != 'Dir'
+// TODO: Rethink the JSON data structure.
+// Seeing this condition, I can't help but wonder...
+      if (typeof searchArray[key]['datainfo'] !== "undefined"
+        && typeof searchArray[key]['datainfo']['name'] !== "undefined"
+        && searchArray[key]['datainfo']['extension'] !== 'Dir'
                 && searchObject(searchArray[key]['datainfo']['name'])) {
                 resultArray.push(searchArray[key]);
             }
             if (searchArray[key] instanceof Object) {
-                resultArray = resultArray.concat(recursiveSearch(searchObject, searchArray[key], level++));
+        resultArray = resultArray.concat(
+          recursiveSearch(searchObject, searchArray[key], level+1));
             }
         }
         return resultArray;
     }
-
-
     jQuery(function () {
-
         jQuery('button.mediabrowser-button').each(function () {
-
             angular.bootstrap(jQuery(this).next('.mediaBrowserScope')[0], ['MediaBrowser']);
             var scope = angular.element(jQuery(this).next()[0]).injector();
             if (!scope){
                 console.warn('.mediaBrowserScope Element is missing, please generate the button only with the mediabrowser class and not by yourself!');
                 return;
             }
-
             jQuery(this).on('click', function (event, config) {
                 var mediabrowserConfig = scope.get('mediabrowserConfig');
                 if (mediabrowserConfig.get('isOpen')){
                     return;
                 }
                 var $modal = scope.get('$modal');
-
                 var attrs = jQuery(this).data();
-
                 for (var i in config) {
                     attrs[i] = config[i];
                 }
-
                 /**
                  * Set all options and default values
                  */
@@ -992,46 +972,37 @@
                 if (attrs.cxMbStartview) {
                     mediabrowserConfig.set('startView', attrs.cxMbStartview.charAt(0).toUpperCase() + attrs.cxMbStartview.slice(1) + "Ctrl");
                 }
-
                 mediabrowserConfig.set('views', 'all');
                 if (attrs.cxMbViews) {
                     mediabrowserConfig.set('views', attrs.cxMbViews.trim().split(","));
                 }
-
                 mediabrowserConfig.set('startMedia', 'files');
                 if (attrs.cxMbStartmediatype) {
                     mediabrowserConfig.set('startMedia', attrs.cxMbStartmediatype);
                 }
-
                 mediabrowserConfig.set('mediatypes', 'all');
                 if (attrs.cxMbMediatypes) {
                     mediabrowserConfig.set('mediatypes', attrs.cxMbMediatypes.split(/[\s,]+/));
                 }
-
                 mediabrowserConfig.set('multipleSelect', false);
                 if (attrs.cxMbMultipleselect) {
                     mediabrowserConfig.set('multipleSelect', attrs.cxMbMultipleselect);
                 }
-
                 mediabrowserConfig.set('modalOpened', false);
                 if (attrs.cxMbCbJsModalopened) {
                     mediabrowserConfig.set('modalOpened', attrs.cxMbCbJsModalopened);
                 }
-
                 if (attrs.startPath) {
                     mediabrowserConfig.set('lastPath', attrs.startPath);
                 }
-
                 if (typeof(config) !== 'undefined' && typeof(config.callback) !== 'undefined') {
                     mediabrowserConfig.set('modalClosed', config.callback);
-                }
-                else {
+        } else {
                     mediabrowserConfig.set('modalClosed', false);
                     if (attrs.cxMbCbJsModalclosed) {
                         mediabrowserConfig.set('modalClosed', attrs.cxMbCbJsModalclosed);
                     }
                 }
-
                 mediabrowserConfig.set('isOpen',true);
                 $modal.open({
                     templateUrl: cx.variables.get('basePath','contrexx')+'core_modules/MediaBrowser/View/Template/MediaBrowserModal.html',
@@ -1044,10 +1015,7 @@
                 }).result.finally(function(){
                         mediabrowserConfig.set('isOpen',false);
                     });
-
-                /**
-                 * Configuring Callbacks
-                 */
+        // Configuring Callbacks
                 if (mediabrowserConfig.get('modalOpened') !== false) {
                     var fn = window[mediabrowserConfig.get('modalOpened')];
                     var data = {type: 'modalopened', data: []};
@@ -1055,19 +1023,17 @@
                         fn(data);
                     }
                 }
-
                 mediabrowserConfig.set('callbackWrapper', function (e) {
                     scope.tabs = scope.dataTabs;
                     if (mediabrowserConfig.get('modalClosed') !== false) {
                         if (typeof mediabrowserConfig.get('modalClosed') === 'function') {
                             mediabrowserConfig.get('modalClosed')(e);
-                        }
-                        else {
+            } else {
                             var windowScope = window;
                             var scopeSplit = mediabrowserConfig.get('modalClosed').split('.');
                             for (var i = 0; i < scopeSplit.length - 1; i++) {
                                 windowScope = windowScope[scopeSplit[i]];
-                                if (scope == undefined) return;
+                if (typeof scope === "undefined") return;
                             }
                             var fn = windowScope[scopeSplit[scopeSplit.length - 1]];
                             if (typeof fn === 'function') {
@@ -1080,4 +1046,4 @@
             jQuery(this).removeAttr('disabled');
         });
     });
-}(cx.variables.get('jquery', 'mediabrowser'));
+}(cx));

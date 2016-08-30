@@ -30,7 +30,12 @@ class Translation extends AbstractTranslation
      * @Id
      * @GeneratedValue
      */
-    private $id;
+// Fix/Customizing: $translationRepo->translate() won't work otherwise:
+//  Fatal error: Cannot access private property Gedmo\Translatable\Entity\Translation::$id
+//  in C:\contrexx\c_vbv\lib\doctrine\Gedmo\Translatable\Entity\AbstractTranslation.php on line 59
+// was:
+//    private $id;
+    public $id;
 
     /**
      * All required columns are mapped through inherited superclass

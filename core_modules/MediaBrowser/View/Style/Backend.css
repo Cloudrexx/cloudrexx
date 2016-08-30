@@ -3,4 +3,17 @@
  * You may add own CSS files using
  * \JS::registerCSS(substr($this->getDirectory(false, true) . '/View/Style/FileName.css', 1));
  * or remove this file if you don't need it
- */
+
+TODO: Shouldn't this file be included in the backend? -- It isn't.
+-> Added styles to {@see MediaBrowser.css}
+
+.lexicon-list-entries {
+  width: 100%;
+}
+.icon-lexicon {
+  background: url("../Media/Icons/glyphicons-115-list.png") no-repeat;
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+}
+*/

@@ -55,13 +55,20 @@ class Yaml extends File implements Driver
         if (isset($mapping['fields'])) {
             foreach ($mapping['fields'] as $field => $fieldMapping) {
                 if (isset($fieldMapping['gedmo'])) {
-
-                    if (in_array('sluggable', $fieldMapping['gedmo'])) {
+//\DBG::log("Yaml: Fieldmapping for $field: " . var_export($fieldMapping, true));
+// The "source" field, e.g. "name":
+// Fixed:
+//                    if (in_array('sluggable', $fieldMapping['gedmo'])) {
+                    if (array_key_exists('sluggable', $fieldMapping['gedmo'])) {
                         if (!$this->isValidField($meta, $field)) {
                             throw new InvalidMappingException("Cannot slug field - [{$field}] type is not valid and must be 'string' in class - {$meta->name}");
                         }
-                        $sluggable = $fieldMapping['gedmo'][array_search('sluggable', $fieldMapping['gedmo'])];
+// Fixed:
+//                        $sluggable = $fieldMapping['gedmo'][array_search('sluggable', $fieldMapping['gedmo'])];
+                        $sluggable = $fieldMapping['gedmo']['sluggable'];
                         $config['fields'][] = array('field' => $field, 'position' => $sluggable['position']);
+//\DBG::log("Yaml: Fields: " . var_export($config['fields'], true));
+// The "target" slug field, e.g. "slug":
                     } elseif (isset($fieldMapping['gedmo']['slug']) || in_array('slug', $fieldMapping['gedmo'])) {
                         $slug = $fieldMapping['gedmo']['slug'];
                         if (!$this->isValidField($meta, $field)) {
@@ -83,9 +90,11 @@ class Yaml extends File implements Driver
 
                         $config['separator'] = isset($slug['separator']) ?
                             (string)$slug['separator'] : '-';
+//\DBG::log("Yaml: Slug: " . var_export($config['slug'], true));
                     }
                 }
             }
+//\DBG::log("Yaml: CONFIG: " . var_export($config, true));
         }
     }
 

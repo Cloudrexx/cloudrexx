@@ -77,27 +77,20 @@ class ContrexxJavascript {
     private function __construct()
     {
         global $objInit;
-
-        $backOrFrontend = $objInit->mode;
-// TODO: Unused
-//        global $objFWUser;
-//        $langId; 
-        if($backOrFrontend == "frontend")
-            $langId = $objInit->getFrontendLangId();
-        else //backend
-            $langId = $objInit->getBackendLangId();
+        $langId = ($objInit->mode == "frontend"
+            ? $objInit->getFrontendLangId() : $objInit->getBackendLangId());
         $langCode = FWLanguage::getLanguageCodeById($langId);
-
         $this->setVariable(
             array(
-                'path'      => ASCMS_PATH_OFFSET.'/'.$langCode.'/',
-                'basePath'  => ASCMS_PATH_OFFSET.'/',
-                'cadminPath'=> \Cx\Core\Core\Controller\Cx::instanciate()->getWebsiteBackendPath().'/',
-                'mode'      => $objInit->mode,
-                'language'  => $langCode,
-                'csrf'      => \Cx\Core\Csrf\Controller\Csrf::code(),
-            ),
-            'contrexx'
+                'path' => ASCMS_PATH_OFFSET . '/' . $langCode . '/',
+                'basePath' => ASCMS_PATH_OFFSET . '/',
+                'cadminPath' => \Cx\Core\Core\Controller\Cx::instanciate()->getWebsiteBackendPath() . '/',
+                'mode' => $objInit->mode,
+                'language' => $langCode,
+                'csrf' => \Cx\Core\Csrf\Controller\Csrf::code(),
+                'theme_id' => $objInit->currentThemesId,
+                'theme_folder' => $objInit->getCurrentThemesPath(),
+            ), 'contrexx'
         );
 
         //let i18n set it's variables

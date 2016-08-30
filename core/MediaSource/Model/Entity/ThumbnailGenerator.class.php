@@ -229,7 +229,9 @@ class ThumbnailGenerator extends EntityBase
      */
     public function getThumbnailFilename($filename) {
         // legacy fallback for older calls.
-        if (preg_match('/\.thumb$/', $filename)) return $filename;
+        if (preg_match('/\.thumb$/', $filename)) {
+            return $filename;
+        }
         if (!file_exists($filename) && !file_exists($this->cx->getWebsitePath().'/'.ltrim($filename,'/')) ) {
             return $filename.'.thumb';
         }

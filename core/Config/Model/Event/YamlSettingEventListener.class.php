@@ -121,14 +121,14 @@ class YamlSettingEventListener implements \Cx\Core\Event\Model\Entity\EventListe
             \DBG::msg($e->getMessage());
         }
     }
-    
-    public function onEvent($eventName, array $eventArgs) {
-        \DBG::msg(__METHOD__);
-        if ($eventName == 'postFlush') {
-            if (isset($eventArgs[1]) && !preg_match('#\b(Config.yml)\b#', $eventArgs[1])) {
-                return false;
-            }
+
+    public function onEvent($eventName, array $eventArgs)
+    {
+        if ($eventName === 'postFlush'
+            && isset($eventArgs[1])
+            && preg_match('/\\bConfig\\.yml\\b/', $eventArgs[1])) {
+                $this->$eventName(current($eventArgs));
         }
-        $this->$eventName(current($eventArgs));
     }
+
 }

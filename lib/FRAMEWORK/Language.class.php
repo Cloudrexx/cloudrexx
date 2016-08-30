@@ -47,6 +47,15 @@
  */
 class FWLanguage
 {
+    /**
+     * @var array Mapping of language ID to locale
+     * @todo make it complete (at least six elements)
+     * @todo make it configurable
+     * @todo make it support full locale (ab_CD)
+     * @author  Reto Kohli <reto.kohli@comvation.com>
+     */
+    protected static $locales = array( 99 => 'sm_PL', );
+
     private static $arrLanguages = null;
 
     /**
@@ -428,6 +437,56 @@ class FWLanguage
         return false;
     }
 
+    /**
+     * Return the locale for the given Language ID
+     *
+     * If no proper locale is found, returns the two-letter Language ISO code.
+     * Returns null if that isn't found either.
+     * @param   integer $langId         The Language ID
+     * @return  string|null             The locale, Language code, or null
+     * @static
+     * @author  Reto Kohli <reto.kohli@comvation.com>
+     */
+    public static function getLocaleById($langId)
+    {
+        if (array_key_exists($langId, self::$locales)) {
+            return self::$locales[$langId];
+        }
+        // Note that this SHOULD NOT pretend the *code* to be a locale!
+        // (FTTB, Language code and locale are identical)
+        $locale = self::getLanguageParameter($langId, 'lang');
+        if ($locale) {
+            return $locale;
+        }
+        return null;
+    }
+
+    /**
+     * Return the ID of the given locale
+     *
+     * If no matching locale is found, returns the ID matching the
+     * two-letter language ISO code.
+     * Returns null if that isn't found either.
+     * @param   string  $locale         The locale
+     * @return  string|null             The Language ID
+     * @static
+     * @author  Reto Kohli <reto.kohli@comvation.com>
+     */
+    public static function getIdByLocale($locale)
+    {
+        // TODO: Inefficient, and pointless FTTB (no locales!)
+        $key = array_search($locale, self::$locales);
+        if ($key !== false) {
+            return self::$locales[$key];
+        }
+        // Note that this SHOULD NOT pretend the *code* to be a locale!
+        // (FTTB, Language code and locale are identical)
+        $id = self::getLanguageIdByCode($locale, 'lang');
+        if ($id) {
+            return $id;
+        }
+        return null;
+    }
 
     /**
      * Return the fallback language ID for the given ID
