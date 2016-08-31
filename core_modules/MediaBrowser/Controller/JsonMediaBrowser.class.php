@@ -88,7 +88,7 @@ class JsonMediaBrowser extends SystemComponentController implements JsonAdapter
     public function getAccessableMethods() {
         return array(
             'getFiles', 'getSites', 'getSources', 'createThumbnails',
-            'createDir', 'renameFile', 'removeFile', 
+            'createDir', 'renameFile', 'removeFile',
             'removeFileFromFolderWidget'=> new \Cx\Core_Modules\Access\Model\Entity\Permission(null, null, false),
             'folderWidget' => new \Cx\Core_Modules\Access\Model\Entity\Permission(null, null, false)
         );

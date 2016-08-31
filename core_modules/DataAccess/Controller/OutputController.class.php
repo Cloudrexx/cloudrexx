@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,10 +24,10 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Output controller
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author Michael Ritter <michael.ritter@cloudrexx.com>
  * @package cloudrexx
@@ -38,14 +38,14 @@ namespace Cx\Core_Modules\DataAccess\Controller;
 
 /**
  * Output controller
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author Michael Ritter <michael.ritter@cloudrexx.com>
  * @package cloudrexx
  * @subpackage core_modules_dataaccess
  */
 abstract class OutputController extends \Cx\Core\Core\Model\Entity\Controller {
-    
+
     /**
      * Returns encoded data
      * @param array $data Data to encode
@@ -53,4 +53,3 @@ abstract class OutputController extends \Cx\Core\Core\Model\Entity\Controller {
      */
     public abstract function parse($data);
 }
-

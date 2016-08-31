@@ -19,7 +19,7 @@
     function diableSelect() {
         document.getElementById("selectSurvey").disabled = true;
     }
-</script>   
+</script>
 <form name="create_copy" method="post" action="">
     <table width="100%" cellspacing="0" cellpadding="3" border="0" class="adminlist">
         <tr>
@@ -28,18 +28,18 @@
         <tr class="row2">
             <td width="2%" nowrap>
                 <input type="radio" value="create" id="createSurvey" name="createSurvey" {SELECT_CREATE}  onclick="diableSelect();"/>
-            </td>   
-            <td width="98%" nowrap>           
+            </td>
+            <td width="98%" nowrap>
                 <label for="createSurvey">Neue Umfrage erstellen</label><br/>
             </td>
         </tr>
-        <tr class="row1"> 
-            <td width="2%" nowrap>         
+        <tr class="row1">
+            <td width="2%" nowrap>
                 <input type="radio" value="copy" id="copySurvey" name="createSurvey" onclick="enabsleSelect();"/>
             </td>
-            <td width="98%" nowrap>           
+            <td width="98%" nowrap>
                 <label for="copySurvey">Bestehende Umfrage kopieren</label><br/>
-            </td>        
+            </td>
         </tr>
         <tr class="row2">
             <td></td>
@@ -47,11 +47,11 @@
                 <select name="selectSurvey" id="selectSurvey" disabled>
                     <option value="0"> - Bitte wählen Sie eine bestehende Umfrage - </option>
                     <!-- BEGIN ShowSurveys -->
-                    <option value="{TXT_SURVEY_ID}">{TXT_SURVEY_TITLE}</option>        
-                    <!-- END ShowSurveys -->                                  
+                    <option value="{TXT_SURVEY_ID}">{TXT_SURVEY_TITLE}</option>
+                    <!-- END ShowSurveys -->
                 </select>
             </td>
-        </tr>          
+        </tr>
     </table>
     <br />
     <table cellpadding="2" cellspacing="0" border="0">
@@ -62,4 +62,3 @@
         </tr>
     </table>
 </form>
-

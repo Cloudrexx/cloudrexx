@@ -7,22 +7,22 @@
     Ihr Eintrag wurde erfolgreich gespeichert, ist aber noch nicht öffentlich einsehbar.<br />Um Ihren Eintrag zu veröffentlichen, müssen Sie vor dem Speichervorgang die Option <strong>Freigeben</strong> auswählen.
     <!-- END mediadirEntrySaveOnlyMessage -->
     <!-- BEGIN mediadirEntryReadyToConfirmMessage -->
-    Ihr Eintrag wurde erfolgreich gespeichert und wird nun von der Administration geprüft.<br />Nach erfolgter Prüfung wird Ihr Eintrag öffentlich einsehbar sein.<br />Bitte beachten Sie, dass die Prüfung einige Zeit in Anspruch nehmen kann. 
+    Ihr Eintrag wurde erfolgreich gespeichert und wird nun von der Administration geprüft.<br />Nach erfolgter Prüfung wird Ihr Eintrag öffentlich einsehbar sein.<br />Bitte beachten Sie, dass die Prüfung einige Zeit in Anspruch nehmen kann.
     <!-- END mediadirEntryReadyToConfirmMessage -->
     <!-- BEGIN mediadirEntryErrMessage -->
     Beim Speichern trat ein Fehler auf. Bitte versuchen Sie es erneut.
     <!-- END mediadirEntryErrMessage -->
     <!-- BEGIN mediadirEntryModifyForm -->
     <form enctype="multipart/form-data" method="post" onsubmit="{MEDIADIR_FORM_ONSUBMIT}" action="index.php?section=MediaDir&amp;cmd=edit" name="entryModfyForm">
-        <!-- BEGIN mediadirForms -->   
+        <!-- BEGIN mediadirForms -->
         <table width="100%">
-            <!-- BEGIN mediadirFormList -->  
+            <!-- BEGIN mediadirFormList -->
             <tr>
                 <td width="1%" valign="top"><input type="radio" name="selectedFormId" value="{TXT_MEDIADIR_FORM_ID}" onclick="document.entryModfyForm.submit();"></td>
                 <td width="30%" valign="top">{TXT_MEDIADIR_FORM_IMAGE_THUMB}</td>
                 <td width="69%" valign="top"><h2>{TXT_MEDIADIR_FORM_TITLE}</h2>{TXT_MEDIADIR_FORM_DESCRIPTION}</td>
-            </tr> 
-            <!-- END mediadirFormList -->   
+            </tr>
+            <!-- END mediadirFormList -->
         </table>
         <!-- END mediadirForms -->
         <!-- BEGIN mediadirInputfields -->
@@ -34,11 +34,11 @@
         <input type="hidden" value="{MEDIADIR_ENTRY_ID}" name="entryId" />
         <input type="hidden" value="{MEDIADIR_FORM_ID}" name="formId" />
         <input type="hidden" value="{MEDIADIR_UPLOADER_ID}" name="uploaderId" />
-        <!-- BEGIN mediadirInputfieldElement -->   
-        <!-- BEGIN mediadirInputfieldAddStep -->  
+        <!-- BEGIN mediadirInputfieldElement -->
+        <!-- BEGIN mediadirInputfieldAddStep -->
         {MEDIADIR_INPUTFIELD_ADDSTEP}
         <!-- END mediadirInputfieldAddStep -->
-        <!-- BEGIN mediadirInputfieldList -->   
+        <!-- BEGIN mediadirInputfieldList -->
         <p><label>{TXT_MEDIADIR_INPUTFIELD_NAME}</label>{MEDIADIR_INPUTFIELD_FIELD}</p>
         <!-- END mediadirInputfieldList -->
         <!-- BEGIN mediadirTranslationStatus -->

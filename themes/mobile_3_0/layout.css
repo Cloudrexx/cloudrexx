@@ -204,7 +204,7 @@ a.out {
 /************************************************************************
 MAIN LAYOUT
 *************************************************************************/
-body {   
+body {
 }
 body {
     background: none repeat scroll 0 0 #FFFFFF;
@@ -236,7 +236,7 @@ body {
     font-weight: bold;
     padding: 14px 0 0 10px;
 }
-#header .right { 
+#header .right {
     padding: 10px 10px 0 0
 }
 #header a {
@@ -283,7 +283,7 @@ h3{
 /************************************************************************
 NAVIGATION STYLING
 *************************************************************************/
-.content1 ul.menu { 
+.content1 ul.menu {
     background: none repeat scroll 0 0 #FFFFFF;
     margin: 0px;border-radius: 5px; border: 1px solid #D5D5D5;
 
@@ -401,7 +401,7 @@ select{
     background: none repeat scroll 0 0 #FFFFFF;
 }
 label{
-    font-size: 12px;    
+    font-size: 12px;
     display: block;
     text-transform: uppercase;
     font-weight: bold;

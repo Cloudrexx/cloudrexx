@@ -46,7 +46,7 @@ namespace Cx\Core\Routing\Controller;
  */
 class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBackendController
 {
-    
+
     /**
     * Returns a list of available commands (?act=XY)
     * @return array List of acts
@@ -54,7 +54,7 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
     public function getCommands() {
         return array('RewriteRule');
     }
-    
+
     /**
      * This is used as a temporary workaround to set user titles of fieldnames
      * If BackendTable and FormGenerator use a sensful format for getting the
@@ -62,7 +62,7 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
      */
     protected function getViewGeneratorOptions($entityClassName, $classIdentifier) {
         global $_ARRAYLANG;
-        
+
         $langVarName = 'TXT_' . strtoupper($this->getType() . '_' . $this->getName() . '_ACT_' . $classIdentifier);
         $header = '';
         if (isset($_ARRAYLANG[$langVarName])) {

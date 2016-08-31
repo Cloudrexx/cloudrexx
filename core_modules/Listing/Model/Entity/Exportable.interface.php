@@ -45,6 +45,6 @@ namespace Cx\Core_Modules\Listing\Model\Entity;
  * @subpackage  coremodule_listing
  */
 interface Exportable {
-    
+
     public function export($twoDimensionalArray);
 }

@@ -4,7 +4,7 @@
 
 /* iPad Landscape */
 @media only screen and (max-width: 1024px) {
-    
+
     #homeSlideshow .text h2 {
         font-size: 1.5em !important;
         line-height: 2.4em !important;
@@ -75,9 +75,9 @@
     #sidebar {width: 220px;}
     #newsletter input[type="submit"] {margin-left: 0;}
     #voting .voting label {width: 80% !important;}
-    #mediadir .mapLarge {width: 100%;}   
+    #mediadir .mapLarge {width: 100%;}
     form p{padding-left: 0 !important; width: 100% !important;}
-    
+
 }
 /*layouts smaller than 600px, iPhone and mobiles*/
 @media only screen and (max-width: 480px), screen and (max-device-width: 480px), screen and (max-width: 600px)  {
@@ -215,7 +215,7 @@
         margin-left: 3% !important;
         margin-right: 0px!important;
         width: 97% !important;
-    }    
+    }
     label{
         width:100% !important;
         margin-left: 0 !important;
@@ -266,7 +266,7 @@
     label{
         width:100% !important;
         margin-left: 0 !important;
-    }    
+    }
     #sidebar .oneFourth{clear:both !important;}
     #footer .oneThird{clear:both !important;}
     table{width:100% !important;}
@@ -303,7 +303,7 @@
     label{
         width:100% !important;
         margin-left: 0 !important;
-    } 
+    }
     form p{padding-left: 0 !important;}
     #recommend #captcha {margin-left: 0;}
 }

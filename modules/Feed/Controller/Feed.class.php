@@ -54,9 +54,9 @@ namespace Cx\Modules\Feed\Controller;
  */
 class Feed extends FeedLibrary
 {
-	/**
-	 * @var    \Cx\Core\Html\Sigma
-	 */
+    /**
+     * @var    \Cx\Core\Html\Sigma
+     */
     public $_objTpl;
     public $pageTitle;
     public $statusMessage;

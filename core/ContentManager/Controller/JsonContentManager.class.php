@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * JSON Adapter for ContentManager
  * @copyright   Cloudrexx AG
@@ -44,7 +44,7 @@ use \Cx\Core\Json\JsonAdapter;
  * @subpackage  core_json
  */
 class JsonContentManager implements JsonAdapter {
-    
+
     /**
      * Returns the internal name used as identifier for this adapter
      * @return String Name of this adapter
@@ -52,7 +52,7 @@ class JsonContentManager implements JsonAdapter {
     public function getName() {
         return 'cm';
     }
-    
+
     /**
      * Returns an array of method names accessable from a JSON request
      * @return array List of method names
@@ -68,7 +68,7 @@ class JsonContentManager implements JsonAdapter {
     public function getMessagesAsString() {
         return '';
     }
-    
+
     /**
      * Returns default permission as object
      * @return Object
@@ -76,7 +76,7 @@ class JsonContentManager implements JsonAdapter {
     public function getDefaultPermissions() {
         return null;
     }
-    
+
     /**
      * Saves the toggle statuses in the session.
      * @param Array $params Client parameters
@@ -87,13 +87,13 @@ class JsonContentManager implements JsonAdapter {
         foreach ($params['post'] as $toggleKey => $toggleValue) {
             $arrToggleStatuses[contrexx_input2raw($toggleKey)] = contrexx_input2raw($toggleValue);
         }
-        
+
         if (!isset($_SESSION['contentManager'])) {
             $_SESSION['contentManager'] = array();
         }
         $_SESSION['contentManager']['toggleStatuses'] = $arrToggleStatuses;
     }
-    
+
     /**
      * Returns an array containing the permissions of the current user
      * The array has the following keys with boolean values:
@@ -116,7 +116,7 @@ class JsonContentManager implements JsonAdapter {
             'publish'   => $global && \Permission::checkAccess(78, 'static', true),
         );
     }
-    
+
     /**
      * Copies the complete tree from the default language to another and copies the pages content
      * @param array $params Array containing target language (array("get"=>array("to"=>{target}))
@@ -124,7 +124,7 @@ class JsonContentManager implements JsonAdapter {
     public function copy($params) {
         return $this->performLanguageAction('copy', $params);
     }
-    
+
     /**
      * Copies the complete tree from the default language to another and sets content type to fallback
      * @param array $params Array containing target language (array("get"=>array("to"=>{target}))
@@ -132,10 +132,10 @@ class JsonContentManager implements JsonAdapter {
     public function link($params) {
         return $this->performLanguageAction('link', $params);
     }
-    
+
     private function performLanguageAction($action, $params) {
         global $_CORELANG;
-        
+
         // Global access check
         if (!\Permission::checkAccess(6, 'static', true) ||
                 !\Permission::checkAccess(35, 'static', true)) {

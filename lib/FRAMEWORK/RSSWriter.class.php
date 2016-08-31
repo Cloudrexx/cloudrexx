@@ -256,7 +256,7 @@ class RSSWriter {
     {
         $this->xmlDocument = <<<XMLJSOUTPUT
 if (document.body) {
-	document.write('<div id="news_rss_feeds"></div>');
+    document.write('<div id="news_rss_feeds"></div>');
 }
 fnWinOnload = window.onload;
 window.onload = function() {
@@ -276,8 +276,8 @@ XMLJSOUTPUT;
             $this->xmlDocument .= "rssFeedNews[".$nr."]['date'] = '".date(ASCMS_DATE_FORMAT_DATE, $arrItem['pubDate'])."';\n";
             $nr++;
         }
-		$utf8_fixed = $this->_js_umlauts($this->xmlDocument);
-		if ($utf8_fixed) $this->xmlDocument = $utf8_fixed;
+        $utf8_fixed = $this->_js_umlauts($this->xmlDocument);
+        if ($utf8_fixed) $this->xmlDocument = $utf8_fixed;
 
 
         $this->xmlDocument .= <<<XMLJSOUTPUT
@@ -519,14 +519,14 @@ XMLJSOUTPUT;
         return sprintf("%'\t".$this->_xmlElementLevel."s", "");
     }
 
-	/** returns the ord() of an UTF8 character.
-	 * @param c - the character you want to have converted
-	 * @param index (optional) index into the string
-	 * @param bytes (optional, out) returns number of bytes of character.
-	 * Copyright: "kerry at shetline dot com", copied from php.net/ord.
-	 * Dave Vogt, 25.07.2008
-	 */
-	private function _ordUTF8($c, $index = 0, &$bytes = null) {
+    /** returns the ord() of an UTF8 character.
+     * @param c - the character you want to have converted
+     * @param index (optional) index into the string
+     * @param bytes (optional, out) returns number of bytes of character.
+     * Copyright: "kerry at shetline dot com", copied from php.net/ord.
+     * Dave Vogt, 25.07.2008
+     */
+    private function _ordUTF8($c, $index = 0, &$bytes = null) {
         $len   = strlen($c);
         $bytes = 0;
 
@@ -535,60 +535,60 @@ XMLJSOUTPUT;
         $h = ord($c{$index});
 
         if ($h <= 0x7F) {
-			$bytes = 1;
-			return $h;
+            $bytes = 1;
+            return $h;
         }
         else if ($h < 0xC2) return false;
         else if ($h <= 0xDF && $index < $len - 1) {
-			$bytes = 2;
-			return ($h & 0x1F) <<    6 | (ord($c{$index + 1}) & 0x3F);
+            $bytes = 2;
+            return ($h & 0x1F) <<    6 | (ord($c{$index + 1}) & 0x3F);
         }
         else if ($h <= 0xEF && $index < $len - 2) {
-			$bytes = 3;
-			return ($h & 0x0F) << 12 | (ord($c{$index + 1}) & 0x3F) << 6
-									 | (ord($c{$index + 2}) & 0x3F);
-        }                    
+            $bytes = 3;
+            return ($h & 0x0F) << 12 | (ord($c{$index + 1}) & 0x3F) << 6
+                                     | (ord($c{$index + 2}) & 0x3F);
+        }
         else if ($h <= 0xF4 && $index < $len - 3) {
-			$bytes = 4;
-			return ($h & 0x0F) << 18 | (ord($c{$index + 1}) & 0x3F) << 12
-									 | (ord($c{$index + 2}) & 0x3F) << 6
-									 | (ord($c{$index + 3}) & 0x3F);
+            $bytes = 4;
+            return ($h & 0x0F) << 18 | (ord($c{$index + 1}) & 0x3F) << 12
+                                     | (ord($c{$index + 2}) & 0x3F) << 6
+                                     | (ord($c{$index + 3}) & 0x3F);
         }
 
         else return false;
-	}
+    }
 
-	/**
-	 * Helper function for converting an special character into
-	 * it's proper \uXXXX notation.
-	 */
-	private function _uni_escape($chr) {
-		$chr = $chr[0];
-		$bytecount = 1;
-		$codepoint = $this->_ordUTF8($chr, 0, $bytecount);
+    /**
+     * Helper function for converting an special character into
+     * it's proper \uXXXX notation.
+     */
+    private function _uni_escape($chr) {
+        $chr = $chr[0];
+        $bytecount = 1;
+        $codepoint = $this->_ordUTF8($chr, 0, $bytecount);
 
-		// 1-byte UTF8 character means ASCII aequivalent. no need
-		// to escape!
-		if ($bytecount == 1) return $chr;
+        // 1-byte UTF8 character means ASCII aequivalent. no need
+        // to escape!
+        if ($bytecount == 1) return $chr;
 
-		$hex       = strtoupper(dechex($codepoint));
+        $hex       = strtoupper(dechex($codepoint));
 
-		$len = strlen($hex);
-		// output needs to be zero-padded (four positions)
-		$zeroes    = 4 - $len;
-		for (; $zeroes > 0; $zeroes--) {
-			$hex = "0$hex";
-		}
-		return "\\u$hex";
-	}
+        $len = strlen($hex);
+        // output needs to be zero-padded (four positions)
+        $zeroes    = 4 - $len;
+        for (; $zeroes > 0; $zeroes--) {
+            $hex = "0$hex";
+        }
+        return "\\u$hex";
+    }
 
-	/**
-	 * Takes a string and replaces all umlauts and special chars with
-	 * their unicode escape sequence. This is needed so UTF8 Javascript
-	 * news gets displayed correctly in Latin1 pages.
-	 */
-	private function _js_umlauts($str) {
-		return preg_replace_callback('/(.)/u', array($this, '_uni_escape'), $str); 
-	}
+    /**
+     * Takes a string and replaces all umlauts and special chars with
+     * their unicode escape sequence. This is needed so UTF8 Javascript
+     * news gets displayed correctly in Latin1 pages.
+     */
+    private function _js_umlauts($str) {
+        return preg_replace_callback('/(.)/u', array($this, '_uni_escape'), $str);
+    }
 }
 ?>

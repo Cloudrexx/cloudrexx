@@ -466,7 +466,7 @@ class Market extends MarketLibrary
                    $this->_objTpl->setVariable(array(
                     'MARKET_ENDDATE'            => $enddate,
                     'MARKET_TITLE'                => $objResult->fields['title'],
-					'MARKET_COLOR'                => $objResult->fields['color'],
+                    'MARKET_COLOR'                => $objResult->fields['color'],
                     'MARKET_DESCRIPTION'        => substr($objResult->fields['description'], 0, 110)."<a href='index.php?section=Market&cmd=detail&id=".$objResult->fields['id']."' target='_self'>[...]</a>",
                     'MARKET_PRICE'                => $price,
                     'MARKET_PICTURE'            => $image,
@@ -736,8 +736,8 @@ class Market extends MarketLibrary
 
                 $residence = $objUser->getProfileAttribute('zip').' '.$objUser->getProfileAttribute('city');
             } else {
-            	$TXTuserDetails 	= $_ARRAYLANG['TXT_MARKET_CONTACT'];
-                $userDetails 		= $user.$userMail;
+                $TXTuserDetails     = $_ARRAYLANG['TXT_MARKET_CONTACT'];
+                $userDetails         = $user.$userMail;
             }
 
             if ($this->entries[$id]['userdetails'] != 1) {
@@ -1387,7 +1387,7 @@ class Market extends MarketLibrary
 
     /**
      * Edit the advertisement entry
-     * 
+     *
      * @return null
      */
 

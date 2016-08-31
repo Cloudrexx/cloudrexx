@@ -6,12 +6,12 @@
        </tr>
        <tr class="row3">
             <td width="2%">&nbsp;&nbsp;#</td>
-            <td style="text-align:center;" width="10%">{TXT_SORTING}</td>            
+            <td style="text-align:center;" width="10%">{TXT_SORTING}</td>
             <td width="20%">{TXT_QUESTION}</td>
-            <td width="15%">{TXT_CREATED_AT}</td>            
-            <td width="20%">{TXT_QUESTION_TYPE}</td>    
+            <td width="15%">{TXT_CREATED_AT}</td>
+            <td width="20%">{TXT_QUESTION_TYPE}</td>
             <td width="15%">{TXT_IS_COMMENTABLE}</td>
-            <td width="5%">{TXT_COUNTER}</td>                      
+            <td width="5%">{TXT_COUNTER}</td>
             <td style="text-align:right;" width="15%">{TXT_FUNCTIONS}</td>
        </tr>
        <!-- BEGIN ShowQuestions -->
@@ -21,48 +21,47 @@
             </td>
             <td style="text-align:center;">
                  <input type="hidden" name="form_id[]" value="{TXT_SURVEY_ID}" />
-	    	   <input type="text" name="form_pos[]" value="{TXT_SURVEY_POS}" style="width:25px; text-align:right; padding:2px;" />
-            </td>            
+           <input type="text" name="form_pos[]" value="{TXT_SURVEY_POS}" style="width:25px; text-align:right; padding:2px;" />
+            </td>
             <td>{TXT_SURVEY_QUESTION}</td>
             <td>{TXT_SURVEY_QUESTION_CREATED_AT}</td>
             <td style="text-align:left;padding-left:2px;">{TXT_SURVEY_QUESTION_TYPE}</td>
-            <td>{TXT_SURVEY_QUESTION_COMMENTABLE}</td>    
-            <td>{TXT_SURVEY_COUNTER}</td>                     
+            <td>{TXT_SURVEY_QUESTION_COMMENTABLE}</td>
+            <td>{TXT_SURVEY_COUNTER}</td>
             <td nowrap="nowrap">
-		 <div align="right" style="padding-right:5px;">
-		   <a href="../index.php?section=Survey&cmd=questionpreview&id={TXT_SURVEY_ID}" title="{TXT_ANALYSE_QUESTION_PREVIEW}" target="_blank" rel="gb_page_fs[]">
-		     <img src="../core/Core/View/Media/icons/preview.png" border="0" alt="{TXT_ANALYSE_QUESTION_PREVIEW}" title="{TXT_ANALYSE_QUESTION_PREVIEW}" />
-		   </a>		 
-		   <a href="index.php?cmd=Survey&act=editQuestions&id={TXT_SURVEY_ID}&linkId={TXT_LINKID}" target="_self" title="{TXT_IMAGE_EDIT}">
-		     <img src="../core/Core/View/Media/icons/edit.gif" border="0" alt="{TXT_IMAGE_EDIT}" title="{TXT_SURVEY_EDIT_TXT}" />
-		   </a>
-		   <a href="javascript:deleteEntry({TXT_SURVEY_ID});" target="_self" title="{TXT_IMGALT_DELETE}">
-		     <img src="../core/Core/View/Media/icons/delete.gif" border="0" alt="{TXT_IMGALT_DELETE}" title="{TXT_SURVEY_DELETE_TXT}" />
-		   </a>
-		 </div>
-	     </td>
+     <div align="right" style="padding-right:5px;">
+       <a href="../index.php?section=Survey&cmd=questionpreview&id={TXT_SURVEY_ID}" title="{TXT_ANALYSE_QUESTION_PREVIEW}" target="_blank" rel="gb_page_fs[]">
+         <img src="../core/Core/View/Media/icons/preview.png" border="0" alt="{TXT_ANALYSE_QUESTION_PREVIEW}" title="{TXT_ANALYSE_QUESTION_PREVIEW}" />
+       </a>
+       <a href="index.php?cmd=Survey&act=editQuestions&id={TXT_SURVEY_ID}&linkId={TXT_LINKID}" target="_self" title="{TXT_IMAGE_EDIT}">
+         <img src="../core/Core/View/Media/icons/edit.gif" border="0" alt="{TXT_IMAGE_EDIT}" title="{TXT_SURVEY_EDIT_TXT}" />
+       </a>
+       <a href="javascript:deleteEntry({TXT_SURVEY_ID});" target="_self" title="{TXT_IMGALT_DELETE}">
+         <img src="../core/Core/View/Media/icons/delete.gif" border="0" alt="{TXT_IMGALT_DELETE}" title="{TXT_SURVEY_DELETE_TXT}" />
+       </a>
+     </div>
+       </td>
        </tr>
-       <!-- END ShowQuestions -->       
+       <!-- END ShowQuestions -->
 </table>
 
 <table cellpadding="2" cellspacing="0" border="0" >
-		<tr>
-			<td>
-				<img src="../core/Core/View/Media/icons/arrow.gif" border="0" width="38" height="22" alt="{TXT_ENTRIES_MARKED}:" />
-				<a href="#" onclick="changeCheckboxes('frmShowQuestionEntries','selectedEntriesId[]',true); return false;">{TXT_SELECT_ALL}</a> /
-				<a href="#" onclick="changeCheckboxes('frmShowQuestionEntries','selectedEntriesId[]',false); return false;">{TXT_DESELECT_ALL}</a>
-				<img src="../core/Core/View/Media/icons/strike.gif" alt="" />
-				<select name="frmShowEntries_MultiAction" onchange="selectMultiAction();">
-					<option value="0">{TXT_SELECT_ACTION}</option>
-					<option value="save">{TXT_SAVE_SORTING}</option>
-					<option value="delete">{TXT_DELETE_SELECTED}</option>
-		 		</select>
-			</td>
-   		</tr>
-	</table>
+    <tr>
+      <td>
+        <img src="../core/Core/View/Media/icons/arrow.gif" border="0" width="38" height="22" alt="{TXT_ENTRIES_MARKED}:" />
+        <a href="#" onclick="changeCheckboxes('frmShowQuestionEntries','selectedEntriesId[]',true); return false;">{TXT_SELECT_ALL}</a> /
+        <a href="#" onclick="changeCheckboxes('frmShowQuestionEntries','selectedEntriesId[]',false); return false;">{TXT_DESELECT_ALL}</a>
+        <img src="../core/Core/View/Media/icons/strike.gif" alt="" />
+        <select name="frmShowEntries_MultiAction" onchange="selectMultiAction();">
+          <option value="0">{TXT_SELECT_ACTION}</option>
+          <option value="save">{TXT_SAVE_SORTING}</option>
+          <option value="delete">{TXT_DELETE_SELECTED}</option>
+         </select>
+      </td>
+       </tr>
+  </table>
 {ENTRIES_PAGING}
-	</form>
-	
-	<br>
-	{ADD_QUESTION_HERE}
+  </form>
 
+  <br>
+  {ADD_QUESTION_HERE}

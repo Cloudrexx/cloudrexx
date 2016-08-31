@@ -92,7 +92,7 @@ class MediaDirectoryInputfieldAccounts extends \Cx\Modules\MediaDir\Controller\M
                     $strValue = null;
                 }
 
-				$arrValue = explode(',',$strValue);
+                $arrValue = explode(',',$strValue);
 
                 //$strFormType = empty($arrInputfield['default_value'][$_LANGID]) ? $arrInputfield['default_value'][0] : $arrInputfield['default_value'][$_LANGID];
                 //$arrSelectorOptions = array();
@@ -195,12 +195,12 @@ class MediaDirectoryInputfieldAccounts extends \Cx\Modules\MediaDir\Controller\M
                 $strInputfield .= <<< EOF
 <script type="text/javascript">
 // <![CDATA[
-/*	\$J(document).ready(function() {
-		JSONData['marketplaceData_$intId'] 	= $listElementsJSON;
-		InsertJSONdataIntoElement(JSONData['marketplaceData_$intId'], 'selectedInputfield_{$intId}_Left', 'selectedInputfield_{$intId}_Right', 0, 0, 'marketplaceData_$intId');
-		InsertJSONdataIntoElement(JSONData['marketplaceData_$intId'], 'selectedInputfield_{$intId}_Right', 'selectedInputfield_{$intId}_Left', 1, 0, 'marketplaceData_$intId');
-		InitDrag();
-	});
+/*    \$J(document).ready(function() {
+        JSONData['marketplaceData_$intId']     = $listElementsJSON;
+        InsertJSONdataIntoElement(JSONData['marketplaceData_$intId'], 'selectedInputfield_{$intId}_Left', 'selectedInputfield_{$intId}_Right', 0, 0, 'marketplaceData_$intId');
+        InsertJSONdataIntoElement(JSONData['marketplaceData_$intId'], 'selectedInputfield_{$intId}_Right', 'selectedInputfield_{$intId}_Left', 1, 0, 'marketplaceData_$intId');
+        InitDrag();
+    });
 
     var $strSerializeFunction = function() {
         \$J('#$strInpufieldId').val(marketplaceGetElList(\$J('#selectedInputfield_{$intId}_Right')));
@@ -286,7 +286,7 @@ EOF;
 <script type="text/javascript">
 </script>
 EOF;
-               
+
 
                 return $strInputfield;
 
@@ -400,13 +400,13 @@ EOF;
         $strValueOutput = '';
 
         /*if($this->arrSettings['settingsTranslationStatus'] == 1) {
-	        if(in_array($_LANGID, $arrTranslationStatus)) {
-	        	$intLangId = $_LANGID;
-	        } else {
-	        	$intLangId = $intEntryDefaultLang;
-	        }
+            if(in_array($_LANGID, $arrTranslationStatus)) {
+                $intLangId = $_LANGID;
+            } else {
+                $intLangId = $intEntryDefaultLang;
+            }
         } else {
-        	$intLangId = $_LANGID;
+            $intLangId = $_LANGID;
         }*/
 
        $objInputfield = $objDatabase->Execute("
@@ -431,21 +431,21 @@ EOF;
             foreach($arrValue as $intUserId) {
                 $objUser = \FWUser::getFWUserObject()->objUser->getUser($intUserId);
                 if ($objUser) {
-               	  if($objUser->getProfileAttribute('firstname') != "" && $objUser->getProfileAttribute('lastname') != "") {
-               	  	 $strValueOutput .= '<li><a href="index.php?section=Access&amp;cmd=user&amp;id='.$intUserId.'">'.contrexx_raw2xhtml($objUser->getProfileAttribute('firstname').' '.$objUser->getProfileAttribute('lastname')).'</a></li>';
-		             $strValueOutputCustom .= contrexx_raw2xhtml($objUser->getProfileAttribute('firstname').' '.$objUser->getProfileAttribute('lastname')).'<br />';
-//		             $strValueOutputCustom .= ($objUser->getProfileAttribute('address') != "") ? $objUser->getProfileAttribute('address').'<br />' : '';
-//		             $strValueOutputCustom .= ($objUser->getProfileAttribute('zip') != "" && $objUser->getProfileAttribute('city') != "") ? $objUser->getProfileAttribute('zip').' '.$objUser->getProfileAttribute('city').'<br />' : '';
-//		             $strValueOutputCustom .= ($objUser->getProfileAttribute('phone_office') != "") ? $objUser->getProfileAttribute('phone_office').'<br />' : '';
-		             $strValueOutputCustom .= $objUser->getProfileAttribute('1') ? htmlentities($objUser->objAttribute->getById($objUser->getProfileAttribute('1'))->getName(), ENT_QUOTES, CONTREXX_CHARSET).'<br />' : '';
-		             //$strValueOutputCustom .= '<a href="mailto:'.$objUser->getEmail().'">'.$_ARRAYLANG['TXT_MEDIADIR_GET_IN_CONTACT'].'</a><br />';
-		             $strValueOutputCustom .= '<a rel="shadowbox;player=iframe;width=700;height=650" href="teilnehmer_kontakt?13='.$objUser->getId().'&amp;14='.urlencode($objUser->getProfileAttribute('company').', '.$objUser->getProfileAttribute('firstname').' '.$objUser->getProfileAttribute('lastname')).'">'.$_ARRAYLANG['TXT_MEDIADIR_GET_IN_CONTACT'].'</a><br />';
-		             $strValueOutputCustom .= '<br />';
-               	  }
+                     if($objUser->getProfileAttribute('firstname') != "" && $objUser->getProfileAttribute('lastname') != "") {
+                          $strValueOutput .= '<li><a href="index.php?section=Access&amp;cmd=user&amp;id='.$intUserId.'">'.contrexx_raw2xhtml($objUser->getProfileAttribute('firstname').' '.$objUser->getProfileAttribute('lastname')).'</a></li>';
+                     $strValueOutputCustom .= contrexx_raw2xhtml($objUser->getProfileAttribute('firstname').' '.$objUser->getProfileAttribute('lastname')).'<br />';
+//                     $strValueOutputCustom .= ($objUser->getProfileAttribute('address') != "") ? $objUser->getProfileAttribute('address').'<br />' : '';
+//                     $strValueOutputCustom .= ($objUser->getProfileAttribute('zip') != "" && $objUser->getProfileAttribute('city') != "") ? $objUser->getProfileAttribute('zip').' '.$objUser->getProfileAttribute('city').'<br />' : '';
+//                     $strValueOutputCustom .= ($objUser->getProfileAttribute('phone_office') != "") ? $objUser->getProfileAttribute('phone_office').'<br />' : '';
+                     $strValueOutputCustom .= $objUser->getProfileAttribute('1') ? htmlentities($objUser->objAttribute->getById($objUser->getProfileAttribute('1'))->getName(), ENT_QUOTES, CONTREXX_CHARSET).'<br />' : '';
+                     //$strValueOutputCustom .= '<a href="mailto:'.$objUser->getEmail().'">'.$_ARRAYLANG['TXT_MEDIADIR_GET_IN_CONTACT'].'</a><br />';
+                     $strValueOutputCustom .= '<a rel="shadowbox;player=iframe;width=700;height=650" href="teilnehmer_kontakt?13='.$objUser->getId().'&amp;14='.urlencode($objUser->getProfileAttribute('company').', '.$objUser->getProfileAttribute('firstname').' '.$objUser->getProfileAttribute('lastname')).'">'.$_ARRAYLANG['TXT_MEDIADIR_GET_IN_CONTACT'].'</a><br />';
+                     $strValueOutputCustom .= '<br />';
+                     }
                }
             }
             if(strlen($strValueOutput) > 0) {
-            	$strValueOutput = '<ul class="'.$this->moduleNameLC.'InputfieldAccounts">'.$strValueOutput.'</ul>';
+                $strValueOutput = '<ul class="'.$this->moduleNameLC.'InputfieldAccounts">'.$strValueOutput.'</ul>';
             }
             $arrContent[$this->moduleLangVar.'_INPUTFIELD_VALUE'] = $strValueOutput;
             $arrContent[$this->moduleLangVar.'_INPUTFIELD_VALUE_CUSTOM'] = $strValueOutputCustom;
@@ -455,8 +455,8 @@ EOF;
         } else {
             $arrContent = null;
         }
-		$strValueOutput = "";
-		$strValueOutputCustom = "";
+        $strValueOutput = "";
+        $strValueOutputCustom = "";
 
         return $arrContent;
     }
@@ -484,7 +484,7 @@ EOF;
 
     function getFormOnSubmit($intInputfieldId)
     {
-    	//return $this->moduleNameLC.'Inputfield_'.$intInputfieldId.'_SelectorSerialize(); ';
+        //return $this->moduleNameLC.'Inputfield_'.$intInputfieldId.'_SelectorSerialize(); ';
         return "selectAll(document.entryModfyForm.elements['".$this->moduleNameLC."Inputfield[".$intInputfieldId."][]']); ";
     }
 }

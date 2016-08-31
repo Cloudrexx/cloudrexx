@@ -38,7 +38,7 @@
                 <label>{TXT_CALENDAR_EVENT_TYPE}</label>
                 <select class="form-control" id="event-type" name="type">
                     <option value="0" {CALENDAR_EVENT_TYPE_EVENT}>{TXT_CALENDAR_EVENT_TYPE_EVENT}</option>
-                    <option value="1" {CALENDAR_EVENT_TYPE_REDIRECT}>{TXT_CALENDAR_EVENT_TYPE_REDIRECT}</option>                                                                            
+                    <option value="1" {CALENDAR_EVENT_TYPE_REDIRECT}>{TXT_CALENDAR_EVENT_TYPE_REDIRECT}</option>
                 </select>
             </div>
             <div id="event-tabs">
@@ -62,7 +62,7 @@
                     </div>
                 </div>
                 <!-- END eventDescTab -->
-            </div>            
+            </div>
         </fieldset>
         <br />
         <fieldset id="place">
@@ -73,7 +73,7 @@
                 <div>
                     <div class="radio">
                         <label for="eventLocationTypeManual">
-                            <input type="radio" name="eventLocationType" class="eventLocationType" id ="eventLocationTypeManual" value="1" {CALENDAR_EVENT_LOCATION_TYPE_MANUAL} /> 
+                            <input type="radio" name="eventLocationType" class="eventLocationType" id ="eventLocationTypeManual" value="1" {CALENDAR_EVENT_LOCATION_TYPE_MANUAL} />
                             {TXT_CALENDAR_PLACE_DATA_DEFAULT}
                         </label>
                     </div>
@@ -175,7 +175,7 @@
                 </div>
                 <div class="event_place_manual">
                     <label>{TXT_CALENDAR_EVENT_LINK}</label>
-                    <input name="placeLink" type="text" value="{CALENDAR_EVENT_PLACE_LINK}" />                 
+                    <input name="placeLink" type="text" value="{CALENDAR_EVENT_PLACE_LINK}" />
                 </div>
                 <div class="event_place_manual">
                     <label>{TXT_CALENDAR_EVENT_PHONE}</label>
@@ -189,7 +189,7 @@
                         <input type="hidden" name="placeMap" value="{CALENDAR_EVENT_PLACE_MAP}" />
                     </div>
                 </div>
-                <!-- END eventPlaceInput -->            
+                <!-- END eventPlaceInput -->
         </fieldset>
         <br/>
         <fieldset id="host">
@@ -197,10 +197,10 @@
             <!-- BEGIN eventHostTypeRadio -->
             <div>
                 <label>&nbsp;</label>
-                <div>                        
+                <div>
                     <div class="radio">
                         <label for="eventHostTypeManual">
-                            <input type="radio" name="eventHostType" class="eventHostType" id ="eventHostTypeManual" value="1" {CALENDAR_EVENT_HOST_TYPE_MANUAL} /> 
+                            <input type="radio" name="eventHostType" class="eventHostType" id ="eventHostTypeManual" value="1" {CALENDAR_EVENT_HOST_TYPE_MANUAL} />
                             {TXT_CALENDAR_PLACE_DATA_DEFAULT}
                         </label>
                     </div>
@@ -311,7 +311,7 @@
             </div>
             <div class="event_host_manual">
                 <label>{TXT_CALENDAR_EVENT_EMAIL}</label>
-                <input name="organizerEmail" type="text" value="{CALENDAR_EVENT_HOST_EMAIL}" />                 
+                <input name="organizerEmail" type="text" value="{CALENDAR_EVENT_HOST_EMAIL}" />
             </div>
             <!-- END eventHostInput -->
         </fieldset>
@@ -343,7 +343,7 @@
                 <select id="category" name="category" class="form-control validate[required]">
                     {CALENDAR_EVENT_CATEGORIES}
                 </select>
-            </div>            
+            </div>
         </fieldset>
         <br />
         <div><input class="btn btn-default" type="submit" value="{TXT_CALENDAR_SAVE}" name="submitFormModifyEvent" /></div>

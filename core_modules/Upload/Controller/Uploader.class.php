@@ -110,7 +110,7 @@ abstract class Uploader
     public function __construct($backend)
     {
        $this->isBackendRequest = $backend;
-       
+
        //start session if it's not ready yet
        global $sessionObj;
        if(empty($sessionObj)) { //session hasn't been initialized so far
@@ -132,7 +132,7 @@ abstract class Uploader
      * The callback can either return null if he moves the files himself or
      * { <path_string> , <web_path_string> } if the files should be moved
      *
-     * @param Array $callbackData { 
+     * @param Array $callbackData {
      *   <classFilePath>,
      *   <className> | <classReference>,
      *   <functionName>
@@ -144,9 +144,9 @@ abstract class Uploader
     {
         $this->callbackData = $callbackData;
         if($updateSession) {
-            //write callback to session            
+            //write callback to session
             $_SESSION['upload']['handlers'][$this->uploadId]['callback'] = $this->callbackData;
-        }            
+        }
     }
 
     /**
@@ -162,7 +162,7 @@ abstract class Uploader
         if($updateSession)
             $_SESSION['upload']['handlers'][$this->uploadId]['redirect_url'] = $url;
 
-        global $_CONFIG;        
+        global $_CONFIG;
         $this->redirectUrl = /*"http://".$_CONFIG['domainUrl'].*/$url;
     }
 
@@ -303,7 +303,7 @@ abstract class Uploader
      * Notifies the callback. Invoked on upload completion.
      */
     public function notifyCallback()
-    {        
+    {
 
         //temporary path where files were uploaded
         $tempDir = '/upload_'.$this->uploadId;
@@ -331,23 +331,23 @@ abstract class Uploader
         $fileInfos = array(
             'originalFileNames' => $originalFileNames
         );
-        
+
         $response = null;
         //the response data.
         if(isset($_SESSION['upload']['handlers'][$this->uploadId]['response_data']))
             $response = UploadResponse::fromSession($_SESSION['upload']['handlers'][$this->uploadId]['response_data']);
         else
             $response = new UploadResponse();
-       
+
         $ret = call_user_func(array($this->callbackData[1],$this->callbackData[2]),$tempPath,$tempWebPath,$this->getData(), $this->uploadId, $fileInfos, $response);
-      
+
         //clean up session: we do no longer need the array with the original file names
         unset($_SESSION['upload']['handlers'][$this->uploadId]['originalFileNames']);
         //same goes for the data
         //if(isset($_SESSION['upload']['handlers'][$this->uploadId]['data']))
 // TODO: unset this when closing the uploader dialog, but not before
 //            unset($_SESSION['upload']['handlers'][$this->uploadId]['data']);
-        
+
         if (\Cx\Lib\FileSystem\FileSystem::exists($tempWebPath)) {
             //the callback could have returned a path where he wants the files moved to
             // check that $ret[1] is not empty is VERY important!!!
@@ -365,7 +365,7 @@ abstract class Uploader
                 //trailing slash needed for File-class calls
                 $tempPath .= '/';
                 $tempWebPath .= '/';
-                
+
                 //move everything uploaded to target dir
                 $h = opendir($tempPath);
                 $im = new \ImageManager();
@@ -399,7 +399,7 @@ abstract class Uploader
     /**
      * Cleans up the session - unsets the callback data stored for this upload
      */
-    protected function cleanupCallbackData() {        
+    protected function cleanupCallbackData() {
 
         unset($_SESSION['upload']['handlers'][$this->uploadId]['callback']);
         $_SESSION->cleanTempPaths();
@@ -453,8 +453,8 @@ abstract class Uploader
      * @throws UploaderException thrown if upload becomes unusable
      */
     protected function addChunk($fileName, $chunk, $chunks)
-    {        
-        
+    {
+
         //get a writable directory
         $tempPath = $_SESSION->getTempPath();
         $webTempPath = $_SESSION->getWebTempPath();

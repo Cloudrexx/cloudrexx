@@ -67,61 +67,61 @@
       <li><a class="active" id="{MODULE_NAME}Tab_importSQL" href="javascript:{}" onclick="selectTab('importSQL')" title="{TXT_MEDIADIR_FROM_DATABASE}">{TXT_MEDIADIR_FROM_DATABASE}</a></li>
       <li><a id="{MODULE_NAME}Tab_importCSV" href="javascript:{}" onclick="selectTab('importCSV')" title="{TXT_MEDIADIR_FROM_FILE}">{TXT_MEDIADIR_FROM_FILE}</a></li>
 </ul>     -->
-<div id="importSQL" class="{MODULE_NAME}Tab" style="display:block;"> 
+<div id="importSQL" class="{MODULE_NAME}Tab" style="display:block;">
     <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
         <tr>
             <th colspan="2">{TXT_MEDIADIR_IMPORT} {TXT_MEDIADIR_FROM_DATABASE}</th>
-        </tr>  
-    </table> 
-    <!-- BEGIN mediadirInterfacesImportSqlSetTable -->   
+        </tr>
+    </table>
+    <!-- BEGIN mediadirInterfacesImportSqlSetTable -->
     <form id="interfacesImportForm" action="index.php?cmd={MODULE_NAME}&amp;act=interfaces&amp;tpl=import&amp;step=assignCols" method="post" >
-        <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">     
-            <tr class="row1">                                         
+        <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
+            <tr class="row1">
                 <td>
                     <select name="interfacesImportSqlTable" style="width: 302px">
                         {MEDIADIR_INTERFACES_IMPORT_SQL_TABLES}
                     </select>
-                    <input type="submit" name="submitInterfacesForm" value="{TXT_MEDIADIR_SELECT_TABLE}" /> 
-                </td>  
-            </tr>         
-        </table>                                                                                       
-    </form>     
+                    <input type="submit" name="submitInterfacesForm" value="{TXT_MEDIADIR_SELECT_TABLE}" />
+                </td>
+            </tr>
+        </table>
+    </form>
     <!-- END mediadirInterfacesImportSqlSetTable -->
     <!-- BEGIN mediadirInterfacesImportSqlAssignCols -->
     <form id="interfacesImportForm" action="index.php?cmd={MODULE_NAME}&amp;act=interfaces&amp;tpl=import&amp;step=insertSQL" method="post" >
     <input type="hidden" name="interfacesImportSqlTable" value="{MEDIADIR_INTERFACES_IMPORT_SQL_TABLE_NANE}" />
-    <input type="hidden" name="interfacesImportSqlForm" value="{MEDIADIR_INTERFACES_IMPORT_SQL_FORM_ID}" /> 
-    <input type="hidden" name="interfacesImportSqlCategory" value="{MEDIADIR_INTERFACES_IMPORT_SQL_CATEGORY_ID}" /> 
-        <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">       
+    <input type="hidden" name="interfacesImportSqlForm" value="{MEDIADIR_INTERFACES_IMPORT_SQL_FORM_ID}" />
+    <input type="hidden" name="interfacesImportSqlCategory" value="{MEDIADIR_INTERFACES_IMPORT_SQL_CATEGORY_ID}" />
+        <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
             <tr class="row1">
                 <td width="200" valign="top">Paare zuweisen</td>
                 <td>
                     <div class="mediadirSelector" style="float: left; height: auto !important;">
                         <div class="mediadirSelectorLeft" style="float: left; height: auto !important;">
-                            <select size="15" name="table_field" id="table_field" style="width: 200px;"> 
-                                {MEDIADIR_INTERFACES_IMPORT_SQL_TABLE_COLS}    
+                            <select size="15" name="table_field" id="table_field" style="width: 200px;">
+                                {MEDIADIR_INTERFACES_IMPORT_SQL_TABLE_COLS}
                             </select><br />
                             <input type="button" onclick="addPair()" value="Paar hinzufügen"/><br />
                             <select size="15" name="pairs_left" id="pairs_left" style="width: 200px;" onchange="document.getElementById('pairs_right')[this.selectedIndex].selected=true"></select>
                         </div>
                         <div class="mediadirSelectorCenter" style="float: left; height: auto !important;">&nbsp;</div>
-                        <div class="mediadirSelectorRight" style="float: left; height: auto !important;">     
+                        <div class="mediadirSelectorRight" style="float: left; height: auto !important;">
                             <select size="15" name="given_field" id="given_field" style="width: 200px;">
-                                {MEDIADIR_INTERFACES_IMPORT_SQL_GIVEN_COLS}       
+                                {MEDIADIR_INTERFACES_IMPORT_SQL_GIVEN_COLS}
                             </select><br />
                             <input type="button" onclick="removePair()" value="Paar entfernen"/><br />
                             <select size="15" name="pairs_right" id="pairs_right" style="width: 200px;" onchange="document.getElementById('pairs_left')[this.selectedIndex].selected=true"></select>
-                            
+
                             <script type="text/javascript">
                             // <[CDATA[
                             document.getElementById('table_field').selectedIndex = 0;
                             document.getElementById('given_field').selectedIndex = 0;
                             // ]]>
                             </script>
-                        </div>       
-                    </div>  
+                        </div>
+                    </div>
                 </td>
-            </tr> 
+            </tr>
             <tr class="row2">
                 <td width="200" valign="top">Verfahren</td>
                 <td>
@@ -129,26 +129,26 @@
                         <option value="1">Importierte Daten an bestehende Daten anfügen</option>
                         <option value="2">Bestehende Daten löschen und durch importierte Daten ersetzten</option>
                     </select>
-                </td>  
-            </tr>            
+                </td>
+            </tr>
         </table>
-        <br />  
-        <input type="submit" name="submitInterfacesForm" value="{TXT_MEDIADIR_DO_IMPORT}" />    
+        <br />
+        <input type="submit" name="submitInterfacesForm" value="{TXT_MEDIADIR_DO_IMPORT}" />
         <input type="hidden" name="pairs_left_keys" id="pairs_left_keys" value="" />
         <input type="hidden" name="pairs_right_keys" id="pairs_right_keys" value="" />
-   
-    </form>       
-    <!-- END mediadirInterfacesImportSqlAssignCols -->    
+
+    </form>
+    <!-- END mediadirInterfacesImportSqlAssignCols -->
 </div>
-<div id="importCSV" class="{MODULE_NAME}Tab" style="display:none;">    
+<div id="importCSV" class="{MODULE_NAME}Tab" style="display:none;">
     <form id="interfacesImportForm" action="index.php?cmd={MODULE_NAME}&amp;act=interfaces&amp;tpl=import_csv" method="post" >
         <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
             <tr>
                 <th colspan="2">{TXT_MEDIADIR_IMPORT} {TXT_MEDIADIR_FROM_FILE}</th>
-            </tr>     
+            </tr>
         </table>
-        <br />  
-        <input type="submit" name="submitInterfacesForm" value="{TXT_MEDIADIR_SUBMIT}" />       
+        <br />
+        <input type="submit" name="submitInterfacesForm" value="{TXT_MEDIADIR_SUBMIT}" />
     </form>
 </div>
 <!-- END module_mediadir_interfaces_import.html -->

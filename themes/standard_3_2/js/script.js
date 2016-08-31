@@ -5,26 +5,26 @@
  *
  *******************************************************/
 jQuery(document).ready(function($) {
-  
+
   //Bootstrap tooltip
   // invoke by adding _tooltip to a tags (this makes it validate)
   $('body').tooltip({
     selector: "a[class*=_tooltip]"
   });
-    
+
   //Bootstrap popover
   // invoke by adding _popover to a tags (this makes it validate)
   $('body').popover({
     selector: "a[class*=_popover]",
     trigger: "hover"
   });
-  
+
   //colour switch
   $('.colour-switcher a').click(function() {
     var c = $(this).attr('href').replace('#','');
     $('.colour-switcher a').removeClass('active');
     $('.colour-switcher a.'+ c).addClass('active');
-    
+
     if (c != 'blue') {
       $('#colour-scheme').attr('href','/themes/standard_3_2/css/colour-'+ c +'.css');
     }
@@ -32,7 +32,7 @@ jQuery(document).ready(function($) {
       $('#colour-scheme').attr('href', '#');
     }
   });
-  
+
   //flexslider
   $('.flexslider').each(function() {
     var sliderSettings =  {
@@ -41,7 +41,7 @@ jQuery(document).ready(function($) {
       controlNav: true,
       smoothHeight: true
     };
-    
+
     var sliderNav = $(this).attr('data-slidernav');
     if (sliderNav != 'auto') {
       sliderSettings = $.extend({}, sliderSettings, {
@@ -49,9 +49,9 @@ jQuery(document).ready(function($) {
         controlsContainer: '.flexslider-wrapper'
       });
     }
-    
+
     $(this).flexslider(sliderSettings);
-  });  
+  });
 
   //jQuery Quicksand plugin
   //@based on: http://www.evoluted.net/thinktank/web-development/jquery-quicksand-tutorial-filtering
@@ -68,7 +68,7 @@ jQuery(document).ready(function($) {
     $(this).parent().addClass('active');
     if ($filterType == 'all') {
       var $filteredData = $data.find('li');
-    } 
+    }
     else {
       var $filteredData = $data.find('li[data-type=' + $filterType + ']');
     }
@@ -79,5 +79,5 @@ jQuery(document).ready(function($) {
     });
     e.preventDefault();
   });
-  
+
 });

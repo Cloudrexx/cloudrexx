@@ -17,7 +17,7 @@ function elementIsChecked(fieldName)
             x++;
         }
     }
-    
+
     if(x > 0) {
         return true;
     } else {
@@ -34,25 +34,25 @@ function selectMultiAction()
                 document.formSettingsHosts.action = "index.php?cmd={CALENDAR_MODULE_NAME}&act=settings&tpl=hosts&multi=delete&{CALENDAR_CSRF}";
                 document.formSettingsHosts.submit();
             }
-        } 
-        if(document.formSettingsHosts.formSettingsHosts_MultiAction.value == "activate") {                
+        }
+        if(document.formSettingsHosts.formSettingsHosts_MultiAction.value == "activate") {
             document.formSettingsHosts.action = "index.php?cmd={CALENDAR_MODULE_NAME}&act=settings&tpl=hosts&multi=activate&{CALENDAR_CSRF}";
-            document.formSettingsHosts.submit(); 
-        } 
-        if(document.formSettingsHosts.formSettingsHosts_MultiAction.value == "deactivate") {                
+            document.formSettingsHosts.submit();
+        }
+        if(document.formSettingsHosts.formSettingsHosts_MultiAction.value == "deactivate") {
             document.formSettingsHosts.action = "index.php?cmd={CALENDAR_MODULE_NAME}&act=settings&tpl=hosts&multi=deactivate&{CALENDAR_CSRF}";
-            document.formSettingsHosts.submit(); 
-        } 
+            document.formSettingsHosts.submit();
+        }
     } else {
         alert("{TXT_CALENDAR_MAKE_SELECTION}");
     }
 
     document.formSettingsHosts.formSettingsHosts_MultiAction.value = "0";
 }
-//]]>       
-                                               
+//]]>
+
 Style[0]=["","","","","",,"black","#ffffe1","","","",,,,1,"#000000",2,21,0.3,,2,"gray",1,,15,-5];
-{CALENDAR_SETTING_INFO_JS}    
+{CALENDAR_SETTING_INFO_JS}
 
 </script>
 
@@ -60,19 +60,19 @@ Style[0]=["","","","","",,"black","#ffffe1","","","",,,,1,"#000000",2,21,0.3,,2,
 <form name="formSettingsHosts" method="post" action="index.php?cmd={CALENDAR_MODULE_NAME}&act=settings&tpl=hosts">
     <input type="button" name="newHost" onclick="location.href='index.php?cmd={CALENDAR_MODULE_NAME}&amp;act=settings&amp;tpl=modify_host&amp;{CALENDAR_CSRF}'" value="{TXT_CALENDAR_INSERT_HOST}" /><br />
     <br />
-	<table style="width: 100%; border-spacing: 0px;" class="adminlist" cellspacing="0" cellpadding="3">
-	    <tr>
-	        <th colspan="7">{TXT_CALENDAR_ADDED_HOSTS}</th>
-	    </tr>
-	    <tr class="row3">
-	       <td style="text-align: center; font-weight: bold" width="1%">&nbsp;#&nbsp;</td>
+  <table style="width: 100%; border-spacing: 0px;" class="adminlist" cellspacing="0" cellpadding="3">
+      <tr>
+          <th colspan="7">{TXT_CALENDAR_ADDED_HOSTS}</th>
+      </tr>
+      <tr class="row3">
+         <td style="text-align: center; font-weight: bold" width="1%">&nbsp;#&nbsp;</td>
            <td style="text-align: center; font-weight: bold" width="1%">&nbsp;{TXT_CALENDAR_STATUS}&nbsp;</td>
            <td style="text-align: left; font-weight: bold">{TXT_CALENDAR_TITLE}</td>
            <td style="text-align: left; font-weight: bold">{TXT_CALENDAR_URI}</td>
            <td style="text-align: left; font-weight: bold" >{TXT_CALENDAR_CATEGORY}</td>
            <td style="text-align: left; font-weight: bold" >{TXT_CALENDAR_KEY}</td>
            <td style="text-align: right; font-weight: bold" width="1%">{TXT_CALENDAR_ACTIONS}</td>
-	    </tr>
+      </tr>
         <!--  BEGIN hostList -->
         <tr class="{CALENDAR_HOST_ROW}">
            <td style="text-align: center;"><input type="checkbox" name="selectedHostId[]" id="selectedHostId" value="{CALENDAR_HOST_ID}" /></td>
@@ -87,7 +87,7 @@ Style[0]=["","","","","",,"black","#ffffe1","","","",,,,1,"#000000",2,21,0.3,,2,
             </td>
         </tr>
         <!-- END hostList -->
-        
+
         <!-- BEGIN emptyHostList -->
         <tr class="row1">
             <td colspan="7"><i>{TXT_CALENDAR_NO_HOSTS_FOUND}</i></td>

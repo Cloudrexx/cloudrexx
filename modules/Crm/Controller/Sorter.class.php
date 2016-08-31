@@ -83,7 +83,7 @@ class Sorter
 
     /**
      * sort function
-     * 
+     *
      * @return array
      */
     function sort()
@@ -107,7 +107,7 @@ class Sorter
      *
      * @param array $a
      * @param array $b
-     * 
+     *
      * @return Integer
      */
     function numericCompare($a, $b)

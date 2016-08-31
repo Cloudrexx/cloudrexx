@@ -1,5 +1,5 @@
 {FORUM_JAVASCRIPT_GOTO}
-{FORUM_JAVASCRIPT_DELETE} 
+{FORUM_JAVASCRIPT_DELETE}
 {FORUM_JAVASCRIPT_SCROLLTO}
 {FORUM_JAVASCRIPT_INSERT_TEXT}
 <div id="forum">
@@ -17,7 +17,7 @@
                 <!-- BEGIN addPostAnchor -->
                 <div class="anchor col-xs-12 col-md-5 pull-left">
                     <input class="btn btn-default" onclick="location.href = '#post';" value="{TXT_FORUM_CREATE_POST}" type="button" />
-                </div>                
+                </div>
                 <!-- END addPostAnchor -->
                 <!-- BEGIN threadActionsSelect -->
                 <div class="anchor-polo col-xs-12 col-md-5 pull-right">
@@ -80,11 +80,11 @@
                         <!-- BEGIN postEdit -->
                         <input class="btn btn-default" onclick="location.href = '?section=Forum&amp;cmd=thread&amp;id={FORUM_THREAD_ID}&amp;act=edit&amp;postid={FORUM_POST_ID}';" value="{TXT_FORUM_EDIT}" type="button" />&nbsp;<!-- END postEdit -->
                         <!-- BEGIN postQuote -->
-                        <input class="btn btn-default" onclick="{FORUM_QUOTE_ONCLICK}" value="{TXT_FORUM_QUOTE}" type="button" />&nbsp;<!-- END postQuote -->               
+                        <input class="btn btn-default" onclick="{FORUM_QUOTE_ONCLICK}" value="{TXT_FORUM_QUOTE}" type="button" />&nbsp;<!-- END postQuote -->
                         <!-- BEGIN postDelete -->
                         <input class="btn btn-default" onclick="deletePost('{FORUM_THREAD_ID}', '{FORUM_POST_ID}');
                             return false;" value="{TXT_FORUM_DELETE}" type="button" />&nbsp;
-                        <!-- END postDelete --> 
+                        <!-- END postDelete -->
                     </td>
                 </tr>
                 <!-- END forumPosts -->
@@ -99,13 +99,13 @@
     <!-- BEGIN addPost -->
     <div class="addpost">
         <a name="post"></a>
-        <fieldset> 
+        <fieldset>
             <legend>{TXT_FORUM_ADD_POST}</legend>
             <form enctype="multipart/form-data" name="frm_thread" action="./index.php?section=Forum&amp;cmd=thread&amp;id={FORUM_THREAD_ID}" method="post" onsubmit="setScrollPos();">
-                <input type="hidden" name="post_edit_user_id" value="{FORUM_POST_EDIT_USERID}" />     
-                <input type="hidden" name="post_id" value="{FORUM_EDIT_POST_ID}" />   
-                <input type="hidden" name="thread_id" value="{FORUM_THREAD_ID}" />    
-                <input type="hidden" name="category_id" value="{FORUM_CATEGORY_ID}" />    
+                <input type="hidden" name="post_edit_user_id" value="{FORUM_POST_EDIT_USERID}" />
+                <input type="hidden" name="post_id" value="{FORUM_EDIT_POST_ID}" />
+                <input type="hidden" name="thread_id" value="{FORUM_THREAD_ID}" />
+                <input type="hidden" name="category_id" value="{FORUM_CATEGORY_ID}" />
                 <input type="hidden" name="pos" value="{FORUM_PAGING_POS}" />
                 <!-- <p>
                     <label>{TXT_FORUM_ICON}</label> -->
@@ -138,19 +138,19 @@
                 <!-- END captcha -->
                 <!-- BEGIN notificationRow -->
                 <p>
-                    <span class="checkbox">                   
+                    <span class="checkbox">
                         <label class="description" for="forum_notify"> <input id="forum_notify" type="checkbox" name="notification" value="notify" {FORUM_NOTIFICATION_CHECKBOX_CHECKED} />{TXT_FORUM_NOTIFY_NEW_POSTS}</label>
                 </p>
                 <!-- END notificationRow -->
                 <p class="thread-button">
                     <input class="btn btn-default" type="reset" value="{TXT_FORUM_RESET}" />&nbsp;
-                    <!-- BEGIN createPost --><input class="btn btn-default" type="submit" name="create" value="{TXT_FORUM_CREATE_POST}" />&nbsp;<!-- END createPost -->                
-                    <!-- BEGIN updatePost --><input class="btn btn-default" type="submit" name="update" value="{TXT_FORUM_UPDATE_POST}" />&nbsp;<!-- END updatePost -->                  
-                    <!-- BEGIN previewNewPost --><input type="submit"  class="btn btn-default" name="preview_new" value="{TXT_FORUM_PREVIEW}" />&nbsp;<!-- END previewNewPost -->                 
-                    <!-- BEGIN previewEditPost --><input type="submit" class="btn btn-default" name="preview_edit" value="{TXT_FORUM_PREVIEW}" />&nbsp;<!-- END previewEditPost -->   
+                    <!-- BEGIN createPost --><input class="btn btn-default" type="submit" name="create" value="{TXT_FORUM_CREATE_POST}" />&nbsp;<!-- END createPost -->
+                    <!-- BEGIN updatePost --><input class="btn btn-default" type="submit" name="update" value="{TXT_FORUM_UPDATE_POST}" />&nbsp;<!-- END updatePost -->
+                    <!-- BEGIN previewNewPost --><input type="submit"  class="btn btn-default" name="preview_new" value="{TXT_FORUM_PREVIEW}" />&nbsp;<!-- END previewNewPost -->
+                    <!-- BEGIN previewEditPost --><input type="submit" class="btn btn-default" name="preview_edit" value="{TXT_FORUM_PREVIEW}" />&nbsp;<!-- END previewEditPost -->
                 </p>
             </form>
-        </fieldset> 
+        </fieldset>
     </div>
     <!-- END addPost -->
     <!-- END threadDisplay -->

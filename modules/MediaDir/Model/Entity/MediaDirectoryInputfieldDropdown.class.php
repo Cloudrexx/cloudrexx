@@ -86,7 +86,7 @@ class MediaDirectoryInputfieldDropdown extends \Cx\Modules\MediaDir\Controller\M
 
                 $strOptions = empty($arrInputfield['default_value'][$_LANGID]) ? $arrInputfield['default_value'][0] : $arrInputfield['default_value'][$_LANGID];
                 $arrOptions = explode(",", $strOptions);
-                
+
                 if(!empty($arrInputfield['info'][0])){
                     $strInfoValue = empty($arrInputfield['info'][$_LANGID]) ? 'title="'.$arrInputfield['info'][0].'"' : 'title="'.$arrInputfield['info'][$_LANGID].'"';
                     $strInfoClass = 'mediadirInputfieldHint';

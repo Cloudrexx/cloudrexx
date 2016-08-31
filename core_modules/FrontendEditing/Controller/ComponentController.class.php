@@ -53,14 +53,14 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
 
     /**
      * Returns all Controller class names for this component (except this)
-     * 
+     *
      * Be sure to return all your controller classes if you add your own
      * @return array List of Controller class names (without namespace)
      */
     public function getControllerClasses() {
         return array('Frontend');
     }
-    
+
     /**
      * Checks whether the frontend editing is active or not
      *
@@ -99,10 +99,10 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         }
         return false;
     }
-    
+
     /**
      * Check the permission for editing pages
-     * 
+     *
      * @return boolean TRUE if the user has permission to edit pages
      */
     protected function userHasPermissionToEditPage() {
@@ -116,21 +116,21 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                    )
                );
     }
-    
+
     /**
      * Check the permission to edit blocks
-     * 
+     *
      * @return boolean TRUE if the user has permission to edit blocks
      */
     protected function userHasPermissionToEditBlocks() {
         return $this->cx->getUser()->objUser->getAdminStatus() ||
                \Permission::checkAccess(76, 'static', true);
     }
-    
+
     /**
      * Make the block editable, add the necessary html containers
      * for the frontend editing
-     * 
+     *
      * @param integer $id the id of the block
      * @param string $output the html output of the block
      */

@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Block
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
@@ -115,7 +115,7 @@ class BlockManager extends \Cx\Modules\Block\Controller\BlockLibrary
                 $this->_strOkMessage = $_ARRAYLANG['TXT_BLOCK_BLOCK_ADDED_SUCCESSFULLY'];
             }
         }
-        
+
         if (isset($_GET['modified']) && $_GET['modified'] == 'true') {
             if (!empty($_GET['blockname'])) {
                 $this->_strOkMessage = sprintf($_ARRAYLANG['TXT_BLOCK_BLOCK_UPDATED_SUCCESSFULLY'], contrexx_raw2xhtml($_GET['blockname']));
@@ -132,7 +132,7 @@ class BlockManager extends \Cx\Modules\Block\Controller\BlockLibrary
             $this->_saveSettings($arrSettings);
             $this->_strOkMessage = $_ARRAYLANG['TXT_SETTINGS_UPDATED'];
         }
-        
+
     }
     private function setNavigation()
     {
@@ -144,7 +144,7 @@ class BlockManager extends \Cx\Modules\Block\Controller\BlockLibrary
                     <a href='index.php?cmd=Block&amp;act=modify' class='".($this->act == 'modify' ? 'active' : '')."'>".$_ARRAYLANG['TXT_BLOCK_ADD_BLOCK']."</a>"
                  : "")
             ."<a href='index.php?cmd=Block&amp;act=categories' class='".($this->act == 'categories' ? 'active' : '')."'>".$_ARRAYLANG['TXT_BLOCK_CATEGORIES']."</a>"
-     	    ."<a href='index.php?cmd=Block&amp;act=settings' class='".($this->act == 'settings' ? 'active' : '')."'>".$_ARRAYLANG['TXT_BLOCK_SETTINGS']."</a>");
+             ."<a href='index.php?cmd=Block&amp;act=settings' class='".($this->act == 'settings' ? 'active' : '')."'>".$_ARRAYLANG['TXT_BLOCK_SETTINGS']."</a>");
     }
 
     /**
@@ -373,8 +373,8 @@ class BlockManager extends \Cx\Modules\Block\Controller\BlockLibrary
                 'BLOCK_RANDOM_3_INFO'         => $random3Info,
                 'BLOCK_RANDOM_4_INFO'         => $random4Info,
                 'BLOCK_TARGETING_CLASS'       => $targetingClass,
-                'BLOCK_TARGETING_INFO'        => !empty($targeting) 
-                                                    ? $targetingInfo 
+                'BLOCK_TARGETING_INFO'        => !empty($targeting)
+                                                    ? $targetingInfo
                                                     : $_ARRAYLANG['TXT_BLOCK_LOCATION_BASED_DISPLAY_INFO'],
                 'BLOCK_GLOBAL_CLASS'          => $globalClass,
                 'BLOCK_GLOBAL_INFO'           => ($arrBlock['global'] == 1)
@@ -697,7 +697,7 @@ class BlockManager extends \Cx\Modules\Block\Controller\BlockLibrary
             'type' => 'button',
             'style' => 'display:none'
         ));
-        
+
         $blockId                = !empty($_REQUEST['blockId']) ? intval($_REQUEST['blockId']) : 0;
         $blockCat               = 0;
         $blockName              = '';
@@ -743,7 +743,7 @@ class BlockManager extends \Cx\Modules\Block\Controller\BlockLibrary
             'TXT_BLOCK_SELECTED_PAGES'          => $_ARRAYLANG['TXT_BLOCK_SELECTED_PAGES'],
             'TXT_BLOCK_AVAILABLE_PAGES'         => $_ARRAYLANG['TXT_BLOCK_AVAILABLE_PAGES'],
             'TXT_BLOCK_SELECT_ALL'              => $_ARRAYLANG['TXT_BLOCK_SELECT_ALL'],
-            'TXT_BLOCK_UNSELECT_ALL'            => $_ARRAYLANG['TXT_BLOCK_UNSELECT_ALL'], 
+            'TXT_BLOCK_UNSELECT_ALL'            => $_ARRAYLANG['TXT_BLOCK_UNSELECT_ALL'],
             'TXT_BLOCK_GLOBAL_PLACEHOLDERS'     => $_ARRAYLANG['TXT_BLOCK_GLOBAL_PLACEHOLDERS'],
             'TXT_BLOCK_GLOBAL_PLACEHOLDERS_INFO'=> $_ARRAYLANG['TXT_BLOCK_GLOBAL_PLACEHOLDERS_INFO'],
             'TXT_BLOCK_DIRECT_PLACEHOLDERS'     => $_ARRAYLANG['TXT_BLOCK_DIRECT_PLACEHOLDERS'],
@@ -814,7 +814,7 @@ class BlockManager extends \Cx\Modules\Block\Controller\BlockLibrary
                     }
                 }
                 $this->_strErrMessage = $_ARRAYLANG['TXT_BLOCK_BLOCK_COULD_NOT_BE_UPDATED'];
-            } else { 
+            } else {
                 if ($blockId = $this->_addBlock($blockCat, $blockContent, $blockName, $blockStart, $blockEnd, $blockRandom, $blockRandom2, $blockRandom3, $blockRandom4, $blockWysiwygEditor, $blockLangActive)) {
                     if ($this->storePlaceholderSettings($blockId, $blockGlobal, $blockDirect, $blockCategory, $blockGlobalAssociatedPageIds, $blockDirectAssociatedPageIds, $blockCategoryAssociatedPageIds)) {
                         $this->storeTargetingSettings($blockId, $targetingStatus, $targeting);
@@ -857,7 +857,7 @@ class BlockManager extends \Cx\Modules\Block\Controller\BlockLibrary
         if ($copy) {
             $blockId = 0;
         }
-        
+
         $this->_objTpl->setVariable(array(
             'BLOCK_ID'                          => $blockId,
             'BLOCK_MODIFY_TITLE'                => $pageTitle,
@@ -900,7 +900,7 @@ class BlockManager extends \Cx\Modules\Block\Controller\BlockLibrary
             'BLOCK_TARGETING_COUNTRY_EXCLUDE'   => !empty($targeting['country']) && $targeting['country']['filter'] == 'exclude'
                                                     ? 'selected="selected"' : '',
         ));
-        
+
         if (!empty($targeting['country']) && !empty($targeting['country']['value'])) {
             foreach ($targeting['country']['value'] as $countryId) {
                 $countryName = \Cx\Core\Country\Controller\Country::getNameById($countryId);
@@ -920,7 +920,7 @@ class BlockManager extends \Cx\Modules\Block\Controller\BlockLibrary
         $pageTitlesTree = $pageTitlesTree['data'];
 
         $objJs = \ContrexxJavascript::getInstance();
-        
+
         $blockGlobalPageSelects   = $this->getPageSelections($pageTitlesTree, $blockGlobalAssociatedPageIds);
         $blockDirectPageSelects   = $this->getPageSelections($pageTitlesTree, $blockDirectAssociatedPageIds);
         $blockCategoryPageSelects = $this->getPageSelections($pageTitlesTree, $blockCategoryAssociatedPageIds);
@@ -948,7 +948,7 @@ class BlockManager extends \Cx\Modules\Block\Controller\BlockLibrary
 
             foreach($arrActiveSystemFrontendLanguages as $langId => $arrLanguage) {
                 $boolLanguageIsActive = $blockId == 0 && $intLanguageCounter == 0 ? true : ((isset($blockLangActive[$langId]) && $blockLangActive[$langId] == 1) ? true : false);
-                
+
                 $arrLanguages[$intLanguageCounter%3] .= '<input id="languagebar_'.$langId.'" '.(($boolLanguageIsActive) ? 'checked="checked"' : '').' type="checkbox" name="blockFormLanguages['.$langId.']" value="1" onclick="switchBoxAndTab(this, \'lang_blockContent_'.$langId.'\');" /><label for="languagebar_'.$langId.'">'.contrexx_raw2xhtml($arrLanguage['name']).' ['.$arrLanguage['lang'].']</label><br />';
                 $strJsTabToDiv .= 'arrTabToDiv["lang_blockContent_'.$langId.'"] = "langTab_'.$langId.'";'."\n";
                 ++$intLanguageCounter;
@@ -961,13 +961,13 @@ class BlockManager extends \Cx\Modules\Block\Controller\BlockLibrary
                 'EDIT_LANGUAGES_3'        => $arrLanguages[2],
                 'EDIT_JS_TAB_TO_DIV'      => $strJsTabToDiv
             ));
-        }        
-        
+        }
+
         $arrLanguages = \FWLanguage::getLanguageArray();
-        $i=0;    
+        $i=0;
         $activeFlag = 0;
-        foreach ($arrLanguages as $langId => $arrLanguage) {            
-            
+        foreach ($arrLanguages as $langId => $arrLanguage) {
+
             if($arrLanguage['frontend'] != 1) {
                 continue;
             }
@@ -975,28 +975,28 @@ class BlockManager extends \Cx\Modules\Block\Controller\BlockLibrary
             $tmpBlockContent       = isset($blockContent[$langId]) ? $blockContent[$langId] : '';
             $tmpBlockLangActive    = isset($blockLangActive[$langId]) ? $blockLangActive[$langId] : 0;
             $tmpBlockContent       = preg_replace('/\{([A-Z0-9_-]+)\}/', '[[\\1]]' ,$tmpBlockContent);
-            
+
             if ($blockId != 0) {
                 if (!$activeFlag && isset($blockLangActive[$langId])) {
                     $activeClass =  'active';
                     $activeFlag = 1;
                 }
             } elseif (!$activeFlag) {
-                $activeClass = 'active';                
+                $activeClass = 'active';
                 $activeFlag = 1;
             }
-            
+
             $this->_objTpl->setVariable(array(
                 'BLOCK_LANG_TAB_LANG_ID'        => intval($langId),
                 'BLOCK_LANG_TAB_CLASS'          => isset($activeClass) ? $activeClass : '',
-                'TXT_BLOCK_LANG_TAB_LANG_NAME'  => contrexx_raw2xhtml($arrLanguage['name']),            
+                'TXT_BLOCK_LANG_TAB_LANG_NAME'  => contrexx_raw2xhtml($arrLanguage['name']),
                 'BLOCK_LANGTAB_DISPLAY'         => $tmpBlockLangActive == 1 ? 'display:inline;' : ($blockId == 0 && $i == 0 ? 'display:inline;' : 'display:none;')
             ));
             $this->_objTpl->parse('block_language_tabs');
 
             $this->_objTpl->setVariable(array(
-                'BLOCK_LANG_ID'                 => intval($langId),                           
-                'BLOCK_CONTENT_TEXT_HIDDEN'     => contrexx_raw2xhtml($tmpBlockContent),                
+                'BLOCK_LANG_ID'                 => intval($langId),
+                'BLOCK_CONTENT_TEXT_HIDDEN'     => contrexx_raw2xhtml($tmpBlockContent),
             ));
             $this->_objTpl->parse('block_language_content');
             $activeClass = '';

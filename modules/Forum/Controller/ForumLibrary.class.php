@@ -525,8 +525,8 @@ class ForumLibrary
      * handles the upload of a file
      *
      * @param string $inputName name of the HTML input element used to upload the file
-     * 
-     * @return array $uploadedFileInfo array containing the properties for the uploaded file, 
+     *
+     * @return array $uploadedFileInfo array containing the properties for the uploaded file,
      *                                 false when upload has failed
      */
     function _handleUpload($inputName)

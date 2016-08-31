@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Specific FrontendController for this Component. Use this to easily create a frontent view
  *
@@ -45,10 +45,10 @@ namespace Cx\Core\User\Controller;
  * @subpackage  core_user
  */
 class FrontendController extends \Cx\Core\Core\Model\Entity\SystemComponentFrontendController {
-    
+
     /**
      * Use this to parse your frontend page
-     * 
+     *
      * You will get a template based on the content of the resolved page
      * You can access Cx class using $this->cx
      * To show messages, use \Message class
@@ -58,11 +58,11 @@ class FrontendController extends \Cx\Core\Core\Model\Entity\SystemComponentFront
         // this class inherits from Controller, therefore you can get access to
         // Cx like this:
         $this->cx;
-        
+
         // Controller routes all calls to undeclared methods to your
         // ComponentController. So you can do things like
         $this->getName();
-        
-        
+
+
     }
 }

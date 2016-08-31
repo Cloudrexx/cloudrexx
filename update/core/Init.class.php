@@ -521,7 +521,7 @@ class InitCMS
         //exists. trying to read a non-existant file would lead to an empty content-template.
         //to omit this, we read the standard print content template instead.
         //another possible behaviour would be to read the standard theme's custom content template instead.
-        //this is not done, because customcontent files are mostly used for sidebars etc. - 
+        //this is not done, because customcontent files are mostly used for sidebars etc. -
         //stuff that should not change the print representation of the content.
         if (!file_exists(ASCMS_THEMES_PATH.'/'.$this->themesPath.'/'.$this->customContentTemplate)) {
             return false;
@@ -688,12 +688,12 @@ class InitCMS
         }
 
         $path = $this->arrModulePath[$module].$this->arrLang[$langId]['lang'].'/'.$mode.'.php';
-        
+
         $customizingPath = preg_replace('#'.ASCMS_PATH.ASCMS_PATH_OFFSET.'#', ASCMS_CUSTOMIZING_PATH, $path);
         if ($_CONFIG['useCustomizings'] == 'on' && file_exists($customizingPath)) {
             $path = $customizingPath;
         }
-        
+
         if (!file_exists($path)) {
             $path = '';
             $langId = $mode == 'backend' ? $this->getBackendDefaultLangId() : $this->getFrontendDefaultLangId();
@@ -893,7 +893,7 @@ class InitCMS
         $url = \Env::get('Resolver')->getUrl();
         $myUrl = clone $url;
         $myUrl->setParam($key, $value);
-        
+
         return $myUrl;
     }
 

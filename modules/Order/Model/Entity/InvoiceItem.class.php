@@ -38,7 +38,7 @@ namespace Cx\Modules\Order\Model\Entity;
 
 /**
  * Class InvoiceItem
- * 
+ *
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
@@ -52,7 +52,7 @@ class InvoiceItem extends \Cx\Model\Base\EntityBase {
     protected $id;
     /**
      *
-     * @var decimal $price 
+     * @var decimal $price
      */
     protected $price;
     /**
@@ -62,10 +62,10 @@ class InvoiceItem extends \Cx\Model\Base\EntityBase {
     protected $description;
 
     /**
-     * @var \Cx\Modules\Order\Model\Entity\Invoice $invoice 
+     * @var \Cx\Modules\Order\Model\Entity\Invoice $invoice
      */
     protected $invoice;
-    
+
     /**
      * Constructor
      */
@@ -73,7 +73,7 @@ class InvoiceItem extends \Cx\Model\Base\EntityBase {
     }
     /**
      * Get the id
-     * 
+     *
      * @return integer $id
      */
     public function getId() {
@@ -82,7 +82,7 @@ class InvoiceItem extends \Cx\Model\Base\EntityBase {
 
     /**
      * Set the id
-     * 
+     *
      * @param integer $id
      */
     public function setId($id) {
@@ -90,7 +90,7 @@ class InvoiceItem extends \Cx\Model\Base\EntityBase {
     }
     /**
      * Get the price
-     * 
+     *
      * @return decimal
      */
     public function getPrice() {
@@ -98,7 +98,7 @@ class InvoiceItem extends \Cx\Model\Base\EntityBase {
     }
     /**
      * Set the price
-     * 
+     *
      * @param decimal $price
      */
     public function setPrice($price) {
@@ -106,37 +106,37 @@ class InvoiceItem extends \Cx\Model\Base\EntityBase {
     }
     /**
      * Get the description
-     * 
-     * @return string 
+     *
+     * @return string
      */
     public function getDescription() {
         return $this->description;
     }
     /**
      * Set the description
-     * 
+     *
      * @param decimal $description
      */
     public function setDescription($description) {
         $this->description = $description;
     }
-    
+
     /**
      * Get the invoice
-     * 
+     *
      * @return \Cx\Modules\Order\Model\Entity\Invoice $invoice
      */
     public function getInvoice() {
         return $this->invoice;
     }
-    
+
     /**
      * Set the invoice
-     * 
+     *
      * @param \Cx\Modules\Order\Model\Entity\Invoice $invoice
      */
     public function setInvoice(Invoice $invoice) {
         $this->invoice = $invoice;
-    
+
     }
 }

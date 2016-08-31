@@ -48,7 +48,7 @@ require_once(ASCMS_FRAMEWORK_PATH.'/FileSystem/FileSystem.class.php');
 /**
  * Factory callback for AdoDB NewConnection
  * @deprecated Use Doctrine!
- * @return \Cx\Core\Model\CustomAdodbPdo 
+ * @return \Cx\Core\Model\CustomAdodbPdo
  */
 function cxupdateAdodbPdoConnectionFactory() {
     require_once '..'.DIRECTORY_SEPARATOR.'lib'.DIRECTORY_SEPARATOR.'adodb'.DIRECTORY_SEPARATOR.'drivers'.DIRECTORY_SEPARATOR.'adodb-pdo.inc.php';
@@ -226,9 +226,9 @@ class CommonFunctions
                     $statusMsg = $_ARRLANG['TXT_ENGINGE_NOT_SUPPORTED'];
                     return false;
                 }
-                
+
                 $this->setTimezone($objDb);
-                
+
                 // Disable STRICT_TRANS_TABLES mode:
                 $res = $objDb->Execute('SELECT @@sql_mode');
                 if ($res->EOF) {
@@ -284,8 +284,8 @@ class CommonFunctions
                 $objDateTimeZone = new DateTimeZone($timezone);
                 $objDateTime = new DateTime('now', $objDateTimeZone);
                 $offset = $objDateTimeZone->getOffset($objDateTime);
-                $offsetHours = round(abs($offset)/3600); 
-                $offsetMinutes = round((abs($offset)-$offsetHours*3600) / 60); 
+                $offsetHours = round(abs($offset)/3600);
+                $offsetMinutes = round((abs($offset)-$offsetHours*3600) / 60);
                 $offsetString = ($offset > 0 ? '+' : '-').($offsetHours < 10 ? '0' : '').$offsetHours.':'.($offsetMinutes < 10 ? '0' : '').$offsetMinutes;
                 $objDatabase->Execute('SET TIME_ZONE="'.addslashes($offsetString).'"');
             }
@@ -581,7 +581,7 @@ class CommonFunctions
         preg_match('/^\d+/', ini_get('memory_limit'), $memoryLimit);
         return $memoryLimit[0];
     }
-    
+
     public function checkMemoryLimit($memoryLimit)
     {
         $result = true;
@@ -591,7 +591,7 @@ class CommonFunctions
                 $result = false;
             }
         }
-        
+
         return array(
             'result'    => $result,
             'required'  => $memoryLimit,
@@ -863,7 +863,7 @@ class CommonFunctions
                 $statusMessage = $this->setStatusMessage($path.$file, $statusMessage);
                 continue;
             }
-            
+
             $arrAllFiles = array();
             $arrSubDirs = array();
 
@@ -880,7 +880,7 @@ class CommonFunctions
                 }
             }
         }
-        
+
         if (empty($statusMessage)) {
             return true;
         } else {
@@ -890,7 +890,7 @@ class CommonFunctions
 
     /**
      * Set the status message of the given directory or file.
-     * 
+     *
      * @param   string  $path
      * @param   string  $statusMessage
      * @return  string  $statusMessage
@@ -898,7 +898,7 @@ class CommonFunctions
     private function setStatusMessage($path, $statusMessage)
     {
         global $_ARRLANG;
-        
+
         if ($this->isWindows()) {
             if (empty($statusMessage)) {
                 $statusMessage = $_ARRLANG['TXT_SET_WRITE_PERMISSION_TO_FILES']."<br />";
@@ -907,7 +907,7 @@ class CommonFunctions
         } else {
             $statusMessage .= $_ARRLANG['TXT_COULD_NOT_CHANGE_PERMISSIONS'].' '.$path."<br />";
         }
-        
+
         return $statusMessage;
     }
 
@@ -936,7 +936,7 @@ class CommonFunctions
                     if (is_dir(realpath($path))) {
                         if (\Cx\Lib\FileSystem\FileSystem::makeWritable($path)) {
                             $arrDirectoriesRec = $this->_getSubDirs($directory.DIRECTORY_SEPARATOR.$file);
-                            
+
                             if (count($arrDirectoriesRec) > 0) {
                                 $arrDirectories = array_merge($arrDirectories, $arrDirectoriesRec);
                             }
@@ -998,18 +998,18 @@ class CommonFunctions
 
         return $str;
     }
-        
+
     function _getHtaccessFileTemplate($file)
     {
         $pathOffset = $_SESSION['installer']['config']['offsetPath'];
-        
+
         // in case no offset path is set (cloudrexx runs directly in the document root)
         // then, we must set pathOffset to /. Path offset is used as RewriteBase.
         // Otherwise, an empty RewriteBase would be invalid
         if (empty($pathOffset)) {
             $pathOffset = '/';
         }
-        
+
         return str_replace(
             array("%PATH_ROOT_OFFSET%"),
             array($pathOffset),
@@ -1195,7 +1195,7 @@ class CommonFunctions
             return $statusMsg;
         }
     }
-        
+
     function createHtaccessFile() {
         global $basePath, $offsetPath, $apacheHtaccessTemplateFile, $apacheHtaccessFile, $iisHtaccessTemplateFile, $iisHtaccessFile, $_ARRLANG, $_CORELANG;
 
@@ -1209,25 +1209,25 @@ class CommonFunctions
             $objHtAccess = new File_HtAccess(ASCMS_DOCUMENT_ROOT.$iisHtaccessFile);
             $objHtAccess->setAdditional(explode("\n", $this->_getHtaccessFileTemplate($iisHtaccessTemplateFile)));
             $result = $objHtAccess->save();
-			if ($result !== true) {
-				return sprintf($_ARRLANG['TXT_NO_WRITE_PERMISSION'], $iisHtaccessFile);
-			}
+            if ($result !== true) {
+                return sprintf($_ARRLANG['TXT_NO_WRITE_PERMISSION'], $iisHtaccessFile);
+            }
         } else {
-            
+
             $objFWHtAccess = new FWHtAccess(ASCMS_DOCUMENT_ROOT, ASCMS_PATH_OFFSET);
 
             $result = $objFWHtAccess->loadHtAccessFile($apacheHtaccessFile);
             if ($result !== true) {
                 return $result;
             }
-            
+
             $objFWHtAccess->setSection("core_routing", explode("\n", $this->_getHtaccessFileTemplate($apacheHtaccessTemplateFile)));
             $result = $objFWHtAccess->write();
             if ($result !== true) {
                 return sprintf($_ARRLANG['TXT_NO_WRITE_PERMISSION'], $apacheHtaccessFile);
             }
         }
-            
+
         return true;
     }
 
@@ -1361,7 +1361,7 @@ class CommonFunctions
             if (!@$objDb->Execute($query)) {
                 $statusMsg .= $_ARRLANG['TXT_COULD_NOT_DEACTIVATE_UNUSED_LANGUAGES']."<br />";
             }
-            
+
             // activate german and set it to default
             $query = '
                 UPDATE `'.$_SESSION['installer']['config']['dbTablePrefix'].'languages`
@@ -1709,7 +1709,7 @@ class CommonFunctions
                 }
 
             //Get values
-                $objResult = $objDb->Execute("SELECT setname, setmodule, setvalue FROM `".$_SESSION['installer']['config']['dbTablePrefix']."settings` ORDER BY	setmodule ASC, setname ASC");
+                $objResult = $objDb->Execute("SELECT setname, setmodule, setvalue FROM `".$_SESSION['installer']['config']['dbTablePrefix']."settings` ORDER BY    setmodule ASC, setname ASC");
                 $intMaxLen = 0;
                 if ($objResult->RecordCount() > 0) {
                     while (!$objResult->EOF) {

@@ -262,7 +262,7 @@
         float: left;
         clear: both;
         width: 100%;
-    } 
+    }
     /*cart*/
     #cartlist #th_bg2 .cartrow:first-child {
         width: 100%;
@@ -359,13 +359,13 @@
         content: "Gebührenfrei ab";
         font-weight: 700;
         position: absolute;
-        left: 15px; 
+        left: 15px;
     }
     .row2 .shoprow:last-child:before {
         content: "Gebühr";
         font-weight: 700;
         position: absolute;
-        left: 15px; 
+        left: 15px;
     }
     /*Medien*/
     head .eachrow:nth-child(2) {
@@ -540,7 +540,7 @@
     #page #gallery div.show_image img , #page #gallery div.category_image img,
     #page #gallery div.category_images img{width: auto;}
     #page #shop div.description{width: 100%;}
-    
+
     /*MediaDir Edit Start*/
     .mediadirSelector .mediadirSelectorCenter {
         padding: 5px 65px 0 !important;
@@ -573,7 +573,7 @@
     .home-box.col-md-4 {width: 100%;margin-bottom: 30px;}
     #content-wrapper {
         padding-bottom: 168px;
-    }    
+    }
     #page #forum div.notification_center {
         padding: 20px 0px 20px 0px;
     }
@@ -736,7 +736,7 @@
     }
     #shop div.message p label {
         min-height: 40px;
-    }    
+    }
     #sidebar {
         width: 22.566667%;
     }
@@ -818,13 +818,13 @@
     }
     .navbar-nav {
         margin: 0;
-    }    
+    }
     body {font-size: 18px;}
 
 }
 
-@media (max-width: 767px) {    
-    .site-intro .title {        
+@media (max-width: 767px) {
+    .site-intro .title {
         margin: 0;
         margin-bottom: 16px;
         color: #444854;
@@ -839,7 +839,7 @@
     }
     .article-content .p1 {
         font-size: 24px;
-        line-height: 42px;       
+        line-height: 42px;
     }
     .site-intro .description {text-align: left;}
     .site-intro {
@@ -848,8 +848,8 @@
         margin-right: 0;
     }
     .site-intro img {margin: 0;}
-    .btn {font-size: 16px;}    
-    #footer {margin: 0 -15px !important;}  
+    .btn {font-size: 16px;}
+    #footer {margin: 0 -15px !important;}
     #home-content {
         width: 100%;
         margin-left: 0;
@@ -863,12 +863,12 @@
     }
 }
 
-@media (max-width: 991px) { 
+@media (max-width: 991px) {
     .header p.toggle-container {
         display: block;
-    }    
-    .header { 
-        padding: 28px 18px 42px 18px; 
+    }
+    .header {
+        padding: 28px 18px 42px 18px;
         margin-left: -18px;
         margin-right: -18px;
     }
@@ -882,7 +882,7 @@
         left: -80%;
         position: absolute;
         height: 100%;
-        z-index: 99999; 
+        z-index: 99999;
         top: 0;
     }
     .main-nav .navigation {
@@ -893,14 +893,14 @@
         margin-bottom: 15px;
         overflow-y: hidden;
         overflow-x: auto;
-    }    
+    }
 }
 
-@media (min-width: 992px) { 
+@media (min-width: 992px) {
     .container {width: 100%;}
     .main-nav h2, .main-nav .buttons, .main-nav hr {
         display: none;
-    } 
+    }
     .inner-wrap {
         -webkit-transform: none !important;
         -moz-transform: none !important;
@@ -911,8 +911,8 @@
         margin: 0 auto;
         left: 0 !important;
         margin-top: 0;
-        margin-bottom: 0;    
-        padding: 0 50px; 
+        margin-bottom: 0;
+        padding: 0 50px;
     }
     .main-nav {
         top: 0;
@@ -923,7 +923,7 @@
         border-right: 0;
         border-bottom: 6px solid #67bfb6;
         clear: none;
-        position: fixed;       
+        position: fixed;
         width: 100%;
         -webkit-transform: none !important;
         -moz-transform: none !important;
@@ -982,10 +982,10 @@
         transition: all ease 0.238s;
         overflow: hidden;
         -webkit-transform: translateY(1em);
-        opacity: 0; 
-        overflow: hidden; 
+        opacity: 0;
+        overflow: hidden;
         -webkit-transform: translateY(1em);
-        visibility: hidden; 
+        visibility: hidden;
     }
     .main-nav ul.menu {
         display: none;
@@ -1077,7 +1077,7 @@
     }
     .csstransforms3d.csstransitions .background-contrast .main-nav {
         left: auto;
-    } 
+    }
     .main-nav ul li.starter_active > a:before {
         border-bottom-color: #67bfb6;
     }
@@ -1094,7 +1094,7 @@
     }
 }
 
-@media (max-width: 450px) { 
-    .btn, input[type="button"], input[type="submit"], #mediadir .mediadirButtonSearch, 
+@media (max-width: 450px) {
+    .btn, input[type="button"], input[type="submit"], #mediadir .mediadirButtonSearch,
     #market .search input.searchbox {margin-top: 15px;}
 }

@@ -22,11 +22,11 @@ function copyText(strField) {
                 }
             }
         }
-    }	
+    }
 }
 
-function deleteCategory(catId){ 
-    if (confirm('{TXT_OVERVIEW_DELETE_CATEGORY_JS}')) 
+function deleteCategory(catId){
+    if (confirm('{TXT_OVERVIEW_DELETE_CATEGORY_JS}'))
         window.location.replace("index.php?cmd=Data&{CSRF_PARAM}&act=deleteCategory&id="+catId);
 }
 
@@ -39,7 +39,7 @@ function selectMultiAction() {
                     submit();
                 }
             break;
-            default: //do nothing			
+            default: //do nothing
         }
     }
 }
@@ -148,7 +148,7 @@ $J(document).ready(function () {
                         <div align="right">
                             <a href="index.php?cmd=Data&amp;catId={OVERVIEW_CATEGORY_ID}" target="_self" title="{TXT_OVERVIEW_IMGALT_MESSAGES}"><img src="../core/Core/View/Media/icons/details.gif" border="0" alt="{TXT_OVERVIEW_IMGALT_MESSAGES}" title="{TXT_OVERVIEW_IMGALT_MESSAGES}" /></a>
                             <a href="index.php?cmd=Data&amp;act=editCategory&amp;id={OVERVIEW_CATEGORY_ID}" target="_self" title="{TXT_OVERVIEW_IMGALT_EDIT}"><img src="../core/Core/View/Media/icons/edit.gif" border="0" alt="{TXT_OVERVIEW_IMGALT_EDIT}" title="{TXT_OVERVIEW_IMGALT_EDIT}" /></a>
-                            <a href="javascript:deleteCategory({OVERVIEW_CATEGORY_ID});" target="_self" title="{TXT_OVERVIEW_IMGALT_DELETE}"><img src="../core/Core/View/Media/icons/delete.gif" border="0" alt="{TXT_OVERVIEW_IMGALT_DELETE}" title="{TXT_OVERVIEW_IMGALT_DELETE}" /></a> 
+                            <a href="javascript:deleteCategory({OVERVIEW_CATEGORY_ID});" target="_self" title="{TXT_OVERVIEW_IMGALT_DELETE}"><img src="../core/Core/View/Media/icons/delete.gif" border="0" alt="{TXT_OVERVIEW_IMGALT_DELETE}" title="{TXT_OVERVIEW_IMGALT_DELETE}" /></a>
                         </div>
                     </td>
                 </tr>
@@ -164,7 +164,7 @@ $J(document).ready(function () {
             <tr>
                 <td>
                     <img src="../core/Core/View/Media/icons/arrow.gif" border="0" width="38" height="22" alt="{TXT_OVERVIEW_MARKED}:" />
-                    <a href="#" onclick="changeCheckboxes('frmShowCategories','selectedCategoryId[]',true); return false;">{TXT_OVERVIEW_SELECT_ALL}</a> / 
+                    <a href="#" onclick="changeCheckboxes('frmShowCategories','selectedCategoryId[]',true); return false;">{TXT_OVERVIEW_SELECT_ALL}</a> /
                     <a href="#" onclick="changeCheckboxes('frmShowCategories','selectedCategoryId[]',false); return false;">{TXT_OVERVIEW_DESELECT_ALL}</a>
                     <img src="../core/Core/View/Media/icons/strike.gif" alt="" />
                     <select name="frmShowCategories_MultiAction" onchange="selectMultiAction();">
@@ -176,7 +176,7 @@ $J(document).ready(function () {
         </table>
     </form>
     <br />
-    <div align="center">{OVERVIEW_PAGING}</div>	
+    <div align="center">{OVERVIEW_PAGING}</div>
 </div>
 
 <div id="AddCategory" class="categories" style="display: none;">
@@ -193,10 +193,10 @@ $J(document).ready(function () {
                         <!-- BEGIN addCategoryNameFields -->
                         <input type="text" name="frmAddCategory_Name_{ADD_NAME_LANGID}" value="" maxlength="100" style="width:730px; margin-top:1px;" />&nbsp;<label for="frmAddCategory_Name_{ADD_NAME_LANGID}">{ADD_NAME_LANG}</label><br />
                         <!-- END addCategoryNameFields -->
-                    </div>	
+                    </div>
                 </td>
             </tr>
-<!--			<tr>
+<!--      <tr>
                 <td>{TXT_PARENT_CAT}</td>
                 <td colspan="3">
                     <select name="frmParentcategory" style="width: 730px">
@@ -248,7 +248,7 @@ $J(document).ready(function () {
             <tr class="row1" id="box_height">
               <td>{TXT_BOX_HEIGHT}</td>
               <td colspan="3">
-                  <input type="text" style="width: 730px;" value="500" name="frmBoxheight" /> px 
+                  <input type="text" style="width: 730px;" value="500" name="frmBoxheight" /> px
               </td>
             </tr>
             <tr class="row2">

@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * JSON Adapter for JSON requests
  * @copyright   Cloudrexx AG
@@ -43,25 +43,25 @@ namespace Cx\Core\Json;
  * @subpackage  core_json
  */
 interface JsonAdapter {
-    
+
     /**
      * Returns the internal name used as identifier for this adapter
      * @return String Name of this adapter
      */
     public function getName();
-    
+
     /**
      * Returns an array of method names accessable from a JSON request
      * @return array List of method names
      */
     public function getAccessableMethods();
-    
+
     /**
      * Returns all messages as string
      * @return String HTML encoded error messages
      */
     public function getMessagesAsString();
-    
+
     /**
      * Returns default permission as object
      * @return Object

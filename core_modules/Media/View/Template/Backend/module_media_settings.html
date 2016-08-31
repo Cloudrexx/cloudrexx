@@ -36,13 +36,13 @@ function DeselectAllGroups(link) {
 function MoveRight(button) {
     var right = cx.jQuery(button).parent().parent().find(".group_list:last");
     cx.jQuery(button).parent().parent().find(".group_list:first").find("option:selected").appendTo(right);
-    return false;  
+    return false;
 };
 
 function MoveLeft(button) {
     var left = cx.jQuery(button).parent().parent().find(".group_list:first");
     cx.jQuery(button).parent().parent().find(".group_list:last").find("option:selected").appendTo(left);
-    return false;  
+    return false;
 };
 
 function BeforeSubmit() {
@@ -61,20 +61,20 @@ function setArchiveTitle(archiveNumber) {
     <li><a id="messageTab_media4" href="javascript:{}" onclick="selectTab('media4');setArchiveTitle('4');" title="{TXT_MEDIA_ARCHIVE} #4">{TXT_MEDIA_ARCHIVE} #4</a></li>
 </ul>
 <table cellspacing="0" cellpadding="2" width="100%" border="0" class="adminlist">
-	<tr>
+  <tr>
         <th>{TXT_MEDIA_ARCHIVE} #<span id="media-archive-number-title">1</span></th>
-	</tr>
-	<tr class="row3" style="font-weight: bold;">
-		<td>{TXT_MEDIA_FRONTEND_FILE_UPLOAD}</td>
-	</tr>
-	<tr class="row1">
-		<td>{TXT_MEDIA_FRONTEND_FILE_UPLOAD_DESC}</td>
+  </tr>
+  <tr class="row3" style="font-weight: bold;">
+    <td>{TXT_MEDIA_FRONTEND_FILE_UPLOAD}</td>
+  </tr>
+  <tr class="row1">
+    <td>{TXT_MEDIA_FRONTEND_FILE_UPLOAD_DESC}</td>
     </tr>
 </table>
 <form action="index.php?cmd=Media&amp;archive=archive1&amp;act=saveSettings" method="post" name="settings">
     <!-- BEGIN mediaAccessSection -->
 <div id="media{MEDIA_ARCHIVE_NUMBER}" class="messageTab" style="display:{MEDIA_TAB_STYLE}">
-	<table cellspacing="0" cellpadding="2" width="100%" border="0" class="adminlist">
+  <table cellspacing="0" cellpadding="2" width="100%" border="0" class="adminlist">
         <tr class="row3" height="20" valign="bottom">
             <td colspan="2" style="font-weight:bold;">{TXT_MEDIA_ADD}</td>
         </tr>

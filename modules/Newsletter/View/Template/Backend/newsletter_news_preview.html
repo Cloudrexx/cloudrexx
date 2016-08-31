@@ -8,15 +8,15 @@ var createNewsletter = function(text){
 }
 
 function refreshIframe() {
-	var email_template = document.getElementById('newsletter_mail_template').value;
-	var import_template = document.getElementById('newsletter_import_template').value;
-	$J('#emailtemplate').val(email_template);
-	$J('#importtemplate').val(import_template);
-	$J('#iframe_data_form').submit();
+  var email_template = document.getElementById('newsletter_mail_template').value;
+  var import_template = document.getElementById('newsletter_import_template').value;
+  $J('#emailtemplate').val(email_template);
+  $J('#importtemplate').val(import_template);
+  $J('#iframe_data_form').submit();
 }
 
 cx.jQuery(document).ready(function() {
-	refreshIframe();
+  refreshIframe();
 });
 
 // -->

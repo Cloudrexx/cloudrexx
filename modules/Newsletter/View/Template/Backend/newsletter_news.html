@@ -3,19 +3,19 @@
 <!--
 
 var previewNewsletter = function(text){
-	var elements = document.getElementById('newsLetterNews').elements;
-	var checked = 0;
+  var elements = document.getElementById('newsLetterNews').elements;
+  var checked = 0;
     for(var i = 0; i < elements.length; i++) {
-		if(elements[i].checked)
-			checked++;
-	}
-	if(checked > 0){
+    if(elements[i].checked)
+      checked++;
+  }
+  if(checked > 0){
       document.getElementById("newsLetterNews").action = "?cmd=Newsletter&act=newspreview";
     return true;
-	}
-	else {
-		return false;
-	}
+  }
+  else {
+    return false;
+  }
 }
 
 //adds the datetimepicker to the date fields
@@ -23,62 +23,62 @@ cx.ready(function() {
     var dpOptions = {
         dateFormat: 'dd.mm.yy',
         timeFormat: 'hh:mm',
-		onClose: function() {
-			document.forms["newsLetterNews"].submit()
-		}
+    onClose: function() {
+      document.forms["newsLetterNews"].submit()
+    }
     };
 
     $J('input[name=newsDate]').datetimepicker(dpOptions);
-    
+
 }, true);
 
 function CategorySelect(t) {
-	var elements = document.getElementById('newsLetterNews').elements;
-	var id = 'tr' + t.id.match(/(\d+)/)[1];
+  var elements = document.getElementById('newsLetterNews').elements;
+  var id = 'tr' + t.id.match(/(\d+)/)[1];
     for(var i = 0; i < elements.length; i++) {
-		if(elements[i].id == id) {
-			elements[i].checked = t.checked;
-			if(t.checked) {
-				elements[i].parentNode.parentNode.setAttribute("class", "row1");
-				elements[i].parentNode.parentNode.style.display = "table-row";
-			}
-			else {
-				elements[i].parentNode.parentNode.style.display = "none";
-				elements[i].parentNode.parentNode.setAttribute("class", "row2");
-			}
-		}
-	}
-	if(t.checked)
-		t.parentNode.parentNode.setAttribute("class", "row1");
-	else
-		t.parentNode.parentNode.setAttribute("class", "row2");
+    if(elements[i].id == id) {
+      elements[i].checked = t.checked;
+      if(t.checked) {
+        elements[i].parentNode.parentNode.setAttribute("class", "row1");
+        elements[i].parentNode.parentNode.style.display = "table-row";
+      }
+      else {
+        elements[i].parentNode.parentNode.style.display = "none";
+        elements[i].parentNode.parentNode.setAttribute("class", "row2");
+      }
+    }
+  }
+  if(t.checked)
+    t.parentNode.parentNode.setAttribute("class", "row1");
+  else
+    t.parentNode.parentNode.setAttribute("class", "row2");
 }
 
 function NewsSelect(t) {
-	if(t.checked)
-		t.parentNode.parentNode.setAttribute("class", "row1");
-	else
-		t.parentNode.parentNode.setAttribute("class", "row2");
-	var news = new Array();
-	var elements = document.getElementById('newsLetterNews').elements;
-	var checked = 0;
+  if(t.checked)
+    t.parentNode.parentNode.setAttribute("class", "row1");
+  else
+    t.parentNode.parentNode.setAttribute("class", "row2");
+  var news = new Array();
+  var elements = document.getElementById('newsLetterNews').elements;
+  var checked = 0;
     for(var i = 0; i < elements.length; i++) {
-		if(elements[i].id == t.id) {
-			if(elements[i].checked)
-				checked++;
-			news.push(elements[i]);
-		}
-	}
-	var id = "cat" + t.id[2];
-	var category = document.getElementById(id);
-	if(checked == 0) {
-		for(var i = 0; i < news.length; i++) {
-			news[i].parentNode.parentNode.style.display = "none";
-			news[i].parentNode.parentNode.setAttribute("class", "row2");
-		}
-		category.parentNode.parentNode.setAttribute("class", "row2");
-		category.checked = false;
-	}
+    if(elements[i].id == t.id) {
+      if(elements[i].checked)
+        checked++;
+      news.push(elements[i]);
+    }
+  }
+  var id = "cat" + t.id[2];
+  var category = document.getElementById(id);
+  if(checked == 0) {
+    for(var i = 0; i < news.length; i++) {
+      news[i].parentNode.parentNode.style.display = "none";
+      news[i].parentNode.parentNode.setAttribute("class", "row2");
+    }
+    category.parentNode.parentNode.setAttribute("class", "row2");
+    category.checked = false;
+  }
 }
 
 // -->
@@ -104,25 +104,25 @@ function NewsSelect(t) {
 <!-- BEGIN news_category -->
   <tr class="row1">
     <td width="5%">
-		<input type="checkbox" id="cat{NEWS_CATEGORY_ID}" onchange="CategorySelect(this);" checked="true"/>
-	</td>
+    <input type="checkbox" id="cat{NEWS_CATEGORY_ID}" onchange="CategorySelect(this);" checked="true"/>
+  </td>
     <td width="95%" colspan="2" style="text-align:left;">
-		<h2>{NEWS_CATEGORY_NAME}</h2>
-	</td>
+    <h2>{NEWS_CATEGORY_NAME}</h2>
+  </td>
   </tr>
 <!-- END news_category -->
 <!-- BEGIN news_message -->
   <tr class="row1">
     <td width="5%">
-		<input type="checkbox" id="tr{NEWS_CATEGORY_ID}" onchange="NewsSelect(this);" name="SelectedNews[]" value="{NEWS_ID}" checked="true"/>
-	</td>
+    <input type="checkbox" id="tr{NEWS_CATEGORY_ID}" onchange="NewsSelect(this);" name="SelectedNews[]" value="{NEWS_ID}" checked="true"/>
+  </td>
     <td width="20%" style="text-align:left;">
-		<img src="{NEWS_IMAGE_PATH}" width="150" height="100"/>
-	</td>
+    <img src="{NEWS_IMAGE_PATH}" width="150" height="100"/>
+  </td>
     <td width="75%" style="text-align:left;">
-		<h3>{NEWS_TITLE}</h3>
-		<p>{NEWS_TEASER_TEXT}</p>
-	</td>
+    <h3>{NEWS_TITLE}</h3>
+    <p>{NEWS_TEASER_TEXT}</p>
+  </td>
   </tr>
 <!-- END news_message -->
 <!-- END news_list -->

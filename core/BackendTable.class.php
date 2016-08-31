@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * BackendTable
  *
@@ -100,7 +100,7 @@ class BackendTable extends HTML_Table {
                     ) {
                         continue;
                     }
-                    
+
                     if (!empty($sortField) && $header === $sortField) {
                         //Add the additional attribute class, to display the updated sort order after the row sorting
                         $this->updateColAttributes($col, array('class' => 'sortBy' . $sortField));
@@ -208,7 +208,7 @@ class BackendTable extends HTML_Table {
                             $this->setCellContents(0, $col, $header, 'th', 0, true);
                         }
                     }
-                    
+
                     $this->updateColAttributes($col, array('style' => 'text-align:right;'));
                     if (empty($options['functions']['baseUrl'])) {
                         $options['functions']['baseUrl'] = clone \Env::get('cx')->getRequest()->getUrl();
@@ -275,7 +275,7 @@ class BackendTable extends HTML_Table {
             }
             $attrs = array();
         }
-        //add the sorting parameters as table attribute 
+        //add the sorting parameters as table attribute
         //if the row sorting functionality is enabled
         $className = 'adminlist';
         if (!empty($sortField)) {
@@ -297,7 +297,7 @@ class BackendTable extends HTML_Table {
             }
             $attrs['data-object'] = 'Html';
             $attrs['data-act'] = 'updateOrder';
-            if (    isset($sortBy['jsonadapter']) 
+            if (    isset($sortBy['jsonadapter'])
                 &&  !empty($sortBy['jsonadapter']['object'])
                 &&  !empty($sortBy['jsonadapter']['act'])
             ) {
@@ -316,7 +316,7 @@ class BackendTable extends HTML_Table {
      * @param type $type
      * @param type $body
      * @param type $encode
-     * @return type 
+     * @return type
      */
     function setCellContents($row, $col, $contents, $type = 'TD', $body = 0, $encode = false)
     {
@@ -345,7 +345,7 @@ class BackendTable extends HTML_Table {
             return $ret;
         }
     }
-    
+
     protected function hasRowFunctions($functions, $virtual = false) {
         if (!is_array($functions)) {
             return false;
@@ -364,10 +364,10 @@ class BackendTable extends HTML_Table {
         }
         return false;
     }
-    
+
     protected function getFunctionsCode($rowname, $rowData, $functions, $virtual = false ) {
         global $_ARRAYLANG;
-        
+
         $baseUrl = $functions['baseUrl'];
         $code = '<span class="functions">';
         if(!$virtual){
@@ -403,10 +403,10 @@ class BackendTable extends HTML_Table {
             } else if (isset($functions['actions']) && is_callable($functions['actions'])) {
                 $code .= $functions['actions']($rowData, $editId);
             }
-            
+
             if (isset($functions['edit']) && $functions['edit']) {
                 $editUrl->setParam('editid', $editId);
-                //remove the parameter 'vg_increment_number' from editUrl 
+                //remove the parameter 'vg_increment_number' from editUrl
                 //if the baseUrl contains the parameter 'vg_increment_number'
                 if (isset($params['vg_increment_number'])) {
                     \Html::stripUriParam($editUrl, 'vg_increment_number');
@@ -438,7 +438,7 @@ class BackendTable extends HTML_Table {
     {
         $template = new \Cx\Core\Html\Sigma(ASCMS_CORE_PATH.'/Html/View/Template/Generic/');
         $template->loadTemplateFile('Attribute.html');
-        
+
         $strAttr = '';
 
         if (is_array($attributes)) {
@@ -453,7 +453,7 @@ class BackendTable extends HTML_Table {
         }
         return $template->get();
     } // end func _getAttrString
-    
+
     /**
      * This is a soft override of Storage's toHtml()
      * in order to use Sigma for parsing

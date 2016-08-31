@@ -87,7 +87,7 @@ class MediaDirectoryInputfieldGoogleWeather extends \Cx\Modules\MediaDir\Control
                 if(empty($strValue)) {
                     $strValue = empty($arrInputfield['default_value'][$_LANGID]) ? $arrInputfield['default_value'][0] : $arrInputfield['default_value'][$_LANGID];
                 }
-                
+
                 if(!empty($arrInputfield['info'][0])){
                     $strInfoValue = empty($arrInputfield['info'][$_LANGID]) ? 'title="'.$arrInputfield['info'][0].'"' : 'title="'.$arrInputfield['info'][$_LANGID].'"';
                     $strInfoClass = 'mediadirInputfieldHint';
@@ -178,21 +178,21 @@ class MediaDirectoryInputfieldGoogleWeather extends \Cx\Modules\MediaDir\Control
             case 'google_weather':
                 /*value = document.getElementById('$fieldName' + field + '_0').value;
                 if (value == "" && isRequiredGlobal(inputFields[field][1], value)) {
-                	isOk = false;
-                	document.getElementById('$fieldName' + field + '_0').style.border = "#ff0000 1px solid";
+                    isOk = false;
+                    document.getElementById('$fieldName' + field + '_0').style.border = "#ff0000 1px solid";
                 } else if (value != "" && !matchType(inputFields[field][2], value)) {
-                	isOk = false;
-                	document.getElementById('$fieldName' + field + '_0').style.border = "#ff0000 1px solid";
+                    isOk = false;
+                    document.getElementById('$fieldName' + field + '_0').style.border = "#ff0000 1px solid";
                 } else {
-                	document.getElementById('$fieldName' + field + '_0').style.borderColor = '';
+                    document.getElementById('$fieldName' + field + '_0').style.borderColor = '';
                 }*/
                 break;
 
 EOF;
         return $strJavascriptCheck;
     }
-    
-    
+
+
     function getFormOnSubmit($intInputfieldId)
     {
         return null;

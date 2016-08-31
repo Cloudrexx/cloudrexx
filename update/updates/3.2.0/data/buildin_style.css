@@ -1,13 +1,13 @@
 /* FORUM */
 #forum .div_title {
-	font-weight: bold;
-	padding: 3px 6px 3px 6px;
-	background-color: #EDEDED;
-	border: 1px solid #7390AF;
+  font-weight: bold;
+  padding: 3px 6px 3px 6px;
+  background-color: #EDEDED;
+  border: 1px solid #7390AF;
 }
 
 #forum div .div_board {
-	margin: 0px 0px 0px 0px;
+  margin: 0px 0px 0px 0px;
 }
 
 #forum span.last_edited{
@@ -15,9 +15,9 @@
 }
 
 #forum table {
-	width: 100%;
-	border-right: 1px solid #7390AF;
-	border-left: 1px solid #7390AF;
+  width: 100%;
+  border-right: 1px solid #7390AF;
+  border-left: 1px solid #7390AF;
 }
 
 #forum table.bottomborder{
@@ -30,28 +30,28 @@
 
 
 #forum table th {
-	font-weight: bold;
+  font-weight: bold;
         text-align: left;
-	padding: 3px 6px 3px 6px;
-	background-color: #F5F5F5;
+  padding: 3px 6px 3px 6px;
+  background-color: #F5F5F5;
 }
 
 #forum table td {
         text-align: left;
-	padding: 3px 6px 3px 6px;
+  padding: 3px 6px 3px 6px;
 }
 
 #forum table .row_subtitle td {
-	font-weight: bold;
-	border-bottom: 1px solid #7390AF;
+  font-weight: bold;
+  border-bottom: 1px solid #7390AF;
 }
 
 #forum .row_1 {
-	background-color: #ffffff;
+  background-color: #ffffff;
 }
 
 #forum .row_2 {
-	background-color: #f2f2f2;
+  background-color: #f2f2f2;
 }
 
 #forum div.div_board hr{
@@ -92,98 +92,98 @@
 
 /* GALLERY */
 #gallery img {
-	border:4px solid #EFEFEF;
-	margin-bottom:4px;
+  border:4px solid #EFEFEF;
+  margin-bottom:4px;
 }
 #gallery a:hover img {
-	border:4px solid #D0D0D0;
-	margin-bottom:4px;
+  border:4px solid #D0D0D0;
+  margin-bottom:4px;
 }
 
 /* DOCSYS */
 #docsys {
-	border-top: 1px solid #D0D0D0;
-	border-left: 1px solid #D0D0D0;
+  border-top: 1px solid #D0D0D0;
+  border-left: 1px solid #D0D0D0;
 }
 
 #docsys td {
-	border-right: 1px solid #D0D0D0;
-	border-bottom: 1px solid #D0D0D0;
+  border-right: 1px solid #D0D0D0;
+  border-bottom: 1px solid #D0D0D0;
 }
 
 #docsys th {
-	border-right: 1px solid #D0D0D0;
-	border-bottom: 1px solid #D0D0D0;
-	font-weight: bold;
-	background-color: #EFEFEF;
+  border-right: 1px solid #D0D0D0;
+  border-bottom: 1px solid #D0D0D0;
+  font-weight: bold;
+  background-color: #EFEFEF;
 }
 
 /* MEDIA */
 #media {
-	border-top: 1px solid #D0D0D0;
-	border-left: 1px solid #D0D0D0;
+  border-top: 1px solid #D0D0D0;
+  border-left: 1px solid #D0D0D0;
 }
 #media td {
-	border-right: 1px solid #D0D0D0;
-	border-bottom: 1px solid #D0D0D0;
+  border-right: 1px solid #D0D0D0;
+  border-bottom: 1px solid #D0D0D0;
 }
 #media th {
-	border-right: 1px solid #D0D0D0;
-	border-bottom: 1px solid #D0D0D0;
-	font-weight: bold;
-	background-color: #EFEFEF;
+  border-right: 1px solid #D0D0D0;
+  border-bottom: 1px solid #D0D0D0;
+  font-weight: bold;
+  background-color: #EFEFEF;
 }
 
 /* NEWS */
 #news {
-	border-top: 1px solid #D0D0D0;
-	border-left: 1px solid #D0D0D0;
+  border-top: 1px solid #D0D0D0;
+  border-left: 1px solid #D0D0D0;
 }
 #news td {
-	border-right: 1px solid #D0D0D0;
-	border-bottom: 1px solid #D0D0D0;
+  border-right: 1px solid #D0D0D0;
+  border-bottom: 1px solid #D0D0D0;
 }
 #news th {
-	border-right: 1px solid #D0D0D0;
-	border-bottom: 1px solid #D0D0D0;
-	font-weight: bold;
-	background-color: #EFEFEF;
+  border-right: 1px solid #D0D0D0;
+  border-bottom: 1px solid #D0D0D0;
+  font-weight: bold;
+  background-color: #EFEFEF;
 }
 
 /* PODCAST */
 #podcast {
-	border-top: 1px solid #D0D0D0;
-	border-left: 1px solid #D0D0D0;
+  border-top: 1px solid #D0D0D0;
+  border-left: 1px solid #D0D0D0;
 }
 
 #podcast td {
-	border-right: 1px solid #D0D0D0;
-	border-bottom: 1px solid #D0D0D0;
+  border-right: 1px solid #D0D0D0;
+  border-bottom: 1px solid #D0D0D0;
 }
 
 #podcast th {
-	border-right: 1px solid #D0D0D0;
-	border-bottom: 1px solid #D0D0D0;
-	font-weight: bold;
-	background-color: #EFEFEF;
+  border-right: 1px solid #D0D0D0;
+  border-bottom: 1px solid #D0D0D0;
+  font-weight: bold;
+  background-color: #EFEFEF;
 }
 
 /* SITEMAP */
 #sitemap_level_1 {
-	border-bottom-width: 1px;
-	border-bottom-style: solid;
-	border-bottom-color: #D0D0D0;
-	font-weight: bold;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-bottom-color: #D0D0D0;
+  font-weight: bold;
 }
 
 #sitemap_level_2,
 #sitemap_level_3,
 #sitemap_level_4,
 #sitemap_level_5 {
-	border-bottom-width: 1px;
-	border-bottom-style: dotted;
-	border-bottom-color: #D0D0D0;
-	font-weight: normal;
+  border-bottom-width: 1px;
+  border-bottom-style: dotted;
+  border-bottom-color: #D0D0D0;
+  font-weight: normal;
 }
 
 #cat
@@ -201,7 +201,7 @@
  color: #B8B8B8;
 }
 
-table.feed 
+table.feed
 {
  horizontal-align: left;
  border-top: 1px solid #ffffff;
@@ -265,43 +265,43 @@ table.feed td.footer a
 
 .calendar_eventlist
 {
-	border-collapse: collapse;
-	border-bottom: black 1px solid;
-	border-top: black 1px solid;
+  border-collapse: collapse;
+  border-bottom: black 1px solid;
+  border-top: black 1px solid;
 }
 
 .calendar_eventlist td, .calendar_eventlist th {
-	border-bottom: black 1px dotted;
-	padding: 5px;
+  border-bottom: black 1px dotted;
+  padding: 5px;
       font-size: 11px;
 }
 
 #directory {
-	border-top: 0px solid #74CC00;
-	border-bottom: 0px solid #74CC00;
-	border-right: 0px solid #74CC00;
-	border-left: 0px solid #74CC00;
-	background-color: #ffffff;
+  border-top: 0px solid #74CC00;
+  border-bottom: 0px solid #74CC00;
+  border-right: 0px solid #74CC00;
+  border-left: 0px solid #74CC00;
+  background-color: #ffffff;
 }
 
 #directory span.title {
-	font-weight: bold;
+  font-weight: bold;
         font-size:11px;
         color: #000000;
 }
 
 #directory span.title a{
-	font-weight: bold;
+  font-weight: bold;
         color: #000000;
 }
 
 #directory span.title a:hover{
-	font-weight: bold;
+  font-weight: bold;
         color: #FC443C;
 }
 
 #directory a.catLink {
-	font-weight: bold;
+  font-weight: bold;
         font-size:12px;
 }
 
@@ -309,7 +309,7 @@ table.feed td.footer a
 }
 
 #directory a.subcatLink {
-	font-weight: normal;
+  font-weight: normal;
         font-size:11px;
 }
 
@@ -317,40 +317,40 @@ table.feed td.footer a
 }
 
 #directory td.description{
-	border-top: 1px solid #E5E5E5;
-	border-bottom: 1px solid #E5E5E5;
-	border-right: 1px solid #E5E5E5;
-	border-left: 1px solid #E5E5E5;
-	background-color: #F2F2F2;
+  border-top: 1px solid #E5E5E5;
+  border-bottom: 1px solid #E5E5E5;
+  border-right: 1px solid #E5E5E5;
+  border-left: 1px solid #E5E5E5;
+  background-color: #F2F2F2;
         padding: 4px;
         color: #000000;
 }
 
 #memberdir tr.memberdir_row1 {
-	background-color: #EDEFF3;
+  background-color: #EDEFF3;
 }
 
 #memberdir tr.memberdir_row2 {
-	background-color: white;
+  background-color: white;
 }
 
 #memberdir tr.memberdir_row1 td, tr.memberdir_row2 td {
-	/*padding: 10px;*/
+  /*padding: 10px;*/
 }
 
 #memberdir tr.memberdir_row2:hover, #memberdir tr.memberdir_row1:hover {
-	background-color: #E6E6E6;
+  background-color: #E6E6E6;
 }
 
 #memberdir tr.memberdir_row2 a, tr.memberdir_row1 a {
-	display: block;
-	color: black;
-	padding: 10px;
+  display: block;
+  color: black;
+  padding: 10px;
       font-weight: normal;
 }
 
 #memberdir div.directory {
-      height: 1em; 
+      height: 1em;
       padding-top: 0.5em;
       padding-bottom: 0.5em;
       padding-left: 5px;
@@ -364,89 +364,89 @@ table.feed td.footer a
 }
 
 #market {
-	border-top: 0px solid #ffffff;
-	border-bottom: 0px solid #ffffff;
-	border-right: 0px solid #ffffff;
-	border-left: 0px solid #ffffff;
+  border-top: 0px solid #ffffff;
+  border-bottom: 0px solid #ffffff;
+  border-right: 0px solid #ffffff;
+  border-left: 0px solid #ffffff;
 }
 
 #market span.title {
-	font-weight: bold;
+  font-weight: bold;
         font-size:12px;
 }
 
 #market a.catLink {
-	font-weight: bold;
+  font-weight: bold;
         font-size:12px;
 }
 
 #market a.subcatLink {
-	font-weight: normal;
+  font-weight: normal;
         font-size:11px;
 }
 
 #market td.description{
-	border-top: 1px solid #B5B5B5;
-	border-bottom: 1px solid #B5B5B5;
-	border-right: 1px solid #B5B5B5;
-	border-left: 1px solid #B5B5B5;
-	background-color: #ECECEC;
+  border-top: 1px solid #B5B5B5;
+  border-bottom: 1px solid #B5B5B5;
+  border-right: 1px solid #B5B5B5;
+  border-left: 1px solid #B5B5B5;
+  background-color: #ECECEC;
         padding: 3px;
 }
 
 .marketRow1 {
-	border-top: 0px solid #FE7272;
-	border-bottom: 1px solid #FE7272;
-	border-right: 0px solid #FE7272;
-	border-left: 0px solid #FE7272;
-	background-color: #FFC6C6;
+  border-top: 0px solid #FE7272;
+  border-bottom: 1px solid #FE7272;
+  border-right: 0px solid #FE7272;
+  border-left: 0px solid #FE7272;
+  background-color: #FFC6C6;
 }
 
 .marketRow2 {
-	border-top: 0px solid #ACDAF1;
-	border-bottom: 1px solid #B5B5B5;
-	border-right: 0px solid #ACDAF1;
-	border-left: 0px solid #ACDAF1;
-	background-color: #ffffff;
+  border-top: 0px solid #ACDAF1;
+  border-bottom: 1px solid #B5B5B5;
+  border-right: 0px solid #ACDAF1;
+  border-left: 0px solid #ACDAF1;
+  background-color: #ffffff;
 }
 
 .marketRow3 {
-	border-top: 0px solid #ACDAF1;
-	border-bottom: 1px solid #ACDAF1;
-	border-right: 0px solid #ACDAF1;
-	border-left: 0px solid #ACDAF1;
-	background-color: #DCF1FC;
+  border-top: 0px solid #ACDAF1;
+  border-bottom: 1px solid #ACDAF1;
+  border-right: 0px solid #ACDAF1;
+  border-left: 0px solid #ACDAF1;
+  background-color: #DCF1FC;
 }
 
 table.reservation a {
-	display: block;
-	padding: 0.5em;
-	color: #3B6506;
-	margin-left: 0px;
+  display: block;
+  padding: 0.5em;
+  color: #3B6506;
+  margin-left: 0px;
 }
 
 table.reservation .row_available  {
-	background-color: #DBFFAD;
+  background-color: #DBFFAD;
 }
 
 table.reservation .row_available:hover {
-	background-color: #F3FFE4;
+  background-color: #F3FFE4;
 }
 
 table.reservation .row_confirmed {
-	background-color: #FF8E5C;
-	color: white;
+  background-color: #FF8E5C;
+  color: white;
 }
 
 table.reservation .row_confirmed td {
-	padding: 0.5em;
-	color: white;
+  padding: 0.5em;
+  color: white;
 }
 
 table.reservation .row_occupied td  {
-	padding: 0.5em;
+  padding: 0.5em;
 }
 
 table.reservation .row_occupied {
-	background-color: #E3B96A;
+  background-color: #E3B96A;
 }

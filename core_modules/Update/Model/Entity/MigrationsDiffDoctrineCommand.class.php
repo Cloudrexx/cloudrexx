@@ -79,14 +79,14 @@ EOT
 
     /**
      * Generate sql queries and create new migration class
-     * 
+     *
      * @param InputInterface  $input
      * @param OutputInterface $output
-     * 
+     *
      * @return null
      * @throws \InvalidArgumentException
      */
-    public function execute(\Symfony\Component\Console\Input\InputInterface $input, \Symfony\Component\Console\Output\OutputInterface $output) 
+    public function execute(\Symfony\Component\Console\Input\InputInterface $input, \Symfony\Component\Console\Output\OutputInterface $output)
     {
             $isDbalOld = (DbalVersion::compare('2.2.0') > 0);
             $configuration = $this->getMigrationConfiguration($input, $output);
@@ -149,10 +149,10 @@ EOT
 
     /**
      * create the sql queries
-     * 
+     *
      * @param Configuration $configuration
      * @param array         $sql
-     * 
+     *
      * @return string
      */
     private function buildCodeFromSql(Configuration $configuration, array $sql) {

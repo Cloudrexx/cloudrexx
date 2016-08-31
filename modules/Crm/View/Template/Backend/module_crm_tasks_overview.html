@@ -1,5 +1,5 @@
 <script language="JavaScript" type="text/javascript">
-    var sort_icons = {CRM_TASK_SORT_ORDER_ICONS};    
+    var sort_icons = {CRM_TASK_SORT_ORDER_ICONS};
     function confirmSubmit()
     {
         if (confirm('{TXT_CRM_DELETE_CONFIRM}'))
@@ -10,7 +10,7 @@
     function changeSortOrder(elm)
     {
         sort_order = $J("#sort_order").val() == 1 ? 0 : 1;
-        
+
         //$J(".sort_order_icon").attr('src', sort_icons[sort_order]);
         $J("#sort_order").val(sort_order);
         elm.closest('form').submit();
@@ -41,7 +41,7 @@
     }
     var _changeTaskStatus = function(Obj, task_status) {
         var taskId = $J(Obj).attr('rel').split('_')[1];
-        
+
         $J.ajax({
             url: './index.php?cmd={MODULE_NAME}&act=task&tpl=cstatus',
             type: "POST",
@@ -52,7 +52,7 @@
                     fadeAlertbox(json['error']);
                 } else if (json['success']) {
                     $J(Obj).find("a img").attr('src', json['status_img']);
-                    
+
                     $parent = $J(Obj).closest('tr');
                     $parent.fadeOut('fast');
                     $parent.html('');
@@ -66,7 +66,7 @@
                 }
             }
         });
-                
+
         $J("#taskStatusPanel").hide();
     };
     $J(document).ajaxStart(function() {
@@ -155,7 +155,7 @@
                             <option value="{CRM_TASK_ID}" {TXT_TASK_SELECTED}>{TXT_TASK_NAME}</option>
                             <!-- END tastType -->
                         </select>
-                        {TXT_CRM_FILTER_SORT_BY} : 
+                        {TXT_CRM_FILTER_SORT_BY} :
                         <select class="searchForm" name="sort_by" id="sort_by" style="width: 200px;" >
                             <!-- BEGIN sort_fields -->
                             <option value="{CRM_FILTER_SORT_ID}" {CRM_FILTER_SORT_FIELD_SELECTED}>{CRM_FILTER_SORT_FIELD}</option>
@@ -204,7 +204,7 @@
                     <!-- END task_status_block -->
                     <!-- BEGIN task_image_block -->
                     <img src="../core/Core/View/Media/icons/{CRM_TASK_TYPE_ACTIVE}" alt="status" />
-                    <!-- END task_image_block -->                    
+                    <!-- END task_image_block -->
                 </td>
                 <td>
                     <div class="taskTypeDiv">
@@ -233,7 +233,7 @@
     </table>
 </form>
 <div align="right">{ENTRIES_PAGING}</div>
-<script id="taskTemplate" type="text/x-jquery-tmpl">    
+<script id="taskTemplate" type="text/x-jquery-tmpl">
         <td style="text-align: center;">
             {{if Update}}
             <span style="cursor: pointer;" rel="task_{{= id }}" task_status="{{= taskStatus }}" onclick="showTaskStatusPanel(this);"><img src="../core/Core/View/Media/icons/{{= activeImg }}" alt="status" /></span>
@@ -261,5 +261,5 @@
             {{if Delete}}
             <a onclick="return confirmSubmit();" href="./index.php?cmd={MODULE_NAME}&act=task&tpl=deleteTask&id={{= id }}{CRM_REDIRECT_LINK}" target="_self" title="{TXT_CRM_IMAGE_DELETE}"><img src="../core/Core/View/Media/icons/delete.gif" border="0" alt="{TXT_CRM_IMAGE_DELETE}" title="{TXT_CRM_IMAGE_DELETE}" /></a>
             {{/if}}
-        </td>    
+        </td>
 </script>

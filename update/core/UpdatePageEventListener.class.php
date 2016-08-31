@@ -40,7 +40,7 @@ class UpdatePageEventListener extends \Cx\Core\ContentManager\Model\Event\PageEv
                 $entity->setUpdatedBy(
                     $_SESSION['contrexx_update']['username']
                 );
-                
+
                 $uow->recomputeSingleEntityChangeSet(
                     $em->getClassMetadata('Cx\Core\ContentManager\Model\Entity\Page'),
                     $entity

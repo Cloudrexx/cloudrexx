@@ -27,7 +27,7 @@
 
 /**
  * Main controller for Podcast
- * 
+ *
  * @copyright   cloudrexx
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
@@ -38,7 +38,7 @@ namespace Cx\Modules\Podcast\Controller;
 
 /**
  * Main controller for Podcast
- * 
+ *
  * @copyright   cloudrexx
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
@@ -47,7 +47,7 @@ namespace Cx\Modules\Podcast\Controller;
 class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentController {
     /**
      * getControllerClasses
-     * 
+     *
      * @return type
      */
     public function getControllerClasses() {
@@ -56,14 +56,14 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
 
      /**
      * Load the component Podcast.
-     * 
+     *
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
      */
     public function load(\Cx\Core\ContentManager\Model\Entity\Page $page) {
         global $subMenuTitle, $objTemplate, $_CORELANG;
-                
+
         switch ($this->cx->getMode()) {
-            case \Cx\Core\Core\Controller\Cx::MODE_FRONTEND:               
+            case \Cx\Core\Core\Controller\Cx::MODE_FRONTEND:
                 $objPodcast = new Podcast(\Env::get('cx')->getPage()->getContent());
                 \Env::get('cx')->getPage()->setContent($objPodcast->getPage($podcastFirstBlock));
                 break;
@@ -77,7 +77,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 $objPodcast = new PodcastManager();
                 $objPodcast->getPage();
                 break;
-                 
+
             default:
                 break;
         }
@@ -85,7 +85,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
 
     /**
     * Do something before content is loaded from DB
-    * 
+    *
     * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
     */
     public function preContentLoad(\Cx\Core\ContentManager\Model\Entity\Page $page) {

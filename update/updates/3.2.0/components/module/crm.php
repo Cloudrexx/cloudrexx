@@ -28,7 +28,7 @@
 
 function _crmUpdate() {
     global $objUpdate, $_CONFIG;
-	try {
+    try {
         \Cx\Lib\UpdateUtil::table(
             DBPREFIX.'module_crm_contacts',
             array(

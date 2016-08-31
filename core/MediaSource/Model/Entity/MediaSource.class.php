@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * @copyright   Cloudrexx AG
  * @author      Robin Glauser <robin.glauser@comvation.com>
@@ -214,7 +214,7 @@ class MediaSource extends DataSource {
     ) {
         throw new \Exception('Not yet implemented');
     }
-    
+
     /**
      * Adds a new entry to this DataSource
      * @param array $data Field=>value-type array. Not all fields may be required.
@@ -223,7 +223,7 @@ class MediaSource extends DataSource {
     public function add($data) {
         throw new \Exception('Not yet implemented');
     }
-    
+
     /**
      * Updates an existing entry of this DataSource
      * @param string $elementId ID of the element to update
@@ -233,7 +233,7 @@ class MediaSource extends DataSource {
     public function update($elementId, $data) {
         throw new \Exception('Not yet implemented');
     }
-    
+
     /**
      * Drops an entry from this DataSource
      * @param string $elementId ID of the element to update

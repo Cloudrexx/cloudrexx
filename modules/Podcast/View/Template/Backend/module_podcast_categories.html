@@ -3,37 +3,37 @@
 //<![CDATA[
 function podcast_delete_category(id, title)
 {
-	strDeleteTitle = '{TXT_PODCAST_CONFIRM_DELETE_CATEGORY_MSG}';
-	if (confirm(strDeleteTitle.replace('%s', '\''+title+'\'')+'\n{TXT_PODCAST_OPERATION_IRREVERSIBLE}')) {
-		window.location.href = "index.php?cmd=Podcast&{CSRF_PARAM}&act=deleteCategory&id="+id;
-	}
+  strDeleteTitle = '{TXT_PODCAST_CONFIRM_DELETE_CATEGORY_MSG}';
+  if (confirm(strDeleteTitle.replace('%s', '\''+title+'\'')+'\n{TXT_PODCAST_OPERATION_IRREVERSIBLE}')) {
+    window.location.href = "index.php?cmd=Podcast&{CSRF_PARAM}&act=deleteCategory&id="+id;
+  }
 }
 //]]>
 </script>
 <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
-	<tbody>
-		<tr>
-			<th colspan="5">{TXT_PODCAST_CATEGORIES}</th>
-		</tr>
-		<tr class="row3" style="font-weight:bold; white-space:nowrap;">
-			<td width="3%">{TXT_PODCAST_STATUS}</td>
-			<td width="25%">{TXT_PODCAST_TITLE}</td>
-			<td width="50%">{TXT_PODCAST_DESCRIPTION}</td>
-			<td width="15%">{TXT_PODCAST_MEDIA_COUNT}</td>
-			<td width="7%" style="text-align:right;">{TXT_PODCAST_FUNCTIONS}</td>
-		</tr>
-		<!-- BEGIN podcast_categories_list -->
-			<tr class="{PODCAST_ROW_CLASS}">
-				<td><img src="../core/Core/View/Media/icons/{PODCAST_CATEGORY_STATUS_IMG}" width="13" height="13" alt="{PODCAST_CATEGORY_STATUS_TXT}" /></td>
-				<td>{PODCAST_CATEGORY_TITLE}</td>
-				<td title="{PODCAST_CATEGORY_DESCRIPTION}">{PODCAST_CATEGORY_DESCRIPTION_CUT}</td>
-				<td>{PODCAST_CATEGORY_MEDIA_COUNT}</td>
-				<td style="text-align:right;">
-					<a href="index.php?cmd=Podcast&amp;act=modifyCategory&amp;id={PODCAST_CATEGORY_ID}" title="{TXT_PODCAST_MODIFY_CATEGORY}"><img src="../core/Core/View/Media/icons/edit.gif" width="16" height="16" border="0" alt="{TXT_PODCAST_MODIFY_CATEGORY}" /></a>
-					<a href="javascript:void(0);" onclick="podcast_delete_category({PODCAST_CATEGORY_ID}, '{PODCAST_CATEGORY_TITLE}')" title="{TXT_PODCAST_DELETE_CATEGORY}"><img src="../core/Core/View/Media/icons/delete.gif" width="17" height="17" border="0" alt="{TXT_PODCAST_DELETE_CATEGORY}" /></a>
-			</tr>
-		<!-- END podcast_categories_list -->
-	</tbody>
+  <tbody>
+    <tr>
+      <th colspan="5">{TXT_PODCAST_CATEGORIES}</th>
+    </tr>
+    <tr class="row3" style="font-weight:bold; white-space:nowrap;">
+      <td width="3%">{TXT_PODCAST_STATUS}</td>
+      <td width="25%">{TXT_PODCAST_TITLE}</td>
+      <td width="50%">{TXT_PODCAST_DESCRIPTION}</td>
+      <td width="15%">{TXT_PODCAST_MEDIA_COUNT}</td>
+      <td width="7%" style="text-align:right;">{TXT_PODCAST_FUNCTIONS}</td>
+    </tr>
+    <!-- BEGIN podcast_categories_list -->
+      <tr class="{PODCAST_ROW_CLASS}">
+        <td><img src="../core/Core/View/Media/icons/{PODCAST_CATEGORY_STATUS_IMG}" width="13" height="13" alt="{PODCAST_CATEGORY_STATUS_TXT}" /></td>
+        <td>{PODCAST_CATEGORY_TITLE}</td>
+        <td title="{PODCAST_CATEGORY_DESCRIPTION}">{PODCAST_CATEGORY_DESCRIPTION_CUT}</td>
+        <td>{PODCAST_CATEGORY_MEDIA_COUNT}</td>
+        <td style="text-align:right;">
+          <a href="index.php?cmd=Podcast&amp;act=modifyCategory&amp;id={PODCAST_CATEGORY_ID}" title="{TXT_PODCAST_MODIFY_CATEGORY}"><img src="../core/Core/View/Media/icons/edit.gif" width="16" height="16" border="0" alt="{TXT_PODCAST_MODIFY_CATEGORY}" /></a>
+          <a href="javascript:void(0);" onclick="podcast_delete_category({PODCAST_CATEGORY_ID}, '{PODCAST_CATEGORY_TITLE}')" title="{TXT_PODCAST_DELETE_CATEGORY}"><img src="../core/Core/View/Media/icons/delete.gif" width="17" height="17" border="0" alt="{TXT_PODCAST_DELETE_CATEGORY}" /></a>
+      </tr>
+    <!-- END podcast_categories_list -->
+  </tbody>
 </table>
 <br />
 {PODCAST_PAGING}

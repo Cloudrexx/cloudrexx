@@ -154,7 +154,7 @@ class MarketLibrary
      * Insert the advertisement entry
      *
      * @param integer $backend
-     * 
+     *
      * @return null
      */
 
@@ -202,7 +202,7 @@ class MarketLibrary
             $objResult = $objDatabase->Execute("INSERT INTO ".DBPREFIX."module_market SET
                                 type='".contrexx_addslashes($_POST['type'])."',
                                   title='".contrexx_addslashes($_POST['title'])."',
-								  color='".contrexx_addslashes($_POST['color'])."',
+                                  color='".contrexx_addslashes($_POST['color'])."',
                                   description='".contrexx_addslashes($_POST['description'])."',
                                 premium='".contrexx_addslashes($_POST['premium'])."',
                                   picture='".contrexx_addslashes($picture)."',
@@ -460,7 +460,7 @@ class MarketLibrary
         $path   = "pictures/";
 
         //check file array
-        $uploaderId = isset($_POST['marketUploaderId']) 
+        $uploaderId = isset($_POST['marketUploaderId'])
                       ? contrexx_input2raw($_POST['marketUploaderId'])
                       : 0;
         $fileName   = isset($_POST['uploadImage'])

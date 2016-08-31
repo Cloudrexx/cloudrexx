@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,10 +24,10 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Calendar Language variables
- * 
+ *
  * @package    cloudrexx
  * @subpackage module_calendar
  * @author     Cloudrexx <info@cloudrexx.com>
@@ -529,7 +529,7 @@ $_ARRAYLANG['TXT_CALENDAR_PLACE_DATA_HOST'] = "Angaben zum Gastgeber";
 $_ARRAYLANG['TXT_CALENDAR_SELECT_FORM_MEDIADIR'] = "Auswahl des Eintragtyps aus dem Medienverzeichnis";
 $_ARRAYLANG['TXT_CALENDAR_PLACE_DATA_STATUS_INFO'] = "Einerseits können die Angaben zur Ortschaft manuell erfasst werden, oder mit dem Medienverzeichnis Modul verknüpft werden. Möchten Sie dies mit dem Medienverzeichnis verknüpfen, wählen Sie bitte die entsprechende Formularvolage aus, aus welcher Sie die Daten auslesen möchten.";
 $_ARRAYLANG['TXT_CALENDAR_PLACE_DATA_DEFAULT'] = "Manuell erfassen";
-$_ARRAYLANG['TXT_CALENDAR_PLACE_DATA_FROM_MEDIADIR'] = "Eintrag aus dem Medienverzeichnis wählen";    
+$_ARRAYLANG['TXT_CALENDAR_PLACE_DATA_FROM_MEDIADIR'] = "Eintrag aus dem Medienverzeichnis wählen";
 $_ARRAYLANG['TXT_CALENDAR_PLACE_DATA_FROM_BOTH'] = "Beides";
 $_ARRAYLANG['TXT_CALENDAR_CONFIRMLIST'] = "Bestätigungsliste";
 $_ARRAYLANG['TXT_PAYMENT_METHODS'] = "Vor Ort,Rechnung,PostFinance";
@@ -589,11 +589,11 @@ $_ARRAYLANG['TXT_CALENDAR_FORM_FIELD_AFFILIATION_FORM'] = "Anmeldeformular";
 $_ARRAYLANG['TXT_CALENDAR_FORM_FIELD_AFFILIATION_CONTACT'] = "Kontaktadresse";
 $_ARRAYLANG['TXT_CALENDAR_FORM_FIELD_AFFILIATION_BILLING'] = "Rechungsadresse";
 $_ARRAYLANG['TXT_CALENDAR_FORM_FIELD_TITLE'] = "Überschrift";
-        
-$_ARRAYLANG['TXT_CALENDAR_TYPE'] = "Typ";   
-$_ARRAYLANG['TXT_CALENDAR_FIRST_EXPORT'] = "Exportiert am";   
-$_ARRAYLANG['TXT_CALENDAR_ALL_CAT'] = "Alle Kategorien";  
-$_ARRAYLANG['TXT_CALENDAR_SHOW_EVENTS_ONLY_IN_ACTIVE_LANGUAGE'] = "Nur Veranstaltungen der aktiven Sprache auflisten";  
+
+$_ARRAYLANG['TXT_CALENDAR_TYPE'] = "Typ";
+$_ARRAYLANG['TXT_CALENDAR_FIRST_EXPORT'] = "Exportiert am";
+$_ARRAYLANG['TXT_CALENDAR_ALL_CAT'] = "Alle Kategorien";
+$_ARRAYLANG['TXT_CALENDAR_SHOW_EVENTS_ONLY_IN_ACTIVE_LANGUAGE'] = "Nur Veranstaltungen der aktiven Sprache auflisten";
 $_ARRAYLANG['TXT_CALENDAR_SHOW_PREVIEW'] = "Vorschau";
 $_ARRAYLANG['TXT_CALENDAR_OCLOCK'] = "Uhr";
 $_ARRAYLANG['TXT_CALENDAR_EVENT_SERIES_TYPE'] = "Wiederholung";

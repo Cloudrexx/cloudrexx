@@ -7,274 +7,274 @@ function deleteCategory(catId){
 
 function selectMultiAction()
 {
-	with (document.frmShowCategories) {
-		switch (frmShowCategories_MultiAction.value) {
-			case 'activate':
-				action='?cmd=Forum&act=category_multiaction';
-				submit();
-			break;
-			case 'deactivate':
-				action='?cmd=Forum&act=category_multiaction';
-				submit();
-			break;
-			case 'delete':
-				if (confirm('{TXT_JS_DELETE_ALL_MSG}')) {
-					action='?cmd=Forum&act=category_multiaction';
-					submit();
-				}
-			break;
-			default: //do nothing
-		}
-	}
+  with (document.frmShowCategories) {
+    switch (frmShowCategories_MultiAction.value) {
+      case 'activate':
+        action='?cmd=Forum&act=category_multiaction';
+        submit();
+      break;
+      case 'deactivate':
+        action='?cmd=Forum&act=category_multiaction';
+        submit();
+      break;
+      case 'delete':
+        if (confirm('{TXT_JS_DELETE_ALL_MSG}')) {
+          action='?cmd=Forum&act=category_multiaction';
+          submit();
+        }
+      break;
+      default: //do nothing
+    }
+  }
 }
 
 function showOrHide(strElement) {
-	if (document.getElementById(strElement).style.display == 'none') {
-		document.getElementById(strElement).style.display = 'block';
-	} else {
-		document.getElementById(strElement).style.display = 'none';
-	}
+  if (document.getElementById(strElement).style.display == 'none') {
+    document.getElementById(strElement).style.display = 'block';
+  } else {
+    document.getElementById(strElement).style.display = 'none';
+  }
 }
 
 function copyText(strType,boolCategory) {
-	for (var h=0; h < document.forms.length;h++) {
-		for (var i=0; i < document.forms[h].elements.length;i++) {
-			//read out all form-elements with the loop
-			if(document.forms[h].elements[i].name.search(strType) != -1) {
-				if (strType == 'frmAddCategory_Name_') {
-					if (boolCategory) {
-						document.forms[h].elements[i].value = document.frmAddCategory.frmAddCategory_Name.value;
-					} else {
-						document.forms[h].elements[i].value = document.frmAddForum.frmAddCategory_Name.value;
-					}
-				} else {
-					if (boolCategory) {
-						document.forms[h].elements[i].value = document.frmAddCategory.frmAddCategory_Desc.value;
-					} else {
-						document.forms[h].elements[i].value = document.frmAddForum.frmAddCategory_Desc.value;
-					}
-				}
-			}
-		}
-	}
+  for (var h=0; h < document.forms.length;h++) {
+    for (var i=0; i < document.forms[h].elements.length;i++) {
+      //read out all form-elements with the loop
+      if(document.forms[h].elements[i].name.search(strType) != -1) {
+        if (strType == 'frmAddCategory_Name_') {
+          if (boolCategory) {
+            document.forms[h].elements[i].value = document.frmAddCategory.frmAddCategory_Name.value;
+          } else {
+            document.forms[h].elements[i].value = document.frmAddForum.frmAddCategory_Name.value;
+          }
+        } else {
+          if (boolCategory) {
+            document.forms[h].elements[i].value = document.frmAddCategory.frmAddCategory_Desc.value;
+          } else {
+            document.forms[h].elements[i].value = document.frmAddForum.frmAddCategory_Desc.value;
+          }
+        }
+      }
+    }
+  }
 }
 
 function markCheckboxes(intSelected) {
-	strCategories = '';
-	for (var h=0; h < document.forms.length;h++) {
-		if (document.forms[h].name == 'frmAddForum') {
-			for (var i=0; i < document.forms[h].elements.length;i++) {
-				//read out all form-elements with the loop
-				if(document.forms[h].elements[i].name.search('frmAddCategory_ParCat_'+intSelected) != -1) {
-					strCategories = document.forms[h].elements[i].value;
-				}
+  strCategories = '';
+  for (var h=0; h < document.forms.length;h++) {
+    if (document.forms[h].name == 'frmAddForum') {
+      for (var i=0; i < document.forms[h].elements.length;i++) {
+        //read out all form-elements with the loop
+        if(document.forms[h].elements[i].name.search('frmAddCategory_ParCat_'+intSelected) != -1) {
+          strCategories = document.forms[h].elements[i].value;
+        }
 
-				if (document.forms[h].elements[i].name.search('frmAddCategory_Languages') != -1) {
-					document.forms[h].elements[i].disabled = true;
-					document.forms[h].elements[i].checked = false;
-				}
-			}
-		}
-	}
+        if (document.forms[h].elements[i].name.search('frmAddCategory_Languages') != -1) {
+          document.forms[h].elements[i].disabled = true;
+          document.forms[h].elements[i].checked = false;
+        }
+      }
+    }
+  }
 
-	if (strCategories != '') {
-		arrTemp = strCategories.split(',');
-		for (var j = 0; j < arrTemp.length; j++) {
-			for (var h=0; h < document.forms.length;h++) {
-				if (document.forms[h].name == 'frmAddForum') {
-					for (var i=0; i < document.forms[h].elements.length;i++) {
-						//read out all form-elements with the loop
-						if(	document.forms[h].elements[i].name.search('frmAddCategory_Languages') != -1	&& document.forms[h].elements[i].value == arrTemp[j]) {
-							document.forms[h].elements[i].disabled = false;
-							document.forms[h].elements[i].checked = true;
-						}
-					}
-				}
-			}
-		}
-	}
+  if (strCategories != '') {
+    arrTemp = strCategories.split(',');
+    for (var j = 0; j < arrTemp.length; j++) {
+      for (var h=0; h < document.forms.length;h++) {
+        if (document.forms[h].name == 'frmAddForum') {
+          for (var i=0; i < document.forms[h].elements.length;i++) {
+            //read out all form-elements with the loop
+            if(  document.forms[h].elements[i].name.search('frmAddCategory_Languages') != -1  && document.forms[h].elements[i].value == arrTemp[j]) {
+              document.forms[h].elements[i].disabled = false;
+              document.forms[h].elements[i].checked = true;
+            }
+          }
+        }
+      }
+    }
+  }
 }
 </script>
 
 <ul id="tabmenu">
-	<li><a id="category_Overview" class="active" href="javascript:{}" onclick="selectTab('Overview')" title="{TXT_TITLE_OVERVIEW}">{TXT_TITLE_OVERVIEW}</a></li>
-	<li><a id="category_AddCategory" href="javascript:{}" onclick="selectTab('AddCategory')" title="{TXT_TITLE_ADD_CATEGORY}">{TXT_TITLE_ADD_CATEGORY}</a></li>
-	<li><a id="category_AddForum" href="javascript:{}" onclick="selectTab('AddForum')" title="{TXT_TITLE_ADD_FORUM}">{TXT_TITLE_ADD_FORUM}</a></li>
+  <li><a id="category_Overview" class="active" href="javascript:{}" onclick="selectTab('Overview')" title="{TXT_TITLE_OVERVIEW}">{TXT_TITLE_OVERVIEW}</a></li>
+  <li><a id="category_AddCategory" href="javascript:{}" onclick="selectTab('AddCategory')" title="{TXT_TITLE_ADD_CATEGORY}">{TXT_TITLE_ADD_CATEGORY}</a></li>
+  <li><a id="category_AddForum" href="javascript:{}" onclick="selectTab('AddForum')" title="{TXT_TITLE_ADD_FORUM}">{TXT_TITLE_ADD_FORUM}</a></li>
 </ul>
 
 
 <div id="Overview" class="category" style="display: block;">
-	<form name="frmShowCategories" method="post" action="?cmd=Forum&amp;act=category_sorting">
-		<table width="100%" cellspacing="0" cellpadding="3" border="0" align="top" class="adminlist">
-			<tr>
-				<th colspan="8">{TXT_TITLE_OVERVIEW}</th>
-			</tr>
-			<tr class="row3">
-				<td nowrap="nowrap" width="2%"><span style="font-weight:bold;">&nbsp;&nbsp;#</span></td>
-				<td nowrap="nowrap" width="4%"><span style="font-weight:bold;">{TXT_SUBTITLE_STATUS}</span></td>
-				<td nowrap="nowrap" width="20%"><span style="font-weight:bold;">{TXT_SUBTITLE_NAME}</span></td>
-				<td nowrap="nowrap" width="8%"><span style="font-weight:bold;">{TXT_SUBTITLE_POSTINGS}</span></td>
-				<td nowrap="nowrap" width="35%"><span style="font-weight:bold;">{TXT_SUBTITLE_DESC}</span></td>
-				<td nowrap="nowrap" width="10%">
+  <form name="frmShowCategories" method="post" action="?cmd=Forum&amp;act=category_sorting">
+    <table width="100%" cellspacing="0" cellpadding="3" border="0" align="top" class="adminlist">
+      <tr>
+        <th colspan="8">{TXT_TITLE_OVERVIEW}</th>
+      </tr>
+      <tr class="row3">
+        <td nowrap="nowrap" width="2%"><span style="font-weight:bold;">&nbsp;&nbsp;#</span></td>
+        <td nowrap="nowrap" width="4%"><span style="font-weight:bold;">{TXT_SUBTITLE_STATUS}</span></td>
+        <td nowrap="nowrap" width="20%"><span style="font-weight:bold;">{TXT_SUBTITLE_NAME}</span></td>
+        <td nowrap="nowrap" width="8%"><span style="font-weight:bold;">{TXT_SUBTITLE_POSTINGS}</span></td>
+        <td nowrap="nowrap" width="35%"><span style="font-weight:bold;">{TXT_SUBTITLE_DESC}</span></td>
+        <td nowrap="nowrap" width="10%">
                                     <!-- BEGIN txt_languages_block -->
                                     <span style="font-weight:bold;">{TXT_SUBTITLE_LANGUAGES}</span>
                                     <!-- END txt_languages_block -->
                                     &nbsp;
                                 </td>
-				<td nowrap="nowrap" width="17%" nowrap="nowrap"><span style="font-weight:bold;">{TXT_SUBTITLE_LASTPOST}</span></td>
-				<td nowrap="nowrap" width="4%"><div align="right"><span style="font-weight:bold;">{TXT_SUBTITLE_ACTIONS}</span></div></td>
-			</tr>
-			<!-- BEGIN showCategories -->
-			<tr class="{CATEGORY_ROWCLASS}">
-				<td><input type="checkbox" name="selectedCategoryId[]" id="selectedCategoryId" value="{CATEGORY_ID}" /></td>
-				<td>
-					<a href="?cmd=Forum&amp;act=category_status&amp;id={CATEGORY_ID}" target="_self"><img src="../core/Core/View/Media/icons/{CATEGORY_STATUS_ICON}.gif" border="0" alt="{TXT_IMGALT_CHANGE_STATUS}" title="{TXT_IMGALT_CHANGE_STATUS}" />
-				</td>
-				<td>{CATEGORY_SPACER}{CATEGORY_TYPE_ICON}&nbsp;<input type="text" name="sortingSystem{CATEGORY_ID}" value="{CATEGORY_ORDERID}" maxlength="2" size="2" />&nbsp; <a href="?cmd=Forum&amp;act=category_edit&amp;id={CATEGORY_ID}" title="edit {CATEGORY_NAME}">{CATEGORY_NAME} </a></td>
-				<td>{CATEGORY_POSTCOUNT}</td>
-				<td><div align="justify">{CATEGORY_DESC}</div></td>
-				<td>{FORUM_LANGUAGES}</td>
-				<td nowrap="nowrap">{CATEGORY_LASTPOST}</td>
-				<td nowrap="nowrap">
-					<div align="right">
-						<a href="?cmd=Forum&amp;act=category_edit&amp;id={CATEGORY_ID}" target="_self" title="{TXT_IMGALT_EDIT}"><img src="../core/Core/View/Media/icons/edit.gif" border="0" alt="{TXT_IMGALT_EDIT}" title="{TXT_IMGALT_EDIT}" /></a>
-						<a href="?cmd=Forum&amp;act=category_access&amp;id={CATEGORY_ID}" target="_self" title="{TXT_IMGALT_ACCESS}"><img src="../core/Core/View/Media/icons/groups.gif" border="0" alt="{TXT_IMGALT_ACCESS}" title="{TXT_IMGALT_ACCESS}" /></a>
-						<a href="javascript:deleteCategory({CATEGORY_ID});" target="_self" title="{TXT_IMGALT_DELETE}"><img src="../core/Core/View/Media/icons/delete.gif" border="0" alt="{TXT_IMGALT_DELETE}" title="{TXT_IMGALT_DELETE}" /></a>
-					</div>
-				</td>
-			</tr>
-			<!-- END showCategories -->
-			<!-- BEGIN noCategories -->
-			<tr class="row2">
-				<td colspan="8"><div align="center">{TXT_NO_CATEGORIES_FOUND}</div></td>
-			</tr>
-			<!-- END noCategories -->
-		</table>
-		<br />
-		<input type="submit" value="{TXT_BUTTON_SAVESORT}" style="margin-left:35px;" />
-		<table cellpadding="2" cellspacing="0" border="0">
-			<tr>
-				<td>
-					<img src="../core/Core/View/Media/icons/arrow.gif" border="0" width="38" height="22" alt="{TXT_MARKED}:" />
-					<a href="#" onClick="changeCheckboxes('frmShowCategories','selectedCategoryId[]',true); return false;">{TXT_SELECT_ALL}</a> /
-					<a href="#" onClick="changeCheckboxes('frmShowCategories','selectedCategoryId[]',false); return false;">{TXT_DESELECT_ALL}</a>
-					<img src="../core/Core/View/Media/icons/strike.gif" />
-					<select name="frmShowCategories_MultiAction" onChange="selectMultiAction();">
-						<option value="0">{TXT_SUBMIT_SELECT}</option>
-						<option value="delete">{TXT_SUBMIT_DELETE}</option>
-						<option value="activate">{TXT_SUBMIT_ACTIVATE}</option>
-						<option value="deactivate">{TXT_SUBMIT_DEACTIVATE}</option>
-					</select>
-				</td>
-			</tr>
-		</table>
-	</form>
+        <td nowrap="nowrap" width="17%" nowrap="nowrap"><span style="font-weight:bold;">{TXT_SUBTITLE_LASTPOST}</span></td>
+        <td nowrap="nowrap" width="4%"><div align="right"><span style="font-weight:bold;">{TXT_SUBTITLE_ACTIONS}</span></div></td>
+      </tr>
+      <!-- BEGIN showCategories -->
+      <tr class="{CATEGORY_ROWCLASS}">
+        <td><input type="checkbox" name="selectedCategoryId[]" id="selectedCategoryId" value="{CATEGORY_ID}" /></td>
+        <td>
+          <a href="?cmd=Forum&amp;act=category_status&amp;id={CATEGORY_ID}" target="_self"><img src="../core/Core/View/Media/icons/{CATEGORY_STATUS_ICON}.gif" border="0" alt="{TXT_IMGALT_CHANGE_STATUS}" title="{TXT_IMGALT_CHANGE_STATUS}" />
+        </td>
+        <td>{CATEGORY_SPACER}{CATEGORY_TYPE_ICON}&nbsp;<input type="text" name="sortingSystem{CATEGORY_ID}" value="{CATEGORY_ORDERID}" maxlength="2" size="2" />&nbsp; <a href="?cmd=Forum&amp;act=category_edit&amp;id={CATEGORY_ID}" title="edit {CATEGORY_NAME}">{CATEGORY_NAME} </a></td>
+        <td>{CATEGORY_POSTCOUNT}</td>
+        <td><div align="justify">{CATEGORY_DESC}</div></td>
+        <td>{FORUM_LANGUAGES}</td>
+        <td nowrap="nowrap">{CATEGORY_LASTPOST}</td>
+        <td nowrap="nowrap">
+          <div align="right">
+            <a href="?cmd=Forum&amp;act=category_edit&amp;id={CATEGORY_ID}" target="_self" title="{TXT_IMGALT_EDIT}"><img src="../core/Core/View/Media/icons/edit.gif" border="0" alt="{TXT_IMGALT_EDIT}" title="{TXT_IMGALT_EDIT}" /></a>
+            <a href="?cmd=Forum&amp;act=category_access&amp;id={CATEGORY_ID}" target="_self" title="{TXT_IMGALT_ACCESS}"><img src="../core/Core/View/Media/icons/groups.gif" border="0" alt="{TXT_IMGALT_ACCESS}" title="{TXT_IMGALT_ACCESS}" /></a>
+            <a href="javascript:deleteCategory({CATEGORY_ID});" target="_self" title="{TXT_IMGALT_DELETE}"><img src="../core/Core/View/Media/icons/delete.gif" border="0" alt="{TXT_IMGALT_DELETE}" title="{TXT_IMGALT_DELETE}" /></a>
+          </div>
+        </td>
+      </tr>
+      <!-- END showCategories -->
+      <!-- BEGIN noCategories -->
+      <tr class="row2">
+        <td colspan="8"><div align="center">{TXT_NO_CATEGORIES_FOUND}</div></td>
+      </tr>
+      <!-- END noCategories -->
+    </table>
+    <br />
+    <input type="submit" value="{TXT_BUTTON_SAVESORT}" style="margin-left:35px;" />
+    <table cellpadding="2" cellspacing="0" border="0">
+      <tr>
+        <td>
+          <img src="../core/Core/View/Media/icons/arrow.gif" border="0" width="38" height="22" alt="{TXT_MARKED}:" />
+          <a href="#" onClick="changeCheckboxes('frmShowCategories','selectedCategoryId[]',true); return false;">{TXT_SELECT_ALL}</a> /
+          <a href="#" onClick="changeCheckboxes('frmShowCategories','selectedCategoryId[]',false); return false;">{TXT_DESELECT_ALL}</a>
+          <img src="../core/Core/View/Media/icons/strike.gif" />
+          <select name="frmShowCategories_MultiAction" onChange="selectMultiAction();">
+            <option value="0">{TXT_SUBMIT_SELECT}</option>
+            <option value="delete">{TXT_SUBMIT_DELETE}</option>
+            <option value="activate">{TXT_SUBMIT_ACTIVATE}</option>
+            <option value="deactivate">{TXT_SUBMIT_DEACTIVATE}</option>
+          </select>
+        </td>
+      </tr>
+    </table>
+  </form>
 </div>
 
 <div id="AddCategory" class="category" style="display: none;">
-	<form name="frmAddCategory" method="post" action="?cmd=Forum&amp;act=category_add">
-		<input type="hidden" name="frmAddCategory_ParentId" value="0" />
-		<input type="hidden" name="frmAddCategory_Inherit" value="0">
-		<table width="100%" cellspacing="0" cellpadding="3" border="0" align="top" class="adminlist">
-			<tr>
-				<th colspan="4">{TXT_TITLE_ADD_CATEGORY}</th>
-			</tr>
-			<tr class="row1">
-				<td valign="top">{TXT_CATEGORY_ADD_CATEGORY_NAME}</td>
-				<td colspan="3">
-					<input type="text" name="frmAddCategory_Name" value="" maxlength="100" onChange="copyText('frmAddCategory_Name_',true);" style="width:30%;" />&nbsp;<a href="javascript:showOrHide('divAddCategoryLang_Name');">{TXT_CATEGORY_ADD_EXTENDED}</a>
-					<div id="divAddCategoryLang_Name" style="display: none;">
-						<!-- BEGIN categoryNameFields -->
-						<input type="text" name="frmAddCategory_Name_{CATEGORY_ADD_NAME_LANGID}" value="" style="width:30%; margin-top:1px;" />&nbsp;<label for="frmAddCategory_Name_{CATEGORY_ADD_NAME_LANGID}">{CATEGORY_ADD_NAME_LANG}</label><br />
-						<!-- END categoryNameFields -->
-					</div>
-				</td>
-			</tr>
-			<tr class="row2">
-				<td valign="top">{TXT_CATEGORY_ADD_CATEGORY_DESC}</td>
-				<td colspan="3">
-					<textarea name="frmAddCategory_Desc" rows="3" onChange="copyText('frmAddCategory_Desc_',true);" style="width:30%;"></textarea>&nbsp;<a href="javascript:showOrHide('divAddCategoryLang_Desc');">{TXT_CATEGORY_ADD_EXTENDED}</a>
-					<div id="divAddCategoryLang_Desc" style="display: none;">
-						<!-- BEGIN categoryDescFields -->
-						<textarea name="frmAddCategory_Desc_{CATEGORY_ADD_DESC_LANGID}" rows="3" style="width:30%; margin-top:1px;"></textarea>&nbsp;<label for="frmAddCategory_Desc_{CATEGORY_ADD_DESC_LANGID}">{CATEGORY_ADD_DESC_LANG}</label><br />
-						<!-- END categoryDescFields -->
-					</div>
-				</td>
-			</tr>
-			<tr class="row1">
-				<td width="10%">{TXT_CATEGORY_ADD_CATEGORY_LANGUAGES}</td>
-				<td width="10%" valign="top">{CATEGORY_ADD_LANGUAGES_1}</td>
-				<td width="10%" valign="top">{CATEGORY_ADD_LANGUAGES_2}</td>
-				<td width="70%" valign="top">{CATEGORY_ADD_LANGUAGES_3}</td>
-			</tr>
-			<tr class="row2">
-				<td width="10%">{TXT_CATEGORY_STATUS}</td>
-				<td colspan="3"><input type="checkbox" value="1" name="frmAddCategory_Status" /></td>
-			</tr>
-		</table>
-		<br />
-		<input type="submit" value="{TXT_CATEGORY_ADD_CATEGORY_BUTTON}" />
-	</form>
+  <form name="frmAddCategory" method="post" action="?cmd=Forum&amp;act=category_add">
+    <input type="hidden" name="frmAddCategory_ParentId" value="0" />
+    <input type="hidden" name="frmAddCategory_Inherit" value="0">
+    <table width="100%" cellspacing="0" cellpadding="3" border="0" align="top" class="adminlist">
+      <tr>
+        <th colspan="4">{TXT_TITLE_ADD_CATEGORY}</th>
+      </tr>
+      <tr class="row1">
+        <td valign="top">{TXT_CATEGORY_ADD_CATEGORY_NAME}</td>
+        <td colspan="3">
+          <input type="text" name="frmAddCategory_Name" value="" maxlength="100" onChange="copyText('frmAddCategory_Name_',true);" style="width:30%;" />&nbsp;<a href="javascript:showOrHide('divAddCategoryLang_Name');">{TXT_CATEGORY_ADD_EXTENDED}</a>
+          <div id="divAddCategoryLang_Name" style="display: none;">
+            <!-- BEGIN categoryNameFields -->
+            <input type="text" name="frmAddCategory_Name_{CATEGORY_ADD_NAME_LANGID}" value="" style="width:30%; margin-top:1px;" />&nbsp;<label for="frmAddCategory_Name_{CATEGORY_ADD_NAME_LANGID}">{CATEGORY_ADD_NAME_LANG}</label><br />
+            <!-- END categoryNameFields -->
+          </div>
+        </td>
+      </tr>
+      <tr class="row2">
+        <td valign="top">{TXT_CATEGORY_ADD_CATEGORY_DESC}</td>
+        <td colspan="3">
+          <textarea name="frmAddCategory_Desc" rows="3" onChange="copyText('frmAddCategory_Desc_',true);" style="width:30%;"></textarea>&nbsp;<a href="javascript:showOrHide('divAddCategoryLang_Desc');">{TXT_CATEGORY_ADD_EXTENDED}</a>
+          <div id="divAddCategoryLang_Desc" style="display: none;">
+            <!-- BEGIN categoryDescFields -->
+            <textarea name="frmAddCategory_Desc_{CATEGORY_ADD_DESC_LANGID}" rows="3" style="width:30%; margin-top:1px;"></textarea>&nbsp;<label for="frmAddCategory_Desc_{CATEGORY_ADD_DESC_LANGID}">{CATEGORY_ADD_DESC_LANG}</label><br />
+            <!-- END categoryDescFields -->
+          </div>
+        </td>
+      </tr>
+      <tr class="row1">
+        <td width="10%">{TXT_CATEGORY_ADD_CATEGORY_LANGUAGES}</td>
+        <td width="10%" valign="top">{CATEGORY_ADD_LANGUAGES_1}</td>
+        <td width="10%" valign="top">{CATEGORY_ADD_LANGUAGES_2}</td>
+        <td width="70%" valign="top">{CATEGORY_ADD_LANGUAGES_3}</td>
+      </tr>
+      <tr class="row2">
+        <td width="10%">{TXT_CATEGORY_STATUS}</td>
+        <td colspan="3"><input type="checkbox" value="1" name="frmAddCategory_Status" /></td>
+      </tr>
+    </table>
+    <br />
+    <input type="submit" value="{TXT_CATEGORY_ADD_CATEGORY_BUTTON}" />
+  </form>
 </div>
 
 <div id="AddForum" class="category" style="display: none;">
-	<form name="frmAddForum" method="post" action="?cmd=Forum&amp;act=category_add">
-		<table width="100%" cellspacing="0" cellpadding="3" border="0" align="top" class="adminlist">
-			<tr>
-				<th colspan="4">{TXT_TITLE_ADD_FORUM}</th>
-			</tr>
-			<tr class="row1">
-				<td>{TXT_CATEGORY_ADD_FORUM_PARCAT}</td>
-				<td colspan="3">
-					{CATEGORY_FORUM_ADD_DROPDOWN}
-					<!-- BEGIN forumAllowedParcats -->
-					<input type="hidden" name="frmAddCategory_ParCat_{FORUM_ADD_PARCAT_ID}" value="{FORUM_ADD_PARCAT_VALUES}">
-					<!-- END forumAllowedParcats -->
-				</td>
-			</tr>
-			<tr class="row2">
-				<td valign="top">{TXT_CATEGORY_ADD_FORUM_NAME}</td>
-				<td colspan="3">
-					<input type="text" name="frmAddCategory_Name" value="" maxlength="100" onChange="copyText('frmAddCategory_Name_',false);" style="width:30%;" />&nbsp;<a href="javascript:showOrHide('divAddForumLang_Name');">{TXT_FORUM_ADD_EXTENDED}</a>
-					<div id="divAddForumLang_Name" style="display: none;">
-						<!-- BEGIN forumNameFields -->
-						<input type="text" name="frmAddCategory_Name_{FORUM_ADD_NAME_LANGID}" value="" style="width:30%; margin-top:1px;" />&nbsp;<label for="frmAddCategory_Name_{FORUM_ADD_NAME_LANGID}">{FORUM_ADD_NAME_LANG}</label><br />
-						<!-- END forumNameFields -->
-					</div>
+  <form name="frmAddForum" method="post" action="?cmd=Forum&amp;act=category_add">
+    <table width="100%" cellspacing="0" cellpadding="3" border="0" align="top" class="adminlist">
+      <tr>
+        <th colspan="4">{TXT_TITLE_ADD_FORUM}</th>
+      </tr>
+      <tr class="row1">
+        <td>{TXT_CATEGORY_ADD_FORUM_PARCAT}</td>
+        <td colspan="3">
+          {CATEGORY_FORUM_ADD_DROPDOWN}
+          <!-- BEGIN forumAllowedParcats -->
+          <input type="hidden" name="frmAddCategory_ParCat_{FORUM_ADD_PARCAT_ID}" value="{FORUM_ADD_PARCAT_VALUES}">
+          <!-- END forumAllowedParcats -->
+        </td>
+      </tr>
+      <tr class="row2">
+        <td valign="top">{TXT_CATEGORY_ADD_FORUM_NAME}</td>
+        <td colspan="3">
+          <input type="text" name="frmAddCategory_Name" value="" maxlength="100" onChange="copyText('frmAddCategory_Name_',false);" style="width:30%;" />&nbsp;<a href="javascript:showOrHide('divAddForumLang_Name');">{TXT_FORUM_ADD_EXTENDED}</a>
+          <div id="divAddForumLang_Name" style="display: none;">
+            <!-- BEGIN forumNameFields -->
+            <input type="text" name="frmAddCategory_Name_{FORUM_ADD_NAME_LANGID}" value="" style="width:30%; margin-top:1px;" />&nbsp;<label for="frmAddCategory_Name_{FORUM_ADD_NAME_LANGID}">{FORUM_ADD_NAME_LANG}</label><br />
+            <!-- END forumNameFields -->
+          </div>
 
-				</td>
-			</tr>
-			<tr class="row1">
-				<td valign="top">{TXT_CATEGORY_ADD_FORUM_DESC}</td>
-				<td colspan="3">
-					<textarea name="frmAddCategory_Desc" rows="3" onChange="copyText('frmAddCategory_Desc_',false);" style="width:30%;"></textarea>&nbsp;<a href="javascript:showOrHide('divAddForumLang_Desc');">{TXT_CATEGORY_ADD_EXTENDED}</a>
-					<div id="divAddForumLang_Desc" style="display: none;">
-						<!-- BEGIN forumDescFields -->
-						<textarea name="frmAddCategory_Desc_{FORUM_ADD_DESC_LANGID}" rows="3" style="width:30%; margin-top:1px;"></textarea>&nbsp;<label for="frmAddCategory_Desc_{FORUM_ADD_DESC_LANGID}">{FORUM_ADD_DESC_LANG}</label><br />
-						<!-- END forumDescFields -->
-					</div>
-				</td>
-			</tr>
-			<tr class="row2">
-				<td width="10%">{TXT_CATEGORY_ADD_CATEGORY_LANGUAGES}</td>
-				<td width="10%" valign="top">{CATEGORY_ADD_LANGUAGES_1}</td>
-				<td width="10%" valign="top">{CATEGORY_ADD_LANGUAGES_2}</td>
-				<td width="70%" valign="top">{CATEGORY_ADD_LANGUAGES_3}</td>
-			</tr>
-			<tr class="row1">
-				<td>{TXT_CATEGORY_ADD_FORUM_INHERIT}</td>
-				<td colspan="3"><input type="checkbox" checked="checked" name="frmAddCategory_Inherit" value="1"></td>
-			</tr>
-			<tr class="row2">
-				<td width="10%">{TXT_CATEGORY_STATUS}</td>
-				<td colspan="3"><input type="checkbox" value="1" name="frmAddCategory_Status" /></td>
-			</tr>
-		</table>
-		<br />
-		<input type="submit" value="{TXT_CATEGORY_ADD_FORUM_BUTTON}" />
-	</form>
+        </td>
+      </tr>
+      <tr class="row1">
+        <td valign="top">{TXT_CATEGORY_ADD_FORUM_DESC}</td>
+        <td colspan="3">
+          <textarea name="frmAddCategory_Desc" rows="3" onChange="copyText('frmAddCategory_Desc_',false);" style="width:30%;"></textarea>&nbsp;<a href="javascript:showOrHide('divAddForumLang_Desc');">{TXT_CATEGORY_ADD_EXTENDED}</a>
+          <div id="divAddForumLang_Desc" style="display: none;">
+            <!-- BEGIN forumDescFields -->
+            <textarea name="frmAddCategory_Desc_{FORUM_ADD_DESC_LANGID}" rows="3" style="width:30%; margin-top:1px;"></textarea>&nbsp;<label for="frmAddCategory_Desc_{FORUM_ADD_DESC_LANGID}">{FORUM_ADD_DESC_LANG}</label><br />
+            <!-- END forumDescFields -->
+          </div>
+        </td>
+      </tr>
+      <tr class="row2">
+        <td width="10%">{TXT_CATEGORY_ADD_CATEGORY_LANGUAGES}</td>
+        <td width="10%" valign="top">{CATEGORY_ADD_LANGUAGES_1}</td>
+        <td width="10%" valign="top">{CATEGORY_ADD_LANGUAGES_2}</td>
+        <td width="70%" valign="top">{CATEGORY_ADD_LANGUAGES_3}</td>
+      </tr>
+      <tr class="row1">
+        <td>{TXT_CATEGORY_ADD_FORUM_INHERIT}</td>
+        <td colspan="3"><input type="checkbox" checked="checked" name="frmAddCategory_Inherit" value="1"></td>
+      </tr>
+      <tr class="row2">
+        <td width="10%">{TXT_CATEGORY_STATUS}</td>
+        <td colspan="3"><input type="checkbox" value="1" name="frmAddCategory_Status" /></td>
+      </tr>
+    </table>
+    <br />
+    <input type="submit" value="{TXT_CATEGORY_ADD_FORUM_BUTTON}" />
+  </form>
 </div>
 <script language="JavaScript" type="text/javascript">
-	markCheckboxes(document.frmAddForum.frmAddCategory_ParentId.options[document.frmAddForum.frmAddCategory_ParentId.selectedIndex].value);
+  markCheckboxes(document.frmAddForum.frmAddCategory_ParentId.options[document.frmAddForum.frmAddCategory_ParentId.selectedIndex].value);
 </script>
 <!-- END category_overview.html -->

@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Specific Setting for this Component. Use this to interact with the Setting.class.php
  *
@@ -36,7 +36,7 @@
  * @subpackage  core_setting
  * @todo        Edit PHP DocBlocks!
  */
- 
+
 namespace Cx\Core\Setting\Model\Entity;
 
 /**
@@ -86,7 +86,7 @@ class YamlEngine extends Engine{
         $this->flush();
         $this->section = $section;
         $this->group = $group;
-        $this->filename =  $configRepository . '/'.$section.'.yml';     
+        $this->filename =  $configRepository . '/'.$section.'.yml';
 
         $this->yamlSettingRepo = new \Cx\Core\Setting\Model\Repository\YamlSettingRepository($this->filename);
         $this->arrSettings = $this->load();
@@ -114,13 +114,13 @@ class YamlEngine extends Engine{
         }
         return array();
     }
-    
+
     /**
      * Returns the settings array for the given section and group
      * @return  array
      */
     public function getArraySetting()
-    { 
+    {
         $settingArray=array();
         if (!empty($this->group)) {
             foreach ($this->arrSettings as $value) {
@@ -135,7 +135,7 @@ class YamlEngine extends Engine{
     }
 
     public function getArray($section, $group = null)
-    { 
+    {
         $groupArray = array();
         if ($group !== null && $this->section == $section) {
             foreach ($this->arrSettings as $value) {
@@ -163,7 +163,7 @@ class YamlEngine extends Engine{
      *                                    false otherwise
      */
     function updateAll()
-    { 
+    {
         //global $_CORELANG;
         if (!$this->changed) {
         // TODO: These messages are inapropriate when settings are stored by another piece of code, too.
@@ -186,7 +186,7 @@ class YamlEngine extends Engine{
             foreach ($this->arrSettings As $yamlSettingName => $yamlSettingValue) {
                 $objYamlSetting = $this->yamlSettingRepo->findOneBy(array('name' => $yamlSettingName, 'section' => $this->section));
                 $objYamlSetting->setValue($yamlSettingValue['value']);
-            
+
             }
             $this->yamlSettingRepo->flush();
         } catch (\Cx\Core\Setting\Model\Entity\YamlSettingException $e) {
@@ -215,7 +215,7 @@ class YamlEngine extends Engine{
      * @param   string    $name   The settings name
      * @return  boolean           True on successful update or if
      *                            unchanged, false on failure
-     * 
+     *
      */
      function update($name)
     {
@@ -238,7 +238,7 @@ class YamlEngine extends Engine{
             try {
                 $objYamlSetting = $this->yamlSettingRepo->findOneBy(array('name' => $name, 'section' => $this->section));
                 $objYamlSetting->setValue($this->arrSettings[$name]['value']);
-            
+
                 $this->yamlSettingRepo->flush();
             } catch (\Cx\Core\Setting\Model\Entity\YamlSettingException $e) {
                 \DBG::msg($e->getMessage());
@@ -251,7 +251,7 @@ class YamlEngine extends Engine{
     }
 
     /**
-     * Add a new record to the settings    
+     * Add a new record to the settings
      *
      * The class *MUST* have been initialized by calling {@see init()}
      * or {@see getArray()} before this method is called.
@@ -267,7 +267,7 @@ class YamlEngine extends Engine{
      *                              defaults to the empty string
      * @param   string    $group    The optional group
      * @return  boolean             True on success, false otherwise
-     */ 
+     */
     function add( $name, $value, $ord=false, $type='text', $values='', $group=null)
     {
         if (!isset($this->section)) {
@@ -300,7 +300,7 @@ class YamlEngine extends Engine{
             \DBG::log("\Cx\Core\Setting\Model\Entity\YamlEngine::add(): ERROR: Setting '$name' already exists and is non-empty ($old_value)");
             return false;
         }
-        
+
         try {
             $objYamlSetting = new \Cx\Core\Setting\Model\Entity\YamlSetting($name);
             $objYamlSetting->setSection($this->section);
@@ -310,20 +310,20 @@ class YamlEngine extends Engine{
             $objYamlSetting->setType($type);
             $objYamlSetting->setValues($values);
             $objYamlSetting->setOrd($ord);
-        
+
             $this->yamlSettingRepo->add($objYamlSetting);
             $this->yamlSettingRepo->flush();
             } catch (\Cx\Core\Setting\Model\Entity\YamlSettingException $e) {
             \DBG::msg($e->getMessage());
             return false;
         }
-        
+
         $this->arrSettings = $this->load();
         return true;
     }
 
     /**
-     * Delete one or more records from the File   
+     * Delete one or more records from the File
      *
      * For maintenance/update purposes only.
      * At least one of the parameter values must be non-empty.
@@ -347,7 +347,7 @@ class YamlEngine extends Engine{
             } else if (!empty ($name)) {
                 $yamlSettings = $this->yamlSettingRepo->findBy(array('name' => $name, 'section' => $this->section));
             } else if (!empty ($group)) {
-                $yamlSettings = $this->yamlSettingRepo->findBy(array('group' => $group, 'section' => $this->section));                
+                $yamlSettings = $this->yamlSettingRepo->findBy(array('group' => $group, 'section' => $this->section));
             }
             foreach ($yamlSettings As $yamlSetting) {
                 $this->yamlSettingRepo->remove($yamlSetting);
@@ -359,7 +359,7 @@ class YamlEngine extends Engine{
         }
 
         $this->arrSettings = $this->load();
-        return true;                   
+        return true;
     }
 
     /**
@@ -372,7 +372,7 @@ class YamlEngine extends Engine{
     function deleteModule()
     {
         if (empty($this->section)) return false;
-        
+
         try {
             $yamlSettings = $this->yamlSettingRepo->findBy(array('section' => $this->section));
             foreach ($yamlSettings As $yamlSetting) {
@@ -391,7 +391,7 @@ class YamlEngine extends Engine{
      *
      * Tries to fix or recreate the settings.
      * @return  boolean             False, always.
-     * 
+     *
      */
     function errorHandler()
     {
@@ -401,6 +401,6 @@ class YamlEngine extends Engine{
             return false;
         } catch (\Cx\Lib\FileSystem\FileSystemException $e) {
             \DBG::msg($e->getMessage());
-        }       
-    } 
+        }
+    }
 }

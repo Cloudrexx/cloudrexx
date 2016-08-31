@@ -5,9 +5,9 @@
     <div class="text">{RECOM_TEXT}</div>
     <div class="form">
         <form id="recommendForm" name="recommend" method="post" action="index.php?section=Recommend&amp;act=sendRecomm">
-            <input type="hidden" value="{RECOM_REFERER}" name="uri" /> 
-            <input type="hidden" value="{RECOM_FEMALE_SALUTATION_TEXT}" name="female_salutation_text" /> 
-            <input type="hidden" value="{RECOM_MALE_SALUTATION_TEXT}" name="male_salutation_text" /> 
+            <input type="hidden" value="{RECOM_REFERER}" name="uri" />
+            <input type="hidden" value="{RECOM_FEMALE_SALUTATION_TEXT}" name="female_salutation_text" />
+            <input type="hidden" value="{RECOM_MALE_SALUTATION_TEXT}" name="male_salutation_text" />
             <input type="hidden" value="{RECOM_PREVIEW}" name="preview_text" />
             <p><label for="receivername">{RECOM_TXT_RECEIVER_NAME}</label>
                 <input type="text" onchange="recommendUpdate();" value="{RECOM_RECEIVER_NAME}" maxlength="100" name="receivername" />
@@ -17,7 +17,7 @@
             </p>
             <p><label>{RECOM_TXT_GENDER}</label>
                 <span class="radio">
-                    <label class="description" for="female"> 
+                    <label class="description" for="female">
                         <input type="radio" onclick="recommendUpdate();" value="female" name="gender" id="female" />
                         {RECOM_TXT_FEMALE}
                     </label>
@@ -51,8 +51,8 @@
                 {RECOM_CAPTCHA_CODE}
             </div>
             <!-- END recommend_captcha -->
-            
-            <p><input class="btn btn-default" type="submit" value="Senden" /> 
+
+            <p><input class="btn btn-default" type="submit" value="Senden" />
                 <input class="btn btn-default" type="reset" value="L&ouml;schen" />
             </p>
         </form>

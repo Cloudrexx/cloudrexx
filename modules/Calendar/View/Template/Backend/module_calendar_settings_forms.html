@@ -13,35 +13,35 @@ function deleteForm(formId)
 <br />
 <form id="formSettingsForm" action="index.php?cmd={CALENDAR_MODULE_NAME}&act=settings&tpl=forms" method="post" >
     <input name="submitSettingsMail" type="hidden" value="1" />
-	<table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
-	    <tr>
-	        <th colspan="4">{TXT_CALENDAR_REGISTRATION_FORMS}</th>
-	    </tr>
-	    <tr class="row3">
-	        <td width="1%"><strong>{TXT_CALENDAR_STATUS}&nbsp;&nbsp;&nbsp;</strong></td>
+  <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
+      <tr>
+          <th colspan="4">{TXT_CALENDAR_REGISTRATION_FORMS}</th>
+      </tr>
+      <tr class="row3">
+          <td width="1%"><strong>{TXT_CALENDAR_STATUS}&nbsp;&nbsp;&nbsp;</strong></td>
             <td width="1%"><strong>{TXT_CALENDAR_SORTING}&nbsp;&nbsp;&nbsp;</strong></td>
-	        <td width="98%"><strong>{TXT_CALENDAR_TITLE}&nbsp;</strong></td>     
-	        <td width="1%" style="text-align: right;"><strong>{TXT_CALENDAR_ACTION}&nbsp;</strong></td>
-	    </tr>
-	    <!-- BEGIN formList -->
-	    <tr class="{CALENDAR_FORM_ROW}">
-	        <td style="text-align: center;"><a href="index.php?cmd={CALENDAR_MODULE_NAME}&amp;act=settings&tpl=forms&amp;switch_status={CALENDAR_FORM_ID}"><img src="../core/Core/View/Media/icons/led_{CALENDAR_FORM_STATUS}.gif" border="0" alt="" title="" /></a></td>
-	        <td style="text-align: center;"><input type="text" maxlength="3" style="width: 20px;" name="formOrder[{CALENDAR_FORM_ID}]" value="{CALENDAR_FORM_SORT}" /></td>
+          <td width="98%"><strong>{TXT_CALENDAR_TITLE}&nbsp;</strong></td>
+          <td width="1%" style="text-align: right;"><strong>{TXT_CALENDAR_ACTION}&nbsp;</strong></td>
+      </tr>
+      <!-- BEGIN formList -->
+      <tr class="{CALENDAR_FORM_ROW}">
+          <td style="text-align: center;"><a href="index.php?cmd={CALENDAR_MODULE_NAME}&amp;act=settings&tpl=forms&amp;switch_status={CALENDAR_FORM_ID}"><img src="../core/Core/View/Media/icons/led_{CALENDAR_FORM_STATUS}.gif" border="0" alt="" title="" /></a></td>
+          <td style="text-align: center;"><input type="text" maxlength="3" style="width: 20px;" name="formOrder[{CALENDAR_FORM_ID}]" value="{CALENDAR_FORM_SORT}" /></td>
             <td><b><a href="index.php?cmd={CALENDAR_MODULE_NAME}&amp;act=settings&tpl=modify_form&amp;id={CALENDAR_FORM_ID}" target="_self" title="{CALENDAR_FORM_TITLE} {TXT_EDIT}">{CALENDAR_FORM_TITLE}</a></b></td>
-	        <td style="text-align: right;" nowrap="nowrap">
+          <td style="text-align: right;" nowrap="nowrap">
                 <a href="index.php?cmd={CALENDAR_MODULE_NAME}&amp;act=settings&tpl=modify_form&amp;copy={CALENDAR_FORM_ID}" target="_self" title="{CALENDAR_FORM_TITLE} {TXT_CALENDAR_COPY}"><img src="../core/Core/View/Media/icons/copy.gif" border="0" alt="{CALENDAR_FORM_TITLE} {TXT_CALENDAR_COPY}" title="{CALENDAR_FORM_TITLE} {TXT_CALENDAR_COPY}" /></a>
-	            <a href="index.php?cmd={CALENDAR_MODULE_NAME}&amp;act=settings&tpl=modify_form&amp;id={CALENDAR_FORM_ID}" target="_self" title="{CALENDAR_FORM_TITLE} {TXT_CALENDAR_EDIT}"><img src="../core/Core/View/Media/icons/edit.gif" border="0" alt="{CALENDAR_FORM_TITLE} {TXT_CALENDAR_EDIT}" title="{CALENDAR_FORM_TITLE} {TXT_CALENDAR_EDIT}" /></a>
-	            <a href="javascript:deleteForm('{CALENDAR_FORM_ID}');" title="{CALENDAR_FORM_TITLE} {TXT_CALENDAR_DELETE}"><img src="../core/Core/View/Media/icons/delete.gif" border="0" alt="{CALENDAR_FORM_TITLE} {TXT_CALENDAR_DELETE}" title="{CALENDAR_FORM_TITLE} {TXT_CALENDAR_DELETE}" /></a>
-	        </td>
-	    </tr>
-	    <!-- END formList -->
-	
-	    <!-- BEGIN emptyFormList -->
-	    <tr class="row1">
-	        <td colspan="4"><i>{TXT_CALENDAR_NO_FORMS_FOUND}</i></td>
-	    </tr>
-	    <!-- END emptyFormList -->
-	</table>
+              <a href="index.php?cmd={CALENDAR_MODULE_NAME}&amp;act=settings&tpl=modify_form&amp;id={CALENDAR_FORM_ID}" target="_self" title="{CALENDAR_FORM_TITLE} {TXT_CALENDAR_EDIT}"><img src="../core/Core/View/Media/icons/edit.gif" border="0" alt="{CALENDAR_FORM_TITLE} {TXT_CALENDAR_EDIT}" title="{CALENDAR_FORM_TITLE} {TXT_CALENDAR_EDIT}" /></a>
+              <a href="javascript:deleteForm('{CALENDAR_FORM_ID}');" title="{CALENDAR_FORM_TITLE} {TXT_CALENDAR_DELETE}"><img src="../core/Core/View/Media/icons/delete.gif" border="0" alt="{CALENDAR_FORM_TITLE} {TXT_CALENDAR_DELETE}" title="{CALENDAR_FORM_TITLE} {TXT_CALENDAR_DELETE}" /></a>
+          </td>
+      </tr>
+      <!-- END formList -->
+
+      <!-- BEGIN emptyFormList -->
+      <tr class="row1">
+          <td colspan="4"><i>{TXT_CALENDAR_NO_FORMS_FOUND}</i></td>
+      </tr>
+      <!-- END emptyFormList -->
+  </table>
     <br />
     <input type="submit" name="submitSettingsForms" value="{TXT_CALENDAR_SAVE}" />
 </form>

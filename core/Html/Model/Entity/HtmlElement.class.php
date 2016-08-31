@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,15 +24,15 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
- * 
+ *
  */
 
 namespace Cx\Core\Html\Model\Entity;
 
 /**
- * 
+ *
  */
 class HtmlElement extends \Cx\Model\Base\EntityBase {
     private $name;
@@ -41,27 +41,27 @@ class HtmlElement extends \Cx\Model\Base\EntityBase {
     private $children = array();
     private $output = null;
     private $allowDirectClose = true;
-    
+
     public function __construct($elementName) {
         $this->setName($elementName);
     }
-    
+
     public function allowDirectClose($allow = null) {
         if ($allow === null) {
             return $this->allowDirectClose;
         }
         $this->allowDirectClose = $allow;
     }
-    
+
     public function getName() {
         return $this->name;
     }
-    
+
     protected function setName($elementName) {
         $this->output = null;
         $this->name = $elementName;
     }
-    
+
     /**
      * Sets an attribute
      *
@@ -81,7 +81,7 @@ class HtmlElement extends \Cx\Model\Base\EntityBase {
         $this->output = null;
         $this->attributes[$name] = $value;
     }
-    
+
     /**
      * Unsets an attribute
      * @param string $name Name of the attribute
@@ -92,7 +92,7 @@ class HtmlElement extends \Cx\Model\Base\EntityBase {
         }
         unset($this->attributes[$name]);
     }
-    
+
     /**
      * Sets a list of attributes
      *
@@ -117,71 +117,71 @@ class HtmlElement extends \Cx\Model\Base\EntityBase {
             $this->unsetAttribute($name);
         }
     }
-    
+
     public function getAttribute($name) {
         if (!isset($this->attributes[$name])) {
             return null;
         }
         return $this->attributes[$name];
     }
-    
+
     public function getAttributes() {
         return $this->attributes;
     }
-    
+
     public function setClass($string) {
         if (!is_array($string)) {
             $string = explode(' ', $string);
         }
         $this->classes = $string;
     }
-    
+
     public function getClasses(&$classes = array()) {
         $classes = $this->classes;
         return implode(' ', $this->classes);
     }
-    
+
     public function hasClass($className) {
         return in_array($className, $this->classes);
     }
-    
+
     public function addClass($className) {
         if ($this->hasClass($className)) {
             return;
         }
         $this->classes[] = $className;
     }
-    
+
     public function removeClass($className) {
         $key = array_search($className, $this->classes);
         if ($key !== false) {
             unset($this->classes[$key]);
         }
     }
-    
+
     public function getChildren() {
         return $this->children;
     }
-    
+
     public function addChild(HtmlElement $element, HtmlElement $reference = null, $before = false) {
         $this->output = null;
         if (!$reference) {
             $this->children[] = $element;
             return true;
         }
-        
+
         $key = array_search($reference, $this->children);
         if ($key === false) {
             return false;
         }
-        
+
         if (!$before) {
             $key++;
         }
         array_splice($this->children, $key, 0, array($element));
         return true;
     }
-    
+
     public function addChildren(array $elements, HtmlElement $reference = null, $before = false) {
         $this->output = null;
         if (!$reference) {
@@ -197,9 +197,9 @@ class HtmlElement extends \Cx\Model\Base\EntityBase {
         }
         return true;
     }
-    
+
     /* addChildAfter, removeChild, getNthChild */
-    
+
     public function render() {
         if ($this->output) {
             return $this->output;

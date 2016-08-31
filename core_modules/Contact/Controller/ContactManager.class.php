@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Contact
  *
@@ -844,7 +844,7 @@ class ContactManager extends \Cx\Core_Modules\Contact\Controller\ContactLib
             $fields = $this->_getFormFieldsFromPost();
             $recipients = $this->getRecipientsFromPost();
         }
-        
+
         $objCrmLibrary = new \Cx\Modules\Crm\Controller\CrmLibrary('Crm');
         $memberships   = array_keys($objCrmLibrary->getMemberships());
         $objCrmLibrary->getMembershipDropdown($this->_objTpl, $memberships, "contactMembership", $crmCustomerGroups);
@@ -1132,7 +1132,7 @@ class ContactManager extends \Cx\Core_Modules\Contact\Controller\ContactLib
             'TXT_CONTACT_ASSIGN_CRM_CUSTOMER_GROUP_DESCRIPTION'  => $_ARRAYLANG['TXT_CONTACT_ASSIGN_CRM_CUSTOMER_GROUP_DESCRIPTION']
 
         ));
-        
+
         if (empty($recipients)) {
             // make an empty one so there's at least one
             $recipients[0] = array(
@@ -1265,7 +1265,7 @@ class ContactManager extends \Cx\Core_Modules\Contact\Controller\ContactLib
                         return;
                     }
                 }
-                
+
                 $crmCustomerGroups = !empty($_POST['assigned_memberships']) ? $_POST['assigned_memberships'] : array();
             }
 

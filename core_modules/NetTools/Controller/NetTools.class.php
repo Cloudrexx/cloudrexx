@@ -44,11 +44,11 @@ namespace Cx\Core_Modules\NetTools\Controller;
  * @subpackage  coremodule_nettools
  */
 class NetTools extends \Cx\Lib\NetTools {
-    
+
     var $statusMessage;
     var $_objTpl;
     var $langId;
-    
+
     /**
     * Constructor
     *
@@ -75,9 +75,9 @@ class NetTools extends \Cx\Lib\NetTools {
         $this->_objTpl = new \Cx\Core\Html\Sigma();
         \Cx\Core\Csrf\Controller\Csrf::add_placeholder($this->_objTpl);
         $this->_objTpl->setErrorHandling(PEAR_ERROR_DIE);
-    }   
-    
-    
+    }
+
+
     /**
     * Get page
     *
@@ -106,18 +106,18 @@ class NetTools extends \Cx\Lib\NetTools {
             return $this->_overview();
             break;
         }
-    }   
+    }
 
-    
+
     function _overview(){
-        
-        global $_ARRAYLANG; 
-        
-        $this->_objTpl->setTemplate($this->pageContent); 
-        
-        $term = (isset($_POST['term']) && !empty($_POST['term'])) ? strip_tags($_POST['term']) : "";        
-        
-        // set language variables   
+
+        global $_ARRAYLANG;
+
+        $this->_objTpl->setTemplate($this->pageContent);
+
+        $term = (isset($_POST['term']) && !empty($_POST['term'])) ? strip_tags($_POST['term']) : "";
+
+        // set language variables
         $this->_objTpl->setVariable(array(
             'TXT_WHOIS'                 => $_ARRAYLANG['TXT_WHOIS'],
             'TXT_BACK'                  => $_ARRAYLANG['TXT_BACK'],
@@ -129,15 +129,15 @@ class NetTools extends \Cx\Lib\NetTools {
             'TXT_CHECK_PORT'        => $_ARRAYLANG['TXT_CHECK_PORT'],
             'TXT_CHECK'             => $_ARRAYLANG['TXT_CHECK'],
             'TXT_CHECK_PORT_TEXT'   => $_ARRAYLANG['TXT_CHECK_PORT_TEXT'],
-            'NETTOOL_TERM'  => $term));     
-        
-        switch($_GET['tool']) {         
-        case 'whois':       
-            $this->_objTpl->setVariable('NETTOOLS_RESULT',$this->_getWhois());              
+            'NETTOOL_TERM'  => $term));
+
+        switch($_GET['tool']) {
+        case 'whois':
+            $this->_objTpl->setVariable('NETTOOLS_RESULT',$this->_getWhois());
             break;
 
         case 'ping':
-            $this->_objTpl->setVariable('NETTOOLS_RESULT',$this->_getPing()); 
+            $this->_objTpl->setVariable('NETTOOLS_RESULT',$this->_getPing());
             break;
         case 'feed':
             return $this->_showFeed();
@@ -145,41 +145,41 @@ class NetTools extends \Cx\Lib\NetTools {
         default:
             break;
         }
-        return $this->_objTpl->get();       
+        return $this->_objTpl->get();
     }
 
-    
-    
+
+
 
     function _getWhois() {
         global $_ARRAYLANG;
-        
+
         if (isset($_POST['term']) && !empty($_POST['term'])) {
             $address = strip_tags($_REQUEST['address']);
-            
+
             if ($this->IsIP($address)) {
                 $whoisInfo = $this->WhoisIP($address);
             } else {
                 $whoisInfo = $this->WhoisDomain($address);
             }
-            
+
             if (empty($whoisInfo)) {
                 $whoisInfo = $_ARRAYLANG['TXT_UNABLE_TO_WHOIS_TARGET'];
-            }       
-            return "<pre>".$whoisInfo."</pre>".$address;    
-        }  
-    }  
-    
-    
-  
+            }
+            return "<pre>".$whoisInfo."</pre>".$address;
+        }
+    }
+
+
+
     function _getPing() {
         global $_ARRAYLANG;
-        
-    
+
+
         $this->pageTitle = $_ARRAYLANG['TXT_PING'];
-        
-    
-        
+
+
+
         if (isset($_POST['term']) && !empty($_POST['term'])) {
             $address = strip_tags($_REQUEST['address']);
             $pingMsg = $this->PingMsg($address,$err);
@@ -192,24 +192,24 @@ class NetTools extends \Cx\Lib\NetTools {
                     return "<pre>".$pingMsg."</pre>".$address;
                 }
             }
-            
-           
-        } 
+
+
+        }
     }
-    
-    
-    
+
+
+
      function _showPort() {
         global $_ARRAYLANG;
-        
-   
-        
+
+
+
         if (isset($_POST['term']) && !empty($_POST['term'])) {
             $address = strip_tags($_REQUEST['address']);
             $port = (int) substr($_REQUEST['address'],strpos($_REQUEST['address'],":")+1);
-            
+
             $result = $this->ProbePort($address, $port, $banner, $err);
-            
+
             if ($result === 0) {
                 $portResult = $_ARRAYLANG['TXT_PORT_IS_OPEN'];
             } elseif ($result === -1) {
@@ -217,18 +217,18 @@ class NetTools extends \Cx\Lib\NetTools {
             } else {
                 $portResult = $_ARRAYLANG['TXT_PORT_IS_CLOSED']." ($result)";
             }
-            
+
             $this->_objTpl->setVariable(array(
                 'NETTOOLS_PORT_ADDRESS' => $_REQUEST['address'],
                 'NETTOOLS_PORT_RESULT'  => $portResult
             ));
             $this->_objTpl->parse('portinfo');
         } else {
- 
+
         }
             return "<pre>".$portResult."</pre>".$address;
         }
-    
-   
+
+
 }
 ?>

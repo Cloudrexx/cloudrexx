@@ -3,8 +3,8 @@
 // <![CDATA[
 
 Array.prototype.in_array = function(needle) {
-	for (var i=0; i < this.length; i++) if (this[i] === needle) return true;
-	return false;
+  for (var i=0; i < this.length; i++) if (this[i] === needle) return true;
+  return false;
 }
 
 aChildFrames = ['access_attribute_child_frame', 'access_attribute_menu_option_frame', 'access_attribute_frames_frame'];
@@ -17,183 +17,183 @@ function accessSwitchType(selectedType)
     document.getElementById('access_attribute_mandatory_frame').style.display = accessMandatoryTypeList.in_array(selectedType) ? '' : 'none';
     document.getElementById('access_attribute_sort_frame_row').setAttribute('class', accessSortableTypeList.in_array(selectedType) && accessMandatoryTypeList.in_array(selectedType) ? 'row1' : 'row2');
     document.getElementById('accessPermissionTab').style.display = ['group', 'frame', 'menu_option'].in_array(selectedType) ? 'none' : '';
-	document.getElementById('accessChildrenTab').style.display = ['frame', 'history'].in_array(selectedType) ? '' : 'none';
-	document.getElementById('accessMenuOptionTab').style.display = selectedType == 'menu' ? '' : 'none';
-	document.getElementById('accessFramesTab').style.display = ['group'].in_array(selectedType) ? '': 'none';
-	document.getElementById('access_attribute_special_menu_access_frame').style.display = selectedType == 'menu' ? '' :'none';
-	document.getElementById('access_text_multiline_option_box').style.display = selectedType == 'text' ? 'inline' : 'none';
+  document.getElementById('accessChildrenTab').style.display = ['frame', 'history'].in_array(selectedType) ? '' : 'none';
+  document.getElementById('accessMenuOptionTab').style.display = selectedType == 'menu' ? '' : 'none';
+  document.getElementById('accessFramesTab').style.display = ['group'].in_array(selectedType) ? '': 'none';
+  document.getElementById('access_attribute_special_menu_access_frame').style.display = selectedType == 'menu' ? '' :'none';
+  document.getElementById('access_text_multiline_option_box').style.display = selectedType == 'text' ? 'inline' : 'none';
 }
 
 function accessSyncNameFields(value)
 {
-	for (i=0; i < document.getElementById('accessModifyAttributeForm').getElementsByTagName('input').length;i++) {
-	    if (typeof(document.getElementById('accessModifyAttributeForm').getElementsByTagName('input')[i].name) != 'undefined' && document.getElementById('accessModifyAttributeForm').getElementsByTagName('input')[i].name.substring(0,21) == 'access_attribute_name') {
-	        document.getElementById('accessModifyAttributeForm').getElementsByTagName('input')[i].value = value;
-	    }
-	}
+  for (i=0; i < document.getElementById('accessModifyAttributeForm').getElementsByTagName('input').length;i++) {
+      if (typeof(document.getElementById('accessModifyAttributeForm').getElementsByTagName('input')[i].name) != 'undefined' && document.getElementById('accessModifyAttributeForm').getElementsByTagName('input')[i].name.substring(0,21) == 'access_attribute_name') {
+          document.getElementById('accessModifyAttributeForm').getElementsByTagName('input')[i].value = value;
+      }
+  }
 }
 
 function accessAddChild(isNewAttribute)
 {
-	storeAttribute = true;
-	if (!accessAttributeHasBeenModified() || (storeAttribute = confirm('{ACCESS_MUST_STORE_BEFORE_CONTINUE_MSG}')) || !isNewAttribute) {
-		if (!storeAttribute && !isNewAttribute) {
-			document.getElementById('accessModifyAttributeForm').reset();
-			for (i = 0; i < aChildAttributeSort.length; i++) {
-				document.getElementsByName(i)[0].value = aChildAttributeSort[i];
-			}
-		}
-		document.getElementById('access_form_submit_button').name = 'access_add_child';
-		document.getElementById('access_form_submit_button').click();
-	}
+  storeAttribute = true;
+  if (!accessAttributeHasBeenModified() || (storeAttribute = confirm('{ACCESS_MUST_STORE_BEFORE_CONTINUE_MSG}')) || !isNewAttribute) {
+    if (!storeAttribute && !isNewAttribute) {
+      document.getElementById('accessModifyAttributeForm').reset();
+      for (i = 0; i < aChildAttributeSort.length; i++) {
+        document.getElementsByName(i)[0].value = aChildAttributeSort[i];
+      }
+    }
+    document.getElementById('access_form_submit_button').name = 'access_add_child';
+    document.getElementById('access_form_submit_button').click();
+  }
 }
 
 function accessBack2ParentAttribute()
 {
-	if (!accessAttributeHasBeenModified() || confirm('{TXT_ACCESS_CHANGES_WILL_BE_LOST}')) {
-		window.location.href = 'index.php?cmd=Access&act=config&tpl={ACCESS_CANCEL_RETURN_SECTION}&id={ACCESS_PARENT_ID}&{CSRF_PARAM}';
-	}
+  if (!accessAttributeHasBeenModified() || confirm('{TXT_ACCESS_CHANGES_WILL_BE_LOST}')) {
+    window.location.href = 'index.php?cmd=Access&act=config&tpl={ACCESS_CANCEL_RETURN_SECTION}&id={ACCESS_PARENT_ID}&{CSRF_PARAM}';
+  }
 }
 
 function accessDeleteAttribute(id,name)
 {
-	msg = '{TXT_ACCESS_CONFIRM_DELETE_ATTRIBUTE_MSG}';
-	if (confirm(msg.replace('%s', name)+'\n\n{TXT_ACCESS_OPERATION_IRREVERSIBLE}')) {
-		window.location.href = 'index.php?cmd=Access&act=config&tpl=deleteAttribute&id='+id+'&{CSRF_PARAM}';
-	}
+  msg = '{TXT_ACCESS_CONFIRM_DELETE_ATTRIBUTE_MSG}';
+  if (confirm(msg.replace('%s', name)+'\n\n{TXT_ACCESS_OPERATION_IRREVERSIBLE}')) {
+    window.location.href = 'index.php?cmd=Access&act=config&tpl=deleteAttribute&id='+id+'&{CSRF_PARAM}';
+  }
 }
 
 function accessAttributeHasBeenModified()
 {
-	// check names
-	for (i=0; i < document.getElementById('accessModifyAttributeForm').getElementsByTagName('input').length;i++) {
-	    if (typeof(document.getElementById('accessModifyAttributeForm').getElementsByTagName('input')[i].name) != 'undefined' && document.getElementById('accessModifyAttributeForm').getElementsByTagName('input')[i].name.substring(0,21) == 'access_attribute_name' && document.getElementById('accessModifyAttributeForm').getElementsByTagName('input')[i].value != document.getElementById('accessModifyAttributeForm').getElementsByTagName('input')[i].defaultValue) {
-	    	return true;
-	    }
-	}
+  // check names
+  for (i=0; i < document.getElementById('accessModifyAttributeForm').getElementsByTagName('input').length;i++) {
+      if (typeof(document.getElementById('accessModifyAttributeForm').getElementsByTagName('input')[i].name) != 'undefined' && document.getElementById('accessModifyAttributeForm').getElementsByTagName('input')[i].name.substring(0,21) == 'access_attribute_name' && document.getElementById('accessModifyAttributeForm').getElementsByTagName('input')[i].value != document.getElementById('accessModifyAttributeForm').getElementsByTagName('input')[i].defaultValue) {
+        return true;
+      }
+  }
 
-	// check parent
-	if (typeof(document.getElementsByName('access_attribute_parent_id')[0]) != 'undefined' &&
-		document.getElementsByName('access_attribute_parent_id')[0].childNodes.length > 0 &&
-		!document.getElementsByName('access_attribute_parent_id')[0].childNodes[document.getElementsByName('access_attribute_parent_id')[0].selectedIndex].defaultSelected) {
-		return true;
-	}
+  // check parent
+  if (typeof(document.getElementsByName('access_attribute_parent_id')[0]) != 'undefined' &&
+    document.getElementsByName('access_attribute_parent_id')[0].childNodes.length > 0 &&
+    !document.getElementsByName('access_attribute_parent_id')[0].childNodes[document.getElementsByName('access_attribute_parent_id')[0].selectedIndex].defaultSelected) {
+    return true;
+  }
 
-	// check type
-	if (typeof(document.getElementsByName('access_attribute_type')[0]) != 'undefined' &&
-		typeof(document.getElementsByName('access_attribute_type')[0].selectedIndex) != 'undefined' &&
-		!document.getElementsByName('access_attribute_type')[0].childNodes[document.getElementsByName('access_attribute_type')[0].selectedIndex].defaultSelected) {
-		return true;
-	}
+  // check type
+  if (typeof(document.getElementsByName('access_attribute_type')[0]) != 'undefined' &&
+    typeof(document.getElementsByName('access_attribute_type')[0].selectedIndex) != 'undefined' &&
+    !document.getElementsByName('access_attribute_type')[0].childNodes[document.getElementsByName('access_attribute_type')[0].selectedIndex].defaultSelected) {
+    return true;
+  }
 
-	// check mandatory
-	if (document.getElementsByName('access_attribute_mandatory')[0].checked != document.getElementsByName('access_attribute_mandatory')[0].defaultChecked) {
-		return true;
-	}
+  // check mandatory
+  if (document.getElementsByName('access_attribute_mandatory')[0].checked != document.getElementsByName('access_attribute_mandatory')[0].defaultChecked) {
+    return true;
+  }
 
-	// check sort type
-	if (typeof(document.getElementsByName('access_attribute_sort_type')[0]) != 'undefined' && !document.getElementsByName('access_attribute_sort_type')[0].childNodes[document.getElementsByName('access_attribute_sort_type')[0].selectedIndex].defaultSelected) {
-		return true;
-	}
+  // check sort type
+  if (typeof(document.getElementsByName('access_attribute_sort_type')[0]) != 'undefined' && !document.getElementsByName('access_attribute_sort_type')[0].childNodes[document.getElementsByName('access_attribute_sort_type')[0].selectedIndex].defaultSelected) {
+    return true;
+  }
 
-	// check sort order
-	for (nr = 0; nr < aChildFrames.length; nr++) {
-		for (i = 0; i < document.getElementById(aChildFrames[nr]).getElementsByTagName('input').length; i++) {
-			if (typeof(document.getElementById(aChildFrames[nr]).getElementsByTagName('input')[i].name) != 'undefined' &&
-			document.getElementById(aChildFrames[nr]).getElementsByTagName('input')[i].name != '' &&
-			document.getElementById(aChildFrames[nr]).getElementsByTagName('input')[i].getAttribute('name').substring(0, 27) == 'access_attribute_sort_order' &&
+  // check sort order
+  for (nr = 0; nr < aChildFrames.length; nr++) {
+    for (i = 0; i < document.getElementById(aChildFrames[nr]).getElementsByTagName('input').length; i++) {
+      if (typeof(document.getElementById(aChildFrames[nr]).getElementsByTagName('input')[i].name) != 'undefined' &&
+      document.getElementById(aChildFrames[nr]).getElementsByTagName('input')[i].name != '' &&
+      document.getElementById(aChildFrames[nr]).getElementsByTagName('input')[i].getAttribute('name').substring(0, 27) == 'access_attribute_sort_order' &&
 
-			//typeof(document.getElementById(aChildFrames[nr])) != 'undefined' &&
-			//typeof(document.getElementById(aChildFrames[nr]).getElementsByTagName('input')[i].name) != 'undefined' &&
-			typeof(aChildAttributeSort[document.getElementById(aChildFrames[nr]).getElementsByTagName('input')[i].name]) != 'undefined' &&
-			aChildAttributeSort[document.getElementById(aChildFrames[nr]).getElementsByTagName('input')[i].getAttribute('name')] != document.getElementById(aChildFrames[nr]).getElementsByTagName('input')[i].value
-			) {
-				return true;
-			}
-		}
-	}
+      //typeof(document.getElementById(aChildFrames[nr])) != 'undefined' &&
+      //typeof(document.getElementById(aChildFrames[nr]).getElementsByTagName('input')[i].name) != 'undefined' &&
+      typeof(aChildAttributeSort[document.getElementById(aChildFrames[nr]).getElementsByTagName('input')[i].name]) != 'undefined' &&
+      aChildAttributeSort[document.getElementById(aChildFrames[nr]).getElementsByTagName('input')[i].getAttribute('name')] != document.getElementById(aChildFrames[nr]).getElementsByTagName('input')[i].value
+      ) {
+        return true;
+      }
+    }
+  }
 
-	return false;
+  return false;
 }
 
 function accessCheckParentAttribute()
 {
-	if (typeof(accessSelectedParentAttribute) == 'undefined') {
-		accessSelectedParentAttribute = {ACCESS_PARENT_ID};
-	}
+  if (typeof(accessSelectedParentAttribute) == 'undefined') {
+    accessSelectedParentAttribute = {ACCESS_PARENT_ID};
+  }
 
-	if (document.getElementsByName('access_attribute_parent_id')[0].value == '-1') {
-		alert('{TXT_ACCESS_INVALID_PARENT_ATTRIBUTE}');
-		document.getElementsByName('access_attribute_parent_id')[0].value = accessSelectedParentAttribute;
-	} else {
-		accessSelectedParentAttribute = document.getElementsByName('access_attribute_parent_id')[0].value;
-	}
+  if (document.getElementsByName('access_attribute_parent_id')[0].value == '-1') {
+    alert('{TXT_ACCESS_INVALID_PARENT_ATTRIBUTE}');
+    document.getElementsByName('access_attribute_parent_id')[0].value = accessSelectedParentAttribute;
+  } else {
+    accessSelectedParentAttribute = document.getElementsByName('access_attribute_parent_id')[0].value;
+  }
 }
 
 aChildAttributeSort = new Array();
 function accessChangeAttributeSort(id, direction, elFrame, elChildren)
 {
-	switchSlaveAttribute = '';
-	switchMasterElement = document.getElementById(elChildren+id);
+  switchSlaveAttribute = '';
+  switchMasterElement = document.getElementById(elChildren+id);
 
-	// get parent node
-	switchSlaveElement = direction == 'up' ? switchMasterElement.previousSibling : switchMasterElement.nextSibling;
-	elChildrenNameRegexp = new RegExp("^"+elChildren+"[a-z_0-9]+$");
+  // get parent node
+  switchSlaveElement = direction == 'up' ? switchMasterElement.previousSibling : switchMasterElement.nextSibling;
+  elChildrenNameRegexp = new RegExp("^"+elChildren+"[a-z_0-9]+$");
 
-	while (switchSlaveElement != null) {
-		if (switchSlaveElement.nodeName.toLowerCase() == 'tr' && typeof(switchSlaveElement.id) != 'undefined' && elChildrenNameRegexp.exec(switchSlaveElement.id) != null && switchSlaveElement.getElementsByTagName('input').length) {
-			switchSlaveAttribute = switchSlaveElement;
-			break;
-		} else {
-			switchSlaveElement = direction == 'up' ? switchSlaveElement.previousSibling : switchSlaveElement.nextSibling;
-		}
-	}
+  while (switchSlaveElement != null) {
+    if (switchSlaveElement.nodeName.toLowerCase() == 'tr' && typeof(switchSlaveElement.id) != 'undefined' && elChildrenNameRegexp.exec(switchSlaveElement.id) != null && switchSlaveElement.getElementsByTagName('input').length) {
+      switchSlaveAttribute = switchSlaveElement;
+      break;
+    } else {
+      switchSlaveElement = direction == 'up' ? switchSlaveElement.previousSibling : switchSlaveElement.nextSibling;
+    }
+  }
 
-	// switch child attributes
-	if (switchSlaveAttribute != '') {
-		if (direction == 'up') {
-			moveAttributeElement = switchMasterElement.cloneNode(true);
-			moveAttributeElement.sortDefault = switchMasterElement.sortDefault;
-			moveAttributeElement.className = switchSlaveAttribute.className;
-			switchSlaveAttribute.className = switchMasterElement.className;
+  // switch child attributes
+  if (switchSlaveAttribute != '') {
+    if (direction == 'up') {
+      moveAttributeElement = switchMasterElement.cloneNode(true);
+      moveAttributeElement.sortDefault = switchMasterElement.sortDefault;
+      moveAttributeElement.className = switchSlaveAttribute.className;
+      switchSlaveAttribute.className = switchMasterElement.className;
 
-			switchMasterElement.parentNode.removeChild(switchMasterElement);
-			switchSlaveAttribute.parentNode.insertBefore(moveAttributeElement, switchSlaveAttribute);
-		} else {
-			moveAttributeElement = switchSlaveAttribute.cloneNode(true);
-			moveAttributeElement.className = switchMasterElement.className;
-			switchMasterElement.className = switchSlaveAttribute.className;
+      switchMasterElement.parentNode.removeChild(switchMasterElement);
+      switchSlaveAttribute.parentNode.insertBefore(moveAttributeElement, switchSlaveAttribute);
+    } else {
+      moveAttributeElement = switchSlaveAttribute.cloneNode(true);
+      moveAttributeElement.className = switchMasterElement.className;
+      switchMasterElement.className = switchSlaveAttribute.className;
 
-			switchMasterElement.parentNode.removeChild(switchSlaveAttribute);
-			switchMasterElement.parentNode.insertBefore(moveAttributeElement, switchMasterElement);
-		}
+      switchMasterElement.parentNode.removeChild(switchSlaveAttribute);
+      switchMasterElement.parentNode.insertBefore(moveAttributeElement, switchMasterElement);
+    }
 
-		// set new sort order
-		nr = 0;
-		for (i = 0; i < document.getElementById(elFrame).getElementsByTagName('input').length; i++) {
-			if (typeof(document.getElementById(elFrame).getElementsByTagName('input')[i].getAttribute('name')) == 'string' && document.getElementById(elFrame).getElementsByTagName('input')[i].getAttribute('name').substring(0, 27) == 'access_attribute_sort_order') {
-				if (typeof(aChildAttributeSort[document.getElementById(elFrame).getElementsByTagName('input')[i].getAttribute('name')]) == 'undefined') {
-					aChildAttributeSort[document.getElementById(elFrame).getElementsByTagName('input')[i].getAttribute('name')] = document.getElementById(elFrame).getElementsByTagName('input')[i].defaultValue;
-				}
-				document.getElementById(elFrame).getElementsByTagName('input')[i].setAttribute('value', nr++);
-			}
-		}
-	}
+    // set new sort order
+    nr = 0;
+    for (i = 0; i < document.getElementById(elFrame).getElementsByTagName('input').length; i++) {
+      if (typeof(document.getElementById(elFrame).getElementsByTagName('input')[i].getAttribute('name')) == 'string' && document.getElementById(elFrame).getElementsByTagName('input')[i].getAttribute('name').substring(0, 27) == 'access_attribute_sort_order') {
+        if (typeof(aChildAttributeSort[document.getElementById(elFrame).getElementsByTagName('input')[i].getAttribute('name')]) == 'undefined') {
+          aChildAttributeSort[document.getElementById(elFrame).getElementsByTagName('input')[i].getAttribute('name')] = document.getElementById(elFrame).getElementsByTagName('input')[i].defaultValue;
+        }
+        document.getElementById(elFrame).getElementsByTagName('input')[i].setAttribute('value', nr++);
+      }
+    }
+  }
 
-	return void(0);
+  return void(0);
 }
 
 function accessSwitchSortType(sortType)
 {
-	displayStyle = sortType == 'custom' ? 'inline' : 'none';
+  displayStyle = sortType == 'custom' ? 'inline' : 'none';
 
-	for (nr = 0; nr < aChildFrames.length; nr++) {
-		for (i = 0; i < document.getElementById(aChildFrames[nr]).getElementsByTagName('div').length; i++) {
-			if (typeof(document.getElementById(aChildFrames[nr]).getElementsByTagName('div')[i].getAttribute('name')) != 'undefined' && document.getElementById(aChildFrames[nr]).getElementsByTagName('div')[i].getAttribute('name') == 'access_attribute_child_sort_buttons') {
-				document.getElementById(aChildFrames[nr]).getElementsByTagName('div')[i].style.display = displayStyle;
-			}
-		}
-	}
+  for (nr = 0; nr < aChildFrames.length; nr++) {
+    for (i = 0; i < document.getElementById(aChildFrames[nr]).getElementsByTagName('div').length; i++) {
+      if (typeof(document.getElementById(aChildFrames[nr]).getElementsByTagName('div')[i].getAttribute('name')) != 'undefined' && document.getElementById(aChildFrames[nr]).getElementsByTagName('div')[i].getAttribute('name') == 'access_attribute_child_sort_buttons') {
+        document.getElementById(aChildFrames[nr]).getElementsByTagName('div')[i].style.display = displayStyle;
+      }
+    }
+  }
 }
 
 // ]]>
@@ -229,286 +229,286 @@ function accessSwitchSortType(sortType)
 <li id="accessPermissionTab" style="display:{ACCESS_PERMISSON_TAB_DISPLAY};"><a id="accessTab_modifyAttribute2" href="javascript:void(0);" onclick="selectTab('modifyAttribute2')" title="{TXT_ACCESS_MODIFICATION_ACCESS}">{TXT_ACCESS_MODIFICATION_ACCESS}</a></li>
 <li id="accessChildrenTab" style="display:{ACCESS_CHILDREN_TAB_DISPLAY};"><a id="accessTab_modifyAttribute3" href="javascript:void(0);" onclick="selectTab('modifyAttribute3')" title="{TXT_ACCESS_PROFILE_ATTRIBUTES}">{TXT_ACCESS_PROFILE_ATTRIBUTES}</a></li>
 <li id="accessMenuOptionTab" style="display:{ACCESS_MENU_OPTION_TAB_DISPLAY};"><a id="accessTab_modifyAttribute4" href="javascript:void(0);" onclick="selectTab('modifyAttribute4')" title="{TXT_ACCESS_SELECT_OPTIONS}">{TXT_ACCESS_SELECT_OPTIONS}</a></li>
-	<li id="accessFramesTab" style="display:{ACCESS_FRAMES_TAB_DISPLAY};"><a id="accessTab_modifyAttribute5" href="javascript:void(0);" onclick="selectTab('modifyAttribute5')" title="{TXT_ACCESS_FRAMES}">{TXT_ACCESS_FRAMES}</a></li>
+  <li id="accessFramesTab" style="display:{ACCESS_FRAMES_TAB_DISPLAY};"><a id="accessTab_modifyAttribute5" href="javascript:void(0);" onclick="selectTab('modifyAttribute5')" title="{TXT_ACCESS_FRAMES}">{TXT_ACCESS_FRAMES}</a></li>
 </ul>
 <form action="index.php?cmd=Access&amp;act=config&amp;tpl=modifyAttribute&amp;id={ACCESS_ATTRIBUTE_ID}" id="accessModifyAttributeForm" onsubmit="accessSelectAllGroups(document.getElementById('access_attribute_associated_groups'))" method="post">
-	<!-- start modifyAttribute1 div -->
-	<div id="modifyAttribute1" class="accessTab" style="display:block">
-		<table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
-			<thead>
-				<tr>
-					<th colspan="2">{ACCESS_PROFILE_OPERATION_TITLE}</th>
-				</tr>
-			</thead>
-			<tbody style="vertical-align:top;">
-				<tr class="row1">
-					<td width="15%">{TXT_ACCESS_NAME}</td>
-					<td width="85%">
-						<!-- BEGIN access_attribute_name -->
-						<input type="text" id="access_attribute_name_0" value="{ACCESS_ATTRIBUTE_NAME}" onchange="accessSyncNameFields(this.value)" style="width:300px;" /> <a href="javascript:void(0);" onclick="document.getElementById('access_attribute_lang_div').style.display = (document.getElementById('access_attribute_lang_div').style.display == 'block' ? 'none' : 'block')" title="{TXT_ACCESS_EXTENDED}">{TXT_ACCESS_EXTENDED} &raquo;</a>
-						<div id="access_attribute_lang_div" style="display:none;">
-						<!-- BEGIN access_attribute_name_list -->
-							<input type="text" name="access_attribute_name[{ACCESS_ATTRIBUTE_LANG_ID}]" id="access_attribute_name_{ACCESS_ATTRIBUTE_LANG_ID}" value="{ACCESS_ATTRIBUTE_NAME}" style="margin-top:1px; width:300px;" /> {ACCESS_ATTRIBUTE_LANG_NAME}<br />
-						<!-- END access_attribute_name_list -->
-						</div>
-						<!-- END access_attribute_name -->
-						<!-- BEGIN access_attribute_core_name_edit -->
-						<input type="text" name="access_attribute_name[0]" value="{ACCESS_ATTRIBUTE_NAME}" style="width:300px;" />
-						<!-- END access_attribute_core_name_edit -->
-						<!-- BEGIN access_attribute_core_name -->
-						{ACCESS_ATTRIBUTE_NAME}
-						<!-- END access_attribute_core_name -->
-					</td>
-				</tr>
-				<tr class="row2">
-					<td>{ACCESS_PARENT_TYPE_TITLE}</td>
-					<td>{ACCESS_PARENT_TYPE}</td>
-				</tr>
-				<tr class="row1">
-					<td>{TXT_ACCESS_TYPE}</td>
-					<td>{ACCESS_ATTRIBUTE_TYPE} <div id="access_text_multiline_option_box" style="display:{ACCESS_TEXT_MULTILINE_OPTION_DISPLAY};"><input type="checkbox" name="access_text_multiline_option" value="1" id="access_text_multiline_option" {ACCESS_TEXT_MULTILINE_CHECKED} style="margin:0px; border:0px; background-color:#F4F7FF;" /> <label for="access_text_multiline_option">{TXT_ACCESS_MULTILINE_TEXT}</label></div></td>
-				</tr>
-			</tbody>
-		</table>
-		<table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist" id="access_attribute_mandatory_frame" style="display:{ACCESS_ATTRIBUTE_MANDATORY_FRAME_DISPLAY};">
-			<tbody>
-				<tr class="row2">
-					<td width="15%">{TXT_ACCESS_MANDATORY_FIELD}</td>
-					<td width="85%">
-						<input type="radio" name="access_attribute_mandatory" value="1" id="access_attribute_mandatory_yes" {ACCESS_ATTRIBUTE_MANDATORY_YES} style="background-color:#fff; border:0px;" /> <label for="access_attribute_mandatory_yes">{TXT_ACCESS_YES}</label>
-						<input type="radio" name="access_attribute_mandatory" value="0" id="access_attribute_mandatory_no" {ACCESS_ATTRIBUTE_MANDATORY_NO} style="background-color:#fff; border:0px;" /> <label for="access_attribute_mandatory_no">{TXT_ACCESS_NO}</label>
-					</td>
-				</tr>
-			</tbody>
-		</table>
-		<table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist" id="access_attribute_sort_frame" style="display:{ACCESS_ATTRIBUTE_SORT_FRAME_DISPLAY};">
-			<tbody style="vertical-align:top;">
+  <!-- start modifyAttribute1 div -->
+  <div id="modifyAttribute1" class="accessTab" style="display:block">
+    <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
+      <thead>
+        <tr>
+          <th colspan="2">{ACCESS_PROFILE_OPERATION_TITLE}</th>
+        </tr>
+      </thead>
+      <tbody style="vertical-align:top;">
+        <tr class="row1">
+          <td width="15%">{TXT_ACCESS_NAME}</td>
+          <td width="85%">
+            <!-- BEGIN access_attribute_name -->
+            <input type="text" id="access_attribute_name_0" value="{ACCESS_ATTRIBUTE_NAME}" onchange="accessSyncNameFields(this.value)" style="width:300px;" /> <a href="javascript:void(0);" onclick="document.getElementById('access_attribute_lang_div').style.display = (document.getElementById('access_attribute_lang_div').style.display == 'block' ? 'none' : 'block')" title="{TXT_ACCESS_EXTENDED}">{TXT_ACCESS_EXTENDED} &raquo;</a>
+            <div id="access_attribute_lang_div" style="display:none;">
+            <!-- BEGIN access_attribute_name_list -->
+              <input type="text" name="access_attribute_name[{ACCESS_ATTRIBUTE_LANG_ID}]" id="access_attribute_name_{ACCESS_ATTRIBUTE_LANG_ID}" value="{ACCESS_ATTRIBUTE_NAME}" style="margin-top:1px; width:300px;" /> {ACCESS_ATTRIBUTE_LANG_NAME}<br />
+            <!-- END access_attribute_name_list -->
+            </div>
+            <!-- END access_attribute_name -->
+            <!-- BEGIN access_attribute_core_name_edit -->
+            <input type="text" name="access_attribute_name[0]" value="{ACCESS_ATTRIBUTE_NAME}" style="width:300px;" />
+            <!-- END access_attribute_core_name_edit -->
+            <!-- BEGIN access_attribute_core_name -->
+            {ACCESS_ATTRIBUTE_NAME}
+            <!-- END access_attribute_core_name -->
+          </td>
+        </tr>
+        <tr class="row2">
+          <td>{ACCESS_PARENT_TYPE_TITLE}</td>
+          <td>{ACCESS_PARENT_TYPE}</td>
+        </tr>
+        <tr class="row1">
+          <td>{TXT_ACCESS_TYPE}</td>
+          <td>{ACCESS_ATTRIBUTE_TYPE} <div id="access_text_multiline_option_box" style="display:{ACCESS_TEXT_MULTILINE_OPTION_DISPLAY};"><input type="checkbox" name="access_text_multiline_option" value="1" id="access_text_multiline_option" {ACCESS_TEXT_MULTILINE_CHECKED} style="margin:0px; border:0px; background-color:#F4F7FF;" /> <label for="access_text_multiline_option">{TXT_ACCESS_MULTILINE_TEXT}</label></div></td>
+        </tr>
+      </tbody>
+    </table>
+    <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist" id="access_attribute_mandatory_frame" style="display:{ACCESS_ATTRIBUTE_MANDATORY_FRAME_DISPLAY};">
+      <tbody>
+        <tr class="row2">
+          <td width="15%">{TXT_ACCESS_MANDATORY_FIELD}</td>
+          <td width="85%">
+            <input type="radio" name="access_attribute_mandatory" value="1" id="access_attribute_mandatory_yes" {ACCESS_ATTRIBUTE_MANDATORY_YES} style="background-color:#fff; border:0px;" /> <label for="access_attribute_mandatory_yes">{TXT_ACCESS_YES}</label>
+            <input type="radio" name="access_attribute_mandatory" value="0" id="access_attribute_mandatory_no" {ACCESS_ATTRIBUTE_MANDATORY_NO} style="background-color:#fff; border:0px;" /> <label for="access_attribute_mandatory_no">{TXT_ACCESS_NO}</label>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist" id="access_attribute_sort_frame" style="display:{ACCESS_ATTRIBUTE_SORT_FRAME_DISPLAY};">
+      <tbody style="vertical-align:top;">
                 <tr class="{ACCESS_ATTRIBUTE_SORT_FRAME_ROW}" id="access_attribute_sort_frame_row">
-					<td width="15%">{TXT_ACCESS_SORT}</td>
-					<td width="85%">{ACCESS_ATTRIBUTE_SORT_TYPE}</td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
-	<!-- end modifyAttribute1 div -->
-	<!-- start modifyAttribute2 div -->
-	<div id="modifyAttribute2" class="accessTab" style="display:none">
-		<table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist" id="access_attribute_access_frame" style="display:{ACCESS_ATTRIBUTE_ACCESS_FRAME_DISPLAY};">
-			<thead>
-				<tr>
-					<th colspan="3">{ACCESS_PROFILE_OPERATION_TITLE}</th>
-				</tr>
-			</thead>
-			<tbody style="vertical-align:top;">
-				<tr class="row1">
-					<td>
-						{TXT_ACCESS_MODIFY_PROFILE_ATTRIBUTE_MSG}<br />
-						<br />
-						<input type="checkbox" name="access_attribute_all_access" id="access_attribute_all_access" style="border:0px; background-color:#F4F7FF;" value="1" {ACCESS_ATTRIBUTE_ACCESS_ALL_CHECKED} onclick="document.getElementById('access_attribute_select_access_frame').style.display = this.checked ? 'none' : ''" /> <label for="access_attribute_all_access">{TXT_ACCESS_EVERYONE_MOD_PERM}</label>
-					</td>
-				</tr>
-				<tr class="row2" id="access_attribute_select_access_frame" style="display:{ACCESS_ATTRIBUTE_SELECT_ACCESS_DISPLAY};">
-					<td>
-						<div style="display:block;">
-							{TXT_ACCESS_SELECT_ALLOWED_MODIFY_GROUPS}
-							<br />
-							<br />
-						</div>
-						<div style="width:300px; float:left; display:block;">
-							{TXT_ACCESS_AVAILABLE_GROUPS}<br />
-							<select name="access_attribute_not_associated_groups[]" id="access_attribute_not_associated_groups" size="15" style="width:300px;" multiple="multiple">
-							{ACCESS_ATTRIBUTE_NOT_ASSOCIATED_GROUPS}
-							</select>
-							<br />
-							<a href="javascript:void(0);" onclick="accessSelectAllGroups(document.getElementById('access_attribute_not_associated_groups'))" title="{TXT_ACCESS_CHECK_ALL}">{TXT_ACCESS_CHECK_ALL}</a>
-							<br />
-							<a href="javascript:void(0);" onclick="accessDeselectAllGroups(document.getElementById('access_attribute_not_associated_groups'))" title="{TXT_ACCESS_UNCHECK_ALL}">{TXT_ACCESS_UNCHECK_ALL}</a>
-						</div>
-						<div style="width:45px; float:left; text-align:center; display:block;">
-							<br /><input type="button" value="&gt;&gt;" name="adduser" onclick="accessAddGroupToList(document.getElementById('access_attribute_not_associated_groups'), document.getElementById('access_attribute_associated_groups'))" style="margin-bottom:2px;" /><br /><input type="button" value="&lt;&lt;" name="removeuser" onclick="accessRemoveGroupFromList(document.getElementById('access_attribute_not_associated_groups'), document.getElementById('access_attribute_associated_groups'))" />
-						</div>
-						<div style="float:left; display:block;">
-							{TXT_ACCESS_ASSOCIATED_GROUPS}<br />
-							<select name="access_attribute_associated_groups[]" id="access_attribute_associated_groups" size="15" style="width:300px;" multiple="multiple">
-							{ACCESS_USER_ASSOCIATED_GROUPS}
-							</select>
-							<br />
-							<a href="javascript:void(0);" onclick="accessSelectAllGroups(document.getElementById('access_attribute_associated_groups'))" title="{TXT_ACCESS_CHECK_ALL}">{TXT_ACCESS_CHECK_ALL}</a>
-							<br />
-							<a href="javascript:void(0);" onclick="accessDeselectAllGroups(document.getElementById('access_attribute_associated_groups'))" title="{TXT_ACCESS_UNCHECK_ALL}">{TXT_ACCESS_UNCHECK_ALL}</a>
-						</div>
-						<div style="clear:both; display:{ACCESS_ATTRIBUTE_SPECIAL_MENU_ACCESS};" id="access_attribute_special_menu_access_frame">
-							<br />
-							<br />
-							{TXT_ACCESS_SPECIAL_MENU_PERM}<br />
-							<input type="radio" name="access_attribute_special_menu_access" style="border:0px; background-color:#ffffff;" value="" {ACCESS_ATTRIBUTE_SPECIAL_NONE_CHECKED} id="access_attribute_special_menu_access_none" /><label for="access_attribute_special_menu_access_none">{TXT_ACCESS_NONE}</label><br />
-							<input type="radio" name="access_attribute_special_menu_access" style="border:0px; background-color:#ffffff;" value="menu_select_higher" {ACCESS_ATTRIBUTE_SPECIAL_HIGHER_CHECKED} id="access_attribute_special_menu_access_higher" /><label for="access_attribute_special_menu_access_higher">{TXT_ACCESS_ONLY_HIGHER_OPTION_ACCESS}</label><br />
-							<input type="radio" name="access_attribute_special_menu_access" style="border:0px; background-color:#ffffff;" value="menu_select_lower" {ACCESS_ATTRIBUTE_SPECIAL_LOWER_CHECKED} id="access_attribute_special_menu_access_lower" /><label for="access_attribute_special_menu_access_lower">{TXT_ACCESS_ONLY_LOWER_OPTION_ACCESS}</label>
-						</div>
-					</td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
-	<!-- end modifyAttribute2 div -->
-	<!-- start modifyAttribute3 div -->
-	<div id="modifyAttribute3" class="accessTab" style="display:none">
-		<table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist" id="access_attribute_child_frame">
-			<thead>
-				<tr>
-					<th colspan="3">{ACCESS_PROFILE_OPERATION_TITLE}</th>
-				</tr>
-			</thead>
-			<tbody style="vertical-align:top;">
-				<!-- BEGIN access_attribute_children -->
-				<tr class="row3">
-					<td width="15%"><strong>{TXT_ACCESS_NAME} ({TXT_ACCESS_ID})</strong></td>
-					<td width="75%"><strong>{TXT_ACCESS_ATTRIBUTE} ({TXT_ACCESS_PREVIEW})</strong></td>
-					<td width="10%" style="text-align:right;"><strong>{TXT_ACCESS_FUNCTIONS}</strong></td>
-				</tr>
-				<!-- BEGIN access_attribute_child_list -->
-					<tr class="row{ACCESS_CHILD_ATTRIBUTE_ROW_CLASS}" id="access_attribute_child_row_{ACCESS_CHILD_ATTRIBUTE_ID}">
-						<td>{ACCESS_CHILD_ATTRIBUTE_NAME} ({ACCESS_CHILD_ATTRIBUTE_ID})</td>
-						<td>{ACCESS_CHILD_ATTRIBUTE}</td>
-						<td style="text-align:right;">&nbsp;
-							<!-- BEGIN access_attribute_child_list_sort -->
-							<input type="hidden" name="access_attribute_sort_order[{ACCESS_CHILD_ATTRIBUTE_ID}]" value="{ACCESS_CHILD_ATTRIBUTE_SORT_NR}" />
-							<div style="display:{ACCESS_CHILD_SORT_ORDER_DISPLAY}" name="access_attribute_child_sort_buttons">
-								<a href="javascript:accessChangeAttributeSort('{ACCESS_CHILD_ATTRIBUTE_ID}','up','access_attribute_child_frame','access_attribute_child_row_');" title="{TXT_ACCESS_MOVE_UP}"><img src="../core/Core/View/Media/icons/up.gif" width="14" height="12" border="0" alt="{TXT_ACCESS_MOVE_UP}" /></a>
-								<a href="javascript:accessChangeAttributeSort('{ACCESS_CHILD_ATTRIBUTE_ID}','down','access_attribute_child_frame','access_attribute_child_row_');" title="{TXT_ACCESS_MOVE_DOWN}"><img src="../core/Core/View/Media/icons/down.gif" width="14" height="12" border="0" alt="{TXT_ACCESS_MOVE_DOWN}" /></a>
-							</div>
-							<!-- END access_attribute_child_list_sort -->
-							<!-- BEGIN access_attribute_child_list_function_modify -->
-							<a href="index.php?cmd=Access&amp;act=config&amp;tpl=modifyAttribute&amp;id={ACCESS_CHILD_ATTRIBUTE_ID}" title="{TXT_ACCESS_MODIFY_ATTRIBUTE}"><img src="../core/Core/View/Media/icons/edit.gif" width="16" height="16" border="0" alt="{TXT_ACCESS_MODIFY_ATTRIBUTE}" /></a>
-							<!-- END access_attribute_child_list_function_modify -->
-							<!-- BEGIN access_attribute_child_list_function_no_modify -->
-							<img src="../core/Core/View/Media/icons/pixel.gif" width="16" height="16" border="0" alt="unmodifiable" /></a>
-							<!-- END access_attribute_child_list_function_no_modify -->
-							<!-- BEGIN access_attribute_child_list_function_delete -->
-							<a href="javascript:accessDeleteAttribute('{ACCESS_CHILD_ATTRIBUTE_ID}','{ACCESS_CHILD_ATTRIBUTE_NAME_JS}')" title="{TXT_ACCESS_DELETE_ATTRIBUTE}"><img src="../core/Core/View/Media/icons/delete.gif" width="17" height="17" border="0" alt="{TXT_ACCESS_DELETE_ATTRIBUTE}" /></a>
-							<!-- END access_attribute_child_list_function_delete -->
-							<!-- BEGIN access_attribute_child_list_function_no_delete -->
-							<img src="../core/Core/View/Media/icons/pixel.gif" width="17" height="17" border="0" alt="unquenchable" /></a>
-							<!-- END access_attribute_child_list_function_no_delete -->
-						</td>
-					</tr>
-				<!-- END access_attribute_child_list -->
-				<!-- END access_attribute_children -->
-				<!-- BEGIN access_attribute_child_add -->
-				<tr class="row{ACCESS_CHILD_ATTRIBUTE_ROW_CLASS}">
-					<td colspan="3" style="padding:10px;"><input type="button" value="{ACCESS_ADD_CHILD_TXT}" onclick="accessAddChild({ACCESS_IS_NEW_ATTRIBUTE})" /></td>
-				</tr>
-				<!-- END access_attribute_child_add -->
-			</tbody>
-		</table>
-	</div>
-	<!-- end modifyAttribute3 div -->
-	<!-- start modifyAttribute4 div -->
-	<div id="modifyAttribute4" class="accessTab" style="display:none">
-		<table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist" id="access_attribute_menu_option_frame">
-			<thead>
-				<tr>
-					<th colspan="2">{ACCESS_PROFILE_OPERATION_TITLE}</th>
-				</tr>
-			</thead>
-			<tbody style="vertical-align:top;">
-				<!-- BEGIN access_attribute_menu_options -->
-				<tr class="row3">
-					<td width="90%"><strong>{TXT_ACCESS_SELECT_OPTION} ({TXT_ACCESS_ID})</strong></td>
-					<td width="10%" style="text-align:right;"><strong>{TXT_ACCESS_FUNCTIONS}</strong></td>
-				</tr>
-				<!-- BEGIN access_attribute_menu_option_list -->
-				<tr class="row{ACCESS_CHILD_ATTRIBUTE_ROW_CLASS}" id="access_attribute_select_option_row_{ACCESS_CHILD_ATTRIBUTE_ID}">
-					<td>{ACCESS_CHILD_ATTRIBUTE_NAME} ({ACCESS_CHILD_ATTRIBUTE_ID})</td>
-					<td style="text-align:right;">&nbsp;
-						<!-- BEGIN access_attribute_menu_option_list_sort -->
-						<input type="hidden" name="access_attribute_sort_order[{ACCESS_CHILD_ATTRIBUTE_ID}]" value="{ACCESS_CHILD_ATTRIBUTE_SORT_NR}" />
-						<div style="display:{ACCESS_CHILD_SORT_ORDER_DISPLAY}" name="access_attribute_child_sort_buttons">
-							<a href="javascript:accessChangeAttributeSort('{ACCESS_CHILD_ATTRIBUTE_ID}','up','access_attribute_menu_option_frame','access_attribute_select_option_row_');" title="{TXT_ACCESS_MOVE_UP}"><img src="../core/Core/View/Media/icons/up.gif" width="14" height="12" border="0" alt="{TXT_ACCESS_MOVE_UP}" /></a>
-							<a href="javascript:accessChangeAttributeSort('{ACCESS_CHILD_ATTRIBUTE_ID}','down','access_attribute_menu_option_frame','access_attribute_select_option_row_');" title="{TXT_ACCESS_MOVE_DOWN}"><img src="../core/Core/View/Media/icons/down.gif" width="14" height="12" border="0" alt="{TXT_ACCESS_MOVE_DOWN}" /></a>
-						</div>
-						<!-- END access_attribute_menu_option_list_sort -->
-						<!-- BEGIN access_attribute_menu_option_list_function_modify -->
-						<a href="index.php?cmd=Access&amp;act=config&amp;tpl=modifyAttribute&amp;id={ACCESS_CHILD_ATTRIBUTE_ID}" title="{TXT_ACCESS_MODIFY_ATTRIBUTE}"><img src="../core/Core/View/Media/icons/edit.gif" width="16" height="16" border="0" alt="{TXT_ACCESS_MODIFY_ATTRIBUTE}" /></a>
-						<!-- END access_attribute_menu_option_list_function_modify -->
-						<!-- BEGIN access_attribute_menu_option_list_function_no_modify -->
-						<img src="../core/Core/View/Media/icons/pixel.gif" width="16" height="16" border="0" alt="unmodifiable" /></a>
-						<!-- END access_attribute_menu_option_list_function_no_modify -->
-						<!-- BEGIN access_attribute_menu_option_list_function_delete -->
-						<a href="javascript:accessDeleteAttribute('{ACCESS_CHILD_ATTRIBUTE_ID}','{ACCESS_CHILD_ATTRIBUTE_NAME_JS}')" title="{TXT_ACCESS_DELETE_ATTRIBUTE}"><img src="../core/Core/View/Media/icons/delete.gif" width="17" height="17" border="0" alt="{TXT_ACCESS_DELETE_ATTRIBUTE}" /></a>
+          <td width="15%">{TXT_ACCESS_SORT}</td>
+          <td width="85%">{ACCESS_ATTRIBUTE_SORT_TYPE}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <!-- end modifyAttribute1 div -->
+  <!-- start modifyAttribute2 div -->
+  <div id="modifyAttribute2" class="accessTab" style="display:none">
+    <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist" id="access_attribute_access_frame" style="display:{ACCESS_ATTRIBUTE_ACCESS_FRAME_DISPLAY};">
+      <thead>
+        <tr>
+          <th colspan="3">{ACCESS_PROFILE_OPERATION_TITLE}</th>
+        </tr>
+      </thead>
+      <tbody style="vertical-align:top;">
+        <tr class="row1">
+          <td>
+            {TXT_ACCESS_MODIFY_PROFILE_ATTRIBUTE_MSG}<br />
+            <br />
+            <input type="checkbox" name="access_attribute_all_access" id="access_attribute_all_access" style="border:0px; background-color:#F4F7FF;" value="1" {ACCESS_ATTRIBUTE_ACCESS_ALL_CHECKED} onclick="document.getElementById('access_attribute_select_access_frame').style.display = this.checked ? 'none' : ''" /> <label for="access_attribute_all_access">{TXT_ACCESS_EVERYONE_MOD_PERM}</label>
+          </td>
+        </tr>
+        <tr class="row2" id="access_attribute_select_access_frame" style="display:{ACCESS_ATTRIBUTE_SELECT_ACCESS_DISPLAY};">
+          <td>
+            <div style="display:block;">
+              {TXT_ACCESS_SELECT_ALLOWED_MODIFY_GROUPS}
+              <br />
+              <br />
+            </div>
+            <div style="width:300px; float:left; display:block;">
+              {TXT_ACCESS_AVAILABLE_GROUPS}<br />
+              <select name="access_attribute_not_associated_groups[]" id="access_attribute_not_associated_groups" size="15" style="width:300px;" multiple="multiple">
+              {ACCESS_ATTRIBUTE_NOT_ASSOCIATED_GROUPS}
+              </select>
+              <br />
+              <a href="javascript:void(0);" onclick="accessSelectAllGroups(document.getElementById('access_attribute_not_associated_groups'))" title="{TXT_ACCESS_CHECK_ALL}">{TXT_ACCESS_CHECK_ALL}</a>
+              <br />
+              <a href="javascript:void(0);" onclick="accessDeselectAllGroups(document.getElementById('access_attribute_not_associated_groups'))" title="{TXT_ACCESS_UNCHECK_ALL}">{TXT_ACCESS_UNCHECK_ALL}</a>
+            </div>
+            <div style="width:45px; float:left; text-align:center; display:block;">
+              <br /><input type="button" value="&gt;&gt;" name="adduser" onclick="accessAddGroupToList(document.getElementById('access_attribute_not_associated_groups'), document.getElementById('access_attribute_associated_groups'))" style="margin-bottom:2px;" /><br /><input type="button" value="&lt;&lt;" name="removeuser" onclick="accessRemoveGroupFromList(document.getElementById('access_attribute_not_associated_groups'), document.getElementById('access_attribute_associated_groups'))" />
+            </div>
+            <div style="float:left; display:block;">
+              {TXT_ACCESS_ASSOCIATED_GROUPS}<br />
+              <select name="access_attribute_associated_groups[]" id="access_attribute_associated_groups" size="15" style="width:300px;" multiple="multiple">
+              {ACCESS_USER_ASSOCIATED_GROUPS}
+              </select>
+              <br />
+              <a href="javascript:void(0);" onclick="accessSelectAllGroups(document.getElementById('access_attribute_associated_groups'))" title="{TXT_ACCESS_CHECK_ALL}">{TXT_ACCESS_CHECK_ALL}</a>
+              <br />
+              <a href="javascript:void(0);" onclick="accessDeselectAllGroups(document.getElementById('access_attribute_associated_groups'))" title="{TXT_ACCESS_UNCHECK_ALL}">{TXT_ACCESS_UNCHECK_ALL}</a>
+            </div>
+            <div style="clear:both; display:{ACCESS_ATTRIBUTE_SPECIAL_MENU_ACCESS};" id="access_attribute_special_menu_access_frame">
+              <br />
+              <br />
+              {TXT_ACCESS_SPECIAL_MENU_PERM}<br />
+              <input type="radio" name="access_attribute_special_menu_access" style="border:0px; background-color:#ffffff;" value="" {ACCESS_ATTRIBUTE_SPECIAL_NONE_CHECKED} id="access_attribute_special_menu_access_none" /><label for="access_attribute_special_menu_access_none">{TXT_ACCESS_NONE}</label><br />
+              <input type="radio" name="access_attribute_special_menu_access" style="border:0px; background-color:#ffffff;" value="menu_select_higher" {ACCESS_ATTRIBUTE_SPECIAL_HIGHER_CHECKED} id="access_attribute_special_menu_access_higher" /><label for="access_attribute_special_menu_access_higher">{TXT_ACCESS_ONLY_HIGHER_OPTION_ACCESS}</label><br />
+              <input type="radio" name="access_attribute_special_menu_access" style="border:0px; background-color:#ffffff;" value="menu_select_lower" {ACCESS_ATTRIBUTE_SPECIAL_LOWER_CHECKED} id="access_attribute_special_menu_access_lower" /><label for="access_attribute_special_menu_access_lower">{TXT_ACCESS_ONLY_LOWER_OPTION_ACCESS}</label>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <!-- end modifyAttribute2 div -->
+  <!-- start modifyAttribute3 div -->
+  <div id="modifyAttribute3" class="accessTab" style="display:none">
+    <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist" id="access_attribute_child_frame">
+      <thead>
+        <tr>
+          <th colspan="3">{ACCESS_PROFILE_OPERATION_TITLE}</th>
+        </tr>
+      </thead>
+      <tbody style="vertical-align:top;">
+        <!-- BEGIN access_attribute_children -->
+        <tr class="row3">
+          <td width="15%"><strong>{TXT_ACCESS_NAME} ({TXT_ACCESS_ID})</strong></td>
+          <td width="75%"><strong>{TXT_ACCESS_ATTRIBUTE} ({TXT_ACCESS_PREVIEW})</strong></td>
+          <td width="10%" style="text-align:right;"><strong>{TXT_ACCESS_FUNCTIONS}</strong></td>
+        </tr>
+        <!-- BEGIN access_attribute_child_list -->
+          <tr class="row{ACCESS_CHILD_ATTRIBUTE_ROW_CLASS}" id="access_attribute_child_row_{ACCESS_CHILD_ATTRIBUTE_ID}">
+            <td>{ACCESS_CHILD_ATTRIBUTE_NAME} ({ACCESS_CHILD_ATTRIBUTE_ID})</td>
+            <td>{ACCESS_CHILD_ATTRIBUTE}</td>
+            <td style="text-align:right;">&nbsp;
+              <!-- BEGIN access_attribute_child_list_sort -->
+              <input type="hidden" name="access_attribute_sort_order[{ACCESS_CHILD_ATTRIBUTE_ID}]" value="{ACCESS_CHILD_ATTRIBUTE_SORT_NR}" />
+              <div style="display:{ACCESS_CHILD_SORT_ORDER_DISPLAY}" name="access_attribute_child_sort_buttons">
+                <a href="javascript:accessChangeAttributeSort('{ACCESS_CHILD_ATTRIBUTE_ID}','up','access_attribute_child_frame','access_attribute_child_row_');" title="{TXT_ACCESS_MOVE_UP}"><img src="../core/Core/View/Media/icons/up.gif" width="14" height="12" border="0" alt="{TXT_ACCESS_MOVE_UP}" /></a>
+                <a href="javascript:accessChangeAttributeSort('{ACCESS_CHILD_ATTRIBUTE_ID}','down','access_attribute_child_frame','access_attribute_child_row_');" title="{TXT_ACCESS_MOVE_DOWN}"><img src="../core/Core/View/Media/icons/down.gif" width="14" height="12" border="0" alt="{TXT_ACCESS_MOVE_DOWN}" /></a>
+              </div>
+              <!-- END access_attribute_child_list_sort -->
+              <!-- BEGIN access_attribute_child_list_function_modify -->
+              <a href="index.php?cmd=Access&amp;act=config&amp;tpl=modifyAttribute&amp;id={ACCESS_CHILD_ATTRIBUTE_ID}" title="{TXT_ACCESS_MODIFY_ATTRIBUTE}"><img src="../core/Core/View/Media/icons/edit.gif" width="16" height="16" border="0" alt="{TXT_ACCESS_MODIFY_ATTRIBUTE}" /></a>
+              <!-- END access_attribute_child_list_function_modify -->
+              <!-- BEGIN access_attribute_child_list_function_no_modify -->
+              <img src="../core/Core/View/Media/icons/pixel.gif" width="16" height="16" border="0" alt="unmodifiable" /></a>
+              <!-- END access_attribute_child_list_function_no_modify -->
+              <!-- BEGIN access_attribute_child_list_function_delete -->
+              <a href="javascript:accessDeleteAttribute('{ACCESS_CHILD_ATTRIBUTE_ID}','{ACCESS_CHILD_ATTRIBUTE_NAME_JS}')" title="{TXT_ACCESS_DELETE_ATTRIBUTE}"><img src="../core/Core/View/Media/icons/delete.gif" width="17" height="17" border="0" alt="{TXT_ACCESS_DELETE_ATTRIBUTE}" /></a>
+              <!-- END access_attribute_child_list_function_delete -->
+              <!-- BEGIN access_attribute_child_list_function_no_delete -->
+              <img src="../core/Core/View/Media/icons/pixel.gif" width="17" height="17" border="0" alt="unquenchable" /></a>
+              <!-- END access_attribute_child_list_function_no_delete -->
+            </td>
+          </tr>
+        <!-- END access_attribute_child_list -->
+        <!-- END access_attribute_children -->
+        <!-- BEGIN access_attribute_child_add -->
+        <tr class="row{ACCESS_CHILD_ATTRIBUTE_ROW_CLASS}">
+          <td colspan="3" style="padding:10px;"><input type="button" value="{ACCESS_ADD_CHILD_TXT}" onclick="accessAddChild({ACCESS_IS_NEW_ATTRIBUTE})" /></td>
+        </tr>
+        <!-- END access_attribute_child_add -->
+      </tbody>
+    </table>
+  </div>
+  <!-- end modifyAttribute3 div -->
+  <!-- start modifyAttribute4 div -->
+  <div id="modifyAttribute4" class="accessTab" style="display:none">
+    <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist" id="access_attribute_menu_option_frame">
+      <thead>
+        <tr>
+          <th colspan="2">{ACCESS_PROFILE_OPERATION_TITLE}</th>
+        </tr>
+      </thead>
+      <tbody style="vertical-align:top;">
+        <!-- BEGIN access_attribute_menu_options -->
+        <tr class="row3">
+          <td width="90%"><strong>{TXT_ACCESS_SELECT_OPTION} ({TXT_ACCESS_ID})</strong></td>
+          <td width="10%" style="text-align:right;"><strong>{TXT_ACCESS_FUNCTIONS}</strong></td>
+        </tr>
+        <!-- BEGIN access_attribute_menu_option_list -->
+        <tr class="row{ACCESS_CHILD_ATTRIBUTE_ROW_CLASS}" id="access_attribute_select_option_row_{ACCESS_CHILD_ATTRIBUTE_ID}">
+          <td>{ACCESS_CHILD_ATTRIBUTE_NAME} ({ACCESS_CHILD_ATTRIBUTE_ID})</td>
+          <td style="text-align:right;">&nbsp;
+            <!-- BEGIN access_attribute_menu_option_list_sort -->
+            <input type="hidden" name="access_attribute_sort_order[{ACCESS_CHILD_ATTRIBUTE_ID}]" value="{ACCESS_CHILD_ATTRIBUTE_SORT_NR}" />
+            <div style="display:{ACCESS_CHILD_SORT_ORDER_DISPLAY}" name="access_attribute_child_sort_buttons">
+              <a href="javascript:accessChangeAttributeSort('{ACCESS_CHILD_ATTRIBUTE_ID}','up','access_attribute_menu_option_frame','access_attribute_select_option_row_');" title="{TXT_ACCESS_MOVE_UP}"><img src="../core/Core/View/Media/icons/up.gif" width="14" height="12" border="0" alt="{TXT_ACCESS_MOVE_UP}" /></a>
+              <a href="javascript:accessChangeAttributeSort('{ACCESS_CHILD_ATTRIBUTE_ID}','down','access_attribute_menu_option_frame','access_attribute_select_option_row_');" title="{TXT_ACCESS_MOVE_DOWN}"><img src="../core/Core/View/Media/icons/down.gif" width="14" height="12" border="0" alt="{TXT_ACCESS_MOVE_DOWN}" /></a>
+            </div>
+            <!-- END access_attribute_menu_option_list_sort -->
+            <!-- BEGIN access_attribute_menu_option_list_function_modify -->
+            <a href="index.php?cmd=Access&amp;act=config&amp;tpl=modifyAttribute&amp;id={ACCESS_CHILD_ATTRIBUTE_ID}" title="{TXT_ACCESS_MODIFY_ATTRIBUTE}"><img src="../core/Core/View/Media/icons/edit.gif" width="16" height="16" border="0" alt="{TXT_ACCESS_MODIFY_ATTRIBUTE}" /></a>
+            <!-- END access_attribute_menu_option_list_function_modify -->
+            <!-- BEGIN access_attribute_menu_option_list_function_no_modify -->
+            <img src="../core/Core/View/Media/icons/pixel.gif" width="16" height="16" border="0" alt="unmodifiable" /></a>
+            <!-- END access_attribute_menu_option_list_function_no_modify -->
+            <!-- BEGIN access_attribute_menu_option_list_function_delete -->
+            <a href="javascript:accessDeleteAttribute('{ACCESS_CHILD_ATTRIBUTE_ID}','{ACCESS_CHILD_ATTRIBUTE_NAME_JS}')" title="{TXT_ACCESS_DELETE_ATTRIBUTE}"><img src="../core/Core/View/Media/icons/delete.gif" width="17" height="17" border="0" alt="{TXT_ACCESS_DELETE_ATTRIBUTE}" /></a>
 
-						<!-- END access_attribute_menu_option_list_function_delete -->
-						<!-- BEGIN access_attribute_menu_option_list_function_no_delete -->
-						<img src="../core/Core/View/Media/icons/pixel.gif" width="17" height="17" border="0" alt="unquenchable" /></a>
-						<!-- END access_attribute_menu_option_list_function_no_delete -->
-					</td>
-				</tr>
-				<!-- END access_attribute_menu_option_list -->
-				<!-- END access_attribute_menu_options -->
-				<!-- BEGIN access_attribute_menu_option_add -->
-				<tr class="row{ACCESS_CHILD_ATTRIBUTE_ROW_CLASS}">
-					<td colspan="2" style="padding:10px;"><input type="button" value="{TXT_ACCESS_ADD_NEW_SELECT_OPTION}" onclick="accessAddChild({ACCESS_IS_NEW_ATTRIBUTE})" /></td>
-				</tr>
-				<!-- END access_attribute_menu_option_add -->
-			</tbody>
-		</table>
-	</div>
-	<!-- end modifyAttribute4 div -->
-	<!-- start modifyAttribute5 div -->
-	<div id="modifyAttribute5" class="accessTab" style="display:none">
-		<table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist" id="access_attribute_frames_frame">
-			<thead>
-				<tr>
-					<th colspan="2">{ACCESS_PROFILE_OPERATION_TITLE}</th>
-				</tr>
-			</thead>
-			<tbody style="vertical-align:top;">
-				<!-- BEGIN access_attribute_frames -->
-				<tr class="row3">
-					<td width="90%"><strong>{TXT_ACCESS_FRAME} ({TXT_ACCESS_ID})</strong></td>
-					<td width="10%" style="text-align:right;"><strong>{TXT_ACCESS_FUNCTIONS}</strong></td>
-				</tr>
-				<!-- BEGIN access_attribute_frames_list -->
-				<tr class="row{ACCESS_CHILD_ATTRIBUTE_ROW_CLASS}" id="access_attribute_frame_row_{ACCESS_CHILD_ATTRIBUTE_ID}">
-					<td>{ACCESS_CHILD_ATTRIBUTE_NAME} ({ACCESS_CHILD_ATTRIBUTE_ID})</td>
-					<td style="text-align:right;">&nbsp;
-						<!-- BEGIN access_attribute_frames_list_sort -->
-						<input type="hidden" name="access_attribute_sort_order[{ACCESS_CHILD_ATTRIBUTE_ID}]" value="{ACCESS_CHILD_ATTRIBUTE_SORT_NR}" />
-						<div style="display:{ACCESS_CHILD_SORT_ORDER_DISPLAY}" name="access_attribute_child_sort_buttons">
-							<a href="javascript:accessChangeAttributeSort('{ACCESS_CHILD_ATTRIBUTE_ID}','up','access_attribute_frames_frame','access_attribute_frame_row_');" title="{TXT_ACCESS_MOVE_UP}"><img src="../core/Core/View/Media/icons/up.gif" width="14" height="12" border="0" alt="{TXT_ACCESS_MOVE_UP}" /></a>
-							<a href="javascript:accessChangeAttributeSort('{ACCESS_CHILD_ATTRIBUTE_ID}','down','access_attribute_frames_frame','access_attribute_frame_row_');" title="{TXT_ACCESS_MOVE_DOWN}"><img src="../core/Core/View/Media/icons/down.gif" width="14" height="12" border="0" alt="{TXT_ACCESS_MOVE_DOWN}" /></a>
-						</div>
-						<!-- END access_attribute_frames_list_sort -->
-						<!-- BEGIN access_attribute_frames_list_function_modify -->
-						<a href="index.php?cmd=Access&amp;act=config&amp;tpl=modifyAttribute&amp;id={ACCESS_CHILD_ATTRIBUTE_ID}" title="{TXT_ACCESS_MODIFY_ATTRIBUTE}"><img src="../core/Core/View/Media/icons/edit.gif" width="16" height="16" border="0" alt="{TXT_ACCESS_MODIFY_ATTRIBUTE}" /></a>
-						<!-- END access_attribute_frames_list_function_modify -->
-						<!-- BEGIN access_attribute_frames_list_function_no_modify -->
-						<img src="../core/Core/View/Media/icons/pixel.gif" width="16" height="16" border="0" alt="unmodifiable" /></a>
-						<!-- END access_attribute_frames_list_function_no_modify -->
-						<!-- BEGIN access_attribute_frames_list_function_delete -->
-						<a href="javascript:accessDeleteAttribute('{ACCESS_CHILD_ATTRIBUTE_ID}','{ACCESS_CHILD_ATTRIBUTE_NAME_JS}')" title="{TXT_ACCESS_DELETE_ATTRIBUTE}"><img src="../core/Core/View/Media/icons/delete.gif" width="17" height="17" border="0" alt="{TXT_ACCESS_DELETE_ATTRIBUTE}" /></a>
-						<!-- END access_attribute_frames_list_function_delete -->
-						<!-- BEGIN access_attribute_frames_list_function_no_delete -->
-						<img src="../core/Core/View/Media/icons/pixel.gif" width="17" height="17" border="0" alt="unquenchable" /></a>
-						<!-- END access_attribute_frames_list_function_no_delete -->
-					</td>
-				</tr>
-				<!-- END access_attribute_frames_list -->
-				<!-- END access_attribute_frames -->
-				<!-- BEGIN access_attribute_frame_add -->
-				<tr class="row{ACCESS_CHILD_ATTRIBUTE_ROW_CLASS}">
-					<td colspan="2" style="padding:10px;"><input type="button" value="{TXT_ACCESS_ADD_NEW_FRAME}" onclick="accessAddChild({ACCESS_IS_NEW_ATTRIBUTE})" /></td>
-				</tr>
-				<!-- END access_attribute_frame_add -->
-			</tbody>
-		</table>
-	</div>
-	<!-- end modifyAttribute5 div -->
-	<br />
-	<input type="button" onclick="accessBack2ParentAttribute()" value="{TXT_ACCESS_BACK}" />
-	<input type="submit" id="access_form_submit_button" name="access_store_attribute" value="{TXT_ACCESS_SAVE}" />
-	<!-- BEGIN access_add_other_child_box -->
-	<input type="checkbox" id="access_add_other_after_store" name="access_add_other_after_store" value="1" style="border: 0px;" /><label for="access_add_other_after_store">{ACCESS_ADD_OTHER_CHILD_TXT}</label>
-	<!-- END access_add_other_child_box -->
+            <!-- END access_attribute_menu_option_list_function_delete -->
+            <!-- BEGIN access_attribute_menu_option_list_function_no_delete -->
+            <img src="../core/Core/View/Media/icons/pixel.gif" width="17" height="17" border="0" alt="unquenchable" /></a>
+            <!-- END access_attribute_menu_option_list_function_no_delete -->
+          </td>
+        </tr>
+        <!-- END access_attribute_menu_option_list -->
+        <!-- END access_attribute_menu_options -->
+        <!-- BEGIN access_attribute_menu_option_add -->
+        <tr class="row{ACCESS_CHILD_ATTRIBUTE_ROW_CLASS}">
+          <td colspan="2" style="padding:10px;"><input type="button" value="{TXT_ACCESS_ADD_NEW_SELECT_OPTION}" onclick="accessAddChild({ACCESS_IS_NEW_ATTRIBUTE})" /></td>
+        </tr>
+        <!-- END access_attribute_menu_option_add -->
+      </tbody>
+    </table>
+  </div>
+  <!-- end modifyAttribute4 div -->
+  <!-- start modifyAttribute5 div -->
+  <div id="modifyAttribute5" class="accessTab" style="display:none">
+    <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist" id="access_attribute_frames_frame">
+      <thead>
+        <tr>
+          <th colspan="2">{ACCESS_PROFILE_OPERATION_TITLE}</th>
+        </tr>
+      </thead>
+      <tbody style="vertical-align:top;">
+        <!-- BEGIN access_attribute_frames -->
+        <tr class="row3">
+          <td width="90%"><strong>{TXT_ACCESS_FRAME} ({TXT_ACCESS_ID})</strong></td>
+          <td width="10%" style="text-align:right;"><strong>{TXT_ACCESS_FUNCTIONS}</strong></td>
+        </tr>
+        <!-- BEGIN access_attribute_frames_list -->
+        <tr class="row{ACCESS_CHILD_ATTRIBUTE_ROW_CLASS}" id="access_attribute_frame_row_{ACCESS_CHILD_ATTRIBUTE_ID}">
+          <td>{ACCESS_CHILD_ATTRIBUTE_NAME} ({ACCESS_CHILD_ATTRIBUTE_ID})</td>
+          <td style="text-align:right;">&nbsp;
+            <!-- BEGIN access_attribute_frames_list_sort -->
+            <input type="hidden" name="access_attribute_sort_order[{ACCESS_CHILD_ATTRIBUTE_ID}]" value="{ACCESS_CHILD_ATTRIBUTE_SORT_NR}" />
+            <div style="display:{ACCESS_CHILD_SORT_ORDER_DISPLAY}" name="access_attribute_child_sort_buttons">
+              <a href="javascript:accessChangeAttributeSort('{ACCESS_CHILD_ATTRIBUTE_ID}','up','access_attribute_frames_frame','access_attribute_frame_row_');" title="{TXT_ACCESS_MOVE_UP}"><img src="../core/Core/View/Media/icons/up.gif" width="14" height="12" border="0" alt="{TXT_ACCESS_MOVE_UP}" /></a>
+              <a href="javascript:accessChangeAttributeSort('{ACCESS_CHILD_ATTRIBUTE_ID}','down','access_attribute_frames_frame','access_attribute_frame_row_');" title="{TXT_ACCESS_MOVE_DOWN}"><img src="../core/Core/View/Media/icons/down.gif" width="14" height="12" border="0" alt="{TXT_ACCESS_MOVE_DOWN}" /></a>
+            </div>
+            <!-- END access_attribute_frames_list_sort -->
+            <!-- BEGIN access_attribute_frames_list_function_modify -->
+            <a href="index.php?cmd=Access&amp;act=config&amp;tpl=modifyAttribute&amp;id={ACCESS_CHILD_ATTRIBUTE_ID}" title="{TXT_ACCESS_MODIFY_ATTRIBUTE}"><img src="../core/Core/View/Media/icons/edit.gif" width="16" height="16" border="0" alt="{TXT_ACCESS_MODIFY_ATTRIBUTE}" /></a>
+            <!-- END access_attribute_frames_list_function_modify -->
+            <!-- BEGIN access_attribute_frames_list_function_no_modify -->
+            <img src="../core/Core/View/Media/icons/pixel.gif" width="16" height="16" border="0" alt="unmodifiable" /></a>
+            <!-- END access_attribute_frames_list_function_no_modify -->
+            <!-- BEGIN access_attribute_frames_list_function_delete -->
+            <a href="javascript:accessDeleteAttribute('{ACCESS_CHILD_ATTRIBUTE_ID}','{ACCESS_CHILD_ATTRIBUTE_NAME_JS}')" title="{TXT_ACCESS_DELETE_ATTRIBUTE}"><img src="../core/Core/View/Media/icons/delete.gif" width="17" height="17" border="0" alt="{TXT_ACCESS_DELETE_ATTRIBUTE}" /></a>
+            <!-- END access_attribute_frames_list_function_delete -->
+            <!-- BEGIN access_attribute_frames_list_function_no_delete -->
+            <img src="../core/Core/View/Media/icons/pixel.gif" width="17" height="17" border="0" alt="unquenchable" /></a>
+            <!-- END access_attribute_frames_list_function_no_delete -->
+          </td>
+        </tr>
+        <!-- END access_attribute_frames_list -->
+        <!-- END access_attribute_frames -->
+        <!-- BEGIN access_attribute_frame_add -->
+        <tr class="row{ACCESS_CHILD_ATTRIBUTE_ROW_CLASS}">
+          <td colspan="2" style="padding:10px;"><input type="button" value="{TXT_ACCESS_ADD_NEW_FRAME}" onclick="accessAddChild({ACCESS_IS_NEW_ATTRIBUTE})" /></td>
+        </tr>
+        <!-- END access_attribute_frame_add -->
+      </tbody>
+    </table>
+  </div>
+  <!-- end modifyAttribute5 div -->
+  <br />
+  <input type="button" onclick="accessBack2ParentAttribute()" value="{TXT_ACCESS_BACK}" />
+  <input type="submit" id="access_form_submit_button" name="access_store_attribute" value="{TXT_ACCESS_SAVE}" />
+  <!-- BEGIN access_add_other_child_box -->
+  <input type="checkbox" id="access_add_other_after_store" name="access_add_other_after_store" value="1" style="border: 0px;" /><label for="access_add_other_after_store">{ACCESS_ADD_OTHER_CHILD_TXT}</label>
+  <!-- END access_add_other_child_box -->
 </form>
 <!-- end module_access_config_attribute_modify.html -->

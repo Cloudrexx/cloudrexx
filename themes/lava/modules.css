@@ -176,7 +176,7 @@ div.row2 {
 /***************************************************/
 /* CSS DEFINITIONS FOR CONTACT MODULE              */
 /***************************************************/
-#contactForm {    
+#contactForm {
     width: 100%;
     padding: 15px 0 0 0;
 }
@@ -609,7 +609,7 @@ div.row2 {
     float: left;
     border-top: 1px solid #ECEDF3;
 }
-#directory .selector {    
+#directory .selector {
     clear: left;
     margin-top: -15px;
     padding-left: 190px;
@@ -1219,7 +1219,7 @@ div.row2 {
     float: left;
     width: 20%;
 }
-#shop div.price {    
+#shop div.price {
     padding: 5px 10px 4px 10px;
     color: white;
     font-size: 15px;
@@ -1412,7 +1412,7 @@ div.row2 {
     padding: 10px 8px 0 0;
 }
 #shop button.details-button {
-    float: right;    
+    float: right;
     color: #FFFFFF;
     font-weight: bold;
     background: #FF755A url('images/arrow-right-white.png') no-repeat 67px 15px;

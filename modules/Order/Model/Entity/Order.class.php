@@ -38,7 +38,7 @@ namespace Cx\Modules\Order\Model\Entity;
 
 /**
  * Class Order
- * 
+ *
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
@@ -50,7 +50,7 @@ class Order extends \Cx\Model\Base\EntityBase {
      * @var integer $id
      */
     protected $id;
-    
+
     /**
      * @var integer $contactId
      */
@@ -81,7 +81,7 @@ class Order extends \Cx\Model\Base\EntityBase {
 
     /**
      * Get the id
-     * 
+     *
      * @return integer $id
      */
     public function getId() {
@@ -104,7 +104,7 @@ class Order extends \Cx\Model\Base\EntityBase {
     public function setContactId($contactId) {
         $this->contactId = $contactId;
     }
-    
+
     /**
      * get the contactId
      *
@@ -136,25 +136,25 @@ class Order extends \Cx\Model\Base\EntityBase {
 
     /**
      * Add the subscription
-     * 
+     *
      * @param \Cx\Modules\Order\Model\Entity\Subscription $subscription
      */
     public function addSubscription(Subscription $subscription) {
-        $this->subscriptions[] = $subscription; 
+        $this->subscriptions[] = $subscription;
     }
-    
+
     /**
      * Get the subscription
-     * 
+     *
      * @return \Cx\Modules\Order\Model\Entity\subscription $subscriptions
      */
     public function getSubscriptions() {
         return $this->subscriptions;
     }
-    
+
     /**
      * Set the subscription
-     * 
+     *
      * @param object $subscriptions
      */
     public function setSubscriptions($subscriptions) {
@@ -166,30 +166,30 @@ class Order extends \Cx\Model\Base\EntityBase {
         $subscription->setOrder($this, true);
         \Env::get('em')->persist($subscription);
         $this->addSubscription($subscription);
-        
+
         return $subscription;
     }
-    
+
     /**
      * Get the Invoices
-     * 
+     *
      * @return array
      */
     public function getInvoices() {
         return $this->invoices;
     }
-    
+
     /**
      * Set the invoices
-     * 
+     *
      * @param array $invoices
      */
     public function setInvoices($invoices) {
         $this->invoices = $invoices;
     }
-    
+
     /**
-     * 
+     *
      * @param \Cx\Modules\Order\Model\Entity\Invoice $invoice
      */
     public function addInvoice(Invoice $invoice) {
@@ -203,12 +203,12 @@ class Order extends \Cx\Model\Base\EntityBase {
     }
     /**
      * Add Invoice to the subscriptions
-     * 
+     *
      */
     public function billSubscriptions() {
         $subscriptions = array();
         foreach ($this->subscriptions as $subscription) {
-            if ($subscription->getPaymentState() == $subscription::PAYMENT_OPEN || 
+            if ($subscription->getPaymentState() == $subscription::PAYMENT_OPEN ||
                 ($subscription->getPaymentState() == $subscription::PAYMENT_RENEWAL && $subscription->getRenewalDate()->getTimestamp() <= time())) {
                 $subscriptions[] = $subscription;
             }
@@ -218,7 +218,7 @@ class Order extends \Cx\Model\Base\EntityBase {
         }
         //Create New Invoice
         $invoice = new Invoice();
-        
+
         foreach ($subscriptions as $subscription) {
             //Create New Invoice Item
             $invoiceItem = new InvoiceItem();
@@ -226,7 +226,7 @@ class Order extends \Cx\Model\Base\EntityBase {
             $invoiceItem->setDescription($subscription->getProduct()->getName() . ' (' . $subscription->getProductEntity() . ')');
             //Add InvoiceItem::$price to Subscription::getPaymentAmount()
             $invoiceItem->setPrice($subscription->getPaymentAmount());
-            
+
             \Env::get('em')->persist($invoiceItem);
             //Attached to the created invoice
             $invoice->addInvoiceItem($invoiceItem);
@@ -237,18 +237,17 @@ class Order extends \Cx\Model\Base\EntityBase {
         $this->addInvoice($invoice);
     }
     /**
-     * 
+     *
      * @return array all associated Invoices that have attribute \Cx\Modules\Order\Model\Entity\Invoice::$paid set to false.
      */
     public function getUnpaidInvoices() {
         $invoices = array();
         foreach ($this->invoices as $invoice) {
             if(!$invoice->getPaid()) {
-                $invoices[] = $invoice; 
+                $invoices[] = $invoice;
             }
         }
         return $invoices;
-        
+
     }
 }
-

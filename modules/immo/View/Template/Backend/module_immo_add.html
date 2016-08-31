@@ -1,36 +1,36 @@
 <!-- START module_immo_add.html -->
 <script type="text/javascript">
 //<![CDATA[
-	var fieldID;
-	var langID;
-	var langcount=2
-	var elInputID;
-	var elinputid;
-	var value;
-	var popUp;
-	var browserPopup;
-	var notDefined;
-	var ltype;
-	var elName;
-	var par;
-	var ol='null';
-	var div=new Array();
-	var i;
-	try{
-		document.body.onresize=function(){
-			handleResize();
-		}
-	}catch(e){}
+  var fieldID;
+  var langID;
+  var langcount=2
+  var elInputID;
+  var elinputid;
+  var value;
+  var popUp;
+  var browserPopup;
+  var notDefined;
+  var ltype;
+  var elName;
+  var par;
+  var ol='null';
+  var div=new Array();
+  var i;
+  try{
+    document.body.onresize=function(){
+      handleResize();
+    }
+  }catch(e){}
 
-	try{
-		document.body.setAttribute('onresize', 'handleResize();');
-	}catch(e){}
+  try{
+    document.body.setAttribute('onresize', 'handleResize();');
+  }catch(e){}
 
-	 /*
+   /*
         Written by Jonathan Snook, http://www.snook.ca/jonathan
         Add-ons by Robert Nyman, http://www.robertnyman.com
     */
-	function getElementsByClassName(oElm, strTagName, strClassName){
+  function getElementsByClassName(oElm, strTagName, strClassName){
         var arrElements = (strTagName == "*" && document.all)? document.all : oElm.getElementsByTagName(strTagName);
         var arrReturnElements = new Array();
         strClassName = strClassName.replace(/\-/g, "\\-");
@@ -46,400 +46,400 @@
     }
 
 
-	if (document.ELEMENT_NODE == null) {
- 		 document.ELEMENT_NODE = 1;
- 		 document.TEXT_NODE = 3;
-	}
+  if (document.ELEMENT_NODE == null) {
+      document.ELEMENT_NODE = 1;
+      document.TEXT_NODE = 3;
+  }
 
-	var handleResize = function(){
-		try{
-			pos = getInputPosition(document.getElementsByName(elinputid)[0]);
-			with(ol){
-					style.left = pos.X;
-					style.top = pos.Y;
-			}
-			removeTrace();
-			createTrace(getInputPosition(document.getElementsByName(elInputID)[0]), getInputPosition(ol));
-		}catch(e){}
-	}
+  var handleResize = function(){
+    try{
+      pos = getInputPosition(document.getElementsByName(elinputid)[0]);
+      with(ol){
+          style.left = pos.X;
+          style.top = pos.Y;
+      }
+      removeTrace();
+      createTrace(getInputPosition(document.getElementsByName(elInputID)[0]), getInputPosition(ol));
+    }catch(e){}
+  }
 
-	function getXMLHttpRequestObj() {
-	  var objXHR;
-	  if(window.XMLHttpRequest) {
-	      objXHR = new XMLHttpRequest();
-	  } else if(window.ActiveXObject) {
-	      objXHR = new ActiveXObject("Microsoft.XMLHTTP");
-	  }
-	  return objXHR;
-	}
+  function getXMLHttpRequestObj() {
+    var objXHR;
+    if(window.XMLHttpRequest) {
+        objXHR = new XMLHttpRequest();
+    } else if(window.ActiveXObject) {
+        objXHR = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    return objXHR;
+  }
 
-	var http = getXMLHttpRequestObj();
+  var http = getXMLHttpRequestObj();
 
-	var fileBrowserPopUpLoaded = function(popup){
-		TD = popup.document.getElementById('pathTD');
-		TD.childNodes[0].data += "  Ref.Nr.: {IMMO_REF_NR}  Ref.Notiz: {IMMO_REF_NR_NOTE}"
-	}
+  var fileBrowserPopUpLoaded = function(popup){
+    TD = popup.document.getElementById('pathTD');
+    TD.childNodes[0].data += "  Ref.Nr.: {IMMO_REF_NR}  Ref.Notiz: {IMMO_REF_NR_NOTE}"
+  }
 
 
     var openBrowser = function openBrowser(url, id ,attrs, xtype, xelName) {
-    	fieldID=id;
-    	ltype=xtype;
-    	elName=xelName;
-    	try{
-			if(!browserPopup.closed){
-				return browserPopup.focus();
-			}
-		}catch(e){}
-		if (!window.focus){
-			return true;
-		}
-  		browserPopup = window.open(url, "", attrs);
-  		browserPopup.focus();
-  		return false;
+      fieldID=id;
+      ltype=xtype;
+      elName=xelName;
+      try{
+      if(!browserPopup.closed){
+        return browserPopup.focus();
+      }
+    }catch(e){}
+    if (!window.focus){
+      return true;
+    }
+      browserPopup = window.open(url, "", attrs);
+      browserPopup.focus();
+      return false;
     }
 
     /** findpos functions code by Peter-Paul Koch (quirksmode.org)
     */
     var findPosX = function(obj){
-		var curleft = 0;
-		if (obj.offsetParent)
-		{
-			while (obj.offsetParent)
-			{
-				curleft += obj.offsetLeft
-				obj = obj.offsetParent;
-			}
-		}
-		else if (obj.x)
-			curleft += obj.x;
-		return curleft;
-	}
+    var curleft = 0;
+    if (obj.offsetParent)
+    {
+      while (obj.offsetParent)
+      {
+        curleft += obj.offsetLeft
+        obj = obj.offsetParent;
+      }
+    }
+    else if (obj.x)
+      curleft += obj.x;
+    return curleft;
+  }
 
-	var findPosY = function(obj){
-		var curtop = 0;
-		if (obj.offsetParent)
-		{
-			while (obj.offsetParent)
-			{
-				curtop += obj.offsetTop
-				obj = obj.offsetParent;
-			}
-		}
-		else if (obj.y)
-			curtop += obj.y;
-		return curtop;
-	}
+  var findPosY = function(obj){
+    var curtop = 0;
+    if (obj.offsetParent)
+    {
+      while (obj.offsetParent)
+      {
+        curtop += obj.offsetTop
+        obj = obj.offsetParent;
+      }
+    }
+    else if (obj.y)
+      curtop += obj.y;
+    return curtop;
+  }
 
     var SetUrl = function(url, width, height, alt) {
 
-		switch(ltype){
-    		case 'img':
-			   	notDefined = true;
-		    	elInput = document.getElementById("hi_"+fieldID);
+    switch(ltype){
+        case 'img':
+           notDefined = true;
+          elInput = document.getElementById("hi_"+fieldID);
 
-				elInput.setAttribute('type', 'hidden');
-				elInput.setAttribute('name', 'hi_'+fieldID);
-				elInput.setAttribute('id', 'hi_'+fieldID);
-				elInput.setAttribute('value', url);
+        elInput.setAttribute('type', 'hidden');
+        elInput.setAttribute('name', 'hi_'+fieldID);
+        elInput.setAttribute('id', 'hi_'+fieldID);
+        elInput.setAttribute('value', url);
 
-				if(document.getElementById('lnk_'+fieldID) == null){
-					notDefined = true;
-		    	}else{
-		    		notDefined = false;
-		    	}
+        if(document.getElementById('lnk_'+fieldID) == null){
+          notDefined = true;
+          }else{
+            notDefined = false;
+          }
 
-				fileRegExp = /.+\/(.+)$/;
-				fileRegExp.exec(url);
-
-
-				if(notDefined){
-					elTxt = document.createTextNode(RegExp.$1);
-				}
-
-				img = document.getElementById("img"+fieldID);
-				img.src = url;
-				if(width > height){
-					fact = 60 / width;
-					img.style.width = width*fact+'px';
-					img.style.height = height*fact+'px';
-				}else{
-					fact = 60 / height;
-					img.style.height = height*fact+'px';
-					img.style.width = width*fact+'px';
-				}
-				if(notDefined){
-					elALink = document.createElement('a');
-				}else{
-					elALink = document.getElementById("lnk_"+fieldID);
-				}
-				elALink.setAttribute('href', url);
-				elALink.setAttribute('target', '_blank');
-				elALink.setAttribute('id', 'lnk_'+fieldID);
-				elALink.setAttribute('title', '{TXT_IMMO_SHOW_FILE}');
-
-				if(notDefined){
-					elALink.appendChild(elTxt);
-					img.parentNode.appendChild(elALink);
-					img.parentNode.appendChild(elInput);
-					img.parentNode.insertBefore(document.createElement('br'), elALink);
-				}else{
-					elALink.removeChild(elTxt);
-					elTxt = document.createTextNode(RegExp.$1);
-					elALink.appendChild(elTxt);
-				}
-			break;
-
-			case 'pdf':
-				document.getElementsByName(elName)[0].value = url;
-			break;
-    	}
-	}
-
-	var decimalOnly = function(str){
-		return str.replace(/[^0-9\.]/g, '');
-	}
-
-	var decimalOnlyCoords = function(str){
-		str = str.replace(/[^0-9\-]/g, '');
-		if(str.indexOf('-', 1) == -1){
-			return str;
-		}else{
-			return '-'+str.replace(/-/g, '');
-		}
-	}
-
-	var mapPopUp = function(obj){
-		try{
-			if(! popUp.closed){
-				return popUp.focus();
-			}
-		}catch(e){}
-
-		url='?cmd=immo&{CSRF_PARAM}&act=map&standalone=true';
-		if (!window.focus){
-			return true;
-		}
-		popUp = window.open(url, 'GoogleMap', 'width=800,height=700,scrollbars=no');
-		popUp.focus();
-		return false;
-	}
+        fileRegExp = /.+\/(.+)$/;
+        fileRegExp.exec(url);
 
 
-	function sendReq(fID, lID, val, eID) {
-		fieldID=fID;
-		langID=lID;
-		value=val;
-		elInputID=eID;
+        if(notDefined){
+          elTxt = document.createTextNode(RegExp.$1);
+        }
 
-		try{
-			if(fieldID && langID && elInputID){
-				http.open('get', '?cmd=immo&standalone=1&act=rpc&fieldid='+fieldID+'&langid='+langID+'&value='+value+'&ID='+elInputID);
-				http.onreadystatechange = showSuggestions;
-	  			http.send(null);
-			}
-		}catch(e){
-			return false;
-		}
-	}
+        img = document.getElementById("img"+fieldID);
+        img.src = url;
+        if(width > height){
+          fact = 60 / width;
+          img.style.width = width*fact+'px';
+          img.style.height = height*fact+'px';
+        }else{
+          fact = 60 / height;
+          img.style.height = height*fact+'px';
+          img.style.width = width*fact+'px';
+        }
+        if(notDefined){
+          elALink = document.createElement('a');
+        }else{
+          elALink = document.getElementById("lnk_"+fieldID);
+        }
+        elALink.setAttribute('href', url);
+        elALink.setAttribute('target', '_blank');
+        elALink.setAttribute('id', 'lnk_'+fieldID);
+        elALink.setAttribute('title', '{TXT_IMMO_SHOW_FILE}');
 
-	var showSuggestions = function(){
-		if(http.readyState == 4){
-			try{
-				if(ol!='null'){
-					try{
-						ol.parentNode.removeChild(ol);
-					}catch(e){}
-				}
-				removeTrace();
-				if(http.responseText.indexOf('{}') != -1
-				|| http.responseText.indexOf('{ 0:""}') != -1
-				|| http.responseText.indexOf('<!D') != -1){
-					return false;
-				}
-				eval(http.responseText);
-				elInput = document.getElementsByName(elInputID)[0];
-				par = elInput.parentNode;
-				while(par.tagName != 'TD'){
-					par = par.parentNode;
-				}
-				lang = parseInt(elInputID.substr(elInputID.length-1,elInputID.length));
-				if(lang!=1){
-					elinputid = elInputID.substr(0,(elInputID.length-1))+(lang-1);
-				}else{
-					elinputid = elInputID;
-				}
-				pos = getInputPosition(document.getElementsByName(elinputid)[0]);
-				ol = createList(sugg);
-				if(!ol){
-					return false;
-				}
-				with(ol){
-					style.cursor = "pointer";
-					style.padding = "0px 0px 0px 1px";
-					style.border = "solid 1px #000";
-					style.position = "absolute";
-					style.left = pos.X;
-					style.top = pos.Y;
-				}
-				par.appendChild(ol);
-//				createTrace(getInputPosition(document.getElementsByName(elInputID)[0]), getInputPosition(ol));
-			}catch(e){}
-		}
-	}
+        if(notDefined){
+          elALink.appendChild(elTxt);
+          img.parentNode.appendChild(elALink);
+          img.parentNode.appendChild(elInput);
+          img.parentNode.insertBefore(document.createElement('br'), elALink);
+        }else{
+          elALink.removeChild(elTxt);
+          elTxt = document.createTextNode(RegExp.$1);
+          elALink.appendChild(elTxt);
+        }
+      break;
 
-	var createList = function(sugglist){
-		rclass = 0;
-		ol=document.createElement('ol');
-		ol.ids = new Array();
-		for(i in sugglist){
-			if(unescape(sugglist[i]) == ''){
-				continue;
-			}
-			li=document.createElement('li');
-			with(li){
-				style.listStyleType='none';
-				style.display='block';
-			}
-			width='';
-			if(elInput.tagName == 'TEXTAREA'){
-				width="_width: 100%;";
-			}
-			li.innerHTML='<div id="div'+i+'" style="'+width+' max-width: 600px; white-space: nowarp; min-width: 100px; background-color:'+((rclass % 2 == 0) ? '#FAFAFA' : '#E5E6FA')+'" onclick="setCont(\''+sugglist[i]+'\'); removeTrace();" onmouseover="document.getElementById(\'div'+i+'\').style.backgroundColor=\'#D5D6DA\'" onmouseout="document.getElementById(\'div'+i+'\').style.backgroundColor=\''+((rclass++ % 2 == 0) ? '#FAFAFA' : '#E5E6FA')+'\'">'+unescape(sugglist[i])+'<\/div>';
-			ol.appendChild(li);
-		}
-		return ol.cloneNode(true);
-	}
+      case 'pdf':
+        document.getElementsByName(elName)[0].value = url;
+      break;
+      }
+  }
 
-	var setCont = function(text){
-		elInput.value = unescape(text);
-		if(ol!='null'){
-			try{
-				ol.parentNode.removeChild(ol);
-			}catch(e){}
-		}
-	}
+  var decimalOnly = function(str){
+    return str.replace(/[^0-9\.]/g, '');
+  }
 
-	var removeTrace = function(){
-		try{
-			trace=document.getElementsByTagName("div");
-			for(pt=0;pt<trace.length;){
-				if(trace[pt].className == 'traceDiv'){
-					trace[pt].parentNode.removeChild(trace[pt]);
-					pt--;
-				}
-				pt++;
-			}
-		}catch(e){}
-	}
+  var decimalOnlyCoords = function(str){
+    str = str.replace(/[^0-9\-]/g, '');
+    if(str.indexOf('-', 1) == -1){
+      return str;
+    }else{
+      return '-'+str.replace(/-/g, '');
+    }
+  }
 
-	var getStyle = function(oElm, strCssRule){
-	    var strValue = "";
-	    if(document.defaultView && document.defaultView.getComputedStyle){
-	        strValue = document.defaultView.getComputedStyle(oElm, "").getPropertyValue(strCssRule);
-	    }
-	    else if(oElm.currentStyle){
-	        strCssRule = strCssRule.replace(/\-(\w)/g, function (strMatch, p1){
-	            return p1.toUpperCase();
-	        });
-	        strValue = oElm.currentStyle[strCssRule];
-	    }
-	    return strValue;
-	}
+  var mapPopUp = function(obj){
+    try{
+      if(! popUp.closed){
+        return popUp.focus();
+      }
+    }catch(e){}
+
+    url='?cmd=immo&{CSRF_PARAM}&act=map&standalone=true';
+    if (!window.focus){
+      return true;
+    }
+    popUp = window.open(url, 'GoogleMap', 'width=800,height=700,scrollbars=no');
+    popUp.focus();
+    return false;
+  }
 
 
-	var createTrace = function(start, end){
-		if(parseInt(start.X.replace('px','')) < parseInt(end.X.replace('px','')) ){
-			sx = parseInt(start.X.replace('px',''));
-			ex = parseInt(end.X.replace('px',''));
-		}else{
-			sx = parseInt(end.X.replace('px',''));
-			ex = parseInt(start.X.replace('px',''));
-		}
-		sy = parseInt(end.Y.replace('px',''));
-		maxTraceWidth = ex-sx;
-		tleft = getStyle(elInput,'right')+18;
-		oleft = getStyle(ol,'left');
-//		maxTraceWidth = (document.body.offsetWidth - 150 - 155 - (langcount * 342) / langcount
-//		alert(ol.offsetWidth+" "+Math.floor(maxTraceWidth))
-		if(parseInt(ol.offsetWidth) < parseInt(Math.floor(maxTraceWidth))){
-			if(document.all){
-				return false;
-				sy+=17;
-				sx-=maxTraceWidth-ol.offsetWidth;
-				ex-=maxTraceWidth-ol.offsetWidth;
-			}else{
-				return false;
-				sy+=18;
-				sx-=40+(maxTraceWidth-ol.offsetWidth);
-				ex+=40+maxTraceWidth-ol.offsetWidth;
-			}
-			makeDivPoint(sx, sy, maxTraceWidth-(maxTraceWidth-ol.offsetWidth));
-		}
-	}
+  function sendReq(fID, lID, val, eID) {
+    fieldID=fID;
+    langID=lID;
+    value=val;
+    elInputID=eID;
 
-	var makeDivPoint = function(x,y,len){
-		mydiv=document.createElement("div");
-		with(mydiv){
-			style.position='absolute';
-			style.border='none';
-			style.height='1px';
-			style.width=len+'px';
-			style.backgroundColor='#AD1233';
-			style.top=y+'px';
-			style.left=x+'px';
-			className="traceDiv";
-		}
-		document.body.appendChild(mydiv);
-	}
+    try{
+      if(fieldID && langID && elInputID){
+        http.open('get', '?cmd=immo&standalone=1&act=rpc&fieldid='+fieldID+'&langid='+langID+'&value='+value+'&ID='+elInputID);
+        http.onreadystatechange = showSuggestions;
+          http.send(null);
+      }
+    }catch(e){
+      return false;
+    }
+  }
 
-	var getInputPosition = function(elInput){
-		try{
-			x = findPosX(elInput);
-			y = findPosY(elInput);
-		}catch(e){}
-		if(document.all){
-			x+=286;
-		}else{
-			x+=322;
-			y-=10;
-		}
-		return {X: x+'px', Y: y+'px'};
-	}
+  var showSuggestions = function(){
+    if(http.readyState == 4){
+      try{
+        if(ol!='null'){
+          try{
+            ol.parentNode.removeChild(ol);
+          }catch(e){}
+        }
+        removeTrace();
+        if(http.responseText.indexOf('{}') != -1
+        || http.responseText.indexOf('{ 0:""}') != -1
+        || http.responseText.indexOf('<!D') != -1){
+          return false;
+        }
+        eval(http.responseText);
+        elInput = document.getElementsByName(elInputID)[0];
+        par = elInput.parentNode;
+        while(par.tagName != 'TD'){
+          par = par.parentNode;
+        }
+        lang = parseInt(elInputID.substr(elInputID.length-1,elInputID.length));
+        if(lang!=1){
+          elinputid = elInputID.substr(0,(elInputID.length-1))+(lang-1);
+        }else{
+          elinputid = elInputID;
+        }
+        pos = getInputPosition(document.getElementsByName(elinputid)[0]);
+        ol = createList(sugg);
+        if(!ol){
+          return false;
+        }
+        with(ol){
+          style.cursor = "pointer";
+          style.padding = "0px 0px 0px 1px";
+          style.border = "solid 1px #000";
+          style.position = "absolute";
+          style.left = pos.X;
+          style.top = pos.Y;
+        }
+        par.appendChild(ol);
+//        createTrace(getInputPosition(document.getElementsByName(elInputID)[0]), getInputPosition(ol));
+      }catch(e){}
+    }
+  }
 
-	var validateForm = function(){
-		var error=false;
-		var mandatoryFields = new Array();
-		var languageIds = new Array();
+  var createList = function(sugglist){
+    rclass = 0;
+    ol=document.createElement('ol');
+    ol.ids = new Array();
+    for(i in sugglist){
+      if(unescape(sugglist[i]) == ''){
+        continue;
+      }
+      li=document.createElement('li');
+      with(li){
+        style.listStyleType='none';
+        style.display='block';
+      }
+      width='';
+      if(elInput.tagName == 'TEXTAREA'){
+        width="_width: 100%;";
+      }
+      li.innerHTML='<div id="div'+i+'" style="'+width+' max-width: 600px; white-space: nowarp; min-width: 100px; background-color:'+((rclass % 2 == 0) ? '#FAFAFA' : '#E5E6FA')+'" onclick="setCont(\''+sugglist[i]+'\'); removeTrace();" onmouseover="document.getElementById(\'div'+i+'\').style.backgroundColor=\'#D5D6DA\'" onmouseout="document.getElementById(\'div'+i+'\').style.backgroundColor=\''+((rclass++ % 2 == 0) ? '#FAFAFA' : '#E5E6FA')+'\'">'+unescape(sugglist[i])+'<\/div>';
+      ol.appendChild(li);
+    }
+    return ol.cloneNode(true);
+  }
 
-	<!-- BEGIN mandatoryArray --> mandatoryFields.push({IMMO_MANDATORY_ID});
-	<!-- END mandatoryArray -->
-	<!-- BEGIN languageIds --> languageIds.push({IMMO_LANGUAGE_ID});
-	<!-- END languageIds -->
+  var setCont = function(text){
+    elInput.value = unescape(text);
+    if(ol!='null'){
+      try{
+        ol.parentNode.removeChild(ol);
+      }catch(e){}
+    }
+  }
 
-		for(i in mandatoryFields){
-			if(document.getElementsByName('field_'+mandatoryFields[i]+'_1')[0].value == ''){
-				error = true;
-				document.getElementsByName('field_'+mandatoryFields[i]+'_1')[0].style.border = 'red 3px solid';
-			}else{
-				document.getElementsByName('field_'+mandatoryFields[i]+'_1')[0].style.border = '#0A50A1 1px solid';
-			}
-			try{
-				if(document.getElementById('hi_'+mandatoryFields[i]) != 'null' ){
-					if(document.getElementById('hi_'+mandatoryFields[i]).value == ''){
-						document.getElementById('img'+mandatoryFields[i]).style.border = 'red 3px solid';
-						error = true;
-					}else{
-						document.getElementById('img'+mandatoryFields[i]).style.border = 'none';
-					}
-				}
-			}catch(e){}
-		}
-		if(error){
-			alert("{TXT_IMMO_MANDATORY_FIELDS_ARE_EMPTY}");
-			return false;
-		}
-		return true;
-	}
+  var removeTrace = function(){
+    try{
+      trace=document.getElementsByTagName("div");
+      for(pt=0;pt<trace.length;){
+        if(trace[pt].className == 'traceDiv'){
+          trace[pt].parentNode.removeChild(trace[pt]);
+          pt--;
+        }
+        pt++;
+      }
+    }catch(e){}
+  }
+
+  var getStyle = function(oElm, strCssRule){
+      var strValue = "";
+      if(document.defaultView && document.defaultView.getComputedStyle){
+          strValue = document.defaultView.getComputedStyle(oElm, "").getPropertyValue(strCssRule);
+      }
+      else if(oElm.currentStyle){
+          strCssRule = strCssRule.replace(/\-(\w)/g, function (strMatch, p1){
+              return p1.toUpperCase();
+          });
+          strValue = oElm.currentStyle[strCssRule];
+      }
+      return strValue;
+  }
+
+
+  var createTrace = function(start, end){
+    if(parseInt(start.X.replace('px','')) < parseInt(end.X.replace('px','')) ){
+      sx = parseInt(start.X.replace('px',''));
+      ex = parseInt(end.X.replace('px',''));
+    }else{
+      sx = parseInt(end.X.replace('px',''));
+      ex = parseInt(start.X.replace('px',''));
+    }
+    sy = parseInt(end.Y.replace('px',''));
+    maxTraceWidth = ex-sx;
+    tleft = getStyle(elInput,'right')+18;
+    oleft = getStyle(ol,'left');
+//    maxTraceWidth = (document.body.offsetWidth - 150 - 155 - (langcount * 342) / langcount
+//    alert(ol.offsetWidth+" "+Math.floor(maxTraceWidth))
+    if(parseInt(ol.offsetWidth) < parseInt(Math.floor(maxTraceWidth))){
+      if(document.all){
+        return false;
+        sy+=17;
+        sx-=maxTraceWidth-ol.offsetWidth;
+        ex-=maxTraceWidth-ol.offsetWidth;
+      }else{
+        return false;
+        sy+=18;
+        sx-=40+(maxTraceWidth-ol.offsetWidth);
+        ex+=40+maxTraceWidth-ol.offsetWidth;
+      }
+      makeDivPoint(sx, sy, maxTraceWidth-(maxTraceWidth-ol.offsetWidth));
+    }
+  }
+
+  var makeDivPoint = function(x,y,len){
+    mydiv=document.createElement("div");
+    with(mydiv){
+      style.position='absolute';
+      style.border='none';
+      style.height='1px';
+      style.width=len+'px';
+      style.backgroundColor='#AD1233';
+      style.top=y+'px';
+      style.left=x+'px';
+      className="traceDiv";
+    }
+    document.body.appendChild(mydiv);
+  }
+
+  var getInputPosition = function(elInput){
+    try{
+      x = findPosX(elInput);
+      y = findPosY(elInput);
+    }catch(e){}
+    if(document.all){
+      x+=286;
+    }else{
+      x+=322;
+      y-=10;
+    }
+    return {X: x+'px', Y: y+'px'};
+  }
+
+  var validateForm = function(){
+    var error=false;
+    var mandatoryFields = new Array();
+    var languageIds = new Array();
+
+  <!-- BEGIN mandatoryArray --> mandatoryFields.push({IMMO_MANDATORY_ID});
+  <!-- END mandatoryArray -->
+  <!-- BEGIN languageIds --> languageIds.push({IMMO_LANGUAGE_ID});
+  <!-- END languageIds -->
+
+    for(i in mandatoryFields){
+      if(document.getElementsByName('field_'+mandatoryFields[i]+'_1')[0].value == ''){
+        error = true;
+        document.getElementsByName('field_'+mandatoryFields[i]+'_1')[0].style.border = 'red 3px solid';
+      }else{
+        document.getElementsByName('field_'+mandatoryFields[i]+'_1')[0].style.border = '#0A50A1 1px solid';
+      }
+      try{
+        if(document.getElementById('hi_'+mandatoryFields[i]) != 'null' ){
+          if(document.getElementById('hi_'+mandatoryFields[i]).value == ''){
+            document.getElementById('img'+mandatoryFields[i]).style.border = 'red 3px solid';
+            error = true;
+          }else{
+            document.getElementById('img'+mandatoryFields[i]).style.border = 'none';
+          }
+        }
+      }catch(e){}
+    }
+    if(error){
+      alert("{TXT_IMMO_MANDATORY_FIELDS_ARE_EMPTY}");
+      return false;
+    }
+    return true;
+  }
 
 
 //]]>
@@ -447,131 +447,131 @@
 <form action="?cmd=immo&amp;act=add&amp;id={IMMO_ID}" method="post" onsubmit="return validateForm();">
 <input type="hidden" value="1" name="sent" />
 <table border="0" cellspacing="0" class="adminlist" style="empty-cells: show; width: 100%" cellpadding="3">
-	 <tr>
+   <tr>
         <th colspan="{IMMO_COLUMN_NUMBER}">{TXT_IMMO_CREATE_OBJECT}</th>
     </tr>
-	<tr class="row1">
-		<td style="width: 10%;">
-			{TXT_IMMO_REFERENCE_NUMBER}
-		</td>
-		<td colspan="{IMMO_COLUMN_NUMBER2}" >
-        	<input type="text" name="ref_nr" value="{IMMO_REF_NR}" maxlength="4" onchange="this.value=decimalOnly(this.value);" />
+  <tr class="row1">
+    <td style="width: 10%;">
+      {TXT_IMMO_REFERENCE_NUMBER}
+    </td>
+    <td colspan="{IMMO_COLUMN_NUMBER2}" >
+          <input type="text" name="ref_nr" value="{IMMO_REF_NR}" maxlength="4" onchange="this.value=decimalOnly(this.value);" />
 
-        	<input type="text" name="ref_nr_note" value="{IMMO_REF_NR_NOTE}" />
-		</td>
-	</tr>
-<!--	<tr class="row1">
-		<td style="width: 10%;">
-			{TXT_IMMO_LOGO}
-		</td>
-		<td colspan="{IMMO_COLUMN_NUMBER2}" >
-        	<select name="logo">
-        		<option value="logo1" {IMMO_LOGO_SELECTED_LOGO1}> Logo 1 </option>
-        		<option value="logo2" {IMMO_LOGO_SELECTED_LOGO2}> Logo 2 </option>
-        	</select>
-		</td>
-	</tr>-->
-	<tr class="row2">
-		<td style="width: 10%;">
-			{TXT_IMMO_SPECIAL_OFFER}
-		</td>
-		<td colspan="{IMMO_COLUMN_NUMBER2}" >
-        	<select name="special_offer">
-        		<option value="1" {IMMO_SPECIAL_OFFER_SELECT_YES}>{TXT_IMMO_YES}</option>
-				<option value="0" {IMMO_SPECIAL_OFFER_SELECT_NO}>{TXT_IMMO_NO}</option>
-        	</select>
-		</td>
-	</tr>
-	<tr class="row1">
-		<td style="width: 10%;">
-			{TXT_IMMO_VISIBLE}
-		</td>
-		<td colspan="{IMMO_COLUMN_NUMBER2}" >
-        	<select name="visibility">
-        		<option value="disabled" {IMMO_VISIBLE_SELECT_DISABLED}>{TXT_IMMO_DISABLED}</option>
-				<option value="reference" {IMMO_VISIBLE_SELECT_REFERENCE}>{TXT_IMMO_REFERENCE}</option>
-				<option value="listing" {IMMO_VISIBLE_SELECT_LISTING}>{TXT_IMMO_LISTING}</option>
-        	</select>
-		</td>
-	</tr>
+          <input type="text" name="ref_nr_note" value="{IMMO_REF_NR_NOTE}" />
+    </td>
+  </tr>
+<!--  <tr class="row1">
+    <td style="width: 10%;">
+      {TXT_IMMO_LOGO}
+    </td>
+    <td colspan="{IMMO_COLUMN_NUMBER2}" >
+          <select name="logo">
+            <option value="logo1" {IMMO_LOGO_SELECTED_LOGO1}> Logo 1 </option>
+            <option value="logo2" {IMMO_LOGO_SELECTED_LOGO2}> Logo 2 </option>
+          </select>
+    </td>
+  </tr>-->
+  <tr class="row2">
+    <td style="width: 10%;">
+      {TXT_IMMO_SPECIAL_OFFER}
+    </td>
+    <td colspan="{IMMO_COLUMN_NUMBER2}" >
+          <select name="special_offer">
+            <option value="1" {IMMO_SPECIAL_OFFER_SELECT_YES}>{TXT_IMMO_YES}</option>
+        <option value="0" {IMMO_SPECIAL_OFFER_SELECT_NO}>{TXT_IMMO_NO}</option>
+          </select>
+    </td>
+  </tr>
+  <tr class="row1">
+    <td style="width: 10%;">
+      {TXT_IMMO_VISIBLE}
+    </td>
+    <td colspan="{IMMO_COLUMN_NUMBER2}" >
+          <select name="visibility">
+            <option value="disabled" {IMMO_VISIBLE_SELECT_DISABLED}>{TXT_IMMO_DISABLED}</option>
+        <option value="reference" {IMMO_VISIBLE_SELECT_REFERENCE}>{TXT_IMMO_REFERENCE}</option>
+        <option value="listing" {IMMO_VISIBLE_SELECT_LISTING}>{TXT_IMMO_LISTING}</option>
+          </select>
+    </td>
+  </tr>
 
-	<tr class="row2">
-		<td>
-			{TXT_IMMO_OBJECT_TYPE}
-		</td>
-		<td colspan="{IMMO_COLUMN_NUMBER2}" >
-			<select name="obj_type">
-				<option value="flat" {IMMO_TYPE_SELECT_FLAT}>{TXT_IMMO_OBJECTTYPE_FLAT}</option>
-				<option value="house" {IMMO_TYPE_SELECT_HOUSE}>{TXT_IMMO_OBJECTTYPE_HOUSE}</option>
-				<option value="multifamily" {IMMO_TYPE_SELECT_MULTIFAMILY}>{TXT_IMMO_OBJECTTYPE_MULTIFAMILY}</option>
-				<option value="estate" {IMMO_TYPE_SELECT_ESTATE}>{TXT_IMMO_OBJECTTYPE_ESTATE}</option>
-				<option value="industry" {IMMO_TYPE_SELECT_INDUSTRY}>{TXT_IMMO_OBJECTTYPE_INDUSTRY}</option>
-				<option value="parking" {IMMO_TYPE_SELECT_PARKING}>{TXT_IMMO_OBJECTTYPE_PARKING}</option>
-			</select>
-		</td>
-	</tr>
+  <tr class="row2">
+    <td>
+      {TXT_IMMO_OBJECT_TYPE}
+    </td>
+    <td colspan="{IMMO_COLUMN_NUMBER2}" >
+      <select name="obj_type">
+        <option value="flat" {IMMO_TYPE_SELECT_FLAT}>{TXT_IMMO_OBJECTTYPE_FLAT}</option>
+        <option value="house" {IMMO_TYPE_SELECT_HOUSE}>{TXT_IMMO_OBJECTTYPE_HOUSE}</option>
+        <option value="multifamily" {IMMO_TYPE_SELECT_MULTIFAMILY}>{TXT_IMMO_OBJECTTYPE_MULTIFAMILY}</option>
+        <option value="estate" {IMMO_TYPE_SELECT_ESTATE}>{TXT_IMMO_OBJECTTYPE_ESTATE}</option>
+        <option value="industry" {IMMO_TYPE_SELECT_INDUSTRY}>{TXT_IMMO_OBJECTTYPE_INDUSTRY}</option>
+        <option value="parking" {IMMO_TYPE_SELECT_PARKING}>{TXT_IMMO_OBJECTTYPE_PARKING}</option>
+      </select>
+    </td>
+  </tr>
 
-	<tr class="row1">
-		<td>
-			{TXT_IMMO_PROPERTY_TYPE}
-		</td>
-		<td colspan={IMMO_COLUMN_NUMBER2}>
-			<select name="property_type">
-				<option value="purchase" {IMMO_PROPERTY_SELECT_PURCHASE}>{TXT_IMMO_PROPERTYTYPE_PURCHASE}</option>
-				<option value="rent" {IMMO_PROPERTY_SELECT_RENT}>{TXT_IMMO_PROPERTYTYPE_RENT}</option>
-			</select>
-		</td>
-	</tr>
-	<tr class="row2">
-		<td>
-			{TXT_IMMO_NEW_BUILDING}
-		</td>
-		<td colspan={IMMO_COLUMN_NUMBER2}>
-			<select name="new_building">
-				<option value="1" {IMMO_NEW_SELECT_YES}>{TXT_IMMO_YES}</option>
-				<option value="0" {IMMO_NEW_SELECT_NO}>{TXT_IMMO_NO}</option>
-			</select>
-		</td>
+  <tr class="row1">
+    <td>
+      {TXT_IMMO_PROPERTY_TYPE}
+    </td>
+    <td colspan={IMMO_COLUMN_NUMBER2}>
+      <select name="property_type">
+        <option value="purchase" {IMMO_PROPERTY_SELECT_PURCHASE}>{TXT_IMMO_PROPERTYTYPE_PURCHASE}</option>
+        <option value="rent" {IMMO_PROPERTY_SELECT_RENT}>{TXT_IMMO_PROPERTYTYPE_RENT}</option>
+      </select>
+    </td>
+  </tr>
+  <tr class="row2">
+    <td>
+      {TXT_IMMO_NEW_BUILDING}
+    </td>
+    <td colspan={IMMO_COLUMN_NUMBER2}>
+      <select name="new_building">
+        <option value="1" {IMMO_NEW_SELECT_YES}>{TXT_IMMO_YES}</option>
+        <option value="0" {IMMO_NEW_SELECT_NO}>{TXT_IMMO_NO}</option>
+      </select>
+    </td>
 
-	</tr>
-	<tr class="row1">
-		<td>
-			{TXT_IMMO_LONGITUDE}
-		</td>
-		<td style="width:40%;">
-			<input size="6" type="text" id="longitude" name="longitude" onchange="this.value = decimalOnlyCoords(this.value);" value="{IMMO_LONGITUDE}" />
-			<strong>.</strong>
-			<input size="15" type="text" id="longitude_fraction" name="longitude_fraction" onchange="this.value = decimalOnly(this.value);" value="{IMMO_LONGITUDE_FRACTION}" />
-			<a href="javascript:void(0);" target="_top" onclick="mapPopUp(this);"> {TXT_IMMO_SEARCH_ADDRESS} </a>
-		</td>
+  </tr>
+  <tr class="row1">
+    <td>
+      {TXT_IMMO_LONGITUDE}
+    </td>
+    <td style="width:40%;">
+      <input size="6" type="text" id="longitude" name="longitude" onchange="this.value = decimalOnlyCoords(this.value);" value="{IMMO_LONGITUDE}" />
+      <strong>.</strong>
+      <input size="15" type="text" id="longitude_fraction" name="longitude_fraction" onchange="this.value = decimalOnly(this.value);" value="{IMMO_LONGITUDE_FRACTION}" />
+      <a href="javascript:void(0);" target="_top" onclick="mapPopUp(this);"> {TXT_IMMO_SEARCH_ADDRESS} </a>
+    </td>
 
-	</tr>
-	<tr class="row2">
-		<td>
-			{TXT_IMMO_LATITUDE}
-		</td>
-		<td>
-			<input size="6" type="text"  id="latitude" name="latitude" onchange="this.value = decimalOnlyCoords(this.value);" value="{IMMO_LATTITUDE}" />
-			<strong>.</strong>
-			<input size="15" type="text" id="latitude_fraction" name="latitude_fraction" onchange="this.value = decimalOnly(this.value);" value="{IMMO_LATTITUDE_FRACTION}" />
-		</td>
-	</tr>
-	<tr class="row1">
-		<td>
-			{TXT_IMMO_ZOOM}
-		</td>
-		<td>
-			<input size="3" type="text" name="zoom" id="map_zoom" onchange="this.value=decimalOnly(this.value);" value="{IMMO_ZOOM}" />
-		</td>
-	</tr>
+  </tr>
+  <tr class="row2">
+    <td>
+      {TXT_IMMO_LATITUDE}
+    </td>
+    <td>
+      <input size="6" type="text"  id="latitude" name="latitude" onchange="this.value = decimalOnlyCoords(this.value);" value="{IMMO_LATTITUDE}" />
+      <strong>.</strong>
+      <input size="15" type="text" id="latitude_fraction" name="latitude_fraction" onchange="this.value = decimalOnly(this.value);" value="{IMMO_LATTITUDE_FRACTION}" />
+    </td>
+  </tr>
+  <tr class="row1">
+    <td>
+      {TXT_IMMO_ZOOM}
+    </td>
+    <td>
+      <input size="3" type="text" name="zoom" id="map_zoom" onchange="this.value=decimalOnly(this.value);" value="{IMMO_ZOOM}" />
+    </td>
+  </tr>
     <tr class="row2">
-	   <td>
-	   {TXT_IMMO_HEADLINER}
-	   </td>
-	   <td>
-	       <input type="checkbox" name="headliner" {IMMO_HEADLINER_SELECT} />
-	   </td>
-	</tr>
+     <td>
+     {TXT_IMMO_HEADLINER}
+     </td>
+     <td>
+         <input type="checkbox" name="headliner" {IMMO_HEADLINER_SELECT} />
+     </td>
+  </tr>
 </table>
 <br />
 
@@ -593,16 +593,16 @@
         <th colspan="{IMMO_COLUMN_NUMBER}">{TXT_IMMO_DEFINE_TEXT}</th>
     </tr>
     <tr class="row3">
-    	<td colspan="2" style="width: 155px;"><strong>{TXT_IMMO_NAME}</strong></td>
-    	<!-- BEGIN languages -->
-    	<td><strong>{TXT_IMMO_LANGUAGE}</strong></td>
-    	<!-- END languages -->
+      <td colspan="2" style="width: 155px;"><strong>{TXT_IMMO_NAME}</strong></td>
+      <!-- BEGIN languages -->
+      <td><strong>{TXT_IMMO_LANGUAGE}</strong></td>
+      <!-- END languages -->
     </tr>
 <!-- BEGIN  rows -->
 <!-- BEGIN fieldRowText -->
     <tr class="row{IMMO_ROW}">
         <td colspan="2" style="vertical-align: top">
-        	<input style="vertical-align: top" value="1" type="checkbox" id="chk_{IMMO_FIELD_TEXT_ID}" name="active[{IMMO_FIELD_TEXT_ID}]" {IMMO_CHECKED} {IMMO_DISABLED} /> <label for="chk_{IMMO_FIELD_TEXT_ID}"> {IMMO_FIELD_TEXT_CAPTION} &nbsp; </label>
+          <input style="vertical-align: top" value="1" type="checkbox" id="chk_{IMMO_FIELD_TEXT_ID}" name="active[{IMMO_FIELD_TEXT_ID}]" {IMMO_CHECKED} {IMMO_DISABLED} /> <label for="chk_{IMMO_FIELD_TEXT_ID}"> {IMMO_FIELD_TEXT_CAPTION} &nbsp; </label>
         </td>
         <!-- BEGIN  text-column -->
             <td style="white-space: nowrap;">
@@ -641,18 +641,18 @@
         <th colspan="{IMMO_COLUMN_NUMBER}">{TXT_IMMO_DEFINE_IMAGE}</th>
     </tr>
      <tr class="row3">
-    	<td colspan="2" style="width: 20%; vertical-align: top;"><strong>{TXT_IMMO_NAME}</strong></td>
-    	<!-- BEGIN languages2 -->
-    	<td><strong>{TXT_IMMO_LANGUAGE}</strong></td>
-    	<!-- END languages2 -->
+      <td colspan="2" style="width: 20%; vertical-align: top;"><strong>{TXT_IMMO_NAME}</strong></td>
+      <!-- BEGIN languages2 -->
+      <td><strong>{TXT_IMMO_LANGUAGE}</strong></td>
+      <!-- END languages2 -->
     </tr>
 <!-- BEGIN fieldRowImg -->
     <tr class="row{IMMO_ROW}">
         <td style="vertical-align: top">
-        		<input value="1" type="checkbox" id="chk_{IMMO_FIELD_IMG_ID}" name="active[{IMMO_FIELD_IMG_ID}]" {IMMO_CHECKED} {IMMO_DISABLED} /> <label for="chk_{IMMO_FIELD_IMG_ID}"> {IMMO_FIELD_IMG_CAPTION} &nbsp; </label>
+            <input value="1" type="checkbox" id="chk_{IMMO_FIELD_IMG_ID}" name="active[{IMMO_FIELD_IMG_ID}]" {IMMO_CHECKED} {IMMO_DISABLED} /> <label for="chk_{IMMO_FIELD_IMG_ID}"> {IMMO_FIELD_IMG_CAPTION} &nbsp; </label>
         </td>
         <td>
-        	<a href="javascript:void(0);" title="{TXT_IMMO_EDIT_OR_ADD_IMAGE}" onclick="openBrowser('?cmd=FileBrowser&amp;standalone=true&amp;path=/immo/images/{LAST_IMMO_ID}','{IMMO_FIELD_IMG_ID}','width=800,height=600,resizable=yes,status=no,scrollbars=yes', 'img', '');" >{TXT_IMMO_EDIT_OR_ADD_IMAGE}<br /> <img id="img{IMMO_FIELD_IMG_ID}"  style="width: 60px; height: 60px; border: none;" src="{IMMO_FIELD_IMG_SRC}" title="{TXT_IMMO_EDIT_OR_ADD_IMAGE}" alt="{TXT_IMMO_EDIT_OR_ADD_IMAGE}" /></a>
+          <a href="javascript:void(0);" title="{TXT_IMMO_EDIT_OR_ADD_IMAGE}" onclick="openBrowser('?cmd=FileBrowser&amp;standalone=true&amp;path=/immo/images/{LAST_IMMO_ID}','{IMMO_FIELD_IMG_ID}','width=800,height=600,resizable=yes,status=no,scrollbars=yes', 'img', '');" >{TXT_IMMO_EDIT_OR_ADD_IMAGE}<br /> <img id="img{IMMO_FIELD_IMG_ID}"  style="width: 60px; height: 60px; border: none;" src="{IMMO_FIELD_IMG_SRC}" title="{TXT_IMMO_EDIT_OR_ADD_IMAGE}" alt="{TXT_IMMO_EDIT_OR_ADD_IMAGE}" /></a>
         </td>
         <!-- BEGIN img-column -->
             <td>
@@ -665,7 +665,7 @@
 <!-- BEGIN fieldRowPanorama -->
     <tr class="row{IMMO_ROW}">
         <td style="vertical-align: top">
-        		<input value="1" type="checkbox" id="chk_{IMMO_FIELD_PANO_ID}" name="active[{IMMO_FIELD_PANO_ID}]" {IMMO_CHECKED} {IMMO_DISABLED} /> <label for="chk_{IMMO_FIELD_PANO_ID}"> {IMMO_FIELD_PANO_CAPTION} &nbsp; </label>
+            <input value="1" type="checkbox" id="chk_{IMMO_FIELD_PANO_ID}" name="active[{IMMO_FIELD_PANO_ID}]" {IMMO_CHECKED} {IMMO_DISABLED} /> <label for="chk_{IMMO_FIELD_PANO_ID}"> {IMMO_FIELD_PANO_CAPTION} &nbsp; </label>
         </td>
         <td>
        <a href="javascript:void(0);" title="{TXT_IMMO_EDIT_OR_ADD_IMAGE}" onclick="openBrowser('?cmd=FileBrowser&amp;standalone=true&amp;path=/immo/images/{LAST_IMMO_ID}','{IMMO_FIELD_PANO_ID}','width=800,height=600,resizable=yes,status=no,scrollbars=yes', 'img', '');">{TXT_IMMO_EDIT_OR_ADD_IMAGE}<br /><img id="img{IMMO_FIELD_PANO_ID}" style="width: 60px; height: 60px; border: none;" src="{IMMO_FIELD_PANO_SRC}" title="{IMMO_FIELD_PANO_NAME}" alt="{TXT_IMMO_CLICK_HERE}" /></a>
@@ -690,15 +690,15 @@
         <th colspan="{IMMO_COLUMN_NUMBER}">{TXT_IMMO_DEFINE_LINK}</th>
     </tr>
      <tr class="row3">
-    	<td style="width: 20%; vertical-align: top"><strong>{TXT_IMMO_NAME}</strong></td>
-    	<!-- BEGIN languages3 -->
-    	<td><strong>{TXT_IMMO_LANGUAGE}</strong></td>
-    	<!-- END languages3 -->
+      <td style="width: 20%; vertical-align: top"><strong>{TXT_IMMO_NAME}</strong></td>
+      <!-- BEGIN languages3 -->
+      <td><strong>{TXT_IMMO_LANGUAGE}</strong></td>
+      <!-- END languages3 -->
     </tr>
 <!-- BEGIN fieldRowLnk -->
     <tr class="row{IMMO_ROW}">
         <td style="vertical-align: top">
-        		<input value="1" type="checkbox" id="chk_{IMMO_FIELD_LNK_ID}" name="active[{IMMO_FIELD_LNK_ID}]" {IMMO_CHECKED} {IMMO_DISABLED} /> <label for="chk_{IMMO_FIELD_LNK_ID}"> {IMMO_FIELD_LNK_CAPTION} &nbsp; </label> <img src="{IMMO_PROTECTED_ICON}" title="{TXT_IMMO_PROTECTED}" alt="{TXT_IMMO_PROTECTED}" />
+            <input value="1" type="checkbox" id="chk_{IMMO_FIELD_LNK_ID}" name="active[{IMMO_FIELD_LNK_ID}]" {IMMO_CHECKED} {IMMO_DISABLED} /> <label for="chk_{IMMO_FIELD_LNK_ID}"> {IMMO_FIELD_LNK_CAPTION} &nbsp; </label> <img src="{IMMO_PROTECTED_ICON}" title="{TXT_IMMO_PROTECTED}" alt="{TXT_IMMO_PROTECTED}" />
         </td>
         <!-- BEGIN lnk-column -->
             <td>

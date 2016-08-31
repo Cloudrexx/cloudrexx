@@ -156,7 +156,7 @@ $_ARRAYLANG['TXT_NEWS_LASTUPDATE_DESCRIPTION'] = "Date of the last modification 
 $_ARRAYLANG['TXT_NEWS_SOURCE_DESCRIPTION'] = "External source of the news message";
 $_ARRAYLANG['TXT_NEWS_URL_DESCRIPTION'] = "Link #1 and #2 of the news message";
 $_ARRAYLANG['TXT_PUBLISHED_ON'] = "Published on:";
-$_ARRAYLANG['TXT_HEADLINE_PLACEHOLLDERS_USAGE'] = "In the design Template <b>headlines.html</b>. 
+$_ARRAYLANG['TXT_HEADLINE_PLACEHOLLDERS_USAGE'] = "In the design Template <b>headlines.html</b>.
 This placeholder [[HEADLINES_FILE]] may be placed either in the design template or in the content of this page.";
 $_ARRAYLANG['TXT_NEWS_IMAGE_PATH_DESCRIPTION'] = "Path to the image of the news message";
 $_ARRAYLANG['TXT_NEWS_THUMBNAIL_PATH_DESCRIPTION'] = "Path to the thumbnail of the news message";

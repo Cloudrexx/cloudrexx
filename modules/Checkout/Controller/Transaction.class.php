@@ -176,7 +176,7 @@ class Transaction {
         } else if (empty($offset) && !empty($limit)) {
             $SQLLimit = ' LIMIT '.intval($limit);
         }
-        
+
         $countries = \Cx\Core\Country\Controller\Country::getNameArray();
 
         $arrTransactions = array();

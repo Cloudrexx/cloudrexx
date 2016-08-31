@@ -84,7 +84,7 @@ class Knowledge extends KnowledgeLibrary
     public function getPage()
     {
         global $_LANGID;
-        
+
         \JS::activate('prototype');
         \JS::registerJS('modules/Knowledge/View/Script/fix_prototype.js');
         \JS::activate('scriptaculous');
@@ -445,7 +445,7 @@ class Knowledge extends KnowledgeLibrary
             foreach ($tag['articles'] as $articleid) {
                 $article = $this->articles->articles[$articleid];
                 if ($article['active']) {
-                
+
                     if ($this->isAllLangsActive()) {
                         foreach ($article['content'] as $lang_id => $content) {
 
@@ -453,8 +453,8 @@ class Knowledge extends KnowledgeLibrary
                             $amount = $article['votes'];
                             $this->tpl->setVariable(array(
                                 "ARTICLE_ID" => $articleid,
-        	                    "QUESTION" => $content['question'],
-        	                    "ANSWER" => $content['answer'],
+                                "QUESTION" => $content['question'],
+                                "ANSWER" => $content['answer'],
                                 'LANG_ID' => $lang_id,
                                 "AVERAGE" => round($average, 2),
                                 "TXT_RATING" => $_ARRAYLANG['TXT_KNOWLEDGE_YOUR_RATING'],
@@ -470,7 +470,7 @@ class Knowledge extends KnowledgeLibrary
                             ));
 
                             try {
-        	                	$tags = $this->tags->getByArticle($articleid, NULL);
+                                $tags = $this->tags->getByArticle($articleid, NULL);
                             } catch (DatabaseError $e) {
                                 // nothing yet
                             }

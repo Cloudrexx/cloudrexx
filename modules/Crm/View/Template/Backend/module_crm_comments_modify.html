@@ -3,8 +3,8 @@
         $J("input, select").css("border","1px solid #0A50A1");
         var errors =new  Array();
         var errChk;
-        var name   = document.getElementById("notes_type").value;        
-        
+        var name   = document.getElementById("notes_type").value;
+
         if(name == 0) {
             errChk = 1;
             document.getElementById("notesCategoriesLink").style.border = "1px solid red";
@@ -12,7 +12,7 @@
         }
         //return false;
     }
-    
+
     function showErrors(errors,  errChk) {
 
         if ( errors.length >= 1 || errChk == 1) {
@@ -26,7 +26,7 @@
             } else {
                 $J('#formerr').html("All fields have not been filled out.!");
             }
-            $J('#formerr').css('display','block');            
+            $J('#formerr').css('display','block');
             return false;
         } else {
             $J('#formerr').html('');
@@ -47,7 +47,7 @@
     }
     var _changeNoteType = function(Obj, text, notes_type) {
         $J(Obj).text(text);
-        $J('#notes_type').val(notes_type);        
+        $J('#notes_type').val(notes_type);
         $J("#notesCategoriesPanel").hide();
     };
     $J(function(){
@@ -88,7 +88,7 @@
                 <div class="taskTypeTitle">{CRM_NOTE_TYPE}</div>
             </div>
         </a>
-        <!-- END NoteType -->        
+        <!-- END NoteType -->
     </div>
 </div>
 <form id="access" method="post" action="" name="addproject">
@@ -98,7 +98,7 @@
                 {TXT_CRM_NOTES_TITLE}
             </th>
         </tr>
-        <tr class="row2">            
+        <tr class="row2">
             <td>
                 <input type="hidden" name="notes_type" id="notes_type" value="{CRM_NOTES_TYPE_ID}" />
                 <div id="notesCategoriesLink" class="crmLeft" onclick="showNotesPanel(this);">

@@ -3,32 +3,32 @@
 //<![CDATA[
 function podcast_delete_template(id, name)
 {
-	strDeleteMsg = '{TXT_PODCAST_CONFIRM_DELETE_TEMPLATE}';
-	if (confirm(strDeleteMsg.replace('%s', name)+'\n{TXT_PODCAST_OPERATION_IRREVERSIBLE}')) {
-		window.location.href='index.php?cmd=Podcast&{CSRF_PARAM}&act=deleteTemplate&id='+id;
-	}
+  strDeleteMsg = '{TXT_PODCAST_CONFIRM_DELETE_TEMPLATE}';
+  if (confirm(strDeleteMsg.replace('%s', name)+'\n{TXT_PODCAST_OPERATION_IRREVERSIBLE}')) {
+    window.location.href='index.php?cmd=Podcast&{CSRF_PARAM}&act=deleteTemplate&id='+id;
+  }
 }
 //]]>
 </script>
 <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
-	<thead>
-		<th colspan="2">{TXT_PODCAST_TEMPLATES}</th>
-	</thead>
-	<tbody>
-		<tr class="row3" style="font-weight:bold;L">
-			<td>{TXT_PODCAST_DESCRIPTION}</td>
-			<td style="text-align:right;">{TXT_PODCAST_FUNCTIONS}</td>
-		</tr>
-		<!-- BEGIN podcast_templates -->
-			<tr class="{PODCAST_ROW_CLASS}">
-				<td>{PODCAST_TEMPLATE_DESCRIPTION}</td>
-				<td style="text-align:right;">
-					<a href="index.php?cmd=Podcast&amp;act=modifyTemplate&amp;id={PODCAST_TEMPLATE_ID}" title="{TXT_PODCAST_MODIFY_TEMPLATE}"><img src="../core/Core/View/Media/icons/edit.gif" width="16" height="16" border="0" alt="{TXT_PODCAST_MODIFY_TEMPLATE}" /></a>
-					<a href="javascript:void(0);" onclick="podcast_delete_template({PODCAST_TEMPLATE_ID}, '{PODCAST_TEMPLATE_DESCRIPTION}')" title="{TXT_PODCAST_DELETE_TEMPLATE}"><img src="../core/Core/View/Media/icons/delete.gif" width="17" height="17" border="0" alt="{TXT_PODCAST_DELETE_TEMPLATE}" /></a>
-					</td>
-			</tr>
-		<!-- END podcast_templates -->
-	</tbody>
+  <thead>
+    <th colspan="2">{TXT_PODCAST_TEMPLATES}</th>
+  </thead>
+  <tbody>
+    <tr class="row3" style="font-weight:bold;L">
+      <td>{TXT_PODCAST_DESCRIPTION}</td>
+      <td style="text-align:right;">{TXT_PODCAST_FUNCTIONS}</td>
+    </tr>
+    <!-- BEGIN podcast_templates -->
+      <tr class="{PODCAST_ROW_CLASS}">
+        <td>{PODCAST_TEMPLATE_DESCRIPTION}</td>
+        <td style="text-align:right;">
+          <a href="index.php?cmd=Podcast&amp;act=modifyTemplate&amp;id={PODCAST_TEMPLATE_ID}" title="{TXT_PODCAST_MODIFY_TEMPLATE}"><img src="../core/Core/View/Media/icons/edit.gif" width="16" height="16" border="0" alt="{TXT_PODCAST_MODIFY_TEMPLATE}" /></a>
+          <a href="javascript:void(0);" onclick="podcast_delete_template({PODCAST_TEMPLATE_ID}, '{PODCAST_TEMPLATE_DESCRIPTION}')" title="{TXT_PODCAST_DELETE_TEMPLATE}"><img src="../core/Core/View/Media/icons/delete.gif" width="17" height="17" border="0" alt="{TXT_PODCAST_DELETE_TEMPLATE}" /></a>
+          </td>
+      </tr>
+    <!-- END podcast_templates -->
+  </tbody>
 </table>
 <br />
 {PODCAST_PAGING}

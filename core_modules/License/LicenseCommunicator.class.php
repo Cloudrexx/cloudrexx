@@ -40,7 +40,7 @@ class LicenseCommunicator {
     private $requestInterval = 1;
     private $lastUpdate;
     private static $javascriptRegistered = false;
-    
+
     public function __construct(&$_CONFIG) {
         if (self::$instance) {
             throw new \BadMethodCallException('Cannot construct a second instance, use ::getInstance()');
@@ -54,13 +54,13 @@ class LicenseCommunicator {
         $this->coreCmsVersion = $_CONFIG['coreCmsVersion'];
         $this->coreCmsStatus = $_CONFIG['coreCmsStatus'];
         $this->domainUrl = $_CONFIG['domainUrl'];
-        
+
         self::$instance = $this;
     }
-    
+
     /**
      * Singleton accessor
-     * @return \Cx\Core_Modules\License\LicenseCommunicator 
+     * @return \Cx\Core_Modules\License\LicenseCommunicator
      */
     public static function getInstance(&$_CONFIG) {
         if (!self::$instance) {
@@ -68,7 +68,7 @@ class LicenseCommunicator {
         }
         return self::$instance;
     }
-    
+
     /**
      * Tells wheter its time to update or not
      * @return boolean True if license is outdated, false otherwise
@@ -81,7 +81,7 @@ class LicenseCommunicator {
         // if offset date lies in future, we do not update yet
         return ($this->lastUpdate + $offset <= time());
     }
-    
+
     /**
      * Updates the license
      * @param \Cx\Core_Modules\License\License $license The license to update
@@ -90,7 +90,7 @@ class LicenseCommunicator {
      * @param boolean $forceTemplate (optional) If set to true, the server is requested to send the template
      * @param array $_CORELANG (optional) Core language array
      * @param string $response (optional) Server response as JSON. If this is set, no HTTP request is perfomed
-     * @return null 
+     * @return null
      */
     public function update(&$license, $_CONFIG, $forceUpdate = false, $forceTemplate = false, $_CORELANG = array(), $response = '') {
         if (!$forceUpdate && !$this->isTimeToUpdate($_CONFIG) && empty($response)) {
@@ -109,12 +109,12 @@ class LicenseCommunicator {
                 return;
             }
         }
-        
+
         $upgradeUrl = $response->license->upgradeUrl;
         if ($response->license->partner->upgradeUrl) {
             $upgradeUrl = $response->license->partner->upgradeUrl;
         }
-        
+
         // create new license
         $installationId = $license->getInstallationId();
         $licenseKey = $license->getLicenseKey();
@@ -226,12 +226,12 @@ class LicenseCommunicator {
             $response->license->isUpgradable == 'true',
             $dashboardMessages
         );
-        
+
         $license->check();
 
         return;
     }
-    
+
     protected function fetchResponse($license, $_CONFIG, $forceTemplate, $_CORELANG) {
         $v = preg_split('#\.#', $_CONFIG['coreCmsVersion']);
         $e = $_CONFIG['coreCmsEdition'];
@@ -255,7 +255,7 @@ class LicenseCommunicator {
             'domainName' => $this->domainUrl,
             'sendTemplate' => $forceTemplate,
         );
-        
+
         if (true) {
             try {
                 $objFile = new \Cx\Lib\FileSystem\File(ASCMS_INSTANCE_PATH.ASCMS_INSTANCE_OFFSET.'/config/License.lic');
@@ -269,7 +269,7 @@ class LicenseCommunicator {
             }
             return $response;
         }
-        
+
         $a = $_SERVER['REMOTE_ADDR'];
         $r = 'http://';
         if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') {
@@ -302,7 +302,7 @@ class LicenseCommunicator {
         }
         return $response;
     }
-    
+
     /**
      * Registers the javascript code to update a license
      * @param array $_CORELANG Core language array
@@ -317,7 +317,7 @@ class LicenseCommunicator {
             $version *= 100;
             $version += $part;
         }
-        
+
         $userAgentRequestArguments = array(
             'data=' . urlencode(json_encode(array(
                 'installationId' => $license->getInstallationId(),
@@ -332,13 +332,13 @@ class LicenseCommunicator {
             'v=' . $version,
             'userAgentRequest=true',
         );
-        
+
         if (!$autoexec || $this->isTimeToUpdate()) {
             if (self::$javascriptRegistered) {
                 return;
             }
             self::$javascriptRegistered = true;
-            
+
             \JS::activate('jquery');
             $objJs = \ContrexxJavascript::getInstance();
             $objJs->setVariable("statusmessage_success", $_CORELANG['TXT_LICENSE_UPDATED'], "core_module/license");
@@ -347,7 +347,7 @@ class LicenseCommunicator {
                     var licenseMessage      = cx.jQuery("#license_message");
                     var cloneLicenseMessage = cx.jQuery("#license_message").clone();
                     var reloadManager       = true;
-                    
+
                     var revertMessage = function(setClass, setHref, setTarget, setText) {
                         setTimeout(function() {
                             newLicenseMessage = cloneLicenseMessage.clone();
@@ -367,7 +367,7 @@ class LicenseCommunicator {
                             licenseMessage = newLicenseMessage;
                         }, 1000);
                     }
-                    
+
                     //var versionCheckUrl = "../core_modules/License/versioncheck.php?force=true";
                     var versionCheckUrl = "../api/licup?force=true";
                     var versionCheckResponseHandler = function(data, allowUserAgent) {';
@@ -407,7 +407,7 @@ class LicenseCommunicator {
                             }, 1500);
                         }
                     }
-                    
+
                     var performRequest = function() {
                         licenseMessage.attr("class", "infobox");
                         licenseMessage.text("' . $_CORELANG['TXT_LICENSE_UPDATING'] . '");
@@ -422,7 +422,7 @@ class LicenseCommunicator {
                         });
                         return false;
                     }' . ($autoexec ? '()' : '') . ';
-                    
+
                     ' . ($intern ? 'cx.jQuery("input[name=update]").click(performRequest);' : '') . '
                 });
             ';

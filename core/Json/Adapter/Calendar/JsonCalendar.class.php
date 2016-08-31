@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * JSON Adapter for Calendar module
  * @copyright   Cloudrexx AG
@@ -46,10 +46,10 @@ use \Cx\Core\Json\JsonAdapter;
 class JsonCalendar implements JsonAdapter {
     /**
      * List of messages
-     * @var Array 
+     * @var Array
      */
     private $messages = array();
-    
+
     /**
      * Returns the internal name used as identifier for this adapter
      * @return String Name of this adapter
@@ -57,7 +57,7 @@ class JsonCalendar implements JsonAdapter {
     public function getName() {
         return 'calendar';
     }
-    
+
     /**
      * Returns an array of method names accessable from a JSON request
      * @return array List of method names
@@ -73,7 +73,7 @@ class JsonCalendar implements JsonAdapter {
     public function getMessagesAsString() {
         return implode('<br />', $this->messages);
     }
-    
+
     /**
      * Returns default permission as object
      * @return Object
@@ -81,20 +81,20 @@ class JsonCalendar implements JsonAdapter {
     public function getDefaultPermissions() {
         return null;
     }
-    
+
     /**
      * Returns all series dates from the given post data
-     *       
+     *
      * @return array Array of dates
      */
     public function getExeceptionDates() {
         global $objInit, $_CORELANG;
-        
+
         if (!\FWUser::getFWUserObject()->objUser->login() || $objInit->mode != 'backend') {
             throw new \Exception($_CORELANG['TXT_ACCESS_DENIED_DESCRIPTION']);
         }
-        
-        $calendarLib = new \Cx\Modules\Calendar\Controller\CalendarLibrary();       
-        return $calendarLib->getExeceptionDates();        
+
+        $calendarLib = new \Cx\Modules\Calendar\Controller\CalendarLibrary();
+        return $calendarLib->getExeceptionDates();
     }
 }

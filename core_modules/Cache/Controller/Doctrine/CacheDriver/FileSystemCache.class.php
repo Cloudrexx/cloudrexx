@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Filesystem Driver Adapter for doctrine
  *
@@ -58,11 +58,11 @@ class FilesystemCache extends \Cx\Core_Modules\Cache\Controller\Doctrine\CacheDr
      */
     protected function doFetch($id)
     {
-        
+
         $data     = '';
         $lifetime = -1;
         $filename = $this->getFilename($id);
-        
+
         if ( ! is_file($filename)) {
             return false;
         }
@@ -88,7 +88,7 @@ class FilesystemCache extends \Cx\Core_Modules\Cache\Controller\Doctrine\CacheDr
         list( $lifetime, $data ) = preg_split("/\r?\n/", file_get_contents( $filename ), 2);
 
         $ret = unserialize($data);
-        
+
         return $ret;
     }
 
@@ -133,21 +133,21 @@ class FilesystemCache extends \Cx\Core_Modules\Cache\Controller\Doctrine\CacheDr
 
         return file_put_contents($filename, intval($lifeTime) . PHP_EOL . $data) !== false;
     }
-    
+
     /**
      * {@inheritdoc}
      */
     protected function doFlush()
     {
-        foreach (new \DirectoryIterator($this->directory) as $file) {            
+        foreach (new \DirectoryIterator($this->directory) as $file) {
             if ($file->isDir() && !$file->isDot()) {
                 \Cx\Lib\FileSystem\FileSystem::delete_folder(str_replace('\\', '/', $file->getPath() .'/'. $file->getFilename()), true);
 }
         }
-        
+
         return true;
     }
-    
+
     /**
      * Deletes all cache entries.
      *

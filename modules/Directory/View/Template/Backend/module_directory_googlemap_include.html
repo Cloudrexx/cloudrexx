@@ -5,45 +5,45 @@
 var isBackend = {IS_BACKEND}
 
 var addEvent = function( obj, type, fn ) {
-	if (obj.addEventListener) {
-		obj.addEventListener( type, fn, false );
-		EventCache.add(obj, type, fn);
-	}
-	else if (obj.attachEvent) {
-		obj["e"+type+fn] = fn;
-		obj[type+fn] = function() { obj["e"+type+fn]( window.event ); }
-		obj.attachEvent( "on"+type, obj[type+fn] );
-		EventCache.add(obj, type, fn);
-	}
-	else {
-		obj["on"+type] = obj["e"+type+fn];
-	}
+  if (obj.addEventListener) {
+    obj.addEventListener( type, fn, false );
+    EventCache.add(obj, type, fn);
+  }
+  else if (obj.attachEvent) {
+    obj["e"+type+fn] = fn;
+    obj[type+fn] = function() { obj["e"+type+fn]( window.event ); }
+    obj.attachEvent( "on"+type, obj[type+fn] );
+    EventCache.add(obj, type, fn);
+  }
+  else {
+    obj["on"+type] = obj["e"+type+fn];
+  }
 }
 
 var EventCache = function(){
-	var listEvents = [];
-	return {
-		listEvents : listEvents,
-		add : function(node, sEventName, fHandler){
-			listEvents.push(arguments);
-		},
-		flush : function(){
-			var i, item;
-			for(i = listEvents.length - 1; i >= 0; i = i - 1){
-				item = listEvents[i];
-				if(item[0].removeEventListener){
-					item[0].removeEventListener(item[1], item[2], item[3]);
-				};
-				if(item[1].substring(0, 2) != "on"){
-					item[1] = "on" + item[1];
-				};
-				if(item[0].detachEvent){
-					item[0].detachEvent(item[1], item[2]);
-				};
-				item[0][item[1]] = null;
-			};
-		}
-	};
+  var listEvents = [];
+  return {
+    listEvents : listEvents,
+    add : function(node, sEventName, fHandler){
+      listEvents.push(arguments);
+    },
+    flush : function(){
+      var i, item;
+      for(i = listEvents.length - 1; i >= 0; i = i - 1){
+        item = listEvents[i];
+        if(item[0].removeEventListener){
+          item[0].removeEventListener(item[1], item[2], item[3]);
+        };
+        if(item[1].substring(0, 2) != "on"){
+          item[1] = "on" + item[1];
+        };
+        if(item[0].detachEvent){
+          item[0].detachEvent(item[1], item[2]);
+        };
+        item[0][item[1]] = null;
+      };
+    }
+  };
 }();
 addEvent(window,'unload',EventCache.flush);
 
@@ -69,7 +69,7 @@ var startZoom   = {DIRECTORY_START_ZOOM};
 var map = null;
 var geocoder = null;
 var point = null;
-var address = null; 
+var address = null;
 
 //var elName = document.getElementsByName("inputValue[country]")[0];
 //var elCompany = document.getElementsByName("inputValue[company_name]")[0];
@@ -80,20 +80,20 @@ var elCountry = document.getElementsByName("inputValue[country]")[0];
 
 //addEvent(elStreet, 'blur', function(){getAddress();})
 
-var elLat 		= document.getElementsByName("inputValue[lon]")[0];
-var elLatFrac 	= document.getElementsByName("inputValue[lon_fraction]")[0];
-var elLon 		= document.getElementsByName("inputValue[lat]")[0];
-var elLonFrac 	= document.getElementsByName("inputValue[lat_fraction]")[0];
-var elZoom 		= document.getElementsByName("inputValue[zoom]")[0];
+var elLat     = document.getElementsByName("inputValue[lon]")[0];
+var elLatFrac   = document.getElementsByName("inputValue[lon_fraction]")[0];
+var elLon     = document.getElementsByName("inputValue[lat]")[0];
+var elLonFrac   = document.getElementsByName("inputValue[lat_fraction]")[0];
+var elZoom     = document.getElementsByName("inputValue[zoom]")[0];
 
 var updateAddress = function(){
-//	name 	= {DIRECTORY_ENTRY_NAME};
-//	company = {DIRECTORY_ENTRY_COMPANY};
-	street 	= elStreet.value;
-	zip 	= elZip.value;
-	city	= elCity.value;
-	country	= elCountry.options[elCountry.selectedIndex].value;
-	return street+', '+zip+' '+city+', '+country;
+//  name   = {DIRECTORY_ENTRY_NAME};
+//  company = {DIRECTORY_ENTRY_COMPANY};
+  street   = elStreet.value;
+  zip   = elZip.value;
+  city  = elCity.value;
+  country  = elCountry.options[elCountry.selectedIndex].value;
+  return street+', '+zip+' '+city+', '+country;
 }
 
 var load = function() {
@@ -102,33 +102,33 @@ var load = function() {
         center: new google.maps.LatLng(-122.1419, 37.4419),
         mapTypeId: google.maps.MapTypeId.ROADMAP
     };
-    
-	if( (elLon.value != '' && elLon.value != 0 && elLat.value != '' && elLat.value != 0) &&
-		(elLonFrac.value != '' && elLonFrac.value != 0 && elLatFrac.value != '' && elLatFrac.value != 0)){
-		lon = elLon.value;
-		lonf = elLonFrac.value;
-		lat = elLat.value;
-		latf = elLatFrac.value;
-		options.zoom = parseInt((elZoom.value != '') ? elZoom.value : 13);
-		options.center = new google.maps.LatLng(lat+'.'+latf, lon+'.'+lonf);
-		point = options.center;
-	} else {
-		options.center = new google.maps.LatLng(
-		    {DIRECTORY_MAP_LAT_BACKEND},
-		    {DIRECTORY_MAP_LON_BACKEND}
-	    );
-	    options.zoom = {DIRECTORY_MAP_ZOOM_BACKEND};
-		point = options.center;
-		if(!location.href.match(/cmd=add/) && !location.href.match(/act=new/)){
-			x = setTimeout('getAddress()', 0);
-		}
-	}
-	
+
+  if( (elLon.value != '' && elLon.value != 0 && elLat.value != '' && elLat.value != 0) &&
+    (elLonFrac.value != '' && elLonFrac.value != 0 && elLatFrac.value != '' && elLatFrac.value != 0)){
+    lon = elLon.value;
+    lonf = elLonFrac.value;
+    lat = elLat.value;
+    latf = elLatFrac.value;
+    options.zoom = parseInt((elZoom.value != '') ? elZoom.value : 13);
+    options.center = new google.maps.LatLng(lat+'.'+latf, lon+'.'+lonf);
+    point = options.center;
+  } else {
+    options.center = new google.maps.LatLng(
+        {DIRECTORY_MAP_LAT_BACKEND},
+        {DIRECTORY_MAP_LON_BACKEND}
+      );
+      options.zoom = {DIRECTORY_MAP_ZOOM_BACKEND};
+    point = options.center;
+    if(!location.href.match(/cmd=add/) && !location.href.match(/act=new/)){
+      x = setTimeout('getAddress()', 0);
+    }
+  }
+
     map = new google.maps.Map(
         document.getElementById('gmap'),
         options
     );
-    
+
     marker = new google.maps.Marker({
         position: point,
         map: map,
@@ -143,14 +143,14 @@ var load = function() {
 
             point = event.latLng;
             passValues();
-        }); 
+        });
 
         google.maps.event.addListener(marker, 'dragend', function(event){
             point = event.latLng;
             passValues();
         });
     }
-    
+
     geocoder = new google.maps.Geocoder();
 
     passValues();
@@ -159,37 +159,37 @@ var load = function() {
 }
 
 var getStatusString = function(X, Y){
-	return '<span class="red">lat: </span>'+Y+'<br /><span class="red">lon: </span>'+X+'<span class="red"><br /> zoom: </span>'+map.getZoom();
+  return '<span class="red">lat: </span>'+Y+'<br /><span class="red">lon: </span>'+X+'<span class="red"><br /> zoom: </span>'+map.getZoom();
 }
 
-var passValues = function(){    
-	lon 	= point.lng().toString().split('.')[0];
-	lonfac 	= point.lng().toString().split('.')[1];
-	lat 	= point.lat().toString().split('.')[0];
-	latfac 	= point.lat().toString().split('.')[1];
-	if (!lonfac) {
-	    lonfac = 0;
-	}
-	if (!latfac) {
-	    latfac = 0;
-	}
-	elLon.value = lon;
-	elLonFrac.value = lonfac;
-	elLat.value = lat;
-	elLatFrac.value = latfac;
-	elZoom.value = map.getZoom();
+var passValues = function(){
+  lon   = point.lng().toString().split('.')[0];
+  lonfac   = point.lng().toString().split('.')[1];
+  lat   = point.lat().toString().split('.')[0];
+  latfac   = point.lat().toString().split('.')[1];
+  if (!lonfac) {
+      lonfac = 0;
+  }
+  if (!latfac) {
+      latfac = 0;
+  }
+  elLon.value = lon;
+  elLonFrac.value = lonfac;
+  elLat.value = lat;
+  elLatFrac.value = latfac;
+  elZoom.value = map.getZoom();
 }
 
 var getAddress = function() {
-	address = updateAddress();
-	if(address.match(/^,  ,/)){
+  address = updateAddress();
+  if(address.match(/^,  ,/)){
         try{
-	        document.getElementById("geostatus").innerHTML = "{TXT_DIR_GEO_SPECIFY_ADDRESS_OR_CHOOSE_MANUALLY}";
-	    }catch(e){}
-	    return false;
-	}
-   	if (geocoder) {
-   		geocoder.geocode({'address':address}, getGeoCodeData);
+          document.getElementById("geostatus").innerHTML = "{TXT_DIR_GEO_SPECIFY_ADDRESS_OR_CHOOSE_MANUALLY}";
+      }catch(e){}
+      return false;
+  }
+     if (geocoder) {
+       geocoder.geocode({'address':address}, getGeoCodeData);
     }
 }
 
@@ -198,7 +198,7 @@ var getGeoCodeData = function(results, status) {
         map.setCenter(results[0].geometry.location);
         marker.setPosition(results[0].geometry.location);
     } else {
-		document.getElementById("geostatus").innerHTML = reasons[status];
+    document.getElementById("geostatus").innerHTML = reasons[status];
     }
 }
 

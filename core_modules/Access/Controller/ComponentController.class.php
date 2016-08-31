@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,10 +24,10 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Main controller for Access
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
@@ -39,7 +39,7 @@ use Cx\Core_Modules\Access\Model\Event\AccessEventListener;
 
 /**
  * Main controller for Access
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
@@ -54,7 +54,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
 
      /**
      * Load your component.
-     * 
+     *
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
      */
     public function load(\Cx\Core\ContentManager\Model\Entity\Page $page) {
@@ -70,7 +70,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             case \Cx\Core\Core\Controller\Cx::MODE_BACKEND:
                 $this->cx->getTemplate()->addBlockfile('CONTENT_OUTPUT', 'content_master', 'LegacyContentMaster.html');
                 $objTemplate = $this->cx->getTemplate();
-                
+
                 $subMenuTitle = $_CORELANG['TXT_COMMUNITY'];
                 $objAccessManager = new AccessManager();
                 $objAccessManager->getPage();
@@ -80,10 +80,10 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 break;
         }
     }
-    
+
     /**
      * Do something before content is loaded from DB
-     * 
+     *
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
      */
     public function preContentLoad(\Cx\Core\ContentManager\Model\Entity\Page $page) {
@@ -98,11 +98,11 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 break;
         }
     }
-    
-    
+
+
     /**
      * Do something after content is loaded from DB
-     * 
+     *
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
      */
     public function postContentLoad(\Cx\Core\ContentManager\Model\Entity\Page $page) {
@@ -188,16 +188,16 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 break;
         }
     }
-    
+
     /**
      * Do something after resolving is done
-     * 
+     *
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
      */
     public function postResolve(\Cx\Core\ContentManager\Model\Entity\Page $page) {
         switch ($this->cx->getMode()) {
             case \Cx\Core\Core\Controller\Cx::MODE_BACKEND:
-                
+
                 global $plainCmd, $isRegularPageRequest;
                 $objTemplate = $this->cx->getTemplate();
                 $objFWUser = \FWUser::getFWUserObject();
@@ -249,11 +249,11 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                     'TXT_PROFILE' => $txtProfile,
                     'USER_ID' => $objFWUser->objUser->getId(),
                 ));
-                
+
                 if ($loggedIn) {
                     break;
                 }
-                
+
                 if (isset($_POST['redirect'])) {
                     $redirect = \FWUser::getRedirectUrl(urlencode($_POST['redirect']));
                     \Cx\Core\Csrf\Controller\Csrf::header('location: ' . $redirect);
@@ -266,7 +266,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 break;
         }
     }
-    
+
     /**
      * Register your event listeners here
      *
@@ -281,7 +281,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         $eventListener = new AccessEventListener($this->cx);
         $this->cx->getEvents()->addEventListener('mediasource.load', $eventListener);
     }
-    
+
     /**
      * Do something before main template gets parsed
      *

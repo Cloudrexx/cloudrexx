@@ -723,7 +723,7 @@ class Forum extends ForumLibrary {
             $this->_objTpl->touchBlock('previewNewPost');
             $this->_objTpl->hideBlock('previewEditPost');
         }
-        
+
         if($_REQUEST['act'] == 'quote'){
             $quoteContent = $this->_getPostingData($intPostId);
             $subject = 'RE: '.addcslashes(htmlentities($quoteContent['subject'], ENT_QUOTES, CONTREXX_CHARSET), '\\');
@@ -1717,7 +1717,7 @@ class Forum extends ForumLibrary {
                             offset = document.documentElement.scrollTop;
                         }
                         if(document.getElementById("scrollpos")){
-                        	document.getElementById("scrollpos").value = offset;
+                            document.getElementById("scrollpos").value = offset;
                         }
                     }
                 //]]>

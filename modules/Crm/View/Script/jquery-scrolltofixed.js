@@ -73,12 +73,12 @@
 
             // Capture the offset left of the target element.
             offsetLeft = target.offset().left;
-            
+
             // If the offsets option is on, alter the left offset.
             if (base.options.offsets) {
                 offsetLeft += (target.offset().left - target.position().left);
             }
-            
+
             if (originalOffsetLeft == -1) {
                 originalOffsetLeft = offsetLeft;
             }
@@ -87,7 +87,7 @@
 
             // Set that this has been called at least once.
             isReset = true;
-            
+
             if (base.options.bottom != -1) {
                 target.trigger('preFixed.ScrollToFixed');
                 setFixed();
@@ -307,7 +307,7 @@
                         if (isFixed()) {
                             postPosition();
                             target.trigger('preUnfixed.ScrollToFixed');
-                            
+
                             if (originalPosition === 'absolute') {
                                 setAbsolute();
                             } else {
@@ -338,7 +338,7 @@
 
         function postPosition() {
             var position = target.css('position');
-            
+
             if (position == 'absolute') {
                 target.trigger('postAbsolute.ScrollToFixed');
             } else if (position == 'fixed') {
@@ -354,7 +354,7 @@
             if(target.is(':visible')) {
                 isReset = false;
                 checkScroll();
-			}
+      }
         }
 
         var windowScroll = function(event) {
@@ -439,7 +439,7 @@
             // When the window scrolls, check to see if we need to fix or unfix
             // the target element.
             $(window).bind('scroll.ScrollToFixed', windowScroll);
-            
+
             if (base.options.preFixed) {
                 target.bind('preFixed.ScrollToFixed', base.options.preFixed);
             }
@@ -482,7 +482,7 @@
 
             target.bind('detach.ScrollToFixed', function(ev) {
                 preventDefault(ev);
-                
+
                 target.trigger('preUnfixed.ScrollToFixed');
                 setUnfixed();
                 target.trigger('unfixed.ScrollToFixed');
@@ -493,7 +493,7 @@
                 target.unbind('.ScrollToFixed');
                 base.$el.removeData('ScrollToFixed');
             });
-            
+
             // Reset everything.
             windowResize();
         };

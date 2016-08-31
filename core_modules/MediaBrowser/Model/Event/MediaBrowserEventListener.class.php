@@ -26,7 +26,7 @@
  */
 
 /**
- * @copyright   Cloudrexx AG 
+ * @copyright   Cloudrexx AG
  * @author Robin Glauser <robin.glauser@comvation.com>
  * @package     cloudrexx
  */

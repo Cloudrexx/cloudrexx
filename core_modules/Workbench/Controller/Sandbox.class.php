@@ -46,7 +46,7 @@ class Sandbox {
         $this->execute();
         $this->show($language);
     }
-    
+
     protected function initialize(&$arguments) {
         switch ($this->mode) {
             case self::MODE_DQL:
@@ -66,7 +66,7 @@ class Sandbox {
                 break;
         }
     }
-    
+
     protected function execute() {
         switch ($this->mode) {
             case self::MODE_DQL:
@@ -114,7 +114,7 @@ class Sandbox {
                 break;
         }
     }
-    
+
     /**
      * This code does not belong here, but where to put it?
      */
@@ -162,14 +162,14 @@ class Sandbox {
         $entityList .= '</ul>';
         return $entityList;
     }
-    
+
     /**
      * @todo: no HTML here!
      */
     protected function show(&$lang) {
         $this->template = new \Cx\Core\Html\Sigma(ASCMS_CORE_MODULE_PATH . '/Workbench/View/Template/Backend');
         $this->template->loadTemplateFile('Sandbox.html');
-        
+
         switch ($this->mode) {
             case self::MODE_DQL:
                 $sideboxTitle = $lang['TXT_WORKBENCH_SANDBOX_ENTITIES'];
@@ -184,7 +184,7 @@ class Sandbox {
                 </ul>';
                 break;
         }
-        
+
         $this->template->setVariable(array(
             'FORM_ACTION' => 'index.php?cmd=Workbench&act=sandbox/' . $this->mode,
             'TXT_WORKBENCH_SANDBOX_SUBMIT' => $lang['TXT_WORKBENCH_SANDBOX_SUBMIT'],
@@ -194,16 +194,15 @@ class Sandbox {
             'SIDEBOX_CONTENT' => $sideboxContent,
         ));
     }
-    
+
     public function phpErrorsAsExceptionsHandler($errno, $errstr) {
         if (!$this->errrorHandlerActive) {
             return;
         }
         throw new SandboxException($errstr);
     }
-    
+
     public function __toString() {
         return $this->template->get();
     }
 }
-

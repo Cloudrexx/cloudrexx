@@ -90,9 +90,9 @@ body a:hover {text-decoration: underline;}
     display: block;
 }
 .header {
-    background-color: #67bfb6;      
+    background-color: #67bfb6;
     background-position: center center;
-    background-repeat: no-repeat;    
+    background-repeat: no-repeat;
     margin-left: -50px;
     margin-right: -50px;
     padding-left: 0;
@@ -153,7 +153,7 @@ body a:hover {text-decoration: underline;}
 }
 #metanavigation {
     right: 54px;
-    top: 0;    
+    top: 0;
 }
 #metanavigation li {
     position: relative;
@@ -235,7 +235,7 @@ body a:hover {text-decoration: underline;}
     position: relative;
     display: block
 }
-.navigation li a {    
+.navigation li a {
     box-sizing: border-box;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
@@ -247,7 +247,7 @@ body a:hover {text-decoration: underline;}
 }
 #content-wrapper {
     float: left;
-    width: 100%;   
+    width: 100%;
     padding: 0 0 20px 0;
     padding-bottom: 88px;
 }
@@ -256,7 +256,7 @@ body a:hover {text-decoration: underline;}
     width: 100%;
     min-height: 194px;
     padding: 6px 15px 20px 15px;
-    margin: 0 0 20px 0;   
+    margin: 0 0 20px 0;
 }
 #home-page {
     float: left;
@@ -340,7 +340,7 @@ body a:hover {text-decoration: underline;}
 #content-top {
     margin: 10px auto 10px;
     color: #888888;
-    font-size: 12px;   
+    font-size: 12px;
 }
 #breadcrumb {
     float: left;
@@ -671,7 +671,7 @@ body a:hover {text-decoration: underline;}
     margin: 0 0 5px 0;
     color: #FFFFFF;
     font-size: 18px;
-    font-weight: bold;    
+    font-weight: bold;
     background: #67bfb6;
 }
 #page-header {
@@ -941,7 +941,7 @@ span.disconnected {
     padding-right: 21px;
     color: #fff;
     font-size: 15px;
-    float: left;   
+    float: left;
 }
 .modal-nav button:hover {
     background: none;
@@ -1354,7 +1354,7 @@ p#loginerror {
 .mobile-reg:hover {
     background: url('images/user_register.png') no-repeat center #888;
 }
-.mobile-login:hover { 
+.mobile-login:hover {
     background: url('images/login.png') no-repeat center #888;
 }
 .navbar-toggle:hover {
@@ -1473,8 +1473,8 @@ p#loginerror {
 /* new */
 .inner-wrap {
     background-color: #f7fcfb;
-    position: relative;         
-    width: 100%;      
+    position: relative;
+    width: 100%;
 }
 .site-intro {
     display: inline;
@@ -1552,10 +1552,10 @@ p#loginerror {
     padding-top: 16px;
 }
 .btn {
-    background-color: #67bfb6;  
+    background-color: #67bfb6;
     padding: 15px 20px;
     color: #f7fcfb;
-    font-weight: 600;    
+    font-weight: 600;
     -webkit-border-radius: 3px;
     border-radius: 3px;
     border: 0;
@@ -1601,7 +1601,7 @@ p#loginerror {
     padding-right: 0;
     position: fixed;
     bottom: 18px;
-    right: 18px;  
+    right: 18px;
     outline: 0;
     display: none;
     overflow: hidden;
@@ -1644,7 +1644,7 @@ a.back-to-top:focus,
     top: -1px;
     right: 0;
     bottom: 0;
-    left: 0;    
+    left: 0;
     width: 100%;
     line-height: 2.665;
     -webkit-transition: all ease 0.238s;
@@ -1661,7 +1661,7 @@ a.back-to-top:focus,
 }
 .header .nav-toggle {
     text-indent: -999em;
-    position: relative;   
+    position: relative;
     padding: 0;
     height: 42px;
     width: 42px;
@@ -1797,7 +1797,7 @@ a.back-to-top:focus,
 }
 .btn-link {
     color: #67bfb6;
-    background-color: #f7fcfb;    
+    background-color: #f7fcfb;
 }
 .btn-link:hover {
     color: #67bfb6;

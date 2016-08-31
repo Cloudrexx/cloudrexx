@@ -27,7 +27,7 @@
 
 function _downloadsUpdate()
 {
-	global $objDatabase, $_ARRAYLANG, $_CORELANG;
+    global $objDatabase, $_ARRAYLANG, $_CORELANG;
 
     try{
         \Cx\Lib\UpdateUtil::sql(

@@ -87,13 +87,13 @@ class SurveyManager extends SurveyLibrary {
      */
     function __construct() {
         global $objTemplate, $_ARRAYLANG, $objDatabase;
-        
+
         parent::__construct();
-        
+
         $this->_objTpl = new \Cx\Core\Html\Sigma(ASCMS_MODULE_PATH.'/Survey/View/Template/Backend');
         \Cx\Core\Csrf\Controller\Csrf::add_placeholder($this->_objTpl);
         $this->_objTpl->setErrorHandling(PEAR_ERROR_DIE);
-        
+
         $objTemplate->setVariable("CONTENT_NAVIGATION",
                 "<a href='index.php?cmd=Survey' title='".$_ARRAYLANG['TXT_OVERVIEW']."'>".$_ARRAYLANG['TXT_OVERVIEW']."</a>
                  <a href='index.php?cmd=Survey&act=createOrCopy' title='".$_ARRAYLANG['TXT_CREATE_SURVEY']."'>".$_ARRAYLANG['TXT_CREATE_SURVEY']."</a>
@@ -122,10 +122,10 @@ class SurveyManager extends SurveyLibrary {
             case "copyEditSurvey":
                 $this->copyEditSurvey();
                 break;
-            case "modify_survey":                
+            case "modify_survey":
             case "addSurvey":
             case "editSurvey":
-                $this->_modifySurvey();                
+                $this->_modifySurvey();
                 break;
             case "settings":
                 $this->Settings();
@@ -148,7 +148,7 @@ class SurveyManager extends SurveyLibrary {
             case "questionAnalyseSurvey":
                 $this->QuestionAnalyseSurvey();
                 break;
-            case "addQuestions":   
+            case "addQuestions":
                 $this->addQuestions();
                 break;
             case "editQuestionsOverview":
@@ -172,10 +172,10 @@ class SurveyManager extends SurveyLibrary {
         }
 
         $objTemplate->setVariable(array(
-                'CONTENT_TITLE'	    => $this->_pageTitle,
+                'CONTENT_TITLE'        => $this->_pageTitle,
                 'CONTENT_OK_MESSAGE'     => $this->_strOkMessage,
                 'CONTENT_STATUS_MESSAGE' => $this->_strErrMessage,
-                'ADMIN_CONTENT'	    => $this->_objTpl->get()
+                'ADMIN_CONTENT'        => $this->_objTpl->get()
         ));
     }
 
@@ -253,7 +253,7 @@ class SurveyManager extends SurveyLibrary {
         global $_CORELANG, $_ARRAYLANG, $objDatabase;
         $this->_pageTitle = $_ARRAYLANG['TXT_CREATE_SURVEY'];
         $this->_objTpl->loadTemplateFile('module_add_surveyone.html');
-        
+
         $id = contrexx_input2raw($_REQUEST['id']);
         // Parsing javascript function to the place holder.
         $this->_objTpl->setVariable(array(
@@ -302,13 +302,13 @@ class SurveyManager extends SurveyLibrary {
             $textAfterButton = contrexx_input2db($_POST['textAfterButton']);
             // Insert Query for Inserting the Fields Posted
             $insertSurvey = 'UPDATE `'.DBPREFIX.'module_survey_surveygroup` SET
-    					   `title` = "'.$title.'",
-    					   `UserRestriction` = "'.$method.'",       
-					   `text1` = "'.$text1.'",
+                           `title` = "'.$title.'",
+                           `UserRestriction` = "'.$method.'",
+                       `text1` = "'.$text1.'",
                                            `text2` = "'.$text2.'",
                                            `thanksMSG` = "'.$thanksMSG.'",
                                            `description` = "'.$description.'",
-					   `textAfterButton` = "'.$textAfterButton.'",
+                       `textAfterButton` = "'.$textAfterButton.'",
                                             `additional_salutation` = "'.((isset($_POST['additional_salutation'])&&($_POST['additional_salutation']=='on'))?1:0).'",
                                             `additional_nickname` = "'.((isset($_POST['additional_nickname'])&&($_POST['additional_nickname']=='on'))?1:0).'",
                                             `additional_forename` = "'.((isset($_POST['additional_forename'])&&($_POST['additional_forename']=='on'))?1:0).'",
@@ -340,7 +340,7 @@ class SurveyManager extends SurveyLibrary {
                                                     pos = "'.contrexx_raw2db($objCopyResult->fields['pos']).'",
                                                     column_choice = "'.contrexx_raw2db($objCopyResult->fields['column_choice']).'"');
                 $insertSurvey = 'UPDATE `'.DBPREFIX.'module_survey_surveyQuestions`
-           					      SET  `survey_id` = "'.contrexx_raw2db($id).'" WHERE survey_id = 0';
+                                     SET  `survey_id` = "'.contrexx_raw2db($id).'" WHERE survey_id = 0';
                 $objDatabase->Execute($insertSurvey);
 
                 // to get the current question id
@@ -352,7 +352,7 @@ class SurveyManager extends SurveyLibrary {
                 }
                 // select query for updating the new answer in tables
                 $objResult = $objDatabase->Execute('SELECT `id` FROM '.DBPREFIX.'module_survey_surveyQuestions
-                                                    WHERE survey_id='.$cid.' ORDER BY id'); 
+                                                    WHERE survey_id='.$cid.' ORDER BY id');
                 while(!$objResult->EOF) {
                     $question_id[] = $objResult->fields['id'];
                     $objResult->MoveNext();
@@ -365,25 +365,25 @@ class SurveyManager extends SurveyLibrary {
                                                 `votes` = 0,
                                                  `answer` = "'.$objAnsResult->fields['answer'].'"');
                     $insertAnswers = 'UPDATE `'.DBPREFIX.'module_survey_surveyAnswers`
-           				SET  `question_id` = "'.contrexx_raw2db($currentId[$i]).'" WHERE question_id =  0';
+                           SET  `question_id` = "'.contrexx_raw2db($currentId[$i]).'" WHERE question_id =  0';
                     $objDatabase->Execute($insertAnswers);
                 }
                 // loop populate the Column Choice for the questions
                 for($i=0;$i<count($currentId);$i++) {
-                    $objAnsResult = $objDatabase->Execute('SELECT choice FROM `'.DBPREFIX.'module_survey_columnChoices` WHERE 	question_id= "'.$question_id[$i].'"');
+                    $objAnsResult = $objDatabase->Execute('SELECT choice FROM `'.DBPREFIX.'module_survey_columnChoices` WHERE     question_id= "'.$question_id[$i].'"');
                     $objDatabase->Execute('INSERT INTO `'.DBPREFIX.'module_survey_columnChoices`
                                             SET `question_id` = 0,
                                                 `choice` = "'.contrexx_raw2db($objAnsResult->fields['choice']).'"');
                     $insertAnswers = 'UPDATE `'.DBPREFIX.'module_survey_columnChoices`
-           				SET  `question_id` = "'.contrexx_raw2db($currentId[$i]).'" WHERE question_id =  0';
+                           SET  `question_id` = "'.contrexx_raw2db($currentId[$i]).'" WHERE question_id =  0';
                     $objDatabase->Execute($insertAnswers);
                 }
             }
             $this->_strOkMessage = $_ARRAYLANG['TXT_SURVEY_UPDATE_SUC_TXT'];
         }
-        
+
         $objResult = $objDatabase->Execute('SELECT * FROM '.DBPREFIX.'module_survey_surveygroup
-               WHERE id='.$id.' ORDER BY id desc');	
+               WHERE id='.$id.' ORDER BY id desc');
         if(!$objResult->EOF) {
             $additional_nickname = $objResult->fields['additional_nickname'];
             $additional_forename = $objResult->fields['additional_forename'];
@@ -451,7 +451,7 @@ class SurveyManager extends SurveyLibrary {
             ));
         }
     }
-    
+
     function EditSurvey() {
         global $_CORELANG, $_ARRAYLANG, $objDatabase;
 
@@ -466,7 +466,7 @@ class SurveyManager extends SurveyLibrary {
         }else {
             $hiddenField = "<input type='hidden' name='hidfield' id='hidfield' value=''>";
         }
-        
+
         // Parsing javascript function to the place holder.
         $this->_objTpl->setVariable(array(
             'HIDDEN_FIELD'              => $hiddenField,
@@ -499,7 +499,7 @@ class SurveyManager extends SurveyLibrary {
             'TXT_HIDE'                  => $_ARRAYLANG['TXT_HIDE'],
             'TXT_PLACEOFREC'            => $_ARRAYLANG['TXT_PLACEOFREC']
         ));
-        
+
         $link = "'index.php?".$CSRF_PARAM."&cmd=Survey&act=editQuestionsOverview&id=".$id."&linkId=".$id."'";
         $this->_objTpl->setVariable(array(
             'TXT_NEXT' => '<input type="button" name="Next" value="'.$_ARRAYLANG['TXT_SURVEY_NEXT_TXT'].'" onclick= "window.location='.$link.'" />',
@@ -724,15 +724,15 @@ class SurveyManager extends SurveyLibrary {
                 }
             }
             $this->_objTpl->setVariable(array(
-                    'TXT_SURVEY_ID'		      => contrexx_raw2xhtml($objResult->fields['id']),
-                    'TXT_SURVEY_POS'	              => contrexx_raw2xhtml($objResult->fields['pos']),
-                    'TXT_SURVEY_QUESTION'	      => $surveyTemp,
+                    'TXT_SURVEY_ID'              => contrexx_raw2xhtml($objResult->fields['id']),
+                    'TXT_SURVEY_POS'                  => contrexx_raw2xhtml($objResult->fields['pos']),
+                    'TXT_SURVEY_QUESTION'          => $surveyTemp,
                     'TXT_SURVEY_QUESTION_CREATED_AT'  => contrexx_raw2xhtml($objResult->fields['created']),
                     'TXT_SURVEY_QUESTION_TYPE'        => contrexx_raw2xhtml($Radio),
                     'TXT_SURVEY_QUESTION_COMMENTABLE' => contrexx_raw2xhtml($comment),
                     'TXT_ANALYSE_QUESTION_PREVIEW'    => $_ARRAYLANG['TXT_ANALYSE_QUESTION_PREVIEW'],
-                    'TXT_SURVEY_EDIT_TXT'	      => $_ARRAYLANG['TXT_SURVEY_EDIT_TXT'],
-                    'TXT_SURVEY_DELETE_TXT'	      => $_ARRAYLANG['TXT_SURVEY_DELETE_TXT'],
+                    'TXT_SURVEY_EDIT_TXT'          => $_ARRAYLANG['TXT_SURVEY_EDIT_TXT'],
+                    'TXT_SURVEY_DELETE_TXT'          => $_ARRAYLANG['TXT_SURVEY_DELETE_TXT'],
                     'TXT_SURVEY_COUNTER'              => contrexx_raw2xhtml($objResult->fields['votes'])." votes",
                     'TXT_LINKID'                      => contrexx_raw2xhtml($linkId),
                     'ENTRY_ROWCLASS'                  => $row = ($row == 'row1') ? 'row2' : 'row1',
@@ -745,7 +745,7 @@ class SurveyManager extends SurveyLibrary {
     function EditQuestions() {
         global $_CORELANG, $_ARRAYLANG, $objDatabase;
         \JS::activate('greybox');
-        
+
         $this->_pageTitle = $_ARRAYLANG['TXT_EDIT_QUESTION_TXT'];
         $this->_objTpl->loadTemplateFile('module_add_survey.html');
         $id = isset($_REQUEST['id']) ? contrexx_input2raw($_REQUEST['id']) : 0;
@@ -912,7 +912,7 @@ class SurveyManager extends SurveyLibrary {
                 $i++;
                 $objResults->MoveNext();
             }
-            
+
             // to get the id of column choices
             $query="SELECT choice,id FROM ".DBPREFIX."module_survey_columnChoices WHERE question_id='$id' ORDER BY id";
             $objResults = $objDatabase->Execute($query);
@@ -994,7 +994,7 @@ class SurveyManager extends SurveyLibrary {
 
             // Insert Query for Inserting the Fields Posted
             $insertSurvey = 'UPDATE `'.DBPREFIX.'module_survey_surveyQuestions`
-    					      SET  `survey_id` = "'.contrexx_raw2db($survey_id).'",
+                              SET  `survey_id` = "'.contrexx_raw2db($survey_id).'",
                                            `isCommentable` = "'.contrexx_raw2db($commentable).'",
                                            `QuestionType` = "'.contrexx_raw2db($questionType).'",
                                            `column_choice` = "'.contrexx_raw2db($colChoic).'",
@@ -1067,7 +1067,7 @@ class SurveyManager extends SurveyLibrary {
                     'TXT_SURVEY_ID'      => $ids,
                     'TXT_SURVEY_QUES'    => contrexx_raw2xhtml($question),
                     'TXT_SURVEY_VOTES'   => $total,
-                    'TXT_SURVEY_SKIPPED' => $skipped,     		         		                      'TXT_SUR_ID'      =>	$id,
+                    'TXT_SURVEY_SKIPPED' => $skipped,                                                    'TXT_SUR_ID'      =>    $id,
                     'ENTRY_ROWCLASS'     => $row = ($row == 'row1') ? 'row2' : 'row1'
             ));
             $this->_objTpl->parse('Show_Analyse');
@@ -1127,7 +1127,7 @@ class SurveyManager extends SurveyLibrary {
             }
 
             $query = "SELECT id, answer FROM ".DBPREFIX."module_survey_surveyAnswers WHERE
-		           question_id='$answerId' ORDER BY id";
+                   question_id='$answerId' ORDER BY id";
             $objResult = $objDatabase->Execute($query);
 
             $SurveyOptionText = "";
@@ -1179,9 +1179,9 @@ class SurveyManager extends SurveyLibrary {
                                 break;
                             case "6":
                                 $SurveyOptionText .="<tr>
-			 <td style='width:5%'><span  style='float:left;padding:3px 10px 2px 0px;'>".contrexx_remove_script_tags($objResult->fields['answer'])."</span></td>
-			 <td><input style='float:left;width:250px;' type='text' name='votingoption_$cou' value='' /> 
-			 </td></tr>";
+             <td style='width:5%'><span  style='float:left;padding:3px 10px 2px 0px;'>".contrexx_remove_script_tags($objResult->fields['answer'])."</span></td>
+             <td><input style='float:left;width:250px;' type='text' name='votingoption_$cou' value='' />
+             </td></tr>";
                                 break;
                         }
                     }
@@ -1195,7 +1195,7 @@ class SurveyManager extends SurveyLibrary {
                 $SurveyOptionText .= "</table>";
             }
             $this->_objTpl->setVariable(array(
-                'GRAND_TITLE'	        => contrexx_raw2xhtml($QuestionDatas->fields['title']),
+                'GRAND_TITLE'            => contrexx_raw2xhtml($QuestionDatas->fields['title']),
                 'SURVEY_TITLE'          => contrexx_raw2xhtml($QuestionDatas->fields['Question']),
                 'SURVEY_OPTIONS_TEXT'   => $SurveyOptionText,
                 'SURVEY_COMMENT_BOX'    => $commentBox
@@ -1222,7 +1222,7 @@ class SurveyManager extends SurveyLibrary {
             'TXT_BACK'                      => $_ARRAYLANG['TXT_BACK_SURVEY_TXT'],
             'TXT_SURVID'                    => contrexx_raw2xhtml($sid)
         ));
-        
+
         $images           = 1;
         $votingResultText = '';
         $answered         = '';
@@ -1268,7 +1268,7 @@ class SurveyManager extends SurveyLibrary {
                 $votingVotes=intval($objResult->fields['svotes']);
             }
             $votingVotes = ($votingVotes) ? $votingVotes : 1;
-            
+
             $percentage = 0;
             $imagewidth = 1; //Mozilla Bug if image width=0
             if ($QType == 3 || $QType == 4) {
@@ -1376,7 +1376,7 @@ class SurveyManager extends SurveyLibrary {
     function surveyOverview() {
         global $_CORELANG, $_ARRAYLANG, $objDatabase;
         \JS::activate('greybox');
-        
+
         $this->_pageTitle = $_ARRAYLANG['TXT_SURVEY_OVERVIEW'];
         $this->_objTpl->loadTemplateFile('module_survey_overview.html');
 
@@ -1400,21 +1400,21 @@ class SurveyManager extends SurveyLibrary {
         $this->_objTpl->setVariable(array(
             'SHOW_SURVEY_JAVASCRIPT'    => $this->getCreateSurveyJavascript(),
             'TXT_SURVEY_OVERVIEW'       => $_ARRAYLANG['TXT_SURVEY_OVERVIEW'],
-            'TXT_SYMBOL'		=> $_ARRAYLANG['TXT_SYMBOL'],
-            'TXT_STATUS'       		=> $_ARRAYLANG['TXT_STATUS'],
-            'TXT_HOME'       		=> $_ARRAYLANG['TXT_HOME'],
-            'TXT_SURVEY_TITLE'       	=> $_ARRAYLANG['TXT_SURVEY_TITLE'],
+            'TXT_SYMBOL'        => $_ARRAYLANG['TXT_SYMBOL'],
+            'TXT_STATUS'               => $_ARRAYLANG['TXT_STATUS'],
+            'TXT_HOME'               => $_ARRAYLANG['TXT_HOME'],
+            'TXT_SURVEY_TITLE'           => $_ARRAYLANG['TXT_SURVEY_TITLE'],
             'TXT_CREATED_AT'            => $_ARRAYLANG['TXT_CREATED_AT'],
-            'TXT_MODIFIED_AT'		=> $_ARRAYLANG['TXT_MODIFIED_AT'],
-            'TXT_COUNTER'		=> $_ARRAYLANG['TXT_COUNTER'],
-            'TXT_FUNCTIONS'		=> $_ARRAYLANG['TXT_FUNCTIONS'],
-            'TXT_SELECT_ALL'		=> $_ARRAYLANG['TXT_SELECT_ALL'],
-            'TXT_DESELECT_ALL'		=> $_ARRAYLANG['TXT_DESELECT_ALL'],
-            'TXT_DESCRIPTION'		=> $_ARRAYLANG['TXT_DESCRIPTION'],
-            'TXT_SELECT_ACTION'		=> $_ARRAYLANG['TXT_SELECT_ACTION'],
-            'TXT_ACTIVATE'		=> $_ARRAYLANG['TXT_ACTIVATE'],
-            'TXT_DEACTIVATE'		=> $_ARRAYLANG['TXT_DEACTIVATE'],
-            'TXT_DELETE_SELECTED'	=> $_ARRAYLANG['TXT_DELETE_SELECTED']
+            'TXT_MODIFIED_AT'        => $_ARRAYLANG['TXT_MODIFIED_AT'],
+            'TXT_COUNTER'        => $_ARRAYLANG['TXT_COUNTER'],
+            'TXT_FUNCTIONS'        => $_ARRAYLANG['TXT_FUNCTIONS'],
+            'TXT_SELECT_ALL'        => $_ARRAYLANG['TXT_SELECT_ALL'],
+            'TXT_DESELECT_ALL'        => $_ARRAYLANG['TXT_DESELECT_ALL'],
+            'TXT_DESCRIPTION'        => $_ARRAYLANG['TXT_DESCRIPTION'],
+            'TXT_SELECT_ACTION'        => $_ARRAYLANG['TXT_SELECT_ACTION'],
+            'TXT_ACTIVATE'        => $_ARRAYLANG['TXT_ACTIVATE'],
+            'TXT_DEACTIVATE'        => $_ARRAYLANG['TXT_DEACTIVATE'],
+            'TXT_DELETE_SELECTED'    => $_ARRAYLANG['TXT_DELETE_SELECTED']
         ));
 
         while(!$objResult->EOF) {
@@ -1492,19 +1492,19 @@ class SurveyManager extends SurveyLibrary {
 
 
         /* Start Paging ------------------------------------ */
-        /*	$intPos             = (isset($_GET['pos'])) ? intval($_GET['pos']) : 0;
-		// TODO: Never used
-	        $intPerPage         = $this->getPagingLimit();
-        
-        	$strPagingSource    = getPaging($this->countEntries('survey_surveygroup'), $intPos, '&amp;section=Survey&amp;cmd=activesurveys', false, $intPerPage);        
-        	$this->_objTpl->setVariable('ENTRIES_PAGING', $strPagingSource);
-		$limit = $this->getPagingLimit();                 //how many items to show per page
-		$page = $_REQUEST['pos'];
-		if($page){ 
-		$start = $page; 			//first item to display on this page
-	        }else{
-			$start = 0;				//if no page var is given, set start to 0
-		}	*/
+        /*    $intPos             = (isset($_GET['pos'])) ? intval($_GET['pos']) : 0;
+        // TODO: Never used
+            $intPerPage         = $this->getPagingLimit();
+
+            $strPagingSource    = getPaging($this->countEntries('survey_surveygroup'), $intPos, '&amp;section=Survey&amp;cmd=activesurveys', false, $intPerPage);
+            $this->_objTpl->setVariable('ENTRIES_PAGING', $strPagingSource);
+        $limit = $this->getPagingLimit();                 //how many items to show per page
+        $page = $_REQUEST['pos'];
+        if($page){
+        $start = $page;             //first item to display on this page
+            }else{
+            $start = 0;                //if no page var is given, set start to 0
+        }    */
         /* End Paging -------------------------------------- */
 
 
@@ -1513,21 +1513,21 @@ class SurveyManager extends SurveyLibrary {
         $row = 'row1';
 
         $this->_objTpl->setVariable(array(
-                'TXT_ADDRESS_LIST_OVERVIEW'	=> $_ARRAYLANG['TXT_ADDRESS_LIST_OVERVIEW'],
-                'TXT_SYMBOL'			=> $_ARRAYLANG['TXT_SYMBOL'],
-                'TXT_STATUS'       		=> $_ARRAYLANG['TXT_STATUS'],
-                'TXT_SURVEY_TITLE'       	=> $_ARRAYLANG['TXT_SURVEY_TITLE'],
-                'TXT_CREATED_AT'             	=> $_ARRAYLANG['TXT_CREATED_AT'],
-                'TXT_MODIFIED_AT'		=> $_ARRAYLANG['TXT_MODIFIED_AT'],
-                'TXT_COUNTER'			=> $_ARRAYLANG['TXT_COUNTER'],
-                'TXT_FUNCTIONS'			=> $_ARRAYLANG['TXT_FUNCTIONS'],
-                'TXT_SELECT_ALL'		=> $_ARRAYLANG['TXT_SELECT_ALL'],
-                'TXT_DESELECT_ALL'		=> $_ARRAYLANG['TXT_DESELECT_ALL'],
-                'TXT_DESCRIPTION'		=> $_ARRAYLANG['TXT_DESCRIPTION'],
-                'TXT_SELECT_ACTION'		=> $_ARRAYLANG['TXT_SELECT_ACTION'],
-                'TXT_ACTIVATE'			=> $_ARRAYLANG['TXT_ACTIVATE'],
-                'TXT_DEACTIVATE'		=> $_ARRAYLANG['TXT_DEACTIVATE'],
-                'TXT_DELETE_SELECTED'		=> $_ARRAYLANG['TXT_DELETE_SELECTED'],
+                'TXT_ADDRESS_LIST_OVERVIEW'    => $_ARRAYLANG['TXT_ADDRESS_LIST_OVERVIEW'],
+                'TXT_SYMBOL'            => $_ARRAYLANG['TXT_SYMBOL'],
+                'TXT_STATUS'               => $_ARRAYLANG['TXT_STATUS'],
+                'TXT_SURVEY_TITLE'           => $_ARRAYLANG['TXT_SURVEY_TITLE'],
+                'TXT_CREATED_AT'                 => $_ARRAYLANG['TXT_CREATED_AT'],
+                'TXT_MODIFIED_AT'        => $_ARRAYLANG['TXT_MODIFIED_AT'],
+                'TXT_COUNTER'            => $_ARRAYLANG['TXT_COUNTER'],
+                'TXT_FUNCTIONS'            => $_ARRAYLANG['TXT_FUNCTIONS'],
+                'TXT_SELECT_ALL'        => $_ARRAYLANG['TXT_SELECT_ALL'],
+                'TXT_DESELECT_ALL'        => $_ARRAYLANG['TXT_DESELECT_ALL'],
+                'TXT_DESCRIPTION'        => $_ARRAYLANG['TXT_DESCRIPTION'],
+                'TXT_SELECT_ACTION'        => $_ARRAYLANG['TXT_SELECT_ACTION'],
+                'TXT_ACTIVATE'            => $_ARRAYLANG['TXT_ACTIVATE'],
+                'TXT_DEACTIVATE'        => $_ARRAYLANG['TXT_DEACTIVATE'],
+                'TXT_DELETE_SELECTED'        => $_ARRAYLANG['TXT_DELETE_SELECTED'],
 
         ));
 
@@ -1559,11 +1559,11 @@ class SurveyManager extends SurveyLibrary {
 
 
             $this->_objTpl->setVariable(array(
-                    'TXT_LIST_ID'		   =>	$objResult->fields['id'],
-                    'TXT_LIST_TITLE_LABEL'	   =>	$listTemp,
+                    'TXT_LIST_ID'           =>    $objResult->fields['id'],
+                    'TXT_LIST_TITLE_LABEL'       =>    $listTemp,
                     'TXT_LIST_CREATED_AT'         =>  $objResult->fields['created'],
                     'TXT_LIST_UPDATED_AT'         =>  $objResult->fields['updated'],
-                    'TXT_LIST_COUNTER'		  => $Addresscount,
+                    'TXT_LIST_COUNTER'          => $Addresscount,
                     'ENTRY_ROWCLASS'                =>  $row = ($row == 'row1') ? 'row2' : 'row1',
             ));
             $this->_objTpl->parse('showEntries');
@@ -1612,7 +1612,7 @@ class SurveyManager extends SurveyLibrary {
     }
 
     /*
-	This is the Function used to change the home survey	
+    This is the Function used to change the home survey
     */
     function SurveyHomeChange() {
         global $_CORELANG, $_ARRAYLANG, $objDatabase;
@@ -1712,7 +1712,7 @@ class SurveyManager extends SurveyLibrary {
         }else {
             $hiddenField = "<input type='hidden' name='hidfield' id='hidfield' value=''>";
         }
-        
+
         $strMessageInputHTML = new \Cx\Core\Wysiwyg\Wysiwyg('Description', '', 'full');
         $strMessageText1     = new \Cx\Core\Wysiwyg\Wysiwyg('text1', '', 'full');
         $strMessageText2     = new \Cx\Core\Wysiwyg\Wysiwyg('text2', '', 'full');
@@ -1768,16 +1768,16 @@ class SurveyManager extends SurveyLibrary {
             $text2          = contrexx_input2db($_POST['text2']);
             $thanksMSG      = contrexx_input2db($_POST['thanksMSG']);
             $isHome         = (contrexx_input2raw($_POST['hidfield']) == '') ? 1 : 0;
-            
+
             // Insert Query for Inserting the Fields Posted
             $insertSurvey = 'INSERT INTO `'.DBPREFIX.'module_survey_surveygroup`
-    					    SET `title` = "'.$title.'",
-    	                            	   `UserRestriction` = "'.$method.'",
+                            SET `title` = "'.$title.'",
+                                           `UserRestriction` = "'.$method.'",
                                            `description` = "'.$description.'",
                                            `textAfterButton` = "'.$textAfterButton.'",
                                            `text1` = "'.$text1.'",
                                            `text2` = "'.$text2.'",
-					   `thanksMSG` = "'.$thanksMSG.'",	
+                       `thanksMSG` = "'.$thanksMSG.'",
                                            `isHomeBox` = "'.$isHome.'",
                                            `additional_salutation` = "'.((isset($_POST['additional_salutation'])&&($_POST['additional_salutation']=='on'))?1:0).'",
                                             `additional_nickname` = "'.((isset($_POST['additional_nickname'])&&($_POST['additional_nickname']=='on'))?1:0).'",
@@ -1802,7 +1802,7 @@ class SurveyManager extends SurveyLibrary {
     function addQuestions() {
         global $_CORELANG, $_ARRAYLANG, $objDatabase;
         \JS::activate('greybox');
-        
+
         $this->_pageTitle = $_ARRAYLANG['TXT_SURVEY_ADDQUESTION_TXT'];
         $this->_objTpl->loadTemplateFile('module_add_survey.html');
 
@@ -1830,7 +1830,7 @@ class SurveyManager extends SurveyLibrary {
                 'TXT_SAVE_TXT'                          => $_ARRAYLANG['TXT_SAVE_TXT'],
                 'TXT_COLUMN_CHOICE'                     => $_ARRAYLANG['TXT_COLUMN_CHOICE'],
                 'TXT_MULTIPLE_TEXTBOX'                  => $_ARRAYLANG['TXT_MULTIPLE_TEXTBOX'],
-                'TXT_TEXT_ROW'				=> $_ARRAYLANG['TXT_TEXT_ROW'],
+                'TXT_TEXT_ROW'                => $_ARRAYLANG['TXT_TEXT_ROW'],
                 'TXT_HELPONE_SEL'                       => 'none',
                 'TXT_HELPTWO_SEL'                       => 'none',
                 'TXT_HELPTHREE_SEL'                     => 'none',
@@ -1889,8 +1889,8 @@ class SurveyManager extends SurveyLibrary {
             for ($i=0;$i<count($options);$i++) {
                 if(trim($options[$i]) != "") {
                     $insertSurvey = 'INSERT INTO `'.DBPREFIX.'module_survey_surveyAnswers`
-    					    SET  `question_id` = "'.$lastId.'",
-    					        `answer` = "'.contrexx_raw2db($options[$i]).'",
+                            SET  `question_id` = "'.$lastId.'",
+                                `answer` = "'.contrexx_raw2db($options[$i]).'",
                                                 `votes` = "'.contrexx_raw2db($vote).'"';
                     $objDatabase->Execute($insertSurvey);
                 }
@@ -1899,8 +1899,8 @@ class SurveyManager extends SurveyLibrary {
             for ($i=0;$i<count($ColChoices);$i++) {
                 if($ColChoices[$i] != "") {
                     $insertSurvey = 'INSERT INTO `'.DBPREFIX.'module_survey_columnChoices`
-    					    SET `question_id` = "'.$lastId.'",
-    					        `choice` = "'.contrexx_raw2db($ColChoices[$i]).'"';
+                            SET `question_id` = "'.$lastId.'",
+                                `choice` = "'.contrexx_raw2db($ColChoices[$i]).'"';
                     $objDatabase->Execute($insertSurvey);
                 }
             }
@@ -1991,7 +1991,7 @@ class SurveyManager extends SurveyLibrary {
             // Insert Query for Inserting the Fields Posted
             $insertSurvey = 'UPDATE `'.DBPREFIX.'module_survey_settings` SET
                             `salutation` = "'.contrexx_raw2db($FinalSalutationVal).'",
-    			    `agegroup` = "'.contrexx_raw2db($FinalageGroupVal).'"
+                    `agegroup` = "'.contrexx_raw2db($FinalageGroupVal).'"
                              WHERE id = "'.$id.'"';
             $objDatabase->Execute($insertSurvey);
 
@@ -2006,9 +2006,9 @@ class SurveyManager extends SurveyLibrary {
         $ENTER_SALUTATION = $_ARRAYLANG['ENTER_SALUTATION'];
         $ENTER_AGE_GROUP  = $_ARRAYLANG['ENTER_AGE_GROUP'];
         $javascript = <<<END
-                 
+
         <script language="JavaScript" type="text/javascript">
-        
+
         function trim(sString){
               while (sString.substring(0,1) == ' '){
                sString = sString.substring(1, sString.length);
@@ -2019,38 +2019,38 @@ class SurveyManager extends SurveyLibrary {
          return sString;
         }
         function ltrim(s){
-       	var l=0;
-	       while(l < s.length && s[l] == ' ')
-	       {	l++; }
-       	return s.substring(l, s.length);
+           var l=0;
+           while(l < s.length && s[l] == ' ')
+           {    l++; }
+           return s.substring(l, s.length);
         }
         function rtrim(s){
-       	var r=s.length -1;
-	       while(r > 0 && s[r] == ' ')
-	       {	r-=1;	}
-	       return s.substring(0, r+1);
+           var r=s.length -1;
+           while(r > 0 && s[r] == ' ')
+           {    r-=1;    }
+           return s.substring(0, r+1);
         }
-                
+
        function checkValidations() {
-        
+
            var salutation    = document.getElementById("salutation").value;
            var Age_group        = document.getElementById("Age_group").value;
-          
-		
+
+
            if(trim(salutation) == "") {
              alert("$ENTER_SALUTATION");
              document.getElementById("salutation").focus();
              document.getElementById("salutation").value="";
-		   return false;           
+           return false;
            }if(trim(Age_group) == "") {
              alert("$ENTER_AGE_GROUP");
              document.getElementById("Age_group").focus();
              document.getElementById("Age_group").value="";
-		   return false;           
-           }                
+           return false;
+           }
              return true;
-           
-       }               
+
+       }
         </script>
 END;
         return $javascript;
@@ -2074,7 +2074,7 @@ END;
         $javascript = <<<END
         <script language="JavaScript" type="text/javascript">
        function IsNumeric(strString){
-        //  check for valid numeric strings	
+        //  check for valid numeric strings
         var strValidChars = "0123456789";
           var strChar;
           var blnResult = true;
@@ -2089,7 +2089,7 @@ END;
                 }
              }
           return blnResult;
-       }     
+       }
        function gup( name )
        {
          name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
@@ -2100,7 +2100,7 @@ END;
            return "";
          else
            return results[1];
-       }        
+       }
        function selectMultiAction() {
            with (document.frmShowQuestionEntries) {
                              var chks = document.getElementsByName('selectedEntriesId[]');
@@ -2118,21 +2118,21 @@ END;
                                       document.frmShowQuestionEntries.frmShowEntries_MultiAction.focus();
                                       return false;
                                }
-		switch (frmShowEntries_MultiAction.value) {
+        switch (frmShowEntries_MultiAction.value) {
 
-			case 'delete':
+            case 'delete':
                 if (confirm("$TXT_SURVEY_CONFIRM_DELETE_ERR")) {
                                    var qqid = gup('id');
-					action='index.php?cmd=Survey&act=deleteQuestions&$CSRF_PARAM&id='+qqid+'&linkId='+qqid;
-					submit();
-				}
-				else{
+                    action='index.php?cmd=Survey&act=deleteQuestions&$CSRF_PARAM&id='+qqid+'&linkId='+qqid;
+                    submit();
+                }
+                else{
                   frmShowEntries_MultiAction.value=0;
                 }
 
-			break;
-			default: //do nothing
-		}
+            break;
+            default: //do nothing
+        }
 
                 if(frmShowEntries_MultiAction.value == "save"){
                              var sortText = document.getElementsByName('form_pos[]');
@@ -2140,49 +2140,49 @@ END;
                              var cond=0;
                              for (var i = 0; i < sortText.length; i++){
 
-				   if(sortText[i].value==""){ 
+                   if(sortText[i].value==""){
                                             alert("$TXT_SURVEY_SORTING_NUMBER_ERR");
                                       document.frmShowQuestionEntries.frmShowEntries_MultiAction.value=0;
                                       document.frmShowQuestionEntries.frmShowEntries_MultiAction.focus();
                                             cond=1;
                                             return false;
-                                            break; 
-                                       }    
-				   else if(IsNumeric(sortText[i].value) == false){
-			                alert("$TXT_SURVEY_SORTING_NUMBER_NUM_ERR");
-					  document.frmShowQuestionEntries.frmShowEntries_MultiAction.value=0;
-                                     	  document.frmShowQuestionEntries.frmShowEntries_MultiAction.focus();
+                                            break;
+                                       }
+                   else if(IsNumeric(sortText[i].value) == false){
+                            alert("$TXT_SURVEY_SORTING_NUMBER_NUM_ERR");
+                      document.frmShowQuestionEntries.frmShowEntries_MultiAction.value=0;
+                                           document.frmShowQuestionEntries.frmShowEntries_MultiAction.focus();
                                             cond=1;
                                             return false;
-                                            break; 
-                                       }   
+                                            break;
+                                       }
 
                                   for (var j = i+1; j < sortText.length; j++){
-                                    
-					if(sortText[i].value==sortText[j].value){ 
+
+                    if(sortText[i].value==sortText[j].value){
                                             alert("$TXT_SURVEY_SORTING_NUMBER_NOTSAME_ERR");
                                       document.frmShowQuestionEntries.frmShowEntries_MultiAction.value=0;
                                       document.frmShowQuestionEntries.frmShowEntries_MultiAction.focus();
                                             cond=1;
                                             return false;
-                                            break; 
+                                            break;
                                        }
-                                 
+
                                   }
                                       if(cond == 1){
                                          break;
                                       }
                              }
                                    var qid = gup('id');
-					action='index.php?cmd=Survey&act=editQuestionsOverview&$CSRF_PARAM&id='+qid+'&linkId='+qid+'&chg=1';
-					submit();
+                    action='index.php?cmd=Survey&act=editQuestionsOverview&$CSRF_PARAM&id='+qid+'&linkId='+qid+'&chg=1';
+                    submit();
                   }
-               
-	}
+
+    }
 }
-       
+
        function deleteEntry(entryId){
-		 var qsid = gup('id');
+         var qsid = gup('id');
             if(confirm("$TXT_SURVEY_CONFIRM_DELETE_ERR"))
                  window.location.replace("index.php?cmd=Survey&act=deleteQuestions&$CSRF_PARAM&id="+entryId+"&linkId="+qsid);
         }
@@ -2218,171 +2218,171 @@ END;
          return sString;
         }
         function ltrim(s){
-       	var l=0;
-	       while(l < s.length && s[l] == ' ')
-	       {	l++; }
-       	return s.substring(l, s.length);
+           var l=0;
+           while(l < s.length && s[l] == ' ')
+           {    l++; }
+           return s.substring(l, s.length);
         }
         function rtrim(s){
-       	var r=s.length -1;
-	       while(r > 0 && s[r] == ' ')
-	       {	r-=1;	}
-	       return s.substring(0, r+1);
+           var r=s.length -1;
+           while(r > 0 && s[r] == ' ')
+           {    r-=1;    }
+           return s.substring(0, r+1);
         }
-       
+
        function showColumnTab(){
          var matrix = document.getElementById("questionType").value;
-	
+
          var helplink;
-   	 if((matrix == 3) || (matrix == 4)){
-		
+        if((matrix == 3) || (matrix == 4)){
+
          document.getElementById("col").style.display='';
 
          }else{
-         document.getElementById("col").style.display='none';       
+         document.getElementById("col").style.display='none';
          }
 
-	 if(matrix == 5){
-         document.getElementById("answer").style.display='none';      
-	  document.getElementById("addComent").style.display='';
-          document.getElementById("RowTextfield").style.display='none';
-  	 document.getElementById("qTextfield").style.display='';         
-         }
-	else if(matrix == 7){
-	  document.getElementById("addComent").style.display='none';
+     if(matrix == 5){
          document.getElementById("answer").style.display='none';
-	 document.getElementById("qTextfield").style.display='none';
-         document.getElementById("RowTextfield").style.display='';          
-         }        
-   	else{
-	  document.getElementById("addComent").style.display='';   
-         document.getElementById("answer").style.display=''; 
-         document.getElementById("RowTextfield").style.display='none';
-	 document.getElementById("qTextfield").style.display='';    
+      document.getElementById("addComent").style.display='';
+          document.getElementById("RowTextfield").style.display='none';
+       document.getElementById("qTextfield").style.display='';
          }
-         
-	 if(matrix == 1){
-		document.getElementById("help1").style.display="";
-		document.getElementById("help2").style.display="none";
-		document.getElementById("help3").style.display="none";
-		document.getElementById("help4").style.display="none";
-		document.getElementById("help5").style.display="none";
-		document.getElementById("help6").style.display="none";
-		document.getElementById("help7").style.display="none";
+    else if(matrix == 7){
+      document.getElementById("addComent").style.display='none';
+         document.getElementById("answer").style.display='none';
+     document.getElementById("qTextfield").style.display='none';
+         document.getElementById("RowTextfield").style.display='';
+         }
+       else{
+      document.getElementById("addComent").style.display='';
+         document.getElementById("answer").style.display='';
+         document.getElementById("RowTextfield").style.display='none';
+     document.getElementById("qTextfield").style.display='';
+         }
 
-	 }else if(matrix == 2){
-		document.getElementById("help1").style.display="none";
-		document.getElementById("help2").style.display="";
-		document.getElementById("help3").style.display="none";
-		document.getElementById("help4").style.display="none";
-		document.getElementById("help5").style.display="none";
-		document.getElementById("help6").style.display="none";
-		document.getElementById("help7").style.display="none";
-	 }else if(matrix == 3){
-		document.getElementById("help1").style.display="none";
-		document.getElementById("help2").style.display="none";
-		document.getElementById("help3").style.display="";
-		document.getElementById("help4").style.display="none";
-		document.getElementById("help5").style.display="none";
-		document.getElementById("help6").style.display="none";
-		document.getElementById("help7").style.display="none";
-	 }else if(matrix == 4){
-		document.getElementById("help1").style.display="none";
-		document.getElementById("help2").style.display="none";
-		document.getElementById("help3").style.display="none";
-		document.getElementById("help4").style.display="";
-		document.getElementById("help5").style.display="none";
-		document.getElementById("help6").style.display="none";
-		document.getElementById("help7").style.display="none";
-	 }else if(matrix == 5){
-		document.getElementById("help1").style.display="none";
-		document.getElementById("help2").style.display="none";
-		document.getElementById("help3").style.display="none";
-		document.getElementById("help4").style.display="none";
-		document.getElementById("help5").style.display="";
-		document.getElementById("help6").style.display="none";
-		document.getElementById("help7").style.display="none";
-	 }else if(matrix == 6){
-		document.getElementById("help1").style.display="none";
-		document.getElementById("help2").style.display="none";
-		document.getElementById("help3").style.display="none";
-		document.getElementById("help4").style.display="none";
-		document.getElementById("help5").style.display="none";
-		document.getElementById("help6").style.display="";
-		document.getElementById("help7").style.display="none";
-	 }else if(matrix == 7){
-		document.getElementById("help1").style.display="none";
-		document.getElementById("help2").style.display="none";
-		document.getElementById("help3").style.display="none";
-		document.getElementById("help4").style.display="none";
-		document.getElementById("help5").style.display="none";
-		document.getElementById("help6").style.display="none";
-		document.getElementById("help7").style.display="";
-		}
-	else{
-		document.getElementById("help1").style.display="none";
-		document.getElementById("help2").style.display="none";
-		document.getElementById("help3").style.display="none";
-		document.getElementById("help4").style.display="none";
-		document.getElementById("help5").style.display="none";
-		document.getElementById("help6").style.display="none";
-		document.getElementById("help7").style.display="none";
-	 }
+     if(matrix == 1){
+        document.getElementById("help1").style.display="";
+        document.getElementById("help2").style.display="none";
+        document.getElementById("help3").style.display="none";
+        document.getElementById("help4").style.display="none";
+        document.getElementById("help5").style.display="none";
+        document.getElementById("help6").style.display="none";
+        document.getElementById("help7").style.display="none";
+
+     }else if(matrix == 2){
+        document.getElementById("help1").style.display="none";
+        document.getElementById("help2").style.display="";
+        document.getElementById("help3").style.display="none";
+        document.getElementById("help4").style.display="none";
+        document.getElementById("help5").style.display="none";
+        document.getElementById("help6").style.display="none";
+        document.getElementById("help7").style.display="none";
+     }else if(matrix == 3){
+        document.getElementById("help1").style.display="none";
+        document.getElementById("help2").style.display="none";
+        document.getElementById("help3").style.display="";
+        document.getElementById("help4").style.display="none";
+        document.getElementById("help5").style.display="none";
+        document.getElementById("help6").style.display="none";
+        document.getElementById("help7").style.display="none";
+     }else if(matrix == 4){
+        document.getElementById("help1").style.display="none";
+        document.getElementById("help2").style.display="none";
+        document.getElementById("help3").style.display="none";
+        document.getElementById("help4").style.display="";
+        document.getElementById("help5").style.display="none";
+        document.getElementById("help6").style.display="none";
+        document.getElementById("help7").style.display="none";
+     }else if(matrix == 5){
+        document.getElementById("help1").style.display="none";
+        document.getElementById("help2").style.display="none";
+        document.getElementById("help3").style.display="none";
+        document.getElementById("help4").style.display="none";
+        document.getElementById("help5").style.display="";
+        document.getElementById("help6").style.display="none";
+        document.getElementById("help7").style.display="none";
+     }else if(matrix == 6){
+        document.getElementById("help1").style.display="none";
+        document.getElementById("help2").style.display="none";
+        document.getElementById("help3").style.display="none";
+        document.getElementById("help4").style.display="none";
+        document.getElementById("help5").style.display="none";
+        document.getElementById("help6").style.display="";
+        document.getElementById("help7").style.display="none";
+     }else if(matrix == 7){
+        document.getElementById("help1").style.display="none";
+        document.getElementById("help2").style.display="none";
+        document.getElementById("help3").style.display="none";
+        document.getElementById("help4").style.display="none";
+        document.getElementById("help5").style.display="none";
+        document.getElementById("help6").style.display="none";
+        document.getElementById("help7").style.display="";
+        }
+    else{
+        document.getElementById("help1").style.display="none";
+        document.getElementById("help2").style.display="none";
+        document.getElementById("help3").style.display="none";
+        document.getElementById("help4").style.display="none";
+        document.getElementById("help5").style.display="none";
+        document.getElementById("help6").style.display="none";
+        document.getElementById("help7").style.display="none";
+     }
        }
        function checkValidations_one() {
-        
+
            var title = document.getElementById("title").value;
-            
-           if(trim(title) == "") {           
+
+           if(trim(title) == "") {
              alert("$TXT_SURVEY_ENTER_TITLE_ERR");
              document.getElementById("title").focus();
              document.getElementById("title").value="";
-		   return false;
+           return false;
            }
            var Yeshome = document.getElementById("Yeshome").checked;
-           var isHomeBox = document.getElementById("hidfield").value;           
+           var isHomeBox = document.getElementById("hidfield").value;
              if(Yeshome){
-                  if(trim(isHomeBox) == "present") {           
+                  if(trim(isHomeBox) == "present") {
                     alert("$TXT_SURVEY_HOMEBOX_ERR");
                     document.getElementById("Yeshome").focus();
-		          return false;
+                  return false;
                   }
              }
              return true;
-           
+
        }
-        
+
        function checkValidations() {
-        
+
            var questionType    = document.getElementById("questionType").value;
            var Question        = document.getElementById("Question").value;
-	   var QuestionRow     = document.getElementById("QuestionRow").value;	
+       var QuestionRow     = document.getElementById("QuestionRow").value;
            var QuestionAnswers = document.getElementById("QuestionAnswers").value;
-           
-		
+
+
            if(trim(questionType) == "") {
              alert("$TXT_SURVEY_SELECT_ANSWER_INPUT_ERR");
              document.getElementById("questionType").focus();
              document.getElementById("questionType").value="";
-		   return false;           
+           return false;
            }if((trim(Question) == "") && (questionType != 7)) {
              alert("$TXT_SURVEY_ENTER_QUESTION_ERR");
              document.getElementById("Question").focus();
              document.getElementById("Question").value="";
-		   return false;           
+           return false;
            }if((trim(QuestionRow) == "") && (questionType == 7)) {
              alert("$TXT_SURVEY_ENTER_QUESTION_ERR");
              document.getElementById("QuestionRow").focus();
              document.getElementById("QuestionRow").value="";
-		   return false;           
+           return false;
            }
-	   if(trim(QuestionAnswers) == "") {
+       if(trim(QuestionAnswers) == "") {
             if((questionType != 5) && (questionType != 7)){
              alert("$TXT_SURVEY_ENTER_ANSWER_ERR");
              document.getElementById("QuestionAnswers").focus();
              document.getElementById("QuestionAnswers").value="";
-		   return false;           
-	     }
+           return false;
+         }
            }
            if(questionType == 3){
              var ColumnChoices = document.getElementById("ColumnChoices").value;
@@ -2390,9 +2390,9 @@ END;
                     alert("$TXT_SURVEY_ENTER_COLUMN_ERR");
                     document.getElementById("ColumnChoices").focus();
                     document.getElementById("ColumnChoices").value="";
-	             return false;                           
-	      }   
-           }    
+                 return false;
+          }
+           }
            if(questionType == 4){
              var ColumnChoices = document.addsurvey.ColumnChoices.value;
              var chio = trim(ColumnChoices);
@@ -2401,13 +2401,13 @@ END;
                     document.getElementById("ColumnChoices").focus();
                     document.getElementById("ColumnChoices").value="";
                     return false;
-                           
-	      }   
-           }                   
+
+          }
+           }
              return true;
-           
-       }       
-       
+
+       }
+
        </script>
 
 END;
@@ -2435,7 +2435,7 @@ END;
 
         $javascript = <<<END
         <script language="JavaScript" type="text/javascript">
-       
+
         function trim(sString){
               while (sString.substring(0,1) == ' '){
                sString = sString.substring(1, sString.length);
@@ -2446,19 +2446,19 @@ END;
          return sString;
         }
         function ltrim(s){
-       	var l=0;
-	       while(l < s.length && s[l] == ' ')
-	       {	l++; }
-       	return s.substring(l, s.length);
+           var l=0;
+           while(l < s.length && s[l] == ' ')
+           {    l++; }
+           return s.substring(l, s.length);
         }
         function rtrim(s){
-       	var r=s.length -1;
-	       while(r > 0 && s[r] == ' ')
-	       {	r-=1;	}
-	       return s.substring(0, r+1);
+           var r=s.length -1;
+           while(r > 0 && s[r] == ' ')
+           {    r-=1;    }
+           return s.substring(0, r+1);
         }
        function IsNumeric(strString){
-        //  check for valid numeric strings	
+        //  check for valid numeric strings
         var strValidChars = "0123456789";
           var strChar;
           var blnResult = true;
@@ -2476,9 +2476,9 @@ END;
        }
        function showColumnTab(){
          var matrix = document.getElementById("questionType").value;
-       
+
          var helplink;
-   	 if((matrix == 3) || (matrix == 4)){
+        if((matrix == 3) || (matrix == 4)){
 
          document.getElementById("col").style.display='';
 
@@ -2486,144 +2486,144 @@ END;
          document.getElementById("col").style.display='none';
          }
 
-	 if(matrix == 5){
+     if(matrix == 5){
          document.getElementById("answer").style.display='none';
-	  document.getElementById("addComent").style.display='';
+      document.getElementById("addComent").style.display='';
           document.getElementById("RowTextfield").style.display='none';
-  	 document.getElementById("qTextfield").style.display='';
+       document.getElementById("qTextfield").style.display='';
          }
-	else if(matrix == 7){
-	  document.getElementById("addComent").style.display='none';
+    else if(matrix == 7){
+      document.getElementById("addComent").style.display='none';
          document.getElementById("answer").style.display='none';
-	 document.getElementById("qTextfield").style.display='none';
+     document.getElementById("qTextfield").style.display='none';
          document.getElementById("RowTextfield").style.display='';
          }
-   	else{
-	  document.getElementById("addComent").style.display='';
+       else{
+      document.getElementById("addComent").style.display='';
          document.getElementById("answer").style.display='';
          document.getElementById("RowTextfield").style.display='none';
-	 document.getElementById("qTextfield").style.display='';
+     document.getElementById("qTextfield").style.display='';
          }
 
-	 if(matrix == 1){
-		document.getElementById("help1").style.display="";
-		document.getElementById("help2").style.display="none";
-		document.getElementById("help3").style.display="none";
-		document.getElementById("help4").style.display="none";
-		document.getElementById("help5").style.display="none";
-		document.getElementById("help6").style.display="none";
-		document.getElementById("help7").style.display="none";
-	 }else if(matrix == 2){
-		document.getElementById("help1").style.display="none";
-		document.getElementById("help2").style.display="";
-		document.getElementById("help3").style.display="none";
-		document.getElementById("help4").style.display="none";
-		document.getElementById("help5").style.display="none";
-		document.getElementById("help6").style.display="none";
-		document.getElementById("help7").style.display="none";
-	 }else if(matrix == 3){
-		document.getElementById("help1").style.display="none";
-		document.getElementById("help2").style.display="none";
-		document.getElementById("help3").style.display="";
-		document.getElementById("help4").style.display="none";
-		document.getElementById("help5").style.display="none";
-		document.getElementById("help6").style.display="none";
-		document.getElementById("help7").style.display="none";
-	 }else if(matrix == 4){
-		document.getElementById("help1").style.display="none";
-		document.getElementById("help2").style.display="none";
-		document.getElementById("help3").style.display="none";
-		document.getElementById("help4").style.display="";
-		document.getElementById("help5").style.display="none";
-		document.getElementById("help6").style.display="none";
-		document.getElementById("help7").style.display="none";
-	 }else if(matrix == 5){
-		document.getElementById("help1").style.display="none";
-		document.getElementById("help2").style.display="none";
-		document.getElementById("help3").style.display="none";
-		document.getElementById("help4").style.display="none";
-		document.getElementById("help5").style.display="";
-		document.getElementById("help6").style.display="none";
-		document.getElementById("help7").style.display="none";
-	 }else if(matrix == 6){
-		document.getElementById("help1").style.display="none";
-		document.getElementById("help2").style.display="none";
-		document.getElementById("help3").style.display="none";
-		document.getElementById("help4").style.display="none";
-		document.getElementById("help5").style.display="none";
-		document.getElementById("help6").style.display="";
-		document.getElementById("help7").style.display="none";
-	 }else if(matrix == 7){
-		document.getElementById("help1").style.display="none";
-		document.getElementById("help2").style.display="none";
-		document.getElementById("help3").style.display="none";
-		document.getElementById("help4").style.display="none";
-		document.getElementById("help5").style.display="none";
-		document.getElementById("help6").style.display="none";
-		document.getElementById("help7").style.display="";
-	} else {
-		document.getElementById("help1").style.display="none";
-		document.getElementById("help2").style.display="none";
-		document.getElementById("help3").style.display="none";
-		document.getElementById("help4").style.display="none";
-		document.getElementById("help5").style.display="none";
-		document.getElementById("help6").style.display="none";
-		document.getElementById("help7").style.display="none";
-	 }
+     if(matrix == 1){
+        document.getElementById("help1").style.display="";
+        document.getElementById("help2").style.display="none";
+        document.getElementById("help3").style.display="none";
+        document.getElementById("help4").style.display="none";
+        document.getElementById("help5").style.display="none";
+        document.getElementById("help6").style.display="none";
+        document.getElementById("help7").style.display="none";
+     }else if(matrix == 2){
+        document.getElementById("help1").style.display="none";
+        document.getElementById("help2").style.display="";
+        document.getElementById("help3").style.display="none";
+        document.getElementById("help4").style.display="none";
+        document.getElementById("help5").style.display="none";
+        document.getElementById("help6").style.display="none";
+        document.getElementById("help7").style.display="none";
+     }else if(matrix == 3){
+        document.getElementById("help1").style.display="none";
+        document.getElementById("help2").style.display="none";
+        document.getElementById("help3").style.display="";
+        document.getElementById("help4").style.display="none";
+        document.getElementById("help5").style.display="none";
+        document.getElementById("help6").style.display="none";
+        document.getElementById("help7").style.display="none";
+     }else if(matrix == 4){
+        document.getElementById("help1").style.display="none";
+        document.getElementById("help2").style.display="none";
+        document.getElementById("help3").style.display="none";
+        document.getElementById("help4").style.display="";
+        document.getElementById("help5").style.display="none";
+        document.getElementById("help6").style.display="none";
+        document.getElementById("help7").style.display="none";
+     }else if(matrix == 5){
+        document.getElementById("help1").style.display="none";
+        document.getElementById("help2").style.display="none";
+        document.getElementById("help3").style.display="none";
+        document.getElementById("help4").style.display="none";
+        document.getElementById("help5").style.display="";
+        document.getElementById("help6").style.display="none";
+        document.getElementById("help7").style.display="none";
+     }else if(matrix == 6){
+        document.getElementById("help1").style.display="none";
+        document.getElementById("help2").style.display="none";
+        document.getElementById("help3").style.display="none";
+        document.getElementById("help4").style.display="none";
+        document.getElementById("help5").style.display="none";
+        document.getElementById("help6").style.display="";
+        document.getElementById("help7").style.display="none";
+     }else if(matrix == 7){
+        document.getElementById("help1").style.display="none";
+        document.getElementById("help2").style.display="none";
+        document.getElementById("help3").style.display="none";
+        document.getElementById("help4").style.display="none";
+        document.getElementById("help5").style.display="none";
+        document.getElementById("help6").style.display="none";
+        document.getElementById("help7").style.display="";
+    } else {
+        document.getElementById("help1").style.display="none";
+        document.getElementById("help2").style.display="none";
+        document.getElementById("help3").style.display="none";
+        document.getElementById("help4").style.display="none";
+        document.getElementById("help5").style.display="none";
+        document.getElementById("help6").style.display="none";
+        document.getElementById("help7").style.display="none";
+     }
        }
 
        function checkValidations_one() {
            var title = document.getElementById("title").value;
            var Restrict = document.getElementById("votingRestrictionMethod").checked;
 
-	   if(Restrict == false) {		
-		var emailFiled = document.getElementById("additional_email").checked;
-		if(emailFiled == false) {
-			alert("$TXT_SURVEY_SELECT_EMAIL_ERR");		
-			return false;
-		}
-	   }
-		
-           if(trim(title) == "") {           
+       if(Restrict == false) {
+        var emailFiled = document.getElementById("additional_email").checked;
+        if(emailFiled == false) {
+            alert("$TXT_SURVEY_SELECT_EMAIL_ERR");
+            return false;
+        }
+       }
+
+           if(trim(title) == "") {
              alert("$TXT_SURVEY_ENTER_TITLE_ERR");
              document.getElementById("title").focus();
              document.getElementById("title").value="";
-		   return false;
+           return false;
            }
            return true;
        }
-        
+
        function checkValidations() {
-        
+
            var questionType    = document.getElementById("questionType").value;
            var Question        = document.getElementById("Question").value;
-	   var QuestionRow     = document.getElementById("QuestionRow").value;	
+       var QuestionRow     = document.getElementById("QuestionRow").value;
            var QuestionAnswers = document.getElementById("QuestionAnswers").value;
-           
-		
+
+
            if(trim(questionType) == "") {
              alert("$TXT_SURVEY_SELECT_ANSWER_INPUT_ERR");
              document.getElementById("questionType").focus();
              document.getElementById("questionType").value="";
-		   return false;           
+           return false;
            }if((trim(Question) == "") && (questionType != 7)) {
              alert("$TXT_SURVEY_ENTER_QUESTION_ERR");
              document.getElementById("Question").focus();
              document.getElementById("Question").value="";
-		   return false;           
+           return false;
            }if((trim(QuestionRow) == "") && (questionType == 7)) {
              alert("$TXT_SURVEY_ENTER_QUESTION_ERR");
              document.getElementById("QuestionRow").focus();
              document.getElementById("QuestionRow").value="";
-		   return false;           
+           return false;
            }
-	   if(trim(QuestionAnswers) == "") {
+       if(trim(QuestionAnswers) == "") {
             if((questionType != 5) && (questionType != 7)){
              alert("$TXT_SURVEY_ENTER_ANSWER_ERR");
              document.getElementById("QuestionAnswers").focus();
              document.getElementById("QuestionAnswers").value="";
-		   return false;           
-	     }
+           return false;
+         }
            }
            if(questionType == 3){
              var ColumnChoices = document.getElementById("ColumnChoices").value;
@@ -2631,9 +2631,9 @@ END;
                     alert("$TXT_SURVEY_ENTER_COLUMN_ERR");
                     document.getElementById("ColumnChoices").focus();
                     document.getElementById("ColumnChoices").value="";
-	             return false;                           
-	      }   
-           }    
+                 return false;
+          }
+           }
            if(questionType == 4){
              var ColumnChoices = document.addsurvey.ColumnChoices.value;
              var chio = trim(ColumnChoices);
@@ -2642,13 +2642,13 @@ END;
                     document.getElementById("ColumnChoices").focus();
                     document.getElementById("ColumnChoices").value="";
                     return false;
-                           
-	      }   
-           }                   
+
+          }
+           }
              return true;
-           
-       }       
-       
+
+       }
+
        function selectMultiAction() {
            with (document.frmShowSurveyEntries) {
                              var chks = document.getElementsByName('selectedEntriesId[]');
@@ -2666,32 +2666,32 @@ END;
                                       document.frmShowSurveyEntries.frmShowEntries_MultiAction.focus();
                                       return false;
                                }
-		switch (frmShowEntries_MultiAction.value) {
+        switch (frmShowEntries_MultiAction.value) {
 
-			case 'delete':
+            case 'delete':
                 if (confirm("$TXT_SURVEY_CONFIRM_DELETE_ERR")) {
-					action='index.php?cmd=Survey&act=deletesurvey&$CSRF_PARAM';
-					submit();
-				}
-				else{
+                    action='index.php?cmd=Survey&act=deletesurvey&$CSRF_PARAM';
+                    submit();
+                }
+                else{
                   frmShowEntries_MultiAction.value=0;
                 }
 
-			break;
-			default: //do nothing
-		}
+            break;
+            default: //do nothing
+        }
 
                 if(frmShowEntries_MultiAction.value == "activate"){
-					action='index.php?cmd=Survey&act=SurveyChangeStatus&type=activate&$CSRF_PARAM';
-					submit();
-                }   
+                    action='index.php?cmd=Survey&act=SurveyChangeStatus&type=activate&$CSRF_PARAM';
+                    submit();
+                }
                 if(frmShowEntries_MultiAction.value == "deactivate"){
-					action='index.php?cmd=Survey&act=SurveyChangeStatus&type=deactivate&$CSRF_PARAM';
-					submit();
-                }                
-	}
+                    action='index.php?cmd=Survey&act=SurveyChangeStatus&type=deactivate&$CSRF_PARAM';
+                    submit();
+                }
+    }
 }
-       
+
        function deleteEntry(entryId){
             if(confirm("$TXT_SURVEY_CONFIRM_DELETE_ERR"))
                  window.location.replace("index.php?cmd=Survey&$CSRF_PARAM&act=deletesurvey&id="+entryId);
@@ -2707,7 +2707,7 @@ END;
                 tag.title = "$TXT_SHOW";
             }
         }
-        function activateSurvey() { 
+        function activateSurvey() {
             for (var i=0; i < document.frmShowSurveyEntries.Yeshome.length; i++)
             {
                 if (document.frmShowSurveyEntries.Yeshome[i].checked)
@@ -2736,7 +2736,7 @@ END;
         </style>
         <script language="JavaScript" type="text/javascript">
         $(document).ready(function() {
-        defaCheck(); 
+        defaCheck();
        });
 
 
@@ -2746,7 +2746,7 @@ END;
          document.getElementById("colchoice").style.display='block';
          }
         }
-       
+
         function trim(sString){
               while (sString.substring(0,1) == ' '){
                sString = sString.substring(1, sString.length);
@@ -2757,19 +2757,19 @@ END;
          return sString;
         }
         function ltrim(s){
-       	var l=0;
-	       while(l < s.length && s[l] == ' ')
-	       {	l++; }
-       	return s.substring(l, s.length);
+           var l=0;
+           while(l < s.length && s[l] == ' ')
+           {    l++; }
+           return s.substring(l, s.length);
         }
         function rtrim(s){
-       	var r=s.length -1;
-	       while(r > 0 && s[r] == ' ')
-	       {	r-=1;	}
-	       return s.substring(0, r+1);
+           var r=s.length -1;
+           while(r > 0 && s[r] == ' ')
+           {    r-=1;    }
+           return s.substring(0, r+1);
         }
        function IsNumeric(strString){
-        //  check for valid numeric strings	
+        //  check for valid numeric strings
         var strValidChars = "0123456789";
           var strChar;
           var blnResult = true;
@@ -2791,55 +2791,55 @@ END;
          document.getElementById("colchoice").style.display='block';
 
          }else{
-         document.getElementById("colchoice").style.display='none';       
+         document.getElementById("colchoice").style.display='none';
          }
-         alert(matrix); 
-	 if(matrix == 5){
-         document.getElementById("answer").style.display='none';      
+         alert(matrix);
+     if(matrix == 5){
+         document.getElementById("answer").style.display='none';
          document.getElementById("labelid").innerHTML=[[QUESTION_TEXT]];
          }
-		else if(matrix == 7){
+        else if(matrix == 7){
          document.getElementById("answer").style.display='none';
          document.getElementById("labelid").innerHTML=[[TXT_TEXT_ROW]];
          }
-       
+
    else{
-         document.getElementById("answer").style.display='';       
+         document.getElementById("answer").style.display='';
          document.getElementById("labelid").innerHTML='Question Text';
          }
-         
+
        }
        function checkValidations_one() {
-        
+
            var title = document.getElementById("title").value;
-            
-           if(trim(title) == "") {           
+
+           if(trim(title) == "") {
              alert("Enter the title");
              document.getElementById("title").focus();
              document.getElementById("title").value="";
-		   return false;
+           return false;
            }
 
              return true;
-           
+
        }
-        
+
        function checkValidations() {
-        
-         
+
+
            var AddressDetails = document.getElementById("AddressDetails").value;
-           
-	if(trim(AddressDetails) == "") {
+
+    if(trim(AddressDetails) == "") {
              alert("Please Enter the answer for the Question");
              document.getElementById("AddressDetails").focus();
              document.getElementById("AddressDetails").value="";
-		   return false;           
+           return false;
            }
-                    
+
              return true;
-           
-       }       
-       
+
+       }
+
        function selectMultiAction() {
            with (document.frmShowSurveyEntries) {
                              var chks = document.getElementsByName('selectedEntriesId[]');
@@ -2857,32 +2857,32 @@ END;
                                       document.frmShowSurveyEntries.frmShowEntries_MultiAction.focus();
                                       return false;
                                }
-		switch (frmShowEntries_MultiAction.value) {
+        switch (frmShowEntries_MultiAction.value) {
 
-			case 'delete':
+            case 'delete':
                 if (confirm("Are you Sure! You Want to delete the Entry")) {
-					action='index.php?cmd=Survey&act=deletesurvey&$CSRF_PARAM';
-					submit();
-				}
-				else{
+                    action='index.php?cmd=Survey&act=deletesurvey&$CSRF_PARAM';
+                    submit();
+                }
+                else{
                   frmShowEntries_MultiAction.value=0;
                 }
 
-			break;
-			default: //do nothing
-		}
+            break;
+            default: //do nothing
+        }
 
                 if(frmShowEntries_MultiAction.value == "activate"){
-					action='index.php?cmd=Survey&act=SurveyChangeStatus&type=activate&$CSRF_PARAM';
-					submit();
-                }   
+                    action='index.php?cmd=Survey&act=SurveyChangeStatus&type=activate&$CSRF_PARAM';
+                    submit();
+                }
                 if(frmShowEntries_MultiAction.value == "deactivate"){
-					action='index.php?cmd=Survey&act=SurveyChangeStatus&type=deactivate&$CSRF_PARAM';
-					submit();
-                }                
-	}
+                    action='index.php?cmd=Survey&act=SurveyChangeStatus&type=deactivate&$CSRF_PARAM';
+                    submit();
+                }
+    }
 }
-       
+
        function deleteEntry(entryId){
             if(confirm("Are you Sure! You Want to delete the Entry"))
                  window.location.replace("index.php?cmd=Survey&act=deletesurvey&$CSRF_PARAM&id="+entryId);
@@ -3178,21 +3178,21 @@ END;
             exit;
         }
     }
-    
+
     function _modifySurvey()
     {
         global $_ARRAYLANG;
-        
+
         $objTpl = $this->_objTpl;
         $objTpl->loadTemplateFile("module_survey_modify_survey.html");
-        
+
         $id   = isset($_GET['id']) ? (int) $_GET['id'] : 0;
-        $copy = isset($_GET['copy']); 
-        
+        $copy = isset($_GET['copy']);
+
         $this->_pageTitle = !empty($id) ?  $_ARRAYLANG['TXT_SURVEY_EDIT_TXT'] : $_ARRAYLANG['TXT_CREATE_SURVEY'];
-        
+
         $objSurvey = new SurveyEntry();
-        
+
         $objSurvey->id                       = $id;
         $objSurvey->title                    = isset($_POST['title']) ? contrexx_input2raw($_POST['title']) : '';
         $objSurvey->description              = isset($_POST['Description']) ? contrexx_input2raw($_POST['Description']) : '';
@@ -3200,8 +3200,8 @@ END;
         $objSurvey->textBelowSubmit          = isset($_POST['below_submit_button']) ? contrexx_input2raw($_POST['below_submit_button']) : '';
         $objSurvey->textBeginSurvey          = isset($_POST['begin_survey']) ? contrexx_input2raw($_POST['begin_survey']) : '';
         $objSurvey->textBeforeSubscriberInfo = isset($_POST['before_sub_info']) ? contrexx_input2raw($_POST['before_sub_info']) : '';
-        $objSurvey->textFeedbackMsg          = isset($_POST['feedback_msg']) ? contrexx_input2raw($_POST['feedback_msg']) : '';        
-        
+        $objSurvey->textFeedbackMsg          = isset($_POST['feedback_msg']) ? contrexx_input2raw($_POST['feedback_msg']) : '';
+
         foreach ($objSurvey->additionalFields as $additionalField) {
             $objSurvey->{$additionalField}   = isset($_POST["additional_{$additionalField}"]) ? 1 : 0;
         }
@@ -3220,21 +3220,21 @@ END;
                 $this->_strErrMessage = implode("<br />", $objSurvey->errorMsg);
             }
         } elseif (!empty($objSurvey->id)) {
-            $objSurvey->get();            
+            $objSurvey->get();
         }
-        
-        foreach ($objSurvey->additionalFields as $additionalField) {                        
+
+        foreach ($objSurvey->additionalFields as $additionalField) {
             $objTpl->setVariable(array(
                 $this->moduleLangVar.'_ADDITIONAL_FIELD_NAME'      => $additionalField,
                 $this->moduleLangVar.'_ADDITIONAL_FIELD'           => $objSurvey->{$additionalField} ? "checked='checked'" : '',
                 "TXT_{$this->moduleLangVar}_ADDITIONAL_FIELD_NAME" => $_ARRAYLANG["TXT_{$this->moduleLangVar}_ADDITIONAL_FIELD_".  strtoupper($additionalField)]
             ));
-            
+
             $objTpl->parse('surveyAdditionalFields');
         }
-                
-        $objSurveyQuestionManager = new SurveyQuestionManager($objSurvey->id);        
-        
+
+        $objSurveyQuestionManager = new SurveyQuestionManager($objSurvey->id);
+
         $objTpl->setGlobalVariable(array(
             $this->moduleLangVar.'_TITLE_MODIFY'     => !empty($objSurvey->id) ?  $_ARRAYLANG['TXT_SURVEY_EDIT_TXT'] : $_ARRAYLANG['TXT_CREATE_SURVEY'],
             'TXT_'.$this->moduleLangVar.'_GENERAL'   => $_ARRAYLANG['TXT_SURVEY_GENERAL'],
@@ -3247,7 +3247,7 @@ END;
             'TXT_'.$this->moduleLangVar.'_SAVE'      => $_ARRAYLANG['TXT_SURVEY_SAVE'],
             'TXT_'.$this->moduleLangVar.'_MODIFY_QUESTION' => $_ARRAYLANG['TXT_SURVEY_MODIFY_QUESTION'],
             'TXT_'.$this->moduleLangVar.'_OK'        => $_ARRAYLANG['TXT_SURVEY_OK'],
-            
+
             'TXT_'.$this->moduleLangVar.'_QUESTION_OVERVIEW'         => $_ARRAYLANG['TXT_QUESTION_OVERVIEW'],
             'TXT_'.$this->moduleLangVar.'_SORTING'                   => $_ARRAYLANG['TXT_SORTING'],
             'TXT_'.$this->moduleLangVar.'_QUESTION'                  => $_ARRAYLANG['TXT_QUESTION'],
@@ -3265,7 +3265,7 @@ END;
             'TXT_'.$this->moduleLangVar.'_SAVE_SORTING'              => $_ARRAYLANG['TXT_SAVE_SORTING'],
             'TXT_'.$this->moduleLangVar.'_DELETE_SELECTED'           => $_ARRAYLANG['TXT_DELETE_SELECTED'],
             'TXT_'.$this->moduleLangVar.'_ADD_QUESTION'              => $_ARRAYLANG['TXT_QUESTION_ADD_TXT'],
-            
+
             'SURVEY_IMAGE_PATH'                     => ASCMS_PATH_OFFSET.ASCMS_MODULE_FOLDER.'/Survey/View/Media',
             'WELCOME_MSD'                           => $_ARRAYLANG['TXT_WELCOME_MSG'],
             'TXT_ADD_QUESTION'                      => $_ARRAYLANG['TXT_SURVEY_CREATEQUESTION_TXT'],
@@ -3287,7 +3287,7 @@ END;
             'TXT_COLUMN_CHOICE'                     => $_ARRAYLANG['TXT_COLUMN_CHOICE'],
             'TXT_MULTIPLE_TEXTBOX'                  => $_ARRAYLANG['TXT_MULTIPLE_TEXTBOX'],
             'TXT_TEXT_ROW'                          => $_ARRAYLANG['TXT_TEXT_ROW'],
-            
+
             $this->moduleLangVar.'_ID'              => (int) $objSurvey->id,
             $this->moduleLangVar.'_TITLE'           => contrexx_raw2xhtml($objSurvey->title),
             $this->moduleLangVar.'_DESCRIPTION'     => contrexx_raw2xhtml($objSurvey->description),
@@ -3297,9 +3297,9 @@ END;
             $this->moduleLangVar.'_FEEDBACK_MSG'    => new \Cx\Core\Wysiwyg\Wysiwyg('feedback_msg', contrexx_raw2xhtml($objSurvey->textFeedbackMsg), 'full'),
             $this->moduleLangVar.'_TYPE_COOKIE'     => $objSurvey->surveyType == 'cookie' ? "checked='checked'" : '',
             $this->moduleLangVar.'_TYPE_EMAIL'      => $objSurvey->surveyType == 'email' ? "checked='checked'" : '',
-            $this->moduleLangVar.'_QUESTIONS'       => $objSurveyQuestionManager->showQuestions(),            
-            
-            'TXT_BUTTON'                    => $_ARRAYLANG['TXT_SURVEY_CREATE_TXT'],            
+            $this->moduleLangVar.'_QUESTIONS'       => $objSurveyQuestionManager->showQuestions(),
+
+            'TXT_BUTTON'                    => $_ARRAYLANG['TXT_SURVEY_CREATE_TXT'],
             'TXT_TITLE'                     => $_ARRAYLANG['TXT_TITLE'],
             'TXT_UNIQUE_USER_VERIFICATION'  => $_ARRAYLANG['TXT_UNIQUE_USER_VERIFICATION'],
             'TXT_IS_HOME_BOX'               => $_ARRAYLANG['TXT_IS_HOME_BOX'],
@@ -3312,10 +3312,9 @@ END;
             'TXT_THANK_MSG'                 => $_ARRAYLANG['TXT_THANK_MSG'],
             'TXT_COOKIE_BASED'              => $_ARRAYLANG['TXT_COOKIE_BASED'],
             'TXT_EMAIL_BASED'               => $_ARRAYLANG['TXT_EMAIL_BASED'],
-            'TXT_ADDITIONAL_FIELDS_LABEL'   => $_ARRAYLANG['TXT_ADDITIONAL_FIELDS_LABEL'],            
+            'TXT_ADDITIONAL_FIELDS_LABEL'   => $_ARRAYLANG['TXT_ADDITIONAL_FIELDS_LABEL'],
         ));
-        
+
     }
 }
 ?>
-

@@ -39,17 +39,17 @@ function filesDoAction()
 {
     if(filesIsChecked("formSelected[]") == true)
     {
-	    if(document.files.selectAction.value == "delete")
-	    {
-	    	if(confirm('{TXT_CONFIRM_DELETE_DATA}\n{TXT_ACTION_IS_IRREVERSIBLE}'))
-        		document.files.action = "index.php?cmd=Directory&act=delfile";
-        		document.files.submit();
-	    }
-	    if(document.files.selectAction.value == "move")
-	    {
-	    	document.files.action = "index.php?cmd=Directory&act=movefile";
-        	document.files.submit();
-	    }
+      if(document.files.selectAction.value == "delete")
+      {
+        if(confirm('{TXT_CONFIRM_DELETE_DATA}\n{TXT_ACTION_IS_IRREVERSIBLE}'))
+            document.files.action = "index.php?cmd=Directory&act=delfile";
+            document.files.submit();
+      }
+      if(document.files.selectAction.value == "move")
+      {
+        document.files.action = "index.php?cmd=Directory&act=movefile";
+          document.files.submit();
+      }
     }
     else
     {
@@ -119,7 +119,7 @@ function filesDoAction()
     <td width="16" valign="top">
         <br />
     </td>
-  	<td width="100%" valign="top" colspan="9">
+    <td width="100%" valign="top" colspan="9">
         {NO_FILES_FOUND}
     </td>
   </tr>
@@ -128,19 +128,19 @@ function filesDoAction()
 <!-- BEGIN importSelectAction -->
 <br />
 <table cellpadding="2" cellspacing="0" border="0">
-	<tr>
-		<td>
-			<img src="../core/Core/View/Media/icons/arrow.gif" border="0" width="38" height="22" alt="{TXT_MARKED}:" />
-			<a href="javascript:{void(0)};" onclick="changeCheckboxes('files','formSelected[]',true); return false;">{TXT_SELECT_ALL}</a> /
-			<a href="javascript:{void(0)};" onclick="changeCheckboxes('files','formSelected[]',false); return false;">{TXT_DESELECT_ALL}</a>
-			<img src="../core/Core/View/Media/icons/strike.gif" width="34" height="22" alt="strike" />
-			<select name="selectAction" onchange="filesDoAction();">
-			<option value="0" selected="selected">{TXT_SELECT_ACTION}</option>
-			<option value="delete">{TXT_DELETE}</option>
-			<option value="move">{TXT_MOVE}</option>
-		    </select>
-		</td>
-	</tr>
+  <tr>
+    <td>
+      <img src="../core/Core/View/Media/icons/arrow.gif" border="0" width="38" height="22" alt="{TXT_MARKED}:" />
+      <a href="javascript:{void(0)};" onclick="changeCheckboxes('files','formSelected[]',true); return false;">{TXT_SELECT_ALL}</a> /
+      <a href="javascript:{void(0)};" onclick="changeCheckboxes('files','formSelected[]',false); return false;">{TXT_DESELECT_ALL}</a>
+      <img src="../core/Core/View/Media/icons/strike.gif" width="34" height="22" alt="strike" />
+      <select name="selectAction" onchange="filesDoAction();">
+      <option value="0" selected="selected">{TXT_SELECT_ACTION}</option>
+      <option value="delete">{TXT_DELETE}</option>
+      <option value="move">{TXT_MOVE}</option>
+        </select>
+    </td>
+  </tr>
 </table>
 <!-- END importSelectAction -->
 <br>

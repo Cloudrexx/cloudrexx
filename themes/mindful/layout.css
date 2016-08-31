@@ -97,7 +97,7 @@ input[type="email"], input[type="text"], textarea, select, input[type="password"
     width:300px;
     color: #6a6a6a;
     border: 1px solid #ddd;
-    background:	#fafafa url(images/field_bkg.png) repeat-x;
+    background:  #fafafa url(images/field_bkg.png) repeat-x;
     float:left;
     margin-right: 10px;
     height: 37px;
@@ -132,7 +132,7 @@ a.action {
 #main {
     margin: 70px 0 20px 0;
     width: 100%;
-    background: #fff;    
+    background: #fff;
 }
 #middle {
     margin: 0 auto 20px;
@@ -279,7 +279,7 @@ a.action {
 /** arrow **/
 #mainNav .sf-menu a.sf-with-ul {
     position: relative;
-    min-width:		1px;
+    min-width:    1px;
 }
 .sf-sub-indicator {
     position: absolute;

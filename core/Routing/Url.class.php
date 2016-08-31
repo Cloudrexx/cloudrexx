@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * An URL container
  *
@@ -121,13 +121,13 @@ class Url {
     const ROUTED = 2;
 
     protected $state = 0;
-    
+
     /**
      * The port of the URL
      * @var int
      */
     protected $port = 0;
-    
+
     /**
      * The fragment (after #) part of the URL
      * @var string
@@ -140,7 +140,7 @@ class Url {
      * @param bool $replacePorts - indicates if we need to replace ports with default ones
      */
     public function __construct($url, $replacePorts = false) {
-        
+
         $data = parse_url($url);
         if (isset($data['host'])) {
             $this->domain   = $data['host'];
@@ -170,7 +170,7 @@ class Url {
             $path = $data['path'];
         }
         $path = ltrim($path, '/');
-        
+
         // do not add virtual language dir for files
         $fileName = \Cx\Core\Core\Controller\Cx::instanciate()->getWebsitePath() . '/' . $path;
         if (file_exists($fileName)) {
@@ -182,7 +182,7 @@ class Url {
         if (strpos($this->realPath, \Cx\Core\Core\Controller\Cx::instanciate()->getBackendFolderName()) === 0) {
             $this->setMode('backend');
         }
-        
+
         if(!empty($data['query'])) {
             $path .= '?' . $data['query'];
         }
@@ -191,7 +191,7 @@ class Url {
         } else {
             $this->suggest();
         }
-        
+
         if (!empty($data['fragment'])) {
             $this->fragment = $data['fragment'];
         }
@@ -206,7 +206,7 @@ class Url {
             \DBG::msg('URL: Invalid url mode "'.$mode.'"');
         }
     }
-    
+
     /**
      * Checks wheter this Url points to a location within this installation
      * @todo This does not work correctly if setPath() is called from outside
@@ -214,7 +214,7 @@ class Url {
      */
     public function isInternal() {
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-        
+
         // check domain
         $domainRepo = $cx->getDb()->getEntityManager()->getRepository(
             'Cx\Core\Net\Model\Entity\Domain'
@@ -222,7 +222,7 @@ class Url {
         if (!$domainRepo->findOneBy(array('name' => $this->getDomain()))) {
             return false;
         }
-        
+
         // check offset
         $installationOffset = \Env::get('cx')->getWebsiteOffsetPath();
         $providedOffset = $this->realPath;
@@ -237,13 +237,13 @@ class Url {
 
     /**
      * Get the protocol
-     * 
+     *
      * @return String
      */
     public function getProtocol() {
         return $this->protocol;
     }
-    
+
     public function getMode() {
         return $this->mode;
     }
@@ -254,7 +254,7 @@ class Url {
     public function isRouted() {
         return $this->state >= self::ROUTED;
     }
-    
+
     /**
      * gets port of URL;
      */
@@ -268,8 +268,8 @@ class Url {
     function setPort($port) {
         $this->port = $port;
     }
-    
-    /** 
+
+    /**
      * gets default port from settings
      */
     function getDefaultPort() {
@@ -278,7 +278,7 @@ class Url {
         $protocol = strtoupper($this->getProtocol());
         $port  =  \Cx\Core\Setting\Controller\Setting::getValue('port' . $mode . $protocol, 'Config');
         return $port;
-    }    
+    }
 
     /**
      * sets $this->suggestedParams and $this->suggestedTargetPath
@@ -303,7 +303,7 @@ class Url {
                 $this->suggestedParams = $matches[2];
             }
         }
-        
+
 
         $this->state = self::SUGGESTED;
     }
@@ -574,8 +574,8 @@ class Url {
     public function getSuggestedParams() {
         return $this->suggestedParams;
     }
-    
-    
+
+
     public static function fromRequest() {
         if (php_sapi_name() === 'cli') {
             return new Url('file://' . getcwd());
@@ -667,7 +667,7 @@ class Url {
 
         return static::fromPage($page, $parameters, $protocol, true);
     }
-    
+
     /**
      * This returns an Url object for an absolute or relative url or an Url object
      * @author Michael Ritter <michael.ritter@comvation.com>
@@ -680,16 +680,16 @@ class Url {
         if (is_object($url) && $url instanceof self) {
             return $url;
         }
-        
+
         $matches = array();
         preg_match('#(http(s)?|file)://#', $url, $matches);
-        
+
         // relative URL
         if (!count($matches)) {
-            
+
             $absoluteUrl = self::fromRequest();
             preg_match('#((?:http(?:s)?|file)://)((?:[^/]*))([/$](?:.*)/)?#', $absoluteUrl->toString(true), $matches);
-            
+
             // starting with a /?
             if (substr($url, 0, 1) == '/') {
                 $url = $matches[1] . $matches[2] . $url;
@@ -697,12 +697,12 @@ class Url {
                 $url = $matches[1] . $matches[2] . $matches[3] . $url;
             }
             $url = new static($url);
-            
+
         // absolute URL
         } else {
             $url = new static($url);
         }
-        
+
         return $url;
     }
 
@@ -815,12 +815,12 @@ class Url {
     /**
      * Returns an absolute or relative link
      * @param boolean $absolute (optional) set to false to return a relative URL
-     * @return type 
+     * @return type
      */
     public function toString($absolute = true, $forcePort = false) {
         if(!$absolute) {
             return \Cx\Core\Core\Controller\Cx::instanciate()->getWebsiteOffsetPath()  . '/' .
-                ($this->getMode() != 'backend' ? $this->getLangDir().'/' : '') . 
+                ($this->getMode() != 'backend' ? $this->getLangDir().'/' : '') .
                 $this->path . (empty($this->fragment) ? '' : '#' . $this->fragment);
         }
         $defaultPort = getservbyname($this->protocol, 'tcp');

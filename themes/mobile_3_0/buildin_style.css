@@ -260,7 +260,7 @@ form table, form tr, form th, form td {
     height:auto !important;
 }
 #blog div.comments,
-#blog div.networks, 
+#blog div.networks,
 #blog div.code,
 #blog div.statistics {
     float:left;
@@ -657,7 +657,7 @@ dl.dat_module dt {
     border:2px solid #51BBF9;
     margin: 0px 15px 0px 0px;
 }
-#directory div.fields table, 
+#directory div.fields table,
 #directory div.fields tr,
 #directory div.fields th,
 #directory div.fields td {
@@ -763,16 +763,16 @@ dl.dat_module dt {
 #forum td.smallfont {
     font-size: 0.9em;
 }
-#forum div.links, 
-#forum div.dropdown, 
-#forum div.latest, 
-#forum div.category, 
-#forum div.navtree, 
-#forum div.paging, 
-#forum div.anchor, 
-#forum div.threads, 
-#forum div.addthread, 
-#forum div.posts, 
+#forum div.links,
+#forum div.dropdown,
+#forum div.latest,
+#forum div.category,
+#forum div.navtree,
+#forum div.paging,
+#forum div.anchor,
+#forum div.threads,
+#forum div.addthread,
+#forum div.posts,
 #forum div.addpost,
 #forum div.forums,
 #forum div.searchform,
@@ -1501,14 +1501,14 @@ dl.dat_module dt {
     float:left;
     height:auto !important;
 }
-#shop div.menu, 
-#shop div.cart_info, 
-#shop div.informations, 
-#shop div.payment, 
-#shop div.message, 
+#shop div.menu,
+#shop div.cart_info,
+#shop div.informations,
+#shop div.payment,
+#shop div.message,
 #shop div.lsv_form,
-#shop div.cart, 
-#shop div.cart_links, 
+#shop div.cart,
+#shop div.cart_links,
 #shop div.message_error,
 #shop div.customer_address,
 #shop div.shipping_address,
@@ -1760,8 +1760,8 @@ shop select {
     float:left;
     height:auto !important;
 }
-#voting div.form, 
-#voting div.archive, 
+#voting div.form,
+#voting div.archive,
 #voting div.message {
     width: 100%;
     padding: 0px 0px 0px 0px;
@@ -1885,7 +1885,7 @@ shop select {
     color: #029202;
 }
 /***************************************
-KNOWLEDGE 
+KNOWLEDGE
 ***************************************/
 .cloud {
     margin: 0px;

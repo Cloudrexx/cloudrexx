@@ -13,7 +13,7 @@ state = {};
 function uploaderStatusChanged(uploader)
 {
     if(uploader.getStatus() == uploader.STATUS_READY) {
-        //uploading finished.   
+        //uploading finished.
         updateUrl(uploader);
     }
 }
@@ -51,7 +51,7 @@ function appletInitialized(applet)
         config: config,
         baseUrl: config.getUploadUrl()
     };
-    
+
     // upload/restrictUpload2SingleFile might not be set and must therefore be cast into Boolean
     var restrictUpload2SingleFile = Boolean(cx.variables.get('restrictUpload2SingleFile', 'upload/widget_{UPLOAD_ID}'));
     config.setMaxFiles(restrictUpload2SingleFile ? 1 : -1);

@@ -1,28 +1,28 @@
 <!-- start module_podcast_modify_template.html -->
 <form action="index.php?cmd=Podcast&amp;act=modifyTemplate&amp;id={PODCAST_TEMPLATE_ID}" method="post">
-	<table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
-		<thead>
-			<tr>
-				<th colspan="2">{PODCAST_TEMPLATE_MODIFY_TITLE}</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr class="row1">
-				<td width="15%">{TXT_PODCAST_DESCRIPTION}</td>
-				<td width="85%"><input type="text" value="{PODCAST_TEMPLATE_DESCRIPTION}" name="podcast_template_description" maxlength="255" style="width:450px;" /></td>
-			</tr>
-			<tr class="row2" style="vertical-align:top;">
-				<td>{TXT_PODCAST_TEMPLATE}</td>
-				<td><textarea name="podcast_template_template" cols="100" rows="15" style="width:690px; height:300px;">{PODCAST_TEMPLATE_TEMPLATE}</textarea></td>
-			</tr>
-			<tr class="row1">
-				<td>{TXT_PODCAST_FILE_EXTENSIONS}</td>
-				<td><input type="text" name="podcast_template_file_extensions" value="{PODCAST_TEMPLATE_FILE_EXTENSIONS}" maxlength="255" style="width:450px;" /></td>
-			</tr>
-		</tbody>
-	</table>
-	<br />
-	<input type="button" onclick="window.location.href='index.php?cmd=Podcast&{CSRF_PARAM}&amp;act=templates'" value="{TXT_PODCAST_BACK}" />
-	<input type="submit" name="podcast_template_save" value="{TXT_PODCAST_SAVE}" />
+  <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
+    <thead>
+      <tr>
+        <th colspan="2">{PODCAST_TEMPLATE_MODIFY_TITLE}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="row1">
+        <td width="15%">{TXT_PODCAST_DESCRIPTION}</td>
+        <td width="85%"><input type="text" value="{PODCAST_TEMPLATE_DESCRIPTION}" name="podcast_template_description" maxlength="255" style="width:450px;" /></td>
+      </tr>
+      <tr class="row2" style="vertical-align:top;">
+        <td>{TXT_PODCAST_TEMPLATE}</td>
+        <td><textarea name="podcast_template_template" cols="100" rows="15" style="width:690px; height:300px;">{PODCAST_TEMPLATE_TEMPLATE}</textarea></td>
+      </tr>
+      <tr class="row1">
+        <td>{TXT_PODCAST_FILE_EXTENSIONS}</td>
+        <td><input type="text" name="podcast_template_file_extensions" value="{PODCAST_TEMPLATE_FILE_EXTENSIONS}" maxlength="255" style="width:450px;" /></td>
+      </tr>
+    </tbody>
+  </table>
+  <br />
+  <input type="button" onclick="window.location.href='index.php?cmd=Podcast&{CSRF_PARAM}&amp;act=templates'" value="{TXT_PODCAST_BACK}" />
+  <input type="submit" name="podcast_template_save" value="{TXT_PODCAST_SAVE}" />
 </form>
 <!-- end module_podcast_modify_template.html -->

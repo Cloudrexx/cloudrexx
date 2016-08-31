@@ -48,32 +48,32 @@ namespace Cx\Core_Modules\Update\Controller;
  */
 class UpdateController extends \Cx\Core\Core\Model\Entity\Controller {
 
-    
+
     /**
      * pending codeBase changes yml
      * @var string $pendingCodeBaseChangesYml
      */
     protected $pendingCodeBaseChangesYml = 'PendingCodeBaseChanges.yml';
-    
+
     /**
      * Command Line Interface
      * @var \Symfony\Component\Console\Application | null
      */
     protected $cli = null;
-    
+
     /**
      * Calculate database delta
      *
      * It will calculate which codeBase database update scripts need to be executed.
      * If the original version number is smaller than new version number,
      * Add each version between those two versions to the delta as non-rollback updates otherwise delta as rollback updates
-     * 
+     *
      * @param integer $oldVersion
      * @param string  $codeBasePath
      */
     public function calculateDbDelta($oldVersion, $codeBasePath) {
         \Cx\Core\Setting\Controller\Setting::init('Config', '', 'Yaml');
-        
+
         $latestVersion = str_replace('.', '', \Cx\Core\Setting\Controller\Setting::getValue('coreCmsVersion', 'Config'));
         $olderVersion = str_replace('.', '', $oldVersion);
 
@@ -92,14 +92,14 @@ class UpdateController extends \Cx\Core\Core\Model\Entity\Controller {
             rsort($versions);
         }
         foreach ($versions as $version) {
-            if (    (   $isHigherVersion 
-                    &&  (   $version > $olderVersion 
+            if (    (   $isHigherVersion
+                    &&  (   $version > $olderVersion
                         &&  $version <= $latestVersion
                         )
                     )
                 ||
-                    (   !$isHigherVersion 
-                    &&  (   $version <= $olderVersion 
+                    (   !$isHigherVersion
+                    &&  (   $version <= $olderVersion
                         &&  $version > $latestVersion
                         )
                     )
@@ -115,10 +115,10 @@ class UpdateController extends \Cx\Core\Core\Model\Entity\Controller {
 
     /**
      * Register DB Update hooks
-     * 
-     * This saves the calculated delta to /tmp/Update/$pendingCodeBaseChangesYml. 
+     *
+     * This saves the calculated delta to /tmp/Update/$pendingCodeBaseChangesYml.
      * It contains a serialized Delta.
-     * 
+     *
      * @staticvar object $deltaRepo
      * @param \Cx\Core_Modules\Update\Model\Entity\Delta $delta
      */
@@ -134,10 +134,10 @@ class UpdateController extends \Cx\Core\Core\Model\Entity\Controller {
 
     /**
      * Get the serialized Delta
-     * 
-     * This loads the serialized Delta and calls applyNext() on it 
+     *
+     * This loads the serialized Delta and calls applyNext() on it
      * until returns false.
-     * 
+     *
      * @return null
      */
     public function applyDelta() {
@@ -188,7 +188,7 @@ class UpdateController extends \Cx\Core\Core\Model\Entity\Controller {
         if (file_exists($tmpUpdateFolderPath)) {
             \Cx\Lib\FileSystem\FileSystem::delete_folder($tmpUpdateFolderPath, true);
         }
-        
+
         //set the website back to Online mode
         \Cx\Core\Setting\Controller\Setting::set('websiteState', \Cx\Core_Modules\MultiSite\Model\Entity\Website::STATE_ONLINE);
         \Cx\Core\Setting\Controller\Setting::update('websiteState');
@@ -213,12 +213,12 @@ class UpdateController extends \Cx\Core\Core\Model\Entity\Controller {
 
     /**
      * Update CodeBase
-     * 
+     *
      * @param string $newCodeBaseVersion   latest codeBase version
      * @param string $installationRootPath installationRoot path
      * @param string $oldCodeBaseVersion   old codeBase version
      */
-    public function updateCodeBase($newCodeBaseVersion, $installationRootPath, $oldCodeBaseVersion = '') 
+    public function updateCodeBase($newCodeBaseVersion, $installationRootPath, $oldCodeBaseVersion = '')
     {
         //change installation root
         $objConfigData = new \Cx\Lib\FileSystem\File(\Cx\Core\Core\Controller\Cx::instanciate()->getWebsiteConfigPath() . '/configuration.php');
@@ -229,20 +229,20 @@ class UpdateController extends \Cx\Core\Core\Model\Entity\Controller {
             $installationRootPath = str_replace($newCodeBaseVersion, $oldCodeBaseVersion, $matches[1] );
             $newCodeBaseVersion   = $oldCodeBaseVersion;
         }
-        
+
         $newConfigData = preg_replace('/\\$_PATHCONFIG\\[\'ascms_installation_root\'\\] = \'.*?\';/', '$_PATHCONFIG[\'ascms_installation_root\'] = \'' . $installationRootPath . '\';', $configData);
 
         $objConfigData->write($newConfigData);
-        
+
         //change code base
         \Cx\Core\Setting\Controller\Setting::init('Config', '', 'Yaml');
         \Cx\Core\Setting\Controller\Setting::set('coreCmsVersion', $newCodeBaseVersion);
         \Cx\Core\Setting\Controller\Setting::update('coreCmsVersion');
     }
-    
+
     /**
      * Get Doctrine Migration Command Line Interface
-     * 
+     *
      * @return \Symfony\Component\Console\Application
      */
     public function getDoctrineMigrationCli()
@@ -250,7 +250,7 @@ class UpdateController extends \Cx\Core\Core\Model\Entity\Controller {
         if ($this->cli) {
             return $this->cli;
         }
-        
+
         $em = \Env::get('em');
         $conn = $em->getConnection();
 
@@ -283,17 +283,17 @@ class UpdateController extends \Cx\Core\Core\Model\Entity\Controller {
             $this->getDoctrineMigrationCommand('\Doctrine\DBAL\Migrations\Tools\Console\Command\VersionCommand', $configuration),
         ));
         $this->cli->setAutoExit(false);
-        
+
         return $this->cli;
     }
-    
-    
+
+
     /**
      * Get the doctrine migrations command as object
-     * 
+     *
      * @param string $migrationCommandNameSpace
      * @param object $configuration
-     * 
+     *
      * @return object doctrine migration command
      */
     protected function getDoctrineMigrationCommand($migrationCommandNameSpace, $configuration) {
@@ -301,14 +301,14 @@ class UpdateController extends \Cx\Core\Core\Model\Entity\Controller {
         $migrationCommand->setMigrationConfiguration($configuration);
         return $migrationCommand;
     }
-    
+
     /**
      * Store the website details into the YML file
-     * 
+     *
      * @param string $folderPath
      * @param string $filePath
      * @param array  $ymlContent
-     * 
+     *
      * @return null
      */
     public function storeUpdateWebsiteDetailsToYml($folderPath, $filePath, $ymlContent)
@@ -335,12 +335,12 @@ class UpdateController extends \Cx\Core\Core\Model\Entity\Controller {
             \DBG::log($e->getMessage());
         }
     }
-    
+
     /**
      * Get update websiteDetailsFromYml
-     * 
+     *
      * @param string $file yml file name
-     * 
+     *
      * @return array website details
      */
     public function getUpdateWebsiteDetailsFromYml($file) {
@@ -351,12 +351,12 @@ class UpdateController extends \Cx\Core\Core\Model\Entity\Controller {
         $yaml = new \Symfony\Component\Yaml\Yaml();
         return $yaml->load($objFile->getData());
     }
-    
+
     /**
      * getAllCodeBaseVersions
-     * 
+     *
      * @param string $codeBasePath codeBase path
-     * 
+     *
      * @return array codeBase versions
      */
     public function getAllCodeBaseVersions($codeBasePath) {
@@ -375,10 +375,10 @@ class UpdateController extends \Cx\Core\Core\Model\Entity\Controller {
         }
         return $codeBaseVersions;
     }
-    
+
     /**
      * Get codeBase Changes file
-     * 
+     *
      * @return string $pendingCodeBaseChangesYml
      */
     public function getPendingCodeBaseChangesFile() {

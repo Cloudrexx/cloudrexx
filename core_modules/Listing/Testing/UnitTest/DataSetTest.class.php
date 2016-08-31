@@ -27,7 +27,7 @@
 
 /**
  * DataSet Test
- * 
+ *
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Michael Ritter <michael.ritter@comvation.com>
  * @version     1.0.0
@@ -39,7 +39,7 @@ namespace Cx\Core_Modules\Listing\Testing\UnitTest;
 
 /**
  * DataSet Test
- * 
+ *
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Michael Ritter <michael.ritter@comvation.com>
  * @version     1.0.0
@@ -58,7 +58,7 @@ class DataSetTest extends \Cx\Core\Test\Model\Entity\ContrexxTestCase
         1 => array('field1' => 'value3', 'field2' => 'value4'),
         2 => array('field1' => 'value3', 'field2' => 'value6'),
     );
-    
+
     /**
      * @var array
      * This is the expected output after flipping the array
@@ -67,7 +67,7 @@ class DataSetTest extends \Cx\Core\Test\Model\Entity\ContrexxTestCase
         'field1' => array(0 => 'value1', 1 => 'value3', 2 => 'value3'),
         'field2' => array(0 => 'value2', 1 => 'value4', 2 => 'value6'),
     );
-    
+
     /**
      * @var array
      * This is the expected output after sorting for "field1" descending
@@ -78,7 +78,7 @@ class DataSetTest extends \Cx\Core\Test\Model\Entity\ContrexxTestCase
         2 => array('field1' => 'value3', 'field2' => 'value6'),
         0 => array('field1' => 'value1', 'field2' => 'value2'),
     );
-    
+
     /**
      * @var array
      * This is the expected output after sorting columns descending
@@ -94,7 +94,7 @@ class DataSetTest extends \Cx\Core\Test\Model\Entity\ContrexxTestCase
         $flippedSet = $testSet->flip();
         $this->assertEquals($this->flippedArray, $flippedSet->toArray());
     }
-    
+
     public function testSort() {
         $testSet = new \Cx\Core_Modules\Listing\Model\Entity\DataSet($this->testArray);
         $sortedSet = $testSet->sort(array(
@@ -103,11 +103,10 @@ class DataSetTest extends \Cx\Core\Test\Model\Entity\ContrexxTestCase
         ));
         $this->assertEquals($this->sortedArray, $sortedSet->toArray());
     }
-    
+
     public function testSortColumns() {
         $testSet = new \Cx\Core_Modules\Listing\Model\Entity\DataSet($this->testArray);
         $testSet->sortColumns(array('field2', 'field1'));
         $this->assertEquals($this->sortedColumnsArray, $testSet->toArray());
     }
 }
-

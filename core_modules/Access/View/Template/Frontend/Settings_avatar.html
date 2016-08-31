@@ -5,7 +5,7 @@
         <form role="form" method="post" action="index.php?section=Access&amp;cmd=settings_avatar" enctype="multipart/form-data">
             <input type="hidden" value="{ACCESS_IMAGE_UPLOADER_ID}" name="access_image_uploader_id" />
             <!-- BEGIN access_profile_attribute_picture -->
-            <fieldset class="access_image_uploader_container" id="{ACCESS_PROFILE_ATTRIBUTE_PICTURE_ID}" > 
+            <fieldset class="access_image_uploader_container" id="{ACCESS_PROFILE_ATTRIBUTE_PICTURE_ID}" >
                 <legend>Aktuelles Profilbild</legend>
                 <p class="row">
                     <label class="col-md-3 col-xs-9">
@@ -26,16 +26,16 @@
                             type="button"
                             value="{ACCESS_PROFILE_ATTRIBUTE_PICTURE_CHOOSE_FILE}"
                             onClick="getImageUploader($J(this).closest('.access_image_uploader_container'));"
-                        />                        
-                        <a 
-                            title="Bild l&ouml;schen" 
-                            style="display:none;" 
+                        />
+                        <a
+                            title="Bild l&ouml;schen"
+                            style="display:none;"
                             class="btn btn-default"
                             onclick="
                                 var imageContainer = $J(this).closest('.access_image_uploader_container');
                                     imageContainer.find('.uploader_rel_field').val('');
                                     imageContainer.find('.uploader_rel_field_source').val('');
-                                    $J(this).hide();" 
+                                    $J(this).hide();"
                             href="javascript:void(0)"
                         >
                             <img width="17" height="17" style="vertical-align: bottom;" alt="Bild l&ouml;schen" src="core_modules/Access/View/Media/delete.gif" />
@@ -43,10 +43,10 @@
                         <br />
                         <em>Maximale Gr&ouml;&szlig;e {ACCESS_PROFILE_ATTRIBUTE_PICTURE_MAX_WIDTH}&times;{ACCESS_PROFILE_ATTRIBUTE_PICTURE_MAX_HEIGHT} Pixel, gr&ouml;&szlig;ere Bilder werden verkleinert.
                         </em>
-                        
+
                     </span>
                 </p>
-            </fieldset> 
+            </fieldset>
             <!-- END access_profile_attribute_picture -->
             <p>{ACCESS_STORE_BUTTON}<a class="btn btn-danger"
                                        title="Bild l&ouml;schen"
@@ -62,10 +62,10 @@
             </a></p>
         </form>
     </div>
-    <!-- END access_settings --> 
-    <!-- BEGIN access_settings_done --> 
+    <!-- END access_settings -->
+    <!-- BEGIN access_settings_done -->
     <div class="text-success">{ACCESS_SETTINGS_MESSAGE}</div>
-    <!-- END access_settings_done --> 
+    <!-- END access_settings_done -->
     {ACCESS_JAVASCRIPT_FUNCTIONS}
     {ACCESS_IMAGE_UPLOADER_CODE}
 </div>

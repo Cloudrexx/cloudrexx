@@ -3,8 +3,8 @@
 function CheckForm() {
   var errorMsg = "";
   with( document.formEntry ) {
-  	if (type.value == "") {
-    	errorMsg = errorMsg + "- {TXT_TYPE}\n";
+    if (type.value == "") {
+      errorMsg = errorMsg + "- {TXT_TYPE}\n";
     }
     if (title.value == "") {
         errorMsg = errorMsg + "- {TXT_TITLE_ENTRY}\n";
@@ -16,13 +16,13 @@ function CheckForm() {
         errorMsg = errorMsg + "- {TXT_CATEGORIE}\n";
     }
     if (price.value == "") {
-    	if(forfree.value == "" && agreement.value == ""){
-        	errorMsg = errorMsg + "- {TXT_PRICE}\n";
-    	}
+      if(forfree.value == "" && agreement.value == ""){
+          errorMsg = errorMsg + "- {TXT_PRICE}\n";
+      }
     }
-    
+
     {END_DATE_JS}
-    
+
     if (userdetails.value == "") {
         errorMsg = errorMsg + "- {TXT_USER_DETAIL}\n";
     }
@@ -32,9 +32,9 @@ function CheckForm() {
     if (email.value == "") {
         errorMsg = errorMsg + "- {TXT_E-MAIL}\n";
     }else{
-    	if (!matchType('^[_a-zA-Z0-9-]+(\\.[_a-zA-Z0-9-]+)*@[a-zA-Z0-9-]+(.[a-zA-Z0-9-]+)*\\.(([0-9]{1,3})|([a-zA-Z]{2,3})|(aero|coop|info|museum|name))$', email.value)){
-    		errorMsg = errorMsg + "- {TXT_E-MAIL}\n";
-    	}
+      if (!matchType('^[_a-zA-Z0-9-]+(\\.[_a-zA-Z0-9-]+)*@[a-zA-Z0-9-]+(.[a-zA-Z0-9-]+)*\\.(([0-9]{1,3})|([a-zA-Z]{2,3})|(aero|coop|info|museum|name))$', email.value)){
+        errorMsg = errorMsg + "- {TXT_E-MAIL}\n";
+      }
     }
 
     if (errorMsg != "")
@@ -42,17 +42,17 @@ function CheckForm() {
         alert ("{TXT_FIELDS_REQUIRED}\n{TXT_THOSE_FIELDS_ARE_EMPTY}\n" + errorMsg);
         return false;
     }else{
-    	return true;
+      return true;
     }
   }
 }
 
 function matchType(pattern, value) {
-	var reg = new RegExp(pattern);
-	if (value.match(reg)) {
-		return true;
-	}
-	return false;
+  var reg = new RegExp(pattern);
+  if (value.match(reg)) {
+    return true;
+  }
+  return false;
 }
 function marketUploaderCallback(path) {
   if (typeof path[0] !== 'undefined') {
@@ -74,74 +74,74 @@ jQuery(document).ready(function ($) {
 <input type="hidden" name="id" value="{ENTRY_ID}">
 <input type="hidden" name="picOld" value="{ENTRY_PICTURE_OLD}">
 <input type="hidden" name="userid" value="{ENTRY_ADDEDBY_ID}">
-	<table width="100%" cellspacing="0" cellpadding="3" border="0" align="top" class="adminlist">
-		<tr>
-			<th colspan="2" align="left">{TXT_TITLE}</th>
-		</tr>
-		<tr class="row1">
-			<td nowrap="nowrap">{TXT_TYPE}<font color="red"> *</font></td>
-			<td>
-				<input type="radio" name="type" value="offer" {ENTRY_TYPE_OFFER} />&nbsp;{TXT_OFFER}
-				<input type="radio" name="type" value="search" {ENTRY_TYPE_SEARCH} />&nbsp;{TXT_SEARCH}
-			</td>
-		</tr>
-		<tr valign="top" class="row2">
-			<td nowrap="nowrap" width="150">{TXT_TITLE_ENTRY}<font color="red"> *</font></td>
-			<td><input type="text" name="title" style="width: 300px;" maxlength="100" value="{ENTRY_TITLE}" ></td>
-		</tr>
-		<tr valign="top" class="row1">
-			<td nowrap="nowrap" width="150">{TXT_MARKET_COLOR}</font></td>
-			<td><input type="text" name="color" style="width: 300px;" maxlength="100" value="{ENTRY_COLOR}" ></td>
-		</tr>
-		<tr valign="top" class="row2">
-			<td nowrap="nowrap">{TXT_DESCRIPTION}<font color="red"> *</font></td>
-			<td><textarea name="description" rows="5"  style="width: 300px; overflow: auto;">{ENTRY_DESCRIPTION}</textarea></td>
-		</tr>
-		<tr valign="top" class="row1">
-			<td nowrap="nowrap" width="150">{TXT_PICTURE}</td>
-			<td>{ENTRY_PICTURE}<input type="text" name="uploadImage" value="" id="uploadImage" autocomplete="off" style="width: 200px;" onfocus="this.select();" />&nbsp;
+  <table width="100%" cellspacing="0" cellpadding="3" border="0" align="top" class="adminlist">
+    <tr>
+      <th colspan="2" align="left">{TXT_TITLE}</th>
+    </tr>
+    <tr class="row1">
+      <td nowrap="nowrap">{TXT_TYPE}<font color="red"> *</font></td>
+      <td>
+        <input type="radio" name="type" value="offer" {ENTRY_TYPE_OFFER} />&nbsp;{TXT_OFFER}
+        <input type="radio" name="type" value="search" {ENTRY_TYPE_SEARCH} />&nbsp;{TXT_SEARCH}
+      </td>
+    </tr>
+    <tr valign="top" class="row2">
+      <td nowrap="nowrap" width="150">{TXT_TITLE_ENTRY}<font color="red"> *</font></td>
+      <td><input type="text" name="title" style="width: 300px;" maxlength="100" value="{ENTRY_TITLE}" ></td>
+    </tr>
+    <tr valign="top" class="row1">
+      <td nowrap="nowrap" width="150">{TXT_MARKET_COLOR}</font></td>
+      <td><input type="text" name="color" style="width: 300px;" maxlength="100" value="{ENTRY_COLOR}" ></td>
+    </tr>
+    <tr valign="top" class="row2">
+      <td nowrap="nowrap">{TXT_DESCRIPTION}<font color="red"> *</font></td>
+      <td><textarea name="description" rows="5"  style="width: 300px; overflow: auto;">{ENTRY_DESCRIPTION}</textarea></td>
+    </tr>
+    <tr valign="top" class="row1">
+      <td nowrap="nowrap" width="150">{TXT_PICTURE}</td>
+      <td>{ENTRY_PICTURE}<input type="text" name="uploadImage" value="" id="uploadImage" autocomplete="off" style="width: 200px;" onfocus="this.select();" />&nbsp;
         <input type="button" id='file_upload' value="{TXT_MARKET_CHOOSE_FILE}"/>
         <input type="hidden" value="{MARKET_UPLOADER_ID}" name="marketUploaderId" />
       </td>
-		<tr valign="top" class="row2">
-			<td nowrap="nowrap" width="150">{TXT_CATEGORIE}<font color="red"> *</font></td>
-			<td><select name="cat"  style="width: 305px;">{CATEGORIES}</select></td>
-		<tr valign="top" class="row1">
-			<td nowrap="nowrap" width="150">{TXT_PRICE}<font color="red"> *</font></td>
-			<td><input type="text" name="price" style="width: 58px;" maxlength="100" value="{ENTRY_PRICE}">&nbsp;&nbsp;<input type="checkbox" name="forfree" value="1" {ENTRY_FOR_FREE}/>&nbsp;{TXT_FOR_FREE}&nbsp;<input type="checkbox" name="agreement" value="1" {ENTRY_AGREEMENT}/>&nbsp;{TXT_AGREEMENT}</td>
-		<!-- BEGIN end_date_dropdown -->
-		<tr valign="top" class="row2">
-			<td nowrap="nowrap" width="150">{TXT_END_DATE}<font color="red"> *</font></td>
-			<td><select name="days" style="width: 60px;">{DAYS_ONLINE}</select>&nbsp;&nbsp;{TXT_DAYS}</td>
-		<!-- END end_date_dropdown -->
-		<tr valign="top" class="row1">
-			<td nowrap="nowrap" width="150">{TXT_PREMIUM}</td>
-			<td><input type="checkbox" name="premium" value="1" {ENTRY_PREMIUM} /></td>
-		<tr valign="top" class="row2">
-			<td nowrap="nowrap" width="150">{TXT_ADDED_BY}<font color="red"> *</font></td>
-			<td><input type="text" name="addedby" style="width: 300px;" maxlength="100" value="{ENTRY_ADDEDBY}"></td>
-		<tr valign="top" class="row1">
-			<td nowrap="nowrap" width="150">{TXT_NAME}<font color="red"> *</font></td>
-			<td><input type="text" name="name" style="width: 300px;" maxlength="100" value="{ENTRY_NAME}"></td>
-		<tr valign="top" class="row2">
-			<td nowrap="nowrap" width="150">{TXT_MARKET_EMAIL}<font color="red"> *</font></td>
-			<td><input type="text" name="email" style="width: 300px;" maxlength="100" value="{ENTRY_E-MAIL}"></td>
-		<tr valign="top" class="row1">
-			<td nowrap="nowrap" width="150">{TXT_USER_DETAIL}<font color="red"> *</font></td>
-			<td>
-				<input type="radio" name="userdetails" value="1" {ENTRY_USERDETAILS_ON} />&nbsp;{TXT_DETAIL_SHOW}
-				<input type="radio" name="userdetails" value="0" {ENTRY_USERDETAILS_OFF} />&nbsp;{TXT_DETAIL_HIDE}
-			</td>
-		</td>
-		<!-- BEGIN spez_fields -->
-		<tr valign="top" class="{SPEZ_FIELD_ROW_CLASS}">
-			<td nowrap="nowrap" width="150">{TXT_SPEZ_FIELD_NAME}</td>
-			<td>{SPEZ_FIELD_INPUT}</td>
-		</td>
-		<!-- END spez_fields -->
+    <tr valign="top" class="row2">
+      <td nowrap="nowrap" width="150">{TXT_CATEGORIE}<font color="red"> *</font></td>
+      <td><select name="cat"  style="width: 305px;">{CATEGORIES}</select></td>
+    <tr valign="top" class="row1">
+      <td nowrap="nowrap" width="150">{TXT_PRICE}<font color="red"> *</font></td>
+      <td><input type="text" name="price" style="width: 58px;" maxlength="100" value="{ENTRY_PRICE}">&nbsp;&nbsp;<input type="checkbox" name="forfree" value="1" {ENTRY_FOR_FREE}/>&nbsp;{TXT_FOR_FREE}&nbsp;<input type="checkbox" name="agreement" value="1" {ENTRY_AGREEMENT}/>&nbsp;{TXT_AGREEMENT}</td>
+    <!-- BEGIN end_date_dropdown -->
+    <tr valign="top" class="row2">
+      <td nowrap="nowrap" width="150">{TXT_END_DATE}<font color="red"> *</font></td>
+      <td><select name="days" style="width: 60px;">{DAYS_ONLINE}</select>&nbsp;&nbsp;{TXT_DAYS}</td>
+    <!-- END end_date_dropdown -->
+    <tr valign="top" class="row1">
+      <td nowrap="nowrap" width="150">{TXT_PREMIUM}</td>
+      <td><input type="checkbox" name="premium" value="1" {ENTRY_PREMIUM} /></td>
+    <tr valign="top" class="row2">
+      <td nowrap="nowrap" width="150">{TXT_ADDED_BY}<font color="red"> *</font></td>
+      <td><input type="text" name="addedby" style="width: 300px;" maxlength="100" value="{ENTRY_ADDEDBY}"></td>
+    <tr valign="top" class="row1">
+      <td nowrap="nowrap" width="150">{TXT_NAME}<font color="red"> *</font></td>
+      <td><input type="text" name="name" style="width: 300px;" maxlength="100" value="{ENTRY_NAME}"></td>
+    <tr valign="top" class="row2">
+      <td nowrap="nowrap" width="150">{TXT_MARKET_EMAIL}<font color="red"> *</font></td>
+      <td><input type="text" name="email" style="width: 300px;" maxlength="100" value="{ENTRY_E-MAIL}"></td>
+    <tr valign="top" class="row1">
+      <td nowrap="nowrap" width="150">{TXT_USER_DETAIL}<font color="red"> *</font></td>
+      <td>
+        <input type="radio" name="userdetails" value="1" {ENTRY_USERDETAILS_ON} />&nbsp;{TXT_DETAIL_SHOW}
+        <input type="radio" name="userdetails" value="0" {ENTRY_USERDETAILS_OFF} />&nbsp;{TXT_DETAIL_HIDE}
+      </td>
+    </td>
+    <!-- BEGIN spez_fields -->
+    <tr valign="top" class="{SPEZ_FIELD_ROW_CLASS}">
+      <td nowrap="nowrap" width="150">{TXT_SPEZ_FIELD_NAME}</td>
+      <td>{SPEZ_FIELD_INPUT}</td>
+    </td>
+    <!-- END spez_fields -->
   </table>
-	<br />
-	<input type="submit" name="submitEntry" value="{TXT_SAVE}" />
+  <br />
+  <input type="submit" name="submitEntry" value="{TXT_SAVE}" />
 </form>
 {MARKET_UPLOADER_CODE}
 <!-- END module_market_entry.html -->

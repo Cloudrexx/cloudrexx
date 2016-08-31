@@ -382,7 +382,7 @@ class ContentMigration
                     if (!isset($_SESSION['contrexx_update']['pages'])) {
                         $_SESSION['contrexx_update']['pages'] = array();
                     }
-                    
+
                     // CREATE PAGE
                     switch ($objResult->fields['action']) {
                         case 'new':
@@ -557,7 +557,7 @@ class ContentMigration
 
         return true;
     }
-    
+
     function _setCmd($page, $cmd) {
         $origCmd = $cmd;
         $cmd = preg_replace('/[^-A-Za-z0-9_]+/', '_', $origCmd);

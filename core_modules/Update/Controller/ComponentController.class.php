@@ -47,10 +47,10 @@ namespace Cx\Core_Modules\Update\Controller;
  * @subpackage  module_update
  */
 class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentController {
-    
+
     /**
      * Get the controller classes
-     * 
+     *
      * @return array array of the controller classes.
      */
     public function getControllerClasses() {
@@ -59,9 +59,9 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
 
     /**
      * postInit
-     * 
+     *
      * @param \Cx\Core\Core\Controller\Cx $cx
-     * 
+     *
      * @return null
      */
     public function postInit(\Cx\Core\Core\Controller\Cx $cx)
@@ -70,7 +70,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         if (!$componentController) {
             return;
         }
-        
+
         \Cx\Core\Setting\Controller\Setting::init('MultiSite', 'config', 'FileSystem');
         if (\Cx\Core\Setting\Controller\Setting::getValue('mode', 'MultiSite') != \Cx\Core_Modules\MultiSite\Controller\ComponentController::MODE_WEBSITE) {
             return;

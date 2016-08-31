@@ -41,7 +41,7 @@ class Version {
     private $codeName;
     private $state;
     private $releaseDate;
-    
+
     public function __construct($number, $name, $codeName, $state, $releaseDate) {
         $this->number = $number;
         $this->name = $name;
@@ -49,54 +49,54 @@ class Version {
         $this->state = $state;
         $this->releaseDate = $releaseDate;
     }
-    
+
     public function getNumber($asInt = false) {
         if ($asInt) {
             return $this->stringNumberToInt($this->number);
         }
         return $this->number;
     }
-    
+
     public function setNumber($number) {
         $this->number = $number;
     }
-    
+
     public function getName() {
         return $this->name;
     }
-    
+
     public function setName($name) {
         $this->name = $name;
     }
-    
+
     public function getCodeName() {
         return $this->codeName;
     }
-    
+
     public function setCodeName($codeName) {
         $this->codeName = $codeName;
     }
-    
+
     public function getState() {
         return $this->state;
     }
-    
+
     public function setState($state) {
         $this->state = $state;
     }
-    
+
     public function getReleaseDate() {
         return $this->releaseDate;
     }
-    
+
     public function setReleaseDate($releaseDate) {
         $this->releaseDate = $releaseDate;
     }
-    
+
     public function isNewerThan($otherVersion) {
         return ($this->getNumber(true) > $otherVersion->getNumber(true));
     }
-    
+
     public function isEqualTo($otherVersion) {
         return ($this->getNumber() === $otherVersion->getNumber());
     }

@@ -38,7 +38,7 @@ namespace Cx\Modules\Order\Model\Repository;
 
 /**
  * Class SubscriptionRepository
- * 
+ *
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @author      Thomas Däppen <thomas.daeppen@comvation.com>
@@ -49,13 +49,13 @@ class SubscriptionRepository extends \Doctrine\ORM\EntityRepository
 {
     /**
      * Fetch expired Subscriptions
-     * 
+     *
      * @param   mixed   $status Optional argument to filter the expired subscriptions
      *                          by status (Subscription::$state).
      *                          Specify single status as string or multiple status as array.
      * @return  array   Returns an array of Subscription objects. If none are found, NULL is returned.
      */
-    public function getExpiredSubscriptions($status = null) 
+    public function getExpiredSubscriptions($status = null)
     {
         $now = new \DateTime('now');
         $qb  = \Env::get('em')->createQueryBuilder();
@@ -67,32 +67,32 @@ class SubscriptionRepository extends \Doctrine\ORM\EntityRepository
             if (is_array($status)) {
                 $qb->andWhere($qb->expr()->in('s.state', $status));
             } else {
-                $qb->andWhere('s.state = :state')->setParameter('state', $status); 
+                $qb->andWhere('s.state = :state')->setParameter('state', $status);
             }
         }
         return $qb->getQuery()->getResult();
     }
-    
+
     /**
      * Find the subscriptions by the filter
-     * 
+     *
      * @param string $filter
-     * 
+     *
      * @return array
      */
     function findSubscriptionsBySearchTerm($filter) {
         if (empty($filter)) {
             return array();
         }
-        
+
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb
             ->select('p')
             ->from('\Cx\Modules\Pim\Model\Entity\Product', 'p')
             ->groupBy('p.entityClass');
-        
+
         $products = $qb->getQuery()->getResult();
-        
+
         $subscriptions = array();
         foreach ($products as $product) {
             $ids  = array();
@@ -112,7 +112,7 @@ class SubscriptionRepository extends \Doctrine\ORM\EntityRepository
                     $options = array('in' => array(array('s.productEntityId', $ids)), 'p.entityClass' => $product->getEntityClass());
                 }
             }
-            
+
             if (!empty($filter['filterProduct'])) {
                 $options['in'][]   = array('p.id', $filter['filterProduct']);
             }
@@ -121,15 +121,15 @@ class SubscriptionRepository extends \Doctrine\ORM\EntityRepository
             }
             $subscriptions = array_merge($subscriptions, $this->getSubscriptionsByCriteria($options));
         }
-        
+
         return $subscriptions;
     }
-    
+
     /**
      * Get the subscriptions by criteria
-     * 
+     *
      * @param array $criteria
-     * 
+     *
      * @return array
      */
     function getSubscriptionsByCriteria($criteria, $order) {
@@ -143,13 +143,13 @@ class SubscriptionRepository extends \Doctrine\ORM\EntityRepository
             ->from('\Cx\Modules\Order\Model\Entity\Subscription', 's')
             ->leftJoin('s.product', 'p')
             ->leftJoin('s.order', 'o');
-            
+
         if (!empty($order)) {
             foreach ($order as $field => $type) {
                 $qb->orderBy($field, $type);
             }
         }
-        
+
         $i = 1;
         foreach ($criteria as $fieldType => $value) {
             if (method_exists($qb->expr(), $fieldType) && is_array($value)) {
@@ -162,7 +162,7 @@ class SubscriptionRepository extends \Doctrine\ORM\EntityRepository
             $i++;
         }
         $subscriptions = $qb->getQuery()->getResult();
-        
+
         return !empty($subscriptions) ? $subscriptions : array();
     }
 }

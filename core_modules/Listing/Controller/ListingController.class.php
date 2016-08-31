@@ -88,58 +88,58 @@ class ListingController {
     const FILTERING_HTML_AJAX = 18;
     const FILTERING_DATA_AJAX = 19;
     const FILTERING_CLIENT_ONLY = 20;
-    
+
     /**
      * How many lists are there for this request
      * @var int
      */
     protected static $listNumber = 0;
-    
+
     /**
      * Entity class name
      * @var String
      */
     protected $entityClass = null;
-    
+
     /**
      * Callback function to get data
      * @var Callable
      */
     protected $callback = null;
-    
+
     /**
      * Offset to start from
      * @var int
      */
     protected $offset = 0;
-    
+
     /**
      * How many results are returned
      * @var int
      */
     protected $count = 0;
-    
+
     /**
      * Order by array($field=>asc/desc)
      * @var Array
      */
     protected $order = array();
-    
+
     /**
      * Criteria the result must match
      * @var Array
      */
     protected $criteria = array();
-    
-    
+
+
     private $paging;
-    
+
     /**
      * Entity name
      * @var String
      */
     private $entityName = '';
-    
+
     /**
      * Handles a list
      * @param mixed $entities Entity class name as string or callback function
@@ -165,7 +165,7 @@ class ListingController {
             $this->handlers[] = new SortingController();
         }
         $this->handlers[] = new PagingController();
-        
+
         if (is_callable($entities)) {
             \DBG::msg('Init ListingController using callback function');
             $this->callback = $entities;
@@ -177,11 +177,11 @@ class ListingController {
             $this->entityClass = $entities;
         }
         $this->criteria = $crit;
-        
+
         // todo: allow multiple listing controllers per page request
         $this->args = contrexx_input2raw($_GET);
     }
-    
+
     /**
      * Initializes listing for the given object
      * @param Cx\Core_Modules\Listing\Model\Listable $listableObject
@@ -203,7 +203,7 @@ class ListingController {
         $this->count    = $params['count'];
         $this->order    = $params['order'];
         $this->criteria = $params['criteria'];
-        
+
         // handle ajax requests
         if (false /* ajax request for this listing */) {
             $jd = new \Cx\Core\Json\JsonData();
@@ -214,18 +214,18 @@ class ListingController {
             ), true);
             // JsonData->json() does call die() itself
         }
-        
+
         if ($this->entityClass instanceof \Cx\Core_Modules\Listing\Model\Entity\DataSet) {
             //$data = new \Cx\Core_Modules\Listing\Model\Entity\DataSet();
             $data = $this->entityClass;
-            
+
             $data = $data->sort($this->order);
-            
+
             // add sorting and filtering
             $data = $data->limit($this->count, $this->offset);
             return $data;
         }
-        
+
         // If a callback was specified, use it:
         $qb = \Env::get('em')->createQueryBuilder();
         $qb->select('e')->from($this->entityClass, 'e');
@@ -237,11 +237,11 @@ class ListingController {
                 return $query;
             }
         }
-        
+
         if (!class_exists($this->entityClass)) {
             //throw new ListingException('No such entity "' . $this->entityClass . '"');
         }
-        
+
         // build query
         // TODO: check if entity class is managed
          //$qb = new \Doctrine\ORM\QueryBuilder();
@@ -258,25 +258,25 @@ class ListingController {
         }
         var_dump($query->getDQL());*/
         $entities = $query->getResult();
-        
+
         // @todo: check if entities should be encapsulated in a class
         $data = new \Cx\Core_Modules\Listing\Model\Entity\DataSet($entities);
-        
+
         // return calculated data
         return $data;
     }
-    
+
     /**
      * @todo: implement, this is just a draft!
      */
     public function toHtml() {
         return $this->getPagingControl();
     }
-    
+
     public function __toString() {
         return $this->toHtml();
     }
-    
+
     /**
      * Calculates the paging
      * @throws PagingException when paging type is unknown (see class constants)
@@ -303,7 +303,7 @@ class ListingController {
                 break;
         }
     }
-    
+
     /**
      * This renders the template for paging control element
      * @todo templating!
@@ -313,17 +313,17 @@ class ListingController {
     protected function getPagingControl() {
         $html = '';
         if(!$this->paging || $this->entityClass->size() <= $this->count){
-            return $html;    
+            return $html;
         }
         $numberOfPages = ceil($this->entityClass->size() / $this->count);
         $activePageNumber = ceil(($this->offset + 1) / $this->count);
-        
+
         /*echo 'Number of entries: ' . count($this->entityClass->toArray()) . '<br />';
         echo 'Entries per page: ' . $this->count . '<br />';
         echo 'Number of pages: ' . $numberOfPages . '<br />';
         echo 'Active page: ' . $activePageNumber . '<br />';*/
-        
-        
+
+
         $paramName = !empty($this->entityName) ? $this->entityName . 'Pos' : 'pos';
         if ($this->offset) {
             // render goto start
@@ -342,7 +342,7 @@ class ListingController {
         } else {
             $html .= '&lt;&lt;&nbsp;&lt;&nbsp;';
         }
-        
+
         for ($pageNumber = 1; $pageNumber <= $numberOfPages; $pageNumber++) {
             if ($pageNumber == $activePageNumber) {
                 // render page without link
@@ -355,7 +355,7 @@ class ListingController {
             $url->setParam($paramName, $pagePos);
             $html .= '<a href="' . $url . '">' . $pageNumber . '</a>&nbsp;';
         }
-        
+
         if ($this->offset + $this->count < $this->entityClass->size()) {
             // render goto next
             $pagePos = ($activePageNumber - 0) * $this->count;
@@ -365,7 +365,7 @@ class ListingController {
             $url = clone \Env::get('cx')->getRequest()->getUrl();
             $url->setParam($paramName, $pagePos);
             $html .= '<a href="' . $url . '">&gt;</a>&nbsp;';
-            
+
             // render goto last page
             $url = clone \Env::get('cx')->getRequest()->getUrl();
             $url->setParam($paramName, ($numberOfPages - 1) * $this->count);

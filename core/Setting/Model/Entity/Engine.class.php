@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Specific Setting for this Component. Use this abstract class extends with the Db.class.php or FileSystem.class.php
  *
@@ -36,7 +36,7 @@
  * @subpackage  core_setting
  * @todo        Edit PHP DocBlocks!
  */
- 
+
 namespace Cx\Core\Setting\Model\Entity;
 
 /**
@@ -67,7 +67,7 @@ abstract class Engine implements EngineInterface {
      *    ... more ...
      *  );
      * @var     array
-     * 
+     *
      * @access  protected
      */
     protected $arrSettings = null;
@@ -76,7 +76,7 @@ abstract class Engine implements EngineInterface {
      * The group last used to {@see init()} the settings.
      * Defaults to null (ignored).
      * @var     string
-     * 
+     *
      * @access  protected
      */
 
@@ -85,7 +85,7 @@ abstract class Engine implements EngineInterface {
      * The section last used to {@see init()} the settings.
      * Defaults to null (which will cause an error in most methods).
      * @var     string
-     * 
+     *
      * @access  protected
      */
 
@@ -96,7 +96,7 @@ abstract class Engine implements EngineInterface {
      * This flag is set to true as soon as any change to the settings is detected.
      * It is cleared whenever {@see updateAll()} is called.
      * @var     boolean
-     * 
+     *
      * @access  protected
      */
     protected $changed = false;
@@ -147,7 +147,7 @@ abstract class Engine implements EngineInterface {
         $this->changed = null;
     }
 
-    /** 
+    /**
      * Returns the settings array for the given section and group
      *
      * See {@see init()} on how the arguments are used.
@@ -192,7 +192,7 @@ abstract class Engine implements EngineInterface {
 
      /**
      * Returns the true or false for given the setting name
-     * 
+     *
      * If the settings have not been initialized (see {@see init()}), or
      * if no setting of that name is present in the current set, false
      * is returned.
@@ -201,14 +201,14 @@ abstract class Engine implements EngineInterface {
      *                                false otherwise
      */
     public  function isDefined($name)
-    { 
+    {
         if (isset($this->arrSettings[$name]['name'])) {
-            return true;   
+            return true;
         }
         return false;
     }
-    
-    
+
+
     /**
      * Updates a setting
      *
@@ -236,7 +236,7 @@ abstract class Engine implements EngineInterface {
         \DBG::log("\Cx\Core\Setting\Model\Entity\Engine::set($name, $value): Added/updated, changed: ".$this->changed);
         return true;
     }
-    
+
     /**
      * Adds element to array
      * @param   string  $name
@@ -244,27 +244,27 @@ abstract class Engine implements EngineInterface {
      */
     public function addToArray($name, $item)
     {
-        $this->arrSettings[$name] = $item;        
+        $this->arrSettings[$name] = $item;
     }
-    
+
     /**
-     * Get group 
+     * Get group
      * @return  group
      */
     public function getGroup()
     {
-        return $this->group;        
+        return $this->group;
     }
-    
+
     /**
      * Get section
      * @return  string
      */
     public function getSection()
     {
-        return $this->section;  
+        return $this->section;
     }
-    
+
     /**
      * Get array
      * @return type
@@ -272,5 +272,5 @@ abstract class Engine implements EngineInterface {
     public function getArraySetting() {
         return $this->arrSettings;
     }
-    
+
 }

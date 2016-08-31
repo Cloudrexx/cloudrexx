@@ -57,7 +57,7 @@ class SearchKnowledge extends SearchInterface  {
     {
         $lib = new \Cx\Modules\Knowledge\Controller\KnowledgeLibrary();
         $this->isAllLangsActive = $lib->isAllLangsActive();
-        
+
         $this->term = addslashes($term);
 
         $this->parseResults($this->searchArticles(), "formatArticleURI");
@@ -76,7 +76,7 @@ class SearchKnowledge extends SearchInterface  {
     private function searchArticles()
     {
         global $objDatabase;
-        
+
         $additionalSelectField = '';
         $additionalWhere = '';
         if ($this->isAllLangsActive) {
@@ -108,7 +108,7 @@ class SearchKnowledge extends SearchInterface  {
     private function searchCategories()
     {
         global $objDatabase;
-        
+
         $additionalSelectField = '';
         $additionalWhere = '';
         if ($this->isAllLangsActive) {

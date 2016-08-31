@@ -46,18 +46,18 @@ namespace Cx\Core_Modules\LinkManager\Controller;
  */
 
 class User extends \User {
-    
+
     /**
      * Get the user name
-     * 
+     *
      * @param integer $userId
-     * 
+     *
      * @return string
      */
     public function getUpdatedUserName($userId, $currentUser)
     {
         $objFwUser = \FWUser::getFWUserObject();
-        
+
         if (!empty($userId)) {
             $objUser = $objFwUser->objUser->getUser($userId);
             if ($objUser) {
@@ -70,6 +70,6 @@ class User extends \User {
             );
         }
         return false;
-    }        
-    
+    }
+
 }

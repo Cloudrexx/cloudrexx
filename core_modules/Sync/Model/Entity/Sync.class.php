@@ -85,7 +85,7 @@ class Sync extends \Cx\Model\Base\EntityBase {
         $this->relations = new \Doctrine\Common\Collections\ArrayCollection();
         $this->hostEntities = new \Doctrine\Common\Collections\ArrayCollection();
     }
-    
+
     /**
      * Get id
      *

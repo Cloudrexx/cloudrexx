@@ -30,7 +30,7 @@
  *
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Thomas Kaelin <thomas.kaelin@comvation.com>
- * @version	   $Id: index.inc.php,v 1.00 $
+ * @version       $Id: index.inc.php,v 1.00 $
  * @package     cloudrexx
  * @subpackage  module_survey
  * @todo        Edit PHP DocBlocks!
@@ -41,7 +41,7 @@ namespace Cx\Modules\Survey\Controller;
  *
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Thomas Kaelin <thomas.kaelin@comvation.com>
- * @version	   $Id: index.inc.php,v 1.00 $
+ * @version       $Id: index.inc.php,v 1.00 $
  * @package     cloudrexx
  * @subpackage  module_survey
  * @todo        Edit PHP DocBlocks!
@@ -67,7 +67,7 @@ class SurveyEntry extends SurveyLibrary
     public $street;
     public $zip;
     public $city;
-    
+
     public $okMsg = array();
     public $errorMsg = array();
 
@@ -83,12 +83,12 @@ class SurveyEntry extends SurveyLibrary
         'zip',
         'city'
     );
-    
+
     function get()
     {
         global $objDatabase;
-        
-        $query = "SELECT 
+
+        $query = "SELECT
                     `title`,
                     `UserRestriction`,
                     `description`,
@@ -107,13 +107,13 @@ class SurveyEntry extends SurveyLibrary
                     `additional_street`,
                     `additional_zip`,
                     `additional_city`
-                 FROM 
+                 FROM
                     `".DBPREFIX."module_survey_surveygroup`
                  WHERE
                     `id` = {$this->id}";
-        
+
          $objResult = $objDatabase->Execute($query);
-         
+
          if ($objResult) {
             $this->title                    = $objResult->fields['title'];
             $this->surveyType               = $objResult->fields['UserRestriction'];
@@ -136,11 +136,11 @@ class SurveyEntry extends SurveyLibrary
          }
 
     }
-    
+
     function save()
     {
         global $objDatabase, $_ARRAYLANG;
-        
+
         $arrFields = array(
             'title'                 => $this->title,
             'UserRestriction'       => $this->surveyType,
@@ -161,16 +161,16 @@ class SurveyEntry extends SurveyLibrary
             'additional_zip'        => $this->zip,
             'additional_city'       => $this->city
         );
-        
+
         if (empty($this->id)) {
             $query = \SQL::insert('module_survey_surveygroup', $arrFields, array('escape' => true));
         } else {
             $arrFields['updated'] = date("Y-m-d H:i:s");
             $query = \SQL::update('module_survey_surveygroup', $arrFields, array('escape' => true))." WHERE `id` = {$this->id}";
         }
-        
+
         // echo $query;
-        
+
         if ($objDatabase->Execute($query)) {
             $this->okMsg[] = empty($this->id) ? $_ARRAYLANG['TXT_SURVEY_ADDED_SUC_TXT'] : $_ARRAYLANG['TXT_SURVEY_UPDATE_SUC_TXT'];
             return true;
@@ -179,24 +179,24 @@ class SurveyEntry extends SurveyLibrary
             return true;
         }
     }
-    
+
     function isStandred()
     {
         global $objDatabase;
-        
+
         $objResult = $objDatabase->Execute('SELECT 1 FROM `'.DBPREFIX.'module_survey_surveygroup` WHERE isHomeBox="1"');
-        
+
         return !$objResult->RecordCount();
     }
-    
+
     function validate()
     {
         global $_ARRAYLANG;
-        
+
         if (trim($this->title) == '') {
             $this->errorMsg[] = $_ARRAYLANG['TXT_SURVEY_ENTER_TITLE_ERR'];
         }
-        
+
         return empty($this->errorMsg) ? true : false;
     }
 }

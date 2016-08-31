@@ -40,7 +40,7 @@ class ProductException extends \Exception {};
 
 /**
  * Product
- * 
+ *
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      CLOUDREXX Development Team <info@cloudrexx.com>
  * @package     cloudrexx
@@ -135,7 +135,7 @@ class Product extends \Cx\Model\Base\EntityBase {
     /**
      * @var Cx\Modules\Pim\Model\Entity\Price
      */
-	protected $prices;
+    protected $prices;
 
     /**
      * @var Cx\Modules\Pim\Model\Entity\Product
@@ -493,7 +493,7 @@ class Product extends \Cx\Model\Base\EntityBase {
 
     /**
      * Add upgrade product to the existing upgrades
-     * 
+     *
      * @param type $upgrade
      */
     public function addUpgrades(Product $upgrades)
@@ -503,7 +503,7 @@ class Product extends \Cx\Model\Base\EntityBase {
 
     /**
      * Get the available upgrades
-     * 
+     *
      * @return array Return the available upgrades
      */
     public function getUpgrades()
@@ -526,13 +526,13 @@ class Product extends \Cx\Model\Base\EntityBase {
     public function setDefaultRenewalOption($defaultRenewalOption) {
         return $this->defaultRenewalOption = $defaultRenewalOption;
     }
-    
+
     public function getNewEntityForSale($saleOptions) {
         return \Env::get('em')->getRepository($this->entityClass)->findOneForSale($this->entityAttributes, $saleOptions);
     }
 
     public function getEntityById($entityId) {
-        $entityIdKey = \Env::get('em')->getClassMetadata($this->entityClass)->getSingleIdentifierFieldName(); 
+        $entityIdKey = \Env::get('em')->getClassMetadata($this->entityClass)->getSingleIdentifierFieldName();
         return \Env::get('em')->getRepository($this->entityClass)->findOneBy(array($entityIdKey => $entityId));
     }
 
@@ -572,7 +572,7 @@ class Product extends \Cx\Model\Base\EntityBase {
         if (empty($this->renewalOptions)) {
             $this->initRenewalConfig();
         }
-        
+
         if ($this->isValidRenewalDefinition($unit, $quantifier)) {
             return array($unit, $quantifier);
         }

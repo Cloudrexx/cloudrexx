@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Admin CP navigation
  *
@@ -212,9 +212,9 @@ class adminMenu
             foreach ($arrMatchingItems as $link_data) {
                 if ($this->moduleExists($link_data[4])) {
                     if($link_data[4] && !in_array($link_data[4], \Env::get('cx')->getLicense()->getLegalComponentsList())) {
-                       continue; 
+                       continue;
                     }
-                        
+
                     // active exceptions for media and content module
                     // ask: thomas.daeppen@comvation.com
                     $linkCmd = '';
@@ -405,7 +405,7 @@ class adminMenu
                         </a>
                     </li>\n";
                 }
-                
+
                 $cssClass = '';
             }
 

@@ -21,13 +21,13 @@ function themesZipFileUploaderCallback(callback) {
         $J('#localarchive').val(fileName);
     }
 }
-var init = function() {	
-    form 	=	document.getElementById("manageform");
-    dweb 	=	document.getElementById("web");
-    dlocal 	= 	document.getElementById("local");
-    dfilesystem = 	document.getElementById("filesystem");
-    ilocal 	= 	document.getElementById("localarchive");
-    iremote     = 	document.getElementById("remotearchive");
+var init = function() {
+    form   =  document.getElementById("manageform");
+    dweb   =  document.getElementById("web");
+    dlocal   =   document.getElementById("local");
+    dfilesystem =   document.getElementById("filesystem");
+    ilocal   =   document.getElementById("localarchive");
+    iremote     =   document.getElementById("remotearchive");
     ifilesystem =       document.getElementById("existingdirName");
     document.getElementById("radiolocal").className = 'noborder';
     document.getElementById("radioremote").className = 'noborder';
@@ -76,7 +76,7 @@ var importSelect = function(div) {
             dweb.style.display = "none";
             dfilesystem.style.display = "block";
             break;
-    }    
+    }
 }
 
 $J(document).ready(function() {

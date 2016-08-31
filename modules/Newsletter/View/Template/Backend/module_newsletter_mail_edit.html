@@ -32,7 +32,7 @@ function newsletterDelAttachment(attachmentNr) {
 function mediaBrowserCallback(data) {
   if (data.type=="file") {
     var url = data.data[0].datainfo.filepath;
-    
+
     newsletterAttachmentNr++;
 
     elDiv = document.createElement('div');
@@ -115,7 +115,7 @@ function mediaBrowserCallback(data) {
   <tr class="row1" style="vertical-align:top;">
     <td width="15%">
         {TXT_NEWSLETTER_ASSOCIATED_LISTS}
-        <!-- BEGIN associatedListToolTip --><span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_NEWSLETTER_INFO_ABOUT_ASSOCIATED_LISTS}</span><!-- END associatedListToolTip -->        
+        <!-- BEGIN associatedListToolTip --><span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_NEWSLETTER_INFO_ABOUT_ASSOCIATED_LISTS}</span><!-- END associatedListToolTip -->
     </td>
     <td width="20%">
 <!-- BEGIN newsletter_mail_associated_list_0 -->
@@ -153,7 +153,7 @@ function mediaBrowserCallback(data) {
   </tr>
 
   <tr class="row2" style="vertical-align:top;">
-    <td width="15%">        
+    <td width="15%">
         {TXT_NEWSLETTER_ASSOCIATED_GROUPS}
         <!-- BEGIN associatedGroupToolTipBeforeSend --><span class="icon-warning tooltip-trigger"></span><span class="tooltip-message">{TXT_NEWSLETTER_INFO_ABOUT_ASSOCIATED_LISTS_SEND}</span><!-- END associatedGroupToolTipBeforeSend -->
         <!-- BEGIN associatedGroupToolTipAfterSent --><span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_NEWSLETTER_INFO_ABOUT_ASSOCIATED_LISTS}</span><!-- END associatedGroupToolTipAfterSent -->

@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * JSON Interface to Cloudrexx
  * @copyright   Cloudrexx AG
@@ -53,7 +53,7 @@ class JsonData {
     /**
      * List of adapter class names.
      * @deprecated Use component framework instead (SystemComponentController->getControllersAccessableByJson())
-     * @var array List of adapter class names 
+     * @var array List of adapter class names
      */
     protected static $adapter_classes = array(
         '\\Cx\\Core\\Json\\Adapter\\User' => array(
@@ -66,7 +66,7 @@ class JsonData {
             'JsonCrm',
         ),
     );
-    
+
     /**
      * List of adapters to use (they have to implement the JsonAdapter interface)
      * @var Array List of JsonAdapters
@@ -89,7 +89,7 @@ class JsonData {
             }
         }
     }
-    
+
     /**
      * @deprecated Use component framework instead (SystemComponentController->getControllersAccessableByJson())
      */
@@ -105,10 +105,10 @@ class JsonData {
         }
         self::$adapter_classes[$namespace][] = $className;
     }
-    
+
     /**
      * Adds an adapter accessable by JSON requests.
-     * 
+     *
      * Either specify a fully qualified classname, or a classname and the containing
      * namespace separatly
      * @todo Adapter loading could be optimized
@@ -122,12 +122,12 @@ class JsonData {
         } else {
             $adapter = $namespace . '\\' . $className;
         }
-        
+
         // check if its an adapter!
         if (!is_a($adapter, '\Cx\Core\Json\JsonAdapter', true)) {
             throw new \Exception('Tried to load class as JsonAdapter, but interface is not implemented: "' . $adapter . '"');
         }
-        
+
         // load specified controller
         $matches = array();
         preg_match('/\\\\?Cx\\\\(?:Core|Core_Modules|Modules|modules)\\\\([^\\\\]*)/', $adapter, $matches);
@@ -137,13 +137,13 @@ class JsonData {
         }
         $nsParts = explode('\\', $adapter);
         $controllerClass = end($nsParts);
-        
+
         // legacy adapter
         if (in_array($possibleComponentName, array('Json', 'Crm'))) {
             $this->loadLegacyAdapter($adapter);
             return;
         }
-        
+
         $em = \Env::get('cx')->getDb()->getEntityManager();
         $componentRepo = $em->getRepository('Cx\Core\Core\Model\Entity\SystemComponent');
         $component = $componentRepo->findOneBy(array('name'=>$possibleComponentName));
@@ -160,7 +160,7 @@ class JsonData {
         }
         $this->adapters[$object->getName()] = $object;
     }
-    
+
     /**
      * @deprecated: This load adapter in a way they shouldn't be loaded
      */
@@ -178,7 +178,7 @@ class JsonData {
     /**
      * Passes JSON data to the particular adapter and returns the result
      * Called from index.php when section is 'jsondata'
-     * 
+     *
      * @author Florian Schuetz <florian.schuetz@comvation.com>
      * @author Michael Ritter <michael.ritter@comvation.com>
      * @param String $adapter Adapter name
@@ -190,7 +190,7 @@ class JsonData {
     public function jsondata($adapter, $method, $arguments = array(), $setContentType = true) {
         return $this->json($this->data($adapter, $method, $arguments), $setContentType);
     }
-    
+
     /**
      * Parses data into JSON
      * @param array $data Data to JSONify
@@ -231,7 +231,7 @@ class JsonData {
         $adapter = $this->adapters[$adapter];
         $methods = $adapter->getAccessableMethods();
         $realMethod = '';
-        
+
         /*
          * $adapter->getAccessableMethods() might return two type of arrays
          * Format 1: array('method1', 'method2')
@@ -243,12 +243,12 @@ class JsonData {
             } elseif ($methodValue == $method) {
                 $realMethod = $method;
             }
-            
+
             if (!empty($realMethod)) {
                 break;
             }
         }
-        
+
         if ($realMethod == '') {
             return $this->getErrorData('No such method: ' . $method);
         }
@@ -260,7 +260,7 @@ class JsonData {
         } else if (!empty ($defaultPermission) && ($defaultPermission instanceof \Cx\Core_Modules\Access\Model\Entity\Permission)) {
             $objPermission = $defaultPermission;
         }
-        
+
         if ($objPermission && ($objPermission instanceof \Cx\Core_Modules\Access\Model\Entity\Permission)) {
             if (!$objPermission->hasAccess($arguments)) {
                 $backend = \Cx\Core\Core\Controller\Cx::instanciate()->getMode() == \Cx\Core\Core\Controller\Cx::MODE_BACKEND;
@@ -270,7 +270,7 @@ class JsonData {
                 return $this->getErrorData('JsonData-request to method ' . $realMethod . ' of adapter ' . $adapter->getName() . ' has been rejected by not complying to the permission requirements of the requested method.');
             }
         }
-        
+
         try {
             $output = call_user_func(array($adapter, $realMethod), $arguments);
 
@@ -284,15 +284,15 @@ class JsonData {
             return $this->getErrorData($e->getMessage());
         }
     }
-    
+
     public function setSessionId($sessionId) {
         $this->sessionId = $sessionId;
     }
-    
+
     public function getSessionId() {
         return $this->sessionId;
     }
-    
+
     /**
      * Fetches a json response via HTTP request
      * @todo Support cookies (to allow login and similiar features)
@@ -331,13 +331,13 @@ class JsonData {
         foreach ($data as $name=>$value) {
             $request->addPostParameter($name, $value);
         }
-        
+
         if (!empty($files)) {
             foreach ($files as $fieldId => $file) {
                 $request->addUpload($fieldId, $file);
             }
         }
-        
+
         if ($this->sessionId !== null) {
             $request->addCookie(session_name(), $this->sessionId);
         }
@@ -365,7 +365,7 @@ class JsonData {
             \DBG::dump($data);
             return false;
         }
-        
+
         $body = json_decode($response->getBody());
         if ($body === NULL) {
             \DBG::msg(__METHOD__.' failed!');
@@ -373,7 +373,7 @@ class JsonData {
         }
         return $body;
     }
-    
+
     /**
      * Returns the JSON code for a error message
      * @param String $message HTML encoded message

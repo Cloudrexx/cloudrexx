@@ -87,13 +87,13 @@ function getDatabaseObject(&$errorMsg, $newInstance = false)
                 $objDateTimeZone = new DateTimeZone($_CONFIG['timezone']);
                 $objDateTime = new DateTime('now', $objDateTimeZone);
                 $offset = $objDateTimeZone->getOffset($objDateTime);
-                $offsetHours = round(abs($offset)/3600); 
-                $offsetMinutes = round((abs($offset)-$offsetHours*3600) / 60); 
+                $offsetHours = round(abs($offset)/3600);
+                $offsetMinutes = round((abs($offset)-$offsetHours*3600) / 60);
                 $offsetString = ($offset > 0 ? '+' : '-').($offsetHours < 10 ? '0' : '').$offsetHours.':'.($offsetMinutes < 10 ? '0' : '').$offsetMinutes;
                 $objDb->Execute('SET TIME_ZONE="'.$offsetString.'"');
             }
         }
-        
+
         // Disable STRICT_TRANS_TABLES mode:
         $res = $objDb->Execute('SELECT @@sql_mode');
         if ($res->EOF) {

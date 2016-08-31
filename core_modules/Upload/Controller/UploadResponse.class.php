@@ -26,7 +26,7 @@
  */
 
 /**
- * 
+ *
  *
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      CLOUDREXX Development Team <info@cloudrexx.com>
@@ -90,7 +90,7 @@ class UploadResponse {
         $this->logs[] = array(
             'status' => $this->statusTexts[$status],
             'message' => $message,
-            'file' => $file                        
+            'file' => $file
         );
 
         if($status > $this->worstStatus)
@@ -146,5 +146,5 @@ class UploadResponse {
             'worstStatus' => $this->worstStatus,
             'uploadFinished' => $this->uploadFinished
         ));
-    }    
+    }
 }

@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Image type handling
  *
@@ -916,7 +916,7 @@ class ImageType
             $objResult = $objDatabase->Execute("
                 DROP TABLE `".DBPREFIX."core_imagetype`");
             if (!$objResult) return false;
-            
+
 echo("ImageType::errorHandler(): Created table core_imagetype<br />");
         }
         $objResult = $objDatabase->Execute("

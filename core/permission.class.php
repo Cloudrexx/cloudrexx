@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Permission
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
@@ -165,7 +165,7 @@ class Permission
 
         return (bool) $objDatabase->Execute('DELETE FROM `'.DBPREFIX.'access_group_'.$type.'_ids` WHERE `access_id` = '.$accessId.(isset($groupId) ? ' AND `group_id` IN ('.(is_array($groupId) ? implode(',', $groupId) : $groupId).')' : ''));
     }
-    
+
     public static function getGroupIdsForAccessId($accessId) {
         global $objDatabase;
 
@@ -176,7 +176,7 @@ class Permission
         if($rs === false) {
             return false;
         }
-        
+
         $ids = array();
         while(!$rs->EOF) {
             $ids[] = $rs->fields['group_id'];

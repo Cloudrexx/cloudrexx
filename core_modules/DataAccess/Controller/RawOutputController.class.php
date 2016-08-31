@@ -4,7 +4,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -23,10 +23,10 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Output controller for raw output
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author Michael Ritter <michael.ritter@cloudrexx.com>
  * @package cloudrexx
@@ -37,7 +37,7 @@ namespace Cx\Core_Modules\DataAccess\Controller;
 
 /**
  * Output controller for raw output
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author Michael Ritter <michael.ritter@cloudrexx.com>
  * @package cloudrexx
@@ -119,17 +119,17 @@ class RawOutputController extends OutputController {
      * @var Character for bottom line
      */
     const BOTTOM = '-';
-    
+
     /**
      * @var Character to pad smaller values
      */
     const PAD = ' ';
-    
+
     /**
      * @var Character before each value
      */
     const BEFORE_VALUE = ' ';
-    
+
     /**
      * @var Character after each value
      */
@@ -139,7 +139,7 @@ class RawOutputController extends OutputController {
      * @var Character for line break
      */
     const LINE_END = "\n";
-    
+
     /**
      * Returns the raw encoded (/unencoded) data
      * @param array $data Data to encode
@@ -151,13 +151,13 @@ class RawOutputController extends OutputController {
             return 'Error: ' . current($data['messages']['error']) . "\n";
         }
         $data = $data['data'];
-        
+
         if (!count($data)) {
             return '(Empty set)' . "\n";
         }
         return $this->tablify($data);
     }
-    
+
     /**
      * Creates a human readable table with ASCII art
      * @todo add option to break long lines after some chars
@@ -167,7 +167,7 @@ class RawOutputController extends OutputController {
     protected function tablify($table) {
         $tableString = '';
         $fieldLength = array();
-        
+
         // pre-calculate table:
         foreach ($table as $row) {
             foreach ($row as $caption=>$value) {
@@ -182,11 +182,11 @@ class RawOutputController extends OutputController {
                 }
             }
         }
-        
+
         // generate table:
         $tableString .= $this->createTableBorderLine($fieldLength, 'top');
         $tableString .= $this->createTableDataLine($fieldLength, array_keys($fieldLength));
-        
+
         foreach ($table as $row) {
             $tableString .= $this->createTableBorderLine($fieldLength, 'middle');
             $tableString .= $this->createTableDataLine($fieldLength, $row);
@@ -194,7 +194,7 @@ class RawOutputController extends OutputController {
         $tableString .= $this->createTableBorderLine($fieldLength, 'bottom');
         return $tableString;
     }
-    
+
     /**
      * Creates one of the border lines (those without data)
      * @param array $fieldLength List of the size of the longest values for each attribute
@@ -233,7 +233,7 @@ class RawOutputController extends OutputController {
             array()
         );
     }
-    
+
     /**
      * Creates one of the data lines
      * @param array $fieldLength List of the size of the longest values for each attribute
@@ -252,7 +252,7 @@ class RawOutputController extends OutputController {
             $data
         );
     }
-    
+
     /**
      * Creates a table line using the supplied signs
      * @param string $begin Character to begin the line with (must be of same length for each row!)
@@ -280,4 +280,3 @@ class RawOutputController extends OutputController {
         return $line . static::LINE_END;
     }
 }
-

@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -93,7 +93,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     $this->userAttributeName = new \Doctrine\Common\Collections\ArrayCollection();
     $this->userProfile = new \Doctrine\Common\Collections\ArrayCollection();
     }
-    
+
     /**
      * Get id
      *

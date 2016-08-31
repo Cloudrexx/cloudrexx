@@ -4,7 +4,7 @@
  */
 
 /**
- * Script for initializing the row sorting functionality in ViewGenerator 
+ * Script for initializing the row sorting functionality in ViewGenerator
  */
 cx.ready(function() {
     var jQuery = cx.jQuery;
@@ -12,7 +12,7 @@ cx.ready(function() {
         sortable = {
             ajaxCall : function(opt) {
                 var data = 'sortOrder=' + opt.sortOrder + '&curPosition=' + opt.curIndex
-                            + '&prePosition=' + opt.preIndex + '&sortField=' + opt.sortField 
+                            + '&prePosition=' + opt.preIndex + '&sortField=' + opt.sortField
                             + '&pagingPosition=' + opt.position,
                     recordCount = 0;
                 if (opt.component && opt.entity) {
@@ -71,7 +71,7 @@ cx.ready(function() {
                 //If the same 'order' field value is repeated,
                 //we need to update all the entries.
                 if (options.repeat) {
-                    var pagingCnt = isDescOrder 
+                    var pagingCnt = isDescOrder
                                     ? (recordCnt - options.position) + 1
                                     : options.position;
                     obj.each(function() {
@@ -101,7 +101,7 @@ cx.ready(function() {
                 }
             }
         };
-    
+
     jQuery('table.sortable tbody').sortable({
         axis: "y",
         items: "> tr.row1,> tr.row2 ",
@@ -135,7 +135,7 @@ cx.ready(function() {
             ) {
                 return;
             }
-            
+
             params.uiItem.removeData('pIndex');
             sortable.ajaxCall(params);
         }

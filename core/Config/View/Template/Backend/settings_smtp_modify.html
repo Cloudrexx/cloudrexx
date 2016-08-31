@@ -1,51 +1,51 @@
 <!-- start settings_smtp_modify.html -->
 <form action="?cmd=Config&amp;act=smtp&amp;tpl=modify&amp;id={SETTINGS_SMTP_ID}" method="post">
-	<table summary="" border="0" width="100%" cellpadding="3" cellspacing="0" class="adminlist">
-		<thead>
-			<tr>
-				<th colspan="2">{SETTINGS_SMTP_TITLE}</th>
-			</tr>
-		</thead>
-		<tbody style="vertical-align:top;">
-			<tr class="row1">
-				<td width="15%">{TXT_SETTINGS_ACCOUNT}</td>
-				<td>
-					{TXT_SETTINGS_NAME_OF_ACCOUNT}:<br />
-					<input type="text" name="settings_smtp_account" value="{SETTINGS_SMTP_ACCOUNT}" maxlength="50" style="width:250px;" />
-				</td>
-			</tr>
-			<tr class="row2">
-				<td>{TXT_SETTINGS_SMTP_SERVER}</td>
-				<td>
-					<div style="float:left; width:261px;">
-						{TXT_SETTINGS_HOST}:<br />
-						<input type="text" name="settings_smtp_hostname" value="{SETTINGS_SMTP_HOST}" maxlength="255" style="width:250px;" />
-					</div>
-					<div>
-						{TXT_SETTINGS_PORT}:<br />
-						<input type="text" name="settings_smtp_port" value="{SETTINGS_SMTP_PORT}" maxlength="5" style="width:80px;" />
-					</div>
-				</td>
-			</tr>
-			<tr class="row1">
-				<td>{TXT_SETTINGS_AUTHENTICATION}</td>
-				<td>
-					<div style="float:left; width:261px;">
-						{TXT_SETTINGS_USERNAME}:<br />
-						<input type="text" name="settings_smtp_username" value="{SETTINGS_SMTP_USERNAME}" maxlength="255" style="width:250px;" />
-					</div>
-					<div>
-						{TXT_SETTINGS_PASSWORD}:<br />
-						<input type="password" name="settings_smtp_password" value="{SETTINGS_SMTP_PASSWORD}" maxlength="255" style="width:250px;" />
-					</div>
-					<br />
-					<div style="clear:left;">{TXT_SETTINGS_SMTP_AUTHENTICATION_TXT}</div>
-				</td>
-			</tr>
-		</tbody>
-	</table>
-	<br />
-	<input type="button" value="{TXT_SETTINGS_BACK}" onclick="window.location.href='?cmd=Config&{CSRF_PARAM}&amp;act=smtp'" />
-	<input type="submit" value="{TXT_SETTINGS_SAVE}" name="settings_smtp_save" />
+  <table summary="" border="0" width="100%" cellpadding="3" cellspacing="0" class="adminlist">
+    <thead>
+      <tr>
+        <th colspan="2">{SETTINGS_SMTP_TITLE}</th>
+      </tr>
+    </thead>
+    <tbody style="vertical-align:top;">
+      <tr class="row1">
+        <td width="15%">{TXT_SETTINGS_ACCOUNT}</td>
+        <td>
+          {TXT_SETTINGS_NAME_OF_ACCOUNT}:<br />
+          <input type="text" name="settings_smtp_account" value="{SETTINGS_SMTP_ACCOUNT}" maxlength="50" style="width:250px;" />
+        </td>
+      </tr>
+      <tr class="row2">
+        <td>{TXT_SETTINGS_SMTP_SERVER}</td>
+        <td>
+          <div style="float:left; width:261px;">
+            {TXT_SETTINGS_HOST}:<br />
+            <input type="text" name="settings_smtp_hostname" value="{SETTINGS_SMTP_HOST}" maxlength="255" style="width:250px;" />
+          </div>
+          <div>
+            {TXT_SETTINGS_PORT}:<br />
+            <input type="text" name="settings_smtp_port" value="{SETTINGS_SMTP_PORT}" maxlength="5" style="width:80px;" />
+          </div>
+        </td>
+      </tr>
+      <tr class="row1">
+        <td>{TXT_SETTINGS_AUTHENTICATION}</td>
+        <td>
+          <div style="float:left; width:261px;">
+            {TXT_SETTINGS_USERNAME}:<br />
+            <input type="text" name="settings_smtp_username" value="{SETTINGS_SMTP_USERNAME}" maxlength="255" style="width:250px;" />
+          </div>
+          <div>
+            {TXT_SETTINGS_PASSWORD}:<br />
+            <input type="password" name="settings_smtp_password" value="{SETTINGS_SMTP_PASSWORD}" maxlength="255" style="width:250px;" />
+          </div>
+          <br />
+          <div style="clear:left;">{TXT_SETTINGS_SMTP_AUTHENTICATION_TXT}</div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <br />
+  <input type="button" value="{TXT_SETTINGS_BACK}" onclick="window.location.href='?cmd=Config&{CSRF_PARAM}&amp;act=smtp'" />
+  <input type="submit" value="{TXT_SETTINGS_SAVE}" name="settings_smtp_save" />
 </form>
 <!-- end settings_smtp_modify.html -->

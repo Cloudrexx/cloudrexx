@@ -12,12 +12,12 @@ function CheckForm() {
 }
 
 function setText(){
-	with(document.addForm )
-	{
-		var txtValue = edit_name.value;
-		if(edit_description.value == "")
-			edit_description.value=txtValue;
-	}
+  with(document.addForm )
+  {
+    var txtValue = edit_name.value;
+    if(edit_description.value == "")
+      edit_description.value=txtValue;
+  }
 }
 </script>
 <form name="addForm" method="post" action="index.php?cmd=Directory&amp;act=editlevel" onSubmit="return CheckForm()">

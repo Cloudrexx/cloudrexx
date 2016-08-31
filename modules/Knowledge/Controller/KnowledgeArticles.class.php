@@ -46,7 +46,7 @@ namespace Cx\Modules\Knowledge\Controller;
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author Stefan Heinemann <sh@comvation.com>
  * @package     cloudrexx
- * @subpackage	module_knowledge
+ * @subpackage    module_knowledge
  */
 class KnowledgeArticles
 {
@@ -57,7 +57,7 @@ class KnowledgeArticles
      * @var string
      */
     private $basequery = "";
-    
+
     protected $isAllLangsActive = false;
 
     /**
@@ -79,7 +79,7 @@ class KnowledgeArticles
                     FROM `".DBPREFIX."module_knowledge_articles` AS articles
                     INNER JOIN `".DBPREFIX."module_knowledge_article_content`
                     AS content ON articles.id = content.article";
-        
+
         $this->isAllLangsActive = $showAllLangs;
     }
 
@@ -598,18 +598,18 @@ class KnowledgeArticles
         global $objDatabase;
 
         foreach ($this->insertContent as $values) {
-    	    $lang = $values['lang'];
-    	    $question = $values['question'];
-    	    $answer = $values['answer'];
+            $lang = $values['lang'];
+            $question = $values['question'];
+            $answer = $values['answer'];
 
-    	    $query = " INSERT INTO ".DBPREFIX."module_knowledge_article_content
-    	                   (article, lang, question, answer)
-    	               VALUES
-    	                   (".$id.", ".$lang.", '".$question."', '".$answer."')";
+            $query = " INSERT INTO ".DBPREFIX."module_knowledge_article_content
+                           (article, lang, question, answer)
+                       VALUES
+                           (".$id.", ".$lang.", '".$question."', '".$answer."')";
             if ($objDatabase->Execute($query) === false) {
                 throw new DatabaseError("inserting category content failed");
             }
-    	}
+        }
     }
 
     /**

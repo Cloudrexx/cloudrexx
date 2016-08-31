@@ -50,13 +50,13 @@
     }
 })(jQuery);
 jQuery.noConflict();
-jQuery(document).ready(function(){ 
-    jQuery("ul.sf-menu").supersubs({ 
-        minWidth:    8,                                 // minimum width of sub-menus in em units 
-        maxWidth:    15,                                // maximum width of sub-menus in em units 
-        extraWidth:  1                                  // extra width can ensure lines don't sometimes turn over 
+jQuery(document).ready(function(){
+    jQuery("ul.sf-menu").supersubs({
+        minWidth:    8,                                 // minimum width of sub-menus in em units
+        maxWidth:    15,                                // maximum width of sub-menus in em units
+        extraWidth:  1                                  // extra width can ensure lines don't sometimes turn over
     // due to slight rounding differences and font-family
-    }).superfish({ 
+    }).superfish({
         delay:       400,
         animation:   {
             opacity:'show',
@@ -65,7 +65,7 @@ jQuery(document).ready(function(){
         speed:       'fast',
         autoArrows:  true,
         dropShadows: true
-    }); 
+    });
 });
 ;
 (function($){
@@ -142,21 +142,21 @@ jQuery(document).ready(function(){
         shadowClass : 'sf-shadow'
     };
     sf.defaults = {
-        hoverClass	: 'sfHover',
-        pathClass	: 'overideThisToUse',
-        pathLevels	: 1,
-        delay		: 800,
-        animation	: {
+        hoverClass  : 'sfHover',
+        pathClass  : 'overideThisToUse',
+        pathLevels  : 1,
+        delay    : 800,
+        animation  : {
             opacity:'show'
         },
-        speed		: 'normal',
-        autoArrows	: true,
+        speed    : 'normal',
+        autoArrows  : true,
         dropShadows : true,
-        disableHI	: false,		// true disables hoverIntent detection
-        onInit		: function(){}, // callback functions
+        disableHI  : false,    // true disables hoverIntent detection
+        onInit    : function(){}, // callback functions
         onBeforeShow: function(){},
-        onShow		: function(){},
-        onHide		: function(){}
+        onShow    : function(){},
+        onHide    : function(){}
     };
     $.fn.extend({
         hideSuperfishUl : function(){

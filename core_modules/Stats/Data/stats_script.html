@@ -2,41 +2,41 @@
 <script type="text/javascript">
 // <![CDATA[
 (function() {//don't pollute global namespace
-	var referer = document.referrer ? encodeURI(document.referrer) : '';
-	var c = 0;
-	var v = navigator.appName;
-	if (v != 'Netscape') { c = screen.colorDepth; }
-	else                 { c = screen.pixelDepth; }
+  var referer = document.referrer ? encodeURI(document.referrer) : '';
+  var c = 0;
+  var v = navigator.appName;
+  if (v != 'Netscape') { c = screen.colorDepth; }
+  else                 { c = screen.pixelDepth; }
 
-	var stats_data = {
-		'mode':        'script',
-		'referer':     referer,
-		'pageId':      '[PAGEID]',
-		'screen':      screen.width + 'x' + screen.height,
-		'color_depth': c
-	};
-	if ('[SEARCHTERM_PLAIN]' != '') {
-		stats_data['searchTerm'] = '[SEARCHTERM_PLAIN]';
-	}
+  var stats_data = {
+    'mode':        'script',
+    'referer':     referer,
+    'pageId':      '[PAGEID]',
+    'screen':      screen.width + 'x' + screen.height,
+    'color_depth': c
+  };
+  if ('[SEARCHTERM_PLAIN]' != '') {
+    stats_data['searchTerm'] = '[SEARCHTERM_PLAIN]';
+  }
 
-	if(typeof Ajax != 'undefined') { // prototype
-		Event.observe(window, 'load', function() {
-			new Ajax.Request( "[CORE_MODULE_URL]/Stats/Controller/Counter.php", {
-				method: 'get',
-				parameters: stats_data
-			});
-		});
-	} else if (typeof cx != 'undefined' && typeof cx.jQuery != 'undefined') { // jQuery
-		cx.jQuery(function(){
-			cx.jQuery.get("[CORE_MODULE_URL]/Stats/Controller/Counter.php",
-				stats_data
-			);
-		});
-	} else { // no known js framework
+  if(typeof Ajax != 'undefined') { // prototype
+    Event.observe(window, 'load', function() {
+      new Ajax.Request( "[CORE_MODULE_URL]/Stats/Controller/Counter.php", {
+        method: 'get',
+        parameters: stats_data
+      });
+    });
+  } else if (typeof cx != 'undefined' && typeof cx.jQuery != 'undefined') { // jQuery
+    cx.jQuery(function(){
+      cx.jQuery.get("[CORE_MODULE_URL]/Stats/Controller/Counter.php",
+        stats_data
+      );
+    });
+  } else { // no known js framework
         var script_opener = '%3Cscript type="text/javascript" ';
         var script_closer = '%3C/script%3E';
         document.write(decodeURI(script_opener) + ' src="[CORE_MODULE_URL]/Stats/Controller/Counter.php?mode=script&amp;referer='+referer+'&amp;pageId=[PAGEID]&amp;screen=' + screen.width + 'x' + screen.height + '&amp;color_depth=' + c + '[SEARCHTERM]" >' + decodeURI(script_closer));
-	}
+  }
 })();
 // ]]>
 </script>

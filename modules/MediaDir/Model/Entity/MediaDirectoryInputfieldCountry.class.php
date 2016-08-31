@@ -67,7 +67,7 @@ class MediaDirectoryInputfieldCountry extends \Cx\Modules\MediaDir\Controller\Me
         switch ($intView) {
             default:
             case 1:
-            	if(isset($intEntryId) && $intEntryId != 0) {
+                if(isset($intEntryId) && $intEntryId != 0) {
                     $objInputfieldValue = $objDatabase->Execute("
                         SELECT
                             `value`
@@ -83,7 +83,7 @@ class MediaDirectoryInputfieldCountry extends \Cx\Modules\MediaDir\Controller\Me
                 } else {
                     $strValue = null;
                 }
-                
+
                 if(empty($strValue)) {
                     if(substr($arrInputfield['default_value'][0],0,2) == '[[') {
                         $objPlaceholder = new \Cx\Modules\MediaDir\Controller\MediaDirectoryPlaceholder($this->moduleName);
@@ -92,7 +92,7 @@ class MediaDirectoryInputfieldCountry extends \Cx\Modules\MediaDir\Controller\Me
                         $strValue = empty($arrInputfield['default_value'][$_LANGID]) ? $arrInputfield['default_value'][0] : $arrInputfield['default_value'][$_LANGID];
                     }
                 }
-                
+
                 if(!empty($arrInputfield['info'][0])){
                     $strInfoValue = empty($arrInputfield['info'][$_LANGID]) ? 'title="'.$arrInputfield['info'][0].'"' : 'title="'.$arrInputfield['info'][$_LANGID].'"';
                     $strInfoClass = 'mediadirInputfieldHint';
@@ -102,13 +102,13 @@ class MediaDirectoryInputfieldCountry extends \Cx\Modules\MediaDir\Controller\Me
                 }
 
                 if($objInit->mode == 'backend') {
-                	$strInputfield = '<select name="'.$this->moduleNameLC.'Inputfield['.$intId.']" id="'.$this->moduleNameLC.'Inputfield_'.$intId.'" class="'.$this->moduleNameLC.'InputfieldDropdown" style="width: 302px">';
+                    $strInputfield = '<select name="'.$this->moduleNameLC.'Inputfield['.$intId.']" id="'.$this->moduleNameLC.'Inputfield_'.$intId.'" class="'.$this->moduleNameLC.'InputfieldDropdown" style="width: 302px">';
                 } else {
-                	$strInputfield = '<select name="'.$this->moduleNameLC.'Inputfield['.$intId.']" id="'.$this->moduleNameLC.'Inputfield_'.$intId.'" class="'.$this->moduleNameLC.'InputfieldDropdown '.$strInfoClass.'" '.$strInfoValue.'>';
+                    $strInputfield = '<select name="'.$this->moduleNameLC.'Inputfield['.$intId.']" id="'.$this->moduleNameLC.'Inputfield_'.$intId.'" class="'.$this->moduleNameLC.'InputfieldDropdown '.$strInfoClass.'" '.$strInfoValue.'>';
                 }
 
                 $strInputfieldOptions = \Cx\Core\Country\Controller\Country::getMenuoptions($strValue);
-                
+
                 $strInputfield .= $strInputfieldOptions.'</select>';
 
                 return $strInputfield;
@@ -118,7 +118,7 @@ class MediaDirectoryInputfieldCountry extends \Cx\Modules\MediaDir\Controller\Me
                 //search View
                 $country = \Cx\Core\Country\Controller\Country::getNameArray(true, $_LANGID);
                 foreach ($country as $id => $name) {
-                	$strInputfieldOptions .= '<option value="'.$id.'">'.$name.'</option>';
+                    $strInputfieldOptions .= '<option value="'.$id.'">'.$name.'</option>';
                 }
 
                 $strInputfield = '<select name="'.$intId.'" class="'.$this->moduleName.'InputfieldSearch">';

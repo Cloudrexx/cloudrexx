@@ -26,7 +26,7 @@
             <script type="text/javascript" src="modules/Knowledge/View/Script/search.js"></script>
             <form action="index.php?section=Knowledge&amp;cmd=search" method="get" id="form" onsubmit="return submitSearch(this)">
                 <div>
-                    <input type="text" class="searchbox searchinput_search" maxlength="100" value=" {TXT_SEARCH_INPUT}" 
+                    <input type="text" class="searchbox searchinput_search" maxlength="100" value=" {TXT_SEARCH_INPUT}"
                            onfocus="this.value = ''" id="searchinput" name="{SEARCH_HASH}"/>
                     <input type="hidden" name="section" value="Knowledge" />
                     <input type="hidden" name="cmd" value="search" />
@@ -34,7 +34,7 @@
                     <input type="submit" value="{TXT_SEARCH}" class="search_button" />
                 </div>
             </form>
-        </div>    
+        </div>
         <div id="resultbox" style="display: none;">
         </div>
         <script type="text/javascript">
@@ -80,11 +80,11 @@
                             <td>
                                 <div><!-- BEGIN tags -->
                                     <div>
-                                        <ul class="tags"> 	 								<!-- BEGIN tag -->
+                                        <ul class="tags">                    <!-- BEGIN tag -->
                                             <li><a href="index.php?section=Knowledge{MODULE_INDEX}&amp;tid={TAGID}">{TAG}</a>,</li>
-                                            <!-- END tag --> 	 								<!-- BEGIN lasttag -->
+                                            <!-- END tag -->                    <!-- BEGIN lasttag -->
                                             <li><a href="index.php?section=Knowledge{MODULE_IDNEX}&amp;tid={TAGID}">{TAG}</a></li>
-                                            <!-- END lasttag --> 								</ul>
+                                            <!-- END lasttag -->                 </ul>
                                     </div>
                                     <!-- END tags --></div>
                             </td>
@@ -124,6 +124,6 @@
                         /* ]]> */
             </script>
         </li>
-        <!-- END article -->	
+        <!-- END article -->
     </ul>
 </div>

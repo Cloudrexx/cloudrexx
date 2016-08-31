@@ -86,7 +86,7 @@ function _ecardUpdate() {
     }
 
     /*     * **********************************************
-     * BUGFIX:	Set write access to the image dir   *
+     * BUGFIX:    Set write access to the image dir   *
      * ********************************************** */
     $arrImagePaths = array(
         array(ASCMS_DOCUMENT_ROOT . '/images/modules/ecard', ASCMS_PATH_OFFSET . '/images/modules/ecard'),

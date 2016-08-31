@@ -41,7 +41,7 @@ function entriesDoAction(formId, objSelect)
             case "delete_entry":
                 if (confirm('{TXT_MEDIADIR_CONFIRM_DELETE_DATA}\n{TXT_MEDIADIR_ACTION_IS_IRREVERSIBLE}')) {
                     actionValue = "index.php?cmd={MODULE_NAME}&{CSRF}&act=delete_entry";
-            	}
+              }
                 break
             case "confirm_entry":
                 actionValue = "index.php?cmd={MODULE_NAME}&{CSRF}&act=confirm_entry";
@@ -84,26 +84,26 @@ var switchState = function(id, obj, action, type)
 }
 
 cx.jQuery(document).ready(function(){
-	cx.jQuery('#submit-search').click(function(e){
-	searchEntries(e);
-	});
+  cx.jQuery('#submit-search').click(function(e){
+  searchEntries(e);
+  });
 });
 
 var searchEntries = function (event) {
-	event.preventDefault();
-	formId = '';
-	levelId = '';
-	catId = '';
-	if(cx.jQuery('select[name="form_id"]').length>0){
-		formId = '&form_id='+cx.jQuery('select[name="form_id"]').val();
-	}
-	if(cx.jQuery('select[name="level_id"]').length>0){
-		levelId = '&level_id='+cx.jQuery('select[name="level_id"]').val();
-	}
-	if(cx.jQuery('select[name="cat_id"]').length>0){
-		catId = '&cat_id='+cx.jQuery('select[name="cat_id"]').val();
-	}
-	cx.jQuery('#search_mediadir').attr('action', cx.jQuery('#search_mediadir').attr('action') + catId+formId+levelId).submit();
+  event.preventDefault();
+  formId = '';
+  levelId = '';
+  catId = '';
+  if(cx.jQuery('select[name="form_id"]').length>0){
+    formId = '&form_id='+cx.jQuery('select[name="form_id"]').val();
+  }
+  if(cx.jQuery('select[name="level_id"]').length>0){
+    levelId = '&level_id='+cx.jQuery('select[name="level_id"]').val();
+  }
+  if(cx.jQuery('select[name="cat_id"]').length>0){
+    catId = '&cat_id='+cx.jQuery('select[name="cat_id"]').val();
+  }
+  cx.jQuery('#search_mediadir').attr('action', cx.jQuery('#search_mediadir').attr('action') + catId+formId+levelId).submit();
 }
 
 //]]>

@@ -27,7 +27,7 @@
 
 /**
  * ComponentController for Workbench
- * 
+ *
  * Loads backend view Controllers and adds warning message
  * @author Michael Ritter <michael.ritter@comvation.com>
  */
@@ -36,14 +36,14 @@ namespace Cx\Core_Modules\Workbench\Controller;
 
 /**
  * ComponentController for Workbench
- * 
+ *
  * Loads backend view Controllers and adds warning message
  * @author Michael Ritter <michael.ritter@comvation.com>
  */
 class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentController {
     /**
      * getControllerClasses
-     * 
+     *
      * @return type
      */
     public function getControllerClasses() {
@@ -51,7 +51,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         // does not exist a backend, nor a frontend controller of this component.
         return array();
     }
-    
+
     public function getCommandsForCommandMode() {
         return array('workbench', 'wb');
     }
@@ -85,7 +85,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         $this->cx->getTemplate()->addBlockfile('CONTENT_OUTPUT', 'content_master', 'ContentMaster.html');
         $this->cx->getTemplate()->setRoot($cachedRoot);
         $_ARRAYLANG = \Env::get('init')->loadLanguageData($this->getName());
-        
+
         // Initialize
         if (!isset($_GET['act'])) {
             $_GET['act'] = '';
@@ -99,7 +99,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             $cmd[1] = '';
         }
         $act = $cmd[1];
-        
+
         // Load controller specific things
         switch ($controller) {
             case 'sandbox':
@@ -125,7 +125,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 $objTemplate->setVariable('ADMIN_CONTENT', new Toolbox($_ARRAYLANG, $act, $_POST));
                 break;
         }
-        
+
         // set tabs
         $navigation = new \Cx\Core\Html\Sigma(ASCMS_CORE_PATH . '/Core/View/Template/Backend');
         $navigation->loadTemplateFile('Navigation.html');

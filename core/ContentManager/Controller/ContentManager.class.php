@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * ContentManager
  *
@@ -124,7 +124,7 @@ class ContentManager extends \Module
             var_dump($this->nodeRepository->recover());
         }
         $objCx    = \ContrexxJavascript::getInstance();
-        
+
         $themeRepo = new \Cx\Core\View\Model\Repository\ThemeRepository();
         $defaultTheme = $themeRepo->getDefaultTheme();
         $objCx->setVariable('themeId', $defaultTheme->getId(), 'contentmanager/theme');
@@ -245,7 +245,7 @@ class ContentManager extends \Module
                 $objCx->setVariable($name, $_CORELANG[$value], 'contentmanager/lang/' . $subscope);
             }
         }
-        
+
         // Mediabrowser
         $mediaBrowser = new \Cx\Core_Modules\MediaBrowser\Model\Entity\MediaBrowser();
         $mediaBrowser->setOptions(array('type' => 'button'));
@@ -336,7 +336,7 @@ class ContentManager extends \Module
         } else {
             $this->template->hideBlock('show_caching_option');
         }
-        
+
         if (\Permission::checkAccess(78, 'static', true)) {
             $this->template->hideBlock('release_button');
         } else {
@@ -383,7 +383,7 @@ class ContentManager extends \Module
         $this->template->setVariable('FALLBACK_ARRAY', json_encode($this->getFallbackArray()));
         $this->template->setVariable('LANGUAGE_LABELS', json_encode($this->getLangLabels()));
         $this->template->setVariable('EDIT_VIEW_CSS_CLASS', $editViewCssClass);
-        
+
         $this->template->touchBlock('content_manager_language_selection');
 
         $editmodeTemplate = new \Cx\Core\Html\Sigma(ASCMS_CORE_PATH . '/ContentManager/View/Template/Backend');

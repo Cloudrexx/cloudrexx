@@ -3,19 +3,19 @@
 <!--
 function confirmDeleteEntry(id)
 {
-	if (confirm('{TXT_CONTACT_CONFIRM_DELETE_ENTRY}\n{TXT_CONTACT_ACTION_IS_IRREVERSIBLE}')) {
-		document.location.href = 'index.php?cmd=Contact&act=forms&tpl=deleteEntry&formId={CONTACT_FORM_ID}&entryId='+id+'&{CSRF_PARAM}';
-	}
+  if (confirm('{TXT_CONTACT_CONFIRM_DELETE_ENTRY}\n{TXT_CONTACT_ACTION_IS_IRREVERSIBLE}')) {
+    document.location.href = 'index.php?cmd=Contact&act=forms&tpl=deleteEntry&formId={CONTACT_FORM_ID}&entryId='+id+'&{CSRF_PARAM}';
+  }
 }
 // -->
 </script>
 <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
-	<tbody>
-		<tr>
-			<th>{CONTACT_ENTRY_TITLE}</th>
-		</tr>
+  <tbody>
+    <tr>
+      <th>{CONTACT_ENTRY_TITLE}</th>
+    </tr>
 
-	</tbody>
+  </tbody>
 </table>
 {CONTACT_ENTRY}
 <br />

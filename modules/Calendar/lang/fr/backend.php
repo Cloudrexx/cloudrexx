@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -27,7 +27,7 @@
 
 /**
  * Calendar Language variables
- * 
+ *
  * @package    cloudrexx
  * @subpackage module_calendar
  * @author     Cloudrexx <info@cloudrexx.com>
@@ -454,7 +454,7 @@ $_ARRAYLANG['TXT_CALENDAR_FORM_SUCCESSFULLY_DELETED'] = "Le formulaire d’inscr
 $_ARRAYLANG['TXT_CALENDAR_FORM_CORRUPT_DELETED'] = "Une erreur est intervenue lors de l’effacement du formulaire d’inscription";
 $_ARRAYLANG['TXT_CALENDAR_INSERT_REGISTRATION_FORM'] = "Remplir le formulaire d‘inscription";
 $_ARRAYLANG['TXT_CALENDAR_MAKE_SELECTION'] = "S’il vous plaît: veuillez saisir un élément au minimum";
-$_ARRAYLANG['TXT_CALENDAR_COPY'] = "copier"; 
+$_ARRAYLANG['TXT_CALENDAR_COPY'] = "copier";
 
 $_ARRAYLANG['TXT_CALENDAR_CATEGORY_COUNT_ENTRIES'] = "Anzahl Einträge im Dropdown anzeigen";
 $_ARRAYLANG['TXT_CALENDAR_EVENT_TYPE'] = "Type d'événement";
@@ -476,7 +476,7 @@ $_ARRAYLANG['TXT_CALENDAR_ACTIVATE_ONLY_COMMUNITY'] = "Aktivieren nur für angem
 $_ARRAYLANG['TXT_CALENDAR_CONFIRM_FRONTEND_EVENTS'] = "Nouveau rendez-vous doit être confirmer";
 $_ARRAYLANG['TXT_CALENDAR_PLACE_DATA'] = "Indication du lieu";
 $_ARRAYLANG['TXT_CALENDAR_PLACE_DATA_STATUS_INFO'] = "Einerseits können die Angaben zur Ortschaft manuell erfasst werden, oder mit dem Medienverzeichnis Modul verknüpft werden. Möchten Sie dies mit dem Medienverzeichnis verknüpfen, wählen Sie bitte die entsprechende Formularvolage aus, aus welcher Sie die Daten auslesen möchten.";
-$_ARRAYLANG['TXT_CALENDAR_PLACE_DATA_DEFAULT'] = "Saisir manuelle";    
+$_ARRAYLANG['TXT_CALENDAR_PLACE_DATA_DEFAULT'] = "Saisir manuelle";
 $_ARRAYLANG['TXT_CALENDAR_CONFIRMLIST'] = "Liste de confirmation";
 $_ARRAYLANG['TXT_PAYMENT_METHODS'] = "Vor Ort,Rechnung,Yellowpay";
 $_ARRAYLANG['TXT_PAYMENT_COMPLETED'] = "Bezahlt";
@@ -530,9 +530,9 @@ $_ARRAYLANG['TXT_CALENDAR_FORM_FIELD_AFFILIATION_FORM'] = "Formulaire d'inscript
 $_ARRAYLANG['TXT_CALENDAR_FORM_FIELD_AFFILIATION_CONTACT'] = "Adresse du contact";
 $_ARRAYLANG['TXT_CALENDAR_FORM_FIELD_AFFILIATION_BILLING'] = "Adresse de facturation";
 $_ARRAYLANG['TXT_CALENDAR_FORM_FIELD_TITLE'] = "Titre";
-        
-$_ARRAYLANG['TXT_CALENDAR_TYPE'] = "Type";   
-$_ARRAYLANG['TXT_CALENDAR_FIRST_EXPORT'] = "Exportiert am";   
-$_ARRAYLANG['TXT_CALENDAR_ALL_CAT'] = "Tous les catégories";  
-$_ARRAYLANG['TXT_CALENDAR_SHOW_EVENTS_ONLY_IN_ACTIVE_LANGUAGE'] = "Afficher uniquement les rendez-vous de la langue active";  
+
+$_ARRAYLANG['TXT_CALENDAR_TYPE'] = "Type";
+$_ARRAYLANG['TXT_CALENDAR_FIRST_EXPORT'] = "Exportiert am";
+$_ARRAYLANG['TXT_CALENDAR_ALL_CAT'] = "Tous les catégories";
+$_ARRAYLANG['TXT_CALENDAR_SHOW_EVENTS_ONLY_IN_ACTIVE_LANGUAGE'] = "Afficher uniquement les rendez-vous de la langue active";
 ?>

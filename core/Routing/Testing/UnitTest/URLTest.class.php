@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,10 +24,10 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * ResolverTest
- * 
+ *
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Cloudrexx Development Team <info@cloudrexx.com>
  * @author      SS4U <ss4u.comvation@gmail.com>
@@ -41,7 +41,7 @@ use Cx\Core\Routing\Url as Url;
 
 /**
  * ResolverTest
- * 
+ *
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Cloudrexx Development Team <info@cloudrexx.com>
  * @author      SS4U <ss4u.comvation@gmail.com>
@@ -51,7 +51,7 @@ use Cx\Core\Routing\Url as Url;
  */
 class URLTest extends \Cx\Core\Test\Model\Entity\ContrexxTestCase {
     public function testDomainAndPath() {
-        $url = new Url('http://example.com/');   
+        $url = new Url('http://example.com/');
         $this->assertEquals('example.com', $url->getDomain());
         $this->assertEquals('', $url->getPath());
 
@@ -75,46 +75,46 @@ class URLTest extends \Cx\Core\Test\Model\Entity\ContrexxTestCase {
         $this->assertEquals('Test', $url->getSuggestedTargetPath());
         $this->assertEquals('?foo=bar', $url->getSuggestedParams());
     }
-    
+
     public function testPorts() {
         $url = new Url('http://example.com', true);
         $this->assertEquals('80', $url->getPort());
-        
+
         $url = new Url('http://example.com');
-        $this->assertEquals('80', $url->getPort());        
-        
+        $this->assertEquals('80', $url->getPort());
+
         $url = new Url('http://example.com:81', true);
         $this->assertEquals('80', $url->getPort());
-        
+
         $url = new Url('http://example.com:81');
         $this->assertEquals('81', $url->getPort());
-        
+
         $url = new Url('https://example.com:445', true);
         $this->assertEquals('443', $url->getPort());
-        
+
         $url = new Url('https://example.com:445');
         $this->assertEquals('445', $url->getPort());
-        
+
         $url = new Url('http://example.com:81/cadmin/', true);
         $this->assertEquals('80', $url->getPort());
-        
+
         $url = new Url('http://example.com:81/cadmin/');
         $this->assertEquals('81', $url->getPort());
-        
+
         $url = new Url('https://example.com:445/cadmin/', true);
         $this->assertEquals('443', $url->getPort());
-        
+
         $url = new Url('https://example.com:445/cadmin/');
         $this->assertEquals('445', $url->getPort());
     }
-    
+
     public function testFileUrls() {
         $testResult = 'file://' . getcwd();
-        
+
         $url = Url::fromRequest();
         $this->assertEquals($testResult, $url->toString());
         $this->assertEquals(getcwd(), (string) $url);
-        
+
         $url = Url::fromMagic($testResult);
         $this->assertEquals($testResult, $url->toString());
         $this->assertEquals(getcwd(), (string) $url);

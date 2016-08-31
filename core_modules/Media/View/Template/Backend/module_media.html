@@ -94,9 +94,9 @@ function openWindow(theURL,winName,features)
 </script>
 <script type="text/javascript">
     $J(document).ready(function(){
-       $J('#media_browse_button').hide(); 
+       $J('#media_browse_button').hide();
        $J('#uploaderStarter').click(function() {
-          $J('#media_browse_button').trigger('click'); 
+          $J('#media_browse_button').trigger('click');
        });
     });
     function mediaCallbackJs(callback) {
@@ -163,20 +163,20 @@ function openWindow(theURL,winName,features)
 <div id="loadfile" class="mediaTab" style="display:none;">
     <form name="upload_files" method="post" action="{MEDIA_UPLOAD_FILES_ACTION}" enctype="multipart/form-data" onsubmit="return mediaCheckUploadFiles();">
     <table width="100%" cellspacing="0" cellpadding="5" border="0" align="center" class="adminlist">
-    		<tr>
-    		    <th>{TXT_MEDIA_UPLOAD_FILES}</th>
-    		</tr>
-    		<tr class="row1">
-    	    	<td>
-    	    	    <input type="file" name="fileName[]" value="" size="80" /><br />
-    	    	    <input type="file" name="fileName[]" value="" size="80" /><br />
-    	    	    <input type="file" name="fileName[]" value="" size="80" /><br />
-    	    	    <input type="file" name="fileName[]" value="" size="80" /><br />
-    	    	    <input type="file" name="fileName[]" value="" size="80" /><br />
-    	<br />
-    	<input type="submit" name="submit" value="{TXT_MEDIA_UPLOAD}" />
-    	<input type="checkbox" id="uploadForceOverwrite" name="uploadForceOverwrite" value="1" checked="checked" />
-    	<label for="uploadForceOverwrite">{TXT_MEDIA_FORCE_OVERWRITE}</label>
+        <tr>
+            <th>{TXT_MEDIA_UPLOAD_FILES}</th>
+        </tr>
+        <tr class="row1">
+            <td>
+                <input type="file" name="fileName[]" value="" size="80" /><br />
+                <input type="file" name="fileName[]" value="" size="80" /><br />
+                <input type="file" name="fileName[]" value="" size="80" /><br />
+                <input type="file" name="fileName[]" value="" size="80" /><br />
+                <input type="file" name="fileName[]" value="" size="80" /><br />
+      <br />
+      <input type="submit" name="submit" value="{TXT_MEDIA_UPLOAD}" />
+      <input type="checkbox" id="uploadForceOverwrite" name="uploadForceOverwrite" value="1" checked="checked" />
+      <label for="uploadForceOverwrite">{TXT_MEDIA_FORCE_OVERWRITE}</label>
         </td>
       </tr>
     </table>
@@ -190,7 +190,7 @@ function openWindow(theURL,winName,features)
 <form name="fileList" method="post" action="index.php?cmd=Media">
     <input type="hidden" name="deleteMedia" value="0" />
     <input type="hidden" name="file" value="" />
-    
+
     <table width="100%" cellspacing="0" cellpadding="5" border="0" align="center" class="adminlist">
       <tr>
           <th width="16"><div align="center">#</div></th>

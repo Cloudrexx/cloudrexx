@@ -1,33 +1,33 @@
 <!-- START module_news_teasers_show_frame.html -->
 <script language="javascript" type="text/javascript">
 <!--
-	function confirmDeleteTeaser()
-	{
-		if (confirm('TXT_Möchten Sie diesen Teaser wirklich entfernen?')) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
-	function confirmDeleteFrame()
-	{
-		if (confirm('TXT_Möchten Sie diesen Teaser Rahmen wirklick löschen?')) {
-			return true;
-		} else {
-			return false;
-		}
-	}
+  function confirmDeleteTeaser()
+  {
+    if (confirm('TXT_Möchten Sie diesen Teaser wirklich entfernen?')) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  function confirmDeleteFrame()
+  {
+    if (confirm('TXT_Möchten Sie diesen Teaser Rahmen wirklick löschen?')) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 // -->
 </script>
 <form action="index.php?cmd=News&amp;act=settings&amp;tpl=teasers&amp;tpl2=frames" method="post">
-	<table class="adminlist" cellspacing="0" cellpadding="3" width="100%" border="0">
-		<tr class="row1">
-			<th>TXT_Teaser Frame Vorschau</th>
-		</tr>
-	</table>
-	{NEWS_TEASER_FRAME}
-	<br />
-	<input type="submit" name="cancel" value="TXT_Zurück" />
+  <table class="adminlist" cellspacing="0" cellpadding="3" width="100%" border="0">
+    <tr class="row1">
+      <th>TXT_Teaser Frame Vorschau</th>
+    </tr>
+  </table>
+  {NEWS_TEASER_FRAME}
+  <br />
+  <input type="submit" name="cancel" value="TXT_Zurück" />
 </form>
 <!-- END module_news_teasers_show_frame.html -->

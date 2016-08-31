@@ -122,32 +122,32 @@ class Jobs extends JobsLibrary
 
         $footnotetext = "";
         $footnotelink = "";
-    	$footnote = "";
+        $footnote = "";
         $link = "";
         $url = "";
 
         if($id > 0) {
-	        $query = "SELECT *
-	                     FROM `".DBPREFIX."module_jobs_settings`
-	                     WHERE name = 'footnote'
-	                     OR name = 'link'
-	                     OR name = 'url'
-	                     ";
-	        $objResult = $objDatabase->Execute($query);
+            $query = "SELECT *
+                         FROM `".DBPREFIX."module_jobs_settings`
+                         WHERE name = 'footnote'
+                         OR name = 'link'
+                         OR name = 'url'
+                         ";
+            $objResult = $objDatabase->Execute($query);
 
-	        while(!$objResult->EOF) {
+            while(!$objResult->EOF) {
 
-	            if($objResult->fields['name']== "footnote") {
-	                $footnote = stripslashes($objResult->fields['value']);
-	            }
-	            elseif($objResult->fields['name']== "link") {
-	                $link = stripslashes($objResult->fields['value']);
-	            }
-	            elseif($objResult->fields['name']== "url") {
-	                $url = stripslashes($objResult->fields['value']);
-	            }
-	            $objResult->movenext();
-	        }
+                if($objResult->fields['name']== "footnote") {
+                    $footnote = stripslashes($objResult->fields['value']);
+                }
+                elseif($objResult->fields['name']== "link") {
+                    $link = stripslashes($objResult->fields['value']);
+                }
+                elseif($objResult->fields['name']== "url") {
+                    $url = stripslashes($objResult->fields['value']);
+                }
+                $objResult->movenext();
+            }
 
         }
 
@@ -206,18 +206,18 @@ class Jobs extends JobsLibrary
 
                 $title = stripslashes($objResult->fields['title']);
 
-		        /*
-		        * Replace self defined placeholders in $url
-		        */
-		        if(!empty($footnote)) {
-					$footnotetext = nl2br($footnote);
-		        }
+                /*
+                * Replace self defined placeholders in $url
+                */
+                if(!empty($footnote)) {
+                    $footnotetext = nl2br($footnote);
+                }
 
-		        if(!empty($link)) {
-			        $url = str_replace("%URL%",urlencode($_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']),$url);
-			        $url = htmlspecialchars(str_replace("%TITLE%",urlencode(stripslashes($title)),$url), ENT_QUOTES, CONTREXX_CHARSET);
-			        $footnotelink = "<a href='$url'>$link</a>";
-		        }
+                if(!empty($link)) {
+                    $url = str_replace("%URL%",urlencode($_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']),$url);
+                    $url = htmlspecialchars(str_replace("%TITLE%",urlencode(stripslashes($title)),$url), ENT_QUOTES, CONTREXX_CHARSET);
+                    $footnotelink = "<a href='$url'>$link</a>";
+                }
 
 
                 $this->_objTpl->setVariable(array(
@@ -293,7 +293,7 @@ class Jobs extends JobsLibrary
          * This overwrites $_REQUEST['catid'] but it shouldnt be set parallel anyway
          */
         if(isset($_REQUEST['cmd']) && is_numeric($_REQUEST['cmd'])) {
-        	$category = $_REQUEST['cmd'];
+            $category = $_REQUEST['cmd'];
         }
 
 
@@ -404,7 +404,7 @@ class Jobs extends JobsLibrary
 
                 $this->_objTpl->setVariable(array(
                     'JOBS_STYLE'      => $class,
-                    'JOBS_ID'			=> $objResult->fields['docid'],
+                    'JOBS_ID'            => $objResult->fields['docid'],
                     'JOBS_LONG_DATE'  => date($this->dateLongFormat,$objResult->fields['date']),
                     'JOBS_DATE'       => date($this->dateFormat,$objResult->fields['date']),
                     'JOBS_LINK'       => "<a href=\"?section=Jobs&amp;cmd=details&amp;id=".$objResult->fields['docid']."\" title=\"".stripslashes($objResult->fields['title'])."\">".stripslashes($objResult->fields['title'])."</a>",

@@ -1,83 +1,83 @@
 <!-- START gallery_overview.html -->
 <script language="JavaScript" type="text/javascript">
 // <![CDATA[
-function deleteCategory(catId){ 
-    if(confirm('{TXT_DELETE_CATEGORY_MSG}')) 
+function deleteCategory(catId){
+    if(confirm('{TXT_DELETE_CATEGORY_MSG}'))
         window.location.replace("?cmd=Gallery&{CSRF_PARAM}&act=delete_category&id="+catId);
 }
 
 function selectMultiAction()
 {
-	with (document.frmShowGallery) {
-		switch (frmShowGallery_MultiAction.value) {
-			case 'activate':
-				action='?cmd=Gallery&act=cat_multi_action';
-				submit();
-			break;
-			case 'deactivate':
-				action='?cmd=Gallery&act=cat_multi_action';
-				submit();
-			break;
-			case 'delete':
-				if (confirm('{TXT_DELETE_CATEGORY_ALL}')) {
-					action='?cmd=Gallery&act=cat_multi_action';
-					submit();
-				}
-			break;
-			default: //do nothing			
-		}
-	}
+  with (document.frmShowGallery) {
+    switch (frmShowGallery_MultiAction.value) {
+      case 'activate':
+        action='?cmd=Gallery&act=cat_multi_action';
+        submit();
+      break;
+      case 'deactivate':
+        action='?cmd=Gallery&act=cat_multi_action';
+        submit();
+      break;
+      case 'delete':
+        if (confirm('{TXT_DELETE_CATEGORY_ALL}')) {
+          action='?cmd=Gallery&act=cat_multi_action';
+          submit();
+        }
+      break;
+      default: //do nothing
+    }
+  }
 }
 // ]]>
 </script>
 <form name="frmShowGallery" method="post" action="?cmd=Gallery&amp;act=sort_categories">
 <table width="100%" cellspacing="0" cellpadding="3" border="0" align="top" class="adminlist">
-	<tr>
-		<th width="2%"><div align="left">#</div></th>
-		<th width="3%"><div align="left">{TXT_STATUS}</div></th>
-		<th width="22%"><div align="left">{TXT_NAME}</div></th>
-		<th width="43%"><div align="left">{TXT_DESC}</div></th>
-		<th width="10%" nowrap="nowrap" align="center"><div align="left">{TXT_IMAGECOUNT}</div></th>
-		<th width="10%" nowrap="nowrap" algin="center"><div align="left">{TXT_SPACE}</div></th>
-		<th width="10%" nowrap="nowrap"><div align="right">{TXT_ACTION}&nbsp;</div></th>
-	</tr>
-	<!-- BEGIN showCategories -->
-	<tr class="row{OVERVIEW_ROWCLASS}">
-		<td width="1%"><input type="checkbox" name="selectedCategoryId[]" id="selectedCategoryId" value="{OVERVIEW_ID}"></td>
-		<td width="1%"><a href="?cmd=Gallery&amp;act=activate_category&amp;id={OVERVIEW_ID}" target="_self"><img src="../core/Core/View/Media/icons/{OVERVIEW_ICON}.gif" border="0" alt="" /></a></td>
-		<td width="1%" nowrap="nowrap">{OVERVIEW_SUBCATEGORY}<img src="../core/Core/View/Media/icons/folder_on.gif" border="0" alt="" />&nbsp;
-			<input type="text" name="sortingSystem{OVERVIEW_ID}" value="{OVERVIEW_SORTING}" maxlength="5" size="5" />&nbsp;
-			<a href="?cmd=Gallery&amp;act=cat_details&amp;id={OVERVIEW_ID}">{OVERVIEW_NAME}</a>
-		</td>
-		<td align="justify">{OVERVIEW_DESCRIPTION}&nbsp;</td>
-		<td align="center">{OVERVIEW_COUNT_IMAGES}&nbsp;</td>
-		<td align="center">{OVERVIEW_IMAGE_SIZE} kb&nbsp;</td>
-		<td align="right" nowrap="nowrap">
-			<div align="right" {OVERVIEW_ACTION_DISPLAY}>
-				<a href="?cmd=Gallery&amp;act=edit_category&amp;id={OVERVIEW_ID}" target="_self"><img alt="{TXT_IMG_EDIT_ALT}" title="{TXT_IMG_EDIT_ALT}" src="../core/Core/View/Media/icons/edit.gif" border="0" /></a> 
-				<a href="javascript:deleteCategory({OVERVIEW_ID});" target="_self"><img alt="{TXT_IMG_DEL_ALT}" src="../core/Core/View/Media/icons/delete.gif" border="0" title="{TXT_IMG_DEL_ALT}" /></a> 
-			</div>
-		</td>
-	</tr>
-	<!-- END showCategories -->
+  <tr>
+    <th width="2%"><div align="left">#</div></th>
+    <th width="3%"><div align="left">{TXT_STATUS}</div></th>
+    <th width="22%"><div align="left">{TXT_NAME}</div></th>
+    <th width="43%"><div align="left">{TXT_DESC}</div></th>
+    <th width="10%" nowrap="nowrap" align="center"><div align="left">{TXT_IMAGECOUNT}</div></th>
+    <th width="10%" nowrap="nowrap" algin="center"><div align="left">{TXT_SPACE}</div></th>
+    <th width="10%" nowrap="nowrap"><div align="right">{TXT_ACTION}&nbsp;</div></th>
+  </tr>
+  <!-- BEGIN showCategories -->
+  <tr class="row{OVERVIEW_ROWCLASS}">
+    <td width="1%"><input type="checkbox" name="selectedCategoryId[]" id="selectedCategoryId" value="{OVERVIEW_ID}"></td>
+    <td width="1%"><a href="?cmd=Gallery&amp;act=activate_category&amp;id={OVERVIEW_ID}" target="_self"><img src="../core/Core/View/Media/icons/{OVERVIEW_ICON}.gif" border="0" alt="" /></a></td>
+    <td width="1%" nowrap="nowrap">{OVERVIEW_SUBCATEGORY}<img src="../core/Core/View/Media/icons/folder_on.gif" border="0" alt="" />&nbsp;
+      <input type="text" name="sortingSystem{OVERVIEW_ID}" value="{OVERVIEW_SORTING}" maxlength="5" size="5" />&nbsp;
+      <a href="?cmd=Gallery&amp;act=cat_details&amp;id={OVERVIEW_ID}">{OVERVIEW_NAME}</a>
+    </td>
+    <td align="justify">{OVERVIEW_DESCRIPTION}&nbsp;</td>
+    <td align="center">{OVERVIEW_COUNT_IMAGES}&nbsp;</td>
+    <td align="center">{OVERVIEW_IMAGE_SIZE} kb&nbsp;</td>
+    <td align="right" nowrap="nowrap">
+      <div align="right" {OVERVIEW_ACTION_DISPLAY}>
+        <a href="?cmd=Gallery&amp;act=edit_category&amp;id={OVERVIEW_ID}" target="_self"><img alt="{TXT_IMG_EDIT_ALT}" title="{TXT_IMG_EDIT_ALT}" src="../core/Core/View/Media/icons/edit.gif" border="0" /></a>
+        <a href="javascript:deleteCategory({OVERVIEW_ID});" target="_self"><img alt="{TXT_IMG_DEL_ALT}" src="../core/Core/View/Media/icons/delete.gif" border="0" title="{TXT_IMG_DEL_ALT}" /></a>
+      </div>
+    </td>
+  </tr>
+  <!-- END showCategories -->
 </table>
 <br />
 <input type="submit" value="{TXT_BUTTON_SAVESORT}" style="margin-left:35px;" />
 <table cellpadding="2" cellspacing="0" border="0">
-	<tr>
-		<td>
-			<img src="../core/Core/View/Media/icons/arrow.gif" border="0" width="38" height="22" alt="" />
-			<a href="#" onClick="changeCheckboxes('frmShowGallery','selectedCategoryId[]',true); return false;">{TXT_SELECT_ALL}</a> / 
-			<a href="#" onClick="changeCheckboxes('frmShowGallery','selectedCategoryId[]',false); return false;">{TXT_DESELECT_ALL}</a>
-			<img src="../core/Core/View/Media/icons/strike.gif">
-			<select name="frmShowGallery_MultiAction" onChange="selectMultiAction();">
-				<option value="0">{TXT_SUBMIT_SELECT}</option>
-				<option value="delete">{TXT_SUBMIT_DELETE}</option>
-				<option value="activate">{TXT_SUBMIT_ACTIVATE}</option>
-				<option value="deactivate">{TXT_SUBMIT_DEACTIVATE}</option>
-			</select>
-		</td>
-	</tr>
+  <tr>
+    <td>
+      <img src="../core/Core/View/Media/icons/arrow.gif" border="0" width="38" height="22" alt="" />
+      <a href="#" onClick="changeCheckboxes('frmShowGallery','selectedCategoryId[]',true); return false;">{TXT_SELECT_ALL}</a> /
+      <a href="#" onClick="changeCheckboxes('frmShowGallery','selectedCategoryId[]',false); return false;">{TXT_DESELECT_ALL}</a>
+      <img src="../core/Core/View/Media/icons/strike.gif">
+      <select name="frmShowGallery_MultiAction" onChange="selectMultiAction();">
+        <option value="0">{TXT_SUBMIT_SELECT}</option>
+        <option value="delete">{TXT_SUBMIT_DELETE}</option>
+        <option value="activate">{TXT_SUBMIT_ACTIVATE}</option>
+        <option value="deactivate">{TXT_SUBMIT_DEACTIVATE}</option>
+      </select>
+    </td>
+  </tr>
 </table>
 </form>
 <!-- END gallery_overview.html -->

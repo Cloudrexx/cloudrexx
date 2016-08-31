@@ -59,14 +59,14 @@ class Search
      * @var \Cx\Core_Modules\Listing\Model\Entity\DataSet
      */
     private $result;
-    
+
     /**
      * Root page for search. If specified only results from this page's branch
      * are delivered
      * @var \Cx\Core\ContentManger\Model\Entity\Page $page
      */
     protected $rootPage = null;
-    
+
     /**
      * Resolves cmd. If it's a node placeholder, search is limited to the node's
      * branch
@@ -86,7 +86,7 @@ class Search
             } catch (\Cx\Core\Routing\NodePlaceholderException $e) {}
         }
     }
-    
+
     /**
      * Returns the specified root page (if any)
      * @return \Cx\Core\ContentManger\Model\Entity\Page The specified root page
@@ -171,9 +171,9 @@ class Search
                  *  +1 if $a  < $b
                  * Used for ordering search results.
                  * @author  Christian Wehrli <christian.wehrli@astalavista.ch>
-                 * @param  	string  $a      The first element
-                 * @param  	string  $b      The second element
-                 * @return 	integer         The comparison result
+                 * @param      string  $a      The first element
+                 * @param      string  $b      The second element
+                 * @return     integer         The comparison result
                  */
                 function($a, $b) {
                     if ($a['Score'] == $b['Score']) {
@@ -241,10 +241,10 @@ class Search
         $objTpl->setVariable('SEARCH_TITLE', $noresult);
         return $objTpl->get();
     }
-    
+
     /**
      * Returns an accessable page of this module (if any)
-     * 
+     *
      * This should be called by all search event handlers that do not call
      * getResultArray(). If it returns null, no search results should be
      * returned!
@@ -257,7 +257,7 @@ class Search
         $criteria = array(
             'module' => $module,
             'lang'   => FRONTEND_LANG_ID,
-            'type'   => \Cx\Core\ContentManager\Model\Entity\Page::TYPE_APPLICATION,            
+            'type'   => \Cx\Core\ContentManager\Model\Entity\Page::TYPE_APPLICATION,
         );
         if (!empty($command)) {
             $criteria['cmd'] = $command;
@@ -364,7 +364,7 @@ class Search
             } else {
                 $temp_pagelink = $pagePath.'?'.$pagevar.$objResult->fields['id'];
             }
-            
+
             if (is_callable($parseSearchData)) {
                 $parseSearchData($objResult->fields);
             }

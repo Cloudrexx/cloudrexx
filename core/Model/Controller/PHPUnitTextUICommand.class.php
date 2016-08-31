@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Wrapper class for PHPUnit_TextUI_Command
  *
@@ -36,7 +36,7 @@
  */
 
 namespace Cx\Core\Model\Controller;
-        
+
 /**
  * Wrapper class for PHPUnit_TextUI_Command
  *
@@ -44,17 +44,17 @@ namespace Cx\Core\Model\Controller;
  * @author      ss4u <ss4u.comvation@gmail.com>
  * @version     $Id:    Exp $
  * @package     cloudrexx
- * @subpackage  core 
+ * @subpackage  core
  */
 class PHPUnitTextUICommand extends \PHPUnit_TextUI_Command {
-    
+
     /**
      * Contains test runner object
-     * 
+     *
      * @var object
      */
     private $runner;
-    
+
     /**
      * @var array
      */
@@ -81,17 +81,17 @@ class PHPUnitTextUICommand extends \PHPUnit_TextUI_Command {
         $this->handleArguments($argv);
 
         $this->runner->setLoader($this->arguments['loader']);
-        
+
         $suite = new \PHPUnit_Framework_TestSuite();
-        
+
         $testFiles = array();
         foreach ($this->arguments['test'] as $testFodler) {
             $testFiles = array_merge($testFiles, self::collectTests($testFodler));
         }
-        
+
         asort($testFiles);
         $suite->addTestFiles($testFiles);
-        
+
         unset($this->arguments['test']);
         unset($this->arguments['testFile']);
 
@@ -115,23 +115,23 @@ class PHPUnitTextUICommand extends \PHPUnit_TextUI_Command {
             return $ret;
         }
     }
-    
+
     private static function collectTests($foldername)
     {
         $result = array();
-        
+
         foreach (glob($foldername.'/*Test.class.php') as $file) {
             $result[] = $file;
         }
-        
+
         foreach (glob($foldername.'/*Test.php') as $file) {
             $result[] = $file;
         }
-        
+
         foreach (glob($foldername.'/*', GLOB_ONLYDIR) as $folder) {
             $result = array_merge($result, self::collectTests($folder));
         }
-        
+
         return $result;
     }
 

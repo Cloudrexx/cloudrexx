@@ -1,81 +1,81 @@
 <!-- START module_banner_overview.html -->
 <script language="JavaScript" type="text/javascript">
-function emptyGroup(intId){ 
+function emptyGroup(intId){
     if(confirm('{TXT_BANNER_GROUP_EMPTY_JS}')) {
-   		window.location.replace("?cmd=banner&{CSRF_PARAM}&act=group_empty&id="+intId);	    	
+       window.location.replace("?cmd=banner&{CSRF_PARAM}&act=group_empty&id="+intId);
     }
 }
 function deleteGroup(intId) {
     if(confirm('{TXT_BANNER_GROUP_DELETE_JS}')) {
-   		window.location.replace("?cmd=banner&{CSRF_PARAM}&act=group_delete&id="+intId);	    	
+       window.location.replace("?cmd=banner&{CSRF_PARAM}&act=group_delete&id="+intId);
     }
 }
 function selectMultiAction()
 {
-	with (document.frmShowOverview)
-	{
-		switch (frmShowOverview_MultiAction.value) {
-			case 'activate':
-				submit();
-			break;
-			case 'deactivate':
-				submit();
-			break;
-			default: //do nothing
-			
-		}
-	}
+  with (document.frmShowOverview)
+  {
+    switch (frmShowOverview_MultiAction.value) {
+      case 'activate':
+        submit();
+      break;
+      case 'deactivate':
+        submit();
+      break;
+      default: //do nothing
+
+    }
+  }
 }
 </script>
 <form name="frmShowOverview" method="post" action="?cmd=banner">
-	<table style="empty-cells: show;" class="adminlist" cellspacing="0" cellpadding="3" width="100%" border="0">
-	  <tr>
-	  	<th width="1%"></th>
-	    <th width="1%">{TXT_BANNER_GROUP_STATUS}</td>
-	    <th width="30%">{TXT_BANNER_GROUP_GROUPS}</td>
-	    <th width="40%">{TXT_BANNER_GROUP_DESC}</td>
-	    <th width="16%">{TXT_BANNER_GROUP_PLACEHOLDER}</td>
-	    <th width="22%">{TXT_BANNER_GROUP_BANCOUNT}</td>
-	    <th width="5%">{TXT_BANNER_GROUP_FUNCTIONS}</td>
-	  </tr>
-	  <!-- BEGIN banner_group_row -->
-	  <tr class="row{BANNER_GROUP_STYLE}">
-		<td valign="top">
-			<input type="checkbox" name="selectedGroupsId[]" id="selectedGroupsId" value="{BANNER_GROUP_ID}">
-		</td>
-	    <td align="center">
-	    	<a href="?cmd=banner&amp;act=group_status&amp;id={BANNER_GROUP_ID}">
-	    		<img src="../core/Core/View/Media/icons/{BANNER_GROUP_STATUS_PICTURE}" border="0" alt="{TXT_BANNER_GROUP_STATUS_2}" title="{TXT_BANNER_GROUP_STATUS_2}" />
-	    	</a>
-	    </td>
-	    <td><a href="?cmd=banner&amp;act=group_details&amp;id={BANNER_GROUP_ID}">{BANNER_GROUP_NAME}</a></td>
-	    <td>{BANNER_GROUP_DESCRIPTION}</td>
-	    <td>{BANNER_GROUP_PLACEHOLDER}</td>
-	    <td>{BANNER_GROUP_BANCOUNT}</td>
-	    <td>
-			<div align="right">
-				<a href="?cmd=banner&amp;act=group_edit&amp;id={BANNER_GROUP_ID}" target="_self"><img src="../core/Core/View/Media/icons/edit.gif" border="0" alt="{TXT_BANNER_GROUP_EDIT}" title="{TXT_BANNER_GROUP_EDIT}" /></a> 
-				<a href="javascript:emptyGroup({BANNER_GROUP_ID});" target="_self"><img src="../core/Core/View/Media/icons/empty.gif" border="0" alt="{TXT_BANNER_GROUP_EMPTY}" title="{TXT_BANNER_GROUP_EMPTY}" /></a> 
-				<a href="javascript:deleteGroup({BANNER_GROUP_ID});" target="_self"><img src="../core/Core/View/Media/icons/delete.gif" border="0" alt="{TXT_BANNER_GROUP_DELETE}" title="{TXT_BANNER_GROUP_DELETE}" /></a> 
-			</div>    
-	    </td>
-	  </tr>
-	  <!-- END banner_group_row -->
-	</table>
-	<table cellpadding="2" cellspacing="0" border="0">
-		<tr>
-			<td>
-				<img src="../core/Core/View/Media/icons/arrow.gif" border="0" width="38" height="22" alt="{TXT_MARKED}:" />
-				<a href="#" onclick="changeCheckboxes('frmShowOverview','selectedGroupsId[]',true); return false;">{TXT_BANNER_GROUP_SELECT_ALL}</a> / 
-				<a href="#" onclick="changeCheckboxes('frmShowOverview','selectedGroupsId[]',false); return false;">{TXT_BANNER_GROUP_DESELECT_ALL}</a>
-				<img src="../core/Core/View/Media/icons/strike.gif">
-				<select name="frmShowOverview_MultiAction" onchange="selectMultiAction();">
-					<option value="0">{TXT_BANNER_GROUP_SUBMIT_SELECT}</option>
-					<option value="activate">{TXT_BANNER_GROUP_SUBMIT_ACTIVATE}</option>
-					<option value="deactivate">{TXT_BANNER_GROUP_SUBMIT_DEACTIVATE}</option>
-				</select>
-			</td>
-		</tr>
-	</table>
+  <table style="empty-cells: show;" class="adminlist" cellspacing="0" cellpadding="3" width="100%" border="0">
+    <tr>
+      <th width="1%"></th>
+      <th width="1%">{TXT_BANNER_GROUP_STATUS}</td>
+      <th width="30%">{TXT_BANNER_GROUP_GROUPS}</td>
+      <th width="40%">{TXT_BANNER_GROUP_DESC}</td>
+      <th width="16%">{TXT_BANNER_GROUP_PLACEHOLDER}</td>
+      <th width="22%">{TXT_BANNER_GROUP_BANCOUNT}</td>
+      <th width="5%">{TXT_BANNER_GROUP_FUNCTIONS}</td>
+    </tr>
+    <!-- BEGIN banner_group_row -->
+    <tr class="row{BANNER_GROUP_STYLE}">
+    <td valign="top">
+      <input type="checkbox" name="selectedGroupsId[]" id="selectedGroupsId" value="{BANNER_GROUP_ID}">
+    </td>
+      <td align="center">
+        <a href="?cmd=banner&amp;act=group_status&amp;id={BANNER_GROUP_ID}">
+          <img src="../core/Core/View/Media/icons/{BANNER_GROUP_STATUS_PICTURE}" border="0" alt="{TXT_BANNER_GROUP_STATUS_2}" title="{TXT_BANNER_GROUP_STATUS_2}" />
+        </a>
+      </td>
+      <td><a href="?cmd=banner&amp;act=group_details&amp;id={BANNER_GROUP_ID}">{BANNER_GROUP_NAME}</a></td>
+      <td>{BANNER_GROUP_DESCRIPTION}</td>
+      <td>{BANNER_GROUP_PLACEHOLDER}</td>
+      <td>{BANNER_GROUP_BANCOUNT}</td>
+      <td>
+      <div align="right">
+        <a href="?cmd=banner&amp;act=group_edit&amp;id={BANNER_GROUP_ID}" target="_self"><img src="../core/Core/View/Media/icons/edit.gif" border="0" alt="{TXT_BANNER_GROUP_EDIT}" title="{TXT_BANNER_GROUP_EDIT}" /></a>
+        <a href="javascript:emptyGroup({BANNER_GROUP_ID});" target="_self"><img src="../core/Core/View/Media/icons/empty.gif" border="0" alt="{TXT_BANNER_GROUP_EMPTY}" title="{TXT_BANNER_GROUP_EMPTY}" /></a>
+        <a href="javascript:deleteGroup({BANNER_GROUP_ID});" target="_self"><img src="../core/Core/View/Media/icons/delete.gif" border="0" alt="{TXT_BANNER_GROUP_DELETE}" title="{TXT_BANNER_GROUP_DELETE}" /></a>
+      </div>
+      </td>
+    </tr>
+    <!-- END banner_group_row -->
+  </table>
+  <table cellpadding="2" cellspacing="0" border="0">
+    <tr>
+      <td>
+        <img src="../core/Core/View/Media/icons/arrow.gif" border="0" width="38" height="22" alt="{TXT_MARKED}:" />
+        <a href="#" onclick="changeCheckboxes('frmShowOverview','selectedGroupsId[]',true); return false;">{TXT_BANNER_GROUP_SELECT_ALL}</a> /
+        <a href="#" onclick="changeCheckboxes('frmShowOverview','selectedGroupsId[]',false); return false;">{TXT_BANNER_GROUP_DESELECT_ALL}</a>
+        <img src="../core/Core/View/Media/icons/strike.gif">
+        <select name="frmShowOverview_MultiAction" onchange="selectMultiAction();">
+          <option value="0">{TXT_BANNER_GROUP_SUBMIT_SELECT}</option>
+          <option value="activate">{TXT_BANNER_GROUP_SUBMIT_ACTIVATE}</option>
+          <option value="deactivate">{TXT_BANNER_GROUP_SUBMIT_DEACTIVATE}</option>
+        </select>
+      </td>
+    </tr>
+  </table>
 </form>
 <!-- END module_banner_overview.html -->

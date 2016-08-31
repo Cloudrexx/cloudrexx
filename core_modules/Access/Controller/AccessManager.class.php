@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
 * User Management
 * @copyright    CLOUDREXX CMS - CLOUDREXX AG
@@ -73,7 +73,7 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
     public function __construct()
     {
         parent::__construct();
-        
+
         $this->_objTpl = new \Cx\Core\Html\Sigma(ASCMS_CORE_MODULE_PATH.'/Access/View/Template/Backend');
         \Cx\Core\Csrf\Controller\Csrf::add_placeholder($this->_objTpl);
         $this->_objTpl->setErrorHandling(PEAR_ERROR_DIE);
@@ -217,13 +217,13 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
                                    $value = $_CORELANG['TXT_ACCESS_NOT_SPECIFIED'];
                                 break;
                             }
-                            break; 
+                            break;
 
                         case 'title':
                         case 'country':
                             $title = '';
                             $value = $objUser->objAttribute->getById($field . '_' . $value)->getName();
-                            break; 
+                            break;
 
                         default:
                             $objAttribute = $objUser->objAttribute->getById($field);
@@ -232,7 +232,7 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
                                 $date ->setTimestamp($value);
                                 $value = $date->format(ASCMS_DATE_FORMAT_DATE);
                             }
-                            break; 
+                            break;
                     }
                     print $this->_escapeCsvValue($value).$csvSeparator;
                 }
@@ -485,7 +485,7 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
                     'ACCESS_LANG_NAME'          => $arrLang['lang'],
                 ));
 
-			    $this->_objTpl->parse('languages');
+                $this->_objTpl->parse('languages');
             }
 
             $this->_objTpl->setVariable(array(
@@ -823,7 +823,7 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
                     'style'            => 'display: none;'
         ));
         $mediaBrowser->setCallback('SetUrl');
-        
+
         $this->attachJavaScriptFunction('accessSetWebpage');
         $this->attachJavaScriptFunction('accessSelectAllGroups');
         $this->attachJavaScriptFunction('accessDeselectAllGroups');
@@ -905,7 +905,7 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
                     $rowCssClass[] = 'active';
                 }
 
-                $published = $nodeData['metadata'][$pageData['attr']['id']]['publishing'] == 'published'; 
+                $published = $nodeData['metadata'][$pageData['attr']['id']]['publishing'] == 'published';
 
                 $this->_objTpl->setVariable(array(
                     'ACCESS_PAGE_ID'            => $pageData['attr']['id'],
@@ -944,7 +944,7 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
     function _parsePermissionAreas($arrAreas, $areaId, $scope)
     {
         global $_CORELANG;
-        
+
         // hide access areas of inactive modules
         $em = \Cx\Core\Core\Controller\Cx::instanciate()->getDb()->getEntityManager();
         $componentRepository = $em->getRepository('Cx\Core\Core\Model\Entity\SystemComponent');
@@ -953,7 +953,7 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
         if ($component && !$component->isActive()) {
             $areaHidden = 'display:none;';
         }
-        
+
         $this->_objTpl->setVariable(array(
             'ACCESS_AREA_ID'            => $arrAreas[$areaId]['access_id'],
             'ACCESS_AREA_NAME'          => isset($_CORELANG[$arrAreas[$areaId]['name']]) ? htmlentities($_CORELANG[$arrAreas[$areaId]['name']], ENT_QUOTES, CONTREXX_CHARSET) : $arrAreas[$areaId]['name'],
@@ -1154,7 +1154,7 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
                 'ACCESS_USER_USERNAME_FILTER'       => $usernameFilter,
                 'ACCESS_USER_STATUS_FILTER'         => $userStatusFilter,
                 'ACCESS_USER_ROLE_FILTER'           => $userRoleFilter,
-				'ACCESS_SEARCH_VALUE'               => contrexx_raw2xhtml(join(' ', $search))
+                'ACCESS_SEARCH_VALUE'               => contrexx_raw2xhtml(join(' ', $search))
             ));
 
             $this->_objTpl->setCurrentBlock('access_user_list');
@@ -1201,14 +1201,14 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
             }
             $this->_objTpl->parse('access_has_users');
             $this->_objTpl->hideBlock('access_no_user');
-			$this->_objTpl->setVariable(array(
-				'TXT_ACCESS_CHECK_ALL'                      => $_ARRAYLANG['TXT_ACCESS_CHECK_ALL'],
-				'TXT_ACCESS_UNCHECK_ALL'                    => $_ARRAYLANG['TXT_ACCESS_UNCHECK_ALL'],
-				'TXT_ACCESS_SELECT_ACTION'                  => $_ARRAYLANG['TXT_ACCESS_SELECT_ACTION'],
-				'TXT_ACCESS_DELETE'                  		=> $_ARRAYLANG['TXT_ACCESS_DELETE'],
-				'ACCESS_CONFIRM_DELETE_USERS_TXT'    		=> preg_replace('#\n#', '\\n', addslashes($_ARRAYLANG['TXT_ACCESS_CONFIRM_DELETE_USERS'])),
-                'ACCESS_SEARCH_VALUE_ESCAPED'       		=> urlencode(implode(' ',$search))
-			));
+            $this->_objTpl->setVariable(array(
+                'TXT_ACCESS_CHECK_ALL'                      => $_ARRAYLANG['TXT_ACCESS_CHECK_ALL'],
+                'TXT_ACCESS_UNCHECK_ALL'                    => $_ARRAYLANG['TXT_ACCESS_UNCHECK_ALL'],
+                'TXT_ACCESS_SELECT_ACTION'                  => $_ARRAYLANG['TXT_ACCESS_SELECT_ACTION'],
+                'TXT_ACCESS_DELETE'                          => $_ARRAYLANG['TXT_ACCESS_DELETE'],
+                'ACCESS_CONFIRM_DELETE_USERS_TXT'            => preg_replace('#\n#', '\\n', addslashes($_ARRAYLANG['TXT_ACCESS_CONFIRM_DELETE_USERS'])),
+                'ACCESS_SEARCH_VALUE_ESCAPED'               => urlencode(implode(' ',$search))
+            ));
             $this->_objTpl->parse('access_user_action_dropdown');
         } else {
             $groupName = $groupId == 'groupless' ? $_ARRAYLANG['TXT_ACCESS_GROUPLESS_USERS'] : htmlentities($objGroup->getName(), ENT_QUOTES, CONTREXX_CHARSET);
@@ -1261,8 +1261,8 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
             \Permission::noAccess();
         }
 
-		if (isset($_POST['access_user_id']) && is_array($_POST['access_user_id'])) {
-			$_REQUEST['id'] = $_POST['access_user_id'];
+        if (isset($_POST['access_user_id']) && is_array($_POST['access_user_id'])) {
+            $_REQUEST['id'] = $_POST['access_user_id'];
         }
 
         $arrIds = !empty($_REQUEST['id']) ? is_array($_REQUEST['id']) ? $_REQUEST['id'] : array($_REQUEST['id']) : array();
@@ -1329,8 +1329,8 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
 
             if (isset($_POST['access_profile_attribute']) && is_array($_POST['access_profile_attribute'])) {
                 $arrProfile = $_POST['access_profile_attribute'];
-                if (   !empty($_POST['access_image_uploader_id']) 
-                    && isset($_POST['access_profile_attribute_images']) 
+                if (   !empty($_POST['access_image_uploader_id'])
+                    && isset($_POST['access_profile_attribute_images'])
                     && is_array($_POST['access_profile_attribute_images'])
                 ) {
                     $upload_res = $this->addUploadedImagesToProfile($objUser, $arrProfile, $_POST['access_profile_attribute_images'], $_POST['access_image_uploader_id']);
@@ -1351,7 +1351,7 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
             }
 
             $objUser->setPrimaryGroup(isset($_POST['access_user_primary_group']) ? $_POST['access_user_primary_group'] : 0);
-            
+
             if (((isset($_POST['notification_email']) && $_POST['notification_email'] == 1 && !$objUser->getId()) || $objUser->setPassword(isset($_POST['access_user_password']) ? trim(contrexx_stripslashes($_POST['access_user_password'])) : '', isset($_POST['access_user_password_confirmed']) ? trim(contrexx_stripslashes($_POST['access_user_password_confirmed'])) : '')) &&
                 // only administrators are allowed to change the admin status and the account validity
                 (!\Permission::hasAllAccess() || $objUser->getId() == $objFWUser->objUser->getId() || (
@@ -1478,7 +1478,7 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
         }
 
         $this->parseNewsletterLists($objUser);
-        
+
         $urlParams = '';
         $cancelUrl = 'index.php?cmd=Access&amp;act=user';
         $source = isset($_GET['source']) ? contrexx_input2raw($_GET['source']) : 'Access';
@@ -1495,7 +1495,7 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
         }
 
         $this->attachJavaScriptFunction('addHistoryField');
-        
+
         $uploader = $this->getImageUploader();
         $this->_objTpl->setVariable(array(
             'ACCESS_USER_ID'                       => $objUser->getId(),
@@ -1587,18 +1587,18 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
         if (contrexx_isModuleInstalled('Downloads')) {
             $this->processDigitalAssetManagementExtension($objUser);
         }
-        
+
         if(isset($_GET['source'])){
             switch ($_GET['source']){
                 case 'Newsletter':
-                    \Cx\Core\Csrf\Controller\Csrf::header('Location: 
+                    \Cx\Core\Csrf\Controller\Csrf::header('Location:
                         index.php?cmd=Newsletter&act=users&store=true'. //and add Params for Newsletter Filter
                         (!empty($_GET['newsletterListId']) ? '&newsletterListId='.contrexx_input2raw($_GET['newsletterListId']) : '').
                         (!empty($_GET['filterkeyword']) ? '&filterkeyword='.contrexx_input2raw($_GET['filterkeyword']) : '').
                         (!empty($_GET['filterattribute']) ? '&filterattribute='.contrexx_input2raw($_GET['filterattribute']) : '').
                         (!empty($_GET['filterStatus']) ? '&filterStatus='.contrexx_input2raw($_GET['filterStatus']) : '')
                     );
-                    exit;               
+                    exit;
             }
         }
     }
@@ -2097,9 +2097,9 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
             'TXT_ACCESS_MISCELLANEOUS'                          => $_ARRAYLANG['TXT_ACCESS_MISCELLANEOUS'],
             'TXT_ACCESS_STANDARD'                               => $_ARRAYLANG['TXT_ACCESS_STANDARD'],
             'TXT_ACCESS_EMAIL'                                  => $_ARRAYLANG['TXT_ACCESS_EMAIL'],
-            'TXT_ACCESS_SESSION_ON_INTERVAL'				    => $_ARRAYLANG['TXT_ACCESS_SESSION_ON_INTERVAL'],
+            'TXT_ACCESS_SESSION_ON_INTERVAL'                    => $_ARRAYLANG['TXT_ACCESS_SESSION_ON_INTERVAL'],
             'TXT_ACCESS_SESSION_DESCRIPTION'                    =>$_ARRAYLANG['TXT_ACCESS_SESSION_DESCRIPTION'],
-            'TXT_ACCESS_SESSION_TITLE' 				            => $_ARRAYLANG['TXT_ACCESS_SESSION_TITLE'],
+            'TXT_ACCESS_SESSION_TITLE'                             => $_ARRAYLANG['TXT_ACCESS_SESSION_TITLE'],
             'TXT_ACCESS_USE_SELECTED_ACCESS_FOR_EVERYONE'       => $_ARRAYLANG['TXT_ACCESS_USE_SELECTED_ACCESS_FOR_EVERYONE'],
             'TXT_ACCESS_CROP_THUMBNAIL_TXT'                     => $_ARRAYLANG['TXT_ACCESS_CROP_THUMBNAIL_TXT'],
             'TXT_ACCESS_SCALE_THUMBNAIL_TXT'                    => $_ARRAYLANG['TXT_ACCESS_SCALE_THUMBNAIL_TXT'],
@@ -2239,13 +2239,13 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
             }
 
             $session_on_interval =  intval($_POST['sessioninterval']);
-   			if(trim($session_on_interval) != null) {
+               if(trim($session_on_interval) != null) {
 
-				if ($session_on_interval >=0 && $session_on_interval <= 300) {
+                if ($session_on_interval >=0 && $session_on_interval <= 300) {
 
-				 $arrSettings['session_user_interval']['value'] = $session_on_interval;
-				}
-			}
+                 $arrSettings['session_user_interval']['value'] = $session_on_interval;
+                }
+            }
 
 
             if (!empty($_POST["sociallogin_providers"])) {
@@ -2385,7 +2385,7 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
             'ACCESS_MAX_PIC_HEIGHT'                                 => $arrSettings['max_pic_height']['value'],
             'ACCESS_MAX_THUMBNAIL_PIC_WIDTH'                        => $arrSettings['max_thumbnail_pic_width']['value'],
             'ACCESS_MAX_THUMBNAIL_PIC_HEIGHT'                       => $arrSettings['max_thumbnail_pic_height']['value'],
-            'ACCESS_SESSION_USER_INTERVAL'			    => $arrSettings['session_user_interval']['value'],
+            'ACCESS_SESSION_USER_INTERVAL'                => $arrSettings['session_user_interval']['value'],
             'ACCESS_MAX_PIC_SIZE'                                   => \FWSystem::getLiteralSizeFormat($arrSettings['max_pic_size']['value']),
             'ACCESS_PROFILE_THUMBNAIL_CROP'                         => $arrSettings['profile_thumbnail_method']['value'] == 'crop' ? 'selected="selected"' : '',
             'ACCESS_PROFILE_THUMBNAIL_SCALE'                        => $arrSettings['profile_thumbnail_method']['value'] == 'scale' ? 'selected="selected"' : '',
@@ -3070,39 +3070,39 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
      * Sets up common User and Profile fields as well as
      * Newsletter list relations.
      * Fields and their mapping:
-     *  Anrede	-> Titel
+     *  Anrede    -> Titel
      *  Vorname
      *  Name
      *  eMail
      *  Firma
-     *  Strasse	-> Zusammen mit Hausnummer in Adresse
-     *  Hausnummer	-> Zusammen mit Strasse in Adresse
+     *  Strasse    -> Zusammen mit Hausnummer in Adresse
+     *  Hausnummer    -> Zusammen mit Strasse in Adresse
      *  PLZ
      *  Ort
      *  Land
-     *  Bundesland	-> Evtl in Ort?
-     *  Tel.-Vorwahl	-> Zusammen mit Tel.-Nummer in phone_office
-     *  Tel.-Nummer		-> Zusammen mit Tel.-Vorwahl in phone_office
-     *  Fax-Vorwahl		-> Zusammen mit Fax.-Nummer in phone_fax
-     *  Fax-Nummer		-> Zusammen mit Fax.-Vorwahl in phone_fax
-     *  Mobil-Vorwahl	-> Zusammen mit Mobil-Nummer in phone_mobile
-     *  Mobil-Nummer	-> Zusammen mit Mobil-Vorwahl in phone_mobile
-     *  P1	-> Interessen: Newsletter Listen, kommagetrennt
+     *  Bundesland    -> Evtl in Ort?
+     *  Tel.-Vorwahl    -> Zusammen mit Tel.-Nummer in phone_office
+     *  Tel.-Nummer        -> Zusammen mit Tel.-Vorwahl in phone_office
+     *  Fax-Vorwahl        -> Zusammen mit Fax.-Nummer in phone_fax
+     *  Fax-Nummer        -> Zusammen mit Fax.-Vorwahl in phone_fax
+     *  Mobil-Vorwahl    -> Zusammen mit Mobil-Nummer in phone_mobile
+     *  Mobil-Nummer    -> Zusammen mit Mobil-Vorwahl in phone_mobile
+     *  P1    -> Interessen: Newsletter Listen, kommagetrennt
      *      -> Nicht vorhandene Listen werden angelegt
-     *  P2	-> Antwort: ?
-     *  P3	-> ?
-     *  P4	-> Titel: ?
-     *  P5	-> ?
-     *  Ursprungsformular	-> ?
-     *  Permission	-> ?
-     *  Ausgetragen	-> Wenn true, alle Listenzuordnungen entfernen, sonst fehlende anlegen
-     *  Anzahl Hard-Bounces	-> Nicht vorhanden?
-     *  Status	-> Bedeutung?
-     *  Sprache	-> Wird die verwendet?
-     *  ID	-> Bedeutung?
-     *  Eintragungsdatum	-> regdate
-     *  Aenderungsdatum	-> ? (Nur regdate)
-     *  Austragungsdatum	-> ? (Nur regdate)
+     *  P2    -> Antwort: ?
+     *  P3    -> ?
+     *  P4    -> Titel: ?
+     *  P5    -> ?
+     *  Ursprungsformular    -> ?
+     *  Permission    -> ?
+     *  Ausgetragen    -> Wenn true, alle Listenzuordnungen entfernen, sonst fehlende anlegen
+     *  Anzahl Hard-Bounces    -> Nicht vorhanden?
+     *  Status    -> Bedeutung?
+     *  Sprache    -> Wird die verwendet?
+     *  ID    -> Bedeutung?
+     *  Eintragungsdatum    -> regdate
+     *  Aenderungsdatum    -> ? (Nur regdate)
+     *  Austragungsdatum    -> ? (Nur regdate)
      * @param   string    $file_name    The CSV file name
      */
     static function import_csv($file_name)

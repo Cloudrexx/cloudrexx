@@ -1,5 +1,5 @@
 /**
- * LinkManagerBackend js for ajax loading and clicking functionality for changing link status(link solved or not)  
+ * LinkManagerBackend js for ajax loading and clicking functionality for changing link status(link solved or not)
  *
  * @copyright   Cloudrexx AG
  * @author      Project Team SS4U <info@cloudrexx.com>

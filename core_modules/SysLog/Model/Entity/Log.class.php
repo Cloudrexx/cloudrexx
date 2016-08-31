@@ -45,25 +45,25 @@ namespace Cx\Core_Modules\SysLog\Model\Entity;
  * @version      5.0.0
  */
 class Log extends \Cx\Model\Base\EntityBase {
-    
+
     /**
      * Information message used for debugging only
      * @var string SEVERITY_INFO
      */
     const SEVERITY_INFO = 'INFO';
-    
+
     /**
      * Warning message, something is not good, but non-fatal
      * @var string SEVERITY_WARNING
      */
     const SEVERITY_WARNING = 'WARNING';
-    
+
     /**
      * Fatal, the component that logged this cannot do what it should
      * @var string SEVERITY_FATAL
      */
     const SEVERITY_FATAL = 'FATAL';
-    
+
     /**
      * @var integer $id
      */

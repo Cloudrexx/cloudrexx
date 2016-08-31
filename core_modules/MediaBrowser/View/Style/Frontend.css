@@ -1826,8 +1826,8 @@
     padding: 0
 }
 
-.media-browser-modal-window a, 
-.media-browser-modal-window a:hover, 
+.media-browser-modal-window a,
+.media-browser-modal-window a:hover,
 .media-browser-modal-window a:focus  {
     -webkit-transition: none;
     transition: none

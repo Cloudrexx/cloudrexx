@@ -48,7 +48,7 @@ class SQL
      * Generates insert SQL
      * @param string $table the table name
      * @param array $columns array(
-     *     <column_name> => <data> 
+     *     <column_name> => <data>
      *                 | array(
      *             'val' => string, #the value
      *             [ 'omitEmpty' => boolean ] #skip fields with empty value (null or empty string)? defaults to false
@@ -60,12 +60,12 @@ class SQL
      *                  'escape' => boolean #whether strings are escaped automatically
      *              )
      */
-    public static function insert($table, $columns, $options=array()) 
+    public static function insert($table, $columns, $options=array())
     {
         $escape = false;
         if(isset($options['escape']))
            $escape = $options['escape'];
-        
+
         $sql  = 'INSERT INTO `'.DBPREFIX."$table` ";
         $sql .= self::columnPart($columns, $escape);
         return $sql;
@@ -75,7 +75,7 @@ class SQL
      * Generates update SQL
      * @param string $table the table name
      * @param array $columns array(
-     *     <column_name> => <data> 
+     *     <column_name> => <data>
      *                 | array(
      *             'val' => string, #the value
      *             [ 'omitEmpty' => boolean ] #skip fields with empty value (null or empty string)? defaults to false
@@ -95,10 +95,10 @@ class SQL
 
         $sql  = 'UPDATE `'.DBPREFIX."$table` ";
         $sql .= self::columnPart($columns, $escape);
-        return $sql;        
+        return $sql;
     }
 
-    protected static function columnPart($columns, $escape) 
+    protected static function columnPart($columns, $escape)
     {
         $result = "SET \n";
 
@@ -123,7 +123,7 @@ class SQL
         return $result;
     }
 
-    protected static function apostrophizeIfString($value, $escape) 
+    protected static function apostrophizeIfString($value, $escape)
     {
         if(is_string($value)) { //escape strings
             if($escape)

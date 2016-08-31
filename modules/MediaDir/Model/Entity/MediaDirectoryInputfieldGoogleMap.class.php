@@ -73,7 +73,7 @@ class MediaDirectoryInputfieldGoogleMap extends \Cx\Modules\MediaDir\Controller\
                 $strValueCity = '';
                 $strValueZip = '';
                 parent::getSettings();
-                
+
                 if(isset($intEntryId) && $intEntryId != 0) {
                     $objInputfieldValue = $objDatabase->Execute("
                         SELECT
@@ -149,7 +149,7 @@ class MediaDirectoryInputfieldGoogleMap extends \Cx\Modules\MediaDir\Controller\
                     $strInputfield .= '<div id="'.$strMapId.'" class="map"></div>';
                     $strInputfield .= '</div>';
                 }
-                
+
                 $strInputfield .= <<<EOF
 <script src="https://maps.googleapis.com/maps/api/js?key=$strKey&sensor=false&v=3"></script>
 <script>
@@ -190,7 +190,7 @@ function initialize() {
         }
         map.setCenter(new google.maps.LatLng(event.latLng.lat(), event.latLng.lng()));
     });
-    
+
     geocoder = new google.maps.Geocoder();
 
     google.maps.event.addListener(map, "click", function(event) {
@@ -214,7 +214,7 @@ function searchAddress() {
         });
     }
 }
-                        
+
 function setPosition(position) {
     if (!marker) {
         marker = new google.maps.Marker({
@@ -334,21 +334,21 @@ EOF;
 
                 if ((value_lon == "" || value_lat == "" || value_zoom == "") && isRequiredGlobal(inputFields[field][1], value)) {
                     isOk = false;
-                	if (value_lon == "" && isRequiredGlobal(inputFields[field][1], value)) {
-                    	document.getElementById('$fieldName' + field + '_lon').style.border = "#ff0000 1px solid";
+                    if (value_lon == "" && isRequiredGlobal(inputFields[field][1], value)) {
+                        document.getElementById('$fieldName' + field + '_lon').style.border = "#ff0000 1px solid";
                     }
 
                     if (value_lat == "" && isRequiredGlobal(inputFields[field][1], value)) {
-                    	document.getElementById('$fieldName' + field + '_lat').style.border = "#ff0000 1px solid";
+                        document.getElementById('$fieldName' + field + '_lat').style.border = "#ff0000 1px solid";
                     }
 
                     if (value_zoom == "" && isRequiredGlobal(inputFields[field][1], value)) {
-                    	document.getElementById('$fieldName' + field + '_zoom').style.border = "#ff0000 1px solid";
+                        document.getElementById('$fieldName' + field + '_zoom').style.border = "#ff0000 1px solid";
                     }
                 }  else {
-                	document.getElementById('$fieldName' + field + '_lon').style.borderColor = '';
-                	document.getElementById('$fieldName' + field + '_lat').style.borderColor = '';
-                	document.getElementById('$fieldName' + field + '_zoom').style.borderColor = '';
+                    document.getElementById('$fieldName' + field + '_lon').style.borderColor = '';
+                    document.getElementById('$fieldName' + field + '_lat').style.borderColor = '';
+                    document.getElementById('$fieldName' + field + '_zoom').style.borderColor = '';
                 }
 
                 break;
@@ -356,8 +356,8 @@ EOF;
 EOF;
         return $strJavascriptCheck;
     }
-    
-    
+
+
     function getFormOnSubmit($intInputfieldId)
     {
         return null;

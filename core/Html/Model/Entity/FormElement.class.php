@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,21 +24,21 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
- * 
+ *
  */
 
 namespace Cx\Core\Html\Model\Entity;
 
 /**
- * 
+ *
  */
 class FormElement extends HtmlElement {
     const ENCTYPE_MULTIPART_FORMDATA = 'multipart/formdata';
     public $cancelUrl = null;
     protected $addButtons;
-    
+
     public function __construct($action, $method = 'post', $enctype = self::ENCTYPE_MULTIPART_FORMDATA, $addButtons = true) {
         parent::__construct('form');
         $this->addButtons = $addButtons;
@@ -49,7 +49,7 @@ class FormElement extends HtmlElement {
             'onsubmit' => 'cx.ui.forms.validate(cx.jQuery(this));',
         ));
     }
-    
+
     /**
      * Add children to first fieldset
      */
@@ -63,7 +63,7 @@ class FormElement extends HtmlElement {
         }
         current($this->getChildren())->addChild($element, $reference, $before);
     }
-    
+
     public function addChildren(array $elements, HtmlElement $reference = null, $before = false) {
         foreach ($elements as $child) {
             $this->addChild($child, $reference, $before);
@@ -71,7 +71,7 @@ class FormElement extends HtmlElement {
             $reference = $child;
         }
     }
-    
+
     public function isValid() {
         // foreach data field
         foreach ($this->getChildren() as $fieldset) {
@@ -86,14 +86,14 @@ class FormElement extends HtmlElement {
         }
         return true;
     }
-    
+
     public function getData($element = null, &$data = array()) {
         $internalRequest = true;
         if (!$element) {
             $element = $this;
             $internalRequest = false;
         }
-        
+
         foreach ($element->getChildren() as $subElement) {
             if ($subElement instanceof \Cx\Core\Html\Model\Entity\DataElement) {
                 $data[$subElement->getIdentifier()] = $subElement->getData();
@@ -112,7 +112,7 @@ class FormElement extends HtmlElement {
         }
         return new \Cx\Core_Modules\Listing\Model\Entity\DataSet(array($data));
     }
-    
+
     public function render() {
         global $_CORELANG;
 
@@ -143,4 +143,3 @@ class FormElement extends HtmlElement {
         return parent::render();
     }
 }
-

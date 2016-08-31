@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Class Cache Library
  *
@@ -55,12 +55,12 @@ namespace Cx\Core_Modules\Cache\Controller;
 class CacheLib
 {
     var $strCachePath;
-    
+
     /**
      * Alternative PHP Cache extension
      */
     const CACHE_ENGINE_APC = 'apc';
-    
+
     /**
      * memcache extension
      */
@@ -70,45 +70,45 @@ class CacheLib
      * memcache(d) extension
      */
     const CACHE_ENGINE_MEMCACHED = 'memcached';
-    
+
     /**
      * xcache extension
      */
     const CACHE_ENGINE_XCACHE = 'xcache';
-    
+
     /**
      * zend opcache extension
      */
     const CACHE_ENGINE_ZEND_OPCACHE = 'zendopcache';
-    
+
     /**
      * file system user cache extension
      */
     const CACHE_ENGINE_FILESYSTEM = 'filesystem';
-    
+
     /**
      * cache off
      */
     const CACHE_ENGINE_OFF = 'off';
-    
+
     /**
      * Used op cache engines
      * @var array Cache engine names, empty for none
      */
     protected $opCacheEngines = array();
-    
+
     /**
      * Used user cache engines
      * @var type array Cache engine names, empty for none
      */
     protected $userCacheEngines = array();
-    
+
     protected $opCacheEngine = null;
     protected $userCacheEngine = null;
     protected $memcache = null;
 
     /**
-     * Delete all cached file's of the cache system   
+     * Delete all cached file's of the cache system
      */
     function _deleteAllFiles($cacheEngine = null)
     {
@@ -138,7 +138,7 @@ class CacheLib
             closedir($handleDir);
     }
         }
-    
+
     protected function initOPCaching()
     {
         // APC
@@ -162,7 +162,7 @@ class CacheLib
             ini_set('opcache.save_comments', 1);
             ini_set('opcache.load_comments', 1);
             ini_set('opcache.enable', 1);
-            
+
             if (
                 !$this->isActive(self::CACHE_ENGINE_ZEND_OPCACHE) ||
                 !$this->isConfigured(self::CACHE_ENGINE_ZEND_OPCACHE)
@@ -186,7 +186,7 @@ class CacheLib
     protected function initUserCaching()
     {
         global $_CONFIG;
-        
+
         // APC
         if ($this->isInstalled(self::CACHE_ENGINE_APC)) {
             // have to use serializer "php", not "default" due to doctrine2 gedmo tree repository
@@ -198,7 +198,7 @@ class CacheLib
                 $this->userCacheEngines[] = self::CACHE_ENGINE_APC;
             }
         }
-        
+
         // Memcache
         if (   $this->isInstalled(self::CACHE_ENGINE_MEMCACHE)
             && (\Env::get('cx')->getMode() == \Cx\Core\Core\Controller\Cx::MODE_BACKEND
@@ -248,17 +248,17 @@ class CacheLib
         ) {
             $this->userCacheEngines[] = self::CACHE_ENGINE_XCACHE;
         }
-        
+
         // Filesystem
         if ($this->isConfigured(self::CACHE_ENGINE_FILESYSTEM)) {
             $this->userCacheEngines[] = self::CACHE_ENGINE_FILESYSTEM;
         }
     }
-    
+
     protected function getActivatedCacheEngines()
     {
         global $_CONFIG;
-        
+
         $this->userCacheEngine = self::CACHE_ENGINE_OFF;
         if (   isset($_CONFIG['cacheUserCache'])
             && in_array($_CONFIG['cacheUserCache'], $this->userCacheEngines)
@@ -273,7 +273,7 @@ class CacheLib
             $this->opCacheEngine = $_CONFIG['cacheOPCache'];
         }
     }
-        
+
     public function deactivateNotUsedOpCaches()
     {
         if (empty($this->opCacheEngine)) {
@@ -301,7 +301,7 @@ class CacheLib
             }
         }
     }
-    
+
     public function getUserCacheActive()
     {
         global $_CONFIG;
@@ -316,27 +316,27 @@ class CacheLib
             isset($_CONFIG['cacheOpStatus'])
             && $_CONFIG['cacheOpStatus'] == 'on';
     }
-    
+
     public function getOpCacheEngine() {
         return $this->opCacheEngine;
     }
-    
+
     public function getUserCacheEngine() {
         return $this->userCacheEngine;
     }
-    
+
     public function getMemcache() {
         return $this->memcache;
     }
-    
+
     public function getAllUserCacheEngines() {
         return array(self::CACHE_ENGINE_APC, self::CACHE_ENGINE_MEMCACHE, self::CACHE_ENGINE_MEMCACHED, self::CACHE_ENGINE_XCACHE);
     }
-    
+
     public function getAllOpCacheEngines() {
         return array(self::CACHE_ENGINE_APC, self::CACHE_ENGINE_ZEND_OPCACHE);
     }
-    
+
     protected function isInstalled($cacheEngine)
     {
         switch ($cacheEngine) {
@@ -354,7 +354,7 @@ class CacheLib
                 return true;
         }
     }
-    
+
     protected function isActive($cacheEngine)
     {
         if (!$this->isInstalled($cacheEngine)) {
@@ -382,7 +382,7 @@ class CacheLib
             return $configurations[$setting]['global_value'];
         }
     }
-    
+
     protected function isConfigured($cacheEngine, $user = false)
     {
         if (!$this->isActive($cacheEngine)) {
@@ -403,8 +403,8 @@ class CacheLib
             case self::CACHE_ENGINE_XCACHE:
                 if ($user) {
                     return (
-                        ini_get('xcache.var_size') > 0 && 
-                        ini_get('xcache.admin.user') && 
+                        ini_get('xcache.var_size') > 0 &&
+                        ini_get('xcache.admin.user') &&
                         ini_get('xcache.admin.pass')
                     );
                 }
@@ -413,19 +413,19 @@ class CacheLib
                 return is_writable(ASCMS_CACHE_PATH);
         }
     }
-    
+
     protected function getMemcacheConfiguration()
     {
         global $_CONFIG;
         $ip = '127.0.0.1';
         $port = '11211';
-        
+
         if(!empty($_CONFIG['cacheUserCacheMemcacheConfig'])){
             $settings = json_decode($_CONFIG['cacheUserCacheMemcacheConfig'], true);
             $ip = $settings['ip'];
             $port = $settings['port'];
         }
-        
+
         return array('ip' => $ip, 'port' => $port);
     }
 
@@ -434,31 +434,31 @@ class CacheLib
         global $_CONFIG;
         $ip = '127.0.0.1';
         $port = '11211';
-        
+
         if(!empty($_CONFIG['cacheUserCacheMemcachedConfig'])){
             $settings = json_decode($_CONFIG['cacheUserCacheMemcachedConfig'], true);
             $ip = $settings['ip'];
             $port = $settings['port'];
         }
-        
+
         return array('ip' => $ip, 'port' => $port);
     }
-    
+
     protected function getVarnishConfiguration()
     {
         global $_CONFIG;
         $ip = '127.0.0.1';
         $port = '8080';
-        
+
         if(!empty($_CONFIG['cacheProxyCacheVarnishConfig'])){
             $settings = json_decode($_CONFIG['cacheProxyCacheVarnishConfig'], true);
             $ip = $settings['ip'];
             $port = $settings['port'];
         }
-        
+
         return array('ip' => $ip, 'port' => $port);
     }
-    
+
     /**
      * Flush all cache instances
      * @see \Cx\Core\ContentManager\Model\Event\PageEventListener on update of page objects
@@ -476,7 +476,7 @@ class CacheLib
             // remove cached files
             $this->_deleteAllFiles('cxPages');
         }
-        
+
         $cacheEngine = $cacheEngine == null ? $this->userCacheEngine : $cacheEngine;
         switch ($cacheEngine) {
             case self::CACHE_ENGINE_APC:
@@ -499,10 +499,10 @@ class CacheLib
             default:
                 break;
         }
-        
+
         $this->clearVarnishCache();
     }
-    
+
     /**
      * Clears Varnish cache
      */
@@ -532,7 +532,7 @@ class CacheLib
         fwrite($varnishSocket, $request);
         fclose($varnishSocket);
     }
-    
+
     /**
      * Clears APC cache if APC is installed
      */
@@ -547,7 +547,7 @@ class CacheLib
             \apc_clear_cache(); // this only deletes the cached files
         }
     }
-    
+
     /**
      * Clears all Memcachedata related to this Domain if Memcache is installed
      */
@@ -613,7 +613,7 @@ class CacheLib
             }
         }
     }
-    
+
     /**
      * Clears XCache if configured. Configuration is needed to clear.
      */
@@ -623,7 +623,7 @@ class CacheLib
             \xcache_clear_cache();
         }
     }
-    
+
     /**
      * Clears Zend OPCache if installed
      */
@@ -633,7 +633,7 @@ class CacheLib
             \opcache_reset();
         }
     }
-    
+
     /**
      * Retunrns the CachePrefix related to this Domain
      * @global string $_DBCONFIG

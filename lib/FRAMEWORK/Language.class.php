@@ -464,7 +464,7 @@ class FWLanguage
         while(!$rs->EOF) {
             $langId = intval($rs->fields['id']);
             $fallbackLangId = intval($rs->fields['fallback']);
-            
+
             //explicitly overwrite null (default) with the default language id
             if($fallbackLangId === 0) {
                 $fallbackLangId = $defaultLangId;
@@ -476,7 +476,7 @@ class FWLanguage
             $ret[$langId] = $fallbackLangId;
             $rs->MoveNext();
         }
-        
+
         return $ret;
     }
 }

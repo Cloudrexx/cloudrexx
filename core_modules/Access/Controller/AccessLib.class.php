@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * User Management
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
@@ -319,7 +319,7 @@ class AccessLib
             $imageRepoPath = $attributeId == 'picture'
                                 ? $cx->getWebsiteImagesAccessProfilePath()
                                 : $cx->getWebsiteImagesAccessPhotoPath();
-            
+
             if (!$edit || file_exists($imageRepoPath .'/'. $image)) {
                 $arrPlaceholders['_VALUE'] = htmlentities($objUser->getProfileAttribute($objAttribute->getId(), $historyId), ENT_QUOTES, CONTREXX_CHARSET);
             }
@@ -1384,7 +1384,7 @@ function SetUrl(data)
     if (data.type === '' || !data.data[0]) {
         return;
     }
-            
+
     switch (data.type) {
         case 'page':
             accessSetWebpage(data.data[0].node);
@@ -1557,7 +1557,7 @@ JSaccessValidatePrimaryGroupAssociation
                 fileName   = data.pop();
             uploaderField.find('.uploader_rel_field_source').val(callback[0]);
             uploaderField.find('.uploader_rel_field').val(fileName);
-            uploaderField.find('.uploader_rel_field_remove_icon').show();            
+            uploaderField.find('.uploader_rel_field_remove_icon').show();
         }
     }
 
@@ -1611,7 +1611,7 @@ JS
             $arrLetters[] = 48;
             $arrLetters = array_merge($arrLetters, range(65, 90)); // ascii codes of characters "A" to "Z"
             $arrLetters[] = '';
-            
+
             $selfUri = \Cx\Core\Routing\Url::fromPage(\Cx\Core\Core\Controller\Cx::instanciate()->getPage());
 
             foreach ($arrLetters as $letter) {
@@ -1632,7 +1632,7 @@ JS
                 if ($letter == '' && $selectedLetter == '' || chr($letter) == $selectedLetter) {
                     $parsedLetter = '<strong>'.$parsedLetter.'</strong>';
                 }
-                
+
                 $uriLetter = null;
                 if (!empty($letter)) {
                     $uriLetter = chr($letter);
@@ -2135,7 +2135,7 @@ JS
 
     /**
      * Initialize the access image uploader and get the uploader instance
-     * 
+     *
      * @return \Cx\Core_Modules\Uploader\Model\Entity\Uploader
      */
     public function getImageUploader()
@@ -2150,7 +2150,7 @@ JS
             'data-upload-limit'  => 1,
         ));
         $this->attachJavaScriptFunction('imageUploaderCode');
-        
+
         return $uploader;
     }
 }

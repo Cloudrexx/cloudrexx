@@ -3,18 +3,18 @@
 // <![CDATA[
 function votingDelete(id, email)
 {
-	strMsg = '{TXT_VOTING_CONFIRM_DELETE_EMAIL}';
-	if (confirm(strMsg.replace('%s', email))) {
-		window.location.href = '?cmd=Voting&{CSRF_PARAM}&act=detail&delete='+id+'&id={VOTING_ID}&pos={VOTING_POS}';
-	}
+  strMsg = '{TXT_VOTING_CONFIRM_DELETE_EMAIL}';
+  if (confirm(strMsg.replace('%s', email))) {
+    window.location.href = '?cmd=Voting&{CSRF_PARAM}&act=detail&delete='+id+'&id={VOTING_ID}&pos={VOTING_POS}';
+  }
 }
 
 function votingVerify(id, email)
 {
-	strMsg = '{TXT_VOTING_CONFIRM_VERIFY_EMAIL}';
-	if (confirm(strMsg.replace('%s', email))) {
-		window.location.href = '?cmd=Voting&{CSRF_PARAM}&act=detail&verify='+id+'&id={VOTING_ID}&pos={VOTING_POS}';
-	}
+  strMsg = '{TXT_VOTING_CONFIRM_VERIFY_EMAIL}';
+  if (confirm(strMsg.replace('%s', email))) {
+    window.location.href = '?cmd=Voting&{CSRF_PARAM}&act=detail&verify='+id+'&id={VOTING_ID}&pos={VOTING_POS}';
+  }
 }
 
 
@@ -22,24 +22,24 @@ function votingVerify(id, email)
 </script>
 
 <table class="adminlist" border="0" width="100%" cellpadding="3" cellspacing="0">
-	<tr>
-		<th colspan="3">{TXT_VOTING_EMAIL_ADRESSE_OF_QUESTION}</th>
-	</tr>
-	<tr class="row3" style="font-weight:bold;">
-		<td width="75%">{TXT_VOTING_EMAIL}</td>
-		<td width="20%">{TXT_VOTING_VALID}</td>
-		<td width="5%" style="text-align:right;">{TXT_VOTING_FUNCTIONS}</td>
-	</tr>
-	<!-- BEGIN voting_emails -->
-	<tr class="row{VOTING_ROW_NR}">
-		<td><a href="mailto:{VOTING_EMAIL}" title="{TXT_VOTING_WRITE_EMAIL}">{VOTING_EMAIL}</a></td>
-		<td>{VOTING_VALID}</td>
-		<td style="text-align:right;">
-			<!-- BEGIN voting_verify_email --><a href="javascript:votingVerify({VOTING_EMAIL_ID},'{VOTING_EMAIL}')" title="{TXT_VOTING_VERIFY_EMAIL}"><img src="../core/Core/View/Media/icons/check.gif" width="15" height="15" border="0" alt="{TXT_VOTING_VERIFY_EMAIL}" /></a><!-- END voting_verify_email -->
-			<a href="javascript:votingDelete({VOTING_EMAIL_ID},'{VOTING_EMAIL}')" title="{TXT_VOTING_DELETE_EMAIL}"><img src="../core/Core/View/Media/icons/delete.gif" width="17" height="17" border="0" alt="{TXT_VOTING_DELETE_EMAIL}" /></a>
-		</td>
-	</tr>
-	<!-- END voting_emails -->
+  <tr>
+    <th colspan="3">{TXT_VOTING_EMAIL_ADRESSE_OF_QUESTION}</th>
+  </tr>
+  <tr class="row3" style="font-weight:bold;">
+    <td width="75%">{TXT_VOTING_EMAIL}</td>
+    <td width="20%">{TXT_VOTING_VALID}</td>
+    <td width="5%" style="text-align:right;">{TXT_VOTING_FUNCTIONS}</td>
+  </tr>
+  <!-- BEGIN voting_emails -->
+  <tr class="row{VOTING_ROW_NR}">
+    <td><a href="mailto:{VOTING_EMAIL}" title="{TXT_VOTING_WRITE_EMAIL}">{VOTING_EMAIL}</a></td>
+    <td>{VOTING_VALID}</td>
+    <td style="text-align:right;">
+      <!-- BEGIN voting_verify_email --><a href="javascript:votingVerify({VOTING_EMAIL_ID},'{VOTING_EMAIL}')" title="{TXT_VOTING_VERIFY_EMAIL}"><img src="../core/Core/View/Media/icons/check.gif" width="15" height="15" border="0" alt="{TXT_VOTING_VERIFY_EMAIL}" /></a><!-- END voting_verify_email -->
+      <a href="javascript:votingDelete({VOTING_EMAIL_ID},'{VOTING_EMAIL}')" title="{TXT_VOTING_DELETE_EMAIL}"><img src="../core/Core/View/Media/icons/delete.gif" width="17" height="17" border="0" alt="{TXT_VOTING_DELETE_EMAIL}" /></a>
+    </td>
+  </tr>
+  <!-- END voting_emails -->
 </table>
 {VOTING_PAGING}
 <!-- end voting_detail.html -->

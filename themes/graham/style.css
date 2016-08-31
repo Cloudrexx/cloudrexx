@@ -111,7 +111,7 @@
         width: auto;
         margin-right: auto;
         margin-left: 15px;
-    }    
+    }
     .footer-right {
         width: 100%;
         float: left;
@@ -125,14 +125,14 @@
         width: 100%;
         height: 41px;
         padding: 6px 12px;
-        color: #FFFFFF;        
+        color: #FFFFFF;
         font-weight: bold;
         background: url('images/contact-us-button.jpg') no-repeat;
         background-size: 100% 100%;
         text-align: center;
         background-position: 100%;
     }
-    #page h1, .h1 {        
+    #page h1, .h1 {
         word-wrap: break-word;
     }
     #home-page-wrapper {
@@ -150,7 +150,7 @@
     #sidebar {margin-top: 20px;width: 100%;}
     #tagelement,#tagelement tr, #tagelement .row2  {
         float: left;
-        width: 100%;        
+        width: 100%;
     }
     #tagelement td {
         float: left;
@@ -249,7 +249,7 @@
         float: left;
         clear: both;
         width: 100%;
-    } 
+    }
     /*cart*/
     #cartlist #th_bg2 .cartrow:first-child {
         width: 100%;
@@ -314,7 +314,7 @@
         display: none;
     }
     /*versandkonditions*/
-    
+
     #shop .shopterms .row2 .shoprow {
         float: left;
         width: 100%;
@@ -344,13 +344,13 @@
         content: "Gebührenfrei ab";
         font-weight: 700;
         position: absolute;
-        left: 15px; 
+        left: 15px;
     }
     .row2 .shoprow:last-child:before {
         content: "Gebühr";
         font-weight: 700;
         position: absolute;
-        left: 15px; 
+        left: 15px;
     }
     /*Medien*/
     head .eachrow:nth-child(2) {
@@ -524,7 +524,7 @@
     .employee-left, .employee-middle, .employee-right {padding-bottom: 20px;}
     #page #gallery div.show_image img , #page #gallery div.category_image img, #page #gallery div.category_images img{width: auto;}
     #page #shop div.description{width: 100%;}
-   
+
     /*MediaDir Edit Start*/
     .mediadirSelector .mediadirSelectorCenter {
         padding: 5px 65px 0 !important;
@@ -668,10 +668,10 @@
         border-bottom: 0;
         padding-bottom: 10px;
     }
-    
+
     .sidebar-block.contact-us a {
         padding: 7% 0 0 13%;
-        
+
     }
     .head .eachrow:nth-child(3) {width: 24%;}
     .head .eachrow:nth-child(2) {width: 46%;}
@@ -763,15 +763,15 @@
     #sidebar.col-md-3 {
         width: 20.5%;
     }
-    
+
     .sidebar-block.contact-us a {
         padding: 5% 0 0 12%;
-       
+
     }
     .regdivider {
         margin: 0 27px;
     }
-    
+
     #profile-left-button {
         padding-left: 35.5%;
     }
@@ -818,7 +818,7 @@
         text-align: center;
         padding-top: 0;
     }
-    #logo { 
+    #logo {
         padding: 22px 0 20px;
         width: 100%;
     }
@@ -833,7 +833,7 @@
 }
 @media (max-width: 767px) {
     .wrapper { padding: 0 15px;}
-    .footer-left-top > div, .footer-left-top > a { 
+    .footer-left-top > div, .footer-left-top > a {
         float: left;
         width: 100%;
     }
@@ -842,7 +842,7 @@
     .modules-page { width: 100%;}
     .news-info { line-height: 24pt;}
     .header { padding-right: 30px;}
-    .content ul li, #page a, .radio label {word-break: break-word; white-space: normal; word-wrap: break-word;} 
+    .content ul li, #page a, .radio label {word-break: break-word; white-space: normal; word-wrap: break-word;}
     #mediadir .table-responsive table {min-width: 400px;}
 }
 
@@ -850,5 +850,5 @@
     #mediadir .mediadirSearchForm input[type="submit"] {margin-top: 15px;}
     form input[type="submit"], form input[type="reset"], #podcast input[type="button"] {margin-top: 15px;}
     #page #gallery div.category_image img, .ecardPreviewMotive img {width: 100%;}
-    
+
 }

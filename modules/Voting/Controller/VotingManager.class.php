@@ -70,7 +70,7 @@ class VotingManager
 
         $this->_objTpl = new \Cx\Core\Html\Sigma(ASCMS_MODULE_PATH.'/Voting/View/Template/Backend');
         \Cx\Core\Csrf\Controller\Csrf::add_placeholder($this->_objTpl);
-        $this->_objTpl->setErrorHandling(PEAR_ERROR_DIE);        
+        $this->_objTpl->setErrorHandling(PEAR_ERROR_DIE);
     }
     private function setNavigation()
     {
@@ -759,14 +759,14 @@ class VotingManager
 
         // Now select those fields from our table.
         $fields_txt = join(',', $fields);
-		#echo "exporting $fields_txt...\n";
+        #echo "exporting $fields_txt...\n";
 
         $sql_export = "
             SELECT $fields_txt
             FROM ".DBPREFIX."voting_additionaldata
             WHERE voting_system_id = $voting_id
             ORDER BY date_entered
-			";
+            ";
         $data = $objDatabase->Execute($sql_export);
         header("Content-Type: text/csv");
         header("Content-Disposition: Attachment; filename=\"export.csv\"");

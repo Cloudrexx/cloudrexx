@@ -63,7 +63,7 @@ class MemberDirManager extends MemberDirLibrary
     //var $arrSettings = array();
 
     private $act = '';
-    
+
     /**
      * Constructor
      *
@@ -88,7 +88,7 @@ class MemberDirManager extends MemberDirLibrary
         $this->langId=$objInit->userFrontendLangId;
 
         parent::__construct();
-        
+
     }
     private function setNavigation()
     {
@@ -1716,7 +1716,7 @@ class MemberDirManager extends MemberDirLibrary
         global $objDatabase, $_ARRAYLANG;
 
         \Env::get('ClassLoader')->loadFile(ASCMS_LIBRARY_PATH.'/importexport/import.class.php');
-        
+
         $importlib = new \Import();
 
         if (isset($_POST['import_cancel'])) {

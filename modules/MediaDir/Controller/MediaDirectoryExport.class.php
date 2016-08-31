@@ -45,138 +45,138 @@ namespace Cx\Modules\MediaDir\Controller;
  */
 class MediaDirectoryExport extends MediaDirectoryLibrary
 {
-    private $csvSeparator = ';'; 
-    private $elementSeparator = ','; 
+    private $csvSeparator = ';';
+    private $elementSeparator = ',';
     /**
      * Constructor
      */
     function __construct($name)
-    {                                 
+    {
         parent::__construct('.', $name);
     }
-    
+
     function exportCSV($intFormId, $arrCategoryIds=null, $arrLevelIds=null, $intMaskId=null)
     {
-        global $_ARRAYLANG, $_CORELANG, $_LANGID, $objDatabase;      
-        
+        global $_ARRAYLANG, $_CORELANG, $_LANGID, $objDatabase;
+
         if($intFormId != null) {
-            $objValidator = new \FWValidator();                                                                                 
-            $arrEntries = array(); 
+            $objValidator = new \FWValidator();
+            $arrEntries = array();
             $arrEntriesData = array();
-            $arrInputfields = array();   
-            $arrMask = array();     
-            
-            if($intMaskId != null && $intMaskId != 0) { 
+            $arrInputfields = array();
+            $arrMask = array();
+
+            if($intMaskId != null && $intMaskId != 0) {
                 $objResultMask = $objDatabase->Execute("SELECT
-                                                    fields, form_id 
+                                                    fields, form_id
                                                 FROM
-                                                    ".DBPREFIX."module_".$this->moduleTablePrefix."_masks     
-                                                WHERE id = '".$intMaskId."'     
+                                                    ".DBPREFIX."module_".$this->moduleTablePrefix."_masks
+                                                WHERE id = '".$intMaskId."'
                                                ");
                 if ($objResultMask !== false) {
-                    $arrMask = explode(',', $objResultMask->fields['fields']);  
-                    $intFormId = $objResultMask->fields['form_id'];                   
+                    $arrMask = explode(',', $objResultMask->fields['fields']);
+                    $intFormId = $objResultMask->fields['form_id'];
                 }
-            }            
-            
-            $objForm = new MediaDirectoryForm($intFormId, $this->moduleName);             
-            $objInputfields = new MediaDirectoryInputfield($intFormId, false, null, $this->moduleName);    
-            $strFilename = contrexx_raw2encodedUrl($objForm->arrForms[$intFormId]['formName'][0])."_".mktime().".csv"; 
-                                              
-            if($arrCategoryIds != null) {                                      
+            }
+
+            $objForm = new MediaDirectoryForm($intFormId, $this->moduleName);
+            $objInputfields = new MediaDirectoryInputfield($intFormId, false, null, $this->moduleName);
+            $strFilename = contrexx_raw2encodedUrl($objForm->arrForms[$intFormId]['formName'][0])."_".mktime().".csv";
+
+            if($arrCategoryIds != null) {
                 foreach($arrCategoryIds as $intKey => $intCategoryId) {
                     if($arrLevelIds != null) {
                         $strDatabaseLevel = ",".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_levels AS level";
                         $strLevels = join(',', $arrLevelIds);
-                        $strWhereLevel = " AND ((cat.entry_id = level.entry_id) AND (level.level_id IN (".$strLevels.")))"; 
+                        $strWhereLevel = " AND ((cat.entry_id = level.entry_id) AND (level.level_id IN (".$strLevels.")))";
                     }
-                    
+
                     $objResultCategories = $objDatabase->Execute("SELECT
-                                                                        cat.entry_id AS entryId 
+                                                                        cat.entry_id AS entryId
                                                                     FROM
                                                                         ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_categories AS cat
-                                                                        ".$strDatabaseLevel."      
+                                                                        ".$strDatabaseLevel."
                                                                     WHERE
                                                                         cat.category_id ='".$intCategoryId."'
-                                                                        ".$strWhereLevel."      
+                                                                        ".$strWhereLevel."
                                                                    ");
                     if ($objResultCategories !== false) {
                         while (!$objResultCategories->EOF) {
                             $arrEntries[$objResultCategories->fields['entryId']] = $objResultCategories->fields['entryId'];
                             $objResultCategories->MoveNext();
-                        }                   
+                        }
                     }
                 }
-            } else if($arrLevelIds != null) { 
+            } else if($arrLevelIds != null) {
                 foreach($arrLevelIds as $intKey => $intLevelId) {
                     $objResultLevels = $objDatabase->Execute("SELECT
-                                                                        level.entry_id AS entryId 
+                                                                        level.entry_id AS entryId
                                                                     FROM
-                                                                        ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_levels AS level       
+                                                                        ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_levels AS level
                                                                     WHERE
-                                                                        level.level_id ='".$intLevelId."'     
+                                                                        level.level_id ='".$intLevelId."'
                                                                    ");
                     if ($objResultLevels !== false) {
                         while (!$objResultLevels->EOF) {
                             $arrEntries[$objResultLevels->fields['entryId']] = $objResultLevels->fields['entryId'];
                             $objResultLevels->MoveNext();
-                        }                   
+                        }
                     }
-                }  
+                }
             } else {
-                $objEntry = new MediaDirectoryEntry($this->moduleName); 
-                $objEntry->getEntries(null, null, null, null, null, null, true, null, 'n', null, null, $intFormId);  
-                
+                $objEntry = new MediaDirectoryEntry($this->moduleName);
+                $objEntry->getEntries(null, null, null, null, null, null, true, null, 'n', null, null, $intFormId);
+
                 foreach($objEntry->arrEntries as $intEntryId => $arrEntry) {
-                    $arrEntries[$intEntryId] = $intEntryId;    
-                }  
-            }                  
-            
-            foreach($arrEntries as $intKey => $intEntryId) {  
-                $objResultEntry = $objDatabase->Execute("SELECT     
-                                                                entry.value AS value, entry.form_id AS formId, entry.field_id AS fieldId 
+                    $arrEntries[$intEntryId] = $intEntryId;
+                }
+            }
+
+            foreach($arrEntries as $intKey => $intEntryId) {
+                $objResultEntry = $objDatabase->Execute("SELECT
+                                                                entry.value AS value, entry.form_id AS formId, entry.field_id AS fieldId
                                                             FROM
-                                                                ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields AS entry     
+                                                                ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields AS entry
                                                             WHERE
                                                                 entry.entry_id ='".$intEntryId."'
-                                                            AND 
-                                                                entry.lang_id ='".$_LANGID."'           
+                                                            AND
+                                                                entry.lang_id ='".$_LANGID."'
                                                            ");
                 if ($objResultEntry !== false) {
                     while (!$objResultEntry->EOF) {
                         if($objResultEntry->fields['formId'] == $intFormId) {
-                            $arrEntriesData[$intEntryId][$objResultEntry->fields['fieldId']] = $objResultEntry->fields['value'];   
-                        }  
+                            $arrEntriesData[$intEntryId][$objResultEntry->fields['fieldId']] = $objResultEntry->fields['value'];
+                        }
                         $objResultEntry->MoveNext();
-                    }                   
+                    }
                 }
             }
-            
-            foreach($objInputfields->arrInputfields as $intFieldId => $arrField) { 
+
+            foreach($objInputfields->arrInputfields as $intFieldId => $arrField) {
                 $arrInputfields[$arrField['order']]['id'] = $intFieldId;
-                $arrInputfields[$arrField['order']]['name'] = $arrField['name'][0];        
-            }   
-            
-            ksort($arrInputfields);   
-            
-            header("Content-Type: text/comma-separated-values; charset=".CONTREXX_CHARSET, true);
-            header("Content-Disposition: attachment; filename=\"$strFilename\"", true);      
-                                                                                         
-            foreach($arrInputfields as $intKey => $arrField) {
-                if($intMaskId == null || ($arrMask != null && in_array($arrField['id'], $arrMask))) {  
-                    print self::escapeCsvValue($arrField['name']).$this->csvSeparator;    
-                } 
+                $arrInputfields[$arrField['order']]['name'] = $arrField['name'][0];
             }
-              
-            print "\r\n";  
-            
-            foreach($arrEntriesData as $intEntryId => $arrEntry) {            
-                foreach($arrInputfields as $intFieldOrder => $arrField) { 
-                    if($intMaskId == null || ($arrMask != null && in_array($arrField['id'], $arrMask))) { 
+
+            ksort($arrInputfields);
+
+            header("Content-Type: text/comma-separated-values; charset=".CONTREXX_CHARSET, true);
+            header("Content-Disposition: attachment; filename=\"$strFilename\"", true);
+
+            foreach($arrInputfields as $intKey => $arrField) {
+                if($intMaskId == null || ($arrMask != null && in_array($arrField['id'], $arrMask))) {
+                    print self::escapeCsvValue($arrField['name']).$this->csvSeparator;
+                }
+            }
+
+            print "\r\n";
+
+            foreach($arrEntriesData as $intEntryId => $arrEntry) {
+                foreach($arrInputfields as $intFieldOrder => $arrField) {
+                    if($intMaskId == null || ($arrMask != null && in_array($arrField['id'], $arrMask))) {
                         switch($arrField['id']) {
                             case 1:
                                 $arrCategories = self::getCategoriesLevels(1, $intEntryId);
-                                $strFieldValue = join($this->elementSeparator, $arrCategories);  
+                                $strFieldValue = join($this->elementSeparator, $arrCategories);
                                 break;
                             case 2:
                                 $arrLevels = self::getCategoriesLevels(2, $intEntryId);
@@ -186,44 +186,44 @@ class MediaDirectoryExport extends MediaDirectoryLibrary
                                 $strFieldValue = isset($arrEntriesData[$intEntryId][$arrField['id']]) ? $arrEntriesData[$intEntryId][$arrField['id']] : '';
                                 $strFieldValue = strip_tags($strFieldValue);
                                 $strFieldValue = self::escapeCsvValue($strFieldValue);
-                                $strFieldValue = html_entity_decode($strFieldValue, ENT_QUOTES, CONTREXX_CHARSET);  
+                                $strFieldValue = html_entity_decode($strFieldValue, ENT_QUOTES, CONTREXX_CHARSET);
                                 break;
                         }
-                        if(CONTREXX_CHARSET == 'UTF-8') {  
-                            $strFieldValue = utf8_decode($strFieldValue);      
+                        if(CONTREXX_CHARSET == 'UTF-8') {
+                            $strFieldValue = utf8_decode($strFieldValue);
                         }
-                        print $strFieldValue.$this->csvSeparator;     
-                    }   
+                        print $strFieldValue.$this->csvSeparator;
+                    }
                 }
-                
-                print "\r\n";       
-            }        
-            exit();  
+
+                print "\r\n";
+            }
+            exit();
         } else {
             return false;
-        }  
+        }
     }
-    
-    
+
+
     function escapeCsvValue($value)
-    {             
-        $valueModified = stripslashes($value);                                                           
-        $valueModified = preg_replace('/\r\n/', " ", $valueModified);      
-        $valueModified = str_replace('"', '""', $valueModified);         
+    {
+        $valueModified = stripslashes($value);
+        $valueModified = preg_replace('/\r\n/', " ", $valueModified);
+        $valueModified = str_replace('"', '""', $valueModified);
 
         if ($valueModified != $value || preg_match('/['.$this->csvSeparator.'\n]+/', $value)) {
             $value = '"'.$valueModified.'"';
-        } 
-         
+        }
+
         return $value;
-    } 
-    
+    }
+
     function getCategoriesLevels($intType, $intEntryId=null)
     {
         global $objDatabase, $_LANGID;
-        
+
         $arrList = array();
-        
+
         if($intType == 1) {
             //categories
             $query = "SELECT
@@ -240,7 +240,7 @@ class MediaDirectoryExport extends MediaDirectoryLibrary
                     cat_name.`lang_id` = '".intval($_LANGID)."'
                   ORDER BY
                     cat_name.`category_name` ASC
-                  ";              
+                  ";
         } else {
             //levels
             $query = "SELECT
@@ -257,25 +257,25 @@ class MediaDirectoryExport extends MediaDirectoryLibrary
                     level_name.`lang_id` = '".intval($_LANGID)."'
                   ORDER BY
                     level_name.`level_name` ASC
-                  ";               
+                  ";
         }
-        
-        $objEntryCategoriesLevels = $objDatabase->Execute($query);              
-        
-        if ($objEntryCategoriesLevels !== false) {      
+
+        $objEntryCategoriesLevels = $objDatabase->Execute($query);
+
+        if ($objEntryCategoriesLevels !== false) {
             while (!$objEntryCategoriesLevels->EOF) {
-                $strValue = strip_tags($objEntryCategoriesLevels->fields['elm_name']);     
+                $strValue = strip_tags($objEntryCategoriesLevels->fields['elm_name']);
                 $strValue = self::escapeCsvValue($strValue);
-                $strValue = html_entity_decode($strValue, ENT_QUOTES, CONTREXX_CHARSET);  
-                
-                if(CONTREXX_CHARSET == 'UTF-8') {  
-                    $strValue = utf8_decode($strValue);      
-                } 
+                $strValue = html_entity_decode($strValue, ENT_QUOTES, CONTREXX_CHARSET);
+
+                if(CONTREXX_CHARSET == 'UTF-8') {
+                    $strValue = utf8_decode($strValue);
+                }
                 $arrList[] = $objEntryCategoriesLevels->fields['elm_name'];
                 $objEntryCategoriesLevels->MoveNext();
-            }       
+            }
         }
-        
+
         return $arrList;
     }
 }

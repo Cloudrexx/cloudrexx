@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Socket class
  *
@@ -47,36 +47,36 @@
  */
 class Socket
 {
-	/**
-	 * Seconds until the connection attempt times out
-	 */
-	private static $timeout_connect  = 5;
+    /**
+     * Seconds until the connection attempt times out
+     */
+    private static $timeout_connect  = 5;
 
-	/**
-	 * Seconds until waiting for a response times out
-	 */
-	private static $timeout_response = 5;
+    /**
+     * Seconds until waiting for a response times out
+     */
+    private static $timeout_response = 5;
 
 
-	/**
-	 * Connect to the given URI and return the response
-	 *
-	 * The URI should consist of a string like
-	 *     http://my.domain.com:80/path/to?your=resource
-	 * Where only the host name is mandatory.
-	 * The defaults for other parts are:
-	 * - Protocol: http
-	 * - Port:     80
-	 * - Path:     /
+    /**
+     * Connect to the given URI and return the response
+     *
+     * The URI should consist of a string like
+     *     http://my.domain.com:80/path/to?your=resource
+     * Where only the host name is mandatory.
+     * The defaults for other parts are:
+     * - Protocol: http
+     * - Port:     80
+     * - Path:     /
      * Returns false upon the tiniest of errors.
      * Note:  Uses HTTP/1.0 *ONLY*
-	 * @param  string      $uri        The URI to connect to
-	 * @return string                  The response on success, false otherwise
-	 */
+     * @param  string      $uri        The URI to connect to
+     * @return string                  The response on success, false otherwise
+     */
     static function getHttp10Response($uri)
     {
 //echo("getHttp10Response($uri): Entered<br />");
-    	// Split the gateway URI into protocol, host, port, and path
+        // Split the gateway URI into protocol, host, port, and path
         $arrMatch = array();
 //        '/^
 //          (?:
@@ -126,7 +126,7 @@ class Socket
         $fp = fsockopen($host, intval($port), $errno, $errstr, self::$timeout_connect);
         if (!$fp) {
 //echo("ERROR $errno: $errstr<br />");
-        	return false;
+            return false;
         }
         stream_set_timeout($fp, self::$timeout_response, 0);
 

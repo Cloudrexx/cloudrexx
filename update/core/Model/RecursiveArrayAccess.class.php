@@ -32,7 +32,7 @@
  * @author      ss4u <ss4u.comvation@gmail.com>
  * @version     3.1.2
  * @package     cloudrexx
- * @subpackage  core 
+ * @subpackage  core
  */
 
 namespace Cx\Core\Model;
@@ -45,7 +45,7 @@ namespace Cx\Core\Model;
  * @version     $Id:    Exp $
  * @package     cloudrexx
  * @subpackage  core
- * 
+ *
  * @see         /core/session.class.php
  */
 class RecursiveArrayAccess implements \ArrayAccess, \Countable, \Iterator {
@@ -59,51 +59,51 @@ class RecursiveArrayAccess implements \ArrayAccess, \Countable, \Iterator {
 
     /**
      * Path of the current array
-     * 
+     *
      * @var string
      */
     protected $offset;
-    
+
     /**
      * Callable funtion on offsetSet
-     * 
+     *
      * @var callable
      */
-    protected $callableOnSet;    
+    protected $callableOnSet;
     /**
      * Callable funtion on offsetGet
-     * 
+     *
      * @var callable
      */
     protected $callableOnGet;
-    
+
     /**
      * Callable funtion on offsetUnset
-     * 
+     *
      * @var callable
      */
     protected $callableOnUnset;
-    
+
     /**
      * Callable function on callableOnValidateKey
-     * 
+     *
      * @var callable
      */
     protected $callableOnValidateKey;
-    
+
     /**
-     * 
-     * 
+     *
+     *
      * @var integer
      */
     protected $id;
-    
+
     /**
      *
-     * @var type 
+     * @var type
      */
     protected $parentId;
-    
+
     /**
      * Default object constructor.
      *
@@ -113,17 +113,17 @@ class RecursiveArrayAccess implements \ArrayAccess, \Countable, \Iterator {
     {
         $this->offset   = $offset;
         $this->parentId = intval($parentId);
-        
+
         $this->callableOnSet   = $callableOnSet;
-        $this->callableOnGet   = $callableOnGet;        
+        $this->callableOnGet   = $callableOnGet;
         $this->callableOnUnset = $callableOnUnset;
         $this->callableOnValidateKey = $callableOnValidateKey;
-        
+
         if ($this->callableOnUnset)
             call_user_func($this->callableOnUnset, $this->offset, $this->parentId);
         if ($this->callableOnSet)
             call_user_func($this->callableOnSet, $this);
-        
+
         if (is_array($data)) {
             foreach ($data as $key => $value) {
                 $this[$key] = $value;
@@ -155,7 +155,7 @@ class RecursiveArrayAccess implements \ArrayAccess, \Countable, \Iterator {
      *
      * @return boolean true on success or false on failure.
      */
-    public function offsetExists($offset) {       
+    public function offsetExists($offset) {
         return isset($this->data[$offset]);
     }
 
@@ -187,19 +187,19 @@ class RecursiveArrayAccess implements \ArrayAccess, \Countable, \Iterator {
      * @return null
      */
     public function offsetSet($offset, $data, $callableOnSet = null, $callableOnGet = null, $callableOnUnset = null, $callableOnValidateKey = null) {
-        
+
         if ($callableOnValidateKey) {
             $this->callableOnValidateKey = $callableOnValidateKey;
         }
-        
+
         if ($this->callableOnValidateKey) {
             call_user_func($this->callableOnValidateKey, $offset);
         }
-        
+
         if ($offset === null) {
             $offset = count($this->data);
         }
-        
+
         if ($callableOnSet) {
             $this->callableOnSet = $callableOnSet;
         }
@@ -209,7 +209,7 @@ class RecursiveArrayAccess implements \ArrayAccess, \Countable, \Iterator {
         if ($callableOnUnset) {
             $this->callableOnUnset = $callableOnUnset;
         }
-        
+
         if ( is_array( $data ) ) {
             $data = new self(
                             $data,
@@ -223,7 +223,7 @@ class RecursiveArrayAccess implements \ArrayAccess, \Countable, \Iterator {
         } else if (isset($this->data[$offset]) && is_object($this->data[$offset]) && is_a($this->data[$offset], __CLASS__)) {
             $this->offsetUnset($offset);
         }
-        
+
         $this->data[$offset] = $data;
 
         if ($this->callableOnSet) {
@@ -240,12 +240,12 @@ class RecursiveArrayAccess implements \ArrayAccess, \Countable, \Iterator {
      *
      * @return null
      */
-    public function offsetUnset($offset) {        
+    public function offsetUnset($offset) {
         if ($this->callableOnUnset)
             call_user_func($this->callableOnUnset, $offset, $this->id);
-        
+
         unset($this->data[$offset]);
-        
+
         if ($this->callableOnSet)
             call_user_func($this->callableOnSet, $this);
     }

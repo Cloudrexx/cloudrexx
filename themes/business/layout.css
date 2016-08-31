@@ -115,7 +115,7 @@ padding-bottom:8px;
 #page h1 {
 font-family:OpenSans-Regular;
 font-size:29px;
-color:#528AA2; 
+color:#528AA2;
 padding-top:0;
 line-height:normal;
 padding-bottom:20px;
@@ -473,12 +473,12 @@ border-style: solid;
 border-width: 0 1px 0;
 background-image: url('images/line.png');
 background-position: top right;
-background-repeat: no-repeat; 
+background-repeat: no-repeat;
 /*  -webkit-border-image: -webkit-gradient(linear, 0 0, 0 100%, from(#BFBFBF), to(rgba(0, 0, 0, 0))) 1 100%;
--webkit-border-image: 
+-webkit-border-image:
       -webkit-linear-gradient(#BFBFBF, rgba(0, 0, 0, 0)) 1 100%;
     -moz-border-image:
-      -moz-linear-gradient(#BFBFBF, rgba(0, 0, 0, 0)) 1 100%;    
+      -moz-linear-gradient(#BFBFBF, rgba(0, 0, 0, 0)) 1 100%;
     -o-border-image:
       -o-linear-gradient(#BFBFBF, rgba(0, 0, 0, 0)) 1 100%;
     border-image:
@@ -657,4 +657,3 @@ hr { display: block; height: 1px;
 #kontact-map {
     display: none;
 }
-

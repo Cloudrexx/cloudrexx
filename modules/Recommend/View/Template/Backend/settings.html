@@ -1,69 +1,68 @@
 <form method="POST" action="?cmd=Recommend&amp;act=saveSettings">
 <table class="adminlist" cellspacing="0" style="width:100%;">
 <tr>
-	<th width="100%" colspan="2">{TXT_TITLE}</th>
+  <th width="100%" colspan="2">{TXT_TITLE}</th>
 </tr>
 <tr class="row1">
-	<td style="width: 15%; padding-top: 5px;" valign="top">{TXT_AVAILABLE_VARS}</td>
-	<td style="width: 85%; padding-bottom: 5px; padding-top: 5px;">
-		<table cellpadding="0" cellspacing="0" style="width: 40%">
-		<tr>
-			<td style="width: 30%"><span style="font-family:monospace">&lt;SALUTATION&gt;</span></td>
-			<td style="width: 70%">{TXT_SALUTATION}</td>
-		</tr>	
-		<tr>
-			<td style="width: 30%"><span style="font-family:monospace">&lt;SENDER_NAME&gt;</span></td>
-			<td style="width: 70%">{TXT_SENDERNAME}</td>
-		</tr>
-		<tr>
-			<td><span style="font-family:monospace">&lt;SENDER_MAIL&gt;</span></td>
-			<td>{TXT_SENDERMAIL}</td>
-		</tr>
-		<tr>
-			<td><span style="font-family:monospace">&lt;RECEIVER_NAME&gt;</span></td>
-			<td>{TXT_RECEIVERNAME}</td>
-		</tr>
-		<tr>
-			<td><span style="font-family:monospace">&lt;RECEIVER_MAIL&gt;</span></td>
-			<td>{TXT_RECEIVERMAIL}</td>
-		</tr>
-		<tr>
-			<td><span style="font-family:monospace">&lt;URL&gt;</span></td>
-			<td>{TXT_URL}</td>
-		</tr>
-		<tr>
-			<td><span style="font-family:monospace">&lt;COMMENT&gt;</span></td>	
-			<td>{TXT_COMMENT}</td>
-		</tr>
-		</table>
-	</td>
+  <td style="width: 15%; padding-top: 5px;" valign="top">{TXT_AVAILABLE_VARS}</td>
+  <td style="width: 85%; padding-bottom: 5px; padding-top: 5px;">
+    <table cellpadding="0" cellspacing="0" style="width: 40%">
+    <tr>
+      <td style="width: 30%"><span style="font-family:monospace">&lt;SALUTATION&gt;</span></td>
+      <td style="width: 70%">{TXT_SALUTATION}</td>
+    </tr>
+    <tr>
+      <td style="width: 30%"><span style="font-family:monospace">&lt;SENDER_NAME&gt;</span></td>
+      <td style="width: 70%">{TXT_SENDERNAME}</td>
+    </tr>
+    <tr>
+      <td><span style="font-family:monospace">&lt;SENDER_MAIL&gt;</span></td>
+      <td>{TXT_SENDERMAIL}</td>
+    </tr>
+    <tr>
+      <td><span style="font-family:monospace">&lt;RECEIVER_NAME&gt;</span></td>
+      <td>{TXT_RECEIVERNAME}</td>
+    </tr>
+    <tr>
+      <td><span style="font-family:monospace">&lt;RECEIVER_MAIL&gt;</span></td>
+      <td>{TXT_RECEIVERMAIL}</td>
+    </tr>
+    <tr>
+      <td><span style="font-family:monospace">&lt;URL&gt;</span></td>
+      <td>{TXT_URL}</td>
+    </tr>
+    <tr>
+      <td><span style="font-family:monospace">&lt;COMMENT&gt;</span></td>
+      <td>{TXT_COMMENT}</td>
+    </tr>
+    </table>
+  </td>
 </tr>
 <tr class="row2">
-	<td>{TXT_SALUTATION_FEMALE}</td>
-	<td style="padding-top: 5px; padding-bottom: 5px;">
-		<input name="salutation_female" maxlength="40" value="{SETTINGS_SALUTATION_FEMALE}" style="font-family: monospace; width: 40%" />
-	</td>
+  <td>{TXT_SALUTATION_FEMALE}</td>
+  <td style="padding-top: 5px; padding-bottom: 5px;">
+    <input name="salutation_female" maxlength="40" value="{SETTINGS_SALUTATION_FEMALE}" style="font-family: monospace; width: 40%" />
+  </td>
 </tr>
 <tr class="row1">
-	<td>{TXT_SALUTATION_MALE}</td>
-	<td style="padding-top: 5px; padding-bottom: 5px;">
-		<input name="salutation_male" maxlength="40" value="{SETTINGS_SALUTATION_MALE}" style="font-family: monospace; width: 40%" />
-	</td>
+  <td>{TXT_SALUTATION_MALE}</td>
+  <td style="padding-top: 5px; padding-bottom: 5px;">
+    <input name="salutation_male" maxlength="40" value="{SETTINGS_SALUTATION_MALE}" style="font-family: monospace; width: 40%" />
+  </td>
 </tr>
 <tr class="row2" style="padding-bottom: 10px;">
-	<td>{TXT_SUBJECT}</td>
-	<td style="padding-top: 5px; padding-bottom: 5px;">
-		<input name="subject" size="45" maxlength="100" value="{SETTINGS_SUBJECT}" style="font-family: monospace; width: 40%" />
-	</td>
+  <td>{TXT_SUBJECT}</td>
+  <td style="padding-top: 5px; padding-bottom: 5px;">
+    <input name="subject" size="45" maxlength="100" value="{SETTINGS_SUBJECT}" style="font-family: monospace; width: 40%" />
+  </td>
 </tr>
 <tr class="row1">
-	<td valign="top">{TXT_BODY}</td>
-	<td style="padding-top: 5px; padding-bottom: 5px;">
-		<textarea name="body" cols="45" rows="15" style="font-family: monospace; width: 40%">{SETTINGS_BODY}</textarea>
-	</td>
+  <td valign="top">{TXT_BODY}</td>
+  <td style="padding-top: 5px; padding-bottom: 5px;">
+    <textarea name="body" cols="45" rows="15" style="font-family: monospace; width: 40%">{SETTINGS_BODY}</textarea>
+  </td>
 </tr>
 </table>
 <br />
 <input type="submit" value="{TXT_SUBMIT}" name="submit" />
-		</form>
-
+    </form>

@@ -29,7 +29,7 @@
 
     function downloadsSelectAll()
     {
-    	downloadsSelectAllOptions(document.getElementById('downloads_category_read_associated_groups'))
+      downloadsSelectAllOptions(document.getElementById('downloads_category_read_associated_groups'))
         downloadsSelectAllOptions(document.getElementById('downloads_category_add_subcategories_associated_groups'))
         downloadsSelectAllOptions(document.getElementById('downloads_category_manage_subcategories_associated_groups'))
         downloadsSelectAllOptions(document.getElementById('downloads_category_add_files_associated_groups'))
@@ -80,7 +80,7 @@
             }
         }
     }
-    
+
 
     var downloadsPermissionDependencies = {
         'read':{
@@ -106,7 +106,7 @@
         'add_files':['manage_files'],
         'manage_files':[]
     }
-        
+
     function downloadsAdjustAccessConfig(trigger)
     {
         downloadsResolvePermissionDependencies(downloadsPermissionDependencies, null, false, trigger);
@@ -149,10 +149,10 @@
         elTriggerGroupContainer             = document.getElementById('downloads_category_'+trigger+masterContainerType);
         elSyncAssociatedGroupsContainer     = document.getElementById('downloads_category_'+sync+masterContainerType);
         elSyncNotAssociatedGroupsContainer  = document.getElementById('downloads_category_'+sync+slaveContainerType);
-        
+
         aSyncAssociatedGroups = new Array();
         aSyncedGroups = new Array();
-        
+
         for (var i=0; i<elSyncAssociatedGroupsContainer.options.length; i++) {
             aSyncAssociatedGroups[elSyncAssociatedGroupsContainer.options[i].value] = i;
         }
@@ -176,7 +176,7 @@
 
     function mbCallback(data)
     {
-        if (data.type === "file" && data.data[0]) {            
+        if (data.type === "file" && data.data[0]) {
             var url = data.data[0].datainfo.filepath;
             var thumbImage = data.data[0].datainfo.thumbnail[150];
             $J.ajax({
@@ -187,7 +187,7 @@
                 }
             });
             document.getElementById('downloads_category_image').value = url;
-            document.getElementById('downloads_category_image_remove_button').style.display = '';            
+            document.getElementById('downloads_category_image_remove_button').style.display = '';
             //document.getElementById('downloads_category_image_preview').src = thumb_url;
             //document.getElementById('downloads_category_image_preview').style.width = thumb_width;
             //document.getElementById('downloads_category_image_preview').style.height = thumb_height;
@@ -488,7 +488,7 @@
     </div>
 <!-- end div downloadsPermissionCategoryMenu_manageSubcategoriesTab -->
 <br />
-                
+
 <ul id="tabmenu">
     <li><a id="downloadsPermissionFilesMenu_addFilesTab" class="active" href="javascript:void(0)" onclick="selectTab('addFilesTab')" title="{TXT_DOWNLOADS_ADD}">{TXT_DOWNLOADS_ADD}</a></li>
     <li><a id="downloadsPermissionFilesMenu_manageFilesTab" href="javascript:void(0)" onclick="selectTab('manageFilesTab')" title="{TXT_DOWNLOADS_MANAGE}">{TXT_DOWNLOADS_MANAGE}</a></li>

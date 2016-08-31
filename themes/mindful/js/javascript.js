@@ -30,7 +30,7 @@ function isotopeAnimationEngine(){
 //////////////////////////////
 // Responsive Nav
 /////////////////////////////
-jQuery(function(){    
+jQuery(function(){
     var $responsive_nav = jQuery("<select />");
     jQuery("<option />", {
         "selected": "selected",

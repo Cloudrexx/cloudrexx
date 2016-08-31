@@ -46,10 +46,10 @@ use \Cx\Core\Json\JsonAdapter;
 class JsonCrm implements JsonAdapter {
     /**
      * List of messages
-     * @var Array 
+     * @var Array
      */
     private $messages = array();
-    
+
     /**
      * Returns the internal name used as identifier for this adapter
      * @return String Name of this adapter
@@ -57,7 +57,7 @@ class JsonCrm implements JsonAdapter {
     public function getName() {
         return 'Crm';
     }
-    
+
     /**
      * Returns an array of method names accessable from a JSON request
      * @return array List of method names
@@ -81,7 +81,7 @@ class JsonCrm implements JsonAdapter {
     public function getDefaultPermissions() {
         return null;
     }
-    
+
     /**
      * get customer search result
      *
@@ -90,7 +90,7 @@ class JsonCrm implements JsonAdapter {
      * @return json result
      */
     public function searchContacts()
-    { 
+    {
         global $objDatabase;
 
         $searchFields = array(
@@ -109,10 +109,10 @@ class JsonCrm implements JsonAdapter {
             'sorto'               => $_REQUEST['sorto'],
             'sortf'               => $_REQUEST['sortf'],
         );
-        
+
         $objCrmLibrary = new CrmLibrary($this->getName());
         $query         = $objCrmLibrary->getContactsQuery($searchFields);
-        
+
         $objResult     = $objDatabase->Execute($query);
 
         $result = array();
@@ -131,7 +131,7 @@ class JsonCrm implements JsonAdapter {
                 $objResult->MoveNext();
             }
         }
-        
+
         return $result;
     }
-}    
+}

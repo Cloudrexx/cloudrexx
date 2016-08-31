@@ -81,10 +81,10 @@
 galleryWidth = {GALLERY_WINDOW_WIDTH};
 galleryHeight = {GALLERY_WINDOW_HEIGHT}+60;
 if(galleryWidth > screen.width){
-	galleryWidth = screen.width-10;
+  galleryWidth = screen.width-10;
 }
 if(galleryHeight > screen.height){
-	galleryHeight = screen.height-10;
+  galleryHeight = screen.height-10;
 }
 window.resizeTo(galleryWidth,galleryHeight);
 window.moveTo(0,0);
@@ -93,43 +93,43 @@ window.moveTo(0,0);
 </script>
 <style type="text/css">
 <!--
-body	{background-color: #000000; margin:0px;padding:0px;font-family: Arial, Helvetica, sans-serif; font-size: 11px; color: #000000;}
-td	{font-size: 11px;}
-select	{width: 160px;}
+body  {background-color: #000000; margin:0px;padding:0px;font-family: Arial, Helvetica, sans-serif; font-size: 11px; color: #000000;}
+td  {font-size: 11px;}
+select  {width: 160px;}
 #commentTable {
-	font-size: 11px;
-	font-family: Arial;
-	font-color: #000000;
-	border: 1px solid #444444;
-	margin-top:0px;
-	margin-bottom:0px;
-	margin-left: 0px;
-	margin-right: 0px;
+  font-size: 11px;
+  font-family: Arial;
+  font-color: #000000;
+  border: 1px solid #444444;
+  margin-top:0px;
+  margin-bottom:0px;
+  margin-left: 0px;
+  margin-right: 0px;
 }
 #commentTable th {
-	font-family: Arial;
-	font-size: 12px;
-	background-color:#999999;
+  font-family: Arial;
+  font-size: 12px;
+  background-color:#999999;
 }
 #commentTable th a {
-	color: #000000;
-	text-decoration:none;
+  color: #000000;
+  text-decoration:none;
 }
 #commentTable th a:hover {
-	color: #FFFFFF;
-	text-decoration:none;
+  color: #FFFFFF;
+  text-decoration:none;
 }
 #commentTable td {
-	font-family: Arial;
-	font-size: 11px;
+  font-family: Arial;
+  font-size: 11px;
 }
 #commentTable input, #commentTable textarea {
-	font-family: Arial;
-	font-size: 11px;
-	border: 1px solid #444444;
-	background-color:#FFFFFF;
-	margin: 1px;
-	padding: 1px;
+  font-family: Arial;
+  font-size: 11px;
+  border: 1px solid #444444;
+  background-color:#FFFFFF;
+  margin: 1px;
+  padding: 1px;
 }
 #commentTable .row1 { background-color: #E9E9E9; border-top: 1px solid #444444;}
 #commentTable .row2 { background-color: #D9D9D9; border-top: 1px solid #444444;}
@@ -138,149 +138,149 @@ select	{width: 160px;}
 </head>
 <body>
 <table border="0" cellpadding="0" cellspacing="0" width="100%" style="height: 100%;">
-	<tr>
-		<td bgcolor="#000000">
-			<table width="100%" style="height: 30px;" border="0" cellpadding="0" cellspacing="1">
-				<tr style="vertical-align:middle;" bgcolor="#999999">
-					<td nowrap="nowrap"><a href="javascript:{}" onclick="window.close()" title="{TXT_CLOSE_WINDOW}"><img src="modules/Gallery/View/Media/close.gif" style="margin-left:10px;margin-right:10px;width:18px;height:18px;" alt="{TXT_CLOSE_WINDOW}" border="0" /></a></td>
-					<td nowrap="nowrap">
-						<table>
-							<tr>
-								<td><a href="javascript:{}" onmousedown="controlZoom(-1)" onmouseout="controlZoom(0)" onmouseup="controlZoom(0)" title="{TXT_ZOOM_OUT}"><img src="modules/Gallery/View/Media/zoom_out.gif" alt="{TXT_ZOOM_OUT}" style="margin-left:10px;margin-right:5px;width:18px;height:18px;" border="0" /></a><a href="javascript:{}" onmousedown="controlZoom(1)" onmouseout="controlZoom(0)" onmouseup="controlZoom(0)" title="{TXT_ZOOM_IN}"><img src="modules/Gallery/View/Media/zoom_in.gif" alt="{TXT_ZOOM_IN}" style="margin-left:5px;margin-right:5px;width:18px;height:18px;" border="0" /></a></td>
-								<td><select id="zoomBox" style="margin-left:5px;margin-right:10px;margin-top:0px;margin-bottom:0px;" onchange="zoomTo(this.value)"><option value="100">{TXT_USER_DEFINED}(100%)</option><option value="25">25%</option><option value="50">50%</option><option value="75">75%</option><option value="100" selected="selected">100%</option><option value="200">200%</option></select></td>
-							</tr>
-						</table>
-					</td>
-					<td nowrap="nowrap"><a href="javascript:{}" onclick="setBg('#000000')" title="{TXT_CHANGE_BG_COLOR}"><img src="modules/Gallery/View/Media/black.gif" border="0" style="margin-left:10px;width:18px;height:18px;" alt="{TXT_CHANGE_BG_COLOR}" /></a><a href="javascript:{}" onclick="setBg('#ffffff')" title="{TXT_CHANGE_BG_COLOR}"><img src="modules/Gallery/View/Media/white.gif" border="0" style="margin-right:10px;width:18px;height:18px;" alt="{TXT_CHANGE_BG_COLOR}" /></a></td>
-					<td nowrap="nowrap"><a href="javascript:{}" onclick="printImage()" title="{TXT_PRINT}"><img src="modules/Gallery/View/Media/print.gif" style="margin-left:10px;margin-right:10px;width:18px;height:18px;" alt="{TXT_PRINT}" border="0" /></a></td>
-					<td nowrap="nowrap"><a href="{IMAGE_PREVIOUS}" title="{TXT_PREVIOUS_IMAGE}"><img src="modules/Gallery/View/Media/previous.gif" style="margin-left:10px;margin-right:5px;width:18px;height:18px;" border="0" alt="{TXT_PREVIOUS_IMAGE}" /></a><a href="{IMAGE_NEXT}" title="{TXT_NEXT_IMAGE}"><img src="modules/Gallery/View/Media/next.gif" style="margin-left:5px;margin-right:10px;width:18px;height:18px;" border="0" alt="{TXT_NEXT_IMAGE}" /></a></td>
-					<td width="100%">&nbsp;</td>
-				</tr>
-		  </table>
-		</td>
-	<!-- BEGIN votingTab -->
-	<tr>
-		<td>
-			<div style="width:100%;">
-				<table id="commentTable" width="100%" cellpadding="0" cellspacing="0">
-					<tr>
-						<th align="left" style="height: 30px;" >&nbsp;<a href="javascript:showOrHide('votingDiv');">{TXT_VOTING_TITLE}</a></th>
-				  	</tr>
-					<tr>
-						<td>
-							<div id="votingDiv" style="width:100%;display:none;">
-								<table width="100%" cellpadding="1" cellspacing="0">
-									<tr>
-										<td align="center" class="row1">
-											<!-- BEGIN showVotingBar --><a href="{CONTREXX_DIRECTORY_INDEX}?section=Gallery&amp;cid={VOTING_BAR_CID}&amp;pId={VOTING_BAR_PICID}&amp;mark={VOTING_BAR_MARK}" title="{VOTING_BAR_ALT}"><img src="{VOTING_BAR_SRC}" alt="{VOTING_BAR_ALT}" align="baseline" border="0" style="margin-left:1px; margin-top:3px;" /></a><!-- END showVotingBar -->
-											{TXT_VOTING_ALREADY_VOTED}&nbsp;<b>{VOTING_ALREADY_VOTED_MARK}&nbsp;</b>
-										</td>
-									</tr>
-									<tr>
-										<td align="center" class="row2">
-										{TXT_VOTING_STATS_ACTUAL}:&nbsp;&Oslash;&nbsp;<b>{VOTING_STATS_MARK}</b>&nbsp;{TXT_VOTING_STATS_WITH}&nbsp;<b>{VOTING_STATS_VOTES}</b>&nbsp;{TXT_VOTING_STATS_VOTES}
-										</td>
-									</tr>
-								</table>
-							</div>
-						</td>
-					</tr>
-			  </table>
-			</div>
-		</td>
-	</tr>
-	<!-- END votingTab -->
-	<!-- BEGIN commentTab -->
-	<tr>
-		<td align="center">
-			<table id="commentTable" width="100%" cellpadding="0" cellspacing="0">
-				<tr>
-					<th align="left" style="height: 30px;" >&nbsp;<a href="javascript:showOrHide('commentDiv');">{TXT_COMMENTS_TITLE}</a></th>
-				</tr>
-			</table>
-			<div id="commentDiv" style="width:100%;display:none;">
-				<table id="commentTable" width="100%" cellpadding="0" cellspacing="0">
-					<tr>
-						<td>
-							<table width="100%" cellpadding="1" cellspacing="0">
-								<!-- BEGIN showComments -->
-								<tr>
-									<td nowrap="nowrap" align="left" valign="top" width="15%" class="row{COMMENTS_ROWCLASS}">
-										<b>{COMMENTS_NAME}</b>
-										<br />
-										<i>{COMMENTS_DATE}</i>
-										<br />
-										{COMMENTS_WWW}{COMMENTS_EMAIL}
-									</td>
-									<td align="justify" valign="top" width="85%" class="row{COMMENTS_ROWCLASS}">{COMMENTS_TEXT}</td>
-								</tr>
-								<!-- END showComments -->
-							</table>
-						</td>
-					</tr>
-					<tr>
-						<th align="left" style="height: 30px;" >{TXT_COMMENTS_ADD_TITLE}</th>
-					</tr>
-					<tr>
-						<td>
-							<form method="post" name="frmGalComAdd" action="{CONTREXX_DIRECTORY_INDEX}?section=Gallery&amp;pId={GALLERY_PICTURE_ID}">
-							<input type="hidden" name="frmGalComAdd_PicId" value="{GALLERY_PICTURE_ID}" />
-							<input type="hidden" name="frmGalComAdd_GalId" value="{GALLERY_CATEGORY_ID}" />
-							<table width="100%" cellpadding="1" cellspacing="0">
-								<tr>
-									<td nowrap="nowrap" align="left" width="15%" class="row1">
-										<b>{TXT_COMMENTS_ADD_NAME}:</b>
-									</td>
-									<td align="left" width="85%" class="row1">
-										<input type="text" name="frmGalComAdd_Name" style="width:400px;" />
-									</td>
-								</tr>
-								<tr>
-									<td nowrap="nowrap" align="left" class="row2">
-										<b>{TXT_COMMENTS_ADD_EMAIL}:</b>
-									</td>
-									<td align="left" class="row2">
-										<input type="text" name="frmGalComAdd_Email" style="width:400px;" />
-									</td>
-								</tr>
-								<tr>
-									<td nowrap="nowrap" align="left" class="row1">
-										<b>{TXT_COMMENTS_ADD_HOMEPAGE}:</b>
-									</td>
-									<td align="left" class="row1">
-										<input type="text" name="frmGalComAdd_Homepage" value="http://" style="width:400px;" />
-									</td>
-								</tr>
-								<tr>
-									<td nowrap="nowrap" align="left" valign="top" class="row2">
-										<b>{TXT_COMMENTS_ADD_TEXT}:</b>
-									</td>
-									<td align="left" class="row2">
-										<textarea name="frmGalComAdd_Text" style="width:400px; height:80px;"></textarea>
-									</td>
-								</tr>
-								<tr>
-									<td class="row1">&nbsp;</td>
-									<td class="row1"><div align="left"><input type="submit" name="frmGalComAdd_Submit" value="{TXT_COMMENTS_ADD_SUBMIT}" /></div></td>
-								</tr>
-							</table>
-							</form>
-						</td>
-					</tr>
-				</table>
-			</div>
-		</td>
-	</tr>
-	<!-- END commentTab -->
-	<tr>
-		<td id="galleryBox" align="center" style="height: 100%;vertical-align: middle;">
-			<div id="gallery" style="width:100%;height:100%;">
-				<img id="image" src="{IMAGE_THIS}" alt="" style="width:{IMAGE_WIDTH}px;height:{IMAGE_HEIGHT}px; margin-top:2px;" border="0" /><br />
-				<font id="imageDesc" style="color:#ffffff;">{IMAGE_DESC}</font>
-				<a href="{IMAGE_LINK}" id="imageLink" style="color:#ffffff;text-decoration:none;font-size: 10px">{IMAGE_LINK}</a>
-			</div>
-		</td>
-	</tr>
+  <tr>
+    <td bgcolor="#000000">
+      <table width="100%" style="height: 30px;" border="0" cellpadding="0" cellspacing="1">
+        <tr style="vertical-align:middle;" bgcolor="#999999">
+          <td nowrap="nowrap"><a href="javascript:{}" onclick="window.close()" title="{TXT_CLOSE_WINDOW}"><img src="modules/Gallery/View/Media/close.gif" style="margin-left:10px;margin-right:10px;width:18px;height:18px;" alt="{TXT_CLOSE_WINDOW}" border="0" /></a></td>
+          <td nowrap="nowrap">
+            <table>
+              <tr>
+                <td><a href="javascript:{}" onmousedown="controlZoom(-1)" onmouseout="controlZoom(0)" onmouseup="controlZoom(0)" title="{TXT_ZOOM_OUT}"><img src="modules/Gallery/View/Media/zoom_out.gif" alt="{TXT_ZOOM_OUT}" style="margin-left:10px;margin-right:5px;width:18px;height:18px;" border="0" /></a><a href="javascript:{}" onmousedown="controlZoom(1)" onmouseout="controlZoom(0)" onmouseup="controlZoom(0)" title="{TXT_ZOOM_IN}"><img src="modules/Gallery/View/Media/zoom_in.gif" alt="{TXT_ZOOM_IN}" style="margin-left:5px;margin-right:5px;width:18px;height:18px;" border="0" /></a></td>
+                <td><select id="zoomBox" style="margin-left:5px;margin-right:10px;margin-top:0px;margin-bottom:0px;" onchange="zoomTo(this.value)"><option value="100">{TXT_USER_DEFINED}(100%)</option><option value="25">25%</option><option value="50">50%</option><option value="75">75%</option><option value="100" selected="selected">100%</option><option value="200">200%</option></select></td>
+              </tr>
+            </table>
+          </td>
+          <td nowrap="nowrap"><a href="javascript:{}" onclick="setBg('#000000')" title="{TXT_CHANGE_BG_COLOR}"><img src="modules/Gallery/View/Media/black.gif" border="0" style="margin-left:10px;width:18px;height:18px;" alt="{TXT_CHANGE_BG_COLOR}" /></a><a href="javascript:{}" onclick="setBg('#ffffff')" title="{TXT_CHANGE_BG_COLOR}"><img src="modules/Gallery/View/Media/white.gif" border="0" style="margin-right:10px;width:18px;height:18px;" alt="{TXT_CHANGE_BG_COLOR}" /></a></td>
+          <td nowrap="nowrap"><a href="javascript:{}" onclick="printImage()" title="{TXT_PRINT}"><img src="modules/Gallery/View/Media/print.gif" style="margin-left:10px;margin-right:10px;width:18px;height:18px;" alt="{TXT_PRINT}" border="0" /></a></td>
+          <td nowrap="nowrap"><a href="{IMAGE_PREVIOUS}" title="{TXT_PREVIOUS_IMAGE}"><img src="modules/Gallery/View/Media/previous.gif" style="margin-left:10px;margin-right:5px;width:18px;height:18px;" border="0" alt="{TXT_PREVIOUS_IMAGE}" /></a><a href="{IMAGE_NEXT}" title="{TXT_NEXT_IMAGE}"><img src="modules/Gallery/View/Media/next.gif" style="margin-left:5px;margin-right:10px;width:18px;height:18px;" border="0" alt="{TXT_NEXT_IMAGE}" /></a></td>
+          <td width="100%">&nbsp;</td>
+        </tr>
+      </table>
+    </td>
+  <!-- BEGIN votingTab -->
+  <tr>
+    <td>
+      <div style="width:100%;">
+        <table id="commentTable" width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <th align="left" style="height: 30px;" >&nbsp;<a href="javascript:showOrHide('votingDiv');">{TXT_VOTING_TITLE}</a></th>
+            </tr>
+          <tr>
+            <td>
+              <div id="votingDiv" style="width:100%;display:none;">
+                <table width="100%" cellpadding="1" cellspacing="0">
+                  <tr>
+                    <td align="center" class="row1">
+                      <!-- BEGIN showVotingBar --><a href="{CONTREXX_DIRECTORY_INDEX}?section=Gallery&amp;cid={VOTING_BAR_CID}&amp;pId={VOTING_BAR_PICID}&amp;mark={VOTING_BAR_MARK}" title="{VOTING_BAR_ALT}"><img src="{VOTING_BAR_SRC}" alt="{VOTING_BAR_ALT}" align="baseline" border="0" style="margin-left:1px; margin-top:3px;" /></a><!-- END showVotingBar -->
+                      {TXT_VOTING_ALREADY_VOTED}&nbsp;<b>{VOTING_ALREADY_VOTED_MARK}&nbsp;</b>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td align="center" class="row2">
+                    {TXT_VOTING_STATS_ACTUAL}:&nbsp;&Oslash;&nbsp;<b>{VOTING_STATS_MARK}</b>&nbsp;{TXT_VOTING_STATS_WITH}&nbsp;<b>{VOTING_STATS_VOTES}</b>&nbsp;{TXT_VOTING_STATS_VOTES}
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </td>
+  </tr>
+  <!-- END votingTab -->
+  <!-- BEGIN commentTab -->
+  <tr>
+    <td align="center">
+      <table id="commentTable" width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <th align="left" style="height: 30px;" >&nbsp;<a href="javascript:showOrHide('commentDiv');">{TXT_COMMENTS_TITLE}</a></th>
+        </tr>
+      </table>
+      <div id="commentDiv" style="width:100%;display:none;">
+        <table id="commentTable" width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td>
+              <table width="100%" cellpadding="1" cellspacing="0">
+                <!-- BEGIN showComments -->
+                <tr>
+                  <td nowrap="nowrap" align="left" valign="top" width="15%" class="row{COMMENTS_ROWCLASS}">
+                    <b>{COMMENTS_NAME}</b>
+                    <br />
+                    <i>{COMMENTS_DATE}</i>
+                    <br />
+                    {COMMENTS_WWW}{COMMENTS_EMAIL}
+                  </td>
+                  <td align="justify" valign="top" width="85%" class="row{COMMENTS_ROWCLASS}">{COMMENTS_TEXT}</td>
+                </tr>
+                <!-- END showComments -->
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <th align="left" style="height: 30px;" >{TXT_COMMENTS_ADD_TITLE}</th>
+          </tr>
+          <tr>
+            <td>
+              <form method="post" name="frmGalComAdd" action="{CONTREXX_DIRECTORY_INDEX}?section=Gallery&amp;pId={GALLERY_PICTURE_ID}">
+              <input type="hidden" name="frmGalComAdd_PicId" value="{GALLERY_PICTURE_ID}" />
+              <input type="hidden" name="frmGalComAdd_GalId" value="{GALLERY_CATEGORY_ID}" />
+              <table width="100%" cellpadding="1" cellspacing="0">
+                <tr>
+                  <td nowrap="nowrap" align="left" width="15%" class="row1">
+                    <b>{TXT_COMMENTS_ADD_NAME}:</b>
+                  </td>
+                  <td align="left" width="85%" class="row1">
+                    <input type="text" name="frmGalComAdd_Name" style="width:400px;" />
+                  </td>
+                </tr>
+                <tr>
+                  <td nowrap="nowrap" align="left" class="row2">
+                    <b>{TXT_COMMENTS_ADD_EMAIL}:</b>
+                  </td>
+                  <td align="left" class="row2">
+                    <input type="text" name="frmGalComAdd_Email" style="width:400px;" />
+                  </td>
+                </tr>
+                <tr>
+                  <td nowrap="nowrap" align="left" class="row1">
+                    <b>{TXT_COMMENTS_ADD_HOMEPAGE}:</b>
+                  </td>
+                  <td align="left" class="row1">
+                    <input type="text" name="frmGalComAdd_Homepage" value="http://" style="width:400px;" />
+                  </td>
+                </tr>
+                <tr>
+                  <td nowrap="nowrap" align="left" valign="top" class="row2">
+                    <b>{TXT_COMMENTS_ADD_TEXT}:</b>
+                  </td>
+                  <td align="left" class="row2">
+                    <textarea name="frmGalComAdd_Text" style="width:400px; height:80px;"></textarea>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="row1">&nbsp;</td>
+                  <td class="row1"><div align="left"><input type="submit" name="frmGalComAdd_Submit" value="{TXT_COMMENTS_ADD_SUBMIT}" /></div></td>
+                </tr>
+              </table>
+              </form>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </td>
+  </tr>
+  <!-- END commentTab -->
+  <tr>
+    <td id="galleryBox" align="center" style="height: 100%;vertical-align: middle;">
+      <div id="gallery" style="width:100%;height:100%;">
+        <img id="image" src="{IMAGE_THIS}" alt="" style="width:{IMAGE_WIDTH}px;height:{IMAGE_HEIGHT}px; margin-top:2px;" border="0" /><br />
+        <font id="imageDesc" style="color:#ffffff;">{IMAGE_DESC}</font>
+        <a href="{IMAGE_LINK}" id="imageLink" style="color:#ffffff;text-decoration:none;font-size: 10px">{IMAGE_LINK}</a>
+      </div>
+    </td>
+  </tr>
 </table>
 <script language="javascript" type="text/javascript">
 <!--
@@ -298,139 +298,139 @@ intZoom = 1;
 
 // set the size of the picture layer and the zoom factor for the image
 if(imgWidthOriginal > galleryWidth){
-	imgFactorWidth = 1 / imgWidthOriginal * (galleryWidth-20);
+  imgFactorWidth = 1 / imgWidthOriginal * (galleryWidth-20);
 }
 if(imgHeightOriginal > galleryHeight){
-	imgFactorHeight = 1 / imgHeightOriginal * (galleryHeight-120);
+  imgFactorHeight = 1 / imgHeightOriginal * (galleryHeight-120);
 }
 
 // check if the image have to be zoom
 if(typeof(imgFactorWidth) != 'undefined'){
-	if(typeof(imgFactorHeight) != 'undefined'){
-		if(imgFactorWidth < imgFactorHeight){
-			imgFactor = imgFactorWidth;
-		}else {
-			imgFactor = imgFactorHeight;
-		}
-	} else {
-		imgFactor = imgFactorWidth;
-	}
+  if(typeof(imgFactorHeight) != 'undefined'){
+    if(imgFactorWidth < imgFactorHeight){
+      imgFactor = imgFactorWidth;
+    }else {
+      imgFactor = imgFactorHeight;
+    }
+  } else {
+    imgFactor = imgFactorWidth;
+  }
 } else {
-	if(typeof(imgFactorHeight) != 'undefined'){
-		imgFactor = imgFactorHeight;
-	} else {
-		imgFactor = 1;
-	}
+  if(typeof(imgFactorHeight) != 'undefined'){
+    imgFactor = imgFactorHeight;
+  } else {
+    imgFactor = 1;
+  }
 }
 
 // zoom the image if necessary
 if(imgFactor != 1){
-	document.getElementById('zoomBox').options[0].text = "{TXT_USER_DEFINED}("+parseInt(imgFactor*100)+" %)";
-	document.getElementById('zoomBox').options[0].value = parseInt(imgFactor*100);
-	document.getElementById('zoomBox').selectedIndex = 0;
-	document.getElementById('image').style.width = imgWidthOriginal * imgFactor + "px";
-	document.getElementById('image').style.height = imgHeightOriginal * imgFactor + "px";
-	intZoom = imgFactor;
+  document.getElementById('zoomBox').options[0].text = "{TXT_USER_DEFINED}("+parseInt(imgFactor*100)+" %)";
+  document.getElementById('zoomBox').options[0].value = parseInt(imgFactor*100);
+  document.getElementById('zoomBox').selectedIndex = 0;
+  document.getElementById('image').style.width = imgWidthOriginal * imgFactor + "px";
+  document.getElementById('image').style.height = imgHeightOriginal * imgFactor + "px";
+  intZoom = imgFactor;
 }
 
 // controls the zoom function
 function controlZoom(step){
-	if(step == 0){
-		// stop zoom
-		doZoom = false;
-	} else {
-		// start zoom if it isn't already started
-		if(doZoom != true){
-			doZoom = true;
-			zoom(step);
-		}
-	}
+  if(step == 0){
+    // stop zoom
+    doZoom = false;
+  } else {
+    // start zoom if it isn't already started
+    if(doZoom != true){
+      doZoom = true;
+      zoom(step);
+    }
+  }
 }
 
 // zoom in/out the image
 function zoom(factor){
-	if(doZoom == true){
-		// set zoom factor
-		intZoom += factor / 100;
-		if (intZoom <= 0) {
-			//intZoom -= factor / 100;
-			intZoom = 0;
-			doZoom = false;
-		}
+  if(doZoom == true){
+    // set zoom factor
+    intZoom += factor / 100;
+    if (intZoom <= 0) {
+      //intZoom -= factor / 100;
+      intZoom = 0;
+      doZoom = false;
+    }
 
-		// set image size
-		imgWidth = imgWidthOriginal * intZoom;
-		imgHeight = imgHeightOriginal * intZoom;
+    // set image size
+    imgWidth = imgWidthOriginal * intZoom;
+    imgHeight = imgHeightOriginal * intZoom;
 
-		// set new image size
-		document.getElementById('image').style.width = imgWidth + "px";
-		document.getElementById('image').style.height = imgHeight + "px";
+    // set new image size
+    document.getElementById('image').style.width = imgWidth + "px";
+    document.getElementById('image').style.height = imgHeight + "px";
 
-		// set value in select box
-		//intSize = parseInt(100 / imgWidthOriginal * (imgWidth));
-		intSize = parseInt(intZoom * 100);
-		document.getElementById('zoomBox').options[0].text = "{TXT_USER_DEFINED}("+intSize+" %)";
-		document.getElementById('zoomBox').options[0].value = intSize;
-		document.getElementById('zoomBox').selectedIndex = 1;
-		document.getElementById('zoomBox').selectedIndex = 0;
+    // set value in select box
+    //intSize = parseInt(100 / imgWidthOriginal * (imgWidth));
+    intSize = parseInt(intZoom * 100);
+    document.getElementById('zoomBox').options[0].text = "{TXT_USER_DEFINED}("+intSize+" %)";
+    document.getElementById('zoomBox').options[0].value = intSize;
+    document.getElementById('zoomBox').selectedIndex = 1;
+    document.getElementById('zoomBox').selectedIndex = 0;
 
-		// fit image box
-		if (window.innerHeight) {
-			document.getElementById('galleryBox').style.height = (window.innerHeight - 30) + "px";
-		}
+    // fit image box
+    if (window.innerHeight) {
+      document.getElementById('galleryBox').style.height = (window.innerHeight - 30) + "px";
+    }
 
-		// set timer to recall this function in 500 miliseconds
-		active.push(window.setTimeout("zoom("+factor+")",10));
-	} else {
-		// stop timer
-		if(active.length != 0){
-			for(i=0;i<active.length;i++){
-				window.clearTimeout(active[i]);
-			}
-		}
-	}
+    // set timer to recall this function in 500 miliseconds
+    active.push(window.setTimeout("zoom("+factor+")",10));
+  } else {
+    // stop timer
+    if(active.length != 0){
+      for(i=0;i<active.length;i++){
+        window.clearTimeout(active[i]);
+      }
+    }
+  }
 }
 
 //Zoom the image to a specified size relative to its original size
 function zoomTo(size){
-	// set zoom factor
-	intZoom = size / 100;
+  // set zoom factor
+  intZoom = size / 100;
 
-	// fit image box
-	if (window.innerHeight) {
-		document.getElementById('galleryBox').style.height = (window.innerHeight - 30) + "px";
-	}
+  // fit image box
+  if (window.innerHeight) {
+    document.getElementById('galleryBox').style.height = (window.innerHeight - 30) + "px";
+  }
 
-	// set new image size
-	document.getElementById('image').style.width = imgWidthOriginal * (intZoom) + "px";
-	document.getElementById('image').style.height = imgHeightOriginal * (intZoom) + "px";
+  // set new image size
+  document.getElementById('image').style.width = imgWidthOriginal * (intZoom) + "px";
+  document.getElementById('image').style.height = imgHeightOriginal * (intZoom) + "px";
 }
 
 // set background color of the gallery
 function setBg(color){
-	document.getElementsByTagName('body')[0].style.backgroundColor = color;
-	if(color == '#ffffff'){
-		document.getElementById('imageLink').style.color = '#000000';
-		document.getElementById('imageDesc').style.color = '#000000';
-	} else {
-		document.getElementById('imageLink').style.color = '#ffffff';
-		document.getElementById('imageDesc').style.color = '#ffffff';
-	}
+  document.getElementsByTagName('body')[0].style.backgroundColor = color;
+  if(color == '#ffffff'){
+    document.getElementById('imageLink').style.color = '#000000';
+    document.getElementById('imageDesc').style.color = '#000000';
+  } else {
+    document.getElementById('imageLink').style.color = '#ffffff';
+    document.getElementById('imageDesc').style.color = '#ffffff';
+  }
 }
 
 // print document
 function printImage(){
-	window.print();
+  window.print();
 }
 
 // show and hide blocks
 function showOrHide(strElement)
 {
-	if (document.getElementById(strElement).style.display == 'block'){
-		document.getElementById(strElement).style.display = 'none';
-	} else {
-		document.getElementById(strElement).style.display = 'block';
-	}
+  if (document.getElementById(strElement).style.display == 'block'){
+    document.getElementById(strElement).style.display = 'none';
+  } else {
+    document.getElementById(strElement).style.display = 'block';
+  }
 }
 //-->
 </script>

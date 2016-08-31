@@ -53,7 +53,7 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
 
     /**
      * Returns a list of available commands (?act=XY)
-     * 
+     *
      * @return array list of acts
      */
     public function getCommands() {
@@ -62,11 +62,11 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
 
     /**
      * Use this to parse your backend page
-     * 
+     *
      * You will get the template located in /View/Template/{CMD}.html
      * You can access Cx class using $this->cx
      * To show messages, use \Message class
-     * 
+     *
      * @param \Cx\Core\Html\Sigma $template template for current CMD
      * @param array               $cmd      CMD separated by slashes
      */
@@ -77,7 +77,7 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
         //GeoIp configuration setting
         self::initConfig();
         $this->showOverview();
-        
+
         \Message::show();
     }
 
@@ -95,7 +95,7 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
 
         //display the setting options
         \Cx\Core\Setting\Controller\Setting::init('GeoIp', null,'Yaml');
-        \Cx\Core\Setting\Controller\Setting::setEngineType('GeoIp', 'Yaml', 'config');    
+        \Cx\Core\Setting\Controller\Setting::setEngineType('GeoIp', 'Yaml', 'config');
         \Cx\Core\Setting\Controller\Setting::show(
             $this->template,
             'index.php?cmd=GeoIp',
@@ -106,8 +106,8 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
     }
 
     /**
-     * Fixes database errors.   
-     * 
+     * Fixes database errors.
+     *
      * @return boolean
      * @throws GeoIpException
      */

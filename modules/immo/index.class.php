@@ -124,7 +124,7 @@ class Immo extends ImmoLib
         if (!isset($_SESSION['immo'])) {
             $_SESSION['immo'] = array();
         }
-        
+
         parent::__construct();
     }
 

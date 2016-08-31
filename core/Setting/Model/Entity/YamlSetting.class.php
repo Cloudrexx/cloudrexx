@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * YamlSetting Entity
  *
@@ -72,37 +72,37 @@ class YamlSetting extends \Cx\Core\Model\Model\Entity\YamlEntity {
      * @var string
      */
     protected $name;
-    
+
     /**
      * YamlSetting's section name
      * @var string
      */
     protected $section;
-    
+
     /**
      *YamlSetting's group name
      * @var string
      */
     protected $group;
-    
+
     /**
      * YamlSetting's default value
      * @var string
      */
     protected $value;
-    
+
     /**
      * YamlSetting's type
      * @var string
      */
     protected $type;
-    
+
     /**
      * YamlSetting's values
      * @var string
      */
     protected $values;
-    
+
     /**
      * YamlSetting's order number
      * @var integer
@@ -148,7 +148,7 @@ class YamlSetting extends \Cx\Core\Model\Model\Entity\YamlEntity {
     public function getName() {
         return $this->name;
     }
-    
+
     /**
      * Return the section name
      * @return string $section
@@ -156,7 +156,7 @@ class YamlSetting extends \Cx\Core\Model\Model\Entity\YamlEntity {
     public function getSection() {
         return $this->section;
     }
-    
+
     /**
      * Set the section name
      * @param string $section
@@ -164,7 +164,7 @@ class YamlSetting extends \Cx\Core\Model\Model\Entity\YamlEntity {
     public function setSection($section) {
         $this->section = $section;
     }
-    
+
     /**
      * Set the group name
      * @param string $group
@@ -172,7 +172,7 @@ class YamlSetting extends \Cx\Core\Model\Model\Entity\YamlEntity {
     public function setGroup($group) {
         $this->group = $group;
     }
-    
+
     /**
      * Return the group name
      * @return string $group
@@ -180,7 +180,7 @@ class YamlSetting extends \Cx\Core\Model\Model\Entity\YamlEntity {
     public function getGroup() {
         return $this->group;
     }
-    
+
     /**
      * Set the setting's value
      * @param string $value
@@ -188,7 +188,7 @@ class YamlSetting extends \Cx\Core\Model\Model\Entity\YamlEntity {
     public function setValue($value) {
         $this->value = $value;
     }
-    
+
     /**
      * Return the setting's value
      * @return string $value
@@ -196,7 +196,7 @@ class YamlSetting extends \Cx\Core\Model\Model\Entity\YamlEntity {
     public function getValue() {
         return $this->value;
     }
-    
+
     /**
      * Set the setting's type
      * @param string $type
@@ -204,7 +204,7 @@ class YamlSetting extends \Cx\Core\Model\Model\Entity\YamlEntity {
     public function setType($type) {
         $this->type = $type;
     }
-    
+
     /**
      * Return the setting's type
      * @return string $type
@@ -212,7 +212,7 @@ class YamlSetting extends \Cx\Core\Model\Model\Entity\YamlEntity {
     public function getType() {
         return $this->type;
     }
-    
+
     /**
      * Set the settings values
      * @param string $values
@@ -220,7 +220,7 @@ class YamlSetting extends \Cx\Core\Model\Model\Entity\YamlEntity {
     public function setValues($values) {
         $this->values = $values;
     }
-    
+
     /**
      * Return the setting's values
      * @return string $values
@@ -228,7 +228,7 @@ class YamlSetting extends \Cx\Core\Model\Model\Entity\YamlEntity {
     public function getValues() {
         return $this->values;
     }
-    
+
     /**
      * Set the setting's order
      * @param integer $ord
@@ -236,7 +236,7 @@ class YamlSetting extends \Cx\Core\Model\Model\Entity\YamlEntity {
     public function setOrd($ord) {
         $this->ord =  $ord;
     }
-    
+
     /**
      * Return the setting's order
      * @return string
@@ -245,4 +245,3 @@ class YamlSetting extends \Cx\Core\Model\Model\Entity\YamlEntity {
         return $this->ord;
     }
 }
-

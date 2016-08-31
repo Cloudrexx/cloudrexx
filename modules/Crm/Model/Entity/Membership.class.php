@@ -74,7 +74,7 @@ class Membership
      * find all the membership by language
      *
      * @param array $data conditions
-     * 
+     *
      * @return array
      */
     function findAllByLang($data = array())

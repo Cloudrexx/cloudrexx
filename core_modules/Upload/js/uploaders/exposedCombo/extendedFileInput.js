@@ -1,5 +1,5 @@
 var ExtendedFileInput = function(options) {
-    var field = options.field; //the input field we extend 
+    var field = options.field; //the input field we extend
 
     //fetch the uploader instance...
     var fileUploader = cx.instances.get(options.instance,'uploader');

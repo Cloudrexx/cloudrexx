@@ -107,7 +107,7 @@ class DataAccess extends \Cx\Model\Base\EntityBase {
         $this->dataAccessApiKeys = new \Doctrine\Common\Collections\ArrayCollection();
         $this->relations = new \Doctrine\Common\Collections\ArrayCollection();
     }
-    
+
     /**
      * Get id
      *

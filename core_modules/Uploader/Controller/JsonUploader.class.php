@@ -211,7 +211,7 @@ class JsonUploader extends SystemComponentController implements JsonAdapter
                     $file,  rtrim($fileLocation[0], '/') .'/'. pathinfo( $file, PATHINFO_BASENAME),
                     true
                 );
-    
+
                 if (isset($fileLocation[2])){
                     $uploader['name'] = $fileLocation[2];
                 }

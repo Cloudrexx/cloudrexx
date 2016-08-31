@@ -50,10 +50,10 @@ class MediaLibrary
 {
     protected $sortBy    = 'name';
     protected $sortDesc  = false;
-    
+
     public $_arrSettings = array();
-    
-    
+
+
     // act: newDir
     // creates a new directory through php or ftp
     function _createNewDir($dirName)
@@ -128,7 +128,7 @@ class MediaLibrary
     function _downloadMedia()
     {
         global $_ARRAYLANG;
-        
+
         if (self::isIllegalFileName($this->getFile)) { die($_ARRAYLANG['TXT_MEDIA_FILE_DONT_DOWNLOAD']);}
         // The file is already checked (media paths only)
         $file = $this->path.$this->getFile;
@@ -407,12 +407,12 @@ class MediaLibrary
         $this->_objImage->loadImage($this->path . $result);
         $this->_objImage->saveNewImage($this->path . $result, true);
     }
-    
+
     /**
      * This method is used for the image preview.
-     * 
+     *
      * @param   array  $arrData  Contains $_GET array.
-     * @return  image  On error, 
+     * @return  image  On error,
      */
     public function getImage($arrData)
     {
@@ -421,24 +421,24 @@ class MediaLibrary
             if (!$this->_objImage->loadImage($this->path.$this->getFile)) {
                 throw new \Exception('Could not load image');
             }
-            
+
             // Rotate image
             if (!empty($arrData['d'])) {
                 $this->_objImage->rotateImage(intval($arrData['d']));
             }
-            
+
             // Crop image
             if (isset($arrData['x']) && isset($arrData['y']) && !empty($arrData['w']) && !empty($arrData['h'])) {
                 $this->_objImage->cropImage(intval($arrData['x']), intval($arrData['y']), intval($arrData['w']), intval($arrData['h']));
             }
-            
+
             // Resize image
             if (!empty($arrData['rw']) && !empty($arrData['rh']) && !empty($arrData['q'])) {
                 if (!$this->_objImage->resizeImage(intval($arrData['rw']), intval($arrData['rh']), intval($arrData['q']))) {
                     throw new \Exception('Could not resize image');
                 }
             }
-            
+
             // Show edited image
             if (!$this->_objImage->showNewImage()) {
                 throw new \Exception('Is not a valid image or image type');
@@ -446,27 +446,27 @@ class MediaLibrary
 
             return;
         }
-        
+
         throw new \Exception('Path or file is empty');
     }
-    
-    
+
+
     /**
      * Edits and saves an image.
-     * 
+     *
      * @param  array  $arrData  Contains $_POST array.
      * @return bool             True on success, false otherwise.
      */
     public function editImage($arrData)
     {
         global $_ARRAYLANG, $objTemplate;
-        
+
         $objFile = new \File();
         $orgFile = $arrData['orgName'].'.'.$arrData['orgExt'];
         $newName = $arrData['newName'];
         $newFile = $newName.'.'.$arrData['orgExt'];
         \Cx\Lib\FileSystem\FileSystem::clean_path($newFile);
-        
+
         // If new image name is set, image will be copied. Otherwise, image will be overwritten
         if ($newName != '') {
             $this->fileLog = $objFile->copyFile($this->path, $orgFile, $this->path, $newFile);
@@ -476,41 +476,41 @@ class MediaLibrary
         } else {
             $this->fileLog = $orgFile;
         }
-        
+
         // Edit image
         if (!empty($this->path) && !empty($this->fileLog)) {
             // Image loader
             if (!$this->_objImage->loadImage($this->path.$this->fileLog)) {
                 throw new \Exception('Could not load image');
             }
-            
+
             // Rotate image
             if (!empty($arrData['d'])) {
                 $this->_objImage->rotateImage(intval($arrData['d']));
             }
-            
+
             // Crop image
             if (isset($arrData['x']) && isset($arrData['y']) && !empty($arrData['w']) && !empty($arrData['h'])) {
                 $this->_objImage->cropImage(intval($arrData['x']), intval($arrData['y']), intval($arrData['w']), intval($arrData['h']));
             }
-            
+
             // Resize image
             if (!empty($arrData['rw']) && !empty($arrData['rh']) && !empty($arrData['q'])) {
                 if (!$this->_objImage->resizeImage(intval($arrData['rw']), intval($arrData['rh']), intval($arrData['q']))) {
                     throw new \Exception('Could not resize image');
                 }
             }
-            
+
             // Save new image
             if (!$this->_objImage->saveNewImage($this->path.$this->fileLog, true)) {
                 throw new \Exception('Is not a valid image or image type');
             }
 
-            
+
             // If no error occured, return true
             return $this->fileLog;
         }
-        
+
         throw new \Exception('Path or file is empty');
     }
 
@@ -590,7 +590,7 @@ class MediaLibrary
         $d    = $tree['dir'];
         $f    = $tree['file'];
         $direction = $this->sortDesc ? SORT_DESC : SORT_ASC;
-        
+
         switch ($this->sortBy) {
             // sort by size
             case 'size':
@@ -620,7 +620,7 @@ class MediaLibrary
                 @array_multisort($f['name'], $direction, SORT_NATURAL | SORT_FLAG_CASE, $f['size'], $f['type'], $f['date'], $f['perm'], $f['icon'], $f['path']);
                 break;
         }
-        
+
         $dirTree['dir']  = $d;
         $dirTree['file'] = $f;
         return $dirTree;
@@ -708,10 +708,10 @@ class MediaLibrary
 
     /**
      * Gets the icon for the file
-     * 
+     *
      * @param string $file      The File Path
      * @param string $fileType  (optional) The File type
-     * 
+     *
      * @return string           The Icon name
      */
     public static function _getIcon($file, $fileType = null)
@@ -723,7 +723,7 @@ class MediaLibrary
             $info = pathinfo($file);
             $icon = strtoupper($info['extension']);
         }
-        
+
         $arrImageExt        = array('JPEG', 'JPG', 'TIFF', 'GIF', 'BMP', 'PNG');
         $arrVideoExt        = array('3GP', 'AVI', 'DAT', 'FLV', 'FLA', 'M4V', 'MOV', 'MPEG', 'MPG', 'OGG', 'WMV', 'SWF');
         $arrAudioExt        = array('WAV', 'WMA', 'AMR', 'MP3', 'AAC');
@@ -731,7 +731,7 @@ class MediaLibrary
         $arrSpreadsheetExt  = array('CSV', 'ODS', 'XLS', 'XLSX');
         $arrDocumentsExt    = array('DOC', 'DOCX', 'ODT', 'RTF');
         $arrWebDocumentExt  = array('HTML', 'HTM');
-        
+
         switch (true) {
             case ($icon == 'TXT'):
                 $icon = 'Text';
@@ -768,16 +768,16 @@ class MediaLibrary
         if (is_dir($file)) {
             $icon = 'Folder';
         }
-        
+
         if (!file_exists(self::_getIconPath().$icon.'.png') or !isset($icon)) {
             $icon = '_blank';
         }
         return $icon;
     }
-    
+
     /**
      * Returns icon's absolute path
-     * 
+     *
      * @return string
      */
     public static function _getIconPath()
@@ -787,12 +787,12 @@ class MediaLibrary
 
     /**
      * Returns icon's web path
-     * 
-     * @return string 
+     *
+     * @return string
      */
     public static function _getIconWebPath()
     {
-        return \Cx\Core\Core\Controller\Cx::instanciate()->getCodeBaseCoreModuleWebPath() . '/Media/View/Media/';        
+        return \Cx\Core\Core\Controller\Cx::instanciate()->getCodeBaseCoreModuleWebPath() . '/Media/View/Media/';
     }
 
     // gets the filesize
@@ -996,7 +996,7 @@ class MediaLibrary
                                 return false;
                             }
                         }
-        
+
                         /*
                            **  Returns the caret (cursor) position of the specified text field.
                            **  Return value range is 0-oField.length.
@@ -1060,7 +1060,7 @@ class MediaLibrary
                                     file = \$J(this).parent().parent().find('.file_name a').html();
                                     fileSplitLength = file.split('.').length;
                                     isFolder = (\$J(this).parent().parent().find('.file_size').html() == '&nbsp;-') ? 1 : 0;
-        
+
                                     //Display Filename in input box without file extension (with multi dots in filename)
                                     file_ext = (isFolder != 1 && fileSplitLength > 1) ?
                                                     ("."+file.split('.')[fileSplitLength-1])
@@ -1068,7 +1068,7 @@ class MediaLibrary
                                     loop     = (isFolder != 1 && fileSplitLength > 1) ?
                                                     (fileSplitLength - 1)
                                                     : fileSplitLength;
-        
+
                                     for (i=0; i < loop; i++) {
                                         file_name += i > 0 ? "." : "";
                                         file_name += file.split('.')[i];
@@ -1103,7 +1103,7 @@ END;
      * @global  ADONewConnection
      * @return  array       $arrReturn
      */
-    function createSettingsArray() 
+    function createSettingsArray()
     {
         global $objDatabase;
 
@@ -1120,11 +1120,11 @@ END;
         }
         return $arrReturn;
     }
-    
+
     /**
      * this is called as soon as uploads have finished.
      * takes care of moving them to the right folder
-     * 
+     *
      * @return string the directory to move to
      */
     public static function uploadFinished(
@@ -1209,7 +1209,7 @@ END;
 
         return array($data['path'], $data['webPath']);
     }
-    
+
     /**
      * Returns the image settings array.
      *
@@ -1219,13 +1219,13 @@ END;
     public function getImageSettings()
     {
         global $objDatabase;
-        
+
         $query = '
             SELECT `name`, `value`
             FROM `'.DBPREFIX.'settings_image`
         ';
         $objResult = $objDatabase->Execute($query);
-        
+
         $arrImageSettings = array();
         if ($objResult === false) {
             throw new \Exception($objDatabase->ErrorMsg());
@@ -1234,13 +1234,13 @@ END;
             $arrImageSettings[$objResult->fields['name']] = intval($objResult->fields['value']);
             $objResult->MoveNext();
         }
-        
+
         return $arrImageSettings;
     }
-    
+
     /**
      * Check the the file name is illegal or not.
-     * 
+     *
      * @param type $file
      * @return boolean
      */

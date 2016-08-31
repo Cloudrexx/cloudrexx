@@ -10,7 +10,7 @@
       });
       e.preventDefault();
     });
-    
+
     $J("#multiAction").change(function () {
       if ($J(".entrySelection:checked").length <= 0 && $J(this).val() != 0) {
         alert('{TXT_CRM_NOTHING_SELECTED}');
@@ -165,5 +165,5 @@ function fadeOkbox(msg) {
     </table>
     <br>
     <input type="submit" name="save" value="{TXT_CRM_SAVE}" />
-  </form> 
+  </form>
 </div>

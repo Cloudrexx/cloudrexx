@@ -4,54 +4,54 @@
 <li><a id="newsTab_advanced" href="javascript:{}" onclick="selectTab('advanced')" title="{TXT_NEWS_ADVANCED}">{TXT_NEWS_ADVANCED}</a></li>
 </ul>
 <form action="index.php?cmd=News&amp;act=settings&amp;tpl=ticker&amp;tpl2=modify&amp;id={NEWS_TICKER_ID}&amp;pos={NEWS_TICKER_POS}" method="post">
-	<!-- start general div -->
-	<div id="general" class="newsTab" style="display:block">
-		<table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
-			<thead>
-				<tr>
-					<th colspan="2">{NEWS_MODIFY_TITLE_TXT}</th>
-				</tr>
-			</thead>
-			<tbody style="vertical-align:top;">
-				<tr class="row2">
-					<td width="15%">{TXT_NEWS_FILENAME}</td>
-					<td width="85%"><input type="text" name="news_ticker_filename" value="{NEWS_TICKER_FILENAME}" style="width:600px;" /></td>
-				</tr>
-				<tr class="row1">
-					<td>{TXT_NEWS_CONTENT}</td>
-					<td><textarea name="news_ticker_content" style="width:600px; height:250px;">{NEWS_TICKER_CONTENT}</textarea></td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
-	<!-- end general div -->
-	<!-- start advanced div -->
-	<div id="advanced" class="newsTab" style="display:none;">
-		<table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
-			<thead>
-				<tr>
-					<th colspan="2">{NEWS_MODIFY_TITLE_TXT}</th>
-				</tr>
-			</thead>
-			<tbody style="vertical-align:top;">
-				<tr class="row2">
-					<td>{TXT_NEWS_CHARSET}</td>
-					<td>{NEWS_TICKER_CHARSET_MENU}</td>
-				</tr>
-				<tr class="row1">
-					<td>{TXT_NEWS_URL_ENCODING}</td>
-					<td><input type="checkbox" name="news_ticker_urlencode" id="news_ticker_urlencode" value="1" {NEWS_TICKER_URLENCODE} /><label for="news_ticker_urlencode">{TXT_NEWS_URL_ENCODING_TXT}</label></td>
-				</tr>
-				<tr class="row2">
-					<td>{TXT_NEWS_PREFIX}</td>
-					<td>{TXT_NEWS_TICKER_PREFIX_MSG}<br /><input type="text" name="news_ticker_prefix" value="{NEWS_TICKER_PREFIX}" maxlength="250" style="width:500px;" /></td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
-	<!-- end advanced div -->
-	<br />
-	<input type="button" onclick="window.location.href='index.php?cmd=News&{CSRF_PARAM}&amp;act=ticker&amp;pos={NEWS_TICKER_POS}'" value="{TXT_NEWS_CANCEL}" />
-	<input type="submit" name="news_save_ticker" value="{TXT_NEWS_SAVE}" />
+  <!-- start general div -->
+  <div id="general" class="newsTab" style="display:block">
+    <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
+      <thead>
+        <tr>
+          <th colspan="2">{NEWS_MODIFY_TITLE_TXT}</th>
+        </tr>
+      </thead>
+      <tbody style="vertical-align:top;">
+        <tr class="row2">
+          <td width="15%">{TXT_NEWS_FILENAME}</td>
+          <td width="85%"><input type="text" name="news_ticker_filename" value="{NEWS_TICKER_FILENAME}" style="width:600px;" /></td>
+        </tr>
+        <tr class="row1">
+          <td>{TXT_NEWS_CONTENT}</td>
+          <td><textarea name="news_ticker_content" style="width:600px; height:250px;">{NEWS_TICKER_CONTENT}</textarea></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <!-- end general div -->
+  <!-- start advanced div -->
+  <div id="advanced" class="newsTab" style="display:none;">
+    <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
+      <thead>
+        <tr>
+          <th colspan="2">{NEWS_MODIFY_TITLE_TXT}</th>
+        </tr>
+      </thead>
+      <tbody style="vertical-align:top;">
+        <tr class="row2">
+          <td>{TXT_NEWS_CHARSET}</td>
+          <td>{NEWS_TICKER_CHARSET_MENU}</td>
+        </tr>
+        <tr class="row1">
+          <td>{TXT_NEWS_URL_ENCODING}</td>
+          <td><input type="checkbox" name="news_ticker_urlencode" id="news_ticker_urlencode" value="1" {NEWS_TICKER_URLENCODE} /><label for="news_ticker_urlencode">{TXT_NEWS_URL_ENCODING_TXT}</label></td>
+        </tr>
+        <tr class="row2">
+          <td>{TXT_NEWS_PREFIX}</td>
+          <td>{TXT_NEWS_TICKER_PREFIX_MSG}<br /><input type="text" name="news_ticker_prefix" value="{NEWS_TICKER_PREFIX}" maxlength="250" style="width:500px;" /></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <!-- end advanced div -->
+  <br />
+  <input type="button" onclick="window.location.href='index.php?cmd=News&{CSRF_PARAM}&amp;act=ticker&amp;pos={NEWS_TICKER_POS}'" value="{TXT_NEWS_CANCEL}" />
+  <input type="submit" name="news_save_ticker" value="{TXT_NEWS_SAVE}" />
 </form>
 <!-- end module_news_ticker_modify.html -->

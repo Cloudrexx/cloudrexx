@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * PageTree
  *
@@ -194,18 +194,18 @@ abstract class PageTree {
                     }
                 }
             }
-            
-            //if page is protected, protected pages are hidden and user has not 
+
+            //if page is protected, protected pages are hidden and user has not
             //sufficent permissions, then hide all child elements from this page
             if($page && $page->isFrontendProtected() && $_CONFIG['coreListProtectedPages'] != 'on' &&
                !(
-                    \Permission::checkAccess($page->getFrontendAccessId(), 'dynamic', true) && 
+                    \Permission::checkAccess($page->getFrontendAccessId(), 'dynamic', true) &&
                     $this->considerLogin
                 )
             ){
                 $hasChilds = false;
             }
-            
+
             if ($hasChilds && !$dontDescend) {
                 // add preRenderLevel to stack
                 $pageTree = $this;
@@ -224,7 +224,7 @@ abstract class PageTree {
                     return $pageTree->preRenderLevel($level, $lang, $node);
                 });
             }
-            
+
             if (
                    !$page
                 || ($this->skipInvisible && !$page->isVisible())
@@ -233,7 +233,7 @@ abstract class PageTree {
             ) {
                 continue;
             }
-            
+
             try {
                 $parentPage = $page->getParent();
                 // if parent is invisible or unpublished and parent node is not start node
@@ -250,11 +250,11 @@ abstract class PageTree {
                 // if parent page does not exist, parent is root
             }
 
-            
+
             // if page is protected, user has not sufficent permissions and protected pages are hidden
             if ($page->isFrontendProtected() && $_CONFIG['coreListProtectedPages'] != 'on' &&
                 !(
-                    \Permission::checkAccess($page->getFrontendAccessId(), 'dynamic', true) && 
+                    \Permission::checkAccess($page->getFrontendAccessId(), 'dynamic', true) &&
                     $this->considerLogin
                 )
             ) {

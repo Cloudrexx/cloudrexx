@@ -22,114 +22,114 @@
 </script>
 
 <form name="newcat" method="post" action="?cmd=Gallery&amp;act=save_settings" >
-	<table width="100%" cellspacing="0" cellpadding="3" border="0" align="top" class="adminlist">
-	<tr>
-		<th colspan="2">
-			<div align="left">{TXT_TITLE}</div>
-		</th>
-	</tr>
+  <table width="100%" cellspacing="0" cellpadding="3" border="0" align="top" class="adminlist">
+  <tr>
+    <th colspan="2">
+      <div align="left">{TXT_TITLE}</div>
+    </th>
+  </tr>
 
 <!-- new -->
-	<tr class="row1">
-		<td nowrap="nowrap" valign="top" width="10%">{TXT_SETTINGS_HEADER_TYPE}</td>
-		<td width="90%">
-		    <input type="radio" name="header_type" value="hierarchy" {SETTINGS_VALUE_HEADER_HIERARCHY} />
-			<label for="header_type">{TXT_SETTINGS_HEADER_HIERARCHY}</label><br />
-			<input type="radio" name="header_type" value="flat" {SETTINGS_VALUE_HEADER_FLAT} />
-			<label for="header_type">{TXT_SETTINGS_HEADER_FLAT}</label><br />
-	   </td>
-	</tr>
-<!-- new -->	
-	<tr class="row2">
-		<td nowrap="nowrap" valign="top">{TXT_SETTINGS_COMMENTS_SHOW}</td>
-		<td>
-			<input type="checkbox" name="show_comments" value="on" {SETTINGS_VALUE_SHOW_COMMENTS} />
-		</td>
-	</tr>
-	<tr class="row1">
-		<td nowrap="nowrap" valign="top">{TXT_SETTINGS_VOTING_SHOW}</td>
-		<td>
-			<input type="checkbox" name="show_voting" value="on" {SETTINGS_VALUE_SHOW_VOTING} />
-		</td>
-	</tr>
-	<tr class="row2">
-		<td nowrap="nowrap" valign="top">{TXT_SETTINGS_LAST_SHOW}</td>
-		<td>
-			<input type="checkbox" name="show_latest" value="on" {SETTINGS_VALUE_SHOW_LATEST} />
-		</td>
-	</tr>
-	<tr class="row1">
-		<td nowrap="nowrap" valign="top">{TXT_SETTINGS_RANDOM_SHOW}</td>
-		<td>
-			<input type="checkbox" name="show_random" value="on" {SETTINGS_VALUE_SHOW_RANDOM} />
-		</td>
-	</tr>
-	<tr class="row2">
-		<td nowrap="nowrap" valign="top">{TXT_SETTINGS_VALIDATION_TYPE}</td>
-		<td>
-			<input type="radio" name="validation_standard_type" value="all" {SETTINGS_VALUE_VALIDATION_TYPE_ALL} /><label for="validation_standard_type">{TXT_SETTINGS_VALIDATION_ALL}</label><br />
-			<div style="padding-left:20px;">
-				<input type="text" name="validation_show_limit" value="{SETTINGS_VALUE_VALIDATION_SHOW_LIMIT}" style="width:50px">&nbsp;<label for="validation_show_limit">{TXT_SETTINGS_VALIDATION_LIMIT}</label>
-			</div>
-			<input type="radio" name="validation_standard_type" value="single" {SETTINGS_VALUE_VALIDATION_TYPE_SINGLE} /><label for="validation_standard_type">{TXT_SETTINGS_VALIDATION_SINGLE}</label>
-		</td>
-	</tr>
-	<tr class="row1">
-		<td nowrap="nowrap" valign="top">{TXT_SETTINGS_THUMB_TYPE}</td>
-		<td>
-			<input type="radio" name="standard_size_type" value="abs" {SETTINGS_VALUE_THUMB_TYPE_ABS} /><label for="standard_size_type">{TXT_SETTINGS_THUMB_ABS}</label><br />
-			<div style="padding-left:20px;">
-				<input type="text" name="standard_width_abs" value="{SETTINGS_VALUE_STANDARD_WIDTH_ABS}" style="width:50px">&nbsp;<label for="standard_width_abs">{TXT_SETTINGS_THUMB_ABS_WIDTH}</label><br />
-				<input type="text" name="standard_height_abs" value="{SETTINGS_VALUE_STANDARD_HEIGHT_ABS}" style="width:50px">&nbsp;<label for="standard_height_abs">{TXT_SETTINGS_THUMB_ABS_HEIGHT}</label><br />
-			</div>
-			<input type="radio" name="standard_size_type" value="proz" {SETTINGS_VALUE_THUMB_TYPE_PROZ} /><label for="standard_size_type">{TXT_SETTINGS_THUMB_PROZ}</label><br />
-			<div style="padding-left:20px;">
-				<input type="text" name="standard_size_proz" value="{SETTINGS_VALUE_STANDARD_SIZE_PROZ}" style="width:50px">&nbsp;<label for="standard_size_proz">{TXT_SETTINGS_THUMB_PROZ_DESC}</label>
-			</div>
-		</td>
-	</tr>
-	<tr class="row2">
-		<td nowrap="nowrap" valign="top">{TXT_SETTINGS_QUALITY}</td>
-		<td>
-			<input type="text" name="standard_quality" value="{SETTINGS_VALUE_STANDARD_QUALITY}" style="width:50px">&nbsp;<label for="standard_quality">{TXT_STANDARD_QUALITY_UPLOADED_PICS}</label><br />
-			<input type="text" name="quality" value="{SETTINGS_VALUE_QUALITY}" style="width:50px">&nbsp;<label for="quality">{TXT_QUALITY}</label><br />
-		</td>
-	</tr>
-	<tr class="row1">
-		<td nowrap="nowrap" valign="top">{TXT_GALLERY_SETTINGS_POPUP_ENABLED}</td>
-		<td>
+  <tr class="row1">
+    <td nowrap="nowrap" valign="top" width="10%">{TXT_SETTINGS_HEADER_TYPE}</td>
+    <td width="90%">
+        <input type="radio" name="header_type" value="hierarchy" {SETTINGS_VALUE_HEADER_HIERARCHY} />
+      <label for="header_type">{TXT_SETTINGS_HEADER_HIERARCHY}</label><br />
+      <input type="radio" name="header_type" value="flat" {SETTINGS_VALUE_HEADER_FLAT} />
+      <label for="header_type">{TXT_SETTINGS_HEADER_FLAT}</label><br />
+     </td>
+  </tr>
+<!-- new -->
+  <tr class="row2">
+    <td nowrap="nowrap" valign="top">{TXT_SETTINGS_COMMENTS_SHOW}</td>
+    <td>
+      <input type="checkbox" name="show_comments" value="on" {SETTINGS_VALUE_SHOW_COMMENTS} />
+    </td>
+  </tr>
+  <tr class="row1">
+    <td nowrap="nowrap" valign="top">{TXT_SETTINGS_VOTING_SHOW}</td>
+    <td>
+      <input type="checkbox" name="show_voting" value="on" {SETTINGS_VALUE_SHOW_VOTING} />
+    </td>
+  </tr>
+  <tr class="row2">
+    <td nowrap="nowrap" valign="top">{TXT_SETTINGS_LAST_SHOW}</td>
+    <td>
+      <input type="checkbox" name="show_latest" value="on" {SETTINGS_VALUE_SHOW_LATEST} />
+    </td>
+  </tr>
+  <tr class="row1">
+    <td nowrap="nowrap" valign="top">{TXT_SETTINGS_RANDOM_SHOW}</td>
+    <td>
+      <input type="checkbox" name="show_random" value="on" {SETTINGS_VALUE_SHOW_RANDOM} />
+    </td>
+  </tr>
+  <tr class="row2">
+    <td nowrap="nowrap" valign="top">{TXT_SETTINGS_VALIDATION_TYPE}</td>
+    <td>
+      <input type="radio" name="validation_standard_type" value="all" {SETTINGS_VALUE_VALIDATION_TYPE_ALL} /><label for="validation_standard_type">{TXT_SETTINGS_VALIDATION_ALL}</label><br />
+      <div style="padding-left:20px;">
+        <input type="text" name="validation_show_limit" value="{SETTINGS_VALUE_VALIDATION_SHOW_LIMIT}" style="width:50px">&nbsp;<label for="validation_show_limit">{TXT_SETTINGS_VALIDATION_LIMIT}</label>
+      </div>
+      <input type="radio" name="validation_standard_type" value="single" {SETTINGS_VALUE_VALIDATION_TYPE_SINGLE} /><label for="validation_standard_type">{TXT_SETTINGS_VALIDATION_SINGLE}</label>
+    </td>
+  </tr>
+  <tr class="row1">
+    <td nowrap="nowrap" valign="top">{TXT_SETTINGS_THUMB_TYPE}</td>
+    <td>
+      <input type="radio" name="standard_size_type" value="abs" {SETTINGS_VALUE_THUMB_TYPE_ABS} /><label for="standard_size_type">{TXT_SETTINGS_THUMB_ABS}</label><br />
+      <div style="padding-left:20px;">
+        <input type="text" name="standard_width_abs" value="{SETTINGS_VALUE_STANDARD_WIDTH_ABS}" style="width:50px">&nbsp;<label for="standard_width_abs">{TXT_SETTINGS_THUMB_ABS_WIDTH}</label><br />
+        <input type="text" name="standard_height_abs" value="{SETTINGS_VALUE_STANDARD_HEIGHT_ABS}" style="width:50px">&nbsp;<label for="standard_height_abs">{TXT_SETTINGS_THUMB_ABS_HEIGHT}</label><br />
+      </div>
+      <input type="radio" name="standard_size_type" value="proz" {SETTINGS_VALUE_THUMB_TYPE_PROZ} /><label for="standard_size_type">{TXT_SETTINGS_THUMB_PROZ}</label><br />
+      <div style="padding-left:20px;">
+        <input type="text" name="standard_size_proz" value="{SETTINGS_VALUE_STANDARD_SIZE_PROZ}" style="width:50px">&nbsp;<label for="standard_size_proz">{TXT_SETTINGS_THUMB_PROZ_DESC}</label>
+      </div>
+    </td>
+  </tr>
+  <tr class="row2">
+    <td nowrap="nowrap" valign="top">{TXT_SETTINGS_QUALITY}</td>
+    <td>
+      <input type="text" name="standard_quality" value="{SETTINGS_VALUE_STANDARD_QUALITY}" style="width:50px">&nbsp;<label for="standard_quality">{TXT_STANDARD_QUALITY_UPLOADED_PICS}</label><br />
+      <input type="text" name="quality" value="{SETTINGS_VALUE_QUALITY}" style="width:50px">&nbsp;<label for="quality">{TXT_QUALITY}</label><br />
+    </td>
+  </tr>
+  <tr class="row1">
+    <td nowrap="nowrap" valign="top">{TXT_GALLERY_SETTINGS_POPUP_ENABLED}</td>
+    <td>
             <input type="checkbox" onchange="if (this.checked) { $('slide_settings').show(); $('image_width_settings_container').show(); } else { $('slide_settings').hide(); $('image_width_settings_container').hide(); }" name="enable_popups" value="on" {SETTINGS_VALUE_ENABLE_POPUPS} />
-			<div style="{SLIDE_SHOW_BLOCK};" id="slide_settings"><div style="padding-left:20px;">
+      <div style="{SLIDE_SHOW_BLOCK};" id="slide_settings"><div style="padding-left:20px;">
                 <input type="radio" name="slide_show" value="slideshow" {SETTINGS_VALUE_SLIDE_SHOW} onclick="slideSeconds();"/><label for="slide_show">{TXT_GALLERY_SLIDE_SHOW}</label><br />
                 <div style="padding-left:20px;display:{SLIDE_SHOW_SECONDS_BLOCK}" id="slide_seconds_settings" >
                     <input type="text" name="slide_show_seconds" value="{SETTINGS_VALUE_SLIDE_SHOW_SECONDS}" style="width:50px" >&nbsp;<label for="slide_show_seconds">{TXT_GALLERY_SLIDE_SHOW_SECONDS}</label><br />
                 </div>
             </div>
 
-			<div style="padding-left:20px;">
+      <div style="padding-left:20px;">
                 <input type="radio" name="slide_show" value="normal" {SETTINGS_VALUE_NORMAL_VIEW} onclick="slideSeconds();"/><label for="slide_show">{TXT_GALLERY_SINGLE_IMAGE_VIEW}</label><br />
-			</div>
-		</td>
-	</tr>
-	<tr class="row2" id="image_width_settings_container" style="{IMAGE_WIDTH_CONTAINER_VISIBILITY}">
+      </div>
+    </td>
+  </tr>
+  <tr class="row2" id="image_width_settings_container" style="{IMAGE_WIDTH_CONTAINER_VISIBILITY}">
         <td nowrap="nowrap" valign="top">{TXT_GALLERY_SETTINGS_IMAGE_WIDTH}</td>
         <td>
             <input type="text" size="2" name="image_width" value="{SETTINGS_VALUE_IMAGE_WIDTH}"  />
         </td>
-	</tr>
-	<tr class="row1">
-		<td nowrap="nowrap" valign="top">{TXT_GALLERY_SETTINGS_PAGING}</td>
-		<td>
-			<input type="text" size="2" name="paging" value="{SETTINGS_VALUE_PAGING}"  />
-		</td>
-	</tr>
-	<tr class="row2">
-		<td nowrap="nowrap" valign="top" width="10%">{TXT_SETTINGS_IMAGENAME_SHOW}</td>
-		<td width="90%">
-			<input type="checkbox" name="show_names" value="on" {SETTINGS_VALUE_SHOW_NAMES} />
-		</td>
-	</tr>
-	<tr class="row2">
+  </tr>
+  <tr class="row1">
+    <td nowrap="nowrap" valign="top">{TXT_GALLERY_SETTINGS_PAGING}</td>
+    <td>
+      <input type="text" size="2" name="paging" value="{SETTINGS_VALUE_PAGING}"  />
+    </td>
+  </tr>
+  <tr class="row2">
+    <td nowrap="nowrap" valign="top" width="10%">{TXT_SETTINGS_IMAGENAME_SHOW}</td>
+    <td width="90%">
+      <input type="checkbox" name="show_names" value="on" {SETTINGS_VALUE_SHOW_NAMES} />
+    </td>
+  </tr>
+  <tr class="row2">
             <td nowrap="nowrap" valign="top">
                 {TXT_GALLERY_SHOW_FILE_NAME}
             </td>
@@ -142,7 +142,7 @@
                     </div>
                 </div>
             </td>
-	</tr>
+  </tr>
         <tr class="row1">
             <td nowrap="nowrap" valign="top">
                 {TXT_IMAGE_SIZE_SHOW}
@@ -151,8 +151,8 @@
                 <input type="checkbox" name="show_image_size" value="on" {SETTINGS_VALUE_SHOW_IMAGE_SIZE} />
             </td>
         </tr>
-	</table>
-	<br />
+  </table>
+  <br />
 <input type="submit" value="{TXT_BUTTON_SUBMIT}" />
 </form>
 <!-- END gallery_settings.html -->

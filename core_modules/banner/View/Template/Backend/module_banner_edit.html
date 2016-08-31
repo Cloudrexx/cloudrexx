@@ -4,251 +4,251 @@
 function banner_add(from,dest,add,remove)
 {
     if ( from.selectedIndex < 0) {
-		if (from.options[0] != null)
-			from.options[0].selected = true;
-		from.focus();
-		return false;
-	} else {
-		for (var i=0; i<from.length; i++) {
-			if (from.options[i].selected) {
-		    	dest.options[dest.length] = new Option( from.options[i].text, from.options[i].value, false, false);
-   			}
-		}
-	    for (var i=from.length-1; i>=0; i--) {
-			if (from.options[i].selected) {
-		       from.options[i] = null;
-   			}
-		}
-	}
+    if (from.options[0] != null)
+      from.options[0].selected = true;
+    from.focus();
+    return false;
+  } else {
+    for (var i=0; i<from.length; i++) {
+      if (from.options[i].selected) {
+          dest.options[dest.length] = new Option( from.options[i].text, from.options[i].value, false, false);
+         }
+    }
+      for (var i=from.length-1; i>=0; i--) {
+      if (from.options[i].selected) {
+           from.options[i] = null;
+         }
+    }
+  }
     disableButtons(from,dest,add,remove);
 }
 
 function banner_remove(from,dest,add,remove)
 {
-	if ( dest.selectedIndex < 0) {
-		if (dest.options[0] != null)
-			dest.options[0].selected = true;
-		dest.focus();
-		return false;
-	} else {
-		for (var i=0; i<dest.options.length; i++) {
-			if (dest.options[i].selected) {
-		    	from.options[from.options.length] = new Option( dest.options[i].text, dest.options[i].value, false, false);
-   			}
-		}
-	    for (var i=dest.options.length-1; i>=0; i--) {
-			if (dest.options[i].selected) {
-		       dest.options[i] = null;
-   			}
-		}
-	}
-	disableButtons(from,dest,add,remove);
+  if ( dest.selectedIndex < 0) {
+    if (dest.options[0] != null)
+      dest.options[0].selected = true;
+    dest.focus();
+    return false;
+  } else {
+    for (var i=0; i<dest.options.length; i++) {
+      if (dest.options[i].selected) {
+          from.options[from.options.length] = new Option( dest.options[i].text, dest.options[i].value, false, false);
+         }
+    }
+      for (var i=dest.options.length-1; i>=0; i--) {
+      if (dest.options[i].selected) {
+           dest.options[i] = null;
+         }
+    }
+  }
+  disableButtons(from,dest,add,remove);
 }
 
 function disableButtons(from,dest,add,remove)
 {
-	if (from.options.length > 0 ) {
-		add.disabled = 0;
-	} else {
-		add.disabled = 1;
-	}
+  if (from.options.length > 0 ) {
+    add.disabled = 0;
+  } else {
+    add.disabled = 1;
+  }
 
-	if (dest.options.length > 0) {
-		remove.disabled = 0;
-	} else {
-		remove.disabled = 1;
-	}
+  if (dest.options.length > 0) {
+    remove.disabled = 0;
+  } else {
+    remove.disabled = 1;
+  }
 }
 
 function selectAll(CONTROL)
 {
-	for(var i = 0;i < CONTROL.length;i++) {
-		CONTROL.options[i].selected = true;
-	}
+  for(var i = 0;i < CONTROL.length;i++) {
+    CONTROL.options[i].selected = true;
+  }
 }
 
 function deselectAll(CONTROL)
 {
-	for(var i = 0;i < CONTROL.length;i++) {
-		CONTROL.options[i].selected = false;
-	}
+  for(var i = 0;i < CONTROL.length;i++) {
+    CONTROL.options[i].selected = false;
+  }
 }
 
 function switchDiv(strElement)
 {
-	switch (strElement) {
-		case 'content':
-			document.getElementById('divRelationPages').style.display = 'block';
-			document.getElementById('divRelationNews').style.display = 'none';
-			document.getElementById('divRelationTeaser').style.display = 'none';
-			break;
+  switch (strElement) {
+    case 'content':
+      document.getElementById('divRelationPages').style.display = 'block';
+      document.getElementById('divRelationNews').style.display = 'none';
+      document.getElementById('divRelationTeaser').style.display = 'none';
+      break;
 
-		case 'news':
-			document.getElementById('divRelationPages').style.display = 'none';
-			document.getElementById('divRelationNews').style.display = 'block';
-			document.getElementById('divRelationTeaser').style.display = 'none';
-			break;
+    case 'news':
+      document.getElementById('divRelationPages').style.display = 'none';
+      document.getElementById('divRelationNews').style.display = 'block';
+      document.getElementById('divRelationTeaser').style.display = 'none';
+      break;
 
-		case 'teaser':
-			document.getElementById('divRelationPages').style.display = 'none';
-			document.getElementById('divRelationNews').style.display = 'none';
-			document.getElementById('divRelationTeaser').style.display = 'block';
-			break;
-	}
+    case 'teaser':
+      document.getElementById('divRelationPages').style.display = 'none';
+      document.getElementById('divRelationNews').style.display = 'none';
+      document.getElementById('divRelationTeaser').style.display = 'block';
+      break;
+  }
 }
 // ]]>
 </script>
-<form name="formEditBanner" method="post" action="index.php?cmd=banner&amp;act=banner_update"  onsubmit="	selectAll(document.formEditBanner.elements['selectedPages[]']);
-						                                                                      				selectAll(document.formEditBanner.elements['notSelectedPages[]']);
-						                                                                      				selectAll(document.formEditBanner.elements['selectedNews[]']);
-						                                                                      				selectAll(document.formEditBanner.elements['notSelectedNews[]']);
-						                                                                      				selectAll(document.formEditBanner.elements['selectedTeaser[]']);
-						                                                                      				selectAll(document.formEditBanner.elements['notSelectedTeaser[]']);">
+<form name="formEditBanner" method="post" action="index.php?cmd=banner&amp;act=banner_update"  onsubmit="  selectAll(document.formEditBanner.elements['selectedPages[]']);
+                                                                                          selectAll(document.formEditBanner.elements['notSelectedPages[]']);
+                                                                                          selectAll(document.formEditBanner.elements['selectedNews[]']);
+                                                                                          selectAll(document.formEditBanner.elements['notSelectedNews[]']);
+                                                                                          selectAll(document.formEditBanner.elements['selectedTeaser[]']);
+                                                                                          selectAll(document.formEditBanner.elements['notSelectedTeaser[]']);">
 <input type="hidden" name="bannerId" value="{BANNER_EDIT_ID}" />
-	<table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist">
-		<tr>
-			<th valign="top" colspan="2">{TXT_BANNER_EDIT_TITLE}</th>
-		</tr>
-		<tr valign="top" class="row1">
-			<td width="12%" nowrap="nowrap">{TXT_BANNER_EDIT_NAME}</td>
-			<td><input name="bannerName" type="text" id="bannerName" style="width:400px;" maxlength="250" value="{BANNER_EDIT_NAME}" /></td>
-		</tr>
-		<tr valign="top" class="row2">
-			<td width="12%" nowrap="nowrap">{TXT_BANNER_EDIT_GROUP}</td>
-			<td>
-				<select name="bannerGroupId" id="bannerGroupId" style="width:400px;">
-				<option value="0">{TXT_BANNER_EDIT_GROUP_SELECT}</option>
-				<option value="0">-------------</option>
-				{BANNER_EDIT_GROUP_MENU}
-				</select>
-			</td>
-		</tr>
-		<tr valign="top" class="row1">
-			<td nowrap="nowrap">{TXT_BANNER_EDIT_STATUS}</td>
-			<td height="26"><b><input name="bannerStatus" type="checkbox" value="1" {BANNER_EDIT_STATUS} /></b></td>
-		</tr>
-		<tr valign="top" class="row2">
-			<td width="12%" nowrap="nowrap">{TXT_BANNER_EDIT_CODE}</td>
-			<td><textarea name="bannerCode" id="bannerCode" style="width:90%; height:250px;">{BANNER_EDIT_CODE}</textarea></td>
-		</tr>
-		<tr valign="top" class="row1">
-			<td nowrap="nowrap">{TXT_BANNER_EDIT_RELATION}</td>
-			<td nowrap="nowrap">
-				<div>
-					<!-- BEGIN showContent -->
-						<input type="radio" name="bannerRelationSelect" onClick="switchDiv('content');" checked="checked" id="bannerRelationSelectContent" /><label for="bannerRelationSelectContent">{TXT_BANNER_EDIT_RELATION_CONTENT}</label>
-					<!-- END showContent -->
-					<!-- BEGIN showNews -->
-						<input type="radio" name="bannerRelationSelect" onClick="switchDiv('news');" id="bannerRelationSelectNews" /><label for="bannerRelationSelectNews">{TXT_BANNER_EDIT_RELATION_NEWS}</label>
-					<!-- END showNews -->
-					<!-- BEGIN showTeaser -->
-						<input type="radio" name="bannerRelationSelect" onClick="switchDiv('teaser');" id="bannerRelationSelectTeaser" /><label for="bannerRelationSelectTeaser">{TXT_BANNER_EDIT_RELATION_TEASER}</label>
-					<!-- END showTeaser -->
-				</div>
-				<div id="divRelationPages" style="display:block;">
-					<table width="100%" border="0">
-					  <tr>
-					    <td width="13%">
-					      <select name="notSelectedPages[]" size="12" style="width:200px;" multiple="multiple">
-					          {BANNER_EDIT_RELATION_PAGES_UNSELECTED}
-					      </select>
-					      <br />
-					      <font><a href="javascript:selectAll(document.formEditBanner.elements['notSelectedPages[]']);">{TXT_BANNER_EDIT_RELATION_SELECT}<br />
-					      </a><a href="javascript:deselectAll(document.formEditBanner.elements['notSelectedPages[]']);">{TXT_BANNER_EDIT_RELATION_DESELECT}</a></font>
-					    </td>
-					    <td width="4%">
-					      <div align="center">
-					        <input type="button" value=" &gt;&gt; " name="addpages" onclick="banner_add(document.formEditBanner.elements['notSelectedPages[]'],document.formEditBanner.elements['selectedPages[]'],addpages,removepages);" />
-					        <br />
-					        <input type="button" value=" &lt;&lt; " name="removepages" onclick="banner_remove(document.formEditBanner.elements['notSelectedPages[]'],document.formEditBanner.elements['selectedPages[]'],addpages,removepages);" />
-					        <br /><br />
-					      </div>
-					    </td>
-					    <td width="1%">
-					      <div align="left">
-					        <select name="selectedPages[]" size="12" style="width:200px;" multiple="multiple">
-					        	{BANNER_EDIT_RELATION_PAGES_SELECTED}
-					        </select>
-					        <br />
-					        <font><a href="javascript:selectAll(document.formEditBanner.elements['selectedPages[]']);">{TXT_BANNER_EDIT_RELATION_SELECT}<br />
-					        </a><a href="javascript:deselectAll(document.formEditBanner.elements['selectedPages[]']);">{TXT_BANNER_EDIT_RELATION_DESELECT}</a></font>
-					      </div>
-					    </td>
-					    <td width="82%">&nbsp;</td>
-					  </tr>
-					</table>
-				</div>
-				<div id="divRelationNews" style="display:none;">
-					<table width="100%" border="0">
-					  <tr>
-					    <td width="13%">
-					      <select name="notSelectedNews[]" size="12" style="width:200px;" multiple="multiple">
-					          {BANNER_EDIT_RELATION_NEWS_UNSELECTED}
-					      </select>
-					      <br />
-					      <font><a href="javascript:selectAll(document.formEditBanner.elements['notSelectedNews[]']);">{TXT_BANNER_EDIT_RELATION_SELECT}<br />
-					      </a><a href="javascript:deselectAll(document.formEditBanner.elements['notSelectedNews[]']);">{TXT_BANNER_EDIT_RELATION_DESELECT}</a></font>
-					    </td>
-					    <td width="4%">
-					      <div align="center">
-					        <input type="button" value=" &gt;&gt; " name="addnews" onclick="banner_add(document.formEditBanner.elements['notSelectedNews[]'],document.formEditBanner.elements['selectedNews[]'],addnews,removenews);" />
-					        <br />
-					        <input type="button" value=" &lt;&lt; " name="removenews" onclick="banner_remove(document.formEditBanner.elements['notSelectedNews[]'],document.formEditBanner.elements['selectedNews[]'],addnews,removenews);" />
-					        <br /><br />
-					      </div>
-					    </td>
-					    <td width="1%">
-					      <div align="left">
-					        <select name="selectedNews[]" size="12" style="width:200px;" multiple="multiple">
-					        	{BANNER_EDIT_RELATION_NEWS_SELECTED}
-					        </select>
-					        <br />
-					        <font><a href="javascript:selectAll(document.formEditBanner.elements['selectedNews[]']);">{TXT_BANNER_EDIT_RELATION_SELECT}<br />
-					        </a><a href="javascript:deselectAll(document.formEditBanner.elements['selectedNews[]']);">{TXT_BANNER_EDIT_RELATION_DESELECT}</a></font>
-					      </div>
-					    </td>
-					    <td width="82%">&nbsp;</td>
-					  </tr>
-					</table>
-				</div>
-				<div id="divRelationTeaser" style="display:none;">
-					<table width="100%" border="0">
-					  <tr>
-					    <td width="13%">
-					      <select name="notSelectedTeaser[]" size="12" style="width:200px;" multiple="multiple">
-					          {BANNER_EDIT_RELATION_TEASER_UNSELECTED}
-					      </select>
-					      <br />
-					      <font><a href="javascript:selectAll(document.formEditBanner.elements['notSelectedTeaser[]']);">{TXT_BANNER_EDIT_RELATION_SELECT}<br />
-					      </a><a href="javascript:deselectAll(document.formEditBanner.elements['notSelectedTeaser[]']);">{TXT_BANNER_EDIT_RELATION_DESELECT}</a></font>
-					    </td>
-					    <td width="4%">
-					      <div align="center">
-					        <input type="button" value=" &gt;&gt; " name="addnews" onclick="banner_add(document.formEditBanner.elements['notSelectedTeaser[]'],document.formEditBanner.elements['selectedTeaser[]'],addnews,removenews);" />
-					        <br />
-					        <input type="button" value=" &lt;&lt; " name="removenews" onclick="banner_remove(document.formEditBanner.elements['notSelectedTeaser[]'],document.formEditBanner.elements['selectedTeaser[]'],addnews,removenews);" />
-					        <br /><br />
-					      </div>
-					    </td>
-					    <td width="1%">
-					      <div align="left">
-					        <select name="selectedTeaser[]" size="12" style="width:200px;" multiple="multiple">
-					        	{BANNER_EDIT_RELATION_TEASER_SELECTED}
-					        </select>
-					        <br />
-					        <font><a href="javascript:selectAll(document.formEditBanner.elements['selectedTeaser[]']);">{TXT_BANNER_EDIT_RELATION_SELECT}<br />
-					        </a><a href="javascript:deselectAll(document.formEditBanner.elements['selectedTeaser[]']);">{TXT_BANNER_EDIT_RELATION_DESELECT}</a></font>
-					      </div>
-					    </td>
-					    <td width="82%">&nbsp;</td>
-					  </tr>
-					</table>
-				</div>
-			</td>
+  <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist">
+    <tr>
+      <th valign="top" colspan="2">{TXT_BANNER_EDIT_TITLE}</th>
     </tr>
-	</table>
-	<br />
-	<input type="submit" value="{TXT_BANNER_EDIT_RELATION_SAVE}" />
+    <tr valign="top" class="row1">
+      <td width="12%" nowrap="nowrap">{TXT_BANNER_EDIT_NAME}</td>
+      <td><input name="bannerName" type="text" id="bannerName" style="width:400px;" maxlength="250" value="{BANNER_EDIT_NAME}" /></td>
+    </tr>
+    <tr valign="top" class="row2">
+      <td width="12%" nowrap="nowrap">{TXT_BANNER_EDIT_GROUP}</td>
+      <td>
+        <select name="bannerGroupId" id="bannerGroupId" style="width:400px;">
+        <option value="0">{TXT_BANNER_EDIT_GROUP_SELECT}</option>
+        <option value="0">-------------</option>
+        {BANNER_EDIT_GROUP_MENU}
+        </select>
+      </td>
+    </tr>
+    <tr valign="top" class="row1">
+      <td nowrap="nowrap">{TXT_BANNER_EDIT_STATUS}</td>
+      <td height="26"><b><input name="bannerStatus" type="checkbox" value="1" {BANNER_EDIT_STATUS} /></b></td>
+    </tr>
+    <tr valign="top" class="row2">
+      <td width="12%" nowrap="nowrap">{TXT_BANNER_EDIT_CODE}</td>
+      <td><textarea name="bannerCode" id="bannerCode" style="width:90%; height:250px;">{BANNER_EDIT_CODE}</textarea></td>
+    </tr>
+    <tr valign="top" class="row1">
+      <td nowrap="nowrap">{TXT_BANNER_EDIT_RELATION}</td>
+      <td nowrap="nowrap">
+        <div>
+          <!-- BEGIN showContent -->
+            <input type="radio" name="bannerRelationSelect" onClick="switchDiv('content');" checked="checked" id="bannerRelationSelectContent" /><label for="bannerRelationSelectContent">{TXT_BANNER_EDIT_RELATION_CONTENT}</label>
+          <!-- END showContent -->
+          <!-- BEGIN showNews -->
+            <input type="radio" name="bannerRelationSelect" onClick="switchDiv('news');" id="bannerRelationSelectNews" /><label for="bannerRelationSelectNews">{TXT_BANNER_EDIT_RELATION_NEWS}</label>
+          <!-- END showNews -->
+          <!-- BEGIN showTeaser -->
+            <input type="radio" name="bannerRelationSelect" onClick="switchDiv('teaser');" id="bannerRelationSelectTeaser" /><label for="bannerRelationSelectTeaser">{TXT_BANNER_EDIT_RELATION_TEASER}</label>
+          <!-- END showTeaser -->
+        </div>
+        <div id="divRelationPages" style="display:block;">
+          <table width="100%" border="0">
+            <tr>
+              <td width="13%">
+                <select name="notSelectedPages[]" size="12" style="width:200px;" multiple="multiple">
+                    {BANNER_EDIT_RELATION_PAGES_UNSELECTED}
+                </select>
+                <br />
+                <font><a href="javascript:selectAll(document.formEditBanner.elements['notSelectedPages[]']);">{TXT_BANNER_EDIT_RELATION_SELECT}<br />
+                </a><a href="javascript:deselectAll(document.formEditBanner.elements['notSelectedPages[]']);">{TXT_BANNER_EDIT_RELATION_DESELECT}</a></font>
+              </td>
+              <td width="4%">
+                <div align="center">
+                  <input type="button" value=" &gt;&gt; " name="addpages" onclick="banner_add(document.formEditBanner.elements['notSelectedPages[]'],document.formEditBanner.elements['selectedPages[]'],addpages,removepages);" />
+                  <br />
+                  <input type="button" value=" &lt;&lt; " name="removepages" onclick="banner_remove(document.formEditBanner.elements['notSelectedPages[]'],document.formEditBanner.elements['selectedPages[]'],addpages,removepages);" />
+                  <br /><br />
+                </div>
+              </td>
+              <td width="1%">
+                <div align="left">
+                  <select name="selectedPages[]" size="12" style="width:200px;" multiple="multiple">
+                    {BANNER_EDIT_RELATION_PAGES_SELECTED}
+                  </select>
+                  <br />
+                  <font><a href="javascript:selectAll(document.formEditBanner.elements['selectedPages[]']);">{TXT_BANNER_EDIT_RELATION_SELECT}<br />
+                  </a><a href="javascript:deselectAll(document.formEditBanner.elements['selectedPages[]']);">{TXT_BANNER_EDIT_RELATION_DESELECT}</a></font>
+                </div>
+              </td>
+              <td width="82%">&nbsp;</td>
+            </tr>
+          </table>
+        </div>
+        <div id="divRelationNews" style="display:none;">
+          <table width="100%" border="0">
+            <tr>
+              <td width="13%">
+                <select name="notSelectedNews[]" size="12" style="width:200px;" multiple="multiple">
+                    {BANNER_EDIT_RELATION_NEWS_UNSELECTED}
+                </select>
+                <br />
+                <font><a href="javascript:selectAll(document.formEditBanner.elements['notSelectedNews[]']);">{TXT_BANNER_EDIT_RELATION_SELECT}<br />
+                </a><a href="javascript:deselectAll(document.formEditBanner.elements['notSelectedNews[]']);">{TXT_BANNER_EDIT_RELATION_DESELECT}</a></font>
+              </td>
+              <td width="4%">
+                <div align="center">
+                  <input type="button" value=" &gt;&gt; " name="addnews" onclick="banner_add(document.formEditBanner.elements['notSelectedNews[]'],document.formEditBanner.elements['selectedNews[]'],addnews,removenews);" />
+                  <br />
+                  <input type="button" value=" &lt;&lt; " name="removenews" onclick="banner_remove(document.formEditBanner.elements['notSelectedNews[]'],document.formEditBanner.elements['selectedNews[]'],addnews,removenews);" />
+                  <br /><br />
+                </div>
+              </td>
+              <td width="1%">
+                <div align="left">
+                  <select name="selectedNews[]" size="12" style="width:200px;" multiple="multiple">
+                    {BANNER_EDIT_RELATION_NEWS_SELECTED}
+                  </select>
+                  <br />
+                  <font><a href="javascript:selectAll(document.formEditBanner.elements['selectedNews[]']);">{TXT_BANNER_EDIT_RELATION_SELECT}<br />
+                  </a><a href="javascript:deselectAll(document.formEditBanner.elements['selectedNews[]']);">{TXT_BANNER_EDIT_RELATION_DESELECT}</a></font>
+                </div>
+              </td>
+              <td width="82%">&nbsp;</td>
+            </tr>
+          </table>
+        </div>
+        <div id="divRelationTeaser" style="display:none;">
+          <table width="100%" border="0">
+            <tr>
+              <td width="13%">
+                <select name="notSelectedTeaser[]" size="12" style="width:200px;" multiple="multiple">
+                    {BANNER_EDIT_RELATION_TEASER_UNSELECTED}
+                </select>
+                <br />
+                <font><a href="javascript:selectAll(document.formEditBanner.elements['notSelectedTeaser[]']);">{TXT_BANNER_EDIT_RELATION_SELECT}<br />
+                </a><a href="javascript:deselectAll(document.formEditBanner.elements['notSelectedTeaser[]']);">{TXT_BANNER_EDIT_RELATION_DESELECT}</a></font>
+              </td>
+              <td width="4%">
+                <div align="center">
+                  <input type="button" value=" &gt;&gt; " name="addnews" onclick="banner_add(document.formEditBanner.elements['notSelectedTeaser[]'],document.formEditBanner.elements['selectedTeaser[]'],addnews,removenews);" />
+                  <br />
+                  <input type="button" value=" &lt;&lt; " name="removenews" onclick="banner_remove(document.formEditBanner.elements['notSelectedTeaser[]'],document.formEditBanner.elements['selectedTeaser[]'],addnews,removenews);" />
+                  <br /><br />
+                </div>
+              </td>
+              <td width="1%">
+                <div align="left">
+                  <select name="selectedTeaser[]" size="12" style="width:200px;" multiple="multiple">
+                    {BANNER_EDIT_RELATION_TEASER_SELECTED}
+                  </select>
+                  <br />
+                  <font><a href="javascript:selectAll(document.formEditBanner.elements['selectedTeaser[]']);">{TXT_BANNER_EDIT_RELATION_SELECT}<br />
+                  </a><a href="javascript:deselectAll(document.formEditBanner.elements['selectedTeaser[]']);">{TXT_BANNER_EDIT_RELATION_DESELECT}</a></font>
+                </div>
+              </td>
+              <td width="82%">&nbsp;</td>
+            </tr>
+          </table>
+        </div>
+      </td>
+    </tr>
+  </table>
+  <br />
+  <input type="submit" value="{TXT_BANNER_EDIT_RELATION_SAVE}" />
 </form>
 <br />
 <!-- END module_banner_edit.html -->

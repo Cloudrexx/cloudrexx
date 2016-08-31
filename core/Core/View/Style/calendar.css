@@ -1,6 +1,6 @@
 .year {
-	background-color: white;
-	text-align: center;
+  background-color: white;
+  text-align: center;
 }
 table.month {
      background-color: white;
@@ -78,8 +78,8 @@ table.month td.saturday {
 }
 
 table.month td.event {
-	text-align: center;
-	color: black;
+  text-align: center;
+  color: black;
     /*height:20px;*/
     width: 25px;
     border: 1px solid #FAF7F7;
@@ -110,12 +110,12 @@ table.month td.selectedday {
 }
 table.month td.selectedevent {
     text-align: center;
-	color: black;
-	/*height:20px;*/
-	width: 25px;
-	background-color: #F4F7FF;
-	border: 1px black solid;
-	padding: 0px;
+  color: black;
+  /*height:20px;*/
+  width: 25px;
+  background-color: #F4F7FF;
+  border: 1px black solid;
+  padding: 0px;
 }
 table.month td.selectedevent a {
     display: block;
@@ -138,34 +138,34 @@ table.month td.selectedevent a {
 
 }
 .event {
-	text-align: center;
-	color: black;
+  text-align: center;
+  color: black;
     /*height:20px;*/
     width: 25px;
     border: 1px solid #FAF7F7;
 }
 .event a {
-	color: black;
-	display: block;
+  color: black;
+  display: block;
 }
 .todayevent {
     text-align: center;
-	color: black;
+  color: black;
     background-color: #ffff99;
     /*height:20px;*/
     width: 25px;
 }
 table.month td.todayevent {
     text-align: center;
-	color: black;
+  color: black;
     background-color: #F4F7FF;
     /*height:20px;
     width:20px;*/
 }
 .todayevent a {
     background-color: #F4F7FF;
-	color: black;
-	display: block;
+  color: black;
+  display: block;
 }
 .todayevent a:hover {
     background-color: white;

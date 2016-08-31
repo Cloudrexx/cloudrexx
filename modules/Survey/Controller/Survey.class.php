@@ -118,7 +118,7 @@ class Survey {
     function checkUserRestriction($type, $surveyId, $email) {
         global $_ARRAYLANG,$objDatabase;
         $retVal = '';
-        
+
         $ipId=$_SERVER['REMOTE_ADDR'];
         if($type == "cookie") {
             $value = isset($_COOKIE["votingcookie_$surveyId"]) ? contrexx_input2raw($_COOKIE["votingcookie_$surveyId"]) : '';
@@ -199,26 +199,26 @@ class Survey {
         $limit = $this->getPagingLimit();                 //how many items to show per page
         $page = isset($_REQUEST['pos']) ? contrexx_input2raw($_REQUEST['pos']) : 0;
         if($page) {
-            $start = $page; 			//first item to display on this page
+            $start = $page;             //first item to display on this page
         }else {
-            $start = 0;				//if no page var is given, set start to 0
+            $start = 0;                //if no page var is given, set start to 0
         }
         /* End Paging -------------------------------------- */
         $objResult =   $objDatabase->Execute('SELECT  * FROM '.DBPREFIX.'module_survey_surveygroup WHERE isActive !=0 ORDER BY id desc LIMIT '.$start.', '.$limit);
         $row = 'row2';
 
         $this->_objTpl->setVariable(array(
-            'TXT_SURVEY_OVERVIEW'	=> $_ARRAYLANG['TXT_SURVEY_OVERVIEW'],
-            'TXT_STATUS'       		=> $_ARRAYLANG['TXT_STATUS'],
-            'TXT_SURVEY_TITLE'       	=> $_ARRAYLANG['TXT_SURVEY_TITLE'],
+            'TXT_SURVEY_OVERVIEW'    => $_ARRAYLANG['TXT_SURVEY_OVERVIEW'],
+            'TXT_STATUS'               => $_ARRAYLANG['TXT_STATUS'],
+            'TXT_SURVEY_TITLE'           => $_ARRAYLANG['TXT_SURVEY_TITLE'],
             'TXT_CREATED_AT'            => $_ARRAYLANG['TXT_CREATED_AT'],
-            'TXT_MODIFIED_AT'		=> $_ARRAYLANG['TXT_MODIFIED_AT'],
-            'TXT_COUNTER'		=> $_ARRAYLANG['TXT_COUNTER'],
-            'TXT_FUNCTIONS'		=> $_ARRAYLANG['TXT_FUNCTIONS'],
-            'TXT_ACTIVATE'		=> $_ARRAYLANG['TXT_ACTIVATE'],
-            'TXT_DEACTIVATE'		=> $_ARRAYLANG['TXT_DEACTIVATE'],
-            'TXT_DESCRIPTION'		=> $_ARRAYLANG['TXT_DESCRIPTION'],
-            'TXT_DELETE_SELECTED'	=> $_ARRAYLANG['TXT_DELETE_SELECTED'],
+            'TXT_MODIFIED_AT'        => $_ARRAYLANG['TXT_MODIFIED_AT'],
+            'TXT_COUNTER'        => $_ARRAYLANG['TXT_COUNTER'],
+            'TXT_FUNCTIONS'        => $_ARRAYLANG['TXT_FUNCTIONS'],
+            'TXT_ACTIVATE'        => $_ARRAYLANG['TXT_ACTIVATE'],
+            'TXT_DEACTIVATE'        => $_ARRAYLANG['TXT_DEACTIVATE'],
+            'TXT_DESCRIPTION'        => $_ARRAYLANG['TXT_DESCRIPTION'],
+            'TXT_DELETE_SELECTED'    => $_ARRAYLANG['TXT_DELETE_SELECTED'],
             'ACTIVESYRVEY_JAVASCRIPT'   => $this->getShowActiveSurveyJavaScript(),
         ));
 
@@ -253,8 +253,8 @@ class Survey {
                 }
             }
             $this->_objTpl->setVariable(array(
-                'TXT_SURVEY_ID'		        => contrexx_raw2xhtml($objResult->fields['id']),
-                'TXT_SURVEY_TITLE_LABEL'	=> contrexx_raw2xhtml($SurveyTemp),
+                'TXT_SURVEY_ID'                => contrexx_raw2xhtml($objResult->fields['id']),
+                'TXT_SURVEY_TITLE_LABEL'    => contrexx_raw2xhtml($SurveyTemp),
                 'TXT_SURVEY_CREATED_AT'         => contrexx_raw2xhtml($objResult->fields['created']),
                 'TXT_SURVEY_UPDATED_AT'         => contrexx_raw2xhtml($objResult->fields['updated']),
                 'TXT_SURVEY_ACTIVE_IMAGE'       => $activeImage,
@@ -263,7 +263,7 @@ class Survey {
                 'TXT_SURVEY_DESC_TITLE'         => contrexx_raw2xhtml($descTitle),
                 'TXT_SURVEY_NAME_TITLE'         => contrexx_raw2xhtml($surveyTitle),
                 'TXT_SURVEY_ACTIVE'             => $objResult->fields['isActive'],
-                'TXT_SURVEY_COUNTER'		=> contrexx_raw2xhtml($objResult->fields['votes']),
+                'TXT_SURVEY_COUNTER'        => contrexx_raw2xhtml($objResult->fields['votes']),
                 'ENTRY_ROWCLASS'                => $row = ($row == 'row1') ? 'row2' : 'row1',
             ));
             $this->_objTpl->parse('showEntries');
@@ -311,7 +311,7 @@ END;
                                                 WHERE groups.isActive != "0"
                                                 AND groups.id='.$idOfSurvey.'
                                                 ORDER BY Questions.pos,Questions.id DESC');
-        
+
         $Restriction     = $QuestionDatas->fields['UserRestriction'];
         $surveyId        = $QuestionDatas->fields['id'];
         $textAfterButton = $QuestionDatas->fields['textAfterButton'];
@@ -463,7 +463,7 @@ END;
                 //set page metatitle
                 \Env::get('cx')->getPage()->setMetatitle($QuestionDatas->fields['title']);
                 $this->_objTpl->setVariable(array(
-                    'GRAND_TITLE'	    => contrexx_raw2xhtml($QuestionDatas->fields['title']),
+                    'GRAND_TITLE'        => contrexx_raw2xhtml($QuestionDatas->fields['title']),
                     'SURVEY_TITLE'          => $question_wrap,
                     'SURVEY_OPTIONS_TEXT'   => $SurveyOptionTexts,
                     'SURVEY_COMMENT_BOX'    => $commentBox,
@@ -540,9 +540,9 @@ END;
                                     $AnswerCountCheck++;
                                 }
                             }
-                            
+
                             (!empty($votearr)) ? $AnswerQuestCountCheck++ : $skippedCountCheck++;
-                            
+
                             $votearr = "";
                             break;
                         case "4":
@@ -587,7 +587,7 @@ END;
                     $this->_objTpl->setVariable(array(
                         'SURVEY_SUCCESS' => "<div class='text-danger'>$_ARRAYLANG[TXT_SURVEY_NO_ANSWERED_ERR]</div>"
                     ));
-                } else {	// End Of if the checking for the attend any one question
+                } else {    // End Of if the checking for the attend any one question
                     $emailAdd = isset($_POST['additional_email']) ? trim($_POST['additional_email']) : '';
                     $user_id  = 0;
                     // Checking whether it is restricted or not.
@@ -618,7 +618,7 @@ END;
                         $question_id = contrexx_input2raw($_REQUEST["Survey_id_$i"]);
                         // Option Count calculation
                         $query = "SELECT id, answer FROM ".DBPREFIX."module_survey_surveyAnswers WHERE
-		           question_id='$question_id' ORDER BY id";
+                   question_id='$question_id' ORDER BY id";
                         $objResultcount = $objDatabase->Execute($query);
                         $countss        = $objResultcount->RecordCount();
 
@@ -626,7 +626,7 @@ END;
                         $answers = '';
                         $typ  = $i-1;
                         $type = $inputtyp[$typ];
-                        
+
                         if(!empty($type)) {
                             switch($type) {
                                 case "1":
@@ -698,7 +698,7 @@ END;
                                         $query="UPDATE ".DBPREFIX."module_survey_surveyAnswers set votes='".json_encode($choiceVote[$j-1])."' WHERE id='".$temp[0]."'";
                                         $objDatabase->Execute($query);
                                     }
-                                    
+
                                     $answers = json_encode($answerarr);
                                     if(!empty($votearr)) {
                                         $query="UPDATE ".DBPREFIX."module_survey_surveyQuestions set votes=votes+1
@@ -746,7 +746,7 @@ END;
                                                 $choiceVote[$j-1][$temp[1]]++;
                                             }
                                         }
-                                        
+
                                         $votessid = !empty($votess) ? explode('_', $votess[0]) : 0;
                                         $query="UPDATE ".DBPREFIX."module_survey_surveyAnswers set votes='".json_encode($choiceVote[$j-1])."' WHERE id='".$votessid[0]."'";
                                         $objDatabase->Execute($query);
@@ -825,10 +825,10 @@ END;
                     $ipId=$_SERVER['REMOTE_ADDR'];
                     if($Restriction == "email") {
                         $insertSurvey = 'INSERT INTO `'.DBPREFIX.'module_survey_email`
-    					    SET `id` = "",
-    					        `survey_id` = "'.$surveyId.'",
-    					        `email` = "'.contrexx_raw2db($emailAdd).'",
-    					        `voted` = "1" ';
+                            SET `id` = "",
+                                `survey_id` = "'.$surveyId.'",
+                                `email` = "'.contrexx_raw2db($emailAdd).'",
+                                `voted` = "1" ';
                         $objDatabase->Execute($insertSurvey);
                     }else {
                         $cookieVal = isset($_COOKIE["votingcookie_$surveyId"]) ? contrexx_input2raw($_COOKIE["votingcookie_$surveyId"]) : '';
@@ -853,7 +853,7 @@ END;
         }
     }
 
-    
+
     function _create_additional_input_fields($settings) {
         global $_ARRAYLANG,$objDatabase;
 
@@ -865,7 +865,7 @@ END;
         $Salutation = explode ("--", $SalutationValue);
         $AgeGroup = explode ("--", $AgeGroupValue);
         $input_template_SelectBox = '<select style="width:256px;" name="%name" id="%name" >
-	                               <option value="0">Bitte w&auml;hlen</option>';
+                                   <option value="0">Bitte w&auml;hlen</option>';
         foreach($Salutation as $row) {
             if(trim($row) != "")
                 $input_template_SelectBox .= '<option value="'.$row.'">'.$row.'</option>';
@@ -873,11 +873,11 @@ END;
         $input_template_SelectBox .= '</select>';
 
         $input_template_AgeSelectBox = '<select style="width:256px;" name="%name" id="%name" >
-	                               <option value="0">Bitte w&auml;hlen</option>';	                               
+                                   <option value="0">Bitte w&auml;hlen</option>';
         foreach($AgeGroup as $row) {
             if(trim($row) != "")
                 $input_template_AgeSelectBox .= '<option value="'.$row.'">'.$row.'</option>';
-        }                                     	                                	                               	       
+        }
         $input_template_AgeSelectBox .= '</select>';
 
         $additionals = array(
@@ -938,7 +938,7 @@ END;
                                                         Questions.pos,
                                                         Questions.column_choice
                                                 FROM '.DBPREFIX.'module_survey_surveygroup AS groups
-                                                LEFT JOIN '.DBPREFIX.'module_survey_surveyQuestions AS Questions 
+                                                LEFT JOIN '.DBPREFIX.'module_survey_surveyQuestions AS Questions
                                                 ON groups.id=Questions.survey_id
                                                 WHERE groups.isActive != "0"
                                                 AND isHomeBox="1"
@@ -1094,7 +1094,7 @@ END;
                 //set the page metatitle
                 \Env::get('cx')->getPage()->setMetatitle($QuestionDatas->fields['title']);
                 $this->_objTpl->setVariable(array(
-                    'GRAND_TITLE'	    => contrexx_raw2xhtml($QuestionDatas->fields['title']),
+                    'GRAND_TITLE'        => contrexx_raw2xhtml($QuestionDatas->fields['title']),
                     'SURVEY_TITLE'          => $question_wrap,
                     'SURVEY_OPTIONS_TEXT'   => $SurveyOptionTexts,
                     'SURVEY_COMMENT_BOX'    => $commentBox,
@@ -1218,7 +1218,7 @@ END;
                     $this->_objTpl->setVariable(array(
                         'SURVEY_SUCCESS' => "<div class='text-danger'>$_ARRAYLANG[TXT_SURVEY_NO_ANSWERED_ERR]</div>"
                     ));
-                } else {	// End Of if the checking for the attend any one question
+                } else {    // End Of if the checking for the attend any one question
                     $emailAdd = isset($_POST['additional_email']) ? trim($_POST['additional_email']) : '';
                     $user_id  = 0;
                     // Checking whether it is restricted or not.
@@ -1249,7 +1249,7 @@ END;
                         $question_id = contrexx_input2raw($_REQUEST["Survey_id_$i"]);
                         // Option Count calculation
                         $query = "SELECT id, answer FROM ".DBPREFIX."module_survey_surveyAnswers WHERE
-		           question_id='$question_id' ORDER BY id";
+                   question_id='$question_id' ORDER BY id";
                         $objResultcount = $objDatabase->Execute($query);
                         $countss        = $objResultcount->RecordCount();
 
@@ -1456,10 +1456,10 @@ END;
                     $ipId=$_SERVER['REMOTE_ADDR'];
                     if($Restriction == "email") {
                         $insertSurvey = 'INSERT INTO `'.DBPREFIX.'module_survey_email`
-    					    SET `id` = "",
-    					        `survey_id` = "'.$surveyId.'",
-    					        `email` = "'.contrexx_raw2db($emailAdd).'",
-    					        `voted` = "1" ';
+                            SET `id` = "",
+                                `survey_id` = "'.$surveyId.'",
+                                `email` = "'.contrexx_raw2db($emailAdd).'",
+                                `voted` = "1" ';
                         $objDatabase->Execute($insertSurvey);
                     }else {
                         $cookieVal = isset($_COOKIE["votingcookie_$surveyId"]) ? contrexx_input2raw($_COOKIE["votingcookie_$surveyId"]) : '';
@@ -1492,7 +1492,7 @@ END;
     function surveypreview() {
         global $_ARRAYLANG,$objDatabase;
         $id = isset($_REQUEST['id']) ? contrexx_input2raw($_REQUEST['id']) : 0;
-        
+
         //Query to get the Question and answer details.
         $QuestionDatas = $objDatabase->Execute('SELECT groups.title As title,
                                                         groups.*,
@@ -1515,7 +1515,7 @@ END;
         $text1           = $QuestionDatas->fields['text1'];
         $text2           = $QuestionDatas->fields['text2'];
         $additional_fields = array();
-        
+
         $this->_objTpl->setVariable(array(
             'DB_TEXT_AFTER_BUTTON'  => contrexx_remove_script_tags($textAfterButton),
             'TEXT1'                 => contrexx_remove_script_tags($text1),
@@ -1543,7 +1543,7 @@ END;
             }
 
             $query = "SELECT id, answer FROM ".DBPREFIX."module_survey_surveyAnswers WHERE
-		           question_id='$answerId' ORDER BY id";
+                   question_id='$answerId' ORDER BY id";
             $objResult = $objDatabase->Execute($query);
 
             $SurveyOptionText = "";
@@ -1633,7 +1633,7 @@ END;
             //set the page metatitle
             \Env::get('cx')->getPage()->setMetatitle(contrexx_raw2xhtml($QuestionDatas->fields['title']));
             $this->_objTpl->setVariable(array(
-                    'GRAND_TITLE'	    => contrexx_raw2xhtml($QuestionDatas->fields['title']),
+                    'GRAND_TITLE'        => contrexx_raw2xhtml($QuestionDatas->fields['title']),
                     'SURVEY_TITLE'          => $question_wrap,
                     'SURVEY_OPTIONS_TEXT'   => $SurveyOptionTexts,
                     'SURVEY_COMMENT_BOX'    => $commentBox,
@@ -1716,7 +1716,7 @@ END;
             }
 
             $query = "SELECT id, answer FROM ".DBPREFIX."module_survey_surveyAnswers WHERE
-		          question_id='$answerId' ORDER BY id";
+                  question_id='$answerId' ORDER BY id";
             $objResult = $objDatabase->Execute($query);
 
 
@@ -1808,7 +1808,7 @@ END;
             //set the page metatitle
             \Env::get('cx')->getPage()->setMetatitle($QuestionDatas->fields['title']);
             $this->_objTpl->setVariable(array(
-                'GRAND_TITLE'	    => contrexx_raw2xhtml($QuestionDatas->fields['title']),
+                'GRAND_TITLE'        => contrexx_raw2xhtml($QuestionDatas->fields['title']),
                 'SURVEY_TITLE'          => $question_wrap,
                 'SURVEY_OPTIONS_TEXT'   => $SurveyOptionTexts,
                 'SURVEY_COMMENT_BOX'    => $commentBox,
@@ -1872,9 +1872,9 @@ END;
         $TXT_ENTER_VALID_EMAIL_ERR = $_ARRAYLANG['TXT_ENTER_VALID_EMAIL_ERR'];
 
         $javascript = '
-	<script language="JavaScript" type="text/javascript">
-	
-	 function trim(sString){
+    <script language="JavaScript" type="text/javascript">
+
+     function trim(sString){
               while (sString.substring(0,1) == " "){
                sString = sString.substring(1, sString.length);
               }
@@ -1884,19 +1884,19 @@ END;
          return sString;
         }
         function ltrim(s){
-       	var l=0;
-	       while(l < s.length && s[l] == " ")
-	       {	l++; }
-       	return s.substring(l, s.length);
+           var l=0;
+           while(l < s.length && s[l] == " ")
+           {    l++; }
+           return s.substring(l, s.length);
         }
         function rtrim(s){
-       	var r=s.length -1;
-	       while(r > 0 && s[r] == " ")
-	       {	r-=1;	}
-	       return s.substring(0, r+1);
+           var r=s.length -1;
+           while(r > 0 && s[r] == " ")
+           {    r-=1;    }
+           return s.substring(0, r+1);
         }
        function IsNumeric(strString){
-        //  check for valid numeric strings	
+        //  check for valid numeric strings
         var strValidChars = "0123456789";
           var strChar;
           var blnResult = true;
@@ -1913,186 +1913,186 @@ END;
           return blnResult;
        }
 
-	function alphanumeric(alphane)
-	{
-		var numaric = alphane;		
-		for(var j=0; j<numaric.length; j++)
-			{
-			  var alphaa = numaric.charAt(j);
-			  var hh = alphaa.charCodeAt(0);
-			  if((hh > 47 && hh<58) || (hh > 64 && hh<91) || (hh > 96 && hh<123))
-			  {
-			  }
-			else	{
-				 return false;
-			  }
-	 		}
-	 return true;
-	}
+    function alphanumeric(alphane)
+    {
+        var numaric = alphane;
+        for(var j=0; j<numaric.length; j++)
+            {
+              var alphaa = numaric.charAt(j);
+              var hh = alphaa.charCodeAt(0);
+              if((hh > 47 && hh<58) || (hh > 64 && hh<91) || (hh > 96 && hh<123))
+              {
+              }
+            else    {
+                 return false;
+              }
+             }
+     return true;
+    }
 
-	function alpha(val){
-		 var iChars = "!@#$%^&*()+=-[]\\\;,/{}|\":<>?0123456789";
-		  for (var i = 0; i < val.length; i++) {
-		  	if (iChars.indexOf(val.charAt(i)) != -1) {
-		  	return false;
-		  	}
-		  }
-		  return true; 
-	}
+    function alpha(val){
+         var iChars = "!@#$%^&*()+=-[]\\\;,/{}|\":<>?0123456789";
+          for (var i = 0; i < val.length; i++) {
+              if (iChars.indexOf(val.charAt(i)) != -1) {
+              return false;
+              }
+          }
+          return true;
+    }
 
-	
-	
-	function AdditionalValidate(){	
-	if (document.getElementById("additional_salutation") != undefined){
-		var salutation = document.getElementById("additional_salutation").value;
-		if(salutation == 0){
-			alert("'.$TXT_SELECT_SALUTATION_ERR.'");
-			document.getElementById("additional_salutation").focus();
-			document.getElementById("additional_salutation").value="";
-			return false;
-		}
-	}
-	
-	if (document.getElementById("additional_nickname") != undefined){
-		var nickname = document.getElementById("additional_nickname").value;
-		if(trim(nickname) == ""){
-			alert("'.$TXT_ENTER_NICKNAME_ERR.'");
-			document.getElementById("additional_nickname").focus();
-			document.getElementById("additional_nickname").value="";
-		return false;
-		}  
-	}  
-	
-	if (document.getElementById("additional_forename") != undefined){
-		var forename = document.getElementById("additional_forename").value;
-		if(trim(forename) == ""){
-			alert("'.$TXT_ENTER_FORNAME_ERR.'");
-			document.getElementById("additional_forename").focus();
-			document.getElementById("additional_forename").value="";
-			return false;
-		} 
-		if(alpha(forename) == false){
-			alert("'.$TXT_ENTER_FORNAME_ALFA_ERR.'");
-			document.getElementById("additional_forename").focus();
-			document.getElementById("additional_forename").value="";
-			return false;
-		}
-	}
-	
-	if (document.getElementById("additional_surname") != undefined){
-		var surname = document.getElementById("additional_surname").value;
-		if(trim(surname) == ""){
-			alert("'.$TXT_ENTER_SURNAME_ERR.'");
-			document.getElementById("additional_surname").focus();
-			document.getElementById("additional_surname").value="";	
-			return false;
-		}
-		if(alpha(surname) == false){
-			alert("'.$TXT_ENTER_FORNAME_ALFA_ERR.'");
-			document.getElementById("additional_surname").focus();
-			document.getElementById("additional_surname").value="";
-			return false;
-		}	
-	}
-	
-	if (document.getElementById("additional_agegroup") != undefined){
-		var agegroup = document.getElementById("additional_agegroup").value;
-		if(agegroup == 0){
-			alert("'.$TXT_SELECT_AGEGROUP_ERR.'");
-			document.getElementById("additional_agegroup").focus();
-			document.getElementById("additional_agegroup").value="";
-			return false;
-		}	
-	}
-		
-	
-	//		if(addInfoArr[5] == 1){
-	//			var phone = document.getElementById("additional_phone").value;
-	//			if(trim(phone) == ""){
-	//				alert("'.$TXT_ENTER_TELEPHONE_ERR.'");
-	//				document.getElementById("additional_phone").focus();
-	//				document.getElementById("additional_phone").value="";
-	//				return false;
-	//			}
-	//			if(IsNumeric(phone) == false){
-	//				alert("'.$TXT_ENTER_VALID_TELEPHONE_ERR.'");
-	//				document.getElementById("additional_phone").focus();
-	//				document.getElementById("additional_phone").value="";
-	//				return false;
-	//			}
-	//			return true;
-	//		}
-	
-	if (document.getElementById("additional_street") != undefined){
-		var street = document.getElementById("additional_street").value;
-		if(trim(street) == ""){
-			alert("'.$TXT_ENTER_STREET_ERR.'");
-			document.getElementById("additional_street").focus();
-			document.getElementById("additional_street").value="";
-			return false;
-		}	
-	}
-	
-	
-	if (document.getElementById("additional_zip") != undefined){
-		var zip = document.getElementById("additional_zip").value;
-		if(trim(zip) == ""){
-			alert("'.$TXT_ENTER_ZIP_ERR.'");
-			document.getElementById("additional_zip").focus();
-			document.getElementById("additional_zip").value="";
-			return false;
-		}
-		if(IsNumeric(zip) == false){
-			alert("'.$TXT_ENTER_VALID_ZIP_ERR.'");
-			document.getElementById("additional_zip").focus();
-			document.getElementById("additional_zip").value="";
-			return false;
-		}	
-	}
-	
-	
-	if (document.getElementById("additional_city") != undefined){
-		var city = document.getElementById("additional_city").value;
-		if(trim(city) == ""){
-			alert("'.$TXT_ENTER_CITY_ERR.'");
-			document.getElementById("additional_city").focus();
-			document.getElementById("additional_city").value="";
-			return false;
-		}
-		if(alpha(city) == ""){
-			alert("'.$TXT_ENTER_FORNAME_ALFA_ERR.'");
-			document.getElementById("additional_city").focus();
-			document.getElementById("additional_city").value="";
-			return false;
-		}	
-	}
-	
-	
-	if (document.getElementById("additional_email") != undefined){
-		var email = document.getElementById("additional_email").value;
-		if(trim(email) == ""){
-			alert("'.$TXT_ENTER_EMAIL_ERR.'");
-			document.getElementById("additional_email").focus();
-			document.getElementById("additional_email").value="";
-			return false;
-		}
-		if(/^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/.test(email) == false) {
-			alert("'.$TXT_ENTER_VALID_EMAIL_ERR.'");
-			document.getElementById("additional_email").focus();
-			document.getElementById("additional_email").value="";
-			return false;
-		}	
-	}
-		
-	return true;
+
+
+    function AdditionalValidate(){
+    if (document.getElementById("additional_salutation") != undefined){
+        var salutation = document.getElementById("additional_salutation").value;
+        if(salutation == 0){
+            alert("'.$TXT_SELECT_SALUTATION_ERR.'");
+            document.getElementById("additional_salutation").focus();
+            document.getElementById("additional_salutation").value="";
+            return false;
+        }
+    }
+
+    if (document.getElementById("additional_nickname") != undefined){
+        var nickname = document.getElementById("additional_nickname").value;
+        if(trim(nickname) == ""){
+            alert("'.$TXT_ENTER_NICKNAME_ERR.'");
+            document.getElementById("additional_nickname").focus();
+            document.getElementById("additional_nickname").value="";
+        return false;
+        }
+    }
+
+    if (document.getElementById("additional_forename") != undefined){
+        var forename = document.getElementById("additional_forename").value;
+        if(trim(forename) == ""){
+            alert("'.$TXT_ENTER_FORNAME_ERR.'");
+            document.getElementById("additional_forename").focus();
+            document.getElementById("additional_forename").value="";
+            return false;
+        }
+        if(alpha(forename) == false){
+            alert("'.$TXT_ENTER_FORNAME_ALFA_ERR.'");
+            document.getElementById("additional_forename").focus();
+            document.getElementById("additional_forename").value="";
+            return false;
+        }
+    }
+
+    if (document.getElementById("additional_surname") != undefined){
+        var surname = document.getElementById("additional_surname").value;
+        if(trim(surname) == ""){
+            alert("'.$TXT_ENTER_SURNAME_ERR.'");
+            document.getElementById("additional_surname").focus();
+            document.getElementById("additional_surname").value="";
+            return false;
+        }
+        if(alpha(surname) == false){
+            alert("'.$TXT_ENTER_FORNAME_ALFA_ERR.'");
+            document.getElementById("additional_surname").focus();
+            document.getElementById("additional_surname").value="";
+            return false;
+        }
+    }
+
+    if (document.getElementById("additional_agegroup") != undefined){
+        var agegroup = document.getElementById("additional_agegroup").value;
+        if(agegroup == 0){
+            alert("'.$TXT_SELECT_AGEGROUP_ERR.'");
+            document.getElementById("additional_agegroup").focus();
+            document.getElementById("additional_agegroup").value="";
+            return false;
+        }
+    }
+
+
+    //        if(addInfoArr[5] == 1){
+    //            var phone = document.getElementById("additional_phone").value;
+    //            if(trim(phone) == ""){
+    //                alert("'.$TXT_ENTER_TELEPHONE_ERR.'");
+    //                document.getElementById("additional_phone").focus();
+    //                document.getElementById("additional_phone").value="";
+    //                return false;
+    //            }
+    //            if(IsNumeric(phone) == false){
+    //                alert("'.$TXT_ENTER_VALID_TELEPHONE_ERR.'");
+    //                document.getElementById("additional_phone").focus();
+    //                document.getElementById("additional_phone").value="";
+    //                return false;
+    //            }
+    //            return true;
+    //        }
+
+    if (document.getElementById("additional_street") != undefined){
+        var street = document.getElementById("additional_street").value;
+        if(trim(street) == ""){
+            alert("'.$TXT_ENTER_STREET_ERR.'");
+            document.getElementById("additional_street").focus();
+            document.getElementById("additional_street").value="";
+            return false;
+        }
+    }
+
+
+    if (document.getElementById("additional_zip") != undefined){
+        var zip = document.getElementById("additional_zip").value;
+        if(trim(zip) == ""){
+            alert("'.$TXT_ENTER_ZIP_ERR.'");
+            document.getElementById("additional_zip").focus();
+            document.getElementById("additional_zip").value="";
+            return false;
+        }
+        if(IsNumeric(zip) == false){
+            alert("'.$TXT_ENTER_VALID_ZIP_ERR.'");
+            document.getElementById("additional_zip").focus();
+            document.getElementById("additional_zip").value="";
+            return false;
+        }
+    }
+
+
+    if (document.getElementById("additional_city") != undefined){
+        var city = document.getElementById("additional_city").value;
+        if(trim(city) == ""){
+            alert("'.$TXT_ENTER_CITY_ERR.'");
+            document.getElementById("additional_city").focus();
+            document.getElementById("additional_city").value="";
+            return false;
+        }
+        if(alpha(city) == ""){
+            alert("'.$TXT_ENTER_FORNAME_ALFA_ERR.'");
+            document.getElementById("additional_city").focus();
+            document.getElementById("additional_city").value="";
+            return false;
+        }
+    }
+
+
+    if (document.getElementById("additional_email") != undefined){
+        var email = document.getElementById("additional_email").value;
+        if(trim(email) == ""){
+            alert("'.$TXT_ENTER_EMAIL_ERR.'");
+            document.getElementById("additional_email").focus();
+            document.getElementById("additional_email").value="";
+            return false;
+        }
+        if(/^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/.test(email) == false) {
+            alert("'.$TXT_ENTER_VALID_EMAIL_ERR.'");
+            document.getElementById("additional_email").focus();
+            document.getElementById("additional_email").value="";
+            return false;
+        }
+    }
+
+    return true;
 }
 
 
 
-	
-	
-	</script>	
-	';
+
+
+    </script>
+    ';
         return $javascript;
     }
 

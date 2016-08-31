@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * LinkGenerator
  *
@@ -87,13 +87,13 @@ class LinkGenerator {
             $lg->scan($template);
         }
 
-        $lg->fetch(Env::get('em'));        
+        $lg->fetch(Env::get('em'));
 
         foreach ($arrTemplates as &$template) {
             $lg->replaceIn($template);
         }
     }
-    
+
     public function __construct($absoluteUris = false, $domain = null) {
         $this->absoluteUris = $absoluteUris;
         $this->domain = $domain;
@@ -113,7 +113,7 @@ class LinkGenerator {
             return;
         }
 
-        for($i = 0; $i < count($matches[0]); $i++) {           
+        for($i = 0; $i < count($matches[0]); $i++) {
             $nodeId = isset($matches[\Cx\Core\ContentManager\Model\Entity\Page::NODE_URL_NODE_ID][$i]) ?$matches[\Cx\Core\ContentManager\Model\Entity\Page::NODE_URL_NODE_ID][$i] : 0;
             $module = isset($matches[\Cx\Core\ContentManager\Model\Entity\Page::NODE_URL_MODULE][$i]) ? strtolower($matches[\Cx\Core\ContentManager\Model\Entity\Page::NODE_URL_MODULE][$i]) : '';
             $cmd = isset($matches[\Cx\Core\ContentManager\Model\Entity\Page::NODE_URL_CMD][$i]) ? strtolower($matches[\Cx\Core\ContentManager\Model\Entity\Page::NODE_URL_CMD][$i]) : '';
@@ -157,8 +157,8 @@ class LinkGenerator {
         $qb = $em->createQueryBuilder();
         $qb->add('select', new Doctrine\ORM\Query\Expr\Select(array('p')));
         $qb->add('from', new Doctrine\ORM\Query\Expr\From('Cx\Core\ContentManager\Model\Entity\Page', 'p'));
-       
-        //build a big or with all the node ids and pages 
+
+        //build a big or with all the node ids and pages
         $arrExprs = null;
         $fetchedPages = array();
         $pIdx = 0;
@@ -298,4 +298,3 @@ class LinkGenerator {
         }
     }
 }
-

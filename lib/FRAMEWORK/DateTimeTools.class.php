@@ -248,72 +248,72 @@ cx.jQuery(function() {
 //DBG::log("Chars: ".var_export($chars, true));
         foreach ($chars as $char) {
             switch ($char) {
-                //d 	Day of the month, 2 digits with leading zeros 	01 to 31
+                //d     Day of the month, 2 digits with leading zeros     01 to 31
                 case 'd':
                     $re .= '(?:[0-2][0-9]|3[01])';
                     break;
-                //j 	Day of the month without leading zeros 	1 to 31
+                //j     Day of the month without leading zeros     1 to 31
                 // Note: Matches the optional leading zero anyway.
                 case 'j':
                     $re .= '(?:[0-2]?[0-9]|3[01])';
                     break;
-                //m 	Numeric representation of a month, with leading zeros 	01 through 12
+                //m     Numeric representation of a month, with leading zeros     01 through 12
                 case 'm':
                     $re .= '(?:0[1-9]|1[012])';
                     break;
-                //n 	Numeric representation of a month, without leading zeros 	1 through 12
+                //n     Numeric representation of a month, without leading zeros     1 through 12
                 // Note: Matches the optional leading zero anyway.
                 case 'n':
                     $re .= '(?:0?[1-9]|1[012])';
                     break;
-                //Y 	A full numeric representation of a year, 4 digits 	Examples: 1999 or 2003
+                //Y     A full numeric representation of a year, 4 digits     Examples: 1999 or 2003
                 // Note: Does not limit the age in any way.  "0000" is a
                 // perfectly valid year according to the specifications.
                 case 'Y':
                     $re .= '\d\d\d\d';
                     break;
-                //y 	A two digit representation of a year 	Examples: 99 or 03
+                //y     A two digit representation of a year     Examples: 99 or 03
                 // Note: Proper interpretation of the century is up to you.
                 case 'y':
                     $re .= '\d\d';
                     break;
-                //a 	Lowercase Ante meridiem and Post meridiem 	am or pm
+                //a     Lowercase Ante meridiem and Post meridiem     am or pm
                 // Note: If you use the /i switch, this is equal to 'A'.
                 case 'a':
                     $re .= '[ap]m';
                     break;
-                //A 	Uppercase Ante meridiem and Post meridiem 	AM or PM
+                //A     Uppercase Ante meridiem and Post meridiem     AM or PM
                 // Note: If you use the /i switch, this is equal to 'a'.
                 case 'A':
                     $re .= '[AP]M';
                     break;
-                //B 	Swatch Internet time 	000 through 999
+                //B     Swatch Internet time     000 through 999
                 case 'B':
                     $re .= '\d\d\d';
                     break;
-                //g 	12-hour format of an hour without leading zeros 	1 through 12
+                //g     12-hour format of an hour without leading zeros     1 through 12
                 // Note: Matches the optional leading zero anyway.
                 case 'g':
                     $re .= '(?:0?[1-9]|1[012])';
                     break;
-                //h 	12-hour format of an hour with leading zeros 	01 through 12
+                //h     12-hour format of an hour with leading zeros     01 through 12
                 case 'h':
                     $re .= '(?:0[1-9]|1[012])';
                     break;
-                //G 	24-hour format of an hour without leading zeros 	0 through 23
+                //G     24-hour format of an hour without leading zeros     0 through 23
                 // Note: Matches the optional leading zero anyway.
                 case 'G':
                     $re .= '(?:0?[1-9]|1\d|2[0-3])';
                     break;
-                //H 	24-hour format of an hour with leading zeros 	00 through 23
+                //H     24-hour format of an hour with leading zeros     00 through 23
                 case 'H':
                     $re .= '(?:0[1-9]|1\d|2[0-3])';
                     break;
-                //i 	Minutes with leading zeros 	00 to 59
+                //i     Minutes with leading zeros     00 to 59
                 case 'i':
                     $re .= '[0-5]\d';
                     break;
-                //s 	Seconds, with leading zeros 	00 through 59
+                //s     Seconds, with leading zeros     00 through 59
                 case 's':
                     $re .= '[0-5]\d';
                     break;
@@ -326,34 +326,34 @@ cx.jQuery(function() {
 
 // Not Implemented -- mind your step:
 //Day
-//D 	A textual representation of a day, three letters 	Mon through Sun
-//l (lowercase 'L') 	A full textual representation of the day of the week 	Sunday through Saturday
-//N 	ISO-8601 numeric representation of the day of the week (added in PHP 5.1.0) 	1 (for Monday) through 7 (for Sunday)
-//S 	English ordinal suffix for the day of the month, 2 characters 	st, nd, rd or th. Works well with j
-//w 	Numeric representation of the day of the week 	0 (for Sunday) through 6 (for Saturday)
-//z 	The day of the year (starting from 0) 	0 through 365
-//Week 	--- 	---
-//W 	ISO-8601 week number of year, weeks starting on Monday (added in PHP 4.1.0) 	Example: 42 (the 42nd week in the year)
-//Month 	--- 	---
-//F 	A full textual representation of a month, such as January or March 	January through December
-//M 	A short textual representation of a month, three letters 	Jan through Dec
-//t 	Number of days in the given month 	28 through 31
-//Year 	--- 	---
-//L 	Whether it's a leap year 	1 if it is a leap year, 0 otherwise.
-//o 	ISO-8601 year number. This has the same value as Y, except that if the ISO week number (W) belongs to the previous or next year, that year is used instead. (added in PHP 5.1.0) 	Examples: 1999 or 2003
-//Time 	--- 	---
-//u 	Microseconds (added in PHP 5.2.2) 	Example: 654321
-//Timezone 	--- 	---
-//e 	Timezone identifier (added in PHP 5.1.0) 	Examples: UTC, GMT, Atlantic/Azores
-//I (capital i) 	Whether or not the date is in daylight saving time 	1 if Daylight Saving Time, 0 otherwise.
-//O 	Difference to Greenwich time (GMT) in hours 	Example: +0200
-//P 	Difference to Greenwich time (GMT) with colon between hours and minutes (added in PHP 5.1.3) 	Example: +02:00
-//T 	Timezone abbreviation 	Examples: EST, MDT ...
-//Z 	Timezone offset in seconds. The offset for timezones west of UTC is always negative, and for those east of UTC is always positive. 	-43200 through 50400
-//Full Date/Time 	--- 	---
-//c 	ISO 8601 date (added in PHP 5) 	2004-02-12T15:19:21+00:00
-//r 	» RFC 2822 formatted date 	Example: Thu, 21 Dec 2000 16:01:07 +0200
-//U 	Seconds since the Unix Epoch (January 1 1970 00:00:00 GMT) 	See also time()
+//D     A textual representation of a day, three letters     Mon through Sun
+//l (lowercase 'L')     A full textual representation of the day of the week     Sunday through Saturday
+//N     ISO-8601 numeric representation of the day of the week (added in PHP 5.1.0)     1 (for Monday) through 7 (for Sunday)
+//S     English ordinal suffix for the day of the month, 2 characters     st, nd, rd or th. Works well with j
+//w     Numeric representation of the day of the week     0 (for Sunday) through 6 (for Saturday)
+//z     The day of the year (starting from 0)     0 through 365
+//Week     ---     ---
+//W     ISO-8601 week number of year, weeks starting on Monday (added in PHP 4.1.0)     Example: 42 (the 42nd week in the year)
+//Month     ---     ---
+//F     A full textual representation of a month, such as January or March     January through December
+//M     A short textual representation of a month, three letters     Jan through Dec
+//t     Number of days in the given month     28 through 31
+//Year     ---     ---
+//L     Whether it's a leap year     1 if it is a leap year, 0 otherwise.
+//o     ISO-8601 year number. This has the same value as Y, except that if the ISO week number (W) belongs to the previous or next year, that year is used instead. (added in PHP 5.1.0)     Examples: 1999 or 2003
+//Time     ---     ---
+//u     Microseconds (added in PHP 5.2.2)     Example: 654321
+//Timezone     ---     ---
+//e     Timezone identifier (added in PHP 5.1.0)     Examples: UTC, GMT, Atlantic/Azores
+//I (capital i)     Whether or not the date is in daylight saving time     1 if Daylight Saving Time, 0 otherwise.
+//O     Difference to Greenwich time (GMT) in hours     Example: +0200
+//P     Difference to Greenwich time (GMT) with colon between hours and minutes (added in PHP 5.1.3)     Example: +02:00
+//T     Timezone abbreviation     Examples: EST, MDT ...
+//Z     Timezone offset in seconds. The offset for timezones west of UTC is always negative, and for those east of UTC is always positive.     -43200 through 50400
+//Full Date/Time     ---     ---
+//c     ISO 8601 date (added in PHP 5)     2004-02-12T15:19:21+00:00
+//r     » RFC 2822 formatted date     Example: Thu, 21 Dec 2000 16:01:07 +0200
+//U     Seconds since the Unix Epoch (January 1 1970 00:00:00 GMT)     See also time()
             }
         }
 //DBG::log("Made date RE for format /$format/: /$re/");
@@ -403,9 +403,9 @@ cx.jQuery(function() {
 
     /**
      * Check the given value is in valid date format(d.M.Y H:i:s) or not
-     * 
+     *
      * @param string $value input value
-     * 
+     *
      * @return boolean true|false
      */
     public function isValidDate($value) {

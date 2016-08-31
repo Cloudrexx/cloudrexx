@@ -16,198 +16,198 @@ function deleteVote(vId)
 }
 function selectCommentMultiAction()
 {
-	with (document.frmShowComments)
-	{
-		switch (frmShowComments_MultiAction.value) {
-			case 'delete':
-				if (confirm('{TXT_COMMENT_DELETE_ALL_JS}')) {
-					submit();
-				}
-			break;
-			default: //do nothing
+  with (document.frmShowComments)
+  {
+    switch (frmShowComments_MultiAction.value) {
+      case 'delete':
+        if (confirm('{TXT_COMMENT_DELETE_ALL_JS}')) {
+          submit();
+        }
+      break;
+      default: //do nothing
 
-		}
-	}
+    }
+  }
 }
 function selectVotingMultiAction()
 {
-	with (document.frmShowVotes)
-	{
-		switch (frmShowVotes_MultiAction.value) {
-			case 'delete':
-				if (confirm('{TXT_COMMENT_DELETE_ALL_JS}')) {
-					submit();
-				}
-			break;
-			default: //do nothing
+  with (document.frmShowVotes)
+  {
+    switch (frmShowVotes_MultiAction.value) {
+      case 'delete':
+        if (confirm('{TXT_COMMENT_DELETE_ALL_JS}')) {
+          submit();
+        }
+      break;
+      default: //do nothing
 
-		}
-	}
+    }
+  }
 }
 function showOrHide(strElement) {
-	if (document.getElementById(strElement).style.display == 'none') {
-		document.getElementById(strElement).style.display = 'block';
-	} else {
-		document.getElementById(strElement).style.display = 'none';
-	}
+  if (document.getElementById(strElement).style.display == 'none') {
+    document.getElementById(strElement).style.display = 'block';
+  } else {
+    document.getElementById(strElement).style.display = 'none';
+  }
 }
 function copyText(strType) {
-	for (var h=0; h < document.forms.length;h++) {
-		for (var i=0; i < document.forms[h].elements.length;i++) {
-			//read out all form-elements with the loop
-			if(document.forms[h].elements[i].name.search(strType) != -1) {
-				if (strType == 'pictureDesc_') {
-					document.forms[h].elements[i].value = document.editImage.pictureLinkName.value;
-				} else {
-					document.forms[h].elements[i].value = document.editImage.pictureName.value;
-				}
-			}
-		}
-	}
+  for (var h=0; h < document.forms.length;h++) {
+    for (var i=0; i < document.forms[h].elements.length;i++) {
+      //read out all form-elements with the loop
+      if(document.forms[h].elements[i].name.search(strType) != -1) {
+        if (strType == 'pictureDesc_') {
+          document.forms[h].elements[i].value = document.editImage.pictureLinkName.value;
+        } else {
+          document.forms[h].elements[i].value = document.editImage.pictureName.value;
+        }
+      }
+    }
+  }
 }
 </script>
 
 <ul id="tabmenu">
-	<li><a id="editImageTab_Settings" class="{TAB_ACTIVE_SETTINGS}" href="javascript:{}" onclick="selectTab('Settings')" title="{TXT_TAB_SETTINGS}">{TXT_TAB_SETTINGS}</a></li>
-	<!-- BEGIN tabComment -->
-	<li><a id="editImageTab_Comments" class="{TAB_ACTIVE_COMMENTS}" href="javascript:{}" onclick="selectTab('Comments')" title="{TXT_TAB_COMMENTS}">{TXT_TAB_COMMENTS}</a></li>
-	<!-- END tabComment -->
-	<!-- BEGIN tabVoting -->
-	<li><a id="editImageTab_Votes" class="{TAB_ACTIVE_VOTES}" href="javascript:{}" onclick="selectTab('Votes')" title="{TXT_TAB_VOTES}">{TXT_TAB_VOTES}</a></li>
-	<!-- END tabVoting -->
+  <li><a id="editImageTab_Settings" class="{TAB_ACTIVE_SETTINGS}" href="javascript:{}" onclick="selectTab('Settings')" title="{TXT_TAB_SETTINGS}">{TXT_TAB_SETTINGS}</a></li>
+  <!-- BEGIN tabComment -->
+  <li><a id="editImageTab_Comments" class="{TAB_ACTIVE_COMMENTS}" href="javascript:{}" onclick="selectTab('Comments')" title="{TXT_TAB_COMMENTS}">{TXT_TAB_COMMENTS}</a></li>
+  <!-- END tabComment -->
+  <!-- BEGIN tabVoting -->
+  <li><a id="editImageTab_Votes" class="{TAB_ACTIVE_VOTES}" href="javascript:{}" onclick="selectTab('Votes')" title="{TXT_TAB_VOTES}">{TXT_TAB_VOTES}</a></li>
+  <!-- END tabVoting -->
 </ul>
 <div id="Settings" class="editImageTab" style="display:{TAB_DISPLAY_SETTINGS}">
-	<form name="editImage" method="post" action="?cmd=Gallery&amp;act=update_picture&amp;id={VALUE_ID}">
-	<table width="100%" cellspacing="0" cellpadding="2" border="0" align="top" class="adminlist">
-		<tr>
-			<th colspan="2">{TXT_TITLE}</th>
-		</tr>
-		<tr class="row1">
-			<td width="10%" nowrap="nowrap" valign="top">{TXT_IMAGENAME}:</td>
-			<td>
-				<input name="pictureName" type="text" onchange="copyText('pictureName_');" value="{VALUE_NAME}" size="100" maxlength="255" />&nbsp;<a href="javascript:showOrHide('divLang_Name');" style="padding-left:18px;">{TXT_EXTENDED}</a>
-				<div id="divLang_Name" style="display: none;">
-					<!-- BEGIN showNameFields -->
-					<input name="pictureName_{NAMEFIELDS_LID}" value="{NAMEFIELDS_VALUE}" size="100" style="margin-top:1px;">&nbsp;<label for="pictureName_{NAMEFIELDS_LID}">{NAMEFIELDS_LANGUAGE}</label> <br />
-					<!-- END showNameFields -->
-				</div>
-			</td>
-			</tr><tr class="row1">
-			<td nowrap="nowrap" valign="top">{TXT_IMAGELINKNAME}:</td>
-			<td>
-				<input name="pictureLinkName" type="text" onchange="copyText('pictureDesc_');" value="{VALUE_LINKNAME}" size="100" />
+  <form name="editImage" method="post" action="?cmd=Gallery&amp;act=update_picture&amp;id={VALUE_ID}">
+  <table width="100%" cellspacing="0" cellpadding="2" border="0" align="top" class="adminlist">
+    <tr>
+      <th colspan="2">{TXT_TITLE}</th>
+    </tr>
+    <tr class="row1">
+      <td width="10%" nowrap="nowrap" valign="top">{TXT_IMAGENAME}:</td>
+      <td>
+        <input name="pictureName" type="text" onchange="copyText('pictureName_');" value="{VALUE_NAME}" size="100" maxlength="255" />&nbsp;<a href="javascript:showOrHide('divLang_Name');" style="padding-left:18px;">{TXT_EXTENDED}</a>
+        <div id="divLang_Name" style="display: none;">
+          <!-- BEGIN showNameFields -->
+          <input name="pictureName_{NAMEFIELDS_LID}" value="{NAMEFIELDS_VALUE}" size="100" style="margin-top:1px;">&nbsp;<label for="pictureName_{NAMEFIELDS_LID}">{NAMEFIELDS_LANGUAGE}</label> <br />
+          <!-- END showNameFields -->
+        </div>
+      </td>
+      </tr><tr class="row1">
+      <td nowrap="nowrap" valign="top">{TXT_IMAGELINKNAME}:</td>
+      <td>
+        <input name="pictureLinkName" type="text" onchange="copyText('pictureDesc_');" value="{VALUE_LINKNAME}" size="100" />
                 <span class="tooltip-trigger icon-warning"></span><span class="tooltip-message">{TXT_LINKNAME_HELP}</span>
-				&nbsp;<a href="javascript:showOrHide('divLang_Desc');">{TXT_EXTENDED}</a>
-				<div id="divLang_Desc" style="display: none;">
-					<!-- BEGIN showDescFields -->
-					<input name="pictureDesc_{DESCFIELDS_LID}" value="{DESCFIELDS_VALUE}" size="100" style="margin-top:1px;">&nbsp;<label for="pictureDesc_{DESCFIELDS_LID}">{DESCFIELDS_LANGUAGE}</label> <br />
-					<!-- END showDescFields -->
-				</div>
-			</td>
-		</tr>
-		<tr class="row1">
-			<td nowrap="nowrap">{TXT_IMAGELINK}:</td>
-			<td>
-				<input type="text" name="pictureLink" value="{VALUE_LINK}" size="100" />
+        &nbsp;<a href="javascript:showOrHide('divLang_Desc');">{TXT_EXTENDED}</a>
+        <div id="divLang_Desc" style="display: none;">
+          <!-- BEGIN showDescFields -->
+          <input name="pictureDesc_{DESCFIELDS_LID}" value="{DESCFIELDS_VALUE}" size="100" style="margin-top:1px;">&nbsp;<label for="pictureDesc_{DESCFIELDS_LID}">{DESCFIELDS_LANGUAGE}</label> <br />
+          <!-- END showDescFields -->
+        </div>
+      </td>
+    </tr>
+    <tr class="row1">
+      <td nowrap="nowrap">{TXT_IMAGELINK}:</td>
+      <td>
+        <input type="text" name="pictureLink" value="{VALUE_LINK}" size="100" />
                 <span class="tooltip-trigger icon-warning"></span><span class="tooltip-message">{TXT_LINKNAME_HELP}</span>
-			</td>
-		</tr>
+      </td>
+    </tr>
                 <!-- BEGIN showImageSize -->
-		<tr class="row1">
-			<td nowrap="nowrap">{TXT_SIZESHOW}:</td>
-			<td><input type="checkbox" name="pictureSizeShow" {VALUE_SIZESHOW_CHECKED} /></td>
-		</tr>
+    <tr class="row1">
+      <td nowrap="nowrap">{TXT_SIZESHOW}:</td>
+      <td><input type="checkbox" name="pictureSizeShow" {VALUE_SIZESHOW_CHECKED} /></td>
+    </tr>
                 <!-- END showImageSize -->
-		<tr class="row1">
-			<td colspan="2" nowrap="nowrap">&nbsp;<img border="0" src="{VALUE_THUMB_PATH}" alt="" /></td>
-		</tr>
-	</table>
-	<br />
-	<input type="submit" value="{TXT_BUTTON_SUBMIT}" />
-	</form>
+    <tr class="row1">
+      <td colspan="2" nowrap="nowrap">&nbsp;<img border="0" src="{VALUE_THUMB_PATH}" alt="" /></td>
+    </tr>
+  </table>
+  <br />
+  <input type="submit" value="{TXT_BUTTON_SUBMIT}" />
+  </form>
 </div>
 
 <div id="Comments" class="editImageTab" style="display:{TAB_DISPLAY_COMMENTS}">
-	<form name="frmShowComments" method="POST" action="?cmd=Gallery&amp;act=comment_actions&amp;active=comment&amp;id={VALUE_ID}">
-		<table width="100%" cellspacing="0" cellpadding="2" border="0" align="top" class="adminlist">
-			<tr>
-				<th colspan="9">{COMMENTS_COUNT} {TXT_COMMENT_TITLE}&nbsp;&nbsp;</th>
-			</tr>
-			<!-- BEGIN showComments -->
-			<tr class="row{COMMENTS_ROWCLASS}">
-				<td valign="top" width="1%">
-					<input type="checkbox" name="selectedCommentsId[]" id="selectedCommentsId" value="{COMMENTS_ID}">
-				</td>
-				<td valign="top" width="10%">{COMMENTS_DATE}</td>
-				<td valign="top" width="10%"><a href="?cmd=NetTools&tpl=whois&address={COMMENTS_IP}">{COMMENTS_IP}</a></td>
-				<td valign="top" width="10%">{COMMENTS_NAME}</td>
-				<td valign="top" width="15%"><a href="mailto:{COMMENTS_EMAIL}" alt="{COMMENTS_EMAIL}">{COMMENTS_EMAIL}</a></td>
-				<td valign="top" width="15%"><a href="{COMMENTS_WWW}" alt="{COMMENTS_WWW}" target="_blank">{COMMENTS_WWW}</a></td>
-				<td valign="top" align="justify"width="40%">{COMMENTS_TEXT}</td>
-				<td align="right" nowrap="nowrap">
-					<a href="?cmd=Gallery&amp;act=edit_comment&amp;id={COMMENTS_ID}" target="_self"><img alt="{TXT_COMMENT_EDIT}" title="{TXT_COMMENT_EDIT}" src="../core/Core/View/Media/icons/edit.gif" border="0" /></a>&nbsp;
-					<a href="javascript:deleteComment({COMMENTS_ID})" target="_self"><img alt="{TXT_COMMENT_DELETE}" title="{TXT_COMMENT_DELETE}" src="../core/Core/View/Media/icons/delete.gif" border="0" /></a>
-				</td>
-			</tr>
-			<!-- END showComments -->
-		</table>
-		<table cellpadding="2" cellspacing="0" border="0">
-			<tr>
-				<td>
-					<img src="../core/Core/View/Media/icons/arrow.gif" border="0" width="38" height="22" alt="{TXT_MARKED}:" />
-					<a href="#" onclick="changeCheckboxes('frmShowComments','selectedCommentsId[]',true); return false;">{TXT_COMMENT_SELECT_ALL}</a> /
-					<a href="#" onclick="changeCheckboxes('frmShowComments','selectedCommentsId[]',false); return false;">{TXT_COMMENT_DESELECT_ALL}</a>
-					<img src="../core/Core/View/Media/icons/strike.gif">
-					<select name="frmShowComments_MultiAction" onchange="selectCommentMultiAction();">
-						<option value="0">{TXT_COMMENT_SELECT_ACT}</option>
-						<option value="delete">{TXT_COMMENT_DELETE_ALL}</option>
-					</select>
-				</td>
-			</tr>
-		</table>
-	</form>
+  <form name="frmShowComments" method="POST" action="?cmd=Gallery&amp;act=comment_actions&amp;active=comment&amp;id={VALUE_ID}">
+    <table width="100%" cellspacing="0" cellpadding="2" border="0" align="top" class="adminlist">
+      <tr>
+        <th colspan="9">{COMMENTS_COUNT} {TXT_COMMENT_TITLE}&nbsp;&nbsp;</th>
+      </tr>
+      <!-- BEGIN showComments -->
+      <tr class="row{COMMENTS_ROWCLASS}">
+        <td valign="top" width="1%">
+          <input type="checkbox" name="selectedCommentsId[]" id="selectedCommentsId" value="{COMMENTS_ID}">
+        </td>
+        <td valign="top" width="10%">{COMMENTS_DATE}</td>
+        <td valign="top" width="10%"><a href="?cmd=NetTools&tpl=whois&address={COMMENTS_IP}">{COMMENTS_IP}</a></td>
+        <td valign="top" width="10%">{COMMENTS_NAME}</td>
+        <td valign="top" width="15%"><a href="mailto:{COMMENTS_EMAIL}" alt="{COMMENTS_EMAIL}">{COMMENTS_EMAIL}</a></td>
+        <td valign="top" width="15%"><a href="{COMMENTS_WWW}" alt="{COMMENTS_WWW}" target="_blank">{COMMENTS_WWW}</a></td>
+        <td valign="top" align="justify"width="40%">{COMMENTS_TEXT}</td>
+        <td align="right" nowrap="nowrap">
+          <a href="?cmd=Gallery&amp;act=edit_comment&amp;id={COMMENTS_ID}" target="_self"><img alt="{TXT_COMMENT_EDIT}" title="{TXT_COMMENT_EDIT}" src="../core/Core/View/Media/icons/edit.gif" border="0" /></a>&nbsp;
+          <a href="javascript:deleteComment({COMMENTS_ID})" target="_self"><img alt="{TXT_COMMENT_DELETE}" title="{TXT_COMMENT_DELETE}" src="../core/Core/View/Media/icons/delete.gif" border="0" /></a>
+        </td>
+      </tr>
+      <!-- END showComments -->
+    </table>
+    <table cellpadding="2" cellspacing="0" border="0">
+      <tr>
+        <td>
+          <img src="../core/Core/View/Media/icons/arrow.gif" border="0" width="38" height="22" alt="{TXT_MARKED}:" />
+          <a href="#" onclick="changeCheckboxes('frmShowComments','selectedCommentsId[]',true); return false;">{TXT_COMMENT_SELECT_ALL}</a> /
+          <a href="#" onclick="changeCheckboxes('frmShowComments','selectedCommentsId[]',false); return false;">{TXT_COMMENT_DESELECT_ALL}</a>
+          <img src="../core/Core/View/Media/icons/strike.gif">
+          <select name="frmShowComments_MultiAction" onchange="selectCommentMultiAction();">
+            <option value="0">{TXT_COMMENT_SELECT_ACT}</option>
+            <option value="delete">{TXT_COMMENT_DELETE_ALL}</option>
+          </select>
+        </td>
+      </tr>
+    </table>
+  </form>
 </div>
 
 <div id="Votes" class="editImageTab" style="display:{TAB_DISPLAY_VOTES}">
-	<form name="frmShowVotes" method="POST" action="?cmd=Gallery&amp;act=voting_actions&amp;active=voting&amp;id={VALUE_ID}">
-		<table width="100%" cellspacing="0" cellpadding="2" border="0" align="top" class="adminlist">
-			<tr>
-				<th colspan="5">{VOTING_COUNT} {TXT_VOTING_TITLE}, &Oslash; {VOTING_AVERAGE}</th>
-			</tr>
-			<!-- BEGIN showVotes -->
-			<tr class="row{VOTES_ROWCLASS}">
-				<td valign="top" width="1%">
-					<input type="checkbox" name="selectedVotesId[]" id="selectedVotesId" value="{COMMENTS_ID}">
-				</td>
-				<td width="33%">{VOTES_DATE}</td>
-				<td width="33%"><a href="?cmd=NetTools&tpl=whois&address={VOTES_IP}">{VOTES_IP}</a></td>
-				<td width="33%">{VOTES_MARK}</td>
-				<td align="right" nowrap="nowrap">
-					<a href="javascript:deleteVote({VOTES_ID})" target="_self"><img alt="{TXT_VOTING_DELETE}" title="{TXT_VOTING_DELETE}" src="../core/Core/View/Media/icons/delete.gif" border="0" /></a>
-				</td>
-			</tr>
-			<!-- END showVotes -->
-		</table>
-		<table cellpadding="2" cellspacing="0" border="0">
-			<tr>
-				<td>
-				<img src="../core/Core/View/Media/icons/arrow.gif" border="0" width="38" height="22" alt="{TXT_MARKED}:" />
-				<a href="#" onclick="changeCheckboxes('frmShowVotes','selectedVotesId[]',true); return false;">{TXT_COMMENT_SELECT_ALL}</a> /
-				<a href="#" onclick="changeCheckboxes('frmShowVotes','selectedVotesId[]',false); return false;">{TXT_COMMENT_DESELECT_ALL}</a>
-				<img src="../core/Core/View/Media/icons/strike.gif">
-				<select name="frmShowVotes_MultiAction" onchange="selectVotingMultiAction();">
-					<option value="0">{TXT_COMMENT_SELECT_ACT}</option>
-					<option value="delete">{TXT_COMMENT_DELETE_ALL}</option>
-				</select>
-				</td>
-			</tr>
-		</table>
-	</form>
-	<br />
-	<table width="100%" cellspacing="0" cellpadding="2" border="0">
-		<tr class="row1">
-			<td>{VOTING_PAGING}</td>
-		</tr>
-	</table>
+  <form name="frmShowVotes" method="POST" action="?cmd=Gallery&amp;act=voting_actions&amp;active=voting&amp;id={VALUE_ID}">
+    <table width="100%" cellspacing="0" cellpadding="2" border="0" align="top" class="adminlist">
+      <tr>
+        <th colspan="5">{VOTING_COUNT} {TXT_VOTING_TITLE}, &Oslash; {VOTING_AVERAGE}</th>
+      </tr>
+      <!-- BEGIN showVotes -->
+      <tr class="row{VOTES_ROWCLASS}">
+        <td valign="top" width="1%">
+          <input type="checkbox" name="selectedVotesId[]" id="selectedVotesId" value="{COMMENTS_ID}">
+        </td>
+        <td width="33%">{VOTES_DATE}</td>
+        <td width="33%"><a href="?cmd=NetTools&tpl=whois&address={VOTES_IP}">{VOTES_IP}</a></td>
+        <td width="33%">{VOTES_MARK}</td>
+        <td align="right" nowrap="nowrap">
+          <a href="javascript:deleteVote({VOTES_ID})" target="_self"><img alt="{TXT_VOTING_DELETE}" title="{TXT_VOTING_DELETE}" src="../core/Core/View/Media/icons/delete.gif" border="0" /></a>
+        </td>
+      </tr>
+      <!-- END showVotes -->
+    </table>
+    <table cellpadding="2" cellspacing="0" border="0">
+      <tr>
+        <td>
+        <img src="../core/Core/View/Media/icons/arrow.gif" border="0" width="38" height="22" alt="{TXT_MARKED}:" />
+        <a href="#" onclick="changeCheckboxes('frmShowVotes','selectedVotesId[]',true); return false;">{TXT_COMMENT_SELECT_ALL}</a> /
+        <a href="#" onclick="changeCheckboxes('frmShowVotes','selectedVotesId[]',false); return false;">{TXT_COMMENT_DESELECT_ALL}</a>
+        <img src="../core/Core/View/Media/icons/strike.gif">
+        <select name="frmShowVotes_MultiAction" onchange="selectVotingMultiAction();">
+          <option value="0">{TXT_COMMENT_SELECT_ACT}</option>
+          <option value="delete">{TXT_COMMENT_DELETE_ALL}</option>
+        </select>
+        </td>
+      </tr>
+    </table>
+  </form>
+  <br />
+  <table width="100%" cellspacing="0" cellpadding="2" border="0">
+    <tr class="row1">
+      <td>{VOTING_PAGING}</td>
+    </tr>
+  </table>
 </div>
 <!-- END gallery_edit_image.html -->

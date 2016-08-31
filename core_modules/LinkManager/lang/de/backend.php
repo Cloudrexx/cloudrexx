@@ -95,5 +95,3 @@ $_ARRAYLANG['TXT_CORE_MODULE_LINKMANAGER_SUCCESS_MSG'] = "Änderungen wurden erf
 //Linkcrawler script specific values:
 $_ARRAYLANG['TXT_CORE_MODULE_LINKMANAGER_NO_IMAGE'] = "Kein Bild";
 $_ARRAYLANG['TXT_CORE_MODULE_LINKMANAGER_NO_LINK'] = "Kein Link";
-
-

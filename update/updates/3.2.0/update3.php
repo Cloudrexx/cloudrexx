@@ -1616,7 +1616,7 @@ if ($objUpdate->_isNewerVersion($_CONFIG['coreCmsVersion'], '3.1.0')) {
         return \Cx\Lib\UpdateUtil::DefaultActionHandler($e);
     }
     \DBG::log('installing crm module');
-    
+
     // install frontend editing
     $frontendEditingModuleInfo = getModuleInfo('FrontendEditing');
     try {
@@ -2140,7 +2140,7 @@ if ($objUpdate->_isNewerVersion($_CONFIG['coreCmsVersion'], '3.1.0')) {
         \DBG::dump($calendarMigration);
         return $calendarMigration;
     }
-    
+
     // rewrite backendAreas
     require_once(dirname(__FILE__).'/components/core/backendAreas.php');
     $backendAreasUpdate = _updateBackendAreas();
@@ -2330,8 +2330,8 @@ foreach ($arrContentSites as $module) {
         return \Cx\Lib\UpdateUtil::DefaultActionHandler($e);
     }
 }
-    
-    
+
+
 $arrContentSites = array(
     'media1', 'media2', 'media3', 'media4',
 );

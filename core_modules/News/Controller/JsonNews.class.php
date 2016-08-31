@@ -146,4 +146,3 @@ class JsonNews implements JsonAdapter {
         return $result;
     }
 }
-

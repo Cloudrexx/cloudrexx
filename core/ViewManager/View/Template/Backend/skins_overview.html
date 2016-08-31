@@ -7,7 +7,7 @@
                 $J('#selectedTab').val($J( "#tabs" ).tabs('option', 'selected'));
             },
             select: function(event, ui) {
-                window.location.hash = ui.tab.hash;                
+                window.location.hash = ui.tab.hash;
             }
         });
         var activateDialog = cx.ui.dialog({
@@ -30,13 +30,13 @@
         $J(".themesActivate").click(function() {
             var themeId = $J(this).attr('data-themeId');
             if ({THEMES_LANG_ACTIVE_COUNT} > 1) {
-                $J( ".active_language_checkbox_container" ).html(' ');                
+                $J( ".active_language_checkbox_container" ).html(' ');
                 $J.ajax({
                     url     : 'index.php?cmd=JsonData&object=ViewManager&act=activateLanguages',
                     data    : {
                                 themeId : themeId,
                                 themeType : $J('#selectedTab').val()
-                              },                    
+                              },
                     type    : "post",
                     dataType: "json",
                     success: function(response) {
@@ -45,7 +45,7 @@
                         });
                         $J("#multipleFormThemeId").val(themeId);
                         $J('#activateThemeForm input[type=checkbox]').attr('checked', 'checked');
-                        
+
                         activateDialog.open();
                     }
                 });
@@ -55,7 +55,7 @@
                 ajaxActivateTheme(themeId);
                 return false;
             }
-        });        
+        });
     });
 
     //Activate Theme
@@ -72,7 +72,7 @@
             data    : data,
             dataType: "json",
             success: function(response) {
-                if (response.status == 'success') {                    
+                if (response.status == 'success') {
                     window.location.reload();
                 } else {
                     cx.tools.StatusMessage.showMessage(response.message, "error", 1000);
@@ -80,7 +80,7 @@
             }
         });
     }
-    
+
     function checkThemeExistsByThemeId(themeId) {
 
         $J.ajax({

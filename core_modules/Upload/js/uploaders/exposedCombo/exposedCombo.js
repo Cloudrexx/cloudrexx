@@ -13,7 +13,7 @@ var ExposedCombo = function(theConfig) {
     var starter = $(theConfig.starterElement); //open button of the dialog
     var comboUploader = theConfig.comboUploader; //the combouploader we enhance
     var uploader = $(theConfig.uploaderDiv); //the div we expose
-   
+
     var dialog;
     dialog = cx.ui.dialog({
         title: theConfig.title,
@@ -32,9 +32,9 @@ var ExposedCombo = function(theConfig) {
     dialog.open = function() {
         //maybe the uploader cached information about already uploaded files - clean those up.
         comboUploader.refresh();
-        oldOpen();        
+        oldOpen();
     };
-      
+
     //add some functionality to the starter
     starter.bind('click', function() {
         dialog.open();

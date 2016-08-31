@@ -2,7 +2,7 @@
 <script type="text/javascript">
     (function($) {
         cx.ready(function() {
-            
+
         /**
          * Locks the password status in reset password to prevent user input
          */
@@ -15,7 +15,7 @@
         cx.unlock = function() {
             cx.jQuery("#load-lock").hide();
         };
-        
+
         $('#resetPassword').click(function() {
                 url = cx.variables.get('baseUrl', 'MultiSite') + cx.variables.get('cadminPath', 'contrexx') + "index.php?cmd=JsonData&object=MultiSite&act=resetFtpPassword";
                 cx.bind("loadingStart", cx.lock, "resetPasswordFtp");
@@ -38,7 +38,7 @@
                                 cx.tools.StatusMessage.showMessage(response.data.message, null, 2000);
                             }
                         }
-                        cx.trigger("loadingEnd", "resetPasswordFtp", {}); 
+                        cx.trigger("loadingEnd", "resetPasswordFtp", {});
                     }
                 });
             });

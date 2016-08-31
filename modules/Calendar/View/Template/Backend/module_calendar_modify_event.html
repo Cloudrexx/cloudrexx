@@ -262,7 +262,7 @@
                     $J( this ).dialog( "close" );
                 },
                 "{TXT_CALENDAR_OK}": function() {
-                    $J( "#seriesExeptionsList" ).html( "" );                    
+                    $J( "#seriesExeptionsList" ).html( "" );
                     $J( ".exceptionDateContainer .exceptionDateHolder input:checked" ).each(function(){
                         checkedDate    = $J(this).val();
                         txtCheckedDate = $J(this).data( 'txtSeriesDate' );
@@ -298,7 +298,7 @@
             exceptionDialog.open();
         });
         $J( ".delete_exception" ).live("click", function() {
-           $J( this ).closest(".seriesList").fadeOut("slow").remove(); 
+           $J( this ).closest(".seriesList").fadeOut("slow").remove();
         });
 
         // Format the series exceptions on page load
@@ -316,7 +316,7 @@
         });
     });
 
-    function showOrHidePlaceFields(inputValue, type) {        
+    function showOrHidePlaceFields(inputValue, type) {
         if (inputValue == '1') {
             $J( "tr.event_"+type+"_manual" ).css("display", "table-row");
             $J( "tr.event_"+type+"_mediadir" ).css("display", "none");
@@ -385,38 +385,38 @@
         var limit = 10;
         for(i=0;i<limit;i++) {
            var page = (page_index*limit) + i;
-           $J( '.exceptionDateHolder li:eq('+ page +')').show();            
+           $J( '.exceptionDateHolder li:eq('+ page +')').show();
         }
     }
-    
+
     function setSelectedEventRedirect(data) {
         if (data.type == 'page') {
             var url = data.data[0].node;
             document.getElementById('eventRedirect').value = url;
         }
     }
-    
+
     function setSelectedEventPicture(data) {
         if (data.type == 'file') {
             var url = data.data[0].datainfo;
             document.getElementById('eventPicture').value = url.filepath;
         }
     }
-    
+
     function setSelectedEventAttachment(data) {
         if (data.type == 'file') {
-            var url = data.data[0].datainfo;            
+            var url = data.data[0].datainfo;
             document.getElementById('eventAttachment').value = url.filepath;
         }
     }
-    
+
     function setSelectedInputPlaceMap(data) {
         if (data.type == 'file') {
-            var url = data.data[0].datainfo;            
+            var url = data.data[0].datainfo;
             document.getElementById('inputPlaceMap').value = url.filepath;
         }
     }
-    
+
     function formCheck()
     {
         var status = true;
@@ -717,7 +717,7 @@
             cx.jQuery('.event_minimized_block').find('input').trigger('keyup');
         }
     }
-</script>      
+</script>
 
 
 <form action="index.php?cmd={CALENDAR_MODULE_NAME}&act=modify_event" id="formModifyEvent" name="formModifyEvent" method="post" onsubmit="selectAll(document.formModifyEvent.elements['selectedGroups[]']); {CALENDAR_EVENT_ONSUBMIT_PUBLICATIONS} return formCheck();">
@@ -747,13 +747,13 @@
         <li><a id="eventTab_series" href="javascript:{}" onclick="selectTab('series');" title="{TXT_CALENDAR_EVENT_SERIES}" >{TXT_CALENDAR_EVENT_SERIES}</a></li>
         <!-- BEGIN eventPublicateMenu -->
         <li><a id="eventTab_publicate" href="javascript:{}" onclick="selectTab('publicate')" title="{TXT_CALENDAR_EVENT_PUBLICATE}">{TXT_CALENDAR_EVENT_PUBLICATE}</a></li>
-        <!-- END eventPublicateMenu -->        
+        <!-- END eventPublicateMenu -->
     </ul>
     <div id="event" class="eventTab" style="display:block;">
         <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist">
             <tr>
                 <th colspan="3"><b>{TXT_CALENDAR_BASIC_DATA}</b></th>
-            </tr>            
+            </tr>
             <tr class="row2">
                 <td width="180"  valign="top">{TXT_CALENDAR_EVENT_START} <font color="#ff0000">*</font></td>
                 <td >
@@ -777,19 +777,19 @@
             </tr>
             <tr class="row1">
                 <td valign="top">{TXT_CALENDAR_EVENT_TYPE}</td>
-                <td>    
+                <td>
                     <select id="type" name="type" style="width: 258px" onchange="langCheck();">
                         <option value="0" {CALENDAR_EVENT_TYPE_EVENT}>{TXT_CALENDAR_EVENT_TYPE_EVENT}</option>
-                        <option value="1" {CALENDAR_EVENT_TYPE_REDIRECT}>{TXT_CALENDAR_EVENT_TYPE_REDIRECT}</option>                                                                            
-                    </select>                                                              
+                        <option value="1" {CALENDAR_EVENT_TYPE_REDIRECT}>{TXT_CALENDAR_EVENT_TYPE_REDIRECT}</option>
+                    </select>
                 </td>
-            </tr>            
+            </tr>
             <tr class="row2">
                 <td valign="top">{TXT_CALENDAR_EVENT_DETAIL_VIEW}</td>
-                <td>    
+                <td>
                     <label><input type="checkbox" name="show-detail-view" {CALENDAR_EVENT_SHOW_DETAIL_VIEW} value="1" /> {TXT_CALENDAR_EVENT_DETAIL_VIEW_LABEL} </label>
                 </td>
-            </tr>            
+            </tr>
         </table>
         <ul id="tabmenu" class="language_tab" style="{CALENDAR_HIDE_ON_SINGLE_LANG} margin-top: 15px;">
             <!-- BEGIN eventTabMenuDescTab -->
@@ -799,7 +799,7 @@
         <!-- BEGIN eventDescTab -->
         <div id="{CALENDAR_EVENT_LANG_ID}_desc" class="eventDescTab" style="display: {CALENDAR_EVENT_TAB_DISPLAY};" >
             <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist">
-                <tr style="{CALENDAR_HIDE_ON_SINGLE_LANG}">                            
+                <tr style="{CALENDAR_HIDE_ON_SINGLE_LANG}">
                     <th colspan="2">{TXT_CALENDAR_EVENT}</th>
                 </tr>
                 <tr class="row1">
@@ -814,7 +814,7 @@
                         <textarea id="teaser_{CALENDAR_EVENT_LANG_ID}" name="teaser[{CALENDAR_EVENT_LANG_ID}]" style="width: 250px" maxlength="65535">{CALENDAR_EVENT_TEASER}</textarea>
                     </td>
                 </tr>
-            </table>            
+            </table>
             <div id="{CALENDAR_EVENT_LANG_ID}_typeEvent" style="display: {CALENDAR_EVENT_TYPE_EVENT_DISPLAY};" >
                 <br />
                 <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist">
@@ -823,13 +823,13 @@
                     </tr>
                     <tr class="row1">
                         <td>
-                            {CALENDAR_EVENT_DESCRIPTION}                                                  
+                            {CALENDAR_EVENT_DESCRIPTION}
                         </td>
                     </tr>
                 </table>
-            </div>   
-            <div id="{CALENDAR_EVENT_LANG_ID}_typeRedirect" style="display: {CALENDAR_EVENT_TYPE_REDIRECT_DISPLAY};" > 
-                <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist">                        
+            </div>
+            <div id="{CALENDAR_EVENT_LANG_ID}_typeRedirect" style="display: {CALENDAR_EVENT_TYPE_REDIRECT_DISPLAY};" >
+                <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist">
                     <tr class="row1">
                         <td width="180"  valign="top">{TXT_CALENDAR_EVENT_TYPE_REDIRECT}</td>
                         <td>
@@ -837,18 +837,18 @@
                         </td>
                     </tr>
                 </table>
-            </div> 
-        </div>            
-        <!-- END eventDescTab -->                                              
+            </div>
+        </div>
+        <!-- END eventDescTab -->
     </div>
-    <div id="location" class="eventTab" style="display:none;">                     
+    <div id="location" class="eventTab" style="display:none;">
         <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist">
             <tr>
                 <th colspan="2"><strong>{TXT_CALENDAR_EVENT_LOCATION}</strong></th>
             </tr>
             <tr class="row3">
                 <td>
-                    {TXT_CALENDAR_EVENT_PLACE}                    
+                    {TXT_CALENDAR_EVENT_PLACE}
                 </td>
                 <td>
                     <!-- BEGIN eventPlaceTypeRadio -->
@@ -860,14 +860,14 @@
             <!-- BEGIN eventPlaceSelect -->
             <tr class="row2 event_place_mediadir">
                 <td width="180" valign="top">{TXT_CALENDAR_EVENT_PLACE}</td>
-                <td>                                                
+                <td>
                     <select name="placeMediadir" style="width: 258px;">
                         {CALENDAR_EVENT_PLACE_OPTIONS}
                     </select>
                 </td>
             </tr>
-            <!-- END eventPlaceSelect -->                        
-            <!-- BEGIN eventPlaceInput -->            
+            <!-- END eventPlaceSelect -->
+            <!-- BEGIN eventPlaceInput -->
             <tr class="row2 event_place_manual">
                 <td width="180" valign="top">{TXT_CALENDAR_EVENT_PLACE}</td>
                 <td>
@@ -892,7 +892,7 @@
                         </table>
                     </div>
                 </td>
-            </tr>            
+            </tr>
             <tr class="row1 event_place_manual">
                 <td width="180"  valign="top">{TXT_CALENDAR_EVENT_STREET}</td>
                 <td>
@@ -979,13 +979,13 @@
                     <input type="text" maxlength="255" name="placeMap" id="inputPlaceMap" style="width: 250px;" value="{CALENDAR_PLACE_MAP_SOURCE}" />&nbsp;{CALENDAR_PLACE_MAP_SOURCE_BROWSE_BUTTON}
                     <label><input name="google" value="1" type="checkbox" {CALENDAR_EVENT_MAP}/> {TXT_CALENDAR_EVENT_USE_GOOGLEMAPS}</label>
                 </td>
-            </tr>                    
+            </tr>
         <!-- END eventPlaceInput -->
         </table>
         <br/>
         <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist">
             <tr class="row3">
-                <td >{TXT_CALENDAR_EVENT_HOST}</td>                        
+                <td >{TXT_CALENDAR_EVENT_HOST}</td>
                 <td>
                     <!-- BEGIN eventHostTypeRadio -->
                     <label><input type="radio" name="eventHostType" class="eventHostType" value="1" {CALENDAR_EVENT_HOST_TYPE_MANUAL} /> {TXT_CALENDAR_PLACE_DATA_DEFAULT}</label>
@@ -996,7 +996,7 @@
             <!-- BEGIN eventHostSelect -->
             <tr class="row2 event_host_mediadir">
                 <td width="180" valign="top">{TXT_CALENDAR_EVENT_PLACE}</td>
-                <td>                                                
+                <td>
                     <select name="hostMediadir" style="width: 258px;">
                         {CALENDAR_EVENT_PLACE_OPTIONS}
                     </select>
@@ -1116,7 +1116,7 @@
                 </td>
             </tr>
             <!-- END eventHostInput -->
-        </table>                          
+        </table>
     </div>
     <div id="details" class="eventTab" style="display:none;">
         <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist">
@@ -1162,7 +1162,7 @@
                         <!-- END eventAccess -->
                     </select>
                 </td>
-            </tr> 
+            </tr>
             <tr class="row2">
                 <td width="180"  valign="top">{TXT_CALENDAR_EVENT_PRIORITY}</td>
                 <td colspan="2">
@@ -1178,7 +1178,7 @@
                 <td colspan="2">
                     <input type="text" maxlength="255" name="link" value="{CALENDAR_EVENT_LINK}" id="eventLink" style="width: 250px;" />
                 </td>
-            </tr>             
+            </tr>
             <tr class="row1">
                 <td width="180" valign="top">{TXT_CALENDAR_EVENT_PICTURE}</td>
                 <td colspan="2">
@@ -1190,7 +1190,7 @@
                 <td colspan="2">
                     <input type="text" maxlength="255" name="attachment" value="{CALENDAR_EVENT_ATTACHMENT}" id="eventAttachment" style="width: 250px;" />&nbsp;{CALENDAR_EVENT_ATTACHMENT_BROWSE_BUTTON}
                 </td>
-            </tr>                             
+            </tr>
         </table>
     </div>
     <div id="invite" class="eventTab" style="display:none;">
@@ -1231,7 +1231,7 @@
                     <input name="sendInvitation" class="sendInvitation" type="checkbox" value="1" {CALENDAR_EVENT_SEND_INVITATION}/>
                 </td>
                 <td>
-                    <div class="invitationEmailTemplateContainer" style="display: none;">                        
+                    <div class="invitationEmailTemplateContainer" style="display: none;">
                         <!-- BEGIN invitation_email_template -->
                         <div class="invitationEmailTemplate">
                             <div class="language-icons">{CALENDAR_EVENT_INVITATION_EMAIL_LANG}</div>
@@ -1285,7 +1285,7 @@
                 </tr>
                 <tr class="row2">
                     <td valign="top">{TXT_CALENDAR_EVENT_EMAIL_TEMPLATE}</td>
-                    <td>                                             
+                    <td>
                         <!-- BEGIN registration_email_template -->
                         <div class="registrationEmailTemplate">
                             <div class="language-icons">{CALENDAR_EVENT_REGISTRATION_EMAIL_LANG}</div>
@@ -1355,7 +1355,7 @@
                     </td>
                 </tr>
             </table>
-        </div>     
+        </div>
         <div class="series-event-row" id="seriesMaskWeekly" style="display:none">
             <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist">
                 <tr class="row1">
@@ -1372,7 +1372,7 @@
                     </td>
                 </tr>
             </table>
-        </div>   
+        </div>
         <div class="series-event-row" id="seriesMaskMonthly" style="display:none">
             <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist">
                 <tr class="row1">
@@ -1396,7 +1396,7 @@
                             <input type="hidden" name="seriesExeptions[]" value="{CALENDAR_SERIES_EXEPTION_DATE}"  />
                             &nbsp;<a href="javascript:void(0);" class="delete_exception" title="{TXT_CALENDAR_DELETE}"><img style="vertical-align: middle;" src="../core/Core/View/Media/icons/delete.gif" alt="{TXT_CALENDAR_DELETE}" width="17" border="0" height="17"></a>
                         </div>
-                        <!-- END eventExeptions -->                        
+                        <!-- END eventExeptions -->
                     </div>
                     <input type="button" class="add_exception" value="{TXT_CALENDAR_MANAGE}" />
                 </td>
@@ -1408,7 +1408,7 @@
                     <label style="width: 100px;float:left;"><input type="radio" name='seriesDouranceType' value="2" {CALENDAR_SERIES_PATTERN_DOURANCE_2}/>&nbsp;{TXT_CALENDAR_SERIES_PATTERN_ENDS_AFTER}&nbsp;</label>
                     <input type="text" name='seriesDouranceEvents' id="seriesDouranceEvents" maxlength="3" value="{CALENDAR_SERIES_PATTERN_ENDS_EVENTS}" style="width: 20px;" onkeypress="return modifyEvent._isNumber(event);" />&nbsp;{TXT_CALENDAR_SERIES_PATTERN_APPONTMENTS}<br />
                     <label style="width: 100px;float:left;"><input type="radio" name='seriesDouranceType' value="3" {CALENDAR_SERIES_PATTERN_DOURANCE_3}/>&nbsp;{TXT_CALENDAR_SERIES_PATTERN_ENDS}&nbsp;</label>
-                    <input type="text" name="seriesDouranceDate"  id="{CALENDAR_SERIES_PATTERN_ENDS_INPUT_ID}" class="event_date" style="width: 140px;" value="{CALENDAR_SERIES_PATTERN_ENDS_DATE}" />      
+                    <input type="text" name="seriesDouranceDate"  id="{CALENDAR_SERIES_PATTERN_ENDS_INPUT_ID}" class="event_date" style="width: 140px;" value="{CALENDAR_SERIES_PATTERN_ENDS_DATE}" />
                 </td>
             </tr>
             <tr class="row2">
@@ -1417,10 +1417,10 @@
                     <label><input type="checkbox" name='seriesIndependent' value="1" {CALENDAR_EVENT_SERIES_INDEPENDENT}/></label>
                 </td>
             </tr>
-        </table>          
+        </table>
     </div>
 
-    <!-- BEGIN eventPublicateTab -->   
+    <!-- BEGIN eventPublicateTab -->
     <div id="publicate" class="eventTab" style="display: none;">
         <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist">
             <tr>
@@ -1446,10 +1446,10 @@
                         </div>
                     </div>
                 </td>
-            </tr>           
-        </table>        
+            </tr>
+        </table>
     </div>
-    <!-- END eventPublicateTab -->  
+    <!-- END eventPublicateTab -->
     <br />
     <input type="button" onclick="location.href = 'index.php?cmd=Calendar&{CALENDAR_CSRF}';" value="{TXT_CALENDAR_CANCEL}" />
     &nbsp;<input class="tab-next" type="button" onclick="modifyEvent._moveToNextTab($J(this));" value="{TXT_CALENDAR_NEXT}" />
@@ -1464,10 +1464,10 @@
     <ul class="exceptionDateHolder" style="min-height: 190px;">
 
     </ul>
-    <br/>    
+    <br/>
     <div class="paginationHolder"></div>
 </div>
-<script id="exceptionDateTemplate" type="jquery/tmpl">                
+<script id="exceptionDateTemplate" type="jquery/tmpl">
     <li>
     <label>
     <input class="exceptionDate" type="checkbox" value="" />&nbsp;<span class="txtExceptionDate"></span>
@@ -1482,4 +1482,3 @@
 </script>
 
 <!-- END module_calendar_modify_event.html -->
-

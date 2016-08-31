@@ -3,26 +3,26 @@
 <!-- // confirm delete page
 function reloadThemesPage()
 {
-	document.themesForm.action = 'index.php?cmd=ViewManager';
-	document.themesForm.submit();
+  document.themesForm.action = 'index.php?cmd=ViewManager';
+  document.themesForm.submit();
 }
 
 function existingdirNameValue2()
 {
-	document.create_dir.existingdirName.value='';
-	document.create_dir.fromTheme.value='';
+  document.create_dir.existingdirName.value='';
+  document.create_dir.fromTheme.value='';
 }
 
 function existingdirNameValue()
 {
-	document.create_dir.existingdirName.value='';
+  document.create_dir.existingdirName.value='';
 
 }
 
 
 function sameName()
 {
-	document.create_dir.dbName.value = document.create_dir.dirName.value;
+  document.create_dir.dbName.value = document.create_dir.dirName.value;
 }
 // -->
 </script>
@@ -36,29 +36,29 @@ function sameName()
 </div>
 
 <form name="create_dir" method="post" action="{CREATE_DIR_ACTION}">
-	<table summary="" width="100%" cellspacing="0" cellpadding="5" border="0" class="adminlist">
-		<tr>
-		    <th colspan="2">{TXT_NEW_DIRECTORY}</th>
-		</tr>
-		<tr class="row1">
-	    	<td width="20%">
-	    	    {TXT_DIR_NAME}:
-			</td>
-			<td width="80%">
-				{TXT_DESCRIPTION}&nbsp;<input type="text" onchange="sameName()" onclick="existingdirNameValue()" name="dirName" style="padding-left: 3px; padding-right: 3px; WIDTH: 241px;" />&nbsp;<select name="fromTheme" onchange="existingdirNameValue()" size="1" style="WIDTH: 150px"><option value="" selected>--- {TXT_FROM_TEMPLATE} -------------</option>{THEMES_TEMPLATE_MENU}</select>&nbsp;{TXT_FROM_DB}
-			</td>
-		</tr>		
-		<tr class="row1">
-	    	<td>
-	    	    {TXT_DB_NAME}:
-			</td>
-			<td>
-				<input type="text" name="dbName" style="padding-left: 3px; padding-right: 3px; WIDTH: 285px;" />
-			</td>
-		</tr>
-	</table>
-	<br />
-	<input type="submit" name="submit" value="{TXT_CREATE}" />
+  <table summary="" width="100%" cellspacing="0" cellpadding="5" border="0" class="adminlist">
+    <tr>
+        <th colspan="2">{TXT_NEW_DIRECTORY}</th>
+    </tr>
+    <tr class="row1">
+        <td width="20%">
+            {TXT_DIR_NAME}:
+      </td>
+      <td width="80%">
+        {TXT_DESCRIPTION}&nbsp;<input type="text" onchange="sameName()" onclick="existingdirNameValue()" name="dirName" style="padding-left: 3px; padding-right: 3px; WIDTH: 241px;" />&nbsp;<select name="fromTheme" onchange="existingdirNameValue()" size="1" style="WIDTH: 150px"><option value="" selected>--- {TXT_FROM_TEMPLATE} -------------</option>{THEMES_TEMPLATE_MENU}</select>&nbsp;{TXT_FROM_DB}
+      </td>
+    </tr>
+    <tr class="row1">
+        <td>
+            {TXT_DB_NAME}:
+      </td>
+      <td>
+        <input type="text" name="dbName" style="padding-left: 3px; padding-right: 3px; WIDTH: 285px;" />
+      </td>
+    </tr>
+  </table>
+  <br />
+  <input type="submit" name="submit" value="{TXT_CREATE}" />
 </form>
 <br />
 <!-- END themes_create.html -->

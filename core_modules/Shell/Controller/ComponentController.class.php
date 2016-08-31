@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -82,7 +82,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             echo passthru(implode(' ', $arguments) . ' > `tty`');
             return;
         }
-        
+
         $this->commandRunning = true;
         echo 'This is Cloudrexx Command mode shell v3.2
 Please type `help` to find available commands
@@ -130,9 +130,8 @@ Please type `help` to find available commands
         $component = $componentRepo->findOneBy(array('name'=>$name));
         return $component;
     }
-    
+
     public function getControllerClasses() {
         return array();
     }
 }
-

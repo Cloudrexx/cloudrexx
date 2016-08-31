@@ -1110,7 +1110,7 @@ die("Failed to update the Cart!");
                 }
             }
         }
-		// Remember visited Products
+        // Remember visited Products
         if ($product_id) {
             self::rememberVisitedProducts($product_id);
         }
@@ -1656,12 +1656,12 @@ die("Failed to update the Cart!");
         }
         return true;
     }
-    
+
     /**
      * Get the valid products
-     * 
+     *
      * @param  array $productIds
-     * 
+     *
      * @return array array of object
      */
     public static function getValidProducts($productIds = array()) {
@@ -1675,7 +1675,7 @@ die("Failed to update the Cart!");
                 $arrProduct[] = $product;
             }
         }
-        
+
         return $arrProduct;
     }
 
@@ -3074,8 +3074,8 @@ die("Shop::processRedirect(): This method is obsolete!");
     /**
      * Set up the "lsv_form" page with the user information form for LSV
      *
-     * @todo		Fill in the order summary automatically.
-     * @todo		Problem: If the order is big enough, it may not fit into the
+     * @todo        Fill in the order summary automatically.
+     * @todo        Problem: If the order is big enough, it may not fit into the
      *  visible text area, thus causing some order items to be cut off
      *  when printed.  This issue should be resolved by replacing the
      *  <textarea> with a variable height element, such as a table, or

@@ -54,7 +54,7 @@ class DoctrineSQLLogger implements \Doctrine\DBAL\Logging\SQLLogger
 {
     private $query = null;
     private $startTime = null;
-    
+
     /**
      * {@inheritdoc}
      */
@@ -85,12 +85,12 @@ class DoctrineSQLLogger implements \Doctrine\DBAL\Logging\SQLLogger
                             break;
                         default:
                             break;
-                        
+
                     }
                 }
             }
             $sql = vsprintf($sql, $params);
-    	}
+        }
 
         \DBG::logSQL($sql);
         $this->startTime = microtime(true);
@@ -102,21 +102,21 @@ class DoctrineSQLLogger implements \Doctrine\DBAL\Logging\SQLLogger
     public function stopQuery()
     {
         /*global $objDatabase;
-        
+
         if (   !(\DBG::getMode() & DBG_DOCTRINE)
             && !(\DBG::getMode() & DBG_DOCTRINE_CHANGE)
             && !(\DBG::getMode() & DBG_DOCTRINE_ERROR)
         ) {
             return;
         }
-        
+
         if (!$objDatabase || !$this->query) {
             return;
         }
-        
+
         $timeDiff = microtime(true) - $this->startTime;
         $this->startTime = null;
-        
+
         $result = $objDatabase->execute($this->query);
         $this->query = null;
         if (!$result) {

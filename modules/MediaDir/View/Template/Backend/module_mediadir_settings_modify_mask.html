@@ -1,44 +1,44 @@
-<!-- START module_mediadir_settings_modify_mask.html -->     
+<!-- START module_mediadir_settings_modify_mask.html -->
 <form name="maskModfyForm" action="index.php?cmd={MODULE_NAME}&act=settings&tpl=masks" method="post" >
 <input name="maskId" type="hidden" value="{MEDIADIR_MASK_ID}" />
 <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
     <tr>
         <th colspan="2">{TXT_MEDIADIR_PAGE_TITLE}</th>
-    </tr>            
+    </tr>
     <tr class="row1">
         <td width="200" valign="top">{TXT_MEDIADIR_TITLE}</td>
         <td>
             <input name="maskTitle" type="text" style="width: 300px" value="{MEDIADIR_MASK_TITLE}" />
         </td>
     </tr>
-    <!-- BEGIN mediadirFormList --> 
-    <tr class="row2"> 
+    <!-- BEGIN mediadirFormList -->
+    <tr class="row2">
         <td>
-            {TXT_MEDIADIR_FORM_TEMPLATE}            
-        </td>                                        
+            {TXT_MEDIADIR_FORM_TEMPLATE}
+        </td>
         <td>
             <select name="maskForm" style="width: 302px">
                 {MEDIADIR_MASK_FORMS}
-            </select>                                                                                 
-        </td>  
-    </tr>   
-    <!-- END mediadirFormList --> 
-    <!-- BEGIN mediadirInputfieldList -->  
+            </select>
+        </td>
+    </tr>
+    <!-- END mediadirFormList -->
+    <!-- BEGIN mediadirInputfieldList -->
     <tr class="row3">
         <td valign="top"><b>{TXT_MEDIADIR_INPUTFIELD}</b></td>
-         <td valign="top"><b>{TXT_MEDIADIR_STATUS}</b></td> 
+         <td valign="top"><b>{TXT_MEDIADIR_STATUS}</b></td>
     </tr>
-    <!-- BEGIN mediadirInputfield --> 
+    <!-- BEGIN mediadirInputfield -->
     <tr class="{MEDIADIR_INPUTFIELD_ROW_CLASS}">
         <td valign="top">{MEDIADIR_INPUTFIELD_NAME}</td>
         <td>
-            <input name="maskInputfields[]" type="checkbox" value="{MEDIADIR_INPUTFIELD_ID}" {MEDIADIR_INPUTFIELD_CHECKED} /> 
+            <input name="maskInputfields[]" type="checkbox" value="{MEDIADIR_INPUTFIELD_ID}" {MEDIADIR_INPUTFIELD_CHECKED} />
         </td>
     </tr>
     <!-- END mediadirInputfield -->
-    <!-- END mediadirInputfieldList -->   
+    <!-- END mediadirInputfieldList -->
 </table>
 <br />
 <input type="submit" name="submitSettingsForm" value="{TXT_MEDIADIR_SUBMIT}" />
-</form>       
+</form>
 <!-- module_mediadir_settings_modify_mask.html -->

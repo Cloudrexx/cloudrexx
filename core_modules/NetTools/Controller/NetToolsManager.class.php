@@ -45,10 +45,10 @@ namespace Cx\Core_Modules\NetTools\Controller;
  */
 class NetToolsManager extends \Cx\Lib\NetTools {
 
-	var $pageTitle;
-	var $strErrMessage = '';
-	var $strOkMessage = '';
-	var $_objTpl;
+    var $pageTitle;
+    var $strErrMessage = '';
+    var $strOkMessage = '';
+    var $_objTpl;
 
 
     /**
@@ -63,15 +63,15 @@ class NetToolsManager extends \Cx\Lib\NetTools {
     /**
     * constructor
     *
-    * global	object	$objTemplate
-    * global	array	$_ARRAYLANG
+    * global    object    $objTemplate
+    * global    array    $_ARRAYLANG
     */
     function __construct(){
-    	global $objTemplate, $_ARRAYLANG;
+        global $objTemplate, $_ARRAYLANG;
 
-    	$this->_objTpl = new \Cx\Core\Html\Sigma(ASCMS_CORE_MODULE_PATH.'/NetTools/View/Template/Backend');
+        $this->_objTpl = new \Cx\Core\Html\Sigma(ASCMS_CORE_MODULE_PATH.'/NetTools/View/Template/Backend');
             \Cx\Core\Csrf\Controller\Csrf::add_placeholder($this->_objTpl);
-		$this->_objTpl->setErrorHandling(PEAR_ERROR_DIE);		
+        $this->_objTpl->setErrorHandling(PEAR_ERROR_DIE);
     }
     private function setNavigation()
     {
@@ -99,250 +99,250 @@ class NetToolsManager extends \Cx\Lib\NetTools {
     * @return    mixed    Template content
     */
     function getContent(){
-    	global $objTemplate;
+        global $objTemplate;
 
-    	if(!isset($_REQUEST['tpl'])){
-    		$_REQUEST['tpl'] = "";
-    	}
+        if(!isset($_REQUEST['tpl'])){
+            $_REQUEST['tpl'] = "";
+        }
 
-		switch ($_REQUEST['tpl']){
-    		case 'whois': // show whois page
-    			$this->_showWhois();
-    			break;
+        switch ($_REQUEST['tpl']){
+            case 'whois': // show whois page
+                $this->_showWhois();
+                break;
 
-    		case 'lookup':
-    			$this->_showLookup();
-    			break;
+            case 'lookup':
+                $this->_showLookup();
+                break;
 
-    		case 'mxlookup':
-    			$this->_showMXLookup();
-    			break;
+            case 'mxlookup':
+                $this->_showMXLookup();
+                break;
 
-    		case 'ping':
-    			$this->_showPing();
-    			break;
+            case 'ping':
+                $this->_showPing();
+                break;
 
-    		case 'port':
-    			$this->_showPort();
-    			break;
+            case 'port':
+                $this->_showPort();
+                break;
 
-    		default:
-    			$this->_showWhois();
-    			break;
-    	}
+            default:
+                $this->_showWhois();
+                break;
+        }
 
-    	$objTemplate->setVariable(array(
-    		'CONTENT_TITLE'				=> $this->pageTitle,
-			'CONTENT_OK_MESSAGE'		=> $this->strOkMessage,
-			'CONTENT_STATUS_MESSAGE'	=> $this->strErrMessage,
-    		'ADMIN_CONTENT'				=> $this->_objTpl->get()
-    	));
+        $objTemplate->setVariable(array(
+            'CONTENT_TITLE'                => $this->pageTitle,
+            'CONTENT_OK_MESSAGE'        => $this->strOkMessage,
+            'CONTENT_STATUS_MESSAGE'    => $this->strErrMessage,
+            'ADMIN_CONTENT'                => $this->_objTpl->get()
+        ));
 
         $this->act = $_REQUEST['tpl'];
         $this->setNavigation();
     }
 
     function _showWhois() {
-    	global $_ARRAYLANG;
+        global $_ARRAYLANG;
 
-    	$this->_objTpl->loadTemplateFile('module_nettools_whois.html',true,true);
-    	$this->pageTitle = $_ARRAYLANG['TXT_WHOIS'];
+        $this->_objTpl->loadTemplateFile('module_nettools_whois.html',true,true);
+        $this->pageTitle = $_ARRAYLANG['TXT_WHOIS'];
 
-    	// set language variables
-    	$this->_objTpl->setVariable(array(
-    		'TXT_WHOIS'					=> $_ARRAYLANG['TXT_WHOIS'],
-    		'TXT_BACK'					=> $_ARRAYLANG['TXT_BACK'],
-    		'TXT_WHOIS_TEXT'			=> $_ARRAYLANG['TXT_WHOIS_TEXT'],
-    		'TXT_WHOIS_REQUEST'			=> $_ARRAYLANG['TXT_WHOIS_REQUEST']
-    	));
+        // set language variables
+        $this->_objTpl->setVariable(array(
+            'TXT_WHOIS'                    => $_ARRAYLANG['TXT_WHOIS'],
+            'TXT_BACK'                    => $_ARRAYLANG['TXT_BACK'],
+            'TXT_WHOIS_TEXT'            => $_ARRAYLANG['TXT_WHOIS_TEXT'],
+            'TXT_WHOIS_REQUEST'            => $_ARRAYLANG['TXT_WHOIS_REQUEST']
+        ));
 
-    	if (isset($_REQUEST['address']) && !empty($_REQUEST['address'])) {
-    		$address = strip_tags($_REQUEST['address']);
+        if (isset($_REQUEST['address']) && !empty($_REQUEST['address'])) {
+            $address = strip_tags($_REQUEST['address']);
 
-	    	if ($this->IsIP($address)) {
-	    		$whoisInfo = $this->WhoisIP($address);
-	    	} else {
-	    		$whoisInfo = $this->WhoisDomain($address);
-	    	}
+            if ($this->IsIP($address)) {
+                $whoisInfo = $this->WhoisIP($address);
+            } else {
+                $whoisInfo = $this->WhoisDomain($address);
+            }
 
-	    	if (empty($whoisInfo)) {
-	    		$whoisInfo = $_ARRAYLANG['TXT_UNABLE_TO_WHOIS_TARGET'];
-	    	}
+            if (empty($whoisInfo)) {
+                $whoisInfo = $_ARRAYLANG['TXT_UNABLE_TO_WHOIS_TARGET'];
+            }
 
-	    	$this->_objTpl->setVariable(array(
-		    	'NETTOOLS_WHOIS_INFO_TEXT'	=> "<pre>".$whoisInfo."</pre>",
-		    	'NETTOOLS_WHOIS_ADDRESS'	=> $address,
-		    	'NETTOOLS_WHOIS_BACK_LINK'		=> "<a href=\"javascript:history.back()\" alt=\"".$_ARRAYLANG['TXT_BACK']."\" title=\"".$_ARRAYLANG['TXT_BACK']."\">".$_ARRAYLANG['TXT_BACK']."</a>"
-		    ));
-		    $this->_objTpl->parse('whoisinfo');
-    	} else {
-    		$this->_objTpl->setVariable(array(
-    			'NETTOOLS_WHOIS_ADDRESS'	=> $_SERVER['REMOTE_ADDR'],
-    		));
-    		$this->_objTpl->hideBlock('whoisinfo');
-    	}
+            $this->_objTpl->setVariable(array(
+                'NETTOOLS_WHOIS_INFO_TEXT'    => "<pre>".$whoisInfo."</pre>",
+                'NETTOOLS_WHOIS_ADDRESS'    => $address,
+                'NETTOOLS_WHOIS_BACK_LINK'        => "<a href=\"javascript:history.back()\" alt=\"".$_ARRAYLANG['TXT_BACK']."\" title=\"".$_ARRAYLANG['TXT_BACK']."\">".$_ARRAYLANG['TXT_BACK']."</a>"
+            ));
+            $this->_objTpl->parse('whoisinfo');
+        } else {
+            $this->_objTpl->setVariable(array(
+                'NETTOOLS_WHOIS_ADDRESS'    => $_SERVER['REMOTE_ADDR'],
+            ));
+            $this->_objTpl->hideBlock('whoisinfo');
+        }
     }
 
     function _showLookup() {
-    	global $_ARRAYLANG;
-    	$this->_objTpl->loadTemplateFile('module_nettools_lookup.html',true,true);
-    	$this->pageTitle = $_ARRAYLANG['TXT_LOOKUP'];
+        global $_ARRAYLANG;
+        $this->_objTpl->loadTemplateFile('module_nettools_lookup.html',true,true);
+        $this->pageTitle = $_ARRAYLANG['TXT_LOOKUP'];
 
-    	$this->_objTpl->setVariable(array(
-    		'TXT_LOOKUP'			=> $_ARRAYLANG['TXT_LOOKUP'],
-    		'TXT_LOOKUP_REQUEST'	=> $_ARRAYLANG['TXT_LOOKUP_REQUEST'],
-    		'TXT_LOOKUP_TEXT'		=> $_ARRAYLANG['TXT_LOOKUP_TEXT']
-    	));
+        $this->_objTpl->setVariable(array(
+            'TXT_LOOKUP'            => $_ARRAYLANG['TXT_LOOKUP'],
+            'TXT_LOOKUP_REQUEST'    => $_ARRAYLANG['TXT_LOOKUP_REQUEST'],
+            'TXT_LOOKUP_TEXT'        => $_ARRAYLANG['TXT_LOOKUP_TEXT']
+        ));
 
-    	if (isset($_REQUEST['address']) && !empty($_REQUEST['address'])) {
-    		$address = strip_tags($_REQUEST['address']);
-    		if ($this->IsIP($address)) {
-    			if ($this->LookupIP($address,$hostname)) {
-    				$lookupResult = "".$_ARRAYLANG['TXT_HOSTNAME_OF']." $address: $hostname";
-    			} else {
-    				$lookupResult = $_ARRAYLANG['TXT_LOOKUP_FAILED'];
-    			}
-    		} else {
-    			if ($this->LookupDomain($address,$ip)) {
-    				$lookupResult = "".$_ARRAYLANG['TXT_IP_ADDRESS_OF']." $address: $ip";
-    			} else {
-    				$lookupResult = $_ARRAYLANG['TXT_LOOKUP_FAILED'];
-    			}
-    		}
+        if (isset($_REQUEST['address']) && !empty($_REQUEST['address'])) {
+            $address = strip_tags($_REQUEST['address']);
+            if ($this->IsIP($address)) {
+                if ($this->LookupIP($address,$hostname)) {
+                    $lookupResult = "".$_ARRAYLANG['TXT_HOSTNAME_OF']." $address: $hostname";
+                } else {
+                    $lookupResult = $_ARRAYLANG['TXT_LOOKUP_FAILED'];
+                }
+            } else {
+                if ($this->LookupDomain($address,$ip)) {
+                    $lookupResult = "".$_ARRAYLANG['TXT_IP_ADDRESS_OF']." $address: $ip";
+                } else {
+                    $lookupResult = $_ARRAYLANG['TXT_LOOKUP_FAILED'];
+                }
+            }
 
-    		$this->_objTpl->setVariable(array(
-    			'NETTOOLS_LOOKUP_ADDRESS'	=> $address,
-    			'NETTOOLS_LOOKUP_RESULT'	=> $lookupResult
-    		));
-    		$this->_objTpl->parse('lookupinfo');
-    	} else {
-			$this->_objTpl->setVariable(array(
-    			'NETTOOLS_LOOKUP_ADDRESS'	=> $_SERVER['REMOTE_ADDR'],
-    		));
-    		$this->_objTpl->hideBlock('lookupinfo');
-    	}
+            $this->_objTpl->setVariable(array(
+                'NETTOOLS_LOOKUP_ADDRESS'    => $address,
+                'NETTOOLS_LOOKUP_RESULT'    => $lookupResult
+            ));
+            $this->_objTpl->parse('lookupinfo');
+        } else {
+            $this->_objTpl->setVariable(array(
+                'NETTOOLS_LOOKUP_ADDRESS'    => $_SERVER['REMOTE_ADDR'],
+            ));
+            $this->_objTpl->hideBlock('lookupinfo');
+        }
     }
 
     function _showMXLookup() {
-    	global $_ARRAYLANG;
+        global $_ARRAYLANG;
 
-    	$this->_objTpl->loadTemplateFile('module_nettools_mxlookup.html');
-    	$this->pageTitle = $_ARRAYLANG['TXT_MX_LOOKUP'];
+        $this->_objTpl->loadTemplateFile('module_nettools_mxlookup.html');
+        $this->pageTitle = $_ARRAYLANG['TXT_MX_LOOKUP'];
 
-    	$this->_objTpl->setVariable(array(
-    		'TXT_MX_LOOKUP'			=> $_ARRAYLANG['TXT_MX_LOOKUP'],
-    		'TXT_MX_LOOKUP_TEXT'	=> $_ARRAYLANG['TXT_MX_LOOKUP_TEXT'],
-    		'TXT_PREFERENCE'		=> $_ARRAYLANG['TXT_PREFERENCE'],
-    		'TXT_HOSTNAME' => $_ARRAYLANG['TXT_HOSTNAME']
-    	));
+        $this->_objTpl->setVariable(array(
+            'TXT_MX_LOOKUP'            => $_ARRAYLANG['TXT_MX_LOOKUP'],
+            'TXT_MX_LOOKUP_TEXT'    => $_ARRAYLANG['TXT_MX_LOOKUP_TEXT'],
+            'TXT_PREFERENCE'        => $_ARRAYLANG['TXT_PREFERENCE'],
+            'TXT_HOSTNAME' => $_ARRAYLANG['TXT_HOSTNAME']
+        ));
 
-    	if (isset($_REQUEST['address']) && !empty($_REQUEST['address'])) {
-    		$address = strip_tags($_REQUEST['address']);
+        if (isset($_REQUEST['address']) && !empty($_REQUEST['address'])) {
+            $address = strip_tags($_REQUEST['address']);
 
-    		$objMXLookup = new MXLookup();
-    		if ($objMXLookup->getMailServers($address)) {
-    			$arrMxRRs = $objMXLookup->arrMXRRs;
+            $objMXLookup = new MXLookup();
+            if ($objMXLookup->getMailServers($address)) {
+                $arrMxRRs = $objMXLookup->arrMXRRs;
 
-    			$rowNr = 0;
-    			foreach ($arrMxRRs as $arrMxRR) {
-    				$this->_objTpl->setVariable(array(
-    					'NETTOOLS_MX_LOOKUP_PREFERENCE'	=> $arrMxRR['PREFERENCE'],
-    					'NETTOOLS_MX_LOOKUP_HOST'		=> $arrMxRR['EXCHANGE'],
-    					'NETTOOLS_MX_LOOKUP_CLASS'		=> $rowNr%2 == 0 ? "row2" : "row1"
-    				));
-    				$this->_objTpl->parse('mxlookup-list');
-    				$rowNr++;
-    			}
-    			$this->_objTpl->parse('mxlookup');
-    			$this->_objTpl->hideBlock('mxlookup-error');
-    		} else {
-    			$this->_objTpl->setVariable('NETTOOLS_MX_LOOKUP_ERROR', $objMXLookup->errorMsg);
-    			$this->_objTpl->hideBlock('mxlookup');
-    			$this->_objTpl->parse('mxlookup-error');
-    		}
+                $rowNr = 0;
+                foreach ($arrMxRRs as $arrMxRR) {
+                    $this->_objTpl->setVariable(array(
+                        'NETTOOLS_MX_LOOKUP_PREFERENCE'    => $arrMxRR['PREFERENCE'],
+                        'NETTOOLS_MX_LOOKUP_HOST'        => $arrMxRR['EXCHANGE'],
+                        'NETTOOLS_MX_LOOKUP_CLASS'        => $rowNr%2 == 0 ? "row2" : "row1"
+                    ));
+                    $this->_objTpl->parse('mxlookup-list');
+                    $rowNr++;
+                }
+                $this->_objTpl->parse('mxlookup');
+                $this->_objTpl->hideBlock('mxlookup-error');
+            } else {
+                $this->_objTpl->setVariable('NETTOOLS_MX_LOOKUP_ERROR', $objMXLookup->errorMsg);
+                $this->_objTpl->hideBlock('mxlookup');
+                $this->_objTpl->parse('mxlookup-error');
+            }
 
-    		$this->_objTpl->setVariable('NETTOOLS_MX_LOOKUP_ADDRESS', $address);
-    	} else {
-    		$this->_objTpl->hideBlock('mxlookup');
-    		$this->_objTpl->hideBlock('mxlookup-error');
-    	}
+            $this->_objTpl->setVariable('NETTOOLS_MX_LOOKUP_ADDRESS', $address);
+        } else {
+            $this->_objTpl->hideBlock('mxlookup');
+            $this->_objTpl->hideBlock('mxlookup-error');
+        }
     }
 
     function _showPing() {
-    	global $_ARRAYLANG;
+        global $_ARRAYLANG;
 
-    	$this->_objTpl->loadTemplateFile('module_nettools_ping.html',true,true);
-    	$this->pageTitle = $_ARRAYLANG['TXT_PING'];
+        $this->_objTpl->loadTemplateFile('module_nettools_ping.html',true,true);
+        $this->pageTitle = $_ARRAYLANG['TXT_PING'];
 
-    	$this->_objTpl->setVariable(array(
-    		'TXT_PING'	=> $_ARRAYLANG['TXT_PING'],
-    		'TXT_PING_REQUEST' => $_ARRAYLANG['TXT_PING_REQUEST'],
-    		'TXT_PING_TEXT'		=> $_ARRAYLANG['TXT_PING_TEXT']
-    	));
+        $this->_objTpl->setVariable(array(
+            'TXT_PING'    => $_ARRAYLANG['TXT_PING'],
+            'TXT_PING_REQUEST' => $_ARRAYLANG['TXT_PING_REQUEST'],
+            'TXT_PING_TEXT'        => $_ARRAYLANG['TXT_PING_TEXT']
+        ));
 
-    	if (isset($_REQUEST['address']) && !empty($_REQUEST['address'])) {
-    		$address = strip_tags($_REQUEST['address']);
-    		$pingMsg = $this->PingHost($address,$err);
-    		if ($err) {
-    			$pingResult = $_ARRAYLANG['TXT_INVALID_TARGET'];
-    		} else {
-    			if (strlen($pingMsg) == 0) {
-    				$pingResult = $_ARRAYLANG['TXT_NO_RESULT'];
-    			} else {
-    				$pingResult = "<pre>".$pingMsg."</pre>";
-    			}
-    		}
+        if (isset($_REQUEST['address']) && !empty($_REQUEST['address'])) {
+            $address = strip_tags($_REQUEST['address']);
+            $pingMsg = $this->PingHost($address,$err);
+            if ($err) {
+                $pingResult = $_ARRAYLANG['TXT_INVALID_TARGET'];
+            } else {
+                if (strlen($pingMsg) == 0) {
+                    $pingResult = $_ARRAYLANG['TXT_NO_RESULT'];
+                } else {
+                    $pingResult = "<pre>".$pingMsg."</pre>";
+                }
+            }
 
-		    $this->_objTpl->setVariable(array(
-				'NETTOOLS_PING_ADDRESS'	=> $address,
-				'NETTOOLS_PING_RESULT'	=> $pingResult
-			));
-			$this->_objTpl->parse('pinginfo');
-    	} else {
-    		$this->_objTpl->setVariable(array(
-    			'NETTOOLS_PING_ADDRESS'	=> $_SERVER['REMOTE_ADDR'],
-    		));
-    		$this->_objTpl->hideBlock('pinginfo');
-    	}
+            $this->_objTpl->setVariable(array(
+                'NETTOOLS_PING_ADDRESS'    => $address,
+                'NETTOOLS_PING_RESULT'    => $pingResult
+            ));
+            $this->_objTpl->parse('pinginfo');
+        } else {
+            $this->_objTpl->setVariable(array(
+                'NETTOOLS_PING_ADDRESS'    => $_SERVER['REMOTE_ADDR'],
+            ));
+            $this->_objTpl->hideBlock('pinginfo');
+        }
     }
 
     function _showPort() {
-    	global $_ARRAYLANG;
+        global $_ARRAYLANG;
 
-    	$this->_objTpl->loadTemplateFile('module_nettools_port.html',true,true);
-    	$this->pageTitle = $_ARRAYLANG['TXT_CHECK_PORT'];
+        $this->_objTpl->loadTemplateFile('module_nettools_port.html',true,true);
+        $this->pageTitle = $_ARRAYLANG['TXT_CHECK_PORT'];
 
-    	$this->_objTpl->setVariable(array(
-    		'TXT_CHECK_PORT'		=> $_ARRAYLANG['TXT_CHECK_PORT'],
-    		'TXT_CHECK'				=> $_ARRAYLANG['TXT_CHECK'],
-    		'TXT_CHECK_PORT_TEXT'	=> $_ARRAYLANG['TXT_CHECK_PORT_TEXT']
-    	));
+        $this->_objTpl->setVariable(array(
+            'TXT_CHECK_PORT'        => $_ARRAYLANG['TXT_CHECK_PORT'],
+            'TXT_CHECK'                => $_ARRAYLANG['TXT_CHECK'],
+            'TXT_CHECK_PORT_TEXT'    => $_ARRAYLANG['TXT_CHECK_PORT_TEXT']
+        ));
 
-		if (isset($_REQUEST['address']) && !empty($_REQUEST['address'])) {
-			$address = substr($_REQUEST['address'],0, strpos($_REQUEST['address'],":"));
-			$port = (int) substr($_REQUEST['address'],strpos($_REQUEST['address'],":")+1);
+        if (isset($_REQUEST['address']) && !empty($_REQUEST['address'])) {
+            $address = substr($_REQUEST['address'],0, strpos($_REQUEST['address'],":"));
+            $port = (int) substr($_REQUEST['address'],strpos($_REQUEST['address'],":")+1);
 
-    		$result = $this->ProbePort($address, $port, $banner, $err);
+            $result = $this->ProbePort($address, $port, $banner, $err);
 
-    		if ($result === 0) {
-    			$portResult = $_ARRAYLANG['TXT_PORT_IS_OPEN'];
-    		} elseif ($result === -1) {
-    			$portResult = $_ARRAYLANG['TXT_INVALID_PORT'].'!';
-    		} else {
-    			$portResult = $_ARRAYLANG['TXT_PORT_IS_CLOSED']." ($result)";
-    		}
+            if ($result === 0) {
+                $portResult = $_ARRAYLANG['TXT_PORT_IS_OPEN'];
+            } elseif ($result === -1) {
+                $portResult = $_ARRAYLANG['TXT_INVALID_PORT'].'!';
+            } else {
+                $portResult = $_ARRAYLANG['TXT_PORT_IS_CLOSED']." ($result)";
+            }
 
-		    $this->_objTpl->setVariable(array(
-				'NETTOOLS_PORT_ADDRESS'	=> $_REQUEST['address'],
-				'NETTOOLS_PORT_RESULT'	=> $portResult
-			));
-			$this->_objTpl->parse('portinfo');
-    	} else {
-    		$this->_objTpl->setVariable(array(
-    			'NETTOOLS_PORT_ADDRESS'	=> $_SERVER['REMOTE_ADDR'].':80',
-    		));
-    		$this->_objTpl->hideBlock('portinfo');
-    	}
+            $this->_objTpl->setVariable(array(
+                'NETTOOLS_PORT_ADDRESS'    => $_REQUEST['address'],
+                'NETTOOLS_PORT_RESULT'    => $portResult
+            ));
+            $this->_objTpl->parse('portinfo');
+        } else {
+            $this->_objTpl->setVariable(array(
+                'NETTOOLS_PORT_ADDRESS'    => $_SERVER['REMOTE_ADDR'].':80',
+            ));
+            $this->_objTpl->hideBlock('portinfo');
+        }
     }
 }
 ?>

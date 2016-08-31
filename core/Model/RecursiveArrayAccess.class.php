@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Wrapper class for the recursive array
  *
@@ -32,7 +32,7 @@
  * @author      ss4u <ss4u.comvation@gmail.com>
  * @version     3.1.2
  * @package     cloudrexx
- * @subpackage  core 
+ * @subpackage  core
  */
 
 namespace Cx\Core\Model;
@@ -56,7 +56,7 @@ class RecursiveArrayAccessException extends \Exception {}
  * @version     $Id:    Exp $
  * @package     cloudrexx
  * @subpackage  core
- * 
+ *
  * @see         /core/session.class.php
  */
 class RecursiveArrayAccess implements \ArrayAccess, \Countable, \Iterator {
@@ -70,34 +70,34 @@ class RecursiveArrayAccess implements \ArrayAccess, \Countable, \Iterator {
 
     /**
      * Path of the current array
-     * 
+     *
      * @var string
      */
     protected $offset;
-    
+
     /**
      * Callable funtion on offsetSet
-     * 
+     *
      * @var callable
      */
-    protected $callableOnSet;    
+    protected $callableOnSet;
     /**
      * Callable funtion on offsetGet
-     * 
+     *
      * @var callable
      */
     protected $callableOnGet;
-    
+
     /**
      * Callable funtion on offsetUnset
-     * 
+     *
      * @var callable
      */
     protected $callableOnUnset;
-    
+
     /**
      * Callable function on callableOnValidateKey
-     * 
+     *
      * @var callable
      */
     protected $callableOnValidateKey;
@@ -108,14 +108,14 @@ class RecursiveArrayAccess implements \ArrayAccess, \Countable, \Iterator {
      * @var callable
      */
     protected $callableOnSanitizeKey;
-    
+
     /**
-     * 
-     * 
+     *
+     *
      * @var integer
      */
     protected $id;
-    
+
     /**
      *
      * @var int
@@ -142,17 +142,17 @@ class RecursiveArrayAccess implements \ArrayAccess, \Countable, \Iterator {
     {
         $this->offset   = $offset;
         $this->parentId = intval($parentId);
-        
+
         $this->callableOnSet   = $callableOnSet;
-        $this->callableOnGet   = $callableOnGet;        
+        $this->callableOnGet   = $callableOnGet;
         $this->callableOnUnset = $callableOnUnset;
         $this->callableOnValidateKey = $callableOnValidateKey;
-        
+
         if ($this->callableOnUnset)
             call_user_func($this->callableOnUnset, $this->offset, $this->parentId);
         if ($this->callableOnSet)
             call_user_func($this->callableOnSet, $this);
-        
+
         if (is_array($data)) {
             foreach ($data as $key => $value) {
                 $this[$key] = $value;
@@ -184,7 +184,7 @@ class RecursiveArrayAccess implements \ArrayAccess, \Countable, \Iterator {
      *
      * @return boolean true on success or false on failure.
      */
-    public function offsetExists($offset) {       
+    public function offsetExists($offset) {
         return isset($this->data[$offset]);
     }
 
@@ -264,15 +264,15 @@ class RecursiveArrayAccess implements \ArrayAccess, \Countable, \Iterator {
         if ($callableOnValidateKey) {
             $this->callableOnValidateKey = $callableOnValidateKey;
         }
-        
+
         if ($this->callableOnValidateKey) {
             call_user_func($this->callableOnValidateKey, $offset);
         }
-        
+
         if ($offset === null) {
             $offset = count($this->data);
         }
-        
+
         if ($callableOnSet) {
             $this->callableOnSet = $callableOnSet;
         }
@@ -376,9 +376,9 @@ class RecursiveArrayAccess implements \ArrayAccess, \Countable, \Iterator {
     public function offsetUnset($offset) {
         if ($this->callableOnUnset)
             call_user_func($this->callableOnUnset, $offset, $this->id);
-        
+
         unset($this->data[$offset]);
-        
+
         if ($this->callableOnSet)
             call_user_func($this->callableOnSet, $this);
     }

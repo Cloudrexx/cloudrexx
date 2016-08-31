@@ -63,7 +63,7 @@ class ContrexxUpdate
             'CHARSET'                           => UPDATE_UTF8 ? 'utf-8' : 'iso-8859-1',
             'JAVASCRIPT'                        => 'javascript_inserting_here',
         ));
-        
+
         $this->objDatabase = Env::get('db');
 
         DBG::set_adodb_debug_mode();
@@ -77,7 +77,7 @@ class ContrexxUpdate
             $this->parseJsonRequest();
         }
     }
-    
+
     public function getPage()
     {
         if (!empty($_REQUEST['cmd']) && ($_REQUEST['cmd'] == 'logout')) {
@@ -85,7 +85,7 @@ class ContrexxUpdate
         }
 
         if (isset($_GET['debug_update']) && $_GET['debug_update'] === 'true') {
-            \DBG::activate(DBG_PHP | DBG_DB | DBG_LOG); 
+            \DBG::activate(DBG_PHP | DBG_DB | DBG_LOG);
         }
 
         if (isset($_POST['doGroup']) && $_POST['doGroup']) {
@@ -107,9 +107,9 @@ class ContrexxUpdate
             $this->setStep();
             $this->showStep();
         }
-        
+
         $this->setPlaceholders();
-        
+
         if ($this->ajax) {
             die($this->objJson->encode(
                 array(
@@ -131,13 +131,13 @@ class ContrexxUpdate
             $_POST = array_map('utf8_decode', $_POST);
         }
     }
-    
+
     private function setStep()
     {
         if (empty($_SESSION['contrexx_update']['step'])) {
             $_SESSION['contrexx_update']['step'] = 0;
         }
-        
+
         if (isset($_POST['updateBack']) && !isset($_POST['updateNext']) && !isset($_POST['skipRequirements'])) {
             $this->setPreviousStep();
         }
@@ -166,23 +166,23 @@ class ContrexxUpdate
                 break;
         }
     }
-    
+
     private function setNextStep()
     {
         $_SESSION['contrexx_update']['step'] = $_SESSION['contrexx_update']['step'] + 1;
     }
-    
+
     private function setPreviousStep()
     {
         $_SESSION['contrexx_update']['step'] = $_SESSION['contrexx_update']['step'] - 1;
     }
-    
+
     private function setPlaceholders()
     {
         global $_CORELANG;
-        
+
         $logout = $this->auth() ? '<input name="logout" value="'.$_CORELANG['TXT_UPDATE_LOGOUT'].'" type="button" onclick="window.location.href=\'index.php?cmd=logout\'" />' : '';
-        
+
         if ($this->ajax) {
             $this->html['content'] = !UPDATE_UTF8 ? utf8_encode($this->html['content']) : $this->html['content'];
             $this->html['logout']  = $logout;
@@ -192,7 +192,7 @@ class ContrexxUpdate
             $this->objTemplate->setVariable('LOGOUT_BUTTON', $logout);
         }
     }
-    
+
     private function setNavigation($navigation)
     {
         if ($this->ajax) {
@@ -201,7 +201,7 @@ class ContrexxUpdate
             $this->objTemplate->setVariable('NAVIGATION', $navigation);
         }
     }
-    
+
     private function getLangMenu()
     {
         $menu = '<select class="lang" name="lang" onchange="window.location.href=\'?lang=\'+this.value">';
@@ -211,17 +211,17 @@ class ContrexxUpdate
         $menu .= '</select>';
         return $menu;
     }
-    
+
     private function getOverview()
     {
         $arrVersions = $this->getAvailabeVersions();
         $_SESSION['contrexx_update']['countAvailableVersions'] = count($arrVersions);
-        
+
         if (count($arrVersions) === 1) {
             $updateVersion = key($arrVersions);
             $_POST['updateVersion'] = $updateVersion;
         }
-        
+
         if (!empty($_POST['updateVersion'])) {
             if (in_array($this->stripslashes($_POST['updateVersion']), array_keys($arrVersions))) {
                 $_SESSION['contrexx_update']['version'] = $this->stripslashes($_POST['updateVersion']);
@@ -234,14 +234,14 @@ class ContrexxUpdate
             $this->getOverviewPage($arrVersions);
         }
     }
-    
+
     private function getOverviewPage($arrVersions)
     {
         global $_CORELANG;
-        
+
         $this->objTemplate->addBlockfile('CONTENT', 'overview', 'overview.html');
         $this->objTemplate->setVariable('TXT_UPDATE_VERSION_SELECTION', $_CORELANG['TXT_UPDATE_VERSION_SELECTION']);
-        
+
         if (count($arrVersions) !== 0) {
             $this->objTemplate->setVariable(array(
                 'TXT_UPDATE_SELECT_VERSION_MSG' => $_CORELANG['TXT_UPDATE_SELECT_VERSION_MSG'],
@@ -264,7 +264,7 @@ class ContrexxUpdate
             } else {
                 $this->objTemplate->hideBlock('updateNoVersionSelected');
             }
-            
+
             $this->objTemplate->parse('updateVersions');
             $this->objTemplate->hideBlock('updateNoVersions');
         } else {
@@ -272,14 +272,14 @@ class ContrexxUpdate
             $this->objTemplate->parse('updateNoVersions');
             $this->objTemplate->hideBlock('updateVersions');
         }
-        
+
         $this->objTemplate->parse('overview');
         if ($this->ajax) {
             $this->html['content'] = $this->objTemplate->get('overview');
         }
         $this->setNavigation('<input type="submit" value="'.$_CORELANG['TXT_UPDATE_NEXT'].'" name="updateNext" />');
     }
-    
+
     private function showRequirements()
     {
         global $_CONFIG, $objUpdate;
@@ -302,11 +302,11 @@ class ContrexxUpdate
             $this->showStep();
         }
     }
-    
+
     private function showRequirementsPage($arrRequirements)
     {
         global $_CORELANG;
-        
+
         $this->objTemplate->addBlockfile('CONTENT', 'requirements', 'requirements.html');
         $this->objTemplate->setVariable(array(
             'TXT_UPDATE_SYSTEM_REQUIREMENTS' => $_CORELANG['TXT_UPDATE_SYSTEM_REQUIREMENTS'],
@@ -314,7 +314,7 @@ class ContrexxUpdate
             'TXT_UPDATE_PHP_EXTENSIONS'      => $_CORELANG['TXT_UPDATE_PHP_EXTENSIONS'],
             'TXT_UPDATE_PHP_CONFIGURATIONS'  => $_CORELANG['TXT_UPDATE_PHP_CONFIGURATIONS'],
         ));
-        
+
         if (!empty($arrRequirements['versions'])) {
             $serverNotices = '';
             foreach ($arrRequirements['versions'] as $arrVersion) {
@@ -328,7 +328,7 @@ class ContrexxUpdate
         } else {
             $this->objTemplate->hideBlock('versions');
         }
-        
+
         if (isset($arrRequirements['phpExtensions']) && count($arrRequirements['phpExtensions'])) {
             $phpExtensions = '';
             foreach ($arrRequirements['phpExtensions'] as $arrPhpExtension) {
@@ -342,7 +342,7 @@ class ContrexxUpdate
         } else {
             $this->objTemplate->hideBlock('phpExtension');
         }
-        
+
         if (!empty($arrRequirements['phpConfigurations'])) {
             $serverRequirements = '';
             foreach ($arrRequirements['phpConfigurations'] as $arrPhpConfiguration) {
@@ -356,17 +356,17 @@ class ContrexxUpdate
         } else {
             $this->objTemplate->hideBlock('phpConfigurations');
         }
-        
+
         $this->objTemplate->parse('requirements');
         if ($this->ajax) {
             $this->html['content'] = $this->objTemplate->get('requirements');
         }
-        
+
         $updateBack = '';
         if (isset($_SESSION['contrexx_update']['countAvailableVersions']) && $_SESSION['contrexx_update']['countAvailableVersions'] > 1) {
             $updateBack = '<input type="submit" value="'.$_CORELANG['TXT_UPDATE_BACK'].'" name="updateBack" onclick="try{doUpdate(true)} catch(e){return true;}" /> ';
         }
-        
+
         $this->setNavigation($updateBack . '<input type="submit" value="'.$_CORELANG['TXT_UPDATE_NEXT'].'" name="skipRequirements" />');
     }
 
@@ -374,7 +374,7 @@ class ContrexxUpdate
     {
         $arrUpdate = $this->getLoadedVersionInfo();
         if ($arrUpdate) {
-            
+
             if (isset($_POST['updateNext'])) {
                 if (empty($_POST['update_license'])) {
                     $_SESSION['contrexx_update']['license_agreement'] = false;
@@ -385,7 +385,7 @@ class ContrexxUpdate
 
             if (isset($_POST['updateNext']) && (!empty($_POST['update_license']))) {
                 $_SESSION['contrexx_update']['license_agreement'] = true;
-                
+
                 $this->setNextStep();
                 $this->showStep();
             } else {
@@ -400,7 +400,7 @@ class ContrexxUpdate
     private function showLicensePage($arrUpdate)
     {
         global $_CORELANG;
-        
+
         $this->objTemplate->addBlockfile('CONTENT', 'license', 'license.html');
 
         $licenseFile = UPDATE_UPDATES.'/'.$arrUpdate['cmsVersion'].'/data/contrexx_lizenz_de.txt';
@@ -413,13 +413,13 @@ class ContrexxUpdate
             'UPDATE_LICENSE_LICENSE_TXT'    => $licenseTxt,
             'UPDATE_LICENSE_CHECKED'        => !empty($_SESSION['contrexx_update']['license_agreement']) ? 'checked="checked"' : '',
         ));
-        
-        
+
+
         $this->objTemplate->parse('license');
         if ($this->ajax) {
             $this->html['content'] = $this->objTemplate->get('license');
         }
-        
+
         $this->setNavigation('<input type="submit" value="'.$_CORELANG['TXT_UPDATE_BACK'].'" name="updateBack" onclick="try{doUpdate(true)} catch(e){return true;}" /> <input type="submit" value="'.$_CORELANG['TXT_UPDATE_NEXT'].'" name="updateNext" />');
     }
 
@@ -436,7 +436,7 @@ class ContrexxUpdate
 
         if ((isset($_POST['updateNext']) && (!empty($_POST['update_license_info']))) || !$this->_isNewerVersion($_CONFIG['coreCmsVersion'], '3.0.0')) {
             $_SESSION['contrexx_update']['license_info'] = true;
-            
+
             $this->setNextStep();
             $this->showStep();
         } else {
@@ -447,7 +447,7 @@ class ContrexxUpdate
     private function showInfoAboutLicensePage()
     {
         global $_CORELANG, $_CONFIG;
-        
+
         $this->objTemplate->addBlockfile('CONTENT', 'license_info', 'license_info.html');
 
         $this->objTemplate->setVariable(array(
@@ -463,12 +463,12 @@ class ContrexxUpdate
         } else {
             $this->objTemplate->hideBlock('update_license_info_free');
         }
-        
+
         $this->objTemplate->parse('license_info');
         if ($this->ajax) {
             $this->html['content'] = $this->objTemplate->get('license_info');
         }
-        
+
         $this->setNavigation('<input type="submit" value="'.$_CORELANG['TXT_UPDATE_BACK'].'" name="updateBack" onclick="try{doUpdate(true)} catch(e){return true;}" /> <input type="submit" value="'.$_CORELANG['TXT_UPDATE_NEXT'].'" name="updateNext" />');
     }
 
@@ -485,29 +485,29 @@ class ContrexxUpdate
             }
         }
     }
-    
+
     private function showUpdatePage()
     {
         global $_CORELANG;
 
         $this->objTemplate->addBlockfile('CONTENT', 'start', 'start.html');
-        
+
         $arrVersion    = $this->getLoadedVersionInfo();
         $updateVersion = $version = $this->getLiteralRepresentationOfVersion($arrVersion['cmsVersion']);
-        
+
         $this->objTemplate->setVariable(array(
             'TXT_UPDATE_UPDATE_IS_READY' => $_CORELANG['TXT_UPDATE_UPDATE_IS_READY'],
             'UPDATE_VERSION'             => $updateVersion,
         ));
         $this->objTemplate->parse('start');
-        
+
         if ($this->ajax) {
             $this->html['content'] = $this->objTemplate->get('start');
         }
-        
+
         $this->setNavigation('<input type="submit" value="'.$_CORELANG['TXT_UPDATE_BACK'].'" name="updateBack" onclick="try{doUpdate(true)} catch(e){return true;}" /> <input type="submit" value="'.$_CORELANG['TXT_UPDATE_START_UPDATE'].'" name="updateNext" /><input type="hidden" name="processUpdate" id="processUpdate" /><input type="hidden" id="checkTimeout" />');
     }
-    
+
     private function processUpdate()
     {
         global $_CORELANG, $_CONFIG, $_ARRAYLANG;
@@ -700,21 +700,21 @@ class ContrexxUpdate
     {
         global $_CONFIG;
         static $arrVersions = array();
-        
+
         if (!count($arrVersions)) {
             if (($dh = opendir(UPDATE_UPDATES)) === false) {
                 return false;
             }
-            
+
             while ($file = readdir($dh)) {
                 if (preg_match('/^\d(\.\d)+$/', $file)) {
                     $arrUpdate = false;
-                    
+
                     if (@include_once(UPDATE_UPDATES . '/' . $file . '/config.inc.php')) {
                         if (is_array($arrUpdate)) {
                             $updateVersionIsNewer  = $this->_isNewerVersion($_CONFIG['coreCmsVersion'], $arrUpdate['cmsVersion']);
                             $installedVersionIsTooOld = $this->_isNewerVersion($_CONFIG['coreCmsVersion'], $arrUpdate['cmsFromVersion']);
-                            
+
                             if ($updateVersionIsNewer && !$installedVersionIsTooOld) {
                                 $arrVersions[$file] = $arrUpdate;
                             }
@@ -724,19 +724,19 @@ class ContrexxUpdate
                 }
             }
         }
-        
+
         return $arrVersions;
     }
-    
+
     private function getRequirements($arrUpdate)
     {
         global $_CONFIG, $_CORELANG;
-        
+
         $failed               = false;
         $arrVersions          = array();
         $arrPhpExtensions     = array();
         $arrPhpConfigurations = array();
-        
+
         if (!$this->checkPHPVersion($arrUpdate['cmsRequiredPHP'])) {
             $failed = true;
             $arrVersions['php']['class'] = 'failed';
@@ -745,7 +745,7 @@ class ContrexxUpdate
         }
         $arrVersions['php']['name']  = sprintf($_CORELANG['TXT_UPDATE_VERSION_PHP'], $arrUpdate['cmsRequiredPHP']);
         $arrVersions['php']['value'] = phpversion();
-        
+
         if (!$this->checkMySQLVersion($arrUpdate['cmsRequiredMySQL'])) {
             $failed = true;
             $arrVersions['mysql']['class'] = "failed";
@@ -754,7 +754,7 @@ class ContrexxUpdate
         }
         $arrVersions['mysql']['name']  = sprintf($_CORELANG['TXT_UPDATE_VERSION_MYSQL'], $arrUpdate['cmsRequiredMySQL']);
         $arrVersions['mysql']['value'] = $this->getMySQLServerVersion();
-        
+
         if (!$this->checkGDVersion($arrUpdate['cmsRequiredGD'])) {
             $failed = true;
             $arrVersions['gd']['class'] = 'failed';
@@ -763,7 +763,7 @@ class ContrexxUpdate
         }
         $arrVersions['gd']['name']  = sprintf($_CORELANG['TXT_UPDATE_VERSION_GD'], $arrUpdate['cmsRequiredGD']);
         $arrVersions['gd']['value'] = $this->getGDVersion();
-        
+
         if (!$this->checkFTPSupport()) {
             $failed = true;
             $arrPhpExtensions['ftp']['class'] = 'failed';
@@ -773,7 +773,7 @@ class ContrexxUpdate
             $arrPhpExtensions['ftp']['value'] = $_CORELANG['TXT_UPDATE_YES'];
         }
         $arrPhpExtensions['ftp']['name']  = $_CORELANG['TXT_UPDATE_FTP_SUPPORT'] . ' <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">' . $_CORELANG['TXT_UPDATE_FTP_SUPPORT_TOOLTIP'] . '</span>';
-        
+
         if ($this->getWebserverSoftware() == 'apache') {
             $modRewriteResult = $this->checkModRewrite();
             if ($modRewriteResult === true) {
@@ -802,7 +802,7 @@ class ContrexxUpdate
             $arrPhpExtensions['pdo']['value'] = $_CORELANG['TXT_UPDATE_YES'];
             $arrPhpExtensions['pdo']['name']  = $_CORELANG['TXT_UPDATE_PDO'];
         }
-        
+
         if ($this->getWebserverSoftware() == 'iis') {
             if (!$this->checkIISUrlRewriteModule()) {
                 $failed = true;
@@ -814,7 +814,7 @@ class ContrexxUpdate
             }
             $arrPhpExtensions['iisUrlRewriteModule']['name'] = $_CORELANG['TXT_UPDATE_IIS_URL_REWRITE_MODULE'];
         }
-        
+
         if (!$this->checkAPC()) {
             $arrPhpExtensions['apc']['class'] = 'warning';
             $arrPhpExtensions['apc']['value'] = $_CORELANG['TXT_UPDATE_NO'];
@@ -823,7 +823,7 @@ class ContrexxUpdate
             $arrPhpExtensions['apc']['value'] = $_CORELANG['TXT_UPDATE_YES'];
         }
         $arrPhpExtensions['apc']['name'] = $_CORELANG['TXT_UPDATE_APC'] . ' <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">' . $_CORELANG['TXT_UPDATE_APC_TOOLTIP'] . '</span>';
-        
+
         if (!$this->checkMemoryLimit()) {
             $failed = true;
             $arrPhpConfigurations['memoryLimit']['class'] = 'failed';
@@ -832,7 +832,7 @@ class ContrexxUpdate
         }
         $arrPhpConfigurations['memoryLimit']['name'] = 'memory_limit (>= ' . $this->getRequiredMemoryLimit() . 'M)';
         $arrPhpConfigurations['memoryLimit']['value'] = $this->getMemoryLimit('string');
-        
+
         return array(
             'incompatible'      => $failed,
             'versions'          => $arrVersions,
@@ -840,22 +840,22 @@ class ContrexxUpdate
             'phpConfigurations' => $arrPhpConfigurations,
         );
     }
-    
+
     private function getGDVersion()
     {
         if (!extension_loaded('gd'))     return false;
         if (!function_exists('gd_info')) return false;
-        
+
         $gdInfo = gd_info();
         preg_match('/[\d\.]+/', $gdInfo['GD Version'], $gdVersion);
-        
+
         if (!empty($gdVersion[0])) {
             return $gdVersion[0];
         } else {
             return false;
         }
     }
-    
+
     private function checkGDVersion($requiredGDVersion)
     {
         if ($gdVersion = $this->getGDVersion()) {
@@ -863,15 +863,15 @@ class ContrexxUpdate
                 return true;
             }
         }
-        
+
         return false;
     }
-    
+
     private function isWindows()
     {
         return substr(PHP_OS, 0, 3) == 'WIN';
     }
-    
+
     private function checkFTPSupport()
     {
         if (!$this->isWindows() && ini_get('safe_mode')) {
@@ -879,18 +879,18 @@ class ContrexxUpdate
                 return false;
             }
         }
-        
+
         return true;
     }
-    
+
     private function getWebserverSoftware()
     {
         $serverSoftware = strtolower($_SERVER['SERVER_SOFTWARE']);
-        
+
         if (!empty($serverSoftware)) {
             $isApache = strpos($serverSoftware, 'apache') !== false;
             $isIIS    = strpos($serverSoftware, 'iis');
-            
+
             if ($isApache) {
                 $serverSoftware = 'apache';
             } else if ($isIIS) {
@@ -901,10 +901,10 @@ class ContrexxUpdate
         } else {
             $serverSoftware = false;
         }
-        
+
         return $serverSoftware;
     }
-    
+
     private function checkModRewrite()
     {
         global $_CONFIG;
@@ -925,7 +925,7 @@ class ContrexxUpdate
             } catch (\HTTP_Request2_Exception $e) {
                 \DBG::log($e->getMessage());
             }
-            
+
             if (empty($arrHeaders['location'])) {
                 $modRewrite = 'warning';
             } else if (strpos($arrHeaders['location'], 'weiterleitungen_funktionieren') !== false) {
@@ -934,15 +934,15 @@ class ContrexxUpdate
                 $modRewrite = false;
             }
         }
-        
+
         return $modRewrite;
     }
-    
+
     private function checkIISUrlRewriteModule()
     {
         return isset($_SERVER['IIS_UrlRewriteModule']);
     }
-    
+
     private function checkAPC()
     {
         // Try to enable APC
@@ -957,10 +957,10 @@ class ContrexxUpdate
                 }
             }
         }
-        
+
         return $apcEnabled;
     }
-    
+
     private function checkMemoryLimit()
     {
         if ($this->getMemoryLimit() < $this->getRequiredMemoryLimit()) {
@@ -971,7 +971,7 @@ class ContrexxUpdate
         }
         return true;
     }
-    
+
     private function getMemoryLimit($type = '')
     {
         $memoryLimit = ini_get('memory_limit');
@@ -981,7 +981,7 @@ class ContrexxUpdate
         }
         return $memoryLimit;
     }
-    
+
     private function getRequiredMemoryLimit()
     {
         if ($this->checkAPC()) {
@@ -991,11 +991,11 @@ class ContrexxUpdate
         }
         return $requiredMemoryLimit;
     }
-    
+
     private function setMinimalMemoryLimit()
     {
         $memoryLimit = $this->getMemoryLimit();
-        
+
         if ($this->checkAPC()) {
             if ($memoryLimit < 32) {
                 ini_set('memory_limit', '32M');
@@ -1006,16 +1006,16 @@ class ContrexxUpdate
             }
         }
     }
-    
+
     /**
      * Check for newer version
      *
      * Returns TRUE if $newVersion has a higher version number than $installedVersion.
      * ($newVersion > $installedVersion)
-	 *
-	 * @param string $installedVersion
-	 * @param string $newVersion
-	 * @return boolean
+     *
+     * @param string $installedVersion
+     * @param string $newVersion
+     * @return boolean
      */
     function _isNewerVersion($installedVersion, $newVersion)
     {
@@ -1033,7 +1033,7 @@ class ContrexxUpdate
                 return false;
             }
         }
-        
+
         return false;
     }
 
@@ -1042,10 +1042,10 @@ class ContrexxUpdate
         if (is_a($sessionArr, '\Cx\Core\Model\RecursiveArrayAccess')) {
             $sessionArr = $sessionArr->toArray();
         }
-        
+
         return $sessionArr;
     }
-    
+
     function _isNewerStatus($installedStatus, $newStatus)
     {
         $arrStatusInstalled = array();
@@ -1189,7 +1189,7 @@ class ContrexxUpdate
         }
         return false;
     }
-    
+
     function addslashes($string)
     {
       // if magic quotes is on the string is already quoted,

@@ -9,7 +9,7 @@
     }
     .container #mediadir .reference {
         margin-bottom: 20px;
-        height: auto; 
+        height: auto;
         padding: 30px;
     }
     #podcast_container embed {
@@ -263,7 +263,7 @@
         float: left;
         clear: both;
         width: 100%;
-    } 
+    }
     /*cart*/
     #cartlist #th_bg2 .cartrow:first-child {
         width: 100%;
@@ -360,13 +360,13 @@
         content: "Gebührenfrei ab";
         font-weight: 700;
         position: absolute;
-        left: 15px; 
+        left: 15px;
     }
     .row2 .shoprow:last-child:before {
         content: "Gebühr";
         font-weight: 700;
         position: absolute;
-        left: 15px; 
+        left: 15px;
     }
     /*Medien*/
     head .eachrow:nth-child(2) {
@@ -619,7 +619,7 @@
     #forum div.notification_center {
         padding: 20px 0px 20px 0px;
         width: 100%;
-        height: auto; 
+        height: auto;
     }
     .search_form select[name="id"] {
         margin-bottom: 10px;
@@ -689,7 +689,7 @@
     #forum div.notification_center {
         padding: 20px 0px 20px 0px;
         width: 100%;
-        height: auto; 
+        height: auto;
     }
     #livecam img {
         width: 100%;
@@ -740,7 +740,7 @@
     /*MediaDir Edit End*/
     .container #mediadir .reference {
         margin-bottom: 20px;
-        height: auto; 
+        height: auto;
         padding: 30px;
     }
     .employee-left, .employee-middle, .employee-right {padding-bottom: 20px;}
@@ -874,7 +874,7 @@
         padding-bottom: 168px;
     }
     form p {
-        padding-left: 0; 
+        padding-left: 0;
     }
     form .contactFormGroup {width: 100%;}
     #shop div.message p label {

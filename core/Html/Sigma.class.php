@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Sigma
  *
@@ -48,14 +48,14 @@ namespace Cx\Core\Html;
 class Sigma extends \HTML_Template_Sigma {
 
     protected $restoreFileRoot = null;
-    
+
     public function __construct($root = '', $cacheRoot = '') {
         parent::__construct($root, $cacheRoot);
         $this->removeVariablesRegExp = '@' . $this->openingDelimiter . '(' . $this->variablenameRegExp . ')\s*'
             . $this->closingDelimiter . '@sm';
         $this->setErrorHandling(PEAR_ERROR_DIE);
     }
-    
+
     function getRoot() {
         return $this->fileRoot;
     }
@@ -117,7 +117,7 @@ class Sigma extends \HTML_Template_Sigma {
             $this->restoreFileRoot = null;
         }
     }
-    
+
     /**
      * Check if the given block exist. If not then an error is logged.
      * Otherwise it preserves the block.
@@ -133,7 +133,7 @@ class Sigma extends \HTML_Template_Sigma {
         }
         return parent::touchBlock($block);
     }
-    
+
     /**
      * Check if the given block exist. If not then an error is logged.
      * Otherwise it hides the block even if it is not "empty".
@@ -151,7 +151,7 @@ class Sigma extends \HTML_Template_Sigma {
         }
         return parent::hideBlock($block);
     }
-    
+
     /**
      * Check if the given block exist. If not then an error is logged.
      * Otherwise it sets the name of the current block: the block where variables are added
@@ -167,7 +167,7 @@ class Sigma extends \HTML_Template_Sigma {
         }
         return parent::setCurrentBlock($block);
     }
-    
+
     /**
      * Check if the given block exist and if it exist the given block is parsed.
      * Otherwise an error is logged.

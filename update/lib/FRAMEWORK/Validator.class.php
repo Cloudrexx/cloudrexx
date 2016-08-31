@@ -346,7 +346,7 @@ class CxValidateRegexp extends CxValidate {
     }
 
     return $this->passesValidation;
-    }   
+    }
 }
 
 /**

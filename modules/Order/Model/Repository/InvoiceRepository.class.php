@@ -38,7 +38,7 @@ namespace Cx\Modules\Order\Model\Repository;
 
 /**
  * Class InvoiceRepository
- * 
+ *
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx

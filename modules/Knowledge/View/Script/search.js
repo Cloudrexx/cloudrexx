@@ -42,7 +42,7 @@ var Search = {
             }
             Search.keyPress();
         };
-        
+
         var onBlur = $(field).onblur;
         $(field).onblur = function() {
             if (onBlur) {
@@ -50,7 +50,7 @@ var Search = {
             }
             Search.hideBoxDelayed();
         };
-        
+
         this.resultBox = resultBox;
     },
     /**
@@ -59,7 +59,7 @@ var Search = {
      */
     keyPress : function()
     {
-        var d = new Date();    
+        var d = new Date();
         this.keyTime = d.getTime();
         var ref = this;
         setTimeout(function() {
@@ -91,7 +91,7 @@ var Search = {
     getData : function()
     {
         var ref = this;
-        
+
         if (this.curRequest != null && this.curRequest.abort) {
             this.curRequest.abort();
         }
@@ -114,14 +114,14 @@ var Search = {
                         ref.showBox();
                     } else {
                         ref.hideBox();
-                    } 
+                    }
                 }
             });
         });
     },
     clearBox : function()
     {
-      var children = $(this.resultBox).childNodes;  
+      var children = $(this.resultBox).childNodes;
       for (var i = 0; i < children.length; i++) {
           $(this.resultBox).removeChild(children[i]);
       }
@@ -164,4 +164,3 @@ function submitSearch(obj)
     searchinput.name = "";
     return true;
 }
-

@@ -245,7 +245,7 @@ table th a:hover {
 }
 table tr.row1,
 table tr.marketRow2 {
-    background-color: #FFFFFF;    
+    background-color: #FFFFFF;
 }
 .voting td {
     float: left;
@@ -254,7 +254,7 @@ table tr.marketRow2 {
 table tr.row2,
 table tr.marketRow3 {
     background-color: #F6F6F6;
-    padding: 0;    
+    padding: 0;
 }
 #tagelement td {
     float: left;

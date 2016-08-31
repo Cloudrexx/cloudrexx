@@ -20,7 +20,7 @@ function getParam( name )
 
 function setUrl(url, width, height, alt, type) {
     var ckFuncNum = getParam('CKEditorFuncNum');
-    
+
     // Check if the user requested the fileBrowser from within the CKeditor
     if(ckFuncNum !== "") {
         window.opener.CKEDITOR.tools.callFunction(parseInt(ckFuncNum), webPath+url, function() {

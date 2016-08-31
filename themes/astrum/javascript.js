@@ -1,5 +1,5 @@
 (function ($) {
-    jQuery(document).ready(function () {   
+    jQuery(document).ready(function () {
     jQuery("#rslider").responsiveSlides({
                     auto: true,
                     pager: false,
@@ -8,7 +8,7 @@
                     namespace: "callbacks",
                 });
         /*tooltip*/
-	jQuery('.masterTooltip').hover(function(){
+  jQuery('.masterTooltip').hover(function(){
                 // Hover over code
                 var title = jQuery(this).attr('title');
                 jQuery(this).data('tipText', title).removeAttr('title');
@@ -25,19 +25,19 @@
                 var mousey = e.pageY + 10; //Get Y coordinates
                 jQuery('.mytooltip')
                 .css({ top: mousey, left: mousex })
-        }); 
-        /*Flexslider Start*/         
+        });
+        /*Flexslider Start*/
         /*jQuery('#mediadir-slider').flexslider({
-			animation: "slide",
+      animation: "slide",
             controlNav: false,
             directionNav: false,
-            slideshowSpeed: 5000         
+            slideshowSpeed: 5000
         });*/
         /*Sidr Navigation*/
         jQuery('#simple-menu').sidr({
             name: 'sidr', /* ID des DIV's, der die Navigation beinhaltet */
             side: 'left', /* Seite auf der Sidr geöffnet werden soll, mögliche Werte sind left oder right */
-            
+
         });
         /* Metanavigation Start */
         if ($('#select-language a').length > 1) {
@@ -232,14 +232,14 @@
             return false;
         });
     });
-    
+
     $(function() {
        $('fieldset legend').each(function() {
-           $(this).html("<span>" + $(this).html() + "</span>") 
+           $(this).html("<span>" + $(this).html() + "</span>")
        });
        /*console.log("hi");
        console.log($.trim($('#fe_content').text()).substr(0,1));*/
 
-               
+
     });
 })(jQuery);

@@ -27,7 +27,7 @@
 
 /**
  * Main controller for DocSys
- * 
+ *
  * @copyright  cloudrexx
  * @author     Project Team SS4U <info@cloudrexx.com>
  * @package    cloudrexx
@@ -38,7 +38,7 @@ namespace Cx\Modules\DocSys\Controller;
 
 /**
  * Main controller for DocSys
- * 
+ *
  * @copyright  cloudrexx
  * @author     Project Team SS4U <info@cloudrexx.com>
  * @package    cloudrexx
@@ -47,7 +47,7 @@ namespace Cx\Modules\DocSys\Controller;
 class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentController {
     /**
      * getControllerClasses
-     * 
+     *
      * @return type
      */
     public function getControllerClasses() {
@@ -56,14 +56,14 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
 
      /**
      * Load the component DocSys.
-     * 
+     *
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
      */
     public function load(\Cx\Core\ContentManager\Model\Entity\Page $page) {
         global $objTemplate, $_CORELANG, $subMenuTitle;
-                
+
         switch ($this->cx->getMode()) {
-            case \Cx\Core\Core\Controller\Cx::MODE_FRONTEND:               
+            case \Cx\Core\Core\Controller\Cx::MODE_FRONTEND:
                 $docSysObj= new DocSys(\Env::get('cx')->getPage()->getContent());
                 \Env::get('cx')->getPage()->setContent($docSysObj->getDocSysPage());
                 $docSysObj->getPageTitle(\Env::get('cx')->getPage()->getTitle());
@@ -86,10 +86,10 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 break;
         }
     }
-    
+
     /**
      * Do something for search the content
-     * 
+     *
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
      */
     public function preContentParse(\Cx\Core\ContentManager\Model\Entity\Page $page) {

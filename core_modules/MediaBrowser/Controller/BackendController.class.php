@@ -158,6 +158,6 @@ class BackendController extends SystemComponentBackendController
             new \Cx\Core_Modules\MediaBrowser\Model\Entity\FolderWidget($this->cx->getWebsiteImagesContentPath(), true)
         );
 
-        
+
     }
 }

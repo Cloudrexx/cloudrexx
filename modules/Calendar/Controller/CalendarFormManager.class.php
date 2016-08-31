@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,10 +24,10 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
- * Calendar 
- * 
+ * Calendar
+ *
  * @package    cloudrexx
  * @subpackage module_calendar
  * @author     Cloudrexx <info@cloudrexx.com>
@@ -38,7 +38,7 @@ namespace Cx\Modules\Calendar\Controller;
 
 /**
  * Calendar Class Form manager
- * 
+ *
  * @package    cloudrexx
  * @subpackage module_calendar
  * @author     Cloudrexx <info@cloudrexx.com>
@@ -49,12 +49,12 @@ class CalendarFormManager extends CalendarLibrary
 {
     /**
      * Form list
-     * 
+     *
      * @access public
-     * @var array 
+     * @var array
      */
-    public $formList = array(); 
-    
+    public $formList = array();
+
     /**
      * Input fields type
      *
@@ -67,9 +67,9 @@ class CalendarFormManager extends CalendarLibrary
         'select',
         'radio',
         'checkbox',
-        'fieldset'        
+        'fieldset'
     );
-    
+
     private $arrRegistrationFields = array(
         'mail',
         'seating',
@@ -79,34 +79,34 @@ class CalendarFormManager extends CalendarLibrary
         'lastname',
         //'selectBillingAddress'
     );
-    
+
     /**
      * Input fields affiliations
      *
      * @access private
-     * @var array 
+     * @var array
      */
     private $arrInputfieldAffiliations = array(
         1  => 'form',
         2  => 'contact',
         3  => 'billing',
     );
-    
+
     /**
      * only Active
      *
      * @access private
      * @var boolean
      */
-    private $onlyActive;  
-    
+    private $onlyActive;
+
     /**
      * Form field Template
-     * 
+     *
      * @var string
      */
     const frontendFieldTemplate = '<div class="row">
-                <label>{TXT_CALENDAR_FIELD_NAME}</label> 
+                <label>{TXT_CALENDAR_FIELD_NAME}</label>
                 {CALENDAR_FIELD_INPUT}
             </div>';
 
@@ -119,18 +119,18 @@ class CalendarFormManager extends CalendarLibrary
 
     /**
      * Form manager constructor
-     * 
+     *
      * @param boolean $onlyActive get only active forms
      */
     function __construct($onlyActive=false){
         $this->onlyActive = $onlyActive;
     }
-    
+
     /**
      * Get the forms list
-     * 
+     *
      * Loads the forms from the database into $this->formList array
-     * 
+     *
      * @return null
      */
     function getFormList() {
@@ -167,83 +167,83 @@ class CalendarFormManager extends CalendarLibrary
             $objResult->MoveNext();
         }
     }
-    
+
     /**
      * Sets the form list placeholders to the template
-     *      
+     *
      * @param object $objTpl Template object
-     * 
+     *
      * @return null
      */
-    function showFormList($objTpl) 
+    function showFormList($objTpl)
     {
         global $objDatabase, $_ARRAYLANG;
-        
+
         $i=0;
-        foreach ($this->formList as $key => $objForm) {      
+        foreach ($this->formList as $key => $objForm) {
             $objTpl->setVariable(array(
                 $this->moduleLangVar.'_FORM_ROW'           => $i%2==0 ? 'row1' : 'row2',
                 $this->moduleLangVar.'_FORM_ID'            => $objForm->id,
-                $this->moduleLangVar.'_FORM_STATUS'        => $objForm->status==0 ? 'red' : 'green',        
-                $this->moduleLangVar.'_FORM_TITLE'         => $objForm->title,           
-                $this->moduleLangVar.'_FORM_SORT'          => $objForm->sort,                       
+                $this->moduleLangVar.'_FORM_STATUS'        => $objForm->status==0 ? 'red' : 'green',
+                $this->moduleLangVar.'_FORM_TITLE'         => $objForm->title,
+                $this->moduleLangVar.'_FORM_SORT'          => $objForm->sort,
             ));
-            
+
             $i++;
             $objTpl->parse('formList');
         }
-        
+
         if(count($this->formList) == 0) {
             $objTpl->hideBlock('formList');
-        
+
             $objTpl->setVariable(array(
                 'TXT_CALENDAR_NO_FORMS_FOUND' => $_ARRAYLANG['TXT_CALENDAR_NO_FORMS_FOUND'],
             ));
-            
+
             $objTpl->parse('emptyFormList');
         }
     }
-    
+
     /**
      * Returns the form list drop down
-     *      
+     *
      * @param integer $selectedId selected option in the form
-     * 
-     * @return string HTML drop down menu 
+     *
+     * @return string HTML drop down menu
      */
     function getFormDorpdown($selectedId=null) {
         global $_ARRAYLANG;
-        
+
         $this->getSettings();
         $arrOptions = array();
-        
-        foreach ($this->formList as $key => $objForm) {       
+
+        foreach ($this->formList as $key => $objForm) {
             $arrOptions[$objForm->id] = $objForm->title;
-        }      
-        
+        }
+
         $options .= $this->buildDropdownmenu($arrOptions, $selectedId);
-        
+
         return $options;
     }
-    
+
     /**
      * Sets placeholders for the form view.
-     *      
+     *
      * @param object $objTpl         Template object
      * @param integer $formId        Form id
      * @param integer $intView       request mode frontend or backend
      * @param integer $arrNumSeating number of seating
-     * 
+     *
      * @return null
      */
     function showForm($objTpl, $formId, $intView, $ticketSales=false) {
-        global $_ARRAYLANG, $_LANGID;  
-        
+        global $_ARRAYLANG, $_LANGID;
+
         $objForm = new \Cx\Modules\Calendar\Controller\CalendarForm(intval($formId));
         if (!empty($formId)) {
             $this->formList[$formId] = $objForm;
         }
-        
+
         switch($intView) {
                 case 1:
                     $this->getFrontendLanguages();
@@ -285,8 +285,8 @@ class CalendarFormManager extends CalendarLibrary
                             );
                         }
                     }
-                                        
-                    foreach ($this->arrFrontendLanguages as $key => $arrLang) {                        
+
+                    foreach ($this->arrFrontendLanguages as $key => $arrLang) {
                         $objTpl->setVariable(array(
                             $this->moduleLangVar.'_INPUTFIELD_LANG_ID'       => $arrLang['id'],
                             $this->moduleLangVar.'_INPUTFIELD_LANG_NAME'     => $arrLang['name'],
@@ -304,16 +304,16 @@ class CalendarFormManager extends CalendarLibrary
                         ));
                         $objTpl->parse('inputfieldLanguagesList');
                     }
-                    
+
                     foreach ($this->arrInputfieldTypes as $fieldType) {
-                        $objTpl->setVariable(array(                           
+                        $objTpl->setVariable(array(
                            $this->moduleLangVar.'_FORM_FIELD_TYPE'        =>  $fieldType,
                            'TXT_'.$this->moduleLangVar.'_FORM_FIELD_TYPE' =>  $_ARRAYLANG['TXT_CALENDAR_FORM_FIELD_'.strtoupper($fieldType)]
                         ));
                         $objTpl->parse('inputfieldTypes');
                     }
                     foreach ($this->arrRegistrationFields as $fieldType) {
-                        $objTpl->setVariable(array(                           
+                        $objTpl->setVariable(array(
                            $this->moduleLangVar.'_FORM_FIELD_TYPE'        =>  $fieldType,
                            'TXT_'.$this->moduleLangVar.'_FORM_FIELD_TYPE' =>  $_ARRAYLANG['TXT_CALENDAR_FORM_FIELD_'.strtoupper($fieldType)]
                         ));
@@ -326,10 +326,10 @@ class CalendarFormManager extends CalendarLibrary
                         ));
                         $objTpl->parse('fieldAfflications');
                     }*/
-                    
-                    $objTpl->setVariable(array(                        
+
+                    $objTpl->setVariable(array(
                         $this->moduleLangVar.'_FORM_DATA'           => json_encode($formFields),
-                        $this->moduleLangVar.'_FRONTEND_LANG_COUNT' => count($this->arrFrontendLanguages),                        
+                        $this->moduleLangVar.'_FRONTEND_LANG_COUNT' => count($this->arrFrontendLanguages),
                         $this->moduleLangVar.'_INPUTFIELD_LAST_ID'  => $objForm->getLastInputfieldId(),
                         $this->moduleLangVar.'_INPUTFIELD_LAST_ROW' => $i%2 == 0 ? "'row2'" : "'row1'",
                         $this->moduleLangVar.'_DISPLAY_EXPAND'      => count($this->arrFrontendLanguages) > 1 ? "block" : "none",
@@ -339,16 +339,16 @@ class CalendarFormManager extends CalendarLibrary
             case 2:
                 $objFieldTemplate = new \Cx\Core\Html\Sigma('.');
                 $objFieldTemplate->setTemplate(self::frontendFieldTemplate, true, true);
-                $objFieldTemplate->setVariable(array(                    
+                $objFieldTemplate->setVariable(array(
                     'TXT_'.$this->moduleLangVar.'_FIELD_NAME'   => $_ARRAYLANG['TXT_CALENDAR_TYPE'].'<font class="calendarRequired"> *</font>',
                     $this->moduleLangVar.'_FIELD_INPUT'         => '<select class="calendarSelect affiliateForm" name="registrationType"><option value="1" selected="selected"/>'.$_ARRAYLANG['TXT_CALENDAR_REG_REGISTRATION'].'</option><option value="0"/>'.$_ARRAYLANG['TXT_CALENDAR_REG_SIGNOFF'].'</option></select>',
-                    $this->moduleLangVar.'_FIELD_CLASS'         => 'affiliationForm',   
+                    $this->moduleLangVar.'_FIELD_CLASS'         => 'affiliationForm',
                 ));
                 $objTpl->setVariable($this->moduleLangVar.'_REGISTRATION_FIELD', $objFieldTemplate->get());
                 $objTpl->parse('calendarRegistrationField');
-                
+
                 // $selectBillingAddressStatus = false;
-                                
+
                 foreach ($objForm->inputfields as $key => $arrInputfield) {
                     $objFieldTemplate->setTemplate(self::frontendFieldTemplate, true, true);
                     $options = array();
@@ -387,7 +387,7 @@ class CalendarFormManager extends CalendarLibrary
                     $affiliationClass = 'affiliation'.ucfirst($arrInputfield['affiliation']);
 
                     switch($arrInputfield['type']) {
-                        case 'inputtext':     
+                        case 'inputtext':
                         case 'mail':
                         case 'firstname':
                         case 'lastname':
@@ -409,7 +409,7 @@ class CalendarFormManager extends CalendarLibrary
                         case 'select':
                         case 'salutation':
                             $inputfield = '<select class="calendarSelect" name="registrationField['.$arrInputfield['id'].']">';
-                            $selected =  empty($_POST) ? 'selected="selected"' : '';  
+                            $selected =  empty($_POST) ? 'selected="selected"' : '';
                             $inputfield .= $optionSelect ? '<option value="" '.$selected.'>'.$_ARRAYLANG['TXT_CALENDAR_PLEASE_CHOOSE'].'</option>' : '';
 
                             foreach ($options as $key => $name) {
@@ -420,29 +420,29 @@ class CalendarFormManager extends CalendarLibrary
                                 $inputfield .= '<option value="' . intval($key + 1) . '" ' . $selected . '>' . $name . '</option>';
                             }
 
-                            $inputfield .= '</select>'; 
+                            $inputfield .= '</select>';
                             break;
-                         case 'radio': 
-                            foreach($options as $key => $name)  { 
-                                $checked =  ($key+1 == $value) || (empty($_POST) && $key == 0) ? 'checked="checked"' : '';     
-                                
+                         case 'radio':
+                            foreach($options as $key => $name)  {
+                                $checked =  ($key+1 == $value) || (empty($_POST) && $key == 0) ? 'checked="checked"' : '';
+
                                 $textValue = (isset($_POST["registrationFieldAdditional"][$arrInputfield['id']][$key]) ? $_POST["registrationFieldAdditional"][$arrInputfield['id']][$key] : '');
                                 $textfield = '<input type="text" class="calendarInputCheckboxAdditional" name="registrationFieldAdditional['.$arrInputfield['id'].']['.$key.']" value="'. contrexx_input2xhtml($textValue) .'" />';
                                 $name = str_replace('[[INPUT]]', $textfield, $name);
 
-                                $inputfield .= '<input type="radio" class="calendarInputCheckbox" name="registrationField['.$arrInputfield['id'].']" value="'.intval($key+1).'" '.$checked.'/>&nbsp;'.$name.'<br />';  
+                                $inputfield .= '<input type="radio" class="calendarInputCheckbox" name="registrationField['.$arrInputfield['id'].']" value="'.intval($key+1).'" '.$checked.'/>&nbsp;'.$name.'<br />';
                             }
                             break;
-                         case 'checkbox':       
-                            foreach($options as $key => $name)  {    
+                         case 'checkbox':
+                            foreach($options as $key => $name)  {
                                 $textValue = (isset($_POST["registrationFieldAdditional"][$arrInputfield['id']][$key]) ? $_POST["registrationFieldAdditional"][$arrInputfield['id']][$key] : '');
                                 $textfield = '<input type="text" class="calendarInputCheckboxAdditional" name="registrationFieldAdditional['.$arrInputfield['id'].']['.$key.']" value="'. contrexx_input2xhtml($textValue) .'" />';
                                 $name = str_replace('[[INPUT]]', $textfield, $name);
 
-                                $checked =  (in_array($key+1, $_POST['registrationField'][$arrInputfield['id']]))  ? 'checked="checked"' : '';       
-                                $inputfield .= '<input '.$checked.' type="checkbox" class="calendarInputCheckbox" name="registrationField['.$arrInputfield['id'].'][]" value="'.intval($key+1).'" />&nbsp;'.$name.'<br />';  
+                                $checked =  (in_array($key+1, $_POST['registrationField'][$arrInputfield['id']]))  ? 'checked="checked"' : '';
+                                $inputfield .= '<input '.$checked.' type="checkbox" class="calendarInputCheckbox" name="registrationField['.$arrInputfield['id'].'][]" value="'.intval($key+1).'" />&nbsp;'.$name.'<br />';
                             }
-                            break;                        
+                            break;
                         case 'agb':
                             $inputfield = '<input class="calendarInputCheckbox" type="checkbox" name="registrationField['.$arrInputfield['id'].'][]" value="1" />&nbsp;'.$_ARRAYLANG['TXT_CALENDAR_AGB'].'<br />';
                             break;
@@ -455,11 +455,11 @@ class CalendarFormManager extends CalendarLibrary
                                 }
 
                                 $inputfield = '<select id="calendarSelectBillingAddress" class="calendarSelect" name="registrationField['.$arrInputfield['id'].']">';
-                                $inputfield .= '<option value="sameAsContact">'.$_ARRAYLANG['TXT_CALENDAR_SAME_AS_CONTACT'].'</option>';    
-                                $inputfield .= '<option value="deviatesFromContact" '.$selectDeviatesFromContact.'>'.$_ARRAYLANG['TXT_CALENDAR_DEVIATES_FROM_CONTACT'].'</option>';    
-                                $inputfield .= '</select>'; 
+                                $inputfield .= '<option value="sameAsContact">'.$_ARRAYLANG['TXT_CALENDAR_SAME_AS_CONTACT'].'</option>';
+                                $inputfield .= '<option value="deviatesFromContact" '.$selectDeviatesFromContact.'>'.$_ARRAYLANG['TXT_CALENDAR_DEVIATES_FROM_CONTACT'].'</option>';
+                                $inputfield .= '</select>';
                                 $selectBillingAddressStatus = true;
-                            } 
+                            }
                             break; */
                         case 'fieldset':
                             $inputfield = null;
@@ -468,7 +468,7 @@ class CalendarFormManager extends CalendarLibrary
 
                     $field = '';
                     if($arrInputfield['type'] == 'fieldset') {
-                        $field = '</fieldset><fieldset><legend>'.$arrInputfield['name'][$_LANGID].'</legend>';                        
+                        $field = '</fieldset><fieldset><legend>'.$arrInputfield['name'][$_LANGID].'</legend>';
                         $hide = true;
                     } else {
                         $required = $arrInputfield['required'] == 1 ? '<font class="calendarRequired"> *</font>' : '';
@@ -484,11 +484,11 @@ class CalendarFormManager extends CalendarLibrary
                         $field = $objFieldTemplate->get();
                     }
                     $objTpl->setVariable($this->moduleLangVar.'_REGISTRATION_FIELD', $field);
-                    
+
                     $objTpl->parse('calendarRegistrationField');
                 }
                 break;
-        }        
+        }
     }
 
     /**

@@ -133,7 +133,7 @@ class MediaDirectoryInputfieldWysiwyg extends \Cx\Modules\MediaDir\Controller\Me
                         $strInputfield .=  new \Cx\Core\Wysiwyg\Wysiwyg($this->moduleNameLC.'Inputfield['.$intId.']['.$intLangId.']', contrexx_raw2xhtml($arrValue[$intLangId])).'&nbsp;'.$arrLang['name'].'<br />';
                     }
                     $strInputfield .=  "&nbsp;<a href=\"javascript:javascript:ExpandMinimizeMultiple('".$intId."', 'ELEMENT');\">&laquo;&nbsp;".$_ARRAYLANG['TXT_MEDIADIR_MINIMIZE']."</a>";
-                                        
+
                     $strInputfield .= '</span>';
                 } else {
                     //$strInputfield = '<textarea name="'.$this->moduleName.'Inputfield['.$intId.'][0]" id="'.$this->moduleName.'Inputfield_'.$intId.'_0" class="'.$this->moduleName.'InputfieldTextarea" onfocus="this.select();" />'.$arrValue[0].'</textarea>';
@@ -153,7 +153,7 @@ class MediaDirectoryInputfieldWysiwyg extends \Cx\Modules\MediaDir\Controller\Me
                         //$strInputfield .= '<textarea name="'.$this->moduleName.'Inputfield['.$intId.']['.$intLangId.']" id="'.$this->moduleName.'Inputfield_'.$intId.'_'.$intLangId.'" class="'.$this->moduleName.'InputfieldTextarea '.$strInfoClass.'" '.$arrInfoValue[$intLangId].' onfocus="this.select();" />'.$arrValue[$intLangId].'</textarea>&nbsp;'.$arrLang['name'].'<a href="javascript:ExpandMinimize(\''.$intId.'\');">&nbsp;'.$minimize.'</a><br />';
 
                         $strInputfield .=  new \Cx\Core\Wysiwyg\Wysiwyg($this->moduleNameLC.'Inputfield['.$intId.']['.$intLangId.']', contrexx_raw2xhtml($arrValue[$intLangId])).'&nbsp;'.$arrLang['name'].'<a href="javascript:javascript:ExpandMinimizeMultiple(\''.$intId.'\', \'ELEMENT\');">&nbsp;'.$minimize.'</a><br />';
-                    }                    
+                    }
                     $strInputfield .= '</span></span>';
                 }
                 return $strInputfield;
@@ -264,7 +264,7 @@ class MediaDirectoryInputfieldWysiwyg extends \Cx\Modules\MediaDir\Controller\Me
 
 
     function getJavascriptCheck()
-    {             
+    {
         return null;
     }
 

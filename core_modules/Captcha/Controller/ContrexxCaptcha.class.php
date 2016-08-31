@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * ContrexxCaptcha
  *
@@ -48,49 +48,49 @@ namespace Cx\Core_Modules\Captcha\Controller;
  */
 class ContrexxCaptcha implements CaptchaInterface {
     private $boolFreetypeInstalled = false;
-    
+
     private $strRandomString;
-    
+
     private $strFontDir;
     private $strBackgroundDir;
-    
+
     private $intRandomLength = 5;
     private $intMaximumCharacters = 20;
-    
+
     private $intImageWidth = 120;
     private $intNumberOfBackgrounds = 7;
 
     private $image = null; //the GD image
 
     private $securityCheck = null;
-    
+
     public function __construct($config)
     {
         srand ((double)microtime()*1000000);
-                
+
         $this->strRandomString  = $this->createRandomString();
-        
+
         $this->strFontDir       = ASCMS_CORE_MODULE_PATH.'/Captcha/Data/ContrexxCaptcha/fonts/';
         $this->strBackgroundDir = ASCMS_CORE_MODULE_PATH.'/Captcha/Data/ContrexxCaptcha/backgrounds/';
-  
+
         $this->isFreetypeInstalled();
     }
-    
+
     /**
      * Figures out if the Freetype-Extension (part of GD) is installed.
      */
     private function isFreetypeInstalled() {
         $arrExtensions = get_loaded_extensions();
-        
+
         if (in_array('gd', $arrExtensions)) {
-            $arrGdFunctions = get_extension_funcs('gd');       
-                
+            $arrGdFunctions = get_extension_funcs('gd');
+
             if (in_array('imagettftext', $arrGdFunctions)) {
                 $this->boolFreetypeInstalled = true;
             }
         }
     }
-   
+
     /**
      * Creates an random string with $intDigits digits.
      *
@@ -101,14 +101,14 @@ class ContrexxCaptcha implements CaptchaInterface {
         if ($intDigits > $this->intMaximumCharacters || $intDigits == 0) {
             $intDigits = $this->intRandomLength;
         }
-        
-        $strReturn = '';            
+
+        $strReturn = '';
         for ($i=1; $i <= $intDigits; ++$i) {
             switch (rand(0,1)) {
                 case 0:
                     $char = chr(rand(65,90));
                     while($char == 'O') //no O's pleace
-                        $char = chr(rand(65,90));                    
+                        $char = chr(rand(65,90));
                     $strReturn .= $char;
                     break;
                 case 1:
@@ -117,10 +117,10 @@ class ContrexxCaptcha implements CaptchaInterface {
                 default:
             }
         }
-        
+
         return  $strReturn;
     }
-     
+
     /**
      * Creates a captcha image.
      *
@@ -131,45 +131,45 @@ class ContrexxCaptcha implements CaptchaInterface {
         $intFontSize         = floor($intWidth / strlen($this->strRandomString)) - 2;
         $intAngel             = 15;
         $intVerticalMove     = floor($intHeight/7);
-        
+
         $image = imagecreatetruecolor($intWidth, $intHeight);
-        
+
         $arrFontColors     = array(imagecolorallocate($image, 0, 0, 0),        //black
                                 imagecolorallocate($image, 255, 0, 0),         //red
                                 imagecolorallocate($image, 0, 180, 0),         //darkgreen
                                 imagecolorallocate($image, 0, 105, 172),    //blue
                                 imagecolorallocate($image, 145, 19, 120)    //purple
                             );
-                                                        
+
         $arrFonts    = array(    $this->strFontDir.'coprgtb.ttf',
                                 $this->strFontDir.'ltypeb.ttf',
                         );
-                        
+
         //Draw background
         $imagebg = imagecreatefromjpeg($this->strBackgroundDir.rand(1, $this->intNumberOfBackgrounds).'.jpg');
         imagesettile($image, $imagebg);
         imagefilledrectangle($image, 0, 0, $intWidth, $intHeight, IMG_COLOR_TILED);
-        
+
         //Draw string
         for ($i = 0; $i < strlen($this->strRandomString); ++$i) {
             $intColor     = rand(0, count($arrFontColors)-1);
             $intFont    = rand(0, count($arrFonts)-1);
             $intAngel     = rand(-$intAngel, $intAngel);
             $intYMove     = rand(-$intVerticalMove, $intVerticalMove);
-            
+
             if ($this->boolFreetypeInstalled) {
-                imagettftext(    $image, 
-                                $intFontSize, 
-                                $intAngel, 
-                                (6+$intFontSize*$i), 
-                                ($intHeight/2+$intFontSize/2+$intYMove), 
-                                $arrFontColors[$intColor], 
-                                $arrFonts[$intFont], 
+                imagettftext(    $image,
+                                $intFontSize,
+                                $intAngel,
+                                (6+$intFontSize*$i),
+                                ($intHeight/2+$intFontSize/2+$intYMove),
+                                $arrFontColors[$intColor],
+                                $arrFonts[$intFont],
                                 substr($this->strRandomString,$i,1)
                             );
             } else {
-                imagestring($image, 
-                            5, 
+                imagestring($image,
+                            5,
                             (6+25*$i),
                             12+$intYMove,
                             substr($this->strRandomString,$i,1),
@@ -207,7 +207,7 @@ class ContrexxCaptcha implements CaptchaInterface {
     private function updateSession() {
         $_SESSION['captchaSecret'] = $this->strRandomString;
     }
-    
+
     public function getCode($tabIndex = null)
     {
         global $_CORELANG;
@@ -246,7 +246,7 @@ class ContrexxCaptcha implements CaptchaInterface {
         }
 
         return $this->securityCheck;
-    }       
+    }
 
     private function isValidCode()
     {
@@ -286,7 +286,7 @@ class ContrexxCaptcha implements CaptchaInterface {
         else {
             $url .= '/index.php?section=Captcha';
         }
-        
+
         //add no cache param
         $url .= '&amp;nc='.md5(''.time());
         return $url;

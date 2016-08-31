@@ -2,18 +2,18 @@
 /* CSS DEFINITIONS FOR MEDIADIR MODULE             */
 /***************************************************/
 #mediadir div.mediadirInputfieldWysiwyg{
-	font-size: 12px;
-	font-family: Verdana;
-	border: 1px solid #d3d3d3;
-	background-color:#ffffff;
-	color:#000000;
-	padding: 4px;
-	margin: 1px 2px 3px 0px;
-	height: 80px;
-	width: 300px;
-	overflow:auto;
-	margin-left: 190px;
-	cursor:text;
+  font-size: 12px;
+  font-family: Verdana;
+  border: 1px solid #d3d3d3;
+  background-color:#ffffff;
+  color:#000000;
+  padding: 4px;
+  margin: 1px 2px 3px 0px;
+  height: 80px;
+  width: 300px;
+  overflow:auto;
+  margin-left: 190px;
+  cursor:text;
 }
 
 #mediadir div.mediadirInputfieldWysiwyg, #mediadir div.mediadirInputfieldWysiwyg:hover, #mediadir div.mediadirInputfieldWysiwyg:link {
@@ -112,8 +112,8 @@ outline-style:none;
 #mediadir .map{
     margin-top: 10px;
     border: 1px solid #CFCFCF;
-    width: 489px; 
-    height: 250px; 
+    width: 489px;
+    height: 250px;
 }
 
 #mediadir table.list{
@@ -121,9 +121,9 @@ outline-style:none;
     width: 710px !important;
     margin-bottom: 20px;
     margin-left: -20px;
-	background-image:url(images/list_radius_bg.gif);
-	background-repeat:repeat-x;
-	background-position:bottom left;
+  background-image:url(images/list_radius_bg.gif);
+  background-repeat:repeat-x;
+  background-position:bottom left;
 }
 
 #mediadir table.list h3{
@@ -138,27 +138,27 @@ outline-style:none;
 #mediadir .mapLarge{
     margin-top: 10px;
     border: 0px solid #CFCFCF;
-    width: 698px; 
-    height: 600px; 
+    width: 698px;
+    height: 600px;
 }
 
 #mediadir input[type="button"].active {
-	font-weight:bold;
-	text-transform:uppercase;
-	color: #74CC00;
+  font-weight:bold;
+  text-transform:uppercase;
+  color: #74CC00;
 }
 
 #mediadir input.mediadirInputfieldGoogleMapLarge {
-	width: 185px;
+  width: 185px;
 }
 
 #mediadir input.mediadirInputfieldGoogleMapSmall {
-	width: 35px;
+  width: 35px;
 }
 
 #mediadir input.mediadirVoteButton {
-       font-weight:normal;  
-       min-width:1px; 
+       font-weight:normal;
+       min-width:1px;
        width: 30px !important;
 }
 
@@ -178,4 +178,3 @@ outline-style:none;
     padding: 10px;
     color: #FF8F8F;
 }
-

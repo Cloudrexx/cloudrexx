@@ -53,7 +53,7 @@ namespace Cx\Modules\Crm\Model\Entity;
 
 class CrmContact
 {
-    
+
     /**
     * Module Name
     *
@@ -61,10 +61,10 @@ class CrmContact
     * @var string
     */
     protected $moduleName = "crm";
-    
+
     /**
      * Option to send notification mail to the contact
-     * 
+     *
      * @var int
      */
     protected $emailDelivery;
@@ -88,7 +88,7 @@ class CrmContact
                              c.customer_name, c.customer_addedby,
                              c.customer_currency, c.contact_familyname,
                              c.contact_role, c.contact_customer, c.contact_language,c.company_size,
-                             c.notes, c.contact_type,c.user_account,c.added_date,c.industry_type,                             
+                             c.notes, c.contact_type,c.user_account,c.added_date,c.industry_type,
                              e.email,p.phone, c.datasource,
                              c.gender,c.profile_picture, c.`email_delivery`
                          FROM `".DBPREFIX."module_{$this->moduleName}_contacts` AS c
@@ -99,7 +99,7 @@ class CrmContact
                          WHERE c.`id` = {$this->id}";
             $objResult = $objDatabase->Execute($query);
             if (false != $objResult) {
-                $this->contactType      = $objResult->fields['contact_type'];                
+                $this->contactType      = $objResult->fields['contact_type'];
                 $this->customerId       = $objResult->fields['customer_id'];
                 $this->customerType     = $objResult->fields['customer_type'];
                 $this->customerName     = $objResult->fields['customer_name'];
@@ -109,10 +109,10 @@ class CrmContact
                 $this->companySize      = $objResult->fields['company_size'];
                 $this->contact_customer = $objResult->fields['contact_customer'];
                 $this->addedUser        = $objResult->fields['customer_addedby'];
-                $this->currency         = $objResult->fields['customer_currency'];                
+                $this->currency         = $objResult->fields['customer_currency'];
                 $this->notes            = $objResult->fields['notes'];
                 $this->industryType     = $objResult->fields['industry_type'];
-                $this->account_id       = $objResult->fields['user_account'];                
+                $this->account_id       = $objResult->fields['user_account'];
                 $this->datasource       = $objResult->fields['datasource'];
                 $this->contact_gender   = $objResult->fields['gender'];
                 $this->profile_picture  = $objResult->fields['profile_picture'];
@@ -120,7 +120,7 @@ class CrmContact
 
                 $this->email            = $objResult->fields['email'];
                 $this->phone            = $objResult->fields['phone'];
-                $this->added_date       = $objResult->fields['added_date'];                
+                $this->added_date       = $objResult->fields['added_date'];
             }
             return true;
         }
@@ -135,7 +135,7 @@ class CrmContact
     function getCustomerDetails()
     {
         global $objDatabase, $_LANGID;
-        
+
         $query = "SELECT   c.id,
                            c.customer_id,
                            c.customer_type,
@@ -154,7 +154,7 @@ class CrmContact
                            c.user_account,
                            c.datasource,
                            c.gender,
-                           con.customer_name AS contactCustomer,                           
+                           con.customer_name AS contactCustomer,
                            t.label AS cType,
                            lang.name AS language,
                            curr.name AS currency,
@@ -177,11 +177,11 @@ class CrmContact
                          ON c.contact_language = lang.id
                        WHERE c.id = {$this->id}";
         $objResult = $objDatabase->SelectLimit($query, 1);
-        
+
         if ($objResult) {
             foreach ($objResult->fields as $key => $value) {
                 $customerDetail[$key] = $value;
-            }            
+            }
         }
 
         return $customerDetail;
@@ -189,9 +189,9 @@ class CrmContact
 
     /**
      * Save a record
-     * 
+     *
      * @global ADO Connection $objDatabase
-     * 
+     *
      * @return Boolean
      */
     function save()
@@ -217,7 +217,7 @@ class CrmContact
             'profile_picture'   => array ( 'val' => isset ($this->profile_picture) && !empty($this->profile_picture) ? $this->profile_picture : null, 'omitEmpty' => true),
             'email_delivery'    => isset ($this->emailDelivery) ? contrexx_input2int($this->emailDelivery) : 1,
         );
-        
+
         if (!isset($this->id) || empty ($this->id)) {
             $fields['datasource'] = isset ($this->datasource) ? $this->datasource : '';
             $fields['added_date'] = date('Y-m-d H:i:s');
@@ -235,32 +235,32 @@ class CrmContact
             } else if (!empty ($this->id)) {
                 \Env::get('cx')->getEvents()->triggerEvent('model/postUpdate', array(new \Doctrine\ORM\Event\LifecycleEventArgs($this, \Env::get('em'))));
             }
-            
+
             return true;
         }
-        
+
         return false;
     }
-    
+
     /**
      * Delete the CRM Person/Company
-     * 
+     *
      * @param integer $id
      * @param integer $contactType
-     * 
+     *
      * @global object $objDatabase
-     * 
+     *
      * @return boolean
      */
     public function delete($id = 0) {
         global $objDatabase;
-        
+
         if (empty($id)) {
             return;
         }
-        
+
         $this->load($id);
-        \Env::get('cx')->getEvents()->triggerEvent('model/preRemove', array(new \Doctrine\ORM\Event\LifecycleEventArgs($this, \Env::get('em'))));    
+        \Env::get('cx')->getEvents()->triggerEvent('model/preRemove', array(new \Doctrine\ORM\Event\LifecycleEventArgs($this, \Env::get('em'))));
         $deleteQuery = 'DELETE       contact.*, email.*, phone.*, website.*, addr.*
                             FROM  `' . DBPREFIX . 'module_' . $this->moduleName . '_contacts` AS contact
                             LEFT JOIN    `' . DBPREFIX . 'module_' . $this->moduleName . '_customer_contact_emails` AS email
@@ -276,15 +276,15 @@ class CrmContact
                                 WHERE       customer_id = ' . $id;
         $deleteMembership = 'DELETE FROM `' . DBPREFIX . 'module_' . $this->moduleName . '_customer_membership`
                                 WHERE contact_id = ' . $id;
-        
+
         if ($objDatabase->Execute($deleteQuery) !== false && $objDatabase->Execute($deleteComQuery) !== false && $objDatabase->Execute($deleteMembership) !== false) {
-            \Env::get('cx')->getEvents()->triggerEvent('model/postRemove', array(new \Doctrine\ORM\Event\LifecycleEventArgs($this, \Env::get('em'))));    
+            \Env::get('cx')->getEvents()->triggerEvent('model/postRemove', array(new \Doctrine\ORM\Event\LifecycleEventArgs($this, \Env::get('em'))));
             return true;
         }
-        
+
         return false;
     }
-    
+
     /**
      * Set the variable if new
      *

@@ -2,10 +2,10 @@
  * @param theConfig Object {
  *   div: <advancedFileUploader-div>
  *   uploaders: [
- *     { 
+ *     {
  *       type: 'uploader_type',
- *       description: 'uploader_name' 
- *     } 
+ *       description: 'uploader_name'
+ *     }
  *   ],
  *   uploadId: upload_id,
  *   switchUrl: 'switch_url',
@@ -199,13 +199,13 @@ var ComboUploader = function(theConfig) {
             'json'
         );
     };
-    
+
     //hello mr. ugly hack!
     //periodically check whether the upload finished and display response if yes.
-    //we do this polling because of the api mess (jumploader: global callbacks, pl: nice, 
+    //we do this polling because of the api mess (jumploader: global callbacks, pl: nice,
     //simple: todo)
     setTimeout(uploadResponse, 1000);
-    
+
     return {
         refresh: function() {
             switchUploader(curType);

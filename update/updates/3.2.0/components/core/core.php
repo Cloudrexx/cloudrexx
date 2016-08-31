@@ -1495,7 +1495,7 @@ function _coreUpdate()
         // we COULD do something else here..
         return \Cx\Lib\UpdateUtil::DefaultActionHandler($e);
     }
-    
+
     try {
         /********************************************************************
          * NEW IN VERSION 3.1.1: no fallback language should be possible
@@ -1849,4 +1849,3 @@ CONFIG_TPL
 
     return true;
 }
-

@@ -109,7 +109,7 @@ function _contactUpdate()
                                  '".addslashes($objResult->fields['attributes'])."')";
                         \Cx\Lib\UpdateUtil::sql($query);
                     }
-                    
+
                     $objResult->MoveNext();
                 }
             }
@@ -167,7 +167,7 @@ function _contactUpdate()
                               '".addslashes($objResult->fields['name'])."')";
                     \Cx\Lib\UpdateUtil::sql($query);
                 }
-                
+
                 $objResult->MoveNext();
             }
         }
@@ -308,7 +308,7 @@ function _contactUpdate()
                 'order_id'       => array('type' => 'SMALLINT(5)',      'notnull' => true,  'unsigned' => true, 'default' => 0, 'after' => 'check_type')
             )
         );
-        
+
         /*
          * Update 'id_lang' column with form language id
          */
@@ -403,7 +403,7 @@ function _contactUpdate()
                         )";
                     \Cx\Lib\UpdateUtil::sql($formLangQuery);
                 }
-                
+
                 $objResult->MoveNext();
             }
         }

@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,10 +24,10 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Calendar Language variables
- * 
+ *
  * @package    cloudrexx
  * @subpackage module_calendar
  * @author     Cloudrexx <info@cloudrexx.com>
@@ -528,9 +528,9 @@ $_ARRAYLANG['TXT_CALENDAR_PLACE_DATA'] = "Information about location";
 $_ARRAYLANG['TXT_CALENDAR_PLACE_DATA_HOST'] = "Information about host";
 $_ARRAYLANG['TXT_CALENDAR_SELECT_FORM_MEDIADIR'] = "Select entry-form from Media Directory";
 $_ARRAYLANG['TXT_CALENDAR_PLACE_DATA_STATUS_INFO'] = "On one hand, the information on the town can be entered manually, or be associated with the media directory module. Do you want to link this to the media directory, select the corresponding form from which you want to read the data.";
-$_ARRAYLANG['TXT_CALENDAR_PLACE_DATA_DEFAULT'] = "Enter manually";    
-$_ARRAYLANG['TXT_CALENDAR_PLACE_DATA_FROM_MEDIADIR'] = "Select entry from Media Directory";    
-$_ARRAYLANG['TXT_CALENDAR_PLACE_DATA_FROM_BOTH'] = "Both";    
+$_ARRAYLANG['TXT_CALENDAR_PLACE_DATA_DEFAULT'] = "Enter manually";
+$_ARRAYLANG['TXT_CALENDAR_PLACE_DATA_FROM_MEDIADIR'] = "Select entry from Media Directory";
+$_ARRAYLANG['TXT_CALENDAR_PLACE_DATA_FROM_BOTH'] = "Both";
 $_ARRAYLANG['TXT_CALENDAR_CONFIRMLIST'] = "Confirm list";
 $_ARRAYLANG['TXT_PAYMENT_METHODS'] = "On location,Bill,PostFinance";
 $_ARRAYLANG['TXT_PAYMENT_COMPLETED'] = "Paid";
@@ -589,11 +589,11 @@ $_ARRAYLANG['TXT_CALENDAR_FORM_FIELD_AFFILIATION_FORM'] = "Application form";
 $_ARRAYLANG['TXT_CALENDAR_FORM_FIELD_AFFILIATION_CONTACT'] = "Contact address";
 $_ARRAYLANG['TXT_CALENDAR_FORM_FIELD_AFFILIATION_BILLING'] = "Billing address";
 $_ARRAYLANG['TXT_CALENDAR_FORM_FIELD_TITLE'] = "Title";
-        
-$_ARRAYLANG['TXT_CALENDAR_TYPE'] = "Type";   
-$_ARRAYLANG['TXT_CALENDAR_FIRST_EXPORT'] = "Export first";   
-$_ARRAYLANG['TXT_CALENDAR_ALL_CAT'] = "All Categories";  
-$_ARRAYLANG['TXT_CALENDAR_SHOW_EVENTS_ONLY_IN_ACTIVE_LANGUAGE'] = "Show Events only in active language";  
+
+$_ARRAYLANG['TXT_CALENDAR_TYPE'] = "Type";
+$_ARRAYLANG['TXT_CALENDAR_FIRST_EXPORT'] = "Export first";
+$_ARRAYLANG['TXT_CALENDAR_ALL_CAT'] = "All Categories";
+$_ARRAYLANG['TXT_CALENDAR_SHOW_EVENTS_ONLY_IN_ACTIVE_LANGUAGE'] = "Show Events only in active language";
 $_ARRAYLANG['TXT_CALENDAR_SHOW_PREVIEW'] = "Preview";
 $_ARRAYLANG['TXT_CALENDAR_OCLOCK'] = "Clock";
 $_ARRAYLANG['TXT_CALENDAR_EVENT_SERIES_TYPE'] = "Repeat event";

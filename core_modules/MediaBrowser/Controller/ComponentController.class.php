@@ -99,7 +99,7 @@ class ComponentController extends
             'JsonMediaBrowser',
         );
     }
-    
+
     /**
      * Register your event listeners here
      *

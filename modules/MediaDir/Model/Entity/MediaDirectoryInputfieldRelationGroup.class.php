@@ -102,13 +102,13 @@ class MediaDirectoryInputfieldRelationGroup extends \Cx\Modules\MediaDir\Control
                 $intFormType   = intval($intFormType) == 0 ? null : $intFormType;
 
                 $objFWUser     = \FWUser::getFWUserObject();
-	            $objUser       = $objFWUser->objUser;
-	            //$intUserId     = intval($objUser->getId());
+                $objUser       = $objFWUser->objUser;
+                //$intUserId     = intval($objUser->getId());
 
-	            //OSEC COSTUMIZING
-	            if($intFormType == 6) {
+                //OSEC COSTUMIZING
+                if($intFormType == 6) {
                     $objEntries->getEntries(null,null,null,null,null,null,true,null,'n',null,null,$intFormType);
-	            } else {
+                } else {
                     if ($intEntryId) {
                         $objEntry = new \Cx\Modules\MediaDir\Controller\MediaDirectoryEntry();
                         $objEntry->getEntries($intEntryId, null, null, null, null, false,true);
@@ -123,7 +123,7 @@ class MediaDirectoryInputfieldRelationGroup extends \Cx\Modules\MediaDir\Control
                     } else {
                         $objEntries->getEntries(null,null,null,null,null,null,true,null,'n', \FWUser::getFWUserObject()->objUser->getId(), null, $intFormType);
                     }
-	            }
+                }
 
                 foreach($objEntries->arrEntries as $intKey => $arrEntry) {
                     if(in_array($intKey,$arrValue)) {
@@ -162,15 +162,15 @@ class MediaDirectoryInputfieldRelationGroup extends \Cx\Modules\MediaDir\Control
                 }
 
                 if($objInit->mode == 'backend') {
-                	$strAddNewButton = '';
+                    $strAddNewButton = '';
                     //$strEditButton = '';
                     //$strStyle = 'style="overflow: auto; border: 1px solid #0A50A1; background-color: #ffffff; width: 298px; height: 200px; float: left; list-style: none; padding: 0px; margin: 0px 5px 0px 0px;"';
                     //$strRefreshNewButton = '';
                 } else {
-		            //get user attributes
-		            /*$objFWUser      = \FWUser::getFWUserObject();
-		            $objUser        = $objFWUser->objUser;
-		            $intUserId      = intval($objUser->getId());*/
+                    //get user attributes
+                    /*$objFWUser      = \FWUser::getFWUserObject();
+                    $objUser        = $objFWUser->objUser;
+                    $intUserId      = intval($objUser->getId());*/
                     $intUserIsAdmin = $objUser->getAdminStatus();
 
                     $arrUserGroups  = array();
@@ -197,7 +197,7 @@ class MediaDirectoryInputfieldRelationGroup extends \Cx\Modules\MediaDir\Control
                         $strAddNewButton = '<a class="addEntryLink" rel="shadowbox[add'.$intId.'];height=750;width=730;options={onClose:new Function(\'refreshSelector_'.$intId.'(\\\''.$intId.'\\\', \\\''.$this->moduleNameLC.'Inputfield_deselected_'.$intId.'\\\', \\\''.$this->moduleNameLC.'Inputfield_'.$intId.'\\\', \\\''.$_GET['section'].'\\\', \\\''.$_GET['cmd'].'\\\', \\\''.$intEntryId.'\\\')\')}" href="index.php?section=mediadir&cmd='.$strAddNewCmd.'" ><img src="../core/Core/View/Media/icons/icon-user-add.png" style="cursor: pointer;  border: 0px;" />&nbsp;'.$_ARRAYLANG['TXT_MEDIADIR_ADD_ENTRY'].'</a>';
                         $strEditFunction = 'ondblclick="editSelectedElement_'.$intId.'(this);"';
                     } else {
-                    	$strAddNewButton = '';
+                        $strAddNewButton = '';
                         $strEditFunction = '';
                     }
 
@@ -248,12 +248,12 @@ class MediaDirectoryInputfieldRelationGroup extends \Cx\Modules\MediaDir\Control
                 $strInputfield .= <<< EOF
 <script type="text/javascript">
 /* <![CDATA[ */
-/*	\$J(document).ready(function() {
-		JSONData['marketplaceData_$intId'] 	= $listElementsJSON;
-		InsertJSONdataIntoElement(JSONData['marketplaceData_$intId'], 'selectedInputfield_{$intId}_Left', 'selectedInputfield_{$intId}_Right', 0, 0, 'marketplaceData_$intId');
-		InsertJSONdataIntoElement(JSONData['marketplaceData_$intId'], 'selectedInputfield_{$intId}_Right', 'selectedInputfield_{$intId}_Left', 1, 0, 'marketplaceData_$intId');
-		InitDrag();
-	});
+/*    \$J(document).ready(function() {
+        JSONData['marketplaceData_$intId']     = $listElementsJSON;
+        InsertJSONdataIntoElement(JSONData['marketplaceData_$intId'], 'selectedInputfield_{$intId}_Left', 'selectedInputfield_{$intId}_Right', 0, 0, 'marketplaceData_$intId');
+        InsertJSONdataIntoElement(JSONData['marketplaceData_$intId'], 'selectedInputfield_{$intId}_Right', 'selectedInputfield_{$intId}_Left', 1, 0, 'marketplaceData_$intId');
+        InitDrag();
+    });
 
     var $strSerializeFunction = function() {
         \$J('#$strInpufieldId').val(marketplaceGetElList(\$J('#selectedInputfield_{$intId}_Right')));
@@ -357,7 +357,7 @@ EOF;
                break;
 
             case 3:
-            	// OSEC CUSTOMIZING
+                // OSEC CUSTOMIZING
                 //ajax relaod
                 if(isset($intEntryId) && $intEntryId != 0) {
                     $objInputfieldValue = $objDatabase->Execute("
@@ -387,10 +387,10 @@ EOF;
                 $objUser       = $objFWUser->objUser;
                 //$intUserId     = intval($objUser->getId());
 
-	            //OSEC COSTUMIZING
-	            if($intFormType == 6) {
+                //OSEC COSTUMIZING
+                if($intFormType == 6) {
                     $objEntries->getEntries(null,null,null,null,null,null,true,null,'n',null,null,$intFormType);
-	            } else {
+                } else {
                     if ($intEntryId) {
                         $objEntry = new \Cx\Modules\MediaDir\Controller\MediaDirectoryEntry();
                         $objEntry->getEntries($intEntryId, null, null, null, null, false,true);
@@ -405,7 +405,7 @@ EOF;
                     } else {
                         $objEntries->getEntries(null,null,null,null,null,null,true,null,'n', \FWUser::getFWUserObject()->objUser->getId(), null, $intFormType);
                     }
-	            }
+                }
 
                 foreach($objEntries->arrEntries as $intKey => $arrEntry) {
                     if(!in_array($intKey,$arrValue)) {
@@ -532,11 +532,11 @@ EOF;
 
             //make relation elements
             foreach ($arrRelationGroup as $intRelationId) {
-            	$objEntry = new \Cx\Modules\MediaDir\Controller\MediaDirectoryEntry;
-		        $objEntry->getEntries($intRelationId);
+                $objEntry = new \Cx\Modules\MediaDir\Controller\MediaDirectoryEntry;
+                $objEntry->getEntries($intRelationId);
 
-		        $strRelationValue = $objEntry->arrEntries[$intRelationId]['entryFields'][0];
-		        //$strRelationFormId = $objEntry->arrEntries[$intRelationId]['entryFormId'];
+                $strRelationValue = $objEntry->arrEntries[$intRelationId]['entryFields'][0];
+                //$strRelationFormId = $objEntry->arrEntries[$intRelationId]['entryFormId'];
 
                 /*if($this->checkPageCmd('detail'.intval($strRelationFormId))) {
                     $strDetailCmd = 'detail'.intval($strRelationFormId);
@@ -544,7 +544,7 @@ EOF;
                     $strDetailCmd = 'detail';
                 }*/
 
-            	//make hyperlink with <a> and <li> tag
+                //make hyperlink with <a> and <li> tag
                 //$strList .= '<li><a href="index.php?section='.$this->moduleName.'&amp;cmd='.$strDetailCmd.'&amp;eid='.$intRelationId.'" target="_blank">'.$strRelationValue.'</a></li>';
                 $strList .= '<li>'.$strRelationValue.'</li>';
 
@@ -553,67 +553,67 @@ EOF;
                 $objRelationDefaultLang = $objDatabase->Execute("SELECT `lang_id` FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_entries WHERE id=".intval($intRelationId)." LIMIT 1");
                 $intRelationDefaultLang = intval($objRelationDefaultLang->fields['lang_id']);
 
-	            if($this->arrSettings['settingsTranslationStatus'] == 1) {
-		            if(in_array($_LANGID, $arrTranslationStatus)) {
-		                $intRelationLangId = $_LANGID;
-		            } else {
-		                $intRelationLangId = $intRelationDefaultLang;
-		            }
-		        } else {
-		            $intRelationLangId = $_LANGID;
-		        }
-		        $objRelationValues = $objDatabase->Execute("
-		            SELECT
-		                `value`, `field_id`
-		            FROM
-		                ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields
-		            WHERE
-		                lang_id=".$intRelationLangId."
-		            AND
-		                entry_id=".$intRelationId."
-		        ");
-
-		        $arrRelationValues = array();
-		        if ($objRelationValues !== false) {
-                    while (!$objRelationValues->EOF) {
-                    	$arrRelationValues[$objRelationValues->fields['field_id']] = htmlspecialchars($objRelationValues->fields['value'], ENT_QUOTES, CONTREXX_CHARSET);
-                    	$objRelationValues->MoveNext();
+                if($this->arrSettings['settingsTranslationStatus'] == 1) {
+                    if(in_array($_LANGID, $arrTranslationStatus)) {
+                        $intRelationLangId = $_LANGID;
+                    } else {
+                        $intRelationLangId = $intRelationDefaultLang;
                     }
-		        }
+                } else {
+                    $intRelationLangId = $_LANGID;
+                }
+                $objRelationValues = $objDatabase->Execute("
+                    SELECT
+                        `value`, `field_id`
+                    FROM
+                        ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields
+                    WHERE
+                        lang_id=".$intRelationLangId."
+                    AND
+                        entry_id=".$intRelationId."
+                ");
+
+                $arrRelationValues = array();
+                if ($objRelationValues !== false) {
+                    while (!$objRelationValues->EOF) {
+                        $arrRelationValues[$objRelationValues->fields['field_id']] = htmlspecialchars($objRelationValues->fields['value'], ENT_QUOTES, CONTREXX_CHARSET);
+                        $objRelationValues->MoveNext();
+                    }
+                }
 
                 $strWeb = !empty($arrRelationValues[56]) ? '<a href="'.$arrRelationValues[56].'" target="_blank">'.$arrRelationValues[56].'</a>' : '';
                 $arrUsers = array();
                 $arrUsers = explode(',',$arrRelationValues[57]);
 
                 $strUsers = '';
-	            foreach($arrUsers as $intUserId) {
+                foreach($arrUsers as $intUserId) {
                     $objUser = \FWUser::getFWUserObject()->objUser->getUser($intUserId);
                     if ($objUser) {
-	                  if($objUser->getProfileAttribute('firstname') != "" && $objUser->getProfileAttribute('lastname') != "") {
-	                     $strUsers .= htmlentities($objUser->getProfileAttribute('firstname').' '.$objUser->getProfileAttribute('lastname'), ENT_QUOTES, CONTREXX_CHARSET).'<br />';
+                      if($objUser->getProfileAttribute('firstname') != "" && $objUser->getProfileAttribute('lastname') != "") {
+                         $strUsers .= htmlentities($objUser->getProfileAttribute('firstname').' '.$objUser->getProfileAttribute('lastname'), ENT_QUOTES, CONTREXX_CHARSET).'<br />';
                          $strUsers .= $objUser->getProfileAttribute('1') ? htmlentities($objUser->objAttribute->getById($objUser->getProfileAttribute('1'))->getName(), ENT_QUOTES, CONTREXX_CHARSET).'<br />' : '';
-	                     //$strUsers .= ($objUser->getProfileAttribute('address') != "") ? $objUser->getProfileAttribute('address').'<br />' : '';
-	                     //$strUsers .= ($objUser->getProfileAttribute('zip') != "" && $objUser->getProfileAttribute('city') != "") ? $objUser->getProfileAttribute('zip').' '.$objUser->getProfileAttribute('city').'<br />' : '';
-	                     //$strUsers .= ($objUser->getProfileAttribute('phone_office') != "") ? $objUser->getProfileAttribute('phone_office').'<br />' : '';
-	                     $strUsers .= '<a rel="shadowbox;player=iframe;width=700;height=650" href="teilnehmer_kontakt?13='.$objUser->getId().'&amp;14='.urlencode($objUser->getProfileAttribute('company').', '.$objUser->getProfileAttribute('firstname').' '.$objUser->getProfileAttribute('lastname')).'">'.$_ARRAYLANG['TXT_MEDIADIR_GET_IN_CONTACT'].'</a><br />';
-	                     $strUsers .= '<br />';
-	                  }
-	               }
-	            }
+                         //$strUsers .= ($objUser->getProfileAttribute('address') != "") ? $objUser->getProfileAttribute('address').'<br />' : '';
+                         //$strUsers .= ($objUser->getProfileAttribute('zip') != "" && $objUser->getProfileAttribute('city') != "") ? $objUser->getProfileAttribute('zip').' '.$objUser->getProfileAttribute('city').'<br />' : '';
+                         //$strUsers .= ($objUser->getProfileAttribute('phone_office') != "") ? $objUser->getProfileAttribute('phone_office').'<br />' : '';
+                         $strUsers .= '<a rel="shadowbox;player=iframe;width=700;height=650" href="teilnehmer_kontakt?13='.$objUser->getId().'&amp;14='.urlencode($objUser->getProfileAttribute('company').', '.$objUser->getProfileAttribute('firstname').' '.$objUser->getProfileAttribute('lastname')).'">'.$_ARRAYLANG['TXT_MEDIADIR_GET_IN_CONTACT'].'</a><br />';
+                         $strUsers .= '<br />';
+                      }
+                   }
+                }
 
                 $strCustom .= '<table border="0" cellpadding="2">
-	               <tr>
+                   <tr>
                         <td colspan="2"><h3>'.\FWUser::getFWUserObject()->objUser->objAttribute->getById('country_'.$arrRelationValues[54])->getName().'</h3></td>
-	               <tr>
-	                   <td width="50%">'.$arrRelationValues[61].'<br />'.(!empty($arrRelationValues[49]) ? $arrRelationValues[49].'<br />' : '').$arrRelationValues[50].'<br />'.$arrRelationValues[51].' '.$arrRelationValues[53].'<br />'.\FWUser::getFWUserObject()->objUser->objAttribute->getById('country_'.$arrRelationValues[54])->getName().'<br />'.$strWeb.'<br /></td>
+                   <tr>
+                       <td width="50%">'.$arrRelationValues[61].'<br />'.(!empty($arrRelationValues[49]) ? $arrRelationValues[49].'<br />' : '').$arrRelationValues[50].'<br />'.$arrRelationValues[51].' '.$arrRelationValues[53].'<br />'.\FWUser::getFWUserObject()->objUser->objAttribute->getById('country_'.$arrRelationValues[54])->getName().'<br />'.$strWeb.'<br /></td>
                        <td width="50%">'.$strUsers.'</td>
-	               </tr>
-	            </table>';
+                   </tr>
+                </table>';
                 ///////// CUSTOM ///////////
             }
 
-	        //close relation </ul> list
-	        $strList .= '</ul>';
+            //close relation </ul> list
+            $strList .= '</ul>';
         }
 
         if(!empty($strValue)) {
@@ -668,7 +668,7 @@ EOF;
 
     function getFormOnSubmit($intInputfieldId)
     {
-    	//return $this->moduleName.'Inputfield_'.$intInputfieldId.'_SelectorSerialize(); ';
+        //return $this->moduleName.'Inputfield_'.$intInputfieldId.'_SelectorSerialize(); ';
         return "selectAll(document.entryModfyForm.elements['".$this->moduleNameLC."Inputfield[".$intInputfieldId."][]']); ";
     }
 }

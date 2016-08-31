@@ -1,93 +1,93 @@
 <!-- START module_feed_category.html -->
 <script language="JavaScript">
-	function formCheck()
-	{
+  function formCheck()
+  {
         if(document.form.form_name.value == "")
         {
             alert("{TXT_FEED_FORMCHECK_NAME}");
-	        document.form.form_name.focus();
+          document.form.form_name.focus();
             return false;
         }
         if(document.form.form_lang.value == "")
         {
             alert("{TXT_FEED_FORMCHECK_LANGUAGE}");
-	        document.form.form_lang.focus();
+          document.form.form_lang.focus();
             return false;
         }
         if(document.form.form_status.value == "")
         {
             alert("{TXT_FEED_FORMCHECK_STATUS}");
-	        document.form.form_status.focus();
+          document.form.form_status.focus();
             return false;
         }
     }
     function editCategory(id)
     {
-    	window.location.replace("?cmd=Feed&{CSRF_PARAM}&act=catedit&id="+id);
+      window.location.replace("?cmd=Feed&{CSRF_PARAM}&act=catedit&id="+id);
     }
     function selectTodoCategory()
     {
         if(document.form2.form_select_todo.value == "sort")
-	    {
+      {
             document.form2.form_sort.value = "1";
-	        document.form2.submit();
-	    }
+          document.form2.submit();
+      }
         if(document.form2.ischecked.value != "0")
         {
-	        if(document.form2.form_select_todo.value == "activate")
-	        {
-	            document.form2.form_activate.value = "1";
-		        document.form2.submit();
-	        }
-	        if(document.form2.form_select_todo.value == "deactivate")
-	        {
-	            document.form2.form_deactivate.value = "1";
-		        document.form2.submit();
-	        }
-	        if(document.form2.form_select_todo.value == "discharge")
-	        {
-	            if(confirm('{TXT_FEED_DELETE_RECORDS_CONFIRM}'))
-	    	    {
-		            document.form2.form_discharge.value = "1";
-		            document.form2.submit();
-	    	    }
-	        }
-	        if(document.form2.form_select_todo.value == "delete")
-	        {
-	        	if(confirm('{TXT_FEED_DELETE_CONFIRM}'))
-		        {
-		            document.form2.form_delete.value = "1";
-		            document.form2.submit();
-		        }
-	        }
-		}
-	    else
-	    {
-	        if(document.form2.form_select_todo.value != "sort")
-	        {
-	    	    alert("{TXT_FEED_NO_SELECT_OPERATION}");
-	        }
-	    }
+          if(document.form2.form_select_todo.value == "activate")
+          {
+              document.form2.form_activate.value = "1";
+            document.form2.submit();
+          }
+          if(document.form2.form_select_todo.value == "deactivate")
+          {
+              document.form2.form_deactivate.value = "1";
+            document.form2.submit();
+          }
+          if(document.form2.form_select_todo.value == "discharge")
+          {
+              if(confirm('{TXT_FEED_DELETE_RECORDS_CONFIRM}'))
+            {
+                document.form2.form_discharge.value = "1";
+                document.form2.submit();
+            }
+          }
+          if(document.form2.form_select_todo.value == "delete")
+          {
+            if(confirm('{TXT_FEED_DELETE_CONFIRM}'))
+            {
+                document.form2.form_delete.value = "1";
+                document.form2.submit();
+            }
+          }
+    }
+      else
+      {
+          if(document.form2.form_select_todo.value != "sort")
+          {
+            alert("{TXT_FEED_NO_SELECT_OPERATION}");
+          }
+      }
         document.form2.form_select_todo.value = "0";
     }
-	function setCheckboxes(do_check)
-	{
-		with(document.form2)
-		{
-		    var box      = elements['form_selected[]'];
-		    var box_cnt  = (typeof(box.length) != 'undefined') ? box.length : 0;
+  function setCheckboxes(do_check)
+  {
+    with(document.form2)
+    {
+        var box      = elements['form_selected[]'];
+        var box_cnt  = (typeof(box.length) != 'undefined') ? box.length : 0;
 
-		    if(box_cnt)
-		    {
-		        for(var i = 0; i < box_cnt; i++)
-		        {
-		            box[i].checked = do_check;
-		        }
-		    }
-		    else
-		    {
-		        box.checked = do_check;
-		    }
+        if(box_cnt)
+        {
+            for(var i = 0; i < box_cnt; i++)
+            {
+                box[i].checked = do_check;
+            }
+        }
+        else
+        {
+            box.checked = do_check;
+        }
         }
         if(do_check == true)
         {
@@ -97,93 +97,93 @@
         {
             document.form2.ischecked.value = "0";
         }
-	    return true;
-	}
-	function isChecked(isitchecked){
-		if(isitchecked == true)
-		{
-		    document.form2.ischecked.value++;
-		}
-		else
-		{
-		    document.form2.ischecked.value--;
-		}
-	}
+      return true;
+  }
+  function isChecked(isitchecked){
+    if(isitchecked == true)
+    {
+        document.form2.ischecked.value++;
+    }
+    else
+    {
+        document.form2.ischecked.value--;
+    }
+  }
 </script>
 <form action="?cmd=Feed&act=category&new=1" name="form" method="POST" style="padding:0px; margin:0px;" onSubmit="return formCheck();">
-	<table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist">
-	    <tr>
-	    	<th>{TXT_FEED_INSERT_CATEGORY}</th>
-	    </tr>
-	    <tr class="row1">
-	    	<td>
-	    	    {TXT_FEED_NAME}: <input type="text" name="form_name" size="30">&nbsp;&nbsp;&nbsp;&nbsp;
-	    	    {TXT_FEED_LANGUAGE}: <select name="form_lang">
-	    					 <!-- BEGIN feed_lang -->
-	    				     <option value="{FEED_LANG_ID}"{FEED_LANG_SELECTED}>{FEED_LANG_NAME}</option>
-	    				     <!-- END feed_lang -->
-	    				 </select>&nbsp;&nbsp;&nbsp;&nbsp;
-	    		{TXT_FEED_STATUS}: <select name="form_status">
-	    	                <option value="0">{TXT_FEED_INACTIVE}</option>
-	    		            <option value="1" selected>{TXT_FEED_ACTIVE}</option>
-	    	             </select>
-	    	</td>
-	    </tr>
-	</table>
-	<br><input type="submit" value="{TXT_FEED_SAVE}">
+  <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist">
+      <tr>
+        <th>{TXT_FEED_INSERT_CATEGORY}</th>
+      </tr>
+      <tr class="row1">
+        <td>
+            {TXT_FEED_NAME}: <input type="text" name="form_name" size="30">&nbsp;&nbsp;&nbsp;&nbsp;
+            {TXT_FEED_LANGUAGE}: <select name="form_lang">
+                 <!-- BEGIN feed_lang -->
+                   <option value="{FEED_LANG_ID}"{FEED_LANG_SELECTED}>{FEED_LANG_NAME}</option>
+                   <!-- END feed_lang -->
+               </select>&nbsp;&nbsp;&nbsp;&nbsp;
+          {TXT_FEED_STATUS}: <select name="form_status">
+                        <option value="0">{TXT_FEED_INACTIVE}</option>
+                      <option value="1" selected>{TXT_FEED_ACTIVE}</option>
+                     </select>
+        </td>
+      </tr>
+  </table>
+  <br><input type="submit" value="{TXT_FEED_SAVE}">
 </form><br>
 <form action="?cmd=Feed&act=category&chg=1" name="form2" method="POST" style="padding:0px; margin:0px;">
 <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist">
     <tr>
-    	<th width="25"><center>#</center></th>
-    	<th width="70">{TXT_FEED_SORTING}</th>
-    	<th width="40">{TXT_FEED_STATUS}</th>
-	    <th width="35">{TXT_FEED_ID}</th>
-	    <th>{TXT_FEED_CAT_NAME}</th>
-	    <th width="80" style="text-align:left;">{TXT_FEED_LANGUAGE}</th>
-	    <th width="80">{TXT_FEED_RECORDS}</th>
-	    <th width="150">{TXT_FEED_BUILT_EDITED}</th>
+      <th width="25"><center>#</center></th>
+      <th width="70">{TXT_FEED_SORTING}</th>
+      <th width="40">{TXT_FEED_STATUS}</th>
+      <th width="35">{TXT_FEED_ID}</th>
+      <th>{TXT_FEED_CAT_NAME}</th>
+      <th width="80" style="text-align:left;">{TXT_FEED_LANGUAGE}</th>
+      <th width="80">{TXT_FEED_RECORDS}</th>
+      <th width="150">{TXT_FEED_BUILT_EDITED}</th>
     </tr>
     <input type="hidden" name="ischecked" value="0">
     <!-- BEGIN feed_table_row -->
     <tr class="{FEED_CLASS}">
-    	<td><input type="checkbox" name="form_selected[]" value="{FEED_ID}" onclick="isChecked(this.checked);" hidefocus></td>
-    	<td>
-	    	    <input type="hidden" name="form_id[]" value="{FEED_ID}">
-	    	    <input type="text" name="form_pos[]" value="{FEED_POS}" style="width:25px; padding:2px;">
-    	</td>
-    	<td align="center"><img src="../core/Core/View/Media/icons/led_{FEED_STATUS}.gif"></td>
-    	<td align="center">{FEED_ID}</td>
-    	<td><nobr><a href="javascript:editCategory({FEED_ID})" title="{TXT_FEED_EDIT}" hidefocus>{FEED_NAME}</a></nobr></td>
-    	<td>{FEED_LANG}</td>
-    	<td align="center">{FEED_RECORDS}</td>
-    	<td align="center">{FEED_TIME}</td>
+      <td><input type="checkbox" name="form_selected[]" value="{FEED_ID}" onclick="isChecked(this.checked);" hidefocus></td>
+      <td>
+            <input type="hidden" name="form_id[]" value="{FEED_ID}">
+            <input type="text" name="form_pos[]" value="{FEED_POS}" style="width:25px; padding:2px;">
+      </td>
+      <td align="center"><img src="../core/Core/View/Media/icons/led_{FEED_STATUS}.gif"></td>
+      <td align="center">{FEED_ID}</td>
+      <td><nobr><a href="javascript:editCategory({FEED_ID})" title="{TXT_FEED_EDIT}" hidefocus>{FEED_NAME}</a></nobr></td>
+      <td>{FEED_LANG}</td>
+      <td align="center">{FEED_RECORDS}</td>
+      <td align="center">{FEED_TIME}</td>
     </tr>
     <!-- END feed_table_row -->
 </table>
 <!-- BEGIN feed_table_hidden -->
 <table cellspacing="0" cellpadding="3" width="100%" border="0">
     <tr>
-    	<td>
-    	    <img src="../core/Core/View/Media/icons/arrow.gif">
-    	    <a href="" onclick="setCheckboxes(true); return false;" hidefocus>{TXT_FEED_MARK_ALL}</a> /
-    	    <a href="" onclick="setCheckboxes(false); return false;" hidefocus>{TXT_FEED_REMOVE_CHOICE}</a>
-    	    <img src="../core/Core/View/Media/icons/strike.gif">
-    	    <select name="form_select_todo" onchange="selectTodoCategory();">
-    	        <option value="0" selected>{TXT_FEED_SELECT_OPERATION}:</option>
-    	        <option value="sort">{TXT_FEED_SAVE_SORTING}</option>
-    	        <option value="activate">{TXT_FEED_ACTIVATE_CAT}</option>
-    	        <option value="deactivate">{TXT_FEED_DEACTIVATE_CAT}</option>
-    	        <option value="discharge">{TXT_FEED_DELETE_RECORDS}</option>
-    	        <option value="delete">{TXT_FEED_DELETE_CAT}</option>
-    	    </select>
+      <td>
+          <img src="../core/Core/View/Media/icons/arrow.gif">
+          <a href="" onclick="setCheckboxes(true); return false;" hidefocus>{TXT_FEED_MARK_ALL}</a> /
+          <a href="" onclick="setCheckboxes(false); return false;" hidefocus>{TXT_FEED_REMOVE_CHOICE}</a>
+          <img src="../core/Core/View/Media/icons/strike.gif">
+          <select name="form_select_todo" onchange="selectTodoCategory();">
+              <option value="0" selected>{TXT_FEED_SELECT_OPERATION}:</option>
+              <option value="sort">{TXT_FEED_SAVE_SORTING}</option>
+              <option value="activate">{TXT_FEED_ACTIVATE_CAT}</option>
+              <option value="deactivate">{TXT_FEED_DEACTIVATE_CAT}</option>
+              <option value="discharge">{TXT_FEED_DELETE_RECORDS}</option>
+              <option value="delete">{TXT_FEED_DELETE_CAT}</option>
+          </select>
             <input type="hidden" name="form_sort" value="">
-    	    <input type="hidden" name="form_activate" value="">
-    	    <input type="hidden" name="form_deactivate" value="">
-			<input type="hidden" name="form_discharge" value="">
+          <input type="hidden" name="form_activate" value="">
+          <input type="hidden" name="form_deactivate" value="">
+      <input type="hidden" name="form_discharge" value="">
             <input type="hidden" name="form_delete" value="">
-    	</td>
-    	<td width="20">{FEED_RECORDS_HIDDEN}</td>
+      </td>
+      <td width="20">{FEED_RECORDS_HIDDEN}</td>
     </tr>
 </table>
 <!-- END feed_table_hidden -->

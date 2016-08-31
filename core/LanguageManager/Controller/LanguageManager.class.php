@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Language
  *
@@ -53,7 +53,7 @@ class LanguageManager
 {
     /**
      * Sigma template instance
-     * 
+     *
      * @var Cx\Core\Html\Sigma  $template
      */
     protected $template;
@@ -66,7 +66,7 @@ class LanguageManager
     public $langIDs = array();
 
     private $act = '';
-    
+
     /**
      * Constructor
      * @global  ADONewConnection
@@ -93,7 +93,7 @@ class LanguageManager
         }
         if (in_array(DBPREFIX."language_variable_names",$arrTables) && in_array(DBPREFIX."language_variable_content",$arrTables)) {
             $this->hideVariables = false;
-        }        
+        }
         $objResult = $objDatabase->Execute("SELECT id,name FROM ".DBPREFIX."languages");
         if ($objResult !== false) {
             while (!$objResult->EOF) {
@@ -104,9 +104,9 @@ class LanguageManager
         $objDatabase->Execute("OPTIMIZE TABLE ".DBPREFIX."languages");
         $objDatabase->Execute("OPTIMIZE TABLE ".DBPREFIX."language_variable_content");
         $objDatabase->Execute("OPTIMIZE TABLE ".DBPREFIX."language_variable_names");
-        
+
         $this->template = new \Cx\Core\Html\Sigma(ASCMS_CORE_PATH . '/LanguageManager/View/Template/Backend');
-        $this->template->setErrorHandling(PEAR_ERROR_DIE);    
+        $this->template->setErrorHandling(PEAR_ERROR_DIE);
     }
     private function setNavigation()
     {
@@ -118,7 +118,7 @@ class LanguageManager
             <a href='index.php?cmd=LanguageManager&amp;act=mod' class='".($this->act == 'mod' ? 'active' : '')."'>".$_ARRAYLANG['TXT_ADD_LANGUAGE_VARIABLES']."</a>
             <a href='index.php?cmd=LanguageManager&amp;act=writefiles' class='".($this->act == 'writefiles' ? 'active' : '')."' title='".$_ARRAYLANG['TXT_WRITE_VARIABLES_TO_FILES']."'>".$_ARRAYLANG['TXT_WRITE_VARIABLES_TO_FILES']."</a>": ""));
     }
-    
+
     protected function isInFullMode() {
         global $_CONFIG, $objDatabase;
         return \Cx\Core_Modules\License\License::getCached($_CONFIG, $objDatabase)->isInLegalComponents("fulllanguage");
@@ -172,7 +172,7 @@ class LanguageManager
                 $this->createFiles();
                 $this->listVariables();
                 break;
-            default:                
+            default:
                 \Permission::checkAccess(50, 'static');
                 $this->modifyLanguage();
                 $this->languageOverview();
@@ -200,7 +200,7 @@ class LanguageManager
     {
         global $_ARRAYLANG, $objDatabase;
         if (!empty($_REQUEST['id'])) {
-            
+
             $pageRepo = \Env::get('em')->getRepository('Cx\Core\ContentManager\Model\Entity\Page');
             $pages = $pageRepo->findBy(array(
                 'lang' => intval($_REQUEST['id']),
@@ -736,7 +736,7 @@ class LanguageManager
 
         $this->template->loadTemplateFile('language_list.html');
         $this->pageTitle = $_ARRAYLANG['TXT_VARIABLE_LIST'];
-        
+
         if (!isset($_SESSION['lang'])) {
             $_SESSION['lang'] = array();
         }
@@ -920,10 +920,10 @@ class LanguageManager
         $cxjs->setVariable('noOption', $_ARRAYLANG['TXT_NO'], 'language/lang');
         $cxjs->setVariable('langRemovalLabel', $_ARRAYLANG['TXT_LANGUAGE_MANAGER_LABEL_LANG_REMOVAL'], 'language/lang');
         $cxjs->setVariable('langRemovalContent', $_ARRAYLANG['TXT_LANGUAGE_MANAGER_LANG_REMOVAL_CONTENT'], 'language/lang');
-        
+
         $this->template->loadTemplateFile('language_langlist.html');
         $this->pageTitle = $_ARRAYLANG['TXT_LANGUAGE_LIST'];
-        
+
         if (!$this->isInFullMode()) {
             $this->hideVariables = true;
             $this->template->hideBlock('extendedTitles');
@@ -931,7 +931,7 @@ class LanguageManager
         } else {
             $this->template->touchBlock('extendedTitles');
         }
-        
+
         //begin language variables
         $this->template->setVariable(array(
             'TXT_ADD_NEW_LANGUAGE'             => $_ARRAYLANG['TXT_ADD_NEW_LANGUAGE'],
@@ -960,7 +960,7 @@ class LanguageManager
             'TXT_LANGUAGE_DEPENDANT_SYSTEM_VARIABLES'=> $_ARRAYLANG['TXT_LANGUAGE_DEPENDANT_SYSTEM_VARIABLES'],
             'TXT_ADMINISTRATION_PAGES'       => $_ARRAYLANG['TXT_ADMINISTRATION_PAGES'],
             'TXT_WEB_PAGES'                  => $_ARRAYLANG['TXT_WEB_PAGES'],
-            'TXT_SECTION'                    => $_ARRAYLANG['TXT_SECTION'],            
+            'TXT_SECTION'                    => $_ARRAYLANG['TXT_SECTION'],
             'TXT_CORE_FALLBACK'              => $_ARRAYLANG['TXT_CORE_FALLBACK'],
             'TXT_LANGUAGE_MANAGER_OK'        => $_ARRAYLANG['TXT_LANGUAGE_MANAGER_OK']
         ));
@@ -970,14 +970,14 @@ class LanguageManager
             'CMD'                  => contrexx_input2xhtml($_GET['cmd']),
             'TXT_LANGUAGE_ACTION_COPY'       => $_ARRAYLANG['TXT_LANGUAGE_ACTION_COPY'],
             'TXT_LANGUAGE_ACTION_LINK'       => $_ARRAYLANG['TXT_LANGUAGE_ACTION_LINK'],
-        ));        
+        ));
         //end language variables
         if ($this->hideVariables == true) {
             $this->template->setGlobalVariable(array('LANGUAGE_ADMIN_STYLE' => 'display: none'));
         } else {
             $this->template->setGlobalVariable(array('LANGUAGE_ADMIN_STYLE' => 'display: block'));
         }
-                
+
         $arrLanguages  = \FWLanguage::getActiveFrontendLanguages();
         $this->template->setVariable('LANGUAGE_MANAGER_ACTIVE_LANGIDS' , implode(', ', array_keys($arrLanguages)));
         $objResult = $objDatabase->Execute("SELECT * FROM ".DBPREFIX."languages ORDER BY id");
@@ -998,20 +998,20 @@ class LanguageManager
                 if ($objResult->fields['backend']==1) {
                   $checked = "checked";
                 }
-                
-                $selectedLang = '';                
+
+                $selectedLang = '';
                 switch ($objResult->fields['fallback']) {
                     case '':
                         $this->template->setVariable('NONE_SELECTED', 'selected="selected"');
                         break;
                     case '0':
                         $this->template->setVariable('LANGUAGE_DEFAULT_SELECTED', 'selected="selected"');
-                        break;        
+                        break;
                     default:
-                        $selectedLang = $objResult->fields['fallback'];                        
+                        $selectedLang = $objResult->fields['fallback'];
                 }
-                // set fallback language drop down                
-                foreach ($arrLanguages as $langId => $arrLanguage) {      
+                // set fallback language drop down
+                foreach ($arrLanguages as $langId => $arrLanguage) {
                     $selected = ($langId == $selectedLang) ? 'selected="selected"' : '';
                     $this->template->setVariable(array(
                         'LANGUAGE_LANG_ID'         => $langId,
@@ -1019,8 +1019,8 @@ class LanguageManager
                         'LANGUAGE_OPTION_SELECTED' => $selected
                     ));
                     $this->template->parse('fallbackLanguages');
-                }                    
-                
+                }
+
                 $adminStatus ="<input type='checkbox' name='langAdminStatus[".$objResult->fields['id']."]' value='1' $checked />";
                 $this->template->setVariable(array(
                     'LANGUAGE_ROWCLASS'            => 'row'.(($i++ % 2)+1),
@@ -1032,14 +1032,14 @@ class LanguageManager
                     'LANGUAGE_ACTIVE_STATUS'    => $activeStatus,
                     'LANGUAGE_ADMIN_STATUS'        => $adminStatus
                 ));
-                                
+
                 if (!$this->isInFullMode()) {
                     $this->template->hideBlock('extendedOptions');
                 }
                 $this->template->parse('languageRow');
                 $objResult->MoveNext();
             }
-        }    
+        }
     }
 
 
@@ -1117,8 +1117,8 @@ class LanguageManager
                 );
             }
 
-            //Trigger the event 'languageStatusUpdate' 
-            //if the language is activated/deactivated for frontend 
+            //Trigger the event 'languageStatusUpdate'
+            //if the language is activated/deactivated for frontend
             if (!empty($eventArgs)) {
                 $evm = \Cx\Core\Core\Controller\Cx::instanciate()->getEvents();
                 $evm->triggerEvent(
@@ -1165,8 +1165,8 @@ class LanguageManager
                 if (isset($_POST['langAdminStatus'][$id]) && $_POST['langAdminStatus'][$id]==1) {
                     $adminstatus = 1;
                 }
-                $fallBack = (isset($_POST['fallBack'][$id]) && $_POST['fallBack'][$id] != "" ) ? intval($_POST['fallBack'][$id]) : 'NULL';                
-                $objDatabase->Execute("UPDATE ".DBPREFIX."languages SET 
+                $fallBack = (isset($_POST['fallBack'][$id]) && $_POST['fallBack'][$id] != "" ) ? intval($_POST['fallBack'][$id]) : 'NULL';
+                $objDatabase->Execute("UPDATE ".DBPREFIX."languages SET
                                         name='".$name."',
                                         frontend=".$active.",
                                         is_default='".$status."',

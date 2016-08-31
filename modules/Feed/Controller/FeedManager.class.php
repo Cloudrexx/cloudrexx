@@ -64,7 +64,7 @@ class FeedManager extends FeedLibrary
     public $_objNewsML;
 
     private $act = '';
-    
+
     function __construct()
     {
         global  $_ARRAYLANG, $objTemplate, $_CONFIG;
@@ -75,7 +75,7 @@ class FeedManager extends FeedLibrary
 
         if (isset($_GET['act']) && $_GET['act'] == 'settings' && isset($_POST['save'])) {
             $this->_saveSettings();
-        }       
+        }
 
         //feed path
         $this->feedpath = \Env::get('cx')->getWebsiteFeedPath() . '/';
@@ -144,7 +144,7 @@ class FeedManager extends FeedLibrary
 
         $this->act = $_REQUEST['act'];
         $this->setNavigation();
-        
+
         $objTemplate->setVariable('ADMIN_CONTENT', $this->_objTpl->get());
     }
 
@@ -174,7 +174,7 @@ class FeedManager extends FeedLibrary
                 \Cx\Core\Setting\Controller\Setting::update('feedNewsMLStatus');
             }
         }
-        
+
         $_SESSION['strOkMessage'] = $_CORELANG['TXT_SETTINGS_UPDATED'];
     }
 

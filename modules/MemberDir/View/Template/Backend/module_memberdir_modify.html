@@ -2,34 +2,34 @@
 
 <script type="text/javascript">
 /* <![CDATA[ */
-	var fieldID;
+  var fieldID;
 
-	function dirChange(value) {
-		document.getElementById("memberModifyForm").action = "?cmd=MemberDir{MEMBERDIR_JS_URLPART}&dirid=" + value
-		document.getElementById("memberModifyForm").submit()
-	}
-	
-	var openBrowser = function openBrowser(url, id, attrs) {
-    	fieldID=id;
-    	try{
-			if(!browserPopup.closed){
-				return browserPopup.focus();
-			}
-		}catch(e){}
-		if (!window.focus){
-			return true;
-		}
-  		browserPopup = window.open(url, "", attrs);
-  		browserPopup.focus();  		
-  		return false;
+  function dirChange(value) {
+    document.getElementById("memberModifyForm").action = "?cmd=MemberDir{MEMBERDIR_JS_URLPART}&dirid=" + value
+    document.getElementById("memberModifyForm").submit()
+  }
+
+  var openBrowser = function openBrowser(url, id, attrs) {
+      fieldID=id;
+      try{
+      if(!browserPopup.closed){
+        return browserPopup.focus();
+      }
+    }catch(e){}
+    if (!window.focus){
+      return true;
     }
-    
+      browserPopup = window.open(url, "", attrs);
+      browserPopup.focus();
+      return false;
+    }
+
     var SetUrl = function(url, width, height, alt) {
-    	image = document.getElementById("img"+fieldID);
-    	image.src = url;
-    	image.style.width = "40px";
-    	hidden = document.getElementById("hi"+fieldID);
-    	hidden.value = url;
+      image = document.getElementById("img"+fieldID);
+      image.src = url;
+      image.style.width = "40px";
+      hidden = document.getElementById("hi"+fieldID);
+      hidden.value = url;
     }
 /* ]]> */
 </script>
@@ -44,35 +44,35 @@
     </th>
   </tr>
   <tr class="row1">
-  	<td>{TXT_DIRECTORY}</td>
-  	<td>
-  	{MEMBERDIR_DIRECTORY_LIST}
-  	</td>
+    <td>{TXT_DIRECTORY}</td>
+    <td>
+    {MEMBERDIR_DIRECTORY_LIST}
+    </td>
   </tr>
 
   <!-- BEGIN pic_row -->
   <tr class="{MEMBERDIR_ROW}">
     <td width="150">{TXT_MEMBERDIR_FIELD}:</td>
 <!--    <td><input type="file" style="width: 200px;" name="{MEMBERDIR_FIELD_NAME}" value="{MEMBERDIR_FIELD_VALUE}"/> <span style="margin-left: 15px;">{TXT_MAX_FILE_SIZE}</span></td>-->
-    	<td>
-    		<img id="img{MEMBERDIR_IMAGE_NUMBER}" onclick="openBrowser('?cmd=FileBrowser&{CSRF_PARAM}&amp;standalone=true&amp;path=','{MEMBERDIR_IMAGE_NUMBER}','width=800,height=600,resizable=yes,status=no,scrollbars=yes');" style="width: {MEMBERDIR_IMAGE_SIZE}px;" src="{MEMBERDIR_IMAGE_SRC}" title="" alt="Hier klicken" />
-    		<a href="#" onclick="openBrowser('?cmd=FileBrowser&{CSRF_PARAM}&amp;standalone=true&amp;path=','{MEMBERDIR_IMAGE_NUMBER}','width=800,height=600,resizable=yes,status=no,scrollbars=yes');">{TXT_EDIT_IMAGE}</a>
-    		<input type="hidden" id="hi{MEMBERDIR_IMAGE_NUMBER}" value="{MEMBERDIR_HIDDEN_VALUE}" name="image{MEMBERDIR_IMAGE_NUMBER}" />
-    	</td>
+      <td>
+        <img id="img{MEMBERDIR_IMAGE_NUMBER}" onclick="openBrowser('?cmd=FileBrowser&{CSRF_PARAM}&amp;standalone=true&amp;path=','{MEMBERDIR_IMAGE_NUMBER}','width=800,height=600,resizable=yes,status=no,scrollbars=yes');" style="width: {MEMBERDIR_IMAGE_SIZE}px;" src="{MEMBERDIR_IMAGE_SRC}" title="" alt="Hier klicken" />
+        <a href="#" onclick="openBrowser('?cmd=FileBrowser&{CSRF_PARAM}&amp;standalone=true&amp;path=','{MEMBERDIR_IMAGE_NUMBER}','width=800,height=600,resizable=yes,status=no,scrollbars=yes');">{TXT_EDIT_IMAGE}</a>
+        <input type="hidden" id="hi{MEMBERDIR_IMAGE_NUMBER}" value="{MEMBERDIR_HIDDEN_VALUE}" name="image{MEMBERDIR_IMAGE_NUMBER}" />
+      </td>
   </tr>
   <!-- END pic_row -->
 
   <!-- BEGIN input_row -->
   <tr class="{MEMBERDIR_ROW}">
-  	<td width="150">{TXT_MEMBERDIR_FIELD}:</td>
-  	<td><input type="text" name="{MEMBERDIR_FIELD_NAME}" value="{MEMBERDIR_FIELD_VALUE}" style="width: 200px;" /></td>
+    <td width="150">{TXT_MEMBERDIR_FIELD}:</td>
+    <td><input type="text" name="{MEMBERDIR_FIELD_NAME}" value="{MEMBERDIR_FIELD_VALUE}" style="width: 200px;" /></td>
   </tr>
   <!-- END input_row -->
 
   <!-- BEGIN textarea_row -->
   <tr class="{MEMBERDIR_ROW}">
-  	<td style="vertical-align: top;">{TXT_MEMBERDIR_FIELD}:</td>
-  	<td style="vertical-align: top;"><textarea name="{MEMBERDIR_FIELD_NAME}" cols="25" rows="6" style="width: 200px;">{MEMBERDIR_FIELD_VALUE}</textarea></td>
+    <td style="vertical-align: top;">{TXT_MEMBERDIR_FIELD}:</td>
+    <td style="vertical-align: top;"><textarea name="{MEMBERDIR_FIELD_NAME}" cols="25" rows="6" style="width: 200px;">{MEMBERDIR_FIELD_VALUE}</textarea></td>
   </tr>
   <!-- END textarea_row -->
  </table>

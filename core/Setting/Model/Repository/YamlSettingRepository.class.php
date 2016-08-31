@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * YamlSetting Repository
  *
@@ -59,11 +59,11 @@ class YamlSettingRepositoryException extends \Exception {};
  * @subpackage  core_setting
  */
 class YamlSettingRepository extends \Cx\Core\Model\Controller\YamlRepository {
-    
+
     public function __construct($repositoryPath) {
         parent::__construct($repositoryPath);
     }
-    
+
     protected function load() {
         if (!parent::load()) {
             $this->entityIdentifier = 'id';
@@ -71,4 +71,3 @@ class YamlSettingRepository extends \Cx\Core\Model\Controller\YamlRepository {
         }
     }
 }
-

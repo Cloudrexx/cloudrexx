@@ -3,7 +3,7 @@
     $J(document).ready(function() {
         $J('.recipientAcive').click(function() {
             elemId = $J(this).attr('id');
-            
+
             if ($J(this).is(':checked')) {
                 $J('div.'+elemId).show();
             } else {
@@ -31,14 +31,14 @@
     <th colspan="3">{TXT_NEWSLETTER_INTERFACE}</th>
   </tr>
   <tr class="row3">
-      <td colspan="3"><strong>{TXT_NEWSLETTER_PROFILE_DETAILS}</strong></td>      
-  </tr>    
+      <td colspan="3"><strong>{TXT_NEWSLETTER_PROFILE_DETAILS}</strong></td>
+  </tr>
     <tr class="row1">
       <td valign="top">{TXT_NEWSLETTER_SEX}</td>
       <td width="5%" nowrap="nowrap"><input type="checkbox" id="recipientSex" class="recipientAcive" name="recipientSex" value="1" {NEWSLETTER_RECIPIENT_SEX} /><label for="recipientSex">{TXT_ACTIVE}</label></td>
       <td><div class="recipientSex" style="display: {NEWSLETTER_RECIPIENT_SEX_MANTOTRY_DISPLAY}" ><input type="checkbox" id="requiredSex" name="requiredSex" value="1" {NEWSLETTER_RECIPIENT_SEX_REQUIRED} /><label for="requiredSex">{TXT_NEWSLETTER_MANDATORY_FIELD}</label></div>
       </td>
-    </tr>    
+    </tr>
     <tr class="row2">
       <td>{TXT_NEWSLETTER_SALUTATION}</td>
       <td><input type="checkbox" name="recipientSalutation" class="recipientAcive" id="recipientSalutation" value="1" {NEWSLETTER_RECIPIENT_SALUTATION} /><label for="recipientSalutation">{TXT_ACTIVE}</label></td>
@@ -127,5 +127,5 @@
 </table>
     <br />
 <input type="submit" name="interfaceSettings" value="{TXT_SAVE}" />
-</form>    
+</form>
 <!-- START module_newsletter_config_interface.html -->

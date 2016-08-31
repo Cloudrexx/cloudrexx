@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,10 +24,10 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Handling Request
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
@@ -38,7 +38,7 @@ namespace Cx\Core\Routing\Model\Entity;
 
 /**
  * Handling Request
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
@@ -46,24 +46,24 @@ namespace Cx\Core\Routing\Model\Entity;
  */
 
 class Request {
-    
+
     /**
      * HTTP requested method
-     * 
+     *
      * @var String
      */
     protected $httpRequestMethod;
-    
+
     /**
-     * Resolved url object 
-     * 
+     * Resolved url object
+     *
      * @var object
      */
     protected $url;
-    
+
     /**
      * Constructor to initialize the $httpRequestMethod and $url
-     * 
+     *
      * @param String $method
      * @param Object $resolvedUrl
      */
@@ -71,23 +71,22 @@ class Request {
         $this->httpRequestMethod = strtolower($method);
         $this->url               = $resolvedUrl;
     }
-    
+
     /**
      * Get the httpRequest method
-     * 
+     *
      * @return String
      */
     public function getHttpRequestMethod() {
         return $this->httpRequestMethod;
     }
-    
+
     /**
      * Get the resolved url object
-     * 
+     *
      * @return Object
      */
     public function getUrl() {
         return $this->url;
     }
 }
-

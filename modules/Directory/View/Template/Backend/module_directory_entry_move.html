@@ -11,27 +11,27 @@
       <td width="150" valign="top">{TXT_CATEGORY}:<font color="red">*</font></td>
       <td>
         <table width="100%" border="0">
-		  <tr>
-		    <td width="210">
-		      <select name="notSelectedCat[]" size="12" style="width:200px;" multiple="multiple">
-		          {CATEGORY}
-		      </select>
-		    </td>
-		    <td width="50">
-		      <div align="center">
+      <tr>
+        <td width="210">
+          <select name="notSelectedCat[]" size="12" style="width:200px;" multiple="multiple">
+              {CATEGORY}
+          </select>
+        </td>
+        <td width="50">
+          <div align="center">
                 <input type="button" value="&gt;&gt;" name="addCat" onclick="move(document.moveForm.elements['notSelectedCat[]'],document.moveForm.elements['selectedCat[]'],addCat,removeCat);" />
                 <br />
                 <input type="button" value="&lt;&lt;" name="removeCat" onclick="move(document.moveForm.elements['selectedCat[]'],document.moveForm.elements['notSelectedCat[]'],removeCat,addCat);" />
               </div>
-		    </td>
-		    <td>
-		      <div align="left">
-		        <select name="selectedCat[]" size="12" style="width:200px;" multiple="multiple">
-		        </select>
-		      </div>
-		    </td>
-		  </tr>
-		</table>
+        </td>
+        <td>
+          <div align="left">
+            <select name="selectedCat[]" size="12" style="width:200px;" multiple="multiple">
+            </select>
+          </div>
+        </td>
+      </tr>
+    </table>
       </td>
     </tr>
     <!-- BEGIN levels -->
@@ -39,27 +39,27 @@
       <td width="150" valign="top">{TXT_LEVEL}:<font color="red">*</font></td>
       <td>
         <table width="100%" border="0">
-		  <tr>
-		    <td width="210">
-		      <select name="notSelectedLevel[]" size="12" style="width:200px;" multiple="multiple">
-		          {LEVELS}
-		      </select>
-		    </td>
-		    <td width="50">
-		      <div align="center">
+      <tr>
+        <td width="210">
+          <select name="notSelectedLevel[]" size="12" style="width:200px;" multiple="multiple">
+              {LEVELS}
+          </select>
+        </td>
+        <td width="50">
+          <div align="center">
                 <input type="button" value=" &gt;&gt; " name="addLevel" onclick="move(document.moveForm.elements['notSelectedLevel[]'],document.moveForm.elements['selectedLevel[]'],addLevel,removeLevel);" />
                 <br />
                 <input type="button" value=" &lt;&lt; " name="removeLevel" onclick="move(document.moveForm.elements['selectedLevel[]'],document.moveForm.elements['notSelectedLevel[]'],removeLevel,addLevel);" />
               </div>
-		    </td>
-		    <td>
-		      <div align="left">
-		        <select name="selectedLevel[]" size="12" style="width:200px;" multiple="multiple">
-		        </select>
-		      </div>
-		    </td>
-		  </tr>
-		</table>
+        </td>
+        <td>
+          <div align="left">
+            <select name="selectedLevel[]" size="12" style="width:200px;" multiple="multiple">
+            </select>
+          </div>
+        </td>
+      </tr>
+    </table>
       </td>
     </tr>
   <!-- END levels -->

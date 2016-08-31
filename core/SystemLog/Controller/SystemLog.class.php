@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * SystemLog
  * Class to see SystemLog
@@ -53,7 +53,7 @@ class SystemLog
     var $statusMessage = "";
 
     private $act = '';
-    
+
     /**
     * Constructor
     *
@@ -62,14 +62,14 @@ class SystemLog
     */
     function __construct()
     {
-        global $_ARRAYLANG, $objTemplate;        
+        global $_ARRAYLANG, $objTemplate;
     }
 
 
     function setNavigation()
     {
         global $_ARRAYLANG, $objTemplate;
-        
+
         $objTemplate->setVariable(array(
             'CONTENT_TITLE'      => $_ARRAYLANG['TXT_OVERVIEW'],
             'CONTENT_NAVIGATION' => '<a href="index.php?cmd=SystemLog" class="active">'.$_ARRAYLANG['TXT_OVERVIEW'].'</a>',
@@ -80,7 +80,7 @@ class SystemLog
     function getLogPage()
     {
         global $objTemplate;
-        
+
         if (!isset($_GET['act'])) {
             $_GET['act'] = '';
         }
@@ -156,7 +156,7 @@ class SystemLog
         $term = isset($_POST['term']) ? contrexx_input2db($_POST['term']) : '';
         $objTemplate->setVariable('LOG_SEARCHTERM', $term);
         $q_search = '';
-        
+
         if(!empty($term)){
            $q_search = "WHERE log.id LIKE '%$term%'
                        OR log.userid LIKE '%$term%'
@@ -190,7 +190,7 @@ class SystemLog
                      log.http_x_forwarded_for AS http_x_forwarded_for,
                      log.referer AS referer
                 FROM ".DBPREFIX."log AS log
-                $q_search 
+                $q_search
                 ORDER BY log.id DESC
          ";
 

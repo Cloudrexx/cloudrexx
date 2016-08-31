@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,15 +24,15 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
-/** 
- * @copyright   CLOUDREXX CMS - CLOUDREXX AG 
+
+/**
+ * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Cloudrexx Development Team <info@cloudrexx.com>
- * @access      public 
+ * @access      public
  * @package     cloudrexx
  * @subpackage  coremodule_cache
- */ 
-global $_ARRAYLANG; 
+ */
+global $_ARRAYLANG;
 $_ARRAYLANG['TXT_CACHE_ERR_NOTWRITABLE'] = 'Le dossier choisi pour le cache est protégé en écriture. Veuillez affecter le privilège chmod 777 au dossier suivant:';
 $_ARRAYLANG['TXT_CACHE_ERR_NOTEXIST'] = 'Le dossier suivant, prévu pour le cache, n"existe pas:';
 $_ARRAYLANG['TXT_SETTINGS_MENU_CACHE'] = 'Cache';

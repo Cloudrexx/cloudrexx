@@ -14,7 +14,7 @@ var FormUploader = function(uploaderId) {
                 fileDiv.remove();
             }
             return false; //do not follow link
-        });        
+        });
     };
 
     var add = function() {

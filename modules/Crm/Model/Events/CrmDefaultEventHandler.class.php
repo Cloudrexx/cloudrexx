@@ -64,7 +64,7 @@ class CrmDefaultEventHandler implements \Cx\Modules\Crm\Model\Events\CrmEventHan
 
     /**
      * Event handler
-     * 
+     *
      * @param Event $event calling event
      *
      * @return boolean
@@ -78,7 +78,7 @@ class CrmDefaultEventHandler implements \Cx\Modules\Crm\Model\Events\CrmEventHan
             $this->default_info,
             array(
                 'key'          => $event->getName(),
-                'lang_id'      => $lang_id, 
+                'lang_id'      => $lang_id,
                 'substitution' => $substitutions,
         ));
 
@@ -89,4 +89,3 @@ class CrmDefaultEventHandler implements \Cx\Modules\Crm\Model\Events\CrmEventHan
         return true;
     }
 }
-

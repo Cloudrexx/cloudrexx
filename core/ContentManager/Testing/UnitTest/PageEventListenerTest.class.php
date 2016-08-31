@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,10 +24,10 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * PageEventListenerTest
- * 
+ *
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Cloudrexx Development Team <info@cloudrexx.com>
  * @author      SS4U <ss4u.comvation@gmail.com>
@@ -40,7 +40,7 @@ namespace Cx\Core\ContentManager\Testing\UnitTest;
 
 /**
  * PageEventListenerTest
- * 
+ *
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Cloudrexx Development Team <info@cloudrexx.com>
  * @author      SS4U <ss4u.comvation@gmail.com>
@@ -52,21 +52,21 @@ class PageEventListenerTest extends \Cx\Core\Test\Model\Entity\DoctrineTestCase
 {
     public function testUniqueSlugGeneration() {
         $nodeRepo = self::$em->getRepository('Cx\Core\ContentManager\Model\Entity\Node');
-        
+
         $root = $nodeRepo->getRoot();
 
         $n1 = new \Cx\Core\ContentManager\Model\Entity\Node();
         $n1->setParent($root);
         $root->addChildren($n1);
-        
+
         $n2 = new \Cx\Core\ContentManager\Model\Entity\Node();
         $n2->setParent($root);
         $root->addChildren($n2);
-        
+
         $n3 = new \Cx\Core\ContentManager\Model\Entity\Node();
         $n3->setParent($root);
         $root->addChildren($n3);
-        
+
         self::$em->persist($n1);
         self::$em->persist($n2);
         self::$em->persist($n3);
@@ -118,28 +118,28 @@ class PageEventListenerTest extends \Cx\Core\Test\Model\Entity\DoctrineTestCase
         $p4->setUseSkinForAllChannels('');
         $p4->setCmd('');
         $p4->setActive(1);
-        
+
         self::$em->persist($n1);
         self::$em->persist($n2);
         self::$em->persist($n3);
-        
+
         self::$em->persist($p1);
         self::$em->flush();
         self::$em->refresh($n1);
-        
+
         self::$em->persist($p2);
         self::$em->flush();
         self::$em->refresh($n2);
-        
+
         self::$em->persist($p3);
         self::$em->flush();
         self::$em->refresh($n1);
         self::$em->refresh($n2);
-        
+
         self::$em->persist($p4);
         self::$em->flush();
         self::$em->refresh($n3);
-        
+
         //see whether the listener changed the slug as we expect him to do.
         $this->assertEquals('slug-testpage', $p1->getSlug());
         $this->assertEquals('slug-testpage-1', $p2->getSlug());
@@ -148,10 +148,10 @@ class PageEventListenerTest extends \Cx\Core\Test\Model\Entity\DoctrineTestCase
         $this->assertEquals('slug-testpage', $p3->getSlug());
 
     }
-    
+
     public function testUniqueSlugGenerationWithPersistedNodes() {
         $nodeRepo = self::$em->getRepository('Cx\Core\ContentManager\Model\Entity\Node');
-        
+
         $root = $nodeRepo->getRoot();
 
         $n1 = new \Cx\Core\ContentManager\Model\Entity\Node();
@@ -160,9 +160,9 @@ class PageEventListenerTest extends \Cx\Core\Test\Model\Entity\DoctrineTestCase
         $n2 = new \Cx\Core\ContentManager\Model\Entity\Node();
         $n2->setParent($root);
         $root->addChildren($n2);
-        
+
         self::$em->persist($n1);
-        self::$em->persist($n2);        
+        self::$em->persist($n2);
         self::$em->flush();
 
         $p1 = new \Cx\Core\ContentManager\Model\Entity\Page();
@@ -175,14 +175,14 @@ class PageEventListenerTest extends \Cx\Core\Test\Model\Entity\DoctrineTestCase
         $p1->setUseSkinForAllChannels('');
         $p1->setCmd('');
         $p1->setActive(1);
-        
+
         self::$em->persist($n1);
         self::$em->persist($n2);
         self::$em->persist($p1);
         self::$em->flush();
 
         $id = $n2->getId();
-       
+
         self::$em->refresh($n1);
         self::$em->refresh($n2);
 
@@ -211,7 +211,7 @@ class PageEventListenerTest extends \Cx\Core\Test\Model\Entity\DoctrineTestCase
         $p3->setUseSkinForAllChannels('');
         $p3->setCmd('');
         $p3->setActive(1);
-        
+
         self::$em->persist($p2);
         self::$em->persist($p3);
         self::$em->flush();
@@ -220,7 +220,7 @@ class PageEventListenerTest extends \Cx\Core\Test\Model\Entity\DoctrineTestCase
         $newNode = new \Cx\Core\ContentManager\Model\Entity\Node();
         $newNode->setParent($node->getParent());
         $node->getParent()->addChildren($newNode);
-        
+
         //mixing in a conflict inside the new persists
         $p4 = new \Cx\Core\ContentManager\Model\Entity\Page();
         $p4->setLang(1);
@@ -232,21 +232,21 @@ class PageEventListenerTest extends \Cx\Core\Test\Model\Entity\DoctrineTestCase
         $p4->setUseSkinForAllChannels('');
         $p4->setCmd('');
         $p4->setActive(1);
-        
+
         self::$em->persist($newNode);
         self::$em->persist($p4);
-        self::$em->flush();      
+        self::$em->flush();
         self::$em->refresh($newNode);
-        
+
         $this->assertEquals('unique-slug-testpage', $p1->getSlug());
         $this->assertEquals('unique-slug-testpage-1', $p2->getSlug());
         $this->assertEquals('unique-slug-testpage', $p3->getSlug());
         $this->assertEquals('unique-slug-testpage-2', $p4->getSlug());
     }
 
-    public function testSlugReleasing() {        
+    public function testSlugReleasing() {
         $nodeRepo = self::$em->getRepository('Cx\Core\ContentManager\Model\Entity\Node');
-        
+
         $root = $nodeRepo->getRoot();
 
         $n1 = new \Cx\Core\ContentManager\Model\Entity\Node();
@@ -255,11 +255,11 @@ class PageEventListenerTest extends \Cx\Core\Test\Model\Entity\DoctrineTestCase
         $n2 = new \Cx\Core\ContentManager\Model\Entity\Node();
         $n2->setParent($root);
         $root->addChildren($n2);
-        
+
         self::$em->persist($n1);
-        self::$em->persist($n2);        
+        self::$em->persist($n2);
         self::$em->flush();
-        
+
         $p1 = new \Cx\Core\ContentManager\Model\Entity\Page();
         $p1->setLang(1);
         $p1->setTitle('slug release testpage');
@@ -282,7 +282,7 @@ class PageEventListenerTest extends \Cx\Core\Test\Model\Entity\DoctrineTestCase
 
         self::$em->refresh($n1);
         self::$em->refresh($n2);
-        
+
         $this->assertEquals('slug-release-testpage', $p1->getSlug());
 
         $p1 = self::$em->find('Cx\Core\ContentManager\Model\Entity\Page', $idp1);
@@ -302,10 +302,10 @@ class PageEventListenerTest extends \Cx\Core\Test\Model\Entity\DoctrineTestCase
 
         self::$em->remove($p1);
         self::$em->flush();
-        
+
         self::$em->persist($p2);
         self::$em->flush();
-        
+
         $this->assertEquals('slug-release-testpage', $p2->getSlug());
    }
 }

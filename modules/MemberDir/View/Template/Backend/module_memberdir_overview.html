@@ -25,66 +25,66 @@
     }
 
 
-	function memberdirDelete(pageId){
-	    if(confirm('{TXT_CONFIRM_DELETE_DATA}\n{TXT_ACTION_IS_IRREVERSIBLE}'))
-	        window.location.replace("?cmd=MemberDir&{CSRF_PARAM}&act=deleteDir&id="+pageId);
-	}
+  function memberdirDelete(pageId){
+      if(confirm('{TXT_CONFIRM_DELETE_DATA}\n{TXT_ACTION_IS_IRREVERSIBLE}'))
+          window.location.replace("?cmd=MemberDir&{CSRF_PARAM}&act=deleteDir&id="+pageId);
+  }
 
-	function selectMultiAction()
-	{
-		with (document.dirlist) {
-			switch (memberdir_MultiAction.value) {
-				case 'export':
-					action='?cmd=MemberDir&act=export';
-					submit();
-				break;
-				case 'delete':
-					if (confirm('{TXT_DELETE_CATEGORY_ALL}')) {
-						action='?cmd=MemberDir&act=multiDirDelete';
-						submit();
-					}
-				break;
-				default: //do nothing
-			}
-		}
-	}
+  function selectMultiAction()
+  {
+    with (document.dirlist) {
+      switch (memberdir_MultiAction.value) {
+        case 'export':
+          action='?cmd=MemberDir&act=export';
+          submit();
+        break;
+        case 'delete':
+          if (confirm('{TXT_DELETE_CATEGORY_ALL}')) {
+            action='?cmd=MemberDir&act=multiDirDelete';
+            submit();
+          }
+        break;
+        default: //do nothing
+      }
+    }
+  }
 
-	function closeSubDir(obj, level) {
-	    var number = obj.id.substring(3);
-		var children = getElementsByClassName(document, "*", "p" + number);
+  function closeSubDir(obj, level) {
+      var number = obj.id.substring(3);
+    var children = getElementsByClassName(document, "*", "p" + number);
 
-		for (var i = 0; i < children.length; i++) {
-		    children[i].style.display = "none";
-		}
+    for (var i = 0; i < children.length; i++) {
+        children[i].style.display = "none";
+    }
 
-		if (level == openedLevel) {
-		    if (openedHolder > 1) {
-		        openedHolder--;
-		    } else {
-		        openedLevel--;
-		    }
-		}
-		document.getElementById("status-column").style.width = (60 + (openedLevel * 20))+"px";
+    if (level == openedLevel) {
+        if (openedHolder > 1) {
+            openedHolder--;
+        } else {
+            openedLevel--;
+        }
+    }
+    document.getElementById("status-column").style.width = (60 + (openedLevel * 20))+"px";
 
-		obj.src = "../core/Core/View/Media/icons/pluslink.gif";
-		obj.onclick = function(){  openSubDir(this, level-1); };
-		setColors();
-	}
+    obj.src = "../core/Core/View/Media/icons/pluslink.gif";
+    obj.onclick = function(){  openSubDir(this, level-1); };
+    setColors();
+  }
 
-	function openSubDir(obj, level) {
-	    var number = obj.id.substring(3);
-	    var className = "";
-		var children = getElementsByClassName(document, "*", "p" + number);
-		var reg = new RegExp("(p"+number+") ?$", "i");
+  function openSubDir(obj, level) {
+      var number = obj.id.substring(3);
+      var className = "";
+    var children = getElementsByClassName(document, "*", "p" + number);
+    var reg = new RegExp("(p"+number+") ?$", "i");
 
-		++level;
-		if (level > openedLevel) {
-		    openedLevel = level;
-		    openedHolder = 1;
-		} else if (level == openedLevel) {
-		    openedHolder++;
-		}
-		document.getElementById("status-column").style.width = (60 + (openedLevel * 20))+"px";
+    ++level;
+    if (level > openedLevel) {
+        openedLevel = level;
+        openedHolder = 1;
+    } else if (level == openedLevel) {
+        openedHolder++;
+    }
+    document.getElementById("status-column").style.width = (60 + (openedLevel * 20))+"px";
 
         for (var i = 0; i < children.length; i++) {
             className = children[i].className;
@@ -99,10 +99,10 @@
         obj.src = "../core/Core/View/Media/icons/minuslink.gif";
         obj.onclick = function(){  closeSubDir(this, level); };
         setColors();
-	}
+  }
 
-	function setColors() {
-	    var rowid = 2;
+  function setColors() {
+      var rowid = 2;
         var rows = document.getElementById("dirlisttbl").getElementsByTagName("tr");
         var after = "";
         for (var i = 0; i < rows.length; i++) {
@@ -112,42 +112,42 @@
                 rowid = (rowid == 2) ? 1 : 2;
             }
         }
-	}
+  }
 
 
     function downloadQuestion(dirid, has_children) {
-	    if (has_children == 1 && window.confirm("{TXT_DOWNLOAD_QUESTION}")) {
-	       location.href = "index.php?cmd=MemberDir&{CSRF_PARAM}&with_children=1&act=export&id=" + dirid;
-	    } else {
+      if (has_children == 1 && window.confirm("{TXT_DOWNLOAD_QUESTION}")) {
+         location.href = "index.php?cmd=MemberDir&{CSRF_PARAM}&with_children=1&act=export&id=" + dirid;
+      } else {
             location.href = "index.php?cmd=MemberDir&{CSRF_PARAM}&with_children=0&act=export&id=" + dirid;
-	    }
-	}
+      }
+  }
 
 
 // ]]>
 </script>
 
 <table class="adminlist" cellspacing="0" cellpadding="3" width="100%" border="0">
-	<tr>
-		<th>
-			<div align="left">{TXT_FILTER}</div>
-		</th>
-	</tr><!--
-	<tr class="row1">
-		<td>
-		{MEMBERDIR_CHARLIST}
-		</td>
-	</tr>-->
-	<tr class="row2">
-		<td>
-			<form action="index.php" method="get">
-				<input type="hidden" name="search" value="search" />
-				<input type="hidden" name="cmd" value="MemberDir" />
-				<input type="hidden" name="act" value="showdir" />
-				<input type="text" name="keyword" value="{TXT_KEYWORD}" onclick="this.value=''"/> {DIRECTORY_LIST} <input type="submit" value="{TXT_SEARCH}" />
-			</form>
-		</td>
-	</tr>
+  <tr>
+    <th>
+      <div align="left">{TXT_FILTER}</div>
+    </th>
+  </tr><!--
+  <tr class="row1">
+    <td>
+    {MEMBERDIR_CHARLIST}
+    </td>
+  </tr>-->
+  <tr class="row2">
+    <td>
+      <form action="index.php" method="get">
+        <input type="hidden" name="search" value="search" />
+        <input type="hidden" name="cmd" value="MemberDir" />
+        <input type="hidden" name="act" value="showdir" />
+        <input type="text" name="keyword" value="{TXT_KEYWORD}" onclick="this.value=''"/> {DIRECTORY_LIST} <input type="submit" value="{TXT_SEARCH}" />
+      </form>
+    </td>
+  </tr>
 </table>
 
 <form method="post" name="dirlist" action="?cmd=MemberDir" id="dirlist">
@@ -162,7 +162,7 @@
  <table class="adminlist" cellspacing="0" cellpadding="3" width="100%" border="0" style="empty-cells: show; table-layout: fixed;" id="dirlisttbl">
   <tr class="row3" style="font-weight:bold;">
     <td style="width: 20px;">{TXT_ID}</td>
-  	<td style="width: 60px;" id="status-column">{TXT_STATUS}</td>
+    <td style="width: 60px;" id="status-column">{TXT_STATUS}</td>
     <td>{TXT_NAME}</td>
     <td>{TXT_DESCRIPTION}</td>
     <td>{TXT_ENTRIES}</td>
@@ -173,37 +173,37 @@
   <!-- BEGIN dirlist_row -->
   <tr class="{MEMBERDIR_ROW} {MEMBERDIR_PARENTS}" style="display: {MEMBERDIR_DISPLAY};">
     <td valign="top">{MEMBERDIR_DIRID}</td>
-  	<td valign="top" style="padding-left:{MEMBERDIR_MARGIN}px;">
-  	<!-- BEGIN treeimg --><img src="../core/Core/View/Media/icons/pluslink.gif" alt="open" onclick="openSubDir(this, {MEMBERDIR_LEVEL});" id="img{MEMBERDIR_DIRID}"/><!-- END treeimg -->
-  	<!-- BEGIN spacer --><img src="../core/Core/View/Media/icons/pixel.gif" alt="space" style="height: 11px; width: 11px;" /><!-- END spacer -->
-  	<a href="index.php?cmd=MemberDir&amp;act=activate&amp;id={MEMBERDIR_DIRID}"><img src="../core/Core/View/Media/icons/led_{MEMBERDIR_ACTIVE}.gif" alt="" border="0"/></a>
-  	<input type="checkbox" name="selectedId[]" id="selectedId" value="{MEMBERDIR_DIRID}" />
+    <td valign="top" style="padding-left:{MEMBERDIR_MARGIN}px;">
+    <!-- BEGIN treeimg --><img src="../core/Core/View/Media/icons/pluslink.gif" alt="open" onclick="openSubDir(this, {MEMBERDIR_LEVEL});" id="img{MEMBERDIR_DIRID}"/><!-- END treeimg -->
+    <!-- BEGIN spacer --><img src="../core/Core/View/Media/icons/pixel.gif" alt="space" style="height: 11px; width: 11px;" /><!-- END spacer -->
+    <a href="index.php?cmd=MemberDir&amp;act=activate&amp;id={MEMBERDIR_DIRID}"><img src="../core/Core/View/Media/icons/led_{MEMBERDIR_ACTIVE}.gif" alt="" border="0"/></a>
+    <input type="checkbox" name="selectedId[]" id="selectedId" value="{MEMBERDIR_DIRID}" />
 
-  	</td>
- 	<td valign="top"><a href="index.php?cmd=MemberDir&amp;act=showdir&amp;id={MEMBERDIR_DIRID}">{MEMBERDIR_DIRNAME}</a></td>
- 	<td valign="top">{MEMBERDIR_DESC}</td>
- 	<td valign="top">{MEMBERDIR_ENTRYCOUNT}</td>
- 	<td valign="top">{MEMBERDIR_LANGUAGE}</td>
- 	<td valign="top"><a href="#" onclick="downloadQuestion('{MEMBERDIR_DIRID}', '{MEMBERDIR_HAS_CHILDREN}');">{TXT_DOWNLOAD}</a></td>
+    </td>
+   <td valign="top"><a href="index.php?cmd=MemberDir&amp;act=showdir&amp;id={MEMBERDIR_DIRID}">{MEMBERDIR_DIRNAME}</a></td>
+   <td valign="top">{MEMBERDIR_DESC}</td>
+   <td valign="top">{MEMBERDIR_ENTRYCOUNT}</td>
+   <td valign="top">{MEMBERDIR_LANGUAGE}</td>
+   <td valign="top"><a href="#" onclick="downloadQuestion('{MEMBERDIR_DIRID}', '{MEMBERDIR_HAS_CHILDREN}');">{TXT_DOWNLOAD}</a></td>
     <td valign="top" style="text-align: right"><a href="index.php?cmd=MemberDir&amp;act=copy&amp;id={MEMBERDIR_DIRID}"><img src="../core/Core/View/Media/icons/copy.gif" alt="" border="0"/></a> <a href="index.php?cmd=MemberDir&amp;act=editDir&amp;id={MEMBERDIR_DIRID}"><img src="../core/Core/View/Media/icons/edit.gif" border="0" alt="Eintrag editieren" width="15" height="15" /></a> <a href="javascript:memberdirDelete({MEMBERDIR_DIRID})"><img src="../core/Core/View/Media/icons/delete.gif" border="0" alt="Eintrag l&ouml;schen"  width="17" height="17" /></a> </td>
   </tr>
   <!-- END dirlist_row -->
 </table>
 <table cellpadding="2" cellspacing="0" border="0">
-	<tr>
-		<td>
-			<img src="../core/Core/View/Media/icons/arrow.gif" border="0" width="38" height="22" alt="{TXT_MARKED}:" />
-			<a href="#" onClick="changeCheckboxes('dirlist','selectedId[]',true); return false;">{TXT_SELECT_ALL}</a> /
-			<a href="#" onClick="changeCheckboxes('dirlist','selectedId[]',false); return false;">{TXT_DESELECT_ALL}</a>
-			<img src="../core/Core/View/Media/icons/strike.gif" alt="strike" />
-			<select name="memberdir_MultiAction" onchange="selectMultiAction();">
-				<option value="0">{TXT_SUBMIT_SELECT}</option>
-				<option value="export">{TXT_DOWNLOAD}</option>
-				<option value="delete">{TXT_SUBMIT_DELETE}</option>
-				<!--<option value="export">{TXT_SUBMIT_EXPORT}</option>-->
-			</select>
-		</td>
-	</tr>
+  <tr>
+    <td>
+      <img src="../core/Core/View/Media/icons/arrow.gif" border="0" width="38" height="22" alt="{TXT_MARKED}:" />
+      <a href="#" onClick="changeCheckboxes('dirlist','selectedId[]',true); return false;">{TXT_SELECT_ALL}</a> /
+      <a href="#" onClick="changeCheckboxes('dirlist','selectedId[]',false); return false;">{TXT_DESELECT_ALL}</a>
+      <img src="../core/Core/View/Media/icons/strike.gif" alt="strike" />
+      <select name="memberdir_MultiAction" onchange="selectMultiAction();">
+        <option value="0">{TXT_SUBMIT_SELECT}</option>
+        <option value="export">{TXT_DOWNLOAD}</option>
+        <option value="delete">{TXT_SUBMIT_DELETE}</option>
+        <!--<option value="export">{TXT_SUBMIT_EXPORT}</option>-->
+      </select>
+    </td>
+  </tr>
 </table>
 </form>
 <br />

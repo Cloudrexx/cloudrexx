@@ -58,5 +58,5 @@ margin-bottom:10px;
 border:1px solid #fff;
 opacity:1;
 }
-.flexslider .slides > li:first-child {display: block; -webkit-backface-visibility: visible;} 
+.flexslider .slides > li:first-child {display: block; -webkit-backface-visibility: visible;}
 .flexslider .slides > li {display: none; -webkit-backface-visibility: hidden;}

@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Paging
  *
@@ -200,10 +200,10 @@ class Paging
 
             return intval($_REQUEST[$parameter_name]);
         }
-            
+
         if (!isset($_SESSION['paging'])) {
             $_SESSION['paging'] = array();
-        }        
+        }
         if (!isset($_SESSION['paging'][$parameter_name]))
             $_SESSION['paging'][$parameter_name] = 0;
         if (isset($_REQUEST[$parameter_name])) {
@@ -254,7 +254,7 @@ class Paging
             true)));
 */
         $arrStack = debug_backtrace();
-      	$i = 0;
+          $i = 0;
         while ($arrStack[$i]['class'] == 'Paging') {
             ++$i;
         }
@@ -280,7 +280,7 @@ class Paging
         if (strlen($parameterName) > \cmsSession::getVariableKeyMaxLength()) {
             $parameterName = substr(md5($parameterName), 0, \cmsSession::getVariableKeyMaxLength());
         }
-        
+
         return $parameterName;
     }
 }

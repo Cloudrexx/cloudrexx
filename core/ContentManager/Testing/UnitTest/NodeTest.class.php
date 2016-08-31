@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,10 +24,10 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * NodeTest
- * 
+ *
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Cloudrexx Development Team <info@cloudrexx.com>
  * @author      SS4U <ss4u.comvation@gmail.com>
@@ -40,7 +40,7 @@ namespace Cx\Core\ContentManager\Testing\UnitTest;
 
 /**
  * NodeTest
- * 
+ *
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Cloudrexx Development Team <info@cloudrexx.com>
  * @author      SS4U <ss4u.comvation@gmail.com>
@@ -51,7 +51,7 @@ namespace Cx\Core\ContentManager\Testing\UnitTest;
 class NodeTest extends \Cx\Core\Test\Model\Entity\DoctrineTestCase
 {
     public function testPagesByLang() {
-        
+
         $nodeRepo = self::$em->getRepository('Cx\Core\ContentManager\Model\Entity\Node');
 
         $node = new \Cx\Core\ContentManager\Model\Entity\Node();

@@ -13,8 +13,8 @@
 
 <script type="text/javascript">
 function deleteImage(imageId)
-{ 
-    if(confirm('{TXT_DELETE_IMAGE_MSG}')) 
+{
+    if(confirm('{TXT_DELETE_IMAGE_MSG}'))
         window.location.replace("?cmd=Gallery&{CSRF_PARAM}&act=delete_valid_image&id="+imageId);
 }
 
@@ -30,182 +30,182 @@ function imageNameFields()
 
 function imageActiveBoxes()
 {
-	with (document.gallery_validate)
-	{
-		if (settingsActive.checked == false)
-		{ // the images should be activated one by one
-			<!-- BEGIN javascriptBlock3 -->
-				imageActive{JS_IMAGE_ID3}.disabled = false;
-			<!-- END javascriptBlock3 -->
-		}
-		else
-		{
-			<!-- BEGIN javascriptBlock4 -->
-				imageActive{JS_IMAGE_ID4}.disabled = true;
-			<!-- END javascriptBlock4 -->
-		}
-	}
+  with (document.gallery_validate)
+  {
+    if (settingsActive.checked == false)
+    { // the images should be activated one by one
+      <!-- BEGIN javascriptBlock3 -->
+        imageActive{JS_IMAGE_ID3}.disabled = false;
+      <!-- END javascriptBlock3 -->
+    }
+    else
+    {
+      <!-- BEGIN javascriptBlock4 -->
+        imageActive{JS_IMAGE_ID4}.disabled = true;
+      <!-- END javascriptBlock4 -->
+    }
+  }
 }
 
 function imageCategorySelects()
 {
-	with (document.gallery_validate)
-	{
-		if (settingsCategory.checked == false)
-		{ // the category should be selected one by one
-			imageCategoryAll.disabled = true;
-			<!-- BEGIN javascriptBlock6 -->
-				imageCategory{JS_IMAGE_ID6}.disabled = false;
-			<!-- END javascriptBlock6 -->
-		}
-		else
-		{
-			imageCategoryAll.disabled = false;
-			<!-- BEGIN javascriptBlock5 -->
-				imageCategory{JS_IMAGE_ID5}.disabled = true;
-			<!-- END javascriptBlock5 -->
-		}
-	}		
+  with (document.gallery_validate)
+  {
+    if (settingsCategory.checked == false)
+    { // the category should be selected one by one
+      imageCategoryAll.disabled = true;
+      <!-- BEGIN javascriptBlock6 -->
+        imageCategory{JS_IMAGE_ID6}.disabled = false;
+      <!-- END javascriptBlock6 -->
+    }
+    else
+    {
+      imageCategoryAll.disabled = false;
+      <!-- BEGIN javascriptBlock5 -->
+        imageCategory{JS_IMAGE_ID5}.disabled = true;
+      <!-- END javascriptBlock5 -->
+    }
+  }
 }
 
 function enableProz()
 {
-	with (document.gallery_validate)
-	{
-		settingsThumbSizeAbsWidth.disabled = true;
-		settingsThumbSizeAbsHeight.disabled = true;
-		settingsThumbSizeProz.disabled = false;
-	}			
+  with (document.gallery_validate)
+  {
+    settingsThumbSizeAbsWidth.disabled = true;
+    settingsThumbSizeAbsHeight.disabled = true;
+    settingsThumbSizeProz.disabled = false;
+  }
 }
 
 function enableAbs()
 {
-	with (document.gallery_validate)
-	{
-		settingsThumbSizeAbsWidth.disabled = false;
-		settingsThumbSizeAbsHeight.disabled = false;
-		settingsThumbSizeProz.disabled = true;
-	}	
+  with (document.gallery_validate)
+  {
+    settingsThumbSizeAbsWidth.disabled = false;
+    settingsThumbSizeAbsHeight.disabled = false;
+    settingsThumbSizeProz.disabled = true;
+  }
 }
 
 function settingsChanged()
 {
-	with (document.gallery_validate)
-	{
-		update_button.disabled = false;
-		submit_button.disabled = true;
-	}			
+  with (document.gallery_validate)
+  {
+    update_button.disabled = false;
+    submit_button.disabled = true;
+  }
 }
 
 function checkAbsWidth()
 {
-	with (document.gallery_validate)
-	{
-		if (settingsThumbSizeAbsHeight.value != 0)
-		{
-			settingsThumbSizeAbsWidth.value = 0;	
-		}
-		if (settingsThumbSizeAbsHeight.value > 2000)
-		{
-			settingsThumbSizeAbsHeight.value = 2000;
-		}
-	}			
+  with (document.gallery_validate)
+  {
+    if (settingsThumbSizeAbsHeight.value != 0)
+    {
+      settingsThumbSizeAbsWidth.value = 0;
+    }
+    if (settingsThumbSizeAbsHeight.value > 2000)
+    {
+      settingsThumbSizeAbsHeight.value = 2000;
+    }
+  }
 }
 
 function checkAbsHeight()
 {
-	with (document.gallery_validate)
-	{
-		if (settingsThumbSizeAbsWidth.value != 0)
-		{
-			settingsThumbSizeAbsHeight.value = 0;	
-		}
-		if (settingsThumbSizeAbsWidth.value > 2000)
-		{
-			settingsThumbSizeAbsWidth.value = 2000;
-		}
-	}			
+  with (document.gallery_validate)
+  {
+    if (settingsThumbSizeAbsWidth.value != 0)
+    {
+      settingsThumbSizeAbsHeight.value = 0;
+    }
+    if (settingsThumbSizeAbsWidth.value > 2000)
+    {
+      settingsThumbSizeAbsWidth.value = 2000;
+    }
+  }
 }
 
 function checkCategories()
 {
-	with (document.gallery_validate)
-	{
-		if (settingsCategory.checked == true)
-		{ // there should a maincategory be checked
-			categoryChecker = false;
-			if (imageCategoryAll.value != 0)
-			{ // there is a category checked
-				categoryChecker = true;
-			}
-		}
-		else
-		{ // check all the subcategories
-			categoryChecker = true;
-			<!-- BEGIN javascriptBlock7 -->
-				if (imageCategory{JS_IMAGE_ID7}.value == 0)
-				{ // there is no category checked, give out an error
-					categoryChecker = false;
-				}
-			<!-- END javascriptBlock7 -->
-		}
-		
-		if (categoryChecker == true)
-		{ // everything is okay, submit the form
-			submit();
-		}
-		else
-		{
-			alert('{TXT_WRONG_CATEGORIES_MSG}');	
-		}
-		
-	}	
+  with (document.gallery_validate)
+  {
+    if (settingsCategory.checked == true)
+    { // there should a maincategory be checked
+      categoryChecker = false;
+      if (imageCategoryAll.value != 0)
+      { // there is a category checked
+        categoryChecker = true;
+      }
+    }
+    else
+    { // check all the subcategories
+      categoryChecker = true;
+      <!-- BEGIN javascriptBlock7 -->
+        if (imageCategory{JS_IMAGE_ID7}.value == 0)
+        { // there is no category checked, give out an error
+          categoryChecker = false;
+        }
+      <!-- END javascriptBlock7 -->
+    }
+
+    if (categoryChecker == true)
+    { // everything is okay, submit the form
+      submit();
+    }
+    else
+    {
+      alert('{TXT_WRONG_CATEGORIES_MSG}');
+    }
+
+  }
 }
 
 function showOrHide(strElement) {
-	if (document.getElementById(strElement).style.display == 'none') {
-		document.getElementById(strElement).style.display = 'block';
-	} else {
-		document.getElementById(strElement).style.display = 'none';
-	}
+  if (document.getElementById(strElement).style.display == 'none') {
+    document.getElementById(strElement).style.display = 'block';
+  } else {
+    document.getElementById(strElement).style.display = 'none';
+  }
 }
 
 function copyText(strType,strValue) {
-	for (var h=0; h < document.forms.length;h++) {
-		for (var i=0; i < document.forms[h].elements.length;i++) {
-			//read out all form-elements with the loop
-			if(document.forms[h].elements[i].name.search(strType) != -1) {
-				document.forms[h].elements[i].value = strValue;
-			}
-		}
-	}	
+  for (var h=0; h < document.forms.length;h++) {
+    for (var i=0; i < document.forms[h].elements.length;i++) {
+      //read out all form-elements with the loop
+      if(document.forms[h].elements[i].name.search(strType) != -1) {
+        document.forms[h].elements[i].value = strValue;
+      }
+    }
+  }
 }
 </script>
 
 <form name="gallery_validate" method="post" action="?cmd=Gallery&amp;act=validate_all_pictures&amp;type=all">
   <table width="100%" cellspacing="0" cellpadding="3" border="0" align="top" class="adminlist">
-    <tr> 
-      <th> 
+    <tr>
+      <th>
         <div align="left">{TXT_SETTINGS_TITLE}</div>
       </th>
-      <th colspan="2"> 
+      <th colspan="2">
         <div align="left">{TXT_SETTINGS_TITLE_THUMBSIZE}</div>
       </th>
-      <th> 
+      <th>
         <div align="left">{TXT_SETTINGS_TITLE_THUMBQUALITY}</div>
       </th>
     </tr>
-    <tr class="row2"> 
-      <td nowrap="nowrap"> 
+    <tr class="row2">
+      <td nowrap="nowrap">
         <input type="checkbox" id="settingsFilename" name="settingsFilename" value="1" checked="checked" onclick="imageNameFields()" />
         &nbsp;<label for="settingsFilename">{TXT_SETTINGS_FILENAME}</label></td>
-      <td nowrap="nowrap"> 
+      <td nowrap="nowrap">
         <input type="radio" id="radioThumbSizeAbs" name="settingsThumbSize" value="abs" onclick="enableAbs();settingsChanged();" {SETTINGS_SELECTED_ABS} />
         &nbsp;<label for="radioThumbSizeAbs">{TXT_SETTINGS_THUMBSIZE_ABS}</label></td>
-      <td nowrap="nowrap"> 
+      <td nowrap="nowrap">
         <input type="radio" id="radioThumbSizeProz" name="settingsThumbSize" value="proz" onclick="enableProz();settingsChanged();" {SETTINGS_SELECTED_PROZ} />
         &nbsp;<label for="radioThumbSizeProz">{TXT_SETTINGS_THUMBSIZE_PROZ}</label></td>
-      <td nowrap="nowrap"> 
+      <td nowrap="nowrap">
         <select name="settingsThumbQuality" onchange="settingsChanged()">
           <!-- BEGIN showThumbQuality -->
           <option value="{THUMB_QUALITY_VALUE}" {THUMB_QUALITY_SELECTED}>{THUMB_QUALITY_VALUE}%</option>
@@ -213,14 +213,14 @@ function copyText(strType,strValue) {
         </select>
       </td>
     </tr>
-<tr class="row1"> 
-<td nowrap="nowrap"> 
+<tr class="row1">
+<td nowrap="nowrap">
 <input type="checkbox" id="settingsActive" name="settingsActive" value="1" checked="checked" onclick="imageActiveBoxes()" />
 &nbsp;<label for="settingsActive">{TXT_SETTINGS_ACTIVE}</label></td>
-<td nowrap="nowrap"> 
+<td nowrap="nowrap">
 <input type="text" name="settingsThumbSizeAbsWidth" maxlength="4" size="5" onchange="settingsChanged();checkAbsHeight();" value="{SETTINGS_THUMBSIZE_ABS_WIDTH}" {SETTINGS_THUMBSIZE_ABS_WIDTH_DIS} />
 &nbsp;{TXT_SETTINGS_THUMBSIZE_ABS_WIDTH}</td>
-<td nowrap="nowrap" colspan="2"> 
+<td nowrap="nowrap" colspan="2">
 <select name="settingsThumbSizeProz" {SETTINGS_THUMBSIZE_PROZ_DIS} onchange="settingsChanged()">
 <!-- BEGIN showThumbSizeProz -->
 <option value="{THUMB_SIZE_VALUE}" {THUMB_SIZE_SELECTED}>{THUMB_SIZE_VALUE}%</option>
@@ -228,19 +228,19 @@ function copyText(strType,strValue) {
 </select>
 </td>
 </tr>
-<tr> 
-<td> 
+<tr>
+<td>
 <input type="checkbox" id="settingsCategory" name="settingsCategory" value="1" checked="checked" onclick="imageCategorySelects()" />
 &nbsp;<label for="settingsCategory">{TXT_SETTINGS_CATEGORY}</label>
 <select name="imageCategoryAll" {CAT_DROPDOWN_DISABLED}>
     <option value="0">{TXT_DETAILS_CATEGORYSELECT}</option>
     <option value="0">----------------------------</option>
-	<!-- BEGIN showCategories -->
-	<option value="{CAT_DROPDOWN_VALUE}" {CAT_DROPDOWN_SELECTED}>{CAT_DROPDOWN_INDENT}{CAT_DROPDOWN_NAME}</option>
-	<!-- END showCategories -->
+  <!-- BEGIN showCategories -->
+  <option value="{CAT_DROPDOWN_VALUE}" {CAT_DROPDOWN_SELECTED}>{CAT_DROPDOWN_INDENT}{CAT_DROPDOWN_NAME}</option>
+  <!-- END showCategories -->
 </select>
 </td>
-<td nowrap="nowrap"> 
+<td nowrap="nowrap">
 <input type="text" name="settingsThumbSizeAbsHeight" maxlength="4" size="5" onchange="settingsChanged();checkAbsWidth();" value="{SETTINGS_THUMBSIZE_ABS_HEIGHT}" {SETTINGS_THUMBSIZE_ABS_HEIGHT_DIS} />
 &nbsp;{TXT_SETTINGS_THUMBSIZE_ABS_HEIGHT}</td>
 
@@ -253,56 +253,56 @@ function copyText(strType,strValue) {
 <input type="hidden" name="settingsAllImagesIds" value="{HIDDEN_ALL_IMAGES_IDS}" />
 <br /><br />
   <table width="100%" cellspacing="0" cellpadding="3" border="0" align="top" class="adminlist">
-    <tr> 
-      <th nowrap="nowrap" width="20%"> 
+    <tr>
+      <th nowrap="nowrap" width="20%">
         <div align="left">#</div>
       </th>
-      <th nowrap="nowrap" width="20%"> 
+      <th nowrap="nowrap" width="20%">
         <div align="left">{TXT_TITLE_NAME}</div>
       </th>
-      <th nowrap="nowrap" width="15%"> 
+      <th nowrap="nowrap" width="15%">
         <div align="left">{TXT_TITLE_UPLOADDATE}</div>
       </th>
-      <th nowrap="nowrap" width="15%"> 
+      <th nowrap="nowrap" width="15%">
         <div align="left">{TXT_TITLE_SIZE_O}</div>
       </th>
-      <th nowrap="nowrap" width="15%"> 
+      <th nowrap="nowrap" width="15%">
         <div align="left">{TXT_TITLE_SIZE_T}</div>
       </th>
-      <th nowrap="nowrap" width="20%"> 
+      <th nowrap="nowrap" width="20%">
         <div align="left">{TXT_TITLE_CATEGORY}</div>
       </th>
-      <th nowrap="nowrap" align="center"> 
+      <th nowrap="nowrap" align="center">
         <div align="left">{TXT_TITLE_ACTIVE}</div>
       </th>
-      <th nowrap="nowrap"> 
+      <th nowrap="nowrap">
         <div align="left"></div>
       </th>
     </tr>
     <!-- BEGIN showImages -->
-    <tr class="row{IMAGES_ROWCLASS}"> 
+    <tr class="row{IMAGES_ROWCLASS}">
       <td valign="top"><img border="0" src="{IMAGES_THUMB_SOURCE}" alt="" /></td>
-      <td valign="top" class="imageNameContainer"> 
+      <td valign="top" class="imageNameContainer">
         <input type="text" name="imageName{IMAGES_ID}" onChange="copyText('imageName_{IMAGES_ID}_',this.value);" value="{IMAGES_NAME}" disabled="disabled" />&nbsp;<a href="javascript:showOrHide('divLangName_{IMAGES_ID}');">{TXT_EXTENDED}</a>
-		<div id="divLangName_{IMAGES_ID}" style="display: none;">
-			<!-- BEGIN showNameFields -->
-			<input name="imageName_{NAMEFIELDS_IMID}_{NAMEFIELDS_LID}" value="{NAMEFIELDS_IMVALUE}" style="margin-top:1px;" disabled="disabled">&nbsp;<label for="imageName_{NAMEFIELDS_IMID}_{NAMEFIELDS_LID}">{NAMEFIELDS_LANGUAGE}</label> <br />
-			<!-- END showNameFields -->
-		</div>
+    <div id="divLangName_{IMAGES_ID}" style="display: none;">
+      <!-- BEGIN showNameFields -->
+      <input name="imageName_{NAMEFIELDS_IMID}_{NAMEFIELDS_LID}" value="{NAMEFIELDS_IMVALUE}" style="margin-top:1px;" disabled="disabled">&nbsp;<label for="imageName_{NAMEFIELDS_IMID}_{NAMEFIELDS_LID}">{NAMEFIELDS_LANGUAGE}</label> <br />
+      <!-- END showNameFields -->
+    </div>
       </td>
       <td valign="top">{IMAGES_UPLOADDATE}</td>
       <td valign="top">{IMAGES_SIZE_O}kB&nbsp;({IMAGES_RESO_O})</td>
       <td valign="top">{IMAGES_SIZE_T}kb&nbsp;({IMAGES_RESO_T})</td>
-      <td valign="top"> 
+      <td valign="top">
         <select name="imageCategory{IMAGES_ID}" {CAT_DROPDOWN_DISABLED}>
             <option value="0">{TXT_DETAILS_CATEGORYSELECT}</option>
             <option value="0">----------------------------</option>
-        	<!-- BEGIN showCategoriesPerImage -->
-        	<option value="{CAT_DROPDOWN_VALUE}" {CAT_DROPDOWN_SELECTED}>{CAT_DROPDOWN_INDENT}{CAT_DROPDOWN_NAME}</option>
-        	<!-- END showCategoriesPerImage -->
+          <!-- BEGIN showCategoriesPerImage -->
+          <option value="{CAT_DROPDOWN_VALUE}" {CAT_DROPDOWN_SELECTED}>{CAT_DROPDOWN_INDENT}{CAT_DROPDOWN_NAME}</option>
+          <!-- END showCategoriesPerImage -->
         </select>
       </td>
-      <td valign="top" align="center"> 
+      <td valign="top" align="center">
         <input type="checkbox" name="imageActive{IMAGES_ID}" value="1" disabled="disabled" checked="checked" />
       </td>
       <td valign="top"><a href="javascript:deleteImage('{IMAGES_ID}')" target="_self"><img src="../core/Core/View/Media/icons/delete.gif" border="0" alt="l&ouml;schen" title="l&ouml;schen" /></a></td>

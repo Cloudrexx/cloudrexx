@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,10 +24,10 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * EventListener for Calendar
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
@@ -41,14 +41,14 @@ use Cx\Core\Event\Model\Entity\DefaultEventListener;
 
 /**
  * EventListener for Calendar
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
  * @subpackage  module_calendar
  */
 class CalendarEventListener extends DefaultEventListener {
-   
+
     public function SearchFindContent($search) {
         $term_db = $search->getTerm();
         $query = \Cx\Modules\Calendar\Controller\CalendarEvent::getEventSearchQuery($term_db);

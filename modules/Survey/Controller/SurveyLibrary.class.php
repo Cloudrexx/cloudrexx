@@ -50,44 +50,44 @@ namespace Cx\Modules\Survey\Controller;
  */
 class SurveyLibrary {
 
-	var $_intLangId;
-	var $_arrSettings           = array();	
-	var $_arrSurveyTranslations = array();
-	var $_arrSurveyValues       = array();
-        
+    var $_intLangId;
+    var $_arrSettings           = array();
+    var $_arrSurveyTranslations = array();
+    var $_arrSurveyValues       = array();
+
         /**
          * module name
-         * 
+         *
          * @var string
          */
         public $moduleName    = 'Survey';
         public $moduleLangVar = 'SURVEY';
 
-	/**
-	 * Constructor
-	 */
-	function __construct()
-	{
-		$this->_arrLanguages 		= $this->createLanguageArray();
-		$this->_arrSettings		= $this->createSettingsArray();
-		$this->_arrSurveyTranslations   = $this->createSurveyTranslationArray();
-		$this->_arrSurveyValues		= $this->createSurveyValuesArray();
-	}
+    /**
+     * Constructor
+     */
+    function __construct()
+    {
+        $this->_arrLanguages         = $this->createLanguageArray();
+        $this->_arrSettings        = $this->createSettingsArray();
+        $this->_arrSurveyTranslations   = $this->createSurveyTranslationArray();
+        $this->_arrSurveyValues        = $this->createSurveyValuesArray();
+    }
 
 
-	/**
-	 * Creates an array containing all frontend-languages. Example: $arrValue[$langId]['short'] or $arrValue[$langId]['long']
-	 *
-	 * @global 	object		$objDatabase
-	 * @return	array		$arrReturn
-	 */
-	function createLanguageArray() {
-		global $objDatabase;
+    /**
+     * Creates an array containing all frontend-languages. Example: $arrValue[$langId]['short'] or $arrValue[$langId]['long']
+     *
+     * @global     object        $objDatabase
+     * @return    array        $arrReturn
+     */
+    function createLanguageArray() {
+        global $objDatabase;
 
-		$arrReturn = array();
-		$objResult = $objDatabase->Execute('SELECT id,
+        $arrReturn = array();
+        $objResult = $objDatabase->Execute('SELECT id,
                                                            lang,
-                                                           FROM	'.DBPREFIX.'languages
+                                                           FROM    '.DBPREFIX.'languages
                                                            WHERE frontend=1
                                                            ORDER BY id');
                 if ($objResult) {
@@ -96,43 +96,43 @@ class SurveyLibrary {
                         $objResult->MoveNext();
                     }
                 }
-		
-		return $arrReturn;
-	}
+
+        return $arrReturn;
+    }
 
 
-	/**
-	 * Create an array containing all settings. Exapmle: $arrSettings['setname']
-	 *
-	 * @global 	object		$objDatabase
-	 * @return 	array		$arrReturn
-	 */
-	function createSettingsArray() {
-		global $objDatabase;
+    /**
+     * Create an array containing all settings. Exapmle: $arrSettings['setname']
+     *
+     * @global     object        $objDatabase
+     * @return     array        $arrReturn
+     */
+    function createSettingsArray() {
+        global $objDatabase;
 
-		$arrReturn = array();
+        $arrReturn = array();
 
-		$objResult = $objDatabase->Execute('SELECT name,
+        $objResult = $objDatabase->Execute('SELECT name,
                                                            value
-                                                           FROM	'.DBPREFIX.'module_survey_settings');
-		if ($objResult) {
+                                                           FROM    '.DBPREFIX.'module_survey_settings');
+        if ($objResult) {
                     while (!$objResult->EOF) {
                         $arrReturn[$objResult->fields['name']] = $objResult->fields['value'];
                         $objResult->MoveNext();
                     }
                 }
-                
-		return $arrReturn;
-	}
+
+        return $arrReturn;
+    }
 
 
-	/**
-	 * Creates an array containing all translations of the surveys. Example: $arrValue[$surveyId][$langId].
-	 *
-	 * @global 	object		$objDatabase
-	 * @return	array		$arrReturn
-	 */
-	function createSurveyTranslationArray() {
+    /**
+     * Creates an array containing all translations of the surveys. Example: $arrValue[$surveyId][$langId].
+     *
+     * @global     object        $objDatabase
+     * @return    array        $arrReturn
+     */
+    function createSurveyTranslationArray() {
             global $objDatabase;
 
             $arrReturn = array();
@@ -148,18 +148,18 @@ class SurveyLibrary {
                     $objResult->MoveNext();
                 }
             }
-            
+
             return $arrReturn;
-	}
+    }
 
 
-	/**
-	 * Creates an array containing all values of the surveys. Example: $arrValue[randomIndex]['xxx'].
-	 *
-	 * @global 	object		$objDatabase
-	 * @return	array		$arrReturn
-	 */
-	function createSurveyValuesArray() {
+    /**
+     * Creates an array containing all values of the surveys. Example: $arrValue[randomIndex]['xxx'].
+     *
+     * @global     object        $objDatabase
+     * @return    array        $arrReturn
+     */
+    function createSurveyValuesArray() {
             global $objDatabase;
 
             $arrReturn = array();
@@ -173,7 +173,7 @@ class SurveyLibrary {
                                                        isExtended,
                                                        isCommentable,
                                                        isHomeBox
-                                                       FROM	'.DBPREFIX.'module_survey_groups
+                                                       FROM    '.DBPREFIX.'module_survey_groups
                                                        ORDER BY created DESC');
 
             $intIndex = 0;
@@ -195,16 +195,16 @@ class SurveyLibrary {
             }
 
             return $arrReturn;
-	}
+    }
 
 
-	/**
-	 * Get the index-value for the surveyValueArray for a desired survey.
-	 *
-	 * @param	integer		$intSurveyId
-	 * @return	integer		Index for the surveyValueArray. If the id was not found, -1 will be returned.
-	 */
-	function getSurveyArrayIndex($intSurveyId) {
+    /**
+     * Get the index-value for the surveyValueArray for a desired survey.
+     *
+     * @param    integer        $intSurveyId
+     * @return    integer        Index for the surveyValueArray. If the id was not found, -1 will be returned.
+     */
+    function getSurveyArrayIndex($intSurveyId) {
             $intSurveyId = intval($intSurveyId);
 
             foreach ($this->_arrSurveyValues as $intIndex => $arrValues) {
@@ -214,5 +214,5 @@ class SurveyLibrary {
             }
 
             return -1;
-	}
+    }
 }

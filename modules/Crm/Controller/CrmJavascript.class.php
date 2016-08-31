@@ -84,282 +84,6 @@ class CrmJavascript {
         $CSRFPARAM                            = \Cx\Core\Csrf\Controller\Csrf::param();
 
         $javascript = <<<END
-<script type="text/javascript" src="../lib/javascript/jquery.js"></script>        
-        <script language="JavaScript" type="text/javascript">
-          var \$j  = jQuery.noConflict(); 
-          \$j(document).ready(function () {
-          \$j("input").keyup(function () {
-                \$j(this).css("border","1px solid #0A50A1");
-          });
-          \$j("select").change(function () {
-                \$j(this).css("border","1px solid #0A50A1");
-          });          
-          });        
-        //<![CDATA[
-        function trim(sString)
-{
-while (sString.substring(0,1) == ' ')
-{
-sString = sString.substring(1, sString.length);
-}
-while (sString.substring(sString.length-1, sString.length) == ' ')
-{
-sString = sString.substring(0,sString.length-1);
-}
-return sString;
-}
-
-function ltrim(s)
-{
-	var l=0;
-	while(l < s.length && s[l] == ' ')
-	{	l++; }
-	return s.substring(l, s.length);
-}
-
-function rtrim(s)
-{
-	var r=s.length -1;
-	while(r > 0 && s[r] == ' ')
-	{	r-=1;	}
-	return s.substring(0, r+1);
-}
-function IsNumeric(strString)
-   //  check for valid numeric strings
-   {
-   var strValidChars = "0123456789";
-   var strChar;
-   var blnResult = true;
-
-   if (strString.length == 0) return false;
-
-   //  test strString consists of valid characters listed above
-   for (i = 0; i < strString.length && blnResult == true; i++)
-      {
-      strChar = strString.charAt(i);
-      if (strValidChars.indexOf(strChar) == -1)
-         {
-         blnResult = false;
-         }
-      }
-   return blnResult;
-   }
-
-
-function checkValidations() {
-     \$j("input, select").css("border","1px solid #0A50A1");
-     var errors =new  Array();
-     var errChk;
-    var name   = document.getElementById("name").value;
-    var sorting = document.getElementById("sortingNumber").value;
-    if(trim(name)=="") {
- //       alert("$TXT_ENTER_CURRENCY_FIELD");
-        errChk = 1;
-        document.getElementById("name").style.border = "1px solid red";     
-//		return false;
-    }
-//       else if(sorting == ""){
-//                alert("$TXT_ENTER_SORTING");
-//	        document.getElementById("sortingNumber").style.border = "1px solid red";     
-//                document.getElementById("sortingNumber").value = "";
-//                return false;
-//        }
-        if((trim(sorting) != "") && (IsNumeric(sorting) == false)){
-            errChk = 1;
-	        document.getElementById("sortingNumber").style.border = "1px solid red";     
-            document.getElementById("sortingNumber").value = "";
-//            return false;
-        }
-        
-        return showErrors(errors, errChk);
-}
-function showErrors(errors,  errChk) {
-    if ( errors.length >= 1 || errChk == 1) {
-                if (errChk == 1 && errors.length >= 1) {
-                    errString = errors.join('<br />');
-                    \$j('#formerr').html("$TXT_MANDATORY_ERROR<br />"+errString);
-                } else if (  errors.length >= 1) {
-                    errString = errors.join('<br />');
-                    \$j('#formerr').html(errString);       
-                } else {
-                    \$j('#formerr').html("$TXT_MANDATORY_ERROR");
-                }       
-       \$j('#formerr').css('display','block');
-       //\$j('#formerr').html(errString);       
-        return false;
-    } else {
-        \$j('#formerr').html('');
-        \$j('#formerr').css('display', 'none');
-        return true;
-    } 
-}
-
-function checkValidationsEdit() {
-     \$j("input, select").css("border","1px solid #0A50A1");
-     var errors =new  Array();
-     var errChk;
-     var name   = document.getElementById("name").value; 
-     var sorting = document.getElementById("sortingNumber").value;          
-    if(trim(name)=="") {
-//        alert("$TXT_ENTER_CURRENCY_FIELD");
-        errChk = 1;
-        document.getElementById("name").style.border = "1px solid red";     
-		//return false;
-    }
-      if((trim(sorting) != "") && (IsNumeric(sorting) == false)){
-            errors.push("$TXT_SORTING_NUMERIC");
-	        document.getElementById("sortingNumber").style.border = "1px solid red";     
-            document.getElementById("sortingNumber").value = "";
-//            return false;
-        }
-    return showErrors(errors, errChk);
-}
-function showErrors(errors,  errChk) {
-    if ( errors.length >= 1 || errChk == 1) {
-                if (errChk == 1 && errors.length >= 1) {
-                    errString = errors.join('<br />');
-                    \$j('#formerr').html("$TXT_MANDATORY_ERROR<br />"+errString);
-                } else if (  errors.length >= 1) {
-                    errString = errors.join('<br />');
-                    \$j('#formerr').html(errString);       
-                } else {
-                    \$j('#formerr').html("$TXT_MANDATORY_ERROR");
-                }       
-       \$j('#formerr').css('display','block');
-       //\$j('#formerr').html(errString);       
-        return false;
-    } else {
-        \$j('#formerr').html('');
-        \$j('#formerr').css('display', 'none');
-        return true;
-    } 
-}
-
-function selectMultiAction() {
-
-
-	with (document.frmShowCurrencyEntries) {
-                             var chks = document.getElementsByName('selectedEntriesId[]');
-                             var hasChecked = false;
-                             // Get the checkbox array length and iterate it to see if any of them is selected
-                             for (var i = 0; i < chks.length; i++){
-                                if (chks[i].checked){
-                                      hasChecked = true;
-                                      break;
-                                }
-                             }
-                               if (!hasChecked) {
-                                      alert("$TXT_CRM_NOTHING_SELECTED");
-                                      document.frmShowCurrencyEntries.frmShowEntries_MultiAction.value=0;
-                                      document.frmShowCurrencyEntries.frmShowEntries_MultiAction.focus();
-                                      return false;
-                               }
-		switch (frmShowEntries_MultiAction.value) {
-
-			case 'delete':
-                if (confirm("$TXT_CRM_SURE_TO_DELETE_SELECTED_ENTRIES")) {
-					action='index.php?cmd=$MODULE_NAME&act=deleteCurrency&$CSRFPARAM';
-					submit();
-				}
-				else{
-                  frmShowEntries_MultiAction.value=0;
-                }
-
-			break;
-			default: //do nothing
-		}
-                if(frmShowEntries_MultiAction.value == "sort"){
-                             var sortText = document.getElementsByName('form_pos[]');
-                             var SortArray = new Array();
-                             var cond=0;
-                             for (var i = 0; i < sortText.length; i++){
-
-				  if(sortText[i].value==""){
-                                            alert("$TXT_ENTER_SORTING");
-                                      document.frmShowCurrencyEntries.frmShowEntries_MultiAction.value=0;
-                                      document.frmShowCurrencyEntries.frmShowEntries_MultiAction.focus();
-                                            cond=1;
-                                            return false;
-                                            break;
-                                       }
-				    else if(IsNumeric(sortText[i].value) == false){
-			                alert("$TXT_SORTING_NUMERIC");
-					 document.frmShowCurrencyEntries.frmShowEntries_MultiAction.value=0;
-                                         document.frmShowCurrencyEntries.frmShowEntries_MultiAction.focus();
-                                            cond=1;
-                                            return false;
-                                            break;
-                                       }
-
-//                                  for (var j = i+1; j < sortText.length; j++){
-//
-//					if(sortText[i].value==sortText[j].value){
-//                                            alert("$TXT_CRM_SAME_SORTVALUE");
-//                                      document.frmShowCurrencyEntries.frmShowEntries_MultiAction.value=0;
-//                                      document.frmShowCurrencyEntries.frmShowEntries_MultiAction.focus();
-//                                            cond=1;
-//                                            return false;
-//                                            break;
-//                                       }
-//
-//                                  }
-                                      if(cond == 1){
-                                         break;
-                                      }
-                             }
-					action='index.php?cmd=$MODULE_NAME&act=settings&tpl=currency&chg=1&$CSRFPARAM';
-					submit();
-                  }
-                if(frmShowEntries_MultiAction.value == "activate"){
-					action='index.php?cmd=$MODULE_NAME&act=settings&tpl=currencyChangeStatus&type=activate&$CSRFPARAM';
-					submit();
-                }
-                if(frmShowEntries_MultiAction.value == "deactivate"){
-					action='index.php?cmd=$MODULE_NAME&act=settings&tpl=currencyChangeStatus&type=deactivate&$CSRFPARAM';
-					submit();
-                }
-	}
-}
-
-function showList(id) {
-
-    document.getElementById(id).style.display="block";
-    return false;
-}
-
-function deleteEntry(entryId){
-            if(confirm("$TXT_CRM_ARE_YOU_SURE_TO_DELETE_THE_ENTRY"))
-                 window.location.replace("index.php?cmd=$MODULE_NAME&act=deleteCurrency&$CSRFPARAM&id="+entryId);
-        }
-//]]>
-</script>
-END;
-        return $javascript;
-    }
-
-
-    /**
-     * Get Add Notes Script
-     *
-     * @return String $javascript
-     */
-    function getAddNotesJavascript()
-    {
-        global $_CORELANG, $_ARRAYLANG, $objDatabase;
-
-
-        $TXT_ENTER_CURRENCY_FIELD = $_ARRAYLANG['TXT_ENTER_CURRENCY_FIELD'];
-        $TXT_NAME_FIELD_SHOULD_HAVE_ALPHA = $_ARRAYLANG['TXT_NAME_FIELD_SHOULD_HAVE_ALPHA'];
-        $TXT_CRM_ARE_YOU_SURE_TO_DELETE_THE_ENTRY =$_ARRAYLANG['TXT_CRM_ARE_YOU_SURE_TO_DELETE_THE_ENTRY'];
-        $TXT_CRM_SURE_TO_DELETE_SELECTED_ENTRIES = $_ARRAYLANG['TXT_CRM_SURE_TO_DELETE_SELECTED_ENTRIES'];
-        $TXT_CRM_NOTHING_SELECTED                = $_ARRAYLANG['TXT_CRM_NOTHING_SELECTED'];
-        $TXT_CRM_SAME_SORTVALUE                  = $_ARRAYLANG['TXT_CRM_SAME_SORTVALUE'];
-        $TXT_ENTER_SORTING                  = $_ARRAYLANG['TXT_ENTER_SORTING'];
-        $TXT_MANDATORY_ERROR                  = $_ARRAYLANG['TXT_CRM_MANDATORY_FIELDS_NOT_FILLED_OUT'];  
-        $TXT_SORTING_NUMERIC                  = $_ARRAYLANG['TXT_SORTING_NUMERIC'];
-        $MODULE_NAME                          = $this->moduleName;
-
-        $javascript = <<<END
 <script type="text/javascript" src="../lib/javascript/jquery.js"></script>
         <script language="JavaScript" type="text/javascript">
           var \$j  = jQuery.noConflict();
@@ -387,18 +111,18 @@ return sString;
 
 function ltrim(s)
 {
-	var l=0;
-	while(l < s.length && s[l] == ' ')
-	{	l++; }
-	return s.substring(l, s.length);
+    var l=0;
+    while(l < s.length && s[l] == ' ')
+    {    l++; }
+    return s.substring(l, s.length);
 }
 
 function rtrim(s)
 {
-	var r=s.length -1;
-	while(r > 0 && s[r] == ' ')
-	{	r-=1;	}
-	return s.substring(0, r+1);
+    var r=s.length -1;
+    while(r > 0 && s[r] == ' ')
+    {    r-=1;    }
+    return s.substring(0, r+1);
 }
 function IsNumeric(strString)
    //  check for valid numeric strings
@@ -428,22 +152,21 @@ function checkValidations() {
      var errChk;
     var name   = document.getElementById("name").value;
     var sorting = document.getElementById("sortingNumber").value;
-    if(trim(name)=="") { 
+    if(trim(name)=="") {
  //       alert("$TXT_ENTER_CURRENCY_FIELD");
         errChk = 1;
         document.getElementById("name").style.border = "1px solid red";
-//		return false;
+//        return false;
     }
 //       else if(sorting == ""){
 //                alert("$TXT_ENTER_SORTING");
-//	        document.getElementById("sortingNumber").style.border = "1px solid red";
+//            document.getElementById("sortingNumber").style.border = "1px solid red";
 //                document.getElementById("sortingNumber").value = "";
 //                return false;
 //        }
         if((trim(sorting) != "") && (IsNumeric(sorting) == false)){
-            errors.push("$TXT_SORTING_NUMERIC");
             errChk = 1;
-	        document.getElementById("sortingNumber").style.border = "1px solid red";
+            document.getElementById("sortingNumber").style.border = "1px solid red";
             document.getElementById("sortingNumber").value = "";
 //            return false;
         }
@@ -481,11 +204,288 @@ function checkValidationsEdit() {
 //        alert("$TXT_ENTER_CURRENCY_FIELD");
         errChk = 1;
         document.getElementById("name").style.border = "1px solid red";
-		//return false;
+        //return false;
     }
       if((trim(sorting) != "") && (IsNumeric(sorting) == false)){
             errors.push("$TXT_SORTING_NUMERIC");
-	        document.getElementById("sortingNumber").style.border = "1px solid red";
+            document.getElementById("sortingNumber").style.border = "1px solid red";
+            document.getElementById("sortingNumber").value = "";
+//            return false;
+        }
+    return showErrors(errors, errChk);
+}
+function showErrors(errors,  errChk) {
+    if ( errors.length >= 1 || errChk == 1) {
+                if (errChk == 1 && errors.length >= 1) {
+                    errString = errors.join('<br />');
+                    \$j('#formerr').html("$TXT_MANDATORY_ERROR<br />"+errString);
+                } else if (  errors.length >= 1) {
+                    errString = errors.join('<br />');
+                    \$j('#formerr').html(errString);
+                } else {
+                    \$j('#formerr').html("$TXT_MANDATORY_ERROR");
+                }
+       \$j('#formerr').css('display','block');
+       //\$j('#formerr').html(errString);
+        return false;
+    } else {
+        \$j('#formerr').html('');
+        \$j('#formerr').css('display', 'none');
+        return true;
+    }
+}
+
+function selectMultiAction() {
+
+
+    with (document.frmShowCurrencyEntries) {
+                             var chks = document.getElementsByName('selectedEntriesId[]');
+                             var hasChecked = false;
+                             // Get the checkbox array length and iterate it to see if any of them is selected
+                             for (var i = 0; i < chks.length; i++){
+                                if (chks[i].checked){
+                                      hasChecked = true;
+                                      break;
+                                }
+                             }
+                               if (!hasChecked) {
+                                      alert("$TXT_CRM_NOTHING_SELECTED");
+                                      document.frmShowCurrencyEntries.frmShowEntries_MultiAction.value=0;
+                                      document.frmShowCurrencyEntries.frmShowEntries_MultiAction.focus();
+                                      return false;
+                               }
+        switch (frmShowEntries_MultiAction.value) {
+
+            case 'delete':
+                if (confirm("$TXT_CRM_SURE_TO_DELETE_SELECTED_ENTRIES")) {
+                    action='index.php?cmd=$MODULE_NAME&act=deleteCurrency&$CSRFPARAM';
+                    submit();
+                }
+                else{
+                  frmShowEntries_MultiAction.value=0;
+                }
+
+            break;
+            default: //do nothing
+        }
+                if(frmShowEntries_MultiAction.value == "sort"){
+                             var sortText = document.getElementsByName('form_pos[]');
+                             var SortArray = new Array();
+                             var cond=0;
+                             for (var i = 0; i < sortText.length; i++){
+
+                  if(sortText[i].value==""){
+                                            alert("$TXT_ENTER_SORTING");
+                                      document.frmShowCurrencyEntries.frmShowEntries_MultiAction.value=0;
+                                      document.frmShowCurrencyEntries.frmShowEntries_MultiAction.focus();
+                                            cond=1;
+                                            return false;
+                                            break;
+                                       }
+                    else if(IsNumeric(sortText[i].value) == false){
+                            alert("$TXT_SORTING_NUMERIC");
+                     document.frmShowCurrencyEntries.frmShowEntries_MultiAction.value=0;
+                                         document.frmShowCurrencyEntries.frmShowEntries_MultiAction.focus();
+                                            cond=1;
+                                            return false;
+                                            break;
+                                       }
+
+//                                  for (var j = i+1; j < sortText.length; j++){
+//
+//                    if(sortText[i].value==sortText[j].value){
+//                                            alert("$TXT_CRM_SAME_SORTVALUE");
+//                                      document.frmShowCurrencyEntries.frmShowEntries_MultiAction.value=0;
+//                                      document.frmShowCurrencyEntries.frmShowEntries_MultiAction.focus();
+//                                            cond=1;
+//                                            return false;
+//                                            break;
+//                                       }
+//
+//                                  }
+                                      if(cond == 1){
+                                         break;
+                                      }
+                             }
+                    action='index.php?cmd=$MODULE_NAME&act=settings&tpl=currency&chg=1&$CSRFPARAM';
+                    submit();
+                  }
+                if(frmShowEntries_MultiAction.value == "activate"){
+                    action='index.php?cmd=$MODULE_NAME&act=settings&tpl=currencyChangeStatus&type=activate&$CSRFPARAM';
+                    submit();
+                }
+                if(frmShowEntries_MultiAction.value == "deactivate"){
+                    action='index.php?cmd=$MODULE_NAME&act=settings&tpl=currencyChangeStatus&type=deactivate&$CSRFPARAM';
+                    submit();
+                }
+    }
+}
+
+function showList(id) {
+
+    document.getElementById(id).style.display="block";
+    return false;
+}
+
+function deleteEntry(entryId){
+            if(confirm("$TXT_CRM_ARE_YOU_SURE_TO_DELETE_THE_ENTRY"))
+                 window.location.replace("index.php?cmd=$MODULE_NAME&act=deleteCurrency&$CSRFPARAM&id="+entryId);
+        }
+//]]>
+</script>
+END;
+        return $javascript;
+    }
+
+
+    /**
+     * Get Add Notes Script
+     *
+     * @return String $javascript
+     */
+    function getAddNotesJavascript()
+    {
+        global $_CORELANG, $_ARRAYLANG, $objDatabase;
+
+
+        $TXT_ENTER_CURRENCY_FIELD = $_ARRAYLANG['TXT_ENTER_CURRENCY_FIELD'];
+        $TXT_NAME_FIELD_SHOULD_HAVE_ALPHA = $_ARRAYLANG['TXT_NAME_FIELD_SHOULD_HAVE_ALPHA'];
+        $TXT_CRM_ARE_YOU_SURE_TO_DELETE_THE_ENTRY =$_ARRAYLANG['TXT_CRM_ARE_YOU_SURE_TO_DELETE_THE_ENTRY'];
+        $TXT_CRM_SURE_TO_DELETE_SELECTED_ENTRIES = $_ARRAYLANG['TXT_CRM_SURE_TO_DELETE_SELECTED_ENTRIES'];
+        $TXT_CRM_NOTHING_SELECTED                = $_ARRAYLANG['TXT_CRM_NOTHING_SELECTED'];
+        $TXT_CRM_SAME_SORTVALUE                  = $_ARRAYLANG['TXT_CRM_SAME_SORTVALUE'];
+        $TXT_ENTER_SORTING                  = $_ARRAYLANG['TXT_ENTER_SORTING'];
+        $TXT_MANDATORY_ERROR                  = $_ARRAYLANG['TXT_CRM_MANDATORY_FIELDS_NOT_FILLED_OUT'];
+        $TXT_SORTING_NUMERIC                  = $_ARRAYLANG['TXT_SORTING_NUMERIC'];
+        $MODULE_NAME                          = $this->moduleName;
+
+        $javascript = <<<END
+<script type="text/javascript" src="../lib/javascript/jquery.js"></script>
+        <script language="JavaScript" type="text/javascript">
+          var \$j  = jQuery.noConflict();
+          \$j(document).ready(function () {
+          \$j("input").keyup(function () {
+                \$j(this).css("border","1px solid #0A50A1");
+          });
+          \$j("select").change(function () {
+                \$j(this).css("border","1px solid #0A50A1");
+          });
+          });
+        //<![CDATA[
+        function trim(sString)
+{
+while (sString.substring(0,1) == ' ')
+{
+sString = sString.substring(1, sString.length);
+}
+while (sString.substring(sString.length-1, sString.length) == ' ')
+{
+sString = sString.substring(0,sString.length-1);
+}
+return sString;
+}
+
+function ltrim(s)
+{
+    var l=0;
+    while(l < s.length && s[l] == ' ')
+    {    l++; }
+    return s.substring(l, s.length);
+}
+
+function rtrim(s)
+{
+    var r=s.length -1;
+    while(r > 0 && s[r] == ' ')
+    {    r-=1;    }
+    return s.substring(0, r+1);
+}
+function IsNumeric(strString)
+   //  check for valid numeric strings
+   {
+   var strValidChars = "0123456789";
+   var strChar;
+   var blnResult = true;
+
+   if (strString.length == 0) return false;
+
+   //  test strString consists of valid characters listed above
+   for (i = 0; i < strString.length && blnResult == true; i++)
+      {
+      strChar = strString.charAt(i);
+      if (strValidChars.indexOf(strChar) == -1)
+         {
+         blnResult = false;
+         }
+      }
+   return blnResult;
+   }
+
+
+function checkValidations() {
+     \$j("input, select").css("border","1px solid #0A50A1");
+     var errors =new  Array();
+     var errChk;
+    var name   = document.getElementById("name").value;
+    var sorting = document.getElementById("sortingNumber").value;
+    if(trim(name)=="") {
+ //       alert("$TXT_ENTER_CURRENCY_FIELD");
+        errChk = 1;
+        document.getElementById("name").style.border = "1px solid red";
+//        return false;
+    }
+//       else if(sorting == ""){
+//                alert("$TXT_ENTER_SORTING");
+//            document.getElementById("sortingNumber").style.border = "1px solid red";
+//                document.getElementById("sortingNumber").value = "";
+//                return false;
+//        }
+        if((trim(sorting) != "") && (IsNumeric(sorting) == false)){
+            errors.push("$TXT_SORTING_NUMERIC");
+            errChk = 1;
+            document.getElementById("sortingNumber").style.border = "1px solid red";
+            document.getElementById("sortingNumber").value = "";
+//            return false;
+        }
+
+        return showErrors(errors, errChk);
+}
+function showErrors(errors,  errChk) {
+    if ( errors.length >= 1 || errChk == 1) {
+                if (errChk == 1 && errors.length >= 1) {
+                    errString = errors.join('<br />');
+                    \$j('#formerr').html("$TXT_MANDATORY_ERROR<br />"+errString);
+                } else if (  errors.length >= 1) {
+                    errString = errors.join('<br />');
+                    \$j('#formerr').html(errString);
+                } else {
+                    \$j('#formerr').html("$TXT_MANDATORY_ERROR");
+                }
+       \$j('#formerr').css('display','block');
+       //\$j('#formerr').html(errString);
+        return false;
+    } else {
+        \$j('#formerr').html('');
+        \$j('#formerr').css('display', 'none');
+        return true;
+    }
+}
+
+function checkValidationsEdit() {
+     \$j("input, select").css("border","1px solid #0A50A1");
+     var errors =new  Array();
+     var errChk;
+     var name   = document.getElementById("name").value;
+     var sorting = document.getElementById("sortingNumber").value;
+    if(trim(name)=="") {
+//        alert("$TXT_ENTER_CURRENCY_FIELD");
+        errChk = 1;
+        document.getElementById("name").style.border = "1px solid red";
+        //return false;
+    }
+      if((trim(sorting) != "") && (IsNumeric(sorting) == false)){
+            errors.push("$TXT_SORTING_NUMERIC");
+            document.getElementById("sortingNumber").style.border = "1px solid red";
             document.getElementById("sortingNumber").value = "";
 //            return false;
         }
@@ -531,7 +531,7 @@ END;
 
     /**
      * Get service type script
-     * 
+     *
      * @return String $javascript
      */
     function getServiceTypeJavascript()
@@ -547,13 +547,13 @@ END;
         $MODULE_NAME                               =  $this->moduleName;
         $javascript = <<<END
 
-  <script type="text/javascript" src="../lib/javascript/jquery.js"></script>   
+  <script type="text/javascript" src="../lib/javascript/jquery.js"></script>
   <script type="text/javascript">
-      var \$j  = jQuery.noConflict(); 
+      var \$j  = jQuery.noConflict();
 
         function isSpecialChars(s)
         {   var i;
-		var iChars = "_!@#$%^&*()+=-[]\\\';,./{}|\":<>?";
+        var iChars = "_!@#$%^&*()+=-[]\\\';,./{}|\":<>?";
             for (i = 0; i < s.length; i++)
             {
                 // Check that current character special chars.
@@ -601,9 +601,9 @@ var iChars = "_!@#$%^&*()+=-[]\\\';,./{}|\":<>?";
             }
         return sString;
         }
-        
+
     function checkAdditionalcontact() {
-  
+
     \$j("input, select").css("border","1px solid #0A50A1");
     \$j("input").keyup(function () {
                 \$j(this).css("border","1px solid #0A50A1");
@@ -612,34 +612,34 @@ var iChars = "_!@#$%^&*()+=-[]\\\';,./{}|\":<>?";
     var errChk;
         var supportcases = document.getElementById('support_cases').value;
         var service_price = document.getElementById('service_price').value;
-        
+
         if((trim(supportcases) != "") && (supportcases.search(/^[0-9]+$/))) {
         errors.push("$TXT_ENTER_SUPPORTCASES");
-		document.add_service_type_form.support_cases.style.border = "1px solid red";     
-		document.add_service_type_form.support_cases.value="";
+        document.add_service_type_form.support_cases.style.border = "1px solid red";
+        document.add_service_type_form.support_cases.value="";
     }
 
  if((trim(service_price)!= "") && (service_price.search(/^[0-9]+$/))) {
         errors.push("$TXT_ENTER_PRICE");
-		document.add_service_type_form.service_price.style.border = "1px solid red";     
-		document.add_service_type_form.service_price.value="";
+        document.add_service_type_form.service_price.style.border = "1px solid red";
+        document.add_service_type_form.service_price.value="";
     }
 
-       if ( errors.length >= 1 || errChk == 1 ) { 
+       if ( errors.length >= 1 || errChk == 1 ) {
          if ( errors.length >= 1 && errChk == 1 ) {
                 errString = errors.join('<br />');
-            } else if (  errors.length >= 1) { 
+            } else if (  errors.length >= 1) {
                     errString = errors.join('<br />');
-                    \$j('#formerr').html(errString);       
-            } 
+                    \$j('#formerr').html(errString);
+            }
               \$j('#formerr').css("display","block");
               return false;
         } else {
-           \$j('#formerr').html('');   
+           \$j('#formerr').html('');
             \$j('#formerr').css("display","none");
             document.getElementById('add_service_plan_type').style.display='none';
             document.getElementById('fade').style.display='none';
-            return true;            
+            return true;
         }
 
     }
@@ -654,7 +654,7 @@ function selectMultiAction() {
       with (document.frmShowCustomersEntries) {
              var chks = document.getElementsByName('selectedEntriesId[]');
              var hasChecked = false;
-            
+
              for (var i = 0; i < chks.length; i++){
                 if (chks[i].checked){
                       hasChecked = true;
@@ -669,16 +669,16 @@ function selectMultiAction() {
                       return false;
                }
                    switch (frmShowEntries_MultiAction.value) {
-			case 'delete':
-				if (confirm('$TXT_CRM_SURE_TO_DELETE_SELECTED_ENTRIES')) {
-					action='?cmd=$MODULE_NAME&act=deleteServiceType';
-					submit();
-				}
-				else{
+            case 'delete':
+                if (confirm('$TXT_CRM_SURE_TO_DELETE_SELECTED_ENTRIES')) {
+                    action='?cmd=$MODULE_NAME&act=deleteServiceType';
+                    submit();
+                }
+                else{
                 frmShowEntries_MultiAction.value=0;
                 }
-			break;
-		}
+            break;
+        }
 }
 }
 
@@ -703,13 +703,13 @@ END;
         $TXT_CRM_NOTHING_SELECTED                  =  $_ARRAYLANG['TXT_CRM_NOTHING_SELECTED'];
         $MODULE_NAME                               =  $this->moduleName;
         $javascript = <<<END
-  
- <script type="text/javascript" src="../lib/javascript/jquery.js"></script>   
+
+ <script type="text/javascript" src="../lib/javascript/jquery.js"></script>
  <script type="text/javascript">
-      var \$j  = jQuery.noConflict(); 
+      var \$j  = jQuery.noConflict();
       function isSpecialChars(s)
         {   var i;
-		var iChars = "_!@#$%^&*()+=-[]\\\';,./{}|\":<>?";
+        var iChars = "_!@#$%^&*()+=-[]\\\';,./{}|\":<>?";
             for (i = 0; i < s.length; i++)
             {
                 // Check that current character special chars.
@@ -757,44 +757,44 @@ END;
             }
         return sString;
         }
-        
+
     function checkHostingcontact() {
-  
+
     \$j("input, select").css("border","1px solid #0A50A1");
     \$j("input").keyup(function () {
                 \$j(this).css("border","1px solid #0A50A1");
           });
     var errors = new Array();
     var errChk;
-        
+
       var hosting_price = document.getElementById('hosting_price').value;
-   
-        
+
+
        if((trim(hosting_price) != "") && (hosting_price.search(/^[0-9]+$/))) {
         errors.push("$TXT_ENTER_PRICE");
-		document.add_hosting_type_form.hosting_price.style.border = "1px solid red";     
-		document.add_hosting_type_form.hosting_price.value="";
+        document.add_hosting_type_form.hosting_price.style.border = "1px solid red";
+        document.add_hosting_type_form.hosting_price.value="";
     }
 
-       
-        if ( errors.length >= 1 || errChk == 1 ) { 
+
+        if ( errors.length >= 1 || errChk == 1 ) {
 
             if ( errors.length >= 1 && errChk == 1 ) {
                 errString = errors.join('<br />');
 
-                  
-            } else if (  errors.length >= 1) { 
+
+            } else if (  errors.length >= 1) {
                     errString = errors.join('<br />');
-                    \$j('#formerr').html(errString);       
-            } 
+                    \$j('#formerr').html(errString);
+            }
               \$j('#formerr').css("display","block");
               return false;
         } else {
-           \$j('#formerr').html('');   
+           \$j('#formerr').html('');
             \$j('#formerr').css("display","none");
             document.getElementById('add_hostingtype').style.display='none';
             document.getElementById('fade').style.display='none';
-            return true;            
+            return true;
         }
 
     }
@@ -807,10 +807,10 @@ function deleteEntry(entryId){
 function selectMultiAction() {
 
 
-	with (document.frmShowCustomersEntries) {
+    with (document.frmShowCustomersEntries) {
              var chks = document.getElementsByName('selectedEntriesId[]');
              var hasChecked = false;
-            
+
              for (var i = 0; i < chks.length; i++){
                 if (chks[i].checked){
                       hasChecked = true;
@@ -825,16 +825,16 @@ function selectMultiAction() {
                       return false;
                }
 switch (frmShowEntries_MultiAction.value) {
-			case 'delete':
-				if (confirm('$TXT_CRM_SURE_TO_DELETE_SELECTED_ENTRIES')) {
-					action='?cmd=$MODULE_NAME&act=deleteHostingType';
-					submit();
-				}
-				else{
+            case 'delete':
+                if (confirm('$TXT_CRM_SURE_TO_DELETE_SELECTED_ENTRIES')) {
+                    action='?cmd=$MODULE_NAME&act=deleteHostingType';
+                    submit();
+                }
+                else{
                 frmShowEntries_MultiAction.value=0;
                 }
-			break;
-		}
+            break;
+        }
 }
 }
 </script>
@@ -860,27 +860,27 @@ END;
         $TXT_SUPPORT_TITLE                              =  $_ARRAYLANG['TXT_SUPPORT_TITLE'];
         $MODULE_NAME                          = $this->moduleName;
         $javascript = <<<END
- 
+
 
 
 
 
 <script language="JavaScript" type="text/javascript">
 //<![CDATA[
-\$j = jQuery.noConflict(); 
+\$j = jQuery.noConflict();
 \$j(function() {
     \$j( "#issue_date,#support_date,#registrationdate,#nextinvoice" ).datepicker({
-	    showWeek: true,
-	    firstDay: 1,
+        showWeek: true,
+        firstDay: 1,
     });
-    
+
     \$j('.plan_link').click(function(){
         planId_class = \$j(this).attr('id');
-	planId = planId_class.split('_');
-	planId = planId[2]; 
+    planId = planId_class.split('_');
+    planId = planId[2];
          \$j('#show_support_plan .support_id').html(\$j('#service_'+planId+' .service_id').text());
         \$j('#show_support_plan .support_type').html(\$j('#service_'+planId+' .service_type').text());
-	\$j('#show_support_plan .support_date').html(\$j('#service_'+planId+' .service_date').text());
+    \$j('#show_support_plan .support_date').html(\$j('#service_'+planId+' .service_date').text());
         \$j('#show_support_plan .support_until').html(\$j('#service_'+planId+' .service_until').text());
         \$j('#show_support_plan .support_support').html(\$j('#service_'+planId+' .serice_support').text());
         \$j('#show_support_plan .support_cases').html(\$j('#service_'+planId+' .service_cases').text());
@@ -893,25 +893,25 @@ END;
 
 function deleteSupportCase(entryId,customId){
             if(confirm("$TXT_CRM_ARE_YOU_SURE_DELETE_ENTRIES"))
-       
+
        window.location.replace("index.php?cmd=$MODULE_NAME&act=customers&tpl=showcustdetail&act=deleteCustomerSupportcase&id="+entryId+"&customId="+customId);
-     
+
         }
-        
+
   function deleteHosting(entryId,customId){
             if(confirm("$TXT_CRM_ARE_YOU_SURE_DELETE_ENTRIES"))
-       
+
        window.location.replace("index.php?cmd=Crm&act=customers&tpl=showcustdetail&action=addHosting&act=deleteCustomerHosting&id="+entryId+"&customId="+customId);
-     
+
         }
          function deleteServicePlan(entryId,customerId){
             if(confirm("$TXT_CRM_ARE_YOU_SURE_DELETE_ENTRIES"))
   window.location.replace("index.php?cmd=$MODULE_NAME&act=customers&tpl=showcustdetail&act=deleteCustomerServiceplan&seriveId="+entryId+"&customerId="+customerId);
-   
+
         }
 
 
-function selectTab(displayTab) { 
+function selectTab(displayTab) {
     \$j('.Entries').css('display','none');
     \$j('#'+displayTab).css('display','block');
     \$j('#tabmenu a').removeClass('active');
@@ -924,12 +924,12 @@ function selectTab(displayTab) {
 
 
 
-\$j = jQuery.noConflict(); 
+\$j = jQuery.noConflict();
 
 
   function isSpecialChars(s)
         {   var i;
-		var iChars = "_!@#$%^&*()+=-[]\\\';,./{}|\":<>?";
+        var iChars = "_!@#$%^&*()+=-[]\\\';,./{}|\":<>?";
             for (i = 0; i < s.length; i++)
             {
                 // Check that current character special chars.
@@ -979,7 +979,7 @@ var iChars = "_!@#$%^&*()+=-[]\\\';,./{}|\":<>?";
             }
         return sString;
         }
-        
+
  function checkServiceCases() {
 
     \$j("input, select").css("border","1px solid #0A50A1");
@@ -989,42 +989,42 @@ var iChars = "_!@#$%^&*()+=-[]\\\';,./{}|\":<>?";
     var errors = new Array();
     var errChk;
 
-       
+
         var ticket = document.getElementById('support_ticket').value;
         var title= document.getElementById('support_title').value;
-        
+
 
         if((trim(ticket) != "") && (ticket.search(/^[0-9]+$/))) {
         errors.push("$TXT_SUPPORTTICKET");
-		document.add_support_case_form.support_ticket.style.border = "1px solid red";     
-		document.add_support_case_form.support_ticket.value="";
+        document.add_support_case_form.support_ticket.style.border = "1px solid red";
+        document.add_support_case_form.support_ticket.value="";
     }
 
        if((trim(title) != "") && (isSpecialChars(title) == true || isInteger(title) == true || isSpecialInteger(title) == true)) {
-	  errors.push("$TXT_SUPPORT_TITLE");
+      errors.push("$TXT_SUPPORT_TITLE");
           document.add_support_case_form.support_title.style.border = "1px solid red";
-	  document.add_support_case_form.support_title.value="";
-   }        
-      
-       
-        if ( errors.length >= 1 || errChk == 1 ) { 
+      document.add_support_case_form.support_title.value="";
+   }
+
+
+        if ( errors.length >= 1 || errChk == 1 ) {
 
             if ( errors.length >= 1 && errChk == 1 ) {
                 errString = errors.join('<br />');
 
-                   
-            } else if (  errors.length >= 1) { 
+
+            } else if (  errors.length >= 1) {
                     errString = errors.join('<br />');
-                    \$j('#supportcaseerr').html(errString);       
+                    \$j('#supportcaseerr').html(errString);
             }
               \$j('#supportcaseerr').css("display","block");
               return false;
         } else {
-           \$j('#supportcaseerr').html('');   
+           \$j('#supportcaseerr').html('');
             \$j('#supportcaseerr').css("display","none");
             document.getElementById('add_support_case').style.display='none';
             document.getElementById('fade').style.display='none';
-            return true;            
+            return true;
         }
 
     }
@@ -1046,39 +1046,39 @@ var iChars = "_!@#$%^&*()+=-[]\\\';,./{}|\":<>?";
        var price = document.getElementById('hosting_price').value;
        var additionalinformation = document.getElementById('additionalinformation').value;
  if ((trim(domain) != "") && (isSpecialChars(domain) == true || isInteger(domain) == true || isSpecialInteger(domain) == true)) {
-	  errors.push("$TXT_ENTER_DOMAINNAME");
+      errors.push("$TXT_ENTER_DOMAINNAME");
           document.hosting_case_form.domain.style.border = "1px solid red";
-	  document.hosting_case_form.domain.value="";
-   }        
+      document.hosting_case_form.domain.value="";
+   }
 
 if((trim(price) != "") && (price.search(/^[0-9]+$/))) {
         errors.push("$TXT_ENTER_PRICE");
-		document.hosting_case_form.hosting_price.style.border = "1px solid red";     
-		document.hosting_case_form.hosting_price.value="";
+        document.hosting_case_form.hosting_price.style.border = "1px solid red";
+        document.hosting_case_form.hosting_price.value="";
     }
 
-    if ( errors.length >= 1 || errChk == 1 ) { 
+    if ( errors.length >= 1 || errChk == 1 ) {
 
             if ( errors.length >= 1 && errChk == 1 ) {
                 errString = errors.join('<br />');
 
-                  
-            } else if (  errors.length >= 1) { 
+
+            } else if (  errors.length >= 1) {
                     errString = errors.join('<br />');
-                    \$j('#hostingcaseerr').html(errString);       
-            } 
+                    \$j('#hostingcaseerr').html(errString);
+            }
               \$j('#hostingcaseerr').css("display","block");
               return false;
         } else {
-           \$j('#hostingcaseerr').html('');   
+           \$j('#hostingcaseerr').html('');
             \$j('#hostingcaseerr').css("display","none");
             document.getElementById('add_hosting').style.display='none';
             document.getElementById('fade').style.display='none';
-            return true;            
+            return true;
         }
 
     }
-  
+
 function showList(id) {
     document.getElementById(id).style.display="block";
     return false;
@@ -1109,24 +1109,24 @@ END;
         $TXT_CRM_SAME_SORTVALUE                   = $_ARRAYLANG['TXT_CRM_SAME_SORTVALUE'];
         $TXT_ENTER_SORTING                    = $_ARRAYLANG['TXT_ENTER_SORTING'];
         $TXT_SORTING_NUMERIC                  = $_ARRAYLANG['TXT_SORTING_NUMERIC'];
-        $TXT_MANDATORY_ERROR                  = $_ARRAYLANG['TXT_CRM_MANDATORY_FIELDS_NOT_FILLED_OUT'];  
+        $TXT_MANDATORY_ERROR                  = $_ARRAYLANG['TXT_CRM_MANDATORY_FIELDS_NOT_FILLED_OUT'];
         $MODULE_NAME                          = $this->moduleName;
         $CSRFPARAM                            = \Cx\Core\Csrf\Controller\Csrf::param();
 
 
         $javascript = <<<END
-        <script type="text/javascript" src="../lib/javascript/jquery.js"></script> 
+        <script type="text/javascript" src="../lib/javascript/jquery.js"></script>
         <script language="JavaScript" type="text/javascript">
-          var \$j  = jQuery.noConflict(); 
+          var \$j  = jQuery.noConflict();
           \$j(document).ready(function () {
           \$j("input").keyup(function () {
                 \$j(this).css("border","1px solid #0A50A1");
           });
           \$j("select").change(function () {
                 \$j(this).css("border","1px solid #0A50A1");
-          });          
           });
-                  
+          });
+
         //<![CDATA[
         function trim(sString)
 {
@@ -1143,18 +1143,18 @@ return sString;
 
 function ltrim(s)
 {
-	var l=0;
-	while(l < s.length && s[l] == ' ')
-	{	l++; }
-	return s.substring(l, s.length);
+    var l=0;
+    while(l < s.length && s[l] == ' ')
+    {    l++; }
+    return s.substring(l, s.length);
 }
 
 function rtrim(s)
 {
-	var r=s.length -1;
-	while(r > 0 && s[r] == ' ')
-	{	r-=1;	}
-	return s.substring(0, r+1);
+    var r=s.length -1;
+    while(r > 0 && s[r] == ' ')
+    {    r-=1;    }
+    return s.substring(0, r+1);
 }
 
 function IsNumeric(strString)
@@ -1182,7 +1182,7 @@ function IsNumeric(strString)
 function selectMultiAction() {
 
 
-	with (document.frmShowCustomerEntries) {
+    with (document.frmShowCustomerEntries) {
                              var chks = document.getElementsByName('selectedEntriesId[]');
                              var hasChecked = false;
                              // Get the checkbox array length and iterate it to see if any of them is selected
@@ -1198,33 +1198,33 @@ function selectMultiAction() {
                                       document.frmShowCustomerEntries.frmShowEntries_MultiAction.focus();
                                       return false;
                                }
-		switch (frmShowEntries_MultiAction.value) {
-			case 'delete':
+        switch (frmShowEntries_MultiAction.value) {
+            case 'delete':
                 if (confirm("$TXT_CRM_SURE_TO_DELETE_SELECTED_ENTRIES")) {
-					action='index.php?cmd=$MODULE_NAME&act=deleteCustomerTypes&$CSRFPARAM';
-					submit();
-				}
-				else{
+                    action='index.php?cmd=$MODULE_NAME&act=deleteCustomerTypes&$CSRFPARAM';
+                    submit();
+                }
+                else{
                 frmShowEntries_MultiAction.value=0;
                 }
-			break;
-			default: //do nothing
-		}
+            break;
+            default: //do nothing
+        }
                 if(frmShowEntries_MultiAction.value == "activate"){
-		action='index.php?cmd=$MODULE_NAME&act=settings&tpl=customerTypeChangeStatus&type=activate';
-					submit();
+        action='index.php?cmd=$MODULE_NAME&act=settings&tpl=customerTypeChangeStatus&type=activate';
+                    submit();
                 }
                 if(frmShowEntries_MultiAction.value == "deactivate"){
-				action='index.php?cmd=$MODULE_NAME&act=settings&tpl=customerTypeChangeStatus&type=deactivate';
-					submit();
+                action='index.php?cmd=$MODULE_NAME&act=settings&tpl=customerTypeChangeStatus&type=deactivate';
+                    submit();
                 }
                 if(frmShowEntries_MultiAction.value == "sort"){
                              var sortText = document.getElementsByName('form_pos[]');
-			     var SortArray = new Array();
+                 var SortArray = new Array();
                              var cond=0;
                              for (var i = 0; i < sortText.length; i++){
 
-					if(sortText[i].value==""){
+                    if(sortText[i].value==""){
                                             alert("$TXT_ENTER_SORTING");
                                       document.frmShowCustomerEntries.frmShowEntries_MultiAction.value=0;
                                       document.frmShowCustomerEntries.frmShowEntries_MultiAction.focus();
@@ -1233,8 +1233,8 @@ function selectMultiAction() {
                                             break;
                                        }
                                       else if(IsNumeric(sortText[i].value) == false){
-			                alert("$TXT_SORTING_NUMERIC");
-					 document.frmShowCustomerEntries.frmShowEntries_MultiAction.value=0;
+                            alert("$TXT_SORTING_NUMERIC");
+                     document.frmShowCustomerEntries.frmShowEntries_MultiAction.value=0;
                                          document.frmShowCustomerEntries.frmShowEntries_MultiAction.focus();
                                             cond=1;
                                             return false;
@@ -1245,10 +1245,10 @@ function selectMultiAction() {
                                          break;
                                       }
                              }
-					action='index.php?cmd=$MODULE_NAME&act=settings&tpl=customertypes&chg=1';
-					submit();
+                    action='index.php?cmd=$MODULE_NAME&act=settings&tpl=customertypes&chg=1';
+                    submit();
                   }
-	}
+    }
 }
 
 function showList(id) {
@@ -1267,7 +1267,7 @@ function checkValidations() {
 
           \$j("input, select").css("border","1px solid #0A50A1");
            var errors =new  Array();
-           var errChk;           
+           var errChk;
            var label           = document.getElementById("label").value;
            //var discountPercent = document.getElementById("discount").value;
            var sorting         = document.getElementById("sortingNumber").value;
@@ -1280,18 +1280,18 @@ function checkValidations() {
         if((trim(sorting) != "") && (IsNumeric(sorting) == false)) {
                 errors.push("$TXT_SORTING_NUMERIC");
                 errChk = 1;
-	        document.getElementById("sortingNumber").style.border = "1px solid red";
+            document.getElementById("sortingNumber").style.border = "1px solid red";
                 document.getElementById("sortingNumber").value = "";
         }
        /*if(trim(discountPercent) == "") {
         errChk = 1;
         document.getElementById("discount").style.border = "1px solid red";
-		document.getElementById("discount").value="";
+        document.getElementById("discount").value="";
 
     } else if(discountPercent.search(/^[0-9.]+$/)) {
         errors.push("$TXT_CRM_PLEASE_ENTER_DISCOUNT_PERCENT_IN_NUMBER");
-		document.getElementById("discount").style.border = "1px solid red";
-		document.getElementById("discount").value="";
+        document.getElementById("discount").style.border = "1px solid red";
+        document.getElementById("discount").value="";
     }*/
     if ( errors.length >= 1 || errChk == 1) {
                 if (errChk == 1 && errors.length >= 1) {
@@ -1299,10 +1299,10 @@ function checkValidations() {
                     \$j('#formerr').html("$TXT_MANDATORY_ERROR<br />"+errString);
                 } else if (  errors.length >= 1) {
                     errString = errors.join('<br />');
-                    \$j('#formerr').html(errString);       
+                    \$j('#formerr').html(errString);
                 } else {
                     \$j('#formerr').html("$TXT_MANDATORY_ERROR");
-                }       
+                }
        \$j('#formerr').css('display','block');
         return false;
     } else {
@@ -1339,20 +1339,20 @@ END;
 
         $TXT_CRM_SURE_TO_DELETE_SELECTED_ENTRIES = $_ARRAYLANG['TXT_CRM_SURE_TO_DELETE_SELECTED_ENTRIES'];
         $TXT_CRM_ARE_YOU_SURE_TO_DELETE_THE_ENTRY =$_ARRAYLANG['TXT_CRM_ARE_YOU_SURE_TO_DELETE_THE_ENTRY'];
-        $TXT_MANDATORY_ERROR                  = $_ARRAYLANG['TXT_CRM_MANDATORY_FIELDS_NOT_FILLED_OUT'];  
+        $TXT_MANDATORY_ERROR                  = $_ARRAYLANG['TXT_CRM_MANDATORY_FIELDS_NOT_FILLED_OUT'];
         $MODULE_NAME                          = $this->moduleName;
         $javascript = <<<END
-<script type="text/javascript" src="../lib/javascript/jquery.js"></script>          
+<script type="text/javascript" src="../lib/javascript/jquery.js"></script>
             <script>
-          var \$j  = jQuery.noConflict(); 
+          var \$j  = jQuery.noConflict();
           \$j(document).ready(function () {
           \$j("input").keyup(function () {
                 \$j(this).css("border","1px solid #0A50A1");
           });
           \$j("select").change(function () {
                 \$j(this).css("border","1px solid #0A50A1");
-          });          
-          });            
+          });
+          });
 function trim(sString)
 {
 while (sString.substring(0,1) == ' ')
@@ -1368,24 +1368,24 @@ return sString;
 
 function ltrim(s)
 {
-	var l=0;
-	while(l < s.length && s[l] == ' ')
-	{	l++; }
-	return s.substring(l, s.length);
+    var l=0;
+    while(l < s.length && s[l] == ' ')
+    {    l++; }
+    return s.substring(l, s.length);
 }
 
 function rtrim(s)
 {
-	var r=s.length -1;
-	while(r > 0 && s[r] == ' ')
-	{	r-=1;	}
-	return s.substring(0, r+1);
+    var r=s.length -1;
+    while(r > 0 && s[r] == ' ')
+    {    r-=1;    }
+    return s.substring(0, r+1);
 }
 
 function selectMultiAction() {
 
 
-	with (document.frmShowCustomerEntries) {
+    with (document.frmShowCustomerEntries) {
                              var chks = document.getElementsByName('selectedEntriesId[]');
                              var hasChecked = false;
                              // Get the checkbox array length and iterate it to see if any of them is selected
@@ -1401,25 +1401,25 @@ function selectMultiAction() {
                                       document.frmShowCustomerEntries.frmShowEntries_MultiAction.focus();
                                       return false;
                                }
-		switch (frmShowEntries_MultiAction.value) {
-			case 'delete':
+        switch (frmShowEntries_MultiAction.value) {
+            case 'delete':
                 if (confirm("$TXT_CRM_SURE_TO_DELETE_SELECTED_ENTRIES")) {
-					action='index.php?cmd=$MODULE_NAME&act=deleteCustomerTypes';
-					submit();
-				}
-				else{
+                    action='index.php?cmd=$MODULE_NAME&act=deleteCustomerTypes';
+                    submit();
+                }
+                else{
                 frmShowEntries_MultiAction.value=0;
                 }
-			break;
-			default: //do nothing
-		}
+            break;
+            default: //do nothing
+        }
 if(frmShowEntries_MultiAction.value == "activate"){
-					action='index.php?cmd=$MODULE_NAME&act=customerTypeChangeStatus&type=activate';
-					submit();
+                    action='index.php?cmd=$MODULE_NAME&act=customerTypeChangeStatus&type=activate';
+                    submit();
                 }
                 if(frmShowEntries_MultiAction.value == "deactivate"){
-					action='index.php?cmd=$MODULE_NAME&act=customerTypeChangeStatus&type=deactivate';
-					submit();
+                    action='index.php?cmd=$MODULE_NAME&act=customerTypeChangeStatus&type=deactivate';
+                    submit();
                 }
                 if(frmShowEntries_MultiAction.value == "sort"){
                              var sortText = document.getElementsByName('form_pos[]');
@@ -1435,7 +1435,7 @@ if(frmShowEntries_MultiAction.value == "activate"){
                                             return false;
                                             break;
                                        }
-				       else if(IsNumeric(sortText[i].value) == false){
+                       else if(IsNumeric(sortText[i].value) == false){
                                             alert("$TXT_SORTING_NUMERIC");
                                             document.frmShowCustomerEntries.frmShowEntries_MultiAction.value=0;
                                             document.frmShowCustomerEntries.frmShowEntries_MultiAction.focus();
@@ -1450,10 +1450,10 @@ if(frmShowEntries_MultiAction.value == "activate"){
                                          break;
                                       }
                              }
-					action='index.php?cmd=$MODULE_NAME&act=settings&chg=1';
-					submit();
+                    action='index.php?cmd=$MODULE_NAME&act=settings&chg=1';
+                    submit();
                   }
-	}
+    }
 }
 
 function showList(id) {
@@ -1473,22 +1473,22 @@ function checkValidations() {
      \$j("input, select").css("border","1px solid #0A50A1");
      var errors =new  Array();
      var errChk;
-     
+
      var label           = document.customerTypes.label.value;
      //var discountPercent = document.customerTypes.discount_percent.value;
      if(trim(label)=="") {
         errChk = 1;
-        document.customerTypes.label.style.border = "1px solid red";     
-		document.customerTypes.label.value="";
+        document.customerTypes.label.style.border = "1px solid red";
+        document.customerTypes.label.value="";
     }
        /* if(trim(discountPercent) == "") {
         errChk = 1;
-        document.customerTypes.discount_percent.style.border = "1px solid red";     
-		document.customerTypes.discount_percent.value="";
+        document.customerTypes.discount_percent.style.border = "1px solid red";
+        document.customerTypes.discount_percent.value="";
     } else if(discountPercent.search(/^[0-9.]+$/)) {
         errors.push("$TXT_CRM_PLEASE_ENTER_DISCOUNT_PERCENT_IN_NUMBER");
-		document.customerTypes.discount_percent.style.border = "1px solid red";     
-		document.customerTypes.discount_percent.value="";
+        document.customerTypes.discount_percent.style.border = "1px solid red";
+        document.customerTypes.discount_percent.value="";
     }*/
 
     if ( errors.length >= 1 || errChk == 1) {
@@ -1497,17 +1497,17 @@ function checkValidations() {
                     \$j('#formerr').html("$TXT_MANDATORY_ERROR<br />"+errString);
                 } else if (  errors.length >= 1) {
                     errString = errors.join('<br />');
-                    \$j('#formerr').html(errString);       
+                    \$j('#formerr').html(errString);
                 } else {
                     \$j('#formerr').html("$TXT_MANDATORY_ERROR");
-                }       
+                }
        \$j('#formerr').css('display','block');
         return false;
     } else {
         \$j('#formerr').html('');
         \$j('#formerr').css('display', 'none');
         return true;
-    }      
+    }
 }
 </script>
 END;
@@ -1522,13 +1522,13 @@ END;
     function showPopup()
     {
         $javascript = <<<END
-		<script>
-		var \$j  = jQuery.noConflict(); 
-		    \$j(document).ready(function () {
-				document.getElementById('add_hostingtype').style.display='block';
-				document.getElementById('fade').style.display='block';
-			});
-		</script>
+        <script>
+        var \$j  = jQuery.noConflict();
+            \$j(document).ready(function () {
+                document.getElementById('add_hostingtype').style.display='block';
+                document.getElementById('fade').style.display='block';
+            });
+        </script>
 END;
         return $javascript;
     }
@@ -1541,13 +1541,13 @@ END;
     function showServicePopup()
     {
         $javascript = <<<END
-		<script>
-		var \$j  = jQuery.noConflict(); 
-		    \$j(document).ready(function () {
-				document.getElementById('add_service_plan_type').style.display='block';
-				document.getElementById('fade').style.display='block';
-			});
-		</script>
+        <script>
+        var \$j  = jQuery.noConflict();
+            \$j(document).ready(function () {
+                document.getElementById('add_service_plan_type').style.display='block';
+                document.getElementById('fade').style.display='block';
+            });
+        </script>
 END;
         return $javascript;
     }
@@ -1561,13 +1561,13 @@ END;
     {
 
         $javascript = <<<END
-		<script>
-		var \$j  = jQuery.noConflict(); 
-		    \$j(document).ready(function () {
-				document.getElementById('add_support_plan').style.display='block';
-				document.getElementById('fade').style.display='block';
-			});
-		</script>
+        <script>
+        var \$j  = jQuery.noConflict();
+            \$j(document).ready(function () {
+                document.getElementById('add_support_plan').style.display='block';
+                document.getElementById('fade').style.display='block';
+            });
+        </script>
 END;
         return $javascript;
     }
@@ -1580,13 +1580,13 @@ END;
     function showHostingPopup()
     {
         $javascript = <<<END
-		<script>
-		var \$j  = jQuery.noConflict(); 
-		    \$j(document).ready(function () {
-				document.getElementById('add_hosting').style.display='block';
-				document.getElementById('fade').style.display='block';
-			});
-		</script>
+        <script>
+        var \$j  = jQuery.noConflict();
+            \$j(document).ready(function () {
+                document.getElementById('add_hosting').style.display='block';
+                document.getElementById('fade').style.display='block';
+            });
+        </script>
 END;
         return $javascript;
     }
@@ -1599,13 +1599,13 @@ END;
     function showSupportcases()
     {
         $javascript = <<<END
-		<script>
-		var \$j  = jQuery.noConflict(); 
-		    \$j(document).ready(function () {
-				document.getElementById('add_support_case').style.display='block';
-				document.getElementById('fade').style.display='block';
-			});
-		</script>
+        <script>
+        var \$j  = jQuery.noConflict();
+            \$j(document).ready(function () {
+                document.getElementById('add_support_case').style.display='block';
+                document.getElementById('fade').style.display='block';
+            });
+        </script>
 END;
         return $javascript;
     }
@@ -1621,33 +1621,33 @@ END;
         $CRM_COMPANY_NAME_ALREADY_PRESENT   = $_ARRAYLANG['TXT_CRM_COMPANYNAME_ALREADY_EXISTS'];
         $javascript = <<<END
 <!--  Script refered from
-        http://jquery.malsup.com/form/ 
+        http://jquery.malsup.com/form/
         -->
 <script type="text/javascript" src="../modules/pm/lib/jquery.form.js"></script>
 <script type="text/javascript">
           \$j(document).ready(function () {
-                var options = { 
+                var options = {
                     dataType:  'json',
                     success: function(data) {
                                           //  alert(data.errChk);
                                           if (data.errChk == 1) {
                                               \$j('#formerr').append('$CRM_COMPANY_NAME_ALREADY_PRESENT');
-                                              \$j('#formerr').show();                                          
+                                              \$j('#formerr').show();
                                           } else {
                                               window.parent.changeCustomer(data.customerId, data.customerName);
                                               window.parent.Shadowbox.close();
                                           }
-                                      },  // post-submit callback              
-                };           
-                
-		        \$j('#access').bind('submit', function(e) {
-			        e.preventDefault(); // <-- important			        
-                    \$j(this).ajaxSubmit(options); 
+                                      },  // post-submit callback
+                };
 
-                    // !!! Important !!! 
-                    // always return false to prevent standard browser submit and page navigation 
-                    return false; 			        
-		        });	        
+                \$j('#access').bind('submit', function(e) {
+                    e.preventDefault(); // <-- important
+                    \$j(this).ajaxSubmit(options);
+
+                    // !!! Important !!!
+                    // always return false to prevent standard browser submit and page navigation
+                    return false;
+                });
           });
         \$j(document).ajaxStart(function() {
             \$j('#loading').show();
@@ -1701,14 +1701,14 @@ END;
                         window.parent.Shadowbox.close();
                     }
                 }
-		        \$J('#access').bind('submit', function(e) {
-			        e.preventDefault(); // <-- important
+                \$J('#access').bind('submit', function(e) {
+                    e.preventDefault(); // <-- important
                     \$J(this).ajaxSubmit(options);
 
                     // !!! Important !!!
                     // always return false to prevent standard browser submit and page navigation
                     return false;
-		        });
+                });
           });
         \$J(document).ajaxStart(function() {
             \$J('#loading').show();
@@ -1751,14 +1751,14 @@ END;
                                       },  // post-submit callback
                 };
 
-		        \$J('#access').bind('submit', function(e) {
-			        e.preventDefault(); // <-- important
+                \$J('#access').bind('submit', function(e) {
+                    e.preventDefault(); // <-- important
                     \$J(this).ajaxSubmit(options);
 
                     // !!! Important !!!
                     // always return false to prevent standard browser submit and page navigation
                     return false;
-		        });
+                });
           });
         \$J(document).ajaxStart(function() {
             \$J('#loading').show();
@@ -1798,18 +1798,18 @@ return sString;
 
 function ltrim(s)
 {
-	var l=0;
-	while(l < s.length && s[l] == ' ')
-	{	l++; }
-	return s.substring(l, s.length);
+    var l=0;
+    while(l < s.length && s[l] == ' ')
+    {    l++; }
+    return s.substring(l, s.length);
 }
 
 function rtrim(s)
 {
-	var r=s.length -1;
-	while(r > 0 && s[r] == ' ')
-	{	r-=1;	}
-	return s.substring(0, r+1);
+    var r=s.length -1;
+    while(r > 0 && s[r] == ' ')
+    {    r-=1;    }
+    return s.substring(0, r+1);
 }
 
 function IsNumeric(strString)
@@ -1894,47 +1894,47 @@ function removePair()
 }
 function formValidation(){
 
-	var pairsLeft = document.getElementById('pairs_left_keys').value;
+    var pairsLeft = document.getElementById('pairs_left_keys').value;
 
-	if(pairsLeft == "") {
-		alert("Please Add Pair Fields");
-		document.getElementById('file_field').focus();
-		return false;
-	}
+    if(pairsLeft == "") {
+        alert("Please Add Pair Fields");
+        document.getElementById('file_field').focus();
+        return false;
+    }
 
-	var custType = document.getElementById('cust_type').value;
+    var custType = document.getElementById('cust_type').value;
 
-	if(custType == "") {
-		alert("Please Select Customer Type Field");
-		document.getElementById('cust_type').focus();
-		return false;
-	}
+    if(custType == "") {
+        alert("Please Select Customer Type Field");
+        document.getElementById('cust_type').focus();
+        return false;
+    }
 
-	var parentId = document.getElementById('parent_id').value;
+    var parentId = document.getElementById('parent_id').value;
 
-	if(parentId == "") {
-		alert("Please Select Parent Id Field");
-		document.getElementById('parent_id').focus();
-		return false;
-	}
+    if(parentId == "") {
+        alert("Please Select Parent Id Field");
+        document.getElementById('parent_id').focus();
+        return false;
+    }
 
-	var lang = document.getElementById('lang').value;
+    var lang = document.getElementById('lang').value;
 
-	if(lang == "") {
-		alert("Please Select Language Field");
-		document.getElementById('lang').focus();
-		return false;
-	}
+    if(lang == "") {
+        alert("Please Select Language Field");
+        document.getElementById('lang').focus();
+        return false;
+    }
 
-	var currency = document.getElementById('currency').value;
+    var currency = document.getElementById('currency').value;
 
-	if(currency == "") {
-		alert("Please Select Currency Field");
-		document.getElementById('currency').focus();
-		return false;
-	}
+    if(currency == "") {
+        alert("Please Select Currency Field");
+        document.getElementById('currency').focus();
+        return false;
+    }
 
-	return true;
+    return true;
 }
 
 
@@ -1972,18 +1972,18 @@ return sString;
 
 function ltrim(s)
 {
-	var l=0;
-	while(l < s.length && s[l] == ' ')
-	{	l++; }
-	return s.substring(l, s.length);
+    var l=0;
+    while(l < s.length && s[l] == ' ')
+    {    l++; }
+    return s.substring(l, s.length);
 }
 
 function rtrim(s)
 {
-	var r=s.length -1;
-	while(r > 0 && s[r] == ' ')
-	{	r-=1;	}
-	return s.substring(0, r+1);
+    var r=s.length -1;
+    while(r > 0 && s[r] == ' ')
+    {    r-=1;    }
+    return s.substring(0, r+1);
 }
 
 function IsNumeric(strString)
@@ -2011,31 +2011,31 @@ function IsNumeric(strString)
 
 function formValidation(){
 
-	var table = document.getElementById('table').value;
+    var table = document.getElementById('table').value;
 
-	if(table == 0) {
-		alert("Please Select the Data");
-		document.getElementById('table').focus();
-		return false;
-	}
+    if(table == 0) {
+        alert("Please Select the Data");
+        document.getElementById('table').focus();
+        return false;
+    }
 
-	var separator = document.getElementById('import_options_csv_separator').value;
+    var separator = document.getElementById('import_options_csv_separator').value;
 
-	if(trim(separator) == "") {
-		alert("Please Enter the Separator");
-		document.getElementById('import_options_csv_separator').focus();
-		return false;
-	}
+    if(trim(separator) == "") {
+        alert("Please Enter the Separator");
+        document.getElementById('import_options_csv_separator').focus();
+        return false;
+    }
 
-	var enclosure = document.getElementById('import_options_csv_enclosure').value;
+    var enclosure = document.getElementById('import_options_csv_enclosure').value;
 
-	if(trim(enclosure) == "") {
-		alert("Please Enter the Enclosure");
-		document.getElementById('import_options_csv_enclosure').focus();
-		return false;
-	}
+    if(trim(enclosure) == "") {
+        alert("Please Enter the Enclosure");
+        document.getElementById('import_options_csv_enclosure').focus();
+        return false;
+    }
 
-	return true;
+    return true;
 }
 
 
@@ -2074,18 +2074,18 @@ return sString;
 
 function ltrim(s)
 {
-	var l=0;
-	while(l < s.length && s[l] == ' ')
-	{	l++; }
-	return s.substring(l, s.length);
+    var l=0;
+    while(l < s.length && s[l] == ' ')
+    {    l++; }
+    return s.substring(l, s.length);
 }
 
 function rtrim(s)
 {
-	var r=s.length -1;
-	while(r > 0 && s[r] == ' ')
-	{	r-=1;	}
-	return s.substring(0, r+1);
+    var r=s.length -1;
+    while(r > 0 && s[r] == ' ')
+    {    r-=1;    }
+    return s.substring(0, r+1);
 }
 
 function IsNumeric(strString)
@@ -2339,7 +2339,7 @@ function removePair4()
 END;
         return $javascript;
     }
-    
+
     /**
      * Get script for dropdown toggle
      *

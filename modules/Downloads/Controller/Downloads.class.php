@@ -195,7 +195,7 @@ class Downloads extends DownloadsLibrary
     private function overview()
     {
         global $_LANGID;
-        
+
         // load source code if cmd value is integer
         if ($this->objTemplate->placeholderExists('APPLICATION_DATA')) {
             $page = new \Cx\Core\ContentManager\Model\Entity\Page();
@@ -383,22 +383,22 @@ class Downloads extends DownloadsLibrary
 
     /**
      * Upload Finished callback
-     * 
+     *
      * This is called as soon as uploads have finished.
      * takes care of moving them to the right folder
-     * 
-     * @param string $tempPath    Path to the temporary directory containing the files at this moment 
+     *
+     * @param string $tempPath    Path to the temporary directory containing the files at this moment
      * @param string $tempWebPath Points to the same folder as tempPath, but relative to the webroot
-     * @param array  $data        Data given to setData() when creating the uploader  
+     * @param array  $data        Data given to setData() when creating the uploader
      * @param string $uploadId    unique session id for the current upload
-     * @param array  $fileInfos   uploaded file informations  
+     * @param array  $fileInfos   uploaded file informations
      * @param array  $response    uploaded status
-     * 
+     *
      * @return array path and webpath
      */
-    public static function uploadFinished($tempPath, $tempWebPath, $data, $uploadId, $fileInfos, $response) 
+    public static function uploadFinished($tempPath, $tempWebPath, $data, $uploadId, $fileInfos, $response)
     {
-        
+
         $path = $data['path'];
         $webPath = $data['webPath'];
         $objCategory = Category::getCategory($data['category_id']);
@@ -413,11 +413,11 @@ class Downloads extends DownloadsLibrary
         //rename files, delete unwanted
         $arrFilesToRename = array(); //used to remember the files we need to rename
         $h = opendir($tempPath);
-        
+
         if (!$h) {
             return array($path, $webPath);
         }
-        
+
         while (false !== ($file = readdir($h))) {
             //skip . and ..
             if ($file == '.' || $file == '..') { continue; }
@@ -426,7 +426,7 @@ class Downloads extends DownloadsLibrary
                 //delete potentially malicious files
                 $objTempFile = new \Cx\Lib\FileSystem\File($tempPath . '/' . $file);
                 if (!\FWValidator::is_file_ending_harmless($file)) {
-                    $objTempFile->delete();                  
+                    $objTempFile->delete();
                     continue;
                 }
 
@@ -435,7 +435,7 @@ class Downloads extends DownloadsLibrary
                     $objTempFile->rename($tempPath . '/' . $cleanFile, false);
                     $file = $cleanFile;
                 }
-                
+
                 $info = pathinfo($file);
                 //check if file needs to be renamed
                 $newName = '';
@@ -447,7 +447,7 @@ class Downloads extends DownloadsLibrary
                     $arrFilesToRename[$file] = $newName;
                     array_push($arrFiles, $newName);
                 }
-                
+
                 if (!isset($arrFilesToRename[$file])) {
                     array_push($uploadFiles, $file);
                 }
@@ -458,7 +458,7 @@ class Downloads extends DownloadsLibrary
                     $objTempFile->rename($tempPath . '/' . $newName, false);
                     array_push($uploadFiles, $newName);
                 }
-                
+
                 //move file from temp path into target folder
                 $objImage = new \ImageManager();
                 foreach ($uploadFiles as $fileName) {
@@ -477,22 +477,22 @@ class Downloads extends DownloadsLibrary
             $objDownloads = new downloads('');
             $objDownloads->addDownloadFromUpload($info['filename'], $info['extension'], $suffix, $objCategory, $objDownloads, $fileInfos['name']);
         }
-        
+
         return array($path, $webPath);
     }
-    
+
     /**
      * Save upload file details to database for download
-     * 
+     *
      * @param string $fileName      filename it is modified name or original name
      *                              ie) what name will be mentioned for upload file in target folder
      * @param string $fileExtension file extension
      * @param mixed  $suffix        if choosen file is already exist, suffix will be created as string
-     *                              otherwise empty          
+     *                              otherwise empty
      * @param object $objCategory   upload file category
      * @param object $objDownloads  downdload file object from the upload informations
      * @param object $sourceName    original file name
-     * 
+     *
      * @return boolean true | false
      */
     public static function addDownloadFromUpload($fileName, $fileExtension, $suffix, $objCategory, $objDownloads, $sourceName)
@@ -542,7 +542,7 @@ class Downloads extends DownloadsLibrary
         $objDownload->setGroups(array());
         $objDownload->setCategories(array($objCategory->getId()));
         $objDownload->setDownloads(array());
-        
+
 
         if (!$objDownload->store($objCategory)) {
             $objDownloads->arrStatusMsg['error'] = array_merge($objDownloads->arrStatusMsg['error'], $objDownload->getErrorMsg());
@@ -626,7 +626,7 @@ class Downloads extends DownloadsLibrary
     private function parseUploadForm($objCategory)
     {
         global $_CONFIG, $_ARRAYLANG;
-        
+
         if (!$this->objTemplate->blockExists('downloads_simple_file_upload') && !$this->objTemplate->blockExists('downloads_advanced_file_upload')) {
             return;
         }
@@ -1488,7 +1488,7 @@ JS_CODE;
             'is_active'     => true,
             'id'            => $arrCategoryIds,
             // read_access_id = 0 refers to unprotected categories
-            'read_access_id'=> array(0), 
+            'read_access_id'=> array(0),
         );
         $objUser = \FWUser::getFWUserObject()->objUser;
         if ($objUser->login()) {

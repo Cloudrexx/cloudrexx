@@ -7,7 +7,7 @@
     }
     #ajaxMessageDiv:hover{
         background-color: #D0D0A8;
-    }    
+    }
 </style>
 <script type="text/javascript">
     function htmlEncode(value){
@@ -33,7 +33,7 @@
             $J(this).addClass(rowClass);
             count++;
         });
-    } 
+    }
     $J(function(){
         $J('.changestatus').click(function(e){
             var $elm = $J(this);
@@ -46,7 +46,7 @@
             e.preventDefault();
         });
         $J("#multiAction").change(function(){
-            
+
             if ($J(".entrySelection:checked").length <= 0 && $J(this).val() != 0) {
                 alert('{TXT_CRM_NOTHING_SELECTED}');
                 return
@@ -54,7 +54,7 @@
             if ($J(this).val() == "delete") {
                 if(confirm('{TXT_CRM_SURE_TO_DELETE_SELECTED_ENTRIES}'))
                     $J("#success_entries").submit();
-                else 
+                else
                     return;
 
             }
@@ -76,11 +76,11 @@
             }
         });
         $J(".editEntry ").click(function(){
-            
+
             en_id = $J(this).attr('rel').split('_')[1];
             $J(".entry_"+en_id+"_hidden").show();
             $J(".entry_"+en_id+"_text").hide();
-            
+
             $J(this).hide();
             $J(".entry_"+en_id+"_save").show();
 
@@ -88,7 +88,7 @@
         $J(".saveEntry").click(function() {
             var $elm = $J(this);
             form_value = $J("#success_entries").serialize();
-            
+
             $J.ajax({
                 url     : './index.php?cmd={MODULE_NAME}&act=settings&tpl=successrate&fn=modify&ajax=1',
                 type    : 'POST',
@@ -96,7 +96,7 @@
                 success : function(result){
                     en_id = $elm.attr('rel').split('_')[1];
                     $J(".entry_"+en_id+"_hidden").hide();
-                    $J(".entry_"+en_id+"_hidden").each(function(){                        
+                    $J(".entry_"+en_id+"_hidden").each(function(){
                         $J(this).next().html(htmlEncode($J(this).val()));
                     });
                     $J(".entry_"+en_id+"_text").show();

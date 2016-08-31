@@ -24,30 +24,30 @@
         <meta name="twitter:title" content="{METATITLE}" />
         <meta name="twitter:description" content="{METADESC}" />
         <link type="images/x-icon" rel="icon" href="themes/business/images/favicon.png" />
-        <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>            
-        
-        
+        <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+
+
         <link rel="stylesheet" href="themes/business/default.css" type="text/css" media="screen" />
         <link rel="stylesheet" href="themes/business/slider.css" type="text/css" media="screen" />
         <link type="text/css" rel="stylesheet" href="themes/business/gmap.css" />
-        
+
         {JAVASCRIPT}
         {STYLE_FILE}
         {LOGIN_INCLUDE}
-        <link type="text/css" rel="stylesheet" href="themes/business/layout.css" />   
+        <link type="text/css" rel="stylesheet" href="themes/business/layout.css" />
         <link type="text/css" rel="stylesheet" href="themes/business/text.css" />
         <link type="text/css" rel="stylesheet" href="themes/business/modules.css" />
         <link type="text/css" rel="stylesheet" href="themes/business/responsiveslides.css" />
         <link type="text/css" rel="stylesheet" href="themes/business/responsive.css" />
         <link type="text/css" rel="stylesheet" href="themes/business/mobile_mainnavigation.css" />
         <script type="text/javascript">
-			
+
             var cssName = '{CSS_NAME}';
-            if (cssName.length > 0) {               
+            if (cssName.length > 0) {
                 $J.ajax({
                     url: '{PATH_OFFSET}/themes/business/images/titelbilder/titelbild_' + cssName + '.jpg',
                     complete: function(jqXHR) {
-                       
+
                         var contentType = jqXHR.getResponseHeader('Content-Type');
                         if ($J.type(contentType) == 'string' && contentType.substring(0, 5) == 'image') {
                             $J('#page').prepend('<img id="page-header" class="img-responsive" src="{PATH_OFFSET}/themes/business/images/titelbilder/titelbild_' + cssName + '.jpg" alt="Titelbild" />');
@@ -84,7 +84,7 @@
         </script>
 
         <script type="text/javascript" src= "themes/business/js/javascript.js"></script>
-	<script type="text/javascript" src= "themes/business/js/script.js"></script>
+  <script type="text/javascript" src= "themes/business/js/script.js"></script>
         <!--[if IE 6]>
         <script type="text/javascript" src="themes/business/js/DD_belatedPNG.js"></script>
         <script type="text/javascript">
@@ -114,13 +114,13 @@
             <header id="header">
                 <div class="wrapper">
                     <div id="header_container" class="full-width">
-           
+
                         <!-- logo block start -->
-                        
+
                         <div id="logo"><a href="[[NODE_HOME]]"><img alt="logo" src="themes/business/images/Logo.png" /></a></div>
-                        
+
                         <!-- logo block end -->
-                        
+
                         <div id="right-nav" class="grid10">
                             {NAVBAR_FILE}
                         </div>
@@ -136,13 +136,13 @@
             </section>
             <footer id="footer">
                 <div class="wrapper">
-                    
+
                     <!-- footer block start -->
-                    
+
                     <div id="footer_container">
                         <hr>
-                        <div class="contact">  
-                            <div class="imprint">  
+                        <div class="contact">
+                            <div class="imprint">
                                 <div class="col two grid4">
                                     <div class="copyright">
                                             <ul>
@@ -154,11 +154,11 @@
                                 </div>
                                 <div class="col two grid4">
                                     <div class="social_media">
-                                        <a target="_blank" href="https://www.facebook.com/contrexxsoftware" class="social facebook"><!-- --></a> <a target="_blank" href="http://twitter.com/contrexx" class="social twitter"><!-- --></a> <a target="_blank" href="http://www.contrexx.com/feed/news_headlines_de.xml" class="social rss"><!-- --></a> <a target="_blank" href="http://www.xing.com/companies/comvationag" class="social xing"><!-- --></a> 
+                                        <a target="_blank" href="https://www.facebook.com/contrexxsoftware" class="social facebook"><!-- --></a> <a target="_blank" href="http://twitter.com/contrexx" class="social twitter"><!-- --></a> <a target="_blank" href="http://www.contrexx.com/feed/news_headlines_de.xml" class="social rss"><!-- --></a> <a target="_blank" href="http://www.xing.com/companies/comvationag" class="social xing"><!-- --></a>
                                    </div>
-                                </div>  
+                                </div>
                             </div>
-                        </div>   
+                        </div>
                     </div>
                 </div>
             </footer>

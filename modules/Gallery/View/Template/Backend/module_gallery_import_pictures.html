@@ -5,29 +5,29 @@ function importSelectAll(e)
     if(e.checked)
     {  // check all
         var ml  = document.fileList;
-    	var len = ml.elements.length;
-    	for(var i = 0; i < len; i++)
-    	{
-    	    var e = ml.elements[i];
-    	    if(e.name == "formSelected[]")
-    	    {
-    		    e.checked = true;
-    	    }
-    	}
-	}
-	else
-	{  // uncheck all
-	    var ml  = document.fileList;
-    	var len = ml.elements.length;
-    	for(var i = 0; i < len; i++)
-    	{
-    	    var e = ml.elements[i];
-    	    if(e.name == "formSelected[]")
-    	    {
-    		    e.checked = false;
-    	    }
-    	}
-	}
+      var len = ml.elements.length;
+      for(var i = 0; i < len; i++)
+      {
+          var e = ml.elements[i];
+          if(e.name == "formSelected[]")
+          {
+            e.checked = true;
+          }
+      }
+  }
+  else
+  {  // uncheck all
+      var ml  = document.fileList;
+      var len = ml.elements.length;
+      for(var i = 0; i < len; i++)
+      {
+          var e = ml.elements[i];
+          if(e.name == "formSelected[]")
+          {
+            e.checked = false;
+          }
+      }
+  }
 }
 
 function importIsChecked(fieldName)
@@ -55,16 +55,16 @@ function importDoAction()
 {
     if(importIsChecked("formSelected[]") == true)
     {
-	    if(document.fileList.selectAction.value == "import")
-	    {
-	        document.fileList.action = "index.php?cmd=Gallery&act=importFromFolder";
-	        document.fileList.submit();
-	    }
+      if(document.fileList.selectAction.value == "import")
+      {
+          document.fileList.action = "index.php?cmd=Gallery&act=importFromFolder";
+          document.fileList.submit();
+      }
         if(document.fileList.selectAction.value == "delete")
-	    {
-	        document.fileList.action = "index.php?cmd=Gallery&act=deleteImportPicture";
-        	document.fileList.submit();
-	    }
+      {
+          document.fileList.action = "index.php?cmd=Gallery&act=deleteImportPicture";
+          document.fileList.submit();
+      }
     }
     else
     {
@@ -83,73 +83,73 @@ function deletePicture(pic)
 }
 
 function openWindow(theURL,winName,features)
-	{
-	  window.open(theURL,winName,features);
-	}
+  {
+    window.open(theURL,winName,features);
+  }
 </script>
 <div id="okbox">{TXT_MAX_PICTURES}</div><br />
 <form name="fileList" method="post" action="index.php?cmd=Gallery&act=import_picture">
     <table width="100%" cellspacing="0" cellpadding="5" border="0" align="middle" class="adminlist">
-    	<tr>
-    	    <th width="16"><div align="center">#</div></th>
-    	    <th colspan="">{TXT_FILENAME}
-    	        {IMPORT_IMAGE_NAME_ICON}
-    	    </th>
-    	    <th width="90">
-    	        <div align="right">{TXT_FILESIZE}
-    	            {IMPORT_IMAGE_SIZE_ICON}
-    	        </div>
-    	    </th>
-    	    <th width="90">
-    	        <div align="right">{TXT_FILETYPE}
-    	            {IMPORT_IMAGE_TYPE_ICON}
-    	        </div>
-    	    </th>
-    	    <th width="20">
-    	        &nbsp;
-    	    </th>
-    	</tr>
-     	<tr valign="middle" class="row2">
-    	    <td width="16">
-    	        <center>
-    	            <input type="checkbox" name="toggleAll" title="Select or deselect all messages" onclick="importSelectAll(this);">
-    	            <!-- <img src="/images/modules/media2/_base.gif" width="16" height="16" alt="base" /> -->
-    	        </center>
-    	    </td>
-    	    <td colspan="4">
-    	    	<strong><a href="{IMPORT_IMAGE_TREE_NAV_MAIN_HREF}">{IMPORT_IMAGE_TREE_NAV_MAIN}</a></strong>
-    	    </td>
-     	</tr>
+      <tr>
+          <th width="16"><div align="center">#</div></th>
+          <th colspan="">{TXT_FILENAME}
+              {IMPORT_IMAGE_NAME_ICON}
+          </th>
+          <th width="90">
+              <div align="right">{TXT_FILESIZE}
+                  {IMPORT_IMAGE_SIZE_ICON}
+              </div>
+          </th>
+          <th width="90">
+              <div align="right">{TXT_FILETYPE}
+                  {IMPORT_IMAGE_TYPE_ICON}
+              </div>
+          </th>
+          <th width="20">
+              &nbsp;
+          </th>
+      </tr>
+       <tr valign="middle" class="row2">
+          <td width="16">
+              <center>
+                  <input type="checkbox" name="toggleAll" title="Select or deselect all messages" onclick="importSelectAll(this);">
+                  <!-- <img src="/images/modules/media2/_base.gif" width="16" height="16" alt="base" /> -->
+              </center>
+          </td>
+          <td colspan="4">
+            <strong><a href="{IMPORT_IMAGE_TREE_NAV_MAIN_HREF}">{IMPORT_IMAGE_TREE_NAV_MAIN}</a></strong>
+          </td>
+       </tr>
 
-    	<!-- BEGIN importDirectoryTree -->
-    		<tr class="{IMPORT_IMAGE_DIR_TREE_ROW}" valign="top">
-    			<td>{IMPORT_IMAGE_CHECKBOX}</td>
-    			<td><a href="javascript:openWindow('{IMPORT_IMAGE_PATH}&{CSRF_PARAM}','','width={IMPORT_IMAGE_WIDTH},height={IMPORT_IMAGE_HEIGHT}')">{IMPORT_IMAGE_NAME}</a>  {IMPORT_IMAGE_NAME_ATTRIBUT}</td>
-    		   	<td><div align="right">{IMPORT_IMAGE_SIZE} Bytes</div></td>
-    		   	<td><div align="right">{IMPORT_IMAGE_TYP}-Datei</div></td>
-    		   	<td><div align="right"><a href="javascript:deletePicture('{IMPORT_IMAGE_NAME}')" target="_self"><img src="../core/Core/View/Media/icons/delete.gif" border="0"></a></div></td>
-    		</tr>
-    	<!-- END importDirectoryTree -->
-    	<!-- BEGIN importEmptyDirectory -->
-    		<tr class="row1">
-    			<td>&nbsp;</td>
-    			<td colspan="7">{TXT_IMPORT_IMAGE_DIR_EMPTY}</td>
-    		</tr>
-    	<!-- END importEmptyDirectory -->
+      <!-- BEGIN importDirectoryTree -->
+        <tr class="{IMPORT_IMAGE_DIR_TREE_ROW}" valign="top">
+          <td>{IMPORT_IMAGE_CHECKBOX}</td>
+          <td><a href="javascript:openWindow('{IMPORT_IMAGE_PATH}&{CSRF_PARAM}','','width={IMPORT_IMAGE_WIDTH},height={IMPORT_IMAGE_HEIGHT}')">{IMPORT_IMAGE_NAME}</a>  {IMPORT_IMAGE_NAME_ATTRIBUT}</td>
+             <td><div align="right">{IMPORT_IMAGE_SIZE} Bytes</div></td>
+             <td><div align="right">{IMPORT_IMAGE_TYP}-Datei</div></td>
+             <td><div align="right"><a href="javascript:deletePicture('{IMPORT_IMAGE_NAME}')" target="_self"><img src="../core/Core/View/Media/icons/delete.gif" border="0"></a></div></td>
+        </tr>
+      <!-- END importDirectoryTree -->
+      <!-- BEGIN importEmptyDirectory -->
+        <tr class="row1">
+          <td>&nbsp;</td>
+          <td colspan="7">{TXT_IMPORT_IMAGE_DIR_EMPTY}</td>
+        </tr>
+      <!-- END importEmptyDirectory -->
     </table>
     <!-- BEGIN importSelectAction -->
-		<table width="100%" height="50" cellspacing="0" cellpadding="5" border="0">
-			<tr>
-				<td valign="top">
-					<img src="../core/Core/View/Media/icons/arrow.gif" width="38" height="22" alt="arrow">
-					<select name="selectAction" onchange="importDoAction();">
-						<option value="0" selected="selected">{TXT_IMPORT_IMAGE_SELECT_ACTION}</option>
-						<option value="import">{TXT_IMPORT_IMAGE_IMPORT}</option>
-						<option value="delete">{TXT_IMPORT_IMAGE_DELETE}</option>
-					</select>
-				</td>
-			</tr>
-		</table>
-	<!-- END importSelectAction -->
+    <table width="100%" height="50" cellspacing="0" cellpadding="5" border="0">
+      <tr>
+        <td valign="top">
+          <img src="../core/Core/View/Media/icons/arrow.gif" width="38" height="22" alt="arrow">
+          <select name="selectAction" onchange="importDoAction();">
+            <option value="0" selected="selected">{TXT_IMPORT_IMAGE_SELECT_ACTION}</option>
+            <option value="import">{TXT_IMPORT_IMAGE_IMPORT}</option>
+            <option value="delete">{TXT_IMPORT_IMAGE_DELETE}</option>
+          </select>
+        </td>
+      </tr>
+    </table>
+  <!-- END importSelectAction -->
 </form>
 <!-- END module_gallery_import_pictures.html -->

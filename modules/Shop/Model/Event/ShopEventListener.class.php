@@ -27,7 +27,7 @@
 
 /**
  * EventListener for Shop
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
@@ -43,14 +43,14 @@ use Cx\Core\Event\Model\Entity\DefaultEventListener;
 /**
  * Class ShopEventListener
  * EventListener for Shop
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
  * @subpackage  module_shop
  */
 class ShopEventListener extends DefaultEventListener {
-   
+
     public function SearchFindContent($search) {
         $term_db = $search->getTerm();
 

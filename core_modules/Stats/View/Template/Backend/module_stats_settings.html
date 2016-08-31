@@ -3,11 +3,11 @@
 <!--
 
 function toggleSettings(objCheck, objDiv) {
-	if (document.getElementById(objCheck).checked == true) {
-		document.getElementById(objDiv).style.display = "block";
-	} else {
-		document.getElementById(objDiv).style.display = "none";
-	}
+  if (document.getElementById(objCheck).checked == true) {
+    document.getElementById(objDiv).style.display = "block";
+  } else {
+    document.getElementById(objDiv).style.display = "none";
+  }
 }
 
 // -->
@@ -19,163 +19,163 @@ function toggleSettings(objCheck, objDiv) {
 <!-- start statsSettings div -->
 <div id="statsSettings" class="settingsTab" style="display:block">
 <form name="stats_settings_form" action="index.php?cmd=Stats&amp;stat=settings" method="post">
-	<table cellspacing="0" cellpadding="1" width="100%" border="0" class="adminlist">
-		<tr>
-			<th>&nbsp;{TXT_SETTINGS}</th>
-		</tr>
-		<tr class="row1">
-			<td nowrap="nowrap">
-				<label for="options_make_statistics"><input id="options_make_statistics" name="options[make_statistics]" onclick="toggleSettings('options_make_statistics', 'stats_settings')" type="checkbox" value="1" {STATS_SETTINGS_MAKE_STATISTICS} />&nbsp;{TXT_MAKE_STATISTICS}</label>
-			</td>
-		</tr>
-	</table>
-	<div id="stats_settings" style="display:{STATS_SETTINGS_STATUS}">
-		<table cellspacing="0" cellpadding="1" width="100%" border="0" class="adminlist">
-			<tr class="row2">
-				<td nowrap="nowrap" colspan="2">&nbsp;&nbsp;&nbsp;<label for="options_count_referer"><input id="options_count_referer" name="options[count_referer]" type="checkbox" value="1" {STATS_SETTINGS_COUNT_REFERER} />&nbsp;{TXT_REFERER}</label></td>
-			</tr>
-			<tr class="row1">
-				<td nowrap="nowrap" colspan="2">&nbsp;&nbsp;&nbsp;<label for="options_count_hostname"><input id="options_count_hostname" name="options[count_hostname]" type="checkbox" value="1" {STATS_SETTINGS_COUNT_HOSTNAME} />&nbsp;{TXT_DOMAIN}</label></td>
-			</tr>
-			<tr class="row2">
-				<td nowrap="nowrap" colspan="2">&nbsp;&nbsp;&nbsp;<label for="options_count_country"><input id="options_count_country" name="options[count_country]" type="checkbox" value="1" {STATS_SETTINGS_COUNT_COUNTRY} />&nbsp;{TXT_COUNTRIES_OF_ORIGIN}</label></td>
-			</tr>
-			<tr class="row1">
-				<td nowrap="nowrap" colspan="2">&nbsp;&nbsp;&nbsp;<label for="options_count_browser"><input id="options_count_browser" name="options[count_browser]" type="checkbox" value="1" {STATS_SETTINGS_COUNT_BROWSER} />&nbsp;{TXT_BROWSERS}</label></td>
-			</tr>
-			<tr class="row2">
-				<td nowrap="nowrap" colspan="2">&nbsp;&nbsp;&nbsp;<label for="options_count_operating_system"><input id="options_count_operating_system" name="options[count_operating_system]" type="checkbox" value="1" {STATS_SETTINGS_COUNT_OS} />&nbsp;{TXT_OPERATING_SYSTEMS}</label></td>
-			</tr>
-			<tr class="row1">
-				<td nowrap="nowrap" colspan="2">&nbsp;&nbsp;&nbsp;<label for="options_count_spiders"><input id="options_count_spiders" name="options[count_spiders]" type="checkbox" value="1" {STATS_SETTINGS_COUNT_SPIDERS} />&nbsp;{TXT_SEARCH_ENGINES}</label></td>
-			</tr>
-			<tr class="row2">
-				<td nowrap="nowrap" colspan="2">&nbsp;&nbsp;&nbsp;<label for="options_count_search_terms"><input id="options_count_search_terms" name="options[count_search_terms]" type="checkbox" value="1" {STATS_SETTINGS_COUNT_SEARCH_TERMS} />&nbsp;{TXT_SEARCH_TERMS}</label></td>
-			</tr>
-			<tr class="row1">
-				<td nowrap="nowrap" colspan="2">&nbsp;&nbsp;&nbsp;<label for="options_count_screen_resolution"><input id="options_count_screen_resolution" name="options[count_screen_resolution]" type="checkbox" value="1" {STATS_SETTINGS_COUNT_RESOLUTION} />&nbsp;{TXT_SCREEN_RESOLUTION}</label></td>
-			</tr>
-			<tr class="row2">
-				<td nowrap="nowrap" colspan="2">&nbsp;&nbsp;&nbsp;<label for="options_count_colour_depth"><input id="options_count_colour_depth" name="options[count_colour_depth]" type="checkbox" value="1" {STATS_SETTINGS_COUNT_COLOUR} />&nbsp;{TXT_COLOUR_DEPTH}</label></td>
-			</tr>
-			<tr class="row1">
-				<td nowrap="nowrap" colspan="2">&nbsp;&nbsp;&nbsp;<label for="options_count_javascript"><input id="options_count_javascript" name="options[count_javascript]" type="checkbox" value="1" {STATS_SETTINGS_COUNT_JAVASCRIPT} />&nbsp;{TXT_JAVASCRIPT_SUPPORT}</label></td>
-			</tr>
-			<tr class="row2">
-				<td colspan="2"><input id="options_exclude_identifying_info" name="options[exclude_identifying_info]" type="checkbox" value="1" {STATS_SETTINGS_EXCLUDE_IDENTIFYING_INFO} />&nbsp;<label for="options_exclude_identifying_info">{TXT_EXCLUDE_IDENTIFYING_INFO}</label></td>
-			</tr>
-			<tr class="row1">
-				<td colspan="2"><label for="options_remove_requests_status"><input id="options_remove_requests_status" name="options[remove_requests_status]" onclick="toggleSettings('options_remove_requests_status', 'remove_requests_value')" type="checkbox" value="1" {STATS_SETTINGS_REMOVE_REQUESTS_CHECKED} />&nbsp;{TXT_REMOVE_REQUESTS}</label><div style="display:{STATS_SETTINGS_REMOVE_REQUESTS_STATUS};" id="remove_requests_value">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" style="text-align:right;width:60px;" name="options[remove_requests]" value="{STATS_SETTINGS_REMOVE_REQUESTS}" />&nbsp;{TXT_REMOVE_REQUESTS_INTERVAL}</div></td>
-			</tr>
-			<tr class="row2">
-				<td colspan="2"><label for="options_online_timeout_status"><input id="options_online_timeout_status" name="options[online_timeout_status]" onclick="toggleSettings('options_online_timeout_status', 'online_timeout_value')" type="checkbox" value="1" {STATS_SETTINGS_ONLINE_TIMEOUT_CHECKED} />&nbsp;{TXT_ONLINE_TIMEOUT}</label><div id="online_timeout_value" style="display:{STATS_SETTINGS_ONLINE_TIMEOUT_STATUS};">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" style="text-align:right;width:60px;" name="options[online_timeout]" value="{STATS_SETTINGS_ONLINE_TIMEOUT}" />&nbsp;{TXT_ONLINE_TIMEOUT_INTERVAL}</div></td>
-			</tr>
-			<tr class="row1">
-				<td colspan="2"><input type="checkbox" value="1" name="options[count_visitor_number]" id="options_count_visitor_number" {STATS_SETTINGS_COUNT_VISITOR_NUMBER} /><label for="options_count_visitor_number">{TXT_STATS_COUNT_VISIOTR_NUMBER}</label></td>
-			</tr>
-			<tr class="row2">
-				<td colspan="2"><input type="text" style="text-align:right;width:60px;" name="options[reload_block_time]" value="{STATS_SETTINGS_RELOAD_BLOCK_TIME}" />&nbsp;{TXT_RELOAD_BLOCK_TIME}</td>
-			</tr>
-			<tr class="row1">
-				<td colspan="2"><input type="text" style="text-align:right;width:60px;" name="options[paging_limit]" value="{STATS_SETTINGS_PAGING_LIMIT}" />&nbsp;{TXT_SHOW_LIMIT}</td>
-			</tr>
-			<tr class="row2">
-				<td colspan="2"><input type="text" style="text-align:right;width:60px;" name="options[paging_limit_visitor_details]" value="{STATS_SETTINGS_PAGING_LIMIT_VISITOR_DETAILS}" />&nbsp;{TXT_SHOW_LIMIT_VISITOR_DETAILS}</td>
-			</tr>
-		</table>
-	</div>
-	<br />
-	<input type="submit" value="{TXT_STORE}" name="save_stats_settings" />
+  <table cellspacing="0" cellpadding="1" width="100%" border="0" class="adminlist">
+    <tr>
+      <th>&nbsp;{TXT_SETTINGS}</th>
+    </tr>
+    <tr class="row1">
+      <td nowrap="nowrap">
+        <label for="options_make_statistics"><input id="options_make_statistics" name="options[make_statistics]" onclick="toggleSettings('options_make_statistics', 'stats_settings')" type="checkbox" value="1" {STATS_SETTINGS_MAKE_STATISTICS} />&nbsp;{TXT_MAKE_STATISTICS}</label>
+      </td>
+    </tr>
+  </table>
+  <div id="stats_settings" style="display:{STATS_SETTINGS_STATUS}">
+    <table cellspacing="0" cellpadding="1" width="100%" border="0" class="adminlist">
+      <tr class="row2">
+        <td nowrap="nowrap" colspan="2">&nbsp;&nbsp;&nbsp;<label for="options_count_referer"><input id="options_count_referer" name="options[count_referer]" type="checkbox" value="1" {STATS_SETTINGS_COUNT_REFERER} />&nbsp;{TXT_REFERER}</label></td>
+      </tr>
+      <tr class="row1">
+        <td nowrap="nowrap" colspan="2">&nbsp;&nbsp;&nbsp;<label for="options_count_hostname"><input id="options_count_hostname" name="options[count_hostname]" type="checkbox" value="1" {STATS_SETTINGS_COUNT_HOSTNAME} />&nbsp;{TXT_DOMAIN}</label></td>
+      </tr>
+      <tr class="row2">
+        <td nowrap="nowrap" colspan="2">&nbsp;&nbsp;&nbsp;<label for="options_count_country"><input id="options_count_country" name="options[count_country]" type="checkbox" value="1" {STATS_SETTINGS_COUNT_COUNTRY} />&nbsp;{TXT_COUNTRIES_OF_ORIGIN}</label></td>
+      </tr>
+      <tr class="row1">
+        <td nowrap="nowrap" colspan="2">&nbsp;&nbsp;&nbsp;<label for="options_count_browser"><input id="options_count_browser" name="options[count_browser]" type="checkbox" value="1" {STATS_SETTINGS_COUNT_BROWSER} />&nbsp;{TXT_BROWSERS}</label></td>
+      </tr>
+      <tr class="row2">
+        <td nowrap="nowrap" colspan="2">&nbsp;&nbsp;&nbsp;<label for="options_count_operating_system"><input id="options_count_operating_system" name="options[count_operating_system]" type="checkbox" value="1" {STATS_SETTINGS_COUNT_OS} />&nbsp;{TXT_OPERATING_SYSTEMS}</label></td>
+      </tr>
+      <tr class="row1">
+        <td nowrap="nowrap" colspan="2">&nbsp;&nbsp;&nbsp;<label for="options_count_spiders"><input id="options_count_spiders" name="options[count_spiders]" type="checkbox" value="1" {STATS_SETTINGS_COUNT_SPIDERS} />&nbsp;{TXT_SEARCH_ENGINES}</label></td>
+      </tr>
+      <tr class="row2">
+        <td nowrap="nowrap" colspan="2">&nbsp;&nbsp;&nbsp;<label for="options_count_search_terms"><input id="options_count_search_terms" name="options[count_search_terms]" type="checkbox" value="1" {STATS_SETTINGS_COUNT_SEARCH_TERMS} />&nbsp;{TXT_SEARCH_TERMS}</label></td>
+      </tr>
+      <tr class="row1">
+        <td nowrap="nowrap" colspan="2">&nbsp;&nbsp;&nbsp;<label for="options_count_screen_resolution"><input id="options_count_screen_resolution" name="options[count_screen_resolution]" type="checkbox" value="1" {STATS_SETTINGS_COUNT_RESOLUTION} />&nbsp;{TXT_SCREEN_RESOLUTION}</label></td>
+      </tr>
+      <tr class="row2">
+        <td nowrap="nowrap" colspan="2">&nbsp;&nbsp;&nbsp;<label for="options_count_colour_depth"><input id="options_count_colour_depth" name="options[count_colour_depth]" type="checkbox" value="1" {STATS_SETTINGS_COUNT_COLOUR} />&nbsp;{TXT_COLOUR_DEPTH}</label></td>
+      </tr>
+      <tr class="row1">
+        <td nowrap="nowrap" colspan="2">&nbsp;&nbsp;&nbsp;<label for="options_count_javascript"><input id="options_count_javascript" name="options[count_javascript]" type="checkbox" value="1" {STATS_SETTINGS_COUNT_JAVASCRIPT} />&nbsp;{TXT_JAVASCRIPT_SUPPORT}</label></td>
+      </tr>
+      <tr class="row2">
+        <td colspan="2"><input id="options_exclude_identifying_info" name="options[exclude_identifying_info]" type="checkbox" value="1" {STATS_SETTINGS_EXCLUDE_IDENTIFYING_INFO} />&nbsp;<label for="options_exclude_identifying_info">{TXT_EXCLUDE_IDENTIFYING_INFO}</label></td>
+      </tr>
+      <tr class="row1">
+        <td colspan="2"><label for="options_remove_requests_status"><input id="options_remove_requests_status" name="options[remove_requests_status]" onclick="toggleSettings('options_remove_requests_status', 'remove_requests_value')" type="checkbox" value="1" {STATS_SETTINGS_REMOVE_REQUESTS_CHECKED} />&nbsp;{TXT_REMOVE_REQUESTS}</label><div style="display:{STATS_SETTINGS_REMOVE_REQUESTS_STATUS};" id="remove_requests_value">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" style="text-align:right;width:60px;" name="options[remove_requests]" value="{STATS_SETTINGS_REMOVE_REQUESTS}" />&nbsp;{TXT_REMOVE_REQUESTS_INTERVAL}</div></td>
+      </tr>
+      <tr class="row2">
+        <td colspan="2"><label for="options_online_timeout_status"><input id="options_online_timeout_status" name="options[online_timeout_status]" onclick="toggleSettings('options_online_timeout_status', 'online_timeout_value')" type="checkbox" value="1" {STATS_SETTINGS_ONLINE_TIMEOUT_CHECKED} />&nbsp;{TXT_ONLINE_TIMEOUT}</label><div id="online_timeout_value" style="display:{STATS_SETTINGS_ONLINE_TIMEOUT_STATUS};">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" style="text-align:right;width:60px;" name="options[online_timeout]" value="{STATS_SETTINGS_ONLINE_TIMEOUT}" />&nbsp;{TXT_ONLINE_TIMEOUT_INTERVAL}</div></td>
+      </tr>
+      <tr class="row1">
+        <td colspan="2"><input type="checkbox" value="1" name="options[count_visitor_number]" id="options_count_visitor_number" {STATS_SETTINGS_COUNT_VISITOR_NUMBER} /><label for="options_count_visitor_number">{TXT_STATS_COUNT_VISIOTR_NUMBER}</label></td>
+      </tr>
+      <tr class="row2">
+        <td colspan="2"><input type="text" style="text-align:right;width:60px;" name="options[reload_block_time]" value="{STATS_SETTINGS_RELOAD_BLOCK_TIME}" />&nbsp;{TXT_RELOAD_BLOCK_TIME}</td>
+      </tr>
+      <tr class="row1">
+        <td colspan="2"><input type="text" style="text-align:right;width:60px;" name="options[paging_limit]" value="{STATS_SETTINGS_PAGING_LIMIT}" />&nbsp;{TXT_SHOW_LIMIT}</td>
+      </tr>
+      <tr class="row2">
+        <td colspan="2"><input type="text" style="text-align:right;width:60px;" name="options[paging_limit_visitor_details]" value="{STATS_SETTINGS_PAGING_LIMIT_VISITOR_DETAILS}" />&nbsp;{TXT_SHOW_LIMIT_VISITOR_DETAILS}</td>
+      </tr>
+    </table>
+  </div>
+  <br />
+  <input type="submit" value="{TXT_STORE}" name="save_stats_settings" />
 </form>
 </div>
 <!-- end statsSettings div -->
 <!-- start statsReset div -->
 <div id="statsReset" class="settingsTab" style="display:none">
-	<form name="stats_delete_form" action="index.php?cmd=Stats&amp;stat=settings" method="post">
-		<table cellspacing="0" cellpadding="1" width="100%" border="0" class="adminlist">
-				<tr>
-					<th>&nbsp;{TXT_RESET_STATISTIC}</th>
-				</tr>
-				<tr class="row1">
-					<td nowrap="nowrap"><b>{TXT_SELECT_STATISTICS_TO_RESET}</b></td>
-				</tr>
-				<tr class="row2">
-					<td nowrap="nowrap">
-						<label for="statistics[requests]"><input id="statistics[requests]" name="statistics[]" type="checkbox" value="requests" />&nbsp;{TXT_VISITORS_AND_PAGE_VIEWS}</label>
-					</td>
-				</tr>
-				<tr class="row1">
-					<td nowrap="nowrap">
-						<label for="statistics[visitors]"><input id="statistics[visitors]" name="statistics[]" type="checkbox" value="visitors" />&nbsp;{TXT_VISITOR_DETAIL_FROM_TODAY}</label>
-					</td>
-				</tr>
-				<tr class="row2">
-					<td nowrap="nowrap">
-						<label for="statistics[mvp]"><input id="statistics[mvp]" name="statistics[]" type="checkbox" value="mvp" />&nbsp;{TXT_MOST_POPULAR_PAGES}</label>
-					</td>
-				</tr>
-				<tr class="row1">
-					<td nowrap="nowrap">
-						<label for="statistics[referer]"><input id="statistics[referer]" name="statistics[]" type="checkbox" value="referer" />&nbsp;{TXT_REFERER}</label>
-					</td>
-				</tr>
-				<tr class="row2">
-					<td nowrap="nowrap">
-						<label for="statistics[hostname]"><input id="statistics[hostname]" name="statistics[]" type="checkbox" value="hostname" />&nbsp;{TXT_DOMAIN}</label>
-					</td>
-				</tr>
-				<tr class="row1">
-					<td nowrap="nowrap">
-						<label for="statistics[country]"><input id="statistics[country]" name="statistics[]" type="checkbox" value="country" />&nbsp;{TXT_COUNTRIES_OF_ORIGIN}</label>
-					</td>
-				</tr>
-				<tr class="row2">
-					<td nowrap="nowrap">
-						<label for="statistics[browsers]"><input id="statistics[browsers]" name="statistics[]" type="checkbox" value="browsers" />&nbsp;{TXT_BROWSERS}</label>
-					</td>
-				</tr>
-				<tr class="row1">
-					<td nowrap="nowrap">
-						<label for="statistics[os]"><input id="statistics[os]" name="statistics[]" type="checkbox" value="os" />&nbsp;{TXT_OPERATING_SYSTEMS}</label>
-					</td>
-				</tr>
-				<tr class="row2">
-					<td nowrap="nowrap">
-						<label for="statistics[search]"><input id="statistics[search]" name="statistics[]" type="checkbox" value="search" />&nbsp;{TXT_SEARCH_TERMS}</label>
-					</td>
-				</tr>
-				<tr class="row1">
-					<td nowrap="nowrap">
-						<label for="statistics[spiders]"><input id="statistics[spiders]" name="statistics[]" type="checkbox" value="spiders" />&nbsp;{TXT_SEARCH_ENGINES}</label>
-					</td>
-				</tr>
-				<tr class="row2">
-					<td nowrap="nowrap">
-						<label for="statistics[indexedPages]"><input id="statistics[indexedPages]" name="statistics[]" type="checkbox" value="indexedPages" />&nbsp;{TXT_INDEXED_PAGES}</label>
-					</td>
-				</tr>
-				<tr class="row1">
-					<td nowrap="nowrap">
-						<label for="statistics[resolution]"><input id="statistics[resolution]" name="statistics[]" type="checkbox" value="resolution" />&nbsp;{TXT_SCREEN_RESOLUTION}</label>
-					</td>
-				</tr>
-				<tr class="row2">
-					<td nowrap="nowrap">
-						<label for="statistics[colour]"><input id="statistics[colour]" name="statistics[]" type="checkbox" value="colour" />&nbsp;{TXT_COLOUR_DEPTH}</label>
-					</td>
-				</tr>
-				<tr class="row1">
-					<td nowrap="nowrap">
-						<label for="statistics[javascript]"><input id="statistics[javascript]" name="statistics[]" type="checkbox" value="javascript" />&nbsp;{TXT_JAVASCRIPT_SUPPORT}</label>
-					</td>
-				</tr>
+  <form name="stats_delete_form" action="index.php?cmd=Stats&amp;stat=settings" method="post">
+    <table cellspacing="0" cellpadding="1" width="100%" border="0" class="adminlist">
+        <tr>
+          <th>&nbsp;{TXT_RESET_STATISTIC}</th>
+        </tr>
+        <tr class="row1">
+          <td nowrap="nowrap"><b>{TXT_SELECT_STATISTICS_TO_RESET}</b></td>
+        </tr>
+        <tr class="row2">
+          <td nowrap="nowrap">
+            <label for="statistics[requests]"><input id="statistics[requests]" name="statistics[]" type="checkbox" value="requests" />&nbsp;{TXT_VISITORS_AND_PAGE_VIEWS}</label>
+          </td>
+        </tr>
+        <tr class="row1">
+          <td nowrap="nowrap">
+            <label for="statistics[visitors]"><input id="statistics[visitors]" name="statistics[]" type="checkbox" value="visitors" />&nbsp;{TXT_VISITOR_DETAIL_FROM_TODAY}</label>
+          </td>
+        </tr>
+        <tr class="row2">
+          <td nowrap="nowrap">
+            <label for="statistics[mvp]"><input id="statistics[mvp]" name="statistics[]" type="checkbox" value="mvp" />&nbsp;{TXT_MOST_POPULAR_PAGES}</label>
+          </td>
+        </tr>
+        <tr class="row1">
+          <td nowrap="nowrap">
+            <label for="statistics[referer]"><input id="statistics[referer]" name="statistics[]" type="checkbox" value="referer" />&nbsp;{TXT_REFERER}</label>
+          </td>
+        </tr>
+        <tr class="row2">
+          <td nowrap="nowrap">
+            <label for="statistics[hostname]"><input id="statistics[hostname]" name="statistics[]" type="checkbox" value="hostname" />&nbsp;{TXT_DOMAIN}</label>
+          </td>
+        </tr>
+        <tr class="row1">
+          <td nowrap="nowrap">
+            <label for="statistics[country]"><input id="statistics[country]" name="statistics[]" type="checkbox" value="country" />&nbsp;{TXT_COUNTRIES_OF_ORIGIN}</label>
+          </td>
+        </tr>
+        <tr class="row2">
+          <td nowrap="nowrap">
+            <label for="statistics[browsers]"><input id="statistics[browsers]" name="statistics[]" type="checkbox" value="browsers" />&nbsp;{TXT_BROWSERS}</label>
+          </td>
+        </tr>
+        <tr class="row1">
+          <td nowrap="nowrap">
+            <label for="statistics[os]"><input id="statistics[os]" name="statistics[]" type="checkbox" value="os" />&nbsp;{TXT_OPERATING_SYSTEMS}</label>
+          </td>
+        </tr>
+        <tr class="row2">
+          <td nowrap="nowrap">
+            <label for="statistics[search]"><input id="statistics[search]" name="statistics[]" type="checkbox" value="search" />&nbsp;{TXT_SEARCH_TERMS}</label>
+          </td>
+        </tr>
+        <tr class="row1">
+          <td nowrap="nowrap">
+            <label for="statistics[spiders]"><input id="statistics[spiders]" name="statistics[]" type="checkbox" value="spiders" />&nbsp;{TXT_SEARCH_ENGINES}</label>
+          </td>
+        </tr>
+        <tr class="row2">
+          <td nowrap="nowrap">
+            <label for="statistics[indexedPages]"><input id="statistics[indexedPages]" name="statistics[]" type="checkbox" value="indexedPages" />&nbsp;{TXT_INDEXED_PAGES}</label>
+          </td>
+        </tr>
+        <tr class="row1">
+          <td nowrap="nowrap">
+            <label for="statistics[resolution]"><input id="statistics[resolution]" name="statistics[]" type="checkbox" value="resolution" />&nbsp;{TXT_SCREEN_RESOLUTION}</label>
+          </td>
+        </tr>
+        <tr class="row2">
+          <td nowrap="nowrap">
+            <label for="statistics[colour]"><input id="statistics[colour]" name="statistics[]" type="checkbox" value="colour" />&nbsp;{TXT_COLOUR_DEPTH}</label>
+          </td>
+        </tr>
+        <tr class="row1">
+          <td nowrap="nowrap">
+            <label for="statistics[javascript]"><input id="statistics[javascript]" name="statistics[]" type="checkbox" value="javascript" />&nbsp;{TXT_JAVASCRIPT_SUPPORT}</label>
+          </td>
+        </tr>
 
-		</table>
-		<img src="../core/Core/View/Media/icons/arrow.gif" border="0" width="38" height="22" title="{TXT_MARKED}:" alt="{TXT_MARKED}:" />
-		<a href="javascript:{}" onclick="changeCheckboxes('stats_delete_form','statistics[]',true)" title="{TXT_SELECT_ALL}">{TXT_SELECT_ALL}</a>&nbsp;/&nbsp;
-		<a href="javascript:{}" onclick="changeCheckboxes('stats_delete_form','statistics[]',false)" title="{TXT_REMOVE_SELECTION}">{TXT_REMOVE_SELECTION}</a><br />
-		<br />
-		<input type="submit" name="delete_statistics" value="{TXT_RESET_STATISTIC}" />
-	</form>
+    </table>
+    <img src="../core/Core/View/Media/icons/arrow.gif" border="0" width="38" height="22" title="{TXT_MARKED}:" alt="{TXT_MARKED}:" />
+    <a href="javascript:{}" onclick="changeCheckboxes('stats_delete_form','statistics[]',true)" title="{TXT_SELECT_ALL}">{TXT_SELECT_ALL}</a>&nbsp;/&nbsp;
+    <a href="javascript:{}" onclick="changeCheckboxes('stats_delete_form','statistics[]',false)" title="{TXT_REMOVE_SELECTION}">{TXT_REMOVE_SELECTION}</a><br />
+    <br />
+    <input type="submit" name="delete_statistics" value="{TXT_RESET_STATISTIC}" />
+  </form>
 </div>
 <!-- end statsReset div -->

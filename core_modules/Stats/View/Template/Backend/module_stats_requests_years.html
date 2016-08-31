@@ -2,39 +2,39 @@
 <li><a id="requestsTab_statsRequests1" class="active" href="javascript:{}" onclick="selectTab('statsRequests1')" title="{TXT_ANNUAL_STATISTICS}">{TXT_ANNUAL_STATISTICS}</a></li>
 <li><a id="requestsTab_statsRequests2" href="javascript:{}" onclick="selectTab('statsRequests2')" title="{TXT_DETAILS}">{TXT_DETAILS}</a></li>
 </ul>
-<!-- start statsRequests1 div --> 
+<!-- start statsRequests1 div -->
 <div id="statsRequests1" class="requestsTab" style="display:block">
-	<table cellspacing="0" cellpadding="1" width="100%" border="0" class="adminlist">
-		<tr>
-			<th>&nbsp;{TXT_ANNUAL_STATISTICS}</th>
-		</tr>
-		<tr class="row1">
-			<td nowrap="nowrap" width="100%">
-			    <!-- Inline style definitions (width & height) are necessary for the jqplot plugin -->
+  <table cellspacing="0" cellpadding="1" width="100%" border="0" class="adminlist">
+    <tr>
+      <th>&nbsp;{TXT_ANNUAL_STATISTICS}</th>
+    </tr>
+    <tr class="row1">
+      <td nowrap="nowrap" width="100%">
+          <!-- Inline style definitions (width & height) are necessary for the jqplot plugin -->
                 <div id="chart" style="width: 800px; height: 300px;"></div>
-			</td>
-		</tr>
-	</table>
+      </td>
+    </tr>
+  </table>
 </div>
 <!-- end statsRequests1 div -->
-<!-- start statsRequests2 div --> 
+<!-- start statsRequests2 div -->
 <div id="statsRequests2" class="requestsTab" style="display:none">
-	<table cellspacing="0" cellpadding="1" width="100%" border="0" class="adminlist">
-		<tr>
-			<th colspan="3">&nbsp;{TXT_DETAILS}</th>
-		</tr>
-		<tr class="row1">
-			<td nowrap="nowrap" width="8%"><b>{TXT_YEAR}</b></td>
-			<td nowrap="nowrap" width="8%"><b>{TXT_VISITORS}</b></td>
-			<td nowrap="nowrap" width="84%"><b>{TXT_PAGE_VIEWS}</b></td>
-		</tr>
-		<!-- BEGIN stats_requests_years -->
-			<tr class="{STATS_REQUESTS_ROW_CLASS}">
-				<td nowrap="nowrap" width="8%">{STATS_REQUESTS_TIME}</td>
-				<td nowrap="nowrap" width="8%">{STATS_REQUESTS_VISITORS}</td>
-				<td nowrap="nowrap" width="84%">{STATS_REQUESTS_PAGE_VIEWS}</td>
-			</tr>
-		<!-- END stats_requests_years -->
-	</table>
+  <table cellspacing="0" cellpadding="1" width="100%" border="0" class="adminlist">
+    <tr>
+      <th colspan="3">&nbsp;{TXT_DETAILS}</th>
+    </tr>
+    <tr class="row1">
+      <td nowrap="nowrap" width="8%"><b>{TXT_YEAR}</b></td>
+      <td nowrap="nowrap" width="8%"><b>{TXT_VISITORS}</b></td>
+      <td nowrap="nowrap" width="84%"><b>{TXT_PAGE_VIEWS}</b></td>
+    </tr>
+    <!-- BEGIN stats_requests_years -->
+      <tr class="{STATS_REQUESTS_ROW_CLASS}">
+        <td nowrap="nowrap" width="8%">{STATS_REQUESTS_TIME}</td>
+        <td nowrap="nowrap" width="8%">{STATS_REQUESTS_VISITORS}</td>
+        <td nowrap="nowrap" width="84%">{STATS_REQUESTS_PAGE_VIEWS}</td>
+      </tr>
+    <!-- END stats_requests_years -->
+  </table>
 </div>
 <!-- end statsRequests2 div -->

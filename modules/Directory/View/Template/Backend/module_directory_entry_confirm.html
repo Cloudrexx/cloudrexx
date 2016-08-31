@@ -38,17 +38,17 @@ function confirmDoAction()
 {
     if(confirmIsChecked("formSelected[]") == true)
     {
-	    if(document.fileList.selectAction.value == "confirm")
-	    {
-	        document.fileList.action = "index.php?cmd=Directory&act=confirmfile";
-	        document.fileList.submit();
-	    }
+      if(document.fileList.selectAction.value == "confirm")
+      {
+          document.fileList.action = "index.php?cmd=Directory&act=confirmfile";
+          document.fileList.submit();
+      }
         if(document.fileList.selectAction.value == "delete")
-	    {
-	    	if(confirm('{TXT_CONFIRM_DELETE_DATA}\n{TXT_ACTION_IS_IRREVERSIBLE}'))
-	        	document.fileList.action = "index.php?cmd=Directory&act=delfile";
-        		document.fileList.submit();
-	    }
+      {
+        if(confirm('{TXT_CONFIRM_DELETE_DATA}\n{TXT_ACTION_IS_IRREVERSIBLE}'))
+            document.fileList.action = "index.php?cmd=Directory&act=delfile";
+            document.fileList.submit();
+      }
     }
     else
     {
@@ -79,7 +79,7 @@ function confirmDoAction()
     <th colspan="11">{TXT_CONFIRMLIST}</th>
   </tr>
   <tr class="row3">
-  	<td width="16">
+    <td width="16">
        <center><b>#</b></center>
     </td>
     <td width="55%"><b><a href="index.php?cmd=Directory&amp;act=confirm&amp;sort=name{CATID_SORT}">{TXT_NAME}</a></b></td>
@@ -89,7 +89,7 @@ function confirmDoAction()
   </tr>
   <!-- BEGIN filesRow -->
   <tr class={FILES_ROW}>
-  	<td width="16" valign="top">
+    <td width="16" valign="top">
         <center>
         {FILES_CHECKBOX}
         </center>
@@ -110,7 +110,7 @@ function confirmDoAction()
     <td width="16" valign="top">
         <br />
     </td>
-  	<td width="100%" valign="top" colspan="6">
+    <td width="100%" valign="top" colspan="6">
         {NO_FILES_FOUND}
     </td>
   </tr>
@@ -118,19 +118,19 @@ function confirmDoAction()
 </table>
 <!-- BEGIN importSelectAction -->
 <table width="100%" height="50" cellspacing="0" cellpadding="5" border="0">
-	<tr>
-		<td valign="top">
-			<img src="../core/Core/View/Media/icons/arrow.gif" border="0" width="38" height="22" alt="{TXT_MARKED}:" />
-			<a href="javascript:{void(0)};" onclick="changeCheckboxes('fileList','formSelected[]',true); return false;">{TXT_SELECT_ALL}</a> /
-			<a href="javascript:{void(0)};" onclick="changeCheckboxes('fileList','formSelected[]',false); return false;">{TXT_DESELECT_ALL}</a>
-			<img src="../core/Core/View/Media/icons/strike.gif" width="34" height="22" alt="strike" />
-			<select name="selectAction" onchange="confirmDoAction();">
-				<option value="0" selected="selected">{TXT_SELECT_ACTION}</option>
-				<option value="confirm">{TXT_IMPORT}</option>
-				<option value="delete">{TXT_DELETE}</option>
-			 </select>
-		</td>
-	</tr>
+  <tr>
+    <td valign="top">
+      <img src="../core/Core/View/Media/icons/arrow.gif" border="0" width="38" height="22" alt="{TXT_MARKED}:" />
+      <a href="javascript:{void(0)};" onclick="changeCheckboxes('fileList','formSelected[]',true); return false;">{TXT_SELECT_ALL}</a> /
+      <a href="javascript:{void(0)};" onclick="changeCheckboxes('fileList','formSelected[]',false); return false;">{TXT_DESELECT_ALL}</a>
+      <img src="../core/Core/View/Media/icons/strike.gif" width="34" height="22" alt="strike" />
+      <select name="selectAction" onchange="confirmDoAction();">
+        <option value="0" selected="selected">{TXT_SELECT_ACTION}</option>
+        <option value="confirm">{TXT_IMPORT}</option>
+        <option value="delete">{TXT_DELETE}</option>
+       </select>
+    </td>
+  </tr>
 </table>
 <!-- END importSelectAction -->
 </form>

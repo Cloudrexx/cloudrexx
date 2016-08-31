@@ -14,9 +14,9 @@
 
 <script type="text/javascript">
 
-    
+
     cx.license = new function() {
-        
+
         return {
             crc32: function(s) {
                 s = String(s);
@@ -101,13 +101,13 @@
     jQuery("document").ready(function() {
         var selector = "input[name=licenseKey]";
         var id = jQuery("#installationId").html();
-        
+
         cx.license.appendIcon(jQuery(selector), id);
-        
+
         jQuery(selector).keyup(function() {
             cx.license.appendIcon(jQuery(this), id);
         });
-        
+
         var edition = jQuery("#edition").html();
         if (edition == "Free" || edition == "Trial") {
             jQuery("#upgradeButton").show();

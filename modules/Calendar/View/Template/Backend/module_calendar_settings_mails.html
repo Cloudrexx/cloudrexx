@@ -13,37 +13,37 @@ function deleteTemplate(templateId)
 <br />
 <form id="formSettingsMail" action="index.php?cmd={CALENDAR_MODULE_NAME}&act=settings&tpl=mails" method="post" >
     <input name="submitSettingsMail" type="hidden" value="1" />
-	<table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
-	    <tr>
-	        <th colspan="6">{TXT_CALENDAR_MAIL_TEMPLATES}</th>
-	    </tr>
-	    <tr class="row3">
-	        <td width="1%"><strong>{TXT_CALENDAR_STATUS}&nbsp;&nbsp;&nbsp;</strong></td>
-	        <td width="25%"><strong>{TXT_CALENDAR_TITLE}&nbsp;</strong></td>
-	        <td width="25%"><strong>{TXT_CALENDAR_ACTION}&nbsp;</strong></td>
-	        <td width="20%"><strong>{TXT_CALENDAR_LANG}&nbsp;</strong></td>
-	        <td width="19%"><strong>{TXT_CALENDAR_DEFAULT}&nbsp;</strong></td>
-	        <td width="10%" style="text-align: right;"><strong>{TXT_CALENDAR_ACTION}&nbsp;</strong></td>
-	    </tr>
-	    <!-- BEGIN templateList -->
-	    <tr class="{CALENDAR_TEMPLATE_ROW}">
-	        <td style="text-align: center;"><a href="index.php?cmd={CALENDAR_MODULE_NAME}&amp;act=settings&tpl=mails&amp;switch_status={CALENDAR_TEMPLATE_ID}"><img src="../core/Core/View/Media/icons/led_{CALENDAR_TEMPLATE_STATUS}.gif" border="0" alt="" title="" /></a></td>
-	        <td><b><a href="index.php?cmd={CALENDAR_MODULE_NAME}&amp;act=settings&tpl=modify_mail&amp;id={CALENDAR_TEMPLATE_ID}" target="_self" title="{CALENDAR_TEMPLATE_TITLE} {TXT_EDIT}">{CALENDAR_TEMPLATE_TITLE}</a></b></td>
-	        <td ><em>{CALENDAR_TEMPLATE_ACTION}</em></td>
-	        <td>{CALENDAR_TEMPLATE_LANG}</td>
-	        <td><input type="radio" onclick="submit();" name="{CALENDAR_TEMPLATE_DEFAULT_NAME}" value="{CALENDAR_TEMPLATE_ID}" {CALENDAR_TEMPLATE_DEFAULT}/></td>
-	        <td style="text-align: right;">
-	            <a href="index.php?cmd={CALENDAR_MODULE_NAME}&amp;act=settings&tpl=modify_mail&amp;id={CALENDAR_TEMPLATE_ID}" target="_self" title="{CALENDAR_TEMPLATE_TITLE} {TXT_CALENDAR_EDIT}"><img src="../core/Core/View/Media/icons/edit.gif" border="0" alt="{CALENDAR_TEMPLATE_TITLE} {TXT_CALENDAR_EDIT}" title="{CALENDAR_TEMPLATE_TITLE} {TXT_CALENDAR_EDIT}" /></a>
-	            <a href="javascript:deleteTemplate('{CALENDAR_TEMPLATE_ID}');" title="{CALENDAR_TEMPLATE_TITLE} {TXT_CALENDAR_DELETE}"><img src="../core/Core/View/Media/icons/delete.gif" border="0" alt="{CALENDAR_TEMPLATE_TITLE} {TXT_CALENDAR_DELETE}" title="{CALENDAR_TEMPLATE_TITLE} {TXT_CALENDAR_DELETE}" /></a>
-	        </td>
-	    </tr>
-	    <!-- END templateList -->
-	
-	    <!-- BEGIN emptyTemplateList -->
-	    <tr class="row1">
-	        <td colspan="6"><i>{TXT_CALENDAR_NO_TEMPLATES_FOUND}</i></td>
-	    </tr>
-	    <!-- END emptyTemplateList -->
-	</table>
+  <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
+      <tr>
+          <th colspan="6">{TXT_CALENDAR_MAIL_TEMPLATES}</th>
+      </tr>
+      <tr class="row3">
+          <td width="1%"><strong>{TXT_CALENDAR_STATUS}&nbsp;&nbsp;&nbsp;</strong></td>
+          <td width="25%"><strong>{TXT_CALENDAR_TITLE}&nbsp;</strong></td>
+          <td width="25%"><strong>{TXT_CALENDAR_ACTION}&nbsp;</strong></td>
+          <td width="20%"><strong>{TXT_CALENDAR_LANG}&nbsp;</strong></td>
+          <td width="19%"><strong>{TXT_CALENDAR_DEFAULT}&nbsp;</strong></td>
+          <td width="10%" style="text-align: right;"><strong>{TXT_CALENDAR_ACTION}&nbsp;</strong></td>
+      </tr>
+      <!-- BEGIN templateList -->
+      <tr class="{CALENDAR_TEMPLATE_ROW}">
+          <td style="text-align: center;"><a href="index.php?cmd={CALENDAR_MODULE_NAME}&amp;act=settings&tpl=mails&amp;switch_status={CALENDAR_TEMPLATE_ID}"><img src="../core/Core/View/Media/icons/led_{CALENDAR_TEMPLATE_STATUS}.gif" border="0" alt="" title="" /></a></td>
+          <td><b><a href="index.php?cmd={CALENDAR_MODULE_NAME}&amp;act=settings&tpl=modify_mail&amp;id={CALENDAR_TEMPLATE_ID}" target="_self" title="{CALENDAR_TEMPLATE_TITLE} {TXT_EDIT}">{CALENDAR_TEMPLATE_TITLE}</a></b></td>
+          <td ><em>{CALENDAR_TEMPLATE_ACTION}</em></td>
+          <td>{CALENDAR_TEMPLATE_LANG}</td>
+          <td><input type="radio" onclick="submit();" name="{CALENDAR_TEMPLATE_DEFAULT_NAME}" value="{CALENDAR_TEMPLATE_ID}" {CALENDAR_TEMPLATE_DEFAULT}/></td>
+          <td style="text-align: right;">
+              <a href="index.php?cmd={CALENDAR_MODULE_NAME}&amp;act=settings&tpl=modify_mail&amp;id={CALENDAR_TEMPLATE_ID}" target="_self" title="{CALENDAR_TEMPLATE_TITLE} {TXT_CALENDAR_EDIT}"><img src="../core/Core/View/Media/icons/edit.gif" border="0" alt="{CALENDAR_TEMPLATE_TITLE} {TXT_CALENDAR_EDIT}" title="{CALENDAR_TEMPLATE_TITLE} {TXT_CALENDAR_EDIT}" /></a>
+              <a href="javascript:deleteTemplate('{CALENDAR_TEMPLATE_ID}');" title="{CALENDAR_TEMPLATE_TITLE} {TXT_CALENDAR_DELETE}"><img src="../core/Core/View/Media/icons/delete.gif" border="0" alt="{CALENDAR_TEMPLATE_TITLE} {TXT_CALENDAR_DELETE}" title="{CALENDAR_TEMPLATE_TITLE} {TXT_CALENDAR_DELETE}" /></a>
+          </td>
+      </tr>
+      <!-- END templateList -->
+
+      <!-- BEGIN emptyTemplateList -->
+      <tr class="row1">
+          <td colspan="6"><i>{TXT_CALENDAR_NO_TEMPLATES_FOUND}</i></td>
+      </tr>
+      <!-- END emptyTemplateList -->
+  </table>
 </form>
 <!-- END module_calendar_settings_mails.html -->

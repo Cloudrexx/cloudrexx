@@ -1,7 +1,7 @@
 <!-- start showObj --> <script type="text/javascript">
 //<![CDATA[
-	[[IMMO_DETAILS_JAVASCRIPT]]
-	
+  [[IMMO_DETAILS_JAVASCRIPT]]
+
 //]]>
 </script>
 <div id="immo">
@@ -9,7 +9,7 @@
 <!-- BEGIN basicData -->
 <tbody>
 <tr>
-    <td class="center" colspan="2"> 
+    <td class="center" colspan="2">
        <a href="javascript:void(0)" onclick="openPreview('[[IMMO_IMG_SRC]]', '[[IMMO_IMG_WIDTH]]', '[[IMMO_IMG_HEIGHT]]')">
          <img [[IMMO_IMG_DIM]] src="[[IMMO_IMG_SRC]]" title="[[IMMO_HEADER]]" alt="[[IMMO_HEADER]]" />
        <a/>
@@ -18,28 +18,28 @@
 <tr>
     <td class="nowrap">
          <p>[[IMMO_HEADLINE]]</p>
-         <p>[[IMMO_ADDRESS]] <br /> [[IMMO_LOCATION]] 
-           <a href="javascript:void(0)" title="[[TXT_IMMO_SHOWMAP]]" onclick="openMap([[IMMO_ID]]);"> <br />[[TXT_IMMO_SHOWMAP]] </a><br />  
+         <p>[[IMMO_ADDRESS]] <br /> [[IMMO_LOCATION]]
+           <a href="javascript:void(0)" title="[[TXT_IMMO_SHOWMAP]]" onclick="openMap([[IMMO_ID]]);"> <br />[[TXT_IMMO_SHOWMAP]] </a><br />
          </p>
      </td>
      <td>
       <p style="margin-left: 25px;">[[TXT_IMMO_PRICE_PREFIX]] [[IMMO_PRICE]][[TXT_IMMO_PRICE_SUFFIX]] </p>
-     <ul> 		
+     <ul>
          <!-- BEGIN listing -->
-  	       <li> [[IMMO_LISTING]] </li>
-         <!-- END listing --> 		
+           <li> [[IMMO_LISTING]] </li>
+         <!-- END listing -->
      </ul>
      <br />
     </td>
  </tr>
 <tr>
-	<td colspan="2">
-		<p>[[IMMO_DESCRIPTION]]</p>
-             <!-- BEGIN homepageLink --> 
+  <td colspan="2">
+    <p>[[IMMO_DESCRIPTION]]</p>
+             <!-- BEGIN homepageLink -->
                  <ul><li><a href="[[IMMO_HOMEPAGE_LINK]]" title="[[TXT_IMMO_HOMEPAGE_LINK]]"> [[TXT_IMMO_HOMEPAGE_LINK]]</a>&nbsp;</li></ul>
              <!-- END homepageLink -->
             <br />
-	</td>
+  </td>
 </tr>
     <!-- END basicData -->
 <tr>
@@ -62,24 +62,24 @@
 </td>
 </tr>
 <tr>
-	<td colspan="2">
-		<h1>[[TXT_IMMO_PICTURES]]</h1>
-	</td>
+  <td colspan="2">
+    <h1>[[TXT_IMMO_PICTURES]]</h1>
+  </td>
 </tr>
 </table>
 <table style="width: 100%">
-<!-- BEGIN panorama --> 
+<!-- BEGIN panorama -->
 <tr>
  <td class="center" colspan="3">
   [[IMMO_FIELD_NAME]]
  </td>
 </tr>
 <tr>
- <td class="center" colspan="3"> 
+ <td class="center" colspan="3">
   <a href="javascript:void(0)" onclick="openPreview('[[IMMO_IMG_SRC]]', '[[IMMO_IMG_WIDTH]]', '[[IMMO_IMG_HEIGHT]]')">
    <img [[IMMO_IMG_DIM]] src="[[IMMO_IMG_SRC]]" alt="[[IMMO_FIELD_CONTENT]]" title="[[IMMO_IMG_SRC]]"/>
-  </a> 
- </td>  
+  </a>
+ </td>
 </tr>
 <tr>
  <td class="center" colspan="3">
@@ -89,69 +89,69 @@
 <!-- END panorama -->
 
 
-<!-- BEGIN imageListRow -->  
+<!-- BEGIN imageListRow -->
 <tr>
-<!-- BEGIN imageList -->  
-	<td class="center" style="width: 33%;">
+<!-- BEGIN imageList -->
+  <td class="center" style="width: 33%;">
             <!-- BEGIN anchor_plan_images -->
                  <a name="plans"> &nbsp; </a>
             <!-- END anchor_plan_images -->
-		[[IMMO_FIELD_NAME]]<br />
-		<a href="javascript:void(0)" onclick="openPreview('[[IMMO_IMG_SRC]]', '[[IMMO_IMG_WIDTH]]', '[[IMMO_IMG_HEIGHT]]')"><img [[IMMO_IMG_DIM]] src="[[IMMO_IMG_SRC]]" /></a><br />
-	    [[IMMO_FIELD_CONTENT]]<br />
-	</td> 
-<!-- END imageList --> 
+    [[IMMO_FIELD_NAME]]<br />
+    <a href="javascript:void(0)" onclick="openPreview('[[IMMO_IMG_SRC]]', '[[IMMO_IMG_WIDTH]]', '[[IMMO_IMG_HEIGHT]]')"><img [[IMMO_IMG_DIM]] src="[[IMMO_IMG_SRC]]" /></a><br />
+      [[IMMO_FIELD_CONTENT]]<br />
+  </td>
+<!-- END imageList -->
 </tr>
-<!-- BEGIN imageListHR --> 
-<tr> 
-	<td colspan="3">    
-		<hr />   
-	</td> 
+<!-- BEGIN imageListHR -->
+<tr>
+  <td colspan="3">
+    <hr />
+  </td>
 </tr>
-<!-- END imageListHR --> 
-<!-- END imageListRow -->  
+<!-- END imageListHR -->
+<!-- END imageListRow -->
 </table>
 <br />
 <table width="100%">
 <tr>
     <td colspan="2">
-		<h1>[[TXT_IMMO_OBJECTDATA]]</h1>
-		<span style="float: right"><a href="#servicelinks" name="objdata" title="[[TXT_IMMO_OBJECTDATA]]">[[TXT_IMMO_GOTO_TOP]]</a></span>
-	</td>
+    <h1>[[TXT_IMMO_OBJECTDATA]]</h1>
+    <span style="float: right"><a href="#servicelinks" name="objdata" title="[[TXT_IMMO_OBJECTDATA]]">[[TXT_IMMO_GOTO_TOP]]</a></span>
+  </td>
 </tr>
-<!-- BEGIN textList -->  
+<!-- BEGIN textList -->
 <tr>
-	<td class="field">
-		[[IMMO_FIELD_NAME]]
-	</td>
-	<td>
-		[[TXT_IMMO_CURRENCY_PREFIX]] [[IMMO_FIELD_CONTENT]][[TXT_IMMO_CURRENCY_SUFFIX]]
-	</td>
+  <td class="field">
+    [[IMMO_FIELD_NAME]]
+  </td>
+  <td>
+    [[TXT_IMMO_CURRENCY_PREFIX]] [[IMMO_FIELD_CONTENT]][[TXT_IMMO_CURRENCY_SUFFIX]]
+  </td>
 </tr>
-<!-- BEGIN textListHR -->  
-<tr> 
-	<td colspan="2"> 
-		<hr /> 
-	</td> 
+<!-- BEGIN textListHR -->
+<tr>
+  <td colspan="2">
+    <hr />
+  </td>
 </tr>
-<!-- END textListHR -->  
+<!-- END textListHR -->
 <!-- END textList -->
 <tr><td colspan="2">&nbsp;</td></tr>
 <tr>
     <td colspan="2">
-		<h1>[[TXT_IMMO_LINKS]]</h1>
-		<span style="float: right"><a href="#servicelinks" name="links" title="[[TXT_IMMO_LINKS]]">[[TXT_IMMO_GOTO_TOP]]</a></span>
-	</td>
+    <h1>[[TXT_IMMO_LINKS]]</h1>
+    <span style="float: right"><a href="#servicelinks" name="links" title="[[TXT_IMMO_LINKS]]">[[TXT_IMMO_GOTO_TOP]]</a></span>
+  </td>
 </tr>
-<!-- BEGIN linkListRow -->  
+<!-- BEGIN linkListRow -->
 <tr>
 <!-- BEGIN linkList -->
-	<td>	
-		<img style="border: none; vertical-align: middle;" height="16px" width="16px" src="[[IMMO_LINK_ICON_SRC]]" alt="[[IMMO_FIELD_NAME]]" title="[[IMMO_FIELD_NAME]]" /><a href="[[IMMO_FIELD_CONTENT]]" title="[[IMMO_FIELD_NAME]]"> [[IMMO_FIELD_NAME]]  </a>
-	</td>
+  <td>
+    <img style="border: none; vertical-align: middle;" height="16px" width="16px" src="[[IMMO_LINK_ICON_SRC]]" alt="[[IMMO_FIELD_NAME]]" title="[[IMMO_FIELD_NAME]]" /><a href="[[IMMO_FIELD_CONTENT]]" title="[[IMMO_FIELD_NAME]]"> [[IMMO_FIELD_NAME]]  </a>
+  </td>
 <!-- END linkList -->
-</tr>  
-<!-- END linkListRow -->  
+</tr>
+<!-- END linkListRow -->
 <tr><td colspan="2">&nbsp;</td></tr>
 </tbody>
 </table>
@@ -162,7 +162,7 @@
 <!--
 <div style="float: right;">
   <a href="javascript:history.back()" title="[[TXT_IMMO_BACK]]"> [[TXT_IMMO_BACK]] </a>
-</div>        
+</div>
 -->
 <div style="float: right;">
   <a href="index.php?section=Contact&cmd=3" title="[[TXT_IMMO_CONTACT_FORM]]"> [[TXT_IMMO_CONTACT_FORM]]</a>&nbsp;

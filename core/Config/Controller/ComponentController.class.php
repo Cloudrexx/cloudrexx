@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,10 +24,10 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Main controller for Config
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
@@ -38,7 +38,7 @@ namespace Cx\Core\Config\Controller;
 
 /**
  * Main controller for Config
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
@@ -53,7 +53,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
 
      /**
      * Load your component.
-     * 
+     *
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
      */
     public function load(\Cx\Core\ContentManager\Model\Entity\Page $page) {
@@ -67,8 +67,8 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         \Permission::checkAccess(17, 'static');
         $objConfig = new \Cx\Core\Config\Controller\Config();
         $objConfig->getPage();
-                
-        $this->cx->getTemplate()->setRoot($cachedRoot);        
+
+        $this->cx->getTemplate()->setRoot($cachedRoot);
     }
 
     public function postResolve(\Cx\Core\ContentManager\Model\Entity\Page $page) {

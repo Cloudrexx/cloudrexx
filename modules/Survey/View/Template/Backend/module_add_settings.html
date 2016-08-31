@@ -1,30 +1,29 @@
 {CREATE_SETTING_JAVASCRIPT}
    <form name="salutation_agegroup" method="post" action="">
- 	<table width="100%" cellspacing="0" cellpadding="3" border="0" class="adminlist">
+   <table width="100%" cellspacing="0" cellpadding="3" border="0" class="adminlist">
          <tr>
-	   <th colspan="15">{SETTINGS_TEXT}</th>
-	  </tr>   
+     <th colspan="15">{SETTINGS_TEXT}</th>
+    </tr>
          <tr class="row1">
            <td nowrap="nowrap">{ADD_SALUTATION}&nbsp;<font color="red">*</font></td>
            <td>
             <textarea style="width: 440px;" rows="6" name="salutation" id="salutation">{DB_SALUTATION_VALUE}</textarea>
            </td>
-         </tr>  
+         </tr>
          <tr class="row2">
            <td nowrap="nowrap">{AGE_GROUP}&nbsp;<font color="red">*</font></td>
            <td>
             <textarea style="width: 440px;" rows="6" name="Age_group" id="Age_group">{DB_AGEGROUP_VALUE}</textarea>
            </td>
-         </tr>                
-  	</table>
-	<br />
-	<table cellpadding="2" cellspacing="0" border="0">
-		<tr>
-			<td>
-  	<input type="hidden" name="settings_id" value="{TXT_SETTING_ID}"/>
-  	<input type="submit" name="settings_submit" value="{TXT_SAVE_TXT}" onClick="return checkValidations()" />
-			</td>
-   		</tr>
-	</table>
+         </tr>
+    </table>
+  <br />
+  <table cellpadding="2" cellspacing="0" border="0">
+    <tr>
+      <td>
+    <input type="hidden" name="settings_id" value="{TXT_SETTING_ID}"/>
+    <input type="submit" name="settings_submit" value="{TXT_SAVE_TXT}" onClick="return checkValidations()" />
+      </td>
+       </tr>
+  </table>
    </form>
-

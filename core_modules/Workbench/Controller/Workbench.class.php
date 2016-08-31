@@ -27,7 +27,7 @@
 
 /**
  * This is the Workbench Controller
- * 
+ *
  * This handles Workbench's configuration and files
  * @author Michael Ritter <michael.ritter@comvation.com>
  */
@@ -41,13 +41,13 @@ class WorkbenchException extends \Exception {}
 
 /**
  * This is the Workbench Controller
- * 
+ *
  * This handles Workbench's configuration and files
  * @author Michael Ritter <michael.ritter@comvation.com>
  */
 class Workbench {
     private $config = null;
-    
+
     /**
      * Returns a list of files (directories include all contained files and folders)
      * @return array List of files and folders
@@ -65,7 +65,7 @@ class Workbench {
             '/testing',
         );
     }
-    
+
     /**
      * Returns the configuration value for the given identifier
      * @param string $identifier Configuration identifier
@@ -80,7 +80,7 @@ class Workbench {
         }
         return $this->config[$identifier];
     }
-    
+
     /**
      * Sets the configuration value with the given identifier to the given value
      * @param string $identifier Configuration identifier
@@ -92,16 +92,16 @@ class Workbench {
         }
         $this->config[$identifier] = $value;
     }
-    
+
     /**
      * Destructor
-     * 
+     *
      * Write Workbench configuration
      */
     public function __destruct() {
         $this->writeConfig();
     }
-    
+
     /**
      * Read configuration into memory
      */
@@ -117,7 +117,7 @@ class Workbench {
             $this->config[trim($line[0])] = trim($line[1]);
         }
     }
-    
+
     /**
      * Write configuration from memory into filesystem
      */

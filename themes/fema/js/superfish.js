@@ -3,8 +3,8 @@
  * Copyright (c) 2013 Joel Birch
  *
  * Dual licensed under the MIT and GPL licenses:
- *	http://www.opensource.org/licenses/mit-license.php
- *	http://www.gnu.org/licenses/gpl.html
+ *  http://www.opensource.org/licenses/mit-license.php
+ *  http://www.gnu.org/licenses/gpl.html
  */
 (function ($) {
     "use strict";
@@ -13,9 +13,9 @@
         var c = {
             bcClass: 'sf-breadcrumb',
             menuClass: 'sf-js-enabled',
-            anchorClass: 'sf-with-ul',            
+            anchorClass: 'sf-with-ul',
             menuArrowClass: 'sf-arrows'
-        },        
+        },
         ios = (function () {
             var ios = /iPhone|iPad|iPod/i.test(navigator.userAgent);
             if (ios) {

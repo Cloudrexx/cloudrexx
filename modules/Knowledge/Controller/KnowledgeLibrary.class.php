@@ -27,7 +27,7 @@
 
 /**
  * knowledgeLib
- * 
+ *
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author Stefan Heinemann <sh@comvation.com>
  * @package     cloudrexx
@@ -39,7 +39,7 @@ namespace Cx\Modules\Knowledge\Controller;
 
 /**
  * Some basic operations for the knowledge module.
- * 
+ *
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author Stefan Heinemann <sh@comvation.com>
  * @package cloudrexx
@@ -51,49 +51,49 @@ class KnowledgeLibrary {
      *
      * @var object
      */
-	protected $settings;
-	
-	/**
-	 * The articles object
-	 *
-	 * @var object
-	 */
-	protected $articles;
-	
-	/**
-	 * The categories object
-	 *
-	 * @var object
-	 */
-	protected $categories;
-	
-	/**
-	 * The tags object
-	 *
-	 * @var object
-	 */
-	protected $tags;
+    protected $settings;
 
-	/**
-	 * Initialise the needed objects
+    /**
+     * The articles object
+     *
+     * @var object
      */
-	public function __construct() {
-		$this->categories = new KnowledgeCategory();
-		$this->settings = new KnowledgeSettings();
-		$this->articles = new KnowledgeArticles($this->isAllLangsActive());
-		$this->tags = new KnowledgeTags();
-		
-		$this->_arrLanguages 	= $this->createLanguageArray();
-	}
-	
-	/**
-	 * Update the global setting
-	 *
-	 * @param int $value
-	 * @throws DatabaseError
-	 * @global $objDatabase
-	 */
-	protected function updateGlobalSetting($value)
+    protected $articles;
+
+    /**
+     * The categories object
+     *
+     * @var object
+     */
+    protected $categories;
+
+    /**
+     * The tags object
+     *
+     * @var object
+     */
+    protected $tags;
+
+    /**
+     * Initialise the needed objects
+     */
+    public function __construct() {
+        $this->categories = new KnowledgeCategory();
+        $this->settings = new KnowledgeSettings();
+        $this->articles = new KnowledgeArticles($this->isAllLangsActive());
+        $this->tags = new KnowledgeTags();
+
+        $this->_arrLanguages     = $this->createLanguageArray();
+    }
+
+    /**
+     * Update the global setting
+     *
+     * @param int $value
+     * @throws DatabaseError
+     * @global $objDatabase
+     */
+    protected function updateGlobalSetting($value)
         {
             \Cx\Core\Setting\Controller\Setting::init('Config', 'component', 'Yaml');
             if (isset($value)) {
@@ -107,69 +107,69 @@ class KnowledgeLibrary {
         }
 
     /**
-	 * Return the global setting
-	 *
-	 * @return string
-	 * @throws DatabaseError
-	 * @global $objDatabase
-	 * @return mixed
-	 */
-	protected function getGlobalSetting()
-	{
+     * Return the global setting
+     *
+     * @return string
+     * @throws DatabaseError
+     * @global $objDatabase
+     * @return mixed
+     */
+    protected function getGlobalSetting()
+    {
             //return the global setting('useKnowledgePlaceholders') value
             \Cx\Core\Setting\Controller\Setting::init('Config', 'component','Yaml');
             return \Cx\Core\Setting\Controller\Setting::getValue('useKnowledgePlaceholders','Config');
-	}
-	
-	/**
-	 * Creates an array containing all frontend-languages.
-	 *
-	 * Contents:
-	 * $arrValue[$langId]['short']		=>	For Example: en, de, fr, ...
-	 * $arrValue[$langId]['long']		=>	For Example: 'English', 'Deutsch', 'French', ...
-	 *
-	 * @global 	object		$objDatabase
-	 * @return	array		$arrReturn
-	 */
-	function createLanguageArray() {
-		global $objDatabase;
+    }
 
-		$arrReturn = array();
+    /**
+     * Creates an array containing all frontend-languages.
+     *
+     * Contents:
+     * $arrValue[$langId]['short']        =>    For Example: en, de, fr, ...
+     * $arrValue[$langId]['long']        =>    For Example: 'English', 'Deutsch', 'French', ...
+     *
+     * @global     object        $objDatabase
+     * @return    array        $arrReturn
+     */
+    function createLanguageArray() {
+        global $objDatabase;
 
-		$objResult = $objDatabase->Execute('SELECT		id,
-														lang,
-														name
-											FROM		'.DBPREFIX.'languages
-											WHERE		frontend=1
-											ORDER BY	id
-										');
-		while (!$objResult->EOF) {
-			$arrReturn[$objResult->fields['id']] = array(	'short'	=>	stripslashes($objResult->fields['lang']),
-															'long'	=>	htmlentities(stripslashes($objResult->fields['name']),ENT_QUOTES, CONTREXX_CHARSET)
-														);
-			$objResult->MoveNext();
-		}
+        $arrReturn = array();
 
-		return $arrReturn;
-	}
-	
-	/**
-	 * Tells whether the allLangs setting is active or not
-	 * @return boolean True if setting is enabled
-	 */
-	public function isAllLangsActive() {
-	    return $this->settings->get("show_all_langs") == 1;
-	}
-	
-	/**
-	 * Returns lang ID based on allLangs setting
-	 * @return int|null lang ID
-	 */
-	public function getLangId() {
-	    if ($this->isAllLangsActive()) {
-	        return null;
-	    }
-	    global $_LANGID;
-	    return $_LANGID;
-	}
+        $objResult = $objDatabase->Execute('SELECT        id,
+                                                        lang,
+                                                        name
+                                            FROM        '.DBPREFIX.'languages
+                                            WHERE        frontend=1
+                                            ORDER BY    id
+                                        ');
+        while (!$objResult->EOF) {
+            $arrReturn[$objResult->fields['id']] = array(    'short'    =>    stripslashes($objResult->fields['lang']),
+                                                            'long'    =>    htmlentities(stripslashes($objResult->fields['name']),ENT_QUOTES, CONTREXX_CHARSET)
+                                                        );
+            $objResult->MoveNext();
+        }
+
+        return $arrReturn;
+    }
+
+    /**
+     * Tells whether the allLangs setting is active or not
+     * @return boolean True if setting is enabled
+     */
+    public function isAllLangsActive() {
+        return $this->settings->get("show_all_langs") == 1;
+    }
+
+    /**
+     * Returns lang ID based on allLangs setting
+     * @return int|null lang ID
+     */
+    public function getLangId() {
+        if ($this->isAllLangsActive()) {
+            return null;
+        }
+        global $_LANGID;
+        return $_LANGID;
+    }
 }

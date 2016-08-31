@@ -7,9 +7,9 @@
        <tr class="row3">
             <td width="5%">&nbsp;&nbsp;{TXT_SYMBOL}</td>
             <td width="20%">{TXT_SURVEY_TITLE}</td>
-            <td width="15%">{TXT_COUNTER}</td> 
+            <td width="15%">{TXT_COUNTER}</td>
             <td width="20%">{TXT_CREATED_AT}</td>
-            <td width="20%">{TXT_MODIFIED_AT}</td>           
+            <td width="20%">{TXT_MODIFIED_AT}</td>
             <td style="text-align:right;" width="15%">{TXT_FUNCTIONS}</td>
        </tr>
        <!-- BEGIN showEntries -->
@@ -17,42 +17,41 @@
             <td>
              <input type="checkbox" name="selectedEntriesId[]" id="selectedEntriesId" value="{TXT_SURVEY_ID}" />
             </td>
-         
+
             <td><a href="index.php?cmd=Survey&act=AddressOverview&id={TXT_LIST_ID}" target="_self" >{TXT_LIST_TITLE_LABEL}</a></td>
-            <td style="text-align:left;padding-left:2px;">{TXT_LIST_COUNTER}</td>           
+            <td style="text-align:left;padding-left:2px;">{TXT_LIST_COUNTER}</td>
             <td>{TXT_LIST_CREATED_AT}</td>
             <td>{TXT_LIST_CREATED_AT}</td>
             <td nowrap="nowrap">
-		 <div align="right" style="padding-right:5px;">
-		   	 
-		   <a href="#" target="_self" title="{TXT_IMAGE_EDIT}">
-		     <img src="../core/Core/View/Media/icons/edit.gif" border="0" alt="{TXT_IMAGE_EDIT}" title="{TXT_IMAGE_EDIT}" />
-		   </a>
-		   <a href="#" target="_self" title="{TXT_IMGALT_DELETE}">
-		     <img src="../core/Core/View/Media/icons/delete.gif" border="0" alt="{TXT_IMGALT_DELETE}" title="{TXT_IMGALT_DELETE}" />
-		   </a>
-		 </div>
-	     </td>
+     <div align="right" style="padding-right:5px;">
+
+       <a href="#" target="_self" title="{TXT_IMAGE_EDIT}">
+         <img src="../core/Core/View/Media/icons/edit.gif" border="0" alt="{TXT_IMAGE_EDIT}" title="{TXT_IMAGE_EDIT}" />
+       </a>
+       <a href="#" target="_self" title="{TXT_IMGALT_DELETE}">
+         <img src="../core/Core/View/Media/icons/delete.gif" border="0" alt="{TXT_IMGALT_DELETE}" title="{TXT_IMGALT_DELETE}" />
+       </a>
+     </div>
+       </td>
        </tr>
-       <!-- END showEntries -->       
+       <!-- END showEntries -->
 </table>
 
 <table cellpadding="2" cellspacing="0" border="0" >
-		<tr>
-			<td>
-				<img src="../core/Core/View/Media/icons/arrow.gif" border="0" width="38" height="22" alt="{TXT_ENTRIES_MARKED}:" />
-				<a href="#" onclick="changeCheckboxes('frmShowSurveyEntries','selectedEntriesId[]',true); return false;">{TXT_SELECT_ALL}</a> /
-				<a href="#" onclick="changeCheckboxes('frmShowSurveyEntries','selectedEntriesId[]',false); return false;">{TXT_DESELECT_ALL}</a>
-				<img src="../core/Core/View/Media/icons/strike.gif" alt="" />
-				<select name="frmShowEntries_MultiAction" onchange="selectMultiAction();">
-					<option value="0">{TXT_SELECT_ACTION}</option>
-					<option value="activate">{TXT_ACTIVATE}</option>
-					<option value="deactivate">{TXT_DEACTIVATE}</option>
-					<option value="delete">{TXT_DELETE_SELECTED}</option>
-		 		</select>
-			</td>
-   		</tr>
-	</table>
+    <tr>
+      <td>
+        <img src="../core/Core/View/Media/icons/arrow.gif" border="0" width="38" height="22" alt="{TXT_ENTRIES_MARKED}:" />
+        <a href="#" onclick="changeCheckboxes('frmShowSurveyEntries','selectedEntriesId[]',true); return false;">{TXT_SELECT_ALL}</a> /
+        <a href="#" onclick="changeCheckboxes('frmShowSurveyEntries','selectedEntriesId[]',false); return false;">{TXT_DESELECT_ALL}</a>
+        <img src="../core/Core/View/Media/icons/strike.gif" alt="" />
+        <select name="frmShowEntries_MultiAction" onchange="selectMultiAction();">
+          <option value="0">{TXT_SELECT_ACTION}</option>
+          <option value="activate">{TXT_ACTIVATE}</option>
+          <option value="deactivate">{TXT_DEACTIVATE}</option>
+          <option value="delete">{TXT_DELETE_SELECTED}</option>
+         </select>
+      </td>
+       </tr>
+  </table>
 {ENTRIES_PAGING}
-	</form>
-
+  </form>

@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Class ComponentController
  *
@@ -53,21 +53,21 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     public function __construct(\Cx\Core\Core\Model\Entity\SystemComponent $systemComponent, \Cx\Core\Core\Controller\Cx $cx) {
         parent::__construct($systemComponent, $cx);
     }
-    
+
     public function getCommandsForCommandMode() {
         return array('Cron');
     }
-    
+
     /**
      * This component only has a backend
      */
     public function getControllerClasses() {
         return array('Backend', 'Default', 'Settings');
     }
-    
+
     /**
      * To describe the Cron command
-     * 
+     *
      * @param type $command
      * @param type $short
      * @return string
@@ -80,7 +80,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     }
     /**
      * Fetch all Job entities and check each of them if they need to be executed
-     * 
+     *
      * @param string $command Name of command to execute
      * @param array  $arguments List of arguments for the command
      * @param array  $dataArguments (optional) List of data arguments for the command
@@ -101,16 +101,16 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                         $data .= "\r\n\r\n" . $command . ":\r\n" . $detail;
                     }
                 }
-                
+
                 $this->cx->getEvents()->triggerEvent('SysLog/Add', array(
-                    'severity'  => $severity, 
+                    'severity'  => $severity,
                     'message'   => 'Cron Executed',
                     'data'      => $data,
                 ));
                 break;
         }
     }
-    
+
     protected function executeCronJobs(&$severity, &$executedJobs) {
         $em = $this->cx->getDb()->getEntityManager();
         $cronJobs = $em->getRepository('Cx\Core_Modules\Cron\Model\Entity\Job')->findBy(array('active'=>1));

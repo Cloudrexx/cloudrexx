@@ -507,7 +507,7 @@ class MarketManager extends MarketLibrary
             $_SESSION['market'] = array();
 //            $_SESSION['market']['sort'] = array();
         }
-        
+
         // Sort
         if (empty ($_SESSION['market']['sort'])) {
             $_SESSION['market']['sort'] = 'title ASC';
@@ -655,7 +655,7 @@ class MarketManager extends MarketLibrary
             'TXT_NAME'                        =>    $_CORELANG['TXT_NAME'],
             'TXT_MARKET_EMAIL'              => $_ARRAYLANG['TXT_MARKET_EMAIL'],
             'TXT_TITLE_ENTRY'                =>    $_ARRAYLANG['TXT_MARKET_TITLE'],
-			'TXT_MARKET_COLOR'				 =>		$_ARRAYLANG['TXT_MARKET_COLOR'],
+            'TXT_MARKET_COLOR'                 =>        $_ARRAYLANG['TXT_MARKET_COLOR'],
             'TXT_DESCRIPTION'                =>    $_CORELANG['TXT_DESCRIPTION'],
             'TXT_SAVE'                        =>    $_ARRAYLANG['TXT_SAVE'],
             'TXT_FIELDS_REQUIRED'            =>    $_ARRAYLANG['TXT_MARKET_CATEGORY_ADD_FILL_FIELDS'],
@@ -707,12 +707,12 @@ class MarketManager extends MarketLibrary
           }
 
         $this->_objTpl->setVariable(array(
-            'FORM_ACTION'			=> "addEntry",
-            'CATEGORIES'			=> $categories,
-            'ENTRY_ADDEDBY'			=> htmlentities($objFWUser->objUser->getUsername(), ENT_QUOTES, CONTREXX_CHARSET),
-            'ENTRY_USERDETAILS_ON'	=> "checked",
-            'ENTRY_TYPE_OFFER'		=> "checked",
-            'DAYS_ONLINE'			=> $daysOnline
+            'FORM_ACTION'            => "addEntry",
+            'CATEGORIES'            => $categories,
+            'ENTRY_ADDEDBY'            => htmlentities($objFWUser->objUser->getUsername(), ENT_QUOTES, CONTREXX_CHARSET),
+            'ENTRY_USERDETAILS_ON'    => "checked",
+            'ENTRY_TYPE_OFFER'        => "checked",
+            'DAYS_ONLINE'            => $daysOnline
         ));
 
         if (isset($_POST['submitEntry'])) {
@@ -773,9 +773,9 @@ class MarketManager extends MarketLibrary
 
         if ($objResult !== false) {
             $this->strOkMessage = $_ARRAYLANG['TXT_MARKET_STATUS_CHANGED'];
-       	}else{
+           }else{
            $this->strErrMessage = $_CORELANG['TXT_DATABASE_QUERY_ERROR'];
-      	 }
+           }
     }
 
 
@@ -823,7 +823,7 @@ class MarketManager extends MarketLibrary
             'TXT_NAME'                        =>    $_CORELANG['TXT_NAME'],
             'TXT_E-MAIL'                    =>    $_CORELANG['TXT_EMAIL'],
             'TXT_MARKET_EMAIL'              => $_ARRAYLANG['TXT_MARKET_EMAIL'],
-            'TXT_MARKET_COLOR'              =>		$_ARRAYLANG['TXT_MARKET_COLOR'],
+            'TXT_MARKET_COLOR'              =>        $_ARRAYLANG['TXT_MARKET_COLOR'],
             'TXT_DESCRIPTION'                =>    $_CORELANG['TXT_DESCRIPTION'],
             'TXT_SAVE'                        =>    $_ARRAYLANG['TXT_SAVE'],
             'TXT_FIELDS_REQUIRED'            =>    $_ARRAYLANG['TXT_MARKET_CATEGORY_ADD_FILL_FIELDS'],
@@ -1227,13 +1227,13 @@ class MarketManager extends MarketLibrary
             foreach ($_POST['setvalue'] as $id => $value) {
                 $objResult = $objDatabase->Execute("UPDATE ".DBPREFIX."module_market_settings SET value='".contrexx_addslashes($value)."' WHERE id=".intval($id));
 
-	            if ($id == 11) {
-	            	if ($value == '0') {
-	            		$objResult = $objDatabase->Execute("UPDATE ".DBPREFIX."module_market_mail SET mailto='admin' WHERE id='2'");
-	            	} else {
-	            		$objResult = $objDatabase->Execute("UPDATE ".DBPREFIX."module_market_mail SET mailto='advertiser' WHERE id='2'");
-	            	}
-	            }
+                if ($id == 11) {
+                    if ($value == '0') {
+                        $objResult = $objDatabase->Execute("UPDATE ".DBPREFIX."module_market_mail SET mailto='admin' WHERE id='2'");
+                    } else {
+                        $objResult = $objDatabase->Execute("UPDATE ".DBPREFIX."module_market_mail SET mailto='advertiser' WHERE id='2'");
+                    }
+                }
             }
 
             if ($objResult !== false) {
@@ -1334,15 +1334,15 @@ class MarketManager extends MarketLibrary
 
         //get content
         $objResult = $objDatabase->Execute("SELECT title, content, mailto, mailcc FROM ".DBPREFIX."module_market_mail WHERE id = '2'");
-		if ($objResult !== false) {
-			while (!$objResult->EOF) {
-				$mailContent     	= $objResult->fields['content'];
-				$mailTitle         	= $objResult->fields['title'];
-				$mailTo         	= $objResult->fields['mailto'];
-				$mailCC        		= $objResult->fields['mailcc'];
-				$objResult->MoveNext();
-			}
-		}
+        if ($objResult !== false) {
+            while (!$objResult->EOF) {
+                $mailContent         = $objResult->fields['content'];
+                $mailTitle             = $objResult->fields['title'];
+                $mailTo             = $objResult->fields['mailto'];
+                $mailCC                = $objResult->fields['mailcc'];
+                $objResult->MoveNext();
+            }
+        }
 
         $mailTo == 'admin' ? $admin = 'checked' : $admin = '';
         $mailTo == 'advertiser' || $mailTo == '' ? $advertiser = 'checked' : $advertiser = '';
@@ -1369,20 +1369,20 @@ class MarketManager extends MarketLibrary
         ));
 
         $this->_objTpl->setVariable(array(
-            'MAIL_CONTENT' 				=> $mailContent,
-            'MAIL_TITLE'   				=> $mailTitle,
-            'MAIL_TO_ADVERTISER'      	=> $advertiser,
-            'MAIL_TO_ADMIN'      		=> $admin,
-            'MAIL_CC'      				=> $mailCC
+            'MAIL_CONTENT'                 => $mailContent,
+            'MAIL_TITLE'                   => $mailTitle,
+            'MAIL_TO_ADVERTISER'          => $advertiser,
+            'MAIL_TO_ADMIN'              => $admin,
+            'MAIL_CC'                      => $mailCC
         ));
 
         if (isset($_POST['submitSettings'])) {
             $objResult = $objDatabase->Execute("UPDATE ".DBPREFIX."module_market_mail SET title='".$_POST['mailTitle']."', content='".$_POST['mailContent']."', mailcc='".$_POST['mailCC']."', active='1', mailto='".$_POST['mailTo']."' WHERE id='2'");
 
             if ($_POST['mailTo'] == 'admin') {
-            	$objResult = $objDatabase->Execute("UPDATE ".DBPREFIX."module_market_settings SET value='0' WHERE id='11'");
+                $objResult = $objDatabase->Execute("UPDATE ".DBPREFIX."module_market_settings SET value='0' WHERE id='11'");
             } else {
-            	$objResult = $objDatabase->Execute("UPDATE ".DBPREFIX."module_market_settings SET value='1' WHERE id='11'");
+                $objResult = $objDatabase->Execute("UPDATE ".DBPREFIX."module_market_settings SET value='1' WHERE id='11'");
             }
 
             if ($objResult !== false) {

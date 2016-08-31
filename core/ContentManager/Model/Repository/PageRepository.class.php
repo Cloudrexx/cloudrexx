@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * PageRepository
  *
@@ -83,7 +83,7 @@ class PageRepository extends EntityRepository {
         parent::__construct($em, $class);
         $this->em = $em;
     }
-    
+
     /**
      * Finds all entities in the repository.
      *
@@ -93,7 +93,7 @@ class PageRepository extends EntityRepository {
     {
         return $this->findBy(array(), true);
     }
-    
+
     public function find($id, $lockMode = 0, $lockVersion = NULL, $useResultCache = true) {
         return $this->findOneBy(array('id' => $id), true, $useResultCache);
     }
@@ -109,7 +109,7 @@ class PageRepository extends EntityRepository {
     public function findBy(array $criteria, $inactive_langs = false)
     {
         $activeLangs = \FWLanguage::getActiveFrontendLanguages();
-        
+
         $qb = $this->_em->createQueryBuilder();
         $qb->select('p')
                 ->from('\Cx\Core\ContentManager\Model\Entity\Page', 'p');
@@ -122,7 +122,7 @@ class PageRepository extends EntityRepository {
             }
             $i++;
         }
-        
+
         try {
             $q = $qb->getQuery()->useResultCache(true);
             $pages = $q->getResult();
@@ -150,7 +150,7 @@ class PageRepository extends EntityRepository {
     public function findOneBy(array $criteria, $inactive_langs = false, $useResultCache = true)
     {
         $activeLangs = \FWLanguage::getActiveFrontendLanguages();
-        
+
         $qb = $this->_em->createQueryBuilder();
         $qb->select('p')
                 ->from('\Cx\Core\ContentManager\Model\Entity\Page', 'p')->setMaxResults(1);
@@ -163,7 +163,7 @@ class PageRepository extends EntityRepository {
             }
             $i++;
         }
-        
+
         try {
             $q = $qb->getQuery()->useResultCache($useResultCache);
             $page = $q->getSingleResult();
@@ -208,7 +208,7 @@ class PageRepository extends EntityRepository {
     }
 
     /**
-     * Tries to find a page that acts as a module page, but that does physically 
+     * Tries to find a page that acts as a module page, but that does physically
      * not exist in the specified language, but might exist as a fallback page.
      *
      * @param   string  $module
@@ -238,7 +238,7 @@ class PageRepository extends EntityRepository {
         if (!$page) {
             // We could not find the requested module page in the fallback-language.
             // Lets try to find the requested module page in the fallback-language
-            // of the fallback-language (this will start a recursion until we will 
+            // of the fallback-language (this will start a recursion until we will
             // reach the end of the fallback-language tree)
             $page = $this->lookupPageFromModuleAndCmdByFallbackLanguage($module, $cmd, $fallbackLangId);
         }
@@ -334,15 +334,15 @@ class PageRepository extends EntityRepository {
             'beforeSlug' => $beforeSlug,
         );
     }
-    
+
     /**
      * Adds all virtual pages to the original tree.
-     * 
+     *
      * @param   array    $tree         Original tree.
      * @param   integer  $lang
      * @param   integer  $rootNodeLvl
      * @param   string   $rootPath
-     * 
+     *
      * @return  array    $tree         New tree with virtual pages.
      */
     /*protected function addVirtualTree($tree, $lang, $rootNodeLvl, $rootPath) {
@@ -360,31 +360,31 @@ class PageRepository extends EntityRepository {
         }
         return $tree;
     }*/
-    
+
     /**
      * Adds the pages of the given node level to the tree.
-     * 
+     *
      * @param   array    $tree
      * @param   integer  $lang
      * @param   integer  $rootNodeLvl
      * @param   string   $rootPath
-     * 
+     *
      * @return  array    $tree
      */
     /*protected function addVirtualTreeLvl($tree, $lang, $rootNodeLvl, $rootPath) {
         foreach ($this->virtualPages as $virtualPage) {
             $page = $virtualPage['page'];
             $node = $page->getNode();
-            
+
             if (count(explode('/', $page->getPath())) - 2 != $rootNodeLvl ||
                     // Only add pages within path of currently parsed node
                     substr($page->getPath().'/', 0, strlen($rootPath.'/')) != $rootPath.'/') {
                 continue;
             }
-            
+
             $beforeSlug = $virtualPage['beforeSlug'];
             $position   = array_search($beforeSlug, array_keys($tree));
-            
+
             if (!empty($beforeSlug) && $position !== false) {
                 $head = array_splice($tree, 0, $position);
                 $insert[$page->getSlug()] = array(
@@ -407,14 +407,14 @@ class PageRepository extends EntityRepository {
             // Recursion for virtual subpages of a virtual page
             $tree[$page->getSlug()] = $this->addVirtualTreeLvl($tree[$page->getSlug()], $lang, $rootNodeLvl + 1, $page->getPath());
         }
-        
+
         return $tree;
     }*/
 
     /**
      * Get a tree of all Nodes with their Pages assigned.
      *
-     * @todo there has once been a $lang param here, but fetching only a certain language fills 
+     * @todo there has once been a $lang param here, but fetching only a certain language fills
      *       the pages collection on all nodes with only those fetched pages. this means calling
      *       getPages() later on said nodes will yield a collection containing only a subset of
      *       all pages linked to the node. now, we're fetching all pages and sorting those not
@@ -435,7 +435,7 @@ class PageRepository extends EntityRepository {
         $joinCondition = null;
 
         $qb->addSelect('p');
-        
+
         //join the pages
         $qb->leftJoin('node.pages', 'p', $joinConditionType, $joinCondition);
         $qb->where($qb->expr()->gt('node.lvl', 0)); //exclude root node
@@ -446,7 +446,7 @@ class PageRepository extends EntityRepository {
         switch ($search_mode) {
             case self::SEARCH_MODE_ALIAS_ONLY:
                 $qb->andWhere(
-                        'p.type = \'' . 
+                        'p.type = \'' .
                         \Cx\Core\ContentManager\Model\Entity\Page::TYPE_ALIAS .
                         '\''
                 ); //exclude non alias nodes
@@ -456,13 +456,13 @@ class PageRepository extends EntityRepository {
             case self::SEARCH_MODE_PAGES_ONLY:
             default:
                 $qb->andWhere(
-                        'p.type != \'' . 
+                        'p.type != \'' .
                         \Cx\Core\ContentManager\Model\Entity\Page::TYPE_ALIAS .
                         '\''
                 ); //exclude alias nodes
                 continue;
         }
-        
+
         //get all nodes
         if (is_object($rootNode) && !$rootNode->getId()) {
             $tree = array();
@@ -472,7 +472,7 @@ class PageRepository extends EntityRepository {
 
         return $tree;
     }*/
-    
+
     /**
      * Get a tree mapping slugs to Page, Node and language.
      *
@@ -548,7 +548,7 @@ class PageRepository extends EntityRepository {
         } else {
             $pages = array();
             $page  = $node->getPage($lang);
-            
+
             if ($page) {
                 $pages = array($page);
             }
@@ -616,7 +616,7 @@ class PageRepository extends EntityRepository {
 
     /**
      * Returns the matched and unmatched path.
-     * 
+     *
      * @param  string  $path e.g. Hello/APage/AModuleObject
      * @param  array   $tree
      * @param  boolean $exact if true, returns null on partially matched path
@@ -663,14 +663,14 @@ class PageRepository extends EntityRepository {
             'treePointer'   => $treePointer,
         );
     }*/
-    
+
     /**
      * @todo We could use this in a much more efficient way. There's no need to call this method twice!
      * @todo Remove parameter $search_mode
      * @todo Return a single page or null
      * @param type $path
      * @param type $search_mode
-     * @return boolean 
+     * @return boolean
      */
     public function resolve($path, $search_mode) {
         // remove slash at the beginning
@@ -716,15 +716,15 @@ class PageRepository extends EntityRepository {
             );
             return false;
         }
-        
+
         $nodeRepo = $this->em->getRepository('Cx\Core\ContentManager\Model\Entity\Node');
-        
+
         $page = null;
         $node = $nodeRepo->getRoot();
         if (!$node) {
             throw new PageRepositoryException('No pages found!');
         }
-        $q = $this->em->createQuery("SELECT n FROM Cx\Core\ContentManager\Model\Entity\Node n JOIN n.pages p WHERE p.type != 'alias' AND n.parent = ?1 AND p.lang = ?2 AND p.slug = ?3");      
+        $q = $this->em->createQuery("SELECT n FROM Cx\Core\ContentManager\Model\Entity\Node n JOIN n.pages p WHERE p.type != 'alias' AND n.parent = ?1 AND p.lang = ?2 AND p.slug = ?3");
         foreach ($parts as $index=>$slug) {
             if (empty($slug)) {
                 break;
@@ -763,17 +763,17 @@ class PageRepository extends EntityRepository {
     public function getPath($page) {
         return substr($page->getPath(), 1);
     }
-    
+
     /**
      * Returns an array with the page translations of the given page id.
-     * 
+     *
      * @param  int  $pageId
      * @param  int  $historyId  If the page does not exist, we need the history id to revert them.
      */
     public function getPageTranslations($pageId, $historyId) {
         $pages = array();
         $pageTranslations = array();
-        
+
         $currentPage = $this->findOneById($pageId);
         // If page is deleted
         if (!is_object($currentPage)) {
@@ -781,7 +781,7 @@ class PageRepository extends EntityRepository {
             $currentPage->setId($pageId);
             $logRepo = $this->em->getRepository('Cx\Core\ContentManager\Model\Entity\LogEntry');
             $logRepo->revert($currentPage, $historyId);
-            
+
             $logs = $logRepo->getLogsByAction('remove');
             foreach ($logs as $log) {
                 $page = new \Cx\Core\ContentManager\Model\Entity\Page();
@@ -794,23 +794,23 @@ class PageRepository extends EntityRepository {
         } else { // Page exists
             $pages = $this->findByNodeIdShadowed($currentPage->getNodeIdShadowed());
         }
-        
+
         foreach ($pages as $page) {
             $pageTranslations[$page->getLang()] = \FWLanguage::getLanguageCodeById($page->getLang());
         }
-        
+
         return $pageTranslations;
     }
 
     /**
      * Returns the type of the page as string.
-     * 
+     *
      * @param   \Cx\Core\ContentManager\Model\Entity\Page  $page
      * @return  string                         $type
      */
     public function getTypeByPage($page) {
         global $_CORELANG;
-        
+
         switch ($page->getType()) {
             case \Cx\Core\ContentManager\Model\Entity\Page::TYPE_REDIRECT:
                 $criteria = array(
@@ -838,10 +838,10 @@ class PageRepository extends EntityRepository {
             default:
                 $type = $_CORELANG['TXT_CORE_CM_TYPE_CONTENT'];
         }
-        
+
         return $type;
     }
-    
+
     /**
      * Returns the target page for a page with internal target
      * @todo use this everywhere (resolver!)
@@ -880,7 +880,7 @@ class PageRepository extends EntityRepository {
         if(!$page) {
             throw new PageRepositoryException('No page with the target language found!');
         }
-        
+
         return $page;
     }
 
@@ -979,7 +979,7 @@ class PageRepository extends EntityRepository {
 
     public function getLastModifiedPages($from, $count) {
         $query = $this->em->createQuery("
-            select p from Cx\Core\ContentManager\Model\Entity\Page p 
+            select p from Cx\Core\ContentManager\Model\Entity\Page p
                  order by p.updatedAt asc
         ");
         $query->setFirstResult($from);
@@ -987,10 +987,10 @@ class PageRepository extends EntityRepository {
 
         return $query->getResult();
     }
-    
+
     /**
      * Creates a page with the given parameters.
-     * 
+     *
      * This should be a constructor of Page. Since PHP does not support method
      * overloading and doctrine needs a constructor without parameters, it's
      * located here.

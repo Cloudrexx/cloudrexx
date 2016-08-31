@@ -1,23 +1,23 @@
 <!-- start module_access_config_mail.html -->
 <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
-	<thead>
-		<tr>
-			<th colspan="4">{TXT_ACCESS_EMAIL_NOTIFICATIONS}</th>
-		</tr>
-	</thead>
-	<tbody style="vertical-align:top;">
-		<tr class="row3" style="font-weight:bold;">
-			<td width="15%">{TXT_ACCESS_TYPE}</td>
-			<td width="10%">{TXT_ACCESS_LANGUAGE}</td>
-			<td width="80%">{TXT_ACCESS_MAIL_SUBJECT}</td>
-			<td width="5%" style="text-align:right;">{TXT_ACCESS_FUNCTIONS}</td>
-		</tr>
-		<!-- BEGIN access_email_list -->
-		<tr class="row{ACCESS_ROW_CLASS_NR}">
-			<td style="{ACCESS_MAIL_TYPE_STYLE}; white-space:nowrap;">{ACCESS_MAIL_TYPE_TXT}</td>
-			<td>{ACCESS_MAIL_LANGUAGE}</td>
-			<td>{ACCESS_MAIL_SUBJECT}</td>
-			<td>
+  <thead>
+    <tr>
+      <th colspan="4">{TXT_ACCESS_EMAIL_NOTIFICATIONS}</th>
+    </tr>
+  </thead>
+  <tbody style="vertical-align:top;">
+    <tr class="row3" style="font-weight:bold;">
+      <td width="15%">{TXT_ACCESS_TYPE}</td>
+      <td width="10%">{TXT_ACCESS_LANGUAGE}</td>
+      <td width="80%">{TXT_ACCESS_MAIL_SUBJECT}</td>
+      <td width="5%" style="text-align:right;">{TXT_ACCESS_FUNCTIONS}</td>
+    </tr>
+    <!-- BEGIN access_email_list -->
+    <tr class="row{ACCESS_ROW_CLASS_NR}">
+      <td style="{ACCESS_MAIL_TYPE_STYLE}; white-space:nowrap;">{ACCESS_MAIL_TYPE_TXT}</td>
+      <td>{ACCESS_MAIL_LANGUAGE}</td>
+      <td>{ACCESS_MAIL_SUBJECT}</td>
+      <td>
                 <!-- BEGIN access_email_delete -->
                 <a href="javascript:if(confirm('{TXT_ACCESS_CONFIRM_DELETE_MAIL}')){window.location.href='index.php?cmd=Access&{CSRF_PARAM}&amp;act=config&amp;tpl=deleteMail&amp;type={ACCESS_MAIL_TYPE}&amp;access_mail_lang={ACCESS_MAIL_LANG}';}" title="{TXT_ACCESS_DELETE_MAIL_TEMPLATE}" style="float: right;"><img src="../core/Core/View/Media/icons/delete.gif" alt="{TXT_ACCESS_DELETE_MAIL_TEMPLATE}" border="0" width="17" height="17" /></a>
                 <!-- END access_email_delete -->
@@ -29,8 +29,8 @@
                 <a href="index.php?cmd=Access&amp;act=config&amp;tpl=copyMail&amp;type={ACCESS_MAIL_TYPE}" title="{TXT_ACCESS_COPY_MAIL_TEMPLATE}" style="float: right;"><img src="../core/Core/View/Media/icons/copy.gif" alt="{TXT_ACCESS_COPY_MAIL_TEMPLATE}" border="0" width="16" height="16" /></a>
                 <!-- END access_email_copy -->
             </td>
-		</tr>
-		<!-- END access_email_list -->
-	</tbody>
+    </tr>
+    <!-- END access_email_list -->
+  </tbody>
 </table>
 <!-- end module_access_config_mail.html -->

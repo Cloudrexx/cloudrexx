@@ -115,7 +115,7 @@ function setTableRow(tableId) {
     });
 }
 $J(function(){
-    
+
     $J('form#searchcustomer #term').autocomplete({
             minLength: 2,
             delay: 500,
@@ -139,4 +139,3 @@ $J(function(){
             }
         });
 });
-

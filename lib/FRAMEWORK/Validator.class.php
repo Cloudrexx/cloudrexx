@@ -106,14 +106,14 @@ define('VALIDATOR_REGEX_URI_JS',
  */
 class FWValidator
 {
-    
+
     /**
      * Regular Expression for e-mail addresses
      * @author Kevin Riesen
      * @since 3.1.1
      */
     const REGEX_EMAIL = VALIDATOR_REGEX_EMAIL;
-    
+
     /**
      * Regular Expression in javascript for e-mail addresses
      * @author Kevin Riesen
@@ -123,28 +123,28 @@ class FWValidator
 
     /**
      * Regular Expression for URI protocols
-     * 
+     *
      * Known protocols include HTTP, HTTPS, FTP, and FTPS
      * @author Kevin Riesen
      * @since 3.1.1
      */
     const REGEX_URI_PROTO = VALIDATOR_REGEX_URI_PROTO;
-    
+
     /**
      * Regular Expression for URIs
      * @author  Kevin Riesen
      * @since   3.1.1
      */
     const REGEX_URI = VALIDATOR_REGEX_URI;
-    
-    
+
+
     /*
      * Regular Expression in javascript for URIs
      * @author Kevin Riesen
      * @since 3.1.1
      */
     const REGEX_URI_JS = VALIDATOR_REGEX_URI_JS;
-    
+
     /**
      * Validate an E-mail address
      *
@@ -300,19 +300,19 @@ class FWValidator
 
         return $fileName;
     }
-    
+
     /**
      * Check whether the given value is empty or not
-     * 
+     *
      * @param mixed $value
-     * 
+     *
      * @return boolean true if the value is empty, false otherwise
      */
     public static function isEmpty($value)
     {
         return empty($value);
     }
-    
+
     /**
     * Tests if an input is valid PHP serialized string.
     *
@@ -331,19 +331,19 @@ class FWValidator
     * <li>null: <code>N;</code></li>
     * </ul>
     *
-    * @author	Chris Smith <code+php@chris.cs278.org>, Frank Bültge <frank@bueltge.de>
-    * @copyright	Copyright (c) 2009 Chris Smith (http://www.cs278.org/), 2011 Frank Bültge (http://bueltge.de)
-    * @license	http://sam.zoy.org/wtfpl/ WTFPL
-    * @param	string $value Value to test for serialized form
-    * @param	mixed $result Result of unserialize() of the $value
-    * @return	boolean True if $value is serialized data, otherwise FALSE
+    * @author    Chris Smith <code+php@chris.cs278.org>, Frank Bültge <frank@bueltge.de>
+    * @copyright    Copyright (c) 2009 Chris Smith (http://www.cs278.org/), 2011 Frank Bültge (http://bueltge.de)
+    * @license    http://sam.zoy.org/wtfpl/ WTFPL
+    * @param    string $value Value to test for serialized form
+    * @param    mixed $result Result of unserialize() of the $value
+    * @return    boolean True if $value is serialized data, otherwise FALSE
     */
     static function is_serialized( $value, &$result = null ) {
         // Bit of a give away this one
         if ( ! is_string( $value ) ) {
             return false;
         }
-        
+
         // Serialized FALSE, return TRUE. unserialize() returns FALSE on an
         // invalid string or it could return FALSE if the string is serialized
         // FALSE, eliminate that possibility.
@@ -351,10 +351,10 @@ class FWValidator
             $result = false;
             return true;
         }
-        
-        $length	= strlen($value);
-        $end	= '';
-        
+
+        $length    = strlen($value);
+        $end    = '';
+
         if ( isset( $value[0] ) ) {
             switch ($value[0]) {
                 case 's':
@@ -369,7 +369,7 @@ class FWValidator
                 case 'a':
                 case 'O':
                     $end .= '}';
-                    
+
                     if (':' !== $value[1]) {
                         return false;
                     }
@@ -386,28 +386,28 @@ class FWValidator
                         case 8:
                         case 9:
                             break;
-                        
+
                         default:
                             return false;
                     }
                 case 'N':
                     $end .= ';';
-                    
+
                     if ($value[$length - 1] !== $end[0]) {
                         return false;
                     }
                     break;
-                
+
                 default:
                     return false;
             }
         }
-        
+
         if ( ( $result = @unserialize($value) ) === false ) {
             $result = null;
             return false;
         }
-        
+
         return true;
     }
 }
@@ -499,7 +499,7 @@ class CxValidateRegexp extends CxValidate {
     }
 
     return $this->passesValidation;
-    }   
+    }
 }
 
 /**

@@ -1,177 +1,177 @@
 <script type="text/javascript">
 //<![CDATA[
-	[[IMMO_IMMO_JAVASCRIPT]]
-	var swapSearch = function(){
-		document.getElementById("advanced_search").style.display = document.getElementById("advanced_search").style.display == 'none' ? 'block'  : 'none';
-		document.getElementById("simple_search").style.display = document.getElementById("simple_search").style.display == 'none' ? 'block'  : 'none';
-	}
-	
+  [[IMMO_IMMO_JAVASCRIPT]]
+  var swapSearch = function(){
+    document.getElementById("advanced_search").style.display = document.getElementById("advanced_search").style.display == 'none' ? 'block'  : 'none';
+    document.getElementById("simple_search").style.display = document.getElementById("simple_search").style.display == 'none' ? 'block'  : 'none';
+  }
+
 //]]>
 </script>
 
 <form action="?section=immo&amp;cmd=immolist" method="post">
 <div id="immo">
-	<a style="float:right;" href="javascript:swapSearch();"> [[TXT_IMMO_SEARCH_STYLE]] </a>
+  <a style="float:right;" href="javascript:swapSearch();"> [[TXT_IMMO_SEARCH_STYLE]] </a>
         <div id="advanced_search" style="display:none;">
-	<table style="width: 100%">
-		<tr>
-			<td>
-				[[TXT_IMMO_REF_NR]]
-			</td>
-			<td>
-				<input type="text" name="ref_nr" value="" />
-			</td>
-		</tr>
-		<tr>
-			<td>[[TXT_IMMO_LOCATIONS]]</td>
-			<td><select name="locations">
-					<option value="">Alle Orte</option>
-					<!-- BEGIN locations -->
-					<option value="[[IMMO_LOCATION_CONTENT]]">[[IMMO_LOCATION_CONTENT]]</option>
-					<!-- END locations -->
-				</select><br />
-			</td>
-		<tr>
-		<td>
-			[[TXT_IMMO_PROPERTY_TYPE]]				
-		</td>
-			<td>
-				<select name="property_type">
-					<option value=""></option>
-					<option value="purchase">[[TXT_IMMO_PROPERTYTYPE_PURCHASE]]</option>
-					<option value="rent">[[TXT_IMMO_PROPERTYTYPE_RENT]]</option>
-				</select><br / >
-			</td>
-		</tr>
-		<tr>
-			<td>
-				[[TXT_IMMO_OBJECT_TYPE]]
-			</td>
-			<td>				
-				<select name="obj_type">
-					<option value=""></option>
-					<option value="flat">[[TXT_IMMO_OBJECTTYPE_FLAT]]</option>
-					<option value="house">[[TXT_IMMO_OBJECTTYPE_HOUSE]]</option>
-					<option value="multifamily">[[TXT_IMMO_OBJECTTYPE_MULTIFAMILY]]</option>
-					<option value="estate">[[TXT_IMMO_OBJECTTYPE_ESTATE]]</option>
-					<option value="industry">[[TXT_IMMO_OBJECTTYPE_INDUSTRY]]</option>
-					<option value="parking">[[TXT_IMMO_OBJECTTYPE_PARKING]]</option>
-				</select><br />
-			</td>
-		</tr>
+  <table style="width: 100%">
+    <tr>
+      <td>
+        [[TXT_IMMO_REF_NR]]
+      </td>
+      <td>
+        <input type="text" name="ref_nr" value="" />
+      </td>
+    </tr>
+    <tr>
+      <td>[[TXT_IMMO_LOCATIONS]]</td>
+      <td><select name="locations">
+          <option value="">Alle Orte</option>
+          <!-- BEGIN locations -->
+          <option value="[[IMMO_LOCATION_CONTENT]]">[[IMMO_LOCATION_CONTENT]]</option>
+          <!-- END locations -->
+        </select><br />
+      </td>
+    <tr>
+    <td>
+      [[TXT_IMMO_PROPERTY_TYPE]]
+    </td>
+      <td>
+        <select name="property_type">
+          <option value=""></option>
+          <option value="purchase">[[TXT_IMMO_PROPERTYTYPE_PURCHASE]]</option>
+          <option value="rent">[[TXT_IMMO_PROPERTYTYPE_RENT]]</option>
+        </select><br / >
+      </td>
+    </tr>
+    <tr>
+      <td>
+        [[TXT_IMMO_OBJECT_TYPE]]
+      </td>
+      <td>
+        <select name="obj_type">
+          <option value=""></option>
+          <option value="flat">[[TXT_IMMO_OBJECTTYPE_FLAT]]</option>
+          <option value="house">[[TXT_IMMO_OBJECTTYPE_HOUSE]]</option>
+          <option value="multifamily">[[TXT_IMMO_OBJECTTYPE_MULTIFAMILY]]</option>
+          <option value="estate">[[TXT_IMMO_OBJECTTYPE_ESTATE]]</option>
+          <option value="industry">[[TXT_IMMO_OBJECTTYPE_INDUSTRY]]</option>
+          <option value="parking">[[TXT_IMMO_OBJECTTYPE_PARKING]]</option>
+        </select><br />
+      </td>
+    </tr>
                 <tr>
                   <td>
-                      [[TXT_IMMO_PRICE]]    
+                      [[TXT_IMMO_PRICE]]
                   </td>
                   <td>
-                     [[TXT_IMMO_FROM]] 
+                     [[TXT_IMMO_FROM]]
                       <select name="fprice" style="width: 300px;">
-                     	<option value=""> Alle </option>
-                     	<option value="1000"> 1000 </option>
-                     	<option value="2000"> 2000 </option>
-                     	<option value="5000"> 5000 </option>
-                     	<option value="10000"> 10000 </option>
-                     	<option value="100000"> 100000 </option>
-                     	<option value="200000"> 200000 </option>
-                     	<option value="300000"> 300000</option>
-                     	<option value="400000"> 400000 </option>
-                     	<option value="500000"> 500000 </option>
-                     	<option value="600000"> 600000 </option>
-                     	<option value="700000"> 700000 </option>
-                     	<option value="700001"> 700000+ </option>
+                       <option value=""> Alle </option>
+                       <option value="1000"> 1000 </option>
+                       <option value="2000"> 2000 </option>
+                       <option value="5000"> 5000 </option>
+                       <option value="10000"> 10000 </option>
+                       <option value="100000"> 100000 </option>
+                       <option value="200000"> 200000 </option>
+                       <option value="300000"> 300000</option>
+                       <option value="400000"> 400000 </option>
+                       <option value="500000"> 500000 </option>
+                       <option value="600000"> 600000 </option>
+                       <option value="700000"> 700000 </option>
+                       <option value="700001"> 700000+ </option>
                      </select>
 
-					 [[TXT_IMMO_TO]] 
-					  <select name="tprice" style="width: 300px;">
-                     	<option value=""> Alle </option>
-                     	<option value="1000"> 1000 </option>
-                     	<option value="2000"> 2000 </option>
-                     	<option value="5000"> 5000 </option>
-                     	<option value="10000"> 10000 </option>
-                     	<option value="100000"> 100000 </option>
-                     	<option value="200000"> 200000 </option>
-                     	<option value="300000"> 300000</option>
-                     	<option value="400000"> 400000 </option>
-                     	<option value="500000"> 500000 </option>
-                     	<option value="600000"> 600000 </option>
-                     	<option value="700000"> 700000 </option>
-                     	<option value="700001"> 700000+ </option>
+           [[TXT_IMMO_TO]]
+            <select name="tprice" style="width: 300px;">
+                       <option value=""> Alle </option>
+                       <option value="1000"> 1000 </option>
+                       <option value="2000"> 2000 </option>
+                       <option value="5000"> 5000 </option>
+                       <option value="10000"> 10000 </option>
+                       <option value="100000"> 100000 </option>
+                       <option value="200000"> 200000 </option>
+                       <option value="300000"> 300000</option>
+                       <option value="400000"> 400000 </option>
+                       <option value="500000"> 500000 </option>
+                       <option value="600000"> 600000 </option>
+                       <option value="700000"> 700000 </option>
+                       <option value="700001"> 700000+ </option>
                      </select>
                   </td>
-                </tr>               
+                </tr>
                 <tr>
                   <td>
                      [[TXT_IMMO_ROOMS]]
                   </td>
                   <td>
-					[[TXT_IMMO_FROM]] 
+          [[TXT_IMMO_FROM]]
                      <select name="frooms" style="width: 300px;">
-               			<option value="1">Alle</option>
-						<option value="1.5">1.5</option>
-						<option value="2">2</option>
-						<option value="2.5">2.5</option>
-						<option value="3">3</option>
-						<option value="3.5">3.5</option>
-						<option value="4">4</option>
-						<option value="4.5">4.5</option>
-						<option value="5">5</option>
-						<option value="5.5">5.5</option>
-						<option value="6">6</option>
-						<option value="6.5">6.5</option>
-						<option value="7">7</option>
-						<option value="7.5">7.5</option>
-						<option value="8">8</option>						
-						<option value="8.5">8+</option>						
+                     <option value="1">Alle</option>
+            <option value="1.5">1.5</option>
+            <option value="2">2</option>
+            <option value="2.5">2.5</option>
+            <option value="3">3</option>
+            <option value="3.5">3.5</option>
+            <option value="4">4</option>
+            <option value="4.5">4.5</option>
+            <option value="5">5</option>
+            <option value="5.5">5.5</option>
+            <option value="6">6</option>
+            <option value="6.5">6.5</option>
+            <option value="7">7</option>
+            <option value="7.5">7.5</option>
+            <option value="8">8</option>
+            <option value="8.5">8+</option>
                      </select>
 
-					 [[TXT_IMMO_TO]] 
-					 <select name="trooms" style="width: 300px;">
-                     	<option value="">Alle</option>
-                     	<option value="1">1</option>
-						<option value="1.5">1.5</option>
-						<option value="2">2</option>
-						<option value="2.5">2.5</option>
-						<option value="3">3</option>
-						<option value="3.5">3.5</option>
-						<option value="4">4</option>
-						<option value="4.5">4.5</option>
-						<option value="5">5</option>
-						<option value="5.5">5.5</option>
-						<option value="6">6</option>
-						<option value="6.5">6.5</option>
-						<option value="7">7</option>
-						<option value="7.5">7.5</option>
-						<option value="100">8+</option>
+           [[TXT_IMMO_TO]]
+           <select name="trooms" style="width: 300px;">
+                       <option value="">Alle</option>
+                       <option value="1">1</option>
+            <option value="1.5">1.5</option>
+            <option value="2">2</option>
+            <option value="2.5">2.5</option>
+            <option value="3">3</option>
+            <option value="3.5">3.5</option>
+            <option value="4">4</option>
+            <option value="4.5">4.5</option>
+            <option value="5">5</option>
+            <option value="5.5">5.5</option>
+            <option value="6">6</option>
+            <option value="6.5">6.5</option>
+            <option value="7">7</option>
+            <option value="7.5">7.5</option>
+            <option value="100">8+</option>
                      </select>
                   </td>
                 </tr>
-	</table>
+  </table>
     </div>
     <div id="simple_search">
-    	<table>
-    		<tr>
-    			<td>[[TXT_IMMO_FULLTEXT_SEARCH]] <td>
-    			<td><input type="text" name="search" value="" /></td>
-    		</tr>
-    	</table>
+      <table>
+        <tr>
+          <td>[[TXT_IMMO_FULLTEXT_SEARCH]] <td>
+          <td><input type="text" name="search" value="" /></td>
+        </tr>
+      </table>
     </div>
-	<br />
-	<input type="submit" value="[[TXT_IMMO_SEARCH]]" />
-<br /><br />		
+  <br />
+  <input type="submit" value="[[TXT_IMMO_SEARCH]]" />
+<br /><br />
 <h1>[[TXT_IMMO_SPECIAL_OFFERS]]</h1>
 <table>
 <tr>
 <!-- BEGIN specialOffersImg -->
-	<td class="center">
-		<a href="index.php?section=immo&amp;cmd=showObj&amp;id=[[IMMO_ID]]" title="[[IMMO_SPECIAL_OFFER_CONTENT]]"><img [[IMMO_IMG_DIM]] src="[[IMMO_SPECIAL_OFFER_IMG_SRC]]" alt="[[IMMO_SPECIAL_OFFER_CONTENT]]" title="[[IMMO_SPECIAL_OFFER_CONTENT]]" /></a>
+  <td class="center">
+    <a href="index.php?section=immo&amp;cmd=showObj&amp;id=[[IMMO_ID]]" title="[[IMMO_SPECIAL_OFFER_CONTENT]]"><img [[IMMO_IMG_DIM]] src="[[IMMO_SPECIAL_OFFER_IMG_SRC]]" alt="[[IMMO_SPECIAL_OFFER_CONTENT]]" title="[[IMMO_SPECIAL_OFFER_CONTENT]]" /></a>
         </td>
 <!-- END specialOffersImg -->
 </tr>
 <tr>
 <!-- BEGIN specialOffersText -->
         <td class="center">
-		[[IMMO_SPECIAL_OFFER_CONTENT]]
-	</td>					
+    [[IMMO_SPECIAL_OFFER_CONTENT]]
+  </td>
 <!-- END specialOffersText -->
 </tr>
 </table>

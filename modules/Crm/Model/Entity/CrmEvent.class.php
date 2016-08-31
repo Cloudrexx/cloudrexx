@@ -102,7 +102,7 @@ class CrmEvent
 
     /**
      * Set Context
-     * 
+     *
      * @param String $context event context
      *
      * @return null
@@ -114,7 +114,7 @@ class CrmEvent
 
     /**
      * Get Context
-     * 
+     *
      * @return String
      */
     public function getContext()
@@ -136,7 +136,7 @@ class CrmEvent
 
     /**
      * Get Information
-     * 
+     *
      * @return String
      */
     public function getInfo()
@@ -166,7 +166,7 @@ class CrmEvent
 
     /**
      * Set name
-     * 
+     *
      * @param String $name set event name
      *
      * @return null
@@ -178,7 +178,7 @@ class CrmEvent
 
     /**
      * Get name
-     * 
+     *
      * @return String
      */
     public function getName()
@@ -186,4 +186,3 @@ class CrmEvent
         return $this->name;
     }
 }
- 

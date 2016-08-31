@@ -1,119 +1,119 @@
 <!-- START category_access.html -->
 <script language="JavaScript" type="text/javascript">
 function changeRow(groupId,strAct){
-	strRead 	= 'frmCategoryAccess_Read_'+groupId;
-	strWrite 	= 'frmCategoryAccess_Write_'+groupId;
-	strEdit 	= 'frmCategoryAccess_Edit_'+groupId;
-	strDelete 	= 'frmCategoryAccess_Delete_'+groupId;
-	strMove 	= 'frmCategoryAccess_Move_'+groupId;
-	strClose 	= 'frmCategoryAccess_Close_'+groupId;
-	strSticky 	= 'frmCategoryAccess_Sticky_'+groupId;
+  strRead   = 'frmCategoryAccess_Read_'+groupId;
+  strWrite   = 'frmCategoryAccess_Write_'+groupId;
+  strEdit   = 'frmCategoryAccess_Edit_'+groupId;
+  strDelete   = 'frmCategoryAccess_Delete_'+groupId;
+  strMove   = 'frmCategoryAccess_Move_'+groupId;
+  strClose   = 'frmCategoryAccess_Close_'+groupId;
+  strSticky   = 'frmCategoryAccess_Sticky_'+groupId;
 
-	if (strAct == 'check') {
-		boolCheck = true;
-	} else {
-		boolCheck = false;
-	}
+  if (strAct == 'check') {
+    boolCheck = true;
+  } else {
+    boolCheck = false;
+  }
 
-	for (var h=0; h < document.forms.length;h++)
-	{
-		for (var i=0; i < document.forms[h].elements.length;i++)
-		{//read out all form-elements with the loop
-			if (document.forms[h].elements[i].name == strRead ||
-				document.forms[h].elements[i].name == strWrite ||
-				document.forms[h].elements[i].name == strEdit ||
-				document.forms[h].elements[i].name == strDelete ||
-				document.forms[h].elements[i].name == strMove ||
-				document.forms[h].elements[i].name == strClose ||
-				document.forms[h].elements[i].name == strSticky)
-			{
-				document.forms[h].elements[i].checked = boolCheck;
-			}
-		}
-	}
+  for (var h=0; h < document.forms.length;h++)
+  {
+    for (var i=0; i < document.forms[h].elements.length;i++)
+    {//read out all form-elements with the loop
+      if (document.forms[h].elements[i].name == strRead ||
+        document.forms[h].elements[i].name == strWrite ||
+        document.forms[h].elements[i].name == strEdit ||
+        document.forms[h].elements[i].name == strDelete ||
+        document.forms[h].elements[i].name == strMove ||
+        document.forms[h].elements[i].name == strClose ||
+        document.forms[h].elements[i].name == strSticky)
+      {
+        document.forms[h].elements[i].checked = boolCheck;
+      }
+    }
+  }
 
 }
 
 function changeColumn(strRight) {
-	strSearch = 'frmCategoryAccess_'+strRight;
-	for (var h=0; h < document.forms.length;h++)
-	{
-		for (var i=0; i < document.forms[h].elements.length;i++)
-		{//read out all form-elements with the loop
-			if (document.forms[h].elements[i].name == strSearch){
-				boolCheck = document.forms[h].elements[i].checked;
-			}
-		}
-	}
+  strSearch = 'frmCategoryAccess_'+strRight;
+  for (var h=0; h < document.forms.length;h++)
+  {
+    for (var i=0; i < document.forms[h].elements.length;i++)
+    {//read out all form-elements with the loop
+      if (document.forms[h].elements[i].name == strSearch){
+        boolCheck = document.forms[h].elements[i].checked;
+      }
+    }
+  }
 
-	for (var h=0; h < document.forms.length;h++)
-	{
-		for (var i=0; i < document.forms[h].elements.length;i++)
-		{//read out all form-elements with the loop
-			if (document.forms[h].elements[i].name.search(strSearch) != -1 &&
-				document.forms[h].elements[i].name != strSearch) {
-				document.forms[h].elements[i].checked = boolCheck;
-			}
-		}
-	}
+  for (var h=0; h < document.forms.length;h++)
+  {
+    for (var i=0; i < document.forms[h].elements.length;i++)
+    {//read out all form-elements with the loop
+      if (document.forms[h].elements[i].name.search(strSearch) != -1 &&
+        document.forms[h].elements[i].name != strSearch) {
+        document.forms[h].elements[i].checked = boolCheck;
+      }
+    }
+  }
 }
 
 </script>
 <form name="frmCategoryAccess" method="post" action="?cmd=Forum&amp;act=category_access_update">
-	<input type="hidden" name="frmCategoryAccess_CategoryId" value="{VALUE_CATEGORY_ID}" />
-	<table width="100%" cellspacing="0" cellpadding="3" border="0" style="vertical-align: top;" class="adminlist">
-		<tr>
-			<th colspan="9">{TXT_TITLE_CATEGORY_ACCESS}:&nbsp;{VALUE_CATEGORY_NAME}</th>
-		</tr>
-		<tr class="row3">
-			<td width="10%"><span style="font-weight:bold;">{TXT_SUBTITLE_GROUPNAME}</span></td>
-			<td width="10%"><div align="center"><span style="font-weight:bold;">{TXT_SUBTITLE_READ}</span></div></td>
-			<td width="10%"><div align="center"><span style="font-weight:bold;">{TXT_SUBTITLE_WRITE}</span></div></td>
-			<td width="10%"><div align="center"><span style="font-weight:bold;">{TXT_SUBTITLE_EDIT}</span></div></td>
-			<td width="10%"><div align="center"><span style="font-weight:bold;">{TXT_SUBTITLE_DELETE}</span></div></td>
-			<td width="10%"><div align="center"><span style="font-weight:bold;">{TXT_SUBTITLE_MOVE}</span></div></td>
-			<td width="10%"><div align="center"><span style="font-weight:bold;">{TXT_SUBTITLE_CLOSE}</span></div></td>
-		    <td width="5%"><div align="center"><span style="font-weight:bold;">{TXT_SUBTITLE_STICKY}</span></div></td>
-			<td width="30%">&nbsp;</td>
-		</tr>
-		<!-- BEGIN showRights -->
-		<tr class="row{VALUE_ROWCLASS}">
-			<td>{VALUE_GROUPNAME}<input type="hidden" name="frmCategoryAccess_GroupId_{VALUE_GROUP_ID}" value="{VALUE_GROUP_ID}" /></td>
-			<td><div align="center"><input type="checkbox" name="frmCategoryAccess_Read_{VALUE_GROUP_ID}" value="1" {VALUE_READ} /></div></td>
-			<td><div align="center"><input type="checkbox" name="frmCategoryAccess_Write_{VALUE_GROUP_ID}" value="1" {VALUE_WRITE} /></div></td>
-			<td><div align="center"><input type="checkbox" name="frmCategoryAccess_Edit_{VALUE_GROUP_ID}" value="1" {VALUE_EDIT} /></div></td>
-			<td><div align="center"><input type="checkbox" name="frmCategoryAccess_Delete_{VALUE_GROUP_ID}" value="1" {VALUE_DELETE} /></div></td>
-			<td><div align="center"><input type="checkbox" name="frmCategoryAccess_Move_{VALUE_GROUP_ID}" value="1" {VALUE_MOVE} /></div></td>
-			<td><div align="center"><input type="checkbox" name="frmCategoryAccess_Close_{VALUE_GROUP_ID}" value="1" {VALUE_CLOSE} /></div></td>
-		<td><div align="center"><input type="checkbox" name="frmCategoryAccess_Sticky_{VALUE_GROUP_ID}" value="1" {VALUE_STICKY} /></div></td>
-			<td>&nbsp;&nbsp;&nbsp;<a href="javascript:changeRow({VALUE_GROUP_ID},'check');" target="_self">{TXT_FORUM_SELECT_ALL}</a> | <a href="javascript:changeRow({VALUE_GROUP_ID},'uncheck');" target="_self">{TXT_FORUM_DESELECT_ALL}</a></td>
-		</tr>
-		<!-- END showRights -->
-		<!-- BEGIN noGroupsHide_1 -->
-		<tr class="row3">
-			<td>{TXT_CATEGORY_GLOBAL_RIGHTS}</td>
-			<td><div align="center"><input type="checkbox" name="frmCategoryAccess_Read" value="0" onclick="changeColumn('Read');" /></div></td>
-			<td><div align="center"><input type="checkbox" name="frmCategoryAccess_Write" value="0" onclick="changeColumn('Write');" /></div></td>
-			<td><div align="center"><input type="checkbox" name="frmCategoryAccess_Edit" value="0" onclick="changeColumn('Edit');" /></div></td>
-			<td><div align="center"><input type="checkbox" name="frmCategoryAccess_Delete" value="0" onclick="changeColumn('Delete');" /></div></td>
-			<td><div align="center"><input type="checkbox" name="frmCategoryAccess_Move" value="0" onclick="changeColumn('Move');" /></div></td>
-			<td><div align="center"><input type="checkbox" name="frmCategoryAccess_Close" value="0" onclick="changeColumn('Close');" /></div></td>
-		    <td><div align="center"><input type="checkbox" name="frmCategoryAccess_Sticky" value="0" onclick="changeColumn('Sticky');" /></div></td>
-			<td>&nbsp;</td>
-		</tr>
-		<!-- END noGroupsHide_1 -->
-		<!-- BEGIN noGroupsMessage -->
-		<tr class="row1">
-			<td colspan="7"><div align="center">{TXT_CATEGORY_ACCESS_NOGROUPS}</div></td>
-		</tr>
-		<!-- END noGroupsMessage -->
-	</table>
-	<!-- BEGIN noGroupsHide_2 -->
-	<br />
-	<input type="checkbox" name="frmCategoryAccess_Bequeath" value="1" />
-	<label for="frmCategoryAccess_Bequeath">{TXT_CATEGORY_ACCESS_BEQUEATH}</label>
-	<br /><br />
-	<input type="submit" value="{TXT_CATEGORY_ACCESS_BUTTON}" />
-	<!-- END noGroupsHide_2 -->
+  <input type="hidden" name="frmCategoryAccess_CategoryId" value="{VALUE_CATEGORY_ID}" />
+  <table width="100%" cellspacing="0" cellpadding="3" border="0" style="vertical-align: top;" class="adminlist">
+    <tr>
+      <th colspan="9">{TXT_TITLE_CATEGORY_ACCESS}:&nbsp;{VALUE_CATEGORY_NAME}</th>
+    </tr>
+    <tr class="row3">
+      <td width="10%"><span style="font-weight:bold;">{TXT_SUBTITLE_GROUPNAME}</span></td>
+      <td width="10%"><div align="center"><span style="font-weight:bold;">{TXT_SUBTITLE_READ}</span></div></td>
+      <td width="10%"><div align="center"><span style="font-weight:bold;">{TXT_SUBTITLE_WRITE}</span></div></td>
+      <td width="10%"><div align="center"><span style="font-weight:bold;">{TXT_SUBTITLE_EDIT}</span></div></td>
+      <td width="10%"><div align="center"><span style="font-weight:bold;">{TXT_SUBTITLE_DELETE}</span></div></td>
+      <td width="10%"><div align="center"><span style="font-weight:bold;">{TXT_SUBTITLE_MOVE}</span></div></td>
+      <td width="10%"><div align="center"><span style="font-weight:bold;">{TXT_SUBTITLE_CLOSE}</span></div></td>
+        <td width="5%"><div align="center"><span style="font-weight:bold;">{TXT_SUBTITLE_STICKY}</span></div></td>
+      <td width="30%">&nbsp;</td>
+    </tr>
+    <!-- BEGIN showRights -->
+    <tr class="row{VALUE_ROWCLASS}">
+      <td>{VALUE_GROUPNAME}<input type="hidden" name="frmCategoryAccess_GroupId_{VALUE_GROUP_ID}" value="{VALUE_GROUP_ID}" /></td>
+      <td><div align="center"><input type="checkbox" name="frmCategoryAccess_Read_{VALUE_GROUP_ID}" value="1" {VALUE_READ} /></div></td>
+      <td><div align="center"><input type="checkbox" name="frmCategoryAccess_Write_{VALUE_GROUP_ID}" value="1" {VALUE_WRITE} /></div></td>
+      <td><div align="center"><input type="checkbox" name="frmCategoryAccess_Edit_{VALUE_GROUP_ID}" value="1" {VALUE_EDIT} /></div></td>
+      <td><div align="center"><input type="checkbox" name="frmCategoryAccess_Delete_{VALUE_GROUP_ID}" value="1" {VALUE_DELETE} /></div></td>
+      <td><div align="center"><input type="checkbox" name="frmCategoryAccess_Move_{VALUE_GROUP_ID}" value="1" {VALUE_MOVE} /></div></td>
+      <td><div align="center"><input type="checkbox" name="frmCategoryAccess_Close_{VALUE_GROUP_ID}" value="1" {VALUE_CLOSE} /></div></td>
+    <td><div align="center"><input type="checkbox" name="frmCategoryAccess_Sticky_{VALUE_GROUP_ID}" value="1" {VALUE_STICKY} /></div></td>
+      <td>&nbsp;&nbsp;&nbsp;<a href="javascript:changeRow({VALUE_GROUP_ID},'check');" target="_self">{TXT_FORUM_SELECT_ALL}</a> | <a href="javascript:changeRow({VALUE_GROUP_ID},'uncheck');" target="_self">{TXT_FORUM_DESELECT_ALL}</a></td>
+    </tr>
+    <!-- END showRights -->
+    <!-- BEGIN noGroupsHide_1 -->
+    <tr class="row3">
+      <td>{TXT_CATEGORY_GLOBAL_RIGHTS}</td>
+      <td><div align="center"><input type="checkbox" name="frmCategoryAccess_Read" value="0" onclick="changeColumn('Read');" /></div></td>
+      <td><div align="center"><input type="checkbox" name="frmCategoryAccess_Write" value="0" onclick="changeColumn('Write');" /></div></td>
+      <td><div align="center"><input type="checkbox" name="frmCategoryAccess_Edit" value="0" onclick="changeColumn('Edit');" /></div></td>
+      <td><div align="center"><input type="checkbox" name="frmCategoryAccess_Delete" value="0" onclick="changeColumn('Delete');" /></div></td>
+      <td><div align="center"><input type="checkbox" name="frmCategoryAccess_Move" value="0" onclick="changeColumn('Move');" /></div></td>
+      <td><div align="center"><input type="checkbox" name="frmCategoryAccess_Close" value="0" onclick="changeColumn('Close');" /></div></td>
+        <td><div align="center"><input type="checkbox" name="frmCategoryAccess_Sticky" value="0" onclick="changeColumn('Sticky');" /></div></td>
+      <td>&nbsp;</td>
+    </tr>
+    <!-- END noGroupsHide_1 -->
+    <!-- BEGIN noGroupsMessage -->
+    <tr class="row1">
+      <td colspan="7"><div align="center">{TXT_CATEGORY_ACCESS_NOGROUPS}</div></td>
+    </tr>
+    <!-- END noGroupsMessage -->
+  </table>
+  <!-- BEGIN noGroupsHide_2 -->
+  <br />
+  <input type="checkbox" name="frmCategoryAccess_Bequeath" value="1" />
+  <label for="frmCategoryAccess_Bequeath">{TXT_CATEGORY_ACCESS_BEQUEATH}</label>
+  <br /><br />
+  <input type="submit" value="{TXT_CATEGORY_ACCESS_BUTTON}" />
+  <!-- END noGroupsHide_2 -->
 </form>
 <!-- END category_access.html -->

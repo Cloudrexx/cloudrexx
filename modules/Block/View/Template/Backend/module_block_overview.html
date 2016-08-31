@@ -5,7 +5,7 @@ function selectMultiAction()
 {
   with (document.frmBlocks) {
     switch (frmBlocksMultiAction.value) {
-      case 'activate':          
+      case 'activate':
         action='{DIRECTORY_INDEX}?cmd=Block&act=activate&{CSRF_PARAM}';
         submit();
         break;
@@ -13,7 +13,7 @@ function selectMultiAction()
       case 'deactivate':
         action='{DIRECTORY_INDEX}?cmd=Block&act=deactivate&{CSRF_PARAM}';
         submit();
-        break;     
+        break;
 
       case 'global':
         action='{DIRECTORY_INDEX}?cmd=Block&act=global&{CSRF_PARAM}';

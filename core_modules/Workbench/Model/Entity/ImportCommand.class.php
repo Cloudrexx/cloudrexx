@@ -37,31 +37,31 @@ namespace Cx\Core_Modules\Workbench\Model\Entity;
  * @author Michael Ritter <michael.ritter@comvation.com>
  */
 class ImportCommand extends Command {
-    
+
     /**
      * Command name
      * @var string
      */
     protected $name = 'import';
-    
+
     /**
      * Command description
      * @var string
      */
     protected $description = 'Installs a component (core, core_module, lib, module, template, etc.)';
-    
+
     /**
      * Command synopsis
      * @var string
      */
     protected $synopsis = 'workbench(.bat) import {path to zip package}';
-    
+
     /**
      * Command help text
      * @var string
      */
     protected $help = 'Installs a component using the specified zip package.';
-    
+
     /**
      * Execute this command
      * @param array $arguments Array of commandline arguments

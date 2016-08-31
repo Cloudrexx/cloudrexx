@@ -1,27 +1,27 @@
 <!-- START module_newsletter_link_feedback.html -->
 <table width="100%" border="0" cellpadding="3" cellspacing="0" class="adminlist">
-	<tr>
-		<th colspan="3">{TXT_NEWSLETTER_LINK_FEEDBACK}</th>
-	</tr>
-	<tr class="row3">
-		<td style="font-weight:bold; width: 30%;">{TXT_NEWSLETTER_RECIPIENT}</td>
-		<td style="font-weight:bold; width: 66%;">{TXT_NEWSLETTER_FEEDBACK_CLICKS}</td>
-		<td style="white-space:nowrap; font-weight:bold; text-align:right; width: 4%;">{TXT_NEWSLETTER_FUNCTIONS}</td>
-	</tr>
-	<!-- BEGIN recipient_list -->
-	<tr class="{NEWSLETTER_RECIPIENT_ROW_CLASS}">
-		<td>{NEWSLETTER_RECIPIENT_NAME}</td>
-		<td style="white-space:nowrap;"><a href="index.php?cmd=Newsletter&act=feedback&link_id={NEWSLETTER_LINK_ID}&recipient_id={USER_ID}&recipient_type={USER_TYPE}" title="{TXT_NEWSLETTER_RECIPIENT_FEEDBACK_ANALYZE_DETAIL}">{NEWSLETTER_RECIPIENT_FEEDBACK}% ({NEWSLETTER_RECIPIENT_CLICKS})</a></td>
-		<td style="white-space:nowrap; text-align:right;">
-			<a href="index.php?cmd=Newsletter&act=feedback&link_id={NEWSLETTER_LINK_ID}&recipient_id={USER_ID}&recipient_type={USER_TYPE}" title="{TXT_NEWSLETTER_RECIPIENT_FEEDBACK_ANALYZE_DETAIL}"><img src="../core/Core/View/Media/icons/analyze_on.gif" border="0" width="16" height="16" alt="{TXT_NEWSLETTER_RECIPIENT_FEEDBACK_ANALYZE_DETAIL}" /></a>
-<!-- BEGIN newsletter_user_type -->			
-			<a href="index.php?cmd=Newsletter&amp;act=users&amp;tpl=edit&amp;id={USER_ID}" title="{TXT_NEWSLETTER_MODIFY_RECIPIENT}"><img src="../core/Core/View/Media/icons/edit.gif" border="0" width="16" height="16" alt="{TXT_NEWSLETTER_MODIFY_RECIPIENT}"/></a>
+  <tr>
+    <th colspan="3">{TXT_NEWSLETTER_LINK_FEEDBACK}</th>
+  </tr>
+  <tr class="row3">
+    <td style="font-weight:bold; width: 30%;">{TXT_NEWSLETTER_RECIPIENT}</td>
+    <td style="font-weight:bold; width: 66%;">{TXT_NEWSLETTER_FEEDBACK_CLICKS}</td>
+    <td style="white-space:nowrap; font-weight:bold; text-align:right; width: 4%;">{TXT_NEWSLETTER_FUNCTIONS}</td>
+  </tr>
+  <!-- BEGIN recipient_list -->
+  <tr class="{NEWSLETTER_RECIPIENT_ROW_CLASS}">
+    <td>{NEWSLETTER_RECIPIENT_NAME}</td>
+    <td style="white-space:nowrap;"><a href="index.php?cmd=Newsletter&act=feedback&link_id={NEWSLETTER_LINK_ID}&recipient_id={USER_ID}&recipient_type={USER_TYPE}" title="{TXT_NEWSLETTER_RECIPIENT_FEEDBACK_ANALYZE_DETAIL}">{NEWSLETTER_RECIPIENT_FEEDBACK}% ({NEWSLETTER_RECIPIENT_CLICKS})</a></td>
+    <td style="white-space:nowrap; text-align:right;">
+      <a href="index.php?cmd=Newsletter&act=feedback&link_id={NEWSLETTER_LINK_ID}&recipient_id={USER_ID}&recipient_type={USER_TYPE}" title="{TXT_NEWSLETTER_RECIPIENT_FEEDBACK_ANALYZE_DETAIL}"><img src="../core/Core/View/Media/icons/analyze_on.gif" border="0" width="16" height="16" alt="{TXT_NEWSLETTER_RECIPIENT_FEEDBACK_ANALYZE_DETAIL}" /></a>
+<!-- BEGIN newsletter_user_type -->
+      <a href="index.php?cmd=Newsletter&amp;act=users&amp;tpl=edit&amp;id={USER_ID}" title="{TXT_NEWSLETTER_MODIFY_RECIPIENT}"><img src="../core/Core/View/Media/icons/edit.gif" border="0" width="16" height="16" alt="{TXT_NEWSLETTER_MODIFY_RECIPIENT}"/></a>
 <!-- END newsletter_user_type -->
 <!-- BEGIN access_user_type -->
-			<a href="index.php?cmd=Access&act=user&tpl=modify&id={USER_ID}" title="{TXT_NEWSLETTER_MODIFY_RECIPIENT}"><img src="../core/Core/View/Media/icons/edit.gif" border="0" width="16" height="16" alt="{TXT_NEWSLETTER_MODIFY_RECIPIENT}"/></a>
+      <a href="index.php?cmd=Access&act=user&tpl=modify&id={USER_ID}" title="{TXT_NEWSLETTER_MODIFY_RECIPIENT}"><img src="../core/Core/View/Media/icons/edit.gif" border="0" width="16" height="16" alt="{TXT_NEWSLETTER_MODIFY_RECIPIENT}"/></a>
 <!-- END access_user_type -->
-		</td>
-	</tr>
+    </td>
+  </tr>
 <!-- END recipient_list -->
 </table>
 {NEWSLETTER_RECIPIENTS_PAGING}

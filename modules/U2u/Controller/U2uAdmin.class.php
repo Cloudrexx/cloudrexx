@@ -53,7 +53,7 @@ class U2uAdmin extends U2uLibrary {
     var $_strOkMessage  = '';
 
     private $act = '';
-    
+
     /**
     * Constructor   -> Create the module-menu and an internal template-object
     * @global   object      $objInit
@@ -71,7 +71,7 @@ class U2uAdmin extends U2uLibrary {
         $this->_intLanguageId = $objInit->userFrontendLangId;
 
         $objFWUser = \FWUser::getFWUserObject();
-        $this->_intCurrentUserId = $objFWUser->objUser->getId();        
+        $this->_intCurrentUserId = $objFWUser->objUser->getId();
     }
     private function setNavigation()
     {
@@ -137,7 +137,7 @@ class U2uAdmin extends U2uLibrary {
         $strEmailInputHTML   = new \Cx\Core\Wysiwyg\Wysiwyg('private_message',$this->strMessages, 'fullpage');
 
         $this->_objTpl->setVariable(array(
-            'TXT_U2U_MAX_POSTING_SIZE'	             => $settingMaxPosting['max_posting_size'],
+            'TXT_U2U_MAX_POSTING_SIZE'                 => $settingMaxPosting['max_posting_size'],
             'TXT_U2U_MAX_POSTING_CHARS'              => $settingMaxChars['max_posting_chars'],
             'TXT_U2U_SETTINGS_MAIL_SUBJECT'          => $settingEmailSubject['subject'],
             'TXT_U2U_SETTINGS_MAIL_FROM'             => $settingEmailFrom['from'],
@@ -170,10 +170,10 @@ class U2uAdmin extends U2uLibrary {
        if($_POST['frmSettings_submit']) {
             $settings =  array();
             $settings =  array('max_inbox'      => contrexx_addslashes(strip_tags($_POST['frmSettings_max_inbox'])),
-                                   'max_chars' 	    => contrexx_addslashes(strip_tags($_POST['frmSettings_max_chars'])),
-                                   'mail_subject' 	=> contrexx_addslashes(strip_tags($_POST['frmSettings_subject'])),
-                                   'mail_from' 	    => contrexx_addslashes(strip_tags($_POST['frmSettings_from'])),
-                                   'mail_message' 	=> contrexx_addslashes($_POST['private_message']),
+                                   'max_chars'         => contrexx_addslashes(strip_tags($_POST['frmSettings_max_chars'])),
+                                   'mail_subject'     => contrexx_addslashes(strip_tags($_POST['frmSettings_subject'])),
+                                   'mail_from'         => contrexx_addslashes(strip_tags($_POST['frmSettings_from'])),
+                                   'mail_message'     => contrexx_addslashes($_POST['private_message']),
                                );
             $updateMaxPostings=' UPDATE '.DBPREFIX.'module_u2u_settings
                                 SET `value`      = "'.$settings['max_inbox'].'"

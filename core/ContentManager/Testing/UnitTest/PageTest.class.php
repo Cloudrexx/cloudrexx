@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,10 +24,10 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * PageTest
- * 
+ *
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Cloudrexx Development Team <info@cloudrexx.com>
  * @author      SS4U <ss4u.comvation@gmail.com>
@@ -40,7 +40,7 @@ namespace Cx\Core\ContentManager\Testing\UnitTest;
 
 /**
  * PageTest
- * 
+ *
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Cloudrexx Development Team <info@cloudrexx.com>
  * @author      SS4U <ss4u.comvation@gmail.com>
@@ -61,7 +61,7 @@ class PageTest extends \Cx\Core\Test\Model\Entity\DoctrineTestCase
         self::$em->flush();
 
         $p = new \Cx\Core\ContentManager\Model\Entity\Page();
-        
+
         $p->setLang(1);
         $p->setTitle('testpage');
         $p->setNode($node);
@@ -79,15 +79,15 @@ class PageTest extends \Cx\Core\Test\Model\Entity\DoctrineTestCase
 
     public function testLoggable() {
         $nodeRepo = self::$em->getRepository('Cx\Core\ContentManager\Model\Entity\Node');
-        
+
         $n = new \Cx\Core\ContentManager\Model\Entity\Node();
 
         $n->setParent($nodeRepo->getRoot());
         $nodeRepo->getRoot()->addChildren($n);
-        
+
         self::$em->persist($n);
         self::$em->flush();
-        
+
         $p = new \Cx\Core\ContentManager\Model\Entity\Page();
 
         $p->setLang(1);
@@ -98,8 +98,8 @@ class PageTest extends \Cx\Core\Test\Model\Entity\DoctrineTestCase
         $p->setUseCustomApplicationTemplateForAllChannels('');
         $p->setUseSkinForAllChannels('');
         $p->setCmd('');
-        
-                
+
+
         self::$em->persist($n);
         self::$em->persist($p);
         self::$em->flush();
@@ -129,11 +129,11 @@ class PageTest extends \Cx\Core\Test\Model\Entity\DoctrineTestCase
 
     public function testSlugGeneration() {
         $p = new \Cx\Core\ContentManager\Model\Entity\Page();
-        $p->setTitle('test');        
+        $p->setTitle('test');
         $this->assertEquals('test', $p->getSlug());
 
         $p = new \Cx\Core\ContentManager\Model\Entity\Page();
-        $p->setTitle('test with space');        
+        $p->setTitle('test with space');
         $this->assertEquals('test-with-space', $p->getSlug());
 
         $p = new \Cx\Core\ContentManager\Model\Entity\Page();
@@ -164,7 +164,7 @@ class PageTest extends \Cx\Core\Test\Model\Entity\DoctrineTestCase
         $this->assertEquals(12, $p->getTargetNodeId());
         $this->assertEquals(0, $p->getTargetLangId());
         $this->assertEquals('querystring', $p->getTargetQueryString());
-                
+
         $p->setTarget('[[NODE_12_1]]querystring');
         $this->assertEquals(1, $p->isTargetInternal());
         $this->assertEquals(12, $p->getTargetNodeId());
@@ -182,7 +182,7 @@ class PageTest extends \Cx\Core\Test\Model\Entity\DoctrineTestCase
         $p = new \Cx\Core\ContentManager\Model\Entity\Page();
 
         //currently untested because set(Front|Backend)Protection() call static Permission-methods.
-        
+
         /*        $this->assertEquals(false, $p->isFrontendProtected());
         $this->assertEquals(false, $p->isBackendProtected());
 
@@ -195,7 +195,7 @@ class PageTest extends \Cx\Core\Test\Model\Entity\DoctrineTestCase
         $this->assertEquals(false, $p->isFrontendProtected());
         $this->assertEquals(true, $p->isBackendProtected());*/
     }
-    
+
     public function testGetURL() {
         $nodeRepo = self::$em->getRepository('Cx\Core\ContentManager\Model\Entity\Node');
 
@@ -207,7 +207,7 @@ class PageTest extends \Cx\Core\Test\Model\Entity\DoctrineTestCase
         self::$em->flush();
 
         $p1 = new \Cx\Core\ContentManager\Model\Entity\Page();
-        
+
         $p1->setLang(1);
         $p1->setTitle('testgeturl');
         $p1->setNode($n1);
@@ -221,31 +221,31 @@ class PageTest extends \Cx\Core\Test\Model\Entity\DoctrineTestCase
         self::$em->persist($n1);
         self::$em->persist($p1);
         self::$em->flush();
-        
+
         $urlWithDomain = $p1->getURL('http://example.com/cms', '?k=v');
         $this->assertEquals('http://example.com/cms/de/testgeturl?k=v', $urlWithDomain);
 
         $urlWithoutDomain = $p1->getURL('', '?k=v');
         $this->assertEquals('/de/testgeturl?k=v', $urlWithoutDomain);
     }
-    
+
     public function testTranslate() {
-        
+
         $nodeRepo = self::$em->getRepository('Cx\Core\ContentManager\Model\Entity\Node');
         $pageRepo = self::$em->getRepository('Cx\Core\ContentManager\Model\Entity\Page');
-        
+
         $n1 = new \Cx\Core\ContentManager\Model\Entity\Node();
         $n1->setParent($nodeRepo->getRoot());
         $nodeRepo->getRoot()->addChildren($n1);
-        
+
         $n2 = new \Cx\Core\ContentManager\Model\Entity\Node();
         $n2->setParent($n1);
-        
+
         self::$em->persist($n1);
         self::$em->persist($n2);
-        self::$em->flush();        
+        self::$em->flush();
 
-        $p1 = new \Cx\Core\ContentManager\Model\Entity\Page();     
+        $p1 = new \Cx\Core\ContentManager\Model\Entity\Page();
         $p1->setLang(1);
         $p1->setTitle('test translate root');
         $p1->setNode($n1);
@@ -256,7 +256,7 @@ class PageTest extends \Cx\Core\Test\Model\Entity\DoctrineTestCase
         $p1->setCmd('');
         $p1->setActive(1);
 
-        $p2 = new \Cx\Core\ContentManager\Model\Entity\Page();     
+        $p2 = new \Cx\Core\ContentManager\Model\Entity\Page();
         $p2->setLang(1);
         $p2->setTitle('child page');
         $p2->setNode($n2);
@@ -266,22 +266,22 @@ class PageTest extends \Cx\Core\Test\Model\Entity\DoctrineTestCase
         $p2->setUseSkinForAllChannels('');
         $p2->setCmd('');
         $p2->setActive(1);
-        
+
         self::$em->persist($n1);
         self::$em->persist($n2);
 
         self::$em->persist($p1);
         self::$em->persist($p2);
-       
+
         self::$em->flush();
-        
+
         $pageId = $p2->getId();
-        
+
         self::$em->refresh($n1);
         self::$em->refresh($n2);
-                
+
         $pageToTranslate = $pageRepo->findOneById($pageId);
-        
+
         // copy page following redirects
         $page = $pageToTranslate->copyToLang(
                 2,
@@ -297,24 +297,24 @@ class PageTest extends \Cx\Core\Test\Model\Entity\DoctrineTestCase
 
         $pageToTranslate->setupPath(2);
 
-        $page->setNodeIdShadowed($pageToTranslate->getId());    
+        $page->setNodeIdShadowed($pageToTranslate->getId());
 
         self::$em->persist($page);
         self::$em->flush();
-        
+
         $pageId = $page->getId(); // Translated page id
-        
+
         self::$em->refresh($n1);
         self::$em->refresh($n2);
-        
+
         $page = $pageRepo->findOneById($pageId); // Translated page
-        
+
         $this->assertEquals('/test-translate-root/child-page', $page->getPath());
         $this->assertEquals(2, $page->getLang());
 
         //see if the parent node is really, really there.
-        $parentPages = $page->getNode()->getParent()->getPagesByLang();        
-        $this->assertArrayHasKey(2, $parentPages);        
+        $parentPages = $page->getNode()->getParent()->getPagesByLang();
+        $this->assertArrayHasKey(2, $parentPages);
         $this->assertEquals('test translate root', $parentPages[2]->getTitle());
-    }    
+    }
 }

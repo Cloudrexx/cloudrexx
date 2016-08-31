@@ -44,17 +44,17 @@ namespace Cx\Core_Modules\LinkManager\Model\Repository;
  * @package     cloudrexx
  * @subpackage  coremodule_linkmanager
  */
-class CrawlerRepository extends \Doctrine\ORM\EntityRepository {     
-    
+class CrawlerRepository extends \Doctrine\ORM\EntityRepository {
+
     /**
      * get the last run detail by the language
-     * 
+     *
      * @param integer $lang language id
-     * 
+     *
      * @return object
      */
     public function getLastRunByLang($lang)
-    {   
+    {
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('crawler')
             ->from('Cx\Core_Modules\LinkManager\Model\Entity\Crawler', 'crawler')
@@ -63,13 +63,13 @@ class CrawlerRepository extends \Doctrine\ORM\EntityRepository {
             ->getDql();
         $qb->setParameter("lang", $lang)->setMaxResults(1);
         $objResult = $qb->getQuery()->getResult();
-        
+
         return $objResult[0];
     }
-    
+
     /**
      * get the last run details
-     * 
+     *
      * @return object
      */
     public function getLatestRunDetails()
@@ -81,28 +81,28 @@ class CrawlerRepository extends \Doctrine\ORM\EntityRepository {
            ->orderBy("crawler.id", "DESC")
            ->getDql();
         $qb->setParameter('runStatus', 'running')->setMaxResults(1);
-        
+
         return $qb->getQuery()->getResult();
     }
-    
+
     /**
      * get the crawler entry counts
-     * 
+     *
      * @return integer
      */
     public function crawlerEntryCount()
     {
         $objResult = new \Doctrine\Common\Collections\ArrayCollection($this->findAll());
-        
+
         return $objResult->count();
     }
-    
+
     /**
      * get the crawler run entries
-     * 
+     *
      * @param integer $pos       position
-     * @param integer $pageLimit page limit 
-     * 
+     * @param integer $pageLimit page limit
+     *
      * @return array
      */
     public function getCrawlerRunEntries($pos, $pageLimit)
@@ -113,7 +113,7 @@ class CrawlerRepository extends \Doctrine\ORM\EntityRepository {
             ->orderBy("crawler.id", "DESC")
             ->getQuery();
         $qb->setFirstResult($pos)->setMaxResults($pageLimit);
-        
+
         return new \Doctrine\Common\Collections\ArrayCollection($qb->getQuery()->getResult());
     }
 }

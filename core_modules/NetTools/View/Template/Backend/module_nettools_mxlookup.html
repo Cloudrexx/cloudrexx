@@ -1,28 +1,28 @@
 <table cellspacing="0" cellpadding="1" width="100%" border="0" class="adminlist">
-	<tr>
-		<th colspan="2">&nbsp;{TXT_MX_LOOKUP}</th>
-	</tr>
-	<tr class="row1">
-		<td colspan="2">{TXT_MX_LOOKUP_TEXT}<br /><br /></td>
-	</tr>
-	<tr class="row2">
-		<td colspan="2"><form action="?cmd=NetTools&amp;tpl=mxlookup" method="post"><input type="text" name="address" value="{NETTOOLS_MX_LOOKUP_ADDRESS}" />&nbsp;<input type="submit" value="{TXT_MX_LOOKUP}" /></form></td>
-	</tr>
-	<!-- BEGIN mxlookup -->
-		<tr class="row1">
-			<td width="10%"><b>{TXT_PREFERENCE}</b></td>
-			<td width="90%"><b>{TXT_HOSTNAME}</b></td>
-		</tr>
-		<!-- BEGIN mxlookup-list -->
-		<tr class="{NETTOOLS_MX_LOOKUP_CLASS}">
-			<td width="10%">{NETTOOLS_MX_LOOKUP_PREFERENCE}</td>
-			<td width="90%">{NETTOOLS_MX_LOOKUP_HOST}</td>
-		</tr>
-		<!-- END mxlookup-list -->
-	<!-- END mxlookup -->
-	<!-- BEGIN mxlookup-error -->
-		<tr class="row1">
-			<td>{NETTOOLS_MX_LOOKUP_ERROR}</td>
-		</tr>
-	<!-- END mxlookup-error -->
+  <tr>
+    <th colspan="2">&nbsp;{TXT_MX_LOOKUP}</th>
+  </tr>
+  <tr class="row1">
+    <td colspan="2">{TXT_MX_LOOKUP_TEXT}<br /><br /></td>
+  </tr>
+  <tr class="row2">
+    <td colspan="2"><form action="?cmd=NetTools&amp;tpl=mxlookup" method="post"><input type="text" name="address" value="{NETTOOLS_MX_LOOKUP_ADDRESS}" />&nbsp;<input type="submit" value="{TXT_MX_LOOKUP}" /></form></td>
+  </tr>
+  <!-- BEGIN mxlookup -->
+    <tr class="row1">
+      <td width="10%"><b>{TXT_PREFERENCE}</b></td>
+      <td width="90%"><b>{TXT_HOSTNAME}</b></td>
+    </tr>
+    <!-- BEGIN mxlookup-list -->
+    <tr class="{NETTOOLS_MX_LOOKUP_CLASS}">
+      <td width="10%">{NETTOOLS_MX_LOOKUP_PREFERENCE}</td>
+      <td width="90%">{NETTOOLS_MX_LOOKUP_HOST}</td>
+    </tr>
+    <!-- END mxlookup-list -->
+  <!-- END mxlookup -->
+  <!-- BEGIN mxlookup-error -->
+    <tr class="row1">
+      <td>{NETTOOLS_MX_LOOKUP_ERROR}</td>
+    </tr>
+  <!-- END mxlookup-error -->
 </table>

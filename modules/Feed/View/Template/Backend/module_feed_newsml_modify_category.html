@@ -4,90 +4,90 @@
 <li><a id="feed_newsml2" href="javascript:{}" onclick="selectTab('newsml2')" title="{TXT_FEED_PLACEHOLDERS}">{TXT_FEED_PLACEHOLDERS}</a></li>
 </ul>
 <form action="?cmd=Feed&amp;act=newsML&amp;tpl=updateCategory&amp;categoryId={FEED_NEWSML_CATEGORY_ID}" method="post">
-	<!-- start newsml1 -->
-	<div id="newsml1" class="feed" style="display:block">
-		<table cellspacing="0" cellpadding="0" width="100%" border="0" class="adminlist">
-			<tbody>
-				<tr style="height:20px;">
-					<th colspan="2">{FEED_CATEGORY_TITLE}</th>
-				</tr>
-				<tr style="height:20px;" class="row1">
-					<td width="15%">{TXT_FEED_NAME}</td>
-					<td width="85%"><input type="text" name="feedNewsMLCategoryName" value="{FEED_NEWSML_CATEGORY_NAME}" style="width:300px;" maxlength="40" /></td>
-				</tr>
-				<tr style="height:20px;" class="row2">
-					<td width="15%">{TXT_FEED_NEWSML_PROVIDER}</td>
-					<td width="85%">{FEED_NEWSML_PROVIDER_MENU}</td>
-				</tr>
-				<tr style="height:20px;" class="row1">
-					<td width="15%" style="vertical-align:top;">{TXT_FEED_NEWSML_SUBJECT_CODES}</td>
-					<td width="85%">{FEED_NEWSML_SUBJECT_CODES_MENU}<div id="feedNewsMLSubjectBoxExclusive" style="display:{FEED_NEWSML_SUBJECT_CODES_STYLE}; border:1px solid #fffaa;"><textarea name="feedNewsMLSubjects" style="width:300px; height:50px; vertical-align:top;">{FEED_NEWSML_SUBJECT_CODES}</textarea> {TXT_FEED_SUBJECT_CODES_SEPARATED}</div></td>
-				</tr>
-				<tr style="height:20px;" class="row2">
-					<td width="15%">{TXT_FEED_NEWSML_MSG_COUNT}</td>
-					<td width="85%"><input type="text" name="feedNewsMLCategoryMsgCount" style="width:300px;" value="{FEED_NEWSML_CATEGORY_MSG_COUNT}" /></td>
-				</tr>
-				<tr style="height:20px;" class="row1">
-					<td>{TXT_FEED_SHOW_PICTURES}</td>
-					<td>
-						<input type="radio" value="1" name="feedNewsMLCategoryShowPics" id="feedNewsMLCategoryShowPicsYes" {FEED_NEWSML_SHOW_PICS_YES} /><label for="feedNewsMLCategoryShowPicsYes">{TXT_FEED_YES}</label>
-						<input type="radio" value="0" name="feedNewsMLCategoryShowPics" id="feedNewsMLCategoryShowPicsNo" {FEED_NEWSML_SHOW_PICS_NO} /><label for="feedNewsMLCategoryShowPicsNo">{TXT_FEED_NO}</label>
-					</td>
-				</tr>
-				<tr style="height:20px;" class="row2">
-					<td style="vertical-align:top;" width="15%">{TXT_FEED_LAYOUT}</td>
-					<td width="85%"><textarea name="feedNewsMLCategoryTemplate" style="width:600px; height:200px;">{FEED_NEWSML_CATEGORY_TEMPLATE}</textarea></td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
-	<!-- end newsml1 -->
-	<!-- start newsml2 -->
-	<div id="newsml2" class="feed" style="display:none;">
-		<table cellspacing="0" cellpadding="0" width="100%" border="0" class="adminlist">
-			<tbody>
-				<tr>
-					<th colspan="2">{TXT_FEED_PLACEHOLDERS}</th>
-				</tr>
-				<tr style="height:20px;" class="row3">
-					<td colspan="2">{TXT_FEED_AVAILABILITY_OF_PLACEHOLDERS}</td>
-				</tr>
-				<tr style="height:20px;" class="row1">
-					<td colspan="2"> </td>
-				</tr>
-				<tr style="height:20px;" class="row2">
-					<td width="15%" style="font-weight:bold;">{TXT_FEED_PLACEHOLDER}</td>
-					<td width="85%" style="font-weight:bold;">{TXT_FEED_DESCRIPTION}</td>
-				</tr>
-				<tr style="height:20px;" class="row1">
-					<td>[[ID]]</td>
-					<td>{TXT_FEED_ID_OF_NEWS_MSG}</td>
-				</tr>
-				<tr style="height:20px;" class="row2">
-					<td>[[TITLE]]</td>
-					<td>{TXT_FEED_TITLE}</td>
-				</tr>
-				<tr style="height:20px;" class="row1">
-					<td>[[DATE]]</td>
-					<td>{TXT_FEED_DATE} ({FEED_DATE})</td>
-				</tr>
-				<tr style="height:20px;" class="row2">
-					<td>[[LONG_DATE]]</td>
-					<td>{TXT_FEED_DATE} ({FEED_LONG_DATE})</td>
-				</tr>
-				<tr style="height:20px;" class="row1">
-					<td>[[SHORT_DATE]]</td>
-					<td>{TXT_FEED_DATE} ({FEED_SHORT_DATE})</td>
-				</tr>
-				<tr style="height:20px;" class="row2">
-					<td>[[TEXT]]</td>
-					<td>{TXT_FEED_CONTENT_OF_NEWS_MSG}</td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
-	<!-- end newsml2 -->
-	<br />
-	<input type="button" value="{TXT_FEED_BACK}" onclick="window.history.back()" /> <input type="submit" name="save" value="{TXT_FEED_STORE}" />
+  <!-- start newsml1 -->
+  <div id="newsml1" class="feed" style="display:block">
+    <table cellspacing="0" cellpadding="0" width="100%" border="0" class="adminlist">
+      <tbody>
+        <tr style="height:20px;">
+          <th colspan="2">{FEED_CATEGORY_TITLE}</th>
+        </tr>
+        <tr style="height:20px;" class="row1">
+          <td width="15%">{TXT_FEED_NAME}</td>
+          <td width="85%"><input type="text" name="feedNewsMLCategoryName" value="{FEED_NEWSML_CATEGORY_NAME}" style="width:300px;" maxlength="40" /></td>
+        </tr>
+        <tr style="height:20px;" class="row2">
+          <td width="15%">{TXT_FEED_NEWSML_PROVIDER}</td>
+          <td width="85%">{FEED_NEWSML_PROVIDER_MENU}</td>
+        </tr>
+        <tr style="height:20px;" class="row1">
+          <td width="15%" style="vertical-align:top;">{TXT_FEED_NEWSML_SUBJECT_CODES}</td>
+          <td width="85%">{FEED_NEWSML_SUBJECT_CODES_MENU}<div id="feedNewsMLSubjectBoxExclusive" style="display:{FEED_NEWSML_SUBJECT_CODES_STYLE}; border:1px solid #fffaa;"><textarea name="feedNewsMLSubjects" style="width:300px; height:50px; vertical-align:top;">{FEED_NEWSML_SUBJECT_CODES}</textarea> {TXT_FEED_SUBJECT_CODES_SEPARATED}</div></td>
+        </tr>
+        <tr style="height:20px;" class="row2">
+          <td width="15%">{TXT_FEED_NEWSML_MSG_COUNT}</td>
+          <td width="85%"><input type="text" name="feedNewsMLCategoryMsgCount" style="width:300px;" value="{FEED_NEWSML_CATEGORY_MSG_COUNT}" /></td>
+        </tr>
+        <tr style="height:20px;" class="row1">
+          <td>{TXT_FEED_SHOW_PICTURES}</td>
+          <td>
+            <input type="radio" value="1" name="feedNewsMLCategoryShowPics" id="feedNewsMLCategoryShowPicsYes" {FEED_NEWSML_SHOW_PICS_YES} /><label for="feedNewsMLCategoryShowPicsYes">{TXT_FEED_YES}</label>
+            <input type="radio" value="0" name="feedNewsMLCategoryShowPics" id="feedNewsMLCategoryShowPicsNo" {FEED_NEWSML_SHOW_PICS_NO} /><label for="feedNewsMLCategoryShowPicsNo">{TXT_FEED_NO}</label>
+          </td>
+        </tr>
+        <tr style="height:20px;" class="row2">
+          <td style="vertical-align:top;" width="15%">{TXT_FEED_LAYOUT}</td>
+          <td width="85%"><textarea name="feedNewsMLCategoryTemplate" style="width:600px; height:200px;">{FEED_NEWSML_CATEGORY_TEMPLATE}</textarea></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <!-- end newsml1 -->
+  <!-- start newsml2 -->
+  <div id="newsml2" class="feed" style="display:none;">
+    <table cellspacing="0" cellpadding="0" width="100%" border="0" class="adminlist">
+      <tbody>
+        <tr>
+          <th colspan="2">{TXT_FEED_PLACEHOLDERS}</th>
+        </tr>
+        <tr style="height:20px;" class="row3">
+          <td colspan="2">{TXT_FEED_AVAILABILITY_OF_PLACEHOLDERS}</td>
+        </tr>
+        <tr style="height:20px;" class="row1">
+          <td colspan="2"> </td>
+        </tr>
+        <tr style="height:20px;" class="row2">
+          <td width="15%" style="font-weight:bold;">{TXT_FEED_PLACEHOLDER}</td>
+          <td width="85%" style="font-weight:bold;">{TXT_FEED_DESCRIPTION}</td>
+        </tr>
+        <tr style="height:20px;" class="row1">
+          <td>[[ID]]</td>
+          <td>{TXT_FEED_ID_OF_NEWS_MSG}</td>
+        </tr>
+        <tr style="height:20px;" class="row2">
+          <td>[[TITLE]]</td>
+          <td>{TXT_FEED_TITLE}</td>
+        </tr>
+        <tr style="height:20px;" class="row1">
+          <td>[[DATE]]</td>
+          <td>{TXT_FEED_DATE} ({FEED_DATE})</td>
+        </tr>
+        <tr style="height:20px;" class="row2">
+          <td>[[LONG_DATE]]</td>
+          <td>{TXT_FEED_DATE} ({FEED_LONG_DATE})</td>
+        </tr>
+        <tr style="height:20px;" class="row1">
+          <td>[[SHORT_DATE]]</td>
+          <td>{TXT_FEED_DATE} ({FEED_SHORT_DATE})</td>
+        </tr>
+        <tr style="height:20px;" class="row2">
+          <td>[[TEXT]]</td>
+          <td>{TXT_FEED_CONTENT_OF_NEWS_MSG}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <!-- end newsml2 -->
+  <br />
+  <input type="button" value="{TXT_FEED_BACK}" onclick="window.history.back()" /> <input type="submit" name="save" value="{TXT_FEED_STORE}" />
 </form>
 <!-- END module_feed_newsml_modify_category.html.html -->

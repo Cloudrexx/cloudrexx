@@ -2,40 +2,40 @@
 <script language="JavaScript" type="text/javascript">
 function CheckForm() {
   with( document.formCat ) {
-    if (status.value == "" || name.value == "") 
+    if (status.value == "" || name.value == "")
     {
-        alert ("{TXT_FIELDS_REQUIRED}");       
+        alert ("{TXT_FIELDS_REQUIRED}");
         return false;
-    }   	
+    }
     return true;
   }
 }
 </script>
 <form name="formCat" method="post" action="?cmd=Market&amp;act={FORM_ACTION}" onsubmit="return CheckForm()">
-<input type="hidden" name="id" value="{CAT_ID}">	
-	<table width="100%" cellspacing="0" cellpadding="3" border="0" align="top" class="adminlist">
-		<tr>
-			<th colspan="2" align="left">{TXT_TITLE}</th>
-		</tr>
-		<tr valign="top" class="row1">
-			<td nowrap="nowrap" width="150">{TXT_NAME}<font color="red"> *</font></td>		
-			<td><input name="name" size="70" maxlength="100" value="{CAT_NAME}"></td>
-		</td>		
-		</tr>
-		<tr valign="top" class="row2">
-			<td nowrap="nowrap">{TXT_DESCRIPTION}</td>
-			<td><textarea name="description" rows="5" cols="50" >{CAT_DESCRIPTION}</textarea></td>
-		</tr>
-		<tr class="row1">
-			<td nowrap="nowrap">{TXT_STATUS}<font color="red"> *</font></td>
-			<td>
-				<input type="radio" name="status" value="1" {CAT_STATUS_ON} />&nbsp;{TXT_STATUS_ON}
-				<input type="radio" name="status" value="0" {CAT_STATUS_OFF} />&nbsp;{TXT_STATUS_OFF}
-			</td>
-		</tr>
-		
+<input type="hidden" name="id" value="{CAT_ID}">
+  <table width="100%" cellspacing="0" cellpadding="3" border="0" align="top" class="adminlist">
+    <tr>
+      <th colspan="2" align="left">{TXT_TITLE}</th>
+    </tr>
+    <tr valign="top" class="row1">
+      <td nowrap="nowrap" width="150">{TXT_NAME}<font color="red"> *</font></td>
+      <td><input name="name" size="70" maxlength="100" value="{CAT_NAME}"></td>
+    </td>
+    </tr>
+    <tr valign="top" class="row2">
+      <td nowrap="nowrap">{TXT_DESCRIPTION}</td>
+      <td><textarea name="description" rows="5" cols="50" >{CAT_DESCRIPTION}</textarea></td>
+    </tr>
+    <tr class="row1">
+      <td nowrap="nowrap">{TXT_STATUS}<font color="red"> *</font></td>
+      <td>
+        <input type="radio" name="status" value="1" {CAT_STATUS_ON} />&nbsp;{TXT_STATUS_ON}
+        <input type="radio" name="status" value="0" {CAT_STATUS_OFF} />&nbsp;{TXT_STATUS_OFF}
+      </td>
+    </tr>
+
   </table>
-	<br />
-	<input type="submit" name="submitCat" value="{TXT_SAVE}" />
+  <br />
+  <input type="submit" name="submitCat" value="{TXT_SAVE}" />
 </form>
 <!-- END module_market_edit_category.html -->

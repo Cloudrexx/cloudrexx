@@ -33,7 +33,7 @@ class TreeNavCommand extends NavCommand {
     protected $description = 'Shows the backend navigation as a tree';
     protected $synopsis = 'workbench(.bat) navtree';
     protected $help = 'Shows the backend navigation as a tree';
-    
+
     public function execute(array $arguments) {
         $this->interface->tree($this->getEntries(), 'area_name');
     }

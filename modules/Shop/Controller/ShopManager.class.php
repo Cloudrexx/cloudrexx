@@ -71,11 +71,11 @@ class ShopManager extends ShopLibrary
         global $_ARRAYLANG, $objTemplate;
 
         \Cx\Core\Setting\Controller\Setting::init('Shop', 'config');
-        
+
         $this->checkProfileAttributes();
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-        self::$defaultImage = file_exists($cx->getWebsiteImagesShopPath() . '/' . ShopLibrary::noPictureName) ? 
-                                $cx->getWebsiteImagesShopWebPath() . '/' . ShopLibrary::noPictureName : 
+        self::$defaultImage = file_exists($cx->getWebsiteImagesShopPath() . '/' . ShopLibrary::noPictureName) ?
+                                $cx->getWebsiteImagesShopWebPath() . '/' . ShopLibrary::noPictureName :
                                 $cx->getCodeBaseOffsetPath(). '/images/Shop/' . ShopLibrary::noPictureName;
         self::$objTemplate = new \Cx\Core\Html\Sigma($cx->getCodeBaseModulePath() . '/Shop/View/Template/Backend');
         self::$objTemplate->setErrorHandling(PEAR_ERROR_DIE);
@@ -119,7 +119,7 @@ class ShopManager extends ShopLibrary
                 throw new \Cx\Lib\Update_DatabaseException(
                     "Failed to create User_Profile_Attribute 'notes'");
             }
-            
+
             //Re initialize shop setting
             \Cx\Core\Setting\Controller\Setting::init('Shop', 'config');
 //DBG::log("Customer::errorHandler(): Stored notes attribute, ID ".$objProfileAttribute->getId());
@@ -156,7 +156,7 @@ class ShopManager extends ShopLibrary
                 throw new \Cx\Lib\Update_DatabaseException(
                     "Failed to create User_Profile_Attribute 'notes'");
             }
-            
+
             //Re initialize shop setting
             \Cx\Core\Setting\Controller\Setting::init('Shop', 'config');
             if (!(\Cx\Core\Setting\Controller\Setting::set('user_profile_attribute_customer_group_id', $objProfileAttribute->getId())
@@ -1674,7 +1674,7 @@ if ($test === NULL) {
         $virtual = false;
         $pictureFilename = NULL;
         $picturePath = $thumbPath = self::$defaultImage;
-        if ($category_id) {            
+        if ($category_id) {
             // Edit the selected category:  Flip view to the edit tab
             $flagEditTabActive = true;
             $objCategory = ShopCategory::getById($category_id);
@@ -1741,7 +1741,7 @@ if ($test === NULL) {
         self::$objTemplate->setGlobalVariable(array(
             'MEDIABROWSER_BUTTON' => self::getMediaBrowserButton($mediaBrowserOptions, 'setSelectedImage')
         ));
-        
+
         self::$objTemplate->parse('category_edit');
 // TODO: Add controls to fold parent categories
 //        $level_prev = null;
@@ -2148,7 +2148,7 @@ if ($test === NULL) {
 //            self::$objTemplate->setVariable(
 //                'SHOP_FLAGS_SELECTION', $flagsSelection);
 //        }
-//        
+//
         // media browser
         $mediaBrowserOptions = array(
             'type'                      => 'button',
@@ -2157,7 +2157,7 @@ if ($test === NULL) {
             'id'                        => 'media_browser_shop',
             'style'                     => 'display:none'
         );
-        
+
         self::$objTemplate->setVariable(array(
             'MEDIABROWSER_BUTTON' => self::getMediaBrowserButton($mediaBrowserOptions, 'setSelectedImage')
         ));
@@ -2246,11 +2246,11 @@ if ($test === NULL) {
             'SHOP_PICTURE1_IMG_SRC' =>
                 (   !empty($arrImages[1]['img'])
                  && is_file(\ImageManager::getThumbnailFilename($websiteImagesShopPath . $arrImages[1]['img']))
-                        ? contrexx_raw2encodedUrl(\ImageManager::getThumbnailFilename($websiteImagesShopWebPath . $arrImages[1]['img'])) 
+                        ? contrexx_raw2encodedUrl(\ImageManager::getThumbnailFilename($websiteImagesShopWebPath . $arrImages[1]['img']))
                     : self::$defaultImage),
             'SHOP_PICTURE2_IMG_SRC' =>
                 (   !empty($arrImages[2]['img'])
-                 && is_file(\ImageManager::getThumbnailFilename($websiteImagesShopPath . $arrImages[2]['img'])) 
+                 && is_file(\ImageManager::getThumbnailFilename($websiteImagesShopPath . $arrImages[2]['img']))
                         ? contrexx_raw2encodedUrl(\ImageManager::getThumbnailFilename($websiteImagesShopWebPath . $arrImages[2]['img']))
                     : self::$defaultImage),
             'SHOP_PICTURE3_IMG_SRC' =>
@@ -4049,30 +4049,30 @@ die("Shopmanager::delete_article_group(): Obsolete method called");
 
     /**
      * Get Media Browser
-     * 
-     * @param object $objTpl            Template object 
+     *
+     * @param object $objTpl            Template object
      * @param string $placeholderKey    Place holder name
      * @param string $placeholderValue  Display name
      * @param array  $options           options Ex:type, id.. etc
      * @param string $callback          callback function name
-     * 
+     *
      * @return null
      */
     public static function getMediaBrowserButton($options = array(), $callback = '')
     {
         global $_ARRAYLANG;
-        
+
         if (empty($options)) {
             return;
         }
-        
+
         // Mediabrowser
         $mediaBrowser = new \Cx\Core_Modules\MediaBrowser\Model\Entity\MediaBrowser();
         $mediaBrowser->setOptions($options);
         if ($callback) {
             $mediaBrowser->setCallback($callback);
         }
-        
+
         return $mediaBrowser->getXHtml($_ARRAYLANG['TXT_SHOP_EDIT_OR_ADD_IMAGE']);
     }
 }

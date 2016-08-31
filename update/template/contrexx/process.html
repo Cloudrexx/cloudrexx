@@ -16,7 +16,7 @@
         </tr>
     </table>
     <!-- END processStatus -->
-    
+
     <!-- BEGIN dialogContent -->
     <script type="text/javascript">
         cx.ready(function() {
@@ -28,7 +28,7 @@
                 dialogClass:   "content-migration-dialog",
                 title:         "Inhaltsseiten gruppieren",
                 content:       '{PROCESS_DIALOG_CONTENT}',
-                
+
                 close: function() {
                     executeGrouping();
                 },
@@ -40,14 +40,14 @@
             });
         });
     </script>
-    
+
     <div style="margin: 180px 0 0 155px;">Bitte haben Sie einen Moment Geduld.<br />Das Update wird durchgeführt...<br /><br /><img src="template/contrexx/images/content/loading_animation.gif" width="208" height="13" alt="" /></div>
     <!-- END dialogContent -->
-    
+
     <!-- BEGIN ajaxDialogContent -->
     {PROCESS_DIALOG_CONTENT}
     <!-- END ajaxDialogContent -->
- 
+
     <!-- BEGIN finish -->
     <h1>{TXT_UPDATE_UPDATE_FINISHED}</h1>
     Gratulation, Sie haben Contrexx WMS Version {UPDATE_VERSION_INSTALLED} erfolgreich installiert!<br /><br />
@@ -84,7 +84,7 @@
         </ul>
         </div>
         <!-- END backed_files -->
-        
+
         <!-- BEGIN changed_cmds -->
         <div class="message-alert">
         <h3 style="padding-top:0px;">Modifizierte Inhaltsseiten</h3>

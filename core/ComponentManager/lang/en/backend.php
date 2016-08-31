@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,17 +24,17 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
-/** 
+
+/**
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Cloudrexx Development Team <info@cloudrexx.com>
- * @access      public 
+ * @access      public
  * @package     cloudrexx
  * @subpackage  core_componentmanager
- */ 
-global $_ARRAYLANG; 
+ */
+global $_ARRAYLANG;
 $_ARRAYLANG['TXT_MODULE_MANAGER'] = 'Applications';
-$_ARRAYLANG['TXT_COMPONENTMANAGER_MODULE_DESCRIPTION'] = 'Applications'; 
+$_ARRAYLANG['TXT_COMPONENTMANAGER_MODULE_DESCRIPTION'] = 'Applications';
 $_ARRAYLANG['TXT_MODULE_ACTIVATION'] = 'Modul activation';
 $_ARRAYLANG['TXT_NAME'] = 'Name';
 $_ARRAYLANG['TXT_CONFIRM_DELETE_DATA'] = 'Do you want to delete the selected data?';

@@ -53,117 +53,117 @@ class MediaDirectoryInterfaces extends MediaDirectoryLibrary
         parent::__construct('.', $name);
         parent::getSettings();
     }
-    
+
     function showImport($step, $objTpl)
     {
         global $_ARRAYLANG, $_CORELANG, $_LANGID, $objDatabase;
 
         $objTpl->addBlockfile($this->moduleLangVar.'_INTERFACES_CONTENT', 'interfaces_content', 'module_'.$this->moduleNameLC.'_interfaces_import.html');
-        
+
         $objTpl->setVariable(array(
             'TXT_'.$this->moduleLangVar.'_FROM_DATABASE' => $_ARRAYLANG['TXT_MEDIADIR_FROM_DATABASE'],
-            'TXT_'.$this->moduleLangVar.'_FROM_FILE' => $_ARRAYLANG['TXT_MEDIADIR_FROM_FILE'],   
+            'TXT_'.$this->moduleLangVar.'_FROM_FILE' => $_ARRAYLANG['TXT_MEDIADIR_FROM_FILE'],
         ));
-        
-        switch($step) { 
+
+        switch($step) {
             case 'assignCols':
-                $objTpl->hideBlock($this->moduleNameLC.'InterfacesImportSqlSetTable'); 
-                
+                $objTpl->hideBlock($this->moduleNameLC.'InterfacesImportSqlSetTable');
+
                 $tableName = contrexx_stripslashes($_POST['interfacesImportSqlTable']);
                 $formId = intval($_POST['interfacesImportSqlForm']);
                 $formId = 15;
                 $categoryId = intval($_POST['interfacesImportSqlCategory']);
                 $categoryId = 162;
-                
+
                 $objResult = $objDatabase->Execute('SHOW FIELDS FROM '.$tableName);
                 while (!$objResult->EOF) {
                     $avaiableCols .= '<option value="'.$objResult->fields['Field'].'">'.$objResult->fields['Field'].'</option>';
                     $objResult->MoveNext();
-                } 
-                
-                $objInputfield = new MediaDirectoryInputfield($formId, false, null, $this->moduleName);   
-                
+                }
+
+                $objInputfield = new MediaDirectoryInputfield($formId, false, null, $this->moduleName);
+
                 foreach($objInputfield->arrInputfields as $key => $inputfield) {
                     if($key != 1 && $key != 2) {
-                        $givenCols .= '<option value="'.$inputfield['id'].'">'.$inputfield['name'][0].'</option>';  
-                    } 
-                } 
-                
+                        $givenCols .= '<option value="'.$inputfield['id'].'">'.$inputfield['name'][0].'</option>';
+                    }
+                }
+
                 $objTpl->setVariable(array(
                     $this->moduleLangVar.'_INTERFACES_IMPORT_SQL_TABLE_COLS' => $avaiableCols,
                     $this->moduleLangVar.'_INTERFACES_IMPORT_SQL_GIVEN_COLS' => $givenCols,
                     $this->moduleLangVar.'_INTERFACES_IMPORT_SQL_TABLE_NANE' => $tableName,
                     $this->moduleLangVar.'_INTERFACES_IMPORT_SQL_FORM_ID' => $formId,
                     $this->moduleLangVar.'_INTERFACES_IMPORT_SQL_CATEGORY_ID' => $categoryId,
-                ));  
+                ));
 
-                $objTpl->parse($this->moduleNameLC.'InterfacesImportSqlAssignCols'); 
+                $objTpl->parse($this->moduleNameLC.'InterfacesImportSqlAssignCols');
                 break;
-            default:        
-                $objTpl->hideBlock($this->moduleNameLC.'InterfacesImportSqlAssignCols'); 
-                        
-                $objResult = $objDatabase->Execute('SHOW TABLE STATUS LIKE "%"');          
-                
+            default:
+                $objTpl->hideBlock($this->moduleNameLC.'InterfacesImportSqlAssignCols');
+
+                $objResult = $objDatabase->Execute('SHOW TABLE STATUS LIKE "%"');
+
                 while (!$objResult->EOF) {
                     $dbName =  $objResult->fields['Name'];
                     $avaiableTables .= '<option value="'.$dbName.'">'.$dbName.'</option>';
                     $objResult->MoveNext();
                 }
-                                          
+
                 $objTpl->setVariable(array(
                     $this->moduleLangVar.'_INTERFACES_IMPORT_SQL_TABLES' => $avaiableTables
                 ));
-                
+
                 $objTpl->parse($this->moduleNameLC.'InterfacesImportSqlSetTable');
                 break;
         }
-              
+
         $objTpl->parse('interfaces_content');
     }
-    
+
     function showExport($step, $objTpl)
     {
-        global $_ARRAYLANG, $_CORELANG, $_LANGID, $objDatabase;    
+        global $_ARRAYLANG, $_CORELANG, $_LANGID, $objDatabase;
 
         $objTpl->addBlockfile($this->moduleLangVar.'_INTERFACES_CONTENT', 'interfaces_content', 'module_'.$this->moduleNameLC.'_interfaces_export.html');
-        
+
         if($this->arrSettings['settingsShowLevels'] == 1) {
             $strFormOnSubmit = "selectAll(document.interfacesExportForm.elements['selectedCategories']); ";
             $strFormOnSubmit .= "selectAll(document.interfacesExportForm.elements['selectedLevels']); ";
-            
+
             $objLevels = new MediaDirectoryLevel(null,null,true, $this->moduleName);
             $arrLevels = $objLevels->listLevels($objTpl, 4);
-        
+
             $objTpl->parse($this->moduleNameLC.'InterfacesExportSelectLevels');
-        } else {  
+        } else {
             $strFormOnSubmit = "selectAll(document.interfacesExportForm.elements['selectedCategories']); ";
-            $objTpl->hideBlock($this->moduleNameLC.'InterfacesExportSelectLevels'); 
+            $objTpl->hideBlock($this->moduleNameLC.'InterfacesExportSelectLevels');
         }
-        
+
         $objCategories = new MediaDirectoryCategory(null,null, true, $this->moduleName);
         $arrCategories = $objCategories->listCategories($objTpl, 4);
-        
+
         $objForms = new MediaDirectoryForm(null, $this->moduleName);
         $strForms = $objForms->listForms($objTpl, 4);
-        
+
         $strMasks = '<option value="0">'.$_ARRAYLANG['TXT_MEDIADIR_NO_EXPORT_MASK'].'</option>';
         $objResultMasks = $objDatabase->Execute("SELECT
-                                                    id,title,form_id 
+                                                    id,title,form_id
                                                 FROM
-                                                    ".DBPREFIX."module_".$this->moduleTablePrefix."_masks 
-                                                WHERE active = '1'    
-                                                ORDER BY title ASC     
+                                                    ".DBPREFIX."module_".$this->moduleTablePrefix."_masks
+                                                WHERE active = '1'
+                                                ORDER BY title ASC
                                                ");
         if ($objResultMasks !== false) {
-            while (!$objResultMasks->EOF) { 
+            while (!$objResultMasks->EOF) {
                 $objForm = new MediaDirectoryForm($objResultMasks->fields['form_id'], $this->moduleName);
-                $strFormName = $objForm->arrForms[$objResultMasks->fields['form_id']]['formName'][0];                                                                       
-                $strMasks .= '<option value="'.$objResultMasks->fields['id'].'">'.$objResultMasks->fields['title'].' ('.$strFormName.')</option>'; 
+                $strFormName = $objForm->arrForms[$objResultMasks->fields['form_id']]['formName'][0];
+                $strMasks .= '<option value="'.$objResultMasks->fields['id'].'">'.$objResultMasks->fields['title'].' ('.$strFormName.')</option>';
                 $objResultMasks->MoveNext();
-            }                   
+            }
         }
-        
-        
+
+
         $objTpl->setVariable(array(
             $this->moduleLangVar.'_INTERFACES_EXPORT_DESELECTED_CATEGORIES' => $arrCategories['not_selected'],
             $this->moduleLangVar.'_INTERFACES_EXPORT_DESELECTED_LEVELS' => $arrLevels['not_selected'],
@@ -175,8 +175,8 @@ class MediaDirectoryInterfaces extends MediaDirectoryLibrary
             'TXT_'.$this->moduleLangVar.'_EXPORT_MASK' => $_ARRAYLANG['TXT_MEDIADIR_EXPORT_MASK'],
             'TXT_'.$this->moduleLangVar.'_CATEGORIES' => $_ARRAYLANG['TXT_MEDIADIR_CATEGORIES'],
             'TXT_'.$this->moduleLangVar.'_LEVELS' => $_ARRAYLANG['TXT_MEDIADIR_LEVELS'],
-        )); 
-                                                                                                        
+        ));
+
         $objTpl->parse('interfaces_content');
     }
 }

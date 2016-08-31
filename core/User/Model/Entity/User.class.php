@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -179,10 +179,10 @@ class User extends \Cx\Model\Base\EntityBase {
         $this->restoreKey = '';
         $this->restoreKeyTime = '';
         $this->u2uActive = 0;
-        
+
         $this->group = new \Doctrine\Common\Collections\ArrayCollection();
     }
-    
+
     /**
      * Get id
      *
@@ -192,13 +192,13 @@ class User extends \Cx\Model\Base\EntityBase {
     {
         return $this->id;
     }
-    
+
     /**
      * set id
      *
      * @param integer $id
      */
-    public function setId($id) 
+    public function setId($id)
     {
         $this->id = $id;
     }

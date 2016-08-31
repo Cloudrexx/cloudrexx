@@ -2,7 +2,7 @@
 var handlerEvent = function()
 {
     if (editAllowed == null || !editAllowed) {
-        $('error_box_content').innerHTML = notAllowedMsg; 
+        $('error_box_content').innerHTML = notAllowedMsg;
         Effect.SlideDown('error_box', {duration : 0.5});
         window.setTimeout(function() {
             Effect.DropOut('error_box', {duration: 0.3});
@@ -29,6 +29,6 @@ var statusMsg = function(msg)
             }
         }
     }
-    
+
     return true;
 }

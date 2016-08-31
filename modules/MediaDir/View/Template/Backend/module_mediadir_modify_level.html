@@ -5,7 +5,7 @@ var mediaBrowseInputBox;
 var mediaBrowserCallback = function(data) {
     if (data.type=="file") {
       var path = data.data[0].datainfo.filepath;
-      mediaBrowseInputBox.val(path);      
+      mediaBrowseInputBox.val(path);
     }
 };
 $J(function(){
@@ -58,7 +58,7 @@ $J(function(){
     <tr class="row2">
         <td valign="top">{TXT_MEDIADIR_VISIBLE}</td>
         <td><input type="radio" name="levelActive" value="1" {MEDIADIR_LEVEL_ACTIVE_ON} /> {TXT_MEDIADIR_ACTIVATE} &nbsp;<input type="radio" name="levelActive" value="0" {MEDIADIR_LEVEL_ACTIVE_OFF} /> {TXT_MEDIADIR_DEACTIVATE}&nbsp;&nbsp;<span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_MEDIADIR_VISIBLE_LEVEL_INFO}</span></td>
-    </tr>        
+    </tr>
 </table>
 <br />
 <ul id="tabmenu" class="language_tab" style="{MEDIADIR_HIDE_ON_SINGLE_LANG} margin-top: 15px;">

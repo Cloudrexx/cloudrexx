@@ -27,7 +27,7 @@
 
 /**
  * Main controller for U2u
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
@@ -38,7 +38,7 @@ namespace Cx\Modules\U2u\Controller;
 
 /**
  * Main controller for U2u
- * 
+ *
  * @copyright   Cloudrexx AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
@@ -54,14 +54,14 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
 
     /**
      * Load your component.
-     * 
+     *
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
      */
     public function load(\Cx\Core\ContentManager\Model\Entity\Page $page) {
         global $_CORELANG, $subMenuTitle, $objTemplate;
         switch ($this->cx->getMode()) {
             case \Cx\Core\Core\Controller\Cx::MODE_FRONTEND:
-                
+
                 $objU2u = new U2u(\Env::get('cx')->getPage()->getContent());
                 \Env::get('cx')->getPage()->setContent($objU2u->getPage(\Env::get('cx')->getPage()->getMetatitle(), \Env::get('cx')->getPage()->getTitle()));
 
@@ -73,7 +73,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 $objTemplate = $this->cx->getTemplate();
 
                 \Permission::checkAccess(149, 'static');
-                
+
                 $subMenuTitle = $_CORELANG['TXT_U2U_MODULE'];
                 $objU2uAdmin = new U2uAdmin();
                 $objU2uAdmin->getPage();

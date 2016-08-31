@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -27,7 +27,7 @@
 
 /**
  * Calendar Language variables
- * 
+ *
  * @package    cloudrexx
  * @subpackage module_calendar
  * @author     Cloudrexx <info@cloudrexx.com>
@@ -121,7 +121,7 @@ $_ARRAYLANG['TXT_CALENDAR_REGISTRATION_SUBMIT'] = "Submit";
 $_ARRAYLANG['TXT_CALENDAR_INVALID_CAPTCHA_CODE'] = "Please retype the captcha code.";
 $_ARRAYLANG['TXT_CALENDAR_TYPE'] = "Type";
 $_ARRAYLANG['TXT_CALENDAR_EVENT_FULLY_BLOCKED'] = "We are afraid this event is already fully booked. There can not be any further registrations.";
-$_ARRAYLANG['TXT_CALENDAR_PLEASE_CHOOSE'] = "please choose";  
+$_ARRAYLANG['TXT_CALENDAR_PLEASE_CHOOSE'] = "please choose";
 $_ARRAYLANG['TXT_CALENDAR_EVENT_IN_PAST'] = "It's not possible to enroll for this event, because it has expired.";
 $_ARRAYLANG['TXT_CALENDAR_REGISTRATION_SUCCESSFULLY_ADDED'] = "Your enrollment has been saved successfully.";
 $_ARRAYLANG['TXT_CALENDAR_REGISTRATION_SUCCESSFULLY_ADDED_SIGNOFF'] = "Your attendance has been successfully cancelled.";
@@ -129,12 +129,12 @@ $_ARRAYLANG['TXT_CALENDAR_REGISTRATION_SUCCESSFULLY_ADDED_WAITLIST'] = "Your reg
 $_ARRAYLANG['TXT_CALENDAR_OCLOCK'] = "Clock";
 $_ARRAYLANG['TXT_CALENDAR_EVENT_SUCCESSFULLY_SAVED'] = "Event successfull saved";
 $_ARRAYLANG['TXT_CALENDAR_EVENT_CORRUPT_SAVED'] = "Corrupt save";
-$_ARRAYLANG['TXT_CALENDAR_EVENT'] = "Event"; 
-$_ARRAYLANG['TXT_CALENDAR_EVENT_DETAILS'] = "Details";  
-$_ARRAYLANG['TXT_CALENDAR_SAVE'] = "Save";   
+$_ARRAYLANG['TXT_CALENDAR_EVENT'] = "Event";
+$_ARRAYLANG['TXT_CALENDAR_EVENT_DETAILS'] = "Details";
+$_ARRAYLANG['TXT_CALENDAR_SAVE'] = "Save";
 $_ARRAYLANG['TXT_CALENDAR_EXPAND'] = "Expand";
-$_ARRAYLANG['TXT_CALENDAR_MINIMIZE'] = "Minimize";    
-$_ARRAYLANG['TXT_CALENDAR_EVENT_PLACE'] = "Place"; 
+$_ARRAYLANG['TXT_CALENDAR_MINIMIZE'] = "Minimize";
+$_ARRAYLANG['TXT_CALENDAR_EVENT_PLACE'] = "Place";
 $_ARRAYLANG['TXT_CALENDAR_EVENT_STREET'] = "Street / Nr.";
 $_ARRAYLANG['TXT_CALENDAR_EVENT_ZIP'] = "Zip";
 $_ARRAYLANG['TXT_CALENDAR_EVENT_CITY'] = "City";
@@ -146,7 +146,7 @@ $_ARRAYLANG['TXT_CALENDAR_EVENT_USE_GOOGLEMAPS'] = "Use Google Maps";
 $_ARRAYLANG['TXT_CALENDAR_EVENT_LINK'] = "Link";
 $_ARRAYLANG['TXT_CALENDAR_EVENT_PRICE'] = "Admission charge";
 $_ARRAYLANG['TXT_CALENDAR_EVENT_FREE_PLACES'] = "Availability";
-$_ARRAYLANG['TXT_CALENDAR_EVENT_PICTURE'] = "Picture";   
+$_ARRAYLANG['TXT_CALENDAR_EVENT_PICTURE'] = "Picture";
 $_ARRAYLANG['TXT_CALENDAR_EVENT_ATTACHMENT'] = "Attachment";
 $_ARRAYLANG['TXT_CALENDAR_EVENT_DESCRIPTION'] = "Description";
 $_ARRAYLANG['TXT_CALENDAR_EDIT'] = "Edit";

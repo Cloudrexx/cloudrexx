@@ -33,7 +33,7 @@ echo directoryUpdates();
 function directoryUpdates() {
     //Update the database changes
     try {
-        //update module name 
+        //update module name
         \Cx\Lib\UpdateUtil::sql("UPDATE `".DBPREFIX."modules` SET `name` = 'Directory' WHERE `contrexx_modules`.`id` = 12");
         //update navigation url
         \Cx\Lib\UpdateUtil::sql("UPDATE `".DBPREFIX."backend_areas` SET `uri` = 'index.php?cmd=Directory' WHERE `contrexx_backend_areas`.`area_id` = 59");
@@ -44,11 +44,11 @@ function directoryUpdates() {
     } catch (\Cx\Lib\UpdateException $e) {
         return "Error: $e->sql";
     }
-    
+
     //Update script for moving the folder
     $sourcePath      = ASCMS_DOCUMENT_ROOT . '/media/directory';
     $destinationPath = ASCMS_DOCUMENT_ROOT . '/media/Directory';
-    
+
     try {
         if (file_exists($sourcePath) && !file_exists($destinationPath)) {
             \Cx\Lib\FileSystem\FileSystem::makeWritable($sourcePath);
@@ -59,6 +59,6 @@ function directoryUpdates() {
     } catch (\Cx\Lib\FileSystem\FileSystemException $e) {
         return $e->getMessage();
     }
-    
+
     return 'Directory is updated successfully.';
 }

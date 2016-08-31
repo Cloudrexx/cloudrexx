@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Specific BackendController for this Component. Use this to easily create a backend view
  *
@@ -45,12 +45,12 @@ namespace Cx\Core\NetManager\Controller;
  * @subpackage  core_netmanager
  */
 class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBackendController {
-    
+
     /**
      * Template object
      */
     protected $template;
-    
+
     /**
      * Returns a list of available commands (?act=XY)
      * @return array List of acts
@@ -58,10 +58,10 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
     public function getCommands() {
         return array();
     }
-    
+
     /**
      * Use this to parse your backend page
-     * 
+     *
      * You will get the template located in /View/Template/{CMD}.html
      * You can access Cx class using $this->cx
      * To show messages, use \Message class
@@ -73,11 +73,11 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
         // Cx like this:
         $this->cx;
         $this->template = $template;
-        
+
         // instantiate the default View Controller
         $objController = new \Cx\Core\NetManager\Controller\DefaultController($this->getSystemComponentController(), $this->cx);
         $objController->parsePage($this->template);
-        
+
         \Message::show();
     }
 
@@ -203,5 +203,5 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
         }
     }
 
-    
+
 }

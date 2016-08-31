@@ -1,110 +1,110 @@
 <!-- START module_data_entries_voting.html -->
 <script language="JavaScript" type="text/javascript">
-function deleteVote(voteId){ 
-    if(confirm('{TXT_DETAILS_DELETE_JS}')) 
+function deleteVote(voteId){
+    if(confirm('{TXT_DETAILS_DELETE_JS}'))
         window.location.replace("?cmd=Data&{CSRF_PARAM}&act=deleteVoting&id="+voteId);
 }
 
 function selectMultiAction() {
-	with (document.frmShowDetails) {
-		switch (frmShowDetails_MultiAction.value) {
-			case 'delete':
-				if (confirm('{TXT_DETAILS_SUBMIT_DELETE_JS}')) {
-					action='?cmd=Data&act=multiactionVoting';
-					submit();
-				}
-			break;
-			default: //do nothing			
-		}
-	}
+  with (document.frmShowDetails) {
+    switch (frmShowDetails_MultiAction.value) {
+      case 'delete':
+        if (confirm('{TXT_DETAILS_SUBMIT_DELETE_JS}')) {
+          action='?cmd=Data&act=multiactionVoting';
+          submit();
+        }
+      break;
+      default: //do nothing
+    }
+  }
 }
 </script>
 <ul id="tabmenu">
-	<li><a id="votes_Statistics" class="{TABS_STATS_CLASS}" href="javascript:{}" onclick="selectTab('Statistics')" title="{TXT_VOTES_TITLE}">{TXT_VOTES_TITLE}</a></li>
-	<li><a id="votes_Details" class="{TABS_DETAILS_CLASS}" href="javascript:{}" onclick="selectTab('Details')" title="{TXT_DETAILS_TITLE}">{TXT_DETAILS_TITLE}</a></li>
+  <li><a id="votes_Statistics" class="{TABS_STATS_CLASS}" href="javascript:{}" onclick="selectTab('Statistics')" title="{TXT_VOTES_TITLE}">{TXT_VOTES_TITLE}</a></li>
+  <li><a id="votes_Details" class="{TABS_DETAILS_CLASS}" href="javascript:{}" onclick="selectTab('Details')" title="{TXT_DETAILS_TITLE}">{TXT_DETAILS_TITLE}</a></li>
 </ul>
 <div id="Statistics" class="votes" style="display: {DIVS_STATS_STYLE};">
-	<table width="100%" cellspacing="0" cellpadding="3" border="0" align="top" class="adminlist">
-		<tr>
-			<th colspan="2">{TXT_VOTES_TITLE}: {VOTES_SUBJECT}</th>
-		</tr>
-		<tr class="row2">
-			<td width="10%">{TXT_VOTES_COUNT}</td>
-			<td width="90%">{VOTES_COUNT}</td>
-		</tr>
-		<tr class="row1">
-			<td>{TXT_VOTES_AVG}</td>
-			<td>&#216;&nbsp;{VOTES_AVG}</td>
-		</tr>
-	</table>
-	<br />
-	<table width="100%" cellspacing="0" cellpadding="3" border="0" align="top" class="adminlist">
-		<tr>
-			<th colspan="2">{TXT_STATISTICS_TITLE}</th>
-		</tr>
-		<!-- BEGIN showStatistics -->
-		<tr class="{STATS_ROWCLASS}">
-			<td width="10%">{STATS_MARK}</td>
-			<td width="90%"><img src="../core/Core/View/Media/icons/1.gif" border="0" height="10px" width="{STATS_GRAPH}" alt="{STATS_PERCENT}" title="{STATS_PERCENT}" />&nbsp;{STATS_PERCENT}&nbsp;({STATS_COUNT})</td>
-		</tr>
-		<!-- END showStatistics -->
-		<!-- BEGIN noStatistics -->
-		<tr class="row2">
-			<td colspan="2"><div align="center"><br />{TXT_STATISTICS_NONE}<br /><br /></td>
-		</tr>	
-		<!-- END noStatistics -->
-	</table>
+  <table width="100%" cellspacing="0" cellpadding="3" border="0" align="top" class="adminlist">
+    <tr>
+      <th colspan="2">{TXT_VOTES_TITLE}: {VOTES_SUBJECT}</th>
+    </tr>
+    <tr class="row2">
+      <td width="10%">{TXT_VOTES_COUNT}</td>
+      <td width="90%">{VOTES_COUNT}</td>
+    </tr>
+    <tr class="row1">
+      <td>{TXT_VOTES_AVG}</td>
+      <td>&#216;&nbsp;{VOTES_AVG}</td>
+    </tr>
+  </table>
+  <br />
+  <table width="100%" cellspacing="0" cellpadding="3" border="0" align="top" class="adminlist">
+    <tr>
+      <th colspan="2">{TXT_STATISTICS_TITLE}</th>
+    </tr>
+    <!-- BEGIN showStatistics -->
+    <tr class="{STATS_ROWCLASS}">
+      <td width="10%">{STATS_MARK}</td>
+      <td width="90%"><img src="../core/Core/View/Media/icons/1.gif" border="0" height="10px" width="{STATS_GRAPH}" alt="{STATS_PERCENT}" title="{STATS_PERCENT}" />&nbsp;{STATS_PERCENT}&nbsp;({STATS_COUNT})</td>
+    </tr>
+    <!-- END showStatistics -->
+    <!-- BEGIN noStatistics -->
+    <tr class="row2">
+      <td colspan="2"><div align="center"><br />{TXT_STATISTICS_NONE}<br /><br /></td>
+    </tr>
+    <!-- END noStatistics -->
+  </table>
 </div>
 <div id="Details" class="votes" style="display: {DIVS_DETAILS_STYLE};">
-	<form name="frmShowDetails" method="post" action="">
-		<table width="100%" cellspacing="0" cellpadding="3" border="0" align="top" class="adminlist">
-			<tr>
-				<th colspan="5">{TXT_DETAILS_TITLE}</th>
-			</tr>
-			<tr class="row3">
-				<td nowrap="nowrap" width="1%"><span style="font-weight:bold;">&nbsp;&nbsp;#</span></td>
-				<td nowrap="nowrap" width="33%"><span style="font-weight:bold;">{TXT_DETAILS_DATE}</span></td>
-				<td nowrap="nowrap" width="33%"><span style="font-weight:bold;">{TXT_DETAILS_IP}</span></td>
-				<td nowrap="nowrap" width="31%"><span style="font-weight:bold;">{TXT_DETAILS_VOTE}</span></td>
-				<td nowrap="nowrap" width="1%"><span style="font-weight:bold;">{TXT_DETAILS_ACTION}</span></td>
-			</tr>
-			<!-- BEGIN showDetails -->
-			<tr class="{DETAILS_ROWCLASS}">
-				<td><input type="checkbox" name="selectedVotingsId[]" id="selectedVotingsId" value="{DETAILS_VOTE_ID}" /></td>
-				<td>{DETAILS_DATE}</td>
-				<td><a href="index.php?cmd=NetTools&tpl=whois&address={DETAILS_IP}" title="{DETAILS_IP}" target="_blank">{DETAILS_IP}</a></td>
-				<td>{DETAILS_VOTE}</td>
-				<td>
-					<div align="right">
-					<a href="javascript:deleteVote({DETAILS_VOTE_ID});" target="_self" title="{TXT_IMGALT_DELETE}"><img src="../core/Core/View/Media/icons/delete.gif" border="0" alt="{TXT_IMGALT_DELETE}" title="{TXT_IMGALT_DELETE}" /></a>
-					</div>
-				</td>
-			</tr>
-			<!-- END showDetails -->
-			<!-- BEGIN noDetails -->
-			<tr class="row2">
-				<td colspan="5"><div align="center"><br />{TXT_DETAILS_NONE}<br /><br /></td>
-			</tr>	
-			<!-- END noDetails -->		
-		</table>
-		<br />
-		<table cellpadding="2" cellspacing="0" border="0">
-			<tr>
-				<td>
-					<img src="../core/Core/View/Media/icons/arrow.gif" border="0" width="38" height="22" alt="{TXT_DETAILS_VOTES_MARKED}:" />
-					<a href="#" onClick="changeCheckboxes('frmShowDetails','selectedVotingsId[]',true); return false;">{TXT_DETAILS_SELECT_ALL}</a> / 
-					<a href="#" onClick="changeCheckboxes('frmShowDetails','selectedVotingsId[]',false); return false;">{TXT_DETAILS_DESELECT_ALL}</a>
-					<img src="../core/Core/View/Media/icons/strike.gif" />
-					<select name="frmShowDetails_MultiAction" onChange="selectMultiAction();">
-						<option value="0">{TXT_DETAILS_SUBMIT_SELECT}</option>
-						<option value="delete">{TXT_DETAILS_SUBMIT_DELETE}</option>
-					</select>
-				</td>
-			</tr>
-		</table>
-	</form>
-	<br />
-	<div align="center">{DETAILS_PAGING}</div>	
+  <form name="frmShowDetails" method="post" action="">
+    <table width="100%" cellspacing="0" cellpadding="3" border="0" align="top" class="adminlist">
+      <tr>
+        <th colspan="5">{TXT_DETAILS_TITLE}</th>
+      </tr>
+      <tr class="row3">
+        <td nowrap="nowrap" width="1%"><span style="font-weight:bold;">&nbsp;&nbsp;#</span></td>
+        <td nowrap="nowrap" width="33%"><span style="font-weight:bold;">{TXT_DETAILS_DATE}</span></td>
+        <td nowrap="nowrap" width="33%"><span style="font-weight:bold;">{TXT_DETAILS_IP}</span></td>
+        <td nowrap="nowrap" width="31%"><span style="font-weight:bold;">{TXT_DETAILS_VOTE}</span></td>
+        <td nowrap="nowrap" width="1%"><span style="font-weight:bold;">{TXT_DETAILS_ACTION}</span></td>
+      </tr>
+      <!-- BEGIN showDetails -->
+      <tr class="{DETAILS_ROWCLASS}">
+        <td><input type="checkbox" name="selectedVotingsId[]" id="selectedVotingsId" value="{DETAILS_VOTE_ID}" /></td>
+        <td>{DETAILS_DATE}</td>
+        <td><a href="index.php?cmd=NetTools&tpl=whois&address={DETAILS_IP}" title="{DETAILS_IP}" target="_blank">{DETAILS_IP}</a></td>
+        <td>{DETAILS_VOTE}</td>
+        <td>
+          <div align="right">
+          <a href="javascript:deleteVote({DETAILS_VOTE_ID});" target="_self" title="{TXT_IMGALT_DELETE}"><img src="../core/Core/View/Media/icons/delete.gif" border="0" alt="{TXT_IMGALT_DELETE}" title="{TXT_IMGALT_DELETE}" /></a>
+          </div>
+        </td>
+      </tr>
+      <!-- END showDetails -->
+      <!-- BEGIN noDetails -->
+      <tr class="row2">
+        <td colspan="5"><div align="center"><br />{TXT_DETAILS_NONE}<br /><br /></td>
+      </tr>
+      <!-- END noDetails -->
+    </table>
+    <br />
+    <table cellpadding="2" cellspacing="0" border="0">
+      <tr>
+        <td>
+          <img src="../core/Core/View/Media/icons/arrow.gif" border="0" width="38" height="22" alt="{TXT_DETAILS_VOTES_MARKED}:" />
+          <a href="#" onClick="changeCheckboxes('frmShowDetails','selectedVotingsId[]',true); return false;">{TXT_DETAILS_SELECT_ALL}</a> /
+          <a href="#" onClick="changeCheckboxes('frmShowDetails','selectedVotingsId[]',false); return false;">{TXT_DETAILS_DESELECT_ALL}</a>
+          <img src="../core/Core/View/Media/icons/strike.gif" />
+          <select name="frmShowDetails_MultiAction" onChange="selectMultiAction();">
+            <option value="0">{TXT_DETAILS_SUBMIT_SELECT}</option>
+            <option value="delete">{TXT_DETAILS_SUBMIT_DELETE}</option>
+          </select>
+        </td>
+      </tr>
+    </table>
+  </form>
+  <br />
+  <div align="center">{DETAILS_PAGING}</div>
 </div>
 <br />
 <input type="button" value="{TXT_BUTTON_BACK}" onClick="self.location='index.php?cmd=Data&{CSRF_PARAM}'">

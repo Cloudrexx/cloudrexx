@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Block
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
@@ -62,7 +62,7 @@ class Block extends \Cx\Modules\Block\Controller\BlockLibrary
             $arrTemplates = &$content;
         }
 
-        foreach ($arrTemplates as &$template) { 
+        foreach ($arrTemplates as &$template) {
             // Set blocks [[BLOCK_<ID>]]
             if (preg_match_all('/{'.$objBlock->blockNamePrefix.'([0-9]+)}/', $template, $arrMatches)) {
                 $objBlock->setBlock($arrMatches[1], $template, $page->getId());

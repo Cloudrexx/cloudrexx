@@ -523,7 +523,7 @@ class CrmManager extends CrmLibrary
         \JS::registerCSS("modules/Crm/View/Style/main.css");
 
         $this->_objTpl->loadTemplateFile('module_'.$this->moduleNameLC.'_customer_overview.html');
-        
+
         $settings = $this->getSettings();
 
         $delValue         = isset($_GET['delId']) ? intval($_GET['delId']) : 0;
@@ -580,7 +580,7 @@ class CrmManager extends CrmLibrary
             'sorto'               => isset($_REQUEST['sorto']) ? $_REQUEST['sorto'] : '',
             'sortf'               => isset($_REQUEST['sortf']) ? $_REQUEST['sortf'] : 0,
         );
-        
+
         $searchLink = '';
 
         // This is the function to show the A-Z letters
@@ -886,7 +886,7 @@ class CrmManager extends CrmLibrary
                     $this->_strOkMessage = $_ARRAYLANG['TXT_CRM_COMMENT_DELETESUCESSMESSAGE'];
                 break;
             case 'taskDeleted':
-                    $this->_strOkMessage = $_ARRAYLANG['TXT_CRM_TASK_DELETE_MESSAGE'];            
+                    $this->_strOkMessage = $_ARRAYLANG['TXT_CRM_TASK_DELETE_MESSAGE'];
                 break;
             }
         }
@@ -1094,7 +1094,7 @@ class CrmManager extends CrmLibrary
                         'CRM_INDUSTRY_TYPE'     => contrexx_raw2xhtml($custDetails['industry_name']),
                         'CRM_CUSTOMER_COMPANY_SIZE' => contrexx_raw2xhtml($custDetails['companySize']),
                         'CRM_CONTACT_PROFILE_IMAGE' => !empty($custDetails['profile_picture']) ? contrexx_raw2xhtml($custDetails['profile_picture']).".thumb" : 'profile_company_big.png',
-                                        
+
                         'TXT_CRM_COMPANY_SIZE'        => $_ARRAYLANG['TXT_CRM_COMPANY_SIZE'],
                         'TXT_CRM_NAME'                => $_ARRAYLANG['TXT_CRM_CONTACT_NAME'],
                         'TXT_CRM_WEBSITE'             => $_ARRAYLANG['TXT_CRM_WEBSITE'],
@@ -1299,7 +1299,7 @@ class CrmManager extends CrmLibrary
 
         $this->_pageTitle = $custDetails['contact_type'] == 1 ? $_ARRAYLANG['TXT_CRM_CUSTOMER_DETAILS'] : $_ARRAYLANG['TXT_CRM_CONTACT_DETAILS'];
     }
-    
+
     /**
      * remove the styles sheet on shadow box page
      */
@@ -1412,7 +1412,7 @@ END;
      * @return true
      */
     function customerTypeChangeStatus()
-    { 
+    {
         global $_CORELANG, $_ARRAYLANG, $objDatabase;
         $status = ($_GET['status'] == 0) ? 1 : 0;
         $id     = $_GET['id'];
@@ -1933,7 +1933,7 @@ END;
     function _modifyContact()
     {
         global $_ARRAYLANG, $objDatabase ,$objJs, $objResult, $_LANGID, $_CORELANG;
-        
+
         \JS::activate('cx');
         \JS::activate("jquery");
         \JS::activate("jqueryui");
@@ -1989,7 +1989,7 @@ END;
         $this->contact->contact_language = (isset($_POST['contact_language'])) ? (int) $_POST['contact_language'] : (empty($id) ? $_LANGID : 0);
         $this->contact->contact_customer = isset($_POST['company']) ? (int) $_POST['company'] : (isset($_GET['custId']) ? (int) $_GET['custId'] : 0);
         $this->contact->contactType      = $contactType;
-        $this->contact->companySize      = isset($_POST['companySize']) ? contrexx_input2raw($_POST['companySize']) : 0;      
+        $this->contact->companySize      = isset($_POST['companySize']) ? contrexx_input2raw($_POST['companySize']) : 0;
         $this->contact->contact_gender   = isset($_POST['contact_gender']) ? (int) $_POST['contact_gender'] : 0;
         $this->contact->emailDelivery    = empty($_POST) || isset($_POST['emailDelivery']) ? 1 : 0;
 
@@ -2365,7 +2365,7 @@ END;
         $objResult =   $objDatabase->Execute('SELECT  id,name,lang FROM    '.DBPREFIX.'languages');
         while (!$objResult->EOF) {
             $this->_objTpl->setVariable(array(
-                    'TXT_LANG_ID'	=>  (int) $objResult->fields['id'],
+                    'TXT_LANG_ID'    =>  (int) $objResult->fields['id'],
                     'TXT_LANG_NAME'     =>  contrexx_raw2xhtml($objResult->fields['name']),
                     'TXT_LANG_SELECT'   =>  ($objResult->fields['id'] == $this->contact->contact_language) ? "selected=selected" : "",
             ));
@@ -2444,7 +2444,7 @@ END;
                 'CRM_CONTACT_USERNAME'      => $objUser ? contrexx_raw2xhtml($objUser->getEmail()) : '',
                 'CRM_CONTACT_ACCOUNT_USERNAME' => $objUser ? $accountName : ' ',
                 'CRM_CONTACT_SHOW_PASSWORD' => "style='display: none;'",
-                'CRM_CONTACT_RANDOM_PASSWORD' => \User::make_password(),        
+                'CRM_CONTACT_RANDOM_PASSWORD' => \User::make_password(),
                 'CRM_GENDER_FEMALE_SELECTED'=> $this->contact->contact_gender == 1 ? 'selected' : '',
                 'CRM_GENDER_MALE_SELECTED'  => $this->contact->contact_gender == 2 ? 'selected' : '',
                 'CRM_CONTACT_TYPE'          => ($contactType == 1) ? 'company' : 'contact',
@@ -2857,7 +2857,7 @@ END;
             'COMBO_UPLOADER_CODE_NOTES'     => $uploaderCodeTaskType,
             'REDIRECT_URL'                  => $redirectUrl
         ));
-        
+
         $fn = isset ($_REQUEST['fn']) ? $_REQUEST['fn'] : '';
         if (!empty($fn)) {
             switch ($fn) {
@@ -2978,7 +2978,7 @@ END;
             } else {
                 $iconPath  = '../modules/Crm/View/Media/customer_note.png';
             }
-            
+
             $this->_objTpl->setVariable(array(
                     'TXT_NOTES_ID'      => (int) $objResult->fields['id'],
                     'TXT_NOTES_NAME'    => contrexx_raw2xhtml($objResult->fields['name']),
@@ -3166,7 +3166,7 @@ END;
      * @return true
      */
     function currencyChangeStatus()
-    { 
+    {
         global $_CORELANG, $_ARRAYLANG, $objDatabase;
         $status = ($_GET['status'] == 0) ? 1 : 0;
         $id     = intval($_GET['id']);
@@ -3419,7 +3419,7 @@ END;
                 }
                 $objAddr->MoveNext();
             }
-            
+
 
             if ($objRS->fields['contact_type'] == 1) {
                 $firstName = utf8_decode($objRS->fields['customer_name']);
@@ -4392,7 +4392,7 @@ END;
 
             $row = "row2";
             while (!$objResult->EOF) {
-                
+
                 $objTpl->setVariable(array(
                         'ENTRY_ID'              => (int) $objResult->fields['id'],
                         'CRM_DEALS_TITLE'       => contrexx_raw2xhtml($objResult->fields['title']),
@@ -4651,7 +4651,7 @@ END;
                 $contactName = $objContactPerson->fields['customer_name']." ".$objContactPerson->fields['contact_familyname'];
 
                 $this->_objTpl->setVariable(array(
-                        'TXT_CONTACT_ID'   =>	(int) $objContactPerson->fields['id'] ,
+                        'TXT_CONTACT_ID'   =>    (int) $objContactPerson->fields['id'] ,
                         'TXT_CONTACT_NAME' =>   contrexx_raw2xhtml($contactName),
                         'TXT_SELECTED'     =>   $selected));
                 $this->_objTpl->parse('Contacts');
@@ -5148,7 +5148,7 @@ END;
         $name    = isset($_POST['name']) ? contrexx_input2raw($_POST['name']) : '';
         $sorting = isset($_POST['sortingNumber']) ? (int) $_POST['sortingNumber'] : '';
         $status  = isset($_POST['activeStatus']) ? 1 : (empty($_POST) ? 1 : 0);
-        
+
         $inputField = isset($_POST['Inputfield']) ? $_POST['Inputfield'] : array();
         if (isset ($_POST['save_entry'])) {
             $fields = array(
@@ -5172,7 +5172,7 @@ END;
             } else {
                 $query = "INSERT INTO `".DBPREFIX."module_{$this->moduleNameLC}_memberships` SET
                         $field_set";
-                
+
             }
             $db = $objDatabase->Execute($query);
             $entryId = !empty($id) ? $id : $objDatabase->INSERT_ID();
@@ -5197,7 +5197,7 @@ END;
                 $this->_strErrMessage = "Error in saving Data";
             }
         }
-        
+
         $first = true;
         foreach ($this->_arrLanguages as $langId => $langValue) {
 
@@ -5243,7 +5243,7 @@ END;
             $objTpl->parse("membershipEntries");
             $objResult->MoveNext();
         }
-        
+
         $objTpl->setGlobalVariable(array(
                 'TXT_CRM_MORE'              => $_ARRAYLANG['TXT_CRM_MORE'],
                 'TXT_CRM_MINIMIZE'          => $_ARRAYLANG['TXT_CRM_MINIMIZE']
@@ -5709,12 +5709,12 @@ END;
      * @param string     $tempWebPath the temporary file path which is accessable by web browser
      * @param array      $data        the data which are attached by uploader init method
      * @param integer    $uploadId    the upload id
-     * @param array      $fileInfos   the file infos  
+     * @param array      $fileInfos   the file infos
      * @param String     $response    the respose
-     * 
+     *
      * @return array the target paths
      */
-    public static function uploadFinished($tempPath, $tempWebPath, $data, $uploadId, $fileInfos, $response) 
+    public static function uploadFinished($tempPath, $tempWebPath, $data, $uploadId, $fileInfos, $response)
     {
         global $objDatabase, $_ARRAYLANG, $_CONFIG, $objInit;
 
@@ -5732,8 +5732,8 @@ END;
                 $info = pathinfo($file);
 
                 //skip . and ..
-                if ($file == '.' || $file == '..') { 
-                    continue; 
+                if ($file == '.' || $file == '..') {
+                    continue;
                 }
 
                 //delete unwanted files
@@ -5801,15 +5801,15 @@ END;
      * @param string     $tempWebPath the temporary file path which is accessable by web browser
      * @param array      $data        the data which are attached by uploader init method
      * @param integer    $uploadId    the upload id
-     * @param array      $fileInfos   the file infos 
-     * 
+     * @param array      $fileInfos   the file infos
+     *
      * @return array the target paths
      */
     public static function docUploadFinished($tempPath, $tempWebPath, $data, $uploadId, $fileInfos, $response)
     {
 
         global $objDatabase;
-        
+
         $objFWUser = \FWUser::getFWUserObject();
         $depositionTarget = \Cx\Core\Core\Controller\Cx::instanciate()->getWebsiteMediaCrmPath().'/'; //target folder
         $h = opendir($tempPath);
@@ -5820,8 +5820,8 @@ END;
                 $info = pathinfo($file);
 
                 //skip . and ..
-                if ($file == '.' || $file == '..') { 
-                    continue; 
+                if ($file == '.' || $file == '..') {
+                    continue;
                 }
 
                 if ($file != '..' && $file != '.') {
@@ -5860,7 +5860,7 @@ END;
         // return web- and filesystem path. files will be moved there.
         return array($tempPath, $tempWebPath);
     }
-    
+
     /**
      * the upload is finished
      * rewrite the names
@@ -5870,8 +5870,8 @@ END;
      * @param string     $tempWebPath the temporary file path which is accessable by web browser
      * @param array      $data        the data which are attached by uploader init method
      * @param integer    $uploadId    the upload id
-     * @param array      $fileInfos   the file infos  
-     * 
+     * @param array      $fileInfos   the file infos
+     *
      * @return array the target paths
      */
     public static function proPhotoUploadFinished($tempPath, $tempWebPath, $data, $uploadId, $fileInfos, $response)
@@ -5888,8 +5888,8 @@ END;
                 $info = pathinfo($file);
 
                 //skip . and ..
-                if ($file == '.' || $file == '..') { 
-                    continue; 
+                if ($file == '.' || $file == '..') {
+                    continue;
                 }
 
                 if ($file != '..' && $file != '.') {
@@ -5972,7 +5972,7 @@ END;
         // return web- and filesystem path. files will be moved there.
         return array($tempPath, $tempWebPath);
     }
-    
+
     /**
      * the upload is finished
      * rewrite the names
@@ -5982,8 +5982,8 @@ END;
      * @param string     $tempWebPath the temporary file path which is accessable by web browser
      * @param array      $data        the data which are attached by uploader init method
      * @param integer    $uploadId    the upload id
-     * @param array      $fileInfos   the file infos  
-     * 
+     * @param array      $fileInfos   the file infos
+     *
      * @return array the target paths
      */
     public static function taskUploadFinished($tempPath, $tempWebPath, $data, $uploadId, $fileInfos, $response)
@@ -5998,8 +5998,8 @@ END;
                 $info = pathinfo($file);
 
                 //skip . and ..
-                if ($file == '.' || $file == '..') { 
-                    continue; 
+                if ($file == '.' || $file == '..') {
+                    continue;
                 }
 
                 if ($file != '..' && $file != '.') {
@@ -6041,11 +6041,11 @@ END;
             }
             closedir($h);
         }
-        
+
         // return web- and filesystem path. files will be moved there.
         return array($tempPath, $tempWebPath);
     }
-    
+
     /**
      * the upload is finished
      * rewrite the names
@@ -6055,8 +6055,8 @@ END;
      * @param string     $tempWebPath the temporary file path which is accessable by web browser
      * @param array      $data        the data which are attached by uploader init method
      * @param integer    $uploadId    the upload id
-     * @param array      $fileInfos   the file infos 
-     * 
+     * @param array      $fileInfos   the file infos
+     *
      * @return array the target paths
      */
     public static function notesUploadFinished($tempPath, $tempWebPath, $data, $uploadId, $fileInfos, $response)
@@ -6071,8 +6071,8 @@ END;
                 $info = pathinfo($file);
 
                 //skip . and ..
-                if ($file == '.' || $file == '..') { 
-                    continue; 
+                if ($file == '.' || $file == '..') {
+                    continue;
                 }
 
                 if ($file != '..' && $file != '.') {
@@ -6121,7 +6121,7 @@ END;
 
     /**
      * check the account id
-     * 
+     *
      * @return json
      */
     function checkAccountId()
@@ -6194,4 +6194,3 @@ END;
         exit();
     }
 }
-

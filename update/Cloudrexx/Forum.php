@@ -33,7 +33,7 @@ echo forumUpdates();
 function forumUpdates() {
     //Update the database changes
     try {
-        //update module name 
+        //update module name
         \Cx\Lib\UpdateUtil::sql("UPDATE `".DBPREFIX."modules` SET `name` = 'Forum' WHERE `id` = 20");
         //update navigation url
         \Cx\Lib\UpdateUtil::sql("UPDATE `".DBPREFIX."backend_areas` SET `uri` = 'index.php?cmd=Forum' WHERE `area_id` = 106");
@@ -44,11 +44,11 @@ function forumUpdates() {
     } catch (\Cx\Lib\UpdateException $e) {
         return "Error: $e->sql";
     }
-    
+
     //Update script for moving the folder
     $sourcePath      = ASCMS_DOCUMENT_ROOT . '/media/forum';
     $destinationPath = ASCMS_DOCUMENT_ROOT . '/media/Forum';
-    
+
     try {
         if (file_exists($sourcePath) && !file_exists($destinationPath)) {
             \Cx\Lib\FileSystem\FileSystem::makeWritable($sourcePath);
@@ -59,6 +59,6 @@ function forumUpdates() {
     } catch (\Cx\Lib\FileSystem\FileSystemException $e) {
         return $e->getMessage();
     }
-    
+
     return 'Forum updated successfully.';
 }

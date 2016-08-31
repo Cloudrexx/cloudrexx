@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * Repository for SystemComponents
  *
@@ -41,7 +41,7 @@ namespace Cx\Core\Core\Model\Repository;
 
 /**
  * Repository for SystemComponents
- * 
+ *
  * This decorates SystemComponents with SystemComponentController class
  *
  * @copyright   Cloudrexx AG
@@ -54,16 +54,16 @@ class SystemComponentRepository extends \Doctrine\ORM\EntityRepository
 {
     /**
      * List of loaded (and decorated) components
-     * @var array 
+     * @var array
      */
     protected $loadedComponents = array();
-    
+
     /**
      * Main class instance
      * @var \Cx\Core\Core\Controller\Cx
      */
     protected $cx = null;
-    
+
     /**
      * Initialize repository
      * @param \Doctrine\ORM\EntityManager $em Doctrine entity manager
@@ -73,10 +73,10 @@ class SystemComponentRepository extends \Doctrine\ORM\EntityRepository
         parent::__construct($em, $class);
         $this->cx = \Env::get('cx');
     }
-    
+
     /**
      * Finds an entity by its primary key / identifier.
-     * 
+     *
      * Overwritten in order to decorate result
      * @param int $id The identifier.
      * @param int $lockMode
@@ -86,7 +86,7 @@ class SystemComponentRepository extends \Doctrine\ORM\EntityRepository
     public function find($id, $lockMode = LockMode::NONE, $lockVersion = null) {
         return $this->decorate(parent::find($id, $lockMode, $lockVersion));
     }
-    
+
     /**
      * Finds all entities in the repository.
      *
@@ -127,7 +127,7 @@ class SystemComponentRepository extends \Doctrine\ORM\EntityRepository
     public function findBy(array $criteria) {
         return $this->decorate(parent::findBy($criteria));
     }
-    
+
     /**
      * Finds a single entity by a set of criteria.
      *
@@ -138,7 +138,7 @@ class SystemComponentRepository extends \Doctrine\ORM\EntityRepository
     public function findOneBy(array $criteria) {
         return $this->decorate(parent::findOneBy($criteria));
     }
-    
+
     /**
      * Decorates an entity or an array of entities
      * @param mixed $components SystemComponent or array of SystemComponents
@@ -148,7 +148,7 @@ class SystemComponentRepository extends \Doctrine\ORM\EntityRepository
         if (!$components) {
             return $components;
         }
-        
+
         if (!is_array($components)) {
             if (isset($this->loadedComponents[$components->getId()])) {
                 return $this->loadedComponents[$components->getId()];
@@ -161,7 +161,7 @@ class SystemComponentRepository extends \Doctrine\ORM\EntityRepository
             \Cx\Core\Json\JsonData::addAdapter($entity->getControllersAccessableByJson(), $entity->getNamespace() . '\\Controller');
             return $entity;
         }
-        
+
         $yamlDirs = array();
         foreach ($components as $component) {
             if (isset($this->loadedComponents[$component->getId()])) {
@@ -172,7 +172,7 @@ class SystemComponentRepository extends \Doctrine\ORM\EntityRepository
                 $yamlDirs[] = $yamlDir;
             }
         }
-        
+
         $this->cx->getDb()->addSchemaFileDirectories($yamlDirs);
         foreach ($components as &$component) {
             if (isset($this->loadedComponents[$component->getId()])) {
@@ -184,7 +184,7 @@ class SystemComponentRepository extends \Doctrine\ORM\EntityRepository
         }
         return $components;
     }
-    
+
     /**
      * Decorates a single entity
      * @param \Cx\Core\Core\Model\Entity\SystemComponent $component
@@ -193,16 +193,16 @@ class SystemComponentRepository extends \Doctrine\ORM\EntityRepository
     protected function decorateEntity(\Cx\Core\Core\Model\Entity\SystemComponent $component) {
         if (isset($this->loadedComponents[$component->getId()])) {
             return $this->loadedComponents[$component->getId()];
-        }        
+        }
         $componentControllerClass = $this->getComponentControllerClassFor($component);
         $componentController = new $componentControllerClass($component, $this->cx);
         $this->loadedComponents[$component->getId()] = $componentController;
         return $componentController;
     }
-    
+
     /**
      * Returns class name to use for decoration
-     * 
+     *
      * If the component does not have a class named "ComponentController"
      * the default SystemComponentController class is used
      * @param \Cx\Core\Core\Model\Entity\SystemComponent $component Component to get decoration class for
@@ -215,7 +215,7 @@ class SystemComponentRepository extends \Doctrine\ORM\EntityRepository
         $className = $component->getNamespace() . '\\Controller\\ComponentController';
         return $className;
     }
-    
+
     /**
      * Calls a hook on all components
      * @param string $hookMethodName Method name of the hook to call
@@ -248,7 +248,7 @@ class SystemComponentRepository extends \Doctrine\ORM\EntityRepository
             );
         }
     }
-    
+
     /**
      * Call hook script of all SystemComponents to register events
      */
@@ -258,7 +258,7 @@ class SystemComponentRepository extends \Doctrine\ORM\EntityRepository
             array()
         );
     }
-    
+
     /**
      * Call hook script of all SystemComponents to register event listeners
      */
@@ -268,7 +268,7 @@ class SystemComponentRepository extends \Doctrine\ORM\EntityRepository
             array()
         );
     }
-    
+
     /**
      * Call hook script of all SystemComponents before resolving
      */
@@ -280,7 +280,7 @@ class SystemComponentRepository extends \Doctrine\ORM\EntityRepository
             )
         );
     }
-    
+
     /**
      * Call hook script of all SystemComponents after resolving
      */
@@ -292,7 +292,7 @@ class SystemComponentRepository extends \Doctrine\ORM\EntityRepository
             )
         );
     }
-    
+
     /**
      * Call hook script of all SystemComponents before loading content
      */
@@ -304,7 +304,7 @@ class SystemComponentRepository extends \Doctrine\ORM\EntityRepository
             )
         );
     }
-    
+
     /**
      * Call hook script of all SystemComponents before loading module content
      */
@@ -316,7 +316,7 @@ class SystemComponentRepository extends \Doctrine\ORM\EntityRepository
             )
         );
     }
-    
+
     /**
      * Load a component (tell it to parse its content)
      * @param string $componentName Name of component to load
@@ -341,7 +341,7 @@ class SystemComponentRepository extends \Doctrine\ORM\EntityRepository
             )
         );
     }
-    
+
     /**
      * Call hook script of all SystemComponents after loading module content
      */
@@ -353,7 +353,7 @@ class SystemComponentRepository extends \Doctrine\ORM\EntityRepository
             )
         );
     }
-    
+
     /**
      * Call hook script of all SystemComponents after loading content
      */
@@ -365,7 +365,7 @@ class SystemComponentRepository extends \Doctrine\ORM\EntityRepository
             )
         );
     }
-    
+
     /**
      * Call hook script of all SystemComponents before finalization
      */
@@ -377,7 +377,7 @@ class SystemComponentRepository extends \Doctrine\ORM\EntityRepository
             )
         );
     }
-    
+
     /**
      * Call hook script of all SystemComponents after finalization
      */

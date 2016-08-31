@@ -17,7 +17,7 @@
             $('#select-language a').addClass('alone');
         }
         /* Metanavigation End */
-//        $('.breadcrumbs').html($('.breadcrumbs').html().replace(/\&gt;/g,'»')); 
+//        $('.breadcrumbs').html($('.breadcrumbs').html().replace(/\&gt;/g,'»'));
         /* Navigation Start */
         $('#navigation > li').hover(function () {
             $(this).children('ul').animate({
@@ -60,10 +60,10 @@
                 '<div class="cycle-button" id="cycle-next" />' +
                 '<div id="cycle-nav" />'
                 ).cycle({
-                fx:      'fade', 
-                speed:    1000, 
+                fx:      'fade',
+                speed:    1000,
                 timeout:  0,
-                next:    '#cycle-next', 
+                next:    '#cycle-next',
                 prev:    '#cycle-prev',
                 pager:   '#cycle-nav'
             });

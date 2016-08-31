@@ -248,7 +248,7 @@ table tr.marketRow2 {
 table tr.row2,
 table tr.marketRow3 {
     background-color: #F6F6F6;
-    padding: 0;    
+    padding: 0;
 }
 #tagelement td {
     float: left;
@@ -2646,7 +2646,7 @@ td ul {
     z-index: 9999;
     color: #25556d;
 }
-.noCaption {   
+.noCaption {
     float: left;
 }
 #news-social-media li {

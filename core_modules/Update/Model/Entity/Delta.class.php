@@ -38,7 +38,7 @@ namespace Cx\Core_Modules\Update\Model\Entity;
 
 /**
  * Class Delta
- * 
+ *
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
@@ -77,7 +77,7 @@ class Delta extends \Cx\Core\Model\Model\Entity\YamlEntity {
 
     /**
      * Set id
-     * 
+     *
      * @param integer $id
      */
     public function setId($id) {
@@ -140,7 +140,7 @@ class Delta extends \Cx\Core\Model\Model\Entity\YamlEntity {
 
     /**
      * addCodeBase
-     * 
+     *
      * @param integer $codeBaseId
      * @param boolean $rollback
      * @param integer $offset
@@ -163,10 +163,10 @@ class Delta extends \Cx\Core\Model\Model\Entity\YamlEntity {
 
     /**
      * Run the Migration command to migrate the DB
-     * 
+     *
      * @param integer $version
      * @param string  $process
-     * 
+     *
      * @return integer
      */
     protected function runMigrationCommand($version, $process) {

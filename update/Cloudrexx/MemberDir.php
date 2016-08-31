@@ -33,7 +33,7 @@ echo memberDirUpdates();
 function memberDirUpdates() {
     //Update the database changes
     try {
-        //update module name 
+        //update module name
         \Cx\Lib\UpdateUtil::sql("UPDATE `".DBPREFIX."modules` SET `name` = 'MemberDir' WHERE `contrexx_modules`.`id` = 31");
         //update navigation url
         \Cx\Lib\UpdateUtil::sql("UPDATE `".DBPREFIX."backend_areas` SET `uri` = 'index.php?cmd=MemberDir' WHERE `contrexx_backend_areas`.`area_id` = 89");
@@ -44,11 +44,11 @@ function memberDirUpdates() {
     } catch (\Cx\Lib\UpdateException $e) {
         return "Error: $e->sql";
     }
-    
+
     //Update script for moving the folder
     $sourcePath      = ASCMS_DOCUMENT_ROOT . '/media/memberdir';
     $destinationPath = ASCMS_DOCUMENT_ROOT . '/media/MemberDir';
-    
+
     try {
         if (file_exists($sourcePath) && !file_exists($destinationPath)) {
             \Cx\Lib\FileSystem\FileSystem::makeWritable($sourcePath);
@@ -59,6 +59,6 @@ function memberDirUpdates() {
     } catch (\Cx\Lib\FileSystem\FileSystemException $e) {
         return $e->getMessage();
     }
-    
+
     return 'MemberDir is updated successfully.';
 }

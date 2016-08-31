@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- * 
+ *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
- 
+
 /**
  * SigmaPageTree
  *
@@ -62,6 +62,6 @@ abstract class SigmaPageTree extends PageTree {
         }
         $this->realPreRender($lang);
     }
-    
+
     protected abstract function realPreRender($lang);
 }

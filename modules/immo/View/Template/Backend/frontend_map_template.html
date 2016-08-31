@@ -43,28 +43,28 @@ markers[{IMMO_KEY_NUMBER}]['logo'] = "{IMMO_MARKER_LOGO}";
 <!-- END setmarker -->
 
 var loadMap = function() {
-	if (GBrowserIsCompatible()) {
-		map = new GMap2(document.getElementById("gmap"));
-		map.addControl(new GLargeMapControl());
-    	map.addControl(new GMapTypeControl());
-		map.addControl(new GOverviewMapControl(new GSize(200,100)));
-		map.setCenter(new GLatLng(startX, startY), startZoom);
-		//sIcon = new GIcon(G_DEFAULT_ICON, "");
-		//cIcon = new GIcon(G_DEFAULT_ICON, "");
-		//sIcon.iconSize = new GSize(47, 35);
-		//cIcon.iconSize = new GSize(47, 35);
-	    //sIcon.shadowSize = new GSize(0, 0);
-		//cIcon.shadowSize = new GSize(0, 0);
-		//sIcon.shadow = "";
-		//cIcon.shadow = "";
+  if (GBrowserIsCompatible()) {
+    map = new GMap2(document.getElementById("gmap"));
+    map.addControl(new GLargeMapControl());
+      map.addControl(new GMapTypeControl());
+    map.addControl(new GOverviewMapControl(new GSize(200,100)));
+    map.setCenter(new GLatLng(startX, startY), startZoom);
+    //sIcon = new GIcon(G_DEFAULT_ICON, "");
+    //cIcon = new GIcon(G_DEFAULT_ICON, "");
+    //sIcon.iconSize = new GSize(47, 35);
+    //cIcon.iconSize = new GSize(47, 35);
+      //sIcon.shadowSize = new GSize(0, 0);
+    //cIcon.shadowSize = new GSize(0, 0);
+    //sIcon.shadow = "";
+    //cIcon.shadow = "";
         //sIcon.imageMap = [0,1,13,37,38,28,34,7];
         //cIcon.imageMap = [0,1,13,37,38,28,34,7];
-		// Set markers
-		for (var i = 0; i < markers.length; i++) {
-			map.addOverlay(createMarker(i));
-		}
-		//change to hybrid mode
-		gMapType = map.getMapTypes();
+    // Set markers
+    for (var i = 0; i < markers.length; i++) {
+      map.addOverlay(createMarker(i));
+    }
+    //change to hybrid mode
+    gMapType = map.getMapTypes();
         map.setMapType(gMapType[2]);  // [0] map [1] satellite [2] hybrid
 
         // remove overlays on click
@@ -74,51 +74,51 @@ var loadMap = function() {
           }
         });
 
-    	//switch maptype to normal if zoom bigger than 14 (no images available for this zoom location)
-    	//else show hybrid
+      //switch maptype to normal if zoom bigger than 14 (no images available for this zoom location)
+      //else show hybrid
 
         GEvent.addListener(map, "zoomend", function() {
-    	    zoom = map.getZoom();
-			if(zoom > 14){
-				map.setMapType(gMapType[0]);
-			}else{
-				map.setMapType(gMapType[2]);
-			}
-    	});
-	}
+          zoom = map.getZoom();
+      if(zoom > 14){
+        map.setMapType(gMapType[0]);
+      }else{
+        map.setMapType(gMapType[2]);
+      }
+      });
+  }
 }
 
 var createMarker = function(i) {
-	var point = new GLatLng(markers[i]['long'], markers[i]['lat']);
-	var message = createMessage(i);
-	//custom icons can be set here, different ones as well
-	/*var icon = null;
-	if (markers[i]['logo'] == 1) {
-		icon = sIcon;
-	} else {
-		icon = cIcon;
-	}*/
-	//var house = new GMarker(point, icon);
-	var house = new GMarker(point);
-	GEvent.addListener(house, "click", function() {
-		house.openInfoWindowHtml(message);
-	});
-	return house;
+  var point = new GLatLng(markers[i]['long'], markers[i]['lat']);
+  var message = createMessage(i);
+  //custom icons can be set here, different ones as well
+  /*var icon = null;
+  if (markers[i]['logo'] == 1) {
+    icon = sIcon;
+  } else {
+    icon = cIcon;
+  }*/
+  //var house = new GMarker(point, icon);
+  var house = new GMarker(point);
+  GEvent.addListener(house, "click", function() {
+    house.openInfoWindowHtml(message);
+  });
+  return house;
 }
 
 var createMessage = function(id) {
-	var message = markers[id]['message'];
-	var id = markers[id]['id'];
-	return "<div class=\"immomap\">"+message+"<p><a href=\"javascript:showObj("+id+");\">"+txtLook+"<\/a><\/p><\/div>";
+  var message = markers[id]['message'];
+  var id = markers[id]['id'];
+  return "<div class=\"immomap\">"+message+"<p><a href=\"javascript:showObj("+id+");\">"+txtLook+"<\/a><\/p><\/div>";
 }
 
 var showObj = function(id){
-	if(!opener){
-		top.location.href='index.php?section=immo&{CSRF_PARAM}&cmd=showObj&immoLang='+immoLang+"&id="+id;
-	}else{
-		opener.top.location.href='index.php?section=immo&{CSRF_PARAM}&cmd=showObj&immoLang='+immoLang+"&id="+id;
-		window.close();
-	}
+  if(!opener){
+    top.location.href='index.php?section=immo&{CSRF_PARAM}&cmd=showObj&immoLang='+immoLang+"&id="+id;
+  }else{
+    opener.top.location.href='index.php?section=immo&{CSRF_PARAM}&cmd=showObj&immoLang='+immoLang+"&id="+id;
+    window.close();
+  }
 }
 
 //]]>

@@ -99,7 +99,7 @@ class CrmEventDispatcher
 
     /**
      * Add handler
-     * 
+     *
      * @param String       $event_name    event name
      * @param EventHandler $event_handler event handler
      *
@@ -112,7 +112,7 @@ class CrmEventDispatcher
 
     /**
      * Trigger the event
-     * 
+     *
      * @param String $event_name event name
      * @param String $context    event context
      * @param String $info       event info
@@ -140,4 +140,3 @@ class CrmEventDispatcher
     }
 
 }
- 

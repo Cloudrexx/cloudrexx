@@ -17,7 +17,7 @@ function elementIsChecked(fieldName)
             x++;
         }
     }
-    
+
     if(x > 0) {
         return true;
     } else {
@@ -34,15 +34,15 @@ function selectMultiAction()
                 document.formCategoryList.action = "index.php?cmd={CALENDAR_MODULE_NAME}&act=categories&multi=delete&{CALENDAR_CSRF}";
                 document.formCategoryList.submit();
             }
-        } 
-        if(document.formCategoryList.formCategoryList_MultiAction.value == "activate") {                
+        }
+        if(document.formCategoryList.formCategoryList_MultiAction.value == "activate") {
             document.formCategoryList.action = "index.php?cmd={CALENDAR_MODULE_NAME}&act=categories&multi=activate&{CALENDAR_CSRF}";
-            document.formCategoryList.submit(); 
-        } 
-        if(document.formCategoryList.formCategoryList_MultiAction.value == "deactivate") {                
+            document.formCategoryList.submit();
+        }
+        if(document.formCategoryList.formCategoryList_MultiAction.value == "deactivate") {
             document.formCategoryList.action = "index.php?cmd={CALENDAR_MODULE_NAME}&act=categories&multi=deactivate&{CALENDAR_CSRF}";
-            document.formCategoryList.submit(); 
-        } 
+            document.formCategoryList.submit();
+        }
     } else {
         alert("{TXT_CALENDAR_MAKE_SELECTION}");
     }
@@ -81,7 +81,7 @@ function selectMultiAction()
             </td>
         </tr>
         <!-- END categoryList -->
-    
+
         <!-- BEGIN emptyCategoryList -->
         <tr class="row1">
             <td colspan="6"><i>{TXT_CALENDAR_NO_CATEGORIES_FOUND}</i></td>

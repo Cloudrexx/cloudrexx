@@ -987,7 +987,7 @@ if (!$limit) {
         // Send an email to the customer
         if (   !empty($_GET['sendMail'])
             && !empty($_GET['order_id'])) {
-            
+
             // TODO: It might be useful to move this to its own method:
             $hasMail = false;
             $result = null;
