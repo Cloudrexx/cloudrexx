@@ -40,6 +40,7 @@ class LocalFileSystem extends EntityBase implements FileSystem
 {
 
     private $rootPath;
+    protected $fileListCache;
 
     function __construct($path) {
         if (!$path) {
@@ -60,6 +61,10 @@ class LocalFileSystem extends EntityBase implements FileSystem
     }
 
     public function getFileList($directory, $recursive = false, $readonly = false) {
+        if (isset($this->fileListCache[$directory][$recursive][$readonly])) {
+            return $this->fileListCache[$directory][$recursive][$readonly];
+        }
+
         $recursiveIteratorIterator = new \RegexIterator(
             new \RecursiveIteratorIterator(
                 new \RecursiveDirectoryIterator(
@@ -162,6 +167,7 @@ class LocalFileSystem extends EntityBase implements FileSystem
             $jsonFileArray = $this->array_merge_recursive($jsonFileArray, $path);
         }
         $jsonFileArray = $this->utf8EncodeArray($jsonFileArray);
+        $this->fileListCache[$directory][$recursive][$readonly] = $jsonFileArray;
         return $jsonFileArray;
     }
     

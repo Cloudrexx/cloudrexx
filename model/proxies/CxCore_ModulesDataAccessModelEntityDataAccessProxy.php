@@ -129,6 +129,18 @@ class CxCore_ModulesDataAccessModelEntityDataAccessProxy extends \Cx\Core_Module
         return parent::getWritePermission();
     }
 
+    public function addSync(\Cx\Core_Modules\Sync\Model\Entity\Sync $sync)
+    {
+        $this->_load();
+        return parent::addSync($sync);
+    }
+
+    public function getSyncs()
+    {
+        $this->_load();
+        return parent::getSyncs();
+    }
+
     public function __get($name)
     {
         $this->_load();
@@ -168,7 +180,7 @@ class CxCore_ModulesDataAccessModelEntityDataAccessProxy extends \Cx\Core_Module
 
     public function __sleep()
     {
-        return array('__isInitialized__', 'id', 'name', 'fieldList', 'accessCondition', 'allowedOutputMethods', 'dataAccessApiKeys', 'readPermission', 'writePermission', 'dataSource');
+        return array('__isInitialized__', 'id', 'name', 'fieldList', 'accessCondition', 'allowedOutputMethods', 'dataAccessApiKeys', 'syncs', 'readPermission', 'writePermission', 'dataSource');
     }
 
     public function __clone()

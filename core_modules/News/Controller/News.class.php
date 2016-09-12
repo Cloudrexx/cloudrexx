@@ -174,6 +174,7 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                                                         news.teaser_image_thumbnail_path AS newsThumbImg,
                                                         news.typeid             AS typeid,
                                                         news.allow_comments     AS commentactive,
+                                                        news.new_window         AS newWindow,
                                                         locale.text,
                                                         locale.title            AS title,
                                                         locale.teaser_text
@@ -351,7 +352,9 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
             if ($this->_objTpl->blockExists('news_text')) {
                 $this->_objTpl->parse('news_text');
             }
-            if ($this->_objTpl->blockExists('news_redirect')) {
+            if ($this->_objTpl->blockExists('news_redirect') && $newWindow) {
+                $this->_objTpl->parse('news_redirect');
+            } else {
                 $this->_objTpl->hideBlock('news_redirect');
             }
         } else {

@@ -212,10 +212,20 @@ class Search
                 $arraySearchOut = array_slice($arraySearchResults, $pos,
                                               $_CONFIG['corePagingLimit']);
                 foreach ($arraySearchOut as $details) {
+                    // append search term to result link
+                    $link = $details['Link'];
+                    if (strpos($link, '?') === false) {
+                        $link .= '?';
+                    } else {
+                        $link .= '&';
+                    }
+                    $link .= 'searchTerm='.urlencode($term);
+
+                    // parse result into template
                     $objTpl->setVariable(array(
                         'COUNT_MATCH' =>
                         $_ARRAYLANG['TXT_RELEVANCE'].' '.$details['Score'].'%',
-                        'LINK' => '<b><a href="'.$details['Link'].
+                        'LINK' => '<b><a href="'.$link.
                         '" title="'.contrexx_raw2xhtml($details['Title']).'">'.
                         contrexx_raw2xhtml($details['Title']).'</a></b>',
                         'SHORT_CONTENT' => contrexx_raw2xhtml($details['Content']),

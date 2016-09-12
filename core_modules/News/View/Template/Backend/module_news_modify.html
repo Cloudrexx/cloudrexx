@@ -4,14 +4,14 @@
     cx.jQuery(document).ready(function () {
         toggleBlock($J('#enableRelatedNews'), $J('#live-search-news-block'), true);
         toggleBlock($J('#enableTags'), $J('#{NEWS_TAG_ID}'));
-        
+
         $J('#enableRelatedNews').click(function () {
             toggleBlock($J('#enableRelatedNews'), $J('#live-search-news-block'));
         });
         $J('#enableTags').click(function () {
             toggleBlock($J('#enableTags'), $J('#{NEWS_TAG_ID}'));
         });
-       $J('#news_category').chosen(); 
+       $J('#news_category').chosen();
     });
     cx.ready(function() {
         var dpOptions = {
@@ -49,7 +49,7 @@
     function SetUrl(data) {
         var type = data.type;
         var url  = '';
-        
+
         if (type === 'close') {
             return false;
         } else if (type === 'file') {
@@ -57,10 +57,10 @@
         } else if (type === 'page') {
             url = data.data[0].node;
         }
-        
+
         switch (newsElType) {
             case 'image':
-            case 'webpages':
+            case 'mixed':
                 document.getElementById(newsElInsertBox).value = url;
                 break
             case 'link':
@@ -90,8 +90,13 @@
             case 'image':
                 options = {cxMbViews: 'filebrowser', cxMbStartview: 'MediaBrowserList'};
                 break;
+<<<<<<< HEAD
             case 'webpages':
                 options = {cxMbViews: 'sitestructure,filebrowser', cxMbStartview: 'Sitestrukture'};
+=======
+            case 'mixed':
+                options = {cxMbViews: 'sitestructure,filebrowser', cxMbStartview: 'Sitestructure'};
+>>>>>>> master
                 break;
             case 'link':
                 options = {cxMbViews: 'filebrowser,sitestructure', cxMbStartview: 'MediaBrowserList'};
@@ -160,7 +165,7 @@
             if (newsScheduled.checked == false) {
                 startDate.disabled = true;
                 endDate.disabled = true;
-                $J("#newsDate").css('display','none');                
+                $J("#newsDate").css('display','none');
             } else {
                 startDate.disabled = false;
                 endDate.disabled = false;
@@ -364,7 +369,7 @@
         <li><a id="messageTab_news2" href="javascript:{}" onclick="selectTab('news2')" title="{TXT_NEWS_MORE_OPTIONS}">{TXT_NEWS_MORE_OPTIONS}</a></li>
         <li><a id="messageTab_news3" href="javascript:{}" onclick="selectTab('news3')" title="{NEWS_HEADLINES_TEASERS_TXT}">{NEWS_HEADLINES_TEASERS_TXT}</a></li>
         <!-- BEGIN news_permission_tab --><li><a id="messageTab_news4" href="javascript:{}" onclick="selectTab('news4')" title="{TXT_NEWS_PERMISSIONS}">{TXT_NEWS_PERMISSIONS}</a></li><!-- END news_permission_tab -->
-    </ul>    
+    </ul>
     <!-- start news1 div -->
     <div id="news1" class="messageTab" style="display:block">
         <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist">

@@ -591,10 +591,10 @@ class CxCoreContentManagerModelEntityPageProxy extends \Cx\Core\ContentManager\M
         return parent::setVirtual($virtual);
     }
 
-    public function getFallbackContentFrom($page)
+    public function setContentOf($page, $includeThemeOptions = false)
     {
         $this->_load();
-        return parent::getFallbackContentFrom($page);
+        return parent::setContentOf($page, $includeThemeOptions);
     }
 
     public function setCssNavName($cssNavName)

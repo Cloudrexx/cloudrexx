@@ -687,8 +687,8 @@ class MediaManager extends MediaLibrary
                         $previewUrl->setParam('file', $file);
                     }
                 }
-                $deleteUrl->setParam('path', $path);
-                $deleteUrl->setParam('file', $key == 'dir' ? null : $file);
+                $deleteUrl->setParam('path', rawurlencode($mediaWebPath));
+                $deleteUrl->setParam('file', $file);
 
                 $renameUrl->setParam('path', rawurlencode($mediaWebPath));
                 $renameUrl->setParam('file', $file);

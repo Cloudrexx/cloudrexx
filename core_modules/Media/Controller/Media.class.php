@@ -273,6 +273,7 @@ class Media extends MediaLibrary
                     $path = rawurlencode($mediaWebPath . $fileName . '/');
                     $previewUrl->setParam('act', null);
                     $previewUrl->setParam('file', null);
+                    $previewUrl->setParam('path', $path);
                 } elseif ($key == 'file') {
                     $path = rawurlencode($mediaWebPath);
 
@@ -283,6 +284,7 @@ class Media extends MediaLibrary
                         $imagePreview = 'javascript: preview(\'' . $mediaWebPath . $fileName . '\', ' . $tmpSize[0] . ', ' . $tmpSize[1] . ');';
                     } else {
                         $previewUrl->setParam('act', 'download');
+                        $previewUrl->setParam('path', $path);
                         $previewUrl->setParam('file', $file);
                     }
                 }
@@ -291,10 +293,6 @@ class Media extends MediaLibrary
 
                 $renameUrl->setParam('path', rawurlencode($mediaWebPath));
                 $renameUrl->setParam('file', $file);
-
-                if (!$image) {
-                    $previewUrl->setParam('path', $path);
-                }
 
                 $this->_objTpl->setVariable(array(
                     'MEDIA_FILE_NAME_HREF'   => $image ? $imagePreview : $previewUrl->toString(false),

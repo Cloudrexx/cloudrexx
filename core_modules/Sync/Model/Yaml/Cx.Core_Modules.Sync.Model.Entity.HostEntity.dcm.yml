@@ -1,0 +1,37 @@
+Cx\Core_Modules\Sync\Model\Entity\HostEntity:
+  type: entity
+  table: core_module_sync_host_entity
+  repositoryClass: Cx\Core_Modules\Sync\Model\Repository\HostEntityRepository
+  indexes:    
+    fk_contrexx_core_module_sync_host_entity_contrexx_core_modu_idx:
+      columns: [ host_id ]
+
+  fields:
+    syncId:
+      id: true
+      type: integer
+      column: sync_id
+      associationKey: true
+    hostId:
+      id: true
+      type: integer
+      column: host_id
+      associationKey: true
+    entityId:
+      id: true
+      type: string
+      column: entity_id
+
+  manyToOne:
+    sync:
+      targetEntity: Cx\Core_Modules\Sync\Model\Entity\Sync
+      inversedBy: hostEntities
+      joinColumns:
+        sync_id:
+          referencedColumnName: id
+    host:
+      targetEntity: Cx\Core_Modules\Sync\Model\Entity\Host
+      inversedBy: hostEntities
+      joinColumns:
+        host_id:
+          referencedColumnName: id

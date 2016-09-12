@@ -260,11 +260,11 @@ class Products
                     AND (`product`.`stock_visible`=0 OR `product`.`stock`>0)
                     '.($category_id ? '' : 'AND `category`.`active`=1' )/*only check if active when not in category view*/.'
                     AND (
-                        `product`.`date_start` < CURRENT_DATE()
+                        `product`.`date_start` <= CURRENT_DATE()
                      OR `product`.`date_start` = 0
                     )
                     AND (
-                        `product`.`date_end` > CURRENT_DATE()
+                        `product`.`date_end` >= CURRENT_DATE()
                      OR `product`.`date_end` = 0
                     )'
             ).

@@ -70,6 +70,11 @@ class Resolver {
     protected $page = null;
 
     /**
+     * @var Cx\Core\ContentManager\Model\Entity\Page
+     */
+    protected $urlPage = null;
+
+    /**
      * Doctrine Cx\Core\ContentManager\Model\Repository\PageRepository
      */
     protected $pageRepo = null;
@@ -436,9 +441,11 @@ class Resolver {
             ($this->page->isTargetInternal() && preg_match('/[?&]external=permanent/', $this->page->getTarget()))
         ) {
             if ($this->page->isTargetInternal()) {
-                $params = array();
+                if (isset($params['external']) && $params['external'] == 'permanent') {
+                    unset($params['external']);
+                }
                 if (trim($this->page->getTargetQueryString()) != '') {
-                    $params = explode('&', $this->page->getTargetQueryString());
+                    $params = array_merge($params, explode('&', $this->page->getTargetQueryString()));
                 }
                 $target = \Cx\Core\Routing\Url::fromNodeId($this->page->getTargetNodeId(), $this->page->getTargetLangId(), $params);
             } else {
@@ -791,7 +798,11 @@ class Resolver {
 
             // now lets resolve the page that is referenced by our fallback page
             $this->resolvePage(true);
-            $page->getFallbackContentFrom($this->page);
+            // fallback pages use theme options of their target page, symlink use their own
+            $page->setContentOf(
+                $this->page,
+                $page->getType() == \Cx\Core\ContentManager\Model\Entity\Page::TYPE_FALLBACK
+            );
 
             // Important: We must assigne a copy of $page to $this->path here.
             // Otherwise, the virtual fallback page ($this->page) will also

@@ -1,0 +1,22 @@
+Cx\Core_Modules\Sync\Model\Entity\IdMapping:
+  type: entity
+  table: core_module_sync_id_mapping
+  repositoryClass: Cx\Core_Modules\Sync\Model\Repository\IdMappingRepository
+  id: 
+    id:
+      type: integer
+      generator:
+        strategy: AUTO
+  fields:
+    foreignHost:
+      type: string
+      column: foreign_host
+    entityType:
+      type: string
+      column: entity_type
+    foreignId:
+      type: integer
+      column: foreign_id
+    localId:
+      type: integer
+      column: local_id

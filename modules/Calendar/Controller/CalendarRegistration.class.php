@@ -302,11 +302,20 @@ class CalendarRegistration extends CalendarLibrary
         
         $objEvent = new \Cx\Modules\Calendar\Controller\CalendarEvent($eventId);
 
-        if (   $objInit->mode == \Cx\Core\Core\Controller\Cx::MODE_BACKEND
-            && $objEvent->seriesStatus
+        if (   $objEvent->seriesStatus
             && $objEvent->independentSeries
         ) {
             $eventDate = isset($data['registrationEventDate']) ? contrexx_input2int($data['registrationEventDate']) : $eventDate;
+
+            $endDate   = new \DateTime();
+            $endDate->modify('+10 years');
+
+            $eventManager = new CalendarEventManager(null, $endDate);
+            $eventManager->getEvent($objEvent, $eventDate, true);
+            $objEvent = $eventManager->eventList[0];
+            if (empty($objEvent)) {
+                return false;
+            }
         }
 
         $query = '
@@ -412,9 +421,9 @@ class CalendarRegistration extends CalendarLibrary
             $objMailManager = new \Cx\Modules\Calendar\Controller\CalendarMailManager();
             
             $templateId     = $objEvent->emailTemplate[FRONTEND_LANG_ID];
-            $objMailManager->sendMail(intval($_REQUEST['id']), \Cx\Modules\Calendar\Controller\CalendarMailManager::MAIL_CONFIRM_REG, $this->id, $templateId);
+            $objMailManager->sendMail($objEvent, \Cx\Modules\Calendar\Controller\CalendarMailManager::MAIL_CONFIRM_REG, $this->id, $templateId);
             
-            $objMailManager->sendMail(intval($_REQUEST['id']), \Cx\Modules\Calendar\Controller\CalendarMailManager::MAIL_ALERT_REG, $this->id);
+            $objMailManager->sendMail($objEvent, \Cx\Modules\Calendar\Controller\CalendarMailManager::MAIL_ALERT_REG, $this->id);
         }
         
         return true;

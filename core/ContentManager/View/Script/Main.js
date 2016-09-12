@@ -886,9 +886,9 @@ cx.cm = function(target) {
             cx.jQuery('#page #preview').show();
         }
         if (cx.jQuery(this).val() == 'fallback') {
-            cx.jQuery("#type_toggle").hide();
+            cx.jQuery("#type_toggle, #themes_toggle, #themes_container").hide();
         } else {
-            cx.jQuery("#type_toggle").show();
+            cx.jQuery("#type_toggle, #themes_toggle, #themes_container").show();
         }
         cx.cm.resizeEditorHeight();
 

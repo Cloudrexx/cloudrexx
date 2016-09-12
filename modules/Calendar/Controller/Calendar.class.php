@@ -498,6 +498,7 @@ EOF;
         $showFrom = true;
         
         $objEvent = new \Cx\Modules\Calendar\Controller\CalendarEvent();
+        $isEventLoaded = false;
         
         if (isset($_POST['submitFormModifyEvent'])) {
             $arrData = array();
@@ -511,14 +512,18 @@ EOF;
                 $this->_objTpl->hideBlock('calendarEventModifyForm');
                 $this->_objTpl->touchBlock('calendarEventOkMessage');
                 
+                // refresh event data after save
+                $objEvent->get($objEvent->id);
+                $objEvent->getData();
+                $isEventLoaded  = true;
                 $objMailManager = new \Cx\Modules\Calendar\Controller\CalendarMailManager();
-                $objMailManager->sendMail($objEvent->id, \Cx\Modules\Calendar\Controller\CalendarMailManager::MAIL_NOTFY_NEW_APP);
+                $objMailManager->sendMail($objEvent, \Cx\Modules\Calendar\Controller\CalendarMailManager::MAIL_NOTFY_NEW_APP);
             } else {
                 $this->_objTpl->touchBlock('calendarEventErrMessage');
             }
         }
         
-        if ($eventId) {
+        if ($eventId && !$isEventLoaded) {
             $objEvent->get($eventId);
             $objEvent->getData();
         }
@@ -527,26 +532,59 @@ EOF;
         
         $locationType = $this->arrSettings['placeData'] == 3 ? ($eventId != 0 ? $objEvent->locationType : 1) : $this->arrSettings['placeData'];
         $hostType     = $this->arrSettings['placeDataHost'] == 3 ? ($eventId != 0 ? $objEvent->hostType : 1) : $this->arrSettings['placeDataHost'];
+
+        \ContrexxJavascript::getInstance()->setVariable(array(
+            'language_id' => \FWLanguage::getDefaultLangId(),
+            'active_lang' => implode(',', \FWLanguage::getIdArray()),
+        ), 'calendar');
+
         $javascript = <<< EOF
 <script language="JavaScript" type="text/javascript">
-              
+var defaultLang = cx.variables.get('language_id', 'calendar');
+var activeLang = [cx.variables.get('active_lang', 'calendar')];
 cx.ready(function() {
     var options = {
         dateFormat: '$dateFormat',        
         timeFormat: 'hh:mm',
-        onSelect: function(dateText, inst) {
-            startDateTime = cx.jQuery(".startDate").datetimepicker("getDate").getTime() / 1000;
-            endDateTime   = cx.jQuery(".endDate").datetimepicker("getDate").getTime() / 1000;                
+        showSecond: false,
+        onSelect: function(dateText, inst){
+            var startDate = cx.jQuery( ".startDate" ).datetimepicker("getDate");
+            var endDate   = cx.jQuery( ".endDate" ).datetimepicker("getDate");
 
-            if (startDateTime > endDateTime) {
-                cx.jQuery(".endDate").datetimepicker('setDate', cx.jQuery(".startDate").val());
+            if ( cx.jQuery( this )[0].id == 'startDate' ) {
+                var prevStartDate = cx.jQuery( ".startDate" ).data('prevDate');
+
+                if (cx.jQuery(".all_day").is(':checked')) {
+                    prevStartDate.setHours(0, 0, 0);
+                    startDate.setHours(0, 0, 0);
+                    endDate.setHours(0, 0, 0);
+                }
+
+                if (prevStartDate.getTime() != startDate.getTime()) {
+                    var timeDiff = Math.abs(endDate.getTime() - prevStartDate.getTime());
+                    endDate = new Date(startDate.getTime() + timeDiff);
+                    cx.jQuery( ".endDate" ).datetimepicker('setDate', endDate);
+                }
+
+            } else if (startDate.getTime() > endDate.getTime()) {
+                endDate = new Date(startDate.getTime() + (30*60*1000));
+                cx.jQuery(".endDate").datetimepicker('setDate', endDate);
             }
-        },
-        showSecond: false
+
+            cx.jQuery( ".startDate" ).data('prevDate', cx.jQuery(".startDate").datetimepicker("getDate"));
+            cx.jQuery( ".endDate" ).data('prevDate', cx.jQuery(".endDate").datetimepicker("getDate"));
+            cx.jQuery( this ).datetimepicker('refresh');
+        }
     };
-    cx.jQuery('input[name=startDate]').datetimepicker(options);
-    cx.jQuery('input[name=endDate]').datetimepicker(options);
-    modifyEvent._handleAllDayEvent(\$J(".all_day"));
+    cx.jQuery('input[name=startDate]')
+        .datetimepicker(options)
+        .data('prevDate', cx.jQuery(".startDate").datetimepicker("getDate"));
+    cx.jQuery('input[name=endDate]')
+        .datetimepicker(options)
+        .data('prevDate', cx.jQuery(".endDate").datetimepicker("getDate"));
+    if ( \$J(".all_day").is(':checked') ) {
+        modifyEvent._handleAllDayEvent( \$J(".all_day") );
+    }
     showOrHidePlaceFields('$locationType', 'place');
     showOrHidePlaceFields('$hostType', 'host');
 });
@@ -623,6 +661,8 @@ UPLOADER;
             'TXT_'.$this->moduleLangVar.'_PLACE_DATA_FROM_MEDIADIR' => $_ARRAYLANG['TXT_CALENDAR_PLACE_DATA_FROM_MEDIADIR'],
             'TXT_'.$this->moduleLangVar.'_PREV'                     => $_ARRAYLANG['TXT_CALENDAR_PREV'],
             'TXT_'.$this->moduleLangVar.'_NEXT'                     => $_ARRAYLANG['TXT_CALENDAR_NEXT'],
+            'TXT_'.$this->moduleLangVar.'_MORE'                     => $_ARRAYLANG['TXT_CALENDAR_MORE'],
+            'TXT_'.$this->moduleLangVar.'_MINIMIZE'                 => $_ARRAYLANG['TXT_CALENDAR_MINIMIZE'],
 
             $this->moduleLangVar.'_EVENT_TYPE_EVENT'                => $eventId != 0 ? ($objEvent->type == 0 ? 'selected="selected"' : '') : '',      
             $this->moduleLangVar.'_EVENT_TYPE_REDIRECT'             => $eventId != 0 ? ($objEvent->type == 1 ? 'selected="selected"' : '') : '',
@@ -642,7 +682,7 @@ UPLOADER;
             $this->moduleLangVar.'_EVENT_PLACE_MAP'                 => $objEvent->place_map,
             $this->moduleLangVar.'_EVENT_PLACE_LINK'                => $objEvent->place_link,
             $this->moduleLangVar.'_EVENT_PLACE_PHONE'               => $objEvent->place_phone,
-            $this->moduleLangVar.'_EVENT_MAP'                       => $objEvent->map == 1 ? 'checked="checked"' : '',
+            $this->moduleLangVar.'_EVENT_MAP'                       => $objEvent->google == 1 ? 'checked="checked"' : '',
             $this->moduleLangVar.'_EVENT_HOST'                      => $objEvent->org_name,
             $this->moduleLangVar.'_EVENT_HOST_ADDRESS'              => $objEvent->org_street,
             $this->moduleLangVar.'_EVENT_HOST_ZIP'                  => $objEvent->org_zip,
@@ -661,7 +701,22 @@ UPLOADER;
             $this->moduleLangVar.'_EVENT_ALL_DAY'                   => $eventId != 0 && $objEvent->all_day ? 'checked="checked"' : '',
             $this->moduleLangVar.'_HIDE_ON_SINGLE_LANG'             => count($this->arrFrontendLanguages) == 1 ? "display: none;" : "",
         ));
-        
+        $multiLingualFields = array(
+            'place',
+            'place_city',
+            'place_country',
+            'org_name',
+            'org_city',
+            'org_country',
+        );
+        $isOneActiveLanguage = count($this->arrFrontendLanguages) == 1;
+        foreach ($multiLingualFields as $inputField) {
+            if ($isOneActiveLanguage) {
+                $this->_objTpl->hideBlock('calendar_event_'. $inputField .'_expand');
+            } else {
+                $this->_objTpl->touchBlock('calendar_event_'. $inputField .'_expand');
+            }
+        }
         foreach ($this->arrFrontendLanguages as $arrLang) {
             //parse globals
             $this->_objTpl->setGlobalVariable(array(
@@ -710,6 +765,19 @@ UPLOADER;
             ));
             
             $this->_objTpl->parse('eventDescTab');
+            //parse eventLingualFields
+            foreach ($multiLingualFields as $inputField) {
+                $this->_objTpl->setVariable(
+                    $this->moduleLangVar.'_EVENT_'. strtoupper($inputField) .'_DEFAULT',
+                    $eventId != 0 ? $objEvent->{$inputField} : ''
+                );
+                $this->_objTpl->setVariable(array(
+                    $this->moduleLangVar.'_EVENT_VALUE' => !empty($objEvent->arrData[$inputField][$arrLang['id']])
+                                                          ? $objEvent->arrData[$inputField][$arrLang['id']]
+                                                          : ($eventId != 0 ? $objEvent->{$inputField} : ''),
+                ));
+                $this->_objTpl->parse('calendar_event_'. $inputField);
+            }
                         
             $langChecked = $langChecked ? 'checked="checked"' : '';
             	
@@ -862,9 +930,14 @@ UPLOADER;
 
         $objEvent = $this->objEventManager->eventList[0];
 
-        if(empty($objEvent)) {
-            \Cx\Core\Csrf\Controller\Csrf::redirect("index.php?section=".$this->moduleName);
+        if (empty($objEvent)) {
+            \Cx\Core\Csrf\Controller\Csrf::redirect(\Cx\Core\Routing\Url::fromModuleAndCmd($this->moduleName, ''));
             return;
+        }
+
+        if(!$objEvent->status) {
+            \Cx\Core\Csrf\Controller\Csrf::redirect(\Cx\Core\Routing\Url::fromModuleAndCmd($this->moduleName, ''));
+            return;   
         }
 
         if($objEvent->access == 1 && !\FWUser::getFWUserObject()->objUser->login()){

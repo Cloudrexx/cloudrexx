@@ -190,17 +190,13 @@ class CalendarMailManager extends CalendarLibrary {
     
     /**
      * Initialize the mail functionality to the recipient
-     * 
-     * @global object $objDatabase
-     * @global array $_ARRAYLANG
-     * @global integer $_LANGID
-     * @global array $_CONFIG
-     * @param integer $eventId
-     * @param integer $actionId
-     * @param integer $regId
-     * @param string $mailTemplate
+     *
+     * @param \Cx\Modules\Calendar\Controller\CalendarEvent $event          Event instance
+     * @param integer                                       $actionId       Mail action id
+     * @param integer                                       $regId          Registration id
+     * @param string                                        $mailTemplate   Mail template id
      */
-    function sendMail($eventId, $actionId, $regId=null, $mailTemplate = null)
+    function sendMail(CalendarEvent $event, $actionId, $regId=null, $mailTemplate = null)
     {
         global $objDatabase,$_ARRAYLANG, $_CONFIG ;
                 
@@ -210,12 +206,10 @@ class CalendarMailManager extends CalendarLibrary {
         $this->loadMailList($actionId, $mailTemplate);
         
         if (!empty($this->mailList)) {
-            
-            $objEvent = new \Cx\Modules\Calendar\Controller\CalendarEvent($eventId);
-            
+
             $objRegistration = null;
             if(!empty($regId)) {
-                $objRegistration = new \Cx\Modules\Calendar\Controller\CalendarRegistration($objEvent->registrationForm, $regId);
+                $objRegistration = new \Cx\Modules\Calendar\Controller\CalendarRegistration($event->registrationForm, $regId);
                 
                 list($registrationDataText, $registrationDataHtml) = $this->getRegistrationData($objRegistration);                 
                 
@@ -258,16 +252,16 @@ class CalendarMailManager extends CalendarLibrary {
                                                                                                   
             $domain     = ASCMS_PROTOCOL."://".$_CONFIG['domainUrl'].ASCMS_PATH_OFFSET."/";
             $date       = $this->format2userDateTime(new \DateTime());
-            $startDate  = $objEvent->startDate;
-            $endDate    = $objEvent->endDate;
+            $startDate  = $event->startDate;
+            $endDate    = $event->endDate;
 
-            $eventTitle = $objEvent->title;
-            $eventStart = $objEvent->all_day ? $this->format2userDate($startDate) : $this->formatDateTime2user($startDate, $this->getDateFormat() . ' (H:i:s)');
-            $eventEnd   = $objEvent->all_day ? $this->format2userDate($endDate) : $this->formatDateTime2user($endDate, $this->getDateFormat() . ' (H:i:s)');
+            $eventTitle = $event->title;
+            $eventStart = $event->all_day ? $this->format2userDate($startDate) : $this->formatDateTime2user($startDate, $this->getDateFormat() . ' (H:i:s)');
+            $eventEnd   = $event->all_day ? $this->format2userDate($endDate) : $this->formatDateTime2user($endDate, $this->getDateFormat() . ' (H:i:s)');
 
             $placeholder = array('[[TITLE]]', '[[START_DATE]]', '[[END_DATE]]', '[[LINK_EVENT]]', '[[LINK_REGISTRATION]]', '[[USERNAME]]', '[[FIRSTNAME]]', '[[LASTNAME]]', '[[URL]]', '[[DATE]]');
             
-            $recipients = $this->getSendMailRecipients($actionId, $objEvent, $regId, $objRegistration);
+            $recipients = $this->getSendMailRecipients($actionId, $event, $regId, $objRegistration);
                         
             $objMail = new \phpmailer();
 
@@ -313,12 +307,12 @@ class CalendarMailManager extends CalendarLibrary {
                     // actual language of selected e-mail template
                     $contentLanguage = $this->mailList[$langId]['lang_id'];
 
-                    if ($actionId == self::MAIL_NOTFY_NEW_APP && $objEvent->arrSettings['confirmFrontendEvents'] == 1) {
-                        $eventLink = $domain."/cadmin/index.php?cmd={$this->moduleName}&act=modify_event&id={$objEvent->id}&confirm=1";
+                    if ($actionId == self::MAIL_NOTFY_NEW_APP && $event->arrSettings['confirmFrontendEvents'] == 1) {
+                        $eventLink = $domain."/cadmin/index.php?cmd={$this->moduleName}&act=modify_event&id={$event->id}&confirm=1";
                     } else {
-                        $eventLink = \Cx\Core\Routing\Url::fromModuleAndCmd($this->moduleName, 'detail', $contentLanguage, array('id' => $objEvent->id, 'date' => $objEvent->startDate->getTimestamp()))->toString();
+                        $eventLink = \Cx\Core\Routing\Url::fromModuleAndCmd($this->moduleName, 'detail', $contentLanguage, array('id' => $event->id, 'date' => $event->startDate->getTimestamp()))->toString();
                     }            
-                    $regLink   = \Cx\Core\Routing\Url::fromModuleAndCmd($this->moduleName, 'register', $contentLanguage, array('id' => $objEvent->id, 'date' => $objEvent->startDate->getTimestamp()))->toString();
+                    $regLink   = \Cx\Core\Routing\Url::fromModuleAndCmd($this->moduleName, 'register', $contentLanguage, array('id' => $event->id, 'date' => $event->startDate->getTimestamp()))->toString();
 
                     $replaceContent  = array($eventTitle, $eventStart, $eventEnd, $eventLink, $regLink, $userNick, $userFirstname, $userLastname, $domain, $date);
 

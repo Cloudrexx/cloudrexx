@@ -523,7 +523,7 @@ class User_Profile_Attribute
 
 // TODO: In the backend, this always results in the empty string!
 // The core language is not loaded yet when this is run!
-            $this->arrAttributes[$attributeId]['names'][$this->langId] = $_CORELANG[$arrAttribute['desc']];
+            $this->arrAttributes[$attributeId]['names'][$this->langId] = isset($_CORELANG[$arrAttribute['desc']]) ? $_CORELANG[$arrAttribute['desc']] : null;
 // See:
 //die(var_export($_CORELANG, true));
 // and

@@ -74,8 +74,18 @@
         border-color: #999;
         background: #fff;
     }
+    table.adminlist_inner tr, table.adminlist_inner tr td {
+        margin: 0;
+        padding: 0;
+        border: 0 none;
+    }
+    table.adminlist_inner tr td.vertical_middle {
+        vertical-align: middle;
+    }
 </style>
 <script language="JavaScript" type="text/javascript">
+    var defaultLang = cx.variables.get('language_id', 'calendar');
+    var activeLang = [cx.variables.get('active_lang', 'calendar')];
     var blankExeception;
     var modifyEvent = {
         // elm => jquery object
@@ -88,18 +98,17 @@
             }
         },
         _handleAllDayEvent: function(elm) {
-            cx.jQuery(".startDate").data('dateTime', cx.jQuery(".startDate").datetimepicker("getDate").getTime());
-            cx.jQuery(".endDate").data('dateTime', cx.jQuery(".endDate").datetimepicker("getDate").getTime());
             if (elm.is(":checked")) {
-                // new initialization instead of show up once
-                cx.jQuery(".startDate").datepicker('setDate', new Date(cx.jQuery(".startDate").data('dateTime')));
-                cx.jQuery(".endDate").datepicker('setDate', new Date(cx.jQuery(".endDate").data('dateTime')));
+                // Timepicker should be shown atleast once before disable
+                // Instead of showing, initialization of datepicker will solve the issue
+                cx.jQuery(".startDate").datetimepicker('setDate', cx.jQuery( ".startDate" ).data('prevDate'));
+                cx.jQuery(".endDate").datetimepicker('setDate', cx.jQuery( ".endDate" ).data('prevDate'));
                 cx.jQuery(".startDate, .endDate").datetimepicker('disableTimepicker');
             } else {
                 cx.jQuery(".startDate, .endDate").datetimepicker('enableTimepicker');
             }
-            cx.jQuery(".startDate").datepicker('setDate', new Date(cx.jQuery(".startDate").data('dateTime')));
-            cx.jQuery(".endDate").datepicker('setDate', new Date(cx.jQuery(".endDate").data('dateTime')));
+            cx.jQuery(".startDate").datetimepicker('setDate', cx.jQuery( ".startDate" ).data('prevDate'));
+            cx.jQuery(".endDate").datetimepicker('setDate', cx.jQuery( ".endDate" ).data('prevDate'));
         },
         _isNumber: function(evt) {
             evt = (evt) ? evt : window.event;
@@ -159,25 +168,86 @@
         });
         showOrHidePlaceFields('{CALENDAR_LOCATION_TYPE}', 'place');
         showOrHidePlaceFields('{CALENDAR_EVENT_HOST_TYPE}', 'host');
+        cx.jQuery('.eventInputfieldDefault').each(function(){
+            var id = cx.jQuery(this).data('id');
+            var relatedFieldPrefix = 'event';
+            cx.jQuery(this).data('lastDefaultValue', cx.jQuery(this).val());
+
+            cx.jQuery(this).keyup(function(){
+                var that = cx.jQuery(this);
+                var id = cx.jQuery(this).data('id');
+
+                var relatedFieldPrefix = 'event';
+                cx.jQuery.each(activeLang, function(i, v) {
+                    if (   cx.jQuery('input[name="showIn[]"]:checked').length == 1
+                        || cx.jQuery('#'+ relatedFieldPrefix + '_' + id +'_'+ v).val() == that.data('lastDefaultValue')
+                    ) {
+                        cx.jQuery('#'+ relatedFieldPrefix + '_' + id +'_'+ v).val(that.val());
+                    }
+                });
+                cx.jQuery(this).data('lastDefaultValue', cx.jQuery(this).val());
+            });
+
+            cx.jQuery('#'+ relatedFieldPrefix + '_' + id +'_'+ defaultLang).keyup(function(){
+                var id = cx.jQuery(this).data('id');
+                var relatedFieldPrefix = 'event';
+                cx.jQuery('#'+ relatedFieldPrefix + '_' + id +'_0').val(cx.jQuery(this).val());
+                cx.jQuery('#'+ relatedFieldPrefix + '_' + id +'_0').data('lastDefaultValue', cx.jQuery(this).val());
+            });
+        });
     });
+
+    function ExpandMinimize(toggle){
+        var elm1 = document.getElementById('event_' + toggle + '_Minimized');
+        var elm2 = document.getElementById('event_' + toggle + '_Expanded');
+
+        elm1.style.display = (elm1.style.display=='none') ? 'block' : 'none';
+        elm2.style.display = (elm2.style.display=='none') ? 'block' : 'none';
+    }
 
     cx.ready(function() {
         var options = {
             dateFormat: '{CALENDAR_EVENT_DATE_FORMAT}',
             timeFormat: 'hh:mm',
-            onSelect: function(dateText, inst) {
-                startDateTime = cx.jQuery(".startDate").datetimepicker("getDate").getTime() / 1000;
-                endDateTime = cx.jQuery(".endDate").datetimepicker("getDate").getTime() / 1000;
+            showSecond: false,
+            onSelect: function(dateText, inst){
+                var startDate = cx.jQuery( ".startDate" ).datetimepicker("getDate");
+                var endDate   = cx.jQuery( ".endDate" ).datetimepicker("getDate");
 
-                if (startDateTime > endDateTime) {
-                    cx.jQuery(".endDate").datetimepicker('setDate', cx.jQuery(".startDate").val());
+                if ( cx.jQuery( this )[0].id == 'startDate' ) {
+                    var prevStartDate = cx.jQuery( ".startDate" ).data('prevDate');
+
+                    if (cx.jQuery(".all_day").is(':checked')) {
+                        prevStartDate.setHours(0, 0, 0);
+                        startDate.setHours(0, 0, 0);
+                        endDate.setHours(0, 0, 0);
+                    }
+
+                    if (prevStartDate.getTime() != startDate.getTime()) {
+                        var timeDiff = Math.abs(endDate.getTime() - prevStartDate.getTime());
+                        endDate = new Date(startDate.getTime() + timeDiff);
+                        cx.jQuery( ".endDate" ).datetimepicker('setDate', endDate);
+                    }
+
+                } else if (startDate.getTime() > endDate.getTime()) {
+                    endDate = new Date(startDate.getTime() + (30*60*1000));
+                    cx.jQuery(".endDate").datetimepicker('setDate', endDate);
                 }
-            },
-            showSecond: false
+
+                cx.jQuery( ".startDate" ).data('prevDate', cx.jQuery(".startDate").datetimepicker("getDate"));
+                cx.jQuery( ".endDate" ).data('prevDate', cx.jQuery(".endDate").datetimepicker("getDate"));
+                cx.jQuery( this ).datetimepicker('refresh');
+            }
         };
-        cx.jQuery('input[name=startDate]').datetimepicker(options);
-        cx.jQuery('input[name=endDate]').datetimepicker(options);
-        modifyEvent._handleAllDayEvent($J(".all_day"));
+        cx.jQuery('input[name=startDate]')
+            .datetimepicker(options)
+            .data('prevDate', cx.jQuery(".startDate").datetimepicker("getDate"));
+        cx.jQuery('input[name=endDate]')
+            .datetimepicker(options)
+            .data('prevDate', cx.jQuery(".endDate").datetimepicker("getDate"));
+        if ( $J(".all_day").is(':checked') ) {
+            modifyEvent._handleAllDayEvent($J(".all_day"));
+        }
         refreshDatePickers();
 
         blankException = $J( "#exceptionDateTemplate" ).html();
@@ -449,12 +519,15 @@
                     } else {
                         tab1body.style.display = 'none';
                     }
+                    cx.jQuery('.input_field_'+ langId).show();
                 } else {
                     tab1.style.display = 'none';
                     tab1body.style.display = 'none';
+                    cx.jQuery('.input_field_'+ langId).hide();
                 }
             }
         }
+        showOrHideExpandMinimize();
     }
 
     function langCount(reg)
@@ -630,6 +703,20 @@
         };
         cx.jQuery('.event_date').datepicker(options);
     }
+    function showOrHideExpandMinimize() {
+        if (cx.jQuery('input[name="showIn[]"]:checked').length > 1) {
+            cx.jQuery('.input_field_expand').show();
+        } else {
+            cx.jQuery('.event_expanded_block').each(function(){
+                if (cx.jQuery(this).is(':visible')) {
+                    cx.jQuery(this).closest('td').find('.event_minimized_block').show();
+                    cx.jQuery(this).hide();
+                }
+            });
+            cx.jQuery('.input_field_expand').hide();
+            cx.jQuery('.event_minimized_block').find('input').trigger('keyup');
+        }
+    }
 </script>      
 
 
@@ -783,8 +870,27 @@
             <!-- BEGIN eventPlaceInput -->            
             <tr class="row2 event_place_manual">
                 <td width="180" valign="top">{TXT_CALENDAR_EVENT_PLACE}</td>
-                <td>                        
-                    <input name="place" type="text" maxlength="255" value="{CALENDAR_EVENT_PLACE}" style="width: 250px" />                                                
+                <td>
+                    <div class="event_minimized_block" id="event_place_Minimized" style="display: block;">
+                        <input type="text" data-id="place" class="eventInputfieldDefault" name="event_place[0]" id="event_place_0" value="{CALENDAR_EVENT_PLACE_DEFAULT}" style="width: 250px">&nbsp;
+                        <!-- BEGIN calendar_event_place_expand -->
+                        <a class="input_field_expand" href="javascript:ExpandMinimize('place');">{TXT_CALENDAR_MORE}&nbsp;&raquo;</a>
+                        <!-- END calendar_event_place_expand -->
+                    </div>
+                    <div class="event_expanded_block" id="event_place_Expanded" style="display: none;">
+                        <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist_inner">
+                            <tr>
+                                <td width="325">
+                                    <!-- BEGIN calendar_event_place -->
+                                    <div class="input_field_{CALENDAR_EVENT_LANG_ID}">
+                                        <input type="text" data-id="place" name="event_place[{CALENDAR_EVENT_LANG_ID}]" id="event_place_{CALENDAR_EVENT_LANG_ID}" value="{CALENDAR_EVENT_VALUE}" style="width: 232px; margin-bottom: 2px; padding-left: 21px; background: #ffffff url('/core/Country/View/Media/Flag/flag_{CALENDAR_EVENT_LANG_SHORTCUT}.gif') no-repeat 3px 3px;">&nbsp;{TXT_CALENDAR_EVENT_LANG_NAME}&nbsp;<br>
+                                    </div>
+                                    <!-- END calendar_event_place -->
+                                </td>
+                                <td class="vertical_middle"><a class="input_field_minimize" href="javascript:ExpandMinimize('place');">&laquo;&nbsp;{TXT_CALENDAR_MINIMIZE}</a></td>
+                            </tr>
+                        </table>
+                    </div>
                 </td>
             </tr>            
             <tr class="row1 event_place_manual">
@@ -802,13 +908,51 @@
             <tr class="row1 event_place_manual">
                 <td valign="top">{TXT_CALENDAR_EVENT_CITY}</td>
                 <td>
-                    <input name="city" type="text" maxlength="255" value="{CALENDAR_EVENT_CITY}" style="width: 250px" />
+                    <div class="event_minimized_block" id="event_place_city_Minimized" style="display: block;">
+                        <input type="text" data-id="place_city" class="eventInputfieldDefault" name="event_place_city[0]" id="event_place_city_0" value="{CALENDAR_EVENT_PLACE_CITY_DEFAULT}" style="width: 250px">&nbsp;
+                        <!-- BEGIN calendar_event_place_city_expand -->
+                        <a class="input_field_expand" href="javascript:ExpandMinimize('place_city');">{TXT_CALENDAR_MORE}&nbsp;&raquo;</a>
+                        <!-- END calendar_event_place_city_expand -->
+                    </div>
+                    <div class="event_expanded_block" id="event_place_city_Expanded" style="display: none;">
+                        <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist_inner">
+                            <tr>
+                                <td width="325">
+                                    <!-- BEGIN calendar_event_place_city -->
+                                    <div class="input_field_{CALENDAR_EVENT_LANG_ID}">
+                                        <input type="text" data-id="place_city" name="event_place_city[{CALENDAR_EVENT_LANG_ID}]" id="event_place_city_{CALENDAR_EVENT_LANG_ID}" value="{CALENDAR_EVENT_VALUE}" style="width: 232px; margin-bottom: 2px; padding-left: 21px; background: #ffffff url('/core/Country/View/Media/Flag/flag_{CALENDAR_EVENT_LANG_SHORTCUT}.gif') no-repeat 3px 3px;">&nbsp;{TXT_CALENDAR_EVENT_LANG_NAME}&nbsp;<br>
+                                    </div>
+                                    <!-- END calendar_event_place_city -->
+                                </td>
+                                <td class="vertical_middle"><a class="input_field_minimize" href="javascript:ExpandMinimize('place_city');">&laquo;&nbsp;{TXT_CALENDAR_MINIMIZE}</a></td>
+                            </tr>
+                        </table>
+                    </div>
                 </td>
             </tr>
             <tr class="row2 event_place_manual">
                 <td valign="top">{TXT_CALENDAR_EVENT_COUNTRY}</td>
                 <td>
-                    <input name="country" type="text" maxlength="255" value="{CALENDAR_EVENT_COUNTRY}" style="width: 250px" />
+                    <div class="event_minimized_block" id="event_place_country_Minimized" style="display: block;">
+                        <input type="text" data-id="place_country" class="eventInputfieldDefault" name="event_place_country[0]" id="event_place_country_0" value="{CALENDAR_EVENT_PLACE_COUNTRY_DEFAULT}" style="width: 250px">&nbsp;
+                        <!-- BEGIN calendar_event_place_country_expand -->
+                        <a class="input_field_expand" href="javascript:ExpandMinimize('place_country');">{TXT_CALENDAR_MORE}&nbsp;&raquo;</a>
+                        <!-- END calendar_event_place_country_expand -->
+                    </div>
+                    <div class="event_expanded_block" id="event_place_country_Expanded" style="display: none;">
+                        <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist_inner">
+                            <tr>
+                                <td width="325">
+                                    <!-- BEGIN calendar_event_place_country -->
+                                    <div class="input_field_{CALENDAR_EVENT_LANG_ID}">
+                                        <input type="text" data-id="place_country" name="event_place_country[{CALENDAR_EVENT_LANG_ID}]" id="event_place_country_{CALENDAR_EVENT_LANG_ID}" value="{CALENDAR_EVENT_VALUE}" style="width: 232px; margin-bottom: 2px; padding-left: 21px; background: #ffffff url('/core/Country/View/Media/Flag/flag_{CALENDAR_EVENT_LANG_SHORTCUT}.gif') no-repeat 3px 3px;">&nbsp;{TXT_CALENDAR_EVENT_LANG_NAME}&nbsp;<br>
+                                    </div>
+                                    <!-- END calendar_event_place_country -->
+                                </td>
+                                <td class="vertical_middle"><a class="input_field_minimize" href="javascript:ExpandMinimize('place_country');">&laquo;&nbsp;{TXT_CALENDAR_MINIMIZE}</a></td>
+                            </tr>
+                        </table>
+                    </div>
                 </td>
             </tr>
             <tr class="row1 event_place_manual">
@@ -833,7 +977,7 @@
                 <td valign="top">{TXT_CALENDAR_EVENT_MAP}</td>
                 <td>
                     <input type="text" maxlength="255" name="placeMap" id="inputPlaceMap" style="width: 250px;" value="{CALENDAR_PLACE_MAP_SOURCE}" />&nbsp;{CALENDAR_PLACE_MAP_SOURCE_BROWSE_BUTTON}
-                    <!--<label><input name="map[{CALENDAR_EVENT_LANG_ID}]" value="1" type="checkbox" {CALENDAR_EVENT_MAP}/> {TXT_CALENDAR_EVENT_USE_GOOGLEMAPS}</label>-->
+                    <label><input name="google" value="1" type="checkbox" {CALENDAR_EVENT_MAP}/> {TXT_CALENDAR_EVENT_USE_GOOGLEMAPS}</label>
                 </td>
             </tr>                    
         <!-- END eventPlaceInput -->
@@ -863,7 +1007,26 @@
             <tr class="row1 event_host_manual">
                 <td width="180"  valign="top">{TXT_CALENDAR_EVENT_NAME}</td>
                 <td>
-                    <input name="organizerName" type="text" maxlength="255" value="{CALENDAR_EVENT_HOST}" style="width: 250px" />
+                    <div class="event_minimized_block" id="event_org_name_Minimized" style="display: block;">
+                        <input type="text" data-id="org_name" class="eventInputfieldDefault" name="event_org_name[0]" id="event_org_name_0" value="{CALENDAR_EVENT_ORG_NAME_DEFAULT}" style="width: 250px">&nbsp;
+                        <!-- BEGIN calendar_event_org_name_expand -->
+                        <a class="input_field_expand" href="javascript:ExpandMinimize('org_name');">{TXT_CALENDAR_MORE}&nbsp;&raquo;</a>
+                        <!-- END calendar_event_org_name_expand -->
+                    </div>
+                    <div class="event_expanded_block" id="event_org_name_Expanded" style="display: none;">
+                        <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist_inner">
+                            <tr>
+                                <td width="325">
+                                    <!-- BEGIN calendar_event_org_name -->
+                                    <div class="input_field_{CALENDAR_EVENT_LANG_ID}">
+                                        <input type="text" data-id="org_name" name="event_org_name[{CALENDAR_EVENT_LANG_ID}]" id="event_org_name_{CALENDAR_EVENT_LANG_ID}" value="{CALENDAR_EVENT_VALUE}" style="width: 232px; margin-bottom: 2px; padding-left: 21px; background: #ffffff url('/core/Country/View/Media/Flag/flag_{CALENDAR_EVENT_LANG_SHORTCUT}.gif') no-repeat 3px 3px;">&nbsp;{TXT_CALENDAR_EVENT_LANG_NAME}&nbsp;<br>
+                                    </div>
+                                    <!-- END calendar_event_org_name -->
+                                </td>
+                                <td class="vertical_middle"><a class="input_field_minimize" href="javascript:ExpandMinimize('org_name');">&laquo;&nbsp;{TXT_CALENDAR_MINIMIZE}</a></td>
+                            </tr>
+                        </table>
+                    </div>
                 </td>
             </tr>
             <tr class="row2 event_host_manual">
@@ -881,13 +1044,51 @@
             <tr class="row2 event_host_manual">
                 <td valign="top">{TXT_CALENDAR_EVENT_CITY}</td>
                 <td>
-                    <input name="organizerCity" type="text" maxlength="255" value="{CALENDAR_EVENT_HOST_CITY}" style="width: 250px" />
+                    <div class="event_minimized_block" id="event_org_city_Minimized" style="display: block;">
+                        <input type="text" data-id="org_city" class="eventInputfieldDefault" name="event_org_city[0]" id="event_org_city_0" value="{CALENDAR_EVENT_ORG_CITY_DEFAULT}" style="width: 250px">&nbsp;
+                        <!-- BEGIN calendar_event_org_city_expand -->
+                        <a class="input_field_expand" href="javascript:ExpandMinimize('org_city');">{TXT_CALENDAR_MORE}&nbsp;&raquo;</a>
+                        <!-- END calendar_event_org_city_expand -->
+                    </div>
+                    <div class="event_expanded_block" id="event_org_city_Expanded" style="display: none;">
+                        <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist_inner">
+                            <tr>
+                                <td width="325">
+                                    <!-- BEGIN calendar_event_org_city -->
+                                    <div class="input_field_{CALENDAR_EVENT_LANG_ID}">
+                                        <input type="text" data-id="org_city" name="event_org_city[{CALENDAR_EVENT_LANG_ID}]" id="event_org_city_{CALENDAR_EVENT_LANG_ID}" value="{CALENDAR_EVENT_VALUE}" style="width: 232px; margin-bottom: 2px; padding-left: 21px; background: #ffffff url('/core/Country/View/Media/Flag/flag_{CALENDAR_EVENT_LANG_SHORTCUT}.gif') no-repeat 3px 3px;">&nbsp;{TXT_CALENDAR_EVENT_LANG_NAME}&nbsp;<br>
+                                    </div>
+                                    <!-- END calendar_event_org_city -->
+                                </td>
+                                <td class="vertical_middle"><a class="input_field_minimize" href="javascript:ExpandMinimize('org_city');">&laquo;&nbsp;{TXT_CALENDAR_MINIMIZE}</a></td>
+                            </tr>
+                        </table>
+                    </div>
                 </td>
             </tr>
             <tr class="row2 event_host_manual">
                 <td valign="top">{TXT_CALENDAR_EVENT_COUNTRY}</td>
                 <td>
-                    <input name="organizerCountry" type="text" maxlength="255" value="{CALENDAR_EVENT_HOST_COUNTRY}" style="width: 250px" />
+                    <div class="event_minimized_block" id="event_org_country_Minimized" style="display: block;">
+                        <input type="text" data-id="org_country" class="eventInputfieldDefault" name="event_org_country[0]" id="event_org_country_0" value="{CALENDAR_EVENT_ORG_COUNTRY_DEFAULT}" style="width: 250px">&nbsp;
+                        <!-- BEGIN calendar_event_org_country_expand -->
+                        <a class="input_field_expand" href="javascript:ExpandMinimize('org_country');">{TXT_CALENDAR_MORE}&nbsp;&raquo;</a>
+                        <!-- END calendar_event_org_country_expand -->
+                    </div>
+                    <div class="event_expanded_block" id="event_org_country_Expanded" style="display: none;">
+                        <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist_inner">
+                            <tr>
+                                <td width="325">
+                                    <!-- BEGIN calendar_event_org_country -->
+                                    <div class="input_field_{CALENDAR_EVENT_LANG_ID}">
+                                        <input type="text" data-id="org_country" name="event_org_country[{CALENDAR_EVENT_LANG_ID}]" id="event_org_country_{CALENDAR_EVENT_LANG_ID}" value="{CALENDAR_EVENT_VALUE}" style="width: 232px; margin-bottom: 2px; padding-left: 21px; background: #ffffff url('/core/Country/View/Media/Flag/flag_{CALENDAR_EVENT_LANG_SHORTCUT}.gif') no-repeat 3px 3px;">&nbsp;{TXT_CALENDAR_EVENT_LANG_NAME}&nbsp;<br>
+                                    </div>
+                                    <!-- END calendar_event_org_country -->
+                                </td>
+                                <td class="vertical_middle"><a class="input_field_minimize" href="javascript:ExpandMinimize('org_country');">&laquo;&nbsp;{TXT_CALENDAR_MINIMIZE}</a></td>
+                            </tr>
+                        </table>
+                    </div>
                 </td>
             </tr>
             <tr class="row1 event_host_manual">

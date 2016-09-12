@@ -147,6 +147,10 @@ class LinkSanitizer {
                     }
                     $ret = \Cx\Core\Routing\Url::fromModuleAndCmd($params['section'], $cmd);
                     unset($params['section']);
+                    $ret->setParams($params);
+                    return $matches[\LinkSanitizer::ATTRIBUTE_AND_OPEN_QUOTE] .
+                    $ret .
+                    $matches[\LinkSanitizer::CLOSE_QUOTE];
                 
                 // backend case
                 } else if (isset($params['cmd'])) {
@@ -171,17 +175,14 @@ class LinkSanitizer {
             $ret .
             $matches[\LinkSanitizer::CLOSE_QUOTE];
         } else if (
-            $this->cx->getClassLoader()->getWebFilePath(
+            $localFile = $this->cx->getClassLoader()->getWebFilePath(
                 $this->cx->getCodeBaseDocumentRootPath() . '/' .
                 $matches[\LinkSanitizer::FILE_PATH]
             )
         ) {
             // this is an existing file, do not add virtual language dir
             return $matches[\LinkSanitizer::ATTRIBUTE_AND_OPEN_QUOTE] .
-            $this->cx->getClassLoader()->getWebFilePath(
-                $this->cx->getCodeBaseDocumentRootPath() . '/' .
-                $matches[\LinkSanitizer::FILE_PATH]
-            ) .
+            $localFile .
             $matches[\LinkSanitizer::CLOSE_QUOTE];
         } else {
             // this is a link to a page, add virtual language dir

@@ -337,12 +337,12 @@ class CalendarEvent extends CalendarLibrary
     public $availableLang;
     
     /**
-     * Event map status
+     * Event google status
      *
      * @access public
      * @var integer 
      */
-    public $map;
+    public $google;
     
     /**
      * Event invited group
@@ -782,29 +782,28 @@ class CalendarEvent extends CalendarLibrary
                          event.series_pattern_exceptions AS series_pattern_exceptions,
                          event.all_day,
                          event.location_type AS location_type,
-                         event.place AS place, 
+                         field.place AS place,
                          event.place_street AS place_street, 
                          event.place_zip AS place_zip, 
-                         event.place_city AS place_city, 
-                         event.place_country AS place_country, 
+                         field.place_city AS place_city,
+                         field.place_country AS place_country,
                          event.place_website AS place_website, 
                          event.place_link AS place_link, 
                          event.place_phone AS place_phone, 
                          event.place_map AS place_map, 
                          event.host_type AS host_type,
-                         event.org_name AS org_name, 
+                         field.org_name AS org_name,
                          event.org_street AS org_street, 
                          event.org_zip AS org_zip, 
-                         event.org_city AS org_city, 
-                         event.org_country AS org_country, 
+                         field.org_city AS org_city,
+                         field.org_country AS org_country,
                          event.org_website AS org_website, 
                          event.org_link AS org_link, 
                          event.org_phone AS org_phone, 
                          event.org_email AS org_email, 
                          field.title AS title,
                          field.teaser AS teaser,
-                         field.description AS description,
-                         event.place AS place
+                         field.description AS description
                     FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_event AS event,
                          ".DBPREFIX."module_".$this->moduleTablePrefix."_event_field AS field
                    WHERE event.id = '".intval($eventId)."'  
@@ -891,7 +890,7 @@ class CalendarEvent extends CalendarLibrary
                 $this->status = intval($objResult->fields['status']);
                 $this->showDetailView = intval($objResult->fields['show_detail_view']);
                 $this->catId = intval($objResult->fields['catid']);
-                $this->map = intval($objResult->fields['google']);
+                $this->google = intval($objResult->fields['google']);
                 $this->seriesStatus = intval($objResult->fields['series_status']);
                 $this->independentSeries = intval($objResult->fields['independent_series']);
                      
@@ -964,7 +963,13 @@ class CalendarEvent extends CalendarLibrary
             $query = "SELECT field.title AS title,
                              field.teaser AS teaser,
                              field.description AS description,
-                             field.redirect AS redirect                                 
+                             field.redirect AS redirect,
+                             field.place AS place,
+                             field.place_city AS place_city,
+                             field.place_country AS place_country,
+                             field.org_name AS org_name,
+                             field.org_city AS org_city,
+                             field.org_country AS org_country
                         FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_event_field AS field
                        WHERE field.event_id = '".intval($this->id)."'
                          AND field.lang_id = '".intval($langId)."'
@@ -978,6 +983,12 @@ class CalendarEvent extends CalendarLibrary
                         $this->arrData['teaser'][$langId] = htmlentities(stripslashes($objResult->fields['teaser']), ENT_QUOTES, CONTREXX_CHARSET);                        
                         $this->arrData['description'][$langId] = stripslashes($objResult->fields['description']);
                         $this->arrData['redirect'][$langId] = htmlentities(stripslashes($objResult->fields['redirect']), ENT_QUOTES, CONTREXX_CHARSET);                         
+                        $this->arrData['place'][$langId] = contrexx_raw2xhtml($objResult->fields['place']);
+                        $this->arrData['place_city'][$langId] = contrexx_raw2xhtml($objResult->fields['place_city']);
+                        $this->arrData['place_country'][$langId] = contrexx_raw2xhtml($objResult->fields['place_country']);
+                        $this->arrData['org_name'][$langId] = contrexx_raw2xhtml($objResult->fields['org_name']);
+                        $this->arrData['org_city'][$langId] = contrexx_raw2xhtml($objResult->fields['org_city']);
+                        $this->arrData['org_country'][$langId] = contrexx_raw2xhtml($objResult->fields['org_country']);
                         $objResult->MoveNext();
                 }
             }
@@ -1024,7 +1035,7 @@ class CalendarEvent extends CalendarLibrary
         $startDate = $this->getDbDateTimeFromIntern($this->getDateTime($startDate, intval($startHour), intval($startMin)))->format('Y-m-d H:i:s');
         $endDate   = $this->getDbDateTimeFromIntern($this->getDateTime($endDate, intval($endHour), intval($endMin)))->format('Y-m-d H:i:s');
 
-        $google        = isset($data['map'][$_LANGID]) ? intval($data['map'][$_LANGID]) : 0;
+        $google        = isset($data['google']) ? intval($data['google']) : 0;
         $allDay        = isset($data['all_day']) ? 1 : 0;
         $convertBBCode = ($objInit->mode == 'frontend' && empty($id));
         $showDetailView= isset($data['show-detail-view']) ? 1 : 0;
@@ -1085,6 +1096,38 @@ class CalendarEvent extends CalendarLibrary
                 $showTimeTypeDetail  = 0;
             }
         }
+
+        //backward compatibility, multilingual fields might be empty
+        if (empty($data['event_place'])) {
+            $data['event_place'] = array(
+                isset($data['place']) ? $data['place'] : ''
+            );
+        }
+        if (empty($data['event_place_city'])) {
+            $data['event_place_city'] = array(
+                isset($data['city']) ? $data['city'] : ''
+            );
+        }
+        if (empty($data['event_place_country'])) {
+            $data['event_place_country'] = array(
+                isset($data['country']) ? $data['country'] : ''
+            );
+        }
+        if (empty($data['event_org_name'])) {
+            $data['event_org_name'] = array(
+                isset($data['organizerName']) ? $data['organizerName'] : ''
+            );
+        }
+        if (empty($data['event_org_city'])) {
+            $data['event_org_city'] = array(
+                isset($data['organizerCity']) ? $data['organizerCity'] : ''
+            );
+        }
+        if (empty($data['event_org_country'])) {
+            $data['event_org_country'] = array(
+                isset($data['organizerCountry']) ? $data['organizerCountry'] : ''
+            );
+        }
                 
         $access                    = isset($data['access']) ? intval($data['access']) : 0;
         $priority                  = isset($data['priority']) ? intval($data['priority']) : 0;
@@ -1113,11 +1156,8 @@ class CalendarEvent extends CalendarLibrary
         $related_hosts             = isset($data['selectedHosts']) ? $data['selectedHosts'] : '';        
         $locationType              = isset($data['eventLocationType']) ? (int) $data['eventLocationType'] : $this->arrSettings['placeData'];
         $hostType                  = isset($data['eventHostType']) ? (int) $data['eventHostType'] : $this->arrSettings['placeDataHost'];
-        $place                     = isset($data['place']) ? contrexx_input2db(contrexx_strip_tags($data['place'])) : '';
         $street                    = isset($data['street']) ? contrexx_input2db(contrexx_strip_tags($data['street'])) : '';
         $zip                       = isset($data['zip']) ? contrexx_input2db(contrexx_strip_tags($data['zip'])) : '';
-        $city                      = isset($data['city']) ? contrexx_input2db(contrexx_strip_tags($data['city'])) : '';
-        $country                   = isset($data['country']) ? contrexx_input2db(contrexx_strip_tags($data['country'])) : '';
         $placeWebsite              = isset($data['placeWebsite']) ? contrexx_input2db($data['placeWebsite']) : '';
         $placeLink                 = isset($data['placeLink']) ? contrexx_input2db($data['placeLink']) : '';
         $placePhone                = isset($data['placePhone']) ? contrexx_input2db($data['placePhone']) : '';
@@ -1148,11 +1188,8 @@ class CalendarEvent extends CalendarLibrary
             }
         }
 
-        $orgName   = isset($data['organizerName']) ? contrexx_input2db($data['organizerName']) : '';
         $orgStreet = isset($data['organizerStreet']) ? contrexx_input2db($data['organizerStreet']) : '';
         $orgZip    = isset($data['organizerZip']) ? contrexx_input2db($data['organizerZip']) : '';
-        $orgCity   = isset($data['organizerCity']) ? contrexx_input2db($data['organizerCity']) : '';
-        $orgCountry= isset($data['organizerCountry']) ? contrexx_input2db($data['organizerCountry']) : '';
         $orgWebsite= isset($data['organizerWebsite']) ? contrexx_input2db($data['organizerWebsite']) : '';
         $orgLink   = isset($data['organizerLink']) ? contrexx_input2db($data['organizerLink']) : '';
         $orgPhone  = isset($data['organizerPhone']) ? contrexx_input2db($data['organizerPhone']) : '';
@@ -1381,21 +1418,15 @@ class CalendarEvent extends CalendarLibrary
             'all_day'                       => $allDay,
             'location_type'                 => $locationType,
             'host_type'                     => $hostType,
-            'place'                         => $place,
             'place_id'                      => 0,
             'place_street'                  => $street,
             'place_zip'                     => $zip,
-            'place_city'                    => $city,
-            'place_country'                 => $country,
             'place_website'                 => $placeWebsite,
             'place_link'                    => $placeLink,
             'place_phone'                   => $placePhone,
             'place_map'                     => $placeMap,
-            'org_name'                      => $orgName,
             'org_street'                    => $orgStreet,
             'org_zip'                       => $orgZip,
-            'org_city'                      => $orgCity,
-            'org_country'                   => $orgCountry,
             'org_website'                   => $orgWebsite,
             'org_link'                      => $orgLink,
             'org_phone'                     => $orgPhone,
@@ -1467,11 +1498,53 @@ class CalendarEvent extends CalendarLibrary
                 } else {
                     $description = '';
                 }
+                if (!empty($data['event_place'][$langId])) {
+                    $place = contrexx_input2db($data['event_place'][$langId]);
+                } else {
+                    $place = contrexx_input2db($data['event_place'][0]);
+                }
+                if (!empty($data['event_place_city'][$langId])) {
+                    $placeCity = contrexx_input2db($data['event_place_city'][$langId]);
+                } else {
+                    $placeCity = contrexx_input2db($data['event_place_city'][0]);
+                }
+                if (!empty($data['event_place_country'][$langId])) {
+                    $placeCountry = contrexx_input2db($data['event_place_country'][$langId]);
+                } else {
+                    $placeCountry = contrexx_input2db($data['event_place_country'][0]);
+                }
+                if (!empty($data['event_org_name'][$langId])) {
+                    $orgName = contrexx_input2db($data['event_org_name'][$langId]);
+                } else {
+                    $orgName = contrexx_input2db($data['event_org_name'][0]);
+                }
+                if (!empty($data['event_org_city'][$langId])) {
+                    $orgCity = contrexx_input2db($data['event_org_city'][$langId]);
+                } else {
+                    $orgCity = contrexx_input2db($data['event_org_city'][0]);
+                }
+                if (!empty($data['event_org_country'][$langId])) {
+                    $orgCountry = contrexx_input2db($data['event_org_country'][$langId]);
+                } else {
+                    $orgCountry = contrexx_input2db($data['event_org_country'][0]);
+                }
 
-                $query = "INSERT INTO ".DBPREFIX."module_".$this->moduleTablePrefix."_event_field
-                            (`event_id`,`lang_id`,`title`, `teaser`, `description`,`redirect`)
-                          VALUES
-                            ('".intval($id)."','".intval($langId)."','".$title."','".$teaser."','".$description."','".$redirect."')";
+                $query = 'INSERT INTO
+                            `' . DBPREFIX . 'module_' . $this->moduleTablePrefix . '_event_field`
+                          SET
+                            `event_id`      = ' . contrexx_input2int($id) . ',
+                            `lang_id`       = ' . contrexx_input2int($langId) . ',
+                            `title`         = "' . $title . '",
+                            `teaser`        = "' . $teaser . '",
+                            `description`   = "' . $description . '",
+                            `redirect`      = "' . $redirect . '",
+                            `place`         = "' . $place . '",
+                            `place_city`    = "' . $placeCity . '",
+                            `place_country` = "' . $placeCountry . '",
+                            `org_name`      = "' . $orgName . '",
+                            `org_city`      = "' . $orgCity . '",
+                            `org_country`   = "' . $orgCountry . '"
+                ';
 
                 $objResult = $objDatabase->Execute($query); 
 
@@ -1491,11 +1564,13 @@ class CalendarEvent extends CalendarLibrary
             }
         }   
             
-        if($send_invitation == 1) {    
-             $objMailManager = new \Cx\Modules\Calendar\Controller\CalendarMailManager();    
-             foreach ($invitationTemplate as $templateId) {
-                 $objMailManager->sendMail(intval($id), \Cx\Modules\Calendar\Controller\CalendarMailManager::MAIL_INVITATION, null, $templateId);
-             }
+        if ($send_invitation == 1) {
+            // TO-DO set form data into $this
+            $event          = new CalendarEvent($this->id);
+            $objMailManager = new \Cx\Modules\Calendar\Controller\CalendarMailManager();
+            foreach ($invitationTemplate as $templateId) {
+                $objMailManager->sendMail($event, \Cx\Modules\Calendar\Controller\CalendarMailManager::MAIL_INVITATION, null, $templateId);
+            }
         }
         
         return true;
@@ -1873,7 +1948,7 @@ class CalendarEvent extends CalendarLibrary
                          field.`title` AS `title`,
                          field.`teaser` AS `teaser`,
                          field.`description` AS content,
-                         event.`place` AS place,
+                         field.`place` AS place,
                          MATCH (field.`title`, field.`teaser`, field.`description`) AGAINST ('%$term%') AS `score`
                     FROM ".DBPREFIX."module_calendar_event AS event,
                          ".DBPREFIX."module_calendar_event_field AS field
@@ -1882,7 +1957,7 @@ class CalendarEvent extends CalendarLibrary
                        AND (   field.title LIKE ('%$term%')
                             OR field.teaser LIKE ('%$term%')
                             OR field.description LIKE ('%$term%')
-                            OR event.place LIKE ('%$term%')
+                            OR field.place LIKE ('%$term%')
                            )";
         
         return $query;

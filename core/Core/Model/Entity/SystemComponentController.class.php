@@ -131,7 +131,7 @@ class SystemComponentController extends Controller {
     protected function getControllerClassName($controllerClassShort) {
         $class = $controllerClassShort;
         if (strpos('\\', $class) != 1) {
-            if (!$this->cx->getClassLoader()->getFilePath($this->getDirectory().'/Controller/'.$class.'Controller.class.php')) {
+            if (!$this->cx->getClassLoader()->getFilePath($this->getDirectory(false).'/Controller/'.$class.'Controller.class.php')) {
                 $class = '\\Cx\\Core\\Core\\Model\\Entity\\SystemComponent' . $class . 'Controller';
             } else {
                 $class = $this->getNamespace() . '\\Controller\\' . $class . 'Controller';

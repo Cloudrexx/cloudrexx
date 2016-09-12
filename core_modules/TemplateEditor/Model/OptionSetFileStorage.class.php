@@ -65,28 +65,33 @@ class OptionSetFileStorage implements Storable
      */
     public function retrieve($name)
     {
-        $file = file_get_contents(
-            \Cx\Core\Core\Controller\Cx::instanciate()->getClassLoader()
-                ->getFilePath(
-                    $this->path
-                    . '/' . $name . '/options/options.yml'
-                )
+        $file = \Cx\Core\Core\Controller\Cx::instanciate()->getClassLoader()->getFilePath(
+            $this->path
+            . '/' . $name . '/options/options.yml'
         );
-        if ($file) {
-            try {
-                $yaml = new Parser();
-                return $yaml->parse($file);
-            } catch (ParserException $e) {
-                preg_match(
-                    "/line (?P<line>[0-9]+)/", $e->getMessage(), $matches
-                );
-                throw new ParserException($e->getMessage(), $matches['line']);
-            }
-        } else {
+        if (!$file) {
             throw new ParserException(
                 "File" . $this->path
                 . '/' . $name . '/options/options.yml not found'
             );
+        }
+
+        $content = file_get_contents($file);
+        if (!$content) {
+            throw new ParserException(
+                "File" . $this->path
+                . '/' . $name . '/options/options.yml not found'
+            );
+        }
+
+        try {
+            $yaml = new Parser();
+            return $yaml->parse($content);
+        } catch (ParserException $e) {
+            preg_match(
+                "/line (?P<line>[0-9]+)/", $e->getMessage(), $matches
+            );
+            throw new ParserException($e->getMessage(), $matches['line']);
         }
     }
 
