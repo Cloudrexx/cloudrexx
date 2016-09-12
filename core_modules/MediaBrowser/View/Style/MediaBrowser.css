@@ -436,7 +436,6 @@ input[type="date"].input-lg, input[type="date"].input-lg, input[type="time"].inp
 .radio, .checkbox {
     position: relative;
     display: block;
-    min-height: 20px;
     margin-top: 10px;
     margin-bottom: 10px;
 }

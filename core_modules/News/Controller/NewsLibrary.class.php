@@ -1219,7 +1219,7 @@ class NewsLibrary
         return array($image, $imageLink, $source);
     }
 
-    protected static function parseLink($href, $title, $innerHtml, $target)
+    protected static function parseLink($href, $title, $innerHtml, $target=null)
     {
         if (empty($href)) return '';
 

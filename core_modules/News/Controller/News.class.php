@@ -352,7 +352,7 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                 $this->_objTpl->parse('news_text');
             }
             if ($this->_objTpl->blockExists('news_redirect')) {
-                $this->_objTpl->parse('news_redirect');
+                $this->_objTpl->hideBlock('news_redirect');
             }
         } else {
             if (\FWValidator::isUri($redirect)) {
@@ -705,8 +705,13 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                                     : \Cx\Core\Routing\Url::fromModuleAndCmd('News', $this->findCmdById('details', array_keys($newsCategories)), FRONTEND_LANG_ID, array('newsid' => $newsid)))
                                 : $objResult->fields['redirect'];
 
-            $htmlLink       = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml('['.$_ARRAYLANG['TXT_NEWS_MORE'].'...]'));
-            $htmlLinkTitle  = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml($newstitle));
+            $redirectNewWindow = 0;
+            if (!empty($objResult->fields['redirect']) && !empty($objResult->fields['redirectNewWindow'])) {
+                $redirectNewWindow = $objResult->fields['redirectNewWindow'];
+            }
+            $htmlLink = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml('['.$_ARRAYLANG['TXT_NEWS_MORE'].'...]'), $redirectNewWindow);
+            $htmlLinkTitle = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml($newstitle), $redirectNewWindow);
+            $linkTarget = $redirectNewWindow == 0 ? '_self' : '_blank';
             // in case that the message is a stub, we shall just display the news title instead of a html-a-tag with no href target
             if (empty($htmlLinkTitle)) {
                 $htmlLinkTitle = contrexx_raw2xhtml($newstitle);
@@ -729,6 +734,7 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                'NEWS_'.$placeholderPrefix.'_RELATED_MESSAGE_TIME'          => date(ASCMS_DATE_FORMAT_TIME, $objResult->fields['newsdate']),
                'NEWS_'.$placeholderPrefix.'_RELATED_MESSAGE_LINK_TITLE'    => $htmlLinkTitle,
                'NEWS_'.$placeholderPrefix.'_RELATED_MESSAGE_LINK'          => $htmlLink,
+               'NEWS_'.$placeholderPrefix.'_RELATED_MESSAGE_LINK_TARGET'   => $linkTarget,
                'NEWS_'.$placeholderPrefix.'_RELATED_MESSAGE_LINK_URL'      => contrexx_raw2xhtml($newsUrl),
                'NEWS_'.$placeholderPrefix.'_RELATED_MESSAGE_CATEGORY'      => contrexx_raw2xhtml(implode(', ', $newsCategories)),
 // TODO: fetch typename through a newly to be created separate methode
@@ -1006,7 +1012,10 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                                     )
                                     : $objResult->fields['redirect'];
 
-                $redirectNewWindow = empty($objResult->fields['redirect']) && empty($objResult->fields['redirectNewWindow']) ? 0 : $objResult->fields['redirectNewWindow'];
+                $redirectNewWindow = 0;
+                if (!empty($objResult->fields['redirect']) && !empty($objResult->fields['redirectNewWindow'])) {
+                    $redirectNewWindow = $objResult->fields['redirectNewWindow'];
+                }
                 $htmlLink = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml('[' . $_ARRAYLANG['TXT_NEWS_MORE'] . '...]'), $redirectNewWindow);
                 $htmlLinkTitle = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml($newstitle), $redirectNewWindow);
                 $linkTarget = $redirectNewWindow == 0 ? '_self' : '_blank';
@@ -1263,7 +1272,10 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                                         : \Cx\Core\Routing\Url::fromModuleAndCmd('News', $this->findCmdById('details', array_keys($newsCategories)), FRONTEND_LANG_ID, array('newsid' => $newsid)))
                                     : $objResult->fields['redirect'];
 
-                $redirectNewWindow = empty($objResult->fields['redirect']) && empty($objResult->fields['redirectNewWindow']) ? 0 : $objResult->fields['redirectNewWindow'];
+                $redirectNewWindow = 0;
+                if (!empty($objResult->fields['redirect']) && !empty($objResult->fields['redirectNewWindow'])) {
+                    $redirectNewWindow = $objResult->fields['redirectNewWindow'];
+                }
                 $htmlLink = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml('[' . $_ARRAYLANG['TXT_NEWS_MORE'] . '...]'), $redirectNewWindow);
                 $htmlLinkTitle = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml($newstitle), $redirectNewWindow);
                 $linkTarget = $redirectNewWindow == 0 ? '_self' : '_blank';
@@ -1597,7 +1609,9 @@ JSCODE;
         $data['newsTags'] = !empty($_POST['newsTags'])
             ? contrexx_input2raw($_POST['newsTags'])
             : array();
-        $data['redirectNewWindow'] = !empty(contrexx_input2raw($_POST['redirect_new_window'])) ? contrexx_input2raw($_POST['redirect_new_window']) : $data['redirectNewWindow'];
+        if (!empty(contrexx_input2raw($_POST['redirect_new_window']))) {
+            $data['redirectNewWindow'] = contrexx_input2raw($_POST['redirect_new_window']);
+        }
 
         return array(true, $data);
     }
