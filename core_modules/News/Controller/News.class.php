@@ -352,9 +352,7 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
             if ($this->_objTpl->blockExists('news_text')) {
                 $this->_objTpl->parse('news_text');
             }
-            if ($this->_objTpl->blockExists('news_redirect') && $newWindow) {
-                $this->_objTpl->parse('news_redirect');
-            } else {
+            if ($this->_objTpl->blockExists('news_redirect')) {
                 $this->_objTpl->hideBlock('news_redirect');
             }
         } else {
