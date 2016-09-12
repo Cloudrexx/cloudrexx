@@ -200,7 +200,7 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
             exit;
         }
 
-        $newsCommentActive  = $objResult->fields['commentactive'];
+        $newsCommentActive  = $objResult->fields['commentactive'];        
         $lastUpdate         = $objResult->fields['changelog'];
         $text               = $objResult->fields['text'];
         $redirect           = contrexx_raw2xhtml($objResult->fields['redirect']);

@@ -152,7 +152,7 @@ class NewsLibrary
         $html = '';
         if (!empty($monthlyStats)) {
             $newsArchiveLink = \Cx\Core\Routing\Url::fromModuleAndCmd('News', 'archive');
-
+            
             $html  = '<ul class="news_archive">';
             foreach ($monthlyStats as $key => $value) {
                 $redirectNewWindow = empty($value['redirect']) && empty($value['redirectNewWindow']) ? 0 : $value['redirectNewWindow'];
