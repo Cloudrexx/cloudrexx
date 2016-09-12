@@ -1116,7 +1116,7 @@ class NewsManager extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                 'TXT_LANGUAGE'              => $_ARRAYLANG['TXT_LANGUAGE'],
                 'EDIT_LANGUAGES_1'          => $arrActiveLang[0],
                 'EDIT_LANGUAGES_2'          => $arrActiveLang[1],
-                'EDIT_LANGUAGES_3'          => $arrActiveLang[2]
+                'EDIT_LANGUAGES_3'          => $arrActiveLang[2]                
             ));
         }
 
