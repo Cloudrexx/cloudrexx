@@ -2234,12 +2234,7 @@ RSS2JSCODE;
 
                     $redirectNewWindow = !empty($news['redirect']) && !empty($news['redirectNewWindow']);
                     $htmlLink = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml('[' . $_ARRAYLANG['TXT_NEWS_MORE'] . '...]'), $redirectNewWindow);
-                    $htmlLinkTitle = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml($newstitle), $redirectNewWindow);
                     $linkTarget = $redirectNewWindow ? '_blank' : '_self';
-                    // in case that the message is a stub, we shall just display the news title instead of a html-a-tag with no href target
-                    if (empty($htmlLinkTitle)) {
-                        $htmlLinkTitle = contrexx_raw2xhtml($newstitle);
-                    }
 
                     list($image, $htmlLinkImage, $imageSource) = self::parseImageThumbnail($news['teaser_image_path'],
                                                                                            $news['teaser_image_thumbnail_path'],
@@ -2257,7 +2252,7 @@ RSS2JSCODE;
                        'NEWS_ARCHIVE_LONG_DATE'     => date(ASCMS_DATE_FORMAT,$news['date']),
                        'NEWS_ARCHIVE_DATE'          => date(ASCMS_DATE_FORMAT_DATE, $news['date']),
                        'NEWS_ARCHIVE_TIME'          => date(ASCMS_DATE_FORMAT_TIME, $news['date']),
-                       'NEWS_ARCHIVE_LINK_TITLE'    => $htmlLinkTitle,
+                       'NEWS_ARCHIVE_LINK_TITLE'    => contrexx_raw2xhtml($newstitle),
                        'NEWS_ARCHIVE_LINK'          => $htmlLink,
                        'NEWS_ARCHIVE_LINK_TARGET'   => $linkTarget,
                        'NEWS_ARCHIVE_LINK_URL'      => contrexx_raw2xhtml($newsUrl),
