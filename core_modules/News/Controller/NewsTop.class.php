@@ -145,13 +145,10 @@ class NewsTop extends \Cx\Core_Modules\News\Controller\NewsLibrary
                                 ? \Cx\Core\Routing\Url::fromModuleAndCmd('News', $this->findCmdById('details', self::sortCategoryIdByPriorityId(array_keys($newsCategories), array($catId))), FRONTEND_LANG_ID, array('newsid' => $newsid))
                                 : $objResult->fields['redirect'];
 
-                $redirectNewWindow = 0;
-                if (!empty($objResult->fields['redirect']) && !empty($objResult->fields['redirectNewWindow'])) {
-                    $redirectNewWindow = $objResult->fields['redirectNewWindow'];
-                }
+                $redirectNewWindow = !empty($objResult->fields['redirect']) && !empty($objResult->fields['redirectNewWindow']);
                 $htmlLink = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml($newstitle), $redirectNewWindow);
                 $htmlLinkTitle = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml($newstitle), $redirectNewWindow);
-                $linkTarget = $redirectNewWindow == 0 ? '_self' : '_blank';
+                $linkTarget = $redirectNewWindow ? '_blank' : '_self';
                 // in case that the message is a stub, we shall just display the news title instead of a html-a-tag with no href target
                 if (empty($htmlLinkTitle)) {
                     $htmlLinkTitle = contrexx_raw2xhtml($newstitle);

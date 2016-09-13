@@ -155,8 +155,8 @@ class NewsLibrary
             
             $html  = '<ul class="news_archive">';
             foreach ($monthlyStats as $key => $value) {
-                $redirectNewWindow = empty($value['redirect']) && empty($value['redirectNewWindow']) ? 0 : $value['redirectNewWindow'];
-                $linkTarget = $redirectNewWindow == 0 ? '_self' : '_blank';
+                $redirectNewWindow = !empty($value['redirect']) && !empty($value['redirectNewWindow']);
+                $linkTarget = $redirectNewWindow ? '_blank' : '_self';
                 $html .= '<li><a href="' . $newsArchiveLink . '#' . $key . '" title="' . $value['name'] . '" target="' . $linkTarget . '">' . $value['name'] . '</a></li>';
             }
             $html .= '</ul>';
@@ -2009,10 +2009,10 @@ class NewsLibrary
                     : $currentRelatedDetails['redirect'];
 
                 $newstitle = $currentRelatedDetails['title'];
-                $redirectNewWindow = empty($currentRelatedDetails['redirect']) && empty($currentRelatedDetails['redirectNewWindow']) ? 0 : $currentRelatedDetails['redirectNewWindow'];
+                $redirectNewWindow = !empty($currentRelatedDetails['redirect']) && !empty($currentRelatedDetails['redirectNewWindow']);
                 $htmlLink = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml('[' . $_ARRAYLANG['TXT_NEWS_MORE'] . '...]'), $redirectNewWindow);
                 $htmlLinkTitle = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml($newstitle), $redirectNewWindow);
-                $linkTarget = $redirectNewWindow == 0 ? '_self' : '_blank';
+                $linkTarget = $redirectNewWindow ? '_blank' : '_self';
                 // in case that the message is a stub,
                 // we shall just display the news title instead of a html-a-tag
                 // with no href target
