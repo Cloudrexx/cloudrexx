@@ -30,8 +30,9 @@
  * @author      Cloudrexx Development Team <info@cloudrexx.com>
  * @access      public
  * @package     cloudrexx
- * @subpackage  coremodule_filebrowser
+ * @subpackage  coremodule_mediabrowser
  */
+global $_ARRAYLANG;
 $_ARRAYLANG['TXT_CLOSE'] = "Fermer";
 $_ARRAYLANG['TXT_FILEBROWSER_MEDIA_1'] = "Dossier #1";
 $_ARRAYLANG['TXT_FILEBROWSER_MEDIA_2'] = "Dossier #2";
@@ -53,3 +54,9 @@ $_ARRAYLANG['TXT_FILEBROWSER_UPLOAD_FILE_MULTI'] = "Envoyer fichier(s)";
 $_ARRAYLANG['TXT_FILEBROWSER_MEDIADIR'] = "Dossiers";
 $_ARRAYLANG['TXT_FILEBROWSER_DOWNLOADS'] = "Gestion des ressources numériques";
 $_ARRAYLANG['TXT_FILEBROWSER_START_FILE_UPLOADER'] = "or start File Uploader...";
+// TODO: Translate:
+$_ARRAYLANG['TXT_FILEBROWSER_SEARCHTERM_PLACEHOLDER'] = 'Suchen...';
+$_ARRAYLANG['TXT_FILEBROWSER_LEXICON'] = 'Lexikon';
+$_ARRAYLANG['TXT_FILEBROWSER_LEXICON_ENTRY_NAME'] = 'Eintrag';
+$_ARRAYLANG['TXT_FILEBROWSER_LEXICON_ENTRIES_NONE'] = 'Kein Eintrag vorhanden';
+$_ARRAYLANG['TXT_FILEBROWSER_LEXICON_ENTRY_ACCEPT'] = 'Eintrag wählen';

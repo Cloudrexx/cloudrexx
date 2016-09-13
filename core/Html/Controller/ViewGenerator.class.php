@@ -104,7 +104,18 @@ class ViewGenerator {
             }
             // If the options for this object are not set, we use the standard values from the component
             if (empty($this->options)) {
-                $this->options = $options[''];
+// Fixed
+//                $this->options = $options[''];
+                $this->options = array(
+                    'functions' => array(
+                        'add' => true,
+                        'edit' => true,
+                        'delete' => true,
+                        'sorting' => true,
+                        'paging' => true,
+                        'filtering' => false,
+                    ),
+                );
             }
             
             //initialize the row sorting functionality
@@ -566,11 +577,12 @@ class ViewGenerator {
                 $tpl->loadTemplateFile('NoEntries.html');
                 return $tpl->get().$addBtn;
             }
-            $listingController = new \Cx\Core_Modules\Listing\Controller\ListingController($renderObject, array(), $this->options['functions']);
+            $listingController =
+                new \Cx\Core_Modules\Listing\Controller\ListingController(
+                    $renderObject, array(), $this->options['functions']);
             $renderObject = $listingController->getData();
             $this->options['functions']['vg_increment_number'] = $this->viewId;
             $backendTable = new \BackendTable($renderObject, $this->options) . '<br />' . $listingController;
-
             return $backendTable.$addBtn;
         }
 
@@ -963,7 +975,7 @@ class ViewGenerator {
             if (!empty($entityObj)) {
                 if ($entityObj instanceof \Cx\Core\Model\Model\Entity\YamlEntity) {
                     $ymlRepo = $em->getRepository($entityWithNS);
-                    $ymlRepo->remove($entityObj);;
+                    $ymlRepo->remove($entityObj);
                     $ymlRepo->flush();
                 } else {
                     $em->remove($entityObj);

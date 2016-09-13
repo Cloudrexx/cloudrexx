@@ -582,7 +582,7 @@ class InitCMS
         }
 
         // The configured frontend template does not exist
-        \DBG::msg('Template width ID '.$this->currentThemesId.' does not exist!');
+        \DBG::msg('Template with ID '.$this->currentThemesId.' does not exist!');
 
         // We will try to load the frontend template of a fallback-language therefore
         $langId = $this->frontendLangId;

@@ -148,6 +148,8 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page Resolved page
      */
     public function postContentLoad(\Cx\Core\ContentManager\Model\Entity\Page $page) {
+// Fixed:
+        \JS::activate('cx');
         \JS::registerJS('core_modules/Workbench/View/Script/Warning.js');
         $objTemplate = $this->cx->getTemplate();
         $warning = new \Cx\Core\Html\Sigma(ASCMS_CORE_MODULE_PATH . '/Workbench/View/Template/Backend');

@@ -52,8 +52,10 @@ namespace Cx\Core\Setting\Controller;
  * @subpackage  core_setting
  * @todo        Edit PHP DocBlocks!
  */
-class SettingException extends \Exception {}
+class SettingException extends \Exception
+{
 
+}
 
 /**
  * Manages settings stored in the database or file system
@@ -68,14 +70,13 @@ class SettingException extends \Exception {}
  * @subpackage  core_setting
  * @todo        Edit PHP DocBlocks!
  */
-class Setting{
-
+class Setting
+{
     /**
      * Upload path for documents
      * Used externally only, see hotelcard module for an example.
      */
     const FILEUPLOAD_FOLDER_PATH = 'media';
-
     /**
      * Setting types
      * See {@see show()} for examples on how to extend these.
@@ -90,10 +91,8 @@ class Setting{
     const TYPE_TEXTAREA = 'textarea';
     const TYPE_EMAIL = 'email';
     const TYPE_BUTTON = 'button';
-    // 20110224
     const TYPE_CHECKBOX = 'checkbox';
     const TYPE_CHECKBOXGROUP = 'checkboxgroup';
-    // 20120508
     const TYPE_RADIO = 'radio';
     const TYPE_DATE  = 'date';
     const TYPE_DATETIME  = 'datetime';
@@ -108,29 +107,25 @@ class Setting{
     const NOT_POPULATE = 0;
     const POPULATE = 1;
     const REPOPULATE = 2;
-
     /**
      * Default width for input fields
      *
      * Note that textareas often use twice that value.
      */
     const DEFAULT_INPUT_WIDTH = 300;
-
     const TYPE_PASSWORD = 'password';
 
     public static $arrSettings = array();
     protected static $engines = array(
-	'Database' => '\Cx\Core\Setting\Model\Entity\DbEngine',
-	'FileSystem' => '\Cx\Core\Setting\Model\Entity\FileSystem',
-	'Yaml'	=> '\Cx\Core\Setting\Model\Entity\YamlEngine',
+        'Database' => '\Cx\Core\Setting\Model\Entity\DbEngine',
+        'FileSystem' => '\Cx\Core\Setting\Model\Entity\FileSystem',
+        'Yaml' => '\Cx\Core\Setting\Model\Entity\YamlEngine',
     );
-
     protected static $engine = 'Database';
     protected static $section = null;
     protected static $group = null;
     protected static $tab_index = 1;
     protected static $instanceId = null;
-
 
     /**
      * Returns the current value of the changed flag.
@@ -147,6 +142,7 @@ class Setting{
         }
         return $engine->changed();
     }
+
     /**
      * Optionally sets and returns the value of the tab index
      * @param   integer  $tab_index The optional new tab index
@@ -160,6 +156,7 @@ class Setting{
         }
         return $engine->tab_index($tab_index);
     }
+
     /**
      * Initialize the settings entries from the database with key/value pairs
      * for the current section and the given group
@@ -184,7 +181,8 @@ class Setting{
      * @return  boolean               True on success, false otherwise
      * @global  ADOConnection   $objDatabase
      */
-    static function init($section, $group = null, $engine = 'Database', $fileSystemConfigRepository = null, $populate = 0)
+    static function init($section, $group = null, $engine = 'Database',
+        $fileSystemConfigRepository = null, $populate = 0)
     {
         if (self::setEngineType($section, $engine, $group)){
             $engineType = self::getEngineType();
@@ -197,9 +195,11 @@ class Setting{
                     . ' Group: ' .  $group . "\r\n"
                     . ' Repo: ' .  $fileSystemConfigRepository . "\r\n"
                 . ' ***');*/
-            if ($populate || $engine == null || $engine->getArraySetting() == null || $fileSystemConfigRepository) {
+            if ($populate || $engine == null || $engine->getArraySetting() == null
+                || $fileSystemConfigRepository) {
                 $oSectionEngine = new $engineType();
-                $oSectionEngine->init($section, $group, $fileSystemConfigRepository);
+                $oSectionEngine->init($section, $group,
+                    $fileSystemConfigRepository);
                 if ($fileSystemConfigRepository) {
                     $populate = self::REPOPULATE;
                 }
@@ -226,6 +226,7 @@ class Setting{
         }
         return $engine->flush();
     }
+
     /**
      * Returns the settings array for the given section and group
      *
@@ -246,6 +247,7 @@ class Setting{
         }
         return $engine->getArray($section,$group);
     }
+
     /**
      * Returns the settings value stored in the section for the name given.
      *
@@ -282,6 +284,7 @@ class Setting{
         }
         return $engine->getValue($name);
     }
+
     /**
      * Returns the true or false, if settings name is exist or not .
      *
@@ -300,6 +303,7 @@ class Setting{
         }
         return $engine->isDefined($name);
     }
+
     /**
      * Updates a setting
      *
@@ -320,6 +324,7 @@ class Setting{
         }
         return $engine->set($name, $value);
     }
+
     /**
      * Stores all settings entries present in the $arrSettings object
      * array variable
@@ -342,6 +347,7 @@ class Setting{
         }
         return $engine->updateAll();
     }
+
     /**
      * Updates the value for the given name in the settings table
      *
@@ -366,6 +372,7 @@ class Setting{
         }
         return $engine->update($name);
     }
+
     /**
      * Add a new record to the settings
      *
@@ -384,7 +391,8 @@ class Setting{
      * @param   string    $group    The optional group
      * @return  boolean             True on success, false otherwise
      */
-    static function add( $name, $value, $ord = false, $type = 'text', $values = '', $group = null)
+    static function add($name, $value, $ord = false, $type = 'text',
+        $values = '', $group = null)
     {
         $engine=self::getSectionEngine();
         if ($engine == null) {
@@ -394,7 +402,6 @@ class Setting{
             $group = self::$group;
         }
         return $engine->add( $name, $value, $ord, $type, $values, $group);
-
     }
 
     static function setGroup()
@@ -429,6 +436,7 @@ class Setting{
         }
         return $engine->delete($name, $group);
     }
+
     /**
      * Display the settings present in the $arrSettings class array
      *
@@ -458,9 +466,8 @@ class Setting{
      *  - TXT_CORE_SETTING_NAME
      *  - TXT_CORE_SETTING_VALUE
      *
-     * The template object is given by reference, and if the block
-     * 'core_setting_row' is not present, is replaced by the default backend
-     * template.
+     * If the template object given does not contain the block
+     * 'core_setting_row', is replaced by the default backend template.
      * $uriBase *SHOULD* be the URI for the current module page.
      * If you want your settings to be stored, you *MUST* handle the post
      * request, check for the 'bsubmit' index in the $_POST array, and call
@@ -486,7 +493,8 @@ class Setting{
      *                   I.e. if the language variable for an option is TXT_CORE_MODULE_MULTISITE_INSTANCESPATH,
      *                   then the option's tooltip language variable key would be TXT_CORE_MODULE_MULTISITE_INSTANCESPATH_TOOLTIP
      */
-    static function show(&$objTemplateLocal, $uriBase, $section = '', $tab_name = '', $prefix = 'TXT_', $readOnly = false)
+    static function show($objTemplateLocal, $uriBase, $section = '',
+        $tab_name = '', $prefix = 'TXT_', $readOnly = false)
     {
         global $_CORELANG;
         $arrSettings = self::getCurrentSettings();
@@ -494,11 +502,7 @@ class Setting{
         \Html::replaceUriParameter($uriBase, 'active_tab=' . self::$tab_index);
         // Default headings and elements
         $objTemplateLocal->setGlobalVariable(
-            $_CORELANG
-          + array(
-            'URI_BASE' => $uriBase,
-        ));
-
+            $_CORELANG + array('URI_BASE' => $uriBase));
         if ($objTemplateLocal->blockExists('core_setting_row')){
                 $objTemplateLocal->setCurrentBlock('core_setting_row');
         }
@@ -506,8 +510,7 @@ class Setting{
             return \Message::error($_CORELANG['TXT_CORE_SETTING_ERROR_RETRIEVING']);
         }
         if (empty($arrSettings)) {
-            \Message::warning(
-                sprintf(
+            \Message::warning(sprintf(
                     $_CORELANG['TXT_CORE_SETTING_WARNING_NONE_FOUND_FOR_TAB_AND_SECTION'],
                     $tab_name, $section));
             return false;
@@ -524,12 +527,11 @@ class Setting{
                 'CORE_SETTING_TAB_INDEX' => self::$tab_index,
                 'CORE_SETTING_TAB_CLASS' => (self::$tab_index == $active_tab ? 'active' : ''),
                 'CORE_SETTING_TAB_DISPLAY' => (self::$tab_index++ == $active_tab ? 'block' : 'none'),
-                'CORE_SETTING_CURRENT_TAB'=>'tab-'.$active_tab
+                'CORE_SETTING_CURRENT_TAB' => 'tab-' . $active_tab,
             ));
             $objTemplateLocal->touchBlock('core_setting_header');
             $objTemplateLocal->touchBlock('core_setting_tab_row');
             $objTemplateLocal->parse('core_setting_tab_row');
-
             // parse submit button (or hide if $readOnly is set)
             if ($objTemplateLocal->blockExists('core_setting_submit')) {
                 if ($readOnly) {
@@ -542,18 +544,14 @@ class Setting{
             $objTemplateLocal->touchBlock('core_setting_tab_div');
             $objTemplateLocal->parse('core_setting_tab_div');
         }
-
-// NOK
-//die(nl2br(contrexx_raw2xhtml(var_export($objTemplateLocal, true))));
-
         return true;
     }
+
     /**
      * Display a section of settings present in the $arrSettings class array
      *
      * See the description of {@see show()} for details.
-     * @param   \Cx\Core\Html\Sigma $objTemplateLocal   The Template object,
-     *                                                  by reference
+     * @param   \Cx\Core\Html\Sigma $objTemplateLocal   The Template object
      * @param   string              $section      The optional section header
      *                                            text to add
      * @param   string              $prefix       The optional prefix for
@@ -561,7 +559,8 @@ class Setting{
      *                                            Defaults to 'TXT_'
      * @return  boolean                           True on success, false otherwise
      */
-    static function show_section(&$objTemplateLocal, $section = '', $prefix = 'TXT_', $readOnly = false)
+    static function show_section($objTemplateLocal, $section = '',
+        $prefix = 'TXT_', $readOnly = false)
     {
         global $_ARRAYLANG, $_CORELANG;
         $arrSettings = self::getCurrentSettings();
@@ -569,8 +568,9 @@ class Setting{
         // This is set to multipart if necessary
         $enctype = '';
         $i = 0;
-        if ($objTemplateLocal->blockExists('core_setting_row'))
+        if ($objTemplateLocal->blockExists('core_setting_row')) {
             $objTemplateLocal->setCurrentBlock('core_setting_row');
+        }
         foreach ($arrSettings as $name => $arrSetting) {
             // Determine HTML element for type and apply values and selected
             $element = '';
@@ -580,17 +580,15 @@ class Setting{
             // Not implemented yet:
             // Warn if some mandatory value is empty
             if (empty($value) && preg_match('/_mandatory$/', $type)) {
-                \Message::warning(
-                    sprintf($_CORELANG['TXT_CORE_SETTING_WARNING_EMPTY'],
-                        $_ARRAYLANG[$prefix.strtoupper($name)],
-                        $name));
+                \Message::warning(sprintf(
+                        $_CORELANG['TXT_CORE_SETTING_WARNING_EMPTY'],
+                        $_ARRAYLANG[$prefix . strtoupper($name)], $name));
             }
             // Warn if some language variable is not defined
             if (empty($_ARRAYLANG[$prefix.strtoupper($name)])) {
-                \Message::warning(
-                    sprintf($_CORELANG['TXT_CORE_SETTING_WARNING_MISSING_LANGUAGE'],
-                        $prefix.strtoupper($name),
-                        $name));
+                \Message::warning(sprintf(
+                        $_CORELANG['TXT_CORE_SETTING_WARNING_MISSING_LANGUAGE'],
+                        $prefix . strtoupper($name), $name));
             }
 
 //DBG::log("Value: $value -> align $value_align");
@@ -602,7 +600,8 @@ class Setting{
               case self::TYPE_DROPDOWN:
                 $matches   = null;
                 $arrValues = $arrSetting['values'];
-                if (preg_match('/^\{src:([a-z0-9_\\\:]+)\(\)\}$/i', $arrSetting['values'], $matches)) {
+                    if (preg_match('/^\{src:([a-z0-9_\\\:]+)\(\)\}$/i',
+                            $arrSetting['values'], $matches)) {
                     $arrValues = call_user_func($matches[1]);
                 }
                 if (is_string($arrValues)) {
@@ -613,11 +612,9 @@ class Setting{
                 $elementValue  = is_array($value) ? array_flip($value) : $value;
                 $elementAttr   = $isMultiSelect ? ' multiple class="chzn-select"' : '';
                 $element       = \Html::getSelect(
-                                    $elementName, $arrValues, $elementValue,
-                                    '', '',
+                            $elementName, $arrValues, $elementValue, '', '',
                                     'style="width: ' . self::DEFAULT_INPUT_WIDTH . 'px;' .
-                                    (   !$isMultiSelect
-                                     && isset ($arrValues[$value])
+                            (!$isMultiSelect && isset($arrValues[$value])
                                      && is_numeric($arrValues[$value])
                                         ? 'text-align: right;' : '') . '"' .
                                     ($readOnly ? \Html::ATTRIBUTE_DISABLED : '') . $elementAttr);
@@ -627,15 +624,16 @@ class Setting{
                     $name,
                     User_Profile_Attribute::getCustomAttributeNameArray(),
                     $arrSetting['value'], '', '',
-                    'style="width: '.self::DEFAULT_INPUT_WIDTH.'px;"'.($readOnly ? \Html::ATTRIBUTE_DISABLED : '')
+                            'style="width: ' . self::DEFAULT_INPUT_WIDTH . 'px;"'
+                            . ($readOnly ? \Html::ATTRIBUTE_DISABLED : '')
                 );
                 break;
               case self::TYPE_DROPDOWN_USERGROUP:
                 $element = \Html::getSelect(
-                    $name,
-                    UserGroup::getNameArray(),
-                    $arrSetting['value'],
-                    '', '', 'style="width: '.self::DEFAULT_INPUT_WIDTH.'px;"'.($readOnly ? \Html::ATTRIBUTE_DISABLED : '')
+                            $name, UserGroup::getNameArray(),
+                            $arrSetting['value'], '', '',
+                            'style="width: ' . self::DEFAULT_INPUT_WIDTH . 'px;"'
+                            . ($readOnly ? \Html::ATTRIBUTE_DISABLED : '')
                 );
                 break;
               case self::TYPE_WYSIWYG:
@@ -659,39 +657,37 @@ class Setting{
                 $objTemplateLocal->parseCurrentBlock();
                 // Skip the part below, all is done already
                 continue 2;
-
               case self::TYPE_FILEUPLOAD:
 //echo("\Cx\Core\Setting\Controller\Setting::show_section(): Setting up upload for $name, $value<br />");
-                $element =
-                    \Html::getInputFileupload(
+                    $element = \Html::getInputFileupload(
                         // Set the ID only if the $value is non-empty.
                         // This toggles the file name and delete icon on or off
                         $name, ($value ? $name : false),
                         Filetype::MAXIMUM_UPLOAD_FILE_SIZE,
                         // "values" defines the MIME types allowed
                         $arrSetting['values'],
-                        'style="width: '.self::DEFAULT_INPUT_WIDTH.'px;"'.($readOnly ? \Html::ATTRIBUTE_DISABLED : ''), true,
+                            'style="width: ' . self::DEFAULT_INPUT_WIDTH . 'px;"'
+                            . ($readOnly ? \Html::ATTRIBUTE_DISABLED : ''),
+                            true,
+// TODO: This condition would better be handled outside of the parameter list
                         ($value
                           ? $value
-                          : 'media/'.
-                            (isset($_REQUEST['cmd'])
+                                : 'media/'
+                                    . (isset($_REQUEST['cmd'])
                                 ? $_REQUEST['cmd'] : 'other'))
                     );
                 // File uploads must be multipart encoded
                 $enctype = 'enctype="multipart/form-data"';
                 break;
-
               case self::TYPE_BUTTON:
                 // The button is only available to trigger some event.
-                $event =
-                    'onclick=\''.
+                    $event = 'onclick=\'' .
                       'if (confirm("'.$_ARRAYLANG[$prefix.strtoupper($name).'_CONFIRM'].'")) {'.
                         'document.getElementById("'.$name.'").value=1;'.
                         'document.formSettings_'.self::$tab_index.'.submit();'.
                       '}\'';
 //DBG::log("\Cx\Core\Setting\Controller\Setting::show_section(): Event: $event");
-                $element =
-                    \Html::getInputButton(
+                    $element = \Html::getInputButton(
                         // The button itself gets a dummy name attribute value
                         '__'.$name,
                         $_ARRAYLANG[strtoupper($prefix.$name).'_LABEL'],
@@ -703,84 +699,98 @@ class Setting{
                     \Html::getHidden($name, 0, '');
 //DBG::log("\Cx\Core\Setting\Controller\Setting::show_section(): Element: $element");
                 break;
-
               case self::TYPE_TEXTAREA:
-                $element =
-                    \Html::getTextarea($name, $value, 80, 8, ($readOnly ? \Html::ATTRIBUTE_DISABLED : ''));
-//                        'style="width: '.self::DEFAULT_INPUT_WIDTH.'px;'.$value_align.'"');
+                    $element = \Html::getTextarea($name, $value, 80, 8,
+                            ($readOnly ? \Html::ATTRIBUTE_DISABLED : ''));
                 break;
-
               case self::TYPE_CHECKBOX:
                 $arrValues = self::splitValues($arrSetting['values']);
                 $value_true = current($arrValues);
                 $element =
-                    \Html::getCheckbox($name, $value_true, false,
-                        in_array($value, $arrValues), '', ($readOnly ? \Html::ATTRIBUTE_DISABLED : ''));
+// Fixed
+                        // Unchecked boxes are not included in the request,
+                        // as there is no value for that state.
+                        // Thus, it is impossible to clear a checkbox, unless
+                        // a hidden field with the same name is prepended.
+                        // The last value in the post, which will be applied,
+                        // will be the checkboxes', if checked.
+                        \Html::getHidden($name, 0)
+                        . \Html::getCheckbox($name, $value_true, false,
+                            in_array($value, $arrValues), '',
+                            ($readOnly ? \Html::ATTRIBUTE_DISABLED : ''));
                 break;
               case self::TYPE_CHECKBOXGROUP:
                 $checked = self::splitValues($value);
-                $element =
-                    \Html::getCheckboxGroup($name, $values, $values, $checked,
-                        '', '', '<br />', ($readOnly ? \Html::ATTRIBUTE_DISABLED : ''), '');
+                    $element = \Html::getCheckboxGroup($name, $values, $values,
+                            $checked, '', '', '<br />',
+                            ($readOnly ? \Html::ATTRIBUTE_DISABLED : ''), '');
                 break;
-// 20120508 UNTESTED!
               case self::TYPE_RADIO:
                 $checked = $value;
-                $element =
-                    \Html::getRadioGroup($name, $values, $checked, '', ($readOnly ? \Html::ATTRIBUTE_DISABLED : ''));
+                    $element = \Html::getRadioGroup($name, $values, $checked,
+                            '', ($readOnly ? \Html::ATTRIBUTE_DISABLED : ''));
                 break;
-
                 case self::TYPE_PASSWORD:
-                $element =
-                    \Html::getInputPassword($name, $value, 'style="width: '.self::DEFAULT_INPUT_WIDTH.'px;"'.($readOnly ? \Html::ATTRIBUTE_DISABLED : ''));
+                    $element = \Html::getInputPassword($name, $value,
+                            'style="width: ' . self::DEFAULT_INPUT_WIDTH . 'px;"'
+                            . ($readOnly ? \Html::ATTRIBUTE_DISABLED : ''));
                 break;
 
                 //datepicker
                 case self::TYPE_DATE:
-                    $element = \Html::getDatepicker($name, array('defaultDate' => $value), 'style="width: '.self::DEFAULT_INPUT_WIDTH.'px;"');
+                    $element = \Html::getDatepicker($name,
+                            array('defaultDate' => $value),
+                            'style="width: ' . self::DEFAULT_INPUT_WIDTH . 'px;"');
                     break;
                 //datetimepicker
                 case self::TYPE_DATETIME:
-                    $element = \Html::getDatetimepicker($name, array('defaultDate' => $value), 'style="width: '.self::DEFAULT_INPUT_WIDTH.'px;"');
+                    $element = \Html::getDatetimepicker($name,
+                            array('defaultDate' => $value),
+                            'style="width: ' . self::DEFAULT_INPUT_WIDTH . 'px;"');
                     break;
 
                 // Default to text input fields
               case self::TYPE_TEXT:
               case self::TYPE_EMAIL:
               default:
-                $element =
-                    \Html::getInputText(
+                    $element = \Html::getInputText(
                         $name, $value, false,
                         'style="width: '.self::DEFAULT_INPUT_WIDTH.'px;'.
                         (is_numeric($value) ? 'text-align: right;' : '').
                         '"'.
                         ($readOnly ? \Html::ATTRIBUTE_DISABLED : ''));
             }
-
             //add Tooltip
             $toolTips='';
             $toolTipsHelp ='';
             if (isset($_ARRAYLANG[$prefix.strtoupper($name).'_TOOLTIP'])) {
                 // generate tooltip for configuration option
-                $toolTips='  <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">'.$_ARRAYLANG[$prefix.strtoupper($name).'_TOOLTIP'].'</span>';
+                $toolTips =
+                    '  <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">'
+                    . $_ARRAYLANG[$prefix . strtoupper($name) . '_TOOLTIP']
+                    . '</span>';
             }
             if (isset($_ARRAYLANG[$prefix.strtoupper($name).'_TOOLTIP_HELP'])) {
                 // generate tooltip for configuration option
-                $toolTipsHelp ='  <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">'.$_ARRAYLANG[$prefix.strtoupper($name).'_TOOLTIP_HELP'].'</span>';
+                $toolTipsHelp =
+                    '  <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">'
+                    . $_ARRAYLANG[$prefix . strtoupper($name) . '_TOOLTIP_HELP']
+                    . '</span>';
             }
             $objTemplateLocal->setVariable(array(
-                'CORE_SETTING_NAME' => (isset($_ARRAYLANG[$prefix.strtoupper($name)]) ? $_ARRAYLANG[$prefix.strtoupper($name)] : $name).$toolTips,
+                'CORE_SETTING_NAME' =>
+                    (isset($_ARRAYLANG[$prefix . strtoupper($name)])
+                        ? $_ARRAYLANG[$prefix . strtoupper($name)] : $name)
+                    . $toolTips,
                 'CORE_SETTING_VALUE' => $element.$toolTipsHelp,
                 'CORE_SETTING_ROWCLASS2' => (++$i % 2 ? '1' : '2'),
             ));
             $objTemplateLocal->parseCurrentBlock();
 //echo("\Cx\Core\Setting\Controller\Setting::show(objTemplateLocal, $prefix): shown $name => $value<br />");
         }
-
         // Set form encoding to multipart if necessary
         if (!empty($enctype))
             $objTemplateLocal->setVariable('CORE_SETTING_ENCTYPE', $enctype);
-
         if (   !empty($section)
             && $objTemplateLocal->blockExists('core_setting_section')) {
 //echo("\Cx\Core\Setting\Controller\Setting::show(objTemplateLocal, $header, $prefix): creating section $header<br />");
@@ -791,6 +801,7 @@ class Setting{
         }
         return true;
     }
+
     /**
      * Adds an external settings view to the current template
      *
@@ -802,15 +813,15 @@ class Setting{
      * @param   string              $content            The external content
      * @return  boolean                                 True on success
      */
-    static function show_external( &$objTemplateLocal, $tab_name, $content)
+    static function show_external($objTemplateLocal, $tab_name, $content)
     {
-        if (empty($objTemplateLocal)|| !$objTemplateLocal->blockExists('core_setting_row'))
-        {
-            $objTemplateLocal = new \Cx\Core\Html\Sigma(\Env::get('cx')->getCodeBaseDocumentRootPath() . '/core/Setting/View/Template/Generic');
+        if (empty($objTemplateLocal) || !$objTemplateLocal->blockExists('core_setting_row')) {
+            $objTemplateLocal = new \Cx\Core\Html\Sigma(
+                \Env::get('cx')->getCodeBaseDocumentRootPath()
+                . '/core/Setting/View/Template/Generic');
             if (!$objTemplateLocal->loadTemplateFile('Form.html'))
                 die("Failed to load template Form.html");
         }
-
         $active_tab = (isset($_REQUEST['active_tab']) ? $_REQUEST['active_tab'] : 1);
         // The tabindex must be set in the form name in any case
         $objTemplateLocal->setGlobalVariable(array(
@@ -818,13 +829,14 @@ class Setting{
                                                     'CORE_SETTING_EXTERNAL' => $content,
                                                 ));
         // Set up the tab, if any
-        if (!empty($tab_name))
-        {
+        if (!empty($tab_name)) {
             $objTemplateLocal->setGlobalVariable(array(
                                                         'CORE_SETTING_TAB_NAME' => $tab_name,
                                                         'CORE_SETTING_TAB_INDEX' => self::$tab_index,
-                                                        'CORE_SETTING_TAB_CLASS' => (self::$tab_index == $active_tab ? 'active' : ''),
-                                                        'CORE_SETTING_TAB_DISPLAY' => (self::$tab_index++ == $active_tab ? 'block' : 'none'),
+                'CORE_SETTING_TAB_CLASS' =>
+                    (self::$tab_index == $active_tab ? 'active' : ''),
+                'CORE_SETTING_TAB_DISPLAY' =>
+                    (self::$tab_index++ == $active_tab ? 'block' : 'none'),
                                                         'CORE_SETTING_CURRENT_TAB'=>'tab-'.$active_tab
                                                 ));
             $objTemplateLocal->touchBlock('core_setting_tab_row');
@@ -834,29 +846,36 @@ class Setting{
         }
         return true;
     }
+
     /**
      * Ensures that a valid template is available
      *
      * Die()s if the template given is invalid, and Form.html cannot be
      * loaded to replace it.
-     * @param   \Cx\Core\Html\Sigma $objTemplateLocal   The template,
-     *                                                  by reference
+     * @param   \Cx\Core\Html\Sigma|null    $objTemplateLocal   The template
+     *
+     * @return  \Cx\Core\Html\Sigma
      */
-    static function verify_template(&$objTemplateLocal)
+    static function verify_template($objTemplateLocal)
     {
         //"instanceof" considers subclasses of Sigma to be a Sigma, too!
         if (!($objTemplateLocal instanceof \Cx\Core\Html\Sigma)) {
-            $objTemplateLocal = new \Cx\Core\Html\Sigma(\Env::get('cx')->getCodeBaseDocumentRootPath() . '/core/Setting/View/Template/Generic');
+            $objTemplateLocal = new \Cx\Core\Html\Sigma(
+                \Env::get('cx')->getCodeBaseDocumentRootPath()
+                . '/core/Setting/View/Template/Generic');
         }
         if (!$objTemplateLocal->blockExists('core_setting_row')) {
-            $objTemplateLocal->setRoot(\Env::get('cx')->getCodeBaseDocumentRootPath() . '/core/Setting/View/Template/Generic');
+            $objTemplateLocal->setRoot(
+                \Env::get('cx')->getCodeBaseDocumentRootPath()
+                . '/core/Setting/View/Template/Generic');
         //$objTemplateLocal->setCacheRoot('.');
             if (!$objTemplateLocal->loadTemplateFile('Form.html')) {
                 die("Failed to load template Form.html");
             }
-            //die(nl2br(contrexx_raw2xhtml(var_export($objTemplateLocal, true))));
         }
+        return $objTemplateLocal;
     }
+
     /**
      * Update and store all settings found in the $_POST array
      *
@@ -869,10 +888,8 @@ class Setting{
     static function storeFromPost()
     {
         global $_CORELANG;
-
         //echo("self::storeFromPost(): POST:<br />".nl2br(htmlentities(var_export($_POST, true)))."<hr />");
         //echo("self::storeFromPost(): FILES:<br />".nl2br(htmlentities(var_export($_FILES, true)))."<hr />");
-
         // There may be several tabs for different groups being edited, so
         // load the full set of settings for the module.
         // Note that this is why setting names should be unique.
@@ -943,7 +960,6 @@ class Setting{
                     $value = (is_array($value)
                         ? join(',', array_keys($value))
                         : $value);
-                        // 20120508
                   case self::TYPE_RADIO:
                       break;
                   default:
@@ -969,6 +985,7 @@ class Setting{
         // There has been an error anyway
         return false;
     }
+
     /**
      * Deletes all entries for the current section
      *
@@ -984,6 +1001,7 @@ class Setting{
         }
         return $engine->deleteModule();
     }
+
     /**
      * Splits the string value at commas and returns an array of strings
      *
@@ -1007,8 +1025,8 @@ class Setting{
         $match = array();
         foreach (
             preg_split(
-                '/\s*(?<!\\\\),\s*/', $strValues,
-                null, PREG_SPLIT_NO_EMPTY) as $value
+            '/\s*(?<!\\\\),\s*/', $strValues, null, PREG_SPLIT_NO_EMPTY) as
+                $value
         ) {
             $key = null;
             if (preg_match('/^(.+?)\s*(?<!\\\\):\s*(.+$)/', $value, $match)) {
@@ -1027,6 +1045,7 @@ class Setting{
             // \DBG::log("Array: ".var_export($arrValues, true));
         return $arrValues;
     }
+
     /**
      * Joins the strings in the array with commas into a single values string
      *
@@ -1050,6 +1069,7 @@ class Setting{
         }
         return $strValues;
     }
+
     /**
      * Should be called whenever there's a problem with the settings table
      *
@@ -1065,6 +1085,7 @@ class Setting{
         }
         return $engine->errorHandler();
     }
+
     /**
      * Returns the settings from the old settings table for the given module ID,
      * if available
@@ -1094,13 +1115,11 @@ class Setting{
         }
         $arrConfig = array();
         while (!$objResult->EOF) {
-            $arrConfig[$objResult->fields['setname']] =
-                $objResult->fields['setvalue'];
+            $arrConfig[$objResult->fields['setname']] = $objResult->fields['setvalue'];
             $objResult->MoveNext();
         }
         return $arrConfig;
     }
-
 
     /**
      * Returns engine from section
@@ -1122,8 +1141,7 @@ class Setting{
            return self::$arrSettings[self::getInstanceId()][$section][$engine];
         }
         $engine = self::$arrSettings[self::getInstanceId()][$section]['default_engine'];
-        if(isset(self::$arrSettings[self::getInstanceId()][$section][$engine]))
-        {
+        if (isset(self::$arrSettings[self::getInstanceId()][$section][$engine])) {
             return self::$arrSettings[self::getInstanceId()][$section][$engine];
         }
         // \DBG::log("Section engine don't exist. Section: $section, Engine: $engine");
@@ -1152,21 +1170,23 @@ class Setting{
                 case self::NOT_POPULATE:
                     return;
                 case self::POPULATE:
-                    foreach($oSectionEngine->getArraySetting() as $itemName => $item) {
+                    foreach ($oSectionEngine->getArraySetting() as $itemName =>
+                            $item) {
                         self::addToArray($itemName, $item);
                     }
                     return;
                 case  self::REPOPULATE:
-                    self::$arrSettings[self::getInstanceId()][self::$section][self::$engine] = $oSectionEngine;
+                    self::$arrSettings[self::getInstanceId()][self::$section][self::$engine] =
+                        $oSectionEngine;
                     return;
             }
         }
-        self::$arrSettings[self::getInstanceId()][self::$section][self::$engine] = $oSectionEngine;
+        self::$arrSettings[self::getInstanceId()][self::$section][self::$engine] =
+            $oSectionEngine;
     }
 
     /**
      * Set engineType
-     *
      * @param string $engine
      */
     static function setEngineType($section, $engine, $group = null)
@@ -1177,11 +1197,12 @@ class Setting{
             self::$section = $section;
             self::$group = $group;
             if (!isset(self::$arrSettings[self::getInstanceId()][$section]['default_engine'])) {
-                self::$arrSettings[self::getInstanceId()][$section]['default_engine'] = $engine;
+                self::$arrSettings[self::getInstanceId()][$section]['default_engine'] =
+                    $engine;
             }
             return true;
-	}
-	return false;
+        }
+        return false;
     }
 
     /**
@@ -1222,12 +1243,12 @@ class Setting{
 
     /**
      * Adds element to array
-     *
      * @param  string  $name
      * @param  string  $value
      * @return boolean
      */
-    static function addToArray($name, $value) {
+    static function addToArray($name, $value)
+    {
         $engine=self::getSectionEngine();
         if ($engine == null) {
             return false;
@@ -1236,7 +1257,6 @@ class Setting{
     }
 
     /**
-     *
      * Enhanced method of getting settins by section, engine and group;
      * Recommended for use in future; getArray() is just for backward compatibility
      * @param type $section
@@ -1259,21 +1279,21 @@ class Setting{
         }
     }
 
-
     /**
      * Gets current settings based on currently set section, engine and group
-     *
      * @return array | false
      */
-    static function getCurrentSettings() {
+    static function getCurrentSettings()
+    {
         return self::getSettings(self::$section, self::$engine, self::$group);
     }
 
     /**
      * Returns Id of current instance
-     *
      */
-    static function getInstanceId() {
+    static function getInstanceId()
+    {
         return \Cx\Core\Core\Controller\Cx::instanciate()->getId();
     }
+
 }

@@ -195,7 +195,9 @@ class ImageManager
             $thumb_name = self::getThumbnailFilename($file);
         }
         if (!$_objImage->saveNewImage($strPath.$thumb_name)) return false;
-        if (!\Cx\Lib\FileSystem\FileSystem::makeWritable($strPath.$thumb_name)) return false;
+        if (!\Cx\Lib\FileSystem\FileSystem::makeWritable($strPath.$thumb_name)) {
+            return false;
+        }
         return true;
     }
 
