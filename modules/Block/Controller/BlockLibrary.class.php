@@ -349,8 +349,7 @@ class BlockLibrary
                                                    content='".contrexx_raw2db($content)."',
                                                    active='".intval((isset($arrLangActive[$langId]) ? $arrLangActive[$langId] : 0))."'",
                                                   $blockId));
-            global $objCache;
-            $objCache->clearSsiCachePage(
+            \Cx\Core\Core\Controller\Cx::instanciate()->getComponent('Cache')->clearSsiCachePage(
                 'Block',
                 'getBlockContent',
                 array(
@@ -955,7 +954,7 @@ class BlockLibrary
      * @param boolean $randomize (optional) Wheter to randomize the blocks or not, default false
      */
     protected function replaceBlocks($placeholderName, $query, &$code, $separator = '', $randomize = false) {
-        global $objDatabase, $objCache;
+        global $objDatabase;
 
         // find all block IDs to parse
         $objResult = $objDatabase->Execute($query);
@@ -985,7 +984,7 @@ class BlockLibrary
                     )
                 );
             }
-            $blockContent = $objCache->getRandomizedEsiContent(
+            $blockContent = \Cx\Core\Core\Controller\Cx::instanciate()->getComponent('Cache')->getRandomizedEsiContent(
                 $esiBlockInfos
             );
             $frontendEditingComponent->prepareBlock(
@@ -996,7 +995,7 @@ class BlockLibrary
         } else {
             $contentList = array();
             foreach ($blockIds as $blockId) {
-                $blockContent = $objCache->getEsiContent(
+                $blockContent = \Cx\Core\Core\Controller\Cx::instanciate()->getComponent('Cache')->getEsiContent(
                     'Block',
                     'getBlockContent',
                     array(

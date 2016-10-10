@@ -1,3 +1,6 @@
 -
   name: Net
   type: core
+-
+  name: Cache
+  type: core_module

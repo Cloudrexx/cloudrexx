@@ -400,7 +400,7 @@ class Forum extends ForumLibrary {
      */
     function showForum($intForumId)
     {
-        global $objDatabase, $_ARRAYLANG, $objCache, $_LANGID, $_CORELANG;
+        global $objDatabase, $_ARRAYLANG, $_LANGID, $_CORELANG;
 
         if ($intForumId == 0) {
             //wrong id, redirect
@@ -617,7 +617,7 @@ class Forum extends ForumLibrary {
      */
     function showThread($intThreadId)
     {
-        global $objDatabase, $_ARRAYLANG, $objCache;
+        global $objDatabase, $_ARRAYLANG;
 
         $objFWUser = \FWUser::getFWUserObject();
         $this->_communityLogin();

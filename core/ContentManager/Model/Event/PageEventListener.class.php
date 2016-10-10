@@ -148,14 +148,11 @@ class PageEventListener implements \Cx\Core\Event\Model\Entity\EventListener {
 
         $pageRepo = $em->getRepository('Cx\Core\ContentManager\Model\Entity\Page');
 
-        global $objCache;
-        if ($objCache) {
-            /*
-             * Really unneccessary, because we do not use resultcache
-             * @see http://bugs.contrexx.com/contrexx/ticket/2339
-             */
-            //$objCache->clearCache();
-        }
+        /*
+         * Really unneccessary, because we do not use resultcache
+         * @see http://bugs.contrexx.com/contrexx/ticket/2339
+         */
+        //\Cx\Core\Core\Controller\Cx::instanciate()->getComponent('Cache')->clearCache();
 
         foreach ($uow->getScheduledEntityUpdates() AS $entity) {
             $this->checkValidPersistingOperation($pageRepo, $entity);

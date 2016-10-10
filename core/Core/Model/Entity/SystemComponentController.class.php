@@ -92,6 +92,14 @@ class SystemComponentController extends Controller {
     }
 
     /**
+     * Sets the SystemComponent this Controller decorates
+     * @return \Cx\Core\Core\Model\Entity\SystemComponent
+     */
+    public function setSystemComponent($systemComponent) {
+        $this->systemComponent = $systemComponent;
+    }
+
+    /**
      * Registers a controller instance
      * @param Controller $controller Controller to register
      * @return null
@@ -307,6 +315,22 @@ class SystemComponentController extends Controller {
     public function postInit(\Cx\Core\Core\Controller\Cx $cx) {}
 
     /**
+     * Do something before component load
+     * * USE CAREFULLY, DO NOT DO ANYTHING COSTLY HERE!
+     * CALCULATE YOUR STUFF AS LATE AS POSSIBLE.
+     * This event must be registered in the preComponentLoad-Hook definition
+     * file config/preComponentLoadHooks.yml.
+     */
+    public function preComponentLoad() {}
+
+    /**
+     * Do something after all active components are loaded
+     * USE CAREFULLY, DO NOT DO ANYTHING COSTLY HERE!
+     * CALCULATE YOUR STUFF AS LATE AS POSSIBLE.
+     */
+    public function postComponentLoad() {}
+
+    /**
      * Register your events here
      *
      * Do not do anything else here than list statements like
@@ -454,6 +478,7 @@ class SystemComponentController extends Controller {
      * Do something after main template got parsed
      *
      * USE CAREFULLY, DO NOT DO ANYTHING COSTLY HERE!
+     * @param string                                    $endcode The processed data to be sent to the client as response
      */
-    public function postFinalize() {}
+    public function postFinalize(&$endcode) {}
 }

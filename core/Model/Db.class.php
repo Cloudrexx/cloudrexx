@@ -76,12 +76,6 @@ namespace Cx\Core\Model {
     class Db {
 
         /**
-         * Cloudrexx instance
-         * @var \Cx\Core\Core\Controller\Cx
-         */
-        protected $cx = null;
-
-        /**
          * PDO instance
          * @var \PDO
          */
@@ -118,13 +112,20 @@ namespace Cx\Core\Model {
         protected $dbUser;
 
         /**
+         * doctrine cache driver instance
+         * @var mixed
+         */
+        protected $cacheDriver;
+
+        /**
          * Creates a new instance of the database connection handler
          * @param \Cx\Core\Model\Model\Entity\Db $db Database connection details
          * @param \Cx\Core\Model\Model\Entity\DbUser $dbUser Database user details
          */
-        public function __construct(\Cx\Core\Model\Model\Entity\Db $db, \Cx\Core\Model\Model\Entity\DbUser $dbUser) {
+        public function __construct(\Cx\Core\Model\Model\Entity\Db $db, \Cx\Core\Model\Model\Entity\DbUser $dbUser, $cacheDriver) {
             $this->db = $db;
             $this->dbUser = $dbUser;
+            $this->cacheDriver = $cacheDriver;
         }
 
         /**
@@ -287,47 +288,11 @@ namespace Cx\Core\Model {
                 return $this->em;
             }
 
-            global $objCache;
-
             $config = new \Doctrine\ORM\Configuration();
 
-            $userCacheEngine = $objCache->getUserCacheEngine();
-            if (!$objCache->getUserCacheActive()) {
-                $userCacheEngine = \Cx\Core_Modules\Cache\Controller\Cache::CACHE_ENGINE_OFF;
-            }
-
-            $arrayCache = new \Doctrine\Common\Cache\ArrayCache();
-            switch ($userCacheEngine) {
-                case \Cx\Core_Modules\Cache\Controller\Cache::CACHE_ENGINE_APC:
-                    $cache = new \Doctrine\Common\Cache\ApcCache();
-                    $cache->setNamespace($this->db->getName() . '.' . $this->db->getTablePrefix());
-                    break;
-                case \Cx\Core_Modules\Cache\Controller\Cache::CACHE_ENGINE_MEMCACHE:
-                    $memcache = $objCache->getMemcache();
-                    if ($memcache instanceof \Memcache) {
-                        $cache = new \Doctrine\Common\Cache\MemcacheCache();
-                        $cache->setMemcache($memcache);
-                    } elseif ($memcache instanceof \Memcached) {
-                        $cache = new \Doctrine\Common\Cache\MemcachedCache();
-                        $cache->setMemcache($memcache);
-                    }
-                    $cache->setNamespace($this->db->getName() . '.' . $this->db->getTablePrefix());
-                    break;
-                case \Cx\Core_Modules\Cache\Controller\Cache::CACHE_ENGINE_XCACHE:
-                    $cache = new \Doctrine\Common\Cache\XcacheCache();
-                    $cache->setNamespace($this->db->getName() . '.' . $this->db->getTablePrefix());
-                    break;
-                case \Cx\Core_Modules\Cache\Controller\Cache::CACHE_ENGINE_FILESYSTEM:
-                    $cache = new \Cx\Core_Modules\Cache\Controller\Doctrine\CacheDriver\FileSystemCache(ASCMS_CACHE_PATH);
-                    break;
-                default:
-                    $cache = $arrayCache;
-                    break;
-            }
-            \Env::set('cache', $cache);
-            //$config->setResultCacheImpl($cache);
-            $config->setMetadataCacheImpl($cache);
-            $config->setQueryCacheImpl($cache);
+            //$config->setResultCacheImpl($this->cacheDriver);
+            $config->setMetadataCacheImpl($this->cacheDriver);
+            $config->setQueryCacheImpl($this->cacheDriver);
 
             $config->setProxyDir(ASCMS_MODEL_PROXIES_PATH);
             $config->setProxyNamespace('Cx\Model\Proxies');
