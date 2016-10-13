@@ -769,7 +769,7 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
         }
 
         $this->_objTpl->setVariable(array(
-           // 'TXT_NEWS_COMMENTS'                                => $_ARRAYLANG['TXT_NEWS_COMMENTS'],
+            'TXT_NEWS_COMMENTS'                                => $_ARRAYLANG['TXT_NEWS_COMMENTS'],
             'TXT_NEWS_DATE'                                    => $_ARRAYLANG['TXT_DATE'],
             'TXT_NEWS_MESSAGE'                                 => $_ARRAYLANG['TXT_NEWS_MESSAGE'],
             'TXT_NEWS_RELATED_MESSAGES_OF_'.$placeholderPrefix => $_ARRAYLANG['TXT_NEWS_RELATED_MESSAGES_OF_'.$placeholderPrefix],
