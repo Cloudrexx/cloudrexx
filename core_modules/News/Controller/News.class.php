@@ -270,7 +270,9 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
            'NEWS_SOURCE'         => $newsSource,
            'NEWS_URL'            => $newsUrl,
            'NEWS_CATEGORY_NAME'  => implode(', ', contrexx_raw2xhtml($newsCategories)),
-           'NEWS_COUNT_COMMENTS' => ($newsCommentActive && $this->arrSettings['news_comments_activated']) ? contrexx_raw2xhtml($objSubResult->fields['countComments'].' '.$_ARRAYLANG['TXT_NEWS_COMMENTS']) : '',
+           'NEWS_COUNT_COMMENTS' => ($newsCommentActive && $this->arrSettings['news_comments_activated'])
+               ? $this->getNewsCountCommentsText($objSubResult->fields['countComments'])
+               : '',
 // TODO: create a new methode from which we can fetch the name of the 'type' (do not fetch it from within the same SQL query of which we collect any other data!)
            //'NEWS_TYPE_NAME' => ($this->arrSettings['news_use_types'] == 1 ? htmlentities($objResult->fields['typename'], ENT_QUOTES, CONTREXX_CHARSET) : '')
         ));
@@ -767,7 +769,7 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
         }
 
         $this->_objTpl->setVariable(array(
-            'TXT_NEWS_COMMENTS'                                => $_ARRAYLANG['TXT_NEWS_COMMENTS'],
+           // 'TXT_NEWS_COMMENTS'                                => $_ARRAYLANG['TXT_NEWS_COMMENTS'],
             'TXT_NEWS_DATE'                                    => $_ARRAYLANG['TXT_DATE'],
             'TXT_NEWS_MESSAGE'                                 => $_ARRAYLANG['TXT_NEWS_MESSAGE'],
             'TXT_NEWS_RELATED_MESSAGES_OF_'.$placeholderPrefix => $_ARRAYLANG['TXT_NEWS_RELATED_MESSAGES_OF_'.$placeholderPrefix],
@@ -1058,7 +1060,7 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                    //'NEWS_TYPE'          => ($this->arrSettings['news_use_types'] == 1 ? stripslashes($objResult->fields['typename']) : ''),
                    'NEWS_PUBLISHER'      => contrexx_raw2xhtml($publisher),
                    'NEWS_AUTHOR'         => contrexx_raw2xhtml($author),
-                   'NEWS_COUNT_COMMENTS' => contrexx_raw2xhtml($objSubResult->fields['countComments'].' '.$_ARRAYLANG['TXT_NEWS_COMMENTS']),
+                   'NEWS_COUNT_COMMENTS' => $this->getNewsCountCommentsText($objSubResult->fields['countComments']),
                 ));
 
                 if (!$newsCommentActive || !$this->arrSettings['news_comments_activated']) {
@@ -2328,5 +2330,28 @@ RSS2JSCODE;
 
 
         return $this->_objTpl->get();
+    }
+
+    /**
+     * Returns the text for the count of comments
+     *
+     * @param  $countComments int    the count of comments
+     * @return                string the text for the comment count
+     */
+    function getNewsCountCommentsText($countComments) {
+        global $_ARRAYLANG;
+
+        switch ($countComments) {
+            case 0:
+                $newsCountComments = $_ARRAYLANG['TXT_NEWS_COMMENTS_NONE_EXISTING'];
+                break;
+            case 1:
+                $newsCountComments = $countComments . ' ' . $_ARRAYLANG['TXT_NEWS_COMMENT'];
+                break;
+            default:
+                $newsCountComments = $countComments . ' ' . $_ARRAYLANG['TXT_NEWS_COMMENTS'];
+                break;
+        }
+        return contrexx_raw2xhtml($newsCountComments);
     }
 }
