@@ -1570,6 +1570,7 @@ JSCODE;
         $this->_objTpl->setGlobalVariable(
             array(
                 'NEWS_STATUS_MESSAGE' => $msg,
+                'NEWS_STATUS_MESSAGE_CSS_CLASS' => $newsId ? 'text-success' : 'text-danger',
                 'TXT_CATEGORY_SELECT' => $_ARRAYLANG['TXT_CATEGORY_SELECT']
             )
         );
