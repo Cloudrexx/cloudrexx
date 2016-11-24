@@ -30,8 +30,9 @@
  * @author      Cloudrexx Development Team <info@cloudrexx.com>
  * @access      public
  * @package     cloudrexx
- * @subpackage  coremodule_filebrowser
+ * @subpackage  coremodule_mediabrowser
  */
+global $_ARRAYLANG;
 $_ARRAYLANG['TXT_CLOSE'] = "Schliessen";
 $_ARRAYLANG['TXT_FILEBROWSER_MEDIA_1'] = "Medienarchiv #1";
 $_ARRAYLANG['TXT_FILEBROWSER_MEDIA_2'] = "Medienarchiv #2";
