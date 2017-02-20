@@ -263,25 +263,25 @@ class CacheManager extends \Cx\Core_Modules\Cache\Controller\CacheLib
                 }
             }
         }
-        $apcMaxSizeKb = isset($apcSmaInfo['num_seg']) && isset($apcSmaInfo['seg_size']) ? $apcSmaInfo['num_seg']*$apcSmaInfo['seg_size'] / 1024 : 0;
-        $apcSizeKb = isset($apcCacheInfo['mem_size']) ? $apcCacheInfo['mem_size'] / 1024 : 0;
+        $apcMaxSizeKib = isset($apcSmaInfo['num_seg']) && isset($apcSmaInfo['seg_size']) ? $apcSmaInfo['num_seg']*$apcSmaInfo['seg_size'] / 1024 : 0;
+        $apcSizeKib = isset($apcCacheInfo['mem_size']) ? $apcCacheInfo['mem_size'] / 1024 : 0;
 
         $opcacheSizeCount = !isset($opCacheStatus) || $opCacheStatus == false ? 0 : $opCacheStatus['opcache_statistics']['num_cached_scripts'];
-        $opcacheSizeKb = (!isset($opCacheStatus) || $opCacheStatus == false ? 0 : $opCacheStatus['memory_usage']['used_memory']) / (1024 * 1024);
-        $opcacheMaxSizeKb = isset($opCacheConfig['directives']['opcache.memory_consumption']) ? $opCacheConfig['directives']['opcache.memory_consumption'] / (1024 * 1024) : 0;
+        $opcacheSizeKib = (!isset($opCacheStatus) || $opCacheStatus == false ? 0 : $opCacheStatus['memory_usage']['used_memory']) / (1024 * 1024);
+        $opcacheMaxSizeKib = isset($opCacheConfig['directives']['opcache.memory_consumption']) ? $opCacheConfig['directives']['opcache.memory_consumption'] / (1024 * 1024) : 0;
 
         $memcacheEntriesCount = isset($memcacheStats['curr_items']) ? $memcacheStats['curr_items'] : 0;
-        $memcacheSizeMb = isset($memcacheStats['bytes']) ? $memcacheStats['bytes'] / (1024 *1024) : 0;
-        $memcacheMaxSizeMb = isset($memcacheStats['limit_maxbytes']) ? $memcacheStats['limit_maxbytes'] / (1024 *1024) : 0;
+        $memcacheSizeMib = isset($memcacheStats['bytes']) ? $memcacheStats['bytes'] / (1024 *1024) : 0;
+        $memcacheMaxSizeMib = isset($memcacheStats['limit_maxbytes']) ? $memcacheStats['limit_maxbytes'] / (1024 *1024) : 0;
 
         $memcacheConfiguration = $this->getMemcacheConfiguration();
         $memcacheServerKey = $memcacheConfiguration['ip'].':'.$memcacheConfiguration['port'];
         $memcachedServerEntriesCount = isset($memcachedStats[$memcacheServerKey]['curr_items']) ? $memcachedStats[$memcacheServerKey]['curr_items'] : 0;
-        $memcachedServerSizeMb = isset($memcachedStats[$memcacheServerKey]['bytes']) ? $memcachedStats[$memcacheServerKey]['bytes'] / (1024 *1024) : 0;
+        $memcachedServerSizeMib = isset($memcachedStats[$memcacheServerKey]['bytes']) ? $memcachedStats[$memcacheServerKey]['bytes'] / (1024 *1024) : 0;
         $memcachedEntriesCount = $this->getMemcachedEntryCount();
-        $memcachedSizeMb = $memcachedServerEntriesCount ? $memcachedServerSizeMb / $memcachedServerEntriesCount * $memcachedEntriesCount : 0;
+        $memcachedSizeMib = $memcachedServerEntriesCount ? $memcachedServerSizeMib / $memcachedServerEntriesCount * $memcachedEntriesCount : 0;
 
-        $memcachedMaxSizeMb = isset($memcachedStats[$memcacheServerKey]['limit_maxbytes']) ? $memcachedStats[$memcacheServerKey]['limit_maxbytes'] / (1024 *1024) : 0;
+        $memcachedMaxSizeMib = isset($memcachedStats[$memcacheServerKey]['limit_maxbytes']) ? $memcachedStats[$memcacheServerKey]['limit_maxbytes'] / (1024 *1024) : 0;
 
         $this->objTpl->setVariable(array(
             'SETTINGS_STATUS_ON' => ($this->arrSettings['cacheEnabled'] == 'on') ? 'checked' : '',
@@ -307,17 +307,17 @@ class CacheManager extends \Cx\Core_Modules\Cache\Controller\CacheLib
             'STATS_FOLDERSIZE_ENTRIES'              => number_format($intFoldersizeEntries / 1024, 2, '.', '\''),
             'STATS_APC_CHACHE_SITE_COUNT'           => $apcSizeCount,
             'STATS_APC_CHACHE_ENTRIES_COUNT'        => $apcEntriesCount,
-            'STATS_APC_MAX_SIZE'                    => number_format($apcMaxSizeKb, 2, '.', '\''),
-            'STATS_APC_SIZE'                        => number_format($apcSizeKb, 2, '.', '\''),
+            'STATS_APC_MAX_SIZE'                    => number_format($apcMaxSizeKib, 2, '.', '\''),
+            'STATS_APC_SIZE'                        => number_format($apcSizeKib, 2, '.', '\''),
             'STATS_OPCACHE_CHACHE_SITE_COUNT'       => $opcacheSizeCount,
-            'STATS_OPCACHE_SIZE'                    => number_format($opcacheSizeKb, 2, '.', '\''),
-            'STATS_OPCACHE_MAX_SIZE'                => number_format($opcacheMaxSizeKb, 2, '.', '\''),
+            'STATS_OPCACHE_SIZE'                    => number_format($opcacheSizeKib, 2, '.', '\''),
+            'STATS_OPCACHE_MAX_SIZE'                => number_format($opcacheMaxSizeKib, 2, '.', '\''),
             'STATS_MEMCACHE_CHACHE_ENTRIES_COUNT'   => $memcacheEntriesCount,
-            'STATS_MEMCACHE_SIZE'                   => number_format($memcacheSizeMb, 2, '.', '\''),
-            'STATS_MEMCACHE_MAX_SIZE'               => number_format($memcacheMaxSizeMb, 2, '.', '\''),
+            'STATS_MEMCACHE_SIZE'                   => number_format($memcacheSizeMib, 2, '.', '\''),
+            'STATS_MEMCACHE_MAX_SIZE'               => number_format($memcacheMaxSizeMib, 2, '.', '\''),
             'STATS_MEMCACHED_CHACHE_ENTRIES_COUNT'   => $memcachedEntriesCount,
-            'STATS_MEMCACHED_SIZE'                   => number_format($memcachedSizeMb, 2, '.', '\''),
-            'STATS_MEMCACHED_MAX_SIZE'               => number_format($memcachedMaxSizeMb, 2, '.', '\''),
+            'STATS_MEMCACHED_SIZE'                   => number_format($memcachedSizeMib, 2, '.', '\''),
+            'STATS_MEMCACHED_MAX_SIZE'               => number_format($memcachedMaxSizeMib, 2, '.', '\''),
         ));
 
         $objTemplate->setVariable(array(
