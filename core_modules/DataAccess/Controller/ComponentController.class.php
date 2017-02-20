@@ -103,11 +103,12 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      *
      * <domain>(/<offset>)/api/v1/<outputModule>/<dataSource>/<parameters>[(?apikey=<apikey>(&<options>))|?<options>]
      * @see getCommandsForCommandMode()
-     * @param string $command Name of command to execute
-     * @param array $arguments List of arguments for the command
-     * @return void
+     * @param   string  $command        Name of command to execute
+     * @param   array   $arguments      List of arguments for the command
+     * @param   array   $dataArguments  The optional List of data arguments
+     * @return  void
      */
-    public function executeCommand($command, $arguments, $dataArguments) {
+    public function executeCommand($command, $arguments, $dataArguments = array()) {
         try {
             switch ($command) {
                 case 'v1':
