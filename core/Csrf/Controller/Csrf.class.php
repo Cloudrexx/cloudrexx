@@ -105,8 +105,11 @@ class Csrf {
         if (!empty(self::$current_code)) {
             return self::$current_code;
         }
-        self::$current_code = base64_encode(rand(1000000000000, 9999999999999));
-        self::$current_code = preg_replace('#[\'"=%]#', '_', self::$current_code);
+// FIX: Make rand() work on systems using 32 bit integers
+//        self::$current_code = base64_encode(rand(100000000, 999999999));
+//        self::$current_code = preg_replace('#[\'"=%]#', '_', self::$current_code);
+// FIX: Even better: Use uniqid() to create real unique values in a single step
+        self::$current_code = uniqid();
         self::__setkey(self::$current_code, self::$validity_count);
         return self::$current_code;
     }
