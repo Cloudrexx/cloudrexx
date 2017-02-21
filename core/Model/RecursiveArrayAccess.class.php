@@ -185,7 +185,7 @@ class RecursiveArrayAccess implements \ArrayAccess, \Countable, \Iterator {
      * @return boolean true on success or false on failure.
      */
     public function offsetExists($offset) {
-        return isset($this->data[$offset]);
+        return !is_null($offset) && isset($this->data[$offset]);
     }
 
     /**
