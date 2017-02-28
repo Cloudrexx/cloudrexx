@@ -1138,10 +1138,11 @@ class LanguageManager
                 if (isset($_POST['langActiveStatus'][$id]) && $_POST['langActiveStatus'][$id]==1 ) {
                     $languageCode = \FWLanguage::getLanguageCodeById($id);
                     $pageRepo = \Env::get('em')->getRepository('Cx\Core\ContentManager\Model\Entity\Page');
+// FIXED: Argument 2 to findBy() MUST NOT be a boolean
                     $alias = $pageRepo->findBy(array(
                         'type' => \Cx\Core\ContentManager\Model\Entity\Page::TYPE_ALIAS,
                         'slug' => $languageCode,
-                    ), true);
+                    ));
 
                     if (count($alias)) {
                         if (is_array($alias)) $alias = $alias[0];
