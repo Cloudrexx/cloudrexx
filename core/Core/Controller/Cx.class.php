@@ -2031,6 +2031,7 @@ namespace Cx\Core\Core\Controller {
                 'DOMAIN_URL'                     => $_CONFIG['domainUrl'],
                 'PATH_OFFSET'                    => $this->codeBaseOffsetPath,
                 'BASE_URL'                       => ASCMS_PROTOCOL.'://'.$_CONFIG['domainUrl'] . $this->codeBaseOffsetPath,
+                'THEME_FOLDER_NAME'              => contrexx_raw2xhtml(\Env::get('init')->getCurrentThemesPath()),
                 'METAKEYS'                       => $metarobots ? contrexx_raw2xhtml($this->resolvedPage->getMetakeys()) : '',
                 'METADESC'                       => $metarobots ? contrexx_raw2xhtml($this->resolvedPage->getMetadesc()) : '',
                 'METAROBOTS'                     => $metarobots ? 'all' : 'none',
