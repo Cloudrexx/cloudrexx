@@ -79,6 +79,10 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      */
     public function postInit(\Cx\Core\Core\Controller\Cx $cx) {
         $widgetController = $this->getComponent('Widget');
+        if (!$widgetController) {
+            // Not available in minimal mode?
+            return;
+        }
         $widgetNames = array(
             'STANDARD_URL',
             'MOBILE_URL',

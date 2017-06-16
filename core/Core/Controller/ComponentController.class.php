@@ -53,6 +53,10 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     public function postInit(\Cx\Core\Core\Controller\Cx $cx)
     {
         $widgetController = $this->getComponent('Widget');
+        if (!$widgetController) {
+            // Not available in minimal mode?
+            return;
+        }
         $widgetController->registerWidget(
             new \Cx\Core_Modules\Widget\Model\Entity\FinalStringWidget(
                 $this,
@@ -248,7 +252,7 @@ Available commands:
             // else return 'customized';
         return 'normal';
     }
-    
+
     /**
      * Executes a command (in CLI command mode) asynchronously
      * @param string $command Command mode command name to execute
