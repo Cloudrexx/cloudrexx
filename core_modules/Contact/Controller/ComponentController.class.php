@@ -73,6 +73,10 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             'coreAdminName' => 'Name',
         );
         $widgetController = $this->getComponent('Widget');
+        if (!$widgetController) {
+            // Not available in minimal mode?
+            return;
+        }
         foreach ($globalPlaceholders as $configIndex=>$placeholder) {
             if (is_int($configIndex)) {
                 $configIndex = 'contact' . $placeholder;

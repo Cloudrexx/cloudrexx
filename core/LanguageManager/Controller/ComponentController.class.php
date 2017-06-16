@@ -280,7 +280,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         }
         $this->parseLocaleList($template);
     }
-    
+
     /**
      * Parses locale list in a template file
      * @todo Does language list only for now. Update as soon as locales are available
@@ -350,6 +350,10 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     public function postInit(\Cx\Core\Core\Controller\Cx $cx)
     {
         $widgetController = $this->getComponent('Widget');
+        if (!$widgetController) {
+            // Not available in minimal mode?
+            return;
+        }
         $langManager      = new LanguageManager();
         $widgetNames      = array(
             'CHARSET',

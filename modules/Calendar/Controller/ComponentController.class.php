@@ -120,6 +120,10 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     {
         // Get Calendar Events
         $widgetController = $this->getComponent('Widget');
+        if (!$widgetController) {
+            // Not available in minimal mode?
+            return;
+        }
         $calendarLib      = new CalendarLibrary('');
         foreach ($calendarLib->getHeadlinePlaceholders() as $widgetName) {
             $widget = new \Cx\Core_Modules\Widget\Model\Entity\EsiWidget(
