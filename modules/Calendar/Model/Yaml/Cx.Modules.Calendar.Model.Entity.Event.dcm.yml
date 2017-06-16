@@ -2,8 +2,6 @@ Cx\Modules\Calendar\Model\Entity\Event:
   type: entity
   table: module_calendar_event
   indexes:
-    contrexx_module_calendar_cat_id_ibfk:
-      columns: [ catid ]
     contrexx_module_calendar_registration_form_ibkf:
       columns: [ registration_form ]
   id:
@@ -249,15 +247,21 @@ Cx\Modules\Calendar\Model\Entity\Event:
       targetEntity: Cx\Modules\Calendar\Model\Entity\Registration
       mappedBy: event
   manyToOne:
-    category:
-      targetEntity: Cx\Modules\Calendar\Model\Entity\Category
-      inversedBy: events
-      joinColumn:
-        name: catid
-        referencedColumnName: id
     registrationForm:
       targetEntity: Cx\Modules\Calendar\Model\Entity\RegistrationForm
       inversedBy: events
       joinColumn:
         name: registration_form
         referencedColumnName: id
+  manyToMany:
+    categories:
+      targetEntity: Cx\Modules\Calendar\Model\Entity\Category
+      inversedBy: events
+      joinTable:
+        name: module_calendar_events_categories
+        joinColumns:
+          event_id:
+            referencedColumnName: id
+        inverseJoinColumns:
+          category_id:
+            referencedColumnName: id
