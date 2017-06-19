@@ -84,7 +84,7 @@ class CalendarCategoryManager extends CalendarLibrary
         $onlyActive_where = ($this->onlyActive == true ? ' WHERE status=1' : '');
 
         $query = "SELECT category.id AS id
-                    FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_category AS category
+                    FROM ".DBPREFIX."module_".self::TABLE_PREFIX."_category AS category
                          ".$onlyActive_where."
                 ORDER BY category.pos";
 

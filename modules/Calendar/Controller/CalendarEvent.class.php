@@ -752,103 +752,100 @@ class CalendarEvent extends CalendarLibrary
             $langId = $_LANGID;
         }
 
-        $query = "SELECT event.id AS id,
-                         event.type AS type,
-                         event.startdate AS startdate,
-                         event.enddate AS enddate,
+        $query = "
+            SELECT event.id,
+                event.type,
+                event.startdate,
+                event.enddate,
                          event.use_custom_date_display AS useCustomDateDisplay,
-                         event.showStartDateList AS showStartDateList,
-                         event.showEndDateList AS showEndDateList,
-                         event.showStartTimeList AS showStartTimeList,
-                         event.showEndTimeList AS showEndTimeList,
-                         event.showTimeTypeList AS showTimeTypeList,
-                         event.showStartDateDetail AS showStartDateDetail,
-                         event.showEndDateDetail AS showEndDateDetail,
-                         event.showStartTimeDetail AS showStartTimeDetail,
-                         event.showEndTimeDetail AS showEndTimeDetail,
-                         event.showTimeTypeDetail AS showTimeTypeDetail,
-                         event.access AS access,
-                         event.price AS price,
-                         event.link AS link,
-                         event.pic AS pic,
-                         event.attach AS attach,
-                         event.place_mediadir_id AS place_mediadir_id,
-                         event.host_mediadir_id AS host_mediadir_id,
-                         event.priority AS priority,
-                         event.catid AS catid,
-                         event.status AS status,
-                         event.author AS author,
-                         event.confirmed AS confirmed,
+                event.showStartDateList,
+                event.showEndDateList,
+                event.showStartTimeList,
+                event.showEndTimeList,
+                event.showTimeTypeList,
+                event.showStartDateDetail,
+                event.showEndDateDetail,
+                event.showStartTimeDetail,
+                event.showEndTimeDetail,
+                event.showTimeTypeDetail,
+                event.access,
+                event.price,
+                event.link,
+                event.pic,
+                event.attach,
+                event.place_mediadir_id,
+                event.host_mediadir_id,
+                event.priority,
+                event.status,
+                event.author,
+                event.confirmed,
                          event.show_detail_view,
-                         event.show_in AS show_in,
-                         event.google AS google,
-                         event.invited_groups AS invited_groups,
-                         event.invited_crm_groups AS invited_crm_groups,
-                         event.invited_mails AS invited_mails,
-                         event.invitation_sent AS invitation_sent,
-                         event.invitation_email_template AS invitation_email_template,
-                         event.registration AS registration,
-                         event.registration_form AS registration_form,
-                         event.registration_num AS registration_num,
-                         event.registration_notification AS registration_notification,
+                         event.show_in,
+                         event.google,
+                         event.invited_groups,
+                         event.invited_crm_groups,
+                         event.invited_mails,
+                         event.invitation_sent,
+                         event.invitation_email_template,
+                         event.registration,
+                         event.registration_form,
+                         event.registration_num,
+                         event.registration_notification,
                          event.registration_external_link,
                          event.registration_external_fully_booked,
-                         event.email_template AS email_template,
-                         event.ticket_sales AS ticket_sales,
-                         event.num_seating AS num_seating,
-                         event.series_status AS series_status,
+                event.email_template,
+                event.ticket_sales,
+                event.num_seating,
+                event.series_status,
                          event.independent_series,
-                         event.series_type AS series_type,
-                         event.series_pattern_count AS series_pattern_count,
-                         event.series_pattern_weekday AS series_pattern_weekday,
-                         event.series_pattern_day AS series_pattern_day,
-                         event.series_pattern_week AS series_pattern_week,
-                         event.series_pattern_month AS series_pattern_month,
-                         event.series_pattern_type AS series_pattern_type,
-                         event.series_pattern_dourance_type AS series_pattern_dourance_type,
-                         event.series_pattern_end AS series_pattern_end,
-                         event.series_pattern_end_date AS series_pattern_end_date,
-                         event.series_pattern_begin AS series_pattern_begin,
-                         event.series_pattern_exceptions AS series_pattern_exceptions,
-                         event.series_additional_recurrences AS series_additional_recurrences,
+                event.series_type,
+                event.series_pattern_count,
+                event.series_pattern_weekday,
+                event.series_pattern_day,
+                event.series_pattern_week,
+                event.series_pattern_month,
+                event.series_pattern_type,
+                event.series_pattern_dourance_type,
+                event.series_pattern_end,
+                event.series_pattern_end_date,
+                event.series_pattern_begin,
+                event.series_pattern_exceptions,
+                event.series_additional_recurrences,
                          event.all_day,
-                         event.location_type AS location_type,
+                event.location_type,
                          field.place AS place,
-                         event.place_street AS place_street, 
-                         event.place_zip AS place_zip, 
+                event.place_street,
+                event.place_zip,
                          field.place_city AS place_city,
                          field.place_country AS place_country,
-                         event.place_website AS place_website, 
-                         event.place_link AS place_link, 
-                         event.place_phone AS place_phone, 
-                         event.place_map AS place_map, 
-                         event.host_type AS host_type,
+                event.place_website,
+                event.place_link,
+                event.place_phone,
+                event.place_map,
+                event.host_type,
                          field.org_name AS org_name,
-                         event.org_street AS org_street, 
-                         event.org_zip AS org_zip, 
+                event.org_street,
+                event.org_zip,
                          field.org_city AS org_city,
                          field.org_country AS org_country,
-                         event.org_website AS org_website, 
-                         event.org_link AS org_link, 
-                         event.org_phone AS org_phone, 
-                         event.org_email AS org_email, 
+                event.org_website,
+                event.org_link,
+                event.org_phone,
+                event.org_email,
                          field.title AS title,
                          field.teaser AS teaser,
                          field.description AS description
-                    FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_event AS event,
-                         ".DBPREFIX."module_".$this->moduleTablePrefix."_event_field AS field
+            FROM ".DBPREFIX."module_".self::TABLE_PREFIX."_event AS event
+            JOIN ".DBPREFIX."module_".self::TABLE_PREFIX."_event_field AS field
+            ON event.id=field.event_id
+            AND field.lang_id='".intval($langId)."'
                    WHERE event.id = '".intval($eventId)."'  
-                     AND (    event.id = field.event_id
-                          AND field.lang_id = '".intval($langId)."'
-                          AND FIND_IN_SET('".intval($langId)."',event.show_in)>0)
-                   LIMIT 1";
-
-        
-        $objResult = $objDatabase->Execute($query);  
-
+            AND FIND_IN_SET('".intval($langId)."', event.show_in)>0";
+        $objResult = $objDatabase->SelectLimit($query, 1);
         $this->fetchedLangIds[] = $langId;
-
-        if ($objResult !== false) {
+        if (!$objResult) {
+            return;
+        }
             // check if events of all languages shall be listed (not only those available in the requested language)
             if (   \Cx\Core\Core\Controller\Cx::instanciate()->getMode() == \Cx\Core\Core\Controller\Cx::MODE_BACKEND
                 || $this->arrSettings['showEventsOnlyInActiveLanguage'] == 2
@@ -977,26 +974,19 @@ class CalendarEvent extends CalendarLibrary
                 $this->ticketSales = intval($objResult->fields['ticket_sales']);
                 $this->arrNumSeating = json_decode($objResult->fields['num_seating']);
                 $this->numSeating = !empty($this->arrNumSeating) ? implode(',', $this->arrNumSeating) : '';
-                
                 $queryHosts = '
                     SELECT host_id                            
-                    FROM '.DBPREFIX.'module_'.$this->moduleTablePrefix.'_rel_event_host
-                    WHERE event_id = '.intval($eventId)
-                ;
-                                
+            FROM '.DBPREFIX.'module_'.self::TABLE_PREFIX.'_rel_event_host
+            WHERE event_id = '.intval($eventId);
                 $objResultHosts = $objDatabase->Execute($queryHosts); 
-                
                 if ($objResultHosts !== false) {      
                     while (!$objResultHosts->EOF) {                                             
                         $this->relatedHosts[] = intval($objResultHosts->fields['host_id']);
                         $objResultHosts->MoveNext();
                     }
                 }
-                
                 $this->getData(); 
             }
-        }
-    }
     
     /**
      * gets the data for the event
@@ -1020,7 +1010,7 @@ class CalendarEvent extends CalendarLibrary
                              field.org_name AS org_name,
                              field.org_city AS org_city,
                              field.org_country AS org_country
-                        FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_event_field AS field
+                        FROM ".DBPREFIX."module_".self::TABLE_PREFIX."_event_field AS field
                        WHERE field.event_id = '".intval($this->id)."'
                          AND field.lang_id = '".intval($langId)."'
                        LIMIT 1";
@@ -1524,40 +1514,36 @@ class CalendarEvent extends CalendarLibrary
                 'model/preUpdate', $event,
                 array('relations' => array('oneToMany' => 'getEventFields')), true
             );
-            $query = \SQL::update("module_{$this->moduleTablePrefix}_event", $formData, array('escape' => true)) ." WHERE id = '$id'";
-        
+            $query = \SQL::update(
+                    "module_" . self::TABLE_PREFIX . "_event", $formData,
+                    array('escape' => true))
+                . " WHERE id = '$id'";
             $objResult = $objDatabase->Execute($query);
-            
-            if ($objResult !== false) {
+            if (!$objResult) {
+                return false;
+            }
                 $this->id = $id;
                 $eventFieldEntities = $event->getEventFields();
                 foreach ($eventFieldEntities as $eventFieldEntity)  {
                     //Trigger preRemove event for EventField Entity
                     $this->triggerEvent('model/preRemove', $eventFieldEntity);
                 }
-                $query = "DELETE FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_event_field
+            $query = "DELETE FROM ".DBPREFIX."module_".self::TABLE_PREFIX."_event_field
                                 WHERE event_id = '".$id."'";
-
                 $objResult = $objDatabase->Execute($query);
-                if ($objResult !== false) {
+            if ($objResult) {
                     foreach ($eventFieldEntities as $eventFieldEntity)  {
                         //Trigger postRemove event for EventField Entity
                         $this->triggerEvent('model/postRemove', $eventFieldEntity);
                     }
                     $this->triggerEvent('model/postFlush');
                 }
-
-                $query = "DELETE FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_event_host
+            $query = "DELETE FROM ".DBPREFIX."module_".self::TABLE_PREFIX."_rel_event_host
                                 WHERE event_id = '".$id."'";
-
                 $objResult = $objDatabase->Execute($query);
             } else {
-                return false;
-            }
-        } else {
             $objFWUser  = \FWUser::getFWUserObject();
             $objUser    = $objFWUser->objUser;
-
             if ($objInit->mode == 'frontend') {
                 $status    = 1;
                 $confirmed = $this->arrSettings['confirmFrontendEvents'] == 1 ? 0 : 1;
@@ -1580,9 +1566,8 @@ class CalendarEvent extends CalendarLibrary
                 'model/prePersist', $event,
                 array('relations' => array('oneToMany' => 'getEventFields')), true
             );
-            $query = \SQL::insert("module_{$this->moduleTablePrefix}_event", $formData, array('escape' => true));
+            $query = \SQL::insert("module_{self::TABLE_PREFIX}_event", $formData, array('escape' => true));
             $objResult = $objDatabase->Execute($query);
-
             if ($objResult !== false) {
                 $id = intval($objDatabase->Insert_ID());
                 $event = $this->getEventEntity($id);
@@ -1605,7 +1590,7 @@ class CalendarEvent extends CalendarLibrary
                         array('relations' => array('manyToOne' => 'getEvent')), true
                     );
                     $query =
-                        'INSERT INTO ' . DBPREFIX . 'module_' . $this->moduleTablePrefix. '_event_field
+                        'INSERT INTO ' . DBPREFIX . 'module_' . self::TABLE_PREFIX. '_event_field
                           SET `event_id`      = ' . $id . ',
                               `lang_id`       = ' . $eventField['langId'] . ',
                               `title`         = "' . contrexx_addslashes($eventField['title']) . '",
@@ -1628,17 +1613,14 @@ class CalendarEvent extends CalendarLibrary
                     $this->triggerEvent('model/postFlush');
                 }
             }
-
             if (!empty($related_hosts)) {
                 foreach ($related_hosts as $key => $hostId) {
-                    $query = "INSERT INTO ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_event_host
+                    $query = "INSERT INTO ".DBPREFIX."module_".self::TABLE_PREFIX."_rel_event_host
                                       (`host_id`,`event_id`) 
                                VALUES ('".intval($hostId)."','".intval($id)."')";
-
                     $objResult = $objDatabase->Execute($query); 
                 }
             }
-            
             if ($eId == 0) {
                 //Trigger postPersist event for Event Entity
                 $this->triggerEvent('model/postPersist', $event, null, true);
@@ -1881,7 +1863,7 @@ class CalendarEvent extends CalendarLibrary
             array('relations' => array('oneToMany' => 'getEventFields')), true
         );
 
-        $query = "DELETE FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_event
+        $query = "DELETE FROM ".DBPREFIX."module_".self::TABLE_PREFIX."_event
                    WHERE id = '".intval($this->id)."'";
 
         $objResult = $objDatabase->Execute($query);
@@ -1892,7 +1874,7 @@ class CalendarEvent extends CalendarLibrary
                 //Trigger preRemove event for EventField Entity
                 $this->triggerEvent('model/preRemove', $eventFieldEntity);
             }
-            $query = "DELETE FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_event_field
+            $query = "DELETE FROM ".DBPREFIX."module_".self::TABLE_PREFIX."_event_field
                             WHERE event_id = '".intval($this->id)."'";
 
             $objResult = $objDatabase->Execute($query);
@@ -1903,7 +1885,7 @@ class CalendarEvent extends CalendarLibrary
                 }
                 //Trigger postRemove event for Event Entity
                 $this->triggerEvent('model/postRemove', $event);
-                $query = "DELETE FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_event_host
+                $query = "DELETE FROM ".DBPREFIX."module_".self::TABLE_PREFIX."_rel_event_host
                                 WHERE event_id = '".intval($this->id)."'";
 
                 $objResult = $objDatabase->Execute($query);
@@ -2028,7 +2010,7 @@ class CalendarEvent extends CalendarLibrary
             'model/preUpdate', $event,
             array('relations' => array('oneToMany' => 'getEventFields')), true
         );
-        $query = "UPDATE ".DBPREFIX."module_".$this->moduleTablePrefix."_event AS event
+        $query = "UPDATE ".DBPREFIX."module_".self::TABLE_PREFIX."_event AS event
                      SET event.status = '".intval($status)."'
                    WHERE event.id = '".intval($this->id)."'";
 
@@ -2063,7 +2045,7 @@ class CalendarEvent extends CalendarLibrary
             'model/preUpdate', $event,
             array('relations' => array('oneToMany' => 'getEventFields')), true
         );
-        $query = "UPDATE ".DBPREFIX."module_".$this->moduleTablePrefix."_event AS event
+        $query = "UPDATE ".DBPREFIX."module_".self::TABLE_PREFIX."_event AS event
                      SET event.confirmed = '1'
                    WHERE event.id = '".intval($this->id)."'";
 
@@ -2395,7 +2377,7 @@ class CalendarEvent extends CalendarLibrary
                                         COUNT(1) AS numSubscriber,
                                         r.`type`
                                     FROM
-                                        `'.DBPREFIX.'module_'.$this->moduleTablePrefix.'_registration` AS `r`
+                                        `'.DBPREFIX.'module_'.self::TABLE_PREFIX.'_registration` AS `r`
                                     WHERE
                                         r.`event_id` = '. contrexx_input2int($this->id) .'
                                         '. $filterEventTime .'
@@ -2424,13 +2406,13 @@ class CalendarEvent extends CalendarLibrary
             SELECT
                 `fn`.`default` AS `seating_option`
             FROM
-                `'.DBPREFIX.'module_'.$this->moduleTablePrefix.'_registration_form` AS `f`
+                `'.DBPREFIX.'module_'.self::TABLE_PREFIX.'_registration_form` AS `f`
             INNER JOIN
-                `'.DBPREFIX.'module_'.$this->moduleTablePrefix.'_registration_form_field` AS `ff`
+                `'.DBPREFIX.'module_'.self::TABLE_PREFIX.'_registration_form_field` AS `ff`
             ON
                 `f`.`id` = `ff`.`form`
             INNER JOIN
-                `'.DBPREFIX.'module_'.$this->moduleTablePrefix.'_registration_form_field_name` AS `fn`
+                `'.DBPREFIX.'module_'.self::TABLE_PREFIX.'_registration_form_field_name` AS `fn`
             ON
                 `ff`.`id` = `fn`.`field_id`
             WHERE
@@ -2448,10 +2430,10 @@ class CalendarEvent extends CalendarLibrary
             $seatingOptionArray = explode(',', $seatingOption);
             $queryRegistrations = '
                 SELECT `v`.`value` AS `reserved_seating`
-                FROM `'.DBPREFIX.'module_'.$this->moduleTablePrefix.'_registration_form_field_value` AS `v`
-                INNER JOIN `'.DBPREFIX.'module_'.$this->moduleTablePrefix.'_registration` AS `r`
+                FROM `'.DBPREFIX.'module_'.self::TABLE_PREFIX.'_registration_form_field_value` AS `v`
+                INNER JOIN `'.DBPREFIX.'module_'.self::TABLE_PREFIX.'_registration` AS `r`
                 ON `v`.`reg_id` = `r`.`id`
-                INNER JOIN `'.DBPREFIX.'module_'.$this->moduleTablePrefix.'_registration_form_field` AS `f`
+                INNER JOIN `'.DBPREFIX.'module_'.self::TABLE_PREFIX.'_registration_form_field` AS `f`
                 ON `v`.`field_id` = `f`.`id`
                 WHERE `r`.`event_id` = '. contrexx_input2int($this->id) .'
                     '. $filterEventTime .'

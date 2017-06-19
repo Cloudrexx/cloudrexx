@@ -76,14 +76,6 @@ class CalendarLibrary
     public $moduleName = "Calendar";
     
     /**
-     * module table prefix
-     *
-     * @access public
-     * @var string 
-     */
-    public $moduleTablePrefix = "calendar";
-    
-    /**
      * module language variable prefix
      *
      * @access public
@@ -155,6 +147,13 @@ class CalendarLibrary
      * @var \Doctrine\ORM\EntityManager
      */
     protected $em;
+
+    /**
+     * Module table prefix
+     * @access public
+     * @var string
+     */
+    const TABLE_PREFIX = 'calendar';
 
     /**
      * map field key
@@ -366,52 +365,55 @@ class CalendarLibrary
     function getSettings()
     {
         global $objDatabase, $_ARRAYLANG, $objInit;
-        
         // only initialize once
         if ($this->arrSettings) {
             return;
         }
-        
         // hotfix: this fixes the issue that the settings are being fetch from the
         // database over and over again.
         // This is just workaround without having to refactor the whole implementation of CalendarLibrary::$arrSettings
-        if (isset(static::$settings[$this->moduleTablePrefix])) {
-            $this->arrSettings = static::$settings[$this->moduleTablePrefix];
+        if (isset(static::$settings[static::TABLE_PREFIX])) {
+            $this->arrSettings = static::$settings[static::TABLE_PREFIX];
             return;
         }
-
     	$arrSettings = array();
         $arrDateSettings =  array(
-                            'separatorDateList','separatorDateTimeList', 'separatorSeveralDaysList', 'separatorTimeList',
-                            'separatorDateDetail','separatorDateTimeDetail', 'separatorSeveralDaysDetail', 'separatorTimeDetail',
+            'separatorDateList','separatorDateTimeList',
+            'separatorSeveralDaysList', 'separatorTimeList',
+            'separatorDateDetail','separatorDateTimeDetail',
+            'separatorSeveralDaysDetail', 'separatorTimeDetail',
                             );
-
-        $objSettings = $objDatabase->Execute("SELECT name,value,options, type FROM  ".DBPREFIX."module_".$this->moduleTablePrefix."_settings ORDER BY name ASC");
-        if ($objSettings !== false) {
+        $objSettings = $objDatabase->Execute("
+            SELECT name, value, options, type
+            FROM  ".DBPREFIX."module_".static::TABLE_PREFIX."_settings
+            ORDER BY name ASC");
+        if ($objSettings) {
             while (!$objSettings->EOF) {
                 //return date settings
-                if($objSettings->fields['type'] == 5 && in_array($objSettings->fields['name'], $arrDateSettings) )
-                {
+                if ($objSettings->fields['type'] == 5
+                    && in_array($objSettings->fields['name'], $arrDateSettings)) {
                     $strOptions = $objSettings->fields['options'];
                     $arrOptions = explode(',', $strOptions );
                     $value = $arrOptions[$objSettings->fields['value']];
-                    
                     if($objInit->mode == 'backend') {
                         // This is for the preview in settings > Date
-                        $arrSettings["{$objSettings->fields['name']}_value"] = htmlspecialchars($_ARRAYLANG["{$value}_VALUE"], ENT_QUOTES, CONTREXX_CHARSET);
+                        $arrSettings["{$objSettings->fields['name']}_value"] =
+                            htmlspecialchars($_ARRAYLANG["{$value}_VALUE"],
+                                ENT_QUOTES, CONTREXX_CHARSET);
                     }
                     $value = $_ARRAYLANG[$value];                    
-                    $arrSettings[$objSettings->fields['name']] = htmlspecialchars($value, ENT_QUOTES, CONTREXX_CHARSET);
+                    $arrSettings[$objSettings->fields['name']] =
+                        htmlspecialchars($value, ENT_QUOTES, CONTREXX_CHARSET);
                 } else {
                     //return all exept date settings
-                    $arrSettings[$objSettings->fields['name']] = htmlspecialchars($objSettings->fields['value'], ENT_QUOTES, CONTREXX_CHARSET);
+                    $arrSettings[$objSettings->fields['name']] =
+                        htmlspecialchars($objSettings->fields['value'],
+                            ENT_QUOTES, CONTREXX_CHARSET);
                 }
-
                 $objSettings->MoveNext();
             }
         }
-        
-        static::$settings[$this->moduleTablePrefix] = $arrSettings;
+        static::$settings[static::TABLE_PREFIX] = $arrSettings;
         $this->arrSettings = $arrSettings;
     }
     
@@ -660,7 +662,7 @@ EOF;
     {
         return bin2hex(openssl_random_pseudo_bytes(16));
     }
-    
+
     /**
      * Loads datepicker
      *      

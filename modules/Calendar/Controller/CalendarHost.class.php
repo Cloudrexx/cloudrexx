@@ -127,7 +127,7 @@ class CalendarHost extends CalendarLibrary
         global $objDatabase, $_LANGID;
 
         $query = "SELECT  id,title,uri,cat_id,`key`,confirmed,status
-                    FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_host
+                    FROM ".DBPREFIX."module_".self::TABLE_PREFIX."_host
                    WHERE id = '".intval($hostId)."'
                    LIMIT 1";
 
@@ -171,11 +171,11 @@ class CalendarHost extends CalendarLibrary
         }
 
         if(intval($this->id) == 0) {
-            $query = "INSERT INTO ".DBPREFIX."module_".$this->moduleTablePrefix."_host
+            $query = "INSERT INTO ".DBPREFIX."module_".self::TABLE_PREFIX."_host
                                   (`title`,`uri`,`cat_id`,`key`,`confirmed`,`status`)
                            VALUES ('".$title."','".$uri."','".$category."','".$key."','".$confirmed."','".$status."')";
         } else {
-            $query = "UPDATE ".DBPREFIX."module_".$this->moduleTablePrefix."_host
+            $query = "UPDATE ".DBPREFIX."module_".self::TABLE_PREFIX."_host
                          SET `title` = '".$title."',
                              `uri` = '".$uri."',
                              `cat_id` = '".$category."',
@@ -207,7 +207,7 @@ class CalendarHost extends CalendarLibrary
             $hostStatus = 1;
         }
 
-        $query = "UPDATE ".DBPREFIX."module_".$this->moduleTablePrefix."_host
+        $query = "UPDATE ".DBPREFIX."module_".self::TABLE_PREFIX."_host
                      SET status = '".intval($hostStatus)."'
                    WHERE id = '".intval($this->id)."'";
 
@@ -228,13 +228,13 @@ class CalendarHost extends CalendarLibrary
     function delete(){
         global $objDatabase;
 
-        $query = "DELETE FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_host
+        $query = "DELETE FROM ".DBPREFIX."module_".self::TABLE_PREFIX."_host
                         WHERE id = '".intval($this->id)."'";
 
         $objResult = $objDatabase->Execute($query);
 
         if ($objResult !== false) {
-            $query = "DELETE FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_note_host
+            $query = "DELETE FROM ".DBPREFIX."module_".self::TABLE_PREFIX."_rel_note_host
                             WHERE host_id = '".intval($this->id)."'";
 
             $objResult = $objDatabase->Execute($query);

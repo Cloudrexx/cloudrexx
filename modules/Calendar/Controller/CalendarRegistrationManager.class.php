@@ -183,7 +183,7 @@ class CalendarRegistrationManager extends CalendarLibrary
 
         $query = '
             SELECT `id`
-            FROM `'.DBPREFIX.'module_'.$this->moduleTablePrefix.'_registration`
+            FROM `'.DBPREFIX.'module_'.self::TABLE_PREFIX.'_registration`
             WHERE `event_id` = '.$this->eventId.'
             '.$strWhere.'
             ORDER BY `id` DESC'
@@ -211,7 +211,7 @@ class CalendarRegistrationManager extends CalendarLibrary
     {
         global $objDatabase, $_LANGID, $_ARRAYLANG;
 
-        $objResult = $objDatabase->Execute('SELECT count(DISTINCT `field_id`) AS `count_form_fields` FROM `'.DBPREFIX.'module_'.$this->moduleTablePrefix.'_registration_form_field_name` WHERE `form_id` = '.$this->formId);
+        $objResult = $objDatabase->Execute('SELECT count(DISTINCT `field_id`) AS `count_form_fields` FROM `'.DBPREFIX.'module_'.self::TABLE_PREFIX.'_registration_form_field_name` WHERE `form_id` = '.$this->formId);
         $objTpl->setVariable($this->moduleLangVar.'_COUNT_FORM_FIELDS', $objResult->fields['count_form_fields'] + 4);
 
         $query = '
@@ -219,7 +219,7 @@ class CalendarRegistrationManager extends CalendarLibrary
                 `formField`.`id`,
                 (
                     SELECT `fieldName`.`name`
-                    FROM `'.DBPREFIX.'module_'.$this->moduleTablePrefix.'_registration_form_field_name` AS `fieldName`
+                    FROM `'.DBPREFIX.'module_'.self::TABLE_PREFIX.'_registration_form_field_name` AS `fieldName`
                     WHERE `fieldName`.`field_id` = `formField`.`id` AND `fieldName`.`form_id` = `formField`.`form`
                     ORDER BY CASE `fieldName`.`lang_id`
                                 WHEN '.$_LANGID.' THEN 1
@@ -229,7 +229,7 @@ class CalendarRegistrationManager extends CalendarLibrary
                 ) AS `name`,
                 (
                     SELECT `fieldDefault`.`default`
-                    FROM `'.DBPREFIX.'module_'.$this->moduleTablePrefix.'_registration_form_field_name` AS `fieldDefault`
+                    FROM `'.DBPREFIX.'module_'.self::TABLE_PREFIX.'_registration_form_field_name` AS `fieldDefault`
                     WHERE `fieldDefault`.`field_id` = `formField`.`id` AND `fieldDefault`.`form_id` = `formField`.`form`
                     ORDER BY CASE `fieldDefault`.`lang_id`
                                 WHEN '.$_LANGID.' THEN 1
@@ -238,7 +238,7 @@ class CalendarRegistrationManager extends CalendarLibrary
                     LIMIT 1
                 ) AS `default`,
                 `formField`.`type`
-            FROM `'.DBPREFIX.'module_'.$this->moduleTablePrefix.'_registration_form_field` AS `formField`
+            FROM `'.DBPREFIX.'module_'.self::TABLE_PREFIX.'_registration_form_field` AS `formField`
             WHERE `formField`.`form` = '.$this->formId.'
             ORDER BY `formField`.`order`
         ';
@@ -259,7 +259,7 @@ class CalendarRegistrationManager extends CalendarLibrary
 
             $objTpl->setVariable($this->moduleLangVar.'_REGISTRATION_NAME', $dateFilterTpl->get());
             $objTpl->parse('eventRegistrationName');
-            
+
             //display the registration submission date header
             $objTpl->setVariable($this->moduleLangVar.'_REGISTRATION_NAME', $_ARRAYLANG['TXT_CALENDAR_EVENT_REGISTRATION_SUBMISSION']);
             $objTpl->parse('eventRegistrationName');
@@ -286,8 +286,8 @@ class CalendarRegistrationManager extends CalendarLibrary
 
         $query = '
             SELECT `v`.`reg_id`, `v`.`field_id`, `v`.`value`, `f`.`type`
-            FROM `'.DBPREFIX.'module_'.$this->moduleTablePrefix.'_registration_form_field_value` AS `v`
-            INNER JOIN `'.DBPREFIX.'module_'.$this->moduleTablePrefix.'_registration_form_field` AS `f`
+            FROM `'.DBPREFIX.'module_'.self::TABLE_PREFIX.'_registration_form_field_value` AS `v`
+            INNER JOIN `'.DBPREFIX.'module_'.self::TABLE_PREFIX.'_registration_form_field` AS `f`
             ON `v`.`field_id` = `f`.`id`
             WHERE `f`.`form` = '.$this->formId.'
             ORDER BY `f`.`order`
@@ -492,7 +492,7 @@ class CalendarRegistrationManager extends CalendarLibrary
         $query = 'SELECT
                     COUNT(1) AS `count`,
                     `date` FROM
-                  `'.DBPREFIX.'module_'.$this->moduleTablePrefix.'_registration`
+                  `'.DBPREFIX.'module_'.self::TABLE_PREFIX.'_registration`
                 WHERE
                     `event_id` = '. $this->eventId .'
                     '. $strWhere .'
@@ -672,9 +672,9 @@ class CalendarRegistrationManager extends CalendarLibrary
         $query = "SELECT
                     `n`.`field_id`
                   FROM
-                    `".DBPREFIX."module_{$this->moduleTablePrefix}_registration_form_field_name` AS `n`
+                    `".DBPREFIX."module_{self::TABLE_PREFIX}_registration_form_field_name` AS `n`
                   INNER JOIN
-                    `".DBPREFIX."module_{$this->moduleTablePrefix}_registration_form_field` AS `f`
+                    `".DBPREFIX."module_{self::TABLE_PREFIX}_registration_form_field` AS `f`
                   ON
                     `n`.`field_id` = `f`.`id`
                   WHERE

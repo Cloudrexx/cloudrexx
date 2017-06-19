@@ -113,7 +113,7 @@ class CalendarHostManager extends CalendarLibrary
         }
 
         $query = "SELECT id
-                    FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_host
+                    FROM ".DBPREFIX."module_".self::TABLE_PREFIX."_host
                    WHERE id != 0 ".$catId_where." ".$active_where."
                 ORDER BY status DESC";
 

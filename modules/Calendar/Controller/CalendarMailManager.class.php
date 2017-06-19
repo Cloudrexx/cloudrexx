@@ -128,7 +128,7 @@ class CalendarMailManager extends CalendarLibrary {
         global $objDatabase,$_ARRAYLANG,$_LANGID;
 
         $query = "SELECT id
-                    FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_mail
+                    FROM ".DBPREFIX."module_".self::TABLE_PREFIX."_mail
                 ORDER BY action_id ASC, title ASC";
 
         $objResult = $objDatabase->Execute($query);
@@ -252,10 +252,10 @@ class CalendarMailManager extends CalendarLibrary {
             list($registrationDataText, $registrationDataHtml) = $this->getRegistrationData($objRegistration);
 
             $query = 'SELECT `v`.`value`, `n`.`default`, `f`.`type`
-                      FROM '.DBPREFIX.'module_'.$this->moduleTablePrefix.'_registration_form_field_value AS `v`
-                      INNER JOIN '.DBPREFIX.'module_'.$this->moduleTablePrefix.'_registration_form_field_name AS `n`
+                          FROM '.DBPREFIX.'module_'.self::TABLE_PREFIX.'_registration_form_field_value AS `v`
+                          INNER JOIN '.DBPREFIX.'module_'.self::TABLE_PREFIX.'_registration_form_field_name AS `n`
                       ON `v`.`field_id` = `n`.`field_id`
-                      INNER JOIN '.DBPREFIX.'module_'.$this->moduleTablePrefix.'_registration_form_field AS `f`
+                          INNER JOIN '.DBPREFIX.'module_'.self::TABLE_PREFIX.'_registration_form_field AS `f`
                       ON `v`.`field_id` = `f`.`id`
                       WHERE `v`.`reg_id` = '.$regId.'
                       AND (
@@ -518,7 +518,7 @@ class CalendarMailManager extends CalendarLibrary {
         }
 
         $query = "SELECT id, lang_id, is_default, recipients
-                    FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_mail
+                    FROM ".DBPREFIX."module_".self::TABLE_PREFIX."_mail
                    WHERE action_id='".intval($actionId)."'
                      AND status='1'
                          $whereId

@@ -304,45 +304,40 @@ class CalendarEventManager extends CalendarLibrary
                 (event.series_status = 1)
             ))';
         }
-
-        if(!empty($this->searchTerm) && $this->searchTerm != $_ARRAYLANG['TXT_CALENDAR_KEYWORD']) {
-            $searchTerm_DB = ", ".DBPREFIX."module_".$this->moduleTablePrefix."_event_field AS field";
-            $searchTerm_where = " AND ((field.title LIKE '%".$this->searchTerm."%' OR field.teaser LIKE '%".$this->searchTerm."%' OR field.description LIKE '%".$this->searchTerm."%' OR field.place LIKE '%".$this->searchTerm."%') AND field.event_id = event.id)";
-        } else {
-            $searchTerm_where = $searchTerm_DB = '';
+        if (!empty($this->searchTerm)
+            && $this->searchTerm != $_ARRAYLANG['TXT_CALENDAR_KEYWORD']) {
+            $searchTerm_DB = ", ".DBPREFIX."module_".self::TABLE_PREFIX."_event_field AS field";
+            $searchTerm_where = "
+                AND ((field.title LIKE '%".$this->searchTerm."%'
+                    OR field.teaser LIKE '%".$this->searchTerm."%'
+                    OR field.description LIKE '%".$this->searchTerm."%'
+                    OR field.place LIKE '%".$this->searchTerm."%')
+                AND field.event_id=event.id)";
         }
-
-        if($this->onlyConfirmed) {
-            $confirmed_where =' AND (event.confirmed = 1)';
-        } else {
-            $confirmed_where =' AND (event.confirmed = 0)';
-        }
-
-        $author_where = '';
+        $confirmed_where = '
+            AND (event.confirmed=' . ($this->onlyConfirmed ? '1' : '0').')';
         if(intval($this->author) != 0) {
             $author_where =' AND (event.author = '.intval($this->author).')';
         }
-
-        $query = "SELECT event.id AS id
-                    FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_event AS event
-                         ".$searchTerm_DB."
-                   WHERE ".$dateScope_where."
-                         ".$onlyActive_where."
-                         ".$categoryId_where."
-                         ".$searchTerm_where."
-                         ".$showIn_where."
-                         ".$confirmed_where."
-                         ".$author_where."
+        $query = "
+            SELECT event.id AS id
+            FROM ".DBPREFIX."module_".self::TABLE_PREFIX."_event AS event
+            $joins
+            $searchTerm_DB
+            WHERE $dateScope_where
+            $onlyActive_where
+            $categoryId_where
+            $searchTerm_where
+            $showIn_where
+            $confirmed_where
+            $author_where
                 GROUP BY event.id
                 ORDER BY event.startdate";
-
         $objResult = $objDatabase->Execute($query);
-
-        if ($objResult !== false) {
+        if ($objResult) {
             $objFWUser = \FWUser::getFWUserObject();
             while (!$objResult->EOF) {
                 $objEvent = new \Cx\Modules\Calendar\Controller\CalendarEvent(intval($objResult->fields['id']));
-
                 if ($objEvent->access) {
                     // cache userbased
                     $cx = \Cx\Core\Core\Controller\Cx::instanciate();
@@ -777,23 +772,23 @@ class CalendarEventManager extends CalendarLibrary
 
         $hostUri    = '';
         $hostTarget = '';
-        if($objEvent->external) {
+            if ($objEvent->external) {
             $objHost = new \Cx\Modules\Calendar\Controller\CalendarHost($objEvent->hostId);
 
-            if(substr($objHost->uri,-1) != '/') {
-                 $hostUri = $objHost->uri.'/';
+                if (substr($objHost->uri, -1) != '/') {
+                    $hostUri = $objHost->uri . '/';
             } else {
                  $hostUri = $objHost->uri;
             }
 
-            if(substr($hostUri,0,7) != 'http://') {
+                if (substr($hostUri, 0, 7) != 'http://') {
                 $hostUri = "http://".$hostUri;
             }
 
             $hostTarget = 'target="_blank"';
         }
 
-        if($this->arrSettings['showEventsOnlyInActiveLanguage'] == 2) {
+            if ($this->arrSettings['showEventsOnlyInActiveLanguage'] == 2) {
             $_LANGID = $objEvent->availableLang;
         }
 
@@ -852,7 +847,7 @@ class CalendarEventManager extends CalendarLibrary
         }
 
         //show date and time by user settings
-        if($objTpl->blockExists('calendarDateDetail')) {
+            if ($objTpl->blockExists('calendarDateDetail')) {
 
             $showStartDateDetail  = $objEvent->useCustomDateDisplay ? $objEvent->showStartDateDetail : ($this->arrSettings['showStartDateDetail'] == 1);
             $showEndDateDetail    = $objEvent->useCustomDateDisplay ? $objEvent->showEndDateDetail : ($this->arrSettings['showEndDateDetail'] == 1);
@@ -903,7 +898,7 @@ class CalendarEventManager extends CalendarLibrary
         if (($this->arrSettings['placeData'] == 1) && $objEvent->place == '' && $objEvent->place_street == '' && $objEvent->place_zip == '' && $objEvent->place_city == '' && $objEvent->place_country == '' && $objEvent->place_website == '' && $objEvent->place_phone == '') {
             $objTpl->hideBlock('calendarEventAddress');
         } else {
-            if($objEvent->google) {
+                if ($objEvent->google) {
 // TODO: implement with new Google Maps Embed API. see https://developers.google.com/maps/documentation/embed/guide
                 /*$googleCoordinates = self::_getCoorinates($objEvent->place_street, $objEvent->place_zip, $objEvent->place_city);
                 if($googleCoordinates != false) {

@@ -152,7 +152,7 @@ class CalendarFormManager extends CalendarLibrary
             SELECT
                 `id` AS id
             FROM
-                `'.DBPREFIX.'module_'.$this->moduleTablePrefix.'_registration_form`
+                `'.DBPREFIX.'module_'.self::TABLE_PREFIX.'_registration_form`
                 ' . $whereCondition . '
             ORDER BY `order`
         ';

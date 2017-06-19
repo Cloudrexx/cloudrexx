@@ -154,7 +154,7 @@ class CalendarSettings extends CalendarLibrary
         $where = " WHERE `name` IN (". implode(',', array_map(function($val) { return "'$val'"; }, $arrDateSettings)).")" ;
 
         $this->arrSeparatorValue = array();
-        $objSettings = $objDatabase->Execute("SELECT name,value,options, type FROM  ".DBPREFIX."module_".$this->moduleTablePrefix."_settings $where ORDER BY name ASC");
+        $objSettings = $objDatabase->Execute("SELECT name,value,options, type FROM  ".DBPREFIX."module_".self::TABLE_PREFIX."_settings $where ORDER BY name ASC");
         if ($objSettings !== false) {
             while (!$objSettings->EOF) {
                 $strOptions = $objSettings->fields['options'];
@@ -667,7 +667,7 @@ class CalendarSettings extends CalendarLibrary
             if(is_array($value)) {
                 $value = implode(',',$value);
             }
-            $query = "UPDATE ".DBPREFIX."module_".$this->moduleTablePrefix."_settings
+            $query = "UPDATE ".DBPREFIX."module_".self::TABLE_PREFIX."_settings
                          SET value = '".contrexx_addslashes($value)."'
                        WHERE name = '".contrexx_addslashes($name)."'";
 
@@ -710,7 +710,7 @@ class CalendarSettings extends CalendarLibrary
         $this->getSettings();
 
         $query = "SELECT id,title
-                    FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_settings_section
+                    FROM ".DBPREFIX."module_".self::TABLE_PREFIX."_settings_section
                    WHERE parent='".intval($section)."'
                 ORDER BY `order` ASC";
 
@@ -722,7 +722,7 @@ class CalendarSettings extends CalendarLibrary
                 ));
 
                 $query = "SELECT  id,name,title,value,info,type,options,special
-                            FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_settings
+                            FROM ".DBPREFIX."module_".self::TABLE_PREFIX."_settings
                            WHERE section_id='".intval($objResult->fields['id'])."'
                         ORDER BY `order` ASC";
 
@@ -908,7 +908,7 @@ class CalendarSettings extends CalendarLibrary
         global $objDatabase;
         if(!$this->yellowPaySettings) {
             $query = "SELECT  id,name,title,value,info,type,options,special
-                                        FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_settings
+                                        FROM ".DBPREFIX."module_".self::TABLE_PREFIX."_settings
                                        WHERE `name` LIKE '%yellowpay%' OR `name` LIKE '%payment%'
                                     ORDER BY `order` ASC";
 
