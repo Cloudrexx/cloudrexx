@@ -246,58 +246,58 @@ class CalendarEventManager extends CalendarLibrary
      */
     function getEventList() {
         global $objDatabase, $_ARRAYLANG, $_LANGID, $objInit;
-
         $this->getSettings();
-
         // need for database TIMESTAMP
-        $startDate = $this->startDate ? $this->getDbDateTimeFromIntern($this->startDate)->format('Y-m-d H:i:s') : '0000-00-00 00:00:00';
-        $endDate   = $this->endDate ? $this->getDbDateTimeFromIntern($this->endDate)->format("Y-m-d H:i:s") : '0000-00-00 00:00:00';
-
-        $onlyActive_where = ($this->onlyActive == true ? ' AND event.status=1' : '');
-        $categoryId_where = ($this->categoryId != 0 ? ' AND event.catid='.$this->categoryId : '');
-
-        if($objInit->mode == 'backend') {
-            $showIn_where = "";
-        } else {
+        $startDate = $this->startDate
+            ? $this->getDbDateTimeFromIntern($this->startDate)->format('Y-m-d H:i:s')
+            : '0000-00-00 00:00:00';
+        $endDate   = $this->endDate
+            ? $this->getDbDateTimeFromIntern($this->endDate)->format("Y-m-d H:i:s")
+            : '0000-00-00 00:00:00';
+        $onlyActive_where = ($this->onlyActive ? ' AND event.status=1' : '');
+        $joins = $categoryId_where = $showIn_where = $dateScope_where =
+            $searchTerm_where = $searchTerm_DB = $author_where = '';
+        if ($this->categoryId) {
+            $categoryId_where = '
+                AND rel_categories.category_id='.intval($this->categoryId);
+            $joins = '
+                JOIN '.DBPREFIX.'module_'.self::TABLE_PREFIX.'_events_categories AS rel_categories
+                ON event.id=rel_categories.event_id';
+        }
+        if ($objInit->mode === 'frontend') {
             if($this->arrSettings['showEventsOnlyInActiveLanguage'] == 1) {
-                $showIn_where = "AND FIND_IN_SET('".$_LANGID."',event.show_in)>0 ";
-            } else {
-                $showIn_where = "";
+                $showIn_where = "
+                    AND FIND_IN_SET('" . $_LANGID . "', event.show_in)>0";
             }
         }
-
         if ($this->endDate !== null) {
             // Note: 'NOW' in the following comments refers to the filtered
             //       date of the request.
-            $dateScope_where = '(('
+            $dateScope_where = '
+                (('
                 // Event is happening now (it did already start) and will go on
                 // after the selected range.
                 // Logic: startdate <= START && enddate <= END
                 .'(event.startdate <= "'.$startDate.'" AND "'.$endDate.'" <= event.enddate) OR '
-
                 // Event is about to happen in the selected range, but will go
                 // on afterwards as well.
                 // Logic: START <= startdate <= END <= enddate
                 .'("'.$startDate.'" <= event.startdate AND "'.$endDate.'" <= event.enddate AND event.startdate <= "'.$endDate.'") OR '
-
                 // Event is happening now and is about to end in the selected range.
                 // Logic: startdate <= START <= enddate <= END
                 .'(event.startdate <= "'.$startDate.'" AND event.enddate <= "'.$endDate.'" AND "'.$startDate.'" <= event.enddate) OR '
-
                 // Event is happening exactly within the selected range
                 // Logic: START <= startdate <= enddate <= END
                 .'("'.$startDate.'" <= event.startdate AND event.enddate <= "'.$endDate.'")
             ) OR (
                 (event.series_status = 1) AND (event.startdate <= "'.$endDate.'")
             ))';
-
         } else {
             // Note: 'NOW' in the following comments refers to the filtered
             //       date of the request.
             $dateScope_where = '(('
                 // event is happening now (startdate <= NOW <= enddate)
                 .'((event.enddate >= "'.$startDate.'") AND (event.startdate <= "'.$startDate.'")) OR '
-
                 // event lies in the future (NOW <= startdate <= enddate)
                 .'((event.startdate >= "'.$startDate.'") AND (event.enddate >= "'.$startDate.'"))
             ) OR (
@@ -364,25 +364,12 @@ class CalendarEventManager extends CalendarLibrary
                 } else {
                     $this->eventList[] = $objEvent;
                 }
-
-                //if ($this->numEvents != 'n' && count($this->eventList) > $this->numEvents && $objInit->mode == 'frontend') {
-                //     break;
-                //} else {
                 $objResult->MoveNext();
-//              //  }
             }
         }
-
-        /* if($this->arrSettings['publicationStatus'] == 1) {
-            self::_importEvents();
-        } */
-
         self::_clearEmptyEvents();
         self::_sortEventList();
-
         $this->countEvents = count($this->eventList);
-
-
         if ($this->numEvents != 'n' && $this->numEvents != 0) {
             $this->eventList = array_slice($this->eventList, $this->startPos, $this->numEvents);
         }
@@ -753,11 +740,9 @@ class CalendarEventManager extends CalendarLibrary
             \Cx\Core\Csrf\Controller\Csrf::redirect(CONTREXX_SCRIPT_PATH."?section=Login&redirect=".$link);
             return;
         }
-
-        $objCategory = new \Cx\Modules\Calendar\Controller\CalendarCategory($objEvent->catId);
-
+            $objCategory = CalendarCategory::getCurrentCategory(
+                $this->categoryId, $objEvent);
         list ($priority, $priorityImg) = $this->getPriorityImage($objEvent);
-
         $plainDescription = contrexx_html2plaintext($objEvent->description);
         if (strlen($plainDescription) > 100) {
             $points = '...';

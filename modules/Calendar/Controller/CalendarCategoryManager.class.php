@@ -63,6 +63,15 @@ class CalendarCategoryManager extends CalendarLibrary
     private $onlyActive;
 
     /**
+     * Category selection dropdown view modes
+     *
+     * @see
+     */
+    const DROPDOWN_TYPE_FILTER = 'filter';
+    const DROPDOWN_TYPE_ASSIGN = 'assign';
+    const DROPDOWN_TYPE_DEFAULT = 'default';
+
+    /**
      * Constructor
      *
      * @param boolean $onlyActive
@@ -160,43 +169,39 @@ class CalendarCategoryManager extends CalendarLibrary
     }
 
     /**
-     * Return's the category dropdown
-     *
-     * @global array $_ARRAYLANG
-     * @param integer $selectedId
-     * @param integer $type
-     * @return string Return's the html dropdown of the categories.
+     * Return the options for any Category menu
+     * @global  array   $_ARRAYLANG
+     * @param   array   $selected_ids   The IDs to be preselected.
+     *                                  Note that the array may be empty
+     * @param   string  $type           The options type
+     * @return  string                  The HTML options
+     * @author  Reto Kohli <reto.kohli@comvation.com>
+     *          - Add class constants for option types
+     *          - Use \Html::getOptions() in order to handle multiselect
      */
-    function getCategoryDropdown($selectedId=null, $type) {
+    function getCategoryDropdown(array $selected_ids,
+        $type=self::DROPDOWN_TYPE_DEFAULT)
+    {
         global $_ARRAYLANG;
-
         $this->getSettings();
         $arrOptions = array();
-
-        foreach ($this->categoryList as $key => $objCategory) {
-            if($this->arrSettings['countCategoryEntries'] == 1) {
-                $count = ' ('.$objCategory->countEntries(false, true).')';
-            } else {
-                $count = '';
-            }
-
-            $arrOptions[$objCategory->id] = $objCategory->name.$count;
+        foreach ($this->categoryList as $objCategory) {
+            $arrOptions[$objCategory->id] = $objCategory->name
+                . ($this->arrSettings['countCategoryEntries']
+                    ? ' ('.$objCategory->countEntries(false, true).')' : '');
         }
-
-        switch(intval($type)) {
-            case 1:
-                $options = "<option value=''>".$_ARRAYLANG['TXT_CALENDAR_ALL_CAT']."</option>";
+        $options = ''; // Default case: prepend nothing
+        switch ($type) {
+            case static::DROPDOWN_TYPE_FILTER:
+                $options = "<option value=''>"
+                    . $_ARRAYLANG['TXT_CALENDAR_ALL_CAT'] . "</option>";
                 break;
-            case 2:
-                $options = "<option value=''>".$_ARRAYLANG['TXT_CALENDAR_PLEASE_CHOOSE']."</option>";
-                break;
-            default:
-                $options = "<option value=''></option>";
+            case static::DROPDOWN_TYPE_ASSIGN:
+                $options = "<option value=''>"
+                    . $_ARRAYLANG['TXT_CALENDAR_PLEASE_CHOOSE'] . "</option>";
                 break;
         }
-
-        $options .= $this->buildDropdownmenu($arrOptions, $selectedId);
-
-        return $options;
+        return $options . \Html::getOptions($arrOptions, $selected_ids);
     }
+
 }

@@ -220,8 +220,7 @@ class CalendarFormManager extends CalendarLibrary
         foreach ($this->formList as $key => $objForm) {
             $arrOptions[$objForm->id] = $objForm->title;
         }
-
-        return $this->buildDropdownmenu($arrOptions, $selectedId);
+        return \HTML::getOptions($arrOptions, $selectedId);
     }
 
     /**

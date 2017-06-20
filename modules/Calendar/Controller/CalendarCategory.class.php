@@ -582,4 +582,89 @@ class CalendarCategory extends CalendarLibrary
 
         return $categoryName;
     }
+
+    /**
+     * Return all Category IDs associated with the given Event ID
+     * @param   integer         $event_id   The Event ID
+     * @return  array|boolean               The Category IDs on success,
+     *                                      false otherwise
+     * @author  Reto Kohli <reto.kohli@comvation.com>
+     */
+    public static function getIdsByEventId($event_id)
+    {
+        global $objDatabase;
+        $query = '
+            SELECT `category_id`
+            FROM `'.DBPREFIX.'module_'.self::TABLE_PREFIX.'_events_categories`
+            WHERE `event_id`=?';
+        $objResult = $objDatabase->Execute($query, array($event_id));
+        if (!$objResult || $objResult->EOF) {
+            return false;
+        }
+        $category_ids = [];
+        while (!$objResult->EOF) {
+            $category_ids[] = $objResult->fields['category_id'];
+            $objResult->MoveNext();
+        }
+        return $category_ids;
+    }
+
+    /**
+     * Return the current Category
+     *
+     * The Event may have multiple Categories associated with it.
+     * If an active $category_id is given, use that.
+     * Otherwise, pick the first Category associated with the Event instead.
+     * @param   integer         $category_id
+     * @param   CalendarEvent   $event
+     * @return  \Cx\Modules\Calendar\Controller\CalendarCategory
+     * @author  Reto Kohli <reto.kohli@comvation.com>
+     */
+    public static function getCurrentCategory($category_id,
+        CalendarEvent $event)
+    {
+        if (!$category_id) {
+            $category_ids = $event->category_ids;
+            if ($category_ids) {
+                $category_id = current($category_ids);
+            }
+        }
+        return
+            new \Cx\Modules\Calendar\Controller\CalendarCategory($category_id);
+    }
+
+    /**
+     * Update the Category-Event relation
+     * @global  \ADOConnection  $objDatabase
+     * @param   integer         $event_id
+     * @param   array           $category_ids
+     * @return  boolean                         Returns true on success,
+     *                                          false otherwise
+     * @author  Reto Kohli <reto.kohli@comvation.com>
+     */
+    public static function updateEventRelation($event_id, $category_ids)
+    {
+        global $objDatabase;
+        $query = '
+            DELETE FROM `'.DBPREFIX.'module_'.self::TABLE_PREFIX.'_events_categories`
+            WHERE `event_id`=?';
+        $objResult = $objDatabase->Execute($query, array($event_id));
+        if (!$objResult) {
+            return false;
+        }
+        $query = '
+            INSERT INTO `'.DBPREFIX.'module_'.self::TABLE_PREFIX.'_events_categories` (
+                `event_id`, `category_id`
+            ) VALUES ('
+            . join('), (', array_map(function($category_id) use ($event_id) {
+                return $event_id.', '.$category_id;
+            }, $category_ids))
+            . ')';
+        $objResult = $objDatabase->Execute($query, array($event_id));
+        if (!$objResult) {
+            return false;
+        }
+        return true;
+    }
+
 }
