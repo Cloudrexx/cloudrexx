@@ -596,30 +596,23 @@ EOF;
         global $_ARRAYLANG, $_CORELANG, $_LANGID;
         \JS::activate('cx');
         \JS::activate('jqueryui');
-
+        \JS::activate('chosen');
         \JS::registerJS('modules/Calendar/View/Script/Frontend.js');
-
         $this->getFrontendLanguages();
         $this->getSettings();
         $this->_objTpl->setTemplate($this->pageContent, true, true);
-
         $showFrom = true;
-
         $objEvent = new \Cx\Modules\Calendar\Controller\CalendarEvent();
         $isEventLoaded = false;
-
         if (isset($_POST['submitFormModifyEvent'])) {
             $arrData = array();
             $arrData = $_POST;
-
             $arrData['access'] = 0;
             $arrData['priority'] = 3;
-
             if($objEvent->save($arrData)) {
                 $showFrom = false;
                 $this->_objTpl->hideBlock('calendarEventModifyForm');
                 $this->_objTpl->touchBlock('calendarEventOkMessage');
-
                 // refresh event data after save
                 $objEvent->get($objEvent->id);
                 $objEvent->getData();
