@@ -1561,7 +1561,8 @@ class CalendarEvent extends CalendarLibrary
                 'model/prePersist', $event,
                 array('relations' => array('oneToMany' => 'getEventFields')), true
             );
-            $query = \SQL::insert("module_{self::TABLE_PREFIX}_event", $formData, array('escape' => true));
+            $query = \SQL::insert("module_" . self::TABLE_PREFIX . "_event",
+                $formData, array('escape' => true));
             $objResult = $objDatabase->Execute($query);
             if ($objResult !== false) {
                 $id = intval($objDatabase->Insert_ID());
