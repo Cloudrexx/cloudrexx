@@ -205,7 +205,7 @@ class CalendarEventManager extends CalendarLibrary
      * @var array List of indexData of calendar events synced from a remote location
      */
     protected static $syncedIds;
-    
+
     /**
      * Loads the event manager configuration
      *
@@ -489,7 +489,7 @@ class CalendarEventManager extends CalendarLibrary
                 $result->MoveNext();
             }
         }
-        
+
          foreach($this->eventList as $key => $objEvent) {
              if(empty($objEvent->title)) {
                 unset($this->eventList[$key]);
@@ -659,7 +659,7 @@ class CalendarEventManager extends CalendarLibrary
         try {
             $inviteId = $request->getParam(\CX\Modules\Calendar\Model\Entity\Invite::HTTP_REQUEST_PARAM_ID);
         } catch (\Exception $e) {}
-        try { 
+        try {
             $inviteToken = $request->getParam(\CX\Modules\Calendar\Model\Entity\Invite::HTTP_REQUEST_PARAM_TOKEN);
         } catch (\Exception $e) {}
 
@@ -710,7 +710,7 @@ class CalendarEventManager extends CalendarLibrary
             return;
         }
 
-        if (!$objEvent) { 
+        if (!$objEvent) {
             $objEvent = new \Cx\Modules\Calendar\Controller\CalendarEvent($eventId);
             $this->eventList = array($objEvent);
         }
@@ -740,8 +740,8 @@ class CalendarEventManager extends CalendarLibrary
             \Cx\Core\Csrf\Controller\Csrf::redirect(CONTREXX_SCRIPT_PATH."?section=Login&redirect=".$link);
             return;
         }
-            $objCategory = CalendarCategory::getCurrentCategory(
-                $this->categoryId, $objEvent);
+        $objCategory = CalendarCategory::getCurrentCategory(
+            $this->categoryId, $objEvent);
         list ($priority, $priorityImg) = $this->getPriorityImage($objEvent);
         $plainDescription = contrexx_html2plaintext($objEvent->description);
         if (strlen($plainDescription) > 100) {
@@ -760,20 +760,20 @@ class CalendarEventManager extends CalendarLibrary
             if ($objEvent->external) {
             $objHost = new \Cx\Modules\Calendar\Controller\CalendarHost($objEvent->hostId);
 
-                if (substr($objHost->uri, -1) != '/') {
-                    $hostUri = $objHost->uri . '/';
+            if (substr($objHost->uri, -1) != '/') {
+                $hostUri = $objHost->uri . '/';
             } else {
-                 $hostUri = $objHost->uri;
+                $hostUri = $objHost->uri;
             }
 
-                if (substr($hostUri, 0, 7) != 'http://') {
+            if (substr($hostUri, 0, 7) != 'http://') {
                 $hostUri = "http://".$hostUri;
             }
 
             $hostTarget = 'target="_blank"';
         }
 
-            if ($this->arrSettings['showEventsOnlyInActiveLanguage'] == 2) {
+        if ($this->arrSettings['showEventsOnlyInActiveLanguage'] == 2) {
             $_LANGID = $objEvent->availableLang;
         }
 
@@ -1151,7 +1151,7 @@ class CalendarEventManager extends CalendarLibrary
             $regLinkSrc       = '';
             $registrationOpen = false;
         }
-         
+
         $regLinkSrc = str_replace(
             '[[SERIES_ELEMENT_STARTDATE]]',
             $event->startDate->getTimestamp(),
