@@ -1042,10 +1042,9 @@ class CalendarEvent extends CalendarLibrary
         global $objDatabase, $_LANGID, $_CONFIG, $objInit;
 
         $this->getSettings();
-
         if (   empty($data['startDate'])
             || empty($data['endDate'])
-            || empty($data['category'])
+            || empty($data['category_ids'])
             || (   isset($data['seriesStatus'])
                 && $data['seriesStatus'] == 1
                 && $data['seriesType'] == 2
