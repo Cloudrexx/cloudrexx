@@ -914,7 +914,6 @@ class CalendarEvent extends CalendarLibrary
             $this->availableLang = intval($langId);
             $this->status = intval($objResult->fields['status']);
             $this->showDetailView = intval($objResult->fields['show_detail_view']);
-            $this->catId = intval($objResult->fields['catid']);
             $this->google = intval($objResult->fields['google']);
             $this->seriesStatus = intval($objResult->fields['series_status']);
             $this->independentSeries = intval($objResult->fields['independent_series']);
@@ -956,8 +955,6 @@ class CalendarEvent extends CalendarLibrary
                 $this->seriesData['seriesPatternExceptions'] = array();
                 $this->seriesData['seriesAdditionalRecurrences'] = array();
             }
-                  
-                
             $this->invitedGroups = preg_grep('/^$/', explode(',', $objResult->fields['invited_groups']), PREG_GREP_INVERT);
             $this->invitedCrmGroups = preg_grep('/^$/', explode(',', $objResult->fields['invited_crm_groups']), PREG_GREP_INVERT);
             $this->invitedMails =  htmlentities($objResult->fields['invited_mails'], ENT_QUOTES, CONTREXX_CHARSET);
