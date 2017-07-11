@@ -672,9 +672,9 @@ class CalendarRegistrationManager extends CalendarLibrary
         $query = "SELECT
                     `n`.`field_id`
                   FROM
-                    `".DBPREFIX."module_{self::TABLE_PREFIX}_registration_form_field_name` AS `n`
+                    `" . DBPREFIX . "module_" . self::TABLE_PREFIX . "_registration_form_field_name` AS `n`
                   INNER JOIN
-                    `".DBPREFIX."module_{self::TABLE_PREFIX}_registration_form_field` AS `f`
+                    `" . DBPREFIX . "module_" . self::TABLE_PREFIX . "_registration_form_field` AS `f`
                   ON
                     `n`.`field_id` = `f`.`id`
                   WHERE
