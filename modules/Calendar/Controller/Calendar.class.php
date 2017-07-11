@@ -51,7 +51,7 @@ class Calendar extends CalendarLibrary
     /**
      * Event manager object
      *
-     * @var object
+     * @var \Cx\Modules\Calendar\Controller\CalendarEventManager
      */
     private $objEventManager;
 
