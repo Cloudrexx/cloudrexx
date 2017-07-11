@@ -717,21 +717,16 @@ class CalendarEvent extends CalendarLibrary
     public $registrationExternalFullyBooked;
 
     /**
-     * Constructor
-     *
-     * Loads the event object of given id
-     * Call the parent constructor to initialize the settings values
-     *
-     * @param integer $id Event id
+     * Load the Event for the given ID, if any
+     * @param   integer     $id     The Event ID
      */
-    function __construct($id=null){
-        if($id != null) {
+    function __construct($id = null)
+    {
+        if ($id != null) {
             $this->get($id);
         }
-
-        $this->uploadImgPath    = \Env::get('cx')->getWebsiteImagesPath().'/'.$this->moduleName.'/';
-        $this->uploadImgWebPath = \Env::get('cx')->getWebsiteImagesWebPath().'/'.$this->moduleName.'/';
-
+        $this->uploadImgPath = \Env::get('cx')->getWebsiteImagesPath() . '/' . $this->moduleName . '/';
+        $this->uploadImgWebPath = \Env::get('cx')->getWebsiteImagesWebPath() . '/' . $this->moduleName . '/';
         $this->getSettings();
         $this->init();
     }
