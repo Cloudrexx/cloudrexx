@@ -416,25 +416,6 @@ class CalendarLibrary
     }
     
     /**
-     * Used to bulid the option menu from the array
-     * 
-     * @param type    $arrOptions  options value for the select menu
-     * @param integer $intSelected selected option in the select menu
-     * 
-     * @return string drop down options
-     */
-    function buildDropdownmenu($arrOptions, $intSelected=null)
-    {
-        $strOptions = '';
-        foreach ($arrOptions as $intValue => $strName) {
-            $checked = $intValue==$intSelected ? 'selected="selected"' : '';
-            $strOptions .= "<option value='".$intValue."' ".$checked.">".htmlspecialchars($strName, ENT_QUOTES, CONTREXX_CHARSET)."</option>";
-        }
-
-        return $strOptions;
-    }
-    
-    /**
      * Initialize the active frontend languages array
      * 
      * Fetch the active frontend languages from the database and assign those

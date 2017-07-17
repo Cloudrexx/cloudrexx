@@ -635,20 +635,18 @@ class CalendarSettings extends CalendarLibrary
             'TXT_'.$this->moduleLangVar.'_HOST_KEY_AUTOGEN_IF_EMPTY'    => $_ARRAYLANG['TXT_CALENDAR_HOST_KEY_AUTOGEN_IF_EMPTY'],
             'TXT_'.$this->moduleLangVar.'_HOST_CATEGORY'                => $_ARRAYLANG['TXT_CALENDAR_CATEGORY'],
         ));
-
         if($hostId != 0) {
             $objHostManager = new \Cx\Modules\Calendar\Controller\CalendarHostManager();
             $objHostManager->showHost($objTpl, $hostId);
             $objHost = $objHostManager->hostList[$hostId];
         }
-
         $objCategoryManager = new \Cx\Modules\Calendar\Controller\CalendarCategoryManager(true);
         $objCategoryManager->getCategoryList();
-
         $category = '<select style="width: 252px;" name="category" >';
-        $category .= $objCategoryManager->getCategoryDropdown(intval($objHost->catId), 2);
+        $category .= $objCategoryManager->getCategoryDropdown(
+            array($objHost->catId => null),
+            CalendarCategoryManager::DROPDOWN_TYPE_ASSIGN);
         $category .= '</select>';
-
         $objTpl->setVariable(array(
             $this->moduleLangVar.'_HOST_CATEGORY'    => $category
         ));
@@ -839,14 +837,15 @@ class CalendarSettings extends CalendarLibrary
                                 }
                     $output .= '</select>';
                 }
-
                 if(!empty($special)) {
                     switch ($special) {
                         case 'getCategoryDorpdown':
                             $objCategoryManager = new \Cx\Modules\Calendar\Controller\CalendarCategoryManager(true);
                             $objCategoryManager->getCategoryList();
                             $output = '<select style="width: 252px;" name="settings['.$name.']" >';
-                            $output .= $objCategoryManager->getCategoryDropdown(intval($value), 1);
+                            $output .= $objCategoryManager->getCategoryDropdown(
+                                array(intval($value) => null),
+                                CalendarCategoryManager::DROPDOWN_TYPE_FILTER);
                             $output .= '</select>';
                             break;
                         case 'getPlaceDataDorpdown':
