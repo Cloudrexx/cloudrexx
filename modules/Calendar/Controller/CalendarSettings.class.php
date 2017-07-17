@@ -91,14 +91,10 @@ class CalendarSettings extends CalendarLibrary
      */
     function general($objTpl)
     {
-        global $objDatabase, $_ARRAYLANG, $_CORELANG;
-
         $objTpl->addBlockfile($this->moduleLangVar.'_SETTINGS_CONTENT', 'settings_content', 'module_calendar_settings_general.html');
-
-        if(isset($_POST['submitSettingsGeneral'])){
-           $this->_saveSettings();
+        if (isset($_POST['submitSettingsGeneral'])) {
+            $this->_saveSettings();
         }
-
         $this->_getSettingElements($objTpl, 1);
     }
 
@@ -111,14 +107,11 @@ class CalendarSettings extends CalendarLibrary
      */
     function dateDisplay($objTpl)
     {
-        global $objDatabase, $_ARRAYLANG, $_CORELANG;
-
+        global $_ARRAYLANG;
         $objTpl->addBlockfile($this->moduleLangVar.'_SETTINGS_CONTENT', 'settings_content', 'module_calendar_settings_date.html');
-
-        if(isset($_POST['submitSettingsDate'])){
-           $this->_saveSettings();
+        if (isset($_POST['submitSettingsDate'])) {
+            $this->_saveSettings();
         }
-
         $this->_getDateSeparators();
         $objTpl->setVariable(array(
             $this->moduleLangVar."_SEPARATOR_DATE_LIST"           => json_encode($this->getDateSeparatorByName('separatorDateList')),
@@ -144,17 +137,16 @@ class CalendarSettings extends CalendarLibrary
      */
     function _getDateSeparators()
     {
-        global $_ARRAYLANG, $objDatabase;
-
+        global $objDatabase;
         $arrDateSettings =  array(
-                            'separatorDateList','separatorDateTimeList', 'separatorSeveralDaysList', 'separatorTimeList',
-                            'separatorDateDetail','separatorDateTimeDetail', 'separatorSeveralDaysDetail', 'separatorTimeDetail',
-                            );
-
+            'separatorDateList','separatorDateTimeList',
+            'separatorSeveralDaysList', 'separatorTimeList',
+            'separatorDateDetail','separatorDateTimeDetail',
+            'separatorSeveralDaysDetail', 'separatorTimeDetail',
+        );
         $where = " WHERE `name` IN (". implode(',', array_map(function($val) { return "'$val'"; }, $arrDateSettings)).")" ;
-
         $this->arrSeparatorValue = array();
-        $objSettings = $objDatabase->Execute("SELECT name,value,options, type FROM  ".DBPREFIX."module_".$this->moduleTablePrefix."_settings $where ORDER BY name ASC");
+        $objSettings = $objDatabase->Execute("SELECT name,value,options, type FROM  ".DBPREFIX."module_".self::TABLE_PREFIX."_settings $where ORDER BY name ASC");
         if ($objSettings !== false) {
             while (!$objSettings->EOF) {
                 $strOptions = $objSettings->fields['options'];
@@ -195,16 +187,12 @@ class CalendarSettings extends CalendarLibrary
      */
     function payment($objTpl)
     {
-        global $objDatabase, $_ARRAYLANG, $_CORELANG;
-
-        $objTpl->addBlockfile($this->moduleLangVar.'_SETTINGS_CONTENT', 'settings_content', 'module_calendar_settings_payment.html');
-
-        if(isset($_POST['submitSettingsPayment'])){
-           $this->_saveSettings();
+        $objTpl->addBlockfile($this->moduleLangVar . '_SETTINGS_CONTENT',
+            'settings_content', 'module_calendar_settings_payment.html');
+        if (isset($_POST['submitSettingsPayment'])) {
+            $this->_saveSettings();
         }
-
         $this->_getSettingElements($objTpl, 9);
-
     }
 
     /**
@@ -216,14 +204,11 @@ class CalendarSettings extends CalendarLibrary
      */
     function forms($objTpl)
     {
-        global $objDatabase, $_ARRAYLANG, $_CORELANG;
-
+        global $_ARRAYLANG, $_CORELANG;
         $objTpl->addBlockfile($this->moduleLangVar.'_SETTINGS_CONTENT', 'settings_content', 'module_calendar_settings_forms.html');
-
-        if(isset($_POST['submitModifyForm'])){
+        if (isset($_POST['submitModifyForm'])) {
             $objForm = new \Cx\Modules\Calendar\Controller\CalendarForm(intval($_POST['formId']));
-
-            if($objForm->save($_POST)) {
+            if ($objForm->save($_POST)) {
                 \Cx\Core\Core\Controller\Cx::instanciate()->getComponent('Cache')->deleteComponentFiles('Calendar');
                 if(intval($_POST['formId']) == 0 || intval($_POST['copy']) == 1) {
                     $this->okMessage = $_ARRAYLANG['TXT_CALENDAR_FORM_SUCCESSFULLY_ADDED'];
@@ -362,13 +347,11 @@ class CalendarSettings extends CalendarLibrary
      */
     function mails($objTpl)
     {
-        global $objDatabase, $_ARRAYLANG, $_CORELANG;
-
+        global $_ARRAYLANG, $_CORELANG;
         $objTpl->addBlockfile($this->moduleLangVar.'_SETTINGS_CONTENT', 'settings_content', 'module_calendar_settings_mails.html');
-
-        if(isset($_GET['switch_status'])) {
+        if (isset($_GET['switch_status'])) {
             $objMail = new \Cx\Modules\Calendar\Controller\CalendarMail(intval($_GET['switch_status']));
-            if($objMail->switchStatus()) {
+            if ($objMail->switchStatus()) {
                 $this->okMessage = $_ARRAYLANG['TXT_CALENDAR_MAIL_SUCCESSFULLY_EDITED'];
             } else {
                 $this->errMessage = $_ARRAYLANG['TXT_CALENDAR_MAIL_CORRUPT_EDITED'];
@@ -487,9 +470,9 @@ class CalendarSettings extends CalendarLibrary
         foreach ($objMailManager->getMailActions() as $id => $name) {
             $checked = $id == $objMail->action_id ? 'selected="selected"' : '';
             $action .= '<option value="'.$id.'" '.$checked.'>'.$name.'</option>';
-        }
+            }
 
-        foreach ($this->arrFrontendLanguages as $key => $arrLang) {
+        foreach ($this->arrFrontendLanguages as $arrLang) {
             $checked = $arrLang['id'] == $objMail->lang_id ? 'selected="selected"' : '';
             $lang .= '<option value="'.intval($arrLang['id']).'" '.$checked.'>'.$arrLang['name'].'</option>';
         }
@@ -510,12 +493,10 @@ class CalendarSettings extends CalendarLibrary
      */
     function hosts($objTpl)
     {
-        global $_ARRAYLANG, $_CORELANG;
-
+        global $_ARRAYLANG;
         $objTpl->addBlockfile($this->moduleLangVar.'_SETTINGS_CONTENT', 'settings_content', 'module_calendar_settings_hosts.html');
-
-        if(isset($_POST['submitSettingsHosts'])){
-           $this->_saveSettings();
+        if (isset($_POST['submitSettingsHosts'])) {
+            $this->_saveSettings();
         }
 
         if(isset($_POST['submitModifyHost'])){
@@ -549,7 +530,7 @@ class CalendarSettings extends CalendarLibrary
             $status = true;
             $messageVar = 'EDITED';
 
-            foreach($_POST['selectedHostId'] as $key => $hostId) {
+            foreach ($_POST['selectedHostId'] as $hostId) {
                 $objHost = new \Cx\Modules\Calendar\Controller\CalendarHost(intval($hostId));
 
                 switch($_GET['multi']) {
@@ -616,11 +597,9 @@ class CalendarSettings extends CalendarLibrary
      */
     function modifyHost($objTpl, $hostId)
     {
-        global $_ARRAYLANG, $_CORELANG;
-
+        global $_ARRAYLANG;
         $objTpl->addBlockfile('CALENDAR_SETTINGS_CONTENT', 'settings_content', 'module_calendar_settings_modify_host.html');
-
-        if($hostId != 0) {
+        if ($hostId != 0) {
             $this->_pageTitle = $_ARRAYLANG['TXT_CALENDAR_HOST']." ".$_ARRAYLANG['TXT_CALENDAR_EDIT'];
         } else {
             $this->_pageTitle = $_ARRAYLANG['TXT_CALENDAR_INSERT_HOST'];
@@ -635,20 +614,18 @@ class CalendarSettings extends CalendarLibrary
             'TXT_'.$this->moduleLangVar.'_HOST_KEY_AUTOGEN_IF_EMPTY'    => $_ARRAYLANG['TXT_CALENDAR_HOST_KEY_AUTOGEN_IF_EMPTY'],
             'TXT_'.$this->moduleLangVar.'_HOST_CATEGORY'                => $_ARRAYLANG['TXT_CALENDAR_CATEGORY'],
         ));
-
         if($hostId != 0) {
             $objHostManager = new \Cx\Modules\Calendar\Controller\CalendarHostManager();
             $objHostManager->showHost($objTpl, $hostId);
             $objHost = $objHostManager->hostList[$hostId];
         }
-
         $objCategoryManager = new \Cx\Modules\Calendar\Controller\CalendarCategoryManager(true);
         $objCategoryManager->getCategoryList();
-
         $category = '<select style="width: 252px;" name="category" >';
-        $category .= $objCategoryManager->getCategoryDropdown(intval($objHost->catId), 2);
+        $category .= $objCategoryManager->getCategoryDropdown(
+            array($objHost->catId => null),
+            CalendarCategoryManager::DROPDOWN_TYPE_ASSIGN);
         $category .= '</select>';
-
         $objTpl->setVariable(array(
             $this->moduleLangVar.'_HOST_CATEGORY'    => $category
         ));
@@ -667,7 +644,7 @@ class CalendarSettings extends CalendarLibrary
             if(is_array($value)) {
                 $value = implode(',',$value);
             }
-            $query = "UPDATE ".DBPREFIX."module_".$this->moduleTablePrefix."_settings
+            $query = "UPDATE ".DBPREFIX."module_".self::TABLE_PREFIX."_settings
                          SET value = '".contrexx_addslashes($value)."'
                        WHERE name = '".contrexx_addslashes($name)."'";
 
@@ -710,7 +687,7 @@ class CalendarSettings extends CalendarLibrary
         $this->getSettings();
 
         $query = "SELECT id,title
-                    FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_settings_section
+                    FROM ".DBPREFIX."module_".self::TABLE_PREFIX."_settings_section
                    WHERE parent='".intval($section)."'
                 ORDER BY `order` ASC";
 
@@ -722,7 +699,7 @@ class CalendarSettings extends CalendarLibrary
                 ));
 
                 $query = "SELECT  id,name,title,value,info,type,options,special
-                            FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_settings
+                            FROM ".DBPREFIX."module_".self::TABLE_PREFIX."_settings
                            WHERE section_id='".intval($objResult->fields['id'])."'
                         ORDER BY `order` ASC";
 
@@ -775,23 +752,19 @@ class CalendarSettings extends CalendarLibrary
      *
      * @return string Html of the setting field
      */
-    function _getSettingProperties($id,$name,$title,$value,$info,$type,$options,$special)
+    function _getSettingProperties($id, $name, $title, $value, $info, $type,
+        $options, $special)
     {
-        global $_ARRAYLANG, $_CORELANG;
-
+        global $_ARRAYLANG;
         $arrSetting = array();
-
         switch (intval($type)) {
             case 1:
-                //input text
                 $output = '<input type="text" style="width: 250px;" name="settings['.$name.']" value="'.$value.'" />';
                 break;
             case 2:
-                //textarea
                 $output = '<textarea style="width: 250px; height: 60px;" name="settings['.$name.']">'.$value.'"</textarea>';
                 break;
             case 3:
-                //radio
                 switch ($name) {
                     case 'placeData':
                     case 'placeDataHost':
@@ -801,7 +774,6 @@ class CalendarSettings extends CalendarLibrary
                         $addBreak = false;
                         break;
                 }
-
                 $arrOptions = array();
                 if(!empty($options)) {
                     $arrOptions = explode(",",$options);
@@ -815,7 +787,6 @@ class CalendarSettings extends CalendarLibrary
                 }
                 break;
             case 4:
-                //checkbox
                 $arrOptions = array();
                 if(!empty($options)) {
                     $arrOptions = explode(",",$options);
@@ -829,7 +800,6 @@ class CalendarSettings extends CalendarLibrary
                 }
                 break;
             case 5:
-                //dropdown
                 if(!empty($options)) {
                     $options = explode(",",$options);
                     $output = '<select style="width: 252px;" name="settings['.$name.']" >';
@@ -839,21 +809,22 @@ class CalendarSettings extends CalendarLibrary
                                 }
                     $output .= '</select>';
                 }
-
-                if(!empty($special)) {
+                if (!empty($special)) {
                     switch ($special) {
                         case 'getCategoryDorpdown':
                             $objCategoryManager = new \Cx\Modules\Calendar\Controller\CalendarCategoryManager(true);
                             $objCategoryManager->getCategoryList();
                             $output = '<select style="width: 252px;" name="settings['.$name.']" >';
-                            $output .= $objCategoryManager->getCategoryDropdown(intval($value), 1);
+                            $output .= $objCategoryManager->getCategoryDropdown(
+                                array(intval($value) => null),
+                                CalendarCategoryManager::DROPDOWN_TYPE_FILTER);
                             $output .= '</select>';
                             break;
                         case 'getPlaceDataDorpdown':
                             $objMediadirForms = new \Cx\Modules\MediaDir\Controller\MediaDirectoryForm(null, 'MediaDir');
                             $objMediadirForms->getForms();
+// TODO: $objTpl is undefined (2x)!
                             $objMediadirForms->listForms($objTpl,4);
-
                             $output  = $_ARRAYLANG['TXT_CALENDAR_SELECT_FORM_MEDIADIR'].": <br />";
                             $output .= '<select style="width: 252px;" name="settings['.$name.']" >';
                             $output .= $objMediadirForms->listForms($objTpl,4,intval($value));
@@ -884,18 +855,13 @@ class CalendarSettings extends CalendarLibrary
                     $output = "<div id='detailPreview'></div>";
                 }
                 break;
-    }
-
-        if(!empty($info)) {
-            $infobox = '&nbsp;<span class="icon-info tooltip-trigger"></span><span class="tooltip-message">' . $_ARRAYLANG[$info] . '</span>';
-        } else {
-            $infobox = '';
         }
-
+        $infobox = '';
+        if (!empty($info)) {
+            $infobox = '&nbsp;<span class="icon-info tooltip-trigger"></span><span class="tooltip-message">' . $_ARRAYLANG[$info] . '</span>';
+        }
         $arrSetting['output'] = $output;
         $arrSetting['infobox'] = $infobox;
-
-
         return $arrSetting;
     }
 
@@ -908,7 +874,7 @@ class CalendarSettings extends CalendarLibrary
         global $objDatabase;
         if(!$this->yellowPaySettings) {
             $query = "SELECT  id,name,title,value,info,type,options,special
-                                        FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_settings
+                                        FROM ".DBPREFIX."module_".self::TABLE_PREFIX."_settings
                                        WHERE `name` LIKE '%yellowpay%' OR `name` LIKE '%payment%'
                                     ORDER BY `order` ASC";
 

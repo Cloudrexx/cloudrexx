@@ -23,6 +23,9 @@ Cx\Modules\Calendar\Model\Entity\CategoryName:
       targetEntity: Cx\Modules\Calendar\Model\Entity\Category
       inversedBy: categoryNames
       joinColumn:
+        # TODO: This mapping is wrong,
+        # as it creates a unique index on cat_id alone,
+        # instead of the composite primary key including lang_id!
         name: cat_id
         referencedColumnName: id
         unique: true

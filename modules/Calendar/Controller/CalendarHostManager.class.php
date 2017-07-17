@@ -98,7 +98,7 @@ class CalendarHostManager extends CalendarLibrary
      * @return null
      */
     function getHostList() {
-        global $objDatabase,$_ARRAYLANG,$_LANGID;
+        global $objDatabase;
 
         if($this->catId != null) {
             $catId_where = "AND cat_id = '".$this->catId."' ";
@@ -113,7 +113,7 @@ class CalendarHostManager extends CalendarLibrary
         }
 
         $query = "SELECT id
-                    FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_host
+                    FROM ".DBPREFIX."module_".self::TABLE_PREFIX."_host
                    WHERE id != 0 ".$catId_where." ".$active_where."
                 ORDER BY status DESC";
 
@@ -139,7 +139,7 @@ class CalendarHostManager extends CalendarLibrary
         global $_ARRAYLANG;
 
         $i=0;
-        foreach ($this->hostList as $key => $objHost) {
+        foreach ($this->hostList as $objHost) {
             $objCategory = new \Cx\Modules\Calendar\Controller\CalendarCategory(intval($objHost->catId));
 
             $objTpl->setVariable(array(

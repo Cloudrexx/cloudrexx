@@ -121,8 +121,6 @@ class CalendarHeadlines extends CalendarLibrary
      */
     function getHeadlines($categoryId = null)
     {
-        global $_CONFIG;
-
         \LinkGenerator::parseTemplate($this->pageContent);
         $this->_objTpl->setTemplate($this->pageContent,true,true);
 

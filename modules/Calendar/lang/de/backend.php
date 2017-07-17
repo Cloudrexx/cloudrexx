@@ -657,3 +657,9 @@ $_ARRAYLANG['TXT_CALENDAR_CRM_MEMBERSHIPS'] = 'CRM Kundengruppen';
 $_ARRAYLANG['TXT_CALENDAR_CHOOSE_CRM_MEMBERSHIPS'] = 'Kundengruppen wählen';
 $_ARRAYLANG['TXT_CALENDAR_PUBLISHED'] = 'Veröffentlicht';
 $_ARRAYLANG['TXT_CALENDAR_USE_CUSTOM_FORMAT'] = 'Individuelles Format verwenden';
+$_ARRAYLANG['TXT_CALENDAR_SELECT_ADDITIONAL_RECURRENCES_INFO'] = "Wählen Sie ein zusätzliches Wiederholungsdatum für die Veranstaltung aus";
+// Missing -- copied from frontend.php
+$_ARRAYLANG['TXT_CALENDAR_NOT_SPECIFIED'] = "Keine Angabe";
+// Missing -- TODO: complete
+$_ARRAYLANG['TXT_CALENDAR_LIST_ACTUAL'] = "TODO: TXT_CALENDAR_LIST_ACTUAL";
+$_ARRAYLANG['TXT_CALENDAR_LIST_ALL'] = "TODO: TXT_CALENDAR_LIST_ALL";

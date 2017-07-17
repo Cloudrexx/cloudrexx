@@ -425,9 +425,9 @@ class Event extends \Cx\Model\Base\EntityBase {
     protected $registrations;
 
     /**
-     * @var Cx\Modules\Calendar\Model\Entity\Category
+     * @var \Doctrine\Common\Collections\Collection
      */
-    protected $category;
+    protected $categories;
 
     /**
      * @var Cx\Modules\Calendar\Model\Entity\RegistrationForm
@@ -438,8 +438,9 @@ class Event extends \Cx\Model\Base\EntityBase {
     {
         $this->eventFields = new \Doctrine\Common\Collections\ArrayCollection();
         $this->registrations = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->categories = new \Doctrine\Common\Collections\ArrayCollection();
     }
-    
+
     /**
      * Get id
      *
@@ -2006,23 +2007,25 @@ class Event extends \Cx\Model\Base\EntityBase {
     }
 
     /**
-     * Set category
-     *
-     * @param Cx\Modules\Calendar\Model\Entity\Category $category
+     * Set categories
+     * @param \Doctrine\Common\Collections\Collection $categories
+     * @return Event
+     * @author Reto Kohli <reto.kohli@comvation.com>
      */
-    public function setCategory(\Cx\Modules\Calendar\Model\Entity\Category $category)
+    public function setCategories(\Doctrine\Common\Collections\Collection $categories)
     {
-        $this->category = $category;
+        $this->categories[] = $categories;
+        return $this;
     }
 
     /**
-     * Get category
-     *
-     * @return Cx\Modules\Calendar\Model\Entity\Category $category
+     * Get categories
+     * @return \Doctrine\Common\Collections\Collection
+     * @author Reto Kohli <reto.kohli@comvation.com>
      */
-    public function getCategory()
+    public function getCategories()
     {
-        return $this->category;
+        return $this->categories;
     }
 
     /**
@@ -2044,4 +2047,5 @@ class Event extends \Cx\Model\Base\EntityBase {
     {
         return $this->registrationForm;
     }
+
 }
