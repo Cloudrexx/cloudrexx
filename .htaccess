@@ -16,11 +16,11 @@
     RewriteCond %{REQUEST_URI} !\.thumb_large\.[^\/]*$
     RewriteRule . - [F]
 
-    # Strip virtual language directory for MEDIA RESSOURCES, CONTENT DATA and THEME
-    # IMPORTANT: When running Contrexx in a subdirectory (relativ to the webserver's DocumentRoot)
-    #            then you'll have to comment-out the following ruleset
-    RewriteCond %{REQUEST_URI} ^/\w+/(core|core_modules|lib|modules|feed|media|images|themes)/
-    RewriteRule ^\w+\/(.*)$ /$1 [L]
+    # Strip virtual language directory:
+    # Match exactly two letters, in order to avoid
+    # collisions with proper folders
+    RewriteCond %{REQUEST_URI} ^/\w\w/(core|core_modules|lib|modules|feed|media|images|themes)/
+    RewriteRule ^\w\w\/(.*)$ /$1 [L]
 
     # Deny direct access to directories containing sensitive data
     RewriteCond %{ENV:REDIRECT_END} !1
