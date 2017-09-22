@@ -111,7 +111,6 @@ class YamlSettingEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventL
                     $objSetting->setValue($value);
                     $this->getComponent('Cache')->deleteNonPagePageCache();
                     break;
-                
                 case 'cacheReverseProxy':
                 case 'cacheProxyCacheConfig':
                     if ($value != $_CONFIG[$objSetting->getName()]) {
@@ -119,7 +118,6 @@ class YamlSettingEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventL
                         \Cx\Core\Core\Controller\Cx::instanciate()->getComponent('Cache')->clearReverseProxyCache('*');
                     }
                     break;
-                
                 case 'cacheSsiOutput':
                 case 'cacheSsiType':
                 case 'cacheSsiProcessorConfig':
@@ -151,13 +149,14 @@ class YamlSettingEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventL
         }
     }
 
-    public function onEvent($eventName, array $eventArgs) {
-        \DBG::msg(__METHOD__);
-        if ($eventName == 'postFlush') {
-            if (isset($eventArgs[1]) && !preg_match('#\b(Config.yml)\b#', $eventArgs[1])) {
-                return false;
-            }
+    public function onEvent($eventName, array $eventArgs)
+    {
+// Fixed condition
+        if ($eventName === 'postFlush'
+            && isset($eventArgs[1])
+            && preg_match('/\\bConfig\\.yml\\b/', $eventArgs[1])) {
+                $this->$eventName(current($eventArgs));
         }
-        $this->$eventName(current($eventArgs));
     }
+
 }
