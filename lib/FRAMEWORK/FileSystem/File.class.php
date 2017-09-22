@@ -56,9 +56,9 @@ class FileException extends \Exception {};
  */
 class File implements FileInterface
 {
-    const UNKNOWN_ACCESS  = 0;
-    const PHP_ACCESS      = 1;
-    const FTP_ACCESS      = 2;
+    const UNKNOWN_ACCESS = 0;
+    const PHP_ACCESS = 1;
+    const FTP_ACCESS = 2;
 
     private $file = null;
     private $accessMode = null;
@@ -75,49 +75,43 @@ class File implements FileInterface
         try {
             $fsFile = new FileSystemFile($this->file);
             $fileOwnerUserId = $fsFile->getFileOwner();
-            \DBG::msg('File (FileSystem): '.$this->file.' is owned by '.$fileOwnerUserId);
+            //\DBG::msg('File (FileSystem): '.$this->file.' is owned by '.$fileOwnerUserId);
         } catch (FileSystemFileException $e) {
-            \DBG::msg('FileSystemFile: '.$e->getMessage());
-            \DBG::msg('File: CAUTION: '.$this->file.' is owned by an unknown user!');
+            //\DBG::msg('FileSystemFile: '.$e->getMessage());
+            //\DBG::msg('File: CAUTION: '.$this->file.' is owned by an unknown user!');
             return false;
         }
-
         // get the user-ID of the user running the PHP-instance
         if (function_exists('posix_getuid')) {
             $phpUserId = posix_getuid();
         } else {
             $phpUserId = getmyuid();
         }
-        \DBG::msg('File (PHP): Script user is '.$phpUserId);
-
+        //\DBG::msg('File (PHP): Script user is '.$phpUserId);
         // check if the file we're going to work with is owned by the PHP user
         if ($fileOwnerUserId == $phpUserId) {
             $this->accessMode = self::PHP_ACCESS;
-            \DBG::msg('File: Using FileSystem access');
+            //\DBG::msg('File: Using FileSystem access');
             return true;
         }
-
         // fetch FTP user-ID
         $ftpConfig = \Env::get('ftpConfig');
         $ftpUsername = $ftpConfig['username'];
         if (function_exists('posix_getpwnam')) {
             $ftpUserInfo = posix_getpwnam($ftpUsername);
             $ftpUserId = $ftpUserInfo['uid'];
-            \DBG::msg('File (FTP): '.$this->file.' is owned by '.$ftpUserId);
+            //\DBG::msg('File (FTP): '.$this->file.' is owned by '.$ftpUserId);
         } else {
             $ftpUserId = null;
         }
-
-
         // check if the file we're going to work with is owned by the FTP user
         if ($fileOwnerUserId == $ftpUserId) {
             $this->accessMode = self::FTP_ACCESS;
-            \DBG::msg('File: Using FTP access');
+            //\DBG::msg('File: Using FTP access');
             return true;
         }
-
         // the file to work on is neither owned by the PHP user nor the FTP user
-        \DBG::msg('File: CAUTION: '.$this->file.' is owned by an unknown user!');
+        //\DBG::msg('File: CAUTION: '.$this->file.' is owned by an unknown user!');
         $this->accessMode = self::UNKNOWN_ACCESS;
         return false;
     }
@@ -133,7 +127,6 @@ class File implements FileInterface
         if ($data === false) {
             throw new FileSystemException('Unable to read data from file '.$this->file.'!');
         }
-
         return $data;
     }
 
@@ -158,7 +151,6 @@ class File implements FileInterface
                 \DBG::msg('FileSystemFile: '.$e->getMessage());
             }
         }
-
         // use FTP
         if (   $this->accessMode == self::FTP_ACCESS
             || $this->accessMode == self::UNKNOWN_ACCESS
@@ -171,7 +163,6 @@ class File implements FileInterface
                 \DBG::msg('FTPFile: '.$e->getMessage());
             }
         }
-
         throw new FileSystemException('File: Unable to write data to file '.$this->file.'!');
     }
 
@@ -189,7 +180,6 @@ class File implements FileInterface
                 \DBG::msg('FileSystemFile: '.$e->getMessage());
             }
         }
-
         // use FTP
         if (   $this->accessMode == self::FTP_ACCESS
             || $this->accessMode == self::UNKNOWN_ACCESS
@@ -202,7 +192,6 @@ class File implements FileInterface
                 \DBG::msg('FTPFile: '.$e->getMessage());
             }
         }
-
         throw new FileSystemException('File: Unable to append data to file '.$this->file.'!');
     }
 
@@ -227,7 +216,6 @@ class File implements FileInterface
                 \DBG::msg('FileSystemFile: '.$e->getMessage());
             }
         }
-
         // use FTP
         if (   $this->accessMode == self::FTP_ACCESS
             || $this->accessMode == self::UNKNOWN_ACCESS
@@ -240,7 +228,6 @@ class File implements FileInterface
                 \DBG::msg('FTPFile: '.$e->getMessage());
             }
         }
-
         throw new FileSystemException('File: Unable to touch file '.$this->file.'!');
     }
 
@@ -249,12 +236,10 @@ class File implements FileInterface
         if (!$force && file_exists($dst)) {
             return true;
         }
-
-        $path       = \Env::get('cx')->getCodeBaseDocumentRootPath();
-        $relPath    = str_replace($path, '', $dst);
-        $pathInfo   = pathinfo($relPath);
+        $path = \Env::get('cx')->getCodeBaseDocumentRootPath();
+        $relPath = str_replace($path, '', $dst);
+        $pathInfo = pathinfo($relPath);
         $arrFolders = explode('/', $pathInfo['dirname']);
-
         foreach ($arrFolders as $folder) {
             if (empty($folder)) continue;
             $path .= '/' . $folder;
@@ -262,7 +247,6 @@ class File implements FileInterface
                 \Cx\Lib\FileSystem\FileSystem::make_folder($path);
             }
         }
-
         // use PHP
         if (   $this->accessMode == self::PHP_ACCESS
             || $this->accessMode == self::UNKNOWN_ACCESS
@@ -276,7 +260,6 @@ class File implements FileInterface
                 \DBG::msg('FileSystemFile: '.$e->getMessage());
             }
         }
-
         // use FTP
         if (   $this->accessMode == self::FTP_ACCESS
             || $this->accessMode == self::UNKNOWN_ACCESS
@@ -289,7 +272,6 @@ class File implements FileInterface
                 \DBG::msg('FTPFile: '.$e->getMessage());
             }
         }
-
         throw new FileSystemException('File: Unable to copy file '.$this->file.'!');
     }
 
@@ -303,12 +285,10 @@ class File implements FileInterface
         if (!$force && file_exists($dst)) {
             return true;
         }
-
-        $path       = \Env::get('cx')->getCodeBaseDocumentRootPath();
-        $relPath    = str_replace($path, '', $dst);
-        $pathInfo   = pathinfo($relPath);
+        $path = \Env::get('cx')->getCodeBaseDocumentRootPath();
+        $relPath = str_replace($path, '', $dst);
+        $pathInfo = pathinfo($relPath);
         $arrFolders = explode('/', $pathInfo['dirname']);
-
         foreach ($arrFolders as $folder) {
             if (empty($folder)) continue;
             $path .= '/' . $folder;
@@ -316,7 +296,6 @@ class File implements FileInterface
                 \Cx\Lib\FileSystem\FileSystem::make_folder($path);
             }
         }
-
         // use PHP
         if (   $this->accessMode == self::PHP_ACCESS
             || $this->accessMode == self::UNKNOWN_ACCESS
@@ -330,7 +309,6 @@ class File implements FileInterface
                 \DBG::msg('FileSystemFile: '.$e->getMessage());
             }
         }
-
         // use FTP
         if (   $this->accessMode == self::FTP_ACCESS
             || $this->accessMode == self::UNKNOWN_ACCESS
@@ -343,7 +321,6 @@ class File implements FileInterface
                 \DBG::msg('FTPFile: '.$e->getMessage());
             }
         }
-
         throw new FileSystemException('File: Unable to copy file '.$this->file.'!');
     }
 
@@ -367,7 +344,6 @@ class File implements FileInterface
                 \DBG::msg('FileSystemFile: '.$e->getMessage());
             }
         }
-
         // use FTP
         if (   $this->accessMode == self::FTP_ACCESS
             || $this->accessMode == self::UNKNOWN_ACCESS
@@ -380,7 +356,6 @@ class File implements FileInterface
                 \DBG::msg('FTPFile: '.$e->getMessage());
             }
         }
-
         throw new FileSystemException('File: Unable to set write access to file '.$this->file.'!');
     }
 
@@ -407,7 +382,6 @@ class File implements FileInterface
                 \DBG::msg('FileSystemFile: '.$e->getMessage());
             }
         }
-
         // use FTP
         if (   $this->accessMode == self::FTP_ACCESS
             || $this->accessMode == self::UNKNOWN_ACCESS
@@ -425,4 +399,5 @@ class File implements FileInterface
         }
         throw new FileSystemException('File: Unable to delete file '.$this->file.'!');
     }
+
 }

@@ -87,24 +87,20 @@ class FTPFile implements FileInterface
         if (empty($file)) {
             throw new FTPFileException('No file path specified!');
         }
-
         if (isset($ftpConfig)) {
             $this->ftpConfig = $ftpConfig;
         } else {
             $this->ftpConfig = \Env::get('ftpConfig');
         }
-
         $this->passedFilePath = $file;
         $pathInfo = pathinfo($file);
         $this->file = $pathInfo['basename'];
         $path = $pathInfo['dirname'];
-
         if (   $file == \Env::get('cx')->getWebsiteDocumentRootPath()
             || $file == \Env::get('cx')->getCodeBaseDocumentRootPath()
         ) {
             $this->file = '';
         }
-
         $this->filePath = $this->getValidFilePath($file, $path);
     }
 
@@ -115,15 +111,12 @@ class FTPFile implements FileInterface
     private function getValidFilePath($file, $path)
     {
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-
 // TODO: Implement support for having a different document root for the Website repository than for the Code Base repository
         if (strpos($cx->getWebsiteDocumentRootPath(), $cx->getCodeBaseDocumentRootPath()) !== 0) {
             throw new FTPFileException(__CLASS__.' does not work in case the Code Base and Website repository do not share the same document root.');
         }
-
         // define the relative path from the installation's document root to the Website repository
         $websiteRepositoryOffsetPath = substr($cx->getWebsiteDocumentRootPath(), strlen($cx->getCodeBaseDocumentRootPath()));
-
         // $file is specified by absolute file system path of operating system to Website repository
         if ($file == $cx->getWebsiteDocumentRootPath()) {
             $filePath = $this->ftpConfig['path'] . $websiteRepositoryOffsetPath;
@@ -152,7 +145,6 @@ class FTPFile implements FileInterface
         } else {
             $filePath = $this->ftpConfig['path'] . $websiteRepositoryOffsetPath . '/'.$path;
         }
-
         return preg_replace('#^/+#', '', $filePath);
     }
 
@@ -179,32 +171,26 @@ class FTPFile implements FileInterface
         if (file_exists($this->passedFilePath)) {
             return true;
         }
-
         $this->write('');
     }
 
     public function copy($dst)
     {
         $this->initConnection();
-
         try {
             $src = fopen($this->passedFilePath, 'r');
-
             $pathInfo = pathinfo($dst);
             $path     = $pathInfo['dirname'];
             $file     = $pathInfo['basename'];
             $filePath = $this->getValidFilePath($file, $path);
             $dst      = $filePath . '/' . $file;
-
             ftp_set_option($this->connection, FTP_TIMEOUT_SEC, 600);
-
             if (!ftp_fput($this->connection, $dst, $src, FTP_BINARY)) {
                 throw new FTPFileException('FTP upload from ' . $this->passedFilePath . ' to ' . $dst . ' failed.');
             }
         } catch (FTPFileException $e) {
             throw new FTPFileException($e->getMessage());
         }
-
     }
 
     public function rename($dst)
@@ -215,42 +201,36 @@ class FTPFile implements FileInterface
     public function move($dst)
     {
         $this->initConnection();
-
         try {
             $pathInfo = pathinfo($dst);
-            $path     = $pathInfo['dirname'];
-            $file     = $pathInfo['basename'];
+            $path = $pathInfo['dirname'];
+            $file = $pathInfo['basename'];
             $filePath = $this->getValidFilePath($file, $path);
-            $dst      = $filePath . '/' . $file;
-
+            $dst = $filePath . '/' . $file;
             if (!ftp_rename($this->connection, $this->passedFilePath, $dst)) {
                 throw new FTPFileException('FTP rename from ' . $this->passedFilePath . ' to ' . $dst . ' failed.');
             }
         } catch (FTPFileException $e) {
             throw new FTPFileException($e->getMessage());
         }
-
     }
 
     public function makeWritable()
     {
         $this->initConnection();
-
         // fetch current permissions on loaded file through FileSystemFile object
         try {
             $objFile = new \Cx\Lib\FileSystem\FileSystemFile($this->passedFilePath);
             $filePerms = $objFile->getFilePermissions();
-            \DBG::msg('FTPFile: Fetched file permissions of '.$this->passedFilePath.': '.substr(sprintf('%o', $filePerms), -4));
+            //\DBG::msg('FTPFile: Fetched file permissions of '.$this->passedFilePath.': '.substr(sprintf('%o', $filePerms), -4));
         } catch (FileSystemFileException $e) {
             throw new FTPFileException($e->getMessage());
         }
-
         // abort process in case the file is already writable
         // test: check write access for file owner
         if ($filePerms & \Cx\Lib\FileSystem\FileSystem::CHMOD_USER_WRITE) {
             return true;
         }
-
         // this is probably not required for FTP - TD / 11/1/2012
         /*$parentDirectory = dirname($this->passedFilePath);
         if (!is_writable($parentDirectory)) {
@@ -262,13 +242,10 @@ class FTPFile implements FileInterface
                 \DBG::msg('Parent directory '.$parentDirectory.' lies outside of Cloudrexx installation and can therefore not be made writable!');
             }
         }*/
-
         // set write access to file owner
         $filePerms |= \Cx\Lib\FileSystem\FileSystem::CHMOD_USER_WRITE;
-
         // log file permissions into the humand readable chmod() format
-        \DBG::msg('FTPFile: CHMOD: '.substr(sprintf('%o', $filePerms), -4));
-
+        //\DBG::msg('FTPFile: CHMOD: '.substr(sprintf('%o', $filePerms), -4));
         if (!ftp_chmod($this->connection, $filePerms, $this->filePath.'/'.$this->file)) {
             throw new FTPFileException('FTPFile: Unable to set write access to file '.$this->filePath.'/'.$this->file.'!');
         }
@@ -277,7 +254,6 @@ class FTPFile implements FileInterface
     public function delete()
     {
         $this->initConnection();
-
         if (!ftp_delete($this->connection, $this->filePath.'/'.$this->file)) {
             throw new FTPFileException('Unable to delete file '.$this->filePath.'/'.$this->file.'!');
         }
@@ -292,11 +268,9 @@ class FTPFile implements FileInterface
                 ftp_chdir($this->connection, $dir);
             }
         }
-
         if ($this->filePath != ftp_pwd($this->connection)) {
             throw new FTPFileException('Unable to navigation into directory '.$this->filePath.' on FTP server');
         }*/
-
         ftp_set_option($this->connection, FTP_TIMEOUT_SEC, 600);
         rewind($this->tempFileHandler);
         if (!ftp_fput($this->connection, $this->filePath.'/'.$this->file, $this->tempFileHandler, FTP_BINARY)) {
@@ -312,7 +286,6 @@ class FTPFile implements FileInterface
             // try to create file in the session temp path
             $cx = \Cx\Core\Core\Controller\Cx::instanciate();
             $sessionObj = $cx->getComponent('Session')->getSession();
-
             $sessionTempPath = $_SESSION->getTempPath();
             $pathInfo = pathinfo($this->file);
             $tempFile = $sessionTempPath.'/'.$pathInfo['basename'];
@@ -320,22 +293,18 @@ class FTPFile implements FileInterface
             while (file_exists($tempFile)) {
                 $tempFile = $sessionTempPath.'/'.$pathInfo['filename'].$idx++.$pathInfo['extension'];
             }
-
             if (($this->tempFileHandler = fopen($tempFile, 'r+')) === false) {
                 return false;
             }
-
             // remember tempFile, we will have to delete it after it fullfilled its purpose
             $this->tempFile = $tempFile;
         }
-
         return true;
     }
 
     private function deleteTempFile()
     {
         fclose($this->tempFileHandler);
-
         if (!empty($this->tempFile)) {
             unlink($this->tempFile);
             $this->tempFile = null;
@@ -347,7 +316,6 @@ class FTPFile implements FileInterface
         if (!$this->openTempFileHandler()) {
             throw new FTPFileException('Unable to create a temporary file used to buffer the file data!');
         }
-
         rewind($this->tempFileHandler);
         if (fwrite($this->tempFileHandler, $data) === false) {
             throw new FTPFileException('Unable to write the data to the temporary file!');
@@ -359,20 +327,16 @@ class FTPFile implements FileInterface
         if ($this->connected) {
             return;
         }
-
         if (!$this->ftpConfig['is_activated']) {
             throw new FTPFileException('No FTP support on this system!');
         }
-
         $this->connection = ftp_connect($this->ftpConfig['host']);
         if (!$this->connection) {
             throw new FTPFileException('Unable to establish FTP connection. Probably wrong FTP host info specified in config/configuration.php');
         }
-
         if (!ftp_login($this->connection, $this->ftpConfig['username'], $this->ftpConfig['password'])) {
             throw new FTPFileException('Unable to authenticate on FTP server. Probably wrong FTP login credentials specified in config/configuration.php');
         }
-
         $this->connected = true;
     }
 
@@ -385,4 +349,5 @@ class FTPFile implements FileInterface
     {
         return $this->filePath;
     }
+
 }

@@ -73,7 +73,6 @@ class FileSystemFile implements FileInterface
         if (empty($file)) {
             throw new FileSystemFileException('No file path specified!');
         }
-
         // $file is specified by absolute file system path of operating system
         if (   strpos($file, \Env::get('cx')->getWebsiteDocumentRootPath()) === 0
             || strpos($file, \Env::get('cx')->getCodeBaseDocumentRootPath()) === 0
@@ -98,7 +97,6 @@ class FileSystemFile implements FileInterface
         if (!$fileOwnerId) {
             throw new FileSystemFileException('Unable to fetch file owner of '.$this->filePath);
         }
-
         return $fileOwnerId;
     }
 
@@ -114,19 +112,15 @@ class FileSystemFile implements FileInterface
             // try to set write access
             $this->makeWritable($this->filePath);
         }
-
         // second try
         $fp = @fopen($this->filePath, 'w');
         if (!$fp) {
             throw new FileSystemFileException('Unable to open file '.$this->filePath.' for writting!');
         }
-
         // acquire exclusive file lock
         flock($fp, LOCK_EX);
-
         // write data to file
         $writeStatus = fwrite($fp, $data);
-
         // release exclusive file lock
         flock($fp, LOCK_UN);
         if ($writeStatus === false) {
@@ -142,19 +136,15 @@ class FileSystemFile implements FileInterface
             // try to set write access
             $this->makeWritable($this->filePath);
         }
-
         // second try
         $fp = @fopen($this->filePath, 'a');
         if (!$fp) {
             throw new FileSystemFileException('Unable to open file '.$this->filePath.' for writting!');
         }
-
         // acquire exclusive file lock
         flock($fp, LOCK_EX);
-
         // write data to file
         $writeStatus = fwrite($fp, $data);
-
         // release exclusive file lock
         flock($fp, LOCK_UN);
         if ($writeStatus === false) {
@@ -198,11 +188,9 @@ class FileSystemFile implements FileInterface
         if ($filePerms === false) {
             throw new FileSystemFileException('Unable to fetch file permissions of file '.$this->filePath.'!');
         }
-
         // Strip BITs that are not related to the file permissions.
         // Only the first 9 BITs are related (i.e: rwxrwxrwx) -> bindec(111111111) = 511
         $filePerms = $filePerms & 511;
-
         return $filePerms;
     }
 
@@ -212,7 +200,6 @@ class FileSystemFile implements FileInterface
         if (is_writable($this->filePath)) {
             return true;
         }
-
         $parentDirectory = dirname($this->filePath);
         if (!is_writable($parentDirectory)) {
             if (strpos($parentDirectory, \Env::get('cx')->getWebsiteDocumentRootPath()) === 0) {
@@ -223,16 +210,12 @@ class FileSystemFile implements FileInterface
                 throw new FileSystemFileException('Parent directory '.$parentDirectory.' lies outside of Cloudrexx installation and can therefore not be made writable!');
             }
         }
-
         // fetch current permissions on loaded file
         $filePerms = $this->getFilePermissions();
-
         // set write access to file owner
         $filePerms |= \Cx\Lib\FileSystem\FileSystem::CHMOD_USER_WRITE;
-
         // log file permissions into the humand readable chmod() format
-        \DBG::msg('CHMOD: '.substr(sprintf('%o', $filePerms), -4));
-
+        //\DBG::msg('CHMOD: '.substr(sprintf('%o', $filePerms), -4));
         if (!@chmod($this->filePath, $filePerms)) {
             throw new FileSystemFileException('Unable to set write access to file '.$this->filePath.'!');
         }
@@ -255,4 +238,5 @@ class FileSystemFile implements FileInterface
     {
         return $this->filePath;
     }
+
 }
