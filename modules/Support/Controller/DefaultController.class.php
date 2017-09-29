@@ -288,31 +288,15 @@ class DefaultController extends \Cx\Core\Core\Model\Entity\Controller {
     </table>
 </div>';
 
-        if (\Env::get('ClassLoader')->loadFile(ASCMS_LIBRARY_PATH . '/phpmailer/class.phpmailer.php')) {
-            $objMail = new \PHPMailer();
+        $objMail = new \Cx\Core\MailTemplate\Model\Entity\Mail();
+        $objMail->SetFrom($arrFields['fromEmail'], $arrFields['name']);
+        $objMail->Subject = 'Cloudrexx - ' . $_ARRAYLANG['TXT_SUPPORT_EMAIL_MESSAGE_SUBJECT'];
+        $objMail->AddAddress($arrFields['toEmail']);
+        $objMail->IsHTML(true);
+        $objMail->Body = $arrFields['message_html'];
+        $objMail->AltBody = $arrFields['message'];
 
-            if (!empty($_CONFIG['coreSmtpServer']) && \Env::get('ClassLoader')->loadFile(ASCMS_CORE_PATH . '/SmtpSettings.class.php')) {
-                if (($arrSmtp = \SmtpSettings::getSmtpAccount($_CONFIG['coreSmtpServer'])) !== false) {
-                    $objMail->IsSMTP();
-                    $objMail->SMTPAuth = true;
-                    $objMail->Host = $arrSmtp['hostname'];
-                    $objMail->Port = $arrSmtp['port'];
-                    $objMail->Username = $arrSmtp['username'];
-                    $objMail->Password = $arrSmtp['password'];
-                }
-            }
-
-            $objMail->SetFrom($arrFields['fromEmail'], $arrFields['name']);
-            $objMail->Subject = 'Cloudrexx - ' . $_ARRAYLANG['TXT_SUPPORT_EMAIL_MESSAGE_SUBJECT'];
-            $objMail->AddAddress($arrFields['toEmail']);
-            $objMail->CharSet = CONTREXX_CHARSET;
-            $objMail->IsHTML(true);
-            $objMail->Body = $arrFields['message_html'];
-            $objMail->AltBody = $arrFields['message'];
-
-            return $objMail->Send();
-        }
-        return false;
+        return $objMail->Send();
     }
 
 }

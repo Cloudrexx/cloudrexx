@@ -1,0 +1,41 @@
+Cx\Modules\Calendar\Model\Entity\Invite:
+  type: entity
+  table: module_calendar_invite
+  indexes:
+    contrexx_module_calendar_event_id_ibfk:
+      columns: [ event_id ]
+  id:
+    id:
+      type: integer
+      generator:
+        strategy: AUTO
+  fields:
+    timestamp:
+      type: integer
+      column: date
+    inviteeType:
+      type: string
+      length: 255
+      column: invitee_type
+    inviteeId:
+      type: integer
+      column: invitee_id
+    email:
+      type: string
+      length: 255
+      column: email
+    token:
+      type: string
+      length: 32
+      column: token
+  oneToOne:
+    registration:
+      targetEntity: Cx\Modules\Calendar\Model\Entity\Registration
+      mappedBy: invite
+  manyToOne:
+    event:
+      targetEntity: Cx\Modules\Calendar\Model\Entity\Event
+      inversedBy: invite
+      joinColumn:
+        name: event_id
+        referencedColumnName: id

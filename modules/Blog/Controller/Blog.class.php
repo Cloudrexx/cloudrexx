@@ -566,39 +566,26 @@ class Blog extends \Cx\Modules\Blog\Controller\BlogLibrary  {
 
             if ($intIsNotification) {
                 //Send notification to administrator
-                if (\Env::get('ClassLoader')->loadFile(ASCMS_LIBRARY_PATH.'/phpmailer/class.phpmailer.php')) {
-                    $objMail = new \phpmailer();
+                $objMail = new \Cx\Core\MailTemplate\Model\Entity\Mail();
 
-                    if ($_CONFIG['coreSmtpServer'] > 0) {
-                        if (($arrSmtp = \SmtpSettings::getSmtpAccount($_CONFIG['coreSmtpServer'])) !== false) {
-                            $objMail->IsSMTP();
-                            $objMail->Host = $arrSmtp['hostname'];
-                            $objMail->Port = $arrSmtp['port'];
-                            $objMail->SMTPAuth = true;
-                            $objMail->Username = $arrSmtp['username'];
-                            $objMail->Password = $arrSmtp['password'];
-                        }
-                    }
-
-                    if ($this->_intCurrentUserId > 0) {
-                        $objFWUser = \FWUser::getFWUserObject();
-                        $strName = htmlentities($objFWUser->objUser->getUsername(), ENT_QUOTES, CONTREXX_CHARSET);
-                    }
-
-                    $strMailSubject = str_replace('[SUBJECT]', $strSubject, $_ARRAYLANG['TXT_BLOG_FRONTEND_DETAILS_COMMENT_INSERT_MAIL_SUBJECT']);
-                    $strMailBody    = str_replace('[USERNAME]', $strName, $_ARRAYLANG['TXT_BLOG_FRONTEND_DETAILS_COMMENT_INSERT_MAIL_BODY']);
-                    $strMailBody    = str_replace('[DOMAIN]', ASCMS_PROTOCOL . '://' . $_CONFIG['domainUrl'] . ASCMS_PATH_OFFSET, $strMailBody);
-                    $strMailBody    = str_replace('[SUBJECT]', $strSubject, $strMailBody);
-                    $strMailBody    = str_replace('[COMMENT]', $strComment, $strMailBody);
-
-                    $objMail->CharSet = CONTREXX_CHARSET;
-                    $objMail->SetFrom($_CONFIG['coreAdminEmail'], $_CONFIG['coreGlobalPageTitle']);
-                    $objMail->AddAddress($_CONFIG['coreAdminEmail']);
-                    $objMail->Subject   = $strMailSubject;
-                    $objMail->IsHTML(false);
-                    $objMail->Body      = $strMailBody;
-                    $objMail->Send();
+                if ($this->_intCurrentUserId > 0) {
+                    $objFWUser = \FWUser::getFWUserObject();
+                    $strName = htmlentities($objFWUser->objUser->getUsername(), ENT_QUOTES, CONTREXX_CHARSET);
                 }
+
+                $strMailSubject = str_replace('[SUBJECT]', $strSubject, $_ARRAYLANG['TXT_BLOG_FRONTEND_DETAILS_COMMENT_INSERT_MAIL_SUBJECT']);
+                $strMailBody    = str_replace('[USERNAME]', $strName, $_ARRAYLANG['TXT_BLOG_FRONTEND_DETAILS_COMMENT_INSERT_MAIL_BODY']);
+                $strMailBody    = str_replace('[DOMAIN]', ASCMS_PROTOCOL . '://' . $_CONFIG['domainUrl'] . ASCMS_PATH_OFFSET, $strMailBody);
+                $strMailBody    = str_replace('[SUBJECT]', $strSubject, $strMailBody);
+                $strMailBody    = str_replace('[COMMENT]', $strComment, $strMailBody);
+
+                $objMail->SetFrom($_CONFIG['coreAdminEmail'], $_CONFIG['coreGlobalPageTitle']);
+                $objMail->AddAddress($_CONFIG['coreAdminEmail']);
+                $objMail->Subject   = $strMailSubject;
+                $objMail->IsHTML(false);
+                $objMail->Body      = $strMailBody;
+                $objMail->Send();
+
             }
         }
     }

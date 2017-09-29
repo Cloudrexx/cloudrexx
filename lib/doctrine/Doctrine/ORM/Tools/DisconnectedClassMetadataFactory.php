@@ -13,22 +13,22 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * This software consists of voluntary contributions made by many individuals
- * and is licensed under the LGPL. For more information, see
+ * and is licensed under the MIT license. For more information, see
  * <http://www.doctrine-project.org>.
  */
 
 namespace Doctrine\ORM\Tools;
 
+use Doctrine\Common\Persistence\Mapping\StaticReflectionService;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 /**
  * The DisconnectedClassMetadataFactory is used to create ClassMetadataInfo objects
- * that do not require the entity class actually exist. This allows us to 
+ * that do not require the entity class actually exist. This allows us to
  * load some mapping information and use it to do things like generate code
  * from the mapping information.
  *
- * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
+ *
  * @link    www.doctrine-project.org
  * @since   2.0
  * @author  Benjamin Eberlei <kontakt@beberlei.de>
@@ -39,24 +39,10 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 class DisconnectedClassMetadataFactory extends ClassMetadataFactory
 {
     /**
-     * @override
+     * @return \Doctrine\Common\Persistence\Mapping\StaticReflectionService
      */
-    protected function newClassMetadataInstance($className)
+    public function getReflectionService()
     {
-        $metadata = new ClassMetadataInfo($className);
-        if (strpos($className, "\\") !== false) {
-            $metadata->namespace = strrev(substr( strrev($className), strpos(strrev($className), "\\")+1 ));
-        } else {
-            $metadata->namespace = "";
-        }
-        return $metadata;
-    }
-
-    /**
-     * @override
-     */
-    protected function getParentClasses($name)
-    {
-        return array();
+        return new StaticReflectionService();
     }
 }

@@ -1,0 +1,24 @@
+Cx\Modules\Calendar\Model\Entity\RegistrationForm:
+  type: entity
+  table: module_calendar_registration_form
+  id:
+    id:
+      type: integer
+      generator:
+        strategy: AUTO
+  fields:
+    status:
+      type: integer
+    order:
+      type: integer
+      column: `order`
+    title:
+      type: string
+      length: 255
+  oneToMany:
+    events:
+      targetEntity: Cx\Modules\Calendar\Model\Entity\Event
+      mappedBy: registrationForm
+    registrationFormFields:
+      targetEntity: Cx\Modules\Calendar\Model\Entity\RegistrationFormField
+      mappedBy: registrationForm

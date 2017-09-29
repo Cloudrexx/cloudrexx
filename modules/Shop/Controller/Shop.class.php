@@ -116,6 +116,13 @@ class Shop extends ShopLibrary
     protected static $pageTitle = null;
 
     /**
+     * Whether or not a session has been initialized
+     * and is being used
+     * @var boolean
+     */
+    protected static $hasSession = false;
+
+    /**
      * Initialize
      * @access public
      */
@@ -174,6 +181,15 @@ die("Shop::init(): ERROR: Shop::init() called more than once!");
     }
 
     /**
+     * Returns true if the shop is using a session
+     * @return  boolean             True if the shop is using a session, false otherwise
+     */
+    public static function hasSession()
+    {
+        return self::$hasSession;
+    }
+
+    /**
      * Initialises the session with regard to the Shop
      *
      * Does nothing but return if either
@@ -183,19 +199,21 @@ die("Shop::init(): ERROR: Shop::init() called more than once!");
      */
     private static function init_session()
     {
-        if (empty($_SESSION)) {
+        $cx  = \Cx\Core\Core\Controller\Cx::instanciate();
+
+        if (!$cx->getComponent('Session')->isInitialized()) {
             if (checkForSpider()) {
                 return;
             }
             if (!self::use_session()) {
                 return;
             }
-            $cx  = \Cx\Core\Core\Controller\Cx::instanciate();
             $sessionObj = $cx->getComponent('Session')->getSession();
         }
         if (empty($_SESSION['shop'])) {
             $_SESSION['shop'] = array();
         }
+        self::$hasSession = true;
     }
 
     /**
@@ -651,6 +669,14 @@ die("Failed to get Customer for ID $customer_id");
             if (!$objTemplate->blockExists('shopJsCart')) {
                 continue;
             }
+
+            // placeholder SHOP_FORCE_JS_CART will allow multiple parsing of shopJsCart
+            // TODO: drop placeholder/feature as soon as placeholder-modification-
+            //       feature of Locale component is live
+            if (self::$use_js_cart && !$objTemplate->placeholderExists('SHOP_FORCE_JS_CART')) {
+                break;
+            }
+
 //\DBG::log("Shop::setJsCart(): In themespage $index: {$themesPages[$index]}");
             $objTemplate->setCurrentBlock('shopJsCart');
             // Set all language entries and replace formats
@@ -686,7 +712,10 @@ die("Failed to get Customer for ID $customer_id");
             }
             // One instance only (mind that there's a unique id attribute)
             self::$use_js_cart = true;
-            break;
+
+            // TODO: reactivate 'break' statement as soon as placeholder-modification-
+            //       feature of Locale component is live
+            //break;
         }
         if (!self::$use_js_cart) {
             return;
@@ -967,6 +996,7 @@ die("Failed to update the Cart!");
         }
         $cell = 0;
         $arrDefaultImageSize = false;
+        $categoriesPerRow = \Cx\Core\Setting\Controller\Setting::getValue('num_categories_per_row','Shop');
         // For all child categories do...
         foreach ($arrShopCategory as $objCategory) {
             $id = $objCategory->id();
@@ -1036,7 +1066,7 @@ die("Failed to update the Cart!");
             }
             if (self::$objTemplate->blockExists('subCategories')) {
                 self::$objTemplate->parse('subCategories');
-                if (++$cell % 4 == 0) {
+                if (++$cell % $categoriesPerRow == 0) {
                     self::$objTemplate->parse('subCategoriesRow');
                 }
             }
@@ -1988,7 +2018,7 @@ die("Failed to update the Cart!");
                           case Attribute::TYPE_TEXT_MANDATORY:
 //                            $option_price = '&nbsp;';
                             $selectValues .=
-                                '<input type="text" name="productOption['.$attribute_id.
+                                '<input type="text" maxlength="65535" name="productOption['.$attribute_id.
                                 ']" id="productOption-'.$product_id.'-'.$attribute_id.'-'.$domId.
                                 '" value="'.$arrOption['value'].'" style="width:180px;" />'.
                                 '<label for="productOption-'.$product_id.'-'.$attribute_id.'-'.$domId.'">'.
@@ -2070,7 +2100,7 @@ die("Failed to update the Cart!");
                           case Attribute::TYPE_TEXTAREA_MANDATORY:
 //                            $valuePrice = '&nbsp;';
                             $selectValues .=
-                                '<textarea name="productOption['.$attribute_id.
+                                '<textarea maxlength="65535" name="productOption['.$attribute_id.
                                 ']" id="productOption-'.$product_id.'-'.$attribute_id.'-'.$domId.
                                 '" style="width:300px;">'.
                                 contrexx_input2xhtml($arrOption['value']).
@@ -2247,7 +2277,7 @@ die("Failed to update the Cart!");
         \ContrexxJavascript::getInstance()->setVariable('TXT_SHOP_PRODUCT_ADDED_TO_CART', $_ARRAYLANG['TXT_SHOP_PRODUCT_ADDED_TO_CART'], 'shop');
         \ContrexxJavascript::getInstance()->setVariable('TXT_SHOP_CONFIRM_DELETE_PRODUCT', $_ARRAYLANG['TXT_SHOP_CONFIRM_DELETE_PRODUCT'], 'shop');
         \ContrexxJavascript::getInstance()->setVariable('TXT_MAKE_DECISION_FOR_OPTIONS', $_ARRAYLANG['TXT_MAKE_DECISION_FOR_OPTIONS'], 'shop');
-        \JS::registerJS(substr(\Cx\Core\Core\Controller\Cx::instanciate()->getModuleFolderName() . '/Shop/View/Script/shop.js', 1));
+        \JS::registerJS(substr(\Cx\Core\Core\Controller\Cx::instanciate()->getModuleFolderName() . '/Shop/View/Script/shop.js?v1', 1));
     }
 
 
@@ -2537,7 +2567,16 @@ die("Shop::processRedirect(): This method is obsolete!");
 //\DBG::log("Shop::view_account(): Mandatory/None -> div password");
                 $block_password = true;
             }
+            if (self::$objTemplate->blockExists('shop_account_password')) {
+                self::$objTemplate->touchBlock('shop_account_password');
+            }
         } else {
+            // Hide password input field if customer is signed-in.
+            // This is required to prevent the autocomplete feature
+            // of modern browsers to reset the password
+            if (self::$objTemplate->blockExists('shop_account_password')) {
+                self::$objTemplate->hideBlock('shop_account_password');
+            }
 //\DBG::log("Shop::view_account(): Got Customer -> no block");
         }
 //\DBG::log("Shop::view_account(): block_password ".var_export($block_password, true));
@@ -2604,6 +2643,12 @@ die("Shop::processRedirect(): This method is obsolete!");
             $_SESSION['shop'][$key] =
                 trim(strip_tags(contrexx_input2raw($value)));
         }
+
+        // clear password in case it wasn't provided in the account-form
+        if (isset($_POST['email']) && !isset($_POST['password'])) {
+            $_SESSION['shop']['password'] = '';
+        }
+
         if (   empty($_SESSION['shop']['gender2'])
             || empty($_SESSION['shop']['lastname2'])
             || empty($_SESSION['shop']['firstname2'])

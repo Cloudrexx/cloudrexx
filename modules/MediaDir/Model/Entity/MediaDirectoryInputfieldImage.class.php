@@ -440,6 +440,46 @@ INPUT;
 
     function getContent($intEntryId, $arrInputfield, $arrTranslationStatus)
     {
+        $strValue = static::getRawData($intEntryId, $arrInputfield, $arrTranslationStatus);
+        $strValue = strip_tags(htmlspecialchars($strValue, ENT_QUOTES, CONTREXX_CHARSET));
+
+        if (empty($strValue) || $strValue == 'new_image') {
+            return null;
+        }
+        $arrImageInfo   = getimagesize(\Env::get('cx')->getWebsitePath().$strValue);
+        $imageWidth     = $arrImageInfo[0]+20;
+        $imageHeight    = $arrImageInfo[1]+20;
+        $arrImageInfo   = pathinfo($strValue);
+        $strImageName    = $arrImageInfo['basename'];
+
+        return array(
+            'TXT_MEDIADIR_INPUTFIELD_NAME' => htmlspecialchars(
+                $arrInputfield['name'][0], ENT_QUOTES, CONTREXX_CHARSET),
+            'MEDIADIR_INPUTFIELD_VALUE' =>
+                '<a rel="shadowbox[1];options={slideshowDelay:5}" href="'.$strValue.'">'.
+                '<img src="'.$strValue.'.thumb" alt="'.$arrInputfield['name'][0].'" border="0" title="'.$arrInputfield['name'][0].'" '.
+                'width="'.intval($this->arrSettings['settingsThumbSize']).'" /></a>',
+            'MEDIADIR_INPUTFIELD_VALUE_SRC' => $strValue,
+            'MEDIADIR_INPUTFIELD_VALUE_FILENAME' => $strImageName,
+            'MEDIADIR_INPUTFIELD_VALUE_SRC_THUMB' => $strValue.".thumb",
+            'MEDIADIR_INPUTFIELD_VALUE_POPUP' =>
+                '<a href="'.$strValue.'"'.
+                ' onclick="window.open(this.href,\'\',\'resizable=no,location=no,menubar=no,scrollbars=no,status=no,toolbar=no,fullscreen=no,dependent=no,width='.$imageWidth.',height='.$imageHeight.',status\');return false">'.
+                '<img src="'.$strValue.'.thumb" title="'.$arrInputfield['name'][0].'"'.
+                ' width="'.intval($this->arrSettings['settingsThumbSize']).'"'.
+                ' alt="'.$arrInputfield['name'][0].'" border="0" /></a>',
+            'MEDIADIR_INPUTFIELD_VALUE_IMAGE' =>
+                '<img src="'.$strValue.'" title="'.$arrInputfield['name'][0].'"'.
+                ' alt="'.$arrInputfield['name'][0].'" />',
+            'MEDIADIR_INPUTFIELD_VALUE_THUMB' =>
+                '<img src="'.$strValue.'.thumb"'.
+                ' width="'.intval($this->arrSettings['settingsThumbSize']).'"'.
+                ' title="'.$arrInputfield['name'][0].'"'.
+                ' alt="'.$arrInputfield['name'][0].'" />',
+        );
+    }
+
+    function getRawData($intEntryId, $arrInputfield, $arrTranslationStatus) {
         global $objDatabase, $_LANGID;
 
         $intId = intval($arrInputfield['id']);
@@ -467,41 +507,7 @@ INPUT;
                    AND lang_id=$intEntryDefaultLang
                  LIMIT 1 ");
         }
-        $strValue = strip_tags(htmlspecialchars($objResult->fields['value'], ENT_QUOTES, CONTREXX_CHARSET));
-        if (empty($strValue) || $strValue == 'new_image') {
-            return null;
-        }
-        $arrImageInfo   = getimagesize(\Env::get('cx')->getWebsitePath().$strValue);
-        $imageWidth     = $arrImageInfo[0]+20;
-        $imageHeight    = $arrImageInfo[1]+20;
-        $arrImageInfo   = pathinfo($strValue);
-        $strImageName    = $arrImageInfo['basename'];
-
-        return array(
-            'TXT_MEDIADIR_INPUTFIELD_NAME' => htmlspecialchars(
-                $arrInputfield['name'][0], ENT_QUOTES, CONTREXX_CHARSET),
-            'MEDIADIR_INPUTFIELD_VALUE' =>
-                '<a rel="shadowbox[1];options={slideshowDelay:5}" href="'.$strValue.'">'.
-                '<img src="'.$strValue.'.thumb" alt="" border="0" title="" '.
-                'width="'.intval($this->arrSettings['settingsThumbSize']).'" /></a>',
-            'MEDIADIR_INPUTFIELD_VALUE_SRC' => $strValue,
-            'MEDIADIR_INPUTFIELD_VALUE_FILENAME' => $strImageName,
-            'MEDIADIR_INPUTFIELD_VALUE_SRC_THUMB' => $strValue.".thumb",
-            'MEDIADIR_INPUTFIELD_VALUE_POPUP' =>
-                '<a href="'.$strValue.'"'.
-                ' onclick="window.open(this.href,\'\',\'resizable=no,location=no,menubar=no,scrollbars=no,status=no,toolbar=no,fullscreen=no,dependent=no,width='.$imageWidth.',height='.$imageHeight.',status\');return false">'.
-                '<img src="'.$strValue.'.thumb" title="'.$arrInputfield['name'][0].'"'.
-                ' width="'.intval($this->arrSettings['settingsThumbSize']).'"'.
-                ' alt="'.$arrInputfield['name'][0].'" border="0" /></a>',
-            'MEDIADIR_INPUTFIELD_VALUE_IMAGE' =>
-                '<img src="'.$strValue.'" title="'.$arrInputfield['name'][0].'"'.
-                ' alt="'.$arrInputfield['name'][0].'" />',
-            'MEDIADIR_INPUTFIELD_VALUE_THUMB' =>
-                '<img src="'.$strValue.'.thumb"'.
-                ' width="'.intval($this->arrSettings['settingsThumbSize']).'"'.
-                ' title="'.$arrInputfield['name'][0].'"'.
-                ' alt="'.$arrInputfield['name'][0].'" />',
-        );
+        return $objResult->fields['value'];
     }
 
 

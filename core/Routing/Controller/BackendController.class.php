@@ -86,7 +86,7 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                 'rewriteStatusCode' => array(
                     'header' => $_ARRAYLANG['rewriteStatusCode'],
                     'type' => 'select',
-                    'validValues' => array(301=>301, 302=>302),
+                    'validValues' => array(301=>301, 302=>302, 'intern'=>'Intern'),
                     'tooltip' => $_ARRAYLANG['TXT_CORE_ROUTING_REWRITE_STATUS_CODE_TOOLTIP'],
                 ),
                 'continueOnMatch' => array(

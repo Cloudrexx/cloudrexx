@@ -1,6 +1,9 @@
 <!-- START module_mediadir_settings_global.html -->
 <script language="JavaScript" type="text/javascript">
 $J(function(){
+    $J(".inputfieldType").live("change", function() {
+       handleKeywordAbility();
+    });
    $J( ".inputfieldContext" ).live('change', function(){
        resetContextFields();
    });
@@ -9,6 +12,7 @@ $J(function(){
       var inputId = $J(this).data('inputId');
       mediaBrowseInputBox = $J('#' + inputId);
    });
+   handleKeywordAbility();
 });
 
 function resetContextFields() {
@@ -25,6 +29,8 @@ function resetContextFields() {
     $J.each(contexts, function(i, context){
         $J(".inputfieldContext option[value="+ context +"]").removeAttr('disabled');
     });
+
+    handleKeywordAbility();
 }
 
 cx.jQuery.removeFromArray = function(value, arr) {
@@ -112,6 +118,33 @@ function ExpandMinimizeForm(toggle){
 
     elm1.style.display = (elm1.style.display=='none') ? 'block' : 'none';
     elm2.style.display = (elm2.style.display=='none') ? 'block' : 'none';
+}
+
+function handleKeywordAbility() {
+    /* compatible field types for meta keywords:
+    1: text
+    2: textarea
+    3: dropdown
+    4: radio
+    5: checkbox
+     */
+    var compatibleTypes = [1, 2, 3, 4, 5];
+    cx.jQuery(".inputfieldType").each(function() {
+        var keywordsOption = cx.jQuery(this)
+          .closest("tr")
+          .find(".inputfieldContext option[value='keywords']");
+        if (
+          (
+            compatibleTypes.indexOf(parseInt(cx.jQuery(this).val())) != -1 &&
+            !cx.jQuery(".inputfieldContext option[value='keywords']:selected").length
+          ) ||
+          keywordsOption.is(":selected")
+        ) {
+            keywordsOption.prop("disabled", false);
+        } else {
+            keywordsOption.prop("disabled", true);
+        }
+    });
 }
 var mediaBrowseInputBox;
 var mediaBrowserCallback = function(data) {

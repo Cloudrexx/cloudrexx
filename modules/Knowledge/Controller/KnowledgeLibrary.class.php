@@ -125,29 +125,20 @@ class KnowledgeLibrary {
      * Creates an array containing all frontend-languages.
      *
      * Contents:
-     * $arrValue[$langId]['short']        =>    For Example: en, de, fr, ...
+     * $arrValue[$langId]['short']        =>    For Example: en, de, fr, de-CH, ...
      * $arrValue[$langId]['long']        =>    For Example: 'English', 'Deutsch', 'French', ...
      *
-     * @global     object        $objDatabase
      * @return    array        $arrReturn
      */
     function createLanguageArray() {
-        global $objDatabase;
 
         $arrReturn = array();
 
-        $objResult = $objDatabase->Execute('SELECT        id,
-                                                        lang,
-                                                        name
-                                            FROM        '.DBPREFIX.'languages
-                                            WHERE        frontend=1
-                                            ORDER BY    id
-                                        ');
-        while (!$objResult->EOF) {
-            $arrReturn[$objResult->fields['id']] = array(    'short'    =>    stripslashes($objResult->fields['lang']),
-                                                            'long'    =>    htmlentities(stripslashes($objResult->fields['name']),ENT_QUOTES, CONTREXX_CHARSET)
-                                                        );
-            $objResult->MoveNext();
+        foreach (\FWLanguage::getActiveFrontendLanguages() as $frontendLanguage) {
+            $arrReturn[$frontendLanguage['id']] = array(
+                'short' =>  stripslashes($frontendLanguage['lang']),
+                'long'  =>  htmlentities(stripslashes($frontendLanguage['name']),ENT_QUOTES, CONTREXX_CHARSET)
+            );
         }
 
         return $arrReturn;

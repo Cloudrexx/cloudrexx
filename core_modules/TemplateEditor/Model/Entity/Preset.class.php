@@ -142,6 +142,9 @@ class Preset implements YamlSerializable
      */
     public function getOption($name)
     {
+        if (!isset($this->optionValues[$name])) {
+            return '';
+        }
         return $this->optionValues[$name];
     }
 

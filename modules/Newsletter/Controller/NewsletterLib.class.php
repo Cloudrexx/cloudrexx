@@ -836,8 +836,12 @@ class NewsletterLib
                             'l'                     => $linkId,
                             ($realUser ? 'r' : 'm') => $UserId,
                         );
+                        $protocol = null;
+                        if (\Env::get('config')['forceProtocolFrontend'] != 'none') {
+                            $protocol = \Env::get('config')['forceProtocolFrontend'];
+                        }
                         $newUrl = \Cx\Core\Routing\Url::fromDocumentRoot(
-                            $arrParameters, null, null)->toString();
+                            $arrParameters, null, $protocol)->toString();
                         $matches[$attrKey][$i] = preg_replace(
                             "/href\s*=\s*(['\"]).*?\\1/i",
                             "href=\"".$newUrl."\"", $matches[$attrKey][$i]);

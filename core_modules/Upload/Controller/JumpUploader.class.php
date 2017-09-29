@@ -94,12 +94,10 @@ class JumpUploader extends Uploader
       $appletPath = $basePath.'=jumpUploaderApplet';
       $l10nPath = $basePath.'=jumpUploaderL10n';
 
-      $langId;
       if(!$this->isBackendRequest)
-          $langId = $objInit->getFrontendLangId();
+          $langCode = \FWLanguage::getLanguageCodeById($objInit->getFrontendLangId());
       else //backend
-          $langId = $objInit->getBackendLangId();
-      $langCode = \FWLanguage::getLanguageCodeById($langId);
+          $langCode = \FWLanguage::getBackendLanguageCodeById($objInit->getBackendLangId());
       if (!file_exists(ASCMS_CORE_MODULE_PATH.'/Upload/ressources/uploaders/jump/messages_'.$langCode.'.zip')) {
           $langCode = 'en';
       }

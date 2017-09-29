@@ -25,6 +25,9 @@ Cx\Core_Modules\Sync\Model\Entity\Sync:
     hostEntities:
       targetEntity: Cx\Core_Modules\Sync\Model\Entity\HostEntity
       mappedBy: sync
+    changes:
+      targetEntity: Cx\Core_Modules\Sync\Model\Entity\Change
+      mappedBy: sync
   manyToOne: # owning side
     dataAccess:
       targetEntity: Cx\Core_Modules\DataAccess\Model\Entity\DataAccess

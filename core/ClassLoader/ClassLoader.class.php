@@ -118,6 +118,8 @@ class ClassLoader {
                     $third = 'events';
                 }
                 if ($parts[2] == 'Proxies') {
+                    $tmpPart = implode('', array_slice($parts, 3));
+                    $parts   = array('Cx', 'Model', 'Proxies', $tmpPart);
                     $third = 'proxies';
                     $suffix = '';
                 }
@@ -282,13 +284,48 @@ class ClassLoader {
         $path = $this->getFileFromWebsiteRepository($file, $webPath, $isWebsite);
         if ($path) return $path;
 
-        // 4. check if original file exists in code base
+        // 4. check if file exists in a MediaSource (shared repository)
+        $path = $this->getFileFromMediaSource($file, $webPath);
+        if ($path) return $path;
+
+        // 5. check if original file exists in code base
         if (file_exists($this->basePath.$file)) {
             return ($webPath ? $this->cx->getCodeBaseOffsetPath() : $this->basePath) . $file;
         }
 
         // lookup of file failed -> file does not exist
         return false;
+    }
+
+    public function getFileFromMediaSource($file, $webPath = false) {
+        // media source files may only be located in /images, /media or /themes
+        $cxClassName = get_class($this->cx);
+        if (!preg_match('#^(?:' . preg_quote($cxClassName::FOLDER_NAME_IMAGES, '#') . '|' . preg_quote($cxClassName::FOLDER_NAME_MEDIA, '#') . '|' . preg_quote($cxClassName::FOLDER_NAME_THEMES, '#') . ')/#', $file)) {
+            return false;
+        }
+
+        // check if Env has been initialized yet
+        if (!class_exists('Env', false)) {
+            return false;
+        }
+
+        // check if InitCMS has been initialized yet 
+        $objInit = \Env::get('init');
+        if (!$objInit) {
+            return false;
+        }
+        $mediaSourceManager = $this->cx->getMediaSourceManager();
+        if (!$mediaSourceManager) {
+            return false;
+        }
+
+        // check if file exists in any of the registered MediaSource filesystems
+        $mediaSourceFile = $mediaSourceManager->getMediaSourceFileFromPath($file);
+        if (!$mediaSourceFile) {
+            return false;
+        }
+
+        return $webPath ? $file : $mediaSourceFile->getFileSystem()->getFullPath($mediaSourceFile);
     }
 
     /**

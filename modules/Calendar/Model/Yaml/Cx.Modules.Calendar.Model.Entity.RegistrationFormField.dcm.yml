@@ -1,0 +1,38 @@
+Cx\Modules\Calendar\Model\Entity\RegistrationFormField:
+  type: entity
+  table: module_calendar_registration_form_field
+  indexes:
+    contrexx_module_calendar_form_ibfk:
+      columns: [ form ]
+  id:
+    id:
+      type: integer
+      generator:
+        strategy: AUTO
+  fields:
+    type:
+      type: string
+    required:
+      type: integer
+    order:
+      type: integer
+    affiliation:
+      type: string
+      length: 45
+  uniqueConstraints:
+    form:
+      columns: [ form ]
+  oneToMany:
+    registrationFormFieldNames:
+      targetEntity: Cx\Modules\Calendar\Model\Entity\RegistrationFormFieldName
+      mappedBy: registrationFormField
+    registrationFormFieldValues:
+      targetEntity: Cx\Modules\Calendar\Model\Entity\RegistrationFormFieldValue
+      mappedBy: registrationFormField
+  manyToOne:
+    registrationForm:
+      targetEntity: Cx\Modules\Calendar\Model\Entity\RegistrationForm
+      inversedBy: registrationFormFields
+      joinColumn:
+        name: form
+        referencedColumnName: id

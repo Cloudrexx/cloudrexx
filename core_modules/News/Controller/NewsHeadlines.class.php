@@ -172,7 +172,7 @@ class NewsHeadlines extends \Cx\Core_Modules\News\Controller\NewsLibrary
                     'NEWS_DATE'         => date(ASCMS_DATE_FORMAT_DATE, $objResult->fields['date']),
                     'NEWS_TIME'         => date(ASCMS_DATE_FORMAT_TIME, $objResult->fields['date']),
                     'NEWS_TITLE'        => contrexx_raw2xhtml($newstitle),
-                    'NEWS_TEASER'       => nl2br($objResult->fields['teaser_text']),
+                    'NEWS_TEASER'       => $this->arrSettings['news_use_teaser_text'] ? nl2br($objResult->fields['teaser_text']) : '',
                     'NEWS_LINK_TITLE'   => $htmlLinkTitle,
                     'NEWS_LINK'         => $htmlLink,
                     'NEWS_LINK_URL'     => contrexx_raw2xhtml($newsUrl),
@@ -183,7 +183,7 @@ class NewsHeadlines extends \Cx\Core_Modules\News\Controller\NewsLibrary
                     // Backward compatibility for templates pre 3.0
                     'HEADLINE_ID'       => $newsid,
                     'HEADLINE_DATE'     => date(ASCMS_DATE_FORMAT_DATE, $objResult->fields['date']),
-                    'HEADLINE_TEXT'     => nl2br($objResult->fields['teaser_text']),
+                    'HEADLINE_TEXT'     => $this->arrSettings['news_use_teaser_text'] ? nl2br($objResult->fields['teaser_text']) : '',
                     'HEADLINE_LINK'     => $htmlLinkTitle,
                     'HEADLINE_AUTHOR'   => contrexx_raw2xhtml($author),
                 ));

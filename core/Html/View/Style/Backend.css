@@ -134,9 +134,14 @@ form.cx-ui input[type="email"],
 form.cx-ui input[type="password"],
 form.cx-ui input[type="tel"],
 form.cx-ui input[type="url"],
-form.cx-ui input[type="date"]{
+form.cx-ui input[type="date"],
+form.cx-ui select{
     width: 300px;
     max-width: 300px;
+    -ms-box-sizing:content-box;
+    -moz-box-sizing:content-box;
+    -webkit-box-sizing:content-box;
+    box-sizing:content-box;
 }
 form.cx-ui input#imagePath {
     width: 292px;

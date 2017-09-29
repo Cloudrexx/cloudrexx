@@ -85,7 +85,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      * @param array  $dataArguments (optional) List of data arguments for the command
      * @return void
      */
-    public function executeCommand($command, $arguments) {
+    public function executeCommand($command, $arguments, $dataArguments = array()) {
         switch ($command) {
             case 'Data':
                 if (
@@ -102,6 +102,9 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 unset($arguments[static::ARGUMENT_INDEX_DATA_ADAPTER]);
                 unset($arguments[static::ARGUMENT_INDEX_DATA_METHOD]);
                 $dataArguments = array('get' => $arguments);
+                if (!isset($arguments['response'])) {
+                    $arguments['response'] = $this->cx->getResponse();
+                }
                 
                 $json = new \Cx\Core\Json\JsonData();
                 $data = $json->data($dataAdapter, $dataMethod, $dataArguments);
@@ -117,7 +120,11 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                         echo $data['data']['content'];
                         break;
                     case 'Json':
-                        $json->json($data, true);
+                        $response = $arguments['response'];
+                        $response->setAbstractContent($data);
+                        $response->setParser($json->getParser());
+                        $response->send();
+                        echo $json->parse($data, true);
                         break;
                     default:
                         throw new \Exception('No such output module: "' . $outputModule . '"');
@@ -146,7 +153,11 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 $adapter = contrexx_input2raw($_GET['object']);
                 $method = contrexx_input2raw($_GET['act']);
                 // TODO: Replace arguments by something reasonable
-                $arguments = array('get' => $_GET, 'post' => $_POST);
+                $arguments = array(
+                    'get' => $_GET,
+                    'post' => $_POST,
+                    'response' => $this->cx->getResponse(),
+                );
                 echo $json->jsondata($adapter, $method, $arguments);
                 die();
                 break;
@@ -170,7 +181,11 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                     $adapter = contrexx_input2raw($_GET['object']);
                     $method = contrexx_input2raw($_GET['act']);
                     // TODO: Replace arguments by something reasonable
-                    $arguments = array('get' => $_GET, 'post' => $_POST);
+                    $arguments = array(
+                        'get' => $_GET,
+                        'post' => $_POST,
+                        'response' => $this->cx->getResponse(),
+                    );
                     echo $json->jsondata($adapter, $method, $arguments);
                     die();
                 }

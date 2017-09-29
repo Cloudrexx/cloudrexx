@@ -175,7 +175,6 @@ $_ARRAYLANG['TXT_DOWNLOADS_MANAGE'] = "Verwalten";
 $_ARRAYLANG['TXT_DOWNLOADS_CATEGORY_DELETABLE_BY_OWNER'] = "Der Besitzer darf diese Kategorie löschen.";
 $_ARRAYLANG['TXT_DOWNLOADS_CATEGORY_MANAGE_BY_OWNER'] = "Der Besitzer dieser Kategorie darf dessen Eigenschaften ändern.";
 $_ARRAYLANG['TXT_DOWNLOADS_CATEG0RY_VISIBILITY_DESC'] = "Diese Kategorie immer auflisten, auch wenn der aktuelle Benutzer keine Zugriffsberechtigung auf den Inhalt hat.";
-$_ARRAYLANG['TXT_DOWNLOADS_EMPTY_NAME_ERROR'] = "Sie müssen zwingend einen Namen für die Kategorie definieren!";
 $_ARRAYLANG['TXT_DOWNLOADS_CATEGORY_DELETE_FAILED'] = "Beim Löschen der Kategorie %s trat ein Fehler auf!";
 $_ARRAYLANG['TXT_DOWNLOADS_FUNCTIONS'] = "Funktionen";
 $_ARRAYLANG['TXT_DOWNLOADS_ID'] = "ID";

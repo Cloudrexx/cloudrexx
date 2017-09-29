@@ -62,6 +62,10 @@ class CoreAttribute extends \Cx\Model\Base\EntityBase {
      */
     private $accessId;
 
+    /**
+     * @var Cx\Core_Modules\Access\Model\Entity\AccessId
+     */
+    protected $readAccessId;
 
     /**
      * Set id
@@ -181,5 +185,25 @@ class CoreAttribute extends \Cx\Model\Base\EntityBase {
     public function getAccessId()
     {
         return $this->accessId;
+    }
+
+    /**
+     * Set readAccessId
+     *
+     * @param Cx\Core_Modules\Access\Model\Entity\AccessId $readAccessId
+     */
+    public function setReadAccessId(\Cx\Core_Modules\Access\Model\Entity\AccessId $readAccessId)
+    {
+        $this->readAccessId = $readAccessId;
+    }
+
+    /**
+     * Get readAccessId
+     *
+     * @return Cx\Core_Modules\Access\Model\Entity\AccessId $readAccessId
+     */
+    public function getReadAccessId()
+    {
+        return $this->readAccessId;
     }
 }

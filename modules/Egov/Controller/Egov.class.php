@@ -126,7 +126,7 @@ class Egov extends EgovLibrary
             )");
         $order_id = $objDatabase->Insert_ID();
         if (self::GetProduktValue('product_per_day', $product_id) == 'yes') {
-            list ($calD, $calM, $calY) = explode('[.]', contrexx_input2raw($_REQUEST['contactFormField_1000']));
+            list ($calD, $calM, $calY) = explode('.', contrexx_input2raw($_REQUEST['contactFormField_1000']));
             for($x = 0; $x < $quantity; ++$x) {
                 $objDatabase->Execute("
                     INSERT INTO ".DBPREFIX."module_egov_product_calendar (
@@ -220,30 +220,19 @@ class Egov extends EgovLibrary
             if (empty($replyAddress)) {
                 $replyAddress = self::GetSettings('set_orderentry_sender');
             }
-            if (@include_once ASCMS_LIBRARY_PATH.'/phpmailer/class.phpmailer.php') {
-                $objMail = new \phpmailer();
-                if (!empty($_CONFIG['coreSmtpServer'])) {
-                    if (($arrSmtp = \SmtpSettings::getSmtpAccount($_CONFIG['coreSmtpServer'])) !== false) {
-                        $objMail->IsSMTP();
-                        $objMail->Host = $arrSmtp['hostname'];
-                        $objMail->Port = $arrSmtp['port'];
-                        $objMail->SMTPAuth = true;
-                        $objMail->Username = $arrSmtp['username'];
-                        $objMail->Password = $arrSmtp['password'];
-                    }
-                }
-                $objMail->CharSet = CONTREXX_CHARSET;
-                $from = self::GetSettings('set_orderentry_sender');
-                $fromName = self::GetSettings('set_orderentry_name');
-                $objMail->AddReplyTo($replyAddress);
-                $objMail->SetFrom($from, $fromName);
-                $objMail->Subject = $SubjectText;
-                $objMail->Priority = 3;
-                $objMail->IsHTML(false);
-                $objMail->Body = $BodyText;
-                $objMail->AddAddress($recipient);
-                $objMail->Send();
-            }
+
+            $objMail = new \Cx\Core\MailTemplate\Model\Entity\Mail();
+            $from    = self::GetSettings('set_orderentry_sender');
+            $fromName = self::GetSettings('set_orderentry_name');
+            $objMail->AddReplyTo($replyAddress);
+            $objMail->SetFrom($from, $fromName);
+            $objMail->Subject = $SubjectText;
+            $objMail->Priority = 3;
+            $objMail->IsHTML(false);
+            $objMail->Body = $BodyText;
+            $objMail->AddAddress($recipient);
+            $objMail->Send();
+
         }
 
         // Update 29.10.2006 Statusmail automatisch abschicken || Produktdatei
@@ -274,30 +263,19 @@ class Egov extends EgovLibrary
                 $BodyText = str_replace('[[ORDER_VALUE]]', $FormValue4Mail, $BodyDB);
                 $BodyText = str_replace('[[PRODUCT_NAME]]', html_entity_decode(self::GetProduktValue('product_name', $product_id)), $BodyText);
                 $BodyText = html_entity_decode($BodyText);
-                if (@include_once ASCMS_LIBRARY_PATH.'/phpmailer/class.phpmailer.php') {
-                    $objMail = new \phpmailer();
-                    if ($_CONFIG['coreSmtpServer'] > 0) {
-                        if (($arrSmtp = \SmtpSettings::getSmtpAccount($_CONFIG['coreSmtpServer'])) !== false) {
-                            $objMail->IsSMTP();
-                            $objMail->Host = $arrSmtp['hostname'];
-                            $objMail->Port = $arrSmtp['port'];
-                            $objMail->SMTPAuth = true;
-                            $objMail->Username = $arrSmtp['username'];
-                            $objMail->Password = $arrSmtp['password'];
-                        }
-                    }
-                    $objMail->CharSet = CONTREXX_CHARSET;
-                    $objMail->SetFrom($FromEmail, $FromName);
-                    $objMail->Subject = $SubjectText;
-                    $objMail->Priority = 3;
-                    $objMail->IsHTML(false);
-                    $objMail->Body = $BodyText;
-                    $objMail->AddAddress($TargetMail);
-                    if (self::GetProduktValue('product_electro', $product_id) == 1) {
-                        $objMail->AddAttachment(ASCMS_PATH.self::GetProduktValue('product_file', $product_id));
-                    }
-                    $objMail->Send();
+
+                $objMail = new \Cx\Core\MailTemplate\Model\Entity\Mail();
+
+                $objMail->SetFrom($FromEmail, $FromName);
+                $objMail->Subject = $SubjectText;
+                $objMail->Priority = 3;
+                $objMail->IsHTML(false);
+                $objMail->Body = $BodyText;
+                $objMail->AddAddress($TargetMail);
+                if (self::GetProduktValue('product_electro', $product_id) == 1) {
+                    $objMail->AddAttachment(ASCMS_PATH.self::GetProduktValue('product_file', $product_id));
                 }
+                $objMail->Send();
             }
         }
         return '';

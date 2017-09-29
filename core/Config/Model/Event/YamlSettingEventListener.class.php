@@ -57,9 +57,9 @@ class YamlSettingEventListenerException extends \Exception {}
  * @package     cloudrexx
  * @subpackage  core_config
  */
-class YamlSettingEventListener implements \Cx\Core\Event\Model\Entity\EventListener {
+class YamlSettingEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventListener {
     public function preUpdate($eventArgs) {
-        global $_CONFIG,$_ARRAYLANG, $objCache;
+        global $_CONFIG,$_ARRAYLANG;
         try {
             $objSetting = $eventArgs->getEntity();
             $value = $objSetting->getValue();
@@ -79,6 +79,7 @@ class YamlSettingEventListener implements \Cx\Core\Event\Model\Entity\EventListe
                     }
                     $value = htmlspecialchars($value, ENT_QUOTES, CONTREXX_CHARSET);
                     $objSetting->setValue($value);
+                    $this->getComponent('Cache')->deleteNonPagePageCache();
                     break;
 
                 case 'forceProtocolFrontend':
@@ -88,6 +89,7 @@ class YamlSettingEventListener implements \Cx\Core\Event\Model\Entity\EventListe
                         }
                         $objSetting->setValue($value);
                     }
+                    $this->getComponent('Cache')->deleteNonPagePageCache();
                     break;
 
                 case 'forceProtocolBackend':
@@ -107,13 +109,14 @@ class YamlSettingEventListener implements \Cx\Core\Event\Model\Entity\EventListe
                     }
                     $value = \Cx\Core\Config\Controller\Config::checkAccessibility($protocol) ? $value : 'off';
                     $objSetting->setValue($value);
+                    $this->getComponent('Cache')->deleteNonPagePageCache();
                     break;
                 
                 case 'cacheReverseProxy':
                 case 'cacheProxyCacheConfig':
                     if ($value != $_CONFIG[$objSetting->getName()]) {
                         // drop reverse proxy cache
-                        $objCache->clearReverseProxyCache('*');
+                        \Cx\Core\Core\Controller\Cx::instanciate()->getComponent('Cache')->clearReverseProxyCache('*');
                     }
                     break;
                 
@@ -122,7 +125,16 @@ class YamlSettingEventListener implements \Cx\Core\Event\Model\Entity\EventListe
                 case 'cacheSsiProcessorConfig':
                     if ($value != $_CONFIG[$objSetting->getName()]) {
                         // drop esi/ssi cache
-                        $objCache->clearSsiCache();
+                        \Cx\Core\Core\Controller\Cx::instanciate()->getComponent('Cache')->clearSsiCache();
+                    }
+                    break;
+                case 'defaultMetaimage':
+                    if ($value != $_CONFIG[$objSetting->getName()]) {
+                        // drop esi/ssi cache
+                        $this->cx->getEvents()->triggerEvent(
+                            'clearEsiCache',
+                            array('Widget', 'METAIMAGE')
+                        );
                     }
                     break;
             }

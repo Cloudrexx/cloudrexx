@@ -64,6 +64,10 @@ class ComponentController extends SystemComponentController
         );
     }
 
+    public function isActive() {
+        return (boolean) count($this->uploaderInstances);
+    }
+
     public function preFinalize(\Cx\Core\Html\Sigma $template) {
         if (count($this->uploaderInstances) == 0) {
             return;

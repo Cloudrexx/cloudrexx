@@ -15,8 +15,8 @@ Cx\Core_Modules\Sync\Model\Entity\IdMapping:
       type: string
       column: entity_type
     foreignId:
-      type: integer
+      type: array
       column: foreign_id
     localId:
-      type: integer
+      type: array
       column: local_id

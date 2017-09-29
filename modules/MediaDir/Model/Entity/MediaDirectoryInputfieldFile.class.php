@@ -399,6 +399,34 @@ INPUT;
 
     function getContent($intEntryId, $arrInputfield, $arrTranslationStatus)
     {
+        $arrValue = explode(
+            ",",
+            static::getRawData($intEntryId, $arrInputfield, $arrTranslationStatus)
+        );
+        $strValue = strip_tags(htmlspecialchars($arrValue[0], ENT_QUOTES, CONTREXX_CHARSET));
+
+        if(!empty($strValue) && $strValue != 'new_file') {
+            $arrFileInfo    = pathinfo($strValue);
+            $strFileName    = htmlspecialchars($arrFileInfo['basename'], ENT_QUOTES, CONTREXX_CHARSET);
+            if(empty($arrValue[1])) {
+                $strName = $strFileName;
+            } else {
+                $strName = strip_tags(htmlspecialchars($arrValue[1], ENT_QUOTES, CONTREXX_CHARSET));
+            }
+
+            $arrContent['TXT_'.$this->moduleLangVar.'_INPUTFIELD_NAME'] = htmlspecialchars($arrInputfield['name'][0], ENT_QUOTES, CONTREXX_CHARSET);
+            $arrContent[$this->moduleLangVar.'_INPUTFIELD_VALUE'] = '<a href="'.urldecode($strValue).'" alt="'.$strName.'" title="'.$strName.'" target="_blank">'.$strName.'</a>';
+            $arrContent[$this->moduleLangVar.'_INPUTFIELD_VALUE_SRC'] = urldecode($strValue);
+            $arrContent[$this->moduleLangVar.'_INPUTFIELD_VALUE_NAME'] = $strName;
+            $arrContent[$this->moduleLangVar.'_INPUTFIELD_VALUE_FILENAME'] = $strFileName;
+        } else {
+            $arrContent = null;
+        }
+
+        return $arrContent;
+    }
+
+    function getRawData($intEntryId, $arrInputfield, $arrTranslationStatus) {
         global $objDatabase, $_LANGID;
 
         $intId = intval($arrInputfield['id']);
@@ -427,28 +455,7 @@ INPUT;
                  LIMIT 1 ");
         }
 
-        $arrValue = explode(",", $objResult->fields['value']);
-        $strValue = strip_tags(htmlspecialchars($arrValue[0], ENT_QUOTES, CONTREXX_CHARSET));
-
-        if(!empty($strValue) && $strValue != 'new_file') {
-            $arrFileInfo    = pathinfo($strValue);
-            $strFileName    = htmlspecialchars($arrFileInfo['basename'], ENT_QUOTES, CONTREXX_CHARSET);
-            if(empty($arrValue[1])) {
-                $strName = $strFileName;
-            } else {
-                $strName = strip_tags(htmlspecialchars($arrValue[1], ENT_QUOTES, CONTREXX_CHARSET));
-            }
-
-            $arrContent['TXT_'.$this->moduleLangVar.'_INPUTFIELD_NAME'] = htmlspecialchars($arrInputfield['name'][0], ENT_QUOTES, CONTREXX_CHARSET);
-            $arrContent[$this->moduleLangVar.'_INPUTFIELD_VALUE'] = '<a href="'.urldecode($strValue).'" alt="'.$strName.'" title="'.$strName.'" target="_blank">'.$strName.'</a>';
-            $arrContent[$this->moduleLangVar.'_INPUTFIELD_VALUE_SRC'] = urldecode($strValue);
-            $arrContent[$this->moduleLangVar.'_INPUTFIELD_VALUE_NAME'] = $strName;
-            $arrContent[$this->moduleLangVar.'_INPUTFIELD_VALUE_FILENAME'] = $strFileName;
-        } else {
-            $arrContent = null;
-        }
-
-        return $arrContent;
+        return $objResult->fields['value'];
     }
 
 

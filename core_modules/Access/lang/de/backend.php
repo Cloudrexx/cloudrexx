@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- *
+ * 
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
-
+ 
 /**
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Cloudrexx Development Team <info@cloudrexx.com>
@@ -73,7 +73,9 @@ $_ARRAYLANG['TXT_ACCESS_AVAILABLE_GROUPS'] = "Vorhandene Gruppen";
 $_ARRAYLANG['TXT_ACCESS_AVAILABLE_USERS'] = "Vorhandene Benutzer";
 $_ARRAYLANG['TXT_ACCESS_BACK'] = "zurück";
 $_ARRAYLANG['TXT_ACCESS_BACKEND_DESC'] = "Administrationskonsole (backend)";
-$_ARRAYLANG['TXT_ACCESS_BIRTHDAYS'] = "Geburtstage";
+$_ARRAYLANG['TXT_ACCESS_BIRTHDAYS'] = "Aktuelle Geburtstage";
+$_ARRAYLANG['TXT_ACCESS_NEXT_BIRTHDAYS'] = "Nächste Geburtstage";
+$_ARRAYLANG['TXT_ACCESS_NEXT_BIRTHDAYS_DAYS'] = "Anzahl Tage";
 $_ARRAYLANG['TXT_ACCESS_CANCEL'] = "Abbrechen";
 $_ARRAYLANG['TXT_ACCESS_CHANGE_PROFILE_PIC'] = "Profilbild ändern";
 $_ARRAYLANG['TXT_ACCESS_CHANGE_SORT_DIRECTION'] = "Sortierreihenfolge ändern";
@@ -142,6 +144,9 @@ $_ARRAYLANG['TXT_ACCESS_GROUP_LIST'] = "Gruppen Liste";
 $_ARRAYLANG['TXT_ACCESS_GROUPS'] = "Gruppen";
 $_ARRAYLANG['TXT_ACCESS_GROUP_STORED_SUCCESSFULLY'] = "Die Gruppe wurde erfolgreich gespeichert";
 $_ARRAYLANG['TXT_ACCESS_GROUP_SUCCESSFULLY_DELETED'] = "Die Gruppe %s wurde erfolgreich gelöscht.";
+$_ARRAYLANG['TXT_ACCESS_GROUP_MANAGE_GROUP_RIGHTS_NOT_DELETED'] = "Die Berechtigung \"%s\" wurde für die Gruppe nicht entfernt, da ihr Benutzer sonst keine Gruppen mehr bearbeiten kann.";
+$_ARRAYLANG['TXT_ACCESS_GROUP_NOT_DEACTIVATED_DUE_TO_MANAGE_GROUP_RIGHTS'] = "Die Benutzergruppe wurde nicht deaktiviert, da ihr Benutzer sonst keine Gruppen mehr bearbeiten kann.";
+$_ARRAYLANG['TXT_ACCESS_GROUP_NOT_DELETED_DUE_TO_MANAGE_GROUP_RIGHTS'] = "Die Benutzergruppe wurde nicht gelöscht, da ihr Benutzer sonst keine Gruppen mehr bearbeiten kann.";
 $_ARRAYLANG['TXT_ACCESS_GROUP_TYP'] = "Gruppentyp";
 $_ARRAYLANG['TXT_ACCESS_HISTORY'] = "Verlauf";
 $_ARRAYLANG['TXT_ACCESS_HTML_UC'] = "HTML";
@@ -337,4 +342,12 @@ $_ARRAYLANG['TXT_ACCESS_PASSWORD_MANUALLY'] = "Kennwort manuell setzen";
 $_ARRAYLANG['TXT_ACCESS_PASSWORD_GENERATED'] = "Automatisch und an die E-Mail Adresse zustellen";
 $_ARRAYLANG['TXT_ACCESS_USER_ACCOUNT_VERIFICATION'] = "Konformität Pflichtfelder (Profil Eigenschaften)";
 $_ARRAYLANG['TXT_ACCESS_USER_ACCOUNT_VERIFICATION_TEXT'] = "Die Pflichtfelder müssen geprüft und gesetzt sein";
-?>
+$_ARRAYLANG['TXT_CORE_MODULE_ACCESS_MANAGE_USERS'] = "Benutzer verwalten";
+$_ARRAYLANG['TXT_CORE_MODULE_ACCESS_MANAGE_USER_GROUPS'] = "Benutzergruppen verwalten";
+$_ARRAYLANG['TXT_CORE_MODULE_ACCESS_NO_PERMISSION_DELETE_ADMIN_USER'] = "Sie verfügen nicht über die benötigte Berechtigungsstufe, um das Konto %s zu löschen";
+$_ARRAYLANG['TXT_ACCESS_TOOLBARCONFIGURATOR'] = 'Editorfunktionen';
+$_ARRAYLANG['TXT_ACCESS_READ_ACCESS_TAB_TITLE'] = 'Lesezugriff';
+$_ARRAYLANG['TXT_ACCESS_READ_ACCESS_MODIFY_TITLE_TEXT'] = 'Definieren Sie hier, wer die Daten dieser Eigenschaft von anderen Benutzern einsehen darf.';
+$_ARRAYLANG['TXT_ACCESS_READ_ACCESS_EVERYONE_MOD_PERM'] = 'Jeder darf diese Eigenschaft einsehen.';
+$_ARRAYLANG['TXT_ACCESS_READ_ACCESS_SELECT_ALLOWED_MODIFY_GROUPS'] = 'Wählen Sie die Gruppen aus, welche berechtigt sein sollen, diese Eigenschaft einzusehen';
+$_ARRAYLANG['TXT_ACCESS_READ_ACCESS_TITLE_TOOLTIP_TEXT'] = "Der Lesezugriff auf ein Benutzerprofil kann pro Benutzer (mittels Eigenschaft %s) weiter eingeschränkt werden. Abhängig davon ist die Konfiguration an dieser Stelle wirkungslos.";

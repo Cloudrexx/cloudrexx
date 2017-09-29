@@ -1,8 +1,5 @@
 <?php
-
 /*
- *  $Id$
- *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -16,7 +13,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * This software consists of voluntary contributions made by many individuals
- * and is licensed under the LGPL. For more information, see
+ * and is licensed under the MIT license. For more information, see
  * <http://www.doctrine-project.org>.
  */
 
@@ -27,26 +24,47 @@ use Doctrine\ORM\Tools\Export\ExportException;
 
 /**
  * Abstract base class which is to be used for the Exporter drivers
- * which can be found in Doctrine\ORM\Tools\Export\Driver
+ * which can be found in \Doctrine\ORM\Tools\Export\Driver.
  *
- * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link    www.doctrine-project.org
  * @since   2.0
- * @version $Revision$
  * @author  Jonathan Wage <jonwage@gmail.com>
  */
 abstract class AbstractExporter
 {
+    /**
+     * @var array
+     */
     protected $_metadata = array();
+
+    /**
+     * @var string|null
+     */
     protected $_outputDir;
+
+    /**
+     * @var string|null
+     */
     protected $_extension;
+
+    /**
+     * @var bool
+     */
     protected $_overwriteExistingFiles = false;
 
+    /**
+     * @param string|null $dir
+     */
     public function __construct($dir = null)
     {
         $this->_outputDir = $dir;
     }
 
+    /**
+     * @param bool $overwrite
+     *
+     * @return void
+     */
     public function setOverwriteExistingFiles($overwrite)
     {
         $this->_overwriteExistingFiles = $overwrite;
@@ -54,17 +72,19 @@ abstract class AbstractExporter
 
     /**
      * Converts a single ClassMetadata instance to the exported format
-     * and returns it
+     * and returns it.
      *
-     * @param ClassMetadataInfo $metadata 
-     * @return mixed $exported
+     * @param ClassMetadataInfo $metadata
+     *
+     * @return string
      */
     abstract public function exportClassMetadata(ClassMetadataInfo $metadata);
 
     /**
-     * Set the array of ClassMetadataInfo instances to export
+     * Sets the array of ClassMetadataInfo instances to export.
      *
-     * @param array $metadata 
+     * @param array $metadata
+     *
      * @return void
      */
     public function setMetadata(array $metadata)
@@ -73,9 +93,9 @@ abstract class AbstractExporter
     }
 
     /**
-     * Get the extension used to generated the path to a class
+     * Gets the extension used to generated the path to a class.
      *
-     * @return string $extension
+     * @return string|null
      */
     public function getExtension()
     {
@@ -83,14 +103,15 @@ abstract class AbstractExporter
     }
 
     /**
-     * Set the directory to output the mapping files to
+     * Sets the directory to output the mapping files to.
      *
      *     [php]
      *     $exporter = new YamlExporter($metadata);
      *     $exporter->setOutputDir(__DIR__ . '/yaml');
      *     $exporter->export();
      *
-     * @param string $dir 
+     * @param string $dir
+     *
      * @return void
      */
     public function setOutputDir($dir)
@@ -99,36 +120,42 @@ abstract class AbstractExporter
     }
 
     /**
-     * Export each ClassMetadata instance to a single Doctrine Mapping file
-     * named after the entity
+     * Exports each ClassMetadata instance to a single Doctrine Mapping file
+     * named after the entity.
      *
      * @return void
+     *
+     * @throws \Doctrine\ORM\Tools\Export\ExportException
      */
     public function export()
     {
         if ( ! is_dir($this->_outputDir)) {
-            mkdir($this->_outputDir, 0777, true);
+            mkdir($this->_outputDir, 0775, true);
         }
 
         foreach ($this->_metadata as $metadata) {
-            $output = $this->exportClassMetadata($metadata);
-            $path = $this->_generateOutputPath($metadata);
-            $dir = dirname($path);
-            if ( ! is_dir($dir)) {
-                mkdir($dir, 0777, true);
+            //In case output is returned, write it to a file, skip otherwise
+            if($output = $this->exportClassMetadata($metadata)){
+                $path = $this->_generateOutputPath($metadata);
+                $dir = dirname($path);
+                if ( ! is_dir($dir)) {
+                    mkdir($dir, 0775, true);
+                }
+                if (file_exists($path) && !$this->_overwriteExistingFiles) {
+                    throw ExportException::attemptOverwriteExistingFile($path);
+                }
+                file_put_contents($path, $output);
+                chmod($path, 0664);
             }
-            if (file_exists($path) && !$this->_overwriteExistingFiles) {
-                throw ExportException::attemptOverwriteExistingFile($path);
-            }
-            file_put_contents($path, $output);
         }
     }
 
     /**
-     * Generate the path to write the class for the given ClassMetadataInfo instance
+     * Generates the path to write the class for the given ClassMetadataInfo instance.
      *
-     * @param ClassMetadataInfo $metadata 
-     * @return string $path
+     * @param ClassMetadataInfo $metadata
+     *
+     * @return string
      */
     protected function _generateOutputPath(ClassMetadataInfo $metadata)
     {
@@ -136,7 +163,7 @@ abstract class AbstractExporter
     }
 
     /**
-     * Set the directory to output the mapping files to
+     * Sets the directory to output the mapping files to.
      *
      *     [php]
      *     $exporter = new YamlExporter($metadata, __DIR__ . '/yaml');
@@ -144,6 +171,7 @@ abstract class AbstractExporter
      *     $exporter->export();
      *
      * @param string $extension
+     *
      * @return void
      */
     public function setExtension($extension)
@@ -151,65 +179,72 @@ abstract class AbstractExporter
         $this->_extension = $extension;
     }
 
+    /**
+     * @param int $type
+     *
+     * @return string
+     */
     protected function _getInheritanceTypeString($type)
     {
-        switch ($type)
-        {
+        switch ($type) {
             case ClassMetadataInfo::INHERITANCE_TYPE_NONE:
                 return 'NONE';
-            break;
 
             case ClassMetadataInfo::INHERITANCE_TYPE_JOINED:
                 return 'JOINED';
-            break;
-            
+
             case ClassMetadataInfo::INHERITANCE_TYPE_SINGLE_TABLE:
                 return 'SINGLE_TABLE';
-            break;
-            
+
             case ClassMetadataInfo::INHERITANCE_TYPE_TABLE_PER_CLASS:
                 return 'PER_CLASS';
-            break;
         }
     }
 
+    /**
+     * @param int $policy
+     *
+     * @return string
+     */
     protected function _getChangeTrackingPolicyString($policy)
     {
-        switch ($policy)
-        {
+        switch ($policy) {
             case ClassMetadataInfo::CHANGETRACKING_DEFERRED_IMPLICIT:
                 return 'DEFERRED_IMPLICIT';
-            break;
-            
+
             case ClassMetadataInfo::CHANGETRACKING_DEFERRED_EXPLICIT:
                 return 'DEFERRED_EXPLICIT';
-            break;
-            
+
             case ClassMetadataInfo::CHANGETRACKING_NOTIFY:
                 return 'NOTIFY';
-            break;
         }
     }
 
+    /**
+     * @param int $type
+     *
+     * @return string
+     */
     protected function _getIdGeneratorTypeString($type)
     {
-        switch ($type)
-        {
+        switch ($type) {
             case ClassMetadataInfo::GENERATOR_TYPE_AUTO:
                 return 'AUTO';
-            break;
-            
+
             case ClassMetadataInfo::GENERATOR_TYPE_SEQUENCE:
                 return 'SEQUENCE';
-            break;
-            
+
             case ClassMetadataInfo::GENERATOR_TYPE_TABLE:
                 return 'TABLE';
-            break;
-            
+
             case ClassMetadataInfo::GENERATOR_TYPE_IDENTITY:
                 return 'IDENTITY';
-            break;
+
+            case ClassMetadataInfo::GENERATOR_TYPE_UUID:
+                return 'UUID';
+
+            case ClassMetadataInfo::GENERATOR_TYPE_CUSTOM:
+                return 'CUSTOM';
         }
     }
 }

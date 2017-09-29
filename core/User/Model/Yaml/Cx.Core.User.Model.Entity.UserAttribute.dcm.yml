@@ -49,6 +49,12 @@ Cx\Core\User\Model\Entity\UserAttribute:
       joinColumns:
         access_id:
           referencedColumnName: id
+    readAccessId:
+      targetEntity: Cx\Core_Modules\Access\Model\Entity\AccessId
+      inversedBy: contrexxAccessUserAttributeRead
+      joinColumns:
+        read_access_id:
+          referencedColumnName: id
   manyToMany:
     userProfile:
       targetEntity: Cx\Core\User\Model\Entity\UserProfile

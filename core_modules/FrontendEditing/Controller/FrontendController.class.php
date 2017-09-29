@@ -81,7 +81,7 @@ class FrontendController extends \Cx\Core\Core\Model\Entity\Controller
 
         // activate ckeditor
         \JS::activate('ckeditor');
-        \JS::activate('jquery-cookie');
+        \JS::activate('js-cookie');
 
         // load language data
         $_ARRAYLANG = $objInit->loadLanguageData('FrontendEditing');
@@ -239,7 +239,10 @@ class FrontendController extends \Cx\Core\Core\Model\Entity\Controller
      */
     private function getDefaultTemplate()
     {
-        $query = 'SELECT `id`, `lang`, `themesid` FROM `' . DBPREFIX . 'languages` WHERE `id` = ' . FRONTEND_LANG_ID;
-        return $this->cx->getDb()->getAdoDb()->SelectLimit($query, 1)->fields['themesid'];
+        $themeRepo = new \Cx\Core\View\Model\Repository\ThemeRepository();
+        $theme = $themeRepo->getDefaultTheme(
+            \Cx\Core\View\Model\Entity\Theme::THEME_TYPE_WEB,
+            FRONTEND_LANG_ID);
+        return $theme->getId();
     }
 }

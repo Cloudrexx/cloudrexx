@@ -1,0 +1,34 @@
+.range-slider {
+    display: inline-block;
+    vertical-align: middle;
+    position: relative;
+    width: 100%;
+    height: 20px;
+}
+.range-slider .nstSlider {
+    width: 100%;
+    background: transparent;
+}
+.range-slider input {
+    display: none;
+}
+.range-slider .bar {
+    background-color: #333;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+}
+.range-slider .range-slider-grip {
+    background-color: #FFF;
+    border: 1px solid #DDD;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+}
+

@@ -100,6 +100,7 @@ class Domain extends \Cx\Core\Model\Model\Entity\YamlEntity {
      * @param   string $name    Domain name to set the domain to
      */
     public function setName($name) {
+        $name = preg_replace('/\s+/', '', $name);
         $this->name = \Cx\Core\Net\Controller\ComponentController::convertIdnToAsciiFormat($name);
     }
 
@@ -141,5 +142,4 @@ class Domain extends \Cx\Core\Model\Model\Entity\YamlEntity {
         }
         return $domainName;
     }
-
 }

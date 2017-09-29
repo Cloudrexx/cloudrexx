@@ -215,8 +215,16 @@ function openDialogForAssociation(content, className, existingData)
     });
     jQuery.each(existingData.split('&'), function(index, value){
         property = value.split('=');
-        dialog.getElement().find('[name='+property[0]+']').not('[type=button]').val(property[1]);
-        dialog.getElement().find('[type=button].mappedAssocciationButton').prop("disabled", true);
+        var el = dialog.getElement().find('[name='+property[0]+']');
+        if (el.attr('type') == 'button') {
+            el.filter('.mappedAssocciationButton').prop("disabled", true);
+        } else if (el.attr('type') == 'radio') {
+            dialog.getElement().find('[name='+property[0]+']').filter('[value='+property[1]+']').click();
+        } else if (el.attr('type') == 'checkbox') {
+            dialog.getElement().find('[name='+property[0]+']').filter('[value='+property[1]+']').prop('checked', true);
+        } else {
+            el.val(property[1]);
+        }
         if (property[0] == 'id') {
             jQuery('<input>').attr({
                 value: property[1],

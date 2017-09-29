@@ -61,6 +61,7 @@ class ReverseProxyCloudrexx extends \Cx\Lib\ReverseProxy\Model\Entity\ReversePro
     
     /**
      * Clears a cache page
+     * Please note that this will not work during an ESI sub-request.
      * @param string $urlPattern Drop all pages that match the pattern, for exact format, make educated guesses
      * @param string $domain Domain name to drop cache page of
      * @param int $port Port to drop cache page of
@@ -70,30 +71,77 @@ class ReverseProxyCloudrexx extends \Cx\Lib\ReverseProxy\Model\Entity\ReversePro
         $strCachePath = $cx->getWebsiteCachePath() . '/';
 
         $glob = null;
+        $glob2 = null;
         if ($urlPattern == '*') {
             $glob = $strCachePath . '*';
         }
-        
-        $searchParts = \Env::get('cache')->getCacheFileNameSearchPartsFromUrl($urlPattern);
-        if (count($searchParts)) {
-            $glob = $strCachePath . '*' . implode('*', $searchParts) . '*';
+
+        if (!$glob) {
+            $searchParts = $cx->getComponent('Cache')->getCacheFileNameSearchPartsFromUrl(
+                $urlPattern,
+                $cx->getRequest()->getUrl()
+            );
+            $glob = $strCachePath . $cx->getComponent('Cache')->getCacheFileNameFromUrl(
+                $urlPattern,
+                $cx->getRequest()->getUrl(),
+                false
+            ) . '*' . implode('', $searchParts) . '*';
+            $this->toggleHttps($urlPattern);
+            $glob2 = $strCachePath . $cx->getComponent('Cache')->getCacheFileNameFromUrl(
+                $urlPattern,
+                $cx->getRequest()->getUrl(),
+                false
+            ) . '*' . implode('', $searchParts) . '*';
         }
         
         if ($glob !== null) {
-            $fileNames = glob($glob);
-            foreach ($fileNames as $fileName) {
-                if (!preg_match('#/[0-9a-f]{32}((_[plutgc][a-z0-9]+)+)?$#', $fileName)) {
-                    continue;
-                }
-                $file = new \Cx\Lib\FileSystem\File($fileName);
-                $file->delete();
+            $this->globDrop($glob);
+            if ($glob2 !== null && $glob2 != $glob) {
+                $this->globDrop($glob2);
             }
             return;
         }
+
+        $cacheFile = $cx->getComponent('Cache')->getCacheFileNameFromUrl(
+            $urlPattern,
+            $cx->getRequest()->getUrl()
+        );
+        try {
+            $file = new \Cx\Lib\FileSystem\File($strCachePath . $cacheFile);
+            $file->delete();
+        } catch (\Cx\Lib\FileSystem\FileSystemException $e) {}
         
-        $cacheFile = \Env::get('cache')->getCacheFileNameFromUrl($urlPattern);
-        $file = new \Cx\Lib\FileSystem\File($strCachePath . $cacheFile);
-        $file->delete();
+        // make sure HTTP and HTTPS files are dropped
+        $this->toggleHttps($urlPattern);
+        $cacheFile = $cx->getComponent('Cache')->getCacheFileNameFromUrl(
+            $urlPattern,
+            $cx->getRequest()->getUrl()
+        );
+        try {
+            $file = new \Cx\Lib\FileSystem\File($strCachePath . $cacheFile);
+            $file->delete();
+        } catch (\Cx\Lib\FileSystem\FileSystemException $e) {}
+    }
+    
+    protected function toggleHttps(&$url) {
+        if (substr($url, 0, 5) == 'https') {
+            $url = 'http' . substr($url, 5);
+        } else if (substr($url, 0, 4) == 'http') {
+            $url = 'https' . substr($url, 4);
+        }
+    }
+    
+    protected function globDrop($glob) {
+        $fileNames = glob($glob);
+        foreach ($fileNames as $fileName) {
+            if (!preg_match('#/[0-9a-f]{32}((_[plutcgr][a-zA-Z0-9]+)+)?$#', $fileName)) {
+                continue;
+            }
+            try {
+                $file = new \Cx\Lib\FileSystem\File($fileName);
+                $file->delete();
+            } catch (\Cx\Lib\FileSystem\FileSystemException $e) {}
+        }
     }
 }
 

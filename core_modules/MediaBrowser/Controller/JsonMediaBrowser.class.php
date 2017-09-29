@@ -157,8 +157,8 @@ class JsonMediaBrowser extends SystemComponentController implements JsonAdapter
      */
     public function getSites() {
         $pageTree = new MediaBrowserPageTree(
-            $this->cx->getDb()->getEntityManager(), $this->cx->getLicense(), 0, null, FRONTEND_LANG_ID
-            , null, false, false, false
+            $this->cx->getDb()->getEntityManager(), $this->cx->getLicense(), 0, null, FRONTEND_LANG_ID,
+            null, false, true, false
         );
         $pageTree->render();
         return $pageTree->getFlatTree();
@@ -208,19 +208,25 @@ class JsonMediaBrowser extends SystemComponentController implements JsonAdapter
         $oldName    = !empty($params['post']['oldName']) ? contrexx_input2raw(utf8_decode($params['post']['oldName'])) : null;
         $newName    = !empty($params['post']['newName']) ? contrexx_input2raw(utf8_decode($params['post']['newName'])) : null;
 
-        if ($path && $oldName && $newName) {
-            $pathArray = explode('/', $path);
-            // Shift off the first element of the array to get the media type.
-            $mediaType  = array_shift($pathArray);
-            $strPath    = '/' . join('/', $pathArray);
-            $this->setMessage(
-                $this->cx->getMediaSourceManager()->getMediaType($mediaType)->getFileSystem()->moveFile(
-                    new \Cx\Core\MediaSource\Model\Entity\LocalFile(
-                        $strPath . $oldName
-                    ), $newName
-                )
-            );
+        if (!$path || !$oldName || !$newName) {
+            return;
         }
+
+        $pathArray = explode('/', $path);
+        // Shift off the first element of the array to get the media type.
+        $mediaType  = array_shift($pathArray);
+        $strPath    = '/' . join('/', $pathArray);
+
+        $fileSystem = $this->cx->getMediaSourceManager()->getMediaType($mediaType)->getFileSystem();
+        $file = $fileSystem->getFileFromPath($strPath . $oldName);
+
+        if (!$file) {
+            throw new \Exception('Unknown file ' . $strPath . $oldName);
+        }
+
+        $this->setMessage(
+            $fileSystem->moveFile($file, $newName)
+        );
     }
 
     /**
@@ -236,12 +242,16 @@ class JsonMediaBrowser extends SystemComponentController implements JsonAdapter
             // Shift off the first element of the array to get the media type.
             $mediaType  = array_shift($pathArray);
             $strPath    = '/' . join('/', $pathArray);
+
+            $fileSystem = $this->cx->getMediaSourceManager()->getMediaType($mediaType)->getFileSystem();
+            $file = $fileSystem->getFileFromPath($strPath . $filename);
+
+            if (!$file) {
+                throw new \Exception('Unknown file ' . $strPath . $filename);
+            }
+
             $this->setMessage(
-                $this->cx->getMediaSourceManager()->getMediaType($mediaType)->getFileSystem()->removeFile(
-                    new \Cx\Core\MediaSource\Model\Entity\LocalFile(
-                        $strPath . $filename
-                    )
-                )
+                $fileSystem->removeFile($file)
             );
         }
     }
@@ -323,11 +333,9 @@ class JsonMediaBrowser extends SystemComponentController implements JsonAdapter
         }
         $folder          = $_SESSION['MediaBrowser']['FolderWidget'][$folderWidgetId]['folder'];
         $localFileSystem = new \Cx\Core\MediaSource\Model\Entity\LocalFileSystem($folder);
+        $file = $localFileSystem->getFileFromPath('/' . $path);
 
-        $file    = '/' . $path;
-        $objFile = new \Cx\Core\MediaSource\Model\Entity\LocalFile($file);
-
-        $this->setMessage($localFileSystem->removeFile($objFile));
+        $this->setMessage($localFileSystem->removeFile($file));
 
         return array();
     }

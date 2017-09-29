@@ -128,7 +128,9 @@ class Message
         if (empty($_SESSION['messages_stack'])) {
             $_SESSION['messages_stack'] = array();
         }
-        $_SESSION['messages_stack'] = array_push($_SESSION['messages_stack']->toArray(), $_SESSION['messages']->toArray());
+        $messagesStackTmp = $_SESSION['messages_stack']->toArray();
+        array_push($messagesStackTmp, $_SESSION['messages']);
+        $_SESSION['messages_stack'] = $messagesStackTmp;
         self::clear();
     }
 
@@ -144,7 +146,9 @@ class Message
             self::clear();
             return;
         }
-        $_SESSION['messages'] = array_pop(self::toArray($_SESSION['messages_stack']));
+        $messagesStackTmp = $_SESSION['messages_stack']->toArray();
+        $_SESSION['messages'] = array_pop($messagesStackTmp);
+        $_SESSION['messages_stack'] = $messagesStackTmp;
     }
 
 

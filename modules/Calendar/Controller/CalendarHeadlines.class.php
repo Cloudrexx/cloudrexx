@@ -79,7 +79,25 @@ class CalendarHeadlines extends CalendarLibrary
     {
         if($this->arrSettings['headlinesStatus'] == 1 && $this->_objTpl->blockExists('calendar_headlines_row')) {
             $startDate = new \DateTime();
-            $startDate->setTime(0, 0, 0);
+
+            switch ($this->arrSettings['frontendPastEvents']) {
+                case CalendarLibrary::SHOW_EVENTS_OF_TODAY:
+                    // get next ending event starting from today 0:01
+                    // the event's day on midnight is our expiration date
+                    $startDate->setTime(0, 0, 0);
+                    break;
+
+                case CalendarLibrary::SHOW_EVENTS_UNTIL_START:
+                    // TODO: implement logic
+                    //break;
+
+                case CalendarLibrary::SHOW_EVENTS_UNTIL_END:
+                default:
+                    // keep the start date to NOW
+                    // fixing the timezone offset is not required here
+                    break;
+            }
+
             $endDate = new \DateTime();
             $endDate->setTime(23, 59, 59);
             $endDate->modify('+10 years');
@@ -105,6 +123,7 @@ class CalendarHeadlines extends CalendarLibrary
     {
         global $_CONFIG;
 
+        \LinkGenerator::parseTemplate($this->pageContent);
         $this->_objTpl->setTemplate($this->pageContent,true,true);
 
         if($this->arrSettings['headlinesStatus'] == 1) {

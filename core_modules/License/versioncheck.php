@@ -33,7 +33,7 @@ if (!isset($objUser) || !isset($objDatabase) || !isset($license)) {
     // In mode 'minimal' we have to manually register event listeners.
     // The listener registerYamlSettingEventListener is used to update the
     // settings.php file.
-    \Cx\Core\Config\Controller\ComponentController::registerYamlSettingEventListener();
+    \Cx\Core\Config\Controller\ComponentController::registerYamlSettingEventListener($cx);
 }
 if (!$cx) {
     $cx = \Cx\Core\Core\Controller\Cx::instanciate();

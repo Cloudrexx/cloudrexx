@@ -43,7 +43,7 @@ var saveOptions = function (){
                 className: "btn-success",
                 callback: function() {
                     var loading = bootbox.dialog({
-                        message: '<img style="margin: 30px auto; display:block;" src="../lib/javascript/jquery/jstree/themes/default/throbber.gif" alt=""/>',
+                        message: '<img style="margin: 30px auto; display:block;" src="' + cx.variables.get('basePath', 'contrexx') + 'lib/javascript/jquery/jstree/themes/default/throbber.gif" alt=""/>',
                         title: cx.variables.get('TXT_CORE_MODULE_TEMPLATEEDITOR_SAVE','TemplateEditor'),
                         onEscape: function() {},
                         closeButton: false

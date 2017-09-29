@@ -350,27 +350,50 @@ class Category
         return $this->set_permissions_recursive;
     }
 
-    public function getAssociatedDownloadsCount()
-    {
+    /**
+     * Get associated downloads count
+     *
+     * @param boolean $listDownloadsOfCurrentLanguage If true get Downloads count of current language
+     *                                                otherwise get Downloads count of all language
+     */
+    public function getAssociatedDownloadsCount(
+        $listDownloadsOfCurrentLanguage = false
+    ) {
         if (!isset($this->downloads_count)) {
-            $this->loadAssociatedDownloadsCount();
+            $this->loadAssociatedDownloadsCount($listDownloadsOfCurrentLanguage);
         }
         return $this->downloads_count;
     }
 
-    private function loadAssociatedDownloadsCount()
+    /**
+     * Load associated downloads and get its count
+     *
+     * @param boolean $listDownloadsOfCurrentLanguage If true get Downloads count of current language
+     *                                                otherwise get Downloads count of all language
+     */
+    private function loadAssociatedDownloadsCount($listDownloadsOfCurrentLanguage)
     {
         global $objDatabase;
 
         $objFWUser = \FWUser::getFWUserObject();
         $arrCategoryIds = array_keys($this->arrLoadedCategories);
+        $localeJoinQry = '';
+        $localeCondition = '';
+        if ($listDownloadsOfCurrentLanguage) {
+            $localeJoinQry =
+                ' INNER JOIN `' . DBPREFIX . 'module_downloads_download_locale` as tblL
+                ON tblL.`download_id` = tblD.`id` ';
+            $localeCondition = ' AND tblL.`lang_id` = ' . LANG_ID . ' ';
+        }
         $objResult = $objDatabase->Execute('
             SELECT  tblR.`category_id`,
                     COUNT(1) AS `count`
             FROM    `'.DBPREFIX.'module_downloads_rel_download_category` AS tblR
             '.($this->isFrontendMode || !\Permission::checkAccess(143, 'static', true) ? 'INNER JOIN `'.DBPREFIX.'module_downloads_download` AS tblD ON tblD.`id` = tblR.`download_id`' : '').'
+            ' . $localeJoinQry . '
             WHERE   tblR.`category_id` IN ('.implode(',', $arrCategoryIds).')
                     '.($this->isFrontendMode ? 'AND tblD.`is_active` = 1' : '').'
+                    ' . $localeCondition . '
                     '.($this->isFrontendMode ? 'AND (tblD.`expiration` = 0 || tblD.`expiration` > '.time().')' : '').'
                     '.($this->isFrontendMode || !\Permission::checkAccess(143, 'static', true) ?
                             'AND (tblD.`visibility` = 1'.(
@@ -420,7 +443,7 @@ class Category
         $objResult = $objDatabase->Execute('SELECT `download_id`, `order` FROM `'.DBPREFIX.'module_downloads_rel_download_category` WHERE ('.implode(' OR ', $arrSubCategories).')');
         if ($objResult) {
             while (!$objResult->EOF) {
-                $this->downloads[$objResult->fields['download_id']] = $objResult->fields['order'];
+                $this->downloads[$objResult->fields['download_id']] = intval($objResult->fields['order']);
                 $objResult->MoveNext();
             }
         }

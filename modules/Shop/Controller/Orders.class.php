@@ -1306,7 +1306,7 @@ if (!$limit) {
                 )),
             );
         }
-        $arrItems = $objOrder->getItems();
+        $arrItems = $objOrder->getItems(false);
         if (!$arrItems) {
             \Message::warning($_ARRAYLANG['TXT_SHOP_ORDER_WARNING_NO_ITEM']);
         }
@@ -1343,15 +1343,17 @@ if (!$limit) {
             $product_code = $objProduct->code();
             // Pick the order items attributes
             $str_options = '';
+            $optionList = array();
             // Any attributes?
             if ($item['attributes']) {
                 $str_options = '  '; // '[';
                 $attribute_name_previous = '';
-                foreach ($item['attributes'] as
-                        $attribute_name => $arrAttribute) {
+                foreach ($item['attributes'] as $attribute_name => $arrAttribute) {
+                    $optionValues = array();
 //DBG::log("Attribute /$attribute_name/ => ".var_export($arrAttribute, true));
 // NOTE: The option price is optional and may be left out
                     foreach ($arrAttribute as $arrOption) {
+                        $option = array();
                         $option_name = $arrOption['name'];
                         $option_price = $arrOption['price'];
                         $item_price += $option_price;
@@ -1372,6 +1374,7 @@ if (!$limit) {
                         } else {
                             $str_options .= ', '.$option_name;
                         }
+                        $option['PRODUCT_OPTIONS_VALUE'] = $option_name;
 // TODO: Add proper formatting with sprintf() and language entries
                         if ($option_price != 0) {
                             $str_options .=
@@ -1380,8 +1383,15 @@ if (!$limit) {
                                 ' '.Currency::getActiveCurrencyCode()
 //                                .')'
                                 ;
+                            $option['PRODUCT_OPTIONS_PRICE'] = Currency::formatPrice($option_price);
+                            $option['PRODUCT_OPTIONS_CURRENCY'] = Currency::getActiveCurrencyCode();
                         }
+                        $optionValues[] = $option;
                     }
+                    $optionList[] = array(
+                        'PRODUCT_OPTIONS_NAME' => $attribute_name,
+                        'PRODUCT_OPTIONS_VALUES' => $optionValues,
+                    );
                 }
 //                $str_options .= ']';
             }
@@ -1392,6 +1402,7 @@ if (!$limit) {
                 'PRODUCT_QUANTITY' => $quantity,
                 'PRODUCT_TITLE' => $product_name,
                 'PRODUCT_OPTIONS' => $str_options,
+                'PRODUCT_OPTION_LIST' => $optionList,
                 'PRODUCT_ITEM_PRICE' => sprintf('% 9.2f', $item_price),
                 'PRODUCT_TOTAL_PRICE' => sprintf('% 9.2f', $item_price*$quantity),
             );

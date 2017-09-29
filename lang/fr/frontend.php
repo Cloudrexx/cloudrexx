@@ -54,6 +54,8 @@ $_ARRAYLANG['TXT_PASSWORD'] = "Mot de passe";
 $_ARRAYLANG['TXT_PAGE'] = "Page";
 $_ARRAYLANG['TXT_BROWSERLANGUAGE'] = "Langue";
 $_ARRAYLANG['TXT_FROM'] = "sur";
+$_ARRAYLANG['TXT_PAGING_OUT_OF'] = "sur";
+$_ARRAYLANG['TXT_PAGING_TO'] = "à";
 $_ARRAYLANG['TXT_PASSWORD_FIELD_EMPTY'] = "Si un mot de passe n'est pas saisi, le mot de passe actuel sera conservé! ";
 $_ARRAYLANG['TXT_SIZE'] = "Taille du fichier";
 $_ARRAYLANG['TXT_DATABASE_QUERY_ERROR'] = "Erreur lors de la requête à la base de données!";
@@ -300,3 +302,5 @@ $_ARRAYLANG['UPLOAD_FORM_ADD'] = "Ajouter autres fichiers";
 $_ARRAYLANG['TXT_CORE_CAPTCHA'] = "Code de sécurité";
 $_ARRAYLANG['TXT_CORE_CAPTCHA_ENTER_THE_LETTERS_BELOW'] = "Veuillez saisir la séquence de caractères de l'image dans le champ ci-dessous.";
 $_ARRAYLANG['TXT_CORE_REMEMBER_ME'] = "Souviens de moi";
+
+$_ARRAYLANG['TXT_READ_MORE'] = "Plus";

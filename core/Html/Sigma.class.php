@@ -81,6 +81,41 @@ class Sigma extends \HTML_Template_Sigma {
         return $return;
     }
 
+    function replaceBlock($block, $template, $keepContent = false, $outer = false) {
+        if (!$outer) {
+            return parent::replaceBlock($block, $template, $keepContent);
+        }
+
+        // ensure placeholder is not in $template
+        $matches = array();
+        if (
+            preg_match(
+                $this->blockRegExp,
+                $template,
+                $matches
+            ) &&
+            $matches[1] == $block
+        ) {
+            $template = $matches[2];
+        }
+
+        // replace block placeholder
+        $placeholder = $this->openingDelimiter.'__'.$block.'__'.$this->closingDelimiter;
+        foreach ($this->_blocks as $outerBlock=>&$content) {
+            $content = str_replace(
+                $placeholder,
+                $template,
+                $content
+            );
+        }
+
+        // remove block
+        $this->_removeBlockData($block, false);
+
+        // Renew variable list
+        return $this->_buildBlockVariables();
+    }
+
     /**
      * The customizing mechanism does not apply to method _getCached().
      * Therefore it is not overwritten.
@@ -184,5 +219,28 @@ class Sigma extends \HTML_Template_Sigma {
             return false;
         }
         return parent::parse($block, $flagRecursion, $fakeParse);
+    }
+
+    /**
+     * Returns an unparsed block (/as it was delivered)
+     * This is useful for "reflection". This is used by ESI parsing.
+     * @author Michael Ritter <michael.ritter@cloudrexx.com>
+     * @param string $blockName Name of block to return
+     * @throws \Exception Thrown if the block does not exist within this template
+     * @return string Template content
+     */
+    function getUnparsedBlock($blockName) {
+        if (!isset($this->_blocks[$blockName])) {
+            throw new \Exception('Reverse parsing of block failed');
+        }
+        return '<!-- BEGIN ' . $blockName . ' -->' .
+            preg_replace_callback(
+                '/\{__(' . $this->blocknameRegExp . ')__\}/',
+                function(array $matches) {
+                    return $this->getUnparsedBlock($matches[1]);
+                },
+                $this->_blocks[$blockName]
+            ) .
+            '<!-- END ' . $blockName . ' -->';
     }
 }

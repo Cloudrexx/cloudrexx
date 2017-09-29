@@ -71,7 +71,7 @@ class JsonData {
      * List of adapters to use (they have to implement the JsonAdapter interface)
      * @var Array List of JsonAdapters
      */
-    protected $adapters = array();
+    protected static $adapters = array();
     /**
      * Session id for request which we got from the login request
      * @var string $sessionId
@@ -83,6 +83,10 @@ class JsonData {
      * @author Michael Ritter <michael.ritter@comvation.com>
      */
     public function __construct() {
+        if (count(static::$adapters)) {
+            return;
+        }
+
         foreach (self::$adapter_classes as $ns=>$adapters) {
             foreach ($adapters as $adapter) {
                 $this->loadAdapter($adapter, $ns);
@@ -124,7 +128,7 @@ class JsonData {
         }
 
         // check if its an adapter!
-        if (!is_a($adapter, '\Cx\Core\Json\JsonAdapter', true)) {
+        if ($adapter instanceof \Cx\Core\Json\JsonAdapter) {
             throw new \Exception('Tried to load class as JsonAdapter, but interface is not implemented: "' . $adapter . '"');
         }
 
@@ -158,7 +162,7 @@ class JsonData {
             return;
             //throw new \Exception('JsonAdapter controller could not be found: "' . $adapter . '"');
         }
-        $this->adapters[$object->getName()] = $object;
+        static::$adapters[$object->getName()] = $object;
     }
 
     /**
@@ -172,7 +176,7 @@ class JsonData {
             $object = new $adapter();
         }
         \Env::get('init')->loadLanguageData($object->getName());
-        $this->adapters[$object->getName()] = $object;
+        static::$adapters[$object->getName()] = $object;
     }
 
     /**
@@ -183,34 +187,62 @@ class JsonData {
      * @author Michael Ritter <michael.ritter@comvation.com>
      * @param String $adapter Adapter name
      * @param String $method Method name
-     * @param Array $arguments Arguments to pass
+     * @param Array $arguments Arguments to pass, first dimension indexes are "response", "get" (optional) and "post" (optional)
      * @param boolean $setContentType (optional) If true (default) the content type is set to application/json
      * @return String JSON data to return to client
      */
     public function jsondata($adapter, $method, $arguments = array(), $setContentType = true) {
-        return $this->json($this->data($adapter, $method, $arguments), $setContentType);
+        $data = $this->data($adapter, $method, $arguments);
+        $arguments['response']->setAbstractContent($data);
+        if ($data['status'] != 'success' && $arguments['response']->getCode() == 200) {
+            $arguments['response']->setCode(500);
+        }
+        return $this->json($arguments['response'], $setContentType);
     }
 
     /**
-     * Parses data into JSON
-     * @param array $data Data to JSONify
+     * Parses a Response into JSON
+     * @param \Cx\Core\Routing\Model\Entity\Response $response Data to JSONify
      * @param boolean $setContentType (optional) If true (NOT default) the content type is set to application/json
      * @return String JSON data to return to client
      */
-    public function json($data, $setContentType = false) {
+    public function json(\Cx\Core\Routing\Model\Entity\Response $response, $setContentType = false) {
+        $response->setParser($this->getParser());
+        $parsedContent = $response->getParsedContent();
         if ($setContentType) {
-            // browsers will pass rendering of application/* MIMEs to other
-            // applications, usually.
-            // Skip the following line for debugging, if so desired
-            header('Content-Type: application/json');
-
             // Disabling CSRF protection. That's no problem as long as we
             // only return associative arrays or objects!
             // https://mycomvation.com/wiki/index.php/Contrexx_Security#CSRF
             // Search for a better way to disable CSRF!
             ini_set('url_rewriter.tags', '');
+            header('Content-Type: ' . $response->getContentType());
         }
-        return json_encode($data);
+        return $parsedContent;
+    }
+
+    /**
+     * Returns the parser used to parse JSON
+     * Parser is either a callback function which accepts an instance of
+     * \Cx\Core\Routing\Model\Entity\Response as first argument or an object with a
+     * parse(\Cx\Core\Routing\Model\Entity\Response $response) method.
+     * @return Object|callable Parser
+     */
+    public function getParser() {
+        return function($response) {
+            $response->setContentType('application/json');
+            return json_encode($response->getAbstractContent());
+        };
+    }
+
+    /**
+     * This method can be used to parse data to JSON format
+     * @param array $data Data to be parsed
+     * @return string JSON encoded data
+     */
+    public function parse(array $data) {
+        $response = new \Cx\Core\Routing\Model\Entity\Response($data);
+        $response->setParser($this->getParser());
+        return $response->getParsedContent();
     }
 
     /**
@@ -219,16 +251,16 @@ class JsonData {
      * @author Michael Ritter <michael.ritter@comvation.com>
      * @param String $adapter Adapter name
      * @param String $method Method name
-     * @param Array $arguments Arguments to pass
-     * @return String data to use for further processing
+     * @param Array $arguments Arguments to pass, first dimension indexes are "response", "get" (optional) and "post" (optional)
+     * @return array Data to use for further processing
      */
     public function data($adapter, $method, $arguments = array()) {
         global $_ARRAYLANG;
 
-        if (!isset($this->adapters[$adapter])) {
+        if (!isset(static::$adapters[$adapter])) {
             return $this->getErrorData('No such adapter');
         }
-        $adapter = $this->adapters[$adapter];
+        $adapter = static::$adapters[$adapter];
         $methods = $adapter->getAccessableMethods();
         $realMethod = '';
 
@@ -265,18 +297,23 @@ class JsonData {
             if (!$objPermission->hasAccess($arguments)) {
                 $backend = \Cx\Core\Core\Controller\Cx::instanciate()->getMode() == \Cx\Core\Core\Controller\Cx::MODE_BACKEND;
                 if (!\FWUser::getFWUserObject()->objUser->login($backend)) {
-                    die($this->json($this->getErrorData($_ARRAYLANG['TXT_LOGIN_NOAUTH_JSON']), true));
+                    return $this->getErrorData(
+                        $_ARRAYLANG['TXT_LOGIN_NOAUTH_JSON']
+                    );
                 }
                 return $this->getErrorData('JsonData-request to method ' . $realMethod . ' of adapter ' . $adapter->getName() . ' has been rejected by not complying to the permission requirements of the requested method.');
             }
         }
 
-        try {
-            $output = call_user_func(array($adapter, $realMethod), $arguments);
+        if (!isset($arguments['response'])) {
+            $arguments['response'] = \Cx\Core\Core\Controller\Cx::instanciate()->getResponse();
+        }
 
+        try {
+            $data = call_user_func(array($adapter, $realMethod), $arguments);
             return array(
                 'status'  => 'success',
-                'data'    => $output,
+                'data'    => $data,
                 'message' => $adapter->getMessagesAsString()
             );
         } catch (\Exception $e) {
@@ -378,12 +415,12 @@ class JsonData {
      * Returns the JSON code for a error message
      * @param String $message HTML encoded message
      * @author Michael Ritter <michael.ritter@comvation.com>
-     * @return String JSON code
+     * @return array Data for JSON response
      */
     public function getErrorData($message) {
         return array(
             'status' => 'error',
-            'message'   => $message
+            'message' => $message
         );
     }
 }

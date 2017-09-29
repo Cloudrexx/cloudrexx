@@ -173,7 +173,7 @@ class BackendController extends SystemComponentBackendController
                     )
                 );
             }
-        } catch (\Symfony\Component\Yaml\ParserException $e) {
+        } catch (\Symfony\Component\Yaml\Exception\ParseException $e) {
 
         }
 

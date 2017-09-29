@@ -248,11 +248,16 @@ class Livecam extends LivecamLibrary
 
         \JS::activate("shadowbox", array('players' => array('img')));
         \JS::activate('jqueryui');
-        \JS::registerCode("
-            cx.ready(function() {
-                cx.jQuery('input[name=date]').datepicker({dateFormat: 'yy-mm-dd'});
-            });
-        ");
+        $jsCode = <<<JSCODE
+cx.ready(function() {
+    cx.jQuery('input[name=date]').datepicker({dateFormat: 'yy-mm-dd'});
+});
+liveCamPageReload = function() {
+    window.location.reload(true);
+};
+setTimeout(liveCamPageReload, 60000);
+JSCODE;
+        \JS::registerCode($jsCode);
 
         if ($this->camSettings['shadowboxActivate'] == 1) {
             $imageLink = $this->camSettings['currentImagePath'];

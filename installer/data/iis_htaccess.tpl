@@ -15,7 +15,7 @@
 
                             <!-- Resolve language specific sitemap.xml -->
                             <rule name="Map multilingual sitemap.xml" stopProcessing="true">
-                                <match url="^(\w+)\/sitemap.xml$" />
+                                <match url="^([a-z]{1,2}(?:-[A-Za-z]{2,4})?)\/sitemap.xml$" />
                                 <action type="Rewrite" url="sitemap_{R:1}.xml" />
                             </rule>
 

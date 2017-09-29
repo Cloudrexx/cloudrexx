@@ -272,7 +272,7 @@ class Url extends Uri {
      * @param array $queryParts Key=>value style array
      */
     public function setParsedQuery($queryParts) {
-        $query = http_build_query($queryParts);
+        $query = http_build_query($queryParts, '', '&');
         $this->setQuery($query);
     }
     

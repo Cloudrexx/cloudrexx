@@ -43,4 +43,24 @@ namespace Cx\Core_Modules\Sync\Model\Repository;
  * @package     cloudrexx
  * @subpackage  coremodule_sync
  */
-class RelationRepository extends \Doctrine\ORM\EntityRepository {}
+class RelationRepository extends \Doctrine\ORM\EntityRepository {
+
+    /**
+     * Find a relation from a local field
+     * @param \Cx\Core_Modules\Sync\Model\Entity\Sync $sync Related Sync
+     * @param string $fieldName Local field name
+     * @param \Cx\Core_Modules\Sync\Model\Entity\Relation $parentRelationConfig (optional) Parent config
+     * @return \Cx\Core_Modules\Sync\Model\Entity\Relation Matching relation or null
+     */
+    public function findRelationByField($sync, $fieldName, $parentRelationConfig = null) {
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->select('r')
+            ->from('Cx\Core_Modules\Sync\Model\Entity\Relation', 'r')
+            ->andWhere($qb->expr()->eq('r.relatedSync', $sync))
+            ->andWhere($qb->expr()->eq('r.localFieldName', $fieldName))
+            ->andWhere($qb->expr()->eq('r.parent', $parentRelationConfig));
+        
+        return $qb->getQuery()->getFirstResult();
+    }
+}
+

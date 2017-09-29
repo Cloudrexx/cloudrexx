@@ -150,18 +150,6 @@
                     </td>
                     <td></td>
                 </tr>
-                <tr>
-                    <td>
-                        <!-- BEGIN cache_usercache_filesystem -->
-                        <input type="radio" name="usercache" value="filesystem" id="usercache_filesystem" {CHECKED_USERCACHE_FILESYSTEM} />
-                        <!-- END cache_usercache_filesystem -->
-                    </td>
-                    <td><label for="usercache_filesystem">{TXT_CACHE_FILESYSTEM}</label></td>
-                    <td></td>
-                    <td></td>
-                    <td><img src="../core/Core/View/Media/icons/{FILESYSTEM_USERCACHE_CONFIGURATION_ICON}" /></td>
-                    <td></td>
-                </tr>
             </table>
         </div>
         <br />
@@ -359,8 +347,7 @@
             <th colspan="2">{TXT_CACHE_CONTREXX_CACHING}</th>
         </tr>
         <tr class="row2">
-            <td width="20%">{TXT_STATS_CHACHE_SITE_COUNT}</td>
-            <td width="80%">{STATS_CONTREXX_FILESYSTEM_CHACHE_PAGES_COUNT}</td>
+            <td colspan="2" width="20%">{TXT_STATS_CHACHE_SITE_COUNT}</td>
         </tr>
         <tr class="row1">
             <td>{TXT_STATS_FOLDERSIZE}</td>
@@ -433,7 +420,7 @@
         </tr>
         <tr class="row1">
             <td>{TXT_STATS_CACHE_SIZE}</td>
-            <td>{STATS_MEMCACHE_SIZE} mB / {STATS_MEMCACHE_MAX_SIZE} mB</td>
+            <td>{STATS_MEMCACHE_SIZE} MB / {STATS_MEMCACHE_MAX_SIZE} MB</td>
         </tr>
         <tr class="row2">
             <td width="20%">
@@ -444,6 +431,28 @@
     </table>
     <br />
     <!-- END memcacheCachingStats -->
+    <!-- BEGIN memcachedCachingStats -->
+    <table width="100%" cellspacing="0" cellpadding="3" border="0" class="adminlist">
+        <tr>
+            <th colspan="2">{TXT_CACHE_MEMCACHED}</th>
+        </tr>
+        <tr class="row2">
+            <td width="20%">{TXT_STATS_CHACHE_ENTRIES_COUNT}</td>
+            <td width="80%">{STATS_MEMCACHED_CHACHE_ENTRIES_COUNT}</td>
+        </tr>
+        <tr class="row1">
+            <td>{TXT_STATS_CACHE_SIZE}</td>
+            <td>{STATS_MEMCACHED_SIZE} MB / {STATS_MEMCACHED_MAX_SIZE} MB</td>
+        </tr>
+        <tr class="row2">
+            <td width="20%">
+                <input type="button" name="frmEmpty_Submit" value="{TXT_EMPTY_BUTTON}" onclick="location.href = 'index.php?cmd=Config&{CSRF_PARAM}&amp;act=cache_empty&amp;cache=memcached'">
+            </td>
+            <td width="80%" align="justify">{TXT_EMPTY_DESC_MEMCACHE}</td>
+        </tr>
+    </table>
+    <br />
+    <!-- END memcachedCachingStats -->
     <!-- BEGIN xCacheCachingStats -->
     <table width="100%" cellspacing="0" cellpadding="3" border="0" class="adminlist">
         <tr>
@@ -458,22 +467,5 @@
     </table>
     <br />
     <!-- END xCacheCachingStats -->
-    <!-- BEGIN FileSystemCachingStats -->
-    <table width="100%" cellspacing="0" cellpadding="3" border="0" class="adminlist">
-        <tr>
-            <th colspan="2">Contrexx File System</th>
-        </tr>
-        <tr class="row2">
-            <td width="20%">{TXT_STATS_CHACHE_ENTRIES_COUNT}</td>
-            <td width="80%">{STATS_CONTREXX_FILESYSTEM_CHACHE_ENTRIES_COUNT}</td>
-        </tr>
-        <tr class="row2">
-            <td width="20%">
-                <input type="button" name="frmEmpty_Submit" value="{TXT_EMPTY_BUTTON}" onclick="location.href = 'index.php?cmd=Config&{CSRF_PARAM}&amp;act=cache_empty&amp;cache=cxEntries'">
-            </td>
-            <td width="80%" align="justify">{TXT_EMPTY_DESC}</td>
-        </tr>
-    </table>
-    <!-- END FileSystemCachingStats -->
 </div>
 <!-- END settings.html -->

@@ -191,24 +191,8 @@ class MediaDirectoryInputfieldCheckbox extends \Cx\Modules\MediaDir\Controller\M
 
     function getContent($intEntryId, $arrInputfield, $arrTranslationStatus)
     {
-        global $objDatabase;
-
-        $intId = intval($arrInputfield['id']);
-        $objInputfieldValue = $objDatabase->Execute("
-            SELECT
-                `value`
-            FROM
-                ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields
-            WHERE
-                field_id=".$intId."
-            AND
-                entry_id=".$intEntryId."
-            LIMIT 1
-        ");
-
-
         $arrValues = explode(",", $arrInputfield['default_value'][0]);
-        $strValue = strip_tags(htmlspecialchars($objInputfieldValue->fields['value'], ENT_QUOTES, CONTREXX_CHARSET));
+        $strValue = strip_tags(htmlspecialchars(static::getDataFromDb($intEntryId, $arrInputfield), ENT_QUOTES, CONTREXX_CHARSET));
 
         //explode elements
         $arrElements = explode(",", $strValue);
@@ -233,6 +217,40 @@ class MediaDirectoryInputfieldCheckbox extends \Cx\Modules\MediaDir\Controller\M
         }
 
         return $arrContent;
+    }
+
+    function getRawData($intEntryId, $arrInputfield, $arrTranslationStatus) {
+        $strValue = static::getDataFromDb($intEntryId, $arrInputfield);
+
+        //explode elements
+        $arrElements = explode(",", $strValue);
+
+        $arrValues = explode(",", $arrInputfield['default_value'][0]);
+        $strValues = array();
+        foreach ($arrElements as $strElement) {
+            $strValues[] = $arrValues[$strElement - 1];
+        }
+
+        return implode(',', $strValues);
+    }
+
+    function getDataFromDb($intEntryId, $arrInputfield) {
+        global $objDatabase;
+
+        $intId = intval($arrInputfield['id']);
+        $objInputfieldValue = $objDatabase->Execute("
+            SELECT
+                `value`
+            FROM
+                ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields
+            WHERE
+                field_id=".$intId."
+            AND
+                entry_id=".$intEntryId."
+            LIMIT 1
+        ");
+
+        return $objInputfieldValue->fields['value'];
     }
 
 

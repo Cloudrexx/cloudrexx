@@ -2,27 +2,27 @@
 
 namespace Gedmo\Translatable\Document;
 
-use Doctrine\ODM\MongoDB\Mapping\Document;
-use Doctrine\ODM\MongoDB\Mapping\UniqueIndex;
-use Doctrine\ODM\MongoDB\Mapping\Index;
+use Doctrine\ODM\MongoDB\Mapping\Annotations\Document;
+use Doctrine\ODM\MongoDB\Mapping\Annotations\UniqueIndex;
+use Doctrine\ODM\MongoDB\Mapping\Annotations\Index;
 
 /**
  * Gedmo\Translatable\Document\Translation
  *
  * @Document(repositoryClass="Gedmo\Translatable\Document\Repository\TranslationRepository")
  * @UniqueIndex(name="lookup_unique_idx", keys={
- *         "locale",
- *         "object_class",
- *         "foreign_key",
- *         "field"
+ *         "locale" = "asc",
+ *         "object_class" = "asc",
+ *         "foreign_key" = "asc",
+ *         "field" = "asc"
  * })
  * @Index(name="translations_lookup_idx", keys={
- *      "locale",
- *      "object_class",
- *      "foreign_key"
+ *      "locale" = "asc",
+ *      "object_class" = "asc",
+ *      "foreign_key" = "asc"
  * })
  */
-class Translation extends AbstractTranslation
+class Translation extends MappedSuperclass\AbstractTranslation
 {
     /**
      * All required columns are mapped through inherited superclass

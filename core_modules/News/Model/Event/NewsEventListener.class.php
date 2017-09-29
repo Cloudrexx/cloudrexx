@@ -68,29 +68,30 @@ class NewsEventListener implements \Cx\Core\Event\Model\Entity\EventListener {
         $search = current($eventArgs);
         $term_db = contrexx_raw2db($search->getTerm());
         $newsLib = new \Cx\Core_Modules\News\Controller\NewsLibrary();
+        $newsLib->getSettings();
         $query = '
             SELECT
                 `id`,
-                `text` AS `content`,
+                `text` AS "content",
                 `title`,
                 `date`,
                 `redirect`,
-                `MATCH` (
+                MATCH (
                     `text`,`title`,`teaser_text`
-                ) `AGAINST` (
-                    "%`' . $term_db . '`%"
+                ) AGAINST (
+                    "%' . $term_db . '%"
                 ) AS `score`
             FROM
                 `' . DBPREFIX  . 'module_news` AS `tblN`
             INNER JOIN
-                `' . DBPREFIX  . 'module_news_locale` AS `tblL`
+                `' . DBPREFIX  . 'module_news_locale` AS `nl`
             ON
-                `tblL`.`news_id` = `tblN`.`id`
+                `nl`.`news_id` = `tblN`.`id`
             WHERE
                 (
-                   `text` `LIKE` ("%`' . $term_db . '`%")
-                    OR `title` `LIKE` ("%`' . $term_db . '`%")
-                    OR `teaser_text` `LIKE` ("%`' . $term_db . '`%")
+                   `text` LIKE ("%' . $term_db . '%")
+                    OR `title` LIKE ("%' . $term_db . '%")
+                    OR `teaser_text` LIKE ("%' . $term_db . '%")
                 )' .
             $newsLib->getNewsFilterQuery('tblN', '', '');
 
@@ -130,8 +131,6 @@ class NewsEventListener implements \Cx\Core\Event\Model\Entity\EventListener {
      */
     protected function languageStatusUpdate(array $eventArgs)
     {
-        global $objDatabase;
-
         if (empty($eventArgs[0])) {
             return;
         }
@@ -150,45 +149,92 @@ class NewsEventListener implements \Cx\Core\Event\Model\Entity\EventListener {
                 continue;
             }
 
+            $db = $this->cx->getDb()->getAdoDb();
             //Update the news locale
-            $newsQuery = $langStatus ?
-                            'INSERT IGNORE INTO
-                                `' . DBPREFIX . 'module_news_locale`
-                                (   `news_id`,
-                                    `lang_id`,
-                                    `is_active`,
-                                    `title`,
-                                    `text`,
-                                    `teaser_text`
-                                )
-                                SELECT `news_id`,
-                                        ' . $langId . ',
-                                        0,
-                                        `title`,
-                                        `text`,
-                                        `teaser_text`
-                                    FROM `' . DBPREFIX . 'module_news_locale`
-                                    WHERE lang_id = ' . $defaultLangId
-                        :   'DELETE FROM `' . DBPREFIX . 'module_news_locale`
-                                WHERE lang_id = ' . $langId;
-            $objDatabase->Execute($newsQuery);
+            if ($langStatus) {
+                $newsQuery = 'INSERT IGNORE INTO `' . DBPREFIX . 'module_news_locale`
+                    (   
+                        `news_id`,
+                        `lang_id`,
+                        `is_active`,
+                        `title`,
+                        `text`,
+                        `teaser_text`
+                    )
+                    SELECT 
+                        `news_id`,
+                        ' . $langId . ',
+                        0,
+                        `title`,
+                        `text`,
+                        `teaser_text`
+                    FROM `' . DBPREFIX . 'module_news_locale`
+                    WHERE lang_id = ' . $defaultLangId;
+            } else {
+                $newsQuery = 'DELETE FROM `' . DBPREFIX . 'module_news_locale`
+                    WHERE lang_id = ' . $langId;
+            }
+            $db->Execute($newsQuery);
 
             //Update the news category locale
-            $catQuery = $langStatus ?
-                            'INSERT IGNORE INTO
-                                `' . DBPREFIX . 'module_news_categories_locale`
-                                (   `category_id`,
-                                    `lang_id`,
-                                    `name`
-                                )
-                                SELECT `category_id`,
-                                        ' . $langId . ',
-                                        `name`
-                                    FROM `' . DBPREFIX . 'module_news_categories_locale`
-                                    WHERE lang_id = ' . $defaultLangId
-                        :   'DELETE FROM `' . DBPREFIX . 'module_news_categories_locale`
-                                WHERE lang_id = ' . $langId;
-            $objDatabase->Execute($catQuery);
+            if ($langStatus) {
+                $catQuery = 'INSERT IGNORE INTO `' . DBPREFIX . 'module_news_categories_locale`
+                    (   
+                        `category_id`,
+                        `lang_id`,
+                        `name`
+                    )
+                    SELECT 
+                        `category_id`,
+                        ' . $langId . ',
+                        `name`
+                    FROM `' . DBPREFIX . 'module_news_categories_locale`
+                    WHERE lang_id = ' . $defaultLangId;
+            } else {
+                $catQuery = 'DELETE FROM `' . DBPREFIX . 'module_news_categories_locale`
+                    WHERE lang_id = ' . $langId;
+            }
+            $db->Execute($catQuery);
+
+            // Update the news type locale
+            if ($langStatus) {
+                $typeQuery = 'INSERT IGNORE INTO `' . DBPREFIX . 'module_news_types_locale`
+                    (   
+                        `type_id`,
+                        `lang_id`,
+                        `name`
+                    )
+                    SELECT 
+                        `type_id`,
+                        ' . $langId . ',
+                        `name`
+                    FROM `' . DBPREFIX . 'module_news_types_locale`
+                    WHERE lang_id = ' . $defaultLangId;
+            } else {
+                $typeQuery = 'DELETE FROM `' . DBPREFIX . 'module_news_types_locale`
+                    WHERE lang_id = ' . $langId;
+            }
+            $db->Execute($typeQuery);
+
+            // Update the news settings locale
+            if ($langStatus) {
+                $settingsQuery = 'INSERT IGNORE INTO `' . DBPREFIX . 'module_news_settings_locale`
+                    (   
+                        `name`,
+                        `lang_id`,
+                        `value`
+                    )
+                    SELECT 
+                        `name`,
+                        ' . $langId . ',
+                        `value`
+                    FROM `' . DBPREFIX . 'module_news_settings_locale`
+                    WHERE lang_id = ' . $defaultLangId;
+            } else {
+                $settingsQuery = 'DELETE FROM `' . DBPREFIX . 'module_news_settings_locale`
+                    WHERE lang_id = ' . $langId;
+            }
+            $db->Execute($settingsQuery);
         }
     }
 }

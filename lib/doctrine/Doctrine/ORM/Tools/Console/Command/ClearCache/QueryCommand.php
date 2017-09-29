@@ -1,7 +1,5 @@
 <?php
 /*
- *  $Id$
- *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -15,49 +13,69 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * This software consists of voluntary contributions made by many individuals
- * and is licensed under the LGPL. For more information, see
+ * and is licensed under the MIT license. For more information, see
  * <http://www.doctrine-project.org>.
  */
 
 namespace Doctrine\ORM\Tools\Console\Command\ClearCache;
 
-use Symfony\Component\Console\Input\InputArgument,
-    Symfony\Component\Console\Input\InputOption,
-    Symfony\Component\Console;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Doctrine\Common\Cache\ApcCache;
 
 /**
  * Command to clear the query cache of the various cache drivers.
  *
- * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link    www.doctrine-project.org
  * @since   2.0
- * @version $Revision$
  * @author  Benjamin Eberlei <kontakt@beberlei.de>
  * @author  Guilherme Blanco <guilhermeblanco@hotmail.com>
  * @author  Jonathan Wage <jonwage@gmail.com>
  * @author  Roman Borschel <roman@code-factory.org>
  */
-class QueryCommand extends Console\Command\Command
+class QueryCommand extends Command
 {
     /**
-     * @see Console\Command\Command
+     * {@inheritdoc}
      */
     protected function configure()
     {
         $this
         ->setName('orm:clear-cache:query')
         ->setDescription('Clear all query cache of the various cache drivers.')
-        ->setDefinition(array())
-        ->setHelp(<<<EOT
-Clear all query cache of the various cache drivers.
+        ->setDefinition(array(
+            new InputOption(
+                'flush', null, InputOption::VALUE_NONE,
+                'If defined, cache entries will be flushed instead of deleted/invalidated.'
+            )
+        ));
+
+        $this->setHelp(<<<EOT
+The <info>%command.name%</info> command is meant to clear the query cache of associated Entity Manager.
+It is possible to invalidate all cache entries at once - called delete -, or flushes the cache provider
+instance completely.
+
+The execution type differ on how you execute the command.
+If you want to invalidate the entries (and not delete from cache instance), this command would do the work:
+
+<info>%command.name%</info>
+
+Alternatively, if you want to flush the cache provider using this command:
+
+<info>%command.name% --flush</info>
+
+Finally, be aware that if <info>--flush</info> option is passed, not all cache providers are able to flush entries,
+because of a limitation of its execution nature.
 EOT
         );
     }
 
     /**
-     * @see Console\Command\Command
+     * {@inheritdoc}
      */
-    protected function execute(Console\Input\InputInterface $input, Console\Output\OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         $em = $this->getHelper('em')->getEntityManager();
         $cacheDriver = $em->getConfiguration()->getQueryCacheImpl();
@@ -66,20 +84,20 @@ EOT
             throw new \InvalidArgumentException('No Query cache driver is configured on given EntityManager.');
         }
 
-        if ($cacheDriver instanceof \Doctrine\Common\Cache\ApcCache) {
+        if ($cacheDriver instanceof ApcCache) {
             throw new \LogicException("Cannot clear APC Cache from Console, its shared in the Webserver memory and not accessible from the CLI.");
         }
 
         $output->write('Clearing ALL Query cache entries' . PHP_EOL);
 
-        $cacheIds = $cacheDriver->deleteAll();
+        $result  = $cacheDriver->deleteAll();
+        $message = ($result) ? 'Successfully deleted cache entries.' : 'No cache entries were deleted.';
 
-        if ($cacheIds) {
-            foreach ($cacheIds as $cacheId) {
-                $output->write(' - ' . $cacheId . PHP_EOL);
-            }
-        } else {
-            $output->write('No entries to be deleted.' . PHP_EOL);
+        if (true === $input->getOption('flush')) {
+            $result  = $cacheDriver->flushAll();
+            $message = ($result) ? 'Successfully flushed cache entries.' : $message;
         }
+
+        $output->write($message . PHP_EOL);
     }
 }

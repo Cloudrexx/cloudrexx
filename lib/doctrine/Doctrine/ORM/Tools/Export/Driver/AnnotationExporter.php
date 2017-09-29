@@ -1,8 +1,5 @@
 <?php
-
 /*
- *  $Id$
- *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -16,42 +13,43 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * This software consists of voluntary contributions made by many individuals
- * and is licensed under the LGPL. For more information, see
+ * and is licensed under the MIT license. For more information, see
  * <http://www.doctrine-project.org>.
  */
 
 namespace Doctrine\ORM\Tools\Export\Driver;
 
-use Doctrine\ORM\Mapping\ClassMetadataInfo,
-    Doctrine\ORM\Mapping\AssociationMapping,
-    Doctrine\ORM\Tools\EntityGenerator;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\Tools\EntityGenerator;
 
 /**
- * ClassMetadata exporter for PHP classes with annotations
+ * ClassMetadata exporter for PHP classes with annotations.
  *
- * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link    www.doctrine-project.org
  * @since   2.0
- * @version $Revision$
  * @author  Jonathan Wage <jonwage@gmail.com>
  */
 class AnnotationExporter extends AbstractExporter
 {
+    /**
+     * @var string
+     */
     protected $_extension = '.php';
+
+    /**
+     * @var EntityGenerator|null
+     */
     private $_entityGenerator;
 
     /**
-     * Converts a single ClassMetadata instance to the exported format
-     * and returns it
-     *
-     * @param ClassMetadataInfo $metadata 
-     * @return string $exported
+     * {@inheritdoc}
      */
     public function exportClassMetadata(ClassMetadataInfo $metadata)
     {
         if ( ! $this->_entityGenerator) {
             throw new \RuntimeException('For the AnnotationExporter you must set an EntityGenerator instance with the setEntityGenerator() method.');
         }
+
         $this->_entityGenerator->setGenerateAnnotations(true);
         $this->_entityGenerator->setGenerateStubMethods(false);
         $this->_entityGenerator->setRegenerateEntityIfExists(false);
@@ -60,11 +58,21 @@ class AnnotationExporter extends AbstractExporter
         return $this->_entityGenerator->generateEntityClass($metadata);
     }
 
+    /**
+     * @param \Doctrine\ORM\Mapping\ClassMetadataInfo $metadata
+     *
+     * @return string
+     */
     protected function _generateOutputPath(ClassMetadataInfo $metadata)
     {
         return $this->_outputDir . '/' . str_replace('\\', '/', $metadata->name) . $this->_extension;
     }
 
+    /**
+     * @param \Doctrine\ORM\Tools\EntityGenerator $entityGenerator
+     *
+     * @return void
+     */
     public function setEntityGenerator(EntityGenerator $entityGenerator)
     {
         $this->_entityGenerator = $entityGenerator;

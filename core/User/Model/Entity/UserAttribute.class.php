@@ -87,6 +87,11 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
      */
     private $userProfile;
 
+    /**
+     * @var Cx\Core_Modules\Access\Model\Entity\AccessId
+     */
+    protected $readAccessId;
+
     public function __construct()
     {
         $this->parent = new \Doctrine\Common\Collections\ArrayCollection();
@@ -302,5 +307,25 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     public function getUserProfile()
     {
         return $this->userProfile;
+    }
+
+    /**
+     * Set readAccessId
+     *
+     * @param Cx\Core_Modules\Access\Model\Entity\AccessId $readAccessId
+     */
+    public function setReadAccessId(\Cx\Core_Modules\Access\Model\Entity\AccessId $readAccessId)
+    {
+        $this->readAccessId = $readAccessId;
+    }
+
+    /**
+     * Get readAccessId
+     *
+     * @return Cx\Core_Modules\Access\Model\Entity\AccessId $readAccessId
+     */
+    public function getReadAccessId()
+    {
+        return $this->readAccessId;
     }
 }

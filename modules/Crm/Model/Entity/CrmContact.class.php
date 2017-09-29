@@ -70,6 +70,13 @@ class CrmContact
     protected $emailDelivery;
 
     /**
+     * Date of last modification
+     *
+     * @var string
+     */
+    public $updated_date = '';
+
+    /**
      * Load the record
      *
      * @param Integer $id record id
@@ -86,10 +93,11 @@ class CrmContact
         if (!empty($this->id)) {
             $query = "SELECT c.id, c.customer_id, c.customer_type,
                              c.customer_name, c.customer_addedby,
-                             c.customer_currency, c.contact_familyname,
+                             c.customer_currency, c.contact_amount,
+                             c.contact_familyname, c.contact_title,
                              c.contact_role, c.contact_customer, c.contact_language,c.company_size,
-                             c.notes, c.contact_type,c.user_account,c.added_date,c.industry_type,
-                             e.email,p.phone, c.datasource,
+                             c.notes, c.contact_type,c.user_account,c.updated_date,c.added_date,
+                             c.industry_type,e.email,p.phone, c.datasource,
                              c.gender,c.profile_picture, c.`email_delivery`
                          FROM `".DBPREFIX."module_{$this->moduleName}_contacts` AS c
                          LEFT JOIN `".DBPREFIX."module_{$this->moduleName}_customer_contact_emails` as e
@@ -104,6 +112,8 @@ class CrmContact
                 $this->customerType     = $objResult->fields['customer_type'];
                 $this->customerName     = $objResult->fields['customer_name'];
                 $this->family_name      = $objResult->fields['contact_familyname'];
+                $this->contact_title    = $objResult->fields['contact_title'];
+                $this->contact_amount   = $objResult->fields['contact_amount'];
                 $this->contact_role     = $objResult->fields['contact_role'];
                 $this->contact_language = $objResult->fields['contact_language'];
                 $this->companySize      = $objResult->fields['company_size'];
@@ -121,6 +131,7 @@ class CrmContact
                 $this->email            = $objResult->fields['email'];
                 $this->phone            = $objResult->fields['phone'];
                 $this->added_date       = $objResult->fields['added_date'];
+                $this->updated_date     = $objResult->fields['updated_date'];
             }
             return true;
         }
@@ -141,9 +152,12 @@ class CrmContact
                            c.customer_type,
                            c.customer_name,
                            c.contact_familyname,
+                           c.contact_title,
+                           c.contact_amount,
                            c.contact_type,
                            c.contact_customer AS contactCustomerId,
                            c.status,
+                           c.updated_date,
                            c.added_date,
                            c.contact_role,
                            c.notes,
@@ -154,9 +168,9 @@ class CrmContact
                            c.user_account,
                            c.datasource,
                            c.gender,
+                           c.contact_language,
                            con.customer_name AS contactCustomer,
                            t.label AS cType,
-                           lang.name AS language,
                            curr.name AS currency,
                            c.profile_picture,
                            c.`email_delivery`
@@ -173,8 +187,6 @@ class CrmContact
                          ON idn.entry_id = i.id AND lang_id = {$_LANGID}
                        LEFT JOIN ".DBPREFIX."module_{$this->moduleName}_currency AS curr
                          ON c.customer_currency = curr.id
-                       LEFT JOIN ".DBPREFIX."languages AS lang
-                         ON c.contact_language = lang.id
                        WHERE c.id = {$this->id}";
         $objResult = $objDatabase->SelectLimit($query, 1);
 
@@ -205,7 +217,9 @@ class CrmContact
             'customer_addedby'  => isset ($this->addedUser) ? (int) $this->addedUser : 1,
             'company_size'      => isset ($this->companySize) ? $this->companySize : 0,
             'customer_currency' => isset ($this->currency) ? (int) $this->currency : 0,
+            'contact_amount'    => isset ($this->contact_amount) ? $this->contact_amount : '',
             'contact_familyname'=> isset ($this->family_name) ? $this->family_name : '',
+            'contact_title'     => isset ($this->contact_title) ? $this->contact_title : '',
             'contact_role'      => isset ($this->contact_role) ? $this->contact_role : '',
             'contact_customer'  => isset ($this->contact_customer) ? (int) $this->contact_customer : '',
             'contact_language'  => isset ($this->contact_language) ? (int) $this->contact_language : '',
@@ -229,6 +243,8 @@ class CrmContact
         }
         //echo $query; exit();
         if ($objDatabase->execute($query)) {
+            // reload entry from database to get the proper updated_date
+            $this->load($this->id);
             if (!isset($this->id) || empty ($this->id)) {
                 $this->id = $objDatabase->INSERT_ID();
                 \Env::get('cx')->getEvents()->triggerEvent('model/postPersist', array(new \Doctrine\ORM\Event\LifecycleEventArgs($this, \Env::get('em'))));
@@ -323,22 +339,25 @@ class CrmContact
         $this->customerType     = 0;
         $this->customerName     = '';
         $this->family_name      = '';
+        $this->contact_title    = '';
         $this->contact_role     = '';
         $this->contact_language = 0;
         $this->contact_customer = 0;
         $this->addedUser        = 0;
         $this->currency         = 0;
+        $this->contact_amount   = null;
         $this->notes            = '';
         $this->industryType     = 0;
         $this->account_id       = 0;
         $this->datasource       = 0;
         $this->contact_gender   = 0;
         $this->profile_picture  = '';
-        $this->emailDelivery    = 0;
+        $this->emailDelivery    = 1;
 
         $this->email            = '';
         $this->phone            = '';
         $this->added_date       = '';
+        $this->updated_date     = '';
     }
 
     /**

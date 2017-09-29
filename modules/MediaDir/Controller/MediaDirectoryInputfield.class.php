@@ -92,7 +92,12 @@ class MediaDirectoryInputfield extends MediaDirectoryLibrary
 
     function getInputfields()
     {
-        global $_ARRAYLANG, $objDatabase, $_LANGID;
+        global $_ARRAYLANG, $objDatabase;
+
+        // LANG_ID is set to backend or frontend interface language.
+        // If LANG_ID is not yet set, then we've been requested from
+        // the frontend and the resolver did already set FRONTEND_LANG_ID
+        $langId = defined('LANG_ID') && LANG_ID ? LANG_ID : FRONTEND_LANG_ID;
 
         $whereFormId  = 'AND (`form`.`active` = 1)';
         $joinFormsTbl = 'LEFT JOIN `' . DBPREFIX .'module_' . $this->moduleTablePrefix . '_forms` as form
@@ -136,7 +141,7 @@ class MediaDirectoryInputfield extends MediaDirectoryLibrary
                 LEFT JOIN `' . DBPREFIX . 'module_' . $this->moduleTablePrefix . '_inputfield_types` AS types
                     ON (`input`.`type` = `types`.`id`)
             WHERE
-                (`names`.`lang_id` = ' . $_LANGID . ')
+                (`names`.`lang_id` = ' . $langId . ')
                 ' . $whereFormId . '
                 ' . $whereExpSearch . '
             ORDER BY
@@ -204,6 +209,7 @@ class MediaDirectoryInputfield extends MediaDirectoryLibrary
         $arrCategorySelector['type_name'] = '';
         $arrCategorySelector['required'] = 1;
         $arrCategorySelector['type'] = 0;
+        // in frontend, categorySelectorExpSearch is only set for active forms
         $arrCategorySelector['search'] = !empty($this->intFormId) ? $this->arrSettings['categorySelectorExpSearch'][$this->intFormId] : 0;
         $arrInputfields[1] = $arrCategorySelector;
 
@@ -214,6 +220,7 @@ class MediaDirectoryInputfield extends MediaDirectoryLibrary
             $arrLevelSelector['type_name'] = '';
             $arrLevelSelector['required'] = 1;
             $arrLevelSelector['type'] = 0;
+            // in frontend, levelSelectorExpSearch is only set for active forms
             $arrLevelSelector['search'] = !empty($this->intFormId) ? $this->arrSettings['levelSelectorExpSearch'][$this->intFormId] : 0;
             $arrInputfields[2] = $arrLevelSelector;
         }
@@ -542,6 +549,14 @@ class MediaDirectoryInputfield extends MediaDirectoryLibrary
                                 }
 
                                 if(!empty($arrInputfieldContent)) {
+                                    // Workaround as inputfields have placeholder prefix hard-coded to: MEDIADIR_
+                                    // Set placeholder prefix according to configured option $this->moduleLangVar
+                                    if ($this->moduleLangVar != 'MEDIADIR') {
+                                        foreach ($arrInputfieldContent as $key => $value) {
+                                            $arrInputfieldContent[preg_replace('/^MEDIADIR/', $this->moduleLangVar, $key)] = $value;
+                                        }
+                                    }
+
                                     if (\Cx\Core\Core\Controller\Cx::instanciate()->getMode() == \Cx\Core\Core\Controller\Cx::MODE_FRONTEND && \Cx\Core\Setting\Controller\Setting::getValue('blockStatus', 'Config')) {
                                         $arrInputfieldContent[$this->moduleLangVar.'_INPUTFIELD_VALUE'] = preg_replace('/\\[\\[(BLOCK_[A-Z0-9_-]+)\\]\\]/', '{\\1}', $arrInputfieldContent[$this->moduleLangVar.'_INPUTFIELD_VALUE']);
                                         \Cx\Modules\Block\Controller\Block::setBlocks($arrInputfieldContent[$this->moduleLangVar.'_INPUTFIELD_VALUE'], \Cx\Core\Core\Controller\Cx::instanciate()->getPage());
@@ -1235,14 +1250,15 @@ EOF;
         global $_ARRAYLANG;
 
         $arrContexts = array(
-          'none'    => $_ARRAYLANG["TXT_MEDIADIR_INPUTFIELD_CONTEXT_NONE"],
-          'title'   => $_ARRAYLANG["TXT_MEDIADIR_INPUTFIELD_CONTEXT_TITLE"],
-          'content' => $_ARRAYLANG['TXT_MEDIADIR_INPUTFIELD_CONTEXT_CONTENT'],
-          'address' => $_ARRAYLANG["TXT_MEDIADIR_INPUTFIELD_CONTEXT_ADDRESS"],
-          'zip'     => $_ARRAYLANG["TXT_MEDIADIR_INPUTFIELD_CONTEXT_ZIP"],
-          'city'    => $_ARRAYLANG["TXT_MEDIADIR_INPUTFIELD_CONTEXT_CITY"],
-          'country' => $_ARRAYLANG["TXT_MEDIADIR_INPUTFIELD_CONTEXT_COUNTRY"],
-          'image'   => $_ARRAYLANG["TXT_MEDIADIR_INPUTFIELD_CONTEXT_IMAGE"],
+          'none'     => $_ARRAYLANG["TXT_MEDIADIR_INPUTFIELD_CONTEXT_NONE"],
+          'title'    => $_ARRAYLANG["TXT_MEDIADIR_INPUTFIELD_CONTEXT_TITLE"],
+          'content'  => $_ARRAYLANG['TXT_MEDIADIR_INPUTFIELD_CONTEXT_CONTENT'],
+          'address'  => $_ARRAYLANG["TXT_MEDIADIR_INPUTFIELD_CONTEXT_ADDRESS"],
+          'zip'      => $_ARRAYLANG["TXT_MEDIADIR_INPUTFIELD_CONTEXT_ZIP"],
+          'city'     => $_ARRAYLANG["TXT_MEDIADIR_INPUTFIELD_CONTEXT_CITY"],
+          'country'  => $_ARRAYLANG["TXT_MEDIADIR_INPUTFIELD_CONTEXT_COUNTRY"],
+          'image'    => $_ARRAYLANG["TXT_MEDIADIR_INPUTFIELD_CONTEXT_IMAGE"],
+          'keywords' => $_ARRAYLANG["TXT_MEDIADIR_INPUTFIELD_CONTEXT_KEYWORDS"],
         );
 
         return $arrContexts;

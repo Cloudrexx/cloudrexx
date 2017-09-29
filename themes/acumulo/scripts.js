@@ -27,7 +27,7 @@ $jq(document).ready(function(){
   field_id = ".navigation-wrapper select";
   $jq(field_id).change(function()
   {
-     value = $jq(this).attr('value');
+	 value = $jq(this).val();
      window.location = value;
   });
 /*----------------------------------*/

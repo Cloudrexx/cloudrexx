@@ -193,6 +193,13 @@ class BackendTable extends HTML_Table {
                         $data = '<i>(empty)</i>';
                         $encode = false;
                     }
+                    if (
+                        isset($options['fields']) &&
+                        isset($options['fields'][$origHeader]['table']) &&
+                        isset($options['fields'][$origHeader]['table']['attributes'])
+                    ) {
+                        $this->setCellAttributes($row, $col, $options['fields'][$origHeader]['table']['attributes']);
+                    }
                     $this->setCellContents($row, $col, $data, 'TD', 0, $encode);
                     $col++;
                 }

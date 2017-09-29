@@ -1754,6 +1754,7 @@ form[name="registrationForm"] .row {
     float: left;
     width: auto;
     background-color: #0A85C8;
+    margin-right: 5px;
 }
 ul#newsTags:hover {
     background: transparent;

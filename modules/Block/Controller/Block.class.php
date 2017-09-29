@@ -84,10 +84,9 @@ class Block extends \Cx\Modules\Block\Controller\BlockLibrary
                 $placeholderSuffix = '';
 
                 $randomBlockIdx = 1;
-
                 while ($randomBlockIdx <= 4) {
                     if (preg_match('/{'.$objBlock->blockNamePrefix.'RANDOMIZER'.$placeholderSuffix.'}/', $template)) {
-                        $objBlock->setBlockRandom($template, $randomBlockIdx);
+                        $objBlock->setBlockRandom($template, $randomBlockIdx, $page->getId());
                     }
 
                     $randomBlockIdx++;
@@ -145,9 +144,9 @@ class Block extends \Cx\Modules\Block\Controller\BlockLibrary
     * @param string &$code
     * @see blockLibrary::_setBlock()
     */
-    function setBlockRandom(&$code, $id)
+    function setBlockRandom(&$code, $id, $pageId)
     {
-        $this->_setBlockRandom($code, $id);
+        $this->_setBlockRandom($code, $id, $pageId);
     }
 
     function setBlockGlobal(&$code, $pageId)

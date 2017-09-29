@@ -1,0 +1,29 @@
+Cx\Modules\Calendar\Model\Entity\RegistrationFormFieldName:
+  type: entity
+  table: module_calendar_registration_form_field_name
+  fields:
+    fieldId:
+      id: true
+      type: integer
+      column: field_id
+      associationKey: true
+    formId:
+      id: true
+      type: integer
+      column: form_id
+    langId:
+      id: true
+      type: integer
+      column: lang_id
+    name:
+      type: string
+      length: 255
+    default:
+      type: text
+  manyToOne:
+    registrationFormField:
+      targetEntity: Cx\Modules\Calendar\Model\Entity\RegistrationFormField
+      inversedBy: registrationFormFieldNames
+      joinColumn:
+        name: field_id
+        referencedColumnName: id

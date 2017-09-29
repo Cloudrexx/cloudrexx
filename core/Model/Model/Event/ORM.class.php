@@ -83,4 +83,12 @@ final class ORM extends BaseAdapterORM implements LoggableAdapter
         return $q->getSingleScalarResult() + 1;
 
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public function isPostInsertGenerator($meta)
+    {
+        return $meta->idGenerator->isPostInsertGenerator();
+    }
 }

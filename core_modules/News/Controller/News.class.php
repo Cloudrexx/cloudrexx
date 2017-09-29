@@ -204,6 +204,7 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
         $newsCommentActive  = $objResult->fields['commentactive'];
         $lastUpdate         = $objResult->fields['changelog'];
         $text               = $objResult->fields['text'];
+        $newsTeaser         = '';
         $redirect           = contrexx_raw2xhtml($objResult->fields['redirect']);
         $sourceHref         = contrexx_raw2xhtml($objResult->fields['source']);
         $url1Href           = contrexx_raw2xhtml($objResult->fields['url1']);
@@ -244,8 +245,10 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
         $newstitle = $this->newsTitle;
         $this->newsText = $text;
         $this->newsThumbnail = $objResult->fields['newsThumbImg'];
-        $newsTeaser = nl2br($objResult->fields['teaser_text']);
-        \LinkGenerator::parseTemplate($newsTeaser);
+        if ($this->arrSettings['news_use_teaser_text']) {
+            $newsTeaser = nl2br($objResult->fields['teaser_text']);
+            \LinkGenerator::parseTemplate($newsTeaser);
+        }
 
         $objSubResult = $objDatabase->Execute('SELECT count(`id`) AS `countComments` FROM `'.DBPREFIX.'module_news_comments` WHERE `newsid` = '.$newsid);
         //Get the Category list
@@ -728,7 +731,7 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
             $this->_objTpl->setVariable(array(
                'NEWS_'.$placeholderPrefix.'_RELATED_MESSAGE_ID'            => $newsid,
                'NEWS_'.$placeholderPrefix.'_RELATED_MESSAGE_CSS'           => 'row'.($i % 2 + 1),
-               'NEWS_'.$placeholderPrefix.'_RELATED_MESSAGE_TEASER'        => nl2br($objResult->fields['teaser_text']),
+               'NEWS_'.$placeholderPrefix.'_RELATED_MESSAGE_TEASER'        => $this->arrSettings['news_use_teaser_text'] ? nl2br($objResult->fields['teaser_text']) : '',
                'NEWS_'.$placeholderPrefix.'_RELATED_MESSAGE_TITLE'         => contrexx_raw2xhtml($newstitle),
                'NEWS_'.$placeholderPrefix.'_RELATED_MESSAGE_LONG_DATE'     => date(ASCMS_DATE_FORMAT,$objResult->fields['newsdate']),
                'NEWS_'.$placeholderPrefix.'_RELATED_MESSAGE_DATE'          => date(ASCMS_DATE_FORMAT_DATE, $objResult->fields['newsdate']),
@@ -903,20 +906,25 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
 
         //Filter by tag
         if (!empty($_REQUEST['tag'])) {
-            $parameters['filterTag'] = $searchTag = contrexx_input2raw($_REQUEST['tag']);
+            $searchTag = is_array($_REQUEST['tag'])
+                    ? contrexx_input2raw($_REQUEST['tag'])
+                    : contrexx_input2raw(array($_REQUEST['tag']));
+            $parameters['filterTag[]'] = implode('&filterTag[]=', $searchTag);
             $searchedTag   = $this->getNewsTags(null, $searchTag);
-            $searchedTagId = current(array_keys($searchedTag['tagList']));
             if (!empty($searchedTag['newsIds'])) {
-                $this->incrementViewingCount($searchedTagId);
+                $this->incrementViewingCount(array_keys($searchedTag['tagList']));
                 $newsfilter .= ' AND n.`id` IN ('
                     . implode(',', $searchedTag['newsIds'])
                     . ')';
-                $this->_objTpl->setVariable(array(
-                   'NEWS_FILTER_TAG_ID'   =>  $searchedTagId,
-                   'NEWS_FILTER_TAG_NAME' =>  ucfirst(current($searchedTag['tagList']))
-                ));
-                if ($this->_objTpl->blockExists('tagFilterCont')) {
-                    $this->_objTpl->parse('tagFilterCont');
+                if ($this->_objTpl->blockExists('news_headlines_filter_tags')) {
+                    foreach ($searchedTag['tagList'] as $tagId => $tagName) {
+                        $this->_objTpl->setVariable(array(
+                           'NEWS_FILTER_TAG_ID'   => contrexx_raw2xhtml($tagId),
+                           'NEWS_FILTER_TAG_NAME' => ucfirst(contrexx_raw2xhtml($tagName))
+                        ));
+                        $this->_objTpl->parse('news_headlines_filter_tag');
+                    }
+                    $this->_objTpl->parse('news_headlines_filter_tags');
                 }
             } else {
                 $validToShowList = false;
@@ -1044,7 +1052,7 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                 $this->_objTpl->setVariable(array(
                    'NEWS_ID'             => $newsid,
                    'NEWS_CSS'            => 'row'.($i % 2 + 1),
-                   'NEWS_TEASER'         => nl2br($objResult->fields['teaser_text']),
+                   'NEWS_TEASER'         => $this->arrSettings['news_use_teaser_text'] ? nl2br($objResult->fields['teaser_text']) : '',
                    'NEWS_TITLE'          => contrexx_raw2xhtml($newstitle),
                    'NEWS_LONG_DATE'      => date(ASCMS_DATE_FORMAT,$objResult->fields['newsdate']),
                    'NEWS_DATE'           => date(ASCMS_DATE_FORMAT_DATE, $objResult->fields['newsdate']),
@@ -1299,7 +1307,7 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                 $this->_objTpl->setVariable(array(
                    'NEWS_ID'            => $newsid,
                    'NEWS_CSS'           => 'row'.($i % 2 + 1),
-                   'NEWS_TEASER'        => nl2br($objResult->fields['teaser_text']),
+                   'NEWS_TEASER'        => $this->arrSettings['news_use_teaser_text'] ? nl2br($objResult->fields['teaser_text']) : '',
                    'NEWS_TITLE'         => contrexx_raw2xhtml($newstitle),
                    'NEWS_LONG_DATE'     => date(ASCMS_DATE_FORMAT,$objResult->fields['newsdate']),
                    'NEWS_DATE'          => date(ASCMS_DATE_FORMAT_DATE, $objResult->fields['newsdate']),
@@ -1453,29 +1461,16 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
         $msg .= "\n\n";
         $msg .= $_CONFIG['coreAdminName'];
 
-        if (@include_once ASCMS_LIBRARY_PATH.'/phpmailer/class.phpmailer.php') {
-            $objMail = new \phpmailer();
+        $objMail = new \Cx\Core\MailTemplate\Model\Entity\Mail();
 
-            if ($_CONFIG['coreSmtpServer'] > 0 && @include_once ASCMS_CORE_PATH.'/SmtpSettings.class.php') {
-                if (($arrSmtp = \SmtpSettings::getSmtpAccount($_CONFIG['coreSmtpServer'])) !== false) {
-                    $objMail->IsSMTP();
-                    $objMail->Host = $arrSmtp['hostname'];
-                    $objMail->Port = $arrSmtp['port'];
-                    $objMail->SMTPAuth = true;
-                    $objMail->Username = $arrSmtp['username'];
-                    $objMail->Password = $arrSmtp['password'];
-                }
-            }
+        $objMail->SetFrom($_CONFIG['coreAdminEmail'], $_CONFIG['coreAdminName']);
+        $objMail->Subject = $_ARRAYLANG['TXT_NOTIFY_SUBJECT'];
+        $objMail->IsHTML(false);
+        $objMail->Body = $msg;
 
-            $objMail->CharSet = CONTREXX_CHARSET;
-            $objMail->SetFrom($_CONFIG['coreAdminEmail'], $_CONFIG['coreAdminName']);
-            $objMail->Subject = $_ARRAYLANG['TXT_NOTIFY_SUBJECT'];
-            $objMail->IsHTML(false);
-            $objMail->Body = $msg;
+        $objMail->AddAddress($objUser->getEmail(), $name);
+        $objMail->Send();
 
-            $objMail->AddAddress($objUser->getEmail(), $name);
-            $objMail->Send();
-        }
         return true;
     }
 
@@ -1570,6 +1565,7 @@ JSCODE;
         $this->_objTpl->setGlobalVariable(
             array(
                 'NEWS_STATUS_MESSAGE' => $msg,
+                'NEWS_STATUS_MESSAGE_CSS_CLASS' => $newsId ? 'text-success' : 'text-danger',
                 'TXT_CATEGORY_SELECT' => $_ARRAYLANG['TXT_CATEGORY_SELECT']
             )
         );
@@ -1659,26 +1655,29 @@ JSCODE;
 });
 EOF;
         \JS::registerCode($jsCodeCategoryChosen);
-        if (!empty($this->arrSettings['use_related_news'])) {
-            $objCx = \ContrexxJavascript::getInstance();
-            $objCx->setVariable(
-                array(
-                    'noResultsMsg' => $_ARRAYLANG['TXT_NEWS_NOT_FOUND'],
-                    'langId' => FRONTEND_LANG_ID,
-                ),
-                'news/news-live-search'
-            );
-            \JS::registerJS('core_modules/News/View/Script/news-live-search.js');
-            if (!empty($data['relatedNews'])) {
-                $this->parseRelatedNewsTags(
-                    $this->_objTpl,
-                    $data['relatedNews'],
-                    FRONTEND_LANG_ID
+        // TODO: this block must be renamed to news_related_container
+        if ($this->_objTpl->blockExists('relatedNewsBlock')) {
+            if (!empty($this->arrSettings['use_related_news'])) {
+                $objCx = \ContrexxJavascript::getInstance();
+                $objCx->setVariable(
+                    array(
+                        'noResultsMsg' => $_ARRAYLANG['TXT_NEWS_NOT_FOUND'],
+                        'langId' => FRONTEND_LANG_ID,
+                    ),
+                    'news/news-live-search'
                 );
+                \JS::registerJS('core_modules/News/View/Script/news-live-search.js');
+                if (!empty($data['relatedNews'])) {
+                    $this->parseRelatedNewsTags(
+                        $this->_objTpl,
+                        $data['relatedNews'],
+                        FRONTEND_LANG_ID
+                    );
+                }
+                $this->_objTpl->touchBlock('relatedNewsBlock');
+            } else {
+                $this->_objTpl->hideBlock('relatedNewsBlock');
             }
-            $this->_objTpl->touchBlock('relatedNewsBlock');
-        } else {
-            $this->_objTpl->hideBlock('relatedNewsBlock');
         }
         $this->_objTpl->setVariable(array(
             'TXT_NEWS_MESSAGE'          => $_ARRAYLANG['TXT_NEWS_MESSAGE'],
@@ -1836,7 +1835,8 @@ EOF;
         }
 
         $date = time();
-        $userid = \FWUser::getFWUserObject()->objUser->getId();
+        $userId = \FWUser::getFWUserObject()->objUser->getId();
+        $userName = \FWUser::getFWUserObject()->objUser->getUsername();
 
         $enable = intval($this->arrSettings['news_activate_submitted_news']);
         $query = "INSERT INTO `".DBPREFIX."module_news`
@@ -1848,7 +1848,9 @@ EOF;
                 `typeid` = '".contrexx_raw2db($data['newsType'])."',
                 `status` = '$enable',
                 `validated` = '$enable',
-                `userid` = '$userid',
+                `userid` = $userId,
+                `author_id` = $userId,
+                `author` = '" . contrexx_raw2db($userName) . "',
                 `changelog` = '$date',
                 `enable_tags`='" . $data['enableTags'] . "',
                 `enable_related_news`=" . $data['enableRelatedNews'] . ",
@@ -2117,26 +2119,8 @@ RSS2JSCODE;
         }
 
         // Send a notification e-mail to administrator
-        if (!@include_once ASCMS_LIBRARY_PATH.'/phpmailer/class.phpmailer.php') {
-            \DBG::msg('Unable to send e-mail notification to admin');
-            //DBG::stack();
-            return array(true, null);
-        }
+        $objMail = new \Cx\Core\MailTemplate\Model\Entity\Mail();
 
-        $objMail = new \phpmailer();
-
-        if ($_CONFIG['coreSmtpServer'] > 0 && @include_once ASCMS_CORE_PATH.'/SmtpSettings.class.php') {
-            if (($arrSmtp = \SmtpSettings::getSmtpAccount($_CONFIG['coreSmtpServer'])) !== false) {
-                $objMail->IsSMTP();
-                $objMail->Host = $arrSmtp['hostname'];
-                $objMail->Port = $arrSmtp['port'];
-                $objMail->SMTPAuth = true;
-                $objMail->Username = $arrSmtp['username'];
-                $objMail->Password = $arrSmtp['password'];
-            }
-        }
-
-        $objMail->CharSet   = CONTREXX_CHARSET;
         $objMail->SetFrom($_CONFIG['coreAdminEmail'], $_CONFIG['coreGlobalPageTitle']);
         $objMail->IsHTML(false);
         $objMail->Subject   = sprintf($_ARRAYLANG['TXT_NEWS_COMMENT_NOTIFICATION_MAIL_SUBJECT'], $newsMessageTitle);
@@ -2248,7 +2232,7 @@ RSS2JSCODE;
                                             : \Cx\Core\Routing\Url::fromModuleAndCmd('News', $this->findCmdById('details', self::sortCategoryIdByPriorityId(array_keys($newsCategories), $categories)), FRONTEND_LANG_ID, array('newsid' => $newsid)))
                                         : $news['newsredirect'];
 
-                    $redirectNewWindow = !empty($news['redirect']) && !empty($news['redirectNewWindow']);
+                    $redirectNewWindow = !empty($news['newsredirect']) && !empty($news['redirectNewWindow']);
                     $htmlLink = self::parseLink($newsUrl, $newstitle, contrexx_raw2xhtml('[' . $_ARRAYLANG['TXT_NEWS_MORE'] . '...]'), $redirectNewWindow);
                     $linkTarget = $redirectNewWindow ? '_blank' : '_self';
 
@@ -2263,7 +2247,7 @@ RSS2JSCODE;
                     $this->_objTpl->setVariable(array(
                        'NEWS_ARCHIVE_ID'            => $newsid,
                        'NEWS_ARCHIVE_CSS'           => 'row'.($i % 2 + 1),
-                       'NEWS_ARCHIVE_TEASER'        => nl2br($news['teaser_text']),
+                       'NEWS_ARCHIVE_TEASER'        => $this->arrSettings['news_use_teaser_text'] ? nl2br($news['teaser_text']) : '',
                        'NEWS_ARCHIVE_TITLE'         => contrexx_raw2xhtml($newstitle),
                        'NEWS_ARCHIVE_LONG_DATE'     => date(ASCMS_DATE_FORMAT,$news['date']),
                        'NEWS_ARCHIVE_DATE'          => date(ASCMS_DATE_FORMAT_DATE, $news['date']),

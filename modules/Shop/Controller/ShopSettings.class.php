@@ -211,6 +211,12 @@ class ShopSettings
                 intval($_POST['numof_products_per_page_frontend']), null,
                 \Cx\Core\Setting\Controller\Setting::TYPE_TEXT, null, 'config');
         }
+        if (!\Cx\Core\Setting\Controller\Setting::set('num_categories_per_row',
+            intval($_POST['num_categories_per_row']))) {
+            \Cx\Core\Setting\Controller\Setting::add('num_categories_per_row',
+                intval($_POST['num_categories_per_row']), null,
+                \Cx\Core\Setting\Controller\Setting::TYPE_TEXT, null, 'config');
+        }
     }
 
 
@@ -908,6 +914,8 @@ class ShopSettings
             \Cx\Core\Setting\Controller\Setting::TYPE_DROPDOWN_USER_CUSTOM_ATTRIBUTE, null, 'config');
         \Cx\Core\Setting\Controller\Setting::add('user_profile_attribute_notes', 0, 352,
             \Cx\Core\Setting\Controller\Setting::TYPE_DROPDOWN_USER_CUSTOM_ATTRIBUTE, null, 'config');
+        \Cx\Core\Setting\Controller\Setting::add('num_categories_per_row', 4, ++$i,
+            \Cx\Core\Setting\Controller\Setting::TYPE_TEXT, null, 'config');
         // Note that the Settings *MUST* be reinited after adding new entries!
 
         // Add more new/missing settings here

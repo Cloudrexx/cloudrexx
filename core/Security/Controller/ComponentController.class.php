@@ -205,28 +205,15 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         $message = "DATE : $cdate\r\nFILE : $where\r\n\r\n$user\r\n\r\n$gpcs";
 
         // Send the e-mail to the administrator
-        if (\Env::get('ClassLoader')->loadFile(ASCMS_LIBRARY_PATH.'/phpmailer/class.phpmailer.php')) {
-            $objMail = new \phpmailer();
+        $objMail = new \Cx\Core\MailTemplate\Model\Entity\Mail();
 
-            if ($config['coreSmtpServer'] > 0 && \Env::get('ClassLoader')->loadFile(ASCMS_CORE_PATH.'/SmtpSettings.class.php')) {
-                if (($arrSmtp = \SmtpSettings::getSmtpAccount($config['coreSmtpServer'])) !== false) {
-                    $objMail->IsSMTP();
-                    $objMail->Host = $arrSmtp['hostname'];
-                    $objMail->Port = $arrSmtp['port'];
-                    $objMail->SMTPAuth = true;
-                    $objMail->Username = $arrSmtp['username'];
-                    $objMail->Password = $arrSmtp['password'];
-                }
-            }
+        $objMail->SetFrom($config['coreAdminEmail'], $config['coreAdminName']);
+        $objMail->Subject = $_SERVER['HTTP_HOST']." : $type";
+        $objMail->IsHTML(false);
+        $objMail->Body = $message;
+        $objMail->AddAddress($emailto);
+        $objMail->Send();
 
-            $objMail->CharSet = CONTREXX_CHARSET;
-            $objMail->SetFrom($config['coreAdminEmail'], $config['coreAdminName']);
-            $objMail->Subject = $_SERVER['HTTP_HOST']." : $type";
-            $objMail->IsHTML(false);
-            $objMail->Body = $message;
-            $objMail->AddAddress($emailto);
-            $objMail->Send();
-        }
     }
 
     /**

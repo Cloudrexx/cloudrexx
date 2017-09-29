@@ -185,6 +185,20 @@ class MediaDirectoryInputfieldDropdown extends \Cx\Modules\MediaDir\Controller\M
 
     function getContent($intEntryId, $arrInputfield, $arrTranslationStatus)
     {
+        $strValue = static::getRawData($intEntryId, $arrInputfield, $arrTranslationStatus);
+
+        if(!empty($strValue)) {
+            $strValue = htmlspecialchars($strValue, ENT_QUOTES, CONTREXX_CHARSET);
+            $arrContent['TXT_'.$this->moduleLangVar.'_INPUTFIELD_NAME'] = htmlspecialchars($arrInputfield['name'][0], ENT_QUOTES, CONTREXX_CHARSET);
+            $arrContent[$this->moduleLangVar.'_INPUTFIELD_VALUE'] = $strValue;
+        } else {
+            $arrContent = null;
+        }
+
+        return $arrContent;
+    }
+
+    function getRawData($intEntryId, $arrInputfield, $arrTranslationStatus) {
         global $objDatabase;
 
         $intId = intval($arrInputfield['id']);
@@ -202,16 +216,7 @@ class MediaDirectoryInputfieldDropdown extends \Cx\Modules\MediaDir\Controller\M
 
         $intValueKey = intval($objInputfieldValue->fields['value'])-1;
         $arrValues = explode(",", $arrInputfield['default_value'][0]);
-        $strValue = htmlspecialchars($arrValues[$intValueKey], ENT_QUOTES, CONTREXX_CHARSET);
-
-        if(!empty($strValue)) {
-            $arrContent['TXT_'.$this->moduleLangVar.'_INPUTFIELD_NAME'] = htmlspecialchars($arrInputfield['name'][0], ENT_QUOTES, CONTREXX_CHARSET);
-            $arrContent[$this->moduleLangVar.'_INPUTFIELD_VALUE'] = $strValue;
-        } else {
-            $arrContent = null;
-        }
-
-        return $arrContent;
+        return $arrValues[$intValueKey];
     }
 
 

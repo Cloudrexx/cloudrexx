@@ -72,7 +72,7 @@ class NodeRepository extends NestedTreeRepository {
      * @return array
      * @override
      */
-    public function findBy(array $criteria)
+    public function findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
     {
         $qb = $this->_em->createQueryBuilder();
         $qb->select('n')

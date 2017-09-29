@@ -37,7 +37,7 @@ RewriteCond %PATH_DOCUMENT_ROOT%${websiteDomainCodeBaseMap:%{HTTP_HOST}}%{REQUES
 RewriteRule (.*) ${websiteDomainCodeBaseMap:%{HTTP_HOST}}/$1 [L,QSA,E=END:1]
 
 # Resolve language specific sitemap.xml
-RewriteRule ^(\w+)\/sitemap.xml$ sitemap_$1.xml [L,NC]
+RewriteRule ^([a-z]{1,2}(?:-[A-Za-z]{2,4})?)\/sitemap.xml$ sitemap_$1.xml [L,NC]
 
 # Allow directory index files
 RewriteCond %{REQUEST_FILENAME}/index.php -f

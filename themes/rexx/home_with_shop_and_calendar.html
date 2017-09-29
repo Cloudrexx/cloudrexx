@@ -1,0 +1,67 @@
+<style>
+    body section {margin-top: 49px;}
+</style>
+<div class="banner-slider container-fluid">
+    <div id="carousel-example-generic" class="carousel slide container" data-ride="carousel">
+        <!-- Indicators -->
+        <ol class="carousel-indicators">
+            <li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
+            <li data-target="#carousel-example-generic" data-slide-to="1"></li>
+        </ol>
+        <!-- Wrapper for slides -->
+        <div class="carousel-inner">
+            <div class="item active">{BLOCK_29}</div>
+            <div class="item">{BLOCK_30}</div>
+        </div>
+        <!-- Controls -->
+        <a class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev">
+            <span class="glyphicon glyphicon-chevron-left"></span>
+        </a>
+        <a class="right carousel-control" href="#carousel-example-generic" role="button" data-slide="next">
+            <span class="glyphicon glyphicon-chevron-right"></span>
+        </a>
+    </div>
+</div>
+<div id="home-content" class="clearfix inner container">
+    <div class="row">
+        <div id="home-page-wrapper" class="content">
+            <div id="home-page" class="col-md-8 col-xs-12">
+                <h1 class="first">{CONTENT_TITLE}</h1>
+                {CONTENT_TEXT}
+            </div>
+            <div id="home-block" class="col-md-4 col-xs-12">
+                <h1 class="first">Shop</h1>
+                Sind Sie auf der Suche nach etwas Aussergewöhnlichem? Profitieren Sie von unseren Spezialangeboten und attraktiven Dienstleistungen.<br /><br />
+                <a href="{NODE_SHOP}">zum Shop</a>
+            </div>
+        </div>
+        <div id="home-boxes">
+            <div class="first col-md-4 col-sm-12">
+                <div class="home-box"><h2>News</h2>
+                    {HEADLINES_FILE}
+                    <a class="more-link" href="{NODE_NEWS}">Weitere News</a>
+                </div>
+            </div>
+            <div class="middlebox col-md-4 col-sm-12">
+                <div class="home-box">
+                    <h2>Veranstaltungen</h2>
+                    <div id="home-event">
+                        {EVENTS_FILE}
+                    </div>
+                </div>
+            </div>
+            <div class="lastbox col-md-4 col-sm-12">
+                <div class="home-box"><h2>Newsletter</h2>
+                    <div id="home-newsletter">
+                        Sie m&ouml;chten gerne regelm&auml;ssig &uuml;ber die neusten Themen informiert werden? Dann melden Sie sich einfach hier f&uuml;r unseren kostenlosen Newsletter an:
+                        <form name="newsletter" action="{NODE_NEWSLETTER_SUBSCRIBE}" method="post">
+                            <input type="hidden" name="list[1]" value="1" />
+                            <input type="text" onfocus="this.value = ''" name="email" value="E-mail address" maxlength="255" />
+                            <button name="recipient_save">Anmelden</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

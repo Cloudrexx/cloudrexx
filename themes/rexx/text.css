@@ -1,0 +1,364 @@
+/* Start CSS Reset */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+    display: block;
+}
+body {
+    line-height: 1;
+}
+body ol,body ul {
+    list-style: none;
+    margin-bottom: 0;
+}
+blockquote, q {
+    quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+    content: '';
+    content: none;
+}
+fieldset {
+    float: left;
+    width: 100%;
+}
+ul,
+ol {
+    padding: 10px 0;
+    margin-left: 25px;
+}
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+body {
+    color: #505050;
+    font-family: Arial, Helvetica;
+    font-size: 14px;
+    line-height: 1.5em;
+    background: #f7f7f7;
+    padding-right: 0 !important;
+}
+body section {
+    margin-top: 63px;
+}
+body a {
+    color: #066196;
+    text-decoration: none;
+    outline: 0 none;
+}
+body a:hover, body a:focus {
+    color: #323F55;
+    text-decoration: none;
+    outline: 0 none;
+}
+body p {
+    margin: 0 0 0px;
+    padding: 0 0 10px 0;
+}
+b,
+strong {
+    font-weight: bold;
+}
+ul.horizontal-list li {
+    float: left;
+    padding: 0 10px 0 0;
+    margin: 0 10px 0 0;
+    background: none;
+}
+ul.horizontal-list li.last {
+    padding: 0 !important;
+    margin: 0 !important;
+    background: none !important;
+}
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+    padding: 10px 0 10px 0;
+    line-height: 1.4;
+    color: #151515;
+    font-weight: normal;
+}
+h1 {
+    font-size: 34px;
+}
+h1.first {
+    padding-top: 0;
+}
+h2 {
+    font-size: 22px;
+}
+h3 {
+    font-size: 18px;
+}
+h4 {
+    font-size: 17px;
+}
+h5 {
+    font-size: 16px;
+}
+h6 {
+    font-size: 15px;
+}
+input {color: #7d7d7d;}
+input,
+button,
+select,
+textarea {
+    display: block;
+    width: 100%;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 13px;
+    font-family: Arial, Helvetica;
+    line-height: 1.42857143;
+    color: #414141;
+    background-color: #ffffff;
+    background-image: none;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    -webkit-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s; 
+}
+input[type="file"]:focus, input[type="radio"]:focus, input[type="checkbox"]:focus{outline: none;}
+input[type="submit"], input[type="reset"], input[type=button] {color: #414141; font-size: 13px;}
+textarea {color: #7d7d7d;}
+select.form-control {
+    padding: 7px 8px;
+    color: #7d7d7d;
+    font-size: 13px;
+    font-weight: normal;
+}
+select {
+    display: block;
+    width: 100%;
+    height: 34px;
+    padding: 7px 8px;
+    font-size: 13px;
+    line-height: 1.42857143;
+    color: #7d7d7d;
+    line-height: 28px !important;
+    background-color: #ffffff;
+    background-image: none;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    -webkit-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s; 
+}
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: #66afe9;
+    outline: 0;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, 0.6);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, 0.6);
+}
+input[type=submit],
+input[type=button],
+input[type=reset],
+input[type=radio],
+input[type=checkbox],
+button {
+    width: auto;
+}
+input[type=radio] {
+    float: left;
+    margin: 3px 10px 3px 0;
+    padding: 0;
+    border: 0 none;
+    clear: both;
+}
+input[type=checkbox] {
+    float: left;
+    margin: 4px 10px 4px 0;
+    padding: 0;
+    border: 0 none;
+}
+input[type=text] {
+    line-height: 17px;
+}
+.loginbutton,
+.loginbutton:link,
+.loginbutton:hover,
+.loginbutton:visited {
+    display: block;
+    float: left;
+    color: transparent;
+    height: 26px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    width: 189px;
+}
+.loginbutton:hover {
+    text-decoration: underline;
+}
+button[disabled=disabled],
+input[disabled=disabled] {
+    opacity: 0.6;
+    cursor: default;
+}
+.ie7 button,
+.ie8 button {
+    border: 1px solid #DDDDDD;
+}
+input[name="access_signup"]:focus {
+    border-color: #CCCCCC;
+    box-shadow: none;
+}
+input[type=submit]:hover,
+input[type=reset]:hover, button[name="recipient_save"]:hover, #podcast input:hover {
+    background-color: #e6e6e6;
+    border-color: #adadad;
+    color: #414141;
+}
+textarea {
+    height: 113px;
+}
+button[disabled=disabled]:hover,
+input[disabled=disabled]:hover {
+    background: #F5F5F5;
+}
+legend {
+    display: none;
+}
+h1, .h1, h2, .h2, h3, .h3 {margin-top: 0;margin-bottom: 0;}
+fieldset .radio input[type="radio"],fieldset .radio-inline input[type="radio"],fieldset .checkbox input[type="checkbox"],fieldset .checkbox-inline input[type="checkbox"]{margin-left: -17px;}
+fieldset .radio label,fieldset .checkbox label {
+    padding-left: 17px;
+}
+.img-responsive, .thumbnail > img, .thumbnail a > img, .carousel-inner > .item img, .carousel-inner > .item > a > img {
+    display: block;
+    max-width: 102.2%;
+    height: auto;
+}
+/**/
+html {
+    font-family: sans-serif;
+    -ms-text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+    overflow-y: scroll;
+}
+h1 {
+    font-size: 34px;
+    margin: 0;
+}
+button,
+input,
+optgroup,
+select,
+textarea {
+    font-family: arial;
+    color: #414141;
+    font-size: 13px;
+    margin: 0;
+}
+h1,
+.h1 {
+    font-size: 34px;
+}
+h2,
+.h2 {
+    font-size: 22px;
+}
+h3,
+.h3 {
+    font-size: 18px;
+}
+h4,
+.h4 {
+    font-size: 17px;
+}
+h5,
+.h5 {
+    font-size: 16px;
+}
+h6,
+.h6 {
+    font-size: 15px;
+}
+.text-primary, .text-success, .text-info, .text-warning, .text-danger  {
+    padding: 0;
+    margin: 0;
+}
+legend {
+    display: none;
+    padding-bottom: 5px;
+}
+.label:empty {
+    display: block;
+}
+.modal-open {
+    overflow: visible;
+}
+.modal-header {
+    padding: 15px;
+    border-bottom: 0;
+    min-height: 16.42857143px;
+}
+.modal-open .modal {
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+.modal-body {
+    position: relative;
+    padding: 5px;
+    float: left;
+    min-height: 200px;
+    width: 100%;
+}
+modal-footer {
+    border-top: 0;
+}
+.carousel-inner > .item img {
+    line-height: 1;
+}
+.carousel-control {
+    width: auto;
+}
+.carousel-control.left, .carousel-control.right  {
+    background-image: none;
+}
+.carousel-control .icon-next,
+.carousel-control .glyphicon-chevron-right {
+    right: 50%;
+    margin-right: 0;
+}
+.carousel-indicators {
+    bottom: -10px;
+}
+.carousel-indicators .active {
+    width: 10px;
+    height: 10px;
+}
+.carousel-control .glyphicon-chevron-right,
+.carousel-control .icon-next {
+    margin-right: 0;
+}
+.carousel-indicators {
+    bottom: 0;
+}

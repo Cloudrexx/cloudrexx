@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- *
+ * 
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,7 +24,7 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
-
+ 
 /**
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Cloudrexx Development Team <info@cloudrexx.com>
@@ -73,7 +73,9 @@ $_ARRAYLANG['TXT_ACCESS_AVAILABLE_GROUPS'] = "Available Groups";
 $_ARRAYLANG['TXT_ACCESS_AVAILABLE_USERS'] = "Available users";
 $_ARRAYLANG['TXT_ACCESS_BACK'] = "back";
 $_ARRAYLANG['TXT_ACCESS_BACKEND_DESC'] = "Administration console (backend)";
-$_ARRAYLANG['TXT_ACCESS_BIRTHDAYS'] = "Birthdays";
+$_ARRAYLANG['TXT_ACCESS_BIRTHDAYS'] = "Current birthdays";
+$_ARRAYLANG['TXT_ACCESS_NEXT_BIRTHDAYS'] = "Next birthdays";
+$_ARRAYLANG['TXT_ACCESS_NEXT_BIRTHDAYS_DAYS'] = "Number of days";
 $_ARRAYLANG['TXT_ACCESS_CANCEL'] = "Cancel";
 $_ARRAYLANG['TXT_ACCESS_CHANGE_PROFILE_PIC'] = "Change profile picture";
 $_ARRAYLANG['TXT_ACCESS_CHANGE_SORT_DIRECTION'] = "Change sort order";
@@ -142,6 +144,9 @@ $_ARRAYLANG['TXT_ACCESS_GROUP_LIST'] = "Group overview";
 $_ARRAYLANG['TXT_ACCESS_GROUPS'] = "Groups";
 $_ARRAYLANG['TXT_ACCESS_GROUP_STORED_SUCCESSFULLY'] = "The group was saved successfully.";
 $_ARRAYLANG['TXT_ACCESS_GROUP_SUCCESSFULLY_DELETED'] = "The group %s was removed.";
+$_ARRAYLANG['TXT_ACCESS_GROUP_MANAGE_GROUP_RIGHTS_NOT_DELETED'] = "The permission \"%s\" wasn't removed for this group, otherwise your user wouldn't be able to manage groups anymore.";
+$_ARRAYLANG['TXT_ACCESS_GROUP_NOT_DEACTIVATED_DUE_TO_MANAGE_GROUP_RIGHTS'] = "The user group was not deactivated, otherwise your user wouldn't be able to manage groups anymore.";
+$_ARRAYLANG['TXT_ACCESS_GROUP_NOT_DELETED_DUE_TO_MANAGE_GROUP_RIGHTS'] = "The user group was not deleted, otherwise your user wouldn't be able to manage groups anymore.";
 $_ARRAYLANG['TXT_ACCESS_GROUP_TYP'] = "Group type";
 $_ARRAYLANG['TXT_ACCESS_HISTORY'] = "History";
 $_ARRAYLANG['TXT_ACCESS_HTML_UC'] = "HTML";
@@ -339,3 +344,12 @@ $_ARRAYLANG['TXT_ACCESS_USER_ACCOUNT_VERIFICATION'] = "Conformity mandatory ( pr
 $_ARRAYLANG['TXT_ACCESS_USER_ACCOUNT_VERIFICATION_TEXT'] = "The mandatory fields must be checked and set";
 $_ARRAYLANG['TXT_CORE_MODULE_ACCESS_PERMISSION_SET_VIRTUAL_ERROR_MSG'] = "Could not set instance as non-virtual since instance contains callback.";
 $_ARRAYLANG['TXT_CORE_MODULE_ACCESS_PERMISSION_SET_CALLBACK_ERROR_MSG'] = "Could not set callback for non-virtual instance.";
+$_ARRAYLANG['TXT_CORE_MODULE_ACCESS_MANAGE_USERS'] = "Manage users";
+$_ARRAYLANG['TXT_CORE_MODULE_ACCESS_MANAGE_USER_GROUPS'] = "Manage user groups";
+$_ARRAYLANG['TXT_CORE_MODULE_ACCESS_NO_PERMISSION_DELETE_ADMIN_USER'] = "You have not sufficient permission to delete the account %s";
+$_ARRAYLANG['TXT_ACCESS_TOOLBARCONFIGURATOR'] = 'Editor functions';
+$_ARRAYLANG['TXT_ACCESS_READ_ACCESS_TAB_TITLE'] = 'Read access';
+$_ARRAYLANG['TXT_ACCESS_READ_ACCESS_MODIFY_TITLE_TEXT'] = 'Define who shall be granted read access to the data of this attribute of  other users.';
+$_ARRAYLANG['TXT_ACCESS_READ_ACCESS_EVERYONE_MOD_PERM'] = 'Everyone may access this property.';
+$_ARRAYLANG['TXT_ACCESS_READ_ACCESS_SELECT_ALLOWED_MODIFY_GROUPS'] = 'Choose the groups to be allowed to access this property';
+$_ARRAYLANG['TXT_ACCESS_READ_ACCESS_TITLE_TOOLTIP_TEXT'] = "The read access to a user's profile can further be restricted through the attribute %s. In such case, the configuration in this section is noneffective.";

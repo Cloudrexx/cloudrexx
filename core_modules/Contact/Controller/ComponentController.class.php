@@ -51,7 +51,46 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         return array();
     }
 
-     /**
+    /**
+     * Do something after system initialization
+     *
+     * USE CAREFULLY, DO NOT DO ANYTHING COSTLY HERE!
+     * CALCULATE YOUR STUFF AS LATE AS POSSIBLE.
+     * This event must be registered in the postInit-Hook definition
+     * file config/postInitHooks.yml.
+     * @param \Cx\Core\Core\Controller\Cx   $cx The instance of \Cx\Core\Core\Controller\Cx
+     */
+    public function postInit(\Cx\Core\Core\Controller\Cx $cx) {
+        $globalPlaceholders = array(
+            'contactFormEmail' => 'Email',
+            'Company',
+            'Address',
+            'Zip',
+            'Place',
+            'Country',
+            'Phone',
+            'Fax',
+            'coreAdminName' => 'Name',
+        );
+        $widgetController = $this->getComponent('Widget');
+        foreach ($globalPlaceholders as $configIndex=>$placeholder) {
+            if (is_int($configIndex)) {
+                $configIndex = 'contact' . $placeholder;
+            }
+            $widgetController->registerWidget(
+                new \Cx\Core_Modules\Widget\Model\Entity\FinalStringWidget(
+                    $this,
+                    'CONTACT_' . strtoupper($placeholder),
+                    \Cx\Core\Setting\Controller\Setting::getValue(
+                        $configIndex,
+                        'Config'
+                    )
+                )
+            );
+        }
+    }
+
+    /**
      * Load your component.
      *
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
@@ -78,6 +117,26 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             default:
                 break;
         }
+    }
+
+    /**
+     * Do something with a Response object
+     * You may do page alterations here (like changing the metatitle)
+     * You may do response alterations here (like set headers)
+     * PLEASE MAKE SURE THIS METHOD IS MOCKABLE. IT MAY ONLY INTERACT WITH
+     * resolve() HOOK.
+     *
+     * @param \Cx\Core\Routing\Model\Entity\Response $response Response object to adjust
+     */
+    public function adjustResponse(\Cx\Core\Routing\Model\Entity\Response $response) {
+        $params = $response->getRequest()->getUrl()->getParamArray();
+        unset($params['section']);
+        unset($params['cmd']);
+        $canonicalUrl = \Cx\Core\Routing\Url::fromPage($response->getPage(), $params);
+        $response->setHeader(
+            'Link',
+            '<' . $canonicalUrl->toString() . '>; rel="canonical"'
+        );
     }
 
     /**

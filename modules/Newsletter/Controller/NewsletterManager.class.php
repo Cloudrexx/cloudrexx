@@ -668,7 +668,7 @@ class NewsletterManager extends NewsletterLib
                         $this->_impTpl->setVariable(array(
                             'NEWS_CATEGORY_NAME' => $objNews->fields['name']
                         ));
-                        if($current_category == $objNews->fields['catid'])
+                        if($current_category == $objNews->fields['catid'] && $this->_impTpl->blockExists('news_category'))
                             $this->_impTpl->hideBlock("news_category");
                         $current_category = $objNews->fields['catid'];
                         $newsid         = $objNews->fields['newsid'];
@@ -1784,6 +1784,10 @@ class NewsletterManager extends NewsletterLib
                     'active'              => (isset($_POST['recipientWebsite'])),
                     'required'            => (isset($_POST['requiredWebsite'])),
                     ),
+                'captcha'       => array(
+                    'active'              => (isset($_POST['captcha'])),
+                    'required'            => (isset($_POST['requiredCaptcha'])),
+                ),
             );
 
             $objUpdateStatus = $objDatabase->Execute("UPDATE ".DBPREFIX."module_newsletter_settings
@@ -1829,6 +1833,7 @@ class NewsletterManager extends NewsletterLib
             'TXT_NEWSLETTER_PHONE_MOBILE'   => $_ARRAYLANG['TXT_NEWSLETTER_PHONE_MOBILE'],
             'TXT_NEWSLETTER_FAX'            => $_ARRAYLANG['TXT_NEWSLETTER_FAX'],
             'TXT_NEWSLETTER_WEBSITE'        => $_ARRAYLANG['TXT_NEWSLETTER_WEBSITE'],
+            'TXT_NEWSLETTER_CAPTCHA'        => $_ARRAYLANG['TXT_NEWSLETTER_CAPTCHA'],
             'TXT_NEWSLETTER_EMAIL_ADDRESS'  => $_ARRAYLANG['TXT_NEWSLETTER_EMAIL_ADDRESS'],
             'TXT_NEWSLETTER_WEBSITE'        => $_ARRAYLANG['TXT_NEWSLETTER_WEBSITE'],
             'TXT_NEWSLETTER_SALUTATION'     => $_ARRAYLANG['TXT_NEWSLETTER_SALUTATION'],
@@ -2902,8 +2907,6 @@ class NewsletterManager extends NewsletterLib
     ) {
         global $objDatabase, $_ARRAYLANG, $_DBCONFIG;
 
-        require_once ASCMS_LIBRARY_PATH.'/phpmailer/class.phpmailer.php';
-
         $newsletterValues = $this->getNewsletterValues($NewsletterID);
         if ($newsletterValues !== false) {
             $subject      = $newsletterValues['subject'];
@@ -2949,7 +2952,7 @@ class NewsletterManager extends NewsletterLib
         );
         \LinkGenerator::parseTemplate($NewsletterBody_TEXT, true);
 
-        $mail = new \phpmailer();
+        $mail = new \Cx\Core\MailTemplate\Model\Entity\Mail();
         if ($smtpAccount > 0) {
             if (($arrSmtp = \SmtpSettings::getSmtpAccount($smtpAccount)) !== false) {
                 $mail->IsSMTP();
@@ -2960,7 +2963,6 @@ class NewsletterManager extends NewsletterLib
                 $mail->Password = $arrSmtp['password'];
             }
         }
-        $mail->CharSet  = CONTREXX_CHARSET;
         $mail->AddReplyTo($return_path);
         $mail->SetFrom($sender_email, $sender_name);
         $mail->Subject  = $subject;
@@ -3350,7 +3352,11 @@ class NewsletterManager extends NewsletterLib
                 $ReplaceWith = $URLforReplace;
             }
 
-            $content_text = str_replace('"'.$URLforReplace.'"', '"'.$ReplaceWith.'"', $content_text);
+            $content_text = str_replace(
+                '"'.$URLforReplace.'"',
+                '"'. contrexx_raw2encodedUrl($ReplaceWith) .'"',
+                $content_text
+            );
             $i++;
         }
 
@@ -3679,7 +3685,7 @@ class NewsletterManager extends NewsletterLib
                     'NEWS_CATEGORY_NAME' => contrexx_raw2xhtml($objNews->fields['catname']),
                     'NEWS_CATEGORY_ID' => $objNews->fields['catid'],
                 ));
-                if($current_category == $objNews->fields['catid'])
+                if($current_category == $objNews->fields['catid'] && $this->_objTpl->blockExists('news_category'))
                     $this->_objTpl->hideBlock("news_category");
                 $current_category = $objNews->fields['catid'];
 // TODO: Unused
@@ -3781,7 +3787,7 @@ class NewsletterManager extends NewsletterLib
                         $this->_objTpl->setVariable(array(
                             'NEWS_CATEGORY_NAME' => $objNews->fields['name']
                         ));
-                        if($current_category == $objNews->fields['catid'])
+                        if($current_category == $objNews->fields['catid'] && $this->_objTpl->blockExists('news_category'))
                             $this->_objTpl->hideBlock("news_category");
                         $current_category = $objNews->fields['catid'];
                         $newsid         = $objNews->fields['newsid'];

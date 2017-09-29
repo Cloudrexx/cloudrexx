@@ -46,6 +46,9 @@ namespace Cx\Core\Routing\Model\Entity;
  */
 class RewriteRule extends \Cx\Model\Base\EntityBase
 {
+    const REDIRECTION_TYPE_INTERN = 'intern';
+    const REDIRECTION_TYPE_301 = 301;
+    const REDIRECTION_TYPE_302 = 302;
     /**
      * @var integer $id
      */

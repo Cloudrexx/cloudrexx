@@ -129,6 +129,44 @@ class MediaDirectoryManager extends MediaDirectoryLibrary
                 break;
         }
 
+        if (
+            in_array($this->act, array(
+                'delete_entry',
+                'restore_voting',
+                'restore_comments',
+                'confirm_entry',
+                'switchState',
+                'delete_comment',
+                'delete_level',
+                'order_level',
+                'delete_category',
+                'order_category',
+            )) ||
+            (
+                $this->act == 'modify_entry' &&
+                isset($_POST['submitEntryModfyForm']) &&
+                !empty($_POST['formId'])
+            ) ||
+            (
+                $this->act == 'modify_category' &&
+                isset($_POST['submitCategoryModfyForm'])
+            ) ||
+            (
+                $this->act == 'modify_level' &&
+                isset($_POST['submitLevelModfyForm'])
+            ) ||
+            (
+                $this->act == 'interfaces' &&
+                isset($_POST['submitInterfacesForm'])
+            ) ||
+            (
+                $this->act == 'settings' &&
+                isset($_POST['submitSettingsForm'])
+            )
+        ) {
+            \Cx\Core\Core\Controller\Cx::instanciate()->getComponent('Cache')->deleteComponentFiles('MediaDir');
+        }
+
         $objTemplate->setVariable(array(
             'CONTENT_OK_MESSAGE'     => $this->strOkMessage,
             'CONTENT_STATUS_MESSAGE' => $this->strErrMessage,
@@ -758,6 +796,7 @@ class MediaDirectoryManager extends MediaDirectoryLibrary
             'TXT_'.$this->moduleLangVar.'_DEACTIVATE' =>  $_ARRAYLANG['TXT_MEDIADIR_DEAVTIVATE'],
             'TXT_'.$this->moduleLangVar.'_NAME' =>  $_CORELANG['TXT_NAME'],
             'TXT_'.$this->moduleLangVar.'_DESCRIPTION' =>  $_CORELANG['TXT_DESCRIPTION'],
+            'TXT_'.$this->moduleLangVar.'_META_DESCRIPTION' =>  $_CORELANG['TXT_META_DESCRIPTION'],
             'TXT_'.$this->moduleLangVar.'_PICTURE' =>  $_CORELANG['TXT_IMAGE'],
             'TXT_'.$this->moduleLangVar.'_SHOW_SUBCATEGORIES' =>  $_ARRAYLANG['TXT_MEDIADIR_SHOW_SUBCATEGORIES'],
             'TXT_'.$this->moduleLangVar.'_SHOW_ENTRIES' =>  $_ARRAYLANG['TXT_MEDIADIR_SHOW_ENTRIES'],
@@ -801,11 +840,18 @@ class MediaDirectoryManager extends MediaDirectoryLibrary
             } else {
                 $strCategoryDescription = '';
             }
+            //category meta description
+            if (isset($intCategoryId)) {
+                $categoryMetaDescription = empty($objCategory->arrCategories[$intCategoryId]['catMetaDesc'][$arrLang['id']]) ? $objCategory->arrCategories[$intCategoryId]['catMetaDesc'][0] : $objCategory->arrCategories[$intCategoryId]['catMetaDesc'][$arrLang['id']];
+            } else {
+                $categoryMetaDescription = '';
+            }
 
             $this->_objTpl->setVariable(array(
                 $this->moduleLangVar.'_CATEGORY_LANG_ID' => $arrLang['id'],
                 $this->moduleLangVar.'_CATEGORY_NAME' => $strCategoryName,
                 $this->moduleLangVar.'_CATEGORY_DESCRIPTION' => new \Cx\Core\Wysiwyg\Wysiwyg("categoryDescription[{$arrLang['id']}]", $strCategoryDescription),
+                $this->moduleLangVar.'_CATEGORY_META_DESCRIPTION' => $categoryMetaDescription,
                 $this->moduleLangVar.'_CATEGORY_BLOCK_DISPLAY' => $first ? 'display:block;' : 'display:none;'
             ));
 
@@ -985,6 +1031,7 @@ class MediaDirectoryManager extends MediaDirectoryLibrary
             'TXT_'.$this->moduleLangVar.'_DEACTIVATE' =>  $_ARRAYLANG['TXT_MEDIADIR_DEAVTIVATE'],
             'TXT_'.$this->moduleLangVar.'_NAME' =>  $_CORELANG['TXT_NAME'],
             'TXT_'.$this->moduleLangVar.'_DESCRIPTION' =>  $_CORELANG['TXT_DESCRIPTION'],
+            'TXT_'.$this->moduleLangVar.'_META_DESCRIPTION' =>  $_CORELANG['TXT_META_DESCRIPTION'],
             'TXT_'.$this->moduleLangVar.'_PICTURE' =>  $_CORELANG['TXT_IMAGE'],
             'TXT_'.$this->moduleLangVar.'_SHOW_SUBLEVELS' =>  $_ARRAYLANG['TXT_MEDIADIR_SHOW_SUBLEVELS'],
             'TXT_'.$this->moduleLangVar.'_SHOW_CATEGORIES' =>  $_ARRAYLANG['TXT_MEDIADIR_SHOW_CATEGORIES'],
@@ -1031,12 +1078,19 @@ class MediaDirectoryManager extends MediaDirectoryLibrary
             } else {
                 $strLevelDescription = '';
             }
+            //level meta description
+            if (isset($intLevelId)) {
+                $levelMetaDescription = empty($objLevel->arrLevels[$intLevelId]['levelMetaDesc'][$arrLang['id']]) ? $objLevel->arrLevels[$intLevelId]['levelMetaDesc'][0] : $objLevel->arrLevels[$intLevelId]['levelMetaDesc'][$arrLang['id']];
+            } else {
+                $levelMetaDescription = '';
+            }
 
             $this->_objTpl->setVariable(array(
                 $this->moduleLangVar.'_LEVEL_LANG_ID' => $arrLang['id'],
                 $this->moduleLangVar.'_LEVEL_NAME' => $strLevelName,
                 $this->moduleLangVar.'_LEVELS_DROPDOWN_OPTIONS' => $levelDropdown,
                 $this->moduleLangVar.'_LEVEL_DESCRIPTION' => new \Cx\Core\Wysiwyg\Wysiwyg("levelDescription[{$arrLang['id']}]", $strLevelDescription),
+                $this->moduleLangVar.'_LEVEL_META_DESCRIPTION' => $levelMetaDescription,
                 $this->moduleLangVar.'_LEVEL_BLOCK_DISPLAY' => $first ? 'display:block;' : 'display:none;'
             ));
 

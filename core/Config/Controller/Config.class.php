@@ -81,25 +81,32 @@ class Config
     {
         global $objTemplate, $_ARRAYLANG;
 
+        // TODO: instead of including the config section of MultiSite component
+        // (as well as the one of Cache component) directly, the Config
+        // component should provide a method for other components to include
+        // their config sections in the base configuration section
         $componentRepo = \Env::get('cx')->getDb()->getEntityManager()->getRepository('Cx\Core\Core\Model\Entity\SystemComponent');
         $component     = $componentRepo->findOneBy(array('name' => 'multisite'));
 
         $multisiteNavigation = '';
-        if ($component &&
-            \Cx\Core_Modules\MultiSite\Controller\JsonMultiSiteController::isWebsiteOwner() &&
-            \Cx\Core\Setting\Controller\Setting::getValue('websiteFtpUser','MultiSite')
-        ) {
-            $multisiteNavigation = '<a href="index.php?cmd=Config&amp;act=Ftp" class="'.
-                ($this->act == 'Ftp' ? 'active' : '').'">' . $_ARRAYLANG['TXT_SETTINGS_FTP'].'</a>';
+        if ($component) {
+            if (\Cx\Core_Modules\MultiSite\Controller\JsonMultiSiteController::isWebsiteOwner() &&
+                \Cx\Core\Setting\Controller\Setting::getValue('websiteFtpUser','MultiSite')
+            ) {
+                $multisiteNavigation = '<a href="index.php?cmd=Config&amp;act=Ftp" class="'.
+                    ($this->act == 'Ftp' ? 'active' : '').'">' . $_ARRAYLANG['TXT_SETTINGS_FTP'].'</a>';
+            }
+
+            \Cx\Core\Setting\Controller\Setting::init('MultiSite', 'website','FileSystem');
         }
 
-        \Cx\Core\Setting\Controller\Setting::init('MultiSite', 'website','FileSystem');
         $objTemplate->setVariable('CONTENT_NAVIGATION','
             <a href="?cmd=Config" class="'.($this->act == '' ? 'active' : '').'">'.$_ARRAYLANG['TXT_SETTINGS_MENU_SYSTEM'].'</a>'
             .(in_array('CacheManager', \Env::get('cx')->getLicense()->getLegalComponentsList()) ? '<a href="?cmd=Config&amp;act=cache" class="'.($this->act == 'cache' ? 'active' : '').'">'.$_ARRAYLANG['TXT_SETTINGS_MENU_CACHE'].'</a>' : '')  .
             '<a href="?cmd=Config&amp;act=smtp" class="'.($this->act == 'smtp' ? 'active' : '').'">'.$_ARRAYLANG['TXT_EMAIL_SERVER'].'</a>
             <a href="index.php?cmd=Config&amp;act=image" class="'.($this->act == 'image' ? 'active' : '').'">'.$_ARRAYLANG['TXT_SETTINGS_IMAGE'].'</a>'
             .(in_array('Wysiwyg', \Env::get('cx')->getLicense()->getLegalComponentsList()) ? '<a href="index.php?cmd=Config&amp;act=Wysiwyg" class="'.($this->act == 'Wysiwyg' ? 'active' : '').'">'.$_ARRAYLANG['TXT_CORE_WYSIWYG'].'</a>' : '')
+            .(in_array('Pdf', \Env::get('cx')->getLicense()->getLegalComponentsList()) ? '<a href="index.php?cmd=Config&amp;act=Pdf" class="'.($this->act == 'Pdf' ? 'active' : '').'">'.$_ARRAYLANG['TXT_CORE_CONFIG_PDF'].'</a>' : '')
             .(in_array('LicenseManager', \Env::get('cx')->getLicense()->getLegalComponentsList()) ? '<a href="index.php?cmd=License">'.$_ARRAYLANG['TXT_LICENSE'].'</a>' : '')
             . $multisiteNavigation
         );
@@ -187,6 +194,13 @@ class Config
                 }
 
                 break;
+            case 'Pdf':
+                if (!in_array('Pdf', \Env::get('cx')->getLicense()->getLegalComponentsList())) {
+                    \Permission::noAccess();
+                }
+                $boolShowStatus = false;
+                $this->showPdf();
+                break;
 
             case 'cache_update':
                 $boolShowStatus = false;
@@ -265,6 +279,9 @@ class Config
             case 'Settings':
                 $wysiwygBackendController->parsePage($objTpl, array('Settings'));
                 break;
+            case 'Functions':
+                $wysiwygBackendController->parsePage($objTpl, array('Functions'));
+                break;
             case '':
             default:
                 $objTpl->addBlockfile('WYSIWYG_CONFIG_TEMPLATE', 'wysiwyg_template', 'Default.html');
@@ -280,6 +297,16 @@ class Config
         ));
     }
 
+
+    /**
+     * Show PDF
+     */
+    protected function showPdf()
+    {
+        $pdf = Cx::instanciate()->getComponent('Pdf');
+        $pdfBackendController = $pdf->getController('Backend');
+        $pdfBackendController->parsePage(Cx::instanciate()->getTemplate(), array('PdfTemplate'));
+    }
 
     /**
      * Set the cms system settings
@@ -310,7 +337,8 @@ class Config
             'TXT_RADIO_ON'                              => $_ARRAYLANG['TXT_ACTIVATED'],
             'TXT_RADIO_OFF'                             => $_ARRAYLANG['TXT_DEACTIVATED']
             ));
-        if (in_array('SystemInfo', \Env::get('cx')->getLicense()->getLegalComponentsList())) {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        if (in_array('SystemInfo', $cx->getLicense()->getLegalComponentsList())) {
             if (isset($_POST['debugging'])) {
                 $this->updateDebugSettings($_POST['debugging']);
             }
@@ -355,7 +383,7 @@ class Config
                 'TXT_CORE_CONFIG_',
                 !$this->isWritable()
                 );
-        if (in_array('SystemInfo', \Env::get('cx')->getLicense()->getLegalComponentsList())) {
+        if (in_array('SystemInfo', $cx->getLicense()->getLegalComponentsList())) {
             \Cx\Core\Setting\Controller\Setting::show_external(
                 $template,
                 $_ARRAYLANG['TXT_SETTINGS_TITLE_DEVELOPMENT'],
@@ -374,7 +402,7 @@ class Config
 
 
         // show also hidden settins
-        if (   in_array('SystemInfo', \Env::get('cx')->getLicense()->getLegalComponentsList())
+        if (   in_array('SystemInfo', $cx->getLicense()->getLegalComponentsList())
             && \Permission::hasAllAccess()
             && isset($_GET['all'])
         ) {
@@ -424,6 +452,9 @@ class Config
                     true
                     );
         }
+        $scriptPath = $cx->getCodeBaseCoreWebPath() . '/Config/View/Script/Backend.js';
+        \JS::registerJS(substr($scriptPath, 1));
+
         $this->checkFtpAccess();
         $objTemplate->setVariable('SETTINGS_TABLE', $template->get());
         $objTemplate->parse('settings_system');
@@ -464,6 +495,21 @@ class Config
         return implode(',', $options);
     }
 
+    /**
+     * Returns captcha options
+     *
+     * @return string captcha options as string
+     */
+    public static function getCaptchaOptions()
+    {
+        global $_ARRAYLANG;
+
+        $options = array(
+            'contrexxCaptcha:' .  $_ARRAYLANG['TXT_CORE_CONFIG_CONTREXX_CAPTCHA_LABEL'],
+            'reCaptcha:' .  $_ARRAYLANG['TXT_CORE_CONFIG_RECAPTCHA_LABEL']
+        );
+        return implode(',', $options);
+    }
 
     /**
      * Sets debugging related template variables according to session state.
@@ -519,6 +565,7 @@ class Config
             // otherwise, cloudrexx does not activate 'https' when the server doesn't have an ssl certificate installed
             $request->setConfig(array(
                 'ssl_verify_peer' => false,
+                'ssl_verify_host' => false,
             ));
 
             // send the request
@@ -641,7 +688,7 @@ class Config
         }
 
         //get values from ymlsetting
-        \Cx\Core\Setting\Controller\Setting::init('Config', NULL,'Yaml');
+        \Cx\Core\Setting\Controller\Setting::init('Config', NULL,'Yaml', null, \Cx\Core\Setting\Controller\Setting::REPOPULATE);
         $ymlArray = \Cx\Core\Setting\Controller\Setting::getArray('Config', null);
         $intMaxLen = 0;
         $ymlArrayValues = array();
@@ -704,6 +751,10 @@ class Config
         try {
             $objFile = new \Cx\Lib\FileSystem\File(self::getSettingsFile());
             $objFile->write($data);
+
+            // Drop complete cache (page and ESI)
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $cx->getComponent('Cache')->clearCache();
             return true;
         } catch (\Cx\Lib\FileSystem\FileSystemException $e) {
             \DBG::msg($e->getMessage());
@@ -1202,7 +1253,7 @@ class Config
                     throw new \Cx\Lib\Update_DatabaseException("Failed to add Setting entry for Auto Detect Language");
             }
             if (!\Cx\Core\Setting\Controller\Setting::isDefined('coreGlobalPageTitle')
-                && !\Cx\Core\Setting\Controller\Setting::add('coreGlobalPageTitle', isset($existingConfig['coreGlobalPageTitle']) ? $existingConfig['coreGlobalPageTitle'] : 'Contrexx Example Website', 3,
+                && !\Cx\Core\Setting\Controller\Setting::add('coreGlobalPageTitle', isset($existingConfig['coreGlobalPageTitle']) ? $existingConfig['coreGlobalPageTitle'] : 'Cloudrexx Example Website', 3,
                 \Cx\Core\Setting\Controller\Setting::TYPE_TEXT, null, 'site')){
                     throw new \Cx\Lib\Update_DatabaseException("Failed to add Setting entry for Global Page Title");
             }
@@ -1237,15 +1288,25 @@ class Config
                     throw new \Cx\Lib\Update_DatabaseException("Failed to add Setting entry for Protocol In Use");
             }
             if (!\Cx\Core\Setting\Controller\Setting::isDefined('portFrontendHTTP')
-                && !\Cx\Core\Setting\Controller\Setting::add('portFrontendHTTP', isset($existingConfig['portFrontendHTTP']) ? $existingConfig['portFrontendHTTP'] : 80, 1,
+                && !\Cx\Core\Setting\Controller\Setting::add('portFrontendHTTP', isset($existingConfig['portFrontendHTTP']) ? $existingConfig['portFrontendHTTP'] : 80, 10,
                 \Cx\Core\Setting\Controller\Setting::TYPE_TEXT, null, 'site')){
                     \DBG::log("Failed to add Setting entry for core HTTP Port (Frontend)");
                     throw new \Cx\Lib\Update_DatabaseException("Failed to add Setting entry for core HTTP Port (Frontend)");
             }
             if (!\Cx\Core\Setting\Controller\Setting::isDefined('portFrontendHTTPS')
-                && !\Cx\Core\Setting\Controller\Setting::add('portFrontendHTTPS', isset($existingConfig['portFrontendHTTPS']) ? $existingConfig['portFrontendHTTPS'] : 443, 1,
+                && !\Cx\Core\Setting\Controller\Setting::add('portFrontendHTTPS', isset($existingConfig['portFrontendHTTPS']) ? $existingConfig['portFrontendHTTPS'] : 443, 11,
                 \Cx\Core\Setting\Controller\Setting::TYPE_TEXT, null, 'site')){
                     throw new \Cx\Lib\Update_DatabaseException("Failed to add Setting entry for core HTTPS Port (Frontend)");
+            }
+            if (!\Cx\Core\Setting\Controller\Setting::isDefined('favicon')
+                && !\Cx\Core\Setting\Controller\Setting::add('favicon', 'favicon.ico', 12,
+                \Cx\Core\Setting\Controller\Setting::TYPE_IMAGE, '{"type":"copy"}', 'site')) {
+                    throw new \Cx\Lib\Update_DatabaseException("Failed to add Setting entry for favicon");
+            }
+            if (!\Cx\Core\Setting\Controller\Setting::isDefined('defaultLocaleId')
+                && !\Cx\Core\Setting\Controller\Setting::add('defaultLocaleId',  isset($existingConfig['defaultLocaleId']) ? $existingConfig['defaultLocaleId'] : 1, 13,
+                    \Cx\Core\Setting\Controller\Setting::TYPE_DROPDOWN, '{src:\\'.__CLASS__.'::getLocales()}', 'site') ) {
+                throw new \Cx\Lib\Update_DatabaseException("Failed to add Setting entry for default Locale (Frontend)");
             }
 
             //administrationArea group
@@ -1256,7 +1317,7 @@ class Config
                     throw new \Cx\Lib\Update_DatabaseException("Failed to add Setting entry for Dashboard News");
             }
             if (!\Cx\Core\Setting\Controller\Setting::isDefined('dashboardNewsSrc')
-                && !\Cx\Core\Setting\Controller\Setting::add('dashboardNewsSrc', isset($existingConfig['dashboardNewsSrc']) ? $existingConfig['dashboardNewsSrc'] : 'http://www.contrexx.com/feed/news_headlines_de.xml', 1,
+                && !\Cx\Core\Setting\Controller\Setting::add('dashboardNewsSrc', isset($existingConfig['dashboardNewsSrc']) ? $existingConfig['dashboardNewsSrc'] : 'http://www.cloudrexx.com/feed/news_headlines_de.xml', 1,
                     \Cx\Core\Setting\Controller\Setting::TYPE_TEXT, null, 'component')){
                 throw new \Cx\Lib\Update_DatabaseException("Failed to add Setting entry for dashboardNewsSrc");
             }
@@ -1283,7 +1344,7 @@ class Config
 
             if (in_array('SystemInfo', \Env::get('cx')->getLicense()->getLegalComponentsList())) {
                 if (!\Cx\Core\Setting\Controller\Setting::isDefined('dnsServer')
-                    && !\Cx\Core\Setting\Controller\Setting::add('dnsServer', isset($existingConfig['dnsServer']) ? $existingConfig['dnsServer'] : 'ns1.contrexxhosting.com', 6,
+                    && !\Cx\Core\Setting\Controller\Setting::add('dnsServer', isset($existingConfig['dnsServer']) ? $existingConfig['dnsServer'] : '8.8.8.8', 6,
                     \Cx\Core\Setting\Controller\Setting::TYPE_TEXT, null, 'administrationArea')){
                         throw new \Cx\Lib\Update_DatabaseException("Failed to add Setting entry for Dns Server");
                 }
@@ -1308,6 +1369,11 @@ class Config
                 \Cx\Core\Setting\Controller\Setting::TYPE_TEXT, null, 'administrationArea')){
                     throw new \Cx\Lib\Update_DatabaseException("Failed to add Setting entry for core HTTPS Port (Backend)");
             }
+            if (!\Cx\Core\Setting\Controller\Setting::isDefined('defaultLanguageId')
+                && !\Cx\Core\Setting\Controller\Setting::add('defaultLanguageId',  isset($existingConfig['defaultLanguageId']) ? $existingConfig['defaultLanguageId'] : 1, 9,
+                    \Cx\Core\Setting\Controller\Setting::TYPE_DROPDOWN, '{src:\\'.__CLASS__.'::getBackendLanguages()}', 'administrationArea') ) {
+                throw new \Cx\Lib\Update_DatabaseException("Failed to add Setting entry for default language (Backend)");
+            }
 
             //security group
             \Cx\Core\Setting\Controller\Setting::init('Config', 'security','Yaml', $configPath);
@@ -1320,6 +1386,54 @@ class Config
                 && !\Cx\Core\Setting\Controller\Setting::add('passwordComplexity', isset($existingConfig['passwordComplexity']) ? $existingConfig['passwordComplexity'] : 'off', 2,
                 \Cx\Core\Setting\Controller\Setting::TYPE_RADIO, 'on:TXT_ACTIVATED,off:TXT_DEACTIVATED', 'security')){
                     throw new \Cx\Lib\Update_DatabaseException("Failed to add Setting entry for Passwords must meet the complexity requirements");
+            }
+            if (
+                !\Cx\Core\Setting\Controller\Setting::isDefined('captchaMethod') &&
+                !\Cx\Core\Setting\Controller\Setting::add(
+                    'captchaMethod',
+                    (isset($existingConfig['captchaMethod'])
+                        ? $existingConfig['captchaMethod']
+                        : 'contrexxCaptcha'
+                    ),
+                    3,
+                    \Cx\Core\Setting\Controller\Setting::TYPE_DROPDOWN,
+                    '{src:\\'.__CLASS__.'::getCaptchaOptions()}',
+                    'security'
+                )
+            ) {
+                throw new \Cx\Lib\Update_DatabaseException("Failed to add Setting entry for Security check Captcha");
+            }
+            if (
+                !\Cx\Core\Setting\Controller\Setting::isDefined('recaptchaSiteKey') &&
+                !\Cx\Core\Setting\Controller\Setting::add(
+                    'recaptchaSiteKey',
+                    (isset($existingConfig['recaptchaSiteKey'])
+                        ? $existingConfig['recaptchaSiteKey']
+                        : ''
+                    ),
+                    4,
+                    \Cx\Core\Setting\Controller\Setting::TYPE_TEXT,
+                    null,
+                    'security'
+                )
+            ) {
+                throw new \Cx\Lib\Update_DatabaseException("Failed to add Setting entry for reCAPTCHA site key");
+            }
+            if (
+                !\Cx\Core\Setting\Controller\Setting::isDefined('recaptchaSecretKey') &&
+                !\Cx\Core\Setting\Controller\Setting::add(
+                    'recaptchaSecretKey',
+                    (isset($existingConfig['recaptchaSecretKey'])
+                        ? $existingConfig['recaptchaSecretKey']
+                        : ''
+                    ),
+                    5,
+                    \Cx\Core\Setting\Controller\Setting::TYPE_TEXT,
+                    null,
+                    'security'
+                )
+            ) {
+                throw new \Cx\Lib\Update_DatabaseException("Failed to add Setting entry for reCAPTCHA secret key");
             }
 
             //contactInformation group
@@ -1530,7 +1644,7 @@ class Config
                     throw new \Cx\Lib\Update_DatabaseException("Failed to add Setting entry for coreCmsEdition");
             }
             if (!\Cx\Core\Setting\Controller\Setting::isDefined('coreCmsVersion')
-                && !\Cx\Core\Setting\Controller\Setting::add('coreCmsVersion', isset($existingConfig['coreCmsVersion']) ? $existingConfig['coreCmsVersion'] : '4.0.0', 1,
+                && !\Cx\Core\Setting\Controller\Setting::add('coreCmsVersion', isset($existingConfig['coreCmsVersion']) ? $existingConfig['coreCmsVersion'] : '5.0.0', 1,
                 \Cx\Core\Setting\Controller\Setting::TYPE_TEXT, null, 'release')){
                     throw new \Cx\Lib\Update_DatabaseException("Failed to add Setting entry for coreCmsVersion");
             }
@@ -1550,7 +1664,7 @@ class Config
                     throw new \Cx\Lib\Update_DatabaseException("Failed to add Setting entry for coreCmsReleaseDate");
             }
             if (!\Cx\Core\Setting\Controller\Setting::isDefined('coreCmsName')
-                && !\Cx\Core\Setting\Controller\Setting::add('coreCmsName', isset($existingConfig['coreCmsName']) ? $existingConfig['coreCmsName'] : 'Contrexx', 1,
+                && !\Cx\Core\Setting\Controller\Setting::add('coreCmsName', isset($existingConfig['coreCmsName']) ? $existingConfig['coreCmsName'] : 'Cloudrexx', 1,
                 \Cx\Core\Setting\Controller\Setting::TYPE_TEXT, null, 'release')){
                     throw new \Cx\Lib\Update_DatabaseException("Failed to add Setting entry for coreCmsName");
             }
@@ -1716,6 +1830,12 @@ class Config
                     \Cx\Core\Setting\Controller\Setting::TYPE_TEXT, null, 'cache')){
                         throw new \Cx\Lib\Update_DatabaseException("Failed to add Setting entry for cacheUserCacheMemcacheConfig");
                 }
+                // The following is temporary until the LanguageManager replacement (component 'Locale') is here:
+                if (!\Cx\Core\Setting\Controller\Setting::isDefined('useVirtualLanguageDirectories')
+                    && !\Cx\Core\Setting\Controller\Setting::add('useVirtualLanguageDirectories', isset($existingConfig['useVirtualLanguageDirectories']) ? $existingConfig['useVirtualLanguageDirectories'] : 'on', 1,
+                    \Cx\Core\Setting\Controller\Setting::TYPE_RADIO, 'on:TXT_ACTIVATED,off:TXT_DEACTIVATED', 'lang')){
+                        throw new \Cx\Lib\Update_DatabaseException("Failed to add Setting entry for useVirtualLanguageDirectories");
+                }
             }
         } catch (\Exception $e) {
             \DBG::msg($e->getMessage());
@@ -1735,6 +1855,42 @@ class Config
         $display = array();
         foreach ($domains As $domain) {
             $display[] = $domain->getId() . ':' . $domain->getNameWithPunycode();
+        }
+        return implode(',', $display);
+    }
+
+    /**
+     * Shows all backend languages
+     *
+     * @access  public
+     * @return  string
+     */
+    public static function getBackendLanguages() {
+        $cx = Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $backendLangRepo = $em->getRepository('Cx\Core\Locale\Model\Entity\Backend');
+        $languages = $backendLangRepo->findAll();
+        $display = array();
+        foreach ($languages As $language) {
+            $display[] = $language->getId() . ':' . $language->getIso1();
+        }
+        return implode(',', $display);
+    }
+
+    /**
+     * Shows all locales
+     *
+     * @access  public
+     * @return  string
+     */
+    public static function getLocales() {
+        $cx = Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $localeRepository = $em->getRepository('Cx\Core\Locale\Model\Entity\Locale');
+        $locales = $localeRepository->findAll();
+        $display = array();
+        foreach ($locales As $locale) {
+            $display[] = $locale->getId() . ':' . $locale->getLabel();
         }
         return implode(',', $display);
     }

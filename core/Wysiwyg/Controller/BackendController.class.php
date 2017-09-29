@@ -114,6 +114,39 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
 
                 $template->setVariable('WYSIWYG_CONFIG_TEMPLATE', $tmpl->get());
                 break;
+            case 'Functions':
+                $toolbarController = $this->getController('Toolbar');
+                // check if the toolbar shall be saved
+                if (isset($_POST) && isset($_POST['save'])) {
+                    // Get the database connection
+                    $dbCon = $this->cx->getDb()->getAdoDb();
+                    // Check if there is already a default toolbar
+                    $defaultToolbar = $dbCon->Execute('
+                        SELECT `id` FROM `' . DBPREFIX . 'core_wysiwyg_toolbar`
+                        WHERE `is_default` = 1
+                        LIMIT 1');
+                    // Check if the query did not fail
+                    if (!$defaultToolbar) {
+                        throw new \Exception('Failed to check for existing default toolbar!');
+                    }
+                    // Get the default toolbar id
+                    $toolbarId = $defaultToolbar->fields['id'];
+                    $toolbarController->store(
+                        $_POST['removedButtons'],
+                        $toolbarId,
+                        true
+                    );
+                }
+                $toolbarConfigurator = $toolbarController->getToolbarConfiguratorTemplate(
+                    $this->getDirectory(false, true),
+                    true
+                );
+                // Get the template and replace the placeholder
+                $template->setVariable(
+                    'WYSIWYG_CONFIG_TEMPLATE',
+                    $toolbarConfigurator->get()
+                );
+                break;
             case '':
             default:
                 if ($template->blockExists('overview')) {
@@ -262,7 +295,7 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
      * @param string $entityClassName contains the FQCN from entity
      * @return array array containing the options
      */
-    protected function getViewGeneratorOptions($entityClassName) {
+    protected function getViewGeneratorOptions($entityClassName, $dataSetIdentifier = '') {
         global $_ARRAYLANG;
 
         $classNameParts = explode('\\', $entityClassName);

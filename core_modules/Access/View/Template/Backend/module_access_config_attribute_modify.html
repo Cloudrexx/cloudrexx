@@ -17,6 +17,7 @@ function accessSwitchType(selectedType)
     document.getElementById('access_attribute_mandatory_frame').style.display = accessMandatoryTypeList.in_array(selectedType) ? '' : 'none';
     document.getElementById('access_attribute_sort_frame_row').setAttribute('class', accessSortableTypeList.in_array(selectedType) && accessMandatoryTypeList.in_array(selectedType) ? 'row1' : 'row2');
     document.getElementById('accessPermissionTab').style.display = ['group', 'frame', 'menu_option'].in_array(selectedType) ? 'none' : '';
+    document.getElementById('accessReadTab').style.display = ['group', 'frame', 'menu_option'].in_array(selectedType) ? 'none' : '';
   document.getElementById('accessChildrenTab').style.display = ['frame', 'history'].in_array(selectedType) ? '' : 'none';
   document.getElementById('accessMenuOptionTab').style.display = selectedType == 'menu' ? '' : 'none';
   document.getElementById('accessFramesTab').style.display = ['group'].in_array(selectedType) ? '': 'none';
@@ -183,6 +184,10 @@ function accessChangeAttributeSort(id, direction, elFrame, elChildren)
   return void(0);
 }
 
+function accessGroups(){
+    accessSelectAllGroups(document.getElementById('access_attribute_associated_groups'));
+    accessSelectAllGroups(document.getElementById('read_access_attribute_associated_groups'));
+}
 function accessSwitchSortType(sortType)
 {
   displayStyle = sortType == 'custom' ? 'inline' : 'none';
@@ -227,11 +232,12 @@ function accessSwitchSortType(sortType)
 <ul id="tabmenu">
 <li><a id="accessTab_modifyAttribute1" class="active" href="javascript:void(0);" onclick="selectTab('modifyAttribute1')" title="{TXT_ACCESS_GENERAL}">{TXT_ACCESS_GENERAL}</a></li>
 <li id="accessPermissionTab" style="display:{ACCESS_PERMISSON_TAB_DISPLAY};"><a id="accessTab_modifyAttribute2" href="javascript:void(0);" onclick="selectTab('modifyAttribute2')" title="{TXT_ACCESS_MODIFICATION_ACCESS}">{TXT_ACCESS_MODIFICATION_ACCESS}</a></li>
+<li id="accessReadTab"><a id="accessTab_modifyAttribute6" href="javascript:void(0);" onclick="selectTab('modifyAttribute6')" title="{TXT_ACCESS_READ_ACCESS_TAB_TITLE}">{TXT_ACCESS_READ_ACCESS_TAB_TITLE}</a></li>
 <li id="accessChildrenTab" style="display:{ACCESS_CHILDREN_TAB_DISPLAY};"><a id="accessTab_modifyAttribute3" href="javascript:void(0);" onclick="selectTab('modifyAttribute3')" title="{TXT_ACCESS_PROFILE_ATTRIBUTES}">{TXT_ACCESS_PROFILE_ATTRIBUTES}</a></li>
 <li id="accessMenuOptionTab" style="display:{ACCESS_MENU_OPTION_TAB_DISPLAY};"><a id="accessTab_modifyAttribute4" href="javascript:void(0);" onclick="selectTab('modifyAttribute4')" title="{TXT_ACCESS_SELECT_OPTIONS}">{TXT_ACCESS_SELECT_OPTIONS}</a></li>
   <li id="accessFramesTab" style="display:{ACCESS_FRAMES_TAB_DISPLAY};"><a id="accessTab_modifyAttribute5" href="javascript:void(0);" onclick="selectTab('modifyAttribute5')" title="{TXT_ACCESS_FRAMES}">{TXT_ACCESS_FRAMES}</a></li>
 </ul>
-<form action="index.php?cmd=Access&amp;act=config&amp;tpl=modifyAttribute&amp;id={ACCESS_ATTRIBUTE_ID}" id="accessModifyAttributeForm" onsubmit="accessSelectAllGroups(document.getElementById('access_attribute_associated_groups'))" method="post">
+<form action="index.php?cmd=Access&amp;act=config&amp;tpl=modifyAttribute&amp;id={ACCESS_ATTRIBUTE_ID}" id="accessModifyAttributeForm" onsubmit="accessGroups()" method="post">
   <!-- start modifyAttribute1 div -->
   <div id="modifyAttribute1" class="accessTab" style="display:block">
     <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
@@ -316,9 +322,7 @@ function accessSwitchSortType(sortType)
             </div>
             <div style="width:300px; float:left; display:block;">
               {TXT_ACCESS_AVAILABLE_GROUPS}<br />
-              <select name="access_attribute_not_associated_groups[]" id="access_attribute_not_associated_groups" size="15" style="width:300px;" multiple="multiple">
               {ACCESS_ATTRIBUTE_NOT_ASSOCIATED_GROUPS}
-              </select>
               <br />
               <a href="javascript:void(0);" onclick="accessSelectAllGroups(document.getElementById('access_attribute_not_associated_groups'))" title="{TXT_ACCESS_CHECK_ALL}">{TXT_ACCESS_CHECK_ALL}</a>
               <br />
@@ -329,9 +333,7 @@ function accessSwitchSortType(sortType)
             </div>
             <div style="float:left; display:block;">
               {TXT_ACCESS_ASSOCIATED_GROUPS}<br />
-              <select name="access_attribute_associated_groups[]" id="access_attribute_associated_groups" size="15" style="width:300px;" multiple="multiple">
               {ACCESS_USER_ASSOCIATED_GROUPS}
-              </select>
               <br />
               <a href="javascript:void(0);" onclick="accessSelectAllGroups(document.getElementById('access_attribute_associated_groups'))" title="{TXT_ACCESS_CHECK_ALL}">{TXT_ACCESS_CHECK_ALL}</a>
               <br />
@@ -351,6 +353,57 @@ function accessSwitchSortType(sortType)
     </table>
   </div>
   <!-- end modifyAttribute2 div -->
+  <!-- start modifyAttribute6 div -->
+  <div id="modifyAttribute6" class="accessTab" style="display:none">
+    <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist" id="read_access_attribute_access_frame" style="display:{ACCESS_ATTRIBUTE_ACCESS_FRAME_DISPLAY};">
+      <thead>
+        <tr>
+          <th colspan="3">{ACCESS_PROFILE_OPERATION_TITLE}</th>
+        </tr>
+      </thead>
+      <tbody style="vertical-align:top;">
+        <tr class="row1">
+          <td>
+            {TXT_ACCESS_READ_ACCESS_MODIFY_TITLE_TEXT}<span class="tooltip-trigger icon-info"></span>
+             <span class="tooltip-message" style="visibility: visible; position: absolute; top: 192px; left: 1071.36px; display: none;">{TXT_ACCESS_READ_ACCESS_TITLE_TOOLTIP_TEXT}</span>
+            <br />
+            <br />
+            <input type="checkbox" name="read_access_attribute_all_access" id="read_access_attribute_all_access" style="border:0px; background-color:#F4F7FF;" value="1" {ACCESS_READ_ACCESS_ATTRIBUTE_ACCESS_ALL_CHECKED} onclick="document.getElementById('read_access_attribute_select_access_frame').style.display = this.checked ? 'none' : ''" /><label for="read_access_attribute_all_access">{TXT_ACCESS_READ_ACCESS_EVERYONE_MOD_PERM}</label>
+          </td>
+        </tr>
+        <tr class="row2" id="read_access_attribute_select_access_frame" style="display:{ACCESS_READ_ACCESS_ATTRIBUTE_SELECT_ACCESS_DISPLAY};">
+          <td>
+            <div style="display:block;">
+              {TXT_ACCESS_READ_ACCESS_SELECT_ALLOWED_MODIFY_GROUPS}
+              <br />
+              <br />
+            </div>
+            <div style="width:300px; float:left; display:block;">
+              {TXT_ACCESS_AVAILABLE_GROUPS}<br />
+              {ACCESS_READ_ACCESS_ATTRIBUTE_NOT_ASSOCIATED_GROUPS}
+              <br />
+              <a href="javascript:void(0);" onclick="accessSelectAllGroups(document.getElementById('read_access_attribute_not_associated_groups'))" title="{TXT_ACCESS_CHECK_ALL}">{TXT_ACCESS_CHECK_ALL}</a>
+              <br />
+              <a href="javascript:void(0);" onclick="accessDeselectAllGroups(document.getElementById('read_access_attribute_not_associated_groups'))" title="{TXT_ACCESS_UNCHECK_ALL}">{TXT_ACCESS_UNCHECK_ALL}</a>
+            </div>
+            <div style="width:45px; float:left; text-align:center; display:block;">
+              <br /><input type="button" value="&gt;&gt;" name="adduser" onclick="accessAddGroupToList(document.getElementById('read_access_attribute_not_associated_groups'), document.getElementById('read_access_attribute_associated_groups'))" style="margin-bottom:2px;" /><br />
+              <input type="button" value="&lt;&lt;" name="removeuser" onclick="accessRemoveGroupFromList(document.getElementById('read_access_attribute_not_associated_groups'), document.getElementById('read_access_attribute_associated_groups'))" />
+            </div>
+            <div style="float:left; display:block;">
+              {TXT_ACCESS_ASSOCIATED_GROUPS}<br />
+              {ACCESS_READ_ACCESS_USER_ASSOCIATED_GROUPS}
+              <br />
+              <a href="javascript:void(0);" onclick="accessSelectAllGroups(document.getElementById('read_access_attribute_associated_groups'))" title="{TXT_ACCESS_CHECK_ALL}">{TXT_ACCESS_CHECK_ALL}</a>
+              <br />
+              <a href="javascript:void(0);" onclick="accessDeselectAllGroups(document.getElementById('read_access_attribute_associated_groups'))" title="{TXT_ACCESS_UNCHECK_ALL}">{TXT_ACCESS_UNCHECK_ALL}</a>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <!-- end modifyAttribute6 div -->
   <!-- start modifyAttribute3 div -->
   <div id="modifyAttribute3" class="accessTab" style="display:none">
     <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist" id="access_attribute_child_frame">

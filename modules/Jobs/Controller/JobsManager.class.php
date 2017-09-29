@@ -245,15 +245,13 @@ class JobsManager extends JobsLibrary
         ));
         $query = "SELECT n.id AS jobsId, n.date, n.changelog,
                          n.title, n.status, n.author,
-                         l.name,
+                         n.lang,
                          nc.name AS catname,
                          n.userid
                     FROM ".DBPREFIX."module_jobs_categories AS nc,
-                         ".DBPREFIX."module_jobs AS n,
-                         ".DBPREFIX."languages AS l
+                         ".DBPREFIX."module_jobs AS n
                          $locationFilter
-                         n.lang=l.id
-                     AND n.lang=$this->langId
+                     n.lang=$this->langId
                      AND $docFilter nc.catid=n.catid
                    ORDER BY n.id DESC";
         $objResult = $objDatabase->Execute($query);
@@ -265,7 +263,13 @@ class JobsManager extends JobsLibrary
             $this->_objTpl->hideBlock('row');
             return;
         }
+        // get array containing the active locale ids
+        $activeLangIds = \FWLanguage::getIdArray('frontend');
         while ($objResult !== false && !$objResult->EOF) {
+            // check if the job has assigned an existing language
+            if (!in_array($objResult->fields['lang'], $activeLangIds)) {
+                $objResult->MoveNext();
+            }
             $statusPicture = ($objResult->fields['status']==1) ? "status_green.gif" : "status_red.gif";
             $jobUser = \FWUser::getFWUserObject()->objUser->getUser($objResult->fields['userid']);
             $username = $_ARRAYLANG['TXT_ACCESS_UNKNOWN'];

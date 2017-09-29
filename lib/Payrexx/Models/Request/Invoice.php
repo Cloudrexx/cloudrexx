@@ -30,6 +30,9 @@ class Invoice extends \Payrexx\Models\Base
     protected $amount = 0;
     protected $currency = '';
 
+    protected $successRedirectUrl;
+    protected $failedRedirectUrl;
+
     protected $subscriptionState = false;
     protected $subscriptionInterval = '';
     protected $subscriptionPeriod = '';
@@ -104,7 +107,7 @@ class Invoice extends \Payrexx\Models\Base
     /**
      * Set the payment service provider to use, a
      * list of available payment service providers (short psp)
-     * can be found here: http://developers.payrexx.com/en/REST-API/Miscellaneous
+     * can be found here: http://developers.payrexx.com/docs/miscellaneous
      *
      * @param int $psp
      */
@@ -181,13 +184,49 @@ class Invoice extends \Payrexx\Models\Base
     /**
      * Set the corresponding payment currency for the amount.
      * You can use the ISO Code.
-     * A list of available currencies you can find on http://developers.payrexx.com/en/REST-API/Miscellaneous
+     * A list of available currencies you can find on http://developers.payrexx.com/docs/miscellaneous
      *
      * @param string $currency
      */
     public function setCurrency($currency)
     {
         $this->currency = $currency;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSuccessRedirectUrl()
+    {
+        return $this->successRedirectUrl;
+    }
+
+    /**
+     * Set the URL to redirect to after a successful payment
+     *
+     * @param string $successRedirectUrl
+     */
+    public function setSuccessRedirectUrl($successRedirectUrl)
+    {
+        $this->successRedirectUrl = $successRedirectUrl;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFailedRedirectUrl()
+    {
+        return $this->failedRedirectUrl;
+    }
+
+    /**
+     * Set the url to redirect to after a failed payment
+     *
+     * @param string $failedRedirectUrl
+     */
+    public function setFailedRedirectUrl($failedRedirectUrl)
+    {
+        $this->failedRedirectUrl = $failedRedirectUrl;
     }
 
     /**
@@ -308,7 +347,7 @@ class Invoice extends \Payrexx\Models\Base
      * @param string $type the type of field
      *                     can be: title, forename, surname, company, street, postcode,
      *                     place, phone, country, email, date_of_birth, terms, custom_field_1,
-     *                     custom_field_2, custom_field_3
+     *                     custom_field_2, custom_field_3, custom_field_4, custom_field_5
      * @param boolean $mandatory TRUE if the field has to be filled out for payment
      * @param string $defaultValue the default value. This value will be editable for the client.
      *                             for the title of a customer you can set mister / miss

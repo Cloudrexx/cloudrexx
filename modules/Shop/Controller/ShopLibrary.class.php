@@ -90,33 +90,20 @@ die("ShopLibrary::shopSendmail(): Obsolete method called");
         // replace cr/lf by lf only
         $shopMailBody = preg_replace('/\015\012/', "\012", $shopMailBody);
 
-        if (@include_once ASCMS_LIBRARY_PATH.'/phpmailer/class.phpmailer.php') {
-            $objMail = new \phpmailer();
-            if (   isset($_CONFIG['coreSmtpServer'])
-                && $_CONFIG['coreSmtpServer'] > 0
-                && @include_once ASCMS_CORE_PATH.'/SmtpSettings.class.php') {
-                if (($arrSmtp = SmtpSettings::getSmtpAccount($_CONFIG['coreSmtpServer'])) !== false) {
-                    $objMail->IsSMTP();
-                    $objMail->Host = $arrSmtp['hostname'];
-                    $objMail->Port = $arrSmtp['port'];
-                    $objMail->SMTPAuth = true;
-                    $objMail->Username = $arrSmtp['username'];
-                    $objMail->Password = $arrSmtp['password'];
-                }
-            }
-            $objMail->CharSet = CONTREXX_CHARSET;
-            $from = preg_replace('/\015\012/', "\012", $shopMailFrom);
-            $fromName = preg_replace('/\015\012/', "\012", $shopMailFromText);
-            $objMail->AddReplyTo($_CONFIG['coreAdminEmail']);
-            $objMail->SetFrom($from, $fromName);
-            $objMail->Subject = $shopMailSubject;
-            $objMail->IsHTML(false);
-            $objMail->Body = $shopMailBody;
-            $objMail->AddAddress($shopMailTo);
-            if ($objMail->Send()) {
-                return true;
-            }
+        $objMail = new \Cx\Core\MailTemplate\Model\Entity\Mail();
+
+        $from = preg_replace('/\015\012/', "\012", $shopMailFrom);
+        $fromName = preg_replace('/\015\012/', "\012", $shopMailFromText);
+        $objMail->AddReplyTo($_CONFIG['coreAdminEmail']);
+        $objMail->SetFrom($from, $fromName);
+        $objMail->Subject = $shopMailSubject;
+        $objMail->IsHTML(false);
+        $objMail->Body = $shopMailBody;
+        $objMail->AddAddress($shopMailTo);
+        if ($objMail->Send()) {
+            return true;
         }
+
         return false;
  */
     }
@@ -407,8 +394,17 @@ die("ShopLibrary::shopSetMailTemplate(): Obsolete method called");
      */
     static function getSubstitutionArray()
     {
+        // fetch shop country name
+        $countryId = \Cx\Core\Setting\Controller\Setting::getValue('country_id','Shop');
+        $country = \Cx\Core\Country\Controller\Country::getNameById($countryId);
+
         return array(
-            'SHOP_COMPANY' => \Cx\Core\Setting\Controller\Setting::getValue('company','Shop'),
+            'SHOP_COMPANY'  => \Cx\Core\Setting\Controller\Setting::getValue('company','Shop'),
+            'SHOP_ADDRESS'  => \Cx\Core\Setting\Controller\Setting::getValue('address','Shop'),
+            'SHOP_TELEPHONE'=> \Cx\Core\Setting\Controller\Setting::getValue('telephone','Shop'),
+            'SHOP_FAX'      => \Cx\Core\Setting\Controller\Setting::getValue('fax','Shop'),
+            'SHOP_COUNTRY'  => $country,
+            'SHOP_EMAIL'    => \Cx\Core\Setting\Controller\Setting::getValue('email','Shop'),
             'SHOP_HOMEPAGE' => \Cx\Core\Routing\Url::fromModuleAndCmd(
                 'Shop', '', FRONTEND_LANG_ID)->toString(),
         );

@@ -5,14 +5,18 @@ function getMediaBrowser(e) { // e => jQuery element
         isImageField = e.data('isImage'),
         mediaBrowseInputBox = $J('#' + inputId);
     cx.variables.get('jquery','mediabrowser')('#mediabrowser_button').trigger('click', {
-        callback: function(data) {
-            if (data.type == "file") {
+        callback: function (data) {
+            if (data.type === 'file') {
                 var path = data.data[0].datainfo.filepath;
                 mediaBrowseInputBox.val(path);
                 mediaBrowseInputBox.trigger('keyup');
-                if (isImageField && $J('#'+ inputId +'_preview')) {
-                    changeImagePreview($J('#'+ inputId +'_preview'), path);
+                if (isImageField && $J('#' + inputId + '_preview')) {
+                    changeImagePreview($J('#' + inputId + '_preview'), path);
                 }
+            } else if (data.type === 'page') {
+                var node = data.data[0].node;
+                mediaBrowseInputBox.val(node);
+                mediaBrowseInputBox.trigger('keyup');
             }
         },
         cxMbViews : e.data('views'),

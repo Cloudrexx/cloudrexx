@@ -45,7 +45,7 @@ $_ARRAYLANG['regularExpression'] = 'Regulärer Ausdruck';
 $_ARRAYLANG['TXT_CORE_ROUTING_REGULAR_EXPRESSION_TOOLTIP'] = '<a href="http://de.wikipedia.org/wiki/Regulärer_Ausdruck" target="_blank">Regulärer Ausdruck</a>, der verwendet wird, um die Anfrage-Adresse in die Zieladresse umzuschreiben. Beispiel: <b>#/shop\.example\.com/#/example.com/de/Shop/#</b>.';
 $_ARRAYLANG['orderNo'] = 'Sortiernummer';
 $_ARRAYLANG['rewriteStatusCode'] = 'HTTP Statuscode der Weiterleitung';
-$_ARRAYLANG['TXT_CORE_ROUTING_REWRITE_STATUS_CODE_TOOLTIP'] = 'Wählen Sie 302 wenn die Anfrage-Adresse weiterhin gültig ist, ansonsten 301. <a href="https://de.wikipedia.org/wiki/HTTP-Statuscode#3xx_.E2.80.93_Umleitung" target="_blank">Weitere Informationen</a>';
+$_ARRAYLANG['TXT_CORE_ROUTING_REWRITE_STATUS_CODE_TOOLTIP'] = 'Wählen Sie 302 wenn die Anfrage-Adresse weiterhin gültig ist, ansonsten 301. <a href="https://de.wikipedia.org/wiki/HTTP-Statuscode#3xx_.E2.80.93_Umleitung" target="_blank">Weitere Informationen</a><br />Wählen Sie "Intern" wenn Sie die Anfrage-Adresse in der Adresszeile des Browsers beibehalten möchten.';
 $_ARRAYLANG['continueOnMatch'] = 'Fortfahren nach Treffer';
 $_ARRAYLANG['TXT_CORE_ROUTING_CONTINUE_ON_MATCH_TOOLTIP'] = 'Sollen, sofern diese Regel zutrifft, trotzdem die nächsten Regeln (falls vorhanden) bearbeitet werden?';
 

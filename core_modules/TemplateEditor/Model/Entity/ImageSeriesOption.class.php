@@ -48,7 +48,7 @@ class ImageSeriesOption extends Option
      *
      * @var array
      */
-    protected $urls;
+    protected $urls = array();
 
     /**
      * @param String $name Name of the option
@@ -58,6 +58,9 @@ class ImageSeriesOption extends Option
     public function __construct($name, $translations, $data)
     {
         parent::__construct($name, $translations, $data);
+        if (!is_array($data['urls'])) {
+            return;
+        }
         foreach ($data['urls'] as $key => $url) {
             if (!empty($url)) {
                 $this->urls[$key] = $url;

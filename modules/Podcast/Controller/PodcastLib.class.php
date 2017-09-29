@@ -308,7 +308,7 @@ class PodcastLib
         if ($objCategory !== false) {
             while (!$objCategory->EOF) {
                 if ($langId !== false) {
-                    $arrLangIds = &$this->_getLangIdsOfCategory($objCategory->fields['id']);
+                    $arrLangIds = $this->_getLangIdsOfCategory($objCategory->fields['id']);
                     if (!in_array($_LANGID, $arrLangIds)) {
                         $objCategory->MoveNext();
                         continue;
@@ -1276,7 +1276,7 @@ EOF;
             }
 
             $column = $categoryNr % 3;
-            $arrCatLangIds = &$this->_getLangIdsOfCategory($categoryId);
+            $arrCatLangIds = $this->_getLangIdsOfCategory($categoryId);
             array_walk($arrCatLangIds, create_function('&$cat, $k, $arrLanguages', '$cat = $arrLanguages[$cat]["lang"];'), $arrLanguages);
             $arrCategory['title'] .= ' ('.implode(', ', $arrCatLangIds).')';
 

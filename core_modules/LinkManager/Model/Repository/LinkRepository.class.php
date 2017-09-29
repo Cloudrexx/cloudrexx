@@ -100,6 +100,9 @@ class LinkRepository extends \Doctrine\ORM\EntityRepository {
      */
     public function getSelectedLinks($ids = array())
     {
+        if (empty($ids)) {
+            return;
+        }
         try {
             $query = $this->getEntityManager()->createQuery('SELECT l FROM Cx\Core_Modules\LinkManager\Model\Entity\Link l WHERE l.id IN ('.implode(',', $ids).')');
             $objResult = $query->getResult();

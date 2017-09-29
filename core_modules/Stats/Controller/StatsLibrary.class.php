@@ -138,12 +138,6 @@ class StatsLibrary
                 $searchTermPlain = contrexx_addslashes($_REQUEST['term']);
             }
 
-            if (isset($_SERVER['HTTP_REFERER'])) {
-                $referer = urlencode($_SERVER['HTTP_REFERER']);
-            } else {
-                $referer = "";
-            }
-
             $ascms_core_module_web_path = $this->cx->getCodeBaseCoreModuleWebPath();
             $counterTag = file_get_contents(dirname(dirname(__FILE__)).'/Data/stats_script.html');
             $replaces = array(
@@ -151,7 +145,7 @@ class StatsLibrary
                 '[PAGEID]'          => $pageId,
                 '[SEARCHTERM]'      => $searchTerm,
                 '[SEARCHTERM_PLAIN]'=> $searchTermPlain,
-                '[REFERER]'         => $referer,
+                '[REFERER]'         => '$(HTTP_REFERER)',
             );
             foreach ($replaces as $from => $to) {
                 $counterTag = str_replace($from, $to, $counterTag);

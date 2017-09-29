@@ -76,26 +76,24 @@ class SurveyLibrary {
 
 
     /**
-     * Creates an array containing all frontend-languages. Example: $arrValue[$langId]['short'] or $arrValue[$langId]['long']
+     * Creates an array containing all frontend-languages.
      *
-     * @global     object        $objDatabase
+     * Contents:
+     * $arrValue[$langId]['short']        =>    For Example: en, de, fr, de-CH, ...
+     * $arrValue[$langId]['long']        =>    For Example: 'English', 'Deutsch', 'French', ...
+     *
      * @return    array        $arrReturn
      */
     function createLanguageArray() {
-        global $objDatabase;
 
         $arrReturn = array();
-        $objResult = $objDatabase->Execute('SELECT id,
-                                                           lang,
-                                                           FROM    '.DBPREFIX.'languages
-                                                           WHERE frontend=1
-                                                           ORDER BY id');
-                if ($objResult) {
-                    while (!$objResult->EOF) {
-                        $arrReturn[$objResult->fields['id']] = array('short' => $objResult->fields['lang']);
-                        $objResult->MoveNext();
-                    }
-                }
+
+        foreach (\FWLanguage::getActiveFrontendLanguages() as $frontendLanguage) {
+            $arrReturn[$frontendLanguage['id']] = array(
+                'short' =>  stripslashes($frontendLanguage['lang']),
+                'long'  =>  htmlentities(stripslashes($frontendLanguage['name']),ENT_QUOTES, CONTREXX_CHARSET)
+            );
+        }
 
         return $arrReturn;
     }

@@ -356,6 +356,7 @@ class Search
         if (!$objResult || $objResult->EOF) {
             return array();
         }
+        $config = \Env::get('config');
         $max_length = intval($config['searchDescriptionLength']);
         $arraySearchResults = array();
         while (!$objResult->EOF) {

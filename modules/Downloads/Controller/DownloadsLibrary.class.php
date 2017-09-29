@@ -70,7 +70,8 @@ class DownloadsLibrary
         'updated_file_count'            => 5,
         'new_file_time_limit'           => 604800,
         'updated_file_time_limit'       => 604800,
-        'associate_user_to_groups'      => ''
+        'associate_user_to_groups'      => '',
+        'list_downloads_current_lang'   => 1
     );
 
     /**
@@ -353,7 +354,7 @@ class DownloadsLibrary
     {
         global $_ARRAYLANG;
 
-        $menu = '<select name="downloads_download_mime_type" id="downloads_download_mime_type" style="width:300px;">';
+        $menu = '<select name="downloads_download_mime_type" id="downloads_download_mime_type" style="width:300px;display:block;">';
         $arrMimeTypes = Download::$arrMimeTypes;
         foreach ($arrMimeTypes as $type => $arrMimeType) {
             $menu .= '<option value="'.$type.'"'.($type == $selectedType ? ' selected="selected"' : '').'>'.$_ARRAYLANG[$arrMimeType['description']].'</option>';
