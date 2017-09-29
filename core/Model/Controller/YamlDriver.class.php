@@ -51,7 +51,7 @@ class YamlDriver extends \Doctrine\ORM\Mapping\Driver\YamlDriver
     /**
      * {@inheritdoc}
      */
-    public function loadMetadataForClass($className, \Doctrine\ORM\Mapping\ClassMetadataInfo $metadata)
+    public function loadMetadataForClass($className, \Doctrine\Common\Persistence\Mapping\ClassMetadata $metadata)
     {
         $element = $this->getElement($className, true);
         // Customizing for Cloudrexx: YamlEntity extension
@@ -69,7 +69,7 @@ class YamlDriver extends \Doctrine\ORM\Mapping\Driver\YamlDriver
      */
     public function getElement($className, $raw = false)
     {
-        $result = $this->_loadMappingFile($this->_findMappingFile($className));
+        $result = $this->loadMappingFile($this->locator->findMappingFile($className));
         if (!$raw && $result[$className]['type'] == 'YamlEntity') {
             $result[$className]['type'] = 'entity';
         }

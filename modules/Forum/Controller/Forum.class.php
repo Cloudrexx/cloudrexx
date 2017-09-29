@@ -99,9 +99,6 @@ class Forum extends ForumLibrary {
             case 'cat':
                 $this->showCategory($_GET['id']);
                 break;
-            case 'userinfo':
-                $this->showProfile($_GET['id']);
-                break;
             case 'notification':
                 $this->showNotifications();
                 break;
@@ -400,7 +397,7 @@ class Forum extends ForumLibrary {
      */
     function showForum($intForumId)
     {
-        global $objDatabase, $_ARRAYLANG, $objCache, $_LANGID, $_CORELANG;
+        global $objDatabase, $_ARRAYLANG, $_LANGID, $_CORELANG;
 
         if ($intForumId == 0) {
             //wrong id, redirect
@@ -617,7 +614,7 @@ class Forum extends ForumLibrary {
      */
     function showThread($intThreadId)
     {
-        global $objDatabase, $_ARRAYLANG, $objCache;
+        global $objDatabase, $_ARRAYLANG;
 
         $objFWUser = \FWUser::getFWUserObject();
         $this->_communityLogin();
@@ -1292,14 +1289,13 @@ class Forum extends ForumLibrary {
      */
     function _sendNotifications($intThreadId, $strSubject, $strContent){
         global $objDatabase, $_CONFIG;
-        require_once(ASCMS_LIBRARY_PATH.'/phpmailer/class.phpmailer.php');
 
         $arrTempSubcribers = array();
         $arrSubscribers = array();
 
         $intCategoryId = $this->_getCategoryIdFromThread($intThreadId);
 
-        $mail =new \PHPMailer();
+        $mail  = new \Cx\Core\MailTemplate\Model\Entity\Mail();
         $query = '    SELECT `subject`, `user_id` FROM `'.DBPREFIX.'module_forum_postings`
                     WHERE `thread_id` = '.$intThreadId.'
                     AND `prev_post_id` = 0';
@@ -1344,7 +1340,6 @@ class Forum extends ForumLibrary {
         }
 
         if(!empty($arrSubscribers)){
-            $mail->CharSet = CONTREXX_CHARSET;
             $mail->IsHTML(false);
             $mail->SetFrom($this->_arrSettings['notification_from_email'], $this->_arrSettings['notification_from_name']);
             $strThreadURL = 'http://'.$_CONFIG['domainUrl'].CONTREXX_SCRIPT_PATH.'?section=Forum&cmd=thread&id='.$intThreadId;
@@ -1560,39 +1555,6 @@ class Forum extends ForumLibrary {
         } else {
             //no forums in database
         }
-    }
-
-    /**
-     * show the user profile - adapted from the community module
-     *
-     * @param integer $userId as in `access_users`
-     * @return void
-     */
-    function showProfile($userId)
-    {
-        global $objDatabase;
-        $this->_communityLogin();
-        $userId = intval($userId);
-        $objResult = $objDatabase->SelectLimit("SELECT email, firstname, lastname, street, zip, phone, mobile, residence, profession, interests, webpage, company FROM ".DBPREFIX."access_users WHERE id=".$userId);
-        if ($objResult !== false) {
-            $this->_objTpl->setVariable(array(
-                'COMMUNITY_FIRSTNAME'    => $objResult->fields['firstname'],
-                'COMMUNITY_LASTNAME'    => $objResult->fields['lastname'],
-                'COMMUNITY_STREET'        => $objResult->fields['street'],
-                'COMMUNITY_ZIP'            => $objResult->fields['zip'],
-                'COMMUNITY_RESIDENCE'    => $objResult->fields['residence'],
-                'COMMUNITY_PROFESSION'    => $objResult->fields['profession'],
-                'COMMUNITY_INTERESTS'    => $objResult->fields['interests'],
-                'COMMUNITY_WEBPAGE'        => preg_replace('#(http://)?(www\.)?([a-zA-Z][a-zA-Z0-9-/]+\.[a-zA-Z][a-zA-Z0-9-/&\#\+=\?\.;%]+)#i', '<a href="http://$2$3"> $2$3 </a>' , $objResult->fields['webpage']),
-                'COMMUNITY_EMAIL'        => $objResult->fields['email'],
-                'COMMUNITY_COMPANY'        => $objResult->fields['company'],
-                'COMMUNITY_PHONE'        => $objResult->fields['phone'],
-                'COMMUNITY_MOBILE'        => $objResult->fields['mobile'],
-            ));
-        }else{
-            die('DB error: '.$objDatabase->ErrorMsg());
-        }
-        $this->_objTpl->setVariable("FORUM_REFERER", $_SERVER['HTTP_REFERER']);
     }
 
     /**

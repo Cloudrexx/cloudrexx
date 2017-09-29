@@ -19,15 +19,17 @@
 <!-- BEGIN news_menu -->
 <form name="formNews" id="filter-form" method="post" action="index.php?section=News&amp;cmd={NEWS_CMD}">
     {NEWS_CAT_DROPDOWNMENU}
-    <!-- BEGIN tagFilterCont -->
+    <!-- BEGIN news_headlines_filter_tags -->
     <div class="news-frm-full-width tag-filter-cont">
+        <!-- BEGIN news_headlines_filter_tag -->
         <div id="tag-filter">
             <p>{NEWS_FILTER_TAG_NAME}</p>
             <p id="remove-tag-filter">&nbsp;</p>
         </div>
         <input type="hidden" name="tag" id='tag-filter-value' value="{NEWS_FILTER_TAG_NAME}" />
+        <!-- END news_headlines_filter_tag -->
     </div>
-    <!-- END tagFilterCont -->
+    <!-- END news_headlines_filter_tags -->
 </form>
 <!-- END news_menu -->
 <!-- BEGIN news_list -->

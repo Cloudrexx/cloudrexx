@@ -1608,6 +1608,8 @@ if ($test === NULL) {
                 \Cx\Core\Setting\Controller\Setting::getValue('numof_coupon_per_page_backend','Shop'),
             'SHOP_SETTING_NUMOF_PRODUCTS_PER_PAGE_FRONTEND' =>
                 \Cx\Core\Setting\Controller\Setting::getValue('numof_products_per_page_frontend','Shop'),
+            'SHOP_SETTING_NUM_CATEGORIES_PER_ROW' =>
+                \Cx\Core\Setting\Controller\Setting::getValue('num_categories_per_row','Shop'),
 
 // TODO: Use \Cx\Core\Setting\Controller\Setting::show(), and add a proper setting type!
             'SHOP_SETTING_USERGROUP_ID_CUSTOMER' =>
@@ -2895,7 +2897,7 @@ if ($test === NULL) {
         ));
 // TODO: TEST
         $count = NULL;
-        $orders = Orders::getArray($count, NULL, array(), \Paging::getPosition(),
+        $orders = Orders::getArray($count, NULL, array('customer_id' => $objCustomer->id()), \Paging::getPosition(),
                 \Cx\Core\Setting\Controller\Setting::getValue('numof_orders_per_page_backend','Shop'));
         $i = 1;
         foreach ($orders as $order) {

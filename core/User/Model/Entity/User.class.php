@@ -675,6 +675,16 @@ class User extends \Cx\Model\Base\EntityBase {
     }
 
     /**
+     * Remove the group
+     * 
+     * @param \Cx\Core\User\Model\Entity\Group $group
+     */
+    public function removeGroup(\Cx\Core\User\Model\Entity\Group $group) {
+        $group->removeUser($this);
+        $this->group->removeElement($group);
+    }
+    
+    /**
      * Get group
      *
      * @return Doctrine\Common\Collections\Collection $group

@@ -87,6 +87,13 @@ class googleMap
         $this->mapId = $id;
     }
 
+    /**
+     * Get the ID of the GoogleMap
+     */
+    public function getMapId() {
+        return $this->mapId;
+    }
+
 
 
     function setMapDimensions($width, $height)
@@ -155,69 +162,18 @@ class googleMap
     }
 
 
-
-    private function getMapMarkers()
-    {
-        $markers = '';
+    /**
+     * Load the registered map markers into JavaScript
+     */
+    protected function loadMapMarkers() {
+        $markers = array();
         foreach ($this->mapMarkers as $id => $marker) {
             if($marker['lon'] >= 0 && $marker['lat'] >= 0) {
-                if ($marker['click'] != null) {
-                    $click = "google.maps.event.addListener(marker$id, \"click\", function() {
-                        ".$marker['click']."
-                    });";
-                } else {
-                    $click = '';
-                }
-
-                if ($marker['mouseover'] != null) {
-                    $mouseover = "google.maps.event.addListener(marker$id, \"mouseover\", function() {
-                        ".$marker['mouseover']."
-                    });";
-                } else {
-                    $mouseover = '';
-                }
-
-                if ($marker['mouseout'] != null) {
-                    $mouseout = "google.maps.event.addListener(marker$id, \"mouseout\", function() {
-                        ".$marker['mouseout']."
-                    });";
-                } else {
-                    $mouseout = '';
-                }
-
-                if (!$marker['hideInfo']) {
-                    $showInfo = "infowindow_{$this->mapIndex}.setContent(info$id);infowindow_{$this->mapIndex}.open(map_{$this->mapIndex}, marker$id)";
-                } else {
-                    $showInfo = '';
-                }
-
-                $km = 10;
-                $factor = 0.009009009009009;
-                $dist = $km*$factor;
-
-                $divLatPlus = $marker['lat']+$dist;
-                $divLatMinus = $marker['lat']-$dist;
-                $divLonPlus = $marker['lon']+$dist;
-                $divLonMinus = $marker['lon']-$dist;
-                
-                $markers .= "                
-                var point$id = new google.maps.LatLng(".$marker['lat'].", ".$marker['lon'].");
-                var marker$id = new google.maps.Marker({
-                        position: point$id,
-                        map: map_".$this->mapIndex."
-                });
-                var info$id = '".$marker['info']."';
-
-                ".$click."
-                ".$mouseover."
-                ".$mouseout."
-                ".$showInfo."
-
-                ";
+                $markers[$id] = $marker;
             }
         }
 
-        return $markers;
+        \ContrexxJavascript::getInstance()->setVariable('map_'.$this->mapIndex.'_markers', $markers, $this->mapId);
     }
 
 
@@ -236,12 +192,12 @@ class googleMap
 
     private function getOverviewMap()
     {
+        \JS::activate('cx');
+
         $layer = '<div id="'.$this->mapId.'" '.$this->mapClass.' '.$this->mapDimensions.'></div>';
 
-        $markers = $this->getMapMarkers();
+        $this->loadMapMarkers();
         $map = "map_".$this->mapIndex;
-        $initialize = "initialize_".$this->mapIndex;
-        $tmpGoogleMapOnLoad = "tmpGoogleMapOnLoad_".$this->mapIndex;
 
         $layer .= <<<EOF
 <script src="https://maps.googleapis.com/maps/api/js?key=$this->apiKey&sensor=false&v=3"></script>
@@ -249,26 +205,48 @@ class googleMap
 //<![CDATA[
 var $map;
 
-function $initialize() {
+cx.ready(function() {
     $map = new google.maps.Map(document.getElementById("$this->mapId"));
+    cx.variables.set('map_{$this->mapIndex}', $map, '$this->mapId');
     $this->mapCenter
 
     $map.setCenter(center);
     $map.setZoom($this->mapZoom);
 
     $map.setMapTypeId(google.maps.MapTypeId.$this->mapType);
-    var infowindow_$this->mapIndex = new google.maps.InfoWindow();
+    infoWindow = new google.maps.InfoWindow();
+    cx.variables.set('map_{$this->mapIndex}_infoWindow', infoWindow, '$this->mapId');
 
-    $markers
-}
+    var mapMarkers = cx.variables.get('map_{$this->mapIndex}_markers', '$this->mapId');
+    for (var key in mapMarkers) {
+        if (!mapMarkers.hasOwnProperty(key)) {
+            continue;
+        }
 
-var $tmpGoogleMapOnLoad = window.onload; 
-window.onload = function() { 
-	if($tmpGoogleMapOnLoad){
-		$tmpGoogleMapOnLoad();
-    } 
-    $initialize(); 
-}
+        mapMarker = mapMarkers[key];
+        mapMarker.marker = new google.maps.Marker({
+            position: new google.maps.LatLng(mapMarker.lat, mapMarker.lon),
+            map: map_$this->mapIndex
+        });
+
+        if (mapMarker.click) {
+            google.maps.event.addListener(mapMarker.marker, 'click', Function(mapMarker.click));
+        }
+
+        if (mapMarker.mouseover) {
+            google.maps.event.addListener(mapMarker.marker, 'mouseover', mapMarker.mouseover);
+        }
+
+        if (mapMarker.mouseout) {
+            google.maps.event.addListener(mapMarker.marker, 'mouseout', mapMarker.mouseout);
+        }
+
+        if (!mapMarker.hideInfo) {
+            infoWindow.setContent(mapMarker.info);
+            infoWindow.open('map_$this->mapIndex', mapMarker.marker);
+        }
+    }
+});
 //]]>
 </script>
 EOF;

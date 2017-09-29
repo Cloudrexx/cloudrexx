@@ -1246,7 +1246,7 @@ class KnowledgeAdmin extends KnowledgeLibrary
         die();
 
         print $_GET['order'];
-        $order = explode("articlelist\[\]=", $_GET['order']);
+        $order = explode("articlelist[]=", $_GET['order']);
 
         foreach ($order as $sort => $id) {
             $id = intval($id);

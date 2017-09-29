@@ -342,10 +342,13 @@ class Sorting
                 ? $_CORELANG['TXT_CORE_SORTING_ASCENDING']
                 : $_CORELANG['TXT_CORE_SORTING_DESCENDING']
             );
+        $img = \Cx\Core\Core\Controller\Cx::instanciate()->getClassLoader()->getWebFilePath(
+            \Cx\Core\Core\Controller\Cx::instanciate()->getCoreFolderName() . '/Core/View/Media/icons/'.
+            strtolower($this->orderDirection).
+            '.png'
+        );
         return
-            '<img src="'.\Env::get('cx')->getCodeBaseOffsetPath().'/core/Core/View/Media/icons/'.
-                strtolower($this->orderDirection).
-            '.png" border="0" alt="'.$orderDirectionString.
+            '<img src="'.$img.'" border="0" alt="'.$orderDirectionString.
             '" title="'.$orderDirectionString.'" />';
     }
 

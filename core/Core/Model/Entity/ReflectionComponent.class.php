@@ -127,7 +127,7 @@ class ReflectionComponent {
             $metaTypes = array('core'=>'core', 'core_module'=>'system', 'module'=>'application', 'lib'=>'other');
             $yaml = new \Symfony\Component\Yaml\Yaml();
             $content = file_get_contents(ASCMS_APP_CACHE_FOLDER . '/meta.yml');
-            $meta = $yaml->load($content);
+            $meta = $yaml->parse($content);
             $type = array_key_exists($meta['DlcInfo']['type'], $metaTypes) ? $meta['DlcInfo']['type'] : 'lib';
 
             // initialize ReflectionComponent
@@ -322,7 +322,7 @@ class ReflectionComponent {
         // Read meta file
         $yaml = new \Symfony\Component\Yaml\Yaml();
         $content = file_get_contents(ASCMS_APP_CACHE_FOLDER . '/meta.yml');
-        $meta = $yaml->load($content);
+        $meta = $yaml->parse($content);
 
         // Check dependencies
         echo "Checking  dependencies ... ";
@@ -388,7 +388,7 @@ class ReflectionComponent {
 
         $classes = array();
         foreach (glob($ymlDirectory.'/*.yml') as $yml) {
-            $ymlArray  = \Symfony\Component\Yaml\Yaml::load($yml);
+            $ymlArray  = \Symfony\Component\Yaml\Yaml::parse($yml);
             $classes[] = $em->getClassMetadata(key($ymlArray));
         }
 
@@ -598,7 +598,7 @@ class ReflectionComponent {
             // Read meta file
             $yaml = new \Symfony\Component\Yaml\Yaml();
             $content = file_get_contents($componentFolder . '/meta.yml');
-            $meta = $yaml->load($content);
+            $meta = $yaml->parse($content);
             if (isset($meta['DlcInfo']['additionalFiles'])) {
                 foreach ($meta['DlcInfo']['additionalFiles'] as $additionalFile) {
                     $srcPath = $websitePath. '/'. $additionalFile;
@@ -1685,8 +1685,12 @@ class ReflectionComponent {
         // fix namespaces in DB
         // at the moment, only log_entry stores namespaces so we can simply:
         $em = \Env::get('cx')->getDb()->getEntityManager();
-        $query = $em->createQuery('SELECT FROM Cx\Core\ContentManager\Model\Entity\LogEntry l WHERE l.object_class LIKE \'' . $ns . '%\'');
-        foreach ($query->getResult() as $log) {
+        $qb = $em->createQueryBuilder();
+        $qb->select('l')
+                ->from('Cx\Core\ContentManager\Model\Entity\LogEntry', 'l')
+                ->where('l.objectClass LIKE :objectClass')
+                ->setParameter('objectClass', $ns . '%');
+        foreach ($qb->getQuery()->getResult() as $log) {
             $object_class = $log->getObjectClass();
             $object_class = preg_replace(
                 '/' . preg_quote($oldNs . '\\', '/') . '/',

@@ -112,9 +112,12 @@ class EntityBase {
      */
     public function getComponentController() {
         $matches = array();
-        preg_match('/Cx\\\\(?:Core|Core_Modules|Modules)\\\\([^\\\\]*)\\\\/', get_class($this), $matches);
+        preg_match('/Cx\\\\(?:Core|Core_Modules|Modules)\\\\([^\\\\]*)\\\\|Cx\\\\Model\\\\Proxies\\\\Cx(?:Core_Modules|Core|Modules)([^\\\\]*)ModelEntity/', get_class($this), $matches);
         if (empty($matches[1])) {
-            throw new \Exception('Could not find component name');
+            if (empty($matches[2])) {
+                throw new \Exception('Could not find component name');
+            }
+            $matches[1] = $matches[2];
         }
         $em = $this->cx->getDb()->getEntityManager();
         $componentRepo = $em->getRepository('Cx\Core\Core\Model\Entity\SystemComponent');
@@ -163,6 +166,16 @@ class EntityBase {
         }
         if(count($errors) > 0)
             throw new ValidationException($errors);
+    }
+
+    /**
+     * Route methods like getName(), getType(), getDirectory(), etc.
+     * @param string $methodName Name of method to call
+     * @param array $arguments List of arguments for the method to call
+     * @return mixed Return value of the method to call
+     */
+    public function __call($methodName, $arguments) {
+        return call_user_func_array(array($this->getComponentController(), $methodName), $arguments);
     }
 
     public function __toString() {

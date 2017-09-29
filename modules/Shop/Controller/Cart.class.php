@@ -124,13 +124,21 @@ class Cart
         if (!include_once(\Cx\Core\Core\Controller\Cx::instanciate()->getCodeBaseLibraryPath() . '/PEAR/Services/JSON.php')) {
             die('Could not load JSON library');
         }
+
+        // Get amount of products in cart.
+        // Only fetch from session if session has been initialized.
+        $itemCount = 0;
+        if (Shop::hasSession()) {
+            $itemCount = $_SESSION['shop']['cart']['total_items'];
+        }
+
         $arrCart = array(
             'items' => self::$products,
             'total_price' => Currency::formatPrice(
                   self::get_price()
                 + (Vat::isEnabled() && !Vat::isIncluded()
                     ? self::get_vat_amount() : 0)),
-            'item_count' => $_SESSION['shop']['cart']['total_items'],
+            'item_count' => $itemCount,
             'unit' => Currency::getActiveCurrencySymbol()
         );
         $objJson = new \Services_JSON();
@@ -448,6 +456,9 @@ class Cart
         global $_ARRAYLANG;
 
 //DBG::log("Cart::update(): Cart: ".var_export($_SESSION['shop']['cart'], true));
+        if (!Shop::hasSession()) {
+            return true;
+        }
         if (empty($_SESSION['shop']['cart'])) {
             self::init();
             return true;//self::get_products_array();

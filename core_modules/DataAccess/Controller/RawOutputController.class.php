@@ -152,8 +152,17 @@ class RawOutputController extends OutputController {
         }
         $data = $data['data'];
 
+        if (!is_array($data)) {
+            switch (gettype($data)) {
+                default:
+                    var_export($data);
+                    echo static::LINE_END;
+                    return;
+            }
+        }
+
         if (!count($data)) {
-            return '(Empty set)' . "\n";
+            return '(Empty set)' . static::LINE_END;
         }
         return $this->tablify($data);
     }

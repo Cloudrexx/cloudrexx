@@ -35,6 +35,7 @@ namespace Cx\Core\MediaSource\Model\Entity;
 
 
 interface File {
+    public function getFileSystem();
     public function getPath();
     public function getName();
     public function getFullName();

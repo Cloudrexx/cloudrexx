@@ -718,7 +718,8 @@ class MediaManager extends MediaLibrary
                         'MEDIA_FILE_NAME_PRE'       => 'preview_' . $fileName,
                         'MEDIA_FILE_NAME_IMG_HREF'  => $mediaWebPath . $fileName,
                         'MEDIA_FILE_NAME_IMG_SRC'   => $thumb,
-                        'MEDIA_FILE_NAME_IMG_SIZE'  => $thumbnails[0]['size']
+                        // TODO: size of thumbnails not supported by ThumbnailGenerator
+                        //'MEDIA_FILE_NAME_IMG_SIZE'  => $thumbnails[0]['size']
                     ));
                     $this->_objTpl->parse('mediaShowThumbnail');
 

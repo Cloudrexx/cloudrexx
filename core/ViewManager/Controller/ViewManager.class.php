@@ -117,6 +117,16 @@ class ViewManager
         'headlines8.html',
         'headlines9.html',
         'headlines10.html',
+        'headlines11.html',
+        'headlines12.html',
+        'headlines13.html',
+        'headlines14.html',
+        'headlines15.html',
+        'headlines16.html',
+        'headlines17.html',
+        'headlines18.html',
+        'headlines19.html',
+        'headlines20.html',
         'events.html',
         'events2.html',
         'events3.html',
@@ -127,6 +137,16 @@ class ViewManager
         'events8.html',
         'events9.html',
         'events10.html',
+        'events11.html',
+        'events12.html',
+        'events13.html',
+        'events14.html',
+        'events15.html',
+        'events16.html',
+        'events17.html',
+        'events18.html',
+        'events19.html',
+        'events20.html',
         'javascript.js',
         'buildin_style.css',
         'directory.html',
@@ -163,43 +183,59 @@ class ViewManager
 
     private $themeRepository;
 
+    /**
+     * @var \Cx\Core\Core\Controller\Cx
+     */
+    protected $cx;
+
+    /**
+     * @var \Cx\Core\ViewManager\Model\Entity\ViewManagerFileSystem
+     */
+    protected $fileSystem;
+
     public $arrWebPaths;                      // array web paths
     public $getAct;                           // $_GET['act']
     public $getPath;                          // $_GET['path']
     public $path;                             // current path
     public $webPath;                          // current web path
-    public $codeBasePath;                     // code base path
     public $websitePath;                      // website path
-    public $codeBaseThemesPath;               // code base themes path
     public $websiteThemesPath;                // website themes path
-    public $codeBaseThemesFilePath;           // default codebase current themes path
-    public $websiteThemesFilePath;            // website current themes path
     public $tableExists;                      // Table exists
     public $oldTable;                         // old Theme-Table name
 
     private $act = '';
 
+    /**
+     * The doctrine entity manager
+     * @var \Doctrine\ORM\EntityManager
+     */
+    protected $em;
 
     function __construct()
     {
-        global  $_ARRAYLANG, $objTemplate, $objDatabase;
+        global  $_ARRAYLANG, $objDatabase;
 
+        $this->cx         = \Cx\Core\Core\Controller\Cx::instanciate();
+        $this->fileSystem = $this->cx->getMediaSourceManager()->getMediaType('themes')->getFileSystem();
+
+        $this->em = \Cx\Core\Core\Controller\Cx::instanciate()
+            ->getDb()
+            ->getEntityManager();
         //add preview.gif to required files
         $this->filenames[] = \Cx\Core\View\Model\Entity\Theme::THEME_PREVIEW_FILE;
+
         //get path variables
-        $this->path = \Env::get('cx')->getWebsiteThemesPath() . '/';
-        $this->arrWebPaths  = array(\Env::get('cx')->getWebsiteThemesWebPath() . '/');
-        $this->codeBasePath = \Env::get('cx')->getCodeBaseDocumentRootPath() . '/';
-        $this->codeBaseThemesPath = \Env::get('cx')->getCodeBaseThemesPath() . '/';
-        $this->websitePath  = \Env::get('cx')->getWebsiteDocumentRootPath() . '/';
-        $this->websiteThemesPath  = \Env::get('cx')->getWebsiteThemesPath() . '/';
-        $this->themeZipPath = '/themezips/';
-        $this->_archiveTempWebPath = \Env::get('cx')->getWebsiteTempWebPath() . $this->themeZipPath;
-        $this->_archiveTempPath = \Env::get('cx')->getWebsiteTempPath() . $this->themeZipPath;
+        $this->path                 = $this->cx->getWebsiteThemesPath() . '/';
+        $this->arrWebPaths          = array($this->cx->getWebsiteThemesWebPath() . '/');
+        $this->websitePath          = $this->cx->getWebsiteDocumentRootPath() . '/';
+        $this->websiteThemesPath    = $this->cx->getWebsiteThemesPath() . '/';
+        $this->themeZipPath         = '/themezips/';
+        $this->_archiveTempWebPath  = $this->cx->getWebsiteTempWebPath() . $this->themeZipPath;
+        $this->_archiveTempPath     = $this->cx->getWebsiteTempPath() . $this->themeZipPath;
         //create /tmp/zip path if it doesnt exists
-        if (!file_exists($this->_archiveTempPath)){
-            if (!\Cx\Lib\FileSystem\FileSystem::make_folder(\Env::get('cx')->getWebsiteTempPath() . $this->themeZipPath)){
-                $this->strErrMessage = \Env::get('cx')->getWebsiteTempPath() . $this->themeZipPath .":".$_ARRAYLANG['TXT_THEME_UNABLE_TO_CREATE'];
+        if (!file_exists($this->_archiveTempPath)) {
+            if (!\Cx\Lib\FileSystem\FileSystem::make_folder($this->cx->getWebsiteTempPath() . $this->themeZipPath)) {
+                $this->strErrMessage = $this->cx->getWebsiteTempPath() . $this->themeZipPath . ":" . $_ARRAYLANG['TXT_THEME_UNABLE_TO_CREATE'];
             }
         }
         $this->webPath = $this->arrWebPaths[0];
@@ -235,8 +271,8 @@ class ViewManager
         global $objTemplate, $_ARRAYLANG;
 
         $objTemplate->setVariable("CONTENT_NAVIGATION","
-            <a href='index.php?cmd=ViewManager' class='".($this->act == '' ? 'active' : '')."'>".$_ARRAYLANG['TXT_DESIGN_OVERVIEW']."</a>
-            <a href='index.php?cmd=ViewManager&amp;act=templates' class='".($this->act == 'templates' || $this->act == 'newDir' ? 'active' : '')."'>".$_ARRAYLANG['TXT_DESIGN_TEMPLATES']."</a>
+            <a href='index.php?cmd=ViewManager' class='".($this->act == '' ? 'active' : '')."'>".$_ARRAYLANG['TXT_VIEWMANAGER_OVERVIEW']."</a>
+            <a href='index.php?cmd=ViewManager&amp;act=templates' class='".($this->act == 'templates' || $this->act == 'newDir' ? 'active' : '')."'>".$_ARRAYLANG['TXT_VIEWMANAGER_TEMPLATE_EDITOR']."</a>
             <a href='index.php?cmd=ViewManager&amp;act=settings' class='".($this->act == 'settings' ? 'active' : '')."'>".$_ARRAYLANG['TXT_DESIGN_SETTINGS']."</a>"
         );
 
@@ -375,9 +411,8 @@ class ViewManager
 
         $activeLanguages   = $theme->getLanguagesByType($subType);
         foreach ($activeLanguages  as $activeLanguage) {
-            $activatedLanguageCode = \FWLanguage::getLanguageCodeById($activeLanguage);
             $objTemplate->setVariable(array(
-                'THEME_ACTIVATED_LANG_CODE' => contrexx_raw2xhtml(strtoupper($activatedLanguageCode))
+                'THEME_ACTIVATED_LANG_CODE' => contrexx_raw2xhtml(strtoupper($activeLanguage))
             ));
             $objTemplate->parse('activatedLangCode'. ucfirst($subType));
 
@@ -394,14 +429,8 @@ class ViewManager
         ));
 
         $supportForTemplateEditor = false;
-        if (file_exists(
-                $cx->getClassLoader()->getFilePath(
-                    $cx->getWebsiteThemesPath() . '/'
-                    . $theme->getFoldername()
-                    . '/options/options.yml'
-                )
-            )
-        ) {
+        $optionsFile = new \Cx\Core\ViewManager\Model\Entity\ViewManagerFile($theme->getFoldername(). '/options/options.yml', $this->fileSystem);
+        if ($this->fileSystem->fileExists($optionsFile)) {
             $supportForTemplateEditor = true;
         }
 
@@ -520,27 +549,21 @@ class ViewManager
             $this->strErrMessage = sprintf($_ARRAYLANG['TXT_THEME_NOT_COMPONENT'], contrexx_raw2xhtml($theme->getThemesname()));
         }
 
-        $this->codeBaseThemesFilePath = $this->codeBaseThemesPath . $theme->getFoldername();
-        $this->websiteThemesFilePath  = $this->websiteThemesPath . $theme->getFoldername();
-
-        $filePath = '';
-        $relativeFilePath = '';
+        $selectedFile = null;
         if (!empty($themesPage)) {
-            list($filePath, $relativeFilePath) = $this->getFileFullPath($themesPage, $isComponentFile);
+            $selectedFile = $this->getFileFromPath($theme, $themesPage, $isComponentFile);
         }
 
-        if (!is_file($filePath)) {
-            $filePath   = file_exists($this->websiteThemesFilePath . '/index.html')
-                          ? $this->websiteThemesFilePath . '/index.html'
-                          : $this->codeBaseThemesFilePath . '/index.html';
-            $relativeFilePath = '/index.html';
+        if ($selectedFile == null) {
+            $selectedFile     = new \Cx\Core\ViewManager\Model\Entity\ViewManagerFile($theme->getFoldername() . '/index.html', $this->fileSystem);
             $themesPage = '/index.html';
+            $isComponentFile  = false;
         }
 
         // Get the left side file's menu
         $this->getFilesDropdown($theme, $themesPage, $isComponentFile);
         // Load the content
-        $this->getFilesContent($filePath, $relativeFilePath);
+        $this->getFilesContent($selectedFile);
 
         $objTemplate->setVariable(array(
             'THEME_ID'                  => $theme->getId(),
@@ -550,7 +573,7 @@ class ViewManager
             'THEME_IS_APPLICATION'      => $isComponentFile ? 1 : 0,
             'THEME_EDIT_PATH'           => (!$isComponentFile ? '/'.$theme->getFoldername() : '') . $themesPage,
             'THEMES_MENU'               => $this->getThemesDropdown($theme),
-            'CONTREXX_BASE_URL'         => \Env::get('cx')->getWebsiteOffsetPath() . '/',
+            'CONTREXX_BASE_URL'         => $this->cx->getWebsiteOffsetPath() . '/',
         ));
 
 
@@ -579,7 +602,8 @@ CODE;
             'cancel'                => $_ARRAYLANG['TXT_THEME_CANCEL'],
             'create'                => $_ARRAYLANG['TXT_THEME_CREATE'],
             'save'                  => $_ARRAYLANG['TXT_SAVE'],
-            'rename'                => $_ARRAYLANG['TXT_THEME_RENAME']
+            'rename'                => $_ARRAYLANG['TXT_THEME_RENAME'],
+            'loading'               => $_ARRAYLANG['TXT_CORE_VIEWMANAGER_LOADING'],
         ), 'viewmanager/lang');
 
         $objTemplate->setVariable(array(
@@ -597,7 +621,7 @@ CODE;
             'TXT_MANAGE_FILES'                => $_ARRAYLANG['TXT_MANAGE_FILES'],
             'TXT_SELECT_THEME'                => $_ARRAYLANG['TXT_SELECT_THEME'],
             'TXT_THEME_NAME'                  => $_ARRAYLANG['TXT_THEME_NAME'],
-            'TXT_DESIGN_OVERVIEW'             => $_ARRAYLANG['TXT_DESIGN_OVERVIEW'],
+            'TXT_VIEWMANAGER_OVERVIEW'        => $_ARRAYLANG['TXT_VIEWMANAGER_OVERVIEW'],
             'TXT_MODE'                        => $_ARRAYLANG['TXT_MODE'],
             'TXT_THEMES_EDIT'                 => $_ARRAYLANG['TXT_SETTINGS_MODFIY'],
             'TXT_THEMES_CREATE'               => $_ARRAYLANG['TXT_CREATE'],
@@ -949,7 +973,7 @@ CODE;
                 $themeInfoContent = $archive->extract(PCLZIP_OPT_BY_NAME, $themeDirectoryFromArchive .  \Cx\Core\View\Model\Entity\Theme::THEME_COMPONENT_FILE, PCLZIP_OPT_EXTRACT_AS_STRING);
                 if (!empty($themeInfoContent)) {
                     $yaml      = new \Symfony\Component\Yaml\Yaml();
-                    $themeInfo = $yaml->load($themeInfoContent[0]['content']);
+                    $themeInfo = $yaml->parse($themeInfoContent[0]['content']);
                     $themeName = isset($themeInfo['DlcInfo']['name']) ? $themeInfo['DlcInfo']['name'] : $themeName;
                 }
 
@@ -968,25 +992,22 @@ CODE;
                 \Message::add(contrexx_raw2xhtml($themeName).' ('.$themeDirectory.') '.$_ARRAYLANG['TXT_THEME_SUCCESSFULLY_IMPORTED']);
                 break;
             case 'filesystem':
+                $theme                     = new \Cx\Core\View\Model\Entity\Theme();
                 $themeName = null;
                 $existingThemeInFilesystem = !empty($_POST['existingdirName']) ? contrexx_input2raw($_POST['existingdirName']) : null;
 
-                $themePath = file_exists(\Env::get('cx')->getWebsiteThemesPath() . '/' . $existingThemeInFilesystem) ? \Env::get('cx')->getWebsiteThemesPath() . '/' . $existingThemeInFilesystem : \Env::get('cx')->getCodeBaseThemesPath() . '/'. $existingThemeInFilesystem;
+                $themePath = $theme->getFilePath($existingThemeInFilesystem);
 
                 if (!file_exists($themePath)) {
                     \Message::add($_ARRAYLANG['TXT_THEME_OPERATION_FAILED_FOR_EMPTY_PARAMS'], \Message::CLASS_ERROR);
                     return false;
                 }
 
-                $yamlFile =  file_exists(\Env::get('cx')->getWebsiteThemesPath() . '/' . $existingThemeInFilesystem . '/component.yml')
-                           ? \Env::get('cx')->getWebsiteThemesPath() . '/' . $existingThemeInFilesystem . '/component.yml'
-                           : ( file_exists(\Env::get('cx')->getCodeBaseThemesPath() . '/' . $existingThemeInFilesystem . '/component.yml')
-                              ? \Env::get('cx')->getCodeBaseThemesPath() . '/' . $existingThemeInFilesystem . '/component.yml'
-                              : '');
+                $yamlFile = $theme->getFilePath($existingThemeInFilesystem . '/component.yml');
                 if ($yamlFile) {
                     $objFile = new \Cx\Lib\FileSystem\File($yamlFile);
                     $yaml = new \Symfony\Component\Yaml\Yaml();
-                    $themeInformation = $yaml->load($objFile->getData());
+                    $themeInformation = $yaml->parse($objFile->getData());
                     $themeName = $themeInformation['DlcInfo']['name'];
                 }
 
@@ -999,7 +1020,6 @@ CODE;
 
                 $this->validateThemeName($themeName);
 
-                $theme = new \Cx\Core\View\Model\Entity\Theme();
                 $theme->setThemesname($themeName);
                 $theme->setFoldername($existingThemeInFilesystem);
 
@@ -1131,76 +1151,104 @@ CODE;
         //clean up tmp folder
         $this->_cleantmp();
 
-        $themeFolder = $theme->getFoldername();
-
-        $this->codeBaseThemesFilePath = $this->codeBaseThemesPath . $themeFolder;
-        $this->websiteThemesFilePath  = $this->websiteThemesPath . $themeFolder;
-        if (is_dir($this->codeBaseThemesFilePath) || is_dir($this->websiteThemesFilePath)) {
-            $archive    = new \PclZip($this->_archiveTempPath . $themeFolder . '.zip');
-            $themeFiles = $this->getThemesFiles();
-            \Cx\Lib\FileSystem\FileSystem::makeWritable($this->_archiveTempPath);
-            $this->createZipFolder($themeFiles, '', $archive);
-            \Cx\Lib\FileSystem\FileSystem::makeWritable($this->_archiveTempPath . $themeFolder . '.zip');
-            return $this->_archiveTempPath . $themeFolder . '.zip';
+        $themeFolderPath = new \Cx\Core\ViewManager\Model\Entity\ViewManagerFile($theme->getFoldername(), $this->fileSystem);
+        if (!$this->fileSystem->fileExists($themeFolderPath)) {
+            $this->strErrMessage = $_ARRAYLANG['TXT_THEME_FOLDER_DOES_NOT_EXISTS'];
+            return false;
         }
 
-        $this->strErrMessage = $_ARRAYLANG['TXT_THEME_FOLDER_DOES_NOT_EXISTS'];
-        return false;
+        $themeFolder = $theme->getFoldername();
+        $archive     = new \PclZip($this->_archiveTempPath . $themeFolder . '.zip');
+        $themeFiles  = $this->getThemesFiles($theme);
+
+        \Cx\Lib\FileSystem\FileSystem::makeWritable($this->_archiveTempPath);
+        $this->createZipFolder($archive, $themeFiles, '/' . $themeFolder);
+        \Cx\Lib\FileSystem\FileSystem::makeWritable($this->_archiveTempPath . $themeFolder . '.zip');
+        return $this->_archiveTempPath . $themeFolder . '.zip';
     }
 
     /**
-     * create the archive file to tmp folder
+     * Create the archive file to tmp folder
      *
-     * @param array  $themeFilesArray  themes files in array
-     * @param string $folder           folder name
-     * @param object $archive          contains the PclZip archive object
-     *
+     * @param object $archive           Contains the PclZip archive object
+     * @param array  $themeFilesArray   Themes files in array
+     * @param string $folder            Folder name
      */
-    function createZipFolder($themeFilesArray, $folder = '/', $archive) {
+    function createZipFolder($archive, $themeFilesArray, $folder = '/')
+    {
         global $_ARRAYLANG;
         foreach ($themeFilesArray as $folderName => $fileName) {
             if (is_array($fileName)) {
-                $this->createZipFolder($fileName, $folder . '/' . $folderName, $archive);
-            } else {
-                $relativePath    = $folder . '/' . $fileName;
-                if (self::isFileTypeComponent($relativePath)) {
-                    $relativePath = self::getComponentFilePath($relativePath, false);
-                }
-                if (file_exists($this->websiteThemesFilePath . $folder . '/' . $fileName)) {
-                    $themesFilePath = $this->websiteThemesFilePath;
-                    $removePath     = $this->websiteThemesPath;
-                } else {
-                    $themesFilePath = $this->codeBaseThemesFilePath;
-                    $removePath     = $this->codeBaseThemesPath;
-                }
-                if ($archive->add($themesFilePath . $relativePath, PCLZIP_OPT_REMOVE_PATH, $removePath) == 0) {
-                    \DBG::log($_ARRAYLANG['TXT_THEME_ARCHIVE_ERROR'] .' ' . $archive->errorInfo(true));
-                }
+                $this->createZipFolder($archive, $fileName, $folder . '/' . $folderName);
+                continue;
+            }
+            $relativePath = $folder . '/' . $fileName;
+            if (self::isFileTypeComponent($relativePath)) {
+                $relativePath = self::getComponentFilePath($relativePath, false);
+            }
+
+            $localFile  = new \Cx\Core\ViewManager\Model\Entity\ViewManagerFile($relativePath, $this->fileSystem);
+            $filePath   = $localFile->getFileSystem()->getFullPath($localFile);
+            $removePath = preg_replace('/'. preg_quote($relativePath, '/') .'$/', '', $filePath);
+
+            if ($archive->add($filePath, PCLZIP_OPT_REMOVE_PATH, $removePath) == 0) {
+                \DBG::log($_ARRAYLANG['TXT_THEME_ARCHIVE_ERROR'] .' ' . $archive->errorInfo(true));
             }
         }
     }
 
     /**
-     * get the themes files from codeBaseThemesFilePath and websiteThemesFilePath
+     * Get the themes files using viewmanager filesystem
      *
      * @return  array
      */
-    function getThemesFiles() {
+    function getThemesFiles(\Cx\Core\View\Model\Entity\Theme $theme) {
+        $filesList     = $this->fileSystem->getFileList($theme->getFoldername());
+        $formatedFiles = $this->formatFileList($filesList);
+        $this->sortFilesFolders($formatedFiles);
 
-        $codeBaseFiles = array();
-        $websiteThemesFiles = array();
-        if (file_exists($this->codeBaseThemesFilePath)) {
-            $codeBaseIterator = new \DirectoryIterator($this->codeBaseThemesFilePath);
-            $codeBaseFiles = $this->directoryIteratorToArray($codeBaseIterator);
-        }
-        if (file_exists($this->websiteThemesFilePath)) {
-            $websiteIterator = new \DirectoryIterator($this->websiteThemesFilePath);
-            $websiteThemesFiles = $this->directoryIteratorToArray($websiteIterator);
+        return $formatedFiles;
+    }
+
+    /**
+     * Format the Filesystem files and folders to viewManger format
+     *
+     * @param array $filesList
+     *
+     * @return array
+     */
+    function formatFileList($filesList)
+    {
+        $result = array();
+
+        foreach ($filesList as $fileInfo) {
+            $info = $fileInfo['datainfo'];
+            if ($info['type'] == 'file') {
+                $result[] = $info['name'];
+            } elseif ($info['type'] == 'dir') {
+                $subFiles = $fileInfo;
+                unset($subFiles['datainfo']);
+
+                $name = $info['name'];
+                switch (true) {
+                    case $name == ltrim($this->cx->getCoreModuleFolderName() , '/'):
+                        $name = 'core_module';
+                        break;
+                    case $name == ltrim($this->cx->getModuleFolderName(), '/'):
+                        $name = 'module';
+                        break;
+                    case $name == ltrim($this->cx->getCoreFolderName(), '/'):
+                        $name = 'core';
+                        break;
+                    default:
+                        break;
+                }
+
+                $result[$name] = $this->formatFileList($subFiles);
+            }
         }
 
-        $this->array_merge_recursive_distinct($codeBaseFiles, $websiteThemesFiles);
-        $this->sortFilesFolders($codeBaseFiles);
-        return $codeBaseFiles;
+        return $result;
     }
 
     /**
@@ -1209,7 +1257,6 @@ CODE;
      * @global   ADONewConnection
      * @global   array
      * @global   \Cx\Core\Html\Sigma
-     * @return   string   parsed content
      */
     function _activate()
     {
@@ -1234,59 +1281,72 @@ CODE;
         ));
         $i=0;
 
+        // channels
+        $channels = \Cx\Core\View\Model\Entity\Theme::$channels;
+
         if (isset($_POST['themesId'])) {
-            foreach ($_POST['themesId'] as $langid => $themesId) {
-                $objDatabase->Execute("UPDATE ".DBPREFIX."languages SET themesid='".intval($themesId)."' WHERE id=".intval($langid));
+            foreach ($_POST['themesId'] as $langId => $themesId) {
+                $this->activateFrontendTheme(
+                    $langId,
+                    $channels[0],
+                    $themesId
+                );
             }
-            foreach ($_POST['printThemesId'] as $langid => $printThemesId) {
-                $objDatabase->Execute("UPDATE ".DBPREFIX."languages SET print_themes_id='".intval($printThemesId)."' WHERE id=".intval($langid));
+            foreach ($_POST['mobileThemesId'] as $langId => $mobileThemesId) {
+                $this->activateFrontendTheme(
+                    $langId,
+                    $channels[1],
+                    $mobileThemesId
+                );
             }
-            foreach ($_POST['pdfThemesId'] as $langid => $pdfThemesId) {
-                $objDatabase->Execute("UPDATE ".DBPREFIX."languages SET pdf_themes_id='".intval($pdfThemesId)."' WHERE id=".intval($langid));
+            foreach ($_POST['printThemesId'] as $langId => $printThemesId) {
+                $this->activateFrontendTheme(
+                    $langId,
+                    $channels[2],
+                    $printThemesId
+                );
             }
-            foreach ($_POST['mobileThemesId'] as $langid => $mobileThemesId) {
-                $objDatabase->Execute("UPDATE ".DBPREFIX."languages SET mobile_themes_id='".intval($mobileThemesId)."' WHERE id=".intval($langid));
+            foreach ($_POST['pdfThemesId'] as $langId => $pdfThemesId) {
+                $this->activateFrontendTheme(
+                    $langId,
+                    $channels[3],
+                    $pdfThemesId
+                );
             }
-            foreach ($_POST['appThemesId'] as $langid => $appThemesId) {
-                $objDatabase->Execute("UPDATE ".DBPREFIX."languages SET app_themes_id='".intval($appThemesId)."' WHERE id=".intval($langid));
+            foreach ($_POST['appThemesId'] as $langId => $appThemesId) {
+                $this->activateFrontendTheme(
+                    $langId,
+                    $channels[4],
+                    $appThemesId
+                );
             }
+            $this->em->flush();
+            // reinit fwlanguage to show updated frontends
+            \FWLanguage::init();
+
             $this->strOkMessage = $_ARRAYLANG['TXT_DATA_RECORD_UPDATED_SUCCESSFUL'];
         }
-        $objResult = $objDatabase->Execute('
-            SELECT   `id`, `lang`, `name`, `frontend`, `themesid`, `mobile_themes_id`, `print_themes_id`, `pdf_themes_id`, `app_themes_id`, `is_default`
-            FROM     `'.DBPREFIX.'languages`
-            WHERE    `frontend` = 1
-            ORDER BY `id`
-        ');
-
-        if ($objResult !== false) {
-            while (!$objResult->EOF) {
-                if (!$this->isInLanguageFullMode() && $objResult->fields['is_default'] == "false") {
-                    $objResult->MoveNext();
-                    continue;
-                }
-
-                if (($i % 2) == 0) {
-                    $class="row1";
-                } else {
-                    $class="row2";
-                }
-
-                $objTemplate->setVariable(array(
-                    'THEMES_ROWCLASS'             => $class,
-                    'THEMES_LANG_ID'              => $objResult->fields['id'],
-                    'THEMES_LANG_SHORTNAME'       => $objResult->fields['lang'],
-                    'THEMES_LANG_NAME'            => $objResult->fields['name'],
-                    'THEMES_TEMPLATE_MENU'        => $this->_getDropdownActivated($objResult->fields['themesid']),
-                    'THEMES_PRINT_TEMPLATE_MENU'  => $this->_getDropdownActivated($objResult->fields['print_themes_id']),
-                    'THEMES_MOBILE_TEMPLATE_MENU' => $this->_getDropdownActivated($objResult->fields['mobile_themes_id']),
-                    'THEMES_PDF_TEMPLATE_MENU'    => $this->_getDropdownActivated($objResult->fields['pdf_themes_id']),
-                    'THEMES_APP_TEMPLATE_MENU'    => $this->_getDropdownActivated($objResult->fields['app_themes_id']),
-                ));
-                $objTemplate->parse('themesLangRow');
-                $i++;
-                $objResult->MoveNext();
+        // parse row for every frontend locale
+        foreach (\FWLanguage::getActiveFrontendLanguages() as $frontendLanguage) {
+            if (!$this->isInLanguageFullMode() && !$frontendLanguage['is_default']) {
+                continue;
             }
+
+            $class = 'row' . ($i % 2 + 1);
+
+            $objTemplate->setVariable(array(
+                'THEMES_ROWCLASS'             => $class,
+                'THEMES_LANG_ID'              => $frontendLanguage['id'],
+                'THEMES_LANG_SHORTNAME'       => $frontendLanguage['lang'],
+                'THEMES_LANG_NAME'            => $frontendLanguage['name'],
+                'THEMES_TEMPLATE_MENU'        => $this->_getDropdownActivated($frontendLanguage['themesid']),
+                'THEMES_MOBILE_TEMPLATE_MENU' => $this->_getDropdownActivated($frontendLanguage['mobile_themes_id']),
+                'THEMES_PRINT_TEMPLATE_MENU'  => $this->_getDropdownActivated($frontendLanguage['print_themes_id']),
+                'THEMES_PDF_TEMPLATE_MENU'    => $this->_getDropdownActivated($frontendLanguage['pdf_themes_id']),
+                'THEMES_APP_TEMPLATE_MENU'    => $this->_getDropdownActivated($frontendLanguage['app_themes_id']),
+            ));
+            $objTemplate->parse('themesLangRow');
+            $i++;
         }
     }
 
@@ -1419,25 +1479,14 @@ CODE;
                     }
                     break;
                 case (!empty($copyFromTheme) && empty($createFromDatabase)):
-                    //check Whether the folder exists in both codebase
-                    if (
-                           $this->codeBaseThemesPath != $this->websiteThemesPath
-                        && file_exists($this->codeBaseThemesPath . $copyFromTheme)
-                    ) {
-                        if (!\Cx\Lib\FileSystem\FileSystem::copy_folder($this->codeBaseThemesPath . $copyFromTheme, $this->websiteThemesPath . $dirName, true)) {
-                            \Message::add($_ARRAYLANG['TXT_MSG_ERROR_NEW_DIR'], \Message::CLASS_ERROR);
-                            $this->newdir();
-                            return;
-                        }
+                    $fromThemeFolder = new \Cx\Core\ViewManager\Model\Entity\ViewManagerFile('/'. $copyFromTheme, $this->fileSystem);
+                    $toThemeFolder   = new \Cx\Core\ViewManager\Model\Entity\ViewManagerFile('/'. $dirName, $this->fileSystem);
+                    if (!$this->fileSystem->copyFolder($fromThemeFolder, $toThemeFolder)) {
+                        \Message::add($_ARRAYLANG['TXT_MSG_ERROR_NEW_DIR'], \Message::CLASS_ERROR);
+                        $this->newdir();
+                        return;
                     }
-                    //check Whether the folder exists in website data repository
-                    if (file_exists($this->websiteThemesPath . $copyFromTheme)) {
-                        if (!\Cx\Lib\FileSystem\FileSystem::copy_folder($this->websiteThemesPath . $copyFromTheme, $this->websiteThemesPath . $dirName, true)) {
-                            \Message::add($_ARRAYLANG['TXT_MSG_ERROR_NEW_DIR'], \Message::CLASS_ERROR);
-                            $this->newdir();
-                            return;
-                        }
-                    }
+
                     $this->replaceThemeName($copyFromTheme, $dirName, $this->websiteThemesPath . $dirName);
                     //convert theme to component
                     try {
@@ -1545,24 +1594,20 @@ CODE;
      */
     function getDropdownNotInDb()
     {
-        if (file_exists($this->codeBaseThemesPath)) {
-            $codeBaseDir = $this->readFiles($this->codeBaseThemesPath);
-        }
-        if (file_exists($this->websiteThemesPath)) {
-            $websiteDir = $this->readFiles($this->websiteThemesPath);
+        
+        $filesList     = $this->fileSystem->getFileList('/');
+
+        ksort($filesList);
+        $result = '';
+        foreach ($filesList as $folderName => $files) {
+            if (!$this->themeRepository->findOneBy(array('foldername' => $folderName))) {
+                $result .= "<option value='" . $folderName . "'>" . $folderName . "</option>\n";
+            }
         }
 
-       $mergeFolders = array_unique(array_merge($codeBaseDir, $websiteDir));
-       sort($mergeFolders);
-       $result = '';
-       foreach($mergeFolders as $folder) {
-           if (!$this->themeRepository->findOneBy(array('foldername' => $folder))) {
-               $result .= "<option value='".$folder."'>".$folder."</option>\n";
-           }
-       }
-
-       return $result;
+        return $result;
     }
+
     /**
      * reading the directories of the file sytem with the specified path
      *
@@ -1625,9 +1670,17 @@ CODE;
                $objFile->touch();
             }
             $objFile->write($pageContent);
+
+            // temporary hotfix for google chrome
+            // remove in case google chrome will no longer throw an ERR_BLOCKED_BY_XSS_AUDITOR exception
+            header('X-XSS-Protection: 0');
         } catch (\Cx\Lib\FileSystem\FileSystemException $e) {
             \DBG::msg($e->getMessage());
         }
+        
+        // drop cache:
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $cx->getComponent('Cache')->clearCache();
     }
 
     /**
@@ -1689,52 +1742,30 @@ CODE;
     }
 
     /**
-     * Get the file's full path
+     * Get the file from the given path
      *
-     * @param string  $filePath        Relative path of file
-     * @param boolean $isComponentFile load from component directory or not
+     * @param \Cx\Core\View\Model\Entity\Theme  $theme
+     * @param string                            $filePath
+     * @param boolean                           $isComponentFile
      *
-     * @return array full and relative path of a file
+     * @return mixed ViewManagerFile instance or null
      */
-    function getFileFullPath($filePath, $isComponentFile)
+    function getFileFromPath(\Cx\Core\View\Model\Entity\Theme $theme, $filePath, $isComponentFile)
     {
         if (empty($filePath)) {
-            return array('', '');
+            return null;
         }
-
-        $fileTypeComponent = false;
-        if (!empty($filePath)) {
-            $fileTypeComponent = self::isFileTypeComponent($filePath);
-        }
-
-        $websitePath  = $this->websiteThemesFilePath;
-        $codebasePath = $this->codeBaseThemesFilePath;
-
-        if ($fileTypeComponent && $isComponentFile) { // selected from create overrides
-            $websitePath  = $this->websitePath;
-            $codebasePath = $this->codeBasePath;
-        }
-
         $relativeFilePath = $filePath;
-        if ($fileTypeComponent) {
+        if (self::isFileTypeComponent($filePath)) {
             $relativeFilePath = self::getComponentFilePath($filePath, $isComponentFile);
         }
-
-        $websiteFilePath  = $websitePath . $relativeFilePath;
-        $codeBaseFilePath = $codebasePath . $relativeFilePath;
-
-        if (file_exists($websiteFilePath)) {
-            $filePath = $websiteFilePath;
-            $relativeFilePath = preg_replace('#' . \Env::get('cx')->getWebsitePath() . '#', '', $websiteFilePath);
-        } elseif (file_exists($codeBaseFilePath)) {
-            $filePath = $codeBaseFilePath;
-            $relativeFilePath = preg_replace('#' . \Env::get('cx')->getCodeBasePath() . '#', '', $codeBaseFilePath);
-        } else {
-            $filePath = $relativeFilePath = '';
+        if (!$isComponentFile) {
+            $relativeFilePath = '/' .$theme->getFoldername() . $relativeFilePath;
         }
+        $localFile = new \Cx\Core\ViewManager\Model\Entity\ViewManagerFile($relativeFilePath, $this->fileSystem);
+        $localFile->setApplicationTemplateFile($isComponentFile);
 
-        return array($filePath, $relativeFilePath);
-
+        return $this->fileSystem->isFile($localFile) ? $localFile : null;
     }
 
     /**
@@ -1999,25 +2030,20 @@ CODE;
         }
         $this->sortFilesFolders($componentFiles);
 
-        $themeFolder = $theme->getFoldername();
-        if ($themeFolder != "") {
-            $mergedFiles = $this->getThemesFiles();
-
-            $objTemplate->setVariable(array(
-                    'THEME_FILES_TAB'                            => $this->getUlLi($mergedFiles, '', 'theme', !$isComponentFile ? $themesPage : ''),
-                    'THEME_OVERRIDE_TAB'                         => $this->getUlLi($componentFiles, '', 'applicationTheme', $isComponentFile ? $themesPage : ''),
-                    'TXT_DESIGN_LAYOUT'                          => $_ARRAYLANG['TXT_DESIGN_LAYOUT'],
-                    'TXT_DESIGN_APPLICATION_TEMPLATE'            => $_ARRAYLANG['TXT_DESIGN_APPLICATION_TEMPLATE'],
-                    'TXT_DESIGN_CONTENT_TEMPLATE'                => $_ARRAYLANG['TXT_DESIGN_CONTENT_TEMPLATE'],
-                    'TXT_DESIGN_HOME_TEMPLATE'                   => $_ARRAYLANG['TXT_DESIGN_HOME_TEMPLATE'],
-                    'TXT_THEME_NEW_WITHIN'                       => $_ARRAYLANG['TXT_THEME_NEW_WITHIN'],
-                    'TXT_THEME_COPY'                             => $_ARRAYLANG['TXT_THEME_COPY'],
-                    'TXT_THEME_RENAME'                           => $_ARRAYLANG['TXT_THEME_RENAME'],
-                    'TXT_THEME_DELETE'                           => $_ARRAYLANG['TXT_THEME_DELETE'],
-                    'TXT_THEME_ACTIONS'                          => $_ARRAYLANG['TXT_THEME_ACTIONS'],
-                ));
-        }
-
+        $mergedFiles = $this->getThemesFiles($theme);
+        $objTemplate->setVariable(array(
+            'THEME_FILES_TAB'                            => $this->getUlLi($mergedFiles, '', 'theme', !$isComponentFile ? $themesPage : '', $theme),
+            'THEME_OVERRIDE_TAB'                         => $this->getUlLi($componentFiles, '', 'applicationTheme', $isComponentFile ? $themesPage : ''),
+            'TXT_DESIGN_LAYOUT'                          => $_ARRAYLANG['TXT_DESIGN_LAYOUT'],
+            'TXT_DESIGN_APPLICATION_TEMPLATE'            => $_ARRAYLANG['TXT_DESIGN_APPLICATION_TEMPLATE'],
+            'TXT_DESIGN_CONTENT_TEMPLATE'                => $_ARRAYLANG['TXT_DESIGN_CONTENT_TEMPLATE'],
+            'TXT_DESIGN_HOME_TEMPLATE'                   => $_ARRAYLANG['TXT_DESIGN_HOME_TEMPLATE'],
+            'TXT_THEME_NEW_WITHIN'                       => $_ARRAYLANG['TXT_THEME_NEW_WITHIN'],
+            'TXT_THEME_COPY'                             => $_ARRAYLANG['TXT_THEME_COPY'],
+            'TXT_THEME_RENAME'                           => $_ARRAYLANG['TXT_THEME_RENAME'],
+            'TXT_THEME_DELETE'                           => $_ARRAYLANG['TXT_THEME_DELETE'],
+            'TXT_THEME_ACTIONS'                          => $_ARRAYLANG['TXT_THEME_ACTIONS'],
+        ));
     }
 
     /**
@@ -2056,38 +2082,38 @@ CODE;
      * @param string $path       current path of the $folder array
      * @param string $block      type of the folder array (theme or applicationTheme)
      * @param string $themesPage selected file in the ul li
+     * @param mixed  $theme      Currently selected theme
      *
      * @return string formatted ul and li for the js tree
      */
-    function getUlLi($folder, $path, $block, $themesPage) {
-        $result  = '<ul>';
-        $virtualFolder = array('View', 'Template', 'Frontend');
+    function getUlLi($folder, $path, $block, $themesPage, $theme = null) {
+        $result           = '<ul>';
+        $virtualFolder    = array('View', 'Template', 'Frontend');
+        $isApplicationTab = $block == 'applicationTheme';
         foreach ($folder as $folderName => $fileName) {
-            $permissionClass = 'protected';
-            $resetClass      = '';
-            $relativePath    = $path . '/' . (is_array($fileName) ? $folderName : $fileName);
+            $resetClass   = '';
+            $relativePath = $path . '/' . (is_array($fileName) ? $folderName .'/' : $fileName);
 
             $isComponentFile = false;
             if (self::isFileTypeComponent($relativePath)) {
-                $componentFilePath = self::getComponentFilePath($relativePath, ($block == 'applicationTheme'));
+                $componentFilePath = self::getComponentFilePath($relativePath, $isApplicationTab);
                 if (!$componentFilePath) { // may be a folder
                     $componentFilePath = self::replaceComponentFolderByItsType($relativePath);
                 }
                 $isComponentFile   = true;
             }
 
-            $filePath = $this->websiteThemesFilePath . ($isComponentFile ? $componentFilePath : $relativePath);
-            if (file_exists($filePath)) {
-                $permissionClass = '';
-                if (
-                       ($this->websiteThemesFilePath != $this->codeBaseThemesFilePath)
-                    && file_exists($this->codeBaseThemesFilePath . ($isComponentFile ? $componentFilePath : $relativePath))
-                ) {
-                    $permissionClass = 'protected';
-                    $resetClass      = 'reset';
-                }
-            } else {
-                $filePath = $this->codeBaseThemesFilePath . ($isComponentFile ? $componentFilePath : $relativePath);
+            $filePath  = $isComponentFile ? $componentFilePath : $relativePath;
+            if ($block == 'theme') {
+                $filePath = $theme->getFolderName() . $filePath;
+            }
+            $localFile = new \Cx\Core\ViewManager\Model\Entity\ViewManagerFile($filePath, $this->fileSystem);
+            $localFile->setApplicationTemplateFile($isApplicationTab);
+
+            $permissionClass = $isComponentFile || $this->fileSystem->isReadOnly($localFile) ? 'protected' : '';
+            if ($this->fileSystem->isResettable($localFile)) {
+                $permissionClass = 'protected';
+                $resetClass      = 'reset';
             }
 
             if (is_array($fileName)) {
@@ -2103,14 +2129,13 @@ CODE;
 
                     $result .= '<li><a  href="javascript:void(0);"' .$activeFolder. ' data-rel="'. $relativePath .'" class="folder naming '. $permissionClass .' '. $resetClass .'">' . $icon . $folderName . '</a>';
                 }
-                $result .= $this->getUlLi($fileName, $path .(!in_array($folderName, $virtualFolder) ? '/'. $folderName : ''), $block, $themesPage);
+                $result .= $this->getUlLi($fileName, $path .(!in_array($folderName, $virtualFolder) ? '/'. $folderName : ''), $block, $themesPage, $theme);
                 $result .= '</li>';
             } else {
-
                 if (in_array($fileName, $this->filenames)) {
                     $iconSrc = '../core/ViewManager/View/Media/Config.png';
                 } else {
-                    $iconSrc = \Cx\Core_Modules\Media\Controller\MediaLibrary::_getIconWebPath() . \Cx\Core_Modules\Media\Controller\MediaLibrary::_getIcon($filePath) . '.png';
+                    $iconSrc = \Cx\Core_Modules\Media\Controller\MediaLibrary::_getIconWebPath() . \Cx\Core_Modules\Media\Controller\MediaLibrary::_getIcon($this->fileSystem->getFullPath($localFile)) . '.png';
                 }
 
                 $icon    = "<img height='16' width='16' alt='icon' src='" . $iconSrc . "' class='icon'>";
@@ -2125,128 +2150,54 @@ CODE;
     }
 
     /**
-     * Converting the files and folders in array format recursively
-     *
-     * @param \DirectoryIterator $it - DirectoryIterator class object for the array
-     *
-     * @return array $result
-     */
-    function directoryIteratorToArray(\DirectoryIterator $it) {
-        $result = array();
-        $virtualFolder = array('View', 'Template', 'Frontend');
-
-        foreach ($it as $child) {
-            if ($child->isDot()) {
-                continue;
-            }
-            $name = $child->getBasename();
-            if ($child->isDir()) {
-                switch (true) {
-                    case $name == preg_replace('#^/#', '', \Env::get('cx')->getCoreModuleFolderName()):
-                        $name = 'core_module';
-                        break;
-                    case $name == preg_replace('#^/#', '', \Env::get('cx')->getModuleFolderName()):
-                        $name = 'module';
-                        break;
-                    case $name == preg_replace('#^/#', '', \Env::get('cx')->getCoreFolderName()):
-                        $name = 'core';
-                        break;
-                    default:
-                        break;
-                }
-                $subit = new \DirectoryIterator($child->getPathname());
-                if (in_array($name, $virtualFolder)) {
-                    return $this->directoryIteratorToArray($subit);
-                }
-                $result[$name] = $this->directoryIteratorToArray($subit);
-            } else {
-                $result[] = $name;
-            }
-        }
-        return $result;
-    }
-
-    /**
-     * merging the array recursively without any duplicates
-     *
-     * @param array $array1
-     * @param array $array2
-     *
-     * @return array $merged
-     */
-    function array_merge_recursive_distinct(array &$array1, &$array2 = null)
-    {
-        foreach ($array2 as $key => $value) {
-            if (is_array($value)) {
-                if (array_key_exists($key, $array1)) {
-                    $this->array_merge_recursive_distinct($array1[$key], $value);
-                } else {
-                    $array1[$key] = $value;
-                }
-            } else {
-                if (!in_array($value, $array1)) {
-                    $array1[] = $value;
-                }
-            }
-        }
-    }
-
-    /**
      * Gets the themes pages file content
-     * @access   public
-     * @param    string   $filePath
-     * @param    string   $relativeFilePath
      *
-     * @return   string   $fileContent
+     * @param \Cx\Core\ViewManager\Model\Entity\ViewManagerFile $file
+     * @return null
      */
-    function getFilesContent($filePath, $relativeFilePath)
+    function getFilesContent(\Cx\Core\ViewManager\Model\Entity\ViewManagerFile $file)
     {
         global $objTemplate, $_ARRAYLANG;
 
-        if (file_exists($filePath)) {
-            $objImageManager = new \ImageManager;
-            $fileIsImage = $objImageManager->_isImage($filePath);
-            $contenthtml = '';
-            if (!$fileIsImage) {
-                $contenthtml = file_get_contents($filePath);
-                $contenthtml = preg_replace('/\{([A-Z0-9_]*?)\}/', '[[\\1]]', $contenthtml);
-                $contenthtml = htmlspecialchars($contenthtml);
+        if (!$this->fileSystem->fileExists($file)) {
+            return;
+        }
+
+        if ($this->fileSystem->isImageFile($file)) {
+            $objTemplate->setVariable(array(
+                'THEMES_CONTENT_IMAGE_PATH' => $this->cx->getThemesFolderName() . $file->__toString(),
+            ));
+            $objTemplate->touchBlock('template_image');
+            $objTemplate->hideBlock('template_content');
+            $objTemplate->hideBlock('file_actions_bottom');
+            $objTemplate->hideBlock('file_editor_fullscreen');
+        } else {
+            \JS::activate('ace');
+
+            $contenthtml = htmlspecialchars(
+                preg_replace('/\{([A-Z0-9_]*?)\}/', '[[\\1]]', $this->fileSystem->readFile($file))
+            );
+            $objTemplate->setVariable('CONTENT_HTML', $contenthtml);
+            $pathInfo =  pathinfo($this->fileSystem->getFullPath($file), PATHINFO_EXTENSION);
+            $mode = 'html';
+
+            switch($pathInfo) {
+                case 'html':
+                case 'css':
+                    $mode = $pathInfo;
+                break;
+                case 'js':
+                    $mode = 'javascript';
+                break;
+                case 'yml':
+                case 'yaml':
+                    $mode = 'yaml';
+                break;
             }
 
-            $objTemplate->setVariable(array(
-                'CONTENT_HTML'             => $contenthtml,
-            ));
-            if ($fileIsImage) {
-                $objTemplate->setVariable(array(
-                    'THEMES_CONTENT_IMAGE_PATH' => $relativeFilePath,
-                ));
-                $objTemplate->touchBlock('template_image');
-                $objTemplate->hideBlock('template_content');
-                $objTemplate->hideBlock('file_actions_bottom');
-                $objTemplate->hideBlock('file_editor_fullscreen');
-            } else {
-                \JS::activate('ace');
-
-                $pathInfo =  pathinfo($filePath, PATHINFO_EXTENSION);
-                $mode = 'html';
-
-                switch($pathInfo) {
-                    case 'html':
-                    case 'css':
-                        $mode = $pathInfo;
-                    break;
-                    case 'js':
-                        $mode = 'javascript';
-                    break;
-                    case 'yml':
-                    case 'yaml':
-                        $mode = 'yaml';
-                    break;
-                }
-
-                $jsCode = <<<CODE
-var editor;
-\$J(function(){
+            $jsCode = <<<CODE
+var editor;                        
+\$J(function(){         
 if (\$J("#editor").length) {
     editor = ace.edit("editor");
     editor.getSession().setMode("ace/mode/$mode");
@@ -2297,17 +2248,13 @@ if (\$J("#editor").length) {
 });
 CODE;
 
-                \JS::registerCode($jsCode);
+            \JS::registerCode($jsCode);
 
-                $objTemplate->touchBlock('file_editor_fullscreen');
-                $objTemplate->touchBlock('file_actions_bottom');
-                $objTemplate->touchBlock('template_content');
-                $objTemplate->hideBlock('template_image');
-            }
-        } else {
-            //TO-DO :
+            $objTemplate->touchBlock('file_editor_fullscreen');
+            $objTemplate->touchBlock('file_actions_bottom');
+            $objTemplate->touchBlock('template_content');
+            $objTemplate->hideBlock('template_image');
         }
-
     }
 
     /**
@@ -2626,6 +2573,28 @@ CODE;
             if ($objResult->RecordCount() == 0) {
                 $objDatabase->Execute("DROP TABLE ".$this->oldTable);
             }
+        }
+    }
+
+    /**
+     * Gets the right frontend entity by lang id and channel,
+     * updates the theme id (when neccessary) and persists the updated entity
+     *
+     * @param int langId language id of the frontend entity
+     * @param string channel used channel of the frontend entity
+     * @param int themeId theme id of the frontend entity
+     */
+    protected function activateFrontendTheme($langId, $channel, $themeId) {
+        $frontendRepo = $this->em->getRepository('\Cx\Core\View\Model\Entity\Frontend');
+        // search for frontend with given language and channel
+        $criteria = array(
+            'language' => $langId,
+            'channel' => $channel
+        );
+        $frontend = $frontendRepo->findOneBy($criteria);
+        if ($frontend->getTheme() != $themeId) {
+            $frontend->setTheme($themeId);
+            $this->em->persist($frontend);
         }
     }
 }

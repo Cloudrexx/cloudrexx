@@ -61,6 +61,17 @@ class ContentManagerException extends \ModuleException
  */
 class ContentManager extends \Module
 {
+    /**
+     * Name of the cookie to be used by the jstree javascript
+     * library to save the loaded nodes
+     */
+    const JSTREE_COOKIE_LOAD = 'jstree_load_ContentManager_node';
+
+    /**
+     * Name of the cookie to be used by the jstree javascript
+     * library to save the opened nodes
+     */
+    const JSTREE_COOKIE_OPEN = 'jstree_open_ContentManager_node';
 
     //doctrine entity manager
     protected $em = null;
@@ -110,6 +121,10 @@ class ContentManager extends \Module
         \JS::registerJS('lib/javascript/lock.js');
         \JS::registerJS('lib/javascript/jquery/jquery.history.max.js');
 
+        $objCx = \ContrexxJavascript::getInstance();
+        $objCx->setVariable('save_loaded', static::JSTREE_COOKIE_LOAD, 'contentmanager/jstree');
+        $objCx->setVariable('save_opened', static::JSTREE_COOKIE_OPEN, 'contentmanager/jstree');
+
 // this can be used to debug the tree, just add &tree=verify or &tree=fix
         $tree = null;
         if (isset($_GET['tree'])) {
@@ -123,7 +138,6 @@ class ContentManager extends \Module
             // this should print "bool(true)"
             var_dump($this->nodeRepository->recover());
         }
-        $objCx    = \ContrexxJavascript::getInstance();
 
         $themeRepo = new \Cx\Core\View\Model\Repository\ThemeRepository();
         $defaultTheme = $themeRepo->getDefaultTheme();
@@ -164,7 +178,7 @@ class ContentManager extends \Module
         }
 
         $this->template->setVariable(array(
-            'CORE_CM_METAIMAGE_BUTTON' => self::showMediaBrowserButton('Metaimage')
+            'CORE_CM_METAIMAGE_BUTTON' => static::showMediaBrowserButton('Metaimage')
         ));
 
         $mediaBrowser = new MediaBrowser();
@@ -279,7 +293,15 @@ class ContentManager extends \Module
 
         // get initial tree data
         $objJsonData = new \Cx\Core\Json\JsonData();
-        $treeData    = $objJsonData->jsondata('node', 'getTree', array('get' => $_GET), false);
+        $treeData = $objJsonData->jsondata(
+            'node',
+            'getTree',
+            array(
+                'get' => $_GET,
+                'response' => new \Cx\Core\Routing\Model\Entity\Response(null),
+            ),
+            false
+        );
         $objCx->setVariable('tree-data', $treeData, 'contentmanager/tree');
 
         if (!empty($_GET['act']) && ($_GET['act'] == 'new')) {
@@ -361,11 +383,33 @@ class ContentManager extends \Module
 
         $cxjs = \ContrexxJavascript::getInstance();
         $cxjs->setVariable('confirmDeleteQuestion', $_ARRAYLANG['TXT_CORE_CM_CONFIRM_DELETE'], 'contentmanager/lang');
-        $cxjs->setVariable('cleanAccessData', $objJsonData->jsondata('page', 'getAccessData', array(), false), 'contentmanager');
+        $cxjs->setVariable(
+            'cleanAccessData',
+            $objJsonData->jsondata(
+                'page',
+                'getAccessData',
+                array(
+                    'response' => new \Cx\Core\Routing\Model\Entity\Response(null),
+                ),
+                false
+            ),
+            'contentmanager'
+        );
         $cxjs->setVariable('contentTemplates', $this->getCustomContentTemplates(), 'contentmanager');
         $cxjs->setVariable('defaultTemplates', $this->getDefaultTemplates(), 'contentmanager/themes');
         $cxjs->setVariable('templateFolders', $this->getTemplateFolders(), 'contentmanager/themes');
-        $cxjs->setVariable('availableBlocks', $objJsonData->jsondata('Block', 'getBlocks', array(), false), 'contentmanager');
+        $cxjs->setVariable(
+            'availableBlocks',
+            $objJsonData->jsondata(
+                'Block',
+                'getBlocks',
+                array(
+                    'response' => new \Cx\Core\Routing\Model\Entity\Response(null),
+                ),
+                false
+            ),
+            'contentmanager'
+        );
 
         // TODO: move including of add'l JS dependencies to cx obj from /cadmin/index.html
         $getLangOptions=$this->getLangOptions();
@@ -405,6 +449,19 @@ class ContentManager extends \Module
             'contrexxBaseUrl'    => ASCMS_PROTOCOL . '://' . $_CONFIG['domainUrl'] . ASCMS_PATH_OFFSET . '/',
             'contrexxPathOffset' => ASCMS_PATH_OFFSET,
         ), 'contentmanager');
+
+        // manually set Wysiwyg variables as the Ckeditor will be
+        // loaded manually through JavaScript (and not properly through the
+        // component interface)
+        $uploader = new \Cx\Core_Modules\Uploader\Model\Entity\Uploader();
+        $mediaSourceManager = \Cx\Core\Core\Controller\Cx::instanciate()
+            ->getMediaSourceManager();
+        $mediaSource        = current($mediaSourceManager->getMediaTypes());
+        $mediaSourceDir     = $mediaSource->getDirectory();
+        $cxjs->setVariable(array(
+            'ckeditorUploaderId'   => $uploader->getId(),
+            'ckeditorUploaderPath' => $mediaSourceDir[1] . '/'
+        ), 'wysiwyg');
     }
 
     protected function getThemes()
@@ -498,13 +555,14 @@ class ContentManager extends \Module
 
     protected function getDefaultTemplates()
     {
-        $query = 'SELECT `id`, `lang`, `themesid` FROM `' . DBPREFIX . 'languages`';
-        $rs    = $this->db->Execute($query);
+        $themeRepo = new \Cx\Core\View\Model\Repository\ThemeRepository();
 
         $defaultThemes = array();
-        while (!$rs->EOF) {
-            $defaultThemes[$rs->fields['lang']] = $rs->fields['themesid'];
-            $rs->MoveNext();
+        foreach (\FWLanguage::getActiveFrontendLanguages() as $frontendLanguage) {
+            $theme = $themeRepo->getDefaultTheme(
+                \Cx\Core\View\Model\Entity\Theme::THEME_TYPE_WEB,
+                $frontendLanguage['id']);
+            $defaultThemes[$frontendLanguage['lang']] = $theme->getId();
         }
 
         return $defaultThemes;

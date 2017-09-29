@@ -599,6 +599,16 @@ EOF;
 
         $objTpl->addBlockfile($this->moduleLangVar.'_SETTINGS_CONTENT', 'settings_content', 'module_'.$this->moduleNameLC.'_settings_entries.html');
 
+        $legacyBehaviorChanges = array(
+            $_ARRAYLANG['TXT_MEDIADIR_LEGACY_BEHAVIOR_SEARCH_ON_CATEGORY_VIEW'],
+            $_ARRAYLANG['TXT_MEDIADIR_LEGACY_BEHAVIOR_SEARCH_ALL_FORMS'],
+            $_ARRAYLANG['TXT_MEDIADIR_LEGACY_PAGE_TITLE'],
+            $_ARRAYLANG['TXT_MEDIADIR_LEGACY_BEHAVIOR_CATEGORY_LIST'],
+            $_ARRAYLANG['TXT_MEDIADIR_LEGACY_BEHAVIOR_NOT_LATEST'],
+            $_ARRAYLANG['TXT_MEDIADIR_LEGACY_BEHAVIOR_LATEST_PARSING'],
+            $_ARRAYLANG['TXT_MEDIADIR_LEGACY_BEHAVIOR_LATEST_HIDING'],
+        );
+
         $objTpl->setGlobalVariable(array(
             'TXT_'.$this->moduleLangVar.'_SETTINGS_CONFIRM_NEW_ENTRIES' => $_ARRAYLANG['TXT_MEDIADIR_SETTINGS_CONFIRM_NEW_ENTRIES'],
             'TXT_'.$this->moduleLangVar.'_SETTINGS_CONFIRM_NEW_ENTRIES_INFO' => $_ARRAYLANG['TXT_MEDIADIR_SETTINGS_CONFIRM_NEW_ENTRIES_INFO'],
@@ -623,12 +633,18 @@ EOF;
             'TXT_'.$this->moduleLangVar.'_LATEST_ENTRIES' => $_ARRAYLANG['TXT_MEDIADIR_LATEST_ENTRIES'],
             'TXT_'.$this->moduleLangVar.'_POPULAR_HITS' => $_ARRAYLANG['TXT_MEDIADIR_POPULAR_HITS'],
             'TXT_'.$this->moduleLangVar.'_SETTINGS_LATEST_NUM_XML' => $_ARRAYLANG['TXT_MEDIADIR_SETTINGS_LATEST_NUM_XML'],
-            'TXT_'.$this->moduleLangVar.'_SETTINGS_LATEST_NUM_OVERVIEW' => $_ARRAYLANG['TXT_MEDIADIR_SETTINGS_LATEST_NUM_OVERVIEW'],
+            'TXT_'.$this->moduleLangVar.'_SETTINGS_LIST_LATEST_ENTRIES_IN_WEBDESIGN_TEMPLATE' => $_ARRAYLANG['TXT_MEDIADIR_SETTINGS_LIST_LATEST_ENTRIES_IN_WEBDESIGN_TEMPLATE'],
+            'TXT_'.$this->moduleLangVar.'_SETTINGS_LIST_LATEST_ENTRIES_IN_OVERVIEW_SECTION' => $_ARRAYLANG['TXT_MEDIADIR_SETTINGS_LIST_LATEST_ENTRIES_IN_OVERVIEW_SECTION'],
             'TXT_'.$this->moduleLangVar.'_SETTINGS_LATEST_NUM_BACKEND' => $_ARRAYLANG['TXT_MEDIADIR_SETTINGS_LATEST_NUM_BACKEND'],
             'TXT_'.$this->moduleLangVar.'_SETTINGS_LATEST_NUM_FRONTEND' => $_ARRAYLANG['TXT_MEDIADIR_SETTINGS_LATEST_NUM_FRONTEND'],
             'TXT_'.$this->moduleLangVar.'_SETTINGS_POPULAR_NUM_FRONTEND' => $_ARRAYLANG['TXT_MEDIADIR_SETTINGS_POPULAR_NUM_FRONTEND'],
             'TXT_'.$this->moduleLangVar.'_SETTINGS_POPULAR_NUM_RESTORE' => $_ARRAYLANG['TXT_MEDIADIR_SETTINGS_POPULAR_NUM_RESTORE'],
-            'TXT_'.$this->moduleLangVar.'_SETTINGS_LATEST_NUM_HEADLINES' => $_ARRAYLANG['TXT_MEDIADIR_SETTINGS_LATEST_NUM_HEADLINES'],
+            'TXT_'.$this->moduleLangVar.'_BEHAVIOR' => $_ARRAYLANG['TXT_MEDIADIR_BEHAVIOR'],
+            'TXT_'.$this->moduleLangVar.'_PRETTY_URLS' => $_ARRAYLANG['TXT_MEDIADIR_PRETTY_URLS'],
+            'TXT_'.$this->moduleLangVar.'_PRETTY_URLS_INFO' => sprintf($_ARRAYLANG['TXT_MEDIADIR_PRETTY_URLS_INFO'], 'https://support.cloudrexx.com/support/solutions/articles/13000031545'),
+            'TXT_'.$this->moduleLangVar.'_LEGACY_BEHAVIOR' => $_ARRAYLANG['TXT_MEDIADIR_LEGACY_BEHAVIOR'],
+            'TXT_'.$this->moduleLangVar.'_LEGACY_BEHAVIOR_INFO' => sprintf($_ARRAYLANG['TXT_MEDIADIR_LEGACY_BEHAVIOR_INFO'], '<ul><li>' . implode('</li><li>', $legacyBehaviorChanges) . '</li></ul>'),
+            'TXT_'.$this->moduleLangVar.'_SETTINGS_NUM_ENTRIES_TO_LIST' => $_ARRAYLANG['TXT_MEDIADIR_SETTINGS_NUM_ENTRIES_TO_LIST'],
             'TXT_'.$this->moduleLangVar.'_SETTINGS_SHOW_ENTRIES_IN_ALL_LANG' => $_ARRAYLANG['TXT_MEDIADIR_SETTINGS_SHOW_ENTRIES_IN_ALL_LANG'],
             'TXT_'.$this->moduleLangVar.'_SETTINGS_SHOW_ENTRIES_IN_ALL_LANG_INFO' => $_ARRAYLANG['TXT_MEDIADIR_SETTINGS_SHOW_ENTRIES_IN_ALL_LANG_INFO'],
             'TXT_'.$this->moduleLangVar.'_SETTINGS_PAGING_NUM_ENTRIES' => $_ARRAYLANG['TXT_MEDIADIR_SETTINGS_PAGING_NUM_ENTRIES'],
@@ -652,6 +668,8 @@ EOF;
             'TXT_'.$this->moduleLangVar.'_SETTINGS_MULTILANG_FRONTEND' => $_ARRAYLANG['TXT_MEDIADIR_SETTINGS_MULTILANG_FRONTEND'],
             'TXT_'.$this->moduleLangVar.'_SETTINGS_MULTILANG_FRONTEND_INFO' => $_ARRAYLANG['TXT_MEDIADIR_SETTINGS_MULTILANG_FRONTEND_INFO'],
             'TXT_'.$this->moduleLangVar.'_SETTINGS_ENTRIEY_INDIVIDUAL_ORDER' => $_ARRAYLANG['TXT_MEDIADIR_SETTINGS_ENTRIEY_INDIVIDUAL_ORDER'],
+            'TXT_'.$this->moduleLangVar.'_SETTINGS_FRONTEND' => $_ARRAYLANG['TXT_FRONTEND'],
+            'TXT_'.$this->moduleLangVar.'_SETTINGS_BACKEND' => $_ARRAYLANG['TXT_LANGUAGE_BACKEND'],
         ));
 
         if($this->arrSettings['settingsConfirmNewEntries'] == 1) {
@@ -789,7 +807,14 @@ EOF;
             $strDisplaydurationNotificationValue = intval($this->arrSettings['settingsEntryDisplaydurationNotification']);
             $strDisplaydurationNotificationShowDaybefore = 'inline';
         }
-
+        $listEntriesOverviewOn  = ($this->arrSettings['showLatestEntriesInOverview'] == 1)
+                                    ? 'checked="checked"' : '';
+        $listEntriesOverviewOff = ($this->arrSettings['showLatestEntriesInOverview'] == 0)
+                                    ? 'checked="checked"' : '';
+        $listEntriesWebdesignTplOn  = ($this->arrSettings['showLatestEntriesInWebdesignTmpl'] == 1)
+                                    ? 'checked="checked"' : '';
+        $listEntriesWebdesignTplOff = ($this->arrSettings['showLatestEntriesInWebdesignTmpl'] == 0)
+                                    ? 'checked="checked"' : '';
         $objTpl->setVariable(array(
             $this->moduleLangVar.'_SETTINGS_CONFIRM_NEW_ENTRIES_ON' => $strConfirmEntriesOn,
             $this->moduleLangVar.'_SETTINGS_CONFIRM_NEW_ENTRIES_OFF' => $strConfirmEntriesOff,
@@ -813,6 +838,10 @@ EOF;
             $this->moduleLangVar.'_SETTINGS_LATEST_NUM_FRONTEND' => intval($this->arrSettings['settingsLatestNumFrontend']),
             $this->moduleLangVar.'_SETTINGS_POPULAR_NUM_FRONTEND' => intval($this->arrSettings['settingsPopularNumFrontend']),
             $this->moduleLangVar.'_SETTINGS_POPULAR_NUM_RESTORE' => intval($this->arrSettings['settingsPopularNumRestore']),
+            $this->moduleLangVar.'_SETTINGS_PRETTY_URLS_ON' => $this->arrSettings['usePrettyUrls'] ? 'checked="checked"' : '',
+            $this->moduleLangVar.'_SETTINGS_PRETTY_URLS_OFF' => $this->arrSettings['usePrettyUrls'] ? '' : 'checked="checked"',
+            $this->moduleLangVar.'_SETTINGS_LEGACY_BEHAVIOR_ON' => $this->arrSettings['legacyBehavior'] ? 'checked="checked"' : '',
+            $this->moduleLangVar.'_SETTINGS_LEGACY_BEHAVIOR_OFF' => $this->arrSettings['legacyBehavior'] ? '' : 'checked="checked"',
             $this->moduleLangVar.'_SETTINGS_LATEST_NUM_HEADLINES' => intval($this->arrSettings['settingsLatestNumHeadlines']),
             $this->moduleLangVar.'_SETTINGS_PAGING_NUM_ENTRIES' => intval($this->arrSettings['settingsPagingNumEntries']),
             $this->moduleLangVar.'_SETTINGS_DISPLAYDURATION_SELECT_ALWAYS' => $strDisplaydurationAlways,
@@ -834,6 +863,10 @@ EOF;
             $this->moduleLangVar.'_SETTINGS_MULTILANG_FRONTEND_OFF' => $strMultilangFrontendOff,
             $this->moduleLangVar.'_SETTINGS_ENTRIEY_INDIVIDUAL_ORDER_ON' => $strIndividualOrderOn,
             $this->moduleLangVar.'_SETTINGS_ENTRIEY_INDIVIDUAL_ORDER_OFF' => $strIndividualOrderOff,
+            $this->moduleLangVar.'_SETTINGS_LIST_ENTRIES_OVERVIEW_ON' => $listEntriesOverviewOn,
+            $this->moduleLangVar.'_SETTINGS_LIST_ENTRIES_OVERVIEW_OFF' => $listEntriesOverviewOff,
+            $this->moduleLangVar.'_SETTINGS_LIST_ENTRIES_WEBDESIGN_TEMPLATE_ON' => $listEntriesWebdesignTplOn,
+            $this->moduleLangVar.'_SETTINGS_LIST_ENTRIES_WEBDESIGN_TEMPLATE_OFF' => $listEntriesWebdesignTplOff,
         ));
 
         if(empty($this->arrCommunityGroups)) {
@@ -854,25 +887,21 @@ EOF;
             }
         }
 
-        $objLanguages = $objDatabase->Execute("SELECT id,lang,name,frontend,is_default FROM ".DBPREFIX."languages ORDER BY is_default ASC");
         $arrActiveLangs = array();
         $arrActiveLangs = explode(",",$this->arrSettings['settingsActiveLanguages']);
-        if ($objLanguages !== false) {
-            while (!$objLanguages->EOF) {
-                if(in_array($objLanguages->fields['id'], $arrActiveLangs)) {
-                    $strLangStatus = 'checked="checked"';
-                } else {
-                   $strLangStatus = '';
-                }
-                $objTpl->setVariable(array(
-                    $this->moduleLangVar.'_SETTINGS_ACTIVE_LANG_ID' => intval($objLanguages->fields['id']),
-                    $this->moduleLangVar.'_SETTINGS_ACTIVE_LANG_NAME' => htmlspecialchars($objLanguages->fields['name'], ENT_QUOTES, CONTREXX_CHARSET),
-                    $this->moduleLangVar.'_SETTINGS_ACTIVE_LANG_STATUS' => $strLangStatus,
-                ));
-
-                $objTpl->parse('activeLanguageList');
-                $objLanguages->MoveNext();
+        foreach (\FWLanguage::getActiveFrontendLanguages() as $frontendLanguage) {
+            if(in_array($frontendLanguage['id'], $arrActiveLangs)) {
+                $strLangStatus = 'checked="checked"';
+            } else {
+               $strLangStatus = '';
             }
+            $objTpl->setVariable(array(
+                $this->moduleLangVar.'_SETTINGS_ACTIVE_LANG_ID' => intval($frontendLanguage['id']),
+                $this->moduleLangVar.'_SETTINGS_ACTIVE_LANG_NAME' => htmlspecialchars($frontendLanguage['name'], ENT_QUOTES, CONTREXX_CHARSET),
+                $this->moduleLangVar.'_SETTINGS_ACTIVE_LANG_STATUS' => $strLangStatus,
+            ));
+
+            $objTpl->parse('activeLanguageList');
         }
 
         $objTpl->parse('settings_content');

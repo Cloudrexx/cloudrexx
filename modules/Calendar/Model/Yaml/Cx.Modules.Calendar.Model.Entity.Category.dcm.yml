@@ -1,0 +1,24 @@
+Cx\Modules\Calendar\Model\Entity\Category:
+  type: entity
+  table: module_calendar_category
+  id:
+    id:
+      type: integer
+      generator:
+        strategy: AUTO
+  fields:
+    pos:
+      type: integer
+      nullable: true
+    status:
+      type: integer
+      nullable: true
+  oneToMany:
+    categoryNames:
+      targetEntity: Cx\Modules\Calendar\Model\Entity\CategoryName
+      mappedBy: category
+      cascade: [persist]
+  manyToMany:
+    events:
+      targetEntity: Cx\Modules\Calendar\Model\Entity\Event
+      mappedBy: categories

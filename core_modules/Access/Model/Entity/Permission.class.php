@@ -139,6 +139,7 @@ class Permission extends \Cx\Model\Base\EntityBase {
         if (count($this->validUserGroups) || count($this->validAccessIds)) {
             $this->requiresLogin = true;
         }
+        $this->setVirtual(true);
         $this->setCallback($callback);
         $this->readDataAccesses  = new \Doctrine\Common\Collections\ArrayCollection();
         $this->writeDataAccesses = new \Doctrine\Common\Collections\ArrayCollection();
@@ -348,11 +349,13 @@ class Permission extends \Cx\Model\Base\EntityBase {
 
         //protocol check
         if ($method != 'cli' && !empty($this->allowedProtocols) && !in_array($protocol, $this->allowedProtocols)) {
+            \DBG::msg(__METHOD__ . ': protocol check failed: ' . $protocol);
             return false;
         }
 
         //access method check
         if (!empty($this->allowedMethods) && !in_array($method, $this->allowedMethods)) {
+            \DBG::msg(__METHOD__ . ': method check failed: ' . $method);
             return false;
         }
 
@@ -381,6 +384,7 @@ class Permission extends \Cx\Model\Base\EntityBase {
         }
 
         //check user logged in or not
+        $this->cx->getComponent('Session')->getSession();
         if (!\FWUser::getFWUserObject()->objUser->login()) {
             return false;
         }

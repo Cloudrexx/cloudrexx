@@ -1,7 +1,5 @@
 <?php
 /*
- *  $Id$
- *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -15,7 +13,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * This software consists of voluntary contributions made by many individuals
- * and is licensed under the LGPL. For more information, see
+ * and is licensed under the MIT license. For more information, see
  * <http://www.doctrine-project.org>.
  */
 
@@ -25,24 +23,35 @@ namespace Doctrine\ORM\Query\AST;
  * SimpleSelectExpression ::= StateFieldPathExpression | IdentificationVariable
  *                          | (AggregateExpression [["AS"] FieldAliasIdentificationVariable])
  *
- * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link    www.doctrine-project.org
  * @since   2.0
- * @version $Revision: 3938 $
  * @author  Guilherme Blanco <guilhermeblanco@hotmail.com>
  * @author  Jonathan Wage <jonwage@gmail.com>
  * @author  Roman Borschel <roman@code-factory.org>
  */
 class SimpleSelectExpression extends Node
 {
+    /**
+     * @var Node
+     */
     public $expression;
+
+    /**
+     * @var string
+     */
     public $fieldIdentificationVariable;
 
+    /**
+     * @param Node $expression
+     */
     public function __construct($expression)
     {
         $this->expression = $expression;
-    }    
-    
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function dispatch($sqlWalker)
     {
         return $sqlWalker->walkSimpleSelectExpression($this);

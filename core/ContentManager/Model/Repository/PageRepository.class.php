@@ -91,7 +91,7 @@ class PageRepository extends EntityRepository {
      */
     public function findAll()
     {
-        return $this->findBy(array(), true);
+        return $this->findBy(array(), null, null, null, true);
     }
 
     public function find($id, $lockMode = 0, $lockVersion = NULL, $useResultCache = true) {
@@ -106,7 +106,7 @@ class PageRepository extends EntityRepository {
      * @return array
      * @override
      */
-    public function findBy(array $criteria, $inactive_langs = false)
+    public function findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null, $inactive_langs = false)
     {
         $activeLangs = \FWLanguage::getActiveFrontendLanguages();
 
@@ -694,7 +694,7 @@ class PageRepository extends EntityRepository {
             $pages = $this->findBy(array(
                 'type' => \Cx\Core\ContentManager\Model\Entity\Page::TYPE_ALIAS,
                 'slug' => $parts[0],
-            ), true);
+            ), null, null, null, true);
             $page = null;
             if (count($pages) == 1) {
                 $page = $pages[0];
@@ -1022,5 +1022,83 @@ class PageRepository extends EntityRepository {
         $page->setMetarobots('index');
         $page->setUpdatedBy(\FWUser::getFWUserObject()->objUser->getUsername());
         return $page;
+    }
+    
+    /**
+     * Generates a list of pages pointing to $page
+     * @param \Cx\Core\ContentManager\Model\Entity\Page $page Page to get referencing pages for
+     * @param array $subPages (optional, by reference) Do not use, internal
+     * @return array List of pages (ID as key, page object as value)
+     */
+    public function getPagesPointingTo($page, &$subPages = array()) {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $fallback_lang_codes = \FWLanguage::getFallbackLanguageArray();
+        $active_langs = \FWLanguage::getActiveFrontendLanguages();
+
+        // get all active languages and their fallbacks
+        // $fallbacks[<langId>] = <fallsBackToLangId>
+        // if <langId> has no fallback <fallsBackToLangId> will be null
+        $fallbacks = array();
+        foreach ($active_langs as $lang) {
+            $fallbacks[\FWLanguage::getLanguageCodeById($lang['id'])] = ((array_key_exists($lang['id'], $fallback_lang_codes)) ? \FWLanguage::getLanguageCodeById($fallback_lang_codes[$lang['id']]) : null);
+        }
+
+        // get all symlinks and fallbacks to it
+        $query = '
+            SELECT
+                p
+            FROM
+                Cx\Core\ContentManager\Model\Entity\Page p
+            WHERE
+                (
+                    p.type = ?1 AND
+                    (
+                        p.target LIKE ?2';
+        if ($page->getType() == \Cx\Core\ContentManager\Model\Entity\Page::TYPE_APPLICATION) {
+            $query .= ' OR
+                        p.target LIKE ?3';
+        }
+        $query .= '
+                    )
+                ) OR
+                (
+                    p.type = ?4 AND
+                    p.node = ' . $page->getNode()->getId() . '
+                )
+        ';
+        $q = $em->createQuery($query);
+        $q->setParameter(1, 'symlink');
+        $q->setParameter('2', '%NODE_' . $page->getNode()->getId() . '%');
+        if ($page->getType() == \Cx\Core\ContentManager\Model\Entity\Page::TYPE_APPLICATION) {
+            $q->setParameter('3', '%NODE_' . strtoupper($page->getModule()) . '%');
+        }
+        $q->setParameter(4, 'fallback');
+
+        $result = $q->getResult(); 
+
+        if (!$result) {
+            return $subPages;
+        }
+
+        foreach ($result as $subPage) {
+            if ($subPage->getType() == \Cx\Core\ContentManager\Model\Entity\Page::TYPE_SYMLINK) {
+                $subPages[$subPage->getId()] = $subPage;
+            } else if ($subPage->getType() == \Cx\Core\ContentManager\Model\Entity\Page::TYPE_FALLBACK) {
+                // check if $subPage is a fallback to $page
+                $targetLang = \FWLanguage::getLanguageCodeById($page->getLang());
+                $currentLang = \FWLanguage::getLanguageCodeById($subPage->getLang());
+                while ($currentLang && $currentLang != $targetLang) {
+                    $currentLang = $fallbacks[$currentLang];
+                }
+                if ($currentLang && !isset($subPages[$subPage->getId()])) {
+                    $subPages[$subPage->getId()] = $subPage;
+
+                    // recurse!
+                    $this->getPagesPointingTo($subPage, $subPages);
+                }
+            }
+        }
+        return $subPages;
     }
 }

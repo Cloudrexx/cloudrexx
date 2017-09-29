@@ -48,7 +48,7 @@ class DataSetException extends \Exception {}
 
 /**
  * Data Set
- *
+ * On import and export from and to files the contents will be cached.
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      CLOUDREXX Development Team <info@cloudrexx.com>
  * @package     cloudrexx
@@ -202,20 +202,39 @@ class DataSet implements \Iterator {
     }
 
     /**
+     * Imports a DataSet from a file using an import interface
      *
-     * @param Cx\Core_Modules\Listing\Model\ImportInterface $importInterface
-     * @param type $filename
+     * @param Cx\Core_Modules\Listing\Model\Entity\Importable $importInterface
+     * @param string $filename
+     * @param boolean $useCache Wether to try to load the file from cache or not
      * @throws \Cx\Lib\FileSystem\FileSystemException
-     * @return type
+     * @return \Cx\Core_Modules\Listing\Model\Entity\DataSet
      */
-    public static function importFromFile(\Cx\Core_Modules\Listing\Model\Entity\Importable $importInterface, $filename) {
+    public static function importFromFile(\Cx\Core_Modules\Listing\Model\Entity\Importable $importInterface, $filename, $useCache = true) {
+        if ($useCache) {
+            $cache = \Cx\Core\Core\Controller\Cx::instanciate()->getComponent('Cache');
+            if (!$cache) {
+                $useCache = false;
+            }
+        }
+        if ($useCache) {
+            // try to load imported from cache
+            $objImport = $cache->fetch($filename);
+            if ($objImport) {
+                return $objImport;
+            }
+        }
         try {
             $objFile = new \Cx\Lib\FileSystem\File($filename);
-            return self::import($importInterface, $objFile->getData());
+            $objImport = self::import($importInterface, $objFile->getData());
         } catch (\Cx\Lib\FileSystem\FileSystemException $e) {
             \DBG::msg($e->getMessage());
             throw new DataSetException("Failed to load data from file $filename!");
         }
+        if ($useCache) { // store imported to cache
+            $cache->save($filename, $objImport);
+        }
+        return $objImport;
     }
 
     public function export(\Cx\Core_Modules\Listing\Model\Entity\Exportable $exportInterface) {
@@ -228,16 +247,27 @@ class DataSet implements \Iterator {
     }
 
     /**
+     * Exports a DataSet to a file using an export interface
      *
-     * @param Cx\Core_Modules\Listing\Model\ExportInterface $exportInterface
-     * @param type $filename
+     * @param Cx\Core_Modules\Listing\Model\Entity\Exportable $exportInterface
+     * @param string $filename
+     * @param boolean $useCache
      * @throws \Cx\Lib\FileSystem\FileSystemException
      */
-    public function exportToFile(\Cx\Core_Modules\Listing\Model\Entity\Exportable $exportInterface, $filename) {
+    public function exportToFile(\Cx\Core_Modules\Listing\Model\Entity\Exportable $exportInterface, $filename, $useCache = true) {
         try {
             $objFile = new \Cx\Lib\FileSystem\File($filename);
             $objFile->touch();
-            $objFile->write($this->export($exportInterface));
+            $export = $this->export($exportInterface);
+            $objFile->write($export);
+            // delete old key from cache, to reload it on the next import
+            if ($useCache) {
+                $cache = \Cx\Core\Core\Controller\Cx::instanciate()->getComponent('Cache');
+                if (!$cache) {
+                    throw new DataSetException('Cache component not available at this stage!');
+                }
+                $cache->delete($filename);
+            }
         } catch (\Cx\Lib\FileSystem\FileSystemException $e) {
             \DBG::msg($e->getMessage());
             throw new DataSetException("Failed to export data to file $filename!");
@@ -259,12 +289,13 @@ class DataSet implements \Iterator {
 
     /**
      *
-     * @param type $filename
+     * @param string $filename
+     * @param boolean $useCache Wether to try to load the file from cache or not
      * @throws \Cx\Lib\FileSystem\FileSystemException
      * @return type
      */
-    public static function load($filename) {
-        return self::importFromFile(self::getYamlInterface(), $filename);
+    public static function load($filename, $useCache = true) {
+        return self::importFromFile(self::getYamlInterface(), $filename, $useCache);
     }
 
     public function getDataType() {
@@ -427,6 +458,18 @@ class DataSet implements \Iterator {
             }
             $this->data[$key] = array_merge($sortedData, $val);
         }
+    }
+
+    /**
+     * Filters entries of this DataSet
+     * @param callable $filterFunction
+     */
+    public function filter(callable $filterFunction) {
+        foreach ($this->data as $key=>$entry) {
+            if (!$filterFunction($entry)) {
+                unset($this->data[$key]);
+            }
+        } 
     }
 
     /**

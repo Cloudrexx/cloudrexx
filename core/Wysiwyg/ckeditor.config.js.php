@@ -68,6 +68,7 @@ if(!cx.variables.get('css', 'wysiwyg')) {
 }
 
 CKEDITOR.scriptLoader.load( '<?php echo $cx->getCodeBaseCoreModuleWebPath().'/MediaBrowser/View/Script/MediaBrowserCkeditorPlugin.js'   ?>' );
+CKEDITOR.scriptLoader.load( '<?php echo $cx->getCodeBaseCoreWebPath().'/Wysiwyg/View/Script/ImagePasteCkeditorPlugin.js'; ?>' );
 CKEDITOR.editorConfig = function( config )
 {
     config.skin = 'moono';
@@ -96,54 +97,25 @@ CKEDITOR.editorConfig = function( config )
     config.templates_files = [ '<?php echo $defaultTemplateFilePath; ?>' ];
     config.templates_replaceContent = <?php echo \Cx\Core\Setting\Controller\Setting::getValue('replaceActualContents','Wysiwyg')? 'true' : 'false' ?>;
 
-    config.toolbar_Full = config.toolbar_Small = [
-        ['Source','-','NewPage','Templates'],
-        ['Cut','Copy','Paste','PasteText','PasteFromWord','-','Scayt'],
-        ['Undo','Redo','-','Find','Replace','-','SelectAll','RemoveFormat'],
-        ['Bold','Italic','Underline','Strike','-','Subscript','Superscript'],
-        ['NumberedList','BulletedList','-','Outdent','Indent', 'Blockquote'],
-        ['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
-        ['Link','Unlink','Anchor'],
-        ['Image','Flash','Table','HorizontalRule','SpecialChar'],
-        ['Format'],
-        ['TextColor','BGColor'],
-        ['ShowBlocks'],
-        ['Maximize'],
-        ['Div','CreateDiv']
-    ];
+    config.toolbar_Full = config.toolbar_Small = <?php echo $wysiwyg->getToolbar() ?>;
 
-    config.toolbar_BBCode = [
-        ['Source','-','NewPage'],
-        ['Undo','Redo','-','Replace','-','SelectAll','RemoveFormat'],
-        ['Bold','Italic','Underline','Link','Unlink','SpecialChar'],
-    ];
+    config.toolbar_BBCode = <?php echo $wysiwyg->getToolbar('bbcode') ?>;
 
-    config.toolbar_FrontendEditingContent = [
-        ['Publish','Save','Templates'],
-        ['Cut','Copy','Paste','PasteText','PasteFromWord','-','Scayt'],
-        ['Undo','Redo','-','Replace','-','SelectAll','RemoveFormat'],
-        ['Bold','Italic','Underline','Strike','-','Subscript','Superscript'],
-        ['NumberedList','BulletedList','-','Outdent','Indent', 'Blockquote'],
-        '/',
-        ['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
-        ['Link','Unlink','Anchor'],
-        ['Image','Flash','Table','HorizontalRule','SpecialChar'],
-        ['Format'],
-        ['TextColor','BGColor'],
-        ['ShowBlocks']
-    ];
+    config.toolbar_FrontendEditingContent = <?php echo $wysiwyg->getToolbar('frontendEditingContent') ?>;
 
-    config.toolbar_FrontendEditingTitle = [
-        ['Publish','Save'],
-        ['Cut','Copy','Paste','-','Scayt'],
-        ['Undo','Redo']
-    ];
+    config.toolbar_FrontendEditingTitle = <?php echo $wysiwyg->getToolbar('frontendEditingTitle') ?>;
     config.extraPlugins = 'codemirror';
 
     //Set the CSS Stuff
     config.contentsCss = cx.variables.get('css', 'wysiwyg');
     config.bodyClass = cx.variables.get('bodyClass', 'wysiwyg');
     config.bodyId = cx.variables.get('bodyId', 'wysiwyg');
+    if (
+        window.location.pathname == cx.variables.get('cadminPath') + 'Config/Wysiwyg' ||
+        window.location.pathname == cx.variables.get('cadminPath') + 'Access/group'
+    ) {
+        <?php echo $wysiwyg->getRemovedButtons(); ?>;
+    }
 };
 
 //loading the templates
@@ -175,6 +147,18 @@ CKEDITOR.on('instanceReady',function(){
                 this.button.setState(CKEDITOR.TRISTATE_ENABLE) // Enable "Template"-Button
             }
         }).bind(loadingTemplates)();
+    }
+
+    var translations = cx.variables.get('toolbarTranslations', 'toolbarConfigurator');
+    if (translations && cx.variables.get('language') == 'de') {
+        cx.jQuery('div.toolbarModifier ul[data-type="table-body"] > li[data-type="group"] > ul > li[data-type="subgroup"] > p > span').each(
+            function() {
+                if (translations.hasOwnProperty(cx.jQuery(this).text())) {
+                    var translation = cx.jQuery(this).text();
+                    cx.jQuery(this).text(translations[translation]);
+                }
+            }
+        );
     }
 });
 
@@ -243,7 +227,7 @@ cx.bind("loadingEnd", function(myArgs) {
                     var config = {
                         customConfig: cx.variables.get('basePath', 'contrexx') + cx.variables.get('ckeditorconfigpath', 'contentmanager'),
                         toolbar: 'Full',
-                        skin: 'moono',
+                        skin: 'moono'
                     };
                     CKEDITOR.replace('page[content]', config);
                 }
@@ -277,4 +261,4 @@ Array.prototype.equals = function (array) {
         }
     }
     return true;
-}
+};

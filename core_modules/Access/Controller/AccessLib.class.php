@@ -80,7 +80,7 @@ class AccessLib
      */
     private $attributeNamePrefix = 'access_profile_attribute';
     protected $accountAttributeNamePrefix = 'access_user_';
-    private $modulePrefix = 'ACCESS_';
+    protected $modulePrefix = 'ACCESS_';
 
     private $arrAttributeTypeTemplates;
 
@@ -88,6 +88,14 @@ class AccessLib
 
     private $arrAccountAttributes;
 
+    /**
+     * Static Access id to manage the users(add/edit)
+     */
+    const MANAGE_USER_ACCESS_ID = 202;
+    /**
+     * Static Access id to manage the user groups
+     */
+    const MANAGE_GROUPS_ACCESS_ID = 203;
 
     /**
      * This library can be used to parse/generate the HTML code of a user's
@@ -275,9 +283,15 @@ class AccessLib
         case 'date':
             $value = $objUser->getProfileAttribute($attributeId, $historyId);
             $arrPlaceholders['_VALUE'] = $value !== false && $value !== '' ? htmlentities(date(ASCMS_DATE_FORMAT_DATE, intval($value)), ENT_QUOTES, CONTREXX_CHARSET) : '';
-            $arrPlaceholders['_MONTH'] = $this->getDateMonthMenu($attributeName, date('m', intval($objUser->getProfileAttribute($attributeId, $historyId))));
-            $arrPlaceholders['_DAY'] = $this->getDateDayMenu($attributeName, date('d', intval($objUser->getProfileAttribute($attributeId, $historyId))));
-            $arrPlaceholders['_YEAR'] = $this->getDateYearMenu($attributeName, date('Y', intval($objUser->getProfileAttribute($attributeId, $historyId))));
+            if ($edit) {
+                $arrPlaceholders['_MONTH'] = $this->getDateMonthMenu($attributeName, date('m', intval($objUser->getProfileAttribute($attributeId, $historyId))));
+                $arrPlaceholders['_DAY'] = $this->getDateDayMenu($attributeName, date('d', intval($objUser->getProfileAttribute($attributeId, $historyId))));
+                $arrPlaceholders['_YEAR'] = $this->getDateYearMenu($attributeName, date('Y', intval($objUser->getProfileAttribute($attributeId, $historyId))));
+            } else {
+                $arrPlaceholders['_MONTH'] = date('m', intval($objUser->getProfileAttribute($attributeId, $historyId)));
+                $arrPlaceholders['_DAY'] = date('d', intval($objUser->getProfileAttribute($attributeId, $historyId)));
+                $arrPlaceholders['_YEAR'] = date('Y', intval($objUser->getProfileAttribute($attributeId, $historyId)));
+            }
             break;
         case 'text':
         case 'mail':
@@ -613,13 +627,15 @@ class AccessLib
     {
         global $_CORELANG;
 
-        $arrScope = array('frontend', 'backend');
         $this->arrAccountAttributes['frontend_language']['children'][0] = $this->arrAccountAttributes['backend_language']['children'][0] = $_CORELANG['TXT_ACCESS_DEFAULT'];
         foreach (\FWLanguage::getLanguageArray() as $langId => $arrLanguage) {
-            foreach ($arrScope as $scope) {
-                if ($arrLanguage[$scope]) {
-                    $this->arrAccountAttributes[$scope.'_language']['children'][$langId] = $arrLanguage['name'];
-                }
+            if ($arrLanguage['frontend']) {
+                $this->arrAccountAttributes['frontend_language']['children'][$langId] = $arrLanguage['name'];
+            }
+        }
+        foreach (\FWLanguage::getBackendLanguageArray() as $langId => $arrLanguage) {
+            if ($arrLanguage['backend']) {
+                $this->arrAccountAttributes['backend_language']['children'][$langId] = $arrLanguage['name'];
             }
         }
     }
@@ -1909,19 +1925,38 @@ JS
         global $objDatabase;
 
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+
+        // fetch thumbnails of fallback images
+        $noAvatarThumbnails =
+            $cx->getMediaSourceManager()
+            ->getThumbnailGenerator()
+            ->getThumbnailsFromFile(
+                $cx->getWebsiteImagesAccessProfileWebPath(),
+                \User_Profile::$arrNoAvatar['src'],
+                true
+            );
+        $noPictureThumbnails =
+            $cx->getMediaSourceManager()
+            ->getThumbnailGenerator()
+            ->getThumbnailsFromFile(
+                $cx->getWebsiteImagesAccessPhotoWebPath(),
+                \User_Profile::$arrNoPicture['src'],
+                true
+            );
+        $noThumbnails = array_merge($noAvatarThumbnails, $noPictureThumbnails);
+
+        // strip path from fallback thumbnails
+        $excludeFiles = array_map('basename', $noThumbnails);
+
+        // add fallback images
+        $excludeFiles[] = \User_Profile::$arrNoAvatar['src'];
+        $excludeFiles[] = \User_Profile::$arrNoPicture['src'];
+
+        // quote images for REGEXP
+        $excludeFiles = array_map('preg_quote', $excludeFiles);
+
         // Regex matching folders and files not to be deleted
-        $noAvatarThumbSrc = \ImageManager::getThumbnailFilename(
-            $cx->getWebsiteImagesAccessProfileWebPath() .'/'.
-            \User_Profile::$arrNoAvatar['src']);
-        $noPictureThumbSrc = \ImageManager::getThumbnailFilename(
-            $cx->getWebsiteImagesAccessPhotoWebPath() .'/'.
-            \User_Profile::$arrNoPicture['src']);
-        $ignoreRe =
-            '/(?:\.(?:\.?|svn)'.
-            '|'.preg_quote(\User_Profile::$arrNoAvatar['src'], '/').
-            '|'.preg_quote($noAvatarThumbSrc, '/').
-            '|'.preg_quote(\User_Profile::$arrNoPicture['src'], '/').
-            '|'.preg_quote($noPictureThumbSrc, '/').')$/';
+        $ignoreRe = '#^(?:\.(?:\.?|svn|git|htaccess|ftpaccess)|' . implode('|', $excludeFiles) . ')$#';
 
         $arrTrueFalse = array(true, false);
         foreach ($arrTrueFalse as $profilePics) {
@@ -1932,21 +1967,8 @@ JS
             $arrImages = array();
             $offset = 0;
             $step = 50000;
-// TODO: Never used
-//            $removeImages = array();
 
-            if (CONTREXX_PHP5) {
-                $arrImages = scandir($imagePath);
-            } else {
-// TODO: We're PHP5 *ONLY* now.  This is obsolete
-                $dh  = opendir($imagePath);
-                $image = readdir($dh);
-                while ($image !== false) {
-                    $arrImages[] = $image;
-                    $image = readdir($dh);
-                }
-                closedir($dh);
-            }
+            $arrImages = scandir($imagePath);
             foreach ($arrImages as $index => $file) {
                 if (preg_match($ignoreRe, $file)) unset($arrImages[$index]);
             }
@@ -1990,18 +2012,28 @@ JS
                     $arrImagesDb = array();
                     while (!$objImage->EOF) {
                         $arrImagesDb[] = $objImage->fields['picture'];
-                        $arrImagesDb[] = basename(
-                            \ImageManager::getThumbnailFilename(
-                                $imageWebPath
-                                .'/'. $objImage->fields['picture']
-                        ));
+
+                        // fetch all thumbnails of image
+                        $thumbnails =
+                            $cx->getMediaSourceManager()
+                            ->getThumbnailGenerator()
+                            ->getThumbnailsFromFile(
+                                $imageWebPath,
+                                $objImage->fields['picture'],
+                                true
+                            );
+                        $thumbnails = array_map('basename', $thumbnails);
+                        $arrImagesDb = array_merge($arrImagesDb, $thumbnails);
+
                         $objImage->MoveNext();
                     }
                     $offset += $step;
                     $arrImages = array_diff($arrImages, $arrImagesDb);
                 }
             }
-            array_walk($arrImages, create_function('$img', 'unlink("'.$imagePath.'/".$img);'));
+            array_walk($arrImages, function ($img) use ($imagePath) {
+                unlink($imagePath.'/'.$img);
+            });
         }
 
         return true;
@@ -2154,4 +2186,66 @@ JS
 
         return $uploader;
     }
+
+    /**
+     * Additional permission check for users with access permission
+     * MANAGE_GROUPS_ACCESS_ID.
+     *
+     * Exists to avoid that the user removes his permission to manage access groups
+     *
+     * Will return false when the group which is edited/deactivated/deleted
+     * is the only group which grants the user the permission to edit groups
+     *
+     * Will return true otherwise (or if the user has administrator privileges)
+     *
+     * @param integer $groupId The id of the group which is edited
+     * @return boolean
+     */
+    public function checkManageGroupAccessPermission($groupId) {
+
+        $fwUser = \FWUser::getFWUserObject();
+
+        // case 1: user is admin, dont bother
+        if ($fwUser->objUser->getAdminStatus()) {
+            return true;
+        }
+
+        // get the active groups associated to the user
+        $userGroups = $fwUser->objUser->getAssociatedGroupIds(true);
+
+        // case 2: user has only one associated group
+        if (count($userGroups) == 1) {
+            // when the edited group is the user's group, return false,
+            // otherwise true
+            return !($groupId == $userGroups[0]);
+        }
+        // case 3: user has multiple associated groups
+        // if the edited group isn't in the user's groups,
+        // don't bother and return true already
+        if (!in_array($groupId, $userGroups)) {
+            return true;
+        }
+        // now we have to check if another group exists,
+        // which gives the user the right to edit groups
+
+        // 1. exclude edited group id from the selection
+        $userGroups = array_diff($userGroups, array($groupId));
+        // 2. check if the remaining groups have the access permission
+        //    AccessLib::MANAGE_GROUPS_ACCESS_ID
+        foreach ($userGroups as $id) {
+            $group = $fwUser->objGroup->getGroup($id);
+            if (
+                in_array(
+                    static::MANAGE_GROUPS_ACCESS_ID,
+                    $group->getStaticPermissionIds()
+                )
+            ) {
+                return true;
+            }
+        }
+        // no other group found, removing of permission not allowed
+        return false;
+    }
+
+
 }

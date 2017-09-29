@@ -158,7 +158,7 @@ cx.ready(function() {
 
     cx.vm.themesManipulationAjaxCall = function(url, data, callback) {
         cx.trigger("loadingStart", "viewmanager", {});
-        cx.tools.StatusMessage.showMessage("<div id=\"loading\">" + cx.jQuery('#loading').html() + "</div>");
+        cx.tools.StatusMessage.showMessage("<div id=\"loading\">" + cx.variables.get('loading', "viewmanager/lang") + "</div>");
         cx.vm.lock();
         cx.jQuery.ajax({
             url: url,

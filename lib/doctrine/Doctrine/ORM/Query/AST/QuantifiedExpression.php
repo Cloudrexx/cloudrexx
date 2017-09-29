@@ -1,7 +1,5 @@
 <?php
 /*
- *  $Id$
- *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -15,54 +13,69 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * This software consists of voluntary contributions made by many individuals
- * and is licensed under the LGPL. For more information, see
+ * and is licensed under the MIT license. For more information, see
  * <http://www.doctrine-project.org>.
  */
-
 namespace Doctrine\ORM\Query\AST;
 
 /**
  * QuantifiedExpression ::= ("ALL" | "ANY" | "SOME") "(" Subselect ")"
  *
- * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link    www.doctrine-project.org
  * @since   2.0
- * @version $Revision: 3938 $
  * @author  Guilherme Blanco <guilhermeblanco@hotmail.com>
  * @author  Jonathan Wage <jonwage@gmail.com>
  * @author  Roman Borschel <roman@code-factory.org>
  */
 class QuantifiedExpression extends Node
 {
+    /**
+     * @var string
+     */
     public $type;
+
+    /**
+     * @var Subselect
+     */
     public $subselect;
 
+    /**
+     * @param Subselect $subselect
+     */
     public function __construct($subselect)
     {
         $this->subselect = $subselect;
     }
 
+    /**
+     * @return bool
+     */
     public function isAll()
     {
         return strtoupper($this->type) == 'ALL';
     }
 
+    /**
+     * @return bool
+     */
     public function isAny()
     {
         return strtoupper($this->type) == 'ANY';
     }
 
+    /**
+     * @return bool
+     */
     public function isSome()
     {
         return strtoupper($this->type) == 'SOME';
     }
 
     /**
-     * @override
+     * {@inheritdoc}
      */
     public function dispatch($sqlWalker)
     {
         return $sqlWalker->walkQuantifiedExpression($this);
     }
 }
-

@@ -13,14 +13,14 @@
 </script>
 <div id="market">
     <div class="search">
-        <form action="index.php?" method="get" name="marketSearch" id="marketSearch">
+        <form action="{NODE_MARKET}" method="get" name="marketSearch" id="marketSearch">
             <input class="searchbox" name="term" value="{TXT_MARKET_SEARCHTERM}" maxlength="100" />
-            <input type="hidden" id="searchCheck" name="check" value="norm" />
+            <input type="hidden" id="searchCheck" name="check" value="{TXT_MARKET_EXP_SEARCH}" />
             <input type="hidden" name="section" value="Market" />
             <input type="hidden" name="cmd" value="search" />&nbsp;
             <input type="submit" value="{TXT_MARKET_SEARCH}" name="search" />
             <div class="adv-search">&nbsp;&raquo;&nbsp;<a href="javascript:toggle('hiddenSearch')" >{TXT_MARKET_SEARCH_EXP}</a></div><br />
-            <div style="display: none;" id="hiddenSearch">
+            <div style="{TXT_MARKET_EXP_SEARCH_TOGGLE}" id="hiddenSearch">
                 {MARKET_EXP_SEARCH_FIELD}
             </div>
         </form>

@@ -1,0 +1,31 @@
+Cx\Modules\Calendar\Model\Entity\RegistrationFormFieldValue:
+  type: entity
+  table: module_calendar_registration_form_field_value
+  indexes:
+    contrexx_module_calendar_reg_id_ibfk:
+      columns: [ reg_id ]
+    contrexx_module_calendar_field_id_ibfk:
+      columns: [ field_id ]
+  id:
+    regId:
+      type: integer
+      column: reg_id
+    fieldId:
+      type: integer
+      column: field_id
+  fields:
+    value:
+      type: text
+  manyToOne:
+    registration:
+      targetEntity: Cx\Modules\Calendar\Model\Entity\Registration
+      inversedBy: registrationFormFieldValues
+      joinColumn:
+        name: reg_id
+        referencedColumnName: id
+    registrationFormField:
+      targetEntity: Cx\Modules\Calendar\Model\Entity\RegistrationFormField
+      inversedBy: registrationFormFieldValues
+      joinColumn:
+        name: field_id
+        referencedColumnName: id

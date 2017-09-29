@@ -1141,7 +1141,7 @@ class LanguageManager
                     $alias = $pageRepo->findBy(array(
                         'type' => \Cx\Core\ContentManager\Model\Entity\Page::TYPE_ALIAS,
                         'slug' => $languageCode,
-                    ), true);
+                    ), null, null, null, true);
 
                     if (count($alias)) {
                         if (is_array($alias)) $alias = $alias[0];
@@ -1175,6 +1175,23 @@ class LanguageManager
                                         WHERE id=".$id);
             }
             $this->strOkMessage = $_ARRAYLANG['TXT_DATA_RECORD_UPDATED_SUCCESSFUL'];
+            //clear cache
+            $widgetNames = array(
+                'LANGUAGE_NAVBAR',
+                'LANGUAGE_NAVBAR_SHORT',
+                'ACTIVE_LANGUAGE_NAME'
+            );
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $cx->getEvents()->triggerEvent(
+                'clearEsiCache',
+                array(
+                    'Widget',
+                    array_merge(
+                        $widgetNames,
+                        $this->getLanguagePlaceholderNames()
+                    )
+                )
+            );
             \FWLanguage::init();
             return true;
         }
@@ -1386,5 +1403,20 @@ class LanguageManager
         } else {
             $this->strOkMessage .= "<br />".$_ARRAYLANG['TXT_SUCCESSFULLY_EXPORTED_TO_FILES'];
         }
+    }
+
+    /**
+     * Get language placeholder names
+     *
+     * @return array
+     */
+    function getLanguagePlaceholderNames()
+    {
+        $activeLanguages = \FWLanguage::getActiveFrontendLanguages();
+        foreach ($activeLanguages as $langData) {
+            $placeholders[] = 'LANG_CHANGE_' . strtoupper($langData['lang']);
+            $placeholders[] = 'LANG_SELECTED_' . strtoupper($langData['lang']);
+        }
+        return $placeholders;
     }
 }

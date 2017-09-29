@@ -160,7 +160,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 // Get Headlines
                 $modulespath = ASCMS_CORE_MODULE_PATH.'/News/Controller/NewsHeadlines.class.php';
                 if (file_exists($modulespath)) {
-                    for ($i = 0; $i <= 10; $i++) {
+                    for ($i = 0; $i <= 20; $i++) {
                         $visibleI = '';
                         if ($i > 0) {
                             $visibleI = (string) $i;
@@ -264,25 +264,29 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 // Set news teasers
                  $config = \Env::get('config');
                 if ($config['newsTeasersStatus'] == '1') {
+                    $objTeasers = null;
                     // set news teasers in the content
                     if (preg_match_all('/{TEASERS_([0-9A-Z_-]+)}/', $page->getContent(), $arrMatches)) {
-                        /** @ignore */
+                        if (!$objTeasers) {
                             $objTeasers = new Teasers();
-                            $content = $page->getContent();
-                            $objTeasers->setTeaserFrames($arrMatches[1], $content);
-                            $page->setContent($content);
+                        }
+                        $content = $page->getContent();
+                        $objTeasers->setTeaserFrames($arrMatches[1], $content);
+                        $page->setContent($content);
                     }
                     // set news teasers in the page design
                     if (preg_match_all('/{TEASERS_([0-9A-Z_-]+)}/', $page_template, $arrMatches)) {
-                        /** @ignore */
-                        $objTeasers = new Teasers();
+                        if (!$objTeasers) {
+                            $objTeasers = new Teasers();
+                        }
                         $objTeasers->setTeaserFrames($arrMatches[1], $page_template);
                     }
                     // set news teasers in the website design
                     if (preg_match_all('/{TEASERS_([0-9A-Z_-]+)}/', $themesPages['index'], $arrMatches)) {
-                        /** @ignore */
+                        if (!$objTeasers) {
                             $objTeasers = new Teasers();
-                            $objTeasers->setTeaserFrames($arrMatches[1], $themesPages['index']);
+                        }
+                        $objTeasers->setTeaserFrames($arrMatches[1], $themesPages['index']);
                     }
                 }
                 break;
@@ -292,6 +296,25 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         }
     }
 
+    /**
+     * Do something with a Response object
+     * You may do page alterations here (like changing the metatitle)
+     * You may do response alterations here (like set headers)
+     * PLEASE MAKE SURE THIS METHOD IS MOCKABLE. IT MAY ONLY INTERACT WITH
+     * resolve() HOOK.
+     *
+     * @param \Cx\Core\Routing\Model\Entity\Response $response Response object to adjust
+     */
+    public function adjustResponse(\Cx\Core\Routing\Model\Entity\Response $response) {
+        $params = $response->getRequest()->getUrl()->getParamArray();
+        unset($params['section']);
+        unset($params['cmd']);
+        $canonicalUrl = \Cx\Core\Routing\Url::fromPage($response->getPage(), $params);
+        $response->setHeader(
+            'Link',
+            '<' . $canonicalUrl->toString() . '>; rel="canonical"'
+        );
+    }
 
     /**
      * Do something for search the content
@@ -306,6 +329,10 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      * Register the Event listeners
      */
     public function registerEventListeners() {
-        $this->cx->getEvents()->addEventListener('languageStatusUpdate', new \Cx\Core_Modules\News\Model\Event\NewsEventListener());
+        $evm = $this->cx->getEvents();
+        // locale event listener
+        $localeLocaleEventListener = new \Cx\Core_Modules\News\Model\Event\LocaleLocaleEventListener($this->cx);
+        $evm->addModelListener('postPersist', 'Cx\\Core\\Locale\\Model\\Entity\\Locale', $localeLocaleEventListener);
+        $evm->addModelListener('preRemove', 'Cx\\Core\\Locale\\Model\\Entity\\Locale', $localeLocaleEventListener);
     }
 }

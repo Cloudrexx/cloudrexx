@@ -10,9 +10,6 @@ use Gedmo\Timestampable\Mapping\Event\TimestampableAdapter;
  * for Timestampable behavior
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
- * @package Gedmo\Timestampable\Mapping\Event\Adapter
- * @subpackage ODM
- * @link http://www.gediminasm.org
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 final class ODM extends BaseAdapterODM implements TimestampableAdapter
@@ -26,6 +23,10 @@ final class ODM extends BaseAdapterODM implements TimestampableAdapter
         if (isset($mapping['type']) && $mapping['type'] === 'timestamp') {
             return time();
         }
+        if (isset($mapping['type']) && $mapping['type'] == 'zenddate') {
+            return new \Zend_Date();
+        }
+
         return new \DateTime();
     }
 }

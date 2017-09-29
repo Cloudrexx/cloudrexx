@@ -1,0 +1,55 @@
+options:
+  -
+    name: font_family_header
+    specific:
+      activeChoice: Ubuntu
+  -
+    name: font_family_body
+    specific:
+      activeChoice: Arial
+  -
+    name: font_family_navigation
+    specific:
+      activeChoice: Ubuntu
+  -
+    name: main_title
+    specific:
+      textvalue: 'Template Editor Test'
+  -
+    name: subtitle
+    specific:
+      textvalue: 'Testing the templateditor sfdsfs'
+  -
+    name: main_color
+    specific:
+      color: '#0d0e12'
+  -
+    name: secondary_color
+    specific:
+      color: '#1abc9c'
+  -
+    name: link_color
+    specific:
+      color: '#27ae60'
+  -
+    name: news_area
+    specific:
+      active: true
+  -
+    name: events_area
+    specific:
+      active: true
+  -
+    name: newsletter_area
+    specific:
+      active: true
+  -
+    name: logo_image
+    specific:
+      url: /themes/rexx/images/demo_logo.png
+  -
+    name: slider_images
+    specific:
+      urls:
+        1: /images/content/slideshow/slide_1.jpg
+        2: /images/content/slideshow/slide_2.jpg

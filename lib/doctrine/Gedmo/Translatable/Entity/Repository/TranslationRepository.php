@@ -2,29 +2,42 @@
 
 namespace Gedmo\Translatable\Entity\Repository;
 
-use Gedmo\Translatable\TranslationListener;
+use Gedmo\Translatable\TranslatableListener;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Gedmo\Tool\Wrapper\EntityWrapper;
+use Gedmo\Translatable\Mapping\Event\Adapter\ORM as TranslatableAdapterORM;
+use Doctrine\DBAL\Types\Type;
 
 /**
  * The TranslationRepository has some useful functions
  * to interact with translations.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
- * @package Gedmo.Translatable.Entity.Repository
- * @subpackage TranslationRepository
- * @link http://www.gediminasm.org
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 class TranslationRepository extends EntityRepository
 {
     /**
-     * Current TranslationListener instance used
+     * Current TranslatableListener instance used
      * in EntityManager
      *
-     * @var TranslationListener
+     * @var TranslatableListener
      */
     private $listener;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __construct(EntityManager $em, ClassMetadata $class)
+    {
+        if ($class->getReflectionClass()->isSubclassOf('Gedmo\Translatable\Entity\MappedSuperclass\AbstractPersonalTranslation')) {
+            throw new \Gedmo\Exception\UnexpectedValueException('This repository is useless for personal translations');
+        }
+        parent::__construct($em, $class);
+    }
 
     /**
      * Makes additional translation of $entity $field into $locale
@@ -33,43 +46,91 @@ class TranslationRepository extends EntityRepository
      * @param object $entity
      * @param string $field
      * @param string $locale
-     * @param mixed $value
-     * @return TranslationRepository
+     * @param mixed  $value
+     *
+     * @throws \Gedmo\Exception\InvalidArgumentException
+     *
+     * @return static
      */
     public function translate($entity, $field, $locale, $value)
     {
         $meta = $this->_em->getClassMetadata(get_class($entity));
-        $config = $this->getTranslationListener()->getConfiguration($this->_em, $meta->name);
+        $listener = $this->getTranslatableListener();
+        $config = $listener->getConfiguration($this->_em, $meta->name);
         if (!isset($config['fields']) || !in_array($field, $config['fields'])) {
-            throw new \Gedmo\Exception\InvalidArgumentException("Entity: {$meta->name} does not translate - {$field}");
+            throw new \Gedmo\Exception\InvalidArgumentException("Entity: {$meta->name} does not translate field - {$field}");
         }
-        $oid = spl_object_hash($entity);
-        $this->listener->addTranslation($oid, $field, $locale, $value);
+        $needsPersist = true;
+        if ($locale === $listener->getTranslatableLocale($entity, $meta)) {
+            $meta->getReflectionProperty($field)->setValue($entity, $value);
+            $this->_em->persist($entity);
+        } else {
+            if (isset($config['translationClass'])) {
+                $class = $config['translationClass'];
+            } else {
+                $ea = new TranslatableAdapterORM();
+                $class = $listener->getTranslationClass($ea, $config['useObjectClass']);
+            }
+            $foreignKey = $meta->getReflectionProperty($meta->getSingleIdentifierFieldName())->getValue($entity);
+            $objectClass = $config['useObjectClass'];
+            $transMeta = $this->_em->getClassMetadata($class);
+            $trans = $this->findOneBy(compact('locale', 'objectClass', 'field', 'foreignKey'));
+            if (!$trans) {
+                $trans = $transMeta->newInstance();
+                $transMeta->getReflectionProperty('foreignKey')->setValue($trans, $foreignKey);
+                $transMeta->getReflectionProperty('objectClass')->setValue($trans, $objectClass);
+                $transMeta->getReflectionProperty('field')->setValue($trans, $field);
+                $transMeta->getReflectionProperty('locale')->setValue($trans, $locale);
+            }
+            if ($listener->getDefaultLocale() != $listener->getTranslatableLocale($entity, $meta) &&
+                $locale === $listener->getDefaultLocale()) {
+                $listener->setTranslationInDefaultLocale(spl_object_hash($entity), $field, $trans);
+                $needsPersist = $listener->getPersistDefaultLocaleTranslation();
+            }
+            $type = Type::getType($meta->getTypeOfField($field));
+            $transformed = $type->convertToDatabaseValue($value, $this->_em->getConnection()->getDatabasePlatform());
+            $transMeta->getReflectionProperty('content')->setValue($trans, $transformed);
+            if ($needsPersist) {
+                if ($this->_em->getUnitOfWork()->isInIdentityMap($entity)) {
+                    $this->_em->persist($trans);
+                } else {
+                    $oid = spl_object_hash($entity);
+                    $listener->addPendingTranslationInsert($oid, $trans);
+                }
+            }
+        }
+
         return $this;
     }
+
     /**
      * Loads all translations with all translatable
      * fields from the given entity
      *
      * @param object $entity Must implement Translatable
+     *
      * @return array list of translations in locale groups
      */
     public function findTranslations($entity)
     {
         $result = array();
-        if ($entity) {
-            if ($this->_em->getUnitOfWork()->getEntityState($entity) == \Doctrine\ORM\UnitOfWork::STATE_NEW) {
-                return $result;
-            }
-            $meta = $this->_em->getClassMetadata(get_class($entity));
-            $entityClass = $meta->name;
-            $identifier = $meta->getSingleIdentifierFieldName();
-            $entityId = $meta->getReflectionProperty($identifier)->getValue($entity);
-
+        $wrapped = new EntityWrapper($entity, $this->_em);
+        if ($wrapped->hasValidIdentifier()) {
+            $entityId = $wrapped->getIdentifier();
+            $entityClass = $wrapped->getMetadata()->rootEntityName;
             $translationMeta = $this->getClassMetadata(); // table inheritance support
+
+            $config = $this
+                ->getTranslatableListener()
+                ->getConfiguration($this->_em, get_class($entity));
+
+            $translationClass = isset($config['translationClass']) ?
+                $config['translationClass'] :
+                $translationMeta->rootEntityName;
+
             $qb = $this->_em->createQueryBuilder();
             $qb->select('trans.content, trans.field, trans.locale')
-                ->from($translationMeta->rootEntityName, 'trans')
+                ->from($translationClass, 'trans')
                 ->where('trans.foreignKey = :entityId', 'trans.objectClass = :entityClass')
                 ->orderBy('trans.locale');
             $q = $qb->getQuery();
@@ -84,18 +145,20 @@ class TranslationRepository extends EntityRepository
                 }
             }
         }
+
         return $result;
     }
 
     /**
      * Find the entity $class by the translated field.
-     * Result is the first occurence of translated field.
+     * Result is the first occurrence of translated field.
      * Query can be slow, since there are no indexes on such
      * columns
      *
      * @param string $field
      * @param string $value
      * @param string $class
+     *
      * @return object - instance of $class or null if not found
      */
     public function findObjectByTranslatedField($field, $value, $class)
@@ -118,6 +181,7 @@ class TranslationRepository extends EntityRepository
                 $entity = $this->_em->find($class, $id);
             }
         }
+
         return $entity;
     }
 
@@ -126,6 +190,7 @@ class TranslationRepository extends EntityRepository
      * fields by a given entity primary key
      *
      * @param mixed $id - primary key value of an entity
+     *
      * @return array
      */
     public function findTranslationsByObjectId($id)
@@ -150,34 +215,31 @@ class TranslationRepository extends EntityRepository
                 }
             }
         }
+
         return $result;
     }
 
     /**
-     * Get the currently used TranslationListener
+     * Get the currently used TranslatableListener
      *
      * @throws \Gedmo\Exception\RuntimeException - if listener is not found
-     * @return TranslationListener
+     *
+     * @return TranslatableListener
      */
-    private function getTranslationListener()
+    private function getTranslatableListener()
     {
         if (!$this->listener) {
             foreach ($this->_em->getEventManager()->getListeners() as $event => $listeners) {
                 foreach ($listeners as $hash => $listener) {
-                    if ($listener instanceof TranslationListener) {
-                        $this->listener = $listener;
-                        break;
+                    if ($listener instanceof TranslatableListener) {
+                        return $this->listener = $listener;
                     }
-                }
-                if ($this->listener) {
-                    break;
                 }
             }
 
-            if (is_null($this->listener)) {
-                throw new \Gedmo\Exception\RuntimeException('The translation listener could not be found');
-            }
+            throw new \Gedmo\Exception\RuntimeException('The translation listener could not be found');
         }
+
         return $this->listener;
     }
 }

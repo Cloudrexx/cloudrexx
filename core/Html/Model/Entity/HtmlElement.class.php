@@ -230,11 +230,13 @@ class HtmlElement extends \Cx\Model\Base\EntityBase {
             ));
             $template->parse('attribute');
         }
-        $template->setVariable(array(
-            'ATTRIBUTE_NAME' => 'class',
-            'ATTRIBUTE_VALUE' => contrexx_raw2xhtml($this->getClasses()),
-        ));
-        $template->parse('attribute');
+        if (count($this->classes)) {
+            $template->setVariable(array(
+                'ATTRIBUTE_NAME' => 'class',
+                'ATTRIBUTE_VALUE' => contrexx_raw2xhtml($this->getClasses()),
+            ));
+            $template->parse('attribute');
+        }
         $this->output = $template->get();
         return $this->output;
     }

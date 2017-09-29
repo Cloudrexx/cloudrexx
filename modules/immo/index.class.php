@@ -331,9 +331,6 @@ class Immo extends ImmoLib
     function _showInterestForm()
     {
         global $objDatabase, $_ARRAYLANG, $_CONFIG;
-        require_once(
-            ASCMS_LIBRARY_PATH.DIRECTORY_SEPARATOR.'phpmailer'.
-            DIRECTORY_SEPARATOR."class.phpmailer.php");
 
         if (!empty($_REQUEST['immoid'])) {
             $this->_objTpl->setVariable('IMMO_ID', intval($_REQUEST['immoid']));
@@ -383,7 +380,7 @@ class Immo extends ImmoLib
             $address = $this->_getFieldFromText('adresse');
             $location = $this->_getFieldFromText('ort');
 
-            $mailer = new PHPMailer();
+            $mailer = new Cx\Core\MailTemplate\Model\Entity\Mail();
             $objRS = $objDatabase->Execute('
                 SELECT setvalue
                   FROM '.DBPREFIX.'module_immo_settings
@@ -394,18 +391,6 @@ class Immo extends ImmoLib
                 $mailer->AddAddress($email);
             }
 
-            if ($_CONFIG['coreSmtpServer'] > 0 && @include_once ASCMS_CORE_PATH.'/SmtpSettings.class.php') {
-                if (($arrSmtp = SmtpSettings::getSmtpAccount($_CONFIG['coreSmtpServer'])) !== false) {
-                    $mailer->IsSMTP();
-                    $mailer->Host = $arrSmtp['hostname'];
-                    $mailer->Port = $arrSmtp['port'];
-                    $mailer->SMTPAuth = true;
-                    $mailer->Username = $arrSmtp['username'];
-                    $mailer->Password = $arrSmtp['password'];
-                }
-            }
-
-            $mailer->CharSet = CONTREXX_CHARSET;
             $mailer->SetFrom(contrexx_addslashes($_REQUEST['contactFormField_email']), 'Interessent');
             $mailer->Subject = 'Neuer Interessent für '.$ref_note.' Ref-Nr.: '.$reference;
             $mailer->IsHTML(false);
@@ -677,7 +662,6 @@ class Immo extends ImmoLib
             $error=0;
             if ($objValidator->isEmail($email)) {
                 if (!empty($name) && !empty($telephone) && !empty($email) && $immoID > 0 && $fieldID > 0) {
-                    require_once(ASCMS_LIBRARY_PATH.DS.'/phpmailer'.DS."class.phpmailer.php");
                     $objRS = $objDatabase->SelectLimit("SELECT email
                                                 FROM ".DBPREFIX."module_immo_contact
                                                 WHERE immo_id = '$immoID'
@@ -696,12 +680,11 @@ class Immo extends ImmoLib
                                                 AND lang_id = '".$this->frontLang."'", 1);
                     if ($objRS) {
                         $link = 'http://'.$_CONFIG['domainUrl'].str_replace(" ", "%20", $objRS->fields['fieldvalue']);
-                        $mailer = new PHPMailer();
+                        $mailer = new Cx\Core\MailTemplate\Model\Entity\Mail();
                         $objDatabase->Execute("INSERT INTO ".DBPREFIX."module_immo_contact
                                                 VALUES
                                                 (NULL, '$email', '$name', '$firstname', '$street', '$zip', '$location', '$company', '$telephone', '$telephone_office', '$telephone_mobile', '$purchase', '$funding', '$comment', '$immoID', '$fieldID', ".mktime()." )");
 
-                        $mailer->CharSet = CONTREXX_CHARSET;
                         $mailer->IsHTML(false);
                         $mailer->SetFrom($this->arrSettings['sender_email'], $this->arrSettings['sender_name']);
                         $mailer->Subject = $this->arrSettings['prot_link_message_subject'];

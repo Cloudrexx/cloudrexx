@@ -1,4 +1,40 @@
 <!-- START module_calendar_event_registrations.html -->
+<style type="text/css">
+    /* jquery ui css customization */
+    .ui-dialog.cxDialog {
+        position: absolute;
+        top: 0 !important;
+        border-top: 0;
+        border-right: 1px solid #0a85c8;
+        border-bottom: 1px solid #0a85c8;
+        border-left: 1px solid #0a85c8;
+        border-radius: 0;
+        text-align: center;
+    }
+    .ui-dialog.noTitle .ui-dialog-titlebar {
+        display: none;
+    }
+    .ui-dialog .error {
+        color: #ff0000;
+    }
+    .ui-dialog #loading {
+        float: none;
+        margin: 0 auto;
+        width: 95px !important;
+        height: 16px !important;
+    }
+    .ui-dialog #loading img {
+        float: left;
+    }
+    .export_options,
+    .export_options > label {
+        width: 100%;
+        float: left;
+    }
+    .export_options input {
+        outline: none;
+    }
+</style>
 <script language="JavaScript" type="text/javascript">
 // <![CDATA[
     function selectMultiAction(containerForm) {
@@ -44,13 +80,56 @@
             var url = "index.php?cmd={CALENDAR_MODULE_NAME}&act=event_registrations&tpl=" + $J('.registration-tab .active').data('registrationType') + "&id={CALENDAR_EVENT_ID}&date=" + selectedDateFilter + '&csrf=' + cx.variables.get('csrf', 'contrexx');
             window.location.replace(url);
         });
+        cx.jQuery('.export_csv').click(function() {
+            cx.jQuery('.csv-file').attr('checked', 'checked');
+            cx.jQuery('.csv-excel-file').removeAttr('checked');
+
+            var fileFormat = Cookies.get('format');
+            if (fileFormat && fileFormat === 'export_csv_excel') {
+                cx.jQuery('.csv-excel-file').attr('checked', 'checked');
+                cx.jQuery('.csv-file').removeAttr('checked');
+            }
+            var exportDialog = cx.ui.dialog({
+                width: 520,
+                title: '{TXT_CALENDAR_EXPORT_TITLE}',
+                content: cx.jQuery( ".exportContainer" ).html(),
+                autoOpen: false,
+                buttons: {
+                    "{TXT_CALENDAR_EXPORT_CANCEL}" : function() {
+                        cx.jQuery(this).dialog("close");
+                    },
+                    "{TXT_CALENDAR_EXPORT_EXPORT}": function() {
+                        var exportFormat = cx.jQuery('input[name=export]:checked').val();
+                        var url = "index.php?cmd={CALENDAR_MODULE_NAME}&act=export_registrations&id={CALENDAR_EVENT_ID}&format=" + exportFormat + "&{CALENDAR_CSRF}";
+                        Cookies.set("format", exportFormat);
+                        window.location.href = url;
+                        cx.jQuery(this).dialog("close");
+                    }
+                },
+                close: function () {
+                    cx.jQuery(this).dialog("close");
+                }
+            });
+            exportDialog.open();
+        });
     });
 // ]]>
 </script>
 <div id="subnavbar_level2">
     <li><a href='index.php?cmd={CALENDAR_MODULE_NAME}&amp;act=event_registrations&amp;id={CALENDAR_EVENT_ID}' title="{TXT_CALENDAR_SUBSCRIPTIONS}">{TXT_CALENDAR_SUBSCRIPTIONS}</a></li>
     <li><a href='index.php?cmd={CALENDAR_MODULE_NAME}&amp;act=add_registration&amp;event_id={CALENDAR_EVENT_ID}' title="{TXT_CALENDAR_ADD}">{TXT_CALENDAR_ADD}</a></li>
-    <li><a href='index.php?cmd={CALENDAR_MODULE_NAME}&amp;act=export_registrations&amp;id={CALENDAR_EVENT_ID}' title="{TXT_CALENDAR_EXPORT}">{TXT_CALENDAR_EXPORT}</a></li>
+    <li><a href="javascript:{}" class="export_csv" title="{TXT_CALENDAR_EXPORT}">{TXT_CALENDAR_EXPORT}</a></li>
+</div>
+<div class="exportContainer" style="display: none;">
+    <div class="export_options">
+        <span>{TXT_CALENDAR_EXPORT_SUB_TITLE}</span>
+        <label>
+            <input type="radio" name="export" value="export_csv" class="csv-file">{TXT_CALENDAR_EXPORT_CSV}
+        </label>
+        <label>
+            <input type="radio" name="export" value="export_csv_excel" class="csv-excel-file">{TXT_CALENDAR_EXPORT_CSV_FOR_MS_EXCEL}
+        </label>
+    </div>
 </div>
 <br />
 <ul id="tabmenu" class="registration-tab">

@@ -37,11 +37,6 @@
 namespace Cx\Modules\Checkout\Controller;
 
 /**
- * @ignore
- */
-\Env::get('ClassLoader')->loadFile(ASCMS_LIBRARY_PATH.'/phpmailer/class.phpmailer.php');
-
-/**
  * Checkout
  *
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
@@ -720,20 +715,8 @@ class Checkout extends CheckoutLibrary {
     {
         global $_ARRAYLANG, $_CONFIG;
 
-        $objPHPMailer = new \phpmailer();
+        $objPHPMailer = new \Cx\Core\MailTemplate\Model\Entity\Mail();
 
-        if ($_CONFIG['coreSmtpServer'] > 0 && @include_once ASCMS_CORE_PATH.'/SmtpSettings.class.php') {
-            if (($arrSmtp = \SmtpSettings::getSmtpAccount($_CONFIG['coreSmtpServer'])) !== false) {
-                $objPHPMailer->IsSMTP();
-                $objPHPMailer->Host = $arrSmtp['hostname'];
-                $objPHPMailer->Port = $arrSmtp['port'];
-                $objPHPMailer->SMTPAuth = true;
-                $objPHPMailer->Username = $arrSmtp['username'];
-                $objPHPMailer->Password = $arrSmtp['password'];
-            }
-        }
-
-        $objPHPMailer->CharSet = CONTREXX_CHARSET;
         $objPHPMailer->IsHTML(true);
         $objPHPMailer->Subject = $arrMail['title'];
         $objPHPMailer->SetFrom($_CONFIG['contactFormEmail'], $_CONFIG['domainUrl']);

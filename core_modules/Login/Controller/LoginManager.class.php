@@ -286,6 +286,7 @@ class LoginManager {
             $this->objTemplate->setVariable(array(
                 'TXT_LOGIN_SECURITY_CODE'   => $_ARRAYLANG['TXT_LOGIN_SECURITY_CODE'],
                 'CAPTCHA_CODE'              => \Cx\Core_Modules\Captcha\Controller\Captcha::getInstance()->getCode(3),
+                'CAPTCHA_VALIDATION_CODE'   => \Cx\Core_Modules\Captcha\Controller\Captcha::getInstance()->getJSValidationFn(),
             ));
             $this->objTemplate->parse('captcha');
         } else {

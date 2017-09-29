@@ -1,7 +1,5 @@
 <?php
 /*
- *  $Id$
- *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -15,7 +13,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * This software consists of voluntary contributions made by many individuals
- * and is licensed under the LGPL. For more information, see
+ * and is licensed under the MIT license. For more information, see
  * <http://www.doctrine-project.org>.
  */
 
@@ -24,29 +22,28 @@ namespace Doctrine\DBAL\Logging;
 /**
  * Interface for SQL loggers.
  *
- * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
- * @link    www.doctrine-project.org
- * @since   2.0
- * @version $Revision$
- * @author  Benjamin Eberlei <kontakt@beberlei.de>
- * @author  Guilherme Blanco <guilhermeblanco@hotmail.com>
- * @author  Jonathan Wage <jonwage@gmail.com>
- * @author  Roman Borschel <roman@code-factory.org>
+ * @link   www.doctrine-project.org
+ * @since  2.0
+ * @author Benjamin Eberlei <kontakt@beberlei.de>
+ * @author Guilherme Blanco <guilhermeblanco@hotmail.com>
+ * @author Jonathan Wage <jonwage@gmail.com>
+ * @author Roman Borschel <roman@code-factory.org>
  */
 interface SQLLogger
 {
     /**
      * Logs a SQL statement somewhere.
      *
-     * @param string $sql The SQL to be executed.
-     * @param array $params The SQL parameters.
-     * @param float $executionMS The microtime difference it took to execute this query.
+     * @param string     $sql    The SQL to be executed.
+     * @param array|null $params The SQL parameters.
+     * @param array|null $types  The SQL parameter types.
+     *
      * @return void
      */
     public function startQuery($sql, array $params = null, array $types = null);
 
     /**
-     * Mark the last started query as stopped. This can be used for timing of queries.
+     * Marks the last started query as stopped. This can be used for timing of queries.
      *
      * @return void
      */

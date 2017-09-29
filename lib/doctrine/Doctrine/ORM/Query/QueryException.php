@@ -1,7 +1,5 @@
 <?php
 /*
- *  $Id$
- *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -15,21 +13,17 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * This software consists of voluntary contributions made by many individuals
- * and is licensed under the LGPL. For more information, see
+ * and is licensed under the MIT license. For more information, see
  * <http://www.doctrine-project.org>.
  */
 
 namespace Doctrine\ORM\Query;
 
-use Doctrine\ORM\Query\AST\PathExpression;
-
 /**
- * Description of QueryException
+ * Description of QueryException.
  *
- * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link    www.doctrine-project.org
  * @since   2.0
- * @version $Revision: 3938 $
  * @author  Guilherme Blanco <guilhermeblanco@hotmail.com>
  * @author  Jonathan Wage <jonwage@gmail.com>
  * @author  Roman Borschel <roman@code-factory.org>
@@ -37,41 +31,108 @@ use Doctrine\ORM\Query\AST\PathExpression;
  */
 class QueryException extends \Doctrine\ORM\ORMException
 {
-    public static function syntaxError($message)
+    /**
+     * @param string $dql
+     *
+     * @return QueryException
+     */
+    public static function dqlError($dql)
     {
-        return new self('[Syntax Error] ' . $message);
+        return new self($dql);
     }
 
-    public static function semanticalError($message)
+    /**
+     * @param string          $message
+     * @param \Exception|null $previous
+     *
+     * @return QueryException
+     */
+    public static function syntaxError($message, $previous = null)
     {
-        return new self('[Semantical Error] ' . $message);
+        return new self('[Syntax Error] ' . $message, 0, $previous);
     }
 
+    /**
+     * @param string          $message
+     * @param \Exception|null $previous
+     *
+     * @return QueryException
+     */
+    public static function semanticalError($message, $previous = null)
+    {
+        return new self('[Semantical Error] ' . $message, 0, $previous);
+    }
+
+    /**
+     * @return QueryException
+     */
+    public static function invalidLockMode()
+    {
+        return new self('Invalid lock mode hint provided.');
+    }
+
+    /**
+     * @param string $expected
+     * @param string $received
+     *
+     * @return QueryException
+     */
     public static function invalidParameterType($expected, $received)
     {
         return new self('Invalid parameter type, ' . $received . ' given, but ' . $expected . ' expected.');
     }
 
+    /**
+     * @param string $pos
+     *
+     * @return QueryException
+     */
     public static function invalidParameterPosition($pos)
     {
         return new self('Invalid parameter position: ' . $pos);
     }
 
+    /**
+     * @return QueryException
+     */
     public static function invalidParameterNumber()
     {
         return new self("Invalid parameter number: number of bound variables does not match number of tokens");
     }
 
+    /**
+     * @param string $value
+     *
+     * @return QueryException
+     */
     public static function invalidParameterFormat($value)
     {
         return new self('Invalid parameter format, '.$value.' given, but :<name> or ?<num> expected.');
     }
 
+    /**
+     * @param string $key
+     *
+     * @return QueryException
+     */
     public static function unknownParameter($key)
     {
         return new self("Invalid parameter: token ".$key." is not defined in the query.");
     }
 
+    /**
+     * @return QueryException
+     */
+    public static function parameterTypeMismatch()
+    {
+        return new self("DQL Query parameter and type numbers mismatch, but have to be exactly equal.");
+    }
+
+    /**
+     * @param object $pathExpr
+     *
+     * @return QueryException
+     */
     public static function invalidPathExpression($pathExpr)
     {
         return new self(
@@ -79,21 +140,32 @@ class QueryException extends \Doctrine\ORM\ORMException
         );
     }
 
-    public static function invalidLiteral($literal) {
+    /**
+     * @param string $literal
+     *
+     * @return QueryException
+     */
+    public static function invalidLiteral($literal)
+    {
         return new self("Invalid literal '$literal'");
     }
 
     /**
-     * @param Doctrine\ORM\Mapping\AssociationMapping $assoc
+     * @param array $assoc
+     *
+     * @return QueryException
      */
     public static function iterateWithFetchJoinCollectionNotAllowed($assoc)
     {
         return new self(
             "Invalid query operation: Not allowed to iterate over fetch join collections ".
-            "in class ".$assoc['sourceEntity']." assocation ".$assoc['fieldName']
+            "in class ".$assoc['sourceEntity']." association ".$assoc['fieldName']
         );
     }
 
+    /**
+     * @return QueryException
+     */
     public static function partialObjectsAreDangerous()
     {
         return new self(
@@ -103,15 +175,23 @@ class QueryException extends \Doctrine\ORM\ORMException
         );
     }
 
+    /**
+     * @param array $assoc
+     *
+     * @return QueryException
+     */
     public static function overwritingJoinConditionsNotYetSupported($assoc)
     {
         return new self(
             "Unsupported query operation: It is not yet possible to overwrite the join ".
-            "conditions in class ".$assoc['sourceEntityName']." assocation ".$assoc['fieldName'].". ".
+            "conditions in class ".$assoc['sourceEntityName']." association ".$assoc['fieldName'].". ".
             "Use WITH to append additional join conditions to the association."
         );
     }
 
+    /**
+     * @return QueryException
+     */
     public static function associationPathInverseSideNotSupported()
     {
         return new self(
@@ -120,19 +200,53 @@ class QueryException extends \Doctrine\ORM\ORMException
         );
     }
 
-    public static function iterateWithFetchJoinNotAllowed($assoc) {
+    /**
+     * @param array $assoc
+     *
+     * @return QueryException
+     */
+    public static function iterateWithFetchJoinNotAllowed($assoc)
+    {
         return new self(
             "Iterate with fetch join in class " . $assoc['sourceEntity'] .
             " using association " . $assoc['fieldName'] . " not allowed."
         );
     }
 
+    /**
+     * @return QueryException
+     */
     public static function associationPathCompositeKeyNotSupported()
     {
         return new self(
             "A single-valued association path expression to an entity with a composite primary ".
             "key is not supported. Explicitly name the components of the composite primary key ".
             "in the query."
+        );
+    }
+
+    /**
+     * @param string $className
+     * @param string $rootClass
+     *
+     * @return QueryException
+     */
+    public static function instanceOfUnrelatedClass($className, $rootClass)
+    {
+        return new self("Cannot check if a child of '" . $rootClass . "' is instanceof '" . $className . "', " .
+                "inheritance hierarchy exists between these two classes.");
+    }
+
+    /**
+     * @param string $dqlAlias
+     *
+     * @return QueryException
+     */
+    public static function invalidQueryComponent($dqlAlias)
+    {
+        return new self(
+            "Invalid query component given for DQL alias '" . $dqlAlias . "', ".
+            "requires 'metadata', 'parent', 'relation', 'map', 'nestingLevel' and 'token' keys."
         );
     }
 }

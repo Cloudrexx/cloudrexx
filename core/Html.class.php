@@ -640,15 +640,13 @@ var _active_tab = '.
         $options = '';
         foreach ($arrOptions as $key => $value) {
             $options .=
-                '<option value="'.$key.'"'.
-                (is_array($selected)
-                    ? (isset($selected[$key]) ? Html::ATTRIBUTE_SELECTED : '')
-                    : ("$selected" === "$key"  ? Html::ATTRIBUTE_SELECTED : '')
-                ).
-                ($attribute ? ' '.$attribute : '').
-                '>'.
-                ($value != '' ? contrexx_raw2xhtml($value) : '&nbsp;').
-                "</option>\n";
+                '<option value="' . $key . '"'
+                . (is_array($selected) && array_key_exists($key, $selected)
+                    || "$selected" === "$key"
+                        ? Html::ATTRIBUTE_SELECTED : '')
+                . ($attribute ? ' ' . $attribute : '') . '>'
+                . ($value != '' ? contrexx_raw2xhtml($value) : '&nbsp;')
+                . "</option>\n";
         }
         return $options;
     }
@@ -1973,8 +1971,8 @@ cx.jQuery(document).ready(function($) {
             return '';
         }
 //echo("Html::getLed($status, $action): led is ".$objImage->getPath()."<br />");
-        $objImage->setWidth(11);
-        $objImage->setHeight(11);
+        $objImage->setWidth(13);
+        $objImage->setHeight(13);
         $led_html = self::getImageOriginal(
             $objImage,
             'border="0"'.($alt ? ' alt="'.$alt.'" title="'.$alt.'"' : ''));

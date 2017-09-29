@@ -372,6 +372,10 @@ class HTML_Template_Sigma extends PEAR
      */
     var $_triggerBlock = '__global__';
 
+    public function __construct($root = '', $cacheRoot = '') {
+        $this->HTML_Template_Sigma($root, $cacheRoot);
+    }
+
     /**
      * Constructor: builds some complex regular expressions and optionally
      * sets the root directories.

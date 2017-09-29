@@ -214,7 +214,6 @@ $_ARRAYLANG['TXT_SHOP_ACCOUNT_NEW_CUSTOMER'] = "I'm a new customer.";
 $_ARRAYLANG['TXT_SHOP_ACCOUNT_NOTE'] = "By registering with us you are able to order more quickly, know the state of your order, and keep track or your previous orders easily.";
 $_ARRAYLANG['TXT_SHOP_ACCOUNT_EXISTING_CUSTOMER'] = "Existing customer.";
 $_ARRAYLANG['TXT_SHOP_ACCOUNT_LOGIN'] = "Log in >>";
-$_ARRAYLANG['TXT_SHOP_CATEGORIES'] = "Categories:";
 $_ARRAYLANG['TXT_PRODUCTS_IN_CATEGORY'] = "Produkte in der Kategorie";
 $_ARRAYLANG['TXT_SHOP_GO_TO_CATEGORY'] = "Continue to Category";
 $_ARRAYLANG['TXT_SHOP_LSV_EE_FIRST_NAME'] = "Firstname";

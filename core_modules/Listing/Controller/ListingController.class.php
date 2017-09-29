@@ -131,6 +131,12 @@ class ListingController {
      */
     protected $criteria = array();
 
+    /**
+     * Filter at least one field of the result must match
+     * @var string
+     */
+    protected $filter = '';
+
 
     private $paging;
 
@@ -146,7 +152,7 @@ class ListingController {
      * @param array $crit (optional) Doctrine style criteria array to use
      * @param array $options (Unused)
      */
-    public function __construct($entities, $crit = array(), $options = array()) {
+    public function __construct($entities, $crit = array(), $filter = '', $options = array()) {
         if (isset($options['paging'])) {
             $this->paging = $options['paging'];
         }
@@ -164,7 +170,10 @@ class ListingController {
         if (!empty($options['sorting'])) {
             $this->handlers[] = new SortingController();
         }
-        $this->handlers[] = new PagingController();
+
+        if ($this->paging) {
+            $this->handlers[] = new PagingController();
+        }
 
         if (is_callable($entities)) {
             \DBG::msg('Init ListingController using callback function');
@@ -177,6 +186,7 @@ class ListingController {
             $this->entityClass = $entities;
         }
         $this->criteria = $crit;
+        $this->filter = $filter;
 
         // todo: allow multiple listing controllers per page request
         $this->args = contrexx_input2raw($_GET);
@@ -194,6 +204,7 @@ class ListingController {
             'count'     => $this->count,
             'order'     => $this->order,
             'criteria'  => $this->criteria,
+            'filter'    => $this->filter,
             'entity'    => $this->entityName,
         );
         foreach ($this->handlers as $handler) {
@@ -203,10 +214,13 @@ class ListingController {
         $this->count    = $params['count'];
         $this->order    = $params['order'];
         $this->criteria = $params['criteria'];
+        $this->filter   = $params['filter'];
 
         // handle ajax requests
         if (false /* ajax request for this listing */) {
             $jd = new \Cx\Core\Json\JsonData();
+            // TODO: This does not work yet
+            // TODO: JsonData->json() expects a Response object
             $jd->json(array(
                 'filtering' => $this->getAjaxFilteringData(),
                 'sorting' => $this->getAjaxSortingData(),
@@ -219,10 +233,40 @@ class ListingController {
             //$data = new \Cx\Core_Modules\Listing\Model\Entity\DataSet();
             $data = $this->entityClass;
 
+            // filter data
+            if (is_array($this->criteria) && count($this->criteria)) {
+                $data->filter(function($entry) {
+                    foreach ($entry as $field=>$data) {
+                        if (
+                            isset($this->criteria[$field]) &&
+                            $this->criteria[$field] != $data
+                        ) {
+                            return false;
+                        }
+                    }
+                    return true;
+                });
+            }
+
+            // filter data
+            if (!empty($this->filter)) {
+                $data->filter(function($entry) {
+                    foreach ($entry as $field=>$data) {
+                        if (strpos($data, $this->filter) !== false) {
+                            return true;
+                        }
+                    }
+                    return false;
+                });
+            }
+
+            // sort data
             $data = $data->sort($this->order);
 
-            // add sorting and filtering
-            $data = $data->limit($this->count, $this->offset);
+            // limit data
+            if ($this->count) {
+                $data = $data->limit($this->count, $this->offset);
+            }
             return $data;
         }
 
@@ -246,7 +290,7 @@ class ListingController {
         // TODO: check if entity class is managed
          //$qb = new \Doctrine\ORM\QueryBuilder();
         $query->setFirstResult($this->offset);
-        $query->setMaxResults($this->count);
+        $query->setMaxResults($this->count ? $this->count : null);
         /*foreach ($this->order as $field=>$order) {
             $query->orderBy($field, $order);
         }

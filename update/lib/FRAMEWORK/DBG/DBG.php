@@ -339,6 +339,7 @@ class DBG
         } elseif (class_exists('\Cx\Lib\FileSystem\File')) {
             try {
                 self::$dbg_fh = new \Cx\Lib\FileSystem\File(ASCMS_DOCUMENT_ROOT.'/update/'.$file.$suffix);
+                self::$dbg_fh->forceAccessMode(\Cx\Lib\FileSystem\File::PHP_ACCESS);
                 self::$dbg_fh->touch();
                 if (self::$dbg_fh->makeWritable()) {
                     return true;

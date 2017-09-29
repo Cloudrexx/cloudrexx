@@ -47,6 +47,7 @@ interface Inputfield  {
     function saveInputfield($intInputfieldId, $strValue, $langId=0);
     function deleteContent($intEntryId, $intIputfieldId);
     function getContent($intEntryId, $arrInputfield, $arrTranslationStatus);
+    function getRawData($intEntryId, $arrInputfield, $arrTranslationStatus);
     function getJavascriptCheck();
     function getFormOnSubmit($intInputfieldId);
 }

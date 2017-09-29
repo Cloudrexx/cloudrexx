@@ -1,0 +1,142 @@
+activePreset: Default
+options:
+  -
+    name: font_family_header
+    specific: {  }
+    type: Cx\Core_Modules\TemplateEditor\Model\Entity\FontOption
+    translation:
+      1: 'Überschrift Schriftart'
+      2: 'Font family for headers'
+  -
+    name: font_family_body
+    specific: {  }
+    type: Cx\Core_Modules\TemplateEditor\Model\Entity\FontOption
+    translation:
+      1: 'Text Schriftart'
+      2: 'Font Family for text'
+  -
+    name: font_family_navigation
+    specific: {  }
+    type: Cx\Core_Modules\TemplateEditor\Model\Entity\FontOption
+    translation:
+      1: 'Schriftart der Navigation'
+      2: 'Font Family for navigation'
+  -
+    name: main_color
+    specific:
+      choice:
+        - '#1ABC9C'
+        - '#16A085'
+        - '#2ECC71'
+        - '#27AE60'
+        - '#3498DB'
+        - '#2980B9'
+        - '#9B59B6'
+        - '#8E44AD'
+        - '#34495E'
+        - '#2C3E50'
+        - '#F1C40F'
+        - '#F39C12'
+        - '#E67E22'
+        - '#D35400'
+        - '#E74C3C'
+        - '#C0392B'
+        - '#ECF0F1'
+        - '#BDC3C7'
+        - '#95A5A6'
+        - '#7F8C8D'
+    type: Cx\Core_Modules\TemplateEditor\Model\Entity\ColorOption
+    translation:
+      1: Navigation
+      2: Navbar
+  -
+    name: secondary_color
+    specific:
+      choice:
+        - '#1ABC9C'
+        - '#16A085'
+        - '#2ECC71'
+        - '#27AE60'
+        - '#3498DB'
+        - '#2980B9'
+        - '#9B59B6'
+        - '#8E44AD'
+        - '#34495E'
+        - '#2C3E50'
+        - '#F1C40F'
+        - '#F39C12'
+        - '#E67E22'
+        - '#D35400'
+        - '#E74C3C'
+        - '#C0392B'
+        - '#ECF0F1'
+        - '#BDC3C7'
+        - '#95A5A6'
+        - '#7F8C8D'
+    type: Cx\Core_Modules\TemplateEditor\Model\Entity\ColorOption
+    translation:
+      1: Akzentfarbe
+      2: 'Accent color'
+  -
+    name: link_color
+    specific:
+      choice:
+        - '#1ABC9C'
+        - '#16A085'
+        - '#2ECC71'
+        - '#27AE60'
+        - '#3498DB'
+        - '#2980B9'
+        - '#9B59B6'
+        - '#8E44AD'
+        - '#34495E'
+        - '#2C3E50'
+        - '#F1C40F'
+        - '#F39C12'
+        - '#E67E22'
+        - '#D35400'
+        - '#E74C3C'
+        - '#C0392B'
+        - '#ECF0F1'
+        - '#BDC3C7'
+        - '#95A5A6'
+        - '#7F8C8D'
+    type: Cx\Core_Modules\TemplateEditor\Model\Entity\ColorOption
+    translation:
+      1: Linkfarbe
+      2: 'Hyperlink color'
+  -
+    name: news_area
+    specific: {  }
+    type: Cx\Core_Modules\TemplateEditor\Model\Entity\AreaOption
+    translation:
+      1: 'News anzeigen'
+      2: 'Show News'
+  -
+    name: events_area
+    specific: {  }
+    type: Cx\Core_Modules\TemplateEditor\Model\Entity\AreaOption
+    translation:
+      1: 'Kalendar anzeigen'
+      2: 'Show calendar'
+  -
+    name: newsletter_area
+    specific: {  }
+    type: Cx\Core_Modules\TemplateEditor\Model\Entity\AreaOption
+    translation:
+      1: 'Newsletter anzeigen'
+      2: 'Show newsletter'
+  -
+    name: logo_image
+    specific: {  }
+    type: Cx\Core_Modules\TemplateEditor\Model\Entity\ImageOption
+    translation:
+      1: Logo
+      2: Logo
+  -
+    name: slider_images
+    specific: {  }
+    type: Cx\Core_Modules\TemplateEditor\Model\Entity\ImageSeriesOption
+    translation:
+      1: 'Haupt Slider'
+      2: 'Main Slider'

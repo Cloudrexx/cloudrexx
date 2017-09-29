@@ -204,6 +204,11 @@ $J(function(){
             cx.jQuery('#'+ relatedFieldPrefix + '_' + id +'_0').val(cx.jQuery(this).val());
             cx.jQuery('#'+ relatedFieldPrefix + '_' + id +'_0').data('lastDefaultValue', cx.jQuery(this).val());
         });
+  cx.jQuery("#category").chosen({
+    placeholder_text_multiple: "",
+    display_disabled_options: false,
+    display_selected_options: false
+  });
     });
 });
 function ExpandMinimize(toggle){

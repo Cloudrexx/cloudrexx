@@ -39,6 +39,10 @@ use Cx\Model\Base\EntityBase;
 class LocalFileSystem extends EntityBase implements FileSystem
 {
 
+    /**
+     * The path of the file system.
+     * Without ending directory separator.
+     */
     private $rootPath;
     protected $fileListCache;
 
@@ -60,16 +64,22 @@ class LocalFileSystem extends EntityBase implements FileSystem
         return new self($path);
     }
 
+    /**
+     * @todo    Option $recursive does not work. It always acts as recursive is set to TRUE
+     */
     public function getFileList($directory, $recursive = false, $readonly = false) {
         if (isset($this->fileListCache[$directory][$recursive][$readonly])) {
             return $this->fileListCache[$directory][$recursive][$readonly];
         }
 
+        $dirPath = rtrim($this->rootPath . '/' . $directory,'/');
+        if (!file_exists($dirPath)) {
+            return array();
+        }
+
         $recursiveIteratorIterator = new \RegexIterator(
             new \RecursiveIteratorIterator(
-                new \RecursiveDirectoryIterator(
-                    rtrim($this->rootPath . '/' . $directory,'/')
-                ),
+                new \RecursiveDirectoryIterator($dirPath),
                 \RecursiveIteratorIterator::SELF_FIRST
             ), '/^((?!thumb(_[a-z]+)?).)*$/'
         );
@@ -86,7 +96,7 @@ class LocalFileSystem extends EntityBase implements FileSystem
              */
             $extension = 'Dir';
             if (!$file->isDir()) {
-                $extension = ucfirst(
+                $extension = strtolower(
                     pathinfo($file->getFilename(), PATHINFO_EXTENSION)
                 );
             }
@@ -205,7 +215,7 @@ class LocalFileSystem extends EntityBase implements FileSystem
         foreach ($arrays as $array) {
             reset($base); //important
             while (list($key, $value) = each($array)) {
-                if (is_array($value) && is_array($base[$key])) {
+                if (is_array($value) && isset($base[$key]) && is_array($base[$key])) {
                     $base[$key] = $this->array_merge_recursive($base[$key], $value);
                 } else {
                     $base[$key] = $value;
@@ -224,7 +234,7 @@ class LocalFileSystem extends EntityBase implements FileSystem
     public function isImage(
         $extension
     ) {
-        return preg_match("/(jpg|jpeg|gif|png)/i", ucfirst($extension));
+        return preg_match("/(jpg|jpeg|gif|png)/i", $extension);
     }
 
     /**
@@ -243,8 +253,8 @@ class LocalFileSystem extends EntityBase implements FileSystem
             $thumbnail
         ) {
             $thumbnails[$thumbnail['size']] = preg_replace(
-                '/\.' . lcfirst($extension) . '$/',
-                $thumbnail['value'] . '.' . lcfirst($extension),
+                '/\.' . $extension . '$/i',
+                $thumbnail['value'] . '.' . strtolower($extension),
                  str_replace(
                     $this->cx->getWebsitePath(), '',
                     $file->getRealPath()
@@ -469,5 +479,35 @@ class LocalFileSystem extends EntityBase implements FileSystem
                 $thumbnail
             );
         }
+    }
+
+    /**
+     * Get Root path of the filesystem
+     *
+     * @return string
+     */
+    public function getRootPath()
+    {
+        return $this->rootPath;
+    }
+
+    /**
+     * Set root path of the filesystem
+     *
+     * @param string $rootPath
+     */
+    public function setRootPath($rootPath)
+    {
+        $this->rootPath = $rootPath;
+    }
+
+    public function getFileFromPath($filepath) {
+        $fileinfo = pathinfo($filepath);
+        $path = dirname($filepath);
+        $files = $this->getFileList($fileinfo['dirname']);
+        if (!isset($files[$fileinfo['basename']])) {
+            return false;
+        }
+        return new LocalFile($filepath, $this);
     }
 }

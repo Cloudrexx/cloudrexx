@@ -1075,6 +1075,7 @@ class CrmSettings extends CrmLibrary
             $settings = array(
                     'allow_pm'                             => (!$this->isPmInstalled ? 0 : (isset($_POST['allowPm']) ? 1 : 0)),
                     'create_user_account'                  => isset($_POST['create_user_account']) ? 1 : 0,
+                    'contact_amount_enabled'               => isset($_POST['contact_amount_enabled']) ? 1 : 0,
                     'customer_default_language_backend'    => isset($_POST['default_language_backend']) ? (int) $_POST['default_language_backend'] : 0,
                     'customer_default_language_frontend'   => isset($_POST['default_language_frontend']) ? (int) $_POST['default_language_frontend'] : 0,
                     'default_user_group'                   => isset($_POST['default_user_group']) ? (int) $_POST['default_user_group'] : 0,
@@ -1122,42 +1123,40 @@ class CrmSettings extends CrmLibrary
         if($settings['create_user_account'] == 1){
             $this->createProfilAttributes();
         }
-        $objLanguages = $objDatabase->Execute("SELECT `id`, `name`, `frontend`, `backend` FROM ".DBPREFIX."languages WHERE frontend = 1 OR backend =1");
 
-        if ($objLanguages) {
+        $frontendLangs = \FWLanguage::getActiveFrontendLanguages();
+        if (!empty($frontendLangs)) { // parse frontend languages
             $objTpl->setVariable(array(
-                    'CRM_LANG_NAME'     => $_ARRAYLANG['TXT_CRM_STANDARD'],
-                    'CRM_LANG_VALUE'    => 0,
-                    'CRM_LANG_SELECTED' => $settings['customer_default_language_frontend'] == 0 ? "selected='selected'" : ''
+                'CRM_LANG_NAME'     => $_ARRAYLANG['TXT_CRM_STANDARD'],
+                'CRM_LANG_VALUE'    => 0,
+                'CRM_LANG_SELECTED' => $settings['customer_default_language_frontend'] == 0 ? "selected='selected'" : ''
             ));
             $objTpl->parse("langFrontend");
+            foreach($frontendLangs as $frontendLang) {
+                $objTpl->setVariable(array(
+                    'CRM_LANG_NAME'     => contrexx_raw2xhtml($frontendLang['name']),
+                    'CRM_LANG_VALUE'    => (int) $frontendLang['id'],
+                    'CRM_LANG_SELECTED' => $settings['customer_default_language_frontend'] == $frontendLang['id'] ? "selected='selected'" : ''
+                ));
+                $objTpl->parse("langFrontend");
+            }
+        }
+
+        $backendLangs = \FWLanguage::getActiveBackendLanguages();
+        if (!empty($backendLangs)) {
             $objTpl->setVariable(array(
-                    'CRM_LANG_NAME'  => $_ARRAYLANG['TXT_CRM_STANDARD'],
-                    'CRM_LANG_VALUE' => 0,
-                    'CRM_LANG_SELECTED' => $settings['customer_default_language_backend'] == 0 ? "selected='selected'" : ''
+                'CRM_LANG_NAME'  => $_ARRAYLANG['TXT_CRM_STANDARD'],
+                'CRM_LANG_VALUE' => 0,
+                'CRM_LANG_SELECTED' => $settings['customer_default_language_backend'] == 0 ? "selected='selected'" : ''
             ));
             $objTpl->parse("langBackend");
-            while (!$objLanguages->EOF) {
-
-                if ($objLanguages->fields['frontend']) {
-                    $objTpl->setVariable(array(
-                            'CRM_LANG_NAME'     => contrexx_raw2xhtml($objLanguages->fields['name']),
-                            'CRM_LANG_VALUE'    => (int) $objLanguages->fields['id'],
-                            'CRM_LANG_SELECTED' => $settings['customer_default_language_frontend'] == $objLanguages->fields['id'] ? "selected='selected'" : ''
-                    ));
-                    $objTpl->parse("langFrontend");
-                }
-
-                if ($objLanguages->fields['backend']) {
-                    $objTpl->setVariable(array(
-                            'CRM_LANG_NAME'     => contrexx_raw2xhtml($objLanguages->fields['name']),
-                            'CRM_LANG_VALUE'    => (int) $objLanguages->fields['id'],
-                            'CRM_LANG_SELECTED' => $settings['customer_default_language_backend'] == $objLanguages->fields['id'] ? "selected='selected'" : ''
-                    ));
-                    $objTpl->parse("langBackend");
-                }
-
-                $objLanguages->MoveNext();
+            foreach ($backendLangs as $backendLang) {
+                $objTpl->setVariable(array(
+                    'CRM_LANG_NAME'     => contrexx_raw2xhtml($backendLang['name']),
+                    'CRM_LANG_VALUE'    => (int) $backendLang['id'],
+                    'CRM_LANG_SELECTED' => $settings['customer_default_language_backend'] == $backendLang['id'] ? "selected='selected'" : ''
+                ));
+                $objTpl->parse("langBackend");
             }
         }
 
@@ -1207,6 +1206,7 @@ class CrmSettings extends CrmLibrary
         $objTpl->setVariable(array(
             'CRM_ALLOW_PM'                   => ($settings['allow_pm']) ? "checked='checked'" : '',
             'CRM_CREATE_ACCOUNT_USER'        => ($settings['create_user_account']) ? "checked='checked'" : '',
+            'CRM_CONTACT_AMOUNT_ENABLED'     => ($settings['contact_amount_enabled']) ? "checked='checked'" : '',
             'CRM_ACCOUNT_MANTATORY'          => ($settings['user_account_mantatory']) ? "checked='checked'" : '',
         ));
 
@@ -1237,6 +1237,7 @@ class CrmSettings extends CrmLibrary
                 'TXT_CRM_EMP_DEFAULT_USER_GROUP' => $_ARRAYLANG['TXT_CRM_EMP_DEFAULT_USER_GROUP'],
                 'TXT_CRM_SETTINGS_EMP_TOOLTIP'   => $_ARRAYLANG['TXT_CRM_SETTINGS_EMPLOYEE_TOOLTIP'],
                 'TXT_CRM_ACCOUNT_ARE_MANTATORY'  => $_ARRAYLANG['TXT_CRM_ACCOUNT_ARE_MANTATORY'],
+                'TXT_CRM_CONTACT_AMOUNT_ENABLED' => $_ARRAYLANG['TXT_CRM_CONTACT_AMOUNT_ENABLED'],
                 'CRM_PROFILE_ATTRIBUT_INDUSTRY_TYPE_DROPDOWN' =>\Html::getSelect(
                                                                 'user_profile_attribute_industry_type',
                                                                 \User_Profile_Attribute::getCustomAttributeNameArray(),

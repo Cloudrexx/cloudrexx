@@ -492,7 +492,12 @@ class Yellowpay
             $arrFields['OPERATION'] = $arrSettings['postfinance_authorization_type']['value'];
         }
         if (empty($arrFields['LANGUAGE'])) {
-            $arrFields['LANGUAGE'] = strtolower(FWLanguage::getLanguageCodeById(FRONTEND_LANG_ID)).'_'.strtoupper(FWLanguage::getLanguageCodeById(FRONTEND_LANG_ID));
+            $shortCode = FWLanguage::getLanguageCodeById(FRONTEND_LANG_ID);
+            if (!strpos($shortCode, '-')) { // short code only contains iso1, like 'de' or 'en'
+                $arrFields['LANGUAGE'] = strtolower($shortCode).'_'.strtoupper($shortCode);
+            } else { // short code contains alpha2 code as well, like 'de-DE' or 'en-GB'
+                $arrFields['LANGUAGE'] = str_replace('-', '_', $shortCode);
+            }
         }
 
         $baseUri = Cx\Core\Routing\Url::fromPage($landingPage)->toString().'?result=';
@@ -620,7 +625,7 @@ class Yellowpay
             case 'AMOUNT':
                 // Fix cents, like "1.23" to "123"
                 if (preg_match('/\./', $value)) {
-                    $value = intval($value * 100);
+                    $value = intval(bcmul($value, 100, 0));
                 }
                 if ($value === intval($value)) return $value;
                 break;

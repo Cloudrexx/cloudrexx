@@ -1552,7 +1552,9 @@ class CommonFunctions
                 case \Cx\Core_Modules\Cache\Controller\CacheLib::CACHE_ENGINE_ZEND_OPCACHE:
                     return extension_loaded('opcache') || extension_loaded('Zend OPcache');
                 case \Cx\Core_Modules\Cache\Controller\CacheLib::CACHE_ENGINE_MEMCACHE:
-                    return extension_loaded('memcache') || extension_loaded('memcached');
+                    return extension_loaded('memcache');
+                case \Cx\Core_Modules\Cache\Controller\CacheLib::CACHE_ENGINE_MEMCACHED:
+                    return extension_loaded('memcached');
                 case \Cx\Core_Modules\Cache\Controller\CacheLib::CACHE_ENGINE_XCACHE:
                     return extension_loaded('xcache');
                 case \Cx\Core_Modules\Cache\Controller\CacheLib::CACHE_ENGINE_FILESYSTEM:
@@ -1568,8 +1570,13 @@ class CommonFunctions
                     }
                     return true;
                 case \Cx\Core_Modules\Cache\Controller\CacheLib::CACHE_ENGINE_ZEND_OPCACHE:
-                    return ini_get('opcache.save_comments') && ini_get('opcache.load_comments');
+                    // opcache.load_comments no longer exists since PHP7
+                    // therefore, ini_get() will return FALSE in case the
+                    // php directive does not exist
+                    return ini_get('opcache.save_comments') && (ini_get('opcache.load_comments') === false || ini_get('opcache.load_comments'));
                 case \Cx\Core_Modules\Cache\Controller\CacheLib::CACHE_ENGINE_MEMCACHE:
+                    return false;
+                case \Cx\Core_Modules\Cache\Controller\CacheLib::CACHE_ENGINE_MEMCACHED:
                     return false;
                 case \Cx\Core_Modules\Cache\Controller\CacheLib::CACHE_ENGINE_XCACHE:
                     if ($user) {
@@ -1632,6 +1639,12 @@ class CommonFunctions
             // Memcache
             if ($isInstalled(\Cx\Core_Modules\Cache\Controller\CacheLib::CACHE_ENGINE_MEMCACHE) && $isConfigured(\Cx\Core_Modules\Cache\Controller\CacheLib::CACHE_ENGINE_MEMCACHE)) {
                 $_CONFIG['cacheUserCache'] = \Cx\Core_Modules\Cache\Controller\CacheLib::CACHE_ENGINE_MEMCACHE;
+                return;
+            }
+
+            // Memcached
+            if ($isInstalled(\Cx\Core_Modules\Cache\Controller\CacheLib::CACHE_ENGINE_MEMCACHED) && $isConfigured(\Cx\Core_Modules\Cache\Controller\CacheLib::CACHE_ENGINE_MEMCACHED)) {
+                $_CONFIG['cacheUserCache'] = \Cx\Core_Modules\Cache\Controller\CacheLib::CACHE_ENGINE_MEMCACHED;
                 return;
             }
 

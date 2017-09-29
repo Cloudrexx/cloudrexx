@@ -12,6 +12,11 @@ Cx\Core\ContentManager\Model\Entity\LogEntry:
     log_user_lookup_idx:
       columns:
         - username
+    log_version_lookup_idx:
+      columns:
+        - object_id
+        - object_class
+        - version
   fields:
     id:
       type: integer
@@ -53,4 +58,12 @@ Cx\Core\ContentManager\Model\Entity\LogEntry:
       scale: 0
       nullable: true
       unique: false
+    loggedAt:
+      type: datetime
+      column: logged_at
+    version:
+      type: integer
+    action:
+      type: string
+      Length: 8
   lifecycleCallbacks: {  }

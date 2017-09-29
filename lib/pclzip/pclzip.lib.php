@@ -204,6 +204,9 @@
     // The class can then disable the magic_quotes and reset it after
     var $magic_quotes_status;
 
+    public function __construct($p_zipname) {
+        $this->PclZip($p_zipname);
+    }
   // --------------------------------------------------------------------------------
   // Function : PclZip()
   // Description :

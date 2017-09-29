@@ -1130,7 +1130,7 @@ class Order
      * @return  array           The Attribute/option array on success,
      *                          null otherwise
      */
-    function getOptionArray()
+    function getOptionArray($withHtmlNotation = true)
     {
         global $objDatabase;
 
@@ -1152,8 +1152,10 @@ class Order
             // Link option names to uploaded files
             if (   $option != $option_full
                 && \File::exists($path)) {
-                $option =
-                    '<a href="'.$path.'" target="uploadimage">'.$option.'</a>';
+                if ($withHtmlNotation) {
+                    $option =
+                        '<a href="'.$path.'" target="uploadFile">'.$option.'</a>';
+                }
             }
             $id = $objResult->fields['id'];
             $price = $objResult->fields['price'];
@@ -2362,7 +2364,7 @@ class Order
      *                                              false otherwise
      * @todo    Let items be handled by their own class
      */
-    function getItems()
+    function getItems($withHtmlNotation = true)
     {
         global $objDatabase, $_ARRAYLANG;
 
@@ -2375,7 +2377,7 @@ class Order
         if (!$objResult) {
             return self::errorHandler();
         }
-        $arrProductOptions = $this->getOptionArray();
+        $arrProductOptions = $this->getOptionArray($withHtmlNotation);
         $items = array();
         while (!$objResult->EOF) {
             $item_id = $objResult->fields['id'];

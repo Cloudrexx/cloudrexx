@@ -81,9 +81,25 @@ class Host extends \Cx\Model\Base\EntityBase
      */
     protected $hostEntities;
 
+    /**
+     * @var Cx\Core_Modules\Sync\Model\Entity\Change
+     */
+    protected $changes;
+
+    /**
+     * @var integer $state
+     */
+    protected $state;
+    
+    /**
+     * @var string Default template for URI
+     */
+    protected $defaultUrlTemplate = '[[HOST]]/api/sync/v[[API_VERSION]]/json/[[DATA_SOURCE]]/[[INDEX_DATA]]?apikey=[[API_KEY]]';
+
     public function __construct()
     {
         $this->hostEntities = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->changes = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     /**
@@ -183,6 +199,9 @@ class Host extends \Cx\Model\Base\EntityBase
      */
     public function setUrlTemplate($urlTemplate)
     {
+        if ($urlTemplate == $this->defaultUrlTemplate) {
+            $urlTemplate = null;
+        }
         $this->urlTemplate = $urlTemplate;
     }
 
@@ -193,6 +212,9 @@ class Host extends \Cx\Model\Base\EntityBase
      */
     public function getUrlTemplate()
     {
+        if (empty($this->urlTemplate)) {
+            return $this->defaultUrlTemplate;
+        }
         return $this->urlTemplate;
     }
 
@@ -225,4 +247,193 @@ class Host extends \Cx\Model\Base\EntityBase
     {
         $this->hostEntities = $hostEntities;
     }
+
+    /**
+     * Add Change
+     *
+     * @param Cx\Core_Modules\Sync\Model\Entity\Change $change
+     */
+    public function addChange(\Cx\Core_Modules\Sync\Model\Entity\Change $change)
+    {
+        $this->changes[] = $change;
+    }
+
+    /**
+     * Get changes
+     *
+     * @return Doctrine\Common\Collections\Collection $changes
+     */
+    public function getChanges()
+    {
+        return $this->changes;
+    }
+
+    /**
+     * Set changes
+     *
+     * @param array $changes
+     */
+    public function setChanges($changes)
+    {
+        $this->changes = $changes;
+    }
+
+    /**
+     * Set state
+     *
+     * @param integer $state
+     */
+    public function setState($state)
+    {
+        $this->state = $state;
+    }
+
+    /**
+     * Get state
+     *
+     * @return integer $state
+     */
+    public function getState()
+    {
+        return $this->state;
+    }
+    
+    /**
+     * Returns the URL for pushing data to this host
+     * @param string $dataSourceName DataSource name to get the URL for
+     * @param array $entityIndexData (optional) Field=>Value-type array with entity index data
+     * @return string URL to push to
+     */
+    public function getToUri($dataSourceName, $entityIndexData = array()) {
+        $indexData = implode('/', $entityIndexData);
+        
+        //<domain>(/<offset>)/api/sync/<apiVersion>/<outputModule>/<dataSource>/<parameters>[(?apikey=<apikey>(&<options>))|?<options>]
+        //<domain>(/<offset>)/api/sync/<apiVersion>/<outputModule>/[[DATA_SOURCE]]/[[INDEX_DATA]][(?apikey=[[API_KEY]](&<options>))|?<options>]
+        $uri = $this->getUrlTemplate();
+        $uri = str_replace('[[HOST]]', $this->getHost(), $uri);
+        $uri = str_replace('[[API_VERSION]]', $this->getApiVersion(), $uri);
+        $uri = str_replace('[[DATA_SOURCE]]', $dataSourceName, $uri);
+        $uri = str_replace('[[API_KEY]]', $this->getApiKey(), $uri);
+        $uri = str_replace('[[INDEX_DATA]]', $indexData, $uri);
+        return $uri;
+    }
+    
+    public function handleChange($change) {
+        // do I sync this entity?
+        if (!$this->getActive()) {
+            //echo "Host not active!\n";
+            return true;
+        }
+        
+        $handle = false;
+        foreach ($change->getOriginSync()->getHostEntitiesIncludingLegacy(false) as $hostEntity) {
+            if ($hostEntity['host'] != $this) {
+                continue;
+            }
+            if (
+                $hostEntity['entityId'] != '*' &&
+                $hostEntity['entityId'] != current($change->getOriginEntityIndexData())
+            ) {
+                continue;
+            }
+            $handle = true;
+            break;
+        }
+        
+        // no: did I before?
+        if (!$handle) {
+            // no: return;
+            $in_array = false;
+            foreach ($change->getHosts() as $host) {
+                if ($host === $this) {
+                    $in_array = true;
+                    break;
+                }
+            }
+            if (!$in_array) {
+                return true;
+            }
+            // yes: use delete changeset
+            $mode = 'delete';
+            $handle = $change->setMode('delete');
+        
+        // yes: use "normal" changeset
+        } else {
+            $mode = 'forward';
+            $handle = $change->setMode('forward');
+        }
+        if (!$handle) {
+            // change does not need to be applied for selected mode
+            //echo "Ignoring change of type " . $change->getEventType() . " due to mode " . $mode . "!\n";
+            return true;
+        }
+        //echo "Handling change of type " . $change->getEventType() . " due to mode " . $mode . "!\n";
+        
+        // replace IDs
+        // @todo: This is currently done on remote side
+        
+        //echo 'Sending change #' . $change->getId() . "\n";
+        return $this->sendRequest(
+            $change->getContents(),
+            $change->getEntityIndexData(),
+            $change->getEventType(),
+            $change->getSync()
+        );
+    }
+    
+    protected function sendRequest($content, $entityIndexData, $eventType, $sync) {
+        $method = strtoupper($eventType);
+        $url = $this->getToUri(
+            $sync->getDataAccess()->getName(),
+            $entityIndexData
+        );
+        
+        $config = array(
+        );
+        $request = new \HTTP_Request2($url, $method, $config);
+        /*$refUrl = \Cx\Core\Routing\Url::fromDocumentRoot();
+        $refUrl->setMode('backend');
+        $request->setHeader('Referrer', $refUrl->toString());*/
+        $request->setHeader('Referrer', 'http://localhost/');
+        $request->setBody(http_build_query($content, null, '&'));
+        
+        $response = $request->send();
+        var_dump($response->getStatus());
+        echo 'Pushed to ' . $url . ' with method ' . $method . ', body was: ' . http_build_query($content) . "\n";
+        echo '<pre>' . $response->getBody() . "</pre>\n\n";
+        
+        return $response->getStatus() == 200;
+    }
+    
+    public function isLocked() {
+        $em = $this->cx->getDb()->getEntityManager();
+        $em->refresh($this);
+        return $this->state == 1;
+    }
+    
+    public function lock() {
+        if ($this->isLocked()) {
+            return false;
+        }
+        $this->state = 1;
+        $em = $this->cx->getDb()->getEntityManager();
+        $em->persist($this);
+        $em->flush();
+        return true;
+    }
+    
+    public function removeLock() {
+        $this->state = 0;
+        $em = $this->cx->getDb()->getEntityManager();
+        $em->persist($this);
+        $em->flush();
+    }
+    
+    public function disable() {
+        $this->state = 2;
+        $em = $this->cx->getDb()->getEntityManager();
+        $em->persist($this);
+        $em->flush();
+    }
 }
+

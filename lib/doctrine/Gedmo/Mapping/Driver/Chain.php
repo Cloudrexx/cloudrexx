@@ -9,16 +9,20 @@ use Gedmo\Mapping\Driver;
  * extension mapping driver support
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
- * @package Gedmo.Mapping.Driver
- * @subpackage Chain
- * @link http://www.gediminasm.org
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 class Chain implements Driver
 {
     /**
+     * The default driver
+     *
+     * @var Driver|null
+     */
+    private $defaultDriver;
+
+    /**
      * List of drivers nested
-     * @var array
+     * @var Driver[]
      */
     private $_drivers = array();
 
@@ -36,7 +40,7 @@ class Chain implements Driver
     /**
      * Get the array of nested drivers.
      *
-     * @return array $drivers
+     * @return Driver[] $drivers
      */
     public function getDrivers()
     {
@@ -44,9 +48,24 @@ class Chain implements Driver
     }
 
     /**
-     * {@inheritDoc}
+     * Get the default driver.
+     *
+     * @return Driver|null
      */
-    public function validateFullMetadata($meta, array $config) {}
+    public function getDefaultDriver()
+    {
+        return $this->defaultDriver;
+    }
+
+    /**
+     * Set the default driver.
+     *
+     * @param Driver $driver
+     */
+    public function setDefaultDriver(Driver $driver)
+    {
+        $this->defaultDriver = $driver;
+    }
 
     /**
      * {@inheritDoc}
@@ -56,10 +75,19 @@ class Chain implements Driver
         foreach ($this->_drivers as $namespace => $driver) {
             if (strpos($meta->name, $namespace) === 0) {
                 $driver->readExtendedMetadata($meta, $config);
+
                 return;
             }
         }
-        throw new \Gedmo\Exception\UnexpectedValueException('Class ' . $meta->name . ' is not a valid entity or mapped super class.');
+
+        if (null !== $this->defaultDriver) {
+            $this->defaultDriver->readExtendedMetadata($meta, $config);
+
+            return;
+        }
+
+        // commenting it for customized mapping support, debugging of such cases might get harder
+        //throw new \Gedmo\Exception\UnexpectedValueException('Class ' . $meta->name . ' is not a valid entity or mapped super class.');
     }
 
     /**

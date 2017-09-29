@@ -171,15 +171,15 @@ class JsonNode implements JsonAdapter {
                     $openNodes[] = '#node_' . $node->getId();
                     $node = $node->getParent();
                 }
-                if (!isset($_COOKIE['jstree_open'])) {
-                    $_COOKIE['jstree_open'] = '';
+                $openNodes2 = array();
+                if (isset($_COOKIE[\Cx\Core\ContentManager\Controller\ContentManager::JSTREE_COOKIE_OPEN])) {
+                    $openNodes2 = explode(',', $_COOKIE[\Cx\Core\ContentManager\Controller\ContentManager::JSTREE_COOKIE_OPEN]);
                 }
-                $openNodes2 = explode(',', $_COOKIE['jstree_open']);
                 if ($openNodes2 == array(0=>'')) {
                     $openNodes2 = array();
                 }
                 $openNodes = array_merge($openNodes, $openNodes2);
-                $_COOKIE['jstree_open'] = implode(',', $openNodes);
+                setcookie(\Cx\Core\ContentManager\Controller\ContentManager::JSTREE_COOKIE_OPEN, implode(',', $openNodes), 0, \Cx\Core\Core\Controller\Cx::instanciate()->getWebsiteOffsetPath() . '/');
             }
         }
 
@@ -243,6 +243,7 @@ class JsonNode implements JsonAdapter {
 
             $this->em->flush();
             $this->em->getConnection()->commit();
+            $this->clearCache();
         } catch (\Exception $e) {
             $this->em->getConnection()->rollback();
             throw $e;
@@ -295,31 +296,39 @@ class JsonNode implements JsonAdapter {
             }
         }
 
-        // copy the node recursively and persist changes
-        $newNode = $node->copy(true);
-        $this->em->flush();
+        $this->em->getConnection()->beginTransaction();
+        try {
+            // copy the node recursively and persist changes
+            $newNode = $node->copy(true);
+            $this->em->flush();
 
-        // rename page
-        foreach ($newNode->getPages() as $page) {
-            $title = $page->getTitle() . ' (' . $_CORELANG['TXT_CORE_CM_COPY_OF_PAGE'] . ')';
-            $i = 1;
-            while ($this->titleExists($node->getParent(), $page->getLang(), $title)) {
-                $i++;
-                if ($page->getLang() == \FWLanguage::getDefaultLangId()) {
-                    $position++;
+            // rename page
+            foreach ($newNode->getPages() as $page) {
+                $title = $page->getTitle() . ' (' . $_CORELANG['TXT_CORE_CM_COPY_OF_PAGE'] . ')';
+                $i = 1;
+                while ($this->titleExists($node->getParent(), $page->getLang(), $title)) {
+                    $i++;
+                    if ($page->getLang() == \FWLanguage::getDefaultLangId()) {
+                        $position++;
+                    }
+                    $title = $page->getTitle() . ' (' . sprintf($_CORELANG['TXT_CORE_CM_COPY_N_OF_PAGE'], $i) . ')';
                 }
-                $title = $page->getTitle() . ' (' . sprintf($_CORELANG['TXT_CORE_CM_COPY_N_OF_PAGE'], $i) . ')';
+                $page->setTitle($title);
+                $this->em->persist($page);
             }
-            $page->setTitle($title);
-            $this->em->persist($page);
+
+            // move the node to correct position
+            $this->nodeRepo->moveUp($newNode, true);
+            $this->nodeRepo->moveDown($newNode, $position, true);
+            $this->em->persist($newNode);
+
+            $this->em->flush();
+            $this->em->getConnection()->commit();
+            $this->clearCache();
+        } catch (\Exception $e) {
+            $this->em->getConnection()->rollback();
+            throw $e;
         }
-
-        // move the node to correct position
-        $this->nodeRepo->moveUp($newNode, true);
-        $this->nodeRepo->moveDown($newNode, $position, true);
-        $this->em->persist($newNode);
-
-        $this->em->flush();
     }
 
     protected function titleExists($parentNode, $lang, $title) {
@@ -384,8 +393,16 @@ class JsonNode implements JsonAdapter {
         }*/
         $this->em->remove($node);
         if ($flush) {
-            $this->em->flush();
-            $this->em->clear();
+            $this->em->getConnection()->beginTransaction();
+            try {
+                $this->em->flush();
+                $this->em->clear();
+                $this->em->getConnection()->commit();
+                $this->clearCache();
+            } catch (\Exception $e) {
+                $this->em->getConnection()->rollback();
+                throw $e;
+            }
         }
         return array(
             'action'                => 'delete',
@@ -402,15 +419,23 @@ class JsonNode implements JsonAdapter {
         $post   = $params['post'];
         $return = array('action' => 'delete');
 
-        foreach ($post['nodes'] as $nodeId) {
-            $data['post']['id'] = $nodeId;
-            $this->delete($data, false);
-            if ($nodeId == $post['currentNodeId']) {
-                $return['deletedCurrentPage'] = true;
+        $this->em->getConnection()->beginTransaction();
+        try {
+            foreach ($post['nodes'] as $nodeId) {
+                $data['post']['id'] = $nodeId;
+                $this->delete($data, false);
+                if ($nodeId == $post['currentNodeId']) {
+                    $return['deletedCurrentPage'] = true;
+                }
             }
+            $this->em->flush();
+            $this->em->clear();
+            $this->em->getConnection()->commit();
+            $this->clearCache();
+        } catch (\Exception $e) {
+            $this->em->getConnection()->rollback();
+            throw $e;
         }
-        $this->em->flush();
-        $this->em->clear();
 
         return $return;
     }
@@ -451,8 +476,8 @@ class JsonNode implements JsonAdapter {
 
         // get open nodes
         $open_nodes = array();
-        if (isset($_COOKIE['jstree_open'])) {
-            $tmp_open_nodes = explode(',', $_COOKIE['jstree_open']);
+        if (isset($_COOKIE[\Cx\Core\ContentManager\Controller\ContentManager::JSTREE_COOKIE_OPEN])) {
+            $tmp_open_nodes = explode(',', $_COOKIE[\Cx\Core\ContentManager\Controller\ContentManager::JSTREE_COOKIE_OPEN]);
             foreach ($tmp_open_nodes as $node) {
                 $node_id = substr($node, 6);
                 $open_nodes[$node_id] = true;
@@ -681,5 +706,13 @@ class JsonNode implements JsonAdapter {
         }
 
         return $tree;
+    }
+
+    /**
+     * Drops the complete output cache
+     */
+    protected function clearCache() {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $cx->getComponent('Cache')->clearCache();
     }
 }

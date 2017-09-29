@@ -1152,6 +1152,8 @@ class ContactManager extends \Cx\Core_Modules\Contact\Controller\ContactLib
             }
         }
 
+        \Cx\Core\Core\Controller\Cx::instanciate()->getComponent('Cache')->deleteComponentFiles('Contact');
+
         // parse the recipients
         $this->_showRecipients($recipients);
     }
@@ -1372,6 +1374,7 @@ class ContactManager extends \Cx\Core_Modules\Contact\Controller\ContactLib
                 $this->cleanRecipients($formId, $recipientIDs);
             }
 
+            \Cx\Core\Core\Controller\Cx::instanciate()->getComponent('Cache')->deleteComponentFiles('Contact');
         }
 
         //$this->_modifyForm();
@@ -1460,6 +1463,8 @@ class ContactManager extends \Cx\Core_Modules\Contact\Controller\ContactLib
             if ($formId > 0) {
                 if ($this->deleteForm($formId)) {
                     $this->_statusMessageOk = $_ARRAYLANG['TXT_CONTACT_CONTACT_FORM_SUCCESSFULLY_DELETED'];
+
+                    \Cx\Core\Core\Controller\Cx::instanciate()->getComponent('Cache')->deleteComponentFiles('Contact');
 
                     if (isset($_GET['deleteContent']) && $_GET['deleteContent'] == 'true') {
                         $this->_deleteContentSite($formId);

@@ -51,15 +51,6 @@ use Cx\Core\Wysiwyg\Model\Event\WysiwygEventListener;
 class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentController implements \Cx\Core\Event\Model\Entity\EventListener {
 
     /**
-     * Initializes a controller
-     * @param \Cx\Core\Core\Model\Entity\SystemComponent $systemComponent SystemComponent to decorate
-     * @param \Cx\Core\Core\Controller\Cx                               $cx         The Cloudrexx main class
-     */
-    public function __construct(\Cx\Core\Core\Model\Entity\SystemComponent $systemComponent, \Cx\Core\Core\Controller\Cx $cx) {
-        parent::__construct($systemComponent, $cx);
-    }
-
-    /**
      * Add the event listener
      *
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
@@ -96,7 +87,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      * @return array List of Controller class names (without namespace)
      */
     public function getControllerClasses() {
-        return array('Backend');
+        return array('Backend', 'Toolbar');
     }
 
     /**
@@ -194,5 +185,36 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     public function registerEventListeners() {
         $eventListener = new WysiwygEventListener($this->cx);
         $this->cx->getEvents()->addEventListener('mediasource.load', $eventListener);
+    }
+
+    /**
+     * Get the Toolbar of the given type
+     *
+     * Returns the toolbar of the desired based on the restricted of functions 
+     * according to user group and default setting
+     * @param string    $type   Type of desired Toolbar (one of the following:
+     *                          small, full, frontendEditingContent,
+     *                          frontendEditingTitle or bbcode)
+     * @return string           Toolbar of the desired type based on the
+     *                          restrictions according to user group and default
+     *                          setting
+     */
+    public function getToolbar($type = 'Full') {
+        $toolbarController = $this->getController('Toolbar');
+        return $toolbarController->getToolbar($type);
+    }
+
+    /**
+     * Get the buttons that shall be removed or unchecked
+     * @return string
+     * @internal param bool|false $buttonsOnly If set, returns only the buttons
+     *                                      no config.removedButtons prefix
+     * @internal param bool|false $isAccess If set, removes the prefix
+     *                                      config.removedButtons from the string
+     */
+    public function getRemovedButtons() {
+        $toolbarController = $this->getController('Toolbar');
+        $buttons = $toolbarController->getRemovedButtons();
+        return $buttons;
     }
 }

@@ -304,7 +304,7 @@ class PaymentProcessing
             // Added 20100222 -- Reto Kohli
             case 'mobilesolutions':
                 $return = \PostfinanceMobile::getForm(
-                    intval(100 * $_SESSION['shop']['grand_total_price']),
+                    intval(bcmul($_SESSION['shop']['grand_total_price'], 100, 0)),
                     $_SESSION['shop']['order_id']);
                 if ($return) {
 //DBG::log("Postfinance Mobile getForm() returned:");
@@ -466,7 +466,7 @@ foreach (\PostfinanceMobile::getErrors() as $error) {
 
         $arrShopOrder = array(
             'order_id'  => $_SESSION['shop']['order_id'],
-            'amount'    => intval($_SESSION['shop']['grand_total_price']*100),
+            'amount'    => intval(bcmul($_SESSION['shop']['grand_total_price'], 100, 0)),
             'currency'  => Currency::getActiveCurrencyCode(),
         );
 
@@ -512,7 +512,7 @@ foreach (\PostfinanceMobile::getErrors() as $error) {
         $arrShopOrder = array(
 // 20111227 - Note that all parameter names should now be uppercase only
             'ORDERID'   => $_SESSION['shop']['order_id'],
-            'AMOUNT'    => intval($_SESSION['shop']['grand_total_price']*100),
+            'AMOUNT'    => intval(bcmul($_SESSION['shop']['grand_total_price'], 100, 0)),
             'CURRENCY'  => Currency::getActiveCurrencyCode(),
             'PARAMPLUS' => 'section=Shop'.MODULE_INDEX.'&cmd=success&handler=yellowpay',
 // Custom code for adding more Customer data to the form.
@@ -634,7 +634,7 @@ if (empty ($return)) {
             case 'paymill_iban':
                 $arrShopOrder = array(
                     'order_id'  => $_SESSION['shop']['order_id'],
-                    'amount'    => intval($_SESSION['shop']['grand_total_price']*100),
+                    'amount'    => intval(bcmul($_SESSION['shop']['grand_total_price'], 100, 0)),
                     'currency'  => Currency::getActiveCurrencyCode(),
                     'note'      => $_SESSION['shop']['note']
                 );

@@ -20,6 +20,12 @@ Cx\Core_Modules\Access\Model\Entity\AccessId:
     coreAttribute:
       targetEntity: Cx\Core\User\Model\Entity\CoreAttribute
       mappedBy: accessId
+    contrexxAccessUserAttributeRead:
+      targetEntity: Cx\Core\User\Model\Entity\UserAttribute
+      mappedBy: readAccessId
+    coreAttributeRead:
+      targetEntity: Cx\Core\User\Model\Entity\CoreAttribute
+      mappedBy: readAccessId
   manyToMany:
     group2:
       targetEntity: Cx\Core\User\Model\Entity\Group

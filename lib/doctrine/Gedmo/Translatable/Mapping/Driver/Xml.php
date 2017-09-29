@@ -2,39 +2,26 @@
 
 namespace Gedmo\Translatable\Mapping\Driver;
 
-use Gedmo\Mapping\Driver\Xml as BaseXml,
-    Gedmo\Exception\InvalidMappingException;
+use Gedmo\Mapping\Driver\Xml as BaseXml;
+use Gedmo\Exception\InvalidMappingException;
 
 /**
  * This is a xml mapping driver for Translatable
  * behavioral extension. Used for extraction of extended
- * metadata from xml specificaly for Translatable
+ * metadata from xml specifically for Translatable
  * extension.
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
  * @author Miha Vrhovnik <miha.vrhovnik@gmail.com>
- * @package Gedmo.Translatable.Mapping.Driver
- * @subpackage Xml
- * @link http://www.gediminasm.org
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 class Xml extends BaseXml
 {
-
     /**
      * {@inheritDoc}
      */
-    public function validateFullMetadata($meta, array $config)
+    public function readExtendedMetadata($meta, array &$config)
     {
-        if ($config && is_array($meta->identifier) && count($meta->identifier) > 1) {
-            throw new InvalidMappingException("Translatable does not support composite identifiers in class - {$meta->name}");
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function readExtendedMetadata($meta, array &$config) {
         /**
          * @var \SimpleXmlElement $xml
          */
@@ -56,10 +43,10 @@ class Xml extends BaseXml
                 }
                 if ($this->_isAttributeSet($data, 'entity')) {
                     $entity = $this->_getAttribute($data, 'entity');
-                    if (!class_exists($entity)) {
+                    if (!$cl = $this->getRelatedClassName($meta, $entity)) {
                         throw new InvalidMappingException("Translation entity class: {$entity} does not exist.");
                     }
-                    $config['translationClass'] = $entity;
+                    $config['translationClass'] = $cl;
                 }
             }
         }
@@ -74,9 +61,19 @@ class Xml extends BaseXml
                 $field = $this->_getAttribute($mappingDoctrine, 'name');
                 if (isset($mapping->translatable)) {
                     $config['fields'][] = $field;
+                    /** @var \SimpleXmlElement $data */
+                    $data = $mapping->translatable;
+                    if ($this->_isAttributeSet($data, 'fallback')) {
+                        $config['fallback'][$field] = 'true' == $this->_getAttribute($data, 'fallback') ? true : false;
+                    }
                 }
             }
         }
-    }
 
+        if (!$meta->isMappedSuperclass && $config) {
+            if (is_array($meta->identifier) && count($meta->identifier) > 1) {
+                throw new InvalidMappingException("Translatable does not support composite identifiers in class - {$meta->name}");
+            }
+        }
+    }
 }

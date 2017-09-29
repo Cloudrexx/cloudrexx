@@ -282,53 +282,38 @@ CODE;
         if (empty($subject))
             $subject = $objMail->fields["subject"];
 
-        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-        if (\Env::get('ClassLoader')->loadFile($cx->getCodeBaseLibraryPath() . '/phpmailer/class.phpmailer.php')) {
-            $objMail = new \phpmailer();
+        $objMail = new \Cx\Core\MailTemplate\Model\Entity\Mail();
 
-            /**
-             * Load mail template and parse it
-             */
-            $objTemplate = new \Cx\Core\Html\Sigma('.');
-            $objTemplate->setErrorHandling(PEAR_ERROR_DIE);
-            $objTemplate->setTemplate($content);
+        /**
+         * Load mail template and parse it
+         */
+        $objTemplate = new \Cx\Core\Html\Sigma('.');
+        $objTemplate->setErrorHandling(PEAR_ERROR_DIE);
+        $objTemplate->setTemplate($content);
 
-            $objTemplate->setVariable(array(
-                "DOMAIN" => $_CONFIG["domainUrl"],
-                'MESSAGE' => $message,
-            ));
+        $objTemplate->setVariable(array(
+            "DOMAIN" => $_CONFIG["domainUrl"],
+            'MESSAGE' => $message,
+        ));
 
-            if ($objTemplate->blockExists('filesharing_file')) {
-                foreach ($files as $file) {
-                    $objTemplate->setVariable(array(
-                        'FILE_DOWNLOAD' => self::getDownloadLink($file),
-                    ));
-                    $objTemplate->parse('filesharing_file');
-                }
-            }
-
-            if ($_CONFIG['coreSmtpServer'] > 0 && \Env::get('ClassLoader')->loadFile($cx->getCodeBaseCorePath() . '/SmtpSettings.class.php')) {
-                if (($arrSmtp = SmtpSettings::getSmtpAccount($_CONFIG['coreSmtpServer'])) !== false) {
-                    $objMail->IsSMTP();
-                    $objMail->Host = $arrSmtp['hostname'];
-                    $objMail->Port = $arrSmtp['port'];
-                    $objMail->SMTPAuth = true;
-                    $objMail->Username = $arrSmtp['username'];
-                    $objMail->Password = $arrSmtp['password'];
-                }
-            }
-
-            $objMail->CharSet = CONTREXX_CHARSET;
-            $objMail->SetFrom($_CONFIG['coreAdminEmail'], $_CONFIG['coreGlobalPageTitle']);
-            $objMail->Subject = $subject;
-            $objMail->Body = $objTemplate->get();
-            foreach($emails as $email){
-                $objMail->AddAddress($email);
-                $objMail->Send();
-                $objMail->ClearAddresses();
+        if ($objTemplate->blockExists('filesharing_file')) {
+            foreach ($files as $file) {
+                $objTemplate->setVariable(array(
+                    'FILE_DOWNLOAD' => self::getDownloadLink($file),
+                ));
+                $objTemplate->parse('filesharing_file');
             }
         }
+
+        $objMail->SetFrom($_CONFIG['coreAdminEmail'], $_CONFIG['coreGlobalPageTitle']);
+
+        $objMail->Subject = $subject;
+        $objMail->Body = $objTemplate->get();
+        foreach($emails as $email){
+            $objMail->AddAddress($email);
+            $objMail->Send();
+            $objMail->ClearAddresses();
+        }
+
     }
 }
-
-?>

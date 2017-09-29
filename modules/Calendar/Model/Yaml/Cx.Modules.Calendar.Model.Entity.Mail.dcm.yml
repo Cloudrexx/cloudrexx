@@ -1,0 +1,31 @@
+Cx\Modules\Calendar\Model\Entity\Mail:
+  type: entity
+  table: module_calendar_mail
+  id:
+    id:
+      type: integer
+      generator:
+        strategy: AUTO
+  fields:
+    title:
+      type: string
+      length: 255
+    contentText:
+      type: text
+      column: content_text
+    contentHtml:
+      type: text
+      column: content_html
+    recipients:
+      type: text
+    langId:
+      type: integer
+      column: lang_id
+    actionId:
+      type: integer
+      column: action_id
+    isDefault:
+      type: integer
+      column: is_default
+    status:
+      type: integer

@@ -13,7 +13,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * This software consists of voluntary contributions made by many individuals
- * and is licensed under the LGPL. For more information, see
+ * and is licensed under the MIT license. For more information, see
  * <http://www.doctrine-project.org>.
  */
 
@@ -24,7 +24,7 @@ use Doctrine\ORM\Query\Lexer;
 /**
  * "SUBSTRING" "(" StringPrimary "," SimpleArithmeticExpression "," SimpleArithmeticExpression ")"
  *
- * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * 
  * @link    www.doctrine-project.org
  * @since   2.0
  * @author  Guilherme Blanco <guilhermeblanco@hotmail.com>
@@ -35,7 +35,15 @@ use Doctrine\ORM\Query\Lexer;
 class SubstringFunction extends FunctionNode
 {
     public $stringPrimary;
+
+    /**
+     * @var \Doctrine\ORM\Query\AST\SimpleArithmeticExpression
+     */
     public $firstSimpleArithmeticExpression;
+
+    /**
+     * @var \Doctrine\ORM\Query\AST\SimpleArithmeticExpression|null
+     */
     public $secondSimpleArithmeticExpression = null;
 
     /**
@@ -64,19 +72,18 @@ class SubstringFunction extends FunctionNode
         $parser->match(Lexer::T_OPEN_PARENTHESIS);
 
         $this->stringPrimary = $parser->StringPrimary();
-        
+
         $parser->match(Lexer::T_COMMA);
-        
+
         $this->firstSimpleArithmeticExpression = $parser->SimpleArithmeticExpression();
 
         $lexer = $parser->getLexer();
         if ($lexer->isNextToken(Lexer::T_COMMA)) {
             $parser->match(Lexer::T_COMMA);
-        
+
             $this->secondSimpleArithmeticExpression = $parser->SimpleArithmeticExpression();
         }
 
         $parser->match(Lexer::T_CLOSE_PARENTHESIS);
     }
 }
-

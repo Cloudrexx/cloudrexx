@@ -465,7 +465,38 @@ EOF;
 
     function getContent($intEntryId, $arrInputfield, $arrTranslationStatus)
     {
-        global $objDatabase, $_LANGID, $_ARRAYLANG;
+        $strValue = static::getRawData($intEntryId, $arrInputfield, $arrTranslationStatus);
+
+        if(!empty($strValue)) {
+            $strValue = strip_tags(htmlspecialchars($strValue, ENT_QUOTES, CONTREXX_CHARSET));
+            $arrParents = array();
+            $arrParents = explode("||", $strValue);
+            $strValue = null;
+
+            foreach($arrParents as $strChildes) {
+                $arrChildes = array();
+                $arrChildes = explode("##", $strChildes);
+
+                $strTitle = '<span class="'.$this->moduleNameLC.'DownloadTitle">'.$arrChildes[0].'</span>';
+                $strDesc = '<span class="'.$this->moduleNameLC.'DownloadDescription">'.$arrChildes[1].'</span>';
+                $arrFileInfo    = pathinfo($arrChildes[2]);
+                $strFileName    = htmlspecialchars($arrFileInfo['basename'], ENT_QUOTES, CONTREXX_CHARSET);
+                $strFile = '<span class="'.$this->moduleNameLC.'DownloadFile"><a href="'.$arrChildes[2].'">'.$strFileName.'</a></span>';
+
+                $strValue .= '<div class="'.$this->moduleNameLC.'Download">'.$strTitle.$strDesc.$strFile.'</div>';
+            }
+
+            $arrContent['TXT_'.$this->moduleLangVar.'_INPUTFIELD_NAME'] = htmlspecialchars($arrInputfield['name'][0], ENT_QUOTES, CONTREXX_CHARSET);
+            $arrContent[$this->moduleLangVar.'_INPUTFIELD_VALUE'] = $strValue;
+        } else {
+            $arrContent = null;
+        }
+
+        return $arrContent;
+    }
+
+    function getRawData($intEntryId, $arrInputfield, $arrTranslationStatus) {
+        global $objDatabase, $_LANGID;
 
         $intId = intval($arrInputfield['id']);
         $objEntryDefaultLang = $objDatabase->Execute("SELECT `lang_id` FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_entries WHERE id=".intval($intEntryId)." LIMIT 1");
@@ -511,34 +542,7 @@ EOF;
             ");
         }
 
-        $strValue = strip_tags(htmlspecialchars($objInputfieldValue->fields['value'], ENT_QUOTES, CONTREXX_CHARSET));
-
-
-        if(!empty($strValue)) {
-            $arrParents = array();
-            $arrParents = explode("||", $strValue);
-            $strValue = null;
-
-            foreach($arrParents as $strChildes) {
-                $arrChildes = array();
-                $arrChildes = explode("##", $strChildes);
-
-                $strTitle = '<span class="'.$this->moduleNameLC.'DownloadTitle">'.$arrChildes[0].'</span>';
-                $strDesc = '<span class="'.$this->moduleNameLC.'DownloadDescription">'.$arrChildes[1].'</span>';
-                $arrFileInfo    = pathinfo($arrChildes[2]);
-                $strFileName    = htmlspecialchars($arrFileInfo['basename'], ENT_QUOTES, CONTREXX_CHARSET);
-                $strFile = '<span class="'.$this->moduleNameLC.'DownloadFile"><a href="'.$arrChildes[2].'">'.$strFileName.'</a></span>';
-
-                $strValue .= '<div class="'.$this->moduleNameLC.'Download">'.$strTitle.$strDesc.$strFile.'</div>';
-            }
-
-            $arrContent['TXT_'.$this->moduleLangVar.'_INPUTFIELD_NAME'] = htmlspecialchars($arrInputfield['name'][0], ENT_QUOTES, CONTREXX_CHARSET);
-            $arrContent[$this->moduleLangVar.'_INPUTFIELD_VALUE'] = $strValue;
-        } else {
-            $arrContent = null;
-        }
-
-        return $arrContent;
+        return $objInputfieldValue->fields['value'];
     }
 
 

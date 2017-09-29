@@ -141,6 +141,9 @@ var $endYear=2037;
 @START PUBLIC METHODS
 ----------------------
 */
+public function __construct($year=false,$month=false,$day=false,$GMTDiff="none"){
+    $this->activeCalendar($year, $month, $day, $GMTDiff);
+}
 /*
 ********************************************************************************
 PUBLIC activeCalendar() -> class constructor, does the initial date calculation

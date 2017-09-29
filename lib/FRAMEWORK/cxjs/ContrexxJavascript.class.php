@@ -83,19 +83,21 @@ class ContrexxJavascript {
 //        global $objFWUser;
 //        $langId;
         if($backOrFrontend == "frontend")
-            $langId = $objInit->getFrontendLangId();
+            $langCode = FWLanguage::getLanguageCodeById($objInit->getFrontendLangId());
         else //backend
-            $langId = $objInit->getBackendLangId();
-        $langCode = FWLanguage::getLanguageCodeById($langId);
+            $langCode = FWLanguage::getBackendLanguageCodeById($objInit->getBackendLangId());
 
         $this->setVariable(
             array(
-                'path'      => ASCMS_PATH_OFFSET.'/'.$langCode.'/',
-                'basePath'  => ASCMS_PATH_OFFSET.'/',
-                'cadminPath'=> \Cx\Core\Core\Controller\Cx::instanciate()->getWebsiteBackendPath().'/',
-                'mode'      => $objInit->mode,
-                'language'  => $langCode,
-                'csrf'      => \Cx\Core\Csrf\Controller\Csrf::code(),
+                'path' => ASCMS_PATH_OFFSET . '/' . $langCode . '/',
+                'basePath' => ASCMS_PATH_OFFSET . '/',
+                'cadminPath' => \Cx\Core\Core\Controller\Cx::instanciate()->getWebsiteBackendPath() . '/',
+                'mode' => $objInit->mode,
+                'language' => $langCode,
+                'csrf' => \Cx\Core\Csrf\Controller\Csrf::code(),
+                'charReplaceList' => \Cx\Core\LanguageManager\Controller\ComponentController::$REPLACEMENT_CHARLIST,
+                'themeId'   => \Env::get('init')->getCurrentThemeId(),
+                'themeFolder' => \Env::get('init')->getCurrentThemesPath(),
             ),
             'contrexx'
         );

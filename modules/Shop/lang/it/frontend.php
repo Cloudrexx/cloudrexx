@@ -215,7 +215,6 @@ $_ARRAYLANG['TXT_SHOP_ACCOUNT_NOTE'] = "Durch Ihre Anmeldung bei uns sind Sie in
 $_ARRAYLANG['TXT_SHOP_ACCOUNT_NOTE_NO_REGISTRATION'] = "Sie sind momentan nicht angemeldet und können ohne Registrierung bestellen.";
 $_ARRAYLANG['TXT_SHOP_ACCOUNT_EXISTING_CUSTOMER'] = "Ich bin bereits Kunde.";
 $_ARRAYLANG['TXT_SHOP_ACCOUNT_LOGIN'] = "Anmelden &gt;&gt;";
-$_ARRAYLANG['TXT_SHOP_CATEGORIES'] = "Kategorien:";
 $_ARRAYLANG['TXT_PRODUCTS_IN_CATEGORY'] = "Produkte in der Kategorie";
 $_ARRAYLANG['TXT_SHOP_GO_TO_CATEGORY'] = "Weiter zur Kategorie";
 $_ARRAYLANG['TXT_SHOP_LSV_EE_FIRST_NAME'] = "Vorname";

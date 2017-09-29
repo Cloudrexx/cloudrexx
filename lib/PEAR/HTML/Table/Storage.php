@@ -119,6 +119,10 @@ class HTML_Table_Storage extends HTML_Common {
      */
     var $_useTGroups = false;
 
+    public function __construct($tabOffset = 0, $useTGroups = false) {
+        $this->HTML_Table_Storage($tabOffset, $useTGroups);
+    }
+
     /**
      * Class constructor
      * @param    int      $tabOffset

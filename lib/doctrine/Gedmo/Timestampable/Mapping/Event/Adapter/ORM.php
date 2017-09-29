@@ -10,9 +10,6 @@ use Gedmo\Timestampable\Mapping\Event\TimestampableAdapter;
  * for Timestampable behavior
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
- * @package Gedmo\Timestampable\Mapping\Event\Adapter
- * @subpackage ORM
- * @link http://www.gediminasm.org
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 final class ORM extends BaseAdapterORM implements TimestampableAdapter
@@ -22,6 +19,14 @@ final class ORM extends BaseAdapterORM implements TimestampableAdapter
      */
     public function getDateValue($meta, $field)
     {
+        $mapping = $meta->getFieldMapping($field);
+        if (isset($mapping['type']) && $mapping['type'] === 'integer') {
+            return time();
+        }
+        if (isset($mapping['type']) && $mapping['type'] == 'zenddate') {
+            return new \Zend_Date();
+        }
+
         return new \DateTime();
     }
 }

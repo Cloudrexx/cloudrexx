@@ -35,8 +35,8 @@
 global $_ARRAYLANG;
 $_ARRAYLANG['TXT_DESIGN_MANAGEMENT'] = "Layout";
 $_ARRAYLANG['TXT_THEME_UNABLE_TO_CREATE'] = ' konnte nicht erstellt werden';
-$_ARRAYLANG['TXT_DESIGN_OVERVIEW'] = 'Überblick ';
-$_ARRAYLANG['TXT_DESIGN_TEMPLATES'] = 'Template Manager';
+$_ARRAYLANG['TXT_VIEWMANAGER_OVERVIEW'] = 'Überblick ';
+$_ARRAYLANG['TXT_VIEWMANAGER_TEMPLATE_EDITOR'] = 'Template Manager';
 $_ARRAYLANG['TXT_DESIGN_SETTINGS'] = 'Einstellungen';
 $_ARRAYLANG['TXT_DESIGN_FILES_ADMINISTRATION'] = 'Dateienverwaltung';
 $_ARRAYLANG['TXT_CORE_PLACEHOLDERS'] = 'Platzhalter';
@@ -217,3 +217,4 @@ $_ARRAYLANG['TXT_THEME_TEMPLATEEDITOR_UNUSABLE'] = 'Code only';
 $_ARRAYLANG['TXT_THEME_TEMPLATEEDITOR_EDIT'] = 'Anpassen';
 $_ARRAYLANG['TXT_THEME_ERROR_IN_INSERT_THEME'] = 'Das Template konnte nicht in der Datenbank gespeichert werden.';
 $_ARRAYLANG['TXT_UNABLE_TO_CONVERT_THEME_TO_COMPONENT'] = 'Das Template konnte nicht korrekt eingelesen werden. Stellen Sie sicher das auf das Verzeichnis im Dateisystem Schreibzugriff besteht.';
+$_ARRAYLANG['TXT_CORE_VIEWMANAGER_LOADING'] = "Laden...";

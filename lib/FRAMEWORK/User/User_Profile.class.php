@@ -129,7 +129,7 @@ class User_Profile
                                 $arrDateCombined[$char] = $arrDate[1][$charNr];
                             }
 
-                            $value = mktime(1, 0, 0,
+                            $value = gmmktime(1, 0, 0,
                                 (isset($arrDateCombined['m']) ? $arrDateCombined['m'] : $arrDateCombined['n']), // month
                                 (isset($arrDateCombined['d']) ? $arrDateCombined['d'] : $arrDateCombined['j']), // day
                                 (isset($arrDateCombined['Y']) ? $arrDateCombined['Y'] : ($arrDateCombined['y'] + ($arrDateCombined['y'] < 70 ? 2000 : 1900))) // year
@@ -420,9 +420,9 @@ class User_Profile
                 }
 
 
-            } elseif ($attribute == 'birthday_day') {
+            } elseif ($attribute === 'birthday_day') {
                 $arrConditions[] = "(DATE_FORMAT(DATE_ADD(FROM_UNIXTIME(0), interval `tblP`.`birthday` second), '%e') = '".intval($condition)."')";
-            } elseif ($attribute == 'birthday_month') {
+            } elseif ($attribute === 'birthday_month') {
                 $arrConditions[] = "(DATE_FORMAT(DATE_ADD(FROM_UNIXTIME(0), interval `tblP`.`birthday` second), '%c') = '".intval($condition)."')";
             }
         }
@@ -450,9 +450,18 @@ class User_Profile
      * (You might even want to extend this to work with arrays, too.
      * Currently, only the shop module uses this feature.) -- RK 20100910
      * @param   mixed     $arrFilter    The term or array of terms
+     * @param   string    $forceTableIdx    Argument must not be used
+     *                                      directly. Will internally be used
+     *                                      for recursion (parsing child
+     *                                      attributes of complex profile
+     *                                      attributes like gender or
+     *                                      country). If $forceTableIdx is set
+     *                                      then its value will be used as
+     *                                      prefix for the table alias of the
+     *                                      SQL statement.
      * @return  array                   The array of SQL snippets
      */
-    protected function parseCustomAttributeFilterConditions($arrFilter)
+    protected function parseCustomAttributeFilterConditions($arrFilter, $forceTableIdx = null)
     {
         if (empty($this->objAttribute)) {
             $this->initAttributes();
@@ -460,35 +469,44 @@ class User_Profile
 
         $arrConditions = array();
         foreach ($arrFilter as $attribute => $condition) {
-            if ($this->objAttribute->load($attribute) && !$this->objAttribute->isCoreAttribute($attribute)) {
-                switch ($this->objAttribute->getDataType()) {
-                    case 'string':
-                        $percent = '%';
-                        if (   !is_array($condition)
-                            && strpos('%', $condition) !== false) $percent = '';
-                        $arrConditions[] =
-                            "tblA.`attribute_id` = ".$attribute.
-                            " AND (tblA.`value` LIKE '$percent".
-                            (is_array($condition)
-                              ? implode("$percent' OR tblA.`value` LIKE '$percent",
-                                    array_map('addslashes', $condition))
-                              : addslashes($condition))."$percent')";
-                        break;
+            if (!$this->objAttribute->load($attribute) || $this->objAttribute->isCoreAttribute($attribute)) {
+                continue;
+            }
 
-                    case 'int':
-                        $arrConditions[] = "tblA.`attribute_id` = ".$attribute." AND (tblA.`value` = '".(is_array($condition) ? implode("' OR tblA.`value` = '", array_map('intval', $condition)) : intval($condition))."')";
-                        break;
-                    case 'array':
-                        if (count($this->objAttribute->getChildren())) {
-                            foreach ($this->objAttribute->getChildren() as $childAttributeId) {
-                                $arrSubFilter[$childAttributeId] = $condition;
-                            }
-                            $arrConditions[] = implode(' OR ', $this->parseCustomAttributeFilterConditions($arrSubFilter));
+            if ($forceTableIdx) {
+                $tableIdx = $forceTableIdx;
+            } else {
+                $tableIdx = $attribute;
+            }
+
+            switch ($this->objAttribute->getDataType()) {
+                case 'string':
+                    $percent = '%';
+                    if (   !is_array($condition)
+                        && strpos('%', $condition) !== false) $percent = '';
+                    $arrConditions['tblA_' . $tableIdx] =
+                        "tblA_$tableIdx.`attribute_id` = ".$attribute.
+                        " AND (tblA_$tableIdx.`value` LIKE '$percent".
+                        (is_array($condition)
+                          ? implode("$percent' OR tblA_$tableIdx.`value` LIKE '$percent",
+                                array_map('addslashes', $condition))
+                          : addslashes($condition))."$percent')";
+                    break;
+
+                case 'int':
+                    $arrConditions['tblA_' . $tableIdx] = "tblA_$tableIdx.`attribute_id` = ".$attribute." AND (tblA_$tableIdx.`value` = '".(is_array($condition) ? implode("' OR tblA_$tableIdx.`value` = '", array_map('intval', $condition)) : intval($condition))."')";
+                    break;
+                case 'array':
+                    if (count($this->objAttribute->getChildren())) {
+                        foreach ($this->objAttribute->getChildren() as $childAttributeId) {
+                            $arrSubFilter[$childAttributeId] = $condition;
                         }
-                        break;
-                }
+                        $arrConditions['tblA_' . $tableIdx] = implode(' OR ', $this->parseCustomAttributeFilterConditions($arrSubFilter, $tableIdx));
+                    }
+                    break;
             }
         }
+
         return $arrConditions;
     }
 

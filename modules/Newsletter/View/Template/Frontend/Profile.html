@@ -1,11 +1,17 @@
 <div id="newsletter">
     <!-- BEGIN newsletter_error_message -->
-    <div class="form-group"><div class="text-danger">
-        {NEWSLETTER_ERROR_MESSAGE}</div></div>
+    <div class="form-group">
+        <div class="text-danger">
+            {NEWSLETTER_ERROR_MESSAGE}
+        </div>
+    </div>
     <!-- END newsletter_error_message -->
     <!-- BEGIN newsletter_ok_message -->
-    <div class="form-group"><div class="text-success">
-        {NEWSLETTER_OK_MESSAGE}</div></div>
+    <div class="form-group">
+        <div class="text-success">
+            {NEWSLETTER_OK_MESSAGE}
+        </div>
+    </div>
     <!-- END newsletter_ok_message -->
     <!-- BEGIN newsletterForm -->
     <div class="form">
@@ -17,7 +23,8 @@
                 <legend>Profil Daten</legend>
                 <div class="newsletter">
                     <label for="email">{TXT_NEWSLETTER_EMAIL_ADDRESS}</label>
-                    <input maxlength="255" name="email" type="text" value="{NEWSLETTER_EMAIL}" /></div>
+                    <input maxlength="255" name="email" type="text" value="{NEWSLETTER_EMAIL}" />
+                </div>
                 <!-- BEGIN recipient_sex -->
                 <div class="newsletter">
                     <label>{TXT_NEWSLETTER_SEX} {NEWSLETTER_RECIPIENT_SEX_MANDATORY}</label>
@@ -40,76 +47,105 @@
                 <!-- BEGIN recipient_salutation -->
                 <div class="newsletter">
                     <label>{TXT_NEWSLETTER_SALUTATION} {NEWSLETTER_RECIPIENT_SALUTATION_MANDATORY}</label> {NEWSLETTER_SALUTATION}</div>
-                <!-- END recipient_salutation --><!-- BEGIN recipient_title -->
+                <!-- END recipient_salutation -->
+                <!-- BEGIN recipient_title -->
                 <div class="newsletter">
                     <label>{TXT_NEWSLETTER_TITLE} {NEWSLETTER_RECIPIENT_TITLE_MANDATORY}</label>
                     <input maxlength="255" name="title" type="text" value="{NEWSLETTER_TITLE}" />
                 </div>
-                <!-- END recipient_title --><!-- BEGIN recipient_firstname -->
+                <!-- END recipient_title -->
+                <!-- BEGIN recipient_firstname -->
                 <div class="newsletter">
                     <label for="firstname">{TXT_NEWSLETTER_FIRSTNAME} {NEWSLETTER_RECIPIENT_FIRSTNAME_MANDATORY}</label>
-                    <input maxlength="255" name="firstname" type="text" value="{NEWSLETTER_FIRSTNAME}" /></div>
-                <!-- END recipient_firstname --><!-- BEGIN recipient_lastname -->
+                    <input maxlength="255" name="firstname" type="text" value="{NEWSLETTER_FIRSTNAME}" />
+                </div>
+                <!-- END recipient_firstname -->
+                <!-- BEGIN recipient_lastname -->
                 <div class="newsletter">
                     <label for="lastname">{TXT_NEWSLETTER_LASTNAME} {NEWSLETTER_RECIPIENT_LASTNAME_MANDATORY}</label>
-                    <input maxlength="255" name="lastname" type="text" value="{NEWSLETTER_LASTNAME}" /></div>
-                <!-- END recipient_lastname --><!-- BEGIN recipient_position -->
+                    <input maxlength="255" name="lastname" type="text" value="{NEWSLETTER_LASTNAME}" />
+                </div>
+                <!-- END recipient_lastname -->
+                <!-- BEGIN recipient_position -->
                 <div class="newsletter">
                     <label for="position">{TXT_NEWSLETTER_POSITION} {NEWSLETTER_RECIPIENT_POSITION_MANDATORY}</label>
-                    <input maxlength="255" name="position" type="text" value="{NEWSLETTER_POSITION}" /></div>
-                <!-- END recipient_position --><!-- BEGIN recipient_company -->
+                    <input maxlength="255" name="position" type="text" value="{NEWSLETTER_POSITION}" />
+                </div>
+                <!-- END recipient_position -->
+                <!-- BEGIN recipient_company -->
                 <div class="newsletter">
                     <label for="company">{TXT_NEWSLETTER_COMPANY} {NEWSLETTER_RECIPIENT_COMPANY_MANDATORY}</label>
-                    <input maxlength="255" name="company" type="text" value="{NEWSLETTER_COMPANY}" /></div>
-                <!-- END recipient_company --><!-- BEGIN recipient_industry -->
+                    <input maxlength="255" name="company" type="text" value="{NEWSLETTER_COMPANY}" />
+                </div>
+                <!-- END recipient_company -->
+                <!-- BEGIN recipient_industry -->
                 <div class="newsletter">
                     <label for="industry_sector">{TXT_NEWSLETTER_INDUSTRY_SECTOR} {NEWSLETTER_RECIPIENT_INDUSTRY_MANDATORY}</label>
-                    <input maxlength="255" name="industry_sector" type="text" value="{NEWSLETTER_INDUSTRY_SECTOR}" /></div>
-                <!-- END recipient_industry --><!-- BEGIN recipient_address -->
+                    <input maxlength="255" name="industry_sector" type="text" value="{NEWSLETTER_INDUSTRY_SECTOR}" />
+                </div>
+                <!-- END recipient_industry -->
+                <!-- BEGIN recipient_address -->
                 <div class="newsletter">
                     <label for="address">{TXT_NEWSLETTER_ADDRESS} {NEWSLETTER_RECIPIENT_ADDRESS_MANDATORY}</label>
-                    <input maxlength="255" name="address" type="text" value="{NEWSLETTER_ADDRESS}" /></div>
-                <!-- END recipient_address --><!-- BEGIN recipient_city -->
+                    <input maxlength="255" name="address" type="text" value="{NEWSLETTER_ADDRESS}" />
+                </div>
+                <!-- END recipient_address -->
+                <!-- BEGIN recipient_city -->
                 <div class="newsletter">
                     <label for="city">{TXT_NEWSLETTER_CITY} {NEWSLETTER_RECIPIENT_CITY_MANDATORY}</label>
-                    <input maxlength="255" name="city" type="text" value="{NEWSLETTER_CITY}" /></div>
-                <!-- END recipient_city --><!-- BEGIN recipient_zip -->
+                    <input maxlength="255" name="city" type="text" value="{NEWSLETTER_CITY}" />
+                </div>
+                <!-- END recipient_city -->
+                <!-- BEGIN recipient_zip -->
                 <div class="newsletter">
                     <label for="zip">{TXT_NEWSLETTER_ZIP} {NEWSLETTER_RECIPIENT_ZIP_MANDATORY}</label>
                     <input maxlength="255" name="zip" type="text" value="{NEWSLETTER_ZIP}" /></div>
-                <!-- END recipient_zip --><!-- BEGIN recipient_country -->
+                <!-- END recipient_zip -->
+                <!-- BEGIN recipient_country -->
                 <div class="newsletter">
-                    <label for="country">{TXT_NEWSLETTER_COUNTRY} {NEWSLETTER_RECIPIENT_COUNTRY_MANDATORY}</label> {NEWSLETTER_COUNTRY}</div>
-                <!-- END recipient_country --><!-- BEGIN recipient_phone -->
+                    <label for="country">{TXT_NEWSLETTER_COUNTRY} {NEWSLETTER_RECIPIENT_COUNTRY_MANDATORY}</label> {NEWSLETTER_COUNTRY}
+                </div>
+                <!-- END recipient_country -->
+                <!-- BEGIN recipient_phone -->
                 <div class="newsletter">
                     <label for="phone_office">{TXT_NEWSLETTER_PHONE} {NEWSLETTER_RECIPIENT_PHONE_MANDATORY}</label>
-                    <input maxlength="255" name="phone_office" type="text" value="{NEWSLETTER_PHONE}" /></div>
-                <!-- END recipient_phone --><!-- BEGIN recipient_private -->
+                    <input maxlength="255" name="phone_office" type="text" value="{NEWSLETTER_PHONE}" />
+                </div>
+                <!-- END recipient_phone -->
+                <!-- BEGIN recipient_private -->
                 <div class="newsletter">
                     <label for="phone_private">{TXT_NEWSLETTER_PHONE_PRIVATE} {NEWSLETTER_RECIPIENT_PRIVATE_MANDATORY}</label>
-                    <input maxlength="255" name="phone_private" type="text" value="{NEWSLETTER_PHONE_PRIVATE}" /></div>
-                <!-- END recipient_private --><!-- BEGIN recipient_mobile -->
+                    <input maxlength="255" name="phone_private" type="text" value="{NEWSLETTER_PHONE_PRIVATE}" />
+                </div>
+                <!-- END recipient_private -->
+                <!-- BEGIN recipient_mobile -->
                 <div class="newsletter">
                     <label for="phone_mobile">{TXT_NEWSLETTER_PHONE_MOBILE} {NEWSLETTER_RECIPIENT_MOBILE_MANDATORY}</label>
-                    <input maxlength="255" name="phone_mobile" type="text" value="{NEWSLETTER_PHONE_MOBILE}" /></div>
+                    <input maxlength="255" name="phone_mobile" type="text" value="{NEWSLETTER_PHONE_MOBILE}" />
+                </div>
                 <!-- END recipient_mobile -->
                 <!-- BEGIN recipient_fax -->
                 <div class="newsletter">
                     <label for="fax">{TXT_NEWSLETTER_FAX} {NEWSLETTER_RECIPIENT_FAX_MANDATORY}</label>
-                    <input maxlength="255" name="fax" type="text" value="{NEWSLETTER_FAX}" /></div>
-                <!-- END recipient_fax --><!-- BEGIN recipient_birthday -->
+                    <input maxlength="255" name="fax" type="text" value="{NEWSLETTER_FAX}" />
+                </div>
+                <!-- END recipient_fax -->
+                <!-- BEGIN recipient_birthday -->
                 <div class="newsletter">
                     <label>{TXT_NEWSLETTER_BIRTHDAY} {NEWSLETTER_RECIPIENT_BIRTHDAY_MANDATORY}</label>
                     <select class="form-control" name="day" style="width:75px">
                         <option value="0">{TXT_NEWSLETTER_RECIPIENT_DATE}</option>
                         <!-- BEGIN birthday_day -->
                         <option {SELECTED_DAY} value="{USERS_BIRTHDAY_DAY}">{USERS_BIRTHDAY_DAY_NAME}</option>
-                        <!-- END birthday_day --></select> <select name="month" style="width:170px">
+                        <!-- END birthday_day -->
+                    </select>
+                    <select class="form-control" name="month" style="width:170px">
                         <option value="0">{TXT_NEWSLETTER_RECIPIENT_MONTH}</option>
                         <!-- BEGIN birthday_month -->
                         <option value="{USERS_BIRTHDAY_MONTH}" {SELECTED_MONTH}>{USERS_BIRTHDAY_MONTH_NAME}</option>
-                        <!-- END birthday_month --></select> <select name="year" style="width:75px">
-                        <option value="0">{TXT_NEWSLETTER_RECIPIENT_YEAR}</option>
+                        <!-- END birthday_month -->
+                    </select>
+                    <select class="form-control" name="year" style="width:75px"><option value="0">{TXT_NEWSLETTER_RECIPIENT_YEAR}</option>
                         <!-- BEGIN birthday_year -->
                         <option value="{USERS_BIRTHDAY_YEAR}" {SELECTED_YEAR}>{USERS_BIRTHDAY_YEAR}</option>
                         <!-- END birthday_year -->
@@ -118,8 +154,15 @@
                 <!-- END recipient_birthday --><!-- BEGIN recipient_website -->
                 <div class="newsletter">
                     <label for="website">{TXT_NEWSLETTER_WEBSITE} {NEWSLETTER_RECIPIENT_WEBSITE_MANDATORY}</label>
-                    <input maxlength="255" name="website" type="text" value="{NEWSLETTER_WEBSITE}" /></div>
+                    <input maxlength="255" name="website" type="text" value="{NEWSLETTER_WEBSITE}" />
+                </div>
                 <!-- END recipient_website -->
+                <!-- BEGIN captcha -->
+                <div class="newsletter">
+                    <label>{TXT_MODULE_CAPTCHA}</label>
+                    {MODULE_CAPTCHA_CODE}
+                </div>
+                <!-- END captcha -->
             </fieldset>
             <!-- END recipient_profile -->
             <!-- BEGIN newsletter_lists -->

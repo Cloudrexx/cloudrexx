@@ -89,7 +89,11 @@ class LegacyClassLoader {
         if (in_array($parts[0], array('Symfony', 'doctrine', 'Doctrine', 'Gedmo', 'DoctrineExtension'))) {
             return;
         // They come from doctrine, there's no need to load these, doctrine does it
-        } else if (in_array($name, array('var', 'Column', 'MappedSuperclass', 'Table', 'index', 'Entity', 'Id', 'GeneratedValue'))) {
+        } else if (in_array($name, array(
+            'var', 'Column', 'MappedSuperclass', 'Table', 'index',
+            'Entity', 'Id', 'GeneratedValue',
+            'UniqueConstraint',
+        ))) {
             return;
         }
         if (substr($name, 0, 8) == 'PHPUnit_') {

@@ -142,15 +142,26 @@ function mbCallback(data)
     }
 }
 
-function downloadsAdjustSourceConfig()
-{
-    if (document.getElementById('downloads_download_type_file').checked) {
-        document.getElementById('downloads_download_type_file_config').style.display = '';
-        document.getElementById('downloads_download_type_url_config').style.display = 'none';
+function downloadsAdjustSourceConfig(source) {
+    if (source === 'file') {
+        var target = 'url';
+    } else if (source === 'url') {
+        var target = 'file';
     } else {
-        document.getElementById('downloads_download_type_file_config').style.display = 'none';
-        document.getElementById('downloads_download_type_url_config').style.display = '';
+        return;
     }
+
+    cx.jQuery('.downloads_download_type_' + source + '_config').css('display', 'block');
+    cx.jQuery('.downloads_download_type_' + target + '_config').css('display', 'none');
+
+    // copy old source to new source input field
+    jQuery('.downloads_download_type_url_config input').each(
+        function(i,e) {
+            var currentSourceInputId = jQuery(e).attr('id').replace('_' + source + '_', '_' + target + '_');
+            var currentSourceInputValue = jQuery('#' + currentSourceInputId).val();
+            jQuery(e).val(currentSourceInputValue);
+        }
+    );
 }
 
 
@@ -347,18 +358,145 @@ function downloadsAdjustSourceConfig()
       }
     }
 
+// ----------------------------------------------------------------------------------- //
+
+function adjustLanguages() {
+    var languageBars = document.getElementsByClassName('downloads_download_language');
+    var availableWidth = 90;
+    for (var i = 0; i < languageBars.length; i++) {
+        var languages = languageBars[i].querySelectorAll('td:not([width])');
+        for (var j = 0; j < languages.length; j++) {
+            if (j !== languages.length - 1) {
+                languages[j].width = 10 + '%';
+                availableWidth -= 10;
+            } else {
+                languages[j].width = availableWidth + '%';
+            }
+        }
+    }
+}
+
+function setActiveLanguage() {
+    var langId = cx.variables.get('currentLanguage', 'Downloads');
+    var checkbox = document.getElementById('downloads_download_language_' + langId);
+    var tab = document.getElementById('downloadsLanguage_downloadLanguage' + langId);
+    if (checkbox && checkbox.checked && tab) {
+        tab.style.display = 'block';
+        tab.className += ' active';
+        tab.click();
+        return;
+    }
+
+    var langMenu = document.getElementsByClassName('downloads_download_language')[0];
+    var firstId = langMenu.querySelector('td input[id^=downloads_download_language_][checked=checked]').id;
+    if (!firstId) {
+        return;
+    }
+    var langId = firstId.substr(firstId.length - 1);
+    var tab = document.getElementById('downloadsLanguage_downloadLanguage' + langId);
+    tab.style.display = 'block';
+    tab.className += ' active';
+    tab.click();
+}
+
+function swapHeaderLangName() {
+    cx.jQuery(
+        'table.downloads_download_language th:first-child,' +
+        'table.downloads_download_tab th:first-child'
+    ).each(
+        function () {
+            cx.jQuery(this).text(
+                cx.jQuery(this).text().replace(/\s\(.*?\)$/, '') +
+                ' (' +
+                cx.jQuery('#downloadGeneral .langmenu li a.active').text().replace(/\s/g, '') +
+                ')'
+            );
+        }
+    )
+}
+
+function switchBox(element, contentId) {
+    var languages = document.querySelectorAll('table.downloads_download_language input[id^="downloads_download_language"]');
+    var checkedLanguages = [];
+    for (var i = 0; i < languages.length; i++) {
+        if (!languages[i].checked || languages[i] === element) {
+            continue;
+        }
+        checkedLanguages.push(languages[i]);
+    }
+    if (checkedLanguages.length < 1) {
+        element.checked = true;
+        return;
+    }
+    var firstLanguageId = checkedLanguages[0].id.substr(checkedLanguages[0].id.length - 1);
+
+    if (element.checked) {
+        var existingName = document.getElementById('downloads_download_name_' + firstLanguageId).value;
+        var existingDescription = document.getElementById('downloads_download_description_' + firstLanguageId).value;
+        var existingSourceFile = document.getElementById('downloads_download_file_source_' + firstLanguageId).value;
+        var existingSourceUrl = document.getElementById('downloads_download_url_source_' + firstLanguageId).value;
+        var existingMetaKeywords = document.getElementById('downloads_download_metakeys_' + firstLanguageId).value;
+        var tab = document.getElementById(contentId);
+        tab.querySelector('input[id^="downloads_download_name_"]').value = existingName;
+        tab.querySelector('textarea[id^="downloads_download_description_"]').value = existingDescription;
+        tab.querySelector('input[id^="downloads_download_file_source_"]').value = existingSourceFile;
+        tab.querySelector('input[id^="downloads_download_url_source_"]').value = existingSourceUrl;
+        tab.querySelector('textarea[id^="downloads_download_metakeys_"]').value = existingMetaKeywords;
+
+        document.getElementById('downloadsLanguage_' + contentId).style.display = 'block';
+        selectTab(contentId);
+        swapHeaderLangName();
+        return;
+    }
+
+    document.getElementById('downloadsLanguage_' + contentId).style.display = 'none';
+    selectTab('downloadLanguage' + firstLanguageId);
+    swapHeaderLangName();
+}
+
+window.onload = function () {
+    adjustLanguages();
+    setActiveLanguage();
+    swapHeaderLangName();
+};
+
 // ]]>
 </script>
 
-<ul id="tabmenu">
-    <li><a id="downloadsTab_downloadGeneral" class="active" href="javascript:void(0)" onclick="selectTab('downloadGeneral')" title="{TXT_DOWNLOADS_GENERAL}">{TXT_DOWNLOADS_GENERAL}</a></li>
-    <li><a id="downloadsTab_downloadPicture" href="javascript:void(0)" onclick="selectTab('downloadPicture')" title="{TXT_DOWNLOADS_IMAGE}">{TXT_DOWNLOADS_IMAGE}</a></li>
-    <li><a id="downloadsTab_downloadCategories" href="javascript:void(0)" onclick="selectTab('downloadCategories')" title="{TXT_DOWNLOADS_CATEGORIES}">{TXT_DOWNLOADS_CATEGORIES}</a></li>
-    <li><a id="downloadsTab_downloadRelatedDownloads" href="javascript:void(0)" onclick="selectTab('downloadRelatedDownloads')" title="{TXT_DOWNLOADS_RELATED_DOWNLOADS}">{TXT_DOWNLOADS_RELATED_DOWNLOADS}</a></li>
-    <li><a id="downloadsTab_downloadPermissions" href="javascript:void(0)" onclick="selectTab('downloadPermissions')" title="{TXT_DOWNLOADS_PERMISSIONS}">{TXT_DOWNLOADS_PERMISSIONS}</a></li>
-</ul>
-
 <form name="downloads_download_form" id="downloads_download_form" action="index.php?cmd=Downloads&amp;act=download&amp;id={DOWNLOADS_DOWNLOAD_ID}&amp;parent_id={DOWNLOADS_PARENT_CATEGORY_ID}&amp;category_sort={DOWNLOADS_DOWNLOAD_CATEGORY_SORT}&amp;category_by={DOWNLOADS_DOWNLOAD_CATEGORY_SORT_BY}&amp;download_sort={DOWNLOADS_DOWNLOAD_DOWNLOAD_SORT}&amp;download_by={DOWNLOADS_DOWNLOAD_DOWNLOAD_BY}&amp;category_pos={DOWNLOADS_DOWNLOAD_CATEGORY_OFFSET}&amp;download_pos={DOWNLOADS_DOWNLOAD_DOWNLOAD_OFFSET}" onsubmit="downloadsSelectAll()" method="post">
+    <table width="100%" class="adminlist downloads_download_language">
+        <tr>
+            <th colspan="10">{TXT_DOWNLOADS_LANGUAGE}</th>
+        </tr>
+        <tr class="row1">
+            <td width="10%">{TXT_DOWNLOADS_LANGUAGE}</td>
+            <!-- BEGIN downloads_download_language_list -->
+            <td>
+                <input id="downloads_download_language_{DOWNLOADS_DOWNLOAD_LANGUAGE_ID}"
+                       {DOWNLOADS_DOWNLOAD_LANGUAGE_CHECKED}
+                       type="checkbox"
+                       name="downloads_download_language[{DOWNLOADS_DOWNLOAD_LANGUAGE_ID}]"
+                       value="1"
+                       onclick="switchBox(this, 'downloadLanguage{DOWNLOADS_DOWNLOAD_LANGUAGE_ID}')"/>
+                <label for="downloads_download_language_{DOWNLOADS_DOWNLOAD_LANGUAGE_ID}">
+                    {DOWNLOADS_DOWNLOAD_LANGUAGE_NAME} [{DOWNLOADS_DOWNLOAD_LANGUAGE_SHORT}]
+                </label>
+            </td>
+            <!-- END downloads_download_language_list -->
+        </tr>
+    </table>
+
+    <br/>
+
+    <ul id="tabmenu">
+        <li><a id="downloadsTab_downloadGeneral" class="active" href="javascript:void(0)" onclick="selectTab('downloadGeneral')" title="{TXT_DOWNLOADS_GENERAL}">{TXT_DOWNLOADS_GENERAL}</a></li>
+        <li><a id="downloadsTab_downloadAdditionalOptions" href="javascript:void(0)" onclick="selectTab('downloadAdditionalOptions')" title="{TXT_DOWNLOADS_ADDITIONAL_OPTIONS}">{TXT_DOWNLOADS_ADDITIONAL_OPTIONS}</a></li>
+        <li><a id="downloadsTab_downloadPicture" href="javascript:void(0)" onclick="selectTab('downloadPicture')" title="{TXT_DOWNLOADS_IMAGE}">{TXT_DOWNLOADS_IMAGE}</a></li>
+        <li><a id="downloadsTab_downloadCategories" href="javascript:void(0)" onclick="selectTab('downloadCategories')" title="{TXT_DOWNLOADS_CATEGORIES}">{TXT_DOWNLOADS_CATEGORIES}</a></li>
+        <li><a id="downloadsTab_downloadRelatedDownloads" href="javascript:void(0)" onclick="selectTab('downloadRelatedDownloads')" title="{TXT_DOWNLOADS_RELATED_DOWNLOADS}">{TXT_DOWNLOADS_RELATED_DOWNLOADS}</a></li>
+        <li><a id="downloadsTab_downloadPermissions" href="javascript:void(0)" onclick="selectTab('downloadPermissions')" title="{TXT_DOWNLOADS_PERMISSIONS}">{TXT_DOWNLOADS_PERMISSIONS}</a></li>
+    </ul>
+
     <!-- start div downloadsTab_downloadGeneral -->
     <div id="downloadGeneral" class="downloadsTab">
         <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
@@ -373,78 +511,99 @@ function downloadsAdjustSourceConfig()
                     <td><input type="checkbox" name="downloads_download_is_active" id="downloads_download_is_active" value="1" {DOWNLOADS_DOWNLOAD_IS_ACTIVE_CHECKED} /> <label for="downloads_download_is_active">{TXT_DOWNLOADS_ACTIVE}</label></td>
                 </tr>
                 <tr class="row1">
-                    <td width="15%">{TXT_DOWNLOADS_NAME}</td>
-                    <td width="85%">
-                        <!-- BEGIN downloads_download_name -->
-                        <input type="text" id="downloads_download_name_0" value="{DOWNLOADS_DOWNLOAD_NAME}" onchange="downloadsSyncNameFields(this.value,'input','downloads_download_name')" style="width:300px;" /> <a href="javascript:void(0);" onclick="document.getElementById('downloads_download_name_lang_div').style.display = (document.getElementById('downloads_download_name_lang_div').style.display == 'block' ? 'none' : 'block')" title="{TXT_DOWNLOADS_EXTENDED}">{TXT_DOWNLOADS_EXTENDED} &raquo;</a>
-                        <div id="downloads_download_name_lang_div" style="display:none;">
-                        <!-- BEGIN downloads_download_name_list -->
-                            <input type="text" name="downloads_download_name[{DOWNLOADS_DOWNLOAD_LANG_ID}]" id="downloads_download_name_{DOWNLOADS_DOWNLOAD_LANG_ID}" value="{DOWNLOADS_DOWNLOAD_NAME}" style="margin-top:1px; width:300px;" /> {DOWNLOADS_DOWNLOAD_LANG_NAME}<br />
-                        <!-- END downloads_download_name_list -->
-                        </div>
-                        <!-- END downloads_download_name -->
-                    </td>
-                </tr>
-                <tr class="row2">
-                    <td>{TXT_DOWNLOADS_DESCRIPTION}</td>
-                    <td>
-                        <!-- BEGIN downloads_download_description -->
-                        <textarea id="downloads_download_description_0" cols="10" rows="5" onchange="downloadsSyncNameFields(this.value,'textarea','downloads_download_description')" style="width:300px;">{DOWNLOADS_DOWNLOAD_DESCRIPTION}</textarea> <a href="javascript:void(0);" onclick="document.getElementById('downloads_download_description_lang_div').style.display = (document.getElementById('downloads_download_description_lang_div').style.display == 'block' ? 'none' : 'block')" title="{TXT_DOWNLOADS_EXTENDED}">{TXT_DOWNLOADS_EXTENDED} &raquo;</a>
-                        <div id="downloads_download_description_lang_div" style="display:none;">
-                        <!-- BEGIN downloads_download_description_list -->
-                            <textarea name="downloads_download_description[{DOWNLOADS_DOWNLOAD_LANG_ID}]" id="downloads_download_description_{DOWNLOADS_DOWNLOAD_LANG_ID}" cols="10" rows="5" style="margin-top:1px; width:300px;">{DOWNLOADS_DOWNLOAD_DESCRIPTION}</textarea> {DOWNLOADS_DOWNLOAD_LANG_DESCRIPTION}<br />
-                        <!-- END downloads_download_description_list -->
-                        </div>
-                        <!-- END downloads_download_description -->
-                    </td>
-                </tr>
-                <tr class="row1">
-                    <td>{TXT_DOWNLOADS_SOURCE}</td>
-                    <td>
-                        <input type="radio" name="downloads_download_type" id="downloads_download_type_file" value="file" {DOWNLOADS_DOWNLOAD_TYPE_FILE_CHECKED} onchange="downloadsAdjustSourceConfig()" /><label for="downloads_download_type_file">{TXT_DOWNLOADS_LOCAL_FILE}</label>
-                        <input type="radio" name="downloads_download_type" id="downloads_download_type_url" value="url" {DOWNLOADS_DOWNLOAD_TYPE_URL_CHECKED} onchange="downloadsAdjustSourceConfig()" /><label for="downloads_download_type_url">{TXT_DOWNLOADS_URL}</label>
-                        <br />
-                        <div id="downloads_download_type_file_config" style="display:{DOWNLOADS_DOWNLOAD_TYPE_FILE_CONFIG_DISPLAY}">
-                            <input type="text" id="downloads_download_file_source_0" value="{DOWNLOADS_DOWNLOAD_FILE_SOURCE}" style="width:300px;" onchange="downloadsSyncNameFields(this.value,'input','downloads_download_file_source')"/> <input type="button" value="{TXT_DOWNLOADS_BROWSE}" onclick="downloadsGetFileBrowser(document.getElementById('downloads_download_file_source_0'),null,null,document.getElementById('downloads_download_mime_type'))" />
-                                <a href="javascript:void(0);" onclick="document.getElementById('downloads_download_file_source_lang_div').style.display = (document.getElementById('downloads_download_file_source_lang_div').style.display == 'block' ? 'none' : 'block')" title="{TXT_DOWNLOADS_EXTENDED}">{TXT_DOWNLOADS_EXTENDED} &raquo;</a>
-                            <div id="downloads_download_file_source_lang_div" style="display:none;">
-                                <!-- BEGIN downloads_download_file_source_list -->
-                                <input type="text" name="downloads_download_file_source[{DOWNLOADS_DOWNLOAD_LANG_ID}]" id="downloads_download_file_source_{DOWNLOADS_DOWNLOAD_LANG_ID}" value="{DOWNLOADS_DOWNLOAD_FILE_SOURCE}" style="width:300px;" /> <input type="button" value="{TXT_DOWNLOADS_BROWSE}" onclick="downloadsGetFileBrowser(document.getElementById('downloads_download_file_source_{DOWNLOADS_DOWNLOAD_LANG_ID}'),null,null,document.getElementById('downloads_download_mime_type'))" /> {DOWNLOADS_DOWNLOAD_LANG_NAME}<br />
-                                <!-- END downloads_download_file_source_list -->
-                            </div>
-                        </div>
-                        <div id="downloads_download_type_url_config" style="display:{DOWNLOADS_DOWNLOAD_TYPE_URL_CONFIG_DISPLAY}">
-                            <input type="text" id="downloads_download_url_source_0" value="{DOWNLOADS_DOWNLOAD_URL_SOURCE}" style="width:300px;" onchange="downloadsSyncNameFields(this.value,'input','downloads_download_url_source')"/>
-                                <a href="javascript:void(0);" onclick="document.getElementById('downloads_download_url_source_lang_div').style.display = (document.getElementById('downloads_download_url_source_lang_div').style.display == 'block' ? 'none' : 'block')" title="{TXT_DOWNLOADS_EXTENDED}">{TXT_DOWNLOADS_EXTENDED} &raquo;</a>
-                            <div id="downloads_download_url_source_lang_div" style="display:none;">
-                                <!-- BEGIN downloads_download_url_source_list -->
-                                <input type="text" name="downloads_download_url_source[{DOWNLOADS_DOWNLOAD_LANG_ID}]" id="downloads_download_url_source_{DOWNLOADS_DOWNLOAD_LANG_ID}" value="{DOWNLOADS_DOWNLOAD_URL_SOURCE}" style="width:300px;" /> {DOWNLOADS_DOWNLOAD_LANG_NAME}<br />
-                                <!-- END downloads_download_url_source_list -->
-                            </div>
-                        </div>
-                    </td>
-
-                </tr>
-                <tr class="row2">
                     <td>{TXT_DOWNLOADS_TYPE}</td>
-                    <td>{DOWNLOADS_DOWNLOAD_MIME_TYPE_MENU}</td>
-                </tr>
-                <!-- BEGIN downloads_download_attr_metakeys -->
-                <tr class="row1">
-                    <td>{TXT_DOWNLOADS_METAKEYS}</td>
                     <td>
-                        <!-- BEGIN downloads_download_metakeys -->
-                        <textarea id="downloads_download_metakeys_0" cols="10" rows="5" onchange="downloadsSyncNameFields(this.value,'textarea','downloads_download_metakeys')" style="width:300px;">{DOWNLOADS_DOWNLOAD_METAKEYS}</textarea> <a href="javascript:void(0);" onclick="document.getElementById('downloads_download_metakeys_lang_div').style.display = (document.getElementById('downloads_download_metakeys_lang_div').style.display == 'block' ? 'none' : 'block')" title="{TXT_DOWNLOADS_EXTENDED}">{TXT_DOWNLOADS_EXTENDED} &raquo;</a>
-                        <div id="downloads_download_metakeys_lang_div" style="display:none;">
-                        <!-- BEGIN downloads_download_metakeys_list -->
-                            <textarea name="downloads_download_metakeys[{DOWNLOADS_DOWNLOAD_LANG_ID}]" id="downloads_download_metakeys_{DOWNLOADS_DOWNLOAD_LANG_ID}" cols="10" rows="5" style="margin-top:1px; width:300px;">{DOWNLOADS_DOWNLOAD_METAKEYS}</textarea> {DOWNLOADS_DOWNLOAD_LANG_METAKEYS}<br />
-                        <!-- END downloads_download_metakeys_list -->
-                        </div>
-                        <!-- END downloads_download_metakeys -->
+                        {DOWNLOADS_DOWNLOAD_MIME_TYPE_MENU}
+                        <input type="radio"
+                               name="downloads_download_type"
+                               id="downloads_download_type_file"
+                               value="file"
+                               {DOWNLOADS_DOWNLOAD_TYPE_FILE_CHECKED}
+                               onchange="downloadsAdjustSourceConfig('file')"/>
+                        <label for="downloads_download_type_file">{TXT_DOWNLOADS_LOCAL_FILE}</label>
+                        <input type="radio"
+                               name="downloads_download_type"
+                               id="downloads_download_type_url"
+                               value="url"
+                               {DOWNLOADS_DOWNLOAD_TYPE_URL_CHECKED}
+                               onchange="downloadsAdjustSourceConfig('url')"/>
+                        <label for="downloads_download_type_url">{TXT_DOWNLOADS_URL}</label>
                     </td>
                 </tr>
-                <!-- END downloads_download_attr_metakeys -->
+            </tbody>
+        </table>
+        <br/>
+        <ul class="tabmenu langmenu">
+            <!-- BEGIN downloads_download_language_tab -->
+            <li>
+                <a id="downloadsLanguage_downloadLanguage{DOWNLOADS_DOWNLOAD_LANGUAGE_ID}"
+                   href="javascript:void(0)"
+                   onclick="selectTab('downloadLanguage{DOWNLOADS_DOWNLOAD_LANGUAGE_ID}');swapHeaderLangName()"
+                   title="{DOWNLOADS_DOWNLOAD_LANGUAGE_NAME}"
+                   {DOWNLOADS_DOWNLOAD_LANGUAGE_ACTIVE}>
+                    {DOWNLOADS_DOWNLOAD_LANGUAGE_NAME}
+                </a>
+            </li>
+            <!-- END downloads_download_language_tab -->
+        </ul>
+        <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist downloads_download_tab">
+            <thead>
+                <tr>
+                    <th colspan="2">{TXT_DOWNLOADS_CONTENT}</th>
+                </tr>
+            </thead>
+        </table>
+        <!-- BEGIN downloads_download_language_content -->
+        <div id="downloadLanguage{DOWNLOADS_DOWNLOAD_LANG_ID}" class="downloadsLanguage" style="display:none;">
+            <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
+                <tbody>
+                    <tr class="row1">
+                        <td width="15%">{TXT_DOWNLOADS_NAME}</td>
+                        <td width="85%">
+                            <input type="text" name="downloads_download_name[{DOWNLOADS_DOWNLOAD_LANG_ID}]" id="downloads_download_name_{DOWNLOADS_DOWNLOAD_LANG_ID}" value="{DOWNLOADS_DOWNLOAD_NAME}" style="width:300px;" />
+                        </td>
+                    </tr>
+                    <tr class="row2">
+                        <td>{TXT_DOWNLOADS_DESCRIPTION}</td>
+                        <td>
+                            <textarea name="downloads_download_description[{DOWNLOADS_DOWNLOAD_LANG_ID}]" id="downloads_download_description_{DOWNLOADS_DOWNLOAD_LANG_ID}" cols="10" rows="5" style="width:300px;">{DOWNLOADS_DOWNLOAD_DESCRIPTION}</textarea>
+                        </td>
+                    </tr>
+                    <tr class="row1">
+                        <td>{TXT_DOWNLOADS_SOURCE}</td>
+                        <td>
+                            <div id="downloads_download_type_file_config_{DOWNLOADS_DOWNLOAD_LANG_ID}" class="downloads_download_type_file_config" style="display:{DOWNLOADS_DOWNLOAD_TYPE_FILE_CONFIG_DISPLAY}">
+                                <input type="text" id="downloads_download_file_source_{DOWNLOADS_DOWNLOAD_LANG_ID}" name="downloads_download_file_source[{DOWNLOADS_DOWNLOAD_LANG_ID}]" value="{DOWNLOADS_DOWNLOAD_FILE_SOURCE}" style="width:300px;" /> <input type="button" value="{TXT_DOWNLOADS_BROWSE}" onclick="downloadsGetFileBrowser(document.getElementById('downloads_download_file_source_{DOWNLOADS_DOWNLOAD_LANG_ID}'),null,null,document.getElementById('downloads_download_mime_type'))" />
+                            </div>
+                            <div id="downloads_download_type_url_config_{DOWNLOADS_DOWNLOAD_LANG_ID}" class="downloads_download_type_url_config" style="display:{DOWNLOADS_DOWNLOAD_TYPE_URL_CONFIG_DISPLAY}">
+                                <input type="text" id="downloads_download_url_source_{DOWNLOADS_DOWNLOAD_LANG_ID}" name="downloads_download_url_source[{DOWNLOADS_DOWNLOAD_LANG_ID}]" value="{DOWNLOADS_DOWNLOAD_URL_SOURCE}" style="width:300px;" />
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- BEGIN downloads_download_metakeys -->
+                    <tr class="row2">
+                        <td>{TXT_DOWNLOADS_METAKEYS}</td>
+                        <td>
+                            <textarea name="downloads_download_metakeys[{DOWNLOADS_DOWNLOAD_LANG_ID}]" id="downloads_download_metakeys_{DOWNLOADS_DOWNLOAD_LANG_ID}" cols="10" rows="5" style="width:300px;">{DOWNLOADS_DOWNLOAD_METAKEYS}</textarea>
+                        </td>
+                    </tr>
+                    <!-- END downloads_download_metakeys -->
+                </tbody>
+            </table>
+        </div>
+        <!-- END downloads_download_language_content -->
+    </div>
+    <!-- end div downloadsTab_downloadGeneral -->
 
+    <!-- start div downloadsTab_downloadAdditionalOptions -->
+    <div id="downloadAdditionalOptions" class="downloadsTab" style="display: none;">
+        <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
+            <thead>
+                <tr>
+                    <th colspan="2">{TXT_DOWNLOADS_ADDITIONAL_OPTIONS}</th>
+                </tr>
+            </thead>
+            <tbody>
                 <!-- BEGIN downloads_download_attr_size -->
                 <tr class="row{DOWNLOADS_DOWNLOAD_ATTRIBUTE_ROW}">
                     <td>{TXT_DOWNLOADS_SIZE}</td>
@@ -482,7 +641,7 @@ function downloadsAdjustSourceConfig()
             </tbody>
         </table>
     </div>
-    <!-- end div downloadsTab_downloadGeneral -->
+    <!-- end div downloadsTab_downloadAdditionalOptions -->
 
     <!-- start div downloadsTab_downloadPicture -->
     <div id="downloadPicture" class="downloadsTab" style="display: none;">
