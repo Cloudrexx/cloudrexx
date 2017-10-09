@@ -1059,7 +1059,7 @@ class CalendarEvent extends CalendarLibrary
 
         if (   empty($data['startDate'])
             || empty($data['endDate'])
-            || empty($data['category_ids'])
+            || (empty($data['category_ids']) && empty($data['category']))
             || (   isset($data['seriesStatus'])
                 && $data['seriesStatus'] == 1
                 && $data['seriesType'] == 2
@@ -1195,8 +1195,13 @@ class CalendarEvent extends CalendarLibrary
         $link                      = isset($data['link']) ? contrexx_strip_tags($data['link']) : '';
         $pic                       = isset($data['picture']) ? contrexx_addslashes(contrexx_strip_tags($data['picture'])) : '';
         $attach                    = isset($data['attachment']) ? contrexx_addslashes(contrexx_strip_tags($data['attachment'])) : '';
-        $category_ids = isset($data['category_ids'])
-            ? contrexx_input2raw($data['category_ids']) : '';
+        if (isset($data['category_ids'])) {
+            $category_ids = contrexx_input2raw($data['category_ids']);
+        } elseif (isset($data['category'])) {
+            $category_ids = array(intval($data['category']));
+        } else {
+            $category_ids = array();
+        }
         $showIn                    = isset($data['showIn']) ? contrexx_addslashes(contrexx_strip_tags(join(",",$data['showIn']))) : '';
         $invited_groups            = isset($data['selectedGroups']) ? join(',', $data['selectedGroups']) : '';
         $invitedCrmGroups          = isset($data['calendar_event_invite_crm_memberships']) ? join(',', $data['calendar_event_invite_crm_memberships']) : '';

@@ -341,7 +341,8 @@
             </div>
             <div>
                 <label>{TXT_CALENDAR_EVENT_CATEGORY} <font color="#ff0000">*</font></label>
-                <select id="category" name="category" class="form-control validate[required]">
+                <select multiple="multiple" id="category" name="category_ids[]"
+                         class="form-control validate[required]">
                     {CALENDAR_EVENT_CATEGORIES}
                 </select>
             </div>
