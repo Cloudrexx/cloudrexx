@@ -6682,7 +6682,11 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
                                 \DBG::msg('Failed to get the hosting controller.');
                                 throw new MultiSiteJsonException('JsonMultiSiteController::domainManipulation(): Failed to process the method '.$params['post']['command'] . '().');
                             }
-                            $hostingController->setWebspaceId($website->getMailAccountId());
+                            if ($hostingController instanceof \Cx\Core_Modules\MultiSite\Controller\PleskController) {
+                                // webspaceId is a special feature of PleskController
+                                // TODO: eliminate webspaceId of PleskController
+                                $hostingController->setWebspaceId($website->getMailAccountId());
+                            }
                             $methodName = $params['post']['command'];
                             switch ($methodName) {
                                 case 'renameDomainAlias':
@@ -6693,7 +6697,6 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
                                     break;
                                 case 'deleteDomainAlias':
                                 case 'createDomainAlias':
-                                case 'renameMailDistribution':
                                     if (!$hostingController->$methodName($params['post']['domainName'])) {
                                         \DBG::msg('Failed to process the method '.$params['post']['command'] . '().');
                                         throw new MultiSiteJsonException('JsonMultiSiteController::domainManipulation(): Failed to process the method '.$params['post']['command'] . '().');

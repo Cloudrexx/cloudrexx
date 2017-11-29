@@ -921,7 +921,7 @@ class Website extends \Cx\Model\Base\EntityBase {
     protected function setupDataFolder($websiteName) {
         // ensure our folder exists
         $hostingController = \Cx\Core_Modules\MultiSite\Controller\ComponentController::getHostingController();
-        return $hostingController->createUserStorage($websiteName);
+        return $hostingController->createUserStorage($websiteName, $this->codeBase);
     }    
      /*
     * function setupConfiguration to create configuration

@@ -1989,6 +1989,8 @@ class PleskController extends HostController {
      * {@inheritdoc}
      */
     public function deleteWebDistributionAlias($mainName, $aliasName) {
+        // delete the subscription for this SSL domain
+        $this->deleteSubscription($aliasName);
     }
 
     /**
@@ -2098,8 +2100,8 @@ HTTPS;
             throw new ApiRequestException("Error in creating site on existing subscription: {$error}");
         }
         if ($resultNode->id) {
-            $hostingController->disableMailService($resultNode->id);
-            $hostingController->disableDnsService($resultNode->id);
+            $this->disableMailService($resultNode->id);
+            $this->disableDnsService($resultNode->id);
         }
         return $resultNode->id;
     }
@@ -2418,9 +2420,6 @@ HTTPS;
             $error = (isset($systemError) ? $systemError : $resultNode->errtext);
             throw new ApiRequestException("Error in removing the SSL Certificate: {$error}");
         }
-
-        // delete the subscription for this SSL domain
-        $this->deleteSubscription($domain);
         
         return true;
     }
