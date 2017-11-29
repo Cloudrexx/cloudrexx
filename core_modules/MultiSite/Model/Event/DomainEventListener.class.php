@@ -222,7 +222,8 @@ class DomainEventListener implements \Cx\Core\Event\Model\Entity\EventListener {
             case \Cx\Core_Modules\MultiSite\Model\Entity\Domain::TYPE_FQDN:
                 // FQDN shall not be persisted in postPersist event
                 // as it already gets persisted in prePersist event.
-                if ($event == 'postPersist') {
+                // We do not create DNS entries before the website exists.
+                if ($event == 'prePersist' || $event == 'postPersist') {
                     return;
                 }
                 $type = 'A';
@@ -240,6 +241,7 @@ class DomainEventListener implements \Cx\Core\Event\Model\Entity\EventListener {
                 // In prePersist event, the DNS-record of BaseDN can't be created
                 // yet, as the FQDN, on which the BaseDN depends on, has not yet
                 // been flushed to the database.
+                // We do not create DNS entries before the website exists.
                 if ($event == 'prePersist' || $event == 'postPersist') {
                     return;
                 }
@@ -281,6 +283,18 @@ class DomainEventListener implements \Cx\Core\Event\Model\Entity\EventListener {
                     $value  = $config['domainUrl'];
                 }
                 break;
+        }
+
+        // Only continue if there's a real change to the DNS entry pending
+        try {
+            $dnsEntry = $hostingController->getDnsRecord($domain->getName());
+            if ($dnsEntry['value'] == $value) {
+                // dns entry already exists with the same value, abort
+                $this->logEvent('DNS entry already exists with same value, aborting', $domain);
+                return;
+            }
+        } catch (\Cx\Core_Modules\MultiSite\Controller\DnsControllerException $e) {
+            // no such DNS entry, continue
         }
 
         // add DNS record through hosting controller

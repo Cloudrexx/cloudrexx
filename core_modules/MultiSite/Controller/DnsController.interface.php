@@ -71,4 +71,13 @@ interface DnsController {
      * @throws ApiRequestException On error
      */
     public function getDnsRecords();
+
+    /**
+     * Get the DNS entry with the given name
+     * @param string $name Name of the DNS record
+     * @param int $pleskId (optional) Deprecated, Plesk domain ID
+     * @return array Key=>value array with the keys "ttl", "type" and "value"
+     * @throws DnsControllerException If no such entry exists
+     */
+    public function getDnsRecord($name, $pleskId = 0);
 }
