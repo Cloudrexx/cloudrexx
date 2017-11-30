@@ -63,11 +63,31 @@ class AwsController extends HostController {
     protected $hostedZoneId;
 
     /**
-     * Instance of a Route53Client
-     *
-     * @var \Aws\Route53\Route53Client
+     * API version to use
+     * @deprecated Each AWS API client should define its own version
+     * @var string
      */
-    protected $route53Client;
+    protected $version;
+
+    /**
+     * AWS API key name
+     *
+     * @var string
+     */
+    protected $credentialsSecret;
+
+    /**
+     * AWS API key value
+     *
+     * @var string
+     */
+    protected $credentialsSecret;
+
+    /**
+     * List of AWS client instances, max. 1 per service
+     * @var array Key=>value array, key is service name
+     */
+    protected $awsClients = array();
 
     /**
      * XAMPP controller for user storage (temporary)
@@ -175,16 +195,9 @@ class AwsController extends HostController {
         );
         $this->ttl = $ttl;
         $this->hostedZoneId = $hostedZoneId;
-        $this->route53Client = new \Aws\Route53\Route53Client(
-            array(
-                'region' => $region, // please note that Route53 only has us-east-1
-                'version' => $version,
-                'credentials' => array(
-                    'key' => $credentialsKey,
-                    'secret' => $credentialsSecret,
-                )
-            )
-        );
+        $this->version = $version;
+        $this->credentialsKey = $credentialsKey;
+        $this->credentialsSecret = $credentialsSecret;
     }
 
     /**
@@ -360,7 +373,7 @@ class AwsController extends HostController {
      */
     protected function getRoute53Client()
     {
-        return $this->route53Client;
+        return $this->getAwsClient('Route53', 'us-east-1', 'latest');
     }
 
     /**
@@ -783,5 +796,29 @@ class AwsController extends HostController {
      */
     public function getAvailableMailDistributionPlans() {
         throw new MailControllerException('Method "' . __METHOD__ . '" not yet implemented in "' . __CLASS__ . '"');
+    }
+
+    /**
+     * Returns an instance of an AWS service client
+     * @param string $service Name of the AWS service
+     * @param string $region Region to connect to
+     * @param string $version AWS API version to use
+     * @return object AWS client
+     */
+    protected function getAwsClient($service, $region, $version) {
+        if (!isset($this->awsClients[$service])) {
+            $serviceClass = '\\Aws\\' . $service . '\\' . $service . 'Client';
+            $this->awsClients[$service] = new $serviceClass(
+                array(
+                    'region' => $region,
+                    'version' => $version,
+                    'credentials' => array(
+                        'key' => $this->credentialsKey,
+                        'secret' => $this->credentialsSecret,
+                    )
+                )
+            );
+        }
+        return $this->awsClients[$service];
     }
 }
