@@ -207,7 +207,25 @@ class Access extends \Cx\Core_Modules\Access\Controller\AccessLib
         // filter out special placeholders that identify allowed filter attributes
         $attributeFilterPlaceholders = preg_grep('/^' . $filterAttributePlaceholderPrefix . '/', $placeholders);
         $allowedFilterAttributes = preg_filter('/^' . $filterAttributePlaceholderPrefix . '/', '', $attributeFilterPlaceholders);
-        
+
+        // verify that attributes are valid
+        $objFWUser = \FWUser::getFWUserObject();
+        foreach ($allowedFilterAttributes as $idx => $attributeId) {
+            $objAttribute = $objFWUser->objUser->objAttribute->getById(strtolower($attributeId));
+
+            // unkown attribute -> drop it from filter
+            if ($objAttribute->EOF) {
+                unset($allowedFilterAttributes[$idx]);
+                continue;
+            }
+
+            // user does not have read access to attribute -> drop it from filter
+            if (!$objAttribute->checkReadPermission()) {
+                unset($allowedFilterAttributes[$idx]);
+                continue;
+            }
+        }
+
         // add filter join methods (OR and AND) to allowed filter attributes
         $allowedFilterAttributes = array_merge($allowedFilterAttributes, array('AND', 'OR', '=', '<', '>', '!=', '<', '>', 'REGEXP', 'LIKE'));
 

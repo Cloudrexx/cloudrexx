@@ -549,6 +549,11 @@ class User_Profile
         foreach ($objParentAttribute->{'get'.($core ? 'Core' : 'Custom').'AttributeIds'}() as $attributeId) {
             $objAttribute = $objParentAttribute->getById($attributeId);
 
+            // do not allow lookup on attributes the user has no read access to
+            if (!$objAttribute->checkReadPermission()) {
+                continue;
+            }
+
             if ($core) {
                 $attributeValueColumn = 'tblP.`'.$objAttribute->getId().'`';
             } else {

@@ -53,7 +53,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      * @return array List of Controller class names (without namespace)
      */
     public function getControllerClasses() {
-        return array('EsiWidget');
+        return array('EsiWidget', 'RandomEsiWidget');
     }
 
     /**
@@ -67,10 +67,10 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      * @return array List of ComponentController classes
      */
     public function getControllersAccessableByJson() {
-        return array('EsiWidgetController');
+        return array('EsiWidgetController', 'RandomEsiWidgetController');
     }
 
-     /**
+    /**
      * Load your component.
      *
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
@@ -219,6 +219,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      */
     public function postInit(\Cx\Core\Core\Controller\Cx $cx)
     {
+        $userSettings     = \User_Setting::getSettings();
         $widgetController = $this->getComponent('Widget');
         foreach (
             array(
@@ -265,6 +266,35 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 $widget
             );
         }
+
+        if ($userSettings['block_random_access_users']['status']) {
+            $widget = new \Cx\Core_Modules\Widget\Model\Entity\RandomEsiWidget(
+                $this,
+                'access_random_users',
+                \Cx\Core_Modules\Widget\Model\Entity\Widget::TYPE_BLOCK
+            );
+            $widget->setEsiVariable(
+                \Cx\Core_Modules\Widget\Model\Entity\EsiWidget::ESI_VAR_ID_USER
+            );
+            $widget->setUniqueRepetitionCount(
+                $userSettings['block_random_access_users']['value']
+            );
+            $widgetController->registerWidget(
+                $widget
+            );
+        }
+
+        $widget = new \Cx\Core_Modules\Widget\Model\Entity\EsiWidget(
+            $this,
+            'access_user',
+            \Cx\Core_Modules\Widget\Model\Entity\Widget::TYPE_PLACEHOLDER
+        );
+        $widget->setEsiVariable(
+            \Cx\Core_Modules\Widget\Model\Entity\EsiWidget::ESI_VAR_ID_USER
+        );
+        $widgetController->registerWidget(
+            $widget
+        );
     }
 
     /**
@@ -325,6 +355,8 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 'access_latest_registered_member_list',
                 'access_birthday_member_list',
                 'access_next_birthday_member_list',
+                'access_random_users',
+                'access_user',
             ),
             $this->getRepeatableWidgetNames('logged_in')
         );
