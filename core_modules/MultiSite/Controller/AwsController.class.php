@@ -74,7 +74,7 @@ class AwsController extends HostController {
      *
      * @var string
      */
-    protected $credentialsSecret;
+    protected $credentialsKey;
 
     /**
      * AWS API key value
