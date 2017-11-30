@@ -11,11 +11,6 @@
 namespace Cx\Core_Modules\MultiSite\Controller;
 
 /**
- * Reports error during the API request
- */
-class AwsRoute53Exception extends DnsControllerException {}
-
-/**
  * Class AwsController
  *
  * @copyright   Cloudrexx AG
@@ -254,7 +249,7 @@ class AwsController extends HostController {
      * @param integer $zoneId Id of Hosted zone
      *
      * @return integer
-     * @throws AwsRoute53Exception
+     * @throws DnsControllerException
      */
     public function addDnsRecord($type = 'A', $host, $value, $zone, $zoneId)
     {
@@ -280,7 +275,7 @@ class AwsController extends HostController {
      * @param integer $recordId DNS record ID
      *
      * @return integer
-     * @throws AwsRoute53Exception
+     * @throws DnsControllerException
      */
     public function updateDnsRecord(
         $type,
@@ -307,7 +302,7 @@ class AwsController extends HostController {
      * @param string  $type     DNS-Record type
      * @param string  $host     DNS-Record host
      * @param integer $recordId DNS record ID
-     * @throws AwsRoute53Exception
+     * @throws DnsControllerException
      */
     public function removeDnsRecord($type, $host, $recordId)
     {
@@ -342,7 +337,7 @@ class AwsController extends HostController {
     /**
      * Get DNS Records
      *
-     * @throws AwsRoute53Exception
+     * @throws DnsControllerException
      * @return array
      */
     public function getDnsRecords()
@@ -387,7 +382,7 @@ class AwsController extends HostController {
      * @param integer                    $zoneId Id of Hosted zone
      * @param integer                    $timeToLive Resource Record cache live time
      *
-     * @throws AwsRoute53Exception
+     * @throws DnsControllerException
      * @return integer
      */
     protected function manipulateDnsRecord(
@@ -433,7 +428,7 @@ class AwsController extends HostController {
             ));
             return 0;
         } catch (\Aws\Exception\AwsException $e) {
-            throw new AwsRoute53Exception($e->getMessage());
+            throw new DnsControllerException($e->getMessage());
         }
     }
 
@@ -444,7 +439,7 @@ class AwsController extends HostController {
      *                                               listResourceRecordSets
      * @param array                      $dnsRecords Array of Resource Recordset
      *
-     * @throws AwsRoute53Exception
+     * @throws DnsControllerException
      */
     protected function fetchDnsRecords($options, &$dnsRecords)
     {
@@ -474,7 +469,7 @@ class AwsController extends HostController {
                 $dnsRecords
             );
         } catch (\Aws\Exception\AwsException $e) {
-            throw new AwsRoute53Exception($e->getMessage());
+            throw new DnsControllerException($e->getMessage());
         }
     }
 
@@ -492,7 +487,7 @@ class AwsController extends HostController {
         ));
         if (!is_array($result) || !isset($result['Location'])) {
             \DBG::dump($result);
-            throw new AwsControllerException('AWS responded with invalid result');
+            throw new UserStorageControllerException('AWS responded with invalid result');
         }
         $bucketLocation = $result['Location'];
 
@@ -543,7 +538,7 @@ class AwsController extends HostController {
         );
         if (!is_array($result) || !isset($result['Distribution'])) {
             \DBG::dump($result);
-            throw new AwsControllerException('AWS responded with invalid result');
+            throw new WebDistributionControllerException('AWS responded with invalid result');
         }
         $this->cloudFrontCache[$websiteName] = $result;
         /*return array(
@@ -685,7 +680,7 @@ class AwsController extends HostController {
             empty($result['Distribution']['DomainName'])
         ) {
             \DBG::dump($result);
-            throw new AwsControllerException('AWS responded with invalid result');
+            throw new WebDistributionControllerException('AWS responded with invalid result');
         }
         $this->cloudFrontCache[$domain] = $result;
         $cfDomain = $result['Distribution']['DomainName'];
