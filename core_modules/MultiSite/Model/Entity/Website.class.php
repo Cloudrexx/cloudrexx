@@ -589,7 +589,7 @@ class Website extends \Cx\Model\Base\EntityBase {
             \DBG::msg('Website: setup process..');
 
             $hostController = \Cx\Core_Modules\MultiSite\Controller\ComponentController::getHostingController();
-            $hostController->createWebDistribution($websiteName);
+            $hostController->createWebDistribution($this->getFqdn()->getName());
 
             $objDb = new \Cx\Core\Model\Model\Entity\Db($_DBCONFIG);
             $objDbUser = new \Cx\Core\Model\Model\Entity\DbUser();
