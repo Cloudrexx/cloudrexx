@@ -65,6 +65,12 @@ class AwsController extends HostController {
     protected $version;
 
     /**
+     * Base region for AWS API
+     * @var string
+     */
+    protected $region;
+
+    /**
      * AWS API key name
      *
      * @var string
@@ -191,6 +197,7 @@ class AwsController extends HostController {
         $this->ttl = $ttl;
         $this->hostedZoneId = $hostedZoneId;
         $this->version = $version;
+        $this->region = $region;
         $this->credentialsKey = $credentialsKey;
         $this->credentialsSecret = $credentialsSecret;
     }
@@ -483,13 +490,19 @@ class AwsController extends HostController {
     public function createUserStorage($websiteName, $codeBase = '') {
         // create S3 bucket
         $result = $this->getS3Client()->createBucket(array(
-            'Bucket' => $websiteName,
+            'Bucket' => 'customer-website-' . $websiteName,
         ));
-        if (!is_array($result) || !isset($result['Location'])) {
+        if (!$result || !$result->hasKey('Location')) {
             \DBG::dump($result);
             throw new UserStorageControllerException('AWS responded with invalid result');
         }
-        $bucketLocation = $result['Location'];
+        $bucketLocation = $result->get('Location');
+        $bucketName = preg_replace(
+            '#https?://(.*)/#',
+            '\1',
+            $bucketLocation
+        );
+        \DBG::msg('S3 Bucket URL is "' . $bucketLocation . '"');
 
         // create IAM user with access to the bucket
    
@@ -501,8 +514,13 @@ class AwsController extends HostController {
         $updatedConfig = $this->getWebDistributionConfig($websiteName);
         $updatedConfig['DistributionConfig']['Origins']['Quantity']++;
         $updatedConfig['DistributionConfig']['Origins']['Items'][] = array(
-            'Id' => 'S3',
-            'DomainName' => $bucketLocation,
+            'Id' => 'userdata',
+            'DomainName' => $bucketName,
+            'CustomHeaders' => array('Quantity' => 0),
+            'OriginPath' => '',
+            'S3OriginConfig' => array(
+                'OriginAccessIdentity' => '',
+            ),
         );
         foreach (
             array(
@@ -518,16 +536,39 @@ class AwsController extends HostController {
             $updatedConfig['DistributionConfig']['CacheBehaviors']['Quantity']++;
             $updatedConfig['DistributionConfig']['CacheBehaviors']['Items'][] = array(
                 'MinTTL' => 0,
-                'TargetOriginId' => $bucketLocation,
+                'TargetOriginId' => 'userdata',
                 'PathPattern' => $pattern,
                 'TrustedSigners' => array(
                     'Enabled' => false,
                     'Quantity' => 0,
                 ),
+                'SmoothStreaming' => false,
+                'DefaultTTL' => 300,
+                'MaxTTL' => 3600,
+                'Compress' => true,
                 'ForwardedValues' => array(
                     'QueryString' => false,
+                    'QueryStringCacheKeys' => array('Quantity' => 0),
                     'Cookies' => array(
                         'Forward' => 'none',
+                    ),
+                    'Headers' => array('Quantity' => 0),
+                ),
+                'LambdaFunctionAssociations' => array(
+                    'Quantity' => 0,
+                ),
+                'AllowedMethods' => array(
+                    'Quantity' => 2,
+                    'Items' => array(
+                        'HEAD',
+                        'GET',
+                    ),
+                    'CachedMethods' => array(
+                        'Quantity' => 2,
+                        'Items' => array(
+                            'HEAD',
+                            'GET',
+                        ),
                     ),
                 ),
                 'ViewerProtocolPolicy' => 'allow-all',
@@ -536,11 +577,15 @@ class AwsController extends HostController {
         $result = $this->getCloudFrontClient()->updateDistribution(
             $updatedConfig
         );
-        if (!is_array($result) || !isset($result['Distribution'])) {
+        if (!$result || !isset($result['Distribution'])) {
             \DBG::dump($result);
             throw new WebDistributionControllerException('AWS responded with invalid result');
         }
-        $this->cloudFrontCache[$websiteName] = $result;
+        $this->cloudFrontCache[$websiteName] = array(
+             'DistributionConfig' => $result->toArray()['Distribution']['DistributionConfig'],
+             'Id' => $result->toArray()['Distribution']['Id'],
+             'IfMatch' => $result->toArray()['ETag'],
+        );
         /*return array(
             IAM access key name
             IAM access key value
@@ -627,11 +672,12 @@ class AwsController extends HostController {
      * {@inheritdoc}
      */
     public function createWebDistribution($domain, $documentRoot = 'httpdocs') {
+        $websiteName = current(explode('.', $domain));
         $webDistributionConfig = array(
             'DistributionConfig' => array(
                 'Aliases' => array('Quantity' => 0),
                 'CacheBehaviors' => array('Quantity' => 0),
-                'Comment' => $domain,
+                'Comment' => 'Customer website ' . $websiteName,
                 'Enabled' => true,
                 'CallerReference' => $domain,
                 'DefaultCacheBehavior' => array(
@@ -669,10 +715,8 @@ class AwsController extends HostController {
                 'PriceClass' => 'PriceClass_100',
             )
         );
-        $result = json_decode(
-            $this->getCloudFrontClient()->createDistribution(
-                $webDistributionConfig
-            )
+        $result = $this->getCloudFrontClient()->createDistribution(
+            $webDistributionConfig
         );
         if (
             !$result ||
@@ -682,7 +726,12 @@ class AwsController extends HostController {
             \DBG::dump($result);
             throw new WebDistributionControllerException('AWS responded with invalid result');
         }
-        $this->cloudFrontCache[$domain] = $result;
+
+        $this->cloudFrontCache[$websiteName] = array(
+            'DistributionConfig' => $result->toArray()['Distribution']['DistributionConfig'],
+            'Id' => $result->toArray()['Distribution']['Id'],
+            'IfMatch' => $result->toArray()['ETag'],
+        );
         $cfDomain = $result['Distribution']['DomainName'];
         \DBG::msg('CloudFront Domain is "' . $cfDomain . '"');
     }
