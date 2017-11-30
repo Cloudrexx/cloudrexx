@@ -487,6 +487,69 @@ class AwsController extends HostController {
      */
     public function createUserStorage($websiteName, $codeBase = '') {
         // create S3 bucket
+        $result = $this->getS3Client()->createBucket(array(
+            'Bucket' => $websiteName,
+        ));
+        if (!is_array($result) || !isset($result['Location'])) {
+            \DBG::dump($result);
+            throw new AwsControllerException('AWS responded with invalid result');
+        }
+        $bucketLocation = $result['Location'];
+
+        // create IAM user with access to the bucket
+   
+        // copy skeleton to the bucket
+        // TODO: this is not yet possible, therefore we copy the skeleton to
+        // EFS using XamppController for now. See end of this method.
+
+        // update cloudfront to redirect requests to S3
+        $updatedConfig = $this->getWebDistributionConfig($websiteName);
+        $updatedConfig['DistributionConfig']['Origins']['Quantity']++;
+        $updatedConfig['DistributionConfig']['Origins']['Items'][] = array(
+            'Id' => 'S3',
+            'DomainName' => $bucketLocation,
+        );
+        foreach (
+            array(
+                'feed/*',
+                'media/*',
+                'images/*',
+                'tmp/public/*',
+                'robots.txt',
+                'sitemap_*.xml',
+                'themes/*',
+            ) as $pattern
+        ) {
+            $updatedConfig['DistributionConfig']['CacheBehaviors']['Quantity']++;
+            $updatedConfig['DistributionConfig']['CacheBehaviors']['Items'][] = array(
+                'MinTTL' => 0,
+                'TargetOriginId' => $bucketLocation,
+                'PathPattern' => $pattern,
+                'TrustedSigners' => array(
+                    'Enabled' => false,
+                    'Quantity' => 0,
+                ),
+                'ForwardedValues' => array(
+                    'QueryString' => false,
+                    'Cookies' => array(
+                        'Forward' => 'none',
+                    ),
+                ),
+                'ViewerProtocolPolicy' => 'allow-all',
+            );
+        }
+        $result = $this->getCloudFrontClient()->updateDistribution(
+            $updatedConfig
+        );
+        if (!is_array($result) || !isset($result['Distribution'])) {
+            \DBG::dump($result);
+            throw new AwsControllerException('AWS responded with invalid result');
+        }
+        $this->cloudFrontCache[$websiteName] = $result;
+        /*return array(
+            IAM access key name
+            IAM access key value
+        )*/
         return $this->getUserStorageController()->createUserStorage(
             $websiteName,
             $codeBase
@@ -546,6 +609,15 @@ class AwsController extends HostController {
         return $this->userStorageController;
     }
 
+    /**
+     * Get S3 client object
+     *
+     * @return \Aws\S3\S3Client
+     */
+    protected function getS3Client() {
+        return $this->getAwsClient('S3', $this->region, 'latest');
+    }
+
     /*******************************************************/
     /* W E B D I S T R I B U T I O N - C O N T R O L L E R */
     /*******************************************************/
@@ -560,6 +632,64 @@ class AwsController extends HostController {
      * {@inheritdoc}
      */
     public function createWebDistribution($domain, $documentRoot = 'httpdocs') {
+        $webDistributionConfig = array(
+            'DistributionConfig' => array(
+                'Aliases' => array('Quantity' => 0),
+                'CacheBehaviors' => array('Quantity' => 0),
+                'Comment' => $domain,
+                'Enabled' => true,
+                'CallerReference' => $domain,
+                'DefaultCacheBehavior' => array(
+                    'MinTTL' => 0,
+                    'TargetOriginId' => $domain,
+                    'TrustedSigners' => array(
+                        'Enabled' => false,
+                        'Quantity' => 0,
+                    ),
+                    'ForwardedValues' => array(
+                        'QueryString' => true,
+                        'Cookies' => array(
+                            'Forward' => 'all',
+                        ),
+                    ),
+                    'ViewerProtocolPolicy' => 'allow-all',
+                ),
+                'DefaultRootObject' => '/',
+                'HttpVersion' => 'http2',
+                'Origins' => array(
+                    'Quantity' => 1,
+                    'Items' => array(
+                        array(
+                            'Id' => $domain,
+                            'DomainName' => $domain,
+                            'CustomOriginConfig' => array(
+                                'HTTPPort' => 80,
+                                'HTTPSPort' => 443,
+                                'OriginProtocolPolicy' => 'match-viewer',
+                                'OriginReadTimeout' => 60,
+                            ),
+                        ),
+                    ),
+                ),
+                'PriceClass' => 'PriceClass_100',
+            )
+        );
+        $result = json_decode(
+            $this->getCloudFrontClient()->createDistribution(
+                $webDistributionConfig
+            )
+        );
+        if (
+            !$result ||
+            empty($result['Distribution']) ||
+            empty($result['Distribution']['DomainName'])
+        ) {
+            \DBG::dump($result);
+            throw new AwsControllerException('AWS responded with invalid result');
+        }
+        $this->cloudFrontCache[$domain] = $result;
+        $cfDomain = $result['Distribution']['DomainName'];
+        \DBG::msg('CloudFront Domain is "' . $cfDomain . '"');
     }
 
     /**
@@ -602,6 +732,27 @@ class AwsController extends HostController {
      * {@inheritdoc}
      */
     public function getAllWebDistributionAliases($websiteName = '') {
+    }
+
+    /**
+     * Get CloudFront client object
+     *
+     * @return \Aws\CloudFront\CloudFrontClient
+     */
+    protected function getCloudFrontClient() {
+        return $this->getAwsClient('CloudFront', 'us-east-1', 'latest');
+    }
+
+    /**
+     * Gets the config for a specific web distribution
+     * @param string $websiteName Name of website
+     * @return array Distribution config
+     */
+    protected function getWebDistributionConfig($websiteName) {
+        if (!isset($this->cloudFrontCache[$websiteName])) {
+            $distributions = $this->getAllWebDistributions();
+        }
+        return $this->cloudFrontCache[$websiteName];
     }
 
     /*******************************/
