@@ -1114,7 +1114,7 @@ class User extends User_Profile
         $arrSelectCoreExpressions = array();
         $arrSelectCustomExpressions = null;
         $this->filtered_search_count = 0;
-        $sqlCondition = '';
+        $sqlCondition = array();
 
         // set filter
         if (isset($filter) && is_array($filter) && count($filter) || !empty($search)) {
@@ -1364,7 +1364,7 @@ class User extends User_Profile
 
 
     private function setSortedUserIdList(
-        $arrSort, $sqlCondition=null, $limit=null, $offset=null, $groupless=false, $crmUser=false
+        $arrSort, $sqlCondition=array(), $limit=null, $offset=null, $groupless=false, $crmUser=false
     ) {
         global $objDatabase;
 

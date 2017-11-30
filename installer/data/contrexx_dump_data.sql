@@ -382,6 +382,7 @@ INSERT INTO `contrexx_access_settings` (`key`, `value`, `status`) VALUES ('block
 INSERT INTO `contrexx_access_settings` (`key`, `value`, `status`) VALUES ('block_latest_reg_users_pic','',0);
 INSERT INTO `contrexx_access_settings` (`key`, `value`, `status`) VALUES ('block_latest_registered_users','10',0);
 INSERT INTO `contrexx_access_settings` (`key`, `value`, `status`) VALUES ('block_latest_registered_users_on','',0);
+INSERT INTO `contrexx_access_settings` (`key`, `value`, `status`) VALUES ('block_random_access_users','5',0);
 INSERT INTO `contrexx_access_settings` (`key`, `value`, `status`) VALUES ('default_email_access','members_only',1);
 INSERT INTO `contrexx_access_settings` (`key`, `value`, `status`) VALUES ('default_profile_access','members_only',1);
 INSERT INTO `contrexx_access_settings` (`key`, `value`, `status`) VALUES ('max_pic_height','600',1);

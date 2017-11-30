@@ -2403,6 +2403,7 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
             'TXT_ACCESS_SOCIALLOGIN_UNCOMPLETED_SIGN_UP'        => $_ARRAYLANG['TXT_ACCESS_SOCIALLOGIN_UNCOMPLETED_SIGN_UP'],
             'TXT_ACCESS_USER_ACCOUNT_VERIFICATION'              => $_ARRAYLANG['TXT_ACCESS_USER_ACCOUNT_VERIFICATION'],
             'TXT_ACCESS_USER_ACCOUNT_VERIFICATION_TEXT'         => $_ARRAYLANG['TXT_ACCESS_USER_ACCOUNT_VERIFICATION_TEXT'],
+            'TXT_ACCESS_RANDOM_USERS'                           => $_ARRAYLANG['TXT_ACCESS_RANDOM_USERS']
         ));
         $this->_objTpl->setGlobalVariable(array(
             'TXT_ACCESS_SOCIALLOGIN_MANUAL'                     => sprintf($_ARRAYLANG['TXT_ACCESS_SOCIALLOGIN_MANUAL'], "http://www.cloudrexx.com/wiki/de/index.php?title=Social_Login"),
@@ -2460,6 +2461,19 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
                 $arrSettings['block_next_birthday_users_pic']['status'] = !empty($_POST['access_blocks_next_birthday_users_pic']) && intval($_POST['access_blocks_next_birthday_users_pic']);
             } else {
                 $arrSettings['block_next_birthday_users']['status'] = 0;
+            }
+
+            if (!empty($_POST['access_blocks_random_access_users'])) {
+                $arrSettings['block_random_access_users']['status'] = 1;
+                $arrSettings['block_random_access_users']['value'] = 0;
+                if(!empty($_POST['access_blocks_random_access_users_count'])) {
+                    $arrSettings['block_random_access_users']['value'] =
+                        contrexx_input2int(
+                            $_POST['access_blocks_random_access_users_count']
+                        );
+                }
+            } else {
+                $arrSettings['block_random_access_users']['status'] = 0;
             }
 
             if (!empty($_POST['accessMaxProfilePicWidth'])) {
@@ -2696,6 +2710,9 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
             'ACCESS_SOCIALLOGIN_ACTIVATED_AUTOMATICALLY_NOT_ENABLED'=> $arrSettings['sociallogin_active_automatically']['status'] ? '' : 'checked="checked"',
             'ACCESS_SOCIALLOGIN_ACTIVATION_TIMEOUT'                 => intval($arrSettings['sociallogin_activation_timeout']['value']),
             'ACCESS_USSER_ACCOUNT_VERIFICATION_CHECKED'             => $arrSettings['user_account_verification']['value'] == 1 ? 'checked' : '',
+            'ACCESS_BLOCKS_RANDOM_ACCESS_USERS'                     => $arrSettings['block_random_access_users']['status'] ? 'checked="checked"' : '',
+            'ACCESS_BLOCKS_RANDOM_ACCESS_USERS_DISPLAY'             => $arrSettings['block_random_access_users']['status'] ? '' : 'none',
+            'ACCESS_BLOCKS_RANDOM_ACCESS_USERS_USER_COUNT'          => $arrSettings['block_random_access_users']['value'],
         ));
         $this->_objTpl->parse('module_access_config_general');
     }

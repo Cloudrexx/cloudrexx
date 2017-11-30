@@ -353,3 +353,4 @@ $_ARRAYLANG['TXT_ACCESS_READ_ACCESS_MODIFY_TITLE_TEXT'] = 'Define who shall be g
 $_ARRAYLANG['TXT_ACCESS_READ_ACCESS_EVERYONE_MOD_PERM'] = 'Everyone may access this property.';
 $_ARRAYLANG['TXT_ACCESS_READ_ACCESS_SELECT_ALLOWED_MODIFY_GROUPS'] = 'Choose the groups to be allowed to access this property';
 $_ARRAYLANG['TXT_ACCESS_READ_ACCESS_TITLE_TOOLTIP_TEXT'] = "The read access to a user's profile can further be restricted through the attribute %s. In such case, the configuration in this section is noneffective.";
+$_ARRAYLANG['TXT_ACCESS_RANDOM_USERS'] = 'Random users';

@@ -113,7 +113,16 @@ abstract class RandomEsiWidgetController extends EsiWidgetController {
      */
     protected function internalParseWidget($widget, $params) {
         if ($widget instanceof \Cx\Core_Modules\Widget\Model\Entity\RandomEsiWidget) {
-            $esiInfos = $this->getRandomEsiWidgetContentInfos($widget, $params);
+            $template = $this->getComponent('Widget')->getWidgetContent(
+                $widget->getName(),
+                $params['get']['theme'],
+                $params['get']['page'],
+                $params['get']['targetComponent'],
+                $params['get']['targetEntity'],
+                $params['get']['targetId'],
+                $params['get']['channel']
+            );
+            $esiInfos = $this->getRandomEsiWidgetContentInfos($widget, $params, $template);
 
             if (count($esiInfos) > $this->getSubwidgetCountLimit()) {
                 // randomly pick some
@@ -154,7 +163,8 @@ abstract class RandomEsiWidgetController extends EsiWidgetController {
      * )
      * @param \Cx\Core_Modules\Widget\Model\Entity\Widget $widget The RandomEsiWidget
      * @param array $params ESI request params
+     * @param \Cx\Core\Html\Sigma Widget template
      * @return array List of URLs
      */
-    protected abstract function getRandomEsiWidgetContentInfos($widgetName, $params);
+    protected abstract function getRandomEsiWidgetContentInfos($widgetName, $params, $template);
 }

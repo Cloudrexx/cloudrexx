@@ -351,3 +351,4 @@ $_ARRAYLANG['TXT_ACCESS_READ_ACCESS_MODIFY_TITLE_TEXT'] = 'Definieren Sie hier, 
 $_ARRAYLANG['TXT_ACCESS_READ_ACCESS_EVERYONE_MOD_PERM'] = 'Jeder darf diese Eigenschaft einsehen.';
 $_ARRAYLANG['TXT_ACCESS_READ_ACCESS_SELECT_ALLOWED_MODIFY_GROUPS'] = 'Wählen Sie die Gruppen aus, welche berechtigt sein sollen, diese Eigenschaft einzusehen';
 $_ARRAYLANG['TXT_ACCESS_READ_ACCESS_TITLE_TOOLTIP_TEXT'] = "Der Lesezugriff auf ein Benutzerprofil kann pro Benutzer (mittels Eigenschaft %s) weiter eingeschränkt werden. Abhängig davon ist die Konfiguration an dieser Stelle wirkungslos.";
+$_ARRAYLANG['TXT_ACCESS_RANDOM_USERS'] = 'Zufällige Benutzer';
