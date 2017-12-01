@@ -126,9 +126,9 @@ class XamppController extends HostController {
      * @throws MultiSiteDbException On error
      */
     public function revokeRightsToDb(\Cx\Core\Model\Model\Entity\DbUser $user, \Cx\Core\Model\Model\Entity\Db $database){
-        $isRevoked = $this->db->execute("REVOKE ALL PRIVILEGES FROM '".$user->getName."'@'localhost'");   
+        $isRevoked = $this->db->execute("REVOKE ALL PRIVILEGES FROM '".$user->getName."'@'%'");   
         if(!$isRevoked){
-            throw new \Exception("Query failed: \REVOKE ALL PRIVILEGES FROM ".$user->getName."'@'localhost'" . $this->db->ErrorMsg());
+            throw new \Exception("Query failed: \REVOKE ALL PRIVILEGES FROM ".$user->getName."'@'%'" . $this->db->ErrorMsg());
         }
     }
     
@@ -140,9 +140,9 @@ class XamppController extends HostController {
     public function removeDbUser(\Cx\Core\Model\Model\Entity\DbUser $dbUser, \Cx\Core\Model\Model\Entity\Db $db ){
         $isUserExist = $this->db->execute("SELECT User FROM mysql.user WHERE user = '".$dbUser->getName()."'");
         if ($isUserExist->RecordCount() == 1) {
-           $isUserDeleted = $this->db->execute("DROP USER '".$dbUser->getName()."'@'localhost'");
+            $isUserDeleted = $this->db->execute("DROP USER '".$dbUser->getName()."'@'%'");
             if (!$isUserDeleted) {
-                throw new \Exception("Query failed: \ DROP USER '".$dbUser->getName()."'@'localhost'" . $this->db->ErrorMsg());
+                throw new \Exception("Query failed: \ DROP USER '".$dbUser->getName()."'@'%'" . $this->db->ErrorMsg());
             }
         }
     }
