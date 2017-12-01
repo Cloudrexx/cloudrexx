@@ -600,9 +600,22 @@ class AwsController extends HostController {
      * {@inheritdoc}
      */
     public function deleteUserStorage($websiteName) {
-        $result = $this->getS3Client()->deleteBucket(array(
-            'Bucket' => /*'customer-website-' .*/ $websiteName,
-        ));
+        \DBG::msg(__METHOD__);
+        $bucketName = /*'customer-website-' .*/ $websiteName;
+        // we need to empty the bucket before we can delete it
+        $versions = $this->getS3Client()->listObjectVersions(
+            array('Bucket' => $bucketName)
+        )->getPath('Versions');
+        $result = $this->getS3Client()->deleteObjects(array(
+            'Bucket'  => $bucketName,
+            'Objects' => array_map(function ($version) {
+                return array(
+                    'Key'       => $version['Key'],
+                    'VersionId' => $version['VersionId']
+                );
+            }, $versions),
+        )); 
+        $result = $this->getS3Client()->deleteBucket(array($bucketName));
         if (!$result) {
             \DBG::dump($result);
             throw new UserStorageControllerException('AWS responded with invalid result');
@@ -753,6 +766,7 @@ class AwsController extends HostController {
      * {@inheritdoc}
      */
     public function deleteWebDistribution($domain) {
+        \DBG::msg(__METHOD__);
         $websiteName = current(explode('.', $domain));
         $config = $this->getWebDistributionConfig($websiteName);
         $result = $this->getCloudFrontClient()->deleteDistribution(
