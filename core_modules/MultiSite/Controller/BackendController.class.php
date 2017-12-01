@@ -1596,6 +1596,10 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                 ) &&
                 in_array($websiteController, array('plesk', 'aws'))
             ) {
+                $controllerClass = '\\' . __NAMESPACE__ . '\\' . ucfirst(
+                    $websiteController
+                ) . 'Controller';
+                $controllerClass::initSettings();
                 \Cx\Core\Setting\Controller\Setting::setEngineType(
                     'MultiSite',
                     'FileSystem',
