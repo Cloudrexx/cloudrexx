@@ -602,23 +602,42 @@ class AwsController extends HostController {
     public function deleteUserStorage($websiteName) {
         \DBG::msg(__METHOD__);
         $bucketName = /*'customer-website-' .*/ $websiteName;
-        // we need to empty the bucket before we can delete it
-        $versions = $this->getS3Client()->listObjectVersions(
-            array('Bucket' => $bucketName)
-        )->getPath('Versions');
-        $result = $this->getS3Client()->deleteObjects(array(
-            'Bucket'  => $bucketName,
-            'Objects' => array_map(function ($version) {
-                return array(
-                    'Key'       => $version['Key'],
-                    'VersionId' => $version['VersionId']
+        try {
+            // we need to empty the bucket before we can delete it
+            $versions = $this->getS3Client()->listObjectVersions(
+                array('Bucket' => $bucketName)
+            )->getPath('Versions');
+            if ($versions) {
+                $objects = array_map(function ($version) {
+                    return array(
+                        'Key'       => $version['Key'],
+                        'VersionId' => $version['VersionId']
+                    );
+                }, $versions);
+                \DBG::dump($objects);	
+                $result = $this->getS3Client()->deleteObjects(array(
+                    'Bucket'  => $bucketName,
+                    'Delete' => array(
+                        'Objects' => $objects,
+                    ),
+                ));
+            }
+            $result = $this->getS3Client()->deleteBucket(
+                array('Bucket' => $bucketName)
+            );
+            if (!$result) {
+                \DBG::dump($result);
+                throw new UserStorageControllerException(
+                    'AWS responded with invalid result'
                 );
-            }, $versions),
-        )); 
-        $result = $this->getS3Client()->deleteBucket(array($bucketName));
-        if (!$result) {
-            \DBG::dump($result);
-            throw new UserStorageControllerException('AWS responded with invalid result');
+            }
+        } catch (\Aws\S3\Exception\S3Exception $e) {
+            if (strpos($e->getMessage(), 'NoSuchBucket') === false) {
+                \DBG::dump($e->getMessage());
+                // unknown error, (re-)throw exception
+                throw $e;
+            }
+            \DBG::msg('Bucket is already deleted');
         }
         // The following is temporary until we can copy the skeleton to S3
         $this->getUserStorageController()->deleteUserStorage(
