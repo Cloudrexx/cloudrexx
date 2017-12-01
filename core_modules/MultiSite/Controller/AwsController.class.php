@@ -797,7 +797,6 @@ class AwsController extends HostController {
         $result = $this->getCloudFrontClient()->deleteDistribution(
             array(
                 'Id' => $config['Id'],
-                'IfMatch' => $config['IfMatch'],
             )
         );
         if (!$result) {
@@ -810,6 +809,29 @@ class AwsController extends HostController {
      * {@inheritdoc}
      */
     public function getAllWebDistributions() {
+        $result = $this->getCloudFrontClient()->listDistributions();
+        if (
+            !$result ||
+            !$result->hasKey('DistributionList') ||
+            !is_array($result->hasKey('DistributionList')['Items'])
+        ) {
+            \DBG::dump($result);
+            throw new WebDistributionControllerException(
+                'AWS responded with invalid result'
+            );
+        }
+        foreach ($result->hasKey('DistributionList')['Items'] as $distribution) {
+            if (strpos($distribution['Comment'], 'Customer website ') === false) {
+                continue;
+            }
+            $websiteName = substr($distribution['Comment'], 17);
+            \DBG::msg('Adding CF dist. for website "' . $websiteName . '" to cache');
+            $this->cloudFrontCache[$websiteName] = array(
+                'DistributionConfig' => $distribution,
+                'Id' => $distribution['Id'],
+            );
+        }
+        return $this->cloudFrontCache;
     }
 
     /**
@@ -852,7 +874,7 @@ class AwsController extends HostController {
      */
     protected function getWebDistributionConfig($websiteName) {
         if (!isset($this->cloudFrontCache[$websiteName])) {
-            $distributions = $this->getAllWebDistributions();
+            $this->getAllWebDistributions();
         }
         return $this->cloudFrontCache[$websiteName];
     }
