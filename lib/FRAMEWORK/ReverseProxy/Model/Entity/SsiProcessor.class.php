@@ -74,7 +74,15 @@ abstract class SsiProcessor {
     public function getIncludeCode($url) {
         $template = $this->getTemplateFile('IncludeTag');
         $template->setVariable('INCLUDE_FILE', $url);
-        return $template->get();
+        $includeCode = $template->get();
+
+        // trim trailing new line
+        // TODO: this should be a generic feature of \Cx\Core\Html\Sigma
+        //       to enforce the guideline that all files should contain
+        //       a trailing new line
+        $includeCode = preg_replace('/\n$/', '', $includeCode);
+
+        return $includeCode;
     }
     
     /**

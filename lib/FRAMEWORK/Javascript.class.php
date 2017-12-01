@@ -1107,7 +1107,11 @@ Caution: JS/ALL files are missing. Also, this should probably be loaded through 
      */
     private static function grabComments(&$content)
     {
+        // filter HTML-comments
         $content = preg_replace_callback('#<!--.*?-->#ms', array('JS', '_storeComment'), $content);
+
+        // filter esi-includes
+        $content = preg_replace_callback('#<esi:include src="([^"]+)" onerror="continue"/>#', array('JS', '_storeComment'), $content);
     }
 
 
