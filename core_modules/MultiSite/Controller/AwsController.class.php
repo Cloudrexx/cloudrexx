@@ -101,6 +101,12 @@ class AwsController extends HostController {
     protected $dbController;
 
     /**
+     * Caches the CloudFront configuration
+     * @var array Key is the website name, value is the CloudFront config
+     */
+    protected $cloudFrontCache = array();
+
+    /**
      * {@inheritdoc}
      */
     public static function initSettings() {
