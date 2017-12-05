@@ -787,16 +787,22 @@ class AwsController extends HostController {
     public function deleteWebDistribution($domain) {
         \DBG::msg(__METHOD__);
         $websiteName = current(explode('.', $domain));
-        $config = $this->getWebDistributionConfig($websiteName);
-        $result = $this->getCloudFrontClient()->deleteDistribution(
-            array(
-                'Id' => $config['Id'],
-            )
+        $updatedConfig = $this->getWebDistributionConfig($websiteName);
+        // we can only disable the distribution, it will be garbage
+        // collected later by a lambda function
+        $updatedConfig['DistributionConfig']['Enabled'] = false;
+        $result = $this->getCloudFrontClient()->updateDistribution(
+            $updatedConfig
         );
-        if (!$result) {
+        if (!$result || !isset($result['Distribution'])) {
             \DBG::dump($result);
             throw new WebDistributionControllerException('AWS responded with invalid result');
         }
+        $this->cloudFrontCache[$websiteName] = array(
+             'DistributionConfig' => $result->toArray()['Distribution']['DistributionConfig'],
+             'Id' => $result->toArray()['Distribution']['Id'],
+             'IfMatch' => $result->toArray()['ETag'],
+        );
     }
 
     /**
@@ -807,14 +813,14 @@ class AwsController extends HostController {
         if (
             !$result ||
             !$result->hasKey('DistributionList') ||
-            !is_array($result->hasKey('DistributionList')['Items'])
+            !is_array($result->get('DistributionList')['Items'])
         ) {
             \DBG::dump($result);
             throw new WebDistributionControllerException(
                 'AWS responded with invalid result'
             );
         }
-        foreach ($result->hasKey('DistributionList')['Items'] as $distribution) {
+        foreach ($result->get('DistributionList')['Items'] as $distribution) {
             if (strpos($distribution['Comment'], 'Customer website ') === false) {
                 continue;
             }
@@ -869,6 +875,29 @@ class AwsController extends HostController {
     protected function getWebDistributionConfig($websiteName) {
         if (!isset($this->cloudFrontCache[$websiteName])) {
             $this->getAllWebDistributions();
+        }
+        if (!isset($this->cloudFrontCache[$websiteName])) {
+            throw new WebDistributionControllerException('');
+        }
+        // getAllWebDistributions() does not set IfMatch
+        if (!isset($this->cloudFrontCache[$websiteName]['IfMatch'])) {
+            $result = $this->getCloudFrontClient()->getDistribution(
+                array('Id'=>$this->cloudFrontCache[$websiteName]['Id'])
+            );
+            if (
+                !$result ||
+                !$result->hasKey('ETag')
+            ) {
+                \DBG::dump($result);
+                throw new WebDistributionControllerException(
+                    'AWS responded with invalid result'
+                );
+            }
+            $this->cloudFrontCache[$websiteName] = array(
+                'DistributionConfig' => $result->toArray()['Distribution']['DistributionConfig'],
+                'Id' => $result->toArray()['Distribution']['Id'],
+                'IfMatch' => $result->toArray()['ETag'],
+            );
         }
         return $this->cloudFrontCache[$websiteName];
     }
