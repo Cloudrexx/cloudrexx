@@ -225,15 +225,11 @@ class DomainEventListener implements \Cx\Core\Event\Model\Entity\EventListener {
                 if ($event == 'postPersist') {
                     return;
                 }
-                $type = 'A';
 
-                // in case we are about to remove the domain,
-                // we don't have to collect any further data
-                if ($operation == 'remove') {
-                    break;
-                }
+                // FQDN always points to ServiceServer
+                $type = 'CNAME';
+                $value = $domain->getWebsite()->getServiceServer()->getHostname();
 
-                $value= $domain->getWebsite()->getIpAddress();
                 break;
 
             case \Cx\Core_Modules\MultiSite\Model\Entity\Domain::TYPE_BASE_DOMAIN:
@@ -250,14 +246,8 @@ class DomainEventListener implements \Cx\Core\Event\Model\Entity\EventListener {
                     return;
                 }
                 $type = 'CNAME';
-
-                // in case we are about to remove the domain,
-                // we don't have to collect any further data
-                if ($operation == 'remove') {
-                    break;
-                }
-
-                $value= $domain->getWebsite()->getFqdn()->getName();
+                // @TODO: Vanity URL should be handled by manager
+                $value = $domain->getWebsite()->getIpAddress();
                 break;
             case \Cx\Core_Modules\MultiSite\Model\Entity\Domain::TYPE_MAIL_DOMAIN:
             case \Cx\Core_Modules\MultiSite\Model\Entity\Domain::TYPE_WEBMAIL_DOMAIN:

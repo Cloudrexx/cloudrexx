@@ -1934,6 +1934,8 @@ class PleskController extends HostController {
      */
     public function createWebDistribution($domain, &$dnsTarget)
     {
+        // Set vanity URL DNS target to FQDN
+        $dnsTarget = $domain;
     }
     
     /**

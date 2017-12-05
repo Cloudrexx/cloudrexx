@@ -772,6 +772,7 @@ class AwsController extends HostController {
         );
         $cfDomain = $result['Distribution']['DomainName'];
         \DBG::msg('CloudFront Domain is "' . $cfDomain . '"');
+        $dnsTarget = $cfDomain;
     }
 
     /**
