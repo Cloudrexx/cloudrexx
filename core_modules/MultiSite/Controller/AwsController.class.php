@@ -521,17 +521,19 @@ class AwsController extends HostController {
                 'OriginAccessIdentity' => '',
             ),
         );
-        foreach (
-            array(
-                'feed/*',
-                'media/*',
-                'images/*',
-                'tmp/public/*',
-                'robots.txt',
-                'sitemap_*.xml',
-                'themes/*',
-            ) as $pattern
-        ) {
+        $mediaSources = \Cx\Core\Core\Controller\Cx::instanciate()->getMediaSourceManager()->getMediaTypes();
+// currently adds:
+// themes/*
+// images/attach/*
+// images/content/*
+// should add:
+// media/*
+// images/*
+// themes/*
+        foreach ($mediaSources as $mediaSource) {
+            $pattern = $mediaSource->getDirectory();
+            $pattern = substr($pattern[1], 1) . '/*';
+            \DBG::msg('Adding CloudFront behavior for MediaSource directory pattern: ' . $pattern);
             $updatedConfig['DistributionConfig']['CacheBehaviors']['Quantity']++;
             $updatedConfig['DistributionConfig']['CacheBehaviors']['Items'][] = array(
                 'MinTTL' => 0,
