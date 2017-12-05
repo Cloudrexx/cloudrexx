@@ -668,6 +668,37 @@ class AwsController extends HostController {
             }
             \DBG::msg('Bucket is already deleted');
         }
+        $result = $this->getIamClient()->listAccessKeys(array(
+            'UserName' => $websiteName,
+        ));
+        if (!$result || !isset($result['AccessKeyMetadata'])) {
+            \DBG::dump($result);
+            throw new WebDistributionControllerException(
+                'AWS responded with invalid result'
+            );
+        }
+        foreach ($result['AccessKeyMetadata'] as $accessKey) {
+            $subResult = $this->getIamClient()->deleteAccessKey(array(
+                'AccessKeyId' => $accessKey['AccessKeyId'],
+                'UserName' => $websiteName,
+            ));
+            if (!$subResult) {
+                \DBG::dump($result);
+                throw new WebDistributionControllerException(
+                    'AWS responded with invalid result'
+                );
+            }
+        }
+        $result = $this->getIamClient()->removeUserFromGroup(array(
+            'GroupName' => 'WebsiteOwner',
+            'UserName' => $websiteName,
+        ));
+        if (!$result) {
+            \DBG::dump($result);
+            throw new WebDistributionControllerException(
+                'AWS responded with invalid result'
+            );
+        }
         $result = $this->getIamClient()->deleteUser(array(
             'UserName' => $websiteName,
         ));
