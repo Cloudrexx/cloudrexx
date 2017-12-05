@@ -30,115 +30,130 @@
  *
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Cloudrexx Development Team <info@cloudrexx.com>
+ * @author      Michael Ritter <michael.ritter@cloudrexx.com>
  * @version     2.0.0
  * @package     cloudrexx
  * @subpackage  core
  */
 
-namespace Cx\Core
-{
+namespace Cx\Core;
+
+/**
+ * Module Checker
+ * Checks for installed and activated modules
+ *
+ * @copyright   CLOUDREXX CMS - CLOUDREXX AG
+ * @author      Cloudrexx Development Team <info@cloudrexx.com>
+ * @author      Michael Ritter <michael.ritter@cloudrexx.com>
+ * @version     2.0.0
+ * @package     cloudrexx
+ * @subpackage  core
+ */
+class ModuleChecker {
 
     /**
-     * Module Checker
-     * Checks for installed and activated modules
+     * Entity Manager
      *
-     * @copyright   CLOUDREXX CMS - CLOUDREXX AG
-     * @author      Cloudrexx Development Team <info@cloudrexx.com>
-     * @version     2.0.0
-     * @package     cloudrexx
-     * @subpackage  core
+     * @access  protected
+     * @var     EntityManager
      */
-    class ModuleChecker
-    {
+    protected $em = null;
 
-        /**
-         * Entity Manager
-         *
-         * @access  private
-         * @var     EntityManager
-         */
-        private $em = null;
+    /**
+     * Database
+     *
+     * @access  protected
+     * @var     ADONewConnection
+     */
+    protected $db = null;
 
-        /**
-         * Database
-         *
-         * @access  private
-         * @var     ADONewConnection
-         */
-        private $db = null;
+    /**
+     * ClassLoader
+     *
+     * @access  protected
+     * @var     \Cx\Core\ClassLoader\ClassLoader
+     */
+    protected $cl = null;
 
-        /**
-         * ClassLoader
-         *
-         * @access  private
-         * @var     \Cx\Core\ClassLoader\ClassLoader
-         */
-        private $cl = null;
+    /**
+     * Names of all core modules
+     *
+     * @access  protected
+     * @var     array
+     */
+    protected $arrCoreModules = array();
 
-        /**
-         * Names of all core modules
-         *
-         * @access  private
-         * @var     array
-         */
-        private $arrCoreModules = array();
+    /**
+     * Names of all modules (except core modules)
+     *
+     * @access  protected
+     * @var     array
+     */
+    protected $arrModules = array();
 
-        /**
-         * Names of all modules (except core modules)
-         *
-         * @access  private
-         * @var     array
-         */
-        private $arrModules = array();
+    /**
+     * Names of active modules
+     *
+     * @access  protected
+     * @var     array
+     */
+    protected $arrActiveModules = array();
 
-        /**
-         * Names of active modules
-         *
-         * @access  private
-         * @var     array
-         */
-        private $arrActiveModules = array();
+    /**
+     * Names of installed modules
+     *
+     * @access  protected
+     * @var     array
+     */
+    protected $arrInstalledModules = array();
 
-        /**
-         * Names of installed modules
-         *
-         * @access  private
-         * @var     array
-         */
-        private $arrInstalledModules = array();
+    /**
+     * Sets all modules activated
+     *
+     * @var boolean
+     */
+    protected $allActivated = false;
 
-        private static $instance = null;
+    protected static $instance = null;
 
-        public static function getInstance($em, $db, $cl) {
-            if (!self::$instance) {
-                self::$instance = new static($em, $db, $cl);
-            }
-            return self::$instance;
+    public static function getInstance($em, $db, $cl) {
+        if (!static::$instance) {
+            static::$instance = new static($em, $db, $cl);
         }
+        return static::$instance;
+    }
 
-        /**
-         * Constructor
-         *
-         * @access  public
-         * @param   EntityManager                     $em
-         * @param   ADONewConnection                  $db
-         * @param   \Cx\Core\ClassLoader\ClassLoader  $cl
-         */
-        private function __construct($em, $db, $cl){
-            $this->em = $em;
-            $this->db = $db;
-            $this->cl = $cl;
+    /**
+     * Constructor
+     *
+     * @access  public
+     * @param   EntityManager                     $em
+     * @param   ADONewConnection                  $db
+     * @param   \Cx\Core\ClassLoader\ClassLoader  $cl
+     */
+    protected function __construct($em, $db, $cl) {
+        $this->em = $em;
+        $this->db = $db;
+        $this->cl = $cl;
 
-            $this->init();
-        }
+        $this->init();
+    }
 
-        /**
-         * Initialisation
-         *
-         * @access  private
-         */
-        private function init()
-        {
+    /**
+     * Sets all modules as activated (as if they would have content pages)
+     * Only use in preComponentLoad or earlier!
+     */
+    public function setAllActivated() {
+        $this->allActivated = true;
+    }
+
+    /**
+     * Initialisation
+     *
+     * @access  protected
+     */
+    protected function init() {
+        if (!$this->allActivated()) {
             // check the content for installed and used modules
             $arrCmActiveModules = array();
             $arrCmInstalledModules = array();
@@ -146,8 +161,8 @@ namespace Cx\Core
             $qb->add('select', 'p')
                 ->add('from', 'Cx\Core\ContentManager\Model\Entity\Page p')
                 ->add('where',
-// TODO: what is the proper syntax for non-empty values?
-// TODO: add additional check for module != NULL
+                    // TODO: what is the proper syntax for non-empty values?
+                    // TODO: add additional check for module != NULL
                     $qb->expr()->neq('p.module', $qb->expr()->literal(''))
                 );
             $pages = $qb->getQuery()->getResult();
@@ -170,129 +185,153 @@ namespace Cx\Core
             $arrCmActiveModules[] = 'Block';
             $arrCmInstalledModules[] = 'upload';
             $arrCmActiveModules[] = 'upload';
+        }
 
-            $objResult = $this->db->Execute('SELECT `name`, `is_core`, `is_required` FROM `'.DBPREFIX.'modules`');
-            if ($objResult !== false) {
-                while (!$objResult->EOF) {
-                    $moduleName = $objResult->fields['name'];
+        $objResult = $this->db->Execute('
+            SELECT
+                `name`,
+                `is_core`,
+                `is_required`
+            FROM
+                `'.DBPREFIX.'modules`
+        ');
+        if ($objResult === false) {
+            return;
+        }
+        while (!$objResult->EOF) {
+            $moduleName = $objResult->fields['name'];
 
-                    if ($moduleName == 'News') {
-                        $this->arrModules[] = $moduleName;
-                        //$this->arrCoreModules[] = $moduleName;
-                        if (in_array($moduleName, $arrCmInstalledModules)) {
-                            $this->arrInstalledModules[] = $moduleName;
-                            if (in_array($moduleName, $arrCmInstalledModules)) {
-                                $this->arrActiveModules[] = $moduleName;
-                            }
-                        }
-                        $objResult->MoveNext();
-                        continue;
+            if (empty($moduleName)) {
+                $objResult->MoveNext();
+                continue;
+            }
+
+            if ($moduleName == 'News') {
+                $this->arrModules[] = $moduleName;
+                //$this->arrCoreModules[] = $moduleName;
+                if (
+                    $this->allActivated ||
+                    in_array($moduleName, $arrCmInstalledModules)
+                ) {
+                    $this->arrInstalledModules[] = $moduleName;
+                    if (
+                        $this->allActivated ||
+                        in_array($moduleName, $arrCmInstalledModules)
+                    ) {
+                        $this->arrActiveModules[] = $moduleName;
                     }
+                }
+                $objResult->MoveNext();
+                continue;
+            }
 
-                    if (!empty($moduleName)) {
-                        $isCore = $objResult->fields['is_core'];
+            $isCore = $objResult->fields['is_core'];
 
-                        if ($isCore == 1) {
-                            $this->arrCoreModules[] = $moduleName;
-                        } else {
-                            $this->arrModules[] = $moduleName;
-                        }
+            if ($isCore == 1) {
+                $this->arrCoreModules[] = $moduleName;
+            } else {
+                $this->arrModules[] = $moduleName;
+            }
 
-                        if ((in_array($moduleName, $arrCmInstalledModules)) &&
-                            ($isCore || (!$isCore && is_dir($this->cl->getFilePath(ASCMS_MODULE_PATH.'/'.$moduleName))))
-                        ) {
-                            $this->arrInstalledModules[] = $moduleName;
-                        }
+            if (
+                $isCore ||
+                (
+                    !$isCore &&
+                    is_dir(
+                        $this->cl->getFilePath(
+                            ASCMS_MODULE_PATH.'/'.$moduleName
+                        )
+                    )
+                )
+            ) {
+                if (
+                    $this->allActivated ||
+                    in_array($moduleName, $arrCmInstalledModules)
+                ) {
+                    $this->arrInstalledModules[] = $moduleName;
+                }
 
-                        if ((in_array($moduleName, $arrCmActiveModules)) &&
-                            ($isCore || (!$isCore && is_dir($this->cl->getFilePath(ASCMS_MODULE_PATH.'/'.$moduleName))))
-                        ) {
-                            $this->arrActiveModules[] = $moduleName;
-                        }
-                    }
-
-                    $objResult->MoveNext();
+                if (
+                    $this->allActivated ||
+                    in_array($moduleName, $arrCmActiveModules)
+                ) {
+                    $this->arrActiveModules[] = $moduleName;
                 }
             }
-        }
 
-        /**
-         * Checks if the passed module is a core module.
-         *
-         * @access  public
-         * @param   string      $moduleName
-         * @return  boolean
-         */
-        public function isCoreModule($moduleName)
-        {
-            // Workaround due to customizing to set News is Module
-            // so it could be used as main navigation entry in backend.
-            if ($moduleName == 'News') {
-                return true;
-            }
-            return in_array($moduleName, $this->arrCoreModules);
+            $objResult->MoveNext();
         }
+    }
 
-        /**
-         * Checks if the passed module is active
-         * (application page exists and is active).
-         *
-         * @access  public
-         * @param   string      $moduleName
-         * @return  boolean
-         */
-        public function isModuleActive($moduleName)
-        {
-            return in_array($moduleName, $this->arrActiveModules);
+    /**
+     * Checks if the passed module is a core module.
+     *
+     * @access  public
+     * @param   string      $moduleName
+     * @return  boolean
+     */
+    public function isCoreModule($moduleName) {
+        // Workaround due to customizing to set News is Module
+        // so it could be used as main navigation entry in backend.
+        if ($moduleName == 'News') {
+            return true;
         }
+        return in_array($moduleName, $this->arrCoreModules);
+    }
 
-        /**
-         * Checks if the passed module is installed
-         * (application page exists).
-         *
-         * @access  public
-         * @param   string      $moduleName
-         * @return  boolean
-         */
-        public function isModuleInstalled($moduleName)
-        {
-            return in_array($moduleName, $this->arrInstalledModules);
-        }
+    /**
+     * Checks if the passed module is active
+     * (application page exists and is active).
+     *
+     * @access  public
+     * @param   string      $moduleName
+     * @return  boolean
+     */
+    public function isModuleActive($moduleName) {
+        return in_array($moduleName, $this->arrActiveModules);
+    }
 
-        /**
-         * Returns the cloudrexx core modules
-         * @return array List of core modules
-         */
-        public function getCoreModules()
-        {
-            return $this->arrCoreModules;
-        }
+    /**
+     * Checks if the passed module is installed
+     * (application page exists).
+     *
+     * @access  public
+     * @param   string      $moduleName
+     * @return  boolean
+     */
+    public function isModuleInstalled($moduleName) {
+        return in_array($moduleName, $this->arrInstalledModules);
+    }
 
-        /**
-         * Returns the cloudrexx modules
-         * @return array List of modules
-         */
-        public function getModules()
-        {
-            return $this->arrModules;
-        }
+    /**
+     * Returns the cloudrexx core modules
+     * @return array List of core modules
+     */
+    public function getCoreModules() {
+        return $this->arrCoreModules;
+    }
 
-        /**
-         * Returns the installed cloudrexx modules
-         * @return array List of installed modules
-         */
-        public function getInstalledModules()
-        {
-            return $this->arrInstalledModules;
-        }
+    /**
+     * Returns the cloudrexx modules
+     * @return array List of modules
+     */
+    public function getModules() {
+        return $this->arrModules;
+    }
 
-        /**
-         * Returns the active cloudrexx modules
-         * @return array List of active modules
-         */
-        public function getActiveModules()
-        {
-            return $this->arrActiveModules;
-        }
+    /**
+     * Returns the installed cloudrexx modules
+     * @return array List of installed modules
+     */
+    public function getInstalledModules() {
+        return $this->arrInstalledModules;
+    }
+
+    /**
+     * Returns the active cloudrexx modules
+     * @return array List of active modules
+     */
+    public function getActiveModules() {
+        return $this->arrActiveModules;
     }
 }
