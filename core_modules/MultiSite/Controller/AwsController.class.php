@@ -368,13 +368,6 @@ class AwsController extends HostController {
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getDnsRecord($name, $pleskId = 0) {
-        // @todo
-    }
-
-    /**
      * Get Route53 client object
      *
      * @return \Aws\Route53\Route53Client

@@ -60,11 +60,6 @@ class PleskController extends HostController {
     protected $apiVersion;
 
     /**
-     * DNS record cache
-     */
-    protected $cachedDnsRecords = array();
-
-    /**
      * {@inheritdoc}
      */
     public static function initSettings() {
@@ -1107,11 +1102,6 @@ class PleskController extends HostController {
             $error = (isset($systemError)?$systemError:$resultNode->errtext);
             throw new ApiRequestException("Error in adding DNS Record: {$error}");
         }
-        $this->cachedDnsRecords[$host] = array(
-            'ttl' => 300,
-            'type' => $type,
-            'value' => $value,
-        );
         return intval($resultNode->id);
     }
 
@@ -1125,9 +1115,6 @@ class PleskController extends HostController {
         \DBG::msg("MultiSite (PleskController): remove DNS-record: $type / $host / $recordId");
         if (empty($recordId)) {
             return false;
-        }
-        if (isset($this->cachedDnsRecords[$host])) {
-            unset($this->cachedDnsRecords[$host]);
         }
         $xmldoc = $this->getXmlDocument();
         $packet = $this->getRpcPacket($xmldoc);
@@ -1191,11 +1178,6 @@ class PleskController extends HostController {
             $error = (isset($systemError)?$systemError:$resultNode->errtext);
             throw new ApiRequestException("Error in fetching DNS Record: {$error}");
         }
-        $this->cachedDnsRecords[$host] = array(
-            'ttl' => 300,
-            'type' => $resultNode->data->type,
-            'value' => $resultNode->data->value,
-        );
 
         $recordType = $resultNode->data->type;
         $recordHost = substr($resultNode->data->host, 0, -1);
@@ -1472,61 +1454,9 @@ class PleskController extends HostController {
         if (!empty($responseArr)) {
             foreach($responseArr['result'] as $result) {
                 $resultArray[$result['id']] = $result['data']['host'];
-                $this->cachedDnsRecords[$result['data']['host']] = array(
-                    'ttl' => 300,
-                    'type' => $result['data']['type'],
-                    'value' => $result['data']['value'],
-                );
             }
             return $resultArray;
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDnsRecord($name, $pleskId = 0) {
-        if (!isset($this->cachedDnsRecords[$name])) {
-            if (!$pleskId) {
-                $this->getDnsRecords();
-            } else {
-                // search the API
-                $xmldoc = $this->getXmlDocument();
-                $packet = $this->getRpcPacket($xmldoc);
-                $dns = $xmldoc->createElement('dns');
-                $packet->appendChild($dns);
-
-                $getRec = $xmldoc->createElement('get_rec');
-                $dns->appendChild($getRec);
-
-                $filter = $xmldoc->createElement('filter');
-                $getRec->appendChild($filter);       
-                
-                //$siteIdTag = $xmldoc->createElement('site-id', $zoneId);
-                //$filter->appendChild($siteIdTag);
-
-                $id = $xmldoc->createElement('id', $recordId);
-                $filter->appendChild($id);
-                
-                $response = $this->executeCurl($xmldoc);
-                $resultNode = $response->dns->{'get_rec'}->result;
-                $errcode = $resultNode->errcode;
-                $systemError = $response->system->errtext;
-                if ('error' == (string)$resultNode->status || $systemError) {
-                    \DBG::dump($recordId);
-                    \DBG::dump($xmldoc->saveXML());
-                    \DBG::dump($response);
-                    $error = (isset($systemError)?$systemError:$resultNode->errtext);
-                    throw new ApiRequestException("Error in fetching DNS Record: {$error}");
-                }
-                $this->cachedDnsRecords[$host] = array(
-                    'ttl' => 300,
-                    'type' => $resultNode->data->type,
-                    'value' => $resultNode->data->value,
-                );
-            }
-        }
-        return $this->cachedDnsRecords[$name];
     }
     
     /**

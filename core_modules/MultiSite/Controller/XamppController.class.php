@@ -345,13 +345,6 @@ class XamppController extends HostController {
         \DBG::msg("MultiSite (XamppController): get Dns Records");
         return null;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDnsRecord($name, $pleskId = 0) {
-        throw new \Cx\Core_Modules\MultiSite\Controller\DnsControllerException();
-    }
     
     /**
      * Get Ftp Accounts
