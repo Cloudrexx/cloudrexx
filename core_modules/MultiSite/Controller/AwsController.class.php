@@ -585,13 +585,41 @@ class AwsController extends HostController {
              'Id' => $result->toArray()['Distribution']['Id'],
              'IfMatch' => $result->toArray()['ETag'],
         );
-        /*return array(
-            IAM access key name
-            IAM access key value
-        )*/
-        return $this->getUserStorageController()->createUserStorage(
+        $result = $this->getIamClient()->createUser(array(
+            'Path' => '/Customers/WebsiteOwners/',
+            'UserName' => $websiteName,
+        ));
+        if (!$result || !isset($result['User'])) {
+            \DBG::dump($result);
+            throw new WebDistributionControllerException('AWS responded with invalid result');
+        }
+        $result = $this->getIamClient()->addUserToGroup(array(
+            'GroupName' => 'WebsiteOwner',
+            'UserName' => $websiteName,
+        ));
+        if (!$result) {
+            \DBG::dump($result);
+            throw new WebDistributionControllerException('AWS responded with invalid result');
+        }
+        $result = $this->getIamClient()->createAccessKey(array(
+            'UserName' => $websiteName,
+        ));
+        if (!$result || !isset($result['AccessKey'])) {
+            \DBG::dump($result);
+            throw new WebDistributionControllerException('AWS responded with invalid result');
+        }
+        // @TODO: Remove the following DBG outputs for security reasons!
+        \DBG::log('S3 AccessKey ID: ' . $result['AccessKey']['AccessKeyId']);
+        \DBG::log('S3 AccessKey Secret: ' . $result['AccessKey']['SecretAccessKey']);
+        // @TODO: Replace by moving files to S3
+        $this->getUserStorageController()->createUserStorage(
             $websiteName,
             $codeBase
+        );
+        return array(
+            'S3AccessKeyId' => $result['AccessKey']['AccessKeyId'],
+            'S3AccessKeySecret' => $result['AccessKey']['SecretAccessKey'],
+            'S3Url' => $bucketLocation,
         );
     }
 
@@ -638,6 +666,14 @@ class AwsController extends HostController {
             }
             \DBG::msg('Bucket is already deleted');
         }
+        $result = $this->getIamClient()->deleteUser(array(
+            'UserName' => $websiteName,
+        ));
+        if (!$result) {
+            \DBG::dump($result);
+            throw new WebDistributionControllerException('AWS responded with invalid result');
+        }
+
         // The following is temporary until we can copy the skeleton to S3
         $this->getUserStorageController()->deleteUserStorage(
             $websiteName
@@ -694,6 +730,15 @@ class AwsController extends HostController {
      */
     protected function getS3Client() {
         return $this->getAwsClient('S3', $this->region, 'latest');
+    }
+
+    /**
+     * Get IAM client object
+     *
+     * @return \Aws\Iam\IamClient
+     */
+    protected function getIamClient() {
+        return $this->getAwsClient('Iam', $this->region, 'latest');
     }
 
     /*******************************************************/
