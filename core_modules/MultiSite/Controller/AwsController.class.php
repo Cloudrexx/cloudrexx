@@ -709,7 +709,7 @@ class AwsController extends HostController {
     /**
      * {@inheritdoc}
      */
-    public function createWebDistribution($domain, $documentRoot = 'httpdocs') {
+    public function createWebDistribution($domain, &$dnsTarget) {
         $websiteName = current(explode('.', $domain));
         $webDistributionConfig = array(
             'DistributionConfig' => array(

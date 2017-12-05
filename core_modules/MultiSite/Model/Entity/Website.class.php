@@ -589,12 +589,18 @@ class Website extends \Cx\Model\Base\EntityBase {
             \DBG::msg('Website: setup process..');
 
             $hostController = \Cx\Core_Modules\MultiSite\Controller\ComponentController::getHostingController();
-            $hostController->createWebDistribution($this->getFqdn()->getName());
-
-            $objDb = new \Cx\Core\Model\Model\Entity\Db($_DBCONFIG);
-            $objDbUser = new \Cx\Core\Model\Model\Entity\DbUser();
+            $dnsTarget = \Cx\Core\Setting\Controller\Setting::getValue(
+                'defaultWebsiteIp',
+                'MultiSite'
+            );
+            $hostController->createWebDistribution(
+                $this->getFqdn()->getName(),
+                $dnsTarget
+            );
 
             \DBG::msg('Website: setupDatabase..');
+            $objDb = new \Cx\Core\Model\Model\Entity\Db($_DBCONFIG);
+            $objDbUser = new \Cx\Core\Model\Model\Entity\DbUser();
             $this->setupDatabase($langId, $this->owner, $objDb, $objDbUser);
 
             \DBG::msg('Website: setupDataFolder..');
@@ -631,7 +637,6 @@ class Website extends \Cx\Model\Base\EntityBase {
 
             \DBG::msg('Website: Set state to '.self::STATE_ONLINE);
             $this->status = self::STATE_ONLINE;
-            $websiteIp = \Cx\Core\Setting\Controller\Setting::getValue('defaultWebsiteIp','MultiSite');
         }
 
         \Env::get('em')->persist($this);
@@ -844,7 +849,7 @@ class Website extends \Cx\Model\Base\EntityBase {
         \DBG::msg('Website: send setup response to Manager..');
         return array(
             'status'      => 'success',
-            'websiteIp'   => $websiteIp,
+            'websiteIp'   => $dnsTarget,
             'codeBase'    => $this->codeBase,
             'state'       => $this->status,
             'ftpPassword' => $ftpAccountPassword,

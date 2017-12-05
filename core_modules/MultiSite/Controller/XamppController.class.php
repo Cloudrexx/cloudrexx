@@ -459,9 +459,9 @@ class XamppController extends HostController {
      * Create new site/domain
      * 
      * @param string  $domain         Name of the site/domain to create
-     * @param string  $documentRoot   Document root to create the site/domain
+     * @param string  $dnsTarget      (reference) Target of the vanity DNS entry
      */
-    public function createWebDistribution($domain, $documentRoot = 'httpdocs') {
+    public function createWebDistribution($domain, &$dnsTarget) {
         \DBG::msg("MultiSite (XamppController): Create new site on existing subscription.");
         return true;
     }
