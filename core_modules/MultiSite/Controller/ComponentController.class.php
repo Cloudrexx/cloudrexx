@@ -3243,6 +3243,16 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         }
     }
 
+    /**
+     * Makes all modules active on ServiceServer so all MediaSources are loaded
+     */
+    public function preComponentLoad() {
+        if (\Cx\Core\Setting\Controller\Setting::getValue('mode','MultiSite') != static::MODE_SERVICE) {
+            return;
+        }
+        \Cx\Core\ModuleChecker::getInstance()->setAllActivated();
+    }
+
     protected function verifyRequest($cx) {
         $domainRepository = new \Cx\Core\Net\Model\Repository\DomainRepository();
         $managerDomain = $domainRepository->getMainDomain();
