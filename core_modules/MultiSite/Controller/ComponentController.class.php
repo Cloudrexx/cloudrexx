@@ -3250,7 +3250,12 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         if (\Cx\Core\Setting\Controller\Setting::getValue('mode','MultiSite') != static::MODE_SERVICE) {
             return;
         }
-        \Cx\Core\ModuleChecker::getInstance()->setAllActivated();
+        \Cx\Core\ModuleChecker::getInstance(
+            $this->cx->getDb()->getEntityManager(),
+            $this->cx->getDb()->getAdoDb(),
+            $this->cx->getClassLoader(),
+            true
+        );
     }
 
     protected function verifyRequest($cx) {
