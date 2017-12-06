@@ -89,20 +89,29 @@ abstract class Widget extends \Cx\Model\Base\EntityBase {
         $this->type = $type;
         if ($this->getType() == static::TYPE_CALLBACK) {
             \Cx\Core\Html\Sigma::addCallbackPlaceholder(
-                $this->getName(),
+                strtolower($this->getName()),
                 function() {
                     $args = func_get_args();
-                    $template = current($args);
-                    if (!$template || !$template->getParseTarget()) {
+                    $template = array_shift($args);
+                    if (!$template) {
                         throw new \Exception('Wrong argument list for callback for widget "' . $this->getName() . '"');
                     }
+                    if (!$template->getParseTarget()) {
+                        throw new \Exception('In order to use widgets of type "callback" you need to set a parse target to your Sigma template');
+                    }
+                    // Since we parse callback Widgets as placeholders we
+                    // need to supply an appropriate template
+                    $parseTemplate = new \Cx\Core\Html\Sigma();
+                    $parseTemplate->setTemplate('{' . $this->getName() . '}');
                     $this->parse(
-                        $template,
+                        $parseTemplate,
                         $this->cx->getResponse(),
                         $template->getParseTarget()->getComponent->getName(),
                         get_class($template->getParseTarget()),
-                        $template->getParseTarget()->getId()
+                        $template->getParseTarget()->getId(),
+                        $args
                     );
+                    return $template->get();
                 }
             );
         }
@@ -121,7 +130,10 @@ abstract class Widget extends \Cx\Model\Base\EntityBase {
      * @return string Name of this widget
      */
     public function getName() {
-        return $this->name;
+        if ($this->getType() == static::TYPE_BLOCK) {
+            return strtolower($this->name);
+        }
+        return strtoupper($this->name);
     }
 
     /**
@@ -165,21 +177,22 @@ abstract class Widget extends \Cx\Model\Base\EntityBase {
         switch ($this->getType()) {
             case static::TYPE_CALLBACK:
             case static::TYPE_PLACEHOLDER:
-            if (!$template->placeholderExists($this->getName())) {
-                return;
-            }
-            $content = $this->internalParse(
-                $template,
-                $response,
-                $targetComponent,
-                $targetEntity,
-                $targetId
-            );
-            \LinkGenerator::parseTemplate($content);
-            $template->setVariable(
-                $this->getName(),
-                $content
-            );
+                if (!$template->placeholderExists($this->getName())) {
+                    return;
+                }
+                $content = $this->internalParse(
+                    $template,
+                    $response,
+                    $targetComponent,
+                    $targetEntity,
+                    $targetId,
+                    $arguments
+                );
+                \LinkGenerator::parseTemplate($content);
+                $template->setVariable(
+                    $this->getName(),
+                    $content
+                );
                 break;
             case static::TYPE_BLOCK:
                 if (!$template->blockExists($this->getName())) {

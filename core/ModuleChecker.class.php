@@ -116,35 +116,35 @@ class ModuleChecker {
 
     protected static $instance = null;
 
-    public static function getInstance($em, $db, $cl) {
+    /**
+     * Singleton pattern instance getter
+     * @param \EntityManager $em Doctrine EntityManager
+     * @param \ADONewConnection $db AdoDB connection
+     * @param \Cx\Core\ClassLoader\ClassLoader $cl Cloudrexx class loader
+     * @param boolean $setAllActivated (optional) Shows all modules as activated, default false
+     * @return self Unique instance of this class
+     */
+    public static function getInstance($em, $db, $cl, $setAllActivated = false) {
         if (!static::$instance) {
-            static::$instance = new static($em, $db, $cl);
+            static::$instance = new static($em, $db, $cl, $setAllActivated);
         }
         return static::$instance;
     }
 
     /**
      * Constructor
-     *
-     * @access  public
-     * @param   EntityManager                     $em
-     * @param   ADONewConnection                  $db
-     * @param   \Cx\Core\ClassLoader\ClassLoader  $cl
+     * @param \EntityManager $em Doctrine EntityManager
+     * @param \ADONewConnection $db AdoDB connection
+     * @param \Cx\Core\ClassLoader\ClassLoader $cl Cloudrexx class loader
+     * @param boolean $setAllActivated (optional) Shows all modules as activated, default false
      */
-    protected function __construct($em, $db, $cl) {
+    protected function __construct($em, $db, $cl, $setAllActivated = false) {
         $this->em = $em;
         $this->db = $db;
         $this->cl = $cl;
+        $this->allActivated = $setAllActivated;
 
         $this->init();
-    }
-
-    /**
-     * Sets all modules as activated (as if they would have content pages)
-     * Only use in preComponentLoad or earlier!
-     */
-    public function setAllActivated() {
-        $this->allActivated = true;
     }
 
     /**
@@ -153,7 +153,7 @@ class ModuleChecker {
      * @access  protected
      */
     protected function init() {
-        if (!$this->allActivated()) {
+        if (!$this->allActivated) {
             // check the content for installed and used modules
             $arrCmActiveModules = array();
             $arrCmInstalledModules = array();

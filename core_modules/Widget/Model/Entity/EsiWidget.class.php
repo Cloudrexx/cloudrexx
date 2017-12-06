@@ -192,7 +192,10 @@ class EsiWidget extends Widget {
         $esiContent = $this->getComponent('Cache')->getEsiContent(
             $this->getJsonAdapterName(),
             $this->getJsonMethodName(),
-            $this->getEsiParams($targetComponent, $targetEntity, $targetId)
+            array_merge(
+                $params,
+                $this->getEsiParams($targetComponent, $targetEntity, $targetId)
+            )
         );
         if ($this->getType() != static::TYPE_BLOCK) {
             return $esiContent;

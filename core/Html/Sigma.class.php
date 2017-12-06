@@ -106,7 +106,7 @@ class Sigma extends \HTML_Template_Sigma {
                 $name,
                 function() use ($callback) {
                     $args = func_get_args();
-                    array_push($this);
+                    array_unshift($args, $this);
                     return call_user_func_array($callback, $args);
                 },
                 true

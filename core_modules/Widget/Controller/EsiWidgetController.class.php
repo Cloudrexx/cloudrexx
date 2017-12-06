@@ -118,7 +118,6 @@ abstract class EsiWidgetController extends \Cx\Core\Core\Model\Entity\Controller
         }
 
         // resolve widget template
-        $widget = $this->getComponent('Widget')->getWidget($params['get']['name']);
         return $this->internalParseWidget($widget, $params);
     }
 
