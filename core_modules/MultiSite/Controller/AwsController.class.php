@@ -152,7 +152,7 @@ class AwsController extends HostController {
                     $i,
                     $initValues['type'],
                     $initValues['values'],
-                    'plesk'
+                    'aws'
                 )
             ) {
                 throw new MultiSiteException(
