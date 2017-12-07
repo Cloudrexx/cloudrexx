@@ -85,6 +85,13 @@ class AwsController extends HostController {
     protected $credentialsSecret;
 
     /**
+     * AWS ACM certificate ARN for *.main_domain
+     *
+     * @var string
+     */
+    protected $mainCertificateArn;
+
+    /**
      * List of AWS client instances, max. 1 per service
      * @var array Key=>value array, key is service name
      */
@@ -131,6 +138,9 @@ class AwsController extends HostController {
             'hostedZoneId' => array(
                 'value' => '',
             ),
+            'mainCertificateArn' => array(
+                'value' => '',
+            ),
         );
         $i = 0;
         \Cx\Core\Setting\Controller\Setting::init('MultiSite', 'aws', 'FileSystem');
@@ -172,7 +182,8 @@ class AwsController extends HostController {
             \Cx\Core\Setting\Controller\Setting::getValue('region', 'MultiSite'),
             \Cx\Core\Setting\Controller\Setting::getValue('version', 'MultiSite'),
             \Cx\Core\Setting\Controller\Setting::getValue('timeToLive', 'MultiSite'),
-            \Cx\Core\Setting\Controller\Setting::getValue('hostedZoneId', 'MultiSite')
+            \Cx\Core\Setting\Controller\Setting::getValue('hostedZoneId', 'MultiSite'),
+            \Cx\Core\Setting\Controller\Setting::getValue('mainCertificateArn', 'MultiSite')
         );
     }
 
@@ -185,6 +196,7 @@ class AwsController extends HostController {
      * @param string $version           AWS version
      * @param integer $ttl              Time to life
      * @param string $hostedZoneId      AWS zone id
+     * @param string $mainCertificateArn AWS ACM certificate ARN for *.main_domain
      * @throws \Aws\Exception\AwsException When connection fails
      */
     public function __construct(
@@ -193,7 +205,8 @@ class AwsController extends HostController {
         $region,
         $version,
         $ttl,
-        $hostedZoneId
+        $hostedZoneId,
+        $mainCertificateArn
     ) {
         //Load the AWS SDK
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
@@ -206,6 +219,7 @@ class AwsController extends HostController {
         $this->region = $region;
         $this->credentialsKey = $credentialsKey;
         $this->credentialsSecret = $credentialsSecret;
+        $this->mainCertificateArn = $mainCertificateArn;
     }
 
     /**
@@ -854,6 +868,11 @@ class AwsController extends HostController {
                     ),
                 ),
                 'PriceClass' => 'PriceClass_100',
+                'ViewerCertificate' => array(
+                    'SSLSupportMethod' => 'sni-only',
+                    'CertificateSource' => 'acm',
+                    'ACMCertificateArn' => $this->mainCertificateArn,
+                ),
             )
         );
         $result = $this->getCloudFrontClient()->createDistribution(
