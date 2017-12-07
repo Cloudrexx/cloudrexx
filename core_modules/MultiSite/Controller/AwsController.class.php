@@ -871,7 +871,12 @@ class AwsController extends HostController {
     public function deleteWebDistribution($domain) {
         \DBG::msg(__METHOD__);
         $websiteName = current(explode('.', $domain));
-        $updatedConfig = $this->getWebDistributionConfig($websiteName);
+        try {
+            $updatedConfig = $this->getWebDistributionConfig($websiteName);
+        } catch (WebDistributionControllerException $e) {
+            \DBG::msg('Web distribution already gone');
+            return;
+        }
         // we can only disable the distribution, it will be garbage
         // collected later by a lambda function
         $updatedConfig['DistributionConfig']['Enabled'] = false;
@@ -961,7 +966,7 @@ class AwsController extends HostController {
             $this->getAllWebDistributions();
         }
         if (!isset($this->cloudFrontCache[$websiteName])) {
-            throw new WebDistributionControllerException('');
+            throw new WebDistributionControllerException('No such distribution');
         }
         // getAllWebDistributions() does not set IfMatch
         if (!isset($this->cloudFrontCache[$websiteName]['IfMatch'])) {
