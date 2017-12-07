@@ -660,43 +660,57 @@ class AwsController extends HostController {
             }
             \DBG::msg('Bucket is already deleted');
         }
-        $result = $this->getIamClient()->listAccessKeys(array(
-            'UserName' => $websiteName,
-        ));
-        if (!$result || !isset($result['AccessKeyMetadata'])) {
-            \DBG::dump($result);
-            throw new WebDistributionControllerException(
-                'AWS responded with invalid result'
-            );
-        }
-        foreach ($result['AccessKeyMetadata'] as $accessKey) {
-            $subResult = $this->getIamClient()->deleteAccessKey(array(
-                'AccessKeyId' => $accessKey['AccessKeyId'],
+        try {
+            $result = $this->getIamClient()->listAccessKeys(array(
                 'UserName' => $websiteName,
             ));
-            if (!$subResult) {
+            if (!$result || !isset($result['AccessKeyMetadata'])) {
                 \DBG::dump($result);
                 throw new WebDistributionControllerException(
                     'AWS responded with invalid result'
                 );
             }
-        }
-        $result = $this->getIamClient()->removeUserFromGroup(array(
-            'GroupName' => 'WebsiteOwner',
-            'UserName' => $websiteName,
-        ));
-        if (!$result) {
-            \DBG::dump($result);
-            throw new WebDistributionControllerException(
-                'AWS responded with invalid result'
-            );
-        }
-        $result = $this->getIamClient()->deleteUser(array(
-            'UserName' => $websiteName,
-        ));
-        if (!$result) {
-            \DBG::dump($result);
-            throw new WebDistributionControllerException('AWS responded with invalid result');
+            foreach ($result['AccessKeyMetadata'] as $accessKey) {
+                $subResult = $this->getIamClient()->deleteAccessKey(array(
+                    'AccessKeyId' => $accessKey['AccessKeyId'],
+                    'UserName' => $websiteName,
+                ));
+                if (!$subResult) {
+                    \DBG::dump($result);
+                    throw new WebDistributionControllerException(
+                        'AWS responded with invalid result'
+                    );
+                }
+            }
+            $result = $this->getIamClient()->removeUserFromGroup(array(
+                'GroupName' => 'WebsiteOwner',
+                'UserName' => $websiteName,
+            ));
+            if (!$result) {
+                \DBG::dump($result);
+                throw new WebDistributionControllerException(
+                    'AWS responded with invalid result'
+                );
+            }
+            $result = $this->getIamClient()->deleteUser(array(
+                'UserName' => $websiteName,
+            ));
+            if (!$result) {
+                \DBG::dump($result);
+                throw new WebDistributionControllerException(
+                    'AWS responded with invalid result'
+                );
+            }
+        } catch (\Aws\Iam\Exception\IamException $e) {
+            if (
+                strpos($e->getMessage(), 'ListAccessKeys') === false ||
+                strpos($e->getMessage(), 'AccessDenied') === false
+            ) {
+                \DBG::dump($e->getMessage());
+                // unknown error, (re-)throw exception
+                throw $e;
+            }
+            \DBG::msg('User is already deleted');
         }
 
         // The following is temporary until we can copy the skeleton to S3
