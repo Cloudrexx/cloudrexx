@@ -501,6 +501,17 @@ class AwsController extends HostController {
             '\1',
             $bucketLocation
         );
+        $result = $this->getS3Client()->putBucketVersioning(array(
+            'Bucket' => 'customer-website-' . $websiteName,
+            'VersioningConfiguration' => array(
+                'MFADelete' => 'Disabled',
+                'Status' => 'Enabled',
+            ),
+        ));
+        if (!$result) {
+            \DBG::dump($result);
+            throw new UserStorageControllerException('AWS responded with invalid result');
+        }
         \DBG::msg('S3 Bucket URL is "' . $bucketLocation . '"');
 
         // create IAM user with access to the bucket
