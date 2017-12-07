@@ -794,10 +794,18 @@ class AwsController extends HostController {
      * {@inheritdoc}
      */
     public function createWebDistribution($domain, &$dnsTarget) {
-        $websiteName = current(explode('.', $domain));
+        $domainParts = explode('.', $domain);
+        $websiteName = current($domainParts);
+        unset($domain[1]);
+        $vanityUrl = implode('.', $domain);
         $webDistributionConfig = array(
             'DistributionConfig' => array(
-                'Aliases' => array('Quantity' => 0),
+                'Aliases' => array(
+                    'Quantity' => 1,
+                    'Items' => array(
+                        $vanityUrl,
+                    ),
+                ),
                 'CacheBehaviors' => array('Quantity' => 0),
                 'Comment' => 'Customer website ' . $websiteName,
                 'Enabled' => true,
