@@ -521,15 +521,7 @@ class AwsController extends HostController {
                 'OriginAccessIdentity' => '',
             ),
         );
-        $mediaSources = \Cx\Core\Core\Controller\Cx::instanciate()->getMediaSourceManager()->getMediaTypes();
-// currently adds:
-// themes/*
-// images/attach/*
-// images/content/*
-// should add:
-// media/*
-// images/*
-// themes/*
+        $mediaSources = \Cx\Core\Core\Controller\Cx::instanciate()->getMediaSourceManager()->getAllMediaTypePaths();
         foreach ($mediaSources as $mediaSource) {
             $pattern = $mediaSource->getDirectory();
             $pattern = substr($pattern[1], 1) . '/*';
