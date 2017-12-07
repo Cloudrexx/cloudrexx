@@ -807,8 +807,8 @@ class AwsController extends HostController {
     public function createWebDistribution($domain, &$dnsTarget) {
         $domainParts = explode('.', $domain);
         $websiteName = current($domainParts);
-        unset($domain[1]);
-        $vanityUrl = implode('.', $domain);
+        unset($domainParts[1]);
+        $vanityUrl = implode('.', $domainParts);
         $webDistributionConfig = array(
             'DistributionConfig' => array(
                 'Aliases' => array(
