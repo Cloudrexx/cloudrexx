@@ -98,11 +98,6 @@ class AwsController extends HostController {
     protected $awsClients = array();
 
     /**
-     * XAMPP controller for user storage (temporary)
-     */
-    protected $userStorageController;
-
-    /**
      * XAMPP controller for db storage
      */
     protected $dbController;
@@ -630,16 +625,95 @@ class AwsController extends HostController {
         // @TODO: Remove the following DBG outputs for security reasons!
         \DBG::log('S3 AccessKey ID: ' . $result['AccessKey']['AccessKeyId']);
         \DBG::log('S3 AccessKey Secret: ' . $result['AccessKey']['SecretAccessKey']);
-        // @TODO: Replace by moving files to S3
-        $this->getUserStorageController()->createUserStorage(
-            $websiteName,
-            $codeBase
-        );
-        return array(
+        $s3credentials = array(
             'S3AccessKeyId' => $result['AccessKey']['AccessKeyId'],
             'S3AccessKeySecret' => $result['AccessKey']['SecretAccessKey'],
             'S3Url' => $bucketLocation,
         );
+        try {
+            $this->copySkeleton(
+                $websiteName,
+                $codeBase,
+                $s3credentials
+            );
+        } catch (\Exception $e) {
+            throw new UserStorageControllerException('Unable to setup data folder');
+        }
+        return $s3credentials;
+    }
+
+    /**
+     * Copies the skeleton to S3/EFS
+     * @todo: Files should be copied to EFS and website instructed to move user storage
+     * @param string $websiteName Name of the website
+     * @param string $codeBase Code base name of the website, empty for default
+     * @param array $s3credentials Array with "S3AccessKeyId", "S3AccessKeySecret" and "S3Url" indexes
+     * @throws \Exception if a file copy operation fails
+     */
+    protected function copySkeleton($websiteName, $codeBase, $s3credentials) {
+        // Prepare base values
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $codeBaseOfWebsite = $cx->getCodeBaseDocumentRootPath();
+        if (!empty($codeBase)) {
+            $codeBaseOfWebsite = \Cx\Core\Setting\Controller\Setting::getValue(
+                'codeBaseRepository',
+                'MultiSite'
+            ) . '/' . $codeBase;
+        }
+        $codeBaseWebsiteSkeletonPath = $codeBaseOfWebsite .
+            $cx->getCoreModuleFolderName() .
+            '/MultiSite/Data/WebsiteSkeleton';
+        $efsUserStoragePath = \Cx\Core\Setting\Controller\Setting::getValue(
+            'websitePath',
+            'MultiSite'
+        ) . '/' . $websiteName;
+        $mediaSources = $cx->getMediaSourceManager();
+        $s3client = new \Aws\S3\S3Client(array(
+            'version'     => 'latest',
+            'region'      => $this->region,
+            'credentials' => array(
+                'key'    => $s3credentials['S3AccessKeyId'],
+                'secret' => $s3credentials['S3AccessKeySecret'],
+            ),
+        ));
+        $s3client->registerStreamWrapper();
+
+        // for each file in skeleton (recursively):
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator(
+                $codeBaseWebsiteSkeletonPath,
+                RecursiveDirectoryIterator::SKIP_DOTS
+            ),
+            RecursiveIteratorIterator::SELF_FIRST,
+            RecursiveIteratorIterator::CATCH_GET_CHILD // Ignore "Permission denied"
+        );
+        foreach ($iterator as $path => $splFileInfo) {
+            if ($splFileInfo->isDir()) continue;
+            $relativePath = str_replace($path, $codeBaseWebsiteSkeletonPath, '');
+            try {
+                // if it's in a subfolder of a mediasource: copy to s3
+                $mediaSource = $mediaSourceManager->getMediaSourceByPath(
+                    $path,
+                    true
+                );
+                \DBG::msg('Copying skeleton file to S3: ' . $relativePath);
+                if (
+                    !copy(
+                        $path,
+                        's3://' . $s3credentials['S3Url'] . '/' . $relativePath
+                    )
+                ) {
+                    throw new UserStorageControllerException(
+                        'Unable to setup data folder'
+                    );
+                }
+            } catch (\Cx\Core\MediaSource\Model\Entity\MediaSourceManagerException $e) {
+                \DBG::msg('Copying skeleton file to EFS: ' . $relativePath);
+                // otherwise: copy to EFS
+                $objFile = new \Cx\Lib\FileSystem\File($path);
+                $objFile->copy($efsUserStoragePath . '/' . $relativePath);
+            }
+        }
     }
 
     /**
@@ -738,10 +812,23 @@ class AwsController extends HostController {
             \DBG::msg('User is already deleted');
         }
 
-        // The following is temporary until we can copy the skeleton to S3
-        $this->getUserStorageController()->deleteUserStorage(
-            $websiteName
-        );
+        $storageLocation = \Cx\Core\Setting\Controller\Setting::getValue(
+            'websitePath',
+            'MultiSite'
+        ) . '/' . $websiteName;
+        if (!file_exists($storageLocation)) {
+            return;
+        }
+        if (
+            !\Cx\Lib\FileSystem\FileSystem::delete_folder(
+                $storageLocation,
+                true
+            )
+        ) {
+            throw new UserStorageControllerException(
+                'Unable to delete the website data repository'
+            );
+        }
     }
 
     /**
@@ -774,17 +861,6 @@ class AwsController extends HostController {
     public function getAllEndUserAccounts($extendedData = false) {
         // there ARE no EndUserAccounts
         return array();
-    }
-
-    /**
-     * Returns the controller to route user storage calls to
-     * @return HostController Host controller for user storage calls
-     */
-    protected function getUserStorageController() {
-        if (!$this->userStorageController) {
-            $this->userStorageController = XamppController::fromConfig();
-        }
-        return $this->userStorageController;
     }
 
     /**
