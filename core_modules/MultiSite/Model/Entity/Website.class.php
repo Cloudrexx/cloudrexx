@@ -529,7 +529,7 @@ class Website extends \Cx\Model\Base\EntityBase {
         $websiteName = $this->getName();
         $websiteMail = $this->owner->getEmail(); 
         $websiteThemeId = $this->getThemeId(); 
-        $websiteIp = null;
+        $dnsTarget = null;
 
         // language
         $lang = $this->owner->getBackendLangId();
