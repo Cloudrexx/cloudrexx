@@ -302,12 +302,17 @@ class MediaSourceManager extends EntityBase
      * Get MediaSource by the given path
      *
      * @param  string $path File path
+     * @param boolean $ignorePermissions (optional) Defaults to false
      * @return \Cx\Core\MediaSource\Model\Entity\MediaSource MediaSource object
      * @throws MediaSourceManagerException
      */
-    public function getMediaSourceByPath($path)
+    public function getMediaSourceByPath($path, $ignorePermissions = false)
     {
-        foreach ($this->mediaTypes as $mediaSource) {
+        $mediaSources = $this->mediaTypes;
+        if ($ignorePermissions) {
+            $this->allMediaTypePaths;
+        }
+        foreach ($mediaSources as $mediaSource) {
             $mediaSourcePath = $mediaSource->getDirectory();
             if (strpos($path, $mediaSourcePath[1]) === 0) {
                 return $mediaSource;

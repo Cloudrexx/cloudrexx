@@ -511,6 +511,7 @@ $_ARRAYLANG['TXT_SHOP_COUPON_UNAVAILABLE_YET'] = "Der eingegebene Gutscheincode 
 $_ARRAYLANG['TXT_SHOP_COUPON_UNAVAILABLE_ALREADY'] = "Der eingegebene Gutscheincode ist nicht mehr gültig";
 $_ARRAYLANG['TXT_SHOP_COUPON_UNAVAILABLE_CAUSE_USED_UP'] = "Der eingegebene Gutscheincode wurde bereits verwendet und ist nicht mehr gültig";
 $_ARRAYLANG['TXT_SHOP_COUPON_UNAVAILABLE_FOR_AMOUNT'] = "Der eingegebene Gutscheincode ist erst ab einer Bestellsumme von %2\$s %1\$.2f gültig";
+$_ARRAYLANG['TXT_SHOP_COUPON_UNAVAILABLE_FOR_MULTIPLE_MWST'] = "Unfortunately, your coupon code is not valid for this order";
 $_ARRAYLANG['TXT_SHOP_ORDERITEMS_AMOUNT_MIN'] = "Achtung!<br />Der Gesamtbetrag Ihrer Bestellung erreicht nicht den Mindestbestellwert von %2\$s %1\$0.2f.";
 // Headers for Product ordering in list view
 $_ARRAYLANG['TXT_SHOP_ORDER_PRODUCT_ORD'] = "Standard";
