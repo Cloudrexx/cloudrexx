@@ -109,6 +109,12 @@ class AwsController extends HostController {
     protected $cloudFrontCache = array();
 
     /**
+     * Caches S3 credentials between bucket creation and user storage initialization
+     * @var array Key is website name, value is an array of S3 credenials
+     */
+    protected $s3credentials = array();
+
+    /**
      * {@inheritdoc}
      */
     public static function initSettings() {
@@ -496,6 +502,25 @@ class AwsController extends HostController {
      * {@inheritdoc}
      */
     public function createUserStorage($websiteName, $codeBase = '') {
+        try {
+            $this->copySkeleton(
+                $websiteName,
+                $codeBase,
+                $this->s3credentials[$websiteName]
+            );
+        } catch (\Exception $e) {
+            throw new UserStorageControllerException('Unable to setup data folder');
+        }
+        return $this->s3credentials[$websiteName];
+    }
+
+    /**
+     * Creates the user storage bucket
+     * This needs to be done ~20s before copying the file to the user storage
+     * since IAM takes that long to populate the new user.
+     * @param string $websiteName Name of the website
+     */
+    protected function createBucket($websiteName) {
         // create S3 bucket
         $result = $this->getS3Client()->createBucket(array(
             'Bucket' => 'customer-website-' . $websiteName,
@@ -625,21 +650,11 @@ class AwsController extends HostController {
         // @TODO: Remove the following DBG outputs for security reasons!
         \DBG::log('S3 AccessKey ID: ' . $result['AccessKey']['AccessKeyId']);
         \DBG::log('S3 AccessKey Secret: ' . $result['AccessKey']['SecretAccessKey']);
-        $s3credentials = array(
-            'S3AccessKeyId' => $result['AccessKey']['AccessKeyId'],
-            'S3AccessKeySecret' => $result['AccessKey']['SecretAccessKey'],
-            'S3Url' => $bucketLocation,
+        $this->s3credentials[$websiteName] = array(
+            'AccessKeyId' => $result['AccessKey']['AccessKeyId'],
+            'AccessKeySecret' => $result['AccessKey']['SecretAccessKey'],
+            'Url' => $bucketLocation,
         );
-        try {
-            $this->copySkeleton(
-                $websiteName,
-                $codeBase,
-                $s3credentials
-            );
-        } catch (\Exception $e) {
-            throw new UserStorageControllerException('Unable to setup data folder');
-        }
-        return $s3credentials;
     }
 
     /**
@@ -667,40 +682,47 @@ class AwsController extends HostController {
             'websitePath',
             'MultiSite'
         ) . '/' . $websiteName;
-        $mediaSources = $cx->getMediaSourceManager();
+        $mediaSourceManager = $cx->getMediaSourceManager();
         $s3client = new \Aws\S3\S3Client(array(
             'version'     => 'latest',
             'region'      => $this->region,
             'credentials' => array(
-                'key'    => $s3credentials['S3AccessKeyId'],
-                'secret' => $s3credentials['S3AccessKeySecret'],
+                'key'    => $s3credentials['AccessKeyId'],
+                'secret' => $s3credentials['AccessKeySecret'],
             ),
         ));
         $s3client->registerStreamWrapper();
+        $matches = array();
+        preg_match(
+            '#^(?:https?://)?([^\.]+)[^/]*/?$#',
+            $s3credentials['Url'],
+            $matches
+        );
+        $bucketDomain = $matches[1];
 
         // for each file in skeleton (recursively):
-        $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator(
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator(
                 $codeBaseWebsiteSkeletonPath,
-                RecursiveDirectoryIterator::SKIP_DOTS
+                \RecursiveDirectoryIterator::SKIP_DOTS
             ),
-            RecursiveIteratorIterator::SELF_FIRST,
-            RecursiveIteratorIterator::CATCH_GET_CHILD // Ignore "Permission denied"
+            \RecursiveIteratorIterator::SELF_FIRST,
+            \RecursiveIteratorIterator::CATCH_GET_CHILD // Ignore "Permission denied"
         );
         foreach ($iterator as $path => $splFileInfo) {
             if ($splFileInfo->isDir()) continue;
-            $relativePath = str_replace($path, $codeBaseWebsiteSkeletonPath, '');
+            $relativePath = str_replace($codeBaseWebsiteSkeletonPath, '', $path);
             try {
                 // if it's in a subfolder of a mediasource: copy to s3
                 $mediaSource = $mediaSourceManager->getMediaSourceByPath(
-                    $path,
+                    $relativePath,
                     true
                 );
                 \DBG::msg('Copying skeleton file to S3: ' . $relativePath);
                 if (
                     !copy(
                         $path,
-                        's3://' . $s3credentials['S3Url'] . '/' . $relativePath
+                        's3://' . $bucketDomain . $relativePath
                     )
                 ) {
                     throw new UserStorageControllerException(
@@ -971,6 +993,12 @@ class AwsController extends HostController {
         $cfDomain = $result['Distribution']['DomainName'];
         \DBG::msg('CloudFront Domain is "' . $cfDomain . '"');
         $dnsTarget = $cfDomain;
+
+        // We need to create the user storage here since IAM takes
+        // about 20s to populate the new user. Since DB init is between
+        // here and user storage init user will be populated in
+        // user storage init.
+        $this->createBucket($websiteName);
     }
 
     /**
