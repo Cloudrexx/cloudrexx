@@ -1207,6 +1207,7 @@ class CalendarEvent extends CalendarLibrary
         $invitedCrmGroups          = isset($data['calendar_event_invite_crm_memberships']) ? join(',', $data['calendar_event_invite_crm_memberships']) : '';
         $invited_mails             = isset($data['invitedMails']) ? contrexx_addslashes(contrexx_strip_tags($data['invitedMails'])) : '';
         $send_invitation           = isset($data['sendInvitation']) ? intval($data['sendInvitation']) : 0;
+        $exclude_registered        = isset($data['excludeFromInvitation']) ? intval($data['excludeFromInvitation']) : 0;
         $invitationTemplate        = isset($data['invitationEmailTemplate']) ? contrexx_input2raw($data['invitationEmailTemplate']) : array();
         $registration              =   isset($data['registration']) && in_array($data['registration'], array(self::EVENT_REGISTRATION_NONE, self::EVENT_REGISTRATION_INTERNAL, self::EVENT_REGISTRATION_EXTERNAL))
                                      ? intval($data['registration']) : 0;
@@ -1677,7 +1678,7 @@ class CalendarEvent extends CalendarLibrary
             // TO-DO set form data into $this
             $legacyEvent    = new CalendarEvent($this->id);
             $objMailManager = new \Cx\Modules\Calendar\Controller\CalendarMailManager();
-            $objMailManager->sendMail($legacyEvent, \Cx\Modules\Calendar\Controller\CalendarMailManager::MAIL_INVITATION, null, $invitationTemplate);
+            $objMailManager->sendMail($legacyEvent, \Cx\Modules\Calendar\Controller\CalendarMailManager::MAIL_INVITATION, null, $invitationTemplate, $exclude_registered);
         }
         foreach ($event->getInvite() as $invite) {
             $em->detach($invite);

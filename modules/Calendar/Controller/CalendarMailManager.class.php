@@ -224,12 +224,19 @@ class CalendarMailManager extends CalendarLibrary {
      * Initialize the mail functionality to the recipient
      *
      * @param \Cx\Modules\Calendar\Controller\CalendarEvent $event          Event instance
-     * @param integer $actionId       Mail action id
-     * @param integer $regId          Registration id
-     * @param array $arrMailTemplateIds   Prefered templates of the specified action to be sent
+     * @param integer   $actionId               Mail action id
+     * @param integer   $regId                  Registration id
+     * @param array     $arrMailTemplateIds     Prefered templates of the specified action to be sent
+     * @param boolean   $exclude_registered     If true, all guests which are already
+     *                                          in a list, will not be invited again
      */
-    function sendMail(CalendarEvent $event, $actionId, $regId=null, $arrMailTemplateIds = array())
-    {
+    function sendMail(
+        CalendarEvent $event,
+        $actionId,
+        $regId = null,
+        $arrMailTemplateIds = array(),
+        $exclude_registered = false
+    ) {
         global $_ARRAYLANG, $_CONFIG ;
 
         $db = \Cx\Core\Core\Controller\Cx::instanciate()->getDb()->getAdoDb();
@@ -299,7 +306,7 @@ class CalendarMailManager extends CalendarLibrary {
 
         $placeholder = array('[[TITLE]]', '[[START_DATE]]', '[[END_DATE]]', '[[LINK_EVENT]]', '[[LINK_REGISTRATION]]', '[[USERNAME]]', '[[FIRSTNAME]]', '[[LASTNAME]]', '[[URL]]', '[[DATE]]');
 
-        $recipients = $this->getSendMailRecipients($actionId, $event, $regId, $objRegistration);
+        $recipients = $this->getSendMailRecipients($actionId, $event, $regId, $objRegistration, $exclude_registered);
 
         $objMail = new \Cx\Core\MailTemplate\Model\Entity\Mail();
         $objMail->SetFrom($_CONFIG['coreAdminEmail'], $_CONFIG['coreGlobalPageTitle']);
@@ -560,15 +567,22 @@ class CalendarMailManager extends CalendarLibrary {
     /**
      * Returns the array recipients
      *
-     * @param integer $actionId         Mail Action
-     * @param object  $objEvent         Event object
-     * @param integer $regId            registration id
-     * @param object  $objRegistration  Registration object
+     * @param integer $actionId             Mail Action
+     * @param object  $objEvent             Event object
+     * @param integer $regId                registration id
+     * @param object  $objRegistration      Registration object
+     * @param boolean $exclude_registered   If true, all guests which are already
+     *                                      in a list, will not be invited again
      *
      * @return array returns the array recipients
      */
-    private function getSendMailRecipients($actionId, $objEvent, $regId = 0, $objRegistration = null)
-    {
+    private function getSendMailRecipients(
+        $actionId,
+        $objEvent,
+        $regId = 0,
+        $objRegistration = null,
+        $exclude_registered = false
+    ) {
         global $_CONFIG, $_LANGID;
 
         $recipients = array();
@@ -719,6 +733,27 @@ class CalendarMailManager extends CalendarLibrary {
         foreach ($this->mailList as $langId => $mailList) {
             foreach ($mailList['recipients'] as $email => $langId) {
                 $recipients[$email] = (new MailRecipient())->setLang($langId)->setAddress($email);
+            }
+        }
+
+        // exclude all guests which are already registered on any of the lists
+        if($exclude_registered && $actionId == static::MAIL_INVITATION) {
+            // get all guests which are on a list
+            $query = 'SELECT `v`.`value` AS `mail`
+                        FROM `'.DBPREFIX.'module_calendar_registration_form_field_value` AS `v`
+                        INNER JOIN `'.DBPREFIX.'module_calendar_registration_form_field` AS `f`
+                          ON `v`.`field_id` = `f`.`id`
+                        INNER JOIN `'.DBPREFIX.'module_calendar_registration` AS `r`
+                          ON `v`.`reg_id` = `r`.`id`
+                        WHERE `r`.`event_id` = ' . $objEvent->getId() . '
+                        AND `f`.`type` = \'mail\'';
+            $result = $db->Execute($query);
+            if ($result !== false) {
+                while (!$result->EOF) {
+                    // delete all registered guests out of the recipients
+                    unset($recipients[$result->fields['mail']]);
+                    $result->MoveNext();
+                }
             }
         }
 

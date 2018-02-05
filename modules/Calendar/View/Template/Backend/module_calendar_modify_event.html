@@ -156,8 +156,10 @@
         $J(".sendInvitation").click(function() {
             if ($J(this).is(":checked")) {
                 $J(".invitationEmailTemplateContainer").show();
+                $J("#invitationExclude").show();
             } else {
                 $J(".invitationEmailTemplateContainer").hide();
+                $J("#invitationExclude").hide();
             }
         });
         $J( ".eventLocationType" ).click(function(){
@@ -1313,6 +1315,16 @@
                         </div>
                         <!-- END invitation_email_template -->
                     </div>
+                </td>
+            </tr>
+            <tr class="row1" id="invitationExclude" style="display: none;">
+                <td valign="top">
+                    {TXT_CALENDAR_EVENT_EXCLUDE_FROM_INVITATION}
+                    <span class="icon-info tooltip-trigger"></span>
+                    <span class="tooltip-message">{TXT_CALENDAR_EVENT_EXCLUDE_TOOLTIP}</span>
+                </td>
+                <td colspan="2">
+                    <input name="excludeFromInvitation" class="excludeFromInvitation" type="checkbox" value="1" />
                 </td>
             </tr>
         </table>
