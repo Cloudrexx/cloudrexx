@@ -156,8 +156,10 @@
         $J(".sendInvitation").click(function() {
             if ($J(this).is(":checked")) {
                 $J(".invitationEmailTemplateContainer").show();
+                $J("#invitationExclude").show();
             } else {
                 $J(".invitationEmailTemplateContainer").hide();
+                $J("#invitationExclude").hide();
             }
         });
         $J( ".eventLocationType" ).click(function(){
@@ -1313,6 +1315,19 @@
                         </div>
                         <!-- END invitation_email_template -->
                     </div>
+                </td>
+            </tr>
+            <tr class="row1" id="invitationExclude" style="display: none;">
+                <td valign="top">
+                    {TXT_CALENDAR_EVENT_SEND_INVITATION_TO}
+                    <span class="icon-info tooltip-trigger"></span>
+                    <span class="tooltip-message">{TXT_CALENDAR_EVENT_SEND_INVITATION_TO_TOOLTIP}</span>
+                </td>
+                <td colspan="2">
+                    <input type="radio" name="sendMailTo" id="allUsers" value="all" checked="checked"/><label for="allUsers"> {TXT_CALENDAR_EVENT_SEND_INVITATION_TO_ALL}</label><br />
+                    <input type="radio" name="sendMailTo" id="signedInUsers" value="signedIn" /><label for="signedInUsers"> {TXT_CALENDAR_EVENT_SEND_INVITATION_TO_SIGNEDIN}</label><br />
+                    <input type="radio" name="sendMailTo" id="inactiveUsers" value="inactive" /><label for="inactiveUsers"> {TXT_CALENDAR_EVENT_SEND_INVITATION_TO_INACTIVE}</label>
+
                 </td>
             </tr>
         </table>
