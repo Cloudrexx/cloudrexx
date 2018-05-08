@@ -1260,7 +1260,7 @@ JSCODE;
                 $intDiffYear = $this->arrSettings['settingsEntryDisplaydurationValue'];
                 break;
         }
-
+        $intOldReadyToConfirm = null;
         if(empty($intId)) {
             if($objInit->mode == 'backend') {
                 $intConfirmed = 1;

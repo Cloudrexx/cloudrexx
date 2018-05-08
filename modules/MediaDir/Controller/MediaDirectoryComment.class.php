@@ -172,8 +172,9 @@ EOF;
                 $bolGenerateCommentForm = true;
             }
 
-            if($bolGenerateCommentForm) {
-                if($objUser->login()) {
+            if ($bolGenerateCommentForm) {
+                $strCaptchaCode = null;
+                if ($objUser->login()) {
                     $strCommentFormName = htmlspecialchars($objUser->getUsername(), ENT_QUOTES, CONTREXX_CHARSET);
                     $strCommentFormMail = htmlspecialchars($objUser->getEmail(), ENT_QUOTES, CONTREXX_CHARSET);
                     $strCommentFormUrl = htmlspecialchars($objUser->getProfileAttribute('website'), ENT_QUOTES, CONTREXX_CHARSET);

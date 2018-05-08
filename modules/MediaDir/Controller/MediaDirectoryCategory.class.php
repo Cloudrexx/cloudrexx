@@ -69,7 +69,7 @@ class MediaDirectoryCategory extends MediaDirectoryLibrary
         $this->intCategoryId = intval($intCategoryId);
         $this->intParentId = intval($intParentId);
         $this->bolGetChildren = intval($bolGetChildren);
-        parent::__construct('.', $name);    
+        parent::__construct('.', $name);
         parent::getSettings();
         parent::getFrontendLanguages();
         $this->loadCategories();
@@ -499,7 +499,9 @@ class MediaDirectoryCategory extends MediaDirectoryLibrary
                         $spacer .= "&nbsp;";
                     }
 
-                    if(in_array($arrCategory['catId'], $this->arrSelectedCategories)) {
+                    if ($this->arrSelectedCategories
+                        && in_array($arrCategory['catId'],
+                            $this->arrSelectedCategories)) {
                       $this->strSelectedOptions .= '<option name="'.$strOptionId.'" value="'.$arrCategory['catId'].'">'.$spacer.contrexx_raw2xhtml($arrCategory['catName'][0]).'</option>';
                     } else {
                       $this->strNotSelectedOptions .= '<option name="'.$strOptionId.'" value="'.$arrCategory['catId'].'">'.$spacer.contrexx_raw2xhtml($arrCategory['catName'][0]).'</option>';
@@ -517,7 +519,7 @@ class MediaDirectoryCategory extends MediaDirectoryLibrary
                 $arrSelectorOptions['not_selected'] = $this->strNotSelectedOptions;
 
                 return $arrSelectorOptions;
-                
+
                 break;
             case 5:
                 //Frontend View Detail
@@ -525,7 +527,7 @@ class MediaDirectoryCategory extends MediaDirectoryLibrary
                 if (isset($requestParams['lid'])) {
                     $levelId = intval($requestParams['lid']);
                 }
-                
+
                 $thumbImage = $this->getThumbImage($arrCategories[$intCategoryId]['catPicture']);
                 $objTpl->setVariable(array(
                     $this->moduleLangVar.'_CATEGORY_LEVEL_TYPE' => 'category',
@@ -592,22 +594,22 @@ class MediaDirectoryCategory extends MediaDirectoryLibrary
                     $bolExpandCategory = $this->getExpandedCategories($intCategoryId, array($arrCategory));
                     $strLinkClass = $bolExpandCategory ? 'active' : 'inactive';
                     $strListClass = 'level_'.intval(count($arrParentIds)+$intStartLevel);
-                    
+
                     $this->strNavigationPlaceholder .= '<li class="'.$strListClass.'"><a href="'.$this->getAutoSlugPath(null, $arrCategory['catId'], $levelId).'" class="'.$strLinkClass.'">'.contrexx_raw2xhtml($arrCategory['catName'][0]).'</a></li>';
-            
+
                     $arrParentIds[] = $arrCategory['catId'];
 
                     //get children
                     if(!empty($arrCategory['catChildren']) && $arrCategory['catShowSubcategories'] == 1){
                     	if($bolExpandCategory) {
                             self::listCategories($objTpl, 6, $intCategoryId, $arrParentIds, null, null, $intStartLevel);
-                    	}                    
+                    	}
                     }
                     @array_pop($arrParentIds);
                 }
-                
+
                 return $this->strNavigationPlaceholder;
-                
+
                 break;
         }
     }
@@ -650,9 +652,9 @@ class MediaDirectoryCategory extends MediaDirectoryLibrary
         $intShowCategories = isset($arrData['categoryShowSubcategories']) ? contrexx_input2int($arrData['categoryShowSubcategories']) : 0;
         $intActive = intval($arrData['categoryActive']);
         $strPicture = contrexx_addslashes(contrexx_strip_tags($arrData['categoryImage']));
-        
+
         $arrName = $arrData['categoryName'];
-        
+
         $arrDescription = $arrData['categoryDescription'];
 
         $arrMetaDesc = $arrData['categoryMetaDesc'];
@@ -670,7 +672,7 @@ class MediaDirectoryCategory extends MediaDirectoryLibrary
         if (empty($arrMetaDesc[0])) {
             $arrMetaDesc[0] = '';
         }
-                        
+
         if(empty($intId)) {
             //insert new category
             $objInsertAttributes = $objDatabase->Execute("
@@ -738,7 +740,7 @@ class MediaDirectoryCategory extends MediaDirectoryLibrary
             ");
 
             if($objUpdateAttributes !== false) {
-                
+
                 $objDeleteNames = $objDatabase->Execute("DELETE FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_categories_names WHERE category_id='".$intId."'");
 
                 if($objInsertNames !== false) {
@@ -822,7 +824,7 @@ class MediaDirectoryCategory extends MediaDirectoryLibrary
                 $objSubCategoriesRS->MoveNext();
             };
         }
-        
+
         $whereCategory = '';
         if ($intCategoryId && $intCategoryId > 0) {
             $whereCategory = " AND `rel_categories`.`category_id` = " . intval($intCategoryId);
@@ -835,16 +837,16 @@ class MediaDirectoryCategory extends MediaDirectoryLibrary
                                                     `".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_categories` AS `rel_categories`
                                                 ON
                                                     `rel_categories`.`entry_id` = `entry`.`id`
-                                                LEFT JOIN 
+                                                LEFT JOIN
                                                     `".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields` AS rel_inputfield
-                                                ON  
+                                                ON
                                                     rel_inputfield.`entry_id` = `entry`.`id`
-                                                
-                                                WHERE 
+
+                                                WHERE
                                                     `entry`.`active` = 1
-                                                AND 
+                                                AND
                                                     (rel_inputfield.`form_id` = entry.`form_id`)
-                                                AND 
+                                                AND
                                                     (rel_inputfield.`field_id` = (".$this->getQueryToFindPrimaryInputFieldId()."))
                                                 AND
                                                     (rel_inputfield.`lang_id` = '" . static::getOutputLocale()->getId() . "')
