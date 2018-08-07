@@ -159,19 +159,22 @@ class ImageManager
      *
      * Note that all "Path" parameters are required to bring along their
      * own trailing slash.
-     *
-     * @param   string $strPath
-     * @param   string $strWebPath
-     * @param   string $file
-     * @param   int    $maxSize The maximum width or height of the image
-     * @param   int    $quality
-     * @param string   $thumb_name
-     * @param bool     $generateThumbnailByRatio
+     * @param   string  $strPath
+     * @param   string  $strWebPath
+     * @param   string  $file
+     * @param   int     $maxSize    The maximum width or height of the image
+     * @param   int     $quality
+     * @param   string  $thumb_name
+     * @param   bool    $generateThumbnailByRatio
      *
      * @return bool
      */
-    function _createThumb($strPath, $strWebPath, $file, $maxSize=80, $quality=90, $thumb_name='', $generateThumbnailByRatio = false)
+    function _createThumb($strPath, $strWebPath, $file, $maxSize=80,
+        $quality=90, $thumb_name='', $generateThumbnailByRatio = false)
     {
+        if (!is_file($strPath.$file)) {
+            return false;
+        }
         $_objImage = new ImageManager();
         $file      = basename($file);
         $tmpSize   = getimagesize($strPath.$file);
@@ -183,19 +186,26 @@ class ImageManager
         }
         $thumbWidth  = $tmpSize[0] * $factor;
         $thumbHeight = $tmpSize[1] * $factor;
-        if (!$_objImage->loadImage($strPath.$file)) return false;
-
-        if ($generateThumbnailByRatio && !$_objImage->resizeImageWithAspectRatio($thumbWidth, $thumbHeight, $quality)) {
-            return false;
-        } elseif (!$generateThumbnailByRatio && !$_objImage->resizeImage($thumbWidth, $thumbHeight, $quality)) {
+        if (!$_objImage->loadImage($strPath.$file)) {
             return false;
         }
-
+        if ($generateThumbnailByRatio
+            && !$_objImage->resizeImageWithAspectRatio(
+                $thumbWidth, $thumbHeight, $quality)) {
+            return false;
+        } elseif (!$generateThumbnailByRatio
+            && !$_objImage->resizeImage($thumbWidth, $thumbHeight, $quality)) {
+            return false;
+        }
         if (!(strlen($thumb_name) > 0)) {
             $thumb_name = self::getThumbnailFilename($file);
         }
-        if (!$_objImage->saveNewImage($strPath.$thumb_name)) return false;
-        if (!\Cx\Lib\FileSystem\FileSystem::makeWritable($strPath.$thumb_name)) return false;
+        if (!$_objImage->saveNewImage($strPath.$thumb_name)) {
+            return false;
+        }
+        if (!\Cx\Lib\FileSystem\FileSystem::makeWritable($strPath.$thumb_name)) {
+            return false;
+        }
         return true;
     }
 
