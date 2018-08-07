@@ -779,6 +779,7 @@ CREATE TABLE `contrexx_module_calendar_event` (
   `show_in` varchar(255) NOT NULL,
   `invited_groups` varchar(255) DEFAULT NULL,
   `invited_crm_groups` varchar(255) DEFAULT NULL,
+  `excluded_crm_groups` varchar(255) DEFAULT NULL,
   `invited_mails` mediumtext,
   `invitation_sent` int(1) NOT NULL,
   `invitation_email_template` varchar(255) NOT NULL,

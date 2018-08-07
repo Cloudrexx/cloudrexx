@@ -383,6 +383,13 @@ class CalendarEvent extends CalendarLibrary
     public $invitedCrmGroups = array();
 
     /**
+     * Event excluded CRM groups
+     *
+     * @var array
+     */
+    public $excludedCrmGroups = array();
+
+    /**
      * Event invited mail
      *
      * @access public
@@ -792,6 +799,7 @@ class CalendarEvent extends CalendarLibrary
                          event.google AS google,
                          event.invited_groups AS invited_groups,
                          event.invited_crm_groups AS invited_crm_groups,
+                         event.excluded_crm_groups AS excluded_crm_groups,
                          event.invited_mails AS invited_mails,
                          event.invitation_sent AS invitation_sent,
                          event.invitation_email_template AS invitation_email_template,
@@ -971,6 +979,7 @@ class CalendarEvent extends CalendarLibrary
 
                 $this->invitedGroups = preg_grep('/^$/', explode(',', $objResult->fields['invited_groups']), PREG_GREP_INVERT);
                 $this->invitedCrmGroups = preg_grep('/^$/', explode(',', $objResult->fields['invited_crm_groups']), PREG_GREP_INVERT);
+                $this->excludedCrmGroups = preg_grep('/^$/', explode(',', $objResult->fields['excluded_crm_groups']), PREG_GREP_INVERT);
                 $this->invitedMails =  htmlentities($objResult->fields['invited_mails'], ENT_QUOTES, CONTREXX_CHARSET);
                 $this->registration = intval($objResult->fields['registration']);
                 $this->registrationForm = intval($objResult->fields['registration_form']);
@@ -1211,6 +1220,7 @@ class CalendarEvent extends CalendarLibrary
         $showIn                    = isset($data['showIn']) ? contrexx_addslashes(contrexx_strip_tags(join(",",$data['showIn']))) : '';
         $invited_groups            = isset($data['selectedGroups']) ? join(',', $data['selectedGroups']) : '';
         $invitedCrmGroups          = isset($data['calendar_event_invite_crm_memberships']) ? join(',', $data['calendar_event_invite_crm_memberships']) : '';
+        $excludedCrmGroups         = isset($data['calendar_event_excluded_crm_memberships']) ? join(',', $data['calendar_event_excluded_crm_memberships']) : '';
         $invited_mails             = isset($data['invitedMails']) ? contrexx_addslashes(contrexx_strip_tags($data['invitedMails'])) : '';
         $send_invitation           = isset($data['sendInvitation']) ? intval($data['sendInvitation']) : 0;
         $invitationTemplate        = isset($data['invitationEmailTemplate']) ? contrexx_input2raw($data['invitationEmailTemplate']) : array();
@@ -1498,6 +1508,7 @@ class CalendarEvent extends CalendarLibrary
             'show_in'                       => $showIn,
             'invited_groups'                => $invited_groups,
             'invited_crm_groups'            => $invitedCrmGroups,
+            'excluded_crm_groups'           => $excludedCrmGroups,
             'invited_mails'                 => $invited_mails,
             'invitation_email_template'     => json_encode($invitationTemplate),
             'registration'                  => $registration,

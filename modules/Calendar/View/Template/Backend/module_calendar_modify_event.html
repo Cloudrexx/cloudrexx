@@ -86,6 +86,7 @@
 <script language="JavaScript" type="text/javascript">
     var defaultLang = cx.variables.get('language_id', 'calendar');
     var activeLang = [];
+    var calendarXhr = null;
     var blankExeception;
     var modifyEvent = {
         // elm => jquery object
@@ -203,6 +204,39 @@
 
         elm1.style.display = (elm1.style.display=='none') ? 'block' : 'none';
         elm2.style.display = (elm2.style.display=='none') ? 'block' : 'none';
+    }
+
+    function updateRecipientsCount() {
+        // abort last call
+        if(calendarXhr != null){
+            calendarXhr.abort();
+        }
+        // parse selected access user groups
+        var selectedGroups = new Array();
+        cx.jQuery('#selectedGroups option').each(function() {
+            selectedGroups.push(cx.jQuery(this).val());
+        });
+
+        calendarXhr = cx.ajax(
+            "calendar",
+            "getRecipientCount",
+            {
+                data: {
+                    'id': '{CALENDAR_EVENT_ID}',
+                    'lang_id': cx.jQuery("input[name='showIn[]']").val(),
+                    'invite_crm_memberships':
+                        cx.jQuery("#calendar_event_invite_crm_memberships").val(),
+                    'excluded_crm_memberships':
+                        cx.jQuery("#calendar_event_excluded_crm_memberships").val(),
+                    'invitedMails':
+                        cx.jQuery("#invitedMails").val(),
+                    'selectedGroups': selectedGroups
+                },
+                success: function(json) {
+                    cx.jQuery("#recipientsCount").text(json['data']);
+                }
+            }
+        );
     }
 
     cx.ready(function() {
@@ -362,6 +396,12 @@
                 addExeptionList(key, v);
             }
         });
+        updateRecipientsCount();
+        $J("#calendar_event_invite_crm_memberships").change(updateRecipientsCount);
+        $J("#calendar_event_excluded_crm_memberships").change(updateRecipientsCount);
+        $J("input[name='addElement']").click(updateRecipientsCount);
+        $J("input[name='removeElement']").click(updateRecipientsCount);
+        $J("#invitedMails").change(updateRecipientsCount);
     });
 
     function showOrHidePlaceFields(inputValue, type) {
@@ -773,6 +813,7 @@
     }
     cx.ready(function() {
         cx.jQuery("#calendar_event_invite_crm_memberships").chosen({ width: '250px' });
+        cx.jQuery("#calendar_event_excluded_crm_memberships").chosen({ width: '250px' });
     });
 </script>
 <form action="index.php?cmd={CALENDAR_MODULE_NAME}&act=modify_event" id="formModifyEvent" name="formModifyEvent" method="post" onsubmit="selectAll(document.formModifyEvent.elements['selectedGroups[]']); {CALENDAR_EVENT_ONSUBMIT_PUBLICATIONS} return formCheck();">
@@ -1280,13 +1321,28 @@
                 </td>
             </tr>
             <tr class="row2">
-                <td width="180" valign="top">{TXT_CALENDAR_CRM_MEMBERSHIPS}</td>
-                <td colspan="2">
+                <td width="180" valign="top">
+                    {TXT_CALENDAR_CRM_MEMBERSHIPS}
+                    <span class="icon-info tooltip-trigger"></span>
+                    <span class="tooltip-message">{TXT_CALENDAR_CRM_MEMBERSHIPS_TOOLTIP}</span>
+                </td>
+                <td>
+                    {TXT_CALENDAR_CRM_INVITED_MEMBERSHIPS}
                     <div>
-                        <select tabindex="7" data-placeholder="{TXT_CALENDAR_CHOOSE_CRM_MEMBERSHIPS}" name="calendar_event_invite_crm_memberships[]" id="calendar_event_invite_crm_memberships" size="1" multiple autocomplete="off">
+                        <select data-placeholder="{TXT_CALENDAR_CHOOSE_CRM_MEMBERSHIPS}" name="calendar_event_invite_crm_memberships[]" id="calendar_event_invite_crm_memberships" size="1" multiple autocomplete="off">
                             <!-- BEGIN calendar_event_invite_crm_membership -->
                             <option value="{CRM_MEMBERSHIP_ID}" {CRM_MEMBERSHIP_SELECTED}>{CRM_MEMBERSHIP_VALUE}</option>
                             <!-- END calendar_event_invite_crm_membership -->
+                        </select>
+                    </div>
+                </td>
+                <td>
+                    {TXT_CALENDAR_CRM_EXCLUDED_MEMBERSHIPS}
+                    <div>
+                        <select data-placeholder="{TXT_CALENDAR_CHOOSE_CRM_MEMBERSHIPS}" name="calendar_event_excluded_crm_memberships[]" id="calendar_event_excluded_crm_memberships" size="1" multiple autocomplete="off">
+                            <!-- BEGIN calendar_event_excluded_crm_membership -->
+                            <option value="{CRM_MEMBERSHIP_ID}" {CRM_MEMBERSHIP_SELECTED}>{CRM_MEMBERSHIP_VALUE}</option>
+                            <!-- END calendar_event_excluded_crm_membership -->
                         </select>
                     </div>
                 </td>
@@ -1294,13 +1350,14 @@
             <tr class="row1">
                 <td valign="top">{TXT_CALENDAR_EVENT_MORE_INVITATIONS}</td>
                 <td colspan="2">
-                    <textarea name="invitedMails" style="width: 250px; height: 60px;" />{CALENDAR_EVENT_MORE_INVITATIONS}</textarea>&nbsp;&nbsp;<span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_CALENDAR_EVENT_MORE_INVITATIONS_INFO}</span>
+                    <textarea id="invitedMails" name="invitedMails" style="width: 250px; height: 60px;" />{CALENDAR_EVENT_MORE_INVITATIONS}</textarea>&nbsp;&nbsp;<span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_CALENDAR_EVENT_MORE_INVITATIONS_INFO}</span>
                 </td>
             </tr>
             <tr class="row2">
                 <td valign="top">{TXT_CALENDAR_EVENT_SEND_INVITATION}</td>
                 <td width="1%">
                     <input name="sendInvitation" class="sendInvitation" type="checkbox" value="1" {CALENDAR_EVENT_SEND_INVITATION}/>
+                    ({TXT_CALENDAR_EVENT_SEND_INVITATION_COUNT}  <p style="display: inline-block;" id="recipientsCount"></p>)
                 </td>
                 <td>
                     <div class="invitationEmailTemplateContainer" style="display: none;">

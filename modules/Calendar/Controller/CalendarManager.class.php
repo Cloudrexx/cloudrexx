@@ -552,6 +552,7 @@ class CalendarManager extends CalendarLibrary
             'TXT_'.$this->moduleLangVar.'_SERIES_PATTERN_APPONTMENTS'       => $_ARRAYLANG['TXT_CALENDAR_SERIES_PATTERN_APPONTMENTS'],
             'TXT_'.$this->moduleLangVar.'_SERIES_PATTERN_ENDS'              => $_ARRAYLANG['TXT_CALENDAR_SERIES_PATTERN_ENDS'],
             'TXT_'.$this->moduleLangVar.'_EVENT_SEND_INVITATION'            => $objEvent->invitationSent == 0 ? $_ARRAYLANG['TXT_CALENDAR_EVENT_SEND_INVITATION'] : $_ARRAYLANG['TXT_CALENDAR_EVENT_SEND_AGAIN_INVITATION'],
+            'TXT_'.$this->moduleLangVar.'_EVENT_SEND_INVITATION_COUNT'      => $_ARRAYLANG['TXT_CALENDAR_EVENT_SEND_INVITATION_COUNT'],
             'TXT_'.$this->moduleLangVar.'_EVENT_TYPE'                       => $_ARRAYLANG['TXT_CALENDAR_EVENT_TYPE'],
             'TXT_'.$this->moduleLangVar.'_EVENT_TYPE_EVENT'                 => $_ARRAYLANG['TXT_CALENDAR_EVENT_TYPE_EVENT'],
             'TXT_'.$this->moduleLangVar.'_EVENT_TYPE_REDIRECT'              => $_ARRAYLANG['TXT_CALENDAR_EVENT_TYPE_REDIRECT'],
@@ -999,8 +1000,12 @@ class CalendarManager extends CalendarLibrary
         $objCrmLibrary = new \Cx\Modules\Crm\Controller\CrmLibrary('Crm');
         $crmMemberships = array_keys($objCrmLibrary->getMemberships());
         $objCrmLibrary->getMembershipDropdown($this->_objTpl, $crmMemberships, 'calendar_event_invite_crm_membership', $objEvent->invitedCrmGroups);
+        $objCrmLibrary->getMembershipDropdown($this->_objTpl, $crmMemberships, 'calendar_event_excluded_crm_membership', $objEvent->excludedCrmGroups);
         $this->_objTpl->setVariable(array(
             'TXT_CALENDAR_CRM_MEMBERSHIPS'          => $_ARRAYLANG['TXT_CALENDAR_CRM_MEMBERSHIPS'],
+            'TXT_CALENDAR_CRM_MEMBERSHIPS_TOOLTIP'  => $_ARRAYLANG['TXT_CALENDAR_CRM_MEMBERSHIPS_TOOLTIP'],
+            'TXT_CALENDAR_CRM_INVITED_MEMBERSHIPS'  => $_ARRAYLANG['TXT_CALENDAR_CRM_INVITED_MEMBERSHIPS'],
+            'TXT_CALENDAR_CRM_EXCLUDED_MEMBERSHIPS' => $_ARRAYLANG['TXT_CALENDAR_CRM_EXCLUDED_MEMBERSHIPS'],
             'TXT_CALENDAR_CHOOSE_CRM_MEMBERSHIPS'   => $_ARRAYLANG['TXT_CALENDAR_CHOOSE_CRM_MEMBERSHIPS'],
         ));
         \JS::activate('chosen');

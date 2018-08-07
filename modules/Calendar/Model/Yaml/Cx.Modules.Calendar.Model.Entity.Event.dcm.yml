@@ -93,6 +93,11 @@ Cx\Modules\Calendar\Model\Entity\Event:
       length: 255
       nullable: true
       column: invited_crm_groups
+    excludedCrmGroups:
+      type: string
+      length: 255
+      nullable: true
+      column: excluded_crm_groups
     invitedMails:
       type: text
       nullable: true

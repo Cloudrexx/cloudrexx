@@ -558,6 +558,27 @@ class CalendarMailManager extends CalendarLibrary {
     }
 
     /**
+     * Returns the array recipients count
+     *
+     * @param integer $actionId         Mail Action
+     * @param object  $objEvent         Event object
+     * @param integer $regId            registration id
+     * @param object  $objRegistration  Registration object
+     *
+     * @return integer                  returns the array recipients count
+     */
+    public function getSendMailRecipientsCount(
+        $actionId, $objEvent, $regId = 0, $objRegistration = null
+    )
+    {
+        return count(
+            $this->getSendMailRecipients(
+                $actionId, $objEvent, $regId, $objRegistration
+            )
+        );
+    }
+
+    /**
      * Returns the array recipients
      *
      * @param integer $actionId         Mail Action
@@ -585,6 +606,19 @@ class CalendarMailManager extends CalendarLibrary {
 
                 // fetch users from Crm groups
                 $db = \Cx\Core\Core\Controller\Cx::instanciate()->getDb()->getAdoDb();
+                $excludeQuery = '';
+                if($objEvent->excludedCrmGroups) {
+                    $excludeQuery = 'AND `crm_contact`.`id` NOT IN (
+                                        SELECT m.`contact_id`
+                                            FROM `' . DBPREFIX . 'module_crm_customer_membership` AS m 
+                                                WHERE m.`membership_id` IN (' . join(',', $objEvent->excludedCrmGroups) . ')
+                                    )
+                                    AND `crm_company`.`id` NOT IN (
+                                        SELECT m.`contact_id`
+                                            FROM `' . DBPREFIX . 'module_crm_customer_membership` AS m 
+                                                WHERE m.`membership_id` IN (' . join(',', $objEvent->excludedCrmGroups) . ')
+                                    )';
+                }
                 $result = $db->Execute('
                     SELECT
                          crm_contact.id
@@ -608,9 +642,12 @@ class CalendarMailManager extends CalendarLibrary {
                         // only select users of which the associated CRM Person or CRM Company has the selected CRM membership
                     'WHERE
                        `crm_contact`.`contact_type` = 2
-                    AND
-                         (   `crm_contact_membership`.`membership_id` IN ('.join(',', $objEvent->invitedCrmGroups).')
-                          OR `crm_company_membership`.`membership_id` IN ('.join(',', $objEvent->invitedCrmGroups).'))'
+                        AND(
+                             (   
+                             `crm_contact_membership`.`membership_id` IN (' . join(',', $objEvent->invitedCrmGroups) . ')
+                              OR `crm_company_membership`.`membership_id` IN (' . join(',', $objEvent->invitedCrmGroups) . ')
+                              ) ' . $excludeQuery .'
+                        )'
                 );
                 if ($result !== false) {
                     $crmContact = new \Cx\Modules\Crm\Model\Entity\CrmContact();

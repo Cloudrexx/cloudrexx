@@ -1938,34 +1938,23 @@ class Event extends \Cx\Modules\Calendar\Model\Entity\Event implements \Doctrine
     /**
      * {@inheritDoc}
      */
-    public function setCategories(\Doctrine\Common\Collections\Collection $categories)
+    public function setCategory(\Cx\Modules\Calendar\Model\Entity\Category $category)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setCategories', array($categories));
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setCategory', array($category));
 
-        return parent::setCategories($categories);
+        return parent::setCategory($category);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getCategories()
+    public function getCategory()
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getCategories', array());
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getCategory', array());
 
-        return parent::getCategories();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function addCategories($category)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addCategories', array($category));
-
-        return parent::addCategories($category);
+        return parent::getCategory();
     }
 
     /**
