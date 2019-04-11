@@ -103,7 +103,9 @@ class ViewGenerator {
         $this->componentOptions = $options;
         $this->viewId = static::$increment++;
         try {
-            \JS::registerCSS($this->cx->getCoreFolderName() . '/Html/View/Style/Backend.css');
+            \JS::registerCSS(
+                $this->cx->getCoreFolderName() . '/Html/View/Style/Backend.css'
+            );
             $entityWithNS = preg_replace(
                 '/^\\\/',
                 '',
