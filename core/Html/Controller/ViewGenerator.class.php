@@ -257,7 +257,12 @@ class ViewGenerator {
             $entityClassName,
             $entityClassName
         );
-        $this->object = $this->listingController->getData();
+        try {
+            $this->object = $this->listingController->getData();
+        } catch (\Doctrine\ORM\Query\QueryException $e) {
+            $this->object = new \Cx\Core_Modules\Listing\Model\Entity\DataSet();
+            throw $e;
+        }
         return $this->object->getDataType();
     }
 
