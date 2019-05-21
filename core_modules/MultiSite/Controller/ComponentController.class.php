@@ -3867,7 +3867,7 @@ MultiSite Cache flush [<pattern>] [-v] [--exec]
             case ComponentController::MODE_WEBSITE:
                 $em = \Cx\Core\Core\Controller\Cx::instanciate()->getDb()->getEntityManager();
                 $userRepo = $em->getRepository('Cx\Core\User\Model\Entity\User');
-                $users = $userRepo->findBy(array('isAdmin' => '1'));
+                $users = $userRepo->findBy(array('isAdmin' => '1', 'active' => '1'));
 
                 
                 foreach ($users as $user) {
@@ -3879,6 +3879,9 @@ MultiSite Cache flush [<pattern>] [-v] [--exec]
 
                 foreach ($groups as $group) {
                     foreach ($group->getUser() as $user) {
+                        if (!$user->getActive()) {
+                            continue;
+                        }
                         if (!array_key_exists($user->getId(), $adminUsers)) {
                             $adminUsers[$user->getId()] = $user;
                         }
