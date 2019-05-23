@@ -2193,7 +2193,7 @@ class Page extends \Cx\Core_Modules\Widget\Model\Entity\WidgetParseTarget implem
         // load application template in case page is an application
         if (
             $page->getType() == static::TYPE_APPLICATION &&
-            $template->blockExists('APPLICATION_DATA')
+            $template->placeholderExists('APPLICATION_DATA')
         ) {
             $contentTemplate =
                 \Cx\Core\Core\Controller\Cx::getContentTemplateOfPageWithoutWidget(
