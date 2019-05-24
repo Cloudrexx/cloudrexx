@@ -5061,7 +5061,7 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
         }
         
         $restoreWebsiteFile = new \PclZip($websiteBackupFilePath);
-        if ($restoreWebsiteFile->extract(PCLZIP_OPT_PATH, $websitePath, PCLZIP_OPT_BY_PREG, '/dataRepository(.(?!config))*$/', PCLZIP_OPT_REMOVE_PATH, 'dataRepository', PCLZIP_OPT_REPLACE_NEWER) == 0) {
+        if ($restoreWebsiteFile->extract(PCLZIP_OPT_PATH, $websitePath, PCLZIP_OPT_BY_PREG, '/dataRepository(.(?!config\/(?!(?:Wysiwyg|GeoIp)\.yml)))*$/', PCLZIP_OPT_REMOVE_PATH, 'dataRepository', PCLZIP_OPT_REPLACE_NEWER) == 0) {
             throw new MultiSiteJsonException(__METHOD__.' failed! : Failed to extract the website repostory on restore.');
         }
 
