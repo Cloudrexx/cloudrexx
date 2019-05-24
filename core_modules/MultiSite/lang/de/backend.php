@@ -141,6 +141,7 @@ $_ARRAYLANG['TXT_MULTISITE_WEBSITE_MAIL_DISABLED_SUCCESSFULLY'] = 'Der E-Mail Di
 $_ARRAYLANG['TXT_MULTISITE_WEBSITE_MAIL_ENABLED_FAILED'] = 'Die Aktivierung der E-Mail Dienste schlug fehl.';
 $_ARRAYLANG['TXT_MULTISITE_WEBSITE_MAIL_DISABLED_FAILED'] = 'Die Abschaltung der E-Mail Dienste schlug fehl.';
 $_ARRAYLANG['TXT_MULTISITE_WEBSITE_LOGIN_PLESK_FAILED'] = 'Die E-Mail Verwaltung kann zur Zeit nicht geöffnet werden.';
+$_ARRAYLANG['TXT_MULTISITE_UNKOWN_MAIL_SERVICE_SERVER'] = 'E-Mail Service nicht verfügbar';
 $_ARRAYLANG['TXT_MULTISITE_WEBSITE_OPEN_ADMINISTRATION'] = 'Verwaltung öffnen';
 $_ARRAYLANG['TXT_MULTISITE_WEBSITE_CREATE_MAIL_ACCOUNT_FAILED'] = 'Die Erstellung eines E-Mail Kontos schlug fehl.';
 $_ARRAYLANG['TXT_MULTISITE_WEBSITE_DELETE_MAIL_ACCOUNT_FAILED'] = 'Die Löschung des E-Mail Kontos schlug fehl.';
@@ -281,6 +282,8 @@ $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_GO_TO_OVERVIEW'] = 'Weiter zur Übersicht
 $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_OWNER_EMAIL_UNIQUE_ERROR'] = 'Die E-Mail Adresse %1$s wird bereits von einem anderen Benutzer unter %2$s eingesetzt und kann daher nicht verwendet werden.';
 $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_MAPPING_DOMAIN_FAILED'] = 'Die Verknüpfung Ihrer Website mit der Domain %s ist nicht zulässig.';
 $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_USER_PROFILE_UPDATED_SUCCESS']= 'Ihr Profil wurde erfolgreich aktualisiert.';
+$_ARRAYLANG['TXT_MULTISITE_INVALID_CALL'] = 'Ungültige Anfrage';
+$_ARRAYLANG['TXT_MULTISITE_UNKNOWN_WEBSITE'] = 'Ungültige Website';
 
 //mail service
 $_ARRAYLANG['TXT_MULTISITE_NO_MAIL_SERVER_FOUND'] = 'E-Mail Service Server ist nicht verfügbar';

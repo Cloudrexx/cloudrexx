@@ -6542,21 +6542,25 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
     {
         global $_ARRAYLANG;
         if (\FWValidator::isEmpty($params['post']['websiteId'])) {
-            throw new MultiSiteJsonException('JsonMultiSiteController::getPanelAutoLoginUrl() failed: Insufficient arguments supplied: ' . var_export($params, true));
+            \DBG::msg(__METHOD__ . ' failed: Insufficient arguments supplied:');
+            \DBG::dump($params);
+            throw new MultiSiteJsonException($_ARRAYLANG['TXT_MULTISITE_INVALID_CALL']);
         }
         try {
             switch (\Cx\Core\Setting\Controller\Setting::getValue('mode','MultiSite')) {
                 case ComponentController::MODE_MANAGER:
                     $website = \Env::get('em')->getRepository('Cx\Core_Modules\MultiSite\Model\Entity\Website')->findOneBy(array('id' => $params['post']['websiteId']));
                     if (!$website) {
-                        throw new MultiSiteJsonException('JsonMultiSiteController::getPanelAutoLoginUrl() failed: Unkown Website-ID: ' . $params['post']['websiteId']);
+                        \DBG::msg(__METHOD__ . ' failed: Unkown Website-ID: ' . $params['post']['websiteId']);
+                        throw new MultiSiteJsonException($_ARRAYLANG['TXT_MULTISITE_UNKNOWN_WEBSITE']);
                     }
                     if ($website->getOwner()->getId() != \FWUser::getFWUserObject()->objUser->getId()) {
                         return array('status' => 'error', 'message' => $_ARRAYLANG['TXT_MULTISITE_WEBSITE_NOT_MULTISITE_USER']);
                     }
                     $mailServiceServer = $website->getMailServiceServer();
                     if (!$mailServiceServer || \FWValidator::isEmpty($website->getMailAccountId())) {
-                        throw new MultiSiteJsonException('JsonMultiSiteController::getPanelAutoLoginUrl() failed: Unkown mail service server.');
+                        \DBG::msg(__METHOD__ . ' failed: Unkown mail service server.');
+                        throw new MultiSiteJsonException($_ARRAYLANG['TXT_MULTISITE_UNKOWN_MAIL_SERVICE_SERVER']);
                     }
 
                     $clientIp = !\FWValidator::isEmpty($_SERVER['HTTP_X_FORWARDED_FOR']) ? trim(end(explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']))) : $_SERVER['REMOTE_ADDR'];
@@ -6574,7 +6578,8 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
                     break;
             }
         } catch (\Exception $e) {
-            throw new MultiSiteJsonException('JsonMultiSiteController::getPanelAutoLoginUrl() failed:' . $_ARRAYLANG['TXT_MULTISITE_WEBSITE_LOGIN_PLESK_FAILED'] . $e->getMessage());
+            \DBG::msg(__METHOD__ . ' failed: ' . $e->getMessage());
+            throw new MultiSiteJsonException($_ARRAYLANG['TXT_MULTISITE_WEBSITE_LOGIN_PLESK_FAILED']);
         }
     }
 
