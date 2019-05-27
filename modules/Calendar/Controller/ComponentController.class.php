@@ -54,7 +54,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      */
     public function getControllerClasses()
     {
-        return array('EsiWidget');
+        return array('EsiWidget', 'JsonCalendar');
     }
 
     /**
@@ -69,7 +69,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      */
     public function getControllersAccessableByJson()
     {
-        return array('EsiWidgetController');
+        return array('EsiWidgetController', 'JsonCalendarController');
     }
 
     /**

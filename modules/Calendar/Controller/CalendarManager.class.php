@@ -122,9 +122,6 @@ class CalendarManager extends CalendarLibrary
                     contrexx_input2int($_GET['rid'])
                 );
                 break;
-            case 'get_exception_dates':
-                $this->getExeceptionDates();
-                break;
             default:
                 $this->showOverview();
                 break;

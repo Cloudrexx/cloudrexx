@@ -1824,7 +1824,7 @@ class CalendarEvent extends CalendarLibrary
         return $eventFields;
     }
 
-    function loadEventFromPost($data)
+    function loadEventFromData($data)
     {
         // fetch event's start and end
         list($startDate, $startHour, $startMin) = $this->parseDateTimeString(

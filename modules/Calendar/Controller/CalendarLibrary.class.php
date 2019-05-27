@@ -681,16 +681,18 @@ EOF;
      */    
     function getExeceptionDates()
     {
-        global $_CORELANG;
-        
         $exceptionDates = array();
         
         $objEvent = new \Cx\Modules\Calendar\Controller\CalendarEvent();
-        $objEvent->loadEventFromPost($_POST);
+        $objEvent->loadEventFromData($_GET);
 
         $objEventManager = new \Cx\Modules\Calendar\Controller\CalendarEventManager($objEvent->startDate);
         $objEventManager->_setNextSeriesElement($objEvent);
         
+        $_CORELANG = \Env::get('init')->getComponentSpecificLanguageData(
+            'Core',
+            false
+        );
         $dayArray = explode(',', $_CORELANG['TXT_CORE_DAY_ABBREV2_ARRAY']);
         foreach ($objEventManager->eventList as $event) {
             $startDate = $event->startDate;

@@ -29,21 +29,21 @@
  * JSON Adapter for Calendar module
  * @copyright   Cloudrexx AG
  * @author      ss4u <ss4ugroup@gmail.com>
+ * @author      Thomas Wirz <thomas.wirz@cloudrexx.com>
  * @package     cloudrexx
- * @subpackage  core_json
+ * @subpackage  module_calendar
  */
 
-namespace Cx\Core\Json\Adapter\Calendar;
-use \Cx\Core\Json\JsonAdapter;
+namespace Cx\Modules\Calendar\Controller;
 
 /**
  * JSON Adapter for Calendar module
  * @copyright   Cloudrexx AG
- * @author      ss4u <ss4ugroup@gmail.com>
+ * @author      Thomas Wirz <thomas.wirz@cloudrexx.com>
  * @package     cloudrexx
- * @subpackage  core_json
+ * @subpackage  module_calendar
  */
-class JsonCalendar implements JsonAdapter {
+class JsonCalendarController extends \Cx\Core\Core\Model\Entity\Controller implements \Cx\Core\Json\JsonAdapter {
     /**
      * List of messages
      * @var Array
@@ -55,7 +55,7 @@ class JsonCalendar implements JsonAdapter {
      * @return String Name of this adapter
      */
     public function getName() {
-        return 'calendar';
+        return 'Calendar';
     }
 
     /**
@@ -79,7 +79,13 @@ class JsonCalendar implements JsonAdapter {
      * @return Object
      */
     public function getDefaultPermissions() {
-        return null;
+        return new \Cx\Core_Modules\Access\Model\Entity\Permission(
+            null, // no specific protocol forced
+            array('get'), // only GET required
+            true, // requires login
+            array(), // no specific user group
+            array(180) // event management
+        );
     }
 
     /**
@@ -88,12 +94,6 @@ class JsonCalendar implements JsonAdapter {
      * @return array Array of dates
      */
     public function getExeceptionDates() {
-        global $objInit, $_CORELANG;
-
-        if (!\FWUser::getFWUserObject()->objUser->login() || $objInit->mode != 'backend') {
-            throw new \Exception($_CORELANG['TXT_ACCESS_DENIED_DESCRIPTION']);
-        }
-
         $calendarLib = new \Cx\Modules\Calendar\Controller\CalendarLibrary();
         return $calendarLib->getExeceptionDates();
     }
@@ -124,7 +124,7 @@ class JsonCalendar implements JsonAdapter {
         }
 
         $_ARRAYLANG = \Env::get('init')->getComponentSpecificLanguageData(
-            'Calendar',
+            $this->getName(),
             false
         );
 
