@@ -187,7 +187,7 @@ class CalendarCategoryManager extends CalendarLibrary
         $arrOptions = array();
         foreach ($this->categoryList as $objCategory) {
             $arrOptions[$objCategory->id] = $objCategory->name
-                . ($this->arrSettings['countCategoryEntries']
+                . ($this->arrSettings['countCategoryEntries'] != 2
                     ? ' ('.$objCategory->countEntries(false, true).')' : '');
         }
         $options = ''; // Default case: prepend nothing
