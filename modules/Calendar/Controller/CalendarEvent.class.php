@@ -1090,16 +1090,16 @@ class CalendarEvent extends CalendarLibrary
             }
         }
 
-        list($startDate, $strStartTime) = explode(' ', $data['startDate']);
-        list($startHour, $startMin)     = explode(':', $strStartTime);
-
-        list($endDate, $strEndTime)     = explode(' ', $data['endDate']);
-        list($endHour, $endMin)         = explode(':', $strEndTime);
-
-        if (!empty($data['all_day'])) {
-            list($startHour, $startMin) = array(0, 0);
-            list($endHour, $endMin)     = array(23, 59);;
-        }
+        // fetch event's start and end
+        list($startDate, $startHour, $startMin) = $this->parseDateTimeString(
+            $data['startDate'],
+            !empty($data['all_day'])
+        );
+        list($endDate, $endHour, $endMin) = $this->parseDateTimeString(
+            $data['endDate'],
+            !empty($data['all_day']),
+            true
+        );
 
         //event data
         $id            = isset($data['copy']) && !empty($data['copy']) ? 0 : (isset($data['id']) ? intval($data['id']) : 0);
@@ -1826,18 +1826,19 @@ class CalendarEvent extends CalendarLibrary
 
     function loadEventFromPost($data)
     {
-        list($startDate, $strStartTime) = explode(' ', $data['startDate']);
-        list($startHour, $startMin)     = explode(':', $strStartTime);
-
-        list($endDate, $strEndTime)     = explode(' ', $data['endDate']);
-        list($endHour, $endMin)         = explode(':', $strEndTime);
+        // fetch event's start and end
+        list($startDate, $startHour, $startMin) = $this->parseDateTimeString(
+            $data['startDate']
+        );
+        list($endDate, $endHour, $endMin) = $this->parseDateTimeString(
+            $data['endDate'],
+            false,
+            true
+        );
 
         //event data
-        $startDate     = $this->getDateTime($startDate, intval($startHour), intval($startMin));
-        $endDate       = $this->getDateTime($endDate, intval($endHour), intval($endMin));
-
-        $this->startDate = $startDate;
-        $this->endDate   = $endDate;
+        $this->startDate = $this->getDateTime($startDate, intval($startHour), intval($startMin));
+        $this->endDate = $this->getDateTime($endDate, intval($endHour), intval($endMin));
 
         //series pattern
         $seriesStatus = isset($data['seriesStatus']) ? intval($data['seriesStatus']) : 0;
