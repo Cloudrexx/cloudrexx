@@ -108,6 +108,8 @@ class JsonCalendar implements JsonAdapter {
      */
     public function getRecipientCount($params = array())
     {
+        global $_ARRAYLANG;
+
         $event = new \Cx\Modules\Calendar\Controller\CalendarEvent();
         if (intval($params['get']['id']) != 0) {
             $event->get(
@@ -121,10 +123,20 @@ class JsonCalendar implements JsonAdapter {
             }
         }
 
+        $_ARRAYLANG = \Env::get('init')->getComponentSpecificLanguageData(
+            'Calendar',
+            false
+        );
+
         // load current lists of invited people directly from the get params,
         // because they are not necessarily stored in the database yet
         // 1.) load access users
-        $event->invitedGroups = $params['get']['selectedGroups'];
+        if (
+            isset($params['get']['selectedGroups']) &&
+            is_array($params['get']['selectedGroups'])
+        ) {
+            $event->invitedGroups = $params['get']['selectedGroups'];
+        }
 
         // 2.) load crm users
         $invited = $params['get']['invite_crm_memberships'];
