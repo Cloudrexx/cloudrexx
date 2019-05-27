@@ -292,6 +292,7 @@ $_ARRAYLANG['TXT_MULTISITE_WEBSITE_MAIL_ENABLED_FAILED'] = 'Mail service activat
 $_ARRAYLANG['TXT_MULTISITE_WEBSITE_MAIL_DISABLED_FAILED'] = 'Mail service deactivation failed.';
 $_ARRAYLANG['TXT_MULTISITE_WEBSITE_OPEN_ADMINISTRATION'] = 'Open administration';
 $_ARRAYLANG['TXT_MULTISITE_WEBSITE_LOGIN_PLESK_FAILED'] = 'The email management console is currently not available.';
+$_ARRAYLANG['TXT_MULTISITE_UNKOWN_MAIL_SERVICE_SERVER'] = 'Email service unavailable';
 $_ARRAYLANG['TXT_MULTISITE_WEBSITE_CREATE_MAIL_ACCOUNT_FAILED'] = 'Failed to create an email account.';
 $_ARRAYLANG['TXT_MULTISITE_WEBSITE_DELETE_MAIL_ACCOUNT_FAILED'] = 'Failed to delete the email account.';
 $_ARRAYLANG['TXT_MULTISITE_WEBSITE_CREATED_MAIL_ACCOUNT_SUCCESSFULLY'] = 'Email account successfully created.';
@@ -426,6 +427,8 @@ $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_GO_TO_OVERVIEW'] = 'Go to the overview pa
 $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_OWNER_EMAIL_UNIQUE_ERROR'] = 'The e-mail %1$s is already in use by a user account on %2$s and can therefore not be used.';
 $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_MAPPING_DOMAIN_FAILED'] = 'Mapping your website to the domain %s is not allowed.';
 $_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_USER_PROFILE_UPDATED_SUCCESS']= 'Your profile has been updated successfully.';
+$_ARRAYLANG['TXT_MULTISITE_INVALID_CALL'] = 'Invalid request';
+$_ARRAYLANG['TXT_MULTISITE_UNKNOWN_WEBSITE'] = 'Unkown website';
 
 //mail service
 $_ARRAYLANG['TXT_MULTISITE_NO_MAIL_SERVER_FOUND'] = 'Mail service server is not available';
