@@ -1027,12 +1027,14 @@ UPLOADER;
             'TXT_'.$this->moduleLangVar.'_ZIP'               =>  $_ARRAYLANG['TXT_CALENDAR_EVENT_ZIP'],
             'TXT_'.$this->moduleLangVar.'_MAP'               =>  $_ARRAYLANG['TXT_CALENDAR_EVENT_MAP'],
             'TXT_'.$this->moduleLangVar.'_HOST'              =>  $_ARRAYLANG['TXT_CALENDAR_HOST'],
+            'TXT_'.$this->moduleLangVar.'_ORGANIZER'         =>  $_ARRAYLANG['TXT_CALENDAR_ORGANIZER'],
             'TXT_'.$this->moduleLangVar.'_MAIL'              =>  $_ARRAYLANG['TXT_CALENDAR_EVENT_EMAIL'],
             'TXT_'.$this->moduleLangVar.'_HOST_NAME'         =>  $_ARRAYLANG['TXT_CALENDAR_EVENT_NAME'],
             'TXT_'.$this->moduleLangVar.'_TITLE'             =>  $_ARRAYLANG['TXT_CALENDAR_TITLE'],
             'TXT_'.$this->moduleLangVar.'_ACCESS'            =>  $_ARRAYLANG['TXT_CALENDAR_ACCESS'],
             'TXT_'.$this->moduleLangVar.'_REGISTRATION'      =>  $_ARRAYLANG['TXT_CALENDAR_REGISTRATION'],
-            'TXT_'.$this->moduleLangVar.'_REGISTRATION_INFO' =>  $_ARRAYLANG['TXT_CALENDAR_REGISTRATION_INFO']
+            'TXT_'.$this->moduleLangVar.'_REGISTRATION_INFO' =>  $_ARRAYLANG['TXT_CALENDAR_REGISTRATION_INFO'],
+            'TXT_'.$this->moduleLangVar.'_EVENT_FULLY_BLOCKED'=>  $_ARRAYLANG['TXT_CALENDAR_EVENT_FULLY_BLOCKED'],
         ));
 
         $this->objEventManager->showEvent(
