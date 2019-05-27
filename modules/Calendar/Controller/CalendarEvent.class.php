@@ -1573,6 +1573,14 @@ class CalendarEvent extends CalendarLibrary
         $event       = $this->getEventEntity($id, $formDatas);
         $eId         = $id;
         if ($id != 0) {
+            // In frontend, the status can not be changed.
+            // As only active events can be edited in frontend,
+            // the status must always be set to 1 in that case.
+            if ($this->cx->getMode() == $this->cx::MODE_FRONTEND) {
+                $status = 1;
+                $formData['status'] = $status;
+            }
+
             //Trigger preUpdate event for Event Entity
             $this->triggerEvent(
                 'model/preUpdate', $event,
