@@ -5061,8 +5061,20 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
         }
         
         $restoreWebsiteFile = new \PclZip($websiteBackupFilePath);
-        if ($restoreWebsiteFile->extract(PCLZIP_OPT_PATH, $websitePath, PCLZIP_OPT_BY_PREG, '/dataRepository(.(?!config\/(?!(?:Wysiwyg|GeoIp)\.yml)))*$/', PCLZIP_OPT_REMOVE_PATH, 'dataRepository', PCLZIP_OPT_REPLACE_NEWER) == 0) {
-            throw new MultiSiteJsonException(__METHOD__.' failed! : Failed to extract the website repostory on restore.');
+        if ($restoreWebsiteFile->extract(
+            // destination path
+            PCLZIP_OPT_PATH, $websitePath,
+            // do not extract /config folder, except for yaml-files.
+            // however, yaml-files of system components must also
+            // not get extracted
+            PCLZIP_OPT_BY_PREG, '/dataRepository(.(?!config\/(?!(?!Config|MultiSite|Support)[^\/]+\.yml)))*$/',
+            // strip folder dataRepository from extraction
+            PCLZIP_OPT_REMOVE_PATH, 'dataRepository',
+            // extract any file (and overwrite existing files) independent of
+            // its creation time
+            PCLZIP_OPT_REPLACE_NEWER
+        ) == 0) {
+            throw new MultiSiteJsonException(__METHOD__.' failed! : Failed to extract the website repository on restore.');
         }
 
         // create tmp directory
