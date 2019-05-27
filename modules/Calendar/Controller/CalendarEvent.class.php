@@ -2253,8 +2253,6 @@ class CalendarEvent extends CalendarLibrary
      */
     static function getEventSearchQuery($term)
     {
-        global $_LANGID;
-
         $query = "SELECT event.`id` AS `id`,
                          event.`startdate`,
                          field.`title` AS `title`,
@@ -2264,7 +2262,7 @@ class CalendarEvent extends CalendarLibrary
                          MATCH (field.`title`, field.`teaser`, field.`description`) AGAINST ('%$term%') AS `score`
                     FROM ".DBPREFIX."module_calendar_event AS event,
                          ".DBPREFIX."module_calendar_event_field AS field
-                   WHERE   (event.id = field.event_id AND field.lang_id = '".intval($_LANGID)."')
+                   WHERE   (event.id = field.event_id AND field.lang_id = '".FRONTEND_LANG_ID."')
                        AND event.status = 1
                        AND (   field.title LIKE ('%$term%')
                             OR field.teaser LIKE ('%$term%')
