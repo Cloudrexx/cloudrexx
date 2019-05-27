@@ -899,11 +899,11 @@ UPLOADER;
                                 : (!empty($objEvent->arrData['redirect'][$_LANGID]) ? $objEvent->arrData['redirect'][$_LANGID] : '');
             $this->_objTpl->setVariable(array(
                 $this->moduleLangVar.'_EVENT_TAB_DISPLAY'               => $langChecked ? 'block' : 'none',
-                $this->moduleLangVar.'_EVENT_TITLE'                     => contrexx_raw2xhtml($eventTitle),
+                $this->moduleLangVar.'_EVENT_TITLE'                     => $eventTitle,
                 $this->moduleLangVar.'_EVENT_DESCRIPTION'               => new \Cx\Core\Wysiwyg\Wysiwyg("description[{$arrLang['id']}]",
                                                                                                         contrexx_raw2xhtml($eventDescription),
                                                                                                         $eventId != 0 ? 'small' : 'bbcode'),
-                $this->moduleLangVar.'_EVENT_REDIRECT'                  => contrexx_raw2xhtml($eventRedirect),
+                $this->moduleLangVar.'_EVENT_REDIRECT'                  => $eventRedirect,
                 $this->moduleLangVar.'_EVENT_TYPE_EVENT_DISPLAY'        => $objEvent->type == 0 ? 'block' : 'none',
                 $this->moduleLangVar.'_EVENT_TYPE_REDIRECT_DISPLAY'     => $objEvent->type == 1 ? 'block' : 'none',
             ));
