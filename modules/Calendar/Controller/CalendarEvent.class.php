@@ -760,7 +760,7 @@ class CalendarEvent extends CalendarLibrary
      * @return null
      */
     function get($eventId, $eventStartDate=null, $langId=null) {
-        global $objDatabase, $_ARRAYLANG, $_LANGID, $objInit;
+        global $objDatabase, $_LANGID;
 
         $this->getSettings();
 
@@ -1019,7 +1019,7 @@ class CalendarEvent extends CalendarLibrary
      * @return null
      */
     function getData() {
-        global $objDatabase, $_ARRAYLANG, $_LANGID;
+        global $objDatabase;
 
         $activeLangs = explode(",", $this->showIn);
         $this->arrData = array();
@@ -1068,7 +1068,7 @@ class CalendarEvent extends CalendarLibrary
      * @return boolean true if saved successfully, false otherwise
      */
     function save($data){
-        global $objDatabase, $_LANGID, $_CONFIG, $objInit;
+        global $objDatabase, $_LANGID, $objInit;
 
         $this->getSettings();
 
@@ -2375,8 +2375,6 @@ class CalendarEvent extends CalendarLibrary
      */
     function loadPlaceLinkFromMediadir($intMediaDirId = 0, $type = 'place')
     {
-        global $_LANGID, $_CONFIG;
-
         $placeUrl       = '';
         $placeUrlSource = '';
 

@@ -378,6 +378,7 @@ $_ARRAYLANG['TXT_CALENDAR_MAIL_SUCCESSFULLY_DELETED'] = "E-Mail deleted successf
 $_ARRAYLANG['TXT_CALENDAR_MAIL_CORRUPT_DELETED'] = "Error in deleting E-mail template.";
 $_ARRAYLANG['TXT_CALENDAR_NUM_PAGING'] = "Number of events per page";
 $_ARRAYLANG['TXT_CALENDAR_NUM_EVENTS_ENTRANCE'] = "Number of events on the home page";
+$_ARRAYLANG['TXT_CALENDAR_NUM_EVENTS_ENTRANCE_INFO'] = "Set the number of maximum events to be listed on the overview section in the frontend. Please note that the paging (in case there are more events available than the set limit) is not available on the overview seciton, unless the search form has been submitted.";
 $_ARRAYLANG['TXT_CALENDAR_ACTIVATE'] = "Activated";
 $_ARRAYLANG['TXT_CALENDAR_DEACTIVATE'] = "Deactivated";
 $_ARRAYLANG['TXT_CALENDAR_HEADLINES_STATUS'] = "List events on home page";

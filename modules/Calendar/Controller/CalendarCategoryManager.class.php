@@ -179,10 +179,13 @@ class CalendarCategoryManager extends CalendarLibrary
      *          - Add class constants for option types
      *          - Use \Html::getOptions() in order to handle multiselect
      */
-    function getCategoryDropdown(array $selected_ids,
+    function getCategoryDropdown($selected_ids,
         $type=self::DROPDOWN_TYPE_DEFAULT)
     {
         global $_ARRAYLANG;
+        if (!is_array($selected_ids)) {
+            $selected_ids = array();
+        }
         $this->getSettings();
         $arrOptions = array();
         foreach ($this->categoryList as $objCategory) {

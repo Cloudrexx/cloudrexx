@@ -378,6 +378,7 @@ $_ARRAYLANG['TXT_CALENDAR_MAIL_SUCCESSFULLY_DELETED'] = "E-Mail Vorlage wurde er
 $_ARRAYLANG['TXT_CALENDAR_MAIL_CORRUPT_DELETED'] = "Fehler beim Löschen der E-Mail Vorlage.";
 $_ARRAYLANG['TXT_CALENDAR_NUM_PAGING'] = "Anzahl Termine pro Seite";
 $_ARRAYLANG['TXT_CALENDAR_NUM_EVENTS_ENTRANCE'] = "Anzahl Termine auf der Einstiegsseite";
+$_ARRAYLANG['TXT_CALENDAR_NUM_EVENTS_ENTRANCE_INFO'] = "Bestimmen Sie die maximale Anzahl Veranstaltungen, welche bei der Übersichtsseite angezeigt werden sollen. Bitte beachten Sie, dass das Paging (sofern mehr Veranstaltungen als die gesetzte Limite vorhanden sind) nur angezeigt wird, sofern das Suchformular benutzt wurde.";
 $_ARRAYLANG['TXT_CALENDAR_ACTIVATE'] = "Aktiviert";
 $_ARRAYLANG['TXT_CALENDAR_DEACTIVATE'] = "Deaktiviert";
 $_ARRAYLANG['TXT_CALENDAR_HEADLINES_STATUS'] = "Termin auf Startseite anzeigen";
