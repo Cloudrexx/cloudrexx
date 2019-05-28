@@ -221,29 +221,6 @@ class UploaderController {
 
                 \Cx\Lib\FileSystem\FileSystem::move($tmp_path, $new_path, true);
 
-                $rootPath      = $conf['target_dir'];
-                $rootPathFull  = $new_path;
-                $filePathinfo  = pathinfo($rootPathFull);
-                $fileExtension = $filePathinfo['extension'];
-                $fileNamePlain = $filePathinfo['filename'];
-
-                $im = new \ImageManager();
-                if ($im->_isImage($rootPathFull)) {
-                    foreach (
-                        $cx->getMediaSourceManager()
-                            ->getThumbnailGenerator()
-                            ->getThumbnails() as
-                        $thumbnail
-                    ) {
-                        $im->_createThumb(
-                            $rootPath, '', $fileName,
-                            $thumbnail['size'], $thumbnail['quality'],
-                            $fileNamePlain . $thumbnail['value'] . '.'
-                            . $fileExtension
-                        );
-                    }
-                }
-
                 return array(
                     'name' => $fileName,
                     'path' => $file_path,
