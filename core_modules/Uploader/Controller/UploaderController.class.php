@@ -221,6 +221,13 @@ class UploaderController {
 
                 \Cx\Lib\FileSystem\FileSystem::move($tmp_path, $new_path, true);
 
+                // verify orientation of images
+                $im = new \ImageManager();
+                if ($im->_isImage($new_path)) {
+                    // Fix an image orientation
+                    $im->fixImageOrientation($new_path);
+                }
+
                 return array(
                     'name' => $fileName,
                     'path' => $file_path,
@@ -389,5 +396,4 @@ class UploaderController {
         }
         rmdir($dir);
     }
-
 }

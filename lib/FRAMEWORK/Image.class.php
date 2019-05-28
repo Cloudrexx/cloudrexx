@@ -961,7 +961,56 @@ class ImageManager
         throw new Exception('Is not a valid image');
     }
 
+    /**
+     * Fix image orientation based on its Exif-data
+     *
+     * @param string $filePath File path
+     */
+    public function fixImageOrientation($filePath)
+    {
+        if (!function_exists('exif_read_data')) {
+            return;
+        }
 
+        // The method exif_read_data() reads a header information from an image.
+        // It returns an associated array where the array indexes are the header
+        // names and the array values are the values associated with those
+        // headers.
+        // If no data can be returned, exif_read_data() will return FALSE.
+        $exif = exif_read_data($filePath);
+        if (empty($exif['Orientation'])) {
+            return;
+        }
+
+        $this->loadImage($filePath);
+        // The information from the accelerometer is stored in the orientation
+        // field of the Exchangeable Image File Format (Exif) metadata.
+        // If the image has rotated, Exif data should have 'Orientation' in its
+        // header information. The orientation is one of 3, 6 or 8. Here
+        // orientation 3 will rotate 180 degree left, orientation 6 will
+        // rotate 90 degree right and orientation 8 will rotate 90 degree left.
+        // For more information about the Orientation image data structure
+        // property see:
+        // http://www.digicamsoft.com/exif22/exif22/html/exif22_24.htm?gInitialPosX=10px&gInitialPosY=10px&gZoomValue=100
+        // or check http://www.cipa.jp for the latest Exif standard doc
+        try {
+            // Note that $this->rotateImage() does rotate the image anticlockwise
+            switch ($exif['Orientation']) {
+                case 3:
+                    $this->rotateImage(180);
+                    break;
+                case 6:
+                    $this->rotateImage(-90);
+                    break;
+                case 8:
+                    $this->rotateImage(90);
+                    break;
+                default :
+                    return;
+            }
+            $this->saveNewImage($filePath, true);
+        } catch (\Exception $ex) {
+            \DBG::msg($ex->getMessage());
+        }
+    }
 }
-
-?>
