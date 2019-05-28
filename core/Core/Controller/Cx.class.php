@@ -1597,6 +1597,7 @@ namespace Cx\Core\Core\Controller {
                     $this->getCommands($params, true);
 
                     if (!isset($this->commands[$command])) {
+                        http_response_code(400);
                         echo 'Command \'' . $command . '\' does not exist';
                         $command = 'help';
                     }
