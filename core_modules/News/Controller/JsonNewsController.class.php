@@ -78,7 +78,7 @@ class JsonNewsController extends \Cx\Core\Core\Model\Entity\Controller implement
      * @return Object
      */
     public function getDefaultPermissions() {
-        return new \Cx\Core_Modules\Access\Model\Entity\Permission(null, null, false);
+        return new \Cx\Core_Modules\Access\Model\Entity\Permission(array(), array(), false);
     }
 
     /**

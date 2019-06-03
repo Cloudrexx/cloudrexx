@@ -80,7 +80,7 @@ class JsonCalendarController extends \Cx\Core\Core\Model\Entity\Controller imple
      */
     public function getDefaultPermissions() {
         return new \Cx\Core_Modules\Access\Model\Entity\Permission(
-            null, // no specific protocol forced
+            array(), // no specific protocol forced
             array('get'), // only GET required
             true, // requires login
             array(), // no specific user group

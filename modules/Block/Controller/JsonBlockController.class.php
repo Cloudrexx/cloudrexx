@@ -102,7 +102,7 @@ class JsonBlockController extends \Cx\Core\Core\Model\Entity\Controller implemen
      */
     public function getDefaultPermissions()
     {
-        return new \Cx\Core_Modules\Access\Model\Entity\Permission(null, array('get', 'post'), true);
+        return new \Cx\Core_Modules\Access\Model\Entity\Permission();
     }
 
     /**
@@ -115,11 +115,11 @@ class JsonBlockController extends \Cx\Core\Core\Model\Entity\Controller implemen
             'getCountries',
             'getBlocks',
             'getBlockContent' => new \Cx\Core_Modules\Access\Model\Entity\Permission(
-                null,
+                array(),
                 array('get', 'cli', 'post'),
                 false
             ),
-            'saveBlockContent' => new \Cx\Core_Modules\Access\Model\Entity\Permission(null, array('post'), true)
+            'saveBlockContent' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array(), array('post'))
         );
     }
 

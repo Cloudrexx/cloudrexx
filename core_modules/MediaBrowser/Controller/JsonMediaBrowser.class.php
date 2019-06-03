@@ -88,8 +88,8 @@ class JsonMediaBrowser extends SystemComponentController implements JsonAdapter
         return array(
             'getFiles', 'getSites', 'getSources', 'createThumbnails',
             'createDir', 'renameFile', 'removeFile',
-            'removeFileFromFolderWidget'=> new \Cx\Core_Modules\Access\Model\Entity\Permission(null, null, false),
-            'folderWidget' => new \Cx\Core_Modules\Access\Model\Entity\Permission(null, null, false)
+            'removeFileFromFolderWidget'=> new \Cx\Core_Modules\Access\Model\Entity\Permission(array(), array(), false),
+            'folderWidget' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array(), array(), false)
         );
     }
 
