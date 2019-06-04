@@ -332,21 +332,6 @@ class Cache extends \Cx\Core_Modules\Cache\Controller\CacheLib
             'News' => array(
                 'submit',
             ),
-            'Newsletter' => array(
-                function($page) {
-                    return (
-                        $page->getCmd() == 'profile' &&
-                        $_SERVER['REQUEST_METHOD'] != 'POST'
-                    ) || (
-                        // prevent re-subscriptions from being cached
-                        $page->getCmd() == 'subscribe' &&
-                        $_SERVER['REQUEST_METHOD'] == 'POST'
-                    ) || (
-                        // prevent confirmation errors from being cached
-                        $page->getCmd() == 'confirm'
-                    );
-                },
-            ),
             'Podcast',
             'Shop',
             'Survey',

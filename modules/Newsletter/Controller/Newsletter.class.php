@@ -80,6 +80,11 @@ class Newsletter extends NewsletterLib
             $_REQUEST['cmd'] = '';
         }
 
+        // All actions must not be cached. This includes all requests to
+        // unsubscribe, subscribe, confirm and profile.
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $cx->getComponent('Cache')->addException('Newsletter');
+
         switch($_REQUEST['cmd']) {
             case 'unsubscribe':
                 $this->_unsubscribe();
