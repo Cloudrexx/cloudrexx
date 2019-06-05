@@ -995,6 +995,9 @@ class AccessLib
                 onClick="var imageContainer = $J(this).closest(\'.access_image_uploader_container\');
                          imageContainer.find(\'.uploader_rel_field\').val(\'\');
                          imageContainer.find(\'.uploader_rel_field_source\').val(\'\');
+                         imageContainer.find(\'.image_uploader_source_image\')
+                            .attr(\'src\', \''.$imageRepoWeb.'/'.$arrNoImage['src'].'\')
+                            .css({width : \''.$arrNoImage['width'].'px\', height: \''.$arrNoImage['height'].'px\'});
                          $J(this).hide()"
                 title="'.$_CORELANG['TXT_ACCESS_DELETE_IMAGE'].'">
                 <img
@@ -1605,7 +1608,12 @@ JSaccessValidatePrimaryGroupAssociation
     var lastAccessImageUploaderContainer = null;
     function getImageUploader(sourceElm) {
         lastAccessImageUploaderContainer = sourceElm;
-        cx.variables.get('jquery','mediabrowser')('#accessImageUploader').trigger('click');
+        // The uploader replaces the thumbnail using this selector
+        cx.variables.get('jquery','mediabrowser')('#accessImageUploader')
+            .data('thumbSelector',
+                jQuery(sourceElm).find('.image_uploader_source_image')
+            )
+            .trigger('click');
     }
     function accessImageUploaderCallback(callback) {
         if (typeof callback[0] !== 'undefined') {
@@ -1617,7 +1625,6 @@ JSaccessValidatePrimaryGroupAssociation
             uploaderField.find('.uploader_rel_field_remove_icon').show();
         }
     }
-
 // ]]>
 </script>
 JSimageUploaderCode
@@ -2259,6 +2266,7 @@ JS
      */
     public function getImageUploader()
     {
+        $arrSettings = \User_Setting::getSettings();
         // init uploader to upload images
         $uploader = new \Cx\Core_Modules\Uploader\Model\Entity\Uploader();
         $uploader->setCallback('accessImageUploaderCallback');
@@ -2267,6 +2275,14 @@ JS
             'allowed-extensions' => array('jpg', 'jpeg', 'png', 'gif'),
             'style'              => 'display:none',
             'data-upload-limit'  => 1,
+            // Note: You can add a (string) selector here.
+            // However, Access requires the distinct target jQuery element
+            // to be set according to the button clicked.
+            //'data-thumb-selector' => '.image_uploader_source_image',
+            'data-thumb-max-width' =>
+                $arrSettings['max_profile_pic_width']['value'],
+            'data-thumb-max-height' =>
+                $arrSettings['max_profile_pic_height']['value'],
         ));
         $this->attachJavaScriptFunction('imageUploaderCode');
 
