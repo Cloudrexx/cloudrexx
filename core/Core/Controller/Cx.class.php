@@ -2159,21 +2159,28 @@ namespace Cx\Core\Core\Controller {
                                                             s.parentNode.insertBefore(x, s);
                                                         })(document, "script");
                                                     </script>',
-                'GOOGLE_ANALYTICS'               => '<script>
-                                                        var gaProperty = \'' . $googleAnalyticsId . '\';
-                                                        var disableStr = \'ga-disable-\' + gaProperty; 
-                                                        if (document.cookie.indexOf(disableStr + \'=true\') > -1) { 
-                                                            window[disableStr] = true;
-                                                        } 
-                                                        function gaOptout(successMsg) { 
-                                                            document.cookie = disableStr + \'=true; expires=Thu, 31 Dec 2099 23:59:59 UTC; path=/\'; 
-                                                            window[disableStr] = true; 
-                                                            alert(successMsg);
-                                                        }
-                                                        ' . $googleAnalyticsCode . '
-                                                    </script>
-                                                    <script async src=\'https://www.google-analytics.com/analytics.js\'></script>',
             ));
+
+            // Google Analytics will not be parsed in preview
+            if (!isset($_GET['pagePreview']) && !isset($_GET['preview'])) {
+                $this->template->setVariable(
+                    'GOOGLE_ANALYTICS',
+                    '<script>
+                        var gaProperty = \'' . $googleAnalyticsId . '\';
+                        var disableStr = \'ga-disable-\' + gaProperty;
+                        if (document.cookie.indexOf(disableStr + \'=true\') > -1) {
+                            window[disableStr] = true;
+                        }
+                        function gaOptout(successMsg) {
+                            document.cookie = disableStr + \'=true; expires=Thu, 31 Dec 2099 23:59:59 UTC; path=/\';
+                            window[disableStr] = true;
+                            alert(successMsg);
+                        }
+                        ' . $googleAnalyticsCode . '
+                    </script>
+                    <script async src=\'https://www.google-analytics.com/analytics.js\'></script>'
+                );
+            }
         }
 
         /**

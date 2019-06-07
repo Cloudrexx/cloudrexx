@@ -731,6 +731,8 @@ class Url {
 
     /**
      * Returns an Url object pointing to the documentRoot of the website
+     * @param   array   $arrParameters (optional) URL arguments for the query
+     *                                 string.
      * @param int $lang (optional) Language to use, default is FRONTEND_LANG_ID
      * @param string $protocol (optional) The protocol to use
      * @return \Cx\Core\Routing\Url Url object for the documentRoot of the website
@@ -747,12 +749,8 @@ class Url {
         $offset = \Cx\Core\Core\Controller\Cx::instanciate()->getWebsiteOffsetPath();
         $langDir = \FWLanguage::getLanguageCodeById($lang);
         $parameters = '';
-        if (count($arrParameters)) {
-            $arrParams = array();
-            foreach ($arrParameters as $key => $value) {
-                $arrParams[] = $key.'='.$value;
-            }
-            $parameters = '?'.implode('&', $arrParams);
+        if (($parameters = self::array2params($arrParameters)) && (strlen($parameters) > 0)) {
+            $parameters = '?'.$parameters;
         }
 
         return new Url($protocol.'://'.$host.$offset.'/'.$langDir.'/'.$parameters, true);
