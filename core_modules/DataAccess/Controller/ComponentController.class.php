@@ -231,7 +231,13 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             
             $em = $this->cx->getDb()->getEntityManager();
             $dataAccessRepo = $em->getRepository($this->getNamespace() . '\Model\Entity\DataAccess');
-            $dataAccess = $dataAccessRepo->getAccess($outputModule, $dataSource, $method, $apiKey);
+            $dataAccess = $dataAccessRepo->getAccess(
+                $outputModule,
+                $dataSource,
+                $method,
+                $apiKey,
+                $arguments
+            );
             if (!$dataAccess) {
                 $response->setStatusCode(403);
                 throw new \BadMethodCallException('Access denied');
@@ -255,7 +261,11 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 case 'options':
                     // lists available methods for a request
                     http_response_code(204); // No Content
-                    $allowedMethods = $dataAccessRepo->getAllowedMethods($dataSource, $apiKey);
+                    $allowedMethods = $dataAccessRepo->getAllowedMethods(
+                        $dataSource,
+                        $apiKey,
+                        $arguments
+                    );
                     header('Allow: ' . implode(', ', $allowedMethods));
                     die();
                     break;
