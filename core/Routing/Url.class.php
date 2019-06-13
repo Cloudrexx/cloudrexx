@@ -588,7 +588,7 @@ class Url {
         $sp = strtolower($_SERVER['SERVER_PROTOCOL']);
         $protocol = substr($sp, 0, strpos($sp, '/')) . $s;
         $port = ($_SERVER['SERVER_PORT'] == '80') ? '' : (':'.$_SERVER['SERVER_PORT']);
-        return new Url($protocol . '://' . $_SERVER['SERVER_NAME'] . $port . $_SERVER['REQUEST_URI'], true);
+        return new Url($protocol . '://' . $_SERVER['HTTP_HOST'] . $port . $_SERVER['REQUEST_URI'], true);
     }
 
     /**
