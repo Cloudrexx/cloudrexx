@@ -1066,7 +1066,6 @@ class Newsletter extends NewsletterLib
                 'key'          => 'notification_email',
                 'section'      => 'Newsletter',
                 'lang_id'      => FRONTEND_LANG_ID,
-                'to'           => implode(',', $notifyMails),
                 'from'         => $arrSettings['sender_mail']['setvalue'],
                 'sender'       => $arrSettings['sender_name']['setvalue'],
                 'reply'        => $arrSettings['reply_mail']['setvalue'],
@@ -1081,6 +1080,9 @@ class Newsletter extends NewsletterLib
                     'NEWSLETTER_CURRENT_DATE'   => date(ASCMS_DATE_FORMAT),
                 ),
             );
+            if (count($notifyMails)) {
+                $arrMailTemplate['to'] = implode(',', $notifyMails);
+            }
             if (!\Cx\Core\MailTemplate\Controller\MailTemplate::send($arrMailTemplate)) {
                 return false;
             }
