@@ -558,7 +558,11 @@ class NewsManager extends \Cx\Core_Modules\News\Controller\NewsLibrary {
             }
 
             if ($count>intval($_CONFIG['corePagingLimit'])) {
-                $paging = getPaging($count, $pos, '&cmd=News&show=archive&monthFilter=' . contrexx_input2xhtml($_GET['monthFilter']), $_ARRAYLANG['TXT_NEWS_MESSAGES'],true);
+                $baseUrl = '&cmd=News&show=archive&monthFilter=' . contrexx_input2xhtml($_GET['monthFilter']);
+                if (!empty($_GET['categoryFilter'])) {
+                    $baseUrl .= '&categoryFilter=' . contrexx_input2xhtml($_GET['categoryFilter']);
+                }
+                $paging = getPaging($count, $pos, $baseUrl, $_ARRAYLANG['TXT_NEWS_MESSAGES'],true);
             }
             $objResult = $objDatabase->SelectLimit($query, $_CONFIG['corePagingLimit'], $pos);
 
