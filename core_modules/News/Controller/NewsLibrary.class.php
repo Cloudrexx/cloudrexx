@@ -3018,7 +3018,7 @@ EOF;
         if (strlen($strSource) > 40) {
             $strSource = substr($strSource, 0, 26) . '...' . substr($strSource, (strrpos($strSource, '.')));
         }
-        return sprintf($linkSourceTag, contrexx_raw2encodedUrl($linkSource), contrexx_raw2xhtml($strSource));
+        return sprintf($linkSourceTag, $linkSource, contrexx_raw2xhtml($strSource));
     }
 
     /**
@@ -3158,7 +3158,7 @@ EOF;
             'TXT_' . $templateVariablePrefix . 'NEWS_LINK1' =>
                 $_ARRAYLANG['TXT_NEWS_LINK1'],
             $templateVariablePrefix . 'NEWS_LINK1_SRC' =>
-                contrexx_raw2encodedUrl($url1),
+                $url1,
         ));
         if ($objTpl->blockExists($templateBlockPrefix . 'news_link1')) {
             if (empty($url1)) {
@@ -3173,7 +3173,7 @@ EOF;
             'TXT_' . $templateVariablePrefix . 'NEWS_LINK2' =>
                 $_ARRAYLANG['TXT_NEWS_LINK2'],
             $templateVariablePrefix . 'NEWS_LINK2_SRC' =>
-                contrexx_raw2encodedUrl($url2)
+                $url2,
         ));
         if ($objTpl->blockExists($templateBlockPrefix . 'news_link2')) {
             if (empty($url2)) {
