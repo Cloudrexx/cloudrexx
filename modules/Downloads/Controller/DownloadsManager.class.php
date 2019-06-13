@@ -1532,14 +1532,15 @@ class DownloadsManager extends DownloadsLibrary
                 'DOWNLOADS_DOWNLOAD_TYPE_FILE_CHECKED' => $objDownload->getType() == 'file' ? 'checked="checked"' : '',
                 'DOWNLOADS_DOWNLOAD_TYPE_URL_CHECKED' => $objDownload->getType() == 'url' ? 'checked="checked"' : '',
             ));
-            $this->objTemplate->parse('downloads_download_language_content');
-        }
 
-        // parse metakeys
-        if ($this->arrConfig['use_attr_metakeys']) {
-            $this->objTemplate->parse('downloads_download_metakeys');
-        } else {
-            $this->objTemplate->hideBlock('downloads_download_metakeys');
+            // parse metakeys
+            if ($this->arrConfig['use_attr_metakeys']) {
+                $this->objTemplate->touchBlock('downloads_download_metakeys');
+            } else {
+                $this->objTemplate->hideBlock('downloads_download_metakeys');
+            }
+
+            $this->objTemplate->parse('downloads_download_language_content');
         }
 
         // parse type
