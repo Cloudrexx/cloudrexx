@@ -1364,6 +1364,7 @@ JS_CODE;
             'DOWNLOADS_'.$variablePrefix.'FILE_THUMBNAIL'          => $thumbnail,
             'DOWNLOADS_'.$variablePrefix.'FILE_THUMBNAIL_SRC'      => $thumbnailSrc,
             'DOWNLOADS_'.$variablePrefix.'FILE_ICON'               => $this->getHtmlImageTag($objDownload->getIcon(), htmlentities($objDownload->getName($_LANGID), ENT_QUOTES, CONTREXX_CHARSET)),
+            'DOWNLOADS_'.$variablePrefix.'FILE_MIME_TYPE'          => $objDownload->getMimeType(),
             'DOWNLOADS_'.$variablePrefix.'FILE_FILE_TYPE_ICON'     => $this->getHtmlImageTag($objDownload->getFileIcon(), htmlentities($objDownload->getName($_LANGID), ENT_QUOTES, CONTREXX_CHARSET)),
             'DOWNLOADS_'.$variablePrefix.'FILE_DELETE_ICON'        => $deleteIcon,
             'DOWNLOADS_'.$variablePrefix.'FILE_DOWNLOAD_LINK_SRC'  => CONTREXX_SCRIPT_PATH . $this->moduleParamsHtml . '&amp;download=' . $objDownload->getId(),
