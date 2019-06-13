@@ -1070,6 +1070,10 @@ class NewsLibrary
             return '';
         }
 
+        if (empty($id)) {
+            return '';
+        }
+
         if (!count($this->arrTypeData)) {
             $this->initTypesLangData();
         }
