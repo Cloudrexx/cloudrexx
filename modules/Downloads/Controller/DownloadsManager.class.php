@@ -1016,7 +1016,7 @@ class DownloadsManager extends DownloadsLibrary
                 $sorting = "&sort=".htmlspecialchars($orderDirection)."&by=".htmlspecialchars($orderBy);
         }
 
-            $this->objTemplate->setVariable('DOWNLOADS_DOWNLOAD_PAGING', getPaging($downloadCount, $limitOffset, '&cmd=downloads&act=downloads'.$sorting.$pagingLink, "<b>".$_ARRAYLANG['TXT_DOWNLOADS_DOWNLOADS']."</b>"));
+            $this->objTemplate->setVariable('DOWNLOADS_DOWNLOAD_PAGING', getPaging($downloadCount, $limitOffset, '&cmd=Downloads&act=downloads'.$sorting.$pagingLink, "<b>".$_ARRAYLANG['TXT_DOWNLOADS_DOWNLOADS']."</b>"));
 
         }
 
