@@ -2884,6 +2884,7 @@ CREATE TABLE `contrexx_module_news_categories` (
   `right_id` int(11) NOT NULL,
   `sorting` int(11) NOT NULL,
   `level` int(11) NOT NULL,
+  `display` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`catid`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_module_news_categories_catid` (

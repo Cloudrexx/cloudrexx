@@ -62,6 +62,14 @@ class JsonNewsController extends \Cx\Core\Core\Model\Entity\Controller implement
     public function getAccessableMethods() {
         return array(
             'getNews',
+            'switchCategoryVisibility' =>
+                new \Cx\Core_Modules\Access\Model\Entity\Permission(
+                    array(),
+                    array(),
+                    true,
+                    array(),
+                    array(178)
+                ),
         );
     }
 
@@ -153,5 +161,48 @@ class JsonNewsController extends \Cx\Core\Core\Model\Entity\Controller implement
         }
 
         return $news;
+    }
+
+    /**
+     * Switch the visibility state of a category
+     *
+     * @param   array   $params JsonData arguments
+     * @return  string  New visibility state of category, fetched from
+     *                  database. Returns "1" if category is visible,
+     *                  otherwise "0".
+     */
+    public function switchCategoryVisibility($params) {
+        if (!isset($params['get']['id'])) {
+            throw new \Exception('Argument id missing');
+        }
+        $id = contrexx_input2db($params['get']['id']);
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $db = $cx->getDb()->getAdoDb();
+
+        $db->Execute(
+            'UPDATE `' . DBPREFIX . 'module_news_categories`
+            SET `display` = !`display` WHERE `catid` = ' . $id
+        );
+
+        $result = $db->SelectLimit(
+            'SELECT `display` FROM `' . DBPREFIX . 'module_news_categories`
+            WHERE `catid` = ' . $id
+        );
+        if (!$result || $result->EOF) {
+            throw new \Exception('Unkown category');
+        }
+
+        $newsLibrary = new NewsLibrary();
+        $cx->getComponent('Cache')->deleteComponentFiles('News');
+        $cx->getEvents()->triggerEvent(
+            'clearEsiCache',
+            array(
+                'Widget',
+                $newsLibrary->getNewsGlobalPlaceholderNames()
+            )
+        );
+
+        return $result->fields['display'];
     }
 }
