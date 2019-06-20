@@ -408,30 +408,28 @@ class FormGenerator {
     public function getDataElement($name, $title, $type, $length, $value, &$options, $entityId) {
         global $_ARRAYLANG, $_CORELANG;
 
-        if (isset($options['valueCallback'])) {
-            $value = $this->viewGenerator->callValueCallback(
-                $options['valueCallback'],
-                $value,
-                $name,
-                array(),
-                $options
-            );
+        try {
+            if (isset($options['valueCallback'])) {
+                $value = \Cx\Core\Html\Controller\ViewGenerator::callCallbackByInfo(
+                    $options['valueCallback'],
+                    array(
+                        'fieldvalue' => $value,
+                        'fieldname' => $name,
+                        'rowData' => array(),
+                        'fieldoption' => $options,
+                        'vgId' => $this->viewGenerator->getViewId(),
+                    )
+                );
+            }
+        } catch (\Exception $e) {
+            \Message::add($e->getMessage(), \Message::CLASS_ERROR);
         }
+        try {
+            if (isset($options['formfield'])) {
+                $formFieldGenerator = $options['formfield'];
 
-        if (isset($options['formfield'])) {
-            $formFieldGenerator = $options['formfield'];
-            $formField = '';
-            /* We use json to do the callback. The 'else if' is for backwards compatibility so you can declare
-             * the function directly without using json. This is not recommended and not working over session */
-            if (
-                is_array($formFieldGenerator) &&
-                isset($formFieldGenerator['adapter']) &&
-                isset($formFieldGenerator['method'])
-            ) {
-                $json = new \Cx\Core\Json\JsonData();
-                $jsonResult = $json->data(
-                    $formFieldGenerator['adapter'],
-                    $formFieldGenerator['method'],
+                $formField = \Cx\Core\Html\Controller\ViewGenerator::callCallbackByInfo(
+                    $formFieldGenerator,
                     array(
                         'name' => $title,
                         'type' => $type,
@@ -441,19 +439,17 @@ class FormGenerator {
                         'id' => $entityId,
                     )
                 );
-                if ($jsonResult['status'] == 'success') {
-                    $formField = $jsonResult["data"];
-                }
-            } else if (is_callable($formFieldGenerator)){
-                $formField = $formFieldGenerator($title, $type, $length, $value, $options, $entityId);
-            }
 
-            if (is_a($formField, 'Cx\Core\Html\Model\Entity\HtmlElement')) {
-                return $formField;
-            } else {
-                $value = $formField;
+                if (is_a($formField, 'Cx\Core\Html\Model\Entity\HtmlElement')) {
+                    return $formField;
+                } else {
+                    $value = $formField;
+                }
             }
+        } catch (\Exception $e) {
+            \Message::add($e->getMessage(), \Message::CLASS_ERROR);
         }
+
         if (isset($options['showDetail']) && $options['showDetail'] === false) {
             return '';
         }

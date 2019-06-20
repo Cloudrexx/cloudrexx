@@ -219,13 +219,20 @@ class BackendTable extends HTML_Table {
                         ) {
                             $vgId = $options['functions']['vg_increment_number'];
                         }
-                        $data = $this->viewGenerator->callValueCallback(
-                            $valueCallback,
-                            $data,
-                            $origHeader,
-                            $rows,
-                            $options['fields'][$origHeader]
-                        );
+                        try {
+                            $data = \Cx\Core\Html\Controller\ViewGenerator::callCallbackByInfo(
+                                $valueCallback,
+                                array(
+                                    'fieldvalue' => $data,
+                                    'fieldname' => $origHeader,
+                                    'rowData' => $rows,
+                                    'fieldoption' => $options['fields'][$origHeader],
+                                    'vgId' => $this->viewGenerator->getViewId(),
+                                )
+                            );
+                        } catch (\Exception $e) {
+                            \Message::add($e->getMessage(), \Message::CLASS_ERROR);
+                        }
                     }
 
                     if (
@@ -261,15 +268,10 @@ class BackendTable extends HTML_Table {
                         ) {
                             $vgId = $options['functions']['vg_increment_number'];
                         }
-                        if (
-                            is_array($callback) &&
-                            isset($callback['adapter']) &&
-                            isset($callback['method'])
-                        ) {
-                            $json = new \Cx\Core\Json\JsonData();
-                            $jsonResult = $json->data(
-                                $callback['adapter'],
-                                $callback['method'],
+
+                        try {
+                            $data = \Cx\Core\Html\Controller\ViewGenerator::callCallbackByInfo(
+                                $callback,
                                 array(
                                     'data' => $data,
                                     'rows' => $rows,
@@ -277,17 +279,10 @@ class BackendTable extends HTML_Table {
                                     'vgId' => $vgId,
                                 )
                             );
-                            if ($jsonResult['status'] == 'success') {
-                                $data = $jsonResult["data"];
-                            }
-                        } else if(is_callable($callback)){
-                            $data = $callback(
-                                $data,
-                                $rows,
-                                $options['fields'][$origHeader],
-                                $vgId
-                            );
+                        } catch (\Exception $e) {
+                            \Message::add($e->getMessage(), \Message::CLASS_ERROR);
                         }
+
                         $encode = false; // todo: this should be set by callback
                     } else if (in_array($origHeader, $status)) {
                         $statusField = new \Cx\Core\Html\Model\Entity\HtmlElement('div');
@@ -443,25 +438,16 @@ class BackendTable extends HTML_Table {
                 foreach ($attrs as $rowname=>$rows) {
                     $originalAttributes = $this->getRowAttributes($row);
                     $data = $originalAttributes;
-                    if (
-                        is_array($callback) &&
-                        isset($callback['adapter']) &&
-                        isset($callback['method'])
-                    ) {
-                        $json = new \Cx\Core\Json\JsonData();
-                        $jsonResult = $json->data(
-                            $callback['adapter'],
-                            $callback['method'],
+                    try {
+                        $data = \Cx\Core\Html\Controller\ViewGenerator::callCallbackByInfo(
+                            $callback,
                             array(
                                 'data' => $rows,
                                 'attributes' => $originalAttributes,
                             )
                         );
-                        if ($jsonResult['status'] == 'success') {
-                            $data = $jsonResult['data'];
-                        }
-                    } else if(is_callable($callback)){
-                        $data = $callback($data, $originalAttributes);
+                    } catch (\Exception $e) {
+                        \Message::add($e->getMessage(), \Message::CLASS_ERROR);
                     }
                     $this->updateRowAttributes($row, $data, true);
                     $row++;
@@ -626,26 +612,18 @@ class BackendTable extends HTML_Table {
         /* We use json to do the action callback. So all callbacks are functions in the json controller of the
          * corresponding component. The 'else if' is for backwards compatibility so you can declare the function
          * directly without using json. This is not recommended and not working over session */
-        if (
-            isset($functions['actions']) &&
-            is_array($functions['actions']) &&
-            isset($functions['actions']['adapter']) &&
-            isset($functions['actions']['method'])
-        ){
-            $json = new \Cx\Core\Json\JsonData();
-            $jsonResult = $json->data(
-                $functions['actions']['adapter'],
-                $functions['actions']['method'],
-                array(
-                    'rowData' => $rowData,
-                    'editId' => $editId,
-                )
-            );
-            if ($jsonResult['status'] == 'success') {
-                $code .= $jsonResult["data"];
+        try {
+            if (isset($functions['actions']) ) {
+                $code .= \Cx\Core\Html\Controller\ViewGenerator::callCallbackByInfo(
+                    $functions['actions'],
+                    array(
+                        'rowData' => $rowData,
+                        'editId' => $editId,
+                    )
+                );
             }
-        } else if (isset($functions['actions']) && is_callable($functions['actions'])) {
-            $code .= $functions['actions']($rowData, $editId);
+        } catch (\Exception $e) {
+            \Message::add($e->getMessage(), \Message::CLASS_ERROR);
         }
 
         if(!$virtual){

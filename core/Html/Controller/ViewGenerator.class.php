@@ -431,26 +431,13 @@ class ViewGenerator {
         if (isset($entityData[$name])) {
             $postedValue = contrexx_input2raw($entityData[$name]);
         }
-        /* We use json to do the storecallback. The 'else if' is for backwards compatibility so you can declare
-         * the function directly without using json. This is not recommended and not working over session */
-        if (is_array($storecallback) && isset($storecallback['adapter']) &&
-            isset($storecallback['method'])
-        ) {
-            $json = new \Cx\Core\Json\JsonData();
-            $jsonResult = $json->data(
-                $storecallback['adapter'],
-                $storecallback['method'],
-                array(
-                    'postedValue' => $postedValue,
-                )
-            );
-            if ($jsonResult['status'] == 'success') {
-                $entityData[$name] = $jsonResult["data"];
-            }
-        } else if (is_callable($storecallback)) {
-            $entityData[$name] = $storecallback($postedValue);
-        }
-        return $entityData[$name];
+        $arguments = array(
+            'postedValue' => $postedValue,
+        );
+        return static::callCallbackByInfo(
+            $storecallback,
+            $arguments
+        );
     }
 
     /**
@@ -1255,33 +1242,20 @@ class ViewGenerator {
         // This should be moved to FormGenerator as soon as FormGenerator
         // gets the real entity instead of $renderArray
         $additionalContent = '';
-        if (isset($this->options['preRenderDetail'])) {
-            $preRender = $this->options['preRenderDetail'];
-            /* We use json to do preRender the detail. The 'else if' is for backwards compatibility so you can declare
-             * the function directly without using json. This is not recommended and not working over session */
-            if (
-                isset($preRender) &&
-                is_array($preRender) &&
-                isset($preRender['adapter']) &&
-                isset($preRender['method'])
-            ) {
-                $json = new \Cx\Core\Json\JsonData();
-                $jsonResult = $json->data(
-                    $preRender['adapter'],
-                    $preRender['method'],
+        try {
+            if (isset($this->options['preRenderDetail'])) {
+                $additionalContent = static::callCallbackByInfo(
+                    $this->options['preRenderDetail'],
                     array(
                         'viewGenerator' => $this,
                         'formGenerator' => $this->formGenerator,
                         'entityId'  => $entityId,
                     )
                 );
-                if ($jsonResult['status'] == 'success') {
-                    $additionalContent .= $jsonResult["data"];
-                }
-            } else if (is_callable($preRender)) {
-                $additionalContent = $preRender($this, $this->formGenerator, $entityId);
 
             }
+        } catch (\Exception $e) {
+            \Message::add($e->getMessage(), \Message::CLASS_ERROR);
         }
         return $this->formGenerator . $additionalContent;
     }
@@ -2271,52 +2245,5 @@ class ViewGenerator {
             throw new ViewGeneratorException('Given argument is not a valid callback');
         }
         return $data;
-    }
-
-    /**
-     * Return the value of the value callback.
-     *
-     * @param $callback    array  callback options
-     * @param $fieldvalue  string value to modify
-     * @param $fieldname   string name of option
-     * @param $rowData     array  entity data
-     * @param $fieldoption array  option config
-     * @param $vgId        int    id of active ViewGenerator
-     * @return mixed
-     */
-    public function callValueCallback($callback, $fieldvalue, $fieldname, $rowData, $fieldoption)
-    {
-        $value = $fieldvalue;
-
-        if (
-            is_array($callback) &&
-            isset($callback['adapter']) &&
-            isset($callback['method'])
-        ) {
-            $json = new \Cx\Core\Json\JsonData();
-            $jsonResult = $json->data(
-                $callback['adapter'],
-                $callback['method'],
-                array(
-                    'fieldvalue' => $fieldvalue,
-                    'fieldname' => $fieldname,
-                    'rowData' => $rowData,
-                    'fieldoption' => $fieldoption,
-                    'vgId' => $this->viewId,
-                )
-            );
-            if ($jsonResult['status'] == 'success') {
-                $value = $jsonResult['data'];
-            }
-        } else if (is_callable($callback)) {
-            $value = $callback(
-                $fieldvalue,
-                $fieldname,
-                $rowData,
-                $fieldoption,
-                $this->viewId
-            );
-        }
-        return $value;
     }
 }
