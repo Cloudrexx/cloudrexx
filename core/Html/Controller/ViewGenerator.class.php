@@ -1707,6 +1707,14 @@ class ViewGenerator {
                     \Message::add($_ARRAYLANG['TXT_CORE_RECORD_UNKNOWN_ERROR'], \Message::CLASS_ERROR);
                 }
                 return;
+            } catch (\Cx\Model\Base\ValidationException $e) {
+                foreach ($e->getErrors() as $error) {
+                    $msg = $error;
+                    if (is_array($error)) {
+                        $msg = current($error);
+                    }
+                    \Message::add($msg, \Message::CLASS_ERROR);
+                }
             } catch (\Exception $e) {
                 echo $e->getMessage();die();
             }
