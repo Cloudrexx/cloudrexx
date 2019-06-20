@@ -12,7 +12,7 @@ if [ "${BASH_VERSION:0:1}" -lt 4 ]; then
     fi
 
     # Pass everything through our wrapper
-    docker run --rm -ti --name clx-win-wrapper -v "$(pwd -P)/":/root -v /var/run/docker.sock:/var/run/docker.sock cloudrexx/ubuntu bash -c "$command"
+    docker run --rm -ti --name clx-win-wrapper --user=$(id -u):$(stat -c '%g' /var/run/docker.sock) -v "$(pwd -P)/":/root -v /var/run/docker.sock:/var/run/docker.sock cloudrexx/ubuntu bash -c "$command"
     exit 0
 fi
 
@@ -764,7 +764,7 @@ function cmd_env {
                     exit 1
                 fi
             fi
-            ARGUMENTS["dir"]="$(pwd -P)"
+            ARGUMENTS["dir"]="$(get_real_pwd)"
             envname="$(cmd_envs list)"
             if [[ "$?" == "0" ]]; then
                 echo "There's already an environment up and running (\"$envname\") for this directory."
@@ -794,7 +794,7 @@ function cmd_env {
                 if ! which cx > /dev/null; then
                     echo ""
                     echo "cx could not be found in your path. Run the following command to add it:"
-                    echo "sudo cp $(pwd -P)/cx /usr/local/bin"
+                    echo "sudo cp $(get_real_pwd)/cx /usr/local/bin"
                 fi
             fi
             exit 0
@@ -1726,6 +1726,15 @@ function runs_as_proxy {
     fi
 }
 
+function is_wrapper {
+    if [[ "$PROXY_HOST_DIR" != "" ]]; then
+        return 0
+    elif [[ "${ARGUMENTS["proxy-host-dir"]}" != "" ]]; then
+        return 0
+    fi
+    return 1
+}
+
 function get_real_pwd {
     local working_directory
     working_directory="$PWD"
@@ -1782,6 +1791,10 @@ if ! $found; then
 
     # command is envs
     elif [[ "$1" == "envs" ]]; then
+        if is_wrapper; then
+            echo "envs command is not available through wrapper!"
+            exit 1
+        fi
         COMMANDS=("${COMMANDS[@]:1}")
         cmd_envs "${COMMANDS[@]/#/}"
         exit
@@ -1806,6 +1819,10 @@ fi
 ORIG_ARGS=("$@")
 case "${COMMANDS[0]}" in
     envs)
+        if is_wrapper; then
+            echo "envs command is not available through wrapper!"
+            exit 1
+        fi
         COMMANDS=("${COMMANDS[@]:1}")
         cmd_envs "${COMMANDS[@]/#/}"
         ;;
