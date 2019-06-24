@@ -339,19 +339,32 @@ class CalendarMailManager extends CalendarLibrary {
         $objMail = new \Cx\Core\MailTemplate\Model\Entity\Mail();
         $objMail->SetFrom($_CONFIG['coreAdminEmail'], $_CONFIG['coreGlobalPageTitle']);
 
-        // In case we're about to send out event invitations,
-        // do check if any have been sent already and do load
-        // them in such case.
-        if ($actionId == self::MAIL_INVITATION || $actionId == self::MAIL_CONFIRM_REG) {
-            $eventRepo = $this->em->getRepository('Cx\Modules\Calendar\Model\Entity\Event');
-            $eventByDoctrine = $eventRepo->findOneById($event->id);
+        switch ($actionId) {
+            case self::MAIL_ALERT_REG:
+                if (empty($regMail)) {
+                    break;
+                }
+                $objMail->addReplyTo($regMail);
+                break;
 
-            $inviteRepo = $this->em->getRepository('Cx\Modules\Calendar\Model\Entity\Invite');
+            // In case we're about to send out event invitations,
+            // do check if any have been sent already and do load
+            // them in such case.
+            case self::MAIL_INVITATION:
+            case self::MAIL_CONFIRM_REG:
+                $eventRepo = $this->em->getRepository('Cx\Modules\Calendar\Model\Entity\Event');
+                $eventByDoctrine = $eventRepo->findOneById($event->id);
 
-            // this should not happen!
-            if (!$eventByDoctrine) {
-                return;
-            }
+                $inviteRepo = $this->em->getRepository('Cx\Modules\Calendar\Model\Entity\Invite');
+
+                // this should not happen!
+                if (!$eventByDoctrine) {
+                    return;
+                }
+                break;
+
+            default:
+                break;
         }
 
         // fetch active frontend languages
