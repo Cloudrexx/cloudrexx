@@ -647,13 +647,15 @@ class FormGenerator {
                 if (empty($data)) {
                     $value = 204;
                 }
-                $options = \Cx\Core\Country\Controller\Country::getMenuoptions($value);
+                $menuoptions = \Cx\Core\Country\Controller\Country::getMenuoptions($value);
                 $select = new \Cx\Core\Html\Model\Entity\DataElement(
                     $title,
                     '',
                     \Cx\Core\Html\Model\Entity\DataElement::TYPE_SELECT
                 );
-                $select->addChild(new \Cx\Core\Html\Model\Entity\TextElement($options));
+                $select->addChild(
+                    new \Cx\Core\Html\Model\Entity\TextElement($menuoptions)
+                );
                 if (isset($options['attributes'])) {
                     $select->setAttributes($options['attributes']);
                 }
