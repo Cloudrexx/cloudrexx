@@ -89,9 +89,16 @@ class BackendTable extends HTML_Table {
         if (!empty($options['functions']['editable'])) {
             $this->editable = true;
         }
-        $this->templateFile = empty($options['template']) || !file_exists($options['template'])
-            ? $cx->getCodeBaseCorePath().'/Html/View/Template/Generic/Table.html'
-            : $options['template'];
+        if (
+            !isset($options['template']['table']) || 
+            !file_exists($options['template']['table'])
+        ) {
+            $this->templateFile = $cx->getCodeBaseCorePath().
+                '/Html/View/Template/Generic/Table.html';
+        } else { 
+            $this->templateFile = $options['template']['table'];
+        }
+               
         if ($attrs instanceof \Cx\Core_Modules\Listing\Model\Entity\DataSet) {
             $this->hasMasterTableHeader = !empty($options['header']);
             // add master table-header-row
