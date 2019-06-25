@@ -182,6 +182,13 @@ class FormGenerator {
             $this->form->addChild($editIdField);
         }
 
+        try {
+            $entityObject = \Env::get('em')->getClassMetadata($this->entityClass);
+            $primaryKeyNames = $entityObject->getIdentifierFieldNames();
+        } catch (\Doctrine\Common\Persistence\Mapping\MappingException $e) {
+            $primaryKeyNames = array();
+        }
+
         $overviewFields = array_keys($entity);
         foreach ($tabs as $tabName=>$tabData) {
             foreach ($entity as $field => $value) {
@@ -276,7 +283,14 @@ class FormGenerator {
                 if (!empty($fieldOptions['type'])) {
                     $type = $fieldOptions['type'];
                 }
-                $dataElement = $this->getDataElement($field, $field, $type, $length, $value, $fieldOptions, $entityId);
+                if (in_array($field, $primaryKeyNames)) {
+                    $dataElement = new \Cx\Core\Html\Model\Entity\TextElement(
+                        $value
+                    );
+                } else {
+                    $dataElement = $this->getDataElement($field, $field, $type, $length, $value, $fieldOptions, $entityId);
+                }
+
                 if (empty($dataElement)) {
                     continue;
                 }

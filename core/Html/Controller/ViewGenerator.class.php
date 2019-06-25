@@ -1386,7 +1386,11 @@ class ViewGenerator {
 
                 // get doctrine field name, database field name and type for each field
                 foreach($renderObject as $name => $value) {
-                    if ($name == 'virtual' || in_array($name, $primaryKeyNames)) {
+                    if ($name == 'virtual' || (
+                            in_array($name, $primaryKeyNames) &&
+                            empty($this->options['showPrimaryKeys'])
+                        )
+                    ) {
                         continue;
                     }
                     $classMetadata = \Env::get('em')->getClassMetadata($entityClassWithNS);
