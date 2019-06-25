@@ -347,7 +347,12 @@ class Page extends \Cx\Core_Modules\Widget\Model\Entity\WidgetParseTarget implem
         $this->backendAccessId = 0;
 
         $this->setUpdatedAtToNow();
+    }
 
+    /**
+     * @inheritDoc
+     */
+    public function initializeValidators() {
         $this->validators = array(
             'lang' => new \CxValidateInteger(),
             'type' => new \CxValidateString(array('alphanumeric' => true, 'maxlength' => 255)),
