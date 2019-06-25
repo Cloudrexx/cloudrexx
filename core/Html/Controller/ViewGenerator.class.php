@@ -156,6 +156,25 @@ class ViewGenerator {
 
             }
 
+            // execute copy if entry is a doctrine entity (or execute callback if specified in configuration)
+            // post edit
+            if (
+                !empty($_GET['copy']) && (
+                    !empty($this->options['functions']['copy']) &&
+                    $this->options['functions']['copy'] != false
+                )
+            ) {
+                unset($_GET['copy']);
+                $showSuccessMessage = $this->saveEntry($entityWithNS);
+                if ($showSuccessMessage) {
+                    \Message::add($_ARRAYLANG['TXT_CORE_RECORD_ADDED_SUCCESSFUL']);
+                }
+                $param = 'copy';
+                $actionUrl = clone $this->cx->getRequest()->getUrl();
+                $actionUrl->setParam($param, null);
+                \Cx\Core\Csrf\Controller\Csrf::redirect($actionUrl);
+            }
+
             // execute edit if entry is a doctrine entity (or execute callback if specified in configuration)
             // post edit
             $editId = $this->getEntryId();
@@ -201,15 +220,6 @@ class ViewGenerator {
             if ($this->cx->getRequest()->hasParam('deleteids')) {
                 $deleteIds = $this->cx->getRequest()->getParam('deleteids');
                 $this->removeEntries($entityWithNS, $deleteIds);
-            }
-
-            // execute copy if entry is a doctrine entity (or execute callback if specified in configuration)
-            // post edit
-            if (
-                !empty($this->options['functions']['copy']) &&
-                $this->options['functions']['copy'] != false
-            ) {
-                $this->saveEntry($entityWithNS);
             }
         } catch (\Exception $e) {
             \Message::add($e->getMessage(), \Message::CLASS_ERROR);
@@ -792,7 +802,8 @@ class ViewGenerator {
             !isset($_GET['editid']) &&
             !isset($_POST['editid']) &&
             !isset($_GET['showid']) &&
-            !isset($_POST['showid'])
+            !isset($_POST['showid']) &&
+            !isset($_GET['copy'])
         ) {
             return 0;
         }
@@ -808,6 +819,9 @@ class ViewGenerator {
         }
         if (isset($_POST['showid'])) {
             $editId = $this->getVgParam($_POST['showid']);
+        }
+        if (isset($_GET['copy'])) {
+            $editId = $this->getVgParam($_GET['copy']);
         }
 
         // Self-heal if the same param is specified multiple times:
@@ -892,8 +906,7 @@ class ViewGenerator {
             $this->options['functions']['copy'] != false
         ) {
             $isSingle = true;
-            $eId = intval($this->getVgParam($_GET['copy']));
-            return $this->renderFormForEntry($eId);
+            return $this->renderFormForEntry($entityId);
         }
 
         $template = new \Cx\Core\Html\Sigma(
@@ -912,7 +925,6 @@ class ViewGenerator {
         $template->setGlobalVariable($_ARRAYLANG);
         $template->setGlobalVariable('VG_ID', $this->viewId);
         $renderObject = $this->object;
-        $entityId = $this->getEntryId();
 
         // this case is used to get the right entry if we edit a existing one
         if (

@@ -644,16 +644,18 @@ class BackendTable extends HTML_Table {
                 $code .= '<a href="' . $showUrl . '" class="show" title="'.$_ARRAYLANG['TXT_CORE_RECORD_SHOW_TITLE'].'"></a>';
             }
             if (isset($functions['copy']) && $functions['copy']) {
-                $actionUrl = clone $editUrl;
-                $actionUrl->setParam('copy', $editId);
+                $copyUrl = \Cx\Core\Html\Controller\ViewGenerator::getVgCopyUrl(
+                    $functions['vg_increment_number'],
+                    $rowname,
+                    clone $baseUrl
+                );
                 //remove the parameter 'vg_increment_number' from actionUrl
                 //if the baseUrl contains the parameter 'vg_increment_number'
-                $params = $actionUrl->getParamArray();
+                $params = $copyUrl->getParamArray();
                 if (isset($params['vg_increment_number'])) {
-                    \Html::stripUriParam($actionUrl, 'vg_increment_number');
+                    \Html::stripUriParam($copyUrl, 'vg_increment_number');
                 }
-                $code = '<a href="'.$actionUrl.'" class="copy" title="'.$_ARRAYLANG['TXT_CORE_RECORD_COPY_TITLE'].'"></a>';
-
+                $code = '<a href="'.$copyUrl.'" class="copy" title="'.$_ARRAYLANG['TXT_CORE_RECORD_COPY_TITLE'].'"></a>';
             }
             if (isset($functions['edit']) && $functions['edit']) {
                 //remove the parameter 'vg_increment_number' from editUrl
