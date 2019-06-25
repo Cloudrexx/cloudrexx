@@ -503,6 +503,9 @@ class FormGenerator {
                 if (isset($options['attributes'])) {
                     $inputNumber->setAttributes($options['attributes']);
                 }
+                if (isset($options['readonly']) && $options['readonly']) {
+                    $inputNumber->setAttribute('disabled');
+                }
                 $inputNumber->setAttribute('type', 'number');
                 return $inputNumber;
                 break;
