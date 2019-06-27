@@ -370,7 +370,11 @@ class Page extends \Cx\Core_Modules\Widget\Model\Entity\WidgetParseTarget implem
             //active is boolean, not checked
             'target' => new \CxValidateString(array('maxlength' => 255)),
             'module' => new \CxValidateString(array('alphanumeric' => true)),
-            'cmd' => new \CxValidateRegexp(array('pattern' => '/^[-A-Za-z0-9_]+$/')),
+            'cmd' => new \CxValidateRegexp(array(
+                'pattern' => '/^([-a-z0-9_]+|\[\[' .
+                    \Cx\Core\Routing\NodePlaceholder::NODE_URL_PCRE .
+                    '\]\])$/ix'
+            )),
         );
     }
 
