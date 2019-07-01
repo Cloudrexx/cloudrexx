@@ -1644,7 +1644,7 @@ function mysql_exec {
     else
         echo "$1" > "./tmp/db/import.sql"
         shift
-        internal_dockerexec exec -i "<db-container>" bash -c "mysql --defaults-file=${TEMP_FILES["db-connection"]} -e $@ 'SOURCE /tmp/import/import.sql'"
+        internal_dockerexec exec -i "<db-container>" bash -c "mysql --defaults-file=${TEMP_FILES["db-connection"]} $@ -e 'SOURCE /tmp/import/import.sql'"
         rm "./tmp/db/import.sql"
     fi
 }
