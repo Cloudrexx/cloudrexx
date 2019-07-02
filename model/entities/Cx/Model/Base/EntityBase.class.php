@@ -169,10 +169,8 @@ class EntityBase {
         foreach ($this->validators as $field => $validator) {
             $methodName = 'get'.ucfirst($field);
             $val = $this->$methodName();
-            if ($val) {
-                if (!$validator->isValid($val)) {
-                     $errors[$field] = $validator->getMessages();
-                }
+            if (!$validator->isValid($val)) {
+                 $errors[$field] = $validator->getMessages();
             }
         }
         if (count($errors) > 0) {
