@@ -1260,18 +1260,20 @@ class ViewGenerator {
         $actionUrl = $renderOptions['actionUrl'];
 
         //sets the order of the fields
-        if(!empty($this->options['order']['form'])) {
-            $sortedData = array();
-            foreach ($this->options['order']['form'] as $orderVal) {
-                if(array_key_exists($orderVal, $renderArray)){
-                    $sortedData[$orderVal] = $renderArray[$orderVal];
-                }
-            }
-            $renderArray = array_merge($sortedData,$renderArray);
+        if(!empty($this->options['order']['form']) && !$readOnly) {
+            $renderArray = $this->orderData(
+                $this->options['order']['form'],
+                $renderArray
+            );
+        } else if (!empty($this->options['order']['show']) && $readOnly) {
+            $renderArray = $this->orderData(
+                $this->options['order']['show'],
+                $renderArray
+            );
         }
         if ($readOnly) {
             unset($renderArray['vg_increment_number']);
-            $this->formGenerator = new \Cx\Core\Html\Controller\TableGenerator($renderArray, $this->options);
+            $this->formGenerator = new \Cx\Core\Html\Controller\TableGenerator($renderArray, $this->options, $readOnly);
         } else {
             $this->formGenerator = new FormGenerator($renderArray, $actionUrl, $entityClassWithNS, $title, $this->options, $entityId, $this->componentOptions, $this);
         }
@@ -1294,6 +1296,24 @@ class ViewGenerator {
             \Message::add($e->getMessage(), \Message::CLASS_ERROR);
         }
         return $this->formGenerator . $additionalContent;
+    }
+
+    /**
+     * Order an array by a given list
+     *
+     * @param $orderList   array order list
+     * @param $renderArray array to order
+     * @return array ordered data
+     */
+    protected function orderData($orderList, $renderArray)
+    {
+        $sortedData = array();
+        foreach ($orderList as $orderVal) {
+            if(array_key_exists($orderVal, $renderArray)){
+                $sortedData[$orderVal] = $renderArray[$orderVal];
+            }
+        }
+        return array_merge($sortedData,$renderArray);
     }
 
     /**
