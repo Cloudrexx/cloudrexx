@@ -1948,7 +1948,7 @@ RSS2JSCODE;
         $i          = 0;
         if ($categories = substr($_REQUEST['cmd'], 7)) {
             $selectedCategories = contrexx_input2int(
-                explode(',', $categories)
+                explode('-', $categories)
             );
             $categories = $this->getCatIdsFromNestedSetArray(
                 $this->getNestedSetCategories($selectedCategories)
