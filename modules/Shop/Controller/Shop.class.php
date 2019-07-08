@@ -1406,6 +1406,10 @@ die("Failed to update the Cart!");
             if (self::$objTemplate->blockExists('no_product')) {
                 self::$objTemplate->touchBlock('no_product');
             }
+            // hide products template block if no products have been loaded
+            if (self::$objTemplate->blockExists('products')) {
+                self::$objTemplate->hideBlock('products');
+            }
             return true;
         }
         if ($count == 0) {
