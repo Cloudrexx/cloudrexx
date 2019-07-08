@@ -2906,11 +2906,6 @@ if ($test === NULL) {
             'SHOP_FAX' => $objCustomer->fax(),
             'SHOP_EMAIL' => $objCustomer->email(),
             'SHOP_CUSTOMER_BIRTHDAY' => date(ASCMS_DATE_FORMAT_DATE, $objCustomer->getProfileAttribute('birthday')),
-// OBSOLETE
-//            'SHOP_CCNUMBER' => $objCustomer->getCcNumber(),
-//            'SHOP_CCDATE' => $objCustomer->getCcDate(),
-//            'SHOP_CCNAME' => $objCustomer->getCcName(),
-//            'SHOP_CVC_CODE' => $objCustomer->getCcCode(),
             'SHOP_COMPANY_NOTE' => $objCustomer->companynote(),
             'SHOP_IS_RESELLER' => $customer_type,
             'SHOP_REGISTER_DATE' => date(ASCMS_DATE_FORMAT_DATETIME,
