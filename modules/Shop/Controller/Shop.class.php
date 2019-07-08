@@ -1131,6 +1131,13 @@ die("Failed to update the Cart!");
                     $arrSize = getimagesize($cx->getWebsitePath() . $thumbnailPath);
                     self::scaleImageSizeToThumbnail($arrSize);
                 }
+            } else {
+                // Fallback if no picture for category was found.
+                // This is intentionally in the else statement and not as
+                // assignement before this if-statement, as it would otherwise
+                // brake the regular thumbnail $thumbnailPath (which would be
+                // overwritten above )
+                $imageName = ShopLibrary::noPictureName;
             }
             if ($imageName) {
                 self::$objTemplate->setVariable(
