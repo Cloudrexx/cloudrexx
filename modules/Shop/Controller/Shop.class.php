@@ -1693,14 +1693,22 @@ die("Failed to update the Cart!");
             }
             $shopProductFormName = "shopProductForm$formId";
             $row = $formId % 2 + 1;
+            $detailDescription = '';
+            if ($longDescription) {
+                $detailDescription = $longDescription;
+            } elseif (!self::$objTemplate->placeholderExists(
+                'SHOP_PRODUCT_DESCRIPTION'
+            )) {
+                // show short description as detail-description if the
+                // short-description placeholder is not being used
+                $detailDescription = $short;
+            }
             self::$objTemplate->setVariable(array(
                 'SHOP_ROWCLASS' => 'row'.$row,
                 'SHOP_PRODUCT_ID' => $objProduct->id(),
                 'SHOP_PRODUCT_TITLE' => contrexx_raw2xhtml($objProduct->name()),
                 'SHOP_PRODUCT_DESCRIPTION' => $short,
-// TODO: Test whether this produces double descriptions in some views
-                'SHOP_PRODUCT_DETAILDESCRIPTION' => ($longDescription
-                    ? $longDescription : $short),
+                'SHOP_PRODUCT_DETAILDESCRIPTION' => $detailDescription,
                 'SHOP_PRODUCT_FORM_NAME' => $shopProductFormName,
                 'SHOP_PRODUCT_SUBMIT_NAME' => $productSubmitName,
                 'SHOP_PRODUCT_SUBMIT_FUNCTION' => $productSubmitFunction,
