@@ -1732,6 +1732,11 @@ die("Failed to update the Cart!");
                     'SHOP_MANUFACTURER_LINK' => $manufacturer_link,
                     'TXT_SHOP_MANUFACTURER_LINK' => $_ARRAYLANG['TXT_SHOP_MANUFACTURER_LINK'],
                 ));
+                if (self::$objTemplate->blockExists('shopProductManufacturer')) {
+                    self::$objTemplate->parse('shopProductManufacturer');
+                }
+            } elseif (self::$objTemplate->blockExists('shopProductManufacturer')) {
+                self::$objTemplate->hideBlock('shopProductManufacturer');
             }
 
             // This is the old Product field for the Manufacturer URI.
