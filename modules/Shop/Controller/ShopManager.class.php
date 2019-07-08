@@ -584,8 +584,11 @@ class ShopManager extends ShopLibrary
                     ++$errorLines;
                 }
             }
-            // Fix picture field and create thumbnails
-            Products::makeThumbnailsById($arrId);
+            // Fix picture field and create thumbnails in case the import
+            // contains images
+            if (in_array('pictures', $arrProductFieldName)) {
+                Products::makeThumbnailsById($arrId);
+            }
             if ($importedLines) {
                 \Message::ok($_ARRAYLANG['TXT_SHOP_IMPORT_SUCCESSFULLY_IMPORTED_PRODUCTS'].
                     ': '.$importedLines);
