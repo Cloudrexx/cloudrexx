@@ -2240,7 +2240,7 @@ if ($test === NULL) {
             'SHOP_STOCK_VISIBILITY' => ($objProduct->stock_visible()
                 ? \Html::ATTRIBUTE_CHECKED : ''),
             'SHOP_MANUFACTURER_MENUOPTIONS' =>
-                Manufacturer::getMenuoptions($objProduct->manufacturer_id()),
+                Manufacturer::getMenuoptions($objProduct->manufacturer_id(), true),
             'SHOP_PICTURE1_IMG_SRC' =>
                 (   !empty($arrImages[1]['img'])
                  && is_file(\ImageManager::getThumbnailFilename($websiteImagesShopPath . $arrImages[1]['img']))
