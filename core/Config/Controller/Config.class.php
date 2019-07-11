@@ -319,6 +319,10 @@ class Config
                     'type' => \Cx\Core\Setting\Controller\Setting::TYPE_RADIO,
                     'value' => 'off',
                 ),
+                'uploadFileSizeLimit' => array(
+                    'value' => '500 mb',
+                    'values' => '{"type":"filesize"}',
+                ),
             ),
             'core' => array(
                 'coreSmtpServer' => array(
