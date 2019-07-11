@@ -1044,6 +1044,33 @@ class Setting{
                         }
                         $value = '';
                       break;
+
+                    case self::TYPE_TEXT:
+                        // option not changed -> abort
+                        if ($value == $arrSettings[$name]['value']) {
+                            break;
+                        }
+                        // fetch setting options
+                        $options = json_decode(
+                            $arrSettings[$name]['values'],
+                            true
+                        );
+                        if (!isset($options['type'])) {
+                            // setting not special -> abort
+                            break;
+                        }
+
+                        // process special parsing
+                        switch ($options['type']) {
+                            case 'filesize':
+                                $value = static::parseFileSizeValue($value);
+                                break;
+
+                            default:
+                                break;
+                        }
+                        break;
+
                     default:
                         // Regular value of any other type
                         break;
@@ -1077,6 +1104,23 @@ class Setting{
         }
         // There has been an error anyway
         return false;
+    }
+
+    /**
+     * Parses value into literal file size notation
+     * @param   string  $value  File size in bytes or literal file size
+     *                          notation.
+     * @return  string  Literal file size notation. I.e.: 10 MB / 1 GB
+     */
+    protected static function parseFileSizeValue($value) {
+        // get bytes of set upload limit
+        if (preg_match('/^\d+$/', $value)) {
+            $bytes = $value;
+        } else {
+            $bytes = \FWSystem::getBytesOfLiteralSizeFormat($value);
+        }
+        // convert bytes into human readable format
+        return \FWSystem::getLiteralSizeFormat($bytes);
     }
 
     /**
