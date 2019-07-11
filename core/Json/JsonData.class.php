@@ -362,6 +362,7 @@ class JsonData {
      *              );
      * </pre>
      * @param array $files Key is the POST field name, value is the file path
+     * @param boolean $sendJson Whether to encode data as JSON, default false
      * @return stdClass|boolean Decoded JSON on success, false otherwise
      */
     public function getJson(
@@ -369,7 +370,8 @@ class JsonData {
         $secure = false,
         $certificateFile = '',
         $httpAuth=array(),
-        $files = array()
+        $files = array(),
+        $sendJson = false
     ) {
         $request = new \HTTP_Request2($url, \HTTP_Request2::METHOD_POST);
 
@@ -395,8 +397,16 @@ class JsonData {
             }
         }
 
-        foreach ($data as $name=>$value) {
-            $request->addPostParameter($name, $value);
+        if ($sendJson) {
+            $request->setHeader(
+                'Content-Type',
+                'application/json'
+            );
+            $request->setBody(json_encode($data));
+        } else {
+            foreach ($data as $name=>$value) {
+                $request->addPostParameter($name, $value);
+            }
         }
 
         if (!empty($files)) {
