@@ -395,8 +395,8 @@ class JsonData {
         }
         $request->setConfig(array(
             // disable ssl peer verification
-            'ssl_verify_host' => false,
-            'ssl_verify_peer' => false,
+            'ssl_verify_host' => $secure,
+            'ssl_verify_peer' => $secure,
             // follow HTTP redirect
             'follow_redirects' => true,
             // resend original request to new location
