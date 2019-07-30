@@ -735,43 +735,6 @@
         }
     }
 
-
-    function checkTime()
-    {
-        var startdate = document.getElementById("formModifyEvent").startDate.value;
-        var enddate = document.getElementById("formModifyEvent").endDate.value;
-        var starthour = document.getElementById("formModifyEvent").startHour.value;
-        if (starthour < 10) {
-            starthour = "0" + starthour
-        }
-        ;
-        var startminute = document.getElementById("formModifyEvent").startMinute.value;
-        if (startminute < 10) {
-            startminute = "0" + startminute
-        }
-        ;
-        var endhour = document.getElementById("formModifyEvent").endHour.value;
-        if (endhour < 10) {
-            endhour = "0" + endhour
-        }
-        ;
-        var endminute = document.getElementById("formModifyEvent").endMinute.value;
-        if (endminute < 10) {
-            endminute = "0" + endminute
-        }
-        ;
-
-        var starttime = starthour + startminute;
-        var endtime = endhour + endminute;
-
-        // alert(starttime + " - " + endtime);
-
-        if (starttime > endtime && enddate <= startdate) {
-            var endhour = document.getElementById("formModifyEvent").endHour.value = starthour;
-            var endminute = document.getElementById("formModifyEvent").endMinute.value = startminute;
-        }
-    }
-
     function showSelection()
     {
         var list = document.getElementById("listformat");
