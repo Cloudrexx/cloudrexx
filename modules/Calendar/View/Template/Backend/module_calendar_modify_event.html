@@ -912,14 +912,14 @@
             <tr class="row2">
                 <td width="180"  valign="top">{TXT_CALENDAR_EVENT_START} <font color="#ff0000">*</font></td>
                 <td >
-                    <input type="text"  name="startDate" class="startDate" id="startDate" value="{CALENDAR_EVENT_START_DATE}" style="width: 250px;" />
+                    <input type="text"  name="startDate" class="startDate" id="startDate" value="{CALENDAR_EVENT_START_DATE}" style="width: 250px;" autocomplete="off" />
                     &nbsp;<label><input type="checkbox" class="all_day" name="all_day" {CALENDAR_EVENT_ALL_DAY} value="1" /> {TXT_CALENDAR_EVENT_ALL_DAY} </label>
                 </td>
             </tr>
             <tr class="row1">
                 <td valign="top">{TXT_CALENDAR_EVENT_END} <font color="#ff0000">*</font></td>
                 <td>
-                    <input type="text" name="endDate" class="endDate" id="endDate" value="{CALENDAR_EVENT_END_DATE}" style="width: 250px;" />
+                    <input type="text" name="endDate" class="endDate" id="endDate" value="{CALENDAR_EVENT_END_DATE}" style="width: 250px;" autocomplete="off" />
                 </td>
             </tr>
             <tr class="row2">
@@ -1630,7 +1630,7 @@
                     <label style="width: 100px;float:left;"><input type="radio" name='seriesDouranceType' value="2" {CALENDAR_SERIES_PATTERN_DOURANCE_2}/>&nbsp;{TXT_CALENDAR_SERIES_PATTERN_ENDS_AFTER}&nbsp;</label>
                     <input type="text" name='seriesDouranceEvents' id="seriesDouranceEvents" maxlength="3" value="{CALENDAR_SERIES_PATTERN_ENDS_EVENTS}" style="width: 20px;" onkeypress="return modifyEvent._isNumber(event);" />&nbsp;{TXT_CALENDAR_SERIES_PATTERN_APPONTMENTS}<br />
                     <label style="width: 100px;float:left;"><input type="radio" name='seriesDouranceType' value="3" {CALENDAR_SERIES_PATTERN_DOURANCE_3}/>&nbsp;{TXT_CALENDAR_SERIES_PATTERN_ENDS}&nbsp;</label>
-                    <input type="text" name="seriesDouranceDate"  id="" class="event_date" style="width: 140px;" value="{CALENDAR_SERIES_PATTERN_ENDS_DATE}" />
+                    <input type="text" name="seriesDouranceDate"  id="" class="event_date" style="width: 140px;" value="{CALENDAR_SERIES_PATTERN_ENDS_DATE}" autocomplete="off" />
                 </td>
             </tr>
             <tr class="row1">
