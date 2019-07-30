@@ -355,7 +355,7 @@ class CalendarEventManager extends CalendarLibrary
                 if ($objInit->mode !== \Cx\Core\Core\Controller\Cx::MODE_BACKEND
                     || $this->showSeries) {
                     $checkFutureEvents = true;
-                    if(self::_addToEventList($objEvent)) {
+                    if($this->_addToEventList($objEvent)) {
                         $this->eventList[] = $objEvent;
                         if ($this->listType == 'upcoming') {
                             $checkFutureEvents = false;
@@ -526,7 +526,7 @@ class CalendarEventManager extends CalendarLibrary
      *
      * @return boolean true if the event is valid, false oterwise
      */
-    function _addToEventList($objEvent) {
+    public function _addToEventList($objEvent) {
         if ($this->startDate == null) {
             if($objEvent->endDate < $this->endDate || $this->endDate == null) {
                 return true;
@@ -2013,7 +2013,7 @@ class CalendarEventManager extends CalendarLibrary
 
         if (   $isAllowedEvent
             && !$this->isDateExists($objCloneEvent->startDate, $objCloneEvent->seriesData['seriesPatternExceptions'])
-            && self::_addToEventList($objCloneEvent)
+            && $this->_addToEventList($objCloneEvent)
         ) {
             array_push($this->eventList, $objCloneEvent);
             if ($this->listType == 'upcoming') {
