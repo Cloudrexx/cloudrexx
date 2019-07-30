@@ -1306,7 +1306,8 @@ class CalendarManager extends CalendarLibrary
             'TXT_'.$this->moduleLangVar.'_CONFIRM_DELETE_DATA'      => $_ARRAYLANG['TXT_CALENDAR_CONFIRM_DELETE_DATA'],
             'TXT_'.$this->moduleLangVar.'_ACTION_IS_IRREVERSIBLE'   => $_ARRAYLANG['TXT_CALENDAR_ACTION_IS_IRREVERSIBLE'],
             'TXT_'.$this->moduleLangVar.'_INSERT_CATEGORY'          => $_ARRAYLANG['TXT_CALENDAR_INSERT_CATEGORY'] ,
-            'TXT_'.$this->moduleLangVar.'_MAKE_SELECTION'           => $_ARRAYLANG['TXT_CALENDAR_MAKE_SELECTION']
+            'TXT_'.$this->moduleLangVar.'_MAKE_SELECTION'           => $_ARRAYLANG['TXT_CALENDAR_MAKE_SELECTION'],
+            'TXT_'.$this->moduleLangVar.'_COUNT_WITHOUT_SERIES'     => $_ARRAYLANG['TXT_CALENDAR_COUNT_WITHOUT_SERIES'],
         ));
 
         $objCategoryManager = new \Cx\Modules\Calendar\Controller\CalendarCategoryManager();
