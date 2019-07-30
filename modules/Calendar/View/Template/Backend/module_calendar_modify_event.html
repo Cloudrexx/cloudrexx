@@ -416,12 +416,12 @@
             cx.jQuery.each(exDates, function(key, v) {
                 $field  = cx.jQuery( blankException );
 
-                $field.find('.exceptionDate').val(key);
-                $field.find('.txtExceptionDate').text(v);
-                if (cx.jQuery.inArray(key, selectedDates) != -1) {
+                $field.find('.exceptionDate').val(v.date);
+                $field.find('.txtExceptionDate').text(v.label);
+                if (cx.jQuery.inArray(v.date, selectedDates) != -1) {
                     $field.find('.exceptionDate').attr("checked", "checked");
                 }
-                $field.find( '.exceptionDate' ).data( 'txtSeriesDate', v );
+                $field.find( '.exceptionDate' ).data( 'txtSeriesDate', v.label );
 
                 exceptionDateHolder.append( $field );
             });
@@ -476,8 +476,8 @@
                         }
 
                         jQuery.each(exceptionDates, function(key, v) {
-                            if (jQuery.inArray(key, selectedDates) != -1) {
-                                addExeptionList(key, v);
+                            if (jQuery.inArray(v.date, selectedDates) != -1) {
+                                addExeptionList(v.date, v.label);
                             }
                         });
                     } else {

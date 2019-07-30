@@ -695,11 +695,23 @@ EOF;
         );
         $dayArray = explode(',', $_CORELANG['TXT_CORE_DAY_ABBREV2_ARRAY']);
         foreach ($objEventManager->eventList as $event) {
-            $startDate = $event->startDate;
-            $endDate   = $event->endDate;
-            $exceptionDates[$this->format2userDate($startDate)] = $this->format2userDate($startDate) != $this->format2userDate($endDate)
-                                                                    ? $dayArray[$this->formatDateTime2user($startDate, "w")] .", " . $this->format2userDate($startDate) .' - ' . $dayArray[$this->formatDateTime2user($endDate, "w")] .", ". $this->format2userDate($endDate)
-                                                                    : $dayArray[$this->formatDateTime2user($startDate, "w")] .", " . $this->format2userDate($startDate);
+            $startDate = $this->format2userDate($event->startDate);
+            $endDate   = $this->format2userDate($event->endDate);
+
+            $label = $dayArray[$this->formatDateTime2user($event->startDate, "w")] .
+                ", " . $startDate;
+            if ($startDate != $endDate) {
+                $label .= ' - ' .
+                    $dayArray[
+                        $this->formatDateTime2user($event->endDate, "w")
+                    ] .
+                    ", ". $endDate;
+            }
+
+            $exceptionDates[] = array(
+                'date'  => $startDate,
+                'label' => $label,
+            );
         }
 
         return $exceptionDates;
