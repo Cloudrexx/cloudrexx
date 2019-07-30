@@ -380,6 +380,25 @@ class CalendarLibrary
             return;
         }
 
+        // TODO: we have to manually load the language-data here, as it
+        // would not be available in the adjustResponse hook.
+        // AS a result, the date format specific options (which depend on the
+        // language-data) won't work properly.
+        // As soon as CLX-1045 has been fixed and completed, the manual
+        // loading of the language-data can be removed from here.
+        $frontend = false;
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        if ($cx->getMode() == \Cx\Core\Core\Controller\Cx::MODE_FRONTEND) {
+            $frontend = true;
+        }
+        $_ARRAYLANG = array_merge(
+            $_ARRAYLANG,
+            \Env::get('init')->getComponentSpecificLanguageData(
+                'Calendar',
+                $frontend
+            )
+        );
+
     	$arrSettings = array();
         $arrDateSettings =  array(
                             'separatorDateList','separatorDateTimeList', 'separatorSeveralDaysList', 'separatorTimeList',
