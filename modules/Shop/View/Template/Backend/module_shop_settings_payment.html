@@ -35,7 +35,7 @@ function deletePayment(pId)
   <div id="content1" class="paymentTab" style="display:block">
     <table border="0" cellspacing="0" cellpadding="2" width="100%" class="adminlist">
       <tr>
-        <th colspan="7">{TXT_PAYMENT_TYPES}</th>
+        <th colspan="8">{TXT_PAYMENT_TYPES}</th>
       </tr>
       <tr class="row1">
         <td width="20%" class="f_bold">
@@ -44,11 +44,14 @@ function deletePayment(pId)
         <td width="10%" class="f_bold">
           {TXT_FEE}
         </td>
+        <td width="10%" class="f_bold">
+          {TXT_SHOP_TYPE}
+        </td>
         <td width="12%" class="f_bold">
           {TXT_FREE_OF_CHARGE}
           <span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_FREE_OF_CHARGE_TIP}</span>
         </td>
-        <td width="38%" class="f_bold">
+        <td width="28%" class="f_bold">
           {TXT_HANDLER}
         </td>
         <td width="10%" class="f_bold">
@@ -68,6 +71,22 @@ function deletePayment(pId)
         <td>
           <input type="text" name="fee[{SHOP_PAYMENT_ID}]"
                  value="{SHOP_PAYMENT_COST}" size="15" maxlength="50" />
+        </td>
+        <td>
+          <select name="fee_type[{SHOP_PAYMENT_ID}]">
+            <option value="fix"
+                <!-- BEGIN shopPaymentFeeFix -->
+                    selected="selected"
+                <!-- END shopPaymentFeeFix --> />
+                {SHOP_PAYMENT_CURRENCY}
+            </option>
+            <option value="percent"
+                <!-- BEGIN shopPaymentFeePercent -->
+                    selected="selected"
+                <!-- END shopPaymentFeePercent --> />
+                {TXT_SHOP_PERCENTAGE}
+            </option>
+          </select>
         </td>
         <td>
           <input type="text" name="free_from[{SHOP_PAYMENT_ID}]"
@@ -100,16 +119,19 @@ function deletePayment(pId)
   <div id="content2" class="paymentTab" style="display:none">
     <table border="0" cellspacing="0" cellpadding="2" width="100%" class="adminlist">
       <tr>
-        <th colspan="6">{TXT_ADD}</th>
+        <th colspan="7">{TXT_ADD}</th>
       </tr>
       <tr class="row1">
         <td width="20%" class="f_bold">{TXT_PAYMENT_TYPE}</td>
         <td width="10%" class="f_bold">{TXT_FEE}</td>
+        <td width="10%" class="f_bold">
+          {TXT_SHOP_TYPE}
+        </td>
         <td width="12%" class="f_bold">
           {TXT_FREE_OF_CHARGE}
           <span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_FREE_OF_CHARGE_TIP}</span>
         </td>
-        <td width="53%" class="f_bold">{TXT_HANDLER}</td>
+        <td width="43%" class="f_bold">{TXT_HANDLER}</td>
         <td width="10%" class="f_bold">{TXT_ZONE}</td>
         <td width="5%" class="a_center f_bold">
           {TXT_ACTIVE}
@@ -118,6 +140,16 @@ function deletePayment(pId)
       <tr class="row2">
         <td class="f_bold"><input name="name_new" type="text" value="" size="30" maxlength="50" /></td>
         <td><input type="text" name="fee_new" value="0.00" size="15" maxlength="50" /></td>
+        <td>
+          <select name="fee_type">
+            <option value="fix" selected="selected">
+                {SHOP_PAYMENT_CURRENCY}
+            </option>
+            <option value="percent">
+                {TXT_SHOP_PERCENTAGE}
+            </option>
+          </select>
+        </td>
         <td><input type="text" name="free_from_new" value="0.00" size="15" maxlength="50" /></td>
         <td>
           <select name="processor_id_new">

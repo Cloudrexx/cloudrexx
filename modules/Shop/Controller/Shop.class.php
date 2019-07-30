@@ -2504,18 +2504,49 @@ die("Failed to update the Cart!");
      *
      * @internal    A lot of this belongs to the Payment class.
      * @param       integer     $payment_id The payment ID
-     * @param       double      $totalPrice The total order price
+     * @param       float       $totalPrice The total order price (of goods)
+     * @param       float       $shipmentPrice The price of the shipment
      * @return      string                  The payment fee, formatted by
      *                                      {@link Currency::getCurrencyPrice()}
      */
-    static function _calculatePaymentPrice($payment_id, $totalPrice)
-    {
-        $paymentPrice = 0;
-        if (!$payment_id) return $paymentPrice;
-        if (  Payment::getProperty($payment_id, 'free_from') == 0
-           || $totalPrice < Payment::getProperty($payment_id, 'free_from')) {
-            $paymentPrice = Payment::getProperty($payment_id, 'fee');
+    static function _calculatePaymentPrice(
+        $payment_id,
+        $totalPrice,
+        $shipmentPrice
+    ) {
+        // no payment fee if payment method is invalid
+        if (!$payment_id) {
+            return 0;
         }
+        // no payment fee if payment method is invalid
+        if (Payment::getProperty($payment_id, 'fee') === false) {
+            return 0;
+        }
+        // no payment fee if order sum is greater then set boundary
+        if (
+            Payment::getProperty($payment_id, 'free_from') > 0 &&
+            $totalPrice >= Payment::getProperty($payment_id, 'free_from')
+        ) {
+            return 0;
+        }
+
+        // fetch fee data
+        $type = Payment::getProperty($payment_id, 'type');
+        $fee = Payment::getProperty($payment_id, 'fee');
+
+        // calculate fee based on selected payment method
+        $paymentPrice = 0;
+        switch ($type) {
+            case 'percent':
+                $paymentPrice = ($totalPrice + $shipmentPrice) * $fee / 100;
+                break;
+
+            case 'fix':
+            default:
+                $paymentPrice = $fee;
+                break;
+        }
+
         return Currency::getCurrencyPrice($paymentPrice);
     }
 
@@ -3227,7 +3258,8 @@ die("Shop::processRedirect(): This method is obsolete!");
         $_SESSION['shop']['payment_price'] =
             self::_calculatePaymentPrice(
                 $_SESSION['shop']['paymentId'],
-                $cart_amount
+                $cart_amount,
+                $shipmentPrice
             );
         Cart::update(self::$objCustomer);
         self::update_session();
