@@ -492,8 +492,11 @@
         cx.jQuery( '.exceptionDateHolder li' ).hide();
         var limit = 10;
         for(i=0;i<limit;i++) {
-           var page = (page_index*limit) + i;
-           cx.jQuery( '.exceptionDateHolder li:eq('+ page +')').show();
+            var page = (page_index*limit) + i;
+            if (cx.jQuery( '.exceptionDateHolder li').length <= page) {
+                break;
+            }
+            cx.jQuery( '.exceptionDateHolder li:eq('+ page +')').show();
         }
     }
 
