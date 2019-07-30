@@ -359,9 +359,10 @@
             },
             open: function() {
                 selectedRecurrence = false;
+                var format = 'D, {CALENDAR_EVENT_DATE_FORMAT}';
                 cx.jQuery("#recurrenceDatepicker").datepicker({
                     minDate: 0,
-                    dateFormat: 'D, dd.mm.yy',
+                    dateFormat: format,
                     onSelect: function(date) {
                         selectedRecurrence = date;
                     }
