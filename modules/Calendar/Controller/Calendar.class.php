@@ -1213,6 +1213,17 @@ UPLOADER;
             }
         }
 
+        // parse url to detail section of associated event
+        $url = \Cx\Core\Routing\Url::fromModuleAndCmd($this->moduleName, 'detail');
+        $url->setParams(array(
+            'id' => $objEvent->id,
+            'date' => $objEvent->startDate->getTimestamp()
+        ));
+        $this->_objTpl->setVariable(
+            $this->moduleLangVar.'_EVENT_DETAIL_LINK',
+            $url
+        );
+
         // set page title based on requested event
         $dateForPageTitle = $objEvent->startDate;
 
