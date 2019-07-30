@@ -706,7 +706,7 @@ EOF;
         $objEvent->loadEventFromData($_GET);
 
         $objEventManager = new \Cx\Modules\Calendar\Controller\CalendarEventManager($objEvent->startDate);
-        $objEventManager->_setNextSeriesElement($objEvent);
+        $objEventManager->generateRecurrencesOfEvent($objEvent);
         
         $_CORELANG = \Env::get('init')->getComponentSpecificLanguageData(
             'Core',
