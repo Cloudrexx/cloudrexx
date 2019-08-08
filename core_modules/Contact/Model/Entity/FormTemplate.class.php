@@ -290,7 +290,7 @@ class FormTemplate extends \Cx\Model\Base\EntityBase {
 
         // Check and return file content if the file exists in the Contact Component.
         $defaultPath = $this->cx->getClassLoader()->getFilePath(
-            $this->getDirectory() . '/View/Template/Frontend/'
+            $this->getDirectory(false) . '/View/Template/Frontend/'
             . $fileName . '.html'
         );
         return file_get_contents($defaultPath);
