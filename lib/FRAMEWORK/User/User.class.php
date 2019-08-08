@@ -2687,7 +2687,7 @@ class User extends User_Profile
         return $objDatabase->Execute('
             UPDATE `' . DBPREFIX . 'access_users`
                SET `last_auth_status` = 0
-             WHERE `' . $column . '` = "' . $username . '"
+             WHERE `' . $column . '` = "' . contrexx_raw2db($username) . '"
         ');
     }
 
