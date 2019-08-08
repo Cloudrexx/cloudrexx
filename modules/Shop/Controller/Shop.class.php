@@ -1483,7 +1483,10 @@ die("Failed to update the Cart!");
                 $thumbnailPath = $pictureLink = '';
                 $imageFilePath = '';
                 if (   empty($image['img'])
-                    || $image['img'] == ShopLibrary::noPictureName) {
+                    || $image['img'] == ShopLibrary::noPictureName
+                ) {
+                    // set no-picture image
+                    $image['img'] = ShopLibrary::noPictureName;
                     // We have at least one picture on display already.
                     // No need to show "no picture" three times!
                     if ($havePicture) { continue; }
