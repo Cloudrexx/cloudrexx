@@ -453,7 +453,14 @@ class ContactManager extends \Cx\Core_Modules\Contact\Controller\ContactLib
                     if ($colNr == $maxFields) {
                         break;
                     }
-                    $this->_objTpl->setVariable('CONTACT_COL_NAME', contrexx_raw2xhtml($arrFormFields[$col]['lang'][$selectedInterfaceLanguage]['name']));
+
+                    $colName = 'N/A';
+                    if (isset($arrFormFields[$col]['lang'][$selectedInterfaceLanguage]['name'])) {
+                        $colName = $arrFormFields[$col]['lang'][$selectedInterfaceLanguage]['name'];
+                    } elseif (!empty($arrFormFields[$col]['lang'])) {
+                        $colName = current($arrFormFields[$col]['lang'])['name'];
+                    }
+                    $this->_objTpl->setVariable('CONTACT_COL_NAME', contrexx_raw2xhtml($colName));
                     $this->_objTpl->parse('contact_col_names');
                     $colNr++;
                 }
