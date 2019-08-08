@@ -953,6 +953,8 @@ class BlockLibrary
         $objResult = $objDatabase->Execute($query);
         $blockIds = array();
         if ($objResult === false || $objResult->RecordCount() <= 0) {
+            // drop empty placeholders
+            $code = str_replace('{' . $placeholderName . '}', '', $code);
             return;
         }
         while(!$objResult->EOF) {
