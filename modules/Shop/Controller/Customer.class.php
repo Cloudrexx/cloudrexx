@@ -575,7 +575,7 @@ class Customer extends \User
 //            'CUSTOMER_GROUP_ID' => current($this->getAssociatedGroupIds()),
         );
 //DBG::log("Login: ".$this->username()."/".$_SESSION['shop']['password']);
-        if (isset($_SESSION['shop']['password'])) {
+        if (!empty($_SESSION['shop']['password'])) {
             $arrSubstitution['CUSTOMER_LOGIN'] = array(0 => array(
                 'CUSTOMER_USERNAME' => $this->username(),
                 'CUSTOMER_PASSWORD' => $_SESSION['shop']['password'],
