@@ -220,7 +220,7 @@ class NewsletterLib
             ),
             array(
                 'code' => $code,
-                'mail' => urlencode($email),
+                'mail' => $email,
             )
         );
 
@@ -256,7 +256,7 @@ class NewsletterLib
             ),
             array(
                 'code' => $code,
-                'mail' => urlencode($email),
+                'mail' => $email,
             )
         );
         if ($htmlTag) {
