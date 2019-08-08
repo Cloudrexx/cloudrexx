@@ -119,7 +119,7 @@ class FormTemplate extends \Cx\Model\Base\EntityBase {
      */
     public function __construct(
         Form $form,
-        \Cx\Core\ContentManager\Model\Entity\Page $page,
+        \Cx\Core\ContentManager\Model\Entity\Page $page = null,
         \Cx\Core\View\Model\Entity\Theme $theme = null
     ) {
         if (
@@ -162,7 +162,12 @@ class FormTemplate extends \Cx\Model\Base\EntityBase {
             $this->getDirectory() . '/View/Template/Frontend'
         );
         $this->template->setErrorHandling(PEAR_ERROR_DIE);
-        $this->template->setTemplate($this->page->getContent());
+
+        if ($this->page) {
+            $this->template->setTemplate($this->page->getContent());
+        } else {
+            $this->template->setTemplate($this->getTemplateContent('Form'));
+        }
 
         if ($this->template->placeholderExists('APPLICATION_DATA')) {
             // Load the Form template from 'theme specific form template' for eg:
