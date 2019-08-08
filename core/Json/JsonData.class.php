@@ -312,6 +312,10 @@ class JsonData {
             if (!$objPermission->hasAccess($arguments)) {
                 $backend = \Cx\Core\Core\Controller\Cx::instanciate()->getMode() == \Cx\Core\Core\Controller\Cx::MODE_BACKEND;
                 if (!\FWUser::getFWUserObject()->objUser->login($backend)) {
+                    // $_ARRAYLANG data is not load in HEAD request
+                    if (!isset($_ARRAYLANG['TXT_LOGIN_NOAUTH_JSON'])) {
+                        $_ARRAYLANG['TXT_LOGIN_NOAUTH_JSON'] = 'Session expired';
+                    }
                     return $this->getErrorData(
                         $_ARRAYLANG['TXT_LOGIN_NOAUTH_JSON']
                     );
