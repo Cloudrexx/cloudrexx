@@ -1865,7 +1865,7 @@ class ContactManager extends \Cx\Core_Modules\Contact\Controller\ContactLib
             if (isset($arrFormFields[$fieldId])) {
                 //fieldset and horizontal field type need not be displayed in the detail page
                 if (!in_array($arrFormFields[$fieldId]['type'], $this->nonValueFormFieldTypes)) {
-                    $label = strip_tags($arrFormFields[$fieldId]['lang'][FRONTEND_LANG_ID]['name']).($arrFormFields[$fieldId]['type'] == 'hidden' ? ' (hidden)' : '');
+                    $label = contrexx_raw2xhtml($arrFormFields[$fieldId]['lang'][FRONTEND_LANG_ID]['name']).($arrFormFields[$fieldId]['type'] == 'hidden' ? ' (hidden)' : '');
 
                     switch ($arrFormFields[$fieldId]['type']) {
                         case 'checkbox':
