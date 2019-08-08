@@ -1068,7 +1068,7 @@ class DBG
      * Reset the text that is being put in front of log messags
      */
     public static function resetLogPrefix() {
-        self::$setLogPrefix();
+        self::setLogPrefix();
     }
 }
 
