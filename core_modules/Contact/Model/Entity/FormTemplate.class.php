@@ -1004,13 +1004,17 @@ class FormTemplate extends \Cx\Model\Base\EntityBase {
                 $valueFromGet = contrexx_input2raw($_GET[$fieldId]);
             }
 
-            $isOptionInPost =
-                !empty($valueFromPost) &&
+            $isOptionInPost = !empty($valueFromPost) && (
                 (
-                    (is_array($valueFromPost) && in_array($option, $valueFromPost)) ||
-                    $option == $valueFromPost ||
-                    strcasecmp($option, $valueFromPost) == 0
-                );
+                    is_array($valueFromPost) &&
+                    in_array($option, $valueFromPost)
+                ) || (
+                    !is_array($valueFromPost) && (
+                        $option == $valueFromPost ||
+                        strcasecmp($option, $valueFromPost) == 0
+                    )
+                )
+            );
             $isOptionInGet =
                 !empty($valueFromGet) &&
                 (
