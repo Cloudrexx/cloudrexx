@@ -721,6 +721,7 @@ class FormTemplate extends \Cx\Model\Base\EntityBase {
                     $template->placeholderExists('TXT_CONTACT_NOT_SPECIFIED') ||
                     $template->placeholderExists('TXT_CONTACT_PLEASE_SELECT')
                 ) {
+                    // legacy
                     $template->setVariable(array(
                         'TXT_CONTACT_PLEASE_SELECT' => $_ARRAYLANG['TXT_CONTACT_PLEASE_SELECT'],
                         'TXT_CONTACT_NOT_SPECIFIED' => $_ARRAYLANG['TXT_CONTACT_NOT_SPECIFIED'],
@@ -944,9 +945,11 @@ class FormTemplate extends \Cx\Model\Base\EntityBase {
         }
 
         foreach ($options as $index => $option) {
+            // legacy
             if ($template->placeholderExists($fieldId . '_' . $index . '_VALUE')) {
                 $valuePlaceholder = $fieldId . '_' . $index . '_VALUE';
             }
+            // legacy
             if ($template->placeholderExists('SELECTED_' . $fieldId . '_' . $index)) {
                 $selectPlaceholder = 'SELECTED_' . $fieldId . '_' . $index;
             }
