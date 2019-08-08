@@ -448,6 +448,7 @@ class Host extends \Cx\Model\Base\EntityBase
         $refUrl = \Cx\Core\Routing\Url::fromDocumentRoot();
         $refUrl->setMode('backend');
         $request->setHeader('Referrer', $refUrl->toString());
+        $request->setHeader('connection', 'close');
         $request->setBody(http_build_query($content, null, '&'));
         $request->setConfig(array(
             'follow_redirects' => true,
