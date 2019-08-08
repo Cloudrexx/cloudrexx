@@ -3316,7 +3316,7 @@ CREATE TABLE `contrexx_module_repository` (
   `displaystatus` set('on','off') NOT NULL DEFAULT 'on',
   `username` varchar(250) NOT NULL DEFAULT '',
   `displayorder` smallint(6) NOT NULL DEFAULT '100',
-  UNIQUE KEY `contentid` (`id`),
+  PRIMARY KEY  (`id`),
   FULLTEXT KEY `fulltextindex` (`title`,`content`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_module_shop_article_group` (
