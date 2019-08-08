@@ -527,7 +527,6 @@ class CalendarManager extends CalendarLibrary
             'TXT_'.$this->moduleLangVar.'_EVENT_NUM_SEATING'                => $_ARRAYLANG['TXT_CALENDAR_EVENT_NUM_SEATING'],
             'TXT_'.$this->moduleLangVar.'_SERIES_PATTERN'                   => $_ARRAYLANG['TXT_CALENDAR_SERIES_PATTERN'],
             'TXT_'.$this->moduleLangVar.'_SERIES_PATTERN_DURANCE'           => $_ARRAYLANG['TXT_CALENDAR_SERIES_PATTERN_DURANCE'],
-            'TXT_'.$this->moduleLangVar.'_SERIES_ACTIVATE'                  => $_ARRAYLANG['TXT_CALENDAR_SERIES_ACTIVATE'],
             'TXT_'.$this->moduleLangVar.'_SERIES'                           => $_ARRAYLANG['TXT_CALENDAR_SERIES'],
             'TXT_'.$this->moduleLangVar.'_SERIES_PATTERN_DAILY'             => $_ARRAYLANG['TXT_CALENDAR_SERIES_PATTERN_DAILY'],
             'TXT_'.$this->moduleLangVar.'_SERIES_PATTERN_WEEKLY'            => $_ARRAYLANG['TXT_CALENDAR_SERIES_PATTERN_WEEKLY'],
