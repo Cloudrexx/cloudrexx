@@ -189,6 +189,7 @@ namespace Cx\Core\Model {
                     // We will have to manually do it by executing the SET NAMES query when connection to the database.
                     \PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES '.$dbCharSet,
                     \PDO::MYSQL_ATTR_INIT_COMMAND => 'SET time_zone = \'' . $offsetString . '\'',
+                    \PDO::MYSQL_ATTR_MULTI_STATEMENTS => false,
                 )
             );
             $this->pdo->setAttribute(\PDO::ATTR_STATEMENT_CLASS, array('Doctrine\DBAL\Driver\PDOStatement', array()));
