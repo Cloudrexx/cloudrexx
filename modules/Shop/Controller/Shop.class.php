@@ -2855,11 +2855,13 @@ die("Shop::processRedirect(): This method is obsolete!");
             'SHOP_ACCOUNT_ACTION' =>
                 \Cx\Core\Routing\Url::fromModuleAndCmd('Shop', 'account'),
             // New template - since 2.1.0
+            // list all countries here (and not restrict to shipping countries)
             'SHOP_ACCOUNT_COUNTRY_MENUOPTIONS' =>
-                \Cx\Core\Country\Controller\Country::getMenuoptions($country_id),
+                \Cx\Core\Country\Controller\Country::getMenuoptions($country_id, false),
             // Old template
             // Compatibility with 2.0 and older versions
-            'SHOP_ACCOUNT_COUNTRY' => \Cx\Core\Country\Controller\Country::getMenu('countryId', $country_id),
+            // list all countries here (and not restrict to shipping countries)
+            'SHOP_ACCOUNT_COUNTRY' => \Cx\Core\Country\Controller\Country::getMenu('countryId', $country_id, false),
             'SHOP_ACCOUNT_BIRTHDAY' => $birthdayDaySelect . $birthdayMonthSelect . $birthdayYearSelect,
         ));
         if (count(static::$errorFields)) {
@@ -2997,6 +2999,8 @@ die("Shop::processRedirect(): This method is obsolete!");
      */
     static function account_to_session()
     {
+        global $_ARRAYLANG;
+
 //\DBG::log("account_to_session(): POST: ".var_export($_POST, true));
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $request = $cx->getRequest();
@@ -3010,6 +3014,13 @@ die("Shop::processRedirect(): This method is obsolete!");
         }
 
 //\DBG::log("Shop::account_to_session(): Have POST");
+
+        // remember currently set country of shipping address.
+        // will be used in case an invalid shipping country has been submitted
+        if (isset($_SESSION['shop']['countryId2'])) {
+            $shippingCountryId = $_SESSION['shop']['countryId2'];
+        }
+
         foreach ($_POST as $key => $value) {
             $_SESSION['shop'][$key] =
                 trim(strip_tags(contrexx_input2raw($value)));
@@ -3056,6 +3067,27 @@ die("Shop::processRedirect(): This method is obsolete!");
             $_SESSION['shop']['equal_address'] = true;
         }
 
+        // verify country of shipment address
+        if (Cart::needs_shipment()) {
+            $country = \Cx\Core\Country\Controller\Country::getById(
+                $_SESSION['shop']['countryId2']
+            );
+            // Ensure selected country of shipment adress is valid.
+            // Otherwise reset to previously set country
+            if (!$country['active']) {
+                \Message::error(sprintf(
+                    $_ARRAYLANG['TXT_SHOP_NO_DELIVERY_TO_COUNTRY'],
+                    \Cx\Core\Country\Controller\Country::getNameById(
+                        $_SESSION['shop']['countryId2']
+                    )
+                ));
+                $_SESSION['shop']['countryId2'] = $shippingCountryId;
+
+                // disable payment and shipment address equality flag
+                $_SESSION['shop']['equal_address'] = false;
+            }
+        }
+
         if (
             !Cart::needs_shipment() &&
             !empty($_SESSION['shop']['countryId'])
@@ -3098,6 +3130,13 @@ die("Shop::processRedirect(): This method is obsolete!");
             $status = \Message::error(
                 $_ARRAYLANG['TXT_FILL_OUT_ALL_REQUIRED_FIELDS']);
         }
+
+        // Check for any error messages.
+        // This is used by the verification of the shipment country
+        if (\Message::have()) {
+            return false;
+        }
+
         // Registered Customers are okay now
         if (self::$objCustomer) return $status;
         if (   \Cx\Core\Setting\Controller\Setting::getValue('register','Shop') == ShopLibrary::REGISTER_MANDATORY

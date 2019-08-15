@@ -526,3 +526,4 @@ $_ARRAYLANG['TXT_SHOP_PRODUCT_SINGLE_CART_STOCK_OUTOFF_ERROR'] = "The product <s
 $_ARRAYLANG['TXT_SHOP_PRODUCT_MULTIPLE_CART_STOCK_OUTOFF_ERROR'] = "The products <strong>%s</strong> are sold out.";
 $_ARRAYLANG['TXT_SHOP_CHOOSE_FILE'] = 'Choose File';
 $_ARRAYLANG['TXT_SHOP_REMOVE_FILE'] = 'Remove File';
+$_ARRAYLANG['TXT_SHOP_NO_DELIVERY_TO_COUNTRY'] = 'We do not ship to %s. Please set a different address for shipment.';

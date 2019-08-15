@@ -527,3 +527,4 @@ $_ARRAYLANG['TXT_SHOP_PRODUCT_SINGLE_CART_STOCK_OUTOFF_ERROR'] = "Das Produkt <s
 $_ARRAYLANG['TXT_SHOP_PRODUCT_MULTIPLE_CART_STOCK_OUTOFF_ERROR'] = "Die Produkte <strong>%s<strong> sind ausverkauft.";
 $_ARRAYLANG['TXT_SHOP_CHOOSE_FILE'] = 'Datei wählen';
 $_ARRAYLANG['TXT_SHOP_REMOVE_FILE'] = 'Datei löschen';
+$_ARRAYLANG['TXT_SHOP_NO_DELIVERY_TO_COUNTRY'] = 'Die Lieferung nach %s wird nicht angeboten. Bitte wählen Sie eine andere Lieferadresse.';

@@ -3038,7 +3038,7 @@ if ($test === NULL) {
             'SHOP_COMPANY_NOTE' => $companynote,
             'SHOP_REGISTER_DATE' => date(ASCMS_DATE_FORMAT_DATETIME, $registerdate),
             'SHOP_COUNTRY_MENUOPTIONS' =>
-                \Cx\Core\Country\Controller\Country::getMenuoptions($country_id),
+                \Cx\Core\Country\Controller\Country::getMenuoptions($country_id, false),
             'SHOP_DISCOUNT_GROUP_CUSTOMER_MENUOPTIONS' =>
                 Discount::getMenuOptionsGroupCustomer($customer_group_id),
             'SHOP_CUSTOMER_TYPE_MENUOPTIONS' =>
