@@ -2791,8 +2791,15 @@ die("Shop::processRedirect(): This method is obsolete!");
             ? $_SESSION['shop']['city']
             : (self::$objCustomer ? self::$objCustomer->city() : ''));
         $country_id = (isset($_SESSION['shop']['countryId'])
+            // load country for payment address from session ..
             ? $_SESSION['shop']['countryId']
-            : (self::$objCustomer ? self::$objCustomer->country_id() : 0));
+            : (self::$objCustomer ?
+                // .. or from signed-in customer
+                self::$objCustomer->country_id() :
+                // .. or use shipment country as pre-set value
+                $_SESSION['shop']['countryId2']
+            )
+        );
         $email = (isset($_SESSION['shop']['email'])
             ? $_SESSION['shop']['email']
             : (self::$objCustomer ? self::$objCustomer->email() : ''));
@@ -3037,14 +3044,17 @@ die("Shop::processRedirect(): This method is obsolete!");
             $_SESSION['shop']['countryId2'] = $_SESSION['shop']['countryId'];
             $_SESSION['shop']['equal_address'] = true;
         }
-        if (empty($_SESSION['shop']['countryId'])) {
-            $_SESSION['shop']['countryId'] = $_SESSION['shop']['countryId2'];
-        } else if (!Cart::needs_shipment()) {
+
+        if (
+            !Cart::needs_shipment() &&
+            !empty($_SESSION['shop']['countryId'])
+        ) {
             // In case we have an order without shipment, shipment country
             // will not be set. We set it to the customer's country in order
             // to calculate VAT correctly.
             $_SESSION['shop']['countryId2'] = $_SESSION['shop']['countryId'];
         }
+
         // Fill missing arguments with empty strings
         if (empty($_SESSION['shop']['company2']))   $_SESSION['shop']['company2'] = '';
         if (empty($_SESSION['shop']['gender2']))    $_SESSION['shop']['gender2'] = '';
