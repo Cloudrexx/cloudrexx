@@ -2998,7 +2998,17 @@ die("Shop::processRedirect(): This method is obsolete!");
     static function account_to_session()
     {
 //\DBG::log("account_to_session(): POST: ".var_export($_POST, true));
-        if (empty($_POST) || !is_array($_POST)) return;
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $request = $cx->getRequest();
+
+        if (
+            $request->getHttpRequestMethod() != 'post' ||
+            empty($_POST) ||
+            !is_array($_POST)
+        ) {
+            return;
+        }
+
 //\DBG::log("Shop::account_to_session(): Have POST");
         foreach ($_POST as $key => $value) {
             $_SESSION['shop'][$key] =
@@ -3029,9 +3039,10 @@ die("Shop::processRedirect(): This method is obsolete!");
             || empty($_SESSION['shop']['city2'])
             || empty($_SESSION['shop']['phone2'])
             || empty($_SESSION['shop']['countryId2'])
+            || empty($_POST['equal_address'])
         ) {
             $_SESSION['shop']['equal_address'] = false;
-        } elseif (!empty($_POST['equal_address'])) {
+        } else {
             // Copy address
             $_SESSION['shop']['company2'] = $_SESSION['shop']['company'];
             $_SESSION['shop']['gender2'] = $_SESSION['shop']['gender'];
