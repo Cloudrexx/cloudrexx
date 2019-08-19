@@ -74,10 +74,13 @@ class CalendarHeadlines extends CalendarLibrary
      * @param   integer $categoryId Limit events to a specific category
      * @param   boolean $listAll    If set to TRUE, then all events (without
      *                              limit) will be loaded.
+     * @param   boolean $archive    If set to TRUE, then not the upcoming events
+     *                              will be loaded, but instead the past events.
      */
     protected function loadEventManager(
         $categoryId = null,
-        $listAll = false
+        $listAll = false,
+        $archive = false
     ) {
         if (
             $this->arrSettings['headlinesStatus'] != 1 ||
@@ -87,29 +90,36 @@ class CalendarHeadlines extends CalendarLibrary
         }
 
         // set event range (upcoming or past events)
-        $startDate = new \DateTime();
+        if ($archive) {
+            $sortDirection = 'DESC';
+            $startDate = null;
+            $endDate = new \DateTime();
+        } else {
+            $sortDirection = 'ASC';
+            $startDate = new \DateTime();
 
-        switch ($this->arrSettings['frontendPastEvents']) {
-            case CalendarLibrary::SHOW_EVENTS_OF_TODAY:
-                // get next ending event starting from today 0:01
-                // the event's day on midnight is our expiration date
-                $startDate->setTime(0, 0, 0);
-                break;
+            switch ($this->arrSettings['frontendPastEvents']) {
+                case CalendarLibrary::SHOW_EVENTS_OF_TODAY:
+                    // get next ending event starting from today 0:01
+                    // the event's day on midnight is our expiration date
+                    $startDate->setTime(0, 0, 0);
+                    break;
 
-            case CalendarLibrary::SHOW_EVENTS_UNTIL_START:
-                // TODO: implement logic
-                //break;
+                case CalendarLibrary::SHOW_EVENTS_UNTIL_START:
+                    // TODO: implement logic
+                    //break;
 
-            case CalendarLibrary::SHOW_EVENTS_UNTIL_END:
-            default:
-                // keep the start date to NOW
-                // fixing the timezone offset is not required here
-                break;
+                case CalendarLibrary::SHOW_EVENTS_UNTIL_END:
+                default:
+                    // keep the start date to NOW
+                    // fixing the timezone offset is not required here
+                    break;
+            }
+
+            $endDate = new \DateTime();
+            $endDate->setTime(23, 59, 59);
+            $endDate->modify('+10 years');
         }
-
-        $endDate = new \DateTime();
-        $endDate->setTime(23, 59, 59);
-        $endDate->modify('+10 years');
 
         // set category filter
         if (!$categoryId && !empty($this->arrSettings['headlinesCategory'])) {
@@ -134,7 +144,8 @@ class CalendarHeadlines extends CalendarLibrary
             false,
             true,
             $startPos,
-            $endPos
+            $endPos,
+            $sortDirection
         );
         // load events based on initialized configuration
         $this->objEventManager->getEventList();
@@ -146,11 +157,14 @@ class CalendarHeadlines extends CalendarLibrary
      * @param   integer $categoryId Only list events of a specific category
      * @param   boolean $listAll    If set to TRUE, then all events (without
      *                              limit) will be listed.
+     * @param   boolean $archive    If set to TRUE, then not the upcoming events
+     *                              will be parsed, but instead the past events.
      * @return string parsed template content
      */
     public function getHeadlines(
         $categoryId = null,
-        $listAll = false
+        $listAll = false,
+        $archive = false
     ) {
         global $_CONFIG;
 
@@ -159,7 +173,7 @@ class CalendarHeadlines extends CalendarLibrary
 
         if($this->arrSettings['headlinesStatus'] == 1) {
             if($this->_objTpl->blockExists('calendar_headlines_row')) {
-                $this->loadEventManager($categoryId, $listAll);
+                $this->loadEventManager($categoryId, $listAll, $archive);
                 if (!empty($this->objEventManager->eventList)) {
                     $this->objEventManager->showEventList($this->_objTpl);
                 }

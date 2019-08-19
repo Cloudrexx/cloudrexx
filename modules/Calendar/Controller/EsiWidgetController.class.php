@@ -118,6 +118,13 @@ class EsiWidgetController extends \Cx\Core_Modules\Widget\Controller\EsiWidgetCo
         // opening template block calendar_headlines_row
         $listAll = (bool) strpos($content, '{CALENDAR_LIMIT_OFF}');
 
+        // check if instead of upcoming events the archive shall be listed
+        //
+        // note: placeholder can never be at position 0,
+        // as the content does always first contain the
+        // opening template block calendar_headlines_row
+        $listArchive = (bool) strpos($content, '{CALENDAR_LIST_ARCHIVE}');
+
         $_ARRAYLANG = array_merge(
             $_ARRAYLANG,
             \Env::get('init')->getComponentSpecificLanguageData('Calendar', true, $_LANGID)
@@ -128,7 +135,8 @@ class EsiWidgetController extends \Cx\Core_Modules\Widget\Controller\EsiWidgetCo
             $name,
             $headlines->getHeadlines(
                 $category,
-                $listAll
+                $listAll,
+                $listArchive
             )
         );
 
