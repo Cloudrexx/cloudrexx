@@ -124,7 +124,13 @@ class EsiWidgetController extends \Cx\Core_Modules\Widget\Controller\EsiWidgetCo
         );
 
         $headlines = new CalendarHeadlines($content);
-        $template->setVariable($name, $headlines->getHeadlines($category, $listAll));
+        $template->setVariable(
+            $name,
+            $headlines->getHeadlines(
+                $category,
+                $listAll
+            )
+        );
 
         //Set expiration date
         // get next event

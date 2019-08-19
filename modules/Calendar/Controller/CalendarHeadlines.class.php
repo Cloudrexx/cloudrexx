@@ -50,17 +50,16 @@ class CalendarHeadlines extends CalendarLibrary
     /**
      * Event manager object
      *
-     * @access public
-     * @var object
+     * @var CalendarEventManager     Local instance of CalendarEventManager
      */
-    private $objEventManager;
+    protected $objEventManager;
 
     /**
      * Headlines constructor
      *
      * @param string $pageContent Template content
      */
-    function __construct($pageContent) {
+    public function __construct($pageContent) {
         parent::__construct('.');
         $this->getSettings();
 
@@ -70,61 +69,89 @@ class CalendarHeadlines extends CalendarLibrary
     }
 
     /**
-     * Load the event manager
+     * Initialize a local instance of the event manager (CalendarEventManager)
      *
-     * @param   integer $categoryId Limits the loaded events by the given category id
-     * @return  null
+     * @param   integer $categoryId Limit events to a specific category
+     * @param   boolean $listAll    If set to TRUE, then all events (without
+     *                              limit) will be loaded.
      */
-    function loadEventManager($categoryId = null, $listAll = false)
-    {
-        if($this->arrSettings['headlinesStatus'] == 1 && $this->_objTpl->blockExists('calendar_headlines_row')) {
-            $startDate = new \DateTime();
-
-            switch ($this->arrSettings['frontendPastEvents']) {
-                case CalendarLibrary::SHOW_EVENTS_OF_TODAY:
-                    // get next ending event starting from today 0:01
-                    // the event's day on midnight is our expiration date
-                    $startDate->setTime(0, 0, 0);
-                    break;
-
-                case CalendarLibrary::SHOW_EVENTS_UNTIL_START:
-                    // TODO: implement logic
-                    //break;
-
-                case CalendarLibrary::SHOW_EVENTS_UNTIL_END:
-                default:
-                    // keep the start date to NOW
-                    // fixing the timezone offset is not required here
-                    break;
-            }
-
-            $endDate = new \DateTime();
-            $endDate->setTime(23, 59, 59);
-            $endDate->modify('+10 years');
-            if (!$categoryId && !empty($this->arrSettings['headlinesCategory'])) {
-                $categoryId = intval($this->arrSettings['headlinesCategory']);
-            }
-
-            $startPos = 0;   
-            if ($listAll) {
-                $endPos = 'n';
-            } else {
-                $endPos = $this->arrSettings['headlinesNum'];  
-            }
-
-            $this->objEventManager = new \Cx\Modules\Calendar\Controller\CalendarEventManager($startDate, $endDate, $categoryId, null, true, false, true, $startPos, $endPos);
-            $this->objEventManager->getEventList();
+    protected function loadEventManager(
+        $categoryId = null,
+        $listAll = false
+    ) {
+        if (
+            $this->arrSettings['headlinesStatus'] != 1 ||
+            !$this->_objTpl->blockExists('calendar_headlines_row')
+        ) {
+            return;
         }
+
+        // set event range (upcoming or past events)
+        $startDate = new \DateTime();
+
+        switch ($this->arrSettings['frontendPastEvents']) {
+            case CalendarLibrary::SHOW_EVENTS_OF_TODAY:
+                // get next ending event starting from today 0:01
+                // the event's day on midnight is our expiration date
+                $startDate->setTime(0, 0, 0);
+                break;
+
+            case CalendarLibrary::SHOW_EVENTS_UNTIL_START:
+                // TODO: implement logic
+                //break;
+
+            case CalendarLibrary::SHOW_EVENTS_UNTIL_END:
+            default:
+                // keep the start date to NOW
+                // fixing the timezone offset is not required here
+                break;
+        }
+
+        $endDate = new \DateTime();
+        $endDate->setTime(23, 59, 59);
+        $endDate->modify('+10 years');
+
+        // set category filter
+        if (!$categoryId && !empty($this->arrSettings['headlinesCategory'])) {
+            $categoryId = intval($this->arrSettings['headlinesCategory']);
+        }
+
+        // set limit
+        $startPos = 0;
+        if ($listAll) {
+            $endPos = 'n';
+        } else {
+            $endPos = $this->arrSettings['headlinesNum'];
+        }
+
+        // initialize event manager
+        $this->objEventManager = new \Cx\Modules\Calendar\Controller\CalendarEventManager(
+            $startDate,
+            $endDate,
+            $categoryId,
+            null,
+            true,
+            false,
+            true,
+            $startPos,
+            $endPos
+        );
+        // load events based on initialized configuration
+        $this->objEventManager->getEventList();
     }
 
     /**
      * Return's headlines
      *
-     * @param  integer $categoryId Limits the headline events by the given category id
+     * @param   integer $categoryId Only list events of a specific category
+     * @param   boolean $listAll    If set to TRUE, then all events (without
+     *                              limit) will be listed.
      * @return string parsed template content
      */
-    function getHeadlines($categoryId = null, $listAll = false)
-    {
+    public function getHeadlines(
+        $categoryId = null,
+        $listAll = false
+    ) {
         global $_CONFIG;
 
         \LinkGenerator::parseTemplate($this->pageContent);
@@ -132,17 +159,16 @@ class CalendarHeadlines extends CalendarLibrary
 
         if($this->arrSettings['headlinesStatus'] == 1) {
             if($this->_objTpl->blockExists('calendar_headlines_row')) {
-                self::loadEventManager($categoryId, $listAll);
+                $this->loadEventManager($categoryId, $listAll);
                 if (!empty($this->objEventManager->eventList)) {
                     $this->objEventManager->showEventList($this->_objTpl);
                 }
             }
         } else {
-            if($this->_objTpl->blockExists('calendar_headlines_row')) {
+            if ($this->_objTpl->blockExists('calendar_headlines_row')) {
                 $this->_objTpl->hideBlock('calendar_headlines_row');
             }
         }
-
 
         return $this->_objTpl->get();
     }
