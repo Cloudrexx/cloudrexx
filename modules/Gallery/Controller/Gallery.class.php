@@ -676,6 +676,7 @@ class Gallery
 
                 $this->_objTpl->setVariable(array(
                     'GALLERY_STYLE'                => ($i % 2)+1,
+                    'GALLERY_CATEGORY_ID'          => $objResult->fields['id'],
                     'GALLERY_CATEGORY_NAME'        => $arrCategoryLang['name'],
                     'GALLERY_CATEGORY_IMAGE'       => $categoryImageLink,
                     'GALLERY_CATEGORY_IMAGE_PATH'  => $imageSrc,
