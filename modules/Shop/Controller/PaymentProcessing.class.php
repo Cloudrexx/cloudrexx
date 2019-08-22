@@ -364,7 +364,7 @@ foreach (\PostfinanceMobile::getErrors() as $error) {
                 '/\.\w+$/', '_'.FRONTEND_LANG_ID.$match[1], $imageName);
 //DBG::log("PaymentProcessing::_getPictureCode(): Testing path ".ASCMS_DOCUMENT_ROOT.SHOP_PAYMENT_LOGO_PATH.$imageName_lang);
         return
-            '<br /><br /><img src="'.
+            '<br /><br /><img id="shopPspLogo" src="'.
             // Is there a language dependent version?
             (file_exists(\Cx\Core\Core\Controller\Cx::instanciate()->getCodeBaseModulePath() . '/Shop/View/Media/payments/' .$imageName_lang)
               ? \Cx\Core\Core\Controller\Cx::instanciate()->getCodeBaseModuleWebPath() . '/Shop/View/Media/payments/' . $imageName_lang
