@@ -957,7 +957,40 @@ class CalendarEvent extends CalendarLibrary
                     $this->seriesData['seriesPatternExceptions'] = $seriesPatternExceptions;
                     $seriesAdditionalRecurrences = array();
                     if (!\FWValidator::isEmpty($objResult->fields['series_additional_recurrences'])) {
-                        $seriesAdditionalRecurrences = array_map(array($this, 'getInternDateTimeFromDb'), (array) explode(",", $objResult->fields['series_additional_recurrences']));
+                        // create array of manually added recurrences as
+                        // DateTime objects from comma-separated db-field
+                        $seriesAdditionalRecurrences = array_map(
+                            function($recurrence) {
+                                // convert db-timestamp notation into datetime
+                                $recurrenceDate = $this->getInternDateTimeFromDb($recurrence);
+
+                                // ensure time is correctly set for recurrence dates
+                                if ($this->all_day) {
+                                    // Forcely set time to 00:00 for all-day
+                                    // recurrence events.
+                                    // This is a fix to ensure old all-day
+                                    // recurrence dates that have been stored
+                                    // without a time-information are correct
+                                    $recurrenceDate->setTime(0, 0);
+
+                                // check if non-all-day recurrence event
+                                // contains time information
+                                } elseif (strpos($recurrence, ' ') === false) {
+                                    // recurrence is lacking time information,
+                                    // so let's set the event's start time as
+                                    // recurrence time
+                                    $recurrenceDate->setTime(
+                                        $this->startDate->format('H'),
+                                        $this->startDate->format('i')
+                                    );
+                                }
+                                return $recurrenceDate;
+                            },
+                            (array) explode(
+                                ',',
+                                $objResult->fields['series_additional_recurrences']
+                            )
+                        );
                     }
                     $this->seriesData['seriesAdditionalRecurrences'] = $seriesAdditionalRecurrences;
                 } else {
@@ -1402,10 +1435,50 @@ class CalendarEvent extends CalendarLibrary
             if (!empty($data['additionalRecurrences'])) {
                 $additionalRecurrenceDates = array();
                 foreach ($data['additionalRecurrences'] as $additionalRecurrence) {
-                    $additionalRecurrenceDates[] = $this->getDbDateTimeFromIntern($this->getDateTime($additionalRecurrence, 23, 59))->format('Y-m-d');
+                    // ensure time is correctly set for recurrence date
+                    if ($allDay) {
+                        $hour = 0;
+                        $minute = 0;
+                    } else
+                        // check if non-all-day recurrence event
+                        // contains time information
+                    if (strpos($additionalRecurrence, ' ') === false) {
+                        // recurrence is lacking time information,
+                        // so let's set the event's start time as
+                        // recurrence time
+                        $hour = $startHour;
+                        $minute = $startMin;
+                    } else {
+                        $recurrenceData = explode(' ', $additionalRecurrence);
+                        $additionalRecurrence = $recurrenceData[0];
+                        $recurrenceTime = explode(':', $recurrenceData[1]);
+                        $hour = $recurrenceTime[0];
+                        $minute = $recurrenceTime[1];
+                    }
+
+                    // convert into db-timestamp format
+                    $additionalRecurrenceDate =
+                        $this->getDbDateTimeFromIntern(
+                            $this->getDateTime(
+                                $additionalRecurrence,
+                                $hour,
+                                $minute
+                            )
+                        )->format('Y-m-d H:i');
+
+                    // add additional recurrence as DateTime
+                    $additionalRecurrenceDates[] = $additionalRecurrenceDate;
                 }
                 sort($additionalRecurrenceDates);
-                $seriesAdditionalRecurrences = join(",", $additionalRecurrenceDates);
+
+                // create comma-separated list of manually added recurrences
+                // for db storage
+                $seriesAdditionalRecurrences = join(
+                    ',',
+                    array_unique(
+                        $additionalRecurrenceDates
+                    )
+                );
             }
             switch($seriesType) {
                 case 1;

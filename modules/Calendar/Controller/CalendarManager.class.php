@@ -485,6 +485,14 @@ class CalendarManager extends CalendarLibrary
 
         $_ARRAYLANG += \Env::get('init')->getComponentSpecificLanguageData('Html', false);
 
+        \ContrexxJavascript::getInstance()->setVariable(
+            array(
+                'TXT_CALENDAR_START_OF_RECURRENCE' =>
+                    $_ARRAYLANG['TXT_CALENDAR_START_OF_RECURRENCE'],
+            ),
+            'Calendar'
+        );
+
         //parse globals
         $this->_objTpl->setGlobalVariable(array(
             'TXT_'.$this->moduleLangVar.'_TITLE'                            => $this->_pageTitle,
@@ -918,7 +926,14 @@ class CalendarManager extends CalendarLibrary
             }
             $dayArray = explode(',', $_CORELANG['TXT_CORE_DAY_ABBREV2_ARRAY']);
             foreach ($objEvent->seriesData['seriesAdditionalRecurrences'] as $additionalRecurrence) {
-                $recurrenceDate = $this->format2userDate($additionalRecurrence);
+                // parse or hide time information for event recurrences
+                // depending on the fact if the event is an all-day event
+                // or not
+                if ($objEvent->all_day) {
+                    $recurrenceDate = $this->format2userDate($additionalRecurrence);
+                } else {
+                    $recurrenceDate = $this->formatDateTime2user($additionalRecurrence, $this->getDateFormat() . ' H:i');
+                }
                 $this->_objTpl->setVariable(array(
                     $this->moduleLangVar . '_SERIES_ADDITIONAL_RECURRENCES_DATE' =>  $recurrenceDate,
                     $this->moduleLangVar . '_SERIES_ADDITIONAL_RECURRENCES_FULL_DATE' => $dayArray[$this->formatDateTime2user($additionalRecurrence, "w")] .", ". $recurrenceDate
@@ -1556,8 +1571,13 @@ class CalendarManager extends CalendarLibrary
 
             print ("\r\n");
 
+            // parse the event date with or without the time information
+            // depending on the fact if the event is an all-day event or not
+            $dateFormat = $this->getDateFormat();
+            if (!$objEvent->all_day) {
+                $dateFormat .= ' H:i';
+            }
             foreach ($objRegistrationManager->registrationList as $key => $objRegistration) {
-
                 if(intval($objRegistration->firstExport) == 0) {
                     $objRegistration->tagExport();
                 }
@@ -1584,7 +1604,12 @@ class CalendarManager extends CalendarLibrary
                 // $objRegistration->eventDate is a UTC unix timestamp
                 $registrationDate = new \DateTime();
                 $registrationDate->setTimestamp($objRegistration->eventDate);
-                print ($this->parseCsvData($objEvent->title, $fileFormat)." - ". $this->format2userDate($registrationDate).$this->csvSeparator);
+                print ($this->parseCsvData($objEvent->title, $fileFormat) .
+                    " - " . $this->formatDateTime2user(
+                        $registrationDate,
+                        $dateFormat
+                    ) . $this->csvSeparator
+                );
 
                 if($objRegistration->langId == null) {
                     print ($this->arrFrontendLanguages[FRONTEND_LANG_ID]['name'].$this->csvSeparator);
@@ -1765,15 +1790,30 @@ class CalendarManager extends CalendarLibrary
             }
             $filterStartTimeStamp = $filterEndTimeStamp = false;
             if (isset($_GET['date']) && $containerDisplay) {
-                $filterYear = $filterMonth = $filterDate = 0;
-                list($filterYear, $filterMonth, $filterDate) = explode('-', $_GET['date']);
+                $filterYear = $filterMonth = $filterDate = $filterTime = 0;
+                $filter = explode('-', $_GET['date']);
+                foreach (array(
+                    'filterYear', 'filterMonth', 'filterDate', 'filterTime'
+                ) as $filterKey) {
+                    if (!isset($filter[0])) {
+                        break;
+                    }
+                    ${$filterKey} = array_shift($filter);
+                }
 
                 $filterStartYear  = !empty($filterYear) ? $filterYear : date('Y');
                 $filterStartMonth = !empty($filterMonth) ? $filterMonth : 1;
                 $filterStartDay   = !empty($filterDate) ? $filterDate : 1;
                 $filterStartDateTime = new \DateTime();
                 $filterStartDateTime->setDate($filterStartYear, $filterStartMonth, $filterStartDay);
-                $filterStartDateTime->setTime(0, 0, 0);
+
+                // filter registrations by time
+                if ($filterTime) {
+                    list($hour, $minutes) = explode(':', $filterTime);
+                    $filterStartDateTime->setTime($hour, $minutes, 0);
+                } else {
+                    $filterStartDateTime->setTime(0, 0, 0);
+                }
 
                 $filterEndYear  = !empty($filterYear) ? $filterYear : date('Y');
                 $filterEndMonth = !empty($filterMonth) ? $filterMonth : 12;
@@ -1783,7 +1823,14 @@ class CalendarManager extends CalendarLibrary
                 if (empty($filterDate)) {
                     $filterEndDateTime->modify('last day of this month');
                 }
-                $filterEndDateTime->setTime(23, 59, 59);
+
+                // filter registrations by time
+                if ($filterTime) {
+                    list($hour, $minutes) = explode(':', $filterTime);
+                    $filterEndDateTime->setTime($hour, $minutes, 59);
+                } else {
+                    $filterEndDateTime->setTime(23, 59, 59);
+                }
 
                 $filterStartTimeStamp = $filterStartDateTime->getTimestamp();
                 $filterEndTimeStamp   = $filterEndDateTime->getTimestamp();

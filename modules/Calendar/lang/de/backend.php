@@ -679,3 +679,4 @@ $_ARRAYLANG['TXT_CALENDAR_CHOOSE_CRM_MEMBERSHIPS'] = 'Kundengruppen wählen';
 $_ARRAYLANG['TXT_CALENDAR_PUBLISHED'] = 'Veröffentlicht';
 $_ARRAYLANG['TXT_CALENDAR_USE_CUSTOM_FORMAT'] = 'Individuelles Format verwenden';
 $_ARRAYLANG['TXT_CALENDAR_COUNT_WITHOUT_SERIES'] = 'Anzahl ohne Wiederholungen';
+$_ARRAYLANG['TXT_CALENDAR_START_OF_RECURRENCE'] = 'Beginn der Wiederholung';

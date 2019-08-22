@@ -1953,7 +1953,9 @@ class CalendarEventManager extends CalendarLibrary
 
                 // recurrence shall end after a specific date
                 case 3:
-                    if ($nextEvent->startDate > $objCloneEvent->seriesData['seriesPatternEndDate']) {
+                    $dayOfStartDate = clone $nextEvent->startDate;
+                    $dayOfStartDate->setTime(0,0);
+                    if ($dayOfStartDate > $objCloneEvent->seriesData['seriesPatternEndDate']) {
                         // recurrence is out of date boundary -> skip
                         return null;
                     }
@@ -2134,7 +2136,7 @@ class CalendarEventManager extends CalendarLibrary
         if (count($additionalRecurrences)) {
             // get event duration. will be used to calculate the end-date
             // of the additional event recurrence
-            $diffDays = $objEvent->startDate->diff($objEvent->endDate)->days;
+            $diff = $objEvent->startDate->diff($objEvent->endDate);
 
             // check if any of the manually added recurrences will occur
             // before the next calculated recurrence
@@ -2152,14 +2154,24 @@ class CalendarEventManager extends CalendarLibrary
                         $additionalRecurrence->format('m'),
                         $additionalRecurrence->format('d')
                 );
+                $objCloneEvent->startDate->setTime(
+                    $additionalRecurrence->format('H'),
+                    $additionalRecurrence->format('i')
+                );
                 $objCloneEvent->endDate->setDate(
                         $additionalRecurrence->format('Y'),
                         $additionalRecurrence->format('m'),
                         $additionalRecurrence->format('d')
                 );
+                $objCloneEvent->endDate->setTime(
+                    $additionalRecurrence->format('H'),
+                    $additionalRecurrence->format('i')
+                );
 
                 // adjust end date of manually added recurrence
-                $objCloneEvent->endDate->modify('+' . $diffDays . ' days');
+                $objCloneEvent->endDate->modify('+' . $diff->d . ' days');
+                $objCloneEvent->endDate->modify('+' . $diff->h . ' hours');
+                $objCloneEvent->endDate->modify('+' . $diff->i . ' minutes');
 
                 // remove recurrence from list of manually added recurrences
                 // as it has been processed now and must not be processed a
