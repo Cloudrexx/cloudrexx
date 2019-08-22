@@ -1070,6 +1070,10 @@ class DBG
     public static function resetLogPrefix() {
         self::setLogPrefix();
     }
+
+    public static function getLogHash() {
+        return self::$logHash;
+    }
 }
 
 function DBG_log_adodb($msg)
