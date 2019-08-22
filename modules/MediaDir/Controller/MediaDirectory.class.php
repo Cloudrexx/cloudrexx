@@ -429,6 +429,7 @@ class MediaDirectory extends MediaDirectoryLibrary
             // custom sort order
             $forceAlphabeticalOrder = false;
             $popular = null;
+            $forceLatest = false;
 
             // check for custom sort order
             // but only if option 'legacy behavior' is not set
@@ -447,6 +448,15 @@ class MediaDirectory extends MediaDirectoryLibrary
                 if (isset($config['sort']['popular'])) {
                     $popular = $config['sort']['popular'];
                 }
+                // note: 'popular' has precedence in
+                // MediaDirectoryEntry::getEntries before 'latest'
+                if (
+                    !$popular &&
+                    isset($config['list']['latest'])
+                ) {
+                    $bolLatest = true;
+                    $forceLatest = true;
+                }
                 if (isset($config['list']['limit'])) {
                     $intLimitEnd = $config['list']['limit'];
                 }
@@ -456,6 +466,15 @@ class MediaDirectory extends MediaDirectoryLibrary
             }
 
             $objEntries->getEntries(null,$intLevelId,$intCategoryId,null,$bolLatest,null,1,$intLimitStart, $intLimitEnd, null, $popular, $intCmdFormId);
+
+            // as we are forcing the latest list within the regular
+            // mediadirEntryList template block, we have to reset the latest
+            // option to make the regular processing within the template
+            // block mediadirEntryList work
+            if ($forceLatest) {
+                $bolLatest = false;
+                $objEntries->setStrBlockName($this->moduleNameLC."EntryList");
+            }
 
             // reset default order behaviour
             if ($forceAlphabeticalOrder) {
