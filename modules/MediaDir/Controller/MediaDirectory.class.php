@@ -225,6 +225,9 @@ class MediaDirectory extends MediaDirectoryLibrary
             $this->_objTpl->addBlock('APPLICATION_DATA', 'application_data', $applicationTemplate);
         }
 
+        // fetch filter config from template
+        $config = static::fetchMediaDirListConfigFromTemplate('__global__', $this->_objTpl);
+
         //search existing category&level blocks
         $arrExistingBlocks = array();
 
@@ -245,6 +248,8 @@ class MediaDirectory extends MediaDirectoryLibrary
         if($this->arrSettings['settingsShowLevels'] == 1) {
             if (isset($requestParams['lid'])) {
                 $intLevelId = intval($requestParams['lid']);
+            } elseif (isset($config['filter']['level'])) {
+                $intLevelId = $config['filter']['level'];
             } elseif (intval($arrIds[0]) != 0) {
                 $intLevelId = intval($arrIds[0]);
                 $this->cx->getRequest()->getUrl()->setParam('lid', $intLevelId);
@@ -267,8 +272,13 @@ class MediaDirectory extends MediaDirectoryLibrary
             }
         }
 
+        // note: when using pretty urls, then the request param cid
+        // will be set to the value of the request param cmd in case
+        // the request param cmd is set to a category-id
         if (isset($requestParams['cid'])) {
             $intCategoryId = intval($requestParams['cid']);
+        } elseif (isset($config['filter']['category'])) {
+            $intCategoryId = $config['filter']['category'];
         } elseif ($intCategoryCmd != 0) {
             $intCategoryId = intval($intCategoryCmd);
             $this->cx->getRequest()->getUrl()->setParam('cid', $intCategoryId);
@@ -281,8 +291,17 @@ class MediaDirectory extends MediaDirectoryLibrary
             $this->_objTpl->touchBlock($this->moduleNameLC.'Overview');
         }
 
-        //check form cmd
-        if(!empty($_GET['cmd']) && $arrIds[0] != 'search') {
+        // check form filter
+        $formFilter = false;
+        if (isset($config['filter']['form'])) {
+            $formFilter = true;
+        } elseif (
+            !empty($_GET['cmd']) &&
+            $arrIds[0] != 'search'
+        ) {
+            $formFilter = true;
+        }
+        if ($formFilter) {
             $arrFormCmd = array();
 
             $objForms = new MediaDirectoryForm(null, $this->moduleName);
@@ -296,12 +315,24 @@ class MediaDirectory extends MediaDirectoryLibrary
                 ) {
                     continue;
                 }
+
+                if (
+                    isset($config['filter']['form']) &&
+                    $config['filter']['form'] == $intFormId
+                ) {
+                    $intCmdFormId = $intFormId;
+                    break;
+                }
+
                 if(!empty($arrForm['formCmd'])) {
                     $arrFormCmd[$arrForm['formCmd']] = intval($intFormId);
                 }
             }
 
-            if(!empty($arrFormCmd[$_GET['cmd']])) {
+            if (
+                !$intCmdFormId &&
+                !empty($arrFormCmd[$_GET['cmd']])
+            ) {
                 $intCmdFormId = intval($arrFormCmd[$_GET['cmd']]);
             }
         }
@@ -1232,8 +1263,23 @@ class MediaDirectory extends MediaDirectoryLibrary
 
         $this->_objTpl->setTemplate($this->pageContent, true, true);
 
+        // fetch filter config from template
+        $config = static::fetchMediaDirListConfigFromTemplate('__global__', $this->_objTpl);
+        $intLevelId = null;
+        $intCategoryId = null;
+        $intCmdFormId = null;
+        if (isset($config['filter']['level'])) {
+            $intLevelId = $config['filter']['level'];
+        }
+        if (isset($config['filter']['category'])) {
+            $intCategoryId = $config['filter']['category'];
+        }
+        if (isset($config['filter']['form'])) {
+            $intCmdFormId = $config['filter']['form'];
+        }
+
         $objEntry = new MediaDirectoryEntry($this->moduleName);
-        $objEntry->getEntries(null,null,null,null,null,null,true);
+        $objEntry->getEntries(null,$intLevelId,$intCategoryId,null,null,null,true,null,'n',null,null,$intCmdFormId);
         $objEntry->listEntries($this->_objTpl, 4);
     }
 
