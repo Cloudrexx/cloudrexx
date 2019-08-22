@@ -455,9 +455,9 @@ class Host extends \Cx\Model\Base\EntityBase
             'strict_redirects' => true,
         ));
         
+        echo 'Pushing to ' . $url . ' with method ' . $method . ', body is: ' . http_build_query($content) . "\n";
         $response = $request->send();
         var_dump($response->getStatus());
-        echo 'Pushed to ' . $url . ' with method ' . $method . ', body was: ' . http_build_query($content) . "\n";
         echo '<pre>' . $response->getBody() . "</pre>\n\n";
         
         return $response->getStatus() == 200;
