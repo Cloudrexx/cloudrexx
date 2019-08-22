@@ -680,3 +680,4 @@ $_ARRAYLANG['TXT_CALENDAR_PUBLISHED'] = 'Veröffentlicht';
 $_ARRAYLANG['TXT_CALENDAR_USE_CUSTOM_FORMAT'] = 'Individuelles Format verwenden';
 $_ARRAYLANG['TXT_CALENDAR_COUNT_WITHOUT_SERIES'] = 'Anzahl ohne Wiederholungen';
 $_ARRAYLANG['TXT_CALENDAR_START_OF_RECURRENCE'] = 'Beginn der Wiederholung';
+$_ARRAYLANG['TXT_CALENDAR_INVALID_RECURRENCE_DATE'] = 'Die Wiederholung %s ist ungültig und kann nicht hinzugefügt werden, da diese vor dem Beginn der Veranstaltung liegt. Eine Wiederholung kann erst nach dem Beginn der Veranstaltung statt finden.';

@@ -1466,6 +1466,12 @@ class CalendarEvent extends CalendarLibrary
                             )
                         )->format('Y-m-d H:i');
 
+                    // ignore additional recurrences that start before the
+                    // start-date of the event as those are not supported
+                    if ($additionalRecurrenceDate <= $startDate) {
+                        continue;
+                    }
+
                     // add additional recurrence as DateTime
                     $additionalRecurrenceDates[] = $additionalRecurrenceDate;
                 }

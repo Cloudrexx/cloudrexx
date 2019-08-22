@@ -489,6 +489,8 @@ class CalendarManager extends CalendarLibrary
             array(
                 'TXT_CALENDAR_START_OF_RECURRENCE' =>
                     $_ARRAYLANG['TXT_CALENDAR_START_OF_RECURRENCE'],
+                'TXT_CALENDAR_INVALID_RECURRENCE_DATE' =>
+                    $_ARRAYLANG['TXT_CALENDAR_INVALID_RECURRENCE_DATE'],
             ),
             'Calendar'
         );

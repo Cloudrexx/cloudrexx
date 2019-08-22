@@ -284,6 +284,12 @@
                 cx.jQuery( ".startDate" ).data('prevDate', cx.jQuery(".startDate").datetimepicker("getDate"));
                 cx.jQuery( ".endDate" ).data('prevDate', cx.jQuery(".endDate").datetimepicker("getDate"));
                 cx.jQuery( this ).datetimepicker('refresh');
+
+                // ensure recurrence date-selection will be reinitialized
+                // to match the newly selected event's start-date
+                if (jQuery('#recurrenceDatepicker').hasClass('hasDatepicker')) {
+                    jQuery('#recurrenceDatepicker').datetimepicker('destroy');
+                }
             }
         };
         cx.jQuery('input[name=startDate]')
@@ -351,6 +357,39 @@
                             var selectedRecurrence = selectedRecurrenceDate;
                         }
                         var selectedDate = cx.jQuery.trim(selectedRecurrence.split(",")[1]);
+
+                        // ensure recurrence lies in the future as recurrences
+                        // before the event's start-date are not suppored
+                        var eventStartDate = cx.jQuery.datepicker.parseDate(
+                            '{CALENDAR_EVENT_DATE_FORMAT}',
+                            cx.jQuery(".startDate").val()
+                        );
+                        var recurrenceDate = cx.jQuery.datepicker.parseDate(
+                            '{CALENDAR_EVENT_DATE_FORMAT}',
+                            selectedDate
+                        );
+                        if (!cx.jQuery(".all_day").is(':checked')) {
+                            var timeData = selectedDate
+                                .split(' ')[1]
+                                .split(':');
+                            recurrenceDate.setHours(timeData[0]);
+                            recurrenceDate.setMinutes(timeData[1]);
+                            var timeData = cx.jQuery(".startDate").val()
+                                .split(' ')[1]
+                                .split(':');
+                            eventStartDate.setHours(timeData[0]);
+                            eventStartDate.setMinutes(timeData[1]);
+                        }
+                        if (recurrenceDate <= eventStartDate) {
+                            cx.ui.messages.add(
+                                cx.variables.get(
+                                    'TXT_CALENDAR_INVALID_RECURRENCE_DATE',
+                                    'Calendar'
+                                ).replace('%s', selectedRecurrence),
+                                'warning'
+                            );
+                            return;
+                        }
 
                         // check for duplicates
                         cx.jQuery('#additionalRecurrencesList .seriesList span').each(function(){
@@ -425,7 +464,7 @@
                     // generate date-selection widget for recurrence selection
                     var format = 'D, {CALENDAR_EVENT_DATE_FORMAT}';
                     cx.jQuery("#recurrenceDatepicker").datepicker({
-                        minDate: 0,
+                        minDate: startDate,
                         dateFormat: format,
                         onSelect: function(date) {
                             selectedRecurrenceDate = date;
