@@ -285,6 +285,9 @@ class Shop extends ShopLibrary
                 (isset($_POST['countryId2'])
                   ? intval($_POST['countryId2'])
                   : \Cx\Core\Setting\Controller\Setting::getValue('country_id', 'Shop'));
+            // we need to reset selected payment and shipment method
+            // as we did just change the shipment country
+            unset($_SESSION['shop']['shipperId']);
         }
 
 // TODO: This should be set up in a more elegant way
@@ -853,8 +856,16 @@ die("Failed to get Customer for ID $customer_id");
     {
 //\DBG::log("Shop::cart(): Entered");
         Cart::init();
-        if (!empty($_POST['countryId2'])) {
+        if (
+            !empty($_POST['countryId2']) && (
+                !isset($_SESSION['shop']['countryId2']) ||
+                $_SESSION['shop']['countryId2'] != intval($_POST['countryId2'])
+            )
+        ) {
             $_SESSION['shop']['countryId2'] = intval($_POST['countryId2']);
+            // we need to reset selected payment and shipment method
+            // as we did just change the shipment country
+            unset($_SESSION['shop']['shipperId']);
         }
         if (empty($_GET['remoteJs'])) {
 //\DBG::log("Shop::cart(): Receiving POST");
@@ -3023,6 +3034,7 @@ die("Shop::processRedirect(): This method is obsolete!");
 
         // remember currently set country of shipping address.
         // will be used in case an invalid shipping country has been submitted
+        $shippingCountryId = 0;
         if (isset($_SESSION['shop']['countryId2'])) {
             $shippingCountryId = $_SESSION['shop']['countryId2'];
         }
@@ -3114,6 +3126,12 @@ die("Shop::processRedirect(): This method is obsolete!");
         if (empty($_SESSION['shop']['city2']))      $_SESSION['shop']['city2'] = '';
         if (empty($_SESSION['shop']['phone2']))     $_SESSION['shop']['phone2'] = '';
         if (empty($_SESSION['shop']['countryId2'])) $_SESSION['shop']['countryId2'] = 0;
+
+        // we need to reset selected payment and shipment method
+        // in case we did just change the shipment country
+        if ($_SESSION['shop']['countryId2'] != $shippingCountryId) {
+            unset($_SESSION['shop']['shipperId']);
+        }
     }
 
 
