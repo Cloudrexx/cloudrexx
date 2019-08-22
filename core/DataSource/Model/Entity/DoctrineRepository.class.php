@@ -337,7 +337,7 @@ class DoctrineRepository extends DataSource {
         $em = $this->cx->getDb()->getEntityManager();
         $repo = $this->getRepository();
 
-        $entity = $repo->findBy($elementId);
+        $entity = $repo->findOneBy($elementId);
 
         if (!$entity) {
             throw new \Exception('Entry not found!');
@@ -359,7 +359,7 @@ class DoctrineRepository extends DataSource {
         $em = $this->cx->getDb()->getEntityManager();
         $repo = $this->getRepository();
 
-        $entity = $repo->findBy($elementId);
+        $entity = $repo->findOneBy($elementId);
 
         if (!$entity) {
             throw new \Exception('Entry not found!');
@@ -425,11 +425,17 @@ class DoctrineRepository extends DataSource {
             }
             // handle many to many relations
             if ($associationMapping['type'] == \Doctrine\ORM\Mapping\ClassMetadata::MANY_TO_MANY) {
+                // todo: handle or document this case
+                if (is_array($data[$field])) {
+                    continue;
+                }
+
                 // prepare data
                 $foreignEntityIndexes = explode(',', $data[$field]);
                 $targetRepo = $em->getRepository($associationMapping['targetEntity']);
                 $primaryKeys = $entityClassMetadata->getIdentifierFieldNames();
                 $addMethod = 'add'.preg_replace('/_([a-z])/', '\1', ucfirst($field));
+                $getMethod = 'get'.preg_replace('/_([a-z])/', '\1', ucfirst($field));
                 // foreach distant entity
                 foreach ($foreignEntityIndexes as $foreignEntityIndex) {
                     // prepare data
@@ -451,6 +457,12 @@ class DoctrineRepository extends DataSource {
                         throw new \Exception(
                             'Entity not found (' . $associationMapping['targetEntity'] . ' with ID ' . var_export($foreignEntityIndexData, true) . ')'
                         );
+                    }
+                    $existingAssociatedEntities = $entity->$getMethod();
+                    foreach ($existingAssociatedEntities as $existingAssociatedEntity) {
+                        if ($targetEntity == $existingAssociatedEntity) {
+                            continue 2;
+                        }
                     }
                     $entity->$addMethod($targetEntity);
                 }
