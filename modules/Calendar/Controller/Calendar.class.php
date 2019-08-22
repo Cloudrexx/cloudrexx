@@ -1048,8 +1048,6 @@ UPLOADER;
             \Cx\Core\Csrf\Controller\Csrf::redirect(\Cx\Core\Routing\Url::fromModuleAndCmd($this->moduleName, ''));
         }
 
-        $this->pageTitle = html_entity_decode($this->objEventManager->eventList[0]->title, ENT_QUOTES, CONTREXX_CHARSET);
-
         // Set the meta page description to the teaser text if displaying calendar details
         $teaser = html_entity_decode($this->objEventManager->eventList[0]->teaser, ENT_QUOTES, CONTREXX_CHARSET);
         if ($teaser) {
@@ -1223,9 +1221,6 @@ UPLOADER;
             $this->moduleLangVar.'_EVENT_DETAIL_LINK',
             $url
         );
-
-        // set page title based on requested event
-        $dateForPageTitle = $objEvent->startDate;
 
         // Only show registration form if event lies in the future
         if(time() > $objEvent->startDate->getTimestamp()) {
