@@ -344,6 +344,15 @@ class CalendarEvent extends CalendarLibrary
     );
 
     /**
+     * Whether this event is a regular event (or recurrence according to the
+     * series configuration) or if the event is a manually added additional
+     * recurrence.
+     *
+     * @var boolean TRUE if event is a manually added recurrence
+     */
+    public $isAdditionalRecurrence = false;
+
+    /**
      * Event languages to show
      *
      * @access public

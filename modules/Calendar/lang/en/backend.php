@@ -681,3 +681,5 @@ $_ARRAYLANG['TXT_CALENDAR_USE_CUSTOM_FORMAT'] = 'Use custom format';
 $_ARRAYLANG['TXT_CALENDAR_COUNT_WITHOUT_SERIES'] = 'Count excluding recurrences';
 $_ARRAYLANG['TXT_CALENDAR_START_OF_RECURRENCE'] = 'Start of recurrence';
 $_ARRAYLANG['TXT_CALENDAR_INVALID_RECURRENCE_DATE'] = 'The recurrence %s is invalid as it occures before the start of the event. Please note that recurrences can only occur after the start of the event.';
+$_ARRAYLANG['TXT_CALENDAR_CONSTRAIN_ADDITIONAL_RECURRENCES'] = 'Limit additional recurrences';
+$_ARRAYLANG['TXT_CALENDAR_CONSTRAIN_ADDITIONAL_RECURRENCES_INFO'] = 'If this option is activated, then additional recurrences that occur after the set recurrence end (according to option "Duration of the repetition") will be ignored. If option is deactivated, then additional recurrences that occur after the set recurrence end will be listed anyway.';

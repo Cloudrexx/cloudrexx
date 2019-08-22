@@ -1921,6 +1921,14 @@ class CalendarEventManager extends CalendarLibrary
      */
     protected function getNextRecurrenceDate($objEvent, $objCloneEvent, &$additionalRecurrences = array()) {
         while ($nextEvent = $this->fetchNextRecurrence($objEvent, $objCloneEvent, $additionalRecurrences)) {
+            // verify that we have not yet reached the end of the recurrence
+            if (
+                $nextEvent->isAdditionalRecurrence &&
+                $this->arrSettings['constrainAdditionalRecurrences'] == 2
+            ) {
+                return $nextEvent;
+            }
+
             switch ($objCloneEvent->seriesData['seriesPatternDouranceType']) {
                 // no recurrence end set
                 case 1:
@@ -1946,6 +1954,17 @@ class CalendarEventManager extends CalendarLibrary
                 case 2:
                     $objCloneEvent->seriesData['seriesPatternEnd'] = $objCloneEvent->seriesData['seriesPatternEnd']-1;
                     if ($objCloneEvent->seriesData['seriesPatternEnd'] <= 0) {
+                        // do not abort processing in case there are unprocessed
+                        // additional recurrences that shall be added
+                        if (
+                            $this->arrSettings[
+                                'constrainAdditionalRecurrences'
+                            ] == 2 &&
+                            count($additionalRecurrences)
+                        ) {
+                            continue 2;
+                        }
+
                         // recurrence is out of date boundary -> skip
                         return null;
                     }
@@ -1956,6 +1975,17 @@ class CalendarEventManager extends CalendarLibrary
                     $dayOfStartDate = clone $nextEvent->startDate;
                     $dayOfStartDate->setTime(0,0);
                     if ($dayOfStartDate > $objCloneEvent->seriesData['seriesPatternEndDate']) {
+                        // do not abort processing in case there are unprocessed
+                        // additional recurrences that shall be added
+                        if (
+                            $this->arrSettings[
+                                'constrainAdditionalRecurrences'
+                            ] == 2 &&
+                            count($additionalRecurrences)
+                        ) {
+                            continue 2;
+                        }
+
                         // recurrence is out of date boundary -> skip
                         return null;
                     }
@@ -2172,6 +2202,12 @@ class CalendarEventManager extends CalendarLibrary
                 $objCloneEvent->endDate->modify('+' . $diff->d . ' days');
                 $objCloneEvent->endDate->modify('+' . $diff->h . ' hours');
                 $objCloneEvent->endDate->modify('+' . $diff->i . ' minutes');
+
+                // flag event as manually added recurrence.
+                // this might cause the algorithm to ingnore the dourance
+                // configuration if option constrainAdditionalRecurrences
+                // is disabled
+                $objCloneEvent->isAdditionalRecurrence = true;
 
                 // remove recurrence from list of manually added recurrences
                 // as it has been processed now and must not be processed a

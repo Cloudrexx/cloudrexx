@@ -681,3 +681,5 @@ $_ARRAYLANG['TXT_CALENDAR_USE_CUSTOM_FORMAT'] = 'Individuelles Format verwenden'
 $_ARRAYLANG['TXT_CALENDAR_COUNT_WITHOUT_SERIES'] = 'Anzahl ohne Wiederholungen';
 $_ARRAYLANG['TXT_CALENDAR_START_OF_RECURRENCE'] = 'Beginn der Wiederholung';
 $_ARRAYLANG['TXT_CALENDAR_INVALID_RECURRENCE_DATE'] = 'Die Wiederholung %s ist ungültig und kann nicht hinzugefügt werden, da diese vor dem Beginn der Veranstaltung liegt. Eine Wiederholung kann erst nach dem Beginn der Veranstaltung statt finden.';
+$_ARRAYLANG['TXT_CALENDAR_CONSTRAIN_ADDITIONAL_RECURRENCES'] = 'Einschränkung zusätzlicher Wiederholungen';
+$_ARRAYLANG['TXT_CALENDAR_CONSTRAIN_ADDITIONAL_RECURRENCES_INFO'] = 'Durch Aktivierung dieser Option werden zusätzliche Wiederholungen (gemäss Option "zusätzliche Wiederholungen") einer Veranstaltung ignoriert, wenn das definierte Ende der Wiederholungsdauer erreicht wurde. Ist diese Option deaktiviert, so werden zusätzliche Wiederholungen auch nach dem definierten Ende der Wiederholungsdauer aufgeführt.';
