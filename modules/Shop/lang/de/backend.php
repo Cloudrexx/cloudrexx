@@ -1040,3 +1040,4 @@ $_ARRAYLANG['TXT_SHOP_DISCOUNT_GROUP_TYPE'] = 'Pro Produkt';
 $_ARRAYLANG['TXT_SHOP_DISCOUNT_TYPE_TIP'] = 'Gilt die Mindestmenge pro Produkt oder für alle Produkte mit dieser Rabattgruppe gemeinsam?';
 $_ARRAYLANG['TXT_SHOP_TYPE'] = 'Art';
 $_ARRAYLANG['TXT_SHOP_PERCENTAGE'] = 'Prozent';
+$_ARRAYLANG['TXT_SHOP_PAYMENT_FEE_INFO'] = 'Definieren Sie hier die Höhe der Kommission, die bei Verwendung der jeweiligen Zahlungsart bei der Bestellung erhoben werden soll. Hinterlegen Sie entweder einen Fixbetrag oder einen Prozentsatz, der auf die Bestellsumme aufgerechnet werden soll.';

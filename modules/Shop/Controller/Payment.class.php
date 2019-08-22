@@ -393,10 +393,10 @@ class Payment
             return null;
         $type = 'fix';
         if (
-            isset($_POST['fee_type']) &&
-            in_array($_POST['fee_type'], array('fix', 'percent'))
+            isset($_POST['fee_type_new']) &&
+            in_array($_POST['fee_type_new'], array('fix', 'percent'))
         ) {
-            $type = $_POST['fee_type'];
+            $type = $_POST['fee_type_new'];
         }
         $query = "
             INSERT INTO ".DBPREFIX."module_shop".MODULE_INDEX."_payment (

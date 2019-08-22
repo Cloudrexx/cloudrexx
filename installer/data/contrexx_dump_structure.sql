@@ -3469,8 +3469,8 @@ CREATE TABLE `contrexx_module_shop_payment` (
   `processor_id` int(10) unsigned NOT NULL DEFAULT '0',
   `fee` decimal(9,2) unsigned NOT NULL DEFAULT '0.00',
   `free_from` decimal(9,2) unsigned NOT NULL DEFAULT '0.00',
-  `ord` int(5) unsigned NOT NULL DEFAULT '0',
   `type` enum('fix','percent') NOT NULL DEFAULT 'fix',
+  `ord` int(5) unsigned NOT NULL DEFAULT '0',
   `active` tinyint(1) unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB ;

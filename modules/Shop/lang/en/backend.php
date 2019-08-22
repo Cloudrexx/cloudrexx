@@ -1006,3 +1006,4 @@ $_ARRAYLANG['TXT_SHOP_DISCOUNT_GROUP_TYPE'] = 'Per product';
 $_ARRAYLANG['TXT_SHOP_DISCOUNT_TYPE_TIP'] = 'Whether to apply the the minimum order quantity on each product separately or on all products within this discount group together';
 $_ARRAYLANG['TXT_SHOP_TYPE'] = 'Type';
 $_ARRAYLANG['TXT_SHOP_PERCENTAGE'] = 'Percentage';
+$_ARRAYLANG['TXT_SHOP_PAYMENT_FEE_INFO'] = 'Set the fee for each payment method that shall be imposed. This can either be a fixed fee or a percentage based on the order sum.';
