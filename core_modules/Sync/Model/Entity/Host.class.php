@@ -380,7 +380,7 @@ class Host extends \Cx\Model\Base\EntityBase
         }
         
         $handle = false;
-        foreach ($change->getOriginSync()->getHostEntitiesIncludingLegacy(false) as $hostEntity) {
+        foreach ($change->getOriginSync()->getHostEntitiesIncludingLegacy(false, $this->getHost()) as $hostEntity) {
             if ($hostEntity['host'] != $this) {
                 continue;
             }
@@ -464,10 +464,18 @@ class Host extends \Cx\Model\Base\EntityBase
     }
     
     public function isLocked() {
-        $em = $this->cx->getDb()->getEntityManager();
-        $hostRepo = $em->getRepository(get_class($this));
-        $me = $hostRepo->find($this->getId());
-        $this->setState($me->getState());
+        $result = $this->cx->getDb()->getAdoDb()->Execute(
+            'SELECT state FROM '.DBPREFIX.'core_module_sync_host WHERE id = '.$this->getId()
+        );
+        if ($result === false || $result->EOF) {
+            return true;
+        }
+        $this->setState($result->fields['state']);
+
+        //$em = $this->cx->getDb()->getEntityManager();
+        //$hostRepo = $em->getRepository(get_class($this));
+        //$me = $hostRepo->find($this->getId());
+        //$this->setState($me->getState());
         return $this->getState() == 1;
     }
     

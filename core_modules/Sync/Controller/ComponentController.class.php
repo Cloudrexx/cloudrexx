@@ -608,6 +608,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 $host->removeLock();
             }
             $query = $em->createQuery('SELECT h FROM ' . $this->getNamespace() . '\Model\Entity\Host h WHERE h.state = 0');
+            $query->useResultCache(false);
             $nonLockedHosts = $query->getResult();
             $hasNonLockedChanges = false;
             foreach ($nonLockedHosts as $host) {

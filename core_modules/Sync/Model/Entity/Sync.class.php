@@ -271,7 +271,7 @@ class Sync extends \Cx\Model\Base\EntityBase {
     }
     
     // Customizing for old Calendar sync config:
-    public function getHostEntitiesIncludingLegacy($cached = true) {
+    public function getHostEntitiesIncludingLegacy($cached = true, $host = '') {
         if ($cached && isset($this->cachedHostEntities)) {
             return $this->cachedHostEntities;
         }
@@ -307,6 +307,9 @@ class Sync extends \Cx\Model\Base\EntityBase {
             WHERE
                 `host`.`status` = 0
         ';
+        if ($host) {
+            $query .= 'AND `host`.`uri` = "' . contrexx_raw2db($host) . '"';
+        }
         $results = $objDatabase->Execute($query);
         if (!$results || $results->EOF) {
             return $hostEntities;
@@ -508,7 +511,7 @@ class Sync extends \Cx\Model\Base\EntityBase {
             }
             $relatedHosts[] = $hostEntity['host'];
         }
-        foreach ($this->getHostEntitiesIncludingLegacy(false) as $hostEntity) {
+        foreach ($this->getHostEntitiesIncludingLegacy() as $hostEntity) {
             if (in_array($hostEntity['host'], $relatedHosts)) {
                 continue;
             }
