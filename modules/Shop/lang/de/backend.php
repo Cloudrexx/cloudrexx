@@ -952,6 +952,7 @@ $_ARRAYLANG['TXT_TOTAL_WEIGHT'] = "Gesamtgewicht";
 $_ARRAYLANG['TXT_TURNOVER'] = "Umsatz";
 $_ARRAYLANG['TXT_UNIT_PRICE'] = "Stückpreis";
 $_ARRAYLANG['TXT_USE_TEST_ACCOUNT'] = "Testaccount verwenden";
+$_ARRAYLANG['TXT_TERMINAL_ID'] = "Terminal ID";
 $_ARRAYLANG['TXT_USERNAME'] = "Benutzername";
 $_ARRAYLANG['TXT_USERNAME_USED_BY_OTHER_CUSTOMER'] = "Dieser Benutzername wird bereits von einem anderen Kunden benutzt!";
 $_ARRAYLANG['TXT_VALUE'] = "Wert";
