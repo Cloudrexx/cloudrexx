@@ -2926,6 +2926,24 @@ die("Shop::processRedirect(): This method is obsolete!");
                 $birthdayDaySelect . $birthdayMonthSelect . $birthdayYearSelect
             );
         }
+        if (self::$objTemplate->blockExists('shop_account_birthday')) {
+            self::$objTemplate->setVariable(array(
+                'SHOP_ACCOUNT_BIRTHDAY_DAY' => $selectedBirthdayDay,
+                'SHOP_ACCOUNT_BIRTHDAY_MONTH' => $selectedBirthdayMonth,
+                'SHOP_ACCOUNT_BIRTHDAY_YEAR' => $selectedBirthdayYear,
+                'SHOP_ACCOUNT_BIRTHDAY_DATE_FORMAT' => ASCMS_DATE_FORMAT_DATE,
+            ));
+            if (!empty($birthday)) {
+                self::$objTemplate->setVariable(array(
+                    'SHOP_ACCOUNT_BIRTHDAY_DATE' => date(
+                        ASCMS_DATE_FORMAT_DATE,
+                        $birthday
+                    ),
+                    'SHOP_ACCOUNT_BIRTHDAY_TIMESTAMP' => $birthday,
+                ));
+            }
+            self::$objTemplate->parse('shop_account_birthday');
+        }
 
         if (count(static::$errorFields)) {
             $errorClassPlaceholders = array();
@@ -3114,6 +3132,48 @@ die("Shop::processRedirect(): This method is obsolete!");
                 $day,
                 $year
             );
+        } elseif (!empty($_POST['shop_birthday_date'])) {
+            // get date format of submitted birthday date
+            if (
+                !empty($_POST['shop_birthday_date_format']) &&
+                is_string($_POST['shop_birthday_date_format'])
+            ) {
+                $birthdayDateFormat = contrexx_input2raw(
+                    $_POST['shop_birthday_date_format']
+                );
+            } else {
+                $birthdayDateFormat = ASCMS_DATE_FORMAT_DATE;
+            }
+            // parse submitted date based on the supplied date-format
+            $birthdayDate = date_parse_from_format(
+                $birthdayDateFormat,
+                $_POST['shop_birthday_date']
+            );
+            // if parsing of the submitted date was successful,
+            // then do generate a timestamp of it
+            if (
+                !empty($birthdayDate['day']) &&
+                !empty($birthdayDate['month']) &&
+                !empty($birthdayDate['year'])
+            ) {
+                $birthday = mktime(
+                    0,
+                    0,
+                    0,
+                    intval($birthdayDate['month']),
+                    intval($birthdayDate['day']),
+                    intval($birthdayDate['year'])
+                );
+            }
+        } elseif (
+            isset($_POST['shop_birthday_date']) || (
+                isset($_POST['shop_birthday_day']) &&
+                isset($_POST['shop_birthday_month']) &&
+                isset($_POST['shop_birthday_year'])
+            )
+        ) {
+            // clear birthday
+            $_SESSION['shop']['birthday'] = 0;
         }
 
         // update birthday property if a valid birthday date has been submitted
@@ -4282,9 +4342,22 @@ die("Shop::processRedirect(): This method is obsolete!");
         self::$objCustomer->country_id($_SESSION['shop']['countryId']);
         self::$objCustomer->phone($_SESSION['shop']['phone']);
         self::$objCustomer->fax($_SESSION['shop']['fax']);
+
+        // set birthday, but only if it has been set (or unset)
+        // otherwise, it shall not get overwitten
         if (!empty($_SESSION['shop']['birthday'])) {
+            $birthday = date(
+                ASCMS_DATE_FORMAT_DATE,
+                $_SESSION['shop']['birthday']
+            );
             self::$objCustomer->setProfile(array(
-                'birthday' => array(0 => date(ASCMS_DATE_FORMAT_DATE, $_SESSION['shop']['birthday']))
+                'birthday' => array(0 => $birthday)
+            ));
+
+        // clear birthday if it has been unset
+        } elseif (isset($_SESSION['shop']['birthday'])) {
+            self::$objCustomer->setProfile(array(
+                'birthday' => array(0 => '')
             ));
         }
 
