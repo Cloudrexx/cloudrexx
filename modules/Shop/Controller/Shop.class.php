@@ -4001,8 +4001,20 @@ die("Shop::processRedirect(): This method is obsolete!");
             'SHOP_EMAIL' => stripslashes($_SESSION['shop']['email']),
             'SHOP_PHONE' => stripslashes($_SESSION['shop']['phone']),
             'SHOP_FAX' => stripslashes($_SESSION['shop']['fax']),
-            'SHOP_BIRTHDAY' => date(ASCMS_DATE_FORMAT_DATE, $_SESSION['shop']['birthday']),
         ));
+
+        // only parse birthday if it had been set
+        if (!empty($_SESSION['shop']['birthday'])) {
+            self::$objTemplate->setVariable(
+                'SHOP_BIRTHDAY',
+                date(
+                    ASCMS_DATE_FORMAT_DATE,
+                    $_SESSION['shop']['birthday']
+                )
+            );
+        }
+
+        // parse shipment address
         if (!empty($_SESSION['shop']['lastname2'])) {
             self::$objTemplate->setVariable(array(
                 'SHOP_COMPANY2' => stripslashes($_SESSION['shop']['company2']),
