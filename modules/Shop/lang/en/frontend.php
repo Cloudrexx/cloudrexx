@@ -374,6 +374,7 @@ $_ARRAYLANG['TXT_SHOP_PRODUCTS_IN_CATEGORY'] = "Products in the category %1\$s";
 $_ARRAYLANG['TXT_SHOP_PRODUCTS_SEARCH_RESULTS'] = "Search results for \"%1\$s\"";
 $_ARRAYLANG['TXT_SHOP_PRODUCTS_SPECIAL_OFFER'] = "Special offers";
 $_ARRAYLANG['TXT_SHOP_PSP_FAILED_TO_INITIALISE_SAFERPAY'] = "Error: Failed to initialize Saferpay";
+$_ARRAYLANG['TXT_SHOP_PSP_FAILED_TO_INITIALIZE_SAFERPAY_JSON'] = "Error: Failed to initialize Saferpay";
 $_ARRAYLANG['TXT_SHOP_PSP_FAILED_TO_INITIALISE_YELLOWPAY'] = "Error: Failed to initialize Yellowpay";
 $_ARRAYLANG['TXT_SHOP_RATE_NONE'] = "-";
 $_ARRAYLANG['TXT_SHOP_REMOVE_ITEM'] = "Remove product";

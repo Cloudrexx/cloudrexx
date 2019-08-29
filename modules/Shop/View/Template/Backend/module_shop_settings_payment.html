@@ -361,7 +361,7 @@ function deletePayment(pId)
     </tr>
 
     <tr class="row1">
-      <td class="nowrap">{TXT_SAFERPAY}</td>
+      <td class="nowrap">{TXT_SAFERPAY}{SAFERPAY_EXPERIMENTAL}</td>
       <td class="nowrap"><label for="safperpay_swapper">{TXT_SHOP_EDIT}&nbsp;</label>
         <input name="safperpay_swapper" id="safperpay_swapper" type="checkbox" onclick="swapBlock('safperpay');" value="1" />&nbsp;
         <div id="safperpay" style="display:none;">
@@ -399,6 +399,50 @@ function deletePayment(pId)
       <td class="nowrap a_center">
         <input type="checkbox" name="saferpay_active" value="1"
                {SHOP_SAFERPAY_STATUS} />
+      </td>
+    </tr>
+    <tr class="row2">
+      <td class="nowrap">{TXT_SHOP_SAFERPAY_JSON}</td>
+      <td class="nowrap"><label for="saferpay_json_swapper">{TXT_SHOP_EDIT}&nbsp;</label>
+        <input name="saferpay_json_swapper" id="saferpay_json_swapper" type="checkbox" onclick="swapBlock('saferpay_json');" value="1" />&nbsp;
+        <div id="saferpay_json" style="display:none;">
+          <table width="100%">
+            <tr>
+              <td width="20%">{TXT_ACCOUNT_ID}</td>
+              <td width="80%">
+                <input type="text" name="saferpay_json_id" value="{SHOP_SAFERPAY_JSON_ID}" style="width: 270px;" maxlength="60" />
+              </td>
+            </tr>
+            <tr>
+              <td width="20%">{TXT_TERMINAL_ID}</td>
+              <td width="80%">
+                <input type="text" name="saferpay_json_terminal_id" value="{SHOP_SAFERPAY_JSON_TERMINAL_ID}" style="width: 270px;" maxlength="60" />
+              </td>
+            </tr>
+            <tr>
+              <td width="20%">{TXT_USERNAME}</td>
+              <td width="80%">
+                <input type="text" name="saferpay_json_user" value="{SHOP_SAFERPAY_JSON_USER}" style="width: 270px;" maxlength="60" />
+              </td>
+            </tr>
+            <tr>
+              <td width="20%">{TXT_PASSWORD}</td>
+              <td width="80%">
+                <input type="text" name="saferpay_json_pass" value="{SHOP_SAFERPAY_JSON_PASS}" style="width: 270px;" maxlength="60" />
+              </td>
+            </tr>
+            <tr>
+              <td>{TXT_USE_TEST_ACCOUNT}</td>
+              <td>
+                <input type="checkbox" name="saferpay_json_use_test_account" value="1" {SHOP_SAFERPAY_JSON_TEST_STATUS} />
+              </td>
+            </tr>
+          </table>
+        </div>
+      </td>
+      <td class="nowrap a_center">
+        <input type="checkbox" name="saferpay_json_active" value="1"
+               {SHOP_SAFERPAY_JSON_STATUS} />
       </td>
     </tr>
     <tr class="row2">

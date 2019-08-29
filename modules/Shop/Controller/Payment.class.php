@@ -565,6 +565,7 @@ class Payment
         ));
         // Payment Service Providers
         $objTemplate->setVariable(array(
+            // Paymill
             'SHOP_PAYMILL_STATUS' => \Cx\Core\Setting\Controller\Setting::getValue('paymill_active','Shop') ? \Html::ATTRIBUTE_CHECKED : '',
             'SHOP_PAYMILL_TEST_SELECTED' => \Cx\Core\Setting\Controller\Setting::getValue('paymill_use_test_account','Shop') == 0 ? \Html::ATTRIBUTE_SELECTED : '',
             'SHOP_PAYMILL_LIVE_SELECTED' => \Cx\Core\Setting\Controller\Setting::getValue('paymill_use_test_account','Shop') == 1 ? \Html::ATTRIBUTE_SELECTED : '',
@@ -574,6 +575,7 @@ class Payment
             'SHOP_PAYMILL_LIVE_PUBLIC_KEY' => contrexx_raw2xhtml(\Cx\Core\Setting\Controller\Setting::getValue('paymill_live_public_key','Shop')),
             'SHOP_PAYMILL_PRIVATE_KEY' => contrexx_raw2xhtml(\Cx\Core\Setting\Controller\Setting::getValue('paymill_private_key','Shop')),
             'SHOP_PAYMILL_PUBLIC_KEY' => contrexx_raw2xhtml(\Cx\Core\Setting\Controller\Setting::getValue('paymill_public_key','Shop')),
+            // Legacy Saferpay
             'SHOP_SAFERPAY_ID' => \Cx\Core\Setting\Controller\Setting::getValue('saferpay_id','Shop'),
             'SHOP_SAFERPAY_STATUS' => (\Cx\Core\Setting\Controller\Setting::getValue('saferpay_active','Shop') ? \Html::ATTRIBUTE_CHECKED : ''),
             'SHOP_SAFERPAY_TEST_ID' => \Cx\Core\Setting\Controller\Setting::getValue('saferpay_use_test_account','Shop'),
@@ -582,11 +584,21 @@ class Payment
                 ? \Html::ATTRIBUTE_CHECKED : ''),
             'SHOP_SAFERPAY_WINDOW_MENUOPTIONS' => \Saferpay::getWindowMenuoptions(
                 \Cx\Core\Setting\Controller\Setting::getValue('saferpay_window_option','Shop')),
+            'SAFERPAY_EXPERIMENTAL' => \Cx\Core\Core\Controller\Cx::instanciate()->getComponent('View')->flagExperimental(),
+            // JSON Saferpay
+            'SHOP_SAFERPAY_JSON_ID' => \Cx\Core\Setting\Controller\Setting::getValue('saferpay_json_id','Shop'),
+            'SHOP_SAFERPAY_JSON_TERMINAL_ID' => \Cx\Core\Setting\Controller\Setting::getValue('saferpay_json_terminal_id','Shop'),
+            'SHOP_SAFERPAY_JSON_USER' => \Cx\Core\Setting\Controller\Setting::getValue('saferpay_json_user','Shop'),
+            'SHOP_SAFERPAY_JSON_PASS' => \Cx\Core\Setting\Controller\Setting::getValue('saferpay_json_pass','Shop'),
+            'SHOP_SAFERPAY_JSON_STATUS' => (\Cx\Core\Setting\Controller\Setting::getValue('saferpay_json_active','Shop') ? \Html::ATTRIBUTE_CHECKED : ''),
+            'SHOP_SAFERPAY_JSON_TEST_STATUS' => (\Cx\Core\Setting\Controller\Setting::getValue('saferpay_json_use_test_account','Shop') ? \Html::ATTRIBUTE_CHECKED : ''),
+            // Payrexx
             'SHOP_PAYREXX_INSTANCE_NAME' => \Cx\Core\Setting\Controller\Setting::getValue('payrexx_instance_name','Shop'),
             'SHOP_PAYREXX_API_SECRET' => \Cx\Core\Setting\Controller\Setting::getValue('payrexx_api_secret','Shop'),
             'SHOP_PAYREXX_STATUS' =>
                 (\Cx\Core\Setting\Controller\Setting::getValue('payrexx_active','Shop')
                     ? \Html::ATTRIBUTE_CHECKED : ''),
+            // PostFinance
             'SHOP_YELLOWPAY_SHOP_ID' => \Cx\Core\Setting\Controller\Setting::getValue('postfinance_shop_id','Shop'),
             'SHOP_YELLOWPAY_STATUS' =>
                 (\Cx\Core\Setting\Controller\Setting::getValue('postfinance_active','Shop')
@@ -605,7 +617,7 @@ class Payment
             'SHOP_YELLOWPAY_USE_TESTSERVER_CHECKED' =>
                 (\Cx\Core\Setting\Controller\Setting::getValue('postfinance_use_testserver','Shop')
                     ? \Html::ATTRIBUTE_CHECKED : ''),
-            // Added 20100222 -- Reto Kohli
+            // PostFinance Mobile
             'SHOP_POSTFINANCE_MOBILE_WEBUSER' => contrexx_raw2xhtml(\Cx\Core\Setting\Controller\Setting::getValue('postfinance_mobile_webuser','Shop')),
             'SHOP_POSTFINANCE_MOBILE_SIGN' => contrexx_raw2xhtml(\Cx\Core\Setting\Controller\Setting::getValue('postfinance_mobile_sign','Shop')),
             'SHOP_POSTFINANCE_MOBILE_IJUSTWANTTOTEST_CHECKED' =>
@@ -614,6 +626,7 @@ class Payment
             'SHOP_POSTFINANCE_MOBILE_STATUS' =>
                 (\Cx\Core\Setting\Controller\Setting::getValue('postfinance_mobile_status','Shop')
                   ? \Html::ATTRIBUTE_CHECKED : ''),
+            // Datatrans
             'SHOP_DATATRANS_AUTHORIZATION_TYPE_OPTIONS' => \Datatrans::getReqtypeMenuoptions(\Cx\Core\Setting\Controller\Setting::getValue('datatrans_request_type','Shop')),
             'SHOP_DATATRANS_MERCHANT_ID' => \Cx\Core\Setting\Controller\Setting::getValue('datatrans_merchant_id','Shop'),
             'SHOP_DATATRANS_STATUS' => (\Cx\Core\Setting\Controller\Setting::getValue('datatrans_active','Shop') ? \Html::ATTRIBUTE_CHECKED : ''),
@@ -623,6 +636,7 @@ class Payment
                 (\Cx\Core\Setting\Controller\Setting::getValue('datatrans_use_testserver','Shop') ? '' : \Html::ATTRIBUTE_CHECKED),
             // Not supported
             //'SHOP_DATATRANS_ACCEPTED_PAYMENT_METHODS_CHECKBOXES' => 0,
+            // PayPal
             'SHOP_PAYPAL_EMAIL' => contrexx_raw2xhtml(\Cx\Core\Setting\Controller\Setting::getValue('paypal_account_email','Shop')),
             'SHOP_PAYPAL_STATUS' => (\Cx\Core\Setting\Controller\Setting::getValue('paypal_active','Shop') ? \Html::ATTRIBUTE_CHECKED : ''),
             'SHOP_PAYPAL_DEFAULT_CURRENCY_MENUOPTIONS' => \PayPal::getAcceptedCurrencyCodeMenuoptions(

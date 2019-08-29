@@ -363,6 +363,7 @@ $_ARRAYLANG['TXT_SHOP_PRODUCTS_IN_CATEGORY'] = "Produkte in der Rubrik %1\$s";
 $_ARRAYLANG['TXT_SHOP_PRODUCTS_SEARCH_RESULTS'] = "Suchergebnisse für \"%1\$s\"";
 $_ARRAYLANG['TXT_SHOP_PRODUCTS_SPECIAL_OFFER'] = "Sonderangebote";
 $_ARRAYLANG['TXT_SHOP_PSP_FAILED_TO_INITIALISE_SAFERPAY'] = "Fehler beim initialisieren von Saferpay";
+$_ARRAYLANG['TXT_SHOP_PSP_FAILED_TO_INITIALIZE_SAFERPAY_JSON'] = "Fehler beim initialisieren von Saferpay";
 $_ARRAYLANG['TXT_SHOP_PSP_FAILED_TO_INITIALISE_YELLOWPAY'] = "Fehler beim initialisieren des Postfinance E-Payment";
 $_ARRAYLANG['TXT_SHOP_RATE_NONE'] = "-";
 $_ARRAYLANG['TXT_SHOP_REMOVE_ITEM'] = "Artikel entfernen";
