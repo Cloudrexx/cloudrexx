@@ -2825,37 +2825,31 @@ die("Shop::processRedirect(): This method is obsolete!");
             : (self::$objCustomer ? self::$objCustomer->fax() : ''));
         $birthday = (isset($_SESSION['shop']['birthday'])
             ? $_SESSION['shop']['birthday']
-            : (self::$objCustomer ? self::$objCustomer->getProfileAttribute('birthday') : mktime(0, 0, 0)));
+            : (self::$objCustomer ? self::$objCustomer->getProfileAttribute('birthday') : 0));
+        $selectedBirthdayDay = '0';
+        $selectedBirthdayMonth = '0';
+        $selectedBirthdayYear = '0';
 
-        $selectedBirthdayDay = date('j', $birthday);
-        $selectedBirthdayMonth = date('n', $birthday);
-        $selectedBirthdayYear = date('Y', $birthday);
+        // load pre-set date
+        if (!empty($birthday)) {
+            $selectedBirthdayDay = date('j', $birthday);
+            $selectedBirthdayMonth = date('n', $birthday);
+            $selectedBirthdayYear = date('Y', $birthday);
+        } else {
+            // if no valid date has been set so far, do check if
+            // a partial date selection has been submitted and if so,
+            // do use those values as presetting
+            if (!empty($_POST['shop_birthday_day'])) {
+                $selectedBirthdayDay = intval($_POST['shop_birthday_day']);
+            }
+            if (!empty($_POST['shop_birthday_month'])) {
+                $selectedBirthdayMonth = intval($_POST['shop_birthday_month']);
+            }
+            if (!empty($_POST['shop_birthday_year'])) {
+                $selectedBirthdayYear = intval($_POST['shop_birthday_year']);
+            }
+        }
 
-        $birthdayDaySelect= new \Cx\Core\Html\Model\Entity\DataElement(
-            'shop_birthday_day',
-            $selectedBirthdayDay,
-            \Cx\Core\Html\Model\Entity\DataElement::TYPE_SELECT,
-            null,
-            array_combine(range(1, 31), range(1, 31))
-        );
-        $birthdayDaySelect->setAttribute('class', 'birthday');
-        $birthdayMonthSelect = new \Cx\Core\Html\Model\Entity\DataElement(
-            'shop_birthday_month',
-            $selectedBirthdayMonth,
-            \Cx\Core\Html\Model\Entity\DataElement::TYPE_SELECT,
-            null,
-            array_combine(range(1, 12), range(1, 12))
-        );
-        $birthdayMonthSelect->setAttribute('class', 'birthday');
-        $birthdayYearSelect= new \Cx\Core\Html\Model\Entity\DataElement(
-            'shop_birthday_year',
-            $selectedBirthdayYear,
-            \Cx\Core\Html\Model\Entity\DataElement::TYPE_SELECT,
-            null,
-            array_combine(range(1900, date('Y')), range(1900, date('Y')))
-        );
-
-        $birthdayYearSelect->setAttribute('class', 'birthday');
         self::$objTemplate->setVariable(array(
             'SHOP_ACCOUNT_COMPANY' => htmlentities($company, ENT_QUOTES, CONTREXX_CHARSET),
             'SHOP_ACCOUNT_PREFIX' => Customers::getGenderMenuoptions($gender),
@@ -2878,8 +2872,61 @@ die("Shop::processRedirect(): This method is obsolete!");
             // countryId is used for payment address, therefore we must
             // list all countries here (and not restrict to shipping countries)
             'SHOP_ACCOUNT_COUNTRY' => \Cx\Core\Country\Controller\Country::getMenu('countryId', $country_id, false),
-            'SHOP_ACCOUNT_BIRTHDAY' => $birthdayDaySelect . $birthdayMonthSelect . $birthdayYearSelect,
         ));
+
+        // parse birthday fields
+        if (self::$objTemplate->placeholderExists('SHOP_ACCOUNT_BIRTHDAY')) {
+            // build day dropdown
+            $birthdayDaySelect= new \Cx\Core\Html\Model\Entity\DataElement(
+                'shop_birthday_day',
+                $selectedBirthdayDay,
+                \Cx\Core\Html\Model\Entity\DataElement::TYPE_SELECT,
+                null,
+                array(
+                    '0' => $_ARRAYLANG['TXT_SHOP_CHOOSE_DAY'],
+                ) + array_combine(
+                    range(1, 31),
+                    range(1, 31)
+                )
+            );
+            $birthdayDaySelect->setAttribute('class', 'birthday');
+
+            // build month dropdown
+            $birthdayMonthSelect = new \Cx\Core\Html\Model\Entity\DataElement(
+                'shop_birthday_month',
+                $selectedBirthdayMonth,
+                \Cx\Core\Html\Model\Entity\DataElement::TYPE_SELECT,
+                null,
+                array(
+                    '0' => $_ARRAYLANG['TXT_SHOP_CHOOSE_MONTH'],
+                ) + array_combine(
+                    range(1, 12),
+                    range(1, 12)
+                )
+            );
+            $birthdayMonthSelect->setAttribute('class', 'birthday');
+
+            // build year dropdown
+            $birthdayYearSelect= new \Cx\Core\Html\Model\Entity\DataElement(
+                'shop_birthday_year',
+                $selectedBirthdayYear,
+                \Cx\Core\Html\Model\Entity\DataElement::TYPE_SELECT,
+                null,
+                array(
+                    '0' => $_ARRAYLANG['TXT_SHOP_CHOOSE_YEAR'],
+                ) + array_combine(
+                    range(1900, date('Y')),
+                    range(1900, date('Y'))
+                )
+            );
+            $birthdayYearSelect->setAttribute('class', 'birthday');
+
+            self::$objTemplate->setVariable(
+                'SHOP_ACCOUNT_BIRTHDAY',
+                $birthdayDaySelect . $birthdayMonthSelect . $birthdayYearSelect
+            );
+        }
+
         if (count(static::$errorFields)) {
             $errorClassPlaceholders = array();
             foreach (static::$errorFields as $field) {
@@ -3050,13 +3097,27 @@ die("Shop::processRedirect(): This method is obsolete!");
         }
 
         // set customer birthday
-        if (isset($_POST['shop_birthday_day']) &&
-            isset($_POST['shop_birthday_month']) &&
-            isset($_POST['shop_birthday_year'])) {
-            $day = contrexx_input2raw($_POST['shop_birthday_day']);
-            $month = contrexx_input2raw($_POST['shop_birthday_month']);
-            $year = contrexx_input2raw($_POST['shop_birthday_year']);
-            $birthday = mktime(0, 0, 0, $month, $day, $year);
+        $birthday = 0;
+        if (
+            !empty($_POST['shop_birthday_day']) &&
+            !empty($_POST['shop_birthday_month']) &&
+            !empty($_POST['shop_birthday_year'])
+        ) {
+            $day = intval($_POST['shop_birthday_day']);
+            $month = intval($_POST['shop_birthday_month']);
+            $year = intval($_POST['shop_birthday_year']);
+            $birthday = mktime(
+                0,
+                0,
+                0,
+                $month,
+                $day,
+                $year
+            );
+        }
+
+        // update birthday property if a valid birthday date has been submitted
+        if (!empty($birthday)) {
             $_SESSION['shop']['birthday'] = $birthday;
         }
 
