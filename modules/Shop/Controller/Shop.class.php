@@ -3181,6 +3181,25 @@ die("Shop::processRedirect(): This method is obsolete!");
             $_SESSION['shop']['birthday'] = $birthday;
         }
 
+        // fetch birthday property (-> will be used to determine if setting a
+        // birthday is mandatory)
+        $profileAttribute = \FWUser::getFWUserObject()->objUser->objAttribute;
+        $birthdayAttribute = $profileAttribute->getById('birthday');
+
+        // in case no birthday has been set, do check if a birthday has been
+        // requested from the customer (placeholder or template-block exists)
+        // and if the setting is mandatory
+        if (
+            empty($_SESSION['shop']['birthday']) && (
+                self::$objTemplate->placeholderExists('SHOP_ACCOUNT_BIRTHDAY') ||
+                self::$objTemplate->blockExists('shop_account_birthday')
+            ) &&
+            $birthdayAttribute->isMandatory()
+        ) {
+            // birthday is mandatory, but has not been set
+            static::$errorFields[] = 'birthday';
+        }
+
         if (   empty($_SESSION['shop']['gender2'])
             || empty($_SESSION['shop']['lastname2'])
             || empty($_SESSION['shop']['firstname2'])
@@ -5104,7 +5123,6 @@ die("Shop::processRedirect(): This method is obsolete!");
      */
     static function verifySessionAddress()
     {
-        static::$errorFields = array();
         // Note that the Country IDs are either set already, or chosen in a
         // dropdown menu, so if everything else is set, so are they.
         // They may thus be disabled entirely without affecting this.
