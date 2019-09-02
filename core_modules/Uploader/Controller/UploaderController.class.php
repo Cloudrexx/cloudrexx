@@ -163,6 +163,10 @@ class UploaderController {
                 }
             }
 
+            $conf['fileName'] = \Cx\Lib\FileSystem\FileSystem::replaceCharacters(
+                $conf['fileName']
+            );
+
             // Cleanup outdated temp files and folders
             if ($conf['cleanup']) {
                 self::cleanup();
