@@ -348,7 +348,6 @@ $_ARRAYLANG['TXT_NEWSLETTER_ERROR_UPDATE_RECIPIENT'] = "Beim aktualisieren des E
 $_ARRAYLANG['TXT_NEWSLETTER_ADD_NEW_RECIPIENT'] = "Neuen Empf�nger hinzuf�gen";
 $_ARRAYLANG['TXT_NEWSLETTER_DUPLICATE_EMAIL_ADDRESS'] = "Diese E-Mail Adresse wird bereits von einem anderen Empf�nger benutzt!";
 $_ARRAYLANG['TXT_NEWSLETTER_INVALIDE_EMAIL_ADDRESS'] = "Sie m�ssen eine g�ltige E-Mail Adresse angeben!";
-$_ARRAYLANG['TXT_NEWSLETTER_BREAK_AFTER'] = "Anzahl Zeichen pro Zeile bei Textmails";
 $_ARRAYLANG['TXT_NEWSLETTER_TEST_RECIPIENT'] = "Test-Empf�nger";
 $_ARRAYLANG['TXT_NEWSLETTER_FAILED'] = "F&uuml;r Fehler und unzustellbare E-Mails";
 $_ARRAYLANG['TXT_NEWSLETTER_BCC'] = "Blindkopien";

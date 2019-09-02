@@ -350,7 +350,6 @@ $_ARRAYLANG['TXT_NEWSLETTER_ERROR_UPDATE_RECIPIENT'] = "\¡Se ha producido un er
 $_ARRAYLANG['TXT_NEWSLETTER_ADD_NEW_RECIPIENT'] = "A&ntilde;adir Nuevo Destinatario";
 $_ARRAYLANG['TXT_NEWSLETTER_DUPLICATE_EMAIL_ADDRESS'] = "La direcci&oacute;n de email ya est&aacute; en uso por otro destinatario.";
 $_ARRAYLANG['TXT_NEWSLETTER_INVALIDE_EMAIL_ADDRESS'] = "Debe introducir una direcci&oacute;n de email v&aacute;lida";
-$_ARRAYLANG['TXT_NEWSLETTER_BREAK_AFTER'] = "N&uacute;mero de caracteres por l&iacute;nea en emails de texto";
 $_ARRAYLANG['TXT_NEWSLETTER_TEST_RECIPIENT'] = "Destinatario de prueba";
 $_ARRAYLANG['TXT_NEWSLETTER_FAILED'] = "Para errores y emails no entregados";
 $_ARRAYLANG['TXT_NEWSLETTER_BCC'] = "Copia dura (BCC)";

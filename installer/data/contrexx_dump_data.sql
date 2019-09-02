@@ -3967,7 +3967,6 @@ INSERT INTO `contrexx_module_newsletter_settings` (`setid`, `setname`, `setvalue
 INSERT INTO `contrexx_module_newsletter_settings` (`setid`, `setname`, `setvalue`, `status`) VALUES (2,'sender_name','admin',1);
 INSERT INTO `contrexx_module_newsletter_settings` (`setid`, `setname`, `setvalue`, `status`) VALUES (3,'reply_mail','info@example.com',1);
 INSERT INTO `contrexx_module_newsletter_settings` (`setid`, `setname`, `setvalue`, `status`) VALUES (4,'mails_per_run','30',1);
-INSERT INTO `contrexx_module_newsletter_settings` (`setid`, `setname`, `setvalue`, `status`) VALUES (5,'text_break_after','100',1);
 INSERT INTO `contrexx_module_newsletter_settings` (`setid`, `setname`, `setvalue`, `status`) VALUES (6,'test_mail','info@example.com',1);
 INSERT INTO `contrexx_module_newsletter_settings` (`setid`, `setname`, `setvalue`, `status`) VALUES (7,'overview_entries_limit','10',1);
 INSERT INTO `contrexx_module_newsletter_settings` (`setid`, `setname`, `setvalue`, `status`) VALUES (8,'rejected_mail_operation','delete',1);
