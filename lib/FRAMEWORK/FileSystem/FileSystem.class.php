@@ -374,8 +374,16 @@ class FileSystem
         $change = array('+', '#');
 
         // replace $signs1 with $signs
-        $signs1 = array(' ', 'ä', 'ö', 'ü', 'ç');
-        $signs2 = array('_', 'ae', 'oe', 'ue', 'c');
+        $signs1 = array(' ', 'Ä', 'Ü', 'Ö', 'ä', 'ö', 'ü', 'œ', 'Œ', 'æ', 'Æ',
+            'Ç', 'ç', 'ß', 'û', 'é', 'è', 'ê', 'à', 'ï', 'Ï', 'ë', 'Ë', 'À',
+            'â', ' ', 'î', 'Î', 'ô', 'Ô', 'ÿ', 'Ÿ', 'ù', 'Ù', 'É', 'È', 'Ê',
+            '´'
+        );
+        $signs2 = array('_', 'Ae', 'Ue', 'Oe', 'ae', 'oe', 'ue', 'oe', 'OE',
+            'ae', 'AE', 'C', 'c', 'ss', 'u', 'e', 'e', 'e', 'a', 'i', 'I', 'e',
+            'E', 'A', 'a', 'A', 'i', 'I', 'o', 'O', 'y', 'Y', 'u', 'U', 'E',
+            'E', 'E', '_'
+        );
 
         foreach ($change as $str) {
             $string = str_replace($str, '_', $string);
