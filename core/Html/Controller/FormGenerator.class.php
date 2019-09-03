@@ -1011,6 +1011,47 @@ CODE;
 
                 return $div;
                 break;
+            case 'password':
+                $input = new \Cx\Core\Html\Model\Entity\DataElement($title, '');
+                if (isset($options['validValues'])) {
+                    $input->setValidator(
+                        new \Cx\Core\Validate\Model\Entity\RegexValidator(
+                            '/^' . $options['validValues'] . '$/'
+                        )
+                    );
+                }
+                $input->setAttribute('type', 'password');
+                $input->setClass('form-control');
+                if (isset($options['readonly']) && $options['readonly']) {
+                    $input->setAttribute('disabled');
+                }
+                if (isset($options['attributes'])) {
+                    $input->setAttributes($options['attributes']);
+                }
+                if (!isset($options['mode']) || $options['mode'] != 'nocomplete') {
+                    return $input;
+                }
+                // in order to circumvent forced autocompletion by modern
+                // browsers we need to add an additional field and set the type
+                // "dynamically"...
+                // For more info see CLX-2388
+                $container = new \Cx\Core\Html\Model\Entity\HtmlElement('div');
+                $dummyInput = new \Cx\Core\Html\Model\Entity\DataElement($title, '');
+                $dummyInput->setAttribute('type', 'password');
+                $dummyInput->setAttribute('style', 'display:none;');
+                $container->addChild($dummyInput);
+                $input->setAttribute('type', 'text');
+                $input->setAttribute(
+                    'onkeyup',
+                    'if (this.value == \'\') { this.setAttribute(\'type\', \'text\'); } else { this.setAttribute(\'type\', \'password\'); }'
+                );
+                $input->setAttribute(
+                    'style',
+                    'text-security: disc; -webkit-text-security: disc;'
+                );
+                $container->addChild($input);
+                return $container;
+                break;
             case 'string':
             case 'hidden':
             default:
@@ -1035,7 +1076,25 @@ CODE;
                 if (isset($options['attributes'])) {
                     $input->setAttributes($options['attributes']);
                 }
-                return $input;
+                if (!isset($options['mode']) || $options['mode'] != 'nocomplete') {
+                    return $input;
+                }
+                // in order to circumvent forced autocompletion by modern
+                // browsers we need to add an additional field and set the type
+                // "dynamically"...
+                // For more info see CLX-2388
+                $container = new \Cx\Core\Html\Model\Entity\HtmlElement('div');
+                $dummyInput = new \Cx\Core\Html\Model\Entity\DataElement($title, '');
+                $dummyInput->setAttribute('style', 'display:none;');
+                $container->addChild($dummyInput);
+                $container->addChild($input);
+                $dummyInput2 = new \Cx\Core\Html\Model\Entity\DataElement(
+                    'not-a-' . $title,
+                    ''
+                );
+                $dummyInput2->setAttribute('style', 'display:none;');
+                $container->addChild($dummyInput2);
+                return $container;
                 break;
         }
     }

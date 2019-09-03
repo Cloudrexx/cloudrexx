@@ -17,7 +17,7 @@ CREATE TABLE `contrexx_access_id` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;
 CREATE TABLE `contrexx_access_rel_user_group` (
-  `user_id` int NOT NULL,
+  `user_id` int UNSIGNED NOT NULL,
   `group_id` int NOT NULL,
   PRIMARY KEY (`user_id`,`group_id`),
   INDEX `contrexx_access_rel_user_group_user_id_ibfk` (`user_id`),
@@ -30,8 +30,8 @@ CREATE TABLE `contrexx_access_settings` (
   UNIQUE KEY `key` (`key`)
 ) ENGINE=InnoDB;
 CREATE TABLE `contrexx_access_user_attribute` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `parent_id` int DEFAULT NULL,
+  `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
+  `parent_id` int UNSIGNED DEFAULT NULL,
   `type` enum('text','textarea','mail','uri','date','image','checkbox','menu','menu_option','group','frame','history') NOT NULL DEFAULT 'text',
   `mandatory` enum('0','1') NOT NULL DEFAULT '0',
   `sort_type` enum('asc','desc','custom') NOT NULL DEFAULT 'asc',
@@ -45,7 +45,7 @@ CREATE TABLE `contrexx_access_user_attribute` (
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_access_user_attribute_name` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `attribute_id` int NOT NULL DEFAULT '0',
+  `attribute_id` int UNSIGNED NOT NULL,
   `lang_id` int NOT NULL DEFAULT '0',
   `name` varchar(255) NOT NULL DEFAULT '',
   `order` int,
@@ -54,13 +54,14 @@ CREATE TABLE `contrexx_access_user_attribute_name` (
   UNIQUE INDEX fk_module_user_attribute_name_unique_idx (`attribute_id`, `lang_id`)
 ) ENGINE=InnoDB;
 CREATE TABLE `contrexx_access_user_attribute_value` (
-  `attribute_id` int NOT NULL,
-  `user_id` int NOT NULL,
-  `history_id` int NOT NULL DEFAULT '0',
+  `attribute_id` int UNSIGNED NOT NULL,
+  `user_id` int UNSIGNED NOT NULL,
+  `history_id` int UNSIGNED NOT NULL DEFAULT '0',
   `value` text NOT NULL,
   PRIMARY KEY (`attribute_id`, `user_id`, `history_id`),
   FULLTEXT KEY `value` (`value`),
-  INDEX `contrexx_access_user_attribute_value_user_id_ibfk` (`user_id`)
+  INDEX `contrexx_access_user_attribute_value_user_id_ibfk` (`user_id`),
+  INDEX IDX_B0DEA323B6E62EFA (attribute_id)
 ) ENGINE=InnoDB;
 CREATE TABLE `contrexx_access_user_groups` (
   `group_id` int NOT NULL AUTO_INCREMENT,
@@ -95,28 +96,28 @@ CREATE TABLE `contrexx_access_user_validity` (
   PRIMARY KEY (`validity`)
 ) ENGINE=InnoDB;
 CREATE TABLE `contrexx_access_users` (
-  `id` int NOT NULL AUTO_INCREMENT,
+  `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
   `is_admin` tinyint(1) NOT NULL DEFAULT '0',
   `username` varchar(255) DEFAULT NULL,
   `password` varchar(255) DEFAULT NULL,
   `auth_token` varchar(32) NOT NULL DEFAULT '',
-  `auth_token_timeout` int NOT NULL DEFAULT '0',
-  `regdate` int NOT NULL DEFAULT '0',
-  `expiration` int NOT NULL DEFAULT '0',
-  `validity` int NOT NULL DEFAULT '0',
-  `last_auth` int NOT NULL DEFAULT '0',
+  `auth_token_timeout` int UNSIGNED NOT NULL DEFAULT '0',
+  `regdate` int UNSIGNED NOT NULL DEFAULT '0',
+  `expiration` int UNSIGNED NOT NULL DEFAULT '0',
+  `validity` int UNSIGNED NOT NULL DEFAULT '0',
+  `last_auth` int UNSIGNED NOT NULL DEFAULT '0',
   `last_auth_status` smallint NOT NULL DEFAULT '1',
-  `last_activity` int NOT NULL DEFAULT '0',
+  `last_activity` int UNSIGNED NOT NULL DEFAULT '0',
   `email` varchar(255) DEFAULT NULL,
   `email_access` enum('everyone','members_only','nobody') NOT NULL DEFAULT 'nobody',
-  `frontend_lang_id` int NOT NULL DEFAULT '0',
-  `backend_lang_id` int NOT NULL DEFAULT '0',
+  `frontend_lang_id` int UNSIGNED NOT NULL DEFAULT '0',
+  `backend_lang_id` int UNSIGNED NOT NULL DEFAULT '0',
   `active` tinyint(1) NOT NULL DEFAULT '1',
   `verified` tinyint(1) NOT NULL DEFAULT '1',
-  `primary_group` int NOT NULL DEFAULT '0',
+  `primary_group` int UNSIGNED NOT NULL DEFAULT '0',
   `profile_access` enum('everyone','members_only','nobody') NOT NULL DEFAULT 'members_only',
   `restore_key` varchar(32) NOT NULL DEFAULT '',
-  `restore_key_time` int NOT NULL DEFAULT '0',
+  `restore_key_time` int UNSIGNED NOT NULL DEFAULT '0',
   `u2u_active` enum('0','1') NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
   KEY `username` (`username`)

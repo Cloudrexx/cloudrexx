@@ -59,9 +59,6 @@ class JsonData {
         '\\Cx\\Core\\Json\\Adapter\\User' => array(
             'JsonUser',
         ),
-        '\\Cx\\Core\\Json\\Adapter\\Calendar' => array(
-            'JsonCalendar',
-        ),
         '\\Cx\\Modules\\Crm\\Controller' => array(
             'JsonCrm',
         ),
@@ -303,7 +300,7 @@ class JsonData {
             return $this->getErrorData('No such method: ' . $method);
         }
         //permission checks
-        $objPermission = new \Cx\Core_Modules\Access\Model\Entity\Permission(null, null, true, null, null, null);
+        $objPermission = new \Cx\Core_Modules\Access\Model\Entity\Permission();
         $defaultPermission = $adapter->getDefaultPermissions();
         if (!empty($methods[$method]) && ($methods[$method] instanceof \Cx\Core_Modules\Access\Model\Entity\Permission)) {
             $objPermission = $methods[$method];

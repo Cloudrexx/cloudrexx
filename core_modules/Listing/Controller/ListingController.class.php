@@ -393,9 +393,18 @@ class ListingController {
                             continue;
                         }
                         if (isset($metaData->associationMappings[$field])) {
-                            $qb->andWhere(
-                                $qb->expr()->eq('x.' . $field, '?' . $i)
-                            );
+                            if (
+                                $metaData->associationMappings[$field]['type'] ==
+                                \Doctrine\ORM\Mapping\ClassMetadataInfo::MANY_TO_MANY
+                            ) {
+                                $qb->andWhere(
+                                     '?' . $i . ' MEMBER OF ' . 'x.' . $field
+                                );
+                            } else {
+                                $qb->andWhere(
+                                    $qb->expr()->eq('x.' . $field, '?' . $i)
+                                );
+                            }
                         } else {
                             $qb->andWhere(
                                 $qb->expr()->like('x.' . $field, '?' . $i)

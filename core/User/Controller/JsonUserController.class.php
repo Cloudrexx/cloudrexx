@@ -41,6 +41,11 @@ class JsonUserController
     implements \Cx\Core\Json\JsonAdapter
 {
     /**
+     * @var array messages from this controller
+     */
+    protected $messages;
+
+    /**
      * Returns the internal name used as identifier for this adapter
      * @return String Name of this adapter
      */
@@ -59,10 +64,14 @@ class JsonUserController
         return array(
             'getAttributeValues',
             'storeUserAttributeValue',
-            'getPasswordField',
             'getRoleIcon',
             'filterCallback',
-            'storeNewsletterLists',
+            'searchCallback',
+            'storeNewsletter',
+            'storeDownloadExtension',
+            'storeOnlyNewsletterLists',
+            'matchWithConfirmedPassword',
+            'setRegDate'
         );
     }
 
@@ -97,20 +106,25 @@ class JsonUserController
      * Store UserAttribute manually because these are custom options
      *
      * @param $param array parameters for callback
+     * @throws \Cx\Core\Error\Model\Entity\ShinyException
      */
     public function storeUserAttributeValue($param)
     {
+        global $_ARRAYLANG;
+
         if (empty($param['fieldName']) || empty($param['entity'])) {
-            // Todo: exception
-            return;
+            throw new \Cx\Core\Error\Model\Entity\ShinyException(
+                $_ARRAYLANG['TXT_CORE_USER_NOT_FOUND']
+            );
         }
         $fieldName = $param['fieldName'];
         $user = $param['entity'];
         $attrId = explode('-', $fieldName)[1];
 
         if (empty($attrId)) {
-            // Todo: exception
-            return;
+            throw new \Cx\Core\Error\Model\Entity\ShinyException(
+                $_ARRAYLANG['TXT_CORE_USER_ATTRIBUTE_NOT_FOUND']
+            );
         }
 
         $em = $this->cx->getDb()->getEntityManager();
@@ -134,82 +148,9 @@ class JsonUserController
             $attrValue->setUserAttribute($attr);
             $attrValue->setHistory(0);
         }
-
         $attrValue->setValue($param['postedValue']);
         $em->persist($attrValue);
-    }
-
-    /**
-     * Get a custom password field to hide the password and disable
-     * auto-complete
-     *
-     * @param $params array params for callback
-     * @return \Cx\Core\Html\Model\Entity\HtmlElement password field
-     */
-    public function getPasswordField($params)
-    {
-        global $_ARRAYLANG, $_CONFIG;
-
-        $name = $params['name'];
-
-        $wrapper = new \Cx\Core\Html\Model\Entity\HtmlElement('div');
-        $password = new \Cx\Core\Html\Model\Entity\DataElement($name);
-        $password->setAttributes(
-            array(
-                'type' => 'text',
-                'class' => 'access-pw-noauto form-control',
-                'id' => 'form-0-' . $name
-            )
-        );
-
-        $star = new \Cx\Core\Html\Model\Entity\HtmlElement('font');
-        $starText = new \Cx\Core\Html\Model\Entity\TextElement('&nbsp;*&nbsp;');
-        $star->addChild($starText);
-        $star->setAttribute('color', 'red');
-
-        $status = new \Cx\Core\Html\Model\Entity\HtmlElement('span');
-        $status->setAttribute('id', 'password-complexity');
-
-        $wrapper->addChildren(
-            array($password, $star, $status)
-        );
-
-        // Set JavaScript Variables
-        $cxJs = \ContrexxJavascript::getInstance();
-        $scope = 'user-password';
-        $cxJs->setVariable(
-            'TXT_CORE_USER_PASSWORD_TOO_SHORT',
-            $_ARRAYLANG['TXT_CORE_USER_PASSWORD_TOO_SHORT'],
-            $scope
-        );
-        $cxJs->setVariable(
-            'TXT_CORE_USER_PASSWORD_INVALID',
-            $_ARRAYLANG['TXT_CORE_USER_PASSWORD_INVALID'],
-            $scope
-        );
-        $cxJs->setVariable(
-            'TXT_CORE_USER_PASSWORD_WEAK',
-            $_ARRAYLANG['TXT_CORE_USER_PASSWORD_WEAK'],
-            $scope
-        );
-        $cxJs->setVariable(
-            'TXT_CORE_USER_PASSWORD_GOOD',
-            $_ARRAYLANG['TXT_CORE_USER_PASSWORD_GOOD'],
-            $scope
-        );
-        $cxJs->setVariable(
-            'TXT_CORE_USER_PASSWORD_STRONG',
-            $_ARRAYLANG['TXT_CORE_USER_PASSWORD_STRONG'],
-            $scope
-        );
-        $cxJs->setVariable(
-            'CORE_USER_PASSWORT_COMPLEXITY',
-            isset($_CONFIG['passwordComplexity'])
-                ? $_CONFIG['passwordComplexity'] : 'off',
-            $scope
-        );
-
-        return $wrapper;
+        $user->addUserAttributeValue($attrValue);
     }
 
     /**
@@ -288,19 +229,60 @@ class JsonUserController
         return $qb;
     }
 
-    public function storeNewsletterLists($params)
+    /**
+     * Custom filter callback function to filter the users by user groups and
+     * account type
+     *
+     * @param $params array contains all params for filter callback
+     * @return \Doctrine\ORM\QueryBuilder
+     */
+    public function searchCallback($params)
     {
-        global $objDatabase;
+        $qb = $params['qb'];
+        $fields = $params['fields'];
+        $crit = $params['crit'];
+
+        // Default
+        $orX = new \Doctrine\DBAL\Query\Expression\CompositeExpression(
+            \Doctrine\DBAL\Query\Expression\CompositeExpression::TYPE_OR
+        );
+        $i = 1;
+        $joinTable = true;
+        foreach ($fields as $field) {
+            if (preg_match('/userAttr-\d+/', $field)) {
+                if ($joinTable) {
+                    $qb->leftJoin(
+                        'Cx\Core\User\Model\Entity\UserAttributeValue',
+                        'av',
+                        'WITH',
+                        'av.userId = x.id'
+                    );
+                    $joinTable = false;
+                }
+                $orX->add($qb->expr()->like('av.value', ':search'));
+            } else {
+                $orX->add($qb->expr()->like('x.' . $field, ':search'));
+            }
+        }
+        $qb->andWhere($orX);
+        $qb->setParameter('search', '%' . $crit . '%');
+
+        return $qb;
+    }
+
+    public function storeNewsletter($params)
+    {
+        global $_ARRAYLANG, $objDatabase;
 
         if (!isset($params) || empty($params['entity'])) {
             throw new \Cx\Core\Error\Model\Entity\ShinyException(
-                'Fail'
+                $_ARRAYLANG['TXT_CORE_USER_NOT_FOUND']
             );
         }
         $user = $params['entity'];
         $values = array();
-        if (!empty($params['postedValue'])) {
-            $values = $params['postedValue'];
+        if ($this->cx->getRequest()->hasParam('newsletter', false)) {
+            $values = $this->cx->getRequest()->getParam('newsletter', false);
         }
 
         // Original FWUSer storeNewsletterSubscriptions
@@ -339,7 +321,184 @@ class JsonUserController
         }
 
         if ($objDatabase->Execute($query) === false) {
-            throw new \Cx\Core\Error\Model\Entity\ShinyException('Fail');
+            throw new \Cx\Core\Error\Model\Entity\ShinyException(
+                $_ARRAYLANG['TXT_CORE_USER_NOT_BE_SAVED']
+            );
+        }
+    }
+
+    /**
+     * Creates a new user group and assigns it to the user. A new category is
+     * created in the DAM, which is named after the user and assigned to the
+     * created user group
+     *
+     * @param $params array contains the user and the entity manager
+     * @return bool if the category could be created
+     */
+    public function storeDownloadExtension($params)
+    {
+        global $_ARRAYLANG;
+
+        if (
+            !isset($params) ||
+            empty($params['entity']) ||
+            empty($params['postedValue'])
+        ) {
+            return null;
+        }
+        $user = $params['entity'];
+        $em = \Cx\Core\Core\Controller\Cx::instanciate()->getDb()->getEntityManager();
+        $objUser = \FWUser::getFWUserObject()->objUser->getUser($user->getId());
+        $objDownloadLib = new \Cx\Modules\Downloads\Controller\DownloadsLibrary();
+        $arrDownloadSettings = $objDownloadLib->getSettings();
+
+        // Set associated download groups
+        $groupIds = array();
+        if ($objUser) {
+            $groupIds = array_merge(
+                $objUser->getAssociatedGroupIds(),
+                array_map(
+                    'trim',
+                    explode(
+                        ',',
+                        $arrDownloadSettings['associate_user_to_groups']
+                    )
+                )
+            );
+        };
+        if (!empty($groupIds) && !empty($groupIds[0])) {
+            $groupRepo = $em->getRepository(
+                'Cx\Core\Model\Entity\Group'
+            );
+            foreach ($groupRepo->findBy($groupIds) as $group) {
+                $user->addGroup($group);
+            }
+            $em->persist($user);
+        }
+
+        $userName = $user->__toString();
+
+        $group = new \Cx\Core\User\Model\Entity\Group();
+        $group->setGroupName(
+            sprintf($_ARRAYLANG['TXT_CORE_USER_CUSTOMER_TITLE'], $userName)
+        );
+        $group->setGroupDescription(
+            sprintf($_ARRAYLANG['TXT_CORE_USER_ACCOUNT_GROUP_DESC'], $userName)
+        );
+        $group->setIsActive(true);
+        $group->setType('frontend');
+        $group->addUser($user);
+        $em->persist($group);
+        $em->flush();
+        $user->addGroup($group);
+
+        $arrLanguageIds = array_keys(\FWLanguage::getLanguageArray());
+        $arrNames = array();
+        $arrDescription = array();
+        foreach ($arrLanguageIds as $langId) {
+            $arrNames[$langId] = sprintf(
+                $_ARRAYLANG['TXT_CORE_USER_CUSTOMER_TITLE'],
+                $userName
+            );
+            $arrDescription[$langId] = '';
+        }
+
+        $objCategory = new \Cx\Modules\Downloads\Controller\Category();
+        $objCategory->setActiveStatus(true);
+        $objCategory->setVisibility(false);
+        $objCategory->setNames($arrNames);
+        $objCategory->setDescriptions($arrDescription);
+        $objCategory->setOwner($user->getId());
+        $objCategory->setDeletableByOwner(false);
+        $objCategory->setModifyAccessByOwner(false);
+        $objCategory->setPermissions(
+            array(
+                'read'  => array(
+                    'protected' => true,
+                    'groups'    => array($group->getGroupId())
+                ),
+                'add_subcategories' => array(
+                    'protected' => true,
+                    'groups'    => array($group->getGroupId())
+                ),
+                'manage_subcategories' => array(
+                    'protected' => true,
+                    'groups'    => array($group->getGroupId())
+                ),
+                'add_files' => array(
+                    'protected' => true,
+                    'groups'    => array($group->getGroupId())
+                ),
+                'manage_files' => array(
+                    'protected' => true,
+                    'groups'    => array($group->getGroupId())
+                )
+            )
+        );
+
+        if (!$objCategory->store()) {
+            return $user;
+        }
+
+        $damCategoryUrl = \Cx\Core\Routing\Url::fromBackend('Downloads');
+        $damCategoryUrl->setParams(
+            array(
+                'act' => 'categories',
+                'parent_id' => $objCategory->getId()
+            )
+        );
+        $damCategoryAnchor = new \Cx\Core\Html\Model\Entity\HtmlElement('a');
+        $damCategoryAnchor->setAttribute('href', $damCategoryUrl);
+        $damCategoryAnchorText = new \Cx\Core\Html\Model\Entity\TextElement(
+            htmlentities(
+                $objCategory->getName(LANG_ID), ENT_QUOTES, CONTREXX_CHARSET
+            )
+        );
+        $damCategoryAnchor->addChild($damCategoryAnchorText);
+
+        $message = sprintf(
+            $_ARRAYLANG['TXT_CORE_USER_NEW_DAM_CATEGORY_CREATED_TXT'],
+            $user->__toString(),
+            $damCategoryAnchor
+        );
+
+        \Message::add($message);
+        return $user;
+    }
+
+    public function matchWithConfirmedPassword($params)
+    {
+        global $_CORELANG;
+
+        $newPassword = $params['entity']->getPassword();
+        $confirmedPassword = $params['postedValue'];
+
+        if (!empty($params['entityData']['password'])) {
+            if (
+                empty($confirmedPassword) ||
+                !password_verify($confirmedPassword, $newPassword)
+            ) {
+                throw new \Cx\Core\Error\Model\Entity\ShinyException(
+                    $_CORELANG['TXT_ACCESS_PASSWORD_NOT_CONFIRMED']
+                );
+            }
+            return;
+        }
+    }
+
+    /**
+     * Set the date of registration, but only if the entity is created
+     *
+     * @param $params array information for storecallback includes the entity
+     */
+    public function setRegDate($params)
+    {
+        if (
+            empty($params['entity']) ||
+            empty($params['entity']->getRegDate())
+        ) {
+            $date = new \DateTime();
+            return $date->getTimestamp();
         }
     }
 }

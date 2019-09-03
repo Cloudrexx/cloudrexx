@@ -99,9 +99,9 @@ form.cx-ui > fieldset #form-0-newsletter .group > .controls {
 }
 
 #content div[name="newsletter"] label {
-    width: calc(100% - 25px);
-    float: right;
+    width: 100%;
     line-height: 27px;
+    display: block;
 }
 
 #content div[name="newsletter"] input {
@@ -112,11 +112,15 @@ form.cx-ui > fieldset #form-0-newsletter .group > .controls {
 #content div[name="newsletter"] label::after {
     border-bottom: 1px solid #e5e5e5;
     content: ' ';
-    width: calc(100% + 25px);
+    width: 100%;
     float: left;
-    margin-left: -25px;
 }
 
 #content div[name="newsletter"] label:last-of-type::after {
     display: none;
+}
+
+#form-0-moduleSpecificExtensions input[type='checkbox'] {
+    float: left;
+    margin-top: 4px;
 }

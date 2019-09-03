@@ -212,6 +212,10 @@ class Config
                     'value' => \FWLanguage::getDefaultBackendLangId(),
                     'values' => '{src:\\' . __CLASS__ . '::getBackendLanguages()}',
                 ),
+                'showLocaleTagsByDefault' => array(
+                    'type'  => \Cx\Core\Setting\Controller\Setting::TYPE_RADIO,
+                    'value' => 'on',
+                ),
             ),
             'security' => array(
                 'coreIdsStatus' => array(

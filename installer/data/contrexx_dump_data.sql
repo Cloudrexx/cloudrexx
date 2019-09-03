@@ -438,56 +438,59 @@ INSERT INTO `contrexx_access_user_validity` (`validity`) VALUES (184);
 INSERT INTO `contrexx_access_user_validity` (`validity`) VALUES (366);
 INSERT INTO `contrexx_access_user_validity` (`validity`) VALUES (731);
 INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES
-(1, NULL, 'text', '0', 'asc', 0, '', 0, 0, 1),
-(2, NULL, 'text', '0', 'asc', 0, '', 0, 0, 1),
-(3, NULL, 'menu', '0', 'asc', 0, '', 0, 0, 1),
-(4, NULL, 'text', '0', 'asc', 0, '', 0, 0, 1),
-(5, NULL, 'text', '0', 'asc', 0, '', 0, 0, 1),
-(6, NULL, 'text', '0', 'asc', 0, '', 0, 0, 1),
-(7, NULL, 'text', '0', 'asc', 0, '', 0, 0, 1),
-(8, NULL, 'text', '0', 'asc', 0, '', 0, 0, 1),
-(9, NULL, 'text', '0', 'asc', 0, '', 0, 0, 1),
-(10, NULL, 'text', '0', 'asc', 0, '', 0, 0, 1),
-(11, NULL, 'text', '0', 'asc', 0, '', 0, 0, 1),
-(12, NULL, 'text', '0', 'asc', 0, '', 0, 0, 1),
-(13, NULL, 'text', '0', 'asc', 0, '', 0, 0, 1),
-(14, NULL, 'text', '0', 'asc', 0, '', 0, 0, 1),
-(15, NULL, 'text', '0', 'asc', 0, '', 0, 0, 1),
-(16, NULL, 'text', '0', 'asc', 0, '', 0, 0, 1),
-(17, NULL, 'text', '0', 'asc', 0, '', 0, 0, 1),
-(18, NULL, 'text', '0', 'asc', 0, '', 0, 0, 1),
-(19, NULL, 'text', '0', 'asc', 0, '', 0, 0, 1),
-(20, NULL, 'text', '0', 'asc', 0, '', 0, 0, 1),
-(21, NULL, 'text', '0', 'asc', 0, '', 0, 0, 1),
-(32, 3, 'menu_option', '0', 'asc', 0, '', 0, 0, 1),
-(33, 3, 'menu_option', '0', 'asc', 0, '', 0, 0, 1);
+(1, NULL, 'menu', '0', 'asc', 2, '', 0, 0, 1),
+(2, NULL, 'menu', '0', 'asc', 3, '', 0, 0, 1),
+(3, NULL, 'text', '0', 'asc', 4, '', 0, 0, 1),
+(4, NULL, 'text', '0', 'asc', 5, '', 0, 0, 1),
+(5, NULL, 'text', '0', 'asc', 6, '', 0, 0, 1),
+(6, NULL, 'text', '0', 'asc', 7, '', 0, 0, 1),
+(7, NULL, 'uri', '0', 'asc', 8, '', 0, 0, 1),
+(8, NULL, 'text', '0', 'asc', 9, '', 0, 0, 1),
+(9, NULL, 'text', '0', 'asc', 11, '', 0, 0, 1),
+(10, NULL, 'text', '0', 'asc', 10, '', 0, 0, 1),
+(11, NULL, 'text', '0', 'asc', 12, '', 0, 0, 1),
+(12, NULL, 'text', '0', 'asc', 13, '', 0, 0, 1),
+(13, NULL, 'text', '0', 'asc', 14, '', 0, 0, 1),
+(14, NULL, 'text', '0', 'asc', 15, '', 0, 0, 1),
+(15, NULL, 'date', '0', 'asc', 16, '', 0, 0, 1),
+(16, NULL, 'uri', '0', 'asc', 17, '', 0, 0, 1),
+(17, NULL, 'text', '0', 'asc', 18, '', 0, 0, 1),
+(18, NULL, 'textarea', '0', 'asc', 19, '', 0, 0, 1),
+(19, NULL, 'textarea', '0', 'asc', 20, '', 0, 0, 1),
+(20, NULL, 'image', '0', 'asc', 1, '', 0, 0, 1),
+(21, 3, 'menu_option', '0', 'asc', 0, '', 0, 0, 1),
+(22, 3, 'menu_option', '0', 'asc', 0, '', 0, 0, 1),
+(23, 3, 'menu_option', '0', 'asc', 0, '', 0, 0, 1),
+(24, 3, 'menu_option', '0', 'asc', 0, '', 0, 0, 1),
+(25, 3, 'menu_option', '0', 'asc', 0, '', 0, 0, 1),
+(26, 3, 'menu_option', '0', 'asc', 0, '', 0, 0, 1);
 INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES
-(2, 0, 'gender', NULL, 2),
-(3, 0, 'title', NULL, 3),
-(4, 0, 'designation', NULL, 4),
-(5, 0, 'firstname', NULL, 5),
-(6, 0, 'lastname', NULL, 6),
-(7, 0, 'company', NULL, 7),
-(8, 0, 'address', NULL, 8),
-(9, 0, 'city', NULL, 9),
-(10, 0, 'country', NULL, 10),
-(11, 0, 'zip', NULL, 11),
-(12, 0, 'phone_office', NULL, 12),
-(13, 0, 'phone_private', NULL, 13),
-(14, 0, 'phone_mobile', NULL, 14),
-(15, 0, 'phone_fax', NULL, 15),
-(16, 0, 'birthday', NULL, 16),
-(17, 0, 'website', NULL, 17),
-(18, 0, 'profession', NULL, 18),
-(19, 0, 'interests', NULL, 19),
-(20, 0, 'signature', NULL, 20),
-(21, 0, 'picture', NULL, 21),
-(32, 1, 'Sehr geehrte Frau', 1, 32),
-(33, 1, 'Sehr geehrter Herr', 2, 33),
-(32, 2, 'Dear Ms', 3, 34),
-(33, 2, 'Dear Mr', 4, 35),
-(32, 3, 'Madame', 5, 36),
-(33, 3, 'Monsieur', 6, 37);
+(1, 0, 'gender', NULL, 1),
+(2, 0, 'title', NULL, 2),
+(3, 0, 'designation', NULL, 3),
+(4, 0, 'firstname', NULL, 4),
+(5, 0, 'lastname', NULL, 5),
+(6, 0, 'company', NULL, 6),
+(7, 0, 'address', NULL, 7),
+(8, 0, 'city', NULL, 8),
+(9, 0, 'country', NULL, 9),
+(10, 0, 'zip', NULL, 10),
+(11, 0, 'phone_office', NULL, 11),
+(12, 0, 'phone_private', NULL, 12),
+(13, 0, 'phone_mobile', NULL, 13),
+(14, 0, 'phone_fax', NULL, 14),
+(15, 0, 'birthday', NULL, 15),
+(16, 0, 'website', NULL, 16),
+(17, 0, 'profession', NULL, 17),
+(18, 0, 'interests', NULL, 18),
+(19, 0, 'signature', NULL, 19),
+(20, 0, 'picture', NULL, 20),
+(21, 0, 'Sehr geehrte Frau', 1, 21),
+(22, 0, 'Sehr geehrter Herr', 2, 22),
+(23, 0, 'Dear Ms', 3, 23),
+(24, 0, 'Dear Mr', 4, 24),
+(25, 0, 'Madame', 5, 25),
+(26, 0, 'Monsieur', 6, 26);
 INSERT INTO `contrexx_backend_areas` (`area_id`, `parent_area_id`, `type`, `scope`, `area_name`, `is_active`, `uri`, `target`, `module_id`, `order_id`, `access_id`) VALUES (1,0,'group','backend','TXT_CONTENT_MANAGEMENT',1,'','_self',0,2,1);
 INSERT INTO `contrexx_backend_areas` (`area_id`, `parent_area_id`, `type`, `scope`, `area_name`, `is_active`, `uri`, `target`, `module_id`, `order_id`, `access_id`) VALUES (2,0,'group','backend','TXT_MODULE',1,'','_self',0,10,2);
 INSERT INTO `contrexx_backend_areas` (`area_id`, `parent_area_id`, `type`, `scope`, `area_name`, `is_active`, `uri`, `target`, `module_id`, `order_id`, `access_id`) VALUES (3,0,'group','backend','TXT_ADMINISTRATION',1,'','_self',0,13,3);
@@ -527,7 +530,7 @@ INSERT INTO `contrexx_backend_areas` (`area_id`, `parent_area_id`, `type`, `scop
 INSERT INTO `contrexx_backend_areas` (`area_id`, `parent_area_id`, `type`, `scope`, `area_name`, `is_active`, `uri`, `target`, `module_id`, `order_id`, `access_id`) VALUES (51,23,'function','backend','TXT_REGISTER_MODULES',1,'','_self',0,0,51);
 INSERT INTO `contrexx_backend_areas` (`area_id`, `parent_area_id`, `type`, `scope`, `area_name`, `is_active`, `uri`, `target`, `module_id`, `order_id`, `access_id`) VALUES (52,23,'function','backend','TXT_INST_REMO_MODULES',1,'','_self',0,0,52);
 INSERT INTO `contrexx_backend_areas` (`area_id`, `parent_area_id`, `type`, `scope`, `area_name`, `is_active`, `uri`, `target`, `module_id`, `order_id`, `access_id`) VALUES (53,6,'function','backend','TXT_COPY_DELETE_SITES',1,'','_self',0,0,53);
-INSERT INTO `contrexx_backend_areas` (`area_id`, `parent_area_id`, `type`, `scope`, `area_name`, `is_active`, `uri`, `target`, `module_id`, `order_id`, `access_id`) VALUES (59,2,'navigation','backend','TXT_LINKS_MODULE_DESCRIPTION',1,'index.php?cmd=Directory','_self',12,0,59);
+INSERT INTO `contrexx_backend_areas` (`area_id`, `parent_area_id`, `type`, `scope`, `area_name`, `is_active`, `uri`, `target`, `module_id`, `order_id`, `access_id`) VALUES (59,2,'navigation','backend','TXT_DIRECTORY_MODULE',1,'index.php?cmd=Directory','_self',12,0,59);
 INSERT INTO `contrexx_backend_areas` (`area_id`, `parent_area_id`, `type`, `scope`, `area_name`, `is_active`, `uri`, `target`, `module_id`, `order_id`, `access_id`) VALUES (62,1,'navigation','backend','TXT_BANNER_ADMINISTRATION',0,'index.php?cmd=banner','_self',28,5,62);
 INSERT INTO `contrexx_backend_areas` (`area_id`, `parent_area_id`, `type`, `scope`, `area_name`, `is_active`, `uri`, `target`, `module_id`, `order_id`, `access_id`) VALUES (64,2,'navigation','backend','TXT_RECOMMEND',1,'index.php?cmd=Recommend','_self',27,0,64);
 INSERT INTO `contrexx_backend_areas` (`area_id`, `parent_area_id`, `type`, `scope`, `area_name`, `is_active`, `uri`, `target`, `module_id`, `order_id`, `access_id`) VALUES (65,12,'function','backend','TXT_GALLERY_MENU_OVERVIEW',1,'','_self',3,1,65);
@@ -552,7 +555,7 @@ INSERT INTO `contrexx_backend_areas` (`area_id`, `parent_area_id`, `type`, `scop
 INSERT INTO `contrexx_backend_areas` (`area_id`, `parent_area_id`, `type`, `scope`, `area_name`, `is_active`, `uri`, `target`, `module_id`, `order_id`, `access_id`) VALUES (91,90,'function','backend','TXT_CONTACT_SETTINGS',1,'','_self',6,0,85);
 INSERT INTO `contrexx_backend_areas` (`area_id`, `parent_area_id`, `type`, `scope`, `area_name`, `is_active`, `uri`, `target`, `module_id`, `order_id`, `access_id`) VALUES (92,21,'function','backend','TXT_THEME_IMPORT_EXPORT',1,'','_self',0,0,102);
 INSERT INTO `contrexx_backend_areas` (`area_id`, `parent_area_id`, `type`, `scope`, `area_name`, `is_active`, `uri`, `target`, `module_id`, `order_id`, `access_id`) VALUES (93,2,'navigation','backend','TXT_PODCAST',1,'index.php?cmd=Podcast','_self',35,0,87);
-INSERT INTO `contrexx_backend_areas` (`area_id`, `parent_area_id`, `type`, `scope`, `area_name`, `is_active`, `uri`, `target`, `module_id`, `order_id`, `access_id`) VALUES (98,2,'navigation','backend','TXT_MARKET_MODULE_DESCRIPTION',1,'index.php?cmd=Market','_self',33,0,98);
+INSERT INTO `contrexx_backend_areas` (`area_id`, `parent_area_id`, `type`, `scope`, `area_name`, `is_active`, `uri`, `target`, `module_id`, `order_id`, `access_id`) VALUES (98,2,'navigation','backend','TXT_MARKET_MODULE',1,'index.php?cmd=Market','_self',33,0,98);
 INSERT INTO `contrexx_backend_areas` (`area_id`, `parent_area_id`, `type`, `scope`, `area_name`, `is_active`, `uri`, `target`, `module_id`, `order_id`, `access_id`) VALUES (106,2,'navigation','backend','TXT_FORUM',1,'index.php?cmd=Forum','_self',20,0,106);
 INSERT INTO `contrexx_backend_areas` (`area_id`, `parent_area_id`, `type`, `scope`, `area_name`, `is_active`, `uri`, `target`, `module_id`, `order_id`, `access_id`) VALUES (107,106,'function','backend','TXT_FORUM_MENU_CATEGORIES',1,'','_self',20,1,107);
 INSERT INTO `contrexx_backend_areas` (`area_id`, `parent_area_id`, `type`, `scope`, `area_name`, `is_active`, `uri`, `target`, `module_id`, `order_id`, `access_id`) VALUES (108,106,'function','backend','TXT_FORUM_MENU_SETTINGS',1,'','_self',20,2,108);
@@ -4665,7 +4668,7 @@ INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variab
 INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (79,'SystemLog','Cloudrexx AG','TXT_SYSTEMLOG_MODULE_DESCRIPTION','n',0,1,1,1,NULL);
 INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (78,'ContentWorkflow','Cloudrexx AG','TXT_CONTENTWORKFLOW_MODULE_DESCRIPTION','n',0,1,1,1,NULL);
 INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (80,'Config','Cloudrexx AG','TXT_CONFIG_MODULE_DESCRIPTION','n',0,1,1,1,NULL);
-INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (83,'Media','Cloudrexx AG','TXT_MEDIA_MODULE_DESCRIPTION','y',0,1,1,1,NULL);
+INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (83,'Media','Cloudrexx AG','TXT_MEDIA_MODULE_DESCRIPTION','n',0,1,1,1,NULL);
 INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (84,'Security','Cloudrexx AG','TXT_SECURITY_MODULE_DESCRIPTION','n',0,1,1,1,NULL);
 INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (72,'ContentManager','Cloudrexx AG','TXT_CONTENTMANAGER_MODULE_DESCRIPTION','n',0,1,1,1,NULL);
 INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (81,'Cache','Cloudrexx AG','','n',0,1,1,1,NULL);
@@ -4674,7 +4677,7 @@ INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variab
 INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (88,'JavaScript','Cloudrexx AG','TXT_JAVASCRIPT_MODULE_DESCRIPTION','n',0,1,1,1,NULL);
 INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (87,'Message','Cloudrexx AG','TXT_MESSAGE_MODULE_DESCRIPTION','n',0,1,1,1,NULL);
 INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (90,'Net','Cloudrexx AG','TXT_NET_MODULE_DESCRIPTION','n',1,1,1,1,NULL);
-INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (92,'Shell','Cloudrexx AG','TXT_CORE_SHELL_DESCRIPTION','y',0,1,1,1,NULL);
+INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (92,'Shell','Cloudrexx AG','TXT_CORE_SHELL_DESCRIPTION','n',0,1,1,1,NULL);
 INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (93,'Order','Cloudrexx AG','TXT_MODULE_ORDER_DESCRIPTION','y',0,0,0,0,NULL);
 INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (94,'Pim','Cloudrexx AG','TXT_MODULE_PIM_DESCRIPTION','y',0,0,0,0,NULL);
 INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (95,'LinkManager','Cloudrexx AG','TXT_MODULE_LINKMANAGER_DESCRIPTION','y',0,1,1,1,NULL);
@@ -4682,24 +4685,24 @@ INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variab
 INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (97,'LicenseManager','Cloudrexx AG','TXT_LICENSE','n',1,1,1,1,NULL);
 INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (98,'Test','Cloudrexx AG','TXT_TEST_MODULE_DESCRIPTION','n',0,1,1,1,NULL);
 INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (99,'Routing','Cloudrexx AG','TXT_ROUTING_MODULE_DESCRIPTION','n',0,1,1,1,NULL);
-INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (107,'User','Cloudrexx AG','TXT_CORE_USER_DESCRIPTION','y',1,1,1,1,NULL);
+INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (107,'User','Cloudrexx AG','TXT_CORE_USER_DESCRIPTION','n',1,1,1,1,NULL);
 INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (100,'Support','Cloudrexx AG','TXT_MODULE_SUPPORT_DESCRIPTION','n',1,0,1,0,NULL);
-INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (103,'Cron','Cloudrexx AG','TXT_CORE_MODULE_CRON_DESCRIPTION','y',1,1,1,1,NULL);
-INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (104,'SysLog','Cloudrexx AG','TXT_CORE_MODULE_SYSLOG_DESCRIPTION','y',0,1,1,0,NULL);
-INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (105,'NetManager','Cloudrexx AG','TXT_NETMANAGER_MODULE_DESCRIPTION','y',1,1,1,1,NULL);
-INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (101,'Uploader','Cloudrexx AG','TXT_CORE_MODULE_UPLOADER_DESCRIPTION','y',1,1,1,1,NULL);
-INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (102,'MediaBrowser','Cloudrexx AG','TXT_CORE_MODULE_MEDIABROWSER_DESCRIPTION','y',1,1,1,1,NULL);
-INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (106,'Wysiwyg','Cloudrexx AG','TXT_CORE_WYSIWYG_DESCRIPTION','y',1,1,1,1,NULL);
-INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (110,'TemplateEditor','Cloudrexx AG','TXT_CORE_MODULE_TEMPLATEEDITOR_DESCRIPTION','y',0,1,1,0,NULL);
-INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (108,'Html','Cloudrexx AG','TXT_CORE_HTML_DESCRIPTION','y',1,1,1,1,NULL);
-INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (111,'GeoIp','Cloudrexx AG','TXT_CORE_MODULE_GEOIP_DESCRIPTION','y',0,1,1,1,NULL);
-INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (109,'MediaSource','Cloudrexx AG','TXT_CORE_MEDIASOURCE_DESCRIPTION','y',1,1,1,1,NULL);
-INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (112,'DateTime','Cloudrexx AG','TXT_CORE_DATETIME_DESCRIPTION','y',1,1,1,1,NULL);
-INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (113,'DataAccess','Cloudrexx AG','TXT_CORE_MODULE_DATAACCESS_DESCRIPTION','y',1,1,1,1,NULL);
-INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (114,'DataSource','Cloudrexx AG','TXT_CORE_MODULE_DATASOURCE_DESCRIPTION','y',1,0,1,1,NULL);
-INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (115,'Sync','Cloudrexx AG','TXT_CORE_MODULE_SYNC_DESCRIPTION','y',1,1,1,1,NULL);
-INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (116,'Model','Cloudrexx AG','TXT_CORE_MODEL_DESCRIPTION','y',1,1,1,1,NULL);
-INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (117,'Pdf','Cloudrexx AG','TXT_CORE_MODULES_PDF_DESCRIPTION','y',1,1,1,1,NULL);
+INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (103,'Cron','Cloudrexx AG','TXT_CORE_MODULE_CRON_DESCRIPTION','n',1,1,1,1,NULL);
+INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (104,'SysLog','Cloudrexx AG','TXT_CORE_MODULE_SYSLOG_DESCRIPTION','n',0,1,1,0,NULL);
+INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (105,'NetManager','Cloudrexx AG','TXT_NETMANAGER_MODULE_DESCRIPTION','n',1,1,1,1,NULL);
+INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (101,'Uploader','Cloudrexx AG','TXT_CORE_MODULE_UPLOADER_DESCRIPTION','n',1,1,1,1,NULL);
+INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (102,'MediaBrowser','Cloudrexx AG','TXT_CORE_MODULE_MEDIABROWSER_DESCRIPTION','n',1,1,1,1,NULL);
+INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (106,'Wysiwyg','Cloudrexx AG','TXT_CORE_WYSIWYG_DESCRIPTION','n',1,1,1,1,NULL);
+INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (110,'TemplateEditor','Cloudrexx AG','TXT_CORE_MODULE_TEMPLATEEDITOR_DESCRIPTION','n',0,1,1,0,NULL);
+INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (108,'Html','Cloudrexx AG','TXT_CORE_HTML_DESCRIPTION','n',1,1,1,1,NULL);
+INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (111,'GeoIp','Cloudrexx AG','TXT_CORE_MODULE_GEOIP_DESCRIPTION','n',0,1,1,1,NULL);
+INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (109,'MediaSource','Cloudrexx AG','TXT_CORE_MEDIASOURCE_DESCRIPTION','n',1,1,1,1,NULL);
+INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (112,'DateTime','Cloudrexx AG','TXT_CORE_DATETIME_DESCRIPTION','n',1,1,1,1,NULL);
+INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (113,'DataAccess','Cloudrexx AG','TXT_CORE_MODULE_DATAACCESS_DESCRIPTION','n',1,1,1,1,NULL);
+INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (114,'DataSource','Cloudrexx AG','TXT_CORE_MODULE_DATASOURCE_DESCRIPTION','n',1,0,1,1,NULL);
+INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (115,'Sync','Cloudrexx AG','TXT_CORE_MODULE_SYNC_DESCRIPTION','n',1,1,1,1,NULL);
+INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (116,'Model','Cloudrexx AG','TXT_CORE_MODEL_DESCRIPTION','n',1,1,1,1,NULL);
+INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (117,'Pdf','Cloudrexx AG','TXT_CORE_MODULES_PDF_DESCRIPTION','n',1,1,1,1,NULL);
 INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (118,'Setting','Cloudrexx AG','TXT_CORE_SETTING_DESCRIPTION','n',1,1,1,1,NULL);
 INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (119,'Country','Cloudrexx AG','TXT_CORE_COUNTRY_DESCRIPTION','n',1,1,1,1,NULL);
 INSERT INTO `contrexx_modules` (`id`, `name`, `distributor`, `description_variable`, `status`, `is_required`, `is_core`, `is_active`, `is_licensed`, `additional_data`) VALUES (120,'View','Cloudrexx AG','TXT_CORE_VIEW_DESCRIPTION','n',1,1,1,1,NULL);

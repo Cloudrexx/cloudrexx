@@ -1909,3 +1909,28 @@ a.cke_dialog_ui_button_ok:hover {
     background-color: #0a85c8;
     color: #fff;
 }
+
+/* ComponentManager */
+.componentList .description:hover {
+    cursor: pointer;
+}
+.componentList .description > div > img {
+    font-size: 20px;
+    vertical-align: middle;
+    margin-left: 5px;
+    -webkit-transition: transform .2s linear 0s;
+    -moz-transition: transform .2s linear 0s;
+    -ms-transition: transform .2s linear 0s;
+    -o-transition: transform .2s linear 0s;
+    transition: transform .2s linear 0s;
+}
+.componentList .description > .showText > img {
+    -webkit-transform: rotate(180deg);
+    -moz-transform: rotate(180deg);
+    -ms-transform: rotate(180deg);
+    -o-transform: rotate(180deg);
+    transform: rotate(180deg);
+}
+.componentList .description .desc-extended {
+    display: none;
+}

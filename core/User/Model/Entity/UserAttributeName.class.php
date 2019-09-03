@@ -31,7 +31,7 @@
  * @copyright   CLOUDREXX CMS - Cloudrexx AG Thun
  * @author      Dario Graf <info@cloudrexx.com>
  * @package     cloudrexx
- * @subpackage  module_user
+ * @subpackage  core_user
  * @version     5.0.0
  */
 namespace Cx\Core\User\Model\Entity;
@@ -42,7 +42,7 @@ namespace Cx\Core\User\Model\Entity;
  * @copyright   CLOUDREXX CMS - Cloudrexx AG Thun
  * @author      Dario Graf <info@cloudrexx.com>
  * @package     cloudrexx
- * @subpackage  module_user
+ * @subpackage  core_user
  * @version     5.0.0
  */
 class UserAttributeName extends \Cx\Model\Base\EntityBase {
@@ -90,7 +90,6 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase {
      * Set attributeId
      *
      * @param integer $attributeId
-     * @return UserAttributeName
      */
     public function setAttributeId($attributeId)
     {
@@ -100,7 +99,7 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase {
     /**
      * Get attributeId
      *
-     * @return integer 
+     * @return integer
      */
     public function getAttributeId()
     {
@@ -175,7 +174,7 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase {
      * @param \Cx\Core\User\Model\Entity\UserAttribute $userAttribute
      * @return UserAttributeName
      */
-    public function setUserAttribute(\Cx\Core\User\Model\Entity\UserAttribute $userAttribute = null)
+    public function setUserAttribute(\Cx\Core\User\Model\Entity\UserAttribute $userAttribute)
     {
         $this->userAttribute = $userAttribute;
     }

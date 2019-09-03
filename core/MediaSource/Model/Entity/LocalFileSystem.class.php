@@ -518,7 +518,7 @@ class LocalFileSystem extends EntityBase implements FileSystem
     public function getFileFromPath($filepath) {
         $fileinfo = pathinfo($filepath);
         $path = dirname($filepath);
-        $files = $this->getFileList($fileinfo['dirname']);
+        $files = $this->getFileList($fileinfo['dirname'], false);
         if (!isset($files[$fileinfo['basename']])) {
             return false;
         }

@@ -214,7 +214,7 @@ Drops all no-longer required profile images';
                 }
 
                 $objTemplate->setVariable(array(
-                    'TXT_PROFILE' => $txtProfile,
+                    'TXT_PROFILE' => contrexx_raw2xhtml($txtProfile),
                     'USER_ID' => $objFWUser->objUser->getId(),
                 ));
 

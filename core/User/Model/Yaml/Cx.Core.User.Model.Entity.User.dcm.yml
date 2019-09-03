@@ -5,6 +5,8 @@ Cx\Core\User\Model\Entity\User:
     id:
       id: true
       type: integer
+      options:
+        unsigned: true
       generator:
         strategy: AUTO
     isAdmin:
@@ -33,27 +35,32 @@ Cx\Core\User\Model\Entity\User:
       nullable: false
       column: auth_token_timeout
       options:
+        unsigned: true
         default: 0
     regdate:
       type: integer
       nullable: false
       options:
+        unsigned: true
         default: 0
     expiration:
       type: integer
       nullable: false
       options:
+        unsigned: true
         default: 0
     validity:
       type: integer
       nullable: false
       options:
+        unsigned: true
         default: 0
     lastAuth:
       type: integer
       nullable: false
       column: last_auth
       options:
+        unsigned: true
         default: 0
     lastAuthStatus:
       type: smallint
@@ -66,6 +73,7 @@ Cx\Core\User\Model\Entity\User:
       nullable: false
       column: last_activity
       options:
+        unsigned: true
         default: 0
     email:
       type: string
@@ -82,12 +90,14 @@ Cx\Core\User\Model\Entity\User:
       nullable: false
       column: frontend_lang_id
       options:
+        unsigned: true
         default: 0
     backendLangId:
       type: integer
       nullable: false
       column: backend_lang_id
       options:
+        unsigned: true
         default: 0
     active:
       type: boolean
@@ -102,6 +112,7 @@ Cx\Core\User\Model\Entity\User:
       nullable: false
       column: primary_group
       options:
+        unsigned: true
         default: 0
     profileAccess:
       type: enum
@@ -121,6 +132,7 @@ Cx\Core\User\Model\Entity\User:
       nullable: false
       column: restore_key_time
       options:
+        unsigned: true
         default: 0
     u2uActive:
       type: enum
@@ -141,6 +153,8 @@ Cx\Core\User\Model\Entity\User:
           user_id:
             referencedColumnName: id
             nullable: false
+            options:
+              unsigned: true
         inverseJoinColumns:
           group_id:
             referencedColumnName: group_id
@@ -149,3 +163,6 @@ Cx\Core\User\Model\Entity\User:
     userAttributeValue:
       targetEntity: Cx\Core\User\Model\Entity\UserAttributeValue
       mappedBy: user
+  lifecycleCallbacks:
+    prePersist: [ validate ]
+    onFlush: [ validate ]

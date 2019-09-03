@@ -80,6 +80,11 @@ class Newsletter extends NewsletterLib
             $_REQUEST['cmd'] = '';
         }
 
+        // All actions must not be cached. This includes all requests to
+        // unsubscribe, subscribe, confirm and profile.
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $cx->getComponent('Cache')->addException('Newsletter');
+
         switch($_REQUEST['cmd']) {
             case 'unsubscribe':
                 $this->_unsubscribe();
@@ -1061,7 +1066,6 @@ class Newsletter extends NewsletterLib
                 'key'          => 'notification_email',
                 'section'      => 'Newsletter',
                 'lang_id'      => FRONTEND_LANG_ID,
-                'to'           => implode(',', $notifyMails),
                 'from'         => $arrSettings['sender_mail']['setvalue'],
                 'sender'       => $arrSettings['sender_name']['setvalue'],
                 'reply'        => $arrSettings['reply_mail']['setvalue'],
@@ -1076,6 +1080,9 @@ class Newsletter extends NewsletterLib
                     'NEWSLETTER_CURRENT_DATE'   => date(ASCMS_DATE_FORMAT),
                 ),
             );
+            if (count($notifyMails)) {
+                $arrMailTemplate['to'] = implode(',', $notifyMails);
+            }
             if (!\Cx\Core\MailTemplate\Controller\MailTemplate::send($arrMailTemplate)) {
                 return false;
             }

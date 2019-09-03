@@ -12,7 +12,7 @@ var language_labels = {LANGUAGE_LABELS};
 
 <link href="../core/ContentManager/View/Style/Main.css" rel="stylesheet" type="text/css" />
 
-<div id="content-manager" class="sidebar-hide {EDIT_VIEW_CSS_CLASS}">
+<div id="content-manager" class="sidebar-hide {EDIT_VIEW_CSS_CLASS} {CONTENTMANAGER_LOCALE_CSS_CLASS}">
     <div id="cm-left">
         <div id="subnav">
             <div class="navi">
@@ -22,28 +22,30 @@ var language_labels = {LANGUAGE_LABELS};
                 <a href="index.php?cmd=ContentWorkflow">{TXT_CONTENT_HISTORY}</a>
                 <a href="index.php?cmd=Media&archive=content">{TXT_IMAGE_ADMINISTRATION}</a>
             </div>
-            <div id="site-language" style="{LANGUAGE_DISPLAY}">
+            <div id="site-language">
                 <!-- BEGIN content_manager_language_selection -->
                 {LANGSWITCH_OPTIONS}
                 <!-- END content_manager_language_selection -->
             </div>
         </div>
-        <div id="site-structure">
-            <div id="tooltip_message" class="tooltip-message"></div>
-            <table class="adminlist {ADMIN_LIST_MARGIN}" width="100%">
-                <tr>
-                    <th class="page" width="42%">
-                        {TXT_CORE_CM_STATUS_PAGE}&nbsp;
-                        <span id="flip-menu">&nbsp;<a href="#" class="jstree-action open"></a>&nbsp;<a href="#" class="jstree-action close"></a></span>
-                    </th>
-                    <th class="translation" width="11%">{TXT_CORE_CM_TRANSLATIONS}</th>
-                    <th class="module" width="17%">{TXT_CORE_CM_APPLICATION}</th>
-                    <th class="preview" width="7%">{TXT_CORE_CM_VIEW}</th>
-                    <th class="actions" width="7%">{TXT_CORE_CM_ACTIONS}</th>
-                    <th class="lastupdate" width="16%">{TXT_CORE_CM_LOG}</th>
-                </tr>
-            </table>
-            <div id="site-tree"></div>
+        <div id="site-structure-wrapper">
+            <div id="site-structure">
+                <div id="tooltip_message" class="tooltip-message"></div>
+                <table class="adminlist">
+                    <tr>
+                        <th class="page">
+                            {TXT_CORE_CM_STATUS_PAGE}&nbsp;
+                            <span id="flip-menu">&nbsp;<a href="#" class="jstree-action open"></a>&nbsp;<a href="#" class="jstree-action close"></a></span>
+                        </th>
+                        <th class="translation">{TXT_CORE_CM_TRANSLATIONS} <a href="#" class="switch-tag-dropdown close"></a></th>
+                        <th class="module">{TXT_CORE_CM_APPLICATION}</th>
+                        <th class="preview">{TXT_CORE_CM_VIEW}</th>
+                        <th class="actions">{TXT_CORE_CM_ACTIONS}</th>
+                        <th class="lastupdate">{TXT_CORE_CM_LOG}</th>
+                    </tr>
+                </table>
+                <div id="site-tree"></div>
+            </div>
         </div>
         <div id="multiple-actions">
             <img id="multiple-actions-arrow" src="../core/Core/View/Media/icons/arrow.gif" border="0" width="38" height="22" alt="" />

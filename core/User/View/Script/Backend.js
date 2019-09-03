@@ -18,6 +18,15 @@ jQuery(document).ready(function($){
         cx.jQuery( '[name="backendLangId"]' ).val(value);
     }
 
+    jQuery('#form-0-primaryGroup').change(function() {
+        var optionId = jQuery(this).find(":selected").val();
+        jQuery('#form-0-group option[value="'+optionId+'"]').attr('selected', true);
+        jQuery("#form-0-group > option:selected").each(function() {
+            jQuery(this).attr('selected', true);
+        });
+        jQuery('#form-0-group').trigger("chosen:updated");
+    });
+
     // START password
     /**
      * Checks the complexity of the given password.

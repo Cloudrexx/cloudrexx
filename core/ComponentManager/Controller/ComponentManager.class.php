@@ -50,8 +50,6 @@ class ComponentManagerException extends \Exception {};
  */
 class ComponentManager
 {
-    var $strErrMessage = '';
-    var $strOkMessage = '';
     var $arrayInstalledModules = array();
     var $arrayRemovedModules = array();
     var $langId;
@@ -124,11 +122,6 @@ class ComponentManager
                 break;
         }
 
-        $objTemplate->setVariable(array(
-            'CONTENT_OK_MESSAGE'        => $this->strOkMessage,
-            'CONTENT_STATUS_MESSAGE'    => $this->strErrMessage,
-        ));
-
         if (isset($_REQUEST['act'])) {
             $this->act = $_REQUEST['act'];
         } else {
@@ -154,7 +147,7 @@ class ComponentManager
         $objResult = $objDatabase->Execute($query);
 
         if ($objResult) {
-            $this->strOkMessage = $status ? $_ARRAYLANG['TXT_MODULE_ACTIVATED_SUCCESSFULLY'] : $_ARRAYLANG['TXT_MODULE_DEACTIVATED_SUCCESSFULLY'];
+            \Message::ok($status ? $_ARRAYLANG['TXT_MODULE_ACTIVATED_SUCCESSFULLY'] : $_ARRAYLANG['TXT_MODULE_DEACTIVATED_SUCCESSFULLY']);
         } else {
             $this->errorHandling();
             return false;
@@ -235,7 +228,6 @@ class ComponentManager
             while (!$objResult->EOF) {
                 $class = (++$i % 2 ? 'row1' : 'row2');
                 if (   in_array($objResult->fields['id'], $arrayInstalledModules)
-                    || in_array($objResult->fields['id'], array(6, 100, 101, 102, 103, 104, 105, 106, 107))
                 ) {
                     $moduleStatusLink = $objResult->fields['is_active']
                                         ? sprintf($statusLink, (int) $objResult->fields['id'], 0, sprintf($statusIcon, 'led_green.gif'))
@@ -281,8 +273,8 @@ class ComponentManager
 
                 if (!in_array($objResult->fields['name'], array('Agb', 'Error', 'Home', 'Ids', 'Imprint', 'Login', 'Privacy', 'Search', 'Sitemap'))
                     && (   in_array($objResult->fields['id'], $arrayInstalledModules)
-                        || $objResult->fields['id'] == 6)
-                    ) {
+                    )
+                ) {
                         switch ($objResult->fields['name']) {
                             case 'Media1':
                             case 'Media2':
@@ -323,6 +315,20 @@ class ComponentManager
                     }
                     $_ARRAYLANG = $arrLang;
                 }
+
+                if (
+                    strpos($description, '.') !== false &&
+                    strpos($description, '.') !== (strlen($description) - 1)
+                ) {
+                    $objTemplate->setVariable(array(
+                        'MODULE_DESCRIPTION_CLASS' => 'description',
+                    ));
+                    $descExtended = substr($description, strpos($description, '.') + 1);
+                    $description = substr($description, 0, strpos($description, '.') + 1) .
+                        ' <img src="/core/Core/View/Media/AngleDown1x.png" alt=""/><span class="desc-extended"><br />' .
+                        $descExtended . '</span>';
+                }
+
                 $objTemplate->setVariable(array(
                     'MODULE_ROWCLASS'   => $class . (!$objResult->fields['is_active'] ? ' rowInactive' : ''),
                     'MODULE_DESCRIPTON' => $description,
@@ -338,13 +344,16 @@ class ComponentManager
     function modModules()
     {
         global $_ARRAYLANG;
+
+        $reload = false;
         if ($this->installModules()) {
             $installedModules = '';
             foreach (array_keys($this->arrayInstalledModules) as $moduleName) {
                 $installedModules .=
                     (empty($installedModules) ? '' : ', ').$moduleName;
             }
-            $this->strOkMessage .= sprintf($_ARRAYLANG['TXT_MODULES_INSTALLED_SUCCESFULL'], $installedModules);
+            \Message::ok(sprintf($_ARRAYLANG['TXT_MODULES_INSTALLED_SUCCESFULL'], $installedModules));
+            $reload = true;
         }
         if ($this->removeModules()) {
             $removedModules = '';
@@ -352,8 +361,15 @@ class ComponentManager
                 $removedModules .=
                     (empty($removedModules) ? '' : ', ').$moduleName;
             }
-            $this->strOkMessage .= ' '.sprintf($_ARRAYLANG['TXT_MODULES_REMOVED_SUCCESSFUL'], $removedModules);
+            \Message::ok(sprintf($_ARRAYLANG['TXT_MODULES_REMOVED_SUCCESSFUL'], $removedModules));
+            $reload = true;
         }
+
+        if (!$reload) {
+            return;
+        }
+
+        \Cx\Core\Csrf\Controller\Csrf::redirect(\Cx\Core\Routing\Url::fromBackend('ComponentManager'));
     }
 
 
@@ -601,6 +617,6 @@ class ComponentManager
 
     function errorHandling() {
         global $_ARRAYLANG;
-        $this->strErrMessage.= " ".$_ARRAYLANG['TXT_DATABASE_QUERY_ERROR']." ";
+        \Message::error($_ARRAYLANG['TXT_DATABASE_QUERY_ERROR']);
     }
 }

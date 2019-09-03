@@ -7,10 +7,15 @@ function deleteVariable(id)
         window.location.replace("index.php?cmd=ComponentManager&{CSRF_PARAM}&act=del&maduleId="+id);
 }
 // -->
+jQuery(document).ready(function() {
+    jQuery('.description').click(function(event) {
+        jQuery(this).find('div').toggleClass('showText').find('.desc-extended').fadeToggle('fast');
+    });
+});
 </script>
 <br />
 <form name="moduleManagerForm" method="post" action="?cmd=ComponentManager&amp;act={MODULE_ACTION}">
-  <table summary="" width="100%" cellspacing="0" cellpadding="3" border="0" style="vertical-align:top;" class="adminlist">
+  <table summary="" width="100%" cellspacing="0" cellpadding="3" border="0" style="vertical-align:top;" class="adminlist componentList">
     <tr>
       <th nowrap="nowrap" width="5%">
         <div align="left">{TXT_STATUS}</div>
@@ -42,7 +47,7 @@ function deleteVariable(id)
       <td>
         <div align="left">{MODULE_REQUIRED}&nbsp;</div>
       </td>
-      <td>
+      <td class="{MODULE_DESCRIPTION_CLASS}">
         <div align="left">{MODULE_DESCRIPTON}&nbsp;</div>
       </td>
       <td>

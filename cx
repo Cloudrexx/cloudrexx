@@ -4,7 +4,7 @@
 # vim: syn=sh
 
 # Wrapper for bash 3
-if [[ $BASH_VERSION != 4.* ]]; then
+if [ "${BASH_VERSION:0:1}" -lt 4 ]; then
     command="cd /root && ./cx --proxy-host-dir='$(pwd -P)' $@"
     # Special case: user wants to start interactive shell to wrapper container
     if [[ "$@" == "env shell --wrapper" ]]; then
@@ -470,6 +470,7 @@ Available options are:
     --request           Shows the log of the last request
     --stack             Shows the stack trace of the last failed request
     --clear-usercache   Clears the user cache
+    --install-x-debug   Installs xDebug inside the web container
     --follow            Follows the log"
             ;;
         *)
@@ -1833,6 +1834,10 @@ case "${COMMANDS[0]}" in
             exit
         elif [[ ${ARGUMENTS["clear-usercache"]} ]]; then
             clearUsercache
+            exit
+        elif [[ ${ARGUMENTS["install-x-debug"]} ]]; then
+            get_config_array
+            internal_dockerexec exec -i "<web-container>" bash -c "pecl install xdebug && docker-php-ext-enable xdebug && apachectl -k graceful"
             exit
         fi
         lastError="$(tac tmp/log/dbg.log | grep -m1 -B1 "initialization failed" | tac)"

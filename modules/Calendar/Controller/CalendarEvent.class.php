@@ -760,7 +760,7 @@ class CalendarEvent extends CalendarLibrary
      * @return null
      */
     function get($eventId, $eventStartDate=null, $langId=null) {
-        global $objDatabase, $_ARRAYLANG, $_LANGID, $objInit;
+        global $objDatabase, $_LANGID;
 
         $this->getSettings();
 
@@ -1019,7 +1019,7 @@ class CalendarEvent extends CalendarLibrary
      * @return null
      */
     function getData() {
-        global $objDatabase, $_ARRAYLANG, $_LANGID;
+        global $objDatabase;
 
         $activeLangs = explode(",", $this->showIn);
         $this->arrData = array();
@@ -1068,7 +1068,7 @@ class CalendarEvent extends CalendarLibrary
      * @return boolean true if saved successfully, false otherwise
      */
     function save($data){
-        global $objDatabase, $_LANGID, $_CONFIG, $objInit;
+        global $objDatabase, $_LANGID, $objInit;
 
         $this->getSettings();
 
@@ -1090,16 +1090,16 @@ class CalendarEvent extends CalendarLibrary
             }
         }
 
-        list($startDate, $strStartTime) = explode(' ', $data['startDate']);
-        list($startHour, $startMin)     = explode(':', $strStartTime);
-
-        list($endDate, $strEndTime)     = explode(' ', $data['endDate']);
-        list($endHour, $endMin)         = explode(':', $strEndTime);
-
-        if (!empty($data['all_day'])) {
-            list($startHour, $startMin) = array(0, 0);
-            list($endHour, $endMin)     = array(23, 59);;
-        }
+        // fetch event's start and end
+        list($startDate, $startHour, $startMin) = $this->parseDateTimeString(
+            $data['startDate'],
+            !empty($data['all_day'])
+        );
+        list($endDate, $endHour, $endMin) = $this->parseDateTimeString(
+            $data['endDate'],
+            !empty($data['all_day']),
+            true
+        );
 
         //event data
         $id            = isset($data['copy']) && !empty($data['copy']) ? 0 : (isset($data['id']) ? intval($data['id']) : 0);
@@ -1573,6 +1573,14 @@ class CalendarEvent extends CalendarLibrary
         $event       = $this->getEventEntity($id, $formDatas);
         $eId         = $id;
         if ($id != 0) {
+            // In frontend, the status can not be changed.
+            // As only active events can be edited in frontend,
+            // the status must always be set to 1 in that case.
+            if ($this->cx->getMode() == $this->cx::MODE_FRONTEND) {
+                $status = 1;
+                $formData['status'] = $status;
+            }
+
             //Trigger preUpdate event for Event Entity
             $this->triggerEvent(
                 'model/preUpdate', $event,
@@ -1816,20 +1824,21 @@ class CalendarEvent extends CalendarLibrary
         return $eventFields;
     }
 
-    function loadEventFromPost($data)
+    function loadEventFromData($data)
     {
-        list($startDate, $strStartTime) = explode(' ', $data['startDate']);
-        list($startHour, $startMin)     = explode(':', $strStartTime);
-
-        list($endDate, $strEndTime)     = explode(' ', $data['endDate']);
-        list($endHour, $endMin)         = explode(':', $strEndTime);
+        // fetch event's start and end
+        list($startDate, $startHour, $startMin) = $this->parseDateTimeString(
+            $data['startDate']
+        );
+        list($endDate, $endHour, $endMin) = $this->parseDateTimeString(
+            $data['endDate'],
+            false,
+            true
+        );
 
         //event data
-        $startDate     = $this->getDateTime($startDate, intval($startHour), intval($startMin));
-        $endDate       = $this->getDateTime($endDate, intval($endHour), intval($endMin));
-
-        $this->startDate = $startDate;
-        $this->endDate   = $endDate;
+        $this->startDate = $this->getDateTime($startDate, intval($startHour), intval($startMin));
+        $this->endDate = $this->getDateTime($endDate, intval($endHour), intval($endMin));
 
         //series pattern
         $seriesStatus = isset($data['seriesStatus']) ? intval($data['seriesStatus']) : 0;
@@ -2245,8 +2254,6 @@ class CalendarEvent extends CalendarLibrary
      */
     static function getEventSearchQuery($term)
     {
-        global $_LANGID;
-
         $query = "SELECT event.`id` AS `id`,
                          event.`startdate`,
                          field.`title` AS `title`,
@@ -2256,7 +2263,7 @@ class CalendarEvent extends CalendarLibrary
                          MATCH (field.`title`, field.`teaser`, field.`description`) AGAINST ('%$term%') AS `score`
                     FROM ".DBPREFIX."module_calendar_event AS event,
                          ".DBPREFIX."module_calendar_event_field AS field
-                   WHERE   (event.id = field.event_id AND field.lang_id = '".intval($_LANGID)."')
+                   WHERE   (event.id = field.event_id AND field.lang_id = '".FRONTEND_LANG_ID."')
                        AND event.status = 1
                        AND (   field.title LIKE ('%$term%')
                             OR field.teaser LIKE ('%$term%')
@@ -2369,8 +2376,6 @@ class CalendarEvent extends CalendarLibrary
      */
     function loadPlaceLinkFromMediadir($intMediaDirId = 0, $type = 'place')
     {
-        global $_LANGID, $_CONFIG;
-
         $placeUrl       = '';
         $placeUrlSource = '';
 

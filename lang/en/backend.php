@@ -140,7 +140,6 @@ $_ARRAYLANG['TXT_PAGING_OUT_OF'] = "out of";
 $_ARRAYLANG['TXT_PAGING_TO'] = "to";
 $_ARRAYLANG['TXT_FIRST_NAME'] = "First name";
 $_ARRAYLANG['TXT_PASSWORD_FIELD_EMPTY'] = "If the password field remains empty, the current password is maintained!";
-$_ARRAYLANG['TXT_PASSWORD_MD5_ENCRYPTED'] = "The password is encoded with the MD5 hashing algorithm.";
 $_ARRAYLANG['TXT_VALUE'] = "Value";
 $_ARRAYLANG['TXT_SIZE'] = "File size";
 $_ARRAYLANG['TXT_DATABASE_QUERY_ERROR'] = "Database Query Error!";
@@ -197,6 +196,7 @@ $_ARRAYLANG['TXT_DOC_SYS_MODULE_DESCRIPTION'] = "Document management system";
 $_ARRAYLANG['TXT_SHOP_MODULE_DESCRIPTION'] = "B2B und B2C Online Shop Solution";
 $_ARRAYLANG['TXT_SITEMAP_MODULE_DESCRIPTION'] = "Dynamical site map system. Displays the site map in Explorer style.";
 $_ARRAYLANG['TXT_LINKS_MODULE_DESCRIPTION'] = "Directory";
+$_ARRAYLANG['TXT_DIRECTORY_MODULE'] = "Directory";
 $_ARRAYLANG['TXT_IDS_MODULE_DESCRIPTION'] = "Integrated Intrusion Detection System ( IDS )";
 $_ARRAYLANG['TXT_ERROR_MODULE_DESCRIPTION'] = "Error reporting system";
 $_ARRAYLANG['TXT_HOME_MODULE_DESCRIPTION'] = "CMS Startpage Module";
@@ -514,6 +514,7 @@ $_ARRAYLANG['TXT_CACHE_FOLDER_EMPTY'] = "Cache folder has been emptied.";
 $_ARRAYLANG['TXT_IMPORT'] = "Import";
 $_ARRAYLANG['TXT_CHOOSE_FILE'] = "Choose The File";
 $_ARRAYLANG['TXT_ADD_PAIR'] = "Add a pair";
+$_ARRAYLANG['TXT_MARKET_MODULE'] = "Advertisement";
 $_ARRAYLANG['TXT_MARKET_MODULE_DESCRIPTION'] = "Advertisement";
 $_ARRAYLANG['TXT_CORE_MARKET_TITLE'] = "Advertisement";
 $_ARRAYLANG['TXT_SEPARATOR'] = "Separator";
@@ -1200,7 +1201,7 @@ $_ARRAYLANG['TXT_USE_CONTENT_FROM_LANGUAGE_HELPTEXT'] = "Verwenden Sie diese Opt
 
 
 $_ARRAYLANG['TXT_CORE_CM_STATUS_PAGE'] = 'Status / Page';
-$_ARRAYLANG['TXT_CORE_CM_TRANSLATIONS'] = 'Translations';
+$_ARRAYLANG['TXT_CORE_CM_TRANSLATIONS'] = 'Locales';
 $_ARRAYLANG['TXT_CORE_CM_SECTION_CMD'] = 'Section / CMD';
 $_ARRAYLANG['TXT_CORE_CM_LOG'] = 'Log';
 $_ARRAYLANG['TXT_CORE_CM_LAST_MODIFIED'] = 'Last modified by user';
@@ -1324,6 +1325,7 @@ $_ARRAYLANG['TXT_CORE_CM_COPY_N_OF_PAGE'] = 'Copy %s';
 $_ARRAYLANG['TXT_CORE_CM_HISTORY_ENTRIES'] = 'Entries';
 $_ARRAYLANG['TXT_CORE_CM_HISTORY_HIDE_DRAFTS'] = 'Hide drafts';
 $_ARRAYLANG['TXT_CORE_CM_SLUG'] = 'URI-Slug';
+$_ARRAYLANG['TXT_CORE_LOCALE_DOESNT_EXIST'] = 'No language was found';
 
 // upload
 $_ARRAYLANG['TXT_CORE_UPLOAD_MORE'] = "Upload more";

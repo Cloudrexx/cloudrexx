@@ -52,8 +52,6 @@ class BackendController extends
         if (!empty($_GET['act'])) {
             $splitAct = explode('/', $_GET['act']);
             $act = $splitAct[0];
-            $tpl = $splitAct[1];
-
         }
 
         switch($act)  {
@@ -61,9 +59,11 @@ class BackendController extends
             case 'config':
             case 'Group':
             case 'group':
+            case 'export':
                 $mappedNavItems = array(
                     'Settings' => 'config',
                     'Group' => 'group',
+                    'export' => 'export',
                 );
 
                 if (!empty($mappedNavItems[$act])) {
@@ -74,7 +74,11 @@ class BackendController extends
                 $langData   = $objInit->loadLanguageData('Access');
                 $_ARRAYLANG = array_merge($_ARRAYLANG, $langData);
 
-                $this->cx->getTemplate()->addBlockfile('CONTENT_OUTPUT', 'content_master', 'LegacyContentMaster.html');
+                $this->cx->getTemplate()->addBlockfile(
+                    'CONTENT_OUTPUT',
+                    'content_master',
+                    'LegacyContentMaster.html'
+                );
                 $objAccessManager = new \Cx\Core_Modules\Access\Controller\AccessManager();
                 $objAccessManager->getPage();
                 return;
@@ -166,6 +170,11 @@ class BackendController extends
                     'method' => 'filterCallback'
                 );
 
+                $options['functions']['searchCallback'] = array(
+                    'adapter' => 'User',
+                    'method' => 'searchCallback'
+                );
+
                 $options['tabs']['groups'] = array(
                     'header' => $_ARRAYLANG['TXT_CORE_USER_GROUP_S'],
                     'fields' => array(
@@ -202,7 +211,7 @@ class BackendController extends
                     ),
                     'username' => array(
                         'table' => array(
-                            'parse' => function ($value, $rowData, $vg) {
+                            'parse' => function ($value, $rowData, $options, $vg) {
                                 return $this->addEditUrl($value, $rowData, $vg);
                             }
                         ),
@@ -241,30 +250,32 @@ class BackendController extends
                     ),
                     'email' => array(
                         'table' => array(
-                            'parse' => function ($value, $rowData, $vg) {
+                            'parse' => function ($value, $rowData, $options, $vg) {
                                 return $this->addEditUrl($value, $rowData, $vg);
                             }
                         ),
                         'showOverview' => true,
                         'showDetail' => true,
                         'allowFiltering' => false,
+                        'allowSearching' => true,
                     ),
                     'password' => array(
                         'showOverview' => false,
-                        'formfield' => array(
-                            'adapter' => 'User',
-                            'method' => 'getPasswordField'
-                        ),
+                        'type' => 'password',
+                        'mode' => 'nocomplete',
                         'tooltip' => $this->getPasswordInfo(),
                         'allowFiltering' => false,
                     ),
                     'passwordConfirmed' => array(
                         'custom' => true,
                         'showOverview' => false,
-                        'attributes' => array(
-                            'class' => 'access-pw-noauto',
-                        ),
+                        'type' => 'password',
+                        'mode' => 'nocomplete',
                         'allowFiltering' => false,
+                        'storecallback' => array(
+                            'adapter' => 'User',
+                            'method' => 'matchWithConfirmedPassword'
+                        ),
                     ),
                     'authToken' => array(
                         'showOverview' => false,
@@ -285,6 +296,10 @@ class BackendController extends
                         'showOverview' => true,
                         'showDetail' => false,
                         'allowFiltering' => false,
+                        'storecallback' => array(
+                            'adapter' => 'User',
+                            'method' => 'setRegDate'
+                        )
                     ),
                     'expiration' => array(
                         'showOverview' => true,
@@ -450,6 +465,7 @@ class BackendController extends
                 );
 
                 $options = $this->appendUserAttributes($options);
+                $options = $this->appendModuleSpecificExtensions($options);
                 $options = $this->appendNewsletterLists($options);
                 break;
             case 'Cx\Core\User\Model\Entity\Group':
@@ -477,11 +493,15 @@ class BackendController extends
                     'add' => true,
                     'edit' => true,
                     'delete' => true,
+                    'status' => array(
+                        'field' => 'isActive'
+                    ),
                 );
                 $options['fields'] = array(
                     'isActive' => array(
                         'showOverview' => true,
                         'allowFiltering' => false,
+                        'type' => 'boolean'
                     ),
                     'groupId' => array(
                         'showOverview' => true,
@@ -556,6 +576,12 @@ class BackendController extends
                         ),
                         'allowFiltering' => false,
                     ),
+                    'selectType' => array(
+                        'custom' => true,
+                        'formfield' => function($fieldname, $fieldtype, $fieldlength, $fieldvalue, $fieldoptions) {
+                            return $this->getOverlay($fieldname, $fieldtype, $fieldlength, $fieldvalue, $fieldoptions);
+                        }
+                    )
                 );
                 break;
             case 'Cx\Core\User\Model\Entity\Settings':
@@ -953,23 +979,16 @@ class BackendController extends
      */
     protected function primaryGroupDropdown($fieldname, $fieldvalue)
     {
-        global $_ARRAYLANG;
-
         $em = $this->cx->getDb()->getEntityManager();
 
-        $userId = intval($this->userId);
+        $validValues = array(0 => '-');
 
-        $user = $em->getRepository('Cx\Core\User\Model\Entity\User')->findOneBy(array('id' => $userId));
+        // Select all active groups
+        $groups = $em->getRepository(
+            'Cx\Core\User\Model\Entity\Group'
+        )->findBy(array('isActive' => 1));
 
-        if (empty($user)) {
-            return;
-        }
-
-        $userGroups = $user->getGroup();
-
-        $validValues = array();
-
-        foreach ($userGroups as $group) {
+        foreach ($groups as $group) {
             $validValues[$group->getGroupId()] = $group->getGroupName();
         }
 
@@ -1207,7 +1226,8 @@ class BackendController extends
                 'custom' => true,
                 'showOverview' => false,
                 'allowFiltering' => false,
-                'storecallback' => array(
+                'allowSearching' => true,
+                'postCallback' => array(
                     'adapter' => 'User',
                     'method' => 'storeUserAttributeValue'
                 ), // todo: move value callback func in json controller
@@ -1334,7 +1354,15 @@ class BackendController extends
             );
         }
 
-        if (count($attr->getChildren())) {
+        if ($name == 'title') {
+            foreach ( $attr->getChildren() as $child) {
+                foreach ($child->getUserAttributeName() as $childName) {
+                    $validValues[
+                    $childName->getAttributeId()
+                    ] = $childName->getName();
+                }
+            }
+        } else if (count($attr->getChildren())) {
             foreach ( $attr->getChildren() as $child) {
                 foreach ($child->getUserAttributeName() as $childName) {
                     if ($childName->getLangId() == FRONTEND_LANG_ID) {
@@ -1364,6 +1392,42 @@ class BackendController extends
         return $attrOption;
     }
 
+    protected function appendModuleSpecificExtensions($options)
+    {
+        global $_ARRAYLANG;
+
+        $status = false;
+        $tabFields = array();
+
+        // Add a category in the digital asset management module
+        // ToDo: use not obsolete method
+        if (contrexx_isModuleInstalled('Downloads')) {
+            $options['fields']['downloadExtension'] = array(
+                'custom' => true,
+                'showOverview' => false,
+                'allowFiltering' => false,
+                'type' => 'checkboxes',
+                'mode' => 'key',
+                'validValues' => array( 1 =>
+                    $_ARRAYLANG['TXT_CORE_USER_ADD_DAM_CATEGORY']),
+                'postCallback' => array(
+                    'adapter' => 'User',
+                    'method' => 'storeDownloadExtension'
+                ),
+            );
+            $tabFields[] = 'downloadExtension';
+            $status = true;
+        }
+
+        if ($status) {
+            $options['tabs']['moduleSpecificExtensions'] = array(
+                'fields' => $tabFields,
+            );
+        }
+
+        return $options;
+    }
+
     protected function appendNewsletterLists($options)
     {
         global $_CONFIG, $objDatabase, $objInit, $_ARRAYLANG;
@@ -1373,29 +1437,28 @@ class BackendController extends
             'custom' => true,
             'type' => 'checkboxes',
             'mode' => 'key',
-            'storecallback' => array(
-                'adapter' => 'User',
-                'method' => 'storeNewsletterLists'
-            ),
             'showOverview' => false,
             'allowFiltering' => false,
+            'postCallback' => array(
+                'adapter' => 'User',
+                'method' => 'storeNewsletter'
+            ),
         );
-
-        if (empty($this->userId)) {
-            return $options;
-        }
-
-        $user = \FWUser::getFWUserObject()->objUser->getUser($this->userId);
-        if (empty($user)) {
-            return $options;
-        }
 
         if (
             \Cx\Core_Modules\License\License::getCached(
                 $_CONFIG, $objDatabase
             )->isInLegalComponents('Newsletter')
         ) {
-            $arrSubscribedNewsletterListIDs = $user->getSubscribedNewsletterListIDs();
+
+            $arrSubscribedNewsletterListIDs = array();
+            if (!empty($this->userId)) {
+                $user = \FWUser::getFWUserObject()->objUser->getUser($this->userId);
+                if (!empty($user)) {
+                    $arrSubscribedNewsletterListIDs = $user->getSubscribedNewsletterListIDs();
+                }
+            }
+
             $arrNewsletterLists = \Cx\Modules\Newsletter\Controller\NewsletterLib::getLists();
 
             if (!count($arrNewsletterLists)) {
@@ -1406,7 +1469,7 @@ class BackendController extends
             if (
                 \Cx\Core\Core\Controller\Cx::instanciate()->getMode() ==
                 \Cx\Core\Core\Controller\Cx::MODE_BACKEND &&
-                !empty($user->getId())
+                !empty($this->userId)
             ) {
                 // load additional newsletter data
                 $query = '
@@ -1417,7 +1480,7 @@ class BackendController extends
                     FROM
                         `' . DBPREFIX . 'module_newsletter_access_user`
                     WHERE
-                        `accessUserID` = ' . $user->getId() . '
+                        `accessUserID` = ' . $this->userId . '
                 ';
                 $consentResult = $objDatabase->Execute($query);
                 while (!$consentResult->EOF) {
@@ -1475,5 +1538,35 @@ class BackendController extends
         }
 
         return $options;
+    }
+
+    protected function getOverlay($fieldname, $fieldtype, $fieldlength, $fieldvalue, $fieldoptions)
+    {
+        $wrapper = new \Cx\Core\Html\Model\Entity\HtmlElement('div');
+        $subTitle = new \Cx\Core\Html\Model\Entity\HtmlElement('div');
+        $checkWrapper = new \Cx\Core\Html\Model\Entity\HtmlElement('div');
+        $checkFrontend = new \Cx\Core\Html\Model\Entity\DataElement(
+            'form-0-select-type',
+            'frontend'
+        );
+        $labelFrontend = new \Cx\Core\Html\Model\Entity\HtmlElement('label');
+        $labelBackend = new \Cx\Core\Html\Model\Entity\HtmlElement('label');
+        $textFrontend = new \Cx\Core\Html\Model\Entity\TextElement('Webseite (frontend)');
+        $textBackend = new \Cx\Core\Html\Model\Entity\TextElement('Webseite (backend)');
+
+        $checkBackend = new \Cx\Core\Html\Model\Entity\DataElement(
+            'form-0-select-type',
+            'backend'
+        );
+
+        $checkFrontend->setAttribute('type', 'checkbox');
+        $checkBackend->setAttribute('type', 'checkbox');
+
+        $wrapper->addChildren(array($subTitle, $checkWrapper));
+        $checkWrapper->addChildren(array($checkFrontend, $labelFrontend, $checkBackend, $labelBackend));
+        $labelFrontend->addChild($textFrontend);
+        $labelBackend->addChild($textBackend);
+        $wrapper->setClass('visible');
+        return $wrapper;
     }
 }

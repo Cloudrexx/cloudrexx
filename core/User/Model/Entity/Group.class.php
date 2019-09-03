@@ -31,7 +31,7 @@
  * @copyright   CLOUDREXX CMS - Cloudrexx AG Thun
  * @author      Dario Graf <info@cloudrexx.com>
  * @package     cloudrexx
- * @subpackage  module_user
+ * @subpackage  core_user
  * @version     5.0.0
  */
 namespace Cx\Core\User\Model\Entity;
@@ -42,7 +42,7 @@ namespace Cx\Core\User\Model\Entity;
  * @copyright   CLOUDREXX CMS - Cloudrexx AG Thun
  * @author      Dario Graf <info@cloudrexx.com>
  * @package     cloudrexx
- * @subpackage  module_user
+ * @subpackage  core_user
  * @version     5.0.0
  */
 class Group extends \Cx\Model\Base\EntityBase {
@@ -239,8 +239,6 @@ class Group extends \Cx\Model\Base\EntityBase {
     public function addUser(\Cx\Core\User\Model\Entity\User $user)
     {
         $this->user[] = $user;
-
-        return $this;
     }
 
     /**

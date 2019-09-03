@@ -177,11 +177,6 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             $entityClass,
             $userListener
         );
-        $this->cx->getEvents()->addModelListener(
-            \Doctrine\ORM\Events::prePersist,
-            $entityClass,
-            $userListener
-        );
     }
 
 }

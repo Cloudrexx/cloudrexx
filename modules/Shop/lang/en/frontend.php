@@ -458,7 +458,7 @@ $_ARRAYLANG['TXT_SHOP_MINIMUM_ORDER_QUANTITY'] = "Minimum order quantity";
 $_ARRAYLANG['TXT_SHOP_MINIMUM_ORDER_QUANTITY_ERROR'] = "Die Bestellmenge entspricht nicht der Mindestbestellmenge.";
 $_ARRAYLANG['TXT_SHOP_MANUFACTURER'] = "Hersteller";
 $_ARRAYLANG['TXT_SHOP_ACCOUNT_REGISTER_NOW'] = "Jetzt registrieren";
-$_ARRAYLANG['TXT_SHOP_PRICE_ONLY'] = "nur";
+$_ARRAYLANG['TXT_SHOP_PRICE_ONLY'] = "just";
 // Mengenrabatte: ab 1 rez: 1.00%, ab 2 rez: 2.00%, ab 3 rez: 3.00%, ab 4 rez: 4.00%
 $_ARRAYLANG['TXT_SHOP_DISCOUNT_COUNT_LIST_FORMAT'] = "
 <h3 class=\"discount_count_title\">Mengenrabatte</h3>

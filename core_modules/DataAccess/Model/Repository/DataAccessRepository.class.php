@@ -54,9 +54,10 @@ class DataAccessRepository extends EntityRepository {
      * @param \Cx\Core\DataSource\Model\Entity\DataSource $dataSource Requested data source
      * @param string $method Request method (get, post, ...)
      * @param string $requestApiKey API key used in request
+     * @param array $arguments List of arguments to the current request
      * @return \Cx\Core_Modules\DataAccess\Model\Entity\DataAccess Matching DataAccess object or null
      */
-    public function getAccess($outputModule, $dataSource, $method, $requestApiKey) {
+    public function getAccess($outputModule, $dataSource, $method, $requestApiKey, $arguments) {
         $requestReadonly = in_array($method, array('options', 'head', 'get'));
 
         // do we have a DataAccess for this DataSource?
@@ -107,7 +108,7 @@ class DataAccessRepository extends EntityRepository {
             } else {
                 $permission = $dataAccess->getWritePermission();
             }
-            if (!$permission || $permission->hasAccess()) {
+            if (!$permission || $permission->hasAccess($arguments)) {
                 return $dataAccess;
             }
         }
@@ -119,9 +120,10 @@ class DataAccessRepository extends EntityRepository {
      * Returns the HTTP method names you're allowed to use for this DataSource with this API key
      * @param \Cx\Core\DataSource\Model\Entity\DataSource $dataSource Requested DataSource
      * @param string $requestApiKey API key of the request
+     * @param array $arguments List of arguments to the current request
      * @return array List of HTTP methods
      */
-    public function getAllowedMethods($dataSource, $requestApiKey) {
+    public function getAllowedMethods($dataSource, $requestApiKey, $arguments) {
         $baseMethods = array('OPTIONS');
         $readMethods = array('HEAD', 'GET');
         $writeMethods = array('PUT', 'PATCH', 'POST', 'DELETE');
@@ -140,7 +142,7 @@ class DataAccessRepository extends EntityRepository {
 
                 if (
                     !$dataAccess->getReadPermission() ||
-                    $dataAccess->getReadPermission()->hasAccess()
+                    $dataAccess->getReadPermission()->hasAccess($arguments)
                 ) {
                     $canRead = true;
                 }
@@ -149,7 +151,7 @@ class DataAccessRepository extends EntityRepository {
                     !$apiKey->getReadOnly() &&
                     (
                         !$dataAccess->getWritePermission() ||
-                        $dataAccess->getWritePermission()->hasAccess()
+                        $dataAccess->getWritePermission()->hasAccess($arguments)
                     )
                 ) {
                     $canWrite = true;

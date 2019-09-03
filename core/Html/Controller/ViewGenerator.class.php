@@ -103,7 +103,9 @@ class ViewGenerator {
         $this->componentOptions = $options;
         $this->viewId = static::$increment++;
         try {
-            \JS::registerCSS($this->cx->getCoreFolderName() . '/Html/View/Style/Backend.css');
+            \JS::registerCSS(
+                $this->cx->getCoreFolderName() . '/Html/View/Style/Backend.css'
+            );
             $entityWithNS = preg_replace(
                 '/^\\\/',
                 '',
@@ -255,7 +257,12 @@ class ViewGenerator {
             $entityClassName,
             $entityClassName
         );
-        $this->object = $this->listingController->getData();
+        try {
+            $this->object = $this->listingController->getData();
+        } catch (\Doctrine\ORM\Query\QueryException $e) {
+            $this->object = new \Cx\Core_Modules\Listing\Model\Entity\DataSet();
+            throw $e;
+        }
         return $this->object->getDataType();
     }
 
@@ -2226,6 +2233,44 @@ class ViewGenerator {
             static::appendVgParam($url, $vgId, 'order', $field . '=' . $order);
         }
         return $url;
+    }
+
+    /**
+     * Calls the given callback with the given arguments
+     *
+     * If the callback is a JsonAdapter, $info must have the indexes "adapter"
+     * and "method" set.
+     * @param array $info Callable or JsonAdapter
+     * @param array $arguments Associative array of arguments
+     * @param boolean $throwIfNoCallback If set to true, throws an exception on error
+     * @throws ViewGeneratorException If $throwIfNoCallback is true and an error happens
+     */
+    public static function callCallbackByInfo($info, $arguments, $throwIfNoCallback = false) {
+        if (
+            is_array($info) &&
+            isset($info['adapter']) &&
+            isset($info['method'])
+        ) {
+            $json = new \Cx\Core\Json\JsonData();
+            $jsonResult = $json->data(
+                $info['adapter'],
+                $info['method'],
+                $arguments
+            );
+            if ($jsonResult['status'] == 'success') {
+                $data = $jsonResult['data'];
+            } else {
+                if ($jsonResult['status'] == 'error' && !empty($jsonResult['message'])) {
+                    throw new \Cx\Core\Error\Model\Entity\ShinyException($jsonResult['message']);
+                }
+                throw new ViewGeneratorException($jsonResult['message']);
+            }
+        } else if (is_callable($info)) {
+            $data = call_user_func_array($info, $arguments);
+        } else if ($throwIfNoCallback) {
+            throw new ViewGeneratorException('Given argument is not a valid callback');
+        }
+        return $data;
     }
 
     /**

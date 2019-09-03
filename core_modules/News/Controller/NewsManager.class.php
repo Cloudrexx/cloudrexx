@@ -321,10 +321,6 @@ class NewsManager extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                 $this->rss();
                 break;
 
-            case 'access_user':
-                $this->access_user();
-                break;
-
             default:
                 (intval($this->arrSettings['news_settings_activated'])==0) ? $this->settings() : $this->overview();
                 break;
@@ -562,7 +558,11 @@ class NewsManager extends \Cx\Core_Modules\News\Controller\NewsLibrary {
             }
 
             if ($count>intval($_CONFIG['corePagingLimit'])) {
-                $paging = getPaging($count, $pos, '&cmd=News&show=archive&monthFilter=' . contrexx_input2xhtml($_GET['monthFilter']), $_ARRAYLANG['TXT_NEWS_MESSAGES'],true);
+                $baseUrl = '&cmd=News&show=archive&monthFilter=' . contrexx_input2xhtml($_GET['monthFilter']);
+                if (!empty($_GET['categoryFilter'])) {
+                    $baseUrl .= '&categoryFilter=' . contrexx_input2xhtml($_GET['categoryFilter']);
+                }
+                $paging = getPaging($count, $pos, $baseUrl, $_ARRAYLANG['TXT_NEWS_MESSAGES'],true);
             }
             $objResult = $objDatabase->SelectLimit($query, $_CONFIG['corePagingLimit'], $pos);
 
@@ -4893,41 +4893,6 @@ class NewsManager extends \Cx\Core_Modules\News\Controller\NewsLibrary {
             'NEWS_TEASER_TITLE_TXT'             => $teaserFrameId != 0 ? $_ARRAYLANG['TXT_EDIT_TEASER_BOX'] : $_ARRAYLANG['TXT_ADD_TEASER_BOX']
         ));
         $this->_objTpl->parse('news_teasers_block');
-    }
-
-    function access_user()
-    {
-        $objFWUser = \FWUser::getFWUserObject();
-        $searchTerm = contrexx_input2raw($_GET['term']);
-        $userType = contrexx_input2raw($_GET['type']);
-        $userGroups = 0;
-
-        if ($userType == 'newsAuthorName') {
-            $userGroups = $this->arrSettings['news_assigned_author_groups'];
-        } elseif ($userType == 'newsPublisherName') {
-            $userGroups = $this->arrSettings['news_assigned_publisher_groups'];
-        }
-
-        $filter = ($userGroups) ? array('group_id' => explode(',', $userGroups)) : '';
-        $objUser = $objFWUser->objUser->getUsers($filter, $searchTerm, null, array());
-
-        $i = 0;
-        $userAttr = array();
-        while($objUser && !$objUser->EOF) {
-            $userName      = $objUser->getUsername();
-            $userId        = $objUser->getId();
-
-            if ($userName) {
-                $userAttr[$i] = array();
-                $userAttr[$i]['id']    = $userId;
-                $userAttr[$i]['label'] = \FWUser::getParsedUserTitle($userId, '', true);
-                $userAttr[$i]['value'] = \FWUser::getParsedUserTitle($userId);
-                $i++;
-            }
-            $objUser->next();
-        }
-        echo json_encode($userAttr);
-        exit();
     }
 
     /**

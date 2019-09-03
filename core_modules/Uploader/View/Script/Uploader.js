@@ -52,7 +52,12 @@
             if (iAttrs.uploaderType == 'Inline'){
                 jQuery('.close-upload-modal').hide();
             }
-
+            if (!iAttrs.thumbMaxWidth) {
+                jQuery(this).data('thumbMaxWidth', 120);
+            }
+            if (!iAttrs.thumbMaxHeight) {
+                jQuery(this).data('thumbMaxHeight', 120);
+            }
             $J('#uploader-modal-' + iAttrs.uploaderId).find(' .drop-target').attr('id', 'drop-target-' + iAttrs.id);
             $J('#uploader-modal-' + iAttrs.uploaderId).find('.upload-limit-tooltip .btn').attr('id', 'drop-target-btn-' + iAttrs.id);
 
@@ -163,12 +168,20 @@
                 uploader.start();
             });
 
+            const jButton = jQuery(this);
             $J(this).bind('click', function () {
                 $J('#uploader-modal-' + iAttrs.uploaderId).modal({
                     backdrop: 'static',
                     keyboard: false
                 });
                 $J('#uploader-modal-' + iAttrs.uploaderId).modal('show');
+                const selector = jButton.data('thumbSelector');
+                if (selector) {
+                    const jImage = jQuery(selector);
+                    if (jImage.length) {
+                        jButton.data('imageThumbTarget', jImage);
+                    }
+                }
             });
             $J(this).removeAttr('disabled');
 
@@ -279,9 +292,19 @@
 
                     var image = $J(new Image()).appendTo('.file-' + file.id + ' .previewImage');
                     var preloader = new mOxie.Image();
-                    preloader.onload = function () {
-                        preloader.downsize(120, 120);
-                        image.attr("src", preloader.getAsDataURL());
+                    preloader.onload = function() {
+                        preloader.downsize(
+                            iAttrs.thumbMaxWidth, iAttrs.thumbMaxHeight
+                        );
+                        let src = preloader.getAsDataURL();
+                        image.attr('src', src);
+                        let jImage = jButton.data('imageThumbTarget');
+                        if (jImage && jImage.length === 1
+                            && up.settings.max_file_count === 1
+                        ) {
+                            jImage.attr('src', src)
+                              .css({width: null, height: null});
+                        }
                     };
                     preloader.load(file.getSource());
 

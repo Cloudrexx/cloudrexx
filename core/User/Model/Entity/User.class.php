@@ -31,10 +31,131 @@
  * @copyright   CLOUDREXX CMS - Cloudrexx AG Thun
  * @author      Dario Graf <info@cloudrexx.com>
  * @package     cloudrexx
- * @subpackage  module_user
+ * @subpackage  core_user
  * @version     5.0.0
  */
 namespace Cx\Core\User\Model\Entity;
+
+class UserValidateEmail extends \CxValidate
+{
+    protected $userId;
+
+    public function __construct($userId, $constraints = array())
+    {
+        $this->userId = $userId;
+        parent::__construct($constraints);
+    }
+
+    /**
+     * Checks if the given mail address is valid and unique
+     * @param string $mail Mail address to check
+     *
+     * @return boolean if email is valid
+     */
+    public function isValid($mail)
+    {
+        global $_CORELANG;
+
+        $this->passesValidation = true;
+
+        if (!\FWValidator::isEmail($mail)) {
+            $this->messages[] = $_CORELANG['TXT_ACCESS_INVALID_EMAIL_ADDRESS'];
+            $this->passesValidation = false;
+        }
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $qb = $em->createQueryBuilder();
+        $qb->select('u')
+           ->from('Cx\Core\User\Model\Entity\User', 'u')
+           ->where($qb->expr()->eq('u.email', ':email'));
+        if (!empty($this->userId)) {
+            $qb->andWhere($qb->expr()->not($qb->expr()->eq('u.id', ':id')));
+            $qb->setParameter('id', $this->userId);
+        }
+        $qb->setParameter('email', $mail);
+        $existingEntity = $qb->getQuery()->getResult();
+
+        if (!empty($existingEntity)) {
+            $this->messages[] = $_CORELANG['TXT_ACCESS_EMAIL_ALREADY_USED'];
+            $this->passesValidation = false;
+        }
+        return $this->passesValidation;
+    }
+}
+
+class UserValidateUsername extends \CxValidate
+{
+    protected $userId;
+
+    public function __construct($userId, $constraints = array())
+    {
+        $this->userId = $userId;
+        parent::__construct($constraints);
+    }
+
+    /**
+     * Checks if the given username is valid and unique
+     * @param string $username username to check
+     *
+     * @return boolean if email is valid
+     */
+    public function isValid($username)
+    {
+        global $_CORELANG;
+
+        $this->passesValidation = true;
+
+        if (empty($username)) {
+            return $this->passesValidation;
+        }
+
+        if (!$this->isValidUsername($username)) {
+            $this->messages[] = $_CORELANG['TXT_ACCESS_INVALID_USERNAME'];
+            $this->passesValidation = false;
+        }
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $qb = $em->createQueryBuilder();
+        $qb->select('u')
+            ->from('Cx\Core\User\Model\Entity\User', 'u')
+            ->where($qb->expr()->eq('u.username', ':username'));
+        if (!empty($this->userId)) {
+            $qb->andWhere($qb->expr()->not($qb->expr()->eq('u.id', ':id')));
+            $qb->setParameter('id', $this->userId);
+        }
+        $qb->setParameter('username', $username);
+        $existingEntity = $qb->getQuery()->getResult();
+
+        if (!empty($existingEntity)) {
+            $this->messages[] = $_CORELANG['TXT_ACCESS_USERNAME_ALREADY_USED'];
+            $this->passesValidation = false;
+        }
+
+        return $this->passesValidation;
+    }
+
+
+    /**
+     * Returns true if the given $username is valid
+     * @param string $username
+     * @return boolean if username is valid
+     */
+    protected function isValidUsername($username)
+    {
+        if (preg_match('/^[a-zA-Z0-9-_]*$/', $username)) {
+            return true;
+        }
+        // For version 2.3, inspired by migrating Shop Customers to Users:
+        // In addition to the above, also accept usernames that look like valid
+        // e-mail addresses
+        if (\FWValidator::isEmail($username)) {
+            return true;
+        }
+        return false;
+    }
+}
 
 /**
  * Users can be created and managed.
@@ -42,7 +163,7 @@ namespace Cx\Core\User\Model\Entity;
  * @copyright   CLOUDREXX CMS - Cloudrexx AG Thun
  * @author      Dario Graf <info@cloudrexx.com>
  * @package     cloudrexx
- * @subpackage  module_user
+ * @subpackage  core_user
  * @version     5.0.0
  */
 class User extends \Cx\Model\Base\EntityBase {
@@ -167,7 +288,7 @@ class User extends \Cx\Model\Base\EntityBase {
     protected $group;
 
     /**
-     * @var \Cx\Core\User\Model\Entity\UserAttributeValue
+     * @var \Doctrine\Common\Collections\Collection
      */
     protected $userAttributeValue;
 
@@ -177,6 +298,14 @@ class User extends \Cx\Model\Base\EntityBase {
     public function __construct()
     {
         $this->group = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->userAttributeValue = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    public function initializeValidators()
+    {
+        $this->validators['username'] = new \Cx\Core\User\Model\Entity\UserValidateUsername($this->getId());
+        $this->validators['email'] = new \Cx\Core\User\Model\Entity\UserValidateEmail($this->getId());
+        $this->validators['password'] = new \CxValidateRegexp(array('pattern' => '/.+/'), false);
     }
 
     /**
@@ -232,18 +361,21 @@ class User extends \Cx\Model\Base\EntityBase {
     }
 
     /**
-     * Set password
+     * Set plaintext (/unhashed) password
      *
      * @param string $password
-     * @return User
      */
     public function setPassword($password)
     {
-        $this->password = $password;
+        if (empty($password)) {
+            return;
+        }
+        $this->checkPasswordValidity($password);
+        $this->password = $this->hashPassword($password);
     }
 
     /**
-     * Get password
+     * Get hashed password
      *
      * @return string 
      */
@@ -424,7 +556,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set email
      *
      * @param string $email
-     * @return User
      */
     public function setEmail($email)
     {
@@ -594,9 +725,11 @@ class User extends \Cx\Model\Base\EntityBase {
      * @param string $restoreKey
      * @return User
      */
-    public function setRestoreKey($restoreKey)
+    public function setRestoreKey($restoreKey = null)
     {
-        $this->restoreKey = $restoreKey;
+        $this->restoreKey = !empty($restoreKey)
+                            ? $restoreKey
+                            : md5($this->email . $this->regdate . time());
     }
 
     /**
@@ -707,10 +840,161 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get userAttributeValue
      *
-     * @return \Cx\Core\User\Model\Entity\UserAttributeValue
+     * @return \Doctrine\Common\Collections\Collection
      */
     public function getUserAttributeValue()
     {
         return $this->userAttributeValue;
+    }
+
+    /**
+     * Return the first- and lastname if they are defined. If this is not the
+     * case, check if a username exists. If this also does not exist, the
+     * e-mail address will be returned.
+     *
+     * @return string firstname & lastname, username or email
+     */
+    public function isBackendGroupUser()
+    {
+        if (!$this->group) {
+            return false;
+        }
+
+        foreach ($this->group as $group) {
+            if ($group->getType() === 'backend') {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Returns true if the given $password is valid
+     * @param   string    $password
+     * @return  boolean
+     */
+    protected function checkPasswordValidity($password)
+    {
+        global $_CONFIG, $_CORELANG;
+
+        if (strlen($password) < 6) {
+            throw new \Cx\Core\Error\Model\Entity\ShinyException(
+                $_CORELANG['TXT_ACCESS_INVALID_PASSWORD']
+            );
+        }
+        if (
+            isset($_CONFIG['passwordComplexity']) &&
+            $_CONFIG['passwordComplexity'] == 'on'
+        ) {
+            // Password must contain the following characters: upper, lower
+            // case and numbers
+            if (
+                !preg_match('/[A-Z]+/', $password) ||
+                !preg_match('/[a-z]+/', $password) ||
+                !preg_match('/[0-9]+/', $password)
+            ) {
+                throw new \Cx\Core\Error\Model\Entity\ShinyException(
+                    $_CORELANG['TXT_ACCESS_INVALID_PASSWORD_WITH_COMPLEXITY']
+                );
+            }
+        }
+    }
+
+    /**
+     * Generate hash of password with default hash algorithm
+     *
+     * @param string $password Password to be hashed
+     *
+     * @return string The generated hash of the supplied password
+     * @throws  \Cx\Core\Error\Model\Entity\ShinyException In case the password
+     *                                                    hash generation fails
+     */
+    protected function hashPassword($password)
+    {
+        $hash = password_hash($password, \PASSWORD_BCRYPT);
+        if ($hash !== false) {
+            return $hash;
+        }
+
+        throw new \Cx\Core\Error\Model\Entity\ShinyException(
+            'Failed to generate a new password hash'
+        );
+    }
+
+    /**
+     * Return the first- and lastname if they are defined. If this is not the
+     * case, check if a username exists. If this also does not exist, the
+     * e-mail address will be returned.
+     *
+     * @return string firstname & lastname, username or email
+     */
+    public function __toString()
+    {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $userName = '';
+
+        // values which we would like to get
+        $profileAttrs = array(
+            'lastname' => '',
+            'firstname' => ''
+        );
+
+        $attrNameRepo = $em->getRepository(
+            'Cx\Core\User\Model\Entity\UserAttributeName'
+        );
+
+        foreach ($profileAttrs as $name => $value) {
+            $selectedAttrName = $attrNameRepo->findOneBy(
+                array('name' => $name)
+            );
+
+            $userAttrValues = array();
+            if (!empty($this->getUserAttributeValue())) {
+                $userAttrValues = $this->getUserAttributeValue();
+            }
+
+            if (is_array($userAttrValues)) {
+                // must be converted, since $userAttrValues is an array
+                $collection = new \Doctrine\Common\Collections\ArrayCollection(
+                    $userAttrValues
+                );
+            } else {
+                $collection = $userAttrValues;
+            }
+
+
+            if (!empty($selectedAttrName)) {
+                $attrId = $selectedAttrName->getAttributeId();
+                $selectedAttrValue = $collection->filter(
+                    function($attrValue) use ($attrId) {
+                        if ($attrId == $attrValue->getAttributeId()) {
+                            return $attrValue;
+                        }
+                    }
+                )->first();
+
+                if (!empty($value)) {
+                    $profileAttrs[$name] = $selectedAttrValue->getValue();
+                }
+            }
+        }
+
+        if (
+            !empty($profileAttrs['firstname']) ||
+            !empty($profileAttrs['lastname'])
+        ) {
+            $userName = trim(
+                $profileAttrs['firstname'].' '. $profileAttrs['lastname']
+            );
+        } else if (!empty($this->getUsername())) {
+            $userName = $this->getUsername();
+        } else if (!empty($this->getEmail())) {
+            $userName = $this->getEmail();
+        } else {
+            $userName = parent::__toString();
+        }
+
+        return $userName;
     }
 }

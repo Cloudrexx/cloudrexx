@@ -139,7 +139,6 @@ $_ARRAYLANG['TXT_PAGING_OUT_OF'] = "sur";
 $_ARRAYLANG['TXT_PAGING_TO'] = "à";
 $_ARRAYLANG['TXT_FIRST_NAME'] = "Prénom";
 $_ARRAYLANG['TXT_PASSWORD_FIELD_EMPTY'] = "Si un mot de passe n'est pas saisi, le mot de passe actuel sera conservé! ";
-$_ARRAYLANG['TXT_PASSWORD_MD5_ENCRYPTED'] = "Le mot de passe est chiffré avec l'algoritme MD5.";
 $_ARRAYLANG['TXT_VALUE'] = "Valeur";
 $_ARRAYLANG['TXT_SIZE'] = "Taille du fichier";
 $_ARRAYLANG['TXT_DATABASE_QUERY_ERROR'] = "Erreur lors de la requête à la base de données!";

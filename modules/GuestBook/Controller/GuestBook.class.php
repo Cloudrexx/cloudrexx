@@ -302,7 +302,7 @@ class GuestBook extends GuestBookLibrary {
         $objDatabase->Execute($query);
 
         if ($this->arrSettings['guestbook_send_notification_email'] == 1) {
-            $this->sendNotificationEmail($forename, $name, $comment, $mail);
+            $this->sendNotificationEmail($forename, $name, $comment);
         }
         $this->statusMessage = $_ARRAYLANG['TXT_GUESTBOOK_RECORD_STORED_SUCCESSFUL'] . "<br />";
         if ($this->arrSettings['guestbook_activate_submitted_entries'] == 0) {
@@ -377,7 +377,7 @@ class GuestBook extends GuestBookLibrary {
      * @return void
      * @desc Sends a notification email to the administrator
      */
-    function sendNotificationEmail($forename, $name, $comment, $email = null) {
+    function sendNotificationEmail($forename, $name, $comment) {
         global $_ARRAYLANG, $_CONFIG;
 
         $message = $_ARRAYLANG['TXT_CHECK_GUESTBOOK_ENTRY'] . "\n\n";
@@ -387,7 +387,7 @@ class GuestBook extends GuestBookLibrary {
 
         $objMail = new \Cx\Core\MailTemplate\Model\Entity\Mail();
 
-        $from = isset($email) ? $email : $mailto;
+        $from = $mailto;
         $objMail->SetFrom($from);
         $objMail->Subject = $subject;
         $objMail->IsHTML(false);

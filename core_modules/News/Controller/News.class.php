@@ -335,7 +335,7 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
         if (!empty($url2)) {
             $newsUrl .= $this->getNewsLink($url2).'<br />';
         }
-        $objTpl->setVariable(
+        $this->_objTpl->setVariable(
             'NEWS_URL',
             $newsUrl
         );
@@ -347,47 +347,47 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
             $newsSourceLink = $this->getNewsLink($source);
             $newsSource = $_ARRAYLANG['TXT_NEWS_SOURCE'] . '<br />'. $newsSourceLink . '<br />';
         }
-        $objTpl->setVariable(array(
+        $this->_objTpl->setVariable(array(
             'TXT_NEWS_SOURCE' => $_ARRAYLANG['TXT_NEWS_SOURCE'],
             'NEWS_SOURCE'     => $newsSource,
             'NEWS_SOURCE_LINK'=> $newsSourceLink,
             'NEWS_SOURCE_SRC' => $source,
         ));
-        if ($objTpl->blockExists('news_source')) {
+        if ($this->_objTpl->blockExists('news_source')) {
             if (empty($source)) {
-                $objTpl->hideBlock('news_source');
+                $this->_objTpl->hideBlock('news_source');
             } else {
-                $objTpl->touchBlock('news_source');
+                $this->_objTpl->touchBlock('news_source');
             }
         }
 
         // parse external link 1
-        $objTpl->setVariable(array(
+        $this->_objTpl->setVariable(array(
             'TXT_NEWS_LINK1' =>
                 $_ARRAYLANG['TXT_NEWS_LINK1'],
             'NEWS_LINK1_SRC' =>
-                contrexx_raw2encodedUrl($url1),
+                $url1,
         ));
-        if ($objTpl->blockExists('news_link1')) {
+        if ($this->_objTpl->blockExists('news_link1')) {
             if (empty($url1)) {
-                $objTpl->hideBlock('news_link1');
+                $this->_objTpl->hideBlock('news_link1');
             } else {
-                $objTpl->touchBlock('news_link1');
+                $this->_objTpl->touchBlock('news_link1');
             }
         }
 
         // parse external link 2
-        $objTpl->setVariable(array(
+        $this->_objTpl->setVariable(array(
             'TXT_NEWS_LINK2' =>
                 $_ARRAYLANG['TXT_NEWS_LINK2'],
             'NEWS_LINK2_SRC' =>
-                contrexx_raw2encodedUrl($url2)
+                $url2,
         ));
-        if ($objTpl->blockExists('news_link2')) {
+        if ($this->_objTpl->blockExists('news_link2')) {
             if (empty($url2)) {
-                $objTpl->hideBlock('news_link2');
+                $this->_objTpl->hideBlock('news_link2');
             } else {
-                $objTpl->touchBlock('news_link2');
+                $this->_objTpl->touchBlock('news_link2');
             }
         }
 
