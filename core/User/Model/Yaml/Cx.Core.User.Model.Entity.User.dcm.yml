@@ -140,6 +140,13 @@ Cx\Core\User\Model\Entity\User:
       column: u2u_active
       options:
         default: "1"
+    lastUpdate:
+      type: datetime
+      column: last_update
+      gedmo:
+        timestampable:
+          on: change
+          field: [ isAdmin, username, password, expiration, validity, email, emailAccess, frontendLangId, backendLangId, active, verified, primaryGroup, profileAccess, u2uActive ]
   indexes:
     username:
       columns: [username]

@@ -283,6 +283,11 @@ class User extends \Cx\Model\Base\EntityBase {
     protected $u2uActive = '1';
 
     /**
+     * @var \DateTime Date the user or its profile was last updated
+     */
+    protected $lastUpdate;
+
+    /**
      * @var \Doctrine\Common\Collections\Collection
      */
     protected $group;
@@ -782,6 +787,26 @@ class User extends \Cx\Model\Base\EntityBase {
     public function getU2uActive()
     {
         return $this->u2uActive;
+    }
+
+    /**
+     * Set lastUpdate
+     *
+     * @param \DateTime $lastUpdate Date the user or its profile was last updated
+     */
+    public function setLastUpdate($lastUpdate)
+    {
+        $this->lastUpdate = $lastUpdate;
+    }
+
+    /**
+     * Get lastUpdate
+     *
+     * @return \DateTime Date the user or its profile was last updated
+     */
+    public function getLastUpdate()
+    {
+        return $this->lastUpdate;
     }
 
     /**

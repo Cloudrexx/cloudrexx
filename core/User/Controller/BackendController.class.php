@@ -461,7 +461,11 @@ class BackendController extends
                                 $validValues
                             );
                         }
-                    )
+                    ),
+                    'lastUpdate' => array(
+                        'showOverview' => false,
+                        'showDetail' => false,
+                    ),
                 );
 
                 $options = $this->appendUserAttributes($options);
