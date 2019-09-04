@@ -141,18 +141,27 @@ class MediaDirectoryEntry extends MediaDirectoryInputfield
      * @param   boolean         $associated         If true, load all Entries
      *                                              associated with Entry ID
      *                                              $intEntryId
+     * @param   boolean         $searchByZip        If true, a lookup will be
+     *                                              performed by matching
+     *                                              $strSearchTerm against
+     *                                              the inputfield that has
+     *                                              the context 'zip' set.
      */
     function getEntries($intEntryId = null, $intLevelId = null,
         $intCatId = null, $strSearchTerm = null, $bolLatest = null,
         $bolUnconfirmed = null, $bolActive = null, $intLimitStart = null,
         $intLimitEnd = 'n', $intUserId = null, $bolPopular = null,
         $intCmdFormId = null, $bolReadyToConfirm = null, $intLimit = 0,
-        $intOffset = 0, $associated = false)
+        $intOffset = 0, $associated = false, $searchByZip = false)
     {
         global $_ARRAYLANG, $_CORELANG, $objDatabase, $objInit;
 
         $this->intEntryId = intval($intEntryId);
-        $this->intLevelId = intval($intLevelId);
+        if ($this->arrSettings['settingsShowLevels']) {
+            $this->intLevelId = intval($intLevelId);
+        } else {
+            $this->intLevelId = 0;
+        }
         $this->intCatId = intval($intCatId);
         $this->bolLatest = intval($bolLatest);
         $this->bolUnconfirmed = intval($bolUnconfirmed);
@@ -273,7 +282,14 @@ class MediaDirectoryEntry extends MediaDirectoryInputfield
         if(empty($this->strSearchTerm)) {
             $strWhereFirstInputfield = "AND (rel_inputfield.`form_id` = entry.`form_id`) AND (rel_inputfield.`field_id` = (".$this->getQueryToFindPrimaryInputFieldId().")) AND (rel_inputfield.`lang_id` = '".$langId."')";
         } else {
-            $strWhereTerm = "AND ((rel_inputfield.`value` LIKE '%".$this->strSearchTerm."%') OR (entry.`id` = '".$this->strSearchTerm."')) ";
+            if ($searchByZip) {
+                $strWhereTerm = "AND (rel_inputfield.`form_id` = entry.`form_id`) ";
+                $strWhereTerm .="AND (rel_inputfield.`field_id` = (".$this->getQueryToFindInputFieldIdByContextType('zip').")) ";
+                $strWhereTerm .="AND (rel_inputfield.`lang_id` = '".$langId."') ";
+                $strWhereTerm .="AND (rel_inputfield.`value` REGEXP '(^|[^a-z0-9])".$this->strSearchTerm."([^a-z0-9]|$)')";
+            } else {
+                $strWhereTerm = "AND ((rel_inputfield.`value` LIKE '%".$this->strSearchTerm."%') OR (entry.`id` = '".$this->strSearchTerm."')) ";
+            }
             $strWhereFirstInputfield = '';
             $this->strBlockName = "";
         }
@@ -764,6 +780,8 @@ class MediaDirectoryEntry extends MediaDirectoryInputfield
 
                     foreach ($this->arrEntries as $key => $arrEntry) {
                         $strTitle = $arrEntry['entryFields'][0];
+                        $strTitle = $this->cx->getComponent('LanguageManager')
+                            ->replaceInternationalCharacters($strTitle);
                         $strAlphaIndex = strtoupper(substr($strTitle, 0, 1));
 
                         if(!in_array($strAlphaIndex, $arrAlphaIndexes)){
@@ -786,7 +804,18 @@ class MediaDirectoryEntry extends MediaDirectoryInputfield
 
                         foreach ($arrAlphaIndexes as $key => $strIndex) {
                             if(array_key_exists($strIndex, $arrAlphaGroups)) {
-                                $strAlphaIndex = '<a href="#'.$strIndex.'">'.$strIndex.'</a>';
+                                switch ($strIndex) {
+                                    case '#':
+                                        $anchorId = '_';
+                                        break;
+                                    case '0-9':
+                                        $anchorId = '_09';
+                                        break;
+                                    default:
+                                        $anchorId = $strIndex;
+                                        break;
+                                }
+                                $strAlphaIndex = '<a href="#'.$anchorId.'">'.$strIndex.'</a>';
                             } else {
                                 $strAlphaIndex = ''.$strIndex.'';
                             }
@@ -799,12 +828,26 @@ class MediaDirectoryEntry extends MediaDirectoryInputfield
                         }
                     }
 
-
+                    // ensure alphabetical order of alpha-groups
+                    uksort($arrAlphaGroups, function($a, $b) use ($arrAlphaIndexes) {
+                        return array_search($a, $arrAlphaIndexes) > array_search($b, $arrAlphaIndexes);
+                    });
 
                     foreach ($arrAlphaGroups as $strAlphaIndex => $arrEntries) {
                         if ($objTpl->blockExists($this->moduleNameLC.'AlphabeticalTitle')) {
+                            switch ($strAlphaIndex) {
+                                case '#':
+                                    $anchorId = '_';
+                                    break;
+                                case '0-9':
+                                    $anchorId = '_09';
+                                    break;
+                                default:
+                                    $anchorId = $strAlphaIndex;
+                                    break;
+                            }
                             $objTpl->setVariable(array(
-                                $this->moduleLangVar.'_ALPHABETICAL_ANCHOR' => $strAlphaIndex,
+                                $this->moduleLangVar.'_ALPHABETICAL_ANCHOR' => $anchorId,
                                 'TXT_'.$this->moduleLangVar.'_ALPHABETICAL_TITLE' => $strAlphaIndex
                             ));
 
@@ -1224,6 +1267,13 @@ JSCODE;
         // create url to the target page and add the entry's ID as argument
         $url = \Cx\Core\Routing\Url::fromPage($page);
         $url->setParam('eid', $arrEntry['entryId']);
+
+        if (!empty($this->intCatId)) {
+            $url->setParam('cid', $this->intCatId);
+        }
+        if (!empty($this->intLevelId)) {
+            $url->setParam('lid', $this->intLevelId);
+        }
 
         // set optional paging position
         if ($pagingPos) {
@@ -1849,6 +1899,7 @@ JSCODE;
                 $objTpl->setVariable(array(
                     $this->moduleLangVar . '_ENTRY_' . $list . '_ID'        => $objCategoriesLevels->fields['elm_id'],
                     $this->moduleLangVar . '_ENTRY_' . $list . '_NAME'      => contrexx_raw2xhtml($objCategoriesLevels->fields['elm_name']),
+                    $this->moduleLangVar . '_ENTRY_' . $list . '_DESCRIPTION'=> $objCategoriesLevels->fields['elm_desc'],
                     $this->moduleLangVar . '_ENTRY_' . $list . '_LINK'      => '<a href="'.$this->getAutoSlugPath(null, $categoryId, $levelId, true).'">'.contrexx_raw2xhtml($objCategoriesLevels->fields['elm_name']).'</a>',
                     $this->moduleLangVar . '_ENTRY_' . $list . '_LINK_SRC'  => $this->getAutoSlugPath(null, $categoryId, $levelId, true),
                     $this->moduleLangVar . '_ENTRY_' . $list . '_PICTURE'   => '<img src="'.$picture.'" border="0" alt="'.contrexx_raw2xhtml($objCategoriesLevels->fields['elm_name']).'" />',
@@ -1900,7 +1951,8 @@ JSCODE;
         $query = "SELECT
             cat_rel.`category_id` AS `elm_id`,
             cat_image.`picture` AS `elm_picture`,
-            cat_name.`category_name` AS `elm_name`
+            cat_name.`category_name` AS `elm_name`,
+            cat_name.`category_description` AS `elm_desc`
           FROM
             ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_categories AS cat_rel
           INNER JOIN
@@ -1940,7 +1992,8 @@ JSCODE;
         $query = "SELECT
             level_rel.`level_id` AS `elm_id`,
             level_image.`picture` AS `elm_picture`,
-            level_name.`level_name` AS `elm_name`
+            level_name.`level_name` AS `elm_name`,
+            level_name.`level_description` AS `elm_desc`
           FROM
             ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_levels AS level_rel
           INNER JOIN
@@ -2039,11 +2092,11 @@ JSCODE;
     /**
      * Searches the content and returns an array that is built as needed by the search module.
      *
-     * @param string $searchTerm
+     * @param \Cx\Core_Modules\Search\Controller\Search $search
      *
      * @return array
      */
-    public function searchResultsForSearchModule($searchTerm)
+    public function searchResultsForSearchModule(\Cx\Core_Modules\Search\Controller\Search $search)
     {
         //get the config site values
         \Cx\Core\Setting\Controller\Setting::init('Config', 'site','Yaml');
@@ -2107,8 +2160,15 @@ JSCODE;
             return array();
         }
 
+        // check any set search options
+        $searchByZip = false;
+        $searchOptions = $search->getOptions();
+        if (!empty($searchOptions['zipLookup'])) {
+            $searchByZip = true;
+        }
+
         //get the media directory entry by the search term
-        $this->getEntries(null, null, null, $searchTerm, null, null, true);
+        $this->getEntries(null, null, null, $search->getTerm(), null, null, true, null, 'n', null, null, null, null, 0, 0, false, $searchByZip);
 
         //if no entries found then return empty result
         if (empty($this->arrEntries)) {

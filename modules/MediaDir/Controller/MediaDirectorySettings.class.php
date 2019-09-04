@@ -599,6 +599,10 @@ EOF;
 
         $objTpl->addBlockfile($this->moduleLangVar.'_SETTINGS_CONTENT', 'settings_content', 'module_'.$this->moduleNameLC.'_settings_entries.html');
 
+        $textElement = new \Cx\Core\Html\Model\Entity\TextElement($_ARRAYLANG['TXT_MEDIADIR_CMD']);
+        $italicElement = new \Cx\Core\Html\Model\Entity\HtmlElement('i');
+        $italicElement->addChild($textElement);
+
         $legacyBehaviorChanges = array(
             $_ARRAYLANG['TXT_MEDIADIR_LEGACY_BEHAVIOR_SEARCH_ON_CATEGORY_VIEW'],
             $_ARRAYLANG['TXT_MEDIADIR_LEGACY_BEHAVIOR_SEARCH_ALL_FORMS'],
@@ -607,6 +611,7 @@ EOF;
             $_ARRAYLANG['TXT_MEDIADIR_LEGACY_BEHAVIOR_NOT_LATEST'],
             $_ARRAYLANG['TXT_MEDIADIR_LEGACY_BEHAVIOR_LATEST_PARSING'],
             $_ARRAYLANG['TXT_MEDIADIR_LEGACY_BEHAVIOR_LATEST_HIDING'],
+            sprintf($_ARRAYLANG['TXT_MEDIADIR_LEGACY_BEHAVIOR_FORM_PAGE'], $italicElement),
         );
 
         $objTpl->setGlobalVariable(array(
@@ -1531,8 +1536,8 @@ EOF;
             $this->moduleLangVar.'_FORM_IMAGE_BROWSE' => $this->getMediaBrowserButton(
                 $_ARRAYLANG['TXT_BROWSE'],
                 array(
-                    'data-cx-mb-views' => 'filebrowser',
-                    'data-cx-mb-startmediatype' => $this->moduleNameLC,
+                    'views' => 'filebrowser',
+                    'startmediatype' => $this->moduleNameLC,
                     'type' => 'button',
                     'data-input-id' => 'formImage2'
                 ),

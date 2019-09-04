@@ -11,25 +11,27 @@ Cx\Core_Modules\Access\Model\Entity\Permission:
         allowedProtocols:
             type: array
             column: allowed_protocols
+            nullable: false
         allowedMethods:
             type: array
             column: allowed_methods
+            nullable: false
         requiresLogin:
             type: boolean
             column: requires_login
-            nullable: true
+            nullable: false
         validUserGroups:
             type: array
             column: valid_user_groups
-            nullable: true
+            nullable: false
         validAccessIds:
             type: array
             column: valid_access_ids
-            nullable: true
+            nullable: false
         callback:
             type: array
             column: callback
-            nullable: true
+            nullable: false
     oneToMany:
         readDataAccesses:
             targetEntity: Cx\Core_Modules\DataAccess\Model\Entity\DataAccess

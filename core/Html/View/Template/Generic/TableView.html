@@ -1,6 +1,6 @@
 <form method="get" id="vg-{VG_ID}-searchForm" data-vg-id="{VG_ID}"></form>
 <!-- BEGIN search -->
-<div>
+<div id="vg-{VG_ID}-filterSearch">
     <table class="adminlist" cellspacing="0" cellpadding="3" width="100%" border="0">
         <tbody>
             <tr>
@@ -47,6 +47,17 @@
     </table> 
 </div>
 <!-- END filter -->
+<!-- BEGIN filter-alphabetical -->
+<div id="vg-{VG_ID}-alphabeticalSearch">
+    <ul class="vg-alphabeticalSearch">
+        <!-- BEGIN letter -->
+        <li <!-- BEGIN selected -->class="selected"<!-- END selected -->>
+            <a href="{ALPHABETICAL_URL}">{LETTER}</a>
+        </li>
+        <!-- END letter -->
+    </ul>
+</div>
+<!-- END filter-alphabetical -->
 <!-- BEGIN no-entries -->
 <p class="vg-noresult">{TXT_NO_RESULT}</p>
 <!-- END no-entries -->

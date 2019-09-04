@@ -219,7 +219,7 @@ class JsonUser implements JsonAdapter {
             return array();
         }
         $resultFormat = '%title%';
-        if (isset($_GET['resultFormat'])) {
+        if (!empty($_GET['resultFormat'])) {
             $resultFormat = contrexx_input2raw($_GET['resultFormat']);
         }
         while (!$objUser->EOF) {

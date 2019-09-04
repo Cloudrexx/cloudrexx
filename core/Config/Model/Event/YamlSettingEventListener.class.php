@@ -89,8 +89,8 @@ class YamlSettingEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventL
                         if ($objMainDomain) {
                             $domainUrl = $objMainDomain->getName();
                             $protocol = 'http';
-                            if ($_CONFIG['forceProtocolFrontend'] != 'none') {
-                                $protocol = $_CONFIG['forceProtocolFrontend'];
+                            if ($_CONFIG['forceProtocolBackend'] != 'none') {
+                                $protocol = $_CONFIG['forceProtocolBackend'];
                             }
                             if (
                                 php_sapi_name() != 'cli' &&

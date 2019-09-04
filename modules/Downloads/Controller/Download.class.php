@@ -268,11 +268,20 @@ class Download {
 
     private $userId;
 
+    /**
+     * Local copy of the components config data
+     * @var array
+     */
+    protected $config = array();
 
-    public function __construct()
+    /**
+     * @param   array   $config Config data of DownloadsLibrary
+     */
+    public function __construct($config = array())
     {
         global $objInit;
 
+        $this->config = $config;
         $this->isFrontendMode = $objInit->mode == 'frontend';
 
         $objFWUser = \FWUser::getFWUserObject();
@@ -1300,7 +1309,14 @@ class Download {
         }
 
         $searchConditions = array();
-        foreach (array('name', 'description') as $fieldName) {
+        $fields = array('name', 'description');
+
+        // also lookup metakeys if the usage of meta-keys has been activated
+        if (!empty($this->config['use_attr_metakeys'])) {
+            $fields[] = 'metakeys';
+        }
+
+        foreach ($fields as $fieldName) {
             if (is_array($search)) {
                 $searchConditions[] = '`' . $fieldName . '` LIKE "%' . implode(
                     '%" OR `' . $fieldName . '` LIKE "%',

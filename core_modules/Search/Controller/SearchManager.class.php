@@ -135,7 +135,7 @@ class SearchManager
                 $paging = \Paging::get($parameter, '', $countPages, 0, true, null, 'pos');
 
                 $this->template->setVariable(array(
-                    'TXT_SEARCH_RESULTS_COMMENT' => sprintf($_ARRAYLANG['TXT_SEARCH_RESULTS_COMMENT'], $this->term, $countPages),
+                    'TXT_SEARCH_RESULTS_COMMENT' => sprintf($_ARRAYLANG['TXT_SEARCH_RESULTS_COMMENT'], contrexx_raw2xhtml($this->term), $countPages),
                     'TXT_SEARCH_TITLE'           => $_ARRAYLANG['TXT_NAVIGATION_TITLE'],
                     'TXT_SEARCH_CONTENT_TITLE'   => $_ARRAYLANG['TXT_PAGETITLE'],
                     'TXT_SEARCH_SLUG'            => $_ARRAYLANG['TXT_CORE_CM_SLUG'],
@@ -186,7 +186,7 @@ class SearchManager
                 }
             } else {
                 $this->template->setVariable(array(
-                    'TXT_SEARCH_NO_RESULTS' => sprintf($_ARRAYLANG['TXT_SEARCH_NO_RESULTS'], $this->term),
+                    'TXT_SEARCH_NO_RESULTS' => sprintf($_ARRAYLANG['TXT_SEARCH_NO_RESULTS'], contrexx_raw2xhtml($this->term)),
                 ));
             }
         } else {

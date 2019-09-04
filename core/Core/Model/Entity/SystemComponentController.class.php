@@ -275,13 +275,22 @@ class SystemComponentController extends Controller {
      *
      * @return boolean
      */
-    public function hasAccessToExecuteCommand($command, $arguments)
-    {
+    public function hasAccessToExecuteCommand($command, $arguments) {
         $commands = $this->getCommandsForCommandMode();
         $method = (php_sapi_name() === 'cli') ? array('cli') : null;
 
-        $objPermission = new \Cx\Core_Modules\Access\Model\Entity\Permission(null, $method, false, null, null, null);
-        if (isset($commands[$command]) && $commands[$command] instanceof \Cx\Core_Modules\Access\Model\Entity\Permission) {
+        $objPermission = new \Cx\Core_Modules\Access\Model\Entity\Permission(
+            array(),
+            $method,
+            false,
+            array(),
+            array(),
+            array()
+        );
+        if (
+            isset($commands[$command]) &&
+            $commands[$command] instanceof \Cx\Core_Modules\Access\Model\Entity\Permission
+        ) {
             $objPermission = $commands[$command];
         }
 

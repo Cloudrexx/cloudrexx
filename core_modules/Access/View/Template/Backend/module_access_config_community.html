@@ -67,6 +67,18 @@ function accessChangeActivationMethod()
   document.getElementById('accessUserActivationBox_1').style.display = method1 ? 'block' : 'none';
   document.getElementById('accessUserActivationBox_0').style.display = method1 ? 'none' : 'block';
 }
+
+function accessChangeSignUpNotification()
+{
+  method1 = document.getElementById('accessSignUpNotification').checked;
+  document.getElementById('accessSignUpNotificationBox').style.display = method1 ? 'block' : 'none';
+}
+
+function accessChangeUserProfileNotification()
+{
+  method1 = document.getElementById('accessUserProfileNotification').checked;
+  document.getElementById('accessUserProfileNotificationBox').style.display = method1 ? 'block' : 'none';
+}
 // ]]>
 </script>
 <form action="index.php?cmd=Access&amp;act=config&amp;tpl=community" method="post" onsubmit="accessSelectAllGroups(document.getElementById('access_user_associated_groups'))">
@@ -146,6 +158,13 @@ function accessChangeActivationMethod()
           <div id="accessUserActivationBox_1" style="display:{ACCESS_USER_ACTIVATION_BOX_1}; padding-left:20px;">
             {TXT_ACCESS_TIME_PERIOD_ACTIVATION_TIME}<br />
             <input style="text-align:right; width:60px;" type="text" value="{ACCESS_USER_ACTIVATION_TIMEOUT}" name="accessUserActivationTimeout" />
+            <br />
+            <br />
+            <input type="checkbox" name="accessSignUpNotification" id="accessSignUpNotification" value="1" style="border:0px; background-color:#F4F7FF;" {ACCESS_SIGNUP_NOTIFICATION_CHECKED} onclick="accessChangeSignUpNotification()" /><label for="accessSignUpNotification">{ACCESS_SIGNUP_NOTIFICATION_TEXT}</label>
+            <div id="accessSignUpNotificationBox" style="display:{ACCESS_SIGNUP_NOTIFICATION_BOX}; padding-left:20px;">
+                {TXT_ACCESS_ADDRESS_FOR_SIGNUP_NOTIFICATION}<br />
+                <input style="width:300px;" type="text" value="{ACCESS_SIGNUP_NOTIFICATION_ADDRESS}" name="accessSignUpNotificationAddress" />
+            </div>
           </div>
           <br />
           <input type="radio" name="accessUserActivation" id="accessUserActivation_0" value="0" style="border:0px; background-color:#F4F7FF;" {ACCESS_USER_ACTIVATION_0} onclick="accessChangeActivationMethod()" /><label for="accessUserActivation_0">{TXT_ACCESS_ACTIVATION_BY_AUTHORIZED_PERSON}</label><br />
@@ -155,6 +174,23 @@ function accessChangeActivationMethod()
           </div>
         </td>
       </tr>
+        <tr class="row2">
+            <td colspan="3">&nbsp;</td>
+        </tr>
+        <tr class="row3">
+            <td colspan="3">
+            <strong>{TXT_ACCESS_USER_PROFILE_MODIFICATION}</strong>
+            </td>
+        </tr>
+        <tr class="row1">
+            <td colspan="3">
+                <input type="checkbox" name="accessUserProfileNotification" id="accessUserProfileNotification" value="1" style="border:0px; background-color:#F4F7FF;" {ACCESS_USER_PROFILE_NOTIFICATION_CHECKED} onclick="accessChangeUserProfileNotification()" /><label for="accessUserProfileNotification">{TXT_ACCESS_USER_PROFILE_MODIFICATION_NOTIFICATION_TEXT}</label>
+                <div id="accessUserProfileNotificationBox" style="display:{ACCESS_USER_PROFILE_NOTIFICATION_BOX}; padding-left:20px;">
+                    {TXT_ACCESS_ADDRESS_OF_USER_TO_NOTIFY_ON_MODIFICATION}<br />
+                    <input style="width:300px;" type="text" value="{ACCESS_USER_PROFILE_NOTIFICATION_ADDRESS}" name="accessUserProfileNotificationAddress" />
+                </div>
+            </td>
+        </tr>
     </tbody>
   </table>
   <br />

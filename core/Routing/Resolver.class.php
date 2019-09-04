@@ -259,173 +259,163 @@ class Resolver {
             \Env::get('init')->setFrontendLangId($this->lang);
         }
 
+        global $section, $command, $history, $url, $_CORELANG,
+                $page, $pageId, $themesPages,
+                $page_template,
+                $now, $start, $end, $plainSection;
+
+        $section = isset($_REQUEST['section']) ? $_REQUEST['section'] : '';
+        $command = isset($_REQUEST['cmd']) ? contrexx_addslashes($_REQUEST['cmd']) : '';
+        $history = isset($_REQUEST['history']) ? intval($_REQUEST['history']) : 0;
 
 
-                        global $section, $command, $history, $url, $_CORELANG,
-                                $page, $pageId, $themesPages,
-                                $page_template,
-                                $isRegularPageRequest, $now, $start, $end, $plainSection;
+        // Initialize page meta
+        $page = null;
+        $pageAccessId = 0;
+        $page_protected = $pageId = $themesPages =
+        $page_template = null;
 
-                        $section = isset($_REQUEST['section']) ? $_REQUEST['section'] : '';
-                        $command = isset($_REQUEST['cmd']) ? contrexx_addslashes($_REQUEST['cmd']) : '';
-                        $history = isset($_REQUEST['history']) ? intval($_REQUEST['history']) : 0;
+        // TODO: history (empty($history) ? )
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $session = $cx->getComponent('Session');
+        if (
+            isset($_GET['pagePreview']) &&
+            $_GET['pagePreview'] == 1
+        ) {
+            // resume existing session, but don't
+            // initialize a new session
+            $session->getSession(false);
+        }
+        $this->init($url, $this->lang, \Env::get('em'), ASCMS_INSTANCE_OFFSET.\Env::get('virtualLanguageDirectory'), \FWLanguage::getFallbackLanguageArray());
+        try {
+            $this->resolvePage();
+            $page = $this->getPage();
+            // TODO: should this check (for type 'application') moved to \Cx\Core\ContentManager\Model\Entity\Page::getCmd()|getModule() ?
+            // only set $section and $command if the requested page is an application
+            $command = $this->getCmd();
+            $section = $this->getSection();
+        } catch (\Cx\Core\Routing\ResolverException $e) {
+            try {
+                $this->legacyResolve($url, $section, $command);
+                $page = $this->getPage();
+                $command = $this->getCmd();
+                $section = $this->getSection();
+            } catch(\Cx\Core\Routing\ResolverException $e) {
+                // legacy resolving also failed.
+                // provoke a 404
+                $page = null;
+            }
+        }
 
+        if(!$page || !$page->isActive()) {
+            //fallback for inexistant error page
+            if ($section == 'Error') {
+                // If the error module is not installed, show this
+                die($_CORELANG['TXT_THIS_MODULE_DOESNT_EXISTS']);
+            } else {
+                //page not found, redirect to error page.
+                \Cx\Core\Csrf\Controller\Csrf::header('Location: '.\Cx\Core\Routing\Url::fromModuleAndCmd('Error'));
+                exit;
+            }
+        }
 
-                        // Initialize page meta
-                        $page = null;
-                        $pageAccessId = 0;
-                        $page_protected = $pageId = $themesPages =
-                        $page_template = null;
+        // TODO: question: what do we need this for? I think there is no need for this (had been added in r15026)
+        //legacy: re-populate cmd and section into $_GET
+        $_GET['cmd'] = $command;
+        $_GET['section'] = $section;
+        // END of TODO question
 
-                        // If standalone is set, then we will not have to initialize/load any content page related stuff
-                        $isRegularPageRequest = !isset($_REQUEST['standalone']) || $_REQUEST['standalone'] == 'false';
+        //check whether the page is active
+        $now = new \DateTime('now');
+        $start = $page->getStart();
+        $end = $page->getEnd();
 
+        $pageId = $page->getId();
 
-                        // Regular page request
-                        if ($isRegularPageRequest) {
-                        // TODO: history (empty($history) ? )
-                            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-                            $session = $cx->getComponent('Session');
-                            if (
-                                isset($_GET['pagePreview']) &&
-                                $_GET['pagePreview'] == 1
-                            ) {
-                                // resume existing session, but don't
-                                // initialize a new session
-                                $session->getSession(false);
-                            }
-                            $this->init($url, $this->lang, \Env::get('em'), ASCMS_INSTANCE_OFFSET.\Env::get('virtualLanguageDirectory'), \FWLanguage::getFallbackLanguageArray());
-                            try {
-                                $this->resolvePage();
-                                $page = $this->getPage();
-                        // TODO: should this check (for type 'application') moved to \Cx\Core\ContentManager\Model\Entity\Page::getCmd()|getModule() ?
-                                // only set $section and $command if the requested page is an application
-                                $command = $this->getCmd();
-                                $section = $this->getSection();
-                            } catch (\Cx\Core\Routing\ResolverException $e) {
-                                try {
-                                    $this->legacyResolve($url, $section, $command);
-                                    $page = $this->getPage();
-                                    $command = $this->getCmd();
-                                    $section = $this->getSection();
-                                } catch(\Cx\Core\Routing\ResolverException $e) {
-                                    // legacy resolving also failed.
-                                    // provoke a 404
-                                    $page = null;
-                                }
-                            }
+        //access: frontend access id for default requests
+        $pageAccessId = $page->getFrontendAccessId();
+        //revert the page if a history param has been given
+        if($history) {
+            //access: backend access id for history requests
+            $pageAccessId = $page->getBackendAccessId();
+            $logRepo = \Env::get('em')->getRepository('Cx\Core\ContentManager\Model\Entity\LogEntry');
+            try {
+                $logRepo->revert($page, $history);
+            }
+            catch(\Gedmo\Exception\UnexpectedValueException $e) {
+            }
 
-                            if(!$page || !$page->isActive()) {
-                                //fallback for inexistant error page
-                                if ($section == 'Error') {
-                                    // If the error module is not installed, show this
-                                    die($_CORELANG['TXT_THIS_MODULE_DOESNT_EXISTS']);
-                                } else {
-                                    //page not found, redirect to error page.
-                                    \Cx\Core\Csrf\Controller\Csrf::header('Location: '.\Cx\Core\Routing\Url::fromModuleAndCmd('Error'));
-                                    exit;
-                                }
-                            }
-
-                        // TODO: question: what do we need this for? I think there is no need for this (had been added in r15026)
-                            //legacy: re-populate cmd and section into $_GET
-                            $_GET['cmd'] = $command;
-                            $_GET['section'] = $section;
-                        // END of TODO question
-
-                            //check whether the page is active
-                            $now = new \DateTime('now');
-                            $start = $page->getStart();
-                            $end = $page->getEnd();
-
-                            $pageId = $page->getId();
-
-                            //access: frontend access id for default requests
-                            $pageAccessId = $page->getFrontendAccessId();
-                            //revert the page if a history param has been given
-                            if($history) {
-                                //access: backend access id for history requests
-                                $pageAccessId = $page->getBackendAccessId();
-                                $logRepo = \Env::get('em')->getRepository('Cx\Core\ContentManager\Model\Entity\LogEntry');
-                                try {
-                                    $logRepo->revert($page, $history);
-                                }
-                                catch(\Gedmo\Exception\UnexpectedValueException $e) {
-                                }
-
-                                $logRepo->revert($page, $history);
-                            }
-                            /*
-                            //404 for inactive pages
-                            if(($start > $now && $start != null) || ($now > $end && $end != null)) {
-                                if ($section == 'Error') {
-                                    // If the error module is not installed, show this
-                                    die($_CORELANG['TXT_THIS_MODULE_DOESNT_EXISTS']);
-                                }
-                                \Cx\Core\Csrf\Controller\Csrf::header('Location: index.php?section=Error&id=404');
-                                exit;
-                                }*/
+            $logRepo->revert($page, $history);
+        }
+        /*
+        //404 for inactive pages
+        if(($start > $now && $start != null) || ($now > $end && $end != null)) {
+            if ($section == 'Error') {
+                // If the error module is not installed, show this
+                die($_CORELANG['TXT_THIS_MODULE_DOESNT_EXISTS']);
+            }
+            \Cx\Core\Csrf\Controller\Csrf::header('Location: index.php?section=Error&id=404');
+            exit;
+        }*/
 
 
-                            \Env::get('init')->setCustomizedTheme($page->getSkin(), $page->getCustomContent(), $page->getUseSkinForAllChannels());
+        \Env::get('init')->setCustomizedTheme($page->getSkin(), $page->getCustomContent(), $page->getUseSkinForAllChannels());
 
-                            $themesPages = \Env::get('init')->getTemplates($page);
+        $themesPages = \Env::get('init')->getTemplates($page);
 
-                            //replace the {NODE_<ID>_<LANG>}- placeholders
-                            \LinkGenerator::parseTemplate($themesPages);
+        //replace the {NODE_<ID>_<LANG>}- placeholders
+        \LinkGenerator::parseTemplate($themesPages);
 
-                        //TODO: analyze those, take action.
-                            //$page_protected = $objResult->fields['protected'];
-                            $page_protected = $page->isFrontendProtected();
+        //TODO: analyze those, take action.
+        //$page_protected = $objResult->fields['protected'];
+        $page_protected = $page->isFrontendProtected();
 
-                            //$page_access_id = $objResult->fields['frontend_access_id'];
-                            $page_template  = $themesPages['content'];
+        //$page_access_id = $objResult->fields['frontend_access_id'];
+        $page_template  = $themesPages['content'];
 
-                            // Authentification for protected pages
-                            // This is only done for regular page requests ($isRegularPageRequest == TRUE)
-                            $this->checkPageFrontendProtection($page, $history);
+        // Authentification for protected pages
+        $this->checkPageFrontendProtection($page, $history);
 
-                        //TODO: history
-                        }
+        //TODO: history
 
-                        // TODO: refactor system to be able to remove this backward compatibility
-                        // Backwards compatibility for code pre Contrexx 3.0 (update)
-                        $_GET['cmd']     = $_POST['cmd']     = $_REQUEST['cmd']     = $command;
-                        $_GET['section'] = $_POST['section'] = $_REQUEST['section'] = $section;
-                        // the system should directly use $this->url->getParamArray() instead of using the super globals
-                        $qsArr = $this->url->getParamArray();
-                        foreach ($qsArr as $qsParam => $qsArgument) {
-                            $_GET[$qsParam] = $_REQUEST[$qsParam] = $qsArgument;
-                        }
+        // TODO: refactor system to be able to remove this backward compatibility
+        // Backwards compatibility for code pre Contrexx 3.0 (update)
+        $_GET['cmd']     = $_POST['cmd']     = $_REQUEST['cmd']     = $command;
+        $_GET['section'] = $_POST['section'] = $_REQUEST['section'] = $section;
+        // the system should directly use $this->url->getParamArray() instead of using the super globals
+        $qsArr = $this->url->getParamArray();
+        foreach ($qsArr as $qsParam => $qsArgument) {
+            $_GET[$qsParam] = $_REQUEST[$qsParam] = $qsArgument;
+        }
 
-                        // To clone any module, use an optional integer cmd suffix.
-                        // E.g.: "shop2", "gallery5", etc.
-                        // Mind that you *MUST* copy all necessary database tables, and fix any
-                        // references to your module (section and cmd parameters, database tables)
-                        // using the MODULE_INDEX constant in the right place both in your code
-                        // *AND* templates!
-                        // See the Shop module for an example.
-                        $arrMatch = array();
-                        if (preg_match('/^(\D+)(\d+)$/', $section, $arrMatch)) {
-                            // The plain section/module name, used below
-                            $plainSection = $arrMatch[1];
-                        } else {
-                            $plainSection = $section;
-                        }
-                        // The module index.
-                        // An empty or 1 (one) index represents the same (default) module,
-                        // values 2 (two) and larger represent distinct instances.
-                        $moduleIndex = (empty($arrMatch[2]) || $arrMatch[2] == 1 ? '' : $arrMatch[2]);
-                        define('MODULE_INDEX', $moduleIndex);
+        // To clone any module, use an optional integer cmd suffix.
+        // E.g.: "shop2", "gallery5", etc.
+        // Mind that you *MUST* copy all necessary database tables, and fix any
+        // references to your module (section and cmd parameters, database tables)
+        // using the MODULE_INDEX constant in the right place both in your code
+        // *AND* templates!
+        // See the Shop module for an example.
+        $arrMatch = array();
+        if (preg_match('/^(\D+)(\d+)$/', $section, $arrMatch)) {
+            // The plain section/module name, used below
+            $plainSection = $arrMatch[1];
+        } else {
+            $plainSection = $section;
+        }
+        // The module index.
+        // An empty or 1 (one) index represents the same (default) module,
+        // values 2 (two) and larger represent distinct instances.
+        $moduleIndex = (empty($arrMatch[2]) || $arrMatch[2] == 1 ? '' : $arrMatch[2]);
+        define('MODULE_INDEX', $moduleIndex);
 
-                        // Start page or default page for no section
-                        if ($section == 'Home') {
-                            if (!\Env::get('init')->hasCustomContent()){
-                                $page_template = $themesPages['home'];
-                            } else {
-                                $page_template = $themesPages['content'];
-                            }
-                        }
+        // Start page or default page for no section
+        if ($section == 'Home') {
+            if (!\Env::get('init')->hasCustomContent()){
+                $page_template = $themesPages['home'];
+            } else {
+                $page_template = $themesPages['content'];
+            }
+        }
 
         // this is the case for standalone and backend requests
         if (!$this->page) {
@@ -745,8 +735,8 @@ class Resolver {
                     }
                 }
 
-                //check whether we have a page now.
-                if (!$targetPage) {
+                //check whether we have an active page now
+                if (!$targetPage || !$targetPage->isActive()) {
                     $this->page = null;
                     return;
                 }
@@ -766,6 +756,11 @@ class Resolver {
                 $this->url->setPath($targetPath.$qs);
                 $this->isRedirection = true;
                 $this->resolvePage(true);
+
+                if (empty($this->page)) {
+                    \DBG::msg(__METHOD__ . ': target page of internal redirection not found/published');
+                    \Cx\Core\Csrf\Controller\Csrf::redirect(\Cx\Core\Routing\Url::fromModuleAndCmd('Error'));
+                }
             } else { //external target - redirect via HTTP redirect
                 if (\FWValidator::isUri($target)) {
                     $this->headers['Location'] = $target;

@@ -143,7 +143,7 @@ class AccessLib
      * use this method to specify the template block prefix to be used when parsing
      * a user's profile attribute.
      * For instance when setting the prefix to 'shop_customer_profile_attribute',
-     * then the method {@link AccessLib::parseAttribute()) will try to parse the
+     * then the method {@link AccessLib::parseAttribute()} will try to parse the
      * \Cx\Core\Html\Sigma template block shop_customer_profile_attribute_firstname
      * in the case of the profile attribute firstname.
      * Defaults to 'access_profile_attribute'
@@ -161,7 +161,7 @@ class AccessLib
      * use this method to specify the template block prefix to be used when parsing
      * a user's account attributes (username, email, password, etc.).
      * For instance when setting the prefix to 'shop_customer_attribute',
-     * then the method {@link AccessLib::parseAccountAttribute()) will try to parse the
+     * then the method {@link AccessLib::parseAccountAttribute()} will try to parse the
      * \Cx\Core\Html\Sigma template block shop_customer_attribute_email
      * in the case of the account attribute email.
      * Defaults to 'access_user'
@@ -179,7 +179,7 @@ class AccessLib
      * use this method to specify the template placeholder prefix to be used when
      * parsing a user's profile attribute.
      * For instance when setting the prefix to 'SHOP_', then the method
-     * {@link AccessLib::parseAttribute()) will parse the \Cx\Core\Html\Sigma
+     * {@link AccessLib::parseAttribute()} will parse the \Cx\Core\Html\Sigma
      * variable SHOP_PROFILE_ATTRIBUTE_FIRSTNAME in the case of the profile
      * attribute firstname.
      * Defaults to 'ACCESS_'
@@ -203,15 +203,44 @@ class AccessLib
         global $_CORELANG;
 
         \JS::activate('jqueryui');
-        \JS::registerCode("
+        \JS::registerCode('
             cx.ready(function() {
-                cx.jQuery('.access_date').datepicker({dateFormat: 'dd.mm.yy'});
+                cx.jQuery(".access_date").datepicker({dateFormat: "dd.mm.yy"});
+
+                nonAutofillPasswordEvent = function(el) {
+                    if (el.setAttribute == undefined) {
+                        el = this;
+                    }
+                    if (el.value == "") {
+                        el.setAttribute("type", "text");
+                    } else {
+                        el.setAttribute("type", "password");
+                    }
+                };
+                cx.jQuery("body").delegate(
+                    ".access-pw-noauto",
+                    "keyup",
+                    nonAutofillPasswordEvent
+                );
+                cx.jQuery("body").delegate(
+                    ".access-pw-noauto",
+                    "paste drop",
+                    function() {
+                        var el = this;
+                        setTimeout(
+                            function() {
+                                nonAutofillPasswordEvent(el);
+                            },
+                            100
+                        );
+                    }
+                );
             });
-        ");
+        ');
         $this->arrAttributeTypeTemplates = array(
             'textarea'        => '<textarea name="[NAME]" rows="1" cols="1">[VALUE]</textarea>',
             'text'            => '<input type="text" name="[NAME]" value="[VALUE]" autocomplete="foobar" />',
-            'password'        => '<input type="text" name="[NAME]" value="" onkeyup="if (this.value == \'\') { this.setAttribute(\'type\', \'text\'); } else { this.setAttribute(\'type\', \'password\'); }" style="text-security: disc; -webkit-text-security: disc;" />',
+            'password'        => '<input type="text" name="[NAME]" value="" class="access-pw-noauto" style="text-security: disc; -webkit-text-security: disc;" />',
             'checkbox'        => '<input type="hidden" name="[NAME]" /><input type="checkbox" name="[NAME]" value="1" [CHECKED] />',
             'menu'            => '<select name="[NAME]"[STYLE]>[VALUE]</select>',
             'menu_option'     => '<option value="[VALUE]"[SELECTED][STYLE]>[VALUE_TXT]</option>',
@@ -966,6 +995,9 @@ class AccessLib
                 onClick="var imageContainer = $J(this).closest(\'.access_image_uploader_container\');
                          imageContainer.find(\'.uploader_rel_field\').val(\'\');
                          imageContainer.find(\'.uploader_rel_field_source\').val(\'\');
+                         imageContainer.find(\'.image_uploader_source_image\')
+                            .attr(\'src\', \''.$imageRepoWeb.'/'.$arrNoImage['src'].'\')
+                            .css({width : \''.$arrNoImage['width'].'px\', height: \''.$arrNoImage['height'].'px\'});
                          $J(this).hide()"
                 title="'.$_CORELANG['TXT_ACCESS_DELETE_IMAGE'].'">
                 <img
@@ -1576,7 +1608,12 @@ JSaccessValidatePrimaryGroupAssociation
     var lastAccessImageUploaderContainer = null;
     function getImageUploader(sourceElm) {
         lastAccessImageUploaderContainer = sourceElm;
-        cx.variables.get('jquery','mediabrowser')('#accessImageUploader').trigger('click');
+        // The uploader replaces the thumbnail using this selector
+        cx.variables.get('jquery','mediabrowser')('#accessImageUploader')
+            .data('thumbSelector',
+                jQuery(sourceElm).find('.image_uploader_source_image')
+            )
+            .trigger('click');
     }
     function accessImageUploaderCallback(callback) {
         if (typeof callback[0] !== 'undefined') {
@@ -1588,7 +1625,6 @@ JSaccessValidatePrimaryGroupAssociation
             uploaderField.find('.uploader_rel_field_remove_icon').show();
         }
     }
-
 // ]]>
 </script>
 JSimageUploaderCode
@@ -2230,6 +2266,7 @@ JS
      */
     public function getImageUploader()
     {
+        $arrSettings = \User_Setting::getSettings();
         // init uploader to upload images
         $uploader = new \Cx\Core_Modules\Uploader\Model\Entity\Uploader();
         $uploader->setCallback('accessImageUploaderCallback');
@@ -2238,6 +2275,14 @@ JS
             'allowed-extensions' => array('jpg', 'jpeg', 'png', 'gif'),
             'style'              => 'display:none',
             'data-upload-limit'  => 1,
+            // Note: You can add a (string) selector here.
+            // However, Access requires the distinct target jQuery element
+            // to be set according to the button clicked.
+            //'data-thumb-selector' => '.image_uploader_source_image',
+            'data-thumb-max-width' =>
+                $arrSettings['max_profile_pic_width']['value'],
+            'data-thumb-max-height' =>
+                $arrSettings['max_profile_pic_height']['value'],
         ));
         $this->attachJavaScriptFunction('imageUploaderCode');
 

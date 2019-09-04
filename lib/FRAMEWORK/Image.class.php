@@ -703,24 +703,52 @@ class ImageManager
     {
         $arrSizeInfo = getimagesize($file);
         if (!is_array($arrSizeInfo)) return false;
+
+        // fetch channels of image
+        if (
+            !isset($arrSizeInfo['channels']) ||
+            $arrSizeInfo['channels'] < 3
+        ) {
+            $channels = 3;
+        } else {
+            $channels = $arrSizeInfo['channels'];
+        }
+
+        // fetch bits per pixel of image
+        if (!isset($arrSizeInfo['bits'])) {
+            $bits = 8;
+        } else {
+            $bits = $arrSizeInfo['bits'];
+        }
+
         $type = $this->_isImage($file);
-        $potentialRequiredMemory = $arrSizeInfo[0] * $arrSizeInfo[1] * 1.8;
+
+        // see comments of https://www.php.net/manual/en/function.imagecreatefromjpeg.php
+        $fudgeFactor = 2.2;
+
+        // width * height * "fudge factor"
+        $potentialRequiredMemory = $arrSizeInfo[0] * $arrSizeInfo[1] * $fudgeFactor;
+
+        // multiply required memory by number of bits and channels per pixel
+        // depending on image type
         switch($type) {
             case self::IMG_TYPE_GIF:
                 $function = 'imagecreatefromgif';
                 break;
             case self::IMG_TYPE_JPEG:
                 $function = 'imagecreatefromjpeg';
-                $potentialRequiredMemory *=
-                    ($arrSizeInfo['bits']/8) * ($arrSizeInfo['channels'] < 3 ? 3 : $arrSizeInfo['channels']);
+                $potentialRequiredMemory *= $bits / 8 * $channels;
                 break;
             case self::IMG_TYPE_PNG:
                 $function = 'imagecreatefrompng';
-                $potentialRequiredMemory *= 4;
+                $potentialRequiredMemory *= $bits;
                 break;
             default:
                 return '';
         }
+
+        // round potential required memory to int
+        $potentialRequiredMemory = round($potentialRequiredMemory);
 
         require_once(ASCMS_FRAMEWORK_PATH.'/System.class.php');
         $objSystem = new FWSystem();
@@ -731,11 +759,14 @@ class ImageManager
             // set default php memory limit of 8 MBytes
             $memoryLimit = 8 * pow(1024, 2);
         }
+        // fetch already used memory
         if (function_exists('memory_get_usage')) {
             $potentialRequiredMemory += memory_get_usage();
         } else {
-            // add a default of 3 MBytes
-            $potentialRequiredMemory += 3 * pow(1024, 2);
+            // as we are unable to fetch the currently used memory,
+            // we do continue our calculation with an expected
+            // amount of used memory of 32 MB
+            $potentialRequiredMemory += 32 * pow(1024, 2);
         }
         if ($potentialRequiredMemory > $memoryLimit) {
             // try to set a higher memory_limit
@@ -930,7 +961,56 @@ class ImageManager
         throw new Exception('Is not a valid image');
     }
 
+    /**
+     * Fix image orientation based on its Exif-data
+     *
+     * @param string $filePath File path
+     */
+    public function fixImageOrientation($filePath)
+    {
+        if (!function_exists('exif_read_data')) {
+            return;
+        }
 
+        // The method exif_read_data() reads a header information from an image.
+        // It returns an associated array where the array indexes are the header
+        // names and the array values are the values associated with those
+        // headers.
+        // If no data can be returned, exif_read_data() will return FALSE.
+        $exif = exif_read_data($filePath);
+        if (empty($exif['Orientation'])) {
+            return;
+        }
+
+        $this->loadImage($filePath);
+        // The information from the accelerometer is stored in the orientation
+        // field of the Exchangeable Image File Format (Exif) metadata.
+        // If the image has rotated, Exif data should have 'Orientation' in its
+        // header information. The orientation is one of 3, 6 or 8. Here
+        // orientation 3 will rotate 180 degree left, orientation 6 will
+        // rotate 90 degree right and orientation 8 will rotate 90 degree left.
+        // For more information about the Orientation image data structure
+        // property see:
+        // http://www.digicamsoft.com/exif22/exif22/html/exif22_24.htm?gInitialPosX=10px&gInitialPosY=10px&gZoomValue=100
+        // or check http://www.cipa.jp for the latest Exif standard doc
+        try {
+            // Note that $this->rotateImage() does rotate the image anticlockwise
+            switch ($exif['Orientation']) {
+                case 3:
+                    $this->rotateImage(180);
+                    break;
+                case 6:
+                    $this->rotateImage(-90);
+                    break;
+                case 8:
+                    $this->rotateImage(90);
+                    break;
+                default :
+                    return;
+            }
+            $this->saveNewImage($filePath, true);
+        } catch (\Exception $ex) {
+            \DBG::msg($ex->getMessage());
+        }
+    }
 }
-
-?>

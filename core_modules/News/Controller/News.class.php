@@ -96,8 +96,12 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
         $expirationDate = null;
         switch ($_REQUEST['cmd']) {
         case 'details':
+            $newsId = 0;
+            if (!empty($_GET['newsid'])) {
+                $newsId = intval($_GET['newsid']);
+            }
             // cache timeout: this article's end date
-            $details  = $this->getDetails($expirationDate);
+            $details  = $this->getDetails($newsId, $expirationDate);
             $response = \Cx\Core\Core\Controller\Cx::instanciate()->getResponse();
             $response->setExpirationDate($expirationDate);
             return $details;
@@ -124,9 +128,13 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
             break;
         default:
             if (substr($_REQUEST['cmd'], 0, 7) == 'details') {
+                $newsId = 0;
+                if (!empty($_GET['newsid'])) {
+                    $newsId = intval($_GET['newsid']);
+                }
                 // cache timeout: this article's end date
                 $categoryId = intval(substr($_REQUEST['cmd'], 7));
-                $details  = $this->getDetails($expirationDate, $categoryId);
+                $details  = $this->getDetails($newsId, $expirationDate, $categoryId);
                 $response = \Cx\Core\Core\Controller\Cx::instanciate()->getResponse();
                 $response->setExpirationDate($expirationDate);
                 return $details;
@@ -150,6 +158,11 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
     /**
      * Gets the news details
      *
+     * @param   integer $newsId ID of news article to display. If left empty
+     *                          and the functional placeholder NEWS_LIST_LATEST
+     *                          is not present in the application template,
+     *                          then the user gets redirected to the main
+     *                          application page of the news component.
      * @param  string $expirationDate Expiration date
      * @param  integer $categoryId ID of category to output the latest news
      *                             article from, in case the URL-argument
@@ -158,12 +171,12 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
      *                             application template.
      * @return string parsed content
      */
-    private function getDetails(&$expirationDate = null, $categoryId = 0)
+    public function getDetails($newsId = 0, &$expirationDate = null, $categoryId = 0)
     {
         global $_CONFIG, $objDatabase, $_ARRAYLANG;
 
-        if (!empty($_GET['newsid'])) {
-            $newsid = intval($_GET['newsid']);
+        if (!empty($newsId)) {
+            $newsid = $newsId;
         } elseif ($this->_objTpl->placeholderExists('NEWS_LIST_LATEST')) {
             try {
                 $newsid = $this->getIdOfLatestNewsArticle($categoryId);
@@ -286,24 +299,12 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
         $source             = contrexx_raw2xhtml($objResult->fields['source']);
         $url1               = $objResult->fields['url1'];
         $url2               = $objResult->fields['url2'];
-        $newsUrl            = '';
-        $newsSource         = '';
         $newsLastUpdate     = !empty($lastUpdate)
                                ? $_ARRAYLANG['TXT_LAST_UPDATE'].'<br />'.date(ASCMS_DATE_FORMAT, $lastUpdate)
                                : '';
 
         if ($objResult->fields['enddate'] != '0000-00-00 00:00:00') {
             $expirationDate = new \DateTime($objResult->fields['enddate']);
-        }
-
-        if (!empty($url1)) {
-            $newsUrl = $_ARRAYLANG['TXT_IMPORTANT_HYPERLINKS'] . '<br />' . $this->getNewsLink($url1) . '<br />';
-        }
-        if (!empty($url2)) {
-            $newsUrl .= $this->getNewsLink($url2).'<br />';
-        }
-        if (!empty($source)) {
-            $newsSource = $_ARRAYLANG['TXT_NEWS_SOURCE'] . '<br />'. $this->getNewsLink($source) . '<br />';
         }
 
         $this->newsTitle = $objResult->fields['title'];
@@ -321,7 +322,10 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
             \LinkGenerator::parseTemplate($newsTeaser);
         }
 
-        $newsCategories = $this->getCategoriesByNewsId($newsid);
+        $newsCategories = $this->getCategoriesByNewsId(
+            $newsid,
+            array($categoryId)
+        );
         // Parse the Category list
         $this->parseCategoryList($this->_objTpl, $newsCategories);
 
@@ -334,16 +338,80 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
            'NEWS_TITLE'          => $newstitle,
            'NEWS_TEASER_TEXT'    => $newsTeaser,
            'NEWS_LASTUPDATE'     => $newsLastUpdate,
-           'NEWS_SOURCE'         => $newsSource,
-           'NEWS_URL'            => $newsUrl,
-           'NEWS_LINK1_SRC'      => contrexx_raw2encodedUrl($url1),
-           'NEWS_LINK2_SRC'      => contrexx_raw2encodedUrl($url2),
            'NEWS_CATEGORY_NAME'  => implode(', ', contrexx_raw2xhtml($newsCategories)),
            'NEWS_TYPE_ID'        => $objResult->fields['typeid'],
            'NEWS_TYPE_NAME'      => contrexx_raw2xhtml($this->getTypeNameById($objResult->fields['typeid'])),
         ));
 
-        if ($this->arrSettings['news_use_teaser_text'] != '1' && $this->_objTpl->blockExists('news_use_teaser_text')) {
+        // parse 'combined' external link
+        $newsUrl = '';
+        if (!empty($url1)) {
+            $newsUrl = $_ARRAYLANG['TXT_IMPORTANT_HYPERLINKS'] . '<br />' . $this->getNewsLink($url1) . '<br />';
+        }
+        if (!empty($url2)) {
+            $newsUrl .= $this->getNewsLink($url2).'<br />';
+        }
+        $this->_objTpl->setVariable(
+            'NEWS_URL',
+            $newsUrl
+        );
+
+        // parse external source
+        $newsSourceLink = '';
+        $newsSource = '';
+        if (!empty($source)) {
+            $newsSourceLink = $this->getNewsLink($source);
+            $newsSource = $_ARRAYLANG['TXT_NEWS_SOURCE'] . '<br />'. $newsSourceLink . '<br />';
+        }
+        $this->_objTpl->setVariable(array(
+            'TXT_NEWS_SOURCE' => $_ARRAYLANG['TXT_NEWS_SOURCE'],
+            'NEWS_SOURCE'     => $newsSource,
+            'NEWS_SOURCE_LINK'=> $newsSourceLink,
+            'NEWS_SOURCE_SRC' => $source,
+        ));
+        if ($this->_objTpl->blockExists('news_source')) {
+            if (empty($source)) {
+                $this->_objTpl->hideBlock('news_source');
+            } else {
+                $this->_objTpl->touchBlock('news_source');
+            }
+        }
+
+        // parse external link 1
+        $this->_objTpl->setVariable(array(
+            'TXT_NEWS_LINK1' =>
+                $_ARRAYLANG['TXT_NEWS_LINK1'],
+            'NEWS_LINK1_SRC' =>
+                $url1,
+        ));
+        if ($this->_objTpl->blockExists('news_link1')) {
+            if (empty($url1)) {
+                $this->_objTpl->hideBlock('news_link1');
+            } else {
+                $this->_objTpl->touchBlock('news_link1');
+            }
+        }
+
+        // parse external link 2
+        $this->_objTpl->setVariable(array(
+            'TXT_NEWS_LINK2' =>
+                $_ARRAYLANG['TXT_NEWS_LINK2'],
+            'NEWS_LINK2_SRC' =>
+                $url2,
+        ));
+        if ($this->_objTpl->blockExists('news_link2')) {
+            if (empty($url2)) {
+                $this->_objTpl->hideBlock('news_link2');
+            } else {
+                $this->_objTpl->touchBlock('news_link2');
+            }
+        }
+
+        // hide teaser container if the use of teasers has been deactivated
+        if (
+            $this->arrSettings['news_use_teaser_text'] != '1' &&
+            $this->_objTpl->blockExists('news_use_teaser_text')
+        ) {
             $this->_objTpl->hideBlock('news_use_teaser_text');
         }
 
@@ -360,10 +428,30 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
         $this->parseCommentsOfMessage($this->_objTpl, $newsid, $newsCommentActive);
 
         // Show related_messages
-        $this->parseRelatedMessagesOfMessage($newsid, 'category', array_keys($newsCategories));
-        $this->parseRelatedMessagesOfMessage($newsid, 'type', $objResult->fields['typeid']);
-        $this->parseRelatedMessagesOfMessage($newsid, 'publisher', $objResult->fields['publisherid']);
-        $this->parseRelatedMessagesOfMessage($newsid, 'author', $objResult->fields['authorid']);
+        $this->parseRelatedMessagesOfMessage(
+            $newsid,
+            'category',
+            array_keys($newsCategories),
+            array($categoryId)
+        );
+        $this->parseRelatedMessagesOfMessage(
+            $newsid,
+            'type',
+            $objResult->fields['typeid'],
+            array($categoryId)
+        );
+        $this->parseRelatedMessagesOfMessage(
+            $newsid,
+            'publisher',
+            $objResult->fields['publisherid'],
+            array($categoryId)
+        );
+        $this->parseRelatedMessagesOfMessage(
+            $newsid,
+            'author',
+            $objResult->fields['authorid'],
+            array($categoryId)
+        );
 
         /*
          * save the teaser text.
@@ -382,7 +470,11 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
         if (    !empty($this->arrSettings['use_related_news'])
             &&  !empty($objResult->fields['enableRelatedNews'])
         ) {
-            $this->parseRelatedNews($this->_objTpl, $newsid);
+            $this->parseRelatedNews(
+                $this->_objTpl,
+                $newsid,
+                array($categoryId)
+            );
             \JS::registerCss('core_modules/News/View/Style/RelatedSearch.css');
         }
 
@@ -408,15 +500,18 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
             }
         }
 
-        self::parseImageBlock($this->_objTpl, $objResult->fields['newsThumbImg'], $newstitle, $newsUrl, 'image_thumbnail');
-        self::parseImageBlock($this->_objTpl, $objResult->fields['newsimage'], $newstitle, $newsUrl, 'image_detail');
+        self::parseImageBlock($this->_objTpl, $objResult->fields['newsThumbImg'], $newstitle, '', 'image_thumbnail');
+        self::parseImageBlock($this->_objTpl, $objResult->fields['newsimage'], $newstitle, '', 'image_detail');
         //previous next newslink
         if (    !empty($this->arrSettings['use_previous_next_news_link']) 
             &&  $this->_objTpl->blockExists('news_details_previous_next_links')
         ) {
             //Register the RelatedLinks.css for styling the previous and next link
             \JS::registerCss('core_modules/News/View/Style/RelatedLinks.css');
-            $this->parseNextAndPreviousLinks($this->_objTpl);
+            $this->parseNextAndPreviousLinks(
+                $this->_objTpl,
+                array($categoryId)
+            );
         }
 
         // The news_text block will be hidden if the news is set to redirect type
@@ -489,8 +584,12 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
      * @global  ADONewConnection
      *
      */
-    private function parseRelatedMessagesOfMessage($messageId, $relatedByKind, $relatedKindId)
-    {
+    private function parseRelatedMessagesOfMessage(
+        $messageId,
+        $relatedByKind,
+         $relatedKindId,
+         $selectedCategories
+    ) {
         global $objDatabase, $_ARRAYLANG;
 
         static $arrRelatedKinds = array('category', 'type', 'publisher', 'author');
@@ -565,7 +664,10 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
 
         while (!$objResult->EOF) {
             $newsid         = $objResult->fields['newsid'];
-            $newsCategories = $this->getCategoriesByNewsId($newsid);
+            $newsCategories = $this->getCategoriesByNewsId(
+                $newsid,
+                $selectedCategories
+            );
             $newstitle      = $objResult->fields['newstitle'];
             $newsUrl        = empty($objResult->fields['redirect'])
                                 ? (empty($objResult->fields['newscontent'])
@@ -703,7 +805,14 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
         if ($this->_objTpl->placeholderExists('NEWS_CAT_DROPDOWNMENU')) {
             $catMenu =  '<select onchange="this.form.submit()" name="category">'."\n";
             $catMenu .= '<option value="">'.$_ARRAYLANG['TXT_CATEGORY'].'</option>'."\n";
-            $catMenu .= $this->getCategoryMenu((!empty($menuCategories) ? $menuCategories : array()), array($selectedCat))."\n";
+            $catMenu .= $this->getCategoryMenu(
+                (!empty($menuCategories) ? $menuCategories : array()),
+                array($selectedCat),
+                array(),
+                false,
+                true,
+                false
+            )."\n";
             $catMenu .= '</select>'."\n";
             $this->_objTpl->setVariable('NEWS_CAT_DROPDOWNMENU', $catMenu);
         }
@@ -884,7 +993,10 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
         ) {
             while (!$objResult->EOF) {
                 $newsid = $parameters['newsid'] = $objResult->fields['newsid'];
-                $arrNewsCategories = $this->getCategoriesByNewsId($newsid);
+                $arrNewsCategories = $this->getCategoriesByNewsId(
+                    $newsid,
+                    $categories
+                );
                 $newsUrl        = empty($objResult->fields['redirect'])
                                     ? (empty($objResult->fields['newscontent'])
                                         ? ''
@@ -898,7 +1010,13 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
                                     : $objResult->fields['redirect'];
 
                 // Parse all the news placeholders
-                $this->parseNewsPlaceholders($this->_objTpl, $objResult, $newsUrl);
+                $this->parseNewsPlaceholders(
+                    $this->_objTpl,
+                    $objResult,
+                    $newsUrl,
+                    '',
+                    $categories
+                );
 
                 $this->_objTpl->setVariable(array(
                    'NEWS_CSS'            => 'row'.($i % 2 + 1),
@@ -1528,7 +1646,14 @@ EOF;
             'TXT_NEWS_SEARCH_PLACEHOLDER'   => $_ARRAYLANG['TXT_NEWS_SEARCH_PLACEHOLDER'],
             'TXT_NEWS_TAGS'                 => $_ARRAYLANG['TXT_NEWS_TAGS'],
             'NEWS_TEXT'                 => new \Cx\Core\Wysiwyg\Wysiwyg('newsText', $data['newsText'], 'bbcode'),
-            'NEWS_CAT_MENU'             => $this->getCategoryMenu($this->nestedSetRootId, array($data['newsCat'])),
+            'NEWS_CAT_MENU'             => $this->getCategoryMenu(
+                $this->nestedSetRootId,
+                array($data['newsCat']),
+                array(),
+                false,
+                true,
+                false
+            ),
             'NEWS_TYPE_MENU'            => ($this->arrSettings['news_use_types'] == 1 ? $this->getTypeMenu($data['newsType']) : ''),
             'NEWS_TITLE'                => contrexx_raw2xhtml($data['newsTitle']),
             'NEWS_SOURCE'               => contrexx_raw2xhtml($data['newsSource']),
@@ -1832,9 +1957,15 @@ RSS2JSCODE;
         global $objDatabase, $_ARRAYLANG;
 
         $categories = '';
+        $selectedCategories = array();
         $i          = 0;
         if ($categories = substr($_REQUEST['cmd'], 7)) {
-            $categories = $this->getCatIdsFromNestedSetArray($this->getNestedSetCategories(explode(',', $categories)));
+            $selectedCategories = contrexx_input2int(
+                explode('-', $categories)
+            );
+            $categories = $this->getCatIdsFromNestedSetArray(
+                $this->getNestedSetCategories($selectedCategories)
+            );
         }
 
         $monthlyStats   = $this->getMonthlyNewsStats($categories);
@@ -1852,7 +1983,10 @@ RSS2JSCODE;
                 foreach ($value['news'] as $news) {
                     $newsid         = $news['id'];
                     $newstitle      = $news['newstitle'];
-                    $newsCategories = $this->getCategoriesByNewsId($newsid);
+                    $newsCategories = $this->getCategoriesByNewsId(
+                        $newsid,
+                        $selectedCategories
+                    );
                     $newsCommentActive = $news['commentactive'];
                     $newsUrl        = empty($news['newsredirect'])
                                         ? (empty($news['newscontent'])

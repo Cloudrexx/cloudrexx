@@ -182,38 +182,6 @@ class Gallery
         $showImageSize   = $this->arrSettings['show_image_size'] == 'on' && $picture->fields['size_show'];
         $imageSize       = ($showImageSize) ? round(filesize($imagePath)/1024, 2) : '';
 
-        // get pictures of the current category
-        $objResult = $objDatabase->Execute(
-            "SELECT id FROM ".DBPREFIX."module_gallery_pictures ".
-            "WHERE status='1' AND validated='1' AND catid=$intCatId ".
-            "ORDER BY sorting, id");
-        while (!$objResult->EOF) {
-            array_push($arrPictures,$objResult->fields['id']);
-            $objResult->MoveNext();
-        }
-
-        // get next picture id
-        if (array_key_exists(array_search($intPicId,$arrPictures)+1,$arrPictures)) {
-            $intPicIdNext = $arrPictures[array_search($intPicId,$arrPictures)+1];
-        } else {
-            $intPicIdNext = $arrPictures[0];
-        }
-
-        // get previous picture id
-        if (array_key_exists(array_search($intPicId,$arrPictures)-1,$arrPictures)) {
-            $intPicIdPrevious = $arrPictures[array_search($intPicId,$arrPictures)-1];
-        } else {
-            $intPicIdPrevious = end($arrPictures);
-        }
-
-        // set language variables
-        $this->_objTpl->setVariable(array(
-            'TXT_GALLERY_PREVIOUS_IMAGE'        => $_ARRAYLANG['TXT_PREVIOUS_IMAGE'],
-            'TXT_GALLERY_NEXT_IMAGE'            => $_ARRAYLANG['TXT_NEXT_IMAGE'],
-            'TXT_GALLERY_BACK_OVERVIEW'         => $_ARRAYLANG['TXT_GALLERY_BACK_OVERVIEW'],
-            'TXT_GALLERY_CURRENT_IMAGE'         => $_ARRAYLANG['TXT_GALLERY_CURRENT_IMAGE'],
-        ));
-
         list($previousPicture, $nextPicture) = $this->getPreviousAndNextPicture($intCatId, $intPicId);
         $intImageWidth  = '';
         $intImageHeigth = '';
@@ -431,11 +399,11 @@ class Gallery
                         `name`      =';
             // name of requested category
             $nameResult = $objDatabase->SelectLimit($query . '\'name\'', 1);
-            $title = $nameResult->fields['value'];
+            $title = html_entity_decode($nameResult->fields['value'], ENT_QUOTES, CONTREXX_CHARSET);
 
             // description of requested category
             $descResult = $objDatabase->SelectLimit($query . '\'desc\'', 1);
-            $desc = $descResult->fields['value'];
+            $desc = html_entity_decode($descResult->fields['value'], ENT_QUOTES, CONTREXX_CHARSET);
         }
         //Consider title as description, if description is empty
         if (empty($desc)) {
@@ -676,6 +644,7 @@ class Gallery
 
                 $this->_objTpl->setVariable(array(
                     'GALLERY_STYLE'                => ($i % 2)+1,
+                    'GALLERY_CATEGORY_ID'          => $objResult->fields['id'],
                     'GALLERY_CATEGORY_NAME'        => $arrCategoryLang['name'],
                     'GALLERY_CATEGORY_IMAGE'       => $categoryImageLink,
                     'GALLERY_CATEGORY_IMAGE_PATH'  => $imageSrc,

@@ -1,5 +1,6 @@
 var baseUrl = 'index.php?cmd=ContentManager';
 var regExpUriProtocol = new RegExp(cx.variables.get('regExpUriProtocol', 'contentmanager'));
+var firstLoad = true;
 
 var mouseIsUp = true;
 cx.jQuery(document).bind('mouseup.global', function() {
@@ -288,7 +289,7 @@ cx.ready(function() {
         }
         data.lang  = cx.jQuery('#site-tree').jstree('get_lang');
         data.nodes = new Array();
-        cx.jQuery('#site-tree ul li.jstree-checked').not(".action-item").each(function() {
+        cx.jQuery('#site-tree ul li.jstree-checked:not(.action-item):not(.translation)').each(function() {
             nodeId = cx.jQuery(this).attr('id').match(/\d+$/)[0];
             data.nodes.push(nodeId);
         });
@@ -408,6 +409,25 @@ cx.ready(function() {
         }
     });
 
+    cx.jQuery("#site-tree .translations-expanded ins").live("click", function(event) {
+        if (cx.jQuery(this).is('ins.page')) {
+            action = "hide";
+            if (cx.jQuery(this).hasClass('invisible')) {
+                action = "show";
+            }
+        } else {
+            action = "deactivate";
+            if (cx.jQuery(this).hasClass('unpublished')) {
+                action = "activate";
+            }
+        }
+        var node = cx.jQuery(this).closest("li[id^='node_']");
+        var nodeId = node.attr("id").split("_")[1];
+        var lang = cx.jQuery(this).parent().attr("class").split(" ")[1];
+        var page = node.children("a."+lang);
+        cx.cm.performAction(action, page.attr("id"), nodeId);
+    });
+
     var data = cx.jQuery.parseJSON(cx.variables.get("tree-data", "contentmanager/tree"));
     cx.cm.actions = data.data.actions;
     cx.cm.hasHome = data.data.hasHome;
@@ -453,25 +473,17 @@ cx.ready(function() {
 
         cx.jQuery('#site-tree>ul li .jstree-wrapper').each(function() {
             jsTreeLang = cx.jQuery('#site-tree').jstree('get_lang');
-            cx.jQuery(this).children('.module.show, .preview.show, .lastupdate.show').removeClass('show').addClass('hide');
-            cx.jQuery(this).children('.module.'+jsTreeLang + ', .preview.'+jsTreeLang + ', .lastupdate.' + jsTreeLang).toggleClass('show hide');
+            var prevShown = cx.jQuery(this).children('.module.show, .preview.show, .lastupdate.show');
+            prevShown.removeClass('show').addClass('hide');
+            cx.jQuery(this).children('.module.'+jsTreeLang + ', .preview.'+jsTreeLang + ', .lastupdate.' + jsTreeLang)
+              .css("left", function() {
+                  return prevShown.filter("."+cx.jQuery(this).attr("class").split(" ")[0]).css("left");
+              })
+              .toggleClass('show hide');
         });
     });
     cx.jQuery(".chzn-select").trigger('change');
-
-    cx.jQuery('div.actions-expanded li.action-item').live('click', function(event) {
-        var classes =  cx.jQuery(event.target).attr("class").split(/\s+/);
-        var url = cx.jQuery(event.target).attr('data-href');
-        var lang = cx.jQuery('#site-tree').jstree('get_lang');
-
-        var action = classes[1];
-        var pageId = cx.jQuery(event.target).closest(".jstree-wrapper").nextAll("a." + lang).attr("id");
-        var nodeId = cx.jQuery(event.target).closest(".jstree-wrapper").parent().attr("id").split("_")[1];
-
-        cx.cm.performAction(action, pageId, nodeId);
-
-        cx.jQuery(event.target).closest('.actions-expanded').hide();
-    });
+    cx.cm.updateLocaleSelect();
 
     //add callback to reload custom content templates available as soon as template or module changes
     cx.jQuery('#page select[name="page[skin]"]').bind('change', function() {
@@ -575,6 +587,10 @@ cx.ready(function() {
     } else {
         cx.cm.isAdjusting = false;
     }
+
+    cx.jQuery(document).click(function() {
+        cx.jQuery(".translations-expanded, .actions-expanded").hide();
+    });
 
     cx.cm();
 });
@@ -1018,10 +1034,10 @@ cx.cm = function(target) {
     cx.jQuery(document).ready(function() {
         if (cx.jQuery('#languageCount').val()<=1) {
             cx.jQuery("#site-language").hide();
-            cx.jQuery(".adminlist ").addClass("margin0");
+            cx.jQuery("#content-manager").addClass("cm-single-locale");
         } else {
             cx.jQuery("#site-language").show();
-            cx.jQuery(".adminlist ").removeClass("margin0");
+            cx.jQuery("#content-manager ").removeClass("cm-single-locale");
         }
         if (cx.jQuery('#pageId').val() == 'new') {
             // make sure history tab is hidden
@@ -1138,6 +1154,11 @@ cx.cm.createJsTree = function(target, data, nodeLevels, open_all) {
     } catch (ex) {}
 
     var eventAdded = false;
+
+    // reset expanded table
+    if (cx.jQuery(".switch-tag-dropdown").hasClass("open")) {
+        cx.cm.resetExpandedTable();
+    }
 
     target.jstree({
         // List of active plugins
@@ -1334,7 +1355,7 @@ cx.cm.createJsTree = function(target, data, nodeLevels, open_all) {
             cx.jQuery('#node_' + nodeId).children('a').children('.jstree-checkbox').css('left', '-' + ((nodeLevels[nodeId] * 18) + 20) + 'px');
         }
 
-        cx.jQuery('#site-tree ul li').not(".actions-expanded li").each(function() {
+        cx.jQuery('#site-tree ul li').not(".actions-expanded li, .translations-expanded li").each(function() {
             cx.jQuery(this).children('a:last').after(function() {
                 if (!cx.jQuery(this).hasClass('jstree-move') && cx.jQuery(this).siblings('.jstree-move').length == 0) {
                     return '<a class="jstree-move" href="#"></a>';
@@ -1412,7 +1433,7 @@ cx.cm.createJsTree = function(target, data, nodeLevels, open_all) {
         cx.jQuery('#' + cx.jQuery('#pageId').val()).siblings('.jstree-wrapper').addClass('active');
 
         // add a wrapper div for the horizontal lines
-        cx.jQuery('#site-tree li > ins.jstree-icon').each(function(index, node) {
+        cx.jQuery('#site-tree li:not(.translation) > ins.jstree-icon').each(function(index, node) {
             cx.jQuery(this).hover(
                 function() {
                     if (mouseIsUp) {
@@ -1453,13 +1474,18 @@ cx.cm.createJsTree = function(target, data, nodeLevels, open_all) {
                     nodeIds[lang] = node.attr("id").substr(5);
                 }
             });
-            cx.jQuery.each(cx.jQuery("select.chzn-select option"), function(index, el) {
+
+            // show dropdown for more than 4 locales
+            var languages = cx.jQuery("select.chzn-select option");
+            // generate tags
+            cx.jQuery.each(languages, function(index, el) {
                 var lang = cx.jQuery(el).val();
                 var langEl = cx.jQuery("<div class=\"translation " + lang + "\" />");
                 langEl.text(lang);
                 langEl.click(function() {
                     var page = cx.cm.getPageStatus(nodeIds[lang], lang);
                     if (page.existing) {
+
                         cx.cm.loadPage(page.id, null, null, "content");
                     } else {
                         cx.cm.setCurrentLang(lang);
@@ -1468,16 +1494,51 @@ cx.cm.createJsTree = function(target, data, nodeLevels, open_all) {
                 });
                 translations.append(langEl);
             });
+            // dropdown
+            translations
+              .append('<div class="label">' + cx.variables.get('TXT_CORE_CM_TRANSLATIONS', 'contentmanager/lang') + '</div><div class="arrow" /></div>')
+              .prepend("<div class=\"translations-expanded\" style=\"display: none;\"><ul></ul></div>")
+              .click(function(e) {
+                  e.stopPropagation();
+                  if (!cx.jQuery(e.target).is(".translations > .translation")) {
+                      cx.jQuery(this).children(".translations-expanded").toggle();
+                      cx.jQuery(".translations.dropdown").not(this).children(".translations-expanded").hide();
+                      cx.jQuery('.actions-expanded').hide();
+                  }
+              });
+            var translationDropdown = translations.find(".translations-expanded ul");
+            cx.jQuery.each(languages, function(index, el) {
+                var lang = cx.jQuery(el).val();
+                var langEl = cx.jQuery("<li class=\"translation " + lang + "\" />");
+                langEl.html("<span>" + cx.jQuery(el).text() + "</span>");
+                langEl.children("span").click(function() {
+                    var page = cx.cm.getPageStatus(nodeIds[lang], lang);
+                    if (page.existing) {
+                        cx.cm.loadPage(page.id, null, null, "content");
+                    } else {
+                        cx.cm.setCurrentLang(lang);
+                        cx.cm.loadPage(undefined, nodeIds[lang], null, "content");
+                    }
+                });
+                translationDropdown.append(langEl);
+            });
+
             var actions = cx.jQuery('<div class="actions"><div class="label">' + cx.variables.get('TXT_CORE_CM_ACTIONS', 'contentmanager/lang') + '</div><div class="arrow" /></div>')
-                            .append("<div class=\"actions-expanded\" style=\"display: none;\"><ul></ul></div>")
-                            .click(function() {
+                            .prepend("<div class=\"actions-expanded\" style=\"display: none;\"><ul></ul></div>")
+                            .click(function(e) {
+                                e.stopPropagation();
                                 cx.jQuery(this).children(".actions-expanded").toggle();
+                                cx.jQuery(".actions").not(this).children(".actions-expanded").hide();
+                                cx.jQuery('.translations-expanded').hide();
                             });
             var wrapper = cx.jQuery(actions).wrap('<div class="jstree-wrapper" />').parent();
             wrapper.prepend(translations);
             cx.jQuery(node).before(wrapper);
         });
-        if (cx.jQuery(".translations").first().children(".translation").length <= 1) {
+        if (
+            !cx.jQuery(".translations").hasClass("dropdown") &&
+            cx.jQuery(".translations").first().children(".translation").length <= 1
+        ) {
             cx.jQuery(".translations").hide();
             cx.jQuery(".translation").html("");
         }
@@ -1520,7 +1581,8 @@ cx.cm.createJsTree = function(target, data, nodeLevels, open_all) {
                 } else {
                     display = 'hide';
                 }
-                cx.jQuery(e).append($J('<span class="module ' + lang + ' ' + display + '" /><a class="preview ' + lang + ' ' + display + '" target="_blank">' + cx.variables.get('TXT_CORE_CM_VIEW', 'contentmanager/lang') + '</a><span class="lastupdate ' + lang + ' ' + display + '"><span class="date" /><span class="user tp-trigger" /><span class="user tp-value"/></span>'));
+                cx.jQuery(e).find('.translations').after('<span class="module ' + lang + ' ' + display + '" /><a class="preview ' + lang + ' ' + display + '" target="_blank">' + cx.variables.get('TXT_CORE_CM_VIEW', 'contentmanager/lang') + '</a>');
+                cx.jQuery(e).find('.actions').after($J('<span class="lastupdate ' + lang + ' ' + display + '"><span class="date" /><span class="user tp-trigger" /><span class="user tp-value"/></span>'));
                 var info = cx.jQuery.parseJSON(cx.jQuery(e).siblings('a[data-href].' + lang).attr('data-href'));
                 try {
                     if (info != null) {
@@ -1541,13 +1603,9 @@ cx.cm.createJsTree = function(target, data, nodeLevels, open_all) {
             cx.jQuery(this).attr("href", path);
         });
 
-        cx.jQuery('.jstree li, .actions-expanded').live('mouseleave', function(event) {
-            if (!cx.jQuery(event.target).is('li.action-item') && cx.jQuery('.actions-expanded').length > 0) {
-                cx.jQuery('.actions-expanded').each(function() {
-                    cx.jQuery(this).parent().parent().children().css('z-index', 'auto');
-                    cx.jQuery(this).hide();
-                });
-            }
+        cx.jQuery(".switch-tag-dropdown").unbind("click").bind("click", function(e) {
+            e.preventDefault();
+            cx.cm.switchTagDropdown(true);
         });
 
         // publishing and visibility icons
@@ -1583,6 +1641,23 @@ cx.cm.createJsTree = function(target, data, nodeLevels, open_all) {
             }
             if (pageId) {
                 cx.cm.updateTreeEntry(cx.cm.getPageStatus(nodeId, lang));
+            }
+
+            var langEl = cx.jQuery("#node_" +nodeId+ " > .jstree-wrapper  .translations-expanded .translation."+lang);
+            if (
+              !cx.jQuery(this).hasClass("jstree-move") &&
+              !langEl.find("ins.page, ins.publishing").length
+            ) { // don't prepend twice
+                // copy publishing and visibility icon to dropdown
+                if (
+                    !cx.jQuery(this).has("ins.page") ||
+                    !cx.jQuery(this).has("ins.publishing")
+                ) {
+                    return;
+                }
+                var insertPage = cx.jQuery(this).children("ins.page").clone();
+                var insertPublishing = cx.jQuery(this).children("ins.publishing").clone();
+                langEl.prepend(insertPage).prepend(insertPublishing);
             }
         });
 
@@ -1723,6 +1798,16 @@ cx.cm.createJsTree = function(target, data, nodeLevels, open_all) {
                 zIndex -= 10;
             });
         }
+        if (
+          firstLoad &&
+          cx.variables.get("showLocaleTagsByDefault", "contentmanager") == "on"
+        ) {
+            cx.cm.switchTagDropdown(true);
+            firstLoad = false;
+        } else {
+            cx.cm.resetExpandedTable();
+            cx.cm.switchTagDropdown(false);
+        }
     })
     .bind("loaded.jstree", function(event, data) {
         if (open_all) {
@@ -1756,6 +1841,31 @@ cx.cm.createJsTree = function(target, data, nodeLevels, open_all) {
     })
     .bind("set_lang.jstree", function(event, data) {
         document.cookie = "userFrontendLangId=" + data.rslt;
+    })
+    .bind("open_node.jstree", function(event, data) {
+        if (cx.jQuery(".switch-tag-dropdown").hasClass("open")) {
+            var node = cx.jQuery(data.rslt.obj);
+            // adjust left position of cols (adopt from parent row)
+            var alreadyExpanded = node.children(".jstree-wrapper");
+            var lang = cx.cm.getCurrentLang();
+            //module
+            var cols = node.children("ul").find(".translations," +
+            "."+lang+".module," +
+            "."+lang+".preview," +
+            ".actions," +
+            "."+lang+".lastupdate"
+            );
+            cols.css("left", function() {
+               return alreadyExpanded.children("."+cx.jQuery(this).attr("class").split(" ")[0]).not(".hide").css("left");
+            });
+            // node.children("ul").find(".module."+lang).css("left", alreadyExpanded.children(".module."+lang).css("left"));
+        }
+    })
+    .bind("open_all.jstree", function(event, data) {
+        // setTimout 0 is neccessary, otherwise the translation col width is 0
+        setTimeout(function() {
+            cx.cm.expandSiteStructure();
+        },0);
     })
     .ajaxStart(function(){
         if (!cx.cm.is_opening) {
@@ -2027,7 +2137,7 @@ cx.cm.updatePagesIcons = function(args) {
 cx.cm.updateTranslationIcons = function(args) {
     var node = cx.jQuery("#node_" + args.page.nodeId);
     var page = node.children("a." + args.page.lang);
-    var translationIcon = page.siblings(".jstree-wrapper").children(".translations").children(".translation." + args.page.lang);
+    var translationIcon = page.siblings(".jstree-wrapper").children(".translations").find(".translation." + args.page.lang);
 
     // reset classes
     translationIcon.attr("class", "translation " + args.page.lang);
@@ -2086,6 +2196,19 @@ cx.cm.updateActionMenu = function(args) {
             menu.append(cx.jQuery("<li class=\"action-item\">").addClass("show").text(cx.variables.get("show", "contentmanager/lang/actions")));
         }
         menu.append(cx.jQuery("<li class=\"action-item\">").addClass("delete").text(cx.variables.get("delete", "contentmanager/lang/actions")));
+        menu.find('li.action-item').click(function(event) {
+            var classes = cx.jQuery(event.target).attr('class').split(/\s+/);
+            var lang    = cx.jQuery('#site-tree').jstree('get_lang');
+            var action  = classes[1];
+            var pageId  = cx.jQuery(event.target).closest('.jstree-wrapper').nextAll('a.' + lang).attr('id');
+            var nodeId  = cx.jQuery(event.target).closest('.jstree-wrapper').parent().attr('id').split('_')[1];
+
+            cx.cm.performAction(action, pageId, nodeId);
+
+            setTimeout(function(){
+                cx.jQuery(event.target).closest('.actions-expanded').hide();
+            }, 100);
+        });
     }
 }
 
@@ -2238,6 +2361,12 @@ cx.cm.updateTreeEntry = function(newStatus) {
         default:
             break;
     }
+
+    // update publishing/visibility in dropdown as well
+    var translation = node.find(".translations-expanded .translation."+pageLang);
+    translation.children("ins.publishing").attr("class", publishing.attr("class"));
+    translation.children("ins.page").attr("class", visibility.attr("class"));
+
 
     // make sure IDs are correct
     newStatus.id = pageId;
@@ -2961,6 +3090,28 @@ cx.cm.pageLoaded = function(page, selectTab, reloadHistory, historyId) {
     }
     cx.jQuery("#node_" + page.node).children(".jstree-wrapper").addClass("active");
     cx.jQuery('html, body').animate({scrollTop:0}, 'slow');
+
+    // store page's locale in last used locales
+    var lastUsedLocales = '';
+    if (!!Cookies.get('lastUsedLocales')) {
+        lastUsedLocales = Cookies.get('lastUsedLocales');
+    }
+    if (lastUsedLocales.length) {
+        lastUsedLocales = lastUsedLocales.split(",");
+    } else {
+        lastUsedLocales = [];
+    }
+    // push used lang to begin of array
+    lastUsedLocales.unshift(page.lang);
+    // drop dublicate entries
+    lastUsedLocales = lastUsedLocales.filter(function(el, index, arr) {
+        return index === arr.indexOf(el);
+    });
+    // convert to string and store last used locales in cookie
+    lastUsedLocales = lastUsedLocales.join(",");
+    Cookies.set('lastUsedLocales', lastUsedLocales);
+
+    cx.cm.updateLocaleSelect();
 };
 
 cx.cm.setPageTarget = function(pageTarget, pageTargetPath) {
@@ -3216,4 +3367,145 @@ cx.cm.setSelectedMetaimage = function (data) {
         var url = data.data[0].datainfo;
         document.getElementById('page_metaimage').value = url.filepath;
     }
+}
+
+/**
+ * Places the last used locales (stored in cookie) on top of the select
+ */
+cx.cm.updateLocaleSelect = function() {
+    // place last used locales on top of select
+    if (!!Cookies.get("lastUsedLocales")) {
+        var lastUsedLocales = Cookies.get("lastUsedLocales").split(",");
+        // loop over last used locales backwards
+        for (var i = lastUsedLocales.length - 1; i >= 0; --i) {
+            // place option on top of select
+            cx.jQuery(".chzn-select").prepend(cx.jQuery(".chzn-select option[value="+ lastUsedLocales[i] + "]"));
+            cx.jQuery(".translations-expanded ul").each(function() {
+               jQuery(this).prepend(cx.jQuery(this).find("li." + lastUsedLocales[i]));
+            });
+        }
+        cx.jQuery(".chzn-select").trigger("chosen:updated");
+    }
+}
+
+/**
+ * Expands/contracts site structure when locale tags are shown/hidden
+ */
+cx.cm.expandSiteStructure = function() {
+    var translations = cx.jQuery("#site-tree .translations");
+    // expand site-structure according to translations column width
+    var difference = translations.width() - cx.jQuery("th.translation").width();
+    var cols = cx.cm.getSiteStructureCols();
+
+    if (difference >= 0) {
+        var parentWidth = cx.jQuery("table.adminlist").outerWidth();
+        var parentExpandedWidth = parentWidth + difference;
+        var expandFactor = parentWidth / parentExpandedWidth;
+        cx.jQuery("table.adminlist").width(parentExpandedWidth);
+
+        // adjust cols
+        cols.css("left", function() {
+            var oldLeft = cx.jQuery(this).position().left;
+            if (cx.jQuery(this).hasClass("translations")) {
+                var newLeft = oldLeft * expandFactor;
+            } else {
+                var newLeft = oldLeft * expandFactor + difference;
+            }
+            // adjust table headers
+            var thEl = null;
+            switch (true) {
+                case cx.jQuery(this).hasClass('translations'):
+                    thEl = cx.jQuery("th.translation");
+                    break;
+                case cx.jQuery(this).hasClass('module'):
+                    thEl = cx.jQuery("th.module");
+                    break;
+                case cx.jQuery(this).hasClass('preview'):
+                    thEl = cx.jQuery("th.preview");
+                    break;
+                case cx.jQuery(this).hasClass('actions'):
+                    thEl = cx.jQuery("th.actions");
+                    break;
+            }
+            if (thEl) {
+                thEl.css({
+                    "position": "absolute",
+                    "left": newLeft + "px",
+                });
+            }
+            return newLeft + "px";
+        });
+    } else {
+        cx.cm.resetExpandedTable();
+    }
+}
+
+/**
+ * Resets the expanded tables width and the positions of its headers and cols
+ */
+cx.cm.resetExpandedTable = function() {
+    // table headers
+    tableHeaders = cx.cm.getSiteStructureHeaders();
+    tableHeaders.removeAttr("style");
+    // cols
+    cols = cx.cm.getSiteStructureCols();
+    cols.removeAttr("style");
+    // table
+    cx.jQuery("table.adminlist").removeAttr("style");
+}
+
+/**
+ * Gets the headers of the site structure table
+ * @returns {jQuery} The selected ths
+ */
+cx.cm.getSiteStructureHeaders = function() {
+    return cx.jQuery("th.page," +
+      "th.translation," +
+      "th.module," +
+      "th.preview," +
+      "th.actions," +
+      "th.lastupdate"
+    );
+}
+
+/**
+ * Gets the (shown) cols of the site structure table
+ * @returns {jQuery} The selected cols
+ */
+cx.cm.getSiteStructureCols = function() {
+    return cx.jQuery("#site-tree .translations," +
+      "#site-tree .module," +
+      "#site-tree .preview," +
+      "#site-tree .actions," +
+      "#site-tree .lastupdate"
+    ).not(".hide");
+}
+
+/**
+ * Handles the switching between the locale tags and the dropdown
+ * @param toggle Wether to switch or not
+ */
+cx.cm.switchTagDropdown = function(toggle) {
+    // do not render locale-selection-dropdown in single-locale-mode
+    if (cx.jQuery('#content-manager').hasClass('cm-single-locale')) {
+        return;
+    }
+    var switchTagDropdown = cx.jQuery(".switch-tag-dropdown");
+    var translations = cx.jQuery("#site-tree .translations");
+
+    if (toggle) {
+        // toggle open class
+        cx.jQuery(switchTagDropdown).toggleClass("open");
+    }
+    if (switchTagDropdown.hasClass("open")) { // tags
+      // show tags
+      translations.removeClass("dropdown");
+      translations.find(".translations-expanded").hide();
+      translations.children(".translation").show();
+    } else {
+      // show dropdown
+      translations.addClass("dropdown");
+      translations.children(".translation").hide();
+    }
+    cx.cm.expandSiteStructure();
 }

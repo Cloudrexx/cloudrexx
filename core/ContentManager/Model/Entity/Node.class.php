@@ -414,6 +414,7 @@ class Node extends \Cx\Model\Base\EntityBase implements \Serializable
                 true,   // includeName
                 true,   // includeMetaData
                 true,   // includeProtection
+                false,  // includeEditingStatus
                 false,  // followRedirects
                 true    // followFallbacks
         );
@@ -428,30 +429,82 @@ class Node extends \Cx\Model\Base\EntityBase implements \Serializable
     /**
      * Creates a copy of this node including its pages
      *
-     * This does not persist anything.
-     * @todo This is untested!
-     * @param boolean $recursive (optional) Wheter copy all children to the new node or not, default false
-     * @param Node $newParent (optional) New parent node for the copy, default is parent of this
-     * @param boolean $persist (optional) Wheter to persist new entities or not, default true, if set to false, be sure to persist everything
+     * @param boolean $recursive (optional) Whether copy all children to the new node or not, default false
+     * @param Node    $newParent (optional) New parent node for the copy, default is parent of this
+     * @param integer $nodePosition         Node position
+     * @param boolean $addCopySuffix        Add the suffix '(Copy)' to the page title if true otherwise not
      * @return \Cx\Core\ContentManager\Model\Entity\Node Copy of this node
      */
-    public function copy($recursive = false, Node $newParent = null, $persist = true) {
-        $em = \Env::get('cx')->getDb()->getEntityManager();
+    public function copy(
+        $recursive = false,
+        Node $newParent = null,
+        &$nodePosition = 0,
+        $addCopySuffix = false
+    ) {
+        global $_CORELANG;
 
+        $em = $this->cx->getDb()->getEntityManager();
         if (!$newParent) {
             $newParent = $this->getParent();
         }
+
         $copy = new self();
         $copy->setParent($newParent);
-        if ($persist) {
-            $em->persist($copy);
-        }
+        $em->persist($copy);
 
         foreach ($this->getPages(true) as $page) {
-            $pageCopy = $page->copyToNode($copy);
-            if ($persist) {
-                $em->persist($pageCopy);
+            $pageCopy = $page->copyToNode($copy, true, true, true, true, true, false);
+
+            $em->persist($pageCopy);
+            // Update the $pageCopy title with the suffix '(Copy)' if the $addCopySuffix is true otherwise not
+            if ($addCopySuffix) {
+                $title = $page->getTitle() . ' (' . $_CORELANG['TXT_CORE_CM_COPY_OF_PAGE'] . ')';
+                $i = 1;
+                while ($page->titleExists($copy->getParent(), $page->getLang(), $title)) {
+                    $i++;
+                    if ($page->getLang() == \FWLanguage::getDefaultLangId()) {
+                        $nodePosition++;
+                    }
+
+                    $title = $page->getTitle() . ' (' . sprintf($_CORELANG['TXT_CORE_CM_COPY_N_OF_PAGE'], $i) . ')';
+                }
+                $pageCopy->setTitle($title);
             }
+
+            // Copy the draft log of $page to $pageCopy only
+            // if the $page editing status is 'hasDraft' or 'hasDraftWaiting'
+            if (!$page->isDraft()) {
+                continue;
+            }
+
+            // Call the flush() method to make the create log for the $pageCopy
+            $em->flush();
+            // Get the draft log of $page. The draft log is either the latest
+            // or the second latest log entry.
+            $logRepo = $em->getRepository('Cx\Core\ContentManager\Model\Entity\LogEntry');
+            $logEntriesOfPage = $logRepo->getLogEntries($page, false, 2);
+            // fetch second latest log
+            $logData = $logEntriesOfPage[1]->getData();
+            // check if the second latest log is a draft-log.
+            // in case the page has been created directly as draft-log,
+            // then the second latest log will not be the draft-log,
+            // but the create-log instead.
+            // If that is the case, the draft-log is the latest log
+            if (
+                !isset($logData['editingStatus']) ||
+                $logData['editingStatus'] != 'hasDraft'
+            ) {
+                $logData = $logEntriesOfPage[0]->getData();
+            }
+            // apply draft data to copied page
+            $pageCopy->updateFromArray($logData);
+            // Call the flush() method to make the update log for the $pageCopy
+            $em->flush();
+            // Now revert the $pageCopy to its create log version.
+            $cachedPageEditingStatus = $pageCopy->getEditingStatus();
+            $logEntriesOfCopyPage    = $logRepo->getLogEntries($pageCopy, false, 1, 1);
+            $logRepo->revert($pageCopy, $logEntriesOfCopyPage[0]->getVersion());
+            $pageCopy->setEditingStatus($cachedPageEditingStatus);
         }
 
         if (!$recursive) {
@@ -507,5 +560,30 @@ class Node extends \Cx\Model\Base\EntityBase implements \Serializable
         foreach ($unserialized[6] as $pageId) {
             $this->pages[] = $pageId;
         }
+    }
+
+    /**
+     * Check if this node is a child (direct or indirect) of node $parent
+     *
+     * @param   Node    $parent Node to check if its the parent of this
+     *                          instance of
+     * @return  boolean Whether this instance is a child of $parent. Whereas
+     *                  $parent is not required to be a direct parent of this
+     *                  instance.
+     */
+    public function isChildOf($parent) {
+        if (
+            // if $this is located within the boundaries
+            // of $parent, then $this is a child of $parent
+            $parent->getLft() < $this->getLft() &&
+            $parent->getRgt() > $this->getRgt() &&
+            // this check is just for the case when the tree
+            // is broken
+            $parent->getLvl() < $this->getLvl()
+        ) {
+            return true;
+        }
+
+        return false;
     }
 }

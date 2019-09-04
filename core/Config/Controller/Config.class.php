@@ -212,6 +212,10 @@ class Config
                     'value' => \FWLanguage::getDefaultBackendLangId(),
                     'values' => '{src:\\' . __CLASS__ . '::getBackendLanguages()}',
                 ),
+                'showLocaleTagsByDefault' => array(
+                    'type'  => \Cx\Core\Setting\Controller\Setting::TYPE_RADIO,
+                    'value' => 'on',
+                ),
             ),
             'security' => array(
                 'coreIdsStatus' => array(
@@ -314,6 +318,10 @@ class Config
                 'dnsHostnameLookup' => array(
                     'type' => \Cx\Core\Setting\Controller\Setting::TYPE_RADIO,
                     'value' => 'off',
+                ),
+                'uploadFileSizeLimit' => array(
+                    'value' => '500 mb',
+                    'values' => '{"type":"filesize"}',
                 ),
             ),
             'core' => array(

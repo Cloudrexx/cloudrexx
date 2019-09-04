@@ -4,7 +4,7 @@
 # vim: syn=sh
 
 # Wrapper for bash 3
-if [[ $BASH_VERSION != 4.* ]]; then
+if [ "${BASH_VERSION:0:1}" -lt 4 ]; then
     command="cd /root && ./cx --proxy-host-dir='$(pwd -P)' $@"
     # Special case: user wants to start interactive shell to wrapper container
     if [[ "$@" == "env shell --wrapper" ]]; then
@@ -12,7 +12,7 @@ if [[ $BASH_VERSION != 4.* ]]; then
     fi
 
     # Pass everything through our wrapper
-    docker run --rm -ti --name clx-win-wrapper -v "$(pwd -P)/":/root -v /var/run/docker.sock:/var/run/docker.sock cloudrexx/ubuntu bash -c "$command"
+    docker run --rm -ti --name clx-win-wrapper --user=$(id -u):$(stat -c '%g' /var/run/docker.sock) -v "$(pwd -P)/":/root -v /var/run/docker.sock:/var/run/docker.sock cloudrexx/ubuntu bash -c "$command"
     exit 0
 fi
 
@@ -316,7 +316,8 @@ Synopsis
 
 Available options are:
     --root          Execute Bash as root
-    --sql           Execute SQL on database container instead of Bash on web container."
+    --sql           Execute SQL on database container instead of Bash on web container.
+    --sql-file      Execute SQL from a file on database container instead of Bash on web container."
                     ;;
                 component)
                     case "$3" in
@@ -450,6 +451,7 @@ Available subcommands are:
     shell       Interactive shell of the current environment's web container
     component   Manages additional components
     remote      Manages remote installations
+    exec        Executes code (Bash/SQL) for the current environment
 
 For more info about a subcommand type ./cx help env <subcommand>";
                     ;;
@@ -467,7 +469,9 @@ Synopsis
 Available options are:
     --web               Shows the log of the web docker container (Apache)
     --request           Shows the log of the last request
+    --stack             Shows the stack trace of the last failed request
     --clear-usercache   Clears the user cache
+    --install-x-debug   Installs xDebug inside the web container
     --follow            Follows the log"
             ;;
         *)
@@ -761,7 +765,7 @@ function cmd_env {
                     exit 1
                 fi
             fi
-            ARGUMENTS["dir"]="$(pwd -P)"
+            ARGUMENTS["dir"]="$(get_real_pwd)"
             envname="$(cmd_envs list)"
             if [[ "$?" == "0" ]]; then
                 echo "There's already an environment up and running (\"$envname\") for this directory."
@@ -791,7 +795,7 @@ function cmd_env {
                 if ! which cx > /dev/null; then
                     echo ""
                     echo "cx could not be found in your path. Run the following command to add it:"
-                    echo "sudo cp $(pwd -P)/cx /usr/local/bin"
+                    echo "sudo cp $(get_real_pwd)/cx /usr/local/bin"
                 fi
             fi
             exit 0
@@ -1043,6 +1047,15 @@ SET FOREIGN_KEY_CHECKS = 1;"
                     mysql_exec "$input"
                 else
                     mysql_exec "$@"
+                fi
+                mysql_drop_tempfile
+            elif [[ ${ARGUMENTS["sql-file"]} ]]; then
+                get_config_array
+                mysql_create_tempfile
+                if read -r -t 0; then
+                    mysql_load "$input"
+                else
+                    mysql_load "$@"
                 fi
                 mysql_drop_tempfile
             else
@@ -1631,7 +1644,7 @@ function mysql_exec {
     else
         echo "$1" > "./tmp/db/import.sql"
         shift
-        internal_dockerexec exec -i "<db-container>" bash -c "mysql --defaults-file=${TEMP_FILES["db-connection"]} -e $@ 'SOURCE /tmp/import/import.sql'"
+        internal_dockerexec exec -i "<db-container>" bash -c "mysql --defaults-file=${TEMP_FILES["db-connection"]} $@ -e 'SOURCE /tmp/import/import.sql'"
         rm "./tmp/db/import.sql"
     fi
 }
@@ -1714,6 +1727,15 @@ function runs_as_proxy {
     fi
 }
 
+function is_wrapper {
+    if [[ "$PROXY_HOST_DIR" != "" ]]; then
+        return 0
+    elif [[ "${ARGUMENTS["proxy-host-dir"]}" != "" ]]; then
+        return 0
+    fi
+    return 1
+}
+
 function get_real_pwd {
     local working_directory
     working_directory="$PWD"
@@ -1745,7 +1767,7 @@ function isPortFree {
 # Decide what to do #
 #####################
 
-# this finds "cx" in currend pwd or above
+# this finds "cx" in current pwd or above
 path="$(pwd)"
 result=""
 found=false
@@ -1770,6 +1792,10 @@ if ! $found; then
 
     # command is envs
     elif [[ "$1" == "envs" ]]; then
+        if is_wrapper; then
+            echo "envs command is not available through wrapper!"
+            exit 1
+        fi
         COMMANDS=("${COMMANDS[@]:1}")
         cmd_envs "${COMMANDS[@]/#/}"
         exit
@@ -1794,6 +1820,10 @@ fi
 ORIG_ARGS=("$@")
 case "${COMMANDS[0]}" in
     envs)
+        if is_wrapper; then
+            echo "envs command is not available through wrapper!"
+            exit 1
+        fi
         COMMANDS=("${COMMANDS[@]:1}")
         cmd_envs "${COMMANDS[@]/#/}"
         ;;
@@ -1823,8 +1853,23 @@ case "${COMMANDS[0]}" in
         elif [[ ${ARGUMENTS["clear-usercache"]} ]]; then
             clearUsercache
             exit
+        elif [[ ${ARGUMENTS["install-x-debug"]} ]]; then
+            get_config_array
+            internal_dockerexec exec -i "<web-container>" bash -c "pecl install xdebug && docker-php-ext-enable xdebug && apachectl -k graceful"
+            exit
         fi
-        tac tmp/log/dbg.log | grep -m1 -B1 "initialization failed" | tac
+        lastError="$(tac tmp/log/dbg.log | grep -m1 -B1 "initialization failed" | tac)"
+        if [[ ${ARGUMENTS["stack"]} == true ]]; then
+            requestId="$(echo "$lastError" | grep '^[^ ].*"([a-z0-9]\+)" ' -m1 | grep -o ' "([0-9a-z]\+)" ' | grep -o '[0-9a-z]\+')"
+            if [ -t 0 ] ; then
+                echo "$lastError"$'\n'"$(grep -Pzo ".*${requestId}(.*\n)*" tmp/log/dbg.log | grep '^          [0-9]\+' -A6 | grep '^          ')" | less
+            else
+                echo "$lastError"
+                grep -Pzo ".*${requestId}(.*\n)*" tmp/log/dbg.log | grep '^          [0-9]\+' -A6 | grep '^          '
+            fi
+        else
+            echo "$lastError"
+        fi
         ;;
     *)
         if [[ "${COMMANDS[0]}" == "" || "${COMMANDS[0]}" == "help" ]]; then

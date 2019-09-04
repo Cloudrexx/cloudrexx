@@ -215,8 +215,16 @@ class Jobs extends JobsLibrary
                 if(!empty($link)) {
                     $domainRepo = new \Cx\Core\Net\Model\Repository\DomainRepository();
                     $domain = $domainRepo->getMainDomain()->getName();
-                    $url = str_replace("%URL%",urlencode($domain.$_SERVER['REQUEST_URI']),$url);
-                    $url = htmlspecialchars(str_replace("%TITLE%",urlencode(stripslashes($title)),$url), ENT_QUOTES, CONTREXX_CHARSET);
+
+                    $url = \Cx\Core\Routing\Url::fromMagic($url);
+                    $params = $url->getParamArray();
+                    foreach ($params as $param => &$value) {
+                        $value = str_replace('%URL%', $domain.$_SERVER['REQUEST_URI'], $value);
+                        $value = str_replace('%TITLE%', stripslashes($title), $value);
+                    }
+                    $url->setParams($params);
+                    $url = $url->toString();
+
                     $footnotelink = "<a href='$url'>$link</a>";
 			        $footnotelinkSrc = $url;
                 }

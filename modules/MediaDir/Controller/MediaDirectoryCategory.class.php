@@ -223,7 +223,7 @@ class MediaDirectoryCategory extends MediaDirectoryLibrary
         }
     }
 
-    function listCategories($objTpl, $intView, $intCategoryId=null, $arrParentIds=null, $intEntryId=null, $arrExistingBlocks=null, $intStartLevel=1)
+    function listCategories($objTpl, $intView, $intCategoryId=null, $arrParentIds=null, $intEntryId=null, $arrExistingBlocks=null, $intStartLevel=1, $cmd = null)
     {
         global $_ARRAYLANG, $_CORELANG, $objDatabase, $objInit;
 
@@ -363,20 +363,13 @@ class MediaDirectoryCategory extends MediaDirectoryLibrary
                         $strIndexHeaderTag = null;
                     }
 
-                    //get ids
-                    if(isset($_GET['cmd'])) {
-                        $strCategoryCmd = '&amp;cmd='.$_GET['cmd'];
-                    } else {
-                        $strCategoryCmd = null;
-                    }
-
                     // parse entries
                     if (
                         $objTpl->blockExists($this->moduleNameLC.'CategoriesLevels_row_' . $intBlockId . '_entries') &&
                         $objTpl->blockExists($this->moduleNameLC.'CategoriesLevels_row_' . $intBlockId . '_entry')
                     ) {
                         $objEntry = new MediaDirectoryEntry($this->moduleName);
-                        $objEntry->getEntries(null, $levelId, $arrCategory['catId'], null, false, null, true);
+                        $objEntry->getEntries(null, $levelId, $arrCategory['catId'], null, false, null, true, null, 'n', null, null, $cmd);
                         if ($objEntry->countEntries()) {
                             // set mediadirCategoriesLevels_row_N_entry tempalte block to be parsed
                             $objEntry->setStrBlockName($this->moduleNameLC.'CategoriesLevels_row_'. $intBlockId . '_entry');

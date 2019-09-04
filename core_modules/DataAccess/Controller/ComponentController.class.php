@@ -68,6 +68,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                     'get',
                     'post',
                     'put',
+                    'patch',
                     'delete',
                     'trace',
                     'options',
@@ -161,16 +162,11 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             if (empty($arguments[1])) {
                 throw new \InvalidArgumentException('Not enough arguments');
             }
-            $em = $this->cx->getDb()->getEntityManager();
             $dataSource = $this->getDataSource($arguments[1]);
             $elementId = array();
-            if (
-                isset($arguments[2]) &&
-                $dataSource instanceof \Cx\Core\DataSource\Model\Entity\DoctrineRepository
-            ) {
+            if (isset($arguments[2])) {
                 $argumentKeys = array_keys($arguments);
-                $metaData = $em->getClassMetadata($dataSource->getIdentifier());
-                $primaryKeyNames = $metaData->getIdentifierFieldNames();
+                $primaryKeyNames = $dataSource->getIdentifierFieldNames();
                 for ($i = 0; $i < count($arguments) - 2; $i++) {
                     if (!is_numeric($argumentKeys[$i + 2])) {
                         break;
@@ -188,12 +184,12 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             if (isset($arguments['order']) && is_array($arguments['order'])) {
                 foreach ($arguments['order'] as $field=>$sortOrder) {
                     if (!$dataSource->hasField($field)) {
-                        throw new \InvalidArgumentsException(
+                        throw new \InvalidArgumentException(
                             'Unknown field "' . $field . '"'
                         );
                     }
                     if (!in_array(strtolower($sortOrder), array('asc', 'desc'))) {
-                        throw new \InvalidArgumentsException(
+                        throw new \InvalidArgumentException(
                             'Unknown sort order "' . $sortOrder . '"'
                         );
                     }
@@ -214,7 +210,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                             );
                         }
                         if (!$dataSource->supportsOperation($operation)) {
-                            throw new \InvalidArgumentsException(
+                            throw new \InvalidArgumentException(
                                 'Unsupported operation "' . $operation . '"'
                             );
                         }
@@ -235,7 +231,13 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             
             $em = $this->cx->getDb()->getEntityManager();
             $dataAccessRepo = $em->getRepository($this->getNamespace() . '\Model\Entity\DataAccess');
-            $dataAccess = $dataAccessRepo->getAccess($outputModule, $dataSource, $method, $apiKey);
+            $dataAccess = $dataAccessRepo->getAccess(
+                $outputModule,
+                $dataSource,
+                $method,
+                $apiKey,
+                $arguments
+            );
             if (!$dataAccess) {
                 $response->setStatusCode(403);
                 throw new \BadMethodCallException('Access denied');
@@ -259,7 +261,11 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 case 'options':
                     // lists available methods for a request
                     http_response_code(204); // No Content
-                    $allowedMethods = $dataAccessRepo->getAllowedMethods($dataSource, $apiKey);
+                    $allowedMethods = $dataAccessRepo->getAllowedMethods(
+                        $dataSource,
+                        $apiKey,
+                        $arguments
+                    );
                     header('Allow: ' . implode(', ', $allowedMethods));
                     die();
                     break;

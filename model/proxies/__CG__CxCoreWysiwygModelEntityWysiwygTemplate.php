@@ -73,10 +73,10 @@ class WysiwygTemplate extends \Cx\Core\Wysiwyg\Model\Entity\WysiwygTemplate impl
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'id', 'title', 'description', 'imagePath', 'htmlContent', 'active', 'validators', 'virtual');
+            return array('__isInitialized__', 'id', 'title', 'description', 'imagePath', 'htmlContent', 'active', 'order', 'validators', 'virtual');
         }
 
-        return array('__isInitialized__', 'id', 'title', 'description', 'imagePath', 'htmlContent', 'active', 'validators', 'virtual');
+        return array('__isInitialized__', 'id', 'title', 'description', 'imagePath', 'htmlContent', 'active', 'order', 'validators', 'virtual');
     }
 
     /**
@@ -305,6 +305,28 @@ class WysiwygTemplate extends \Cx\Core\Wysiwyg\Model\Entity\WysiwygTemplate impl
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getActive', array());
 
         return parent::getActive();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setOrder($order)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setOrder', array($order));
+
+        return parent::setOrder($order);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getOrder()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getOrder', array());
+
+        return parent::getOrder();
     }
 
     /**

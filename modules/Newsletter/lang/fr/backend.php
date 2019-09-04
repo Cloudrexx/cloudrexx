@@ -350,7 +350,6 @@ $_ARRAYLANG['TXT_NEWSLETTER_ERROR_UPDATE_RECIPIENT'] = "Erreur lors de la mise �
 $_ARRAYLANG['TXT_NEWSLETTER_ADD_NEW_RECIPIENT'] = "Nouveau destinataire";
 $_ARRAYLANG['TXT_NEWSLETTER_DUPLICATE_EMAIL_ADDRESS'] = "Cette adresse E-mail est déjà utilisée par un autre utilisateur!";
 $_ARRAYLANG['TXT_NEWSLETTER_INVALIDE_EMAIL_ADDRESS'] = "Veuillez saisir une adresse E-mail valide!";
-$_ARRAYLANG['TXT_NEWSLETTER_BREAK_AFTER'] = "Nombre de caractères par ligne pour les E-mails en mode texte";
 $_ARRAYLANG['TXT_NEWSLETTER_TEST_RECIPIENT'] = "Destinataire test";
 $_ARRAYLANG['TXT_NEWSLETTER_FAILED'] = "Pour les erreurs et les E-mail non remis";
 $_ARRAYLANG['TXT_NEWSLETTER_BCC'] = "Cci (Copies cachées)";

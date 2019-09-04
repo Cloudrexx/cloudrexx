@@ -350,7 +350,6 @@ $_ARRAYLANG['TXT_NEWSLETTER_ERROR_UPDATE_RECIPIENT'] = "Der er opstået en fejl 
 $_ARRAYLANG['TXT_NEWSLETTER_ADD_NEW_RECIPIENT'] = "Tilføj ny modtager";
 $_ARRAYLANG['TXT_NEWSLETTER_DUPLICATE_EMAIL_ADDRESS'] = "Denne emailadresse bliver allerede brugt!";
 $_ARRAYLANG['TXT_NEWSLETTER_INVALIDE_EMAIL_ADDRESS'] = "Du skal angive en gyldig emailadresse!";
-$_ARRAYLANG['TXT_NEWSLETTER_BREAK_AFTER'] = "Antal skrifttegn per linie ved tekstmails";
 $_ARRAYLANG['TXT_NEWSLETTER_TEST_RECIPIENT'] = "Test-modtager";
 $_ARRAYLANG['TXT_NEWSLETTER_FAILED'] = "For fejl og email som ikke kunne sendes";
 $_ARRAYLANG['TXT_NEWSLETTER_BCC'] = "BBC (blind carbon copy)";

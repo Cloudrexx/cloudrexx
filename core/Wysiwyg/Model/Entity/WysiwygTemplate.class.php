@@ -71,6 +71,10 @@ class WysiwygTemplate extends \Cx\Model\Base\EntityBase {
      */
     protected $active = true;
 
+    /**
+     * @var integer $order
+     */
+    protected $order;
 
     /**
      * Get id
@@ -180,5 +184,25 @@ class WysiwygTemplate extends \Cx\Model\Base\EntityBase {
     public function getActive()
     {
         return $this->active;
+    }
+
+    /**
+     * Set order
+     *
+     * @param integer $order
+     */
+    public function setOrder($order)
+    {
+        $this->order = $order;
+    }
+
+    /**
+     * Get order
+     *
+     * @return integer $order
+     */
+    public function getOrder()
+    {
+        return $this->order;
     }
 }

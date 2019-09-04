@@ -1224,11 +1224,13 @@ if (!$limit) {
      * @param   integer $order_id     The order ID
      * @param   boolean $create_accounts  If true, creates User accounts
      *                                    and Coupon codes.  Defaults to true
+     * @param   boolean $updateStock  If true, decreases stock according to order.
+     *                                Defaults to true
      * @return  array                 The array with placeholders as keys
      *                                and values from the order on success,
      *                                false otherwise
      */
-    static function getSubstitutionArray($order_id, $create_accounts=true)
+    static function getSubstitutionArray($order_id, $create_accounts=true, $updateStock=true)
     {
         global $_ARRAYLANG;
 /*
@@ -1335,9 +1337,11 @@ if (!$limit) {
             $quantity = $item['quantity'];
 // TODO: Add individual VAT rates for Products
 //            $orderItemVatPercent = $objResultItem->fields['vat_percent'];
-            // Decrease the Product stock count,
-            // applies to "real", shipped goods only
-            $objProduct->decreaseStock($quantity);
+            if ($updateStock) {
+                // Decrease the Product stock count,
+                // applies to "real", shipped goods only
+                $objProduct->decreaseStock($quantity);
+            }
             $product_code = $objProduct->code();
             // Pick the order items attributes
             $str_options = '';

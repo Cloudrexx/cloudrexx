@@ -137,6 +137,7 @@ $_ARRAYLANG['TXT_CORE_CONFIG_ADVANCEDUPLOADFRONTEND'] = 'Erweiterte Dateiuploadm
 $_ARRAYLANG['TXT_CORE_CONFIG_FORCEPROTOCOLFRONTEND_TOOLTIP_HELP'] = $_ARRAYLANG['TXT_CORE_CONFIG_FORCEPROTOCOLBACKEND_TOOLTIP_HELP'] = 'Cloudrexx erzwingt standardmässig kein Protokoll. Sie können HTTP erzwingen um die Suchmaschinen-Bewertung zu verbessern oder HTTPS (Hypertext Transfer Protocol Secure), ein Protokoll das zusätzlich mehr Sicherheit garantiert, aktivieren. Sollte Ihr Webserver dies nicht unterstützen, deaktiviert Cloudrexx diese Einstellung automatisch wieder.';
 $_ARRAYLANG['TXT_CORE_CONFIG_FORCEPROTOCOLBACKEND'] = 'Verwendetes Protokoll';
 $_ARRAYLANG['TXT_CORE_CONFIG_FORCEPROTOCOLFRONTEND'] = 'Verwendetes Protokoll';
+$_ARRAYLANG['TXT_CORE_CONFIG_SHOWLOCALETAGSBYDEFAULT'] = 'Sprachtags standardmässig anzeigen';
 $_ARRAYLANG['TXT_CORE_CONFIG_NOBODY_LABEL'] = 'Niemand';
 $_ARRAYLANG['TXT_CORE_CONFIG_GROUPS_LABEL'] = 'Ausgewählte Benutzergruppen';
 $_ARRAYLANG['TXT_CORE_CONFIG_ALL_LABEL'] = 'Jeder';
@@ -218,3 +219,5 @@ $_ARRAYLANG['TXT_SETTINGS_COOKIENOTETTL_YEAR']      = '1 Jahr';
 $_ARRAYLANG['TXT_SETTINGS_COOKIENOTETTL_UNLIMITED'] = 'Unendlich';
 $_ARRAYLANG['TXT_CORE_CONFIG_USEVIRTUALLANGUAGEDIRECTORIES']          = 'Virtuelle Sprachverzeichnisse verwenden';
 $_ARRAYLANG['TXT_CONFIG_UNABLE_TO_SET_USEVIRTUALLANGUAGEDIRECTORIES'] = 'Die Option %s kann nicht deaktiviert werden, so lange mehrere Sprachversionen eingerichtet sind.';
+$_ARRAYLANG['TXT_CORE_CONFIG_UPLOADFILESIZELIMIT'] = 'Datei-Upload-Limite';
+$_ARRAYLANG['TXT_CORE_CONFIG_UPLOADFILESIZELIMIT_TOOLTIP_HELP'] = 'Die maximal erlaubte Grösse einer Datei, welche hochgeladen werden darf.';

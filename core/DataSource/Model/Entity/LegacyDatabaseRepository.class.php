@@ -53,23 +53,48 @@ class LegacyDatabaseRepository extends DataSource {
     protected $fieldList = array();
 
     /**
+     * Identifier field list cache
+     * @var array List of fields
+     */
+    protected $identifierFieldList = array();
+
+    /**
      * Returns a list of field names this DataSource consists of
      * @return array List of field names
      */
     public function listFields() {
-        if (count($this->fieldList)) {
-            return $this->fieldList;
+        if (!count($this->fieldList)) {
+            $this->initializeFields();
         }
+        return $this->fieldList;
+    }
 
+    /**
+     * Initialize field caches
+     */
+    protected function initializeFields() {
         $tableName = DBPREFIX . $this->getIdentifier();
         $result = $this->cx->getDb()->getAdoDb()->query(
             'SHOW COLUMNS FROM `' . $tableName . '`'
         );
         while (!$result->EOF) {
             $this->fieldList[] = $result->fields['Field'];
+            if ($result->fields['Key'] == 'PRI') {
+                $this->identifierFieldList[] = $result->fields['Field'];
+            }
             $result->MoveNext();
         }
         return $this->fieldList;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getIdentifierFieldNames() {
+        if (!count($this->identifierFieldList)) {
+            $this->initializeFields();
+        }
+        return $this->identifierFieldList;
     }
 
     /**

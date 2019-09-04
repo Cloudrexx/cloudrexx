@@ -34,7 +34,7 @@
  * @subpackage  coremodule_listing
  */
 
-namespace Cx\Core_Modules\Listing\Model;
+namespace Cx\Core_Modules\Listing\Model\Entity;
 
 /**
  * Csv interface
@@ -62,7 +62,12 @@ class CsvInterface implements Exportable, Importable {
      */
     public function export($twoDimensionalArray) {
         $content = '';
+        $keys = array_keys(current($twoDimensionalArray));
+        unset($keys[array_search('virtual', $keys)]);
+        $content .= implode($this->separator, $keys);
+        $content .= $this->lineEnding;
         foreach ($twoDimensionalArray as $array) {
+            unset($array['virtual']);
             $content .= implode($this->separator, $array);
             $content .= $this->lineEnding;
         }

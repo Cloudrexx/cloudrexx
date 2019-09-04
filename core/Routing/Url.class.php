@@ -62,6 +62,13 @@ class UrlException extends \Exception {};
  * @package     cloudrexx
  * @subpackage  core_routing
  * @todo        Edit PHP DocBlocks!
+ * @todo        This class does not properly handle question marks in
+ *              query strings. According to the RFC (
+ *              https://tools.ietf.org/html/rfc3986#section-3.4), question
+ *              marks are valid characters within the query string. Therefore,
+ *              all operations on the question mark '?' character in this
+ *              class must be reviewed and where applicable being fixed.
+ *              See CLX-1780 for associated issue in LinkSanitizer.
  */
 class Url {
 
@@ -374,8 +381,18 @@ class Url {
             $params = explode('?', $this->path);
             $params = $params[1];
         }
-
         $path = implode('/', $path);
+
+        // cleanup possible duplicate '?'
+        if (strpos($path, '?') !== false) {
+            $pathParams = explode('?', $path, 2);
+            if (!empty($params)) {
+                $params .= '&';
+            }
+            $params .= $pathParams[1];
+            $path = $pathParams[0];
+        }
+
         $this->path = $path;
         $this->path .= !empty($params) ? '?'.$params : '';
         $this->suggest();
@@ -571,7 +588,7 @@ class Url {
         $sp = strtolower($_SERVER['SERVER_PROTOCOL']);
         $protocol = substr($sp, 0, strpos($sp, '/')) . $s;
         $port = ($_SERVER['SERVER_PORT'] == '80') ? '' : (':'.$_SERVER['SERVER_PORT']);
-        return new Url($protocol . '://' . $_SERVER['SERVER_NAME'] . $port . $_SERVER['REQUEST_URI'], true);
+        return new Url($protocol . '://' . $_SERVER['HTTP_HOST'] . $port . $_SERVER['REQUEST_URI'], true);
     }
 
     /**
@@ -714,6 +731,8 @@ class Url {
 
     /**
      * Returns an Url object pointing to the documentRoot of the website
+     * @param   array   $arrParameters (optional) URL arguments for the query
+     *                                 string.
      * @param int $lang (optional) Language to use, default is FRONTEND_LANG_ID
      * @param string $protocol (optional) The protocol to use
      * @return \Cx\Core\Routing\Url Url object for the documentRoot of the website
@@ -730,12 +749,8 @@ class Url {
         $offset = \Cx\Core\Core\Controller\Cx::instanciate()->getWebsiteOffsetPath();
         $langDir = \FWLanguage::getLanguageCodeById($lang);
         $parameters = '';
-        if (count($arrParameters)) {
-            $arrParams = array();
-            foreach ($arrParameters as $key => $value) {
-                $arrParams[] = $key.'='.$value;
-            }
-            $parameters = '?'.implode('&', $arrParams);
+        if (($parameters = self::array2params($arrParameters)) && (strlen($parameters) > 0)) {
+            $parameters = '?'.$parameters;
         }
 
         return new Url($protocol.'://'.$host.$offset.'/'.$langDir.'/'.$parameters, true);
@@ -813,11 +828,7 @@ class Url {
         $langDir = \FWLanguage::getLanguageCodeById($page->getLang());
         $getParams = '';
         if (count($parameters)) {
-            $paramArray = array();
-            foreach ($parameters as $key=>$value) {
-                $paramArray[] = $key . '=' . $value;
-            }
-            $getParams = '?' . implode('&', $paramArray);
+            $getParams = '?' . static::array2params($parameters);
         }
         $url = new Url($protocol.'://'.$host.$offset.'/'.$langDir.$path.$getParams, true);
         if ($page->getType() == \Cx\Core\ContentManager\Model\Entity\Page::TYPE_ALIAS) {

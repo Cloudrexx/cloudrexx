@@ -484,9 +484,9 @@ class DataAdmin extends \Cx\Modules\Data\Controller\DataLibrary {
                                                         'is_active'       => intval(in_array($intLanguageId,$_POST['frmAddCategory_Languages'])),
                                                         'parent_id'    => intval($_POST['frmParentcategory']),
                                                         'cmd'          => intval($_POST['frmFrontendPage']),
-                                                        'action'       => $_POST['frmSettings_action'],
-                                                        'box_width'    => $_POST['frmBoxwidth'],
-                                                        'box_height'   => $_POST['frmBoxheight'],
+                                                        'action'       => in_array($_POST['frmSettings_action'], array('overlaybox', 'content', 'subcategories')) ? $_POST['frmSettings_action'] : 'overlaybox',
+                                                        'box_width'    => intval($_POST['frmBoxwidth']),
+                                                        'box_height'   => intval($_POST['frmBoxheight']),
                                                         'template'     => contrexx_addslashes($_POST['frmTemplate'])
                                                     );
                 }
@@ -513,7 +513,7 @@ class DataAdmin extends \Cx\Modules\Data\Controller\DataLibrary {
                 $query = "INSERT INTO ".DBPREFIX."module_data_placeholders
                           (type, ref_id, placeholder)
                           VALUES
-                          ('cat', ".$intNextCategoryId.", '".$placeholder."')";
+                          ('cat', ".$intNextCategoryId.", '".contrexx_input2db($placeholder)."')";
                 $objDatabase->Execute($query);
             }
 
@@ -737,7 +737,7 @@ class DataAdmin extends \Cx\Modules\Data\Controller\DataLibrary {
         }
     }
 
-    function parseCategorySelector($categoryTree, $arrCategories, $select, $level, $lang, $parent = true, $stack)
+    function parseCategorySelector($categoryTree, $arrCategories, $select, $level, $lang, $parent = true, $stack = '')
     {
     // this used to expect an int value, only allowing entries to belong to a single category. this way we
     // continue to support legacy calls but add support for multiple categories in callers aware of that. -fs
@@ -804,7 +804,7 @@ class DataAdmin extends \Cx\Modules\Data\Controller\DataLibrary {
             foreach ($_POST as $strKey => $strValue) {
 
                 if (substr($strKey,0,strlen('frmEditCategory_Name_')) == 'frmEditCategory_Name_') {
-                    $intLanguageId = substr($strKey,strlen('frmEditCategory_Name_'));
+                    $intLanguageId = intval(substr($strKey,strlen('frmEditCategory_Name_')));
 
                     $objResult = $objDatabase->Execute('SELECT name
                                                         FROM    '.DBPREFIX.'module_data_categories
@@ -821,11 +821,11 @@ class DataAdmin extends \Cx\Modules\Data\Controller\DataLibrary {
                                                         `is_active` = '".(array_key_exists($intLanguageId,$arrActiveLanguages) ? "1" : "0")."',
                                                         `parent_id` = ".intval($_POST["frmParentcategory"]).",
                                                         `name` = '".contrexx_addslashes(strip_tags($strValue))."',
-                                                        `cmd` = '".$_POST["frmFrontendPage"]."',
-                                                        `action` = '".$_POST["frmSettings_action"]."',
-                                                        `box_height` = '".$_POST["frmBoxheight"]."',
-                                                        `box_width` = '".$_POST['frmBoxwidth']."',
-                                                        `template` = '".$_POST['frmTemplate']."
+                                                        `cmd` = '".intval($_POST["frmFrontendPage"])."',
+                                                        `action` = '".(in_array($_POST['frmSettings_action'], array('overlaybox', 'content', 'subcategories')) ? $_POST['frmSettings_action'] : 'overlaybox')."',
+                                                        `box_height` = '".intval($_POST["frmBoxheight"])."',
+                                                        `box_width` = '".intval($_POST['frmBoxwidth'])."',
+                                                        `template` = '".contrexx_raw2db($_POST['frmTemplate'])."
                                             ");
                     } else {
                         //We can update the existing entry
@@ -833,11 +833,11 @@ class DataAdmin extends \Cx\Modules\Data\Controller\DataLibrary {
                                                 SET        `is_active` = '".(array_key_exists($intLanguageId,$arrActiveLanguages) ? "1" : "0")."',
                                                         `name` = '".contrexx_addslashes(strip_tags($strValue))."',
                                                         `parent_id` = ".intval($_POST["frmParentcategory"]).",
-                                                        `cmd` = '".$_POST["frmFrontendPage"]."',
-                                                        `action` = '".$_POST["frmSettings_action"]."',
-                                                        `box_height` = '".$_POST['frmBoxheight']."',
-                                                        `box_width` = '".$_POST["frmBoxwidth"]."',
-                                                        `template` = '".$_POST['frmTemplate']."'
+                                                        `cmd` = '".intval($_POST["frmFrontendPage"])."',
+                                                        `action` = '".(in_array($_POST['frmSettings_action'], array('overlaybox', 'content', 'subcategories')) ? $_POST['frmSettings_action'] : 'overlaybox')."',
+                                                        `box_height` = '".intval($_POST['frmBoxheight'])."',
+                                                        `box_width` = '".intval($_POST["frmBoxwidth"])."',
+                                                        `template` = '".contrexx_raw2db($_POST['frmTemplate'])."'
                                                 WHERE    `category_id` = ".$intCategoryId." AND
                                                         `lang_id` = ".$intLanguageId."
                                                 LIMIT    1
@@ -854,7 +854,7 @@ class DataAdmin extends \Cx\Modules\Data\Controller\DataLibrary {
                 $query = "INSERT INTO ".DBPREFIX."module_data_placeholders
                           (type, ref_id, placeholder)
                           VALUES
-                          ('cat', ".$intCategoryId.", '".$placeholder."')";
+                          ('cat', ".$intCategoryId.", '".contrexx_input2db($placeholder)."')";
                 $objDatabase->Execute($query);
                 $err = $objDatabase->ErrorNo();
                 if ($err == 1062) {
@@ -1389,7 +1389,7 @@ class DataAdmin extends \Cx\Modules\Data\Controller\DataLibrary {
                                      (`type`, `ref_id`, `placeholder`)
                                      VALUES
                                      ('entry', ".$intMessageId.",
-                                      '".$placeholder."')"
+                                      '".contrexx_input2db($placeholder)."')"
                                  );
           $err = $objDatabase->ErrorNo();
           if ($err == 1062) {  //duplicate entry error
@@ -1426,7 +1426,7 @@ class DataAdmin extends \Cx\Modules\Data\Controller\DataLibrary {
                 foreach ($arrEntryValues['categories'][0] as $intKey => $intCategoryId) {
                     $objDatabase->Execute('    INSERT INTO '.DBPREFIX.'module_data_message_to_category
                                             SET `message_id` = '.$intMessageId.',
-                                                `category_id` = '.$intCategoryId.',
+                                                `category_id` = '.intval($intCategoryId).',
                                                 `lang_id` = '.$intLanguageId.'
                                         ');
                     if ($intLanguageId == $this->_intLanguageId) {

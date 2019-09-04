@@ -350,7 +350,6 @@ $_ARRAYLANG['TXT_NEWSLETTER_ERROR_UPDATE_RECIPIENT'] = "An error occured while u
 $_ARRAYLANG['TXT_NEWSLETTER_ADD_NEW_RECIPIENT'] = "Add New Recipient";
 $_ARRAYLANG['TXT_NEWSLETTER_DUPLICATE_EMAIL_ADDRESS'] = "The e-mail address is already in use by an other recipient!";
 $_ARRAYLANG['TXT_NEWSLETTER_INVALIDE_EMAIL_ADDRESS'] = "You must enter a valid E-Mail address!";
-$_ARRAYLANG['TXT_NEWSLETTER_BREAK_AFTER'] = "Number of characters per line in text emails";
 $_ARRAYLANG['TXT_NEWSLETTER_TEST_RECIPIENT'] = "Test Recipient";
 $_ARRAYLANG['TXT_NEWSLETTER_FAILED'] = "For errors and undeliverable E-Mails";
 $_ARRAYLANG['TXT_NEWSLETTER_BCC'] = "Blindkopien";

@@ -380,6 +380,25 @@ class CalendarLibrary
             return;
         }
 
+        // TODO: we have to manually load the language-data here, as it
+        // would not be available in the adjustResponse hook.
+        // AS a result, the date format specific options (which depend on the
+        // language-data) won't work properly.
+        // As soon as CLX-1045 has been fixed and completed, the manual
+        // loading of the language-data can be removed from here.
+        $frontend = false;
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        if ($cx->getMode() == \Cx\Core\Core\Controller\Cx::MODE_FRONTEND) {
+            $frontend = true;
+        }
+        $_ARRAYLANG = array_merge(
+            $_ARRAYLANG,
+            \Env::get('init')->getComponentSpecificLanguageData(
+                'Calendar',
+                $frontend
+            )
+        );
+
     	$arrSettings = array();
         $arrDateSettings =  array(
                             'separatorDateList','separatorDateTimeList', 'separatorSeveralDaysList', 'separatorTimeList',
@@ -643,61 +662,43 @@ EOF;
     }
     
     /**
-     * Loads datepicker
-     *      
-     * @param object  &$datePicker
-     * @param integer $cat
-     * 
-     * @return null
-     */
-    function loadDatePicker(&$datePicker, $cat = null) {
-        global $_CORELANG;
-        if($this->_objTpl->placeholderExists($this->moduleLangVar.'_DATEPICKER')) {
-            $timestamp = time();
-            $datePickerYear = $_REQUEST["yearID"] ? $_REQUEST["yearID"] : date('Y', $timestamp);
-            $datePickerMonth = $_REQUEST["monthID"] ? $_REQUEST["monthID"] : date('m', $timestamp);
-            $datePickerDay = $_REQUEST["dayID"] ? $_REQUEST["dayID"] : date('d', $timestamp);
-            $datePicker = new \activeCalendar($datePickerYear, $datePickerMonth, $datePickerDay);
-            $datePicker->enableMonthNav("?section=Calendar");
-            $datePicker->enableDayLinks("?section=Calendar");
-            $datePicker->setDayNames(explode(',', $_CORELANG['TXT_DAY_ARRAY']));
-            $datePicker->setMonthNames(explode(',', $_CORELANG['TXT_MONTH_ARRAY']));
-
-            $eventManagerAllEvents = new \Cx\Modules\Calendar\Controller\CalendarEventManager(null, null, $cat, null, true, false, true);
-            $eventManagerAllEvents->getEventList();
-            $events = $eventManagerAllEvents->getEventsWithDate();
-            foreach($events as $event) {
-                $datePicker->setEvent($event["year"], $event["month"], $event["day"], " withEvent");
-            }
-
-            $datePicker = $datePicker->showMonth();
-        }
-    }
-    
-    /**
      * Returns all series dates based on the given post data
      *       
      * @return array Array of dates
      */    
     function getExeceptionDates()
     {
-        global $_CORELANG;
-        
         $exceptionDates = array();
         
         $objEvent = new \Cx\Modules\Calendar\Controller\CalendarEvent();
-        $objEvent->loadEventFromPost($_POST);
+        $objEvent->loadEventFromData($_GET);
 
         $objEventManager = new \Cx\Modules\Calendar\Controller\CalendarEventManager($objEvent->startDate);
-        $objEventManager->_setNextSeriesElement($objEvent);
+        $objEventManager->generateRecurrencesOfEvent($objEvent);
         
+        $_CORELANG = \Env::get('init')->getComponentSpecificLanguageData(
+            'Core',
+            false
+        );
         $dayArray = explode(',', $_CORELANG['TXT_CORE_DAY_ABBREV2_ARRAY']);
         foreach ($objEventManager->eventList as $event) {
-            $startDate = $event->startDate;
-            $endDate   = $event->endDate;
-            $exceptionDates[$this->format2userDate($startDate)] = $this->format2userDate($startDate) != $this->format2userDate($endDate)
-                                                                    ? $dayArray[$this->formatDateTime2user($startDate, "w")] .", " . $this->format2userDate($startDate) .' - ' . $dayArray[$this->formatDateTime2user($endDate, "w")] .", ". $this->format2userDate($endDate)
-                                                                    : $dayArray[$this->formatDateTime2user($startDate, "w")] .", " . $this->format2userDate($startDate);
+            $startDate = $this->format2userDate($event->startDate);
+            $endDate   = $this->format2userDate($event->endDate);
+
+            $label = $dayArray[$this->formatDateTime2user($event->startDate, "w")] .
+                ", " . $startDate;
+            if ($startDate != $endDate) {
+                $label .= ' - ' .
+                    $dayArray[
+                        $this->formatDateTime2user($event->endDate, "w")
+                    ] .
+                    ", ". $endDate;
+            }
+
+            $exceptionDates[] = array(
+                'date'  => $startDate,
+                'label' => $label,
+            );
         }
 
         return $exceptionDates;
@@ -1016,5 +1017,74 @@ EOF;
         }
 
         return $placeholders;
+    }
+
+    /**
+     * Split a datetime string (i.E.: '08.06.2015 13:37') into an array
+     * containing the date, hour and minutes information as separate
+     * elements.
+     *
+     * @param   string  $datetime   The datetime string to parse.
+     * @param   boolean $allDay     If set to TRUE, then the returned hour
+     *                              and minutes value are set to 0, unless
+     *                              $end is also set to TRUE.
+     * @param   boolean $end        If set to TRUE and $allDay is also set to
+     *                              TRUE, then the returned hour is set to 23
+     *                              and the minutes to 59. If $allDay is not
+     *                              set to TRUE, then this argument has no
+     *                              effect.
+     * @return  array               Return parsed datetime as array having the
+     *                              following format:
+     *                              <pre>array(
+     *                                  d.m.Y,
+     *                                  G,
+     *                                  m
+     *                             )</pre>
+     */
+    protected function parseDateTimeString(
+        $datetime,
+        $allDay = false,
+        $end = false
+    ) {
+        // init time defaults
+        $hour = 0;
+        $min = 0;
+
+        // set end time defaults for all-day event
+        if ($allDay && $end) {
+            $hour = 23;
+            $min = 59;
+        }
+
+        // fetch data
+        $parts = explode(' ', $datetime);
+        $date = $parts[0];
+
+        // fetch time if event is not an all-day event
+        if (
+            !$allDay &&
+            isset($parts[1])
+        ) {
+            // match time as HH:MM / HH.MM / HH,MM / HHMM
+            $timeData = preg_split(
+                '/(?:[.,:]|(\d{2}$))/',
+                $parts[1],
+                2,
+                PREG_SPLIT_DELIM_CAPTURE
+            );
+            if (isset($timeData[0])) {
+                // remove leading zero
+                $hour = intval($timeData[0]);
+            }
+            if (isset($timeData[1])) {
+                $min = $timeData[1];
+            }
+        }
+
+        return array(
+            $date,
+            $hour,
+            $min
+        );
     }
 }

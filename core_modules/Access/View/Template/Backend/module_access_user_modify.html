@@ -5,7 +5,7 @@
 /* <![CDATA[ */
 $J(document).ready(function() {
     $J('input[name=access_user_password]').keyup(function(){
-        $J('#password-complexity').html(checkComplexity($J('input[name=access_user_password]').val()))
+        $J('#password-complexity').html(checkComplexity($J(this).val()))
     })
     
     $J('input[name="notification_email"]').change(function() {
