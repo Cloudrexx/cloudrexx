@@ -1091,23 +1091,6 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
     {
         global $objDatabase;
 
-        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-        $em = $cx->getDb()->getEntityManager();
-        $repository = $em->getRepository('\Cx\Core\User\Model\Entity\UserAttributeName');
-        $entity = $repository->findOneBy(array('attributeId' => $this->id));
-        $repoTranslation = $em->getRepository(
-            '\Cx\Core\Locale\Model\Entity\Translation'
-        );
-        foreach ($this->arrName as $lang => $value) {
-            $repoTranslation->translate(
-                $entity,
-                'name',
-                \FWLanguage::getLanguageCodeById($lang),
-                $value
-            );
-        }
-        $em->flush();
-
         $arrOldNames = array();
         $status = true;
         $objResult = $objDatabase->Execute('SELECT `lang_id`, `name` FROM `'.DBPREFIX.'access_user_attribute_name` WHERE `attribute_id` = '.$this->id);
