@@ -239,8 +239,6 @@ class Group extends \Cx\Model\Base\EntityBase {
     public function addUser(\Cx\Core\User\Model\Entity\User $user)
     {
         $this->user[] = $user;
-
-        return $this;
     }
 
     /**
