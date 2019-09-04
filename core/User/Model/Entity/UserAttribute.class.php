@@ -291,33 +291,33 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     }
 
     /**
-     * Add parent
+     * Add child
      *
-     * @param \Cx\Core\User\Model\Entity\UserAttribute $parent
+     * @param \Cx\Core\User\Model\Entity\UserAttribute $child
      */
-    public function addParent(\Cx\Core\User\Model\Entity\UserAttribute $parent)
+    public function addChild(\Cx\Core\User\Model\Entity\UserAttribute $child)
     {
-        $this->parent[] = $parent;
+        $this->children[] = $child;
     }
 
     /**
-     * Remove parent
+     * Remove child
      *
-     * @param \Cx\Core\User\Model\Entity\UserAttribute $parent
+     * @param \Cx\Core\User\Model\Entity\UserAttribute $child
      */
-    public function removeParent(\Cx\Core\User\Model\Entity\UserAttribute $parent)
+    public function removeChild(\Cx\Core\User\Model\Entity\UserAttribute $child)
     {
-        $this->parent->removeElement($parent);
+        $this->children->removeElement($child);
     }
 
     /**
-     * Get parent
+     * Get children
      *
      * @return \Doctrine\Common\Collections\Collection 
      */
-    public function getParent()
+    public function getChildren()
     {
-        return $this->parent;
+        return $this->children;
     }
 
     /**
@@ -381,22 +381,22 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     }
 
     /**
-     * Set children
+     * Set parent
      *
-     * @param \Cx\Core\User\Model\Entity\UserAttribute $children
+     * @param \Cx\Core\User\Model\Entity\UserAttribute $parent
      */
-    public function setChildren(\Cx\Core\User\Model\Entity\UserAttribute $children = null)
+    public function setParent(\Cx\Core\User\Model\Entity\UserAttribute $parent = null)
     {
-        $this->children = $children;
+        $this->parent = $parent;
     }
 
     /**
-     * Get children
+     * Get parent
      *
      * @return \Cx\Core\User\Model\Entity\UserAttribute 
      */
-    public function getChildren()
+    public function getParent()
     {
-        return $this->children;
+        return $this->parent;
     }
 }

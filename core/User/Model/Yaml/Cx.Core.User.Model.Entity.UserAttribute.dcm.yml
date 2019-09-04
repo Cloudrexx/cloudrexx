@@ -48,19 +48,22 @@ Cx\Core\User\Model\Entity\UserAttribute:
       options:
         default: "0"
   oneToMany:
-    parent:
+    children:
       targetEntity: Cx\Core\User\Model\Entity\UserAttribute
-      mappedBy: children
+      mappedBy: parent
     userAttributeName:
       targetEntity: Cx\Core\User\Model\Entity\UserAttributeName
+      orderBy: { 'order': 'ASC' }
       mappedBy: userAttribute
     userAttributeValue:
       targetEntity: Cx\Core\User\Model\Entity\UserAttributeValue
       mappedBy: userAttribute
   manyToOne:
-    children:
+    parent:
       targetEntity: Cx\Core\User\Model\Entity\UserAttribute
-      inversedBy: parent
+      inversedBy: children
       joinColumns:
         parent_id:
           referencedColumnName: id
+          options:
+            unsigned: true
