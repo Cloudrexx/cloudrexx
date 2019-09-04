@@ -167,7 +167,7 @@ class User extends \Cx\Model\Base\EntityBase {
     protected $group;
 
     /**
-     * @var \Cx\Core\User\Model\Entity\UserAttributeValue
+     * @var \Doctrine\Common\Collections\Collection
      */
     protected $userAttributeValue;
 
@@ -245,7 +245,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set password
      *
      * @param string $password
-     * @return User
      */
     public function setPassword($password)
     {
@@ -434,7 +433,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set email
      *
      * @param string $email
-     * @return User
      */
     public function setEmail($email)
     {
@@ -598,7 +596,6 @@ class User extends \Cx\Model\Base\EntityBase {
         return $this->profileAccess;
     }
 
-
     /**
      * Set restoreKey
      *
@@ -720,7 +717,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get userAttributeValue
      *
-     * @return \Cx\Core\User\Model\Entity\UserAttributeValue
+     * @return \Doctrine\Common\Collections\Collection
      */
     public function getUserAttributeValue()
     {

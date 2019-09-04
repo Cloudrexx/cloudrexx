@@ -90,7 +90,6 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase {
      * Set attributeId
      *
      * @param integer $attributeId
-     * @return UserAttributeName
      */
     public function setAttributeId($attributeId)
     {
