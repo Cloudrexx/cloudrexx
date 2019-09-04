@@ -96,8 +96,12 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
         $expirationDate = null;
         switch ($_REQUEST['cmd']) {
         case 'details':
+            $newsId = 0;
+            if (!empty($_GET['newsid'])) {
+                $newsId = intval($_GET['newsid']);
+            }
             // cache timeout: this article's end date
-            $details  = $this->getDetails($expirationDate);
+            $details  = $this->getDetails($newsId, $expirationDate);
             $response = \Cx\Core\Core\Controller\Cx::instanciate()->getResponse();
             $response->setExpirationDate($expirationDate);
             return $details;
@@ -124,9 +128,13 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
             break;
         default:
             if (substr($_REQUEST['cmd'], 0, 7) == 'details') {
+                $newsId = 0;
+                if (!empty($_GET['newsid'])) {
+                    $newsId = intval($_GET['newsid']);
+                }
                 // cache timeout: this article's end date
                 $categoryId = intval(substr($_REQUEST['cmd'], 7));
-                $details  = $this->getDetails($expirationDate, $categoryId);
+                $details  = $this->getDetails($newsId, $expirationDate, $categoryId);
                 $response = \Cx\Core\Core\Controller\Cx::instanciate()->getResponse();
                 $response->setExpirationDate($expirationDate);
                 return $details;
@@ -150,6 +158,11 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
     /**
      * Gets the news details
      *
+     * @param   integer $newsId ID of news article to display. If left empty
+     *                          and the functional placeholder NEWS_LIST_LATEST
+     *                          is not present in the application template,
+     *                          then the user gets redirected to the main
+     *                          application page of the news component.
      * @param  string $expirationDate Expiration date
      * @param  integer $categoryId ID of category to output the latest news
      *                             article from, in case the URL-argument
@@ -158,12 +171,12 @@ class News extends \Cx\Core_Modules\News\Controller\NewsLibrary {
      *                             application template.
      * @return string parsed content
      */
-    private function getDetails(&$expirationDate = null, $categoryId = 0)
+    public function getDetails($newsId = 0, &$expirationDate = null, $categoryId = 0)
     {
         global $_CONFIG, $objDatabase, $_ARRAYLANG;
 
-        if (!empty($_GET['newsid'])) {
-            $newsid = intval($_GET['newsid']);
+        if (!empty($newsId)) {
+            $newsid = $newsId;
         } elseif ($this->_objTpl->placeholderExists('NEWS_LIST_LATEST')) {
             try {
                 $newsid = $this->getIdOfLatestNewsArticle($categoryId);

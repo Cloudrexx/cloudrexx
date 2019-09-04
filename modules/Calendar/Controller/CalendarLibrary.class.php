@@ -662,38 +662,6 @@ EOF;
     }
     
     /**
-     * Loads datepicker
-     *      
-     * @param object  &$datePicker
-     * @param integer $cat
-     * 
-     * @return null
-     */
-    function loadDatePicker(&$datePicker, $cat = null) {
-        global $_CORELANG;
-        if($this->_objTpl->placeholderExists($this->moduleLangVar.'_DATEPICKER')) {
-            $timestamp = time();
-            $datePickerYear = $_REQUEST["yearID"] ? $_REQUEST["yearID"] : date('Y', $timestamp);
-            $datePickerMonth = $_REQUEST["monthID"] ? $_REQUEST["monthID"] : date('m', $timestamp);
-            $datePickerDay = $_REQUEST["dayID"] ? $_REQUEST["dayID"] : date('d', $timestamp);
-            $datePicker = new \activeCalendar($datePickerYear, $datePickerMonth, $datePickerDay);
-            $datePicker->enableMonthNav("?section=Calendar");
-            $datePicker->enableDayLinks("?section=Calendar");
-            $datePicker->setDayNames(explode(',', $_CORELANG['TXT_DAY_ARRAY']));
-            $datePicker->setMonthNames(explode(',', $_CORELANG['TXT_MONTH_ARRAY']));
-
-            $eventManagerAllEvents = new \Cx\Modules\Calendar\Controller\CalendarEventManager(null, null, $cat, null, true, false, true);
-            $eventManagerAllEvents->getEventList();
-            $events = $eventManagerAllEvents->getEventsWithDate();
-            foreach($events as $event) {
-                $datePicker->setEvent($event["year"], $event["month"], $event["day"], " withEvent");
-            }
-
-            $datePicker = $datePicker->showMonth();
-        }
-    }
-    
-    /**
      * Returns all series dates based on the given post data
      *       
      * @return array Array of dates

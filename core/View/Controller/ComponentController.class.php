@@ -294,4 +294,25 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             }
         }
     }
+
+    /**
+     * Returns HTML-Code to show an "experimental" flag
+     *
+     * @param string $tooltip (optional) Tooltip to show when hovering over the flag
+     */
+    public function flagExperimental($tooltip = '') {
+        $template = new \Cx\Core\Html\Sigma(
+            $this->getDirectory() . '/View/Template/Backend'
+        );
+        $template->loadTemplateFile('Experimental.html');
+        if (empty($tooltip)) {
+            $template->hideBlock('with-tooltip');
+            $template->touchBlock('without-tooltip');
+        } else {
+            $template->setVariable('TOOLTIP', $tooltip);
+            $template->touchBlock('with-tooltip');
+            $template->hideBlock('without-tooltip');
+        }
+        return $template->get();
+    }
 }

@@ -892,6 +892,18 @@ class CalendarEventManager extends CalendarLibrary
                 ));
                 $objTpl->parse('calendarDateDetail');
             } else {
+                // check if event starts and ends on same day
+                // if so, do only show either the start or end date
+                if (
+                    $this->format2userDate($startDate) == $this->format2userDate($endDate) &&
+                    $showEndDateDetail
+                ) {
+                    $showEndDateDetail = (
+                        $showStartDateDetail xor
+                        $showEndDateDetail
+                    );
+                }
+
                 // get date for single day format
                 $this->getSingleDateBlock($objEvent, $showStartDateDetail, $showEndDateDetail, $this->arrSettings['separatorDateDetail'], $showTimeTypeDetail, $showStartTimeDetail, $showEndTimeDetail, $this->arrSettings['separatorDateTimeDetail'], $this->arrSettings['separatorTimeDetail'], ($this->arrSettings['showClockDetail'] == 1));
 
@@ -1705,6 +1717,18 @@ class CalendarEventManager extends CalendarLibrary
                     ));
                     $objTpl->parse('calendarDateList');
                 } else {
+                    // check if event starts and ends on same day
+                    // if so, do only show either the start or end date
+                    if (
+                        $this->format2userDate($startDate) == $this->format2userDate($endDate) &&
+                        $showEndDateList
+                    ) {
+                        $showEndDateList = (
+                            $showStartDateList xor
+                            $showEndDateList
+                        );
+                    }
+
                     // get date for single day format
                    $this->getSingleDateBlock($objEvent, $showStartDateList, $showEndDateList, $this->arrSettings['separatorDateList'], $showTimeTypeList, $showStartTimeList, $showEndTimeList, $this->arrSettings['separatorDateTimeList'], $this->arrSettings['separatorTimeList'], ($this->arrSettings['showClockList'] == 1));
 
@@ -1897,6 +1921,14 @@ class CalendarEventManager extends CalendarLibrary
      */
     protected function getNextRecurrenceDate($objEvent, $objCloneEvent, &$additionalRecurrences = array()) {
         while ($nextEvent = $this->fetchNextRecurrence($objEvent, $objCloneEvent, $additionalRecurrences)) {
+            // verify that we have not yet reached the end of the recurrence
+            if (
+                $nextEvent->isAdditionalRecurrence &&
+                $this->arrSettings['constrainAdditionalRecurrences'] == 2
+            ) {
+                return $nextEvent;
+            }
+
             switch ($objCloneEvent->seriesData['seriesPatternDouranceType']) {
                 // no recurrence end set
                 case 1:
@@ -1922,6 +1954,17 @@ class CalendarEventManager extends CalendarLibrary
                 case 2:
                     $objCloneEvent->seriesData['seriesPatternEnd'] = $objCloneEvent->seriesData['seriesPatternEnd']-1;
                     if ($objCloneEvent->seriesData['seriesPatternEnd'] <= 0) {
+                        // do not abort processing in case there are unprocessed
+                        // additional recurrences that shall be added
+                        if (
+                            $this->arrSettings[
+                                'constrainAdditionalRecurrences'
+                            ] == 2 &&
+                            count($additionalRecurrences)
+                        ) {
+                            continue 2;
+                        }
+
                         // recurrence is out of date boundary -> skip
                         return null;
                     }
@@ -1929,7 +1972,20 @@ class CalendarEventManager extends CalendarLibrary
 
                 // recurrence shall end after a specific date
                 case 3:
-                    if ($nextEvent->startDate > $objCloneEvent->seriesData['seriesPatternEndDate']) {
+                    $dayOfStartDate = clone $nextEvent->startDate;
+                    $dayOfStartDate->setTime(0,0);
+                    if ($dayOfStartDate > $objCloneEvent->seriesData['seriesPatternEndDate']) {
+                        // do not abort processing in case there are unprocessed
+                        // additional recurrences that shall be added
+                        if (
+                            $this->arrSettings[
+                                'constrainAdditionalRecurrences'
+                            ] == 2 &&
+                            count($additionalRecurrences)
+                        ) {
+                            continue 2;
+                        }
+
                         // recurrence is out of date boundary -> skip
                         return null;
                     }
@@ -2110,7 +2166,7 @@ class CalendarEventManager extends CalendarLibrary
         if (count($additionalRecurrences)) {
             // get event duration. will be used to calculate the end-date
             // of the additional event recurrence
-            $diffDays = $objEvent->startDate->diff($objEvent->endDate)->days;
+            $diff = $objEvent->startDate->diff($objEvent->endDate);
 
             // check if any of the manually added recurrences will occur
             // before the next calculated recurrence
@@ -2128,14 +2184,30 @@ class CalendarEventManager extends CalendarLibrary
                         $additionalRecurrence->format('m'),
                         $additionalRecurrence->format('d')
                 );
+                $objCloneEvent->startDate->setTime(
+                    $additionalRecurrence->format('H'),
+                    $additionalRecurrence->format('i')
+                );
                 $objCloneEvent->endDate->setDate(
                         $additionalRecurrence->format('Y'),
                         $additionalRecurrence->format('m'),
                         $additionalRecurrence->format('d')
                 );
+                $objCloneEvent->endDate->setTime(
+                    $additionalRecurrence->format('H'),
+                    $additionalRecurrence->format('i')
+                );
 
                 // adjust end date of manually added recurrence
-                $objCloneEvent->endDate->modify('+' . $diffDays . ' days');
+                $objCloneEvent->endDate->modify('+' . $diff->d . ' days');
+                $objCloneEvent->endDate->modify('+' . $diff->h . ' hours');
+                $objCloneEvent->endDate->modify('+' . $diff->i . ' minutes');
+
+                // flag event as manually added recurrence.
+                // this might cause the algorithm to ingnore the dourance
+                // configuration if option constrainAdditionalRecurrences
+                // is disabled
+                $objCloneEvent->isAdditionalRecurrence = true;
 
                 // remove recurrence from list of manually added recurrences
                 // as it has been processed now and must not be processed a

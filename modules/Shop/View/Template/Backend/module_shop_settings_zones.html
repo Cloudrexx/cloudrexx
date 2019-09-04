@@ -12,7 +12,7 @@ function submit_form()
     }
     document.shopForm.elements['zone_list[]'].options[zoneId].selected = true;
   }
-  document.shopForm.submit();
+  return true;
 }
 
 function sortSelect(obj)
@@ -109,7 +109,7 @@ function add_zone()
   for (var i = document.shopForm.elements['selected_countries[]'].length-1; i >= 0; --i) {
     document.shopForm.elements['selected_countries[]'].options[i].selected = true;
   }
-  document.shopForm.submit();
+  return true;
 }
 //]]>
 </script>

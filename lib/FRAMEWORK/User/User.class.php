@@ -2687,7 +2687,7 @@ class User extends User_Profile
         return $objDatabase->Execute('
             UPDATE `' . DBPREFIX . 'access_users`
                SET `last_auth_status` = 0
-             WHERE `' . $column . '` = "' . $username . '"
+             WHERE `' . $column . '` = "' . contrexx_raw2db($username) . '"
         ');
     }
 
@@ -2703,6 +2703,7 @@ class User extends User_Profile
     public function setUsername($username)
     {
         $this->username = $username;
+        $this->updateLoadedUserData('username', $this->username);
     }
 
 
@@ -2723,6 +2724,9 @@ class User extends User_Profile
             $this->validity = $validity;
             $this->setExpirationDate(($validitySeconds = $validity*60*60*24) ? mktime(23, 59, 59, date('m', time() + $validitySeconds), date('d', time() + $validitySeconds), date('Y', time() + $validitySeconds)) : 0);
         }
+
+        $this->updateLoadedUserData('validity', $this->validity);
+
         return true;
     }
 
@@ -2730,6 +2734,7 @@ class User extends User_Profile
     public function setExpirationDate($expiration)
     {
         $this->expiration = $expiration;
+        $this->updateLoadedUserData('expiration', $this->expiration);
     }
 
 
@@ -2752,6 +2757,8 @@ class User extends User_Profile
         }
         // END: WORKAROUND FOR ACCOUNTS SOLD IN THE SHOP
         $this->email = $email;
+
+        $this->updateLoadedUserData('email', $this->email);
     }
 
 
@@ -2787,6 +2794,7 @@ class User extends User_Profile
                 return false;
             }
             $this->password = $this->hashPassword($password);
+            $this->updateLoadedUserData('password', $this->password);
             return true;
         }
         if (isset($_CONFIG['passwordComplexity']) && $_CONFIG['passwordComplexity'] == 'on') {
@@ -2804,6 +2812,7 @@ class User extends User_Profile
      */
     public function setHashedPassword($hashedPassword) {
         $this->password = $hashedPassword;
+        $this->updateLoadedUserData('password', $this->password);
     }
 
     /**
@@ -2830,6 +2839,7 @@ class User extends User_Profile
     {
         $this->frontend_language = intval($langId);
         $this->validateLanguageId('frontend');
+        $this->updateLoadedUserData('frontend_lang_id', $this->frontend_language);
     }
 
 
@@ -2844,6 +2854,7 @@ class User extends User_Profile
     {
         $this->backend_language = intval($langId);
         $this->validateLanguageId('backend');
+        $this->updateLoadedUserData('backend_lang_id', $this->backend_language);
     }
 
 
@@ -2858,6 +2869,7 @@ class User extends User_Profile
     public function setActiveStatus($status)
     {
         $this->is_active = (bool)$status;
+        $this->updateLoadedUserData('active', $this->is_active);
     }
 
     /**
@@ -2870,6 +2882,7 @@ class User extends User_Profile
      */
     public function setVerification($verified) {
         $this->verified = $verified;
+        $this->updateLoadedUserData('verified', $this->verified);
         return true;
     }
 
@@ -2891,6 +2904,8 @@ class User extends User_Profile
         } else {
             $this->primary_group = 0;
         }
+
+        $this->updateLoadedUserData('primary_group', $this->primary_group);
     }
 
 
@@ -2911,6 +2926,7 @@ class User extends User_Profile
 
         if ($status || !$this->isLastAdmin() || $force) {
             $this->is_admin = (bool)$status;
+            $this->updateLoadedUserData('is_admin', $this->is_admin);
             return true;
         }
         $this->error_msg[] = sprintf($_CORELANG['TXT_ACCESS_CHANGE_PERM_LAST_ADMIN_USER'], $this->getUsername());
@@ -2954,6 +2970,7 @@ class User extends User_Profile
     {
         $this->email_access = in_array($emailAccess, array_keys($this->arrPrivacyAccessTypes))
             ? $emailAccess : $this->defaultEmailAccessType;
+        $this->updateLoadedUserData('email_access', $this->email_access);
     }
 
 
@@ -2961,6 +2978,7 @@ class User extends User_Profile
     {
         $this->profile_access = in_array($profileAccess, array_keys($this->arrPrivacyAccessTypes))
             ? $profileAccess : $this->defaultProfileAccessTyp;
+        $this->updateLoadedUserData('profile_access', $this->profile_access);
     }
 
 
@@ -3167,6 +3185,34 @@ class User extends User_Profile
         global $_CONFIG;
 
         return new \DateTimeZone($_CONFIG['timezone']);
+    }
+
+    /**
+     * Update a specific profile attribute of the user
+     *
+     * @param   string  $attribute  ID of profile attribute to update
+     * @param   string|integer|boolean  $value  Value to set the profile
+     *                                          attribute to
+     */
+    protected function updateLoadedUserData($attribute, $value) {
+        if (!$this->id) {
+            return;
+        }
+
+        if (!isset($this->arrLoadedUsers[$this->id])) {
+            return;
+        }
+
+        $this->arrLoadedUsers[$this->id][$attribute] = $value;
+    }
+
+    /**
+     * Get object data as array
+     *
+     * @param    array   Return data of user object as array
+     */
+    public function toArray() {
+        return $this->arrLoadedUsers[$this->id];
     }
 
     /**

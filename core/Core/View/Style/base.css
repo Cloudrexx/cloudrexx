@@ -1934,3 +1934,14 @@ a.cke_dialog_ui_button_ok:hover {
 .componentList .description .desc-extended {
     display: none;
 }
+
+.experimental:after {
+    content: "Experimental";
+    vertical-align: super;
+    font-size: 8px;
+    background-color: #fcc;
+    padding: 1px 0 0 1px;
+    font-weight: normal;
+    font-family: monospace;
+    line-height: initial;
+}

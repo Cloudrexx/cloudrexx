@@ -1987,7 +1987,6 @@ class NewsletterManager extends NewsletterLib
                                  WHEN "mails_per_run" THEN "'. contrexx_input2int($_POST['mails_per_run']) .'"
                                  WHEN "overview_entries_limit" THEN "'. contrexx_input2int($_POST["overview_entries"]) .'"
                                  WHEN "test_mail" THEN "'. contrexx_input2db($_POST['test_mail']) .'"
-                                 WHEN "text_break_after" THEN "'. contrexx_input2int($_POST['text_break_after']) .'"
                                  WHEN "rejected_mail_operation" THEN "'. contrexx_input2db($_POST['newsletter_rejected_mail_task']) .'"
                                  WHEN "defUnsubscribe" THEN "'. contrexx_input2int($_POST['def_unsubscribe']) .'"
                                  WHEN "notificationSubscribe" THEN "'. contrexx_input2int($_POST["mailSendSubscribe"]) .'"
@@ -1995,7 +1994,7 @@ class NewsletterManager extends NewsletterLib
                                  WHEN "statistics" THEN "'. contrexx_input2int($_POST["statistics"]) .'"
                                  WHEN "confirmLinkHour" THEN "'. contrexx_input2int($_POST["confirmLinkHour"]) .'"
                                  END
-                WHERE `setname` IN("sender_mail", "sender_name", "reply_mail", "mails_per_run", "overview_entries_limit", "test_mail", "text_break_after", "rejected_mail_operation", "defUnsubscribe", "notificationSubscribe", "notificationUnsubscribe", "statistics", "confirmLinkHour")';
+                WHERE `setname` IN("sender_mail", "sender_name", "reply_mail", "mails_per_run", "overview_entries_limit", "test_mail", "rejected_mail_operation", "defUnsubscribe", "notificationSubscribe", "notificationUnsubscribe", "statistics", "confirmLinkHour")';
             $objDatabase->Execute($queryUpdateSetting);
             if (
                 isset($_POST['statistics_drop']) &&
@@ -2046,7 +2045,6 @@ class NewsletterManager extends NewsletterLib
             'TXT_GENERATE_HTML' => $_ARRAYLANG['TXT_GENERATE_HTML'],
             'TXT_NEWSLETTER_TEMPLATES' => $_ARRAYLANG['TXT_NEWSLETTER_TEMPLATES'],
             'TXT_NEWSLETTER_INTERFACE' => $_ARRAYLANG['TXT_NEWSLETTER_INTERFACE'],
-            'TXT_BREAK_AFTER' => $_ARRAYLANG['TXT_NEWSLETTER_BREAK_AFTER'],
             'TXT_TEST_MAIL' => $_ARRAYLANG['TXT_NEWSLETTER_TEST_RECIPIENT'],
             'TXT_FAILED' => $_ARRAYLANG['TXT_NEWSLETTER_FAILED'],
             'TXT_NEWSLETTER_INFO_ABOUT_ADMIN_INFORM' => $_ARRAYLANG['TXT_NEWSLETTER_INFO_ABOUT_ADMIN_INFORM'],
@@ -2084,8 +2082,6 @@ class NewsletterManager extends NewsletterLib
             'OVERVIEW_ENTRIES_VALUE' => $arrSettings['overview_entries_limit'],
             'TEST_MAIL_VALUE' => htmlentities(
                 $arrSettings['test_mail'], ENT_QUOTES, CONTREXX_CHARSET),
-            'BREAK_AFTER_VALUE' => htmlentities(
-                $arrSettings['text_break_after'], ENT_QUOTES, CONTREXX_CHARSET),
             'NEWSLETTER_REJECTED_MAIL_IGNORE' =>
                 ($arrSettings['rejected_mail_operation'] == 'ignore'
                     ? 'checked="checked"' : ''),
@@ -3254,8 +3250,6 @@ class NewsletterManager extends NewsletterLib
             $count        = $newsletterValues['count'];
             $smtpAccount  = $newsletterValues['smtp_server'];
         }
-        $break = $this->getSetting('txt_break_after');
-        $break = (intval($break) == 0 ? 80 : $break);
         $HTML_TemplateSource = $this->GetTemplateSource($template, 'html');
 // TODO: Unused
 //        $TEXT_TemplateSource = $this->GetTemplateSource($template, 'text');

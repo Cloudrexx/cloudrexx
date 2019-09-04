@@ -2905,7 +2905,6 @@ if ($test === NULL) {
             'SHOP_PHONE' => $objCustomer->phone(),
             'SHOP_FAX' => $objCustomer->fax(),
             'SHOP_EMAIL' => $objCustomer->email(),
-            'SHOP_CUSTOMER_BIRTHDAY' => date(ASCMS_DATE_FORMAT_DATE, $objCustomer->getProfileAttribute('birthday')),
             'SHOP_COMPANY_NOTE' => $objCustomer->companynote(),
             'SHOP_IS_RESELLER' => $customer_type,
             'SHOP_REGISTER_DATE' => date(ASCMS_DATE_FORMAT_DATETIME,
@@ -2914,6 +2913,13 @@ if ($test === NULL) {
             'SHOP_DISCOUNT_GROUP_CUSTOMER' => Discount::getCustomerGroupName(
                 $objCustomer->group_id()),
         ));
+        $birthday = $objCustomer->getProfileAttribute('birthday');
+        if (!empty($birthday)) {
+            self::$objTemplate->setVariable(
+                'SHOP_CUSTOMER_BIRTHDAY',
+                date(ASCMS_DATE_FORMAT_DATE, $birthday)
+            );
+        }
 // TODO: TEST
         $count = NULL;
         $orders = Orders::getArray($count, NULL, array('customer_id' => $objCustomer->id()), \Paging::getPosition(),
@@ -3032,13 +3038,12 @@ if ($test === NULL) {
             'SHOP_EMAIL' => $email,
             'SHOP_PHONE' => $phone,
             'SHOP_FAX' => $fax,
-            'SHOP_CUSTOMER_BIRTHDAY' => date(ASCMS_DATE_FORMAT_DATE, $objCustomer->getProfileAttribute('birthday')),
             'SHOP_USERNAME' => $username,
             'SHOP_PASSWORD' => $password,
             'SHOP_COMPANY_NOTE' => $companynote,
             'SHOP_REGISTER_DATE' => date(ASCMS_DATE_FORMAT_DATETIME, $registerdate),
             'SHOP_COUNTRY_MENUOPTIONS' =>
-                \Cx\Core\Country\Controller\Country::getMenuoptions($country_id),
+                \Cx\Core\Country\Controller\Country::getMenuoptions($country_id, false),
             'SHOP_DISCOUNT_GROUP_CUSTOMER_MENUOPTIONS' =>
                 Discount::getMenuOptionsGroupCustomer($customer_group_id),
             'SHOP_CUSTOMER_TYPE_MENUOPTIONS' =>
@@ -3047,6 +3052,19 @@ if ($test === NULL) {
                 Customers::getActiveMenuoptions($active),
             'SHOP_LANG_ID_MENUOPTIONS' => \FWLanguage::getMenuoptions($lang_id),
         ));
+        $birthday = 0;
+        if ($objCustomer) {
+            $birthday = $objCustomer->getProfileAttribute('birthday');
+        }
+        if (!empty($birthday)) {
+            self::$objTemplate->setVariable(
+                'SHOP_CUSTOMER_BIRTHDAY',
+                date(ASCMS_DATE_FORMAT_DATE, $birthday)
+            );
+        }
+        \JS::registerCode(
+            'cx.ready(function(){cx.jQuery(".datepicker-field").datepicker({dateFormat: "dd.mm.yy"});});'
+        );
         return true;
     }
 
