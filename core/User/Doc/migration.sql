@@ -1,12 +1,18 @@
 ALTER TABLE contrexx_access_user_attribute ADD is_default TINYINT(1) DEFAULT '0' NOT NULL;
 ALTER TABLE contrexx_access_user_attribute_value DROP FOREIGN KEY FK_B0DEA323A76ED395;
-ALTER TABLE contrexx_access_user_attribute_value ADD CONSTRAINT FK_B0DEA323B6E62EFA FOREIGN KEY (attribute_id) REFERENCES contrexx_access_user_attribute (id);
+ALTER TABLE contrexx_access_user_attribute_value ADD CONSTRAINT FK_B0DEA323B6E62EFA
+  FOREIGN KEY (attribute_id) REFERENCES contrexx_access_user_attribute (id);
 
-ALTER TABLE contrexx_access_user_attribute_value ADD CONSTRAINT FK_B0DEA323A76ED395A76ED395A76ED395A76ED395 FOREIGN KEY (user_id) REFERENCES contrexx_access_users (id);
+ALTER TABLE contrexx_access_user_attribute_value ADD CONSTRAINT FK_B0DEA323A76ED395A76ED395A76ED395A76ED395
+  FOREIGN KEY (user_id) REFERENCES contrexx_access_users (id);
 CREATE INDEX IDX_B0DEA323B6E62EFA ON contrexx_access_user_attribute_value (attribute_id);
 
 /*Migrate core attribute to user attribute*/
-INSERT INTO `contrexx_access_user_attribute`(`mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) SELECT `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, '1' FROM `contrexx_access_user_core_attribute`;
+INSERT INTO `contrexx_access_user_attribute`(
+  `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`
+) SELECT `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, '1'
+  FROM `contrexx_access_user_core_attribute`;
+
 /*Migrate user profile to user attribute*/
 ALTER TABLE contrexx_access_user_attribute ADD tmp_name TEXT;
 
@@ -16,16 +22,22 @@ FROM INFORMATION_SCHEMA.COLUMNS
 WHERE table_name = 'contrexx_access_user_profile'
 GROUP BY COLUMN_NAME;
 
-INSERT INTO `contrexx_access_user_attribute`(`access_id`, `type`, `read_access_id`, `is_default`, `tmp_name`) VALUES (0, 'menu_option', 0, 1, 'title-w');
-INSERT INTO `contrexx_access_user_attribute`(`access_id`, `type`, `read_access_id`, `is_default`, `tmp_name`) VALUES (0, 'menu_option', 0, 1, 'title-m');
+INSERT INTO `contrexx_access_user_attribute`(`access_id`, `type`, `read_access_id`, `is_default`, `tmp_name`)
+  VALUES (0, 'menu_option', 0, 1, 'title-w');
+INSERT INTO `contrexx_access_user_attribute`(`access_id`, `type`, `read_access_id`, `is_default`, `tmp_name`)
+  VALUES (0, 'menu_option', 0, 1, 'title-m');
 
-UPDATE contrexx_access_user_attribute as userattr SET parent_id =  (SELECT ua.id FROM (SELECT * FROM contrexx_access_user_attribute)AS ua WHERE ua.tmp_name = 'title') WHERE userattr.tmp_name = 'title-w' OR userattr.tmp_name = 'title-m';
+UPDATE contrexx_access_user_attribute as userattr
+  SET parent_id = (SELECT ua.id FROM (SELECT * FROM contrexx_access_user_attribute) AS ua
+    WHERE ua.tmp_name = 'title'
+  ) WHERE userattr.tmp_name = 'title-w' OR userattr.tmp_name = 'title-m';
 UPDATE contrexx_access_user_attribute SET type = 'menu' WHERE tmp_name = 'title';
 
 INSERT INTO
 	`contrexx_access_user_attribute`(`parent_id`, `access_id`, `type`, `read_access_id`, `is_default`, `tmp_name`)
 SELECT
-	ua.id AS parent_id, null AS access_id, 'menu_option' AS TYPE, null AS read_access_id, 1 AS is_default, 'title-c' AS tmp_name
+	ua.id AS parent_id, null AS access_id, 'menu_option' AS TYPE, null AS read_access_id, 1 AS is_default,
+	'title-c' AS tmp_name
 FROM
 	contrexx_access_user_title
 JOIN
@@ -45,153 +57,260 @@ ALTER TABLE contrexx_access_user_attribute_value DROP FOREIGN KEY FK_B0DEA323A76
 
 UPDATE `contrexx_access_user_profile` SET `tmp_name` = 'gender';
 
-INSERT INTO `contrexx_access_user_attribute_value`(`tmp_name`, `attribute_id`, `user_id`, `value`) SELECT `tmp_name`, (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'gender'), `user_id`, `gender` FROM `contrexx_access_user_profile`;
+INSERT INTO `contrexx_access_user_attribute_value`(`tmp_name`, `attribute_id`, `user_id`, `value`)
+  SELECT `tmp_name`, (
+    SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'gender'
+  ), `user_id`, `gender`
+  FROM `contrexx_access_user_profile`;
 
 
 UPDATE `contrexx_access_user_profile` SET `tmp_name` = 'title';
 
-INSERT INTO `contrexx_access_user_attribute_value`(`tmp_name`, `attribute_id`, `user_id`, `value`) SELECT `tmp_name`, (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'title'), `user_id`, `title` FROM `contrexx_access_user_profile`;
+INSERT INTO `contrexx_access_user_attribute_value`(`tmp_name`, `attribute_id`, `user_id`, `value`)
+  SELECT `tmp_name`, (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'title'), `user_id`, `title`
+  FROM `contrexx_access_user_profile`;
 
 
 UPDATE `contrexx_access_user_profile` SET `tmp_name` = 'designation';
 
-INSERT INTO `contrexx_access_user_attribute_value`(`tmp_name`,`attribute_id`, `user_id`, `value`) SELECT `tmp_name`, (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'designation'),`user_id`, `designation` FROM `contrexx_access_user_profile`;
+INSERT INTO `contrexx_access_user_attribute_value`(`tmp_name`,`attribute_id`, `user_id`, `value`)
+  SELECT `tmp_name`, (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'designation'),`user_id`,
+    `designation`
+  FROM `contrexx_access_user_profile`;
 
 
 UPDATE `contrexx_access_user_profile` SET `tmp_name` = 'firstname';
 
-INSERT INTO `contrexx_access_user_attribute_value`(`tmp_name`,`attribute_id`, `user_id`, `value`) SELECT `tmp_name`, (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'firstname'), `user_id`, `firstname` FROM `contrexx_access_user_profile`;
+INSERT INTO `contrexx_access_user_attribute_value`(`tmp_name`,`attribute_id`, `user_id`, `value`)
+  SELECT `tmp_name`, (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'firstname'), `user_id`,
+    `firstname`
+  FROM `contrexx_access_user_profile`;
 
 
 UPDATE `contrexx_access_user_profile` SET `tmp_name` = 'lastname';
 
-INSERT INTO `contrexx_access_user_attribute_value`(`tmp_name`,`attribute_id`, `user_id`, `value`) SELECT `tmp_name`, (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'lastname'), `user_id`, `lastname` FROM `contrexx_access_user_profile`;
+INSERT INTO `contrexx_access_user_attribute_value`(`tmp_name`,`attribute_id`, `user_id`, `value`)
+  SELECT `tmp_name`, (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'lastname'), `user_id`,
+    `lastname`
+  FROM `contrexx_access_user_profile`;
 
 
 UPDATE `contrexx_access_user_profile` SET `tmp_name` = 'company';
 
-INSERT INTO `contrexx_access_user_attribute_value`(`tmp_name`,`attribute_id`, `user_id`, `value`) SELECT `tmp_name`, (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'company'), `user_id`, `company` FROM `contrexx_access_user_profile`;
+INSERT INTO `contrexx_access_user_attribute_value`(`tmp_name`,`attribute_id`, `user_id`, `value`)
+  SELECT `tmp_name`, (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'company'), `user_id`,
+    `company`
+  FROM `contrexx_access_user_profile`;
 
 
 UPDATE `contrexx_access_user_profile` SET `tmp_name` = 'address';
 
-INSERT INTO `contrexx_access_user_attribute_value`(`tmp_name`,`attribute_id`, `user_id`, `value`) SELECT `tmp_name`, (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'address'), `user_id`, `address` FROM `contrexx_access_user_profile`;
+INSERT INTO `contrexx_access_user_attribute_value`(`tmp_name`,`attribute_id`, `user_id`, `value`)
+  SELECT `tmp_name`, (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'address'), `user_id`,
+    `address`
+  FROM `contrexx_access_user_profile`;
 
 
 UPDATE `contrexx_access_user_profile` SET `tmp_name` = 'city';
 
-INSERT INTO `contrexx_access_user_attribute_value`(`tmp_name`,`attribute_id`, `user_id`, `value`) SELECT `tmp_name`, (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'city'), `user_id`, `city` FROM `contrexx_access_user_profile`;
+INSERT INTO `contrexx_access_user_attribute_value`(`tmp_name`,`attribute_id`, `user_id`, `value`)
+  SELECT `tmp_name`, (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'city'), `user_id`, `city`
+  FROM `contrexx_access_user_profile`;
 
 
 UPDATE `contrexx_access_user_profile` SET `tmp_name` = 'zip';
 
-INSERT INTO `contrexx_access_user_attribute_value`(`tmp_name`,`attribute_id`, `user_id`, `value`) SELECT `tmp_name`, (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'zip'), `user_id`, `zip` FROM `contrexx_access_user_profile`;
+INSERT INTO `contrexx_access_user_attribute_value`(`tmp_name`,`attribute_id`, `user_id`, `value`)
+  SELECT `tmp_name`, (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'zip'), `user_id`, `zip`
+  FROM `contrexx_access_user_profile`;
 
 
 UPDATE `contrexx_access_user_profile` SET `tmp_name` = 'country';
 
-INSERT INTO `contrexx_access_user_attribute_value`(`tmp_name`,`attribute_id`, `user_id`, `value`) SELECT `tmp_name`, (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'country'), `user_id`, `country` FROM `contrexx_access_user_profile`;
+INSERT INTO `contrexx_access_user_attribute_value`(`tmp_name`,`attribute_id`, `user_id`, `value`)
+  SELECT `tmp_name`, (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'country'), `user_id`,
+    `country`
+  FROM `contrexx_access_user_profile`;
 
 
 UPDATE `contrexx_access_user_profile` SET `tmp_name` = 'phone_office';
 
-INSERT INTO `contrexx_access_user_attribute_value`(`tmp_name`,`attribute_id`, `user_id`, `value`) SELECT `tmp_name`, (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'phone_office'), `user_id`, `phone_office` FROM `contrexx_access_user_profile`;
+INSERT INTO `contrexx_access_user_attribute_value`(`tmp_name`,`attribute_id`, `user_id`, `value`)
+  SELECT `tmp_name`, (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'phone_office'), `user_id`,
+    `phone_office`
+  FROM `contrexx_access_user_profile`;
 
 
 UPDATE `contrexx_access_user_profile` SET `tmp_name` = 'phone_private';
 
-INSERT INTO `contrexx_access_user_attribute_value`(`tmp_name`,`attribute_id`, `user_id`, `value`) SELECT `tmp_name`, (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'phone_private'), `user_id`, `phone_private` FROM `contrexx_access_user_profile`;
+INSERT INTO `contrexx_access_user_attribute_value`(`tmp_name`,`attribute_id`, `user_id`, `value`)
+  SELECT `tmp_name`, (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'phone_private'), `user_id`,
+    `phone_private`
+  FROM `contrexx_access_user_profile`;
 
 
 UPDATE `contrexx_access_user_profile` SET `tmp_name` = 'phone_mobile';
 
-INSERT INTO `contrexx_access_user_attribute_value`(`tmp_name`,`attribute_id`, `user_id`, `value`) SELECT `tmp_name`, (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'phone_mobile'), `user_id`, `phone_mobile` FROM `contrexx_access_user_profile`;
+INSERT INTO `contrexx_access_user_attribute_value`(`tmp_name`,`attribute_id`, `user_id`, `value`)
+  SELECT `tmp_name`, (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'phone_mobile'), `user_id`,
+    `phone_mobile`
+  FROM `contrexx_access_user_profile`;
 
 
 UPDATE `contrexx_access_user_profile` SET `tmp_name` = 'phone_fax';
 
-INSERT INTO `contrexx_access_user_attribute_value`(`tmp_name`,`attribute_id`, `user_id`, `value`) SELECT `tmp_name`, (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'phone_fax'), `user_id`, `phone_fax` FROM `contrexx_access_user_profile`;
+INSERT INTO `contrexx_access_user_attribute_value`(`tmp_name`,`attribute_id`, `user_id`, `value`)
+  SELECT `tmp_name`, (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'phone_fax'), `user_id`,
+    `phone_fax`
+  FROM `contrexx_access_user_profile`;
 
 
 UPDATE `contrexx_access_user_profile` SET `tmp_name` = 'birthday';
 
-INSERT INTO `contrexx_access_user_attribute_value`(`tmp_name`,`attribute_id`, `user_id`, `value`) SELECT `tmp_name`, (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'birthday'), `user_id`, `birthday` FROM `contrexx_access_user_profile`;
+INSERT INTO `contrexx_access_user_attribute_value`(`tmp_name`,`attribute_id`, `user_id`, `value`)
+  SELECT `tmp_name`, (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'birthday'), `user_id`,
+    `birthday`
+  FROM `contrexx_access_user_profile`;
 
 
 UPDATE `contrexx_access_user_profile` SET `tmp_name` = 'website';
 
-INSERT INTO `contrexx_access_user_attribute_value`(`tmp_name`,`attribute_id`, `user_id`, `value`) SELECT `tmp_name`, (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'website'), `user_id`, `website` FROM `contrexx_access_user_profile`;
+INSERT INTO `contrexx_access_user_attribute_value`(`tmp_name`,`attribute_id`, `user_id`, `value`)
+  SELECT `tmp_name`, (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'website'), `user_id`,
+    `website`
+  FROM `contrexx_access_user_profile`;
 
 
 UPDATE `contrexx_access_user_profile` SET `tmp_name` = 'profession';
 
-INSERT INTO `contrexx_access_user_attribute_value`(`tmp_name`,`attribute_id`, `user_id`, `value`) SELECT `tmp_name`, (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'profession'), `user_id`, `profession` FROM `contrexx_access_user_profile`;
+INSERT INTO `contrexx_access_user_attribute_value`(`tmp_name`,`attribute_id`, `user_id`, `value`)
+  SELECT `tmp_name`, (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'profession'), `user_id`,
+    `profession`
+  FROM `contrexx_access_user_profile`;
 
 
 UPDATE `contrexx_access_user_profile` SET `tmp_name` = 'interests';
 
-INSERT INTO `contrexx_access_user_attribute_value`(`tmp_name`,`attribute_id`, `user_id`, `value`) SELECT `tmp_name`, (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'interests'), `user_id`, `interests` FROM `contrexx_access_user_profile`;
+INSERT INTO `contrexx_access_user_attribute_value`(`tmp_name`,`attribute_id`, `user_id`, `value`)
+  SELECT `tmp_name`, (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'interests'), `user_id`,
+    `interests`
+  FROM `contrexx_access_user_profile`;
 
 
 UPDATE `contrexx_access_user_profile` SET `tmp_name` = 'signature';
 
-INSERT INTO `contrexx_access_user_attribute_value`(`tmp_name`,`attribute_id`, `user_id`, `value`) SELECT `tmp_name`, (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'signature'), `user_id`, `signature` FROM `contrexx_access_user_profile`;
+INSERT INTO `contrexx_access_user_attribute_value`(`tmp_name`,`attribute_id`, `user_id`, `value`)
+  SELECT `tmp_name`, (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'signature'), `user_id`,
+    `signature`
+  FROM `contrexx_access_user_profile`;
 
 
 UPDATE `contrexx_access_user_profile` SET `tmp_name` = 'picture';
 
-INSERT INTO `contrexx_access_user_attribute_value`(`tmp_name`,`attribute_id`, `user_id`, `value`) SELECT `tmp_name`, (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'picture'), `user_id`, `picture` FROM `contrexx_access_user_profile`;
+INSERT INTO `contrexx_access_user_attribute_value`(`tmp_name`,`attribute_id`, `user_id`, `value`)
+  SELECT `tmp_name`, (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'picture'), `user_id`,
+    `picture`
+  FROM `contrexx_access_user_profile`;
 
 
-ALTER TABLE contrexx_access_user_attribute_value ADD CONSTRAINT FK_B0DEA323B6E62EFA FOREIGN KEY (attribute_id) REFERENCES contrexx_access_user_attribute (id);
-ALTER TABLE contrexx_access_user_attribute_value ADD CONSTRAINT FK_B0DEA323A76ED395A76ED395A76ED395A76ED395 FOREIGN KEY (user_id) REFERENCES contrexx_access_users (id);
+ALTER TABLE contrexx_access_user_attribute_value ADD CONSTRAINT FK_B0DEA323B6E62EFA
+  FOREIGN KEY (attribute_id) REFERENCES contrexx_access_user_attribute (id);
+ALTER TABLE contrexx_access_user_attribute_value ADD CONSTRAINT FK_B0DEA323A76ED395A76ED395A76ED395A76ED395
+  FOREIGN KEY (user_id) REFERENCES contrexx_access_users (id);
 
 /*Insert attribute name*/
 ALTER TABLE contrexx_access_user_attribute_name ADD `order` INT;
 
-INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES((SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'gender'), 'gender');
+INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES(
+  (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'gender'), 'gender'
+);
 
-INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES((SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'title'), 'title');
+INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES(
+  (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'title'), 'title'
+);
 
-INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`, `lang_id`, `order`) SELECT (SELECT `id`+`title`.`id`-1 FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'title-c' LIMIT 1) AS attribute_id, title AS name, 0 as lang_id, id as `order` FROM `contrexx_access_user_title` AS title;
+INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`, `lang_id`, `order`)
+  SELECT (
+    SELECT `id`+`title`.`id`-1 FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'title-c' LIMIT 1
+  ) AS attribute_id, title AS name, 0 as lang_id, id as `order`
+  FROM `contrexx_access_user_title` AS title;
 
-INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES((SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'designation'), 'designation');
+INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES(
+  (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'designation'), 'designation'
+);
 
-INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES((SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'firstname'), 'firstname');
+INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES(
+  (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'firstname'), 'firstname'
+);
 
-INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES((SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'lastname'), 'lastname');
+INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES(
+  (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'lastname'), 'lastname'
+);
 
-INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES((SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'company'), 'company');
+INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES(
+  (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'company'), 'company'
+);
 
-INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES((SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'address'), 'address');
+INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES(
+  (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'address'), 'address'
+);
 
-INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES((SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'city'), 'city');
+INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES(
+  (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'city'), 'city'
+);
 
-INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES((SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'zip'), 'zip');
+INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES(
+  (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'zip'), 'zip'
+);
 
-INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES((SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'country'), 'country');
+INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES(
+  (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'country'), 'country'
+);
 
-INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES((SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'phone_office'), 'phone_office');
+INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES(
+  (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'phone_office'), 'phone_office'
+);
 
-INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES((SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'phone_private'), 'phone_private');
+INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES(
+  (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'phone_private'), 'phone_private'
+);
 
-INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES((SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'phone_mobile'), 'phone_mobile');
+INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES(
+  (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'phone_mobile'), 'phone_mobile'
+);
 
-INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES((SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'phone_fax'), 'phone_fax');
+INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES(
+  (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'phone_fax'), 'phone_fax'
+);
 
-INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES((SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'birthday'), 'birthday');
+INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES(
+  (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'birthday'), 'birthday'
+);
 
-INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES((SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'website'), 'website');
+INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES(
+  (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'website'), 'website'
+);
 
-INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES((SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'profession'), 'profession');
+INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES(
+  (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'profession'), 'profession'
+);
 
-INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES((SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'interests'), 'interests');
+INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES(
+  (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'interests'), 'interests'
+);
 
-INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES((SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'signature'), 'signature');
+INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES(
+  (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'signature'), 'signature'
+);
 
-INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES((SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'picture'), 'picture');
+INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES(
+  (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'picture'), 'picture'
+);
 
-UPDATE `contrexx_access_user_attribute_value` SET `value` = (SELECT name.attribute_id FROM contrexx_access_user_attribute_name AS name JOIN contrexx_access_user_title AS title ON title.order_id = name.order) WHERE `value` = 1 AND `tmp_name` = 'title';
+UPDATE `contrexx_access_user_attribute_value` SET `value` = (
+  SELECT name.attribute_id FROM contrexx_access_user_attribute_name AS name
+    JOIN contrexx_access_user_title AS title ON title.order_id = name.order
+) WHERE `value` = 1 AND `tmp_name` = 'title';
 
 ALTER TABLE contrexx_access_user_attribute_value DROP tmp_name, CHANGE attribute_id attribute_id INT NOT NULL;
 
@@ -209,7 +328,8 @@ WHERE `name`.`order` > 0;
 /* View for user core attribute
  * This view is only temporary
  */
-CREATE VIEW `contrexx_access_user_core_attribute` AS SELECT `tmp_name` AS `id`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`
+CREATE VIEW `contrexx_access_user_core_attribute` AS
+SELECT `tmp_name` AS `id`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`
 FROM `contrexx_access_user_attribute`
 WHERE `is_default` = '1';
 
@@ -304,14 +424,28 @@ FROM contrexx_access_users AS users);
 ALTER TABLE dev.contrexx_access_rel_user_group DROP FOREIGN KEY FK_401DFD43A76ED395;
 ALTER TABLE dev.contrexx_access_user_attribute_value DROP FOREIGN KEY FK_B0DEA323A76ED395A76ED395A76ED395A76ED395;
 
-ALTER TABLE contrexx_access_users CHANGE id id INT UNSIGNED AUTO_INCREMENT NOT NULL, CHANGE auth_token_timeout auth_token_timeout INT UNSIGNED DEFAULT 0 NOT NULL, CHANGE regdate regdate INT UNSIGNED DEFAULT 0 NOT NULL, CHANGE expiration expiration INT UNSIGNED DEFAULT 0 NOT NULL, CHANGE validity validity INT UNSIGNED DEFAULT 0 NOT NULL, CHANGE last_auth last_auth INT UNSIGNED DEFAULT 0 NOT NULL, CHANGE last_activity last_activity INT UNSIGNED DEFAULT 0 NOT NULL, CHANGE frontend_lang_id frontend_lang_id INT UNSIGNED DEFAULT 0 NOT NULL, CHANGE backend_lang_id backend_lang_id INT UNSIGNED DEFAULT 0 NOT NULL, CHANGE primary_group primary_group INT UNSIGNED DEFAULT 0 NOT NULL, CHANGE restore_key_time restore_key_time INT UNSIGNED DEFAULT 0 NOT NULL;
+ALTER TABLE contrexx_access_users
+  CHANGE id id INT UNSIGNED AUTO_INCREMENT NOT NULL,
+  CHANGE auth_token_timeout auth_token_timeout INT UNSIGNED DEFAULT 0 NOT NULL,
+  CHANGE regdate regdate INT UNSIGNED DEFAULT 0 NOT NULL,
+  CHANGE expiration expiration INT UNSIGNED DEFAULT 0 NOT NULL,
+  CHANGE validity validity INT UNSIGNED DEFAULT 0 NOT NULL,
+  CHANGE last_auth last_auth INT UNSIGNED DEFAULT 0 NOT NULL,
+  CHANGE last_activity last_activity INT UNSIGNED DEFAULT 0 NOT NULL,
+  CHANGE frontend_lang_id frontend_lang_id INT UNSIGNED DEFAULT 0 NOT NULL,
+  CHANGE backend_lang_id backend_lang_id INT UNSIGNED DEFAULT 0 NOT NULL,
+  CHANGE primary_group primary_group INT UNSIGNED DEFAULT 0 NOT NULL,
+  CHANGE restore_key_time restore_key_time INT UNSIGNED DEFAULT 0 NOT NULL;
 ALTER TABLE contrexx_access_rel_user_group CHANGE user_id user_id INT UNSIGNED NOT NULL;
 ALTER TABLE contrexx_access_user_attribute_value CHANGE user_id user_id INT UNSIGNED NOT NULL;
 
-ALTER TABLE contrexx_access_rel_user_group ADD CONSTRAINT FK_401DFD43A76ED395 FOREIGN KEY (user_id) REFERENCES contrexx_access_users (id);
-ALTER TABLE contrexx_access_user_attribute_value ADD CONSTRAINT FK_B0DEA323A76ED395 FOREIGN KEY (user_id) REFERENCES contrexx_access_users (id) ON DELETE RESTRICT;
+ALTER TABLE contrexx_access_rel_user_group ADD CONSTRAINT FK_401DFD43A76ED395
+  FOREIGN KEY (user_id) REFERENCES contrexx_access_users (id);
+ALTER TABLE contrexx_access_user_attribute_value ADD CONSTRAINT FK_B0DEA323A76ED395
+  FOREIGN KEY (user_id) REFERENCES contrexx_access_users (id) ON DELETE RESTRICT;
 
 /*Add unique index to access_user_attribute_name*/
 ALTER TABLE contrexx_access_user_attribute_name DROP PRIMARY KEY;
 ALTER TABLE contrexx_access_user_attribute_name ADD id INT AUTO_INCREMENT NOT NULL PRIMARY KEY;
-CREATE UNIQUE INDEX fk_module_user_attribute_name_unique_idx ON contrexx_access_user_attribute_name (attribute_id, lang_id);
+CREATE UNIQUE INDEX fk_module_user_attribute_name_unique_idx
+  ON contrexx_access_user_attribute_name (attribute_id, lang_id);
