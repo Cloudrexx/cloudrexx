@@ -2,8 +2,8 @@ Cx\Core\User\Model\Entity\UserAttributeName:
   type: entity
   table: access_user_attribute_name
   uniqueConstraints:
-      fk_module_user_attribute_name_unique_idx:
-        columns: attribute_id, lang_id
+    fk_module_user_attribute_name_unique_idx:
+      columns: attribute_id, lang_id
   id:
     id:
       type: integer
