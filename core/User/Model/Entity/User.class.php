@@ -338,6 +338,7 @@ class User extends \Cx\Model\Base\EntityBase {
     public function __construct()
     {
         $this->group = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->userAttributeValue = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     public function initializeValidators()
