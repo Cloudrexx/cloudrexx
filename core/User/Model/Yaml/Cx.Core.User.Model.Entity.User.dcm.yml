@@ -163,3 +163,6 @@ Cx\Core\User\Model\Entity\User:
     userAttributeValue:
       targetEntity: Cx\Core\User\Model\Entity\UserAttributeValue
       mappedBy: user
+  lifecycleCallbacks:
+    prePersist: [ validate ]
+    onFlush: [ validate ]

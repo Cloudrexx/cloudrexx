@@ -37,6 +37,167 @@
 namespace Cx\Core\User\Model\Entity;
 
 /**
+ * Validates the email of an User to a set of constraints
+ *
+ * @copyright   CLOUDREXX CMS - Cloudrexx AG Thun
+ * @author      Sam Hawkes <info@cloudrexx.com>
+ * @package     cloudrexx
+ * @subpackage  core_user
+ * @version     5.0.0
+ */
+class UserValidateEmail extends \CxValidate
+{
+    /**
+     * @var int ID of user
+     */
+    protected $userId;
+
+    /**
+     * UserValidateEmail constructor
+     *
+     * @param int   $userId      ID of user
+     * @param array $constraints additional constraints
+     */
+    public function __construct($userId, $constraints = array())
+    {
+        $this->userId = $userId;
+        parent::__construct($constraints);
+    }
+
+    /**
+     * Checks if the given mail address is valid and unique
+     *
+     * @param string $mail Mail address to check
+     *
+     * @return boolean if email is valid
+     */
+    public function isValid($mail)
+    {
+        global $_CORELANG;
+
+        $this->passesValidation = true;
+
+        if (!\FWValidator::isEmail($mail)) {
+            $this->messages[] = $_CORELANG['TXT_ACCESS_INVALID_EMAIL_ADDRESS'];
+            $this->passesValidation = false;
+        }
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $qb = $em->createQueryBuilder();
+        $qb->select('u')
+           ->from('Cx\Core\User\Model\Entity\User', 'u')
+           ->where($qb->expr()->eq('u.email', ':email'));
+        if (!empty($this->userId)) {
+            $qb->andWhere($qb->expr()->not($qb->expr()->eq('u.id', ':id')));
+            $qb->setParameter('id', $this->userId);
+        }
+        $qb->setParameter('email', $mail);
+        $existingEntity = $qb->getQuery()->getResult();
+
+        if (!empty($existingEntity)) {
+            $this->messages[] = $_CORELANG['TXT_ACCESS_EMAIL_ALREADY_USED'];
+            $this->passesValidation = false;
+        }
+        return $this->passesValidation;
+    }
+}
+
+/**
+ * Validates the username of an User to a set of constraints
+ *
+ * @copyright   CLOUDREXX CMS - Cloudrexx AG Thun
+ * @author      Sam Hawkes <info@cloudrexx.com>
+ * @package     cloudrexx
+ * @subpackage  core_user
+ * @version     5.0.0
+ */
+class UserValidateUsername extends \CxValidate
+{
+    /**
+     * @var int ID of user
+     */
+    protected $userId;
+
+    /**
+     * UserValidateUsername constructor
+     *
+     * @param int   $userId      id of user
+     * @param array $constraints additional constraints
+     */
+    public function __construct($userId, $constraints = array())
+    {
+        $this->userId = $userId;
+        parent::__construct($constraints);
+    }
+
+    /**
+     * Checks if the given username is valid and unique
+     *
+     * @param string $username username to check
+     *
+     * @return boolean if email is valid
+     */
+    public function isValid($username)
+    {
+        global $_CORELANG;
+
+        $this->passesValidation = true;
+
+        if (empty($username)) {
+            return $this->passesValidation;
+        }
+
+        if (!$this->isValidUsername($username)) {
+            $this->messages[] = $_CORELANG['TXT_ACCESS_INVALID_USERNAME'];
+            $this->passesValidation = false;
+        }
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $qb = $em->createQueryBuilder();
+        $qb->select('u')
+            ->from('Cx\Core\User\Model\Entity\User', 'u')
+            ->where($qb->expr()->eq('u.username', ':username'));
+        if (!empty($this->userId)) {
+            $qb->andWhere($qb->expr()->not($qb->expr()->eq('u.id', ':id')));
+            $qb->setParameter('id', $this->userId);
+        }
+        $qb->setParameter('username', $username);
+        $existingEntity = $qb->getQuery()->getResult();
+
+        if (!empty($existingEntity)) {
+            $this->messages[] = $_CORELANG['TXT_ACCESS_USERNAME_ALREADY_USED'];
+            $this->passesValidation = false;
+        }
+
+        return $this->passesValidation;
+    }
+
+
+    /**
+     * Returns true if the given $username is valid
+     *
+     * @param string $username username to check
+     *
+     * @return boolean if username is valid
+     */
+    protected function isValidUsername($username)
+    {
+        if (preg_match('/^[a-zA-Z0-9-_]*$/', $username)) {
+            return true;
+        }
+        // For version 2.3, inspired by migrating Shop Customers to Users:
+        // In addition to the above, also accept usernames that look like valid
+        // e-mail addresses
+        if (\FWValidator::isEmail($username)) {
+            return true;
+        }
+        return false;
+    }
+}
+
+/**
  * Users can be created and managed.
  *
  * @copyright   CLOUDREXX CMS - Cloudrexx AG Thun
@@ -177,6 +338,13 @@ class User extends \Cx\Model\Base\EntityBase {
     public function __construct()
     {
         $this->group = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    public function initializeValidators()
+    {
+        $this->validators['username'] = new \Cx\Core\User\Model\Entity\UserValidateUsername($this->getId());
+        $this->validators['email'] = new \Cx\Core\User\Model\Entity\UserValidateEmail($this->getId());
+        $this->validators['password'] = new \CxValidateRegexp(array('pattern' => '/.+/'), true);
     }
 
     /**
