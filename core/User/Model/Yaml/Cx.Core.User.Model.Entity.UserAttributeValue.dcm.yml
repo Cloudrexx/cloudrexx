@@ -11,6 +11,8 @@ Cx\Core\User\Model\Entity\UserAttributeValue:
       type: integer
       column: attribute_id
       associationKey: true
+      options:
+        unsigned: true
     userId:
       id: true
       type: integer
@@ -25,6 +27,7 @@ Cx\Core\User\Model\Entity\UserAttributeValue:
       column: history_id
       options:
         default: 0
+        unsigned: true
     value:
       type: text
       length: 65535

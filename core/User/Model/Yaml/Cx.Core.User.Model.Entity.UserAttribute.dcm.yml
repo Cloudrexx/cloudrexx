@@ -5,6 +5,8 @@ Cx\Core\User\Model\Entity\UserAttribute:
     id:
       id: true
       type: integer
+      options:
+        unsigned: true
       generator:
         strategy: AUTO
     type:
