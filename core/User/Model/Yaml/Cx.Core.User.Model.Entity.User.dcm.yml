@@ -27,6 +27,8 @@ Cx\Core\User\Model\Entity\User:
       length: 32
       nullable: false
       column: auth_token
+      options:
+        default: ''
     authTokenTimeout:
       type: integer
       length: 14
@@ -100,7 +102,7 @@ Cx\Core\User\Model\Entity\User:
     active:
       type: boolean
       options:
-        default: false
+        default: true
     verified:
       type: boolean
       options:

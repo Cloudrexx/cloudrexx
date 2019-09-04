@@ -69,7 +69,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @var string
      */
-    protected $authToken;
+    protected $authToken = '';
 
     /**
      * @var integer
@@ -129,7 +129,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @var boolean
      */
-    protected $active = false;
+    protected $active = true;
 
     /**
      * @var boolean
