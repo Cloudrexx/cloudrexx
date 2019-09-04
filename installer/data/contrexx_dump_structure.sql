@@ -30,8 +30,8 @@ CREATE TABLE `contrexx_access_settings` (
   UNIQUE KEY `key` (`key`)
 ) ENGINE=InnoDB;
 CREATE TABLE `contrexx_access_user_attribute` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `parent_id` int DEFAULT NULL,
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `parent_id` int unsigned DEFAULT NULL,
   `type` enum('text','textarea','mail','uri','date','image','checkbox','menu','menu_option','group','frame','history') NOT NULL DEFAULT 'text',
   `mandatory` enum('0','1') NOT NULL DEFAULT '0',
   `sort_type` enum('asc','desc','custom') NOT NULL DEFAULT 'asc',
@@ -46,7 +46,7 @@ CREATE TABLE `contrexx_access_user_attribute` (
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_access_user_attribute_name` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `attribute_id` int NOT NULL DEFAULT '0',
+  `attribute_id` int unsigned NOT NULL,
   `lang_id` int NOT NULL DEFAULT '0',
   `name` varchar(255) NOT NULL DEFAULT '',
   `order` int,
@@ -55,9 +55,9 @@ CREATE TABLE `contrexx_access_user_attribute_name` (
   UNIQUE INDEX fk_module_user_attribute_name_unique_idx (`attribute_id`, `lang_id`)
 ) ENGINE=InnoDB;
 CREATE TABLE `contrexx_access_user_attribute_value` (
-  `attribute_id` int NOT NULL,
+  `attribute_id` int unsigned NOT NULL,
   `user_id` int unsigned NOT NULL,
-  `history_id` int NOT NULL DEFAULT '0',
+  `history_id` int unsigned NOT NULL DEFAULT '0',
   `value` text NOT NULL,
   PRIMARY KEY (`attribute_id`, `user_id`, `history_id`),
   FULLTEXT KEY `value` (`value`),
@@ -100,7 +100,7 @@ CREATE TABLE `contrexx_access_users` (
   `is_admin` tinyint(1) NOT NULL DEFAULT '0',
   `username` varchar(255) DEFAULT NULL,
   `password` varchar(255) DEFAULT NULL,
-  `auth_token` varchar(32) NOT NULL,
+  `auth_token` varchar(32) NOT NULL DEFAULT '',
   `auth_token_timeout` int unsigned NOT NULL DEFAULT '0',
   `regdate` int unsigned NOT NULL DEFAULT '0',
   `expiration` int unsigned NOT NULL DEFAULT '0',
@@ -112,7 +112,7 @@ CREATE TABLE `contrexx_access_users` (
   `email_access` enum('everyone','members_only','nobody') NOT NULL DEFAULT 'nobody',
   `frontend_lang_id` int unsigned NOT NULL DEFAULT '0',
   `backend_lang_id` int unsigned NOT NULL DEFAULT '0',
-  `active` tinyint(1) NOT NULL DEFAULT '0',
+  `active` tinyint(1) NOT NULL DEFAULT '1',
   `verified` tinyint(1) NOT NULL DEFAULT '1',
   `primary_group` int unsigned NOT NULL DEFAULT '0',
   `profile_access` enum('everyone','members_only','nobody') NOT NULL DEFAULT 'members_only',
