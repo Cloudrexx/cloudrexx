@@ -262,4 +262,9 @@ class Group extends \Cx\Model\Base\EntityBase {
     {
         return $this->user;
     }
+
+    public function __toString()
+    {
+        return $this->getGroupName();
+    }
 }
