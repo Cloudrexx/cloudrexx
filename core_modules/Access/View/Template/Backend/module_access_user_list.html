@@ -102,6 +102,7 @@ function accessUserDoAction(action)
           <td style="white-space:nowrap;">{ACCESS_USER_LAST_ACTIVITY}</td>
           <td style="white-space:nowrap;{ACCESS_USER_EXPIRATION_STYLE}">{ACCESS_USER_EXPIRATION}</td>
           <td style="text-align:right;">
+            <a href="javascript:void(0);" class="customerPanelLogin" data-login="customerpanel" data-owner-id="{ACCESS_USER_ID}" title="Remote login to customer panel" ></a>
             <a href="index.php?cmd=Access&amp;act=user&amp;tpl=modify&amp;id={ACCESS_USER_ID}" title="{TXT_ACCESS_MODIFY_USER_ACCOUNT}"><img src="../core/Core/View/Media/icons/edit.gif" width="16" height="16 "border="0" alt="{TXT_ACCESS_MODIFY_USER_ACCOUNT}" /></a>
             <a href="javascript:void(0);" onclick="accessDeleteUser({ACCESS_USER_ID}, '{ACCESS_USER_USERNAME}')" title="{ACCESS_DELETE_USER_ACCOUNT}"><img src="../core/Core/View/Media/icons/delete.gif" width="17" height="17" border="0" alt="{ACCESS_DELETE_USER_ACCOUNT}" /></a>
           </td>
