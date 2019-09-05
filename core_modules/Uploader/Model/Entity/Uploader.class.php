@@ -66,7 +66,9 @@ class Uploader extends EntityBase
     /**
      * @var Array
      */
-    protected $options = array();
+    protected $options = array(
+        'pl-Max-File-Size' => '',
+    );
 
     /**
      * @var Cx
