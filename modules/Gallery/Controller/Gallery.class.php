@@ -525,11 +525,12 @@ class Gallery
         
         $showImageSizeOverview   = $this->arrSettings['show_image_size'] == 'on';
         while (!$objResult->EOF) {
-            $arrImageSizes[$objResult->fields['catid']][$objResult->fields['id']] = ($showImageSizeOverview) ? round(filesize($this->strImagePath.$objResult->fields['path'])/1024,2) : '';
+            $arrImageSizes[$objResult->fields['catid']][$objResult->fields['id']] = ($showImageSizeOverview) ? round(filesize($this->strImagePath.$objResult->fields['path'])/1024,2) : 0;
             $arrstrImagePaths[$objResult->fields['catid']][$objResult->fields['id']] = $objResult->fields['path'];
             $objResult->MoveNext();
         }
 
+        $arrCategorySizes = array();
         if (isset($arrImageSizes) && isset($arrstrImagePaths)) {
             foreach ($arrImageSizes as $keyCat => $valueCat) {
                 $arrCategorySizes[$keyCat] = 0;

@@ -181,7 +181,7 @@ class DataSet extends \Cx\Model\Base\EntityBase implements \Iterator {
      */
     protected function convertObject(
         $object,
-        &$key,
+        &$key = '',
         $forbiddenClasses = array('Doctrine\ORM\PersistentCollection'),
         $prefix = 'x.'
     ) {
@@ -224,7 +224,10 @@ class DataSet extends \Cx\Model\Base\EntityBase implements \Iterator {
                     // If we don't recurse, we want to know about this field.
                     // If we recurse, it's misleading to show this field as
                     // an empty array even if it might have content.
-                    if (count($this->options['recursions'])) {
+                    if (
+                        isset($this->options['recursions']) &&
+                        count($this->options['recursions'])
+                    ) {
                         unset($data[$field]);
                     }
                     continue;
