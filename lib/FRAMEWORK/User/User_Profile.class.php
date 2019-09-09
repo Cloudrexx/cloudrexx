@@ -256,6 +256,23 @@ class User_Profile
             }
         }
 
+        if ($profileUpdated) {
+            // This is a work-around until this method is rewritten to use Doctrine.
+            // Once Doctrine is used, we need to implement this as an EventListener.
+            $lastUpdateDate = \Cx\Core\Core\Controller\Cx::instanciate()->getComponent(
+                'DateTime'
+            )->createDateTimeForDb()->format(
+                ASCMS_DATE_FORMAT_INTERNATIONAL_DATETIME
+            );
+            $query = '
+                UPDATE `' . DBPREFIX . 'access_users`
+                SET
+                    `last_update` = "' . $lastUpdateDate . '"
+                WHERE `id` = ' . $this->id . '
+            ';
+            $objDatabase->Execute($query);
+        }
+
         return !$error;
     }
 

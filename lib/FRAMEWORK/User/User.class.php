@@ -2160,6 +2160,14 @@ class User extends User_Profile
             }
         }
 
+        // This is a work-around until this method is rewritten to use Doctrine.
+        // Once Doctrine is used, this can be ignored as Gedmo does this for us.
+        $lastUpdateDate = \Cx\Core\Core\Controller\Cx::instanciate()->getComponent(
+            'DateTime'
+        )->createDateTimeForDb()->format(
+            ASCMS_DATE_FORMAT_INTERNATIONAL_DATETIME
+        );
+
         if ($objDatabase->Execute("
             UPDATE `".DBPREFIX."access_users`
             SET
@@ -2178,7 +2186,8 @@ class User extends User_Profile
                 `primary_group` = ".intval($this->primary_group).",
                 `profile_access` = '".$this->profile_access."',
                 `restore_key` = '".$this->restore_key."',
-                `restore_key_time` = ".$this->restore_key_time."
+                `restore_key_time` = ".$this->restore_key_time.",
+                `last_update` = '".$lastUpdateDate."'
             WHERE `id` = ".$this->id
         ) === false) {
             $this->error_msg[] = $_CORELANG['TXT_ACCESS_FAILED_TO_UPDATE_USER_ACCOUNT'];
