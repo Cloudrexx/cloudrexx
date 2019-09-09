@@ -1480,7 +1480,7 @@ class Download {
      * @global array
      * @return boolean
      */
-    public function store($objCategory = null, $selectedLanguages)
+    public function store($objCategory = null, $selectedLanguages = array())
     {
         global $objDatabase, $_ARRAYLANG;
 
