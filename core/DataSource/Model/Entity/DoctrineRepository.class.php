@@ -126,7 +126,10 @@ class DoctrineRepository extends DataSource {
                 if ($operation == 'in') {
                     $value = explode(',', $value);
                 }
-                $criteria[$field] = array($operation => $value);
+                if (!isset($criteria[$field])) {
+                    $criteria[$field] = array();
+                }
+                $criteria[$field][$operation] = $value;
             }
         }
 
