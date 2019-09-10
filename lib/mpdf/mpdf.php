@@ -6382,10 +6382,10 @@ class mPDF
 			$paddingR = 0;
 		} else {
 			/* -- END TABLES -- */
-			$ipaddingL = intval($this->blk[$this->blklvl]['padding_left']);
-			$ipaddingR = intval($this->blk[$this->blklvl]['padding_right']);
-			$paddingL = ($ipaddingL * _MPDFK);
-			$paddingR = ($ipaddingR * _MPDFK);
+			$ipaddingL = $this->blk[$this->blklvl]['padding_left'];
+			$ipaddingR = $this->blk[$this->blklvl]['padding_right'];
+			$paddingL = (intval($ipaddingL) * _MPDFK);
+			$paddingR = (intval($ipaddingR) * _MPDFK);
 			$this->cMarginL = $this->blk[$this->blklvl]['border_left']['w'];
 			$this->cMarginR = $this->blk[$this->blklvl]['border_right']['w'];
 
@@ -7598,10 +7598,10 @@ class mPDF
 			$fpaddingL = 0;
 		} else {
 			/* -- END TABLES -- */
-			$ipaddingL = intval($this->blk[$this->blklvl]['padding_left']);
-			$ipaddingR = intval($this->blk[$this->blklvl]['padding_right']);
-			$paddingL = ($ipaddingL * _MPDFK);
-			$paddingR = ($ipaddingR * _MPDFK);
+			$ipaddingL = $this->blk[$this->blklvl]['padding_left'];
+			$ipaddingR = $this->blk[$this->blklvl]['padding_right'];
+			$paddingL = (intval($ipaddingL) * _MPDFK);
+			$paddingR = (intval($ipaddingR) * _MPDFK);
 			$this->cMarginL = $this->blk[$this->blklvl]['border_left']['w'];
 			$cpaddingadjustL = -$this->cMarginL;
 			$this->cMarginR = $this->blk[$this->blklvl]['border_right']['w'];

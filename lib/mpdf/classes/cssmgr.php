@@ -1356,11 +1356,7 @@ class cssmgr
 
 			//===============================================
 			// Save Cascading CSS e.g. "div.topic p" at this block level
-			$cascadeCSS = '';
-			if (isset($this->mpdf->blk[$this->mpdf->blklvl]['cascadeCSS'])) {
-				$cascadeCSS = $this->mpdf->blk[$this->mpdf->blklvl]['cascadeCSS'];
-			}
-			$this->_mergeFullCSS($this->cascadeCSS, $cascadeCSS, $tag, $classes, $attr['ID'], $attr['LANG']);
+			$this->_mergeFullCSS($this->cascadeCSS, $this->mpdf->blk[$this->mpdf->blklvl]['cascadeCSS'], $tag, $classes, $attr['ID'], $attr['LANG']);
 			//===============================================
 			// Cascading forward CSS
 			//===============================================
