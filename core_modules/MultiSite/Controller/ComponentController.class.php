@@ -635,7 +635,21 @@ MultiSite Cache flush [<pattern>] [-v] [--exec]
         foreach ($products as $product) {
 // customizing: do not list Trial and Enterprise product
 // TODO: implement some sort of selective product selection in the multisite configuration
-            if (in_array($product->getName(), array('Free', 'Enterprise'))) {
+            if (
+                in_array(
+                    $product->getName(),
+                    array(
+                        'Free',
+                        'Solo',
+                        'Enterprise',
+                        'Partnerbeitrag',
+                        'EULA Standard',
+                        'EULA Enterprise',
+                        'EULA Non-Profit',
+                        'Generic App',
+                    )
+                )
+            ) {
                 continue;
             }
             $productName = contrexx_raw2xhtml($product->getName());

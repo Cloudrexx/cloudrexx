@@ -3223,6 +3223,7 @@ CREATE TABLE `contrexx_module_pim_price` (
 CREATE TABLE `contrexx_module_pim_product` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
+  `vat_rate_id` int(11) DEFAULT NULL,
   `entity_class` varchar(255) NOT NULL,
   `entity_attributes` text NOT NULL,
   `renewable` tinyint(1) NOT NULL,
@@ -3237,7 +3238,9 @@ CREATE TABLE `contrexx_module_pim_product` (
   `note_price` text NOT NULL,
   `cancellation_unit` varchar(5) NOT NULL,
   `cancellation_quantifier` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `IDX_6DFE203243897540` (`vat_rate_id`),
+  CONSTRAINT `contrexx_module_pim_product_ibfk_1` FOREIGN KEY (`vat_rate_id`) REFERENCES `contrexx_module_pim_vat_rate` (`id`)
 ) ENGINE=InnoDB;
 CREATE TABLE `contrexx_module_pim_product_upgrade` (
   `product_id` int(11) NOT NULL,
@@ -3247,6 +3250,12 @@ CREATE TABLE `contrexx_module_pim_product_upgrade` (
   KEY `contrexx_module_pim_product_upgrade_upgrade_product_id_ibfk` (`upgrade_product_id`),
   CONSTRAINT `contrexx_module_pim_product_upgrade_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `contrexx_module_pim_product` (`id`),
   CONSTRAINT `contrexx_module_pim_product_upgrade_ibfk_2` FOREIGN KEY (`upgrade_product_id`) REFERENCES `contrexx_module_pim_product` (`id`)
+) ENGINE=InnoDB;
+CREATE TABLE `contrexx_module_pim_vat_rate` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `rate` decimal(5,2) unsigned NOT NULL DEFAULT '0.00',
+  `vat_class` varchar(45) NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;
 CREATE TABLE `contrexx_module_podcast_category` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
