@@ -1054,6 +1054,13 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
     {
         global $_ARRAYLANG, $_CORELANG, $_CONFIG;
 
+        // customizing multisite
+        // todo: inject as soon as we are able to modify the user listing
+        // (using ViewGenerator options)
+        \JS::registerCSS('core_modules/MultiSite/View/Style/Backend.css');
+        \JS::registerJS('core_modules/MultiSite/View/Script/Backend.js');
+        // end customizing
+
         $arrSettings = \User_Setting::getSettings();
         $templateFile = 'module_access_user_list';
         if (!$arrSettings['use_usernames']['status']) {

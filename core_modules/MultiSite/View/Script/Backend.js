@@ -488,10 +488,16 @@
             cx.trigger("loadingStart", "remoteLogin", {});
             cx.ui.messages.showLoad();
             domainUrl = cx.variables.get('baseUrl', 'MultiSite') + cx.variables.get('cadminPath', 'contrexx') + "index.php?cmd=JsonData&object=MultiSite&act=remoteLogin";
+            data = {loginType: $(this).data('login')};
+            if ($(this).attr('data-owner-id')) {
+                data.ownerId = $(this).attr('data-owner-id');
+            } else {
+                data.websiteId = $(this).attr('data-id');
+            }
             $.ajax({
                 url: domainUrl,
                 type: "POST",
-                data: {websiteId: $(this).attr('data-id'), loginType: $(this).data('login')},
+                data: data,
                 dataType: "json",
                 success: function(response) {
                     if (response.status == 'success') {

@@ -3564,23 +3564,40 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
         global $_ARRAYLANG;
         self::loadLanguageData();
         
-        $websiteId = $params['post']['websiteId'];
-        if (empty($websiteId)) {
+        $loginType = ($params['post']['loginType'] == 'customerpanel') ? 'customerpanel' : 'website';
+        if (!empty($params['post']['websiteId'])) {
+           $websiteId = $params['post']['websiteId'];
+        }
+        if (!empty($params['post']['ownerId'])) {
+            $ownerId = $params['post']['ownerId'];
+        }
+        if (
+            (
+                $loginType == 'website' &&
+                empty($websiteId)
+            ) || (
+                $loginType == 'customerpanel' &&
+                empty($ownerId) &&
+                empty($websiteId)
+            )
+        ) {
             return false;
         }
-        $loginType = ($params['post']['loginType'] == 'customerpanel') ? 'customerpanel' : 'website';
         try {
             switch (\Cx\Core\Setting\Controller\Setting::getValue('mode','MultiSite')) {
                 case \Cx\Core_Modules\MultiSite\Controller\ComponentController::MODE_MANAGER:
                 case \Cx\Core_Modules\MultiSite\Controller\ComponentController::MODE_HYBRID:
-                    $websiteRepository = \Env::get('em')->getRepository('Cx\Core_Modules\MultiSite\Model\Entity\Website');
-                    $website   = $websiteRepository->findOneBy(array('id' => $websiteId));
-                    if (!$website) {
-                        return array('status' => 'error', 'message' => sprintf($_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_REMOTE_LOGIN_FAILED'], $loginType));
+                    if ($websiteId) {
+                        $websiteRepository = \Env::get('em')->getRepository('Cx\Core_Modules\MultiSite\Model\Entity\Website');
+                        $website   = $websiteRepository->findOneBy(array('id' => $websiteId));
+                        if (!$website) {
+                            return array('status' => 'error', 'message' => sprintf($_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_REMOTE_LOGIN_FAILED'], $loginType));
+                        }
+                        $ownerId = $website->getOwner()->getId();
                     }
                                     
                     if ($loginType == 'customerpanel') {
-                        $response = self::executeCommandOnManager('generateAuthToken', array('ownerId' => $website->getOwner()->getId()));
+                        $response = self::executeCommandOnManager('generateAuthToken', array('ownerId' => $ownerId));
                         if ($response->status == 'error' || $response->data->status == 'error') {
                             return array('status' => 'error', 'message' => sprintf($_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_REMOTE_LOGIN_FAILED'], $loginType));
                         }
