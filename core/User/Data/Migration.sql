@@ -324,109 +324,7 @@ DROP TABLE contrexx_access_user_title;
 DROP TABLE contrexx_access_user_core_attribute;
 DROP TABLE contrexx_access_user_profile;
 
-/* View for user title
- * This view is only temporary
- */
-CREATE VIEW `contrexx_access_user_title` AS SELECT `order` AS id, `name` AS title, 0 as order_id
-FROM `contrexx_access_user_attribute_name` AS `name`
-WHERE `name`.`order` > 0;
-
-/* View for user core attribute
- * This view is only temporary
- */
-CREATE VIEW `contrexx_access_user_core_attribute` AS
-SELECT `tmp_name` AS `id`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`
-FROM `contrexx_access_user_attribute`
-WHERE `is_default` = '1';
-
-/* View for user profile
- * This view is extremely slow but since it is only temporary, it will be left as it is
- */
-CREATE VIEW `contrexx_access_user_profile` AS (SELECT
-id as 'user_id',
-(SELECT value.value FROM contrexx_access_users AS user
-JOIN contrexx_access_user_attribute_value as value on value.user_id = user.id
-JOIN contrexx_access_user_attribute_name as name on value.attribute_id = name.attribute_id
-WHERE name.name = 'gender' AND lang_id = 0 AND value.user_id = users.id) AS 'gender',
-(SELECT value.value FROM contrexx_access_users AS user
-JOIN contrexx_access_user_attribute_value as value on value.user_id = user.id
-JOIN contrexx_access_user_attribute_name as name on value.attribute_id = name.attribute_id
-WHERE name.name = 'title' AND lang_id = 0 AND value.user_id = users.id) AS 'title',
-(SELECT value.value FROM contrexx_access_users AS user
-JOIN contrexx_access_user_attribute_value as value on value.user_id = user.id
-JOIN contrexx_access_user_attribute_name as name on value.attribute_id = name.attribute_id
-WHERE name.name = 'designation' AND lang_id = 0 AND value.user_id = users.id) AS 'designation',
-(SELECT value.value FROM contrexx_access_users AS user
-JOIN contrexx_access_user_attribute_value as value on value.user_id = user.id
-JOIN contrexx_access_user_attribute_name as name on value.attribute_id = name.attribute_id
-WHERE name.name = 'firstname' AND lang_id = 0 AND value.user_id = users.id) AS 'firstname',
-(SELECT value.value FROM contrexx_access_users AS user
-JOIN contrexx_access_user_attribute_value as value on value.user_id = user.id
-JOIN contrexx_access_user_attribute_name as name on value.attribute_id = name.attribute_id
-WHERE name.name = 'lastname' AND lang_id = 0 AND value.user_id = users.id) AS 'lastname',
-(SELECT value.value FROM contrexx_access_users AS user
-JOIN contrexx_access_user_attribute_value as value on value.user_id = user.id
-JOIN contrexx_access_user_attribute_name as name on value.attribute_id = name.attribute_id
-WHERE name.name = 'company' AND lang_id = 0 AND value.user_id = users.id) AS 'company',
-(SELECT value.value FROM contrexx_access_users AS user
-JOIN contrexx_access_user_attribute_value as value on value.user_id = user.id
-JOIN contrexx_access_user_attribute_name as name on value.attribute_id = name.attribute_id
-WHERE name.name = 'address' AND lang_id = 0 AND value.user_id = users.id) AS 'address',
-(SELECT value.value FROM contrexx_access_users AS user
-JOIN contrexx_access_user_attribute_value as value on value.user_id = user.id
-JOIN contrexx_access_user_attribute_name as name on value.attribute_id = name.attribute_id
-WHERE name.name = 'city' AND lang_id = 0 AND value.user_id = users.id) AS 'city',
-(SELECT value.value FROM contrexx_access_users AS user
-JOIN contrexx_access_user_attribute_value as value on value.user_id = user.id
-JOIN contrexx_access_user_attribute_name as name on value.attribute_id = name.attribute_id
-WHERE name.name = 'zip' AND lang_id = 0 AND value.user_id = users.id) AS 'zip',
-(SELECT value.value FROM contrexx_access_users AS user
-JOIN contrexx_access_user_attribute_value as value on value.user_id = user.id
-JOIN contrexx_access_user_attribute_name as name on value.attribute_id = name.attribute_id
-WHERE name.name = 'country' AND lang_id = 0 AND value.user_id = users.id) AS 'country',
-(SELECT value.value FROM contrexx_access_users AS user
-JOIN contrexx_access_user_attribute_value as value on value.user_id = user.id
-JOIN contrexx_access_user_attribute_name as name on value.attribute_id = name.attribute_id
-WHERE name.name = 'phone_office' AND lang_id = 0 AND value.user_id = users.id) AS 'phone_office',
-(SELECT value.value FROM contrexx_access_users AS user
-JOIN contrexx_access_user_attribute_value as value on value.user_id = user.id
-JOIN contrexx_access_user_attribute_name as name on value.attribute_id = name.attribute_id
-WHERE name.name = 'phone_private' AND lang_id = 0 AND value.user_id = users.id) AS 'phone_private',
-(SELECT value.value FROM contrexx_access_users AS user
-JOIN contrexx_access_user_attribute_value as value on value.user_id = user.id
-JOIN contrexx_access_user_attribute_name as name on value.attribute_id = name.attribute_id
-WHERE name.name = 'phone_mobile' AND lang_id = 0 AND value.user_id = users.id) AS 'phone_mobile',
-(SELECT value.value FROM contrexx_access_users AS user
-JOIN contrexx_access_user_attribute_value as value on value.user_id = user.id
-JOIN contrexx_access_user_attribute_name as name on value.attribute_id = name.attribute_id
-WHERE name.name = 'phone_fax' AND lang_id = 0 AND value.user_id = users.id) AS 'phone_fax',
-(SELECT value.value FROM contrexx_access_users AS user
-JOIN contrexx_access_user_attribute_value as value on value.user_id = user.id
-JOIN contrexx_access_user_attribute_name as name on value.attribute_id = name.attribute_id
-WHERE name.name = 'birthday' AND lang_id = 0 AND value.user_id = users.id) AS 'birthday',
-(SELECT value.value FROM contrexx_access_users AS user
-JOIN contrexx_access_user_attribute_value as value on value.user_id = user.id
-JOIN contrexx_access_user_attribute_name as name on value.attribute_id = name.attribute_id
-WHERE name.name = 'website' AND lang_id = 0 AND value.user_id = users.id) AS 'website',
-(SELECT value.value FROM contrexx_access_users AS user
-JOIN contrexx_access_user_attribute_value as value on value.user_id = user.id
-JOIN contrexx_access_user_attribute_name as name on value.attribute_id = name.attribute_id
-WHERE name.name = 'profession' AND lang_id = 0 AND value.user_id = users.id) AS 'profession',
-(SELECT value.value FROM contrexx_access_users AS user
-JOIN contrexx_access_user_attribute_value as value on value.user_id = user.id
-JOIN contrexx_access_user_attribute_name as name on value.attribute_id = name.attribute_id
-WHERE name.name = 'interests' AND lang_id = 0 AND value.user_id = users.id) AS 'interests',
-(SELECT value.value FROM contrexx_access_users AS user
-JOIN contrexx_access_user_attribute_value as value on value.user_id = user.id
-JOIN contrexx_access_user_attribute_name as name on value.attribute_id = name.attribute_id
-WHERE name.name = 'signature' AND lang_id = 0 AND value.user_id = users.id) AS 'signature',
-(SELECT value.value FROM contrexx_access_users AS user
-JOIN contrexx_access_user_attribute_value as value on value.user_id = user.id
-JOIN contrexx_access_user_attribute_name as name on value.attribute_id = name.attribute_id
-WHERE name.name = 'picture' AND lang_id = 0 AND value.user_id = users.id) AS 'picture'
-FROM contrexx_access_users AS users);
-
-/*Alter table access_users unsigned*/
+/*Alter table access_users */
 ALTER TABLE contrexx_access_rel_user_group DROP FOREIGN KEY IF EXISTS FK_401DFD43A76ED395;
 
 ALTER TABLE contrexx_access_users
@@ -497,3 +395,4 @@ CREATE INDEX IDX_B0DEA323B6E62EFA ON contrexx_access_user_attribute_value (attri
 
 /** Drop tmp names **/
 ALTER TABLE `contrexx_access_user_attribute_value` DROP `tmp_name`;
+ALTER TABLE `contrexx_access_user_attribute` DROP `tmp_name`;
