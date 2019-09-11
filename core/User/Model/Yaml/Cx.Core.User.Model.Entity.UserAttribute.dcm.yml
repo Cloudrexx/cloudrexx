@@ -15,10 +15,9 @@ Cx\Core\User\Model\Entity\UserAttribute:
       options:
         default: "text"
     mandatory:
-      type: enum
-      values: ['0','1']
+      type: boolean
       options:
-        default: "0"
+        default: 0
     sortType:
       type: enum
       values: ['asc','desc','custom']

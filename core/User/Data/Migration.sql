@@ -340,7 +340,8 @@ ALTER TABLE contrexx_access_users
   CHANGE backend_lang_id backend_lang_id INT UNSIGNED DEFAULT 0 NOT NULL,
   CHANGE primary_group primary_group INT UNSIGNED DEFAULT 0 NOT NULL,
   CHANGE restore_key_time restore_key_time INT UNSIGNED DEFAULT 0 NOT NULL,
-  CHANGE active active TINYINT(1) DEFAULT '1' NOT NULL;
+  CHANGE active active TINYINT(1) DEFAULT '1' NOT NULL,
+  CHANGE u2u_active u2u_active TINYINT(1) DEFAULT '1' NOT NULL;
 ALTER TABLE contrexx_access_rel_user_group CHANGE user_id user_id INT UNSIGNED NOT NULL;
 
 /** Drop Foreign Keys To Modify Tables **/
@@ -350,7 +351,8 @@ ALTER TABLE `contrexx_access_rel_user_group` DROP FOREIGN KEY IF EXISTS `FK_401D
 
 ALTER TABLE contrexx_access_user_attribute
 	CHANGE id id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-	CHANGE parent_id parent_id INT UNSIGNED DEFAULT NULL;
+	CHANGE parent_id parent_id INT UNSIGNED DEFAULT NULL,
+	CHANGE mandatory mandatory TINYINT(1) DEFAULT '0' NOT NULL;
 
 ALTER TABLE contrexx_access_user_attribute_name
 	CHANGE attribute_id attribute_id INT UNSIGNED NOT NULL;
@@ -363,7 +365,8 @@ ALTER TABLE contrexx_access_user_attribute_value
 ALTER TABLE contrexx_access_rel_user_group CHANGE group_id group_id INT UNSIGNED NOT NULL;
 
 ALTER TABLE contrexx_access_user_groups
-  CHANGE group_id group_id INT UNSIGNED AUTO_INCREMENT NOT NULL;
+  CHANGE group_id group_id INT UNSIGNED AUTO_INCREMENT NOT NULL,
+  CHANGE is_active is_active TINYINT(1) DEFAULT '1' NOT NULL;
 
 /** Delete all invalid entries **/
 DELETE FROM contrexx_access_user_attribute_value WHERE attribute_id = 0;

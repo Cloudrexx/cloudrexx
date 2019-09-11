@@ -26,7 +26,7 @@ Cx\Core\User\Model\Entity\Group:
       options:
         default: ""
     isActive:
-      type: smallint
+      type: boolean
       nullable: false
       column: is_active
       options:

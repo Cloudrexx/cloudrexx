@@ -135,11 +135,10 @@ Cx\Core\User\Model\Entity\User:
         unsigned: true
         default: 0
     u2uActive:
-      type: enum
-      values: ['0','1']
+      type: boolean
       column: u2u_active
       options:
-        default: "1"
+        default: 1
   indexes:
     username:
       columns: [username]

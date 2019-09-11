@@ -66,7 +66,7 @@ CREATE TABLE `contrexx_access_user_groups` (
   `group_id` int unsigned NOT NULL AUTO_INCREMENT,
   `group_name` varchar(100) NOT NULL DEFAULT '',
   `group_description` varchar(255) NOT NULL DEFAULT '',
-  `is_active` smallint NOT NULL DEFAULT '1',
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `type` enum('frontend','backend') NOT NULL DEFAULT 'frontend',
   `homepage` varchar(255) NOT NULL DEFAULT '',
   `toolbar` int NOT NULL DEFAULT '0',
@@ -117,7 +117,7 @@ CREATE TABLE `contrexx_access_users` (
   `profile_access` enum('everyone','members_only','nobody') NOT NULL DEFAULT 'members_only',
   `restore_key` varchar(32) NOT NULL DEFAULT '',
   `restore_key_time` int unsigned NOT NULL DEFAULT '0',
-  `u2u_active` enum('0','1') NOT NULL DEFAULT '1',
+  `u2u_active` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
   KEY `username` (`username`)
 ) ENGINE=InnoDB ;
