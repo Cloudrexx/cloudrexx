@@ -18,7 +18,7 @@ CREATE TABLE `contrexx_access_id` (
 ) ENGINE=InnoDB;
 CREATE TABLE `contrexx_access_rel_user_group` (
   `user_id` int unsigned NOT NULL,
-  `group_id` int NOT NULL,
+  `group_id` int unsigned NOT NULL,
   PRIMARY KEY (`user_id`,`group_id`),
   INDEX `contrexx_access_rel_user_group_user_id_ibfk` (`user_id`),
   INDEX `contrexx_access_rel_user_group_group_id_ibfk` (`group_id`)
@@ -33,19 +33,18 @@ CREATE TABLE `contrexx_access_user_attribute` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `parent_id` int unsigned DEFAULT NULL,
   `type` enum('text','textarea','mail','uri','date','image','checkbox','menu','menu_option','group','frame','history') NOT NULL DEFAULT 'text',
-  `mandatory` enum('0','1') NOT NULL DEFAULT '0',
+  `mandatory` tinyint(1) NOT NULL DEFAULT '0',
   `sort_type` enum('asc','desc','custom') NOT NULL DEFAULT 'asc',
   `order_id` int NOT NULL DEFAULT '0',
   `access_special` enum('','menu_select_higher','menu_select_lower') NOT NULL DEFAULT '',
   `access_id` int NOT NULL,
   `read_access_id` int NOT NULL,
   `is_default` tinyint(1) DEFAULT '0' NOT NULL,
-  `tmp_name` varchar(255),
   PRIMARY KEY (`id`),
   INDEX `contrexx_access_user_attribute_parent_id_ibfk` (`parent_id`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_access_user_attribute_name` (
-  `id` int NOT NULL AUTO_INCREMENT,
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
   `attribute_id` int unsigned NOT NULL,
   `lang_id` int NOT NULL DEFAULT '0',
   `name` varchar(255) NOT NULL DEFAULT '',
@@ -64,7 +63,7 @@ CREATE TABLE `contrexx_access_user_attribute_value` (
   INDEX `contrexx_access_user_attribute_value_user_id_ibfk` (`user_id`)
 ) ENGINE=InnoDB;
 CREATE TABLE `contrexx_access_user_groups` (
-  `group_id` int NOT NULL AUTO_INCREMENT,
+  `group_id` int unsigned NOT NULL AUTO_INCREMENT,
   `group_name` varchar(100) NOT NULL DEFAULT '',
   `group_description` varchar(255) NOT NULL DEFAULT '',
   `is_active` smallint NOT NULL DEFAULT '1',

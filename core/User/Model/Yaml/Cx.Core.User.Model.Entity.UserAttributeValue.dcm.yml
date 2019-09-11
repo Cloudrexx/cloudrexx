@@ -39,6 +39,8 @@ Cx\Core\User\Model\Entity\UserAttributeValue:
       joinColumns:
         attribute_id:
           referencedColumnName: id
+          options:
+            unsigned: true
     user:
       targetEntity: Cx\Core\User\Model\Entity\User
       inversedBy: userAttributeValue
@@ -47,3 +49,5 @@ Cx\Core\User\Model\Entity\UserAttributeValue:
           onDelete: RESTRICT
           onUpdate: RESTRICT
           referencedColumnName: id
+          options:
+            unsigned: true

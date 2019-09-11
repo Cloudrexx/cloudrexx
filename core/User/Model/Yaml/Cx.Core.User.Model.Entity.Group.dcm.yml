@@ -8,6 +8,8 @@ Cx\Core\User\Model\Entity\Group:
       length: 11
       generator:
         strategy: AUTO
+      options:
+        unsigned: true
       column: group_id   
     groupName:
       type: string

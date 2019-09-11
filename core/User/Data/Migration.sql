@@ -346,6 +346,7 @@ ALTER TABLE contrexx_access_rel_user_group CHANGE user_id user_id INT UNSIGNED N
 /** Drop Foreign Keys To Modify Tables **/
 ALTER TABLE `contrexx_access_user_attribute_name` DROP FOREIGN KEY IF EXISTS `FK_90502F6CB6E62EFA`;
 ALTER TABLE `contrexx_access_user_attribute` DROP FOREIGN KEY IF EXISTS `FK_D97727BE727ACA70`;
+ALTER TABLE `contrexx_access_rel_user_group` DROP FOREIGN KEY IF EXISTS `FK_401DFD43FE54D947`;
 
 ALTER TABLE contrexx_access_user_attribute
 	CHANGE id id INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -358,6 +359,11 @@ ALTER TABLE contrexx_access_user_attribute_value
 	CHANGE attribute_id attribute_id INT UNSIGNED NOT NULL,
 	CHANGE user_id user_id INT UNSIGNED NOT NULL,
 	CHANGE history_id history_id INT UNSIGNED DEFAULT 0 NOT NULL;
+
+ALTER TABLE contrexx_access_rel_user_group CHANGE group_id group_id INT UNSIGNED NOT NULL;
+
+ALTER TABLE contrexx_access_user_groups
+  CHANGE group_id group_id INT UNSIGNED AUTO_INCREMENT NOT NULL;
 
 /** Delete all invalid entries **/
 DELETE FROM contrexx_access_user_attribute_value WHERE attribute_id = 0;
@@ -374,7 +380,7 @@ ALTER TABLE contrexx_access_rel_user_group ADD CONSTRAINT FK_401DFD43A76ED395 FO
 
 /*Add unique index to access_user_attribute_name*/
 ALTER TABLE contrexx_access_user_attribute_name DROP PRIMARY KEY;
-ALTER TABLE contrexx_access_user_attribute_name ADD id INT AUTO_INCREMENT NOT NULL PRIMARY KEY;
+ALTER TABLE contrexx_access_user_attribute_name ADD id INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY;
 CREATE UNIQUE INDEX fk_module_user_attribute_name_unique_idx
   ON contrexx_access_user_attribute_name (attribute_id, lang_id);
 
@@ -389,6 +395,9 @@ ALTER TABLE `contrexx_access_user_attribute_name`ADD CONSTRAINT `FK_90502F6CB6E6
 
 ALTER TABLE `contrexx_access_user_attribute`ADD CONSTRAINT `FK_D97727BE727ACA70`
 	FOREIGN KEY (`parent_id`) REFERENCES `contrexx_access_user_attribute`(`id`);
+
+ALTER TABLE contrexx_access_rel_user_group ADD CONSTRAINT FK_401DFD43FE54D947
+  FOREIGN KEY (group_id) REFERENCES contrexx_access_user_groups (group_id);
 
 /** Add Indexes **/
 CREATE INDEX IDX_B0DEA323B6E62EFA ON contrexx_access_user_attribute_value (attribute_id);

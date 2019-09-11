@@ -9,6 +9,8 @@ Cx\Core\User\Model\Entity\UserAttributeName:
       type: integer
       generator:
         strategy: AUTO
+      options:
+        unsigned: true
   fields:
     attributeId:
       type: integer
@@ -40,3 +42,5 @@ Cx\Core\User\Model\Entity\UserAttributeName:
       joinColumns:
         attribute_id:
           referencedColumnName: id
+          options:
+            unsigned: true
