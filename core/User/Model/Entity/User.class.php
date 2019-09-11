@@ -411,21 +411,17 @@ class User extends \Cx\Model\Base\EntityBase {
     }
 
     /**
-     * Set plaintext (/unhashed) password
+     * Set password
      *
      * @param string $password
      */
     public function setPassword($password)
     {
-        if (empty($password)) {
-            return;
-        }
-        $this->checkPasswordValidity($password);
-        $this->password = $this->hashPassword($password);
+        $this->password = $password;
     }
 
     /**
-     * Get hashed password
+     * Get password
      *
      * @return string 
      */
@@ -914,135 +910,5 @@ class User extends \Cx\Model\Base\EntityBase {
             }
         }
         return false;
-    }
-
-    /**
-     * Returns true if the given $password is valid
-     * @param   string    $password
-     * @return  boolean
-     */
-    protected function checkPasswordValidity($password)
-    {
-        global $_CONFIG, $_CORELANG;
-
-        if (strlen($password) < 6) {
-            throw new \Cx\Core\Error\Model\Entity\ShinyException(
-                $_CORELANG['TXT_ACCESS_INVALID_PASSWORD']
-            );
-        }
-        if (
-            isset($_CONFIG['passwordComplexity']) &&
-            $_CONFIG['passwordComplexity'] == 'on'
-        ) {
-            // Password must contain the following characters: upper, lower
-            // case and numbers
-            if (
-                !preg_match('/[A-Z]+/', $password) ||
-                !preg_match('/[a-z]+/', $password) ||
-                !preg_match('/[0-9]+/', $password)
-            ) {
-                throw new \Cx\Core\Error\Model\Entity\ShinyException(
-                    $_CORELANG['TXT_ACCESS_INVALID_PASSWORD_WITH_COMPLEXITY']
-                );
-            }
-        }
-    }
-
-    /**
-     * Generate hash of password with default hash algorithm
-     *
-     * @param string $password Password to be hashed
-     *
-     * @return string The generated hash of the supplied password
-     * @throws  \Cx\Core\Error\Model\Entity\ShinyException In case the password
-     *                                                    hash generation fails
-     */
-    protected function hashPassword($password)
-    {
-        $hash = password_hash($password, \PASSWORD_BCRYPT);
-        if ($hash !== false) {
-            return $hash;
-        }
-
-        throw new \Cx\Core\Error\Model\Entity\ShinyException(
-            'Failed to generate a new password hash'
-        );
-    }
-
-    /**
-     * Return the first- and lastname if they are defined. If this is not the
-     * case, check if a username exists. If this also does not exist, the
-     * e-mail address will be returned.
-     *
-     * @return string firstname & lastname, username or email
-     */
-    public function __toString()
-    {
-        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-        $em = $cx->getDb()->getEntityManager();
-        $userName = '';
-
-        // values which we would like to get
-        $profileAttrs = array(
-            'lastname' => '',
-            'firstname' => ''
-        );
-
-        $attrNameRepo = $em->getRepository(
-            'Cx\Core\User\Model\Entity\UserAttributeName'
-        );
-
-        foreach ($profileAttrs as $name => $value) {
-            $selectedAttrName = $attrNameRepo->findOneBy(
-                array('name' => $name)
-            );
-
-            $userAttrValues = array();
-            if (!empty($this->getUserAttributeValue())) {
-                $userAttrValues = $this->getUserAttributeValue();
-            }
-
-            if (is_array($userAttrValues)) {
-                // must be converted, since $userAttrValues is an array
-                $collection = new \Doctrine\Common\Collections\ArrayCollection(
-                    $userAttrValues
-                );
-            } else {
-                $collection = $userAttrValues;
-            }
-
-
-            if (!empty($selectedAttrName)) {
-                $attrId = $selectedAttrName->getAttributeId();
-                $selectedAttrValue = $collection->filter(
-                    function($attrValue) use ($attrId) {
-                        if ($attrId == $attrValue->getAttributeId()) {
-                            return $attrValue;
-                        }
-                    }
-                )->first();
-
-                if (!empty($value)) {
-                    $profileAttrs[$name] = $selectedAttrValue->getValue();
-                }
-            }
-        }
-
-        if (
-            !empty($profileAttrs['firstname']) ||
-            !empty($profileAttrs['lastname'])
-        ) {
-            $userName = trim(
-                $profileAttrs['firstname'].' '. $profileAttrs['lastname']
-            );
-        } else if (!empty($this->getUsername())) {
-            $userName = $this->getUsername();
-        } else if (!empty($this->getEmail())) {
-            $userName = $this->getEmail();
-        } else {
-            $userName = parent::__toString();
-        }
-
-        return $userName;
     }
 }
