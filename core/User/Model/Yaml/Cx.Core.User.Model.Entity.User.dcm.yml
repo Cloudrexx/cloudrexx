@@ -28,7 +28,7 @@ Cx\Core\User\Model\Entity\User:
       nullable: false
       column: auth_token
       options:
-        default: ''
+        default: '0'
     authTokenTimeout:
       type: integer
       length: 14
@@ -67,7 +67,7 @@ Cx\Core\User\Model\Entity\User:
       nullable: false
       column: last_auth_status
       options:
-        default: 1
+        default: 0
     lastActivity:
       type: integer
       nullable: false

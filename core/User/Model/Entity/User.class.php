@@ -230,7 +230,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @var string
      */
-    protected $authToken = '';
+    protected $authToken = '0';
 
     /**
      * @var integer
@@ -260,7 +260,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @var integer
      */
-    protected $lastAuthStatus = 1;
+    protected $lastAuthStatus = 0;
 
     /**
      * @var integer
@@ -273,9 +273,9 @@ class User extends \Cx\Model\Base\EntityBase {
     protected $email;
 
     /**
-     * @var enum_user_user_emailaccess
+     * @var string enum_user_user_emailaccess
      */
-    protected $emailAccess = 'nobody';
+    protected $emailAccess;
 
     /**
      * @var integer
@@ -303,9 +303,9 @@ class User extends \Cx\Model\Base\EntityBase {
     protected $primaryGroup = 0;
 
     /**
-     * @var enum_user_user_profileaccess
+     * @var string enum_user_user_profileaccess
      */
-    protected $profileAccess = 'members_only';
+    protected $profileAccess;
 
     /**
      * @var string
@@ -318,9 +318,9 @@ class User extends \Cx\Model\Base\EntityBase {
     protected $restoreKeyTime = 0;
 
     /**
-     * @var enum_user_user_u2uactive
+     * @var boolean
      */
-    protected $u2uActive = '1';
+    protected $u2uActive = false;
 
     /**
      * @var \Doctrine\Common\Collections\Collection
@@ -337,8 +337,13 @@ class User extends \Cx\Model\Base\EntityBase {
      */
     public function __construct()
     {
+        $arrSettings = \FWUser::getSettings();
+        $this->profileAccess = $arrSettings['default_profile_access']['value'];
+        $this->emailAccess = $arrSettings['default_email_access']['value'];
+
         $this->group = new \Doctrine\Common\Collections\ArrayCollection();
         $this->userAttributeValue = new \Doctrine\Common\Collections\ArrayCollection();
+
     }
 
     public function initializeValidators()
