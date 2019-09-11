@@ -1681,7 +1681,6 @@ class User extends User_Profile
         $query = '
             SELECT SQL_CALC_FOUND_ROWS DISTINCT tblU.`id`
               FROM `'.DBPREFIX.'access_users` AS tblU'.
-            ($joinCoreTbl ? ' INNER JOIN `'.DBPREFIX.'access_user_profile` AS tblP ON tblP.`user_id`=tblU.`id`' : '').
             ($joinCustomTbl ? ' INNER JOIN `'.DBPREFIX.'access_user_attribute_value` AS tblA ON tblA.`user_id`=tblU.`id`' : '').
             ($joinGroupTbl
                 ? ($groupless
