@@ -1338,10 +1338,12 @@ class User extends User_Profile
             $arrSelectCustomExpressions = array();
         }
 
+        $userProfileQueries = $this->getUserProfileQueries($arrSelectCoreExpressions);
+
         $query = 'SELECT tblU.`'.implode('`, tblU.`', $arrSelectMetaExpressions).'`'
-            .(count($arrSelectCoreExpressions) ? ', tblP.`'.implode('`, tblP.`', $arrSelectCoreExpressions).'`' : '')
+            .(count($arrSelectCoreExpressions) ? ', ' . $userProfileQueries['select'] : '')
             .'FROM `'.DBPREFIX.'access_users` AS tblU'
-            .(count($arrSelectCoreExpressions) || $arrQuery['tables']['core'] ? ' INNER JOIN `'.DBPREFIX.'access_user_profile` AS tblP ON tblP.`user_id` = tblU.`id`' : '')
+            .(count($arrSelectCoreExpressions) || $arrQuery['tables']['core'] ? ' ' . $userProfileQueries['joins'] : '')
             .($arrQuery['tables']['custom'] ? ' INNER JOIN `'.DBPREFIX.'access_user_attribute_value` AS tblA ON tblA.`user_id` = tblU.`id`' : '')
             .($arrQuery['tables']['group']
                 ? (isset($filter['group_id']) && $filter['group_id'] == 'groupless'
@@ -1352,7 +1354,7 @@ class User extends User_Profile
             .($arrQuery['tables']['group'] && !FWUser::getFWUserObject()->isBackendMode() ? ' INNER JOIN `'.DBPREFIX.'access_user_groups` AS tblGF ON tblGF.`group_id` = tblG.`group_id`' : '')
             .(count($arrQuery['joins']) ? ' '.implode(' ',$arrQuery['joins']) : '')
 // TODO: some conditions are not well enclosed, so there might be a more proper solution than adding more brackes at this point
-            .(count($arrQuery['conditions']) ? ' WHERE ('.implode(') AND (', $arrQuery['conditions']).')' : '')
+            .(count($arrQuery['conditions']) ? ' HAVING ('.implode(') AND (', $arrQuery['conditions']).')' : '')
             .($arrQuery['group_tables'] ? ' GROUP BY tblU.`id`' : '')
             .(count($arrQuery['sort']) ? ' ORDER BY '.implode(', ', $arrQuery['sort']) : '');
         $objUser = false;
@@ -1364,6 +1366,9 @@ class User extends User_Profile
         if ($objUser !== false && $objUser->RecordCount() > 0) {
             while (!$objUser->EOF) {
                 foreach ($objUser->fields as $attributeId => $value) {
+                    if (strpos($attributeId, 'tblP.') !== false) {
+                        $attributeId = explode('tblP.', $attributeId)[1];
+                    }
                     if ($this->objAttribute->isCoreAttribute($attributeId)) {
                         $this->arrCachedUsers[$objUser->fields['id']]['profile'][$attributeId][0] = $this->arrLoadedUsers[$objUser->fields['id']]['profile'][$attributeId][0] = $value;
                     } else {
@@ -1381,6 +1386,51 @@ class User extends User_Profile
         return false;
     }
 
+    protected function getUserProfileAttributeIds()
+    {
+        global $objDatabase;
+
+        $userProfileAttribute = array();
+        $query = 'SELECT `tblA`.`id` AS `id`, `tblN`.`name` AS `name` FROM `'
+                .DBPREFIX .'access_user_attribute` AS `tblA`
+            LEFT JOIN `'.DBPREFIX.'access_user_attribute_name` AS `tblN`'.
+                ' ON `tblN`.`attribute_id` = `tblA`.`id`' .
+            ' WHERE `tblA`.`is_default` = 1 AND `tblA`.`parent_id` IS NULL';
+
+        $objAttributes = $objDatabase->Execute($query);
+        if ($objAttributes !== false && $objAttributes->RecordCount() > 0) {
+            while (!$objAttributes->EOF) {
+                $userProfileAttribute[
+                $objAttributes->fields['id']
+                ] = $objAttributes->fields['name'];
+
+                $objAttributes->MoveNext();
+            }
+        }
+        return $userProfileAttribute;
+    }
+
+    protected function getUserProfileQueries($arrSelectCoreExpressions) {
+        $userProfileAttributes = $this->getUserProfileAttributeIds();
+        $userProfileQueries = array();
+        $joins = array();
+        $select = array();
+        foreach ($userProfileAttributes as $id=>$name) {
+            if (!in_array($name, $arrSelectCoreExpressions)) {
+                continue;
+            }
+            $tableName = 'tbl' . ucfirst($name);
+            $joins[] = 'INNER JOIN `' . DBPREFIX . 'access_user_attribute_value`' .
+                'AS `'.$tableName.'` ON `' . $tableName .'`.`attribute_id` = '.
+                $id;
+            $select[] = '`' . $tableName . '`.`value` AS `tblP.' . $name . '`';
+        }
+
+        $userProfileQueries['joins'] = implode(' ', $joins);
+        $userProfileQueries['select'] = implode(', ', $select);
+
+        return $userProfileQueries;
+    }
 
     public function __clone()
     {
