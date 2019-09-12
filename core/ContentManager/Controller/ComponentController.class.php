@@ -103,12 +103,22 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                     'pagetree',
             ) as $type => $widgetName
         ) {
-            $widgetController->registerWidget(
-                new \Cx\Core_Modules\Widget\Model\Entity\EsiWidget(
-                    $this,
-                    $widgetName
-                )
-            );
+            if (!is_string($type)) {
+                $widgetController->registerWidget(
+                    new \Cx\Core_Modules\Widget\Model\Entity\EsiWidget(
+                        $this,
+                        $widgetName
+                    )
+                );
+            } else {
+                $widgetController->registerWidget(
+                    new \Cx\Core_Modules\Widget\Model\Entity\EsiWidget(
+                        $this,
+                        $widgetName,
+                        $type
+                    )
+                );
+            }
         }
     }
 
