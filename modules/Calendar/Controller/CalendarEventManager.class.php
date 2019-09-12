@@ -2087,7 +2087,7 @@ class CalendarEventManager extends CalendarLibrary
                     $objEvent->startDate->format('s')
                 );
 
-                $addDays = $objCloneEvent->startDate->diff($objEvent->startDate)->days;
+                $addDays = $objCloneEvent->startDate->diff($recurrenceEvent->startDate)->days;
                 $objCloneEvent->endDate->modify('+'. $addDays .' days');
                 $objCloneEvent->endDate->setTime(
                     $objEvent->endDate->format('H'),
@@ -2146,7 +2146,7 @@ class CalendarEventManager extends CalendarLibrary
                     $objEvent->startDate->format('s')
                 );
 
-                $addDays = $objCloneEvent->startDate->diff($objEvent->startDate)->days;
+                $addDays = $objCloneEvent->startDate->diff($recurrenceEvent->startDate)->days;
                 $objCloneEvent->endDate->modify('+'. $addDays .' days');
                 $objCloneEvent->endDate->setTime(
                     $objEvent->endDate->format('H'),
