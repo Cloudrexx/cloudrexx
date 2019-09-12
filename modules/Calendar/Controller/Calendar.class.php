@@ -306,7 +306,7 @@ class Calendar extends CalendarLibrary
             $this->startDate = null;
             $this->sortDirection = 'DESC';
         } else {
-            $this->startDate = new \DateTime();
+            $this->startDate = $this->getInternDateTimeFromUser();
 
             $startDay   = isset($_GET['day']) ? $_GET['day'] : $this->startDate->format('d');
             $startMonth = isset($_GET['month']) ? $_GET['month'] : $this->startDate->format('m');
@@ -329,13 +329,6 @@ class Calendar extends CalendarLibrary
                 case CalendarLibrary::SHOW_EVENTS_UNTIL_END:
                 default:
                     // set the start date to NOW
-
-                    // this is a very dirty hack and should not be necessary!
-                    // this re-substracts the timezone offset, since it will be added
-                    // twice below. This does not work for timezones with a negative
-                    // offset to UTC!
-                    $offsetSeconds = abs($this->getInternDateTimeFromUser()->getOffset());
-                    $this->startDate->sub(new \DateInterval('PT' . $offsetSeconds . 'S'));
                     break;
             }
         }
@@ -344,9 +337,9 @@ class Calendar extends CalendarLibrary
         if (!empty($till)) {
             $this->endDate = $till;
         } else if ($cmd == 'archive') {
-            $this->endDate = new \DateTime();
+            $this->endDate= $this->getInternDateTimeFromUser();
         } else {
-            $this->endDate = new \DateTime();
+            $this->endDate= $this->getInternDateTimeFromUser();
 
             $endDay   = isset($_GET['endDay']) ? $_GET['endDay'] : $this->endDate->format('d');
             $endMonth = isset($_GET['endMonth']) ? $_GET['endMonth'] : $this->endDate->format('m');
@@ -362,7 +355,7 @@ class Calendar extends CalendarLibrary
         // get datepicker-time
         if ((isset($_REQUEST["yearID"]) ||  isset($_REQUEST["monthID"]) || isset($_REQUEST["dayID"])) && $cmd != 'boxes') {
 
-            $this->startDate = new \DateTime();
+            $this->startDate = $this->getInternDateTimeFromUser();
             $year  = isset($_REQUEST["yearID"]) ? (int) $_REQUEST["yearID"] : $this->startDate->format('Y');
             $month = isset($_REQUEST["monthID"]) ? (int) $_REQUEST["monthID"] : $this->startDate->format('m');
             $day   = isset($_REQUEST["dayID"]) ? (int) $_REQUEST["dayID"] : $this->startDate->format('d');
@@ -380,7 +373,7 @@ class Calendar extends CalendarLibrary
             $this->endDate->modify("last day of this month");
             $this->endDate->setTime(23, 59, 59);
         } elseif (isset ($_GET["yearID"]) && isset ($_GET["monthID"]) && isset ($_GET["dayID"])) {
-            $this->startDate = new \DateTime();
+            $this->startDate = $this->getInternDateTimeFromUser();
 
             $year  = isset($_REQUEST["yearID"]) ? (int) $_REQUEST["yearID"] : $this->startDate->format('Y');
             $month = isset($_REQUEST["monthID"]) ? (int) $_REQUEST["monthID"] : $this->startDate->format('m');
@@ -439,22 +432,6 @@ class Calendar extends CalendarLibrary
                 $this->endDate->format('H:i:s') == '00:00:00'
             ) {
                 $this->endDate->setTime('23', '59', '59');
-            }
-            $internDateTime = new \DateTime('now');
-            $dbDateTime = $this->getComponent('DateTime')->createDateTimeForDb('now');
-            $internDateTimeOffset = $internDateTime->getOffset();
-            $dbDateTimeOffset = $dbDateTime->getOffset();
-            if ($internDateTimeOffset > $dbDateTimeOffset) {
-                $timeOffset = $internDateTimeOffset - $dbDateTimeOffset;
-            } else {
-                $timeOffset = $dbDateTimeOffset - $internDateTimeOffset;
-            }
-            if ($timeOffset > 0) {
-                $this->startDate->add(new \DateInterval('PT' . $timeOffset . 'S'));
-                $this->endDate->add(new \DateInterval('PT' . $timeOffset . 'S'));
-            } else {
-                $this->startDate->sub(new \DateInterval('PT' . $timeOffset . 'S'));
-                $this->endDate->sub(new \DateInterval('PT' . $timeOffset . 'S'));
             }
         }
 
