@@ -249,109 +249,93 @@ class CalendarLibrary
     {
         global $objInit;
 
-        if($objInit->mode == 'backend') {
-            //backend access
-        } else {
-            //frontend access
+        if ($objInit->mode == 'backend') {
+            return;
+        }
 
-            $strStatus = '';
-            $objFWUser  = \FWUser::getFWUserObject();
+        $objFWUser  = \FWUser::getFWUserObject();
 
-            //get user attributes
-            $objUser         = $objFWUser->objUser;
-            $intUserId      = intval($objUser->getId());
-            $intUserName    = $objUser->getUsername();
-            $bolUserLogin   = $objUser->login();
-            $intUserIsAdmin = $objUser->getAdminStatus();                                                                                 
+        //get user attributes
+        $objUser         = $objFWUser->objUser;
+        $intUserId      = intval($objUser->getId());
+        $bolUserLogin   = $objUser->login();
 
-            $accessId = 0; //used to remember which access id the user needs to have. this is passed to Permission::checkAccess() later.
-            
-            $intUserIsAdmin = false;
+        self::getSettings();
 
-            if(!$intUserIsAdmin) {
-                self::getSettings();
+        // abort in case frontend mangement is disabled
+        if (!$this->arrSettings['addEventsFrontend']) {
+            \Cx\Core\Csrf\Controller\Csrf::redirect(
+                \Cx\Core\Routing\Url::fromModuleAndCmd(
+                    $this->moduleName
+                )
+            );
+        }
 
-                switch($strAction) {
-                    case 'add_event':  
-                       if($this->arrSettings['addEventsFrontend'] == 1 || $this->arrSettings['addEventsFrontend'] == 2) {
-                            if($this->arrSettings['addEventsFrontend'] == 2) {
-                                if($bolUserLogin) {
-                                    $bolAdd = true;
-                                } else {
-                                    $bolAdd = false;
-                                }
-                            } else {
-                                $bolAdd = true;
-                            } 
+        // fetch this request
+        // will be used in case we have to redirect the user to the
+        // sign-in form
+        $thisRequest = base64_encode(
+            \Cx\Core\Routing\Url::fromRequest()
+        );
 
-                            if($bolAdd) {
-                                //get groups attributes
-                                $arrUserGroups  = array();
-                                $objGroup = $objFWUser->objGroup->getGroups($filter = array('is_active' => true, 'type' => 'frontend'));
-
-                                while (!$objGroup->EOF) {
-                                    if(in_array($objGroup->getId(), $objUser->getAssociatedGroupIds())) {
-                                        $arrUserGroups[] = $objGroup->getId();
-                                    }
-                                    $objGroup->next();
-                                }                  
-                            } else {
-                                $strStatus = 'login';
-                            }
-                        } else {
-                            $strStatus = 'redirect';
-                        }
-                        
-                        break;
-                    case 'edit_event':                
-                        if($this->arrSettings['addEventsFrontend'] == 1 || $this->arrSettings['addEventsFrontend'] == 2) {
-                            if($bolUserLogin) {         
-                                if(isset($_POST['submitFormModifyEvent'])) {
-                                    $eventId = intval($_POST['id']);
-                                } else {
-                                    $eventId = intval($_GET['id']);
-                                }                       
-                                
-                                $objEvent = new \Cx\Modules\Calendar\Controller\CalendarEvent($eventId);
-                                
-                                if($objEvent->author != $intUserId) {
-                                    $strStatus = 'no_access';
-                                }
-                            } else {
-                                $strStatus = 'login';
-                            }   
-                        } else {  
-                            $strStatus = 'redirect';
-                        }
-                        break;
-                    
-                    case 'my_events':
-                        if($this->arrSettings['addEventsFrontend'] == 1 || $this->arrSettings['addEventsFrontend'] == 2) {
-                            if(!$bolUserLogin) {
-                                $strStatus = 'login';
-                            }
-                        } else {  
-                            $strStatus = 'redirect';
-                        }
-                        break;
+        switch($strAction) {
+            case 'add_event':
+                // Frontend submission is enabled for any user
+                if ($this->arrSettings['addEventsFrontend'] == 1) {
+                    return;
                 }
 
-                switch($strStatus) {
-                    case 'no_access':
-                        \Cx\Core\Csrf\Controller\Csrf::redirect(CONTREXX_SCRIPT_PATH.'?section=Login&cmd=noaccess');
-                        exit();
-                        break;
-                    case 'login':
-                        $link = base64_encode(CONTREXX_SCRIPT_PATH.'?'.$_SERVER['QUERY_STRING']);
-                        \Cx\Core\Csrf\Controller\Csrf::redirect(CONTREXX_SCRIPT_PATH."?section=Login&redirect=".$link);
-                        exit();
-                        break;
-                    case 'redirect':
-                        \Cx\Core\Csrf\Controller\Csrf::redirect(CONTREXX_SCRIPT_PATH.'?section='.$this->moduleName);   
-                        exit();
-                        break;
+                // Frontend submission is only enabled for authenticated
+                // users ($this->arrSettings['addEventsFrontend'] == 2).
+                // Therefore, let's check if the user is authenticated
+                // further down
+
+                // important: intentionally no break
+
+            case 'my_events':
+                // Check if the user is authenticated
+                if ($bolUserLogin) {
+                    return;
                 }
-            }
+
+                // intentionally no break as the user shall get redirected to
+                // the sign-in form
+
+            case 'edit_event':
+                if (!$bolUserLogin) {
+                    // redirect the user to the sign-in form
+                    \Cx\Core\Csrf\Controller\Csrf::redirect(
+                        \Cx\Core\Routing\Url::fromModuleAndCmd(
+                            'Login',
+                            '',
+                            '',
+                            array(
+                                'redirect' => $thisRequest,
+                            )
+                        )
+                    );
+                }
+
+                // check if user is owner of event, as only
+                // the owner is allowed to make any modification on
+                // an event in frontend
+                if (isset($_POST['submitFormModifyEvent'])) {
+                    $eventId = intval($_POST['id']);
+                } else {
+                    $eventId = intval($_GET['id']);
+                }
+                $objEvent = new \Cx\Modules\Calendar\Controller\CalendarEvent($eventId);
+                if ($objEvent->author == $intUserId) {
+                    return;
+                }
+
+                \Cx\Core\Csrf\Controller\Csrf::redirect(
+                    \Cx\Core\Routing\Url::fromModuleAndCmd(
+                        'Login',
+                        'noaccess'
+                    )
+                );
+                break;
         }
     }
     
