@@ -753,8 +753,11 @@ class CalendarEventManager extends CalendarLibrary
             \Cx\Core\Csrf\Controller\Csrf::redirect(CONTREXX_SCRIPT_PATH."?section=Login&redirect=".$link);
             return;
         }
-            $objCategory = CalendarCategory::getCurrentCategory(
-                $this->categoryId, $objEvent);
+
+        $objCategory = CalendarCategory::getCurrentCategory(
+            $this->categoryId,
+            $objEvent
+        );
         list ($priority, $priorityImg) = $this->getPriorityImage($objEvent);
         $plainDescription = contrexx_html2plaintext($objEvent->description);
         if (strlen($plainDescription) > 100) {
