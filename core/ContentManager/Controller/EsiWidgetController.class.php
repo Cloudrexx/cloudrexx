@@ -190,6 +190,30 @@ class EsiWidgetController extends \Cx\Core_Modules\Widget\Controller\EsiWidgetCo
 
                 $widgetValue = (string) $link;
                 break;
+
+            case 'pagetree':
+                $lang = $page->getLang();
+                $node = $page->getNode();
+                $nodes = array();
+
+                while ($node->getLvl() > 0){
+                    array_push($nodes, $node);
+                    $node = $node->getParent();
+                }
+                $nodes = array_reverse($nodes);
+
+                foreach ($nodes as $node) {
+                    $pagetreePage = $node->getPage($lang);
+                    $pagetreePath = \Cx\Core\Routing\Url::fromPage($pagetreePage);
+                    $pagetreeTitle = $pagetreePage->getTitle();
+
+                    $template->setVariable(array(
+                        'PAGETREE_PATH' => $pagetreePath,
+                        'PAGETREE_TITLE' => $pagetreeTitle
+                    ));
+                    $template->parse($name);
+                }
+                break;
         }
         $template->setVariable($name, $widgetValue);
     }
