@@ -802,8 +802,8 @@ class JobsManager extends JobsLibrary
 
         $date = $this->_checkDate(date('H:i:s d.m.Y'));
         $dberr = false;
-        $locset = '';                //set of location that is associated with this job in the POST Data
-        $locset_indb = '';           //set of locations that is associated with this job in the db
+        $locset = array();                //set of location that is associated with this job in the POST Data
+        $locset_indb = array();           //set of locations that is associated with this job in the db
         $rel_loc_jobs = '';     //used to generate INSERT Statement
 
         foreach($_POST['associated_locations'] as $value) {
