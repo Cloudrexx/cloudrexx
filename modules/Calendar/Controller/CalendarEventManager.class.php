@@ -486,7 +486,11 @@ class CalendarEventManager extends CalendarLibrary
     function _clearEmptyEvents() {
         // customizing: hide synced events in backend
         $cx = \Env::get('cx');
-        if (!isset(static::$syncedIds)) {
+        $sync = $cx->getComponent('Sync');
+        if (
+            $sync &&
+            !isset(static::$syncedIds)
+        ) {
             $query = '
                 SELECT
                     `local_id`
