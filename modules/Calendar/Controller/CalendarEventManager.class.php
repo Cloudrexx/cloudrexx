@@ -347,7 +347,10 @@ class CalendarEventManager extends CalendarLibrary
                     // cache userbased
                     $cx = \Cx\Core\Core\Controller\Cx::instanciate();
                     $cx->getComponent('Cache')->forceUserbasedPageCache();
-                    if (!$objFWUser->objUser->login()) {
+                    if (
+                        $objInit->mode !== \Cx\Core\Core\Controller\Cx::MODE_BACKEND &&
+                        !\Permission::checkAccess(145, 'static', true)
+                    ) {
                         $objResult->MoveNext();
                         continue;
                     }
@@ -688,6 +691,7 @@ class CalendarEventManager extends CalendarLibrary
 
         // in case the registration form was requested by an invitee
         // and the start-date of the event has changed meanwhile,
+        // or the event is no longer publicly available (access=1),
         // we shall try to load the event based on the invitation data
         if (empty($this->eventList[0])) {
             // abort in case the registration form has not been requested by an invitee
@@ -748,10 +752,37 @@ class CalendarEventManager extends CalendarLibrary
         // Abort in case the associated event is protected and the requestee has
         // not sufficient access rights.
         // Note: access to invitees is always granted
-        if (!$invite && $objEvent->access == 1 && !\FWUser::getFWUserObject()->objUser->login()) {
-            $link = base64_encode(CONTREXX_SCRIPT_PATH.'?'.$_SERVER['QUERY_STRING']);
-            \Cx\Core\Csrf\Controller\Csrf::redirect(CONTREXX_SCRIPT_PATH."?section=Login&redirect=".$link);
-            return;
+        if (
+            !$invite &&
+            $objEvent->access == 1 &&
+            !\Permission::checkAccess(145, 'static', true)
+        ) {
+            $objFWUser = \FWUser::getFWUserObject();
+            // if user is already authenticated, then he is not authorized
+            // and we must therefore redirect the user to the noaccess page
+            if ($objFWUser->objUser->login()) {
+                \Cx\Core\Csrf\Controller\Csrf::redirect(
+                    \Cx\Core\Routing\Url::fromModuleAndCmd(
+                        'Login',
+                        'noaccess'
+                    )
+                );
+            }
+
+            // redirect the user to the sign-in form
+            $thisRequest = base64_encode(
+                \Cx\Core\Routing\Url::fromRequest()
+            );
+            \Cx\Core\Csrf\Controller\Csrf::redirect(
+                \Cx\Core\Routing\Url::fromModuleAndCmd(
+                    'Login',
+                    '',
+                    '',
+                    array(
+                        'redirect' => $thisRequest,
+                    )
+                )
+            );
         }
 
         $objCategory = CalendarCategory::getCurrentCategory(
@@ -2456,11 +2487,6 @@ class CalendarEventManager extends CalendarLibrary
 
             //load events
             foreach ($this->eventList as $objEvent) {
-                if ($objEvent->access
-                    && $objInit->mode !== \Cx\Core\Core\Controller\Cx::MODE_BACKEND
-                    && !\Permission::checkAccess(116, 'static', true)) {
-                    continue;
-                }
                 $startdate     = $this->getUserDateTimeFromIntern($objEvent->startDate);
                 $enddate       = $this->getUserDateTimeFromIntern($objEvent->endDate);
 
