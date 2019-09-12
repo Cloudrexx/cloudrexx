@@ -351,38 +351,35 @@ class Calendar extends CalendarLibrary
             $this->endDate->setTime(23, 59, 59);
         }
 
-
-        // get datepicker-time
-        if ((isset($_REQUEST["yearID"]) ||  isset($_REQUEST["monthID"]) || isset($_REQUEST["dayID"])) && $cmd != 'boxes') {
-
-            $this->startDate = $this->getInternDateTimeFromUser();
-            $year  = isset($_REQUEST["yearID"]) ? (int) $_REQUEST["yearID"] : $this->startDate->format('Y');
-            $month = isset($_REQUEST["monthID"]) ? (int) $_REQUEST["monthID"] : $this->startDate->format('m');
-            $day   = isset($_REQUEST["dayID"]) ? (int) $_REQUEST["dayID"] : $this->startDate->format('d');
-
-            $this->startDate->setDate($year, $month, $day);
-            $this->startDate->modify("first day of this month");
-            $this->startDate->setTime(0, 0, 0);
-
-            $this->endDate = clone $this->startDate;
-            // add months for the list view(month view)
-            if ((empty($_GET['act']) || $_GET['act'] != 'list') && empty($_REQUEST['dayID'])) {
-                $this->endDate->modify("+{$this->boxCount} months");
-            }
-
-            $this->endDate->modify("last day of this month");
-            $this->endDate->setTime(23, 59, 59);
-        } elseif (isset ($_GET["yearID"]) && isset ($_GET["monthID"]) && isset ($_GET["dayID"])) {
+        // Note: the URL arguments yearID, monthID and dayID are only set
+        // by the activeCalendar.
+        //
+        // Get selected date from boxes view. This can either be from
+        // - the application cmd 'boxes'
+        // - the any other listing cmd with the placeholder CALENDAR_BOX
+        // - or from the detail view of an event (CALENDAR_EVENT_MONTH_BOX)
+        if (
+            isset($_REQUEST["yearID"]) &&
+            isset($_REQUEST["monthID"])
+        ) {
             $this->startDate = $this->getInternDateTimeFromUser();
 
             $year  = isset($_REQUEST["yearID"]) ? (int) $_REQUEST["yearID"] : $this->startDate->format('Y');
             $month = isset($_REQUEST["monthID"]) ? (int) $_REQUEST["monthID"] : $this->startDate->format('m');
-            $day   = isset($_REQUEST["dayID"]) ? (int) $_REQUEST["dayID"] : $this->startDate->format('d');
+            $day   = isset($_REQUEST["dayID"]) ? (int) $_REQUEST["dayID"] : 1;
+            $daySet   = isset($_REQUEST["dayID"]);
 
             $this->startDate->setDate($year, $month, $day);
             $this->startDate->setTime(0, 0, 0);
             $this->endDate   = clone $this->startDate;
             $this->endDate->setTime(23, 59, 59);
+            if (!$daySet) {
+                // shift to the last day of the next month twice
+                // as we need to load the events of three months
+                // in total
+                $this->endDate->modify("last day of next month");
+                $this->endDate->modify("last day of next month");
+            }
         }
 
         // In case $_GET['cmd'] is an integer, then we shall treat it as the
