@@ -738,6 +738,16 @@ class CalendarManager extends CalendarLibrary
 
             $this->_objTpl->parse('eventAccess');
         }
+        $permissionLabel = new \Cx\Core\Html\Model\Entity\HtmlElement('i');
+        $permissionLabel->addChild(
+            new \Cx\Core\Html\Model\Entity\TextElement(
+                $_CORELANG['TXT_ACCESS_COMMUNITY_EVENTS']
+            )
+        );
+        $this->_objTpl->setVariable(
+            $this->moduleLangVar.'_EVENT_ACCESS_INFO',
+            sprintf($_ARRAYLANG['TXT_'.$this->moduleLangVar.'_EVENT_ACCESS_INFO'], $permissionLabel)
+        );
 
         //parse priority
         for ($i = 1; $i <= 5; $i++) {
