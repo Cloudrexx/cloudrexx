@@ -171,7 +171,6 @@ class EsiWidgetController extends \Cx\Core_Modules\Widget\Controller\EsiWidgetCo
             null,
             null,
             true,
-            false,
             true,
             0,
             1

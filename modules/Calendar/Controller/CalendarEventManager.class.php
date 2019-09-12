@@ -120,14 +120,6 @@ class CalendarEventManager extends CalendarLibrary
     private $searchTerm;
 
     /**
-     * Need authorization
-     *
-     * @access private
-     * @var boolean
-     */
-    private $needAuth;
-
-    /**
      * Only active
      *
      * @access public
@@ -214,7 +206,6 @@ class CalendarEventManager extends CalendarLibrary
      * @param integer $categoryId    Category Id
      * @param string  $searchTerm    Search Term
      * @param boolean $showSeries    Show Series
-     * @param boolean $needAuth      Need authorization
      * @param boolean $onlyActive    Only active Events
      * @param integer $startPos      Start position
      * @param integer $numEvents     Number of events
@@ -222,13 +213,12 @@ class CalendarEventManager extends CalendarLibrary
      * @param boolean $onlyConfirmed only confirmed Entries
      * @param string  $author        author name
      */
-    function __construct(\DateTime $startDate = null, \DateTime $endDate = null, $categoryId=null, $searchTerm=null, $showSeries=true, $needAuth=false, $onlyActive=false, $startPos=0, $numEvents='n', $sortDirection='ASC', $onlyConfirmed=true, $author=null, $listType = 'all') {
+    function __construct(\DateTime $startDate = null, \DateTime $endDate = null, $categoryId=null, $searchTerm=null, $showSeries=true, $onlyActive=false, $startPos=0, $numEvents='n', $sortDirection='ASC', $onlyConfirmed=true, $author=null, $listType = 'all') {
         $this->startDate = $startDate;
         $this->endDate   = $endDate;
         $this->categoryId = intval($categoryId);
         $this->showSeries = $showSeries;
         $this->searchTerm = contrexx_addslashes($searchTerm);
-        $this->needAuth = $needAuth;
         $this->onlyActive = $onlyActive;
         $this->startPos = $startPos;
         $this->numEvents = $numEvents;
@@ -387,93 +377,6 @@ class CalendarEventManager extends CalendarLibrary
     }
 
     /**
-     * Import Events
-     *
-     * @return null
-     */
-    function _importEvents()
-    {
-        global $objDatabase, $objInit, $_LANGID, $_CONFIG;
-
-        if ($objInit->mode !== \Cx\Core\Core\Controller\Cx::MODE_BACKEND) {
-            $this->getSettings();
-
-            $objHostManager = new \Cx\Modules\Calendar\Controller\CalendarHostManager($this->categoryId, true, true);
-            $objHostManager->getHostList();
-
-
-            foreach($objHostManager->hostList as $key => $objHost)  {
-                $id = $objHost->id;
-                $name = $objHost->title;
-                $key = $objHost->key;
-
-                if(substr($objHost->uri,-1) != '/') {
-                    $uri = $objHost->uri.'/';
-                } else {
-                    $uri = $objHost->uri;
-                }
-
-                if(substr($objHost->uri,0,7) != 'http://') {
-                    $protocol = 'http://';
-                } else {
-                    $protocol = '';
-                }
-
-                $location = $protocol.$uri."modules/Calendar/Controller/CalendarWebserviceServer.class.php";
-
-                if(self::urlfind($protocol.$uri)){
-                    $connection = true;
-                } else {
-                    $connection = false;
-                }
-
-                if($connection) {
-                    if($objWebserviceClient = new \Cx\Modules\Calendar\Controller\CalendarWebserviceClient($location, $uri)) {
-                        $myHost = $_CONFIG['domainUrl'].ASCMS_PATH_OFFSET;
-
-                        if(substr($myHost,-1) != '/') {
-                            $myHost = $myHost.'/';
-                        }
-
-                        $catId = $objHost->catId;
-                        $key = $objHost->key;
-
-                        $foreignHostData = $objWebserviceClient->verifyHost($myHost,$key);
-
-                        if($foreignHostData != false) {
-                            $arrEvents = $objWebserviceClient->getEventList($this->startDate->getTimestamp(), $this->endDate->getTimestamp(), $this->needAuth, $this->searchTerm, $_LANGID, $foreignHostData['id'], $id, $this->arrSettings['showEventsOnlyInActiveLanguage']);
-
-                            if(!empty($arrEvents[0])) {
-                                foreach ($arrEvents as $key => $objExternalEvent) {
-                                    /*$objExternalEvent->showStartDateList = intval($this->arrSettings['showStartDateList']);
-                                    $objExternalEvent->showEndDateList = intval($this->arrSettings['showEndDateList']);
-                                    $objExternalEvent->showStartTimeList = intval($this->arrSettings['showStartTimeList']);
-                                    $objExternalEvent->showEndTimeList = intval($this->arrSettings['showEndTimeList']);
-                                    $objExternalEvent->showTimeTypeList = intval($this->arrSettings['showTimeTypeList']);
-                                    $objExternalEvent->showStartDateDetail = intval($this->arrSettings['showStartDateDetail']);
-                                    $objExternalEvent->showEndDateDetail = intval($this->arrSettings['showEndDateDetail']);
-                                    $objExternalEvent->showStartTimeDetail = intval($this->arrSettings['showStartTimeDetail']);
-                                    $objExternalEvent->showEndTimeDetail = intval($this->arrSettings['showEndTimeDetail']);
-                                    $objExternalEvent->showTimeTypeDetail = intval($this->arrSettings['showTimeTypeDetail']);*/
-                                    $objExternalEvent->startDate = $this->getInternDateTimeFromDb($objExternalEvent->startDate);
-                                    $objExternalEvent->endDate   = $this->getInternDateTimeFromDb($objExternalEvent->endDate);
-
-                                    if($objExternalEvent->seriesStatus == 1 && $_GET['cmd'] != 'my_events') {
-                                        $additionalRecurrences = $objExternalEvent->seriesData['seriesAdditionalRecurrences'];
-                                        $this->generateRecurrencesOfEvent($objExternalEvent, $additionalRecurrences);
-                                    }
-
-                                    $this->eventList[] = $objExternalEvent;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    /**
      * Clears the empty events
      *
      * Empty events will be found if event title is empty
@@ -613,28 +516,6 @@ class CalendarEventManager extends CalendarLibrary
         }
         foreach ($this->eventList as $tmpKey => $tmpObjEvent) {
             if (!$tmpObjEvent->startDate || $tmpObjEvent->startDate->getTimestamp() != $eventStartDate) {
-                unset($this->eventList[$tmpKey]);
-            }
-        }
-
-        sort($this->eventList);
-    }
-
-    /**
-     * Import events
-     *
-     * @param integer $eventId        Event id
-     * @param integer $eventStartDate Unix timestamp of start date
-     *
-     * @return null
-     */
-    function getExternalEvent($eventId, $eventStartDate) {
-        global $objInit;
-
-        self::_importEvents();
-
-        foreach ($this->eventList as $tmpKey => $tmpObjEvent) {
-            if ($tmpObjEvent->startDate->getTimestamp() != $eventStartDate) {
                 unset($this->eventList[$tmpKey]);
             }
         }
@@ -1808,45 +1689,6 @@ class CalendarEventManager extends CalendarLibrary
             $url->setParam('external', 1);
         }
         return (string)$url;
-    }
-
-    /**
-     * Find the url exists or not
-     *
-     * @param string $url url
-     *
-     * @return boolean true on url exists, false otherwise
-     */
-    function urlfind($url){
-        if (!ini_get('allow_url_fopen')) {
-            ini_set('allow_url_fopen', 'On');
-        }
-
-        if (ini_get('allow_url_fopen')) {
-            if($url) {
-                $file = @fopen ($url.'/modules/Calendar/Controller/CalendarWebserviceServer.class.php', "r");
-            }
-
-            if($file){
-                fclose($file);
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            try {
-                $request  = new \HTTP_Request2($url.'modules/Calendar/Controller/CalendarWebserviceServer.class.php');
-                $response = $request->send();
-                if (404 == $response->getStatus()) {
-                    return false;
-                } else {
-                    return true;
-                }
-            } catch (Exception $e) {
-                \DBG::msg($e->getMessage());
-                return false;
-            }
-        }
     }
 
     /**

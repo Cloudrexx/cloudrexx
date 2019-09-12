@@ -87,13 +87,6 @@ class Calendar extends CalendarLibrary
     private $searchTerm;
 
     /**
-     * Need authorization
-     *
-     * @var boolean
-     */
-    private $needAuth;
-
-    /**
      * Start position
      *
      * @var integer
@@ -458,37 +451,31 @@ class Calendar extends CalendarLibrary
             }
         }
 
-        $this->objEventManager = new \Cx\Modules\Calendar\Controller\CalendarEventManager($this->startDate,$this->endDate,$this->categoryId,$this->searchTerm,true,$this->needAuth,true,$this->startPos,$this->numEvents,$this->sortDirection,true,$this->author);
+        $this->objEventManager = new \Cx\Modules\Calendar\Controller\CalendarEventManager($this->startDate,$this->endDate,$this->categoryId,$this->searchTerm,true,true,$this->startPos,$this->numEvents,$this->sortDirection,true,$this->author);
         
         if (!in_array($cmd, array('detail', 'register'))) {
             $this->objEventManager->getEventList();
         } else {
-            /* if($_GET['external'] == 1 && $this->arrSettings['publicationStatus'] == 1) {
-                $this->objEventManager->getExternalEvent(intval($_GET['id']), intval($_GET['date']));
-            } else { */
+            $request = $this->cx->getRequest();
 
-                $request = $this->cx->getRequest();
+            // whether the HTTP request method was GET
+            $isGetRequest = $request->getHttpRequestMethod() == 'get';
 
-                // whether the HTTP request method was GET
-                $isGetRequest = $request->getHttpRequestMethod() == 'get';
+            // id of the associated event (provided by HTTP request)
+            $eventId = 0;
 
-                // id of the associated event (provided by HTTP request)
-                $eventId = 0;
+            // date of the associated event (provided by HTTP request)
+            $eventDate = 0;
 
-                // date of the associated event (provided by HTTP request)
-                $eventDate = 0;
+            // fetch arguments from HTTP request
+            try {
+                $eventId = $request->getParam(\CX\Modules\Calendar\Model\Entity\Invite::HTTP_REQUEST_PARAM_EVENT, $isGetRequest);
+            } catch (\Exception $e) {}
+            try {
+                $eventDate = $request->getParam(\CX\Modules\Calendar\Model\Entity\Invite::HTTP_REQUEST_PARAM_DATE, $isGetRequest);
+            } catch (\Exception $e) {}
 
-                // fetch arguments from HTTP request
-                try {
-                    $eventId = $request->getParam(\CX\Modules\Calendar\Model\Entity\Invite::HTTP_REQUEST_PARAM_EVENT, $isGetRequest);
-                } catch (\Exception $e) {}
-                try {
-                    $eventDate = $request->getParam(\CX\Modules\Calendar\Model\Entity\Invite::HTTP_REQUEST_PARAM_DATE, $isGetRequest);
-                } catch (\Exception $e) {}
-
-                $this->objEventManager->getEvent($eventId, $eventDate);
-
-            /* } */
+            $this->objEventManager->getEvent($eventId, $eventDate);
         }
     }
 
@@ -1416,7 +1403,7 @@ UPLOADER;
             $this->_objTpl->parse('categoryList');
         } else {
             foreach ($objCategoryManager->categoryList as $key => $objCategory) {
-                $objEventManager = new \Cx\Modules\Calendar\Controller\CalendarEventManager($this->startDate,$this->endDate,$objCategory->id,$this->searchTerm,true,$this->needAuth,true,$this->startPos,$this->numEvents);
+                $objEventManager = new \Cx\Modules\Calendar\Controller\CalendarEventManager($this->startDate,$this->endDate,$objCategory->id,$this->searchTerm,true,true,$this->startPos,$this->numEvents);
                 $objEventManager->getEventList();
 
                 $objEventManager->showEventList(
@@ -1579,7 +1566,7 @@ JAVASCRIPT;
     {
         global $_ARRAYLANG;
 
-        $objEventManager = new \Cx\Modules\Calendar\Controller\CalendarEventManager($this->startDate,$this->endDate,$this->categoryId,$this->searchTerm,true,$this->needAuth,true,0,'n',$this->sortDirection,true,$this->author);
+        $objEventManager = new \Cx\Modules\Calendar\Controller\CalendarEventManager($this->startDate,$this->endDate,$this->categoryId,$this->searchTerm,true,true,0,'n',$this->sortDirection,true,$this->author);
         $objEventManager->getEventList();
         $this->_objTpl->setTemplate($this->pageContent);
         if ($_REQUEST['cmd'] == 'boxes') {

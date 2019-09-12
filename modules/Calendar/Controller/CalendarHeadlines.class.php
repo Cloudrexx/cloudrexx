@@ -141,7 +141,6 @@ class CalendarHeadlines extends CalendarLibrary
             $categoryId,
             null,
             true,
-            false,
             true,
             $startPos,
             $endPos,

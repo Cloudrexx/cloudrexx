@@ -290,7 +290,7 @@ class CalendarManager extends CalendarLibrary
             'CALENDAR_CATEGORIES',
             $objCategoryManager->getCategoryDropdown(array($categoryId => null),
                 CalendarCategoryManager::DROPDOWN_TYPE_FILTER));
-        $objConfirmEventManager = new \Cx\Modules\Calendar\Controller\CalendarEventManager(null,null,null,null,null,null,true,null,null,false,null);
+        $objConfirmEventManager = new \Cx\Modules\Calendar\Controller\CalendarEventManager(null,null,null,null,null,true,null,null,false,null);
         $objConfirmEventManager->getEventList();
         if(count($objConfirmEventManager->eventList) > 0) {
             $objConfirmEventManager->showEventList($this->_objTpl, 'confirm');
@@ -305,7 +305,7 @@ class CalendarManager extends CalendarLibrary
         }
 
         $showSeries = ($listType == 'upcoming');
-        $objEventManager = new \Cx\Modules\Calendar\Controller\CalendarEventManager($startDate, null,$categoryId,$searchTerm,$showSeries,null,null,$startPos,$this->arrSettings['numPaging'], 'ASC', true, null, $listType);
+        $objEventManager = new \Cx\Modules\Calendar\Controller\CalendarEventManager($startDate, null,$categoryId,$searchTerm,$showSeries,null,$startPos,$this->arrSettings['numPaging'], 'ASC', true, null, $listType);
         $objEventManager->getEventList();
 
         if($objEventManager->countEvents > $this->arrSettings['numPaging']) {
