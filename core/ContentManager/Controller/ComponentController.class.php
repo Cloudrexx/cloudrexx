@@ -99,7 +99,9 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 'TXT_CORE_LAST_MODIFIED_PAGE',
                 'LAST_MODIFIED_PAGE',
                 'CANONICAL_LINK',
-            ) as $widgetName
+                \Cx\Core_Modules\Widget\Model\Entity\Widget::TYPE_BLOCK  =>
+                    'pagetree',
+            ) as $type => $widgetName
         ) {
             $widgetController->registerWidget(
                 new \Cx\Core_Modules\Widget\Model\Entity\EsiWidget(
