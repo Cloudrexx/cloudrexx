@@ -101,24 +101,19 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 'CANONICAL_LINK',
                 \Cx\Core_Modules\Widget\Model\Entity\Widget::TYPE_BLOCK  =>
                     'pagetree',
-            ) as $type => $widgetName
+            ) as $widgetType => $widgetName
         ) {
-            if (!is_string($type)) {
-                $widgetController->registerWidget(
-                    new \Cx\Core_Modules\Widget\Model\Entity\EsiWidget(
-                        $this,
-                        $widgetName
-                    )
-                );
-            } else {
-                $widgetController->registerWidget(
-                    new \Cx\Core_Modules\Widget\Model\Entity\EsiWidget(
-                        $this,
-                        $widgetName,
-                        $type
-                    )
-                );
+            if (!is_string($widgetType)) {
+                $widgetType =
+                    \Cx\Core_Modules\Widget\Model\Entity\Widget::TYPE_PLACEHOLDER;
             }
+            $widgetController->registerWidget(
+                new \Cx\Core_Modules\Widget\Model\Entity\EsiWidget(
+                    $this,
+                    $widgetName,
+                    $widgetType
+                )
+            );
         }
     }
 
