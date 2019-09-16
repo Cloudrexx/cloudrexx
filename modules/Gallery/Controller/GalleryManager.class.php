@@ -2018,9 +2018,9 @@ class GalleryManager extends GalleryLibrary
             'TXT_GALLERY_SLIDE_SHOW_SECONDS'        =>    $_ARRAYLANG['TXT_GALLERY_SLIDE_SHOW_SECONDS'],
             'TXT_GALLERY_SINGLE_IMAGE_VIEW'         =>    $_ARRAYLANG['TXT_GALLERY_SINGLE_IMAGE_VIEW'] ,
             'TXT_GALLERY_SHOW_FILE_NAME'            =>    $_ARRAYLANG['TXT_GALLERY_SHOW_FILE_NAME'],
-            'TXT_IMAGE_SIZE_SHOW'                   =>    $_ARRAYLANG['TXT_IMAGE_SIZE_SHOW']
-
-            ));
+            'TXT_IMAGE_SIZE_SHOW'                   =>    $_ARRAYLANG['TXT_IMAGE_SIZE_SHOW'],
+            'TXT_DRAG_DROP'                         =>  $_ARRAYLANG['TXT_DRAG_DROP'],
+        ));
 
         $objResult = $objDatabase->Execute('SELECT         *
                                             FROM         '.DBPREFIX.'module_gallery_settings

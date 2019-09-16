@@ -231,3 +231,4 @@ $_ARRAYLANG['TXT_GALLERY_UPLOAD_CONFIRM_IMAGES'] = "Confirm images";
 $_ARRAYLANG['TXT_GALLERY_UPLOAD_IMAGES'] = "Uploaded images";
 $_ARRAYLANG['TXT_GALLERY_UPLOAD_HELP'] = "<b>How can I import new images:</b><br/>
     First upload the images with the upload images button. After the upload has finished, you can confirm the images by clicking on the confirm images button below, add titles and move them into a category.";
+$_ARRAYLANG['TXT_DRAG_DROP'] = "allow Drag & Drop";
