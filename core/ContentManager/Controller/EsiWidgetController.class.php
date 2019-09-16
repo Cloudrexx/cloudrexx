@@ -201,7 +201,7 @@ class EsiWidgetController extends \Cx\Core_Modules\Widget\Controller\EsiWidgetCo
                     $node = $node->getParent();
                 }
                 $nodes = array_reverse($nodes);
-                array_pop($nodes);
+                array_pop($nodes);  //removes the last element in array
 
                 foreach ($nodes as $node) {
                     $pagetreePage = $node->getPage($lang);
