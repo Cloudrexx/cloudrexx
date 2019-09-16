@@ -2099,6 +2099,18 @@ class GalleryManager extends GalleryLibrary
                         'EXTENSION_SHOW_BLOCK'          => $display
                     ));
                     break;
+                case 'drag_drop':
+                    if ($objResult->fields['value'] == 'on') {
+                        var_dump('if');
+                        $checked = "checked='checked'";
+                    } else {
+                        var_dump('else');
+                        $checked = "";
+                    }
+                    $this->_objTpl->setVariable(array(
+                        'SETTINGS_VALUE_SHOW_FILE_NAME' => $checked,
+                    ));
+                    break;
                 default: //integer value
                     $this->_objTpl->SetVariable('SETTINGS_VALUE_'.strtoupper($objResult->fields['name']),$objResult->fields['value']);
             }
@@ -2183,6 +2195,11 @@ class GalleryManager extends GalleryLibrary
         if ($_POST['show_image_size'] != 'on') {
             // the value is not allowed, reset to off
             $_POST['show_image_size'] = 'off';
+        }
+
+        if ($_POST['drag_drop'] != 'on') {
+            // the value is not allowed, reset to off
+            $_POST['drag_drop'] = 'off';
         }
 
         foreach ($_POST as $strKey => $strValue) {
