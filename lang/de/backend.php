@@ -1096,6 +1096,7 @@ $_ARRAYLANG['TXT_CORE_STORE'] = "Speichern";
 $_ARRAYLANG['TXT_CORE_CALENDAR_OPEN'] = "Kalender öffnen";
 $_ARRAYLANG['TXT_CORE_TODAY'] = "Heute";
 $_ARRAYLANG['TXT_CORE_DAY_ARRAY'] = "Sonntag,Montag,Dienstag,Mittwoch,Donnerstag,Freitag,Samstag";
+$_ARRAYLANG['TXT_CORE_DAY_ABBREV_ARRAY'] = "So,Mo,Di,Mi,Do,Fr,Sa";
 $_ARRAYLANG['TXT_CORE_DAY_ABBREV2_ARRAY'] = "So,Mo,Di,Mi,Do,Fr,Sa";
 $_ARRAYLANG['TXT_CORE_DAY_ABBREV3_ARRAY'] = "Son,Mon,Die,Mit,Don,Fre,Sam";
 $_ARRAYLANG['TXT_CORE_MONTH_ARRAY'] = "MONTH_0,Januar,Februar,März,April,Mai,Juni,Juli,August,September,Oktober,November,Dezember";

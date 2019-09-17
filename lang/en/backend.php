@@ -1006,6 +1006,7 @@ $_ARRAYLANG['TXT_CORE_COUNTRY_ORD'] = "Ord.";
 $_ARRAYLANG['TXT_CORE_COUNTRY_PER_PAGE_BACKEND'] = "Anzahl Länder pro Seite im Backend";
 $_ARRAYLANG['TXT_CORE_COUNTRY_SETTINGS'] = "Einstellungen";
 $_ARRAYLANG['TXT_CORE_COUNTRY_STORED_SUCCESSULLY'] = "Die Länder wurden erfolgreich gespeichert";
+$_ARRAYLANG['TXT_CORE_DAY_ABBREV_ARRAY'] = "Sun,Mon,Tue,Wed,Thu,Fri,Sat";
 $_ARRAYLANG['TXT_CORE_DAY_ABBREV2_ARRAY'] = "So,Mo,Di,Mi,Do,Fr,Sa";
 $_ARRAYLANG['TXT_CORE_DAY_ABBREV3_ARRAY'] = "Sun,Mon,Tue,Wed,Thu,Fri,Sat";
 $_ARRAYLANG['TXT_CORE_DAY_ARRAY'] = "Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday";
