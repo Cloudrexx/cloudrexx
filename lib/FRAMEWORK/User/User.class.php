@@ -2445,9 +2445,8 @@ class User extends User_Profile
         }
         if ($userActivationTimeoutStatus) {
             $objDatabase->Execute('
-                DELETE tblU, tblP, tblG, tblA, tblN
+                DELETE tblU, tblG, tblA, tblN
                   FROM `'.DBPREFIX.'access_users` AS tblU
-                 INNER JOIN `'.DBPREFIX.'access_user_profile` AS tblP ON tblP.`user_id`=tblU.`id`
                   LEFT JOIN `'.DBPREFIX.'access_rel_user_group` AS tblG ON tblG.`user_id`=tblU.`id`
                   LEFT JOIN `'.DBPREFIX.'access_user_attribute_value` AS tblA ON tblA.`user_id`=tblU.`id`
                   LEFT JOIN `'.DBPREFIX.'access_user_network` AS tblN ON tblN.`user_id`=tblU.`id`
@@ -2457,9 +2456,8 @@ class User extends User_Profile
         }
         // remove outdated social login users
         $objDatabase->Execute('
-            DELETE tblU, tblP, tblG, tblA, tblN
+            DELETE tblU, tblG, tblA, tblN
               FROM `'.DBPREFIX.'access_users` AS tblU
-             INNER JOIN `'.DBPREFIX.'access_user_profile` AS tblP ON tblP.`user_id`=tblU.`id`
              INNER JOIN `'.DBPREFIX.'access_user_network` AS tblN ON tblN.`user_id`=tblU.`id`
               LEFT JOIN `'.DBPREFIX.'access_rel_user_group` AS tblG ON tblG.`user_id`=tblU.`id`
               LEFT JOIN `'.DBPREFIX.'access_user_attribute_value` AS tblA ON tblA.`user_id`=tblU.`id`
