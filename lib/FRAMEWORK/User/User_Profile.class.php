@@ -233,7 +233,7 @@ class User_Profile
                             $value == '"0"'
                         )
                     ) {
-                        $value = '"gender_undefined"';
+                        $value = 'NULL';
                     }
                     $query = $this->objAttribute->isCoreAttribute($attributeId) ?
                         "REPLACE INTO `".DBPREFIX."access_user_attribute_value` (`user_id`, `attribute_id`, `history_id`, `value`) VALUES (".$this->id.", (SELECT `attribute_id` FROM `".DBPREFIX."access_user_attribute_name` WHERE `name` = '" . $attributeId . "'), ".$historyId.", " . $value . ")" :
