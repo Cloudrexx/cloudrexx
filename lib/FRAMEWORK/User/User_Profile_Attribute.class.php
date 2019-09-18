@@ -1277,14 +1277,7 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
     {
         global $objDatabase, $_ARRAYLANG;
 
-        switch ($this->parent_id) {
-            case 'title':
-                $affectedTable = DBPREFIX.'access_user_title';
-                break;
-            default:
-                $affectedTable = DBPREFIX.'access_user_attribute';
-                break;
-        }
+        $affectedTable = DBPREFIX.'access_user_attribute';
         $pattern = array();
         if ($objDatabase->Execute('DELETE FROM `'.$affectedTable.'` WHERE `id` = '.($this->parent_id == 'title' && preg_match('#([0-9]+)#', $attributeId, $pattern) ? $pattern[0] : $attributeId)) !== false) {
             return true;
@@ -1298,6 +1291,13 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
     {
         global $objDatabase, $_ARRAYLANG;
 
+        if (
+            $this->parent_id == 'title' &&
+            preg_match('#([0-9]+)#', $attributeId, $pattern)
+        ) {
+            $attributeId = $pattern[0];
+        }
+
         if ($objDatabase->Execute("DELETE FROM `".DBPREFIX."access_user_attribute_value` WHERE `attribute_id` = '".$attributeId."'") !== false) {
             return true;
         }
@@ -1309,6 +1309,13 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
     function deleteAttributeNames($attributeId)
     {
         global $objDatabase, $_ARRAYLANG;
+
+        if (
+            $this->parent_id == 'title' &&
+            preg_match('#([0-9]+)#', $attributeId, $pattern)
+        ) {
+            $attributeId = $pattern[0];
+        }
 
         if ($objDatabase->Execute("DELETE FROM `".DBPREFIX."access_user_attribute_name` WHERE `attribute_id` = '".$attributeId."'") !== false) {
             return true;
