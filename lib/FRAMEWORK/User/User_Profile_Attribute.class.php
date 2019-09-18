@@ -1069,16 +1069,8 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
         global $objDatabase;
 
         if ($this->sort_type == 'custom') {
-            switch ($this->id) {
-                case 'title':
-                    $affectedTable = DBPREFIX.'access_user_title';
-                    $offset = 1;
-                    break;
-                default:
-                    $affectedTable = DBPREFIX.'access_user_attribute';
-                    $offset = 0;
-                    break;
-            }
+            $affectedTable = DBPREFIX.'access_user_attribute';
+            $offset = 0;
 
             foreach ($this->children as $orderId => $childAttributeId)
             {
