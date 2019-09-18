@@ -1354,7 +1354,7 @@ class User extends User_Profile
             .($arrQuery['tables']['group'] && !FWUser::getFWUserObject()->isBackendMode() ? ' INNER JOIN `'.DBPREFIX.'access_user_groups` AS tblGF ON tblGF.`group_id` = tblG.`group_id`' : '')
             .(count($arrQuery['joins']) ? ' '.implode(' ',$arrQuery['joins']) : '')
 // TODO: some conditions are not well enclosed, so there might be a more proper solution than adding more brackes at this point
-            .(count($arrQuery['conditions']) ? ' HAVING ('.implode(') AND (', $arrQuery['conditions']).')' : '')
+            .(count($arrQuery['conditions']) ? ' WHERE ('.implode(') AND (', $arrQuery['conditions']).')' : '')
             .($arrQuery['group_tables'] ? ' GROUP BY tblU.`id`' : '')
             .(count($arrQuery['sort']) ? ' ORDER BY '.implode(', ', $arrQuery['sort']) : '');
         $objUser = false;
@@ -1420,9 +1420,9 @@ class User extends User_Profile
                 continue;
             }
             $tableName = 'tbl' . ucfirst($name);
-            $joins[] = 'INNER JOIN `' . DBPREFIX . 'access_user_attribute_value`' .
-                'AS `'.$tableName.'` ON `' . $tableName .'`.`attribute_id` = '.
-                $id;
+            $joins[] = 'LEFT JOIN `' . DBPREFIX . 'access_user_attribute_value`' .
+                'AS `'.$tableName.'` ON (`' . $tableName .'`.`attribute_id` = '.
+                $id .' AND `'.$tableName.'`.`user_id` = `tblU`.`id`) ';
             $select[] = '`' . $tableName . '`.`value` AS `tblP.' . $name . '`';
         }
 
