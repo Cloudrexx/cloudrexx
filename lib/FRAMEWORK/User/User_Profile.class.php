@@ -271,7 +271,9 @@ class User_Profile
     /**
      * Create a profile for the loaded user
      *
-     * This creates an entry in the dabase table contrexx_access_user_profile which is related to the entry in the table cotnrexx_access_users of the same user.
+     * This creates entries in the database table
+     * contrexx_access_user_attribute_value which is related to the entry in the
+     * table cotnrexx_access_users of the same user.
      * This methode will be obsolete as soon as we're using InnoDB as storage engine.
      *
      * @return boolean
