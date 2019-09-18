@@ -72,6 +72,13 @@ class LinkSanitizer {
                 |
                 # or match all CSS @import statements
                 @import\s+url\s*\(
+
+                    # but only those who's values don't start with a quote
+                    (?!['\"])
+
+                    # and neither start with the html notation of a quote, which
+                    # is used in the backend for escaped CSS import code
+                    (?!&quot;)
             )
 
             # but only those who's values don't start with a slash..
