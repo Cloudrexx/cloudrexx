@@ -1312,28 +1312,31 @@ class CalendarEventManager extends CalendarLibrary
         $monthnames = explode(",", $_ARRAYLANG['TXT_CALENDAR_MONTH_ARRAY']);
         $daynames   = explode(',', $_ARRAYLANG['TXT_CALENDAR_DAY_ARRAY']);
 
-        $year  = !empty($_GET['yearID']) ? contrexx_input2int($_GET['yearID']) : 0;
-        $month = !empty($_GET['monthID']) ? contrexx_input2int($_GET['monthID']) : 0;
-
-        $startdate = $this->getUserDateTimeFromIntern($event->startDate);
-        if (empty($year) && empty($month)) {
-            $year      = $startdate->format('Y');
-            $month     = $startdate->format('m');
+        $startDate = $event->startDate;
+        if (!empty($_GET['yearID'])) {
+            $year = contrexx_input2int($_GET['yearID']);
+        } else {
+            $year = $startDate->format('Y');
         }
+        if (!empty($_GET['monthID'])) {
+            $month = contrexx_input2int($_GET['monthID']);
+        } else {
+            $month = $startDate->format('m');
+        }
+        $startDate->setDate(
+            $year,
+            $month,
+            1
+        );
 
         $eventList = array($event);
         // If event series is enabled refresh the eventlist
         if ($event->seriesStatus == 1) {
-            try {
-                $endDate = new \DateTime('1-'.$month.'-'.$year);
-            } catch (\Exception $e) {
-                $year = $startdate->format('Y');
-                $month = $startdate->format('m');
-                $endDate = new \DateTime('1-'.$month.'-'.$year);
-            }
-            $endDate->modify('+1 month');
+            $endDate = clone $startDate;
+            // note: 'this month' is relativ to the set month of $endDate
+            $endDate->modify('last day of this month');
 
-            $eventManager = new static(null, $endDate);
+            $eventManager = new static($startDate, $endDate);
             $objEvent     = new \Cx\Modules\Calendar\Controller\CalendarEvent(intval($event->id));
             if ($eventManager->_addToEventList($objEvent)) {
                 $eventManager->eventList[] = $objEvent;
@@ -1971,8 +1974,15 @@ class CalendarEventManager extends CalendarLibrary
                 // no recurrence end set
                 case 1:
                     if ($this->startDate != null) {
-                        $lastDate = clone $this->startDate;
-                        $lastDate->setDate($lastDate->format('Y') + intval($this->arrSettings['maxSeriesEndsYear']) + 1, $lastDate->format('m'), $lastDate->format('d'));
+                        // end based on option 'List endless series previously'
+                        $lastDate = $this->getInternDateTimeFromUser();
+                        $lastDate->setDate(
+                            $lastDate->format('Y') + intval(
+                                $this->arrSettings['maxSeriesEndsYear']
+                            ) + 1,
+                            $lastDate->format('m'),
+                            $lastDate->format('d')
+                        );
                         if ($nextEvent->startDate > $lastDate) {
                             // recurrence is out of date boundary -> skip
                             return null;
