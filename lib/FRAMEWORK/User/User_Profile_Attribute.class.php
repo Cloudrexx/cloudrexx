@@ -629,8 +629,18 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
     function loadCoreAttributeTitle()
     {
         global $objDatabase;
-
-        $objResult = $objDatabase->Execute('SELECT `id`, `title`, `order_id` FROM '.DBPREFIX.'access_user_title');
+        // Find children of user attribute title
+        $objResult = $objDatabase->Execute('
+            SELECT 
+                `name`.`attribute_id` AS `id` , `name`.`name` AS `title`, 
+                `attribute`.`order_id`
+            FROM `'.DBPREFIX.'access_user_attribute_name` AS `name` 
+            LEFT JOIN `'.DBPREFIX.'access_user_attribute` AS `attribute` 
+                ON `name`.`attribute_id` = `attribute`.`id`
+            LEFT JOIN `'.DBPREFIX.'access_user_attribute_name` AS `titleAttr` 
+                ON `titleAttr`.`name` = "title"
+            WHERE `attribute`.`parent_id`= `titleAttr`.`attribute_id`;
+        ');
         if ($objResult) {
             while (!$objResult->EOF) {
                 $this->arrAttributes['title_'.$objResult->fields['id']] = array(
