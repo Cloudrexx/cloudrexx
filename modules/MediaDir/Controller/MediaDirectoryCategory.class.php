@@ -303,8 +303,13 @@ class MediaDirectoryCategory extends MediaDirectoryLibrary
                 $intNumBlocks = count($arrExistingBlocks);
                 $strIndexHeader = '';
 
-
-                if($this->arrSettings['settingsCategoryOrder'] == 2) {
+                // in a previous version, the system did not start parsing
+                // with the first row block. Instead it began to render the
+                // last column.
+                if(
+                    $this->arrSettings['legacyBehavior'] &&
+                    $this->arrSettings['settingsCategoryOrder'] == 2
+                ) {
                     $i = $intNumBlocks-1;
                 } else {
                     $i = 0;
