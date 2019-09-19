@@ -837,8 +837,14 @@ class Page extends \Cx\Core_Modules\Widget\Model\Entity\WidgetParseTarget implem
                 $fallback_page = $this->getNode()->getPage($fallback_lang);
                 if ($fallback_page && $fallback_page->isActive()) {
                     $fallback_status = $fallback_page->getStatus();
+                    $fallback_status = preg_replace('/(in)?active/', '', $fallback_status);
                     if ($this->isFrontendProtected() && !preg_match('/protected/', $fallback_status)) {
                         $fallback_status .= 'protected ';
+                    }
+                    if ($this->getDisplay()) {
+                        $fallback_status .= 'active ';
+                    } else {
+                        $fallback_status .= "inactive ";
                     }
                     return 'fallback ' . $fallback_status;
                 }
@@ -873,8 +879,11 @@ class Page extends \Cx\Core_Modules\Widget\Model\Entity\WidgetParseTarget implem
             }
         }
 
-        if ($this->getDisplay()) $status .= "active ";
-        else $status .= "inactive ";
+        if ($this->getDisplay()) {
+            $status .= "active ";
+        } else {
+            $status .= "inactive ";
+        }
 
         if ($this->isFrontendProtected()) $status .= "protected ";
         if ($this->getModule()) {
