@@ -27,21 +27,21 @@
 /**
  * UserTest
  *
-copyright   Cloudrexx AG
- * @author      Hava Fuga <hf@cloudrexx.com>, Mirjam Doyon <md@cloudrexx.com>
+ * @copyright   Cloudrexx AG
+ * @author      Hava Fuga <info@cloudrexx.com>, Mirjam Doyon <info@cloudrexx.com>
  * @package     cloudrexx
- * @subpackage  lib_PHPUnit_Framework
+ * @subpackage  core_user
  */
 
-namespace Cx\lib\PHPUnit\phpunit\phpunit\tests\unit\Framework;
+namespace Cx\Core\User\Testing\UnitTest;
 
 /**
  * Test User
  *
  * @copyright   Cloudrexx AG
- * @author      Hava Fuga <hf@cloudrexx.com>, Mirjam Doyon <md@cloudrexx.com>
+ * @author      Hava Fuga <info@cloudrexx.com>, Mirjam Doyon <info@cloudrexx.com>
  * @package     cloudrexx
- * @subpackage  lib_PHPUnit_Framework
+ * @subpackage  core_user
  */
 class UserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
 {
