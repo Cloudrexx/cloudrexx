@@ -1961,6 +1961,18 @@ class CalendarEventManager extends CalendarLibrary
      *                                          objects.
      */
     protected function getNextRecurrenceDate($objEvent, $objCloneEvent, &$additionalRecurrences = array()) {
+        // init last supported day
+        // this is the day before the end of unix timestamp
+        static $endOfUnixTimestamp;
+        if (!isset($endOfUnixTimestamp)) {
+            // End of unix timestamp (= max signed 32bit int)
+            // Note: We should instead use \PHP_INT_MAX
+            // However, as MySQL and MariaDB currently do not yet support
+            // 64bit timestamps, we just can't
+            // See https://cloudrexx.atlassian.net/browse/CLX-3009
+            $endOfUnixTimestamp = $this->getInternDateTimeFromUser('@' . 0x7FFFFFFF);
+            $endOfUnixTimestamp->modify('-1 day');
+        }
         while ($nextEvent = $this->fetchNextRecurrence($objEvent, $objCloneEvent, $additionalRecurrences)) {
             // verify that we have not yet reached the end of the recurrence
             if (
@@ -1968,6 +1980,14 @@ class CalendarEventManager extends CalendarLibrary
                 $this->arrSettings['constrainAdditionalRecurrences'] == 2
             ) {
                 return $nextEvent;
+            }
+
+            // ensure date can be handled (not exceeding unix timestmap)
+            if (
+                $nextEvent->startDate > $endOfUnixTimestamp ||
+                $nextEvent->endDate > $endOfUnixTimestamp
+            ) {
+                return null;
             }
 
             switch ($objCloneEvent->seriesData['seriesPatternDouranceType']) {

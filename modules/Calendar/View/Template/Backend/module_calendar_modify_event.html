@@ -257,6 +257,7 @@
             dateFormat: '{CALENDAR_EVENT_DATE_FORMAT}',
             timeFormat: 'hh:mm',
             showSecond: false,
+            maxDate: new Date(cx.variables.get('maxDate', 'calendar')),
             onSelect: function(dateText, inst){
                 var startDate = cx.jQuery( ".startDate" ).datetimepicker("getDate");
                 var endDate   = cx.jQuery( ".endDate" ).datetimepicker("getDate");
@@ -465,6 +466,7 @@
                     var format = 'D, {CALENDAR_EVENT_DATE_FORMAT}';
                     cx.jQuery("#recurrenceDatepicker").datepicker({
                         minDate: startDate,
+                        maxDate: new Date(cx.variables.get('maxDate', 'calendar')),
                         dateFormat: format,
                         onSelect: function(date) {
                             selectedRecurrenceDate = date;
@@ -928,6 +930,7 @@
     function refreshDatePickers(tmp) {
         var options = {
             dateFormat: '{CALENDAR_EVENT_DATE_FORMAT}',
+            maxDate: new Date(cx.variables.get('maxDate', 'calendar')),
         };
         cx.jQuery('.event_date').datepicker(options);
     }

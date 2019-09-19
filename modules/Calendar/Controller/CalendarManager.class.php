@@ -364,9 +364,21 @@ class CalendarManager extends CalendarLibrary
         \JS::registerJS("modules/{$this->moduleName}/View/Script/jquery.pagination.js");
         \JS::registerJS('modules/Calendar/View/Script/Backend.js');
 
+        // End of unix timestamp (= max signed 32bit int)
+        // Note: We should instead use \PHP_INT_MAX
+        // However, as MySQL and MariaDB currently do not yet support
+        // 64bit timestamps, we just can't
+        // See https://cloudrexx.atlassian.net/browse/CLX-3009
+        $maxDate = 0x7FFFFFFF;
+        // the day before
+        $maxDate -= 86400;
+        // convert into ms
+        $maxDate *= 1000;
+
         \ContrexxJavascript::getInstance()->setVariable(
             array(
-                'language_id' => \FWLanguage::getDefaultLangId()
+                'language_id' => \FWLanguage::getDefaultLangId(),
+                'maxDate'     => $maxDate,
             ),
             'calendar'
         );

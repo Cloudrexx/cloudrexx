@@ -629,9 +629,21 @@ EOF;
         $locationType = $this->arrSettings['placeData'] == 3 ? ($eventId != 0 ? $objEvent->locationType : 1) : $this->arrSettings['placeData'];
         $hostType     = $this->arrSettings['placeDataHost'] == 3 ? ($eventId != 0 ? $objEvent->hostType : 1) : $this->arrSettings['placeDataHost'];
 
+        // End of unix timestamp (= max signed 32bit int)
+        // Note: We should instead use \PHP_INT_MAX
+        // However, as MySQL and MariaDB currently do not yet support
+        // 64bit timestamps, we just can't
+        // See https://cloudrexx.atlassian.net/browse/CLX-3009
+        $maxDate = 0x7FFFFFFF;
+        // the day before
+        $maxDate -= 86400;
+        // convert into ms
+        $maxDate *= 1000;
+
         \ContrexxJavascript::getInstance()->setVariable(array(
             'language_id' => \FWLanguage::getDefaultLangId(),
             'active_lang' => implode(',', \FWLanguage::getIdArray()),
+            'maxDate'     => $maxDate,
         ), 'calendar');
 
         $javascript = <<< EOF
@@ -643,6 +655,7 @@ cx.ready(function() {
         dateFormat: '$dateFormat',
         timeFormat: 'hh:mm',
         showSecond: false,
+        maxDate: new Date(cx.variables.get('maxDate', 'calendar')),
         onSelect: function(dateText, inst){
             var startDate = cx.jQuery( ".startDate" ).datetimepicker("getDate");
             var endDate   = cx.jQuery( ".endDate" ).datetimepicker("getDate");
