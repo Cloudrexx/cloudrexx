@@ -25,7 +25,7 @@
  */
 
 /**
- * UserTest
+ * GetUserTest
  *
  * @copyright   Cloudrexx AG
  * @author      Hava Fuga <info@cloudrexx.com>, Mirjam Doyon <info@cloudrexx.com>
@@ -36,14 +36,35 @@
 namespace Cx\Core\User\Testing\UnitTest;
 
 /**
- * Test User
+ * Test GetUser
  *
  * @copyright   Cloudrexx AG
  * @author      Hava Fuga <info@cloudrexx.com>, Mirjam Doyon <info@cloudrexx.com>
  * @package     cloudrexx
  * @subpackage  core_user
  */
-class UserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
+class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
 {
+
+    public function testOneUserById() {
+        $user = new \Cx\Core\User\Model\Entity\User;
+
+        $user->setId(999);
+        $this->assertEquals(999, $user->getId());
+    }
+
+    public function testUserByGroup() {
+        $user = new \Cx\Core\User\Model\Entity\User;
+        $user->setPrimaryGroup(7);
+
+        $this->assertEquals(7, $user->getPrimaryGroup());
+    }
+
+    public function testUserByValue() {
+        $user = new \Cx\Core\User\Model\Entity\UserAttributeValue;
+        $user->setValue('Lorem');
+
+        $this->assertEquals('Lorem', $user->getValue());
+    }
 
 }
