@@ -48,9 +48,14 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     public function getControllerClasses() {
         // Return an empty array here to let the component handler know that there
         // does not exist a backend, nor a frontend controller of this component.
-        return array();
+        return array('EsiWidget');
     }
-
+    /**
+     * {@inheritdoc}
+     */
+    public function getControllersAccessableByJson() {
+        return array('EsiWidgetController');
+    }
     /**
      * Returns a list of command mode commands provided by this component
      *
@@ -177,22 +182,39 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      */
     public function preContentLoad(\Cx\Core\ContentManager\Model\Entity\Page $page) {
         global $newsletter, $_ARRAYLANG, $page_template, $themesPages, $objInit;
-        switch ($this->cx->getMode()) {
-            case \Cx\Core\Core\Controller\Cx::MODE_FRONTEND:
-                // get Newsletter
-                $_ARRAYLANG = array_merge($_ARRAYLANG, $objInit->loadLanguageData('Newsletter'));
-                $newsletter = new Newsletter('');
-                $content = \Env::get('cx')->getPage()->getContent();
-                if (preg_match('/{NEWSLETTER_BLOCK}/', $content)) {
-                    $newsletter->setBlock($content);
-                }
-                if (preg_match('/{NEWSLETTER_BLOCK}/', $page_template)) {
-                    $newsletter->setBlock($page_template);
-                }
-                if (preg_match('/{NEWSLETTER_BLOCK}/', $themesPages['index'])) {
-                    $newsletter->setBlock($themesPages['index']);
-                }
-                break;
-        }
+//        switch ($this->cx->getMode()) {
+//            case \Cx\Core\Core\Controller\Cx::MODE_FRONTEND:
+//                // get Newsletter
+//                $_ARRAYLANG = array_merge($_ARRAYLANG, $objInit->loadLanguageData('Newsletter'));
+//                $newsletter = new Newsletter('');
+//                $content = \Env::get('cx')->getPage()->getContent();
+//                if (preg_match('/{NEWSLETTER_BLOCK}/', $content)) {
+//                    $newsletter->setBlock($content);
+//                }
+//                if (preg_match('/{NEWSLETTER_BLOCK}/', $page_template)) {
+//                    $newsletter->setBlock($page_template);
+//                }
+//                if (preg_match('/{NEWSLETTER_BLOCK}/', $themesPages['index'])) {
+//                    $newsletter->setBlock($themesPages['index']);
+//                }
+//                break;
+//        }
+
+    }
+    public function postInit(\Cx\Core\Core\Controller\Cx $cx) {
+        
+        $widgetController = $this->getComponent('Widget');
+
+        $widget = new \Cx\Core_Modules\Widget\Model\Entity\EsiWidget(
+             $this,
+            'newsletter_form',
+            \Cx\Core_Modules\Widget\Model\Entity\EsiWidget::TYPE_BLOCK
+        );
+        $widget->setEsiVariable(
+            \Cx\Core_Modules\Widget\Model\Entity\EsiWidget::ESI_VAR_ID_USER
+        );
+        $widgetController->registerWidget(
+            $widget
+        );
     }
 }
