@@ -67,4 +67,27 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
         $this->assertEquals('Lorem', $user->getValue());
     }
 
+    public function testOneUserByName() {
+        $user = new \Cx\Core\User\Model\Entity\User;
+        $user->setUsername('Testerson');
+
+        $this->assertEquals('Testerson', $user->getUsername());
+
+
+    }
+
+    public function testAllUsers() {
+        $user1 = new \Cx\Core\User\Model\Entity\User;
+        $user1->setId(1);
+        $user2 = new \Cx\Core\User\Model\Entity\User;
+        $user2->setId(2);
+        $user3 = new \Cx\Core\User\Model\Entity\User;
+        $user3->setId(3);
+        $user4 = new \Cx\Core\User\Model\Entity\User;
+        $user4->setId(4);
+
+        $this->assertCount(4, [ 'Test']);
+
+    }
+
 }
