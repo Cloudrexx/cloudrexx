@@ -153,6 +153,15 @@ class Resolver {
     protected $additionalPath = '';
 
     /**
+     * List of pages that have been resolved
+     *
+     * This is used to detect infinite internal redirection loops
+     *
+     * @var array
+     */
+    protected $resolveStack = array();
+
+    /**
      * @param Url $url the url to resolve
      * @param integer $lang the language Id
      * @param $entityManager
@@ -739,6 +748,18 @@ class Resolver {
                 if (!$targetPage || !$targetPage->isActive()) {
                     $this->page = null;
                     return;
+                }
+
+                // Ensure the resolved target page has not yet been resolved
+                // before. If it has however, then that means we are in an
+                // infinite redirect loop and must abort the resolving process.
+                if (in_array($targetPage, $this->resolveStack)) {
+                    \DBG::msg(__METHOD__ . ': internal infinite redirection');
+                    \Cx\Core\Csrf\Controller\Csrf::redirect(
+                        \Cx\Core\Routing\Url::fromModuleAndCmd('Error')
+                    );
+                } else {
+                    $this->resolveStack[] = $targetPage;
                 }
 
                 // the redirection page is located within a different language.
