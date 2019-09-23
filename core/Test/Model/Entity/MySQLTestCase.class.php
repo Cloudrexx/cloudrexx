@@ -49,7 +49,7 @@ namespace Cx\Core\Test\Model\Entity;
 class MySQLTestCase extends ContrexxTestCase {
     protected static $database;
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         global $_DBCONFIG, $_CONFIG;
 
         // Set database connection details
@@ -68,15 +68,19 @@ class MySQLTestCase extends ContrexxTestCase {
         $objDbUser->setPassword($_DBCONFIG['password']);
 
         // Initialize database connection
-        $db = new \Cx\Core\Model\Db($objDb, $objDbUser);
+        $db = new \Cx\Core\Model\Db(
+            $objDb,
+            $objDbUser,
+            self::$cx->getComponent('Cache')->getCacheDriver()
+        );
         self::$database = $db->getAdoDb();
     }
 
-    public function setUp() {
+    public function setUp(): void {
         self::$database->BeginTrans();
     }
 
-    public function tearDown() {
+    public function tearDown(): void {
         self::$database->RollbackTrans();
     }
 }
