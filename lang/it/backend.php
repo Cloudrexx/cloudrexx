@@ -90,7 +90,7 @@ $_ARRAYLANG['TXT_IMAGE_ADMINISTRATION'] = "Bilderverwaltung";
 $_ARRAYLANG['TXT_ADMINISTRATION'] = "Amministrazione";
 $_ARRAYLANG['TXT_CONTENT_MANAGEMENT'] = "Content Management";
 $_ARRAYLANG['TXT_CONTENT_MANAGER'] = "Content Manager";
-$_ARRAYLANG['TXT_DATE'] = "Datum";
+$_ARRAYLANG['TXT_DATE'] = "Data";
 $_ARRAYLANG['TXT_DESIGN_MANAGEMENT'] = "Layout";
 $_ARRAYLANG['TXT_ACTION_IS_IRREVERSIBLE'] = "Diese Aktion kann nicht rückgängig gemacht werden!";
 $_ARRAYLANG['TXT_BACKUP_CREATE'] = "Backup erstellen";
@@ -1153,7 +1153,7 @@ $_ARRAYLANG['UPLOAD_EXPOSED_DIALOG_TITLE'] = "Dateien hochladen";
 $_ARRAYLANG['UPLOAD_FORM_ADD'] = "Weitere Dateien hinzufügen";
 $_ARRAYLANG['TXT_CORE_CAPTCHA'] = "Security code";
 $_ARRAYLANG['TXT_CORE_CAPTCHA_ENTER_THE_LETTERS_BELOW'] = "Enter the letters below.";
-$_ARRAYLANG['TXT_CORE_REMEMBER_ME'] = "Remember me";
+$_ARRAYLANG['TXT_CORE_REMEMBER_ME'] = "Rimanere collegato";
 
 $_ARRAYLANG['TXT_CORE_CM_TYPE_REDIRECT_INFO_ACTION'] = 'Enter an external URL or select a page.';
 $_ARRAYLANG['TXT_CORE_CM_USAGE_DENIED'] = "You don't have enough rights to use the content manager.";
