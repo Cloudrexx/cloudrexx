@@ -66,6 +66,8 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             try {
                 $url = $rewriteRule->resolve($url, $last);
             } catch (\Exception $e) {
+                \DBG::msg('RewriteRule error: '. $rewriteRule->getRegularExpression());
+                \DBG::msg($e->getMessage());
                 // This is thrown if the regex of the rule is not valid
             }
             if ($last) {
