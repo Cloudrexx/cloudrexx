@@ -52,11 +52,11 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
         $user->reset();
         $user->setEmail('test@testmail.com');
         $user->store();
-        $id = $user->getId();
 
+        var_dump($user->getId());
         $this->assertEquals(
-            $user->getUser($id),
-            $user->getUsers($id)
+            $user->getId(),
+            $user->getUsers($user->getId())->getId()
         );
     }
 
