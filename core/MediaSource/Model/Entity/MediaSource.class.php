@@ -311,7 +311,11 @@ class MediaSource extends DataSource {
         // combination of MediaSource identifier and a file system path.
         // Therefore using $this->getIdentifier() is intended and correct.
         // See JsonUploader::upload()
-        $data['path'] = $this->getIdentifier() . '/';
+        $offsetPath = '';
+        if (!empty($this->options['offset'])) {
+            $offsetPath = $this->options['offset'];
+        }
+        $data['path'] = $this->getIdentifier() . '/' . $offsetPath;
         $jd = new \Cx\Core\Json\JsonData();
         $res = $jd->data(
             'Uploader',
