@@ -47,10 +47,17 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
 {
 
     public function testOneUserById() {
-        $user = new \Cx\Core\User\Model\Entity\User;
+        $object = \FWUser::getFWUserObject();
+        $user = $object->objUser;
+        $user->reset();
+        $user->setEmail('test@testmail.com');
+        $user->store();
+        $id = $user->getId();
 
-        $user->setId(999);
-        $this->assertEquals(999, $user->getId());
+        $this->assertEquals(
+            $user->getUser($id),
+            $user->getUsers($id)
+        );
     }
 
     public function testUserByGroup() {
