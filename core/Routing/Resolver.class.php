@@ -755,9 +755,10 @@ class Resolver {
                 // infinite redirect loop and must abort the resolving process.
                 if (in_array($targetPage, $this->resolveStack)) {
                     \DBG::msg(__METHOD__ . ': internal infinite redirection');
-                    \Cx\Core\Csrf\Controller\Csrf::redirect(
-                        \Cx\Core\Routing\Url::fromModuleAndCmd('Error')
-                    );
+                    \header($_SERVER['SERVER_PROTOCOL'] . ' 502 Bad Gateway');
+                    // remove CSRF token
+                    output_reset_rewrite_vars();
+                    throw new \Cx\Core\Core\Controller\InstanceException();
                 } else {
                     $this->resolveStack[] = $targetPage;
                 }
