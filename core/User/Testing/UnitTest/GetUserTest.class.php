@@ -60,18 +60,18 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
         );
     }
 
-    public function testUserByGroup() {
-        $user = new \Cx\Core\User\Model\Entity\User;
-        $user->setPrimaryGroup(7);
 
-        $this->assertEquals(7, $user->getPrimaryGroup());
-    }
+    public function testOneUserByEmail() {
+        $object = \FWUser::getFWUserObject();
+        $user = $object->objUser;
+        $user->reset();
+        $user->setEmail('test1@testmail.com');
+        $user->store();
 
-    public function testUserByValue() {
-        $user = new \Cx\Core\User\Model\Entity\UserAttributeValue;
-        $user->setValue('Lorem');
-
-        $this->assertEquals('Lorem', $user->getValue());
+        $this->assertEquals(
+            $user->getEmail(),
+            $user->getUsers($user->getId())->getEmail()
+        );
     }
 
     public function testOneUserByName() {
