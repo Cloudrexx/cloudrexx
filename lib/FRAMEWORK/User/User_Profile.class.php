@@ -233,7 +233,7 @@ class User_Profile
                             $value == '"0"'
                         )
                     ) {
-                        $value = 'NULL';
+                        $value = '"gender_undefined"';
                     }
 
                     if ($this->objAttribute->isCoreAttribute($attributeId)) {
