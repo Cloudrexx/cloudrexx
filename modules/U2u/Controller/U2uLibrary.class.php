@@ -509,15 +509,14 @@ class U2uLibrary {
      /**
      *
      * Gets the Website Address of the Users..
-     * @global      $objDatabase
      */
     function _getSite($id) {
-        global $objDatabase;
+        $objFWUser = \FWUser::getFWUserObject();
 
         $id = intval($id);
-        $siteQuery='SELECT website from '.DBPREFIX.'access_user_profile WHERE user_id='.$id.'';
-        $objResult=$objDatabase->Execute($siteQuery);
-        $arrShowsite['website'] = $objResult->fields['website'];
+        $objUser = $objFWUser->objUser->getUser($id);
+        $arrShowsite['website'] = $objUser->getProfileAttribute('website');
+
         return $arrShowsite;
     }
 
