@@ -494,15 +494,15 @@ class U2uLibrary {
      /**
      *
      * Gets the City of the Users..
-     * @global      $objDatabase
      */
     function _getCity($id) {
-        global $objDatabase;
+        $objFWUser = \FWUser::getFWUserObject();
 
         $id = intval($id);
-        $cityQuery='SELECT city from '.DBPREFIX.'access_user_profile WHERE user_id='.$id.'';
-        $objResult=$objDatabase->Execute($cityQuery);
-        $arrShowcity['city']        =$objResult->fields['city'];
+        $objUser = $objFWUser->objUser->getUser($id);
+        $city = $objUser->getProfileAttribute('city');
+        $arrShowcity['city'] = $city;
+
         return $arrShowcity;
     }
 
