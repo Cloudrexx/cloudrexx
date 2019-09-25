@@ -90,6 +90,7 @@ class User_Profile_Attribute
     private $arrCoreAttributeIds;
     private $arrCustomAttributes;
     private $arrMandatoryAttributes = array();
+    private $arrProfileAttributes = array();
 
     private $arrCoreAttributes = array(
         'picture' => array(
@@ -533,6 +534,7 @@ class User_Profile_Attribute
         $this->arrAttributeTree = null;
 
         $this->loadCoreAttributes();
+        $this->loadProfileAttributes();
         $this->loadCustomAttributes();
         $this->generateAttributeRelations();
         $this->sortChildren();
@@ -570,6 +572,37 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
         $this->loadCoreAttributeTitle();
     }
 
+    /**
+     * Find all default user attributes (ProfileAttributes) and store it in an
+     * array
+     */
+    function loadProfileAttributes()
+    {
+        global $objDatabase;
+
+        $query = '
+            SELECT 
+                `tblA`.`id` AS `id`, 
+                `tblN`.`name` AS `name` 
+            FROM `' .DBPREFIX .'access_user_attribute` AS `tblA`
+            LEFT JOIN `'.DBPREFIX.'access_user_attribute_name` AS `tblN`
+                ON `tblN`.`attribute_id` = `tblA`.`id`
+            WHERE `tblA`.`is_default` = 1 
+            AND `tblA`.`parent_id` IS NULL
+        ';
+
+        $objAttributes = $objDatabase->Execute($query);
+
+        if ($objAttributes !== false && $objAttributes->RecordCount() > 0) {
+            while (!$objAttributes->EOF) {
+                $this->arrProfileAttributes[
+                $objAttributes->fields['id']
+                ] = $objAttributes->fields['name'];
+
+                $objAttributes->MoveNext();
+            }
+        }
+    }
 
     function loadCoreAttributesCustomizing()
     {
@@ -720,6 +753,22 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
         }
     }
 
+    /**
+     * In the system, the ID of a core attribute is the name of the attribute
+     * (e.g. 'title'). But if we want to interact with the database, the core
+     * attribute is handled like other user attributes. This means we have an
+     * integer ID (e.g. 2) and had to track this ID (2) with the system-intern
+     * core attribute ID ('title')
+     *
+     * This method returns an array with the user attribute ID (e.g 2) as array
+     * key profile attribute ID (e.g. 'title') as value
+     *
+     * @return array value with all profile attributes
+     */
+    public function getProfileAttributes()
+    {
+        return $this->arrProfileAttributes;
+    }
 
     function getTree()
     {
@@ -1620,6 +1669,26 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
         return isset($this->arrCoreAttributes[$attributeId]);
     }
 
+    /**
+     * In the system, the ID of a core attribute is the name of the attribute
+     * (e.g. 'title'). But if we want to interact with the database, the core
+     * attribute is handled like other user attributes. This means we have an
+     * integer ID (e.g. 2) and had to track this ID (2) with the system-intern
+     * core attribute ID ('title')
+     *
+     * This method checks if the given attribute id (e.g. 2) is assigned to a
+     * core attribute
+     *
+     * @param int $attributeId id to check if it is assigned
+     * @return bool if is assigned to an core attribute
+     */
+    public function isIdAssignedToCoreAttribute($attributeId=0) {
+        if (!empty($this->getProfileAttributes()[$attributeId])) {
+            return true;
+        }
+        return false;
+    }
+
 
     public function isCustomAttribute($attributeId = null)
     {
@@ -1812,6 +1881,54 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
         return $arrAttributes;
     }
 
+
+    /**
+     * In the system, the ID of a core attribute is the name of the attribute
+     * (e.g. 'title'). But if we want to interact with the database, the core
+     * attribute is handled like other user attributes. This means we have an
+     * integer ID (e.g. 2) and had to track this ID (2) with the system-intern
+     * core attribute ID ('title')
+     *
+     * This method gives the profile attribute ID (e.g. 'title') by the given
+     * user attribute ID (e.g. 2)
+     *
+     * @param int $attributeId user attribute ID to identify profile attribute ID
+     * @return string profile attribute ID
+     */
+    public function getProfileAttributeIdByAttributeId($attributeId)
+    {
+        $profileAttributes = $this->getProfileAttributes();
+
+        if (!empty($profileAttributes[$attributeId])) {
+            return $profileAttributes[$attributeId];
+        }
+
+        return '';
+    }
+
+    /**
+     * In the system, the ID of a core attribute is the name of the attribute
+     * (e.g. 'title'). But if we want to interact with the database, the core
+     * attribute is handled like other user attributes. This means we have an
+     * integer ID (e.g. 2) and had to track this ID (2) with the system-intern
+     * core attribute ID ('title')
+     *
+     * This method gives the user attribute ID (e.g. 2) by the given profile
+     * attribute ID (e.g. 'title')
+     *
+     * @param int $profileId profile attribute ID to identify user attribute ID
+     * @return string user attribute ID
+     */
+    public function getAttributeIdByProfileAttributeId($profileId)
+    {
+        $profileAttributes = $this->getProfileAttributes();
+
+        if (in_array($profileId, $profileAttributes)) {
+            return array_search($profileId, $profileAttributes);
+        }
+
+        return 0;
+    }
 
     function getId()
     {

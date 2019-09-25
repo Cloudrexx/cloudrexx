@@ -235,9 +235,12 @@ class User_Profile
                     ) {
                         $value = 'NULL';
                     }
-                    $query = $this->objAttribute->isCoreAttribute($attributeId) ?
-                        "REPLACE INTO `".DBPREFIX."access_user_attribute_value` (`user_id`, `attribute_id`, `history_id`, `value`) VALUES (".$this->id.", (SELECT `attribute_id` FROM `".DBPREFIX."access_user_attribute_name` WHERE `name` = '" . $attributeId . "'), ".$historyId.", " . $value . ")" :
-                        "REPLACE INTO `".DBPREFIX."access_user_attribute_value` (`user_id`, `attribute_id`, `history_id`, `value`) VALUES (".$this->id.", $attributeId, ".$historyId.", " . $value . ")";
+
+                    if ($this->objAttribute->isCoreAttribute($attributeId)) {
+                        $attributeId = $this->objAttribute->getAttributeIdByProfileAttributeId($attributeId);
+                    }
+
+                    $query = "REPLACE INTO `".DBPREFIX."access_user_attribute_value` (`user_id`, `attribute_id`, `history_id`, `value`) VALUES (".$this->id.", $attributeId, ".$historyId.", " . $value . ")";
 
                     if ($objDatabase->Execute($query) === false) {
                         $objAttribute = $this->objAttribute->getById($attributeId);
@@ -308,11 +311,15 @@ class User_Profile
 
         if ($objAttributeValue !== false && $objAttributeValue->RecordCount() > 0) {
             while (!$objAttributeValue->EOF) {
-                $this->arrCachedUsers[$objAttributeValue->fields['user_id']]['profile'][$objAttributeValue->fields['attribute_id']][$objAttributeValue->fields['history_id']] =
-                    $this->arrLoadedUsers[$objAttributeValue->fields['user_id']]['profile'][$objAttributeValue->fields['attribute_id']][$objAttributeValue->fields['history_id']] =
+                $attributeId = $objAttributeValue->fields['attribute_id'];
+                if ($this->objAttribute->isIdAssignedToCoreAttribute($attributeId)) {
+                    $attributeId = $this->objAttribute->getProfileAttributeIdByAttributeId($attributeId);
+                }
+                $this->arrCachedUsers[$objAttributeValue->fields['user_id']]['profile'][$attributeId][$objAttributeValue->fields['history_id']] =
+                    $this->arrLoadedUsers[$objAttributeValue->fields['user_id']]['profile'][$attributeId][$objAttributeValue->fields['history_id']] =
                         $objAttributeValue->fields['value'];
                 if ($objAttributeValue->fields['history_id'] &&
-                    ($historyAttributeId = $this->objAttribute->getHistoryAttributeId($objAttributeValue->fields['attribute_id'])) !== false &&
+                    ($historyAttributeId = $this->objAttribute->getHistoryAttributeId($attributeId)) !== false &&
                     (
                         !isset($this->arrAttributeHistories[$objAttributeValue->fields['user_id']][$historyAttributeId]) ||
                         !in_array($objAttributeValue->fields['history_id'], $this->arrAttributeHistories[$objAttributeValue->fields['user_id']][$historyAttributeId])
@@ -575,12 +582,7 @@ class User_Profile
         }
         $objParentAttribute = $this->objAttribute->getById($attributeId);
 
-        if ($core) {
-            $attributeKeyClausePrefix = '';
-            $attributeKeyClauseSuffix = '';
-        } else {
-            $attributeValueColumn = 'tblA.`value`';
-        }
+        $attributeValueColumn = 'tblA.`value`';
 
         foreach ($objParentAttribute->{'get'.($core ? 'Core' : 'Custom').'AttributeIds'}() as $attributeId) {
             $objAttribute = $objParentAttribute->getById($attributeId);
@@ -589,13 +591,12 @@ class User_Profile
             if (!$objAttribute->checkReadPermission()) {
                 continue;
             }
-
+            $attributeId = $objAttribute->getId();
             if ($core) {
-                $attributeValueColumn = 'tblP.`'.$objAttribute->getId().'`';
-            } else {
-                $attributeKeyClausePrefix = '(tblA.`attribute_id` = '.$objAttribute->getId().' AND ';
-                $attributeKeyClauseSuffix = ')';
+                $attributeId = $objAttribute->getAttributeIdByProfileAttributeId($objAttribute->getId());
             }
+            $attributeKeyClausePrefix = '(tblA.`attribute_id` = '.$attributeId.' AND ';
+            $attributeKeyClauseSuffix = ')';
 
             switch ($objAttribute->getType()) {
                 case 'text':

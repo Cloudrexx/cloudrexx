@@ -869,7 +869,6 @@ class User extends User_Profile
     {
         $arrConditions = array();
         $arrSearchConditions = array();
-        $tblCoreAttributes = false;
         $tblCustomAttributes = false;
         $tblGroup = false;
         $groupTables = false;
@@ -889,7 +888,6 @@ class User extends User_Profile
             }
             if (count($arrCoreAttributeConditions = $this->parseAttributeSearchConditions($search, true))) {
                 $arrSearchConditions[] = implode(' OR ', $arrCoreAttributeConditions);
-                $tblCoreAttributes = true;
             }
             if (count($arrCustomAttributeConditions = $this->parseAttributeSearchConditions($search, false))) {
                 $groupTables = true;
@@ -902,9 +900,6 @@ class User extends User_Profile
         }
 
         $arrTables = array();
-        if (!empty($tblCoreAttributes)) {
-            $arrTables[] = 'core';
-        }
         if (!empty($tblCustomAttributes)) {
             $arrTables[] = 'custom';
         }
@@ -1285,7 +1280,7 @@ class User extends User_Profile
         if (isset($filter) && is_array($filter) && count($filter) || !empty($search)) {
             $sqlCondition = $this->getFilteredUserIdList($filter, $search);
         } elseif (!empty($filter)) {
-            $sqlCondition['tables'] = array('core');
+            $sqlCondition['tables'] = array();
             $sqlCondition['conditions'] = array('tblU.`id` = '.intval($filter));
             $sqlCondition['group_tables'] = false;
             $limit = 1;
@@ -1323,7 +1318,7 @@ class User extends User_Profile
                 if (isset($this->arrAttributes[$attribute]) && !in_array($attribute, $arrSelectMetaExpressions)) {
                     $arrSelectMetaExpressions[] = $attribute;
                 } elseif ($this->objAttribute->isCoreAttribute($attribute) && !in_array($attribute, $arrSelectCoreExpressions)) {
-                    $arrSelectCoreExpressions[] = $attribute;
+                    $arrSelectCustomExpressions[] = $this->objAttribute->getAttributeIdByProfileAttributeId($attribute);
                 } elseif ($this->objAttribute->isCustomAttribute($attribute) && (!isset($arrSelectCustomExpressions) || !in_array($attribute, $arrSelectCustomExpressions))) {
                     $arrSelectCustomExpressions[] = $attribute;
                 }
@@ -1334,16 +1329,11 @@ class User extends User_Profile
             }
         } else {
             $arrSelectMetaExpressions = array_keys($this->arrAttributes);
-            $arrSelectCoreExpressions = $this->objAttribute->getCoreAttributeIds();
             $arrSelectCustomExpressions = array();
         }
 
-        $userProfileQueries = $this->getUserProfileQueries($arrSelectCoreExpressions);
-
         $query = 'SELECT tblU.`'.implode('`, tblU.`', $arrSelectMetaExpressions).'`'
-            .(count($arrSelectCoreExpressions) ? ', ' . $userProfileQueries['select'] : '')
             .'FROM `'.DBPREFIX.'access_users` AS tblU'
-            .(count($arrSelectCoreExpressions) || $arrQuery['tables']['core'] ? ' ' . $userProfileQueries['joins'] : '')
             .($arrQuery['tables']['custom'] ? ' INNER JOIN `'.DBPREFIX.'access_user_attribute_value` AS tblA ON tblA.`user_id` = tblU.`id`' : '')
             .($arrQuery['tables']['group']
                 ? (isset($filter['group_id']) && $filter['group_id'] == 'groupless'
@@ -1358,22 +1348,17 @@ class User extends User_Profile
             .($arrQuery['group_tables'] ? ' GROUP BY tblU.`id`' : '')
             .(count($arrQuery['sort']) ? ' ORDER BY '.implode(', ', $arrQuery['sort']) : '');
         $objUser = false;
+
         if (empty($limit)) {
             $objUser = $objDatabase->Execute($query);
         } else {
             $objUser = $objDatabase->SelectLimit($query, $limit, $offset);
         };
+
         if ($objUser !== false && $objUser->RecordCount() > 0) {
             while (!$objUser->EOF) {
                 foreach ($objUser->fields as $attributeId => $value) {
-                    if (strpos($attributeId, 'tblP.') !== false) {
-                        $attributeId = explode('tblP.', $attributeId)[1];
-                    }
-                    if ($this->objAttribute->isCoreAttribute($attributeId)) {
-                        $this->arrCachedUsers[$objUser->fields['id']]['profile'][$attributeId][0] = $this->arrLoadedUsers[$objUser->fields['id']]['profile'][$attributeId][0] = $value;
-                    } else {
-                        $this->arrCachedUsers[$objUser->fields['id']][$attributeId] = $this->arrLoadedUsers[$objUser->fields['id']][$attributeId] = $value;
-                    }
+                    $this->arrCachedUsers[$objUser->fields['id']][$attributeId] = $this->arrLoadedUsers[$objUser->fields['id']][$attributeId] = $value;
                 }
                 $this->arrCachedUsers[$objUser->fields['id']]['networks'] = $this->arrLoadedUsers[$objUser->fields['id']]['networks'] = new \Cx\Lib\User\User_Networks($objUser->fields['id']);
                 $objUser->MoveNext();
@@ -1386,51 +1371,6 @@ class User extends User_Profile
         return false;
     }
 
-    protected function getUserProfileAttributeIds()
-    {
-        global $objDatabase;
-
-        $userProfileAttribute = array();
-        $query = 'SELECT `tblA`.`id` AS `id`, `tblN`.`name` AS `name` FROM `'
-                .DBPREFIX .'access_user_attribute` AS `tblA`
-            LEFT JOIN `'.DBPREFIX.'access_user_attribute_name` AS `tblN`'.
-                ' ON `tblN`.`attribute_id` = `tblA`.`id`' .
-            ' WHERE `tblA`.`is_default` = 1 AND `tblA`.`parent_id` IS NULL';
-
-        $objAttributes = $objDatabase->Execute($query);
-        if ($objAttributes !== false && $objAttributes->RecordCount() > 0) {
-            while (!$objAttributes->EOF) {
-                $userProfileAttribute[
-                $objAttributes->fields['id']
-                ] = $objAttributes->fields['name'];
-
-                $objAttributes->MoveNext();
-            }
-        }
-        return $userProfileAttribute;
-    }
-
-    protected function getUserProfileQueries($arrSelectCoreExpressions) {
-        $userProfileAttributes = $this->getUserProfileAttributeIds();
-        $userProfileQueries = array();
-        $joins = array();
-        $select = array();
-        foreach ($userProfileAttributes as $id=>$name) {
-            if (!in_array($name, $arrSelectCoreExpressions)) {
-                continue;
-            }
-            $tableName = 'tbl' . ucfirst($name);
-            $joins[] = 'LEFT JOIN `' . DBPREFIX . 'access_user_attribute_value`' .
-                'AS `'.$tableName.'` ON (`' . $tableName .'`.`attribute_id` = '.
-                $id .' AND `'.$tableName.'`.`user_id` = `tblU`.`id`) ';
-            $select[] = '`' . $tableName . '`.`value` AS `tblP.' . $name . '`';
-        }
-
-        $userProfileQueries['joins'] = implode(' ', $joins);
-        $userProfileQueries['select'] = implode(', ', $select);
-
-        return $userProfileQueries;
-    }
 
     public function __clone()
     {
@@ -1622,7 +1562,6 @@ class User extends User_Profile
 
         $arrCustomJoins = array();
         $arrCustomSelection = array();
-        $joinCoreTbl = false;
         $joinCustomTbl = false;
         $joinGroupTbl = false;
         $arrUserIds = array();
@@ -1631,9 +1570,6 @@ class User extends User_Profile
         $nr = 0;
         if (!empty($sqlCondition)) {
             if (isset($sqlCondition['tables'])) {
-                if (in_array('core', $sqlCondition['tables'])) {
-                    $joinCoreTbl = true;
-                }
                 if (in_array('custom', $sqlCondition['tables'])) {
                     $joinCustomTbl = true;
                 }
@@ -1657,15 +1593,10 @@ class User extends User_Profile
                     if (isset($this->arrAttributes[$attribute])) {
                         $arrSortExpressions[] = 'tblU.`'.$attribute.'` '.$direction;
                     } elseif ($this->objAttribute->load($attribute)) {
-                        if ($this->objAttribute->isCoreAttribute($attribute)) {
-                            $arrSortExpressions[] = 'tblP.`'.$attribute.'` '.$direction;
-                            $joinCoreTbl = true;
-                        } else {
-                            $arrSortExpressions[] = 'tblA'.$nr.'.`value` '.$direction;
-                            $arrCustomJoins[] = 'INNER JOIN `'.DBPREFIX.'access_user_attribute_value` AS tblA'.$nr.' ON tblA'.$nr.'.`user_id` = tblU.`id`';
-                            $arrCustomSelection[] = 'tblA'.$nr.'.`attribute_id` = '.$attribute;
-                            ++$nr;
-                        }
+                        $arrSortExpressions[] = 'tblA'.$nr.'.`value` '.$direction;
+                        $arrCustomJoins[] = 'INNER JOIN `'.DBPREFIX.'access_user_attribute_value` AS tblA'.$nr.' ON tblA'.$nr.'.`user_id` = tblU.`id`';
+                        $arrCustomSelection[] = 'tblA'.$nr.'.`attribute_id` = '.$attribute;
+                        ++$nr;
                     }
                 } elseif ($attribute == 'special') {
                     $arrSortExpressions[] = $direction;
@@ -1713,7 +1644,6 @@ class User extends User_Profile
         }
         return array(
             'tables' => array(
-                'core'      => $joinCoreTbl,
                 'custom'    => $joinCustomTbl,
                 'group'     => $joinGroupTbl
             ),
