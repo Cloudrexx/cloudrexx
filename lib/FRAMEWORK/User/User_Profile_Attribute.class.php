@@ -567,7 +567,6 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
 );
 */
         }
-        $this->loadCoreAttributesCustomizing();
         $this->loadCoreAttributeCountry();
         $this->loadCoreAttributeTitle();
     }
@@ -603,40 +602,6 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
             }
         }
     }
-
-    function loadCoreAttributesCustomizing()
-    {
-        global $objDatabase;
-
-        $objAttribute = $objDatabase->Execute('
-            SELECT
-                `id`,
-                `mandatory`,
-                `sort_type`,
-                `order_id`,
-                `access_special`,
-                `access_id`,
-                `read_access_id`
-            FROM
-                `'.DBPREFIX.'access_user_core_attribute`
-        ');
-        if ($objAttribute) {
-            while (!$objAttribute->EOF) {
-                $this->arrAttributes[$objAttribute->fields['id']]['mandatory'] = $objAttribute->fields['mandatory'];
-                $this->arrAttributes[$objAttribute->fields['id']]['sort_type'] = $objAttribute->fields['sort_type'];
-                $this->arrAttributes[$objAttribute->fields['id']]['order_id'] = $objAttribute->fields['order_id'];
-                $this->arrAttributes[$objAttribute->fields['id']]['access_special'] = $objAttribute->fields['access_special'];
-                $this->arrAttributes[$objAttribute->fields['id']]['access_id'] = $objAttribute->fields['access_id'];
-                $this->arrAttributes[$objAttribute->fields['id']]['read_access_id'] = $objAttribute->fields['read_access_id'];
-                $this->arrAttributes[$objAttribute->fields['id']]['customizing'] = true;
-                if ($objAttribute->fields['mandatory']) {
-                    $this->arrMandatoryAttributes[] = $objAttribute->fields['id'];
-                }
-                $objAttribute->MoveNext();
-            }
-        }
-    }
-
 
     function loadCoreAttributeCountry()
     {
