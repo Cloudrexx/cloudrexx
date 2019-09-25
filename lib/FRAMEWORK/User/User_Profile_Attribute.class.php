@@ -630,7 +630,7 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
         // Find children of user attribute title
         $objResult = $objDatabase->Execute('
             SELECT 
-                `name`.`attribute_id` AS `id` , `name`.`name` AS `title`, 
+                `name`.`id` AS `id` , `name`.`name` AS `title`, 
                 `attribute`.`order_id`
             FROM `'.DBPREFIX.'access_user_attribute_name` AS `name` 
             LEFT JOIN `'.DBPREFIX.'access_user_attribute` AS `attribute` 
