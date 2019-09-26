@@ -47,40 +47,31 @@ namespace Cx\Core\Test\Model\Entity;
  * @subpackage  core_test
  */
 class MySQLTestCase extends ContrexxTestCase {
+
+    /**
+     * Reference to the AdoDb database connection
+     * @var \ADONewConnection
+     */
     protected static $database;
 
+    /**
+     * Save as a reference to the database object
+     */
     public static function setUpBeforeClass(): void {
-        global $_DBCONFIG, $_CONFIG;
-
-        // Set database connection details
-        $objDb = new \Cx\Core\Model\Model\Entity\Db();
-        $objDb->setHost($_DBCONFIG['host']);
-        $objDb->setName($_DBCONFIG['database']);
-        $objDb->setTablePrefix($_DBCONFIG['tablePrefix']);
-        $objDb->setDbType($_DBCONFIG['dbType']);
-        $objDb->setCharset($_DBCONFIG['charset']);
-        $objDb->setCollation($_DBCONFIG['collation']);
-        $objDb->setTimezone((empty($_CONFIG['timezone'])?$_DBCONFIG['timezone']:$_CONFIG['timezone']));
-
-        // Set database user details
-        $objDbUser = new \Cx\Core\Model\Model\Entity\DbUser();
-        $objDbUser->setName($_DBCONFIG['user']);
-        $objDbUser->setPassword($_DBCONFIG['password']);
-
-        // Initialize database connection
-        $db = new \Cx\Core\Model\Db(
-            $objDb,
-            $objDbUser,
-            self::$cx->getComponent('Cache')->getCacheDriver()
-        );
-        self::$database = $db->getAdoDb();
+        static::$database = static::$cx->getDb()->getAdoDb();
     }
 
+    /**
+     * Start a new transaction before each test to keep the database clean
+     */
     public function setUp(): void {
-        self::$database->BeginTrans();
+        static::$database->BeginTrans();
     }
 
+    /**
+     * Discard changes of last test
+     */
     public function tearDown(): void {
-        self::$database->RollbackTrans();
+        static::$database->RollbackTrans();
     }
 }
