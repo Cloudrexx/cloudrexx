@@ -59,9 +59,6 @@ class JsonData {
         '\\Cx\\Core\\Json\\Adapter\\User' => array(
             'JsonUser',
         ),
-        '\\Cx\\Core\\Json\\Adapter\\Calendar' => array(
-            'JsonCalendar',
-        ),
         '\\Cx\\Modules\\Crm\\Controller' => array(
             'JsonCrm',
         ),
@@ -246,6 +243,24 @@ class JsonData {
     }
 
     /**
+     * Checks whether an adapter or an adapter's method exists
+     *
+     * @param string $adapterName Adapter name to check for
+     * @param string $methodName (optional) Method name to check for
+     * @return boolean True if adapter or adapter's method exists, false otherwise
+     */
+    public function hasAdapterAndMethod($adapterName, $methodName = '') {
+        $adapterExists = isset(static::$adapters[$adapterName]);
+        if (empty($methodName) || !$adapterExists) {
+            return $adapterExists;
+        }
+        $adapter = static::$adapters[$adapterName];
+        $methods = $adapter->getAccessableMethods();
+        // $methods has two possible formats: value can be a permission
+        return isset($methods[$methodName]) || in_array($methodName, $methods);
+    }
+
+    /**
      * Passes JSON data to the particular adapter and returns the result
      * Called from jsondata() or any part of Cloudrexx
      * @author Michael Ritter <michael.ritter@comvation.com>
@@ -285,7 +300,7 @@ class JsonData {
             return $this->getErrorData('No such method: ' . $method);
         }
         //permission checks
-        $objPermission = new \Cx\Core_Modules\Access\Model\Entity\Permission(null, null, true, null, null, null);
+        $objPermission = new \Cx\Core_Modules\Access\Model\Entity\Permission();
         $defaultPermission = $adapter->getDefaultPermissions();
         if (!empty($methods[$method]) && ($methods[$method] instanceof \Cx\Core_Modules\Access\Model\Entity\Permission)) {
             $objPermission = $methods[$method];
@@ -297,6 +312,10 @@ class JsonData {
             if (!$objPermission->hasAccess($arguments)) {
                 $backend = \Cx\Core\Core\Controller\Cx::instanciate()->getMode() == \Cx\Core\Core\Controller\Cx::MODE_BACKEND;
                 if (!\FWUser::getFWUserObject()->objUser->login($backend)) {
+                    // $_ARRAYLANG data is not load in HEAD request
+                    if (!isset($_ARRAYLANG['TXT_LOGIN_NOAUTH_JSON'])) {
+                        $_ARRAYLANG['TXT_LOGIN_NOAUTH_JSON'] = 'Session expired';
+                    }
                     return $this->getErrorData(
                         $_ARRAYLANG['TXT_LOGIN_NOAUTH_JSON']
                     );
@@ -337,7 +356,7 @@ class JsonData {
      * @param array $data (optional) HTTP post data
      * @param boolean $secure (optional) Wheter to verify peer using SSL or not, default false
      * @param string $certificateFile (optional) Local certificate file for non public SSL certificates
-     * @param array Set an optional HTTP Authentication method and supply its login credentials.
+     * @param array $httpAuth Set an optional HTTP Authentication method and supply its login credentials.
      *              The supplied array must comply with the following structure:
      * <pre class="brush: php">
      *              $httpAuth = array(
@@ -346,18 +365,40 @@ class JsonData {
      *                  'httpAuthPassword' => '<password>',
      *              );
      * </pre>
-     * @return mixed Decoded JSON on success, false otherwise
+     * @param array $files Key is the POST field name, value is the file path
+     * @param boolean $sendJson Whether to encode data as JSON, default false
+     * @return stdClass|boolean Decoded JSON on success, false otherwise
      */
-    public function getJson($url, $data = array(), $secure = false, $certificateFile = '', $httpAuth=array(), $files = array()) {
+    public function getJson(
+        $url, $data = array(),
+        $secure = false,
+        $certificateFile = '',
+        $httpAuth=array(),
+        $files = array(),
+        $sendJson = false
+    ) {
         $request = new \HTTP_Request2($url, \HTTP_Request2::METHOD_POST);
+        $headers = $request->getHeaders();
+        if (isset($headers['user-agent'])) {
+            $userAgent = $headers['user-agent'] . ' ' . \DBG::getLogHash();
+            $request->setHeader('user-agent', $userAgent);
+        }
 
         if (!empty($httpAuth)) {
             switch($httpAuth['httpAuthMethod']) {
                 case 'basic':
-                    $request->setAuth($httpAuth['httpAuthUsername'], $httpAuth['httpAuthPassword'], \HTTP_Request2::AUTH_BASIC);
+                    $request->setAuth(
+                        $httpAuth['httpAuthUsername'],
+                        $httpAuth['httpAuthPassword'],
+                        \HTTP_Request2::AUTH_BASIC
+                    );
                     break;
                 case 'disgest':
-                    $request->setAuth($httpAuth['httpAuthUsername'], $httpAuth['httpAuthPassword'], \HTTP_Request2::AUTH_DIGEST);
+                    $request->setAuth(
+                        $httpAuth['httpAuthUsername'],
+                        $httpAuth['httpAuthPassword'],
+                        \HTTP_Request2::AUTH_DIGEST
+                    );
                     break;
                 case 'none':
                 default:
@@ -365,8 +406,16 @@ class JsonData {
             }
         }
 
-        foreach ($data as $name=>$value) {
-            $request->addPostParameter($name, $value);
+        if ($sendJson) {
+            $request->setHeader(
+                'Content-Type',
+                'application/json'
+            );
+            $request->setBody(json_encode($data));
+        } else {
+            foreach ($data as $name=>$value) {
+                $request->addPostParameter($name, $value);
+            }
         }
 
         if (!empty($files)) {
@@ -380,8 +429,8 @@ class JsonData {
         }
         $request->setConfig(array(
             // disable ssl peer verification
-            'ssl_verify_host' => false,
-            'ssl_verify_peer' => false,
+            'ssl_verify_host' => $secure,
+            'ssl_verify_peer' => $secure,
             // follow HTTP redirect
             'follow_redirects' => true,
             // resend original request to new location
@@ -397,9 +446,12 @@ class JsonData {
             }
         }
         if ($response->getStatus() != 200) {
-            \DBG::msg(__METHOD__.' Request failed! Status: '.$response->getStatus());
+            \DBG::msg(
+                __METHOD__.' Request failed! Status: '.$response->getStatus()
+            );
             \DBG::msg('URL: '.$url);
             \DBG::dump($data);
+            \DBG::dump($response->getBody());
             return false;
         }
 

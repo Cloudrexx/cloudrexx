@@ -138,7 +138,7 @@ class EcardManager
         $mediaBrowser->setOptions(
                                 array(
                                 'type' => 'button',
-                                'data-cx-mb-views' => 'filebrowser',
+                                'views' => 'filebrowser',
                                 'id' => 'mediabrowser_button',
                                 'style' => 'display: none;'
                                 )

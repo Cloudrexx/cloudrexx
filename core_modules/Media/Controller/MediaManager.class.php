@@ -671,13 +671,13 @@ class MediaManager extends MediaLibrary
                     \Cx\Lib\FileSystem\FileSystem::path_relative_to_root($mediaWebPath);
                     $mediaWebPath = '/'. $mediaWebPath; // Filesystem removes the beginning slash(/)
                 }
-                $file = rawurlencode($fileName);
+                $file = $fileName;
                 if ($key == 'dir') {
-                    $path = rawurlencode($mediaWebPath . $fileName . '/');
+                    $path = $mediaWebPath . $fileName . '/';
                     $previewUrl->setParam('act', null);
                     $previewUrl->setParam('file', null);
                 } elseif ($key == 'file') {
-                    $path = rawurlencode($mediaWebPath);
+                    $path = $mediaWebPath;
 
                     $filePath = $mediaPath . $fileName;
                     if ($this->_isImage($filePath)) {
@@ -688,13 +688,13 @@ class MediaManager extends MediaLibrary
                         $previewUrl->setParam('file', $file);
                     }
                 }
-                $deleteUrl->setParam('path', rawurlencode($mediaWebPath));
+                $deleteUrl->setParam('path', $mediaWebPath);
                 $deleteUrl->setParam('file', $file);
 
-                $renameUrl->setParam('path', rawurlencode($mediaWebPath));
+                $renameUrl->setParam('path', $mediaWebPath);
                 $renameUrl->setParam('file', $file);
 
-                $editUrl->setParam('path', rawurlencode($mediaWebPath));
+                $editUrl->setParam('path', $mediaWebPath);
                 $editUrl->setParam('file', $file);
 
                 if (!$image) {
@@ -794,7 +794,7 @@ class MediaManager extends MediaLibrary
             $uploader->setCallback('mediaCallbackJs');
             $uploader->setFinishedCallback(array(
                 ASCMS_CORE_MODULE_PATH . '/Media/Controller/MediaLibrary.class.php',
-                '\Cx\Core_modules\Media\Controller\MediaLibrary',
+                '\Cx\Core_Modules\Media\Controller\MediaLibrary',
                 'uploadFinished'
             ));
             $uploader->setOptions(//Set html attributes for styling or javascript.

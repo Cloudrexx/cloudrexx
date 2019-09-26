@@ -79,7 +79,7 @@ CREATE TABLE `contrexx_access_user_groups` (
   PRIMARY KEY (`group_id`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_access_user_mail` (
-  `type` enum('reg_confirm','reset_pw','user_activated','user_deactivated','new_user','user_account_invitation') NOT NULL DEFAULT 'reg_confirm',
+  `type` enum('reg_confirm','reset_pw','user_activated','user_deactivated','new_user','user_account_invitation','signup_notification', 'user_profile_modification') NOT NULL DEFAULT 'reg_confirm',
   `lang_id` tinyint(2) unsigned NOT NULL DEFAULT '0',
   `sender_mail` varchar(255) NOT NULL DEFAULT '',
   `sender_name` varchar(255) NOT NULL DEFAULT '',
@@ -273,7 +273,7 @@ CREATE TABLE `contrexx_core_mail_template` (
 CREATE TABLE `contrexx_core_data_source` (
   `id` int(11) AUTO_INCREMENT NOT NULL,
   `identifier` varchar(255) NOT NULL,
-  `options` longtext NOT NULL,
+  `options` longtext NOT NULL COMMENT '(DC2Type:array)',
   `type` varchar(50) NOT NULL,
   PRIMARY KEY(`id`),
   UNIQUE KEY `identifier` (`identifier`)
@@ -309,9 +309,10 @@ CREATE TABLE `contrexx_core_modules_access_permission` (
   `id` int(11) AUTO_INCREMENT NOT NULL,
   `allowed_protocols` longtext NOT NULL COMMENT '(DC2Type:array)',
   `allowed_methods` longtext NOT NULL COMMENT '(DC2Type:array)',
-  `requires_login` tinyint(1) DEFAULT NULL,
-  `valid_user_groups` longtext DEFAULT NULL COMMENT '(DC2Type:array)',
-  `valid_access_ids` longtext DEFAULT NULL COMMENT '(DC2Type:array)',
+  `requires_login` tinyint(1) NOT NULL,
+  `valid_user_groups` longtext NOT NULL COMMENT '(DC2Type:array)',
+  `valid_access_ids` longtext NOT NULL COMMENT '(DC2Type:array)',
+  `callback` longtext NOT NULL COMMENT '(DC2Type:array)',
   PRIMARY KEY(`id`)
 ) ENGINE = InnoDB;
 CREATE TABLE `contrexx_core_module_data_access` (
@@ -525,6 +526,7 @@ CREATE TABLE `contrexx_core_wysiwyg_template` (
   `imagePath` varchar(255) NOT NULL,
   `htmlContent` text,
   `active` tinyint(4) NOT NULL DEFAULT '1',
+  `order` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_core_wysiwyg_toolbar` (
@@ -1047,7 +1049,8 @@ CREATE TABLE `contrexx_module_contact_form_data` (
   `lang` varchar(64) NOT NULL DEFAULT '',
   `browser` varchar(255) NOT NULL DEFAULT '',
   `ipaddress` varchar(15) NOT NULL DEFAULT '',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  INDEX `id_form` (`id_form`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_module_contact_form_field` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -1057,7 +1060,8 @@ CREATE TABLE `contrexx_module_contact_form_field` (
   `is_required` set('0','1') NOT NULL DEFAULT '0',
   `check_type` int(3) NOT NULL DEFAULT '1',
   `order_id` smallint(5) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  INDEX `id_form` (`id_form`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_module_contact_form_field_lang` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -1136,7 +1140,7 @@ CREATE TABLE `contrexx_module_crm_contacts` (
   `contact_customer` int(11) DEFAULT NULL,
   `contact_language` int(11) DEFAULT NULL,
   `gender` tinyint(2) NOT NULL,
-  `salutation` int(11) NOT NULL,
+  `salutation` int(11) NOT NULL DEFAULT '0',
   `notes` text,
   `industry_type` int(11) DEFAULT NULL,
   `contact_type` tinyint(2) DEFAULT NULL,
@@ -2235,11 +2239,25 @@ CREATE TABLE `contrexx_module_jobs_categories` (
   `sort_style` enum('alpha','date','date_alpha') NOT NULL DEFAULT 'alpha',
   PRIMARY KEY (`catid`)
 ) ENGINE=InnoDB ;
+CREATE TABLE `contrexx_module_jobs_flag` (
+  `id` int NOT NULL AUTO_INCREMENT ,
+  `name` varchar(255) NOT NULL DEFAULT '',
+  `icon` text NOT NULL,
+  `value` text NOT NULL,
+  PRIMARY KEY(`id`)
+) ENGINE = InnoDB;
 CREATE TABLE `contrexx_module_jobs_location` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB ;
+CREATE TABLE `contrexx_module_jobs_rel_flag_job` (
+  `job` int(6) unsigned NOT NULL,
+  `flag` int NOT NULL,
+  PRIMARY KEY (`job`,`flag`),
+  CONSTRAINT `contrexx_module_jobs_rel_flag_job_ibfk_1` FOREIGN KEY (`job`) REFERENCES `contrexx_module_jobs` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `contrexx_module_jobs_rel_flag_job_ibfk_2` FOREIGN KEY (`flag`) REFERENCES `contrexx_module_jobs_flag` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB;
 CREATE TABLE `contrexx_module_jobs_rel_loc_jobs` (
   `job` int(10) unsigned NOT NULL DEFAULT '0',
   `location` int(10) unsigned NOT NULL DEFAULT '0',
@@ -2741,6 +2759,7 @@ CREATE TABLE `contrexx_module_news_categories` (
   `right_id` int(11) NOT NULL,
   `sorting` int(11) NOT NULL,
   `level` int(11) NOT NULL,
+  `display` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`catid`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_module_news_categories_catid` (
@@ -3172,7 +3191,7 @@ CREATE TABLE `contrexx_module_repository` (
   `displaystatus` set('on','off') NOT NULL DEFAULT 'on',
   `username` varchar(250) NOT NULL DEFAULT '',
   `displayorder` smallint(6) NOT NULL DEFAULT '100',
-  UNIQUE KEY `contentid` (`id`),
+  PRIMARY KEY  (`id`),
   FULLTEXT KEY `fulltextindex` (`title`,`content`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_module_shop_article_group` (
@@ -3325,6 +3344,7 @@ CREATE TABLE `contrexx_module_shop_payment` (
   `processor_id` int(10) unsigned NOT NULL DEFAULT '0',
   `fee` decimal(9,2) unsigned NOT NULL DEFAULT '0.00',
   `free_from` decimal(9,2) unsigned NOT NULL DEFAULT '0.00',
+  `type` enum('fix','percent') NOT NULL DEFAULT 'fix',
   `ord` int(5) unsigned NOT NULL DEFAULT '0',
   `active` tinyint(1) unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`)

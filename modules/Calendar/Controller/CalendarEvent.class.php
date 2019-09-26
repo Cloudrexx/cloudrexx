@@ -344,6 +344,15 @@ class CalendarEvent extends CalendarLibrary
     );
 
     /**
+     * Whether this event is a regular event (or recurrence according to the
+     * series configuration) or if the event is a manually added additional
+     * recurrence.
+     *
+     * @var boolean TRUE if event is a manually added recurrence
+     */
+    public $isAdditionalRecurrence = false;
+
+    /**
      * Event languages to show
      *
      * @access public
@@ -760,7 +769,7 @@ class CalendarEvent extends CalendarLibrary
      * @return null
      */
     function get($eventId, $eventStartDate=null, $langId=null) {
-        global $objDatabase, $_ARRAYLANG, $_LANGID, $objInit;
+        global $objDatabase, $_LANGID;
 
         $this->getSettings();
 
@@ -957,7 +966,40 @@ class CalendarEvent extends CalendarLibrary
                     $this->seriesData['seriesPatternExceptions'] = $seriesPatternExceptions;
                     $seriesAdditionalRecurrences = array();
                     if (!\FWValidator::isEmpty($objResult->fields['series_additional_recurrences'])) {
-                        $seriesAdditionalRecurrences = array_map(array($this, 'getInternDateTimeFromDb'), (array) explode(",", $objResult->fields['series_additional_recurrences']));
+                        // create array of manually added recurrences as
+                        // DateTime objects from comma-separated db-field
+                        $seriesAdditionalRecurrences = array_map(
+                            function($recurrence) {
+                                // convert db-timestamp notation into datetime
+                                $recurrenceDate = $this->getInternDateTimeFromDb($recurrence);
+
+                                // ensure time is correctly set for recurrence dates
+                                if ($this->all_day) {
+                                    // Forcely set time to 00:00 for all-day
+                                    // recurrence events.
+                                    // This is a fix to ensure old all-day
+                                    // recurrence dates that have been stored
+                                    // without a time-information are correct
+                                    $recurrenceDate->setTime(0, 0);
+
+                                // check if non-all-day recurrence event
+                                // contains time information
+                                } elseif (strpos($recurrence, ' ') === false) {
+                                    // recurrence is lacking time information,
+                                    // so let's set the event's start time as
+                                    // recurrence time
+                                    $recurrenceDate->setTime(
+                                        $this->startDate->format('H'),
+                                        $this->startDate->format('i')
+                                    );
+                                }
+                                return $recurrenceDate;
+                            },
+                            (array) explode(
+                                ',',
+                                $objResult->fields['series_additional_recurrences']
+                            )
+                        );
                     }
                     $this->seriesData['seriesAdditionalRecurrences'] = $seriesAdditionalRecurrences;
                 } else {
@@ -1019,7 +1061,7 @@ class CalendarEvent extends CalendarLibrary
      * @return null
      */
     function getData() {
-        global $objDatabase, $_ARRAYLANG, $_LANGID;
+        global $objDatabase;
 
         $activeLangs = explode(",", $this->showIn);
         $this->arrData = array();
@@ -1068,7 +1110,7 @@ class CalendarEvent extends CalendarLibrary
      * @return boolean true if saved successfully, false otherwise
      */
     function save($data){
-        global $objDatabase, $_LANGID, $_CONFIG, $objInit;
+        global $objDatabase, $_LANGID, $objInit;
 
         $this->getSettings();
 
@@ -1090,16 +1132,16 @@ class CalendarEvent extends CalendarLibrary
             }
         }
 
-        list($startDate, $strStartTime) = explode(' ', $data['startDate']);
-        list($startHour, $startMin)     = explode(':', $strStartTime);
-
-        list($endDate, $strEndTime)     = explode(' ', $data['endDate']);
-        list($endHour, $endMin)         = explode(':', $strEndTime);
-
-        if (!empty($data['all_day'])) {
-            list($startHour, $startMin) = array(0, 0);
-            list($endHour, $endMin)     = array(23, 59);;
-        }
+        // fetch event's start and end
+        list($startDate, $startHour, $startMin) = $this->parseDateTimeString(
+            $data['startDate'],
+            !empty($data['all_day'])
+        );
+        list($endDate, $endHour, $endMin) = $this->parseDateTimeString(
+            $data['endDate'],
+            !empty($data['all_day']),
+            true
+        );
 
         //event data
         $id            = isset($data['copy']) && !empty($data['copy']) ? 0 : (isset($data['id']) ? intval($data['id']) : 0);
@@ -1223,6 +1265,7 @@ class CalendarEvent extends CalendarLibrary
         $excludedCrmGroups         = isset($data['calendar_event_excluded_crm_memberships']) ? join(',', $data['calendar_event_excluded_crm_memberships']) : '';
         $invited_mails             = isset($data['invitedMails']) ? contrexx_addslashes(contrexx_strip_tags($data['invitedMails'])) : '';
         $send_invitation           = isset($data['sendInvitation']) ? intval($data['sendInvitation']) : 0;
+        $sendInvitationTo         = isset($data['sendMailTo']) ? contrexx_input2raw($data['sendMailTo']) : CalendarMailManager::MAIL_INVITATION_TO_ALL;
         $invitationTemplate        = isset($data['invitationEmailTemplate']) ? contrexx_input2raw($data['invitationEmailTemplate']) : array();
         $registration              =   isset($data['registration']) && in_array($data['registration'], array(self::EVENT_REGISTRATION_NONE, self::EVENT_REGISTRATION_INTERNAL, self::EVENT_REGISTRATION_EXTERNAL))
                                      ? intval($data['registration']) : 0;
@@ -1266,14 +1309,15 @@ class CalendarEvent extends CalendarLibrary
             }
         }
 
+        $validUriScheme = '%^(?:(?:ftp|http|https)://|\[\[|//)%';
         if (!empty($placeWebsite)) {
-            if (!preg_match('%^(?:ftp|http|https):\/\/%', $placeWebsite)) {
+            if (!preg_match($validUriScheme, $placeWebsite)) {
                 $placeWebsite = "http://".$placeWebsite;
             }
         }
 
         if (!empty($placeLink)) {
-            if (!preg_match('%^(?:ftp|http|https):\/\/%', $placeLink)) {
+            if (!preg_match($validUriScheme, $placeLink)) {
                 $placeLink = "http://".$placeLink;
             }
         }
@@ -1298,13 +1342,13 @@ class CalendarEvent extends CalendarLibrary
         $orgEmail  = isset($data['organizerEmail']) ? contrexx_input2raw($data['organizerEmail']) : '';
 
         if (!empty($orgWebsite)) {
-            if (!preg_match('%^(?:ftp|http|https):\/\/%', $orgWebsite)) {
+            if (!preg_match($validUriScheme, $orgWebsite)) {
                 $orgWebsite = "http://".$orgWebsite;
             }
         }
 
         if (!empty($orgLink)) {
-            if (!preg_match('%^(?:ftp|http|https):\/\/%', $orgLink)) {
+            if (!preg_match($validUriScheme, $orgLink)) {
                 $orgLink = "http://".$orgLink;
             }
         }
@@ -1400,10 +1444,56 @@ class CalendarEvent extends CalendarLibrary
             if (!empty($data['additionalRecurrences'])) {
                 $additionalRecurrenceDates = array();
                 foreach ($data['additionalRecurrences'] as $additionalRecurrence) {
-                    $additionalRecurrenceDates[] = $this->getDbDateTimeFromIntern($this->getDateTime($additionalRecurrence, 23, 59))->format('Y-m-d');
+                    // ensure time is correctly set for recurrence date
+                    if ($allDay) {
+                        $hour = 0;
+                        $minute = 0;
+                    } else
+                        // check if non-all-day recurrence event
+                        // contains time information
+                    if (strpos($additionalRecurrence, ' ') === false) {
+                        // recurrence is lacking time information,
+                        // so let's set the event's start time as
+                        // recurrence time
+                        $hour = $startHour;
+                        $minute = $startMin;
+                    } else {
+                        $recurrenceData = explode(' ', $additionalRecurrence);
+                        $additionalRecurrence = $recurrenceData[0];
+                        $recurrenceTime = explode(':', $recurrenceData[1]);
+                        $hour = $recurrenceTime[0];
+                        $minute = $recurrenceTime[1];
+                    }
+
+                    // convert into db-timestamp format
+                    $additionalRecurrenceDate =
+                        $this->getDbDateTimeFromIntern(
+                            $this->getDateTime(
+                                $additionalRecurrence,
+                                $hour,
+                                $minute
+                            )
+                        )->format('Y-m-d H:i');
+
+                    // ignore additional recurrences that start before the
+                    // start-date of the event as those are not supported
+                    if ($additionalRecurrenceDate <= $startDate) {
+                        continue;
+                    }
+
+                    // add additional recurrence as DateTime
+                    $additionalRecurrenceDates[] = $additionalRecurrenceDate;
                 }
                 sort($additionalRecurrenceDates);
-                $seriesAdditionalRecurrences = join(",", $additionalRecurrenceDates);
+
+                // create comma-separated list of manually added recurrences
+                // for db storage
+                $seriesAdditionalRecurrences = join(
+                    ',',
+                    array_unique(
+                        $additionalRecurrenceDates
+                    )
+                );
             }
             switch($seriesType) {
                 case 1;
@@ -1571,6 +1661,14 @@ class CalendarEvent extends CalendarLibrary
         $event       = $this->getEventEntity($id, $formDatas);
         $eId         = $id;
         if ($id != 0) {
+            // In frontend, the status can not be changed.
+            // As only active events can be edited in frontend,
+            // the status must always be set to 1 in that case.
+            if ($this->cx->getMode() == $this->cx::MODE_FRONTEND) {
+                $status = 1;
+                $formData['status'] = $status;
+            }
+
             //Trigger preUpdate event for Event Entity
             $this->triggerEvent(
                 'model/preUpdate', $event,
@@ -1715,7 +1813,13 @@ class CalendarEvent extends CalendarLibrary
             // TO-DO set form data into $this
             $legacyEvent    = new CalendarEvent($this->id);
             $objMailManager = new \Cx\Modules\Calendar\Controller\CalendarMailManager();
-            $objMailManager->sendMail($legacyEvent, \Cx\Modules\Calendar\Controller\CalendarMailManager::MAIL_INVITATION, null, $invitationTemplate);
+            $objMailManager->sendMail(
+                $legacyEvent,
+                \Cx\Modules\Calendar\Controller\CalendarMailManager::MAIL_INVITATION,
+                null,
+                $invitationTemplate,
+                $sendInvitationTo
+            );
         }
         foreach ($event->getInvite() as $invite) {
             $em->detach($invite);
@@ -1808,20 +1912,21 @@ class CalendarEvent extends CalendarLibrary
         return $eventFields;
     }
 
-    function loadEventFromPost($data)
+    function loadEventFromData($data)
     {
-        list($startDate, $strStartTime) = explode(' ', $data['startDate']);
-        list($startHour, $startMin)     = explode(':', $strStartTime);
-
-        list($endDate, $strEndTime)     = explode(' ', $data['endDate']);
-        list($endHour, $endMin)         = explode(':', $strEndTime);
+        // fetch event's start and end
+        list($startDate, $startHour, $startMin) = $this->parseDateTimeString(
+            $data['startDate']
+        );
+        list($endDate, $endHour, $endMin) = $this->parseDateTimeString(
+            $data['endDate'],
+            false,
+            true
+        );
 
         //event data
-        $startDate     = $this->getDateTime($startDate, intval($startHour), intval($startMin));
-        $endDate       = $this->getDateTime($endDate, intval($endHour), intval($endMin));
-
-        $this->startDate = $startDate;
-        $this->endDate   = $endDate;
+        $this->startDate = $this->getDateTime($startDate, intval($startHour), intval($startMin));
+        $this->endDate = $this->getDateTime($endDate, intval($endHour), intval($endMin));
 
         //series pattern
         $seriesStatus = isset($data['seriesStatus']) ? intval($data['seriesStatus']) : 0;
@@ -2237,8 +2342,6 @@ class CalendarEvent extends CalendarLibrary
      */
     static function getEventSearchQuery($term)
     {
-        global $_LANGID;
-
         $query = "SELECT event.`id` AS `id`,
                          event.`startdate`,
                          field.`title` AS `title`,
@@ -2248,7 +2351,7 @@ class CalendarEvent extends CalendarLibrary
                          MATCH (field.`title`, field.`teaser`, field.`description`) AGAINST ('%$term%') AS `score`
                     FROM ".DBPREFIX."module_calendar_event AS event,
                          ".DBPREFIX."module_calendar_event_field AS field
-                   WHERE   (event.id = field.event_id AND field.lang_id = '".intval($_LANGID)."')
+                   WHERE   (event.id = field.event_id AND field.lang_id = '".FRONTEND_LANG_ID."')
                        AND event.status = 1
                        AND (   field.title LIKE ('%$term%')
                             OR field.teaser LIKE ('%$term%')
@@ -2361,8 +2464,6 @@ class CalendarEvent extends CalendarLibrary
      */
     function loadPlaceLinkFromMediadir($intMediaDirId = 0, $type = 'place')
     {
-        global $_LANGID, $_CONFIG;
-
         $placeUrl       = '';
         $placeUrlSource = '';
 
@@ -2547,6 +2648,91 @@ class CalendarEvent extends CalendarLibrary
         $this->freePlaces = $freePlaces < 0 ? 0 : $freePlaces;
 
         $this->registrationCalculated = true;
+    }
+
+    /**
+     * Return the registered mail addresses as MailRecipients
+     *
+     * @return array        the mail recipients
+     */
+    public function getRegistrationMailRecipients()
+    {
+
+        $queryRegistration = '
+            SELECT DISTINCT `reg_form_val`.`reg_id`, `reg_form_field`.`type`, 
+              `reg_form_val`.`value`, `invite`.`invitee_type`, `invite`.`invitee_id`
+              FROM `' . DBPREFIX . 'module_calendar_registration` AS `reg`
+                
+                LEFT JOIN `' . DBPREFIX . 'module_calendar_invite` AS `invite`
+                ON `reg`.`invite_id` = `invite`.`id`
+                
+                LEFT JOIN `' . DBPREFIX . 'module_calendar_registration_form_field` as `reg_form_field` 
+                ON `reg_form_field`.`form` = ' . contrexx_input2int($this->registrationForm) . '
+                
+                LEFT JOIN `' . DBPREFIX . 'module_calendar_registration_form_field_value` as `reg_form_val`
+                ON `reg_form_field`.`id` = `reg_form_val`.`field_id` AND `reg_form_val`.`reg_id` = `reg`.`id`
+                  
+                WHERE `reg`.`event_id` = ' . $this->id . ' 
+                AND `reg`.`type` = 1';
+        $database = \Cx\Core\Core\Controller\Cx::instanciate()->getDb()->getAdoDb();
+        $objRegistration = $database->Execute($queryRegistration);
+
+        $recipientsData = array();
+        $mailRecipients = array();
+        if (!$objRegistration) {
+            return $mailRecipients;
+        }
+        while (!$objRegistration->EOF) {
+
+            $regId = $objRegistration->fields['reg_id'];
+            $type = $objRegistration->fields['type'];
+
+            if (!isset($recipientsData[$regId])) {
+                $recipientsData[$regId] = array();
+            }
+
+            $recipientsData[$regId][$type] =
+                $objRegistration->fields['value'];
+            $recipientsData[$regId]['type'] =
+                $objRegistration->fields['invitee_type'];
+            $recipientsData[$regId]['invitee_id'] =
+                $objRegistration->fields['invitee_id'];
+
+            $objRegistration->MoveNext();
+        }
+
+
+        foreach ($recipientsData as $recipientData) {
+            $lang = null;
+
+            // if the recipient is a crm or access user, get its language
+            if ($recipientData['type'] == MailRecipient::RECIPIENT_TYPE_CRM_CONTACT) {
+                $contact = new \Cx\Modules\Crm\Model\Entity\CrmContact();
+                if ($contact->load($recipientData['invitee_id'])) {
+                    $lang = $contact->contact_language;
+                }
+            } elseif ($recipientData['type'] == MailRecipient::RECIPIENT_TYPE_ACCESS_USER) {
+                $user =
+                    \FWUser::getFWUserObject()->objUser->getUser(
+                        $recipientData['invitee_id']
+                    );
+                if ($user) {
+                    $lang = $user->getFrontendLanguage();
+                }
+            }
+
+            $recipient = new MailRecipient();
+            $recipient->setId(isset($recipientData['invitee_id']) ? $recipientData['invitee_id'] : 0);
+            $recipient->setLang($lang);
+            $recipient->setAddress(isset($recipientData['mail']) ? $recipientData['mail'] : '');
+            $recipient->setType(isset($recipientData['type']) ? $recipientData['type'] : '');
+            $recipient->setFirstname(isset($recipientData['firstname']) ? $recipientData['firstname'] : '');
+            $recipient->setLastname(isset($recipientData['lastname']) ? $recipientData['lastname'] : '');
+            $recipient->setUsername(isset($recipientData['mail']) ? $recipientData['mail'] : '');
+            $mailRecipients[] = $recipient;
+        }
+
+        return $mailRecipients;
     }
 
     /**

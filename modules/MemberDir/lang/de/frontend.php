@@ -38,4 +38,5 @@ $_ARRAYLANG['TXT_SEARCH'] = "Suchen";
 $_ARRAYLANG['TXT_OVERVIEW'] = "Übersicht";
 $_ARRAYLANG['TXT_SUBDIRECTORIES'] = "Unterverzeichnisse";
 $_ARRAYLANG['TXT_MEMBERDIR_EXPORT_CONTACT_AS_VCARD'] = "Kontakt als VCard exportieren";
+$_ARRAYLANG['TXT_MEMBERDIR_ENTRIES'] = "Einträge";
 ?>

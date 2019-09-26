@@ -508,7 +508,7 @@ class CalendarCategory extends CalendarLibrary
             $startDate = null;
         }
 
-        $objEventManager = new \Cx\Modules\Calendar\Controller\CalendarEventManager($startDate, $endDate, $this->id, $searchTerm, true, false, $onlyActive);
+        $objEventManager = new \Cx\Modules\Calendar\Controller\CalendarEventManager($startDate, $endDate, $this->id, $searchTerm, false, false, $onlyActive);
         $objEventManager->getEventList();
         $count = count($objEventManager->eventList);
 

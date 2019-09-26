@@ -57,7 +57,7 @@ class Request {
     /**
      * Resolved url object
      *
-     * @var object
+     * @var \Cx\Core\Routing\Url
      */
     protected $url;
 
@@ -116,7 +116,7 @@ class Request {
     /**
      * Get the resolved url object
      *
-     * @return Object
+     * @return \Cx\Core\Routing\Url
      */
     public function getUrl() {
         return $this->url;

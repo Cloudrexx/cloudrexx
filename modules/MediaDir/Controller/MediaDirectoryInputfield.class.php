@@ -552,7 +552,8 @@ class MediaDirectoryInputfield extends MediaDirectoryLibrary
                                     // Set placeholder prefix according to configured option $this->moduleLangVar
                                     if ($this->moduleLangVar != 'MEDIADIR') {
                                         foreach ($arrInputfieldContent as $key => $value) {
-                                            $arrInputfieldContent[preg_replace('/^MEDIADIR/', $this->moduleLangVar, $key)] = $value;
+                                            $arrInputfieldContent[preg_replace('/^(TXT_)?MEDIADIR/', '\1' . $this->moduleLangVar, $key)] = $value;
+                                            unset($arrInputfieldContent[$key]);
                                         }
                                     }
 
@@ -1318,7 +1319,7 @@ EOF;
                 $strPlaceholders = null;
 
                 foreach ($arrPlaceholders as $strPlaceholder) {
-                    $strPlaceholders .= '[['.strtoupper($strPlaceholder).']]&nbsp;';
+                    $strPlaceholders .= '<li>[['.strtoupper($strPlaceholder).']]</li>';
                 }
 
 

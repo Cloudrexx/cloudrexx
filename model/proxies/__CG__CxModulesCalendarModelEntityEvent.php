@@ -753,9 +753,9 @@ class Event extends \Cx\Modules\Calendar\Model\Entity\Event implements \Doctrine
     public function setExcludedCrmGroups($excludedCrmGroups)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setInvitedCrmGroups', array($excludedCrmGroups));
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setExcludedCrmGroups', array($excludedCrmGroups));
 
-        return parent::setInvitedCrmGroups($excludedCrmGroups);
+        return parent::setExcludedCrmGroups($excludedCrmGroups);
     }
 
     /**

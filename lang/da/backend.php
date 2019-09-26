@@ -137,7 +137,6 @@ $_ARRAYLANG['TXT_PAGING_OUT_OF'] = "fra";
 $_ARRAYLANG['TXT_PAGING_TO'] = "til";
 $_ARRAYLANG['TXT_FIRST_NAME'] = "Fornavn";
 $_ARRAYLANG['TXT_PASSWORD_FIELD_EMPTY'] = "Hvis kodeord feltet bliver tom, så bibeholdes det nuværende kodeord! ";
-$_ARRAYLANG['TXT_PASSWORD_MD5_ENCRYPTED'] = "Kodeordet bliver krypteret med MD5 logarrtmen.";
 $_ARRAYLANG['TXT_VALUE'] = "Værdi";
 $_ARRAYLANG['TXT_SIZE'] = "Filstørrelse";
 $_ARRAYLANG['TXT_DATABASE_QUERY_ERROR'] = "Der er opstået en fejl under hentningen af databasen!";

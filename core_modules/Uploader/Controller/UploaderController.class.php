@@ -142,7 +142,7 @@ class UploaderController {
         $conf = self::$conf = array_merge(array(
             'file_data_name' => 'file',
             'tmp_dir' => $session->getTempPath(),
-            'target_dir' => 'images/content/',
+            'target_dir' => $session->getTempPath(),
             'cleanup' => true,
             'max_file_age' => 5 * 3600,
             'chunk' => isset($_REQUEST['chunk']) ? intval($_REQUEST['chunk']) : 0,
@@ -221,27 +221,11 @@ class UploaderController {
 
                 \Cx\Lib\FileSystem\FileSystem::move($tmp_path, $new_path, true);
 
-                $rootPath      = $cx->getWebsitePath() . $conf['target_dir'];
-                $rootPathFull  = $cx->getWebsitePath() . $new_path;
-                $filePathinfo  = pathinfo($rootPathFull);
-                $fileExtension = $filePathinfo['extension'];
-                $fileNamePlain = $filePathinfo['filename'];
-
+                // verify orientation of images
                 $im = new \ImageManager();
-                if ($im->_isImage($rootPathFull)) {
-                    foreach (
-                        $cx->getMediaSourceManager()
-                            ->getThumbnailGenerator()
-                            ->getThumbnails() as
-                        $thumbnail
-                    ) {
-                        $im->_createThumb(
-                            $rootPath, $conf['target_dir'], $fileName,
-                            $thumbnail['size'], $thumbnail['quality'],
-                            $fileNamePlain . $thumbnail['value'] . '.'
-                            . $fileExtension
-                        );
-                    }
+                if ($im->_isImage($new_path)) {
+                    // Fix an image orientation
+                    $im->fixImageOrientation($new_path);
                 }
 
                 return array(
@@ -352,34 +336,6 @@ class UploaderController {
     }
 
     /**
-     * Send cors headers
-     *
-     * @param array  $headers
-     * @param string $origin
-     */
-    static function corsHeaders($headers = array(), $origin = '*') {
-        $allow_origin_present = false;
-
-        if (!empty($headers)) {
-            foreach ($headers as $header => $value) {
-                if (strtolower($header) == 'access-control-allow-origin') {
-                    $allow_origin_present = true;
-                }
-                header("$header: $value");
-            }
-        }
-
-        if ($origin && !$allow_origin_present) {
-            header("Access-Control-Allow-Origin: $origin");
-        }
-
-        // other CORS headers if any...
-        if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-            exit; // finish preflight CORS requests here
-        }
-    }
-
-    /**
      * Cleanup method
      */
     protected static function cleanup() {
@@ -440,5 +396,4 @@ class UploaderController {
         }
         rmdir($dir);
     }
-
 }

@@ -137,7 +137,6 @@ $_ARRAYLANG['TXT_PAGING_OUT_OF'] = "из";
 $_ARRAYLANG['TXT_PAGING_TO'] = "до";
 $_ARRAYLANG['TXT_FIRST_NAME'] = "Имя";
 $_ARRAYLANG['TXT_PASSWORD_FIELD_EMPTY'] = "Если поле, предназначенное для пароля останется незаполненным, будет сохранён старый пароль!";
-$_ARRAYLANG['TXT_PASSWORD_MD5_ENCRYPTED'] = "Пароль будет зашифрован с помощью MD5-логаритма";
 $_ARRAYLANG['TXT_VALUE'] = "Ценность";
 $_ARRAYLANG['TXT_SIZE'] = "Размер файла";
 $_ARRAYLANG['TXT_DATABASE_QUERY_ERROR'] = "Ошибка при осуществлении запроса в банк данных!";

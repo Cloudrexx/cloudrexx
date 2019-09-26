@@ -125,6 +125,9 @@ class Permission extends \Cx\Model\Base\EntityBase {
      * @param Boolean $requiresLogin
      */
     public function __construct($allowedProtocols = array('http', 'https'), $allowedMethods = array('get', 'post'), $requiresLogin = true, $validUserGroups = array(), $validAccessIds = array(), $callback = null) {
+        if ($callback && !($callback instanceof Callback)) {
+            $callback = new Callback($callback);
+        }
         if (!$allowedProtocols) {
             $allowedProtocols = array('http', 'https');
         }
@@ -140,7 +143,9 @@ class Permission extends \Cx\Model\Base\EntityBase {
             $this->requiresLogin = true;
         }
         $this->setVirtual(true);
-        $this->setCallback($callback);
+        if ($callback) {
+            $this->setCallback($callback);
+        }
         $this->readDataAccesses  = new \Doctrine\Common\Collections\ArrayCollection();
         $this->writeDataAccesses = new \Doctrine\Common\Collections\ArrayCollection();
     }
@@ -345,12 +350,11 @@ class Permission extends \Cx\Model\Base\EntityBase {
      * Set the callback
      * Callback may only be used for virtual instances
      *
-     * @param mixed array|string $callback
+     * @param Callback $callback
      */
-    public function setCallback($callback)
+    public function setCallback(Callback $callback)
     {
-        //Use callback only for virtual instances otherwise throw exception
-        if (!$this->isVirtual() && $callback) {
+        if (!$this->isVirtual() && !$callback->isSerializable()) {
             throw new PermissionException('Permission::setCallback() failed: Could not set callback for non-virtual instance.');
         }
         $this->callback = $callback;
@@ -359,10 +363,17 @@ class Permission extends \Cx\Model\Base\EntityBase {
     /**
      * Get the callback
      *
-     * @return mixed array|string
+     * @return Callback Callback for custom permission management
      */
     public function getCallback()
     {
+        if ($this->callback && !($this->callback instanceof Callback)) {
+            try {
+                $this->callback = new Callback($this->callback);
+            } catch (CallbackException $e) {
+                $this->callback = null;
+            }
+        }
         return $this->callback;
     }
 
@@ -375,7 +386,7 @@ class Permission extends \Cx\Model\Base\EntityBase {
     public function setVirtual($virtual)
     {
         //While setting instance as non-virtual, check the instance have callback if so throw exception
-        if ($this->callback && !$virtual) {
+        if ($this->callback && !$this->callback->isSerializable() && !$virtual) {
             throw new PermissionException('Permission::setVirtual() failed: Could not set instance as non-virtual since instance contains callback.');
         }
         parent::setVirtual($virtual);
@@ -384,6 +395,7 @@ class Permission extends \Cx\Model\Base\EntityBase {
     /**
      * Check the permissions(Is allowed protocol, Is allowed method, user's group access, user's login status)
      *
+     * @param array $params Params to pass to callback (if any)
      * @return boolean
      */
     public function hasAccess(array $params = array()) {
@@ -411,7 +423,7 @@ class Permission extends \Cx\Model\Base\EntityBase {
         }
 
         //callback function check
-        if (isset($this->callback) && call_user_func($this->callback, $params) !== true) {
+        if ($this->getCallback() && call_user_func($this->getCallback(), $params) !== true) {
             return false;
         }
 

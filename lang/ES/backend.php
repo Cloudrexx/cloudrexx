@@ -135,7 +135,6 @@ $_ARRAYLANG['TXT_THUMBNAIL_GALLERY'] = "Galer&iacute;a de im&aacute;genes";
 $_ARRAYLANG['TXT_FROM'] = "desde";
 $_ARRAYLANG['TXT_FIRST_NAME'] = "Nombre";
 $_ARRAYLANG['TXT_PASSWORD_FIELD_EMPTY'] = "Si el campo de la contrase&ntilde;a permanece vac&iacute;o, se mantendr&aacut;e la contrase&ntilde;a actual";
-$_ARRAYLANG['TXT_PASSWORD_MD5_ENCRYPTED'] = "La clave esta codificada mediante el algoritmo MD5";
 $_ARRAYLANG['TXT_VALUE'] = "Valor";
 $_ARRAYLANG['TXT_SIZE'] = "Tama&ntilde;o del fichero";
 $_ARRAYLANG['TXT_DATABASE_QUERY_ERROR'] = "\¡Error en la consulta a la base de datos!";

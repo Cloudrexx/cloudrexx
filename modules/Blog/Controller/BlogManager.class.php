@@ -701,8 +701,8 @@ class BlogManager extends \Cx\Modules\Blog\Controller\BlogLibrary {
 
         $options = array(
             'type'                      => 'button',
-            'data-cx-mb-views'          => 'filebrowser',
-            'data-cx-mb-startmediatype' => 'blog',
+            'views'                     => 'filebrowser',
+            'startmediatype'            => 'blog',
             'id'                        => 'mediabrowser_button',
             'style'                     => 'display:none'
         );
@@ -897,8 +897,8 @@ class BlogManager extends \Cx\Modules\Blog\Controller\BlogLibrary {
 
         $options = array(
             'type'                      => 'button',
-            'data-cx-mb-views'          => 'filebrowser',
-            'data-cx-mb-startmediatype' => 'blog',
+            'views'                     => 'filebrowser',
+            'startmediatype'            => 'blog',
             'id'                        => 'mediabrowser_button',
             'style'                     => 'display:none'
         );
@@ -1856,8 +1856,8 @@ class BlogManager extends \Cx\Modules\Blog\Controller\BlogLibrary {
         $options = array(
                         'type'                      => 'button',
                         'id'                        => 'mediabrowser_button',
-                        'data-cx-mb-views'          => 'filebrowser',
-                        'data-cx-mb-startmediatype' => 'blog'
+                        'views'                     => 'filebrowser',
+                        'startmediatype'            => 'blog'
                     );
         $mediaBrowser = self::getMediaBrowserButton($_ARRAYLANG['TXT_BLOG_NETWORKS_ADD_BROWSE'], $options, 'blogSetUrl');
 
@@ -1959,8 +1959,8 @@ class BlogManager extends \Cx\Modules\Blog\Controller\BlogLibrary {
         $options = array(
                         'type'                      => 'button',
                         'id'                        => 'mediabrowser_button',
-                        'data-cx-mb-views'          => 'filebrowser',
-                        'data-cx-mb-startmediatype' => 'blog'
+                        'views'                     => 'filebrowser',
+                        'startmediatype'            => 'blog'
                     );
         $mediaBrowser = self::getMediaBrowserButton($_ARRAYLANG['TXT_BLOG_NETWORKS_ADD_BROWSE'], $options, 'blogSetUrl');
 

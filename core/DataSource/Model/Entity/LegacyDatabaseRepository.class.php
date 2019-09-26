@@ -47,6 +47,57 @@ namespace Cx\Core\DataSource\Model\Entity;
 class LegacyDatabaseRepository extends DataSource {
 
     /**
+     * Field list cache
+     * @var array List of fields
+     */
+    protected $fieldList = array();
+
+    /**
+     * Identifier field list cache
+     * @var array List of fields
+     */
+    protected $identifierFieldList = array();
+
+    /**
+     * Returns a list of field names this DataSource consists of
+     * @return array List of field names
+     */
+    public function listFields() {
+        if (!count($this->fieldList)) {
+            $this->initializeFields();
+        }
+        return $this->fieldList;
+    }
+
+    /**
+     * Initialize field caches
+     */
+    protected function initializeFields() {
+        $tableName = DBPREFIX . $this->getIdentifier();
+        $result = $this->cx->getDb()->getAdoDb()->query(
+            'SHOW COLUMNS FROM `' . $tableName . '`'
+        );
+        while (!$result->EOF) {
+            $this->fieldList[] = $result->fields['Field'];
+            if ($result->fields['Key'] == 'PRI') {
+                $this->identifierFieldList[] = $result->fields['Field'];
+            }
+            $result->MoveNext();
+        }
+        return $this->fieldList;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getIdentifierFieldNames() {
+        if (!count($this->identifierFieldList)) {
+            $this->initializeFields();
+        }
+        return $this->identifierFieldList;
+    }
+
+    /**
      * Gets one or more entries from this DataSource
      *
      * If an argument is not provided, no restriction is made for this argument.
@@ -74,8 +125,13 @@ class LegacyDatabaseRepository extends DataSource {
         $whereList = array();
 
         // $filter
-        if (count($filter)) {
-            foreach ($filter as $field => $value) {
+        foreach ($filter as $field => $filterExpr) {
+            foreach ($filterExpr as $operation=>$value) {
+                if ($operation != 'eq') {
+                    throw new \InvalidArgumentException(
+                        'Operation "' . $operation . '" is not supported'
+                    );
+                }
                 if (count($fieldList) && !in_array($field, $fieldList)) {
                     continue;
                 }

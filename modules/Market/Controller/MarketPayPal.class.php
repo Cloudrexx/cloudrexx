@@ -111,7 +111,10 @@ class MarketPayPal
         $retval .= $this->getInput("custom", $orderId);
         $retval .= $this->getInput("notify_url", $notify_url);
         $retval .= $this->getInput("return", $return);
-        $retval .= $this->getInput("cancel_return", $cancel_return);
+        // PayPal does no longer use 'return' by default for successfull payments.
+        // Instead is uses 'cancel_return'. Therefore we simply set the success-link
+        // as cancel-link
+        $retval .= $this->getInput("cancel_return", $return);
         $retval .= "{$_ARRAYLANG['TXT_PAYPAL_SUBMIT']}Text<br /><br />";
         $retval .= "<input id=\"submit\" type=\"submit\" name=\"submit\" value=\"Button{$_ARRAYLANG['TXT_PAYPAL_SUBMIT_BUTTON']}\">\n";
         $retval .= "</form>\n";

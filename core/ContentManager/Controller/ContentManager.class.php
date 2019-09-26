@@ -181,14 +181,7 @@ class ContentManager extends \Module
             'CORE_CM_METAIMAGE_BUTTON' => static::showMediaBrowserButton('Metaimage')
         ));
 
-        $mediaBrowser = new MediaBrowser();
-        $mediaBrowser->setCallback('target_page_callback');
-        $mediaBrowser->setOptions(array(
-            'type' => 'button',
-            'data-cx-mb-views' => 'sitestructure',
-            'id' => 'page_target_browse'
-        ));
-
+        // MediaBrowser used by the WYSIWYG-editor
         $mediaBrowserCkeditor = new MediaBrowser();
         $mediaBrowserCkeditor->setCallback('ckeditor_image_callback');
         $mediaBrowserCkeditor->setOptions(array(
@@ -198,11 +191,7 @@ class ContentManager extends \Module
         ));
 
         $this->template->setVariable(array(
-            'MEDIABROWSER_BUTTON' => $mediaBrowser->getXHtml($_ARRAYLANG['TXT_CORE_CM_BROWSE']),
-            'MEDIABROWSER_BUTTON_CKEDITOR' => $mediaBrowserCkeditor->getXHtml($_ARRAYLANG['TXT_CORE_CM_BROWSE'])
-        ));
-
-        $this->template->setVariable(array(
+            'MEDIABROWSER_BUTTON_CKEDITOR' => $mediaBrowserCkeditor->getXHtml($_ARRAYLANG['TXT_CORE_CM_BROWSE']),
             'ALIAS_PERMISSION'  => $alias_permission,
             'ALIAS_DENIAL'      => $alias_denial,
             'CONTREXX_BASE_URL' => ASCMS_PROTOCOL . '://' . $_CONFIG['domainUrl'] . ASCMS_PATH_OFFSET . '/',
@@ -214,6 +203,7 @@ class ContentManager extends \Module
 
         $objCx->setVariable('TXT_CORE_CM_VIEW', $_CORELANG['TXT_CORE_CM_VIEW'], 'contentmanager/lang');
         $objCx->setVariable('TXT_CORE_CM_ACTIONS', $_CORELANG['TXT_CORE_CM_ACTIONS'], 'contentmanager/lang');
+        $objCx->setVariable('TXT_CORE_CM_TRANSLATIONS', $_CORELANG['TXT_CORE_CM_TRANSLATIONS'], 'contentmanager/lang');
         $objCx->setVariable('TXT_CORE_CM_VALIDATION_FAIL', $_CORELANG['TXT_CORE_CM_VALIDATION_FAIL'], 'contentmanager/lang');
         $objCx->setVariable('TXT_CORE_CM_HOME_FAIL', $_CORELANG['TXT_CORE_CM_HOME_FAIL'], 'contentmanager/lang');
 
@@ -264,16 +254,25 @@ class ContentManager extends \Module
             }
         }
 
-        // Mediabrowser
+        // MediaBrowser for redirect selection
         $mediaBrowser = new \Cx\Core_Modules\MediaBrowser\Model\Entity\MediaBrowser();
         $mediaBrowser->setOptions(array('type' => 'button'));
         $mediaBrowser->setCallback('setWebPageUrlCallback');
         $mediaBrowser->setOptions(array(
-            'data-cx-mb-startview' => 'sitestructure',
+            'startview' => 'sitestructure',
+            'views' => 'uploader,filebrowser,sitestructure',
             'id' => 'page_target_browse'
         ));
         $this->template->setVariable(array(
             'CM_MEDIABROWSER_BUTTON' => $mediaBrowser->getXHtml($_ARRAYLANG['TXT_CORE_CM_BROWSE'])
+        ));
+
+        // MediaBrowser for symlink selection
+        $mediaBrowser->setOptions(array(
+            'views' => 'sitestructure',
+        ));
+        $this->template->setVariable(array(
+            'CM_MEDIABROWSER_BUTTON_SYMLINK' => $mediaBrowser->getXHtml($_ARRAYLANG['TXT_CORE_CM_BROWSE'])
         ));
 
         $toggleTitles      = !empty($_SESSION['contentManager']['toggleStatuses']['toggleTitles']) ? $_SESSION['contentManager']['toggleStatuses']['toggleTitles'] : 'block';
@@ -413,16 +412,12 @@ class ContentManager extends \Module
 
         // TODO: move including of add'l JS dependencies to cx obj from /cadmin/index.html
         $getLangOptions=$this->getLangOptions();
-        $statusPageLayout='';
-        $languageDisplay='';
-        if (((!empty($_GET['act']) && $_GET['act'] == 'new')
-                ||!empty($_GET['page'])) && $getLangOptions=="") {
-            $statusPageLayout='margin0';
-            $languageDisplay='display:none';
+        $multiLocaleMode ='';
+        if (!$getLangOptions) {
+            $multiLocaleMode ='cm-single-locale';
         }
 
-        $this->template->setVariable('ADMIN_LIST_MARGIN', $statusPageLayout);
-        $this->template->setVariable('LANGUAGE_DISPLAY', $languageDisplay);
+        $this->template->setVariable('CONTENTMANAGER_LOCALE_CSS_CLASS', $statusPageLayout);
 
         // TODO: move including of add'l JS dependencies to cx obj from /cadmin/index.html
         $this->template->setVariable('SKIN_OPTIONS', $this->getSkinOptions());
@@ -448,6 +443,10 @@ class ContentManager extends \Module
             'regExpUriProtocol'  =>  \FWValidator::REGEX_URI_PROTO,
             'contrexxBaseUrl'    => ASCMS_PROTOCOL . '://' . $_CONFIG['domainUrl'] . ASCMS_PATH_OFFSET . '/',
             'contrexxPathOffset' => ASCMS_PATH_OFFSET,
+            'showLocaleTagsByDefault'  => \Cx\Core\Setting\Controller\Setting::getValue(
+                'showLocaleTagsByDefault',
+                'Config'
+            ),
         ), 'contentmanager');
 
         // manually set Wysiwyg variables as the Ckeditor will be
@@ -490,10 +489,12 @@ class ContentManager extends \Module
 
     protected function getLangOptions()
     {
+        global $_CORELANG;
+
         $output = '';
         $language=\FWLanguage::getActiveFrontendLanguages();
         if (count($language)>1) {
-            $output .='<select id="language" class="chzn-select">';
+            $output .= '<select id="language" class="chzn-select" data-disable_search="false" data-no_results_text="' . $_CORELANG['TXT_CORE_LOCALE_DOESNT_EXIST'] . '">';
             foreach ($language as $lang) {
                 $selected = $lang['id'] == FRONTEND_LANG_ID ? ' selected="selected"' : '';
                 $output .= '<option value="' . \FWLanguage::getLanguageCodeById($lang['id']) . '"' . $selected . '>' . $lang['name'] . '</option>';
@@ -606,7 +607,7 @@ class ContentManager extends \Module
         $mediaBrowser = new \Cx\Core_Modules\MediaBrowser\Model\Entity\MediaBrowser();
         $mediaBrowser->setOptions(array(
             'type' => 'button',
-            'data-cx-mb-views' => $type
+            'views' => $type
         ));
         $mediaBrowser->setCallback('cx.cm.setSelected' . ucfirst($name));
 

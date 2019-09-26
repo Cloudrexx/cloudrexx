@@ -4,7 +4,7 @@
         color: red;
     }
 </style>
-<form action="index.php?cmd={CALENDAR_MODULE_NAME}&act=modify_registration&event_id={CALENDAR_EVENT_ID}&amp;amp;reg_id={CALENDAR_REGISTRATION_ID}&{CALENDAR_CSRF}" id="formModifyRegistration" name="formModifyRegistration" method="post">
+<form action="index.php?cmd={CALENDAR_MODULE_NAME}&act=modify_registration&event_id={CALENDAR_EVENT_ID}&amp;rid={CALENDAR_REGISTRATION_ID}&{CALENDAR_CSRF}" id="formModifyRegistration" name="formModifyRegistration" method="post">
     <input type="hidden" name="regid" value="{CALENDAR_REGISTRATION_ID}" />
     <input type="hidden" name="regtpl" value="{CALENDAR_REGISTRATION_TPL}" />
     <input type="hidden" name="type" value="{CALENDAR_REGISTRATION_TYPE}" />

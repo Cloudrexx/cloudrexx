@@ -63,6 +63,13 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
         \Cx\Core\ContentManager\Model\Entity\Page $page
     ) {
         global $_CORELANG, $subMenuTitle, $intAccessIdOffset, $objTemplate;
+
+        switch($_GET['act'])  {
+            case 'newShopPages':
+                parent::getPage($page);
+                return;
+        }
+
         $this->cx->getTemplate()->addBlockfile(
             'CONTENT_OUTPUT',
             'content_master',
@@ -76,4 +83,55 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
         $objShopManager->getPage();
     }
 
+    /**
+     * Returns a list of available commands (?act=XY)
+     * @return array List of acts
+     */
+    public function getCommands()
+    {
+        return array(
+            'orders',
+            'categories',
+            'products',
+            'manufacturer',
+            'customers',
+            'statistics',
+            'import',
+            'settings'
+        );
+    }
+
+    /**
+     * Return true here if you want the first tab to be an entity view
+     * @return boolean True if overview should be shown, false otherwise
+     */
+    protected function showOverviewPage()
+    {
+        return false;
+    }
+
+    /**
+     * This function returns the ViewGeneration options for a given entityClass
+     *
+     * @access protected
+     * @global $_ARRAYLANG
+     * @param $entityClassName contains the FQCN from entity
+     * @param $dataSetIdentifier if $entityClassName is DataSet, this is used
+     *                           for better partition
+     * @return array with options
+     */
+    protected function getViewGeneratorOptions($entityClassName, $dataSetIdentifier = '')
+    {
+        global $_ARRAYLANG;
+
+        $options = parent::getViewGeneratorOptions(
+            $entityClassName,
+            $dataSetIdentifier
+        );
+
+        switch ($entityClassName) {
+
+        }
+        return $options;
+    }
 }

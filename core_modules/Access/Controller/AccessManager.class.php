@@ -135,172 +135,6 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
     }
 
 
-  /**
-    * Export users of a group as CSV
-    * @param integer $groupId
-    */
-    function _exportUsers($groupId = 0, $langId = null)
-    {
-        global $_CORELANG, $_ARRAYLANG, $objInit;
-
-        $csvSeparator = ";";
-        $groupId = intval($groupId);
-
-        $objFWUser = \FWUser::getFWUserObject();
-        $arrLangs = \FWLanguage::getLanguageArray();
-
-        if($groupId){
-            $objGroup = $objFWUser->objGroup->getGroup($groupId);
-            $groupName = $objGroup->getName(LANG_ID);
-        }else{
-            $groupName = $_CORELANG['TXT_USER_ALL'];
-        }
-
-        header("Content-Type: text/comma-separated-values", true);
-        header(
-            "Content-Disposition: attachment; filename=\"".
-            str_replace(array(' ', ',', '.', '\'', '"'), '_', $groupName).
-            ($langId != null ? '_lang_'.$arrLangs[$langId]['lang'] : '').
-            '.csv"', true);
-
-        $arrFields = array (
-            'active'            => $_ARRAYLANG['TXT_ACCESS_ACTIVE'],
-            'frontend_lang_id'  => $_ARRAYLANG['TXT_ACCESS_LANGUAGE'] . ' ('.$_CORELANG['TXT_LANGUAGE_FRONTEND'].')',
-            'backend_lang_id'   => $_ARRAYLANG['TXT_ACCESS_LANGUAGE'] . ' ('.$_CORELANG['TXT_LANGUAGE_BACKEND'].')',
-            'username'          => $_ARRAYLANG['TXT_ACCESS_USERNAME'],
-            'email'             => $_ARRAYLANG['TXT_ACCESS_EMAIL'],
-            'regdate'           => $_ARRAYLANG['TXT_ACCESS_REGISTERED_SINCE'],
-        );
-
-        // fetch profile attributes
-        $arrProfileFields = array_merge(
-            $objFWUser->objUser->objAttribute->getCoreAttributeIds(),
-            $objFWUser->objUser->objAttribute->getCustomAttributeIds()
-        );
-        foreach ($arrFields as $field) {
-            print $this->_escapeCsvValue($field).$csvSeparator;
-        }
-        foreach ($arrProfileFields as $profileField) {
-            $arrFields[$profileField] = $objFWUser->objUser->objAttribute->getById($profileField)->getName();
-            print $this->_escapeCsvValue($arrFields[$profileField]).$csvSeparator;
-        }
-        print "\n";
-
-        $filter = array();
-        if (!empty($groupId)) {
-            $filter['group_id'] = $groupId;
-        }
-        if (!empty($langId)) {
-            if (\FWLanguage::getLanguageParameter($langId, 'is_default') == 'true') {
-                $filter['frontend_lang_id'] = array($langId, 0);
-            } else {
-                $filter['frontend_lang_id'] = $langId;
-            }
-        }
-        $objUser = $objFWUser->objUser->getUsers($filter, null, array('username'), array_keys($arrFields));
-        if ($objUser) {
-            while (!$objUser->EOF) {
-                $activeStatus = $objUser->getActiveStatus() ? $_CORELANG['TXT_YES'] : $_CORELANG['TXT_NO'];
-
-                $frontendLangId = $objUser->getFrontendLanguage();
-                if (empty($frontendLangId)) {
-                    $frontendLangId = $objInit->getDefaultFrontendLangId();
-                }
-                $frontendLang = $arrLangs[$frontendLangId]['name']." (".$arrLangs[$frontendLangId]['lang'].")";
-
-                $backendLangId = $objUser->getBackendLanguage();
-                if (empty($backendLangId)) {
-                    $backendLangId = $objInit->getDefaultBackendLangId();
-                }
-                $backendLang = $arrLangs[$backendLangId]['name']." (".$arrLangs[$backendLangId]['lang'].")";
-
-                // active
-                print $this->_escapeCsvValue($activeStatus).$csvSeparator;
-
-                // frontend_lang_id
-                print $this->_escapeCsvValue($frontendLang).$csvSeparator;
-
-                // backend_lang_id
-                print $this->_escapeCsvValue($backendLang).$csvSeparator;
-
-                // username
-                print $this->_escapeCsvValue($objUser->getUsername()).$csvSeparator;
-
-                // email
-                print $this->_escapeCsvValue($objUser->getEmail()).$csvSeparator;
-
-                // regdate
-                print $this->_escapeCsvValue(date(ASCMS_DATE_FORMAT_DATE, $objUser->getRegistrationDate())).$csvSeparator;
-
-                // profile attributes
-                foreach ($arrProfileFields as $field) {
-                    $value = $objUser->getProfileAttribute($field);
-
-                    switch ($field) {
-                        case 'gender':
-                            switch ($value) {
-                                case 'gender_male':
-                                   $value = $_CORELANG['TXT_ACCESS_MALE'];
-                                break;
-
-                                case 'gender_female':
-                                   $value = $_CORELANG['TXT_ACCESS_FEMALE'];
-                                break;
-
-                                default:
-                                   $value = $_CORELANG['TXT_ACCESS_NOT_SPECIFIED'];
-                                break;
-                            }
-                            break;
-
-                        case 'title':
-                        case 'country':
-                            $title = '';
-                            $value = $objUser->objAttribute->getById($field . '_' . $value)->getName();
-                            break;
-
-                        default:
-                            $objAttribute = $objUser->objAttribute->getById($field);
-                            if (!empty($value) && $objAttribute->getType() == 'date') {
-                                $date = new \DateTime();
-                                $date ->setTimestamp($value);
-                                $value = $date->format(ASCMS_DATE_FORMAT_DATE);
-                            }
-                            break;
-                    }
-                    print $this->_escapeCsvValue($value).$csvSeparator;
-                }
-
-                // add line break at end of row
-                print "\n";
-
-                $objUser->next();
-            }
-        }
-        exit;
-    }
-
-
-    /**
-     * Escape a value that it could be inserted into a csv file.
-     *
-     * @param string $value
-     * @return string
-     */
-    function _escapeCsvValue($value)
-    {
-        $csvSeparator = ";";
-        $value = in_array(strtolower(CONTREXX_CHARSET), array('utf8', 'utf-8')) ? utf8_decode($value) : $value;
-        $value = preg_replace('/\r\n/', "\n", $value);
-        $valueModified = str_replace('"', '""', $value);
-
-        if ($valueModified != $value || preg_match('/['.$csvSeparator.'\n]+/', $value)) {
-            $value = '"'.$valueModified.'"';
-        }
-        return $value;
-    }
-
-
     /**
     * Get page
     * @global \Cx\Core\Html\Sigma
@@ -322,7 +156,7 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
         switch ($_REQUEST['act']) {
             case 'export':
                 $_GET['groupId'] = !empty($_GET['groupId']) ? intval($_GET['groupId']) : 0;
-                $this->_exportUsers($_GET['groupId'], $_GET['langId']);
+                $this->exportUsers($_GET['groupId'], $_GET['langId']);
             break;
             case 'user':
                 if (
@@ -957,7 +791,8 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
         $mediaBrowser = new \Cx\Core_Modules\MediaBrowser\Model\Entity\MediaBrowser();
         $mediaBrowser->setOptions(array(
                     'type'             => 'button',
-                    'data-cx-mb-views' => 'sitestructure',
+                    'views'            => 'sitestructure',
+                    'startview'        => 'sitestructure',
                     'id'               => 'media-browser-button',
                     'style'            => 'display: none;'
         ));
@@ -1096,8 +931,10 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
             $areaHidden = 'display:none;';
         }
 
-        $this->_objTpl->setVariable(array(
+        $this->_objTpl->setGlobalVariable(array(
             'ACCESS_AREA_ID'            => $arrAreas[$areaId]['access_id'],
+        ));
+        $this->_objTpl->setVariable(array(
             'ACCESS_AREA_NAME'          => isset($_CORELANG[$arrAreas[$areaId]['name']]) ? htmlentities($_CORELANG[$arrAreas[$areaId]['name']], ENT_QUOTES, CONTREXX_CHARSET) : $arrAreas[$areaId]['name'],
             'ACCESS_AREA_STYLE_NR'      => $arrAreas[$areaId]['type'] == 'group' ? 3 : ($arrAreas[$areaId]['type'] == 'navigation' ? 1 : 2),
             'ACCESS_AREA_TEXT_INDENT'   => $arrAreas[$areaId]['type'] == 'group' ? 0 : ($arrAreas[$areaId]['type'] == 'navigation' ? 20 : 40),
@@ -1107,12 +944,10 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
 
         if ($arrAreas[$areaId]['scope'] == $scope || $arrAreas[$areaId]['scope'] == 'global') {
             $this->_objTpl->setVariable(array(
-                'ACCESS_AREA_ID'            => $arrAreas[$areaId]['access_id'],
-            'ACCESS_AREA_ALLOWED'       => $arrAreas[$areaId]['allowed'] ? 'checked="checked"' : ''
-        ));
+                'ACCESS_AREA_ALLOWED'       => $arrAreas[$areaId]['allowed'] ? 'checked="checked"' : ''
+            ));
             $this->_objTpl->parse('access_permission_in_scope');
 
-            $this->_objTpl->setVariable('ACCESS_AREA_ID', $arrAreas[$areaId]['access_id']);
             $this->_objTpl->parse('access_permission_access_id');
         } else {
             $this->_objTpl->hideBlock('access_permission_in_scope');
@@ -1218,9 +1053,6 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
     private function userList()
     {
         global $_ARRAYLANG, $_CORELANG, $_CONFIG;
-
-        // add this to a new section maybe named like "maintenance"
-        $this->removeUselessImages();
 
         $arrSettings = \User_Setting::getSettings();
         $templateFile = 'module_access_user_list';
@@ -2252,7 +2084,12 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
             'TXT_ACCESS_ACTIVATION_BY_USER'                     => $_ARRAYLANG['TXT_ACCESS_ACTIVATION_BY_USER'],
             'TXT_ACCESS_ACTIVATION_BY_AUTHORIZED_PERSON'        => $_ARRAYLANG['TXT_ACCESS_ACTIVATION_BY_AUTHORIZED_PERSON'],
             'TXT_ACCESS_TIME_PERIOD_ACTIVATION_TIME'            => $_ARRAYLANG['TXT_ACCESS_TIME_PERIOD_ACTIVATION_TIME'],
-            'TXT_ACCESS_ADDRESS_OF_USER_TO_NOTIFY'              => $_ARRAYLANG['TXT_ACCESS_ADDRESS_OF_USER_TO_NOTIFY']
+            'ACCESS_SIGNUP_NOTIFICATION_TEXT'                   => sprintf($_ARRAYLANG['TXT_ACCESS_SIGNUP_NOTIFICATION_TEXT'], '<strong>' . $_ARRAYLANG['TXT_ACCESS_SIGNUP_NOTIFICATION'] . '</strong>'),
+            'TXT_ACCESS_ADDRESS_FOR_SIGNUP_NOTIFICATION'        => $_ARRAYLANG['TXT_ACCESS_ADDRESS_FOR_SIGNUP_NOTIFICATION'],
+            'TXT_ACCESS_ADDRESS_OF_USER_TO_NOTIFY'              => $_ARRAYLANG['TXT_ACCESS_ADDRESS_OF_USER_TO_NOTIFY'],
+            'TXT_ACCESS_USER_PROFILE_MODIFICATION'              => $_ARRAYLANG['TXT_ACCESS_USER_PROFILE_MODIFICATION'],
+            'TXT_ACCESS_USER_PROFILE_MODIFICATION_NOTIFICATION_TEXT'=> sprintf($_ARRAYLANG['TXT_ACCESS_USER_PROFILE_MODIFICATION_NOTIFICATION_TEXT'], '<strong>' . $_ARRAYLANG['TXT_ACCESS_USER_PROFILE_MODIFICATION'] . '</strong>'),
+            'TXT_ACCESS_ADDRESS_OF_USER_TO_NOTIFY_ON_MODIFICATION'  => $_ARRAYLANG['TXT_ACCESS_ADDRESS_OF_USER_TO_NOTIFY_ON_MODIFICATION'],
         ));
 
         if (isset($_POST['access_save_settings'])) {
@@ -2294,6 +2131,44 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
                 }
             }
 
+            if (!empty($_POST['accessSignUpNotification']) && intval($_POST['accessSignUpNotification']) > 0) {
+                $arrSettings['signup_notification_address']['status'] = 1;
+
+                if (!empty($_POST['accessSignUpNotificationAddress'])) {
+                    $notificationAddresses = array_map('trim', explode(',', contrexx_input2raw($_POST['accessSignUpNotificationAddress'])));
+                    $objValidator = new \FWValidator();
+                    foreach ($notificationAddresses as $key => $address) {
+                        if (!$objValidator->isEmail($address)) {
+                            unset($notificationAddresses[$key]);
+                            $status = false;
+                            self::$arrStatusMsg['error'][] = $_ARRAYLANG['TXT_ACCESS_INVALID_ENTERED_EMAIL_ADDRESS'];
+                        }
+                    }
+                }
+                $arrSettings['signup_notification_address']['value'] = join(',', $notificationAddresses);
+            } else {
+                $arrSettings['signup_notification_address']['status'] = 0;
+            }
+
+            if (!empty($_POST['accessUserProfileNotification']) && intval($_POST['accessUserProfileNotification']) > 0) {
+                $arrSettings['user_change_notification_address']['status'] = 1;
+
+                if (!empty($_POST['accessUserProfileNotificationAddress'])) {
+                    $notificationAddresses = array_map('trim', explode(',', contrexx_input2raw($_POST['accessUserProfileNotificationAddress'])));
+                    $objValidator = new \FWValidator();
+                    foreach ($notificationAddresses as $key => $address) {
+                        if (!$objValidator->isEmail($address)) {
+                            unset($notificationAddresses[$key]);
+                            $status = false;
+                            self::$arrStatusMsg['error'][] = $_ARRAYLANG['TXT_ACCESS_INVALID_ENTERED_EMAIL_ADDRESS'];
+                        }
+                    }
+                }
+                $arrSettings['user_change_notification_address']['value'] = join(',', $notificationAddresses);
+            } else {
+                $arrSettings['user_change_notification_address']['status'] = 0;
+            }
+
             if ($status) {
                 if (\User_Setting::setSettings($arrSettings)) {
                     array_push(self::$arrStatusMsg['ok'], $_ARRAYLANG['TXT_ACCESS_CONFIG_SUCCESSFULLY_SAVED']);
@@ -2324,7 +2199,13 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
             'ACCESS_USER_ACTIVATION_BOX_1'          => $arrSettings['user_activation']['status'] ? 'block' : 'none',
             'ACCESS_USER_ACTIVATION_BOX_0'          => $arrSettings['user_activation']['status'] ? 'none': 'block',
             'ACCESS_USER_ACTIVATION_TIMEOUT'        => $arrSettings['user_activation_timeout']['value'],
-            'ACCESS_USER_NOTIFICATION_ADDRESS'      => $arrSettings['notification_address']['value']
+            'ACCESS_USER_NOTIFICATION_ADDRESS'      => $arrSettings['notification_address']['value'],
+            'ACCESS_SIGNUP_NOTIFICATION_BOX'        => $arrSettings['signup_notification_address']['status'] ? 'block': 'none',
+            'ACCESS_SIGNUP_NOTIFICATION_CHECKED'    => $arrSettings['signup_notification_address']['status'] ? 'checked="checked"' : '',
+            'ACCESS_SIGNUP_NOTIFICATION_ADDRESS'    => $arrSettings['signup_notification_address']['value'],
+            'ACCESS_USER_PROFILE_NOTIFICATION_BOX'  => $arrSettings['user_change_notification_address']['status'] ? 'block': 'none',
+            'ACCESS_USER_PROFILE_NOTIFICATION_CHECKED'=> $arrSettings['user_change_notification_address']['status'] ? 'checked="checked"' : '',
+            'ACCESS_USER_PROFILE_NOTIFICATION_ADDRESS'=> $arrSettings['user_change_notification_address']['value'],
         ));
         $this->_objTpl->parse('module_access_config_community');
     }

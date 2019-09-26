@@ -58,13 +58,26 @@ class ReverseProxyCloudrexx extends \Cx\Lib\ReverseProxy\Model\Entity\ReversePro
         $this->port = $port;
         $this->ssiProcessor = new \Cx\Lib\ReverseProxy\Model\Entity\SsiProcessorEsi();
     }
+
+    /**
+     * {@inheritdoc}
+     *
+     * This method has been overwritten as the Cloudrexx ESI cache is not
+     * stored specific per domain and/or port. Therefore, we only have to
+     * call the flush operation (on clearCachePageForDomainAndPort()) once.
+     */
+    public function clearCachePage($urlPattern, $domainsAndPorts) {
+        $this->clearCachePageForDomainAndPort($urlPattern, '', 0);
+    }
     
     /**
      * Clears a cache page
      * Please note that this will not work during an ESI sub-request.
      * @param string $urlPattern Drop all pages that match the pattern, for exact format, make educated guesses
-     * @param string $domain Domain name to drop cache page of
-     * @param int $port Port to drop cache page of
+     * @param string $domain Domain name to drop cache page of.
+     *                       Not used by ReverseProxyCloudrexx
+     * @param int $port Port to drop cache page of.
+     *                  Not used by ReverseProxyCloudrexx
      */
     protected function clearCachePageForDomainAndPort($urlPattern, $domain, $port) {
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();

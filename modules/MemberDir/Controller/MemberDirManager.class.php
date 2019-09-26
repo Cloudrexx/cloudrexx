@@ -773,11 +773,6 @@ class MemberDirManager extends MemberDirLibrary
                 WHERE dirid = '$dirid'";
             $objDatabase->Execute($query);
 
-            // Little optimisation
-            $objDatabase->Execute("OPTIMIZE TABLE `".DBPREFIX."_module_memberdir_name` ");
-            $objDatabase->Execute("OPTIMIZE TABLE `".DBPREFIX."_module_memberdir_values` ");
-            $objDatabase->Execute("OPTIMIZE TABLE `".DBPREFIX."_module_memberdir_directories` ");
-
             return true;
         } else {
             echo $objDatabase->ErrorMsg();
@@ -1124,7 +1119,11 @@ class MemberDirManager extends MemberDirLibrary
                 "TXT_MAX_FILE_SIZE"     => $_ARRAYLANG['TXT_MAX_FILE_SIZE'].": ".ini_get("upload_max_filesize"),
                 "MEMBERDIR_IMAGE_NUMBER" => 1,
                 "MEMBERDIR_IMAGE_SRC"   => "../core/Core/View/Media/icons/images.gif",
-                "MEMBERDIR_IMAGE_SIZE"  => "21"
+                "MEMBERDIR_IMAGE_SIZE"  => "21",
+                'MEMBERDIR_MEDIABROWSER_BUTTON' => $this->getMediaBrowserButton(
+                    'imageSelectionButtonOne',
+                    'mbImageSelectionOne'
+                ),
             ));
 
             $this->_objTpl->parse("pic_row");
@@ -1138,7 +1137,11 @@ class MemberDirManager extends MemberDirLibrary
                 "TXT_MAX_FILE_SIZE"     => $_ARRAYLANG['TXT_MAX_FILE_SIZE'].": ".ini_get("upload_max_filesize"),
                 "MEMBERDIR_IMAGE_NUMBER" => 2,
                 "MEMBERDIR_IMAGE_SRC"   => "../core/Core/View/Media/icons/images.gif",
-                "MEMBERDIR_IMAGE_SIZE"  => "21"
+                "MEMBERDIR_IMAGE_SIZE"  => "21",
+                'MEMBERDIR_MEDIABROWSER_BUTTON' => $this->getMediaBrowserButton(
+                    'imageSelectionButtonTwo',
+                    'mbImageSelectionTwo'
+                ),
             ));
 
             $this->_objTpl->parse("pic_row");
@@ -1402,7 +1405,11 @@ class MemberDirManager extends MemberDirLibrary
                 "MEMBERDIR_IMAGE_NUMBER" => 1,
                 "MEMBERDIR_IMAGE_SRC"   => ($objResult->fields['pic1'] == "none") ? "../core/Core/View/Media/icons/images.gif" : $objResult->fields['pic1'],
                 "MEMBERDIR_HIDDEN_VALUE"    => ($objResult->fields['pic1'] == "none") ? "" : $objResult->fields['pic1'],
-                "MEMBERDIR_IMAGE_SIZE"  => ($objResult->fields['pic1'] == "none") ? "21" : "60"
+                "MEMBERDIR_IMAGE_SIZE"  => ($objResult->fields['pic1'] == "none") ? "21" : "60",
+                'MEMBERDIR_MEDIABROWSER_BUTTON' => $this->getMediaBrowserButton(
+                    'imageSelectionButtonOne',
+                    'mbImageSelectionOne'
+                ),
             ));
 
             $this->_objTpl->parse("pic_row");
@@ -1416,7 +1423,11 @@ class MemberDirManager extends MemberDirLibrary
                 "MEMBERDIR_IMAGE_NUMBER" => 2,
                 "MEMBERDIR_IMAGE_SRC"   => ($objResult->fields['pic2'] == "none") ? "../core/Core/View/Media/icons/images.gif" : $objResult->fields['pic2'],
                 "MEMBERDIR_HIDDEN_VALUE"    => ($objResult->fields['pic2'] == "none") ? "" : $objResult->fields['pic2'],
-                "MEMBERDIR_IMAGE_SIZE"  => ($objResult->fields['pic2'] == "none") ? "21" : "60"
+                "MEMBERDIR_IMAGE_SIZE"  => ($objResult->fields['pic2'] == "none") ? "21" : "60",
+                'MEMBERDIR_MEDIABROWSER_BUTTON' => $this->getMediaBrowserButton(
+                    'imageSelectionButtonTwo',
+                    'mbImageSelectionTwo'
+                ),
             ));
 
             $this->_objTpl->parse("pic_row");
