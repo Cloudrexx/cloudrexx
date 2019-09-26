@@ -87,12 +87,31 @@ class DataSet extends \Cx\Model\Base\EntityBase implements \Iterator {
         if (!count($data)) {
             return;
         }
-        $this->options = $options;
+        $this->initializeOptions($options);
         if (is_callable($converter)) {
             $this->data = $converter($data);
         } else {
             $this->data = $this->convert($data);
         }
+    }
+
+    /**
+     * Initializes the options, sets necessary defaults
+     * @param array $options Options to set
+     */
+    protected function initializeOptions($options) {
+        $defaults = array(
+            'dateFormatDatetime' => ASCMS_DATE_FORMAT_DATETIME,
+            'dateFormatTimestamp' => ASCMS_DATE_FORMAT_DATETIME,
+            'dateFormatDate' => ASCMS_DATE_FORMAT_DATE,
+            'dateFormatTime' => ASCMS_DATE_FORMAT_TIME,
+        );
+        foreach ($defaults as $optionName=>$defaultValue) {
+            if (!isset($options[$optionName])) {
+                $options[$optionName] = $defaultValue;
+            }
+        }
+        $this->options = $options;
     }
 
     /**
@@ -199,20 +218,11 @@ class DataSet extends \Cx\Model\Base\EntityBase implements \Iterator {
                 $value = $entityClassMetadata->getFieldValue($object, $field);
                 $fieldDefinition = $entityClassMetadata->getFieldMapping($field);
                 if ($value instanceof \DateTime) {
-                    switch ($fieldDefinition['type']) {
-                        case 'datetime':
-                        case 'timestamp':
-                            $value = $value->format(ASCMS_DATE_FORMAT_DATETIME);
-                            break;
-                        case 'date':
-                            $value = $value->format(ASCMS_DATE_FORMAT_DATE);
-                            break;
-                        case 'time':
-                            $value = $value->format(ASCMS_DATE_FORMAT_TIME);
-                            break;
-                        default:
-                            // Unknown types fall through!
-                            break;
+                    // Unknown types fall through!
+                    if (isset($this->options['dateFormat' . ucfirst($fieldDefinition['type'])])) {
+                        $value = $value->format(
+                            $this->options['dateFormat' . ucfirst($fieldDefinition['type'])]
+                        );
                     }
                 } elseif (is_array($value)) {
                     $value = serialize($value);
