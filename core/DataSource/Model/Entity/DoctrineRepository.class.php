@@ -222,6 +222,10 @@ class DoctrineRepository extends DataSource {
             array(
                 'recursions' => $configuredRecursions,
                 'skipVirtual' => true,
+                'dateFormatDatetime' => 'c',
+                'dateFormatTimestamp' => 'c',
+                'dateFormatDate' => ASCMS_DATE_FORMAT_INTERNATIONAL_DATE,
+                'dateFormatTime' => ASCMS_DATE_FORMAT_INTERNATIONAL_TIME,
             )
         );
         if (count($fieldList)) {
