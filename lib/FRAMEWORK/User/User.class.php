@@ -1976,7 +1976,21 @@ class User extends User_Profile
 
         if ($this->id) {
             // update existing account
-            \Env::get('cx')->getEvents()->triggerEvent('model/preUpdate', array(new \Doctrine\ORM\Event\LifecycleEventArgs($this, \Env::get('em'))));
+            try {
+                // To show a custom error message on preUpdate, you can throw a
+                // ShinyException and put the error in the exception message
+                \Env::get('cx')->getEvents()->triggerEvent(
+                    'model/preUpdate',
+                    array(
+                        new \Doctrine\ORM\Event\LifecycleEventArgs(
+                            $this, \Env::get('em')
+                        )
+                    )
+                );
+            } catch (\Cx\Core\Error\Model\Entity\ShinyException $exception) {
+                $this->error_msg[] = $exception->getMessage();
+                return false;
+            }
             $this->updateUser($userChangeStatus);
         } else {
             // add new account
@@ -1984,8 +1998,21 @@ class User extends User_Profile
                 $generatedPassword = $this->make_password();
                 $this->setPassword($generatedPassword);
             }
-
-            \Env::get('cx')->getEvents()->triggerEvent('model/prePersist', array(new \Doctrine\ORM\Event\LifecycleEventArgs($this, \Env::get('em'))));
+            try {
+                // To show a custom error message on prePersist, you can throw a
+                // ShinyException and put the error in the exception message
+                \Env::get('cx')->getEvents()->triggerEvent(
+                    'model/prePersist',
+                    array(
+                        new \Doctrine\ORM\Event\LifecycleEventArgs(
+                            $this, \Env::get('em')
+                        )
+                    )
+                );
+            } catch (\Cx\Core\Error\Model\Entity\ShinyException $exception) {
+                $this->error_msg[] = $exception->getMessage();
+                return false;
+            }
             $this->createUser();
 
             if(!\FWValidator::isEmpty($generatedPassword)) {
