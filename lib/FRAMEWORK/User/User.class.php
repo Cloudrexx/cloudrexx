@@ -1592,7 +1592,10 @@ class User extends User_Profile
                 if (in_array(strtolower($direction), array('asc', 'desc'))) {
                     if (isset($this->arrAttributes[$attribute])) {
                         $arrSortExpressions[] = 'tblU.`'.$attribute.'` '.$direction;
-                    } elseif ($this->objAttribute->load($attribute)) {
+                    } else if ($this->objAttribute->load($attribute)) {
+                        if ($this->objAttribute->isCoreAttribute($attribute)) {
+                            $attribute = $this->objAttribute->getAttributeIdByProfileAttributeId($attribute);
+                        }
                         $arrSortExpressions[] = 'tblA'.$nr.'.`value` '.$direction;
                         $arrCustomJoins[] = 'INNER JOIN `'.DBPREFIX.'access_user_attribute_value` AS tblA'.$nr.' ON tblA'.$nr.'.`user_id` = tblU.`id`';
                         $arrCustomSelection[] = 'tblA'.$nr.'.`attribute_id` = '.$attribute;
