@@ -2021,18 +2021,11 @@ JS
                 if (preg_match($ignoreRe, $file)) unset($arrImages[$index]);
             }
 
-            if ($profilePics) {
-                $query = "
-                    SELECT SUM(1) as entryCount
-                    FROM `".DBPREFIX."access_user_profile`
-                    WHERE `picture` != ''";
-            } else {
-                $query = "
-                    SELECT SUM(1) as entryCount
-                    FROM `".DBPREFIX."access_user_attribute` AS a
-                    INNER JOIN `".DBPREFIX."access_user_attribute_value` AS v ON v.`attribute_id` = a.`id`
-                    WHERE a.`type` = 'image' AND v.`value` != ''";
-            }
+            $query = "
+                SELECT SUM(1) as entryCount
+                FROM `".DBPREFIX."access_user_attribute` AS a
+                INNER JOIN `".DBPREFIX."access_user_attribute_value` AS v ON v.`attribute_id` = a.`id`
+                WHERE a.`type` = 'image' AND v.`value` != ''";
 
             $objCount = $objDatabase->Execute($query);
             if ($objCount !== false) {
@@ -2041,18 +2034,11 @@ JS
                 return false;
             }
 
-            if ($profilePics) {
-                $query = "
-                    SELECT `picture`
-                    FROM `".DBPREFIX."access_user_profile`
-                    WHERE `picture` != ''";
-            } else {
-                $query = "
-                    SELECT v.`value` AS picture
-                    FROM `".DBPREFIX."access_user_attribute` AS a
-                    INNER JOIN `".DBPREFIX."access_user_attribute_value` AS v ON v.`attribute_id` = a.`id`
-                    WHERE a.`type` = 'image' AND v.`value` != ''";
-            }
+            $query = "
+                SELECT v.`value` AS picture
+                FROM `".DBPREFIX."access_user_attribute` AS a
+                INNER JOIN `".DBPREFIX."access_user_attribute_value` AS v ON v.`attribute_id` = a.`id`
+                WHERE a.`type` = 'image' AND v.`value` != ''";
 
             while ($offset < $count) {
                 $objImage = $objDatabase->SelectLimit($query, $step, $offset);
