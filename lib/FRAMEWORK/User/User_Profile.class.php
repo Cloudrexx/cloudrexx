@@ -364,17 +364,18 @@ class User_Profile
              * $condition is either a simple condition (integer or string) or an condition matrix (array)
              */
             if ($this->objAttribute->load($attribute) && $this->objAttribute->isCoreAttribute($attribute)) {
+                $attribute = $this->objAttribute->getAttributeIdByProfileAttributeId($attribute);
                 switch ($attribute) {
                     case 'gender':
-                        $arrConditions[] = "(tblP.`{$attribute}` = '".(is_array($condition) ? implode("' OR tblP.`{$attribute}` = '", array_map('addslashes', $condition)) : addslashes($condition))."')";
+                        $arrConditions[] = "(`tblA`.`attribute_id` = {$attribute} AND `tblA`.`value` = '".(is_array($condition) ? implode("' OR `tblA`.`value` = '", array_map('addslashes', $condition)) : addslashes($condition))."')";
                         break;
 
                     case 'title':
                     case 'country':
-                        $arrConditions[] = '(tblP.`' . $attribute . '` = ' . (
+                        $arrConditions[] = '(`tblA`.`attribute_id` = ' . $attribute . ' AND `tblA`.`value` = ' . (
                             is_array($condition)
                                 ? implode(
-                                    ' OR tblP.`' . $attribute . '` = ',
+                                    ' OR `tblA`.`value` = ',
                                     array_map(
                                         function ($condition) {
                                             if (preg_match('#([0-9]+)#', $condition, $pattern)) {
@@ -426,7 +427,7 @@ class User_Profile
                                     }
                                     $arrRestrictions[] = implode(' AND ', $arrConditionRestriction);
                                 } else {
-                                    $arrRestrictions[] = "tblP.`{$attribute}` ".(
+                                    $arrRestrictions[] = "`tblA`.`attribute_id` = {$attribute} AND `tblA`.`value` ".(
                                         in_array($operator, $arrComparisonOperators[$this->objAttribute->getDataType()], true) ?
                                             $operator
                                         :   $arrDefaultComparisonOperator[$this->objAttribute->getDataType()]
@@ -435,16 +436,18 @@ class User_Profile
                             }
                             $arrConditions[] = '(('.implode(') OR (', $arrRestrictions).'))';
                         } else {
-                            $arrConditions[] = "(tblP.`".$attribute."` ".$arrDefaultComparisonOperator[$this->objAttribute->getDataType()]." '".$arrEscapeFunction[$this->objAttribute->getDataType()]($condition)."')";
+                            $arrConditions[] = "(`tblA`.`attribute_id` = ".$attribute." AND `tblA`.`value` ".$arrDefaultComparisonOperator[$this->objAttribute->getDataType()]." '".$arrEscapeFunction[$this->objAttribute->getDataType()]($condition)."')";
                         }
                         break;
                 }
 
 
             } elseif ($attribute === 'birthday_day') {
-                $arrConditions[] = "(DATE_FORMAT(DATE_ADD(FROM_UNIXTIME(0), interval `tblP`.`birthday` second), '%e') = '".intval($condition)."')";
+                $attribute = $this->objAttribute->getAttributeIdByProfileAttributeId('birthday');
+                $arrConditions[] = "(`tblA`.`attribute_id` = ".$attribute." AND (DATE_FORMAT(DATE_ADD(FROM_UNIXTIME(0), interval `tblA`.`value` second), '%e') = '".intval($condition)."'))";
             } elseif ($attribute === 'birthday_month') {
-                $arrConditions[] = "(DATE_FORMAT(DATE_ADD(FROM_UNIXTIME(0), interval `tblP`.`birthday` second), '%c') = '".intval($condition)."')";
+                $attribute = $this->objAttribute->getAttributeIdByProfileAttributeId('birthday');
+                $arrConditions[] = "(`tblA`.`attribute_id` = ".$attribute." AND (DATE_FORMAT(DATE_ADD(FROM_UNIXTIME(0), interval `tblA`.`value` second), '%c') = '".intval($condition)."'))";
             }
         }
 
