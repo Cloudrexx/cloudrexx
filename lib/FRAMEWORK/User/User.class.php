@@ -878,7 +878,7 @@ class User extends User_Profile
 
         // parse filter
         if (isset($arrFilter) && is_array($arrFilter)) {
-            $arrConditions = $this->parseFilterConditions($arrFilter, $tblCoreAttributes, $tblGroup, $customAttributeJoins, $groupTables);
+            $arrConditions = $this->parseFilterConditions($arrFilter, $tblCustomAttributes, $tblGroup, $customAttributeJoins, $groupTables);
         }
 
         // parse search
@@ -1383,9 +1383,9 @@ class User extends User_Profile
      * used for filtering users.
      *
      * @param   array   $filter A nested array defining filter rules
-     * @param   boolean $tblCoreAttributes  Will be set to TRUE if the supplied
+     * @param   boolean $tblCustomAttributes  Will be set to TRUE if the supplied
      *                                      filter arguments $filter will need
-     *                                      a join to the core-attribute-table
+     *                                      a join to the attribute-table
      * @param   boolean $tblGroup   Will be set to TRUE if the supplied filter
      *                              arguments $filter will need a join to the
      *                              user-group-table
@@ -1401,7 +1401,7 @@ class User extends User_Profile
      *                               unique JOINs.
      * @return  array   List of SQL statements to be used as WHERE arguments
      */
-    protected function parseFilterConditions($filter, &$tblCoreAttributes, &$tblGroup, &$customAttributeJoins, &$groupTables, $uniqueJoins = true, &$joinIdx = 0)
+    protected function parseFilterConditions($filter, &$tblCustomAttributes, &$tblGroup, &$customAttributeJoins, &$groupTables, $uniqueJoins = true, &$joinIdx = 0)
     {
         $arrConditions = array();
 
@@ -1426,7 +1426,7 @@ class User extends User_Profile
             foreach ($filterArguments as $argument) {
                 $filterConditions = $this->parseFilterConditions(
                     $argument,
-                    $tblCoreAttributes,
+                    $tblCustomAttributes,
                     $tblGroup,
                     $customAttributeJoins,
                     $groupTables,
@@ -1454,7 +1454,7 @@ class User extends User_Profile
         }
         if (count($arrCoreAttributeConditions = $this->parseCoreAttributeFilterConditions($filter))) {
             $arrConditions[] = implode(' AND ', $arrCoreAttributeConditions);
-            $tblCoreAttributes = true;
+            $tblCustomAttributes = true;
         }
         $arrCustomAttributeConditions = $this->parseCustomAttributeFilterConditions(
             $filter,
