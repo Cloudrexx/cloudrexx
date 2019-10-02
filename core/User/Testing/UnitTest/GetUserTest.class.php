@@ -35,6 +35,8 @@
 
 namespace Cx\Core\User\Testing\UnitTest;
 
+use function JmesPath\search;
+
 /**
  * Test GetUser
  *
@@ -75,26 +77,44 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
     }
 
     public function testOneUserByName() {
-        $user = new \Cx\Core\User\Model\Entity\User;
+        $object = \FWUser::getFWUserObject();
+        $user = $object->objUser;
+        $user->reset();
         $user->setUsername('Testerson');
+        $user->setEmail('testerson@testmail.com');
+        $user->store();
 
-        $this->assertEquals('Testerson', $user->getUsername());
-
-
+        $this->assertEquals(
+            $user->getUsername(),
+            $user->getUsers(null, $user)->getUsername()
+        );
     }
 
-    public function testAllUsers() {
-        $user1 = new \Cx\Core\User\Model\Entity\User;
-        $user1->setId(1);
-        $user2 = new \Cx\Core\User\Model\Entity\User;
-        $user2->setId(2);
-        $user3 = new \Cx\Core\User\Model\Entity\User;
-        $user3->setId(3);
-        $user4 = new \Cx\Core\User\Model\Entity\User;
-        $user4->setId(4);
-
-        $this->assertCount(4, [ 'Test']);
-
+    public function testUserAmount() {
+        $object = \FWUser::getFWUserObject();
+        $user = $object->objUser;
+        $user->reset();
+        $user->setUsername('One');
+        $user->setEmail('test1@testmail.com');
+        $user->store();
+        $user->reset();
+        $user->setUsername('Two');
+        $user->setEmail('test2@testmail.com');
+        $user->store();
+        $user->reset();
+        $user->setUsername('Three');
+        $user->setEmail('test3@testmail.com');
+        $user->store();
+        $user->reset();
+        $user->setUsername('Four');
+        $user->setEmail('test4@testmail.com');
+        $user->store();
+        $offset = count($user->getUsers());
+        $this->assertCount(
+            4,
+            $user->getUsers(null, null, null, null, null, $offset),
+            'test'
+        );
     }
 
 }
