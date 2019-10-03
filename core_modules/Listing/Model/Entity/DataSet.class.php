@@ -87,12 +87,31 @@ class DataSet extends \Cx\Model\Base\EntityBase implements \Iterator {
         if (!count($data)) {
             return;
         }
-        $this->options = $options;
+        $this->initializeOptions($options);
         if (is_callable($converter)) {
             $this->data = $converter($data);
         } else {
             $this->data = $this->convert($data);
         }
+    }
+
+    /**
+     * Initializes the options, sets necessary defaults
+     * @param array $options Options to set
+     */
+    protected function initializeOptions($options) {
+        $defaults = array(
+            'dateFormatDatetime' => ASCMS_DATE_FORMAT_DATETIME,
+            'dateFormatTimestamp' => ASCMS_DATE_FORMAT_DATETIME,
+            'dateFormatDate' => ASCMS_DATE_FORMAT_DATE,
+            'dateFormatTime' => ASCMS_DATE_FORMAT_TIME,
+        );
+        foreach ($defaults as $optionName=>$defaultValue) {
+            if (!isset($options[$optionName])) {
+                $options[$optionName] = $defaultValue;
+            }
+        }
+        $this->options = $options;
     }
 
     /**
@@ -188,16 +207,23 @@ class DataSet extends \Cx\Model\Base\EntityBase implements \Iterator {
         $data = array();
         if ($object instanceof \Cx\Model\Base\EntityBase) {
             $em = \Env::get('em');
-            $identifiers = $em->getClassMetadata(get_class($object))->getIdentifierValues($object);
+            $entityClassMetadata = $em->getClassMetadata(get_class($object));
+            $identifiers = $entityClassMetadata->getIdentifierValues($object);
             if (is_array($identifiers)) {
                 $identifiers = implode('/', $identifiers);
             }
             $key = $identifiers;
-            foreach ($em->getClassMetadata(get_class($object))->getColumnNames() as $column) {
-                $field = $em->getClassMetadata(get_class($object))->getFieldName($column);
-                $value = $em->getClassMetadata(get_class($object))->getFieldValue($object, $field);
+            foreach ($entityClassMetadata->getColumnNames() as $column) {
+                $field = $entityClassMetadata->getFieldName($column);
+                $value = $entityClassMetadata->getFieldValue($object, $field);
+                $fieldDefinition = $entityClassMetadata->getFieldMapping($field);
                 if ($value instanceof \DateTime) {
-                    $value = $value->format(ASCMS_DATE_FORMAT_DATETIME);
+                    // Unknown types fall through!
+                    if (isset($this->options['dateFormat' . ucfirst($fieldDefinition['type'])])) {
+                        $value = $value->format(
+                            $this->options['dateFormat' . ucfirst($fieldDefinition['type'])]
+                        );
+                    }
                 } elseif (is_array($value)) {
                     $value = serialize($value);
                 }

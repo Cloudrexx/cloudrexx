@@ -722,6 +722,12 @@ class Gallery
             if (empty($strCategoryComment)) {
                 $this->_objTpl->hideBlock('galleryImageBlock');
             }
+
+            // ensure detail image block is not parsed
+            if ($this->_objTpl->blockExists('galleryImage')) {
+                $this->_objTpl->hideBlock('galleryImage');
+            }
+
             return;
         }
 
@@ -921,6 +927,11 @@ class Gallery
         }
 
         $this->_objTpl->parse('galleryCategories');
+
+        // ensure detail image block is not parsed
+        if ($this->_objTpl->blockExists('galleryImage')) {
+            $this->_objTpl->hideBlock('galleryImage');
+        }
     }
 
     /**

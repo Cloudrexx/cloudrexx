@@ -64,7 +64,7 @@ $_ARRAYLANG['TXT_CALENDAR_ERROR_DATE'] = "Enddatum überprüfen!";
 $_ARRAYLANG['TXT_CALENDAR_ERROR_COMMENT'] = "Beschreibung eingeben!";
 $_ARRAYLANG['TXT_CALENDAR_EDIT_EVENT'] = "Eintrag bearbeiten";
 $_ARRAYLANG['TXT_CALENDAR_NAME'] = "Betreff";
-$_ARRAYLANG['TXT_CALENDAR_PLACE'] = "Ort";
+$_ARRAYLANG['TXT_CALENDAR_PLACE'] = "Luogo";
 $_ARRAYLANG['TXT_CALENDAR_PRIORITY'] = "Priorität";
 $_ARRAYLANG['TXT_CALENDAR_START'] = "Start";
 $_ARRAYLANG['TXT_CALENDAR_END'] = "Ende";
@@ -461,4 +461,5 @@ $_ARRAYLANG['TXT_CALENDAR_DATEPICKER'] = "JS DatePickerControl";
 $_ARRAYLANG['TXT_CALENDAR_EVENT_MORE_INVITATIONS_INFO'] = "In diesem Feld kÃ¶nnen weitere E-Mail Adressen (Komma separiert) angegeben werden, an welche eine Einladung per E-Mail geschickt werden soll.";
 $_ARRAYLANG['TXT_CALENDAR_EVENT_NOTIFICATION_TO_INFO'] = "In diesem Feld kÃ¶nnen E-Mail Adressen (Komma separiert) angegeben werden, an welche eine Benachrichtigung bei An- und Abmeldungen per E-Mail geschickt werden soll.";
 $_ARRAYLANG['TXT_CALENDAR_STEP_BACK'] = "Back";
+$_ARRAYLANG['TXT_CALENDAR_EXPORT_ICAL_FORMAT'] = "Scarica Informazioni sull'evento (iCal-Format)";
 ?>
