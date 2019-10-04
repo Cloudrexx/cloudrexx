@@ -35,6 +35,7 @@
 
 namespace Cx\Core\User\Testing\UnitTest;
 
+use phpDocumentor\Reflection\DocBlock\Tags\Uses;
 use function JmesPath\search;
 
 /**
@@ -80,19 +81,29 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
         $object = \FWUser::getFWUserObject();
         $user = $object->objUser;
         $user->reset();
-        $user->setUsername('Testerson');
         $user->setEmail('testerson@testmail.com');
+        $user->setUsername('Testerson');
         $user->store();
+        $myTestUser = array('username'=>'Testerson');
 
         $this->assertEquals(
             $user->getUsername(),
-            $user->getUsers(null, $user)->getUsername()
+            $user->getUsers($myTestUser)->getUsername()
         );
     }
 
     public function testUserAmount() {
+        $offset = 0;
+        $userCount = 0;
+
         $object = \FWUser::getFWUserObject();
         $user = $object->objUser;
+
+        $users = $user->getUsers();
+        while (!$users->EOF){
+            $offset++;
+            $users->next();
+        }
         $user->reset();
         $user->setUsername('One');
         $user->setEmail('test1@testmail.com');
@@ -109,12 +120,16 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
         $user->setUsername('Four');
         $user->setEmail('test4@testmail.com');
         $user->store();
-        $offset = count($user->getUsers());
-        $this->assertCount(
+
+        $users = $user->getUsers(null, null, null, null, null, $offset);
+        while (!$users->EOF){
+            $userCount++;
+            $users->next();
+        }
+
+        $this->assertEquals(
             4,
-            $user->getUsers(null, null, null, null, null, $offset),
-            'test'
+            $userCount
         );
     }
-
 }
