@@ -365,7 +365,7 @@ class FWValidator
     public static function getCleanFileName($fileName)
     {
         // replace $change with ''
-        $change = array('\\', '/', ':', '*', '?', '"', '<', '>', '|');
+        $change = array('\\', '/', ':', '*', '?', '"', '<', '>', '|', '`', '´');
         $fileName = str_replace($change, '_', $fileName);
 
         return $fileName;
