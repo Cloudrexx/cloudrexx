@@ -76,29 +76,53 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
             $user->getUsers($user->getId())->getEmail()
         );
     }
-
-    public function testOneUserByName() {
+    /**
+     * Test One User By ame
+     *
+     * @copyright   Cloudrexx AG
+     * @author      Mirjam Doyon <info@cloudrexx.com>
+     *
+     * Search for a given Username
+     *
+     * @param       void
+     *
+     */
+    public function testOneUserByUsername() {
         $object = \FWUser::getFWUserObject();
         $user = $object->objUser;
         $user->reset();
         $user->setEmail('testerson@testmail.com');
         $user->setUsername('Testerson');
         $user->store();
+        //determine test User
         $myTestUser = array('username'=>'Testerson');
-
+        //check if test User is found
         $this->assertEquals(
             $user->getUsername(),
             $user->getUsers($myTestUser)->getUsername()
         );
     }
-
+    /**
+     * Test UserAmount
+     *
+     * @copyright   Cloudrexx AG
+     * @author      Mirjam Doyon <info@cloudrexx.com>
+     *
+     * Count the amount of Users and check if any are missing
+     *
+     * @param       void
+     *
+     */
     public function testUserAmount() {
+        //counter for offset
         $offset = 0;
+        //counter for Users
         $userCount = 0;
 
         $object = \FWUser::getFWUserObject();
         $user = $object->objUser;
 
+        //count existing Users in DB
         $users = $user->getUsers();
         while (!$users->EOF){
             $offset++;
@@ -120,13 +144,20 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
         $user->setUsername('Four');
         $user->setEmail('test4@testmail.com');
         $user->store();
-
-        $users = $user->getUsers(null, null, null, null, null, $offset);
+        //count all Users and ignore previously existing entries ($offset)
+        $users = $user->getUsers(
+            null,
+            null,
+            null,
+            null,
+            null,
+            $offset
+        );
         while (!$users->EOF){
             $userCount++;
             $users->next();
         }
-
+        //check if there are four test Users
         $this->assertEquals(
             4,
             $userCount
