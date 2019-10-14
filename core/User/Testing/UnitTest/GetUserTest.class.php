@@ -56,7 +56,6 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
         $user->setEmail('test@testmail.com');
         $user->store();
 
-        var_dump($user->getId());
         $this->assertEquals(
             $user->getId(),
             $user->getUsers($user->getId())->getId()
@@ -150,7 +149,7 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
             null,
             null,
             null,
-            null,
+            5,
             $offset
         );
         while (!$users->EOF){
