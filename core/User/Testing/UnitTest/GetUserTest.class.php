@@ -48,7 +48,17 @@ use function JmesPath\search;
  */
 class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
 {
-
+    /**
+     * Test One User By Id
+     *
+     * @copyright   Cloudrexx AG
+     * @author      Hava Fuga <info@cloudrexx.com>
+     *
+     * Search for an Id
+     *
+     * @param       void
+     *
+     */
     public function testOneUserById() {
         $object = \FWUser::getFWUserObject();
         $user = $object->objUser;
@@ -56,14 +66,23 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
         $user->setEmail('test@testmail.com');
         $user->store();
 
-        var_dump($user->getId());
         $this->assertEquals(
             $user->getId(),
             $user->getUsers($user->getId())->getId()
         );
     }
 
-
+    /**
+     * Test One User By Email
+     *
+     * @copyright   Cloudrexx AG
+     * @author      Hava Fuga <info@cloudrexx.com>
+     *
+     * Search for a given Email
+     *
+     * @param       void
+     *
+     */
     public function testOneUserByEmail() {
         $object = \FWUser::getFWUserObject();
         $user = $object->objUser;
