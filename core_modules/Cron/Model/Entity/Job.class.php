@@ -170,14 +170,29 @@ class Job extends \Cx\Model\Base\EntityBase {
             if ($cron->getNextRunDate($this->lastRan, 0)->getTimestamp() > time()) {
                 return false;
             }
-            // execute cron job
-            $arguments = explode(' ', $this->command);
-            $command = array_shift($arguments);
-            $commands = $this->cx->getCommands();
+
+            // parse params
+            $params = explode(' ', $this->command);
+            foreach ($params as $key=>$value) {
+                $argParts = explode('=', $value, 2);
+                if (count($argParts) == 2) {
+                    $params[$argParts[0]] = $argParts[1];
+                    unset($params[$key]);
+                }
+            }
+
+            $command = array_shift($params);
+            $arguments = $params;
+
+            // ensure command is loaded if permissions are argument-based
+            $commands = $this->cx->getCommands($arguments, true);
             if (!isset($commands[$command])) {
                 throw new JobException('Command "' . $command . '" not found!');
             }
+
+            // execute cron job
             $commands[$command]->executeCommand($command, $arguments);
+
             // update last ran time to now if cron job has successfully been executed
             $this->lastRan = new \DateTime();
             return true;
