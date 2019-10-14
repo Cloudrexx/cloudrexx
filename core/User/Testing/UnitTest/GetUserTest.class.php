@@ -121,6 +121,74 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
             $user->getUsers($myTestUser)->getUsername()
         );
     }
+
+    /**
+     * Test All Users
+     *
+     * @copyright   Cloudrexx AG
+     * @author      Hava Fuga <info@cloudrexx.com>
+     *
+     * Search for all given Users
+     *
+     * @param       void
+     *
+     */
+    public function testAllUsers() {
+        $object = \FWUser::getFWUserObject();
+        $user = $object->objUser;
+        $users = $user->getUsers();
+
+        //counter for offset
+        $offset = 0;
+
+        //count existing Users in DB
+        while (!$users->EOF){
+            $offset++;
+            $users->next();
+        }
+
+        //set users with email
+        $user->reset();
+        $user->setUsername('One');
+        $user->setEmail('test1@testmail.com');
+        $user->store();
+        $user->reset();
+        $user->setUsername('Two');
+        $user->setEmail('test2@testmail.com');
+        $user->store();
+        $user->reset();
+        $user->setUsername('Three');
+        $user->setEmail('test3@testmail.com');
+        $user->store();
+
+        //get all users and ignore previously existing entries ($offset)
+        $users = $user->getUsers(
+            null,
+            null,
+            null,
+            null,
+            4,
+            $offset
+        );
+
+        $emails = array();
+        while (!$users->EOF){
+            array_push($emails, $users->getEmail());
+            $users->next();
+        }
+
+        $this->assertEquals(
+            array(
+                'test1@testmail.com',
+                'test2@testmail.com',
+                'test3@testmail.com',
+            ),
+            $emails
+        );
+
+    }
+
+
     /**
      * Test UserAmount
      *
