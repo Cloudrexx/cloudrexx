@@ -237,7 +237,7 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
             null,
             null,
             null,
-            null,
+            5,
             $offset
         );
         while (!$users->EOF){
