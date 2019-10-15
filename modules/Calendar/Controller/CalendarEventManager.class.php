@@ -1903,11 +1903,16 @@ class CalendarEventManager extends CalendarLibrary
         $objEvent,
         $additionalRecurrences = array()
     ) {
+        if (!$objEvent->seriesStatus) {
+            return;
+        }
+
         $this->getSettings();
 
         // create a copy of the event instance which can be used
         // to generate the recurrences on and iterate over them
         $recurrenceEvent = clone $objEvent;
+        $recurrenceEvent->isAdditionalRecurrence = false;
 
         // fetch and iterate over the recurrence dates
         while (
