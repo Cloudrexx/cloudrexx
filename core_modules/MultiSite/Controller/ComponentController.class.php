@@ -3542,6 +3542,18 @@ MultiSite Cache flush [<pattern>] [-v] [--exec]
         // has activated the maintenance-mode.
         $cx->checkSystemState(true);
 
+        // Ensure the current CX instance is the first one (-> Service Server).
+        // This shall prevent an infinite loading loop in case the requested
+        // website is still in its initialization (setup) phase in which
+        // case the website does not yet have a configuration.php file.
+        // The latter would cause to re-load the Service Server again (as
+        // fallback). As every new initialization does increment the ID
+        // of the CX instance, we can identify such a load loop by an ID
+        // higher then 1
+        if ($cx->getId() > 1) {
+            throw new \Cx\Core\Core\Controller\InstanceException();
+        }
+
         $configFile = \Cx\Core\Setting\Controller\Setting::getValue('websitePath','MultiSite').'/'.$website->getName().'/config/configuration.php';
         $requestInfo =    isset($_REQUEST['cmd']) && $_REQUEST['cmd'] == 'JsonData'
                        && isset($_REQUEST['object']) && $_REQUEST['object'] == 'MultiSite'
