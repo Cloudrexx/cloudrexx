@@ -364,15 +364,16 @@ class User_Profile
              * $condition is either a simple condition (integer or string) or an condition matrix (array)
              */
             if ($this->objAttribute->load($attribute) && $this->objAttribute->isCoreAttribute($attribute)) {
-                $attribute = $this->objAttribute->getAttributeIdByProfileAttributeId($attribute);
+                $attributeId = $this->objAttribute->getAttributeIdByProfileAttributeId($attribute);
+
                 switch ($attribute) {
                     case 'gender':
-                        $arrConditions[] = "(`tblA`.`attribute_id` = {$attribute} AND `tblA`.`value` = '".(is_array($condition) ? implode("' OR `tblA`.`value` = '", array_map('addslashes', $condition)) : addslashes($condition))."')";
+                        $arrConditions[] = "(`tblA`.`attribute_id` = {$attributeId} AND `tblA`.`value` = '".(is_array($condition) ? implode("' OR `tblA`.`value` = '", array_map('addslashes', $condition)) : addslashes($condition))."')";
                         break;
 
                     case 'title':
                     case 'country':
-                        $arrConditions[] = '(`tblA`.`attribute_id` = ' . $attribute . ' AND `tblA`.`value` = ' . (
+                        $arrConditions[] = '(`tblA`.`attribute_id` = ' . $attributeId . ' AND `tblA`.`value` = ' . (
                             is_array($condition)
                                 ? implode(
                                     ' OR `tblA`.`value` = ',
@@ -419,7 +420,7 @@ class User_Profile
                                          * $restrictionOperator is a comparison operator ( =, <, >)
                                          * $restrictionValue represents the condition
                                          */
-                                        $arrConditionRestriction[] = "tblP.`{$attribute}` ".(
+                                        $arrConditionRestriction[] = "`tblA`.`attribute_id` = {$attributeId} AND `tblA`.`value` ".(
                                             in_array($restrictionOperator, $arrComparisonOperators[$this->objAttribute->getDataType()], true) ?
                                                 $restrictionOperator
                                             :   $arrDefaultComparisonOperator[$this->objAttribute->getDataType()]
@@ -427,7 +428,7 @@ class User_Profile
                                     }
                                     $arrRestrictions[] = implode(' AND ', $arrConditionRestriction);
                                 } else {
-                                    $arrRestrictions[] = "`tblA`.`attribute_id` = {$attribute} AND `tblA`.`value` ".(
+                                    $arrRestrictions[] = "`tblA`.`attribute_id` = {$attributeId} AND `tblA`.`value` ".(
                                         in_array($operator, $arrComparisonOperators[$this->objAttribute->getDataType()], true) ?
                                             $operator
                                         :   $arrDefaultComparisonOperator[$this->objAttribute->getDataType()]
@@ -436,7 +437,7 @@ class User_Profile
                             }
                             $arrConditions[] = '(('.implode(') OR (', $arrRestrictions).'))';
                         } else {
-                            $arrConditions[] = "(`tblA`.`attribute_id` = ".$attribute." AND `tblA`.`value` ".$arrDefaultComparisonOperator[$this->objAttribute->getDataType()]." '".$arrEscapeFunction[$this->objAttribute->getDataType()]($condition)."')";
+                            $arrConditions[] = "(`tblA`.`attribute_id` = ".$attributeId." AND `tblA`.`value` ".$arrDefaultComparisonOperator[$this->objAttribute->getDataType()]." '".$arrEscapeFunction[$this->objAttribute->getDataType()]($condition)."')";
                         }
                         break;
                 }
