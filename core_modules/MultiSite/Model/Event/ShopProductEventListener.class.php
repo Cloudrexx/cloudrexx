@@ -48,8 +48,13 @@ class ShopProductEventListener implements \Cx\Core\Event\Model\Entity\EventListe
                     if (!empty($options['Product']) && $options['Product'] > 0) {
                         $count = 0;
                         $products = \Cx\Modules\Shop\Controller\Products::getByShopParams($count, 0, null, null, null, null, false, false, null, null, true);
-                        $productsCount = !empty($products) ? count($products) : 0;
-                        if ($productsCount >= $options['Product']) {
+                        foreach ($products as $product) {
+                            if ($product->active()) {
+                                continue;
+                            }
+                            $count--;
+                        }
+                        if ($count >= $options['Product']) {
                             throw new \Cx\Core\Error\Model\Entity\ShinyException(sprintf($_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_MAXIMUM_PRODUCTS_REACHED'], $options['Product']).' <a href="index.php?cmd=Shop&act=products">'.$_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_GO_TO_OVERVIEW'].'</a>');
                         }
                     }

@@ -6557,7 +6557,13 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
                                 $count = 0;
                                 $products = \Cx\Modules\Shop\Controller\Products::getByShopParams($count, 0, null, null, null, null, false, false, null, null, true);
                                 $_CONFIG['corePagingLimit'] = $pagingLimitBkp;
-                                $usage = count($products);
+                                foreach ($products as $product) {
+                                    if ($product->active()) {
+                                        continue;
+                                    }
+                                    $count--;
+                                }
+                                $usage = $count;
                                 break;
 
                             case 'Crm':
