@@ -5181,9 +5181,14 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
             if ($error) {
                 throw new MultiSiteJsonException('Failed to import database on restore.');
             }
-            $this->getComponent('Cache')->setCachePrefix($dbName.'.'.$dbPrefix);
+
+            // flush cache of website
+            global $_DBCONFIG;
+            $_DBCONFIGofServiceServer = $_DBCONFIG;
+            $_DBCONFIG['database'] = $dbName;
             $this->getComponent('Cache')->clearCache(\Cx\Core_Modules\Cache\Controller\CacheLib::CACHE_ENGINE_MEMCACHED);
-            $this->getComponent('Cache')->setCachePrefix();
+            $_DBCONFIG = $_DBCONFIGofServiceServer;
+
             //cleanup website tempory folder
             if (!\Cx\Lib\FileSystem\FileSystem::delete_folder($websiteTempPath, true)) {
                 throw new MultiSiteJsonException('Failed to delete the website temp folder on restore.');
