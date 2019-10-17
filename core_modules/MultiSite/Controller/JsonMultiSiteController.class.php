@@ -5109,7 +5109,7 @@ class JsonMultiSiteController extends    \Cx\Core\Core\Model\Entity\Controller
             // do not extract /config folder, except for yaml-files.
             // however, yaml-files of system components must also
             // not get extracted
-            PCLZIP_OPT_BY_PREG, '/dataRepository(.(?!config\/(?!(?!Config|MultiSite|Support)[^\/]+\.yml)))*$/',
+            PCLZIP_OPT_BY_PREG, '/dataRepository(.(?!config\/(?!(?!Config|MultiSite|Support|DomainRepository)[^\/]+\.yml)))*$/',
             // strip folder dataRepository from extraction
             PCLZIP_OPT_REMOVE_PATH, 'dataRepository',
             // extract any file (and overwrite existing files) independent of
