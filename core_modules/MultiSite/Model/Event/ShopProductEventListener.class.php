@@ -39,7 +39,7 @@ class ShopProductEventListener implements \Cx\Core\Event\Model\Entity\EventListe
     public function prePersist($eventArgs) {
         \DBG::msg('Multisite (ShopProductEventListener): prePersist');
         
-        global $_ARRAYLANG, $_CONFIG;
+        global $_CONFIG;
         try {
             \Cx\Core\Setting\Controller\Setting::init('MultiSite', '','FileSystem');
             switch (\Cx\Core\Setting\Controller\Setting::getValue('mode','MultiSite')) {
@@ -58,6 +58,7 @@ class ShopProductEventListener implements \Cx\Core\Event\Model\Entity\EventListe
                             $count--;
                         }
                         if ($count >= $options['Product']) {
+                            $_ARRAYLANG = \Env::get('init')->getComponentSpecificLanguageData('MultiSite', false);
                             throw new \Cx\Core\Error\Model\Entity\ShinyException(sprintf($_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_MAXIMUM_PRODUCTS_REACHED'], $options['Product']).' <a href="index.php?cmd=Shop&act=products">'.$_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_GO_TO_OVERVIEW'].'</a>');
                         }
                     }
