@@ -39,7 +39,7 @@ class ShopProductEventListener implements \Cx\Core\Event\Model\Entity\EventListe
     public function prePersist($eventArgs) {
         \DBG::msg('Multisite (ShopProductEventListener): prePersist');
         
-        global $_ARRAYLANG;
+        global $_CONFIG;
         try {
             \Cx\Core\Setting\Controller\Setting::init('MultiSite', '','FileSystem');
             switch (\Cx\Core\Setting\Controller\Setting::getValue('mode','MultiSite')) {
@@ -47,9 +47,18 @@ class ShopProductEventListener implements \Cx\Core\Event\Model\Entity\EventListe
                     $options = \Cx\Core_Modules\MultiSite\Controller\ComponentController::getModuleAdditionalDataByType('Shop');
                     if (!empty($options['Product']) && $options['Product'] > 0) {
                         $count = 0;
+                        $pagingLimitBkp = $_CONFIG['corePagingLimit'];
+                        $_CONFIG['corePagingLimit'] = 10000;
                         $products = \Cx\Modules\Shop\Controller\Products::getByShopParams($count, 0, null, null, null, null, false, false, null, null, true);
-                        $productsCount = !empty($products) ? count($products) : 0;
-                        if ($productsCount >= $options['Product']) {
+                        $_CONFIG['corePagingLimit'] = $pagingLimitBkp;
+                        foreach ($products as $product) {
+                            if ($product->active()) {
+                                continue;
+                            }
+                            $count--;
+                        }
+                        if ($count >= $options['Product']) {
+                            $_ARRAYLANG = \Env::get('init')->getComponentSpecificLanguageData('MultiSite', false);
                             throw new \Cx\Core\Error\Model\Entity\ShinyException(sprintf($_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_MAXIMUM_PRODUCTS_REACHED'], $options['Product']).' <a href="index.php?cmd=Shop&act=products">'.$_ARRAYLANG['TXT_CORE_MODULE_MULTISITE_GO_TO_OVERVIEW'].'</a>');
                         }
                     }
