@@ -76,14 +76,11 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
         );
     }
     /**
-     * Test One User By ame
-     *
-     * @copyright   Cloudrexx AG
-     * @author      Mirjam Doyon <info@cloudrexx.com>
+     * Test One User By Name
      *
      * Search for a given Username
-     *
-     * @param       void
+     * @author      Mirjam Doyon <info@cloudrexx.com>
+     * @return      void
      *
      */
     public function testOneUserByUsername() {
@@ -104,13 +101,9 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
     /**
      * Test UserAmount
      *
-     * @copyright   Cloudrexx AG
-     * @author      Mirjam Doyon <info@cloudrexx.com>
-     *
      * Count the amount of Users and check if any are missing
-     *
-     * @param       void
-     *
+     * @author      Mirjam Doyon <info@cloudrexx.com>
+     * @return       void
      */
     public function testUserAmount() {
         //counter for offset
@@ -161,5 +154,50 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
             4,
             $userCount
         );
+    }
+
+    /**
+     * Test Users By Birthdate
+     *
+     * Search for a given Username
+     * @author      Mirjam Doyon <info@cloudrexx.com>
+     * @return      void
+     *
+     */
+    public function testUsersByBirthdate() {
+
+    }
+    /**
+     * Test Find User By First Letter
+     *
+     * Search for a given Username
+     * @author      Mirjam Doyon <info@cloudrexx.com>
+     * @return      void
+     *
+     */
+    public function testFindUserByFirstLetter() {
+
+    }
+    /**
+     * Test Find User By First Letter Of First And Lastname
+     *
+     * Search for a given Username
+     * @author      Mirjam Doyon <info@cloudrexx.com>
+     * @return      void
+     *
+     */
+    public function testFindUserByFirstLetterOfFirstAndLastname() {
+
+    }
+    /**
+     * Test Get List Of Users By Limit
+     *
+     * Get a List of Users with a Limit of 3
+     * @author      Mirjam Doyon <info@cloudrexx.com>
+     * @return      void
+     *
+     */
+    public function testGetListOfUsersByLimit() {
+
     }
 }
