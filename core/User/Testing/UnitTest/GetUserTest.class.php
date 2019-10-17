@@ -49,15 +49,12 @@ use function JmesPath\search;
 class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
 {
     /**
-     * Test One User By Id
-     *
-     * @copyright   Cloudrexx AG
-     * @author      Hava Fuga <info@cloudrexx.com>
-     *
+     * Test one user by Id
      * Search for an Id
      *
-     * @param       void
+     * @author      Hava Fuga <info@cloudrexx.com>
      *
+     * @return      void
      */
     public function testOneUserById() {
         $object = \FWUser::getFWUserObject();
@@ -73,15 +70,12 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
     }
 
     /**
-     * Test One User By Email
-     *
-     * @copyright   Cloudrexx AG
-     * @author      Hava Fuga <info@cloudrexx.com>
-     *
+     * Test one user by Email
      * Search for a given Email
      *
-     * @param       void
+     * @author      Hava Fuga <info@cloudrexx.com>
      *
+     * @return      void
      */
     public function testOneUserByEmail() {
         $object = \FWUser::getFWUserObject();
@@ -123,15 +117,12 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
     }
 
     /**
-     * Test All Users
-     *
-     * @copyright   Cloudrexx AG
-     * @author      Hava Fuga <info@cloudrexx.com>
-     *
+     * Test all Users
      * Search for all given Users
      *
-     * @param       void
+     * @author      Hava Fuga <info@cloudrexx.com>
      *
+     * @return      void
      */
     public function testAllUsers() {
         $object = \FWUser::getFWUserObject();
