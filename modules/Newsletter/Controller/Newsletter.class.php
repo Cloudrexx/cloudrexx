@@ -342,9 +342,13 @@ class Newsletter extends NewsletterLib
 
     function _profile()
     {
-        global $_ARRAYLANG, $_CORELANG, $objDatabase;
-
         $this->_objTpl->setTemplate($this->pageContent);
+        $this->newsletterSignUp($this->_objTpl);
+    }
+
+    public function newsletterSignUp($template) {
+
+        global $_ARRAYLANG, $_CORELANG, $objDatabase;
 
         $showForm = true;
         $arrStatusMessage = array('ok' => array(), 'error' => array());
@@ -694,16 +698,16 @@ class Newsletter extends NewsletterLib
         $this->_createDatesDropdown($recipientBirthday);
 
         if (count($arrStatusMessage['ok']) > 0) {
-            $this->_objTpl->setVariable('NEWSLETTER_OK_MESSAGE', implode('<br />', $arrStatusMessage['ok']));
-            $this->_objTpl->parse('newsletter_ok_message');
+            $template->setVariable('NEWSLETTER_OK_MESSAGE', implode('<br />', $arrStatusMessage['ok']));
+            $template->parse('newsletter_ok_message');
         } else {
-            $this->_objTpl->hideBlock('newsletter_ok_message');
+            $template->hideBlock('newsletter_ok_message');
         }
         if (count($arrStatusMessage['error']) > 0) {
-            $this->_objTpl->setVariable('NEWSLETTER_ERROR_MESSAGE', implode('<br />', $arrStatusMessage['error']));
-            $this->_objTpl->parse('newsletter_error_message');
+            $template->setVariable('NEWSLETTER_ERROR_MESSAGE', implode('<br />', $arrStatusMessage['error']));
+            $template->parse('newsletter_error_message');
         } else {
-            $this->_objTpl->hideBlock('newsletter_error_message');
+            $template->hideBlock('newsletter_error_message');
         }
 
         $languages = '<select name="language" class="selectLanguage" id="language" >';
@@ -716,8 +720,8 @@ class Newsletter extends NewsletterLib
 
         if ($showForm) {
             if ($isAccessRecipient) {
-                if ($this->_objTpl->blockExists('recipient_profile')) {
-                    $this->_objTpl->hideBlock('recipient_profile');
+                if ($template->blockExists('recipient_profile')) {
+                    $template->hideBlock('recipient_profile');
                 }
             } else {
                 //display settings recipient profile detials
@@ -742,14 +746,14 @@ class Newsletter extends NewsletterLib
                     'recipient_website',
                 );
                 foreach ($recipientAttributesArray as $attribute) {
-                    if ($this->_objTpl->blockExists($attribute)) {
+                    if ($template->blockExists($attribute)) {
                         if ($recipientAttributeStatus[$attribute]['active']) {
-                            $this->_objTpl->touchBlock($attribute);
-                            $this->_objTpl->setVariable(array(
+                            $template->touchBlock($attribute);
+                            $template->setVariable(array(
                                 'NEWSLETTER_'.strtoupper($attribute).'_MANDATORY' => ($recipientAttributeStatus[$attribute]['required']) ? '*' : '',
                             ));
                         } else {
-                            $this->_objTpl->hideBlock($attribute);
+                            $template->hideBlock($attribute);
                         }
                     }
                 }
@@ -758,19 +762,19 @@ class Newsletter extends NewsletterLib
                 if (!$isAuthenticatedUser &&
                     $recipientAttributeStatus['captcha']['active']
                 ) {
-                    $this->_objTpl->setVariable(array(
+                    $template->setVariable(array(
                         'TXT_MODULE_CAPTCHA'   => $_CORELANG['TXT_CORE_CAPTCHA'],
                         'MODULE_CAPTCHA_CODE'  => \Cx\Core_Modules\Captcha\Controller\Captcha::getInstance()->getCode(),
 
                         // this is a legacy placeholder
                         'NEWSLETTER_CAPTCHA_MANDATORY' => $recipientAttributeStatus['captcha']['required'] ? '*' : '',
                     ));
-                    $this->_objTpl->touchBlock('captcha');
+                    $template->touchBlock('captcha');
                 } else {
-                    $this->_objTpl->hideBlock('captcha');
+                    $template->hideBlock('captcha');
                 }
 
-                $this->_objTpl->setVariable(array(
+                $template->setVariable(array(
                     'NEWSLETTER_EMAIL'        => htmlentities($recipientEmail, ENT_QUOTES, CONTREXX_CHARSET),
                     'NEWSLETTER_WEBSITE'          => htmlentities($recipientUri, ENT_QUOTES, CONTREXX_CHARSET),
                     'NEWSLETTER_SEX_F'        => $recipientSex == 'f' ? 'checked="checked"' : '',
@@ -794,7 +798,7 @@ class Newsletter extends NewsletterLib
                     'NEWSLETTER_LANGUAGE'     => $languages
                 ));
 
-                $this->_objTpl->setVariable(array(
+                $template->setVariable(array(
                     'TXT_NEWSLETTER_EMAIL_ADDRESS'    => $_ARRAYLANG['TXT_NEWSLETTER_EMAIL_ADDRESS'],
                     'TXT_NEWSLETTER_SALUTATION'     => $_ARRAYLANG['TXT_NEWSLETTER_SALUTATION'],
                     'TXT_NEWSLETTER_SEX'            => $_ARRAYLANG['TXT_NEWSLETTER_SEX'],
@@ -823,41 +827,45 @@ class Newsletter extends NewsletterLib
                     'TXT_NEWSLETTER_RECIPIENT_YEAR' => $_ARRAYLANG['TXT_NEWSLETTER_RECIPIENT_YEAR'],
                 ));
 
-                if ($this->_objTpl->blockExists('recipient_profile')) {
-                    $this->_objTpl->parse('recipient_profile');
+                if ($template->blockExists('recipient_profile')) {
+                    $template->parse('recipient_profile');
                 }
             }
 
             // only show newsletter-lists that are visible for new users (not yet registered ones)
             $excludeDisabledLists = $recipientId == 0;
             $arrLists = self::getLists($excludeDisabledLists);
-            if ($this->_objTpl->blockExists('newsletter_lists') && !empty($arrLists)) {
+            if ($template->blockExists('newsletter_lists') && !empty($arrLists)) {
                 foreach ($arrLists as $listId => $arrList) {
                     if ($arrList['status'] || in_array($listId, $arrPreAssociatedInactiveLists)) {
-                        $this->_objTpl->setVariable(array(
+                        $template->setVariable(array(
                             'NEWSLETTER_LIST_ID'        => $listId,
                             'NEWSLETTER_LIST_NAME'      => contrexx_raw2xhtml($arrList['name']),
                             'NEWSLETTER_LIST_SELECTED'  => in_array($listId, $arrAssociatedLists) ? 'checked="checked"' : ''
                         ));
-                        $this->_objTpl->parse('newsletter_list');
+                        $template->parse('newsletter_list');
                     }
                 }
 
-                $this->_objTpl->setVariable(array(
+                $template->setVariable(array(
                     'TXT_NEWSLETTER_LISTS'             => $_ARRAYLANG['TXT_NEWSLETTER_LISTS'],
                 ));
-                $this->_objTpl->parse('newsletter_lists');
+                $template->parse('newsletter_lists');
             }
 
-            $this->_objTpl->setVariable(array(
+            $template->setVariable(array(
                 'NEWSLETTER_PROFILE_MAIL' => contrexx_raw2xhtml($requestedMail),
                 'NEWSLETTER_USER_CODE'    => $code,
                 'TXT_NEWSLETTER_SAVE'     => $_ARRAYLANG['TXT_NEWSLETTER_SAVE'],
             ));
 
-            $this->_objTpl->parse('newsletterForm');
+            $template->parse('newsletterForm');
+            $template->parse('newsletter_signup');
+            $template->hideBlock('newsletter_recipient');
         } else {
-            $this->_objTpl->hideBlock('newsletterForm');
+            $template->hideBlock('newsletterForm');
+            $template->hideBlock('newsletter_signup');
+            $template->touchBlock('newsletter_recipient');
         }
     }
 
