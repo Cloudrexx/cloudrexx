@@ -45,28 +45,26 @@ class EsiWidgetController extends \Cx\Core_Modules\Widget\Controller\EsiWidgetCo
      * @param \Cx\Core\Html\Sigma $template Widget Template
      * @param \Cx\Core\Routing\Model\Entity\Response $response Response object
      * @param array $params Get parameters
+     * @return void
+     * @throws \Exception
+     *
      */
     public function parseWidget($name, $template, $response, $params)
     {
 
-        $newsletter = new \Cx\Modules\Newsletter\Controller\Newsletter;
-        $newsletterLib = new \Cx\Modules\Newsletter\Controller\NewsletterLib;
-
-        $profileNewsletter = $newsletter ->_profile();
-        $type = $newsletterLib-> $type;
-
-
+        $newsletter = new \Cx\Modules\Newsletter\Controller\Newsletter('');
+        $newsletter->newsletterSignUp($template);
 
         switch ($name) {
-            case 'newsletter_form':
-                if ($type != true){
-                    $this-> $profileNewsletter;
-                } else {
-                    $this -> $profileNewsletter;
-                }
-
-                $template->parse('newsletter_list');
+            case 'newsletter_subscribe':
+                $template->replaceBlock(
+                    'newsletter_subscribe',
+                    $newsletter->_objTpl->get(),
+                    false,
+                    true
+                );
                 break;
         }
+        return;
     }
 }
