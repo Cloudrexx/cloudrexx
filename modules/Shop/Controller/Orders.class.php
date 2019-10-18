@@ -171,25 +171,29 @@ class Orders
                     addslashes($filter['date<'])."'");
 
         if (isset($filter['letter'])) {
-            $term = addslashes($filter['letter']).'%';
-            $query_where .= "
-                AND (   `profile`.`company` LIKE '$term'
-                     OR `profile`.`firstname` LIKE '$term'
-                     OR `profile`.`lastname` LIKE '$term')";
+            if (!empty($filter['user_ids'])) {
+                $query_where .= ' AND ( `order`.`customer_id` IN ('
+                    . join(',', $filter['user_ids']) .
+                    ')) ';
+            } else {
+                $query_where .= ' AND 0';
+            }
         }
         if (isset($filter['term'])) {
             $term = '%'.addslashes($filter['term']).'%';
+
+            $customerIdQuery = '';
+            if (
+                !empty($filter['user_ids']) ||
+                count($filter['user_ids']) > 0
+            ) {
+                $customerIdQuery = '`order`.`customer_id` IN ('
+                    . join(',', $filter['user_ids']) .
+                ') OR ';
+            }
             $query_where .= "
-                AND (   `user`.`username` LIKE '$term'
-                     OR `user`.`email` LIKE '$term'
-                     OR `profile`.`company` LIKE '$term'
-                     OR `profile`.`firstname` LIKE '$term'
-                     OR `profile`.`lastname` LIKE '$term'
-                     OR `profile`.`address` LIKE '$term'
-                     OR `profile`.`city` LIKE '$term'
-                     OR `profile`.`phone_private` LIKE '$term'
-                     OR `profile`.`phone_fax` LIKE '$term'
-                     OR `order`.`company` LIKE '$term'
+                AND ($customerIdQuery
+                     `order`.`company` LIKE '$term'
                      OR `order`.`firstname` LIKE '$term'
                      OR `order`.`lastname` LIKE '$term'
                      OR `order`.`address` LIKE '$term'
@@ -210,14 +214,6 @@ class Orders
 //                : ''
 //            );
 
-        // Need to join the User for filter and sorting.
-        // Note: This might be optimized, so the join only occurs when
-        // searching or sorting by Customer name.
-        $query_join = "
-            LEFT JOIN `".DBPREFIX."access_users` AS `user`
-              ON `order`.`customer_id`=`user`.`id`
-            LEFT JOIN `".DBPREFIX."access_user_profile` AS `profile`
-              ON `user`.`id`=`profile`.`user_id`";
         // The order *SHOULD* contain the direction.  Defaults to DESC here!
         $direction = (preg_match('/\sASC$/i', $order) ? 'ASC' : 'DESC');
         if (preg_match('/customer_name/', $order)) {
@@ -233,7 +229,7 @@ class Orders
         // Get the IDs of the Orders according to the offset and limit
 //DBG::activate(DBG_ADODB);
         $objResult = $objDatabase->SelectLimit(
-            $query_id.$query_from.$query_join.$query_where.$query_order,
+            $query_id.$query_from.$query_where.$query_order,
             $limit, intval($offset));
 //DBG::deactivate(DBG_ADODB);
         if (!$objResult) return Order::errorHandler();
@@ -246,7 +242,7 @@ class Orders
 //DBG::deactivate(DBG_ADODB);
         // Get the total count of matching Orders, set $count
         $objResult = $objDatabase->Execute(
-            $query_count.$query_from.$query_join.$query_where);
+            $query_count.$query_from.$query_where);
         if (!$objResult) return Order::errorHandler();
         $count = $objResult->fields['numof_orders'];
 //DBG::log("Count: $count");
@@ -412,6 +408,77 @@ if (!$limit) {
         $tries = 2;
         $arrOrders = null;
 //\DBG::activate(DBG_DB_FIREPHP);
+
+        //  `user`.`username` LIKE '$term'
+        //                     OR `user`.`email` LIKE '$term'
+        //                     OR `profile`.`company` LIKE '$term'
+        //                     OR `profile`.`firstname` LIKE '$term'
+        //                     OR `profile`.`lastname` LIKE '$term'
+        //                     OR `profile`.`address` LIKE '$term'
+        //                     OR `profile`.`city` LIKE '$term'
+        //                     OR `profile`.`phone_private` LIKE '$term'
+        //                     OR `profile`.`phone_fax` LIKE '$term'
+
+        $customerIds = array();
+
+        $userFilter = array();
+        if (!empty($filter['term'])) {
+            $userFilter = array(
+                'OR' => array(
+                    array('username' => $filter['term']),
+                    array('email' => $filter['term']),
+                    array('company' => $filter['term']),
+                    array('firstname' => $filter['term']),
+                    array('lastname' => $filter['term']),
+                    array('address' => $filter['term']),
+                    array('city' => $filter['term']),
+                    array('phone_private' => $filter['term']),
+                    array('phone_fax' => $filter['term']),
+                )
+            );
+        }
+
+        if (!empty($filter['letter'])) {
+            $userFilter = array(
+                'OR' => array(
+                    array(
+                        'company' => array(
+                            'LIKE' => $filter['letter'] . '%'
+                        ),
+                    ),
+                    array(
+                        'firstname' => array(
+                            'LIKE' => $filter['letter'] . '%'
+                        ),
+                    ),
+                    array(
+                        'lastname' => array(
+                            'LIKE' => $filter['letter'] . '%'
+                        ),
+                    ),
+                )
+            );
+        }
+
+        if (count($userFilter) > 0) {
+            $objFWUser = \FWUser::getFWUserObject();
+
+            $objUser = $objFWUser->objUser->getUsers(
+                $userFilter
+            );
+
+            if ($objUser) {
+                while (!$objUser->EOF) {
+                    $customerIds[] = $objUser->getId();
+                    $objUser->next();
+                }
+            }
+
+            // Können nicht bei den normalen Custerom IDs hinzugefügt werden,
+            // wegen der AND Bestimmung von Customer IDS Term Filter
+            $filter['user_ids'] = $customerIds;
+        }
+
         while ($tries-- && $count == 0) {
             $arrOrders = self::getArray(
                 $count, $objSorting->getOrder(), $filter,
