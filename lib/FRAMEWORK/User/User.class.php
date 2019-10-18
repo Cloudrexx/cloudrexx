@@ -1302,7 +1302,7 @@ class User extends User_Profile
             }
         }
         try {
-            if (!($arrQuery = $this->setSortedUserIdList($arrSort, $sqlCondition, $limit, $offset, $groupless, $crmUser))) {
+            if (($arrQuery = $this->setSortedUserIdList($arrSort, $sqlCondition, $limit, $offset, $groupless, $crmUser)) === false) {
                 $this->clean();
                 return false;
             }
@@ -1642,9 +1642,6 @@ class User extends User_Profile
             }
         }
         $this->arrLoadedUsers = $arrUserIds;
-        if (!count($arrUserIds)) {
-            return false;
-        }
         return array(
             'tables' => array(
                 'custom'    => $joinCustomTbl,
