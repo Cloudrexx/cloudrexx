@@ -325,6 +325,86 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
     }
 
     /**
+     * Test list sorted by firstname
+     * Search for a list, sorted by the firstnames
+     *
+     * @author      Hava Fuga <info@cloudrexx.com>
+     *
+     * @return      void
+     */
+    public function testListSortedByFirstnames() {
+        //array for offset-id's
+        $offsetId = array();
+
+        $object = \FWUser::getFWUserObject();
+        $user = $object->objUser;
+
+        //save id's from existing Users in DB
+        $users = $user->getUsers();
+        while (!$users->EOF) {
+            array_push($offsetId, $users->getId());
+            $users->next();
+        }
+
+        //set users with email and firstname
+        $user->reset();
+        $user->setEmail('test1@testmail.com');
+        $user->setProfile(array(
+            'firstname' => array('Xavier'),
+        ));
+        $user->store();
+        $user->reset();
+        $user->setEmail('test2@testmail.com');
+        $user->setProfile(array(
+            'firstname' => array('Aaron'),
+        ));
+        $user->store();
+        $user->reset();
+        $user->setEmail('test3@testmail.com');
+        $user->setProfile(array(
+            'firstname' => array('Anna'),
+        ));
+        $user->store();
+        $user->reset();
+        $user->setEmail('test4@testmail.com');
+        $user->setProfile(array(
+            'firstname' => array('Nadia'),
+        ));
+        $user->store();
+
+        $arrSort = array(
+            'firstname' => 'asc',
+        );
+
+        // get all users sorted by firstname ($arrSort)
+        $users = $user->getUsers(
+            null,
+            null,
+            $arrSort
+        );
+
+        $names = array();
+        //remove user if previously existed ($offsetId)
+        while (!$users->EOF) {
+            if (!in_array($users->getId(), $offsetId)) {
+                array_push($names, $users->getProfileAttribute('firstname'));
+            }
+            $users->next();
+        }
+
+        $this->assertEquals(
+            array(
+                'Aaron',
+                'Anna',
+                'Nadia',
+                'Xavier',
+            ),
+            $names
+        );
+
+    }
+
+    /**
      * Test Users By Birthdate
      *
      * Search for a given Username
