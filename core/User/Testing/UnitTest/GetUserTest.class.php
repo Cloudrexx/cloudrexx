@@ -396,7 +396,6 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
         //remove user if previously existed ($offsetId)
         while (!$users->EOF) {
             if (!in_array($users->getId(), $offsetId)) {
-                var_dump($users->getEmail());
                 array_push($emails, $users->getEmail());
             }
             $users->next();
