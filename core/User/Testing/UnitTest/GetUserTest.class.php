@@ -411,6 +411,64 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
         );
     }
 
+    /**
+     * Test limit user
+     * Search for all users with a limit
+     * in the first- and the lastname
+     *
+     * @author      Hava Fuga <info@cloudrexx.com>
+     *
+     * @return      void
+     */
+    public function testLimitUser() {
+        //counter for offset
+        $offset = 0;
+
+        $object = \FWUser::getFWUserObject();
+        $user = $object->objUser;
+
+        //count existing Users in DB
+        $users = $user->getUsers();
+        while (!$users->EOF) {
+            $offset++;
+            $users->next();
+        }
+
+        //set users with email
+        $user->reset();
+        $user->setEmail('test1@testmail.com');
+        $user->store();
+        $user->reset();
+        $user->setEmail('test2@testmail.com');
+        $user->store();
+        $user->reset();
+        $user->setEmail('test3@testmail.com');
+        $user->store();
+        $user->reset();
+        $user->setEmail('test4@testmail.com');
+        $user->store();
+        $user->reset();
+        $user->setEmail('test5@testmail.com');
+        $user->store();
+
+        $limit = 4;
+        //get all users with limit ($limit)
+        //and ignore previously existing entries ($offset)
+        $users = $user->getUsers(null, null, null, null, $limit, $offset);
+
+        $countUsers = 0;
+        while (!$users->EOF) {
+            $countUsers++;
+            $users->next();
+        }
+
+        $this->assertEquals(
+            4,
+            $countUsers
+        );
+    }
+
+
 
     /**
      * Test all users with same initial letter in firstname
