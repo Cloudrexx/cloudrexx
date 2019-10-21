@@ -236,6 +236,98 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
     }
 
     /**
+     * Test all users by birthday and existing profilepicture
+     * Search for all users with a specific birthday and a profilepicture
+     *
+     * @author      Hava Fuga <info@cloudrexx.com>
+     *
+     * @return      void
+     */
+    public function testAllUsersByBirthdayAndExistingProfilepicture() {
+        //counter for offset
+        $offset = 0;
+
+        $object = \FWUser::getFWUserObject();
+        $user = $object->objUser;
+
+        //count existing Users in DB
+        $users = $user->getUsers();
+        while (!$users->EOF){
+            $offset++;
+            $users->next();
+        }
+
+        $user->reset();
+        //user with wanted birthday and with profile-picture
+        $user->setEmail('test1@testmail.com');
+        $user->setProfile(array(
+            'birthday' => array('02.10.1999'),
+            'picture' => array('image.jpg'),
+        ));
+        $user->store();
+        $user->reset();
+        //user with wanted birthday and without profile-picture
+        $user->setEmail('test2@testmail.com');
+        $user->setProfile(array(
+            'birthday' => array('02.10.2000'),
+            'picture' => array(''),
+        ));
+        $user->store();
+        $user->reset();
+        //user with unwanted birthday and with profile-picture
+        $user->setEmail('test3@testmail.com');
+        $user->setProfile(array(
+            'birthday' => array('30.10.2000'),
+            'picture' => array('image.jpg'),
+        ));
+        $user->store();
+        $user->reset();
+        //user with wanted birthday and with profile-picture
+        $user->setEmail('test4@testmail.com');
+        $user->setProfile(array(
+            'birthday' => array('02.10.2000'),
+            'picture' => array('image.jpg'),
+        ));
+        $user->store();
+
+        //set filter
+        $day = '2';
+        $month = '10';
+        $filter = array (
+            'birthday_day' => $day,
+            'birthday_month' => $month,
+            'picture' => array (
+                '!=' => ''
+            )
+        );
+
+        //get all users with wanted conditions ($filter)
+        // and ignore previously existing entries ($offset)
+        $users = $user->getUsers(
+            $filter,
+            null,
+            null,
+            null,
+            5,
+            $offset
+        );
+
+        $emails = array();
+        while (!$users->EOF){
+            array_push($emails, $users->getEmail());
+            $users->next();
+        }
+
+        $this->assertEquals(
+            array(
+                'test1@testmail.com',
+                'test4@testmail.com',
+            ),
+            $emails
+        );
+    }
+
+    /**
      * Test Users By Birthdate
      *
      * Search for a given Username
