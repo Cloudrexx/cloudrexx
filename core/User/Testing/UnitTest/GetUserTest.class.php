@@ -245,7 +245,7 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
      */
     public function testAllUsersByBirthdayAndExistingProfilepicture() {
         //counter for offset
-        $offset = 0;
+        $offsetId = array();
 
         $object = \FWUser::getFWUserObject();
         $user = $object->objUser;
@@ -253,7 +253,7 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
         //count existing Users in DB
         $users = $user->getUsers();
         while (!$users->EOF) {
-            $offset++;
+            array_push($offsetId, $users->getId());
             $users->next();
         }
 
@@ -302,19 +302,16 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
         );
 
         //get all users with wanted conditions ($filter)
-        // and ignore previously existing entries ($offset)
         $users = $user->getUsers(
-            $filter,
-            null,
-            null,
-            null,
-            5,
-            $offset
+            $filter
         );
 
         $emails = array();
+        //remove if previously existed user ($offsetId)
         while (!$users->EOF) {
-            array_push($emails, $users->getEmail());
+            if (!in_array($users->getId(), $offsetId)) {
+                array_push($emails, $users->getEmail());
+            }
             $users->next();
         }
 
