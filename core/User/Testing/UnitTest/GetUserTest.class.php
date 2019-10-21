@@ -130,7 +130,7 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
         $offset = 0;
 
         //count existing Users in DB
-        while (!$users->EOF){
+        while (!$users->EOF) {
             $offset++;
             $users->next();
         }
@@ -160,7 +160,7 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
         );
 
         $emails = array();
-        while (!$users->EOF){
+        while (!$users->EOF) {
             array_push($emails, $users->getEmail());
             $users->next();
         }
@@ -195,7 +195,7 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
 
         //count existing Users in DB
         $users = $user->getUsers();
-        while (!$users->EOF){
+        while (!$users->EOF) {
             $offset++;
             $users->next();
         }
@@ -224,7 +224,7 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
             5,
             $offset
         );
-        while (!$users->EOF){
+        while (!$users->EOF) {
             $userCount++;
             $users->next();
         }
@@ -252,7 +252,7 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
 
         //count existing Users in DB
         $users = $user->getUsers();
-        while (!$users->EOF){
+        while (!$users->EOF) {
             $offset++;
             $users->next();
         }
@@ -313,7 +313,7 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
         );
 
         $emails = array();
-        while (!$users->EOF){
+        while (!$users->EOF) {
             array_push($emails, $users->getEmail());
             $users->next();
         }
