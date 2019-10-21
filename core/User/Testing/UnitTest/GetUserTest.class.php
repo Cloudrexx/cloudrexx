@@ -324,6 +324,94 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
         );
     }
 
+    /**
+     * Test all users with same initial letter in firstname and lastname
+     * Search for all users with the same inital letter
+     * in the first- and the lastname
+     *
+     * @author      Hava Fuga <info@cloudrexx.com>
+     *
+     * @return      void
+     */
+    public function testAllUsersWithSameInitialLetterInFirstnameAndLastname() {
+        //array for offset-id's
+        $offsetId = array();
+
+        $object = \FWUser::getFWUserObject();
+        $user = $object->objUser;
+
+        //save id's from existing Users in DB
+        $users = $user->getUsers();
+        while (!$users->EOF) {
+            array_push($offsetId, $users->getId());
+            $users->next();
+        }
+
+        //set users with email and firstname
+        $user->reset();
+        $user->setEmail('test1@testmail.com');
+        $user->setProfile(array(
+            'firstname' => array('Sarah'),
+            'lastname'  => array('Conner')
+        ));
+        $user->store();
+        $user->reset();
+        $user->setEmail('test2@testmail.com');
+        $user->setProfile(array(
+            'firstname' => array('Chris'),
+            'lastname' => array('Crisp'),
+        ));
+        $user->store();
+        $user->reset();
+        $user->setEmail('test3@testmail.com');
+        $user->setProfile(array(
+            'firstname' => array('Harry'),
+            'lastname' => array('Potter'),
+        ));
+        $user->store();
+        $user->reset();
+        $user->setEmail('test4@testmail.com');
+        $user->setProfile(array(
+            'firstname' => array('Christina'),
+            'lastname' => array('Müller'),
+        ));
+        $user->store();
+
+
+        $filter = array(
+            'OR' => array(
+                0 => array(
+                    'firstname' => 'C%',
+                ),
+                1 => array(
+                    'lastname' => 'C%',
+                ),
+            ),
+        );
+
+        // get all users with wanted conditions ($filter)
+        $users = $user->getUsers($filter);
+
+        $emails = array();
+        //remove user if previously existed ($offsetId)
+        while (!$users->EOF) {
+            if (!in_array($users->getId(), $offsetId)) {
+                var_dump($users->getEmail());
+                array_push($emails, $users->getEmail());
+            }
+            $users->next();
+        }
+
+        $this->assertEquals(
+            array(
+                'test1@testmail.com',
+                'test2@testmail.com',
+                'test4@testmail.com',
+            ),
+            $emails
+        );
+    }
+
 
     /**
      * Test all users with same initial letter in firstname
