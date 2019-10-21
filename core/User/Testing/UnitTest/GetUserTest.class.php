@@ -324,6 +324,78 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
         );
     }
 
+
+    /**
+     * Test all users with same initial letter in firstname
+     * Search for all users with the same inital letter in the firstnames
+     *
+     * @author      Hava Fuga <info@cloudrexx.com>
+     *
+     * @return      void
+     */
+    public function testAllUsersWithSameInitialLetterInFirstname() {
+        //array for offset-id's
+        $offsetId = array();
+
+        $object = \FWUser::getFWUserObject();
+        $user = $object->objUser;
+
+        //save id's from existing Users in DB
+        $users = $user->getUsers();
+        while (!$users->EOF) {
+            array_push($offsetId, $users->getId());
+            $users->next();
+        }
+
+        //set users with email and firstname
+        $user->reset();
+        $user->setEmail('test1@testmail.com');
+        $user->setProfile(array(
+            'firstname' => array('Aaron'),
+        ));
+        $user->store();
+        $user->reset();
+        $user->setEmail('test2@testmail.com');
+        $user->setProfile(array(
+            'firstname' => array('Anna'),
+        ));
+        $user->store();
+        $user->reset();
+        $user->setEmail('test3@testmail.com');
+        $user->setProfile(array(
+            'firstname' => array('Xavier'),
+        ));
+        $user->store();
+
+        $filter = array(
+            'firstname' => 'A%',
+        );
+        $users = $user->getUsers($filter);
+
+        // get all users with wanted conditions ($filter)
+        $users = $user->getUsers(
+            $filter
+        );
+
+        $names = array();
+        //remove user if previously existed ($offsetId)
+        while (!$users->EOF) {
+            if (!in_array($users->getId(), $offsetId)) {
+                array_push($names, $users->getProfileAttribute('firstname'));
+            }
+            $users->next();
+        }
+
+        $this->assertEquals(
+            array(
+                'Aaron',
+                'Anna',
+            ),
+            $names
+        );
+    }
+
+
     /**
      * Test list sorted by firstname
      * Search for a list, sorted by the firstnames
