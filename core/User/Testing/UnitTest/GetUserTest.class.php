@@ -632,37 +632,4 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
     public function testUsersByBirthdate() {
 
     }
-    /**
-     * Test Find User By First Letter
-     *
-     * Search for a given Username
-     * @author      Mirjam Doyon <info@cloudrexx.com>
-     * @return      void
-     *
-     */
-    public function testFindUserByFirstLetter() {
-
-    }
-    /**
-     * Test Find User By First Letter Of First And Lastname
-     *
-     * Search for a given Username
-     * @author      Mirjam Doyon <info@cloudrexx.com>
-     * @return      void
-     *
-     */
-    public function testFindUserByFirstLetterOfFirstAndLastname() {
-
-    }
-    /**
-     * Test Get List Of Users By Limit
-     *
-     * Get a List of Users with a Limit of 3
-     * @author      Mirjam Doyon <info@cloudrexx.com>
-     * @return      void
-     *
-     */
-    public function testGetListOfUsersByLimit() {
-
-    }
 }
