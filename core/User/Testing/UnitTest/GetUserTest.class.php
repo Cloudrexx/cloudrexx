@@ -624,12 +624,79 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
     /**
      * Test Users By Birthdate
      *
-     * Search for a given Username
+     * Search for a all Users with given Birthday
      * @author      Mirjam Doyon <info@cloudrexx.com>
      * @return      void
      *
      */
     public function testUsersByBirthdate() {
+
+        //array for offset-id's
+        $offsetId = array();
+
+        $object = \FWUser::getFWUserObject();
+        $user = $object->objUser;
+
+        //save id's from existing Users in DB
+        $users = $user->getUsers();
+        while (!$users->EOF) {
+            array_push($offsetId, $users->getId());
+            $users->next();
+        }
+
+        $user->reset();
+        //set user with desired birthday
+        $user->setEmail('test1@testmail.com');
+        $user->setProfile(array(
+            'birthday' => array('02.10.1991'),
+        ));
+        $user->store();
+        $user->reset();
+        //set second user with same birthday
+        $user->setEmail('test2@testmail.com');
+        $user->setProfile(array(
+            'birthday' => array('02.10.19.1995'),
+        ));
+        $user->store();
+        $user->reset();
+        //set user with different birthday
+        $user->setEmail('test3@testmail.com');
+        $user->setProfile(array(
+            'birthday' => array('02.12.1991'),
+        ));
+        $user->store();
+        $user->reset();
+
+        //set filter
+        $day = '2';
+        $month = '10';
+        $filter = array (
+            'birthday_day' => $day,
+            'birthday_month' => $month
+        );
+
+        //get all users with conditions set in $filter
+        $users = $user->getUsers(
+            $filter
+        );
+
+        $emails = array();
+
+        //remove user if previously existed ($offsetId)
+        while (!$users->EOF) {
+            if (!in_array($users->getId(), $offsetId)) {
+                array_push($emails, $users->getEmail());
+            }
+            $users->next();
+        }
+
+        $this->assertEquals(
+            array(
+                'test1@testmail.com',
+                'test2@testmail.com',
+            ),
+            $emails
+        );
 
     }
 }
