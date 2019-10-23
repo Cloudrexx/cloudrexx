@@ -116,15 +116,14 @@ abstract class Indexer extends \Cx\Model\Base\EntityBase
 
         if (!$indexerEntry) {
             $indexerEntry = new \Cx\Core\MediaSource\Model\Entity\IndexerEntry();
-            $pathToText = $path;
-            $content = $this->getText($pathToText);
-            $indexerEntry->setContent(
-                $content
-            );
-            $indexerEntry->setIndexer(get_class($this));
         }
         $indexerEntry->setPath($path);
+        $indexerEntry->setIndexer(get_class($this));
+        $indexerEntry->setContent(
+            $this->getText($path)
+        );
         $indexerEntry->setLastUpdate(new \DateTime('now'));
+
         $em->persist($indexerEntry);
 
         if ($flush) {
