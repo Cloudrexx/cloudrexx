@@ -86,7 +86,7 @@ class IndexerEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventListe
             return;
         }
 
-        $indexer->clearIndex($file->__toString());
+        $indexer->clearIndex((string) $file);
     }
 
     /**
