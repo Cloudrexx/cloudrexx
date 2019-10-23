@@ -195,6 +195,9 @@ class ComponentController
      */
     public function getIndexer($type)
     {
+        if (!isset($this->indexers[$type])) {
+            return null;
+        }
         return $this->indexers[$type];
     }
 }
