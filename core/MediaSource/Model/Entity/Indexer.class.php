@@ -101,8 +101,10 @@ abstract class Indexer extends \Cx\Model\Base\EntityBase
         $repo = $em->getRepository(
             'Cx\Core\MediaSource\Model\Entity\IndexerEntry'
         );
+        $path = $this->getRelativePath($path);
 
         if (!empty($oldPath)) {
+            $oldPath = $this->getRelativePath($oldPath);
             $indexerEntry = $repo->findOneBy(
                 array('path' => $oldPath, 'indexer' => get_class($this))
             );
@@ -142,6 +144,7 @@ abstract class Indexer extends \Cx\Model\Base\EntityBase
             '\Cx\Core\MediaSource\Model\Entity\IndexerEntry'
         );
         if (!empty($path)) {
+            $path = $this->getRelativePath($path);
             $indexerEntries = $indexerEntryRepo->findBy(
                 array('path' => $path, 'indexer' => get_class($this))
             );
@@ -155,6 +158,20 @@ abstract class Indexer extends \Cx\Model\Base\EntityBase
             $em->remove($indexerEntry);
         }
         $em->flush();
+    }
+
+    /**
+     * Makes absolute paths relative to installation root
+     *
+     * @param string $path Absolute (or already relative) path
+     * @return string Path relative to installation root
+     */
+    protected function getRelativePath($path) {
+        $pathWithoutDocRoot = explode($cx->getWebsiteDocumentRootPath(), $path);
+        if (!empty($pathWithoutDocRoot[1])) {
+            $path = $pathWithoutDocRoot[1];
+        }
+        return $path;
     }
 
     /**
