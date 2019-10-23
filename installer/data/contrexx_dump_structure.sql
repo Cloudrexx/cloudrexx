@@ -3870,7 +3870,8 @@ CREATE TABLE contrexx_core_mediasource_indexer_entry (
   `indexer` VARCHAR(255) NOT NULL,
   `content` VARCHAR(65535) NOT NULL,
   `last_update` DATETIME NOT NULL,
-  PRIMARY KEY(`id`)
+  PRIMARY KEY(`id`),
+  UNIQUE KEY `path_UNIQUE` (`path`(255))
 ) ENGINE = InnoDB;
 
 ALTER TABLE contrexx_module_calendar_invite ADD CONSTRAINT FK_842085E171F7E88B FOREIGN KEY (event_id) REFERENCES contrexx_module_calendar_event (id);
