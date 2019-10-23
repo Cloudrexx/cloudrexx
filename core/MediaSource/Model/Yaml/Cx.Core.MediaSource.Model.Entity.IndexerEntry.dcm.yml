@@ -19,3 +19,6 @@ Cx\Core\MediaSource\Model\Entity\IndexerEntry:
     lastUpdate:
       type: datetime
       column: last_update
+  uniqueConstraints:
+    path_UNIQUE:
+      columns: [ path ]
