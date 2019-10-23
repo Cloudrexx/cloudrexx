@@ -158,51 +158,6 @@ abstract class Indexer extends \Cx\Model\Base\EntityBase
     }
 
     /**
-     * Return all index entries that match
-     *
-     * @param $searchterm string term to search
-     * @param $path       string path to search in
-     *
-     * @return array
-     */
-    public function getMatches($searchterm, $path)
-    {
-        $em = $this->cx->getDb()->getEntityManager();
-
-        $qb = $em->createQueryBuilder();
-        $query = $qb->select(array('ie'))->from(
-            'Cx\Core\MediaSource\Model\Entity\IndexerEntry', 'ie'
-        )->where(
-            $qb->expr()->like('ie.path', ':path')
-        )->andWhere(
-            $qb->expr()->like(
-                'ie.content', ':searchterm'
-            )
-        )->andWhere(
-            $qb->expr()->eq(
-                'ie.indexer', ':indexer'
-            )
-        )->orWhere(
-            $qb->expr()->like(
-                'ie.path', ':searchtermAndPath'
-            )
-        )->orWhere(
-            $qb->expr()->eq(
-                'ie.indexer', ':indexer'
-            )
-        )->setParameters(
-            array(
-                'path' => $path.'%',
-                'searchterm' => '%'.$searchterm.'%',
-                'indexer' => get_class($this),
-                'searchtermAndPath' => $path.'%'.$searchterm.'%'
-            )
-        )->getQuery();
-
-        return $query->getResult();
-    }
-
-    /**
      * Get text from an indexed file
      *
      * @param $filepath string path to file
