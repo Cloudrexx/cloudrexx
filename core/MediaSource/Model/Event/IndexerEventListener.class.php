@@ -92,95 +92,45 @@ class IndexerEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventListe
     /**
      * Get all file paths and get the appropriate index for each file to be able
      * to index the file
-     * Todo: Use orgFile and oldPath as param when FileSystem work smart
      *
+     * This indexes the file identified by $fileInfo. $fileInfo is an array
+     * with the indexes "path" and "oldPath" set.
+     * To index new files or re-index existing ones "oldPath" needs to be an
+     * empty string. If a file has moved "oldPath" can be set to update the
+     * path in the index.
      * @todo: Move this method so it can be called from ComponentController
-     * @param $fileInfo array contains file information
+     * @param $fileInfo array Information about a file
      */
     public function index($fileInfo)
     {
-        // Can be deleted when orgFile and fullPath are params.
+        $filePaths = array();
         $fullPath = $fileInfo['path'];
         $fullOldPath = $fileInfo['oldPath'];
-        $mediaSourcePath = $fullPath;
+        $path = $fullPath;
+
         if (!empty($fullOldPath)) {
-            $mediaSourcePath = $fullOldPath;
+            $path = $fullOldPath;
         }
-        $mediaSource = new \Cx\Core\MediaSource\Model\Entity\MediaSource(
-            '', '', $mediaSourcePath
+
+        $extension = pathinfo($path, PATHINFO_EXTENSION);
+        // This is a workaround, we should use the new path instead
+        if ($extension == 'part') {
+            return;
+        }
+
+        // Get the indexer for this extension (if any)
+        $indexer = $this->cx->getComponent('MediaSource')->getIndexer(
+            $extension
         );
-        $orgFile = new \Cx\Core\MediaSource\Model\Entity\LocalFile(
-            $mediaSourcePath,
-            $mediaSource->getFileSystem()
-        );
-        // End
-
-        $files = array();
-
-        if ($orgFile->getFileSystem()->isDirectory($orgFile)) {
-
-            // Get all files and directories
-            $fileList = $orgFile->getFileSystem()->getFileList(
-                $fullOldPath
-            );
-            // Get an array with all file paths
-            $files = $this->getAllFilePaths(
-                $fileList,
-                $orgFile,
-                array()
-            );
-        } else {
-            array_push($files, $orgFile);
+        if (!$indexer) {
+            return;
         }
 
-        foreach ($files as $file) {
-            $extension = pathinfo($file->__toString(), PATHINFO_EXTENSION);
-            $indexer = $this->cx->getComponent('MediaSource')->getIndexer(
-                $extension
-            );
+        // make new path absolute
+        $filePath = str_replace($fullOldPath, $fullPath, $path);
 
-            if (!$indexer) {
-                continue;
-            }
-
-            $filePath = str_replace(
-                $orgFile->__toString(),
-                $fullPath,
-                $file->__toString()
-            );
-
-            $indexer->index($filePath, $file->__toString());
-        }
-    }
-
-    /**
-     * Returns an array with all file paths of all files in this directory,
-     * including files located in another directory.
-     *
-     * @param $fileList array  all files and directorys
-     * @param $file     \Cx\Core\MediaSource\Model\Entity\LocalFile file to check
-     * @param $result   array  existing result
-     *
-     * @return array
-     */
-    protected function getAllFilePaths(
-        $fileList, $file, $result
-    ) {
-        foreach ($fileList as $fileEntryKey =>$fileListEntry) {
-            $newFile = new \Cx\Core\MediaSource\Model\Entity\LocalFile(
-                $file->__toString() . '/' . $fileEntryKey,
-                $file->getFileSystem()
-            );
-
-            if ($file->getFileSystem()->isDirectory($newFile)) {
-                $result = $this->getAllFilePaths(
-                    $fileListEntry, $newFile, $result
-                );
-            } else if ($file->getFileSystem()->isFile($newFile)) {
-                array_push($result, $newFile);
-            }
-        }
-        return $result;
+        // let the indexer do his job
+        $indexer->index($filePath, $path);
     }
 
     /**
