@@ -1326,9 +1326,18 @@ class Download {
                     contrexx_input2db($search) . '%"';
             }
         }
+
+        // The following includes indexer results of indexers using the default
+        // indexing table. See MediaSource::getFileSystemMatches() for a
+        // proposal on how to approach this for supporting all indexers.
         foreach ($availableLangIds as $langId) {
+            $searchConditions[] = '`tblIdx`.`content` LIKE "%' . contrexx_input2db($search) . '%"';
             $arrConditions[] =
                 '(SELECT 1 FROM `' . DBPREFIX . 'module_downloads_download_locale`
+                    LEFT JOIN
+                        `' . DBPREFIX . 'core_mediasource_indexer_entry` AS `tblIdx`
+                    ON
+                        `source` =  `tblIdx`.`path`
                     WHERE `download_id` = `tblD`.`id`
                         AND `lang_id` = ' . $langId . '
                         AND (' . implode(' OR ', $searchConditions) . '))';
