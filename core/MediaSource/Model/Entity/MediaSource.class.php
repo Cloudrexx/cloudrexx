@@ -385,46 +385,77 @@ class MediaSource extends DataSource {
      *
      * @param $searchterm string term to search
      * @param $path       string path to search in
-     *
+     * @param $limit      int|null (optional) Limits the max number of results
+     * @param $offset     int|null (optional) Offset if $limit is used
+     * @param $count      int (optional, reference) Total number of results
+     * @todo This currently only works for indexers that use the default
+     *          index table. To allow other ways of storage a storage driver
+     *          should be introduced. Indexers using the same storage driver
+     *          could then still be queried at once.
      * @throws \Cx\Core\Core\Model\Entity\SystemComponentException
-     * @return array all search results
+     * @return array Search results as specified by Search component
      */
-    public function getFileSystemMatches($searchterm, $path)
+    public function getFileSystemMatches($searchterm, $path, $limit = null, $offset = null, &$count = 0)
     {
+        if (!$this->isIndexingActivated()) {
+            return array();
+        }
         $searchLength = \Cx\Core\Setting\Controller\Setting::getValue(
             'searchDescriptionLength'
         );
         $fullPath = $this->getDirectory()[0] . $path;
+        $fileList = array();
         $searchResult = array();
-        $fileInformation = array();
 
-        if ($this->isIndexingActivated()) {
-            $indexers = $this->getComponentController()->listIndexers();
-            $componentName = '';
-            if (!empty($this->getSystemComponentController())) {
-                $componentName = $this->getSystemComponentController()->getName();
-            }
+        $componentName = '';
+        if (!empty($this->getSystemComponentController())) {
+            $componentName = $this->getSystemComponentController()->getName();
+        }
+        $em = $this->cx->getDb()->getEntityManager();
+        $qb = $em->createQueryBuilder();
+        $query = $qb->select(
+            'count(ie.id)'
+        )->from(
+            'Cx\Core\MediaSource\Model\Entity\IndexerEntry', 'ie'
+        )->where(
+            $qb->expr()->like('ie.path', ':path')
+        )->andWhere(
+            $qb->expr()->like(
+                'ie.content', ':searchterm'
+            )
+        )->setParameters(
+            array('path' => $path . '%', 'searchterm' => '%'.$searchterm.'%')
+        )->setFirstResult(
+            null
+        )->setMaxResults(
+            null
+        )->getQuery();
+        $count = $query->getSingleScalarResult();
+        if ($limit === 0) {
+            return array();
+        }
+        if ($limit === null) {
+            $limit = 10;
+        }
 
-            foreach ($indexers as $indexer) {
-                $matches = $indexer->getMatches($searchterm, $fullPath);
-                foreach ($matches as $match) {
-                    $content = substr(
-                            $match->getContent(), 0, $searchLength
-                        ) .'...';
-                    $fileInformation['Score'] = 100;
-                    $fileInformation['Title'] = ucfirst(
-                        pathinfo($match->getPath(), PATHINFO_FILENAME)
-                    );
-                    $fileInformation['Content'] = $content;
-                    $link = explode(
-                        $this->cx->getWebsiteDocumentRootPath(),
-                        $match->getPath()
-                    );
-                    $fileInformation['Link'] = $link[1];
-                    $fileInformation['Component'] = $componentName;
-                    array_push($searchResult, $fileInformation);
-                }
-            }
+        $qb->select(
+            'ie'
+        );
+        $qb->setFirstResult($offset);
+        $qb->setMaxResults($limit);
+        $matches = $qb->getQuery()->getResult();
+        foreach ($matches as $match) {
+            $content = substr(
+                $match->getContent(), 0, $searchLength
+            ) .'...';
+            $fileInformation['Score'] = 100;
+            $fileInformation['Title'] = ucfirst(
+                str_replace($fullPath . '/', '', $match->getPath())
+            );
+            $fileInformation['Content'] = $content;
+            $fileInformation['Link'] = $match->getPath();
+            $fileInformation['Component'] = $componentName;
+            array_push($searchResult, $fileInformation);
         }
         return $searchResult;
     }
