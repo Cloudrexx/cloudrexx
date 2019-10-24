@@ -142,8 +142,9 @@ class ComponentController
                             echo 'No file path supplied' . PHP_EOL;
                             die();
                         }
+                        array_shift($arguments);
                         $this->indexerEventListener->index(array(
-                            'path' => $arguments[1],
+                            'path' => current($arguments),
                             'oldPath' => '',
                         ));
                         break;
