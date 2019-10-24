@@ -49,6 +49,51 @@ use function JmesPath\search;
 class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
 {
     /**
+     * Create test-users
+     * Creates test-users with the given parameters
+     *
+     * How the array should look like for example
+     * array(
+     *  'test@testmail.com' => array(
+     *      'username'  => 'randomUsername',
+     *      'profile'   => array(
+     *          'birthday' => array('02.10.1999'),
+     *          'firstname' => array('Lilly'),
+     *          ),
+     *      ),
+     *  );
+     *
+     * @author      Hava Fuga <info@cloudrexx.com>
+     *
+     * return void
+     */
+    protected function createUsers($userObject, $users) {
+        //loop over user-data and create users
+        foreach ($users as $email => $data) {
+            $userObject->reset();
+
+            if (!is_array($data)) {     //if only the email is given
+                $userObject->setEmail($data);
+            } else {
+                $userObject->setEmail($email); //set email and the other data
+                foreach ($data as $key => $value) {
+                    switch ($key) {
+                        case 'username':
+                            $userObject->setUsername($value);
+                            break;
+                        case 'profile':
+                            $userObject->setProfile($value);
+                            break;
+                    }
+                }
+            }
+            $userObject->store();
+        }
+    }
+
+
+
+    /**
      * Test one user by Id
      * Search for an Id
      *
