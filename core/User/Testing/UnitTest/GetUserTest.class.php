@@ -444,6 +444,81 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
     }
 
     /**
+     * Test list firstname and lastname from all users
+     * List all firstnames and lastnames from all users
+     *
+     * @author      Hava Fuga <info@cloudrexx.com>
+     *
+     * @return      void
+     */
+    public function testListFirstnameAndLastnameFromAllUsers() {
+        //array for offset-id's
+        $offsetId = array();
+
+        $object = \FWUser::getFWUserObject();
+        $user = $object->objUser;
+
+        $arrAttributes = array('firstname', 'lastname');
+
+        //save id's from existing Users in DB
+        $users = $user->getUsers(null, null, null, $arrAttributes);
+        while (!$users->EOF) {
+            array_push($offsetId, $users->getId());
+            $users->next();
+        }
+
+        $userInfos = array(
+            'test1@testmail.com' => array(
+                'profile' => array(
+                    'firstname' => array('Sarah'),
+                    'lastname'  => array('Conner'),
+                ),
+            ),
+            'test2@testmail.com' => array(
+                'profile' => array(
+                    'firstname' => array('Chris'),
+                    'lastname' => array('Müller'),
+                ),
+            ),
+            'test3@testmail.com' => array(
+                'profile' => array(
+                    'firstname' => array('Harry'),
+                    'lastname' => array('Potter'),
+                ),
+            ),
+        );
+        //create users with email and firstname
+        $this->createUsers($user, $userInfos);
+
+        //get only wanted attributes from users ($arrAttributes)
+        $users = $user->getUsers(null, null, null, $arrAttributes);
+
+        $names = array();
+        //remove user if previously existed ($offsetId)
+        while (!$users->EOF) {
+            if (!in_array($users->getId(), $offsetId)) {
+                $arr = array();
+                array_push(
+                    $names,
+                    $users->getProfileAttribute('firstname') . ' ' .
+                    $users->getProfileAttribute('lastname')
+                );
+            }
+            $users->next();
+        }
+
+        $this->assertEquals(
+            array(
+                'Sarah Conner',
+                'Chris Müller',
+                'Harry Potter'
+            ),
+            $names
+        );
+    }
+
+
+    /**
      * Test limit user
      * Search for all users with a limit
      * in the first- and the lastname
