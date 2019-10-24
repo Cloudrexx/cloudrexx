@@ -162,13 +162,22 @@ abstract class Indexer extends \Cx\Model\Base\EntityBase
     /**
      * Makes absolute paths relative to installation root
      *
+     * The returned paths start with a slash to be compatible with downloads
+     * module.
+     * @todo The returned paths should not start with a slash
      * @param string $path Absolute (or already relative) path
      * @return string Path relative to installation root
      */
     protected function getRelativePath($path) {
-        $pathWithoutDocRoot = explode($cx->getWebsiteDocumentRootPath(), $path);
+        $pathWithoutDocRoot = explode(
+            $this->cx->getWebsiteDocumentRootPath(),
+            $path
+        );
         if (!empty($pathWithoutDocRoot[1])) {
             $path = $pathWithoutDocRoot[1];
+        }
+        if (substr($path, 0, 1) != '/') {
+            $path = '/' . $path;
         }
         return $path;
     }
