@@ -254,7 +254,9 @@ class MediaSourceManager extends EntityBase
      * @return array
      */
     public function getMediaTypePathsbyNameAndOffset($name, $offset) {
-        return $this->mediaTypePaths[$name][$offset];
+        return (array_key_exists($name, $this->mediaTypePaths)
+            && array_key_exists($offset, $this->mediaTypePaths[$name])
+            ? $this->mediaTypePaths[$name][$offset] : null);
     }
 
     public function getAllMediaTypePaths() {
