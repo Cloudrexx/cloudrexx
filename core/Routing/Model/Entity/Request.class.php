@@ -130,7 +130,8 @@ class Request {
      */
     public function hasParam($name, $get = true) {
         if ($get) {
-            return isset($this->getUrl()->getParamArray()[$name]);
+            $param = $this->getUrl()->getParamArray()[$name];
+            return isset($param);
         }
 
         return isset($this->postData[$name]);
