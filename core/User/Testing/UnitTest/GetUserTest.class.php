@@ -84,10 +84,23 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
                         case 'profile':
                             $userObject->setProfile($value);
                             break;
+                        case 'group':
+                            $userObject->setPrimaryGroup($value);
+                            break;
+                        case 'admin':
+                            $userObject->setAdminStatus($value);
+                        case 'status':
+                            $userObject->setActiveStatus($value);
+                        case 'auth':
+                            $auth = true;
                     }
                 }
             }
             $userObject->store();
+            if ($auth) {
+                //the user should first be stored before the Login can be successful
+                $userObject->registerSuccessfulLogin();
+            }
         }
     }
 
