@@ -807,4 +807,52 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
         );
 
     }
+    
+    /**
+     * Test all users without admin rights
+     * Test all users that don't have admin rights
+     *
+     * @author Hava Fuga <info@cloudrexx.com>
+     *
+     * @return void
+     */
+    public function testAllUsersWithoutAdminRights() {
+        //array for offset-id's
+        $offsetId = array();
+
+        $object = \FWUser::getFWUserObject();
+        $user = $object->objUser;
+
+        //save id's from existing Users in DB
+        $users = $user->getUsers();
+        while (!$users->EOF) {
+            array_push($offsetId, $users->getId());
+            $users->next();
+        }
+
+        $userInfos = array(
+            'test1@testmail.com' => array(
+                'admin' => 1,
+            ),
+            'test2@testmail.com',
+        );
+        //create users with email and firstname
+        $this->createUsers($user, $userInfos);
+
+        $filter = array('is_admin' => 0);
+        $users = $user->getUsers($filter);
+
+        //remove user if previously existed ($offsetId)
+        while (!$users->EOF) {
+            if (!in_array($users->getId(), $offsetId)) {
+                $email = $users->getEmail();
+            }
+            $users->next();
+        }
+
+        $this->assertEquals(
+            'test2@testmail.com',
+            $email
+        );
+    }
 }
