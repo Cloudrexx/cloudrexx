@@ -525,11 +525,12 @@ class Gallery
         
         $showImageSizeOverview   = $this->arrSettings['show_image_size'] == 'on';
         while (!$objResult->EOF) {
-            $arrImageSizes[$objResult->fields['catid']][$objResult->fields['id']] = ($showImageSizeOverview) ? round(filesize($this->strImagePath.$objResult->fields['path'])/1024,2) : '';
+            $arrImageSizes[$objResult->fields['catid']][$objResult->fields['id']] = ($showImageSizeOverview) ? round(filesize($this->strImagePath.$objResult->fields['path'])/1024,2) : 0;
             $arrstrImagePaths[$objResult->fields['catid']][$objResult->fields['id']] = $objResult->fields['path'];
             $objResult->MoveNext();
         }
 
+        $arrCategorySizes = array();
         if (isset($arrImageSizes) && isset($arrstrImagePaths)) {
             foreach ($arrImageSizes as $keyCat => $valueCat) {
                 $arrCategorySizes[$keyCat] = 0;
@@ -721,6 +722,12 @@ class Gallery
             if (empty($strCategoryComment)) {
                 $this->_objTpl->hideBlock('galleryImageBlock');
             }
+
+            // ensure detail image block is not parsed
+            if ($this->_objTpl->blockExists('galleryImage')) {
+                $this->_objTpl->hideBlock('galleryImage');
+            }
+
             return;
         }
 
@@ -920,6 +927,11 @@ class Gallery
         }
 
         $this->_objTpl->parse('galleryCategories');
+
+        // ensure detail image block is not parsed
+        if ($this->_objTpl->blockExists('galleryImage')) {
+            $this->_objTpl->hideBlock('galleryImage');
+        }
     }
 
     /**

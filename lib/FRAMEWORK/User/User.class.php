@@ -2264,6 +2264,7 @@ class User extends User_Profile
         $arrCurrentGroups = $this->loadGroups();
         $arrAddedGroups = array_diff($this->getAssociatedGroupIds(), $arrCurrentGroups);
         $arrRemovedGroups = array_diff($arrCurrentGroups, $this->getAssociatedGroupIds());
+        $groupAssociationChange = false;
         foreach ($arrRemovedGroups as $groupId) {
             if (!$objDatabase->Execute('
                 DELETE FROM `'.DBPREFIX.'access_rel_user_group`
@@ -2272,7 +2273,7 @@ class User extends User_Profile
                 $status = false;
             } elseif ($objDatabase->Affected_Rows()) {
                 // track flushed db change
-                $associationChange = true;
+                $groupAssociationChange = true;
             }
         }
         foreach ($arrAddedGroups as $groupId) {
@@ -2285,8 +2286,17 @@ class User extends User_Profile
                 $status = false;
             } elseif ($objDatabase->Affected_Rows()) {
                 // track flushed db change
-                $associationChange = true;
+                $groupAssociationChange = true;
             }
+        }
+        if ($groupAssociationChange) {
+            $associationChange = true;
+
+            // flush all user based cache to ensure new permissions are enforced
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $cache = $cx->getComponent('Cache');
+            $cache->clearUserBasedPageCache();
+            $cache->clearUserBasedEsiCache();
         }
         return $status;
     }
@@ -3354,5 +3364,14 @@ class User extends User_Profile
         }
 
         throw new UserException('Failed to generate a new password hash');
+    }
+
+    /**
+     * Clears the cache
+     *
+     * Only use this when loading lots of users (export)!
+     */
+    public function clearCache() {
+        $this->arrCachedUsers = array();
     }
 }

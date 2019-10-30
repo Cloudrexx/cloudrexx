@@ -932,6 +932,7 @@ $_ARRAYLANG['TXT_CORE_COUNTRY_PER_PAGE_BACKEND'] = "Anzahl Länder pro Seite im 
 $_ARRAYLANG['TXT_CORE_COUNTRY_SETTINGS'] = "Paremètres";
 $_ARRAYLANG['TXT_CORE_COUNTRY_STORED_SUCCESSULLY'] = "Die Länder wurden erfolgreich gespeichert";
 $_ARRAYLANG['TXT_CORE_CUSTOMCONTENT'] = "Benutzerdefinierte Inhaltsvorlage";
+$_ARRAYLANG['TXT_CORE_DAY_ABBREV_ARRAY'] = "dim.,lun.,mar.,mer.,jeu.,ven.,sam.";
 $_ARRAYLANG['TXT_CORE_DAY_ABBREV2_ARRAY'] = "Di,Lu,Ma,Me,Je,Ve,Sa";
 $_ARRAYLANG['TXT_CORE_DAY_ABBREV3_ARRAY'] = "Dim,Lun,Mar,Mer,Jeu,Ven,Sam";
 $_ARRAYLANG['TXT_CORE_DAY_ARRAY'] = "Dimanche,Lundi,Mardi,Mercredi,Jeudi,Vendredi,Samedi";

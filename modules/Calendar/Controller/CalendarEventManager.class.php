@@ -347,7 +347,10 @@ class CalendarEventManager extends CalendarLibrary
                     // cache userbased
                     $cx = \Cx\Core\Core\Controller\Cx::instanciate();
                     $cx->getComponent('Cache')->forceUserbasedPageCache();
-                    if (!$objFWUser->objUser->login()) {
+                    if (
+                        $objInit->mode !== \Cx\Core\Core\Controller\Cx::MODE_BACKEND &&
+                        !\Permission::checkAccess(145, 'static', true)
+                    ) {
                         $objResult->MoveNext();
                         continue;
                     }
@@ -483,7 +486,11 @@ class CalendarEventManager extends CalendarLibrary
     function _clearEmptyEvents() {
         // customizing: hide synced events in backend
         $cx = \Env::get('cx');
-        if (!isset(static::$syncedIds)) {
+        $sync = $cx->getComponent('Sync');
+        if (
+            $sync &&
+            !isset(static::$syncedIds)
+        ) {
             $query = '
                 SELECT
                     `local_id`
@@ -688,6 +695,7 @@ class CalendarEventManager extends CalendarLibrary
 
         // in case the registration form was requested by an invitee
         // and the start-date of the event has changed meanwhile,
+        // or the event is no longer publicly available (access=1),
         // we shall try to load the event based on the invitation data
         if (empty($this->eventList[0])) {
             // abort in case the registration form has not been requested by an invitee
@@ -748,13 +756,43 @@ class CalendarEventManager extends CalendarLibrary
         // Abort in case the associated event is protected and the requestee has
         // not sufficient access rights.
         // Note: access to invitees is always granted
-        if (!$invite && $objEvent->access == 1 && !\FWUser::getFWUserObject()->objUser->login()) {
-            $link = base64_encode(CONTREXX_SCRIPT_PATH.'?'.$_SERVER['QUERY_STRING']);
-            \Cx\Core\Csrf\Controller\Csrf::redirect(CONTREXX_SCRIPT_PATH."?section=Login&redirect=".$link);
-            return;
+        if (
+            !$invite &&
+            $objEvent->access == 1 &&
+            !\Permission::checkAccess(145, 'static', true)
+        ) {
+            $objFWUser = \FWUser::getFWUserObject();
+            // if user is already authenticated, then he is not authorized
+            // and we must therefore redirect the user to the noaccess page
+            if ($objFWUser->objUser->login()) {
+                \Cx\Core\Csrf\Controller\Csrf::redirect(
+                    \Cx\Core\Routing\Url::fromModuleAndCmd(
+                        'Login',
+                        'noaccess'
+                    )
+                );
+            }
+
+            // redirect the user to the sign-in form
+            $thisRequest = base64_encode(
+                \Cx\Core\Routing\Url::fromRequest()
+            );
+            \Cx\Core\Csrf\Controller\Csrf::redirect(
+                \Cx\Core\Routing\Url::fromModuleAndCmd(
+                    'Login',
+                    '',
+                    '',
+                    array(
+                        'redirect' => $thisRequest,
+                    )
+                )
+            );
         }
-            $objCategory = CalendarCategory::getCurrentCategory(
-                $this->categoryId, $objEvent);
+
+        $objCategory = CalendarCategory::getCurrentCategory(
+            $this->categoryId,
+            $objEvent
+        );
         list ($priority, $priorityImg) = $this->getPriorityImage($objEvent);
         $plainDescription = contrexx_html2plaintext($objEvent->description);
         if (strlen($plainDescription) > 100) {
@@ -1274,28 +1312,31 @@ class CalendarEventManager extends CalendarLibrary
         $monthnames = explode(",", $_ARRAYLANG['TXT_CALENDAR_MONTH_ARRAY']);
         $daynames   = explode(',', $_ARRAYLANG['TXT_CALENDAR_DAY_ARRAY']);
 
-        $year  = !empty($_GET['yearID']) ? contrexx_input2int($_GET['yearID']) : 0;
-        $month = !empty($_GET['monthID']) ? contrexx_input2int($_GET['monthID']) : 0;
-
-        $startdate = $this->getUserDateTimeFromIntern($event->startDate);
-        if (empty($year) && empty($month)) {
-            $year      = $startdate->format('Y');
-            $month     = $startdate->format('m');
+        $startDate = $event->startDate;
+        if (!empty($_GET['yearID'])) {
+            $year = contrexx_input2int($_GET['yearID']);
+        } else {
+            $year = $startDate->format('Y');
         }
+        if (!empty($_GET['monthID'])) {
+            $month = contrexx_input2int($_GET['monthID']);
+        } else {
+            $month = $startDate->format('m');
+        }
+        $startDate->setDate(
+            $year,
+            $month,
+            1
+        );
 
         $eventList = array($event);
         // If event series is enabled refresh the eventlist
         if ($event->seriesStatus == 1) {
-            try {
-                $endDate = new \DateTime('1-'.$month.'-'.$year);
-            } catch (\Exception $e) {
-                $year = $startdate->format('Y');
-                $month = $startdate->format('m');
-                $endDate = new \DateTime('1-'.$month.'-'.$year);
-            }
-            $endDate->modify('+1 month');
+            $endDate = clone $startDate;
+            // note: 'this month' is relativ to the set month of $endDate
+            $endDate->modify('last day of this month');
 
-            $eventManager = new static(null, $endDate);
+            $eventManager = new static($startDate, $endDate);
             $objEvent     = new \Cx\Modules\Calendar\Controller\CalendarEvent(intval($event->id));
             if ($eventManager->_addToEventList($objEvent)) {
                 $eventManager->eventList[] = $objEvent;
@@ -1862,11 +1903,16 @@ class CalendarEventManager extends CalendarLibrary
         $objEvent,
         $additionalRecurrences = array()
     ) {
+        if (!$objEvent->seriesStatus) {
+            return;
+        }
+
         $this->getSettings();
 
         // create a copy of the event instance which can be used
         // to generate the recurrences on and iterate over them
         $recurrenceEvent = clone $objEvent;
+        $recurrenceEvent->isAdditionalRecurrence = false;
 
         // fetch and iterate over the recurrence dates
         while (
@@ -1920,6 +1966,18 @@ class CalendarEventManager extends CalendarLibrary
      *                                          objects.
      */
     protected function getNextRecurrenceDate($objEvent, $objCloneEvent, &$additionalRecurrences = array()) {
+        // init last supported day
+        // this is the day before the end of unix timestamp
+        static $endOfUnixTimestamp;
+        if (!isset($endOfUnixTimestamp)) {
+            // End of unix timestamp (= max signed 32bit int)
+            // Note: We should instead use \PHP_INT_MAX
+            // However, as MySQL and MariaDB currently do not yet support
+            // 64bit timestamps, we just can't
+            // See https://cloudrexx.atlassian.net/browse/CLX-3009
+            $endOfUnixTimestamp = $this->getInternDateTimeFromUser('@' . 0x7FFFFFFF);
+            $endOfUnixTimestamp->modify('-1 day');
+        }
         while ($nextEvent = $this->fetchNextRecurrence($objEvent, $objCloneEvent, $additionalRecurrences)) {
             // verify that we have not yet reached the end of the recurrence
             if (
@@ -1929,12 +1987,27 @@ class CalendarEventManager extends CalendarLibrary
                 return $nextEvent;
             }
 
+            // ensure date can be handled (not exceeding unix timestmap)
+            if (
+                $nextEvent->startDate > $endOfUnixTimestamp ||
+                $nextEvent->endDate > $endOfUnixTimestamp
+            ) {
+                return null;
+            }
+
             switch ($objCloneEvent->seriesData['seriesPatternDouranceType']) {
                 // no recurrence end set
                 case 1:
                     if ($this->startDate != null) {
-                        $lastDate = clone $this->startDate;
-                        $lastDate->setDate($lastDate->format('Y') + intval($this->arrSettings['maxSeriesEndsYear']) + 1, $lastDate->format('m'), $lastDate->format('d'));
+                        // end based on option 'List endless series previously'
+                        $lastDate = $this->getInternDateTimeFromUser();
+                        $lastDate->setDate(
+                            $lastDate->format('Y') + intval(
+                                $this->arrSettings['maxSeriesEndsYear']
+                            ) + 1,
+                            $lastDate->format('m'),
+                            $lastDate->format('d')
+                        );
                         if ($nextEvent->startDate > $lastDate) {
                             // recurrence is out of date boundary -> skip
                             return null;
@@ -2087,7 +2160,7 @@ class CalendarEventManager extends CalendarLibrary
                     $objEvent->startDate->format('s')
                 );
 
-                $addDays = $objCloneEvent->startDate->diff($objEvent->startDate)->days;
+                $addDays = $objCloneEvent->startDate->diff($recurrenceEvent->startDate)->days;
                 $objCloneEvent->endDate->modify('+'. $addDays .' days');
                 $objCloneEvent->endDate->setTime(
                     $objEvent->endDate->format('H'),
@@ -2146,7 +2219,7 @@ class CalendarEventManager extends CalendarLibrary
                     $objEvent->startDate->format('s')
                 );
 
-                $addDays = $objCloneEvent->startDate->diff($objEvent->startDate)->days;
+                $addDays = $objCloneEvent->startDate->diff($recurrenceEvent->startDate)->days;
                 $objCloneEvent->endDate->modify('+'. $addDays .' days');
                 $objCloneEvent->endDate->setTime(
                     $objEvent->endDate->format('H'),
@@ -2453,11 +2526,6 @@ class CalendarEventManager extends CalendarLibrary
 
             //load events
             foreach ($this->eventList as $objEvent) {
-                if ($objEvent->access
-                    && $objInit->mode !== \Cx\Core\Core\Controller\Cx::MODE_BACKEND
-                    && !\Permission::checkAccess(116, 'static', true)) {
-                    continue;
-                }
                 $startdate     = $this->getUserDateTimeFromIntern($objEvent->startDate);
                 $enddate       = $this->getUserDateTimeFromIntern($objEvent->endDate);
 

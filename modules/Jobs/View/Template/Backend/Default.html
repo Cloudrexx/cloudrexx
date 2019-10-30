@@ -92,7 +92,7 @@ cx.ready(function() {
   </tr>
 <tr class="row1">
 <td valign="top">
-      <form action="index.php?cmd=Jobs&act=edit" method="post" name="form2">
+      <form action="index.php?cmd=Jobs&act=Job" method="get" name="form2">
         {TXT_EDIT_JOBS_ID}:
         <input type="text" maxlength="5" size="5" name="id" />
       </form>
@@ -145,9 +145,12 @@ cx.ready(function() {
     <!-- BEGIN jobs_overview_paid -->
     <img border="0" title="{TXT_JOBS_PAID_LABEL}" alt="{TXT_JOBS_PAID_LABEL}" src="/modules/Jobs/View/Media/Money.png" style="width:14px; height:14px;" />
     <!-- END jobs_overview_paid -->
+    <!-- BEGIN jobs_flags_list -->
+    <img border="0" title="{JOBS_FLAG_NAME}" alt="{JOBS_FLAG_NAME}" src="{JOBS_FLAG_ICON_SRC}" style="max-width:14px; max-height:14px;" />
+    <!-- END jobs_flags_list -->
   </td>
   <td nowrap="nowrap">{JOBS_DATE}&nbsp;</td>
-  <td><a href="?cmd=Jobs&act=edit&id={JOBS_ID}">{JOBS_TITLE}</a>&nbsp;</td>
+  <td><a href="?cmd=Jobs&act=Job&id={JOBS_ID}">{JOBS_TITLE}</a>&nbsp;</td>
   <!-- BEGIN jobs_overview_show_hot_offer -->
   <td><input type="checkbox" class="hotOffer" data-id="{JOBS_ID}" name="hotOffer" {JOBS_OVERVIEW_HOT_OFFER} value="1"/></td>
   <!-- END jobs_overview_show_hot_offer -->
@@ -156,8 +159,8 @@ cx.ready(function() {
   <td nowrap="nowrap">{JOBS_CHANGELOG}: {JOBS_USER}&nbsp;</td>
   <td nowrap="nowrap">
     <div align="right">
-    <a href="index.php?cmd=Jobs&amp;act=add&amp;id={JOBS_ID}"><img src="../core/Core/View/Media/icons/copy.gif" alt="{TXT_TEMPLATE}" title="{TXT_TEMPLATE}" border="0" /></a>
-    <a title="{TXT_EDIT}" href="?cmd=Jobs&act=edit&id={JOBS_ID}"><img border="0" alt="{TXT_EDIT}" src="../core/Core/View/Media/icons/edit.gif" /></a>
+    <a href="index.php?cmd=Jobs&amp;act=Job&amp;copy={JOBS_ID}"><img src="../core/Core/View/Media/icons/copy.gif" alt="{TXT_TEMPLATE}" title="{TXT_TEMPLATE}" border="0" /></a>
+    <a title="{TXT_EDIT}" href="?cmd=Jobs&act=Job&id={JOBS_ID}"><img border="0" alt="{TXT_EDIT}" src="../core/Core/View/Media/icons/edit.gif" /></a>
       <a title="{TXT_DELETE}" href="javascript:deletePage({JOBS_ID})"><img border="0" alt="{TXT_DELETE}" src="../core/Core/View/Media/icons/delete.gif" /></a></div>
     </td>
   </tr>

@@ -541,6 +541,13 @@ class Url {
      * @return  string
      */
     public static function array2params($array = array()) {
+        if (
+            !is_array($array) &&
+            !is_object($array)
+        ) {
+            return '';
+        }
+
         if (isset($array['csrf'])) {
             unset($array['csrf']);
         }

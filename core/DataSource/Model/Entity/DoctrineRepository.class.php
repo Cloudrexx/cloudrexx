@@ -126,7 +126,10 @@ class DoctrineRepository extends DataSource {
                 if ($operation == 'in') {
                     $value = explode(',', $value);
                 }
-                $criteria[$field] = array($operation => $value);
+                if (!isset($criteria[$field])) {
+                    $criteria[$field] = array();
+                }
+                $criteria[$field][$operation] = $value;
             }
         }
 
@@ -219,6 +222,10 @@ class DoctrineRepository extends DataSource {
             array(
                 'recursions' => $configuredRecursions,
                 'skipVirtual' => true,
+                'dateFormatDatetime' => 'c',
+                'dateFormatTimestamp' => 'c',
+                'dateFormatDate' => ASCMS_DATE_FORMAT_INTERNATIONAL_DATE,
+                'dateFormatTime' => ASCMS_DATE_FORMAT_INTERNATIONAL_TIME,
             )
         );
         if (count($fieldList)) {

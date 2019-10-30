@@ -62,15 +62,13 @@ function disableDate()
 // -->
 </script>
 
-<form name="jobs" method="post" action="index.php?cmd=Jobs&act={JOBS_FORM_ACTION}" onsubmit="return checkfields();">
+<form name="jobs" method="post" action="index.php?cmd=Jobs&act=Job" onsubmit="return checkfields();">
 <input type="hidden" name="id" value="{JOBS_ID}">
   <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist">
     <tr>
       <th valign="top" colspan="2">
         <div align="left">{TXT_JOBS_MESSAGE}
-          <input type="hidden" name="jobsFormAction" value="{JOBS_STORED_FORM_ACTION}" />
           <input type="hidden" name="jobsId" value="{JOBS_STORED_ID}" />
-          <input type="hidden" name="jobsTopTitle" value="{JOBS_TOP_TITLE}" />
         </div>
       </th>
     </tr>
@@ -282,6 +280,29 @@ function DeselectAllLocations(CONTROL)
     </tr>
   </table>
   <br />
+  <!-- BEGIN jobs_flags_section -->
+  <table border="0" cellspacing="0" cellpadding="2" width="100%" class="adminlist">
+      <tr>
+          <th>
+              <div align="left">{TXT_JOBS_FLAGS}</div>
+          </th>
+      </tr>
+      <tr class="row3">
+          <td>{TXT_JOBS_FLAGS_INFO}</td>
+      </tr>
+      <tr class="row1">
+          <td>
+              <!-- BEGIN jobs_flags_list -->
+              <input type="checkbox" name="jobs-flag[]" value="{JOBS_FLAG_ID}" id="jobs-flag-{JOBS_FLAG_ID}" <!-- BEGIN jobs_flag_checked -->checked="checked"<!-- END jobs_flag_checked --> />
+              <label for="jobs-flag-{JOBS_FLAG_ID}" style="margin-right:20px;">
+                  <!-- BEGIN jobs_flag_icon --><img src="{JOBS_FLAG_ICON_SRC}" style="max-width:16px;" /><!-- END jobs_flag_icon -->
+                  {JOBS_FLAG_NAME}</label>
+              <!-- END jobs_flags_list -->
+          </td>
+      </tr>
+  </table>
+  <br />
+  <!-- END jobs_flags_section -->
   <input type="submit" name="Submit" value="{TXT_STORE}"/>
   <br />
   <br />

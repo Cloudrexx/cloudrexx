@@ -729,6 +729,15 @@ class MediaDirectory extends MediaDirectoryLibrary
         if (!empty($cmd)) {
             $objForms = new MediaDirectoryForm(null, $this->moduleName);
             foreach ($objForms->arrForms as $intFormId => $arrForm) {
+                // note: in a previous version of Cloudrexx, there was no check
+                // if the form was active or not. this caused unexpected
+                // behavior
+                if (
+                    !$this->arrSettings['legacyBehavior'] &&
+                    !$arrForm['formActive']
+                ) {
+                    continue;
+                }
                 if (    !empty($arrForm['formCmd'])
                     &&  $arrForm['formCmd'] === $cmd
                     &&  !empty($arrForm['formEntriesPerPage'])

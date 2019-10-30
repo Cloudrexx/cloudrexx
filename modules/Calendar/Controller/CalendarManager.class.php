@@ -342,7 +342,8 @@ class CalendarManager extends CalendarLibrary
         $mediaBrowser = new \Cx\Core_Modules\MediaBrowser\Model\Entity\MediaBrowser();
         $mediaBrowser->setOptions(array(
                     'type'  => 'button',
-                    'views' => $type
+                    'views' => $type,
+                    'startview' => $type,
         ));
         $mediaBrowser->setCallback('setSelected' . ucfirst($name));
 
@@ -363,9 +364,21 @@ class CalendarManager extends CalendarLibrary
         \JS::registerJS("modules/{$this->moduleName}/View/Script/jquery.pagination.js");
         \JS::registerJS('modules/Calendar/View/Script/Backend.js');
 
+        // End of unix timestamp (= max signed 32bit int)
+        // Note: We should instead use \PHP_INT_MAX
+        // However, as MySQL and MariaDB currently do not yet support
+        // 64bit timestamps, we just can't
+        // See https://cloudrexx.atlassian.net/browse/CLX-3009
+        $maxDate = 0x7FFFFFFF;
+        // the day before
+        $maxDate -= 86400;
+        // convert into ms
+        $maxDate *= 1000;
+
         \ContrexxJavascript::getInstance()->setVariable(
             array(
-                'language_id' => \FWLanguage::getDefaultLangId()
+                'language_id' => \FWLanguage::getDefaultLangId(),
+                'maxDate'     => $maxDate,
             ),
             'calendar'
         );
@@ -737,6 +750,16 @@ class CalendarManager extends CalendarLibrary
 
             $this->_objTpl->parse('eventAccess');
         }
+        $permissionLabel = new \Cx\Core\Html\Model\Entity\HtmlElement('i');
+        $permissionLabel->addChild(
+            new \Cx\Core\Html\Model\Entity\TextElement(
+                $_CORELANG['TXT_ACCESS_COMMUNITY_EVENTS']
+            )
+        );
+        $this->_objTpl->setVariable(
+            $this->moduleLangVar.'_EVENT_ACCESS_INFO',
+            sprintf($_ARRAYLANG['TXT_'.$this->moduleLangVar.'_EVENT_ACCESS_INFO'], $permissionLabel)
+        );
 
         //parse priority
         for ($i = 1; $i <= 5; $i++) {

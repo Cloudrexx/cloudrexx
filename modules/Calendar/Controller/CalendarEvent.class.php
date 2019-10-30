@@ -2023,6 +2023,7 @@ class CalendarEvent extends CalendarLibrary
             }
         }
 
+        $this->seriesStatus = $seriesStatus;
         $this->seriesData['seriesPatternCount'] = intval($seriesPatternCount);
         $this->seriesData['seriesType'] = intval($seriesType);
         $this->seriesData['seriesPatternCount'] = intval($seriesPatternCount);
