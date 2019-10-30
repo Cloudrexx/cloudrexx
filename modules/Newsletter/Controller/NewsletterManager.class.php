@@ -4226,7 +4226,7 @@ class NewsletterManager extends NewsletterLib
         */
 
 // TODO: $WhereStatement is not defined
-$WhereStatement = '';
+$WhereStatement = array();
         list ($users, $count) = $this->returnNewsletterUser(
             $WhereStatement, $order = '', $listId);
 // TODO: $count is never used
@@ -4318,27 +4318,26 @@ $WhereStatement = '';
         $searchstatus = isset($_REQUEST['filter_status']) ? ($_REQUEST['filter_status'] == '1' ? '1' : ($_REQUEST['filter_status'] == '0' ? '0' : null)) : null;
 
         // don't ignore search stuff
-        $search_where = '';
+        $search_where = array();
         if (!empty($keyword)) {
             if (!empty($searchfield)) {
-                $search_where = "AND `$searchfield` LIKE '%$keyword%'";
+                $search_where = array(
+                    $searchfield => $keyword
+                );
             } else {
-                $search_where = 'AND (     email LIKE "%'.$keyword.'%"
-                                        OR company LIKE "%'.$keyword.'%"
-                                        OR lastname LIKE "%'.$keyword.'%"
-                                        OR firstname LIKE "%'.$keyword.'%"
-                                        OR address LIKE "%'.$keyword.'%"
-                                        OR zip LIKE "%'.$keyword.'%"
-                                        OR city LIKE "%'.$keyword.'%"'.
-                                        /*OR country_id LIKE "%'.$keyword.'%"*/'
-                                        OR phone_office LIKE "%'.$keyword.'%"
-                                        OR birthday LIKE "%'.$keyword.'%")';
+                $search_where = array(
+                    'email' => $keyword,
+                    'company' => $keyword,
+                    'lastname' => $keyword,
+                    'firstname' => $keyword,
+                    'address' => $keyword,
+                    'zip' => $keyword,
+                    'city' => $keyword,
+                    'phone_office' => $keyword,
+                    'birthday' => $keyword
+                );
             }
         }
-
-        /*if ($searchstatus !== null) {
-            $search_where .= " AND `status` = $searchstatus ";
-        }*/
 
         list ($users, $output['recipient_count']) = $this->returnNewsletterUser(
             $search_where, "ORDER BY `$field` $order", $listId, $searchstatus, $limit, $pos);
@@ -5654,7 +5653,7 @@ $WhereStatement = '';
      * Return all newsletter users and those access users who are assigned
      * to the list and their information
      * @author      Stefan Heinemann <sh@adfinis.com>
-     * @param       string $where The where String for searching
+     * @param       array $where The where filter for searching
      * @param       int $newsletterListId The id of the newsletter category
      *              to be selected (0 for all users)
      * @return      array(array, int)
@@ -5695,6 +5694,8 @@ $WhereStatement = '';
             )
         );
 
+        $attr = new \User_Profile_Attribute();
+
         $arrFieldsWrapperDefinition = array(
             'newsletter' => array(
                 'type'              => array('type' => 'data', 'def' => 'newsletter_user')
@@ -5702,11 +5703,7 @@ $WhereStatement = '';
             'access' => array(
                 'status'            => array('type' => 'field', 'def' => 'active'),
                 'uri'               => array('type' => 'field', 'def' => 'website'),
-                'sex'               => array('type' => 'operation', 'def' => '(CASE
-                                                                                    WHEN `gender`=\'gender_female\' THEN \'f\'
-                                                                                    WHEN `gender`=\'gender_male\' THEN \'m\'
-                                                                                    ELSE \'-\'
-                                                                                END)'),
+                'sex'               => array('type' => 'field', 'def' => 'gender'),
                 'salutation'        => array('type' => 'field', 'def' => 'title'),
                 'title'             => array('type' => 'data',  'def' => ''),
                 'position'          => array('type' => 'data',  'def' => ''),
@@ -5723,22 +5720,32 @@ $WhereStatement = '';
         foreach ($arrFieldsWrapperDefinition as $recipientType => $arrWrapperDefinitions) {
             foreach ($arrRecipientFields['list'] as $field) {
                 $wrapper = '';
+                $fieldName = $field;
 
                 if (isset($arrWrapperDefinitions[$field])) {
                     $wrapper = $arrWrapperDefinitions[$field]['type'];
+                    $fieldName = $arrWrapperDefinitions[$field]['def'];
+                }
+
+                if ($attr->isCoreAttribute($fieldName) && $recipientType == 'access') {
+                    $wrapper = 'core';
                 }
 
                 switch ($wrapper) {
+                    case 'core':
+                        $wrappedField = sprintf('\'\' AS `%1$s`', $field);
+                        break;
+
                     case 'field':
-                        $wrappedField = sprintf('`%1$s` AS `%2$s`', $arrWrapperDefinitions[$field]['def'], $field);
+                        $wrappedField = sprintf('`%1$s` AS `%2$s`', $fieldName, $field);
                         break;
 
                     case 'data':
-                        $wrappedField = sprintf('\'%1$s\' AS `%2$s`', $arrWrapperDefinitions[$field]['def'], $field);
+                        $wrappedField = sprintf('\'%1$s\' AS `%2$s`', $fieldName, $field);
                         break;
 
                     case 'operation':
-                        $wrappedField = sprintf('%1$s AS `%2$s`', $arrWrapperDefinitions[$field]['def'], $field);
+                        $wrappedField = sprintf('%1$s AS `%2$s`', $fieldName, $field);
                         break;
 
                     default:
@@ -5747,6 +5754,26 @@ $WhereStatement = '';
                 }
 
                 $arrRecipientFields[$recipientType][] = $wrappedField;
+            }
+        }
+
+        $whereStatement = array();
+        $profileJoin = '';
+        if (!empty($where)) {
+            $profileJoin = 'INNER JOIN `'.DBPREFIX
+                .'access_user_attribute_value` AS `cup` ON `cup`.`user_id`=`cu`.`id`';
+        }
+        foreach ($where as $field=>$keyword) {
+            // Newsletter users
+            $whereStatement['newsletter'][] = '`' . $field . '` LIKE "%' . $keyword .'%"';
+
+            // Access users
+            if ($attr->isCoreAttribute($field)) {
+                $fieldId = $attr->getAttributeIdByProfileAttributeId($field);
+                $whereStatement['access'][] = '( `cup`.`attribute_id` = ' . $fieldId
+                    . ' AND `cup`.`value` LIKE "%' . $keyword .'%" )';
+            } else {
+                $whereStatement['access'][] = '`' . $field . '` LIKE "%' . $keyword .'%"';
             }
         }
 
@@ -5776,7 +5803,8 @@ $WhereStatement = '';
         $query   = sprintf('
             (
                 SELECT SQL_CALC_FOUND_ROWS
-                %2$s
+                %2$s,
+                0 AS isAccess
                 FROM `%1$smodule_newsletter_user` AS `nu`
                 %3$s
                 WHERE 1
@@ -5794,13 +5822,14 @@ $WhereStatement = '';
             UNION DISTINCT
             (
                 SELECT
-                %6$s
+                %6$s,
+                1 AS isAccess
                 FROM `%1$smodule_newsletter_access_user` AS `cnu`
                     INNER JOIN `%1$saccess_users` AS `cu` ON `cu`.`id`=`cnu`.`accessUserID`
-                    INNER JOIN `%1$saccess_user_profile` AS `cup` ON `cup`.`user_id`=`cu`.`id`
+                    %12$s
                 WHERE 1
                 %7$s
-                %5$s
+                %13$s
                 %11$s
             )
             %8$s
@@ -5821,7 +5850,7 @@ $WhereStatement = '';
                 ? sprintf('AND `rc`.`category`=%s', intval($newsletterListId)) : ''),
 
             // %5$s
-            $where,
+            (!empty($where) ? 'AND (' . implode('OR ', $whereStatement['newsletter']). ') '  : ''),
 
             // %6$s
             implode(',', $arrRecipientFields['access']),
@@ -5840,19 +5869,66 @@ $WhereStatement = '';
             ($status === null ? '' : 'AND `nu`.`status` = '.$status),
 
             // %11$s
-            ($status === null ? '' : 'AND `cu`.`active` = '.$status)
+            ($status === null ? '' : 'AND `cu`.`active` = '.$status),
+
+            // %12$s
+            $profileJoin,
+
+            // %13$s
+            (!empty($where) ? 'AND (' . implode('OR ', $whereStatement['access']) .') ' : '')
         );
 
         $data = $objDatabase->Execute($query);
+        $dataCount = $objDatabase->Execute('SELECT FOUND_ROWS() AS `count`');
+        $count = $dataCount->fields['count'];
+
+        $objFWUser = \FWUser::getFWUserObject();
         $users = array();
         if ($data !== false ) {
             while (!$data->EOF) {
-                $users[] = $data->fields;
+                $user = array();
+                if ($data->fields['isAccess']) {
+                    foreach ($arrRecipientFields['list'] as $field) {
+                        if ($field == 'title') {
+                            $user[$field] = '';
+                        } else if ($attr->isCoreAttribute($field)) {
+                            $accessField = $field;
+                            if (isset($arrWrapperDefinitions[$field])) {
+                                $accessField = $arrWrapperDefinitions[$field]['def'];
+                            }
+                            $objUser = $objFWUser->objUser->getUsers(
+                                array('id' => $data->fields['id'])
+                            );
+                            $value = $objUser->getProfileAttribute($accessField);
+                            if ($accessField == 'gender') {
+                                switch ($value) {
+                                    case 'gender_female':
+                                        $value = 'f';
+                                        break;
+                                    case 'gender_male':
+                                        $value = 'f';
+                                        break;
+                                    default:
+                                        $value = '-';
+                                }
+                            } $user[$field] = $value;
+                        } else {
+                            $user[$field] = $data->fields[$field];
+                        }
+                    }
+                    $user['source'] = $data->fields['source'];
+                    $user['consent'] = $data->fields['consent'];
+                } else {
+                    $user = $data->fields;
+                    unset($user['isAccess']);
+                }
+
+                $users[] = $user;
+
                 $data->MoveNext();
             }
         }
-        $data = $objDatabase->Execute('SELECT FOUND_ROWS() AS `count`');
-        $count = $data->fields['count'];
+
         return array($users, $count);
     }
 
