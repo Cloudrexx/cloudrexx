@@ -625,7 +625,79 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
         );
     }
 
+    /**
+     * Test all active users that signed in within last hour
+     * Fetch all active users that have been signed in within the last hour
+     *
+     * @author      Hava Fuga <info@cloudrexx.com>
+     *
+     * @return      void
+     */
+    public function testAllActiveUsersThatSignedInWithinLastHour() {
+        //array for offset-id's
+        $offsetId = array();
 
+        $object = \FWUser::getFWUserObject();
+        $user = $object->objUser;
+
+        //save id's from existing Users in DB
+        $users = $user->getUsers();
+        while (!$users->EOF) {
+            array_push($offsetId, $users->getId());
+            $users->next();
+        }
+
+        $userInfos = array(
+            //user that is active and wasn't logged in within the last hour
+            'test1@testmail.com' => array(
+                'status' => 1,
+                'auth' => 3700
+            ),
+            //user that is active but was logged in within the last hour
+            'test2@testmail.com' => array(
+                'status' => 1,
+                'auth' => 300
+            ),
+            //user that isn't active but was logged in within the last hour
+            'test3@testmail.com' => array(
+                'status' => 0,
+                'auth' => 300
+            ),
+            //user that isn't active and wasn't logged in within the last hour
+            'test4@testmail.com' => array(
+                'status' => 0,
+            ),
+        );
+        //create users with status
+        $this->createUsers($user, $userInfos);
+
+        $filter = array(
+            'AND' => array(
+                0 => array(
+                    'last_auth' => array(
+                        '>' => time()-3600
+                    )
+                ),
+                1 => array(
+                    'active' => 1,
+                ),
+            )
+        );
+        $users = $user->getUsers($filter);
+
+        //remove user if previously existed ($offsetId)
+        while (!$users->EOF) {
+            if (!in_array($users->getId(), $offsetId)) {
+                $email = $users->getEmail();
+            }
+            $users->next();
+        }
+
+        $this->assertEquals(
+            'test2@testmail.com',
+            $email
+        );
+    }
 
     /**
      * Test all users with same initial letter in firstname
