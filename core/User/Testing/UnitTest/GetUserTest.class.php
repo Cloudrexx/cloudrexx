@@ -205,10 +205,15 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
     public function testOneUserByUsername() {
         $object = \FWUser::getFWUserObject();
         $user = $object->objUser;
-        $user->reset();
-        $user->setEmail('testerson@testmail.com');
-        $user->setUsername('Testerson');
-        $user->store();
+
+        $userInfos = array(
+            'testerson@testmail.com' => array(
+                'username' => 'Testerson'
+            )
+        );
+
+        $this->createUsers($user, $userInfos);
+
         //determine test User
         $myTestUser = array('username'=>'Testerson');
         //check if test User is found
@@ -294,22 +299,24 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
             $offset++;
             $users->next();
         }
-        $user->reset();
-        $user->setUsername('One');
-        $user->setEmail('test1@testmail.com');
-        $user->store();
-        $user->reset();
-        $user->setUsername('Two');
-        $user->setEmail('test2@testmail.com');
-        $user->store();
-        $user->reset();
-        $user->setUsername('Three');
-        $user->setEmail('test3@testmail.com');
-        $user->store();
-        $user->reset();
-        $user->setUsername('Four');
-        $user->setEmail('test4@testmail.com');
-        $user->store();
+
+        $userInfos = array(
+            'test1@testmail.com' => array(
+                'username' => 'One'
+            ),
+            'test2@testmail.com' => array(
+                'username' => 'Two'
+            ),
+            'test3@testmail.com' => array(
+                'username' => 'Three'
+            ),
+            'test4@testmail.com' => array(
+                'username' => 'Four'
+            ),
+        );
+
+        $this->createUsers($user, $userInfos);
+
         //count all Users and ignore previously existing entries ($offset)
         $users = $user->getUsers(
             null,
@@ -869,29 +876,28 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
             array_push($offsetId, $users->getId());
             $users->next();
         }
-
-        $user->reset();
-        //set user with desired birthday
-        $user->setEmail('test1@testmail.com');
-        $user->setProfile(array(
-            'birthday' => array('02.10.1991'),
-        ));
-        $user->store();
-        $user->reset();
-        //set second user with same birthday
-        $user->setEmail('test2@testmail.com');
-        $user->setProfile(array(
-            'birthday' => array('02.10.19.1995'),
-        ));
-        $user->store();
-        $user->reset();
-        //set user with different birthday
-        $user->setEmail('test3@testmail.com');
-        $user->setProfile(array(
-            'birthday' => array('02.12.1991'),
-        ));
-        $user->store();
-        $user->reset();
+        $userInfos = array(
+            'test1@testmail.com' => array(
+                'profile' => array(
+                    'firstname' => array('Xavier'),
+                    'birthday' => array('02.10.1991')
+                ),
+            ),
+            'test2@testmail.com' => array(
+                'profile' => array(
+                    'firstname' => array('Aaron'),
+                    'birthday' => array('02.10.19.1995')
+                ),
+            ),
+            'test3@testmail.com' => array(
+                'profile' => array(
+                    'firstname' => array('Anna'),
+                    'birthday' => array('02.12.1991')
+                ),
+            ),
+        );
+        //create users with email and firstname
+        $this->createUsers($user, $userInfos);
 
         //set filter
         $day = '2';
