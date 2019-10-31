@@ -52,18 +52,34 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
      * Create test-users
      * Creates test-users with the given parameters
      *
-     * How the array should look like for example
+     * If the array has all possible cases it can look like this:
      * array(
-     *  'test@testmail.com' => array(
-     *      'username'  => 'randomUsername',
-     *      'profile'   => array(
-     *          'birthday' => array('02.10.1999'),
-     *          'firstname' => array('Lilly'),
-     *          ),
-     *      ),
-     *  );
+     *     'test2@testmail.ch',
+     *     'test@testmail.com' => array(
+     *         'username'  => 'randomUsername',
+     *         'profile'   => array(
+     *             'birthday' => array('02.10.1999'),
+     *             'firstname' => array('Lilly'),
+     *         ),
+     *         'admin'     => 1,
+     *         //time() -  your auth-number
+     *         'auth'      => 300,
+     *         'status'    => 1,
+     *
+     *     ),
+     * );
+     *
+     * It is also possible to create users with only the email.
+     * The array would then looks like this:
+     * array(
+     *     'test@testmail.com',
+     *     'example@mail.org'
+     * );
      *
      * @author      Hava Fuga <info@cloudrexx.com>
+     *
+     * @param $userObject \User The UserObject
+     * @param $userInfos Array Contains all infos for the users
      *
      * return void
      */
