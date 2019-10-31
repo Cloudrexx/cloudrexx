@@ -88,11 +88,12 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
         foreach ($userInfos as $email => $data) {
             $userObject->reset();
 
-            if (!is_array($data)) {     //if only the email is given
+            if (!is_array($data)) {
+                //if only the email is given
                 $userObject->setEmail($data);
-                continue;
             } else {
-                $userObject->setEmail($email); //set email and the other data
+                $userObject->setEmail($email);
+                //set email and the other data
                 foreach ($data as $key => $value) {
                     switch ($key) {
                         case 'username':
