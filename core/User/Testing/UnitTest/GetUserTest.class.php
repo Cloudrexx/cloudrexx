@@ -83,13 +83,14 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
      *
      * return void
      */
-    protected function createUsers($userObject, $users) {
+    protected function createUsers($userObject, $userInfos) {
         //loop over user-data and create users
-        foreach ($users as $email => $data) {
+        foreach ($userInfos as $email => $data) {
             $userObject->reset();
 
             if (!is_array($data)) {     //if only the email is given
                 $userObject->setEmail($data);
+                continue;
             } else {
                 $userObject->setEmail($email); //set email and the other data
                 foreach ($data as $key => $value) {
@@ -105,17 +106,22 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
                             break;
                         case 'admin':
                             $userObject->setAdminStatus($value);
+                            break;
                         case 'status':
                             $userObject->setActiveStatus($value);
+                            break;
                         case 'auth':
-                            $auth = true;
+                            $time = $value;
+                            break;
                     }
                 }
             }
             $userObject->store();
-            if ($auth) {
+            if (isset($time)) {
                 //the user should first be stored before the Login can be successful
                 $userObject->registerSuccessfulLogin();
+                $this->setLastAuthenticationTime($userObject->getId(), $time);
+                $userObject->store();
             }
         }
     }
