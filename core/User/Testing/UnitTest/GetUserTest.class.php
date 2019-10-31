@@ -121,6 +121,28 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
     }
 
     /**
+     * Set last AuthTime
+     * Set last AuthTime with the given number
+     *
+     * @author Hava Fuga    <info@cloudrexx.com>
+     *
+     * @param $id int the current users id
+     * @param $time int the time that will be subtracted from the current time
+     *
+     * @return void
+     */
+    private function setLastAuthenticationTime($id, $time)
+    {
+        global $objDatabase;
+
+        // change authentication time
+        $objDatabase->Execute('
+            UPDATE `' . DBPREFIX . 'access_users`
+               SET `last_auth`="' . (time() - $time) . '"
+             WHERE `id`=' . $id );
+    }
+
+    /**
      * Test one user by Id
      * Search for an Id
      *
