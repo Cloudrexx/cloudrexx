@@ -45,4 +45,62 @@ namespace Cx\Core\User\Testing\UnitTest;
 class UserTestCase extends \Cx\Core\Test\Model\Entity\MySQLTestCase
 {
 
+
+    /**
+     * The userObject that contains all users
+     * @var \User
+     * @access private
+     */
+    private $user;
+
+    /**
+     * Contains the id of currently loaded users
+     * @var integer
+     * @access private
+     */
+    private $offsetId = array();
+
+    /**
+     * initialise Test
+     * Initial for a testCase
+     *
+     * @author Hava Fuga    <info@cloudrexx.com>
+     *
+     * @return void
+     */
+    protected function initTest() {
+        $this->createUserObject();
+        $this->saveExistingUserIds();
+    }
+
+    /**
+     * Create UserObject
+     * Create an UserObject
+     *
+     * @author Hava Fuga    <info@cloudrexx.com>
+     *
+     * @return void
+     */
+    protected function createUserObject() {
+        $object = \FWUser::getFWUserObject();
+        $this->user = $object->objUser;
+    }
+
+    /**
+     * Save existing UserIds
+     * Save already existing UserId's
+     *
+     * @author Hava Fuga    <info@cloudrexx.com>
+     *
+     * @return void
+     */
+    protected function saveExistingUserIds() {
+        //save id's from existing Users in DB
+        $users = $this->user->getUsers();
+        while (!$users->EOF) {
+            array_push($this->offsetId, $users->getId());
+            $users->next();
+        }
+    }
+
 }
