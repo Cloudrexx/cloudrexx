@@ -72,6 +72,18 @@ class EsiWidgetController extends \Cx\Core_Modules\Widget\Controller\EsiWidgetCo
             )
         );
 
+        // CONTREXX_SCRIPT_PATH is not defined in command mode.
+        // As widgets might be loaded in command mode we need to define it.
+        if (!defined('CONTREXX_SCRIPT_PATH')) {
+            define(
+                'CONTREXX_SCRIPT_PATH',
+                $this->cx->getCodeBaseOffsetPath() .
+                    $params['locale']->getIso1()->getIso1() .
+                    '/'.
+                    CONTREXX_DIRECTORY_INDEX
+            );
+        }
+
         $matches = array();
         if (preg_match('/^DOWNLOADS_GROUP_([0-9]+)$/', $name, $matches)) {
             $downloads    = new DownloadsLibrary();
