@@ -708,6 +708,62 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
     }
 
     /**
+     * Test limit value of auth time
+     *
+     * @author      Hava Fuga <info@cloudrexx.com>
+     *
+     * @return      void
+     */
+    public function testLimitValueOfAuthTime() {
+        //array for offset-id's
+        $offsetId = array();
+
+        $object = \FWUser::getFWUserObject();
+        $user = $object->objUser;
+
+        //save id's from existing Users in DB
+        $users = $user->getUsers();
+        while (!$users->EOF) {
+            array_push($offsetId, $users->getId());
+            $users->next();
+        }
+
+        $userInfos = array(
+            'test1@testmail.com' => array(
+                'auth' => 3600
+            ),
+            'test2@testmail.com' => array(
+                'auth' => 3599
+            ),
+            'test3@testmail.com' => array(
+                'auth' => 3601
+            ),
+        );
+        //create users with status
+        $this->createUsers($user, $userInfos);
+
+        $filter = array(
+            'last_auth' =>  array(
+                '>' => time()-3600
+            )
+        );
+        $users = $user->getUsers($filter);
+
+        //remove user if previously existed ($offsetId)
+        while (!$users->EOF) {
+            if (!in_array($users->getId(), $offsetId)) {
+                $email = $users->getEmail();
+            }
+            $users->next();
+        }
+
+        $this->assertEquals(
+            'test2@testmail.com',
+            $email
+        );
+    }
+
+    /**
      * Test all users with same initial letter in firstname
      * Search for all users with the same inital letter in the firstnames
      *
