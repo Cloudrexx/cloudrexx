@@ -730,15 +730,13 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
 
         $userInfos = array(
             'test1@testmail.com' => array(
-                'auth' => 3600
+                'auth' => 3600,
             ),
             'test2@testmail.com' => array(
-                'auth' => 3599
-            ),
-            'test3@testmail.com' => array(
-                'auth' => 3601
+                'auth' => 3597,
             ),
         );
+
         //create users with status
         $this->createUsers($user, $userInfos);
 
