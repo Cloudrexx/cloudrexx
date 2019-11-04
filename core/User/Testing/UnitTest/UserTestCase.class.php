@@ -42,7 +42,7 @@ namespace Cx\Core\User\Testing\UnitTest;
  * @package     cloudrexx
  * @subpackage  core_user
  */
-class UserTestCase extends \Cx\Core\Test\Model\Entity\MySQLTestCase
+abstract class UserTestCase extends \Cx\Core\Test\Model\Entity\MySQLTestCase
 {
 
 
