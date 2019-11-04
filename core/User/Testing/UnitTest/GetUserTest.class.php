@@ -709,6 +709,9 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
 
     /**
      * Test limit value of auth time
+     * The acceptable limit would be 3599.
+     * But since the Test takes about 1-2 seconds to execute, the limit is set
+     * 3 seconds before. Therefore the attribute auth is set as 3597 rather then 3599
      *
      * @author      Hava Fuga <info@cloudrexx.com>
      *
