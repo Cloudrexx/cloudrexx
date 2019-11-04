@@ -103,4 +103,34 @@ abstract class UserTestCase extends \Cx\Core\Test\Model\Entity\MySQLTestCase
         }
     }
 
+    /**
+     * Get values
+     * Get values from userObject
+     *
+     * @author Hava Fuga    <info@cloudrexx.com>
+     *
+     * @param $value string the name of the wanted attribute
+     *
+     * @return string[]
+     */
+    protected function getValues($value) {
+        $array = array();
+        $users = $this->user;
+        //remove user if previously existed ($offsetId)
+        while (!$users->EOF) {
+            if (!in_array($this->users->getId(), $this->offsetId)) {
+                switch ($value) {
+                    case 'email':
+                        $result = $users->getEmail();
+                        break;
+                    case 'username':
+                        $result = $users->getUsername();
+                        break;
+                }
+                array_push($array, $result);
+            }
+            $users->next();
+        }
+    }
+
 }
