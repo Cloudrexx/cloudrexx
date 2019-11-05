@@ -111,7 +111,7 @@ class IndexerEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventListe
             $path = $fullOldPath;
         }
 
-        $extension = pathinfo($path, PATHINFO_EXTENSION);
+        $extension = pathinfo($fullPath, PATHINFO_EXTENSION);
         // This is a workaround, we should use the new path instead
         if ($extension == 'part') {
             return;
