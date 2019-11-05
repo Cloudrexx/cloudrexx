@@ -103,7 +103,6 @@ class IndexerEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventListe
      */
     public function index($fileInfo)
     {
-        $filePaths = array();
         $fullPath = $fileInfo['path'];
         $fullOldPath = $fileInfo['oldPath'];
         $path = $fullPath;
