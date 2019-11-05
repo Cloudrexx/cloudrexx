@@ -543,6 +543,20 @@ class FileSystem
     }
 
     /**
+     * Same as callDeleteEvent, but static
+     * @see callDeleteEvent()
+     */
+    protected static function callDeleteEventStatic($path, $name) {
+        static::callEvent(
+            'Remove',
+            array(
+                'path' => $path,
+                'name' => $name
+            )
+        );
+    }
+
+    /**
      * Call Indexer event to update
      * ToDo: Use \Cx\Core\MediaSource\Model\Entity\LocalFile when FileSystem work smart
      *
@@ -586,6 +600,16 @@ class FileSystem
 
     protected function callEvent($event, $params)
     {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $cx->getEvents()->triggerEvent('MediaSource.File:' . $event, $params);
+    }
+
+    /**
+     * Same as callEvent, but static
+     * @see callEvent()
+     * @deprecated Use non-static method instead
+     */
+    protected static function callEventStatic($event, $params) {
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $cx->getEvents()->triggerEvent('MediaSource.File:' . $event, $params);
     }
@@ -1016,6 +1040,10 @@ class FileSystem
         try {
             $objFile = new \Cx\Lib\FileSystem\File($file_path);
             $objFile->delete();
+            static::callDeleteEventStatic(
+                pathinfo($file_path, PATHINFO_DIRNAME) . '/',
+                pathinfo($file_path, PATHINFO_BASENAME)
+            );
             return true;
         } catch (FileSystemException $e) {
             \DBG::msg($e->getMessage());
