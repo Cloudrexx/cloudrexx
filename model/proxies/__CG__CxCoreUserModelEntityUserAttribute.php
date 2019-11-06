@@ -376,34 +376,34 @@ class UserAttribute extends \Cx\Core\User\Model\Entity\UserAttribute implements 
     /**
      * {@inheritDoc}
      */
-    public function addParent(\Cx\Core\User\Model\Entity\UserAttribute $parent)
+    public function addChild(\Cx\Core\User\Model\Entity\UserAttribute $child)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addParent', array($parent));
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addChild', array($child));
 
-        return parent::addParent($parent);
+        return parent::addChild($child);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function removeParent(\Cx\Core\User\Model\Entity\UserAttribute $parent)
+    public function removeChild(\Cx\Core\User\Model\Entity\UserAttribute $child)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeParent', array($parent));
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeChild', array($child));
 
-        return parent::removeParent($parent);
+        return parent::removeChild($child);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getParent()
+    public function getChildren()
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getParent', array());
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getChildren', array());
 
-        return parent::getParent();
+        return parent::getChildren();
     }
 
     /**
@@ -475,23 +475,23 @@ class UserAttribute extends \Cx\Core\User\Model\Entity\UserAttribute implements 
     /**
      * {@inheritDoc}
      */
-    public function setChildren(\Cx\Core\User\Model\Entity\UserAttribute $children = NULL)
+    public function setParent(\Cx\Core\User\Model\Entity\UserAttribute $parent = NULL)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setChildren', array($children));
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setParent', array($parent));
 
-        return parent::setChildren($children);
+        return parent::setParent($parent);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getChildren()
+    public function getParent()
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getChildren', array());
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getParent', array());
 
-        return parent::getChildren();
+        return parent::getParent();
     }
 
     /**
@@ -525,6 +525,17 @@ class UserAttribute extends \Cx\Core\User\Model\Entity\UserAttribute implements 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'isVirtual', array());
 
         return parent::isVirtual();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
     }
 
     /**
