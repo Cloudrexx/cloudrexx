@@ -895,6 +895,7 @@ class User extends User_Profile
             }
             if (count($arrCoreAttributeConditions = $this->parseAttributeSearchConditions($search, true))) {
                 $arrSearchConditions[] = implode(' OR ', $arrCoreAttributeConditions);
+                $tblCustomAttributes = true;
             }
             if (count($arrCustomAttributeConditions = $this->parseAttributeSearchConditions($search, false))) {
                 $groupTables = true;
