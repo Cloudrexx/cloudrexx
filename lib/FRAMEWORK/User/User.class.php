@@ -214,6 +214,13 @@ class User extends User_Profile
     private $last_auth;
 
     /**
+     * If the last time the user try to logged in was successful
+     * @var boolean
+     * @access private
+     */
+    private $last_auth_status = 1;
+
+    /**
      * The last time that the user was active (timestamp)
      * @var integer
      * @access private
@@ -2159,6 +2166,7 @@ class User extends User_Profile
                 `expiration`,
                 `validity`,
                 `last_auth`,
+                `last_auth_status`,
                 `last_activity`,
                 `active`,
                 `verified`,
@@ -2180,6 +2188,7 @@ class User extends User_Profile
                 ".intval($this->expiration).",
                 ".intval($this->validity).",
                 ".$this->last_auth.",
+                ".$this->last_auth_status.",
                 ".$this->last_activity.",
                 ".intval($this->is_active).",
                 ".intval($this->verified).",
