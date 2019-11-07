@@ -138,8 +138,7 @@ class GetUserTest extends \Cx\Core\User\Testing\UnitTest\UserTestCase
      * @return      void
      */
     public function testOneUserById() {
-        $object = \FWUser::getFWUserObject();
-        $user = $object->objUser;
+        $user = $this->createUserObject();
 
         $userInfos = array(
             'test@testmail.com',
@@ -161,8 +160,7 @@ class GetUserTest extends \Cx\Core\User\Testing\UnitTest\UserTestCase
      * @return      void
      */
     public function testOneUserByEmail() {
-        $object = \FWUser::getFWUserObject();
-        $user = $object->objUser;
+        $user = $this->createUserObject();
 
         $userInfos = array(
             'test@testmail.com',
@@ -184,8 +182,7 @@ class GetUserTest extends \Cx\Core\User\Testing\UnitTest\UserTestCase
      *
      */
     public function testOneUserByUsername() {
-        $object = \FWUser::getFWUserObject();
-        $user = $object->objUser;
+        $user = $this->createUserObject();
 
         $userInfos = array(
             'testerson@testmail.com' => array(
@@ -213,8 +210,7 @@ class GetUserTest extends \Cx\Core\User\Testing\UnitTest\UserTestCase
      * @return      void
      */
     public function testAllUsers() {
-        $object = \FWUser::getFWUserObject();
-        $user = $object->objUser;
+        $user = $this->createUserObject();
         $users = $user->getUsers();
 
         //counter for offset
@@ -271,8 +267,7 @@ class GetUserTest extends \Cx\Core\User\Testing\UnitTest\UserTestCase
         //counter for Users
         $userCount = 0;
 
-        $object = \FWUser::getFWUserObject();
-        $user = $object->objUser;
+        $user = $this->createUserObject();
 
         //count existing Users in DB
         $users = $user->getUsers();
@@ -327,18 +322,8 @@ class GetUserTest extends \Cx\Core\User\Testing\UnitTest\UserTestCase
      * @return      void
      */
     public function testAllUsersByBirthdayAndExistingProfilepicture() {
-        //array for offset-id's
-        $offsetId = array();
-
-        $object = \FWUser::getFWUserObject();
-        $user = $object->objUser;
-
-        //save id's from existing Users in DB
-        $users = $user->getUsers();
-        while (!$users->EOF) {
-            array_push($offsetId, $users->getId());
-            $users->next();
-        }
+        $user = $this->createUserObject();
+        $offsetId = $this->saveExistingUserIds();
 
         $userInfos = array(
             'test1@testmail.com' => array(
@@ -413,18 +398,8 @@ class GetUserTest extends \Cx\Core\User\Testing\UnitTest\UserTestCase
      * @return      void
      */
     public function testAllUsersWithSameInitialLetterInFirstnameAndLastname() {
-        //array for offset-id's
-        $offsetId = array();
-
-        $object = \FWUser::getFWUserObject();
-        $user = $object->objUser;
-
-        //save id's from existing Users in DB
-        $users = $user->getUsers();
-        while (!$users->EOF) {
-            array_push($offsetId, $users->getId());
-            $users->next();
-        }
+        $user = $this->createUserObject();
+        $offsetId = $this->saveExistingUserIds();
 
         $userInfos = array(
             'test1@testmail.com' => array(
@@ -497,20 +472,10 @@ class GetUserTest extends \Cx\Core\User\Testing\UnitTest\UserTestCase
      * @return      void
      */
     public function testListFirstnameAndLastnameFromAllUsers() {
-        //array for offset-id's
-        $offsetId = array();
-
-        $object = \FWUser::getFWUserObject();
-        $user = $object->objUser;
+        $user = $this->createUserObject();
+        $offsetId = $this->saveExistingUserIds();
 
         $arrAttributes = array('firstname', 'lastname');
-
-        //save id's from existing Users in DB
-        $users = $user->getUsers(null, null, null, $arrAttributes);
-        while (!$users->EOF) {
-            array_push($offsetId, $users->getId());
-            $users->next();
-        }
 
         $userInfos = array(
             'test1@testmail.com' => array(
@@ -576,8 +541,7 @@ class GetUserTest extends \Cx\Core\User\Testing\UnitTest\UserTestCase
         //counter for offset
         $offset = 0;
 
-        $object = \FWUser::getFWUserObject();
-        $user = $object->objUser;
+        $user = $this->createUserObject();
 
         //count existing Users in DB
         $users = $user->getUsers();
@@ -622,18 +586,8 @@ class GetUserTest extends \Cx\Core\User\Testing\UnitTest\UserTestCase
      * @return      void
      */
     public function testAllActiveUsersThatSignedInWithinLastHour() {
-        //array for offset-id's
-        $offsetId = array();
-
-        $object = \FWUser::getFWUserObject();
-        $user = $object->objUser;
-
-        //save id's from existing Users in DB
-        $users = $user->getUsers();
-        while (!$users->EOF) {
-            array_push($offsetId, $users->getId());
-            $users->next();
-        }
+        $user = $this->createUserObject();
+        $offsetId = $this->saveExistingUserIds();
 
         $userInfos = array(
             //user that is active and wasn't logged in within the last hour
@@ -698,18 +652,8 @@ class GetUserTest extends \Cx\Core\User\Testing\UnitTest\UserTestCase
      * @return      void
      */
     public function testLimitValueOfAuthTime() {
-        //array for offset-id's
-        $offsetId = array();
-
-        $object = \FWUser::getFWUserObject();
-        $user = $object->objUser;
-
-        //save id's from existing Users in DB
-        $users = $user->getUsers();
-        while (!$users->EOF) {
-            array_push($offsetId, $users->getId());
-            $users->next();
-        }
+        $user = $this->createUserObject();
+        $offsetId = $this->saveExistingUserIds();
 
         $userInfos = array(
             'test1@testmail.com' => array(
@@ -753,18 +697,8 @@ class GetUserTest extends \Cx\Core\User\Testing\UnitTest\UserTestCase
      * @return      void
      */
     public function testAllUsersWithSameInitialLetterInFirstname() {
-        //array for offset-id's
-        $offsetId = array();
-
-        $object = \FWUser::getFWUserObject();
-        $user = $object->objUser;
-
-        //save id's from existing Users in DB
-        $users = $user->getUsers();
-        while (!$users->EOF) {
-            array_push($offsetId, $users->getId());
-            $users->next();
-        }
+        $user = $this->createUserObject();
+        $offsetId = $this->saveExistingUserIds();
 
         $userInfos = array(
             'test1@testmail.com' => array(
@@ -823,18 +757,8 @@ class GetUserTest extends \Cx\Core\User\Testing\UnitTest\UserTestCase
      * @return      void
      */
     public function testListSortedByFirstnames() {
-        //array for offset-id's
-        $offsetId = array();
-
-        $object = \FWUser::getFWUserObject();
-        $user = $object->objUser;
-
-        //save id's from existing Users in DB
-        $users = $user->getUsers();
-        while (!$users->EOF) {
-            array_push($offsetId, $users->getId());
-            $users->next();
-        }
+        $user = $this->createUserObject();
+        $offsetId = $this->saveExistingUserIds();
 
         $userInfos = array(
             'test1@testmail.com' => array(
@@ -901,19 +825,9 @@ class GetUserTest extends \Cx\Core\User\Testing\UnitTest\UserTestCase
      *
      */
     public function testUsersByBirthdate() {
+        $user = $this->createUserObject();
+        $offsetId = $this->saveExistingUserIds();
 
-        //array for offset-id's
-        $offsetId = array();
-
-        $object = \FWUser::getFWUserObject();
-        $user = $object->objUser;
-
-        //save id's from existing Users in DB
-        $users = $user->getUsers();
-        while (!$users->EOF) {
-            array_push($offsetId, $users->getId());
-            $users->next();
-        }
         $userInfos = array(
             'test1@testmail.com' => array(
                 'profile' => array(
@@ -977,18 +891,8 @@ class GetUserTest extends \Cx\Core\User\Testing\UnitTest\UserTestCase
      * @return void
      */
     public function testAllUsersWithoutAdminRights() {
-        //array for offset-id's
-        $offsetId = array();
-
-        $object = \FWUser::getFWUserObject();
-        $user = $object->objUser;
-
-        //save id's from existing Users in DB
-        $users = $user->getUsers();
-        while (!$users->EOF) {
-            array_push($offsetId, $users->getId());
-            $users->next();
-        }
+        $user = $this->createUserObject();
+        $offsetId = $this->saveExistingUserIds();
 
         $userInfos = array(
             'test1@testmail.com' => array(
