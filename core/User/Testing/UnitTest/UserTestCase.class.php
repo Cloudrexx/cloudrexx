@@ -66,11 +66,12 @@ abstract class UserTestCase extends \Cx\Core\Test\Model\Entity\MySQLTestCase
      *
      * @author Hava Fuga    <info@cloudrexx.com>
      *
-     * @return void
+     * @return $this->user \User
      */
     protected function initTest() {
         $this->createUserObject();
         $this->saveExistingUserIds();
+        return $this->user;
     }
 
     /**
@@ -79,11 +80,12 @@ abstract class UserTestCase extends \Cx\Core\Test\Model\Entity\MySQLTestCase
      *
      * @author Hava Fuga    <info@cloudrexx.com>
      *
-     * @return void
+     * @return $this->user \User
      */
     protected function createUserObject() {
         $object = \FWUser::getFWUserObject();
         $this->user = $object->objUser;
+        return $this->user;
     }
 
     /**
@@ -92,7 +94,7 @@ abstract class UserTestCase extends \Cx\Core\Test\Model\Entity\MySQLTestCase
      *
      * @author Hava Fuga    <info@cloudrexx.com>
      *
-     * @return void
+     * @return $this->offsetId string[]
      */
     protected function saveExistingUserIds() {
         //save id's from existing Users in DB
@@ -101,6 +103,7 @@ abstract class UserTestCase extends \Cx\Core\Test\Model\Entity\MySQLTestCase
             array_push($this->offsetId, $users->getId());
             $users->next();
         }
+        return $this->offsetId;
     }
 
     /**
