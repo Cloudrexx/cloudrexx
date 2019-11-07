@@ -46,7 +46,7 @@ use function JmesPath\search;
  * @package     cloudrexx
  * @subpackage  core_user
  */
-class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
+class GetUserTest extends \Cx\Core\User\Testing\UnitTest\UserTestCase
 {
     /**
      * Create test-users
