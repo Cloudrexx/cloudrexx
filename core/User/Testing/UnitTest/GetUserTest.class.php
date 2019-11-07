@@ -91,6 +91,8 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
             if (!is_array($data)) {
                 //if only the email is given
                 $userObject->setEmail($data);
+                $userObject->store();
+                continue;
             } else {
                 $userObject->setEmail($email);
                 //set email and the other data
