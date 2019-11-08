@@ -49,14 +49,14 @@ abstract class UserTestCase extends \Cx\Core\Test\Model\Entity\MySQLTestCase
     /**
      * The userObject that contains all users
      * @var \User
-     * @access private
+     * @access protected
      */
     protected $user;
 
     /**
      * Contains the id of currently loaded users
      * @var integer
-     * @access private
+     * @access protected
      */
     protected $offsetId = array();
 
