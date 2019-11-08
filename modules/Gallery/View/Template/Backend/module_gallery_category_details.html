@@ -65,13 +65,15 @@ jQuery( document ).ready(function() {
      **/
     setTimeout(function() {
       cx.jQuery('.adminlist tbody').sortable({
-                update: function () {
-                  //sets index number for sortingSystem
-                  jQuery('.sortingSystem').each(function (index) {
-                    jQuery(this).val(index + 1);
-                  });
-                }
-              }
+          update: function () {
+            //sets index number for sortingSystem
+            jQuery('.sortingSystem').each(function (index) {
+              jQuery(this).val(index + 1);
+            });
+          },
+          items: '.draggable',
+          axis: 'y'
+        }
       );
     }, 100);
   }

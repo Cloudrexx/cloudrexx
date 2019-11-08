@@ -50,12 +50,13 @@ jQuery( document ).ready(function() {
             jQuery('.sortingSystem').each(function (index) {
               jQuery(this).val(index + 1);
             });
-          }
+          },
+          items: '.draggable',
+          axis: 'y'
         }
       );
     }, 100);
   }
-
 });
 // ]]>
 </script>
