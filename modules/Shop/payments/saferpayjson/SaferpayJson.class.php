@@ -254,7 +254,7 @@ class SaferpayJson
             isset($result['Transaction']['AcquirerName']) &&
             in_array(
                 $result['Transaction']['AcquirerName'],
-                $this->acquirersWithout3dSecure
+                static::$acquirersWithout3dSecure
             )
         ) {
             static::$transactionId = $result['Transaction']['Id'];
