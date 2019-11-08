@@ -1280,22 +1280,7 @@ CODE;
                 $subFiles = $fileInfo;
                 unset($subFiles['datainfo']);
 
-                $name = $info['name'];
-                switch (true) {
-                    case $name == ltrim($this->cx->getCoreModuleFolderName() , '/'):
-                        $name = 'core_module';
-                        break;
-                    case $name == ltrim($this->cx->getModuleFolderName(), '/'):
-                        $name = 'module';
-                        break;
-                    case $name == ltrim($this->cx->getCoreFolderName(), '/'):
-                        $name = 'core';
-                        break;
-                    default:
-                        break;
-                }
-
-                $result[$name] = $this->formatFileList($subFiles);
+                $result[$info['name']] = $this->formatFileList($subFiles);
             }
         }
 
