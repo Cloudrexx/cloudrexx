@@ -51,6 +51,7 @@
 // ]]>
 </script>
 <form name="frmShowImages" method="post" action="?cmd=Gallery&amp;act=category_actions&amp;catid={CATEGORY_ID}">
+  <input id="enableDragDrop" type="hidden" value="{ENABLE_DRAP_DROP}">
   <table width="100%" cellspacing="0" cellpadding="3" border="0" class="adminlist">
     <tr>
         <th colspan="9">
@@ -60,6 +61,7 @@
     <tr class="row3">
       <td nowrap="nowrap" width="60" colspan="2"><span style="font-weight:bold;">{TXT_TITLE_ORDER}</span></td>
       <td nowrap="nowrap" width="40"><span style="font-weight:bold;">&nbsp;</span></td>
+      <th class="dragdrop_move" width="1%"><div align="left">{TXT_ORDER}</div></th>
       <td nowrap="nowrap" width="40"><span style="font-weight:bold;">&nbsp;</span></td>
       <td nowrap="nowrap" width="20%"><span style="font-weight:bold;">{TXT_TITLE_NAME}</span></td>
       <td nowrap="nowrap" width="25%"><span style="font-weight:bold;">{TXT_TITLE_ATTR}</span></td>
@@ -73,7 +75,10 @@
         <input type="checkbox" name="selectedImageId[]" value="{IMAGES_ID}" />
       </td>
       <td nowrap="nowrap" align="center" valign="top">
-        <input type="text" name="sortingSystem{IMAGES_CATTYPE}{IMAGES_ID}" value="{IMAGES_SORTING}" maxlength="5" size="5" />
+        <input type="text" class="sortingSystem" name="sortingSystem{IMAGES_CATTYPE}{IMAGES_ID}" value="{IMAGES_SORTING}" maxlength="5" size="5" />
+      </td>
+      <td class="dragdrop_move" width="1%">
+        <img alt="move icon" src="../../../../core/ContentManager/View/Media/Move.png">
       </td>
       <td nowrap="nowrap" valign="top">
         <a href="?cmd=Gallery&amp;act=activate_picture&amp;gid={CATEGORY_ID}&amp;id={IMAGES_ID}" target="_self"><img src="../core/Core/View/Media/icons/{IMAGES_ACTIVE_ICON}" border="0" alt="{TXT_ACTIVATE_PICTURE}" title="{TXT_ACTIVATE_PICTURE}" /></a>
