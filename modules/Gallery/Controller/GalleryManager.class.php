@@ -2120,6 +2120,32 @@ class GalleryManager extends GalleryLibrary
 
 
     /**
+     * Check if drag&drop is enabled
+     *
+     * @author Hava Fuga <info@cloudrexx.com>
+     *
+     * @global    ADONewConnection
+     *
+     * @return $active string
+     */
+    function isDragDrop() {
+        global $objDatabase;
+        $objResult = $objDatabase->Execute(
+            'SELECT      *
+            FROM         '.DBPREFIX.'module_gallery_settings
+            WHERE name = "drag_drop"
+            ORDER BY     id'
+        );
+        if ($objResult->fields['value'] == 'on') {
+            $active = 'active';
+        } else {
+            $active = '';
+        }
+        return $active;
+    }
+
+
+    /**
      * Save the settings for the gallery
      *
      * @global    ADONewConnection
