@@ -2106,7 +2106,7 @@ class GalleryManager extends GalleryLibrary
                         $checked = "";
                     }
                     $this->_objTpl->setVariable(array(
-                        'SETTINGS_VALUE_SHOW_FILE_NAME' => $checked,
+                        'SETTINGS_VALUE_DRAG_DROP' => $checked,
                     ));
                     break;
                 default: //integer value
