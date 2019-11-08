@@ -1383,6 +1383,7 @@ class GalleryManager extends GalleryLibrary
             'TXT_SUBMIT_DEACTIVATE'         =>    $_ARRAYLANG['TXT_GALLERY_CAT_DETAILS_SUBMIT_DEACTIVATE'],
             'TXT_SUBMIT_RESET'              =>    $_ARRAYLANG['TXT_GALLERY_CAT_DETAILS_SUBMIT_RESET'],
             'TXT_SUBMIT_MOVE'               =>    $_ARRAYLANG['TXT_GALLERY_CAT_DETAILS_SUBMIT_MOVE'],
+            'ENABLE_DRAP_DROP'          => $this->isDragDrop(),
         ));
 
         $objResult = $objDatabase->Execute('SELECT     value
