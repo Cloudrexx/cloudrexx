@@ -37,6 +37,7 @@ function selectMultiAction()
   <tr>
     <th width="2%"><div align="left">#</div></th>
     <th width="3%"><div align="left">{TXT_STATUS}</div></th>
+    <th class="dragdrop_move" width="1%"><div align="left">{TXT_ORDER}</div></th>
     <th width="22%"><div align="left">{TXT_NAME}</div></th>
     <th width="43%"><div align="left">{TXT_DESC}</div></th>
     <th width="10%" nowrap="nowrap" align="center"><div align="left">{TXT_IMAGECOUNT}</div></th>
@@ -47,8 +48,9 @@ function selectMultiAction()
   <tr class="row{OVERVIEW_ROWCLASS}">
     <td width="1%"><input type="checkbox" name="selectedCategoryId[]" id="selectedCategoryId" value="{OVERVIEW_ID}"></td>
     <td width="1%"><a href="?cmd=Gallery&amp;act=activate_category&amp;id={OVERVIEW_ID}" target="_self"><img src="../core/Core/View/Media/icons/{OVERVIEW_ICON}.gif" border="0" alt="" /></a></td>
+    <td class="dragdrop_move" width="1%"><img alt="move icon" src="../../../../core/ContentManager/View/Media/Move.png"></td>
     <td width="1%" nowrap="nowrap">{OVERVIEW_SUBCATEGORY}<img src="../core/Core/View/Media/icons/folder_on.gif" border="0" alt="" />&nbsp;
-      <input type="text" name="sortingSystem{OVERVIEW_ID}" value="{OVERVIEW_SORTING}" maxlength="5" size="5" />&nbsp;
+      <input type="text" class="sortingSystem" name="sortingSystem{OVERVIEW_ID}" value="{OVERVIEW_SORTING}" maxlength="5" size="5" />&nbsp;
       <a href="?cmd=Gallery&amp;act=cat_details&amp;id={OVERVIEW_ID}">{OVERVIEW_NAME}</a>
     </td>
     <td align="justify">{OVERVIEW_DESCRIPTION}&nbsp;</td>
