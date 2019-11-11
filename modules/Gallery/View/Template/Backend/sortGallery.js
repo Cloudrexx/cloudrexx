@@ -1,10 +1,10 @@
-jQuery( document ).ready(function() {
-    jQuery('.dragdrop_move').hide();
+cx.jQuery( document ).ready(function() {
+    cx.jQuery('.dragdrop_move').hide();
     //check if drag & drop is active
-    if (jQuery("#enableDragDrop").val() == 'active') {
+    if (cx.jQuery("#enableDragDrop").val() == 'active') {
         //hide order-number and show drag & drop icon
-        jQuery('.dragdrop_move').show();
-        jQuery('.sortingSystem').hide();
+        cx.jQuery('.dragdrop_move').show();
+        cx.jQuery('.sortingSystem').hide();
 
         /**
          * activate sortable
@@ -16,8 +16,8 @@ jQuery( document ).ready(function() {
             cx.jQuery('.adminlist tbody').sortable({
                     update: function () {
                         //sets index number for sortingSystem
-                        jQuery('.sortingSystem').each(function (index) {
-                            jQuery(this).val(index + 1);
+                        cx.jQuery('.sortingSystem').each(function (index) {
+                            cx.jQuery(this).val(index + 1);
                         });
                     },
                     items: '.draggable',
