@@ -461,6 +461,7 @@ class GalleryManager extends GalleryLibrary
             'ENABLE_DRAP_DROP'          => $this->isDragDrop(),
         ));
 
+        $this->checkIsDragDrop();
         $objResult = $objDatabase->Execute('SELECT     id
                        FROM '.DBPREFIX.'module_gallery_categories');
         if ($objResult->RecordCount() > 0) {
@@ -1386,6 +1387,7 @@ class GalleryManager extends GalleryLibrary
             'ENABLE_DRAP_DROP'          => $this->isDragDrop(),
         ));
 
+        $this->checkIsDragDrop();
         $objResult = $objDatabase->Execute('SELECT     value
                                             FROM     '.DBPREFIX.'module_gallery_language
                                             WHERE     gallery_id='.intval($intCatId).' AND
