@@ -21,7 +21,8 @@ cx.jQuery( document ).ready(function() {
                         });
                     },
                     items: '.draggable',
-                    axis: 'y'
+                    axis: 'y',
+                    scroll: false,
                 }
             );
         }, 100);
