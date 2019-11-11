@@ -2126,7 +2126,7 @@ class GalleryManager extends GalleryLibrary
      *
      * @global    ADONewConnection
      *
-     * @return $active string
+     * @return void
      */
     function checkIsDragDrop() {
         global $objDatabase;
@@ -2137,11 +2137,12 @@ class GalleryManager extends GalleryLibrary
             ORDER BY     id'
         );
         if ($objResult->fields['value'] == 'on') {
-            $active = 'active';
-        } else {
-            $active = '';
+            \ContrexxJavascript::getInstance()->setVariable(
+                'isDragDrop',
+                'checked="checked"',
+                'Gallery'
+            );
         }
-        return $active;
     }
 
 

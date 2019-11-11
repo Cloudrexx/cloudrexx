@@ -1,7 +1,10 @@
 cx.jQuery( document ).ready(function() {
     cx.jQuery('.dragdrop_move').hide();
+
+    var isDragDrop = cx.variables.get('isDragDrop', 'Gallery');
+
     //check if drag & drop is active
-    if (cx.jQuery("#enableDragDrop").val() == 'active') {
+    if (isDragDrop != null) {
         //hide order-number and show drag & drop icon
         cx.jQuery('.dragdrop_move').show();
         cx.jQuery('.sortingSystem').hide();
