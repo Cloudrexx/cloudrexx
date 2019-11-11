@@ -2102,10 +2102,9 @@ class GalleryManager extends GalleryLibrary
                     ));
                     break;
                 case 'drag_drop':
+                    $checked = "";
                     if ($objResult->fields['value'] == 'on') {
                         $checked = "checked='checked'";
-                    } else {
-                        $checked = "";
                     }
                     $this->_objTpl->setVariable(array(
                         'SETTINGS_VALUE_DRAG_DROP' => $checked,
