@@ -458,7 +458,6 @@ class GalleryManager extends GalleryLibrary
             'TXT_SUBMIT_DELETE'         => $_ARRAYLANG['TXT_GALLERY_CAT_DETAILS_SUBMIT_DELETE'],
             'TXT_SUBMIT_ACTIVATE'       => $_ARRAYLANG['TXT_GALLERY_CAT_DETAILS_SUBMIT_ACTIVATE'],
             'TXT_SUBMIT_DEACTIVATE'     => $_ARRAYLANG['TXT_GALLERY_CAT_DETAILS_SUBMIT_DEACTIVATE'],
-            'ENABLE_DRAP_DROP'          => $this->isDragDrop(),
         ));
 
         $this->checkIsDragDrop();
@@ -1384,7 +1383,6 @@ class GalleryManager extends GalleryLibrary
             'TXT_SUBMIT_DEACTIVATE'         =>    $_ARRAYLANG['TXT_GALLERY_CAT_DETAILS_SUBMIT_DEACTIVATE'],
             'TXT_SUBMIT_RESET'              =>    $_ARRAYLANG['TXT_GALLERY_CAT_DETAILS_SUBMIT_RESET'],
             'TXT_SUBMIT_MOVE'               =>    $_ARRAYLANG['TXT_GALLERY_CAT_DETAILS_SUBMIT_MOVE'],
-            'ENABLE_DRAP_DROP'          => $this->isDragDrop(),
         ));
 
         $this->checkIsDragDrop();
