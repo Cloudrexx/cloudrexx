@@ -45,6 +45,86 @@ namespace Cx\Core\User\Testing\UnitTest;
 abstract class UserTestCase extends \Cx\Core\Test\Model\Entity\MySQLTestCase
 {
 
+    /**
+     * Create test-users
+     * Creates test-users with the given parameters
+     *
+     * If the array has all possible cases it can look like this:
+     * array(
+     *     'test2@testmail.ch',
+     *     'test@testmail.com' => array(
+     *         'username'  => 'randomUsername',
+     *         'profile'   => array(
+     *             'birthday' => array('02.10.1999'),
+     *             'firstname' => array('Lilly'),
+     *         ),
+     *         'admin'     => 1,
+     *         //time() -  your auth-number
+     *         'auth'      => 300,
+     *         'status'    => 1,
+     *
+     *     ),
+     * );
+     *
+     * It is also possible to create users with only the email.
+     * The array would then looks like this:
+     * array(
+     *     'test@testmail.com',
+     *     'example@mail.org'
+     * );
+     *
+     * @author      Hava Fuga <info@cloudrexx.com>
+     *
+     * @param $userObject \User The UserObject
+     * @param $userInfos Array Contains all infos for the users
+     *
+     * return void
+     */
+    protected function createUsers($userObject, $userInfos) {
+        //loop over user-data and create users
+        foreach ($userInfos as $email => $data) {
+            $userObject->reset();
+
+            if (!is_array($data)) {
+                //if only the email is given
+                $userObject->setEmail($data);
+                $userObject->store();
+                continue;
+            } else {
+                $userObject->setEmail($email);
+                //set email and the other data
+                foreach ($data as $key => $value) {
+                    switch ($key) {
+                        case 'username':
+                            $userObject->setUsername($value);
+                            break;
+                        case 'profile':
+                            $userObject->setProfile($value);
+                            break;
+                        case 'group':
+                            $userObject->setPrimaryGroup($value);
+                            break;
+                        case 'admin':
+                            $userObject->setAdminStatus($value);
+                            break;
+                        case 'status':
+                            $userObject->setActiveStatus($value);
+                            break;
+                        case 'auth':
+                            $time = $value;
+                            break;
+                    }
+                }
+            }
+            $userObject->store();
+            if (isset($time)) {
+                //the user should first be stored before the Login can be successful
+                $userObject->registerSuccessfulLogin();
+                $this->setLastAuthenticationTime($userObject->getId(), $time);
+                $userObject->store();
+            }
+        }
+    }
 
     /**
      * The userObject that contains all users
