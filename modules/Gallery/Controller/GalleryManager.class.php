@@ -2128,7 +2128,7 @@ class GalleryManager extends GalleryLibrary
      *
      * @return $active string
      */
-    function isDragDrop() {
+    function checkIsDragDrop() {
         global $objDatabase;
         $objResult = $objDatabase->Execute(
             'SELECT      *
