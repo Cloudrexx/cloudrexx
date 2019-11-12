@@ -3326,7 +3326,8 @@ CREATE TABLE `contrexx_module_recommend` (
   `name` varchar(255) NOT NULL DEFAULT '',
   `value` text NOT NULL,
   `lang_id` int(11) NOT NULL DEFAULT '1',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `data` (`name`,`lang_id`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_module_repository` (
   `id` int(6) unsigned NOT NULL AUTO_INCREMENT,
