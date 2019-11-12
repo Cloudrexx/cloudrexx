@@ -43,64 +43,8 @@ namespace Cx\Core\User\Testing\UnitTest;
  * @package     cloudrexx
  * @subpackage  core_user
  */
-class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
+class GetUserTest extends \Cx\Core\User\Testing\UnitTest\UserTestCase
 {
-    /**
-     * Create test-users
-     * Creates test-users with the given parameters
-     *
-     * How the array should look like for example
-     * array(
-     *  'test@testmail.com' => array(
-     *      'username'  => 'randomUsername',
-     *      'profile'   => array(
-     *          'birthday' => array('02.10.1999'),
-     *          'firstname' => array('Lilly'),
-     *          ),
-     *      ),
-     *  );
-     *
-     * @author      Hava Fuga <info@cloudrexx.com>
-     *
-     * return void
-     */
-    protected function createUsers($userObject, $users) {
-        //loop over user-data and create users
-        foreach ($users as $email => $data) {
-            $userObject->reset();
-
-            if (!is_array($data)) {     //if only the email is given
-                $userObject->setEmail($data);
-            } else {
-                $userObject->setEmail($email); //set email and the other data
-                foreach ($data as $key => $value) {
-                    switch ($key) {
-                        case 'username':
-                            $userObject->setUsername($value);
-                            break;
-                        case 'profile':
-                            $userObject->setProfile($value);
-                            break;
-                        case 'group':
-                            $userObject->setPrimaryGroup($value);
-                            break;
-                        case 'admin':
-                            $userObject->setAdminStatus($value);
-                        case 'status':
-                            $userObject->setActiveStatus($value);
-                        case 'auth':
-                            $auth = true;
-                    }
-                }
-            }
-            $userObject->store();
-            if ($auth) {
-                //the user should first be stored before the Login can be successful
-                $userObject->registerSuccessfulLogin();
-            }
-        }
-    }
-
     /**
      * Test one user by Id
      * Search for an Id
@@ -110,8 +54,7 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
      * @return      void
      */
     public function testOneUserById() {
-        $object = \FWUser::getFWUserObject();
-        $user = $object->objUser;
+        $user = $this->createUserObject();
 
         $userInfos = array(
             'test@testmail.com',
@@ -133,8 +76,7 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
      * @return      void
      */
     public function testOneUserByEmail() {
-        $object = \FWUser::getFWUserObject();
-        $user = $object->objUser;
+        $user = $this->createUserObject();
 
         $userInfos = array(
             'test@testmail.com',
@@ -156,8 +98,7 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
      *
      */
     public function testOneUserByUsername() {
-        $object = \FWUser::getFWUserObject();
-        $user = $object->objUser;
+        $user = $this->createUserObject();
 
         $userInfos = array(
             'testerson@testmail.com' => array(
@@ -185,8 +126,7 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
      * @return      void
      */
     public function testAllUsers() {
-        $object = \FWUser::getFWUserObject();
-        $user = $object->objUser;
+        $user = $this->createUserObject();
         $users = $user->getUsers();
 
         //counter for offset
@@ -243,8 +183,7 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
         //counter for Users
         $userCount = 0;
 
-        $object = \FWUser::getFWUserObject();
-        $user = $object->objUser;
+        $user = $this->createUserObject();
 
         //count existing Users in DB
         $users = $user->getUsers();
@@ -299,18 +238,8 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
      * @return      void
      */
     public function testAllUsersByBirthdayAndExistingProfilepicture() {
-        //array for offset-id's
-        $offsetId = array();
-
-        $object = \FWUser::getFWUserObject();
-        $user = $object->objUser;
-
-        //save id's from existing Users in DB
-        $users = $user->getUsers();
-        while (!$users->EOF) {
-            array_push($offsetId, $users->getId());
-            $users->next();
-        }
+        $user = $this->createUserObject();
+        $offsetId = $this->saveExistingUserIds();
 
         $userInfos = array(
             'test1@testmail.com' => array(
@@ -385,18 +314,8 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
      * @return      void
      */
     public function testAllUsersWithSameInitialLetterInFirstnameAndLastname() {
-        //array for offset-id's
-        $offsetId = array();
-
-        $object = \FWUser::getFWUserObject();
-        $user = $object->objUser;
-
-        //save id's from existing Users in DB
-        $users = $user->getUsers();
-        while (!$users->EOF) {
-            array_push($offsetId, $users->getId());
-            $users->next();
-        }
+        $user = $this->createUserObject();
+        $offsetId = $this->saveExistingUserIds();
 
         $userInfos = array(
             'test1@testmail.com' => array(
@@ -469,20 +388,10 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
      * @return      void
      */
     public function testListFirstnameAndLastnameFromAllUsers() {
-        //array for offset-id's
-        $offsetId = array();
-
-        $object = \FWUser::getFWUserObject();
-        $user = $object->objUser;
+        $user = $this->createUserObject();
+        $offsetId = $this->saveExistingUserIds();
 
         $arrAttributes = array('firstname', 'lastname');
-
-        //save id's from existing Users in DB
-        $users = $user->getUsers(null, null, null, $arrAttributes);
-        while (!$users->EOF) {
-            array_push($offsetId, $users->getId());
-            $users->next();
-        }
 
         $userInfos = array(
             'test1@testmail.com' => array(
@@ -548,8 +457,7 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
         //counter for offset
         $offset = 0;
 
-        $object = \FWUser::getFWUserObject();
-        $user = $object->objUser;
+        $user = $this->createUserObject();
 
         //count existing Users in DB
         $users = $user->getUsers();
@@ -585,7 +493,116 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
         );
     }
 
+    /**
+     * Test all active users that signed in within last hour
+     * Fetch all active users that have been signed in within the last hour
+     *
+     * @author      Hava Fuga <info@cloudrexx.com>
+     *
+     * @return      void
+     */
+    public function testAllActiveUsersThatSignedInWithinLastHour() {
+        $user = $this->createUserObject();
+        $offsetId = $this->saveExistingUserIds();
 
+        $userInfos = array(
+            //user that is active and wasn't logged in within the last hour
+            'test1@testmail.com' => array(
+                'status' => 1,
+                'auth' => 3700
+            ),
+            //user that is active but was logged in within the last hour
+            'test2@testmail.com' => array(
+                'status' => 1,
+                'auth' => 300
+            ),
+            //user that isn't active but was logged in within the last hour
+            'test3@testmail.com' => array(
+                'status' => 0,
+                'auth' => 300
+            ),
+            //user that isn't active and wasn't logged in within the last hour
+            'test4@testmail.com' => array(
+                'status' => 0,
+            ),
+        );
+        //create users with status
+        $this->createUsers($user, $userInfos);
+
+        $filter = array(
+            'AND' => array(
+                0 => array(
+                    'last_auth' => array(
+                        '>' => time()-3600
+                    )
+                ),
+                1 => array(
+                    'active' => 1,
+                ),
+            )
+        );
+        $users = $user->getUsers($filter);
+
+        //remove user if previously existed ($offsetId)
+        while (!$users->EOF) {
+            if (!in_array($users->getId(), $offsetId)) {
+                $email = $users->getEmail();
+            }
+            $users->next();
+        }
+
+        $this->assertEquals(
+            'test2@testmail.com',
+            $email
+        );
+    }
+
+    /**
+     * Test limit value of auth time
+     * The acceptable limit would be 3599.
+     * But since the Test takes about 1-2 seconds to execute, the limit is set
+     * 3 seconds before. Therefore the attribute auth is set as 3597 rather then 3599
+     *
+     * @author      Hava Fuga <info@cloudrexx.com>
+     *
+     * @return      void
+     */
+    public function testLimitValueOfAuthTime() {
+        $user = $this->createUserObject();
+        $offsetId = $this->saveExistingUserIds();
+
+        $userInfos = array(
+            'test1@testmail.com' => array(
+                'auth' => 3600,
+            ),
+            'test2@testmail.com' => array(
+                'auth' => 3597,
+            ),
+        );
+
+        //create users with status
+        $this->createUsers($user, $userInfos);
+
+        $filter = array(
+            'last_auth' =>  array(
+                '>' => time()-3600
+            )
+        );
+        $users = $user->getUsers($filter);
+
+        //remove user if previously existed ($offsetId)
+        while (!$users->EOF) {
+            if (!in_array($users->getId(), $offsetId)) {
+                $email = $users->getEmail();
+            }
+            $users->next();
+        }
+
+        $this->assertEquals(
+            'test2@testmail.com',
+            $email
+        );
+    }
 
     /**
      * Test all users with same initial letter in firstname
@@ -596,18 +613,8 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
      * @return      void
      */
     public function testAllUsersWithSameInitialLetterInFirstname() {
-        //array for offset-id's
-        $offsetId = array();
-
-        $object = \FWUser::getFWUserObject();
-        $user = $object->objUser;
-
-        //save id's from existing Users in DB
-        $users = $user->getUsers();
-        while (!$users->EOF) {
-            array_push($offsetId, $users->getId());
-            $users->next();
-        }
+        $user = $this->createUserObject();
+        $offsetId = $this->saveExistingUserIds();
 
         $userInfos = array(
             'test1@testmail.com' => array(
@@ -666,18 +673,8 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
      * @return      void
      */
     public function testListSortedByFirstnames() {
-        //array for offset-id's
-        $offsetId = array();
-
-        $object = \FWUser::getFWUserObject();
-        $user = $object->objUser;
-
-        //save id's from existing Users in DB
-        $users = $user->getUsers();
-        while (!$users->EOF) {
-            array_push($offsetId, $users->getId());
-            $users->next();
-        }
+        $user = $this->createUserObject();
+        $offsetId = $this->saveExistingUserIds();
 
         $userInfos = array(
             'test1@testmail.com' => array(
@@ -744,19 +741,9 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
      *
      */
     public function testUsersByBirthdate() {
+        $user = $this->createUserObject();
+        $offsetId = $this->saveExistingUserIds();
 
-        //array for offset-id's
-        $offsetId = array();
-
-        $object = \FWUser::getFWUserObject();
-        $user = $object->objUser;
-
-        //save id's from existing Users in DB
-        $users = $user->getUsers();
-        while (!$users->EOF) {
-            array_push($offsetId, $users->getId());
-            $users->next();
-        }
         $userInfos = array(
             'test1@testmail.com' => array(
                 'profile' => array(
@@ -820,18 +807,8 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
      * @return void
      */
     public function testAllUsersWithoutAdminRights() {
-        //array for offset-id's
-        $offsetId = array();
-
-        $object = \FWUser::getFWUserObject();
-        $user = $object->objUser;
-
-        //save id's from existing Users in DB
-        $users = $user->getUsers();
-        while (!$users->EOF) {
-            array_push($offsetId, $users->getId());
-            $users->next();
-        }
+        $user = $this->createUserObject();
+        $offsetId = $this->saveExistingUserIds();
 
         $userInfos = array(
             'test1@testmail.com' => array(
