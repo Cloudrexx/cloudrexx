@@ -35,9 +35,6 @@
 
 namespace Cx\Core\User\Testing\UnitTest;
 
-use phpDocumentor\Reflection\DocBlock\Tags\Uses;
-use function JmesPath\search;
-
 /**
  * Test GetUser
  *
