@@ -861,4 +861,53 @@ class GetUserTest extends \Cx\Core\Test\Model\Entity\MySQLTestCase
             $email
         );
     }
+
+    /**
+     * Test Custom set Attributes
+     * Test if Attributes get deleted from Database
+     *
+     * @author Mirjam Doyon  <info@cloudrexx.com>
+     *
+     * @return void
+     */
+    public function testCustomSetAttributes() {
+        global $objDatabase;
+        $object = \FWUser::getFWUserObject();
+        $user = $object->objUser;
+
+        $profileAttribute = $user->objAttribute->getById(0);
+        $profileAttribute->reset();
+        $profileAttribute->setNames(array('1'=>'testibus'));
+        $profileAttribute->store();
+
+        //create User with a Attribute Entry
+        $userInfos = array(
+            'test1@testmail.com' => array(
+                'profile' => array(
+                    'firstname' => array('Xavier'),
+                    'testibus' => array('Test Entry')
+                ),
+            )
+        );
+
+        $this->createUsers($user, $userInfos);
+        //determine ID to delete
+        $deleteAttribute = $profileAttribute->getId();
+        $profileAttribute->deleteAttribute($deleteAttribute);
+
+        //check if custom Attribute is still in DB
+        $objResult = $objDatabase->Execute(
+            'SELECT      *
+                FROM    '. DBPREFIX. 'access_user_attribute_name
+                WHERE attribute_id ='. $deleteAttribute
+        );
+        var_dump($profileAttribute->getName(1));
+        //if Attribute isn't in DB, $objResult is false and Test is successful
+        //if Attribute is still in DB, we have a Object and Test fails
+        $this->assertFalse(
+            $objResult
+        );
+
+
+    }
 }
