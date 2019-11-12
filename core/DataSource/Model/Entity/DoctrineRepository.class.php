@@ -410,13 +410,26 @@ class DoctrineRepository extends DataSource {
             }
 
             $fieldDefinition = $entityClassMetadata->getFieldMapping($name);
-            if ($fieldDefinition['type'] == 'datetime') {
-                $data[$name] = new \DateTime($data[$name]);
-            } elseif ($fieldDefinition['type'] == 'array') {
-                // verify that the value is actually an array -> prevent to store other php data
-                if (!is_array($data[$name])) {
-                    $data[$name] = array();
-                }
+            switch ($fieldDefinition['type']) {
+                case 'datetime':
+                case 'timestamp':
+                case 'date':
+                case 'time':
+                    if (!$data[$name]) {
+                        // Empty values must be NULL, or Doctrine will fail
+                        $data[$name] = null;
+                    }
+                    if ($data[$name] && !($data[$name] instanceof \DateTime)) {
+                        // Throws on invalid input
+                        $data[$name] = new \DateTime($data[$name]);
+                    }
+                    break;
+                case 'array':
+                    // verify that the value is actually an array -> prevent to store other php data
+                    if (!is_array($data[$name])) {
+                        $data[$name] = array();
+                    }
+                    break;
             }
 
             $fieldSetMethodName = 'set'.preg_replace('/_([a-z])/', '\1', ucfirst($name));
