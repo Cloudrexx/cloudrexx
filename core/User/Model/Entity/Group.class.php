@@ -108,7 +108,6 @@ class Group extends \Cx\Model\Base\EntityBase {
      * Set groupName
      *
      * @param string $groupName
-     * @return Group
      */
     public function setGroupName($groupName)
     {
@@ -129,7 +128,6 @@ class Group extends \Cx\Model\Base\EntityBase {
      * Set groupDescription
      *
      * @param string $groupDescription
-     * @return Group
      */
     public function setGroupDescription($groupDescription)
     {
@@ -150,7 +148,6 @@ class Group extends \Cx\Model\Base\EntityBase {
      * Set isActive
      *
      * @param integer $isActive
-     * @return Group
      */
     public function setIsActive($isActive)
     {
@@ -171,7 +168,6 @@ class Group extends \Cx\Model\Base\EntityBase {
      * Set type
      *
      * @param enum_user_group_type $type
-     * @return Group
      */
     public function setType($type)
     {
@@ -192,7 +188,6 @@ class Group extends \Cx\Model\Base\EntityBase {
      * Set homepage
      *
      * @param string $homepage
-     * @return Group
      */
     public function setHomepage($homepage)
     {
@@ -213,7 +208,6 @@ class Group extends \Cx\Model\Base\EntityBase {
      * Set toolbar
      *
      * @param integer $toolbar
-     * @return Group
      */
     public function setToolbar($toolbar)
     {
@@ -234,7 +228,6 @@ class Group extends \Cx\Model\Base\EntityBase {
      * Add user
      *
      * @param \Cx\Core\User\Model\Entity\User $user
-     * @return Group
      */
     public function addUser(\Cx\Core\User\Model\Entity\User $user)
     {

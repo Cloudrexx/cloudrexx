@@ -388,7 +388,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set username
      *
      * @param string $username
-     * @return User
      */
     public function setUsername($username)
     {
@@ -429,7 +428,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set authToken
      *
      * @param string $authToken
-     * @return User
      */
     public function setAuthToken($authToken)
     {
@@ -450,7 +448,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set authTokenTimeout
      *
      * @param integer $authTokenTimeout
-     * @return User
      */
     public function setAuthTokenTimeout($authTokenTimeout)
     {
@@ -471,7 +468,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set regdate
      *
      * @param integer $regdate
-     * @return User
      */
     public function setRegdate($regdate)
     {
@@ -492,7 +488,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set expiration
      *
      * @param integer $expiration
-     * @return User
      */
     public function setExpiration($expiration)
     {
@@ -513,7 +508,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set validity
      *
      * @param integer $validity
-     * @return User
      */
     public function setValidity($validity)
     {
@@ -534,7 +528,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set lastAuth
      *
      * @param integer $lastAuth
-     * @return User
      */
     public function setLastAuth($lastAuth)
     {
@@ -555,7 +548,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set lastAuthStatus
      *
      * @param integer $lastAuthStatus
-     * @return User
      */
     public function setLastAuthStatus($lastAuthStatus)
     {
@@ -576,7 +568,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set lastActivity
      *
      * @param integer $lastActivity
-     * @return User
      */
     public function setLastActivity($lastActivity)
     {
@@ -617,7 +608,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set emailAccess
      *
      * @param enum_user_user_emailaccess $emailAccess
-     * @return User
      */
     public function setEmailAccess($emailAccess)
     {
@@ -638,7 +628,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set frontendLangId
      *
      * @param integer $frontendLangId
-     * @return User
      */
     public function setFrontendLangId($frontendLangId)
     {
@@ -659,7 +648,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set backendLangId
      *
      * @param integer $backendLangId
-     * @return User
      */
     public function setBackendLangId($backendLangId)
     {
@@ -680,7 +668,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set active
      *
      * @param boolean $active
-     * @return User
      */
     public function setActive($active)
     {
@@ -701,7 +688,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set verified
      *
      * @param boolean $verified
-     * @return User
      */
     public function setVerified($verified)
     {
@@ -722,7 +708,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set primaryGroup
      *
      * @param integer $primaryGroup
-     * @return User
      */
     public function setPrimaryGroup($primaryGroup)
     {
@@ -743,7 +728,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set profileAccess
      *
      * @param enum_user_user_profileaccess $profileAccess
-     * @return User
      */
     public function setProfileAccess($profileAccess)
     {
@@ -764,7 +748,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set restoreKey
      *
      * @param string $restoreKey
-     * @return User
      */
     public function setRestoreKey($restoreKey = null)
     {
@@ -787,7 +770,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set restoreKeyTime
      *
      * @param integer $restoreKeyTime
-     * @return User
      */
     public function setRestoreKeyTime($restoreKeyTime)
     {
@@ -808,7 +790,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set u2uActive
      *
      * @param enum_user_user_u2uactive $u2uActive
-     * @return User
      */
     public function setU2uActive($u2uActive)
     {

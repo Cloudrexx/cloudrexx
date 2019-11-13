@@ -110,7 +110,6 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase {
      * Set langId
      *
      * @param integer $langId
-     * @return UserAttributeName
      */
     public function setLangId($langId)
     {
@@ -131,7 +130,6 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase {
      * Set name
      *
      * @param string $name
-     * @return UserAttributeName
      */
     public function setName($name)
     {
@@ -172,7 +170,6 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase {
      * Set userAttribute
      *
      * @param \Cx\Core\User\Model\Entity\UserAttribute $userAttribute
-     * @return UserAttributeName
      */
     public function setUserAttribute(\Cx\Core\User\Model\Entity\UserAttribute $userAttribute)
     {

@@ -88,7 +88,6 @@ class ProfileTitle extends \Cx\Model\Base\EntityBase {
      * Set title
      *
      * @param string $title
-     * @return ProfileTitle
      */
     public function setTitle($title)
     {
@@ -109,7 +108,6 @@ class ProfileTitle extends \Cx\Model\Base\EntityBase {
      * Set orderId
      *
      * @param integer $orderId
-     * @return ProfileTitle
      */
     public function setOrderId($orderId)
     {

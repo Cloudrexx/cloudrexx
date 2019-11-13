@@ -87,7 +87,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     protected $readAccessId;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Cx\Core\User\Model\Entity\UserAttribute
      */
     protected $parent;
 
@@ -102,7 +102,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     protected $userAttributeValue;
 
     /**
-     * @var \Cx\Core\User\Model\Entity\UserAttribute
+     * @var \Doctrine\Common\Collections\Collection
      */
     protected $children;
 
