@@ -350,7 +350,7 @@ class User_Profile
      * @param array $arrFilter
      * @return array
      */
-    protected function parseCoreAttributeFilterConditions($arrFilter)
+    protected function parseCoreAttributeFilterConditions($arrFilter, $uniqueJoins, &$joinIdx)
     {
         if (empty($this->objAttribute)) {
             $this->initAttributes();
@@ -359,6 +359,7 @@ class User_Profile
         $arrConditions = array();
         $pattern = array();
         foreach ($arrFilter as $attribute => $condition) {
+            $tableIdx = 'tblExp' . $joinIdx;
             /**
              * $attribute is the account profile attribute like 'firstname' or 'lastname'
              * $condition is either a simple condition (integer or string) or an condition matrix (array)
@@ -368,15 +369,15 @@ class User_Profile
 
                 switch ($attribute) {
                     case 'gender':
-                        $arrConditions[] = "(`tblA`.`attribute_id` = {$attributeId} AND `tblA`.`value` = '".(is_array($condition) ? implode("' OR `tblA`.`value` = '", array_map('addslashes', $condition)) : addslashes($condition))."')";
+                        $arrConditions[$tableIdx] = "(`".$tableIdx."`.`attribute_id` = {$attributeId} AND `".$tableIdx."`.`value` = '".(is_array($condition) ? implode("' OR `".$tableIdx."`.`value` = '", array_map('addslashes', $condition)) : addslashes($condition))."')";
                         break;
 
                     case 'title':
                     case 'country':
-                        $arrConditions[] = '(`tblA`.`attribute_id` = ' . $attributeId . ' AND `tblA`.`value` = ' . (
+                        $arrConditions[$tableIdx] = '(`'.$tableIdx.'`.`attribute_id` = ' . $attributeId . ' AND `'.$tableIdx.'`.`value` = ' . (
                             is_array($condition)
                                 ? implode(
-                                    ' OR `tblA`.`value` = ',
+                                    ' OR `'.$tableIdx.'`.`value` = ',
                                     array_map(
                                         function ($condition) {
                                             if (preg_match('#([0-9]+)#', $condition, $pattern)) {
@@ -420,7 +421,7 @@ class User_Profile
                                          * $restrictionOperator is a comparison operator ( =, <, >)
                                          * $restrictionValue represents the condition
                                          */
-                                        $arrConditionRestriction[] = "`tblA`.`attribute_id` = {$attributeId} AND `tblA`.`value` ".(
+                                        $arrConditionRestriction[] = "`".$tableIdx."`.`attribute_id` = {$attributeId} AND `".$tableIdx."`.`value` ".(
                                             in_array($restrictionOperator, $arrComparisonOperators[$this->objAttribute->getDataType()], true) ?
                                                 $restrictionOperator
                                             :   $arrDefaultComparisonOperator[$this->objAttribute->getDataType()]
@@ -428,16 +429,16 @@ class User_Profile
                                     }
                                     $arrRestrictions[] = implode(' AND ', $arrConditionRestriction);
                                 } else {
-                                    $arrRestrictions[] = "`tblA`.`attribute_id` = {$attributeId} AND `tblA`.`value` ".(
+                                    $arrRestrictions[] = "`".$tableIdx."`.`attribute_id` = {$attributeId} AND `".$tableIdx."`.`value` ".(
                                         in_array($operator, $arrComparisonOperators[$this->objAttribute->getDataType()], true) ?
                                             $operator
                                         :   $arrDefaultComparisonOperator[$this->objAttribute->getDataType()]
                                     )." '".$arrEscapeFunction[$this->objAttribute->getDataType()]($restriction)."'";
                                 }
                             }
-                            $arrConditions[] = '(('.implode(') OR (', $arrRestrictions).'))';
+                            $arrConditions[$tableIdx] = '(('.implode(') OR (', $arrRestrictions).'))';
                         } else {
-                            $arrConditions[] = "(`tblA`.`attribute_id` = ".$attributeId." AND `tblA`.`value` ".$arrDefaultComparisonOperator[$this->objAttribute->getDataType()]." '".$arrEscapeFunction[$this->objAttribute->getDataType()]($condition)."')";
+                            $arrConditions[$tableIdx] = "(`".$tableIdx."`.`attribute_id` = ".$attributeId." AND `".$tableIdx."`.`value` ".$arrDefaultComparisonOperator[$this->objAttribute->getDataType()]." '".$arrEscapeFunction[$this->objAttribute->getDataType()]($condition)."')";
                         }
                         break;
                 }
@@ -445,10 +446,14 @@ class User_Profile
 
             } elseif ($attribute === 'birthday_day') {
                 $attribute = $this->objAttribute->getAttributeIdByProfileAttributeId('birthday');
-                $arrConditions[] = "(`tblA`.`attribute_id` = ".$attribute." AND (DATE_FORMAT(DATE_ADD(FROM_UNIXTIME(0), interval `tblA`.`value` second), '%e') = '".intval($condition)."'))";
+                $arrConditions[$tableIdx] = "(`".$tableIdx."`.`attribute_id` = ".$attribute." AND (DATE_FORMAT(DATE_ADD(FROM_UNIXTIME(0), interval `".$tableIdx."`.`value` second), '%e') = '".intval($condition)."'))";
             } elseif ($attribute === 'birthday_month') {
                 $attribute = $this->objAttribute->getAttributeIdByProfileAttributeId('birthday');
-                $arrConditions[] = "(`tblA`.`attribute_id` = ".$attribute." AND (DATE_FORMAT(DATE_ADD(FROM_UNIXTIME(0), interval `tblA`.`value` second), '%c') = '".intval($condition)."'))";
+                $arrConditions[$tableIdx] = "(`".$tableIdx."`.`attribute_id` = ".$attribute." AND (DATE_FORMAT(DATE_ADD(FROM_UNIXTIME(0), interval `".$tableIdx."`.`value` second), '%c') = '".intval($condition)."'))";
+            }
+
+            if ($uniqueJoins) {
+                $joinIdx++;
             }
         }
 

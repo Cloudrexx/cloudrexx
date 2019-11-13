@@ -1460,8 +1460,7 @@ class User extends User_Profile
         if (count($arrAccountConditions = $this->parseAccountFilterConditions($filter))) {
             $arrConditions[] = implode(' AND ', $arrAccountConditions);
         }
-        if (count($arrCoreAttributeConditions = $this->parseCoreAttributeFilterConditions($filter))) {
-            $arrConditions[] = implode(' AND ', $arrCoreAttributeConditions);
+        if (count($arrCoreAttributeConditions = $this->parseCoreAttributeFilterConditions($filter, $uniqueJoins, $joinIdx))) {
             $tblCustomAttributes = true;
         }
         $arrCustomAttributeConditions = $this->parseCustomAttributeFilterConditions(
@@ -1470,10 +1469,13 @@ class User extends User_Profile
             $uniqueJoins,
             $joinIdx
         );
-        if (count($arrCustomAttributeConditions)) {
+        $arrConditionsMerged = array_merge(
+            $arrCustomAttributeConditions, $arrCoreAttributeConditions
+        );
+        if (count($arrConditionsMerged)) {
             $groupTables = true;
-            $arrConditions[] = implode(' AND ', $arrCustomAttributeConditions);
-            foreach (array_keys($arrCustomAttributeConditions) as $customAttributeTable) {
+            $arrConditions[] = implode(' AND ', $arrConditionsMerged);
+            foreach (array_keys($arrConditionsMerged) as $customAttributeTable) {
                 $customAttributeJoins[] = ' INNER JOIN `'.DBPREFIX.'access_user_attribute_value` AS ' . $customAttributeTable . ' ON ' . $customAttributeTable . '.`user_id` = tblU.`id` ';
             }
 
