@@ -99,6 +99,7 @@ class MediaSourceManager extends EntityBase
         $eventHandlerInstance->triggerEvent('mediasource.load', array($this));
 
         ksort($this->allMediaTypePaths);
+        $this->lockedMediaTypes = array();
         foreach ($this->allMediaTypePaths as $mediaSource) {
             /**
              * @var $mediaSource MediaSource
@@ -106,8 +107,26 @@ class MediaSourceManager extends EntityBase
             if ($mediaSource->checkAccess()) {
                 $this->mediaTypePaths[$mediaSource->getName()] = $mediaSource->getDirectory();
                 $this->mediaTypes[$mediaSource->getName()] = $mediaSource;
+            } else {
+                $this->lockedMediaTypes[$mediaSource->getName()] = $mediaSource;
             }
         }
+    }
+
+    /**
+     * Returns all MediaSources the current user does not have access to
+     * @todo This is a dirty hack to allow the API control over permissions.
+     *      As soon as DataSource can load the correct MediaSource instance
+     *      directly, this should be removed.
+     * @deprecated This method must not be used outside MediaSource itself!
+     * @param string $name Name of the MediaSource to load
+     * @return MediaSource Requested MediaSource or null
+     */
+    public function getLockedMediaType($name) {
+        if (!isset($this->lockedMediaTypes[$name])) {
+            return null;
+        }
+        return $this->lockedMediaTypes[$name];
     }
 
     /**

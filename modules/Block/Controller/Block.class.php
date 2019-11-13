@@ -50,7 +50,7 @@ namespace Cx\Modules\Block\Controller;
  */
 class Block extends \Cx\Modules\Block\Controller\BlockLibrary
 {
-    public static function setBlocks(&$content, $page)
+    public static function setBlocks(&$content, $page = null)
     {
         $config = \Env::get('config');
 
@@ -62,20 +62,25 @@ class Block extends \Cx\Modules\Block\Controller\BlockLibrary
             $arrTemplates = &$content;
         }
 
+        $pageId = 0;
+        if ($page) {
+            $pageId = $page->getId();
+        }
+
         foreach ($arrTemplates as &$template) {
             // Set blocks [[BLOCK_<ID>]]
             if (preg_match_all('/{'.$objBlock->blockNamePrefix.'([0-9]+)}/', $template, $arrMatches)) {
-                $objBlock->setBlock($arrMatches[1], $template, $page->getId());
+                $objBlock->setBlock($arrMatches[1], $template, $pageId);
             }
 
             // Set global block [[BLOCK_GLOBAL]]
             if (preg_match('/{'.$objBlock->blockNamePrefix.'GLOBAL}/', $template)) {
-                $objBlock->setBlockGlobal($template, $page->getId());
+                $objBlock->setBlockGlobal($template, $pageId);
             }
 
             // Set category blocks [[BLOCK_CAT_<ID>]]
             if (preg_match_all('/{'.$objBlock->blockNamePrefix.'CAT_([0-9]+)}/', $template, $arrMatches)) {
-                $objBlock->setCategoryBlock($arrMatches[1], $template, $page->getId());
+                $objBlock->setCategoryBlock($arrMatches[1], $template, $pageId);
             }
 
             /* Set random blocks [[BLOCK_RANDOMIZER]], [[BLOCK_RANDOMIZER_2]],
@@ -86,7 +91,7 @@ class Block extends \Cx\Modules\Block\Controller\BlockLibrary
                 $randomBlockIdx = 1;
                 while ($randomBlockIdx <= 4) {
                     if (preg_match('/{'.$objBlock->blockNamePrefix.'RANDOMIZER'.$placeholderSuffix.'}/', $template)) {
-                        $objBlock->setBlockRandom($template, $randomBlockIdx, $page->getId());
+                        $objBlock->setBlockRandom($template, $randomBlockIdx, $pageId);
                     }
 
                     $randomBlockIdx++;
@@ -108,7 +113,7 @@ class Block extends \Cx\Modules\Block\Controller\BlockLibrary
     * @param int $pageId
     * @see blockLibrary::_setBlock()
     */
-    function setBlock($arrBlocks, &$code, $pageId)
+    function setBlock($arrBlocks, &$code, $pageId = 0)
     {
         foreach ($arrBlocks as $blockId) {
             $this->_setBlock(intval($blockId), $code, $pageId);
@@ -127,7 +132,7 @@ class Block extends \Cx\Modules\Block\Controller\BlockLibrary
     * @param int $pageId
     * @see blockLibrary::_setBlock()
     */
-    function setCategoryBlock($arrCategoryBlocks, &$code, $pageId)
+    function setCategoryBlock($arrCategoryBlocks, &$code, $pageId = 0)
     {
         foreach ($arrCategoryBlocks as $blockId) {
             $this->_setCategoryBlock(intval($blockId), $code, $pageId);
@@ -144,12 +149,12 @@ class Block extends \Cx\Modules\Block\Controller\BlockLibrary
     * @param string &$code
     * @see blockLibrary::_setBlock()
     */
-    function setBlockRandom(&$code, $id, $pageId)
+    function setBlockRandom(&$code, $id, $pageId = 0)
     {
         $this->_setBlockRandom($code, $id, $pageId);
     }
 
-    function setBlockGlobal(&$code, $pageId)
+    function setBlockGlobal(&$code, $pageId = 0)
     {
         $this->_setBlockGlobal($code, $pageId);
     }

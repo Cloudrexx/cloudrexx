@@ -4,7 +4,7 @@
  * Cloudrexx
  *
  * @link      http://www.cloudrexx.com
- * @copyright Cloudrexx AG 2007-2018
+ * @copyright Cloudrexx AG 2007-2019
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -31,7 +31,7 @@
  * @copyright   CLOUDREXX CMS - Cloudrexx AG Thun
  * @author      Dario Graf <info@cloudrexx.com>
  * @package     cloudrexx
- * @subpackage  module_user
+ * @subpackage  core_user
  * @version     5.0.0
  */
 namespace Cx\Core\User\Model\Entity;
@@ -42,7 +42,7 @@ namespace Cx\Core\User\Model\Entity;
  * @copyright   CLOUDREXX CMS - Cloudrexx AG Thun
  * @author      Dario Graf <info@cloudrexx.com>
  * @package     cloudrexx
- * @subpackage  module_user
+ * @subpackage  core_user
  * @version     5.0.0
  */
 class UserAttributeValue extends \Cx\Model\Base\EntityBase {
@@ -162,7 +162,7 @@ class UserAttributeValue extends \Cx\Model\Base\EntityBase {
      *
      * @param \Cx\Core\User\Model\Entity\User $user
      */
-    public function setUser(\Cx\Core\User\Model\Entity\User $user = null)
+    public function setUser(\Cx\Core\User\Model\Entity\User $user)
     {
         $this->user = $user;
     }
@@ -182,7 +182,7 @@ class UserAttributeValue extends \Cx\Model\Base\EntityBase {
      *
      * @param \Cx\Core\User\Model\Entity\UserAttribute $userAttribute
      */
-    public function setUserAttribute(\Cx\Core\User\Model\Entity\UserAttribute $userAttribute = null)
+    public function setUserAttribute(\Cx\Core\User\Model\Entity\UserAttribute $userAttribute)
     {
         $this->userAttribute = $userAttribute;
     }

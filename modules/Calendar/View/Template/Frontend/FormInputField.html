@@ -1,0 +1,46 @@
+<!-- BEGIN row -->
+<div class="row">
+    <!-- BEGIN label -->
+    <label>{TXT_CALENDAR_FIELD_NAME}<!-- BEGIN required --><font class="calendarRequired"> *</font><!-- END required --></label>
+    <!-- END label -->
+    <!-- BEGIN inputtext -->
+    <input type="text" class="calendarInputText" name="{CALENDAR_FIELD_NAME}" value="{CALENDAR_FIELD_VALUE}" /> 
+    <!-- END inputtext -->
+    <!-- BEGIN textarea -->
+    <textarea class="calendarTextarea" name="{CALENDAR_FIELD_NAME}">{CALENDAR_FIELD_VALUE}</textarea>
+    <!-- END textarea -->
+    <!-- BEGIN select -->
+    <select class="calendarSelect" name="{CALENDAR_FIELD_NAME}">
+        <!-- BEGIN select_option -->
+        <option value="{CALENDAR_FIELD_OPTION_KEY}"<!-- BEGIN select_option_selected --> selected="selected"<!-- END select_option_selected -->>
+            {CALENDAR_FIELD_OPTION_VALUE}
+        </option>
+        <!-- END select_option -->
+    </select>
+    <!-- END select -->
+    <!-- BEGIN radio -->
+    <div>
+        <!-- BEGIN radio_option -->
+        <!-- BEGIN radio_embedded -->
+        <input type="text" class="calendarInputCheckboxAdditional" name="{CALENDAR_FIELD_EMBEDDED_NAME}" value="{CALENDAR_FIELD_EMBEDDED_VALUE}" />
+        <!-- END radio_embedded -->
+        <input type="radio" class="calendarInputCheckbox" name="{CALENDAR_FIELD_OPTION_NAME}" value="{CALENDAR_FIELD_OPTION_KEY}"<!-- BEGIN radio_option_selected --> checked="checked"<!-- END radio_option_selected -->/>&nbsp;{CALENDAR_FIELD_OPTION_VALUE}<br />
+        <!-- END radio_option -->
+    </div>
+    <!-- END radio -->
+    <!-- BEGIN checkbox -->
+        <!-- BEGIN checkbox_option -->
+        <!-- BEGIN checkbox_embedded -->
+        <input type="text" class="calendarInputCheckboxAdditional" name="{CALENDAR_FIELD_EMBEDDED_NAME}" value="{CALENDAR_FIELD_EMBEDDED_VALUE}" />
+        <!-- END checkbox_embedded -->
+        <input <!-- BEGIN checkbox_option_selected --> checked="checked"<!-- END checkbox_option_selected --> type="checkbox" class="calendarInputCheckbox" name="{CALENDAR_FIELD_OPTION_NAME}" value="{CALENDAR_FIELD_OPTION_KEY}" />&nbsp;{CALENDAR_FIELD_OPTION_VALUE}<br />
+        <!-- END checkbox_option -->
+    <!-- END checkbox -->
+    <!-- BEGIN agb -->
+    <input <!-- BEGIN agb_option_selected -->checked="checked"<!-- END agb_option_selected --> class="calendarInputCheckbox" type="checkbox" name="{CALENDAR_FIELD_NAME}" value="1" />&nbsp;{CALENDAR_FIELD_VALUE}<br />
+    <!-- END agb -->
+</div>
+<!-- END row -->
+<!-- BEGIN fieldset -->
+</fieldset><fieldset><legend>{TXT_CALENDAR_FIELD_NAME}</legend>
+<!-- END fieldset -->

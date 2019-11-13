@@ -186,17 +186,17 @@ function initialize() {
             animation: google.maps.Animation.DROP
         });
         setPosition(new google.maps.LatLng($strValueLat, $strValueLon));
-    }
 
-    google.maps.event.addListener(marker, 'dragend', function(event){
-        if(event.latLng.lat()){
-           elLat.value = event.latLng.lat();
-        }
-        if(event.latLng.lng()){
-           elLon.value = event.latLng.lng();
-        }
-        map.setCenter(new google.maps.LatLng(event.latLng.lat(), event.latLng.lng()));
-    });
+        google.maps.event.addListener(marker, 'dragend', function(event){
+            if(event.latLng.lat()){
+               elLat.value = event.latLng.lat();
+            }
+            if(event.latLng.lng()){
+               elLon.value = event.latLng.lng();
+            }
+            map.setCenter(new google.maps.LatLng(event.latLng.lat(), event.latLng.lng()));
+        });
+    }
 
     geocoder = new google.maps.Geocoder();
 

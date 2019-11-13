@@ -73,10 +73,10 @@ class AccessId extends \Cx\Core_Modules\Access\Model\Entity\AccessId implements 
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'id', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'entity_class_name', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'entity_class_id', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'contrexxAccessUserAttribute', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'contrexxAccessUserAttributeRead', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'coreAttribute', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'coreAttributeRead', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'group2', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'group', 'validators', 'virtual');
+            return array('__isInitialized__', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'id', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'entity_class_name', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'entity_class_id', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'contrexxAccessUserAttribute', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'contrexxAccessUserAttributeRead', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'group2', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'group', 'validators', 'virtual');
         }
 
-        return array('__isInitialized__', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'id', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'entity_class_name', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'entity_class_id', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'contrexxAccessUserAttribute', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'contrexxAccessUserAttributeRead', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'coreAttribute', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'coreAttributeRead', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'group2', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'group', 'validators', 'virtual');
+        return array('__isInitialized__', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'id', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'entity_class_name', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'entity_class_id', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'contrexxAccessUserAttribute', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'contrexxAccessUserAttributeRead', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'group2', '' . "\0" . 'Cx\\Core_Modules\\Access\\Model\\Entity\\AccessId' . "\0" . 'group', 'validators', 'virtual');
     }
 
     /**
@@ -266,28 +266,6 @@ class AccessId extends \Cx\Core_Modules\Access\Model\Entity\AccessId implements 
     /**
      * {@inheritDoc}
      */
-    public function addCoreAttribute(\Cx\Core\User\Model\Entity\CoreAttribute $coreAttribute)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addCoreAttribute', array($coreAttribute));
-
-        return parent::addCoreAttribute($coreAttribute);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getCoreAttribute()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getCoreAttribute', array());
-
-        return parent::getCoreAttribute();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function addGroup2(\Cx\Core\User\Model\Entity\Group $group2)
     {
 
@@ -349,28 +327,6 @@ class AccessId extends \Cx\Core_Modules\Access\Model\Entity\AccessId implements 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getContrexxAccessUserAttributeRead', array());
 
         return parent::getContrexxAccessUserAttributeRead();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function addCoreAttributeRead(\Cx\Core\User\Model\Entity\CoreAttribute $coreAttributeRead)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addCoreAttributeRead', array($coreAttributeRead));
-
-        return parent::addCoreAttributeRead($coreAttributeRead);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getCoreAttributeRead()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getCoreAttributeRead', array());
-
-        return parent::getCoreAttributeRead();
     }
 
     /**

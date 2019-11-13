@@ -4,7 +4,7 @@
  * Cloudrexx
  *
  * @link      http://www.cloudrexx.com
- * @copyright Cloudrexx AG 2007-2018
+ * @copyright Cloudrexx AG 2007-2019
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -31,7 +31,7 @@
  * @copyright   CLOUDREXX CMS - Cloudrexx AG Thun
  * @author      Dario Graf <info@cloudrexx.com>
  * @package     cloudrexx
- * @subpackage  module_user
+ * @subpackage  core_user
  * @version     5.0.0
  */
 namespace Cx\Core\User\Model\Entity;
@@ -42,7 +42,7 @@ namespace Cx\Core\User\Model\Entity;
  * @copyright   CLOUDREXX CMS - Cloudrexx AG Thun
  * @author      Dario Graf <info@cloudrexx.com>
  * @package     cloudrexx
- * @subpackage  module_user
+ * @subpackage  core_user
  * @version     5.0.0
  */
 class UserAttribute extends \Cx\Model\Base\EntityBase {
@@ -87,7 +87,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     protected $readAccessId;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Cx\Core\User\Model\Entity\UserAttribute
      */
     protected $parent;
 
@@ -102,7 +102,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     protected $userAttributeValue;
 
     /**
-     * @var \Cx\Core\User\Model\Entity\UserAttribute
+     * @var \Doctrine\Common\Collections\Collection
      */
     protected $children;
 
@@ -116,7 +116,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
      */
     public function __construct()
     {
-        $this->parent = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->children = new \Doctrine\Common\Collections\ArrayCollection();
         $this->userAttributeName = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
@@ -291,33 +291,33 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     }
 
     /**
-     * Add parent
+     * Add child
      *
-     * @param \Cx\Core\User\Model\Entity\UserAttribute $parent
+     * @param \Cx\Core\User\Model\Entity\UserAttribute $child
      */
-    public function addParent(\Cx\Core\User\Model\Entity\UserAttribute $parent)
+    public function addChild(\Cx\Core\User\Model\Entity\UserAttribute $child)
     {
-        $this->parent[] = $parent;
+        $this->children[] = $child;
     }
 
     /**
-     * Remove parent
+     * Remove child
      *
-     * @param \Cx\Core\User\Model\Entity\UserAttribute $parent
+     * @param \Cx\Core\User\Model\Entity\UserAttribute $child
      */
-    public function removeParent(\Cx\Core\User\Model\Entity\UserAttribute $parent)
+    public function removeChild(\Cx\Core\User\Model\Entity\UserAttribute $child)
     {
-        $this->parent->removeElement($parent);
+        $this->children->removeElement($child);
     }
 
     /**
-     * Get parent
+     * Get children
      *
      * @return \Doctrine\Common\Collections\Collection 
      */
-    public function getParent()
+    public function getChildren()
     {
-        return $this->parent;
+        return $this->children;
     }
 
     /**
@@ -381,22 +381,22 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     }
 
     /**
-     * Set children
+     * Set parent
      *
-     * @param \Cx\Core\User\Model\Entity\UserAttribute $children
+     * @param \Cx\Core\User\Model\Entity\UserAttribute $parent
      */
-    public function setChildren(\Cx\Core\User\Model\Entity\UserAttribute $children = null)
+    public function setParent(\Cx\Core\User\Model\Entity\UserAttribute $parent = null)
     {
-        $this->children = $children;
+        $this->parent = $parent;
     }
 
     /**
-     * Get children
+     * Get parent
      *
      * @return \Cx\Core\User\Model\Entity\UserAttribute 
      */
-    public function getChildren()
+    public function getParent()
     {
-        return $this->children;
+        return $this->parent;
     }
 }

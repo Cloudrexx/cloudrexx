@@ -214,6 +214,13 @@ class User extends User_Profile
     private $last_auth;
 
     /**
+     * If the last time the user try to logged in was successful
+     * @var boolean
+     * @access private
+     */
+    private $last_auth_status = 1;
+
+    /**
      * The last time that the user was active (timestamp)
      * @var integer
      * @access private
@@ -667,7 +674,6 @@ class User extends User_Profile
                 $objDatabase->startTrans();
                 if (
                     $objDatabase->Execute('DELETE FROM `'.DBPREFIX.'access_user_attribute_value` WHERE `user_id` = ' . $this->id) !== false &&
-                    $objDatabase->Execute('DELETE FROM `'.DBPREFIX.'access_user_profile` WHERE `user_id` = ' . $this->id) !== false &&
                     $objDatabase->Execute('DELETE FROM `'.DBPREFIX.'access_rel_user_group` WHERE `user_id` = ' . $this->id) !== false &&
                     $objDatabase->Execute('DELETE FROM `'.DBPREFIX.'access_user_network` WHERE `user_id` = ' . $this->id) !== false &&
                     $objDatabase->Execute('DELETE FROM `'.DBPREFIX.'access_users` WHERE `id` = ' . $this->id) !== false
@@ -870,7 +876,6 @@ class User extends User_Profile
     {
         $arrConditions = array();
         $arrSearchConditions = array();
-        $tblCoreAttributes = false;
         $tblCustomAttributes = false;
         $tblGroup = false;
         $groupTables = false;
@@ -880,7 +885,7 @@ class User extends User_Profile
 
         // parse filter
         if (isset($arrFilter) && is_array($arrFilter)) {
-            $arrConditions = $this->parseFilterConditions($arrFilter, $tblCoreAttributes, $tblGroup, $customAttributeJoins, $groupTables);
+            $arrConditions = $this->parseFilterConditions($arrFilter, $tblCustomAttributes, $tblGroup, $customAttributeJoins, $groupTables);
         }
 
         // parse search
@@ -890,7 +895,7 @@ class User extends User_Profile
             }
             if (count($arrCoreAttributeConditions = $this->parseAttributeSearchConditions($search, true))) {
                 $arrSearchConditions[] = implode(' OR ', $arrCoreAttributeConditions);
-                $tblCoreAttributes = true;
+                $tblCustomAttributes = true;
             }
             if (count($arrCustomAttributeConditions = $this->parseAttributeSearchConditions($search, false))) {
                 $groupTables = true;
@@ -903,9 +908,6 @@ class User extends User_Profile
         }
 
         $arrTables = array();
-        if (!empty($tblCoreAttributes)) {
-            $arrTables[] = 'core';
-        }
         if (!empty($tblCustomAttributes)) {
             $arrTables[] = 'custom';
         }
@@ -1286,7 +1288,7 @@ class User extends User_Profile
         if (isset($filter) && is_array($filter) && count($filter) || !empty($search)) {
             $sqlCondition = $this->getFilteredUserIdList($filter, $search);
         } elseif (!empty($filter)) {
-            $sqlCondition['tables'] = array('core');
+            $sqlCondition['tables'] = array();
             $sqlCondition['conditions'] = array('tblU.`id` = '.intval($filter));
             $sqlCondition['group_tables'] = false;
             $limit = 1;
@@ -1308,7 +1310,7 @@ class User extends User_Profile
             }
         }
         try {
-            if (!($arrQuery = $this->setSortedUserIdList($arrSort, $sqlCondition, $limit, $offset, $groupless, $crmUser))) {
+            if (($arrQuery = $this->setSortedUserIdList($arrSort, $sqlCondition, $limit, $offset, $groupless, $crmUser)) === false) {
                 $this->clean();
                 return false;
             }
@@ -1324,7 +1326,7 @@ class User extends User_Profile
                 if (isset($this->arrAttributes[$attribute]) && !in_array($attribute, $arrSelectMetaExpressions)) {
                     $arrSelectMetaExpressions[] = $attribute;
                 } elseif ($this->objAttribute->isCoreAttribute($attribute) && !in_array($attribute, $arrSelectCoreExpressions)) {
-                    $arrSelectCoreExpressions[] = $attribute;
+                    $arrSelectCustomExpressions[] = $this->objAttribute->getAttributeIdByProfileAttributeId($attribute);
                 } elseif ($this->objAttribute->isCustomAttribute($attribute) && (!isset($arrSelectCustomExpressions) || !in_array($attribute, $arrSelectCustomExpressions))) {
                     $arrSelectCustomExpressions[] = $attribute;
                 }
@@ -1335,14 +1337,11 @@ class User extends User_Profile
             }
         } else {
             $arrSelectMetaExpressions = array_keys($this->arrAttributes);
-            $arrSelectCoreExpressions = $this->objAttribute->getCoreAttributeIds();
             $arrSelectCustomExpressions = array();
         }
 
         $query = 'SELECT tblU.`'.implode('`, tblU.`', $arrSelectMetaExpressions).'`'
-            .(count($arrSelectCoreExpressions) ? ', tblP.`'.implode('`, tblP.`', $arrSelectCoreExpressions).'`' : '')
             .'FROM `'.DBPREFIX.'access_users` AS tblU'
-            .(count($arrSelectCoreExpressions) || $arrQuery['tables']['core'] ? ' INNER JOIN `'.DBPREFIX.'access_user_profile` AS tblP ON tblP.`user_id` = tblU.`id`' : '')
             .($arrQuery['tables']['custom'] ? ' INNER JOIN `'.DBPREFIX.'access_user_attribute_value` AS tblA ON tblA.`user_id` = tblU.`id`' : '')
             .($arrQuery['tables']['group']
                 ? (isset($filter['group_id']) && $filter['group_id'] == 'groupless'
@@ -1357,16 +1356,19 @@ class User extends User_Profile
             .($arrQuery['group_tables'] ? ' GROUP BY tblU.`id`' : '')
             .(count($arrQuery['sort']) ? ' ORDER BY '.implode(', ', $arrQuery['sort']) : '');
         $objUser = false;
+
         if (empty($limit)) {
             $objUser = $objDatabase->Execute($query);
         } else {
             $objUser = $objDatabase->SelectLimit($query, $limit, $offset);
         };
+
         if ($objUser !== false && $objUser->RecordCount() > 0) {
             while (!$objUser->EOF) {
                 foreach ($objUser->fields as $attributeId => $value) {
-                    if ($this->objAttribute->isCoreAttribute($attributeId)) {
-                        $this->arrCachedUsers[$objUser->fields['id']]['profile'][$attributeId][0] = $this->arrLoadedUsers[$objUser->fields['id']]['profile'][$attributeId][0] = $value;
+                    $profileAttributeId = $this->objAttribute->getProfileAttributeIdByAttributeId($attributeId);
+                    if ($this->objAttribute->isCoreAttribute($profileAttributeId)) {
+                        $this->arrCachedUsers[$objUser->fields['id']]['profile'][$profileAttributeId][0] = $this->arrLoadedUsers[$objUser->fields['id']]['profile'][$profileAttributeId][0] = $value;
                     } else {
                         $this->arrCachedUsers[$objUser->fields['id']][$attributeId] = $this->arrLoadedUsers[$objUser->fields['id']][$attributeId] = $value;
                     }
@@ -1394,9 +1396,9 @@ class User extends User_Profile
      * used for filtering users.
      *
      * @param   array   $filter A nested array defining filter rules
-     * @param   boolean $tblCoreAttributes  Will be set to TRUE if the supplied
+     * @param   boolean $tblCustomAttributes  Will be set to TRUE if the supplied
      *                                      filter arguments $filter will need
-     *                                      a join to the core-attribute-table
+     *                                      a join to the attribute-table
      * @param   boolean $tblGroup   Will be set to TRUE if the supplied filter
      *                              arguments $filter will need a join to the
      *                              user-group-table
@@ -1412,7 +1414,7 @@ class User extends User_Profile
      *                               unique JOINs.
      * @return  array   List of SQL statements to be used as WHERE arguments
      */
-    protected function parseFilterConditions($filter, &$tblCoreAttributes, &$tblGroup, &$customAttributeJoins, &$groupTables, $uniqueJoins = true, &$joinIdx = 0)
+    protected function parseFilterConditions($filter, &$tblCustomAttributes, &$tblGroup, &$customAttributeJoins, &$groupTables, $uniqueJoins = true, &$joinIdx = 0)
     {
         $arrConditions = array();
 
@@ -1437,7 +1439,7 @@ class User extends User_Profile
             foreach ($filterArguments as $argument) {
                 $filterConditions = $this->parseFilterConditions(
                     $argument,
-                    $tblCoreAttributes,
+                    $tblCustomAttributes,
                     $tblGroup,
                     $customAttributeJoins,
                     $groupTables,
@@ -1463,9 +1465,8 @@ class User extends User_Profile
         if (count($arrAccountConditions = $this->parseAccountFilterConditions($filter))) {
             $arrConditions[] = implode(' AND ', $arrAccountConditions);
         }
-        if (count($arrCoreAttributeConditions = $this->parseCoreAttributeFilterConditions($filter))) {
-            $arrConditions[] = implode(' AND ', $arrCoreAttributeConditions);
-            $tblCoreAttributes = true;
+        if (count($arrCoreAttributeConditions = $this->parseCoreAttributeFilterConditions($filter, $uniqueJoins, $joinIdx))) {
+            $tblCustomAttributes = true;
         }
         $arrCustomAttributeConditions = $this->parseCustomAttributeFilterConditions(
             $filter,
@@ -1473,10 +1474,13 @@ class User extends User_Profile
             $uniqueJoins,
             $joinIdx
         );
-        if (count($arrCustomAttributeConditions)) {
+        $arrConditionsMerged = array_merge(
+            $arrCustomAttributeConditions, $arrCoreAttributeConditions
+        );
+        if (count($arrConditionsMerged)) {
             $groupTables = true;
-            $arrConditions[] = implode(' AND ', $arrCustomAttributeConditions);
-            foreach (array_keys($arrCustomAttributeConditions) as $customAttributeTable) {
+            $arrConditions[] = implode(' AND ', $arrConditionsMerged);
+            foreach (array_keys($arrConditionsMerged) as $customAttributeTable) {
                 $customAttributeJoins[] = ' INNER JOIN `'.DBPREFIX.'access_user_attribute_value` AS ' . $customAttributeTable . ' ON ' . $customAttributeTable . '.`user_id` = tblU.`id` ';
             }
 
@@ -1573,7 +1577,6 @@ class User extends User_Profile
 
         $arrCustomJoins = array();
         $arrCustomSelection = array();
-        $joinCoreTbl = false;
         $joinCustomTbl = false;
         $joinGroupTbl = false;
         $arrUserIds = array();
@@ -1582,9 +1585,6 @@ class User extends User_Profile
         $nr = 0;
         if (!empty($sqlCondition)) {
             if (isset($sqlCondition['tables'])) {
-                if (in_array('core', $sqlCondition['tables'])) {
-                    $joinCoreTbl = true;
-                }
                 if (in_array('custom', $sqlCondition['tables'])) {
                     $joinCustomTbl = true;
                 }
@@ -1607,16 +1607,14 @@ class User extends User_Profile
                 if (in_array(strtolower($direction), array('asc', 'desc'))) {
                     if (isset($this->arrAttributes[$attribute])) {
                         $arrSortExpressions[] = 'tblU.`'.$attribute.'` '.$direction;
-                    } elseif ($this->objAttribute->load($attribute)) {
+                    } else if ($this->objAttribute->load($attribute)) {
                         if ($this->objAttribute->isCoreAttribute($attribute)) {
-                            $arrSortExpressions[] = 'tblP.`'.$attribute.'` '.$direction;
-                            $joinCoreTbl = true;
-                        } else {
-                            $arrSortExpressions[] = 'tblA'.$nr.'.`value` '.$direction;
-                            $arrCustomJoins[] = 'INNER JOIN `'.DBPREFIX.'access_user_attribute_value` AS tblA'.$nr.' ON tblA'.$nr.'.`user_id` = tblU.`id`';
-                            $arrCustomSelection[] = 'tblA'.$nr.'.`attribute_id` = '.$attribute;
-                            ++$nr;
+                            $attribute = $this->objAttribute->getAttributeIdByProfileAttributeId($attribute);
                         }
+                        $arrSortExpressions[] = 'tblA'.$nr.'.`value` '.$direction;
+                        $arrCustomJoins[] = 'INNER JOIN `'.DBPREFIX.'access_user_attribute_value` AS tblA'.$nr.' ON tblA'.$nr.'.`user_id` = tblU.`id`';
+                        $arrCustomSelection[] = 'tblA'.$nr.'.`attribute_id` = '.$attribute;
+                        ++$nr;
                     }
                 } elseif ($attribute == 'special') {
                     $arrSortExpressions[] = $direction;
@@ -1632,7 +1630,6 @@ class User extends User_Profile
         $query = '
             SELECT SQL_CALC_FOUND_ROWS DISTINCT tblU.`id`
               FROM `'.DBPREFIX.'access_users` AS tblU'.
-            ($joinCoreTbl ? ' INNER JOIN `'.DBPREFIX.'access_user_profile` AS tblP ON tblP.`user_id`=tblU.`id`' : '').
             ($joinCustomTbl ? ' INNER JOIN `'.DBPREFIX.'access_user_attribute_value` AS tblA ON tblA.`user_id`=tblU.`id`' : '').
             ($joinGroupTbl
                 ? ($groupless
@@ -1660,12 +1657,8 @@ class User extends User_Profile
             }
         }
         $this->arrLoadedUsers = $arrUserIds;
-        if (!count($arrUserIds)) {
-            return false;
-        }
         return array(
             'tables' => array(
-                'core'      => $joinCoreTbl,
                 'custom'    => $joinCustomTbl,
                 'group'     => $joinGroupTbl
             ),
@@ -2181,6 +2174,7 @@ class User extends User_Profile
                 `expiration`,
                 `validity`,
                 `last_auth`,
+                `last_auth_status`,
                 `last_activity`,
                 `active`,
                 `verified`,
@@ -2202,6 +2196,7 @@ class User extends User_Profile
                 ".intval($this->expiration).",
                 ".intval($this->validity).",
                 ".$this->last_auth.",
+                ".$this->last_auth_status.",
                 ".$this->last_activity.",
                 ".intval($this->is_active).",
                 ".intval($this->verified).",
@@ -2286,6 +2281,7 @@ class User extends User_Profile
         $arrCurrentGroups = $this->loadGroups();
         $arrAddedGroups = array_diff($this->getAssociatedGroupIds(), $arrCurrentGroups);
         $arrRemovedGroups = array_diff($arrCurrentGroups, $this->getAssociatedGroupIds());
+        $groupAssociationChange = false;
         foreach ($arrRemovedGroups as $groupId) {
             if (!$objDatabase->Execute('
                 DELETE FROM `'.DBPREFIX.'access_rel_user_group`
@@ -2294,7 +2290,7 @@ class User extends User_Profile
                 $status = false;
             } elseif ($objDatabase->Affected_Rows()) {
                 // track flushed db change
-                $associationChange = true;
+                $groupAssociationChange = true;
             }
         }
         foreach ($arrAddedGroups as $groupId) {
@@ -2307,8 +2303,17 @@ class User extends User_Profile
                 $status = false;
             } elseif ($objDatabase->Affected_Rows()) {
                 // track flushed db change
-                $associationChange = true;
+                $groupAssociationChange = true;
             }
+        }
+        if ($groupAssociationChange) {
+            $associationChange = true;
+
+            // flush all user based cache to ensure new permissions are enforced
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $cache = $cx->getComponent('Cache');
+            $cache->clearUserBasedPageCache();
+            $cache->clearUserBasedEsiCache();
         }
         return $status;
     }
@@ -2397,9 +2402,8 @@ class User extends User_Profile
         }
         if ($userActivationTimeoutStatus) {
             $objDatabase->Execute('
-                DELETE tblU, tblP, tblG, tblA, tblN
+                DELETE tblU, tblG, tblA, tblN
                   FROM `'.DBPREFIX.'access_users` AS tblU
-                 INNER JOIN `'.DBPREFIX.'access_user_profile` AS tblP ON tblP.`user_id`=tblU.`id`
                   LEFT JOIN `'.DBPREFIX.'access_rel_user_group` AS tblG ON tblG.`user_id`=tblU.`id`
                   LEFT JOIN `'.DBPREFIX.'access_user_attribute_value` AS tblA ON tblA.`user_id`=tblU.`id`
                   LEFT JOIN `'.DBPREFIX.'access_user_network` AS tblN ON tblN.`user_id`=tblU.`id`
@@ -2409,9 +2413,8 @@ class User extends User_Profile
         }
         // remove outdated social login users
         $objDatabase->Execute('
-            DELETE tblU, tblP, tblG, tblA, tblN
+            DELETE tblU, tblG, tblA, tblN
               FROM `'.DBPREFIX.'access_users` AS tblU
-             INNER JOIN `'.DBPREFIX.'access_user_profile` AS tblP ON tblP.`user_id`=tblU.`id`
              INNER JOIN `'.DBPREFIX.'access_user_network` AS tblN ON tblN.`user_id`=tblU.`id`
               LEFT JOIN `'.DBPREFIX.'access_rel_user_group` AS tblG ON tblG.`user_id`=tblU.`id`
               LEFT JOIN `'.DBPREFIX.'access_user_attribute_value` AS tblA ON tblA.`user_id`=tblU.`id`
@@ -2687,7 +2690,7 @@ class User extends User_Profile
         return $objDatabase->Execute('
             UPDATE `' . DBPREFIX . 'access_users`
                SET `last_auth_status` = 0
-             WHERE `' . $column . '` = "' . $username . '"
+             WHERE `' . $column . '` = "' . contrexx_raw2db($username) . '"
         ');
     }
 
@@ -2703,6 +2706,7 @@ class User extends User_Profile
     public function setUsername($username)
     {
         $this->username = $username;
+        $this->updateLoadedUserData('username', $this->username);
     }
 
 
@@ -2723,6 +2727,9 @@ class User extends User_Profile
             $this->validity = $validity;
             $this->setExpirationDate(($validitySeconds = $validity*60*60*24) ? mktime(23, 59, 59, date('m', time() + $validitySeconds), date('d', time() + $validitySeconds), date('Y', time() + $validitySeconds)) : 0);
         }
+
+        $this->updateLoadedUserData('validity', $this->validity);
+
         return true;
     }
 
@@ -2730,6 +2737,7 @@ class User extends User_Profile
     public function setExpirationDate($expiration)
     {
         $this->expiration = $expiration;
+        $this->updateLoadedUserData('expiration', $this->expiration);
     }
 
 
@@ -2752,6 +2760,8 @@ class User extends User_Profile
         }
         // END: WORKAROUND FOR ACCOUNTS SOLD IN THE SHOP
         $this->email = $email;
+
+        $this->updateLoadedUserData('email', $this->email);
     }
 
 
@@ -2787,6 +2797,7 @@ class User extends User_Profile
                 return false;
             }
             $this->password = $this->hashPassword($password);
+            $this->updateLoadedUserData('password', $this->password);
             return true;
         }
         if (isset($_CONFIG['passwordComplexity']) && $_CONFIG['passwordComplexity'] == 'on') {
@@ -2804,6 +2815,7 @@ class User extends User_Profile
      */
     public function setHashedPassword($hashedPassword) {
         $this->password = $hashedPassword;
+        $this->updateLoadedUserData('password', $this->password);
     }
 
     /**
@@ -2830,6 +2842,7 @@ class User extends User_Profile
     {
         $this->frontend_language = intval($langId);
         $this->validateLanguageId('frontend');
+        $this->updateLoadedUserData('frontend_lang_id', $this->frontend_language);
     }
 
 
@@ -2844,6 +2857,7 @@ class User extends User_Profile
     {
         $this->backend_language = intval($langId);
         $this->validateLanguageId('backend');
+        $this->updateLoadedUserData('backend_lang_id', $this->backend_language);
     }
 
 
@@ -2858,6 +2872,7 @@ class User extends User_Profile
     public function setActiveStatus($status)
     {
         $this->is_active = (bool)$status;
+        $this->updateLoadedUserData('active', $this->is_active);
     }
 
     /**
@@ -2870,6 +2885,7 @@ class User extends User_Profile
      */
     public function setVerification($verified) {
         $this->verified = $verified;
+        $this->updateLoadedUserData('verified', $this->verified);
         return true;
     }
 
@@ -2891,6 +2907,8 @@ class User extends User_Profile
         } else {
             $this->primary_group = 0;
         }
+
+        $this->updateLoadedUserData('primary_group', $this->primary_group);
     }
 
 
@@ -2911,6 +2929,7 @@ class User extends User_Profile
 
         if ($status || !$this->isLastAdmin() || $force) {
             $this->is_admin = (bool)$status;
+            $this->updateLoadedUserData('is_admin', $this->is_admin);
             return true;
         }
         $this->error_msg[] = sprintf($_CORELANG['TXT_ACCESS_CHANGE_PERM_LAST_ADMIN_USER'], $this->getUsername());
@@ -2954,6 +2973,7 @@ class User extends User_Profile
     {
         $this->email_access = in_array($emailAccess, array_keys($this->arrPrivacyAccessTypes))
             ? $emailAccess : $this->defaultEmailAccessType;
+        $this->updateLoadedUserData('email_access', $this->email_access);
     }
 
 
@@ -2961,6 +2981,7 @@ class User extends User_Profile
     {
         $this->profile_access = in_array($profileAccess, array_keys($this->arrPrivacyAccessTypes))
             ? $profileAccess : $this->defaultProfileAccessTyp;
+        $this->updateLoadedUserData('profile_access', $this->profile_access);
     }
 
 
@@ -3170,6 +3191,34 @@ class User extends User_Profile
     }
 
     /**
+     * Update a specific profile attribute of the user
+     *
+     * @param   string  $attribute  ID of profile attribute to update
+     * @param   string|integer|boolean  $value  Value to set the profile
+     *                                          attribute to
+     */
+    protected function updateLoadedUserData($attribute, $value) {
+        if (!$this->id) {
+            return;
+        }
+
+        if (!isset($this->arrLoadedUsers[$this->id])) {
+            return;
+        }
+
+        $this->arrLoadedUsers[$this->id][$attribute] = $value;
+    }
+
+    /**
+     * Get object data as array
+     *
+     * @param    array   Return data of user object as array
+     */
+    public function toArray() {
+        return $this->arrLoadedUsers[$this->id];
+    }
+
+    /**
      * Tries to form a valid and unique username from the words given
      *
      * Usually, you would use first and last names as parameters.
@@ -3286,16 +3335,19 @@ class User extends User_Profile
             $mix_user_id = array($mix_user_id);
         }
         $count = 0;
-        global $objFWUser;
-        $objUser = $objFWUser->objUser;
+        $objFWUser = \FWUser::getFWUserObject();
         foreach ($mix_user_id as $user_id) {
-            $objUser = $objUser->getUser($user_id);
+            $objUser = $objFWUser->objUser->getUser($user_id);
             if (!$objUser) {
                 Message::warning(sprintf(
                     $_CORELANG['TXT_ACCESS_NO_USER_WITH_ID'], $user_id));
                 continue;
             }
-//$objUser = new User();
+            // do not change the status of the currently signed-in user
+            if ($objUser->getId() == $objFWUser->objUser->getId()) {
+                continue;
+            }
+
             $objUser->setActiveStatus($active);
             if (!$objUser->store()) {
                 Message::warning(sprintf(
@@ -3329,5 +3381,14 @@ class User extends User_Profile
         }
 
         throw new UserException('Failed to generate a new password hash');
+    }
+
+    /**
+     * Clears the cache
+     *
+     * Only use this when loading lots of users (export)!
+     */
+    public function clearCache() {
+        $this->arrCachedUsers = array();
     }
 }

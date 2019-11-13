@@ -54,7 +54,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      */
     public function getControllerClasses()
     {
-        return array('EsiWidget');
+        return array('EsiWidget', 'JsonCalendar');
     }
 
     /**
@@ -69,7 +69,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      */
     public function getControllersAccessableByJson()
     {
-        return array('EsiWidgetController');
+        return array('EsiWidgetController', 'JsonCalendarController');
     }
 
     /**
@@ -165,12 +165,24 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             return;
         }
 
-        $calendar = new \Cx\Modules\Calendar\Controller\Calendar('');
-        $calendar->loadEventManager();
-        $event = $calendar->getEventManager()->eventList[0];
-        if (!$event) {
+        $headers = $response->getRequest()->getHeaders();
+        if (isset($headers['Referer'])) {
+            $refUrl = new \Cx\Lib\Net\Model\Entity\Url($headers['Referer']);
+        } else {
+            $refUrl = new \Cx\Lib\Net\Model\Entity\Url($response->getRequest()->getUrl()->toString());
+        }
+        $params = $refUrl->getParamArray();
+
+        // TODO: this is required as CalendarEventManager::getEvent() depends on $_LANGID
+        global $_LANGID;
+        $_LANGID = $page->getLang();
+        $eventManager = new \Cx\Modules\Calendar\Controller\CalendarEventManager();
+        $eventManager->getEvent($params['id'], $params['date']);
+
+        if (!isset($eventManager->eventList[0])) {
             return;
         }
+        $event = $eventManager->eventList[0];
 
         //Set the Page Title
         $pageTitle = $this->getPageTitle($event, $page->getCmd());

@@ -45,7 +45,7 @@ namespace Cx\Modules\MediaDir\Model\Entity;
  */
 class MediaDirectoryInputfieldCheckbox extends \Cx\Modules\MediaDir\Controller\MediaDirectoryLibrary implements Inputfield
 {
-    public $arrPlaceholders = array('TXT_MEDIADIR_INPUTFIELD_NAME','MEDIADIR_INPUTFIELD_VALUE');
+    public $arrPlaceholders = array('TXT_MEDIADIR_INPUTFIELD_NAME','MEDIADIR_INPUTFIELD_VALUE','MEDIADIR_INPUTFIELD_VALUE_PLAIN');
 
 
 
@@ -85,10 +85,10 @@ class MediaDirectoryInputfieldCheckbox extends \Cx\Modules\MediaDir\Controller\M
                     if(!empty($objInputfieldValue->fields['value'])) {
                         $arrValue = explode(",",$objInputfieldValue->fields['value']);
                     } else {
-                        $arrValue = null;
+                        $arrValue = array();
                     }
                 } else {
-                    $arrValue = null;
+                    $arrValue = array();
                 }
 
                 $strOptions = empty($arrInputfield['default_value'][$langId]) ? $arrInputfield['default_value'][0] : $arrInputfield['default_value'][$langId];
@@ -201,11 +201,13 @@ class MediaDirectoryInputfieldCheckbox extends \Cx\Modules\MediaDir\Controller\M
         if($arrElements[0] != null) {
             //open <ul> list
             $strValue = '<ul class="'.$this->moduleNameLC.'InputfieldCheckbox">';
+            $plain = array();
 
             //make element list
             foreach ($arrElements as $intKey => $strElement) {
                 $strElement = $strElement-1;
                 $strValue .= '<li>'.$arrValues[$strElement].'</li>';
+                $plain[] = $arrValues[$strElement];
             }
 
             //close </ul> list
@@ -213,6 +215,8 @@ class MediaDirectoryInputfieldCheckbox extends \Cx\Modules\MediaDir\Controller\M
 
             $arrContent['TXT_'.$this->moduleLangVar.'_INPUTFIELD_NAME'] = htmlspecialchars($arrInputfield['name'][0], ENT_QUOTES, CONTREXX_CHARSET);
             $arrContent[$this->moduleLangVar.'_INPUTFIELD_VALUE'] = $strValue;
+            $arrContent[$this->moduleLangVar.'_INPUTFIELD_VALUE_PLAIN'] =
+                contrexx_raw2xhtml(join(',', $plain));
         } else {
             $arrContent = null;
         }

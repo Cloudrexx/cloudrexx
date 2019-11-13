@@ -233,14 +233,14 @@ class User_Profile
                             $value == '"0"'
                         )
                     ) {
-                        $value = 'NULL';
+                        $value = '"gender_undefined"';
                     }
-                    $query = $this->objAttribute->isCoreAttribute($attributeId) ?
-                        "UPDATE `".DBPREFIX."access_user_profile` SET `".$attributeId."` = " . $value . " WHERE `user_id` = ".$this->id :
-                        ($newValue ?
-                            "INSERT INTO `".DBPREFIX."access_user_attribute_value` (`user_id`, `attribute_id`, `history_id`, `value`) VALUES (".$this->id.", ".$attributeId.", ".$historyId.", " . $value . ")" :
-                            "UPDATE `".DBPREFIX."access_user_attribute_value` SET `value` = " . $value . " WHERE `user_id` = ".$this->id." AND `attribute_id` = ".$attributeId." AND `history_id` = ".$historyId
-                        );
+
+                    if ($this->objAttribute->isCoreAttribute($attributeId)) {
+                        $attributeId = $this->objAttribute->getAttributeIdByProfileAttributeId($attributeId);
+                    }
+
+                    $query = "REPLACE INTO `".DBPREFIX."access_user_attribute_value` (`user_id`, `attribute_id`, `history_id`, `value`) VALUES (".$this->id.", $attributeId, ".$historyId.", " . $value . ")";
 
                     if ($objDatabase->Execute($query) === false) {
                         $objAttribute = $this->objAttribute->getById($attributeId);
@@ -274,21 +274,17 @@ class User_Profile
     /**
      * Create a profile for the loaded user
      *
-     * This creates an entry in the dabase table contrexx_access_user_profile which is related to the entry in the table cotnrexx_access_users of the same user.
+     * This creates entries in the database table
+     * contrexx_access_user_attribute_value which is related to the entry in the
+     * table cotnrexx_access_users of the same user.
      * This methode will be obsolete as soon as we're using InnoDB as storage engine.
      *
      * @return boolean
      */
     protected function createProfile()
     {
-        global $objDatabase;
-        if ($objDatabase->Execute('INSERT INTO `'.DBPREFIX.'access_user_profile` SET `user_id` = '.$this->id . ', `title` = NULL') !== false) {
-            $this->arrLoadedUsers[$this->id]['profile'] = isset($this->arrLoadedUsers[0]['profile']) ? $this->arrLoadedUsers[0]['profile'] : array();
-            return true;
-        } else {
-            $objDatabase->Execute('DELETE FROM `'.DBPREFIX.'access_user_profile` WHERE `user_id` = '.$this->id);
-            return false;
-        }
+        $this->arrLoadedUsers[$this->id]['profile'] = isset($this->arrLoadedUsers[0]['profile']) ? $this->arrLoadedUsers[0]['profile'] : array();
+        return true;
     }
 
 
@@ -315,11 +311,15 @@ class User_Profile
 
         if ($objAttributeValue !== false && $objAttributeValue->RecordCount() > 0) {
             while (!$objAttributeValue->EOF) {
-                $this->arrCachedUsers[$objAttributeValue->fields['user_id']]['profile'][$objAttributeValue->fields['attribute_id']][$objAttributeValue->fields['history_id']] =
-                    $this->arrLoadedUsers[$objAttributeValue->fields['user_id']]['profile'][$objAttributeValue->fields['attribute_id']][$objAttributeValue->fields['history_id']] =
+                $attributeId = $objAttributeValue->fields['attribute_id'];
+                if ($this->objAttribute->isIdAssignedToCoreAttribute($attributeId)) {
+                    $attributeId = $this->objAttribute->getProfileAttributeIdByAttributeId($attributeId);
+                }
+                $this->arrCachedUsers[$objAttributeValue->fields['user_id']]['profile'][$attributeId][$objAttributeValue->fields['history_id']] =
+                    $this->arrLoadedUsers[$objAttributeValue->fields['user_id']]['profile'][$attributeId][$objAttributeValue->fields['history_id']] =
                         $objAttributeValue->fields['value'];
                 if ($objAttributeValue->fields['history_id'] &&
-                    ($historyAttributeId = $this->objAttribute->getHistoryAttributeId($objAttributeValue->fields['attribute_id'])) !== false &&
+                    ($historyAttributeId = $this->objAttribute->getHistoryAttributeId($attributeId)) !== false &&
                     (
                         !isset($this->arrAttributeHistories[$objAttributeValue->fields['user_id']][$historyAttributeId]) ||
                         !in_array($objAttributeValue->fields['history_id'], $this->arrAttributeHistories[$objAttributeValue->fields['user_id']][$historyAttributeId])
@@ -350,7 +350,7 @@ class User_Profile
      * @param array $arrFilter
      * @return array
      */
-    protected function parseCoreAttributeFilterConditions($arrFilter)
+    protected function parseCoreAttributeFilterConditions($arrFilter, $uniqueJoins, &$joinIdx)
     {
         if (empty($this->objAttribute)) {
             $this->initAttributes();
@@ -359,22 +359,25 @@ class User_Profile
         $arrConditions = array();
         $pattern = array();
         foreach ($arrFilter as $attribute => $condition) {
+            $tableIdx = 'tblExp' . $joinIdx;
             /**
              * $attribute is the account profile attribute like 'firstname' or 'lastname'
              * $condition is either a simple condition (integer or string) or an condition matrix (array)
              */
             if ($this->objAttribute->load($attribute) && $this->objAttribute->isCoreAttribute($attribute)) {
+                $attributeId = $this->objAttribute->getAttributeIdByProfileAttributeId($attribute);
+
                 switch ($attribute) {
                     case 'gender':
-                        $arrConditions[] = "(tblP.`{$attribute}` = '".(is_array($condition) ? implode("' OR tblP.`{$attribute}` = '", array_map('addslashes', $condition)) : addslashes($condition))."')";
+                        $arrConditions[$tableIdx] = "(`".$tableIdx."`.`attribute_id` = {$attributeId} AND `".$tableIdx."`.`value` = '".(is_array($condition) ? implode("' OR `".$tableIdx."`.`value` = '", array_map('addslashes', $condition)) : addslashes($condition))."')";
                         break;
 
                     case 'title':
                     case 'country':
-                        $arrConditions[] = '(tblP.`' . $attribute . '` = ' . (
+                        $arrConditions[$tableIdx] = '(`'.$tableIdx.'`.`attribute_id` = ' . $attributeId . ' AND `'.$tableIdx.'`.`value` = ' . (
                             is_array($condition)
                                 ? implode(
-                                    ' OR tblP.`' . $attribute . '` = ',
+                                    ' OR `'.$tableIdx.'`.`value` = ',
                                     array_map(
                                         function ($condition) {
                                             if (preg_match('#([0-9]+)#', $condition, $pattern)) {
@@ -418,7 +421,7 @@ class User_Profile
                                          * $restrictionOperator is a comparison operator ( =, <, >)
                                          * $restrictionValue represents the condition
                                          */
-                                        $arrConditionRestriction[] = "tblP.`{$attribute}` ".(
+                                        $arrConditionRestriction[] = "`".$tableIdx."`.`attribute_id` = {$attributeId} AND `".$tableIdx."`.`value` ".(
                                             in_array($restrictionOperator, $arrComparisonOperators[$this->objAttribute->getDataType()], true) ?
                                                 $restrictionOperator
                                             :   $arrDefaultComparisonOperator[$this->objAttribute->getDataType()]
@@ -426,25 +429,31 @@ class User_Profile
                                     }
                                     $arrRestrictions[] = implode(' AND ', $arrConditionRestriction);
                                 } else {
-                                    $arrRestrictions[] = "tblP.`{$attribute}` ".(
+                                    $arrRestrictions[] = "`".$tableIdx."`.`attribute_id` = {$attributeId} AND `".$tableIdx."`.`value` ".(
                                         in_array($operator, $arrComparisonOperators[$this->objAttribute->getDataType()], true) ?
                                             $operator
                                         :   $arrDefaultComparisonOperator[$this->objAttribute->getDataType()]
                                     )." '".$arrEscapeFunction[$this->objAttribute->getDataType()]($restriction)."'";
                                 }
                             }
-                            $arrConditions[] = '(('.implode(') OR (', $arrRestrictions).'))';
+                            $arrConditions[$tableIdx] = '(('.implode(') OR (', $arrRestrictions).'))';
                         } else {
-                            $arrConditions[] = "(tblP.`".$attribute."` ".$arrDefaultComparisonOperator[$this->objAttribute->getDataType()]." '".$arrEscapeFunction[$this->objAttribute->getDataType()]($condition)."')";
+                            $arrConditions[$tableIdx] = "(`".$tableIdx."`.`attribute_id` = ".$attributeId." AND `".$tableIdx."`.`value` ".$arrDefaultComparisonOperator[$this->objAttribute->getDataType()]." '".$arrEscapeFunction[$this->objAttribute->getDataType()]($condition)."')";
                         }
                         break;
                 }
 
 
             } elseif ($attribute === 'birthday_day') {
-                $arrConditions[] = "(DATE_FORMAT(DATE_ADD(FROM_UNIXTIME(0), interval `tblP`.`birthday` second), '%e') = '".intval($condition)."')";
+                $attribute = $this->objAttribute->getAttributeIdByProfileAttributeId('birthday');
+                $arrConditions[$tableIdx] = "(`".$tableIdx."`.`attribute_id` = ".$attribute." AND (DATE_FORMAT(DATE_ADD(FROM_UNIXTIME(0), interval `".$tableIdx."`.`value` second), '%e') = '".intval($condition)."'))";
             } elseif ($attribute === 'birthday_month') {
-                $arrConditions[] = "(DATE_FORMAT(DATE_ADD(FROM_UNIXTIME(0), interval `tblP`.`birthday` second), '%c') = '".intval($condition)."')";
+                $attribute = $this->objAttribute->getAttributeIdByProfileAttributeId('birthday');
+                $arrConditions[$tableIdx] = "(`".$tableIdx."`.`attribute_id` = ".$attribute." AND (DATE_FORMAT(DATE_ADD(FROM_UNIXTIME(0), interval `".$tableIdx."`.`value` second), '%c') = '".intval($condition)."'))";
+            }
+
+            if ($uniqueJoins) {
+                $joinIdx++;
             }
         }
 
@@ -582,12 +591,7 @@ class User_Profile
         }
         $objParentAttribute = $this->objAttribute->getById($attributeId);
 
-        if ($core) {
-            $attributeKeyClausePrefix = '';
-            $attributeKeyClauseSuffix = '';
-        } else {
-            $attributeValueColumn = 'tblA.`value`';
-        }
+        $attributeValueColumn = 'tblA.`value`';
 
         foreach ($objParentAttribute->{'get'.($core ? 'Core' : 'Custom').'AttributeIds'}() as $attributeId) {
             $objAttribute = $objParentAttribute->getById($attributeId);
@@ -596,13 +600,12 @@ class User_Profile
             if (!$objAttribute->checkReadPermission()) {
                 continue;
             }
-
+            $attributeId = $objAttribute->getId();
             if ($core) {
-                $attributeValueColumn = 'tblP.`'.$objAttribute->getId().'`';
-            } else {
-                $attributeKeyClausePrefix = '(tblA.`attribute_id` = '.$objAttribute->getId().' AND ';
-                $attributeKeyClauseSuffix = ')';
+                $attributeId = $objAttribute->getAttributeIdByProfileAttributeId($objAttribute->getId());
             }
+            $attributeKeyClausePrefix = '(tblA.`attribute_id` = '.$attributeId.' AND ';
+            $attributeKeyClauseSuffix = ')';
 
             switch ($objAttribute->getType()) {
                 case 'text':

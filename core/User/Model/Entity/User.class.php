@@ -4,7 +4,7 @@
  * Cloudrexx
  *
  * @link      http://www.cloudrexx.com
- * @copyright Cloudrexx AG 2007-2018
+ * @copyright Cloudrexx AG 2007-2019
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -31,10 +31,171 @@
  * @copyright   CLOUDREXX CMS - Cloudrexx AG Thun
  * @author      Dario Graf <info@cloudrexx.com>
  * @package     cloudrexx
- * @subpackage  module_user
+ * @subpackage  core_user
  * @version     5.0.0
  */
 namespace Cx\Core\User\Model\Entity;
+
+/**
+ * Validates the email of an User to a set of constraints
+ *
+ * @copyright   CLOUDREXX CMS - Cloudrexx AG Thun
+ * @author      Sam Hawkes <info@cloudrexx.com>
+ * @package     cloudrexx
+ * @subpackage  core_user
+ * @version     5.0.0
+ */
+class UserValidateEmail extends \CxValidate
+{
+    /**
+     * @var int ID of user
+     */
+    protected $userId;
+
+    /**
+     * UserValidateEmail constructor
+     *
+     * @param int   $userId      ID of user
+     * @param array $constraints additional constraints
+     */
+    public function __construct($userId, $constraints = array())
+    {
+        $this->userId = $userId;
+        parent::__construct($constraints);
+    }
+
+    /**
+     * Checks if the given mail address is valid and unique
+     *
+     * @param string $mail Mail address to check
+     *
+     * @return boolean if email is valid
+     */
+    public function isValid($mail)
+    {
+        global $_CORELANG;
+
+        $this->passesValidation = true;
+
+        if (!\FWValidator::isEmail($mail)) {
+            $this->messages[] = $_CORELANG['TXT_ACCESS_INVALID_EMAIL_ADDRESS'];
+            $this->passesValidation = false;
+        }
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $qb = $em->createQueryBuilder();
+        $qb->select('u')
+           ->from('Cx\Core\User\Model\Entity\User', 'u')
+           ->where($qb->expr()->eq('u.email', ':email'));
+        if (!empty($this->userId)) {
+            $qb->andWhere($qb->expr()->not($qb->expr()->eq('u.id', ':id')));
+            $qb->setParameter('id', $this->userId);
+        }
+        $qb->setParameter('email', $mail);
+        $existingEntity = $qb->getQuery()->getResult();
+
+        if (!empty($existingEntity)) {
+            $this->messages[] = $_CORELANG['TXT_ACCESS_EMAIL_ALREADY_USED'];
+            $this->passesValidation = false;
+        }
+        return $this->passesValidation;
+    }
+}
+
+/**
+ * Validates the username of an User to a set of constraints
+ *
+ * @copyright   CLOUDREXX CMS - Cloudrexx AG Thun
+ * @author      Sam Hawkes <info@cloudrexx.com>
+ * @package     cloudrexx
+ * @subpackage  core_user
+ * @version     5.0.0
+ */
+class UserValidateUsername extends \CxValidate
+{
+    /**
+     * @var int ID of user
+     */
+    protected $userId;
+
+    /**
+     * UserValidateUsername constructor
+     *
+     * @param int   $userId      id of user
+     * @param array $constraints additional constraints
+     */
+    public function __construct($userId, $constraints = array())
+    {
+        $this->userId = $userId;
+        parent::__construct($constraints);
+    }
+
+    /**
+     * Checks if the given username is valid and unique
+     *
+     * @param string $username username to check
+     *
+     * @return boolean if email is valid
+     */
+    public function isValid($username)
+    {
+        global $_CORELANG;
+
+        $this->passesValidation = true;
+
+        if (empty($username)) {
+            return $this->passesValidation;
+        }
+
+        if (!$this->isValidUsername($username)) {
+            $this->messages[] = $_CORELANG['TXT_ACCESS_INVALID_USERNAME'];
+            $this->passesValidation = false;
+        }
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $qb = $em->createQueryBuilder();
+        $qb->select('u')
+            ->from('Cx\Core\User\Model\Entity\User', 'u')
+            ->where($qb->expr()->eq('u.username', ':username'));
+        if (!empty($this->userId)) {
+            $qb->andWhere($qb->expr()->not($qb->expr()->eq('u.id', ':id')));
+            $qb->setParameter('id', $this->userId);
+        }
+        $qb->setParameter('username', $username);
+        $existingEntity = $qb->getQuery()->getResult();
+
+        if (!empty($existingEntity)) {
+            $this->messages[] = $_CORELANG['TXT_ACCESS_USERNAME_ALREADY_USED'];
+            $this->passesValidation = false;
+        }
+
+        return $this->passesValidation;
+    }
+
+
+    /**
+     * Returns true if the given $username is valid
+     *
+     * @param string $username username to check
+     *
+     * @return boolean if username is valid
+     */
+    protected function isValidUsername($username)
+    {
+        if (preg_match('/^[a-zA-Z0-9-_]*$/', $username)) {
+            return true;
+        }
+        // For version 2.3, inspired by migrating Shop Customers to Users:
+        // In addition to the above, also accept usernames that look like valid
+        // e-mail addresses
+        if (\FWValidator::isEmail($username)) {
+            return true;
+        }
+        return false;
+    }
+}
 
 /**
  * Users can be created and managed.
@@ -42,7 +203,7 @@ namespace Cx\Core\User\Model\Entity;
  * @copyright   CLOUDREXX CMS - Cloudrexx AG Thun
  * @author      Dario Graf <info@cloudrexx.com>
  * @package     cloudrexx
- * @subpackage  module_user
+ * @subpackage  core_user
  * @version     5.0.0
  */
 class User extends \Cx\Model\Base\EntityBase {
@@ -69,7 +230,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @var string
      */
-    protected $authToken;
+    protected $authToken = '0';
 
     /**
      * @var integer
@@ -99,7 +260,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @var integer
      */
-    protected $lastAuthStatus = 1;
+    protected $lastAuthStatus = 0;
 
     /**
      * @var integer
@@ -112,9 +273,9 @@ class User extends \Cx\Model\Base\EntityBase {
     protected $email;
 
     /**
-     * @var enum_user_user_emailaccess
+     * @var string enum_user_user_emailaccess
      */
-    protected $emailAccess = 'nobody';
+    protected $emailAccess;
 
     /**
      * @var integer
@@ -129,7 +290,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @var boolean
      */
-    protected $active = false;
+    protected $active = true;
 
     /**
      * @var boolean
@@ -142,9 +303,9 @@ class User extends \Cx\Model\Base\EntityBase {
     protected $primaryGroup = 0;
 
     /**
-     * @var enum_user_user_profileaccess
+     * @var string enum_user_user_profileaccess
      */
-    protected $profileAccess = 'members_only';
+    protected $profileAccess;
 
     /**
      * @var string
@@ -157,9 +318,9 @@ class User extends \Cx\Model\Base\EntityBase {
     protected $restoreKeyTime = 0;
 
     /**
-     * @var enum_user_user_u2uactive
+     * @var boolean
      */
-    protected $u2uActive = '1';
+    protected $u2uActive = false;
 
     /**
      * @var \Doctrine\Common\Collections\Collection
@@ -167,7 +328,7 @@ class User extends \Cx\Model\Base\EntityBase {
     protected $group;
 
     /**
-     * @var \Cx\Core\User\Model\Entity\UserAttributeValue
+     * @var \Doctrine\Common\Collections\Collection
      */
     protected $userAttributeValue;
 
@@ -176,7 +337,20 @@ class User extends \Cx\Model\Base\EntityBase {
      */
     public function __construct()
     {
+        $arrSettings = \FWUser::getSettings();
+        $this->profileAccess = $arrSettings['default_profile_access']['value'];
+        $this->emailAccess = $arrSettings['default_email_access']['value'];
+
         $this->group = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->userAttributeValue = new \Doctrine\Common\Collections\ArrayCollection();
+
+    }
+
+    public function initializeValidators()
+    {
+        $this->validators['username'] = new \Cx\Core\User\Model\Entity\UserValidateUsername($this->getId());
+        $this->validators['email'] = new \Cx\Core\User\Model\Entity\UserValidateEmail($this->getId());
+        $this->validators['password'] = new \CxValidateRegexp(array('pattern' => '/.+/'), true);
     }
 
     /**
@@ -214,7 +388,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set username
      *
      * @param string $username
-     * @return User
      */
     public function setUsername($username)
     {
@@ -235,7 +408,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set password
      *
      * @param string $password
-     * @return User
      */
     public function setPassword($password)
     {
@@ -256,7 +428,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set authToken
      *
      * @param string $authToken
-     * @return User
      */
     public function setAuthToken($authToken)
     {
@@ -277,7 +448,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set authTokenTimeout
      *
      * @param integer $authTokenTimeout
-     * @return User
      */
     public function setAuthTokenTimeout($authTokenTimeout)
     {
@@ -298,7 +468,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set regdate
      *
      * @param integer $regdate
-     * @return User
      */
     public function setRegdate($regdate)
     {
@@ -319,7 +488,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set expiration
      *
      * @param integer $expiration
-     * @return User
      */
     public function setExpiration($expiration)
     {
@@ -340,7 +508,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set validity
      *
      * @param integer $validity
-     * @return User
      */
     public function setValidity($validity)
     {
@@ -361,7 +528,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set lastAuth
      *
      * @param integer $lastAuth
-     * @return User
      */
     public function setLastAuth($lastAuth)
     {
@@ -382,7 +548,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set lastAuthStatus
      *
      * @param integer $lastAuthStatus
-     * @return User
      */
     public function setLastAuthStatus($lastAuthStatus)
     {
@@ -403,7 +568,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set lastActivity
      *
      * @param integer $lastActivity
-     * @return User
      */
     public function setLastActivity($lastActivity)
     {
@@ -424,7 +588,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set email
      *
      * @param string $email
-     * @return User
      */
     public function setEmail($email)
     {
@@ -445,7 +608,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set emailAccess
      *
      * @param enum_user_user_emailaccess $emailAccess
-     * @return User
      */
     public function setEmailAccess($emailAccess)
     {
@@ -466,7 +628,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set frontendLangId
      *
      * @param integer $frontendLangId
-     * @return User
      */
     public function setFrontendLangId($frontendLangId)
     {
@@ -487,7 +648,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set backendLangId
      *
      * @param integer $backendLangId
-     * @return User
      */
     public function setBackendLangId($backendLangId)
     {
@@ -508,7 +668,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set active
      *
      * @param boolean $active
-     * @return User
      */
     public function setActive($active)
     {
@@ -529,7 +688,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set verified
      *
      * @param boolean $verified
-     * @return User
      */
     public function setVerified($verified)
     {
@@ -550,7 +708,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set primaryGroup
      *
      * @param integer $primaryGroup
-     * @return User
      */
     public function setPrimaryGroup($primaryGroup)
     {
@@ -571,7 +728,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set profileAccess
      *
      * @param enum_user_user_profileaccess $profileAccess
-     * @return User
      */
     public function setProfileAccess($profileAccess)
     {
@@ -592,11 +748,12 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set restoreKey
      *
      * @param string $restoreKey
-     * @return User
      */
-    public function setRestoreKey($restoreKey)
+    public function setRestoreKey($restoreKey = null)
     {
-        $this->restoreKey = $restoreKey;
+        $this->restoreKey = !empty($restoreKey)
+                            ? $restoreKey
+                            : md5($this->email . $this->regdate . time());
     }
 
     /**
@@ -613,7 +770,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set restoreKeyTime
      *
      * @param integer $restoreKeyTime
-     * @return User
      */
     public function setRestoreKeyTime($restoreKeyTime)
     {
@@ -634,7 +790,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set u2uActive
      *
      * @param enum_user_user_u2uactive $u2uActive
-     * @return User
      */
     public function setU2uActive($u2uActive)
     {
@@ -655,13 +810,10 @@ class User extends \Cx\Model\Base\EntityBase {
      * Add group
      *
      * @param \Cx\Core\User\Model\Entity\Group $group
-     * @return User
      */
     public function addGroup(\Cx\Core\User\Model\Entity\Group $group)
     {
         $this->group[] = $group;
-
-        return $this;
     }
 
     /**
@@ -707,10 +859,29 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get userAttributeValue
      *
-     * @return \Cx\Core\User\Model\Entity\UserAttributeValue
+     * @return \Doctrine\Common\Collections\Collection
      */
     public function getUserAttributeValue()
     {
         return $this->userAttributeValue;
+    }
+
+    /**
+     * Check if the user is backend group
+     *
+     * @return boolean
+     */
+    public function isBackendGroupUser()
+    {
+        if (!$this->group) {
+            return false;
+        }
+
+        foreach ($this->group as $group) {
+            if ($group->getType() === 'backend') {
+                return true;
+            }
+        }
+        return false;
     }
 }

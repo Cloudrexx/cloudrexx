@@ -4,7 +4,7 @@
  * Cloudrexx
  *
  * @link      http://www.cloudrexx.com
- * @copyright Cloudrexx AG 2007-2018
+ * @copyright Cloudrexx AG 2007-2019
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -31,7 +31,7 @@
  * @copyright   CLOUDREXX CMS - Cloudrexx AG Thun
  * @author      Dario Graf <info@cloudrexx.com>
  * @package     cloudrexx
- * @subpackage  module_user
+ * @subpackage  core_user
  * @version     5.0.0
  */
 namespace Cx\Core\User\Model\Entity;
@@ -42,7 +42,7 @@ namespace Cx\Core\User\Model\Entity;
  * @copyright   CLOUDREXX CMS - Cloudrexx AG Thun
  * @author      Dario Graf <info@cloudrexx.com>
  * @package     cloudrexx
- * @subpackage  module_user
+ * @subpackage  core_user
  * @version     5.0.0
  */
 class Group extends \Cx\Model\Base\EntityBase {
@@ -108,7 +108,6 @@ class Group extends \Cx\Model\Base\EntityBase {
      * Set groupName
      *
      * @param string $groupName
-     * @return Group
      */
     public function setGroupName($groupName)
     {
@@ -129,7 +128,6 @@ class Group extends \Cx\Model\Base\EntityBase {
      * Set groupDescription
      *
      * @param string $groupDescription
-     * @return Group
      */
     public function setGroupDescription($groupDescription)
     {
@@ -150,7 +148,6 @@ class Group extends \Cx\Model\Base\EntityBase {
      * Set isActive
      *
      * @param integer $isActive
-     * @return Group
      */
     public function setIsActive($isActive)
     {
@@ -171,7 +168,6 @@ class Group extends \Cx\Model\Base\EntityBase {
      * Set type
      *
      * @param enum_user_group_type $type
-     * @return Group
      */
     public function setType($type)
     {
@@ -192,7 +188,6 @@ class Group extends \Cx\Model\Base\EntityBase {
      * Set homepage
      *
      * @param string $homepage
-     * @return Group
      */
     public function setHomepage($homepage)
     {
@@ -213,7 +208,6 @@ class Group extends \Cx\Model\Base\EntityBase {
      * Set toolbar
      *
      * @param integer $toolbar
-     * @return Group
      */
     public function setToolbar($toolbar)
     {
@@ -234,13 +228,10 @@ class Group extends \Cx\Model\Base\EntityBase {
      * Add user
      *
      * @param \Cx\Core\User\Model\Entity\User $user
-     * @return Group
      */
     public function addUser(\Cx\Core\User\Model\Entity\User $user)
     {
         $this->user[] = $user;
-
-        return $this;
     }
 
     /**

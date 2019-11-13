@@ -56,6 +56,13 @@ class JsonDataSource extends DataSource {
     }
 
     /**
+     * @inheritdoc
+     */
+    public function getIdentifierFieldNames() {
+        throw new \Exception('Not yet implemented');
+    }
+
+    /**
      * Gets one or more entries from this DataSource
      *
      * If an argument is not provided, no restriction is made for this argument.

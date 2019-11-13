@@ -78,6 +78,11 @@ abstract class FileSharingLib
 
             jQuery('#fileSharing_$uploadId').hide();
             field.bind('click', inputClicked).removeAttr('disabled');
+
+            jQuery('a.toggle').click(function() {
+                jQuery('div.toggle').toggle();
+                return false;
+            });
     });
 
     //uploader javascript callback function

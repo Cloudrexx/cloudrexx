@@ -2214,7 +2214,6 @@ class GalleryManager extends GalleryLibrary
         );
 
         $uploader = new Uploader();
-//        $comboUp = \Cx\Core_Modules\Upload\Controller\UploadFactory::getInstance()->newUploader('exposedCombo');
         $uploader->setFinishedCallback(array(ASCMS_MODULE_PATH.'/Gallery/Controller/GalleryManager.class.php', '\Cx\Modules\Gallery\Controller\GalleryManager', 'uploadFinished'));
         $uploader->setData($paths);
         $uploader->addClass('uploadbutton');

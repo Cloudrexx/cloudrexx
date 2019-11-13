@@ -240,11 +240,7 @@ class MemberDirLibrary
                 $dirid_where
                 ORDER BY field ASC";
         $objResult = $objDatabase->Execute($query);
-
-        $names = $_ARRAYLANG['TXT_FIELD_DEFAULT_NAMES'];
-
         $fieldnames = array();
-
         if ($objResult) {
             while (!$objResult->EOF) {
                 $index = $objResult->fields['field'];
@@ -367,5 +363,27 @@ class MemberDirLibrary
         }
     }
 
+    /**
+     * Get media browser button
+     *
+     * @param string $id       Id of the button
+     * @param string $callback Name of the callback function
+     * @return string HTML element of browse button
+     */
+    protected function getMediaBrowserButton($id, $callback = '')
+    {
+        $options = array(
+            'type'  => 'button',
+            'views' => 'filebrowser',
+            'id'    => $id,
+            'style' => 'display: none;',
+        );
+        $mediaBrowser = new \Cx\Core_Modules\MediaBrowser\Model\Entity\MediaBrowser();
+        $mediaBrowser->setOptions($options);
+        if ($callback) {
+            $mediaBrowser->setCallback($callback);
+        }
+
+        return $mediaBrowser->getXHtml();
+    }
 }
-?>

@@ -57,7 +57,7 @@ class JobsLibrary
      * 
      * @var array 
      */
-    protected $arrSettings = array();
+    protected static $arrSettings = array();
 
     /**
     * Gets the categorie option menu string
@@ -174,10 +174,21 @@ class JobsLibrary
             $template->hideblock('jobs_list');
         }
 
+        // fetch ID-list of associated flags
+        $associatedFlagIds = array();
+        if (!empty($settings['use_flags'])) {
+            $associatedFlagIds = $this->getFlagAssociations();
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $flagRepo = $cx->getDb()->getEntityManager()->getRepository(
+                'Cx\Modules\Jobs\Model\Entity\Flag'
+            );
+        }
+
         while (!$objResult->EOF) {
-            $detailUrl = \Cx\Core\Routing\Url::fromModuleAndCmd('Jobs', 'details', $locale->getId(), array('id' => $objResult->fields['docid']));
+            $id = $objResult->fields['docid'];
+            $detailUrl = \Cx\Core\Routing\Url::fromModuleAndCmd('Jobs', 'details', $locale->getId(), array('id' => $id));
             $template->setVariable(array(
-                'JOBS_ID'	     => $objResult->fields['docid'],
+                'JOBS_ID'	     => $id,
                 'JOBS_LONG_DATE' => date(ASCMS_DATE_FORMAT, $objResult->fields['date']),
                 'JOBS_DATE'      => date(ASCMS_DATE_FORMAT_DATE, $objResult->fields['date']),
                 'JOBS_LINK'      => "<a href=\"" . $detailUrl->toString() . "\" title=\"".contrexx_raw2xhtml($objResult->fields['title'])."\">".contrexx_raw2xhtml($objResult->fields['title'])."</a>",
@@ -203,6 +214,41 @@ class JobsLibrary
                 }
             }
 
+            $flagsParsed = false;
+            if (isset($associatedFlagIds[$id])) {
+                foreach ($associatedFlagIds[$id] as $flagId) {
+                    $flag = $flagRepo->findOneById($flagId);
+                    if (!$flag) {
+                        continue;
+                    }
+                    $img = null;
+                    $icon = $flag->getIcon();
+                    if (!empty($icon)) {
+                        $path = $cx->getClassLoader()->getWebFilePath($icon);
+                        if ($path) {
+                            $img = new \Cx\Core\Html\Model\Entity\HtmlElement('img');
+                            $img->setAttributes(array(
+                                'src' => $path,
+                                'style' => 'max-width: 16px',
+                            ));
+                        }
+                    }
+                    $template->setVariable(array(
+                        'JOB_FLAG_ID'       => $flag->getId(),
+                        'JOB_FLAG_NAME'     => contrexx_raw2xhtml($flag->getName()),
+                        'JOB_FLAG_ICON'     => $img,
+                        'JOB_FLAG_ICON_SRC' => $icon,
+                        'JOB_FLAG_VALUE'    => contrexx_raw2xhtml($flag->getValue()),
+                    ));
+                    $template->parse('job_flag');
+                    $flagsParsed = true;
+                }
+                $template->parse('job_flags');
+            }
+            if (!$flagsParsed) {
+                $template->hideBlock('job_flags');
+            }
+
             $template->parse('jobs_list');
             $objResult->MoveNext();
         }
@@ -215,8 +261,12 @@ class JobsLibrary
      */
     public function getSettings()
     {
-        if ($this->arrSettings) {
-            return $this->arrSettings;
+        return static::getConfig();
+    }
+
+    public static function getConfig() {
+        if (static::$arrSettings) {
+            return static::$arrSettings;
         }
 
         //Get the settings values from DB
@@ -228,18 +278,18 @@ class JobsLibrary
         
         if ($objResult && $objResult->RecordCount() > 0) {
             while (!$objResult->EOF) {
-                $this->arrSettings[$objResult->fields['name']] = $objResult->fields['value'];
+                static::$arrSettings[$objResult->fields['name']] = $objResult->fields['value'];
                 $objResult->MoveNext();
             }
         }
 
-        return $this->arrSettings;
+        return static::$arrSettings;
     }
 
     /**
      * Clear page and esi cache of this component
      */
-    protected function clearCache() {
+    public static function clearCache() {
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $cx->getEvents()->triggerEvent(
             'clearEsiCache',
@@ -249,5 +299,42 @@ class JobsLibrary
             )
         );
         $cx->getComponent('Cache')->deleteComponentFiles('Jobs');
+    }
+
+    /**
+     * Fetch IDs of associated flags on job offers
+     *
+     * @param   integer $jobId  If set, only the IDs associated to the job
+     *                          offer identified by $jobId are returned.
+     * @return  array   List of IDs of associated flags
+     */
+    protected function getFlagAssociations($jobId = 0) {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $db = $cx->getDb()->getAdoDb();
+        $associations = array();
+
+        $query = 'SELECT `job`, `flag`
+            FROM `'.DBPREFIX.'module_jobs_rel_flag_job`';
+        if ($jobId) {
+            $query .= ' WHERE `job`=' . intval($jobId);
+        }
+
+        $result = $db->Execute($query);
+        if (
+            !$result ||
+            $result->EOF
+        ) {
+            return array();
+        }
+
+        while (!$result->EOF) {
+            if (!isset($associations[$result->fields['job']])) {
+                $associations[$result->fields['job']] = array();
+            }
+            $associations[$result->fields['job']][] = $result->fields['flag'];
+            $result->MoveNext();
+        }
+
+        return $associations;
     }
 }

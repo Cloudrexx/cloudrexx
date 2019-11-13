@@ -107,8 +107,8 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      */
     public function getDefaultPermissions() {
         return new \Cx\Core_Modules\Access\Model\Entity\Permission(
-            null,
-            null,
+            array(),
+            array(),
             false
         );
     }

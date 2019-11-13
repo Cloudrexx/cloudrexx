@@ -633,3 +633,6 @@ $_ARRAYLANG['TXT_CRM_TASK_STATUS_COMPLETED'] = 'Erledigt';
 $_ARRAYLANG['TXT_ENTER_SORTING']    = 'Geben Sie einen Sortierwert ein';
 $_ARRAYLANG['TXT_SORTING_NUMERIC']  = 'Sortierwert sollte numerisch sein [0-9]';
 $_ARRAYLANG['TXT_ENTRIES_MARKED']   = 'Aufwärtspfeil';
+
+// Settings interface import success message
+$_ARRAYLANG['TXT_CRM_SETTINGS_INTERFACE_IMPORT_SUCCESS'] = 'Datensätze wurden erfolgreich importiert.';

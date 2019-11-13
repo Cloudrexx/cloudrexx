@@ -80,8 +80,26 @@ h1{ font-size: 20px }
 }
 
 #content-manager #cm-left table.adminlist {
+    width: auto;
+    min-width: 100%;
     float: left;
     margin: 11px 0 0 0;
+    white-space: nowrap;
+    background: #0071bc;
+}
+
+#content-manager.cm-single-locale.edit_view .adminlist {
+    margin:0px !important;
+}
+
+#content-manager.edit_view table.adminlist {
+    /* overwrite fix width set by js when expanding translations*/
+    width: auto !important;
+}
+
+#content-manager.edit_view .actions {
+    left: auto !important;
+    right: 0;
 }
 
 .ie7 #input1{ float:left; }
@@ -94,6 +112,12 @@ h1{ font-size: 20px }
     border-left: 1px solid #e5e5e5;
     margin-left: -1px;
     min-height: 31px;
+}
+
+.edit_view #subnav {
+    border-right: 0;
+    border-left: 0;
+    margin-left: 0;
 }
 
 #site-language {
@@ -109,6 +133,14 @@ h1{ font-size: 20px }
     visibility: hidden;
 }
 
+#site-language .chosen-results li:nth-child(n+11) {
+    display: none !important;
+}
+
+.cm-single-locale #site-language {
+    display:none;
+}
+
 #content-manager.edit_view .chzn-container {
     position: relative;
     float: left;
@@ -121,23 +153,37 @@ h1{ font-size: 20px }
     width: 342px !important;
 }
 
-#site-structure {
+#site-structure-wrapper {
     position: relative;
+    width: auto;
+    min-width: 100%;
+}
+
+#site-structure {
     float: left;
-    width: 100%;
+    width: auto;
+    min-width: 100%;
     border-right: 1px solid #e5e5e5;
     border-left: 1px solid #e5e5e5;
     margin-left: -1px;
-    overflow: visible;
+    overflow-y: hidden;
+    overflow-x: auto;
 }
 
-#site-structure th.lastupdate {
+#site-structure .lastupdate {
+    position: absolute;
     text-align: right;
+    left: auto;
+    right: 0;
 }
 
 #content-manager.edit_view #site-structure {
     width: 350px;
     margin: 0;
+}
+
+#content-manager.cm-single-locale.edit_view #site-structure {
+    margin-top:11px;
 }
 
 #site-structure li select {
@@ -174,12 +220,26 @@ h1{ font-size: 20px }
     background-repeat: no-repeat;
 }
 
-#flip-menu .jstree-action.open {
+#flip-menu .jstree-action.open,
+th.translation .switch-tag-dropdown.close  {
     background-image: url('../Media/Expand.png');
 }
 
-#flip-menu .jstree-action.close {
+#flip-menu .jstree-action.close,
+th.translation .switch-tag-dropdown.open {
     background-image: url('../Media/Close.png');
+}
+
+#site-tree .expanded-tags.translations {
+    max-height: 30px;
+    overflow: auto;
+}
+
+th.translation .switch-tag-dropdown {
+    height: 16px;
+    width: 16px;
+    display: inline-block;
+    vertical-align: middle;
 }
 
 #multiple-actions {
@@ -207,6 +267,23 @@ h1{ font-size: 20px }
     margin: 0;
 }
 
+#content-manager table.adminlist th {
+    box-sizing: border-box;
+    display: inline-block;
+    width: auto;
+    height: 31px;
+    line-height: 31px;
+}
+
+#content-manager.edit_view .adminlist th {
+    display: table-cell;
+}
+
+#content-manager .adminlist th.page,
+#site-tree > ul {
+    min-width: 40%;
+}
+
 *+html #site-tree ul,
 *+html #site-tree ul li {
     width: 100%;
@@ -223,10 +300,58 @@ h1{ font-size: 20px }
 #site-tree .jstree-wrapper {
     position: absolute;
     left: 0;
-    width: 100%;
+    width: auto;
+    min-width: 60%;
     height: 30px;
+    padding-left: 40%;
+    display: inline-block;
+    white-space: nowrap;
     border-bottom: 1px solid #e5e5e5;
-    z-index: auto;
+}
+
+#site-tree > ul,
+#site-tree .jstree-wrapper .translations,
+#site-tree .jstree-wrapper .module,
+#site-tree .jstree-wrapper .preview,
+#site-tree .jstree-wrapper .actions,
+#site-tree .jstree-wrapper .lastupdate {
+    box-sizing: border-box;
+}
+
+#content-manager .adminlist th.translation {
+    min-width: 15%;
+}
+
+#site-tree .jstree-wrapper .translations {
+    left: 40%;
+}
+
+#content-manager .adminlist th.module {
+    min-width: 14%;
+}
+
+#site-tree .jstree-wrapper .module {
+    left: 55%;
+}
+
+#content-manager .adminlist th.preview {
+    min-width: 7%;
+}
+
+#site-tree .jstree-wrapper .preview {
+    left: 69%;
+}
+
+#content-manager .adminlist th.actions {
+    min-width: 15%;
+}
+
+#site-tree .jstree-wrapper .actions {
+    left: 76%;
+}
+
+#content-manager .adminlist th.lastupdate {
+    min-width: 9%;
 }
 
 #site-tree .jstree-wrapper.hover,
@@ -239,29 +364,27 @@ h1{ font-size: 20px }
 #site-tree .preview ,
 #site-tree .actions {
     position: absolute;
-    top: 0;
-    float: left;
-    width: auto;
+    float: none;
     height: 30px;
     line-height: 30px;
     font-size: 11px;
+    display: inline-block;
+    white-space: nowrap;
+    vertical-align: middle;
+    padding: 0 10px;
 }
 
 #site-tree .show {
-    display: block;
+    display: inline-block;
 }
 
 #site-tree .hide {
     display: none;
 }
 
-#site-tree .translations {
-    left: 42.7%;
-}
-
-#site-tree .translations .translation {
+#site-tree .translations:not(.dropdown) .translation {
     float: left;
-    width: 21px;
+    width: auto;
     height: 18px;
     background: #9dcb3b;
     margin: 6px 7px 6px 0;
@@ -271,6 +394,7 @@ h1{ font-size: 20px }
     font-size: 10px;
     color: #ffffff;
     opacity: 0.8;
+    padding: 0 5px;
 }
 
 #site-tree .translations .translation:hover,
@@ -279,37 +403,23 @@ h1{ font-size: 20px }
     cursor: pointer;
 }
 
-#site-tree .translations .translation.unpublished {
+#site-tree .translations:not(.dropdown) .translation.unpublished {
     background: #e45f5f;
 }
 
-#site-tree .module {
-    left: 53.8%;
-}
-
-#site-tree .user {
-    left: 65.6%;
-}
-
 #site-tree .preview {
-    left: 70.6%;
-    background: url(../Media/Preview.png) no-repeat left center;
-    padding: 0 0 0 16px !important;
-}
-
-#site-tree .lastupdate {
-    right: 10px;
+    background: url(../Media/Preview.png) no-repeat 10px center;
+    padding: 0 0 0 26px !important;
 }
 
 #site-tree .lastupdate .date {
     position: static;
-    float: left;
     width: auto;
+    min-width: 86px;
 }
 
 #site-tree .lastupdate .user.tp-trigger {
     position: static;
-    float: left;
     width: 14px !important;
     padding: 0 0 0 5px;
     background: url(../Media/User.png) no-repeat right center;
@@ -324,24 +434,33 @@ h1{ font-size: 20px }
     display: none;
 }
 
-#site-tree .actions {
-    left: 77.6%;
-    background: url(../Media/ActionPlus.png) no-repeat left center;
-    padding: 0 0 0 16px;
+#site-tree .actions, #site-tree .translations.dropdown {
+    background: url(../Media/ActionPlus.png) no-repeat 10px center;
+    padding: 0 0 0 26px;
 }
 
 #site-tree .actions:hover,
 #site-tree .actions:focus,
-#site-tree .actions:active {
+#site-tree .actions:active,
+#site-tree .translations.dropdown:hover,
+#site-tree .translations.dropdown:focus,
+#site-tree .translations.dropdown:active {
     cursor: pointer;
 }
 
-#site-tree .actions .label {
-    float: left;
-    width: auto;
+#site-tree .translations .label {
+    display: none;
 }
 
-#site-tree .actions .arrow {
+#site-tree .actions .label,
+#site-tree .translations.dropdown .label {
+    float: left;
+    width: auto;
+    display: inline;
+}
+
+#site-tree .actions .arrow,
+#site-tree .translations.dropdown .arrow {
     float: left;
     width: 13px;
     height: 100%;
@@ -350,6 +469,10 @@ h1{ font-size: 20px }
 
 #content-manager #site-tree {
     padding: 0 0 0 30px;
+    min-width: 100%;
+    display: inline-block;
+    box-sizing: border-box;
+    background: none;
 }
 
 #content-manager.edit_view #site-tree {
@@ -362,8 +485,10 @@ h1{ font-size: 20px }
 }
 
 #content-manager.edit_view #site-tree .actions {
+    position: absolute;
     left: auto;
     right: 10px;
+    min-width: 0;
 }
 
 #content-manager.edit_view #site-tree .actions .label,
@@ -371,23 +496,33 @@ h1{ font-size: 20px }
     display: none;
 }
 
-#site-tree .actions-expanded {
-    display: block;
+#site-tree .actions-expanded,
+#site-tree .translations-expanded {
+    display: inline-block;
     position: absolute;
     top: 23px;
-    left: 0;
-    z-index: 11;
+    left: 10px;
+    z-index: 1;
 }
 
 #content-manager.edit_view #site-tree .actions-expanded {
+    position: absolute;
     left: auto;
+    top: 23px;
     right: 3px;
+    white-space: nowrap;
 }
 
-#site-tree .actions-expanded ul {
+#site-tree .actions-expanded ul,
+#site-tree .translations-expanded ul {
+    padding: 12px 15px;
+}
+
+#site-tree .actions-expanded ul,
+#site-tree .translations-expanded ul {
+    display: inline-block;
     float: left;
     background: #ffffff;
-    padding: 12px 15px;
     border:  1px solid #d3d3d3;
     margin: 0;
     -moz-box-shadow: 2px 4px 5px rgba(153,153,153,0.5),-2px 4px 5px rgba(153,153,153,0.5);
@@ -397,19 +532,36 @@ h1{ font-size: 20px }
     -ms-filter: progid:DXImageTransform.Microsoft.Shadow(Strength=3,Direction=135,Color='#999999');
 }
 
-#site-tree .actions-expanded ul li {
+#site-tree .actions-expanded ul li,
+#site-tree .translations-expanded ul li {
     float: left;
     clear: both;
     line-height: 16px;
-    padding: 0 0 0 21px;
     background-repeat: no-repeat;
     background-position: 2px center;
     margin: 3px 0 3px 0;
-    display: block !important;
+    display: inline-block !important;
 }
 
-#site-tree .actions-expanded ul li::-moz-selection {
+#site-tree .actions-expanded ul li {
+    padding: 0 0 0 21px;
+}
+
+#site-tree .translations-expanded ul li {
+    line-height: 22px;
+}
+
+#site-tree .actions-expanded ul li::-moz-selection,
+#site-tree .translations-expanded ul li::-moz-selection {
     background: none;
+}
+
+#site-tree .translations-expanded ul li {
+    background-image: none;
+}
+
+#site-tree .translations-expanded > ul > li:nth-child(n+11) {
+    display: none !important; /* limit dropdown to 10 locales */
 }
 
 #site-tree .actions-expanded ul li.new {
@@ -450,9 +602,37 @@ h1{ font-size: 20px }
 
 #site-tree .actions-expanded ul li:hover,
 #site-tree .actions-expanded ul li:focus,
-#site-tree .actions-expanded ul li:active {
+#site-tree .actions-expanded ul li:active,
+#site-tree .translations-expanded ul li:hover,
+#site-tree .translations ul li:focus,
+#site-tree .translations ul li:active {
     cursor: pointer;
     color: #757575;
+}
+
+#site-tree .translations-expanded span,
+#site-tree .translations-expanded ins {
+    display: inline-block;
+    float: none;
+    margin: 0;
+    padding: 0;
+    font-size: 12px;
+}
+
+#site-tree .translations-expanded ins {
+    padding-right: 5px;
+}
+
+#site-tree .translations-expanded ins.publishing {
+    position: relative;
+    top: 1px;
+}
+
+#site-tree .translations-expanded span {
+    position: static;
+    height: 17px;
+    line-height: 17px;
+    vertical-align: top;
 }
 
 #site-tree .jstree-icon,
@@ -663,6 +843,10 @@ li.jstree-closed, li.jstree-leaf {
 #content-manager.edit_view #site-structure .user,
 #content-manager.edit_view #site-structure .lastupdate {
     display: none;
+}
+
+#content-manager.edit_view #site-structure .translations.dropdown {
+    display: none !important;
 }
 
 #content-manager.edit_view #site-structure th.page {
@@ -1435,6 +1619,10 @@ div.date img{
     height: 31px;
 }
 
+.chosen-container .chosen-results {
+    max-height: 250px;
+}
+
 .chosen-container-single .chosen-single {
     background-color: #fff;
     background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #eeeeee), color-stop(0.5, white));
@@ -1460,9 +1648,35 @@ div.date img{
 }
 
 #content-manager.edit_view .chosen-container {
-    width: 352px !important;
+    width: 354px !important;
+    margin-right: -2px;
 }
-.margin0 {
-    margin:0px !important;
-}
+
 span.app-template-tooltip { word-wrap: break-word;}
+
+/* hide log column for small screens */
+@media only screen and (max-width: 919px),
+       only screen and (min-width: 1000px) and (max-width: 1139px) {
+    #content-manager #site-structure .lastupdate {
+        display: none;
+    }
+    #content-manager #site-structure .actions {
+        right: 5px;
+        left: auto;
+    }
+    #content-manager #site-structure .actions-expanded {
+        right: 0;
+        left: auto;
+    }
+    #content-manager #site-structure th.actions {
+        text-align: right;
+        position: absolute;
+    }
+}
+
+/* hide preview column for very small screens */
+@media only screen and (max-width: 569px) {
+    #content-manager #site-structure .preview {
+        display: none;
+    }
+}

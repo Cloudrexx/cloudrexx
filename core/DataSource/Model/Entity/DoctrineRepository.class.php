@@ -63,6 +63,28 @@ class DoctrineRepository extends DataSource {
     }
 
     /**
+     * Perform initializations
+     */
+    protected function init() {
+        if (!defined('FRONTEND_LANG_ID')) {
+            // make sure translatable is properly initialized
+            // maybe this should be part of Cx or in a postInit hook
+            $this->cx->getDb()->getTranslationListener()->setTranslatableLocale(
+                \FWLanguage::getLanguageCodeById(\FWLanguage::getDefaultLangId())
+            );
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getIdentifierFieldNames() {
+        $em = $this->cx->getDb()->getEntityManager();
+        $metaData = $em->getClassMetadata($this->getIdentifier());
+        return $metaData->getIdentifierFieldNames();
+    }
+
+    /**
      * Gets one or more entries from this DataSource
      *
      * If an argument is not provided, no restriction is made for this argument.
@@ -88,6 +110,7 @@ class DoctrineRepository extends DataSource {
         $offset = 0,
         $fieldList = array()
     ) {
+        $this->init();
         $em = $this->cx->getDb()->getEntityManager();
 
         $criteria = array();
@@ -103,7 +126,10 @@ class DoctrineRepository extends DataSource {
                 if ($operation == 'in') {
                     $value = explode(',', $value);
                 }
-                $criteria[$field] = array($operation => $value);
+                if (!isset($criteria[$field])) {
+                    $criteria[$field] = array();
+                }
+                $criteria[$field][$operation] = $value;
             }
         }
 
@@ -187,10 +213,21 @@ class DoctrineRepository extends DataSource {
                 $qb->setFirstResult($offset);
             }
         }
-        $result = $qb->getQuery()->getResult('IndexedArray');
+        $result = $qb->getQuery()->getResult();
 
         // $fieldList
-        $dataSet = new \Cx\Core_Modules\Listing\Model\Entity\DataSet($result);
+        $dataSet = new \Cx\Core_Modules\Listing\Model\Entity\DataSet(
+            $result,
+            null,
+            array(
+                'recursions' => $configuredRecursions,
+                'skipVirtual' => true,
+                'dateFormatDatetime' => 'c',
+                'dateFormatTimestamp' => 'c',
+                'dateFormatDate' => ASCMS_DATE_FORMAT_INTERNATIONAL_DATE,
+                'dateFormatTime' => ASCMS_DATE_FORMAT_INTERNATIONAL_TIME,
+            )
+        );
         if (count($fieldList)) {
             $dataFlipped = $dataSet->flip()->toArray();
             foreach ($dataFlipped as $key=>$value) {
@@ -269,6 +306,7 @@ class DoctrineRepository extends DataSource {
      * @return string ID of the new entry
      */
     public function add($data) {
+        $this->init();
         $em = $this->cx->getDb()->getEntityManager();
         $entityClass = $this->getIdentifier();
         $entityClassMetadata = $em->getClassMetadata($entityClass);
@@ -302,10 +340,11 @@ class DoctrineRepository extends DataSource {
      * @throws \Exception If something did not go as planned
      */
     public function update($elementId, $data) {
+        $this->init();
         $em = $this->cx->getDb()->getEntityManager();
         $repo = $this->getRepository();
 
-        $entity = $repo->findBy($elementId);
+        $entity = $repo->findOneBy($elementId);
 
         if (!$entity) {
             throw new \Exception('Entry not found!');
@@ -323,10 +362,11 @@ class DoctrineRepository extends DataSource {
      * @throws \Exception If something did not go as planned
      */
     public function remove($elementId) {
+        $this->init();
         $em = $this->cx->getDb()->getEntityManager();
         $repo = $this->getRepository();
 
-        $entity = $repo->findBy($elementId);
+        $entity = $repo->findOneBy($elementId);
 
         if (!$entity) {
             throw new \Exception('Entry not found!');
@@ -392,11 +432,17 @@ class DoctrineRepository extends DataSource {
             }
             // handle many to many relations
             if ($associationMapping['type'] == \Doctrine\ORM\Mapping\ClassMetadata::MANY_TO_MANY) {
+                // todo: handle or document this case
+                if (is_array($data[$field])) {
+                    continue;
+                }
+
                 // prepare data
                 $foreignEntityIndexes = explode(',', $data[$field]);
                 $targetRepo = $em->getRepository($associationMapping['targetEntity']);
                 $primaryKeys = $entityClassMetadata->getIdentifierFieldNames();
                 $addMethod = 'add'.preg_replace('/_([a-z])/', '\1', ucfirst($field));
+                $getMethod = 'get'.preg_replace('/_([a-z])/', '\1', ucfirst($field));
                 // foreach distant entity
                 foreach ($foreignEntityIndexes as $foreignEntityIndex) {
                     // prepare data
@@ -418,6 +464,12 @@ class DoctrineRepository extends DataSource {
                         throw new \Exception(
                             'Entity not found (' . $associationMapping['targetEntity'] . ' with ID ' . var_export($foreignEntityIndexData, true) . ')'
                         );
+                    }
+                    $existingAssociatedEntities = $entity->$getMethod();
+                    foreach ($existingAssociatedEntities as $existingAssociatedEntity) {
+                        if ($targetEntity == $existingAssociatedEntity) {
+                            continue 2;
+                        }
                     }
                     $entity->$addMethod($targetEntity);
                 }

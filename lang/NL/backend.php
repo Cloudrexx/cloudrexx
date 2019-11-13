@@ -135,7 +135,6 @@ $_ARRAYLANG['TXT_THUMBNAIL_GALLERY'] = "Fotogalerij";
 $_ARRAYLANG['TXT_FROM'] = "van";
 $_ARRAYLANG['TXT_FIRST_NAME'] = "Voornaam";
 $_ARRAYLANG['TXT_PASSWORD_FIELD_EMPTY'] = "Indien het wachtwoordveld leeggelaten wordt, blijft het huidige wachtwoord actief!";
-$_ARRAYLANG['TXT_PASSWORD_MD5_ENCRYPTED'] = "Het wachtwoord is sterk beveiligd door middel van een MD5 encryptie";
 $_ARRAYLANG['TXT_VALUE'] = "Waarde";
 $_ARRAYLANG['TXT_SIZE'] = "Bestandsformaat";
 $_ARRAYLANG['TXT_DATABASE_QUERY_ERROR'] = "Database query error!";

@@ -1153,7 +1153,7 @@ END;
 
                 if (self::isIllegalFileName($file)) {
                     $response->addMessage(
-                        \Cx\Core_Modules\Upload\Controller\UploadResponse::STATUS_ERROR,
+                        \Cx\Core_Modules\Uploader\Controller\UploadResponse::STATUS_ERROR,
                         "You are not able to create the requested file."
                     );
                     \Cx\Lib\FileSystem\FileSystem::delete_file(
@@ -1344,14 +1344,30 @@ END;
         ) {
             return false;
         }
-        if (preg_match("/(?:\.(?:thumb_thumbnail|thumb_medium|thumb_large)\.[^.]+$)|(?:\.thumb)$/i", $fileName)) {
-            $originalFileName = preg_replace("/(?:\.(?:thumb_thumbnail|thumb_medium|thumb_large)(\.[^.]+)$)|(?:\.thumb)$/mi", "$1", $fileName);
-            if (!\Cx\Lib\FileSystem\FileSystem::exists($filePath . '/' . $originalFileName)) {
-                \Cx\Lib\FileSystem\FileSystem::delete_file($filePath . '/'. $fileName);
-            }
+
+        // check if file is a thumbnail
+        if (!preg_match("/(?:\.(?:thumb_thumbnail|thumb_medium|thumb_large)\.[^.]+$)|(?:\.thumb)$/i", $fileName)) {
+            return true;
+        }
+
+        // check if original image of thumbnail exists
+        $originalFileName = preg_replace("/(?:\.(?:thumb_thumbnail|thumb_medium|thumb_large)(\.[^.]+)$)|(?:\.thumb)$/mi", "$1", $fileName);
+        if (\Cx\Lib\FileSystem\FileSystem::exists($filePath . '/' . $originalFileName)) {
             return false;
         }
-        return true;
+
+        // check if original image of thumbnail exists, by making the
+        // file extension of the image all uppercase
+        $fileInfo = pathinfo($originalFileName);
+        $originalFileName = $fileInfo['filename'] . '.' . strtoupper($fileInfo['extension']);
+        if (\Cx\Lib\FileSystem\FileSystem::exists($filePath . '/' . $originalFileName)) {
+            return false;
+        }
+
+        // original image of thumbnail does not exists,
+        // therefore, we shall drop the orphaned thumbnail image
+        \Cx\Lib\FileSystem\FileSystem::delete_file($filePath . '/'. $fileName);
+        return false;
     }
 
     /**

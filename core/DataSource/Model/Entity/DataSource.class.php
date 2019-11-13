@@ -205,6 +205,12 @@ abstract class DataSource extends \Cx\Model\Base\EntityBase {
     public abstract function listFields();
 
     /**
+     * Returns a list of field names that uniquely identify objects
+     * @return array List of field names
+     */
+    public abstract function getIdentifierFieldNames();
+
+    /**
      * Tells whether this DataSource has a field named $field
      * @param string $field Name of a field
      * @return boolean True if $field exists in this DataSource, false otherwise

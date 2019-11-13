@@ -767,7 +767,7 @@ class Setting{
                     $element .= \Html::getHidden($name, $arrSetting['value'], $name);
                     $mediaBrowser = new \Cx\Core_Modules\MediaBrowser\Model\Entity\MediaBrowser();
                     $mediaBrowser->setCallback($name.'Callback');
-                    $mediaBrowser->setOptions(array('type' => 'button','data-cx-mb-views' => 'filebrowser'));
+                    $mediaBrowser->setOptions(array('type' => 'button','views' => 'filebrowser'));
                     $element .= $mediaBrowser->getXHtml($_ARRAYLANG['TXT_BROWSE']);
                     \JS::registerCode('
                         function ' . $name . 'Callback(data) {
@@ -968,7 +968,9 @@ class Setting{
                             }
                         } else {
                             // No file uploaded.  Skip.
-                            if (empty($_FILES[$name]['name'])) continue;
+                            if (empty($_FILES[$name]['name'])) {
+                                continue 2;
+                            }
                             // $value is the target folder path
                             $target_path = $value . '/' . $_FILES[$name]['name'];
                             // TODO: Test if this works in all browsers:
@@ -1042,6 +1044,33 @@ class Setting{
                         }
                         $value = '';
                       break;
+
+                    case self::TYPE_TEXT:
+                        // option not changed -> abort
+                        if ($value == $arrSettings[$name]['value']) {
+                            break;
+                        }
+                        // fetch setting options
+                        $options = json_decode(
+                            $arrSettings[$name]['values'],
+                            true
+                        );
+                        if (!isset($options['type'])) {
+                            // setting not special -> abort
+                            break;
+                        }
+
+                        // process special parsing
+                        switch ($options['type']) {
+                            case 'filesize':
+                                $value = static::parseFileSizeValue($value);
+                                break;
+
+                            default:
+                                break;
+                        }
+                        break;
+
                     default:
                         // Regular value of any other type
                         break;
@@ -1075,6 +1104,23 @@ class Setting{
         }
         // There has been an error anyway
         return false;
+    }
+
+    /**
+     * Parses value into literal file size notation
+     * @param   string  $value  File size in bytes or literal file size
+     *                          notation.
+     * @return  string  Literal file size notation. I.e.: 10 MB / 1 GB
+     */
+    protected static function parseFileSizeValue($value) {
+        // get bytes of set upload limit
+        if (preg_match('/^\d+$/', $value)) {
+            $bytes = $value;
+        } else {
+            $bytes = \FWSystem::getBytesOfLiteralSizeFormat($value);
+        }
+        // convert bytes into human readable format
+        return \FWSystem::getLiteralSizeFormat($bytes);
     }
 
     /**

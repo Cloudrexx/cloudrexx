@@ -4,7 +4,7 @@
  * Cloudrexx
  *
  * @link      http://www.cloudrexx.com
- * @copyright Cloudrexx AG 2007-2018
+ * @copyright Cloudrexx AG 2007-2019
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -31,7 +31,7 @@
  * @copyright   CLOUDREXX CMS - Cloudrexx AG Thun
  * @author      Dario Graf <info@cloudrexx.com>
  * @package     cloudrexx
- * @subpackage  module_user
+ * @subpackage  core_user
  * @version     5.0.0
  */
 namespace Cx\Core\User\Model\Entity;
@@ -42,17 +42,10 @@ namespace Cx\Core\User\Model\Entity;
  * @copyright   CLOUDREXX CMS - Cloudrexx AG Thun
  * @author      Dario Graf <info@cloudrexx.com>
  * @package     cloudrexx
- * @subpackage  module_user
+ * @subpackage  core_user
  * @version     5.0.0
  */
-class UserAttributeName extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\Translatable{
-    /**
-     * @Gedmo\Locale
-     * Used locale to override Translation listener`s locale
-     * this is not a mapped field of entity metadata, just a simple property
-     */
-    protected $locale;
-
+class UserAttributeName extends \Cx\Model\Base\EntityBase {
     /**
      * @var integer
      */
@@ -69,6 +62,11 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase implements \Gedmo\Tran
     protected $langId = 0;
 
     /**
+     * @var integer
+     */
+    protected $order = 0;
+
+    /**
      * @var string
      */
     protected $name = '';
@@ -78,14 +76,6 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase implements \Gedmo\Tran
      */
     protected $userAttribute;
 
-    /**
-     * Set translatable locale
-     * @param \Gedmo\Locale $locale
-     */
-    public function setTranslatableLocale($locale)
-    {
-        $this->locale = $locale;
-    }
     /**
      * Get id
      *
@@ -109,7 +99,7 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase implements \Gedmo\Tran
     /**
      * Get attributeId
      *
-     * @return integer
+     * @return integer 
      */
     public function getAttributeId()
     {
@@ -120,7 +110,6 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase implements \Gedmo\Tran
      * Set langId
      *
      * @param integer $langId
-     * @return UserAttributeName
      */
     public function setLangId($langId)
     {
@@ -130,7 +119,7 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase implements \Gedmo\Tran
     /**
      * Get langId
      *
-     * @return integer
+     * @return integer 
      */
     public function getLangId()
     {
@@ -141,19 +130,16 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase implements \Gedmo\Tran
      * Set name
      *
      * @param string $name
-     * @return UserAttributeName
      */
     public function setName($name)
     {
         $this->name = $name;
-
-        return $this;
     }
 
     /**
      * Get name
      *
-     * @return string
+     * @return string 
      */
     public function getName()
     {
@@ -161,12 +147,31 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase implements \Gedmo\Tran
     }
 
     /**
+     * Set order
+     *
+     * @param string $order
+     */
+    public function setOrder($order)
+    {
+        $this->order = $order;
+    }
+
+    /**
+     * Get order
+     *
+     * @return string
+     */
+    public function getOrder()
+    {
+        return $this->order;
+    }
+
+    /**
      * Set userAttribute
      *
      * @param \Cx\Core\User\Model\Entity\UserAttribute $userAttribute
-     * @return UserAttributeName
      */
-    public function setUserAttribute(\Cx\Core\User\Model\Entity\UserAttribute $userAttribute = null)
+    public function setUserAttribute(\Cx\Core\User\Model\Entity\UserAttribute $userAttribute)
     {
         $this->userAttribute = $userAttribute;
     }
@@ -174,7 +179,7 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase implements \Gedmo\Tran
     /**
      * Get userAttribute
      *
-     * @return \Cx\Core\User\Model\Entity\UserAttribute
+     * @return \Cx\Core\User\Model\Entity\UserAttribute 
      */
     public function getUserAttribute()
     {

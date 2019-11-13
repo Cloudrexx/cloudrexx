@@ -578,12 +578,25 @@ class MediaDirectoryLibrary
 
     /**
      * Get SQL statement to fetch the ID of the primary field of a form.
-     * The SQL statement can be used as a sub-query in a query where contrexx_module_mediadir_entry
-     * is used and has been aliased as 'entry'
+     * The SQL statement can be used as a sub-query in a query where
+     * contrexx_module_mediadir_entry is used and has been aliased as 'entry'
      *
-     * @return string
+     * @return string   The SQL statement to be used as sub-query
      */
     public function getQueryToFindPrimaryInputFieldId() 
+    {
+        return $this->getQueryToFindInputFieldIdByContextType('title');
+    }
+
+    /**
+     * Get SQL statement to fetch the ID of the field of a form identified by
+     * its context.
+     * The SQL statement can be used as a sub-query in a query where
+     * contrexx_module_mediadir_entry is used and has been aliased as 'entry'
+     *
+     * @return string   The SQL statement to be used as sub-query
+     */
+    protected function getQueryToFindInputFieldIdByContextType($type)
     {
         $query = "SELECT
                         first_rel_inputfield.`field_id` AS `id`
@@ -600,7 +613,7 @@ class MediaDirectoryLibrary
                     AND
                         (first_rel_inputfield.`form_id` = entry.`form_id`)
                     ORDER BY
-                        FIELD(inputfield.context_type, 'title') DESC,
+                        FIELD(inputfield.context_type, '".$type."') DESC,
                         inputfield.`order` ASC
                     LIMIT 1";
         return $query;
@@ -1391,6 +1404,8 @@ EOF;
      * - MEDIADIR_CONFIG_FILTER_CATEGORY_<id> => filter by category
      * - MEDIADIR_CONFIG_FILTER_LEVEL_<id> => filter by level
      * - MEDIADIR_CONFIG_FILTER_AUTO => filter by supplied arguments as default
+     * - MEDIADIR_CONFIG_SORT_POPULAR => order entries by popularity
+     * - MEDIADIR_CONFIG_SORT_ALPHABETICAL => order entries alphabetically
      *
      * @param   string  $block Name of the template block to look up for
      *                         functional placeholders
@@ -1417,7 +1432,10 @@ EOF;
      *                           'form' => 3,
      *                           'category' => 4,
      *                           'level' => 5
-     *                      )
+     *                      ),
+     *                      'sort' => array(
+     *                          'alphabetical' => true,
+     *                      ),
      *                  )</pre>
      *                  Note: the sub entries in array 'list' and array 'filter'
      *                  are optional. They will only be set in case the
@@ -1428,6 +1446,7 @@ EOF;
         $config = array(
             'list' => array(),
             'filter' => array(),
+            'sort' => array(),
         );
 
         // abort in case the template is invalid
@@ -1439,8 +1458,8 @@ EOF;
         $placeholderListAsString = join("\n", $placeholderList);
         $match = null;
         if (preg_match_all(
-                '/MEDIADIR_CONFIG_(FILTER|LIST)_' // $1
-                . '(LATEST|LIMIT|OFFSET|FORM|CATEGORY|LEVEL|ASSOCIATED)' // $2
+                '/MEDIADIR_CONFIG_(FILTER|LIST|SORT)_' // $1
+                . '(LATEST|LIMIT|OFFSET|FORM|CATEGORY|LEVEL|ASSOCIATED|POPULAR|ALPHABETICAL)' // $2
                 . '(?:_([0-9]+))?/', // $3
                 $placeholderListAsString, $match)) {
             foreach ($match[2] as $idx => $key) {

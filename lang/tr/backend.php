@@ -135,7 +135,6 @@ $_ARRAYLANG['TXT_THUMBNAIL_GALLERY'] = "Resim galerisi";
 $_ARRAYLANG['TXT_FROM'] = "den/dan";
 $_ARRAYLANG['TXT_FIRST_NAME'] = "İsim";
 $_ARRAYLANG['TXT_PASSWORD_FIELD_EMPTY'] = "Şifre bölgesi boş kalırsa, güncel şifre kullanılır!";
-$_ARRAYLANG['TXT_PASSWORD_MD5_ENCRYPTED'] = "Şifre  MD5 Logaritması ile kodlanıyor.";
 $_ARRAYLANG['TXT_VALUE'] = "Değer";
 $_ARRAYLANG['TXT_SIZE'] = "Veriler (Dosyalar) Büyüklüğü";
 $_ARRAYLANG['TXT_DATABASE_QUERY_ERROR'] = "Veritabanı sorgulamasında  bir hata var!";

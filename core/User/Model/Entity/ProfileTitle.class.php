@@ -4,7 +4,7 @@
  * Cloudrexx
  *
  * @link      http://www.cloudrexx.com
- * @copyright Cloudrexx AG 2007-2018
+ * @copyright Cloudrexx AG 2007-2019
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -31,7 +31,7 @@
  * @copyright   CLOUDREXX CMS - Cloudrexx AG Thun
  * @author      Dario Graf <info@cloudrexx.com>
  * @package     cloudrexx
- * @subpackage  module_user
+ * @subpackage  core_user
  * @version     5.0.0
  */
 namespace Cx\Core\User\Model\Entity;
@@ -42,7 +42,7 @@ namespace Cx\Core\User\Model\Entity;
  * @copyright   CLOUDREXX CMS - Cloudrexx AG Thun
  * @author      Dario Graf <info@cloudrexx.com>
  * @package     cloudrexx
- * @subpackage  module_user
+ * @subpackage  core_user
  * @version     5.0.0
  */
 class ProfileTitle extends \Cx\Model\Base\EntityBase {
@@ -88,7 +88,6 @@ class ProfileTitle extends \Cx\Model\Base\EntityBase {
      * Set title
      *
      * @param string $title
-     * @return ProfileTitle
      */
     public function setTitle($title)
     {
@@ -109,7 +108,6 @@ class ProfileTitle extends \Cx\Model\Base\EntityBase {
      * Set orderId
      *
      * @param integer $orderId
-     * @return ProfileTitle
      */
     public function setOrderId($orderId)
     {
@@ -130,13 +128,10 @@ class ProfileTitle extends \Cx\Model\Base\EntityBase {
      * Add userProfile
      *
      * @param \Cx\Core\User\Model\Entity\UserProfile $userProfile
-     * @return ProfileTitle
      */
     public function addUserProfile(\Cx\Core\User\Model\Entity\UserProfile $userProfile)
     {
         $this->userProfile[] = $userProfile;
-
-        return $this;
     }
 
     /**

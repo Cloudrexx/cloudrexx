@@ -73,10 +73,10 @@ class UserAttributeName extends \Cx\Core\User\Model\Entity\UserAttributeName imp
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttributeName' . "\0" . 'attributeId', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttributeName' . "\0" . 'langId', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttributeName' . "\0" . 'name', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttributeName' . "\0" . 'userAttribute', 'validators', 'virtual');
+            return array('__isInitialized__', 'id', 'attributeId', 'langId', 'order', 'name', 'userAttribute', 'validators', 'virtual');
         }
 
-        return array('__isInitialized__', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttributeName' . "\0" . 'attributeId', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttributeName' . "\0" . 'langId', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttributeName' . "\0" . 'name', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\UserAttributeName' . "\0" . 'userAttribute', 'validators', 'virtual');
+        return array('__isInitialized__', 'id', 'attributeId', 'langId', 'order', 'name', 'userAttribute', 'validators', 'virtual');
     }
 
     /**
@@ -185,6 +185,21 @@ class UserAttributeName extends \Cx\Core\User\Model\Entity\UserAttributeName imp
     /**
      * {@inheritDoc}
      */
+    public function getId()
+    {
+        if ($this->__isInitialized__ === false) {
+            return (int)  parent::getId();
+        }
+
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getId', array());
+
+        return parent::getId();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function setAttributeId($attributeId)
     {
 
@@ -198,10 +213,6 @@ class UserAttributeName extends \Cx\Core\User\Model\Entity\UserAttributeName imp
      */
     public function getAttributeId()
     {
-        if ($this->__isInitialized__ === false) {
-            return (int)  parent::getAttributeId();
-        }
-
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getAttributeId', array());
 
@@ -224,10 +235,6 @@ class UserAttributeName extends \Cx\Core\User\Model\Entity\UserAttributeName imp
      */
     public function getLangId()
     {
-        if ($this->__isInitialized__ === false) {
-            return (int)  parent::getLangId();
-        }
-
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getLangId', array());
 
@@ -254,6 +261,28 @@ class UserAttributeName extends \Cx\Core\User\Model\Entity\UserAttributeName imp
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getName', array());
 
         return parent::getName();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setOrder($order)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setOrder', array($order));
+
+        return parent::setOrder($order);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getOrder()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getOrder', array());
+
+        return parent::getOrder();
     }
 
     /**
@@ -309,6 +338,17 @@ class UserAttributeName extends \Cx\Core\User\Model\Entity\UserAttributeName imp
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'isVirtual', array());
 
         return parent::isVirtual();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
     }
 
     /**
