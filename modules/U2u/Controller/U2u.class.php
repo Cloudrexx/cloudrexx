@@ -404,7 +404,7 @@ class U2u extends U2uLibrary
             $userEmail  = $this->_getEmail($objValue['buddies_id']);
             $userCity   = $this->_getCity($objValue['buddies_id']);
             $userSite   = $this->_getSite($objValue['buddies_id']);
-            var_dump($userSite);
+
             if($userSite['website']=="") {
                 $imgPath = "modules/U2u/View/Media/home_disabled.gif";
             } else {
@@ -429,7 +429,7 @@ class U2u extends U2uLibrary
             ));
             $this->_objTpl->parse('address_list');
             $i++;
-      }die();
+      }
       if($_CONFIG['corePagingLimit'] < $count) {
           $this->_objTpl->setVariable("ADDRESS_BOOK_PAGINATION",$paging);
       }
