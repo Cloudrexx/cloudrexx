@@ -116,7 +116,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
      */
     public function __construct()
     {
-        $this->parent = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->children = new \Doctrine\Common\Collections\ArrayCollection();
         $this->userAttributeName = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
