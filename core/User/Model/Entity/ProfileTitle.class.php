@@ -128,13 +128,10 @@ class ProfileTitle extends \Cx\Model\Base\EntityBase {
      * Add userProfile
      *
      * @param \Cx\Core\User\Model\Entity\UserProfile $userProfile
-     * @return ProfileTitle
      */
     public function addUserProfile(\Cx\Core\User\Model\Entity\UserProfile $userProfile)
     {
         $this->userProfile[] = $userProfile;
-
-        return $this;
     }
 
     /**

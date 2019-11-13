@@ -810,13 +810,10 @@ class User extends \Cx\Model\Base\EntityBase {
      * Add group
      *
      * @param \Cx\Core\User\Model\Entity\Group $group
-     * @return User
      */
     public function addGroup(\Cx\Core\User\Model\Entity\Group $group)
     {
         $this->group[] = $group;
-
-        return $this;
     }
 
     /**
