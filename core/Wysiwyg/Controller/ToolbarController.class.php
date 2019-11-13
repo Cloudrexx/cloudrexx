@@ -646,14 +646,13 @@ class ToolbarController extends \Cx\Core\Core\Model\Entity\Controller {
      */
     public function getToolbarByGroupId($groupId) {
         // Prepare the query to load the user group toolbar
-        $query = 'SELECT `toolbar` FROM `' . DBPREFIX . 'access_user_groups`
-                      WHERE `group_id` = ' . intval($groupId) . '
-                      LIMIT 1';
-        $toolbarIdRes = $this->dbCon->Execute($query);
+        $objFWUser = \FWUser::getFWUserObject();
+        $toolbarIdRes = $objFWUser->objGroup->getGroup(intval($groupId));
+
         // Verify that the query could be executed
         if ($toolbarIdRes) {
             // Fetch the toolbar id
-            $toolbarId = $toolbarIdRes->fields['toolbar'];
+            $toolbarId = $toolbarIdRes->getToolbar();
             if (!empty($toolbarId)) {
                return $toolbarId;
             }
