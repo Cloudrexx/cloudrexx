@@ -50,6 +50,7 @@ class UserGroup
     private $is_active;
     private $type;
     private $homepage;
+    protected $toolbar;
 
     private $arrLoadedGroups = array();
     private $arrCache = array();
@@ -61,6 +62,7 @@ class UserGroup
         'is_active',
         'type',
         'homepage',
+        'toolbar',
     );
 
     private $arrTypes = array(
@@ -231,6 +233,7 @@ class UserGroup
             $this->is_active = isset($this->arrCache[$id]['is_active']) ? (bool)$this->arrCache[$id]['is_active'] : false;
             $this->type = isset($this->arrCache[$id]['type']) ? $this->arrCache[$id]['type'] : $this->defaultType;
             $this->homepage = isset($this->arrCache[$id]['homepage']) ? $this->arrCache[$id]['homepage'] : '';
+            $this->toolbar = isset($this->arrCache[$id]['toolbar']) ? $this->arrCache[$id]['toolbar'] : '';
             $this->arrDynamicPermissions = null;
             $this->arrStaticPermissions = null;
             $this->arrUsers = null;
@@ -657,6 +660,11 @@ class UserGroup
     public function getType()
     {
         return $this->type;
+    }
+
+    public function getToolbar()
+    {
+        return $this->toolbar;
     }
 
     public function getHomepage()
