@@ -1366,7 +1366,12 @@ class User extends User_Profile
         if ($objUser !== false && $objUser->RecordCount() > 0) {
             while (!$objUser->EOF) {
                 foreach ($objUser->fields as $attributeId => $value) {
-                    $this->arrCachedUsers[$objUser->fields['id']][$attributeId] = $this->arrLoadedUsers[$objUser->fields['id']][$attributeId] = $value;
+                    $profileAttributeId = $this->objAttribute->getProfileAttributeIdByAttributeId($attributeId);
+                    if ($this->objAttribute->isCoreAttribute($profileAttributeId)) {
+                        $this->arrCachedUsers[$objUser->fields['id']]['profile'][$profileAttributeId][0] = $this->arrLoadedUsers[$objUser->fields['id']]['profile'][$profileAttributeId][0] = $value;
+                    } else {
+                        $this->arrCachedUsers[$objUser->fields['id']][$attributeId] = $this->arrLoadedUsers[$objUser->fields['id']][$attributeId] = $value;
+                    }
                 }
                 $this->arrCachedUsers[$objUser->fields['id']]['networks'] = $this->arrLoadedUsers[$objUser->fields['id']]['networks'] = new \Cx\Lib\User\User_Networks($objUser->fields['id']);
                 $objUser->MoveNext();
