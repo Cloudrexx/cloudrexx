@@ -344,10 +344,23 @@ class SystemComponentBackendController extends Controller {
     public function parsePage(\Cx\Core\Html\Sigma $template, array $cmd, &$isSingle = false) {
         global $_ARRAYLANG;
 
+        // Last entry will be empty if we're on a nav-entry without children
+        // or on the first child of a nav-entry.
+        // The following code works fine as long as we don't want an entity
+        // view on the first child of a nav-entry or introduce a third
+        // nav-level. If we want either, we need to refactor getCommands() and
+        // parseNavigation().
+        $entityName = '';
+        if (!empty($cmd) && !empty($cmd[count($cmd) - 1])) {
+            $entityName = $cmd[count($cmd) - 1];
+        } else if (!empty($cmd)) {
+            $entityName = $cmd[0];
+        }
+
         // Parse entity view generation pages
-        $entityClassName = $this->getNamespace() . '\\Model\\Entity\\' . current($cmd);
+        $entityClassName = $this->getNamespace() . '\\Model\\Entity\\' . $entityName;
         if (in_array($entityClassName, $this->getEntityClasses())) {
-            return $this->parseEntityClassPage($template, $entityClassName, current($cmd), array(), $isSingle);
+            return $this->parseEntityClassPage($template, $entityClassName, $entityName, array(), $isSingle);
         }
 
         // Not an entity, parse overview or settings
@@ -396,7 +409,7 @@ class SystemComponentBackendController extends Controller {
                                 $this->getName(),
                                 'nonempty',
                                 $config['corePagingLimit'],
-                                'settings/email'
+                                'Settings/email'
                             )->get()
                         );
                         break;

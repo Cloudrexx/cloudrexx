@@ -46,7 +46,7 @@ namespace Cx\Core\Test\Model\Entity;
  * @package     cloudrexx
  * @subpackage  core_test
  */
-abstract class ContrexxTestCase extends \PHPUnit_Framework_TestCase {
+abstract class ContrexxTestCase extends \PHPUnit\Framework\TestCase {
     protected static $cx;
 
     public function __construct() {

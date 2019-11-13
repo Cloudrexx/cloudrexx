@@ -210,7 +210,24 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                     //    mediadirList_level_5
                     $block = 'mediadirList_'.$objectType.'_'.$objectId;
                     if ($objTemplate->blockExists($block)) {
-                        $config = MediaDirectoryLibrary::fetchMediaDirListConfigFromTemplate($block, $objTemplate);
+                        $categoryId = null;
+                        $levelId = null;
+                        $requestParams = $this->cx->getRequest()->getUrl()->getParamArray();
+                        $categoryId = 0;
+                        if (isset($requestParams['cid'])) {
+                            $categoryId = intval($requestParams['cid']);
+                        }
+                        $levelId = 0;
+                        if (isset($requestParams['lid'])) {
+                            $levelId = intval($requestParams['lid']);
+                        }
+                        $config = MediaDirectoryLibrary::fetchMediaDirListConfigFromTemplate(
+                            $block,
+                            $objTemplate,
+                            null,
+                            $categoryId,
+                            $levelId
+                        );
                         $config['filter'][$objectType] = $objectId;
                         $objMediadir->parseEntries($objTemplate, $block, $config);
                         $foundOne = true;
@@ -339,6 +356,9 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 $formId = null;
                 $formData = $objMediaDirectoryEntry->getFormData();
                 foreach ($formData as $arrForm) {
+                    if (empty($arrForm['formCmd'])) {
+                        continue;
+                    }
                     if ($arrForm['formCmd'] == $cmd) {
                         $formId = $arrForm['formId'];
                         break;

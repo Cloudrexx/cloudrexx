@@ -11,11 +11,15 @@ Cx\Core\User\Model\Entity\UserAttributeValue:
       type: integer
       column: attribute_id
       associationKey: true
+      options:
+        unsigned: true
     userId:
       id: true
       type: integer
       column: user_id
       associationKey: true
+      options:
+        unsigned: true
     history:
       id: true
       type: integer
@@ -23,20 +27,27 @@ Cx\Core\User\Model\Entity\UserAttributeValue:
       column: history_id
       options:
         default: 0
+        unsigned: true
     value:
       type: text
       length: 65535
       nullable: false
   manyToOne:
-#    attribute:
-#      targetEntity: Cx\Core\User\Model\Entity\UserAttribute
-#      inversedBy: userAttributeValue
-#      joinColumns:
-#        attribute_id:
-#          referencedColumnName: id
+    userAttribute:
+      targetEntity: Cx\Core\User\Model\Entity\UserAttribute
+      inversedBy: userAttributeValue
+      joinColumns:
+        attribute_id:
+          referencedColumnName: id
+          options:
+            unsigned: true
     user:
-      targetEntity: Cx\Core\User\Model\Entity\UserProfile
-      inversedBy: userAttributeValues
+      targetEntity: Cx\Core\User\Model\Entity\User
+      inversedBy: userAttributeValue
       joinColumns:
         user_id:
-          referencedColumnName: user_id
+          onDelete: RESTRICT
+          onUpdate: RESTRICT
+          referencedColumnName: id
+          options:
+            unsigned: true

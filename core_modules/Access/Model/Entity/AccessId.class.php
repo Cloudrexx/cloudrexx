@@ -58,16 +58,6 @@ class AccessId extends \Cx\Model\Base\EntityBase {
     private $contrexxAccessUserAttributeRead;
 
     /**
-     * @var Cx\Core\User\Model\Entity\CoreAttribute
-     */
-    private $coreAttribute;
-
-    /**
-     * @var Cx\Core\User\Model\Entity\CoreAttribute
-     */
-    private $coreAttributeRead;
-
-    /**
      * @var Cx\Core\User\Model\Entity\Group
      */
     private $group2;
@@ -158,26 +148,6 @@ class AccessId extends \Cx\Model\Base\EntityBase {
     }
 
     /**
-     * Add coreAttribute
-     *
-     * @param Cx\Core\User\Model\Entity\CoreAttribute $coreAttribute
-     */
-    public function addCoreAttribute(\Cx\Core\User\Model\Entity\CoreAttribute $coreAttribute)
-    {
-        $this->coreAttribute[] = $coreAttribute;
-    }
-
-    /**
-     * Get coreAttribute
-     *
-     * @return Doctrine\Common\Collections\Collection $coreAttribute
-     */
-    public function getCoreAttribute()
-    {
-        return $this->coreAttribute;
-    }
-
-    /**
      * Add group2
      *
      * @param Cx\Core\User\Model\Entity\Group $group2
@@ -236,25 +206,4 @@ class AccessId extends \Cx\Model\Base\EntityBase {
     {
         return $this->contrexxAccessUserAttributeRead;
     }
-
-    /**
-     * Add coreAttributeRead
-     *
-     * @param Cx\Core\User\Model\Entity\CoreAttribute $coreAttributeRead
-     */
-    public function addCoreAttributeRead(\Cx\Core\User\Model\Entity\CoreAttribute $coreAttributeRead)
-    {
-        $this->coreAttributeRead[] = $coreAttributeRead;
-    }
-
-    /**
-     * Get coreAttributeRead
-     *
-     * @return Doctrine\Common\Collections\Collection $coreAttribute
-     */
-    public function getCoreAttributeRead()
-    {
-        return $this->coreAttributeRead;
-    }
-
 }

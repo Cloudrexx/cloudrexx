@@ -238,7 +238,7 @@ class ViewManager
 
     function __construct()
     {
-        global  $_ARRAYLANG, $objDatabase;
+        global  $_ARRAYLANG;
 
         $this->cx         = \Cx\Core\Core\Controller\Cx::instanciate();
         $this->fileSystem = $this->cx->getMediaSourceManager()->getMediaType('themes')->getFileSystem();
@@ -268,7 +268,6 @@ class ViewManager
             $this->webPath = $this->webPath . '/';
         }
 
-        $objDatabase->Execute("OPTIMIZE TABLE ".DBPREFIX."skins");
         $this->oldTable = DBPREFIX."themes";
 
         $this->themeRepository = new \Cx\Core\View\Model\Repository\ThemeRepository();
@@ -1649,7 +1648,7 @@ CODE;
     function getDropdownNotInDb()
     {
         
-        $filesList     = $this->fileSystem->getFileList('/');
+        $filesList     = $this->fileSystem->getFullFileList('/');
 
         ksort($filesList);
         $result = '';
@@ -1697,7 +1696,7 @@ CODE;
         $pageContent = contrexx_input2raw($_POST['content']);
 
         // Change the replacement variables from [[TITLE]] into {TITLE}
-        $pageContent = preg_replace('/\[\[([A-Z0-9_]*?)\]\]/', '{\\1}' ,$pageContent);
+        $pageContent = preg_replace('/\[\[([A-Z0-9_]+)\]\]/', '{\\1}' ,$pageContent);
 
         try {
             if (self::isFileTypeComponent($themesPage)) {
@@ -2248,7 +2247,7 @@ CODE;
             $content = $this->fileSystem->readFile($file);
 
             // replace placeholder format
-            $content = preg_replace('/\{([A-Z0-9_]*?)\}/', '[[\\1]]', $content);
+            $content = preg_replace('/\{([A-Z0-9_]+)\}/', '[[\\1]]', $content);
 
             // escape special characters
             $contenthtml = htmlspecialchars($content);
@@ -2430,21 +2429,34 @@ CODE;
             return false;
         }
 
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $componentFilePath = '';
+        $isCustomized = false;
+        $isWebsite = false;
+
         $offset = 'Template/Frontend';
         if (substr($path, -3, 3) == 'css') {
             $offset = 'Style';
         }
+
         //get the Core Modules File path
         if (preg_match('#^\/'. \Cx\Core\Core\Model\Entity\SystemComponent::TYPE_CORE_MODULE .'#i', $path)) {
-            return \Env::get('cx')->getCoreModuleFolderName() .'/'.$moduleName . ($loadFromComponentDir ? '/View' : '') .'/'.$offset.'/' . $fileName;
-        }
+            $componentFilePath = \Env::get('cx')->getCoreModuleFolderName() .'/'.$moduleName . ($loadFromComponentDir ? '/View' : '') .'/'.$offset.'/' . $fileName;
 
         //get the Modules File path
-        if (preg_match('#^\/'. \Cx\Core\Core\Model\Entity\SystemComponent::TYPE_MODULE .'#i', $path)) {
-            return \Env::get('cx')->getModuleFolderName() .'/'. $moduleName . ($loadFromComponentDir ? '/View' : '') .'/'.$offset.'/' . $fileName;
+        } elseif (preg_match('#^\/'. \Cx\Core\Core\Model\Entity\SystemComponent::TYPE_MODULE .'#i', $path)) {
+            $componentFilePath = \Env::get('cx')->getModuleFolderName() .'/'. $moduleName . ($loadFromComponentDir ? '/View' : '') .'/'.$offset.'/' . $fileName;
+        } else {
+            return false;
         }
 
-        return false;
+        // check for customized version
+        $customizedComponentFilePath = $cx->getClassLoader()->getFilePath($componentFilePath, $isCustomized, $isWebsite, true);
+        if ($customizedComponentFilePath) {
+            return $customizedComponentFilePath;
+        }
+
+        return $componentFilePath;
     }
 
     /**

@@ -4,7 +4,7 @@
  * Cloudrexx
  *
  * @link      http://www.cloudrexx.com
- * @copyright Cloudrexx AG 2007-2015
+ * @copyright Cloudrexx AG 2007-2019
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -25,33 +25,50 @@
  * our trademarks remain entirely with us.
  */
 
-
+/**
+ * The profile title is assigned to the users.
+ *
+ * @copyright   CLOUDREXX CMS - Cloudrexx AG Thun
+ * @author      Dario Graf <info@cloudrexx.com>
+ * @package     cloudrexx
+ * @subpackage  core_user
+ * @version     5.0.0
+ */
 namespace Cx\Core\User\Model\Entity;
 
 /**
- * \Cx\Core\User\Model\Entity\ProfileTitle
+ * The profile title is assigned to the users.
+ *
+ * @copyright   CLOUDREXX CMS - Cloudrexx AG Thun
+ * @author      Dario Graf <info@cloudrexx.com>
+ * @package     cloudrexx
+ * @subpackage  core_user
+ * @version     5.0.0
  */
 class ProfileTitle extends \Cx\Model\Base\EntityBase {
     /**
-     * @var integer $id
+     * @var integer
      */
-    private $id;
+    protected $id;
 
     /**
-     * @var string $title
+     * @var string
      */
-    private $title;
+    protected $title = '';
 
     /**
-     * @var integer $orderId
+     * @var integer
      */
-    private $orderId;
+    protected $orderId = 0;
 
     /**
      * @var \Doctrine\Common\Collections\Collection
      */
-    private $userProfile;
+    protected $userProfile;
 
+    /**
+     * Constructor
+     */
     public function __construct()
     {
         $this->userProfile = new \Doctrine\Common\Collections\ArrayCollection();
@@ -60,7 +77,7 @@ class ProfileTitle extends \Cx\Model\Base\EntityBase {
     /**
      * Get id
      *
-     * @return integer $id
+     * @return integer 
      */
     public function getId()
     {
@@ -80,7 +97,7 @@ class ProfileTitle extends \Cx\Model\Base\EntityBase {
     /**
      * Get title
      *
-     * @return string $title
+     * @return string 
      */
     public function getTitle()
     {
@@ -100,7 +117,7 @@ class ProfileTitle extends \Cx\Model\Base\EntityBase {
     /**
      * Get orderId
      *
-     * @return integer $orderId
+     * @return integer 
      */
     public function getOrderId()
     {
@@ -130,7 +147,7 @@ class ProfileTitle extends \Cx\Model\Base\EntityBase {
     /**
      * Get userProfile
      *
-     * @return \Doctrine\Common\Collections\Collection $userProfile
+     * @return \Doctrine\Common\Collections\Collection 
      */
     public function getUserProfile()
     {

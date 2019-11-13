@@ -4,7 +4,7 @@
  * Cloudrexx
  *
  * @link      http://www.cloudrexx.com
- * @copyright Cloudrexx AG 2007-2015
+ * @copyright Cloudrexx AG 2007-2019
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -25,52 +25,76 @@
  * our trademarks remain entirely with us.
  */
 
-
+/**
+ * Attributes that contain informations about the users.
+ *
+ * @copyright   CLOUDREXX CMS - Cloudrexx AG Thun
+ * @author      Dario Graf <info@cloudrexx.com>
+ * @package     cloudrexx
+ * @subpackage  core_user
+ * @version     5.0.0
+ */
 namespace Cx\Core\User\Model\Entity;
 
 /**
- * Cx\Core\User\Model\Entity\UserAttribute
+ * Attributes that contain informations about the users.
+ *
+ * @copyright   CLOUDREXX CMS - Cloudrexx AG Thun
+ * @author      Dario Graf <info@cloudrexx.com>
+ * @package     cloudrexx
+ * @subpackage  core_user
+ * @version     5.0.0
  */
 class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
-     * @var integer $id
+     * @var integer
      */
-    private $id;
+    protected $id;
 
     /**
-     * @var string $type
+     * @var enum_user_userattribute_type
      */
-    private $type;
+    protected $type = 'text';
 
     /**
-     * @var string $mandatory
+     * @var enum_user_userattribute_mandatory
      */
-    private $mandatory;
+    protected $mandatory = '0';
 
     /**
-     * @var string $sortType
+     * @var enum_user_userattribute_sorttype
      */
-    private $sortType;
+    protected $sortType = 'asc';
 
     /**
-     * @var integer $orderId
+     * @var integer
      */
-    private $orderId;
+    protected $orderId = 0;
 
     /**
-     * @var string $accessSpecial
+     * @var enum_user_userattribute_accessspecial
      */
-    private $accessSpecial;
+    protected $accessSpecial = '';
+
+    /**
+     * @var integer
+     */
+    protected $accessId;
+
+    /**
+     * @var integer
+     */
+    protected $readAccessId;
+
+    /**
+     * @var \Cx\Core\User\Model\Entity\UserAttribute
+     */
+    protected $parent;
 
     /**
      * @var \Doctrine\Common\Collections\Collection
      */
-    private $parent;
-
-    /**
-     * @var \Doctrine\Common\Collections\Collection
-     */
-    private $userAttributeName;
+    protected $userAttributeName;
 
     /**
      * @var \Doctrine\Common\Collections\Collection
@@ -78,37 +102,28 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     protected $userAttributeValue;
 
     /**
-     * @var \Cx\Core\User\Model\Entity\UserAttribute
+     * @var \Doctrine\Common\Collections\Collection
      */
-    private $children;
+    protected $children;
+
+    /***
+     * @var enum_user_userattribute_accessspecial
+     */
+    protected $isDefault;
 
     /**
-     * @var \Cx\Core_Modules\Access\Model\Entity\AccessId
+     * Constructor
      */
-    private $accessId;
-
-    /**
-     * @var \Cx\Core\User\Model\Entity\UserProfile
-     */
-    private $userProfile;
-
-    /**
-     * @var Cx\Core_Modules\Access\Model\Entity\AccessId
-     */
-    protected $readAccessId;
-
     public function __construct()
     {
-        $this->parent = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->children = new \Doctrine\Common\Collections\ArrayCollection();
         $this->userAttributeName = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->userAttributeValue = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->userProfile = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     /**
      * Get id
      *
-     * @return integer $id
+     * @return integer 
      */
     public function getId()
     {
@@ -118,7 +133,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Set type
      *
-     * @param string $type
+     * @param enum_user_userattribute_type $type
      */
     public function setType($type)
     {
@@ -128,7 +143,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get type
      *
-     * @return string $type
+     * @return enum_user_userattribute_type 
      */
     public function getType()
     {
@@ -138,7 +153,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Set mandatory
      *
-     * @param string $mandatory
+     * @param enum_user_userattribute_mandatory $mandatory
      */
     public function setMandatory($mandatory)
     {
@@ -148,7 +163,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get mandatory
      *
-     * @return string $mandatory
+     * @return enum_user_userattribute_mandatory 
      */
     public function getMandatory()
     {
@@ -158,7 +173,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Set sortType
      *
-     * @param string $sortType
+     * @param enum_user_userattribute_sorttype $sortType
      */
     public function setSortType($sortType)
     {
@@ -168,7 +183,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get sortType
      *
-     * @return string $sortType
+     * @return enum_user_userattribute_sorttype 
      */
     public function getSortType()
     {
@@ -188,7 +203,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get orderId
      *
-     * @return integer $orderId
+     * @return integer 
      */
     public function getOrderId()
     {
@@ -198,7 +213,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Set accessSpecial
      *
-     * @param string $accessSpecial
+     * @param enum_user_userattribute_accessspecial $accessSpecial
      */
     public function setAccessSpecial($accessSpecial)
     {
@@ -208,7 +223,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get accessSpecial
      *
-     * @return string $accessSpecial
+     * @return enum_user_userattribute_accessspecial 
      */
     public function getAccessSpecial()
     {
@@ -216,33 +231,93 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     }
 
     /**
-     * Add parent
+     * Set accessId
      *
-     * @param \Cx\Core\User\Model\Entity\UserAttribute $parent
+     * @param integer $accessId
      */
-    public function addParent(\Cx\Core\User\Model\Entity\UserAttribute $parent)
+    public function setAccessId($accessId)
     {
-        $this->parent[] = $parent;
+        $this->accessId = $accessId;
     }
 
     /**
-     * Remove parent
+     * Get accessId
      *
-     * @param \Cx\Core\User\Model\Entity\UserAttribute $parent
+     * @return integer 
      */
-    public function removeParent(\Cx\Core\User\Model\Entity\UserAttribute $parent)
+    public function getAccessId()
     {
-        $this->parent->removeElement($parent);
+        return $this->accessId;
     }
 
     /**
-     * Get parent
+     * Set readAccessId
      *
-     * @return \Doctrine\Common\Collections\Collection $parent
+     * @param integer $readAccessId
      */
-    public function getParent()
+    public function setReadAccessId($readAccessId)
     {
-        return $this->parent;
+        $this->readAccessId = $readAccessId;
+    }
+
+    /**
+     * Get readAccessId
+     *
+     * @return integer 
+     */
+    public function getReadAccessId()
+    {
+        return $this->readAccessId;
+    }
+
+    /**
+     * Set default
+     *
+     * @param enum_user_userattribute_type $isDefault
+     */
+    public function setIsDefault($isDefault)
+    {
+        $this->isDefault = $isDefault;
+    }
+
+    /**
+     * Get default
+     *
+     * @return enum_user_userattribute_type
+     */
+    public function getIsDefault()
+    {
+        return $this->isDefault;
+    }
+
+    /**
+     * Add child
+     *
+     * @param \Cx\Core\User\Model\Entity\UserAttribute $child
+     */
+    public function addChild(\Cx\Core\User\Model\Entity\UserAttribute $child)
+    {
+        $this->children[] = $child;
+    }
+
+    /**
+     * Remove child
+     *
+     * @param \Cx\Core\User\Model\Entity\UserAttribute $child
+     */
+    public function removeChild(\Cx\Core\User\Model\Entity\UserAttribute $child)
+    {
+        $this->children->removeElement($child);
+    }
+
+    /**
+     * Get children
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getChildren()
+    {
+        return $this->children;
     }
 
     /**
@@ -268,7 +343,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get userAttributeName
      *
-     * @return \Doctrine\Common\Collections\Collection $userAttributeName
+     * @return \Doctrine\Common\Collections\Collection 
      */
     public function getUserAttributeName()
     {
@@ -298,7 +373,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get userAttributeValue
      *
-     * @return \Doctrine\Common\Collections\Collection $userAttributeValue
+     * @return \Doctrine\Common\Collections\Collection
      */
     public function getUserAttributeValue()
     {
@@ -306,82 +381,22 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     }
 
     /**
-     * Set children
+     * Set parent
      *
-     * @param \Cx\Core\User\Model\Entity\UserAttribute $children
+     * @param \Cx\Core\User\Model\Entity\UserAttribute $parent
      */
-    public function setChildren(\Cx\Core\User\Model\Entity\UserAttribute $children)
+    public function setParent(\Cx\Core\User\Model\Entity\UserAttribute $parent = null)
     {
-        $this->children = $children;
+        $this->parent = $parent;
     }
 
     /**
-     * Get children
+     * Get parent
      *
-     * @return \Cx\Core\User\Model\Entity\UserAttribute $children
+     * @return \Cx\Core\User\Model\Entity\UserAttribute 
      */
-    public function getChildren()
+    public function getParent()
     {
-        return $this->children;
-    }
-
-    /**
-     * Set accessId
-     *
-     * @param \Cx\Core_Modules\Access\Model\Entity\AccessId $accessId
-     */
-    public function setAccessId(\Cx\Core_Modules\Access\Model\Entity\AccessId $accessId)
-    {
-        $this->accessId = $accessId;
-    }
-
-    /**
-     * Get accessId
-     *
-     * @return \Cx\Core_Modules\Access\Model\Entity\AccessId $accessId
-     */
-    public function getAccessId()
-    {
-        return $this->accessId;
-    }
-
-    /**
-     * Add userProfile
-     *
-     * @param \Cx\Core\User\Model\Entity\UserProfile $userProfile
-     */
-    public function addUserProfile(\Cx\Core\User\Model\Entity\UserProfile $userProfile)
-    {
-        $this->userProfile[] = $userProfile;
-    }
-
-    /**
-     * Get userProfile
-     *
-     * @return \Doctrine\Common\Collections\Collection $userProfile
-     */
-    public function getUserProfile()
-    {
-        return $this->userProfile;
-    }
-
-    /**
-     * Set readAccessId
-     *
-     * @param \Cx\Core_Modules\Access\Model\Entity\AccessId $readAccessId
-     */
-    public function setReadAccessId(\Cx\Core_Modules\Access\Model\Entity\AccessId $readAccessId)
-    {
-        $this->readAccessId = $readAccessId;
-    }
-
-    /**
-     * Get readAccessId
-     *
-     * @return \Cx\Core_Modules\Access\Model\Entity\AccessId $readAccessId
-     */
-    public function getReadAccessId()
-    {
-        return $this->readAccessId;
+        return $this->parent;
     }
 }

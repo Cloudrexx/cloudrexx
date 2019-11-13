@@ -4,7 +4,7 @@
  * Cloudrexx
  *
  * @link      http://www.cloudrexx.com
- * @copyright Cloudrexx AG 2007-2015
+ * @copyright Cloudrexx AG 2007-2019
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -25,33 +25,66 @@
  * our trademarks remain entirely with us.
  */
 
-
+/**
+ * Name assigned to the attributes.
+ *
+ * @copyright   CLOUDREXX CMS - Cloudrexx AG Thun
+ * @author      Dario Graf <info@cloudrexx.com>
+ * @package     cloudrexx
+ * @subpackage  core_user
+ * @version     5.0.0
+ */
 namespace Cx\Core\User\Model\Entity;
 
 /**
- * Cx\Core\User\Model\Entity\UserAttributeName
+ * Name assigned to the attributes.
+ *
+ * @copyright   CLOUDREXX CMS - Cloudrexx AG Thun
+ * @author      Dario Graf <info@cloudrexx.com>
+ * @package     cloudrexx
+ * @subpackage  core_user
+ * @version     5.0.0
  */
 class UserAttributeName extends \Cx\Model\Base\EntityBase {
     /**
-     * @var integer $attributeId
+     * @var integer
      */
-    private $attributeId;
+    protected $id;
 
     /**
-     * @var integer $langId
+     * @var integer
      */
-    private $langId;
+    protected $attributeId = 0;
 
     /**
-     * @var string $name
+     * @var integer
      */
-    private $name;
+    protected $langId = 0;
+
+    /**
+     * @var integer
+     */
+    protected $order = 0;
+
+    /**
+     * @var string
+     */
+    protected $name = '';
 
     /**
      * @var \Cx\Core\User\Model\Entity\UserAttribute
      */
-    private $userAttribute;
+    protected $userAttribute;
 
+    /**
+     * Get id
+     *
+     * @return integer
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
 
     /**
      * Set attributeId
@@ -66,7 +99,7 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase {
     /**
      * Get attributeId
      *
-     * @return integer $attributeId
+     * @return integer 
      */
     public function getAttributeId()
     {
@@ -86,7 +119,7 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase {
     /**
      * Get langId
      *
-     * @return integer $langId
+     * @return integer 
      */
     public function getLangId()
     {
@@ -106,11 +139,31 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase {
     /**
      * Get name
      *
-     * @return string $name
+     * @return string 
      */
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * Set order
+     *
+     * @param string $order
+     */
+    public function setOrder($order)
+    {
+        $this->order = $order;
+    }
+
+    /**
+     * Get order
+     *
+     * @return string
+     */
+    public function getOrder()
+    {
+        return $this->order;
     }
 
     /**
@@ -126,7 +179,7 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase {
     /**
      * Get userAttribute
      *
-     * @return \Cx\Core\User\Model\Entity\UserAttribute $userAttribute
+     * @return \Cx\Core\User\Model\Entity\UserAttribute 
      */
     public function getUserAttribute()
     {

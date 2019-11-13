@@ -1143,7 +1143,7 @@ class CalendarForm extends CalendarLibrary
      *
      * @return Cx\Modules\Calendar\Model\Entity\RegistrationForm
      */
-    public function getFormEntity($id, $formDatas)
+    public function getFormEntity($id, $formDatas = array())
     {
         if (empty($id)) {
             $form = new \Cx\Modules\Calendar\Model\Entity\RegistrationForm();

@@ -90,6 +90,7 @@ class User_Profile_Attribute
     private $arrCoreAttributeIds;
     private $arrCustomAttributes;
     private $arrMandatoryAttributes = array();
+    private $arrProfileAttributes = array();
 
     private $arrCoreAttributes = array(
         'picture' => array(
@@ -533,6 +534,7 @@ class User_Profile_Attribute
         $this->arrAttributeTree = null;
 
         $this->loadCoreAttributes();
+        $this->loadProfileAttributes();
         $this->loadCustomAttributes();
         $this->generateAttributeRelations();
         $this->sortChildren();
@@ -565,45 +567,41 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
 );
 */
         }
-        $this->loadCoreAttributesCustomizing();
         $this->loadCoreAttributeCountry();
         $this->loadCoreAttributeTitle();
     }
 
-
-    function loadCoreAttributesCustomizing()
+    /**
+     * Find all default user attributes (ProfileAttributes) and store it in an
+     * array
+     */
+    function loadProfileAttributes()
     {
         global $objDatabase;
 
-        $objAttribute = $objDatabase->Execute('
-            SELECT
-                `id`,
-                `mandatory`,
-                `sort_type`,
-                `order_id`,
-                `access_special`,
-                `access_id`,
-                `read_access_id`
-            FROM
-                `'.DBPREFIX.'access_user_core_attribute`
-        ');
-        if ($objAttribute) {
-            while (!$objAttribute->EOF) {
-                $this->arrAttributes[$objAttribute->fields['id']]['mandatory'] = $objAttribute->fields['mandatory'];
-                $this->arrAttributes[$objAttribute->fields['id']]['sort_type'] = $objAttribute->fields['sort_type'];
-                $this->arrAttributes[$objAttribute->fields['id']]['order_id'] = $objAttribute->fields['order_id'];
-                $this->arrAttributes[$objAttribute->fields['id']]['access_special'] = $objAttribute->fields['access_special'];
-                $this->arrAttributes[$objAttribute->fields['id']]['access_id'] = $objAttribute->fields['access_id'];
-                $this->arrAttributes[$objAttribute->fields['id']]['read_access_id'] = $objAttribute->fields['read_access_id'];
-                $this->arrAttributes[$objAttribute->fields['id']]['customizing'] = true;
-                if ($objAttribute->fields['mandatory']) {
-                    $this->arrMandatoryAttributes[] = $objAttribute->fields['id'];
-                }
-                $objAttribute->MoveNext();
+        $query = '
+            SELECT 
+                `tblA`.`id` AS `id`, 
+                `tblN`.`name` AS `name` 
+            FROM `' .DBPREFIX .'access_user_attribute` AS `tblA`
+            LEFT JOIN `'.DBPREFIX.'access_user_attribute_name` AS `tblN`
+                ON `tblN`.`attribute_id` = `tblA`.`id`
+            WHERE `tblA`.`is_default` = 1 
+            AND `tblA`.`parent_id` IS NULL
+        ';
+
+        $objAttributes = $objDatabase->Execute($query);
+
+        if ($objAttributes !== false && $objAttributes->RecordCount() > 0) {
+            while (!$objAttributes->EOF) {
+                $this->arrProfileAttributes[
+                $objAttributes->fields['id']
+                ] = $objAttributes->fields['name'];
+
+                $objAttributes->MoveNext();
             }
         }
     }
-
 
     function loadCoreAttributeCountry()
     {
@@ -629,8 +627,18 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
     function loadCoreAttributeTitle()
     {
         global $objDatabase;
-
-        $objResult = $objDatabase->Execute('SELECT `id`, `title`, `order_id` FROM '.DBPREFIX.'access_user_title');
+        // Find children of user attribute title
+        $objResult = $objDatabase->Execute('
+            SELECT 
+                `name`.`id` AS `id` , `name`.`name` AS `title`, 
+                `attribute`.`order_id`
+            FROM `'.DBPREFIX.'access_user_attribute_name` AS `name` 
+            LEFT JOIN `'.DBPREFIX.'access_user_attribute` AS `attribute` 
+                ON `name`.`attribute_id` = `attribute`.`id`
+            LEFT JOIN `'.DBPREFIX.'access_user_attribute_name` AS `titleAttr` 
+                ON `titleAttr`.`name` = "title"
+            WHERE `attribute`.`parent_id`= `titleAttr`.`attribute_id`;
+        ');
         if ($objResult) {
             while (!$objResult->EOF) {
                 $this->arrAttributes['title_'.$objResult->fields['id']] = array(
@@ -669,9 +677,11 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
                 `parent_id`,
                 `access_special`,
                 `access_id`,
-                `read_access_id`
+                `read_access_id`,
+                `is_default`
             FROM
                 `' . DBPREFIX . 'access_user_attribute`
+            WHERE `is_default` = 0
             ORDER BY
                 `order_id`,
                 `id`
@@ -708,6 +718,22 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
         }
     }
 
+    /**
+     * In the system, the ID of a core attribute is the name of the attribute
+     * (e.g. 'title'). But if we want to interact with the database, the core
+     * attribute is handled like other user attributes. This means we have an
+     * integer ID (e.g. 2) and had to track this ID (2) with the system-intern
+     * core attribute ID ('title')
+     *
+     * This method returns an array with the user attribute ID (e.g 2) as array
+     * key profile attribute ID (e.g. 'title') as value
+     *
+     * @return array value with all profile attributes
+     */
+    public function getProfileAttributes()
+    {
+        return $this->arrProfileAttributes;
+    }
 
     function getTree()
     {
@@ -746,6 +772,7 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
 
     public function getById($id)
     {
+
         $objAttribute = clone $this;
         $objAttribute->arrAttributes = &$this->arrAttributes;
         $objAttribute->arrAttributeTree = &$this->arrAttributeTree;
@@ -935,7 +962,7 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
                 $this->isCoreAttribute($this->id) && $this->storeCoreAttribute() ||
                 $this->storeCustomAttribute()
             ) {
-                if ($this->parent_id === 'title' ||
+                if (preg_match('/^title_[0-9]+$/', $this->id) ||
                     ($this->isCoreAttribute($this->id) || $this->storeNames()) &&
                     $this->storeChildrenOrder() &&
                     $this->storeProtection($this->protected, $this->access_id, 'access_id', $this->access_group_ids) &&
@@ -1029,8 +1056,9 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
         global $objDatabase;
 
         $pattern = array();
-        if ($this->id && preg_match('#([0-9]+)#', $this->id, $pattern) && $objDatabase->Execute("UPDATE `".DBPREFIX."access_user_title` SET `title` = '".addslashes($this->arrName[0])."' WHERE `id` = '".$pattern[0]."'") ||
-            $objDatabase->Execute("INSERT INTO `".DBPREFIX."access_user_title` (`title`, `order_id`) VALUES ('".addslashes($this->arrName[0])."', 1)")
+        if ($this->id && preg_match('#([0-9]+)#', $this->id, $pattern) && $objDatabase->Execute("UPDATE `".DBPREFIX."access_user_attribute_name` SET `name` = '".addslashes($this->arrName[0])."' WHERE `attribute_id` = '".$pattern[0]."'") ||
+                $objDatabase->Execute("INSERT INTO `".DBPREFIX."access_user_attribute`(`parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES ((SELECT `attribute_id` FROM `contrexx_access_user_attribute_name` WHERE `name` = 'title'),'menu_option',0,'asc',0,0,0,0,1)") &&
+                $objDatabase->Execute("INSERT INTO `".DBPREFIX."access_user_attribute_name`(`attribute_id`, `lang_id`, `name`, `order`) VALUES (". $objDatabase->Insert_ID() .", 0, '".addslashes($this->arrName[0])."',(select count(`name`.`order`) + 1 as `order` from `".DBPREFIX."access_user_attribute_name` as name))")
         ) {
             return true;
         }
@@ -1042,8 +1070,8 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
     {
         global $objDatabase;
 
-        if (($this->customized && $objDatabase->Execute("UPDATE `".DBPREFIX."access_user_core_attribute` SET `sort_type` = '".$this->sort_type."', `order_id` = ".$this->order_id.", `mandatory` = '".$this->mandatory."' WHERE `id` = '".$this->id."'") !== false) ||
-        ($objDatabase->Execute("INSERT INTO `".DBPREFIX."access_user_core_attribute` (`id`, `sort_type`, `order_id`, `mandatory`) VALUES ('".$this->id."', '".$this->sort_type."', ".$this->order_id.", '".$this->mandatory."')") !== false)) {
+        if (($objDatabase->Execute("UPDATE `".DBPREFIX."access_user_attribute` SET `sort_type` = '".$this->sort_type."', `order_id` = ".$this->order_id.", `mandatory` = '".$this->mandatory."' WHERE `id` = (SELECT `attribute_id` FROM `contrexx_access_user_attribute_name` WHERE `name` = '".$this->id."')") !== false) ||
+        ($objDatabase->Execute("INSERT INTO `".DBPREFIX."access_user_attribute` (`id`, `sort_type`, `order_id`, `mandatory`) VALUES ((SELECT `attribute_id` FROM `contrexx_access_user_attribute_name` WHERE `name` = '".$this->id."'), '".$this->sort_type."', ".$this->order_id.", '".$this->mandatory."')") !== false)) {
             return true;
         }
         return false;
@@ -1055,16 +1083,8 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
         global $objDatabase;
 
         if ($this->sort_type == 'custom') {
-            switch ($this->id) {
-                case 'title':
-                    $affectedTable = DBPREFIX.'access_user_title';
-                    $offset = 1;
-                    break;
-                default:
-                    $affectedTable = DBPREFIX.'access_user_attribute';
-                    $offset = 0;
-                    break;
-            }
+            $affectedTable = DBPREFIX.'access_user_attribute';
+            $offset = 0;
 
             foreach ($this->children as $orderId => $childAttributeId)
             {
@@ -1136,8 +1156,9 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
     {
         $objDatabase = \Cx\Core\Core\Controller\Cx::instanciate()->getDb()->getAdoDb();
         $tableName = 'access_user_attribute';
+        $where = $this->id;
         if ($this->isCoreAttribute($this->id)) {
-            $tableName = 'access_user_core_attribute';
+            $where = '(SELECT `attribute_id` FROM `contrexx_access_user_attribute_name` WHERE `name` = "'. $this->id .'")';
         }
 
         if (!$protected) {
@@ -1150,7 +1171,7 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
                 $objDatabase->Execute('
                     UPDATE `' . DBPREFIX . $tableName . '`
                        SET ' . $updateFields . '
-                       WHERE `id` = "' . $this->id . '"'
+                       WHERE `id` = ' . $where
                 ) !== false &&
                 (
                     !isset($this->arrAttributes[$this->id][$fieldName]) ||
@@ -1186,7 +1207,7 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
                 $objDatabase->Execute('
                     UPDATE `' . DBPREFIX . $tableName . '`
                         SET `' . $fieldName . '` = ' . contrexx_input2db($accessId) . '
-                        WHERE `id` = "' . $this->id . '"'
+                        WHERE `id` = ' . $where
                 ) === false
             ) {
                 return false;
@@ -1204,7 +1225,7 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
             $objDatabase->Execute('
                 UPDATE `' . DBPREFIX . $tableName . '`
                    SET `access_special` = "' . contrexx_input2db($this->access_special) . '"
-                   WHERE `id` = "' . $this->id . '"'
+                   WHERE `id` = ' . $where
             ) === false
         ) {
             return false;
@@ -1270,14 +1291,7 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
     {
         global $objDatabase, $_ARRAYLANG;
 
-        switch ($this->parent_id) {
-            case 'title':
-                $affectedTable = DBPREFIX.'access_user_title';
-                break;
-            default:
-                $affectedTable = DBPREFIX.'access_user_attribute';
-                break;
-        }
+        $affectedTable = DBPREFIX.'access_user_attribute';
         $pattern = array();
         if ($objDatabase->Execute('DELETE FROM `'.$affectedTable.'` WHERE `id` = '.($this->parent_id == 'title' && preg_match('#([0-9]+)#', $attributeId, $pattern) ? $pattern[0] : $attributeId)) !== false) {
             return true;
@@ -1291,6 +1305,13 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
     {
         global $objDatabase, $_ARRAYLANG;
 
+        if (
+            $this->parent_id == 'title' &&
+            preg_match('#([0-9]+)#', $attributeId, $pattern)
+        ) {
+            $attributeId = $pattern[0];
+        }
+
         if ($objDatabase->Execute("DELETE FROM `".DBPREFIX."access_user_attribute_value` WHERE `attribute_id` = '".$attributeId."'") !== false) {
             return true;
         }
@@ -1302,6 +1323,13 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
     function deleteAttributeNames($attributeId)
     {
         global $objDatabase, $_ARRAYLANG;
+
+        if (
+            $this->parent_id == 'title' &&
+            preg_match('#([0-9]+)#', $attributeId, $pattern)
+        ) {
+            $attributeId = $pattern[0];
+        }
 
         if ($objDatabase->Execute("DELETE FROM `".DBPREFIX."access_user_attribute_name` WHERE `attribute_id` = '".$attributeId."'") !== false) {
             return true;
@@ -1606,6 +1634,26 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
         return isset($this->arrCoreAttributes[$attributeId]);
     }
 
+    /**
+     * In the system, the ID of a core attribute is the name of the attribute
+     * (e.g. 'title'). But if we want to interact with the database, the core
+     * attribute is handled like other user attributes. This means we have an
+     * integer ID (e.g. 2) and had to track this ID (2) with the system-intern
+     * core attribute ID ('title')
+     *
+     * This method checks if the given attribute id (e.g. 2) is assigned to a
+     * core attribute
+     *
+     * @param int $attributeId id to check if it is assigned
+     * @return bool if is assigned to an core attribute
+     */
+    public function isIdAssignedToCoreAttribute($attributeId=0) {
+        if (!empty($this->getProfileAttributes()[$attributeId])) {
+            return true;
+        }
+        return false;
+    }
+
 
     public function isCustomAttribute($attributeId = null)
     {
@@ -1798,6 +1846,54 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
         return $arrAttributes;
     }
 
+
+    /**
+     * In the system, the ID of a core attribute is the name of the attribute
+     * (e.g. 'title'). But if we want to interact with the database, the core
+     * attribute is handled like other user attributes. This means we have an
+     * integer ID (e.g. 2) and had to track this ID (2) with the system-intern
+     * core attribute ID ('title')
+     *
+     * This method gives the profile attribute ID (e.g. 'title') by the given
+     * user attribute ID (e.g. 2)
+     *
+     * @param int $attributeId user attribute ID to identify profile attribute ID
+     * @return string profile attribute ID
+     */
+    public function getProfileAttributeIdByAttributeId($attributeId)
+    {
+        $profileAttributes = $this->getProfileAttributes();
+
+        if (!empty($profileAttributes[$attributeId])) {
+            return $profileAttributes[$attributeId];
+        }
+
+        return '';
+    }
+
+    /**
+     * In the system, the ID of a core attribute is the name of the attribute
+     * (e.g. 'title'). But if we want to interact with the database, the core
+     * attribute is handled like other user attributes. This means we have an
+     * integer ID (e.g. 2) and had to track this ID (2) with the system-intern
+     * core attribute ID ('title')
+     *
+     * This method gives the user attribute ID (e.g. 2) by the given profile
+     * attribute ID (e.g. 'title')
+     *
+     * @param int $profileId profile attribute ID to identify user attribute ID
+     * @return string user attribute ID
+     */
+    public function getAttributeIdByProfileAttributeId($profileId)
+    {
+        $profileAttributes = $this->getProfileAttributes();
+
+        if (in_array($profileId, $profileAttributes)) {
+            return array_search($profileId, $profileAttributes);
+        }
+
+        return 0;
+    }
 
     function getId()
     {

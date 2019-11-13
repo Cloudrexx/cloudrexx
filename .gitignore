@@ -2,3 +2,4 @@ docker-compose.yml
 tmp/*
 _meta
 cx.bat
+*.sw*

@@ -255,11 +255,11 @@ class FileSharingManager extends FileSharingLib
             foreach ($_POST["filesharingMail"] as $lang => $inputs) {
                 $objMailTemplate = $objDatabase->Execute("SELECT `subject`, `content` FROM " . DBPREFIX . "module_filesharing_mail_template WHERE `lang_id` = " . intval($lang));
 
-                $content = str_replace(array('{', '}'), array('[[', ']]'), contrexx_input2db($inputs["content"]));
+                $content = str_replace(array('{', '}'), array('[[', ']]'), contrexx_input2raw($inputs["content"]));
                 if ($objMailTemplate === false or $objMailTemplate->RecordCount() == 0) {
-                    $objDatabase->Execute("INSERT INTO " . DBPREFIX . "module_filesharing_mail_template (`subject`, `content`, `lang_id`) VALUES ('" . contrexx_input2db($inputs["subject"]) . "', '" . contrexx_raw2db($content) . "', '" . contrexx_raw2db($lang) . "')");
+                    $objDatabase->Execute("INSERT INTO " . DBPREFIX . "module_filesharing_mail_template (`subject`, `content`, `lang_id`) VALUES ('" . contrexx_input2db($inputs["subject"]) . "', '" . contrexx_raw2db($content) . "', '" . intval($lang) . "')");
                 } else {
-                    $objDatabase->Execute("UPDATE " . DBPREFIX . "module_filesharing_mail_template SET `subject` = '" . contrexx_input2db($inputs["subject"]) . "', `content` = '" . contrexx_raw2db($content) . "' WHERE `lang_id` = '" . contrexx_raw2db($lang) . "'");
+                    $objDatabase->Execute("UPDATE " . DBPREFIX . "module_filesharing_mail_template SET `subject` = '" . contrexx_input2db($inputs["subject"]) . "', `content` = '" . contrexx_raw2db($content) . "' WHERE `lang_id` = '" . intval($lang) . "'");
                 }
             }
         }

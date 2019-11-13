@@ -87,7 +87,10 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                 if(isset($_POST) && isset($_POST['bsubmit'])) {
                     \Cx\Core\Setting\Controller\Setting::set('specificStylesheet', isset($_POST['specificStylesheet'])?1:0);
                     \Cx\Core\Setting\Controller\Setting::set('replaceActualContents', isset($_POST['replaceActualContents'])?1:0);
-
+                    \Cx\Core\Setting\Controller\Setting::set(
+                        'sortBehaviour',
+                        isset($_POST['sortBehaviour']) ? $_POST['sortBehaviour'] : 'custom'
+                    );
                     \Cx\Core\Setting\Controller\Setting::storeFromPost();
                 }
 
@@ -101,6 +104,19 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                     && !\Cx\Core\Setting\Controller\Setting::add('replaceActualContents', '0', ++$i, \Cx\Core\Setting\Controller\Setting::TYPE_CHECKBOX, '1', 'config')
                 ){
                     throw new \Exception("Failed to add new configuration option");
+                }
+                if (
+                    !\Cx\Core\Setting\Controller\Setting::isDefined('sortBehaviour') &&
+                    !\Cx\Core\Setting\Controller\Setting::add(
+                        'sortBehaviour',
+                        'custom',
+                        ++$i,
+                        \Cx\Core\Setting\Controller\Setting::TYPE_RADIO,
+                        'alphabetical:TXT_CORE_WYSIWYG_ALPHABETICAL,custom:TXT_CORE_WYSIWYG_CUSTOM',
+                        'config'
+                    )
+                ) {
+                    throw new \Exception('Failed to add new configuration option');
                 }
 
                 $tmpl = new \Cx\Core\Html\Sigma();
@@ -303,6 +319,14 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
         $classNameParts = explode('\\', $entityClassName);
         $classIdentifier = end($classNameParts);
 
+        $sortBy = array('field' => ['order' => SORT_ASC]);
+        $order  = array();
+        \Cx\Core\Setting\Controller\Setting::init('Wysiwyg', 'config', 'Yaml');
+        if (\Cx\Core\Setting\Controller\Setting::getValue('sortBehaviour') === 'alphabetical') {
+            $sortBy = array();
+            $order  = array('title' => SORT_ASC);
+        }
+
         return array(
             'header' => $_ARRAYLANG['TXT_' . strtoupper($this->getType() . '_' . $this->getName() . '_ACT_' . $classIdentifier)],
             'entityName' => $_ARRAYLANG['TXT_' . strtoupper($this->getType() . '_' . $this->getName() . '_ACT_' . $classIdentifier) . '_ENTITY'],
@@ -317,9 +341,10 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                 'add'       => true,
                 'edit'      => true,
                 'delete'    => true,
-                'sorting'   => true,
+                'order'     => $order,
                 'paging'    => true,
                 'filtering' => false,
+                'sortBy'    => $sortBy,
             ),
             'fields' => array(
                 'id' => array(
@@ -358,13 +383,18 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                     'header' => $_ARRAYLANG['TXT_' . strtoupper($this->getType() . '_' . $this->getName() . '_ACT_' . $classIdentifier) . '_IMAGE_PATH'],
                     'type' => 'image',
                     'showOverview' => false,
-                    'options' => array('data-cx-mb-startmediatype' => 'wysiwyg'),
+                    'options' => array('startmediatype' => 'wysiwyg'),
                 ),
                 'htmlContent' => array(
                     'header' => $_ARRAYLANG['TXT_' . strtoupper($this->getType() . '_' . $this->getName() . '_ACT_' . $classIdentifier) . '_HTML_CONTENT'],
                     'showOverview' => false,
                     'type' => 'sourcecode',
                     'options' => array('mode' => 'html'),
+                ),
+                'order' => array(
+                    'header' => $_ARRAYLANG['TXT_' . strtoupper($this->getType() . '_' . $this->getName() . '_ACT_' . $classIdentifier) . '_ORDER'],
+                    'showOverview' => false,
+                    'showDetail' => false,
                 ),
             ),
         );

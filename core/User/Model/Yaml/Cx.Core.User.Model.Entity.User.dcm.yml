@@ -5,7 +5,8 @@ Cx\Core\User\Model\Entity\User:
     id:
       id: true
       type: integer
-      unsigned: true
+      options:
+        unsigned: true
       generator:
         strategy: AUTO
     isAdmin:
@@ -26,51 +27,53 @@ Cx\Core\User\Model\Entity\User:
       length: 32
       nullable: false
       column: auth_token
+      options:
+        default: '0'
     authTokenTimeout:
       type: integer
       length: 14
       nullable: false
-      unsigned: true
       column: auth_token_timeout
       options:
+        unsigned: true
         default: 0
     regdate:
       type: integer
       nullable: false
-      unsigned: true
       options:
+        unsigned: true
         default: 0
     expiration:
       type: integer
       nullable: false
-      unsigned: true
       options:
+        unsigned: true
         default: 0
     validity:
       type: integer
       nullable: false
-      unsigned: true
       options:
+        unsigned: true
         default: 0
     lastAuth:
       type: integer
       nullable: false
-      unsigned: true
       column: last_auth
       options:
+        unsigned: true
         default: 0
     lastAuthStatus:
       type: smallint
       nullable: false
       column: last_auth_status
       options:
-        default: 1
+        default: 0
     lastActivity:
       type: integer
       nullable: false
-      unsigned: true
       column: last_activity
       options:
+        unsigned: true
         default: 0
     email:
       type: string
@@ -85,21 +88,21 @@ Cx\Core\User\Model\Entity\User:
     frontendLangId:
       type: integer
       nullable: false
-      unsigned: true
       column: frontend_lang_id
       options:
+        unsigned: true
         default: 0
     backendLangId:
       type: integer
       nullable: false
-      unsigned: true
       column: backend_lang_id
       options:
+        unsigned: true
         default: 0
     active:
       type: boolean
       options:
-        default: false
+        default: true
     verified:
       type: boolean
       options:
@@ -107,9 +110,9 @@ Cx\Core\User\Model\Entity\User:
     primaryGroup:
       type: integer
       nullable: false
-      unsigned: true
       column: primary_group
       options:
+        unsigned: true
         default: 0
     profileAccess:
       type: enum
@@ -127,23 +130,18 @@ Cx\Core\User\Model\Entity\User:
     restoreKeyTime:
       type: integer
       nullable: false
-      unsigned: true
       column: restore_key_time
       options:
+        unsigned: true
         default: 0
     u2uActive:
-      type: enum
-      values: ['0','1']
+      type: boolean
       column: u2u_active
       options:
-        default: "1"
+        default: 1
   indexes:
     username:
       columns: [username]
-  oneToOne:
-    userProfile:
-      targetEntity: Cx\Core\User\Model\Entity\UserProfile
-      mappedBy: users
   manyToMany:
     group:
       targetEntity: Cx\Core\User\Model\Entity\Group
@@ -154,7 +152,18 @@ Cx\Core\User\Model\Entity\User:
           user_id:
             referencedColumnName: id
             nullable: false
+            options:
+              unsigned: true
         inverseJoinColumns:
           group_id:
             referencedColumnName: group_id
             nullable: false
+            options:
+              unsigned: true
+  oneToMany:
+    userAttributeValue:
+      targetEntity: Cx\Core\User\Model\Entity\UserAttributeValue
+      mappedBy: user
+  lifecycleCallbacks:
+    prePersist: [ validate ]
+    onFlush: [ validate ]

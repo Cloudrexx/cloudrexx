@@ -1,17 +1,25 @@
 Cx\Core\User\Model\Entity\UserAttributeName:
   type: entity
   table: access_user_attribute_name
+  uniqueConstraints:
+    fk_module_user_attribute_name_unique_idx:
+      columns: attribute_id, lang_id
+  id:
+    id:
+      type: integer
+      generator:
+        strategy: AUTO
+      options:
+        unsigned: true
   fields:
     attributeId:
-      id: true
       type: integer
       associationKey: true
       unsigned: true
       column: attribute_id
       options:
-        default: 0
+        unsigned: true
     langId:
-      id: true
       type: integer
       unsigned: true
       column: lang_id
@@ -23,6 +31,10 @@ Cx\Core\User\Model\Entity\UserAttributeName:
       nullable: false
       options:
         default: ''
+    order:
+      type: integer
+      column: `order`
+      nullable: true
   manyToOne:
     userAttribute:
       targetEntity: Cx\Core\User\Model\Entity\UserAttribute
@@ -30,3 +42,5 @@ Cx\Core\User\Model\Entity\UserAttributeName:
       joinColumns:
         attribute_id:
           referencedColumnName: id
+          options:
+            unsigned: true

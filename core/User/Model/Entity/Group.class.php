@@ -4,7 +4,7 @@
  * Cloudrexx
  *
  * @link      http://www.cloudrexx.com
- * @copyright Cloudrexx AG 2007-2015
+ * @copyright Cloudrexx AG 2007-2019
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -25,74 +25,79 @@
  * our trademarks remain entirely with us.
  */
 
-
+/**
+ * Users can be assigned to groups.
+ *
+ * @copyright   CLOUDREXX CMS - Cloudrexx AG Thun
+ * @author      Dario Graf <info@cloudrexx.com>
+ * @package     cloudrexx
+ * @subpackage  core_user
+ * @version     5.0.0
+ */
 namespace Cx\Core\User\Model\Entity;
 
 /**
- * Cx\Core\User\Model\Entity\Group
+ * Users can be assigned to groups.
+ *
+ * @copyright   CLOUDREXX CMS - Cloudrexx AG Thun
+ * @author      Dario Graf <info@cloudrexx.com>
+ * @package     cloudrexx
+ * @subpackage  core_user
+ * @version     5.0.0
  */
 class Group extends \Cx\Model\Base\EntityBase {
     /**
-     * @var integer $groupId
+     * @var integer
      */
-    private $groupId;
+    protected $groupId;
 
     /**
-     * @var string $groupName
+     * @var string
      */
-    private $groupName;
+    protected $groupName = '';
 
     /**
-     * @var string $groupDescription
+     * @var string
      */
-    private $groupDescription;
+    protected $groupDescription = '';
 
     /**
-     * @var integer $isActive
+     * @var integer
      */
-    private $isActive;
+    protected $isActive = 1;
 
     /**
-     * @var string $type
+     * @var enum_user_group_type
      */
-    private $type;
+    protected $type = 'frontend';
 
     /**
-     * @var string $homepage
+     * @var string
      */
-    private $homepage;
+    protected $homepage = '';
+
+    /**
+     * @var integer
+     */
+    protected $toolbar = 0;
 
     /**
      * @var \Doctrine\Common\Collections\Collection
      */
-    private $user;
+    protected $user;
 
     /**
-     * @var Cx\Core_Modules\Access\Model\Entity\AccessId
+     * Constructor
      */
-    private $accessId2;
-
-    /**
-     * @var Cx\Core_Modules\Access\Model\Entity\AccessId
-     */
-    private $accessId;
-
-    /**
-     * @var 
-     */
-    protected $toolbar;
-
     public function __construct()
     {
         $this->user = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->accessId2 = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->accessId = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     /**
      * Get groupId
      *
-     * @return integer $groupId
+     * @return integer 
      */
     public function getGroupId()
     {
@@ -112,7 +117,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get groupName
      *
-     * @return string $groupName
+     * @return string 
      */
     public function getGroupName()
     {
@@ -132,7 +137,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get groupDescription
      *
-     * @return string $groupDescription
+     * @return string 
      */
     public function getGroupDescription()
     {
@@ -152,7 +157,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get isActive
      *
-     * @return integer $isActive
+     * @return integer 
      */
     public function getIsActive()
     {
@@ -162,7 +167,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Set type
      *
-     * @param string $type
+     * @param enum_user_group_type $type
      */
     public function setType($type)
     {
@@ -172,7 +177,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get type
      *
-     * @return string $type
+     * @return enum_user_group_type 
      */
     public function getType()
     {
@@ -192,11 +197,31 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get homepage
      *
-     * @return string $homepage
+     * @return string 
      */
     public function getHomepage()
     {
         return $this->homepage;
+    }
+
+    /**
+     * Set toolbar
+     *
+     * @param integer $toolbar
+     */
+    public function setToolbar($toolbar)
+    {
+        $this->toolbar = $toolbar;
+    }
+
+    /**
+     * Get toolbar
+     *
+     * @return integer 
+     */
+    public function getToolbar()
+    {
+        return $this->toolbar;
     }
 
     /**
@@ -210,81 +235,22 @@ class Group extends \Cx\Model\Base\EntityBase {
     }
 
     /**
-     * Remove the User
-     * 
+     * Remove user
+     *
      * @param \Cx\Core\User\Model\Entity\User $user
      */
-    public function removeUser(\Cx\Core\User\Model\Entity\User $user) {
+    public function removeUser(\Cx\Core\User\Model\Entity\User $user)
+    {
         $this->user->removeElement($user);
     }
-    
+
     /**
      * Get user
      *
-     * @return \Doctrine\Common\Collections\Collection $user
+     * @return \Doctrine\Common\Collections\Collection 
      */
     public function getUser()
     {
         return $this->user;
-    }
-
-    /**
-     * Add accessId2
-     *
-     * @param Cx\Core_Modules\Access\Model\Entity\AccessId $accessId2
-     */
-    public function addAccessId2(\Cx\Core_Modules\Access\Model\Entity\AccessId $accessId2)
-    {
-        $this->accessId2[] = $accessId2;
-    }
-
-    /**
-     * Get accessId2
-     *
-     * @return Doctrine\Common\Collections\Collection $accessId2
-     */
-    public function getAccessId2()
-    {
-        return $this->accessId2;
-    }
-
-    /**
-     * Add accessId
-     *
-     * @param Cx\Core_Modules\Access\Model\Entity\AccessId $accessId
-     */
-    public function addAccessId(\Cx\Core_Modules\Access\Model\Entity\AccessId $accessId)
-    {
-        $this->accessId[] = $accessId;
-    }
-
-    /**
-     * Get accessId
-     *
-     * @return Doctrine\Common\Collections\Collection $accessId
-     */
-    public function getAccessId()
-    {
-        return $this->accessId;
-    }
-
-    /**
-     * Set toolbar
-     *
-     * @param string $toolbar
-     */
-    public function setToolbar($toolbar)
-    {
-        $this->toolbar = $toolbar;
-    }
-
-    /**
-     * Get toolbar
-     *
-     * @return string $toolbar
-     */
-    public function getToolbar()
-    {
-        return $this->toolbar;
     }
 }

@@ -155,6 +155,11 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
 
                             preg_match_all('/\d+/', $rowId, $ids, null, 0);
 
+                            // hostname's ID is 0
+                            if (!$ids[0][1]) {
+                                return '';
+                            }
+
                             $actionIcons = '';
                             $csrfParams = \Cx\Core\Csrf\Controller\Csrf::param();
                             if ($mainDomainName !== $rowData['name']) {

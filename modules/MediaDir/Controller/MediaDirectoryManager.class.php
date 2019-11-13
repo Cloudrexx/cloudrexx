@@ -369,7 +369,6 @@ class MediaDirectoryManager extends MediaDirectoryLibrary
 
 
         //show categories
-        $objCategories = new MediaDirectoryCategory(null, null, 1, $this->moduleName);
         $objCategories->listCategories($this->_objTpl, 1, null);
 
         $this->_objTpl->setVariable(array(
@@ -827,6 +826,7 @@ class MediaDirectoryManager extends MediaDirectoryLibrary
             'TXT_'.$this->moduleLangVar.'_META_DESCRIPTION' =>  $_CORELANG['TXT_META_DESCRIPTION'],
             'TXT_'.$this->moduleLangVar.'_PICTURE' =>  $_CORELANG['TXT_IMAGE'],
             'TXT_'.$this->moduleLangVar.'_SHOW_SUBCATEGORIES' =>  $_ARRAYLANG['TXT_MEDIADIR_SHOW_SUBCATEGORIES'],
+            'TXT_'.$this->moduleLangVar.'_SHOW_SUBCATEGORIES_INFO' =>  $_ARRAYLANG['TXT_MEDIADIR_SHOW_SUBCATEGORIES_INFO'],
             'TXT_'.$this->moduleLangVar.'_SHOW_ENTRIES' =>  $_ARRAYLANG['TXT_MEDIADIR_SHOW_ENTRIES'],
             'TXT_'.$this->moduleLangVar.'_VISIBLE' =>  $_CORELANG['TXT_VISIBLE'],
             'TXT_'.$this->moduleLangVar.'_CATEGORY' =>  $_ARRAYLANG['TXT_MEDIADIR_CATEGORY'],
@@ -843,7 +843,7 @@ class MediaDirectoryManager extends MediaDirectoryLibrary
             $this->moduleLangVar.'_CATEGORY_IMAGE_BROWSE' => $this->getMediaBrowserButton(
                 $_ARRAYLANG['TXT_BROWSE'],
                 array(
-                    'data-cx-mb-views' => 'filebrowser',
+                    'views' => 'filebrowser',
                     'type' => 'button',
                     'data-input-id' => 'categoryImage2'
                 ),
@@ -1078,7 +1078,7 @@ class MediaDirectoryManager extends MediaDirectoryLibrary
             $this->moduleLangVar.'_LEVEL_IMAGE_BROWSE' => $this->getMediaBrowserButton(
                 $_ARRAYLANG['TXT_BROWSE'],
                 array(
-                    'data-cx-mb-views' => 'filebrowser',
+                    'views' => 'filebrowser',
                     'type' => 'button',
                     'data-input-id' => 'levelImage2'
                 ),

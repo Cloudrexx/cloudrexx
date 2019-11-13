@@ -179,7 +179,7 @@ class U2uLibrary {
           $arrMessage[$messageID] = array();
           $arrMessage[$messageID]["message"]        =   $objResult->fields['message_text'];
           $arrMessage[$messageID]["message_title"]  =   $objResult->fields['message_title'];
-          $arrMessage[$messageID]["username"]       =   $userName['username'];
+          $arrMessage[$messageID]["username"]       =   $userName ? $userName['username'] : 'N/A';
           $arrMessage[$messageID]["date_time"]      =   $objResult->fields['date_time'];
           $objResult->MoveNext();
         }
@@ -336,7 +336,7 @@ class U2uLibrary {
             $userName = $this->_getName($objResult->fields['userid']);
             $arrShowMessage["message"]           =   $objResult->fields['message_text'];
             $arrShowMessage["message_title"]     =   $objResult->fields['message_title'];
-            $arrShowMessage["username"]          =   $userName['username'];
+            $arrShowMessage["username"]          =   $userName ? $userName['username'] : 'N/A';
             $arrShowMessage["registerd_date"]    =  date('Y-m-d',$objResult->fields['regdate']);
             $arrShowMessage["date_time"]         =   $objResult->fields['date_time'];
             $objResult->MoveNext();
@@ -482,40 +482,38 @@ class U2uLibrary {
     function _getName($id) {
         $id = intval($id);
         $objUser = \FWUser::getFWUserObject()->objUser->getUser($id);
+        if (!$objUser) {
+            return false;
+        }
         return array('username' => $objUser->getUsername());
     }
 
      /**
      *
      * Gets the City of the Users..
-     * @global      $objDatabase
      */
     function _getCity($id) {
-        $userId = intval($id);
+        $objFWUser = \FWUser::getFWUserObject();
 
-        $objUser = \FWUser::getFWUserObject()->objUser->getUser($id = $userId);
-        if ($objUser !== false) {
-            $arrShowcity['city'] = $objUser->getProfileAttribute('city');
-        } else {
-            $arrShowcity['city'] = '';
-        }
+        $id = intval($id);
+        $objUser = $objFWUser->objUser->getUser($id);
+        $city = $objUser->getProfileAttribute('city');
+        $arrShowcity['city'] = $city;
+
         return $arrShowcity;
     }
 
      /**
      *
      * Gets the Website Address of the Users..
-     * @global      $objDatabase
      */
     function _getSite($id) {
-        $userId = intval($id);
+        $objFWUser = \FWUser::getFWUserObject();
 
-        $objUser = \FWUser::getFWUserObject()->objUser->getUser($id = $userId);
-        if ($objUser !== false) {
-            $arrShowsite['website'] = $objUser->getProfileAttribute('website');
-        } else {
-            $arrShowsite['website'] = '';
-        }
+        $id = intval($id);
+        $objUser = $objFWUser->objUser->getUser($id);
+        $arrShowsite['website'] = $objUser->getProfileAttribute('website');
+
         return $arrShowsite;
     }
 
@@ -550,6 +548,7 @@ class U2uLibrary {
 
         if (!isset($arrIds)) {
             $arrIds = array();
+
             $objFWUser = \FWUser::getFWUserObject();
             if ($objFWUser->objUser->login()) {
                 $objResult = $objDatabase->Execute('SELECT `buddies_id` FROM `'.DBPREFIX.'module_u2u_address_list` WHERE `user_id` = '.$objFWUser->objUser->getId());

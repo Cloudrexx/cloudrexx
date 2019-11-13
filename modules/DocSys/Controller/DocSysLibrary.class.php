@@ -57,19 +57,16 @@ class DocSysLibrary
      * @param     string     $lang
      * @param     string     $selectedOption
      * @return    string     $modulesMenu
-     * @todo         whats this cmdName for?
      */
-    function getCategoryMenu($langId, $selectedCatIds = array(), $cmdName = false)
+    function getCategoryMenu($langId, $selectedCatIds = array())
     {
         global $objDatabase;
 
         $strMenu = "";
-        $query_where = ($cmdName ? " AND cmd='$cmdName'" : '');
         $query = "
             SELECT catid, name
               FROM " . DBPREFIX . "module_docsys" . MODULE_INDEX . "_categories
              WHERE lang=$langId
-            $query_where
              ORDER BY catid";
         $objResult = $objDatabase->Execute($query);
         while ($objResult && !$objResult->EOF) {

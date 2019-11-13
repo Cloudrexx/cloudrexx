@@ -72,6 +72,12 @@ abstract class DataSource extends \Cx\Model\Base\EntityBase {
     protected $dataAccesses;
 
     /**
+     * List of operations supported by this DataSource
+     * @var array List of operations
+     */
+    protected $supportedOperations = array('eq');
+
+    /**
      * Constructor
      */
     public function __construct() {
@@ -117,7 +123,7 @@ abstract class DataSource extends \Cx\Model\Base\EntityBase {
     /**
      * Set the options
      *
-     * @param string $options
+     * @param array $options
      */
     public function setOptions($options) {
         $this->options = $options;
@@ -126,10 +132,27 @@ abstract class DataSource extends \Cx\Model\Base\EntityBase {
     /**
      * Get the options
      *
-     * @return string $options
+     * @return array $options
      */
     public function getOptions() {
         return $this->options;
+    }
+
+    /**
+     * Get an option by key
+     * @param string $key Path to desired info, delimited by "."
+     * @return mixed Desired information or false if not found
+     */
+    public function getOption($key) {
+        $path = explode('.', $key);
+        $optionLevel = $this->options;
+        foreach ($path as $pathPart) {
+            if (!isset($optionLevel[$pathPart])) {
+                return false;
+            }
+            $optionLevel = $optionLevel[$pathPart];
+        }
+        return $optionLevel;
     }
 
     /**
@@ -173,6 +196,44 @@ abstract class DataSource extends \Cx\Model\Base\EntityBase {
     public function getDataAccesses()
     {
         return $this->dataAccesses;
+    }
+
+    /**
+     * Returns a list of field names this DataSource consists of
+     * @return array List of field names
+     */
+    public abstract function listFields();
+
+    /**
+     * Returns a list of field names that uniquely identify objects
+     * @return array List of field names
+     */
+    public abstract function getIdentifierFieldNames();
+
+    /**
+     * Tells whether this DataSource has a field named $field
+     * @param string $field Name of a field
+     * @return boolean True if $field exists in this DataSource, false otherwise
+     */
+    public function hasField($field) {
+        return in_array($field, $this->listFields());
+    }
+
+    /**
+     * Returns the list of operations supported by this DataSource
+     * @return array List of supported operations
+     */
+    public function getSupportedOperations() {
+        return $this->supportedOperations;
+    }
+
+    /**
+     * Tells whether operation $operation is supported by this DataSource
+     * @param string $operation Name of an operation
+     * @return boolean True if $operation is supported by this DataSource
+     */
+    public function supportsOperation($operation) {
+        return in_array($operation, $this->getSupportedOperations());
     }
 
     /**

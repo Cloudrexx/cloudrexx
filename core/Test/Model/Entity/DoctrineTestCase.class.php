@@ -49,15 +49,15 @@ namespace Cx\Core\Test\Model\Entity;
 abstract class DoctrineTestCase extends ContrexxTestCase {
     protected static $em;
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass(): void {
         self::$em = \Env::get('em');
     }
 
-    public function setUp() {
+    public function setUp(): void {
         self::$em->getConnection()->beginTransaction();
     }
 
-    public function tearDown() {
+    public function tearDown(): void {
         self::$em->getConnection()->rollback();
     }
 }

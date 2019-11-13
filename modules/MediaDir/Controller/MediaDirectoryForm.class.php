@@ -413,7 +413,7 @@ class MediaDirectoryForm extends MediaDirectoryLibrary
         $intUseLevel = isset($arrData['formUseLevel']) ? contrexx_input2int($arrData['formUseLevel']) : 0;
         $intUseReadyToConfirm = isset($arrData['formUseReadyToConfirm']) ? contrexx_input2int($arrData['formUseReadyToConfirm']) : 0;
         $intEntriesPerPage = isset($arrData['formEntriesPerPage']) ? contrexx_input2int($arrData['formEntriesPerPage']) : 0;
-        $useAssociatedEntries = !empty($arrData['use_associated_entries']);
+        $useAssociatedEntries = intval(!empty($arrData['use_associated_entries']));
         $targetFormIds =
             $useAssociatedEntries && !empty($arrData['target_form_ids'])
                 ? $arrData['target_form_ids'] : [];

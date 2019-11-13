@@ -21,27 +21,30 @@ cx.ready(function() {
                 if (opt.repeat) {
                     data += '&' + opt.updatedOrder;
                 }
-                jQuery.ajax({
-                    type: 'POST',
-                    data: data,
-                    url:  cadminPath + 'index.php&cmd=JsonData&object=' + opt.jsonObject + '&act=' + opt.jsonAct,
-                    beforeSend: function() {
-                        jQuery('body').addClass('loading');
-                        opt.that.sortable("disable");
-                        opt.uiItem.find('td:first-child').addClass('sorter-loading');
-                    },
-                    success: function(msg) {
-                        if (msg.data && msg.data.status === 'success') {
-                            recordCount = msg.data.recordCount;
+                cx.ajax(
+                    opt.jsonObject,
+                    opt.jsonAct,
+                    {
+                        type: 'POST',
+                        data: data,
+                        beforeSend: function() {
+                            jQuery('body').addClass('loading');
+                            opt.that.sortable("disable");
+                            opt.uiItem.find('td:first-child').addClass('sorter-loading');
+                        },
+                        success: function(msg) {
+                            if (msg.data && msg.data.status === 'success') {
+                                recordCount = msg.data.recordCount;
+                            }
+                        },
+                        complete: function() {
+                            sortable.updateOrder(opt, recordCount);
+                            opt.that.sortable("enable");
+                            jQuery('body').removeClass('loading');
+                            opt.uiItem.find('td:first-child').removeClass('sorter-loading');
                         }
-                    },
-                    complete: function() {
-                        sortable.updateOrder(opt, recordCount);
-                        opt.that.sortable("enable");
-                        jQuery('body').removeClass('loading');
-                        opt.uiItem.find('td:first-child').removeClass('sorter-loading');
                     }
-                });
+                );
             },
             //Check the same 'order' field value is repeated or not
             isOrderNoRepeat : function(options) {
@@ -140,8 +143,104 @@ cx.ready(function() {
             sortable.ajaxCall(params);
         }
     });
+
+    // Get first element from tabmenu and select tab
+    var firstTab = document.getElementsByClassName('vg-tabs')[0];
+    if (document.getElementById('form-0-tab-legend') && typeof document.getElementById('form-0-tab-legend') !== 'undefined') {
+        document.getElementById('form-0-tab-legend').style.display = 'block';
+        if (document.getElementById('form-0-tabmenu') != null) {
+            selectTab(firstTab.id, true);
+        } else {
+            firstTab.style.display = 'block';
+        }
+        initializeTabClickEvent(0);
+    }
+
     cx.jQuery(".chzn").chosen();
+
+    var cadminPath = cx.variables.get('cadminPath', 'contrexx'),
+        status = {
+            ajaxCall : function(opt) {
+                cx.ajax(
+                    opt.jsonObject,
+                    opt.jsonAct,
+                    {
+                        type: 'POST',
+                        data: {
+                            'entityId': opt.entityId,
+                            'newStatus': opt.statusValue,
+                            'statusField': opt.statusField,
+                            'component': opt.component,
+                            'entity': opt.entity,
+                        },
+                        showMessage: true,
+                        beforeSend: function() {
+                            cx.jQuery(opt.that).addClass('loading');
+                        },
+                        success: function(json) {
+                            cx.jQuery(opt.that).toggleClass('active');
+                        },
+                        preError: function(xhr, status, error) {
+                            cx.tools.StatusMessage.showMessage(error);
+                            cx.jQuery(this).data('status-value', (cx.jQuery(this).hasClass('active') ? 0 : 1));
+                        },
+                        complete: function() {
+                            cx.jQuery(opt.that).removeClass('loading');
+                        }
+                    },
+                    cx.variables.get('frontendLocale', 'contrexx')
+                );
+            },
+        };
+    cx.jQuery('.vg-function-status').click(function () {
+        var table = cx.jQuery(this).closest('table.status');
+        cx.jQuery(this).data('status-value', (cx.jQuery(this).hasClass('active') ? 0 : 1));
+
+        var params = {
+            that: cx.jQuery(this),
+            entityId: cx.jQuery(this).data('entity-id'),
+            jsonObject: table.data('status-object'),
+            jsonAct: table.data('status-act'),
+            component: table.data('status-component'),
+            entity: table.data('status-entity'),
+            statusField: table.data('status-field'),
+            statusValue: cx.jQuery(this).data('status-value'),
+        };
+        status.ajaxCall(params);
+    });
+
+    cx.jQuery(".vg-export").click(function(e) {
+        e.preventDefault();
+        var url = new URL(window.location);
+        var params = {
+            type: cx.jQuery(this).data('object'),
+        };
+        if (url.searchParams.get('search')) {
+            params.search = url.searchParams.get('search');
+        }
+        if (url.searchParams.get('term')) {
+            params.term = url.searchParams.get('term');
+        }
+        cx.ajax(
+            cx.jQuery(this).data('adapter'),
+            cx.jQuery(this).data('method'),
+            {
+                showMessage: true,
+                data: params,
+                postSuccess: function(data) {
+                    window.location.href = data.data;
+                }
+            }
+        );
+    });
 });
+
+function initializeTabClickEvent(formId) {
+    cx.jQuery('.tabmenu a').click(function () {
+        var tabName = cx.jQuery(this).attr('id').split('_')[1];
+        selectTab(tabName, true, formId);
+    });
+}
 
 jQuery(document).ready(function(){
     jQuery('.mappedAssocciationButton, .edit').click(function() {
@@ -426,7 +525,7 @@ cx.ready(function() {
     cx.jQuery(".vg-searchSubmit").filter("a,input").click(getSubmitHandler);
     
     (function() {
-        var url = cx.tools.decodeURI(document.location.href);
+        var url = decodeURIComponent(document.location.href);
         var parts = JavaSplit(url, "?", 2);
         if (parts.length < 2) {
             return;
@@ -464,3 +563,30 @@ cx.ready(function() {
     })();
 });
 
+cx.bind('Html:postFormFix', function() {
+    var formId = 0;
+    cx.jQuery.each(cx.ui.forms.get(), function(index, el) {
+        formId = cx.jQuery(el).attr("id").split("-")[1];
+        cx.jQuery('#form-' + formId).find('*[id*="form-0-"]').each(function () {
+            var id = cx.jQuery(this).attr('id');
+            cx.jQuery(this).attr('id', id.replace('-0-', '-' + formId + '-'));
+        });
+    });
+
+    initializeTabClickEvent(formId);
+
+    var forms = document.getElementsByTagName('form');
+    for (var i = 0; i < forms.length; i++) {
+        var firstTab = forms.item(i).getElementsByClassName('vg-tabs')[0];
+        if (!firstTab) {
+            continue;
+        }
+        document.getElementById('form-'+formId+'-tab-legend').style.display = 'block';
+        if (document.getElementById('form-'+formId+'-tabmenu') != null) {
+            selectTab(firstTab.id, true, formId);
+        } else {
+            firstTab.style.display = 'block';
+        }
+    }
+
+}, 'ViewGenerator');

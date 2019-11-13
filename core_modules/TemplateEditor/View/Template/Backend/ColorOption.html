@@ -8,6 +8,7 @@
         showPalette: true,
         cancelText: cx.variables.get('cancel','TemplateEditor'),
         chooseText: cx.variables.get('select','TemplateEditor'),
+        showAlpha: true,
         palette: [
             {TEMPLATEEDITOR_OPTION_CHOICE}
         ],
@@ -16,7 +17,7 @@
             jQuery("#{TEMPLATEEDITOR_OPTION_NAME}").spectrum("set", color);
             jQuery("#{TEMPLATEEDITOR_OPTION_NAME}").spectrum("hide");
         },
-        preferredFormat: 'hex'
+        preferredFormat: 'rgb'
     });
     jQuery("#{TEMPLATEEDITOR_OPTION_NAME}").show();
 

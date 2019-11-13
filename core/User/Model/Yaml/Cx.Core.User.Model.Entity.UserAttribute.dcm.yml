@@ -5,7 +5,8 @@ Cx\Core\User\Model\Entity\UserAttribute:
     id:
       id: true
       type: integer
-      unsigned: true
+      options:
+        unsigned: true
       generator:
         strategy: AUTO
     type:
@@ -14,10 +15,9 @@ Cx\Core\User\Model\Entity\UserAttribute:
       options:
         default: "text"
     mandatory:
-      type: enum
-      values: ['0','1']
+      type: boolean
       options:
-        default: "0"
+        default: 0
     sortType:
       type: enum
       values: ['asc','desc','custom']
@@ -27,7 +27,6 @@ Cx\Core\User\Model\Entity\UserAttribute:
     orderId:
       type: integer
       nullable: false
-      unsigned: true
       column: order_id
       options:
         default: 0
@@ -44,34 +43,28 @@ Cx\Core\User\Model\Entity\UserAttribute:
     readAccessId:
       type: integer
       column: read_access_id
+    isDefault:
+      type: boolean
+      column: is_default
+      options:
+        default: "0"
   oneToMany:
-    parent:
-      targetEntity: Cx\Core\User\Model\Entity\UserAttribute
-      mappedBy: children
-    userAttributeName:
-      targetEntity: Cx\Core\User\Model\Entity\UserAttributeName
-      mappedBy: userAttribute
-#    userAttributeValue:
-#      targetEntity: Cx\Core\User\Model\Entity\UserAttributeValue
-#      mappedBy: attribute
-  manyToOne:
     children:
       targetEntity: Cx\Core\User\Model\Entity\UserAttribute
-      inversedBy: parent
+      mappedBy: parent
+    userAttributeName:
+      targetEntity: Cx\Core\User\Model\Entity\UserAttributeName
+      orderBy: { 'order': 'ASC' }
+      mappedBy: userAttribute
+    userAttributeValue:
+      targetEntity: Cx\Core\User\Model\Entity\UserAttributeValue
+      mappedBy: userAttribute
+  manyToOne:
+    parent:
+      targetEntity: Cx\Core\User\Model\Entity\UserAttribute
+      inversedBy: children
       joinColumns:
         parent_id:
           referencedColumnName: id
-#    accessId:
-#      targetEntity: Cx\Core_Modules\Access\Model\Entity\AccessId
-#      inversedBy: contrexxAccessUserAttribute
-#      joinColumns:
-#        access_id:
-#          referencedColumnName: id
-#          nullable: false
-#    readAccessId:
-#      targetEntity: Cx\Core_Modules\Access\Model\Entity\AccessId
-#      inversedBy: contrexxAccessUserAttributeRead
-#      joinColumns:
-#        read_access_id:
-#          referencedColumnName: id
-#          nullable: false
+          options:
+            unsigned: true

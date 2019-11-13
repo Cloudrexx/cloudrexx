@@ -29,6 +29,10 @@ cx.jQuery(document).ready(function(){
     });
 
     jQuery("input[name=\"imported\"]").click(function(e){
+        if (!jQuery('input[name="imported"]').closest('form').find('input[name="consentConfirm"]').length) {
+            return;
+        }
+
         if (!jQuery("#consentConfirmImport").is(":checked")) {
             e.preventDefault();
             showErrorMsg(errorMsg);

@@ -168,8 +168,12 @@ var cxDataList = function() {
             recipientRow.append($(htmlTd).append(user.zip));
             recipientRow.append($(htmlTd).append(user.city));
             recipientRow.append($(htmlTd).append(user.country));
-            if (user.feedback) {
-                recipientRow.append($(htmlTd).append($(htmlAFeedback.replace('[id]', user.id).replace('[type]', user.type)).append(user.feedback)));
+            if (jQuery('#userFeedbackCol').length) {
+                if (user.feedback) {
+                    recipientRow.append($(htmlTd).append($(htmlAFeedback.replace('[id]', user.id).replace('[type]', user.type)).append(user.feedback)));
+                } else {
+                    recipientRow.append($(htmlTd).append(''));
+                }
             }
             recipientRow.append($(htmlTd).append(user.emaildate));
             recipientRow.append($(htmlTd).append(user.consent));
@@ -365,7 +369,7 @@ var confirmDeleteInactive = function() {
         <table id="tbluserlist" width="100%" border="0" cellpadding="3" cellspacing="0" class="adminlist">
             <thead>
                 <tr>
-                    <th colspan="12">
+                    <th colspan="13">
                         <span style="float: left; width: auto;">{TXT_NEWSLETTER_RECIPIENTS}</span>
                         <a href="index.php?cmd=Newsletter&amp;act=deleteInactive" onclick="return confirmDeleteInactive();" title="{TXT_NEWSLETTER_DELETE_ALL_INACTIVE}" style="float: right; width: auto;">[ {TXT_NEWSLETTER_DELETE_ALL_INACTIVE} ] </span></a>
                     </th>
@@ -399,7 +403,7 @@ var confirmDeleteInactive = function() {
                         {TXT_COUNTRY}
                     </td>
                     <!-- BEGIN statistics -->
-                    <td nowrap width="1%">
+                    <td nowrap width="1%" id="userFeedbackCol">
                         {TXT_NEWSLETTER_USER_FEEDBACK}
                     </td>
                     <!-- END statistics -->

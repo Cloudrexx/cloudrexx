@@ -453,12 +453,12 @@ class Node extends \Cx\Core\ContentManager\Model\Entity\Node implements \Doctrin
     /**
      * {@inheritDoc}
      */
-    public function copy($recursive = false, \Cx\Core\ContentManager\Model\Entity\Node $newParent = NULL, $persist = true)
+    public function copy($recursive = false, \Cx\Core\ContentManager\Model\Entity\Node $newParent = NULL, &$nodePosition = 0, $addCopySuffix = false)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'copy', array($recursive, $newParent, $persist));
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'copy', array($recursive, $newParent, $nodePosition, $addCopySuffix));
 
-        return parent::copy($recursive, $newParent, $persist);
+        return parent::copy($recursive, $newParent, $nodePosition, $addCopySuffix);
     }
 
     /**
