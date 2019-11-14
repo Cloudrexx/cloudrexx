@@ -913,7 +913,6 @@ class GetUserTest extends \Cx\Core\User\Testing\UnitTest\UserTestCase
                 FROM    '. DBPREFIX. 'access_user_attribute
                 WHERE id ='. $deleteAttribute
         );
-        \DBG::dump($objResult);
 
         //if Attribute isn't in DB, $objResult->EOF is true and Test is successful
         //if Attribute is still in DB, $objResult->EOF is false and Test fails
