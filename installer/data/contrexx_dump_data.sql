@@ -3336,6 +3336,7 @@ INSERT INTO `contrexx_module_gallery_settings` (`id`, `name`, `value`) VALUES (2
 INSERT INTO `contrexx_module_gallery_settings` (`id`, `name`, `value`) VALUES (23,'slide_show','slideshow');
 INSERT INTO `contrexx_module_gallery_settings` (`id`, `name`, `value`) VALUES (24,'slide_show_seconds','3');
 INSERT INTO `contrexx_module_gallery_settings` (`id`, `name`, `value`) VALUES (25,'show_image_size','off');
+INSERT INTO `contrexx_module_gallery_settings` (`id`, `name`, `value`) VALUES (26,'drag_drop'', ''off');
 INSERT INTO `contrexx_module_guestbook` (`id`, `status`, `name`, `forename`, `gender`, `url`, `email`, `comment`, `location`, `lang_id`, `datetime`) VALUES (1,1,'CLOUDREXX','','M','https://www.cloudrexx.com/','nospam@example.com','This is a sample entry.\r\n\r\nsincerely yours\r\nCLOUDREXX AG','Schweiz',2,'2010-12-13 09:00:10');
 INSERT INTO `contrexx_module_guestbook_settings` (`name`, `value`) VALUES ('guestbook_send_notification_email','0');
 INSERT INTO `contrexx_module_guestbook_settings` (`name`, `value`) VALUES ('guestbook_activate_submitted_entries','0');
