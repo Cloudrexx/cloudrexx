@@ -884,4 +884,41 @@ class GetUserTest extends \Cx\Core\User\Testing\UnitTest\UserTestCase
 
 
     }
+
+    /**
+     * Test Custom set Attributes Value
+     * Test if AttributeID gets deleted from contrexx_access_user_attribute
+     *
+     * @author Mirjam Doyon  <info@cloudrexx.com>
+     *
+     * @return void
+     */
+    public function testCustomSetAttributesValue() {
+        global $objDatabase;
+        $object = \FWUser::getFWUserObject();
+        $user = $object->objUser;
+
+        $profileAttribute = $user->objAttribute->getById(0);
+        $profileAttribute->reset();
+        $profileAttribute->setNames(array('1'=>'TestFood'));
+        $profileAttribute->store();
+
+        //determine ID to delete
+        $deleteAttribute = $profileAttribute->getId();
+        $profileAttribute->deleteAttribute($deleteAttribute);
+
+        //check if custom Attribute is still in DB
+        $objResult = $objDatabase->Execute(
+            'SELECT      *
+                FROM    '. DBPREFIX. 'access_user_attribute
+                WHERE id ='. $deleteAttribute
+        );
+        \DBG::dump($objResult);
+
+        //if Attribute isn't in DB, $objResult->EOF is true and Test is successful
+        //if Attribute is still in DB, $objResult->EOF is false and Test fails
+        $this->assertTrue(
+            $objResult->EOF
+        );
+    }
 }
