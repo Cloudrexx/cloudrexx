@@ -875,7 +875,7 @@ class GetUserTest extends \Cx\Core\User\Testing\UnitTest\UserTestCase
                 FROM    '. DBPREFIX. 'access_user_attribute_name
                 WHERE attribute_id ='. $deleteAttribute
         );
-        var_dump($profileAttribute->getName(1));
+
         //if Attribute isn't in DB, $objResult is false and Test is successful
         //if Attribute is still in DB, we have a Object and Test fails
         $this->assertFalse(
