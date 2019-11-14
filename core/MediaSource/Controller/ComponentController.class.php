@@ -159,7 +159,7 @@ class ComponentController
      * @param $indexer \Cx\Core\MediaSource\Model\Entity\Indexer indexer
      *
      * @throws  \Cx\Core\MediaSource\Model\Entity\IndexerException if an index
-     *          already exists with this extension type
+     *          already exists with this file extension
      * @return void
      */
     public function registerIndexer($indexer)
@@ -170,7 +170,7 @@ class ComponentController
         foreach ($extensions as $extension) {
             if (!empty($this->indexers[$extension])) {
                 throw new \Cx\Core\MediaSource\Model\Entity\IndexerException(
-                    'An index with this extension type already exists!'
+                    'An index with this file extension already exists!'
                 );
             }
             $this->indexers[$extension] = $indexer;
@@ -188,17 +188,17 @@ class ComponentController
     }
 
     /**
-     * Get indexer by type
+     * Get indexer by file extension
      *
-     * @param $type string type of indexer
+     * @param $extension string file extension of indexer
      *
      * @return \Cx\Core\MediaSource\Model\Entity\Indexer
      */
-    public function getIndexer($type)
+    public function getIndexer($extension)
     {
-        if (!isset($this->indexers[$type])) {
+        if (!isset($this->indexers[$extension])) {
             return null;
         }
-        return $this->indexers[$type];
+        return $this->indexers[$extension];
     }
 }
