@@ -401,7 +401,8 @@ class MediaSource extends DataSource {
             return array();
         }
         $searchLength = \Cx\Core\Setting\Controller\Setting::getValue(
-            'searchDescriptionLength'
+            'searchDescriptionLength',
+            'Config'
         );
         $fullPath = $this->getDirectory()[0] . $path;
         $fileList = array();
