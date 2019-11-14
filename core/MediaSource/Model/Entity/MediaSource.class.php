@@ -432,11 +432,11 @@ class MediaSource extends DataSource {
             null
         )->getQuery();
         $count = $query->getSingleScalarResult();
-        if ($limit === 0) {
-            return array();
-        }
         if ($limit === null) {
-            $limit = 10;
+            $limit = \Cx\Core\Setting\Controller\Setting::getValue(
+                'corePagingLimit',
+                'Config'
+            );
         }
 
         $qb->select(
