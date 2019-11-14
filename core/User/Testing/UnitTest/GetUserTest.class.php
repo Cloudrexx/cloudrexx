@@ -844,7 +844,7 @@ class GetUserTest extends \Cx\Core\User\Testing\UnitTest\UserTestCase
      *
      * @return void
      */
-    public function testCustomSetAttributes() {
+    public function testCustomSetAttributeNames() {
         global $objDatabase;
         $object = \FWUser::getFWUserObject();
         $user = $object->objUser;
@@ -863,8 +863,8 @@ class GetUserTest extends \Cx\Core\User\Testing\UnitTest\UserTestCase
                 ),
             )
         );
-
         $this->createUsers($user, $userInfos);
+
         //determine ID to delete
         $deleteAttribute = $profileAttribute->getId();
         $profileAttribute->deleteAttribute($deleteAttribute);
@@ -874,16 +874,15 @@ class GetUserTest extends \Cx\Core\User\Testing\UnitTest\UserTestCase
             'SELECT      *
                 FROM    '. DBPREFIX. 'access_user_attribute_name
                 WHERE attribute_id ='. $deleteAttribute
+
         );
 
-        //if Attribute isn't in DB, $objResult is false and Test is successful
-        //if Attribute is still in DB, we have a Object and Test fails
-        $this->assertFalse(
-            $objResult
+        //if Attribute isn't in DB, $objResult->EOF is true and Test is successful
+        //if Attribute is still in DB, $objResult->EOF is false and Test fails
+        $this->assertTrue(
+            $objResult->EOF
         );
-
-
-    }
+    }     
 
     /**
      * Test Custom set Attributes Value
