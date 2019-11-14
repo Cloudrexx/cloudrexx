@@ -450,9 +450,7 @@ class MediaSource extends DataSource {
                 $match->getContent(), 0, $searchLength
             ) .'...';
             $fileInformation['Score'] = 100;
-            $fileInformation['Title'] = ucfirst(
-                str_replace($fullPath . '/', '', $match->getPath())
-            );
+            $fileInformation['Title'] = basename($match->getPath());
             $fileInformation['Content'] = $content;
             $fileInformation['Link'] = $match->getPath();
             $fileInformation['Component'] = $componentName;
