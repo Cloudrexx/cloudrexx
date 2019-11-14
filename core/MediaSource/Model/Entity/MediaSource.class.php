@@ -459,33 +459,4 @@ class MediaSource extends DataSource {
         }
         return $searchResult;
     }
-
-    /**
-     * Returns an array with all file paths of all files in this directory,
-     * including files located in subdirectories.
-     *
-     * @param $fileList array  all files and directories
-     * @param $file    \Cx\Core\MediaSource\Model\Entity\LocalFile file to check
-     * @param $result   array  existing result
-     *
-     * @return array with all files as
-     *               \Cx\Core\MediaSource\Model\Entity\LocalFile
-     */
-    protected function getAllFilesAsObjects($fileList, $file, $result)
-    {
-        foreach ($fileList as $fileEntryKey => $fileListEntry) {
-            $newFile = new \Cx\Core\MediaSource\Model\Entity\LocalFile(
-                $file->__toString() . $fileEntryKey,
-                $this->getFileSystem()
-            );
-            if ($this->getFileSystem()->isDirectory($newFile)) {
-                $result = $this->getAllFilesAsObjects(
-                    $fileListEntry, $newFile, $result
-                );
-            } else if ($this->getFileSystem()->isFile($newFile)) {
-                array_push($result, $newFile);
-            }
-        }
-        return $result;
-    }
 }
