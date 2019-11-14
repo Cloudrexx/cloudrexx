@@ -178,11 +178,11 @@ class ComponentController
     }
 
     /**
-     * List all indexer
+     * Return all indexers by file extension
      *
-     * @return array
+     * @return array List of indexers indexed by file extension
      */
-    public function listIndexers()
+    public function getIndexers()
     {
         return $this->indexers;
     }
