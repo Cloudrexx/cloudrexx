@@ -170,7 +170,7 @@ class ComponentController
         foreach ($extensions as $extension) {
             if (!empty($this->indexers[$extension])) {
                 throw new \Cx\Core\MediaSource\Model\Entity\IndexerException(
-                    $_ARRAYLANG['TXT_INDEXER_ALREADY_EXISTS']
+                    'An index with this extension type already exists!'
                 );
             }
             $this->indexers[$extension] = $indexer;
