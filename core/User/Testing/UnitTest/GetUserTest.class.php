@@ -851,7 +851,7 @@ class GetUserTest extends \Cx\Core\User\Testing\UnitTest\UserTestCase
 
         $profileAttribute = $user->objAttribute->getById(0);
         $profileAttribute->reset();
-        $profileAttribute->setNames(array('1'=>'testibus'));
+        $profileAttribute->setNames(array('1'=>'TestColor'));
         $profileAttribute->store();
 
         //create User with a Attribute Entry
@@ -859,7 +859,7 @@ class GetUserTest extends \Cx\Core\User\Testing\UnitTest\UserTestCase
             'test1@testmail.com' => array(
                 'profile' => array(
                     'firstname' => array('Xavier'),
-                    'testibus' => array('Test Entry')
+                    'TestColor' => array('Red')
                 ),
             )
         );
