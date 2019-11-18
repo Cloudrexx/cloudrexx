@@ -119,7 +119,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             \Cx\Core\Csrf\Controller\Csrf::header(
                 'Location: ' . $url->toString(),
                 true,
-                $rewriteRule->getRewriteStatusCode()
+                intval($rewriteRule->getRewriteStatusCode())
             );
             die();
         }

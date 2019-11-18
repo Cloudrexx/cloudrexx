@@ -90,6 +90,35 @@ class SaferpayJson
     );
 
     /**
+     * For all payment providers that SIX redirects to (i.e. does not handle
+     * internally) we do not need to check PSD-2 compliance as the payment
+     * provider is responsible for this in this case.
+     * Also if a payment provider is only available for citizens of countries
+     * outside the PSD-2 zone we can ignore PSD-2 as this is an exception to
+     * it.
+     * @var array List of acquirer names
+     */
+    protected static $acquirersWithout3dSecure = array(
+        'Alipay',
+        'BillPay Direct Debit',
+        'BillPay Purchase on Receipt',
+        'Bonus Card',
+        'ePrzelewy',
+        'eps',
+        'giropay',
+        'iDEAL',
+        'JCB',
+        'MyOne',
+        'paydirekt',
+        'PayPal',
+        'PostFinance Card',
+        'PostFinance eFinance',
+        'SEPA Direct Debit',
+        'SOFORT',
+        'TWINT',
+    );
+
+    /**
      * Perform a request to the Saferpay JSON API
      *
      * @param string $step One of the strings defined as a key in $urls
@@ -213,6 +242,23 @@ class SaferpayJson
             $result['Transaction']['Status'] != 'AUTHORIZED'
         ) {
             return false;
+        }
+
+        // For all payment providers that SIX redirects to (i.e. does not handle
+        // internally) we do not need to check PSD-2 compliance as the payment
+        // provider is responsible for this in this case.
+        // Also if a payment provider is only available for citizens of countries
+        // outside the PSD-2 zone we can ignore PSD-2 as this is an exception to
+        // it.
+        if (
+            isset($result['Transaction']['AcquirerName']) &&
+            in_array(
+                $result['Transaction']['AcquirerName'],
+                static::$acquirersWithout3dSecure
+            )
+        ) {
+            static::$transactionId = $result['Transaction']['Id'];
+            return true;
         }
 
         // check 3D secure as proposed by https://saferpay.github.io/sndbx/index.html#3ds

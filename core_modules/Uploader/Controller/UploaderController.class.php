@@ -364,7 +364,14 @@ class UploaderController {
      * @return string The sanitized filename
      */
     public static function sanitizeFileName($filename) {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+
+        // 1. transliterate umlauts
+        $filename = $cx->getComponent('LanguageManager')->replaceInternationalCharacters($filename);
+
+        // 2. remove invalid characters
         $filename = FileSystem::replaceCharacters(filter_var($filename,FILTER_SANITIZE_URL));
+
         $fileInfo = pathinfo($filename);
         if (empty($filename)){
             $filename = 'file'.date('Y-m-d H:i:s');

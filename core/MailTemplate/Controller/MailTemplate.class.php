@@ -1222,8 +1222,7 @@ die("MailTemplate::init(): Empty section!");
                     : $_CORELANG['TXT_CORE_MAILTEMPLATE_NEW']);
                 $icon =
                     '<a href="'.
-                        CONTREXX_DIRECTORY_INDEX.
-                        "?cmd=$section&amp;act=".$act.
+                        $uri_edit.
                         '&amp;key='.$key.
                         '&amp;userFrontendLangId='.$lang_id.'"'.
                     ' title="'.$title.'">'.
