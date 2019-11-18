@@ -79,6 +79,8 @@ class UploaderController {
     const PLUPLOAD_SECURITY_ERR = 105;
     const PLUPLOAD_TMPDIR_ERR = 100;
     const PLUPLOAD_UNKNOWN_ERR = 111;
+    const INDEXER_ERROR = 800;
+    const FS_ERROR = 801;
 
     /**
      * Configuration array
@@ -107,6 +109,8 @@ class UploaderController {
         self::PLUPLOAD_TYPE_ERR => 'File type not allowed.',
         self::PLUPLOAD_UNKNOWN_ERR => 'Failed due to unknown error.',
         self::PLUPLOAD_SECURITY_ERR => 'File didn\'t pass security check.',
+        self::INDEXER_ERROR => 'Indexer could not handle file',
+        self::FS_ERROR => 'Filesystem could not handle file',
     );
 
     /**

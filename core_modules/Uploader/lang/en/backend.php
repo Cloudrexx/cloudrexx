@@ -66,3 +66,5 @@ $_ARRAYLANG['TXT_CORE_MODULE_UPLOADER_ERROR_104'] = "Unknown or dangerous filety
 $_ARRAYLANG['TXT_CORE_MODULE_UPLOADER_ERROR_105'] = "Unknown or dangerous filetype.";
 $_ARRAYLANG['TXT_CORE_MODULE_UPLOADER_ERROR_101'] = "File is too big.";
 $_ARRAYLANG['TXT_CORE_MODULE_UPLOADER_ERROR_103'] = "File is too big.";
+$_ARRAYLANG['TXT_CORE_MODULE_UPLOADER_ERROR_800'] = "File name too long.";
+$_ARRAYLANG['TXT_CORE_MODULE_UPLOADER_ERROR_801'] = "Filesystem error.";
