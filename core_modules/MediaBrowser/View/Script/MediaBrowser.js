@@ -478,27 +478,47 @@ cx.ready(function () {
                     UploadProgress: function () {
                         $scope.$digest();
                     },
-                    UploadComplete: function () {
-                        $scope.finishedUpload = true;
-                        $scope.uploadPending = false;
-                        $scope.showUploadedHint = true;
-                        $scope.$digest();
-                        $scope.updateSource(false, false);
+                    FileUploaded: function(uploader, file, response) {
+                        var data = JSON.parse(response.response);
+                        if (data.status !== "success") {
+                            file.status = plupload.FAILED;
+                            console.log("Upload failed with msg: " + data.message);
+                            this.errMsg = data.message;
+                        }
+                    },
+                    UploadComplete: function (up, files) {
+                        var numFailedUpload = 0;
+                        for(i=0; i<files.length; i++){
+                            if(files[i]['status'] == plupload.FAILED){
+                                numFailedUpload++;
+                            }
+                        }
+                        console.log("Failed files: " + numFailedUpload);
+                        if (numFailedUpload > 0) {
+                            var mediaUploaderListCtrl = jQuery('.mediaUploaderListCtrl');
+                            mediaUploaderListCtrl.find('.uploadPlatform')
+                                .addClass('fileError');
+                            mediaUploaderListCtrl.find('.uploadPlatform .error')
+                                .html(this.errMsg);
+                            setTimeout(function () {
+                                mediaUploaderListCtrl.find(' .uploadPlatform')
+                                    .removeClass('fileError');
+                            }, 3000);
+                            up.refresh(); // Reposition Flash/Silverlight
+                        } else {
+                            $scope.finishedUpload = true;
+                            $scope.uploadPending = false;
+                            $scope.showUploadedHint = true;
+                            $scope.$digest();
+                            $scope.updateSource(false, false);
+                        }
                     },
                     Error: function (up, err) {
-                        var mediaUploaderListCtrl = jQuery('.mediaUploaderListCtrl');
-                        mediaUploaderListCtrl.find('.uploadPlatform')
-                            .addClass('fileError');
-                        mediaUploaderListCtrl.find('.uploadPlatform .error')
-                            .html(cx.variables.get(
-                                'TXT_CORE_MODULE_UPLOADER_ERROR_' + /[0-9]+/.exec(err.code),
-                                'mediabrowser'
-                            ));
-                        setTimeout(function () {
-                            mediaUploaderListCtrl.find(' .uploadPlatform')
-                                .removeClass('fileError');
-                        }, 3000);
-                        up.refresh(); // Reposition Flash/Silverlight
+                        var data = JSON.parse(err.response);
+                        if (data.message) {
+                            console.log("Upload failed with msg: " + data.message);
+                            this.errMsg = data.message;
+                        }
                     }
                 }
             });
