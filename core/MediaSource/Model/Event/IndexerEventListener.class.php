@@ -117,6 +117,12 @@ class IndexerEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventListe
             return;
         }
 
+        // we never index files moved to tmp
+        // TODO: Should we remove files that are moved to tmp?
+        if (strpos($fullPath, $this->cx->getCodeBaseDocumentRootPath() . \Cx\Core\Core\Controller\Cx::FOLDER_NAME_TEMP) === 0) {
+            return;
+        }
+
         // Get the indexer for this extension (if any)
         $indexer = $this->cx->getComponent('MediaSource')->getIndexer(
             $extension
