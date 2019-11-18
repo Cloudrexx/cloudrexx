@@ -131,16 +131,21 @@ class UploaderController {
     }
 
     /**
-     * Retrieve the error message
+     * Retrieve the error message (translated if language data is loaded)
      *
      * @param int $code (optional) Code to get message for
      * @return string Error message or empty string
      */
     public static function getErrorMessage($code = null) {
+        global $_ARRAYLANG;
+
         if ($code === null) {
             $code = static::getErrorCode();
         }
         if ($code) {
+            if (isset($_ARRAYLANG['TXT_CORE_MODULE_UPLOADER_ERROR_' . $code])) {
+                return $_ARRAYLANG['TXT_CORE_MODULE_UPLOADER_ERROR_' . $code];
+            }
             return static::$_errors[$code];
         }
         return '';
