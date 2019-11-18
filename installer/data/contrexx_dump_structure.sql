@@ -3866,7 +3866,7 @@ CREATE TABLE `contrexx_voting_system` (
 ) ENGINE=InnoDB ;
 CREATE TABLE contrexx_core_mediasource_indexer_entry (
   `id` INT AUTO_INCREMENT NOT NULL,
-  `path` VARCHAR(65535) NOT NULL,
+  `path` VARCHAR(255) NOT NULL,
   `indexer` VARCHAR(255) NOT NULL,
   `content` VARCHAR(65535) NOT NULL,
   `last_update` DATETIME NOT NULL,
