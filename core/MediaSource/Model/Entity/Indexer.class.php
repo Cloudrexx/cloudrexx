@@ -43,6 +43,28 @@ namespace Cx\Core\MediaSource\Model\Entity;
 class IndexerException extends \Exception {}
 
 /**
+ * Exception if the file path is too long for this indexer
+ *
+ * @copyright   Cloudrexx AG
+ * @author      Michael Ritter <michael.ritter@cloudrexx.com>
+ * @package     cloudrexx
+ * @subpackage  core_mediasource
+ */
+class IndexerPathTooLongException extends IndexerException {
+
+    /**
+     * Automatically set exception message
+     *
+     * @param string $message Exception message
+     * @param int $code Exception code
+     * @param \Exception $previous Previous exception
+     */
+    public function __construct($code = 0, \Exception $previous = null) {
+        parent::__construct('File path is too long for this indexer!', $code, $previous);
+    }
+}
+
+/**
  * Abstract class for Indexer
  *
  * Add, remove or search index entries. With this class you get the possibility
