@@ -215,11 +215,19 @@ class JsonUploader extends SystemComponentController implements JsonAdapter
                     break;
                 }
             }
-            if ($file){
-                \Cx\Lib\FileSystem\FileSystem::move(
-                    $file,  rtrim($fileLocation[0], '/') .'/'. pathinfo( $file, PATHINFO_BASENAME),
-                    true
-                );
+            if ($file) {
+                try {
+                    if (!\Cx\Lib\FileSystem\FileSystem::move(
+                        $file,
+                        rtrim($fileLocation[0], '/') . '/' .
+                            pathinfo($file, PATHINFO_BASENAME),
+                        true
+                    )) {
+                        throw new UploaderException(UploaderController::FS_ERROR);
+                    }
+                } catch (\Cx\Core\MediaSource\Model\Entity\IndexerPathTooLongException $e) {
+                    throw new UploaderException(UploaderController::INDEXER_ERROR, $e);
+                }
 
                 if (isset($fileLocation[2])){
                     $uploader['name'] = $fileLocation[2];

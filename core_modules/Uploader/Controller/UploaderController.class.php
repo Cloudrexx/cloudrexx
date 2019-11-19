@@ -246,7 +246,17 @@ class UploaderController {
                     $i++;
                 }
 
-                \Cx\Lib\FileSystem\FileSystem::move($tmp_path, $new_path, true);
+                try {
+                    if (!\Cx\Lib\FileSystem\FileSystem::move(
+                        $tmp_path,
+                        $new_path,
+                        true
+                    )) {
+                        throw new UploaderException(static::FS_ERROR);
+                    }
+                } catch (\Cx\Core\MediaSource\Model\Entity\IndexerPathTooLongException $e) {
+                    throw new UploaderException(static::INDEXER_ERROR, $e);
+                }
 
                 // verify orientation of images
                 $im = new \ImageManager();
