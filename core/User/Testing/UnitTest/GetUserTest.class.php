@@ -837,14 +837,15 @@ class GetUserTest extends \Cx\Core\User\Testing\UnitTest\UserTestCase
     }
 
     /**
-     * Test Custom set Attributes
-     * Test if Attributes get deleted from Database
+     * Test Custom set Attributes by User
+     * Test if Attributes get deleted from Database if User with the
+     * set Attribute is removed
      *
      * @author Mirjam Doyon  <info@cloudrexx.com>
      *
      * @return void
      */
-    public function testCustomSetAttributeNames() {
+    public function testCustomSetAttributeByUser() {
         global $objDatabase;
         $object = \FWUser::getFWUserObject();
         $user = $object->objUser;
