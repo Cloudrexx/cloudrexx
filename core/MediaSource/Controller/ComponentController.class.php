@@ -175,8 +175,6 @@ class ComponentController extends SystemComponentController {
      */
     public function registerIndexer($indexer)
     {
-        global $_ARRAYLANG;
-
         $extensions = $indexer->getExtensions();
         foreach ($extensions as $extension) {
             if (!empty($this->indexers[$extension])) {
