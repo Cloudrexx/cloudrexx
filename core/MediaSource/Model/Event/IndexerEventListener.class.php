@@ -111,6 +111,14 @@ class IndexerEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventListe
         $indexer->index($fileInfo['path'], $fileInfo['oldPath'], true, false);
     }
 
+    /**
+     * Returns the matching indexer (if any) for the supplied file info
+     *
+     * $fileInfo must either have the indexes "path" and "oldPath" set (for
+     * add or update actions) or "path" and "name" (for delete actions)
+     * @param array $fileInfo Info about the file to handle
+     * @return \Cx\Core\MediaSource\Model\Entity\Indexer|null Matching Indexer or null if none
+     */
     protected function getIndexer($fileInfo) {
         if (isset($fileInfo['path']) && isset($fileInfo['oldPath'])) {
             $fullPath = $fileInfo['path'];
