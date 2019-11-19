@@ -111,16 +111,36 @@ class IndexerEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventListe
             $path = $fullOldPath;
         }
 
+        $indexer = $this->getIndexer($fileInfo);
+
+        if (!$indexer) {
+            return;
+        }
+        
+        // make new path absolute
+        $filePath = str_replace($fullOldPath, $fullPath, $path);
+
+        // let the indexer do his job
+        $indexer->index($filePath, $path, true, false);
+    }
+
+    protected function getIndexer($fileInfo) {
+        if (isset($fileInfo['path']) && isset($fileInfo['oldPath'])) {
+            $fullPath = $fileInfo['path'];
+        } else if (isset($fileInfo['path']) && isset($fileInfo['name'])) {
+            $fullPath = $fileInfo['path'] . $fileInfo['name'];
+        }
+
         $extension = pathinfo($fullPath, PATHINFO_EXTENSION);
         // This is a workaround, we should use the new path instead
         if ($extension == 'part') {
-            return;
+            return null;
         }
 
         // we never index files moved to tmp
         // TODO: Should we remove files that are moved to tmp?
         if (strpos($fullPath, $this->cx->getCodeBaseDocumentRootPath() . \Cx\Core\Core\Controller\Cx::FOLDER_NAME_TEMP) === 0) {
-            return;
+            return null;
         }
 
         // Get the indexer for this extension (if any)
@@ -128,14 +148,9 @@ class IndexerEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventListe
             $extension
         );
         if (!$indexer) {
-            return;
+            return null;
         }
-
-        // make new path absolute
-        $filePath = str_replace($fullOldPath, $fullPath, $path);
-
-        // let the indexer do his job
-        $indexer->index($filePath, $path);
+        return $indexer;
     }
 
     /**
