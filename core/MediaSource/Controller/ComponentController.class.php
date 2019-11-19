@@ -44,9 +44,8 @@ use Cx\Core\Core\Model\Entity\SystemComponentController;
  * @package     cloudrexx
  * @subpackage  core_mediasource
  */
-class ComponentController
-    extends SystemComponentController
-{
+class ComponentController extends SystemComponentController {
+
     /**
      * Include all registered indexers
      */
