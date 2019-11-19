@@ -145,7 +145,7 @@ abstract class Indexer extends \Cx\Model\Base\EntityBase
         $indexerEntry->setPath($path);
         $indexerEntry->setIndexer(get_class($this));
         $indexerEntry->setContent(
-            $this->getText($path)
+            $this->getText($pathToText)
         );
         $indexerEntry->setLastUpdate(new \DateTime('now'));
 
