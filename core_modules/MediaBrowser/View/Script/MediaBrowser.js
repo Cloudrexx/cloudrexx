@@ -233,7 +233,6 @@ cx.ready(function () {
                         $scope.sources = data;
                         $scope.sourcesLoaded.resolve();
                     }, function (reason) {
-                        console.error(reason);
                         bootbox.dialog({
                             className: "media-browser-modal-window",
                             title: cx.variables.get('TXT_FILEBROWSER_ERROR_HAS_HAPPEND', 'mediabrowser'),
@@ -482,7 +481,6 @@ cx.ready(function () {
                         var data = JSON.parse(response.response);
                         if (data.status !== "success") {
                             file.status = plupload.FAILED;
-                            console.log("Upload failed with msg: " + data.message);
                             this.errMsg = data.message;
                         }
                     },
@@ -493,7 +491,6 @@ cx.ready(function () {
                                 numFailedUpload++;
                             }
                         }
-                        console.log("Failed files: " + numFailedUpload);
                         if (numFailedUpload > 0) {
                             var mediaUploaderListCtrl = jQuery('.mediaUploaderListCtrl');
                             mediaUploaderListCtrl.find('.uploadPlatform')
@@ -516,7 +513,6 @@ cx.ready(function () {
                     Error: function (up, err) {
                         var data = JSON.parse(err.response);
                         if (data.message) {
-                            console.log("Upload failed with msg: " + data.message);
                             this.errMsg = data.message;
                         }
                     }
@@ -1194,7 +1190,6 @@ cx.ready(function () {
         angular.bootstrap(jQuery(this).next('.mediaBrowserScope')[0], ['MediaBrowser']);
         var scope = angular.element(jQuery(this).next()[0]).injector();
         if (!scope) {
-            console.warn('.mediaBrowserScope Element is missing, please generate the button only with the mediabrowser class and not by yourself!');
             return;
         }
         jQuery(this).on('click', function (event, config) {
