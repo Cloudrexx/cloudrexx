@@ -86,7 +86,7 @@ class IndexerEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventListe
             return;
         }
 
-        $indexer->clearIndex((string) $file);
+        $indexer->clearIndex((string) $file, false);
     }
 
     /**
@@ -163,6 +163,22 @@ class IndexerEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventListe
      */
     public function onEvent($eventName, array $eventArgs)
     {
-        parent::onEvent($eventName, array($eventArgs));
+        $indexer = $this->getIndexer($eventArgs);
+
+        if (!$indexer) {
+            return;
+        }
+
+        $prefix = \Cx\Core\MediaSource\Controller\ComponentController::FILE_EVENT_PREFIX;
+        if (strpos($eventName, $prefix . 'Pre') === 0) {
+            parent::onEvent(
+                $prefix . substr($eventName, strlen($prefix . 'Pre')),
+                array($eventArgs)
+            );
+        } else if (strpos($eventName, $prefix . 'PostSuccessful') === 0) {
+            $indexer->commitIndex();
+        } else if (strpos($eventName, $prefix . 'PostFailed') === 0) {
+            $indexer->rollbackIndex();
+        }
     }
 }

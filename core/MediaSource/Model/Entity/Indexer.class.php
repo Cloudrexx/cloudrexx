@@ -107,20 +107,25 @@ abstract class Indexer extends \Cx\Model\Base\EntityBase
     /**
      * Index all files which match the indexer type
      *
+     * Starts a transaction and, if $commit is true, commits it.
      * @param $path    string path to indexing file
      * @param $oldPath string (optional) path of the previous location, to get
      *                        the right database entry.
      *                        example use-case: used if an entry is moved.
      * @param $flush   bool   if you want to flush or not
+     * @param $commit  bool   if the transaction should be closed
      *
      * @throws \Doctrine\ORM\OptimisticLockException
-     * @return void
+     * @throws IndexerPathTooLongException If the path is too long to index
      */
-    public function index($path, $oldPath = '', $flush = true)
+    public function index($path, $oldPath = '', $flush = true, $commit = true)
     {
         if (strlen($path) > 255) {
             throw new IndexerPathTooLongException();
         }
+        $em = $this->cx->getDb()->getEntityManager();
+        $em->getConnection()->beginTransaction();
+
         $pathToText = $oldPath;
         $em = $this->cx->getDb()->getEntityManager();
         $repo = $em->getRepository(
@@ -153,17 +158,41 @@ abstract class Indexer extends \Cx\Model\Base\EntityBase
 
         if ($flush) {
             $em->flush();
+            if ($commit) {
+                $this->commitIndex();
+            }
+        }
+    }
+
+    /**
+     * Publishes changes made to the index (/commits transaction)
+     */
+    public function commitIndex() {
+        $em = $this->cx->getDb()->getEntityManager();
+        $em->getConnection()->commit();
+    }
+
+    /**
+     * Drops changes made to the index (/rolls transaction back)
+     */
+    public function rollbackIndex() {
+        $em = $this->cx->getDb()->getEntityManager();
+        if ($em->getConnection()->isTransactionActive()) {
+            $em->getConnection()->rollBack();
         }
     }
 
     /**
      * Delete entries to clear the index
      *
+     * Starts a transaction and, if $commit is true, commits it.
      * @param $path string path to string
+     * @param $commit  bool   if the transaction should be closed
      */
-    public function clearIndex($path = '')
+    public function clearIndex($path = '', $commit = true)
     {
         $em = $this->cx->getDb()->getEntityManager();
+        $em->getConnection()->beginTransaction();
         $indexerEntryRepo = $em->getRepository(
             '\Cx\Core\MediaSource\Model\Entity\IndexerEntry'
         );
@@ -182,6 +211,9 @@ abstract class Indexer extends \Cx\Model\Base\EntityBase
             $em->remove($indexerEntry);
         }
         $em->flush();
+        if ($commit) {
+            $this->commitIndex();
+        }
     }
 
     /**
