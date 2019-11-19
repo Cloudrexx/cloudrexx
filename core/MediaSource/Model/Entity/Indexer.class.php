@@ -55,7 +55,6 @@ class IndexerPathTooLongException extends IndexerException {
     /**
      * Automatically set exception message
      *
-     * @param string $message Exception message
      * @param int $code Exception code
      * @param \Exception $previous Previous exception
      */
