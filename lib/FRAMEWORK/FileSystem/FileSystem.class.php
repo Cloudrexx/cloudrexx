@@ -561,7 +561,7 @@ class FileSystem
      * @deprecated Use non-static method instead
      */
     protected static function callDeleteEventStatic($prefix, $path, $name) {
-        static::callEvent(
+        static::callEventStatic(
             $prefix,
             'Remove',
             array(
