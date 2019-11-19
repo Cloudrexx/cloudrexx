@@ -47,16 +47,19 @@ use Cx\Core\Core\Model\Entity\SystemComponentController;
 class ComponentController extends SystemComponentController {
 
     /**
-     * Include all registered indexers
+     * @var string Prefix for all file events
      */
-    protected $indexers = array();
+    const FILE_EVENT_PREFIX = 'MediaSource.File:';
 
     /**
-     * All file events. The indexer reacts to the events of a file
-     *
-     * @var array
+     * @var array List of event prefixes
      */
-    protected $fileEvents = array('Remove', 'Add', 'Update');
+    const EVENT_PREFIXES = array('Pre', 'PostSuccessful', 'PostFailed');
+
+    /**
+     * @var array File events, for each EVENT_PREFIXES each of these exist
+     */
+    const FILE_EVENTS = array('Remove', 'Add', 'Update');
 
     /**
      * Include all registered indexers
@@ -78,10 +81,12 @@ class ComponentController extends SystemComponentController {
     {
         $eventHandlerInstance = $this->cx->getEvents();
         $eventHandlerInstance->addEvent('mediasource.load');
-        foreach ($this->fileEvents as $fileEvent) {
-            $eventHandlerInstance->addEvent(
-                'MediaSource.File:' . $fileEvent
-            );
+        foreach (static::FILE_EVENTS as $fileEvent) {
+            foreach (static::EVENT_PREFIXES as $prefix) {
+                $eventHandlerInstance->addEvent(
+                    static::FILE_EVENT_PREFIX . $prefix . $fileEvent
+                );
+            }
         }
     }
 
@@ -100,11 +105,13 @@ class ComponentController extends SystemComponentController {
         $eventHandlerInstance = $this->cx->getEvents();
         $this->indexerEventListener = new \Cx\Core\MediaSource\Model\Event\IndexerEventListener($this->cx);
 
-        foreach ($this->fileEvents as $fileEvent) {
-            $eventHandlerInstance->addEventListener(
-                'MediaSource.File:' . $fileEvent,
-                $this->indexerEventListener
-            );
+        foreach (static::FILE_EVENTS as $fileEvent) {
+            foreach (static::EVENT_PREFIXES as $prefix) {
+                $eventHandlerInstance->addEventListener(
+                    static::FILE_EVENT_PREFIX . $prefix . $fileEvent,
+                    $this->indexerEventListener
+                );
+            }
         }
     }
 
