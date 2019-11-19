@@ -59,6 +59,11 @@ class ComponentController extends SystemComponentController {
     protected $fileEvents = array('Remove', 'Add', 'Update');
 
     /**
+     * Include all registered indexers
+     */
+    protected $indexers = array();
+
+    /**
      * @var \Cx\Core\MediaSource\Model\Event\IndexerEventListener Event listener instance
      */
     protected $indexerEventListener;
