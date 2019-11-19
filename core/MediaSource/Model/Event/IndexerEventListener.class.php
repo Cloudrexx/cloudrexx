@@ -101,27 +101,14 @@ class IndexerEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventListe
      * @todo: Move this method so it can be called from ComponentController
      * @param $fileInfo array Information about a file
      */
-    public function index($fileInfo)
-    {
-        $fullPath = $fileInfo['path'];
-        $fullOldPath = $fileInfo['oldPath'];
-        $path = $fullPath;
-
-        if (!empty($fullOldPath)) {
-            $path = $fullOldPath;
-        }
-
+    public function index($fileInfo) {
         $indexer = $this->getIndexer($fileInfo);
-
         if (!$indexer) {
             return;
         }
-        
-        // make new path absolute
-        $filePath = str_replace($fullOldPath, $fullPath, $path);
 
         // let the indexer do his job
-        $indexer->index($filePath, $path, true, false);
+        $indexer->index($fileInfo['path'], $fileInfo['oldPath'], true, false);
     }
 
     protected function getIndexer($fileInfo) {
