@@ -107,6 +107,12 @@ class IndexerEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventListe
             return;
         }
 
+        // we never index files moved to tmp
+        // TODO: Should we remove files that are moved to tmp?
+        if (strpos($fileInfo['path'], $this->cx->getWebsiteTempPath()) === 0) {
+            return null;
+        }
+
         // let the indexer do his job
         $indexer->index($fileInfo['path'], $fileInfo['oldPath'], true, false);
     }
@@ -129,12 +135,6 @@ class IndexerEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventListe
         $extension = pathinfo($fullPath, PATHINFO_EXTENSION);
         // This is a workaround, we should use the new path instead
         if ($extension == 'part') {
-            return null;
-        }
-
-        // we never index files moved to tmp
-        // TODO: Should we remove files that are moved to tmp?
-        if (strpos($fullPath, $this->cx->getWebsiteTempPath()) === 0) {
             return null;
         }
 
