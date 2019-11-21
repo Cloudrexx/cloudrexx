@@ -119,10 +119,13 @@ abstract class Indexer extends \Cx\Model\Base\EntityBase
      */
     public function index($path, $oldPath = '', $flush = true, $commit = true)
     {
-        if (strlen($path) > 255) {
+        $em = $this->cx->getDb()->getEntityManager();
+        $metadata = $em->getClassMetadata(
+            'Cx\Core\MediaSource\Model\Entity\IndexerEntry'
+        );
+        if (strlen($path) > $metadata->fieldMappings['path']['length']) {
             throw new IndexerPathTooLongException();
         }
-        $em = $this->cx->getDb()->getEntityManager();
         $em->getConnection()->beginTransaction();
 
         $pathToText = $oldPath;
