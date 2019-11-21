@@ -412,6 +412,13 @@ class DownloadsLibrary
     }
 
 
+    /**
+     * Returns the code for the user selection in category add/edit views
+     *
+     * @param int $selectedUserId Selected (current) owner
+     * @param int $userId Current User ID
+     * @return string HTML code for user selection
+     */
     protected function getUserDropDownMenu($selectedUserId, $userId)
     {
         $menu = '<select name="downloads_category_owner_id" onchange="document.getElementById(\'downloads_category_owner_config\').style.display = this.value == '.$userId.' ? \'none\' : \'\'" style="width:300px;">';
