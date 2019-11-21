@@ -837,15 +837,16 @@ class GetUserTest extends \Cx\Core\User\Testing\UnitTest\UserTestCase
     }
 
     /**
-     * Test Custom set Attributes by User
-     * Test if Attributes get deleted from Database if User with the
-     * set Attribute is removed
+     * Test Custom set Attributes
+     * Test if Attribute still occurs in Database after Attribute gets
+     * deleted.
+     * Check behavior in two different Tables
      *
      * @author Mirjam Doyon  <info@cloudrexx.com>
      *
      * @return void
      */
-    public function testCustomSetAttributeByUser() {
+    public function testCustomSetAttributes() {
         global $objDatabase;
         $object = \FWUser::getFWUserObject();
         $user = $object->objUser;
@@ -870,30 +871,44 @@ class GetUserTest extends \Cx\Core\User\Testing\UnitTest\UserTestCase
         $deleteAttribute = $profileAttribute->getId();
         $profileAttribute->deleteAttribute($deleteAttribute);
 
-        //check if custom Attribute is still in DB
-        $objResult = $objDatabase->Execute(
+        //check if custom Attribute value is still in DB
+        $objResultValue = $objDatabase->Execute(
             'SELECT      *
-                FROM    '. DBPREFIX. 'access_user_attribute_name
+                FROM    '. DBPREFIX. 'access_user_attribute_value
+                WHERE attribute_id ='. $deleteAttribute
+        );
+        //check if Attribute ID is till in DB
+        $objResultAttribute = $objDatabase->Execute(
+            'SELECT      *
+                FROM    '. DBPREFIX. 'access_user_attribute
                 WHERE attribute_id ='. $deleteAttribute
 
         );
-
         //if Attribute isn't in DB, $objResult->EOF is true and Test is successful
         //if Attribute is still in DB, $objResult->EOF is false and Test fails
+        
+        //$objResultValue tests if the specified Attribute of the User still
+        //got deleted from Database
         $this->assertTrue(
-            $objResult->EOF
+            $objResultValue->EOF
+        );
+        //$objResultAttribute tests if the deleted Attribute is completly
+        //removed from the Database
+        $this->assertTrue(
+            $objResultAttribute->EOF
         );
     }     
 
     /**
-     * Test Custom set Attributes Value
-     * Test if AttributeID gets deleted from contrexx_access_user_attribute
+     * Test Custom set Attributes Value By User
+     * Test if set Attribute is removed from Database
+     * after assigned User is removed.
      *
      * @author Mirjam Doyon  <info@cloudrexx.com>
      *
      * @return void
      */
-    public function testCustomSetAttributesValue() {
+    public function testCustomSetAttributeByUser() {
         global $objDatabase;
         $object = \FWUser::getFWUserObject();
         $user = $object->objUser;
@@ -903,15 +918,27 @@ class GetUserTest extends \Cx\Core\User\Testing\UnitTest\UserTestCase
         $profileAttribute->setNames(array('1'=>'TestFood'));
         $profileAttribute->store();
 
-        //determine ID to delete
-        $deleteAttribute = $profileAttribute->getId();
-        $profileAttribute->deleteAttribute($deleteAttribute);
+        //create User with a Attribute Entry
+        $userInfos = array(
+            'test1@testmail.com' => array(
+                'profile' => array(
+                    'firstname' => array('Xavier'),
+                    'TestColor' => array('Red')
+                ),
+            )
+        );
+        $this->createUsers($user, $userInfos);
+        
+        //determine UserId to delete
+        $deleteUser = $user->getId();
+        //remove this user
+        $user->reset($deleteUser);
 
-        //check if custom Attribute is still in DB
+        //check if custom Attribute-Value is still in DB
         $objResult = $objDatabase->Execute(
             'SELECT      *
-                FROM    '. DBPREFIX. 'access_user_attribute
-                WHERE id ='. $deleteAttribute
+                FROM    '. DBPREFIX. 'access_user_attribute_value
+                WHERE user_id ='. $deleteUser
         );
 
         //if Attribute isn't in DB, $objResult->EOF is true and Test is successful
