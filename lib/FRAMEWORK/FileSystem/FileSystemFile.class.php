@@ -255,4 +255,89 @@ class FileSystemFile implements FileInterface
     {
         return $this->filePath;
     }
+
+    /**
+     * Call Indexer event to delete
+     *
+     * @todo Move to filesystem abstraction based on MediaSource filesystem
+     *  abstraction (see CLX-3069)
+     * @throws \Cx\Core\Event\Controller\EventManagerException
+     * @param $prefix string Event prefix
+     * @param $path string path to file or directory
+     * @param $name string name of file or directory
+     * @deprecated See todo
+     */
+    public static function callDeleteEvent($prefix, $path, $name) {
+        static::callEvent(
+            $prefix,
+            'Remove',
+            array(
+                'path' => $path,
+                'name' => $name
+            )
+        );
+    }
+
+    /**
+     * Call Indexer event to update
+     *
+     * @todo Move to filesystem abstraction based on MediaSource filesystem
+     *  abstraction (see CLX-3069)
+     * @throws \Cx\Core\Event\Controller\EventManagerException
+     * @param $prefix string Event prefix
+     * @param $path    string path to file or directory
+     * @param $name    string name of file or directory
+     * @param $oldname string old name of file or directory
+     * @deprecated See todo
+     */
+    public static function callUpdateEvent($prefix, $from, $to)
+    {
+        static::callEvent(
+            $prefix,
+            'Update',
+            array(
+                'path' => $to,
+                'oldPath' => $from,
+            )
+        );
+    }
+
+    /**
+     * Call Indexer event to add
+     *
+     * @todo Move to filesystem abstraction based on MediaSource filesystem
+     *  abstraction (see CLX-3069)
+     * @throws \Cx\Core\Event\Controller\EventManagerException
+     * @param $prefix string Event prefix
+     * @param $path string path to file or directory
+     * @param $name string name of file or directory
+     * @deprecated See todo
+     */
+    public static function callAddEvent($prefix, $path, $name)
+    {
+        static::callEvent(
+            $prefix,
+            'Add',
+            array(
+                'path' => $path . $name
+            )
+        );
+    }
+
+    /**
+     * Call an indexer event
+     *
+     * @todo Move to filesystem abstraction based on MediaSource filesystem
+     *  abstraction (see CLX-3069)
+     * @throws \Cx\Core\Event\Controller\EventManagerException
+     * @param $prefix string Event prefix
+     * @param $event string Event name without prefix
+     * @param $params array List of params
+     * @deprecated Use non-static method instead
+     * @deprecated See todo
+     */
+    protected static function callEvent($prefix, $event, $params) {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $cx->getEvents()->triggerEvent('MediaSource.File:' . $prefix . $event, $params);
+    }
 }

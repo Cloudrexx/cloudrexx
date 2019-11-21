@@ -57,6 +57,7 @@ class FileSystemException extends \Exception {};
  * @author      Reto Kohli <reto.kohli@comvation.com> (new static methods, error system)
  * @package     cloudrexx
  * @subpackage  lib_filesystem
+ * @deprecated  Use FileSystemFile instead (where possible)
  */
 class FileSystem
 {
@@ -236,7 +237,7 @@ class FileSystem
 
     function copyFile($orgPath, $orgFileName, $newPath, $newFileName, $ignoreExists = false)
     {
-        $this->callAddEvent('Pre', $newPath, $newFileName);
+        FileSystemFile::callAddEvent('Pre', $newPath, $newFileName);
         if (file_exists($newPath.$newFileName)) {
             $info   = pathinfo($newFileName);
             $exte   = $info['extension'];
@@ -248,10 +249,10 @@ class FileSystem
         }
         if (copy($orgPath.$orgFileName, $newPath.$newFileName)) {
             \Cx\Lib\FileSystem\FileSystem::makeWritable($newPath.$newFileName);
-            $this->callAddEvent('PostSuccessful', $newPath, $newFileName);
+            FileSystemFile::callAddEvent('PostSuccessful', $newPath, $newFileName);
         } else {
             $newFileName = 'error';
-            $this->callAddEvent('PostFailed', $newPath, $newFileName);
+            FileSystemFile::callAddEvent('PostFailed', $newPath, $newFileName);
         }
         return $newFileName;
     }
@@ -291,7 +292,7 @@ class FileSystem
     {
         global $_FTPCONFIG;
 
-        $this->callDeleteEvent('Pre', $path, $dirName);
+        FileSystemFile::callDeleteEvent('Pre', $path, $dirName);
         if ($_FTPCONFIG['is_activated'] && empty(self::$connection))
             self::init();
         $webPath=$this->checkWebPath($webPath);
@@ -318,17 +319,17 @@ class FileSystem
         closedir($directory);
         if ($_FTPCONFIG['is_activated']) {
             if (!@ftp_rmdir(self::$connection,  $_FTPCONFIG['path'].$webPath.$dirName)) {
-                $this->callDeleteEvent('PostFailed', $path, $dirName);
+                FileSystemFile::callDeleteEvent('PostFailed', $path, $dirName);
                 return 'error';
             }
         } else {
             if (!@rmdir($path.$dirName.'/'.$file)) {
-                $this->callDeleteEvent('PostFailed', $path, $dirName);
+                FileSystemFile::callDeleteEvent('PostFailed', $path, $dirName);
                 return 'error';
             }
         }
 
-        $this->callDeleteEvent('PostSuccessful', $path, $dirName);
+        FileSystemFile::callDeleteEvent('PostSuccessful', $path, $dirName);
         return '';
     }
 
@@ -337,17 +338,17 @@ class FileSystem
     {
         global $_FTPCONFIG;
 
-        $this->callDeleteEvent('Pre', $path, $fileName);
+        FileSystemFile::callDeleteEvent('Pre', $path, $fileName);
         if ($_FTPCONFIG['is_activated'] && empty(self::$connection))
             self::init();
         $webPath = $this->checkWebPath($webPath);
         $delFile = $_FTPCONFIG['path'].$webPath.$fileName;
         if ($_FTPCONFIG['is_activated']) {
             if (@ftp_delete(self::$connection, $delFile)) {
-                $this->callDeleteEvent('PostSuccessful', $path, $fileName);
+                FileSystemFile::callDeleteEvent('PostSuccessful', $path, $fileName);
                 return $delFile;
             }
-            $this->callDeleteEvent('PostFailed', $path, $fileName);
+            FileSystemFile::callDeleteEvent('PostFailed', $path, $fileName);
             return 'error';
         } else {
             @unlink($path.$fileName);
@@ -355,11 +356,11 @@ class FileSystem
             //clearstatcache();
 
             if (@file_exists($path.$fileName)) {
-                $this->callDeleteEvent('PostFailed', $path, $fileName);
+                FileSystemFile::callDeleteEvent('PostFailed', $path, $fileName);
                 return 'error';
             }
         }
-        $this->callDeleteEvent('PostSuccessful', $path, $fileName);
+        FileSystemFile::callDeleteEvent('PostSuccessful', $path, $fileName);
         return $fileName;
     }
 
@@ -452,7 +453,7 @@ class FileSystem
     {
         global $_FTPCONFIG;
 
-        $this->callUpdateEvent('Pre', $path . $oldFileName, $path . $newFileName);
+        FileSystemFile::callUpdateEvent('Pre', $path . $oldFileName, $path . $newFileName);
         if ($_FTPCONFIG['is_activated'] && empty(self::$connection))
             self::init();
         $webPath = $this->checkWebPath($webPath);
@@ -475,10 +476,10 @@ class FileSystem
                     $status = $newFileName;
                 }
             }
-            $this->callUpdateEvent('PostSuccessful', $path . $oldFileName, $path . $newFileName);
+            FileSystemFile::callUpdateEvent('PostSuccessful', $path . $oldFileName, $path . $newFileName);
         } else {
             $status = $oldFileName;
-            $this->callUpdateEvent('PostFailed', $path . $oldFileName, $path . $newFileName);
+            FileSystemFile::callUpdateEvent('PostFailed', $path . $oldFileName, $path . $newFileName);
         }
         return $status;
     }
@@ -531,104 +532,6 @@ class FileSystem
             }
         }
         return false;
-    }
-
-    /**
-     * Call Indexer event to delete
-     * ToDo: Use \Cx\Core\MediaSource\Model\Entity\LocalFile when FileSystem work smart
-     *
-     * @param $path string path to file or directory
-     * @param $name string name of file or directory
-     *
-     * @throws \Cx\Core\Event\Controller\EventManagerException
-     * @return void
-     */
-    protected function callDeleteEvent($prefix, $path, $name)
-    {
-        $this->callEvent(
-            $prefix,
-            'Remove',
-            array(
-                'path' => $path,
-                'name' => $name
-            )
-        );
-    }
-
-    /**
-     * Same as callDeleteEvent, but static
-     * @see callDeleteEvent()
-     * @deprecated Use non-static method instead
-     */
-    protected static function callDeleteEventStatic($prefix, $path, $name) {
-        static::callEventStatic(
-            $prefix,
-            'Remove',
-            array(
-                'path' => $path,
-                'name' => $name
-            )
-        );
-    }
-
-    /**
-     * Call Indexer event to update
-     * ToDo: Use \Cx\Core\MediaSource\Model\Entity\LocalFile when FileSystem work smart
-     *
-     * @param $path    string path to file or directory
-     * @param $name    string name of file or directory
-     * @param $oldname string old name of file or directory
-     *
-     * @throws \Cx\Core\Event\Controller\EventManagerException
-     * @return void
-     */
-    protected function callUpdateEvent($prefix, $from, $to)
-    {
-        $this->callEvent(
-            $prefix,
-            'Update',
-            array(
-                'path' => $to,
-                'oldPath' => $from,
-            )
-        );
-    }
-
-    /**
-     * Call Indexer event to add
-     * ToDo: Use \Cx\Core\MediaSource\Model\Entity\LocalFile when FileSystem work smart
-     *
-     * @param $path string path to file or directory
-     * @param $name string name of file or directory
-     *
-     * @throws \Cx\Core\Event\Controller\EventManagerException
-     * @return void
-     */
-    protected function callAddEvent($prefix, $path, $name)
-    {
-        $this->callEvent(
-            $prefix,
-            'Add',
-            array(
-                'path' => $path . $name
-            )
-        );
-    }
-
-    protected function callEvent($prefix, $event, $params)
-    {
-        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-        $cx->getEvents()->triggerEvent('MediaSource.File:' . $prefix . $event, $params);
-    }
-
-    /**
-     * Same as callEvent, but static
-     * @see callEvent()
-     * @deprecated Use non-static method instead
-     */
-    protected static function callEventStatic($prefix, $event, $params) {
-        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-        $cx->getEvents()->triggerEvent('MediaSource.File:' . $prefix . $event, $params);
     }
 
 
@@ -1054,7 +957,7 @@ class FileSystem
      */
     public static function delete_file($file_path)
     {
-        static::callDeleteEventStatic(
+        FileSystemFile::callDeleteEvent(
             'Pre',
             pathinfo($file_path, PATHINFO_DIRNAME) . '/',
             pathinfo($file_path, PATHINFO_BASENAME)
@@ -1062,7 +965,7 @@ class FileSystem
         try {
             $objFile = new \Cx\Lib\FileSystem\File($file_path);
             $objFile->delete();
-            static::callDeleteEventStatic(
+            FileSystemFile::callDeleteEvent(
                 'PostSuccessful',
                 pathinfo($file_path, PATHINFO_DIRNAME) . '/',
                 pathinfo($file_path, PATHINFO_BASENAME)
@@ -1071,7 +974,7 @@ class FileSystem
         } catch (FileSystemException $e) {
             \DBG::msg($e->getMessage());
         }
-        static::callDeleteEventStatic(
+        FileSystemFile::callDeleteEvent(
             'PostFailed',
             pathinfo($file_path, PATHINFO_DIRNAME) . '/',
             pathinfo($file_path, PATHINFO_BASENAME)
@@ -1147,13 +1050,13 @@ class FileSystem
 
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $fileSystem = new \Cx\Lib\FileSystem\FileSystem();
-        $fileSystem->callUpdateEvent(
+        FileSystemFile::callUpdateEvent(
             'Pre',
             $from_path,
             $to_path
         );
         if (self::exists($to_path) && !$force) {
-            $fileSystem->callUpdateEvent(
+            FileSystemFile::callUpdateEvent(
                 'PostFailed',
                 $from_path,
                 $to_path
@@ -1164,7 +1067,7 @@ class FileSystem
             \Env::get('cx')->getWebsiteDocumentRootPath().'/'.$from_path,
             \Env::get('cx')->getWebsiteDocumentRootPath().'/'.$to_path)) {
             if (!self::move_ftp($from_path, $to_path, $force)) {
-                $fileSystem->callUpdateEvent(
+                FileSystemFile::callUpdateEvent(
                     'PostFailed',
                     $from_path,
                     $to_path
@@ -1182,14 +1085,14 @@ class FileSystem
                 self::CHMOD_FOLDER
             )
         )) {
-            $fileSystem->callUpdateEvent(
+            FileSystemFile::callUpdateEvent(
                 'PostSuccessful',
                 $from_path,
                 $to_path
             );
             return true;
         } else {
-            $fileSystem->callUpdateEvent(
+            FileSystemFile::callUpdateEvent(
                 'PostFailed',
                 $from_path,
                 $to_path
