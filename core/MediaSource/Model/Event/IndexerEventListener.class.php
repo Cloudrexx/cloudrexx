@@ -134,7 +134,7 @@ class IndexerEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventListe
 
         // we never index files moved to tmp
         // TODO: Should we remove files that are moved to tmp?
-        if (strpos($fullPath, $this->cx->getCodeBaseDocumentRootPath() . \Cx\Core\Core\Controller\Cx::FOLDER_NAME_TEMP) === 0) {
+        if (strpos($fullPath, $this->cx->getWebsiteTempPath()) === 0) {
             return null;
         }
 
