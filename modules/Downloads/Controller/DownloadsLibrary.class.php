@@ -400,11 +400,7 @@ class DownloadsLibrary
         $objFWUser = \FWUser::getFWUserObject();
         $objUser = $objFWUser->objUser->getUser($userId);
         if ($objUser) {
-            if ($objUser->getProfileAttribute('firstname') || $objUser->getProfileAttribute('lastname')) {
-                $author = $objUser->getProfileAttribute('firstname').' '.$objUser->getProfileAttribute('lastname').' ('.$objUser->getUsername().')';
-            } else {
-                $author = $objUser->getUsername();
-            }
+            $author = $objUser->getProfileAttribute('firstname').' '.$objUser->getProfileAttribute('lastname').' ('.$objUser->getUsername().')';
         } else {
             $author = $_ARRAYLANG['TXT_DOWNLOADS_UNKNOWN'];
         }
