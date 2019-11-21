@@ -228,7 +228,7 @@ class ApiResponse extends \Cx\Model\Base\EntityBase implements \JsonSerializable
                 'request' => $this->request,
             ),
             'messages' => $this->messages,
-            'data' => $this->data,
+            'data' => (object) $this->data,
         );
     }
 

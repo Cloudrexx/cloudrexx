@@ -273,8 +273,27 @@ class Resolver {
                 $page_template,
                 $now, $start, $end, $plainSection;
 
-        $section = isset($_REQUEST['section']) ? $_REQUEST['section'] : '';
-        $command = isset($_REQUEST['cmd']) ? contrexx_addslashes($_REQUEST['cmd']) : '';
+        $section = '';
+        if (
+            isset($_REQUEST['section']) &&
+            !is_array($_REQUEST['section']) &&
+            preg_match('/^[a-z0-9]+$/i', $_REQUEST['section'])
+        ) {
+            $section = $_REQUEST['section'];
+        }
+        $command = '';
+        if (
+            isset($_REQUEST['cmd']) &&
+            !is_array($_REQUEST['cmd']) &&
+            preg_match(
+                '/^([-a-z0-9_]+|\[\[' .
+                    \Cx\Core\Routing\NodePlaceholder::NODE_URL_PCRE .
+                    '\]\])$/ix',
+                $_REQUEST['cmd']
+            )
+        ) {
+            $command = $_REQUEST['cmd'];
+        }
         $history = isset($_REQUEST['history']) ? intval($_REQUEST['history']) : 0;
 
 

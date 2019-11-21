@@ -294,7 +294,6 @@ class Cache extends \Cx\Core_Modules\Cache\Controller\CacheLib
             ),
             'Checkout',
             'Crm',
-            'Data',
             'Directory',
             'DocSys',
             'Downloads',

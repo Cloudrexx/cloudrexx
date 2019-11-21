@@ -3389,4 +3389,13 @@ class User extends User_Profile
 
         throw new UserException('Failed to generate a new password hash');
     }
+
+    /**
+     * Clears the cache
+     *
+     * Only use this when loading lots of users (export)!
+     */
+    public function clearCache() {
+        $this->arrCachedUsers = array();
+    }
 }
