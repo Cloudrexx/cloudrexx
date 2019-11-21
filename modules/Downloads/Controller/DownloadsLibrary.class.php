@@ -421,16 +421,23 @@ class DownloadsLibrary
      */
     protected function getUserDropDownMenu($selectedUserId, $userId)
     {
-        $menu = '<select name="downloads_category_owner_id" onchange="document.getElementById(\'downloads_category_owner_config\').style.display = this.value == '.$userId.' ? \'none\' : \'\'" style="width:300px;">';
-        $objFWUser = \FWUser::getFWUserObject();
-        $objUser = $objFWUser->objUser->getUsers(null, null, null, array('id', 'username', 'firstname', 'lastname', 'email'));
-        while (!$objUser->EOF) {
-            $menu .= '<option value="'.$objUser->getId().'"'.($objUser->getId() == $selectedUserId ? ' selected="selected"' : '').'>'.contrexx_raw2xhtml($this->getParsedUsername($objUser->getId())).'</option>';
-            $objUser->next();
-        }
-        $menu .= '</select>';
-
-        return $menu;
+        \FWUser::getUserLiveSearch(array(
+            'minLength' => 3,
+            'canCancel' => true,
+            'canClear'  => false,
+            'limit'     => 15,
+            'resultFormat' => '%firstname% %lastname% (%email%)',
+        ));
+        return '<div style="height:30px;">
+            <input class="live-search-user-id" name="downloads_category_owner_id" value="' . $selectedUserId . '" />
+            <input class="live-search-user-name" name="lalala" value="' . $this->getParsedUsername($selectedUserId) . '" />
+            <script type="text/javascript">
+                cx.bind("userSelected", function(objUser) {
+                    console.log(objUser);
+                    document.getElementById(\'downloads_category_owner_config\').style.display = objUser.id == '.$userId.' ? \'none\' : \'\';
+                }, "user/live-search");
+            </script>
+        </div>';
     }
 
 
