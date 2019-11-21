@@ -107,10 +107,10 @@ class IndexerEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventListe
             return;
         }
 
-        // we never index files moved to tmp
-        // TODO: Should we remove files that are moved to tmp?
+        // we never index files moved to tmp, try to drop such indexes for cleanup
         if (strpos($fileInfo['path'], $this->cx->getWebsiteTempPath()) === 0) {
-            return null;
+            $indexer->clearIndex($fileInfo['path'], false);
+            return;
         }
 
         // let the indexer do his job
