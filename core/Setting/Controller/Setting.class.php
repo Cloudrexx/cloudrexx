@@ -798,6 +798,25 @@ class Setting{
                   break;
                 // Default to text input fields
               case self::TYPE_TEXT:
+                    // fetch setting options
+                    $options = json_decode(
+                        $arrSetting['values'],
+                        true
+                    );
+                    // check for special type
+                    $textType = '';
+                    if (isset($options['type'])) {
+                        $textType = $options['type'];
+                    }
+                    // process special parsing
+                    switch ($textType) {
+                        case 'filesize':
+                            $value = static::parseFileSizeValue($value);
+                            break;
+
+                        default:
+                            break;
+                    }
               case self::TYPE_EMAIL:
               default:
                 $element =
@@ -1063,7 +1082,7 @@ class Setting{
                         // process special parsing
                         switch ($options['type']) {
                             case 'filesize':
-                                $value = static::parseFileSizeValue($value);
+                                $value = static::getFileSizeAsBytes($value);
                                 break;
 
                             default:
@@ -1121,6 +1140,20 @@ class Setting{
         }
         // convert bytes into human readable format
         return \FWSystem::getLiteralSizeFormat($bytes);
+    }
+
+    /**
+     * Get bytes of a literal file size notation
+     * @param   string  $value  File size in bytes or literal file size
+     *                          notation.
+     * @return  string  Bytes of $value
+     */
+    protected static function getFileSizeAsBytes($value) {
+        if (preg_match('/^\d+$/', $value)) {
+            return $value;
+        }
+
+        return \FWSystem::getBytesOfLiteralSizeFormat($value);
     }
 
     /**
