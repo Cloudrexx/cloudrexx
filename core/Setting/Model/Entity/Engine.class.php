@@ -231,10 +231,63 @@ abstract class Engine implements EngineInterface {
             \DBG::log("\Cx\Core\Setting\Model\Entity\Engine::set($name, $value): Identical, changed: ".$this->changed);
             return null;
         }
+        $this->preProcessSetting($name, $value);
         $this->changed = true;
         $this->arrSettings[$name]['value'] = $value;
         \DBG::log("\Cx\Core\Setting\Model\Entity\Engine::set($name, $value): Added/updated, changed: ".$this->changed);
         return true;
+    }
+
+    /**
+     * Process newly set setting option
+     *
+     * This does apply special input parsing to newly set $value of
+     * setting identified by $name.
+     *
+     * @param   string  $name   Name of setting option
+     * @param   string  $value  Newly set value to be parsed
+     */
+    protected function preProcessSetting($name, &$value) {
+        switch ($this->arrSettings[$name]['type']) {
+            case \Cx\Core\Setting\Controller\Setting::TYPE_TEXT:
+                // fetch setting options
+                $options = json_decode(
+                    $this->arrSettings[$name]['values'],
+                    true
+                );
+                if (!isset($options['type'])) {
+                    // setting not special -> abort
+                    break;
+                }
+
+                // process special parsing
+                switch ($options['type']) {
+                    case 'filesize':
+                        $value = $this->getFileSizeAsBytes($value);
+                        break;
+
+                    default:
+                        break;
+                }
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    /**
+     * Get bytes of a literal file size notation
+     * @param   string  $value  File size in bytes or literal file size
+     *                          notation.
+     * @return  string  Bytes of $value
+     */
+    protected function getFileSizeAsBytes($value) {
+        if (preg_match('/^\d+$/', $value)) {
+            return $value;
+        }
+
+        return \FWSystem::getBytesOfLiteralSizeFormat($value);
     }
 
     /**

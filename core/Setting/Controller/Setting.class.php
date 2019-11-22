@@ -1064,32 +1064,6 @@ class Setting{
                         $value = '';
                       break;
 
-                    case self::TYPE_TEXT:
-                        // option not changed -> abort
-                        if ($value == $arrSettings[$name]['value']) {
-                            break;
-                        }
-                        // fetch setting options
-                        $options = json_decode(
-                            $arrSettings[$name]['values'],
-                            true
-                        );
-                        if (!isset($options['type'])) {
-                            // setting not special -> abort
-                            break;
-                        }
-
-                        // process special parsing
-                        switch ($options['type']) {
-                            case 'filesize':
-                                $value = static::getFileSizeAsBytes($value);
-                                break;
-
-                            default:
-                                break;
-                        }
-                        break;
-
                     default:
                         // Regular value of any other type
                         break;
