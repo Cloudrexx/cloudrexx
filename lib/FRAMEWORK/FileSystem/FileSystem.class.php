@@ -485,7 +485,7 @@ class FileSystem
     {
         global $_FTPCONFIG;
 
-        // TODO: Indexer!
+        FileSystemFile::callUpdateEvent('Pre', $path . $oldDirName, $path . $newDirName);
         if ($_FTPCONFIG['is_activated'] && empty(self::$connection))
             self::init();
         $webPath = $this->checkWebPath($webPath);
@@ -505,6 +505,11 @@ class FileSystem
             }
         } else {
             $status = $oldDirName;
+        }
+        if ($status == 'error') {
+            FileSystemFile::callUpdateEvent('PostFailed', $path . $oldDirName, $path . $newDirName);
+        } else {
+            FileSystemFile::callUpdateEvent('PostSuccessful', $path . $oldDirName, $path . $newDirName);
         }
         return $status;
     }

@@ -183,11 +183,13 @@ class FileSystemFile implements FileInterface
 
     public function copy($dst)
     {
-        // TODO: Indexer!
+        static::callUpdateEvent('Pre', $dst);
         if (!copy($this->filePath, $dst)) {
+            static::callUpdateEvent('PostFailed', $dst);
             throw new FileSystemFileException('Unable to copy ' . $this->filePath . ' to ' . $dst . '!');
         }
         \Cx\Lib\FileSystem\FileSystem::makeWritable($dst);
+        static::callUpdateEvent('PostSuccessful', $dst);
     }
 
     public function rename($dst)
