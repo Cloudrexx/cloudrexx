@@ -290,7 +290,7 @@ class FileSystemFile implements FileInterface
      * @param $oldname string old name of file or directory
      * @deprecated See todo
      */
-    public static function callUpdateEvent($prefix, $from, $to)
+    public static function callUpdateEvent($prefix, $from, $to = '')
     {
         static::callEvent(
             $prefix,
