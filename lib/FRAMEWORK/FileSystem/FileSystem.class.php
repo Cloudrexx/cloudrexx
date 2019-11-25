@@ -485,6 +485,7 @@ class FileSystem
     {
         global $_FTPCONFIG;
 
+        // TODO: Indexer!
         if ($_FTPCONFIG['is_activated'] && empty(self::$connection))
             self::init();
         $webPath = $this->checkWebPath($webPath);

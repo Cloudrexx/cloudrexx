@@ -108,6 +108,7 @@ class FileSystemFile implements FileInterface
 
     public function write($data)
     {
+        static::callUpdateEvent('Pre', $this->filePath);
         // first try
         $fp = @fopen($this->filePath, 'w');
         if (!$fp) {
@@ -118,6 +119,7 @@ class FileSystemFile implements FileInterface
         // second try
         $fp = @fopen($this->filePath, 'w');
         if (!$fp) {
+            static::callUpdateEvent('PostFailed', $this->filePath);
             throw new FileSystemFileException('Unable to open file '.$this->filePath.' for writting!');
         }
 
@@ -130,12 +132,15 @@ class FileSystemFile implements FileInterface
         // release exclusive file lock
         flock($fp, LOCK_UN);
         if ($writeStatus === false) {
+            static::callUpdateEvent('PostFailed', $this->filePath);
             throw new FileSystemFileException('Unable to write data to file '.$this->filePath.'!');
         }
+        static::callUpdateEvent('PostSuccessful', $this->filePath);
     }
 
     public function append($data)
     {
+        static::callUpdateEvent('Pre', $this->filePath);
         // first try
         $fp = @fopen($this->filePath, 'a');
         if (!$fp) {
@@ -146,6 +151,7 @@ class FileSystemFile implements FileInterface
         // second try
         $fp = @fopen($this->filePath, 'a');
         if (!$fp) {
+            static::callUpdateEvent('PostFailed', $this->filePath);
             throw new FileSystemFileException('Unable to open file '.$this->filePath.' for writting!');
         }
 
@@ -158,20 +164,26 @@ class FileSystemFile implements FileInterface
         // release exclusive file lock
         flock($fp, LOCK_UN);
         if ($writeStatus === false) {
+            static::callUpdateEvent('PostFailed', $this->filePath);
             throw new FileSystemFileException('Unable to append data to file '.$this->filePath.'!');
         }
+        static::callUpdateEvent('PostSuccessful', $this->filePath);
     }
 
     public function touch()
     {
+        static::callUpdateEvent('Pre', $this->filePath);
         \Cx\Lib\FileSystem\FileSystem::makeWritable($this->filePath);
         if (!touch($this->filePath)) {
+            static::callUpdateEvent('PostFailed', $this->filePath);
             throw new FileSystemFileException('Unable to touch file in file system!');
         }
+        static::callUpdateEvent('PostSuccessful', $this->filePath);
     }
 
     public function copy($dst)
     {
+        // TODO: Indexer!
         if (!copy($this->filePath, $dst)) {
             throw new FileSystemFileException('Unable to copy ' . $this->filePath . ' to ' . $dst . '!');
         }
@@ -185,10 +197,13 @@ class FileSystemFile implements FileInterface
 
     public function move($dst)
     {
+        static::callUpdateEvent('Pre', $this->filePath, $dst);
         if (!rename($this->filePath, $dst)) {
+            static::callUpdateEvent('PostFailed', $this->filePath, $dst);
             throw new FileSystemFileException('Unable to move ' . $this->filePath . ' to ' . $dst . '!');
         }
         \Cx\Lib\FileSystem\FileSystem::makeWritable($dst);
+        static::callUpdateEvent('PostSuccessful', $this->filePath, $dst);
     }
 
     public function getFilePermissions()
@@ -240,10 +255,13 @@ class FileSystemFile implements FileInterface
 
     public function delete()
     {
+        static::callDeleteEvent('Pre', $this->filePath);
         \Cx\Lib\FileSystem\FileSystem::makeWritable(dirname($this->filePath));
         if (!unlink($this->filePath)) {
+            static::callDeleteEvent('PostFailed', $this->filePath);
             throw new FileSystemFileException('Unable to delete file '.$this->filePath.'!');
         }
+        static::callDeleteEvent('PostSuccessful', $this->filePath);
     }
 
     /**
