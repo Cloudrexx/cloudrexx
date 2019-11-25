@@ -782,7 +782,18 @@ function cmd_env {
             if [[ ${ARGUMENTS["silent"]} != true ]]; then
                 echo "Applying configuration to new environment"
             fi
-            phpexec config --force
+            # for version 5 or newer, we do want to reinitialize the base
+            # configuration to ensure any newly added setting options
+            # get properly initialized after a GIT update
+            if [[ "${CONFIG["cms-version"]:0:1}" -ge 5 ]]; then
+                # This makes only sense in case the db has been loaded yet (which
+                # is not the case when performing an init).
+                # We therefore check if the table contrexx_component does exist
+                dockerexec exec "<db-container>" bash -c "mysql -u${CONFIG["db-user"]} -p${CONFIG["db-pass"]} ${CONFIG["db-name"]} -e 'SELECT 1 from \`${CONFIG["db-prefix"]}component\` LIMIT 1' &> /dev/null"
+                if [[ $? == 0 ]]; then
+                    phpexec config --force
+                fi
+            fi
             if [[ ${ARGUMENTS["silent"]} != true ]]; then
                 echo "Environment successfully initialized. It is available at http://${CONFIG["hostname"]}/"
                 if [[ ${CONFIG["is-vhost"]} == true ]]; then
