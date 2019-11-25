@@ -438,6 +438,7 @@ class GalleryManager extends GalleryLibrary
 
 
         $this->strPageTitle = $_ARRAYLANG['TXT_GALLERY_MENU_OVERVIEW'];
+        \JS::registerJS('modules/Gallery/View/Template/Backend/sortGallery.js');
         $this->_objTpl->loadTemplateFile('module_gallery_overview.html',true,true);
 
         $this->_objTpl->setVariable(array(
@@ -1353,7 +1354,7 @@ class GalleryManager extends GalleryLibrary
 
         \JS::activate('shadowbox');
         $objFWUser = \FWUser::getFWUserObject();
-
+        \JS::registerJS('modules/Gallery/View/Template/Backend/sortGallery.js');
         $this->_objTpl->loadTemplateFile('module_gallery_category_details.html', true, true);
         $this->_objTpl->setGlobalVariable(array(
             'TXT_TITLE_NAME'                =>    $_ARRAYLANG['TXT_GALLERY_CAT_DETAILS_NAME'],
