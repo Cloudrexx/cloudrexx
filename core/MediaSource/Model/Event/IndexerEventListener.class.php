@@ -126,13 +126,9 @@ class IndexerEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventListe
      * @return \Cx\Core\MediaSource\Model\Entity\Indexer|null Matching Indexer or null if none
      */
     protected function getIndexer($fileInfo) {
-        if (isset($fileInfo['path']) && isset($fileInfo['oldPath'])) {
-            $fullPath = $fileInfo['path'];
-        } else if (isset($fileInfo['path']) && isset($fileInfo['name'])) {
-            $fullPath = $fileInfo['path'] . $fileInfo['name'];
-        }
+        $fullPath = $fileInfo['path'];
 
-        $extension = pathinfo($fullPath, PATHINFO_EXTENSION);
+        $extension = $fullPath->getExtension();
         // This is a workaround, we should use the new path instead
         if ($extension == 'part') {
             return null;
@@ -149,6 +145,60 @@ class IndexerEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventListe
     }
 
     /**
+     * This converts the paths in $fileInfo from string to File objects.
+     *
+     * @param array $fileInfo (Reference) Array with the indexes "path" and
+     *                          optionally "oldPath" and "name" of type string.
+     */
+    protected function cleanupPaths(&$fileInfo) {
+        $path = '';
+        $oldPath = '';
+        if (isset($fileInfo['path']) && isset($fileInfo['oldPath'])) {
+            $path = $this->getFileObjectForPath($fileInfo['path']);
+            $oldPath = $this->getFileObjectForPath($fileInfo['oldPath']);
+        } else if (isset($fileInfo['path']) && isset($fileInfo['name'])) {
+            $path = $this->getFileObjectForPath(
+                $fileInfo['path'] . $fileInfo['name']
+            );
+        } else {
+            throw new \Cx\Core\MediaSource\Model\Entity\IndexerException(
+                'Could not parse path info'
+            );
+        }
+        $fileInfo = array(
+            'path' => $path,
+            'oldPath' => $oldPath,
+        );
+    }
+
+    /**
+     * Get the MediaSource File for the given path
+     *
+     * @param string $filepath Path to get the file object for
+     * @return \Cx\Core\MediaSource\Model\Entity\File File object for this path
+     */
+    protected function getFileObjectForPath($filepath) {
+        $mediaSourceManager = $this->cx->getMediaSourceManager();
+        $mediaSourceFile = $mediaSourceManager->getMediaSourceFileFromPath(
+            $filepath
+        );
+        if ($mediaSourceFile) {
+            return $mediaSourceFile;
+        }
+
+        // This does not seem to be a MediaSource File yet. Therefore we
+        // simply pretent as if... See
+        // $mediaSourceManager->getMediaSourceFileFromPath() for more info.
+        $filesystem = new \Cx\Core\MediaSource\Model\Entity\LocalFileSystem(
+            dirname($filepath)
+        );
+        return new \Cx\Core\MediaSource\Model\Entity\LocalFile(
+            $filepath,
+            $filesystem
+        );
+    }
+
+    /**
      * Call event method. This method is overwritten to get the whole array
      * of $eventArgs as parameter in the event method, not only the first
      * element.
@@ -158,6 +208,7 @@ class IndexerEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventListe
      */
     public function onEvent($eventName, array $eventArgs)
     {
+        $this->cleanupPaths($eventArgs);
         $indexer = $this->getIndexer($eventArgs);
 
         if (!$indexer) {
