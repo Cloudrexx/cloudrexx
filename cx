@@ -1498,6 +1498,8 @@ function set_config_array {
             if [[ ${ARGUMENTS["silent"]} != true ]]; then
                 echo "Configuring cache"
             fi
+            # force local domain as main domain
+            phpexec Setting set Config -engine=Yaml -group=site mainDomainId 0 > /dev/null
             phpexec Setting set Config -engine=Yaml -group=cache cacheEnabled on > /dev/null
             phpexec Setting set Config -engine=Yaml -group=cache internalSsiCache on > /dev/null
             phpexec Setting set Config -engine=Yaml -group=cache cacheUserCache memcached > /dev/null
