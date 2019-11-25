@@ -292,7 +292,6 @@ class FileSystem
     {
         global $_FTPCONFIG;
 
-        FileSystemFile::callDeleteEvent('Pre', $path, $dirName);
         if ($_FTPCONFIG['is_activated'] && empty(self::$connection))
             self::init();
         $webPath=$this->checkWebPath($webPath);
@@ -319,17 +318,14 @@ class FileSystem
         closedir($directory);
         if ($_FTPCONFIG['is_activated']) {
             if (!@ftp_rmdir(self::$connection,  $_FTPCONFIG['path'].$webPath.$dirName)) {
-                FileSystemFile::callDeleteEvent('PostFailed', $path, $dirName);
                 return 'error';
             }
         } else {
             if (!@rmdir($path.$dirName.'/'.$file)) {
-                FileSystemFile::callDeleteEvent('PostFailed', $path, $dirName);
                 return 'error';
             }
         }
 
-        FileSystemFile::callDeleteEvent('PostSuccessful', $path, $dirName);
         return '';
     }
 
