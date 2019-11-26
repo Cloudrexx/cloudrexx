@@ -39,7 +39,7 @@
 namespace Cx\Core\MediaSource\Model\Entity;
 
 /**
- * Base class for files (exclusing folders)
+ * Base class for files (excluding folders)
  *
  * @copyright   Cloudrexx AG
  * @author      Robin Glauser <robin.glauser@comvation.com>
