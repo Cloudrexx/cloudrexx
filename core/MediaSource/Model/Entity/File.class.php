@@ -48,52 +48,52 @@ namespace Cx\Core\MediaSource\Model\Entity;
  * @package     cloudrexx
  * @subpackage  core_mediasource
  */
-interface File {
+abstract class File extends \Cx\Model\Base\EntityBase {
 
     /**
      * Returns the FileSystem for this file
      *
      * @return FileSystem This file's FileSystem
      */
-    public function getFileSystem();
+    public abstract function getFileSystem();
 
     /**
      * Returns the path (without filename) for this file
      *
      * @return string Path without filename
      */
-    public function getPath();
+    public abstract function getPath();
 
     /**
      * Returns the filename (without path and extension) for this file
      *
      * @return string Filename without path and extension
      */
-    public function getName();
+    public abstract function getName();
 
     /**
      * Returns the filename (without path including extension) for this file
      *
      * @return string Filename without path including extension
      */
-    public function getFullName();
+    public abstract function getFullName();
 
     /**
      * Returns this file's extension
      *
      * @return string File extension
      */
-    public function getExtension();
+    public abstract function getExtension();
 
     /**
      * Returns the MIME type of this file
      *
      * @return string MIME type
      */
-    public function getMimeType();
+    public abstract function getMimeType();
 
     /**
      * Returns the full file path (path and filename including extension)
      */
-    public function __toString();
+    public abstract function __toString();
 }

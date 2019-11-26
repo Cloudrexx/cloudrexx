@@ -29,7 +29,7 @@
  * Base class for filesystems
  *
  * @copyright   Cloudrexx AG
- * @author      Robin Glauser <robin.glauser@comvation.com>
+ * @author Robin Glauser <robin.glauser@comvation.com>
  * @author      Thomas Däppen <thomas.daeppen@cloudrexx.com>
  * @author      Michael Ritter <michael.ritter@cloudrexx.com>
  * @package     cloudrexx
@@ -50,7 +50,7 @@ namespace Cx\Core\MediaSource\Model\Entity;
  * @package     cloudrexx
  * @subpackage  core_mediasource
  */
-interface FileSystem {
+abstract class FileSystem extends \Cx\Model\Base\EntityBase {
 
     /**
      * Returns all files withing a given folder (recursively by default)
@@ -89,7 +89,7 @@ interface FileSystem {
      * @param boolean $recursive (optional) If set to false, recursion is skipped
      * @return array UTF8 encoded list of file names, see description
      */
-    public function getFileList($directory, $recursive = true);
+    public abstract function getFileList($directory, $recursive = true);
 
     /**
      * Removes the given file from the OS FS
@@ -97,7 +97,7 @@ interface FileSystem {
      * @param File $file File to remove
      * @return string Status message
      */
-    public function removeFile(File $file);
+    public abstract function removeFile(File $file);
 
     /**
      * Moves a file to a new location
@@ -107,7 +107,7 @@ interface FileSystem {
      * @param string $destination Destination path (absolute or relative to this FS' root)
      * @return string Status message
      */
-    public function moveFile(File $file, $destination);
+    public abstract function moveFile(File $file, $destination);
 
     /**
      * Writes $content to $file, erases all existing content
@@ -115,7 +115,7 @@ interface FileSystem {
      * @param File $file File to write to
      * @param string $content Content to write
      */
-    public function writeFile(File $file, $content);
+    public abstract function writeFile(File $file, $content);
 
     /**
      * Reads content from $file
@@ -123,7 +123,7 @@ interface FileSystem {
      * @param File $file File to write to
      * @return string File contents
      */
-    public function readFile(File $file);
+    public abstract function readFile(File $file);
 
     /**
      * Tells whether $file is a directory or not
@@ -131,7 +131,7 @@ interface FileSystem {
      * @param File $file File to check
      * @return boolean True if $file is a directory, false otherwise
      */
-    public function isDirectory(File $file);
+    public abstract function isDirectory(File $file);
 
     /**
      * Tells whether $file is not a directory
@@ -139,12 +139,12 @@ interface FileSystem {
      * @param File $file File to check
      * @return boolean True if $file is not a directory, false otherwise
      */
-    public function isFile(File $file);
+    public abstract function isFile(File $file);
 
     /**
      * @todo Reverse engineer or remove, seems to be unused
      */
-    public function getLink(File $file);
+    public abstract function getLink(File $file);
 
     /**
      * Creates a new directory
@@ -153,7 +153,7 @@ interface FileSystem {
      * @param string $directory Directory name
      * @return string Status message
      */
-    public function createDirectory($path, $directory);
+    public abstract function createDirectory($path, $directory);
 
     /**
      * Returns the File instance for a given path
@@ -163,5 +163,5 @@ interface FileSystem {
      * @param string $path Path relative to this FS' root
      * @return File|false File instance for $path of false
      */
-    public function getFileFromPath($path);
+    public abstract function getFileFromPath($path);
 }
