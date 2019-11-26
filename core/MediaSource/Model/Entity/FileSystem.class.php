@@ -29,7 +29,7 @@
  * Base class for filesystems
  *
  * @copyright   Cloudrexx AG
- * @author Robin Glauser <robin.glauser@comvation.com>
+ * @author      Robin Glauser <robin.glauser@comvation.com>
  * @author      Thomas Däppen <thomas.daeppen@cloudrexx.com>
  * @author      Michael Ritter <michael.ritter@cloudrexx.com>
  * @package     cloudrexx
