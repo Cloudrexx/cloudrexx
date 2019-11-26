@@ -34,7 +34,7 @@
 namespace Cx\Core\MediaSource\Model\Entity;
 
 
-class LocalFile implements File
+class LocalFile extends File
 {
     /**
      * The path of the file with a leading directory separator
