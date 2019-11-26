@@ -139,8 +139,6 @@ class LocalFileSystem extends FileSystem
 
             $size = \FWSystem::getLiteralSizeFormat($file->getSize());
             $fileInfos = array(
-                // This is a no-op: $file->getPath() is relative to this FS
-                // therefore there's no need to cut the website path
                 'filepath' => mb_strcut(
                     $file->getPath() . '/' . $file->getFilename(),
                     mb_strlen($this->cx->getWebsitePath())

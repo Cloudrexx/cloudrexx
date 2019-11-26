@@ -74,6 +74,7 @@ abstract class FileSystem extends \Cx\Model\Base\EntityBase {
      *     ),
      *     <nesting>
      * )
+     * <filename> Name of the file without path but including file ending
      * <path> is relative to this FS' root
      * <extension> is "Dir" for directories
      * <preview_link> is relative to Cx root or "none" if no preview is available
