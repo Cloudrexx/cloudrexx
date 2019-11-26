@@ -26,14 +26,28 @@
  */
 
 /**
+ * File for files stored locally on this server
+ *
  * @copyright   Cloudrexx AG
  * @author      Robin Glauser <robin.glauser@comvation.com>
+ * @author      Thomas Däppen <thomas.daeppen@cloudrexx.com>
+ * @author      Michael Ritter <michael.ritter@cloudrexx.com>
  * @package     cloudrexx
+ * @subpackage  core_mediasource
  */
 
 namespace Cx\Core\MediaSource\Model\Entity;
 
-
+/**
+ * File for files stored locally on this server
+ *
+ * @copyright   Cloudrexx AG
+ * @author      Robin Glauser <robin.glauser@comvation.com>
+ * @author      Thomas Däppen <thomas.daeppen@cloudrexx.com>
+ * @author      Michael Ritter <michael.ritter@cloudrexx.com>
+ * @package     cloudrexx
+ * @subpackage  core_mediasource
+ */
 class LocalFile extends File
 {
     /**
