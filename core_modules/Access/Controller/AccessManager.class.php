@@ -586,10 +586,7 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
             // Check if a new toolbar has been created or an existing one updated
             if ($newToolbarId !== 0) {
                 // Set the toolbar id of the current group to the new id
-                $query = 'UPDATE `' . DBPREFIX . 'access_user_groups`
-                      SET `toolbar` = ' . intval($newToolbarId) . '
-                      WHERE `group_id` = ' . intval($objGroup->getId());
-                $dbCon->Execute($query);
+                $objGroup->setToolbar(intval($newToolbarId));
             }
 
             if (isset($_POST['access_save_group'])) {
