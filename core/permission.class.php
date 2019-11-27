@@ -200,6 +200,7 @@ class Permission
         }
 
         $objGroup = $objFWUser->objGroup->getGroups(array('type' => $type));
+        $groups = array();
         while (!$objGroup->EOF) {
             $groups[$objGroup->getId()] = $objGroup->getName();
 
