@@ -1970,8 +1970,6 @@ JS
 
     public static function removeUselessImages()
     {
-        global $objDatabase;
-
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
 
         // fetch thumbnails of fallback images
@@ -2021,50 +2019,40 @@ JS
                 if (preg_match($ignoreRe, $file)) unset($arrImages[$index]);
             }
 
-            $query = "
-                SELECT SUM(1) as entryCount
-                FROM `".DBPREFIX."access_user_attribute` AS a
-                INNER JOIN `".DBPREFIX."access_user_attribute_value` AS v ON v.`attribute_id` = a.`id`
-                WHERE a.`type` = 'image' AND v.`value` != ''";
+            $objFWUser = \FWUser::getFWUserObject();
+            $objUser = $objFWUser->objUser;
+            $arrImagesDb = array();
+            $count = 0;
 
-            $objCount = $objDatabase->Execute($query);
-            if ($objCount !== false) {
-                $count = $objCount->fields['entryCount'];
-            } else {
-                return false;
-            }
+            do {
+                $result = $objUser->objAttribute->getImages(
+                    $step, $offset, $count, $arrImagesDb
+                );
+                if (!$result) {
+                    break;
+                };
 
-            $query = "
-                SELECT v.`value` AS picture
-                FROM `".DBPREFIX."access_user_attribute` AS a
-                INNER JOIN `".DBPREFIX."access_user_attribute_value` AS v ON v.`attribute_id` = a.`id`
-                WHERE a.`type` = 'image' AND v.`value` != ''";
-
-            while ($offset < $count) {
-                $objImage = $objDatabase->SelectLimit($query, $step, $offset);
-                if ($objImage !== false) {
-                    $arrImagesDb = array();
-                    while (!$objImage->EOF) {
-                        $arrImagesDb[] = $objImage->fields['picture'];
-
-                        // fetch all thumbnails of image
-                        $thumbnails =
-                            $cx->getMediaSourceManager()
+                foreach ($arrImagesDb as $image) {
+                    // fetch all thumbnails of image
+                    $thumbnails =
+                        $cx->getMediaSourceManager()
                             ->getThumbnailGenerator()
                             ->getThumbnailsFromFile(
                                 $imageWebPath,
-                                $objImage->fields['picture'],
+                                $image,
                                 true
                             );
-                        $thumbnails = array_map('basename', $thumbnails);
-                        $arrImagesDb = array_merge($arrImagesDb, $thumbnails);
-
-                        $objImage->MoveNext();
-                    }
-                    $offset += $step;
-                    $arrImages = array_diff($arrImages, $arrImagesDb);
+                    $thumbnails = array_map('basename', $thumbnails);
+                    $arrImagesDb = array_merge($arrImagesDb, $thumbnails);
                 }
+                $offset += $step;
+                $arrImages = array_diff($arrImages, $arrImagesDb);
+            } while ($offset < $count);
+
+            if (!$result) {
+                return false;
             }
+
             array_walk($arrImages, function ($img) use ($imagePath) {
                 unlink($imagePath.'/'.$img);
             });
