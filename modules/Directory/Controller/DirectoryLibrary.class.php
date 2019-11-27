@@ -1281,7 +1281,6 @@ class DirectoryLibrary
         $objFWUser = \FWUser::getFWUserObject();
 
         $userId = contrexx_addslashes($id);
-        $author = '';
 
         $objUser = $objFWUser->objUser->getUsers(array('id' => intval($userId)));
         if ($objUser !== false) {
