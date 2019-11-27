@@ -380,31 +380,45 @@ class NewsletterLib
 
         // Ignore the code analyzer warning.  There's plenty of arguments
         $query = sprintf('
-            SELECT COUNT(*) AS `recipientCount`
-              FROM (
-                SELECT `code`
-                  FROM `%1$smodule_newsletter_user` AS `nu`
-                  LEFT JOIN `%1$smodule_newsletter_rel_user_cat` AS `rc`
-                    ON `rc`.`user` = `nu`.`id`
-                 WHERE `rc`.`category`=%2$s
-                    AND (
-                        nu.source != "opt-in"
-                        OR (
-                            nu.source = "opt-in"
-                            AND nu.consent IS NOT NULL
-                        )
+            SELECT COUNT(`email`) AS `recipientCount`
+              FROM `%1$smodule_newsletter_user` AS `nu`
+              LEFT JOIN `%1$smodule_newsletter_rel_user_cat` AS `rc`
+                ON `rc`.`user` = `nu`.`id`
+             WHERE `rc`.`category`=%2$s
+                AND (
+                    nu.source != "opt-in"
+                    OR (
+                        nu.source = "opt-in"
+                        AND nu.consent IS NOT NULL
                     )
-                 UNION DISTINCT
-                SELECT `code`
-                  FROM `%1$smodule_newsletter_access_user` AS `cnu`
-                  LEFT JOIN `%1$smodule_newsletter_rel_cat_news` AS `crn`
-                    ON `cnu`.`newsletterCategoryID`=`crn`.`category`
-                 WHERE `cnu`.`newsletterCategoryID`=%2$s
-              ) AS `subquery`',
+                )',
             DBPREFIX, $id
         );
+
         $data = $objDatabase->Execute($query);
-        return $data->fields['recipientCount'];
+        $counter = $data->fields['recipientCount'];
+
+        // Get all newsletter access user
+        $query = sprintf('
+            SELECT `accessUserID`
+              FROM `%1$smodule_newsletter_access_user` AS `cnu`
+              LEFT JOIN `%1$smodule_newsletter_rel_cat_news` AS `crn`
+                ON `cnu`.`newsletterCategoryID`=`crn`.`category`
+             WHERE `cnu`.`newsletterCategoryID`=%2$s',
+            DBPREFIX, $id
+        );
+
+        $data = $objDatabase->Execute($query);
+        $objUser = \FWUser::getFWUserObject()->objUser;
+        while (!$data || !$data->EOF) {
+            // Check if the access user exists
+            if ($objUser->getUser($data->fields['accessUserID'])) {
+                $counter++;
+            }
+            $data->MoveNext();
+        }
+
+        return $counter;
     }
 
 
