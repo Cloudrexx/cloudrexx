@@ -329,6 +329,7 @@ ALTER TABLE contrexx_access_rel_user_group DROP FOREIGN KEY IF EXISTS FK_401DFD4
 
 ALTER TABLE contrexx_access_users
   CHANGE id id INT UNSIGNED AUTO_INCREMENT NOT NULL,
+  CHANGE email email VARCHAR(255) NOT NULL,
   CHANGE auth_token auth_token VARCHAR(32) DEFAULT '0' NOT NULL,
   CHANGE auth_token_timeout auth_token_timeout INT UNSIGNED DEFAULT 0 NOT NULL,
   CHANGE regdate regdate INT UNSIGNED DEFAULT 0 NOT NULL,
@@ -405,6 +406,7 @@ ALTER TABLE contrexx_access_rel_user_group ADD CONSTRAINT FK_401DFD43FE54D947
 
 /** Add Indexes **/
 CREATE INDEX IDX_B0DEA323B6E62EFA ON contrexx_access_user_attribute_value (attribute_id);
+CREATE UNIQUE INDEX UNIQ_7CD32875E7927C74 ON contrexx_access_users (email);
 
 /** Drop tmp names **/
 ALTER TABLE `contrexx_access_user_attribute_value` DROP `tmp_name`;

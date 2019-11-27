@@ -78,7 +78,7 @@ Cx\Core\User\Model\Entity\User:
     email:
       type: string
       length: 255
-      nullable: true
+      unique: true
     emailAccess:
       type: enum
       values: ['everyone','members_only','nobody']
