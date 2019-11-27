@@ -4496,18 +4496,21 @@ $WhereStatement = array();
         // select stats of access users
         if (count($accessUserIds) > 0) {
             $objLinks = $objDatabase->Execute("SELECT
-                    tlbUser.id,
+                    tblSent.email
                     COUNT(tlbLink.id) AS link_count,
                     COUNT(DISTINCT tblSent.newsletter) AS email_count
                 FROM ".DBPREFIX."module_newsletter_tmp_sending AS tblSent
-                    INNER JOIN ".DBPREFIX."access_users AS tlbUser ON tlbUser.email = tblSent.email
                     LEFT JOIN ".DBPREFIX."module_newsletter_email_link AS tlbLink ON tlbLink.email_id = tblSent.newsletter
                 WHERE tblSent.email IN ('".implode("', '", $accessUserEmails)."') AND tblSent.sendt > 0 AND (tblSent.type = '".self::USER_TYPE_ACCESS."' OR tblSent.type = '".self::USER_TYPE_CORE."')
                 GROUP BY tblSent.email");
             if ($objLinks !== false) {
+                $objUser = \FWUser::getFWUserObject()->objUser;
                 while (!$objLinks->EOF) {
-                    $linkCount[$objLinks->fields['id']][self::USER_TYPE_ACCESS] = $objLinks->fields['link_count'];
-                    $emailCount[$objLinks->fields['id']][self::USER_TYPE_ACCESS] = $objLinks->fields['email_count'];
+                    $objUser = $objUser->getUsers(array('email', $objLinks->fields['email']));
+                    if ($objUser) {
+                        $linkCount[$objUser->getId()][self::USER_TYPE_ACCESS] = $objLinks->fields['link_count'];
+                        $emailCount[$objUser->getId()][self::USER_TYPE_ACCESS] = $objLinks->fields['email_count'];
+                    }
                     $objLinks->MoveNext();
                 }
             }
