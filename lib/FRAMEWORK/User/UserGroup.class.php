@@ -336,7 +336,8 @@ class UserGroup
                     `group_name` = '".addslashes($this->name)."',
                     `group_description` = '".addslashes($this->description)."',
                     `is_active` = ".intval($this->is_active).",
-                    `homepage` = '".addslashes($this->homepage)."'
+                    `homepage` = '".addslashes($this->homepage)."',
+                    `toolbar` = '".intval($this->toolbar)."'
                 WHERE `group_id`=".$this->id
             )) {
                 $this->error_msg = $_CORELANG['TXT_ACCESS_FAILED_TO_UPDATE_GROUP'];
@@ -349,13 +350,15 @@ class UserGroup
                     `group_description`,
                     `is_active`,
                     `type`,
-                    `homepage`
+                    `homepage`,
+                    `toolbar`
                 ) VALUES (
                     '".addslashes($this->name)."',
                     '".addslashes($this->description)."',
                     ".intval($this->is_active).",
                     '".$this->type."',
-                    '".addslashes($this->homepage)."'
+                    '".addslashes($this->homepage)."',
+                    '".intval($this->toolbar)."'
                 )"
             )) {
                 $this->id = $objDatabase->Insert_ID();
@@ -519,6 +522,11 @@ class UserGroup
     public function setType($type)
     {
         $this->type = in_array($type, $this->arrTypes) ? $type : $this->defaultType;
+    }
+
+    public function setToolbar($toolbar)
+    {
+        $this->toolbar = $toolbar;
     }
 
     public function setHomepage($homepage)
