@@ -384,11 +384,14 @@ class Newsletter extends NewsletterLib
         if (!empty($code) && !empty($requestedMail)) {
             $objRecipient = $objDatabase->SelectLimit("SELECT accessUserID
                 FROM ".DBPREFIX."module_newsletter_access_user AS nu
-                INNER JOIN ".DBPREFIX."access_users AS au ON au.id=nu.accessUserID
-                WHERE nu.code='".$code."'
-                AND email='".contrexx_raw2db($requestedMail)."'", 1);
+                WHERE nu.code='".$code."'", 1);
             if ($objRecipient && $objRecipient->RecordCount() == 1) {
-                $objUser = \FWUser::getFWUserObject()->objUser->getUser($objRecipient->fields['accessUserID']);
+                $objUser = \FWUser::getFWUserObject()->objUser->getUsers(
+                    array(
+                        'email' => $requestedMail,
+                        'id' => $objRecipient->fields['accessUserID']
+                    )
+                );
                 if ($objUser) {
                     $recipientId = $objUser->getId();
                     $isAccessRecipient = true;
