@@ -411,26 +411,21 @@ class NewsletterLib
     /**
      * Return the access user groups
      * @author      Stefan Heinemann <sh@adfinis.com>
-     * @param       string $orderBy
      * @return      array
      */
-    protected function _getGroups($orderBy="`group_name`")
+    protected function _getGroups()
     {
-        global $objDatabase;
+        $fwUser = \FWUser::getFWUserObject();
+        $objGroup = $fwUser->objGroup;
 
-        $query = sprintf('
-            SELECT `group_id`   AS `id`,
-                   `group_name` AS `name`
-              FROM `%1$saccess_user_groups`
-             WHERE `is_active`=1
-             ORDER BY %2$s',
-            DBPREFIX, $orderBy
+        $list = $objGroup->getGroups(
+            array('is_active' => 1), array('group_name' => 'ASC')
         );
-        $list = $objDatabase->Execute($query);
+
         $groups = array();
         while ($list !== false && !$list->EOF) {
-            $groups[$list->fields['id']] = $list->fields['name'];
-            $list->moveNext();
+            $groups[$list->getId()] = $list->getName();
+            $list->next();
         }
         return $groups;
     }
