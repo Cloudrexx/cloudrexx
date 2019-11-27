@@ -382,7 +382,7 @@ class NewsletterLib
         $query = sprintf('
             SELECT COUNT(*) AS `recipientCount`
               FROM (
-                SELECT `email`
+                SELECT `code`
                   FROM `%1$smodule_newsletter_user` AS `nu`
                   LEFT JOIN `%1$smodule_newsletter_rel_user_cat` AS `rc`
                     ON `rc`.`user` = `nu`.`id`
@@ -395,10 +395,8 @@ class NewsletterLib
                         )
                     )
                  UNION DISTINCT
-                SELECT `email`
-                  FROM `%1$saccess_users` AS `cu`
-                  LEFT JOIN `%1$smodule_newsletter_access_user` AS `cnu`
-                    ON `cnu`.`accessUserID`=`cu`.`id`
+                SELECT `code`
+                  FROM `%1$smodule_newsletter_access_user` AS `cnu`
                   LEFT JOIN `%1$smodule_newsletter_rel_cat_news` AS `crn`
                     ON `cnu`.`newsletterCategoryID`=`crn`.`category`
                  WHERE `cnu`.`newsletterCategoryID`=%2$s
