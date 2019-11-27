@@ -453,40 +453,6 @@ class DataLibrary
         return $objResult;
     }
 
-    /**
-     * Returns an array containing the necessary user-details for an user.
-     *
-     * @global     ADONewConnection
-     * @param    integer        $intUserId: Details of this user will be returned.
-     * @return    array        Array containing the user-infos.
-     */
-    function getUserData($intUserId) {
-        global $objDatabase;
-
-        $intUserId = intval($intUserId);
-
-        $arrReturn = array(    'name'    =>    '',
-                            'email'    =>    '',
-                            'www'    =>    ''
-                        );
-
-        if ($intUserId > 0) {
-            $objUserResult = $objDatabase->Execute('SELECT     username,
-                                                    email,
-                                                    webpage
-                                            FROM     '.DBPREFIX.'access_users
-                                            WHERE     id='.$intUserId.'
-                                            LIMIT    1
-                                        ');
-
-            $arrReturn['name']     = htmlentities($objUserResult->fields['username'], ENT_QUOTES, CONTREXX_CHARSET);
-            $arrReturn['email'] = htmlentities($objUserResult->fields['email'], ENT_QUOTES, CONTREXX_CHARSET);
-            $arrReturn['www']     = htmlentities($objUserResult->fields['webpage'], ENT_QUOTES, CONTREXX_CHARSET);
-        }
-
-        return $arrReturn;
-    }
-
 
     /**
      * Returns the allowed maximum element per page. Can be used for paging.
