@@ -791,6 +791,52 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
     }
 
     /**
+     * Get all images from all image attributes. Empty values are excluded
+     *
+     * @param int   $limit  limit of database query
+     * @param int   $offset offset of database query
+     * @param int   $count  count of entries
+     * @param array $images contains all images from image attributes
+     * @return bool if the database query was successful
+     */
+    public function getImages($limit, $offset, &$count, &$images)
+    {
+        global $objDatabase;
+
+        $query = "
+                SELECT SUM(1) as entryCount
+                FROM `".DBPREFIX."access_user_attribute` AS a
+                INNER JOIN `".DBPREFIX."access_user_attribute_value` AS v ON v.`attribute_id` = a.`id`
+                WHERE a.`type` = 'image' AND v.`value` != ''";
+
+        $objCount = $objDatabase->Execute($query);
+        if (!$objCount || !$objCount->fields['entryCount']) {
+            return false;
+        }
+
+        $count = $objCount->fields['entryCount'];
+
+        $query = "
+                SELECT v.`value` AS picture
+                FROM `".DBPREFIX."access_user_attribute` AS a
+                INNER JOIN `".DBPREFIX."access_user_attribute_value` AS v 
+                    ON v.`attribute_id` = a.`id`
+                WHERE a.`type` = 'image' AND v.`value` != ''";
+
+        $objImage = $objDatabase->SelectLimit($query, $limit, $offset);
+        if ($objImage === false) {
+            return false;
+        }
+
+        while (!$objImage->EOF) {
+            $images[] = $objImage->fields['picture'];
+            $objImage->MoveNext();
+        }
+
+        return true;
+    }
+
+    /**
      * get attribute id by attribut name
      *
      * @param string $name
