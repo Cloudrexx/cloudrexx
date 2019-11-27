@@ -185,14 +185,14 @@ class Home {
             $objTemplate->setVariable('MESSAGE_LINK_TARGET', contrexx_raw2xhtml($message->getLinkTarget()));
         }
 
-// TODO: Unused
-//        $objFWUser = \FWUser::getFWUserObject();
+        $objFWUser = \FWUser::getFWUserObject();
         $objResult = $objDatabase->SelectLimit(
            'SELECT `logs`.`datetime`, `logs`.`userid`
             FROM `'.DBPREFIX.'log` AS `logs`
             ORDER BY `logs`.`id` DESC', 1);
         if ($objResult && $objResult->RecordCount() > 0) {
-            $objUser = \FWUser::getFWUserObject()->objUser->getUser($id = $objResult->fields['userid']);
+            $objUser = $objFWUser->objUser->getUser($id = $objResult->fields['userid']);
+            $username = '';
             if ($objUser !== false) {
                 $username = $objUser->getRealUsername();
             }
