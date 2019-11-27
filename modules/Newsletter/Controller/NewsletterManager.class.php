@@ -6583,19 +6583,30 @@ function MultiAction() {
         $recipientType = isset($_REQUEST['recipient_type']) ? $_REQUEST['recipient_type'] : '';
         if ($recipientId > 0) {
             if ($recipientType == 'newsletter') {
-                $query = "SELECT lastname, firstname FROM ".DBPREFIX."module_newsletter_user WHERE id=".$recipientId;
+                $query = "SELECT lastname, firstname FROM " . DBPREFIX . "module_newsletter_user WHERE id=" . $recipientId;
+
+                $objRecipient = $objDatabase->SelectLimit($query, 1);
+                if ($objRecipient !== false && $objRecipient->RecordCount() == 1) {
+                    $recipientLastname = $objRecipient->fields['lastname'];
+                    $recipientFirstname = $objRecipient->fields['firstname'];
+                } else {
+                    return $this->_mails();
+                }
             } elseif ($recipientType == 'access') {
-                $query = "SELECT tlbProfile.lastname, tlbProfile.firstname
-                    FROM ".DBPREFIX."access_users AS tlbUser
-                        INNER JOIN ".DBPREFIX."access_user_profile AS tlbProfile ON tlbProfile.user_id = tlbUser.id
-                    WHERE tlbUser.id=".$recipientId;
-            }
-            $objRecipient = $objDatabase->SelectLimit($query, 1);
-            if ($objRecipient !== false && $objRecipient->RecordCount() == 1) {
-                $recipientLastname = $objRecipient->fields['lastname'];
-                $recipientFirstname = $objRecipient->fields['firstname'];
-            } else {
-                return $this->_mails();
+                $objUser = \FWUser::getFWUserObject()->objUser->getUser(
+                    $recipientId
+                );
+
+                if ($objUser) {
+                    $recipientLastname = $objUser->getProfileAttribute(
+                        'lastname'
+                    );
+                    $recipientFirstname = $objUser->getProfileAttribute(
+                        'firstname'
+                    );
+                } else {
+                    return $this->_mails();
+                }
             }
         }
 
