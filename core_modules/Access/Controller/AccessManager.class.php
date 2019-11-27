@@ -581,12 +581,7 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
             $toolbarController = $cx->getComponent('Wysiwyg')->getController('Toolbar');
             $newButtons = $_POST['removedButtons'];
             // Get the assigned toolbar id of the current group
-            $toolbarIdRes = $dbCon->Execute('
-                SELECT `toolbar` FROM `' . DBPREFIX . 'access_user_groups`
-                WHERE `group_id` = ' . intval($objGroup->getId()) . '
-                LIMIT 1');
-            // Fetch the data
-            $toolbarId = $toolbarIdRes->fields['toolbar'];
+            $toolbarId = $objGroup->getToolbar();
             $newToolbarId = $toolbarController->store($newButtons, $toolbarId);
             // Check if a new toolbar has been created or an existing one updated
             if ($newToolbarId !== 0) {
