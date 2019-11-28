@@ -349,7 +349,11 @@ class JsonMediaBrowser extends SystemComponentController implements JsonAdapter
         $localFileSystem = new \Cx\Core\MediaSource\Model\Entity\LocalFileSystem($folder);
         $file = $localFileSystem->getFileFromPath('/' . $path);
 
-        $this->setMessage($localFileSystem->removeFile($file));
+        if ($file === false) {
+            $this->setMessage($file);
+        }else {
+            $this->setMessage($localFileSystem->removeFile($file));
+        }
 
         return array();
     }
