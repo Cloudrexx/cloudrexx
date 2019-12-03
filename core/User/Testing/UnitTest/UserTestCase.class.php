@@ -90,33 +90,34 @@ abstract class UserTestCase extends \Cx\Core\Test\Model\Entity\MySQLTestCase
                 $userObject->setEmail($data);
                 $userObject->store();
                 continue;
-            } else {
-                $userObject->setEmail($email);
-                //set email and the other data
-                foreach ($data as $key => $value) {
-                    switch ($key) {
-                        case 'username':
-                            $userObject->setUsername($value);
-                            break;
-                        case 'profile':
-                            $userObject->setProfile($value);
-                            break;
-                        case 'group':
-                            $userObject->setPrimaryGroup($value);
-                            break;
-                        case 'admin':
-                            $userObject->setAdminStatus($value);
-                            break;
-                        case 'status':
-                            $userObject->setActiveStatus($value);
-                            break;
-                        case 'auth':
-                            $time = $value;
-                            break;
+            }
+
+            $userObject->setEmail($email);
+            //set email and the other data
+            foreach ($data as $key => $value) {
+                switch ($key) {
+                    case 'username':
+                        $userObject->setUsername($value);
+                        break;
+                    case 'profile':
+                        $userObject->setProfile($value);
+                        break;
+                    case 'group':
+                        $userObject->setPrimaryGroup($value);
+                        break;
+                    case 'admin':
+                        $userObject->setAdminStatus($value);
+                        break;
+                    case 'status':
+                        $userObject->setActiveStatus($value);
+                        break;
+                    case 'auth':
+                        $time = $value;
+                        break;
                     }
                 }
-            }
             $userObject->store();
+
             if (isset($time)) {
                 //the user should first be stored before the Login can be successful
                 $userObject->registerSuccessfulLogin();
