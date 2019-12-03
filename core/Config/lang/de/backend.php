@@ -221,3 +221,5 @@ $_ARRAYLANG['TXT_CORE_CONFIG_USEVIRTUALLANGUAGEDIRECTORIES']          = 'Virtuel
 $_ARRAYLANG['TXT_CONFIG_UNABLE_TO_SET_USEVIRTUALLANGUAGEDIRECTORIES'] = 'Die Option %s kann nicht deaktiviert werden, so lange mehrere Sprachversionen eingerichtet sind.';
 $_ARRAYLANG['TXT_CORE_CONFIG_UPLOADFILESIZELIMIT'] = 'Datei-Upload-Limite';
 $_ARRAYLANG['TXT_CORE_CONFIG_UPLOADFILESIZELIMIT_TOOLTIP_HELP'] = 'Die maximal erlaubte Grösse einer Datei, welche hochgeladen werden darf.';
+$_ARRAYLANG['TXT_CORE_CONFIG_MAXEXECUTIONTIMEOVERHTTP'] = 'Maximale Skript-Ausführungszeit';
+$_ARRAYLANG['TXT_CORE_CONFIG_MAXEXECUTIONTIMEOVERHTTP_TOOLTIP_HELP'] = 'Hinterlegen Sie die maximale Ausführungszeit (in Sekunden), welche Cloudrexx für die Abarbeitung einer Anfrage (via HTTP/HTTPS) zur Verfügung steht (gemäss Webserverkonfiguration). Die maximale Skript-Ausführungszeit wird von Cloudrexx verwendet, um die langandauernde Abarbeitung von Anfragen frühzeitig zu beenden ohne dass es zu einem abrupten (unbehandelten) Skript-Abbruch kommt. Setzen Sie den Wert auf 0 (oder leer), um die frühzeitige Beendigung zu deaktivieren.';

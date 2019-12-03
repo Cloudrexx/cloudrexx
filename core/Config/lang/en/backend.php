@@ -210,3 +210,5 @@ $_ARRAYLANG['TXT_CORE_CONFIG_USEVIRTUALLANGUAGEDIRECTORIES']          = 'Use vir
 $_ARRAYLANG['TXT_CONFIG_UNABLE_TO_SET_USEVIRTUALLANGUAGEDIRECTORIES'] = 'The option %s can not be deactivated as long as there are multiple locales defined.';
 $_ARRAYLANG['TXT_CORE_CONFIG_UPLOADFILESIZELIMIT'] = 'File upload limit';
 $_ARRAYLANG['TXT_CORE_CONFIG_UPLOADFILESIZELIMIT_TOOLTIP_HELP'] = 'File size limit of files being uploaded.';
+$_ARRAYLANG['TXT_CORE_CONFIG_MAXEXECUTIONTIMEOVERHTTP'] = 'Maximum script execution time';
+$_ARRAYLANG['TXT_CORE_CONFIG_MAXEXECUTIONTIMEOVERHTTP_TOOLTIP_HELP'] = 'Set the maximum script execution time (in seconds) that Cloudrexx can use to process requests (through HTTP/HTTPS) based on the webserver configuration. Cloudrexx will use the set maximum script execution time to safely terminate any request-processing that is taking a long time before the scrip will be terminated unexpectedly by the webserver. Set this value to 0 (or empty) to disable the safe script termiation.';

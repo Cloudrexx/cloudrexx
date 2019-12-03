@@ -323,6 +323,10 @@ class Config
                     'value' => '500 mb',
                     'values' => '{"type":"filesize"}',
                 ),
+                'maxExecutionTimeOverHttp' => array(
+                    'value' => '',
+                    'componentDependencies' => array('SystemInfo'),
+                ),
             ),
             'core' => array(
                 'coreSmtpServer' => array(
