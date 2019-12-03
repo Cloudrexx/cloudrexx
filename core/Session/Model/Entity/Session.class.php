@@ -372,10 +372,10 @@ class Session extends \Cx\Core\Model\RecursiveArrayAccess implements \SessionHan
                                          `value` = "'. $serializedValue .'"';
                             \Env::get('db')->Execute($query);
 
-                            $this->releaseLock($lockKey);
                         }
                     }
                 }
+                $this->releaseLock($lockKey);
             }
         }
         $this->updateTimeStamp();
