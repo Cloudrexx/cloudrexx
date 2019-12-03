@@ -617,6 +617,24 @@ class Session extends \Cx\Core\Model\RecursiveArrayAccess implements \SessionHan
     }
 
     /**
+     * Release the current session
+     *
+     * This will store any non-persistend data of the session
+     * and then closes it, resp. it will release the session lock.
+     *
+     * Use this to release the lock on the session from this request,
+     * so can parallel requests (that are not session-dependant) can be
+     * processed.
+     *
+     * Important: Any changes made to the session after this call will
+     * be discarded or may result in a system error.
+     */
+    public function release() {
+        $this->releaseLocks();
+        session_write_close();
+    }
+
+    /**
      * Callable on session read
      *
      * @param string $aKey
