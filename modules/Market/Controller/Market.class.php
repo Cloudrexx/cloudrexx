@@ -1566,7 +1566,7 @@ class Market extends MarketLibrary
                         }
 
                         //entry user
-                        $objUser = $objFWUser->objUser->getUsers(array('id' => intval($objResult->fields['userid'])));
+                        $objUser = $objFWUser->objUser->getUser(intval($objResult->fields['userid']));
                         if ($objUser !== false) {
                             $addedby = $objUser->getRealUsername();
                         }

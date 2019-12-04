@@ -579,7 +579,7 @@ class MarketManager extends MarketLibrary
                    $this->entries[$entryId]['status'] == 1 ? $led = 'led_green' : $led = 'led_red';
                    $this->entries[$entryId]['type'] == 'offer' ? $type = $_ARRAYLANG['TXT_MARKET_OFFER'] : $type = $_ARRAYLANG['TXT_MARKET_SEARCH'];
                    $i%2 ? $row = 2 : $row = 1;
-                   $objUser = $objFWUser->objUser->getUsers(array('id' => intval($this->entries[$entryId]['userid'])));
+                   $objUser = $objFWUser->objUser->getUser(intval($this->entries[$entryId]['userid']));
                    if ($objUser !== false) {
                        $addedby = $objUser->getRealUsername();
                    }
@@ -885,7 +885,7 @@ class MarketManager extends MarketLibrary
                     }
 
                     //entry user
-                    $objUser = $objFWUser->objUser->getUsers(array('id' => intval($objResult->fields['userid'])));
+                    $objUser = $objFWUser->objUser->getUser(intval($objResult->fields['userid']));
                     if ($objUser !== false) {
                         $addedby = $objUser->getRealUsername();
                     }

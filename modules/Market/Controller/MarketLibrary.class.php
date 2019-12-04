@@ -265,7 +265,7 @@ class MarketLibrary
         }
 
         //accessuserdata
-        $objUser = $objFWUser->objUser->getUsers(array('id' => intval($entryUserid)));
+        $objUser = $objFWUser->objUser->getUser(intval($entryUserid));
         if ($objUser !== false) {
             $userUsername = $objUser->getRealUsername();
         }
@@ -360,7 +360,7 @@ class MarketLibrary
         }
 
         //accessuserdata
-        $objUser = $objFWUser->objUser->getUsers(array('id' => intval($entryUserid)));
+        $objUser = $objFWUser->objUser->getUser(intval($entryUserid));
         if ($objUser !== false) {
 // TODO: Never used
 //          $userMail = $objUser->getEmail();
