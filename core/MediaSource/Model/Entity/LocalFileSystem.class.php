@@ -183,6 +183,13 @@ class LocalFileSystem extends FileSystem
     }
 
     /**
+     * @inheritdoc
+     */
+    public function getFiles(File $directory = null, bool $recursive = true): array {
+        throw new \Exception('Not yet implemented');
+    }
+
+    /**
      * Applies utf8_encode() to keys and values of an array
      * From: http://stackoverflow.com/questions/7490105/array-walk-recursive-modify-both-keys-and-values
      * @todo move to a different location

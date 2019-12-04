@@ -106,11 +106,30 @@ abstract class FileSystem extends \Cx\Model\Base\EntityBase {
      *          contains the same structure again.
      * @todo Extension "Dir" could be ambiguous
      * @todo Sanitize files named "datainfo"
+     * @deprecated In favor of getFiles()
      * @param string $directory Path relative to this FS' root
      * @param boolean $recursive (optional) If set to false, recursion is skipped
      * @return array UTF8 encoded list of file names, see description
      */
     public abstract function getFileList($directory, $recursive = true);
+
+    /**
+     * Returns a hierarchial/recursive list of File objects
+     *
+     * The following structure is returned:
+     * <filename> => array(
+     *     'file' => <file>
+     *     'children' => <nesting>
+     * ),
+     * <filename> is the name of the file as returned by File::getFullPath()
+     * <file> is the File object
+     * <nesting> is only set for directories and if $recursive is true. It
+     *          contains the same structure again.
+     * @param File $directory (optional) Directory to get the listing of
+     * @param boolean $recursive (optional) If set to false, recursion is skipped
+     * @return array List of File objects, see description
+     */
+    public abstract function getFiles(File $directory = null, bool $recursive = true): array;
 
     /**
      * Removes the given file from the OS FS
