@@ -107,7 +107,7 @@ CREATE TABLE `contrexx_access_users` (
   `last_auth` int unsigned NOT NULL DEFAULT '0',
   `last_auth_status` smallint NOT NULL DEFAULT '0',
   `last_activity` int unsigned NOT NULL DEFAULT '0',
-  `email` varchar(255) DEFAULT NULL,
+  `email` varchar(255) NOT NULL,
   `email_access` enum('everyone','members_only','nobody') NOT NULL DEFAULT 'nobody',
   `frontend_lang_id` int unsigned NOT NULL DEFAULT '0',
   `backend_lang_id` int unsigned NOT NULL DEFAULT '0',
@@ -119,7 +119,8 @@ CREATE TABLE `contrexx_access_users` (
   `restore_key_time` int unsigned NOT NULL DEFAULT '0',
   `u2u_active` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
-  KEY `username` (`username`)
+  KEY `username` (`username`),
+  UNIQUE INDEX `UNIQ_7CD32875E7927C74` (`email`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_backend_areas` (
   `area_id` int(6) unsigned NOT NULL AUTO_INCREMENT,
