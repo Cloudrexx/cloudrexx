@@ -148,7 +148,7 @@ class StatsLibrary
                 '[SEARCHTERM]'      => $searchTerm,
                 '[SEARCHTERM_NOSCRIPT]'=> $searchTermNoScript,
                 '[SEARCHTERM_PLAIN]'=> $searchTermPlain,
-                '[REFERER]'         => '$(HTTP_REFERER)',
+                '[REFERER]'         => '$url_encode($(HTTP_REFERER))',
             );
             foreach ($replaces as $from => $to) {
                 $counterTag = str_replace($from, $to, $counterTag);
