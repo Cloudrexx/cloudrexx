@@ -68,15 +68,6 @@ class LocalFileSystem extends FileSystem
     }
 
     /**
-     * @param $path
-     *
-     * @return LocalFileSystem
-     */
-    public static function createFromPath($path) {
-        return new self($path);
-    }
-
-    /**
      * @todo The param $readonly is non-standard
      */
     public function getFileList($directory, $recursive = true, $readonly = false) {

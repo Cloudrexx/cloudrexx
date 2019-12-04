@@ -99,7 +99,7 @@ class MediaSource extends DataSource {
     protected $systemComponentController;
 
     public function __construct($name,$humanName, $directory, $accessIds = array(), $position = '',FileSystem $fileSystem = null, \Cx\Core\Core\Model\Entity\SystemComponentController $systemComponentController = null) {
-        $this->fileSystem = $fileSystem ? $fileSystem : LocalFileSystem::createFromPath($directory[0]);
+        $this->fileSystem = $fileSystem ? $fileSystem : new LocalFileSystem($directory[0]);
         $this->name      = $name;
         $this->position  = $position;
         $this->humanName = $humanName;
