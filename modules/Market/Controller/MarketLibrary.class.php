@@ -341,12 +341,6 @@ class MarketLibrary
 
         $objFWUser = \FWUser::getFWUserObject();
 
-        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-
-        $em = $cx->getDb()->getEntityManager();
-
-        $qb = $em->createQueryBuilder();
-
         //entrydata
         $objResult = $objDatabase->Execute("SELECT id, title, name, userid, email FROM ".DBPREFIX."module_market WHERE id='".contrexx_addslashes($entryId)."' LIMIT 1");
         if ($objResult !== false) {
