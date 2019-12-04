@@ -185,10 +185,11 @@ class LocalFileSystem extends FileSystem
     /**
      * Applies utf8_encode() to keys and values of an array
      * From: http://stackoverflow.com/questions/7490105/array-walk-recursive-modify-both-keys-and-values
+     * @todo move to a different location
      * @param array $array Array to encode
      * @return array UTF8 encoded array
      */
-    public function utf8EncodeArray($array) {
+    protected function utf8EncodeArray($array) {
         $helper = array();
         foreach ($array as $key => $value) {
             if (is_array($value)) {
@@ -205,6 +206,7 @@ class LocalFileSystem extends FileSystem
      * \array_merge_recursive() behaves unexpected with numerical indexes
      * Fix from http://php.net/array_merge_recursive (array_merge_recursive_new)
      *
+     * @todo move to a different location (see CacheLib)
      * This method behaves differently than the original since it overwrites
      * already present keys
      * @return array Recursively merged array
