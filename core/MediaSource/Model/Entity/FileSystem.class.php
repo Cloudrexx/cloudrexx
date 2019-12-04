@@ -53,6 +53,26 @@ namespace Cx\Core\MediaSource\Model\Entity;
 abstract class FileSystem extends \Cx\Model\Base\EntityBase {
 
     /**
+     * The path of the file system.
+     * Without ending directory separator.
+     */
+    protected $rootPath;
+
+    /**
+     * Creates a new instance of this FileSystem type
+     *
+     * @param string $path Mount path
+     */
+    public function __construct($path) {
+        if (!$path) {
+            throw new \InvalidArgumentException(
+                'Path shouldn\'t be empty: Given: ' . $path
+            );
+        }
+        $this->rootPath = rtrim($path, '/');
+    }
+
+    /**
      * Returns all files withing a given folder (recursively by default)
      *
      * For each file within $directory the following structure is returned:

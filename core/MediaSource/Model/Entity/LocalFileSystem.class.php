@@ -50,22 +50,7 @@ namespace Cx\Core\MediaSource\Model\Entity;
  */
 class LocalFileSystem extends FileSystem
 {
-
-    /**
-     * The path of the file system.
-     * Without ending directory separator.
-     */
-    private $rootPath;
     protected $fileListCache;
-
-    function __construct($path) {
-        if (!$path) {
-            throw new \InvalidArgumentException(
-                "Path shouldn't be empty: Given: " . $path
-            );
-        }
-        $this->rootPath = rtrim($path, '/');
-    }
 
     /**
      * @todo The param $readonly is non-standard
