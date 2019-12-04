@@ -1282,7 +1282,7 @@ class DirectoryLibrary
 
         $userId = contrexx_addslashes($id);
 
-        $objUser = $objFWUser->objUser->getUsers(array('id' => intval($userId)));
+        $objUser = $objFWUser->objUser->getUser(intval($userId));
         if ($objUser !== false) {
             $author = $objUser->getRealUsername();
         } else {
