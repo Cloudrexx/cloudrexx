@@ -347,7 +347,7 @@ class File implements FileInterface
             }
         }
 
-        throw new FileSystemException('File: Unable to copy file '.$this->file.'!');
+        throw new FileSystemException('File: Unable to move file '.$this->file.'!');
     }
 
     /**
