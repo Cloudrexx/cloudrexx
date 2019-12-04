@@ -518,45 +518,53 @@ class MediaDirectoryLibrary
 
         $arrCommunityGroups = array();
 
-        $objCommunityGroups = $objDatabase->Execute("SELECT
-                                                        `group`.`group_id` AS group_id,
-                                                        `group`.`group_name` AS group_name,
-                                                        `group`.`is_active` AS is_active,
-                                                        `group`.`type` AS `type`,
-                                                        `num_entry`.`num_entries` AS num_entries,
-                                                        `num_category`.`num_categories` AS num_categories,
+        $objGroup = \FWUser::getFWUserObject()->objGroup->getGroups();
+
+        while (!$objGroup->EOF) {
+            $gId = intval($objGroup->getId());
+            $arrCommunityGroups[$gId]['name'] = htmlspecialchars($objGroup->getName(), ENT_QUOTES, CONTREXX_CHARSET);
+            $arrCommunityGroups[$gId]['active'] = intval($objGroup->getActiveStatus());
+            $arrCommunityGroups[$gId]['type'] = htmlspecialchars($objGroup->getType(), ENT_QUOTES, CONTREXX_CHARSET);
+
+            $objNumEntry = $objDatabase->Execute("SELECT
+                                                        `num_entry`.`num_entries` AS num_entries
+                                                      FROM
+                                                        ".DBPREFIX."module_".$this->moduleNameLC."_settings_num_entries AS `num_entry`
+                                                      WHERE `num_entry`.`group_id` = $gId");
+
+
+            $objNumCategory = $objDatabase->Execute("SELECT
+                                                        `num_category`.`num_categories` AS num_categories
+                                                      FROM
+                                                        ".DBPREFIX."module_".$this->moduleNameLC."_settings_num_categories AS `num_category`
+                                                      WHERE `num_category`.`group_id` = $gId");
+
+            $objNumLevel = $objDatabase->Execute("SELECT
                                                         `num_level`.`num_levels` AS num_levels
                                                       FROM
-                                                        ".DBPREFIX."access_user_groups AS `group`
-                                                      LEFT JOIN ".DBPREFIX."module_".$this->moduleNameLC."_settings_num_entries AS `num_entry` ON `num_entry`.`group_id` = `group`.`group_id`
-                                                      LEFT JOIN ".DBPREFIX."module_".$this->moduleNameLC."_settings_num_categories AS `num_category` ON `num_category`.`group_id` = `group`.`group_id`
-                                                      LEFT JOIN ".DBPREFIX."module_".$this->moduleNameLC."_settings_num_levels AS `num_level` ON `num_level`.`group_id` = `group`.`group_id`");
-        if ($objCommunityGroups !== false) {
-            while (!$objCommunityGroups->EOF) {
-                $arrCommunityGroups[intval($objCommunityGroups->fields['group_id'])]['name'] = htmlspecialchars($objCommunityGroups->fields['group_name'], ENT_QUOTES, CONTREXX_CHARSET);
-                $arrCommunityGroups[intval($objCommunityGroups->fields['group_id'])]['active'] = intval($objCommunityGroups->fields['is_active']);
-                $arrCommunityGroups[intval($objCommunityGroups->fields['group_id'])]['type'] = htmlspecialchars($objCommunityGroups->fields['type'], ENT_QUOTES, CONTREXX_CHARSET);
-                $arrCommunityGroups[intval($objCommunityGroups->fields['group_id'])]['num_entries'] = htmlspecialchars($objCommunityGroups->fields['num_entries'], ENT_QUOTES, CONTREXX_CHARSET);
-                $arrCommunityGroups[intval($objCommunityGroups->fields['group_id'])]['num_categories'] = htmlspecialchars($objCommunityGroups->fields['num_categories'], ENT_QUOTES, CONTREXX_CHARSET);
-                $arrCommunityGroups[intval($objCommunityGroups->fields['group_id'])]['num_levels'] = htmlspecialchars($objCommunityGroups->fields['num_levels'], ENT_QUOTES, CONTREXX_CHARSET);
-                $arrCommunityGroups[intval($objCommunityGroups->fields['group_id'])]['status_group'] = array();
+                                                        ".DBPREFIX."module_".$this->moduleNameLC."_settings_num_levels AS `num_level`
+                                                      WHERE `num_level`.`group_id` = $gId");
 
-                $objCommunityGroupPermForms = $objDatabase->Execute("SELECT
+            $arrCommunityGroups[$gId]['num_entries'] = htmlspecialchars($objNumEntry->fields['num_entries'], ENT_QUOTES, CONTREXX_CHARSET);
+            $arrCommunityGroups[$gId]['num_categories'] = htmlspecialchars($objNumCategory->fields['num_categories'], ENT_QUOTES, CONTREXX_CHARSET);
+            $arrCommunityGroups[$gId]['num_levels'] = htmlspecialchars($objNumLevel->fields['num_levels'], ENT_QUOTES, CONTREXX_CHARSET);
+            $arrCommunityGroups[$gId]['status_group'] = array();
+
+            $objCommunityGroupPermForms = $objDatabase->Execute("SELECT
                                                         `perm_group_form`.`form_id` AS form_id ,
                                                         `perm_group_form`.`status_group` AS status_group
                                                       FROM
                                                         ".DBPREFIX."module_".$this->moduleNameLC."_settings_perm_group_forms AS `perm_group_form`
                                                       WHERE
-                                                        `perm_group_form`.`group_id` = '".intval($objCommunityGroups->fields['group_id'])."'");
-                if ($objCommunityGroupPermForms !== false) {
-                    while (!$objCommunityGroupPermForms->EOF) {
-                        $arrCommunityGroups[intval($objCommunityGroups->fields['group_id'])]['status_group'][intval($objCommunityGroupPermForms->fields['form_id'])] = htmlspecialchars($objCommunityGroupPermForms->fields['status_group'], ENT_QUOTES, CONTREXX_CHARSET);
-                        $objCommunityGroupPermForms->MoveNext();
-                    }
+                                                        `perm_group_form`.`group_id` = $gId");
+            if ($objCommunityGroupPermForms !== false) {
+                while (!$objCommunityGroupPermForms->EOF) {
+                    $arrCommunityGroups[$gId]['status_group'][intval($objCommunityGroupPermForms->fields['form_id'])] = htmlspecialchars($objCommunityGroupPermForms->fields['status_group'], ENT_QUOTES, CONTREXX_CHARSET);
+                    $objCommunityGroupPermForms->MoveNext();
                 }
-
-                $objCommunityGroups->MoveNext();
             }
+
+            $objGroup->next();
         }
 
         // return $arrCommunityGroups;

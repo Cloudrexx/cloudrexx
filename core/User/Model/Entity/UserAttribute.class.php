@@ -4,7 +4,7 @@
  * Cloudrexx
  *
  * @link      http://www.cloudrexx.com
- * @copyright Cloudrexx AG 2007-2018
+ * @copyright Cloudrexx AG 2007-2019
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -87,7 +87,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     protected $readAccessId;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Cx\Core\User\Model\Entity\UserAttribute
      */
     protected $parent;
 
@@ -102,7 +102,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     protected $userAttributeValue;
 
     /**
-     * @var \Cx\Core\User\Model\Entity\UserAttribute
+     * @var \Doctrine\Common\Collections\Collection
      */
     protected $children;
 
@@ -116,7 +116,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
      */
     public function __construct()
     {
-        $this->parent = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->children = new \Doctrine\Common\Collections\ArrayCollection();
         $this->userAttributeName = new \Doctrine\Common\Collections\ArrayCollection();
     }
 

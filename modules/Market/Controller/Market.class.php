@@ -1566,9 +1566,9 @@ class Market extends MarketLibrary
                         }
 
                         //entry user
-                        $objResultUser = $objDatabase->Execute('SELECT username FROM '.DBPREFIX.'access_users WHERE id = '.$objResult->fields['userid'].' LIMIT 1');
-                        if ($objResultUser !== false) {
-                            $addedby = $objResultUser->fields['username'];
+                        $objUser = $objFWUser->objUser->getUser(intval($objResult->fields['userid']));
+                        if ($objUser !== false) {
+                            $addedby = $objUser->getRealUsername();
                         }
 
                         //entry userdetails

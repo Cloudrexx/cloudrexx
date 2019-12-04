@@ -17,8 +17,8 @@ CREATE TABLE `contrexx_access_id` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;
 CREATE TABLE `contrexx_access_rel_user_group` (
-  `user_id` int UNSIGNED NOT NULL,
-  `group_id` int NOT NULL,
+  `user_id` int unsigned NOT NULL,
+  `group_id` int unsigned NOT NULL,
   PRIMARY KEY (`user_id`,`group_id`),
   INDEX `contrexx_access_rel_user_group_user_id_ibfk` (`user_id`),
   INDEX `contrexx_access_rel_user_group_group_id_ibfk` (`group_id`)
@@ -30,10 +30,10 @@ CREATE TABLE `contrexx_access_settings` (
   UNIQUE KEY `key` (`key`)
 ) ENGINE=InnoDB;
 CREATE TABLE `contrexx_access_user_attribute` (
-  `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
-  `parent_id` int UNSIGNED DEFAULT NULL,
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `parent_id` int unsigned DEFAULT NULL,
   `type` enum('text','textarea','mail','uri','date','image','checkbox','menu','menu_option','group','frame','history') NOT NULL DEFAULT 'text',
-  `mandatory` enum('0','1') NOT NULL DEFAULT '0',
+  `mandatory` tinyint(1) NOT NULL DEFAULT '0',
   `sort_type` enum('asc','desc','custom') NOT NULL DEFAULT 'asc',
   `order_id` int NOT NULL DEFAULT '0',
   `access_special` enum('','menu_select_higher','menu_select_lower') NOT NULL DEFAULT '',
@@ -44,8 +44,8 @@ CREATE TABLE `contrexx_access_user_attribute` (
   INDEX `contrexx_access_user_attribute_parent_id_ibfk` (`parent_id`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_access_user_attribute_name` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `attribute_id` int UNSIGNED NOT NULL,
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `attribute_id` int unsigned NOT NULL,
   `lang_id` int NOT NULL DEFAULT '0',
   `name` varchar(255) NOT NULL DEFAULT '',
   `order` int,
@@ -54,20 +54,19 @@ CREATE TABLE `contrexx_access_user_attribute_name` (
   UNIQUE INDEX fk_module_user_attribute_name_unique_idx (`attribute_id`, `lang_id`)
 ) ENGINE=InnoDB;
 CREATE TABLE `contrexx_access_user_attribute_value` (
-  `attribute_id` int UNSIGNED NOT NULL,
-  `user_id` int UNSIGNED NOT NULL,
-  `history_id` int UNSIGNED NOT NULL DEFAULT '0',
+  `attribute_id` int unsigned NOT NULL,
+  `user_id` int unsigned NOT NULL,
+  `history_id` int unsigned NOT NULL DEFAULT '0',
   `value` text NOT NULL,
   PRIMARY KEY (`attribute_id`, `user_id`, `history_id`),
   FULLTEXT KEY `value` (`value`),
-  INDEX `contrexx_access_user_attribute_value_user_id_ibfk` (`user_id`),
-  INDEX IDX_B0DEA323B6E62EFA (attribute_id)
+  INDEX `contrexx_access_user_attribute_value_user_id_ibfk` (`user_id`)
 ) ENGINE=InnoDB;
 CREATE TABLE `contrexx_access_user_groups` (
-  `group_id` int NOT NULL AUTO_INCREMENT,
+  `group_id` int unsigned NOT NULL AUTO_INCREMENT,
   `group_name` varchar(100) NOT NULL DEFAULT '',
   `group_description` varchar(255) NOT NULL DEFAULT '',
-  `is_active` smallint NOT NULL DEFAULT '1',
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `type` enum('frontend','backend') NOT NULL DEFAULT 'frontend',
   `homepage` varchar(255) NOT NULL DEFAULT '',
   `toolbar` int NOT NULL DEFAULT '0',
@@ -96,31 +95,32 @@ CREATE TABLE `contrexx_access_user_validity` (
   PRIMARY KEY (`validity`)
 ) ENGINE=InnoDB;
 CREATE TABLE `contrexx_access_users` (
-  `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
   `is_admin` tinyint(1) NOT NULL DEFAULT '0',
   `username` varchar(255) DEFAULT NULL,
   `password` varchar(255) DEFAULT NULL,
-  `auth_token` varchar(32) NOT NULL DEFAULT '',
-  `auth_token_timeout` int UNSIGNED NOT NULL DEFAULT '0',
-  `regdate` int UNSIGNED NOT NULL DEFAULT '0',
-  `expiration` int UNSIGNED NOT NULL DEFAULT '0',
-  `validity` int UNSIGNED NOT NULL DEFAULT '0',
-  `last_auth` int UNSIGNED NOT NULL DEFAULT '0',
-  `last_auth_status` smallint NOT NULL DEFAULT '1',
-  `last_activity` int UNSIGNED NOT NULL DEFAULT '0',
-  `email` varchar(255) DEFAULT NULL,
+  `auth_token` varchar(32) NOT NULL DEFAULT '0',
+  `auth_token_timeout` int unsigned NOT NULL DEFAULT '0',
+  `regdate` int unsigned NOT NULL DEFAULT '0',
+  `expiration` int unsigned NOT NULL DEFAULT '0',
+  `validity` int unsigned NOT NULL DEFAULT '0',
+  `last_auth` int unsigned NOT NULL DEFAULT '0',
+  `last_auth_status` smallint NOT NULL DEFAULT '0',
+  `last_activity` int unsigned NOT NULL DEFAULT '0',
+  `email` varchar(255) NOT NULL,
   `email_access` enum('everyone','members_only','nobody') NOT NULL DEFAULT 'nobody',
-  `frontend_lang_id` int UNSIGNED NOT NULL DEFAULT '0',
-  `backend_lang_id` int UNSIGNED NOT NULL DEFAULT '0',
+  `frontend_lang_id` int unsigned NOT NULL DEFAULT '0',
+  `backend_lang_id` int unsigned NOT NULL DEFAULT '0',
   `active` tinyint(1) NOT NULL DEFAULT '1',
   `verified` tinyint(1) NOT NULL DEFAULT '1',
-  `primary_group` int UNSIGNED NOT NULL DEFAULT '0',
+  `primary_group` int unsigned NOT NULL DEFAULT '0',
   `profile_access` enum('everyone','members_only','nobody') NOT NULL DEFAULT 'members_only',
   `restore_key` varchar(32) NOT NULL DEFAULT '',
-  `restore_key_time` int UNSIGNED NOT NULL DEFAULT '0',
-  `u2u_active` enum('0','1') NOT NULL DEFAULT '1',
+  `restore_key_time` int unsigned NOT NULL DEFAULT '0',
+  `u2u_active` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
-  KEY `username` (`username`)
+  KEY `username` (`username`),
+  UNIQUE INDEX `UNIQ_7CD32875E7927C74` (`email`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_backend_areas` (
   `area_id` int(6) unsigned NOT NULL AUTO_INCREMENT,
@@ -2201,11 +2201,25 @@ CREATE TABLE `contrexx_module_jobs_categories` (
   `sort_style` enum('alpha','date','date_alpha') NOT NULL DEFAULT 'alpha',
   PRIMARY KEY (`catid`)
 ) ENGINE=InnoDB ;
+CREATE TABLE `contrexx_module_jobs_flag` (
+  `id` int NOT NULL AUTO_INCREMENT ,
+  `name` varchar(255) NOT NULL DEFAULT '',
+  `icon` text NOT NULL,
+  `value` text NOT NULL,
+  PRIMARY KEY(`id`)
+) ENGINE = InnoDB;
 CREATE TABLE `contrexx_module_jobs_location` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB ;
+CREATE TABLE `contrexx_module_jobs_rel_flag_job` (
+  `job` int(6) unsigned NOT NULL,
+  `flag` int NOT NULL,
+  PRIMARY KEY (`job`,`flag`),
+  CONSTRAINT `contrexx_module_jobs_rel_flag_job_ibfk_1` FOREIGN KEY (`job`) REFERENCES `contrexx_module_jobs` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `contrexx_module_jobs_rel_flag_job_ibfk_2` FOREIGN KEY (`flag`) REFERENCES `contrexx_module_jobs_flag` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB;
 CREATE TABLE `contrexx_module_jobs_rel_loc_jobs` (
   `job` int(10) unsigned NOT NULL DEFAULT '0',
   `location` int(10) unsigned NOT NULL DEFAULT '0',
@@ -2707,6 +2721,7 @@ CREATE TABLE `contrexx_module_news_categories` (
   `right_id` int(11) NOT NULL,
   `sorting` int(11) NOT NULL,
   `level` int(11) NOT NULL,
+  `display` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`catid`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_module_news_categories_catid` (
@@ -3138,7 +3153,7 @@ CREATE TABLE `contrexx_module_repository` (
   `displaystatus` set('on','off') NOT NULL DEFAULT 'on',
   `username` varchar(250) NOT NULL DEFAULT '',
   `displayorder` smallint(6) NOT NULL DEFAULT '100',
-  UNIQUE KEY `contentid` (`id`),
+  PRIMARY KEY  (`id`),
   FULLTEXT KEY `fulltextindex` (`title`,`content`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_module_shop_article_group` (
@@ -3291,6 +3306,7 @@ CREATE TABLE `contrexx_module_shop_payment` (
   `processor_id` int(10) unsigned NOT NULL DEFAULT '0',
   `fee` decimal(9,2) unsigned NOT NULL DEFAULT '0.00',
   `free_from` decimal(9,2) unsigned NOT NULL DEFAULT '0.00',
+  `type` enum('fix','percent') NOT NULL DEFAULT 'fix',
   `ord` int(5) unsigned NOT NULL DEFAULT '0',
   `active` tinyint(1) unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`)
@@ -3835,92 +3851,3 @@ ALTER TABLE contrexx_core_module_sync_change_host ADD CONSTRAINT FK_92C38FE01FB8
 ALTER TABLE contrexx_core_view_frontend ADD CONSTRAINT `contrexx_core_view_frontend_ibfk_locale` FOREIGN KEY (`language`) REFERENCES `contrexx_core_locale_locale` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE contrexx_core_view_frontend ADD CONSTRAINT `contrexx_core_view_frontend_ibfk_theme` FOREIGN KEY (`theme`) REFERENCES `contrexx_skins` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 ALTER TABLE contrexx_core_locale_backend ADD CONSTRAINT FK_B8F1327C4FC20EF FOREIGN KEY (iso_1) REFERENCES contrexx_core_locale_language (iso_1) ON DELETE NO ACTION ON UPDATE NO ACTION;
-CREATE VIEW `contrexx_access_user_title` AS SELECT `order` AS id, name as title, 0 as order_id
-FROM `contrexx_access_user_attribute_name` AS `name`
-WHERE `name`.`order` > 0;
-CREATE VIEW `contrexx_access_user_core_attribute` AS SELECT `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`
-FROM `contrexx_access_user_attribute`
-WHERE `is_default` = '1';
-CREATE VIEW `contrexx_access_user_profile` AS (SELECT
-id as 'user_id',
-(SELECT value.value FROM contrexx_access_users AS user
-JOIN contrexx_access_user_attribute_value as value on value.user_id = user.id
-JOIN contrexx_access_user_attribute_name as name on value.attribute_id = name.attribute_id
-WHERE name.name = 'gender' AND lang_id = 0 AND value.user_id = users.id) AS 'gender',
-(SELECT value.value FROM contrexx_access_users AS user
-JOIN contrexx_access_user_attribute_value as value on value.user_id = user.id
-JOIN contrexx_access_user_attribute_name as name on value.attribute_id = name.attribute_id
-WHERE name.name = 'title' AND lang_id = 0 AND value.user_id = users.id) AS 'title',
-(SELECT value.value FROM contrexx_access_users AS user
-JOIN contrexx_access_user_attribute_value as value on value.user_id = user.id
-JOIN contrexx_access_user_attribute_name as name on value.attribute_id = name.attribute_id
-WHERE name.name = 'designation' AND lang_id = 0 AND value.user_id = users.id) AS 'designation',
-(SELECT value.value FROM contrexx_access_users AS user
-JOIN contrexx_access_user_attribute_value as value on value.user_id = user.id
-JOIN contrexx_access_user_attribute_name as name on value.attribute_id = name.attribute_id
-WHERE name.name = 'firstname' AND lang_id = 0 AND value.user_id = users.id) AS 'firstname',
-(SELECT value.value FROM contrexx_access_users AS user
-JOIN contrexx_access_user_attribute_value as value on value.user_id = user.id
-JOIN contrexx_access_user_attribute_name as name on value.attribute_id = name.attribute_id
-WHERE name.name = 'lastname' AND lang_id = 0 AND value.user_id = users.id) AS 'lastname',
-(SELECT value.value FROM contrexx_access_users AS user
-JOIN contrexx_access_user_attribute_value as value on value.user_id = user.id
-JOIN contrexx_access_user_attribute_name as name on value.attribute_id = name.attribute_id
-WHERE name.name = 'company' AND lang_id = 0 AND value.user_id = users.id) AS 'company',
-(SELECT value.value FROM contrexx_access_users AS user
-JOIN contrexx_access_user_attribute_value as value on value.user_id = user.id
-JOIN contrexx_access_user_attribute_name as name on value.attribute_id = name.attribute_id
-WHERE name.name = 'address' AND lang_id = 0 AND value.user_id = users.id) AS 'address',
-(SELECT value.value FROM contrexx_access_users AS user
-JOIN contrexx_access_user_attribute_value as value on value.user_id = user.id
-JOIN contrexx_access_user_attribute_name as name on value.attribute_id = name.attribute_id
-WHERE name.name = 'city' AND lang_id = 0 AND value.user_id = users.id) AS 'city',
-(SELECT value.value FROM contrexx_access_users AS user
-JOIN contrexx_access_user_attribute_value as value on value.user_id = user.id
-JOIN contrexx_access_user_attribute_name as name on value.attribute_id = name.attribute_id
-WHERE name.name = 'zip' AND lang_id = 0 AND value.user_id = users.id) AS 'zip',
-(SELECT value.value FROM contrexx_access_users AS user
-JOIN contrexx_access_user_attribute_value as value on value.user_id = user.id
-JOIN contrexx_access_user_attribute_name as name on value.attribute_id = name.attribute_id
-WHERE name.name = 'country' AND lang_id = 0 AND value.user_id = users.id) AS 'country',
-(SELECT value.value FROM contrexx_access_users AS user
-JOIN contrexx_access_user_attribute_value as value on value.user_id = user.id
-JOIN contrexx_access_user_attribute_name as name on value.attribute_id = name.attribute_id
-WHERE name.name = 'phone_office' AND lang_id = 0 AND value.user_id = users.id) AS 'phone_office',
-(SELECT value.value FROM contrexx_access_users AS user
-JOIN contrexx_access_user_attribute_value as value on value.user_id = user.id
-JOIN contrexx_access_user_attribute_name as name on value.attribute_id = name.attribute_id
-WHERE name.name = 'phone_private' AND lang_id = 0 AND value.user_id = users.id) AS 'phone_private',
-(SELECT value.value FROM contrexx_access_users AS user
-JOIN contrexx_access_user_attribute_value as value on value.user_id = user.id
-JOIN contrexx_access_user_attribute_name as name on value.attribute_id = name.attribute_id
-WHERE name.name = 'phone_mobile' AND lang_id = 0 AND value.user_id = users.id) AS 'phone_mobile',
-(SELECT value.value FROM contrexx_access_users AS user
-JOIN contrexx_access_user_attribute_value as value on value.user_id = user.id
-JOIN contrexx_access_user_attribute_name as name on value.attribute_id = name.attribute_id
-WHERE name.name = 'phone_fax' AND lang_id = 0 AND value.user_id = users.id) AS 'phone_fax',
-(SELECT value.value FROM contrexx_access_users AS user
-JOIN contrexx_access_user_attribute_value as value on value.user_id = user.id
-JOIN contrexx_access_user_attribute_name as name on value.attribute_id = name.attribute_id
-WHERE name.name = 'birthday' AND lang_id = 0 AND value.user_id = users.id) AS 'birthday',
-(SELECT value.value FROM contrexx_access_users AS user
-JOIN contrexx_access_user_attribute_value as value on value.user_id = user.id
-JOIN contrexx_access_user_attribute_name as name on value.attribute_id = name.attribute_id
-WHERE name.name = 'website' AND lang_id = 0 AND value.user_id = users.id) AS 'website',
-(SELECT value.value FROM contrexx_access_users AS user
-JOIN contrexx_access_user_attribute_value as value on value.user_id = user.id
-JOIN contrexx_access_user_attribute_name as name on value.attribute_id = name.attribute_id
-WHERE name.name = 'profession' AND lang_id = 0 AND value.user_id = users.id) AS 'profession',
-(SELECT value.value FROM contrexx_access_users AS user
-JOIN contrexx_access_user_attribute_value as value on value.user_id = user.id
-JOIN contrexx_access_user_attribute_name as name on value.attribute_id = name.attribute_id
-WHERE name.name = 'interests' AND lang_id = 0 AND value.user_id = users.id) AS 'interests',
-(SELECT value.value FROM contrexx_access_users AS user
-JOIN contrexx_access_user_attribute_value as value on value.user_id = user.id
-JOIN contrexx_access_user_attribute_name as name on value.attribute_id = name.attribute_id
-WHERE name.name = 'signature' AND lang_id = 0 AND value.user_id = users.id) AS 'signature',
-(SELECT value.value FROM contrexx_access_users AS user
-JOIN contrexx_access_user_attribute_value as value on value.user_id = user.id
-JOIN contrexx_access_user_attribute_name as name on value.attribute_id = name.attribute_id
-WHERE name.name = 'picture' AND lang_id = 0 AND value.user_id = users.id) AS 'picture'
-FROM contrexx_access_users AS users);

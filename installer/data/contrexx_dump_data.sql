@@ -437,60 +437,54 @@ INSERT INTO `contrexx_access_user_validity` (`validity`) VALUES (123);
 INSERT INTO `contrexx_access_user_validity` (`validity`) VALUES (184);
 INSERT INTO `contrexx_access_user_validity` (`validity`) VALUES (366);
 INSERT INTO `contrexx_access_user_validity` (`validity`) VALUES (731);
-INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES
-(1, NULL, 'menu', '0', 'asc', 2, '', 0, 0, 1),
-(2, NULL, 'menu', '0', 'asc', 3, '', 0, 0, 1),
-(3, NULL, 'text', '0', 'asc', 4, '', 0, 0, 1),
-(4, NULL, 'text', '0', 'asc', 5, '', 0, 0, 1),
-(5, NULL, 'text', '0', 'asc', 6, '', 0, 0, 1),
-(6, NULL, 'text', '0', 'asc', 7, '', 0, 0, 1),
-(7, NULL, 'uri', '0', 'asc', 8, '', 0, 0, 1),
-(8, NULL, 'text', '0', 'asc', 9, '', 0, 0, 1),
-(9, NULL, 'text', '0', 'asc', 11, '', 0, 0, 1),
-(10, NULL, 'text', '0', 'asc', 10, '', 0, 0, 1),
-(11, NULL, 'text', '0', 'asc', 12, '', 0, 0, 1),
-(12, NULL, 'text', '0', 'asc', 13, '', 0, 0, 1),
-(13, NULL, 'text', '0', 'asc', 14, '', 0, 0, 1),
-(14, NULL, 'text', '0', 'asc', 15, '', 0, 0, 1),
-(15, NULL, 'date', '0', 'asc', 16, '', 0, 0, 1),
-(16, NULL, 'uri', '0', 'asc', 17, '', 0, 0, 1),
-(17, NULL, 'text', '0', 'asc', 18, '', 0, 0, 1),
-(18, NULL, 'textarea', '0', 'asc', 19, '', 0, 0, 1),
-(19, NULL, 'textarea', '0', 'asc', 20, '', 0, 0, 1),
-(20, NULL, 'image', '0', 'asc', 1, '', 0, 0, 1),
-(21, 3, 'menu_option', '0', 'asc', 0, '', 0, 0, 1),
-(22, 3, 'menu_option', '0', 'asc', 0, '', 0, 0, 1),
-(23, 3, 'menu_option', '0', 'asc', 0, '', 0, 0, 1),
-(24, 3, 'menu_option', '0', 'asc', 0, '', 0, 0, 1),
-(25, 3, 'menu_option', '0', 'asc', 0, '', 0, 0, 1),
-(26, 3, 'menu_option', '0', 'asc', 0, '', 0, 0, 1);
-INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES
-(1, 0, 'gender', NULL, 1),
-(2, 0, 'title', NULL, 2),
-(3, 0, 'designation', NULL, 3),
-(4, 0, 'firstname', NULL, 4),
-(5, 0, 'lastname', NULL, 5),
-(6, 0, 'company', NULL, 6),
-(7, 0, 'address', NULL, 7),
-(8, 0, 'city', NULL, 8),
-(9, 0, 'country', NULL, 9),
-(10, 0, 'zip', NULL, 10),
-(11, 0, 'phone_office', NULL, 11),
-(12, 0, 'phone_private', NULL, 12),
-(13, 0, 'phone_mobile', NULL, 13),
-(14, 0, 'phone_fax', NULL, 14),
-(15, 0, 'birthday', NULL, 15),
-(16, 0, 'website', NULL, 16),
-(17, 0, 'profession', NULL, 17),
-(18, 0, 'interests', NULL, 18),
-(19, 0, 'signature', NULL, 19),
-(20, 0, 'picture', NULL, 20),
-(21, 0, 'Sehr geehrte Frau', 1, 21),
-(22, 0, 'Sehr geehrter Herr', 2, 22),
-(23, 0, 'Dear Ms', 3, 23),
-(24, 0, 'Dear Mr', 4, 24),
-(25, 0, 'Madame', 5, 25),
-(26, 0, 'Monsieur', 6, 26);
+INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES (1, NULL, 'image', '0', 'asc', 0, '', 0, 0, 1);
+INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES (2, NULL, 'menu', '0', 'asc', 0, '', 0, 0, 1);
+INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES (3, NULL, 'menu', '0', 'asc', 0, '', 0, 0, 1);
+INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES (4, NULL, 'text', '0', 'asc', 0, '', 0, 0, 1);
+INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES (5, NULL, 'text', '0', 'asc', 0, '', 0, 0, 1);
+INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES (6, NULL, 'text', '0', 'asc', 0, '', 0, 0, 1);
+INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES (7, NULL, 'text', '0', 'asc', 0, '', 0, 0, 1);
+INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES (8, NULL, 'uri', '0', 'asc', 0, '', 0, 0, 1);
+INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES (9, NULL, 'text', '0', 'asc', 0, '', 0, 0, 1);
+INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES (10, NULL, 'text', '0', 'asc', 0, '', 0, 0, 1);
+INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES (11, NULL, 'text', '0', 'asc', 0, '', 0, 0, 1);
+INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES (12, NULL, 'text', '0', 'asc', 0, '', 0, 0, 1);
+INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES (13, NULL, 'text', '0', 'asc', 0, '', 0, 0, 1);
+INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES (14, NULL, 'text', '0', 'asc', 0, '', 0, 0, 1);
+INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES (15, NULL, 'text', '0', 'asc', 0, '', 0, 0, 1);
+INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES (16, NULL, 'date', '0', 'asc', 0, '', 0, 0, 1);
+INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES (17, NULL, 'uri', '0', 'asc', 0, '', 0, 0, 1);
+INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES (18, NULL, 'text', '0', 'asc', 0, '', 0, 0, 1);
+INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES (19, NULL, 'textarea', '0', 'asc', 0, '', 0, 0, 1);
+INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES (20, NULL, 'textarea', '0', 'asc', 0, '', 0, 0, 1);
+INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES (32, 3, 'menu_option', '0', 'asc', 0, '', 0, 0, 1);
+INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES (33, 3, 'menu_option', '0', 'asc', 0, '', 0, 0, 1);
+INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (2, 0, 'gender', NULL, 2);
+INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (3, 0, 'title', NULL, 3);
+INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (4, 0, 'designation', NULL, 4);
+INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (5, 0, 'firstname', NULL, 5);
+INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (6, 0, 'lastname', NULL, 6);
+INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (7, 0, 'company', NULL, 7);
+INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (8, 0, 'address', NULL, 8);
+INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (9, 0, 'city', NULL, 9);
+INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (10, 0, 'country', NULL, 10);
+INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (11, 0, 'zip', NULL, 11);
+INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (12, 0, 'phone_office', NULL, 12);
+INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (13, 0, 'phone_private', NULL, 13);
+INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (14, 0, 'phone_mobile', NULL, 14);
+INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (15, 0, 'phone_fax', NULL, 15);
+INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (16, 0, 'birthday', NULL, 16);
+INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (17, 0, 'website', NULL, 17);
+INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (18, 0, 'profession', NULL, 18);
+INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (19, 0, 'interests', NULL, 19);
+INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (20, 0, 'signature', NULL, 20);
+INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (1, 0, 'picture', NULL, 1);
+INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (32, 1, 'Sehr geehrte Frau', 1, 32);
+INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (33, 1, 'Sehr geehrter Herr', 2, 33);
+INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (32, 2, 'Dear Ms', 3, 34);
+INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (33, 2, 'Dear Mr', 4, 35);
+INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (32, 3, 'Madame', 5, 36);
+INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (33, 3, 'Monsieur', 6, 37);
 INSERT INTO `contrexx_backend_areas` (`area_id`, `parent_area_id`, `type`, `scope`, `area_name`, `is_active`, `uri`, `target`, `module_id`, `order_id`, `access_id`) VALUES (1,0,'group','backend','TXT_CONTENT_MANAGEMENT',1,'','_self',0,2,1);
 INSERT INTO `contrexx_backend_areas` (`area_id`, `parent_area_id`, `type`, `scope`, `area_name`, `is_active`, `uri`, `target`, `module_id`, `order_id`, `access_id`) VALUES (2,0,'group','backend','TXT_MODULE',1,'','_self',0,10,2);
 INSERT INTO `contrexx_backend_areas` (`area_id`, `parent_area_id`, `type`, `scope`, `area_name`, `is_active`, `uri`, `target`, `module_id`, `order_id`, `access_id`) VALUES (3,0,'group','backend','TXT_ADMINISTRATION',1,'','_self',0,13,3);
@@ -1603,6 +1597,12 @@ INSERT INTO `contrexx_core_setting` (`section`, `name`, `group`, `type`, `value`
 INSERT INTO `contrexx_core_setting` (`section`, `name`, `group`, `type`, `value`, `values`, `ord`) VALUES ('Shop','saferpay_id','config','text','12345-12345678','',2);
 INSERT INTO `contrexx_core_setting` (`section`, `name`, `group`, `type`, `value`, `values`, `ord`) VALUES ('Shop','saferpay_use_test_account','config','text','1','',14);
 INSERT INTO `contrexx_core_setting` (`section`, `name`, `group`, `type`, `value`, `values`, `ord`) VALUES ('Shop','saferpay_window_option','config','text','2','',16);
+INSERT INTO `contrexx_core_setting` (`section`, `name`, `group`, `type`, `value`, `values`, `ord`) VALUES ('Shop','saferpay_json_active','config','text','0','',1);
+INSERT INTO `contrexx_core_setting` (`section`, `name`, `group`, `type`, `value`, `values`, `ord`) VALUES ('Shop','saferpay_json_id','config','text','','',2);
+INSERT INTO `contrexx_core_setting` (`section`, `name`, `group`, `type`, `value`, `values`, `ord`) VALUES ('Shop','saferpay_json_terminal_id','config','text','','',3);
+INSERT INTO `contrexx_core_setting` (`section`, `name`, `group`, `type`, `value`, `values`, `ord`) VALUES ('Shop','saferpay_json_user','config','text','','',4);
+INSERT INTO `contrexx_core_setting` (`section`, `name`, `group`, `type`, `value`, `values`, `ord`) VALUES ('Shop','saferpay_json_pass','config','text','','',5);
+INSERT INTO `contrexx_core_setting` (`section`, `name`, `group`, `type`, `value`, `values`, `ord`) VALUES ('Shop','saferpay_json_use_test_account','config','text','1','',6);
 INSERT INTO `contrexx_core_setting` (`section`, `name`, `group`, `type`, `value`, `values`, `ord`) VALUES ('Shop','show_products_default','config','text','1','',32);
 INSERT INTO `contrexx_core_setting` (`section`, `name`, `group`, `type`, `value`, `values`, `ord`) VALUES ('Shop','telephone','config','text','012 3456789','',6);
 INSERT INTO `contrexx_core_setting` (`section`, `name`, `group`, `type`, `value`, `values`, `ord`) VALUES ('Shop','thumbnail_max_height','config','text','999','',22);
@@ -2692,7 +2692,7 @@ INSERT INTO `contrexx_module_calendar_registration_form_field_name` (`field_id`,
 INSERT INTO `contrexx_module_calendar_registration_form_field_name` (`field_id`, `form_id`, `lang_id`, `name`, `default`) VALUES (1,1,2,'Salutation','Dear Ms.,Dear Mr.');
 INSERT INTO `contrexx_module_calendar_registration_form_field_name` (`field_id`, `form_id`, `lang_id`, `name`, `default`) VALUES (1,1,1,'Anrede','Sehr geehrte Frau,Sehr geehrter Herr');
 INSERT INTO `contrexx_module_calendar_settings` (`id`, `section_id`, `name`, `title`, `value`, `info`, `type`, `options`, `special`, `order`) VALUES (8,5,'numPaging','TXT_CALENDAR_NUM_PAGING','15','',1,'','',1);
-INSERT INTO `contrexx_module_calendar_settings` (`id`, `section_id`, `name`, `title`, `value`, `info`, `type`, `options`, `special`, `order`) VALUES (9,5,'numEntrance','TXT_CALENDAR_NUM_EVENTS_ENTRANCE','5','',1,'','',2);
+INSERT INTO `contrexx_module_calendar_settings` (`id`, `section_id`, `name`, `title`, `value`, `info`, `type`, `options`, `special`, `order`) VALUES (9,5,'numEntrance','TXT_CALENDAR_NUM_EVENTS_ENTRANCE','5','TXT_CALENDAR_NUM_EVENTS_ENTRANCE_INFO',1,'','',2);
 INSERT INTO `contrexx_module_calendar_settings` (`id`, `section_id`, `name`, `title`, `value`, `info`, `type`, `options`, `special`, `order`) VALUES (10,6,'headlinesStatus','TXT_CALENDAR_HEADLINES_STATUS','2','',3,'TXT_CALENDAR_ACTIVATE,TXT_CALENDAR_DEACTIVATE','',1);
 INSERT INTO `contrexx_module_calendar_settings` (`id`, `section_id`, `name`, `title`, `value`, `info`, `type`, `options`, `special`, `order`) VALUES (11,6,'headlinesCategory','TXT_CALENDAR_HEADLINES_CATEGORY','','',5,'','getCategoryDorpdown',3);
 INSERT INTO `contrexx_module_calendar_settings` (`id`, `section_id`, `name`, `title`, `value`, `info`, `type`, `options`, `special`, `order`) VALUES (12,6,'headlinesNum','TXT_CALENDAR_HEADLINES_NUM','3','',1,'','',2);
@@ -2746,6 +2746,7 @@ INSERT INTO `contrexx_module_calendar_settings` (`id`, `section_id`, `name`, `ti
 INSERT INTO `contrexx_module_calendar_settings` (`id`, `section_id`, `name`, `title`, `value`, `info`, `type`, `options`, `special`, `order`) VALUES (63,19,'placeDataHost','TXT_CALENDAR_PLACE_DATA_HOST','1','TXT_CALENDAR_PLACE_DATA_STATUS_INFO',3,'TXT_CALENDAR_PLACE_DATA_DEFAULT,TXT_CALENDAR_PLACE_DATA_FROM_MEDIADIR,TXT_CALENDAR_PLACE_DATA_FROM_BOTH','',9);
 INSERT INTO `contrexx_module_calendar_settings` (`id`, `section_id`, `name`, `title`, `value`, `info`, `type`, `options`, `special`, `order`) VALUES (64,19,'placeDataHostForm','','0','',5,'','getPlaceDataDorpdown',10);
 INSERT INTO `contrexx_module_calendar_settings` (`id`, `section_id`, `name`, `title`, `value`, `info`, `type`, `options`, `special`, `order`) VALUES (65,5,'frontendPastEvents','TXT_CALENDAR_FRONTEND_PAST_EVENTS','0','',5,'TXT_CALENDAR_FRONTEND_PAST_EVENTS_DAY,TXT_CALENDAR_FRONTEND_PAST_EVENTS_END','',15);
+INSERT INTO `contrexx_module_calendar_settings` (`id`, `section_id`, `name`, `title`, `value`, `info`, `type`, `options`, `special`, `order`) VALUES (66,5,'constrainAdditionalRecurrences','TXT_CALENDAR_CONSTRAIN_ADDITIONAL_RECURRENCES','1','TXT_CALENDAR_CONSTRAIN_ADDITIONAL_RECURRENCES_INFO','3','TXT_CALENDAR_ACTIVATE,TXT_CALENDAR_DEACTIVATE','','8');
 INSERT INTO `contrexx_module_calendar_settings_section` (`id`, `parent`, `order`, `name`, `title`) VALUES (5,1,0,'global','TXT_CALENDAR_GLOBAL');
 INSERT INTO `contrexx_module_calendar_settings_section` (`id`, `parent`, `order`, `name`, `title`) VALUES (6,1,1,'headlines','TXT_CALENDAR_HEADLINES');
 INSERT INTO `contrexx_module_calendar_settings_section` (`id`, `parent`, `order`, `name`, `title`) VALUES (1,0,0,'global','');
@@ -3431,6 +3432,7 @@ INSERT INTO `contrexx_module_jobs_settings` (`id`, `name`, `value`) VALUES (4,'s
 INSERT INTO `contrexx_module_jobs_settings` (`id`, `name`, `value`) VALUES (5,'templateIntegration','0');
 INSERT INTO `contrexx_module_jobs_settings` (`id`, `name`, `value`) VALUES (6,'sourceOfJobs','latest');
 INSERT INTO `contrexx_module_jobs_settings` (`id`, `name`, `value`) VALUES (7,'listingLimit','0');
+INSERT INTO `contrexx_module_jobs_settings` (`id`, `name`, `value`) VALUES (8,'use_flags','0');
 INSERT INTO `contrexx_module_knowledge_article_content` (`id`, `article`, `lang`, `question`, `answer`) VALUES (184,1,1,'Was ist Cloudrexx?','Cloudrexx ist ein modernes, einzigartiges und modulares Web Content Management System (WCMS) f&uuml;r die komplette Verwaltung einer Webseite. Zudem kann Cloudrexx auch f&uuml;r andere&nbsp;Informationsangebote wie Intranet, Extranet, eShop, Portal und weiteres eingesetzt werden. Das Cloudrexx basiert auf neuster PHP und MySQL Technologie und besticht in der einfachen Bedienung.');
 INSERT INTO `contrexx_module_knowledge_article_content` (`id`, `article`, `lang`, `question`, `answer`) VALUES (185,1,2,'What is Cloudrexx?','Cloudrexx is a powerful Open Source Web Content Management System (WCMS) which will assist you in the creation, administration and maintenance of contents for the internet or intranet. It\'s a completely web-based system with an easy-to-use WYSIWYG editor and intuitive user interface. Cloudrexx is very flexible, by adding modules you can customize the CMS according to your individual demands and it requires no technical knowledge or previous training. Visit us online at <a rel=\"nofollow\" title=\"https://www.cloudrexx.com/\" class=\"external\" href=\"https://www.cloudrexx.com/\">https://www.cloudrexx.com/</a> to learn more.');
 INSERT INTO `contrexx_module_knowledge_article_content` (`id`, `article`, `lang`, `question`, `answer`) VALUES (187,7,1,'Wie erstelle ich einen neuen Eintrag?','<h3>1. Im Backend einloggen</h3> <p>Melden Sie sich zuerst im Backend Ihrer Website an. Die URL&nbsp;zum Backend lautet jeweils <a href=\"http://www.DOMAINNAME.TLD/cadmin\">http://www.DOMAINNAME.TLD/cadmin</a></p> <h3>2. Neuen Artikel erstellen</h3> <p>Navigieren Sie nach &quot;Module/Wissensdatenbank/Artikel&quot; und klicken Sie dort auf die Schaltfl&auml;che &quot;Hinzuf&uuml;gen&quot;.</p> <h3>3. Kategorie festlegen</h3> <p>W&auml;hlen Sie die Kategorie, unter welcher der Artikel erscheinen soll.</p> <img height=\"23\" width=\"412\" src=\"images/content/knowledgebase/wie_erstelle_ich_einen_neuen_eintrag_schritt_3_de.jpg\" alt=\"\" /><br /> <br /> <h3>4. Frage festlegen</h3> <p>Definieren Sie die Frage, welche beantwortet werden soll.</p> <img height=\"47\" border=\"0\" width=\"475\" alt=\"\" src=\"images/content/knowledgebase/wie_erstelle_ich_einen_neuen_eintrag_schritt_4_de.jpg\" /><br /> <br /> <h3>5. Stichworte festlegen</h3> <p>W&auml;hlen Sie vorhandene Stichworte aus oder f&uuml;gen Sie neue hinzu.</p> <img height=\"21\" width=\"378\" alt=\"\" src=\"images/content/knowledgebase/wie_erstelle_ich_einen_neuen_eintrag_schritt_5_de.jpg\" /><br /> <br /> <h3>6. Antwort schreiben</h3> <p>Schreiben Sie die Antwort im Editor.</p> <img height=\"102\" width=\"425\" alt=\"\" src=\"images/content/knowledgebase/wie_erstelle_ich_einen_neuen_eintrag_schritt_6_de.jpg\" /><br /> <br /> <h3>7. Eintrag speichern</h3> <p>Klicken Sie nun auf die Schaltfl&auml;che &quot;Speichern&quot;.</p>');
@@ -3987,7 +3989,6 @@ INSERT INTO `contrexx_module_newsletter_settings` (`setid`, `setname`, `setvalue
 INSERT INTO `contrexx_module_newsletter_settings` (`setid`, `setname`, `setvalue`, `status`) VALUES (2,'sender_name','admin',1);
 INSERT INTO `contrexx_module_newsletter_settings` (`setid`, `setname`, `setvalue`, `status`) VALUES (3,'reply_mail','info@example.com',1);
 INSERT INTO `contrexx_module_newsletter_settings` (`setid`, `setname`, `setvalue`, `status`) VALUES (4,'mails_per_run','30',1);
-INSERT INTO `contrexx_module_newsletter_settings` (`setid`, `setname`, `setvalue`, `status`) VALUES (5,'text_break_after','100',1);
 INSERT INTO `contrexx_module_newsletter_settings` (`setid`, `setname`, `setvalue`, `status`) VALUES (6,'test_mail','info@example.com',1);
 INSERT INTO `contrexx_module_newsletter_settings` (`setid`, `setname`, `setvalue`, `status`) VALUES (7,'overview_entries_limit','10',1);
 INSERT INTO `contrexx_module_newsletter_settings` (`setid`, `setname`, `setvalue`, `status`) VALUES (8,'rejected_mail_operation','delete',1);
@@ -3998,6 +3999,9 @@ INSERT INTO `contrexx_module_newsletter_settings` (`setid`, `setname`, `setvalue
 INSERT INTO `contrexx_module_newsletter_settings` (`setid`, `setname`, `setvalue`, `status`) VALUES (13,'statistics','0',1);
 INSERT INTO `contrexx_module_newsletter_settings` (`setid`, `setname`, `setvalue`, `status`) VALUES (14,'agbTermsConditions','1',1);
 INSERT INTO `contrexx_module_newsletter_settings` (`setid`, `setname`, `setvalue`, `status`) VALUES (15,'confirmLinkHour','24',1);
+INSERT INTO `contrexx_module_newsletter_settings` (`setid`, `setname`, `setvalue`, `status`) VALUES (16,'deliver_user_recipients','1',1);
+INSERT INTO `contrexx_module_newsletter_settings` (`setid`, `setname`, `setvalue`, `status`) VALUES (17,'deliver_crm_recipients','1',1);
+INSERT INTO `contrexx_module_newsletter_settings` (`setid`, `setname`, `setvalue`, `status`) VALUES (18,'use_crm_filter','1',1);
 INSERT INTO `contrexx_module_newsletter_template` (`id`, `name`, `description`, `html`, `required`, `type`) VALUES (1,'Standard','Standard Template','<html>\r\n    <head>\r\n        <style type=\"text/css\">\r\n        *, html, body, table {\r\n			padding: 0;\r\n			margin: 0;\r\n			font-size: 12px;\r\n			font-family: arial;\r\n			line-height: 1.5;\r\n			color: #000000;\r\n        }\r\n\r\n        h1 {\r\n			padding: 20px 0 5px 0;\r\n            font-size: 20px;\r\n			color: #487EAD;\r\n        }\r\n\r\n        h2 {\r\n			padding: 18px 0 4px 0;\r\n            font-size: 16px;\r\n			color: #487EAD;\r\n        }\r\n\r\n        h3, h4, h5, h6 {\r\n			padding: 16px 0 3px 0;\r\n            font-size: 13px;\r\n			font-weight: bold;\r\n			color: #487EAD;\r\n        }\r\n\r\n		a,\r\n        a:link,\r\n		a:hover,\r\n		a:focus,\r\n		a:active,\r\n		a:visited {\r\n            color: #487EAD !imprtant;\r\n        }\r\n        </style>\r\n    </head>\r\n    <body>\r\n        <table height=\"100%\" width=\"100%\" cellspacing=\"60\" style=\"background-color: rgb(204, 204, 204);\">\r\n            <tbody>\r\n                <tr>\r\n                    <td align=\"center\">\r\n                    <table width=\"660\" cellspacing=\"30\" bgcolor=\"#ffffff\" style=\"border: 7px solid rgb(72, 126, 173);\">\r\n                        <tbody>\r\n                            <tr>\r\n                                <td style=\"font-family: arial; font-size: 12px;\"><a target=\"_blank\" style=\"font-family: arial; font-size: 20px; text-decoration: none; color: rgb(72, 126, 173);\" href=\"http://www.example.com\">example.com</a><br />\r\n                                <span style=\"font-size: 20px; font-family: arial; text-decoration: none; color: rgb(72, 126, 173);\">Newsletter</span></td>\r\n                            </tr>\r\n                            <tr>\r\n                                <td style=\"font-family: arial; font-size: 12px; color: rgb(0, 0, 0);\">[[content]]</td>\r\n                            </tr>\r\n                            <tr>\r\n                                <td>\r\n                                <table width=\"600\" cellspacing=\"0\">\r\n                                    <tbody>\r\n                                        <tr>\r\n                                            <td height=\"30\" colspan=\"3\" style=\"border-top: 3px solid rgb(72, 126, 173);\">&nbsp;</td>\r\n                                        </tr>\r\n                                        <tr>\r\n                                            <td width=\"235\" valign=\"top\" style=\"font-family: arial; font-size: 11px; color: rgb(0, 0, 0);\">\r\n                                            <h3 style=\"padding: 0pt; margin: 0pt 0pt 5px;\">Impressum</h3>\r\n                                            Beispiel AG<br />\r\n                                            Firmenstrasse 1<br />\r\n                                            CH-1234 Irgendwo<br />\r\n                                            <br />\r\n                                            Telefon: + 41 (0)12 345 67 89<br />\r\n                                            Fax: + 41 (0)12 345 67 90<br />\r\n                                            <br />\r\n                                            E-Mail: <a href=\"mailto:info@example.com\">info@example.com</a><br />\r\n                                            Web: <a href=\"http://www.example.com\">www.example.com</a></td>\r\n                                            <td width=\"30\" valign=\"top\">&nbsp;</td>\r\n                                            <td width=\"335\" valign=\"top\" style=\"font-family: arial; font-size: 11px; color: rgb(135, 135, 135);\">Diese Art der Korrespondenz ist absichtlich von uns gew&auml;hlt worden, um wertvolle Naturressourcen zu schonen. Dieses E-Mail ist ausdr&uuml;cklich nicht verschickt worden, um Ihre betrieblichen Vorg&auml;nge zu st&ouml;ren und dient ausschliesslich dazu, Sie auf einfachste Weise unverbindlich zu informieren. Falls Sie sich dadurch trotzdem bel&auml;stigt f&uuml;hlen, bitten wir Sie, umgehend mit einem Klick auf &quot;Newsletter abmelden&quot; sich abzumelden, so dass wir Sie aus unserem Verteiler l&ouml;schen k&ouml;nnen.<br />\r\n                                            <br />\r\n                                            <span>[[unsubscribe]]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[[profile_setup]]</span></td>\r\n                                        </tr>\r\n                                    </tbody>\r\n                                </table>\r\n                                </td>\r\n                            </tr>\r\n                        </tbody>\r\n                    </table>\r\n                    </td>\r\n                </tr>\r\n            </tbody>\r\n        </table>\r\n    </body>\r\n</html>',1,'e-mail');
 INSERT INTO `contrexx_module_newsletter_template` (`id`, `name`, `description`, `html`, `required`, `type`) VALUES (2,'Standard','Standard News-Import Template','<table border=\"0\" cellpadding=\"3\" cellspacing=\"0\" width=\"100%\">\r\n    <!-- BEGIN news_list --><!-- BEGIN news_category -->\r\n    <tbody>\r\n        <tr>\r\n            <td colspan=\"2\" style=\"text-align:left;\">\r\n                <h2>\r\n                    [[NEWS_CATEGORY_NAME]]</h2>\r\n            </td>\r\n        </tr>\r\n        <!-- END news_category --><!-- BEGIN news_message -->\r\n        <tr>\r\n            <td style=\"text-align:left;\" width=\"25%\">\r\n                <!-- BEGIN news_image --><img alt=\"\" height=\"100\" src=\"[[NEWS_IMAGE_SRC]]\" width=\"150\" /><!-- END news_image --></td>\r\n            <td style=\"text-align:left;\" width=\"75%\">\r\n                <h3>\r\n                    [[NEWS_TITLE]]</h3>\r\n                <p>\r\n                    [[NEWS_TEASER_TEXT]]</p>\r\n                <p>\r\n                    <a href=\"[[NEWS_URL]]\">Meldung lesen...</a></p>\r\n            </td>\r\n        </tr>\r\n        <!-- END news_message --><!-- END news_list -->\r\n    </tbody>\r\n</table>\r\n',1,'news');
 INSERT INTO `contrexx_module_newsletter_user` (`id`, `code`, `email`, `uri`, `sex`, `salutation`, `title`, `lastname`, `firstname`, `position`, `company`, `industry_sector`, `address`, `zip`, `city`, `country_id`, `phone_office`, `phone_private`, `phone_mobile`, `fax`, `notes`, `birthday`, `status`, `emaildate`, `language`, `source`, `consent`) VALUES (1,'btKCKTku5u','noreply@example.com','','m',2,'','Mustermann','Hans','','','','','','',204,'','','','','','01-01-2011',1,1153137001,1,'backend',NULL);
@@ -4267,6 +4271,7 @@ INSERT INTO `contrexx_module_shop_payment_processors` (`id`, `type`, `name`, `de
 INSERT INTO `contrexx_module_shop_payment_processors` (`id`, `type`, `name`, `description`, `company_url`, `status`, `picture`) VALUES (13,'external','paymill_elv','','https://www.paymill.com',1,'');
 INSERT INTO `contrexx_module_shop_payment_processors` (`id`, `type`, `name`, `description`, `company_url`, `status`, `picture`) VALUES (14,'external','paymill_iban','','https://www.paymill.com',1,'');
 INSERT INTO `contrexx_module_shop_payment_processors` (`id`, `type`, `name`, `description`, `company_url`, `status`, `picture`) VALUES (15,'external','payrexx','Payrexx is a payment gateway solution developed in Switzerland.','https://www.payrexx.com',1,'');
+INSERT INTO `contrexx_module_shop_payment_processors` (`id`, `type`, `name`, `description`, `company_url`, `status`, `picture`) VALUES (16,'external','saferpay_json','Saferpay is a comprehensive Internet payment platform, specially developed for commercial applications. It provides a guarantee of secure payment processes over the Internet for merchants as well as for cardholders. Merchants benefit from the easy integration of the payment method into their e-commerce platform, and from the modularity with which they can take account of current and future requirements. Cardholders benefit from the security of buying from any shop that uses Saferpay.','http://www.saferpay.com/',1,'logo_saferpay.gif');
 INSERT INTO `contrexx_module_shop_pricelists` (`id`, `name`, `lang_id`, `border_on`, `header_on`, `header_left`, `header_right`, `footer_on`, `footer_left`, `footer_right`, `categories`) VALUES (1,'Beispiel Preisliste',1,1,1,'Beispiel Preisliste',NULL,1,'<--DATE-->','<--PAGENUMBER-->','*');
 INSERT INTO `contrexx_module_shop_products` (`id`, `picture`, `category_id`, `distribution`, `normalprice`, `resellerprice`, `stock`, `stock_visible`, `discountprice`, `discount_active`, `active`, `b2b`, `b2c`, `date_start`, `date_end`, `manufacturer_id`, `ord`, `vat_id`, `weight`, `flags`, `group_id`, `article_id`, `usergroup_ids`, `minimum_order_quantity`) VALUES (12,'aHRjX29uZV94LmpwZw==?NTIw?Mjkx:?MA==?MA==:?MA==?MA==','9','delivery',549.90,0.00,50,0,500.00,1,1,1,1,'0000-00-00 00:00:00','0000-00-00 00:00:00',3,0,10,0,'',0,0,'',0);
 INSERT INTO `contrexx_module_shop_products` (`id`, `picture`, `category_id`, `distribution`, `normalprice`, `resellerprice`, `stock`, `stock_visible`, `discountprice`, `discount_active`, `active`, `b2b`, `b2c`, `date_start`, `date_end`, `manufacturer_id`, `ord`, `vat_id`, `weight`, `flags`, `group_id`, `article_id`, `usergroup_ids`, `minimum_order_quantity`) VALUES (13,'Y2xvdWRyZXh4LnBuZw==?NDA5?NDgw:??:??','10','delivery',588.00,0.00,10000,0,0.00,0,1,1,1,'0000-00-00 00:00:00','0000-00-00 00:00:00',1,0,10,0,'',0,0,'',0);

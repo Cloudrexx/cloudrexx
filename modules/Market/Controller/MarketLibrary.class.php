@@ -249,6 +249,8 @@ class MarketLibrary
 
         global $objDatabase, $_ARRAYLANG, $_CONFIG;
 
+        $objFWUser = \FWUser::getFWUserObject();
+
         //entrydata
         $objResult = $objDatabase->Execute("SELECT id, title, name, userid, email, regkey FROM ".DBPREFIX."module_market WHERE id='".contrexx_addslashes($entryId)."' LIMIT 1");
         if ($objResult !== false) {
@@ -262,13 +264,10 @@ class MarketLibrary
             };
         }
 
-        //assesuserdata
-        $objResult = $objDatabase->Execute("SELECT email, username FROM ".DBPREFIX."access_users WHERE id='".$entryUserid."' LIMIT 1");
-        if ($objResult !== false) {
-            while (!$objResult->EOF) {
-                $userUsername        = $objResult->fields['username'];
-                $objResult->MoveNext();
-            };
+        //accessuserdata
+        $objUser = $objFWUser->objUser->getUser(intval($entryUserid));
+        if ($objUser !== false) {
+            $userUsername = $objUser->getRealUsername();
         }
 
         //get mail content n title
@@ -340,6 +339,8 @@ class MarketLibrary
 
         global $objDatabase, $_ARRAYLANG, $_CORELANG, $_CONFIG;
 
+        $objFWUser = \FWUser::getFWUserObject();
+
         //entrydata
         $objResult = $objDatabase->Execute("SELECT id, title, name, userid, email FROM ".DBPREFIX."module_market WHERE id='".contrexx_addslashes($entryId)."' LIMIT 1");
         if ($objResult !== false) {
@@ -352,15 +353,12 @@ class MarketLibrary
             };
         }
 
-        //assesuserdata
-        $objResult = $objDatabase->Execute("SELECT email, username FROM ".DBPREFIX."access_users WHERE id='".$entryUserid."' LIMIT 1");
-        if ($objResult !== false) {
-            while (!$objResult->EOF) {
+        //accessuserdata
+        $objUser = $objFWUser->objUser->getUser(intval($entryUserid));
+        if ($objUser !== false) {
 // TODO: Never used
-//                $userMail            = $objResult->fields['email'];
-                $userUsername        = $objResult->fields['username'];
-                $objResult->MoveNext();
-            };
+//          $userMail = $objUser->getEmail();
+            $userUsername = $objUser->getRealUsername();
         }
 
         //get mail content n title

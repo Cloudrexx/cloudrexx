@@ -554,8 +554,7 @@ class MediaDirectoryManager extends MediaDirectoryLibrary
                         $strCountry = $arrCountry['name'];
 
                         //get title
-                        $objTitle = $objDatabase->Execute("SELECT `title` FROM ".DBPREFIX."access_user_title WHERE id = '".intval($objUser->getProfileAttribute('title'))."' LIMIT 1");
-                        $strTitle = $objTitle->fields['title'];
+                        $strTitle = $objUser->getProfileAttribute('title');
 
                         $this->_objTpl->setVariable(array(
                             'TXT_'.$this->moduleLangVar.'_CONTACT_DATA' => "Kontaktangaben",

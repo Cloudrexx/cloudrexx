@@ -220,7 +220,7 @@ class NewsletterLib
             ),
             array(
                 'code' => $code,
-                'mail' => urlencode($email),
+                'mail' => $email,
             )
         );
 
@@ -256,7 +256,7 @@ class NewsletterLib
             ),
             array(
                 'code' => $code,
-                'mail' => urlencode($email),
+                'mail' => $email,
             )
         );
         if ($htmlTag) {
@@ -380,52 +380,66 @@ class NewsletterLib
 
         // Ignore the code analyzer warning.  There's plenty of arguments
         $query = sprintf('
-            SELECT COUNT(*) AS `recipientCount`
-              FROM (
-                SELECT `email`
-                  FROM `%1$smodule_newsletter_user` AS `nu`
-                  LEFT JOIN `%1$smodule_newsletter_rel_user_cat` AS `rc`
-                    ON `rc`.`user` = `nu`.`id`
-                 WHERE `rc`.`category`=%2$s
-                 UNION DISTINCT
-                SELECT `email`
-                  FROM `%1$saccess_users` AS `cu`
-                  LEFT JOIN `%1$smodule_newsletter_access_user` AS `cnu`
-                    ON `cnu`.`accessUserID`=`cu`.`id`
-                  LEFT JOIN `%1$smodule_newsletter_rel_cat_news` AS `crn`
-                    ON `cnu`.`newsletterCategoryID`=`crn`.`category`
-                 WHERE `cnu`.`newsletterCategoryID`=%2$s
-              ) AS `subquery`',
+            SELECT COUNT(`email`) AS `recipientCount`
+              FROM `%1$smodule_newsletter_user` AS `nu`
+              LEFT JOIN `%1$smodule_newsletter_rel_user_cat` AS `rc`
+                ON `rc`.`user` = `nu`.`id`
+             WHERE `rc`.`category`=%2$s
+                AND (
+                    nu.source != "opt-in"
+                    OR (
+                        nu.source = "opt-in"
+                        AND nu.consent IS NOT NULL
+                    )
+                )',
             DBPREFIX, $id
         );
+
         $data = $objDatabase->Execute($query);
-        return $data->fields['recipientCount'];
+        $counter = $data->fields['recipientCount'];
+
+        // Get all newsletter access user
+        $query = sprintf('
+            SELECT `accessUserID`
+              FROM `%1$smodule_newsletter_access_user` AS `cnu`
+              LEFT JOIN `%1$smodule_newsletter_rel_cat_news` AS `crn`
+                ON `cnu`.`newsletterCategoryID`=`crn`.`category`
+             WHERE `cnu`.`newsletterCategoryID`=%2$s',
+            DBPREFIX, $id
+        );
+
+        $data = $objDatabase->Execute($query);
+        $objUser = \FWUser::getFWUserObject()->objUser;
+        while (!$data || !$data->EOF) {
+            // Check if the access user exists
+            if ($objUser->getUser($data->fields['accessUserID'])) {
+                $counter++;
+            }
+            $data->MoveNext();
+        }
+
+        return $counter;
     }
 
 
     /**
      * Return the access user groups
      * @author      Stefan Heinemann <sh@adfinis.com>
-     * @param       string $orderBy
      * @return      array
      */
-    protected function _getGroups($orderBy="`group_name`")
+    protected function _getGroups()
     {
-        global $objDatabase;
+        $fwUser = \FWUser::getFWUserObject();
+        $objGroup = $fwUser->objGroup;
 
-        $query = sprintf('
-            SELECT `group_id`   AS `id`,
-                   `group_name` AS `name`
-              FROM `%1$saccess_user_groups`
-             WHERE `is_active`=1
-             ORDER BY %2$s',
-            DBPREFIX, $orderBy
+        $list = $objGroup->getGroups(
+            array('is_active' => 1), array('group_name' => 'ASC')
         );
-        $list = $objDatabase->Execute($query);
+
         $groups = array();
         while ($list !== false && !$list->EOF) {
-            $groups[$list->fields['id']] = $list->fields['name'];
-            $list->moveNext();
+            $groups[$list->getId()] = $list->getName();
+            $list->next();
         }
         return $groups;
     }
@@ -700,8 +714,14 @@ class NewsletterLib
         return false;
     }
 
-
-    function _getSettings()
+    /**
+     * This is a workaround for PHP 7 compatability.
+     * As the method _getSettings was used in mixed scope.
+     *
+     * @todo Refactor settings handling of component by migrating
+     *       to \Cx\Setting
+     */
+    public static function getSettings()
     {
         global $objDatabase;
 
@@ -721,6 +741,19 @@ class NewsletterLib
             }
         }
         return $arrSettings;
+    }
+
+
+    /**
+     * This is a workaround for PHP 7 compatability.
+     * As the method _getSettings was used in mixed scope.
+     *
+     * @todo Refactor settings handling of component by migrating
+     *       to \Cx\Setting
+     */
+    function _getSettings()
+    {
+        return static::getSettings();
     }
 
 
@@ -1052,7 +1085,7 @@ class NewsletterLib
     {
         global $objDatabase;
 
-        $arrSettings = static::_getSettings();
+        $arrSettings = static::getSettings();
         if (!$arrSettings['statistics']['setvalue']) {
             return $MailHtmlContent;
         }

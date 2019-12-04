@@ -50,6 +50,7 @@ class UserGroup
     private $is_active;
     private $type;
     private $homepage;
+    protected $toolbar;
 
     private $arrLoadedGroups = array();
     private $arrCache = array();
@@ -61,6 +62,7 @@ class UserGroup
         'is_active',
         'type',
         'homepage',
+        'toolbar',
     );
 
     private $arrTypes = array(
@@ -231,6 +233,7 @@ class UserGroup
             $this->is_active = isset($this->arrCache[$id]['is_active']) ? (bool)$this->arrCache[$id]['is_active'] : false;
             $this->type = isset($this->arrCache[$id]['type']) ? $this->arrCache[$id]['type'] : $this->defaultType;
             $this->homepage = isset($this->arrCache[$id]['homepage']) ? $this->arrCache[$id]['homepage'] : '';
+            $this->toolbar = isset($this->arrCache[$id]['toolbar']) ? $this->arrCache[$id]['toolbar'] : '';
             $this->arrDynamicPermissions = null;
             $this->arrStaticPermissions = null;
             $this->arrUsers = null;
@@ -333,7 +336,8 @@ class UserGroup
                     `group_name` = '".addslashes($this->name)."',
                     `group_description` = '".addslashes($this->description)."',
                     `is_active` = ".intval($this->is_active).",
-                    `homepage` = '".addslashes($this->homepage)."'
+                    `homepage` = '".addslashes($this->homepage)."',
+                    `toolbar` = '".intval($this->toolbar)."'
                 WHERE `group_id`=".$this->id
             )) {
                 $this->error_msg = $_CORELANG['TXT_ACCESS_FAILED_TO_UPDATE_GROUP'];
@@ -346,13 +350,15 @@ class UserGroup
                     `group_description`,
                     `is_active`,
                     `type`,
-                    `homepage`
+                    `homepage`,
+                    `toolbar`
                 ) VALUES (
                     '".addslashes($this->name)."',
                     '".addslashes($this->description)."',
                     ".intval($this->is_active).",
                     '".$this->type."',
-                    '".addslashes($this->homepage)."'
+                    '".addslashes($this->homepage)."',
+                    '".intval($this->toolbar)."'
                 )"
             )) {
                 $this->id = $objDatabase->Insert_ID();
@@ -371,6 +377,12 @@ class UserGroup
             $this->error_msg = $_CORELANG['TXT_ACCESS_COULD_NOT_SET_PERMISSIONS'];
             return false;
         }
+
+        // flush all user based cache to ensure new permissions are enforced
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $cache = $cx->getComponent('Cache');
+        $cache->clearUserBasedPageCache();
+        $cache->clearUserBasedEsiCache();
 
         return true;
     }
@@ -512,6 +524,11 @@ class UserGroup
         $this->type = in_array($type, $this->arrTypes) ? $type : $this->defaultType;
     }
 
+    public function setToolbar($toolbar)
+    {
+        $this->toolbar = $toolbar;
+    }
+
     public function setHomepage($homepage)
     {
         $this->homepage = $homepage;
@@ -651,6 +668,11 @@ class UserGroup
     public function getType()
     {
         return $this->type;
+    }
+
+    public function getToolbar()
+    {
+        return $this->toolbar;
     }
 
     public function getHomepage()

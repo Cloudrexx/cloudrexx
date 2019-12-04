@@ -50,34 +50,95 @@ class TableGenerator extends \BackendTable
      *
      * @param $attrs   array attributes and values
      * @param $options array options for view generator
+     * @param boolean $readOnly if view is only readable
      */
-    public function __construct($attrs = array(), $options = array())
+    public function __construct($attrs = array(), $options = array(), $readOnly = false)
     {
-        global $_ARRAYLANG;
-
         // Rename Key Fields
         foreach ($attrs as $rowname=>$row) {
-            $newRowName = $rowname;
-            if (isset($_ARRAYLANG[$rowname])) {
-                $newRowName = $_ARRAYLANG[$rowname];
+            // If the variable is not set, the field should be
+            // displayed by default.
+            if (
+                isset($options['fields'][$rowname]['show']['show']) &&
+                !$options['fields'][$rowname]['show']['show']
+            ) {
+                continue;
             }
-            $rows[$newRowName] = $row;
+
+            if (
+                $readOnly &&
+                isset($options['fields']) &&
+                isset($options['fields'][$rowname]) &&
+                isset($options['fields'][$rowname]['show']) &&
+                isset($options['fields'][$rowname]['show']['parse'])
+            ) {
+                $callback = $options['fields'][$rowname]['show']['parse'];
+                if (
+                    is_array($callback) &&
+                    isset($callback['adapter']) &&
+                    isset($callback['method'])
+                ) {
+                    $json = new \Cx\Core\Json\JsonData();
+                    $jsonResult = $json->data(
+                        $callback['adapter'],
+                        $callback['method'],
+                        array(
+                            'value' => $row,
+                            'entity' => $attrs,
+                            'options' => $options['fields'][$rowname],
+                        )
+                    );
+                    if ($jsonResult['status'] == 'success') {
+                        $data = $jsonResult["data"];
+                    }
+                } else if (is_callable($callback)) {
+                    $data = $callback(
+                        $row,
+                        $attrs,
+                        $options['fields'][$rowname]
+                    );
+                }
+            } else {
+                $data = $row;
+            }
+            if (!empty($options['fields'][$rowname]['show']['encode'])) {
+                $data = $this->encodeCellContent($data);
+            }
+            $rows[$rowname] = $data;
         }
 
-        $data = new \Cx\Core_Modules\Listing\Model\Entity\DataSet(
-            array('key' => array_keys($rows), 'value' => array_values($rows))
-        );
+        // Check if lines exist to avoid unwanted errors
+        if (!empty($rows)) {
+            $data = new \Cx\Core_Modules\Listing\Model\Entity\DataSet(
+                array('key' => array_keys($rows), 'value' => array_values($rows))
+            );
+        } else {
+            $data = new \Cx\Core_Modules\Listing\Model\Entity\DataSet();
+        }
+
         $options['fields']['key']['sorting'] = false;
         $options['fields']['value']['sorting'] = false;
-        $options['functions']['add'] = false;
-        $options['functions']['edit'] = false;
-        $options['functions']['delete'] = false;
-        $options['functions']['show'] = false;
+        // After the flip(), the options can no longer be assigned to the rows.
+        // But to get the options they are passed with use().
+        // Therefore a PHP callback function is used and not a JsonAdapter.
+        $options['fields']['key']['table']['parse'] = function ($rowname) use ($options) {
+            global $_ARRAYLANG;
+            $newRowName = $rowname;
+
+            if (!empty($options['fields'][$rowname]['show']['header'])) {
+                $newRowName = $options['fields'][$rowname]['show']['header'];
+            } else if (!empty($options['fields'][$rowname]['header'])) {
+                $newRowName = $options['fields'][$rowname]['header'];
+            } else if (isset($_ARRAYLANG[$rowname])) {
+                $newRowName = $_ARRAYLANG[$rowname];
+            }
+            return $newRowName;
+        };
+        unset($options['functions']);
         unset($options['multiActions']);
         unset($options['tabs']);
 
         $data = $data->flip();
-
-        parent::__construct($data, $options, true);
+        parent::__construct($data, $options, true, null, $readOnly);
     }
 }

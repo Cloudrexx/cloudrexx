@@ -330,7 +330,15 @@ class MediaDirectoryLevel extends MediaDirectoryLibrary
             case 2:
                 //Frontend View
                 $intNumBlocks = count($arrExistingBlocks);
-                $i = $intNumBlocks-1;
+
+                // in a previous version, the system did not start parsing
+                // with the first row block. Instead it began to render the
+                // last column.
+                if ($this->arrSettings['legacyBehavior']) {
+                    $i = $intNumBlocks-1;
+                } else {
+                    $i = 0;
+                }
                 $strIndexHeader = '';
 
                 //set first index header

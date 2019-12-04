@@ -28,7 +28,7 @@ Cx\Core\User\Model\Entity\User:
       nullable: false
       column: auth_token
       options:
-        default: ''
+        default: '0'
     authTokenTimeout:
       type: integer
       length: 14
@@ -67,7 +67,7 @@ Cx\Core\User\Model\Entity\User:
       nullable: false
       column: last_auth_status
       options:
-        default: 1
+        default: 0
     lastActivity:
       type: integer
       nullable: false
@@ -78,7 +78,7 @@ Cx\Core\User\Model\Entity\User:
     email:
       type: string
       length: 255
-      nullable: true
+      unique: true
     emailAccess:
       type: enum
       values: ['everyone','members_only','nobody']
@@ -135,11 +135,10 @@ Cx\Core\User\Model\Entity\User:
         unsigned: true
         default: 0
     u2uActive:
-      type: enum
-      values: ['0','1']
+      type: boolean
       column: u2u_active
       options:
-        default: "1"
+        default: 1
   indexes:
     username:
       columns: [username]
@@ -159,6 +158,8 @@ Cx\Core\User\Model\Entity\User:
           group_id:
             referencedColumnName: group_id
             nullable: false
+            options:
+              unsigned: true
   oneToMany:
     userAttributeValue:
       targetEntity: Cx\Core\User\Model\Entity\UserAttributeValue

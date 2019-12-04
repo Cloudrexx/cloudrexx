@@ -73,10 +73,10 @@ class User extends \Cx\Core\User\Model\Entity\User implements \Doctrine\ORM\Prox
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'id', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'isAdmin', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'username', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'password', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'authToken', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'authTokenTimeout', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'regdate', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'expiration', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'validity', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'lastAuth', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'lastAuthStatus', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'lastActivity', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'email', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'emailAccess', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'frontendLangId', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'backendLangId', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'active', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'verified', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'primaryGroup', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'profileAccess', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'restoreKey', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'restoreKeyTime', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'u2uActive', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'userProfile', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'group', 'validators', 'virtual');
+            return array('__isInitialized__', 'id', 'isAdmin', 'username', 'password', 'authToken', 'authTokenTimeout', 'regdate', 'expiration', 'validity', 'lastAuth', 'lastAuthStatus', 'lastActivity', 'email', 'emailAccess', 'frontendLangId', 'backendLangId', 'active', 'verified', 'primaryGroup', 'profileAccess', 'restoreKey', 'restoreKeyTime', 'u2uActive', 'group', 'userAttributeValue', 'validators', 'virtual');
         }
 
-        return array('__isInitialized__', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'id', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'isAdmin', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'username', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'password', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'authToken', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'authTokenTimeout', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'regdate', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'expiration', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'validity', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'lastAuth', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'lastAuthStatus', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'lastActivity', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'email', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'emailAccess', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'frontendLangId', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'backendLangId', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'active', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'verified', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'primaryGroup', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'profileAccess', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'restoreKey', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'restoreKeyTime', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'u2uActive', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'userProfile', '' . "\0" . 'Cx\\Core\\User\\Model\\Entity\\User' . "\0" . 'group', 'validators', 'virtual');
+        return array('__isInitialized__', 'id', 'isAdmin', 'username', 'password', 'authToken', 'authTokenTimeout', 'regdate', 'expiration', 'validity', 'lastAuth', 'lastAuthStatus', 'lastActivity', 'email', 'emailAccess', 'frontendLangId', 'backendLangId', 'active', 'verified', 'primaryGroup', 'profileAccess', 'restoreKey', 'restoreKeyTime', 'u2uActive', 'group', 'userAttributeValue', 'validators', 'virtual');
     }
 
     /**
@@ -185,6 +185,17 @@ class User extends \Cx\Core\User\Model\Entity\User implements \Doctrine\ORM\Prox
     /**
      * {@inheritDoc}
      */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getId()
     {
         if ($this->__isInitialized__ === false) {
@@ -195,17 +206,6 @@ class User extends \Cx\Core\User\Model\Entity\User implements \Doctrine\ORM\Prox
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getId', array());
 
         return parent::getId();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setId($id)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setId', array($id));
-
-        return parent::setId($id);
     }
 
     /**
@@ -695,28 +695,6 @@ class User extends \Cx\Core\User\Model\Entity\User implements \Doctrine\ORM\Prox
     /**
      * {@inheritDoc}
      */
-    public function setUserProfile(\Cx\Core\User\Model\Entity\UserProfile $userProfile)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setUserProfile', array($userProfile));
-
-        return parent::setUserProfile($userProfile);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getUserProfile()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getUserProfile', array());
-
-        return parent::getUserProfile();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function addGroup(\Cx\Core\User\Model\Entity\Group $group)
     {
 
@@ -745,6 +723,39 @@ class User extends \Cx\Core\User\Model\Entity\User implements \Doctrine\ORM\Prox
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getGroup', array());
 
         return parent::getGroup();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function addUserAttributeValue(\Cx\Core\User\Model\Entity\UserAttributeValue $userAttributeValue)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addUserAttributeValue', array($userAttributeValue));
+
+        return parent::addUserAttributeValue($userAttributeValue);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function removeUserAttributeValue(\Cx\Core\User\Model\Entity\UserAttributeValue $userAttributeValue)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeUserAttributeValue', array($userAttributeValue));
+
+        return parent::removeUserAttributeValue($userAttributeValue);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getUserAttributeValue()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getUserAttributeValue', array());
+
+        return parent::getUserAttributeValue();
     }
 
     /**

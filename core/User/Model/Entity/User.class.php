@@ -4,7 +4,7 @@
  * Cloudrexx
  *
  * @link      http://www.cloudrexx.com
- * @copyright Cloudrexx AG 2007-2018
+ * @copyright Cloudrexx AG 2007-2019
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -36,10 +36,28 @@
  */
 namespace Cx\Core\User\Model\Entity;
 
+/**
+ * Validates the email of an User to a set of constraints
+ *
+ * @copyright   CLOUDREXX CMS - Cloudrexx AG Thun
+ * @author      Sam Hawkes <info@cloudrexx.com>
+ * @package     cloudrexx
+ * @subpackage  core_user
+ * @version     5.0.0
+ */
 class UserValidateEmail extends \CxValidate
 {
+    /**
+     * @var int ID of user
+     */
     protected $userId;
 
+    /**
+     * UserValidateEmail constructor
+     *
+     * @param int   $userId      ID of user
+     * @param array $constraints additional constraints
+     */
     public function __construct($userId, $constraints = array())
     {
         $this->userId = $userId;
@@ -48,6 +66,7 @@ class UserValidateEmail extends \CxValidate
 
     /**
      * Checks if the given mail address is valid and unique
+     *
      * @param string $mail Mail address to check
      *
      * @return boolean if email is valid
@@ -84,10 +103,28 @@ class UserValidateEmail extends \CxValidate
     }
 }
 
+/**
+ * Validates the username of an User to a set of constraints
+ *
+ * @copyright   CLOUDREXX CMS - Cloudrexx AG Thun
+ * @author      Sam Hawkes <info@cloudrexx.com>
+ * @package     cloudrexx
+ * @subpackage  core_user
+ * @version     5.0.0
+ */
 class UserValidateUsername extends \CxValidate
 {
+    /**
+     * @var int ID of user
+     */
     protected $userId;
 
+    /**
+     * UserValidateUsername constructor
+     *
+     * @param int   $userId      id of user
+     * @param array $constraints additional constraints
+     */
     public function __construct($userId, $constraints = array())
     {
         $this->userId = $userId;
@@ -96,6 +133,7 @@ class UserValidateUsername extends \CxValidate
 
     /**
      * Checks if the given username is valid and unique
+     *
      * @param string $username username to check
      *
      * @return boolean if email is valid
@@ -139,7 +177,9 @@ class UserValidateUsername extends \CxValidate
 
     /**
      * Returns true if the given $username is valid
-     * @param string $username
+     *
+     * @param string $username username to check
+     *
      * @return boolean if username is valid
      */
     protected function isValidUsername($username)
@@ -190,7 +230,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @var string
      */
-    protected $authToken = '';
+    protected $authToken = '0';
 
     /**
      * @var integer
@@ -220,7 +260,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @var integer
      */
-    protected $lastAuthStatus = 1;
+    protected $lastAuthStatus = 0;
 
     /**
      * @var integer
@@ -233,9 +273,9 @@ class User extends \Cx\Model\Base\EntityBase {
     protected $email;
 
     /**
-     * @var enum_user_user_emailaccess
+     * @var string enum_user_user_emailaccess
      */
-    protected $emailAccess = 'nobody';
+    protected $emailAccess;
 
     /**
      * @var integer
@@ -263,9 +303,9 @@ class User extends \Cx\Model\Base\EntityBase {
     protected $primaryGroup = 0;
 
     /**
-     * @var enum_user_user_profileaccess
+     * @var string enum_user_user_profileaccess
      */
-    protected $profileAccess = 'members_only';
+    protected $profileAccess;
 
     /**
      * @var string
@@ -278,9 +318,9 @@ class User extends \Cx\Model\Base\EntityBase {
     protected $restoreKeyTime = 0;
 
     /**
-     * @var enum_user_user_u2uactive
+     * @var boolean
      */
-    protected $u2uActive = '1';
+    protected $u2uActive = false;
 
     /**
      * @var \Doctrine\Common\Collections\Collection
@@ -297,15 +337,20 @@ class User extends \Cx\Model\Base\EntityBase {
      */
     public function __construct()
     {
+        $arrSettings = \FWUser::getSettings();
+        $this->profileAccess = $arrSettings['default_profile_access']['value'];
+        $this->emailAccess = $arrSettings['default_email_access']['value'];
+
         $this->group = new \Doctrine\Common\Collections\ArrayCollection();
         $this->userAttributeValue = new \Doctrine\Common\Collections\ArrayCollection();
+
     }
 
     public function initializeValidators()
     {
         $this->validators['username'] = new \Cx\Core\User\Model\Entity\UserValidateUsername($this->getId());
         $this->validators['email'] = new \Cx\Core\User\Model\Entity\UserValidateEmail($this->getId());
-        $this->validators['password'] = new \CxValidateRegexp(array('pattern' => '/.+/'), false);
+        $this->validators['password'] = new \CxValidateRegexp(array('pattern' => '/.+/'), true);
     }
 
     /**
@@ -343,7 +388,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set username
      *
      * @param string $username
-     * @return User
      */
     public function setUsername($username)
     {
@@ -361,21 +405,17 @@ class User extends \Cx\Model\Base\EntityBase {
     }
 
     /**
-     * Set plaintext (/unhashed) password
+     * Set password
      *
      * @param string $password
      */
     public function setPassword($password)
     {
-        if (empty($password)) {
-            return;
-        }
-        $this->checkPasswordValidity($password);
-        $this->password = $this->hashPassword($password);
+        $this->password = $password;
     }
 
     /**
-     * Get hashed password
+     * Get password
      *
      * @return string 
      */
@@ -388,7 +428,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set authToken
      *
      * @param string $authToken
-     * @return User
      */
     public function setAuthToken($authToken)
     {
@@ -409,7 +448,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set authTokenTimeout
      *
      * @param integer $authTokenTimeout
-     * @return User
      */
     public function setAuthTokenTimeout($authTokenTimeout)
     {
@@ -430,7 +468,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set regdate
      *
      * @param integer $regdate
-     * @return User
      */
     public function setRegdate($regdate)
     {
@@ -451,7 +488,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set expiration
      *
      * @param integer $expiration
-     * @return User
      */
     public function setExpiration($expiration)
     {
@@ -472,7 +508,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set validity
      *
      * @param integer $validity
-     * @return User
      */
     public function setValidity($validity)
     {
@@ -493,7 +528,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set lastAuth
      *
      * @param integer $lastAuth
-     * @return User
      */
     public function setLastAuth($lastAuth)
     {
@@ -514,7 +548,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set lastAuthStatus
      *
      * @param integer $lastAuthStatus
-     * @return User
      */
     public function setLastAuthStatus($lastAuthStatus)
     {
@@ -535,7 +568,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set lastActivity
      *
      * @param integer $lastActivity
-     * @return User
      */
     public function setLastActivity($lastActivity)
     {
@@ -576,7 +608,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set emailAccess
      *
      * @param enum_user_user_emailaccess $emailAccess
-     * @return User
      */
     public function setEmailAccess($emailAccess)
     {
@@ -597,7 +628,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set frontendLangId
      *
      * @param integer $frontendLangId
-     * @return User
      */
     public function setFrontendLangId($frontendLangId)
     {
@@ -618,7 +648,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set backendLangId
      *
      * @param integer $backendLangId
-     * @return User
      */
     public function setBackendLangId($backendLangId)
     {
@@ -639,7 +668,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set active
      *
      * @param boolean $active
-     * @return User
      */
     public function setActive($active)
     {
@@ -660,7 +688,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set verified
      *
      * @param boolean $verified
-     * @return User
      */
     public function setVerified($verified)
     {
@@ -681,7 +708,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set primaryGroup
      *
      * @param integer $primaryGroup
-     * @return User
      */
     public function setPrimaryGroup($primaryGroup)
     {
@@ -702,7 +728,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set profileAccess
      *
      * @param enum_user_user_profileaccess $profileAccess
-     * @return User
      */
     public function setProfileAccess($profileAccess)
     {
@@ -723,7 +748,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set restoreKey
      *
      * @param string $restoreKey
-     * @return User
      */
     public function setRestoreKey($restoreKey = null)
     {
@@ -746,7 +770,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set restoreKeyTime
      *
      * @param integer $restoreKeyTime
-     * @return User
      */
     public function setRestoreKeyTime($restoreKeyTime)
     {
@@ -767,7 +790,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set u2uActive
      *
      * @param enum_user_user_u2uactive $u2uActive
-     * @return User
      */
     public function setU2uActive($u2uActive)
     {
@@ -788,13 +810,10 @@ class User extends \Cx\Model\Base\EntityBase {
      * Add group
      *
      * @param \Cx\Core\User\Model\Entity\Group $group
-     * @return User
      */
     public function addGroup(\Cx\Core\User\Model\Entity\Group $group)
     {
         $this->group[] = $group;
-
-        return $this;
     }
 
     /**
@@ -848,11 +867,9 @@ class User extends \Cx\Model\Base\EntityBase {
     }
 
     /**
-     * Return the first- and lastname if they are defined. If this is not the
-     * case, check if a username exists. If this also does not exist, the
-     * e-mail address will be returned.
+     * Check if the user is backend group
      *
-     * @return string firstname & lastname, username or email
+     * @return boolean
      */
     public function isBackendGroupUser()
     {
@@ -866,135 +883,5 @@ class User extends \Cx\Model\Base\EntityBase {
             }
         }
         return false;
-    }
-
-    /**
-     * Returns true if the given $password is valid
-     * @param   string    $password
-     * @return  boolean
-     */
-    protected function checkPasswordValidity($password)
-    {
-        global $_CONFIG, $_CORELANG;
-
-        if (strlen($password) < 6) {
-            throw new \Cx\Core\Error\Model\Entity\ShinyException(
-                $_CORELANG['TXT_ACCESS_INVALID_PASSWORD']
-            );
-        }
-        if (
-            isset($_CONFIG['passwordComplexity']) &&
-            $_CONFIG['passwordComplexity'] == 'on'
-        ) {
-            // Password must contain the following characters: upper, lower
-            // case and numbers
-            if (
-                !preg_match('/[A-Z]+/', $password) ||
-                !preg_match('/[a-z]+/', $password) ||
-                !preg_match('/[0-9]+/', $password)
-            ) {
-                throw new \Cx\Core\Error\Model\Entity\ShinyException(
-                    $_CORELANG['TXT_ACCESS_INVALID_PASSWORD_WITH_COMPLEXITY']
-                );
-            }
-        }
-    }
-
-    /**
-     * Generate hash of password with default hash algorithm
-     *
-     * @param string $password Password to be hashed
-     *
-     * @return string The generated hash of the supplied password
-     * @throws  \Cx\Core\Error\Model\Entity\ShinyException In case the password
-     *                                                    hash generation fails
-     */
-    protected function hashPassword($password)
-    {
-        $hash = password_hash($password, \PASSWORD_BCRYPT);
-        if ($hash !== false) {
-            return $hash;
-        }
-
-        throw new \Cx\Core\Error\Model\Entity\ShinyException(
-            'Failed to generate a new password hash'
-        );
-    }
-
-    /**
-     * Return the first- and lastname if they are defined. If this is not the
-     * case, check if a username exists. If this also does not exist, the
-     * e-mail address will be returned.
-     *
-     * @return string firstname & lastname, username or email
-     */
-    public function __toString()
-    {
-        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-        $em = $cx->getDb()->getEntityManager();
-        $userName = '';
-
-        // values which we would like to get
-        $profileAttrs = array(
-            'lastname' => '',
-            'firstname' => ''
-        );
-
-        $attrNameRepo = $em->getRepository(
-            'Cx\Core\User\Model\Entity\UserAttributeName'
-        );
-
-        foreach ($profileAttrs as $name => $value) {
-            $selectedAttrName = $attrNameRepo->findOneBy(
-                array('name' => $name)
-            );
-
-            $userAttrValues = array();
-            if (!empty($this->getUserAttributeValue())) {
-                $userAttrValues = $this->getUserAttributeValue();
-            }
-
-            if (is_array($userAttrValues)) {
-                // must be converted, since $userAttrValues is an array
-                $collection = new \Doctrine\Common\Collections\ArrayCollection(
-                    $userAttrValues
-                );
-            } else {
-                $collection = $userAttrValues;
-            }
-
-
-            if (!empty($selectedAttrName)) {
-                $attrId = $selectedAttrName->getAttributeId();
-                $selectedAttrValue = $collection->filter(
-                    function($attrValue) use ($attrId) {
-                        if ($attrId == $attrValue->getAttributeId()) {
-                            return $attrValue;
-                        }
-                    }
-                )->first();
-
-                if (!empty($value)) {
-                    $profileAttrs[$name] = $selectedAttrValue->getValue();
-                }
-            }
-        }
-
-        if (
-            !empty($profileAttrs['firstname']) ||
-            !empty($profileAttrs['lastname'])
-        ) {
-            $userName = trim(
-                $profileAttrs['firstname'].' '. $profileAttrs['lastname']
-            );
-        } else if (!empty($this->getUsername())) {
-            $userName = $this->getUsername();
-        } else if (!empty($this->getEmail())) {
-            $userName = $this->getEmail();
-        } else {
-            $userName = parent::__toString();
-        }
-
-        return $userName;
     }
 }

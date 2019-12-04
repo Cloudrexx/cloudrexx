@@ -1,0 +1,16 @@
+Cx\Modules\Jobs\Model\Entity\Flag:
+  type: entity
+  table: module_jobs_flag
+  id:
+    id:
+      type: integer
+      generator:
+        strategy: AUTO
+  fields:
+    name:
+      type: string
+      length: 255
+    icon:
+      type: text
+    value:
+      type: text

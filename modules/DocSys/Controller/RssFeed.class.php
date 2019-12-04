@@ -157,11 +157,9 @@ class RssFeed
                                n.text,
                                n.source,
                                n.lang,
-                               n.userid,
-                               u.id
-                        FROM ".DBPREFIX."module_docsys".MODULE_INDEX." AS n,
-                             ".DBPREFIX."access_users AS u
-                        WHERE n.userid = u.id AND n.lang = ".$_LANGID."
+                               n.userid
+                        FROM ".DBPREFIX."module_docsys".MODULE_INDEX." AS n
+                        WHERE n.lang = ".$_LANGID."
                         ORDER BY n.id DESC";
             $objResult = $objDatabase->SelectLimit($query, $this->limit);
 

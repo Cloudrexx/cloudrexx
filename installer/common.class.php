@@ -240,6 +240,18 @@ class CommonFunctions
                 if (($index = array_search('STRICT_TRANS_TABLES', $sqlModes)) !== false) {
                     unset($sqlModes[$index]);
                 }
+                if (($index = array_search('STRICT_ALL_TABLES', $sqlModes)) !== false) {
+                    unset($sqlModes[$index]);
+                }
+                if (($index = array_search('TRADITIONAL', $sqlModes)) !== false) {
+                    unset($sqlModes[$index]);
+                }
+                if (($index = array_search('NO_ZERO_DATE', $sqlModes)) !== false) {
+                    unset($sqlModes[$index]);
+                }
+                if (($index = array_search('NO_ZERO_IN_DATE', $sqlModes)) !== false) {
+                    unset($sqlModes[$index]);
+                }
                 $objDb->Execute('SET sql_mode = \'' . implode(',', $sqlModes) . '\'');
 
                 if (($mysqlServerVersion = $this->getMySQLServerVersion()) !== false && !$this->_isNewerVersion($mysqlServerVersion, '4.1')) {
@@ -1292,22 +1304,25 @@ class CommonFunctions
         if ($objDb !== false) {
             #$objDb->debug = true;
             $user = new \User();
-            $query = "UPDATE `".$_SESSION['installer']['config']['dbTablePrefix']."access_users`
-                         SET `username` = '".$_SESSION['installer']['account']['username']."',
-                             `password` = '" . $user->hashPassword($_SESSION['installer']['account']['password']) . "',
-                             `regdate` = '".time()."',
-                             `email` = '".$_SESSION['installer']['account']['email']."',
-                             `frontend_lang_id` = 1,
-                             `backend_lang_id` = '".$userLangId."',
-                             `active` = 1
-                       WHERE `id` = 1";
-            if ($objDb->Execute($query) !== false) {
-                $query = "UPDATE `".$_SESSION['installer']['config']['dbTablePrefix']."access_user_profile`
-                             SET `firstname` = '".$_SESSION['installer']['sysConfig']['adminName']."',
-                                 `lastname` = ''
-                           WHERE `user_id` = 1";
-                if ($objDb->Execute($query) !== false) {
-                    return true;
+            if ($objUser = \FWUser::getFWUserObject()->objUser->getUser($id = 1)) {
+                $objUser->setUsername($_SESSION['installer']['account']['username']);
+                $objUser->setPassword($user->hashPassword($_SESSION['installer']['account']['password']));
+                $objUser->setEmail($_SESSION['installer']['account']['email']);
+                $objUser->setFrontendLanguage(1);
+                $objUser->setBackendLanguage($userLangId);
+                $objUser->setActiveStatus(1);
+                if ($objUser->store()) {
+                    $objUser->setProfile(
+                        array(
+                            'firstname' => array($_SESSION['installer']['sysConfig']['adminName']),
+                            'lastname' => array(''),
+                        )
+                    );
+                    if ($objUser->store()) {
+                        return true;
+                    }
+                } else {
+                    return $_ARRLANG['TXT_COULD_NOT_CREATE_ADMIN_ACCOUNT'];
                 }
             }
         }

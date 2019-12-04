@@ -192,24 +192,21 @@ class Permission
      * @return mixed Array (id=>name) or false on error
      */
     public static function getGroups($frontend) {
-        global $objDatabase;
+        $objFWUser = \FWUser::getFWUserObject();
 
         $type = 'frontend';
         if (!$frontend) {
             $type = 'backend';
         }
 
-        $query = "SELECT group_id, group_name FROM ".DBPREFIX."access_user_groups WHERE type='".$type."' ORDER BY group_name";
-        $rs = $objDatabase->Execute($query);
-        if ($rs == false) {
-            return false;
+        $objGroup = $objFWUser->objGroup->getGroups(array('type' => $type));
+        $groups = array();
+        while (!$objGroup->EOF) {
+            $groups[$objGroup->getId()] = $objGroup->getName();
+
+            $objGroup->next();
         }
 
-        $groups = array();
-        while (!$rs->EOF) {
-            $groups[$rs->fields['group_id']] = $rs->fields['group_name'];
-            $rs->MoveNext();
-        }
         return $groups;
     }
 }

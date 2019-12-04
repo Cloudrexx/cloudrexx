@@ -214,6 +214,13 @@ class User extends User_Profile
     private $last_auth;
 
     /**
+     * If the last time the user try to logged in was successful
+     * @var boolean
+     * @access private
+     */
+    private $last_auth_status = 1;
+
+    /**
      * The last time that the user was active (timestamp)
      * @var integer
      * @access private
@@ -865,6 +872,58 @@ class User extends User_Profile
     }
 
 
+    private function getFilteredUserIdList($arrFilter = null, $search = null)
+    {
+        $arrConditions = array();
+        $arrSearchConditions = array();
+        $tblCustomAttributes = false;
+        $tblGroup = false;
+        $groupTables = false;
+
+        // SQL JOIN statements used for each custom attribute
+        $customAttributeJoins = array();
+
+        // parse filter
+        if (isset($arrFilter) && is_array($arrFilter)) {
+            $arrConditions = $this->parseFilterConditions($arrFilter, $tblCustomAttributes, $tblGroup, $customAttributeJoins, $groupTables);
+        }
+
+        // parse search
+        if (!empty($search)) {
+            if (count($arrAccountConditions = $this->parseAccountSearchConditions($search))) {
+                $arrSearchConditions[] = implode(' OR ', $arrAccountConditions);
+            }
+            if (count($arrCoreAttributeConditions = $this->parseAttributeSearchConditions($search, true))) {
+                $arrSearchConditions[] = implode(' OR ', $arrCoreAttributeConditions);
+                $tblCustomAttributes = true;
+            }
+            if (count($arrCustomAttributeConditions = $this->parseAttributeSearchConditions($search, false))) {
+                $groupTables = true;
+                $arrSearchConditions[] = implode(' OR ', $arrCustomAttributeConditions);
+                $tblCustomAttributes = true;
+            }
+            if (count($arrSearchConditions)) {
+                $arrConditions[] = implode(' OR ', $arrSearchConditions);
+            }
+        }
+
+        $arrTables = array();
+        if (!empty($tblCustomAttributes)) {
+            $arrTables[] = 'custom';
+        }
+        if ($tblGroup) {
+            $arrTables[] = 'group';
+        }
+
+        return array(
+            'tables'        => $arrTables,
+            'conditions'    => $arrConditions,
+            'group_tables'  => $groupTables,
+            'joins'         => $customAttributeJoins,
+        );
+    }
+
+
     public function getFrontendLanguage()
     {
         if (!$this->frontend_language) {
@@ -1207,148 +1266,7 @@ class User extends User_Profile
         return false;
     }
 
-    /**
-     * Returns a User object according to the given criteria
-     *
-     * @param   mixed   $filter An integer or array defining a filter to apply on the lookup.
-     *                          $filter can be an integer, where its value is treated as the ID of a user account.
-     *                          This will cause the method to return the user account specified by that ID.
-     *                          Addtitionally, $filter can be an array specifing a complex set
-     *                          of <em>filter conditions</em>. Each key-value pair represents a <em>user-account's attribute</em>
-     *                          and its <em>filter condition</em> to apply to. Depending on the attribute's type,
-     *                          the filter condition must be either an integer or a string. It is also
-     *                          possible to define a <em>complex filter condition</em>. This is done by defining an array
-     *                          containing a list of conditions to apply to. Each key-value pair represents the
-     *                          <em>condition operator</em> and the <em>condition expression</em> of the condition.
-     *                          Allowed <em>condition operators</em> are for <em>user-account attributes</em> of type
-     *                          <em>Integer</em>: =, <, > and for attributes of type <em>String</em>: !=, <, >, REGEXP
-     * <h5>Fetch user with ID 3</h5>
-     * <pre class="brush: php">$objUser = \User::getUsers(3);</pre>
-     * <br>
-     * <h5>Fetch all users who's firstname contains the string 'nicole'</h5>
-     * <pre class="brush: php">
-     * $filter = array(
-     *      'firstname' => '%nicole%',
-     * );
-     * $objUser = \User::getUsers($filter);
-     * </pre>
-     * <br>
-     * <h5>Fetch all users whose lastname starts with one of the following letters (case insensitive): a, b, c, e</h5>
-     * <pre class="brush: php">
-     * $filter = array(
-     *      'lastname' => array(
-     *          'a%',
-     *          'b%',
-     *          'c%',
-     *          'e%',
-     *      )
-     * );
-     * $objUser = \User::getUsers($filter);
-     * </pre>
-     * <br>
-     * <h5>This does the same as the preview example but is written in a different notation</h5>
-     * <pre class="brush: php">
-     * $filter = array(
-     *      'lastname' => array(
-     *          array(
-     *              '>'  => 'a',
-     *              '<'  => 'e%'
-     *              '!=' => 'd%'
-     *          ),
-     *          'LIKE'   => 'e%'
-     *      )
-     * );
-     * $objUser = \User::getUsers($filter);
-     * </pre>
-     * <br>
-     * <h5>Fetch all active users that have been signed in within the last hour</h5>
-     * <pre class="brush: php">
-     * $filter = array(
-     *      'is_active' => 1,
-     *      'last_auth' => array(
-     *          '>' => time()-3600
-     *      )
-     * );
-     * $objUser = \User::getUsers($filter);
-     * </pre>
-     * <h5>Fetch all active users named 'John Doe' or 'Max Muster'</h5>
-     * <pre class="brush: php">
-     * $filter = array(
-     *      'AND' => array(
-     *          0 => array(
-     *              'active' => true,
-     *          ),
-     *          1 => array(
-     *              'OR' => array(
-     *                  0 => array(
-     *                      'AND' => array(
-     *                          0 => array(
-     *                              'firstname' => 'John',
-     *                          ),
-     *                          1 => array(
-     *                              'lastname' => 'Doe',
-     *                          ),
-     *                      ),
-     *                  ),
-     *                  1 => array(
-     *                      'AND' => array(
-     *                          0 => array(
-     *                              'firstname' => 'Max',
-     *                          ),
-     *                          1 => array(
-     *                              'lastname' => 'Muster',
-     *                          ),
-     *                      ),
-     *                  ),
-     *              ),
-     *          ),
-     *      ),
-     * );
-     * $objUser = \User::getUsers($filter);
-     * </pre>
-     * @param   string  $search        The optional parameter $search can be used to do a fulltext search on the user accounts.
-     *                                 $search is an array whereas its key-value pairs represent a user-account's attribute
-     *                                 and its search pattern to apply to. If multiple search conditions are set, only one
-     *                                 of the search conditions must match on a user to get included in the result.
-     * <h5>Fetch users that contain the literal <em>nicole</em> in their <em>firstname</em> or <em>smith</em> in their <em>lastname</em></h5>
-     * <pre class="brush: php">
-     * array(
-     *      'firstname' => 'nicole',
-     *      'lastname'  => 'smith',
-     * );
-     * $objUser = \User::getUsers(null, $search);
-     * </pre>
-     *
-     * @param   array   $arrSort       Normally, the users are ordered by their ID. Optionally the order can be specified by
-     *                                 an array. Whereas each key-value pair represents the user-account's attribute and its
-     *                                 order direction (asc/desc) to order the result by.
-     * <h5>Order the users first by their active-status and then by their firstname</h5>
-     * <pre class="brush: php">
-     * $arrSort = array(
-     *     'is_active' => 'desc',
-     *     'firstname' => 'asc',
-     * );
-     * $objUser = \User::getUsers(null, null, $arrSort);
-     * </pre>
-     * @param   array   $arrAttributes Normally, all user-account data is loaded from the database. The optional parameter
-     *                                 $arrAttributes can be used to limit the data that is loaded from the database by explicitly
-     *                                 specifying which user-account attributes should be loaded from the database.
-     *                                 $arrAttributes is an array containing a list of user-account attributes to be loaded.
-     * <h5>Load all user-account data (default)</h5>
-     * <pre class="brush: php">
-     * $objUser = \User::getUsers();
-     * </pre>
-     * <br>
-     * <h5>Load only user-account data <em>firstname</em> and <em>lastname</em> from database</h5>
-     * <pre class="brush: php">
-     * $arrAttributes = array('firstname', 'lastname')
-     * $objUser = \User::getUsers(null, null, null, $arrAttributes);
-     * </pre>
-     * @param   integer $limit The maximal number of Users to load from the database. If not set, all matched users will be loaded.
-     * @param   integer $offset The optional parameter $offset can be used to specify the number of found records to skip in the result set.
-     *
-     * @return  User
-     */
+
     protected function loadUsers(
         $filter=null, $search=null, $arrSort=null, $arrAttributes=null,
         $limit=null, $offset=0
@@ -1368,9 +1286,40 @@ class User extends User_Profile
         $arrSelectCoreExpressions = array();
         $this->filtered_search_count = 0;
 
-        // if $filter is an integer its an ID by definition (see DocBlock)
-        if (is_numeric($filter)) {
-            $filter = array('id' => $filter);
+        // set filter
+        if (isset($filter) && is_array($filter) && count($filter) || !empty($search)) {
+            $sqlCondition = $this->getFilteredUserIdList($filter, $search);
+        } elseif (!empty($filter)) {
+            $sqlCondition['tables'] = array();
+            $sqlCondition['conditions'] = array('tblU.`id` = '.intval($filter));
+            $sqlCondition['group_tables'] = false;
+            $limit = 1;
+        }
+
+        // set sort order
+        if (isset($filter['group_id']) && $filter['group_id'] == 'groupless') {
+            $groupless = true;
+        } else {
+            $groupless = false;
+        }
+
+        // $filter != 1 needed because $filter can be 1 to show all active users
+        $crmUser = false;
+        if (isset($filter['crm']) && $filter != 1 && $filter['crm'] == 1 && is_array($filter)) {
+            $cx = \Env::get('cx');
+            if ($cx->getLicense()->isInLegalComponents('Crm')) {
+                $crmUser = true;
+            }
+        }
+        try {
+            if (($arrQuery = $this->setSortedUserIdList($arrSort, $sqlCondition, $limit, $offset, $groupless, $crmUser)) === false) {
+                $this->clean();
+                return false;
+            }
+        } catch (\Throwable $e) {
+            // catch invalid $filter or $search definitions
+            $this->clean();
+            return false;
         }
 
         // set field list
@@ -1379,336 +1328,351 @@ class User extends User_Profile
                 if (isset($this->arrAttributes[$attribute]) && !in_array($attribute, $arrSelectMetaExpressions)) {
                     $arrSelectMetaExpressions[] = $attribute;
                 } elseif ($this->objAttribute->isCoreAttribute($attribute) && !in_array($attribute, $arrSelectCoreExpressions)) {
-                    $arrSelectCoreExpressions[] = $attribute;
+                    $arrSelectCustomExpressions[] = $this->objAttribute->getAttributeIdByProfileAttributeId($attribute);
+                } elseif ($this->objAttribute->isCustomAttribute($attribute) && (!isset($arrSelectCustomExpressions) || !in_array($attribute, $arrSelectCustomExpressions))) {
+                    $arrSelectCustomExpressions[] = $attribute;
                 }
             }
+
             if (!in_array('id', $arrSelectMetaExpressions)) {
                 $arrSelectMetaExpressions[] = 'id';
             }
         } else {
             $arrSelectMetaExpressions = array_keys($this->arrAttributes);
-            $arrSelectCoreExpressions = $this->objAttribute->getCoreAttributeIds();
+            $arrSelectCustomExpressions = array();
         }
 
-        $repo = $em->getRepository('\Cx\Core\User\Model\Entity\User');
-        $attrNameRepo = $em->getRepository('\Cx\Core\User\Model\Entity\UserAttributeName');
+        $query = 'SELECT tblU.`'.implode('`, tblU.`', $arrSelectMetaExpressions).'`'
+            .'FROM `'.DBPREFIX.'access_users` AS tblU'
+            .($arrQuery['tables']['custom'] ? ' INNER JOIN `'.DBPREFIX.'access_user_attribute_value` AS tblA ON tblA.`user_id` = tblU.`id`' : '')
+            .($arrQuery['tables']['group']
+                ? (isset($filter['group_id']) && $filter['group_id'] == 'groupless'
+                    ? ' LEFT JOIN `'.DBPREFIX.'access_rel_user_group` AS tblG ON tblG.`user_id` = tblU.`id`'
+                    : ' INNER JOIN `'.DBPREFIX.'access_rel_user_group` AS tblG ON tblG.`user_id` = tblU.`id`')
+                : ''
+            )
+            .($arrQuery['tables']['group'] && !FWUser::getFWUserObject()->isBackendMode() ? ' INNER JOIN `'.DBPREFIX.'access_user_groups` AS tblGF ON tblGF.`group_id` = tblG.`group_id`' : '')
+            .(count($arrQuery['joins']) ? ' '.implode(' ',$arrQuery['joins']) : '')
+// TODO: some conditions are not well enclosed, so there might be a more proper solution than adding more brackes at this point
+            .(count($arrQuery['conditions']) ? ' WHERE ('.implode(') AND (', $arrQuery['conditions']).')' : '')
+            .($arrQuery['group_tables'] ? ' GROUP BY tblU.`id`' : '')
+            .(count($arrQuery['sort']) ? ' ORDER BY '.implode(', ', $arrQuery['sort']) : '');
+        $objUser = false;
 
-        $fields = $em->getClassMetadata('\Cx\Core\User\Model\Entity\User');
+        if (empty($limit)) {
+            $objUser = $objDatabase->Execute($query);
+        } else {
+            $objUser = $objDatabase->SelectLimit($query, $limit, $offset);
+        };
 
-        $arrExpressions = array();
-        foreach($arrSelectMetaExpressions as $item) {
-            $arrExpressions[$item] = $fields->getFieldName($item);
-        }
-
-        // Rewrite set filter
-        $userId = 0;
-        $userAttrConditions = array();
-        $attributes = $attrNameRepo->findAll();
-
-        $attributeList = array();
-        foreach ($attributes as $attrName) {
-            $attributeList[$attrName->getAttributeId()] = $attrName->getName();
-        }
-
-        $qb = $em->createQueryBuilder();
-        $qb->select(
-            'tblA'
-        )->from(
-            '\Cx\Core\User\Model\Entity\UserAttributeValue',
-            'tblA'
-        )->leftJoin(
-            'tblA.user',
-            'tblU'
-        );
-        if (!empty($search)) {
-            $this->parseSearchConditions($search, $qb, $attributeList);
-        }
-        if (isset($filter) && is_array($filter) && count($filter) || !empty($search)) {
-            $this->getAttrConditions($filter, $qb, $attributeList);
-        } else if (!empty($filter)) {
-            $userId = intval($filter);
-        }
-
-        $sortBy = array();
-        foreach ($arrSort as $sort=>$order) {
-            $key = $arrExpressions[$sort];
-            $sortBy[$key] = ucwords($order);
-        }
-        $crit = array();
-        if (!empty($userId)) {
-            $crit = array('id' => $userId);
-        }
-        $qb->setMaxResults($limit);
-        $qb->setFirstResult($offset);
-
-        $userAttributes = $qb->getQuery()->getResult();
-
-        $qb->select('count(tblU.id)');
-        $qb->setMaxResults(null);
-        $qb->setFirstResult(null);
-
-        $this->filtered_search_count = $qb->getQuery()->getSingleScalarResult();
-
-        // todo: this is not very efficient
-        $users = array();
-        foreach ($userAttributes as $userAttribute) {
-            if (in_array($userAttribute->getUser(), $users)) {
-                continue;
-            }
-            $users[] = $userAttribute->getUser();
-        }
-
-        foreach ($users as $user) {
-            foreach ($user->getUserAttributeValue() as $attr) {
-                // this is most likely wrong as it gets the name in the first lang
-                $name = $attr->getUserAttribute()->getUserAttributeName()->first()->getName();
-                if (count($arrSelectCoreExpressions) && in_array($name, $arrSelectCoreExpressions)) {
-                    $this->arrCachedUsers[$user->getId()]['profile'][$name][0] = $this->arrLoadedUsers[$user->getId()]['profile'][$name][0] = $attr->getValue();
-                } else {
-                    $this->arrCachedUsers[$user->getId()]['profile'][$attr->getAttributeId()][$attr->getHistory()] =
-                    $this->arrLoadedUsers[$user->getId()]['profile'][$attr->getAttributeId()][$attr->getHistory()] =
-                        $attr->getValue();
-
-                    $historyAttributeId = $attr->getHistory();
-                    if ($attr->getHistory() &&
-                        (!empty($historyAttributeId) &&
-                            (
-                                !isset($this->arrAttributeHistories[$user->getId()][$historyAttributeId]) ||
-                                !in_array($attr->getHistory(), $this->arrAttributeHistories[$user->getId()][$historyAttributeId])
-                            )
-                        )
-                    ) {
-                        $this->arrAttributeHistories[$user->getId()][$historyAttributeId][] = $attr->getHistory();
-                        $this->arrUpdatedAttributeHistories[$user->getId()][$historyAttributeId][] = $attr->getHistory();
+        if ($objUser !== false && $objUser->RecordCount() > 0) {
+            while (!$objUser->EOF) {
+                foreach ($objUser->fields as $attributeId => $value) {
+                    $profileAttributeId = $this->objAttribute->getProfileAttributeIdByAttributeId($attributeId);
+                    if ($this->objAttribute->isCoreAttribute($profileAttributeId)) {
+                        $this->arrCachedUsers[$objUser->fields['id']]['profile'][$profileAttributeId][0] = $this->arrLoadedUsers[$objUser->fields['id']]['profile'][$profileAttributeId][0] = $value;
+                    } else {
+                        $this->arrCachedUsers[$objUser->fields['id']][$attributeId] = $this->arrLoadedUsers[$objUser->fields['id']][$attributeId] = $value;
                     }
                 }
+                $this->arrCachedUsers[$objUser->fields['id']]['networks'] = $this->arrLoadedUsers[$objUser->fields['id']]['networks'] = new \Cx\Lib\User\User_Networks($objUser->fields['id']);
+                $objUser->MoveNext();
             }
-
-            foreach ($arrSelectMetaExpressions as $expr) {
-                $getter = 'get'. ucfirst($arrExpressions[$expr]);
-                $value = $user->$getter();
-                $this->arrCachedUsers[$user->getId()][$expr] = $this->arrLoadedUsers[$user->getId()][$expr] = $value;
-            }
-
-            $this->arrCachedUsers[$user->getId()]['networks'] =
-            $this->arrLoadedUsers[$user->getId()]['networks'] =
-                new \Cx\Lib\User\User_Networks($user->getId());
+            isset($arrSelectCustomExpressions) ? $this->loadCustomAttributeProfileData($arrSelectCustomExpressions) : false;
+            $this->first();
+            return true;
         }
-        $this->first();
-        return true;
+        $this->clean();
+        return false;
     }
 
-    /**
-     * Parses conditions for search
-     *
-     * @todo: only attributesof type text, mail, uri, image and menu
-     * @todo: only attributes with read permission
-     * @param array|string $search What to search for
-     * @param \Doctrine\ORM\QueryBuilder $qb Query builder to apply search conditions to
-     */
-    protected function parseSearchConditions($search, $qb) {
-        $percent = '%';
-        // this condition is legacy code
-        if (!is_array($search) && strpos('%', $search) !== false) {
-            $percent = '';
-        }
-        if (!is_array($search)) {
-            $search = array($search);
-        }
-        $attributes = array('tblU.username');
-        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-        if ($cx->getMode() == \Cx\Core\Core\Controller\Cx::MODE_BACKEND) {
-            $attributes[] = 'tblU.email';
-        }
-        //all attributes with read permission of type "text", "mail", "uri",
-        //"image", "menu"
-        $attributes[] = 'tblA.value';
-        foreach ($attributes as $attribute) {
-            $i = 0;
-            foreach ($search as $term) {
-                $qb->orWhere(
-                    $qb->expr()->like($attribute, ':search' . $i)
-                );
-                $i++;
-            }
-        }
-        $i = 0;
-        foreach ($search as $term) {
-            $qb->setParameter('search' . $i, $percent . $term . $percent);
-            $i++;
-        }
-    }
-
-    /**
-     * Get the query builder by filter conditions
-     *
-     * @param array                       $conditions
-     * @param \Doctrine\ORM\QueryBuilder  $qb
-     * @param array $attributeList Key=>Value array with all attributes
-     */
-    protected function getAttrConditions($conditions, $qb, $attributeList)
-    {
-        $params = array();
-        $counter = 0;
-        $expr = array();
-
-        $attrNames = $this->getAttrNames($conditions, $attributeList);
-
-        foreach ($conditions as $key=>$condition) {
-            $expr = $this->getExpression($qb, $key, $condition, $params, $counter, $attrNames, $expr);
-        }
-
-        foreach ($expr as $ex) {
-            $qb->andWhere($ex);
-        }
-    }
-
-    /**
-     * Get array with needed expressions, parameters and the associated counter
-     *
-     * @param \Doctrine\ORM\QueryBuilder      $qb
-     * @param string                          $key
-     * @param int                             $value
-     * @param array                           $params
-     * @param int                             $counter
-     * @param array                           $attrNames
-     * @param array                           $arrExpr
-     * @param string                          $parentName
-     * @return array List of Doctrine expressions
-     */
-    protected function getExpression($qb, $key, $value, &$params, &$counter, $attrNames, &$arrExpr = array(), $parentName = '', &$joins = array())
-    {
-        $conditions = array(
-            'AND',
-            'OR',
-        );
-
-        $table = 'tblU';
-        $fieldName = $key;
-        if (!in_array($key, $attrNames) && !empty($parentName)) {
-            $fieldName = $parentName;
-        // if $key is an attribute key or name
-        } else if (in_array($key, $attrNames, true) || isset($attrNames[$key])) {
-            $attributeId = $key;
-            if (in_array($key, $attrNames)) {
-                $attributeId = array_search($key, $attrNames);
-            }
-            // join to table and get value over join
-            $fieldName = 'value';
-            $table = 'tblA';
-        }
-
-        $simpleExprs = array(
-            'LIKE' => 'like',
-            '>' => 'gt',
-            '<' => 'lt',
-            '!=' => 'neq',
-            '=' => 'eq',
-        );
-
-        if (in_array($key, $conditions)) {
-            foreach ($value as $andCondition) {
-                foreach ($andCondition as $andKey=>$andValue) {
-                    $expr = $this->getExpression($qb, $andKey, $andValue, $params, $counter, $attrNames, $arrExpr, '', $joins);
-                }
-
-                if ($key == 'AND') {
-                    $arrExpr = $qb->expr()->andX($expr['expr']);
-                } else {
-                    $arrExpr = $qb->expr()->orX($expr['expr']);
-                }
-
-            }
-        } else if (
-            is_array($value) &&
-            in_array(strtoupper(key($value)), array('OR', 'AND'))
-        ) {
-            foreach ($value as $andKey=>$andValue) {
-                $expr = $this->getExpression($qb, $andKey, $andValue, $params, $counter, $attrNames, $arrExpr, $fieldName, $joins);
-            }
-
-            if (count($expr['expr']) > 1) {
-                $arrExpr[] = $qb->expr()->andX($expr['expr']);
-            } else {
-                $arrExpr[] = $expr['expr'][0];
-            }
-        } else {
-            $exprMethod = 'eq';
-            if (isset($simpleExprs[$key])) {
-                $exprMethod = $simpleExprs[$key];
-            } else if (is_array($value)) {
-                $exprMethod = 'in';
-            } else if (strpos($value, '%')) {
-                $exprMethod = 'like';
-            }
-
-            $metadata = $qb->getEntityManager()->getClassMetadata(
-                'Cx\Core\User\Model\Entity\User'
-            );
-            $fieldName = $metadata->getFieldName($fieldName);
-            // TODO: This should be resolved using metadata:
-            if ($fieldName == 'group_id') {
-                $fieldName = 'group';
-            }
-            if (
-                isset($metadata->associationMappings[$fieldName]) &&
-                $metadata->associationMappings[$fieldName]['type'] ==
-                \Doctrine\ORM\Mapping\ClassMetadataInfo::MANY_TO_MANY
-            ) {
-                $arrExpr[] = ':filter' . $counter . ' MEMBER OF ' . 'tblU.' . $fieldName;
-            } else {
-                $arrExpr[] = $qb->expr()->$exprMethod(
-                    $table . '.' . $fieldName,
-                    ':filter' . $counter
-                );
-            }
-            $qb->setParameter('filter' . $counter, $value);
-            $counter++;
-        }
-
-        if (in_array($key, $attrNames, true)) {
-            $arrExpr = array( $qb->expr()->andX(
-                $arrExpr[0],
-                $qb->expr()->eq('attributeId', '?' . $counter)
-            ));
-            $params[$counter] = array_search($key, $attrNames);
-            $counter++;
-        }
-
-        return $arrExpr;
-    }
-
-    /**
-     * Get attribute names
-     *
-     * @param array $filters
-     * @param array $attributeList
-     *
-     * @return array
-     */
-    protected function getAttrNames($filters, $attributeList)
-    {
-        $attrNames = array();
-
-        foreach($filters as $key=>$value) {
-            // if key is an attribute name
-            if (in_array($key, $attributeList)) {
-                $attrNames[array_search($key, $attributeList)] = $key;
-            // if key is an attribute ID
-            } else if (isset($attributeList[$key])) {
-                $attrNames[$key] = $attributeList[$key];
-            // if value is an array -> recurse
-            } else if (is_array($value)) {
-                $attrNames = $this->getAttrNames($value, $attributeList);
-            }
-        }
-
-        return $attrNames;
-    }
 
     public function __clone()
     {
         $this->clean();
+    }
+
+
+    /**
+     * Parse and translate an array of filter rules into SQL statements to be
+     * used for filtering users.
+     *
+     * @param   array   $filter A nested array defining filter rules
+     * @param   boolean $tblCustomAttributes  Will be set to TRUE if the supplied
+     *                                      filter arguments $filter will need
+     *                                      a join to the attribute-table
+     * @param   boolean $tblGroup   Will be set to TRUE if the supplied filter
+     *                              arguments $filter will need a join to the
+     *                              user-group-table
+     * @param   array   $customAttributeJoins   Will be filled with SQL JOIN
+     *                                          statements to be used for
+     *                                          filtering the custom attributes
+     * @param   boolean $groupTables Will be set to TRUE if the SQL statement
+     *                               should be grouped (GROUP BY)
+     * @param   boolean $uniqueJoins Whether the filter arguments shall be
+     *                               joined by separate unique JOINs or by
+     *                               a single common JOIN statement.
+     * @param   integer $joinIdx     The current index used for separate
+     *                               unique JOINs.
+     * @return  array   List of SQL statements to be used as WHERE arguments
+     */
+    protected function parseFilterConditions($filter, &$tblCustomAttributes, &$tblGroup, &$customAttributeJoins, &$groupTables, $uniqueJoins = true, &$joinIdx = 0)
+    {
+        $arrConditions = array();
+
+        // somehow the pointer on $filter is sometimes wrong
+        // therefore we need to reset it
+        reset($filter);
+
+        // check if $filter is constructed by an OR or AND condition
+        if (count($filter) == 1 && in_array(strtoupper(key($filter)), array('OR', 'AND'))) {
+            // first key of $filter defines the join method (either OR or AND)
+            $joinMethod = strtoupper(key($filter));
+
+            // arguments that shall be joined by $joinMethod
+            $filterArguments = current($filter);
+
+            // generate new join to custom attribute table
+            if ($uniqueJoins) {
+                $joinIdx++;
+            }
+
+            // parse filter arguments (generate SQL statements)
+            foreach ($filterArguments as $argument) {
+                $filterConditions = $this->parseFilterConditions(
+                    $argument,
+                    $tblCustomAttributes,
+                    $tblGroup,
+                    $customAttributeJoins,
+                    $groupTables,
+                    $joinMethod == 'AND',
+                    $joinIdx
+                );
+
+                // don't add empty arguments to SQL query (through $arrConditions)
+                if (!$filterConditions) {
+                    continue;
+                }
+                $arrConditions[] = implode(' AND ', $filterConditions);
+            }
+
+            // join generated SQL statements by $joinMethod 
+            return array('(' . implode(' ) ' . $joinMethod . ' ( ', $arrConditions) . ')');
+        }
+
+        // proceed with below code as listed key-value pairs in $filter are
+        // simple attribute filters to be joind by AND
+
+        // filter by user attributes (if set)
+        if (count($arrAccountConditions = $this->parseAccountFilterConditions($filter))) {
+            $arrConditions[] = implode(' AND ', $arrAccountConditions);
+        }
+        if (count($arrCoreAttributeConditions = $this->parseCoreAttributeFilterConditions($filter, $uniqueJoins, $joinIdx))) {
+            $tblCustomAttributes = true;
+        }
+        $arrCustomAttributeConditions = $this->parseCustomAttributeFilterConditions(
+            $filter,
+            null,
+            $uniqueJoins,
+            $joinIdx
+        );
+        $arrConditionsMerged = array_merge(
+            $arrCustomAttributeConditions, $arrCoreAttributeConditions
+        );
+        if (count($arrConditionsMerged)) {
+            $groupTables = true;
+            $arrConditions[] = implode(' AND ', $arrConditionsMerged);
+            foreach (array_keys($arrConditionsMerged) as $customAttributeTable) {
+                $customAttributeJoins[] = ' INNER JOIN `'.DBPREFIX.'access_user_attribute_value` AS ' . $customAttributeTable . ' ON ' . $customAttributeTable . '.`user_id` = tblU.`id` ';
+            }
+
+            // drop redundant joins
+            $customAttributeJoins = array_unique($customAttributeJoins);
+        }
+
+        // filter by user group membership (if set)
+        if (in_array('group_id', array_keys($filter)) && !empty($filter['group_id'])) {
+            $arrGroupConditions = array();
+            if ($filter['group_id'] == 'groupless') {
+                $arrGroupConditions[] = 'tblG.`group_id` IS NULL';
+            } else if (is_array($filter['group_id'])) {
+                foreach ($filter['group_id'] as $groupId) {
+                    $arrGroupConditions[] = 'tblG.`group_id` = '.intval($groupId);
+                }
+                $groupTables = true;
+            } else {
+                $arrGroupConditions[] = 'tblG.`group_id` = '.intval($filter['group_id']);
+            }
+            $arrConditions[] = '('.implode(' OR ', $arrGroupConditions).')';
+
+            if (!FWUser::getFWUserObject()->isBackendMode()) {
+                $arrConditions[] = "tblGF.`is_active` = 1 AND tblGF.`type` = 'frontend'";
+            }
+
+            $tblGroup = true;
+        }
+
+        return $arrConditions;
+    }
+
+
+    /*private function parseSearchConditions($search)
+    {
+        $arrConditions = array();
+
+        if (count($arrAccountConditions = $this->parseAccountSearchConditions($search))) {
+            $arrConditions[] = implode(' OR ', $arrAccountConditions);
+        }
+        if (count($arrCoreAttributeConditions = $this->parseAttributeSearchConditions($search, true))) {
+            $arrConditions[] = implode(' OR ', $arrCoreAttributeConditions);
+        }
+        if (count($arrCustomAttributeConditions = $this->parseAttributeSearchConditions($search, false))) {
+            $arrConditions[] = implode(' OR ', $arrCustomAttributeConditions);
+        }
+
+        return $arrConditions;
+    }*/
+
+
+    /**
+     * Creates the SQL query snippet to match username (and e-mail in the
+     * backend) fields against the search term(s)
+     *
+     * Matches single (scalar) or multiple (array) search terms against a
+     * number of fields.  Generally, the term(s) are enclosed in percent
+     * signs ("%term%"), so any fields that contain them will match.
+     * However, if the search parameter is a string and does contain a percent
+     * sign already, none will be added to the query.
+     * This allows searches using custom patterns, like "fields beginning
+     * with "a" ("a%").
+     * (You might even want to extend this to work with arrays, too.
+     * Currently, only the shop module uses this feature.) -- RK 20100910
+     * @param   mixed     $search   The term or array of terms
+     * @return  array               The array of SQL snippets
+     */
+    private function parseAccountSearchConditions($search)
+    {
+        $FWUser = FWUser::getFWUserObject();
+        $arrConditions = array();
+        $arrAttribute = array('username');
+        if ($FWUser->isBackendMode()) {
+            $arrAttribute[] = 'email';
+        }
+        $percent = '%';
+        if (!is_array($search) && strpos('%', $search) !== false)
+            $percent = '';
+        foreach ($arrAttribute as $attribute) {
+            $arrConditions[] =
+                "(tblU.`".$attribute."` LIKE '$percent".
+                (is_array($search)
+                  ? implode("$percent' OR tblU.`".$attribute."` LIKE '$percent", array_map('addslashes', $search))
+                  : addslashes($search))."$percent')";
+        }
+        return $arrConditions;
+    }
+
+
+    private function setSortedUserIdList(
+        $arrSort, $sqlCondition=array(), $limit=null, $offset=null, $groupless=false, $crmUser=false
+    ) {
+        global $objDatabase;
+
+        $arrCustomJoins = array();
+        $arrCustomSelection = array();
+        $joinCustomTbl = false;
+        $joinGroupTbl = false;
+        $arrUserIds = array();
+        $arrSortExpressions = array();
+        $groupTables = false;
+        $nr = 0;
+        if (!empty($sqlCondition)) {
+            if (isset($sqlCondition['tables'])) {
+                if (in_array('custom', $sqlCondition['tables'])) {
+                    $joinCustomTbl = true;
+                }
+                if (in_array('group', $sqlCondition['tables'])) {
+                    $joinGroupTbl = true;
+                }
+            }
+            if (isset($sqlCondition['conditions']) && count($sqlCondition['conditions'])) {
+                $arrCustomSelection = $sqlCondition['conditions'];
+            }
+            if (!empty($sqlCondition['group_tables'])) {
+                $groupTables = true;
+            }
+            if (isset($sqlCondition['joins']) ) {
+                $arrCustomJoins = $sqlCondition['joins'];
+            }
+        }
+        if (is_array($arrSort)) {
+            foreach ($arrSort as $attribute => $direction) {
+                if (in_array(strtolower($direction), array('asc', 'desc'))) {
+                    if (isset($this->arrAttributes[$attribute])) {
+                        $arrSortExpressions[] = 'tblU.`'.$attribute.'` '.$direction;
+                    } else if ($this->objAttribute->load($attribute)) {
+                        if ($this->objAttribute->isCoreAttribute($attribute)) {
+                            $attribute = $this->objAttribute->getAttributeIdByProfileAttributeId($attribute);
+                        }
+                        $arrSortExpressions[] = 'tblA'.$nr.'.`value` '.$direction;
+                        $arrCustomJoins[] = 'INNER JOIN `'.DBPREFIX.'access_user_attribute_value` AS tblA'.$nr.' ON tblA'.$nr.'.`user_id` = tblU.`id`';
+                        $arrCustomSelection[] = 'tblA'.$nr.'.`attribute_id` = '.$attribute;
+                        ++$nr;
+                    }
+                } elseif ($attribute == 'special') {
+                    $arrSortExpressions[] = $direction;
+                }
+            }
+        }
+        if (!is_array($arrSort) || !array_key_exists('id', $arrSort)) {
+            $arrSortExpressions[] = 'tblU.`id` ASC';
+        }
+        if ($crmUser == true) {
+            $arrCustomJoins[] = 'INNER JOIN `'.DBPREFIX.'module_crm_contacts` AS tblCrm ON tblCrm.`user_account` = tblU.`id`';
+        }
+        $query = '
+            SELECT SQL_CALC_FOUND_ROWS DISTINCT tblU.`id`
+              FROM `'.DBPREFIX.'access_users` AS tblU'.
+            ($joinCustomTbl ? ' INNER JOIN `'.DBPREFIX.'access_user_attribute_value` AS tblA ON tblA.`user_id`=tblU.`id`' : '').
+            ($joinGroupTbl
+                ? ($groupless
+                    ? ' LEFT JOIN `'.DBPREFIX.'access_rel_user_group` AS tblG ON tblG.`user_id`=tblU.`id`'
+                    : ' INNER JOIN `'.DBPREFIX.'access_rel_user_group` AS tblG ON tblG.`user_id`=tblU.`id`')
+                : ''
+            ).
+            ($joinGroupTbl && !FWUser::getFWUserObject()->isBackendMode() ? ' INNER JOIN `'.DBPREFIX.'access_user_groups` AS tblGF ON tblGF.`group_id`=tblG.`group_id`' : '').
+            (count($arrCustomJoins) ? ' '.implode(' ',$arrCustomJoins) : '').
+            (count($arrCustomSelection) ? ' WHERE ('.implode(') AND (', $arrCustomSelection).')' : '').
+            (count($arrSortExpressions) ? ' ORDER BY '.implode(', ', $arrSortExpressions) : '');
+        $objUserId = false;
+        if (empty($limit)) {
+            $objUserId = $objDatabase->Execute($query);
+            $this->filtered_search_count = ($objUserId === false ? 0 : $objUserId->RecordCount());
+        } else {
+            $objUserId = $objDatabase->SelectLimit($query, $limit, intval($offset));
+            $objUserCount = $objDatabase->Execute('SELECT FOUND_ROWS()');
+            $this->filtered_search_count = $objUserCount->fields['FOUND_ROWS()'];
+        }
+        if ($objUserId !== false) {
+            while (!$objUserId->EOF) {
+                $arrUserIds[$objUserId->fields['id']] = array();
+                $objUserId->MoveNext();
+            }
+        }
+        $this->arrLoadedUsers = $arrUserIds;
+        return array(
+            'tables' => array(
+                'custom'    => $joinCustomTbl,
+                'group'     => $joinGroupTbl
+            ),
+            'joins'         => $arrCustomJoins,
+            'conditions'    => $arrCustomSelection,
+            'sort'          => $arrSortExpressions,
+            'group_tables'  => $groupTables,
+        );
+        /*$arrNotSortedUserIds = array_diff(array_keys($this->arrLoadedUsers), $arrUserIds);
+        foreach ($arrNotSortedUserIds as $userId) {
+            $arrUserIds[$userId] = '';
+        }*/
     }
 
     public function generateAuthToken() {
@@ -2213,6 +2177,7 @@ class User extends User_Profile
                 `expiration`,
                 `validity`,
                 `last_auth`,
+                `last_auth_status`,
                 `last_activity`,
                 `active`,
                 `verified`,
@@ -2234,6 +2199,7 @@ class User extends User_Profile
                 ".intval($this->expiration).",
                 ".intval($this->validity).",
                 ".$this->last_auth.",
+                ".$this->last_auth_status.",
                 ".$this->last_activity.",
                 ".intval($this->is_active).",
                 ".intval($this->verified).",
@@ -2318,6 +2284,7 @@ class User extends User_Profile
         $arrCurrentGroups = $this->loadGroups();
         $arrAddedGroups = array_diff($this->getAssociatedGroupIds(), $arrCurrentGroups);
         $arrRemovedGroups = array_diff($arrCurrentGroups, $this->getAssociatedGroupIds());
+        $groupAssociationChange = false;
         foreach ($arrRemovedGroups as $groupId) {
             if (!$objDatabase->Execute('
                 DELETE FROM `'.DBPREFIX.'access_rel_user_group`
@@ -2326,7 +2293,7 @@ class User extends User_Profile
                 $status = false;
             } elseif ($objDatabase->Affected_Rows()) {
                 // track flushed db change
-                $associationChange = true;
+                $groupAssociationChange = true;
             }
         }
         foreach ($arrAddedGroups as $groupId) {
@@ -2339,8 +2306,17 @@ class User extends User_Profile
                 $status = false;
             } elseif ($objDatabase->Affected_Rows()) {
                 // track flushed db change
-                $associationChange = true;
+                $groupAssociationChange = true;
             }
+        }
+        if ($groupAssociationChange) {
+            $associationChange = true;
+
+            // flush all user based cache to ensure new permissions are enforced
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $cache = $cx->getComponent('Cache');
+            $cache->clearUserBasedPageCache();
+            $cache->clearUserBasedEsiCache();
         }
         return $status;
     }
@@ -2429,9 +2405,8 @@ class User extends User_Profile
         }
         if ($userActivationTimeoutStatus) {
             $objDatabase->Execute('
-                DELETE tblU, tblP, tblG, tblA, tblN
+                DELETE tblU, tblG, tblA, tblN
                   FROM `'.DBPREFIX.'access_users` AS tblU
-                 INNER JOIN `'.DBPREFIX.'access_user_profile` AS tblP ON tblP.`user_id`=tblU.`id`
                   LEFT JOIN `'.DBPREFIX.'access_rel_user_group` AS tblG ON tblG.`user_id`=tblU.`id`
                   LEFT JOIN `'.DBPREFIX.'access_user_attribute_value` AS tblA ON tblA.`user_id`=tblU.`id`
                   LEFT JOIN `'.DBPREFIX.'access_user_network` AS tblN ON tblN.`user_id`=tblU.`id`
@@ -2441,9 +2416,8 @@ class User extends User_Profile
         }
         // remove outdated social login users
         $objDatabase->Execute('
-            DELETE tblU, tblP, tblG, tblA, tblN
+            DELETE tblU, tblG, tblA, tblN
               FROM `'.DBPREFIX.'access_users` AS tblU
-             INNER JOIN `'.DBPREFIX.'access_user_profile` AS tblP ON tblP.`user_id`=tblU.`id`
              INNER JOIN `'.DBPREFIX.'access_user_network` AS tblN ON tblN.`user_id`=tblU.`id`
               LEFT JOIN `'.DBPREFIX.'access_rel_user_group` AS tblG ON tblG.`user_id`=tblU.`id`
               LEFT JOIN `'.DBPREFIX.'access_user_attribute_value` AS tblA ON tblA.`user_id`=tblU.`id`
@@ -2719,7 +2693,7 @@ class User extends User_Profile
         return $objDatabase->Execute('
             UPDATE `' . DBPREFIX . 'access_users`
                SET `last_auth_status` = 0
-             WHERE `' . $column . '` = "' . $username . '"
+             WHERE `' . $column . '` = "' . contrexx_raw2db($username) . '"
         ');
     }
 
@@ -2735,6 +2709,7 @@ class User extends User_Profile
     public function setUsername($username)
     {
         $this->username = $username;
+        $this->updateLoadedUserData('username', $this->username);
     }
 
 
@@ -2755,6 +2730,9 @@ class User extends User_Profile
             $this->validity = $validity;
             $this->setExpirationDate(($validitySeconds = $validity*60*60*24) ? mktime(23, 59, 59, date('m', time() + $validitySeconds), date('d', time() + $validitySeconds), date('Y', time() + $validitySeconds)) : 0);
         }
+
+        $this->updateLoadedUserData('validity', $this->validity);
+
         return true;
     }
 
@@ -2762,6 +2740,7 @@ class User extends User_Profile
     public function setExpirationDate($expiration)
     {
         $this->expiration = $expiration;
+        $this->updateLoadedUserData('expiration', $this->expiration);
     }
 
 
@@ -2784,6 +2763,8 @@ class User extends User_Profile
         }
         // END: WORKAROUND FOR ACCOUNTS SOLD IN THE SHOP
         $this->email = $email;
+
+        $this->updateLoadedUserData('email', $this->email);
     }
 
 
@@ -2819,6 +2800,7 @@ class User extends User_Profile
                 return false;
             }
             $this->password = $this->hashPassword($password);
+            $this->updateLoadedUserData('password', $this->password);
             return true;
         }
         if (isset($_CONFIG['passwordComplexity']) && $_CONFIG['passwordComplexity'] == 'on') {
@@ -2836,6 +2818,7 @@ class User extends User_Profile
      */
     public function setHashedPassword($hashedPassword) {
         $this->password = $hashedPassword;
+        $this->updateLoadedUserData('password', $this->password);
     }
 
     /**
@@ -2862,6 +2845,7 @@ class User extends User_Profile
     {
         $this->frontend_language = intval($langId);
         $this->validateLanguageId('frontend');
+        $this->updateLoadedUserData('frontend_lang_id', $this->frontend_language);
     }
 
 
@@ -2876,6 +2860,7 @@ class User extends User_Profile
     {
         $this->backend_language = intval($langId);
         $this->validateLanguageId('backend');
+        $this->updateLoadedUserData('backend_lang_id', $this->backend_language);
     }
 
 
@@ -2890,6 +2875,7 @@ class User extends User_Profile
     public function setActiveStatus($status)
     {
         $this->is_active = (bool)$status;
+        $this->updateLoadedUserData('active', $this->is_active);
     }
 
     /**
@@ -2902,6 +2888,7 @@ class User extends User_Profile
      */
     public function setVerification($verified) {
         $this->verified = $verified;
+        $this->updateLoadedUserData('verified', $this->verified);
         return true;
     }
 
@@ -2923,6 +2910,8 @@ class User extends User_Profile
         } else {
             $this->primary_group = 0;
         }
+
+        $this->updateLoadedUserData('primary_group', $this->primary_group);
     }
 
 
@@ -2943,6 +2932,7 @@ class User extends User_Profile
 
         if ($status || !$this->isLastAdmin() || $force) {
             $this->is_admin = (bool)$status;
+            $this->updateLoadedUserData('is_admin', $this->is_admin);
             return true;
         }
         $this->error_msg[] = sprintf($_CORELANG['TXT_ACCESS_CHANGE_PERM_LAST_ADMIN_USER'], $this->getUsername());
@@ -2986,6 +2976,7 @@ class User extends User_Profile
     {
         $this->email_access = in_array($emailAccess, array_keys($this->arrPrivacyAccessTypes))
             ? $emailAccess : $this->defaultEmailAccessType;
+        $this->updateLoadedUserData('email_access', $this->email_access);
     }
 
 
@@ -2993,6 +2984,7 @@ class User extends User_Profile
     {
         $this->profile_access = in_array($profileAccess, array_keys($this->arrPrivacyAccessTypes))
             ? $profileAccess : $this->defaultProfileAccessTyp;
+        $this->updateLoadedUserData('profile_access', $this->profile_access);
     }
 
 
@@ -3202,6 +3194,34 @@ class User extends User_Profile
     }
 
     /**
+     * Update a specific profile attribute of the user
+     *
+     * @param   string  $attribute  ID of profile attribute to update
+     * @param   string|integer|boolean  $value  Value to set the profile
+     *                                          attribute to
+     */
+    protected function updateLoadedUserData($attribute, $value) {
+        if (!$this->id) {
+            return;
+        }
+
+        if (!isset($this->arrLoadedUsers[$this->id])) {
+            return;
+        }
+
+        $this->arrLoadedUsers[$this->id][$attribute] = $value;
+    }
+
+    /**
+     * Get object data as array
+     *
+     * @param    array   Return data of user object as array
+     */
+    public function toArray() {
+        return $this->arrLoadedUsers[$this->id];
+    }
+
+    /**
      * Tries to form a valid and unique username from the words given
      *
      * Usually, you would use first and last names as parameters.
@@ -3364,5 +3384,14 @@ class User extends User_Profile
         }
 
         throw new UserException('Failed to generate a new password hash');
+    }
+
+    /**
+     * Clears the cache
+     *
+     * Only use this when loading lots of users (export)!
+     */
+    public function clearCache() {
+        $this->arrCachedUsers = array();
     }
 }

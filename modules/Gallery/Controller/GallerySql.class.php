@@ -161,16 +161,15 @@ class GallerySql
      */
     public function getAllGroups($groupType="frontend")
     {
-        global $objDatabase;
+        $objGroup = \FWUser::getFWUserObject()->objGroup->getGroups($filter = array('type' => $groupType));
 
         $arrGroups=array();
-        $objResult = $objDatabase->Execute("SELECT group_id, group_name FROM ".DBPREFIX."access_user_groups WHERE type='".$groupType."'");
-        if ($objResult !== false) {
-            while (!$objResult->EOF) {
-                $arrGroups[$objResult->fields['group_id']]=$objResult->fields['group_name'];
-                $objResult->MoveNext();
-            }
+
+        while (!$objGroup->EOF) {
+            $arrGroups[intval($objGroup->getId())] = $objGroup->getName();
+            $objGroup->next();
         }
+
         return $arrGroups;
     }
 

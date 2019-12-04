@@ -1278,19 +1278,13 @@ class DirectoryLibrary
 
     function getAuthor($id)
     {
-        global $objDatabase, $_ARRAYLANG;
+        $objFWUser = \FWUser::getFWUserObject();
 
         $userId = contrexx_addslashes($id);
-        $author = '';
 
-        if (is_numeric($userId)) {
-            $objResultauthor = $objDatabase->Execute("SELECT id, username FROM ".DBPREFIX."access_users WHERE id = '".$userId."'");
-            if ($objResultauthor !== false) {
-                while (!$objResultauthor->EOF) {
-                    $author = $objResultauthor->fields['username'];
-                    $objResultauthor->MoveNext();
-                }
-            }
+        $objUser = $objFWUser->objUser->getUser(intval($userId));
+        if ($objUser !== false) {
+            $author = $objUser->getRealUsername();
         } else {
             $author = $userId;
         }
@@ -1301,14 +1295,11 @@ class DirectoryLibrary
 
     function getAuthorID($author)
     {
-        global $objDatabase, $_ARRAYLANG;
+        $objFWUser = \FWUser::getFWUserObject();
 
-        $objResultauthor = $objDatabase->Execute("SELECT id, username FROM ".DBPREFIX."access_users WHERE username = '".contrexx_addslashes($author)."'");
-        if ($objResultauthor !== false) {
-            while (!$objResultauthor->EOF) {
-                $author = $objResultauthor->fields['id'];
-                $objResultauthor->MoveNext();
-            }
+        $objUser = $objFWUser->objUser->getUsers(array('username' => $author));
+        if ($objUser !== false) {
+            $author = $objUser->getId();
         }
 
         return $author;

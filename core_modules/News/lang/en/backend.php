@@ -518,3 +518,4 @@ $_ARRAYLANG['TXT_NEWS_RELATED_NEWS_IMAGE_THUMB_LINK_DESCRITION'] = "Related arti
 $_ARRAYLANG['TXT_NEWS_RELATED_NEWS_IMAGE_THUMB_SRC_DESCRITION'] = "Related article teaser thumbnail image source";
 $_ARRAYLANG['TXT_NEWS_SETTINGS_LOGIN_REDIRECT'] = 'Redirect to login when requesting protected news';
 $_ARRAYLANG['TXT_NEWS_SETTINGS_LOGIN_REDIRECT_HELP'] = 'If this option is active, requesting a protected news article redirects to login page. Otherwise the user will be redirected to the overview of all news.';
+$_ARRAYLANG['TXT_NEWS_SWITCH_VISIBILITY'] = 'Click to switch visibility state';

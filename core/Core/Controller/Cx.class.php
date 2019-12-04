@@ -2351,7 +2351,6 @@ JSCODE;
                     'CX_VERSION'       => $_CONFIG['coreCmsVersion'],
                     'CX_CODE_NAME'     => $_CONFIG['coreCmsCodeName'],
                     'CX_STATUS'        => $_CONFIG['coreCmsStatus'],
-                    'CX_RELEASE_DATE'  => date(ASCMS_DATE_FORMAT_DATE, $_CONFIG['coreCmsReleaseDate']),
                     'CX_NAME'          => $_CONFIG['coreCmsName'],
                 ));
 

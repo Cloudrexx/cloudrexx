@@ -189,6 +189,7 @@ namespace Cx\Core\Model {
                     // We will have to manually do it by executing the SET NAMES query when connection to the database.
                     \PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES '.$dbCharSet,
                     \PDO::MYSQL_ATTR_INIT_COMMAND => 'SET time_zone = \'' . $offsetString . '\'',
+                    \PDO::MYSQL_ATTR_MULTI_STATEMENTS => false,
                 )
             );
             $this->pdo->setAttribute(\PDO::ATTR_STATEMENT_CLASS, array('Doctrine\DBAL\Driver\PDOStatement', array()));
@@ -201,7 +202,19 @@ namespace Cx\Core\Model {
             $sqlModes = array_filter(
                 $sqlModes,
                 function($e) {
-                    if (in_array(trim($e), array('ONLY_FULL_GROUP_BY', 'STRICT_TRANS_TABLES'))) {
+                    if (
+                        in_array(
+                            trim($e),
+                            array(
+                                'ONLY_FULL_GROUP_BY',
+                                'STRICT_TRANS_TABLES',
+                                'STRICT_ALL_TABLES',
+                                'TRADITIONAL',
+                                'NO_ZERO_DATE',
+                                'NO_ZERO_IN_DATE',
+                            )
+                        )
+                    ) {
                         return false;
                     }
                     return true;

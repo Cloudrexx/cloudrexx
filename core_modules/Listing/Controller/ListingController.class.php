@@ -357,7 +357,7 @@ class ListingController {
         } else {
             $qb = $em->createQueryBuilder();
             $metaData = $em->getClassMetadata($this->entityClass);
-            $qb->select('x')->from($this->entityClass, 'x');
+            $qb->select('DISTINCT x')->from($this->entityClass, 'x');
             // filtering: advanced search
             if ($this->filtering) {
                 if (
@@ -468,7 +468,7 @@ class ListingController {
             $identifierFieldNames = $metaData->getIdentifierFieldNames();
             $identifierFieldNames = reset($identifierFieldNames);
             $qb->select(
-                'count(x.' . $identifierFieldNames . ')'
+                'count(DISTINCT x.' . $identifierFieldNames . ')'
             );
             $qb->setFirstResult(null);
             $qb->setMaxResults(null);

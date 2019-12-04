@@ -579,7 +579,6 @@ class Forum extends ForumLibrary {
             $userId = $objFWUser->objUser->login() ? $objFWUser->objUser->getId() : 0;
             $icon = !empty($_REQUEST['icons']) ? intval($_REQUEST['icons']) : 1;
 
-
             $insertQuery = 'INSERT INTO '.DBPREFIX.'module_forum_postings (
                             id,         category_id,         thread_id,             prev_post_id,
                             user_id,     time_created,         time_edited,         is_locked,
@@ -1337,27 +1336,27 @@ class Forum extends ForumLibrary {
         }
 
         //fetch thread subscribers
-        $query = '    SELECT `users`.`username`, `users`.`email`, `users`.`id`
-                    FROM `'.DBPREFIX.'access_users` AS `users`
-                    INNER JOIN `'.DBPREFIX.'module_forum_notification` AS `notification` ON `users`.`id` = `notification`.`user_id`
+        $query = '    SELECT `notification`.`user_id`
+                    FROM `'.DBPREFIX.'module_forum_notification` AS `notification`
                     WHERE `notification`.`thread_id` = '.$intThreadId.'
                     AND `notification`.`category_id` = 0';
         if(($objRS = $objDatabase->Execute($query)) !== false){
             while(!$objRS->EOF){
-                $arrTempSubcribers[] = $objRS->fields;
+                $objUser = \FWUser::getFWUserObject()->objUser->getUser($id = $objRS->fields['user_id']);
+                $arrTempSubcribers[] = array("username" => $objUser->getRealUsername(), "email" => $objUser->getEmail(), "id" => $objUser->getId());
                 $objRS->MoveNext();
             }
         }
 
         //fetch category subscribers
-        $query = '    SELECT `users`.`username`, `users`.`email`, `users`.`id`
-                    FROM `'.DBPREFIX.'access_users` AS `users`
-                    INNER JOIN `'.DBPREFIX.'module_forum_notification` AS `notification` ON `users`.`id` = `notification`.`user_id`
+        $query = '    SELECT `notification`.`user_id`
+                    FROM `'.DBPREFIX.'module_forum_notification` AS `notification`
                     WHERE `notification`.`category_id` = '.$intCategoryId.'
                     AND `notification`.`thread_id` = 0';
         if(($objRS = $objDatabase->Execute($query)) !== false){
             while(!$objRS->EOF){
-                $arrTempSubcribers[] = $objRS->fields;
+                $objUser = \FWUser::getFWUserObject()->objUser->getUser($id = $objRS->fields['user_id']);
+                $arrTempSubcribers[] = array("username" => $objUser->getRealUsername(), "email" => $objUser->getEmail(), "id" => $objUser->getId());
                 $objRS->MoveNext();
             }
         }

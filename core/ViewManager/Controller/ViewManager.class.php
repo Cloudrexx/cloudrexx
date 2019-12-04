@@ -2429,21 +2429,34 @@ CODE;
             return false;
         }
 
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $componentFilePath = '';
+        $isCustomized = false;
+        $isWebsite = false;
+
         $offset = 'Template/Frontend';
         if (substr($path, -3, 3) == 'css') {
             $offset = 'Style';
         }
+
         //get the Core Modules File path
         if (preg_match('#^\/'. \Cx\Core\Core\Model\Entity\SystemComponent::TYPE_CORE_MODULE .'#i', $path)) {
-            return \Env::get('cx')->getCoreModuleFolderName() .'/'.$moduleName . ($loadFromComponentDir ? '/View' : '') .'/'.$offset.'/' . $fileName;
-        }
+            $componentFilePath = \Env::get('cx')->getCoreModuleFolderName() .'/'.$moduleName . ($loadFromComponentDir ? '/View' : '') .'/'.$offset.'/' . $fileName;
 
         //get the Modules File path
-        if (preg_match('#^\/'. \Cx\Core\Core\Model\Entity\SystemComponent::TYPE_MODULE .'#i', $path)) {
-            return \Env::get('cx')->getModuleFolderName() .'/'. $moduleName . ($loadFromComponentDir ? '/View' : '') .'/'.$offset.'/' . $fileName;
+        } elseif (preg_match('#^\/'. \Cx\Core\Core\Model\Entity\SystemComponent::TYPE_MODULE .'#i', $path)) {
+            $componentFilePath = \Env::get('cx')->getModuleFolderName() .'/'. $moduleName . ($loadFromComponentDir ? '/View' : '') .'/'.$offset.'/' . $fileName;
+        } else {
+            return false;
         }
 
-        return false;
+        // check for customized version
+        $customizedComponentFilePath = $cx->getClassLoader()->getFilePath($componentFilePath, $isCustomized, $isWebsite, true);
+        if ($customizedComponentFilePath) {
+            return $customizedComponentFilePath;
+        }
+
+        return $componentFilePath;
     }
 
     /**

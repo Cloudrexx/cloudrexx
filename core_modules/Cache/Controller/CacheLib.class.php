@@ -674,12 +674,24 @@ class CacheLib
             if ($engine != $opCacheEngine) {
                 switch ($engine) {
                     case self::CACHE_ENGINE_APC:
+                        // if APC is enabled in php.ini we
+                        // need to reset opcache first, otherwise we get
+                        // "mixed" results!
+                        $this->clearApc();
                         ini_set('apc.cache_by_default', 0);
                         break;
                     case self::CACHE_ENGINE_ZEND_OPCACHE:
+                        // if opcache.enable is not set to '0' in php.ini we
+                        // need to reset opcache first, otherwise we get
+                        // "mixed" results!
+                        $this->clearZendOpCache();
                         ini_set('opcache.enable', 0);
                         break;
                     case self::CACHE_ENGINE_XCACHE:
+                        // if XCache is enabled in php.ini we
+                        // need to reset opcache first, otherwise we get
+                        // "mixed" results!
+                        $this->clearXcache();
                         ini_set('xcache.cacher', 0);
                         break;
                 }
@@ -1638,18 +1650,19 @@ class CacheLib
     }
 
     /**
-     * Clear user based page cache of a specific user identified by its
-     * session ID.
+     * Clear user based page cache
+     *
+     * If argument $sessionId is set, then only the cache of the user
+     * (identified by sessionid $sessionId) will be flushed.
+     * Otherwise (if $sessionId is not set), the complete user based cache
+     * is flushed.
      *
      * @param   string  $sessionId  The session ID of the user of whom
      *                              to clear the page cache from.
+     *                              If not set, then all used based cach
+     *                              is flusehd.
      */
-    public function clearUserBasedPageCache($sessionId) {
-        // abort if no valid session id is supplied
-        if (empty($sessionId)) {
-            return;
-        }
-
+    public function clearUserBasedPageCache($sessionId = '') {
         // fetch complete page cache of specific user
         $files = glob(
             $this->strCachePath .
@@ -1669,18 +1682,19 @@ class CacheLib
     }
 
     /**
-     * Clear user based ESI cache of a specific user identified by its
-     * session ID.
+     * Clear user based ESI cache
+     *
+     * If argument $sessionId is set, then only the cache of the user
+     * (identified by sessionid $sessionId) will be flushed.
+     * Otherwise (if $sessionId is not set), the complete user based cache
+     * is flushed.
      *
      * @param   string  $sessionId  The session ID of the user of whom
      *                              to clear the esi cache from.
+     *                              If not set, then all used based cach
+     *                              is flusehd.
      */
-    public function clearUserBasedEsiCache($sessionId) {
-        // abort if no valid session id is supplied
-        if (empty($sessionId)) {
-            return;
-        }
-
+    public function clearUserBasedEsiCache($sessionId = '') {
         // fetch complete esi cache of specific user
         $files = glob(
             $this->strCachePath . static::CACHE_DIRECTORY_OFFSET_ESI . '*_u' . $sessionId . '*'

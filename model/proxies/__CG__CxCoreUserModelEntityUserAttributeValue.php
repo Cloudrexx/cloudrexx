@@ -73,10 +73,10 @@ class UserAttributeValue extends \Cx\Core\User\Model\Entity\UserAttributeValue i
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'attributeId', 'attribute', 'userId', 'user', 'history', 'value', 'validators', 'virtual');
+            return array('__isInitialized__', 'attributeId', 'userId', 'history', 'value', 'user', 'userAttribute', 'validators', 'virtual');
         }
 
-        return array('__isInitialized__', 'attributeId', 'attribute', 'userId', 'user', 'history', 'value', 'validators', 'virtual');
+        return array('__isInitialized__', 'attributeId', 'userId', 'history', 'value', 'user', 'userAttribute', 'validators', 'virtual');
     }
 
     /**
@@ -185,23 +185,12 @@ class UserAttributeValue extends \Cx\Core\User\Model\Entity\UserAttributeValue i
     /**
      * {@inheritDoc}
      */
-    public function getAttribute()
+    public function setAttributeId($attributeId)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getAttribute', array());
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setAttributeId', array($attributeId));
 
-        return parent::getAttribute();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setAttribute($attribute)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setAttribute', array($attribute));
-
-        return parent::setAttribute($attribute);
+        return parent::setAttributeId($attributeId);
     }
 
     /**
@@ -222,34 +211,12 @@ class UserAttributeValue extends \Cx\Core\User\Model\Entity\UserAttributeValue i
     /**
      * {@inheritDoc}
      */
-    public function setAttributeId($attribute)
+    public function setUserId($userId)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setAttributeId', array($attribute));
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setUserId', array($userId));
 
-        return parent::setAttributeId($attribute);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getUser()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getUser', array());
-
-        return parent::getUser();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setUser($user)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setUser', array($user));
-
-        return parent::setUser($user);
+        return parent::setUserId($userId);
     }
 
     /**
@@ -270,12 +237,12 @@ class UserAttributeValue extends \Cx\Core\User\Model\Entity\UserAttributeValue i
     /**
      * {@inheritDoc}
      */
-    public function setUserId($user)
+    public function setHistory($history)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setUserId', array($user));
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setHistory', array($history));
 
-        return parent::setUserId($user);
+        return parent::setHistory($history);
     }
 
     /**
@@ -296,12 +263,12 @@ class UserAttributeValue extends \Cx\Core\User\Model\Entity\UserAttributeValue i
     /**
      * {@inheritDoc}
      */
-    public function setHistory($history)
+    public function setValue($value)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setHistory', array($history));
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setValue', array($value));
 
-        return parent::setHistory($history);
+        return parent::setValue($value);
     }
 
     /**
@@ -318,12 +285,45 @@ class UserAttributeValue extends \Cx\Core\User\Model\Entity\UserAttributeValue i
     /**
      * {@inheritDoc}
      */
-    public function setValue($value)
+    public function setUser(\Cx\Core\User\Model\Entity\User $user)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setValue', array($value));
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setUser', array($user));
 
-        return parent::setValue($value);
+        return parent::setUser($user);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getUser()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getUser', array());
+
+        return parent::getUser();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setUserAttribute(\Cx\Core\User\Model\Entity\UserAttribute $userAttribute)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setUserAttribute', array($userAttribute));
+
+        return parent::setUserAttribute($userAttribute);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getUserAttribute()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getUserAttribute', array());
+
+        return parent::getUserAttribute();
     }
 
     /**
@@ -357,6 +357,17 @@ class UserAttributeValue extends \Cx\Core\User\Model\Entity\UserAttributeValue i
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'isVirtual', array());
 
         return parent::isVirtual();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
     }
 
     /**
