@@ -908,6 +908,21 @@ namespace Cx\Core\Core\Controller {
         }
 
         /**
+         * Check whether or not the script runtime is running into a timeout
+         *
+         * @return  boolean TRUE if a script timeout is imminent, otherwise
+         *                  FALSE
+         */
+        public function isScriptTimeoutImminent() {
+            $runtime = $this->getRunTime();
+            $maxExecutionTime = \Cx\Core\Setting\Controller\Setting(
+                'maxExecutionTimeOverHttp',
+                'Config'
+            );
+            return $runtime > $maxExecutionTime;
+        }
+
+        /**
          * Load an optional configuration file and sets up the path configuration.
          *
          * Note: The default configuration.php is loaded in index.php in order to
