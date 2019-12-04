@@ -404,7 +404,6 @@ class U2u extends U2uLibrary
             $userEmail  = $this->_getEmail($objValue['buddies_id']);
             $userCity   = $this->_getCity($objValue['buddies_id']);
             $userSite   = $this->_getSite($objValue['buddies_id']);
-
             if($userSite['website']=="") {
                 $imgPath = "modules/U2u/View/Media/home_disabled.gif";
             } else {
