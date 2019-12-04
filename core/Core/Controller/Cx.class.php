@@ -888,11 +888,23 @@ namespace Cx\Core\Core\Controller {
 
         /**
          * Stops time measurement and returns page parsing time
+         * @deprecated   This method is deprecated in favor of
+         *               {@see Cx::getRunTime()}
+         * @todo    Migrate code to {@see Cx::getRunTime()}
          * @return int Time needed to parse page in seconds
          */
         public function stopTimer() {
             $finishTime = explode(' ', microtime());
             return round(((float)$finishTime[0] + (float)$finishTime[1]) - ((float)$this->startTime[0] + (float)$this->startTime[1]), 5);
+        }
+
+        /**
+         * Get elapsed time since the call to {@see Cx::startTimer}
+         * @return  int Elapsed time (in microseconds) since the timer has
+         *              been started
+         */
+        public function getRunTime() {
+            return $this->stopTimer();
         }
 
         /**
