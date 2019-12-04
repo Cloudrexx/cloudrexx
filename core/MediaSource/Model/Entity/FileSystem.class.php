@@ -182,11 +182,6 @@ abstract class FileSystem extends \Cx\Model\Base\EntityBase {
     public abstract function isFile(File $file);
 
     /**
-     * @todo Reverse engineer or remove, seems to be unused
-     */
-    public abstract function getLink(File $file);
-
-    /**
      * Creates a new directory
      *
      * @param string $path Path relative to this FS' root

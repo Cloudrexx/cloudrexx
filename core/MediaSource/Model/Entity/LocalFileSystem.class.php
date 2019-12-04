@@ -438,12 +438,6 @@ class LocalFileSystem extends FileSystem
         return is_file($this->rootPath . '/' . $file->__toString());
     }
 
-    public function getLink(
-        File $file
-    ) {
-        // TODO: Implement getLink() method.
-    }
-
     /**
      * @todo Sanitize $directory
      */
