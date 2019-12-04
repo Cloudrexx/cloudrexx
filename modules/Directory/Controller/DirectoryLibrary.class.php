@@ -1299,12 +1299,10 @@ class DirectoryLibrary
 
         $objUser = $objFWUser->objUser->getUsers(array('username' => $author));
         if ($objUser !== false) {
-            $authorId = $objUser->getId();
-        } else {
-            $authorId = '';
+            $author = $objUser->getId();
         }
 
-        return $authorId;
+        return $author;
     }
 
 
