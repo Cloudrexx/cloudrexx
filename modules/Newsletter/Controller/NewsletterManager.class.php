@@ -2993,10 +2993,26 @@ class NewsletterManager extends NewsletterLib
 
                     // attention: in case there happens a database error, $tmpSending->valid() will return false.
                     //            this will cause to stop the send process even if the newsletter send process wasn't complete yet!!
+                    $objUser = \FWUser::getFWUserObject()->objUser;
                     if ($tmpSending->valid()) {
                         foreach ($tmpSending as $send) {
                             $beforeSend = time();
-                            $this->SendEmail($send['id'], $mailId, $send['email'], 1, $send['type'], true);
+                            $id = $send['id'];
+                            if (
+                                empty($id) && (
+                                    $send ['type'] == static::USER_TYPE_ACCESS ||
+                                    $send ['type'] == static::USER_TYPE_CORE
+                                )
+                            ) {
+                                $accessUser = $objUser->getUsers(
+                                    array('email' => $send['email'])
+                                );
+                                if (!$accessUser) {
+                                    continue;
+                                }
+                                $id = $accessUser->getId();
+                            }
+                            $this->SendEmail($id, $mailId, $send['email'], 1, $send['type'], true);
 
                             // timeout prevention
                             if (time() >= $timeout - (time() - $beforeSend) * 2) {
@@ -3083,7 +3099,7 @@ class NewsletterManager extends NewsletterLib
                          ELSE (
                          	CASE WHEN `s`.`type` = '".self::USER_TYPE_CRM."'
                          	THEN `crm`.`contact_id`
-                         	ELSE `au`.`id`
+                         	ELSE 0
                         END)
                         END) AS `id`,
                     `s`.email,
@@ -3099,13 +3115,9 @@ class NewsletterManager extends NewsletterLib
 
         LEFT JOIN `".DBPREFIX."module_crm_customer_contact_emails` AS `crm`
                 ON `crm`.`email` = `s`.`email`
-               AND `s`.`type` = '".self::USER_TYPE_CRM."'
+               AND `s`.`type` = '".self::USER_TYPE_CRM." AND `nu`.`email` IS NOT NULL'
          LEFT JOIN `".DBPREFIX."module_crm_contacts` AS `contact`
-                ON `crm`.`contact_id` = `contact`.`id`
-
-         LEFT JOIN `".DBPREFIX."access_users` AS `au`
-                ON `au`.`email` = `s`.`email`
-               AND (`s`.`type` = '".self::USER_TYPE_ACCESS."' OR `s`.`type` = '".self::USER_TYPE_CORE."')".
+                ON `crm`.`contact_id` = `contact`.`id` AND `crm`.`email` IS NOT NULL".
          (
             $crmMembershipFilter['associate']
                 ? $this->getCrmMembershipConditions($crmMembershipFilter, true) . ' AND '
@@ -3113,12 +3125,7 @@ class NewsletterManager extends NewsletterLib
          ) . '
               
            `s`.`newsletter` = '.intval($id).'
-           AND `s`.`sendt` = 0
-           AND (
-            `au`.`email` IS NOT NULL 
-            OR `nu`.`email` IS NOT NULL
-            OR `crm`.`email` IS NOT NULL
-           )';
+           AND `s`.`sendt` = 0';
         $res = $objDatabase->SelectLimit($query, $amount, 0);
         return new DBIterator($res);
     }
