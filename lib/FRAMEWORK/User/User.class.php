@@ -1184,6 +1184,7 @@ class User extends User_Profile
      * </pre>
      * @param   integer $limit The maximal number of Users to load from the database. If not set, all matched users will be loaded.
      * @param   integer $offset The optional parameter $offset can be used to specify the number of found records to skip in the result set.
+     *                          <i>Note that this parameter only works if the limit is set!</i>
      * @return  User
      */
     public function getUsers(
