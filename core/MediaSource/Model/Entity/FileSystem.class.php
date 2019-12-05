@@ -41,8 +41,6 @@ namespace Cx\Core\MediaSource\Model\Entity;
 /**
  * Base class for filesystems
  *
- * @todo        Implement a driver structure to allow efficient cross FS operations
- * @todo        Create a path helper class to sanitize paths
  * @copyright   Cloudrexx AG
  * @author      Robin Glauser <robin.glauser@comvation.com>
  * @author      Thomas Däppen <thomas.daeppen@cloudrexx.com>
@@ -205,7 +203,7 @@ abstract class FileSystem extends \Cx\Model\Base\EntityBase {
     /**
      * Returns the File instance for a given path
      *
-     * $path needs to be within this FS' root, otherwise this method will
+     * $path needs to exist within this FS' root, otherwise this method will
      * return false.
      * @param string $path Path relative to this FS' root
      * @return File|false File instance for $path of false
