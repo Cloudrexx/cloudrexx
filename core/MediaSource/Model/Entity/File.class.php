@@ -105,6 +105,9 @@ abstract class File extends \Cx\Model\Base\EntityBase {
         }
         $this->file = $file;
         $this->fileSystem = $fileSystem;
+        if ($this->exists() && $this->getFileSystem()->isDirectory($this)) {
+            $this->type = static::TYPE_DIRECTORY;
+        }
     }
 
     /**
