@@ -272,31 +272,77 @@ class MediaSourceManager extends EntityBase
     }
 
     /**
-     * Get MediaSourceFile from the given path
+     * Get File from the given path
      *
      * This method returns an object which implements the File interface, but
      * only if the file exists within a registered MediaSource. If no matching
      * MediaSource was found it returns null. If a matching MediaSource was
      * found, but the file does not exist, it returns false.
      * @param string $path File path
+     * @deprecated In favor of getFileFromPath()
      * @return File|null|false See description
      */
-    public function getMediaSourceFileFromPath($path)
-    {
+    public function getMediaSourceFileFromPath(string $path) {
         // If the path does not have leading backslash then add it
         if (strpos($path, '/') !== 0) {
             $path = '/' . $path;
         }
 
         try {
-            // Get MediaSource and MediaSourceFile object
+            $mediaSourceFile = $this->getFileFromPath($path, true);
+            if (!$mediaSourceFile) {
+                return false;
+            }
+        } catch (MediaSourceManagerException $e) {
+            \DBG::log($e->getMessage());
+            return;
+        }
+
+        return $mediaSourceFile;
+    }
+
+    /**
+     * Returns the File for the given path.
+     *
+     * @param string $path Path to get File object of
+     * @param boolean $onlyExisting (optional) if set to true this method returns
+     *                              null if the file not yet exists
+     * @throws MediaSourceManagerException If permission is denied
+     * @throws MediaSourceManagerException If path format is wrong
+     * @return File Returns the file (if any)
+     */
+    public function getFileFromPath(string $path, $onlyExisting = false): File {
+        // If the path does not have leading backslash then add it
+        if (strpos($path, '/') !== 0) {
+            throw new MediaSourceManagerException(
+                'Path needs to be absolute to the installation root.'
+            );
+        }
+
+        // Get MediaSource and MediaSourceFile object
+        $mediaSourceFile = null;
+        try {
             $mediaSource     = $this->getMediaSourceByPath($path);
             $mediaSourcePath = $mediaSource->getDirectory();
             $mediaSourceFile = $mediaSource->getFileSystem()
                 ->getFileFromPath(substr($path, strlen($mediaSourcePath[1])));
         } catch (MediaSourceManagerException $e) {
-            \DBG::log($e->getMessage());
-            return;
+            if ($onlyExisting) {
+                throw $e;
+            }
+        }
+        if (!$mediaSourceFile) {
+            if ($onlyExisting) {
+                return null;
+            }
+
+            $filesystem = new \Cx\Core\MediaSource\Model\Entity\LocalFileSystem(
+                $this->cx->getWebsiteDocumentRootPath() . dirname($path)
+            );
+            $mediaSourceFile = new \Cx\Core\MediaSource\Model\Entity\LocalFile(
+                '/' . basename($path),
+                $filesystem
+            );
         }
 
         return $mediaSourceFile;
