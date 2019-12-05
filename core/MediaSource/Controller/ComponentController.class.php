@@ -63,4 +63,24 @@ class ComponentController
         // does not exist a backend, nor a frontend controller of this component.
         return array();
     }
+
+    /**
+     * Returns the file instance for the given path
+     *
+     * @param string $path Path to get File object of
+     * @param boolean $onlyExisting (optional) if set to true this method returns
+     *                              null if the file not yet exists
+     * @throws MediaSourceManagerException If permission is denied
+     * @throws MediaSourceManagerException If path format is wrong
+     * @return \Cx\Core\MediaSource\Model\Entity\File Returns the file (if any)
+     */
+    public function getFile(
+        string $path,
+        $onlyExisting = false
+    ): \Cx\Core\MediaSource\Model\Entity\File {
+        return $this->cx->getMediaSourceManager()->getFileFromPath(
+            $path,
+            $onlyExists
+        );
+    }
 }
