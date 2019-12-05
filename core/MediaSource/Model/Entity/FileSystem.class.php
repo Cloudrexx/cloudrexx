@@ -169,10 +169,12 @@ abstract class FileSystem extends \Cx\Model\Base\EntityBase {
     /**
      * Writes $content to $file, erases all existing content
      *
+     * If $file is a directory this method attempts to create it. If it already
+     * exists an Exception is thrown.
      * @param File $file File to write to
      * @param string $content Content to write
      */
-    public abstract function writeFile(File $file, $content);
+    public abstract function writeFile(File $file, string $content = '');
 
     /**
      * Reads content from $file
@@ -203,6 +205,7 @@ abstract class FileSystem extends \Cx\Model\Base\EntityBase {
      *
      * @param string $path Path relative to this FS' root
      * @param string $directory Directory name
+     * @deprecated In favor of writeFile($file)
      * @return string Status message
      */
     public abstract function createDirectory($path, $directory);

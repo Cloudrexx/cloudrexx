@@ -398,8 +398,15 @@ class LocalFileSystem extends FileSystem
     }
 
     public function writeFile(
-        File $file, $content
+        File $file, string $content = ''
     ) {
+        if ($file->getType() == File::TYPE_DIRECTORY) {
+            if ($file->exists()) {
+                throw new FileSystemException('Cannot write existing directory');
+            }
+            mkdir($this->rootPath . $file->getFullPath());
+            return;
+        }
         file_put_contents(
             $this->rootPath . $file->getFullPath(), $content
         );
