@@ -72,35 +72,4 @@ class LocalFile extends File
         }
         $this->fileSystem = $fileSystem;
     }
-
-    public function getFileSystem() {
-        return $this->fileSystem;
-    }
-
-    public function getPath() {
-        return pathinfo($this->file, PATHINFO_DIRNAME);
-    }
-
-    public function getName() {
-        return pathinfo($this->file, PATHINFO_FILENAME);
-    }
-
-    public function getExtension() {
-        return pathinfo($this->file, PATHINFO_EXTENSION);
-    }
-
-    public function getMimeType() {
-        return \Mime::getMimeTypeForExtension(pathinfo($this->file, PATHINFO_EXTENSION));
-    }
-
-    /**
-     * @return string
-     */
-    public function __toString() {
-        return $this->file;
-    }
-
-    public function getFullName() {
-        return pathinfo($this->file, PATHINFO_BASENAME);
-    }
 }

@@ -55,45 +55,68 @@ abstract class File extends \Cx\Model\Base\EntityBase {
      *
      * @return FileSystem This file's FileSystem
      */
-    public abstract function getFileSystem();
+    public function getFileSystem(): FileSystem {
+        return $this->fileSystem;
+    }
 
     /**
      * Returns the path (without filename) for this file
      *
      * @return string Path without filename
      */
-    public abstract function getPath();
+    public function getPath(): string {
+        return pathinfo($this->file, PATHINFO_DIRNAME);
+    }
 
     /**
      * Returns the filename (without path and extension) for this file
      *
      * @return string Filename without path and extension
      */
-    public abstract function getName();
+    public function getName(): string {
+        return pathinfo($this->file, PATHINFO_FILENAME);
+    }
 
     /**
      * Returns the filename (without path including extension) for this file
      *
      * @return string Filename without path including extension
      */
-    public abstract function getFullName();
+    public function getFullName(): string {
+        return pathinfo($this->file, PATHINFO_BASENAME);
+    }
+
+    /**
+     * Returns the filename relative to the FS' root
+     *
+     * @return string File path including filename and extension
+     */
+    public function getFullPath(): string {
+        return $this->file;
+    }
 
     /**
      * Returns this file's extension
      *
      * @return string File extension
      */
-    public abstract function getExtension();
+    public function getExtension(): string {
+        return pathinfo($this->file, PATHINFO_EXTENSION);
+    }
 
     /**
      * Returns the MIME type of this file
      *
      * @return string MIME type
      */
-    public abstract function getMimeType();
+    public function getMimeType(): string {
+        return \Mime::getMimeTypeForExtension($this->getExtension());
+    }
 
     /**
      * Returns the full file path (path and filename including extension)
      */
-    public abstract function __toString();
+    public function __toString(): string {
+        return $this->getFullPath();
+    }
 }
