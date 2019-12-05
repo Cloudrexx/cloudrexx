@@ -39,6 +39,16 @@
 namespace Cx\Core\MediaSource\Model\Entity;
 
 /**
+ * Exception on invalid action on a file
+ *
+ * @copyright   Cloudrexx AG
+ * @author      Michael Ritter <michael.ritter@cloudrexx.com>
+ * @package     cloudrexx
+ * @subpackage  core_mediasource
+ */
+class FileException extends \Exception {};
+
+/**
  * Base class for files (excluding folders)
  *
  * @copyright   Cloudrexx AG
