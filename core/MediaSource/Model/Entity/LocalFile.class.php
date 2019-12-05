@@ -48,28 +48,4 @@ namespace Cx\Core\MediaSource\Model\Entity;
  * @package     cloudrexx
  * @subpackage  core_mediasource
  */
-class LocalFile extends File
-{
-    /**
-     * The path of the file with a leading directory separator
-     * @var string
-     */
-    protected $file;
-
-    /**
-     * The file system instance this file belongs to
-     *
-     * @var \Cx\Core\MediaSource\Model\Entity\LocalFileSystem
-     */
-    protected $fileSystem;
-
-    public function __construct($file, $fileSystem) {
-        if (strpos($file, '/') === 0) {
-            $this->file = $file;
-        } else {
-            \DBG::msg(__METHOD__.": $file without leading slash supplied!");
-            $this->file = '/' . $file;
-        }
-        $this->fileSystem = $fileSystem;
-    }
-}
+class LocalFile extends File { }

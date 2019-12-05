@@ -51,6 +51,36 @@ namespace Cx\Core\MediaSource\Model\Entity;
 abstract class File extends \Cx\Model\Base\EntityBase {
 
     /**
+     * The file's path relative to the FS' root with a leading directory separator
+     * @var string
+     */
+    protected $file;
+
+    /**
+     * The file system instance this file belongs to
+     *
+     * @var \Cx\Core\MediaSource\Model\Entity\LocalFileSystem
+     */
+    protected $fileSystem;
+
+    /**
+     * Creates a new instance of this class
+     *
+     * @param string $file
+     * @param FileSystem $fileSystem
+     */
+    public function __construct(string $file, FileSystem $fileSystem) {
+        if (strpos($file, '/') === 0) {
+            $this->file = $file;
+        } else {
+            \DBG::msg(__METHOD__.": $file without leading slash supplied!");
+            $this->file = '/' . $file;
+        }
+        $this->file = $file;
+        $this->fileSystem = $fileSystem;
+    }
+
+    /**
      * Returns the FileSystem for this file
      *
      * @return FileSystem This file's FileSystem
