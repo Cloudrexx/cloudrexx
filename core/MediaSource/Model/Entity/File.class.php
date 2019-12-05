@@ -97,11 +97,8 @@ abstract class File extends \Cx\Model\Base\EntityBase {
      * @param FileSystem $fileSystem
      */
     public function __construct(string $file, FileSystem $fileSystem) {
-        if (strpos($file, '/') === 0) {
-            $this->file = $file;
-        } else {
-            \DBG::msg(__METHOD__.": $file without leading slash supplied!");
-            $this->file = '/' . $file;
+        if (strpos($file, '/') !== 0) {
+            throw new FileException('File without leading slash supplied!');
         }
         $this->file = $file;
         $this->fileSystem = $fileSystem;
