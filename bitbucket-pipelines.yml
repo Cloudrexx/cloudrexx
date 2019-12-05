@@ -14,7 +14,7 @@ pipelines:
             - curl -X POST -H "Content-Type:application/json" -u $BITBUCKET_USER:$BITBUCKET_PASS "$MERGE_URI" -d "{}"
   default:
     - step:
-      script:
-        - ci/dependencies.sh
-        - docker-compose run -T client /usr/local/src/test.sh
-        - docker-compose down
+        script:
+          - ci/dependencies.sh
+          - docker-compose run -T client /usr/local/src/test.sh
+          - docker-compose down
