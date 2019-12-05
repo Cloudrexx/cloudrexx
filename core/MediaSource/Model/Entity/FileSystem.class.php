@@ -160,6 +160,14 @@ abstract class FileSystem extends \Cx\Model\Base\EntityBase {
     protected abstract function isWithinSameFsType(File $file): bool;
 
     /**
+     * Copies a file to a new location
+     *
+     * @param File $file
+     * @param File $destination Position to copy to
+     */
+    public abstract function copyFile(File $file, File $destination);
+
+    /**
      * Writes $content to $file, erases all existing content
      *
      * @param File $file File to write to

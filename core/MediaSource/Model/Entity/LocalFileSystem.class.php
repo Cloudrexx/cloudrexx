@@ -190,6 +190,17 @@ class LocalFileSystem extends FileSystem
     }
 
     /**
+     * @inheritdoc
+     */
+    public function copyFile(File $file, File $destination): void {
+        if (!$this->isWithinSameFsType($destination)) {
+            throw new \Excpeption('Copying outsite of this FS type is not yet implemented!');
+        }
+        $objFile = new \Cx\Lib\FileSystem\File($file->getFileSystem()->getFullPath($file));
+        $objFile->copy($destination->getFileSystem()->getFullPath($destination));
+    }
+
+    /**
      * Applies utf8_encode() to keys and values of an array
      * From: http://stackoverflow.com/questions/7490105/array-walk-recursive-modify-both-keys-and-values
      * @todo move to a different location
