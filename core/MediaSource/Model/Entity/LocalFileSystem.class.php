@@ -401,26 +401,26 @@ class LocalFileSystem extends FileSystem
         File $file, $content
     ) {
         file_put_contents(
-            $this->rootPath . $file->__toString(), $content
+            $this->rootPath . $file->getFullPath(), $content
         );
     }
 
     public function readFile(
         File $file
     ) {
-        return file_get_contents($this->rootPath . $file->__toString());
+        return file_get_contents($this->rootPath . $file->getFullPath());
     }
 
     public function isDirectory(
         File $file
     ) {
-        return is_dir($this->rootPath . $file->__toString());
+        return is_dir($this->rootPath . $file->getFullPath());
     }
 
     public function isFile(
         File $file
     ) {
-        return is_file($this->rootPath . $file->__toString());
+        return is_file($this->rootPath . $file->getFullPath());
     }
 
     /**
