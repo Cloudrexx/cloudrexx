@@ -199,4 +199,63 @@ abstract class File extends \Cx\Model\Base\EntityBase {
     public function __toString(): string {
         return $this->getFullPath();
     }
+
+    /**
+     * Wrapper for FileSystem::writeFile()
+     *
+     * @see FileSystem::writeFile()
+     * @param string $content Content to write
+     */
+    public function write(string $content = '') {
+        $this->getFileSystem()->writeFile($this, $content);
+    }
+
+    /**
+     * Wrapper for FileSystem::removeFile()
+     *
+     * @see FileSystem::removeFile()
+     */
+    public function remove() {
+        $this->getFileSystem()->removeFile($this);
+    }
+
+    /**
+     * Wrapper for FileSystem::readFile()
+     *
+     * @see FileSystem::readFile()
+     * @return string File contents
+     */
+    public function read(): string {
+        return $this->getFileSystem()->readFile($this);
+    }
+
+    /**
+     * Wrapper for FileSystem::copyFile()
+     *
+     * @see FileSystem::copyFile()
+     * @param File $destination Position to copy to
+     */
+    public function copy(File $destination) {
+        $this->getFileSystem()->copyFile($this, $destination);
+    }
+
+    /**
+     * Wrapper for FileSystem::moveFile()
+     *
+     * @see FileSystem::moveFile()
+     * @param File $destination Position to move to
+     */
+    public function move(File $destination) {
+        $this->getFileSystem()->moveFile($this, $destination);
+    }
+
+    /**
+     * Wrapper for FileSystem::fileExists()
+     *
+     * @see FileSystem::fileExists()
+     * @return bool Whether this file exists or not
+     */
+    public function exists(): bool {
+        return $this->getFileSystem()->fileExists($this);
+    }
 }
