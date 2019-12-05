@@ -61,6 +61,16 @@ class FileException extends \Exception {};
 abstract class File extends \Cx\Model\Base\EntityBase {
 
     /**
+     * @var string File type "dir"
+     */
+    const TYPE_DIRECTORY = 'dir';
+
+    /**
+     * @var string File type "file"
+     */
+    const TYPE_FILE = 'file';
+
+    /**
      * The file's path relative to the FS' root with a leading directory separator
      * @var string
      */
@@ -72,6 +82,13 @@ abstract class File extends \Cx\Model\Base\EntityBase {
      * @var \Cx\Core\MediaSource\Model\Entity\LocalFileSystem
      */
     protected $fileSystem;
+
+    /**
+     * Whether this file is a file or a directory
+     *
+     * @var string One of the TYPE_* constants
+     */
+    protected $type = self::TYPE_FILE;
 
     /**
      * Creates a new instance of this class
@@ -97,6 +114,29 @@ abstract class File extends \Cx\Model\Base\EntityBase {
      */
     public function getFileSystem(): FileSystem {
         return $this->fileSystem;
+    }
+
+    /**
+     * Sets the type (of non-existing files) to "file" or "dir"
+     *
+     * @see Class constants TYPE_*
+     * @param string $type One of the TYPE_* constants
+     * @throws FileException If the file already exists
+     */
+    public function setType(string $type): void {
+        if ($this->exists()) {
+            throw new FileException('Cannot change type of existing file');
+        }
+        $this->type = $type;
+    }
+
+    /**
+     * Returns the type of this file
+     *
+     * @return string One of the TYPE_* constants
+     */
+    public function getType(): string {
+        return $this->type;
     }
 
     /**
