@@ -240,7 +240,7 @@ class JsonMediaBrowser extends SystemComponentController implements JsonAdapter
         }
 
         $this->setMessage(
-            $fileSystem->moveFile($file, $newName)
+            $fileSystem->renameFile($file, $newName)
         );
     }
 

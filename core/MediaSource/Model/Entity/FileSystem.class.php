@@ -140,12 +140,11 @@ abstract class FileSystem extends \Cx\Model\Base\EntityBase {
     /**
      * Moves a file to a new location
      *
-     * @todo Specify whether moving accross FS should be supported by this method
+     * @todo Not only within this file system!
      * @param File $file File to move
      * @param string $destination Destination path (absolute or relative to this FS' root)
-     * @return string Status message
      */
-    public abstract function moveFile(File $file, $destination);
+    public abstract function moveFile(File $file, File $destination);
 
     /**
      * Tells whether the given file is within the same underlying filesystem

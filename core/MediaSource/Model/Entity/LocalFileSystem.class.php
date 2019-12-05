@@ -192,6 +192,17 @@ class LocalFileSystem extends FileSystem
     /**
      * @inheritdoc
      */
+    public function moveFile(File $file, File $destination): void {
+        if (!$this->isWithinSameFsType($destination)) {
+            throw new \Exception('Moving outsite of this FS type is not yet implemented!');
+        }
+        $objFile = new \Cx\Lib\FileSystem\File($file->getFileSystem()->getFullPath($file));
+        $objFile->move($destination->getFileSystem()->getFullPath($destination));
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function copyFile(File $file, File $destination): void {
         if (!$this->isWithinSameFsType($destination)) {
             throw new \Excpeption('Copying outsite of this FS type is not yet implemented!');
@@ -313,9 +324,13 @@ class LocalFileSystem extends FileSystem
     }
 
     /**
-     * @todo: Allow to move outside of FS
+     * renameFile
+     *
+     * @deprecated In favor of moveFile()
+     * @param File $file File to rename
+     * @param string $destination New file name
      */
-    public function moveFile(
+    public function renameFile(
         File $file, $destination
     ) {
         global $_ARRAYLANG;
