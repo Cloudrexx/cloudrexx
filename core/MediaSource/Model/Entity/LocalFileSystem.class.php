@@ -485,4 +485,12 @@ class LocalFileSystem extends FileSystem
         }
         return new LocalFile($filepath, $this);
     }
+
+    /**
+     * @inheritdoc
+     */
+    protected function isWithinSameFsType(File $file): bool {
+        // This filesystem can move to all other LocalFileSystems
+        return get_class($file->getFileSystem()) == __CLASS__;
+    }
 }

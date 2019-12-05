@@ -150,6 +150,18 @@ abstract class FileSystem extends \Cx\Model\Base\EntityBase {
     public abstract function moveFile(File $file, $destination);
 
     /**
+     * Tells whether the given file is within the same underlying filesystem
+     *
+     * Any two files $a and $b this method returns true for can safely be moved/
+     * copied around using this filesystem instance. If this method returns
+     * false, the correct file instance needs to be fetched to read from or
+     * write to.
+     * @param File $file File to check underlying filesystem type of
+     * @return boolean True if the condition described in description is given, false otherwise
+     */
+    protected abstract function isWithinSameFsType(File $file): bool;
+
+    /**
      * Writes $content to $file, erases all existing content
      *
      * @param File $file File to write to
