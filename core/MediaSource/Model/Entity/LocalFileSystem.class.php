@@ -490,17 +490,6 @@ class LocalFileSystem extends FileSystem
         return $this->rootPath;
     }
 
-    /**
-     * Set root path of the filesystem
-     *
-     * @todo This shouldn't be possible, drop this method
-     * @param string $rootPath
-     */
-    public function setRootPath($rootPath)
-    {
-        $this->rootPath = $rootPath;
-    }
-
     public function getFileFromPath($filepath) {
         $fileinfo = pathinfo($filepath);
         $path = dirname($filepath);
