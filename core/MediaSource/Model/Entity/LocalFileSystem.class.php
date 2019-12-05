@@ -281,64 +281,24 @@ class LocalFileSystem extends FileSystem
         global $_ARRAYLANG;
         $filename = $file->getFullName();
         $strPath = $file->getPath();
-        if (
-            !empty($filename)
-            && !empty($strPath)
-        ) {
-            if (
-                is_dir(
-                    $this->getFullPath($file)
-                    . $filename
-                )
-            ) {
-                if (
-                    \Cx\Lib\FileSystem\FileSystem::delete_folder(
-                        $this->getFullPath($file) . $filename, true
-                    )
-                ) {
-                    return (
-                        sprintf(
-                            $_ARRAYLANG['TXT_FILEBROWSER_DIRECTORY_SUCCESSFULLY_REMOVED'],
-                            $filename
-                        )
-                    );
-                } else {
-                    return (
-                        sprintf(
-                            $_ARRAYLANG['TXT_FILEBROWSER_DIRECTORY_UNSUCCESSFULLY_REMOVED'],
-                            $filename
-                        )
-                    );
-                }
-            } else {
-                if (
-                    \Cx\Lib\FileSystem\FileSystem::delete_file(
-                        $this->getFullPath($file)  . $filename
-                    )
-                ) {
-                    $this->removeThumbnails($file);
-                    return (
-                        sprintf(
-                            $_ARRAYLANG['TXT_FILEBROWSER_FILE_SUCCESSFULLY_REMOVED'],
-                            $filename
-                        )
-                    );
-                } else {
-                    return (
-                        sprintf(
-                            $_ARRAYLANG['TXT_FILEBROWSER_FILE_UNSUCCESSFULLY_REMOVED'],
-                            $filename
-                        )
-                    );
-                }
-            }
+        if (empty($filename) || empty($strPath)) {
+            throw new FileSystemException('Cannot remove outside of this FS');
         }
-        return (
-            sprintf(
-                $_ARRAYLANG['TXT_FILEBROWSER_FILE_UNSUCCESSFULLY_REMOVED'],
-                $filename
-            )
-        );
+        if (is_dir($this->getFullPath($file))) {
+            if (!\Cx\Lib\FileSystem\FileSystem::delete_folder(
+                $this->getFullPath($file),
+                true
+            )) {
+                throw new FileSystemException('Cannot remove directory');
+            }
+        } else {
+            if (!\Cx\Lib\FileSystem\FileSystem::delete_file(
+                $this->getFullPath($file)
+            )) {
+                throw new FileSystemException('Cannot remove file');
+            }
+            $this->removeThumbnails($file);
+        }
     }
 
     /**

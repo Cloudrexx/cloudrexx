@@ -135,7 +135,7 @@ abstract class FileSystem extends \Cx\Model\Base\EntityBase {
      * Removes the given file from the OS FS
      *
      * @param File $file File to remove
-     * @return string Status message
+     * @throw FileSystemException If file could no be removed
      */
     public abstract function removeFile(File $file);
 

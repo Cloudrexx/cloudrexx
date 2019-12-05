@@ -265,11 +265,44 @@ class JsonMediaBrowser extends SystemComponentController implements JsonAdapter
             }
 
             $this->setMessage(
-                $fileSystem->removeFile($file)
+                $this->removeFileWithMessage($fileSystem, $file)
             );
         }
     }
 
+    /**
+     * Adds translated success/error messages to FileSystem::removeFile()
+     *
+     * @param FileSystem $fileSystem Instance to call removeFile() on
+     * @param File $file File to remove
+     * @return string Error or success message
+     */
+    protected function removeFileWithMessage($fileSystem, $file) {
+        global $_ARRAYLANG;
+
+        $isDir = $fileSystem->isDirectory($file);
+        $msg = '';
+        try {
+            $fileSystem->removeFile($file);
+        } catch (\Exception $e) {
+            if ($isDir) {
+                $msg = $_ARRAYLANG['TXT_FILEBROWSER_DIRECTORY_UNSUCCESSFULLY_REMOVED'];
+            } else {
+                $msg = $_ARRAYLANG['TXT_FILEBROWSER_FILE_UNSUCCESSFULLY_REMOVED'];
+            }
+        }
+        if ($isDir) {
+            $msg = $_ARRAYLANG['TXT_FILEBROWSER_DIRECTORY_SUCCESSFULLY_REMOVED'];
+        } else {
+            $msg = $_ARRAYLANG['TXT_FILEBROWSER_FILE_SUCCESSFULLY_REMOVED'];
+        }
+        return (
+            sprintf(
+                $msg,
+                $file->getFullName()
+            )
+        );
+    }
 
     /**
      * Returns default permission as object
@@ -349,7 +382,7 @@ class JsonMediaBrowser extends SystemComponentController implements JsonAdapter
         $localFileSystem = new \Cx\Core\MediaSource\Model\Entity\LocalFileSystem($folder);
         $file = $localFileSystem->getFileFromPath('/' . $path);
 
-        $this->setMessage($localFileSystem->removeFile($file));
+        $this->setMessage($this->removeFileWithMessage($localFileSystem, $file));
 
         return array();
     }
