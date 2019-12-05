@@ -300,7 +300,6 @@ class LocalFileSystem extends FileSystem
      * @todo check whether $file is part of this FS
      */
     public function removeFile(File $file) {
-        global $_ARRAYLANG;
         $filename = $file->getFullName();
         $strPath = $file->getPath();
         if (empty($filename) || empty($strPath)) {
