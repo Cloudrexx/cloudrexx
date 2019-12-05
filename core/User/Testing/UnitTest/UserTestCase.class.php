@@ -86,10 +86,8 @@ abstract class UserTestCase extends \Cx\Core\Test\Model\Entity\MySQLTestCase
             $userObject->reset();
 
             if (!is_array($data)) {
-                //if only the email is given
-                $userObject->setEmail($data);
-                $userObject->store();
-                continue;
+                $email = $data;
+                $data = array();
             }
 
             $userObject->setEmail($email);
@@ -114,16 +112,16 @@ abstract class UserTestCase extends \Cx\Core\Test\Model\Entity\MySQLTestCase
                     case 'auth':
                         $time = $value;
                         break;
-                    }
                 }
-            $userObject->store();
+            }
 
             if (isset($time)) {
                 //the user should first be stored before the Login can be successful
+                $userObject->store();
                 $userObject->registerSuccessfulLogin();
                 $this->setLastAuthenticationTime($userObject->getId(), $time);
-                $userObject->store();
             }
+            $userObject->store();
         }
     }
 
