@@ -211,4 +211,12 @@ abstract class FileSystem extends \Cx\Model\Base\EntityBase {
      * @return File|false File instance for $path of false
      */
     public abstract function getFileFromPath($path);
+
+    /**
+     * Tells whether $file exists in this FileSystem
+     *
+     * @param File $file File to check for existance
+     * @return boolean True if $file exists, false otherwise
+     */
+    public abstract function fileExists(File $file);
 }

@@ -489,6 +489,13 @@ class LocalFileSystem extends FileSystem
     /**
      * @inheritdoc
      */
+    public function fileExists(File $file) {
+        return file_exists($this->rootPath . $file->getFullPath());
+    }
+
+    /**
+     * @inheritdoc
+     */
     protected function isWithinSameFsType(File $file): bool {
         // This filesystem can move to all other LocalFileSystems
         return get_class($file->getFileSystem()) == __CLASS__;
