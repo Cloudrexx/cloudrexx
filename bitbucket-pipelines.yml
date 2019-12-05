@@ -1,3 +1,8 @@
+image: docker:stable
+
+options:
+  docker: true
+
 pipelines:
   branches:
     master:
@@ -7,3 +12,9 @@ pipelines:
             - if [[ $RESULT =~ $REGEX ]] ; then MERGE_URI=${BASH_REMATCH[1]}; else echo "Error while creating merge request, aborting. Result was $RESULT"; exit -1; fi
             - echo "$MERGE_URI"
             - curl -X POST -H "Content-Type:application/json" -u $BITBUCKET_USER:$BITBUCKET_PASS "$MERGE_URI" -d "{}"
+  default:
+    - step:
+      script:
+        - ci/dependencies.sh
+        - docker-compose run -T client /usr/local/src/test.sh
+        - docker-compose down
