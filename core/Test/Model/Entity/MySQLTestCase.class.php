@@ -73,5 +73,6 @@ class MySQLTestCase extends ContrexxTestCase {
      */
     public function tearDown(): void {
         static::$database->failTrans();
+        static::$database->completeTrans();
     }
 }
