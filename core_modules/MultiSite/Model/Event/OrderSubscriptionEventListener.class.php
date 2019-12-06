@@ -128,7 +128,7 @@ class OrderSubscriptionEventListener implements \Cx\Core\Event\Model\Entity\Even
         $currency  = $em->getRepository('\Cx\Modules\Crm\Model\Entity\Currency')->findOneById($currencyId);
         $affiliateCredit->setCurrency($currency);
 
-        // set referee that shall receive the affiliate commission
+        // get user of new subscription
         $crmContactId = $subscription->getOrder()->getContactId();
         $userId = \Cx\Modules\Crm\Controller\CrmLibrary::getUserIdByCrmUserId($crmContactId);
         $user = \FWUser::getFWUserObject()->objUser->getUser($userId);
@@ -137,7 +137,14 @@ class OrderSubscriptionEventListener implements \Cx\Core\Event\Model\Entity\Even
         }
         $affiliateIdReferenceProfileAttributeId = \Cx\Core\Setting\Controller\Setting::getValue('affiliateIdReferenceProfileAttributeId','MultiSite');
         $affiliateIdProfileAttributeId = \Cx\Core\Setting\Controller\Setting::getValue('affiliateIdProfileAttributeId','MultiSite');
+        // get affiliateId of referer
         $refereeId = $user->getProfileAttribute($affiliateIdReferenceProfileAttributeId);
+        // in case the user did not follow an affiliate-link,
+        // we can abort the process
+        if (empty($refereeId)) {
+            return;
+        }
+        // fetch the affiliate-user who did refere the new user to cloudrexx
         $objUser = \FWUser::getFWUserObject()->objUser->getUsers(array(
             $affiliateIdProfileAttributeId => $refereeId,
             'active' => true,
@@ -148,6 +155,7 @@ class OrderSubscriptionEventListener implements \Cx\Core\Event\Model\Entity\Even
         }
         $objRefereeUser = null;
         while(!$objUser->EOF) {
+            // verify the affiliate-ID again
             if ($objUser->getProfileAttribute($affiliateIdProfileAttributeId) === $refereeId) {
                 $objRefereeUser = $objUser;
                 break;
@@ -158,6 +166,7 @@ class OrderSubscriptionEventListener implements \Cx\Core\Event\Model\Entity\Even
         if (!$objRefereeUser) {
             return;
         }
+        // set referee that shall receive the affiliate commission
         $referee = $em->getRepository('Cx\Core\User\Model\Entity\User')->findOneById($objRefereeUser->getId());
         $affiliateCredit->setReferee($referee);
 
