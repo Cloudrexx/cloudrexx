@@ -15,6 +15,7 @@ pipelines:
   default:
     - step:
         script:
+          - whereis chmod
           - chmod +x ci/dependencies.sh
           - chmod +x src/test.sh
           - ci/dependencies.sh
