@@ -39,6 +39,11 @@ use Cx\Core\DataSource\Model\Entity\DataSource;
 /**
  * Class MediaSource
  *
+ * @todo MediaSource should not inherit from DataSource. Instead, the file
+ *          system abstraction should be moved to core/FileSystem and the "File"
+ *          or "FileSystem" entity should inherit from DataSource. After this
+ *          DataAccess could be used instead of MediaSource and this component
+ *          could be dropped.
  * @copyright   Cloudrexx AG
  * @author      Robin Glauser <robin.glauser@comvation.com>
  * @package     cloudrexx
