@@ -452,21 +452,18 @@ class LocalFileSystem extends FileSystem
     ) {
         global $_ARRAYLANG;
         \Env::get('init')->loadLanguageData('MediaBrowser');
-        if (
-            !\Cx\Lib\FileSystem\FileSystem::make_folder(
-                $this->rootPath . $path . '/' . $directory
-            )
-        ) {
+        if (!\Cx\Lib\FileSystem\FileSystem::make_folder(
+            $this->rootPath . $path . '/' . $directory
+        )) {
             return sprintf(
                 $_ARRAYLANG['TXT_FILEBROWSER_UNABLE_TO_CREATE_FOLDER'],
                 $directory
             );
         } else {
-            return
-                sprintf(
-                    $_ARRAYLANG['TXT_FILEBROWSER_DIRECTORY_SUCCESSFULLY_CREATED'],
-                    $directory
-                );
+            return sprintf(
+                $_ARRAYLANG['TXT_FILEBROWSER_DIRECTORY_SUCCESSFULLY_CREATED'],
+                $directory
+            );
         }
     }
 
