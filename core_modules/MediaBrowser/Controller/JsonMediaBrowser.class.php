@@ -364,6 +364,8 @@ class JsonMediaBrowser extends SystemComponentController implements JsonAdapter
      */
     public function removeFileFromFolderWidget($params)
     {
+        global $_ARRAYLANG;
+
         $this->getComponent('Session')->getSession();
 
         $folderWidgetId = isset($params['get']['widget']) ? contrexx_input2int($params['get']['widget']) : 0;
@@ -381,6 +383,11 @@ class JsonMediaBrowser extends SystemComponentController implements JsonAdapter
         $folder          = $_SESSION['MediaBrowser']['FolderWidget'][$folderWidgetId]['folder'];
         $localFileSystem = new \Cx\Core\MediaSource\Model\Entity\LocalFileSystem($folder);
         $file = $localFileSystem->getFileFromPath('/' . $path);
+
+        if (!$file) {
+            $this->setMessage($_ARRAYLANG['TXT_FILEBROWSER_FILE_UNSUCCESSFULLY_REMOVED']);
+            return array();
+        }
 
         $this->setMessage($this->removeFileWithMessage($localFileSystem, $file));
 
