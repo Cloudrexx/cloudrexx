@@ -135,7 +135,7 @@ abstract class FileSystem extends \Cx\Model\Base\EntityBase {
      * @param File $file File to remove
      * @throw FileSystemException If file could no be removed
      */
-    public abstract function removeFile(File $file);
+    public abstract function removeFile(File $file): void;
 
     /**
      * Moves a file to a new location
@@ -144,7 +144,7 @@ abstract class FileSystem extends \Cx\Model\Base\EntityBase {
      * @param File $file File to move
      * @param string $destination Destination path (absolute or relative to this FS' root)
      */
-    public abstract function moveFile(File $file, File $destination);
+    public abstract function moveFile(File $file, File $destination): void;
 
     /**
      * Tells whether the given file is within the same underlying filesystem
@@ -164,7 +164,7 @@ abstract class FileSystem extends \Cx\Model\Base\EntityBase {
      * @param File $file
      * @param File $destination Position to copy to
      */
-    public abstract function copyFile(File $file, File $destination);
+    public abstract function copyFile(File $file, File $destination): void;
 
     /**
      * Writes $content to $file, erases all existing content
@@ -174,7 +174,7 @@ abstract class FileSystem extends \Cx\Model\Base\EntityBase {
      * @param File $file File to write to
      * @param string $content Content to write
      */
-    public abstract function writeFile(File $file, string $content = '');
+    public abstract function writeFile(File $file, string $content = ''): void;
 
     /**
      * Reads content from $file
@@ -182,7 +182,7 @@ abstract class FileSystem extends \Cx\Model\Base\EntityBase {
      * @param File $file File to write to
      * @return string File contents
      */
-    public abstract function readFile(File $file);
+    public abstract function readFile(File $file): string;
 
     /**
      * Tells whether $file is a directory or not
@@ -190,7 +190,7 @@ abstract class FileSystem extends \Cx\Model\Base\EntityBase {
      * @param File $file File to check
      * @return boolean True if $file is a directory, false otherwise
      */
-    public abstract function isDirectory(File $file);
+    public abstract function isDirectory(File $file): bool;
 
     /**
      * Tells whether $file is not a directory
@@ -198,7 +198,7 @@ abstract class FileSystem extends \Cx\Model\Base\EntityBase {
      * @param File $file File to check
      * @return boolean True if $file is not a directory, false otherwise
      */
-    public abstract function isFile(File $file);
+    public abstract function isFile(File $file): bool;
 
     /**
      * Creates a new directory
@@ -208,7 +208,7 @@ abstract class FileSystem extends \Cx\Model\Base\EntityBase {
      * @deprecated In favor of writeFile($file)
      * @return string Status message
      */
-    public abstract function createDirectory($path, $directory);
+    public abstract function createDirectory($path, $directory): string;
 
     /**
      * Returns the File instance for a given path
@@ -218,7 +218,7 @@ abstract class FileSystem extends \Cx\Model\Base\EntityBase {
      * @param string $path Path relative to this FS' root
      * @return File|false File instance for $path of false
      */
-    public abstract function getFileFromPath($path);
+    public abstract function getFileFromPath($path): File;
 
     /**
      * Tells whether $file exists in this FileSystem
@@ -226,5 +226,5 @@ abstract class FileSystem extends \Cx\Model\Base\EntityBase {
      * @param File $file File to check for existance
      * @return boolean True if $file exists, false otherwise
      */
-    public abstract function fileExists(File $file);
+    public abstract function fileExists(File $file): bool;
 }

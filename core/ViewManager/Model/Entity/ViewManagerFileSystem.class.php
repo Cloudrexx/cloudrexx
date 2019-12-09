@@ -155,7 +155,7 @@ class ViewManagerFileSystem extends \Cx\Core\MediaSource\Model\Entity\LocalFileS
      *
      * @return boolean True on success, false otherwise
      */
-    public function isDirectory(\Cx\Core\MediaSource\Model\Entity\File $file)
+    public function isDirectory(\Cx\Core\MediaSource\Model\Entity\File $file): bool
     {
         return is_dir($this->getFullPath($file) . $file->getFullName());
     }
@@ -167,7 +167,7 @@ class ViewManagerFileSystem extends \Cx\Core\MediaSource\Model\Entity\LocalFileS
      *
      * @return boolean True on success, false otherwise
      */
-    public function isFile(\Cx\Core\MediaSource\Model\Entity\File $file)
+    public function isFile(\Cx\Core\MediaSource\Model\Entity\File $file): bool
     {
         return is_file($this->getFullPath($file) . $file->getFullName());
     }
@@ -179,7 +179,7 @@ class ViewManagerFileSystem extends \Cx\Core\MediaSource\Model\Entity\LocalFileS
      *
      * @return boolean True when exists, false otherwise
      */
-    public function fileExists(\Cx\Core\MediaSource\Model\Entity\File $file)
+    public function fileExists(\Cx\Core\MediaSource\Model\Entity\File $file): bool
     {
         return file_exists($this->getFullPath($file) . $file->getFullName());
     }
@@ -194,7 +194,7 @@ class ViewManagerFileSystem extends \Cx\Core\MediaSource\Model\Entity\LocalFileS
      */
     public function readFile(
         \Cx\Core\MediaSource\Model\Entity\File $file
-    ) {
+    ): string {
         return file_get_contents($this->getFullPath($file) . $file->getFullName());
     }
 

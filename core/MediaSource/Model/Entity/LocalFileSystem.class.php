@@ -299,7 +299,7 @@ class LocalFileSystem extends FileSystem
     /**
      * @todo check whether $file is part of this FS
      */
-    public function removeFile(File $file) {
+    public function removeFile(File $file): void {
         $filename = $file->getFullName();
         $strPath = $file->getPath();
         if (empty($filename) || empty($strPath)) {
@@ -399,7 +399,7 @@ class LocalFileSystem extends FileSystem
 
     public function writeFile(
         File $file, string $content = ''
-    ) {
+    ): void {
         if ($file->getType() == File::TYPE_DIRECTORY) {
             if ($file->exists()) {
                 throw new FileSystemException('Cannot write existing directory');
@@ -417,7 +417,7 @@ class LocalFileSystem extends FileSystem
 
     public function readFile(
         File $file
-    ) {
+    ): string {
         $objFile = new \Cx\Lib\FileSystem\File(
             $this->getAbsolutePath($file)
         );
@@ -430,7 +430,7 @@ class LocalFileSystem extends FileSystem
      */
     public function isDirectory(
         File $file
-    ) {
+    ): bool {
         return is_dir($this->getAbsolutePath($file));
     }
 
@@ -440,7 +440,7 @@ class LocalFileSystem extends FileSystem
      */
     public function isFile(
         File $file
-    ) {
+    ): bool {
         return is_file($this->getAbsolutePath($file));
     }
 
@@ -449,7 +449,7 @@ class LocalFileSystem extends FileSystem
      */
     public function createDirectory(
         $path, $directory
-    ) {
+    ): string {
         global $_ARRAYLANG;
         \Env::get('init')->loadLanguageData('MediaBrowser');
         if (!\Cx\Lib\FileSystem\FileSystem::make_folder(
@@ -516,12 +516,11 @@ class LocalFileSystem extends FileSystem
      *
      * @return string
      */
-    public function getRootPath()
-    {
+    public function getRootPath(): string {
         return $this->rootPath;
     }
 
-    public function getFileFromPath($filepath) {
+    public function getFileFromPath($filepath): File {
         $fileinfo = pathinfo($filepath);
         $path = dirname($filepath);
         $files = $this->getFileList($fileinfo['dirname'], false);
@@ -534,7 +533,7 @@ class LocalFileSystem extends FileSystem
     /**
      * @inheritdoc
      */
-    public function fileExists(File $file) {
+    public function fileExists(File $file): bool {
         return \Cx\Lib\FileSystem\FileSystem::exists(
             $this->getAbsolutePath($file)
         );

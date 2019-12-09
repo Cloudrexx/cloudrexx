@@ -206,7 +206,7 @@ abstract class File extends \Cx\Model\Base\EntityBase {
      * @see FileSystem::writeFile()
      * @param string $content Content to write
      */
-    public function write(string $content = '') {
+    public function write(string $content = ''): void {
         $this->getFileSystem()->writeFile($this, $content);
     }
 
@@ -215,7 +215,7 @@ abstract class File extends \Cx\Model\Base\EntityBase {
      *
      * @see FileSystem::removeFile()
      */
-    public function remove() {
+    public function remove(): void {
         $this->getFileSystem()->removeFile($this);
     }
 
@@ -235,7 +235,7 @@ abstract class File extends \Cx\Model\Base\EntityBase {
      * @see FileSystem::copyFile()
      * @param File $destination Position to copy to
      */
-    public function copy(File $destination) {
+    public function copy(File $destination): void {
         $this->getFileSystem()->copyFile($this, $destination);
     }
 
@@ -245,7 +245,7 @@ abstract class File extends \Cx\Model\Base\EntityBase {
      * @see FileSystem::moveFile()
      * @param File $destination Position to move to
      */
-    public function move(File $destination) {
+    public function move(File $destination): void {
         $this->getFileSystem()->moveFile($this, $destination);
     }
 
