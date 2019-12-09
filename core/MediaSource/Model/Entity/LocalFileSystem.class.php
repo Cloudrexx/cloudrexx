@@ -404,26 +404,40 @@ class LocalFileSystem extends FileSystem
             if ($file->exists()) {
                 throw new FileSystemException('Cannot write existing directory');
             }
-            mkdir($this->rootPath . $file->getFullPath());
+            \Cx\Lib\FileSystem\FileSystem::make_folder(
+                $this->rootPath . $file->getFullPath()
+            );
             return;
         }
-        file_put_contents(
-            $this->rootPath . $file->getFullPath(), $content
+        $objFile = new \Cx\Lib\FileSystem\File(
+            $this->rootPath . $file->getFullPath()
         );
+        $objFile->write($content);
     }
 
     public function readFile(
         File $file
     ) {
-        return file_get_contents($this->rootPath . $file->getFullPath());
+        $objFile = new \Cx\Lib\FileSystem\File(
+            $this->rootPath . $file->getFullPath()
+        );
+        return $objFile->getData();
     }
 
+    /**
+     * @inheritdoc
+     * @todo: There is no matching method in lib/FileSystem to call
+     */
     public function isDirectory(
         File $file
     ) {
         return is_dir($this->rootPath . $file->getFullPath());
     }
 
+    /**
+     * @inheritdoc
+     * @todo: There is no matching method in lib/FileSystem to call
+     */
     public function isFile(
         File $file
     ) {
@@ -511,7 +525,9 @@ class LocalFileSystem extends FileSystem
      * @inheritdoc
      */
     public function fileExists(File $file) {
-        return file_exists($this->rootPath . $file->getFullPath());
+        return \Cx\Lib\FileSystem\FileSystem::exists(
+            $this->rootPath . $file->getFullPath()
+        );
     }
 
     /**
