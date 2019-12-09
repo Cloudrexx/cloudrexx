@@ -196,8 +196,8 @@ class LocalFileSystem extends FileSystem
         if (!$this->isWithinSameFsType($destination)) {
             throw new \Exception('Moving outsite of this FS type is not yet implemented!');
         }
-        $objFile = new \Cx\Lib\FileSystem\File($file->getFileSystem()->getFullPath($file));
-        $objFile->move($destination->getFileSystem()->getFullPath($destination));
+        $objFile = new \Cx\Lib\FileSystem\File($file->getFileSystem()->getAbsolutePath($file));
+        $objFile->move($destination->getFileSystem()->getAbsolutePath($destination));
     }
 
     /**
@@ -207,8 +207,8 @@ class LocalFileSystem extends FileSystem
         if (!$this->isWithinSameFsType($destination)) {
             throw new \Excpeption('Copying outsite of this FS type is not yet implemented!');
         }
-        $objFile = new \Cx\Lib\FileSystem\File($file->getFileSystem()->getFullPath($file));
-        $objFile->copy($destination->getFileSystem()->getFullPath($destination));
+        $objFile = new \Cx\Lib\FileSystem\File($file->getFileSystem()->getAbsolutePath($file));
+        $objFile->copy($destination->getFileSystem()->getAbsolutePath($destination));
     }
 
     /**
@@ -305,16 +305,16 @@ class LocalFileSystem extends FileSystem
         if (empty($filename) || empty($strPath)) {
             throw new FileSystemException('Cannot remove outside of this FS');
         }
-        if (is_dir($this->getFullPath($file))) {
+        if (is_dir($this->getAbsolutePath($file))) {
             if (!\Cx\Lib\FileSystem\FileSystem::delete_folder(
-                $this->getFullPath($file),
+                $this->getAbsolutePath($file),
                 true
             )) {
                 throw new FileSystemException('Cannot remove directory');
             }
         } else {
             if (!\Cx\Lib\FileSystem\FileSystem::delete_file(
-                $this->getFullPath($file)
+                $this->getAbsolutePath($file)
             )) {
                 throw new FileSystemException('Cannot remove file');
             }
@@ -405,12 +405,12 @@ class LocalFileSystem extends FileSystem
                 throw new FileSystemException('Cannot write existing directory');
             }
             \Cx\Lib\FileSystem\FileSystem::make_folder(
-                $this->rootPath . $file->getFullPath()
+                $this->getAbsolutePath($file)
             );
             return;
         }
         $objFile = new \Cx\Lib\FileSystem\File(
-            $this->rootPath . $file->getFullPath()
+            $this->getAbsolutePath($file)
         );
         $objFile->write($content);
     }
@@ -419,7 +419,7 @@ class LocalFileSystem extends FileSystem
         File $file
     ) {
         $objFile = new \Cx\Lib\FileSystem\File(
-            $this->rootPath . $file->getFullPath()
+            $this->getAbsolutePath($file)
         );
         return $objFile->getData();
     }
@@ -431,7 +431,7 @@ class LocalFileSystem extends FileSystem
     public function isDirectory(
         File $file
     ) {
-        return is_dir($this->rootPath . $file->getFullPath());
+        return is_dir($this->getAbsolutePath($file));
     }
 
     /**
@@ -441,7 +441,7 @@ class LocalFileSystem extends FileSystem
     public function isFile(
         File $file
     ) {
-        return is_file($this->rootPath . $file->getFullPath());
+        return is_file($this->getAbsolutePath($file));
     }
 
     /**
@@ -468,12 +468,25 @@ class LocalFileSystem extends FileSystem
     }
 
     /**
-     * @param File $file
+     * Returns the absolute path to the given file (without filename)
      *
-     * @return string
+     * @todo This may return string with double slashes!
+     * @deprecated In favor of getAbsolutePath() and using File objects instead of string paths
+     * @param File $file File to get absolute path of
+     * @return string File path without filename absolute to the servers FS root
      */
     public function getFullPath(File $file) {
         return $this->rootPath . ltrim($file->getPath(), '.') . '/';
+    }
+
+    /**
+     * Returns the absolute path including filename
+     *
+     * @param File $file File to get absolute path of
+     * @return string File path including filename absolute to the servers FS root
+     */
+    protected function getAbsolutePath(File $file): string {
+        return $this->getRootPath() . $file->getFullPath();
     }
 
     /**
@@ -487,7 +500,7 @@ class LocalFileSystem extends FileSystem
         }
         $iterator = new \RegexIterator(
             new \DirectoryIterator(
-                $this->getFullPath($file)
+                $this->getAbsolutePath($file)
             ),
             '/' . preg_quote($file->getName(), '/') . '.thumb_[a-z]+\.' . $file->getExtension() . '/'
         );
@@ -523,7 +536,7 @@ class LocalFileSystem extends FileSystem
      */
     public function fileExists(File $file) {
         return \Cx\Lib\FileSystem\FileSystem::exists(
-            $this->rootPath . $file->getFullPath()
+            $this->getAbsolutePath($file)
         );
     }
 
