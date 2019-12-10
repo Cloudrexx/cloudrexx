@@ -520,12 +520,12 @@ class LocalFileSystem extends FileSystem
         return $this->rootPath;
     }
 
-    public function getFileFromPath($filepath): File {
+    public function getFileFromPath($filepath) {
         $fileinfo = pathinfo($filepath);
         $path = dirname($filepath);
         $files = $this->getFileList($fileinfo['dirname'], false);
         if (!isset($files[$fileinfo['basename']])) {
-            return false;
+            return null;
         }
         return new LocalFile($filepath, $this);
     }

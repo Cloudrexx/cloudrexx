@@ -218,7 +218,7 @@ abstract class FileSystem extends \Cx\Model\Base\EntityBase {
      * @param string $path Path relative to this FS' root
      * @return File|false File instance for $path of false
      */
-    public abstract function getFileFromPath($path): File;
+    public abstract function getFileFromPath($path);
 
     /**
      * Tells whether $file exists in this FileSystem

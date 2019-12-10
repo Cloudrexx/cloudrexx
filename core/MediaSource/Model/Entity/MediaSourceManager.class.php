@@ -311,7 +311,7 @@ class MediaSourceManager extends EntityBase
      * @throws MediaSourceManagerException If path format is wrong
      * @return File Returns the file (if any)
      */
-    public function getFileFromPath(string $path, $onlyExisting = false): File {
+    public function getFileFromPath(string $path, $onlyExisting = false): ?File {
         // If the path does not have leading backslash then add it
         if (strpos($path, '/') !== 0) {
             throw new MediaSourceManagerException(
