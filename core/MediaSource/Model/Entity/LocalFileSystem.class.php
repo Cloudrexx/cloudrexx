@@ -224,9 +224,9 @@ class LocalFileSystem extends FileSystem
             if (is_array($value)) {
                 $value = $this->utf8EncodeArray($value);
             } else {
-                $value = utf8_encode($value);
+                $value = utf8_encode((string) $value);
             }
-            $helper[utf8_encode($key)] = $value;
+            $helper[utf8_encode((string) $key)] = $value;
         }
         return $helper;
     }
