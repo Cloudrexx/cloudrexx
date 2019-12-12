@@ -35,6 +35,14 @@
 
 namespace Cx\Modules\Newsletter\Controller;
 
+/**
+ * JsonAdapter Controller to handle EsiWidgets
+ *
+ * @copyright   CLOUDREXX CMS - Cloudrexx AG Thun
+ * @author      Mirjam Doyon <info@cloudrexx.com>
+ * @package     cloudrexx
+ * @subpackage  modules_newsletter
+ */
 class EsiWidgetController extends \Cx\Core_Modules\Widget\Controller\EsiWidgetController
 {
 
