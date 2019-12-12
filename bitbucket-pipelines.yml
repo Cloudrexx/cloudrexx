@@ -15,9 +15,6 @@ pipelines:
   default:
     - step:
         script:
-          - apt-get update 
-          - apt-get install gcc
-          - gcc -v
           - chmod +x ci/dependencies.sh
           - chmod +x src/test.sh
           - ci/dependencies.sh
