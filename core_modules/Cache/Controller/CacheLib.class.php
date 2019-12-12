@@ -291,6 +291,21 @@ class CacheLib
                     $locale
                 );
             },
+            'url_encode' => function($args) {
+                if (empty($args[0])) {
+                    return '';
+                }
+                return urlencode($args[0]);
+            },
+            'html_encode' => function($args) {
+                if (empty($args[0])) {
+                    return '';
+                }
+                // according to the esi specification, only double quotes
+                // are being converted into html entities. Therefore, we have
+                // to set ENT_COMPAT
+                return htmlspecialchars($args[0], ENT_COMPAT, CONTREXX_CHARSET);
+            },
         );
     }
 

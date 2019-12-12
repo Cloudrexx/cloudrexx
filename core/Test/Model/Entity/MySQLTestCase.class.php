@@ -46,7 +46,7 @@ namespace Cx\Core\Test\Model\Entity;
  * @package     cloudrexx
  * @subpackage  core_test
  */
-class MySQLTestCase extends ContrexxTestCase {
+abstract class MySQLTestCase extends ContrexxTestCase {
 
     /**
      * Reference to the AdoDb database connection
@@ -73,5 +73,6 @@ class MySQLTestCase extends ContrexxTestCase {
      */
     public function tearDown(): void {
         static::$database->failTrans();
+        static::$database->completeTrans();
     }
 }

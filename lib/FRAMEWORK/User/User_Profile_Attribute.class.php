@@ -995,6 +995,7 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
         ');
         if (!$result) {
             $objDatabase->failTrans();
+            $objDatabase->completeTrans();
             return false;
         }
         $this->id = $objDatabase->Insert_ID();
@@ -1017,6 +1018,7 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
         ');
         if (!$result) {
             $objDatabase->failTrans();
+            $objDatabase->completeTrans();
             return false;
         }
         $objDatabase->completeTrans();
