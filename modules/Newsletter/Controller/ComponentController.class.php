@@ -184,6 +184,13 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         global $newsletter, $_ARRAYLANG, $page_template, $themesPages, $objInit;
     }
 
+    /**
+     * Do something after system initialization
+     *This event must be registered in the postInit-Hook definition
+     *file config/postInitHooks.yml.
+     * @param \Cx\Core\Core\Controller\Cx   $cx The instance of
+     * \Cx\Core\Core\Controller\Cx
+     */
     public function postInit(\Cx\Core\Core\Controller\Cx $cx) {
         
         $widgetController = $this->getComponent('Widget');
