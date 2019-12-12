@@ -15,6 +15,6 @@ pipelines:
   default:
     - step:
         script:
-          - /bin/bash ci/dependencies.sh
+          - /bin/sh ci/dependencies.sh
           - docker-compose run -T client /usr/local/src/test.sh
           - docker-compose down
