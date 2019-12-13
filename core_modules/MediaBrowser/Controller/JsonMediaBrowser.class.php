@@ -350,8 +350,7 @@ class JsonMediaBrowser extends SystemComponentController implements JsonAdapter
         $file = $localFileSystem->getFileFromPath('/' . $path);
 
         if ($file === false) {
-            $this->setMessage($file);
-            return $message;
+            return;
         } else {
             $this->setMessage($localFileSystem->removeFile($file));
         }
