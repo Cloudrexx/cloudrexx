@@ -64,6 +64,7 @@ $_ARRAYLANG['TXT_FILEBROWSER_INVALID_CHARACTERS'] = "Unzulässige Zeichen gefund
 $_ARRAYLANG['TXT_FILEBROWSER_UNABLE_TO_CREATE_FOLDER'] = "Verzeichnis %s konnte nicht erstellt werden.";
 $_ARRAYLANG['TXT_FILEBROWSER_DIRECTORY_SUCCESSFULLY_CREATED'] = "Verzeichnis %s wurde erfolgreich erstellt.";
 $_ARRAYLANG['TXT_FILEBROWSER_FILE_SUCCESSFULLY_REMOVED'] = "Datei %s wurde erfolgreich gelöscht.";
+$_ARRAYLANG['TXT_FILEBROWSER_FILE_PREVIOUSLY_REMOVED'] = "Datei wurde bereits erfolgreich gelöscht.";
 $_ARRAYLANG['TXT_FILEBROWSER_FILE_UNSUCCESSFULLY_REMOVED'] = "Datei %s konnte nicht gelöscht werden.";
 $_ARRAYLANG['TXT_FILEBROWSER_DIRECTORY_SUCCESSFULLY_REMOVED'] = "Verzeichnis %s wurde erfolgreich gelöscht.";
 $_ARRAYLANG['TXT_FILEBROWSER_DIRECTORY_UNSUCCESSFULLY_REMOVED'] = "Verzeichnis %s konnte nicht gelöscht werden.";

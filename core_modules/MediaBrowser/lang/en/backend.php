@@ -65,6 +65,7 @@ $_ARRAYLANG['TXT_FILEBROWSER_FILE_UNSUCCESSFULLY_REMOVED'] = "File %s couldn't b
 $_ARRAYLANG['TXT_FILEBROWSER_DIRECTORY_SUCCESSFULLY_REMOVED'] = "Directory %s was successfully removed.";
 $_ARRAYLANG['TXT_FILEBROWSER_DIRECTORY_UNSUCCESSFULLY_REMOVED'] = "Directory %s couldn't be removed.";
 $_ARRAYLANG['TXT_FILEBROWSER_FILE_SUCCESSFULLY_RENAMED'] = "File %s was successfully renamed.";
+$_ARRAYLANG['TXT_FILEBROWSER_FILE_PREVIOUSLY_REMOVED'] = "File has already been successfully removed.";
 $_ARRAYLANG['TXT_FILEBROWSER_FILE_UNSUCCESSFULLY_RENAMED'] = "File %s couldn't be renamed.";
 $_ARRAYLANG['TXT_FILEBROWSER_THUMBNAIL_SUCCESSFULLY_CREATED'] = "Successfully created thumbnail for %s.";
 $_ARRAYLANG['TXT_FILEBROWSER_MEDIA_4'] = "Media Archive #4";

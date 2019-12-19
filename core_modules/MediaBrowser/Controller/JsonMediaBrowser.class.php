@@ -352,8 +352,8 @@ class JsonMediaBrowser extends SystemComponentController implements JsonAdapter
         $file = $localFileSystem->getFileFromPath('/' . $path);
 
         if ($file === false) {
-            /*since file is already deleted, set message for successfull removal*/
-            $this->setMessage($_ARRAYLANG['TXT_FILEBROWSER_FILE_SUCCESSFULLY_REMOVED'], $file);
+            // since file is already deleted, set message for successfull removal
+            $this->setMessage($_ARRAYLANG['TXT_FILEBROWSER_FILE_PREVIOUSLY_REMOVED']);
             return false;
         }
         $this->setMessage($localFileSystem->removeFile($file));
