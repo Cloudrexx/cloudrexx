@@ -313,8 +313,6 @@ class BlockManager extends \Cx\Modules\Block\Controller\BlockLibrary
             return;
         }
 
-        // create new ContentTree instance
-        $objContentTree = new \ContentTree();
         $pageRepo = \Cx\Core\Core\Controller\Cx::instanciate()->getDb()->getEntityManager()->getRepository('Cx\Core\ContentManager\Model\Entity\Page');
 
         $rowNr = 0;
@@ -345,10 +343,10 @@ class BlockManager extends \Cx\Modules\Block\Controller\BlockLibrary
             $langString = implode(', ',$lang);
 
             $strGlobalSelectedPages = ($arrBlock['global'] == 2)
-                                        ? $this->getSelectedPages($blockId, 'global', $objContentTree, $pageRepo)
+                                        ? $this->getSelectedPages($blockId, 'global', $pageRepo)
                                         : '';
             $strDirectSelectedPages = ($arrBlock['direct'] == 1)
-                                        ? $this->getSelectedPages($blockId, 'direct', $objContentTree, $pageRepo)
+                                        ? $this->getSelectedPages($blockId, 'direct', $pageRepo)
                                         : '';
 
             $targeting      = $this->loadTargetingSettings($blockId);
@@ -420,32 +418,28 @@ class BlockManager extends \Cx\Modules\Block\Controller\BlockLibrary
      *
      * @param integer                                                 $blockId            Block id
      * @param string                                                  $placeholder        Placeholder (global, direct)
-     * @param \ContentTree                                            $objContentTree     ContentTree instance
      * @param \Cx\Core\ContentManager\Model\Repository\PageRepository $pageRepo           PageRepository instance
      *
      * @return string Return the selected pages as <ul><li></li></ul>
      */
-    function getSelectedPages($blockId, $placeholder, \ContentTree $objContentTree, \Cx\Core\ContentManager\Model\Repository\PageRepository $pageRepo)
+    function getSelectedPages($blockId, $placeholder, \Cx\Core\ContentManager\Model\Repository\PageRepository $pageRepo)
     {
         $pageLinkTemplate       = '<li><a href="%1$s" target="_blank">%2$s</a></li>';
         $blockAssociatedPageIds = $this->_getAssociatedPageIds($blockId, $placeholder);
 
         $selectedPages    = array();
         $strSelectedPages = '';
-        foreach ($objContentTree->getTree() as $arrData) {
-            if (!in_array($arrData['catid'], $blockAssociatedPageIds)) {
-                continue;
-            }
-            $page = $pageRepo->findOneById($arrData['catid']);
+
+        foreach ($blockAssociatedPageIds as $pageId) {
+            $page = $pageRepo->findOneById($pageId);
             if (!$page) {
                 continue;
             }
-            $selectedPages[] = sprintf($pageLinkTemplate, \Cx\Core\Routing\Url::fromPage($page)->toString(), contrexx_raw2xhtml($arrData['catname']));
+            $selectedPages[] = sprintf($pageLinkTemplate, \Cx\Core\Routing\Url::fromPage($page)->toString(), contrexx_raw2xhtml($page->getTitle()));
         }
         if ($selectedPages) {
             $strSelectedPages = '<ul>'.implode($selectedPages).'</ul>';
         }
-        return $strSelectedPages;
     }
 
     /**
