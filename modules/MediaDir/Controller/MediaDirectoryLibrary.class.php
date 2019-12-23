@@ -924,8 +924,12 @@ function ExpandMinimizeMultiple(toggleId, toggleKey){
         });
     }
 
-    elm1 = document.getElementById('mediadirInputfield_' + toggleId +  '_' + toggleKey + '_Minimized');
-    elm2 = document.getElementById('mediadirInputfield_' + toggleId +  '_' + toggleKey + '_Expanded');
+    if (toggleKey != "") {
+        toggleKey += "_";
+    }
+
+    elm1 = document.getElementById('mediadirInputfield_' + toggleId +  '_' + toggleKey + 'Minimized');
+    elm2 = document.getElementById('mediadirInputfield_' + toggleId +  '_' + toggleKey + 'Expanded');
 
     elm1.style.display = (elm1.style.display=='none') ? 'block' : 'none';
     elm2.style.display = (elm2.style.display=='none') ? 'block' : 'none';
