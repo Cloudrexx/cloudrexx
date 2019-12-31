@@ -628,3 +628,7 @@ $_ARRAYLANG['TXT_CRM_TASK_STATUS_COMPLETED'] = 'Completed';
 $_ARRAYLANG['TXT_ENTER_SORTING']   = 'Enter a sort value';
 $_ARRAYLANG['TXT_SORTING_NUMERIC'] = 'Sort value should be in numeric [0-9]';
 $_ARRAYLANG['TXT_ENTRIES_MARKED']  = 'Up arrow';
+
+// Settings interface import message
+$_ARRAYLANG['TXT_CRM_SETTINGS_INTERFACE_IMPORT_SUCCESS']      = 'Records Imported Successfully.';
+$_ARRAYLANG['TXT_CRM_SETTINGS_INTERFACE_IMPORT_MEMORY_ERROR'] = 'CSV import process is interrupted due to insufficient memory in available.';

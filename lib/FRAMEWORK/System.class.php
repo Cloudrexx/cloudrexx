@@ -114,7 +114,7 @@ class FWSystem
         $subpatterns = array();
         if (preg_match('#^([0-9.]+)\s*(gb?|mb?|kb?|bytes?|)?$#i', $literalSize, $subpatterns)) {
             $bytes = $subpatterns[1];
-            switch (strtolower($subpatterns[2][0])) {
+            switch (strtolower(substr($subpatterns[2], 0, 1))) {
                 case 'g':
                     $bytes *= 1024;
 

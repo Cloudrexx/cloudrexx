@@ -87,6 +87,8 @@ class ContrexxJavascript {
         else //backend
             $langCode = FWLanguage::getBackendLanguageCodeById($objInit->getBackendLangId());
 
+        \JS::activate('cx');
+
         $this->setVariable(
             array(
                 'path' => ASCMS_PATH_OFFSET . '/' . $langCode . '/',
@@ -94,6 +96,9 @@ class ContrexxJavascript {
                 'cadminPath' => \Cx\Core\Core\Controller\Cx::instanciate()->getWebsiteBackendPath() . '/',
                 'mode' => $objInit->mode,
                 'language' => $langCode,
+                'frontendLocale' => \FWLanguage::getLanguageCodeById(
+                    \Env::get('init')->getUserFrontendLangId()
+                ),
                 'csrf' => \Cx\Core\Csrf\Controller\Csrf::code(),
                 'charReplaceList' => \Cx\Core\LanguageManager\Controller\ComponentController::$REPLACEMENT_CHARLIST,
                 'themeId'   => \Env::get('init')->getCurrentThemeId(),

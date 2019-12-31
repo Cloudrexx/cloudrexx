@@ -149,7 +149,6 @@ $_ARRAYLANG['TXT_DATA_CATEGORY_MANAGE_TITLE'] = "Gesti&oacute;n de categor&iacut
 $_ARRAYLANG['TXT_DATA_CATEGORY_ADD_TITLE'] = "A&ntilde;adir categor&iacute;a";
 $_ARRAYLANG['TXT_DATA_SETTINGS_TITLE'] = "Configuraci&oacute;n";
 $_ARRAYLANG['TXT_DATA_BLOCK_TITLE'] = "Variable";
-$_ARRAYLANG['TXT_DATA_NETWORKS_TITLE'] = "Gesti&oacute;n de redes";
 $_ARRAYLANG['TXT_DATA_ENTRY_COPY_TITLE'] = "Copy message";
 $_ARRAYLANG['TXT_DATA_ENTRY_ADD_THUMBNAIL'] = "Thumbnail";
 $_ARRAYLANG['TXT_DATA_ENTRY_ADD_THUMBNAIL_BROWSE'] = "Browse";

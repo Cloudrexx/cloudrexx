@@ -1510,6 +1510,7 @@ class CrmLibrary
                        c.contact_customer AS contactCustomerId,
                        c.status,
                        c.added_date,
+                       c.profile_picture,
                        con.customer_name AS contactCustomer,
                        email.email,
                        phone.phone,

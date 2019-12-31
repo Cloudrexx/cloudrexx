@@ -68,6 +68,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                     'get',
                     'post',
                     'put',
+                    'patch',
                     'delete',
                     'trace',
                     'options',
@@ -161,13 +162,11 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             if (empty($arguments[1])) {
                 throw new \InvalidArgumentException('Not enough arguments');
             }
-            $em = $this->cx->getDb()->getEntityManager();
             $dataSource = $this->getDataSource($arguments[1]);
             $elementId = array();
             if (isset($arguments[2])) {
                 $argumentKeys = array_keys($arguments);
-                $metaData = $em->getClassMetadata($dataSource->getIdentifier());
-                $primaryKeyNames = $metaData->getIdentifierFieldNames();
+                $primaryKeyNames = $dataSource->getIdentifierFieldNames();
                 for ($i = 0; $i < count($arguments) - 2; $i++) {
                     if (!is_numeric($argumentKeys[$i + 2])) {
                         break;
@@ -182,24 +181,41 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             }
             
             $order = array();
-            if (isset($arguments['order'])) {
-                $order = $arguments['order'];
-            }
-            $order = array();
-            if (isset($arguments['order'])) {
-                $orderStrings = explode(';', $arguments['order']);
-                foreach ($orderStrings as $orderString) {
-                    $orderStringParts = explode('/', $orderString);
-                    $order[$orderStringParts[0]] = $orderStringParts[1];
+            if (isset($arguments['order']) && is_array($arguments['order'])) {
+                foreach ($arguments['order'] as $field=>$sortOrder) {
+                    if (!$dataSource->hasField($field)) {
+                        throw new \InvalidArgumentException(
+                            'Unknown field "' . $field . '"'
+                        );
+                    }
+                    if (!in_array(strtolower($sortOrder), array('asc', 'desc'))) {
+                        throw new \InvalidArgumentException(
+                            'Unknown sort order "' . $sortOrder . '"'
+                        );
+                    }
                 }
+                $order = $arguments['order'];
             }
             
             $filter = array();
-            if (isset($arguments['filter'])) {
-                $filterStrings = explode(';', $arguments['filter']);
-                foreach ($filterStrings as $filterString) {
-                    $filterStringParts = explode('=', $filterString);
-                    $filter[$filterStringParts[0]] = $filterStringParts[1];
+            if (isset($arguments['filter']) && is_array($arguments['filter'])) {
+                foreach ($arguments['filter'] as $field=>$filterExpr) {
+                    if (!is_array($filterExpr)) {
+                        $filterExpr = array('eq' => $filterExpr);
+                    }
+                    foreach ($filterExpr as $operation=>$value) {
+                        if (!$dataSource->hasField($field)) {
+                            throw new \InvalidArgumentException(
+                                'Unknown field "' . $field . '"'
+                            );
+                        }
+                        if (!$dataSource->supportsOperation($operation)) {
+                            throw new \InvalidArgumentException(
+                                'Unsupported operation "' . $operation . '"'
+                            );
+                        }
+                        $filter[$field][$operation] = $value;
+                    }
                 }
             }
             
@@ -215,7 +231,12 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             
             $em = $this->cx->getDb()->getEntityManager();
             $dataAccessRepo = $em->getRepository($this->getNamespace() . '\Model\Entity\DataAccess');
-            $dataAccess = $dataAccessRepo->getAccess($outputModule, $dataSource, $method, $apiKey);
+            $dataAccess = $dataAccessRepo->getAccess(
+                $method,
+                $apiKey,
+                $arguments,
+                $arguments[1]
+            );
             if (!$dataAccess) {
                 $response->setStatusCode(403);
                 throw new \BadMethodCallException('Access denied');
@@ -239,7 +260,11 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 case 'options':
                     // lists available methods for a request
                     http_response_code(204); // No Content
-                    $allowedMethods = $dataAccessRepo->getAllowedMethods($dataSource, $apiKey);
+                    $allowedMethods = $dataAccessRepo->getAllowedMethods(
+                        $dataSource,
+                        $apiKey,
+                        $arguments
+                    );
                     header('Allow: ' . implode(', ', $allowedMethods));
                     die();
                     break;

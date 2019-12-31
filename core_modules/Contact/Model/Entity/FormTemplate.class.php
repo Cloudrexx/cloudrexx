@@ -119,7 +119,7 @@ class FormTemplate extends \Cx\Model\Base\EntityBase {
      */
     public function __construct(
         Form $form,
-        \Cx\Core\ContentManager\Model\Entity\Page $page,
+        \Cx\Core\ContentManager\Model\Entity\Page $page = null,
         \Cx\Core\View\Model\Entity\Theme $theme = null
     ) {
         if (
@@ -162,7 +162,12 @@ class FormTemplate extends \Cx\Model\Base\EntityBase {
             $this->getDirectory() . '/View/Template/Frontend'
         );
         $this->template->setErrorHandling(PEAR_ERROR_DIE);
-        $this->template->setTemplate($this->page->getContent());
+
+        if ($this->page) {
+            $this->template->setTemplate($this->page->getContent());
+        } else {
+            $this->template->setTemplate($this->getTemplateContent('Form'));
+        }
 
         if ($this->template->placeholderExists('APPLICATION_DATA')) {
             // Load the Form template from 'theme specific form template' for eg:
@@ -290,7 +295,7 @@ class FormTemplate extends \Cx\Model\Base\EntityBase {
 
         // Check and return file content if the file exists in the Contact Component.
         $defaultPath = $this->cx->getClassLoader()->getFilePath(
-            $this->getDirectory() . '/View/Template/Frontend/'
+            $this->getDirectory(false) . '/View/Template/Frontend/'
             . $fileName . '.html'
         );
         return file_get_contents($defaultPath);
@@ -721,6 +726,7 @@ class FormTemplate extends \Cx\Model\Base\EntityBase {
                     $template->placeholderExists('TXT_CONTACT_NOT_SPECIFIED') ||
                     $template->placeholderExists('TXT_CONTACT_PLEASE_SELECT')
                 ) {
+                    // legacy
                     $template->setVariable(array(
                         'TXT_CONTACT_PLEASE_SELECT' => $_ARRAYLANG['TXT_CONTACT_PLEASE_SELECT'],
                         'TXT_CONTACT_NOT_SPECIFIED' => $_ARRAYLANG['TXT_CONTACT_NOT_SPECIFIED'],
@@ -944,9 +950,11 @@ class FormTemplate extends \Cx\Model\Base\EntityBase {
         }
 
         foreach ($options as $index => $option) {
+            // legacy
             if ($template->placeholderExists($fieldId . '_' . $index . '_VALUE')) {
                 $valuePlaceholder = $fieldId . '_' . $index . '_VALUE';
             }
+            // legacy
             if ($template->placeholderExists('SELECTED_' . $fieldId . '_' . $index)) {
                 $selectPlaceholder = 'SELECTED_' . $fieldId . '_' . $index;
             }
@@ -996,13 +1004,17 @@ class FormTemplate extends \Cx\Model\Base\EntityBase {
                 $valueFromGet = contrexx_input2raw($_GET[$fieldId]);
             }
 
-            $isOptionInPost =
-                !empty($valueFromPost) &&
+            $isOptionInPost = !empty($valueFromPost) && (
                 (
-                    (is_array($valueFromPost) && in_array($option, $valueFromPost)) ||
-                    $option == $valueFromPost ||
-                    strcasecmp($option, $valueFromPost) == 0
-                );
+                    is_array($valueFromPost) &&
+                    in_array($option, $valueFromPost)
+                ) || (
+                    !is_array($valueFromPost) && (
+                        $option == $valueFromPost ||
+                        strcasecmp($option, $valueFromPost) == 0
+                    )
+                )
+            );
             $isOptionInGet =
                 !empty($valueFromGet) &&
                 (

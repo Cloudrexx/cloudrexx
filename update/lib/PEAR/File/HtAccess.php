@@ -450,7 +450,7 @@ class File_HtAccess {
         $str  = $this->getContent();
 
         try {
-            $objFile = new \Cx\lib\FileSystem\File($this->getFile());
+            $objFile = new \Cx\Lib\FileSystem\File($this->getFile());
             $objFile->write($str);
         } catch (\Cx\Lib\FileSystem\FileSystemException $e) {
             return $e->getMessage();

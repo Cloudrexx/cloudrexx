@@ -55,7 +55,7 @@ class OptionTest extends ContrexxTestCase
         </div>
         <!-- END option -->';
 
-    protected function setUp() {
+    protected function setUp(): void {
         global $_LANGID;
         $_LANGID = 1;
         \Env::get('init')->loadLanguageData('TemplateEditor');

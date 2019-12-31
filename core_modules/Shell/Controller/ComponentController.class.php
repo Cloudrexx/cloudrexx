@@ -90,7 +90,16 @@ Please type `help` to find available commands
         $componentRepo = $this->cx->getDb()->getEntityManager()->getRepository('Cx\Core\Core\Model\Entity\SystemComponent');
         $commands = array();
         foreach ($componentRepo->findAll() as $component) {
-            foreach ($component->getCommandsForCommandMode() as $command) {
+            foreach ($component->getCommandsForCommandMode() as $command=>$permission) {
+                // permission is optional
+                if (is_string($permission)) {
+                    $command = $permission;
+                }
+                // check permission
+                if (!$component->hasAccessToExecuteCommand($command, array())) {
+                    continue;
+                }
+                // avoid duplicates
                 if (isset($commands[$command])) {
                     throw new \Exception('Command \'' . $command . '\' is already in index');
                 }
@@ -114,6 +123,9 @@ Please type `help` to find available commands
                 echo 'Unknown command \'' . $command . '\'
 ';
                 continue;
+            }
+            if (!$commands[$command]->hasAccessToExecuteCommand($command, $params)) {
+                echo 'Permission denied!' . PHP_EOL;
             }
             try {
                 $commands[$command]->executeCommand($command, $params);

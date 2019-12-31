@@ -1,7 +1,7 @@
 <!-- start module_downloads_download_modify.html -->
 <script type="text/javascript">
 // <![CDATA[
-
+var autoFileNaming = cx.variables.get('autoFileNaming', 'downloads');
 function downloadsSelectAll()
 {
     downloadsSelectAllGroups(document.getElementById('downloads_download_associated_categories'))
@@ -92,9 +92,10 @@ function downloadsRemoveOptionFromList(from,dest)
     }
 }
 
-function downloadsGetFileBrowser(elInsertBox,elImagePreview,elRemoveButton,elMimeType)
+function downloadsGetFileBrowser(elInsertBox,elImagePreview,elRemoveButton,elMimeType,elmName)
 {
     downloadsElInsertBox = elInsertBox;
+    downloadsElmName     = typeof(elmName) == 'undefined' ? null : elmName;
     downloadsElImagePreview = typeof(elImagePreview) == 'undefined' ? null : elImagePreview;
     downloadsElRemoveButton = typeof(elRemoveButton) == 'undefined' ? null : elRemoveButton;
     downloadsElMimeType = typeof(elMimeType) == 'undefined' ? null : elMimeType;
@@ -123,6 +124,23 @@ function mbCallback(data)
                 }
             }
         });
+
+        if (autoFileNaming === 'on' && downloadsElmName != null && downloadsElmName.value === '') {
+            cx.ajax(
+                'Downloads',
+                'getPrettyFileName',
+                {
+                    type : 'GET',
+                    data : {
+                        fileName : data.data[0].datainfo.name
+                    },
+                    success : function(data) {
+                        downloadsElmName.value = data.data.fileName;
+                    }
+                }
+            );
+        }
+
         if (downloadsElRemoveButton != null) {
            downloadsElRemoveButton.style.display = '';
         }
@@ -435,13 +453,17 @@ function switchBox(element, contentId) {
         var existingDescription = document.getElementById('downloads_download_description_' + firstLanguageId).value;
         var existingSourceFile = document.getElementById('downloads_download_file_source_' + firstLanguageId).value;
         var existingSourceUrl = document.getElementById('downloads_download_url_source_' + firstLanguageId).value;
-        var existingMetaKeywords = document.getElementById('downloads_download_metakeys_' + firstLanguageId).value;
+        if (jQuery('textarea[name^="downloads_download_metakeys"').length) {
+            var existingMetaKeywords = document.getElementById('downloads_download_metakeys_' + firstLanguageId).value;
+        }
         var tab = document.getElementById(contentId);
         tab.querySelector('input[id^="downloads_download_name_"]').value = existingName;
         tab.querySelector('textarea[id^="downloads_download_description_"]').value = existingDescription;
         tab.querySelector('input[id^="downloads_download_file_source_"]').value = existingSourceFile;
         tab.querySelector('input[id^="downloads_download_url_source_"]').value = existingSourceUrl;
-        tab.querySelector('textarea[id^="downloads_download_metakeys_"]').value = existingMetaKeywords;
+        if (jQuery('textarea[name^="downloads_download_metakeys"').length) {
+            tab.querySelector('textarea[id^="downloads_download_metakeys_"]').value = existingMetaKeywords;
+        }
 
         document.getElementById('downloadsLanguage_' + contentId).style.display = 'block';
         selectTab(contentId);
@@ -573,7 +595,7 @@ window.onload = function () {
                         <td>{TXT_DOWNLOADS_SOURCE}</td>
                         <td>
                             <div id="downloads_download_type_file_config_{DOWNLOADS_DOWNLOAD_LANG_ID}" class="downloads_download_type_file_config" style="display:{DOWNLOADS_DOWNLOAD_TYPE_FILE_CONFIG_DISPLAY}">
-                                <input type="text" id="downloads_download_file_source_{DOWNLOADS_DOWNLOAD_LANG_ID}" name="downloads_download_file_source[{DOWNLOADS_DOWNLOAD_LANG_ID}]" value="{DOWNLOADS_DOWNLOAD_FILE_SOURCE}" style="width:300px;" /> <input type="button" value="{TXT_DOWNLOADS_BROWSE}" onclick="downloadsGetFileBrowser(document.getElementById('downloads_download_file_source_{DOWNLOADS_DOWNLOAD_LANG_ID}'),null,null,document.getElementById('downloads_download_mime_type'))" />
+                                <input type="text" id="downloads_download_file_source_{DOWNLOADS_DOWNLOAD_LANG_ID}" name="downloads_download_file_source[{DOWNLOADS_DOWNLOAD_LANG_ID}]" value="{DOWNLOADS_DOWNLOAD_FILE_SOURCE}" style="width:300px;" /> <input type="button" value="{TXT_DOWNLOADS_BROWSE}" onclick="downloadsGetFileBrowser(document.getElementById('downloads_download_file_source_{DOWNLOADS_DOWNLOAD_LANG_ID}'),null,null,document.getElementById('downloads_download_mime_type'),document.getElementById('downloads_download_name_{DOWNLOADS_DOWNLOAD_LANG_ID}'))" />
                             </div>
                             <div id="downloads_download_type_url_config_{DOWNLOADS_DOWNLOAD_LANG_ID}" class="downloads_download_type_url_config" style="display:{DOWNLOADS_DOWNLOAD_TYPE_URL_CONFIG_DISPLAY}">
                                 <input type="text" id="downloads_download_url_source_{DOWNLOADS_DOWNLOAD_LANG_ID}" name="downloads_download_url_source[{DOWNLOADS_DOWNLOAD_LANG_ID}]" value="{DOWNLOADS_DOWNLOAD_URL_SOURCE}" style="width:300px;" />
@@ -697,7 +719,7 @@ window.onload = function () {
                             <tbody style="vertical-align:top;">
                                 <tr>
                                     <td width="300" style="border-bottom:0px;">{TXT_DOWNLOADS_AVAILABLE_CATEGORIES}<br />
-                                        <select name="downloads_download_not_associated_categories[]" id="downloads_download_not_associated_categories" size="15" style="width:300px;" multiple="multiple">
+                                        <select name="downloads_download_not_associated_categories[]" id="downloads_download_not_associated_categories" size="15" style="min-width:300px;" multiple="multiple">
                                         {DOWNLOADS_DOWNLOAD_NOT_ASSOCIATED_CATEGORIES}
                                         </select>
                                         <br />
@@ -712,7 +734,7 @@ window.onload = function () {
                                         <input type="button" value="&lt;&lt;" name="removeOption" onclick="downloadsRemoveOptionFromList(document.getElementById('downloads_download_not_associated_categories'), document.getElementById('downloads_download_associated_categories'))" />
                                     </td>
                                    <td width="100%" style="border-bottom:0px;">{TXT_DOWNLOADS_ASSIGNED_CATEGORIES}<br />
-                                        <select name="downloads_download_associated_categories[]" id="downloads_download_associated_categories" size="15" style="width:300px;" multiple="multiple">
+                                        <select name="downloads_download_associated_categories[]" id="downloads_download_associated_categories" size="15" style="min-width:300px;" multiple="multiple">
                                         {DOWNLOADS_DOWNLOAD_ASSOCIATED_CATEGORIES}
                                         </select>
                                         <br />
@@ -746,7 +768,7 @@ window.onload = function () {
                             <tbody style="vertical-align:top;">
                                 <tr>
                                     <td width="300" style="border-bottom:0px;">{TXT_DOWNLOADS_AVAILABLE_DOWNLOADS}<br />
-                                        <select name="downloads_download_not_associated_downloads[]" id="downloads_download_not_associated_downloads" size="15" style="width:300px;" multiple="multiple">
+                                        <select name="downloads_download_not_associated_downloads[]" id="downloads_download_not_associated_downloads" size="15" style="min-width:300px;" multiple="multiple">
                                         {DOWNLOADS_DOWNLOAD_NOT_ASSOCIATED_DOWNLOADS}
                                         </select>
                                         <br />
@@ -761,7 +783,7 @@ window.onload = function () {
                                         <input type="button" value="&lt;&lt;" name="removeOption" onclick="downloadsRemoveOptionFromList(document.getElementById('downloads_download_not_associated_downloads'), document.getElementById('downloads_download_associated_downloads'))" />
                                     </td>
                                    <td width="100%" style="border-bottom:0px;">{TXT_DOWNLOADS_ASSIGNED_DOWNLOADS}<br />
-                                        <select name="downloads_download_associated_downloads[]" id="downloads_download_associated_downloads" size="15" style="width:300px;" multiple="multiple">
+                                        <select name="downloads_download_associated_downloads[]" id="downloads_download_associated_downloads" size="15" style="min-width:300px;" multiple="multiple">
                                         {DOWNLOADS_DOWNLOAD_ASSOCIATED_DOWNLOADS}
                                         </select>
                                         <br />

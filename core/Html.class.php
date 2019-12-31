@@ -31,6 +31,7 @@
  * Provides some commonly used HTML elements
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Reto Kohli <reto.kohli@comvation.com>
+ * @deprecated  This class is deprecated in favor of using Sigma or \Cx\Core\Html\Model\Entity\...
  * @version     3.0.0
  * @package     cloudrexx
  * @subpackage  core
@@ -42,6 +43,7 @@
  * Provides some commonly used HTML elements
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Reto Kohli <reto.kohli@comvation.com>
+ * @deprecated  This class is deprecated in favor of using Sigma or \Cx\Core\Html\Model\Entity\...
  * @version     3.0.0
  * @package     cloudrexx
  * @subpackage  core
@@ -1036,6 +1038,10 @@ var _active_tab = '.
     static function getImageChooserBrowser(
         $objImage, $id, $imagetype_key=false, $type=null, $path=null
     ) {
+        throw new \Exception(
+            'Method ' . __METHOD__ . ' is deprecated. Please use \Cx\Core\Html instead'
+        );
+
         global $_CORELANG;
 
         JS::registerCode(self::getJavascript_Image(Image::PATH_NO_IMAGE));
@@ -1144,6 +1150,10 @@ var _active_tab = '.
         $objImage, $id, $imagetype_key='', $path_default='',
         $replace_only=false
     ) {
+        throw new \Exception(
+            'Method ' . __METHOD__ . ' is deprecated. Please use \Cx\Core\Html instead'
+        );
+
         global $_CORELANG;
 
         JS::registerCode(self::getJavascript_Image($path_default));
@@ -2448,7 +2458,8 @@ alert("change: ID mismatch: "+id);
     static function getRelativeUri()
     {
         // returns the relative uri from url request object
-        return (string) clone \Env::get('Resolver')->getUrl();
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        return (string) clone $cx->getRequest()->getUrl();
     }
 
 
@@ -2596,6 +2607,10 @@ alert("change: ID mismatch: "+id);
      */
     static function getJavascript_Image($path='')
     {
+        throw new \Exception(
+            'Method ' . __METHOD__ . ' is deprecated. Please use \Cx\Core\Html instead'
+        );
+
         global $_CORELANG; //$_ARRAYLANG,
 
         return '

@@ -1080,12 +1080,12 @@ class Page extends \Cx\Core\ContentManager\Model\Entity\Page implements \Doctrin
     /**
      * {@inheritDoc}
      */
-    public function copy($includeContent = true, $includeModuleAndCmd = true, $includeName = true, $includeMetaData = true, $includeProtection = true, $followRedirects = false, $followFallbacks = false, $page = NULL)
+    public function copy($includeContent = true, $includeModuleAndCmd = true, $includeName = true, $includeMetaData = true, $includeProtection = true, $includeEditingStatus = true, $followRedirects = false, $followFallbacks = false, $page = NULL)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'copy', array($includeContent, $includeModuleAndCmd, $includeName, $includeMetaData, $includeProtection, $followRedirects, $followFallbacks, $page));
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'copy', array($includeContent, $includeModuleAndCmd, $includeName, $includeMetaData, $includeProtection, $includeEditingStatus, $followRedirects, $followFallbacks, $page));
 
-        return parent::copy($includeContent, $includeModuleAndCmd, $includeName, $includeMetaData, $includeProtection, $followRedirects, $followFallbacks, $page);
+        return parent::copy($includeContent, $includeModuleAndCmd, $includeName, $includeMetaData, $includeProtection, $includeEditingStatus, $followRedirects, $followFallbacks, $page);
     }
 
     /**
@@ -1102,23 +1102,23 @@ class Page extends \Cx\Core\ContentManager\Model\Entity\Page implements \Doctrin
     /**
      * {@inheritDoc}
      */
-    public function copyToNode($destinationNode, $includeContent = true, $includeModuleAndCmd = true, $includeName = true, $includeMetaData = true, $includeProtection = true, $followRedirects = false, $followFallbacks = false, $page = NULL)
+    public function copyToNode($destinationNode, $includeContent = true, $includeModuleAndCmd = true, $includeName = true, $includeMetaData = true, $includeProtection = true, $includeEditingStatus = true, $followRedirects = false, $followFallbacks = false, $page = NULL)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'copyToNode', array($destinationNode, $includeContent, $includeModuleAndCmd, $includeName, $includeMetaData, $includeProtection, $followRedirects, $followFallbacks, $page));
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'copyToNode', array($destinationNode, $includeContent, $includeModuleAndCmd, $includeName, $includeMetaData, $includeProtection, $includeEditingStatus, $followRedirects, $followFallbacks, $page));
 
-        return parent::copyToNode($destinationNode, $includeContent, $includeModuleAndCmd, $includeName, $includeMetaData, $includeProtection, $followRedirects, $followFallbacks, $page);
+        return parent::copyToNode($destinationNode, $includeContent, $includeModuleAndCmd, $includeName, $includeMetaData, $includeProtection, $includeEditingStatus, $followRedirects, $followFallbacks, $page);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function copyToLang($destinationLang, $includeContent = true, $includeModuleAndCmd = true, $includeName = true, $includeMetaData = true, $includeProtection = true, $followRedirects = false, $followFallbacks = false, $page = NULL)
+    public function copyToLang($destinationLang, $includeContent = true, $includeModuleAndCmd = true, $includeName = true, $includeMetaData = true, $includeProtection = true, $includeEditingStatus = true, $followRedirects = false, $followFallbacks = false, $page = NULL)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'copyToLang', array($destinationLang, $includeContent, $includeModuleAndCmd, $includeName, $includeMetaData, $includeProtection, $followRedirects, $followFallbacks, $page));
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'copyToLang', array($destinationLang, $includeContent, $includeModuleAndCmd, $includeName, $includeMetaData, $includeProtection, $includeEditingStatus, $followRedirects, $followFallbacks, $page));
 
-        return parent::copyToLang($destinationLang, $includeContent, $includeModuleAndCmd, $includeName, $includeMetaData, $includeProtection, $followRedirects, $followFallbacks, $page);
+        return parent::copyToLang($destinationLang, $includeContent, $includeModuleAndCmd, $includeName, $includeMetaData, $includeProtection, $includeEditingStatus, $followRedirects, $followFallbacks, $page);
     }
 
     /**
@@ -1482,6 +1482,17 @@ class Page extends \Cx\Core\ContentManager\Model\Entity\Page implements \Doctrin
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getWidgetContentAttributeName', array($widgetName));
 
         return parent::getWidgetContentAttributeName($widgetName);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function titleExists($parentNode, $lang, $title)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'titleExists', array($parentNode, $lang, $title));
+
+        return parent::titleExists($parentNode, $lang, $title);
     }
 
     /**

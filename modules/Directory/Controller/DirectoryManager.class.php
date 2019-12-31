@@ -2861,18 +2861,16 @@ EOF;
 
     function showSettings_homecontent()
     {
-        global $_CONFIG, $objDatabase, $_ARRAYLANG;
+        global $_ARRAYLANG;
 
         // initialize variables
         $this->_objTpl->addBlockfile('SYSTEM_REQUESTS_CONTENT', 'requests_block', 'module_directory_settings_homecontent.html');
 
         //get settings
-        $homeContent = 0;
-        $objResult = $objDatabase->Execute("SELECT setvalue FROM ".DBPREFIX."settings WHERE setid = '49'");
-        if ($objResult !== false) {
-            $homeContent = $objResult->fields['setvalue'];
-        }
-
+        $homeContent = \Cx\Core\Setting\Controller\Setting::getValue(
+            'directoryHomeContent',
+            'Config'
+        );
         if ($homeContent == 1) {
             $selectDeactivate   = '';
             $selectActivate     = 'checked="checked"';

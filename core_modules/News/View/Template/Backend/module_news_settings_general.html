@@ -19,7 +19,7 @@ function updateLangName(input)
 }
 function swapBlock( div,status ) {
     if(status == 1){
-        document.getElementById( div ).style.display ='block';
+        document.getElementById( div ).style.display ='';
     }else{
         document.getElementById( div ).style.display ='none';
     }
@@ -247,7 +247,7 @@ function preSubmitCheck(){
     <tr class="row2">
       <td nowrap="nowrap" style="vertical-align:top;">{TXT_NEWS_PROTECTION}</td>
       <td nowrap="nowrap">
-        <input type="checkbox" name="newsMessageProtection" id="newsMessageProtection" {NEWS_MESSAGE_PROTECTION_CHECKED} value="1" onclick="swapBlock('newsMessageProtectionRestrictedConfig',this.checked)" />
+        <input type="checkbox" name="newsMessageProtection" id="newsMessageProtection" {NEWS_MESSAGE_PROTECTION_CHECKED} value="1" onclick="swapBlock('newsMessageProtectionRestrictedConfig',this.checked);swapBlock('newsMessageProtectionRedirect',this.checked);" />
         <label for="newsMessageProtection">{TXT_NEWS_ACTIVE}</label>
 
         <div id="newsMessageProtectionRestrictedConfig" style="display:{NEWS_MESSAGE_PROTECTION_RESTRICTED_DISPLAY};">
@@ -256,6 +256,15 @@ function preSubmitCheck(){
             <label for="newsMessageProtectionRestricted">{TXT_NEWS_MESSAGE_PROTECTION_RESTRICTED}</label>
         </div>
       </td>
+    </tr>
+    <tr class="row1" id="newsMessageProtectionRedirect" style="display:{NEWS_MESSAGE_PROTECTION_RESTRICTED_DISPLAY};">
+        <td width="15%" nowrap="nowrap">{TXT_NEWS_SETTINGS_LOGIN_REDIRECT}</td>
+        <td width="85%" nowrap="nowrap">
+            <input type="checkbox" name="newsLoginRedirect" id="newsLoginRedirect" {NEWS_LOGIN_REDIRECT} value="1" />
+            <label for="newsLoginRedirect">{TXT_NEWS_ACTIVE}</label>
+            <span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_NEWS_SETTINGS_LOGIN_REDIRECT_HELP}</span>
+            <br />
+        </td>
     </tr>
     <tr class="row1">
         <td style="vertical-align: top;">{TXT_NEWS_SETTINGS_USE_COMMENTS}</td>
