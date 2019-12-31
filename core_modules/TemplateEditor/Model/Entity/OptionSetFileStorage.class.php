@@ -57,7 +57,7 @@ class OptionSetFileStorage extends \Cx\Model\Base\EntityBase
      * @param String $name
      *
      * @return array
-     * @throws \Symfony\Component\Yaml\ParserException
+     * @throws \Symfony\Component\Yaml\Exception\ParseException
      */
     public function retrieve($name)
     {
@@ -74,7 +74,7 @@ class OptionSetFileStorage extends \Cx\Model\Base\EntityBase
      * @param  Boolean  $isOptional if true, no exception will be thrown if the
      *                                  file is not found
      * @return array                the data from the file
-     * @throws \Symfony\Component\Yaml\ParserException thrown if the file is not found or empty
+     * @throws \Symfony\Component\Yaml\Exception\ParseException thrown if the file is not found or empty
      */
     protected function retrieveFile($fileName, $isOptional = false){
         $file = $this->cx->getClassLoader()
@@ -83,7 +83,7 @@ class OptionSetFileStorage extends \Cx\Model\Base\EntityBase
             if ($isOptional) {
                 return;
             }
-            throw new \Symfony\Component\Yaml\ParserException(
+            throw new \Symfony\Component\Yaml\Exception\ParseException(
                 "File" . $fileName . 'not found'
             );
         }
@@ -93,7 +93,7 @@ class OptionSetFileStorage extends \Cx\Model\Base\EntityBase
             if ($isOptional) {
                 return;
             }
-            throw new \Symfony\Component\Yaml\ParserException(
+            throw new \Symfony\Component\Yaml\Exception\ParseException(
                 "File" . $fileName . 'is empty'
             );
         }
@@ -101,11 +101,11 @@ class OptionSetFileStorage extends \Cx\Model\Base\EntityBase
         try {
             $yaml = new \Symfony\Component\Yaml\Parser();
             return $yaml->parse($content);
-        } catch (\Symfony\Component\Yaml\ParserException $e) {
+        } catch (\Symfony\Component\Yaml\Exception\ParseException $e) {
             preg_match(
                 "/line (?P<line>[0-9]+)/", $e->getMessage(), $matches
             );
-            throw new \Symfony\Component\Yaml\ParserException(
+            throw new \Symfony\Component\Yaml\Exception\ParseException(
                 $e->getMessage(), $matches['line']
             );
         }
