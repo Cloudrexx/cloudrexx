@@ -63,14 +63,14 @@ class JsonViewManager implements \Cx\Core\Json\JsonAdapter {
      */
     public function getAccessableMethods() {
         return array(
-            'activateTheme'             => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), true, null, array(46), null),
-            'activateLanguages'         => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), true, null, array(46), null),
-            'checkThemeExistsByThemeId' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), true, null, array(47), null),
-            'deleteThemeById'           => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), true, null, array(47), null),
-            'delete'                    => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), true, null, array(47), null),
-            'rename'                    => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), true, null, array(47), null),
-            'newWithin'                 => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), true, null, array(47), null),
-            );
+            'activateTheme'             => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), true, array(), array(ViewManager::ENABLE_THEMES_ACCESS_ID)),
+            'activateLanguages'         => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), true, array(), array(ViewManager::ENABLE_THEMES_ACCESS_ID)),
+            'checkThemeExistsByThemeId' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), true, array(), array(ViewManager::EDIT_THEMES_ACCESS_ID)),
+            'deleteThemeById'           => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), true, array(), array(ViewManager::EDIT_THEMES_ACCESS_ID)),
+            'delete'                    => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), true, array(), array(ViewManager::EDIT_THEMES_ACCESS_ID)),
+            'rename'                    => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), true, array(), array(ViewManager::EDIT_THEMES_ACCESS_ID)),
+            'newWithin'                 => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('post'), true, array(), array(ViewManager::EDIT_THEMES_ACCESS_ID)),
+        );
     }
 
     /**
@@ -94,30 +94,41 @@ class JsonViewManager implements \Cx\Core\Json\JsonAdapter {
      * @global type $objDatabase
      */
     public function activateTheme() {
-        global $objDatabase;
-
-        // array contains the database column name for each theme type
-        $themeTypes = array(
-            'themesid',
-            'mobile_themes_id',
-            'print_themes_id',
-            'pdf_themes_id',
-            'app_themes_id'
-        );
+        // array contains the database value name for each theme type
+        $themeChannels = \Cx\Core\View\Model\Entity\Theme::$channels;
 
         $themeId   = isset($_POST['themeId']) ? $_POST['themeId'] : '';
-        $themeType = isset($_POST['themeType']) && array_key_exists($_POST['themeType'], $themeTypes) ? intval($_POST['themeType']) : 0;
+        $themeChannel = isset($_POST['themeType']) && array_key_exists($_POST['themeType'], $themeChannels) ? $themeChannels[intval($_POST['themeType'])] : 0;
+
+        $em = \Cx\Core\Core\Controller\Cx::instanciate()
+            ->getDb()
+            ->getEntityManager();
+        $frontendRepo = $em->getRepository('Cx\Core\View\Model\Entity\Frontend');
 
         if (!empty($themeId)) {
             if (count(\FWLanguage::getActiveFrontendLanguages()) > 1) {
-                if (isset($_POST['themesLangId'])) {
+                if (isset($_POST['themesLangId'])) { // set theme for given languages
                     foreach ($_POST['themesLangId'] as $langId) {
-                        $objDatabase->Execute("UPDATE ".DBPREFIX."languages SET `". $themeTypes[$themeType] ."` = '".intval($themeId)."' WHERE id=".intval($langId));
+                        $criteria = array(
+                            'language' => $langId,
+                            'channel' => $themeChannel
+                        );
+                        $frontend = $frontendRepo->findOneBy($criteria);
+                        $frontend->setTheme($themeId);
+                        $em->persist($frontend);
                     }
                 }
-            } else {
-               $objDatabase->Execute("UPDATE ".DBPREFIX."languages SET `". $themeTypes[$themeType] ."` ='".intval($themeId)."' WHERE `frontend` = 1");
+            } else { // set theme for all active languages
+                $criteria = array(
+                    'channel' => $themeChannel
+                );
+                $frontends = $frontendRepo->findBy($criteria);
+                foreach ($frontends as $frontend) {
+                    $frontend->setTheme($themeId);
+                    $em->persist($frontend);
+                }
             }
+            $em->flush();
         }
 
     }
@@ -148,7 +159,7 @@ class JsonViewManager implements \Cx\Core\Json\JsonAdapter {
 
             $selectThemeNotInLanguages = array_diff_key(
                 \FWLanguage::getActiveFrontendLanguages(),
-                array_flip($theme->getLanguagesByType($themeTypes[$themeType]))
+                $theme->getLanguagesByType($themeTypes[$themeType])
             );
         }
 

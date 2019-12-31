@@ -149,3 +149,6 @@ $_ARRAYLANG['TXT_BLOCK_TARGETING_INFO_EXCLUDE'] = 'Dieser Inhaltscontainer wird 
 $_ARRAYLANG['TXT_BLOCK_DISPLAY_GLOBAL_INACTIVE'] = 'Dieser Inhaltscontainer wird im globalen Platzhalter [[BLOCK_GLOBAL]] nicht angezeigt';
 $_ARRAYLANG['TXT_BLOCK_DIRECT_INFO_SHOW_ALL_PAGES'] = 'Dieser Inhaltscontainer wird auf jeder Seite im eigenen Platzhalter %s angezeigt';
 $_ARRAYLANG['TXT_BLOCK_DIRECT_INFO_SHOW_SELECTED_PAGES'] = 'Dieser Inhaltscontainer wird auf den folgenden Seiten im eigenen Platzhalter %s angezeigt:';
+$_ARRAYLANG['TXT_BLOCK_MARK_PARSED_BLOCK'] = 'Inhaltscontainer mit HTML-Kommentar umschließen';
+$_ARRAYLANG['TXT_BLOCK_MARK_PARSED_BLOCK_INFO'] = 'Aktivieren Sie diese Option, um die Inhaltscontainer bei der Website-Ausgabe (Frontend) mit einem HTML-Kommentar zu versehen. Ist diese Option aktiv, werden alle Inhaltscontainer mit einem HTML-Kommentar wie folgt umschlossen: <br />
+&lt;!-- start BLOCK_1 --&gt;Inhalt des Containers&lt;!-- end BLOCK_1 --&gt;';

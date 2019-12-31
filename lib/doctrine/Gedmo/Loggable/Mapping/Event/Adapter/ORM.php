@@ -10,9 +10,6 @@ use Gedmo\Loggable\Mapping\Event\LoggableAdapter;
  * for Loggable behavior
  *
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
- * @package Gedmo\Loggable\Mapping\Event\Adapter
- * @subpackage ORM
- * @link http://www.gediminasm.org
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 final class ORM extends BaseAdapterORM implements LoggableAdapter
@@ -23,6 +20,14 @@ final class ORM extends BaseAdapterORM implements LoggableAdapter
     public function getDefaultLogEntryClass()
     {
         return 'Gedmo\\Loggable\\Entity\\LogEntry';
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isPostInsertGenerator($meta)
+    {
+        return $meta->idGenerator->isPostInsertGenerator();
     }
 
     /**
@@ -42,8 +47,9 @@ final class ORM extends BaseAdapterORM implements LoggableAdapter
         $q = $em->createQuery($dql);
         $q->setParameters(array(
             'objectId' => $objectId,
-            'objectClass' => $objectMeta->name
+            'objectClass' => $objectMeta->name,
         ));
+
         return $q->getSingleScalarResult() + 1;
     }
 }

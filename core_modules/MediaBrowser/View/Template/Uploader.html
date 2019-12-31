@@ -1,8 +1,8 @@
-<div id="uploader">
+<div id="uploader" ng-controller="UploaderCtrl">
     <div class="tabMediaBrowserBreadcrumbs">
         <ul>
-            <li data-ng-repeat="pathpart in path">
-                <a data-ng-click="clickPath($index)" href="#uploader">{{pathpart.name}}</a>
+            <li ng-repeat="pathpart in path">
+                <a ng-click="clickPath($index)" href="#uploader">{{pathpart.name}}</a>
             </li>
         </ul>
     </div>
@@ -11,57 +11,69 @@
             <div class="uploadPlatform uploadStart">
                 <div class="error"></div>
                 <i class="icon-dropzone"></i>
-
                 <div class="dropzoneText1">
-                    {{:: 'TXT_FILEBROWSER_DRAG_TO_UPLOADER' | translate }}
+                    {{:: 'TXT_FILEBROWSER_DRAG_TO_UPLOADER' | translate}}
                 </div>
                 <div class="dropzoneText2">-
-                    {{:: 'TXT_FILEBROWSER_DRAG_TO_UPLOADER_OR' | translate }} -</div>
-                <button type="submit" disabled id="selectFileFromComputer" class="btn btn-default">{{:: 'TXT_FILEBROWSER_DRAG_TO_UPLOADER_CLICK' | translate }}
+                    {{:: 'TXT_FILEBROWSER_DRAG_TO_UPLOADER_OR' | translate}} -
+                </div>
+                <button type="submit" disabled id="selectFileFromComputer" class="btn btn-default">
+                    {{:: 'TXT_FILEBROWSER_DRAG_TO_UPLOADER_CLICK' | translate}}
                 </button>
             </div>
             <div class="uploadlist">
-                <div class="successfulUpload" data-ng-class="showUploadedHint ? 'finished' : ''">
-                    <button type="button" class="close" data-ng-click="closeUploadedHint()">×</button>
-                    <div>{{:: 'TXT_FILEBROWSER_UPLOAD_FINISHED' | translate }} </div>
-                    <p>{{:: 'TXT_FILEBROWSER_UPLOAD_FINISHED_HINT' | translate }} </p>
+                <div class="successfulUpload" ng-class="showUploadedHint ? 'finished' : ''">
+                    <button type="button" class="close" ng-click="closeUploadedHint()">×</button>
+                    <div>{{:: 'TXT_FILEBROWSER_UPLOAD_FINISHED' | translate}}</div>
+                    <p>{{:: 'TXT_FILEBROWSER_UPLOAD_FINISHED_HINT' | translate}}</p>
                 </div>
                 <table class="table">
                     <tr>
                         <td colspan="3">
-                            {{:: 'TXT_FILEBROWSER_FILE_NAME' | translate }}
+                            {{:: 'TXT_FILEBROWSER_FILE_NAME' | translate}}
                         </td>
                     </tr>
-                    <tr data-ng-repeat="file in uploaderData.filesToUpload track by $index"  data-ng-class="!finishedUpload ? 'fade in' : 'fade out'">
+                    <tr ng-repeat="file in uploaderData.filesToUpload track by $index"
+                        ng-class="!finishedUpload ? 'fade in' : 'fade out'">
                         <td width="10%">
                             <div class="fileName">
-                                {{ file.name }}
+                                {{file.name}}
                             </div>
                         </td>
                         <td class="table-progress" width="80%">
-                            <progressbar value="file.percent" type="{{file.percent}}" data-ng-class="file.percent != 100 ? 'active' : ''">
-
+                            <progressbar value="file.percent" type="{{file.percent}}"
+                                         ng-class="file.percent != 100 ? 'active' : ''">
                             </progressbar>
                         </td>
-                        <td class="text-right table-action"  width="10%">
-                            <a href="#" data-ng-click="removeFile(file)" class="btn btn-default btn-small" data-ng-class="file.percent != 100 ? 'fade in' : 'fade out'">
-                               {{:: 'TXT_FILEBROWSER_FILE_REMOVE' | translate }}
+                        <td class="text-right table-action" width="10%">
+                            <a href="#" class="btn btn-default btn-small"
+                               ng-click="removeFile(file)"
+                               ng-class="file.percent != 100 ? 'fade in' : 'fade out'">
+                                {{:: 'TXT_FILEBROWSER_FILE_REMOVE' | translate}}
                             </a>
                         </td>
                     </tr>
                 </table>
             </div>
-            <div class="uploadPlatform uploadFilesAdded" data-ng-show="uploadPending">
-                <img src="../core_modules/MediaBrowser/View/Media/ajax_loader_gray_128.gif" alt=""/>
-                <div class="dropzoneText2"> {{:: 'TXT_FILEBROWSER_UPLOAD_WATING' | translate }}</div><br />
+            <div class="uploadPlatform uploadFilesAdded" ng-show="uploadPending">
+                <img src="../../core_modules/MediaBrowser/View/Media/ajax_loader_gray_128.gif" alt=""/>
+                <div class="dropzoneText2">
+                    {{:: 'TXT_FILEBROWSER_UPLOAD_WATING' | translate}}
+                </div>
+                <br/>
             </div>
 
         </div>
     </div>
     <div class="tabMediaBrowserFooter">
-        <button type="submit" class="btn btn-primary" data-ng-click="cancel()"> {{:: 'TXT_FILEBROWSER_CANCEL' | translate }}</button>
-        <button  data-ng-show="!finishedUpload" type="submit" class="btn btn-primary" data-ng-click="startUpload()"
-                data-ng-class="uploaderData.filesToUpload.length > 0 ? 'visible' : 'hidden'">{{:: 'TXT_FILEBROWSER_UPLOAD_BUTTON' | translate }}
+        <button type="submit" class="btn btn-primary" ng-click="cancel()">
+            {{:: 'TXT_FILEBROWSER_CANCEL' | translate}}
+        </button>
+        <button class="btn btn-primary"
+                ng-show="!finishedUpload" type="submit"
+                ng-click="startUpload()"
+                ng-class="uploaderData.filesToUpload.length > 0 ? 'visible' : 'hidden'">
+            {{:: 'TXT_FILEBROWSER_UPLOAD_BUTTON' | translate}}
         </button>
     </div>
 </div>

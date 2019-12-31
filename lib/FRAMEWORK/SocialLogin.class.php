@@ -65,8 +65,9 @@ class SocialLogin
      */
     public function loginWithProvider($provider)
     {
-        if (!self::$providers[$provider]->isActive()
-            || !isset(self::$providers[$provider])
+        if (
+            !isset(self::$providers[$provider]) ||
+            !self::$providers[$provider]->isActive()
         ) {
             return null;
         }
@@ -180,6 +181,20 @@ class SocialLogin
             if ($objTpl->blockExists($prefix . 'social_networks')) {
                 $objTpl->hideBlock($prefix . 'social_networks');
             }
+        }
+    }
+
+    /**
+     * Hide the sociallogin login buttons in the given template.
+     *
+     * @static
+     * @param $objTpl \Cx\Core\Html\Sigma template object to parse
+     * @param string $prefix the prefix for the template blocks and variables
+     */
+    public static function hideLogin($objTpl, $prefix = 'login_')
+    {
+        if ($objTpl->blockExists($prefix . 'social_networks')) {
+            $objTpl->hideBlock($prefix . 'social_networks');
         }
     }
 }

@@ -1,0 +1,26 @@
+Cx\Modules\Calendar\Model\Entity\CategoryName:
+  type: entity
+  table: module_calendar_category_name
+  fields:
+    catId:
+      id: true
+      type: integer
+      column: cat_id
+      primary: true
+      associationKey: true
+    name:
+      type: string
+      length: 225
+      nullable: false
+    langId:
+      id: true
+      type: integer
+      primary: true
+      column: lang_id
+  manyToOne:
+    category:
+      targetEntity: Cx\Modules\Calendar\Model\Entity\Category
+      inversedBy: categoryNames
+      joinColumn:
+        name: cat_id
+        referencedColumnName: id

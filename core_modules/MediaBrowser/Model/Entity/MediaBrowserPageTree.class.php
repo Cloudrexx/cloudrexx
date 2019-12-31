@@ -45,23 +45,39 @@ class MediaBrowserPageTree extends \Cx\Core\PageTree\PageTree
     /**
      * Override this to do your representation of the tree.
      *
-     * @param string  $title
-     * @param int     $level     0-based level of the element
+     * @param string $title
+     * @param int $level 0-based level of the element
      * @param boolean $hasChilds are there children of this element? if yes, they will be processed in the subsequent calls.
-     * @param int     $lang      language id
-     * @param string  $path      path to this element, e.g. '/CatA/CatB'
-     * @param boolean $current   if a $currentPage has been specified, this will be set to true if either a parent element of the current element or the current element itself is rendered.
+     * @param int $lang language id
+     * @param string $path path to this element, e.g. '/CatA/CatB'
+     * @param boolean $current if a $currentPage has been specified, this will be set to true if either a parent element of the current element or the current element itself is rendered.
      *
      * @return string your string representation of the element.
      */
     protected function renderElement(
         $title, $level, $hasChilds, $lang, $path, $current, $page
     ) {
-        $url = (string) \Cx\Core\Routing\NodePlaceholder::fromNode($page->getNode(), null, array());
+        $url = (string)\Cx\Core\Routing\NodePlaceholder::fromNode(
+            $page->getNode(),
+            null,
+            array()
+        );
         $pages = $page->getNode()->getPages();
         $titles = array();
-        foreach ($pages as $page){
-            $titles[\FWLanguage::getLanguageCodeById($page->getLang())] = $page->getTitle();
+        $locales = array();
+        foreach ($pages as $page) {
+            $locale = \FWLanguage::getLanguageCodeById($page->getLang());
+            $titles[$locale] = $page->getTitle();
+            $nodePlaceholder = (string)\Cx\Core\Routing\NodePlaceholder::fromNode(
+                $page->getNode(),
+                $page->getLang(),
+                array()
+            );
+            $locales[$locale] = array(
+                'url'   => $page->getPath(),
+                'node'  => $nodePlaceholder,
+                'name'  => $page->getTitle(),
+            );
         }
         $this->return[] = array(
             'click' =>
@@ -72,9 +88,10 @@ class MediaBrowserPageTree extends \Cx\Core\PageTree\PageTree
                 . $path . "','page')}",
             'name' => $titles,
             'extension' => 'Html',
-            'level' => $level-1,
+            'level' => $level - 1,
             'url' => $path,
-            'node' => $url
+            'node' => $url,
+            'localization' => $locales,
         );
     }
 
@@ -106,11 +123,9 @@ class MediaBrowserPageTree extends \Cx\Core\PageTree\PageTree
         // TODO: Implement postRender() method.
     }
 
-
     public function getFlatTree() {
         return $this->return;
     }
-
 
     /**
      * Called on construction. Override if you do not want to override the ctor.

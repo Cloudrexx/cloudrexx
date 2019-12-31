@@ -5,20 +5,24 @@ Cx\Core\User\Model\Entity\UserAttributeName:
     attributeId:
       id: true
       type: integer
-      length: 10
       associationKey: true
       unsigned: true
       column: attribute_id
+      options:
+        default: 0
     langId:
       id: true
       type: integer
-      length: 10
       unsigned: true
       column: lang_id
+      options:
+        default: 0
     name:
       type: string
       length: 255
       nullable: false
+      options:
+        default: ''
   manyToOne:
     userAttribute:
       targetEntity: Cx\Core\User\Model\Entity\UserAttribute

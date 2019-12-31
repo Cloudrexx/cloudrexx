@@ -70,7 +70,7 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
      * @param \Cx\Core\Html\Sigma $template template for current CMD
      * @param array               $cmd      CMD separated by slashes
      */
-    public function parsePage(\Cx\Core\Html\Sigma $template, array $cmd)
+    public function parsePage(\Cx\Core\Html\Sigma $template, array $cmd, &$isSingle = false)
     {
         $this->template = $template;
 

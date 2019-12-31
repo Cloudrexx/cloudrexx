@@ -1,0 +1,24 @@
+Cx\Core\View\Model\Entity\Frontend:
+  type: entity
+  table: core_view_frontend
+  repositoryClass: Cx\Core\View\Model\Repository\FrontendRepository
+  indexes:
+    contrexx_core_view_frontend_ibfk_theme:
+      columns: [ theme ]
+  id:
+    language:
+      type: integer
+    theme:
+      type: integer
+      nullable: true
+      unsigned: true
+    channel:
+      type: enum
+      values: ['default','mobile','print','pdf','app']
+  manyToOne:
+    localeRelatedByIso1s:
+      targetEntity: Cx\Core\Locale\Model\Entity\Locale
+      inversedBy: frontends
+      joinColumn:
+        name: language
+        referencedColumnName: id

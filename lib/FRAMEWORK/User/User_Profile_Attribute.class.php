@@ -64,6 +64,27 @@ class User_Profile_Attribute
     private $arrAttributes;
     private $langId;
 
+    /**
+     * Read Access id
+     *
+     * @var integer
+     */
+    protected $readAccessId;
+
+    /**
+     * Read Group access ids
+     *
+     * @var array
+     */
+    protected $readAccessGroupIds;
+
+    /**
+     * Read protection status(1 or 0)
+     *
+     * @var boolean
+     */
+    protected $readProtected;
+
     private $arrAttributeTree;
     private $arrAttributeRelations;
     private $arrCoreAttributeIds;
@@ -136,6 +157,14 @@ class User_Profile_Attribute
             'value'        => '0',
             'unknown'      => true,
             'order_id'     => 0,
+        ),
+        'designation' => array(
+            'type'         => 'text',
+            'multiline'    => false,
+            'mandatory'    => false,
+            'sort_type'    => 'desc',
+            'parent_id'    => 0,
+            'desc'         => 'TXT_ACCESS_DESIGNATION',
         ),
         'firstname' => array(
             'type'         => 'text',
@@ -547,9 +576,17 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
         global $objDatabase;
 
         $objAttribute = $objDatabase->Execute('
-            SELECT `id`, `mandatory`, `sort_type`, `order_id`, `access_special`,
-                   `access_id`
-              FROM `'.DBPREFIX.'access_user_core_attribute`');
+            SELECT
+                `id`,
+                `mandatory`,
+                `sort_type`,
+                `order_id`,
+                `access_special`,
+                `access_id`,
+                `read_access_id`
+            FROM
+                `'.DBPREFIX.'access_user_core_attribute`
+        ');
         if ($objAttribute) {
             while (!$objAttribute->EOF) {
                 $this->arrAttributes[$objAttribute->fields['id']]['mandatory'] = $objAttribute->fields['mandatory'];
@@ -557,6 +594,7 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
                 $this->arrAttributes[$objAttribute->fields['id']]['order_id'] = $objAttribute->fields['order_id'];
                 $this->arrAttributes[$objAttribute->fields['id']]['access_special'] = $objAttribute->fields['access_special'];
                 $this->arrAttributes[$objAttribute->fields['id']]['access_id'] = $objAttribute->fields['access_id'];
+                $this->arrAttributes[$objAttribute->fields['id']]['read_access_id'] = $objAttribute->fields['read_access_id'];
                 $this->arrAttributes[$objAttribute->fields['id']]['customizing'] = true;
                 if ($objAttribute->fields['mandatory']) {
                     $this->arrMandatoryAttributes[] = $objAttribute->fields['id'];
@@ -616,18 +654,28 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
         }
     }
 
-
     function loadCustomAttributes()
     {
         global $objDatabase;
 
         $this->arrCustomAttributes = array();
         $objResult = $objDatabase->Execute('
-            SELECT `id`, `type`, `sort_type`, `order_id`,
-                   `mandatory`, `parent_id`, `access_special`, `access_id`
-              FROM '.DBPREFIX.'access_user_attribute
-             ORDER BY `order_id`, `id`'
-        );
+            SELECT
+                `id`,
+                `type`,
+                `sort_type`,
+                `order_id`,
+                `mandatory`,
+                `parent_id`,
+                `access_special`,
+                `access_id`,
+                `read_access_id`
+            FROM
+                `' . DBPREFIX . 'access_user_attribute`
+            ORDER BY
+                `order_id`,
+                `id`
+        ');
         if ($objResult) {
             while (!$objResult->EOF) {
                 $this->arrAttributes[$objResult->fields['id']]['type'] = $objResult->fields['type'] == 'textarea' ? 'text' : $objResult->fields['type'];
@@ -635,9 +683,14 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
                 $this->arrAttributes[$objResult->fields['id']]['sort_type'] = $objResult->fields['sort_type'];
                 $this->arrAttributes[$objResult->fields['id']]['order_id'] = $objResult->fields['order_id'];
                 $this->arrAttributes[$objResult->fields['id']]['mandatory'] = $objResult->fields['mandatory'];
-                $this->arrAttributes[$objResult->fields['id']]['parent_id'] = $objResult->fields['parent_id'];
+                $parentId = $objResult->fields['parent_id'];
+                if ($parentId === null) {
+                    $parentId = 0;
+                }
+                $this->arrAttributes[$objResult->fields['id']]['parent_id'] = $parentId;
                 $this->arrAttributes[$objResult->fields['id']]['access_special'] = $objResult->fields['access_special'];
                 $this->arrAttributes[$objResult->fields['id']]['access_id'] = $objResult->fields['access_id'];
+                $this->arrAttributes[$objResult->fields['id']]['read_access_id'] = $objResult->fields['read_access_id'];
                 $this->arrAttributes[$objResult->fields['id']]['modifiable'] = array('type', 'sort_order', 'mandatory', 'parent_id', 'access', 'children');
                 $this->arrCustomAttributes[] = $objResult->fields['id'];
                 if ($objResult->fields['mandatory']) {
@@ -691,13 +744,9 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
     }
 
 
-    function getById($id)
+    public function getById($id)
     {
-        if (CONTREXX_PHP5) {
-            $objAttribute = clone $this;
-        } else {
-            $objAttribute = $this;
-        }
+        $objAttribute = clone $this;
         $objAttribute->arrAttributes = &$this->arrAttributes;
         $objAttribute->arrAttributeTree = &$this->arrAttributeTree;
         $objAttribute->arrAttributeRelations = &$this->arrAttributeRelations;
@@ -708,7 +757,9 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
         if ($objAttribute->load($id)) {
             return $objAttribute;
         }
-        $this->clean();
+
+        // reset attribute (ID=0)
+        $objAttribute->clean();
         return $objAttribute;
     }
 
@@ -748,10 +799,12 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
             $this->parent_id = isset($this->arrAttributes[$id]['parent_id']) ? $this->arrAttributes[$id]['parent_id'] : 0;
             $this->access_special = isset($this->arrAttributes[$id]['access_special']) ? $this->arrAttributes[$id]['access_special'] : '';
             $this->access_id = isset($this->arrAttributes[$id]['access_id']) ? $this->arrAttributes[$id]['access_id'] : 0;
+            $this->readAccessId = isset($this->arrAttributes[$id]['read_access_id']) ? $this->arrAttributes[$id]['read_access_id'] : 0;
             $this->children = isset($this->arrAttributeRelations[$id]) ? $this->arrAttributeRelations[$id] : array();
             $this->arrName = isset($this->arrAttributes[$id]['names']) ? $this->arrAttributes[$id]['names'] : array();
             $this->multiline = isset($this->arrAttributes[$id]['multiline']) ? $this->arrAttributes[$id]['multiline'] : false;
             $this->protected = (bool)$this->access_id;
+            $this->readProtected = (bool)$this->readAccessId;
             $this->customized = isset($this->arrAttributes[$id]['customizing']) && (bool)$this->arrAttributes[$id]['customizing'];
             $this->modifiable = isset($this->arrAttributes[$id]['modifiable']) ? $this->arrAttributes[$id]['modifiable'] : array();
             return true;
@@ -808,7 +861,7 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
      * Clean attribute
      *
      */
-    function clean()
+    public function clean()
     {
         $this->id = 0;
         $this->type = $this->defaultAttributeType;
@@ -818,10 +871,12 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
         $this->parent_id = 0;
         $this->access_special = '';
         $this->access_id = 0;
+        $this->readAccessId = 0;
         $this->children = array();
         $this->arrName = array();
         $this->multiline = false;
         $this->protected = false;
+        $this->readProtected = false;
         $this->modifiable = array('mandatory', 'access', 'type');
         $this->EOF = true;
     }
@@ -882,7 +937,9 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
             ) {
                 if ($this->parent_id === 'title' ||
                     ($this->isCoreAttribute($this->id) || $this->storeNames()) &&
-                    $this->storeChildrenOrder() && $this->storeProtection()
+                    $this->storeChildrenOrder() &&
+                    $this->storeProtection($this->protected, $this->access_id, 'access_id', $this->access_group_ids) &&
+                    $this->storeProtection($this->readProtected, $this->readAccessId, 'read_access_id', $this->readAccessGroupIds, 'read')
                 ) {
                     $this->init();
                     return true;
@@ -905,24 +962,66 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
         $type =
             ($this->arrTypes[$this->type]['multiline'] && $this->multiline
               ? 'textarea' : $this->type);
+        $parentId = $this->parent_id;
+        if ($parentId == 0) {
+            $parentId = 'NULL';
+        }
         if ($this->id) {
             return (boolean)$objDatabase->Execute("
                 UPDATE `".DBPREFIX."access_user_attribute`
                    SET `type`='$type', `sort_type`='$this->sort_type',
                        `order_id`=$this->order_id,
                        `mandatory`='$this->mandatory',
-                       `parent_id`=$this->parent_id
+                       `parent_id`= $parentId
                  WHERE `id`=$this->id");
         }
-        if (!$objDatabase->Execute("
-            INSERT INTO `".DBPREFIX."access_user_attribute` (
-              `type`, `sort_type`, `order_id`, `mandatory`, `parent_id`
+        $objDatabase->startTrans();
+        $result = $objDatabase->Execute('
+            INSERT INTO
+                `' . DBPREFIX . 'access_user_attribute`
+            (
+                `type`,
+                `sort_type`,
+                `order_id`,
+                `mandatory`,
+                `parent_id`
             ) VALUES (
-              '$type', '$this->sort_type', $this->order_id, '$this->mandatory',
-              $this->parent_id)")) {
+                "' . $type . '",
+                "' . $this->sort_type . '",
+                ' . $this->order_id . ',
+                "' . $this->mandatory . '",
+                ' . $parentId . '
+            )
+        ');
+        if (!$result) {
+            $objDatabase->failTrans();
+            $objDatabase->completeTrans();
             return false;
         }
         $this->id = $objDatabase->Insert_ID();
+        $result = $objDatabase->Execute('
+            INSERT INTO
+                `' . DBPREFIX . 'access_user_attribute_value`
+            (
+                `attribute_id`,
+                `user_id`,
+                `history_id`,
+                `value`
+            )
+            SELECT DISTINCT
+                ' . $this->id . ',
+                `id`,
+                0,
+                ""
+            FROM
+                `' . DBPREFIX . 'access_users`
+        ');
+        if (!$result) {
+            $objDatabase->failTrans();
+            $objDatabase->completeTrans();
+            return false;
+        }
+        $objDatabase->completeTrans();
         return true;
     }
 
@@ -1025,64 +1124,120 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
 
 
     /**
-     * Store modification protection
+     * Store read/write protection
      *
-     * Create a new access ID if none is set and associates it with the groups
-     * defined in $this->access_group_ids
-     * @global  ADONewConnection
-     * @global  array
-     * @return  boolean           True on success, false otherwise
+     * @param boolean $protected Is read/write protected
+     * @param integer $accessId  Access Id of read/write
+     * @param string  $fieldName Field name
+     * @param array   $groupIds  Assigned read/write group ids
+     * @param string  $access    Is read/write
+     *
+     * @return boolean
      */
-    function storeProtection()
+    function storeProtection($protected, $accessId, $fieldName, $groupIds, $access = 'write')
     {
-        global $objDatabase, $_CONFIG;
+        $objDatabase = \Cx\Core\Core\Controller\Cx::instanciate()->getDb()->getAdoDb();
+        $tableName = 'access_user_attribute';
+        if ($this->isCoreAttribute($this->id)) {
+            $tableName = 'access_user_core_attribute';
+        }
 
-        if ($this->protected) {
-            $arrOldGroups = array();
-            $status = true;
-            if ($this->access_id) {
-                $objResult = $objDatabase->Execute('SELECT `group_id` FROM `'.DBPREFIX.'access_group_dynamic_ids` WHERE `access_id` = '.$this->access_id);
-                if ($objResult) {
-                    while (!$objResult->EOF) {
-                        $arrOldGroups[] = $objResult->fields['group_id'];
-                        $objResult->MoveNext();
-                    }
-                }
-            } else {
-                $accessId = \Permission::createNewDynamicAccessId();
-                if ($accessId && $objDatabase->Execute("UPDATE `".DBPREFIX."access_user_".($this->isCoreAttribute($this->id) ? 'core_' : '')."attribute` SET `access_id` = ".$accessId." WHERE `id` = '".$this->id."'") !== false) {
-                    $this->arrAttributes[$this->id]['access_id'] = $this->access_id = $accessId;
-                } else {
-                    return false;
+        if (!$protected) {
+            // remove protection
+            $updateFields = ' `' . $fieldName . '` = 0';
+            if ($access == 'write') {
+                $updateFields .= ', `access_special` = ""';
+            }
+            if (
+                $objDatabase->Execute('
+                    UPDATE `' . DBPREFIX . $tableName . '`
+                       SET ' . $updateFields . '
+                       WHERE `id` = "' . $this->id . '"'
+                ) !== false &&
+                (
+                    !isset($this->arrAttributes[$this->id][$fieldName]) ||
+                    $objDatabase->Execute(
+                        'DELETE FROM `' . DBPREFIX . 'access_group_dynamic_ids`
+                            WHERE `access_id` = ' . $this->arrAttributes[$this->id][$fieldName]
+                    ) !== false
+                )
+            ) {
+                return true;
+            }
+            return false;
+        }
+
+        $arrOldGroups = array();
+        $status = true;
+        if ($accessId) {
+            $objResult = $objDatabase->Execute('
+                SELECT `group_id`
+                    FROM `' . DBPREFIX . 'access_group_dynamic_ids`
+                    WHERE `access_id` = ' . $accessId
+            );
+            if ($objResult) {
+                while (!$objResult->EOF) {
+                    $arrOldGroups[] = $objResult->fields['group_id'];
+                    $objResult->MoveNext();
                 }
             }
-            if ($objDatabase->Execute("UPDATE `".DBPREFIX."access_user_".($this->isCoreAttribute($this->id) ? 'core_' : '')."attribute` SET `access_special` = '".$this->access_special."' WHERE `id` = '".$this->id."'") === false) {
+        } else {
+            $accessId = \Permission::createNewDynamicAccessId();
+            if (
+                !$accessId ||
+                $objDatabase->Execute('
+                    UPDATE `' . DBPREFIX . $tableName . '`
+                        SET `' . $fieldName . '` = ' . contrexx_input2db($accessId) . '
+                        WHERE `id` = "' . $this->id . '"'
+                ) === false
+            ) {
                 return false;
             }
-            $arrNewGroups = array_diff($this->access_group_ids, $arrOldGroups);
-            $arrRemovedGroups = array_diff($arrOldGroups, $this->access_group_ids);
-            foreach ($arrNewGroups as $groupId) {
-                if ($objDatabase->Execute('INSERT INTO `'.DBPREFIX.'access_group_dynamic_ids` (`access_id`, `group_id`) VALUES ('.$this->access_id.', '.$groupId.')') === false) {
-                    $status = false;
-                }
+            $this->arrAttributes[$this->id][$fieldName] = $accessId;
+            if ($access == 'write') {
+                $this->access_id = $accessId;
+            } else {
+                $this->readAccessId = $accessId;
             }
-            foreach ($arrRemovedGroups as $groupId) {
-                if ($objDatabase->Execute('DELETE FROM `'.DBPREFIX.'access_group_dynamic_ids` WHERE `access_id` = '.$this->access_id.' AND `group_id` = '.$groupId) === false) {
-                    $status = false;
-                }
-            }
-            return $status;
         }
-        // remove protection
-        if ($objDatabase->Execute("UPDATE `".DBPREFIX."access_user_".($this->isCoreAttribute($this->id) ? 'core_' : '')."attribute` SET `access_special` = '', `access_id` = 0 WHERE `id` = '".$this->id."'") !== false &&
-            !isset($this->arrAttributes[$this->id]['access_id']) ||
-            $objDatabase->Execute('DELETE FROM `'.DBPREFIX.'access_group_dynamic_ids` WHERE `access_id` = '.$this->arrAttributes[$this->id]['access_id']) !== false
-        ) {
-            return true;
-        }
-        return false;
-    }
 
+        if (
+            $access == 'write' &&
+            $objDatabase->Execute('
+                UPDATE `' . DBPREFIX . $tableName . '`
+                   SET `access_special` = "' . contrexx_input2db($this->access_special) . '"
+                   WHERE `id` = "' . $this->id . '"'
+            ) === false
+        ) {
+            return false;
+        }
+
+        $arrNewGroups = array_diff($groupIds, $arrOldGroups);
+        $arrRemovedGroups = array_diff($arrOldGroups, $groupIds);
+        foreach ($arrNewGroups as $groupId) {
+            if (
+                $objDatabase->Execute(
+                    'INSERT INTO `' . DBPREFIX . 'access_group_dynamic_ids`
+                        SET `access_id` = "' . contrexx_raw2db($accessId) . '",
+                            `group_id`  = "' . contrexx_raw2db($groupId) . '" '
+                ) === false
+            ) {
+                $status = false;
+            }
+        }
+        foreach ($arrRemovedGroups as $groupId) {
+            if (
+                $objDatabase->Execute('
+                    DELETE FROM `' . DBPREFIX . 'access_group_dynamic_ids`
+                        WHERE `access_id` = ' . $accessId . '
+                            AND `group_id` = ' . $groupId
+                ) === false
+            ) {
+                $status = false;
+            }
+        }
+        return $status;
+    }
 
     function delete()
     {
@@ -1203,6 +1358,25 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
             break;
         }
         return false;
+    }
+
+
+    /**
+     * Check the read permission of profile attribute
+     *
+     * @return boolean
+     */
+    public function checkReadPermission()
+    {
+        if (!$this->isReadProtected()) {
+            return true;
+        }
+
+        return \Permission::checkAccess(
+            $this->getReadAccessId(),
+            'dynamic',
+            true
+        );
     }
 
 
@@ -1416,6 +1590,15 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
         return $this->protected;
     }
 
+    /**
+     * Return read protection status
+     *
+     * @return boolean
+     */
+    public function isReadProtected()
+    {
+        return $this->readProtected;
+    }
 
     public function isCoreAttribute($attributeId=null)
     {
@@ -1517,6 +1700,19 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
         $this->protected = true;
     }
 
+    /**
+     * Set a read protection
+     *
+     * @param array $arrReadGroups array of Group id's
+     */
+    public function setReadProtection($arrReadGroups)
+    {
+        $this->readAccessGroupIds = array();
+        foreach ($arrReadGroups as $groupId) {
+            $this->readAccessGroupIds[] = $groupId;
+        }
+        $this->readProtected = true;
+    }
 
     public function setSpecialProtection($special)
     {
@@ -1532,6 +1728,14 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
         $this->protected = false;
     }
 
+    /**
+     * Remove read protection
+     */
+    public function removeReadProtection()
+    {
+        $this->readAccessId   = 0;
+        $this->readProtected  = false;
+    }
 
     /**
      * Load attribute name in each language
@@ -1561,7 +1765,7 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
         if ($this->isCoreAttribute($this->id)) {
             $this->arrName[$langId] = (string)$_CORELANG[$this->arrAttributes[$this->id]['desc']];
         } else {
-            $objResult = $objDatabase->SelectLimit('SELECT `name` FROM `'.DBPREFIX.'access_user_attribute_name` WHERE `lang_id` = '.$langId.' AND `attribute_id` = '.$this->id, 1);
+            $objResult = $objDatabase->SelectLimit('SELECT `name` FROM `'.DBPREFIX.'access_user_attribute_name` WHERE `lang_id` = '.$langId.' AND `attribute_id` = "' . contrexx_raw2db($this->id) . '"', 1);
             $this->arrName[$langId] = $objResult && $objResult->RecordCount() == 1 ? $objResult->fields['name'] : '';
         }
         $this->arrAttributes[$this->id]['names'][$langId] = $this->arrName[$langId];
@@ -1809,6 +2013,15 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
         return $this->access_id;
     }
 
+    /**
+     * Get read access ID
+     *
+     * @return integer
+     */
+    public function getReadAccessId()
+    {
+        return $this->readAccessId;
+    }
 
     function getSpecialProtection()
     {

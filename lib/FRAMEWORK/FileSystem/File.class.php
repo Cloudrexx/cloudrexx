@@ -44,7 +44,7 @@ namespace Cx\Lib\FileSystem;
  * @package     cloudrexx
  * @subpackage  lib_filesystem
  */
-class FileException extends \Exception {};
+class FileException extends FileSystemException {};
 
 /**
  * File
@@ -65,6 +65,10 @@ class File implements FileInterface
 
     public function __construct($file)
     {
+        if (preg_match('#(?:^\.\.|/\.\.)/#', $file)) {
+            throw new FileException('Invalid file path: '.$file);
+        }
+
         $this->file = str_replace('\\', '/', $file);
         $this->setAccessMode();
     }
@@ -107,7 +111,6 @@ class File implements FileInterface
         } else {
             $ftpUserId = null;
         }
-
 
         // check if the file we're going to work with is owned by the FTP user
         if ($fileOwnerUserId == $ftpUserId) {
@@ -392,17 +395,15 @@ class File implements FileInterface
      */
     public function delete()
     {
+        $objFile = null;
+
         // use PHP
         if (   $this->accessMode == self::PHP_ACCESS
             || $this->accessMode == self::UNKNOWN_ACCESS
         ) {
             try {
-                $objFilePhp = new FileSystemFile($this->file);
-                $objFilePhp->delete();
-                clearstatcache();
-                if (!file_exists($objFilePhp->getAbsoluteFilePath())) {
-                    return true;
-                }
+                $objFile = new FileSystemFile($this->file);
+                $objFile->delete();
             } catch (FileSystemFileException $e) {
                 \DBG::msg('FileSystemFile: '.$e->getMessage());
             }
@@ -413,16 +414,21 @@ class File implements FileInterface
             || $this->accessMode == self::UNKNOWN_ACCESS
         ) {
             try {
-                $objFileFtp = new FTPFile($this->file);
-                $objFileFtp->delete();
-                clearstatcache();
-                if (!file_exists($objFileFtp->getAbsoluteFilePath())) {
-                    return true;
-                }
+                $objFile = new FTPFile($this->file);
+                $objFile->delete();
             } catch (FTPFileException $e) {
                 \DBG::msg('FTPFile: '.$e->getMessage());
             }
         }
-        throw new FileSystemException('File: Unable to delete file '.$this->file.'!');
+
+        if ($objFile) {
+            clearstatcache(true, $objFile->getAbsoluteFilePath());
+        }
+        if ($objFile && file_exists($objFile->getAbsoluteFilePath())) {
+            throw new FileSystemException('File: Unable to delete file '.$this->file.'!');
+        }
+
+        return true;
     }
 }
+

@@ -13,17 +13,17 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * This software consists of voluntary contributions made by many individuals
- * and is licensed under the LGPL. For more information, see
+ * and is licensed under the MIT license. For more information, see
  * <http://www.doctrine-project.org>.
-*/
+ */
 
 namespace Doctrine\DBAL\Driver\IBMDB2;
 
-use Doctrine\DBAL\Driver,
-    Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Driver;
+use Doctrine\DBAL\Connection;
 
 /**
- * IBM DB2 Driver
+ * IBM DB2 Driver.
  *
  * @since 2.0
  * @author Benjamin Eberlei <kontakt@beberlei.de>
@@ -31,18 +31,12 @@ use Doctrine\DBAL\Driver,
 class DB2Driver implements Driver
 {
     /**
-     * Attempts to create a connection with the database.
-     *
-     * @param array $params All connection parameters passed by the user.
-     * @param string $username The username to use when connecting.
-     * @param string $password The password to use when connecting.
-     * @param array $driverOptions The driver options to use when connecting.
-     * @return Doctrine\DBAL\Driver\Connection The database connection.
+     * {@inheritdoc}
      */
     public function connect(array $params, $username = null, $password = null, array $driverOptions = array())
     {
-        if ( !isset($params['schema']) ) {
-            
+        if ( ! isset($params['protocol'])) {
+            $params['protocol'] = 'TCPIP';
         }
 
         if ($params['host'] !== 'localhost' && $params['host'] != '127.0.0.1') {
@@ -50,10 +44,13 @@ class DB2Driver implements Driver
             $params['dbname'] = 'DRIVER={IBM DB2 ODBC DRIVER}' .
                      ';DATABASE=' . $params['dbname'] .
                      ';HOSTNAME=' . $params['host'] .
-                     ';PORT='     . $params['port'] .
                      ';PROTOCOL=' . $params['protocol'] .
                      ';UID='      . $username .
                      ';PWD='      . $password .';';
+            if (isset($params['port'])) {
+                $params['dbname'] .= 'PORT=' . $params['port'];
+            }
+
             $username = null;
             $password = null;
         }
@@ -62,10 +59,7 @@ class DB2Driver implements Driver
     }
 
     /**
-     * Gets the DatabasePlatform instance that provides all the metadata about
-     * the platform this driver connects to.
-     *
-     * @return Doctrine\DBAL\Platforms\AbstractPlatform The database platform.
+     * {@inheritdoc}
      */
     public function getDatabasePlatform()
     {
@@ -73,11 +67,7 @@ class DB2Driver implements Driver
     }
 
     /**
-     * Gets the SchemaManager that can be used to inspect and change the underlying
-     * database schema of the platform this driver connects to.
-     *
-     * @param  Doctrine\DBAL\Connection $conn
-     * @return Doctrine\DBAL\SchemaManager
+     * {@inheritdoc}
      */
     public function getSchemaManager(Connection $conn)
     {
@@ -85,9 +75,7 @@ class DB2Driver implements Driver
     }
 
     /**
-     * Gets the name of the driver.
-     *
-     * @return string The name of the driver.
+     * {@inheritdoc}
      */
     public function getName()
     {
@@ -95,14 +83,12 @@ class DB2Driver implements Driver
     }
 
     /**
-     * Get the name of the database connected to for this driver.
-     *
-     * @param  Doctrine\DBAL\Connection $conn
-     * @return string $database
+     * {@inheritdoc}
      */
     public function getDatabase(\Doctrine\DBAL\Connection $conn)
     {
         $params = $conn->getParams();
+
         return $params['dbname'];
     }
 }

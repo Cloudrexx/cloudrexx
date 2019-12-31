@@ -58,7 +58,7 @@ class JsonController extends \Cx\Core\Core\Model\Entity\Controller
      */
     public function getAccessableMethods()
     {
-        if (!\Permission::checkAccess(47, 'static', true)) {
+        if (!\Permission::checkAccess(\Cx\Core\ViewManager\Controller\ViewManager::TEMPLATE_EDITOR_ACCESS_ID, 'static', true)) {
             return array();
         }
         return array(
@@ -125,6 +125,7 @@ class JsonController extends \Cx\Core\Core\Model\Entity\Controller
         $presetRepository = $themeOptions->getPresetRepository();
         $preset           = $themeOptions->getChangedPreset();
         $presetRepository->save($preset);
+        $this->clearCache();
     }
 
     /**
@@ -376,5 +377,9 @@ class JsonController extends \Cx\Core\Core\Model\Entity\Controller
         $activePreset = $_SESSION['TemplateEditor'][$themeID]['activePreset'];
         $_SESSION['TemplateEditor'][$themeID] = array();
         $_SESSION['TemplateEditor'][$themeID]['activePreset'] = $activePreset;
+    }
+    
+    protected function clearCache() {
+        $this->getComponent('Cache')->clearCache();
     }
 }

@@ -71,7 +71,7 @@ class ShopEventListener extends DefaultEventListener {
         $parseSearchData = function(&$searchData) {
                                 $searchData['title']   = $searchData['name'];
                                 $searchData['content'] = $searchData['long'] ? $searchData['long'] : $searchData['short'];
-                                $searchData['score']   = $searchData['score1'] + $searchData['score2'] + $searchData['score3'];
+                                $searchData['score']   = $searchData['score1'] + ($searchData['score2']/10) + ($searchData['score3']/10);
                             };
         $result = new \Cx\Core_Modules\Listing\Model\Entity\DataSet($search->getResultArray($query, 'Shop', 'details', 'productId=', $search->getTerm(), $parseSearchData));
         $search->appendResult($result);

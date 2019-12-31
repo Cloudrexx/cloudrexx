@@ -9,8 +9,8 @@ function tidyTags(caller)
         method: "get",
         data: {
             cmd : "knowledge{MODULE_INDEX}",
-            section : "settings",
-            act : "tidyTags"
+            act : "settings",
+            tpl : "tidyTags"
         },
         dataType: 'json',
         success: showOkMessage
@@ -24,8 +24,8 @@ function resetVotes()
         method: "get",
         data: {
             cmd : "knowledge{MODULE_INDEX}",
-            section : "settings",
-            act : "resetVotes"
+            act : "settings",
+            tpl : "resetVotes"
         },
         dataType: 'json',
         success: showOkMessage
@@ -44,7 +44,7 @@ var showOkMessage = function(data){
 
 <div id="errormessagetarget"></div>
 
-<form action="index.php?cmd=Knowledge{MODULE_INDEX}&section=settings&act=update" method="post">
+<form action="index.php?cmd=Knowledge{MODULE_INDEX}&act=settings&tpl=update" method="post">
 <table class="adminlist" cellspacing="0" cellpadding="3" border="0" style="width: 100%;">
     <thead>
         <tr>

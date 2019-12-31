@@ -63,7 +63,7 @@ class YamlRepositoryException extends \Exception {};
  *              operation will be discarded,merged or overwritten. The behavior
  *              is unknown!
  */
-class YamlRepository {
+class YamlRepository implements \Countable {
     /**
      * Absolute path to the YAML-repository
      * @var string
@@ -211,6 +211,13 @@ class YamlRepository {
      * @return  YamlEntity  Object from repository identified by primary identifier $id
      */
     public function find($id) {
+        // as YamlRepository does not support composite-keys,
+        // we have to check if $id is an array (=> composite-key)
+        // and if so, simply fetch the first element of the array
+        // which will then be our primary key
+        if (is_array($id)) {
+            $id = current($id);
+        }
         if (isset($this->entities[$id])) {
             return $this->entities[$id];
         }
@@ -446,5 +453,14 @@ class YamlRepository {
      */
     protected function fileExistsAndNotEmpty($filename) {
         return (file_exists($filename) && filesize($filename) > 0);
+    }
+
+    /**
+     * Returns the total count of entities
+     * @see http://php.net/manual/en/class.countable.php
+     * @return int Total count of entities
+     */
+    public function count() {
+        return count($this->entities);
     }
 }

@@ -161,11 +161,12 @@ function votingShowCurrent($page_content){
             $votingTitle=stripslashes($objResult->fields['title']);
             $votingVotes=$objResult->fields['votes'];
             $votingDate=strtotime($objResult->fields['datesec']);
+            $votingDate = \Cx\Core\DateTime\Controller\ComponentController::strftime('%A, %e. %B %Y', $votingDate);
 
             if (($i % 2) == 0) {$class="row2";} else {$class="row1";}
             $objTpl->setVariable(array(
                 'VOTING_OLDER_TEXT'        => '<a href="index.php?section=Voting&vid='.$votingid.'" title="'.$votingTitle.'">'.$votingTitle.'</a>',
-                'VOTING_OLDER_DATE'        => showFormattedDate($votingDate),
+                'VOTING_OLDER_DATE'        => $votingDate,
                 'VOTING_VOTING_ID'        => $votingid,
                 'VOTING_LIST_CLASS'        => $class,
                 'VOTING_PAGING'            => $paging
@@ -174,13 +175,13 @@ function votingShowCurrent($page_content){
             $i++;
             $objResult->MoveNext();
         }
-    }
-       else {
+    } else {
         if (!$objResult->EOF) {
             $votingId            = $objResult->fields['id'];
             $votingTitle       = stripslashes($objResult->fields['question']);
             $votingVotes       = $objResult->fields['votes'];
             $votingDate           = strtotime($objResult->fields['datesec']);
+            $votingDate           = \Cx\Core\DateTime\Controller\ComponentController::strftime('%A, %e. %B %Y', $votingDate);
             $votingStatus       = $objResult->fields['status'];
             $votingMethod       = $objResult->fields['submit_check'];
             $additional_fields = _create_additional_input_fields($objResult);
@@ -251,7 +252,7 @@ function votingShowCurrent($page_content){
         $objTpl->setVariable(array(
             'VOTING_MSG'                    => $msg,
             'VOTING_TITLE'                    => $votingTitle,
-            'VOTING_DATE'                    => showFormattedDate($votingDate),
+            'VOTING_DATE'                    => $votingDate,
             'VOTING_OPTIONS_TEXT'            => $votingOptionText,
             'VOTING_RESULTS_TEXT'            => $votingResultText,
             'VOTING_RESULTS_TOTAL_VOTES'    => $votingVotes,
@@ -292,11 +293,12 @@ function votingShowCurrent($page_content){
             $votingTitle=stripslashes($objResult->fields['title']);
             $votingVotes=$objResult->fields['votes'];
             $votingDate=strtotime($objResult->fields['datesec']);
+            $votingDate = \Cx\Core\DateTime\Controller\ComponentController::strftime('%A, %e. %B %Y', $votingDate);
 
             if (($i % 2) == 0) {$class="row2";} else {$class="row1";}
             $objTpl->setVariable(array(
                 'VOTING_OLDER_TEXT'        => '<a href="index.php?section=Voting&vid='.$votingid.'" title="'.$votingTitle.'">'.$votingTitle.'</a>',
-                'VOTING_OLDER_DATE'        => showFormattedDate($votingDate),
+                'VOTING_OLDER_DATE'        => $votingDate,
                 'VOTING_VOTING_ID'        => $votingid,
                 'VOTING_LIST_CLASS'        => $class,
                 'VOTING_PAGING'            => $paging

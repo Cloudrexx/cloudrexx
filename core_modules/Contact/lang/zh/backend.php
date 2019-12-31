@@ -146,7 +146,6 @@ $_ARRAYLANG['TXT_CONTACT_CONTACT_FORM_SUCCESSFULLY_DELETED'] = "The contact form
 $_ARRAYLANG['TXT_CONTACT_FAILED_DELETE_CONTACT_FORM'] = "The contact form couldn't be deleted due to an error!";
 $_ARRAYLANG['TXT_CONTACT_DATA_RECORD_UPDATED_SUCCESSFUL_VALIDATE'] = "Your changes have been inserted into database. Because of your limited user-rights, an administrator has to check your update before it appears on the webpage.";
 $_ARRAYLANG['TXT_CONTACT_SETTINGS_UPDATED'] = "Settings have been applied.";
-$_ARRAYLANG['TXT_CONTACT_META_DATE_BY_EXPORT'] = "Meta Data to Export";
 $_ARRAYLANG['TXT_CONTACT_DEFAULT_FEEDBACK_TXT'] = "Thank you for your request. We will get back to you as soon as possible.";
 $_ARRAYLANG['TXT_CONTACT_SHOW_FORM_AFTER_SUBMIT'] = "Display the form again when showing the confirmation receipt text.";
 $_ARRAYLANG['TXT_CONTACT_LANG'] = "Language";

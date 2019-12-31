@@ -1,7 +1,10 @@
 <!-- BEGIN calendar_headlines_row -->
 <div class="content">
-    <p class="date">Date: {CALENDAR_EVENT_STARTDATE}, {CALENDAR_EVENT_STARTTIME} </p>
-    <h2><a href="{NODE_CALENDAR_EVENT}?id={CALENDAR_EVENT_ID}">{CALENDAR_EVENT_NAME}</a></h2>
+    <p class="date">Date: {CALENDAR_EVENT_START_DATE}, {CALENDAR_EVENT_START_TIME} </p>
+    <h2>
+        <!-- BEGIN event_detail_view --><a href="{CALENDAR_EVENT_DETAIL_LINK}" target="{CALENDAR_EVENT_DETAIL_TARGET}">{CALENDAR_EVENT_TITLE}</a><!-- END event_detail_view -->
+        <!-- BEGIN event_no_detail_view -->{CALENDAR_EVENT_TITLE}<!-- END event_no_detail_view -->
+    </h2>
 </div>
 <!-- END calendar_headlines_row -->
 <div class="content">

@@ -47,4 +47,5 @@ namespace Cx\Core_Modules\Captcha\Controller;
 interface CaptchaInterface {
     public function getCode($tabIndex);
     public function check();
+    public function disable();
 }

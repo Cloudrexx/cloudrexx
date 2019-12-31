@@ -2,23 +2,21 @@
 
 namespace Gedmo\Loggable\Mapping\Driver;
 
-use Gedmo\Mapping\Driver\AnnotationDriverInterface,
-    Gedmo\Exception\InvalidMappingException;
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Gedmo\Mapping\Driver\AbstractAnnotationDriver;
+use Gedmo\Exception\InvalidMappingException;
 
 /**
  * This is an annotation mapping driver for Loggable
  * behavioral extension. Used for extraction of extended
- * metadata from Annotations specificaly for Loggable
+ * metadata from Annotations specifically for Loggable
  * extension.
  *
  * @author Boussekeyt Jules <jules.boussekeyt@gmail.com>
  * @author Gediminas Morkevicius <gediminas.morkevicius@gmail.com>
- * @package Gedmo.Loggable.Mapping.Driver
- * @subpackage Annotation
- * @link http://www.gediminasm.org
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
-class Annotation implements AnnotationDriverInterface
+class Annotation extends AbstractAnnotationDriver
 {
     /**
      * Annotation to define that this object is loggable
@@ -31,34 +29,15 @@ class Annotation implements AnnotationDriverInterface
     const VERSIONED = 'Gedmo\\Mapping\\Annotation\\Versioned';
 
     /**
-     * Annotation reader instance
-     *
-     * @var object
-     */
-    private $reader;
-
-    /**
-     * original driver if it is available
-     */
-    protected $_originalDriver = null;
-    /**
      * {@inheritDoc}
      */
-    public function setAnnotationReader($reader)
-    {
-        $this->reader = $reader;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function validateFullMetadata($meta, array $config)
+    public function validateFullMetadata(ClassMetadata $meta, array $config)
     {
         if ($config && is_array($meta->identifier) && count($meta->identifier) > 1) {
             throw new InvalidMappingException("Loggable does not support composite identifiers in class - {$meta->name}");
         }
         if (isset($config['versioned']) && !isset($config['loggable'])) {
-            throw new InvalidMappingException("Class must be annoted with Loggable annotation in order to track versioned fields in class - {$meta->name}");
+            throw new InvalidMappingException("Class must be annotated with Loggable annotation in order to track versioned fields in class - {$meta->name}");
         }
     }
 
@@ -67,17 +46,18 @@ class Annotation implements AnnotationDriverInterface
      */
     public function readExtendedMetadata($meta, array &$config)
     {
-        $class = $meta->getReflectionClass();
+        $class = $this->getMetaReflectionClass($meta);
         // class annotations
         if ($annot = $this->reader->getClassAnnotation($class, self::LOGGABLE)) {
             $config['loggable'] = true;
             if ($annot->logEntryClass) {
-                if (!class_exists($annot->logEntryClass)) {
+                if (!$cl = $this->getRelatedClassName($meta, $annot->logEntryClass)) {
                     throw new InvalidMappingException("LogEntry class: {$annot->logEntryClass} does not exist.");
                 }
-                $config['logEntryClass'] = $annot->logEntryClass;
+                $config['logEntryClass'] = $cl;
             }
         }
+
         // property annotations
         foreach ($class->getProperties() as $property) {
             if ($meta->isMappedSuperclass && !$property->isPrivate() ||
@@ -86,8 +66,9 @@ class Annotation implements AnnotationDriverInterface
             ) {
                 continue;
             }
+
             // versioned property
-            if ($versioned = $this->reader->getPropertyAnnotation($property, self::VERSIONED)) {
+            if ($this->reader->getPropertyAnnotation($property, self::VERSIONED)) {
                 $field = $property->getName();
                 if ($meta->isCollectionValuedAssociation($field)) {
                     throw new InvalidMappingException("Cannot versioned [{$field}] as it is collection in object - {$meta->name}");
@@ -96,16 +77,14 @@ class Annotation implements AnnotationDriverInterface
                 $config['versioned'][] = $field;
             }
         }
-    }
 
-    /**
-     * Passes in the mapping read by original driver
-     *
-     * @param $driver
-     * @return void
-     */
-    public function setOriginalDriver($driver)
-    {
-        $this->_originalDriver = $driver;
+        if (!$meta->isMappedSuperclass && $config) {
+            if (is_array($meta->identifier) && count($meta->identifier) > 1) {
+                throw new InvalidMappingException("Loggable does not support composite identifiers in class - {$meta->name}");
+            }
+            if (isset($config['versioned']) && !isset($config['loggable'])) {
+                throw new InvalidMappingException("Class must be annotated with Loggable annotation in order to track versioned fields in class - {$meta->name}");
+            }
+        }
     }
 }

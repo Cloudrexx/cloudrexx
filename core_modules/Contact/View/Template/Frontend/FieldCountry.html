@@ -1,0 +1,14 @@
+<div class="contact row form-group">
+    <label for="contactFormFieldId_{CONTACT_FORM_FIELD_ID}">{CONTACT_FORM_FIELD_LABEL}
+        <!-- BEGIN contact_form_field_required -->
+        <strong class="is_required">*</strong>
+        <!-- END contact_form_field_required -->
+    </label>
+    <select class="contactFormClass_country"
+        name="contactFormField_{CONTACT_FORM_FIELD_ID}"
+        id="contactFormFieldId_{CONTACT_FORM_FIELD_ID}">
+        <!-- BEGIN contact_form_field_options -->
+        <option value="{CONTACT_FORM_FIELD_VALUE_KEY}" {CONTACT_FORM_FIELD_SELECTED}>{CONTACT_FORM_FIELD_VALUE}</option>
+        <!-- END contact_form_field_options -->
+    </select>
+</div>

@@ -90,12 +90,12 @@
                 <button class="btn btn-primary add-to-cart" type="submit" onclick="{SHOP_PRODUCT_SUBMIT_FUNCTION}" name="{SHOP_PRODUCT_SUBMIT_NAME}">{TXT_ADD_TO_CARD}</button>
                 <div class="price">
                     <!-- BEGIN price -->
-                    <span itemprop="priceCurrency">{SHOP_PRODUCT_PRICE_UNIT}</span> <span itemprop="price">{SHOP_PRODUCT_PRICE}</span>
+                    <span itemprop="priceCurrency">{SHOP_PRODUCT_PRICE_UNIT}</span> <span class="shop-product-price" data-price="{SHOP_PRODUCT_PRICE}" itemprop="price">{SHOP_PRODUCT_PRICE}</span>
                     <!-- END price -->
                     <!-- BEGIN price_discount -->
-                    {SHOP_PRODUCT_DISCOUNTPRICE_TEXTBLOCK_1} <span itemprop="price">{SHOP_PRODUCT_PRICE}</span>
+                    {SHOP_PRODUCT_DISCOUNTPRICE_TEXTBLOCK_1} <span class="shop-product-price" data-price="{SHOP_PRODUCT_PRICE}" itemprop="price">{SHOP_PRODUCT_PRICE}</span>
                     <span class="discount">
-                        {SHOP_PRODUCT_DISCOUNTPRICE_TEXTBLOCK_2} <span itemprop="priceCurrency">{SHOP_PRODUCT_DISCOUNTPRICE_UNIT}</span> <span itemprop="price">{SHOP_PRODUCT_DISCOUNTPRICE}</span>
+                        {SHOP_PRODUCT_DISCOUNTPRICE_TEXTBLOCK_2} <span itemprop="priceCurrency">{SHOP_PRODUCT_DISCOUNTPRICE_UNIT}</span> <span class="shop-product-discount-price" data-price="{SHOP_PRODUCT_DISCOUNTPRICE}" itemprop="price">{SHOP_PRODUCT_DISCOUNTPRICE}</span>
                     </span>
                     <!-- END price_discount -->
                 </div>

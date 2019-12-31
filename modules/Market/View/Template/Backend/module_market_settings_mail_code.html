@@ -1,5 +1,5 @@
 <!-- START module_market_settings_mail_code.html -->
-<form name="settings" method="post" action="?cmd=Market&act=settings&tpl=email_code">
+<form name="settings" method="post" action="index.php?cmd=Market&amp;act=settings&amp;tpl=email_code">
   <table width="100%" cellspacing="0" cellpadding="3" border="0" align="top" class="adminlist">
     <tr>
       <th colspan=2>{TXT_EMAIL_CODE}</th>
@@ -61,7 +61,7 @@
       <td width="180" valign="top">{TXT_TEXT}</td>
       <td ><textarea name="mailContent" style="width:468px; overflow: auto;" rows='15'>{MAIL_CONTENT}</textarea></td>
     </tr>
-    </table>
+  </table>
 <br />
 <input type="submit" value="{TXT_SAVE}" name="submitSettings">
 </form>

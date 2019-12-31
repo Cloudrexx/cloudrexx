@@ -33,14 +33,14 @@
 #contactForm div.mediaBrowserfolderWidget ul,
 div.mediaBrowserfolderWidget ul {
     padding: 0;
-    margin:0;
+    margin: 0;
     width: 100%;
 }
 
 #contactForm .contactFormUpload .mediaBrowserfolderWidget ul.filelist li,
 .mediaBrowserfolderWidget ul.filelist li {
-    list-style:none;
-    background:none;
+    list-style: none;
+    background: none;
     border: 1px solid #ddd;
     width: 100%;
     box-sizing: border-box;
@@ -60,7 +60,7 @@ div.mediaBrowserfolderWidget ul {
 }
 
 .folderWidget .mediaBrowserfolderWidget ul li,
-#contactForm .contactFormUpload  ul li {
+#contactForm .contactFormUpload ul li {
     list-style-type: none;
     padding: 15px 75px 15px 15px;
     text-indent: 0;

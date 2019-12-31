@@ -31,6 +31,7 @@
  * Provides some commonly used HTML elements
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Reto Kohli <reto.kohli@comvation.com>
+ * @deprecated  This class is deprecated in favor of using Sigma or \Cx\Core\Html\Model\Entity\...
  * @version     3.0.0
  * @package     cloudrexx
  * @subpackage  core
@@ -42,6 +43,7 @@
  * Provides some commonly used HTML elements
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Reto Kohli <reto.kohli@comvation.com>
+ * @deprecated  This class is deprecated in favor of using Sigma or \Cx\Core\Html\Model\Entity\...
  * @version     3.0.0
  * @package     cloudrexx
  * @subpackage  core
@@ -640,15 +642,21 @@ var _active_tab = '.
         $options = '';
         foreach ($arrOptions as $key => $value) {
             $options .=
-                '<option value="'.$key.'"'.
-                (is_array($selected)
-                    ? (isset($selected[$key]) ? Html::ATTRIBUTE_SELECTED : '')
-                    : ("$selected" === "$key"  ? Html::ATTRIBUTE_SELECTED : '')
-                ).
-                ($attribute ? ' '.$attribute : '').
-                '>'.
-                ($value != '' ? contrexx_raw2xhtml($value) : '&nbsp;').
-                "</option>\n";
+                '<option value="' . $key . '"'
+                . (
+                    (
+                        is_array($selected) &&
+                        array_key_exists($key, $selected)
+                    ) || 
+                    (
+                        !is_array($selected) &&
+                        "$selected" === "$key"
+                    )
+                    ? Html::ATTRIBUTE_SELECTED : ''
+                )
+                . ($attribute ? ' ' . $attribute : '') . '>'
+                . ($value != '' ? contrexx_raw2xhtml($value) : '&nbsp;')
+                . "</option>\n";
         }
         return $options;
     }
@@ -1030,6 +1038,10 @@ var _active_tab = '.
     static function getImageChooserBrowser(
         $objImage, $id, $imagetype_key=false, $type=null, $path=null
     ) {
+        throw new \Exception(
+            'Method ' . __METHOD__ . ' is deprecated. Please use \Cx\Core\Html instead'
+        );
+
         global $_CORELANG;
 
         JS::registerCode(self::getJavascript_Image(Image::PATH_NO_IMAGE));
@@ -1138,6 +1150,10 @@ var _active_tab = '.
         $objImage, $id, $imagetype_key='', $path_default='',
         $replace_only=false
     ) {
+        throw new \Exception(
+            'Method ' . __METHOD__ . ' is deprecated. Please use \Cx\Core\Html instead'
+        );
+
         global $_CORELANG;
 
         JS::registerCode(self::getJavascript_Image($path_default));
@@ -1973,8 +1989,8 @@ cx.jQuery(document).ready(function($) {
             return '';
         }
 //echo("Html::getLed($status, $action): led is ".$objImage->getPath()."<br />");
-        $objImage->setWidth(11);
-        $objImage->setHeight(11);
+        $objImage->setWidth(13);
+        $objImage->setHeight(13);
         $led_html = self::getImageOriginal(
             $objImage,
             'border="0"'.($alt ? ' alt="'.$alt.'" title="'.$alt.'"' : ''));
@@ -2072,9 +2088,8 @@ cx.jQuery(document).ready(function($) {
 
         $key_off = $class_off = $key_on = $class_on = $key_nop =
         $class_nop = $title_off = $title_on = $title_nop = null;
-        list ($key_off, $class_off) = each($arrStatus);
-        list ($key_on, $class_on) = each($arrStatus);
-        list ($key_nop, $class_nop) = each($arrStatus);
+        list ($key_off, $key_on, $key_nop)       = array_keys($arrStatus);
+        list ($class_off, $class_on, $class_nop) = array_values($arrStatus);
         list ($title_off, $title_on, $title_nop) =
             (is_array($arrTitle) && count($arrTitle) == 3
               ? array_values($arrTitle) : array('', '', ''));
@@ -2443,7 +2458,8 @@ alert("change: ID mismatch: "+id);
     static function getRelativeUri()
     {
         // returns the relative uri from url request object
-        return (string) clone \Env::get('Resolver')->getUrl();
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        return (string) clone $cx->getRequest()->getUrl();
     }
 
 
@@ -2591,6 +2607,10 @@ alert("change: ID mismatch: "+id);
      */
     static function getJavascript_Image($path='')
     {
+        throw new \Exception(
+            'Method ' . __METHOD__ . ' is deprecated. Please use \Cx\Core\Html instead'
+        );
+
         global $_CORELANG; //$_ARRAYLANG,
 
         return '

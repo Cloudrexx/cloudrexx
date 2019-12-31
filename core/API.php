@@ -131,33 +131,3 @@ function getPaging($numof_rows, $pos, $uri_parameter, $paging_text,
     return Paging::get($uri_parameter, $paging_text, $numof_rows,
         $results_per_page, $showeverytime, $pos, 'pos');
 }
-
-/**
- * Builds a (partially localized) date string from the optional timestamp.
- *
- * If no timestamp is supplied, the current date is used.
- * The returned date has the form "Weekday, Day. Month Year".
- * @param   int     $unixtimestamp  Unix timestamp
- * @return  string                  Formatted date
- * @deprecated
- * @todo    The function is inappropriately named "showFormattedDate"
- *          as the date is returned, and not "shown" in any way.
- * @todo    The formatting is not localized.
- *          Use a date format constant and/or language variable template.
- */
-function showFormattedDate($unixtimestamp='')
-{
-    global $_CORELANG;
-    $months = explode(",",$_CORELANG['TXT_MONTH_ARRAY']);
-    $weekday = explode(",",$_CORELANG['TXT_DAY_ARRAY']);
-
-    if (empty($unixtimestamp)) {
-        $date = date("w j n Y");
-    } else {
-        $date = date("w j n Y", $unixtimestamp);
-    }
-    list ($wday, $mday, $month, $year) = explode(' ', $date);
-    $month -= 1;
-    $formattedDate = "$weekday[$wday], $mday. $months[$month] $year";
-    return $formattedDate;
-}

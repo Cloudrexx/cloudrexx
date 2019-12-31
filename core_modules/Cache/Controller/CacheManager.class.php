@@ -88,27 +88,7 @@ class CacheManager extends \Cx\Core_Modules\Cache\Controller\CacheLib
             $objTemplate->SetVariable('CONTENT_STATUS_MESSAGE', $_ARRAYLANG['TXT_CACHE_ERR_NOTEXIST'] . $cx->getWebsiteCachePath());
         }
 
-        $this->initOPCaching();
-        $this->initUserCaching();
-        $this->getActivatedCacheEngines();
-    }
-
-    /**
-     * Creates an array containing all important cache-settings
-     *
-     * @global     object    $objDatabase
-     * @return    array    $arrSettings
-     */
-    function getSettings() {
-        $arrSettings = array();
-        \Cx\Core\Setting\Controller\Setting::init('Config', NULL,'Yaml');
-        $ymlArray = \Cx\Core\Setting\Controller\Setting::getArray('Config', null);
-
-        foreach ($ymlArray as $key => $ymlValue){
-            $arrSettings[$key] = $ymlValue['value'];
-        }
-
-        return $arrSettings;
+        parent::__construct();
     }
 
     /**
@@ -122,36 +102,9 @@ class CacheManager extends \Cx\Core_Modules\Cache\Controller\CacheLib
         global $objTemplate, $_ARRAYLANG;
 
         $this->objTpl->loadTemplateFile('settings.html');
+        $this->objTpl->setVariable($_ARRAYLANG);
         $this->objTpl->setVariable(array(
             'TXT_CACHE_GENERAL' => $_ARRAYLANG['TXT_SETTINGS_MENU_CACHE'],
-            'TXT_CACHE_STATS' => $_ARRAYLANG['TXT_CACHE_STATS'],
-            'TXT_CACHE_CONTREXX_CACHING' => $_ARRAYLANG['TXT_CACHE_CONTREXX_CACHING'],
-            'TXT_CACHE_USERCACHE' => $_ARRAYLANG['TXT_CACHE_USERCACHE'],
-            'TXT_CACHE_OPCACHE' => $_ARRAYLANG['TXT_CACHE_OPCACHE'],
-            'TXT_CACHE_PROXYCACHE' => $_ARRAYLANG['TXT_CACHE_PROXYCACHE'],
-            'TXT_CACHE_EMPTY' => $_ARRAYLANG['TXT_CACHE_EMPTY'],
-            'TXT_CACHE_STATS' => $_ARRAYLANG['TXT_CACHE_STATS'],
-            'TXT_CACHE_APC' => $_ARRAYLANG['TXT_CACHE_APC'],
-            'TXT_CACHE_ZEND_OPCACHE' => $_ARRAYLANG['TXT_CACHE_ZEND_OPCACHE'],
-            'TXT_CACHE_XCACHE' => $_ARRAYLANG['TXT_CACHE_XCACHE'],
-            'TXT_CACHE_MEMCACHE' => $_ARRAYLANG['TXT_CACHE_MEMCACHE'],
-            'TXT_CACHE_MEMCACHED' => $_ARRAYLANG['TXT_CACHE_MEMCACHED'],
-            'TXT_CACHE_FILESYSTEM' => $_ARRAYLANG['TXT_CACHE_FILESYSTEM'],
-            'TXT_CACHE_APC_ACTIVE_INFO' => $_ARRAYLANG['TXT_CACHE_APC_ACTIVE_INFO'],
-            'TXT_CACHE_APC_CONFIG_INFO' => $_ARRAYLANG['TXT_CACHE_APC_CONFIG_INFO'],
-            'TXT_CACHE_ZEND_OPCACHE_ACTIVE_INFO' => $_ARRAYLANG['TXT_CACHE_ZEND_OPCACHE_ACTIVE_INFO'],
-            'TXT_CACHE_ZEND_OPCACHE_CONFIG_INFO' => $_ARRAYLANG['TXT_CACHE_ZEND_OPCACHE_CONFIG_INFO'],
-            'TXT_CACHE_XCACHE_ACTIVE_INFO' => $_ARRAYLANG['TXT_CACHE_XCACHE_ACTIVE_INFO'],
-            'TXT_CACHE_XCACHE_CONFIG_INFO' => $_ARRAYLANG['TXT_CACHE_XCACHE_CONFIG_INFO'],
-            'TXT_CACHE_MEMCACHE_ACTIVE_INFO' => $_ARRAYLANG['TXT_CACHE_MEMCACHE_ACTIVE_INFO'],
-            'TXT_CACHE_MEMCACHE_CONFIG_INFO' => $_ARRAYLANG['TXT_CACHE_MEMCACHE_CONFIG_INFO'],
-            'TXT_CACHE_MEMCACHED_ACTIVE_INFO' => $_ARRAYLANG['TXT_CACHE_MEMCACHED_ACTIVE_INFO'],
-            'TXT_CACHE_MEMCACHED_CONFIG_INFO' => $_ARRAYLANG['TXT_CACHE_MEMCACHED_CONFIG_INFO'],
-            'TXT_CACHE_ENGINE' => $_ARRAYLANG['TXT_CACHE_ENGINE'],
-            'TXT_CACHE_INSTALLATION_STATE' => $_ARRAYLANG['TXT_CACHE_INSTALLATION_STATE'],
-            'TXT_CACHE_ACTIVE_STATE' => $_ARRAYLANG['TXT_CACHE_ACTIVE_STATE'],
-            'TXT_CACHE_CONFIGURATION_STATE' => $_ARRAYLANG['TXT_CACHE_CONFIGURATION_STATE'],
-            'TXT_CACHING' => $_ARRAYLANG['TXT_CACHING'],
             'TXT_SETTINGS_SAVE' => $_ARRAYLANG['TXT_SAVE'],
             'TXT_SETTINGS_ON' => $_ARRAYLANG['TXT_ACTIVATED'],
             'TXT_SETTINGS_OFF' => $_ARRAYLANG['TXT_DEACTIVATED'],
@@ -167,13 +120,11 @@ class CacheManager extends \Cx\Core_Modules\Cache\Controller\CacheLib
             'TXT_EMPTY_DESC_XCACHE' => $_ARRAYLANG['TXT_CACHE_EMPTY_DESC_FILES_AND_ENRIES'],
             'TXT_STATS_FILES' => $_ARRAYLANG['TXT_CACHE_STATS_FILES'],
             'TXT_STATS_FOLDERSIZE' => $_ARRAYLANG['TXT_CACHE_STATS_FOLDERSIZE'],
-            'TXT_STATS_CHACHE_SITE_COUNT' => $_ARRAYLANG['TXT_STATS_CHACHE_SITE_COUNT'],
-            'TXT_STATS_CHACHE_ENTRIES_COUNT' => $_ARRAYLANG['TXT_STATS_CHACHE_ENTRIES_COUNT'],
-            'TXT_STATS_CACHE_SIZE' => $_ARRAYLANG['TXT_STATS_CACHE_SIZE'],
-            'TXT_DEACTIVATED' => $_ARRAYLANG['TXT_DEACTIVATED'],
-            'TXT_DISPLAY_CONFIGURATION' => $_ARRAYLANG['TXT_DISPLAY_CONFIGURATION'],
-            'TXT_HIDE_CONFIGURATION' => $_ARRAYLANG['TXT_HIDE_CONFIGURATION'],
+            'CACHE_EXPERIMENTAL' => \Cx\Core\Core\Controller\Cx::instanciate()->getComponent(
+                'View'
+            )->flagExperimental(),
         ));
+        $this->objTpl->setVariable($_ARRAYLANG);
 
         if ($this->objSettings->isWritable()) {
             $this->objTpl->parse('cache_submit_button');
@@ -192,25 +143,33 @@ class CacheManager extends \Cx\Core_Modules\Cache\Controller\CacheLib
         $this->parseReverseProxySettings();
         $this->parseSsiProcessorSettings();
 
+        // generate stats for page cache
         $intFoldersizePages = 0;
-        $intFoldersizeEntries = 0;
         $intFilesPages = 0;
-        $intFilesEntries = 0;
-
-        $handleFolder = opendir($this->strCachePath);
+        $handleFolder = opendir($this->strCachePath . static::CACHE_DIRECTORY_OFFSET_PAGE);
         if ($handleFolder) {
             while ($strFile = readdir($handleFolder)) {
-                if ($strFile != '.' && $strFile != '..') {
-                    if(is_dir($this->strCachePath.'/'.$strFile)){
-                        $intFoldersizeEntries += filesize($this->strCachePath . $strFile);
-                        ++$intFilesEntries;
-                    }elseif($strFile !== '.htaccess'){
-                        $intFoldersizePages += filesize($this->strCachePath . $strFile);
-                        ++$intFilesPages;
-                    }
+                if (substr($strFile, 0, 1) == '.') {
+                    continue;
                 }
+                $intFoldersizePages += filesize($this->strCachePath . static::CACHE_DIRECTORY_OFFSET_PAGE . $strFile);
+                ++$intFilesPages;
             }
-            $intFoldersizeEntries = filesize($this->strCachePath) - $intFoldersizePages - filesize($this->strCachePath . '.htaccess');
+            closedir($handleFolder);
+        }
+
+        // generate stats for esi cache
+        $intFoldersizeEsi = 0;
+        $intFilesEsi = 0;
+        $handleFolder = opendir($this->strCachePath . static::CACHE_DIRECTORY_OFFSET_ESI);
+        if ($handleFolder) {
+            while ($strFile = readdir($handleFolder)) {
+                if (substr($strFile, 0, 1) == '.') {
+                    continue;
+                }
+                $intFoldersizeEsi += filesize($this->strCachePath . static::CACHE_DIRECTORY_OFFSET_ESI . $strFile);
+                ++$intFilesEsi;
+            }
             closedir($handleFolder);
         }
 
@@ -248,6 +207,15 @@ class CacheManager extends \Cx\Core_Modules\Cache\Controller\CacheLib
         }else{
             $this->objTpl->hideBlock('memcacheCachingStats');
         }
+        if (   $this->isInstalled(self::CACHE_ENGINE_MEMCACHED)
+            && $this->isConfigured(self::CACHE_ENGINE_MEMCACHED)
+            && $this->userCacheEngine == self::CACHE_ENGINE_MEMCACHED
+            && $this->getUserCacheActive()
+        ){
+            $this->objTpl->touchBlock('memcachedCachingStats');
+        }else{
+            $this->objTpl->hideBlock('memcachedCachingStats');
+        }
         if (   $this->isInstalled(self::CACHE_ENGINE_XCACHE)
             && $this->isConfigured(self::CACHE_ENGINE_XCACHE)
             && (
@@ -258,11 +226,6 @@ class CacheManager extends \Cx\Core_Modules\Cache\Controller\CacheLib
             $this->objTpl->touchBlock('xCacheCachingStats');
         }else{
             $this->objTpl->hideBlock('xCacheCachingStats');
-        }
-        if ($this->userCacheEngine == self::CACHE_ENGINE_FILESYSTEM && $this->getUserCacheActive()) {
-            $this->objTpl->touchBlock('FileSystemCachingStats');
-        } else {
-            $this->objTpl->hideBlock('FileSystemCachingStats');
         }
         $apcSizeCount = isset($apcCacheInfo['nhits']) ? $apcCacheInfo['nhits'] : 0;
         $apcEntriesCount = 0;
@@ -284,6 +247,9 @@ class CacheManager extends \Cx\Core_Modules\Cache\Controller\CacheLib
         $memcacheSizeMb = isset($memcacheStats['bytes']) ? $memcacheStats['bytes'] / (1024 *1024) : 0;
         $memcacheMaxSizeMb = isset($memcacheStats['limit_maxbytes']) ? $memcacheStats['limit_maxbytes'] / (1024 *1024) : 0;
 
+        $memcacheConfiguration = $this->getMemcacheConfiguration();
+        $memcacheServerKey = $memcacheConfiguration['ip'].':'.$memcacheConfiguration['port'];
+
         $this->objTpl->setVariable(array(
             'SETTINGS_STATUS_ON' => ($this->arrSettings['cacheEnabled'] == 'on') ? 'checked' : '',
             'SETTINGS_STATUS_OFF' => ($this->arrSettings['cacheEnabled'] == 'off') ? 'checked' : '',
@@ -297,21 +263,23 @@ class CacheManager extends \Cx\Core_Modules\Cache\Controller\CacheLib
             'SETTINGS_SSI_CACHE_STATUS_INTERN'  => ($this->arrSettings['cacheSsiOutput'] == 'intern') ? 'selected' : '',
             'SETTINGS_SSI_CACHE_STATUS_SSI' => ($this->arrSettings['cacheSsiOutput'] == 'ssi') ? 'selected' : '',
             'SETTINGS_SSI_CACHE_STATUS_ESI' => ($this->arrSettings['cacheSsiOutput'] == 'esi') ? 'selected' : '',
+            'INTERNAL_SSI_CACHE_ON' => ($this->arrSettings['internalSsiCache'] == 'on') ? 'checked' : '',
+            'INTERNAL_SSI_CACHE_OFF' => ($this->arrSettings['internalSsiCache'] != 'on') ? 'checked' : '',
             'SETTINGS_SSI_CACHE_TYPE_VARNISH' => ($this->arrSettings['cacheSsiType'] == 'varnish') ? 'selected' : '',
             'SETTINGS_SSI_CACHE_TYPE_NGINX' => ($this->arrSettings['cacheSsiType'] == 'nginx') ? 'selected' : '',
             'SETTINGS_EXPIRATION' => intval($this->arrSettings['cacheExpiration']),
-            'STATS_CONTREXX_FILESYSTEM_CHACHE_PAGES_COUNT' => $intFilesPages,
+            'STATS_PAGE_FILE_COUNT'                 => $intFilesPages,
             'STATS_FOLDERSIZE_PAGES'                => number_format($intFoldersizePages / 1024, 2, '.', '\''),
-            'STATS_CONTREXX_FILESYSTEM_CHACHE_ENTRIES_COUNT' => $intFilesEntries,
-            'STATS_FOLDERSIZE_ENTRIES'              => number_format($intFoldersizeEntries / 1024, 2, '.', '\''),
-            'STATS_APC_CHACHE_SITE_COUNT'           => $apcSizeCount,
-            'STATS_APC_CHACHE_ENTRIES_COUNT'        => $apcEntriesCount,
+            'STATS_ESI_FILE_COUNT'                  => $intFilesEsi,
+            'STATS_FOLDERSIZE_ESI'                  => number_format($intFoldersizeEsi / 1024, 2, '.', '\''),
+            'STATS_APC_CACHE_SITE_COUNT'            => $apcSizeCount,
+            'STATS_APC_CACHE_ENTRIES_COUNT'         => $apcEntriesCount,
             'STATS_APC_MAX_SIZE'                    => number_format($apcMaxSizeKb, 2, '.', '\''),
             'STATS_APC_SIZE'                        => number_format($apcSizeKb, 2, '.', '\''),
-            'STATS_OPCACHE_CHACHE_SITE_COUNT'       => $opcacheSizeCount,
+            'STATS_OPCACHE_CACHE_SITE_COUNT'        => $opcacheSizeCount,
             'STATS_OPCACHE_SIZE'                    => number_format($opcacheSizeKb, 2, '.', '\''),
             'STATS_OPCACHE_MAX_SIZE'                => number_format($opcacheMaxSizeKb, 2, '.', '\''),
-            'STATS_MEMCACHE_CHACHE_ENTRIES_COUNT'   => $memcacheEntriesCount,
+            'STATS_MEMCACHE_CACHE_ENTRIES_COUNT'    => $memcacheEntriesCount,
             'STATS_MEMCACHE_SIZE'                   => number_format($memcacheSizeMb, 2, '.', '\''),
             'STATS_MEMCACHE_MAX_SIZE'               => number_format($memcacheMaxSizeMb, 2, '.', '\''),
         ));
@@ -346,6 +314,7 @@ class CacheManager extends \Cx\Core_Modules\Cache\Controller\CacheLib
         \Cx\Core\Setting\Controller\Setting::set('cacheOpStatus', contrexx_input2db($_POST['cacheOpStatus']));
         \Cx\Core\Setting\Controller\Setting::set('cacheDbStatus', contrexx_input2db($_POST['cacheDbStatus']));
         \Cx\Core\Setting\Controller\Setting::set('cacheReverseProxy', contrexx_input2db($_POST['cacheReverseProxy']));
+        \Cx\Core\Setting\Controller\Setting::set('internalSsiCache', contrexx_input2db($_POST['internalSsiCache']));
         $oldSsiValue = $_CONFIG['cacheSsiOutput'];
         \Cx\Core\Setting\Controller\Setting::set('cacheSsiOutput', contrexx_input2db($_POST['cacheSsiOutput']));
         \Cx\Core\Setting\Controller\Setting::set('cacheSsiType', contrexx_input2db($_POST['cacheSsiType']));
@@ -354,6 +323,10 @@ class CacheManager extends \Cx\Core_Modules\Cache\Controller\CacheLib
             array(
                 'cacheUserCacheMemcacheConfig' => array(
                     'key' => 'memcacheSetting',
+                    'defaultPort' => 11211,
+                ),
+                'cacheUserCacheMemcachedConfig' => array(
+                    'key' => 'memcachedSetting',
                     'defaultPort' => 11211,
                 ),
                 'cacheProxyCacheConfig' => array(
@@ -397,6 +370,7 @@ class CacheManager extends \Cx\Core_Modules\Cache\Controller\CacheLib
         $this->initOPCaching(); // reinit opcaches
         $this->getActivatedCacheEngines();
         $this->clearCache($this->getOpCacheEngine());
+        $this->clearCache($this->getUserCacheEngine());
 
         if ($oldSsiValue != contrexx_input2db($_POST['cacheSsiOutput'])) {
             $this->_deleteAllFiles('cxPages');
@@ -475,7 +449,6 @@ class CacheManager extends \Cx\Core_Modules\Cache\Controller\CacheLib
             self::CACHE_ENGINE_MEMCACHE => array(),
             self::CACHE_ENGINE_MEMCACHED => array(),
             self::CACHE_ENGINE_XCACHE => array(),
-            self::CACHE_ENGINE_FILESYSTEM => array(),
         );
         $this->objTpl->setVariable('CHECKED_USERCACHE_' . strtoupper($this->getUserCacheEngine()), 'checked="checked"');
         if ($this->isInstalled(self::CACHE_ENGINE_APC, true)) {
@@ -518,13 +491,6 @@ class CacheManager extends \Cx\Core_Modules\Cache\Controller\CacheLib
             $cachingEngines[self::CACHE_ENGINE_XCACHE]['configured'] = true;
         }
 
-        if ($this->isConfigured(self::CACHE_ENGINE_FILESYSTEM)) {
-            $cachingEngines[self::CACHE_ENGINE_FILESYSTEM] = array(
-                'installed' => true,
-                'active' => true,
-                'configured' => true
-            );
-        }
         foreach ($cachingEngines as $engine => $data) {
             $installationIcon = $activeIcon = $configurationIcon = 'led_red.gif';
             if (isset($data['installed']) && isset($data['active']) && isset($data['configured'])) {
@@ -579,79 +545,15 @@ class CacheManager extends \Cx\Core_Modules\Cache\Controller\CacheLib
     }
 
     /**
-     * Delete all files in cache-folder
-     *
-     * @global     object    $objTemplate
-     * @global     array    $_ARRAYLANG
-     */
-    function deleteAllFiles($cacheEngine = null)
-    {
-        global $_ARRAYLANG, $objTemplate;
-
-        $this->_deleteAllFiles($cacheEngine);
-
-        $objTemplate->SetVariable('CONTENT_OK_MESSAGE', $_ARRAYLANG['TXT_CACHE_FOLDER_EMPTY']);
-    }
-
-    /**
      * Calls the related Clear Function from Lib and sets an OK-Message
      * @global array $_ARRAYLANG
      * @global object $objTemplate
      * @param string $cacheEngine
      */
     public function forceClearCache($cacheEngine = null){
+        global $objTemplate, $_ARRAYLANG;
 
-        global $_ARRAYLANG, $objTemplate;
-
-        switch ($cacheEngine) {
-            case 'cxEntries':
-            case 'cxPages':
-                $this->deleteAllFiles($cacheEngine);
-                break;
-            case self::CACHE_ENGINE_APC:
-            case 'apc':
-                $this->clearCache(self::CACHE_ENGINE_APC);
-                break;
-            case self::CACHE_ENGINE_ZEND_OPCACHE:
-            case 'zendop':
-                $this->clearCache(self::CACHE_ENGINE_ZEND_OPCACHE);
-                break;
-            case self::CACHE_ENGINE_MEMCACHE:
-            case 'memcache':
-                $this->clearCache(self::CACHE_ENGINE_MEMCACHE);
-                break;
-            case self::CACHE_ENGINE_XCACHE:
-            case 'xcache':
-                $this->clearCache(self::CACHE_ENGINE_XCACHE);
-                break;
-            default:
-                $this->clearCache(null);
-                break;
-        }
-
+        parent::forceClearCache($cacheEngine);
         $objTemplate->SetVariable('CONTENT_OK_MESSAGE', $_ARRAYLANG['TXT_CACHE_EMPTY_SUCCESS']);
     }
-
-
-    /**
-     * Delete all specific file from cache-folder
-     *
-     * @global     object    $objDatabase
-     */
-    function deleteSingleFile($intPageId)
-    {
-        global $objDatabase;
-
-        $intPageId = intval($intPageId);
-        if ( 0 < $intPageId ) {
-            $files = glob( $this->strCachePath . '*_' . $intPageId );
-            if ( count( $files ) ) {
-                foreach ( $files as $file ) {
-                    @unlink( $file );
-                }
-            }
-        }
-    }
 }
-
-?>

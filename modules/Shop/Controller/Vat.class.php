@@ -326,6 +326,45 @@ class Vat
             );
     }
 
+    /**
+     * Check if retail-prices are VAT-inclusive, but not reseller-prices.
+     * If this method returns TRUE, then that indicates that the VAT must
+     * be subtracted from the retail price.
+     *
+     * @return  boolean TRUE if retail-prices are VAT-inclusive, but not
+     *                  reseller-prices. Any other setup VAT configuration
+     *                  causes FALSE to be returned.
+     */
+    static function isIncludedInRetailButNotInReseller() {
+        if (!is_array(self::$arrVat)) self::init();
+
+        // in case retail prices do not use VAT, then
+        // there is no need to do any subtraction
+        if (!self::$arrVatEnabled[self::$is_home_country ? 1 : 0][0]) {
+            return false;
+        }
+        // in case retail prices do not contain VAT, then
+        // there is no need to do any subtraction
+        if (!self::$arrVatIncluded[self::$is_home_country ? 1 : 0][0]) {
+            return false;
+        }
+
+        // in case reseller prices do not use VAT, then
+        // we have to subtract the VAT from the retail price
+        if (!self::$arrVatEnabled[self::$is_home_country ? 1 : 0][1]) {
+            return true;
+        }
+
+        // in case reseller prices are exclusive VAT, then
+        // we have to subtract the VAT from the retail price
+        if (!self::$arrVatIncluded[self::$is_home_country ? 1 : 0][1]) {
+            return true;
+        }
+
+        // reseller prices are inclusive VAT, therefore
+        // there is no need to do any subtraction
+        return false;
+    }
 
     /**
      * Return the array of IDs, rates, and class names

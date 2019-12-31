@@ -140,7 +140,6 @@ $_ARRAYLANG['TXT_CONTACT_CONTACT_FORM_SUCCESSFULLY_DELETED'] = "Das Kontaktformu
 $_ARRAYLANG['TXT_CONTACT_FAILED_DELETE_CONTACT_FORM'] = "Beim l�schen des Kontaktformulars trat ein Fehler auf!";
 $_ARRAYLANG['TXT_CONTACT_DATA_RECORD_UPDATED_SUCCESSFUL_VALIDATE'] = "Die Inhalts-Seite wurde erfolgreich aktualisiert. Da Sie jedoch nur �ber eingschr�nkte Berechtigungen verf�gen, muss ein Administrator Ihren Antrag zuerst best�tigen.";
 $_ARRAYLANG['TXT_CONTACT_SETTINGS_UPDATED'] = "Die Einstellungen wurden �bernommen.";
-$_ARRAYLANG['TXT_CONTACT_META_DATE_BY_EXPORT'] = "Metainformationen beim Export";
 $_ARRAYLANG['TXT_CONTACT_DEFAULT_FEEDBACK_TXT'] = "Vielen Dank f�r Ihre Anfrage. Wir werden uns so schnell wie M�glich mit Ihnen in Verbindung setzen.";
 $_ARRAYLANG['TXT_CONTACT_SHOW_FORM_AFTER_SUBMIT'] = "Formular beim Feedback Text wieder anzeigen";
 $_ARRAYLANG['TXT_CONTACT_LANG'] = "Language";

@@ -160,6 +160,7 @@ class CrmSettings extends CrmLibrary
             $statusArr     = array();
             $x             = 0;
             foreach ($_POST['form_id'] as $id) {
+                $statusArr[$id]           = array();
                 $statusArr[$id]['id']     = intval($id);
                 $statusArr[$id]['status'] = ($defaultTypeId == $id) ? 1 : 0;
                 $statusArr[$id]['pos']    = intval($_POST['form_pos'][$x]);
@@ -319,7 +320,7 @@ class CrmSettings extends CrmLibrary
         $customerStatus     = isset($_POST['activeStatus']) || !isset ($_POST['customer_type_submit']) ? 1 : 0;
         $hrlyRate           = array();
 
-        if ($_POST['customer_type_submit']) {
+        if (isset($_POST['customer_type_submit'])) {
             $success = true;
 
             $searchingQuery = "SELECT label FROM `".DBPREFIX."module_{$this->moduleNameLC}_customer_types`
@@ -823,7 +824,7 @@ class CrmSettings extends CrmLibrary
         ));
         \JS::activate("jquery");
 
-        $msg = base64_decode($_REQUEST['msg']);
+        $msg = isset($_REQUEST['msg']) ? base64_decode($_REQUEST['msg']) : '';
         switch ($msg) {
         case 'taskUpdated':
             $_SESSION['strOkMessage'] = $_ARRAYLANG['TXT_CRM_TASK_TYPE_UPDATED_SUCCESSFULLY'];
@@ -863,7 +864,7 @@ class CrmSettings extends CrmLibrary
                 $_SESSION['strOkMessage'] = $_ARRAYLANG['TXT_CRM_PROJECTSTATUS_SORTING_COMPLETE'];
         }
 
-        if ($_POST['saveTaskType']) {
+        if (isset($_POST['saveTaskType'])) {
             $this->saveTaskTypes();
             $_SESSION['strOkMessage'] = $_ARRAYLANG['TXT_CRM_TASK_TYPE_ADDED_SUCCESSFULLY'];
         }
@@ -916,7 +917,7 @@ class CrmSettings extends CrmLibrary
 
         $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 
-        if ($_POST['saveTaskType']) {
+        if (isset($_POST['saveTaskType'])) {
             $this->saveTaskTypes($id);
             $msg = "taskUpdated";
             \Cx\Core\Csrf\Controller\Csrf::header("Location:./index.php?cmd=".$this->moduleName."&act=settings&tpl=tasktypes&msg=".base64_encode($msg));
@@ -1075,6 +1076,7 @@ class CrmSettings extends CrmLibrary
             $settings = array(
                     'allow_pm'                             => (!$this->isPmInstalled ? 0 : (isset($_POST['allowPm']) ? 1 : 0)),
                     'create_user_account'                  => isset($_POST['create_user_account']) ? 1 : 0,
+                    'contact_amount_enabled'               => isset($_POST['contact_amount_enabled']) ? 1 : 0,
                     'customer_default_language_backend'    => isset($_POST['default_language_backend']) ? (int) $_POST['default_language_backend'] : 0,
                     'customer_default_language_frontend'   => isset($_POST['default_language_frontend']) ? (int) $_POST['default_language_frontend'] : 0,
                     'default_user_group'                   => isset($_POST['default_user_group']) ? (int) $_POST['default_user_group'] : 0,
@@ -1122,42 +1124,40 @@ class CrmSettings extends CrmLibrary
         if($settings['create_user_account'] == 1){
             $this->createProfilAttributes();
         }
-        $objLanguages = $objDatabase->Execute("SELECT `id`, `name`, `frontend`, `backend` FROM ".DBPREFIX."languages WHERE frontend = 1 OR backend =1");
 
-        if ($objLanguages) {
+        $frontendLangs = \FWLanguage::getActiveFrontendLanguages();
+        if (!empty($frontendLangs)) { // parse frontend languages
             $objTpl->setVariable(array(
-                    'CRM_LANG_NAME'     => $_ARRAYLANG['TXT_CRM_STANDARD'],
-                    'CRM_LANG_VALUE'    => 0,
-                    'CRM_LANG_SELECTED' => $settings['customer_default_language_frontend'] == 0 ? "selected='selected'" : ''
+                'CRM_LANG_NAME'     => $_ARRAYLANG['TXT_CRM_STANDARD'],
+                'CRM_LANG_VALUE'    => 0,
+                'CRM_LANG_SELECTED' => $settings['customer_default_language_frontend'] == 0 ? "selected='selected'" : ''
             ));
             $objTpl->parse("langFrontend");
+            foreach($frontendLangs as $frontendLang) {
+                $objTpl->setVariable(array(
+                    'CRM_LANG_NAME'     => contrexx_raw2xhtml($frontendLang['name']),
+                    'CRM_LANG_VALUE'    => (int) $frontendLang['id'],
+                    'CRM_LANG_SELECTED' => $settings['customer_default_language_frontend'] == $frontendLang['id'] ? "selected='selected'" : ''
+                ));
+                $objTpl->parse("langFrontend");
+            }
+        }
+
+        $backendLangs = \FWLanguage::getActiveBackendLanguages();
+        if (!empty($backendLangs)) {
             $objTpl->setVariable(array(
-                    'CRM_LANG_NAME'  => $_ARRAYLANG['TXT_CRM_STANDARD'],
-                    'CRM_LANG_VALUE' => 0,
-                    'CRM_LANG_SELECTED' => $settings['customer_default_language_backend'] == 0 ? "selected='selected'" : ''
+                'CRM_LANG_NAME'  => $_ARRAYLANG['TXT_CRM_STANDARD'],
+                'CRM_LANG_VALUE' => 0,
+                'CRM_LANG_SELECTED' => $settings['customer_default_language_backend'] == 0 ? "selected='selected'" : ''
             ));
             $objTpl->parse("langBackend");
-            while (!$objLanguages->EOF) {
-
-                if ($objLanguages->fields['frontend']) {
-                    $objTpl->setVariable(array(
-                            'CRM_LANG_NAME'     => contrexx_raw2xhtml($objLanguages->fields['name']),
-                            'CRM_LANG_VALUE'    => (int) $objLanguages->fields['id'],
-                            'CRM_LANG_SELECTED' => $settings['customer_default_language_frontend'] == $objLanguages->fields['id'] ? "selected='selected'" : ''
-                    ));
-                    $objTpl->parse("langFrontend");
-                }
-
-                if ($objLanguages->fields['backend']) {
-                    $objTpl->setVariable(array(
-                            'CRM_LANG_NAME'     => contrexx_raw2xhtml($objLanguages->fields['name']),
-                            'CRM_LANG_VALUE'    => (int) $objLanguages->fields['id'],
-                            'CRM_LANG_SELECTED' => $settings['customer_default_language_backend'] == $objLanguages->fields['id'] ? "selected='selected'" : ''
-                    ));
-                    $objTpl->parse("langBackend");
-                }
-
-                $objLanguages->MoveNext();
+            foreach ($backendLangs as $backendLang) {
+                $objTpl->setVariable(array(
+                    'CRM_LANG_NAME'     => contrexx_raw2xhtml($backendLang['name']),
+                    'CRM_LANG_VALUE'    => (int) $backendLang['id'],
+                    'CRM_LANG_SELECTED' => $settings['customer_default_language_backend'] == $backendLang['id'] ? "selected='selected'" : ''
+                ));
+                $objTpl->parse("langBackend");
             }
         }
 
@@ -1207,6 +1207,7 @@ class CrmSettings extends CrmLibrary
         $objTpl->setVariable(array(
             'CRM_ALLOW_PM'                   => ($settings['allow_pm']) ? "checked='checked'" : '',
             'CRM_CREATE_ACCOUNT_USER'        => ($settings['create_user_account']) ? "checked='checked'" : '',
+            'CRM_CONTACT_AMOUNT_ENABLED'     => ($settings['contact_amount_enabled']) ? "checked='checked'" : '',
             'CRM_ACCOUNT_MANTATORY'          => ($settings['user_account_mantatory']) ? "checked='checked'" : '',
         ));
 
@@ -1237,6 +1238,7 @@ class CrmSettings extends CrmLibrary
                 'TXT_CRM_EMP_DEFAULT_USER_GROUP' => $_ARRAYLANG['TXT_CRM_EMP_DEFAULT_USER_GROUP'],
                 'TXT_CRM_SETTINGS_EMP_TOOLTIP'   => $_ARRAYLANG['TXT_CRM_SETTINGS_EMPLOYEE_TOOLTIP'],
                 'TXT_CRM_ACCOUNT_ARE_MANTATORY'  => $_ARRAYLANG['TXT_CRM_ACCOUNT_ARE_MANTATORY'],
+                'TXT_CRM_CONTACT_AMOUNT_ENABLED' => $_ARRAYLANG['TXT_CRM_CONTACT_AMOUNT_ENABLED'],
                 'CRM_PROFILE_ATTRIBUT_INDUSTRY_TYPE_DROPDOWN' =>\Html::getSelect(
                                                                 'user_profile_attribute_industry_type',
                                                                 \User_Profile_Attribute::getCustomAttributeNameArray(),
@@ -1355,7 +1357,7 @@ class CrmSettings extends CrmLibrary
             $_REQUEST['active_tab'] = 2;
         }
         $objTemplate = null;
-        $result &= \Cx\Core\Setting\Controller\Setting::show_external(
+        \Cx\Core\Setting\Controller\Setting::show_external(
             $objTemplate,
             $_CORELANG['TXT_CORE_MAILTEMPLATES'],
             \Cx\Core\MailTemplate\Controller\MailTemplate::overview('Crm', 'config',
@@ -1363,7 +1365,7 @@ class CrmSettings extends CrmLibrary
             )->get()
         );
 
-        $result &= \Cx\Core\Setting\Controller\Setting::show_external(
+        \Cx\Core\Setting\Controller\Setting::show_external(
             $objTemplate,
             (empty($_REQUEST['key'])
               ? $_CORELANG['TXT_CORE_MAILTEMPLATE_ADD']
@@ -1371,7 +1373,7 @@ class CrmSettings extends CrmLibrary
             \Cx\Core\MailTemplate\Controller\MailTemplate::edit('Crm')->get()
         );
 
-        $result &= \Cx\Core\Setting\Controller\Setting::show_external(
+        \Cx\Core\Setting\Controller\Setting::show_external(
             $objTemplate,
             $_ARRAYLANG['TXT_CRM_PLACEHOLDERS'],
             $this->getCrmModulePlaceHolders()
@@ -1494,7 +1496,7 @@ class CrmSettings extends CrmLibrary
         $objTpl->addBlockfile('CRM_SETTINGS_FILE', 'settings_block', 'module_crm_settings_company_size.html');
         $this->_pageTitle = $_ARRAYLANG['TXT_CRM_SETTINGS'];
 
-        if ($_POST['save']) {
+        if (isset($_POST['save'])) {
             //insert
             $query = \SQL::insert('module_' . $this->moduleNameLC . '_company_size', $fields, array('escape' => true));
             $db = $objDatabase->Execute($query);
@@ -1529,7 +1531,7 @@ class CrmSettings extends CrmLibrary
         $this->getCompanySize($id);
         //parse the placeholders
         $this->parseCompanySizePlaceholders();
-        if($_POST['save']) {
+        if (isset($_POST['save'])) {
             if(!empty($id)){
                 //update
                 $query  = \SQL::update('module_'.$this->moduleNameLC.'_company_size', $fields, array('escape' => true)).' WHERE `id` = '.$id;

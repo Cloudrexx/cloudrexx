@@ -43,10 +43,10 @@ $J(function(){
             {MEDIADIR_CATEGORY_IMAGE_BROWSE}
         </td>
     </tr>
-<!-- not yet implemented    <tr class="row1">
+    <tr class="row1">
         <td valign="top">{TXT_MEDIADIR_SHOW_SUBCATEGORIES}</td>
-        <td><input type="radio" name="categoryShowSubcategories" value="1" {MEDIADIR_CATEGORY_SHOW_SUBCATEGORIES_ON} /> {TXT_MEDIADIR_ACTIVATE} &nbsp;<input type="radio" name="categoryShowSubcategories" value="0" {MEDIADIR_CATEGORY_SHOW_SUBCATEGORIES_OFF} /> {TXT_MEDIADIR_DEACTIVATE}</td>
-    </tr> -->
+        <td><input type="radio" name="categoryShowSubcategories" value="1" {MEDIADIR_CATEGORY_SHOW_SUBCATEGORIES_ON} /> {TXT_MEDIADIR_ACTIVATE} &nbsp;<input type="radio" name="categoryShowSubcategories" value="0" {MEDIADIR_CATEGORY_SHOW_SUBCATEGORIES_OFF} /> {TXT_MEDIADIR_DEACTIVATE}&nbsp;&nbsp;<span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_MEDIADIR_SHOW_SUBCATEGORIES_INFO}</span></td>
+    </tr>
     <tr class="row2">
         <td valign="top">{TXT_MEDIADIR_SHOW_ENTRIES}</td>
         <td><input type="radio" name="categoryShowEntries" value="1" {MEDIADIR_CATEGORY_SHOW_ENTRIES_ON} /> {TXT_MEDIADIR_ACTIVATE} &nbsp;<input type="radio" name="categoryShowEntries" value="0" {MEDIADIR_CATEGORY_SHOW_ENTRIES_OFF} /> {TXT_MEDIADIR_DEACTIVATE}</td>
@@ -79,6 +79,13 @@ $J(function(){
                 {TXT_MEDIADIR_DESCRIPTION}
                 <br />
                 {MEDIADIR_CATEGORY_DESCRIPTION}
+            </td>
+        </tr>
+        <tr class="row2">
+            <td valign="top" width="200">{TXT_MEDIADIR_META_DESCRIPTION}</td>
+            <td>
+                <textarea name="categoryMetaDesc[{MEDIADIR_CATEGORY_LANG_ID}]" maxlength="160" style="width: 440px;height: 45px;">{MEDIADIR_CATEGORY_META_DESCRIPTION}</textarea>
+                <br />
             </td>
         </tr>
     </table>

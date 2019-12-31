@@ -47,7 +47,7 @@ class StorableTest extends \Cx\Core\Test\Model\Entity\ContrexxTestCase
      */
     protected $themeOptionRepository;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->testStorage =
             new \Cx\Core_Modules\TemplateEditor\Model\Entity\TestStorage();

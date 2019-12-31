@@ -67,3 +67,4 @@ $_ARRAYLANG['TXT_EGOV_PAYMENT_NOT_COMPLETED'] = "The product hasn't been paid ye
 
 $_ARRAYLANG['TXT_ORDER_LINK_PREPARED'] = "Your order has been prepared for payment. Click the button below in order to proceed to the payment gateway.";
 $_ARRAYLANG['TXT_EGOV_POSTFINANCE'] = "PostFinance";
+$_ARRAYLANG['TXT_EGOV_CAPTCHA_ERROR'] = "Wrong security code entered!";

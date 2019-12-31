@@ -52,6 +52,10 @@ class DB_NestedSet_ADODB extends DB_NestedSet {
      */
     private $db;
 
+    public function __construct($dsn, $params = array()) {
+        $this->DB_NestedSet_ADODB($dsn, $params);
+    }
+
     /**
      * Constructor
      *

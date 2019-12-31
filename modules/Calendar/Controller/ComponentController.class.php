@@ -45,13 +45,34 @@ namespace Cx\Modules\Calendar\Controller;
  * @subpackage  module_calendar
  */
 class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentController {
-    public function getControllerClasses() {
-        // Return an empty array here to let the component handler know that there
-        // does not exist a backend, nor a frontend controller of this component.
-        return array();
+
+    /**
+     * Returns all Controller class names for this component (except this)
+     *
+     * Be sure to return all your controller classes if you add your own
+     * @return array List of Controller class names (without namespace)
+     */
+    public function getControllerClasses()
+    {
+        return array('EsiWidget', 'JsonCalendar');
     }
 
-     /**
+    /**
+     * Returns a list of JsonAdapter class names
+     *
+     * The array values might be a class name without namespace. In that case
+     * the namespace \Cx\{component_type}\{component_name}\Controller is used.
+     * If the array value starts with a backslash, no namespace is added.
+     *
+     * Avoid calculation of anything, just return an array!
+     * @return array List of ComponentController classes
+     */
+    public function getControllersAccessableByJson()
+    {
+        return array('EsiWidgetController', 'JsonCalendarController');
+    }
+
+    /**
      * Load your component.
      *
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
@@ -64,12 +85,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 define('CALENDAR_MANDATE', MODULE_INDEX);
 
                 $objCalendar = new \Cx\Modules\Calendar\Controller\Calendar($page->getContent(), MODULE_INDEX);
-                $page->setContent($objCalendar->getCalendarPage());
-                if ($objCalendar->pageTitle) {
-                    $page->setTitle($objCalendar->pageTitle);
-                    $page->setContentTitle($objCalendar->pageTitle);
-                    $page->setMetaTitle($objCalendar->pageTitle);
-                }
+                $page->setContent($objCalendar->getCalendarPage($page));
                 break;
 
             case \Cx\Core\Core\Controller\Cx::MODE_BACKEND:
@@ -85,40 +101,33 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 break;
         }
     }
-    /**
-     * Do something before content is loaded from DB
-     *
-     * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
-     */
-    public function preContentLoad(\Cx\Core\ContentManager\Model\Entity\Page $page) {
-        global $modulespath, $eventsPlaceholder, $_CONFIG, $themesPages, $page_template,
-                                $calHeadlinesObj, $calHeadlines, $_ARRAYLANG;
-        switch ($this->cx->getMode()) {
-            case \Cx\Core\Core\Controller\Cx::MODE_FRONTEND:
-                // Get Calendar Events
-                $modulespath = ASCMS_MODULE_PATH.'/Calendar/Controller/CalendarHeadlines.class.php';
-                $eventsPlaceholder = '{EVENTS_FILE}';
-                if (   MODULE_INDEX < 2
-                    && $_CONFIG['calendarheadlines']
-                    && (   strpos(\Env::get('cx')->getPage()->getContent(), $eventsPlaceholder) !== false
-                        || strpos($themesPages['index'], $eventsPlaceholder) !== false
-                        || strpos($themesPages['sidebar'], $eventsPlaceholder) !== false
-                        || strpos($page_template, $eventsPlaceholder) !== false)
-                    && file_exists($modulespath)
-                ) {
-                    $_ARRAYLANG = array_merge($_ARRAYLANG, \Env::get('init')->loadLanguageData('Calendar'));
-                    $calHeadlinesObj = new \Cx\Modules\Calendar\Controller\CalendarHeadlines($themesPages['calendar_headlines']);
-                    $calHeadlines = $calHeadlinesObj->getHeadlines();
-                    \Env::get('cx')->getPage()->setContent(str_replace($eventsPlaceholder, $calHeadlines, \Env::get('cx')->getPage()->getContent()));
-                    $themesPages['index']   = str_replace($eventsPlaceholder, $calHeadlines, $themesPages['index']);
-                    $themesPages['sidebar'] = str_replace($eventsPlaceholder, $calHeadlines, $themesPages['sidebar']);
-                    $page_template          = str_replace($eventsPlaceholder, $calHeadlines, $page_template);
-                }
-                break;
-            default:
-                break;
-        }
 
+    /**
+     * Do something after system initialization
+     *
+     * USE CAREFULLY, DO NOT DO ANYTHING COSTLY HERE!
+     * CALCULATE YOUR STUFF AS LATE AS POSSIBLE.
+     * This event must be registered in the postInit-Hook definition
+     * file config/postInitHooks.yml.
+     * @param \Cx\Core\Core\Controller\Cx   $cx The instance of \Cx\Core\Core\Controller\Cx
+     */
+    public function postInit(\Cx\Core\Core\Controller\Cx $cx)
+    {
+        // Get Calendar Events
+        $widgetController = $this->getComponent('Widget');
+        foreach (CalendarLibrary::getHeadlinePlaceholders() as $widgetName) {
+            $widget = new \Cx\Core_Modules\Widget\Model\Entity\EsiWidget(
+                $this,
+                $widgetName
+            );
+            $widget->setEsiVariable(
+                \Cx\Core_Modules\Widget\Model\Entity\EsiWidget::ESI_VAR_ID_THEME |
+                \Cx\Core_Modules\Widget\Model\Entity\EsiWidget::ESI_VAR_ID_CHANNEL
+            );
+            $widgetController->registerWidget(
+                $widget
+            );
+        }
     }
 
     /**
@@ -135,5 +144,116 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         $eventListener = new \Cx\Modules\Calendar\Model\Event\CalendarEventListener($this->cx);
         $this->cx->getEvents()->addEventListener('SearchFindContent', $eventListener);
         $this->cx->getEvents()->addEventListener('mediasource.load', $eventListener);
+
+        foreach ($this->getEntityClasses() as $entityClassName) {
+            $this->cx->getEvents()->addModelListener(\Doctrine\ORM\Events::onFlush, $entityClassName, $eventListener);
+        }
    }
+
+    /**
+     * {@inheritdoc}
+     */
+   public function adjustResponse(
+        \Cx\Core\Routing\Model\Entity\Response $response
+    ) {
+        $page = $response->getPage();
+        if (
+            !$page ||
+            $page->getModule() !== $this->getName() ||
+            !in_array($page->getCmd(), array('detail', 'register', 'sign'))
+        ) {
+            return;
+        }
+
+        $headers = $response->getRequest()->getHeaders();
+        if (isset($headers['Referer'])) {
+            $refUrl = new \Cx\Lib\Net\Model\Entity\Url($headers['Referer']);
+        } else {
+            $refUrl = new \Cx\Lib\Net\Model\Entity\Url($response->getRequest()->getUrl()->toString());
+        }
+        $params = $refUrl->getParamArray();
+
+        // TODO: this is required as CalendarEventManager::getEvent() depends on $_LANGID
+        global $_LANGID;
+        $_LANGID = $page->getLang();
+        $eventManager = new \Cx\Modules\Calendar\Controller\CalendarEventManager();
+        $eventManager->getEvent($params['id'], $params['date']);
+
+        if (!isset($eventManager->eventList[0])) {
+            return;
+        }
+        $event = $eventManager->eventList[0];
+
+        //Set the Page Title
+        $pageTitle = $this->getPageTitle($event, $page->getCmd());
+        if ($pageTitle) {
+            $page->setTitle($pageTitle);
+            $page->setContentTitle($pageTitle);
+            $page->setMetaTitle($pageTitle);
+        }
+
+        //Set the Page Meta Description
+        if ($page->getCmd() == 'detail') {
+            $metaDesc = $this->getPageDescription($event);
+            if ($metaDesc) {
+                $page->setMetadesc($metaDesc);
+            }
+        }
+
+        // Set the Page Meta Image
+        if ($event->pic) {
+            $page->setMetaimage($event->pic);
+        }
+   }
+
+   /**
+    * Get the Page title
+    *
+    * @param \Cx\Modules\Calendar\Controller\CalendarEvent $event Event object
+    * @param string                                        $cmd   Page CMD
+    *
+    * @return string
+    */
+    protected function getPageTitle(CalendarEvent $event, $cmd)
+    {
+        $eventTitle = html_entity_decode(
+            $event->title,
+            ENT_QUOTES,
+            CONTREXX_CHARSET
+        );
+        if ($cmd === 'detail') {
+            return $eventTitle;
+        }
+
+        if (in_array($cmd, array('register', 'sign'))) {
+            if (
+                !$event->status ||
+                ($event->access == 1 && !\FWUser::getFWUserObject()->objUser->login())
+            ) {
+                return '';
+            }
+            $calendarLib = new CalendarLibrary('.');
+            return $calendarLib->format2userDate($event->startDate)
+                . ": " . $eventTitle;
+        }
+    }
+
+    /**
+     * Get the Page description
+     *
+     * @param \Cx\Modules\Calendar\Controller\CalendarEvent $event Event object
+     *
+     * @return string
+     */
+    protected function getPageDescription(CalendarEvent $event)
+    {
+        // Set the meta page description to the teaser text if displaying calendar details
+        $teaser = html_entity_decode($event->teaser, ENT_QUOTES, CONTREXX_CHARSET);
+        if ($teaser) {
+            return contrexx_raw2xhtml(contrexx_strip_tags($teaser));
+        }
+
+        $description = html_entity_decode($event->description, ENT_QUOTES, CONTREXX_CHARSET);
+        return contrexx_raw2xhtml(contrexx_strip_tags($description));
+    }
 }

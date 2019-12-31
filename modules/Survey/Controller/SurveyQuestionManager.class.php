@@ -49,8 +49,15 @@ namespace Cx\Modules\Survey\Controller;
  */
 class SurveyQuestionManager extends SurveyLibrary
 {
+    /**
+     * @var integer $surveyId
+     */
     public $surveyId;
-    public $questions;
+
+    /**
+     * @var array $questions
+     */
+    public $questions = array();
 
     function __construct($id = null)
     {
@@ -110,6 +117,7 @@ class SurveyQuestionManager extends SurveyLibrary
             $objTpl->hideBlock('noSurveyQuestions');
         }
 
+        $row = '';
         foreach ($this->questions as $questionId => $question) {
 
             $comment   = $question['isCommentable'] ? $_ARRAYLANG['TXT_YES'] : $_ARRAYLANG['TXT_NO'];

@@ -1,0 +1,81 @@
+<style>
+    body section {margin-top: 49px;}
+</style>
+<div class="banner-slider container-fluid">
+    <div id="carousel-example-generic" class="carousel container slide" data-ride="carousel">
+        <!-- Indicators -->
+        <ol class="carousel-indicators">
+        </ol>
+        <!-- Wrapper for slides -->
+        <div class="carousel-inner">
+            <!-- BEGIN template_editor_slider_images -->
+            <div class="item">
+                <img alt="Slider" height="500" src="{TEMPLATE_EDITOR_SLIDER_IMAGES}" width="1200" />
+            </div>
+            <!-- END template_editor_slider_images -->
+        </div>
+        <!-- Controls -->
+        <a class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev">
+            <span class="glyphicon glyphicon-chevron-left"></span>
+        </a>
+        <a class="right carousel-control" href="#carousel-example-generic" role="button" data-slide="next">
+            <span class="glyphicon glyphicon-chevron-right"></span>
+        </a>
+    </div>
+    <script>
+        jQuery('.carousel-inner .item:first-child').addClass('active');
+        if (jQuery('.carousel-inner .item').length > 1) {
+            jQuery('.carousel-inner .item').each(function (i) {
+                jQuery('.carousel-indicators').append('<li data-target="#carousel-example-generic" data-slide-to="' + i + '"></li>');
+            });
+            jQuery('.carousel-indicators li:first-child').addClass('active');
+        }
+        else {
+            jQuery('.carousel-control').hide();
+        }
+    </script>
+</div>
+<div id="home-content" class="clearfix inner container">
+    <div class="row">
+        <div id="home-page-wrapper" class="content">
+            <div id="home-page" class="col-md-12 col-xs-12">
+                <h1 class="first">{CONTENT_TITLE}</h1>
+                {CONTENT_TEXT}
+            </div>
+        </div>
+        <div id="home-boxes">
+            <!-- BEGIN template_editor_news_area -->
+            <div class="first col-md-4 col-sm-12">
+                <div class="home-box"><h2>News</h2>
+                    {HEADLINES_FILE}
+                    <a class="more-link" href="{NODE_NEWS}">Weitere News</a>
+                </div>
+            </div>
+            <!-- END template_editor_news_area -->
+            <!-- BEGIN template_editor_events_area -->
+            <div class="middlebox col-md-4 col-sm-12">
+                <div class="home-box">
+                    <h2>Veranstaltungen</h2>
+                    <div id="home-event">
+                        {EVENTS_FILE}
+                    </div>
+                </div>
+            </div>
+            <!-- END template_editor_events_area -->
+            <!-- BEGIN template_editor_newsletter_area -->
+            <div class="lastbox col-md-4 col-sm-12">
+                <div class="home-box"><h2>Newsletter</h2>
+                    <div id="home-newsletter">
+                        Sie m&ouml;chten gerne regelm&auml;ssig &uuml;ber die neusten Themen informiert werden? Dann melden Sie sich einfach hier f&uuml;r unseren kostenlosen Newsletter an:
+                        <form name="newsletter" action="{NODE_NEWSLETTER_SUBSCRIBE}" method="post">
+                            <input type="hidden" name="list[1]" value="1" />
+                            <input type="text" onfocus="this.value = ''" name="email" value="E-mail address" maxlength="255" />
+                            <button name="recipient_save">Anmelden</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- END template_editor_newsletter_area -->
+        </div>
+    </div>
+</div>

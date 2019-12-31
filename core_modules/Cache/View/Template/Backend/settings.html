@@ -8,10 +8,13 @@
           }
           var rowClass = elm.data( 'id' );
           if ( status == 'on' ) {
+              $J( ".setting_no_"+ rowClass).css( "display", "none" );
               $J( "div.setting_"+ rowClass).css( "display", "block" );
               $J( "tr.setting_"+ rowClass).css( "display", "table-row" );
           } else {
               $J( ".setting_"+ rowClass).css( "display", "none" );
+              $J( "div.setting_no_"+ rowClass).css( "display", "block" );
+              $J( "tr.setting_no_"+ rowClass).css( "display", "table-row" );
           }
       }
     };
@@ -67,7 +70,7 @@
                         <input type="radio" name="usercache" value="apc" id="usercache_apc" {CHECKED_USERCACHE_APC} />
                         <!-- END cache_usercache_apc -->
                     </td>
-                    <td><label for="usercache_apc">{TXT_CACHE_APC}</label></td>
+                    <td><label for="usercache_apc">{TXT_CACHE_APC}{CACHE_EXPERIMENTAL}</label></td>
                     <td><img src="../core/Core/View/Media/icons/{APC_USERCACHE_INSTALLATION_ICON}" /></td>
                     <td>
                         <img src="../core/Core/View/Media/icons/{APC_USERCACHE_ACTIVE_ICON}" />&nbsp;
@@ -85,7 +88,7 @@
                         <input type="radio" name="usercache" value="memcache" id="usercache_memcache" {CHECKED_USERCACHE_MEMCACHE} />
                         <!-- END cache_usercache_memcache -->
                     </td>
-                    <td><label for="usercache_memcache">{TXT_CACHE_MEMCACHE}</label></td>
+                    <td><label for="usercache_memcache">{TXT_CACHE_MEMCACHE}{CACHE_EXPERIMENTAL}</label></td>
                     <td><img src="../core/Core/View/Media/icons/{MEMCACHE_USERCACHE_INSTALLATION_ICON}" /></td>
                     <td>
                         <img src="../core/Core/View/Media/icons/{MEMCACHE_USERCACHE_ACTIVE_ICON}" />&nbsp;
@@ -135,7 +138,7 @@
                         <input type="radio" name="usercache" value="xcache" id="usercache_xcache" {CHECKED_USERCACHE_XCACHE} />
                         <!-- END cache_usercache_xcache -->
                     </td>
-                    <td><label for="usercache_xcache">{TXT_CACHE_XCACHE}</label></td>
+                    <td><label for="usercache_xcache">{TXT_CACHE_XCACHE}{CACHE_EXPERIMENTAL}</label></td>
                     <td><img src="../core/Core/View/Media/icons/{XCACHE_USERCACHE_INSTALLATION_ICON}" /></td>
                     <td>
                         <img src="../core/Core/View/Media/icons/{XCACHE_USERCACHE_ACTIVE_ICON}" />&nbsp;
@@ -145,18 +148,6 @@
                         <img src="../core/Core/View/Media/icons/{XCACHE_USERCACHE_CONFIGURATION_ICON}" />&nbsp;
                         <span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_CACHE_XCACHE_CONFIG_INFO}</span>
                     </td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>
-                        <!-- BEGIN cache_usercache_filesystem -->
-                        <input type="radio" name="usercache" value="filesystem" id="usercache_filesystem" {CHECKED_USERCACHE_FILESYSTEM} />
-                        <!-- END cache_usercache_filesystem -->
-                    </td>
-                    <td><label for="usercache_filesystem">{TXT_CACHE_FILESYSTEM}</label></td>
-                    <td></td>
-                    <td></td>
-                    <td><img src="../core/Core/View/Media/icons/{FILESYSTEM_USERCACHE_CONFIGURATION_ICON}" /></td>
                     <td></td>
                 </tr>
             </table>
@@ -198,7 +189,7 @@
                         <input type="radio" name="opcache" value="apc" id="opcache_apc" {CHECKED_OPCACHE_APC} />
                         <!-- END cache_opcache_apc -->
                     </td>
-                    <td><label for="opcache_apc">{TXT_CACHE_APC}</label></td>
+                    <td><label for="opcache_apc">{TXT_CACHE_APC}{CACHE_EXPERIMENTAL}</label></td>
                     <td><img src="../core/Core/View/Media/icons/{APC_OPCACHE_INSTALLATION_ICON}" /></td>
                     <td>
                         <img src="../core/Core/View/Media/icons/{APC_OPCACHE_ACTIVE_ICON}" />&nbsp;
@@ -231,7 +222,7 @@
                         <input type="radio" name="opcache" value="xcache" id="opcache_xcache" {CHECKED_OPCACHE_XCACHE} />
                         <!-- END cache_opcache_xcache -->
                     </td>
-                    <td><label for="opcache_xcache">{TXT_CACHE_XCACHE}</label></td>
+                    <td><label for="opcache_xcache">{TXT_CACHE_XCACHE}{CACHE_EXPERIMENTAL}</label></td>
                     <td><img src="../core/Core/View/Media/icons/{XCACHE_OPCACHE_INSTALLATION_ICON}" /></td>
                     <td>
                         <img src="../core/Core/View/Media/icons/{XCACHE_OPCACHE_ACTIVE_ICON}" />&nbsp;
@@ -318,6 +309,14 @@
                     <span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_CACHE_SSI_HELP_SYSTEM}</span>
                 </td>
             </tr>
+            <tr class="row2 setting_no_ssi_proxy">
+                <td>{TXT_INTERNAL_CACHE_SSI_CACHE}&nbsp;</td>
+                <td>
+                    <label ><input type="radio" name="internalSsiCache" value="on" {INTERNAL_SSI_CACHE_ON}>{TXT_SETTINGS_ON}</label>&nbsp;
+                    <label ><input type="radio" name="internalSsiCache" value="off" {INTERNAL_SSI_CACHE_OFF}>{TXT_SETTINGS_OFF}</label>&nbsp;
+                    <span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_SETTINGS_STATUS_HELP}</span>
+                </td>
+            </tr>
             <tr class="row2 setting_ssi_proxy">
                 <td>{TXT_CACHE_SSI_TYPE}&nbsp;</td>
                 <td>
@@ -348,8 +347,8 @@
             <th colspan="2">{TXT_CACHE_CONTREXX_CACHING}</th>
         </tr>
         <tr class="row2">
-            <td width="20%">{TXT_STATS_CHACHE_SITE_COUNT}</td>
-            <td width="80%">{STATS_CONTREXX_FILESYSTEM_CHACHE_PAGES_COUNT}</td>
+            <td>{TXT_STATS_CACHE_SITE_COUNT}</td>
+            <td>{STATS_PAGE_FILE_COUNT}</td>
         </tr>
         <tr class="row1">
             <td>{TXT_STATS_FOLDERSIZE}</td>
@@ -363,18 +362,38 @@
         </tr>
     </table>
     <br />
+    <table width="100%" cellspacing="0" cellpadding="3" border="0" class="adminlist">
+        <tr>
+            <th colspan="2">{TXT_CACHE_ESI_CACHING}</th>
+        </tr>
+        <tr class="row2">
+            <td>{TXT_STATS_CACHE_SITE_COUNT}</td>
+            <td>{STATS_ESI_FILE_COUNT}</td>
+        </tr>
+        <tr class="row1">
+            <td>{TXT_STATS_FOLDERSIZE}</td>
+            <td>{STATS_FOLDERSIZE_ESI} kB</td>
+        </tr>
+        <tr class="row2">
+            <td width="20%">
+                <input type="button" name="frmEmpty_Submit" value="{TXT_EMPTY_BUTTON}" onclick="location.href = 'index.php?cmd=Config&{CSRF_PARAM}&amp;act=cache_empty&amp;cache=cxEsi'">
+            </td>
+            <td width="80%" align="justify">{TXT_EMPTY_DESC_ESI}</td>
+        </tr>
+    </table>
+    <br />
     <!-- BEGIN apcCachingStats -->
     <table width="100%" cellspacing="0" cellpadding="3" border="0" class="adminlist">
         <tr>
             <th colspan="2">{TXT_CACHE_APC}</th>
         </tr>
         <tr class="row2">
-            <td width="20%">{TXT_STATS_CHACHE_SITE_COUNT}</td>
-            <td width="80%">{STATS_APC_CHACHE_SITE_COUNT}</td>
+            <td width="20%">{TXT_STATS_CACHE_SITE_COUNT}</td>
+            <td width="80%">{STATS_APC_CACHE_SITE_COUNT}</td>
         </tr>
         <tr class="row1">
-            <td width="20%">{TXT_STATS_CHACHE_ENTRIES_COUNT}</td>
-            <td width="80%">{STATS_APC_CHACHE_ENTRIES_COUNT}</td>
+            <td width="20%">{TXT_STATS_CACHE_ENTRIES_COUNT}</td>
+            <td width="80%">{STATS_APC_CACHE_ENTRIES_COUNT}</td>
         </tr>
         <tr class="row2">
             <td>{TXT_STATS_CACHE_SIZE}</td>
@@ -395,12 +414,12 @@
             <th colspan="2">{TXT_CACHE_ZEND_OPCACHE}</th>
         </tr>
         <tr class="row2">
-            <td width="20%">{TXT_STATS_CHACHE_SITE_COUNT}</td>
-            <td width="80%">{STATS_OPCACHE_CHACHE_SITE_COUNT}</td>
+            <td width="20%">{TXT_STATS_CACHE_SITE_COUNT}</td>
+            <td width="80%">{STATS_OPCACHE_CACHE_SITE_COUNT}</td>
         </tr>
         <tr class="row1">
             <td>{TXT_STATS_CACHE_SIZE}</td>
-            <td>{STATS_OPCACHE_SIZE} kB / {STATS_OPCACHE_MAX_SIZE} kB</td>
+            <td>{STATS_OPCACHE_SIZE} MB / {STATS_OPCACHE_MAX_SIZE} MB</td>
         </tr>
         <tr class="row2">
             <td width="20%">
@@ -417,12 +436,12 @@
             <th colspan="2">{TXT_CACHE_MEMCACHE}</th>
         </tr>
         <tr class="row2">
-            <td width="20%">{TXT_STATS_CHACHE_ENTRIES_COUNT}</td>
-            <td width="80%">{STATS_MEMCACHE_CHACHE_ENTRIES_COUNT}</td>
+            <td width="20%">{TXT_STATS_CACHE_ENTRIES_COUNT}</td>
+            <td width="80%">{STATS_MEMCACHE_CACHE_ENTRIES_COUNT}</td>
         </tr>
         <tr class="row1">
             <td>{TXT_STATS_CACHE_SIZE}</td>
-            <td>{STATS_MEMCACHE_SIZE} mB / {STATS_MEMCACHE_MAX_SIZE} mB</td>
+            <td>{STATS_MEMCACHE_SIZE} MB / {STATS_MEMCACHE_MAX_SIZE} MB</td>
         </tr>
         <tr class="row2">
             <td width="20%">
@@ -433,6 +452,20 @@
     </table>
     <br />
     <!-- END memcacheCachingStats -->
+    <!-- BEGIN memcachedCachingStats -->
+    <table width="100%" cellspacing="0" cellpadding="3" border="0" class="adminlist">
+        <tr>
+            <th colspan="2">{TXT_CACHE_MEMCACHED}</th>
+        </tr>
+        <tr class="row2">
+            <td width="20%">
+                <input type="button" name="frmEmpty_Submit" value="{TXT_EMPTY_BUTTON}" onclick="location.href = 'index.php?cmd=Config&{CSRF_PARAM}&amp;act=cache_empty&amp;cache=memcached'">
+            </td>
+            <td width="80%" align="justify">{TXT_EMPTY_DESC_MEMCACHE}</td>
+        </tr>
+    </table>
+    <br />
+    <!-- END memcachedCachingStats -->
     <!-- BEGIN xCacheCachingStats -->
     <table width="100%" cellspacing="0" cellpadding="3" border="0" class="adminlist">
         <tr>
@@ -447,22 +480,5 @@
     </table>
     <br />
     <!-- END xCacheCachingStats -->
-    <!-- BEGIN FileSystemCachingStats -->
-    <table width="100%" cellspacing="0" cellpadding="3" border="0" class="adminlist">
-        <tr>
-            <th colspan="2">Contrexx File System</th>
-        </tr>
-        <tr class="row2">
-            <td width="20%">{TXT_STATS_CHACHE_ENTRIES_COUNT}</td>
-            <td width="80%">{STATS_CONTREXX_FILESYSTEM_CHACHE_ENTRIES_COUNT}</td>
-        </tr>
-        <tr class="row2">
-            <td width="20%">
-                <input type="button" name="frmEmpty_Submit" value="{TXT_EMPTY_BUTTON}" onclick="location.href = 'index.php?cmd=Config&{CSRF_PARAM}&amp;act=cache_empty&amp;cache=cxEntries'">
-            </td>
-            <td width="80%" align="justify">{TXT_EMPTY_DESC}</td>
-        </tr>
-    </table>
-    <!-- END FileSystemCachingStats -->
 </div>
 <!-- END settings.html -->

@@ -84,109 +84,61 @@ class PageLogRepository extends LogEntryRepository
     }
 
     /**
-     * Loads all log entries for the
-     * given $entity
+     * Loads all log entries for the given $entity
      *
-     * @param object $entity
+     * @param object  $entity   Entity object
+     * @param boolean $useCache If true then take entries from cache otherwise from DB
+     * @param integer $offset   Offset value
+     * @param integer $limit    Entries count
+     *
      * @return array
      */
-    public function getLogEntries($entity, $useCache = true)
-    {
+    public function getLogEntries(
+        $entity,
+        $useCache = true,
+        $limit = 0,
+        $offset = 0
+    ) {
         $q = $this->getLogEntriesQuery($entity);
         $q->useResultCache($useCache);
+        if ($limit) {
+            $q->setFirstResult($offset);
+            $q->setMaxResults($limit);
+        }
         return $q->getResult();
     }
 
     /**
-     * Returns an integer with the quantity of log entries with the given action.
-     * The log entries are filtered by the page object.
+     * Get Log entries count
      *
-     * @param   string  $action
-     * @return  int     $counter
+     * @param object $entity Entity object
+     *
+     * @return integer
      */
-    public function countLogEntries($action = '')
+    public function getLogEntriesCount($entity)
     {
-        $counter = 0;
-        $qb = $this->em->createQueryBuilder();
-        $sqb = $this->em->createQueryBuilder();
-
-        $qb->select('l')
-           ->from('Cx\Core\ContentManager\Model\Entity\LogEntry', 'l')
-           ->where('l.action = :action')
-           ->andWhere('l.objectClass = :objectClass')
-           ->andWhere(
-               $qb->expr()->eq(
-                   'l.version',
-                   '('.$sqb->select('MAX(sl.version) AS version')
-                       ->from('Cx\Core\ContentManager\Model\Entity\LogEntry', 'sl')
-                       ->where(
-                           $sqb->expr()->eq(
-                               'l.objectId',
-                               'sl.objectId'
-                           )
-                       )
-                       ->getDQL().')'
-               )
-           )
-           ->setParameter('objectClass', 'Cx\Core\ContentManager\Model\Entity\Page');
-
-        switch ($action) {
-            case 'deleted':
-                $qb->setParameter('action', 'remove');
-                $logs = $qb->getQuery()->getResult();
-                $logsByNodeId = array();
-
-                foreach ($logs as $log) {
-                    $page = new \Cx\Core\ContentManager\Model\Entity\Page();
-                    $page->setId($log->getObjectId());
-                    $this->revert($page, $log->getVersion() - 1);
-
-                    // Only used to count
-                    $logsByNodeId[$page->getNodeIdShadowed()] = 0;
-                }
-
-                $counter = count($logsByNodeId);
-                break;
-            case 'unvalidated':
-                $qb->orWhere('l.action = :orAction')
-                   ->setParameter('action', 'create')
-                   ->setParameter('orAction', 'update');
-                $logs = $qb->getQuery()->getResult();
-
-                foreach ($logs as $log) {
-                    $page = $this->pageRepo->findOneById($log->getObjectId());
-                    if (!$page) {
-                        continue;
-                    }
-
-                    if ($page->getEditingStatus() == 'hasDraftWaiting') {
-                        $counter++;
-                    }
-                }
-                break;
-            default: // create and update
-                $where = $action == 'updated' ? 'update' : 'create';
-                $qb->setParameter('action', $where);
-                $logs = $qb->getQuery()->getResult();
-
-                foreach ($logs as $log) {
-                    $page = $this->pageRepo->findOneById($log->getObjectId());
-                    if (!$page) {
-                        continue;
-                    }
-
-                    if ($page->getEditingStatus() == '') {
-                        $counter++;
-                    }
-                }
-        }
-
-        return $counter;
+        $wrapped = new \Gedmo\Tool\Wrapper\EntityWrapper($entity, $this->_em);
+        $objectClass = $wrapped->getMetadata()->name;
+        $meta = $this->getClassMetadata();
+        $qb   = $this->em->createQueryBuilder();
+        $qb->select('log', 'count(log) AS logCount')
+            ->from($meta->name, 'log')
+            ->where('log.objectId = :objectId')
+            ->andWhere('log.objectClass = :objectClass');
+        $objectId = $wrapped->getIdentifier();
+        $qb->setParameters(array(
+            'objectId'    => $objectId,
+            'objectClass' => $objectClass
+        ));
+        $result = $qb->getQuery()->getResult();
+        return $result[0]['logCount'];
     }
 
     /**
      * Returns an array with the log entries of the given action with a limiter for the paging. It is used for the content workflow overview.
      * The log entries are filtered by the page object.
+     *
+     * @todo Known bug: Paging for action = 'deleted' is wrong
      *
      * @param   string  $action
      * @param   int     $offset
@@ -194,89 +146,117 @@ class PageLogRepository extends LogEntryRepository
      *
      * @return  array   $result
      */
-    public function getLogs($action = '', $offset, $limit)
+    public function getLogs($action = '', $offset, $limit, &$count = 0)
     {
         $result = array();
-
-        $qb = $this->em->createQueryBuilder();
-        $sqb = $this->em->createQueryBuilder();
-        $qb->select('l.objectId, l.action, l.loggedAt, l.version, l.username')
-           ->from('Cx\Core\ContentManager\Model\Entity\LogEntry', 'l')
-           ->where('l.action = :action')
-           ->andWhere('l.objectClass = :objectClass')
-           ->andWhere(
-               $qb->expr()->eq(
-                   'l.version',
-                   '('.$sqb->select('MAX(sl.version) AS version')
-                       ->from('Cx\Core\ContentManager\Model\Entity\LogEntry', 'sl')
-                       ->where(
-                           $sqb->expr()->eq(
-                               'l.objectId',
-                               'sl.objectId'
-                           )
-                       )
-                       ->getDQL().')'
-               )
-           )
-           ->orderBy('l.loggedAt', 'DESC')
-           ->setParameter('objectClass', 'Cx\Core\ContentManager\Model\Entity\Page');
+        $secondAction = '';
+        switch ($action) {
+            case 'unvalidated':
+                $secondAction = ', :secondAction';
+                break;
+        }
+        $activeLangs = array_keys(
+            \FWLanguage::getActiveFrontendLanguages()
+        );
+        $activeLangSql = implode(
+            ',',
+            $activeLangs
+        );
+        $query = '
+            SELECT SQL_CALC_FOUND_ROWS
+                c0_.object_id AS objectId,
+                c0_.action AS action,
+                c0_.logged_at AS loggedAt,
+                c0_.version AS version,
+                c0_.username AS username
+            FROM
+                ' . DBPREFIX . 'log_entry c0_
+            INNER JOIN (
+                SELECT
+                    MAX(c1_.version) AS version,
+                    c1_.object_id AS object_id
+                FROM
+                    '. DBPREFIX . 'log_entry c1_
+                WHERE
+                    (c1_.object_class = :objectClass)
+                GROUP BY
+                    c1_.object_id
+            ) c2_
+            ON
+                c0_.object_id = c2_.object_id AND
+                c0_.version = c2_.version
+            LEFT JOIN
+                ' . DBPREFIX . 'content_page AS c3_
+            ON
+                c3_.id = c0_.object_id
+            WHERE
+                (c0_.action IN(:action' . $secondAction . ')) AND
+                (c0_.object_class = :objectClass) AND
+                (c3_.editingStatus IS NULL OR c3_.editingStatus = :editingStatus) AND
+                (c3_.lang IS NULL OR c3_.lang IN(' . $activeLangSql . '))
+            ORDER BY
+                c0_.logged_at DESC
+            LIMIT
+                ' . contrexx_raw2db($limit) . '
+            OFFSET
+                ' . contrexx_raw2db($offset) . '
+        ';
+        $conn = $this->em->getConnection();
+        $stmt = $conn->prepare($query);
+        $stmt->bindValue(
+            'objectClass',
+            'Cx\\Core\\ContentManager\\Model\\Entity\\Page'
+        );
 
         switch ($action) {
             case 'deleted':
-                $qb->setParameter('action', 'remove');
+                $stmt->bindValue('editingStatus', '');
+                $stmt->bindValue('action', 'remove');
                 break;
             case 'unvalidated':
-                $editingStatus = 'hasDraftWaiting';
-                $qb->orWhere('l.action = :orAction')
-                   ->setParameter('action', 'create')
-                   ->setParameter('orAction', 'update');
+                $stmt->bindValue('editingStatus', 'hasDraftWaiting');
+                $stmt->bindValue('action', 'create');
+                $stmt->bindValue('secondAction', 'update');
                 break;
             case 'updated':
-                $editingStatus = '';
-                $qb->setParameter('action', 'update');
+                $stmt->bindValue('editingStatus', '');
+                $stmt->bindValue('action', 'update');
                 break;
             default: // create
-                $editingStatus = '';
-                $qb->setParameter('action', 'create');
+                $stmt->bindValue('editingStatus', '');
+                $stmt->bindValue('action', 'create');
         }
+
+        $stmt->execute();
+        $logs = $stmt->fetchAll();
+        $stmt = $conn->prepare('SELECT FOUND_ROWS()');
+        $stmt->execute();
+        $count = current(current($stmt->fetchAll()));
 
         switch ($action) {
             case 'deleted':
-                $qb->setFirstResult($offset)->setMaxResults($limit);
-                $logs = $qb->getQuery()->getResult();
-                $logsByNodeId = array();
-
                 // Structure the logs by node id and language
                 foreach ($logs as $log) {
                     $page = new \Cx\Core\ContentManager\Model\Entity\Page();
                     $page->setId($log['objectId']);
                     $this->revert($page, $log['version'] - 1);
-
-                    $result[$page->getNodeIdShadowed()][$page->getLang()] = $log;
+                    if (!in_array($page->getLang(), $activeLangs)) {
+                        continue;
+                    }
+                    if (!$page->getNodeIdShadowed()) {
+                        \DBG::msg('Page #' . $page->getId() . '\'s shadowed node ID is NULL<br />');
+                        $result[] = array($page->getLang() => $log);
+                    } else {
+                        if (!isset($result[$page->getNodeIdShadowed()])) {
+                            $result[$page->getNodeIdShadowed()] = array();
+                        }
+                        $result[$page->getNodeIdShadowed()][$page->getLang()] = $log;
+                    }
                 }
                 break;
             default: // create, update and unvalidated
-                // If setFirstResult() is called, setMaxResult must be also called. Otherwise there is a fatal error.
-                // The parameter for setMaxResult() method is a custom value set to 999999, because we need all pages.
-                $qb->setFirstResult($offset)->setMaxResults(999999);
-                $logs = $qb->getQuery()->getResult();
-                $i = 0;
-
-                foreach ($logs as $log) {
-                    $page = $this->pageRepo->findOneById($log['objectId']);
-                    if (!$page) {
-                        continue;
-                    }
-
-                    if ($page->getEditingStatus() == $editingStatus) {
-                        $result[] = $log;
-                        $i++;
-                    }
-
-                    if ($i >= $limit) {
-                        break;
-                    }
-                }
+                $result = $logs;
+                break;
         }
 
         return $result;

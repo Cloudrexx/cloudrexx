@@ -11,6 +11,7 @@
             <p>{TXT_ACCESS_SIGNUP_INTRODUCTION}</p>
             <div class="text-danger">{ACCESS_SIGNUP_MESSAGE}</div>
             <form class="resetForm" role="form" action="{NODE_ACCESS_SIGNUP}" method="post" enctype="multipart/form-data">
+                <input type="hidden" value="{ACCESS_IMAGE_UPLOADER_ID}" name="access_image_uploader_id" />
                 <fieldset><legend>{TXT_ACCESS_PERSONAL_DATA}</legend>
                     <!-- BEGIN access_profile_attribute_gender -->
                     <p><label>{ACCESS_PROFILE_ATTRIBUTE_GENDER_DESC}</label>{ACCESS_PROFILE_ATTRIBUTE_GENDER}</p>
@@ -81,6 +82,7 @@
             <div class="text-danger">{ACCESS_SIGNUP_MESSAGE}</div>
             <!-- END access_signup_confirm_error -->
             {ACCESS_JAVASCRIPT_FUNCTIONS}
+            {ACCESS_IMAGE_UPLOADER_CODE}
         </div>
     </div>
 </div>

@@ -66,7 +66,15 @@ class SystemComponentBackendController extends Controller {
     public function getCommands() {
         $cmds = array();
         foreach ($this->getEntityClasses() as $class) {
-            $cmds[] = preg_replace('#' . preg_quote($this->getNamespace() . '\\Model\\Entity\\') . '#', '', $class);
+            if (is_a($class, '')) {
+                continue;
+            }
+            $cmdName = preg_replace('#' . preg_quote($this->getNamespace() . '\\Model\\Entity\\') . '#', '', $class);
+            if (is_subclass_of($class, '\Gedmo\Translatable\Translatable')) {
+                $cmds[$cmdName] = array('translatable' => true);
+            } else {
+                $cmds[] = $cmdName;
+            }
         }
         $cmds['Settings'] = array('Help');
         return $cmds;
@@ -167,6 +175,7 @@ class SystemComponentBackendController extends Controller {
                 $cmd[0] = key($commands);
             }
         }
+        $originalCommands = $commands;
         $this->checkAndModifyCmdByPermission($cmd, $commands);
         foreach ($commands as $key => $command) {
             $subNav         = array();
@@ -175,8 +184,13 @@ class SystemComponentBackendController extends Controller {
             if (is_array($command) && isset($command['children'])) {
                 $subNav = array_merge(array('' => array('permission' => $this->defaultPermission)), $command['children']);
             } else {
-                if (is_array($command) && array_key_exists('permission', $command)) {
-                    unset($command['permission']); // navigation might contain only the permission key, unset it
+                if (is_array($command)) {
+                    if (array_key_exists('permission', $command)) {
+                        unset($command['permission']); // navigation might contain only the permission key, unset it
+                    }
+                    if (array_key_exists('translatable', $command)) {
+                        unset($command['translatable']); // navigation might contain only the translatable key, unset it
+                    }
                 }
                 $subNav = is_array($command) && !empty($command)  ? array_merge(array(''), $command) : array();
             }
@@ -201,6 +215,15 @@ class SystemComponentBackendController extends Controller {
                     $first = false;
                 }
             }
+        }
+        if (
+            isset($originalCommands[current($cmd)]) &&
+            isset($originalCommands[current($cmd)]['translatable']) &&
+            $originalCommands[current($cmd)]['translatable']
+        ) {
+            $navigation->setVariable(
+                'FRONTEND_LANG_MENU', \Env::get('init')->getUserFrontendLangMenu(true)
+            );
         }
         return $navigation;
     }
@@ -315,15 +338,29 @@ class SystemComponentBackendController extends Controller {
      * To show messages, use \Message class
      * @param \Cx\Core\Html\Sigma $template Template for current CMD
      * @param array $cmd CMD separated by slashes
+     * @param boolean $isSingle Wether edit view or not
+     * @return ?\Cx\Core\Html\Controller\ViewGenerator Used ViewGenerator or null
      */
-    public function parsePage(\Cx\Core\Html\Sigma $template, array $cmd) {
+    public function parsePage(\Cx\Core\Html\Sigma $template, array $cmd, &$isSingle = false) {
         global $_ARRAYLANG;
 
+        // Last entry will be empty if we're on a nav-entry without children
+        // or on the first child of a nav-entry.
+        // The following code works fine as long as we don't want an entity
+        // view on the first child of a nav-entry or introduce a third
+        // nav-level. If we want either, we need to refactor getCommands() and
+        // parseNavigation().
+        $entityName = '';
+        if (!empty($cmd) && !empty($cmd[count($cmd) - 1])) {
+            $entityName = $cmd[count($cmd) - 1];
+        } else if (!empty($cmd)) {
+            $entityName = $cmd[0];
+        }
+
         // Parse entity view generation pages
-        $entityClassName = $this->getNamespace() . '\\Model\\Entity\\' . current($cmd);
+        $entityClassName = $this->getNamespace() . '\\Model\\Entity\\' . $entityName;
         if (in_array($entityClassName, $this->getEntityClasses())) {
-            $this->parseEntityClassPage($template, $entityClassName, current($cmd));
-            return;
+            return $this->parseEntityClassPage($template, $entityClassName, $entityName, array(), $isSingle);
         }
 
         // Not an entity, parse overview or settings
@@ -334,9 +371,37 @@ class SystemComponentBackendController extends Controller {
                 }
                 switch ($cmd[1]) {
                     case '':
+                        \Cx\Core\Setting\Controller\Setting::init(
+                            $this->getName(),
+                            null,
+                            'FileSystem',
+                            null,
+                            \Cx\Core\Setting\Controller\Setting::REPOPULATE
+                        );
+                        \Cx\Core\Setting\Controller\Setting::storeFromPost();
+                        \Cx\Core\Setting\Controller\Setting::setEngineType(
+                            $this->getName(),
+                            'FileSystem'
+                        );
+                        \Cx\Core\Setting\Controller\Setting::show(
+                            $template,
+                            $this->getName() . '/' . implode('/', $cmd),
+                            $this->getName(),
+                            $_ARRAYLANG[
+                                'TXT_' . strtoupper(
+                                    $this->getType()
+                                ) . '_' . strtoupper(
+                                    $this->getName() . '_ACT_' . $cmd[0] . '_DEFAULT'
+                                )
+                            ],
+                            'TXT_' . strtoupper(
+                                $this->getType() . '_' . $this->getName()
+                            ) . '_'
+                        );
+                        break;
                     default:
                         if (!$template->blockExists('mailing')) {
-                            return;
+                            return null;
                         }
                         $template->setVariable(
                             'MAILING',
@@ -344,7 +409,7 @@ class SystemComponentBackendController extends Controller {
                                 $this->getName(),
                                 'nonempty',
                                 $config['corePagingLimit'],
-                                'settings/email'
+                                'Settings/email'
                             )->get()
                         );
                         break;
@@ -357,6 +422,7 @@ class SystemComponentBackendController extends Controller {
                 }
                 break;
         }
+        return null;
     }
 
     protected function parseEntityClassPage($template, $entityClassName, $classIdentifier, $filter = array(), &$isSingle = false) {
@@ -375,10 +441,11 @@ class SystemComponentBackendController extends Controller {
         );
         $renderedContent = $view->render($isSingle);
         $template->setVariable('ENTITY_VIEW', $renderedContent);
+        return $view;
     }
 
     /**
-     * Returns the object to parse a wiew with
+     * Returns the object to parse a view with
      *
      * If you overwrite this and return anything else than string, filter will not work
      * @return string|array|object An entity class name, entity, array of entities or DataSet

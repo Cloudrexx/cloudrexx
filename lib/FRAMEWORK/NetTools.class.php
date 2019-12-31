@@ -435,7 +435,7 @@ class NetTools {
     function IsIP($host)
     {
         // Make sure it's at least #.#.#.#
-        if(ereg("^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$", $host))
+        if(preg_match("/^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/", $host))
         {
             // If so, make sure none of the octets are higher than 255!
             $octets = explode(".", $host);
@@ -489,7 +489,7 @@ class NetTools {
         $err = 0;
 
         // Make sure the host is valid
-        if(!(ereg("^[a-zA-Z0-9_\\.-]+$", $targethost) && substr($targethost, 0, 1) != "-")) {
+        if(!(preg_match("/^[a-zA-Z0-9_\\.-]+$/", $targethost) && substr($targethost, 0, 1) != "-")) {
             // Invalid host; it's insecure to run ping on this
             $err = -1;
         } else {
@@ -577,7 +577,7 @@ class NetTools {
                 fclose($sock);
 
                 // Get the country: data
-                $splresp = spliti("country:", $resp);
+                $splresp = preg_split("/country:/i", $resp);
 
 //              $hascountry = 0;
 //              if (count($splresp)>1) {

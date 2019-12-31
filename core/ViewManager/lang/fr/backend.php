@@ -105,7 +105,6 @@ $_ARRAYLANG['TXT_ACTIVE_TEMPLATE'] = 'Standard';
 $_ARRAYLANG['TXT_ACTIVE_PDF_TEMPLATE'] = 'PDF';
 $_ARRAYLANG['TXT_ACTIVE_PRINT_TEMPLATE'] = 'Impression';
 $_ARRAYLANG['TXT_THEME_ACTIVATE_INFO'] = 'Langues activées';
-$_ARRAYLANG['TXT_THEME_ACTIVATE_INFO_BODY'] = 'Les langues sur fond rose sont activées dans les <a href="index.php?cmd=LanguageManager">paramètres de langues</a> du Frontend';
 $_ARRAYLANG['TXT_ACTIVE_MOBILE_TEMPLATE'] = 'Mobile';
 $_ARRAYLANG['TXT_APP'] = 'App';
 $_ARRAYLANG['TXT_DESIGN_VARIABLES_LIST'] = 'Variables';

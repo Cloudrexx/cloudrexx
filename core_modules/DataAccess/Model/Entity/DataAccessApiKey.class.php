@@ -56,12 +56,12 @@ class DataAccessApiKey extends \Cx\Model\Base\EntityBase {
     protected $readOnly;
 
     /**
-     * @var Cx\Core_Modules\DataAccess\Model\Entity\ApiKey
+     * @var \Cx\Core_Modules\DataAccess\Model\Entity\ApiKey
      */
     protected $apiKey;
 
     /**
-     * @var Cx\Core_Modules\DataAccess\Model\Entity\DataAccess
+     * @var \Cx\Core_Modules\DataAccess\Model\Entity\DataAccess
      */
     protected $dataAccess;
 
@@ -99,7 +99,7 @@ class DataAccessApiKey extends \Cx\Model\Base\EntityBase {
     /**
      * Set apiKey
      *
-     * @param Cx\Core_Modules\DataAccess\Model\Entity\ApiKey $apiKey
+     * @param \Cx\Core_Modules\DataAccess\Model\Entity\ApiKey $apiKey
      */
     public function setApiKey(\Cx\Core_Modules\DataAccess\Model\Entity\ApiKey $apiKey)
     {
@@ -109,7 +109,7 @@ class DataAccessApiKey extends \Cx\Model\Base\EntityBase {
     /**
      * Get apiKey
      *
-     * @return Cx\Core_Modules\DataAccess\Model\Entity\ApiKey $apiKey
+     * @return \Cx\Core_Modules\DataAccess\Model\Entity\ApiKey $apiKey
      */
     public function getApiKey()
     {
@@ -119,7 +119,7 @@ class DataAccessApiKey extends \Cx\Model\Base\EntityBase {
     /**
      * Set dataAccess
      *
-     * @param Cx\Core_Modules\DataAccess\Model\Entity\DataAccess $dataAccess
+     * @param \Cx\Core_Modules\DataAccess\Model\Entity\DataAccess $dataAccess
      */
     public function setDataAccess(\Cx\Core_Modules\DataAccess\Model\Entity\DataAccess $dataAccess)
     {
@@ -129,7 +129,7 @@ class DataAccessApiKey extends \Cx\Model\Base\EntityBase {
     /**
      * Get dataAccess
      *
-     * @return Cx\Core_Modules\DataAccess\Model\Entity\DataAccess $dataAccess
+     * @return \Cx\Core_Modules\DataAccess\Model\Entity\DataAccess $dataAccess
      */
     public function getDataAccess()
     {

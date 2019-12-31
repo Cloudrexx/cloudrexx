@@ -77,27 +77,27 @@ class DataAccess extends \Cx\Model\Base\EntityBase {
     protected $allowedOutputMethods;
 
     /**
-     * @var Cx\Core_Modules\DataAccess\Model\Entity\DataAccessApiKey
+     * @var \Doctrine\Common\Collections\Collection
      */
     protected $dataAccessApiKeys;
 
     /**
-     * @var Cx\Core_Modules\Sync\Model\Entity\Relation
+     * @var \Doctrine\Common\Collections\Collection
      */
     protected $relations;
 
     /**
-     * @var Cx\Core_Modules\Access\Model\Entity\Permission
+     * @var \Cx\Core_Modules\Access\Model\Entity\Permission
      */
     protected $readPermission;
 
     /**
-     * @var Cx\Core_Modules\Access\Model\Entity\Permission
+     * @var \Cx\Core_Modules\Access\Model\Entity\Permission
      */
     protected $writePermission;
 
     /**
-     * @var \Cx\Core_Modules\Sync\Model\Entity\Sync
+     * @var \Doctrine\Common\Collections\Collection
      */
     protected $syncs;
 
@@ -221,7 +221,30 @@ class DataAccess extends \Cx\Model\Base\EntityBase {
     /**
      * Add dataAccessApiKeys
      *
-     * @param Cx\Core_Modules\DataAccess\Model\Entity\DataAccessApiKey $dataAccessApiKeys
+     * @param \Cx\Core_Modules\DataAccess\Model\Entity\DataAccessApiKey $dataAccessApiKeys
+     * @return DataAccess
+     */
+    public function addDataAccessApiKey(\Cx\Core_Modules\DataAccess\Model\Entity\DataAccessApiKey $dataAccessApiKeys)
+    {
+        $this->dataAccessApiKeys[] = $dataAccessApiKeys;
+
+        return $this;
+    }
+
+    /**
+     * Remove dataAccessApiKeys
+     *
+     * @param \Cx\Core_Modules\DataAccess\Model\Entity\DataAccessApiKey $dataAccessApiKeys
+     */
+    public function removeDataAccessApiKey(\Cx\Core_Modules\DataAccess\Model\Entity\DataAccessApiKey $dataAccessApiKeys)
+    {
+        $this->dataAccessApiKeys->removeElement($dataAccessApiKeys);
+    }
+
+    /**
+     * Add dataAccessApiKeys
+     *
+     * @param \Cx\Core_Modules\DataAccess\Model\Entity\DataAccessApiKey $dataAccessApiKeys
      */
     public function addDataAccessApiKeys(\Cx\Core_Modules\DataAccess\Model\Entity\DataAccessApiKey $dataAccessApiKeys)
     {
@@ -231,7 +254,7 @@ class DataAccess extends \Cx\Model\Base\EntityBase {
     /**
      * Get dataAccessApiKeys
      *
-     * @return Doctrine\Common\Collections\Collection $dataAccessApiKeys
+     * @return \Doctrine\Common\Collections\Collection $dataAccessApiKeys
      */
     public function getDataAccessApiKeys()
     {
@@ -241,7 +264,7 @@ class DataAccess extends \Cx\Model\Base\EntityBase {
     /**
      * Add relations
      *
-     * @param Cx\Core_Modules\Sync\Model\Entity\Relation $relation
+     * @param \Cx\Core_Modules\Sync\Model\Entity\Relation $relation
      */
     public function addRelation(\Cx\Core_Modules\Sync\Model\Entity\Relation $relation)
     {
@@ -249,9 +272,19 @@ class DataAccess extends \Cx\Model\Base\EntityBase {
     }
 
     /**
+     * Remove relations
+     *
+     * @param \Cx\Core_Modules\Sync\Model\Entity\Relation $relations
+     */
+    public function removeRelation(\Cx\Core_Modules\Sync\Model\Entity\Relation $relations)
+    {
+        $this->relations->removeElement($relations);
+    }
+
+    /**
      * Get relations
      *
-     * @return Doctrine\Common\Collections\Collection $relations
+     * @return \Doctrine\Common\Collections\Collection $relations
      */
     public function getRelations()
     {
@@ -271,7 +304,7 @@ class DataAccess extends \Cx\Model\Base\EntityBase {
     /**
      * Set read permission
      *
-     * @param Cx\Core_Modules\Access\Model\Entity\Permission $readPermission
+     * @param \Cx\Core_Modules\Access\Model\Entity\Permission $readPermission
      */
     public function setReadPermission(\Cx\Core_Modules\Access\Model\Entity\Permission $readPermission)
     {
@@ -281,7 +314,7 @@ class DataAccess extends \Cx\Model\Base\EntityBase {
     /**
      * Get read permission
      *
-     * @return Cx\Core_Modules\Access\Model\Entity\Permission $readPermission
+     * @return \Cx\Core_Modules\Access\Model\Entity\Permission $readPermission
      */
     public function getReadPermission()
     {
@@ -291,7 +324,7 @@ class DataAccess extends \Cx\Model\Base\EntityBase {
     /**
      * Set write permission
      *
-     * @param Cx\Core_Modules\Access\Model\Entity\Permission $writePermission
+     * @param \Cx\Core_Modules\Access\Model\Entity\Permission $writePermission
      */
     public function setWritePermission(\Cx\Core_Modules\Access\Model\Entity\Permission $writePermission)
     {
@@ -301,7 +334,7 @@ class DataAccess extends \Cx\Model\Base\EntityBase {
     /**
      * Get write permission
      *
-     * @return Cx\Core_Modules\Access\Model\Entity\Permission $writePermission
+     * @return \Cx\Core_Modules\Access\Model\Entity\Permission $writePermission
      */
     public function getWritePermission()
     {
@@ -319,9 +352,19 @@ class DataAccess extends \Cx\Model\Base\EntityBase {
     }
 
     /**
+     * Remove syncs
+     *
+     * @param \Cx\Core_Modules\Sync\Model\Entity\Sync $syncs
+     */
+    public function removeSync(\Cx\Core_Modules\Sync\Model\Entity\Sync $syncs)
+    {
+        $this->syncs->removeElement($syncs);
+    }
+
+    /**
      * Get Syncs
      *
-     * @return Doctrine\Common\Collections\Collection $syncs
+     * @return \Doctrine\Common\Collections\Collection $syncs
      */
     public function getSyncs()
     {

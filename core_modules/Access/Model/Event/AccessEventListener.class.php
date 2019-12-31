@@ -71,5 +71,4 @@ class AccessEventListener extends DefaultEventListener
         );
         $mediaBrowserConfiguration->addMediaType($mediaType);
     }
-
 }

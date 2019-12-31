@@ -555,6 +555,9 @@ class XML_Parser_Error extends PEAR_Error
 
     // }}}
     // {{{ constructor()
+    public function __construct($msgorparser = 'unknown error', $code = 0, $mode = PEAR_ERROR_RETURN, $level = E_USER_NOTICE) {
+        $this->XML_Parser_Error($msgorparser, $code, $mode, $level);
+    }
    /**
     * construct a new error instance
     *

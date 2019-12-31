@@ -70,12 +70,14 @@ class ADODB_pdo_mysql extends ADODB_pdo {
 	{
 		$save = $this->metaTablesSQL;
 		if ($showSchema && is_string($showSchema)) {
-			$this->metaTablesSQL .= " from $showSchema";
+			$this->metaTablesSQL .= $this->qstr($showSchema);
+		} else {
+			$this->metaTablesSQL .= "schema()";
 		}
 
 		if ($mask) {
 			$mask = $this->qstr($mask);
-			$this->metaTablesSQL .= " like $mask";
+			$this->metaTablesSQL .= " AND table_name LIKE $mask";
 		}
 		$ret = ADOConnection::MetaTables($ttype, $showSchema);
 

@@ -136,9 +136,9 @@ class Podcast extends PodcastLib
 </script>
 EOF;
 
-        if (($arrMedium = &$this->_getMedium($mediumId, true)) !== false) {
+        if (($arrMedium = $this->_getMedium($mediumId, true)) !== false) {
             if ($this->_objTpl->blockExists('podcast_medium')) {
-                $arrTemplate = &$this->_getTemplate($arrMedium['template_id']);
+                $arrTemplate = $this->_getTemplate($arrMedium['template_id']);
 
                 $mediumCode = sprintf($embedCode, addcslashes($this->_getHtmlTag($arrMedium, $arrTemplate['template']), "\r\n'"));
                 $this->_objTpl->setVariable(array(
@@ -185,8 +185,9 @@ EOF;
         }
         if ($this->_objTpl->blockExists('podcast_media')) {
             $pos = isset($_GET['pos']) ? intval($_GET['pos']) : 0;
-            $arrMedia = &$this->_getMedia($categories, true, $_CONFIG['corePagingLimit'], $pos);
+            $arrMedia = $this->_getMedia($categories, true, $_CONFIG['corePagingLimit'], $pos);
             if (count($arrMedia) > 0) {
+                $i = 0;
                 foreach ($arrMedia as $mediumId => $arrMedium) {
                     $this->_objTpl->setVariable(array(
                         'PODCAST_MEDIUM_ROW'                => $i%2==0 ? 'row1' : 'row2',
@@ -212,7 +213,7 @@ EOF;
                 }
             }
 
-            $mediaCount = &$this->_getMediaCount($categoryId, true);
+            $mediaCount = $this->_getMediaCount($categoryId, true);
 
             if ($mediaCount > $_CONFIG['corePagingLimit']) {
                 $paging = getPaging($mediaCount, $pos, '&section=Podcast&cid='.$categoryId, $_ARRAYLANG['TXT_PODCAST_MEDIA']);
@@ -235,4 +236,4 @@ EOF;
     }
 
 }
-?>
+

@@ -17,7 +17,9 @@
         <meta property="og:title" content="{METATITLE}" />
         <meta property="og:description" content="{METADESC}" />
         <meta property="og:url" content="http://{DOMAIN_URL}{CURRENT_URL}" />
-        <meta property="og:image" content="{BASE_URL}/themes/standard_4_0/images/og_logo_social_media.jpg" />
+        <meta property="og:image" content="{METAIMAGE}" />
+        <meta property="og:image:width" content="{METAIMAGE_WIDTH}" />
+        <meta property="og:image:height" content="{METAIMAGE_HEIGHT}" />
         <meta name="twitter:title" content="{METATITLE}" />
         <meta name="twitter:description" content="{METADESC}" />
         <meta name="twitter:image" content="{BASE_URL}/themes/standard_4_0/images/logo_social_media.jpg" />
@@ -29,11 +31,15 @@
         {JAVASCRIPT}
         {STYLE_FILE}
         {LOGIN_INCLUDE}
+        {HEAD_INCLUDES}
         <link type="text/css" rel="stylesheet" href="themes/standard_4_0/modules.css" />
         <link type="text/css" rel="stylesheet" href="themes/standard_4_0/text.css" />
         <script type="text/javascript" src="themes/standard_4_0/modernizr.js"></script>
         <script type="text/javascript" src="themes/standard_4_0/jquery.cycle.js"></script>
         <script type="text/javascript" src="themes/standard_4_0/javascript.js"></script>
+        <!-- BEGIN locale_alternate_list -->
+        <link rel="alternate" hreflang="{LOCALE}" href="{PAGE_LINK}" />
+        <!-- END locale_alternate_list -->
     </head>
     <body>
         <div class="wrapper">

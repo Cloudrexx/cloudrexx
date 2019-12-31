@@ -47,7 +47,7 @@ namespace Cx\Core_Modules\Listing\Controller;
 class SortingController {
 
     public function handle($params, $config) {
-            $paramName = !empty($params['entity']) ? $params['entity'] . 'Order' : 'order';
+        $paramName = !empty($params['entity']) ? $params['entity'] . 'Order' : 'Order';
         if (!isset($config[$paramName])) {
             return $params;
         }

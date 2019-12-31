@@ -41,6 +41,16 @@ use Cx\Core\Core\Controller\Cx;
 use Cx\Model\Base\EntityBase;
 
 /**
+ * Class MediaSourceManagerException
+ *
+ * @copyright   Cloudrexx AG
+ * @author      Thomas Däppen <thomas.daeppen@cloudrexx.com>
+ * @package     cloudrexx
+ * @subpackage  core_mediasource
+ */
+class MediaSourceManagerException extends \Exception {}
+
+/**
  * Class MediaSourceManager
  *
  * @copyright   Cloudrexx AG
@@ -89,6 +99,7 @@ class MediaSourceManager extends EntityBase
         $eventHandlerInstance->triggerEvent('mediasource.load', array($this));
 
         ksort($this->allMediaTypePaths);
+        $this->lockedMediaTypes = array();
         foreach ($this->allMediaTypePaths as $mediaSource) {
             /**
              * @var $mediaSource MediaSource
@@ -96,8 +107,26 @@ class MediaSourceManager extends EntityBase
             if ($mediaSource->checkAccess()) {
                 $this->mediaTypePaths[$mediaSource->getName()] = $mediaSource->getDirectory();
                 $this->mediaTypes[$mediaSource->getName()] = $mediaSource;
+            } else {
+                $this->lockedMediaTypes[$mediaSource->getName()] = $mediaSource;
             }
         }
+    }
+
+    /**
+     * Returns all MediaSources the current user does not have access to
+     * @todo This is a dirty hack to allow the API control over permissions.
+     *      As soon as DataSource can load the correct MediaSource instance
+     *      directly, this should be removed.
+     * @deprecated This method must not be used outside MediaSource itself!
+     * @param string $name Name of the MediaSource to load
+     * @return MediaSource Requested MediaSource or null
+     */
+    public function getLockedMediaType($name) {
+        if (!isset($this->lockedMediaTypes[$name])) {
+            return null;
+        }
+        return $this->lockedMediaTypes[$name];
     }
 
     /**
@@ -193,11 +222,11 @@ class MediaSourceManager extends EntityBase
      * @param $name string
      *
      * @return MediaSource
-     * @throws MediaSourceException
+     * @throws MediaSourceManagerException
      */
     public function getMediaType($name) {
         if(!isset($this->mediaTypes[$name])){
-            throw new MediaSourceException("No such mediatype available");
+            throw new MediaSourceManagerException("No such mediatype available");
         }
         return $this->mediaTypes[$name];
     }
@@ -242,4 +271,78 @@ class MediaSourceManager extends EntityBase
         return $this->thumbnailGenerator;
     }
 
+    /**
+     * Get MediaSourceFile from the given path
+     *
+     * This method returns an object which implements the File interface, but
+     * only if the file exists within a registered MediaSource. If no matching
+     * MediaSource was found it returns null. If a matching MediaSource was
+     * found, but the file does not exist, it returns false.
+     * @param string $path File path
+     * @return File|null|false See description
+     */
+    public function getMediaSourceFileFromPath($path)
+    {
+        // If the path does not have leading backslash then add it
+        if (strpos($path, '/') !== 0) {
+            $path = '/' . $path;
+        }
+
+        try {
+            // Get MediaSource and MediaSourceFile object
+            $mediaSource     = $this->getMediaSourceByPath($path);
+            $mediaSourcePath = $mediaSource->getDirectory();
+            $mediaSourceFile = $mediaSource->getFileSystem()
+                ->getFileFromPath(substr($path, strlen($mediaSourcePath[1])));
+        } catch (MediaSourceManagerException $e) {
+            \DBG::log($e->getMessage());
+            return;
+        }
+
+        return $mediaSourceFile;
+    }
+
+    /**
+     * Get MediaSource by given component
+     *
+     * @param \Cx\Core\Core\Model\Entity\SystemComponentController $component Component to look up for a MediaSource
+     *
+     * @return MediaSource  if a MediaSource of the given Component does exist
+     *                              returns MediaSource, otherwise NULL 
+     */
+    public function getMediaSourceByComponent($component)
+    {
+        foreach ($this->mediaTypes as $mediaSource) {
+            $mediaSourceComponent = $mediaSource->getSystemComponentController();
+            if ($component == $mediaSourceComponent) {
+                return $mediaSource;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Get MediaSource by the given path
+     *
+     * @param  string $path File path
+     * @param boolean $ignorePermissions (optional) Defaults to false
+     * @return \Cx\Core\MediaSource\Model\Entity\MediaSource MediaSource object
+     * @throws MediaSourceManagerException
+     */
+    public function getMediaSourceByPath($path, $ignorePermissions = false)
+    {
+        $mediaSources = $this->mediaTypes;
+        if ($ignorePermissions) {
+            $this->allMediaTypePaths;
+        }
+        foreach ($mediaSources as $mediaSource) {
+            $mediaSourcePath = $mediaSource->getDirectory();
+            if (strpos($path, $mediaSourcePath[1]) === 0) {
+                return $mediaSource;
+            }
+        }
+        throw new MediaSourceManagerException(
+            'No MediaSource found for: '. $path
+        );
+    }
 }

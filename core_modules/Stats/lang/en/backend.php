@@ -169,4 +169,4 @@ $_ARRAYLANG['TXT_PAGING_LIMIT'] = "Statistical Records Limit";
 $_ARRAYLANG['TXT_PAGING_LIMIT_VISITOR_DETAILS'] = "Visitor Details Limit";
 $_ARRAYLANG['TXT_IMAGE_EDIT_SHOW'] = "Show";
 $_ARRAYLANG['TXT_STATS_COUNT_VISIOTR_NUMBER'] = "Compute the number of the current visitor. This option must be enabled if you intend to use the placeholder [[VISITOR_NUMBER]] in the frontend.";
-?>
+$_ARRAYLANG['TXT_STATS_BDSG'] = 'Please note that the information tracked by this metric could contain personal data which is prohibited by law in most countries without explicit consent of the affected person.';

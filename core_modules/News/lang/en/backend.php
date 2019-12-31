@@ -63,6 +63,9 @@ $_ARRAYLANG['TXT_NEWS_MESSAGES'] = "News messages";
 $_ARRAYLANG['TXT_NEWS_MESSAGE'] = "News Message";
 $_ARRAYLANG['TXT_EXTERNAL_SOURCE'] = "External sources";
 $_ARRAYLANG['TXT_LINK'] = "Link";
+$_ARRAYLANG['TXT_NEWS_LINK1'] = "Link #1";
+$_ARRAYLANG['TXT_NEWS_LINK2'] = "Link #2";
+$_ARRAYLANG['TXT_NEWS_SOURCE'] = "Source";
 $_ARRAYLANG['TXT_NEWS_REDIRECT_NEW_WINDOW'] = "New window";
 $_ARRAYLANG['TXT_NEWS_REDIRECT_NEW_WINDOW_HELP'] = "Check this option to open the link in a new window.";
 $_ARRAYLANG['TXT_NEWS_NEWS_CONTENT'] = "News content";
@@ -254,6 +257,7 @@ $_ARRAYLANG['TXT_NEWS_CATEGORY_NAME_DESCRIPTION'] = "Name of the associated cate
 $_ARRAYLANG['TXT_NEWS_IMAGE_LINK_DESCRIPTION'] = "Image-Link to the news message";
 $_ARRAYLANG['TXT_NEWS_COUNT_COMMENTS_DESCRIPTION'] = "Number of comments of the news message";
 $_ARRAYLANG['TXT_NEWS_IMAGE_SRC_DESCRIPTION'] = "Picture source/path ";
+$_ARRAYLANG['TXT_NEWS_EXT_LINK_DESCRIPTION'] = "External link of the news message";
 $_ARRAYLANG['TXT_NEWS_IMAGE_ROW_DESCRIPTION'] = "Optional tag to display the image.<br />
 Starttag: &lt!-- BEGIN news_image --&gt;<br />
 Endtag: &lt!-- END news_image --&gt;";
@@ -266,6 +270,9 @@ Endtag: &lt!-- END news_image_detail --&gt;";
 $_ARRAYLANG['TXT_NEWS_IMAGE_THUMBNAIL_ROW_DESCRIPTION'] = "Optional tag to display the teaser thumbnail image.<br />
 Starttag: &lt!-- BEGIN news_image_thumbnail --&gt;<br />
 Endtag: &lt!-- END news_image_thumbnail --&gt;";
+$_ARRAYLANG['TXT_NEWS_TEASER_LINK_ROW_DESCRIPTION'] = "Optional tag to display the news container url.<br />
+Starttag: &lt!-- BEGIN teaser_link --&gt;<br />
+Endtag: &lt!-- END teaser_link --&gt;";
 $_ARRAYLANG['TXT_NEWS_ARCHIVE_IMAGE_DETAIL_ROW_DESCRIPTION'] = "Optional tag to display the teaser image.<br />
 Starttag: &lt!-- BEGIN news_archive_image_detail --&gt;<br />
 Endtag: &lt!-- END news_archive_image_detail --&gt;";
@@ -307,10 +314,14 @@ $_ARRAYLANG['TXT_NEWS_SETTINGS_COMMENTS_NOTIFICATION'] = "Notification about new
 $_ARRAYLANG['TXT_NEWS_SETTINGS_COMMENTS_NOTIFICATION_HELP'] = "If this option is activated, you receive an email when receiving new news comments.";
 $_ARRAYLANG['TXT_NEWS_SETTINGS_COMMENTS_TIMEOUT'] = "Waiting time between two comments";
 $_ARRAYLANG['TXT_NEWS_SETTINGS_COMMENTS_TIMEOUT_HELP'] = "This value describes how many seconds must be elapsed between two news comments of the same user. This avoids flooding the comment function. We recommend the usage of 30 seconds.";
+$_ARRAYLANG['TXT_NEWS_SETTINGS_USE_COMMENTS'] = "Use comments";
+$_ARRAYLANG['TXT_NEWS_SETTINGS_USE_TYPES'] = "Use types";
 $_ARRAYLANG['TXT_NEWS_COMMENTS_STATUS'] = "De-/activate comments";
 $_ARRAYLANG['TXT_NEWS_COMMENT_ACTIVATE'] = "Activete";
 $_ARRAYLANG['TXT_NEWS_COMMENT_DEACTIVATE'] = "Deactivete";
-$_ARRAYLANG['TXT_NEWS_COMMENTS'] = "Comment";
+$_ARRAYLANG['TXT_NEWS_COMMENTS'] = "Comments";
+$_ARRAYLANG['TXT_NEWS_DEFAULT_TEASERS'] = "Default news container";
+$_ARRAYLANG['TXT_NEWS_DEFAULT_TEASERS_HELP'] = "Select the news containers that shall be pre-selected when adding a new news article.";
 $_ARRAYLANG['TXT_NEWS_TEASERS_SETTINGS_TITLE'] = "Default teasers";
 $_ARRAYLANG['TXT_NEWS_EXTENDED'] = "Erweitert";
 $_ARRAYLANG['TXT_NEWS_MONTH_1'] = "January";
@@ -348,10 +359,10 @@ $_ARRAYLANG['TXT_NEWS_TYPE_DESCRIPTION'] = "Typ der Newsmeldung";
 $_ARRAYLANG['TXT_NEWS_TYPE_NAME_DESCRIPTION'] = "Name des zugehörigen Typen";
 $_ARRAYLANG['TXT_NEWS_TYPE_ADD_ERROR_EMPTY'] = "Typ konnte nicht hinzugefügt werden, es wurde kein Name angegeben.";
 $_ARRAYLANG['TXT_USE_TEASER_TEXT'] = 'Use teaser text';
-$_ARRAYLANG['TXT_USE_RELATED_NEWS'] = 'Use related news';
-$_ARRAYLANG['TXT_USE_TAGS'] = 'Use tags';
+$_ARRAYLANG['TXT_NEWS_SETTINGS_USE_RELATED_NEWS'] = 'Use related articles';
+$_ARRAYLANG['TXT_NEWS_SETTINGS_USE_THUMBNAILS'] = 'Display thumbnails instead of original images';
+$_ARRAYLANG['TXT_NEWS_USE_TAGS'] = 'Use tags';
 
-$_ARRAYLANG['TXT_USE_TYPES'] = "Typen verwenden";
 $_ARRAYLANG['TXT_NO_TYPE'] = "Keine Angabe";
 $_ARRAYLANG['TXT_TOP_NEWS_PLACEHOLDERS_USAGE'] = "In der Designvorlage <b>top_news.html</b>. Diese Seite kann mit dem Platzhalter [[TOP_NEWS_FILE]] im Design oder in einer Content Seite eingebunden werden.";
 $_ARRAYLANG['TXT_NEWS_TOP'] = "Top News";
@@ -426,36 +437,85 @@ $_ARRAYLANG['TXT_NEWS_NO_TITLE'] = "You must specify a title";
 $_ARRAYLANG['TXT_NEWS_NO_TITLE_AND_CATEGORY'] = "You must specify a title and category";
 $_ARRAYLANG['TXT_NEWS_ERR_SAVING_FORM'] = "Error saving the news message";
 
-$_ARRAYLANG['TXT_NEWS_RELATED_NEWS'] = "Related News";
-$_ARRAYLANG['TXT_NEWS_INCLUDE_NEWS'] = "Include News";
-$_ARRAYLANG['TXT_NEWS_INCLUDE_RELATED_NEWS_DESC'] = "Select the news to go to always related to this news";
-$_ARRAYLANG['TXT_NEWS_SEARCH_INFO'] = "Enter at least 3 character(s) of News title.";
-$_ARRAYLANG['TXT_NEWS_SEARCH_PLACEHOLDER'] = "Search News...";
-$_ARRAYLANG['TXT_NEWS_NOT_FOUND'] = "News not found...";
-$_ARRAYLANG['TXT_ERROR_DELETE_RELATED_NEWS_RELATION'] = "Error occured while removing the related news!...";
-$_ARRAYLANG['TXT_ERROR_SAVING_RELATED_NEWS_RELATION'] = "Error occured while saving the related news!...";
+$_ARRAYLANG['TXT_NEWS_RELATED_NEWS'] = "Related articles";
+$_ARRAYLANG['TXT_NEWS_INCLUDE_NEWS'] = "Linked articles";
+$_ARRAYLANG['TXT_NEWS_INCLUDE_RELATED_NEWS_DESC'] = "Select existing articles to link from this article to.";
+$_ARRAYLANG['TXT_NEWS_SEARCH_INFO'] = "Enter at least 3 characters of the title of an article";
+$_ARRAYLANG['TXT_NEWS_SEARCH_PLACEHOLDER'] = "Search article";
+$_ARRAYLANG['TXT_NEWS_NOT_FOUND'] = "No article found";
 
 $_ARRAYLANG['TXT_NEWS_TAGS'] = "Tags";
-$_ARRAYLANG['TXT_NEWS_ADD_TAGS'] = "Add Tags";
+$_ARRAYLANG['TXT_NEWS_ADD_TAGS'] = "Add tags";
 $_ARRAYLANG['TXT_NEWS_TAGS_ENABLE'] = "Enable";
-$_ARRAYLANG['TXT_ERROR_SAVE_NEWS_TAG'] = "Error Occured while saving the news tag!...";
-$_ARRAYLANG['TXT_ERROR_SAVE_NEWS_TAG_RELATION'] = "Error occured while saving the news tag relationship!...";
-$_ARRAYLANG['TXT_ERROR_DELETE_NEWS_TAG_RELATION'] = "Error occured while removing the news tag relationship!...";
-
-$_ARRAYLANG['TXT_NEWS_PREVIOUS_NEXT_LINK_ROW_DESCRIPTION'] = "Tag to display the previous and next news link.<br />
-Starttag: &lt!-- BEGIN previousNextLink --&gt;<br />
-  &nbsp;&nbsp;&nbsp;Starttag: &lt!-- BEGIN previousNewsLink --&gt;<br />
-  &nbsp;&nbsp;&nbsp;Endtag: &lt!-- END previousNewsLink --&gt;<br /><br />
-  &nbsp;&nbsp;&nbsp;Starttag: &lt!-- BEGIN nextNewsLink --&gt;<br />
-  &nbsp;&nbsp;&nbsp;Endtag: &lt!-- END nextNewsLink --&gt;<br />
-Endtag: &lt!-- END previousNextLink --&gt;";
-$_ARRAYLANG['TXT_NEWS_PREVIOUS_NEXT_LINKS'] = "Previous Next Links";
-
-$_ARRAYLANG['TXT_NEWS_PREVIOUS_LINK_DESCRITION'] = "Previous news link";
-$_ARRAYLANG['TXT_NEWS_PREVIOUS_TITLE_DESCRITION'] = "Previous news title";
+$_ARRAYLANG['TXT_NEWS_ERROR_SAVE_NEWS_TAG'] = "Unable to store the tags.";
+$_ARRAYLANG['TXT_NEWS_ERROR_SAVE_NEWS_TAG_RELATION'] = "Unable to store the associated tags.";
+$_ARRAYLANG['TXT_NEWS_ERROR_DELETE_NEWS_TAG_RELATION'] = "Unable to remove the associated tags.";
+$_ARRAYLANG['TXT_NEWS_NO_TAGS_FOUND'] = "No tags assigned";
 
 $_ARRAYLANG['TXT_NEWS_NEXT_LINK_DESCRITION'] = "Next news link";
 $_ARRAYLANG['TXT_NEWS_NEXT_TITLE_DESCRITION'] = "Next news title";
+$_ARRAYLANG['TXT_NEWS_USER_ID_DESCRIPTION'] = 'ID of the associated user account';
+$_ARRAYLANG['TXT_NEWS_USERNAME_DESCRIPTION'] = 'Username of the associated user account';
+$_ARRAYLANG['TXT_NEWS_USER_PROFILE_ATTRIBUTE_DESCRIPTION'] = 'Profile data of the associated user account';
+$_ARRAYLANG['TXT_NEWS_TEASER_TEXT_ROW_DESCRIPTION'] = 'Optional tag to display the news teaser text.';
+$_ARRAYLANG['TXT_NEWS_NEWS_COMMENT_COUNT_ROW_DESCRIPTION'] = 'Optional tag to display the number of comments.';
+$_ARRAYLANG['TXT_NEWS_TEXT_ROW_DESCRIPTION'] = 'This block will be hidden if the news is set to redirect type';
+$_ARRAYLANG['TXT_NEWS_REDIRECT_ROW_DESCRIPTION'] = 'This block will be visible only if the news is set to redirect type';
+$_ARRAYLANG['TXT_NEWS_TAGS_ROW_DESCRIPTION'] = 'Block to list the tags';
+$_ARRAYLANG['TXT_NEWS_TAG_NAME_DESCRIPTION'] = 'Name of the tag';
+$_ARRAYLANG['TXT_NEWS_TAG_LINK_DESCRIPTION'] = 'Linked name of the tag';
+$_ARRAYLANG['TXT_NEWS_COMMENT_BLOCK_COMMENT_POSTER'] = 'Block to display the author of a comment';
+$_ARRAYLANG['TXT_NEWS_COMMENT_BLOCK_COMMENT_TIME'] = 'Submit date of the comment';
+$_ARRAYLANG['TXT_NEWS_COMMENT_BLOCK_COMMENT_TITLE'] = 'Title of the comment';
 
+$_ARRAYLANG['TXT_NEWS_PREVIOUS_NEXT_LINK_ROW_DESCRIPTION'] = "Block to display the links to the previous and next article.<br />
+Starttag: &lt!-- BEGIN news_details_previous_next_links --&gt;<br />
+  &nbsp;&nbsp;&nbsp;Starttag: &lt!-- BEGIN news_details_previous_link --&gt;<br />
+  &nbsp;&nbsp;&nbsp;Endtag: &lt!-- END news_details_previous_link --&gt;<br /><br />
+  &nbsp;&nbsp;&nbsp;Starttag: &lt!-- BEGIN news_details_next_link --&gt;<br />
+  &nbsp;&nbsp;&nbsp;Endtag: &lt!-- END news_details_next_link --&gt;<br />
+Endtag: &lt!-- END news_details_previous_next_links --&gt;";
+$_ARRAYLANG['TXT_NEWS_PREVIOUS_NEXT_LINKS'] = "Links to previous & next articles";
 
-?>
+$_ARRAYLANG['TXT_NEWS_PREVIOUS_LINK_DESCRITION'] = "Link to previous article";
+$_ARRAYLANG['TXT_NEWS_PREVIOUS_TITLE_DESCRITION'] = "Title of previous article";
+
+$_ARRAYLANG['TXT_NEWS_NEXT_LINK_DESCRITION'] = "Link to next article";
+$_ARRAYLANG['TXT_NEWS_NEXT_TITLE_DESCRITION'] = "Title of next article";
+$_ARRAYLANG['TXT_NEWS_PREVIOUS_SRC_DESCRITION'] = "Source/path to previous article";
+$_ARRAYLANG['TXT_NEWS_NEXT_SRC_DESCRITION'] = "Source/path to next article";
+$_ARRAYLANG['TXT_NEWS_USE_PREVIOUS_NEXT_LINK'] = "Use previous & next article linking";
+
+$_ARRAYLANG['TXT_NEWS_RELATED_NEWS_BLOCK_DESCRITION'] = "Block to display the related articles";
+$_ARRAYLANG['TXT_NEWS_RELATED_NEWS_BLOCK_TITLE_DESCRITION'] = "Title for related articles block";
+$_ARRAYLANG['TXT_NEWS_RELATED_NEWS_DETAIL_BLOCK_DESCRITION'] = "Block to display the details of related articles";
+$_ARRAYLANG['TXT_NEWS_RELATED_NEWS_ID_DESCRITION'] = "Id of related article";
+$_ARRAYLANG['TXT_NEWS_RELATED_NEWS_URL_DESCRITION'] = "Url of the related article";
+$_ARRAYLANG['TXT_NEWS_RELATED_NEWS_LINK_DESCRITION'] = "Link of the related article";
+$_ARRAYLANG['TXT_NEWS_RELATED_NEWS_TITLE_DESCRITION'] = "Title of the related article";
+$_ARRAYLANG['TXT_NEWS_RELATED_NEWS_TITLE_SHORT_DESCRITION'] = "Related article short title (limit to max 35 characters)";
+$_ARRAYLANG['TXT_NEWS_RELATED_NEWS_TITLE_LINK_DESCRITION'] = "Title link of the related article";
+$_ARRAYLANG['TXT_NEWS_RELATED_NEWS_TEXT_DESCRITION'] = "Related article text";
+$_ARRAYLANG['TXT_NEWS_RELATED_NEWS_TEXT_SHORT_DESCRITION'] = "Related article short text (limit to max 250 characters)";
+$_ARRAYLANG['TXT_NEWS_RELATED_NEWS_AUTHOR_DESCRITION'] = "Author of the related article";
+$_ARRAYLANG['TXT_NEWS_RELATED_NEWS_PUBLISHER_DESCRITION'] = "Name of the publisher of related article";
+$_ARRAYLANG['TXT_NEWS_RELATED_NEWS_CATEGORY_NAMES_DESCRITION'] = "Category name of related article separated by comma";
+$_ARRAYLANG['TXT_NEWS_RELATED_NEWS_LONG_DATE_DESCRITION'] = "Date with time of related article";
+$_ARRAYLANG['TXT_NEWS_RELATED_NEWS_DATE_DESCRITION'] = "Date of the related article";
+$_ARRAYLANG['TXT_NEWS_RELATED_NEWS_TIME_DESCRITION'] = "Time of the related article";
+$_ARRAYLANG['TXT_NEWS_RELATED_NEWS_COMMENTS_BLOCK_DESCRITION'] = 'This block exist only if the option "Use comments" is active';
+$_ARRAYLANG['TXT_NEWS_RELATED_NEWS_COMMENTS_DESCRITION'] = "Number of comments to this related article";
+$_ARRAYLANG['TXT_NEWS_RELATED_NEWS_TEASER_TEXT_BLOCK_DESCRITION'] = 'This block exist only if the option "Use teaser text" is active';
+$_ARRAYLANG['TXT_NEWS_RELATED_NEWS_TEASER_TEXT_DESCRITION'] = "Teaser text of related article";
+$_ARRAYLANG['TXT_NEWS_RELATED_NEWS_IMAGE_BLOCK_DESCRITION'] = "Block to display the related article teaser image.";
+$_ARRAYLANG['TXT_NEWS_RELATED_NEWS_IMAGE_DESCRITION'] = "Related article teaser image";
+$_ARRAYLANG['TXT_NEWS_RELATED_NEWS_IMAGE_TITLE_DESCRITION'] = "Related article title";
+$_ARRAYLANG['TXT_NEWS_RELATED_NEWS_IMAGE_LINK_DESCRITION'] = "Related article teaser image link";
+$_ARRAYLANG['TXT_NEWS_RELATED_NEWS_IMAGE_SRC_DESCRITION'] = "Related article teaser image source";
+$_ARRAYLANG['TXT_NEWS_RELATED_NEWS_IMAGE_THUMB_BLOCK_DESCRITION'] = "Block to display the related article teaser thumbnail image.";
+$_ARRAYLANG['TXT_NEWS_RELATED_NEWS_IMAGE_THUMB_DESCRITION'] = "Related article teaser thumbnail image";
+$_ARRAYLANG['TXT_NEWS_RELATED_NEWS_IMAGE_THUMB_LINK_DESCRITION'] = "Related article teaser thumbnail image link";
+$_ARRAYLANG['TXT_NEWS_RELATED_NEWS_IMAGE_THUMB_SRC_DESCRITION'] = "Related article teaser thumbnail image source";
+$_ARRAYLANG['TXT_NEWS_SETTINGS_LOGIN_REDIRECT'] = 'Redirect to login when requesting protected news';
+$_ARRAYLANG['TXT_NEWS_SETTINGS_LOGIN_REDIRECT_HELP'] = 'If this option is active, requesting a protected news article redirects to login page. Otherwise the user will be redirected to the overview of all news.';
+$_ARRAYLANG['TXT_NEWS_SWITCH_VISIBILITY'] = 'Click to switch visibility state';

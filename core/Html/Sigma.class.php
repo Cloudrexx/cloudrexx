@@ -47,13 +47,88 @@ namespace Cx\Core\Html;
  */
 class Sigma extends \HTML_Template_Sigma {
 
+    /**
+     * List of callbacks to register for all instances
+     * @see parent::setCallbackFunction()
+     * @var array
+     */
+    protected static $callbackPlaceholders = array();
+
     protected $restoreFileRoot = null;
 
-    public function __construct($root = '', $cacheRoot = '') {
+    /**
+     * Target where this instance is parsed into
+     * @var \Cx\Core\View\Model\Entity\ParseTarget
+     */
+    protected $parseTarget = null;
+
+    /**
+     * Adds a callback function to the list of callbacks for all instances
+     * @param string $name Name of callback to register
+     * @param callable $callback Callback to call for all occurences
+     */
+    public static function addCallbackPlaceholder($name, $callback) {
+        static::$callbackPlaceholders[$name] = $callback;
+    }
+
+    /**
+     * Removes a registered callback
+     * @param string $name Name of callback to unregister
+     */
+    public static function removeCallbackPlaceholder($name) {
+        unset(static::$callbackPlaceholders[$name]);
+    }
+
+    /**
+     * Returns a list of callbacks registered for all instances
+     * @return array List of callbacks ($name=>$callable)
+     */
+    public static function getCallbackPlaceholders() {
+        return static::$callbackPlaceholders;
+    }
+
+    /**
+     * Cx Sigma constructor
+     * @param string $root      root directory for templates
+     * @param string $cacheRoot directory to cache "prepared" templates in
+     * @param \Cx\Core\View\Model\Entity\ParseTarget $parseTarget (optional) Target where this instance will get parsed into
+     */
+    public function __construct($root = '', $cacheRoot = '', $parseTarget = null) {
         parent::__construct($root, $cacheRoot);
+        $this->parseTarget = $parseTarget;
         $this->removeVariablesRegExp = '@' . $this->openingDelimiter . '(' . $this->variablenameRegExp . ')\s*'
             . $this->closingDelimiter . '@sm';
         $this->setErrorHandling(PEAR_ERROR_DIE);
+
+        // Add registered callbacks and ensure we also pass reference to $this
+        foreach (static::getCallbackPlaceholders() as $name=>$callback) {
+            $this->setCallbackFunction(
+                $name,
+                function() use ($callback) {
+                    $args = func_get_args();
+                    array_unshift($args, $this);
+                    return call_user_func_array($callback, $args);
+                },
+                true
+            );
+        }
+    }
+
+    /**
+     * Returns this instances parse target (might be null)
+     * @return \Cx\Core\View\Model\Entity\ParseTarget Target where this instances will get parsed into (or null)
+     */
+    public function getParseTarget() {
+        return $this->parseTarget;
+    }
+
+    /**
+     * Sets the parse target after initialization
+     * @deprecated Set parse target on initialization
+     * @param \Cx\Core\View\Model\Entity\ParseTarget Target where this instances will get parsed into (or null)
+     */
+    public function setParseTarget($parseTarget) {
+        $this->parseTarget = $parseTarget;
     }
 
     function getRoot() {
@@ -79,6 +154,141 @@ class Sigma extends \HTML_Template_Sigma {
         $return = parent::replaceBlockfile($block, $filename, $keepContent);
         $this->unmapCustomizing();
         return $return;
+    }
+
+    /**
+     * Triggers an event on setTemplate() and setTemplateFile()
+     * @inheritDoc
+     */
+    function _buildBlocks($string) {
+        $evm = \Cx\Core\Core\Controller\Cx::instanciate()->getEvents();
+        if (!$evm) {
+            return parent::_buildBlocks($string);
+        }
+        try {
+            $isGlobal = strpos($string, '<!-- BEGIN __global__ -->') !== false;
+            if ($isGlobal) {
+                $string = str_replace(
+                    array('<!-- BEGIN __global__ -->', '<!-- END __global__ -->'),
+                    '',
+                    $string
+                );
+            }
+            $evm->triggerEvent(
+                'View.Sigma:loadContent',
+                array(
+                    'content' => &$string,
+                    'template' => $this,
+                )
+            );
+            if ($isGlobal) {
+                $string = '<!-- BEGIN __global__ -->' . $string .
+                    '<!-- END __global__ -->';
+            }
+        } catch (\Exception $e) {
+            throw $e;
+        }
+        return parent::_buildBlocks($string);
+    }
+
+    /**
+     * Triggers an event on setGlobalVariable()
+     * @inheritDoc
+     */
+    function setGlobalVariable($variable, $value = '') {
+        $this->internalSetVariables($variable, $value);
+        parent::setGlobalVariable($variable, $value);
+    }
+
+    /**
+     * Triggers an event on setVariable()
+     * @inheritDoc
+     */
+    function setVariable($variable, $value = '') {
+        $this->internalSetVariables($variable, $value);
+        parent::setVariable($variable, $value);
+    }
+
+    /**
+     * Triggers events on setVariable() and setGlobalVariable()
+     * @param string|array $variable Variable name or key/value array
+     * @param string|array $value Value or key/value array for sub-keys
+     */
+    protected function internalSetVariables(&$variable, &$value = '') {
+        $evm = \Cx\Core\Core\Controller\Cx::instanciate()->getEvents();
+        if (!$evm) {
+            return;
+        }
+        $variables = array();
+        if (is_array($variable)) {
+            $variables = $variable;
+        } else if (is_array($value)) {
+            $variables = $this->_flattenVariables($variable, $value);
+        } else {
+            $variables = array($variable => $value);
+        }
+        try {
+            foreach ($variables as $key=>&$val) {
+                $evm->triggerEvent(
+                    'View.Sigma:setVariable',
+                    array(
+                        'content' => &$val,
+                        'template' => $this,
+                    )
+                );
+            }
+        } catch (\Exception $e) {
+            throw $e;
+        }
+        $variable = $variables;
+        $value = '';
+    }
+
+    function replaceBlock($block, $template, $keepContent = false, $outer = false) {
+        if (!$outer) {
+            return parent::replaceBlock($block, $template, $keepContent);
+        }
+
+        // ensure placeholder is not in $template
+        $matches = array();
+        if (
+            preg_match(
+                $this->blockRegExp,
+                $template,
+                $matches
+            ) &&
+            $matches[1] == $block
+        ) {
+            $template = $matches[2];
+        }
+
+        // replace block placeholder
+        $placeholder = $this->openingDelimiter.'__'.$block.'__'.$this->closingDelimiter;
+        foreach ($this->_blocks as $outerBlock=>&$content) {
+            $content = str_replace(
+                $placeholder,
+                $template,
+                $content
+            );
+        }
+
+        // remove block
+        $this->_removeBlockData($block, false);
+
+        // remove block from parent block
+        foreach ($this->_children as &$children) {
+            if (isset($children[$block])) {
+                unset($children[$block]);
+            }
+        }
+
+        // Renew variable list without dropping existing callbacks
+        // This may lead to too much data in $this->_functions but
+        // Sigma simply does str_replace() which never matches.
+        $func_bkp = $this->_functions;
+        $ret = $this->_buildBlockVariables();
+        $this->_functions = $func_bkp + $this->_functions;
+        return $ret;
     }
 
     /**
@@ -184,5 +394,32 @@ class Sigma extends \HTML_Template_Sigma {
             return false;
         }
         return parent::parse($block, $flagRecursion, $fakeParse);
+    }
+
+    /**
+     * Returns an unparsed block (/as it was delivered)
+     * This is useful for "reflection". This is used by ESI parsing.
+     * @author Michael Ritter <michael.ritter@cloudrexx.com>
+     * @param string $blockName Name of block to return
+     * @throws \Exception Thrown if the block does not exist within this template
+     * @return string Template content
+     */
+    function getUnparsedBlock($blockName) {
+        if (!isset($this->_blocks[$blockName])) {
+            throw new \Exception('Reverse parsing of block "' . $blockName . '" failed');
+        }
+        return '<!-- BEGIN ' . $blockName . ' -->' .
+            preg_replace_callback(
+                '/\{__(' . $this->blocknameRegExp . ')__\}/',
+                function(array $matches) use ($blockName) {
+                    if (substr($matches[1], 0, 9) == 'function_') {
+                        $info = $this->_functions[$blockName][substr($matches[1], 9)];
+                        return 'func_' . $info['name'] . '(' . implode(',', $info['args']) . ')';
+                    }
+                    return $this->getUnparsedBlock($matches[1]);
+                },
+                $this->_blocks[$blockName]
+            ) .
+            '<!-- END ' . $blockName . ' -->';
     }
 }

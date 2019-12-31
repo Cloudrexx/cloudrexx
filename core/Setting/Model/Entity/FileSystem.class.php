@@ -96,11 +96,30 @@ class FileSystem extends Engine{
 
         try {
             //call DataSet importFromFile method @return array
-            $objDataSet = \Cx\Core_Modules\Listing\Model\Entity\DataSet::load($this->filename);
-            if (!empty($objDataSet)) {
+            $objDataSets = \Cx\Core_Modules\Listing\Model\Entity\DataSet::load($this->filename);
+            if (!empty($objDataSets)) {
                 $this->arrSettings = array();
-                foreach ($objDataSet as $value) {
-                    $this->arrSettings[$value['name']] = $value;
+                $websitePath = \Cx\Core\Core\Controller\Cx::instanciate()
+                    ->getWebsiteDocumentRootPath();
+                foreach ($objDataSets as $objDataSet) {
+                    if (
+                        $objDataSet['type'] == \Cx\Core\Setting\Controller\Setting::TYPE_FILECONTENT &&
+                        $objDataSet['values'] &&
+                        \Cx\Lib\FileSystem\FileSystem::exists(
+                            $websitePath . '/' . $objDataSet['values']
+                        )
+                    ) {
+                        try {
+                            $objFile  = new \Cx\Lib\FileSystem\File(
+                                $websitePath . '/' . $objDataSet['values']
+                            );
+                            $objDataSet['value'] = $objFile->getData();
+                        } catch (\Cx\Lib\FileSystem\FileSystemException $e) {
+                            \DBG::log($e->getMessage());
+                            $objDataSet['value'] = '';
+                        }
+                    }
+                    $this->arrSettings[$objDataSet['name']] = $objDataSet;
                 }
             }
         } catch (\Cx\Core_Modules\Listing\Model\Entity\DataSetException $e) {

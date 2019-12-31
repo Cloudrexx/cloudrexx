@@ -52,10 +52,14 @@ class YamlInterface implements Exportable, Importable {
     }
 
     public function export($twoDimensionalArray) {
-        return $this->yaml->dump($twoDimensionalArray, 1000);
+        return $this->yaml->dump($twoDimensionalArray, 1000, 2, false, true);
     }
 
     public function import($dataAsString) {
-        return $this->yaml->load($dataAsString);
+        $data = $this->yaml->parse($dataAsString, false, true);
+        if (empty($data)) {
+            return array();
+        }
+        return $data;
     }
 }

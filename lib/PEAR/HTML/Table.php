@@ -161,6 +161,10 @@ class HTML_Table extends HTML_Common {
      */
     var $_useTGroups = false;
 
+    public function __construct($attributes = null, $tabOffset = 0, $useTGroups = false) {
+        $this->HTML_Table($attributes, $tabOffset, $useTGroups);
+    }
+
     /**
      * Class constructor
      * @param    array    $attributes        Associative array of table tag

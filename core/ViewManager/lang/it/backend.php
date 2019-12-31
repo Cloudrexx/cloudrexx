@@ -105,7 +105,6 @@ $_ARRAYLANG['TXT_ACTIVE_TEMPLATE'] = 'Standard';
 $_ARRAYLANG['TXT_ACTIVE_PDF_TEMPLATE'] = 'PDF';
 $_ARRAYLANG['TXT_ACTIVE_PRINT_TEMPLATE'] = 'Print';
 $_ARRAYLANG['TXT_THEME_ACTIVATE_INFO'] = 'Abilitato lingue';
-$_ARRAYLANG['TXT_THEME_ACTIVATE_INFO_BODY'] = 'Languags highlighted in pink have been activated as a Frontend language in the <a href="index.php?cmd=LanguageManager">settings.</a>';
 $_ARRAYLANG['TXT_ACTIVE_MOBILE_TEMPLATE'] = 'Mobile';
 $_ARRAYLANG['TXT_APP'] = 'App';
 $_ARRAYLANG['TXT_DESIGN_VARIABLES_LIST'] = 'Platzhalter Verzeichnis';

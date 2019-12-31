@@ -37,7 +37,7 @@ namespace Cx\Core_Modules\TemplateEditor\Testing\UnitTest;
  */
 class OptionTest extends \Cx\Core\Test\Model\Entity\ContrexxTestCase
 {
-    protected function setUp() {
+    protected function setUp(): void {
         global $_LANGID;
         $_LANGID = 1;
         \Env::get('init')->loadLanguageData('TemplateEditor');

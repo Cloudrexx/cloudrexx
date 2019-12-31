@@ -1,15 +1,14 @@
 <div id="mediaBrowserfolderWidget_{MEDIABROWSER_FOLDER_WIDGET_ID}"
      class="mediaBrowserfolderWidget"
-     data-ng-controller="MediaBrowserFolderWidgetCtrl"
+     ng-controller="MediaBrowserFolderWidgetCtrl"
      data-widget-id="{MEDIABROWSER_FOLDER_WIDGET_ID}"
-     data-is-editable="{MEDIABROWSER_FOLDER_WIDGET_IS_EDITABLE}"
->
-  <ul class="filelist">
-    <li data-ng-repeat="file in files">
-      {{ file }}
-      <span class="actions" data-ng-show="isEditable">
-        <a data-ng-click="removeFile(file)" class="removeFile"></a>
+     data-is-editable="{MEDIABROWSER_FOLDER_WIDGET_IS_EDITABLE}">
+    <ul class="filelist">
+        <li ng-repeat="file in files">
+            {{ file }}
+            <span class="actions" ng-show="isEditable">
+        <a ng-click="removeFile(file)" class="removeFile"></a>
       </span>
-    </li>
-  </ul>
+        </li>
+    </ul>
 </div>

@@ -1,6 +1,9 @@
 <!-- START module_mediadir_settings_global.html -->
 <script language="JavaScript" type="text/javascript">
 $J(function(){
+    $J(".inputfieldType").live("change", function() {
+       handleKeywordAbility();
+    });
    $J( ".inputfieldContext" ).live('change', function(){
        resetContextFields();
    });
@@ -9,6 +12,24 @@ $J(function(){
       var inputId = $J(this).data('inputId');
       mediaBrowseInputBox = $J('#' + inputId);
    });
+   handleKeywordAbility();
+  cx.jQuery('input[name=use_associated_entries]')
+    .change(function() {
+      if (cx.jQuery('input[name=use_associated_entries]:checked').val() === "1") {
+        cx.jQuery('#associated-forms-row').show();
+      } else {
+        cx.jQuery('#associated-forms-row').hide();
+      }
+    })
+    .change();
+  cx.jQuery('#associated-forms-select')
+    .chosen({
+      width: '300px',
+      display_selected_options: false,
+      hide_results_on_select: false,
+      no_results_text: '{TXT_MEDIADIR_SELECT_NO_MATCH}',
+      placeholder_text_multiple: '{TXT_MEDIADIR_PLEASE_CHOOSE}'
+    }).chosenSortable();
 });
 
 function resetContextFields() {
@@ -25,6 +46,8 @@ function resetContextFields() {
     $J.each(contexts, function(i, context){
         $J(".inputfieldContext option[value="+ context +"]").removeAttr('disabled');
     });
+
+    handleKeywordAbility();
 }
 
 cx.jQuery.removeFromArray = function(value, arr) {
@@ -113,6 +136,33 @@ function ExpandMinimizeForm(toggle){
     elm1.style.display = (elm1.style.display=='none') ? 'block' : 'none';
     elm2.style.display = (elm2.style.display=='none') ? 'block' : 'none';
 }
+
+function handleKeywordAbility() {
+    /* compatible field types for meta keywords:
+    1: text
+    2: textarea
+    3: dropdown
+    4: radio
+    5: checkbox
+     */
+    var compatibleTypes = [1, 2, 3, 4, 5];
+    cx.jQuery(".inputfieldType").each(function() {
+        var keywordsOption = cx.jQuery(this)
+          .closest("tr")
+          .find(".inputfieldContext option[value='keywords']");
+        if (
+          (
+            compatibleTypes.indexOf(parseInt(cx.jQuery(this).val())) != -1 &&
+            !cx.jQuery(".inputfieldContext option[value='keywords']:selected").length
+          ) ||
+          keywordsOption.is(":selected")
+        ) {
+            keywordsOption.prop("disabled", false);
+        } else {
+            keywordsOption.prop("disabled", true);
+        }
+    });
+}
 var mediaBrowseInputBox;
 var mediaBrowserCallback = function(data) {
     if (data.type=="file") {
@@ -157,7 +207,7 @@ var refreshInputfields = function(formId)
     <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist" id="formContainer">
         <tbody>
             <tr>
-                <th colspan="11">{TXT_MEDIADIR_PAGE_TITLE}</th>
+                <th colspan="2">{TXT_MEDIADIR_PAGE_TITLE}</th>
             </tr>
             <tr class="row1">
                 <td valign="top" width="200">{TXT_MEDIADIR_NAME}</td>
@@ -167,7 +217,7 @@ var refreshInputfields = function(formId)
                     </div>
                     <div id="formNameExpanded" style="display: none;">
                         <!-- BEGIN mediadirFormNameList -->
-                        <input name="formName[{MEDIADIR_FORM_NAME_LANG_ID}]" type="text" style="width: 279px; margin-bottom: 2px; padding-left: 21px; background: #ffffff url('../core/Country/View/Media/Flag/flag_{TXT_MEDIADIR_FORM_NAME_LANG_SHORTCUT}.gif') no-repeat 3px 3px;" title="{TXT_MEDIADIR_FORM_NAME_LANG_NAME}" value="{MEDIADIR_FORM_NAME}" />&nbsp;{TXT_MEDIADIR_FORM_NAME_LANG_NAME}&nbsp;&nbsp;&nbsp;{MEDIADIR_MINIMIZE}<br />
+                        <input name="formName[{MEDIADIR_FORM_NAME_LANG_ID}]" type="text" style="width: 279px; margin-bottom: 2px; padding-left: 21px; background: #ffffff url('/core/Country/View/Media/Flag/flag_{TXT_MEDIADIR_FORM_NAME_LANG_SHORTCUT}.gif') no-repeat 3px 3px;" title="{TXT_MEDIADIR_FORM_NAME_LANG_NAME}" value="{MEDIADIR_FORM_NAME}" />&nbsp;{TXT_MEDIADIR_FORM_NAME_LANG_NAME}&nbsp;&nbsp;&nbsp;{MEDIADIR_MINIMIZE}<br />
                         <!-- END mediadirFormNameList -->
                     </div>
                 </td>
@@ -180,7 +230,7 @@ var refreshInputfields = function(formId)
                     </div>
                     <div id="formDescriptionExpanded" style="display: none;">
                         <!-- BEGIN mediadirFormDescriptionList -->
-                        <textarea name="formDescription[{MEDIADIR_FORM_DESCRIPTION_LANG_ID}]" style="height: 50px; width: 279px; margin-bottom: 2px; padding-left: 21px; background: #ffffff url('../core/Country/View/Media/Flag/flag_{TXT_MEDIADIR_FORM_DESCRIPTION_LANG_SHORTCUT}.gif') no-repeat 3px 3px;" title="{TXT_MEDIADIR_FORM_DESCRIPTION_LANG_NAME}" >{MEDIADIR_FORM_DESCRIPTION}</textarea>&nbsp;{TXT_MEDIADIR_FORM_DESCRIPTION_LANG_NAME}&nbsp;&nbsp;&nbsp;{MEDIADIR_MINIMIZE}<br />
+                        <textarea name="formDescription[{MEDIADIR_FORM_DESCRIPTION_LANG_ID}]" style="height: 50px; width: 279px; margin-bottom: 2px; padding-left: 21px; background: #ffffff url('/core/Country/View/Media/Flag/flag_{TXT_MEDIADIR_FORM_DESCRIPTION_LANG_SHORTCUT}.gif') no-repeat 3px 3px;" title="{TXT_MEDIADIR_FORM_DESCRIPTION_LANG_NAME}" >{MEDIADIR_FORM_DESCRIPTION}</textarea>&nbsp;{TXT_MEDIADIR_FORM_DESCRIPTION_LANG_NAME}&nbsp;&nbsp;&nbsp;{MEDIADIR_MINIMIZE}<br />
                         <!-- END mediadirFormDescriptionList -->
                     </div>
                 </td>
@@ -200,7 +250,14 @@ var refreshInputfields = function(formId)
             <tr class="row1">
                 <td valign="top">{TXT_MEDIADIR_USE_CATEGORY}</td>
                 <td>
-                    <input type="radio" name="formUseCategory" value="1" {MEDIADIR_USE_CATEGORY_ON} /> {TXT_MEDIADIR_ACTIVATE} &nbsp;<input type="radio" name="formUseCategory" value="0" {MEDIADIR_USE_CATEGORY_OFF} /> {TXT_MEDIADIR_DEACTIVATE}&nbsp;
+                    <label>
+                        <input type="radio" name="formUseCategory" value="1" {MEDIADIR_USE_CATEGORY_ON} /> {TXT_MEDIADIR_ACTIVATE}
+                    </label>
+                    &nbsp;
+                    <label>
+                        <input type="radio" name="formUseCategory" value="0" {MEDIADIR_USE_CATEGORY_OFF} /> {TXT_MEDIADIR_DEACTIVATE}
+                    </label>
+                    &nbsp;
                     <span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_MEDIADIR_USE_CATEGORY_INFO}</span>
                 </td>
             </tr>
@@ -208,11 +265,49 @@ var refreshInputfields = function(formId)
             <tr class="row2">
                 <td valign="top">{TXT_MEDIADIR_USE_LEVEL}</td>
                 <td>
-                <input type="radio" name="formUseLevel" value="1" {MEDIADIR_USE_LEVEL_ON} /> {TXT_MEDIADIR_ACTIVATE} &nbsp;<input type="radio" name="formUseLevel" value="0" {MEDIADIR_USE_LEVEL_OFF} /> {TXT_MEDIADIR_DEACTIVATE}&nbsp;
+                    <label>
+                        <input type="radio" name="formUseLevel" value="1" {MEDIADIR_USE_LEVEL_ON} /> {TXT_MEDIADIR_ACTIVATE}
+                    </label>
+                    &nbsp;
+                    <label>
+                        <input type="radio" name="formUseLevel" value="0" {MEDIADIR_USE_LEVEL_OFF} /> {TXT_MEDIADIR_DEACTIVATE}
+                    </label>
+                    &nbsp;
                     <span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_MEDIADIR_USE_LEVEL_INFO}</span>
-            </td>
+                </td>
             </tr>
             <!-- END mediadirFormUseLevel -->
+            <tr>
+                <td valign="top">{TXT_MEDIADIR_USE_ASSOCIATED_ENTRIES}</td>
+                <td>
+                    <label>
+                        <input type="radio" name="use_associated_entries" value="1"
+                               {MEDIADIR_USE_ASSOCIATED_ENTRIES_ON} />
+                        {TXT_MEDIADIR_ACTIVATE}
+                    </label>
+                    &nbsp;
+                    <label>
+                        <input type="radio" name="use_associated_entries" value="0"
+                               {MEDIADIR_USE_ASSOCIATED_ENTRIES_OFF} />
+                        {TXT_MEDIADIR_DEACTIVATE}
+                    </label>
+                    &nbsp;
+                    <span class="tooltip-trigger icon-info"></span>
+                    <span class="tooltip-message">{TXT_MEDIADIR_USE_ASSOCIATED_ENTRIES_INFO}</span>
+                </td>
+            </tr>
+            <tr id="associated-forms-row">
+                <td valign="top">{TXT_MEDIADIR_ASSOCIATED_FORMS}</td>
+                <td>
+                    <select id="associated-forms-select" name="target_form_ids[]"
+                            class="chosen-sortable" multiple
+                            data-placeholder="{TXT_MEDIADIR_PLEASE_CHOOSE}">
+                      {MEDIADIR_ASSOCIATED_FORMS_OPTIONS}
+                    </select>
+                    <span class="tooltip-trigger icon-info"></span>
+                    <span class="tooltip-message">{TXT_MEDIADIR_ASSOCIATED_FORMS_INFO}</span>
+                </td>
+            </tr>
             <!-- BEGIN mediadirFormUseReadyToConfirm -->
             <tr class="row1">
                 <td valign="top">{TXT_MEDIADIR_USE_READY_TO_CONFIRM}</td>
@@ -279,7 +374,7 @@ var refreshInputfields = function(formId)
     <div id="placeholders" class="formTab" style="display: none;">
         <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
             <tr>
-                <th colspan="8">{TXT_MEDIADIR_SETTINGS_PLACEHOLDER}</th>
+                <th>{TXT_MEDIADIR_SETTINGS_PLACEHOLDER}</th>
             </tr>
             <tr class="row3">
                 <td>{TXT_MEDIADIR_SETTINGS_PLACEHOLDER_INFO}</td>
@@ -290,8 +385,7 @@ var refreshInputfields = function(formId)
                     <!-- BEGIN mediadirInputfieldPlaceholderList -->
                         {MEDIADIR_SETTINGS_INPUTFIELD_DESCRIPTION}:<br />
                         <pre style="background-color:#f1f1f1; border: 1px solid #cccccc; margin: 3px 10px 15px 10px; padding: 5px;">&lt;!-- BEGIN {MODULE_NAME_LC}_inputfield_{MEDIADIR_SETTINGS_INPUTFIELD_ID} --&gt;
-&nbsp;&nbsp;&nbsp;&nbsp;{MEDIADIR_SETTINGS_INPUTFIELD_PLACEHOLDERS}
-&lt;!-- END {MODULE_NAME_LC}_inputfield_{MEDIADIR_SETTINGS_INPUTFIELD_ID} --&gt;</pre>
+<ul style="list-style:none;margin:0;">{MEDIADIR_SETTINGS_INPUTFIELD_PLACEHOLDERS}</ul>&lt;!-- END {MODULE_NAME_LC}_inputfield_{MEDIADIR_SETTINGS_INPUTFIELD_ID} --&gt;</pre>
                     <!-- END mediadirInputfieldPlaceholderList -->
                     <br />
                 </td>

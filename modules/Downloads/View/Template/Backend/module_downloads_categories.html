@@ -45,12 +45,12 @@ function downloadsUnlinkDownload(id,name)
     strMsg = '{DOWNLOADS_CONFIRM_UNLINK_DOWNLOAD_TXT}';
     if (confirm(strMsg.replace('%s', '„'+name+'“'))) {
         window.location.href = 'index.php?cmd=Downloads&{CSRF_PARAM}&act=unlink_download&parent_id={DOWNLOADS_CATEGORY_ID}&id='+id
-          +'&category_sort={DOWNLOADS_CATEGORY_CATEGORY_SORT}'
-          +'&category_by={DOWNLOADS_CATEGORY_CATEGORY_SORT_BY}'
-          +'&download_sort={DOWNLOADS_CATEGORY_DOWNLOAD_SORT}'
-          +'&download_by={DOWNLOADS_CATEGORY_DOWNLOAD_BY}'
-          +'&category_pos={DOWNLOADS_CATEGORY_CATEGORY_OFFSET}'
-          +'&download_pos={DOWNLOADS_CATEGORY_DOWNLOAD_OFFSET}';
+            +'&category_sort={DOWNLOADS_CATEGORY_CATEGORY_SORT}'
+            +'&category_by={DOWNLOADS_CATEGORY_CATEGORY_SORT_BY}'
+            +'&download_sort={DOWNLOADS_CATEGORY_DOWNLOAD_SORT}'
+            +'&download_by={DOWNLOADS_CATEGORY_DOWNLOAD_BY}'
+            +'&category_pos={DOWNLOADS_CATEGORY_CATEGORY_OFFSET}'
+            +'&download_pos={DOWNLOADS_CATEGORY_DOWNLOAD_OFFSET}';
     }
 }
 
@@ -73,7 +73,7 @@ function downloadsUpdateSortOrder(event,elForm,idMultiAction)
             <form action="index.php" method="get">
                 <input type="hidden" name="cmd" value="Downloads" />
                 <input type="hidden" name="act" value="categories" />
-                <input type="text" class="search" name="search_term" value="{DOWNLOADS_SEARCH_TERM}" onfocus="if(this.value=='{TXT_DOWNLOADS_SEARCH_DOWNLOAD}'){this.value='';}" onblur="if(this.value==''){this.value='{TXT_DOWNLOADS_SEARCH_DOWNLOAD}';}" style="width: 240px;" />
+                <input type="text" class="search" name="search_term" placeholder="{TXT_DOWNLOADS_SEARCH_DOWNLOAD}" value="{DOWNLOADS_SEARCH_TERM}" style="width: 240px;" />
                 {DOWNLOADS_CATEGORY_MENU}
                 <input type="submit" value="{TXT_DOWNLOADS_SEARCH}" />
             </form>
@@ -141,22 +141,22 @@ function downloadsUpdateSortOrder(event,elForm,idMultiAction)
             </a>
           <!-- END downloads_category_name_link_close -->
         </td>
-    <td>{DOWNLOADS_CATEGORY_DESCRIPTION}</td>
-    <td nowrap="nowrap">{DOWNLOADS_CATEGORY_AUTHOR}</td>
-    <td nowrap="nowrap" style="text-align: right;">
+        <td>{DOWNLOADS_CATEGORY_DESCRIPTION}</td>
+        <td nowrap="nowrap">{DOWNLOADS_CATEGORY_AUTHOR}</td>
+        <td nowrap="nowrap" style="text-align: right;">
             <!-- BEGIN downloads_category_function_modify_link -->
-        <a href="index.php?cmd=Downloads&amp;act=category&amp;parent_id={DOWNLOADS_CATEGORY_PARENT_ID}&amp;id={DOWNLOADS_CATEGORY_ID}&amp;category_sort={DOWNLOADS_CATEGORY_CATEGORY_SORT}&amp;category_by={DOWNLOADS_CATEGORY_CATEGORY_SORT_BY}&amp;download_sort={DOWNLOADS_CATEGORY_DOWNLOAD_SORT}&amp;download_by={DOWNLOADS_CATEGORY_DOWNLOAD_BY}&amp;category_pos={DOWNLOADS_CATEGORY_CATEGORY_OFFSET}&amp;download_pos={DOWNLOADS_CATEGORY_DOWNLOAD_OFFSET}" title="{TXT_DOWNLOADS_EDIT}"><img src="../core/Core/View/Media/icons/edit.gif" alt="{TXT_DOWNLOADS_EDIT}" width="16" height="16" border="0" /></a>
+            <a href="index.php?cmd=Downloads&amp;act=category&amp;parent_id={DOWNLOADS_CATEGORY_PARENT_ID}&amp;id={DOWNLOADS_CATEGORY_ID}&amp;category_sort={DOWNLOADS_CATEGORY_CATEGORY_SORT}&amp;category_by={DOWNLOADS_CATEGORY_CATEGORY_SORT_BY}&amp;download_sort={DOWNLOADS_CATEGORY_DOWNLOAD_SORT}&amp;download_by={DOWNLOADS_CATEGORY_DOWNLOAD_BY}&amp;category_pos={DOWNLOADS_CATEGORY_CATEGORY_OFFSET}&amp;download_pos={DOWNLOADS_CATEGORY_DOWNLOAD_OFFSET}" title="{TXT_DOWNLOADS_EDIT}"><img src="../core/Core/View/Media/icons/edit.gif" alt="{TXT_DOWNLOADS_EDIT}" width="16" height="16" border="0" /></a>
             <!-- END downloads_category_function_modify_link -->
             <!-- BEGIN downloads_category_function_no_modify_link -->
             <img src="../core/Core/View/Media/icons/pixel.gif" alt="{TXT_DOWNLOADS_EDIT}" width="16" height="16" border="0" />
             <!-- END downloads_category_function_no_modify_link -->
             <!-- BEGIN downloads_category_function_delete_link -->
-        <a href="javascript:void(0);" onclick="downloadsDeleteCategory({DOWNLOADS_CATEGORY_ID},'{DOWNLOADS_CATEGORY_NAME_JS}',{DOWNLOADS_CATEGORY_HAS_SUBCATEGORIES})" title="{TXT_DOWNLOADS_DELETE}"><img src="../core/Core/View/Media/icons/delete.gif" alt="{TXT_DOWNLOADS_DELETE}" width="17" height="17" border="0" /></a>
+            <a href="javascript:void(0);" onclick="downloadsDeleteCategory({DOWNLOADS_CATEGORY_ID},'{DOWNLOADS_CATEGORY_NAME_JS}',{DOWNLOADS_CATEGORY_HAS_SUBCATEGORIES})" title="{TXT_DOWNLOADS_DELETE}"><img src="../core/Core/View/Media/icons/delete.gif" alt="{TXT_DOWNLOADS_DELETE}" width="17" height="17" border="0" /></a>
             <!-- END downloads_category_function_delete_link -->
             <!-- BEGIN downloads_category_function_no_delete_link -->
             <img src="../core/Core/View/Media/icons/pixel.gif" alt="no permission to delete this category" width="16" height="16" border="0" />
             <!-- END downloads_category_function_no_delete_link -->
-    </td>
+        </td>
     </tr>
 <!-- END downloads_category_list -->
 </table>

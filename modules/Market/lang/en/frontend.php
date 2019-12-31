@@ -94,4 +94,7 @@ $_ARRAYLANG['TXT_MARKET_LOCATION'] = "Location";
 $_ARRAYLANG['TXT_MARKET_LOCATIONS'] = "All Locations";
 $_ARRAYLANG['TXT_TYPE'] = "Type";
 $_ARRAYLANG['TXT_MARKET_CHOOSE_FILE'] = 'Choose file';
+$_ARRAYLANG['TXT_MARKET_CONFIRM_TERMS'] = "Please confirm the terms and conditions";
+$_ARRAYLANG['TXT_MARKET_TERMS'] = "Terms and conditions";
+$_ARRAYLANG['TXT_MARKET_CONFIRM_TERMS_LABEL'] = "Read terms and conditions";
 ?>

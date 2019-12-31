@@ -92,6 +92,14 @@ class SystemComponentController extends Controller {
     }
 
     /**
+     * Sets the SystemComponent this Controller decorates
+     * @return \Cx\Core\Core\Model\Entity\SystemComponent
+     */
+    public function setSystemComponent($systemComponent) {
+        $this->systemComponent = $systemComponent;
+    }
+
+    /**
      * Registers a controller instance
      * @param Controller $controller Controller to register
      * @return null
@@ -267,13 +275,22 @@ class SystemComponentController extends Controller {
      *
      * @return boolean
      */
-    public function hasAccessToExecuteCommand($command, $arguments)
-    {
+    public function hasAccessToExecuteCommand($command, $arguments) {
         $commands = $this->getCommandsForCommandMode();
         $method = (php_sapi_name() === 'cli') ? array('cli') : null;
 
-        $objPermission = new \Cx\Core_Modules\Access\Model\Entity\Permission(null, $method, false, null, null, null);
-        if (isset($commands[$command]) && $commands[$command] instanceof \Cx\Core_Modules\Access\Model\Entity\Permission) {
+        $objPermission = new \Cx\Core_Modules\Access\Model\Entity\Permission(
+            array(),
+            $method,
+            false,
+            array(),
+            array(),
+            array()
+        );
+        if (
+            isset($commands[$command]) &&
+            $commands[$command] instanceof \Cx\Core_Modules\Access\Model\Entity\Permission
+        ) {
             $objPermission = $commands[$command];
         }
 
@@ -307,6 +324,22 @@ class SystemComponentController extends Controller {
     public function postInit(\Cx\Core\Core\Controller\Cx $cx) {}
 
     /**
+     * Do something before component load
+     * * USE CAREFULLY, DO NOT DO ANYTHING COSTLY HERE!
+     * CALCULATE YOUR STUFF AS LATE AS POSSIBLE.
+     * This event must be registered in the preComponentLoad-Hook definition
+     * file config/preComponentLoadHooks.yml.
+     */
+    public function preComponentLoad() {}
+
+    /**
+     * Do something after all active components are loaded
+     * USE CAREFULLY, DO NOT DO ANYTHING COSTLY HERE!
+     * CALCULATE YOUR STUFF AS LATE AS POSSIBLE.
+     */
+    public function postComponentLoad() {}
+
+    /**
      * Register your events here
      *
      * Do not do anything else here than list statements like
@@ -327,19 +360,6 @@ class SystemComponentController extends Controller {
     public function registerEventListeners() {}
 
     /**
-     * Called for additional, component specific resolving
-     *
-     * If /en/Path/to/Page is the path to a page for this component
-     * a request like /en/Path/to/Page/with/some/parameters will
-     * give an array like array('with', 'some', 'parameters') for $parts
-     *
-     * This may be used to redirect to another page
-     * @param array $parts List of additional path parts
-     * @param \Cx\Core\ContentManager\Model\Entity\Page $page Resolved virtual page
-     */
-    public function resolve($parts, $page) {}
-
-    /**
      * Do something before resolving is done
      *
      * USE CAREFULLY, DO NOT DO ANYTHING COSTLY HERE!
@@ -347,6 +367,21 @@ class SystemComponentController extends Controller {
      * @param \Cx\Core\Routing\Url                      $request    The URL object for this request
      */
     public function preResolve(\Cx\Core\Routing\Url $request) {}
+
+    /**
+     * Called for additional, component specific resolving
+     *
+     * If /en/Path/to/Page is the path to a page for this component
+     * a request like /en/Path/to/Page/with/some/parameters will
+     * give an array like array('with', 'some', 'parameters') for $parts
+     * PLEASE MAKE SURE THIS METHOD IS MOCKABLE. IT MAY ONLY INTERACT WITH
+     * adjustResponse() HOOK.
+     *
+     * This may be used to redirect to another page
+     * @param array $parts List of additional path parts
+     * @param \Cx\Core\ContentManager\Model\Entity\Page $page Resolved virtual page
+     */
+    public function resolve($parts, $page) {}
 
     /**
      * Do something after resolving is done
@@ -376,6 +411,17 @@ class SystemComponentController extends Controller {
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
      */
     public function preContentParse(\Cx\Core\ContentManager\Model\Entity\Page $page){}
+
+    /**
+     * Do something with a Response object
+     * You may do page alterations here (like changing the metatitle)
+     * You may do response alterations here (like set headers)
+     * PLEASE MAKE SURE THIS METHOD IS MOCKABLE. IT MAY ONLY INTERACT WITH
+     * resolve() HOOK.
+     *
+     * @param \Cx\Core\Routing\Model\Entity\Response $response Response object to adjust
+     */
+    public function adjustResponse(\Cx\Core\Routing\Model\Entity\Response $response) {}
 
     /**
      * Load your component. It is needed for this request.
@@ -454,6 +500,7 @@ class SystemComponentController extends Controller {
      * Do something after main template got parsed
      *
      * USE CAREFULLY, DO NOT DO ANYTHING COSTLY HERE!
+     * @param string                                    $endcode The processed data to be sent to the client as response
      */
-    public function postFinalize() {}
+    public function postFinalize(&$endcode) {}
 }

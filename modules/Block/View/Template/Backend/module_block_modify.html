@@ -1,4 +1,4 @@
-<!-- START module_block_block.html -->
+<!-- START module_block_modify.html -->
 <script type="text/javascript">
     $J(document).ready(function() {
         $J('#wysiwyg_editor').change(function() {
@@ -107,9 +107,9 @@
         if ($J('#wysiwyg_editor').prop('checked')) {
             if (typeof(CKEDITOR.instances.ckeditor) == 'undefined') {
                 var config = {
-                    customConfig : cx.variables.get('basePath', 'contrexx') + cx.variables.get('ckeditorconfigpath', 'block'),
+                    customConfig : cx.variables.get('ckeditorconfigpath', 'block'),
                     toolbar: 'Full',
-                    skin: 'moono',
+                    removePlugins: 'bbcode',
                     height: 380
                 };
                 CKEDITOR.replace('page[content]', config);
@@ -204,7 +204,7 @@
         $J('.tabmenu li a').removeClass('active').addClass('inactive');
         $J(ele).removeClass('inactive').addClass('active');
         swapHeaderLangName();
-    }
+    }    
     function swapHeaderLangName(){
         $J('form[name=blockFormModifyBlock] table.block_lang th:first-child').each(
             function(){
@@ -254,7 +254,7 @@
     }
     function onSubmit() {
         activeLangId = $J('ul.blockLang a.active').attr('id').split('_')[2];
-
+        
         if ($J('#wysiwyg_editor').prop('checked')) {
             $J('#blockFormText_'+activeLangId).val(CKEDITOR.instances.ckeditor.getData());
         } else {
@@ -312,23 +312,23 @@
             elm.style.display = 'none';
         }
     }
-    function selectDataTab(ele, tabName) {
-  if(document.getElementById(tabName).style.display != "block")
-  {
-    document.getElementById(tabName).style.display = "block";
-    strClass = document.getElementById(tabName).className;
-
-    arrTags = document.getElementsByTagName("*");
-    for (i=0;i<arrTags.length;i++)
-    {
-      if(arrTags[i].className == strClass && arrTags[i] != document.getElementById(tabName))
-      {
-        arrTags[i].style.display = "none";
-      }
-    }
+    function selectDataTab(ele, tabName) {  
+	if(document.getElementById(tabName).style.display != "block")
+	{
+		document.getElementById(tabName).style.display = "block";
+		strClass = document.getElementById(tabName).className;
+		
+		arrTags = document.getElementsByTagName("*");
+		for (i=0;i<arrTags.length;i++)
+		{
+			if(arrTags[i].className == strClass && arrTags[i] != document.getElementById(tabName))
+			{
+				arrTags[i].style.display = "none";
+			}
+		}
                 $J('#tabmenu li a').removeClass('active');
                 $J(ele).addClass('active');
-  }
+	}
     }
     // ]]>
 </script>
@@ -337,7 +337,7 @@
     cx.ready(function() {
         var dpOptions = {
             dateFormat: 'yy-mm-dd',
-            timeFormat: 'hh:mm'
+            timeFormat: 'hh:mm' 
         };
 
         $J('input[name=inputStartDate]').datetimepicker(dpOptions);
@@ -347,7 +347,7 @@
     // <![CDATA[
     (function(){
         $J(function(){
-
+            
             var $inputDateEnd   = $J('[name=inputEndDate]');
             var $inputDateStart = $J('[name=inputStartDate]');
             var $spansDate      = $J('#startTime,#endTime');
@@ -394,10 +394,10 @@
             swapHeaderLangName();
         });
     })();
-
+    
     $J(document).ready(function() {
         refreshRadioButtons();
-
+        
         $J('input[name*=blockFormLanguages]').click(function() {
             refreshRadioButtons();
         });
@@ -411,7 +411,7 @@
             changePageTitlesByLang($J(this).val(), 'category');
         });
     });
-
+    
     var refreshRadioButtons = function() {
         $J('input[name*=blockFormLanguages]:checked').each(function() {
             $J('#changePageTitlesTo_' + $J(this).attr('id').match(/\d$/)).show();
@@ -436,7 +436,7 @@
             changePageTitlesByLang(langCode, value);
         });
     }
-
+    
     /**
      * Called on click of language switch radio buttons
      * also on startup and before sending the form
@@ -447,7 +447,13 @@
         // do not overwrite data on first call, but parse it into json object
         if (cachedLang == "") {
             selectedOps = cx.jQuery.parseJSON(cx.variables.get(placeholder + "PagesSelectedOptions", "block"));
+            if (selectedOps instanceof Array && !selectedOps.length) {
+                selectedOps = "";
+            }
             unselectedOps = cx.jQuery.parseJSON(cx.variables.get(placeholder + "PagesUnselectedOptions", "block"));
+            if (unselectedOps instanceof Array && !unselectedOps.length) {
+                unselectedOps = "";
+            }
         } else {
             selectedOps = cx.variables.get(placeholder + "PagesSelectedOptions", "block");
             unselectedOps = cx.variables.get(placeholder + "PagesUnselectedOptions", "block");
@@ -514,7 +520,7 @@
 
 </style>
 {BLOCK_WYSIWYG_MEDIABROWSER}
-<form name="blockFormModifyBlock" action="index.php?cmd=Block&amp;act=modify" method="post" onsubmit="onSubmit();">
+<form name="blockFormModifyBlock" action="index.php?cmd=Block&amp;act=modify&amp;catId={BLOCK_FILTER_CATEGORY_ID}" method="post" onsubmit="onSubmit();">
     <input type="hidden" name="blockId" value="{BLOCK_ID}" size="50" />
     <input type="hidden" id="globalCachedLang" name="globalCachedLang" value="" />
     <input type="hidden" id="directCachedLang" name="directCachedLang" value="" />
@@ -550,7 +556,7 @@
                     <td width="250px">{TXT_BLOCK_NAME}:</td>
                     <td width="250px"><input type="text" name="blockName" value="{BLOCK_NAME}" style="width: 250px;" /></td>
                     <td><br /></td>
-                </tr>
+                </tr>   
                 <tr class="row2">
                     <td>{TXT_BLOCK_CATEGORY}:</td>
                     <td colspan="2">
@@ -816,4 +822,4 @@
 <br />
 <input type="submit" name="block_save_block" value="{TXT_BLOCK_SAVE}" />
 </form>
-<!-- END module_block_block.html -->
+<!-- END module_block_modify.html -->

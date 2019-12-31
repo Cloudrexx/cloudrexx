@@ -13,7 +13,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * This software consists of voluntary contributions made by many individuals
- * and is licensed under the LGPL. For more information, see
+ * and is licensed under the MIT license. For more information, see
  * <http://www.doctrine-project.org>.
  */
 
@@ -24,7 +24,7 @@ use Doctrine\ORM\Query\Lexer;
 /**
  * "SIZE" "(" CollectionValuedPathExpression ")"
  *
- * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
+ * 
  * @link    www.doctrine-project.org
  * @since   2.0
  * @author  Guilherme Blanco <guilhermeblanco@hotmail.com>
@@ -34,6 +34,9 @@ use Doctrine\ORM\Query\Lexer;
  */
 class SizeFunction extends FunctionNode
 {
+    /**
+     * @var \Doctrine\ORM\Query\AST\PathExpression
+     */
     public $collectionPathExpression;
 
     /**
@@ -42,32 +45,33 @@ class SizeFunction extends FunctionNode
      */
     public function getSql(\Doctrine\ORM\Query\SqlWalker $sqlWalker)
     {
-        $platform = $sqlWalker->getConnection()->getDatabasePlatform();
-        $dqlAlias = $this->collectionPathExpression->identificationVariable;
-        $assocField = $this->collectionPathExpression->field;
-        
-        $qComp = $sqlWalker->getQueryComponent($dqlAlias);
-        $class = $qComp['metadata'];
-        $assoc = $class->associationMappings[$assocField];
-        $sql = 'SELECT COUNT(*) FROM ';
+        $platform       = $sqlWalker->getEntityManager()->getConnection()->getDatabasePlatform();
+        $quoteStrategy  = $sqlWalker->getEntityManager()->getConfiguration()->getQuoteStrategy();
+        $dqlAlias       = $this->collectionPathExpression->identificationVariable;
+        $assocField     = $this->collectionPathExpression->field;
+
+        $qComp  = $sqlWalker->getQueryComponent($dqlAlias);
+        $class  = $qComp['metadata'];
+        $assoc  = $class->associationMappings[$assocField];
+        $sql    = 'SELECT COUNT(*) FROM ';
 
         if ($assoc['type'] == \Doctrine\ORM\Mapping\ClassMetadata::ONE_TO_MANY) {
-            $targetClass = $sqlWalker->getEntityManager()->getClassMetadata($assoc['targetEntity']);
-            $targetTableAlias = $sqlWalker->getSqlTableAlias($targetClass->table['name']);
-            $sourceTableAlias = $sqlWalker->getSqlTableAlias($class->table['name'], $dqlAlias);
+            $targetClass        = $sqlWalker->getEntityManager()->getClassMetadata($assoc['targetEntity']);
+            $targetTableAlias   = $sqlWalker->getSQLTableAlias($targetClass->getTableName());
+            $sourceTableAlias   = $sqlWalker->getSQLTableAlias($class->getTableName(), $dqlAlias);
 
-            $sql .= $targetClass->getQuotedTableName($platform) . ' ' . $targetTableAlias . ' WHERE ';
+            $sql .= $quoteStrategy->getTableName($targetClass, $platform) . ' ' . $targetTableAlias . ' WHERE ';
 
             $owningAssoc = $targetClass->associationMappings[$assoc['mappedBy']];
 
             $first = true;
-            
+
             foreach ($owningAssoc['targetToSourceKeyColumns'] as $targetColumn => $sourceColumn) {
                 if ($first) $first = false; else $sql .= ' AND ';
 
                 $sql .= $targetTableAlias . '.' . $sourceColumn
                       . ' = '
-                      . $sourceTableAlias . '.' . $class->getQuotedColumnName($class->fieldNames[$targetColumn], $platform);
+                      . $sourceTableAlias . '.' . $quoteStrategy->getColumnName($class->fieldNames[$targetColumn], $class, $platform);
             }
         } else { // many-to-many
             $targetClass = $sqlWalker->getEntityManager()->getClassMetadata($assoc['targetEntity']);
@@ -76,11 +80,11 @@ class SizeFunction extends FunctionNode
             $joinTable = $owningAssoc['joinTable'];
 
             // SQL table aliases
-            $joinTableAlias = $sqlWalker->getSqlTableAlias($joinTable['name']);
-            $sourceTableAlias = $sqlWalker->getSqlTableAlias($class->table['name'], $dqlAlias);
+            $joinTableAlias = $sqlWalker->getSQLTableAlias($joinTable['name']);
+            $sourceTableAlias = $sqlWalker->getSQLTableAlias($class->getTableName(), $dqlAlias);
 
             // join to target table
-            $sql .= $targetClass->getQuotedJoinTableName($owningAssoc, $platform) . ' ' . $joinTableAlias . ' WHERE ';
+            $sql .= $quoteStrategy->getJoinTableName($owningAssoc, $targetClass, $platform) . ' ' . $joinTableAlias . ' WHERE ';
 
             $joinColumns = $assoc['isOwningSide']
                 ? $joinTable['joinColumns']
@@ -91,8 +95,8 @@ class SizeFunction extends FunctionNode
             foreach ($joinColumns as $joinColumn) {
                 if ($first) $first = false; else $sql .= ' AND ';
 
-                $sourceColumnName = $class->getQuotedColumnName(
-                    $class->fieldNames[$joinColumn['referencedColumnName']], $platform
+                $sourceColumnName = $quoteStrategy->getColumnName(
+                    $class->fieldNames[$joinColumn['referencedColumnName']], $class, $platform
                 );
 
                 $sql .= $joinTableAlias . '.' . $joinColumn['name']
@@ -100,7 +104,7 @@ class SizeFunction extends FunctionNode
                       . $sourceTableAlias . '.' . $sourceColumnName;
             }
         }
-        
+
         return '(' . $sql . ')';
     }
 
@@ -109,14 +113,11 @@ class SizeFunction extends FunctionNode
      */
     public function parse(\Doctrine\ORM\Query\Parser $parser)
     {
-        $lexer = $parser->getLexer();
-        
-        $parser->match(Lexer::T_SIZE);
+        $parser->match(Lexer::T_IDENTIFIER);
         $parser->match(Lexer::T_OPEN_PARENTHESIS);
-        
+
         $this->collectionPathExpression = $parser->CollectionValuedPathExpression();
-        
+
         $parser->match(Lexer::T_CLOSE_PARENTHESIS);
     }
 }
-

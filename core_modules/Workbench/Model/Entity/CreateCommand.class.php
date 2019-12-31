@@ -68,7 +68,7 @@ class CreateCommand extends Command {
      */
     public function execute(array $arguments) {
 
-        $component = new \Cx\Core\Core\Model\Entity\ReflectionComponent($arguments[3], $arguments[2]);
+        $component = new ReflectionComponent($arguments[3], $arguments[2]);
         $component->create();
 
         $this->interface->show('Done');

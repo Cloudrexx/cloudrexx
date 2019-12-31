@@ -1895,91 +1895,6 @@ p#remove-tag-filter {
 .title-label h6 {
     padding: 5px 0;
 }
-/*//Styles for next and previous news link blocks Ends here*/
-div#related-news {
-    width: 100%;
-    float: left;
-}
-div#related-news h3 {
-    border-bottom: 1px solid #E3E4E5;
-    padding-bottom: 5px;
-}
-.rel-news-blocks {
-    width: 100%;
-    float: left;
-    height: auto;
-    border-bottom: 1px solid #E3E4E5;
-    padding-bottom: 12px;
-}
-#related-news-list ul li label {
-    margin: 1px;
-    float: left;
-    width: auto;
-    padding-left: 10px;
-}
-div#related-news-list {
-    padding: 0;
-}
-#related-news-list ul li {
-    background: none;
-    list-style-type: none;
-    border: 1px solid rgb(183, 188, 192);
-    padding: 0;
-    margin: 0 10px 10px 0;
-    width: auto;
-    float: left;
-    line-height: 33px;
-}
-#related-news-list ul li span.news_list_close {
-    padding: 1px 8px;
-    margin-bottom: 0px;
-    cursor: pointer;
-    margin-left: 8px;
-    background: rgb(183, 188, 192);
-    color: rgb(255, 255, 255);
-    position: relative;
-    float: right;
-}
-#related-news-list ul {
-    margin: 0;
-    padding: 0;
-    float: right;
-    width: 100%;
-}
-.rel-news-image {
-    height: 150px;
-    float: left;
-    width: auto;
-    margin: -12px -12px 12px;
-}
-.rel-news-image img {
-    float: left;
-    width: 100%;
-    height: auto;
-    overflow: hidden;
-}
-.rel-news-blocks:last-child {
-    margin: 0;
-    border-bottom: 1px solid #D6D6D6;
-}
-.rel-news-link {width:100%; float:right;}
-.rel-news-title {font-weight: bold;}
-
-input.live-search-news-input.ui-autocomplete-input {
-    line-height: 20px;
-    font-size: 14px;
-}
-input.live-search-news-input.ui-autocomplete-input.loading {
-    background: url('images/loading.gif') no-repeat 98% center;
-}
-span.live-search-user-info {
-    float: left;
-    font-size: 12px;
-    width: 100%;
-    font-style: italic;
-    color: #9C9C9C;
-}
-/*//Styles for related news ends here*/
 /***************************************************/
 /* CSS DEFINITIONS FOR NEWSLETTER MODULE           */
 /***************************************************/
@@ -2802,6 +2717,15 @@ td ul {
 }
 #media_div div.message_ok {
     color: #029202;
+}
+#media_div .mediaSearchForm {
+    float: left;
+    width: 100%;
+    padding-bottom: 20px;
+}
+#media_div .mediaSearchForm .mediaButtonSearch {
+    float: left;
+    width: auto !important;
 }
 /***************************************/
 /* CSS DEFINITIONS FOR CHECKOUT MODULE */

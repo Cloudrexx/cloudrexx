@@ -1,12 +1,12 @@
 <div>
     <script>
-        !function($){
+        (function ($) {
             $('#thumbnailSelector').find('.thumbnail-size').change(function () {
-                var size = $(this).val();
-                size = size == 0 ? '100%' : size;
-                $('#thumbnailSelector').find('.image').css({'width': size})
+                var size = parseInt($(this).val(), 10);
+                size = size === 0 ? '100%' : size;
+                $('#thumbnailSelector').find('.image').css({'width': size});
             });
-        }(cx.variables.get('jquery','mediabrowser'))
+        }(cx.variables.get('jquery', 'mediabrowser')));
     </script>
     <div id="thumbnailSelector">
         <img src="" alt="" class="image"/>

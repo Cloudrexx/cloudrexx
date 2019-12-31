@@ -1,4 +1,4 @@
-<?php 
+<?php
 /*
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -13,21 +13,22 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * This software consists of voluntary contributions made by many individuals
- * and is licensed under the LGPL. For more information, see
+ * and is licensed under the MIT license. For more information, see
  * <http://www.doctrine-project.org>.
  */
 
 namespace Doctrine\DBAL;
 
 use Doctrine\DBAL\Logging\SQLLogger;
+use Doctrine\Common\Cache\Cache;
 
 /**
  * Configuration container for the Doctrine DBAL.
  *
- * @since   2.0
- * @author  Guilherme Blanco <guilhermeblanco@hotmail.com>
- * @author  Jonathan Wage <jonwage@gmail.com>
- * @author  Roman Borschel <roman@code-factory.org>
+ * @since    2.0
+ * @author   Guilherme Blanco <guilhermeblanco@hotmail.com>
+ * @author   Jonathan Wage <jonwage@gmail.com>
+ * @author   Roman Borschel <roman@code-factory.org>
  * @internal When adding a new configuration option just write a getter/setter
  *           pair and add the option to the _attributes array with a proper default value.
  */
@@ -44,21 +45,76 @@ class Configuration
     /**
      * Sets the SQL logger to use. Defaults to NULL which means SQL logging is disabled.
      *
-     * @param SQLLogger $logger
+     * @param \Doctrine\DBAL\Logging\SQLLogger|null $logger
+     *
+     * @return void
      */
-    public function setSQLLogger(SQLLogger $logger)
+    public function setSQLLogger(SQLLogger $logger = null)
     {
         $this->_attributes['sqlLogger'] = $logger;
     }
 
     /**
      * Gets the SQL logger that is used.
-     * 
-     * @return SQLLogger
+     *
+     * @return \Doctrine\DBAL\Logging\SQLLogger
      */
     public function getSQLLogger()
     {
         return isset($this->_attributes['sqlLogger']) ?
                 $this->_attributes['sqlLogger'] : null;
+    }
+
+    /**
+     * Gets the cache driver implementation that is used for query result caching.
+     *
+     * @return \Doctrine\Common\Cache\Cache|null
+     */
+    public function getResultCacheImpl()
+    {
+        return isset($this->_attributes['resultCacheImpl']) ?
+                $this->_attributes['resultCacheImpl'] : null;
+    }
+
+    /**
+     * Sets the cache driver implementation that is used for query result caching.
+     *
+     * @param \Doctrine\Common\Cache\Cache $cacheImpl
+     *
+     * @return void
+     */
+    public function setResultCacheImpl(Cache $cacheImpl)
+    {
+        $this->_attributes['resultCacheImpl'] = $cacheImpl;
+    }
+
+    /**
+     * Sets the filter schema assets expression.
+     *
+     * Only include tables/sequences matching the filter expression regexp in
+     * schema instances generated for the active connection when calling
+     * {AbstractSchemaManager#createSchema()}.
+     *
+     * @param string $filterExpression
+     *
+     * @return void
+     */
+    public function setFilterSchemaAssetsExpression($filterExpression)
+    {
+        $this->_attributes['filterSchemaAssetsExpression'] = $filterExpression;
+    }
+
+    /**
+     * Returns filter schema assets expression.
+     *
+     * @return string|null
+     */
+    public function getFilterSchemaAssetsExpression()
+    {
+        if (isset($this->_attributes['filterSchemaAssetsExpression'])) {
+            return $this->_attributes['filterSchemaAssetsExpression'];
+        }
+
+        return null;
     }
 }

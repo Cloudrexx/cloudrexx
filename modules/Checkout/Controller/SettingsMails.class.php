@@ -75,9 +75,10 @@ class SettingsMails {
         $objResult = $this->objDatabase->Execute('SELECT `title`, `content` FROM `'.DBPREFIX.'module_checkout_settings_mails` WHERE `id`=1');
 
         if ($objResult) {
-            $arrAdminMail['title'] = $objResult->fields['title'];
-            $arrAdminMail['content'] = $objResult->fields['content'];
-            return $arrAdminMail;
+            return array(
+                'title'   => $objResult->fields['title'],
+                'content' => $objResult->fields['content'],
+            );
         } else {
             return false;
         }
@@ -93,9 +94,10 @@ class SettingsMails {
         $objResult = $this->objDatabase->Execute('SELECT `title`, `content` FROM `'.DBPREFIX.'module_checkout_settings_mails` WHERE `id`=2');
 
         if ($objResult) {
-            $arrCustomerMail['title'] = $objResult->fields['title'];
-            $arrCustomerMail['content'] = $objResult->fields['content'];
-            return $arrCustomerMail;
+            return array(
+                'title'   => $objResult->fields['title'],
+                'content' => $objResult->fields['content'],
+            );
         } else {
             return false;
         }

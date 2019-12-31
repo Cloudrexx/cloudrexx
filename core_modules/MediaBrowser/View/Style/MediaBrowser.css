@@ -3,8 +3,8 @@
 }
 
 .uploader-modal .modal-title, .media-browser-modal-window .modal-title {
-    color:#fff;
-    clear:none;
+    color: #fff;
+    clear: none;
     text-transform: none;
 }
 
@@ -365,7 +365,7 @@
 }
 
 .uploader-modal .popover.right, .media-browser-modal-window .popover.right {
-    margin-left: 40px;
+    margin-left: -100px;
 }
 
 .uploader-modal .popover.right > .arrow, .media-browser-modal-window .popover.right > .arrow {
@@ -496,7 +496,8 @@ select.input-sm {
     line-height: 30px;
 }
 
-textarea.input-sm, select[multiple].input-sm, {
+textarea.input-sm,
+select[multiple].input-sm {
     height: auto;
 }
 
@@ -702,8 +703,8 @@ textarea.input-lg, select[multiple].input-lg {
 
 .btn-primary.active, .media-browser-modal-window .btn-primary.active,
 .btn-primary:active, .media-browser-modal-window .btn-primary:active,
-.btn-primary:focus,.media-browser-modal-window  .btn-primary:focus,
-.btn-primary:hover,.media-browser-modal-window .btn-primary:hover,
+.btn-primary:focus, .media-browser-modal-window .btn-primary:focus,
+.btn-primary:hover, .media-browser-modal-window .btn-primary:hover,
 .open .dropdown-toggle.btn-primary,
 .media-browser-modal-window .open .dropdown-toggle.btn-primary {
     color: #fff;
@@ -975,7 +976,7 @@ input[type=button].btn-block, input[type=button].btn-block, input[type=reset].bt
 .media-browser-modal-window .dropzoneText2,
 .media-browser-modal-window .icon-dropzone,
 .uploader-modal .icon-dropzone {
-    display: none\9;
+    display: none \9;
 }
 
 .uploader-modal .icon-upload, .media-browser-modal-window .icon-upload {
@@ -1150,7 +1151,7 @@ input[type=button].btn-block, input[type=button].btn-block, input[type=reset].bt
     vertical-align: top;
     display: inline-block;
     height: 585px;
-    float:none;
+    float: none;
 }
 
 .uploader-modal .mediaBrowserNavigation, .media-browser-modal-window .mediaBrowserNavigation {
@@ -1194,7 +1195,7 @@ input[type=button].btn-block, input[type=button].btn-block, input[type=reset].bt
 }
 
 .media-browser-modal-window .mediaBrowserNavigation select.loading {
-    display: none\9;
+    display: none \9;
 }
 
 .uploader-modal .mediaBrowserContent, .media-browser-modal-window .mediaBrowserContent {
@@ -1351,26 +1352,26 @@ input[type=button].btn-block, input[type=button].btn-block, input[type=reset].bt
     text-align: right;
 }
 
-.uploader-modal .mediaBrowserListCtrl, .media-browser-modal-window .mediaBrowserListCtrl, .uploader-modal .sitestructureCtrl, .media-browser-modal-window .sitestructureCtrl {
+.uploader-modal .FilebrowserCtrl, .media-browser-modal-window .FilebrowserCtrl, .uploader-modal .sitestructureCtrl, .media-browser-modal-window .sitestructureCtrl {
     overflow-y: scroll;
     height: 100%;
 }
 
-.uploader-modal .mediaBrowserListCtrl::-webkit-scrollbar, .media-browser-modal-window .mediaBrowserListCtrl::-webkit-scrollbar, .uploader-modal .sitestructureCtrl::-webkit-scrollbar, .media-browser-modal-window .sitestructureCtrl::-webkit-scrollbar {
+.uploader-modal .FilebrowserCtrl::-webkit-scrollbar, .media-browser-modal-window .FilebrowserCtrl::-webkit-scrollbar, .uploader-modal .sitestructureCtrl::-webkit-scrollbar, .media-browser-modal-window .sitestructureCtrl::-webkit-scrollbar {
     width: 10px;
     height: 10px;
 }
 
-.uploader-modal .mediaBrowserListCtrl::-webkit-scrollbar-track-piece, .media-browser-modal-window .mediaBrowserListCtrl::-webkit-scrollbar-track-piece, .uploader-modal .sitestructureCtrl::-webkit-scrollbar-track-piece, .media-browser-modal-window .sitestructureCtrl::-webkit-scrollbar-track-piece {
+.uploader-modal .FilebrowserCtrl::-webkit-scrollbar-track-piece, .media-browser-modal-window .FilebrowserCtrl::-webkit-scrollbar-track-piece, .uploader-modal .sitestructureCtrl::-webkit-scrollbar-track-piece, .media-browser-modal-window .sitestructureCtrl::-webkit-scrollbar-track-piece {
     background-color: #fff;
 }
 
-.uploader-modal .mediaBrowserListCtrl::-webkit-scrollbar-thumb:vertical, .media-browser-modal-window .mediaBrowserListCtrl::-webkit-scrollbar-thumb:vertical, .uploader-modal .sitestructureCtrl::-webkit-scrollbar-thumb:vertical, .media-browser-modal-window .sitestructureCtrl::-webkit-scrollbar-thumb:vertical {
+.uploader-modal .FilebrowserCtrl::-webkit-scrollbar-thumb:vertical, .media-browser-modal-window .FilebrowserCtrl::-webkit-scrollbar-thumb:vertical, .uploader-modal .sitestructureCtrl::-webkit-scrollbar-thumb:vertical, .media-browser-modal-window .sitestructureCtrl::-webkit-scrollbar-thumb:vertical {
     height: 10px;
     background-color: #666;
 }
 
-.uploader-modal .mediaBrowserListCtrl::-webkit-scrollbar-thumb:horizontal, .media-browser-modal-window .mediaBrowserListCtrl::-webkit-scrollbar-thumb:horizontal, .uploader-modal .sitestructureCtrl::-webkit-scrollbar-thumb:horizontal, .media-browser-modal-window .sitestructureCtrl::-webkit-scrollbar-thumb:horizontal {
+.uploader-modal .FilebrowserCtrl::-webkit-scrollbar-thumb:horizontal, .media-browser-modal-window .FilebrowserCtrl::-webkit-scrollbar-thumb:horizontal, .uploader-modal .sitestructureCtrl::-webkit-scrollbar-thumb:horizontal, .media-browser-modal-window .sitestructureCtrl::-webkit-scrollbar-thumb:horizontal {
     width: 10px;
     background-color: #666;
 }
@@ -1431,7 +1432,7 @@ input[type=button].btn-block, input[type=button].btn-block, input[type=reset].bt
     margin-left: 5px;
 }
 
-.uploader-modal input#fileSearch, .media-browser-modal-window input#fileSearch {
+.uploader-modal input.searchterm, .media-browser-modal-window input.searchterm {
     margin-top: 20px;
     display: inline-block;
     width: 25%;
@@ -1447,7 +1448,7 @@ input[type=button].btn-block, input[type=button].btn-block, input[type=reset].bt
     font-family: inherit;
 }
 
-.uploader-modal input#fileSearch:focus, .media-browser-modal-window input#fileSearch:focus {
+.uploader-modal input.searchterm:focus, .media-browser-modal-window input.searchterm:focus {
     border-color: #0a85c8;
     outline: 0;
     box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
@@ -1578,7 +1579,7 @@ input[type=button].btn-block, input[type=button].btn-block, input[type=reset].bt
 
 .uploader-modal .file-list-wrapper,
 .uploader-modal .uploadControl {
-    will-change:height, max-height;
+    will-change: height, max-height;
 }
 
 .uploader-modal .table > thead > tr > th, .media-browser-modal-window .table > thead > tr > th, .uploader-modal .table > tbody > tr > th, .media-browser-modal-window .table > tbody > tr > th, .uploader-modal .table > tfoot > tr > th, .media-browser-modal-window .table > tfoot > tr > th, .uploader-modal .table > thead > tr > td, .media-browser-modal-window .table > thead > tr > td, .uploader-modal .table > tbody > tr > td, .media-browser-modal-window .table > tbody > tr > td, .uploader-modal .table > tfoot > tr > td, .media-browser-modal-window .table > tfoot > tr > td {
@@ -1811,8 +1812,8 @@ input[type=button].btn-block, input[type=button].btn-block, input[type=reset].bt
 }
 
 .uploader-modal .uploadControl {
-    max-height:0;
-    overflow:hidden;
+    max-height: 0;
+    overflow: hidden;
     -webkit-transition: 0.6s max-height ease-out, 0.6s height ease-out;
     -moz-transition: 0.6s max-height ease-out, 0.6s height ease-out;
     -ms-transition: 0.6s max-height ease-out, 0.6s height ease-out;
@@ -1821,8 +1822,8 @@ input[type=button].btn-block, input[type=button].btn-block, input[type=reset].bt
 }
 
 .uploader-modal .uploadControl.open {
-    max-height:2000px;
-    overflow:hidden;
+    max-height: 2000px;
+    overflow: hidden;
 }
 
 .uploader-modal .file-list-wrapper {
@@ -1994,7 +1995,7 @@ input[type=button].btn-block, input[type=button].btn-block, input[type=reset].bt
     overflow-y: scroll;
 }
 
-.media-browser-modal-window tr.data-row.files:hover {
+.media-browser-modal-window tr.data-row:hover {
     background-color: #E4E4E4;
 }
 
@@ -2007,8 +2008,7 @@ input[type=button].btn-block, input[type=button].btn-block, input[type=reset].bt
 }
 
 .media-browser-modal-window .btn-small,
-.uploader-modal .btn-small
-{
+.uploader-modal .btn-small {
     padding: 0 5px;
     font-size: 12px;
 }
@@ -2077,7 +2077,7 @@ input[type=button].btn-block, input[type=button].btn-block, input[type=reset].bt
     padding: 10px;
     right: 50%;
     width: 500px;
-    box-shadow: 0 5px 30px rgba(0,0,0,0.3);
+    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
     border-radius: 4px;
     opacity: 0;
     -webkit-transition: 0.5s all;
@@ -2098,7 +2098,7 @@ input[type=button].btn-block, input[type=button].btn-block, input[type=reset].bt
 
 .media-browser-modal-window .successfulUpload.finished {
     visibility: visible;
-    opacity:1;
+    opacity: 1;
 }
 
 .uploader-modal .media-browser-modal-backdrop, .media-browser-modal-window .media-browser-modal-backdrop {
@@ -2137,7 +2137,7 @@ input[type=button].btn-block, input[type=button].btn-block, input[type=reset].bt
     display: none;
 }
 
-.uploader-modal  .moxie-shim.moxie-shim-html5,
+.uploader-modal .moxie-shim.moxie-shim-html5,
 .media-browser-modal-window .moxie-shim.moxie-shim-html5 {
     z-index: 1;
 }

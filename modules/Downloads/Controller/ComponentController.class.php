@@ -35,21 +35,69 @@
  */
 
 namespace Cx\Modules\Downloads\Controller;
-use Cx\Modules\Downloads\Model\Event\DownloadsEventListener;
+
+/**
+ * Main controller for Downloads
+ *
+ * @copyright   Cloudrexx AG
+ * @author      Thomas Wirz <thomas.wirz@cloudrexx.com>
+ * @package     cloudrexx
+ * @subpackage  module_downloads
+ */
+class DownloadsInternalException extends \Exception {}
 
 /**
  * Main controller for Downloads
  *
  * @copyright   Cloudrexx AG
  * @author      Project Team SS4U <info@cloudrexx.com>
+ * @author      Thomas Wirz <thomas.wirz@cloudrexx.com>
  * @package     cloudrexx
  * @subpackage  module_downloads
  */
 class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentController {
-    public function getControllerClasses() {
-        // Return an empty array here to let the component handler know that there
-        // does not exist a backend, nor a frontend controller of this component.
-        return array();
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getControllerClasses()
+    {
+        return array('EsiWidget', 'JsonDownloads');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getControllersAccessableByJson()
+    {
+        return array('EsiWidgetController', 'JsonDownloadsController');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function adjustResponse(\Cx\Core\Routing\Model\Entity\Response $response)
+    {
+        $page = $response->getPage();
+        if (!$page || $page->getModule() !== $this->getName()) {
+            return;
+        }
+        $downloads = new Downloads('');
+        $downloads->getPage();
+        $pageTitle = $downloads->getPageTitle();
+
+        //Set the Page Title
+        if ($pageTitle) {
+            $page->setTitle($pageTitle);
+            $page->setContentTitle($pageTitle);
+            $page->setMetaTitle($pageTitle);
+        }
+
+        //Set the page metakeys
+        $metaKeys = $downloads->getMetaKeywords();
+        if ($metaKeys) {
+            $page->setMetakeys($metaKeys);
+        }
     }
 
      /**
@@ -63,13 +111,6 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             case \Cx\Core\Core\Controller\Cx::MODE_FRONTEND:
                 $objDownloadsModule = new Downloads(\Env::get('cx')->getPage()->getContent());
                 \Env::get('cx')->getPage()->setContent($objDownloadsModule->getPage());
-                $downloads_pagetitle = $objDownloadsModule->getPageTitle();
-                if ($downloads_pagetitle) {
-                    \Env::get('cx')->getPage()->setTitle($downloads_pagetitle);
-                    \Env::get('cx')->getPage()->setContentTitle($downloads_pagetitle);
-                    \Env::get('cx')->getPage()->setMetaTitle($downloads_pagetitle);
-                }
-
                 break;
 
             case \Cx\Core\Core\Controller\Cx::MODE_BACKEND:
@@ -84,62 +125,53 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 break;
         }
     }
+
     /**
-     * Do something before content is loaded from DB
-     *
-     * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
+     * {@inheritdoc}
      */
-    public function preContentLoad(\Cx\Core\ContentManager\Model\Entity\Page $page) {
-        global $arrMatches, $cl, $objDownloadLib, $downloadBlock, $matches, $objDownloadsModule, $themesPages, $page_template;
-        switch ($this->cx->getMode()) {
-            case \Cx\Core\Core\Controller\Cx::MODE_FRONTEND:
-                // Set download groups
-                if (preg_match_all('/{DOWNLOADS_GROUP_([0-9]+)}/', \Env::get('cx')->getPage()->getContent(), $arrMatches)) {
-                    /** @ignore */
-                    if ($cl->loadFile(ASCMS_MODULE_PATH.'/Downloads/Controller/DownloadsLibrary.class.php')) {
-                        $objDownloadLib = new DownloadsLibrary();
-                        $objDownloadLib->setGroups($arrMatches[1], \Env::get('cx')->getPage()->getContent());
-                    }
-                }
+    public function postInit(\Cx\Core\Core\Controller\Cx $cx)
+    {
+        // downloads group
+        $groups            = Group::getGroups();
+        $groupsPlaceholders = $groups->getGroupsPlaceholders();
+        $this->registerDownloadsWidgets($groupsPlaceholders, \Cx\Core_Modules\Widget\Model\Entity\EsiWidget::TYPE_PLACEHOLDER);
 
-                //--------------------------------------------------------
-                // Parse the download block 'downloads_category_#ID_list'
-                //--------------------------------------------------------
-                $content = $this->cx->getPage()->getContent();
-                $this->cx->getPage()->setContent($this->parseDownloadsForTemplate($content));
-                $themesPages['index']   = $this->parseDownloadsForTemplate($themesPages['index']);
-                $themesPages['sidebar'] = $this->parseDownloadsForTemplate($themesPages['sidebar']);
-                $page_template          = $this->parseDownloadsForTemplate($page_template);
-                break;
-
-            default:
-                break;
-        }
-
-
+        // downloads category list
+        $categoriesBlocks = Category::getCategoryWidgetNames();
+        $this->registerDownloadsWidgets($categoriesBlocks, \Cx\Core_Modules\Widget\Model\Entity\EsiWidget::TYPE_BLOCK);
     }
 
     /**
-     * Parse the downloads by category, used to replace downloads in template
+     * Register the downloads widgets
      *
-     * @param string $content  Template Content to parse
+     * @param array   $widgets widgets array
+     * @param string  $type Widget type
      *
-     * @return string
+     * @return null
      */
-    public function parseDownloadsForTemplate($content)
-    {
-        $downloadBlock = preg_replace_callback(
-            "/<!--\s+BEGIN\s+downloads_category_(\d+)_list\s+-->(.*)<!--\s+END\s+downloads_category_\g1_list\s+-->/s",
-            function($matches) {
-                \Env::get('init')->loadLanguageData('Downloads');
-                if (isset($matches[2])) {
-                    $downloads = new Downloads($matches[2], array('category' => $matches[1]));
-                    return $downloads->getPage();
-                }
-            },
-            $content
-        );
-        return $downloadBlock;
+    protected function registerDownloadsWidgets($widgets, $type) {
+
+        $pos = 0;
+        if (isset($_GET['pos'])) {
+            $pos = intval($_GET['pos']);
+        }
+        $widgetController = $this->getComponent('Widget');
+        foreach ($widgets as $widgetName) {
+            $widget = new \Cx\Core_Modules\Widget\Model\Entity\EsiWidget(
+                $this,
+                $widgetName,
+                $type,
+                '',
+                '',
+                array('pos' => $pos)
+            );
+            $widget->setEsiVariable(
+                \Cx\Core_Modules\Widget\Model\Entity\EsiWidget::ESI_VAR_ID_USER |
+                \Cx\Core_Modules\Widget\Model\Entity\EsiWidget::ESI_VAR_ID_THEME |
+                \Cx\Core_Modules\Widget\Model\Entity\EsiWidget::ESI_VAR_ID_CHANNEL
+            );
+            $widgetController->registerWidget($widget);
+        }
     }
 
     /**
@@ -153,8 +185,192 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      * $this->cx->getEvents()->addEventListener($eventName, $listener);
      */
     public function registerEventListeners() {
-        $eventListener = new DownloadsEventListener($this->cx);
-        $this->cx->getEvents()->addEventListener('mediasource.load', $eventListener);
+        $evm = $this->cx->getEvents();
+        $eventListener = new \Cx\Modules\Downloads\Model\Event\DownloadsEventListener($this->cx);
+        $evm->addEventListener('SearchFindContent', $eventListener);
+        $evm->addEventListener('mediasource.load', $eventListener);
+
+        // locale event listener
+        $localeLocaleEventListener = new \Cx\Modules\Downloads\Model\Event\LocaleLocaleEventListener($this->cx);
+        $evm->addModelListener('postPersist', 'Cx\\Core\\Locale\\Model\\Entity\\Locale', $localeLocaleEventListener);
+        $evm->addModelListener('preRemove', 'Cx\\Core\\Locale\\Model\\Entity\\Locale', $localeLocaleEventListener);
     }
 
+    /**
+     * Find Downloads by keyword $searchTerm and return them in a
+     * two-dimensional array compatible to be used by Search component.
+     *
+     * @param   string  $searchTerm The keyword to search by
+     * @return  array   Two-dimensional array of Downloads found by keyword
+     *                  $searchTerm.
+     *                  If integration into search component is disabled or
+     *                  no Download matched the giving keyword, then an
+     *                  empty array is retured.
+     */
+    public function getDownloadsForSearchComponent($searchTerm) {
+        $result = array();
+        $downloadLibrary = new DownloadsLibrary();
+        $config = $downloadLibrary->getSettings();
+        $download = new Download($config);
+
+        // abort in case downloads shall not be included into the global
+        // fulltext search component
+        if (!$config['integrate_into_search_component']) {
+            return array();
+        }
+
+        // check for valid published application page
+        $filter = null;
+        try {
+            $arrCategoryIds = $this->getCategoryFilterForSearchComponent();
+
+            // set category filter if we have to restrict search by
+            // any category IDs
+            if ($arrCategoryIds) {
+                $filter = array('category_id' => $arrCategoryIds);
+            }
+        } catch (DownloadsInternalException $e) {
+            return array();
+        }
+
+        // lookup downloads by given keyword
+        if (!$download->loadDownloads(
+            $filter,
+            $searchTerm,
+            null,
+            null,
+            null,
+            null,
+            $config['list_downloads_current_lang']
+        )) {
+            return array();
+        }
+
+        /**
+         * @ignore
+         */
+        \Env::get('ClassLoader')->loadFile(ASCMS_LIBRARY_PATH . '/PEAR/Download.php');
+
+        $langId = DownloadsLibrary::getOutputLocale()->getId();
+
+        while (!$download->EOF) {
+            try {
+                $url = DownloadsLibrary::getApplicationUrl(
+                    $download->getAssociatedCategoryIds()
+                );
+            } catch (DownloadsLibraryException $e) {
+                $download->next();
+                continue;
+            }
+
+            // determine link-behaviour
+            switch ($config['global_search_linking']) {
+                case HTTP_DOWNLOAD_INLINE:
+                case HTTP_DOWNLOAD_ATTACHMENT:
+                    $url->setParam('disposition', $config['global_search_linking']);
+                    $url->setParam('download', $download->getId());
+                    break;
+
+                case 'detail':
+                default:
+                    $url->setParam('id', $download->getId());
+                    break;
+            }
+
+            $result[] = array(
+                'Score'     => 100,
+                'Title'     => $download->getName($langId),
+                'Content'   => $download->getTrimmedDescription($langId),
+                'Link'      => (string) $url,
+                'Component' => $this->getName(),
+            );
+            $download->next();
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get published category IDs (as application pages)
+     *
+     *
+     * @return  array   List of published category IDs.
+     *                  An empty array is retured, in case an application 
+     *                  page is published that has no category restriction set
+     *                  through its CMD.
+     * @throws  DownloadsInternalException In case no application page of this
+     *                                  component is published
+     */
+    protected function getCategoryFilterForSearchComponent() {
+        \Cx\Core\Setting\Controller\Setting::init('Config', 'site','Yaml');
+        $coreListProtectedPages   = \Cx\Core\Setting\Controller\Setting::getValue('coreListProtectedPages','Config');
+        $searchVisibleContentOnly = \Cx\Core\Setting\Controller\Setting::getValue('searchVisibleContentOnly','Config');
+
+        // fetch data about existing application pages of this component
+        $cmds = array();
+        $em = $this->cx->getDb()->getEntityManager();
+        $pageRepo = $em->getRepository('Cx\Core\ContentManager\Model\Entity\Page');
+        $pages = $pageRepo->getAllFromModuleCmdByLang($this->getName());
+        foreach ($pages as $pagesOfLang) {
+            foreach ($pagesOfLang as $page) {
+                $cmds[] = $page->getCmd();
+            }
+        }
+
+        // check if an application page is published
+        $cmds = array_unique($cmds);
+        $arrCategoryIds = array();
+        foreach ($cmds as $cmd) {
+            // fetch application page with specific CMD from current locale
+            $page = $pageRepo->findOneByModuleCmdLang($this->getName(), $cmd, FRONTEND_LANG_ID);
+
+            // skip if page does not exist in current locale or has not been
+            // published
+            if (
+                !$page ||
+                !$page->isActive()
+            ) {
+                continue;
+            }
+
+            // skip invisible page (if excluded from search)
+            if (
+                $searchVisibleContentOnly == 'on' &&
+                !$page->isVisible()
+            ) {
+                continue;
+            }
+
+            // skip protected page (if excluded from search)
+            if (
+                $coreListProtectedPages == 'off' &&
+                $page->isFrontendProtected() &&
+                $this->getComponent('Session')->getSession() &&
+                !\Permission::checkAccess($page->getFrontendAccessId(), 'dynamic', true)
+            ) {
+                continue;
+            }
+
+            // in case the CMD is an integer, then
+            // the integer does represent an ID of category which has to be
+            // applied to the search filter
+            if (preg_match('/^\d+$/', $cmd)) {
+                $arrCategoryIds[] = $cmd;
+                continue;
+            }
+
+            // in case an application exists that has not set a category-ID as
+            // its CMD, then we do not have to restrict the search by one or
+            // more specific categories
+            return array();
+        }
+
+        // if we reached this point and no category-IDs have been fetched 
+        // then this means that no application is published
+        if (empty($arrCategoryIds)) {
+            throw new DownloadsInternalException('Application is not published');
+        }
+
+        return $arrCategoryIds;
+    }
 }

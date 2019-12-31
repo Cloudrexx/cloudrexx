@@ -96,6 +96,9 @@ class BlockLibrary
      */
     function __construct()
     {
+        if (\Cx\Core\Core\Controller\Cx::instanciate()->getMode() != \Cx\Core\Core\Controller\Cx::MODE_COMMAND) {
+            return;
+        }
     }
 
 
@@ -349,16 +352,14 @@ class BlockLibrary
                                                    content='".contrexx_raw2db($content)."',
                                                    active='".intval((isset($arrLangActive[$langId]) ? $arrLangActive[$langId] : 0))."'",
                                                   $blockId));
-            global $objCache;
-            $objCache->clearSsiCachePage(
+        }
+            \Cx\Core\Core\Controller\Cx::instanciate()->getComponent('Cache')->clearSsiCachePage(
                 'Block',
                 'getBlockContent',
                 array(
                     'block' => $blockId,
-                    'lang' => \FWLanguage::getLanguageCodeById($langId),
                 )
             );
-        }
 
         $objDatabase->Execute("DELETE FROM ".DBPREFIX."module_block_rel_lang_content WHERE block_id=".$blockId." AND lang_id NOT IN (".join(',', array_map('intval', array_keys($arrLangActive))).")");
     }
@@ -672,13 +673,34 @@ class BlockLibrary
     * @global ADONewConnection
     * @global integer
     */
-    function _setBlock($id, &$code, $pageId)
+    function _setBlock($id, &$code, $pageId = 0)
     {
-        if (!$this->checkTargetingOptions($id)) {
-            return;
-        }
-
         $now = time();
+
+        $activeFilter = '
+            AND (
+                tblBlock.`start` <= ' . $now . '
+                OR tblBlock.`start` = 0
+            )
+            AND (
+                tblBlock.`end` >= ' . $now . '
+                OR tblBlock.end = 0
+            )
+            AND
+                tblBlock.active = 1
+        ';
+        // Note: This is a workaround as content panes are no real widgets yet.
+        //
+        // In case the frontend editing is not in use
+        // then we can always load the content pane.
+        // The JsonData adapter will then decide if the content pane is active or not.
+        // The check for frontend editing is required, as otherwise the frontend editing
+        // would inject an empty DIV element in  case the content pane is inactive.
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        if (!$cx->getComponent('FrontendEditing')->frontendEditingIsActive(false, false)) {
+            $activeFilter = '';
+        }
+        // End of workaround
 
         $this->replaceBlocks(
             $this->blockNamePrefix . $id,
@@ -706,18 +728,8 @@ class BlockLibrary
                     AND (
                         tblContent.lang_id = ' . FRONTEND_LANG_ID . '
                         AND tblContent.active = 1
-                    )
-                    AND (
-                        tblBlock.`start` <= ' . $now . '
-                        OR tblBlock.`start` = 0
-                    )
-                    AND (
-                        tblBlock.`end` >= ' . $now . '
-                        OR tblBlock.end = 0
-                    )
-                    AND
-                        tblBlock.active = 1
-            ',
+                    )' . $activeFilter,
+            $pageId,
             $code
         );
     }
@@ -734,12 +746,37 @@ class BlockLibrary
     * @global ADONewConnection
     * @global integer
     */
-    function _setCategoryBlock($id, &$code, $pageId)
+    function _setCategoryBlock($id, &$code, $pageId = 0)
     {
         $category = $this->_getCategory($id);
         $separator = $category['seperator'];
 
         $now = time();
+
+        $activeFilter = '
+            AND tblBlock.`active` = 1
+            AND (tblBlock.`start` <= ' . $now . ' OR tblBlock.`start` = 0)
+            AND (tblBlock.`end` >= ' . $now . ' OR tblBlock.`end` = 0)
+        ';
+        // Note: This is a workaround as content panes are no real widgets yet.
+        //
+        // In case the frontend editing is not in use and there
+        // is no content pane separator for the category defined,
+        // then we can load all content panes into the template at once.
+        // The JsonData adapter will then decide which content panes to display and
+        // which not.
+        // The check for frontend editing is required, as otherwise the frontend editing
+        // would inject empty DIV elements for non-active content panes.
+        // The check for the content pane separator is required, as otherwise
+        // the system would output the separator for each non-active content pane.
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        if (
+            !$cx->getComponent('FrontendEditing')->frontendEditingIsActive(false, false) &&
+            $separator == ''
+        ) {
+            $activeFilter = '';
+        }
+        // End of workaround
 
         $this->replaceBlocks(
             $this->blockNamePrefix . 'CAT_' . $id,
@@ -766,13 +803,12 @@ class BlockLibrary
                                 AND tblRel.`block_id` = tblBlock.`id`
                                 AND tblRel.`placeholder` = "category") > 0
                         )
-                    AND tblBlock.`active` = 1
-                    AND (tblBlock.`start` <= ' . $now . ' OR tblBlock.`start` = 0)
-                    AND (tblBlock.`end` >= ' . $now . ' OR tblBlock.`end` = 0)
+                    ' . $activeFilter . '
                     AND (tblContent.lang_id = ' . FRONTEND_LANG_ID . ' AND tblContent.active = 1)
                 ORDER BY
                     tblBlock.`order`
             ',
+            $pageId,
             $code,
             $separator
         );
@@ -789,7 +825,7 @@ class BlockLibrary
     * @global ADONewConnection
     * @global integer
     */
-    function _setBlockGlobal(&$code, $pageId)
+    function _setBlockGlobal(&$code, $pageId = 0)
     {
         global $objDatabase;
 
@@ -812,6 +848,37 @@ class BlockLibrary
         }
 
         $now = time();
+
+        $activeFilter = '
+            AND tblBlock.active = 1
+            AND (
+                tblBlock.`start` <= ' . $now . '
+                OR tblBlock.`start` = 0
+            )
+            AND (
+                tblBlock.`end` >= ' . $now . '
+                OR tblBlock.end = 0
+            )
+        ';
+        // Note: This is a workaround as content panes are no real widgets yet.
+        //
+        // In case the frontend editing is not in use and there
+        // is no content pane separator for the global content pane defined,
+        // then we can load all content panes into the template at once.
+        // The JsonData adapter will then decide which content panes to display and
+        // which not.
+        // The check for frontend editing is required, as otherwise the frontend editing
+        // would inject empty DIV elements for non-active content panes.
+        // The check for the content pane separator is required, as otherwise
+        // the system would output the separator for each non-active content pane.
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        if (
+            !$cx->getComponent('FrontendEditing')->frontendEditingIsActive(false, false) &&
+            $separator == ''
+        ) {
+            $activeFilter = '';
+        }
+        // End of workaround
         
         $this->replaceBlocks(
             $this->blockNamePrefix . 'GLOBAL',
@@ -835,16 +902,8 @@ class BlockLibrary
                     AND tblPage.page_id = ' . intval($pageId) . '
                     AND tblContent.`lang_id` = ' . FRONTEND_LANG_ID . '
                     AND tblContent.`active` = 1
-                    AND tblBlock.active = 1
                     AND tblPage.placeholder = "global"
-                    AND (
-                        tblBlock.`start` <= ' . $now . '
-                        OR tblBlock.`start` = 0
-                    )
-                    AND (
-                        tblBlock.`end` >= ' . $now . '
-                        OR tblBlock.end = 0
-                    )
+                    ' . $activeFilter . '
                 UNION DISTINCT
                     SELECT
                         tblBlock.`id` AS `id`,
@@ -860,18 +919,11 @@ class BlockLibrary
                         tblBlock.`global` = 1
                         AND tblContent.`lang_id` = ' . FRONTEND_LANG_ID . '
                         AND tblContent.`active` = 1
-                        AND tblBlock.active=1
-                        AND (
-                            tblBlock.`start` <= ' . $now . '
-                            OR tblBlock.`start` = 0
-                        )
-                        AND (
-                            tblBlock.`end` >= ' . $now . '
-                            OR tblBlock.end = 0
-                        )
+                        ' . $activeFilter . '
                 ORDER BY
                     `order`
             ',
+            $pageId,
             $code,
             $separator
         );
@@ -888,10 +940,15 @@ class BlockLibrary
     * @global ADONewConnection
     * @global integer
     */
-    function _setBlockRandom(&$code, $id)
+    function _setBlockRandom(&$code, $id, $pageId = 0)
     {
         global $objDatabase;
 
+        // Note: known issue:
+        // as content panes are not real widgets, the random block does not properly
+        // take into account if a content page is active or not
+        // Unfortunately, this issue can't be fixed with the current implementation
+        // This issue will be fixed once the content panes have been migrated to widgets
         $now = time();
         $query = "  SELECT
                         tblBlock.id
@@ -910,36 +967,27 @@ class BlockLibrary
         //Get Block Name and Status
         switch ($id) {
             case '1':
-                $objBlockName   = $objDatabase->Execute($query."AND tblBlock.random=1");
+                $query .= "AND tblBlock.random=1";
                 $blockNr        = "";
                 break;
             case '2':
-                $objBlockName   = $objDatabase->Execute($query."AND tblBlock.random_2=1");
+                $query .= "AND tblBlock.random_2=1";
                 $blockNr        = "_2";
                 break;
             case '3':
-                $objBlockName = $objDatabase->Execute($query."AND tblBlock.random_3=1");
+                $query .= "AND tblBlock.random_3=1";
                 $blockNr        = "_3";
                 break;
             case '4':
-                $objBlockName = $objDatabase->Execute($query."AND tblBlock.random_4=1");
+                $query .= "AND tblBlock.random_4=1";
                 $blockNr        = "_4";
                 break;
         }
 
-
-        if ($objBlockName === false || $objBlockName->RecordCount() <= 0) {
-            return;
-        }
-
-        while (!$objBlockName->EOF) {
-            $arrActiveBlocks[] = $objBlockName->fields['id'];
-            $objBlockName->MoveNext();
-        }
-
         $this->replaceBlocks(
             $this->blockNamePrefix . 'RANDOMIZER' . $blockNr,
-            'SELECT ' . implode(' AS id UNION SELECT ', $arrActiveBlocks),
+            $query,
+            $pageId,
             $code,
             '',
             true
@@ -948,30 +996,39 @@ class BlockLibrary
 
     /**
      * Replaces a placeholder with block content
-     * @param string $placeholerName Name of placeholder to replace
+     * @param string $placeholderName Name of placeholder to replace
      * @param string $query SQL query used to fetch blocks
+     * @param int $pageId ID of the current page, 0 if no page available
      * @param string $code (by reference) Code to replace placeholder in
      * @param string $separator (optional) Separator used to separate the blocks
      * @param boolean $randomize (optional) Wheter to randomize the blocks or not, default false
      */
-    protected function replaceBlocks($placeholderName, $query, &$code, $separator = '', $randomize = false) {
-        global $objDatabase, $objCache;
+    protected function replaceBlocks($placeholderName, $query, $pageId, &$code, $separator = '', $randomize = false) {
+        global $objDatabase;
 
         // find all block IDs to parse
         $objResult = $objDatabase->Execute($query);
         $blockIds = array();
         if ($objResult === false || $objResult->RecordCount() <= 0) {
+            // drop empty placeholders
+            $code = str_replace('{' . $placeholderName . '}', '', $code);
             return;
         }
         while(!$objResult->EOF) {
+            if (!$this->checkTargetingOptions($objResult->fields['id'])) {
+                $objResult->MoveNext();
+                continue;
+            }
             $blockIds[] = $objResult->fields['id'];
             $objResult->MoveNext();
         }
 
         // parse
-        $em = \Env::get('cx')->getDb()->getEntityManager();
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
         $systemComponentRepo = $em->getRepository('Cx\Core\Core\Model\Entity\SystemComponent');
         $frontendEditingComponent = $systemComponentRepo->findOneBy(array('name' => 'FrontendEditing'));
+        $settings = $this->getSettings();
 
         if ($randomize) {
             $esiBlockInfos = array();
@@ -982,10 +1039,11 @@ class BlockLibrary
                     array(
                         'block' => $blockId,
                         'lang' => \FWLanguage::getLanguageCodeById(FRONTEND_LANG_ID),
+                        'page' => $pageId,
                     )
                 );
             }
-            $blockContent = $objCache->getRandomizedEsiContent(
+            $blockContent = $cx->getComponent('Cache')->getRandomizedEsiContent(
                 $esiBlockInfos
             );
             $frontendEditingComponent->prepareBlock(
@@ -996,12 +1054,13 @@ class BlockLibrary
         } else {
             $contentList = array();
             foreach ($blockIds as $blockId) {
-                $blockContent = $objCache->getEsiContent(
+                $blockContent = $cx->getComponent('Cache')->getEsiContent(
                     'Block',
                     'getBlockContent',
                     array(
                         'block' => $blockId,
                         'lang' => \FWLanguage::getLanguageCodeById(FRONTEND_LANG_ID),
+                        'page' => $pageId,
                     )
                 );
                 $frontendEditingComponent->prepareBlock(
@@ -1012,7 +1071,48 @@ class BlockLibrary
             }
             $content = implode($separator, $contentList);
         }
+
+        if (!empty($settings['markParsedBlock'])) {
+            $content = "<!-- start $placeholderName -->$content<!-- end $placeholderName -->";
+        }
+
         $code = str_replace('{' . $placeholderName . '}', $content, $code);
+    }
+
+    /**
+     * Get the settings from database
+     *
+     * @staticvar array $settings settings array
+     *
+     * @return array settings array
+     */
+    public function getSettings()
+    {
+
+        static $settings = array();
+        if (!empty($settings)) {
+            return $settings;
+        }
+
+        $query = '
+            SELECT
+                `name`,
+                `value`
+            FROM
+                `'. DBPREFIX .'module_block_settings`';
+        $setting = \Cx\Core\Core\Controller\Cx::instanciate()
+                    ->getDb()
+                    ->getAdoDb()
+                    ->Execute($query);
+        if ($setting === false) {
+            return array();
+        }
+        while (!$setting->EOF) {
+            $settings[$setting->fields['name']] = $setting->fields['value'];
+            $setting->MoveNext();
+        }
+
+        return $settings;
     }
 
     /**

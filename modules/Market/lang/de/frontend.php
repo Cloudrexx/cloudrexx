@@ -94,4 +94,7 @@ $_ARRAYLANG['TXT_MARKET_LOCATION'] = "Standort";
 $_ARRAYLANG['TXT_MARKET_LOCATIONS'] = "Alle Standorte";
 $_ARRAYLANG['TXT_TYPE'] = "Typ";
 $_ARRAYLANG['TXT_MARKET_CHOOSE_FILE'] = 'Datei wählen';
+$_ARRAYLANG['TXT_MARKET_CONFIRM_TERMS'] = "Bitte bestätigen Sie die Allgemeinen Geschäftsbedingungen";
+$_ARRAYLANG['TXT_MARKET_TERMS'] = "Allgemeine Geschäftsbedingungen";
+$_ARRAYLANG['TXT_MARKET_CONFIRM_TERMS_LABEL'] = "AGB gelesen";
 ?>

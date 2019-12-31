@@ -105,6 +105,14 @@ class MailTemplate
      * Class constant for the mail template inline Text key
      */
     const TEXT_INLINE = 'core_mail_template_inline';
+    /**
+     * Class constant for Attach dynamic PDF-document Text key
+     */
+    const TEXT_ATTACH_PDF = 'core_mail_template_attach_pdf';
+    /**
+     * Class constant for PDF template id Text key
+     */
+    const TEXT_PDF_TEMPLATE = 'core_mail_template_pdf_template';
 
     /**
      * The module ID used when init() was called
@@ -139,6 +147,8 @@ class MailTemplate
         'protected'    => false,
         'html'         => false,
         'available'    => false,
+        'attach_pdf'   => false,
+        'pdf_template' => null,
     );
 
     private static $text = array(
@@ -154,6 +164,8 @@ class MailTemplate
         'message_html' => self::TEXT_MESSAGE_HTML,
         'attachments' => self::TEXT_ATTACHMENTS,
         'inline' => self::TEXT_INLINE,
+        'attach_pdf'   => self::TEXT_ATTACH_PDF,
+        'pdf_template' => self::TEXT_PDF_TEMPLATE
     );
 
     /**
@@ -241,6 +253,8 @@ die("MailTemplate::init(): Empty section!");
                     'message_html' => self::TEXT_MESSAGE_HTML,
                     'attachments' => self::TEXT_ATTACHMENTS,
                     'inline' => self::TEXT_INLINE,
+                    'attach_pdf'   => self::TEXT_ATTACH_PDF,
+                    'pdf_template' => self::TEXT_PDF_TEMPLATE,
                 ));
             $query_from = "
                   FROM `".DBPREFIX."core_mail_template` AS `mail`".
@@ -338,6 +352,28 @@ die("MailTemplate::init(): Empty section!");
                         $text_id, $section, self::TEXT_INLINE)->content();
                     if ($strInline) $available = false;
                 }
+                $strAttachPdf = $objResult->fields['attach_pdf'];
+                if ($strAttachPdf === null) {
+                    $strAttachPdf = \Text::getById(
+                        $text_id,
+                        $section,
+                        self::TEXT_ATTACH_PDF
+                    )->content();
+                    if ($strAttachPdf) {
+                        $available = false;
+                    }
+                }
+                $strPdfTplId = $objResult->fields['pdf_template'];
+                if ($strPdfTplId === null) {
+                    $strPdfTplId = \Text::getById(
+                        $text_id,
+                        $section,
+                        self::TEXT_PDF_TEMPLATE
+                    )->content();
+                    if ($strPdfTplId) {
+                        $available = false;
+                    }
+                }
 // TODO: Hard to decide which should be mandatory, as any of them may
 // be filled in "just in time". -- Time will tell.
 //                if (   $strName == ''
@@ -373,6 +409,8 @@ die("MailTemplate::init(): Empty section!");
                     'attachments'  => eval("$strAttachments;"),
                     'inline'       => eval("$strInline;"),
                     'available'    => $available,
+                    'attach_pdf'   => $strAttachPdf,
+                    'pdf_template' => $strPdfTplId,
                 );
                 $objResult->MoveNext();
             }
@@ -508,23 +546,9 @@ die("MailTemplate::init(): Empty section!");
     {
         global $_CONFIG; //, $_CORELANG;
 
-        if (!\Env::get('ClassLoader')->loadFile(ASCMS_LIBRARY_PATH.'/phpmailer/class.phpmailer.php')) {
-\DBG::log("MailTemplate::send(): ERROR: Failed to load phpMailer");
-            return false;
-        }
-        $objMail = new \phpmailer();
-        if (   !empty($_CONFIG['coreSmtpServer'])
-            && \Env::get('ClassLoader')->loadFile(ASCMS_CORE_PATH.'/SmtpSettings.class.php')) {
-            $arrSmtp = \SmtpSettings::getSmtpAccount($_CONFIG['coreSmtpServer']);
-            if ($arrSmtp) {
-                $objMail->IsSMTP();
-                $objMail->SMTPAuth = true;
-                $objMail->Host     = $arrSmtp['hostname'];
-                $objMail->Port     = $arrSmtp['port'];
-                $objMail->Username = $arrSmtp['username'];
-                $objMail->Password = $arrSmtp['password'];
-            }
-        }
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $objMail = new \Cx\Core\MailTemplate\Model\Entity\Mail();
+
         if (empty($arrField['lang_id'])) {
             $arrField['lang_id'] = FRONTEND_LANG_ID;
         }
@@ -582,6 +606,17 @@ die("MailTemplate::init(): Empty section!");
             }
             if ($strip) self::clearEmptyPlaceholders($value);
         }
+        if ($arrTemplate['attach_pdf'] && isset($arrTemplate['pdf_template'])) {
+            $pdf = $cx->getComponent('Pdf');
+            if ($pdf) {
+                $pdfAttachment = $pdf->generatePDF(
+                    $arrTemplate['pdf_template'],
+                    $substitution,
+                    $arrTemplate['key'],
+                    true
+                );
+            }
+        }
 //DBG::log("MailTemplate::send(): Substituted: ".var_export($arrTemplate, true));
 //echo("MailTemplate::send(): Substituted:<br /><pre>".nl2br(htmlentities(var_export($arrTemplate, true), ENT_QUOTES, CONTREXX_CHARSET))."</PRE><hr />");
 //die();//return true;
@@ -603,7 +638,6 @@ die("MailTemplate::init(): Empty section!");
 
         $objMail->SetFrom($arrTemplate['from'], $arrTemplate['sender']);
         $objMail->Subject = $arrTemplate['subject'];
-        $objMail->CharSet = CONTREXX_CHARSET;
 //        $objMail->IsHTML(false);
         if ($arrTemplate['html']) {
             $objMail->IsHTML(true);
@@ -628,6 +662,10 @@ die("MailTemplate::init(): Empty section!");
         // Applicable to attachments stored with the MailTemplate only!
         $arrTemplate['attachments'] =
             self::attachmentsToArray($arrTemplate['attachments']);
+        if (isset($pdfAttachment)) {
+            $arrTemplate['attachments'][$pdfAttachment['filePath']] =
+                $pdfAttachment['fileName'];
+        }
 //DBG::log("MailTemplate::send(): Template Attachments: ".var_export($arrTemplate['attachments'], true));
         // Now the MailTemplates' attachments index is guaranteed to
         // contain an array.
@@ -644,25 +682,24 @@ die("MailTemplate::init(): Empty section!");
 //DBG::log("MailTemplate::send(): All Attachments: ".var_export($arrTemplate['attachments'], true));
         foreach ($arrTemplate['attachments'] as $path => $name) {
             if (is_numeric($path)) $path = $name;
-            $objMail->AddAttachment(ASCMS_DOCUMENT_ROOT.'/'.$path, $name);
+            $objMail->AddAttachment($cx->getWebsiteDocumentRootPath().'/'.$path, $name);
         }
         $arrTemplate['inline'] =
             self::attachmentsToArray($arrTemplate['inline']);
         if ($arrTemplate['inline']) $arrTemplate['html'] = true;
         foreach ($arrTemplate['inline'] as $path => $name) {
             if (is_numeric($path)) $path = $name;
-            $objMail->AddEmbeddedImage(ASCMS_DOCUMENT_ROOT.'/'.$path, uniqid(), $name);
+            $objMail->AddEmbeddedImage($cx->getWebsiteDocumentRootPath().'/'.$path, uniqid(), $name);
         }
         if (   isset($arrField['inline'])
             && is_array($arrField['inline'])) {
             $arrTemplate['html'] = true;
             foreach ($arrField['inline'] as $path => $name) {
                 if (is_numeric($path)) $path = $name;
-                $objMail->AddEmbeddedImage(ASCMS_DOCUMENT_ROOT.'/'.$path, uniqid(), $name);
+                $objMail->AddEmbeddedImage($cx->getWebsiteDocumentRootPath().'/'.$path, uniqid(), $name);
             }
         }
 //die("MailTemplate::send(): Attachments and inlines<br />".var_export($objMail, true));
-        $objMail->CharSet = CONTREXX_CHARSET;
         $objMail->IsHTML($arrTemplate['html']);
 //DBG::log("MailTemplate::send(): Sending: ".nl2br(htmlentities(var_export($objMail, true), ENT_QUOTES, CONTREXX_CHARSET))."<br />Sending...<hr />");
         $result = true;
@@ -906,7 +943,7 @@ die("MailTemplate::init(): Empty section!");
              WHERE `key`='".addslashes($key)."'")) {
             return \Message::error($_CORELANG['TXT_CORE_MAILTEMPLATE_DELETING_FAILED']);
         }
-        $objDatabase->Execute("OPTIMIZE TABLE `".DBPREFIX."core_mail_template`");
+
         return \Message::ok($_CORELANG['TXT_CORE_MAILTEMPLATE_DELETED_SUCCESSFULLY']);
     }
 
@@ -1185,8 +1222,7 @@ die("MailTemplate::init(): Empty section!");
                     : $_CORELANG['TXT_CORE_MAILTEMPLATE_NEW']);
                 $icon =
                     '<a href="'.
-                        CONTREXX_DIRECTORY_INDEX.
-                        "?cmd=$section&amp;act=".$act.
+                        $uri_edit.
                         '&amp;key='.$key.
                         '&amp;userFrontendLangId='.$lang_id.'"'.
                     ' title="'.$title.'">'.
@@ -1215,13 +1251,17 @@ die("MailTemplate::init(): Empty section!");
      * @param   string    $act          The action of the mail template
      * @return  \Cx\Core\Html\Sigma     The template object
      */
-    static function edit($section, $key='', $useDefaultActs = true, $act = 'mailtemplate_overview')
-    {
+    static function edit(
+        $section,
+        $key = '',
+        $useDefaultActs = true,
+        $act = 'mailtemplate_overview'
+    ) {
         global $_CORELANG;
 
         // If the $key parameter is empty, check the request
-        if (empty($key)) {
-            if (isset($_REQUEST['key'])) $key = $_REQUEST['key'];
+        if (empty($key) && isset($_REQUEST['key'])) {
+            $key = $_REQUEST['key'];
         }
         // Try to load an existing template for any non-empty key
         $arrTemplate = null;
@@ -1239,45 +1279,59 @@ die("MailTemplate::init(): Empty section!");
             $arrTemplate['key'] = '';
             $new = true;
         }
-        $objTemplate = new \Cx\Core\Html\Sigma(\Env::get('cx')->getCodeBaseCorePath().'/MailTemplate/View/Template/Generic');
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $objTemplate = new \Cx\Core\Html\Sigma(
+            $cx->getCodeBaseCorePath() . '/MailTemplate/View/Template/Generic'
+        );
         $objTemplate->setErrorHandling(PEAR_ERROR_DIE);
         \Cx\Core\Csrf\Controller\Csrf::add_placeholder($objTemplate);
-        if (!$objTemplate->loadTemplateFile('Edit.html'))
+        if (!$objTemplate->loadTemplateFile('Edit.html')) {
             die("Failed to load template Edit.html");
+        }
         $uri = \Html::getRelativeUri_entities();
         \Html::stripUriParam($uri, 'key');
         $uriAppendix = '';
         if ($useDefaultActs) {
             \Html::stripUriParam($uri, 'act');
-            $uriAppendix = '&amp;act='.$act;
+            $uriAppendix = '&amp;act=' . $act;
         }
         $tab_index = \Cx\Core\Setting\Controller\Setting::tab_index();
-        \Html::replaceUriParameter($uri, 'active_tab='.$tab_index);
-        \Html::replaceUriParameter($uri, 'userFrontendLangId='.FRONTEND_LANG_ID);
+        \Html::replaceUriParameter($uri, 'active_tab=' . $tab_index);
+        \Html::replaceUriParameter(
+            $uri,
+            'userFrontendLangId=' . FRONTEND_LANG_ID
+        );
         $objTemplate->setGlobalVariable(
-            $_CORELANG
-          + array(
-            'CORE_MAILTEMPLATE_EDIT_TITLE' => ($new
-                ? $_CORELANG['TXT_CORE_MAILTEMPLATE_ADD']
-                : $_CORELANG['TXT_CORE_MAILTEMPLATE_EDIT']),
-            'CORE_MAILTEMPLATE_CMD' =>
-                (isset($_REQUEST['cmd']) ? $_REQUEST['cmd'] : ''),
-            'CORE_MAILTEMPLATE_ACTIVE_TAB' => $tab_index,
-            'URI_BASE' => $uri.$uriAppendix,
-        ));
+            $_CORELANG + array(
+                'CORE_MAILTEMPLATE_EDIT_TITLE' => (
+                    $new
+                    ? $_CORELANG['TXT_CORE_MAILTEMPLATE_ADD']
+                    : $_CORELANG['TXT_CORE_MAILTEMPLATE_EDIT']
+                ),
+                'CORE_MAILTEMPLATE_CMD'        =>
+                    (isset($_REQUEST['cmd']) ? $_REQUEST['cmd'] : ''),
+                'CORE_MAILTEMPLATE_ACTIVE_TAB' => $tab_index,
+                'URI_BASE'                     => $uri . $uriAppendix,
+            )
+        );
 
         $i = 0;
         foreach ($arrTemplate as $name => $value) {
             // See if there is a posted parameter value
-            if (isset($_POST[$name])) $value = $_POST[$name];
+            if (isset($_POST[$name])) {
+                $value = $_POST[$name];
+            }
 
             // IDs are set up as hidden fields.
             // They *MUST NOT* be edited!
             if (preg_match('/(?:_id)$/', $name)) {
                 // For copies, IDs *MUST NOT* be reused!
-                if (isset($_REQUEST['copy'])) $value = 0;
+                if (isset($_REQUEST['copy'])) {
+                    $value = 0;
+                }
                 $objTemplate->setVariable(
-                    'MAILTEMPLATE_HIDDEN', \Html::getHidden($name, $value)
+                    'MAILTEMPLATE_HIDDEN',
+                    \Html::getHidden($name, $value)
                 );
                 $objTemplate->parse('core_mailtemplate_hidden');
                 continue;
@@ -1288,123 +1342,196 @@ die("MailTemplate::init(): Empty section!");
             $attribute = '';
 //            $arrMimetype = '';
             switch ($name) {
-              case 'available':
-                continue 2;
-
-/*
-TODO: WARNING: FCKEditor v2.x f***s up the blocks in the mail template!
-Use plain text areas instead.  See below.
-*/
-              case 'message_html':
-                // Show WYSIWYG only if HTML is enabled
-                if (empty($arrTemplate['html']))
+                case 'available':
                     continue 2;
-                $objTemplate->setVariable(array(
-                    'MAILTEMPLATE_ROWCLASS' => (++$i % 2 + 1),
-                    'MAILTEMPLATE_SPECIAL' => $_CORELANG['TXT_CORE_MAILTEMPLATE_'.strtoupper($name)],
-                ));
-                $objTemplate->touchBlock('core_mailtemplate_special');
-                $objTemplate->parse('core_mailtemplate_special');
-                $objTemplate->setVariable(array(
-                    'MAILTEMPLATE_ROWCLASS' => (++$i % 2 + 1),
-                    'MAILTEMPLATE_SPECIAL' => new \Cx\Core\Wysiwyg\Wysiwyg($name, $value, 'fullpage'),
-                ));
-                $objTemplate->touchBlock('core_mailtemplate_special');
-                $objTemplate->parse('core_mailtemplate_special');
-                continue 2;
+
+                /*
+                  TODO: WARNING: FCKEditor v2.x f***s up the blocks in the mail template!
+                  Use plain text areas instead.  See below.
+                 */
+                case 'message_html':
+                    // Show WYSIWYG only if HTML is enabled
+                    if (empty($arrTemplate['html']))
+                        continue 2;
+                    $objTemplate->setVariable(array(
+                        'MAILTEMPLATE_ROWCLASS' => ( ++$i % 2 + 1),
+                        'MAILTEMPLATE_SPECIAL'  => $_CORELANG[
+                            'TXT_CORE_MAILTEMPLATE_' . strtoupper($name)
+                        ],
+                    ));
+                    $objTemplate->touchBlock('core_mailtemplate_special');
+                    $objTemplate->parse('core_mailtemplate_special');
+                    $objTemplate->setVariable(array(
+                        'MAILTEMPLATE_ROWCLASS' => ( ++$i % 2 + 1),
+                        'MAILTEMPLATE_SPECIAL' => new \Cx\Core\Wysiwyg\Wysiwyg(
+                            $name,
+                            contrexx_raw2xhtml($value),
+                            'fullpage'
+                        ),
+                    ));
+                    $objTemplate->touchBlock('core_mailtemplate_special');
+                    $objTemplate->parse('core_mailtemplate_special');
+                    continue 2;
                 //$objTemplate->replaceBlock('core_mailtemplate_special', '', true);
 //              case 'message_html':
-              case 'message':
-                $input =
-                    \Html::getTextarea($name, $value, '', 10,
-                        'style="width: 600px;"');
-                break;
-
-              case 'protected':
-                $attribute = \Html::ATTRIBUTE_DISABLED;
-                $input = \Html::getCheckbox($name, 1, '', $value, '', $attribute);
-                break;
-              case 'html':
-                $input =
-                    \Html::getCheckbox($name, 1, '', $value, '', $attribute).
-                    '&nbsp;'.
+                case 'message':
+                    $input = \Html::getTextarea(
+                        $name,
+                        $value,
+                        '',
+                        10,
+                        'style="width: 600px;"'
+                    );
+                    break;
+                case 'protected':
+                    $input = \Html::getCheckbox(
+                        $name,
+                        1,
+                        '',
+                        $value,
+                        '',
+                        \Html::ATTRIBUTE_DISABLED
+                    );
+                    break;
+                case 'attach_pdf':
+                    \JS::registerCode('
+                        jQuery(document).ready(function() {
+                            showOrHidePdfTpl();
+                        });
+                        function showOrHidePdfTpl() {
+                            var that = jQuery("select[name=pdf_template]")
+                                .closest("tr");
+                            that.hide();
+                            if (jQuery("input[name=attach_pdf]").is(":checked")) {
+                                that.show();
+                            }
+                        }
+                    ');
+                    $input = \Html::getCheckbox(
+                        $name,
+                        1,
+                        '',
+                        $value,
+                        'showOrHidePdfTpl();',
+                        $attribute
+                    );
+                    break;
+                case 'pdf_template':
+                    $arrOptions = $cx->getComponent('Pdf')->getPdfTemplates();
+                    $input      = \Html::getSelect(
+                        $name,
+                        $arrOptions,
+                        $value,
+                        false,
+                        '',
+                        'style="width:300px;"'
+                    );
+                    break;
+                case 'html':
+                    $input = \Html::getCheckbox(
+                        $name,
+                        1,
+                        '',
+                        $value,
+                        '',
+                        $attribute
+                    ) . '&nbsp;' .
                     $_CORELANG['TXT_CORE_MAILTEMPLATE_STORE_TO_SWITCH_EDITOR'];
-                break;
+                    break;
 
-              case 'inline':
-              case 'attachments':
-                continue 2;
+                case 'inline':
+                case 'attachments':
+                    continue 2;
 // TODO: These do not work properly yet
-/*
-              // These are identical except for the MIME types
-              case 'inline':
-                $arrMimetype = \Filetype::getImageMimetypes();
-              case 'attachments':
-                $arrAttachments = self::attachmentsToArray($arrTemplate[$name]);
-                // Show at least one empty attachment/inline row
-                if (empty($arrAttachments))
-                    $arrAttachments = array(array('path' => '', ), );
-                $i = 0;
-                foreach ($arrAttachments as $arrAttachment) {
-                    $div_id = $name.'-'.(++$i);
-                    $element_name = $name.'['.$i.']';
-                    $input .=
-                        '<div id="'.$div_id.'">'.
-                          \Html::getHidden(
-                              $element_name.'[old]', $arrAttachment['path'],
-                              $name.'-hidden-'.$i).
-                          $arrAttachment['path'].'&nbsp;'.
-                          $_CORELANG['TXT_CORE_MAILTEMPLATE_ATTACHMENT_UPLOAD'].
-                          \Html::getInputFileupload(
-                              $element_name.'[new]', $name.'-file-'.$i,
-                              \Filetype::MAXIMUM_UPLOAD_FILE_SIZE,
-                              $arrMimetype).
-                          // Links for adding/removing inputs
-                          \Html::getRemoveAddLinks($div_id).
-                        '</div>';
-                }
-//echo("$name => ".htmlentities($input)."<hr />");
-                break;
-*/
+                /*
+                  // These are identical except for the MIME types
+                  case 'inline':
+                  $arrMimetype = \Filetype::getImageMimetypes();
+                  case 'attachments':
+                  $arrAttachments = self::attachmentsToArray($arrTemplate[$name]);
+                  // Show at least one empty attachment/inline row
+                  if (empty($arrAttachments))
+                  $arrAttachments = array(array('path' => '', ), );
+                  $i = 0;
+                  foreach ($arrAttachments as $arrAttachment) {
+                  $div_id = $name.'-'.(++$i);
+                  $element_name = $name.'['.$i.']';
+                  $input .=
+                  '<div id="'.$div_id.'">'.
+                  \Html::getHidden(
+                  $element_name.'[old]', $arrAttachment['path'],
+                  $name.'-hidden-'.$i).
+                  $arrAttachment['path'].'&nbsp;'.
+                  $_CORELANG['TXT_CORE_MAILTEMPLATE_ATTACHMENT_UPLOAD'].
+                  \Html::getInputFileupload(
+                  $element_name.'[new]', $name.'-file-'.$i,
+                  \Filetype::MAXIMUM_UPLOAD_FILE_SIZE,
+                  $arrMimetype).
+                  // Links for adding/removing inputs
+                  \Html::getRemoveAddLinks($div_id).
+                  '</div>';
+                  }
+                  //echo("$name => ".htmlentities($input)."<hr />");
+                  break;
+                 */
 
-              // Once the key is defined, it cannot be changed.
-              // To fix a wrong key, copy the old template and enter a new key,
-              // then delete the old one.
-              case 'key':
-                $input = ($arrTemplate['key']
-                    ? $value.\Html::getHidden($name, $value)
-                    : \Html::getInputText($name, $value, '', 'style="width: 300px;"'));
+                // Once the key is defined, it cannot be changed.
+                // To fix a wrong key, copy the old template and enter a new key,
+                // then delete the old one.
+                case 'key':
+                    $input = (
+                        $arrTemplate['key']
+                        ? $value . \Html::getHidden($name, $value)
+                        : \Html::getInputText(
+                              $name,
+                              $value,
+                              '',
+                              'style="width: 300px;"'
+                          )
+                    );
 //echo("Key /$key/ -> attr $attribute<br />");
-                break;
+                    break;
 
-              default:
-                $input = \Html::getInputText(
-                    $name, $value, '', 'style="width: 300px;"');
+                default:
+                    $input = \Html::getInputText(
+                        $name,
+                        $value,
+                        '',
+                        'style="width: 300px;"'
+                    );
             }
             $name_upper = strtoupper($name);
             $objTemplate->setVariable(array(
-                'MAILTEMPLATE_ROWCLASS' => (++$i % 2 + 1),
-                'MAILTEMPLATE_NAME' =>
-                    $_CORELANG['TXT_CORE_MAILTEMPLATE_'.$name_upper],
-                'MAILTEMPLATE_VALUE' => $input,
+                'MAILTEMPLATE_ROWCLASS' => ( ++$i % 2 + 1),
+                'MAILTEMPLATE_NAME'     =>
+                $_CORELANG['TXT_CORE_MAILTEMPLATE_' . $name_upper],
+                'MAILTEMPLATE_VALUE'    => $input,
             ));
             // Add note with helpful hints, if available
-            if (isset($_CORELANG['TXT_CORE_MAILTEMPLATE_NOTE_'.$name_upper])) {
-                $objTemplate->setVariable('MAILTEMPLATE_VALUE_NOTE',
-                    $_CORELANG['TXT_CORE_MAILTEMPLATE_NOTE_'.$name_upper]);
+            if (isset($_CORELANG['TXT_CORE_MAILTEMPLATE_NOTE_' . $name_upper])) {
+                $objTemplate->setVariable(
+                    'MAILTEMPLATE_VALUE_NOTE',
+                    $_CORELANG['TXT_CORE_MAILTEMPLATE_NOTE_' . $name_upper]
+                );
             }
             $objTemplate->parse('core_mailtemplate_row');
         }
 
         // Send the (possibly edited and now stored) mail, if requested
-        if (empty($_POST['to_test'])) return $objTemplate;
+        if (empty($_POST['to_test'])) {
+            return $objTemplate;
+        }
         if (empty($key)) {
             \Message::error($_CORELANG['TXT_CORE_MAILTEMPLATE_ERROR_NO_KEY']);
             return $objTemplate;
         }
         $to_test = contrexx_input2raw($_POST['to_test']);
-        $objTemplate->setVariable('CORE_MAILTEMPLATE_TO_TEST', $to_test);
-        self::sendTestMail($section, $key, $to_test);
+        $objTemplate->setVariable(array(
+            'CORE_MAILTEMPLATE_TO_TEST' => $to_test,
+            'TXT_CORE_MAILTEMPLATE_TESTMAIL_NOTE' => $_CORELANG[
+                'TXT_CORE_MAILTEMPLATE_TESTMAIL_NOTE'
+            ],
+        ));
         return $objTemplate;
     }
 
@@ -1413,10 +1540,24 @@ Use plain text areas instead.  See below.
 
         if (empty($email)) return;
 
+        // try to load "from" and use it if it contains no placeholder
+        $from = '';
+        $template = static::get($section, $key);
+        if (
+            $template &&
+            isset($template['from']) &&
+            !preg_match('/\[.*\]/', $template['from'])
+        ) {
+            $from = $template['from'];
+        }
+
         $sent = self::send(array(
             'section' => $section,
             'key' => $key,
             'to' => $email,
+            'from' => $from,
+            'cc' => '',
+            'bcc' => '',
             'do_not_strip_empty_placeholders' => true, ));
         if ($sent) {
             \Message::ok(sprintf(

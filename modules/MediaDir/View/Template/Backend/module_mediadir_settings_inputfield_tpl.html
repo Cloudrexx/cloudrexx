@@ -5,8 +5,8 @@
     </td>
     <td valign="top" style="text-align: center;">
         <input name="inputfieldOrder[{MEDIADIR_SETTINGS_INPUTFIELD_ID}]" style="width: 20px;" type="text" value="{MEDIADIR_SETTINGS_INPUTFIELD_ORDER}" onfocus="this.select();" />&nbsp;
-        <a href="#" id="" title=""><img style="vertical-align: middle;" src="../core/Core/View/Media/icons/up.gif" alt="" width="14" border="0" height="12"></a>
-        <a href="#" id="" title=""><img style="vertical-align: middle;" src="../core/Core/View/Media/icons/down.gif" alt="" width="14" border="0" height="12"></a>
+        <a href="#" id="" title=""><img style="vertical-align: middle;" src="/core/Core/View/Media/icons/up.gif" alt="" width="14" border="0" height="12"></a>
+        <a href="#" id="" title=""><img style="vertical-align: middle;" src="/core/Core/View/Media/icons/down.gif" alt="" width="14" border="0" height="12"></a>
   </td>
     <td valign="top" nowrap="nowrap">
         <div id="inputfieldName_{MEDIADIR_SETTINGS_INPUTFIELD_ID}_Minimized" style="display: block;">
@@ -14,7 +14,7 @@
         </div>
         <div id="inputfieldName_{MEDIADIR_SETTINGS_INPUTFIELD_ID}_Expanded" style="display: none;">
             <!-- BEGIN mediadirInputfieldNameList -->
-                <input name="inputfieldName[{MEDIADIR_SETTINGS_INPUTFIELD_ID}][{MEDIADIR_INPUTFIELD_NAME_LANG_ID}]" maxlength="255" type="text" style="width: 179px; margin-bottom: 2px; padding-left: 21px; background: #ffffff url('../core/Country/View/Media/Flag/flag_{MEDIADIR_INPUTFIELD_NAME_LANG_SHORTCUT}.gif') no-repeat 3px 3px;" title="{MEDIADIR_INPUTFIELD_NAME_LANG_NAME}" value="{MEDIADIR_SETTINGS_INPUTFIELD_NAME}" /><br />
+                <input name="inputfieldName[{MEDIADIR_SETTINGS_INPUTFIELD_ID}][{MEDIADIR_INPUTFIELD_NAME_LANG_ID}]" maxlength="255" type="text" style="width: 179px; margin-bottom: 2px; padding-left: 21px; background: #ffffff url('/core/Country/View/Media/Flag/flag_{MEDIADIR_INPUTFIELD_NAME_LANG_SHORTCUT}.gif') no-repeat 3px 3px;" title="{MEDIADIR_INPUTFIELD_NAME_LANG_NAME}" value="{MEDIADIR_SETTINGS_INPUTFIELD_NAME}" /><br />
             <!-- END mediadirInputfieldNameList -->
         </div>
     </td>
@@ -34,7 +34,7 @@
         </div>
         <div id="inputfieldDefaultvalue_{MEDIADIR_SETTINGS_INPUTFIELD_ID}_Expanded" style="display: none;">
             <!-- BEGIN mediadirInputfieldDefaultvalueList -->
-                <input name="inputfieldDefaultvalue[{MEDIADIR_SETTINGS_INPUTFIELD_ID}][{MEDIADIR_INPUTFIELD_DEFAULTVALUE_LANG_ID}]" type="text" style="width: 179px; margin-bottom: 2px; padding-left: 21px; background: #ffffff url('../core/Country/View/Media/Flag/flag_{MEDIADIR_INPUTFIELD_DEFAULTVALUE_LANG_SHORTCUT}.gif') no-repeat 3px 3px;" title="{MEDIADIR_INPUTFIELD_DEFAULTVALUE_LANG_NAME}" value="{MEDIADIR_SETTINGS_INPUTFIELD_DEFAULTVALUE}" /><br />
+                <input name="inputfieldDefaultvalue[{MEDIADIR_SETTINGS_INPUTFIELD_ID}][{MEDIADIR_INPUTFIELD_DEFAULTVALUE_LANG_ID}]" type="text" style="width: 179px; margin-bottom: 2px; padding-left: 21px; background: #ffffff url('/core/Country/View/Media/Flag/flag_{MEDIADIR_INPUTFIELD_DEFAULTVALUE_LANG_SHORTCUT}.gif') no-repeat 3px 3px;" title="{MEDIADIR_INPUTFIELD_DEFAULTVALUE_LANG_NAME}" value="{MEDIADIR_SETTINGS_INPUTFIELD_DEFAULTVALUE}" /><br />
             <!-- END mediadirInputfieldDefaultvalueList -->
         </div>
     </td>
@@ -44,7 +44,7 @@
         </div>
         <div id="inputfieldInfo_{MEDIADIR_SETTINGS_INPUTFIELD_ID}_Expanded" style="display: none;">
             <!-- BEGIN mediadirInputfieldInfoList -->
-                <input name="inputfieldInfo[{MEDIADIR_SETTINGS_INPUTFIELD_ID}][{MEDIADIR_INPUTFIELD_INFO_LANG_ID}]" type="text" style="width: 179px; margin-bottom: 2px; padding-left: 21px; background: #ffffff url('../core/Country/View/Media/Flag/flag_{MEDIADIR_INPUTFIELD_INFO_LANG_SHORTCUT}.gif') no-repeat 3px 3px;" title="{MEDIADIR_INPUTFIELD_INFO_LANG_NAME}" value="{MEDIADIR_SETTINGS_INPUTFIELD_INFO}" /><br />
+                <input name="inputfieldInfo[{MEDIADIR_SETTINGS_INPUTFIELD_ID}][{MEDIADIR_INPUTFIELD_INFO_LANG_ID}]" type="text" style="width: 179px; margin-bottom: 2px; padding-left: 21px; background: #ffffff url('/core/Country/View/Media/Flag/flag_{MEDIADIR_INPUTFIELD_INFO_LANG_SHORTCUT}.gif') no-repeat 3px 3px;" title="{MEDIADIR_INPUTFIELD_INFO_LANG_NAME}" value="{MEDIADIR_SETTINGS_INPUTFIELD_INFO}" /><br />
             <!-- END mediadirInputfieldInfoList -->
         </div>
     </td>
@@ -70,7 +70,7 @@
         </div>
     </td>
     <td style="text-align: right;" valign="top">
-        <a href="javascript:removeInputfield('{MEDIADIR_SETTINGS_INPUTFIELD_ID}');" id="inputfieldDelete_{MEDIADIR_SETTINGS_INPUTFIELD_ID}" title="{TXT_MEDIADIR_DELETE}"><img style="vertical-align: middle;" src="../core/Core/View/Media/icons/delete.gif" alt="{TXT_MEDIADIR_DELETE}" width="17" border="0" height="17"></a>
+        <a href="javascript:removeInputfield('{MEDIADIR_SETTINGS_INPUTFIELD_ID}');" id="inputfieldDelete_{MEDIADIR_SETTINGS_INPUTFIELD_ID}" title="{TXT_MEDIADIR_DELETE}"><img style="vertical-align: middle;" src="/core/Core/View/Media/icons/delete.gif" alt="{TXT_MEDIADIR_DELETE}" width="17" border="0" height="17"></a>
     </td>
     <!-- END mediadirInputfield -->
 
@@ -80,8 +80,8 @@
     </td>
     <td valign="top" style="text-align: center;">
         <input name="selectorOrder[{MEDIADIR_SETTINGS_SELECTOR_ID}]" type="hidden" value="{MEDIADIR_SETTINGS_SELECTOR_ORDER}" onfocus="this.select();" />&nbsp;
-        <a href="javascript:saveInputfield(function() { moveInputfield('{MEDIADIR_SETTINGS_INPUTFIELD_FORM_ID}', '{MEDIADIR_SETTINGS_SELECTOR_ID}', '1') });" id="" title=""><img style="vertical-align: middle;" src="../core/Core/View/Media/icons/up.gif" alt="" width="14" border="0" height="12"></a>
-        <a href="javascript:saveInputfield(function() { moveInputfield('{MEDIADIR_SETTINGS_INPUTFIELD_FORM_ID}', '{MEDIADIR_SETTINGS_SELECTOR_ID}', '2') });" id="" title=""><img style="vertical-align: middle;" src="../core/Core/View/Media/icons/down.gif" alt="" width="14" border="0" height="12"></a>
+        <a href="javascript:saveInputfield(function() { moveInputfield('{MEDIADIR_SETTINGS_INPUTFIELD_FORM_ID}', '{MEDIADIR_SETTINGS_SELECTOR_ID}', '1') });" id="" title=""><img style="vertical-align: middle;" src="/core/Core/View/Media/icons/up.gif" alt="" width="14" border="0" height="12"></a>
+        <a href="javascript:saveInputfield(function() { moveInputfield('{MEDIADIR_SETTINGS_INPUTFIELD_FORM_ID}', '{MEDIADIR_SETTINGS_SELECTOR_ID}', '2') });" id="" title=""><img style="vertical-align: middle;" src="/core/Core/View/Media/icons/down.gif" alt="" width="14" border="0" height="12"></a>
     </td>
     <td valign="top" nowrap="nowrap" colspan="7">
         {MEDIADIR_SETTINGS_SELECTOR_NAME}

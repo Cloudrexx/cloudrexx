@@ -170,7 +170,7 @@ class UpdateController extends \Cx\Core\Core\Model\Entity\Controller {
                     $oldCodeBase            = $pendingCodeBaseChanges['PendingCodeBaseChanges']['oldCodeBaseId'];
                     $latestCodeBase         = $pendingCodeBaseChanges['PendingCodeBaseChanges']['latestCodeBaseId'];
                     //Register YamlSettingEventListener
-                    \Cx\Core\Config\Controller\ComponentController::registerYamlSettingEventListener();
+                    \Cx\Core\Config\Controller\ComponentController::registerYamlSettingEventListener($this->cx);
                     //Update codeBase in website
                     $this->updateCodeBase($latestCodeBase, null, $oldCodeBase);
                     //Update website codebase in manager and service

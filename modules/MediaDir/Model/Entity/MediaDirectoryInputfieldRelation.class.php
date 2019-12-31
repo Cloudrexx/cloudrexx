@@ -63,10 +63,10 @@ class MediaDirectoryInputfieldRelation extends \Cx\Modules\MediaDir\Controller\M
 
     function getInputfield($intView, $arrInputfield, $intEntryId=null)
     {
-        global $objDatabase, $_LANGID, $objInit, $_ARRAYLANG;
+        global $objDatabase, $objInit, $_ARRAYLANG;
 
         $intId = intval($arrInputfield['id']);
-
+        $langId = static::getOutputLocale()->getId();
 
         switch ($intView) {
             default:
@@ -89,14 +89,14 @@ class MediaDirectoryInputfieldRelation extends \Cx\Modules\MediaDir\Controller\M
                             $arrValue[intval($objInputfieldValue->fields['lang_id'])] = htmlspecialchars($objInputfieldValue->fields['value'], ENT_QUOTES, CONTREXX_CHARSET);
                             $objInputfieldValue->MoveNext();
                         }
-                        $arrValue[0] = $arrValue[$_LANGID];
+                        $arrValue[0] = $arrValue[$langId];
                     }
                 } else {
                     $arrValue = null;
                 }
 
                 if(empty($arrValue)) {
-                    $arrValue[0] = empty($arrInputfield['default_value'][$_LANGID]) ? $arrInputfield['default_value'][0] : $arrInputfield['default_value'][$_LANGID];
+                    $arrValue[0] = empty($arrInputfield['default_value'][$langId]) ? $arrInputfield['default_value'][0] : $arrInputfield['default_value'][$langId];
                 }
 
                 if($objInit->mode == 'backend') {
@@ -119,7 +119,7 @@ class MediaDirectoryInputfieldRelation extends \Cx\Modules\MediaDir\Controller\M
                             $arrValue[intval($objInputfieldValue->fields['lang_id'])] = htmlspecialchars($objInputfieldValue->fields['value'], ENT_QUOTES, CONTREXX_CHARSET);
                             $objInputfieldValue->MoveNext();
                         }
-                        $arrValue[0] = $arrValue[$_LANGID];
+                        $arrValue[0] = $arrValue[$langId];
                     }
 
 
@@ -141,7 +141,7 @@ class MediaDirectoryInputfieldRelation extends \Cx\Modules\MediaDir\Controller\M
                        ON
                           ".DBPREFIX."module_".$this->moduleTablePrefix."_forms.id = ".DBPREFIX."module_".$this->moduleTablePrefix."_form_names.form_id
                        WHERE
-                          lang_id = ".$_LANGID."
+                          lang_id = ".$langId."
                        ".$strWhere."");
 
                    if ($objInputfieldValue !== false) {
@@ -174,7 +174,7 @@ class MediaDirectoryInputfieldRelation extends \Cx\Modules\MediaDir\Controller\M
                               ON
                                  ".DBPREFIX."module_".$this->moduleTablePrefix."_entries.id = ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields.entry_id
                               WHERE
-                                 ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields.lang_id = ".$_LANGID."
+                                 ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields.lang_id = ".$langId."
                                  AND ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields.form_id = '".$objInputfieldValue->fields['id']."'
                                  AND (".$query.") = ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields.field_id
                                ");
@@ -222,7 +222,7 @@ class MediaDirectoryInputfieldRelation extends \Cx\Modules\MediaDir\Controller\M
                    ON
                       ".DBPREFIX."module_".$this->moduleTablePrefix."_forms.id = ".DBPREFIX."module_".$this->moduleTablePrefix."_form_names.form_id
                    WHERE
-                      lang_id = ".$_LANGID."");
+                      lang_id = ".$langId."");
 
                if ($objInputfieldValue !== false) {
                      $arrInputfieldOption = array();
@@ -241,7 +241,7 @@ class MediaDirectoryInputfieldRelation extends \Cx\Modules\MediaDir\Controller\M
                           ON
                              ".DBPREFIX."module_".$this->moduleTablePrefix."_forms.id = ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields.form_id
                           WHERE
-                             lang_id = ".$_LANGID."
+                             lang_id = ".$langId."
                              AND form_id = '".$objInputfieldValue->fields['id']."'
                            ");
 
@@ -295,33 +295,8 @@ class MediaDirectoryInputfieldRelation extends \Cx\Modules\MediaDir\Controller\M
 
     function getContent($intEntryId, $arrInputfield, $arrTranslationStatus)
     {
-        global $objDatabase, $_LANGID;
-
-        $intId = intval($arrInputfield['id']);
-        $objEntryDefaultLang = $objDatabase->Execute("SELECT `lang_id` FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_entries WHERE id=".intval($intEntryId)." LIMIT 1");
-        $intEntryDefaultLang = intval($objEntryDefaultLang->fields['lang_id']);
-
-        if($this->arrSettings['settingsTranslationStatus'] == 1) {
-            if(in_array($_LANGID, $arrTranslationStatus)) {
-                $intLangId = $_LANGID;
-            } else {
-                $intLangId = $intEntryDefaultLang;
-            }
-        } else {
-            $intLangId = $_LANGID;
-        }
-
-       $objInputfield = $objDatabase->Execute("
-          SELECT
-             `value`
-          FROM
-             ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields
-          WHERE
-             ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields.lang_id = ".$_LANGID."
-          AND
-             ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields.field_id = '".$intId."'");
-
-           $intEntryId = intval($objInputfield->fields['value']);
+        $entryId = static::getRawData($intEntryId, $arrInputfield, $arrTranslationStatus);
+        $intEntryId = intval($entryId);
 
         $objEntry = new \Cx\Modules\MediaDir\Controller\MediaDirectoryEntry;
         $objEntry->getEntries($intEntryId);
@@ -336,6 +311,37 @@ class MediaDirectoryInputfieldRelation extends \Cx\Modules\MediaDir\Controller\M
         }
 
         return $arrContent;
+    }
+
+    function getRawData($intEntryId, $arrInputfield, $arrTranslationStatus) {
+        global $objDatabase;
+
+        $intId = intval($arrInputfield['id']);
+        $objEntryDefaultLang = $objDatabase->Execute("SELECT `lang_id` FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_entries WHERE id=".intval($intEntryId)." LIMIT 1");
+        $intEntryDefaultLang = intval($objEntryDefaultLang->fields['lang_id']);
+        $langId = static::getOutputLocale()->getId();
+
+        if($this->arrSettings['settingsTranslationStatus'] == 1) {
+            if(in_array($langId, $arrTranslationStatus)) {
+                $intLangId = $langId;
+            } else {
+                $intLangId = $intEntryDefaultLang;
+            }
+        } else {
+            $intLangId = $langId;
+        }
+
+        $objInputfield = $objDatabase->Execute("
+          SELECT
+             `value`
+          FROM
+             ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields
+          WHERE
+             ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields.lang_id = ".$langId."
+          AND
+             ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields.field_id = '".$intId."'");
+
+        return $objInputfield->fields['value'];
     }
 
 

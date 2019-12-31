@@ -40,6 +40,15 @@ function shopProductsIsChecked(fieldName)
   }
   return false;
 }
+!(function($jq) {
+    $jq(function(){
+        $jq('.schedule_status').each(function(){
+            if ($jq(this).hasClass('scheduled')) {
+                $jq(this).attr('href', $jq(this).attr('href') +'#content4');
+            }
+        });
+    });
+})(cx.jQuery);
 // ]]>
 </script>
 <form name="product_search" method="get" action="index.php">
@@ -110,7 +119,10 @@ function shopProductsIsChecked(fieldName)
         {SHOP_PRODUCT_ID}
         <input type="hidden" name="product_id[{SHOP_PRODUCT_ID}]" value="{SHOP_PRODUCT_ID}" /></td>
       <td class="a_center">
-        <img src="../core/Core/View/Media/icons/{SHOP_PRODUCT_STATUS_PICTURE}" alt="{TXT_PRODUCT_STATUS}" title="{TXT_PRODUCT_STATUS}" />
+          <a class="schedule_status {SHOP_PRODUCT_STATUS_CLASS}"
+             href="index.php?cmd=Shop{MODULE_INDEX}&amp;act=products&amp;tpl=manage&amp;id={SHOP_PRODUCT_ID}">
+            &nbsp;
+          </a>
       </td>
       <td>
         <input type="text" name="ord[{SHOP_PRODUCT_ID}]" size="3" maxlength="5"

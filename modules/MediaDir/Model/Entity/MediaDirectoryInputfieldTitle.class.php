@@ -64,7 +64,7 @@ class MediaDirectoryInputfieldTitle extends \Cx\Modules\MediaDir\Controller\Medi
 
     function getInputfield($intView, $arrInputfield, $intEntryId=null)
     {
-        global $objDatabase, $_LANGID, $objInit, $_ARRAYLANG;
+        global $objDatabase, $objInit, $_ARRAYLANG;
 
         switch ($intView) {
             default:
@@ -101,12 +101,18 @@ class MediaDirectoryInputfieldTitle extends \Cx\Modules\MediaDir\Controller\Medi
 
     function getContent($intEntryId, $arrInputfield, $arrTranslationStatus)
     {
-        $arrContent['TXT_'.$this->moduleLangVar.'_INPUTFIELD_NAME'] = '<h2>'.htmlspecialchars($arrInputfield['name'][0], ENT_QUOTES, CONTREXX_CHARSET).'</h2>';
+        $strValue = static::getRawData($intEntryId, $arrInputfield, $arrTranslationStatus);
+        $strValue = htmlspecialchars($strValue, ENT_QUOTES, CONTREXX_CHARSET);
+
+        $arrContent['TXT_'.$this->moduleLangVar.'_INPUTFIELD_NAME'] = '<h2>'.$strValue.'</h2>';
         $arrContent[$this->moduleLangVar.'_INPUTFIELD_VALUE'] = '';
 
         return $arrContent;
     }
 
+    function getRawData($intEntryId, $arrInputfield, $arrTranslationStatus) {
+        return $arrInputfield['name'][0];
+    }
 
     function getJavascriptCheck()
     {

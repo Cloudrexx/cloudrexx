@@ -3,7 +3,7 @@
 // <![CDATA[
 function accessDeleteUser(id, name)
 {
-  strMsg = '{TXT_ACCESS_CONFIRM_DELETE_USER}';
+  strMsg = "{TXT_ACCESS_CONFIRM_DELETE_USER}";
   if (confirm(strMsg.replace('%s', name)+'\n{TXT_ACCESS_OPERATION_IRREVERSIBLE}')) {
     window.location.replace("index.php?cmd=Access&{CSRF_PARAM}&act=user&tpl=delete&groupId={ACCESS_GROUP_ID}&sort={ACCESS_SORT_DIRECTION}&by={ACCESS_SORT_BY}&search={ACCESS_SEARCH_VALUE_ESCAPED}&username_filter={ACCESS_USER_USERNAME_FILTER_ESCAPED}&user_status_filter={ACCESS_USER_STATUS_FILTER_ESCAPED}&user_role_filter={ACCESS_USER_ROLE_FILTER_ESCAPED}&id="+id);
   }
@@ -11,7 +11,7 @@ function accessDeleteUser(id, name)
 
 function accessChangeUserStatus(id, name)
 {
-  msg = '{TXT_ACCESS_CONFIRM_USER_NOTIFY_ABOUT_ACCOUNT_STATUS_NAMED}';
+  msg = "{TXT_ACCESS_CONFIRM_USER_NOTIFY_ABOUT_ACCOUNT_STATUS_NAMED}";
   notify = confirm(msg.replace('%s', name));
   window.location.href = 'index.php?cmd=Access&{CSRF_PARAM}&act=user&tpl=changeStatus&groupId={ACCESS_GROUP_ID}&sort={ACCESS_SORT_DIRECTION}&by={ACCESS_SORT_BY}&search={ACCESS_SEARCH_VALUE_ESCAPED}&username_filter={ACCESS_USER_USERNAME_FILTER_ESCAPED}&user_status_filter={ACCESS_USER_STATUS_FILTER_ESCAPED}&user_role_filter={ACCESS_USER_ROLE_FILTER_ESCAPED}&id='+id+'&notifyUser='+Number(notify);
 }

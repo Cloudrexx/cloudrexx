@@ -81,22 +81,22 @@ class Relation extends \Cx\Model\Base\EntityBase {
     protected $defaultEntityId;
 
     /**
-     * @var Cx\Core_Modules\Sync\Model\Entity\Relation
+     * @var \Doctrine\Common\Collections\Collection
      */
     protected $children;
 
     /**
-     * @var Cx\Core_Modules\Sync\Model\Entity\Relation
+     * @var \Cx\Core_Modules\Sync\Model\Entity\Relation
      */
     protected $parent;
 
     /**
-     * @var Cx\Core_Modules\Sync\Model\Entity\Sync
+     * @var \Cx\Core_Modules\Sync\Model\Entity\Sync
      */
     protected $relatedSync;
 
     /**
-     * @var Cx\Core_Modules\DataAccess\Model\Entity\DataAccess
+     * @var \Cx\Core_Modules\DataAccess\Model\Entity\DataAccess
      */
     protected $foreignDataAccess;
 
@@ -246,6 +246,29 @@ class Relation extends \Cx\Model\Base\EntityBase {
     }
 
     /**
+     * Add children
+     *
+     * @param \Cx\Core_Modules\Sync\Model\Entity\Relation $children
+     * @return Relation
+     */
+    public function addChild(\Cx\Core_Modules\Sync\Model\Entity\Relation $children)
+    {
+        $this->children[] = $children;
+
+        return $this;
+    }
+
+    /**
+     * Remove children
+     *
+     * @param \Cx\Core_Modules\Sync\Model\Entity\Relation $children
+     */
+    public function removeChild(\Cx\Core_Modules\Sync\Model\Entity\Relation $children)
+    {
+        $this->children->removeElement($children);
+    }
+
+    /**
      * Set children
      *
      * @param array
@@ -258,7 +281,7 @@ class Relation extends \Cx\Model\Base\EntityBase {
     /**
      * Get children
      *
-     * @return Doctrine\Common\Collections\Collection $children
+     * @return \Doctrine\Common\Collections\Collection $children
      */
     public function getChildren()
     {
@@ -268,7 +291,7 @@ class Relation extends \Cx\Model\Base\EntityBase {
     /**
      * Set parent
      *
-     * @param Cx\Core_Modules\Sync\Model\Entity\Relation $parent
+     * @param \Cx\Core_Modules\Sync\Model\Entity\Relation $parent
      */
     public function setParent(\Cx\Core_Modules\Sync\Model\Entity\Relation $parent)
     {
@@ -278,7 +301,7 @@ class Relation extends \Cx\Model\Base\EntityBase {
     /**
      * Get parent
      *
-     * @return Cx\Core_Modules\Sync\Model\Entity\Relation $parent
+     * @return \Cx\Core_Modules\Sync\Model\Entity\Relation $parent
      */
     public function getParent()
     {
@@ -288,7 +311,7 @@ class Relation extends \Cx\Model\Base\EntityBase {
     /**
      * Set relatedSync
      *
-     * @param Cx\Core_Modules\Sync\Model\Entity\Sync $relatedSync
+     * @param \Cx\Core_Modules\Sync\Model\Entity\Sync $relatedSync
      */
     public function setRelatedSync(\Cx\Core_Modules\Sync\Model\Entity\Sync $relatedSync)
     {
@@ -298,7 +321,7 @@ class Relation extends \Cx\Model\Base\EntityBase {
     /**
      * Get relatedSync
      *
-     * @return Cx\Core_Modules\Sync\Model\Entity\Sync $relatedSync
+     * @return \Cx\Core_Modules\Sync\Model\Entity\Sync $relatedSync
      */
     public function getRelatedSync()
     {
@@ -308,7 +331,7 @@ class Relation extends \Cx\Model\Base\EntityBase {
     /**
      * Set foreignDataAccess
      *
-     * @param Cx\Core_Modules\DataAccess\Model\Entity\DataAccess $foreignDataAccess
+     * @param \Cx\Core_Modules\DataAccess\Model\Entity\DataAccess $foreignDataAccess
      */
     public function setForeignDataAccess(\Cx\Core_Modules\DataAccess\Model\Entity\DataAccess $foreignDataAccess)
     {
@@ -318,7 +341,7 @@ class Relation extends \Cx\Model\Base\EntityBase {
     /**
      * Get foreignDataAccess
      *
-     * @return Cx\Core_Modules\DataAccess\Model\Entity\DataAccess $foreignDataAccess
+     * @return \Cx\Core_Modules\DataAccess\Model\Entity\DataAccess $foreignDataAccess
      */
     public function getForeignDataAccess()
     {

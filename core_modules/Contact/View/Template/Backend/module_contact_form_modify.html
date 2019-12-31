@@ -737,6 +737,36 @@
         }
     }
 
+    cx.ready(function() {
+        jQuery('input[name=contactFormSendCopy]').bind('change', function() {
+            var status = parseInt(jQuery(this).attr('value'));
+            jQuery('input[name=contactFormSendMultipleReply]').each(function(i, el) {
+                jQuery(el).prop('disabled', !status);
+            });
+            if (!status) {
+                jQuery('input[name=contactFormSendMultipleReply]').each(function(i, el) {
+                    jQuery(el).prop('checked', parseInt(jQuery(el).attr('value')) == status);
+                });
+                jQuery('input[name=contactFormUseEmailOfSender]').each(function(i, el) {
+                    jQuery(el).prop('disabled', status);
+                });
+            }
+        });
+        jQuery('input[name=contactFormSendMultipleReply]').bind('change', function() {
+            var status = parseInt(jQuery(this).attr('value'));
+            jQuery('input[name=contactFormUseEmailOfSender]').each(function(i, el) {
+                jQuery(el).prop('disabled', status);
+            });
+            if (status) {
+                jQuery('input[name=contactFormUseEmailOfSender]').each(function(i, el) {
+                    jQuery(el).prop('checked', parseInt(jQuery(el).attr('value')) != status);
+                });
+            }
+        });
+        jQuery('input[name=contactFormSendCopy]:checked').trigger('change');
+        jQuery('input[name=contactFormSendMultipleReply]:checked').trigger('change');
+    });
+
     // -->
 </script>
 
@@ -976,14 +1006,18 @@
                 <td><input type="radio" name="contactFormSendCopy" value="1" id="contactFormSendCopy_1" {CONTACT_FORM_SEND_COPY_YES} /><label for="contactFormSendCopy_1">{TXT_CONTACT_YES}</label> <input type="radio" name="contactFormSendCopy" value="0" id="contactFormSendCopy_0" {CONTACT_FORM_SEND_COPY_NO} /><label for="contactFormSendCopy_0">{TXT_CONTACT_NO}</label></td>
             </tr>
             <tr class="row2">
+                <td>{TXT_CONTACT_SEND_MULTIPLE_REPLY}&nbsp;<span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_CONTACT_SEND_MULTIPLE_REPLY_DESCRIPTION}</span></td>
+                <td><input type="radio" name="contactFormSendMultipleReply" value="1" id="contactFormSendMultipleReply_1" {CONTACT_FORM_SEND_MULTIPLE_REPLY_YES} /><label for="contactFormSendMultipleReply_1">{TXT_CONTACT_YES}</label> <input type="radio" name="contactFormSendMultipleReply" value="0" id="contactFormSendMultipleReply_0" {CONTACT_FORM_SEND_MULTIPLE_REPLY_NO} /><label for="contactFormSendMultipleReply_0">{TXT_CONTACT_NO}</label></td>
+            </tr>
+            <tr class="row1">
                 <td>{TXT_CONTACT_USE_EMAIL_OF_SENDER}&nbsp;<span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_CONTACT_USE_EMAIL_OF_SENDER_DESCRIPTION}</span></td>
                 <td><input type="radio" name="contactFormUseEmailOfSender" value="1" id="contactFormUseEmailOfSender_1" {CONTACT_FORM_USE_EMAIL_OF_SENDER_YES} /><label for="contactFormUseEmailOfSender_1">{TXT_CONTACT_YES}</label> <input type="radio" name="contactFormUseEmailOfSender" value="0" id="contactFormUseEmailOfSender_0" {CONTACT_FORM_USE_EMAIL_OF_SENDER_NO} /><label for="contactFormUseEmailOfSender_0">{TXT_CONTACT_NO}</label></td>
             </tr>
-            <tr class="row1">
+            <tr class="row2">
                 <td>{TXT_CONTACT_SEND_HTML_MAIL}</td>
                 <td><input type="checkbox" name="contactFormHtmlMail" id="contactFormHtmlMail" {CONTACT_FORM_SEND_HTML_MAIL} /></td>
             </tr>
-            <tr class="row2">
+            <tr class="row1">
                 <td>{TXT_CONTACT_SEND_ATTACHMENT}&nbsp;<span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_CONTACT_SEND_ATTACHMENT_DESCRIPTION}</span>
                 <td><input type="checkbox" value="1" name="contactFormSendAttachment" {CONTACT_FORM_SEND_ATTACHMENT}/></td>
             </tr>
@@ -991,7 +1025,7 @@
             <tr class="mailTemplateBlock" style="display:{CONTACT_MAIL_TEMPLATE_STYLE}">
                 <th colspan="2">{TXT_CONTACT_MAIL_TEMPLATE}</th>
             </tr>
-            <tr class="mailTemplateBlock row1 reset" style="display:{CONTACT_MAIL_TEMPLATE_STYLE}">
+            <tr class="mailTemplateBlock row2 reset" style="display:{CONTACT_MAIL_TEMPLATE_STYLE}">
                 <td colspan="2">{CONTACT_MAIL_TEMPLATE}</td>
             </tr>
         </table>

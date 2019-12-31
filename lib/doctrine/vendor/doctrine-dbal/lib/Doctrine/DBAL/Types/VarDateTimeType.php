@@ -13,46 +13,41 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * This software consists of voluntary contributions made by many individuals
- * and is licensed under the LGPL. For more information, see
+ * and is licensed under the MIT license. For more information, see
  * <http://www.doctrine-project.org>.
  */
-
 
 namespace Doctrine\DBAL\Types;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 
 /**
- * Variable DateTime Type using date_create() instead of DateTime::createFromFormat()
+ * Variable DateTime Type using date_create() instead of DateTime::createFromFormat().
  *
  * This type has performance implications as it runs twice as long as the regular
  * {@see DateTimeType}, however in certain PostgreSQL configurations with
  * TIMESTAMP(n) columns where n > 0 it is necessary to use this type.
  *
- * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
- * @link        www.doctrine-project.com
- * @since       2.0
- * @author      Benjamin Eberlei <kontakt@beberlei.de>
- * @author      Guilherme Blanco <guilhermeblanco@hotmail.com>
- * @author      Jonathan Wage <jonwage@gmail.com>
- * @author      Roman Borschel <roman@code-factory.org>
+ * @link   www.doctrine-project.org
+ * @since  2.0
+ * @author Benjamin Eberlei <kontakt@beberlei.de>
+ * @author Guilherme Blanco <guilhermeblanco@hotmail.com>
+ * @author Jonathan Wage <jonwage@gmail.com>
+ * @author Roman Borschel <roman@code-factory.org>
  */
 class VarDateTimeType extends DateTimeType
 {
     /**
-     * @throws ConversionException
-     * @param string $value
-     * @param AbstractPlatform $platform
-     * @return DateTime
+     * {@inheritdoc}
      */
     public function convertToPHPValue($value, AbstractPlatform $platform)
     {
-        if ($value === null) {
-            return null;
+        if ($value === null || $value instanceof \DateTime) {
+            return $value;
         }
 
         $val = date_create($value);
-        if (!$val) {
+        if ( ! $val) {
             throw ConversionException::conversionFailed($value, $this->getName());
         }
         return $val;

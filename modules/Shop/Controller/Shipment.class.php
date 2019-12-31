@@ -399,9 +399,7 @@ class Shipment
             DELETE FROM ".DBPREFIX."module_shop".MODULE_INDEX."_shipper
              WHERE id=".$shipper_id);
         if (!$objResult) return false;
-        $objDatabase->Execute("OPTIMIZE TABLE ".DBPREFIX."module_shop".MODULE_INDEX."_shipment_cost");
-        $objDatabase->Execute("OPTIMIZE TABLE ".DBPREFIX."module_shop".MODULE_INDEX."_rel_shipper");
-        $objDatabase->Execute("OPTIMIZE TABLE ".DBPREFIX."module_shop".MODULE_INDEX."_shipper");
+
         return true;
     }
 

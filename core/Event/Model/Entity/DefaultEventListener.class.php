@@ -74,7 +74,7 @@ class DefaultEventListener implements EventListener {
     public function onEvent($eventName, array $eventArgs) {
         $methodName = $eventName;
         if (!method_exists($this, $eventName)) {
-            $eventNameParts = explode('.', $eventName);
+            $eventNameParts = preg_split('/[.:\/]/', $eventName);
             $methodName = lcfirst(implode('', array_map('ucfirst',$eventNameParts)));
         }
         $this->$methodName(current($eventArgs));

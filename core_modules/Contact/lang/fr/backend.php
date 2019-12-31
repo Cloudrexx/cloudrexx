@@ -146,7 +146,6 @@ $_ARRAYLANG['TXT_CONTACT_CONTACT_FORM_SUCCESSFULLY_DELETED'] = "Le formulaire de
 $_ARRAYLANG['TXT_CONTACT_FAILED_DELETE_CONTACT_FORM'] = "Erreur lors de la suppression du formulaire!";
 $_ARRAYLANG['TXT_CONTACT_DATA_RECORD_UPDATED_SUCCESSFUL_VALIDATE'] = "Page mise à jour. Toutefois, un administrateur doit encore en confirmer la suppression, vos privilèges étant insuffisants pour le faire directement.";
 $_ARRAYLANG['TXT_CONTACT_SETTINGS_UPDATED'] = "Paramètres acceptés.";
-$_ARRAYLANG['TXT_CONTACT_META_DATE_BY_EXPORT'] = "Métainformations lors de l'exportation";
 $_ARRAYLANG['TXT_CONTACT_DEFAULT_FEEDBACK_TXT'] = "Nous vous remercions pour votre demande. Nous allons vous contacter très prochainement.";
 $_ARRAYLANG['TXT_CONTACT_SHOW_FORM_AFTER_SUBMIT'] = "Réafficher le formulaire envoi";
 $_ARRAYLANG['TXT_CONTACT_LANG'] = "Langue";

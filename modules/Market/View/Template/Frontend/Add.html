@@ -9,7 +9,7 @@
             document.getElementById('searchCheck').value = 'exp';
         }
     }
-    function CheckForm() {
+    function CheckForm(forceTerms) {
         var errorMsg = "";
         with (document.formEntry) {
             if (type.value == "") {
@@ -24,6 +24,9 @@
             if (cat.value == "") {
                 errorMsg = errorMsg + "- {TXT_MARKET_CATEGORIE}\n";
             }
+            if (price.value == "" && !forfree.checked && !agreement.checked) {
+                errorMsg = errorMsg + "- {TXT_MARKET_PRICE}\n";
+            }
             {END_DATE_JS}
             if (userdetails.value == "") {
                 errorMsg = errorMsg + "- {TXT_MARKET_USER_DETAIL}\n";
@@ -37,6 +40,9 @@
                 if (!matchType('^[_a-zA-Z0-9-]+(.[_a-zA-Z0-9-]+)*@[a-zA-Z0-9-]+(.[a-zA-Z0-9-]+)*.(([0-9]{1,3})|([a-zA-Z]{2,3})|(aero|coop|info|museum|name))$', email.value)) {
                     errorMsg = errorMsg + "- {TXT_MARKET_EMAIL}\n";
                 }
+            }
+            if (forceTerms && !confirm.checked) {
+                errorMsg = errorMsg + "- {TXT_MARKET_CONFIRM_TERMS}"
             }
             if (errorMsg != "")
             {
@@ -69,7 +75,7 @@
     });
     --></script>
 <div id="market">
-    <form name="formEntry" enctype="multipart/form-data" method="post" action="index.php?section=Market&cmd=confirm" onsubmit="return CheckForm()">
+    <form name="formEntry" enctype="multipart/form-data" method="post" action="index.php?section=Market&cmd=confirm" onsubmit="return CheckForm({MARKET_FORCE_TERMS})">
         <input type="hidden" name="id" value="{MARKET_ENTRY_ID}" >
         <p><label>{TXT_MARKET_TYPE}<font color="red"> *</font></label>
             <span class="radio">
@@ -97,12 +103,12 @@
         <p><label for="price">{TXT_MARKET_PRICE}<font color="red"> *</font></label><input type="text" id="price" name="price" maxlength="100" value=""></p>
         <p>
 <span class="checkbox">
-<label class="description" for="forfree"><input type="checkbox" name="forfree" value="1" />{TXT_MARKET_FOR_FREE}</label>
+<label class="description" for="forfree"><input type="checkbox" name="forfree" id="forfree" value="1" />{TXT_MARKET_FOR_FREE}</label>
 </span>
 </p>
         <p>
 <span class="checkbox">
-<label class="description" for="agreement"><input type="checkbox" name="agreement" value="1" />{TXT_MARKET_AGREEMENT}</label>
+<label class="description" for="agreement"><input type="checkbox" name="agreement" id="agreement" value="1" />{TXT_MARKET_AGREEMENT}</label>
 </span>
 </p>
         <!-- BEGIN end_date_dropdown -->
@@ -122,6 +128,7 @@
         <!-- BEGIN spez_fields -->
             <p><label>{TXT_MARKET_SPEZ_FIELD_NAME}</label>{MARKET_SPEZ_FIELD_INPUT}</p>
         <!-- END spez_fields -->
+      <p><label><input name="confirm" type="checkbox">&nbsp;{TXT_MARKET_TERMS}</label></p>
         <p><input class="btn btn-default" type="submit" name="submitEntry" value="{TXT_MARKET_SAVE}" /></p>
   </form>
   {MARKET_UPLOADER_CODE}

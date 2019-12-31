@@ -10,8 +10,6 @@
                         <th width="95%" align="left">{TXT_PRODUCT}</th>
                         <th width="1%" nowrap="nowrap">{TXT_UNIT_PRICE}</th>
                         <th width="1%" nowrap="nowrap">{TXT_QUANTITY}</th>
-                        <!-- <th width="1%" nowrap="nowrap" style="text-align: right;">{TXT_WEIGHT}</th> -->
-                        <th width="1%" nowrap="nowrap" colspan="2">{TXT_TAX_PREFIX}</th>
                         <th width="1%" nowrap="nowrap" class="a_right">{TXT_TOTAL}</th>
                     </tr>
                     <!-- BEGIN shopCartRow -->
@@ -25,58 +23,61 @@
                         </td>
                         <td nowrap="nowrap">{SHOP_PRODUCT_ITEMPRICE} {SHOP_UNIT}</td>
                         <td nowrap="nowrap">{SHOP_PRODUCT_QUANTITY}</td>
-                        <!-- <td nowrap="nowrap" style="text-align: right;">{SHOP_PRODUCT_WEIGHT}</td> -->
-                        <td nowrap="nowrap">{SHOP_PRODUCT_TAX_RATE}</td>
-                        <td nowrap="nowrap">{SHOP_PRODUCT_TAX_AMOUNT}</td>
                         <td nowrap="nowrap" style="text-align: right;">{SHOP_PRODUCT_PRICE} {SHOP_UNIT}</td>
                     </tr>
                     <!-- END shopCartRow -->
+                    <tr class="row3 active">
+                        <td colspan="2">
+                            {TXT_TOTALLY_GOODS}
+                        </td>
+                        <td colspan="2" valign="top" nowrap="nowrap">{SHOP_TOTALITEM} {TXT_PRODUCT_S}</td>
+                        <td class="a_right">
+                            {SHOP_PRODUCT_TOTAL_GOODS}&nbsp;{SHOP_UNIT}
+                        </td>
+                    </tr>
                     <!-- BEGIN shopCouponTotal -->
                     <tr class="row3 active">
                         <td colspan="3">
                             {SHOP_DISCOUNT_COUPON_TOTAL}
                         </td>
-                        <td colspan="3">&nbsp;</td>
+                        <td>&nbsp;</td>
                         <td class="a_right">
                             {SHOP_DISCOUNT_COUPON_TOTAL_AMOUNT}&nbsp;{SHOP_UNIT}
                         </td>
                     </tr>
                     <!-- END shopCouponTotal -->
                     <tr class="row3 active">
-                        <td colspan="2" valign="top">{TXT_INTER_TOTAL} {SHOP_TAX_PRODUCTS_TXT}</td>
-                        <td colspan="4" valign="top" nowrap="nowrap">{SHOP_TOTALITEM} {TXT_PRODUCT_S}</td>
+                        <td colspan="4" valign="top">{TXT_INTER_TOTAL}</td>
                         <td valign="top" nowrap="nowrap" style="text-align: right;">{SHOP_TOTALPRICE} {SHOP_UNIT}</td>
                     </tr>
                     <!-- BEGIN shiprow -->
                     <tr class="row3 active" valign="top">
                         <td colspan="2">{TXT_SHIPPING_METHOD}</td>
-                        <td colspan="4">{SHOP_SHIPMENT}</td>
+                        <td colspan="2">{SHOP_SHIPMENT}</td>
                         <td nowrap="nowrap" style="text-align: right;">{SHOP_SHIPMENT_PRICE} {SHOP_UNIT}</td>
                     </tr>
                     <!-- END shiprow -->
                     <tr class="row3 active" valign="top">
                         <td colspan="2">{TXT_PAYMENT_TYPE}</td>
-                        <td colspan="4">{SHOP_PAYMENT}</td>
+                        <td colspan="2">{SHOP_PAYMENT}</td>
                         <td nowrap="nowrap" style="text-align: right;">{SHOP_PAYMENT_PRICE} {SHOP_UNIT}</td>
                     </tr>
-                    <!-- BEGIN totalExclTaxRow -->
-                    <tr class="row1">
-                        <td colspan="6">{TXT_NET_PRICE}</td>
-                        <td style="text-align: right;">
-                            {SHOP_GRAND_TOTAL_EXCL_TAX} {SHOP_UNIT}
-                        </td>
-                    </tr>
-                    <!-- END totalExclTaxRow -->
-                    <!-- BEGIN taxrow -->
-                    <tr class="row1" valign="top">
-                        <td colspan="6">{TXT_TAX_PREFIX}</td>
+                    <!-- BEGIN shopVatExcl -->
+                    <tr class="row3 active" valign="top">
+                        <td colspan="4">{TXT_TAX_PREFIX}</td>
                         <td nowrap="nowrap" style="text-align: right;">{TXT_TAX_PART} {SHOP_TAX_PRICE} {SHOP_UNIT}</td>
                     </tr>
-                    <!-- END taxrow -->
+                    <!-- END shopVatExcl -->
                     <tr class="row3 active">
-                        <td colspan="6" valign="top" nowrap="nowrap"><strong>{TXT_TOTAL_PRICE}</strong></td>
+                        <td colspan="4" valign="top" nowrap="nowrap"><strong>{TXT_TOTAL_PRICE}</strong></td>
                         <td nowrap="nowrap" style="text-align: right;"><strong>{SHOP_GRAND_TOTAL} {SHOP_UNIT}</strong></td>
                     </tr>
+                    <!-- BEGIN shopVatIncl -->
+                    <tr class="row1" valign="top">
+                        <td colspan="4">{TXT_TAX_PREFIX}</td>
+                        <td nowrap="nowrap" style="text-align: right;">{TXT_TAX_PART} {SHOP_TAX_PRICE} {SHOP_UNIT}</td>
+                    </tr>
+                    <!-- END shopVatIncl -->
                 </table>
             </div>
             <div class="table-responsive">

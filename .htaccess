@@ -16,11 +16,20 @@
     RewriteCond %{REQUEST_URI} !\.thumb_large\.[^\/]*$
     RewriteRule . - [F]
 
+    # Check if virtual language directory had been stripped off of request.
+    # If so, do check if the file does actually exists.
+    # If the file does not exists, do re-add the virtual language directory.
+    RewriteCond %{ENV:REDIRECT_LOCALE} !^$
+    RewriteCond %{REQUEST_URI} ^/(core|core_modules|lib|modules|feed|media|images|themes)/
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule .* %{ENV:REDIRECT_LOCALE}%{REQUEST_URI} [L,E=LOCALE:1]
+
     # Strip virtual language directory for MEDIA RESSOURCES, CONTENT DATA and THEME
     # IMPORTANT: When running Contrexx in a subdirectory (relativ to the webserver's DocumentRoot)
     #            then you'll have to comment-out the following ruleset
-    RewriteCond %{REQUEST_URI} ^/\w+/(core|core_modules|lib|modules|feed|media|images|themes)/
-    RewriteRule ^\w+\/(.*)$ /$1 [L]
+    RewriteCond %{ENV:REDIRECT_LOCALE} ^$
+    RewriteCond %{REQUEST_URI} ^/[a-z]{1,2}(?:-[A-Za-z]{2,4})?/(core|core_modules|lib|modules|feed|media|images|themes)/
+    RewriteRule ^([a-z]{1,2}(?:-[A-Za-z]{2,4})?)\/(.*)$ /$2 [L,E=LOCALE:$1]
 
     # Deny direct access to directories containing sensitive data
     RewriteCond %{ENV:REDIRECT_END} !1
@@ -38,42 +47,127 @@
 
     # MultiSite: Map requests to CONTENT DATA of a Website
     RewriteCond %{ENV:REDIRECT_END} !1
-    RewriteCond %{REQUEST_URI} ^/(feed\/|media\/|images\/|tmp\/public\/|robots\.txt|sitemap_\w+\.xml)
+    RewriteCond %{REQUEST_URI} ^/(feed\/|media\/|images\/|tmp\/public\/|robots\.txt|sitemap(?:_[a-z]{1,2}(?:-[A-Za-z]{2,4})?)?\.xml)
     RewriteRule (.*) ${websiteDomainContentMap:%{HTTP_HOST}|}/$1 [L,QSA,E=END:1]
 
     # MultiSite: Try to map the request of a webdesign template file to the
     #            website's data repository.
-    #            Replace '%PATH_DOCUMENT_ROOT%' by the absolute path to the
-    #            document root of the Contrexx installation. I.e.: /var/www
     RewriteCond %{ENV:REDIRECT_END} !1
     RewriteCond %{REQUEST_URI} ^/(themes)/
-    RewriteCond %PATH_DOCUMENT_ROOT%${websiteDomainContentMap:%{HTTP_HOST}}%{REQUEST_URI} -f
+    RewriteCond %{DOCUMENT_ROOT}${websiteDomainContentMap:%{HTTP_HOST}}%{REQUEST_URI} -f
     RewriteRule (.*) ${websiteDomainContentMap:%{HTTP_HOST}|}/$1 [L,QSA,E=END:1]
 
     # MultiSite: Try to map the request of a the webdesign template file to
     #            the website's Code Base.
-    #            Replace '%PATH_DOCUMENT_ROOT%' by the absolute path to the
-    #            document root of the Contrexx installation. I.e.: /var/www
     RewriteCond %{ENV:REDIRECT_END} !1
     RewriteCond %{REQUEST_URI} ^/(themes)/
-    RewriteCond %PATH_DOCUMENT_ROOT%${websiteDomainCodeBaseMap:%{HTTP_HOST}}%{REQUEST_URI} -f
+    RewriteCond %{DOCUMENT_ROOT}${websiteDomainCodeBaseMap:%{HTTP_HOST}}%{REQUEST_URI} -f
     RewriteRule (.*) ${websiteDomainCodeBaseMap:%{HTTP_HOST}|}/$1 [L,QSA,E=END:1]
 
     # Resolve language specific sitemap.xml
     RewriteCond %{ENV:REDIRECT_END} !1
-    RewriteRule ^(\w+)\/sitemap.xml$ ${websiteDomainContentMap:%{HTTP_HOST}|}/sitemap_$1.xml [L,NC,E=END:1]
+    RewriteRule ^([a-z]{1,2}(?:-[A-Za-z]{2,4})?)\/sitemap(?:_[a-z]{1,2}(?:-[A-Za-z]{2,4})?)?.xml$ ${websiteDomainContentMap:%{HTTP_HOST}|}/sitemap_$1.xml [L,NC,E=END:1]
 
     # Allow directory index files
     RewriteCond %{REQUEST_FILENAME}/index.php -f
     RewriteRule   .  %{REQUEST_URI}/index.php [L,QSA]
 
-    # Redirect all requests to non-existing files to Contrexx,
-    # except for media resources
+    # Redirect all requests to non-existing files to Contrexx
     RewriteCond   %{REQUEST_FILENAME}  !-f
-    RewriteCond   %{REQUEST_URI} !.*\.(gif|jpg|png|bmp|js|css|woff|ttf|svg)$
     RewriteRule   .  index.php?__cap=%{REQUEST_URI} [L,QSA]
 
     # Add captured request to index files
     RewriteRule ^index.php index.php?__cap=%{REQUEST_URI} [L,QSA]
 #  </core_routing>
+
+#  <core_modules_cache>
+    # The mod_deflate module provides the DEFLATE output filter that allows
+    # output from your server to be compressed before being sent to the
+    # client over the network.
+    <IfModule mod_deflate.c>
+        # The mod_setenvif module allows you to set internal environment
+        # variables according to whether different aspects of the request
+        # match regular expressions you specify.
+        <IfModule mod_setenvif.c>
+            # This module is used to assign content metadata to the content
+            # selected for an HTTP response by mapping patterns in the URI or
+            # filenames to the metadata values.
+            <IfModule mod_mime.c>
+                AddType image/svg+xml                   svg svgz
+                AddType application/font-woff           woff
+                AddType application/font-woff2          woff2
+                AddType application/vnd.ms-fontobject   eot
+                AddType application/x-font-ttf          ttc ttf
+                AddType font/opentype                   otf
+                AddEncoding gzip                        svgz
+            </IfModule>
+            # This module enables smart, context-sensitive configuration of
+            # output content filters.
+            <IfModule mod_filter.c>
+                # These are known to be safe with MSIE 6
+                AddOutputFilterByType DEFLATE text/html
+                AddOutputFilterByType DEFLATE text/plain
+                AddOutputFilterByType DEFLATE text/xml
+                # Everything else may cause problems with MSIE 6
+                AddOutputFilterByType DEFLATE text/css
+                AddOutputFilterByType DEFLATE text/javascript
+                AddOutputFilterByType DEFLATE image/x-icon
+                AddOutputFilterByType DEFLATE image/svg+xml
+                AddOutputFilterByType DEFLATE application/x-javascript
+                AddOutputFilterByType DEFLATE application/javascript
+                AddOutputFilterByType DEFLATE application/ecmascript
+                AddOutputFilterByType DEFLATE application/rss+xml
+                AddOutputFilterByType DEFLATE application/xml
+                AddOutputFilterByType DEFLATE application/xhtml+xml
+                AddOutputFilterByType DEFLATE application/font-woff
+                AddOutputFilterByType DEFLATE application/font-woff2
+                AddOutputFilterByType DEFLATE application/vnd.ms-fontobject
+                AddOutputFilterByType DEFLATE application/x-font-ttf
+                AddOutputFilterByType DEFLATE font/opentype
+            </IfModule>
+            # Remove browser bugs (only needed for really old browsers)
+            BrowserMatch ^Mozilla/4 gzip-only-text/html
+            BrowserMatch ^Mozilla/4\.0[678] no-gzip
+            BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
+        </IfModule>
+    </IfModule>
+
+    # This module controls the setting of the Expires HTTP header and the
+    # max-age directive of the Cache-Control HTTP header in server responses.
+    <IfModule mod_expires.c>
+        # Enable expirations
+        ExpiresActive On
+        # Default directive
+        ExpiresDefault "access plus 1 month"
+        # Favicon
+        ExpiresByType image/x-icon "access plus 1 year"
+        # Images
+        ExpiresByType image/gif "access plus 1 month"
+        ExpiresByType image/png "access plus 1 month"
+        ExpiresByType image/jpg "access plus 1 month"
+        ExpiresByType image/jpeg "access plus 1 month"
+        # CSS
+        ExpiresByType text/css "access plus 1 month"
+        # JavaScript
+        ExpiresByType application/javascript "access plus 1 year"
+
+        # Forces browser caches to verify ETag
+        <IfModule mod_headers.c>
+            Header merge Cache-Control no-cache
+        </IfModule>
+
+        # Uncomment & install the following code into the virtual
+        # host configuration file.
+        #
+        ## disable expirations for livecam live image
+        #<LocationMatch "/images/Livecam/">
+        #    ExpiresActive Off
+        #</LocationMatch>
+
+        ## re-enable expirations for livecam archive images
+        #<LocationMatch "/images/Livecam/.*(archive|thumbs)/">
+        #    ExpiresActive On
+        #</LocationMatch>
+    </IfModule>
+#  </core_modules_cache>
 # </contrexx>

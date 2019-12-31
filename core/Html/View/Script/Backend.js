@@ -21,27 +21,30 @@ cx.ready(function() {
                 if (opt.repeat) {
                     data += '&' + opt.updatedOrder;
                 }
-                jQuery.ajax({
-                    type: 'POST',
-                    data: data,
-                    url:  cadminPath + 'index.php&cmd=JsonData&object=' + opt.jsonObject + '&act=' + opt.jsonAct,
-                    beforeSend: function() {
-                        jQuery('body').addClass('loading');
-                        opt.that.sortable("disable");
-                        opt.uiItem.find('td:first-child').addClass('sorter-loading');
-                    },
-                    success: function(msg) {
-                        if (msg.data && msg.data.status === 'success') {
-                            recordCount = msg.data.recordCount;
+                cx.ajax(
+                    opt.jsonObject,
+                    opt.jsonAct,
+                    {
+                        type: 'POST',
+                        data: data,
+                        beforeSend: function() {
+                            jQuery('body').addClass('loading');
+                            opt.that.sortable("disable");
+                            opt.uiItem.find('td:first-child').addClass('sorter-loading');
+                        },
+                        success: function(msg) {
+                            if (msg.data && msg.data.status === 'success') {
+                                recordCount = msg.data.recordCount;
+                            }
+                        },
+                        complete: function() {
+                            sortable.updateOrder(opt, recordCount);
+                            opt.that.sortable("enable");
+                            jQuery('body').removeClass('loading');
+                            opt.uiItem.find('td:first-child').removeClass('sorter-loading');
                         }
-                    },
-                    complete: function() {
-                        sortable.updateOrder(opt, recordCount);
-                        opt.that.sortable("enable");
-                        jQuery('body').removeClass('loading');
-                        opt.uiItem.find('td:first-child').removeClass('sorter-loading');
                     }
-                });
+                );
             },
             //Check the same 'order' field value is repeated or not
             isOrderNoRepeat : function(options) {
@@ -140,7 +143,104 @@ cx.ready(function() {
             sortable.ajaxCall(params);
         }
     });
+
+    // Get first element from tabmenu and select tab
+    var firstTab = document.getElementsByClassName('vg-tabs')[0];
+    if (document.getElementById('form-0-tab-legend') && typeof document.getElementById('form-0-tab-legend') !== 'undefined') {
+        document.getElementById('form-0-tab-legend').style.display = 'block';
+        if (document.getElementById('form-0-tabmenu') != null) {
+            selectTab(firstTab.id, true);
+        } else {
+            firstTab.style.display = 'block';
+        }
+        initializeTabClickEvent(0);
+    }
+
+    cx.jQuery(".chzn").chosen();
+
+    var cadminPath = cx.variables.get('cadminPath', 'contrexx'),
+        status = {
+            ajaxCall : function(opt) {
+                cx.ajax(
+                    opt.jsonObject,
+                    opt.jsonAct,
+                    {
+                        type: 'POST',
+                        data: {
+                            'entityId': opt.entityId,
+                            'newStatus': opt.statusValue,
+                            'statusField': opt.statusField,
+                            'component': opt.component,
+                            'entity': opt.entity,
+                        },
+                        showMessage: true,
+                        beforeSend: function() {
+                            cx.jQuery(opt.that).addClass('loading');
+                        },
+                        success: function(json) {
+                            cx.jQuery(opt.that).toggleClass('active');
+                        },
+                        preError: function(xhr, status, error) {
+                            cx.tools.StatusMessage.showMessage(error);
+                            cx.jQuery(this).data('status-value', (cx.jQuery(this).hasClass('active') ? 0 : 1));
+                        },
+                        complete: function() {
+                            cx.jQuery(opt.that).removeClass('loading');
+                        }
+                    },
+                    cx.variables.get('frontendLocale', 'contrexx')
+                );
+            },
+        };
+    cx.jQuery('.vg-function-status').click(function () {
+        var table = cx.jQuery(this).closest('table.status');
+        cx.jQuery(this).data('status-value', (cx.jQuery(this).hasClass('active') ? 0 : 1));
+
+        var params = {
+            that: cx.jQuery(this),
+            entityId: cx.jQuery(this).data('entity-id'),
+            jsonObject: table.data('status-object'),
+            jsonAct: table.data('status-act'),
+            component: table.data('status-component'),
+            entity: table.data('status-entity'),
+            statusField: table.data('status-field'),
+            statusValue: cx.jQuery(this).data('status-value'),
+        };
+        status.ajaxCall(params);
+    });
+
+    cx.jQuery(".vg-export").click(function(e) {
+        e.preventDefault();
+        var url = new URL(window.location);
+        var params = {
+            type: cx.jQuery(this).data('object'),
+        };
+        if (url.searchParams.get('search')) {
+            params.search = url.searchParams.get('search');
+        }
+        if (url.searchParams.get('term')) {
+            params.term = url.searchParams.get('term');
+        }
+        cx.ajax(
+            cx.jQuery(this).data('adapter'),
+            cx.jQuery(this).data('method'),
+            {
+                showMessage: true,
+                data: params,
+                postSuccess: function(data) {
+                    window.location.href = data.data;
+                }
+            }
+        );
+    });
 });
+
+function initializeTabClickEvent(formId) {
+    cx.jQuery('.tabmenu a').click(function () {
+        var tabName = cx.jQuery(this).attr('id').split('_')[1];
+        selectTab(tabName, true, formId);
+    });
+}
 
 jQuery(document).ready(function(){
     jQuery('.mappedAssocciationButton, .edit').click(function() {
@@ -169,14 +269,15 @@ function editAssociation (thisElement) {
         paramAssociativeArray['mappedBy'],
         paramAssociativeArray['cssName'],
         paramAssociativeArray['sessionKey'],
-        existingData
+        existingData,
+        thisElement
     );
 }
 /*
 * This function creates a cx dialag for the ViewGenerator and opens it
 *
 */
-function openDialogForAssociation(content, className, existingData)
+function openDialogForAssociation(content, className, existingData, currentElement)
 {
 
     buttons = [
@@ -215,8 +316,16 @@ function openDialogForAssociation(content, className, existingData)
     });
     jQuery.each(existingData.split('&'), function(index, value){
         property = value.split('=');
-        dialog.getElement().find('[name='+property[0]+']').not('[type=button]').val(property[1]);
-        dialog.getElement().find('[type=button].mappedAssocciationButton').prop("disabled", true);
+        var el = dialog.getElement().find('[name='+property[0]+']');
+        if (el.attr('type') == 'button') {
+            el.filter('.mappedAssocciationButton').prop("disabled", true);
+        } else if (el.attr('type') == 'radio') {
+            dialog.getElement().find('[name='+property[0]+']').filter('[value='+property[1]+']').click();
+        } else if (el.attr('type') == 'checkbox') {
+            dialog.getElement().find('[name='+property[0]+']').filter('[value='+property[1]+']').prop('checked', true);
+        } else {
+            el.val(property[1]);
+        }
         if (property[0] == 'id') {
             jQuery('<input>').attr({
                 value: property[1],
@@ -300,7 +409,7 @@ function deleteAssociationMappingEntry(element)
  * we can insert the data for the mapped association
  *
  */
-function createAjaxRequest(entityClass, mappedBy, className, sessionKey, existingData){
+function createAjaxRequest(entityClass, mappedBy, className, sessionKey, existingData, currentElement){
     cx.ajax(
         'Html',
         'getViewOverJson',
@@ -314,7 +423,8 @@ function createAjaxRequest(entityClass, mappedBy, className, sessionKey, existin
             openDialogForAssociation(
                 data.data,
                 className,
-                existingData
+                existingData,
+                currentElement
             );
             jQuery('.datepicker').datepicker({
                 dateFormat: 'dd.mm.yy'
@@ -322,3 +432,163 @@ function createAjaxRequest(entityClass, mappedBy, className, sessionKey, existin
         }
     });
 }
+
+// Search and filter functionalities
+cx.ready(function() {
+    // since split() does weird things if limit param is used...
+    // from https://stackoverflow.com/questions/29998343/limiting-the-times-that-split-splits-rather-than-truncating-the-resulting-ar
+    function JavaSplit(string,separator,n) {
+        var split = string.split(separator);
+        if (split.length <= n)
+            return split;
+        var out = split.slice(0,n-1);
+        out.push(split.slice(n-1).join(separator));
+        return out;
+    }
+
+    // Since decodeURI() does not decode all characters and CSRF does weird things:
+    // TODO: Check if this is necessary (CSRF bug?) and either remove or move it
+    cx.tools.decodeURI = function (uri) {
+        uri = decodeURI(uri);
+        uri = uri.replace(/%2C/g, ",");
+        uri = uri.replace(/%3D/g, "=");
+        uri = uri.replace(/%2F/g, "/");
+        return uri;
+    }
+    
+    // If any of the dropdowns change or search button is pressed:
+    // manually generate url and document.location it
+    var getSubmitHandler = function(ev) {
+        var formId = jQuery(this).attr("form");
+        var elements = cx.jQuery("[form=" + formId + "]").filter("select,input,textarea").not("[type=button]").not("[type=submit]");
+        var vgId = jQuery("#" + formId).data("vg-id");
+        var url = cx.tools.decodeURI(document.location.href);
+        // drop paging param from url to show the first page of the results
+        url = url.replace(/pos=[0-9]+&?/, "");
+        var attrGroups = {}
+        elements.each(function(index, el) {
+            el = cx.jQuery(el);
+            var regex = new RegExp("([?&])" + el.attr("name") + "[^&]+");
+            var replacement = "";
+            if (el.val().length) {
+                var val = el.val();
+                if (el.is(".vg-encode")) {
+                    if (el.data("vg-attrgroup")) {
+                        val = "{" + vgId + "," + el.data("vg-field") + "=" + el.val() + "}";
+                        if (!attrGroups[el.data("vg-attrgroup")]) {
+                            attrGroups[el.data("vg-attrgroup")] = "";
+                        } else {
+                            attrGroups[el.data("vg-attrgroup")] += ",";
+                        }
+                        attrGroups[el.data("vg-attrgroup")] += val;
+                        return;
+                    }
+                    val = "{" + vgId + "," + el.val() + "}";
+                }
+                replacement = el.attr("name") + "=" + val;
+            }
+            if (regex.test(url)) {
+                if (replacement.length) {
+                    replacement = "$1" + replacement;
+                }
+                url = url.replace(regex, replacement);
+            } else if (replacement.length) {
+                url += "&" + replacement;
+            }
+        });
+        // TODO: Need to remove attrGroups from URL
+        cx.jQuery(".vg-encode[data-vg-attrgroup]").each(function(index, el) {
+            el = cx.jQuery(el);
+            if (!attrGroups[el.data("vg-attrgroup")]) {
+                attrGroups[el.data("vg-attrgroup")] = "";
+            }
+        });
+        if (attrGroups) {
+            cx.jQuery.each(attrGroups, function(index, el) {
+                val = "";
+                if (el.length) {
+                    val = index + "=" + el;
+                }
+                regex = new RegExp("([?&])" + index + "[^&]+");
+                if (regex.test(url)) {
+                    if (val.length) {
+                        val = "$1" + val;
+                    }
+                    url = url.replace(regex, val);
+                } else if (val.length) {
+                    url += "&" + val;
+                }
+            });
+        }
+        document.location = url;
+        ev.preventDefault();
+    };
+    cx.jQuery("select.vg-searchSubmit").change(getSubmitHandler);
+    cx.jQuery(".vg-searchSubmit").filter("a,input").click(getSubmitHandler);
+    
+    (function() {
+        var url = decodeURIComponent(document.location.href);
+        var parts = JavaSplit(url, "?", 2);
+        if (parts.length < 2) {
+            return;
+        }
+        parts = parts[1].split("&");
+        var elements = cx.jQuery("select,input,textarea").filter(".vg-encode");
+        if (!elements.length) {
+            return;
+        }
+        var regex = /\{([0-9+]),(?:([^=]+)=)?([^\}]+)\}/
+        cx.jQuery.each(parts, function(index, part) {
+            var attribute = JavaSplit(part, "=", 2);
+            if (attribute[0] == "csrf") {
+                return;
+            }
+            if (attribute[0] == "search" || attribute[0] == "term") {
+                var conditions = attribute[1].substr(1, attribute[1].length - 1).split("},{");
+                cx.jQuery.each(conditions, function(index, condition) {
+                    condition = "{" + condition + "}";
+                    var matches = condition.match(regex);
+                    if (matches.length < 4) {
+                        return;
+                    }
+                    var formId = "vg-" + matches[1] + "-searchForm";
+                    var formElement;
+                    if (matches[2]) {
+                        formElement = cx.jQuery("[form=" + formId + "][data-vg-field=" + matches[2] + "]");
+                    } else {
+                        formElement = cx.jQuery("[form=" + formId + "][name=" + attribute[0] + "]");
+                    }
+                    formElement.val(matches[3]);
+                });
+            }
+        });
+    })();
+});
+
+cx.bind('Html:postFormFix', function() {
+    var formId = 0;
+    cx.jQuery.each(cx.ui.forms.get(), function(index, el) {
+        formId = cx.jQuery(el).attr("id").split("-")[1];
+        cx.jQuery('#form-' + formId).find('*[id*="form-0-"]').each(function () {
+            var id = cx.jQuery(this).attr('id');
+            cx.jQuery(this).attr('id', id.replace('-0-', '-' + formId + '-'));
+        });
+    });
+
+    initializeTabClickEvent(formId);
+
+    var forms = document.getElementsByTagName('form');
+    for (var i = 0; i < forms.length; i++) {
+        var firstTab = forms.item(i).getElementsByClassName('vg-tabs')[0];
+        if (!firstTab) {
+            continue;
+        }
+        document.getElementById('form-'+formId+'-tab-legend').style.display = 'block';
+        if (document.getElementById('form-'+formId+'-tabmenu') != null) {
+            selectTab(firstTab.id, true, formId);
+        } else {
+            firstTab.style.display = 'block';
+        }
+    }
+
+}, 'ViewGenerator');

@@ -395,7 +395,7 @@ function _calendarUpdate()
             if (\Cx\Lib\UpdateUtil::column_exist(DBPREFIX.'module_calendar_event', 'enddate_timestamp')) {
                 \Cx\Lib\UpdateUtil::sql('ALTER TABLE `'.DBPREFIX.'module_calendar_event` DROP COLUMN `enddate_timestamp`');
             }
-            \Cx\LIb\UpdateUtil::sql('UPDATE `'.DBPREFIX.'module_calendar_event` SET `series_pattern_end_date` = FROM_UNIXTIME(`series_pattern_end`)');
+            \Cx\Lib\UpdateUtil::sql('UPDATE `'.DBPREFIX.'module_calendar_event` SET `series_pattern_end_date` = FROM_UNIXTIME(`series_pattern_end`)');
         } catch (\Cx\Lib\UpdateException $e) {
             return \Cx\Lib\UpdateUtil::DefaultActionHandler($e);
         }

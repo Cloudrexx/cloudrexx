@@ -227,6 +227,23 @@ class ContrexxCaptcha implements CaptchaInterface {
     }
 
     /**
+     * Get captcha validation code
+     *
+     * @return string Returns JS code
+     */
+    public function getJSValidationFn()
+    {
+        $captchaValidationCode = <<<JSCaptchaValidation
+        if (\$J('#captcha').length) {
+            var code = \$J('#coreCaptchaCode').val();
+            if (\$J.trim(code) === '') {
+                isCaptchaOk = false;
+            }
+        }
+JSCaptchaValidation;
+        return $captchaValidationCode;
+    }
+    /**
      * checks whether the entered string matches the captcha.
      * if the check is already done the result will be returned.
      *
@@ -246,6 +263,16 @@ class ContrexxCaptcha implements CaptchaInterface {
         }
 
         return $this->securityCheck;
+    }
+
+    /**
+     * Disable the captcha check
+     *
+     * @return void
+     */
+    public function disable()
+    {
+        $this->securityCheck = true;
     }
 
     private function isValidCode()

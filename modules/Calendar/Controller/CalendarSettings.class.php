@@ -76,8 +76,10 @@ class CalendarSettings extends CalendarLibrary
      *
      * @see getFrontendLanguages();
      */
-    function __construct(){
+    function __construct()
+    {
         $this->getFrontendLanguages();
+        parent::__construct();
     }
 
     /**
@@ -222,6 +224,7 @@ class CalendarSettings extends CalendarLibrary
             $objForm = new \Cx\Modules\Calendar\Controller\CalendarForm(intval($_POST['formId']));
 
             if($objForm->save($_POST)) {
+                \Cx\Core\Core\Controller\Cx::instanciate()->getComponent('Cache')->deleteComponentFiles('Calendar');
                 if(intval($_POST['formId']) == 0 || intval($_POST['copy']) == 1) {
                     $this->okMessage = $_ARRAYLANG['TXT_CALENDAR_FORM_SUCCESSFULLY_ADDED'];
                 } else {
@@ -239,6 +242,7 @@ class CalendarSettings extends CalendarLibrary
         if(isset($_GET['switch_status'])) {
             $objForm = new \Cx\Modules\Calendar\Controller\CalendarForm(intval($_GET['switch_status']));
             if($objForm->switchStatus()) {
+                \Cx\Core\Core\Controller\Cx::instanciate()->getComponent('Cache')->deleteComponentFiles('Calendar');
                 $this->okMessage = $_ARRAYLANG['TXT_CALENDAR_FORM_SUCCESSFULLY_EDITED'];
             } else {
                 $this->errMessage = $_ARRAYLANG['TXT_CALENDAR_FORM_CORRUPT_EDITED'];
@@ -248,6 +252,7 @@ class CalendarSettings extends CalendarLibrary
         if(isset($_GET['delete'])) {
             $objForm = new \Cx\Modules\Calendar\Controller\CalendarForm(intval($_GET['delete']));
             if($objForm->delete()) {
+                \Cx\Core\Core\Controller\Cx::instanciate()->getComponent('Cache')->deleteComponentFiles('Calendar');
                 $this->okMessage = $_ARRAYLANG['TXT_CALENDAR_FORM_SUCCESSFULLY_DELETED'];
             } else {
                 $this->errMessage = $_ARRAYLANG['TXT_CALENDAR_FORM_CORRUPT_DELETED'];
@@ -264,6 +269,7 @@ class CalendarSettings extends CalendarLibrary
             }
 
             if($status) {
+                \Cx\Core\Core\Controller\Cx::instanciate()->getComponent('Cache')->deleteComponentFiles('Calendar');
                 $this->okMessage = $_ARRAYLANG['TXT_CALENDAR_FORM_SUCCESSFULLY_EDITED'];
             } else {
                  $this->errMessage = $_ARRAYLANG['TXT_CALENDAR_FORM_CORRUPT_EDITED'];
@@ -456,11 +462,13 @@ class CalendarSettings extends CalendarLibrary
             'TXT_'.$this->moduleLangVar.'_TITLE'                    =>  $_ARRAYLANG['TXT_CALENDAR_PLACEHOLDER_TITLE'],
             'TXT_'.$this->moduleLangVar.'_START_DATE'               =>  $_ARRAYLANG['TXT_CALENDAR_PLACEHOLDER_START_DATE'],
             'TXT_'.$this->moduleLangVar.'_END_DATE'                 =>  $_ARRAYLANG['TXT_CALENDAR_PLACEHOLDER_END_DATE'],
+            'TXT_'.$this->moduleLangVar.'_LINK_ATTACHMENT'          =>  $_ARRAYLANG['TXT_CALENDAR_PLACEHOLDER_LINK_ATTACHMENT'],
             'TXT_'.$this->moduleLangVar.'_LINK_EVENT'               =>  $_ARRAYLANG['TXT_CALENDAR_PLACEHOLDER_LINK_EVENT'],
             'TXT_'.$this->moduleLangVar.'_LINK_REGISTRATION'        =>  $_ARRAYLANG['TXT_CALENDAR_PLACEHOLDER_LINK_REGISTRATION'],
             'TXT_'.$this->moduleLangVar.'_USERNAME'                 =>  $_ARRAYLANG['TXT_CALENDAR_PLACEHOLDER_USERNAME'],
             'TXT_'.$this->moduleLangVar.'_FIRSTNAME'                =>  $_ARRAYLANG['TXT_CALENDAR_PLACEHOLDER_FIRSTNAME'],
             'TXT_'.$this->moduleLangVar.'_LASTNAME'                 =>  $_ARRAYLANG['TXT_CALENDAR_PLACEHOLDER_LASTNAME'],
+            'TXT_'.$this->moduleLangVar.'_SALUTATION'               =>  $_ARRAYLANG['TXT_CALENDAR_PLACEHOLDER_SALUTATION'],
             'TXT_'.$this->moduleLangVar.'_URL'                      =>  $_ARRAYLANG['TXT_CALENDAR_PLACEHOLDER_URL'],
             'TXT_'.$this->moduleLangVar.'_DATE'                     =>  $_ARRAYLANG['TXT_CALENDAR_PLACEHOLDER_DATE'],
             'TXT_'.$this->moduleLangVar.'_REGISTRATION_TYPE'        =>  $_ARRAYLANG['TXT_CALENDAR_PLACEHOLDER_REGISTRATION_TYPE'],
@@ -472,35 +480,26 @@ class CalendarSettings extends CalendarLibrary
             'TXT_'.$this->moduleLangVar.'_COMMENT'                  =>  $_ARRAYLANG['TXT_CALENDAR_COMMENT'],
         ));
 
+        $objMailManager = new \Cx\Modules\Calendar\Controller\CalendarMailManager();
         if($mailId != 0) {
-            $objMailManager = new \Cx\Modules\Calendar\Controller\CalendarMailManager();
             $objMailManager->showMail($objTpl, $mailId);
             $objMail = $objMailManager->mailList[$mailId];
         }
 
-        $query = "SELECT  id,name
-                    FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_mail_action
-                ORDER BY `id` ASC";
-
-        $objResult = $objDatabase->Execute($query);
-        if ($objResult !== false) {
-            while (!$objResult->EOF) {
-                $checked = $objResult->fields['id'] == $objMail->action_id ? 'selected="selected"' : '';
-                $action .= '<option value="'.intval($objResult->fields['id']).'" '.$checked.'>'.$_ARRAYLANG['TXT_CALENDAR_MAIL_ACTION_'.strtoupper($objResult->fields['name'])].'</option>';
-                $objResult->MoveNext();
-            }
+        foreach ($objMailManager->getMailActions() as $id => $name) {
+            $checked = $id == $objMail->action_id ? 'selected="selected"' : '';
+            $action .= '<option value="'.$id.'" '.$checked.'>'.$name.'</option>';
         }
 
         foreach ($this->arrFrontendLanguages as $key => $arrLang) {
             $checked = $arrLang['id'] == $objMail->lang_id ? 'selected="selected"' : '';
             $lang .= '<option value="'.intval($arrLang['id']).'" '.$checked.'>'.$arrLang['name'].'</option>';
-            $objResult->MoveNext();
         }
 
         $objTpl->setVariable(array(
             $this->moduleLangVar.'_TEMPLATE_ACTION'          =>  $action,
             $this->moduleLangVar.'_TEMPLATE_LANG'            =>  $lang,
-            $this->moduleLangVar.'_TEMPLATE_CONTENT_HTML'    =>  new \Cx\Core\Wysiwyg\Wysiwyg('content_html', $objMail->content_html, 'fullpage'),
+            $this->moduleLangVar.'_TEMPLATE_CONTENT_HTML'    =>  new \Cx\Core\Wysiwyg\Wysiwyg('content_html', contrexx_raw2xhtml($objMail->content_html), 'fullpage'),
         ));
     }
 
@@ -638,20 +637,18 @@ class CalendarSettings extends CalendarLibrary
             'TXT_'.$this->moduleLangVar.'_HOST_KEY_AUTOGEN_IF_EMPTY'    => $_ARRAYLANG['TXT_CALENDAR_HOST_KEY_AUTOGEN_IF_EMPTY'],
             'TXT_'.$this->moduleLangVar.'_HOST_CATEGORY'                => $_ARRAYLANG['TXT_CALENDAR_CATEGORY'],
         ));
-
         if($hostId != 0) {
             $objHostManager = new \Cx\Modules\Calendar\Controller\CalendarHostManager();
             $objHostManager->showHost($objTpl, $hostId);
             $objHost = $objHostManager->hostList[$hostId];
         }
-
         $objCategoryManager = new \Cx\Modules\Calendar\Controller\CalendarCategoryManager(true);
         $objCategoryManager->getCategoryList();
-
         $category = '<select style="width: 252px;" name="category" >';
-        $category .= $objCategoryManager->getCategoryDropdown(intval($objHost->catId), 2);
+        $category .= $objCategoryManager->getCategoryDropdown(
+            array($objHost->catId => null),
+            CalendarCategoryManager::DROPDOWN_TYPE_ASSIGN);
         $category .= '</select>';
-
         $objTpl->setVariable(array(
             $this->moduleLangVar.'_HOST_CATEGORY'    => $category
         ));
@@ -689,6 +686,9 @@ class CalendarSettings extends CalendarLibrary
         }
 
         if ($objResult !== false) {
+            //Clear cache
+            $this->triggerEvent('clearEsiCache');
+            \Cx\Core\Core\Controller\Cx::instanciate()->getComponent('Cache')->deleteComponentFiles('Calendar');
             $this->okMessage = $_ARRAYLANG['TXT_CALENDAR_SETTINGS_SUCCESSFULLY_EDITED'];
         } else {
             $this->errMessage = $_ARRAYLANG['TXT_CALENDAR_SETTINGS_CORRUPT_EDITED'];
@@ -716,6 +716,7 @@ class CalendarSettings extends CalendarLibrary
 
         $objResult = $objDatabase->Execute($query);
         if ($objResult !== false) {
+            $infoboxJS = '';
             while (!$objResult->EOF) {
                 $objTpl->setVariable(array(
                     'TXT_CALENDAR_SECTION_NAME' => $_ARRAYLANG[$objResult->fields['title']],
@@ -738,12 +739,14 @@ class CalendarSettings extends CalendarLibrary
                         $objTpl->setVariable(array(
                             $this->moduleLangVar.'_SETTING_ROW'             => $i%2==0 ? 'row1' : 'row2',
                             $this->moduleLangVar.'_SETTING_NAME'            => $objResultSetting->fields['name'],
-                            'TXT_'.$this->moduleLangVar.'_SETTING_NAME'     => $_ARRAYLANG[$objResultSetting->fields['title']],
+                            'TXT_'.$this->moduleLangVar.'_SETTING_NAME'     => isset($_ARRAYLANG[$objResultSetting->fields['title']]) ? $_ARRAYLANG[$objResultSetting->fields['title']] : '',
                             $this->moduleLangVar.'_SETTING_VALUE'           => $arrSetting['output'],
                             $this->moduleLangVar.'_SETTING_INFO'            => $arrSetting['infobox'],
                         ));
 
-                        $infoboxJS .= $arrSetting['infoboxJS'];
+                        if (isset($arrSetting['infoboxJS'])) {
+                            $infoboxJS .= $arrSetting['infoboxJS'];
+                        }
 
                         $i++;
                         $objTpl->parse('settingsList');
@@ -780,6 +783,7 @@ class CalendarSettings extends CalendarLibrary
         global $_ARRAYLANG, $_CORELANG;
 
         $arrSetting = array();
+        $output = '';
 
         switch (intval($type)) {
             case 1:
@@ -839,24 +843,25 @@ class CalendarSettings extends CalendarLibrary
                                 }
                     $output .= '</select>';
                 }
-
                 if(!empty($special)) {
                     switch ($special) {
                         case 'getCategoryDorpdown':
                             $objCategoryManager = new \Cx\Modules\Calendar\Controller\CalendarCategoryManager(true);
                             $objCategoryManager->getCategoryList();
                             $output = '<select style="width: 252px;" name="settings['.$name.']" >';
-                            $output .= $objCategoryManager->getCategoryDropdown(intval($value), 1);
+                            $output .= $objCategoryManager->getCategoryDropdown(
+                                array(intval($value) => null),
+                                CalendarCategoryManager::DROPDOWN_TYPE_FILTER);
                             $output .= '</select>';
                             break;
                         case 'getPlaceDataDorpdown':
                             $objMediadirForms = new \Cx\Modules\MediaDir\Controller\MediaDirectoryForm(null, 'MediaDir');
                             $objMediadirForms->getForms();
-                            $objMediadirForms->listForms($objTpl,4);
+                            $objMediadirForms->listForms(null,4);
 
                             $output  = $_ARRAYLANG['TXT_CALENDAR_SELECT_FORM_MEDIADIR'].": <br />";
                             $output .= '<select style="width: 252px;" name="settings['.$name.']" >';
-                            $output .= $objMediadirForms->listForms($objTpl,4,intval($value));
+                            $output .= $objMediadirForms->listForms(null,4,intval($value));
                             $output .= '</select>';
                             break;
                     }

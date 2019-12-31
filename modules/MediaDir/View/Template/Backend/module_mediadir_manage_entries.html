@@ -59,10 +59,10 @@ var switchState = function(id, obj, action, type)
 {
     cx.jQuery.get('index.php', {cmd : '{MODULE_NAME}', act : 'switchState', id : id, state : action, type : type}).success(function() {
         if (action) {
-            path = '../core/Core/View/Media/icons/status_green.gif';
+            path = '/core/Core/View/Media/icons/status_green.gif';
             action = 0;
         } else {
-            path = '../core/Core/View/Media/icons/status_red.gif';
+            path = '/core/Core/View/Media/icons/status_red.gif';
             action = 1;
         }
         cx.jQuery(obj).children('img:first').attr('src', path);
@@ -179,7 +179,7 @@ var searchEntries = function (event) {
         <select name="selectAction" onchange="entriesDoAction('manageEntriesForm', this);">
             <option value="0" selected="selected">{TXT_SELECT_ACTION}</option>
             <option value="delete_entry">{TXT_DELETE_ALL}</option>
-            <option value="move_entry">{TXT_MEDIADIR_MOVE_ALL}</option>
+            <!-- <option value="move_entry">{TXT_MEDIADIR_MOVE_ALL}</option> -->
             <option value="restore_voting">{TXT_MEDIADIR_RESTORE_VOTING_ALL}</option>
             <option value="restore_comments">{TXT_MEDIADIR_RESTORE_COMMENTS_ALL}</option>
         </select>

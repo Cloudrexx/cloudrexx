@@ -70,6 +70,10 @@ class HTML_Common
      */
     var $_comment = '';
 
+    public function __construct($attributes = null, $tabOffset = 0) {
+        $this->HTML_Common($attributes, $tabOffset);
+    }
+
     /**
      * Class constructor
      * @param    mixed   $attributes     Associative array of table tag attributes

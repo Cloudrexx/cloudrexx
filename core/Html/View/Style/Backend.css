@@ -29,19 +29,37 @@ a.edit {
     cursor: pointer;
 }
 
+a.copy {
+    background-image: url(../Media/copy.gif);
+    display: inline-block;
+    height: 16px;
+    width: 16px;
+    margin-top: 4px;
+    margin-left: 4px;
+    cursor: pointer;
+}
+
+a.show {
+    background-image: url(/core/Core/View/Media/icons/details.gif);
+    display: inline-block;
+    height: 16px;
+    width: 16px;
+    margin-top: 4px;
+    margin-left: 4px;
+    cursor: pointer;
+}
+
 form.cx-ui {
     float: none;
     clear: both;
     display: block;
     width: 100%;
-    overflow: hidden;
 }
 
 form.cx-ui > fieldset {
     border: 0;
     padding: 0;
     margin-left: 0;
-    overflow: hidden;
 }
 
 form.cx-ui > fieldset + fieldset {
@@ -49,38 +67,40 @@ form.cx-ui > fieldset + fieldset {
 }
 
 form.cx-ui > fieldset > legend {
-    float: none;
-    display: block;
+    float: left;
     width: 100%;
     height: 28px;
     line-height: 28px;
     padding: 0 10px;
-    margin: 0;
-    background: #0a85c8;
+    margin: 0 0 2px;
+    background: #0071bc;
     font-weight: bold;
     color: #ffffff;
     text-align: left;
     white-space: nowrap;
+    box-sizing: border-box;
 }
 
-form.cx-ui > fieldset > .group {
-    float: none;
+form.cx-ui > fieldset .group {
+    float: left;
     display: block;
     padding: 3px;
     border-bottom: #e5e5e5 1px solid;
     margin: 0;
+    width: 100%;
 }
 
-form.cx-ui > fieldset > .group > label {
+form.cx-ui > fieldset .group > label {
     float: left;
     min-height: 22px;
     line-height: 22px;
     width: 192px;
-    padding: 0 0 0 8px;
+    padding: 0 8px;
+    word-break: break-word;
 }
 
-form.cx-ui > fieldset > .group > .controls,
-form.cx-ui > fieldset > .group > .controls .row {
+form.cx-ui > fieldset .group > .controls,
+form.cx-ui > fieldset .group > .controls .row {
     float: none;
     display: block;
     width: auto;
@@ -89,16 +109,16 @@ form.cx-ui > fieldset > .group > .controls .row {
     margin: 0;
 }
 
-form.cx-ui > fieldset > .group > .controls {
+form.cx-ui > fieldset .group > .controls {
     min-height: 22px;
     line-height: 22px;
     margin-left: 200px;
 }
-form.cx-ui > fieldset > .group > .controls > div {
+form.cx-ui > fieldset .group > .controls > div {
     display: inline-block;
 }
 
-form.cx-ui > fieldset > .actions {
+form.cx-ui > fieldset .actions {
     margin: 10px 0 0 0;
 }
 
@@ -116,7 +136,7 @@ form.cx-ui > fieldset > .actions {
     left: -10px;
     top: 0;
 }
-*+html form.cx-ui > fieldset > .group > .controls {
+*+html form.cx-ui > fieldset .group > .controls {
     text-algin: left;
     margin: 0;
 }
@@ -134,9 +154,14 @@ form.cx-ui input[type="email"],
 form.cx-ui input[type="password"],
 form.cx-ui input[type="tel"],
 form.cx-ui input[type="url"],
-form.cx-ui input[type="date"]{
+form.cx-ui input[type="date"],
+form.cx-ui select{
     width: 300px;
     max-width: 300px;
+    -ms-box-sizing:content-box;
+    -moz-box-sizing:content-box;
+    -webkit-box-sizing:content-box;
+    box-sizing:content-box;
 }
 form.cx-ui input#imagePath {
     width: 292px;
@@ -158,9 +183,14 @@ table.adminlist.sortable tr.row1 {
     user-select: none;
 }
 
+table.adminlist.sortable tr.row3 td:first-child,
 table.adminlist.sortable tr.row2 td:first-child,
 table.adminlist.sortable tr.row1 td:first-child {
     padding-left: 60px;
+}
+
+table.adminlist.sortable tr.row2 td:first-child,
+table.adminlist.sortable tr.row1 td:first-child {
     background: url(../../../../core/ContentManager/View/Media/Move.png) no-repeat 10px center;
     background-size: 18px;
 }
@@ -181,4 +211,54 @@ body.loading {
 
 table.sortable .sorter-loading {
     background-image: url(../../../../core_modules/News/View/Media/loading.gif) !important;
+}
+.vg-tabs {
+    display:none;
+}
+
+#form-0-overview {
+    display: block;
+}
+
+ul.vg-alphabeticalSearch {
+    display: flex;
+    flex-direction: row;
+    list-style-type: none;
+    padding: 0;
+}
+
+ul.vg-alphabeticalSearch li a:before {
+    content: "[";
+    font-weight: normal;
+    padding-right: 0.3em;
+}
+
+ul.vg-alphabeticalSearch li {
+    padding-left: 5px;
+}
+
+ul.vg-alphabeticalSearch li.selected {
+    font-weight: bold;
+}
+
+ul.vg-alphabeticalSearch li a:after {
+    content: "]";
+    font-weight: normal;
+    padding-left: 0.3em;
+}
+
+table.adminlist .vg-function-status {
+    background-image: url(/core/Html/View/Media/StatusInactive.gif);
+    width: 10px;
+    height: 10px;
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    padding: 3px 12px;
+}
+table.adminlist .vg-function-status.active {
+    background-image: url(/core/Html/View/Media/StatusActive.gif);
+}
+
+table.adminlist .vg-function-status.loading {
+    background-image: url(/core/Html/View/Media/Load.gif);
 }

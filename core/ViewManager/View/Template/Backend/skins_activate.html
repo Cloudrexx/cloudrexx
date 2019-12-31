@@ -1,21 +1,4 @@
 <!-- START themes_activate.html -->
-<script language="JavaScript" type="text/javascript">
-<!-- // confirm delete variable
-function deleteLanguage(id)
-{
-    if (confirm('{TXT_CONFIRM_DELETE_DATA}\n{TXT_ACTION_IS_IRREVERSIBLE} {TXT_ATTENTION_SYSTEM_FUNCTIONALLY_AT_RISK}')) {
-        window.location.replace("index.php?cmd=LanguageManager&{CSRF_PARAM}&act=dellang&languageId="+id);
-    }
-}
-
-function reloadThemesPage()
-{
-  document.themesFormActivate.action = 'index.php?cmd=ViewManager&act=activate';
-  document.themesFormActivate.submit();
-}
-// -->
-</script>
-
 <form name="themesFormAssign" method="post" action="index.php?cmd=ViewManager&amp;act=settings&amp;tpl=activate">
     <table summary="" width="100%" cellspacing="0" cellpadding="3" border="0" align="top" class="adminlist">
         <tr>
@@ -35,7 +18,7 @@ function reloadThemesPage()
         <!-- BEGIN themesLangRow -->
         <tr class="{THEMES_ROWCLASS}">
             <td nowrap="nowrap"><div align="left">{THEMES_LANG_ID}</div></td>
-            <td nowrap="nowrap">{THEMES_LANG_NAME}&nbsp;&nbsp;[ {THEMES_LANG_SHORTNAME}]</td>
+            <td nowrap="nowrap">{THEMES_LANG_NAME}&nbsp;&nbsp;[{THEMES_LANG_SHORTNAME}]</td>
             <td nowrap="nowrap">
                 <select name="themesId[{THEMES_LANG_ID}]" style="width: 170px;">
                     {THEMES_TEMPLATE_MENU}

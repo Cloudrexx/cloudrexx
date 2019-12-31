@@ -4,7 +4,7 @@
     <th>{TXT_NEWSLETTER_USER_TITLE}</th>
   </tr>
 </table>
-<form action="index.php?cmd=Newsletter&amp;act=users&amp;tpl=edit&amp;id={NEWSLETTER_RECIPIENT_ID}{NEWSLETTER_FILTER_PARAMS}" method="post">
+<form name="userAddEdit" action="index.php?cmd=Newsletter&amp;act=users&amp;tpl=edit&amp;id={NEWSLETTER_RECIPIENT_ID}{NEWSLETTER_FILTER_PARAMS}" method="post">
   <table width="100%" border="0" cellpadding="3" cellspacing="0" class="adminlist">
     <tr class="row3">
       <td width="15%"><b>{TXT_NEWSLETTER_EMAIL_ADDRESS}</b></td>
@@ -46,23 +46,42 @@
       <td width="15%">{TXT_NEWSLETTER_ASSOCIATED_LISTS}</td>
       <td width="20%">
         <!-- BEGIN newsletter_mail_associated_list_0 -->
-          <input type="checkbox" name="newsletter_recipient_associated_list[{NEWSLETTER_LIST_ID}]" id="newsletter_mail_associated_list_{NEWSLETTER_LIST_ID}" value="1" {NEWSLETTER_LIST_ASSOCIATED} /> <a href="index.php?cmd=Newsletter&amp;act=users&amp;newsletterListId={NEWSLETTER_LIST_ID}" target="_blank" title="{NEWSLETTER_SHOW_RECIPIENTS_OF_LIST_TXT}">{NEWSLETTER_LIST_NAME}</a><br />
+          <input type="checkbox" name="newsletter_recipient_associated_list[{NEWSLETTER_LIST_ID}]" id="newsletter_mail_associated_list_{NEWSLETTER_LIST_ID}" value="1" {NEWSLETTER_LIST_ASSOCIATED} />
+          <label for="newsletter_mail_associated_list_{NEWSLETTER_LIST_ID}">
+            <a href="index.php?cmd=Newsletter&amp;act=users&amp;newsletterListId={NEWSLETTER_LIST_ID}" target="_blank" title="{NEWSLETTER_SHOW_RECIPIENTS_OF_LIST_TXT}">{NEWSLETTER_LIST_NAME}</a>
+            {NEWSLETTER_CONSENT}
+          </label><br />
         <!-- END newsletter_mail_associated_list_0 -->
       </td>
       <td width="20%">
         <!-- BEGIN newsletter_mail_associated_list_1 -->
-          <input type="checkbox" name="newsletter_recipient_associated_list[{NEWSLETTER_LIST_ID}]" id="newsletter_mail_associated_list_{NEWSLETTER_LIST_ID}" value="1" {NEWSLETTER_LIST_ASSOCIATED} /> <a href="index.php?cmd=Newsletter&amp;act=users&amp;newsletterListId={NEWSLETTER_LIST_ID}" target="_blank" title="{NEWSLETTER_SHOW_RECIPIENTS_OF_LIST_TXT}">{NEWSLETTER_LIST_NAME}</a><br />
+          <input type="checkbox" name="newsletter_recipient_associated_list[{NEWSLETTER_LIST_ID}]" id="newsletter_mail_associated_list_{NEWSLETTER_LIST_ID}" value="1" {NEWSLETTER_LIST_ASSOCIATED} />
+          <label for="newsletter_mail_associated_list_{NEWSLETTER_LIST_ID}">
+            <a href="index.php?cmd=Newsletter&amp;act=users&amp;newsletterListId={NEWSLETTER_LIST_ID}" target="_blank" title="{NEWSLETTER_SHOW_RECIPIENTS_OF_LIST_TXT}">{NEWSLETTER_LIST_NAME}</a>
+            {NEWSLETTER_CONSENT}
+          </label><br />
         <!-- END newsletter_mail_associated_list_1 -->
       </td>
       <td width="45%">
         <!-- BEGIN newsletter_mail_associated_list_2 -->
-          <input type="checkbox" name="newsletter_recipient_associated_list[{NEWSLETTER_LIST_ID}]" id="newsletter_mail_associated_list_{NEWSLETTER_LIST_ID}" value="1" {NEWSLETTER_LIST_ASSOCIATED} /> <a href="index.php?cmd=Newsletter&amp;act=users&amp;newsletterListId={NEWSLETTER_LIST_ID}" target="_blank" title="{NEWSLETTER_SHOW_RECIPIENTS_OF_LIST_TXT}">{NEWSLETTER_LIST_NAME}</a><br />
+          <input type="checkbox" name="newsletter_recipient_associated_list[{NEWSLETTER_LIST_ID}]" id="newsletter_mail_associated_list_{NEWSLETTER_LIST_ID}" value="1" {NEWSLETTER_LIST_ASSOCIATED} />
+          <label for="newsletter_mail_associated_list_{NEWSLETTER_LIST_ID}">
+            <a href="index.php?cmd=Newsletter&amp;act=users&amp;newsletterListId={NEWSLETTER_LIST_ID}" target="_blank" title="{NEWSLETTER_SHOW_RECIPIENTS_OF_LIST_TXT}">{NEWSLETTER_LIST_NAME}</a>
+            {NEWSLETTER_CONSENT}
+          </label><br />
         <!-- END newsletter_mail_associated_list_2 -->
       </td>
     </tr>
     <tr class="{NEWSLETTER_NOTES_ROWCLASS}" style="vertical-align:top;">
         <td>{TXT_NEWSLETTER_NOTES}</td>
         <td colspan="3"><textarea name="newsletter_recipient_notes" rows="4" cols="39">{NEWSLETTER_RECIPIENT_NOTES}</textarea></td>
+    </tr>
+    <tr id="consentConfirmdiv" class="row1" style="vertical-align:top;">
+        <td>{TXT_NEWSLETTER_CONSENT_CONFIRM}</td>
+        <td colspan="3">
+          <input type="checkbox" name="consentConfirm" id="consentConfirm" value="1" {NEWSLETTER_CONSENT_CONFIRM_CHECK}/>
+        </td>
+        <td></td>
     </tr>
     <!-- BEGIN recipientProfileAttributes -->
     <tr>
@@ -205,6 +224,7 @@
     <!-- END recipientProfileAttributes -->
   </table>
   <br/>
+  <input type="hidden" name="editUser" id="editUser" value="{NEWSLETTER_RECIPIENT_ID}" />
   <input type="hidden" name="copy" value="{NEWSLETTER_RECIPIENT_COPY}" />
   <input type="submit" name="newsletter_recipient_save" value="{TXT_NEWSLETTER_SAVE}" />
   <a href="index.php?cmd=Newsletter&amp;act=users{NEWSLETTER_FILTER_PARAMS}">

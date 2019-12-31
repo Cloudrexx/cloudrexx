@@ -37,11 +37,6 @@
 namespace Cx\Modules\Checkout\Controller;
 
 /**
- * @ignore
- */
-\Env::get('ClassLoader')->loadFile(ASCMS_LIBRARY_PATH.'/phpmailer/class.phpmailer.php');
-
-/**
  * Checkout
  *
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
@@ -172,87 +167,94 @@ class Checkout extends CheckoutLibrary {
             $arrFieldValues['contact_phone'] = !empty($_REQUEST['contact_phone']) && ($_REQUEST['contact_phone'] !== $_ARRAYLANG['TXT_CHECKOUT_CONTACT_PHONE'].$htmlRequiredField) ? contrexx_input2raw(contrexx_strip_tags($_REQUEST['contact_phone'])) : '';
             $arrFieldValues['contact_email'] = !empty($_REQUEST['contact_email']) && ($_REQUEST['contact_email'] !== $_ARRAYLANG['TXT_CHECKOUT_CONTACT_EMAIL'].$htmlRequiredField) ? contrexx_input2raw(contrexx_strip_tags($_REQUEST['contact_email'])) : '';
 
-            //get keys of passed data
-            if (!isset($this->arrCurrencies[$invoiceCurrency]) && ($key = array_search(strtoupper($invoiceCurrency), $this->arrCurrencies))) {
-                $invoiceCurrency = $key;
-            }
-            if ((strtolower($contactTitle) !== self::MISTER) && (strtolower($contactTitle) !== self::MISS)) {
-                if (ucfirst(strtolower($contactTitle)) == $_ARRAYLANG['TXT_CHECKOUT_CONTACT_TITLE_MISTER']) {
-                    $contactTitle = self::MISTER;
-                } elseif (ucfirst(strtolower($contactTitle)) == $_ARRAYLANG['TXT_CHECKOUT_CONTACT_TITLE_MISS']) {
-                    $contactTitle = self::MISS;
-                }
-            } else {
-                $contactTitle = strtolower($contactTitle);
-            }
-            if (!isset($this->arrCountries[$contactCountry]) && ($key = array_search(ucfirst(strtolower($contactCountry)), $this->arrCountries))) {
-                $contactCountry = $key;
-            }
-
-            $arrUserData['text']['invoice_number']['name'] = $_ARRAYLANG['TXT_CHECKOUT_INVOICE_NUMBER'];
-            $arrUserData['text']['invoice_number']['value'] = $arrFieldValues['invoice_number'];
-            $arrUserData['text']['invoice_number']['length'] = 255;
-            $arrUserData['text']['invoice_number']['mandatory'] = 1;
-
-            $arrUserData['selection']['invoice_currency']['name'] = $_ARRAYLANG['TXT_CHECKOUT_INVOICE_CURRENCY'];
-            $arrUserData['selection']['invoice_currency']['value'] = $arrFieldValues['invoice_currency'];
-            $arrUserData['selection']['invoice_currency']['options'] = $this->arrCurrencies;
-            $arrUserData['selection']['invoice_currency']['mandatory'] = 1;
-
-            $arrUserData['numeric']['invoice_amount']['name'] = $_ARRAYLANG['TXT_CHECKOUT_INVOICE_AMOUNT'];
-            $arrUserData['numeric']['invoice_amount']['value'] = $arrFieldValues['invoice_amount'];
-            $arrUserData['numeric']['invoice_amount']['length'] = 15;
-            $arrUserData['numeric']['invoice_amount']['mandatory'] = 1;
-
-            $arrUserData['selection']['contact_title']['name'] = $_ARRAYLANG['TXT_CHECKOUT_CONTACT_TITLE'];
-            $arrUserData['selection']['contact_title']['value'] = $arrFieldValues['contact_title'];
-            $arrUserData['selection']['contact_title']['options'] = array(self::MISTER => '', self::MISS => '');
-            $arrUserData['selection']['contact_title']['mandatory'] = 1;
-
-            $arrUserData['text']['contact_forename']['name'] = $_ARRAYLANG['TXT_CHECKOUT_CONTACT_FORENAME'];
-            $arrUserData['text']['contact_forename']['value'] = $arrFieldValues['contact_forename'];
-            $arrUserData['text']['contact_forename']['length'] = 255;
-            $arrUserData['text']['contact_forename']['mandatory'] = 1;
-
-            $arrUserData['text']['contact_surname']['name'] = $_ARRAYLANG['TXT_CHECKOUT_CONTACT_SURNAME'];
-            $arrUserData['text']['contact_surname']['value'] = $arrFieldValues['contact_surname'];
-            $arrUserData['text']['contact_surname']['length'] = 255;
-            $arrUserData['text']['contact_surname']['mandatory'] = 1;
-
-            $arrUserData['text']['contact_company']['name'] = $_ARRAYLANG['TXT_CHECKOUT_CONTACT_COMPANY'];
-            $arrUserData['text']['contact_company']['value'] = $arrFieldValues['contact_company'];
-            $arrUserData['text']['contact_company']['length'] = 255;
-            $arrUserData['text']['contact_company']['mandatory'] = 0;
-
-            $arrUserData['text']['contact_street']['name'] = $_ARRAYLANG['TXT_CHECKOUT_CONTACT_STREET'];
-            $arrUserData['text']['contact_street']['value'] = $arrFieldValues['contact_street'];
-            $arrUserData['text']['contact_street']['length'] = 255;
-            $arrUserData['text']['contact_street']['mandatory'] = 1;
-
-            $arrUserData['text']['contact_postcode']['name'] = $_ARRAYLANG['TXT_CHECKOUT_CONTACT_POSTCODE'];
-            $arrUserData['text']['contact_postcode']['value'] = $arrFieldValues['contact_postcode'];
-            $arrUserData['text']['contact_postcode']['length'] = 255;
-            $arrUserData['text']['contact_postcode']['mandatory'] = 1;
-
-            $arrUserData['text']['contact_place']['name'] = $_ARRAYLANG['TXT_CHECKOUT_CONTACT_PLACE'];
-            $arrUserData['text']['contact_place']['value'] = $arrFieldValues['contact_place'];
-            $arrUserData['text']['contact_place']['length'] = 255;
-            $arrUserData['text']['contact_place']['mandatory'] = 1;
-
-            $arrUserData['selection']['contact_country']['name'] = $_ARRAYLANG['TXT_CHECKOUT_CONTACT_COUNTRY'];
-            $arrUserData['selection']['contact_country']['value'] = $arrFieldValues['contact_country'];
-            $arrUserData['selection']['contact_country']['options'] = $this->arrCountries;
-            $arrUserData['selection']['contact_country']['mandatory'] = 1;
-
-            $arrUserData['text']['contact_phone']['name'] = $_ARRAYLANG['TXT_CHECKOUT_CONTACT_PHONE'];
-            $arrUserData['text']['contact_phone']['value'] = $arrFieldValues['contact_phone'];
-            $arrUserData['text']['contact_phone']['length'] = 255;
-            $arrUserData['text']['contact_phone']['mandatory'] = 1;
-
-            $arrUserData['email']['contact_email']['name'] = $_ARRAYLANG['TXT_CHECKOUT_CONTACT_EMAIL'];
-            $arrUserData['email']['contact_email']['value'] = $arrFieldValues['contact_email'];
-            $arrUserData['email']['contact_email']['length'] = 255;
-            $arrUserData['email']['contact_email']['mandatory'] = 1;
+            $arrUserData = array(
+                'text' => array(
+                    'invoice_number' => array(
+                        'name'      => $_ARRAYLANG['TXT_CHECKOUT_INVOICE_NUMBER'],
+                        'value'     => $arrFieldValues['invoice_number'],
+                        'length'    => 255,
+                        'mandatory' => 1,
+                    ),
+                    'contact_forename' => array(
+                        'name'      => $_ARRAYLANG['TXT_CHECKOUT_CONTACT_FORENAME'],
+                        'value'     => $arrFieldValues['contact_forename'],
+                        'length'    => 255,
+                        'mandatory' => 1,
+                    ),
+                    'contact_surname' => array(
+                        'name'      => $_ARRAYLANG['TXT_CHECKOUT_CONTACT_SURNAME'],
+                        'value'     => $arrFieldValues['contact_surname'],
+                        'length'    => 255,
+                        'mandatory' => 1,
+                    ),
+                    'contact_company' => array(
+                        'name'      => $_ARRAYLANG['TXT_CHECKOUT_CONTACT_COMPANY'],
+                        'value'     => $arrFieldValues['contact_company'],
+                        'length'    => 255,
+                        'mandatory' => 0,
+                    ),
+                    'contact_street' => array(
+                        'name'      => $_ARRAYLANG['TXT_CHECKOUT_CONTACT_STREET'],
+                        'value'     => $arrFieldValues['contact_street'],
+                        'length'    => 255,
+                        'mandatory' => 1,
+                    ),
+                    'contact_postcode' => array(
+                        'name'      => $_ARRAYLANG['TXT_CHECKOUT_CONTACT_POSTCODE'],
+                        'value'     => $arrFieldValues['contact_postcode'],
+                        'length'    => 255,
+                        'mandatory' => 1,
+                    ),
+                    'contact_place' => array(
+                        'name'      => $_ARRAYLANG['TXT_CHECKOUT_CONTACT_PLACE'],
+                        'value'     => $arrFieldValues['contact_place'],
+                        'length'    => 255,
+                        'mandatory' => 1,
+                    ),
+                    'contact_phone' => array(
+                        'name'      => $_ARRAYLANG['TXT_CHECKOUT_CONTACT_PHONE'],
+                        'value'     => $arrFieldValues['contact_phone'],
+                        'length'    => 255,
+                        'mandatory' => 1,
+                    ),
+                ),
+                'selection' => array(
+                    'invoice_currency' => array(
+                        'name'      => $_ARRAYLANG['TXT_CHECKOUT_INVOICE_CURRENCY'],
+                        'value'     => $arrFieldValues['invoice_currency'],
+                        'options'   => $this->arrCurrencies,
+                        'mandatory' => 1,
+                    ),
+                    'contact_title' => array(
+                        'name'      => $_ARRAYLANG['TXT_CHECKOUT_CONTACT_TITLE'],
+                        'value'     => $arrFieldValues['contact_title'],
+                        'options'   => array(self::MISTER => '', self::MISS => ''),
+                        'mandatory' => 1,
+                    ),
+                    'contact_country' => array(
+                        'name'      => $_ARRAYLANG['TXT_CHECKOUT_CONTACT_COUNTRY'],
+                        'value'     => $arrFieldValues['contact_country'],
+                        'options'   => $this->arrCountries,
+                        'mandatory' => 1,
+                    )
+                ),
+                'numeric' => array(
+                    'invoice_amount' => array(
+                        'name'      => $_ARRAYLANG['TXT_CHECKOUT_INVOICE_AMOUNT'],
+                        'value'     => $arrFieldValues['invoice_amount'],
+                        'length'    => 15,
+                        'mandatory' => 1,
+                    )
+                ),
+                'email' => array(
+                    'contact_email' => array(
+                        'name'      => $_ARRAYLANG['TXT_CHECKOUT_CONTACT_EMAIL'],
+                        'value'     => $arrFieldValues['contact_email'],
+                        'length'    => 255,
+                        'mandatory' => 1,
+                    )
+                )
+            );
 
             $arrFieldsToHighlight = $this->validateUserData($arrUserData);
 
@@ -285,10 +287,12 @@ class Checkout extends CheckoutLibrary {
                         'PARAMPLUS' => 'section=Checkout',
                     );
 
-                    $arrSettings['postfinance_shop_id']['value'] = $arrYellowpay['pspid'];
-                    $arrSettings['postfinance_hash_signature_in']['value'] = $arrYellowpay['sha_in'];
-                    $arrSettings['postfinance_authorization_type']['value'] = $arrYellowpay['operation'];
-                    $arrSettings['postfinance_use_testserver']['value'] = $arrYellowpay['testserver'];
+                    $arrSettings = array(
+                        'postfinance_shop_id'            => array('value' => $arrYellowpay['pspid']),
+                        'postfinance_hash_signature_in'  => array('value' => $arrYellowpay['sha_in']),
+                        'postfinance_authorization_type' => array('value' => $arrYellowpay['operation']),
+                        'postfinance_use_testserver'     => array('value' => $arrYellowpay['testserver'])
+                    );
 
                     $landingPage = \Env::get('em')->getRepository('Cx\Core\ContentManager\Model\Entity\Page')->findOneByModuleCmdLang('Checkout', '', FRONTEND_LANG_ID);
 
@@ -720,20 +724,8 @@ class Checkout extends CheckoutLibrary {
     {
         global $_ARRAYLANG, $_CONFIG;
 
-        $objPHPMailer = new \phpmailer();
+        $objPHPMailer = new \Cx\Core\MailTemplate\Model\Entity\Mail();
 
-        if ($_CONFIG['coreSmtpServer'] > 0 && @include_once ASCMS_CORE_PATH.'/SmtpSettings.class.php') {
-            if (($arrSmtp = \SmtpSettings::getSmtpAccount($_CONFIG['coreSmtpServer'])) !== false) {
-                $objPHPMailer->IsSMTP();
-                $objPHPMailer->Host = $arrSmtp['hostname'];
-                $objPHPMailer->Port = $arrSmtp['port'];
-                $objPHPMailer->SMTPAuth = true;
-                $objPHPMailer->Username = $arrSmtp['username'];
-                $objPHPMailer->Password = $arrSmtp['password'];
-            }
-        }
-
-        $objPHPMailer->CharSet = CONTREXX_CHARSET;
         $objPHPMailer->IsHTML(true);
         $objPHPMailer->Subject = $arrMail['title'];
         $objPHPMailer->SetFrom($_CONFIG['contactFormEmail'], $_CONFIG['domainUrl']);

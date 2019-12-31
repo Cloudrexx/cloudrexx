@@ -59,7 +59,9 @@ class MediaDirectoryInputfieldAddStep extends \Cx\Modules\MediaDir\Controller\Me
 
     function getInputfield($intView, $arrInputfield, $intEntryId=null, $objAddStep)
     {
-        global $objDatabase, $_LANGID, $objInit;
+        global $objDatabase, $objInit;
+
+        $langId = static::getOutputLocale()->getId();
 
         switch ($intView) {
             default:
@@ -70,7 +72,7 @@ class MediaDirectoryInputfieldAddStep extends \Cx\Modules\MediaDir\Controller\Me
                 } else {
                     $arrStepInfos = $objAddStep->getLastStepInformations();
 
-                    $strValue = empty($arrInputfield['default_value'][$_LANGID]) ? $arrInputfield['default_value'][0] : $arrInputfield['default_value'][$_LANGID];
+                    $strValue = empty($arrInputfield['default_value'][$langId]) ? $arrInputfield['default_value'][0] : $arrInputfield['default_value'][$langId];
 
 
                     if($arrStepInfos['first'] == true) {
@@ -105,6 +107,10 @@ class MediaDirectoryInputfieldAddStep extends \Cx\Modules\MediaDir\Controller\Me
 
     function getContent($intEntryId, $arrInputfield, $arrTranslationStatus)
     {
+        return null;
+    }
+
+    function getRawData($intEntryId, $arrInputfield, $arrTranslationStatus) {
         return null;
     }
 

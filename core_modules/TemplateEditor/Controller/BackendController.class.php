@@ -88,9 +88,9 @@ class BackendController
      * @param \Cx\Core\Html\Sigma $template Template for current CMD
      * @param array               $cmd      CMD separated by slashes
      */
-    public function parsePage(\Cx\Core\Html\Sigma $template, array $cmd)
+    public function parsePage(\Cx\Core\Html\Sigma $template, array $cmd, &$isSingle = false)
     {
-        \Permission::checkAccess(47, 'static');
+        \Permission::checkAccess(\Cx\Core\ViewManager\Controller\ViewManager::TEMPLATE_EDITOR_ACCESS_ID, 'static');
         $fileStorage =
             new \Cx\Core_Modules\TemplateEditor\Model\Entity\OptionSetFileStorage(
             $this->cx->getWebsiteThemesPath()
@@ -132,10 +132,10 @@ class BackendController
         $this->presetRepository =
             new \Cx\Core_Modules\TemplateEditor\Model\Repository\PresetRepository(
                 new \Cx\Core_Modules\TemplateEditor\Model\Entity\PresetFileStorage(
-                    $this->cx->getWebsiteThemesPath() . '/'
-                    . $this->theme->getFoldername()
-                )
-            );
+                $this->cx->getWebsiteThemesPath() . '/'
+                . $this->theme->getFoldername()
+            )
+        );
         try {
             $this->themeOptions = $this->themeOptionRepository->get(
                 $this->theme
@@ -168,7 +168,7 @@ class BackendController
                     )
                 );
             }
-        } catch (\Symfony\Component\Yaml\ParserException $e) {
+        } catch (\Symfony\Component\Yaml\Exception\ParseException $e) {
 
         }
 

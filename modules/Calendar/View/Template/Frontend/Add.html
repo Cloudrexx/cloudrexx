@@ -41,6 +41,12 @@
                     <option value="1" {CALENDAR_EVENT_TYPE_REDIRECT}>{TXT_CALENDAR_EVENT_TYPE_REDIRECT}</option>
                 </select>
             </div>
+            <div>
+                <label>{TXT_CALENDAR_EVENT_DETAIL_VIEW}</label>
+                <div class="checkbox"><label class="eventDetailLink">
+                    <input type="checkbox" name="show-detail-view" {CALENDAR_EVENT_SHOW_DETAIL_VIEW} value="1" /> {TXT_CALENDAR_EVENT_DETAIL_VIEW_LABEL} </label>
+                </div>
+            </div>
             <div id="event-tabs">
                 <ul style="{CALENDAR_HIDE_ON_SINGLE_LANG}">
                     <!-- BEGIN eventTabMenuDescTab -->
@@ -341,7 +347,8 @@
             </div>
             <div>
                 <label>{TXT_CALENDAR_EVENT_CATEGORY} <font color="#ff0000">*</font></label>
-                <select id="category" name="category" class="form-control validate[required]">
+                <select multiple="multiple" id="category" name="category_ids[]"
+                         class="form-control validate[required]">
                     {CALENDAR_EVENT_CATEGORIES}
                 </select>
             </div>

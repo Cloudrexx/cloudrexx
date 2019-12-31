@@ -1,0 +1,10 @@
+a.news_category_switch {
+    background-image: url('/core/Core/View/Media/icons/folder_on.gif');
+    width: 16px;
+    height: 16px;
+    padding-right: 16px;
+    margin-right: 3px;
+}
+a.news_category_switch.hidden {
+    background-image: url('/core/Core/View/Media/icons/folder_off.gif');
+}

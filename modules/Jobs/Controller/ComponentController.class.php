@@ -49,7 +49,36 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     public function getControllerClasses() {
 // Return an empty array here to let the component handler know that there
 // does not exist a backend, nor a frontend controller of this component.
-        return array();
+        return array('Backend', 'JsonJobs', 'EsiWidget');
+    }
+
+    /**
+     * Returns a list of JsonAdapter class names
+     * 
+     * @return array List of ComponentController classes
+     */
+    public function getControllersAccessableByJson() {
+        return array('JsonJobsController', 'EsiWidgetController');
+    }
+
+    /**
+     * Do something after system initialization
+     *
+     * This event must be registered in the postInit-Hook definition
+     * file config/postInitHooks.yml.
+     * @param \Cx\Core\Core\Controller\Cx   $cx The instance of \Cx\Core\Core\Controller\Cx
+     */
+    public function postInit(\Cx\Core\Core\Controller\Cx $cx)
+    {
+        $widgetController = $this->getComponent('Widget');
+        $widget = new \Cx\Core_Modules\Widget\Model\Entity\EsiWidget(
+            $this,
+            'jobs_list',
+            \Cx\Core_Modules\Widget\Model\Entity\Widget::TYPE_BLOCK
+        );
+        $widgetController->registerWidget(
+            $widget
+        );
     }
 
     /**
@@ -63,29 +92,37 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             case \Cx\Core\Core\Controller\Cx::MODE_FRONTEND:
                 $objJobs = new Jobs(\Env::get('cx')->getPage()->getContent());
                 \Env::get('cx')->getPage()->setContent($objJobs->getJobsPage());
-                if ($page->getCmd() === 'details') {
-                    $objJobs->getPageTitle(\Env::get('cx')->getPage()->getTitle());
-                    \Env::get('cx')->getPage()->setTitle($objJobs->jobsTitle);
-                    \Env::get('cx')->getPage()->setContentTitle($objJobs->jobsTitle);
-                    \Env::get('cx')->getPage()->setMetaTitle($objJobs->jobsTitle);
-                }
                 break;
 
             case \Cx\Core\Core\Controller\Cx::MODE_BACKEND:
-
-                $this->cx->getTemplate()->addBlockfile('CONTENT_OUTPUT', 'content_master', 'LegacyContentMaster.html');
-                $objTemplate = $this->cx->getTemplate();
-
-                \Permission::checkAccess(148, 'static');
-
-                $subMenuTitle = $_CORELANG['TXT_JOBS_MANAGER'];
-                $objJobsManager = new JobsManager();
-                $objJobsManager->getJobsPage();
+                parent::load($page);
                 break;
 
             default:
                 break;
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function adjustResponse(
+        \Cx\Core\Routing\Model\Entity\Response $response
+    ) {
+        $page = $response->getPage();
+        if (
+            !$page ||
+            $page->getModule() !== $this->getName() ||
+            $page->getCmd() !== 'details'
+        ) {
+            return;
+        }
+
+        $objJobs = new Jobs('');
+        $objJobs->getDetails();
+        $page->setTitle($objJobs->jobsTitle);
+        $page->setContentTitle($objJobs->jobsTitle);
+        $page->setMetaTitle($objJobs->jobsTitle);
     }
 
 }

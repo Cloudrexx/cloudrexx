@@ -146,7 +146,6 @@ $_ARRAYLANG['TXT_CONTACT_CONTACT_FORM_SUCCESSFULLY_DELETED'] = "Контактн
 $_ARRAYLANG['TXT_CONTACT_FAILED_DELETE_CONTACT_FORM'] = "В процессе удаления контактной формы возникла ошибка!";
 $_ARRAYLANG['TXT_CONTACT_DATA_RECORD_UPDATED_SUCCESSFUL_VALIDATE'] = "Страница содержания успешно оновлена. Но так как вы не обладаете достаточными правами, она передана администратору на утверждение.bestätigen.";
 $_ARRAYLANG['TXT_CONTACT_SETTINGS_UPDATED'] = "Установки сохранены.";
-$_ARRAYLANG['TXT_CONTACT_META_DATE_BY_EXPORT'] = "Метаданные при экспорте";
 $_ARRAYLANG['TXT_CONTACT_DEFAULT_FEEDBACK_TXT'] = "Большое спасибо за Ваш запрос. Мы обязательно свяжемся с Вами.";
 $_ARRAYLANG['TXT_CONTACT_SHOW_FORM_AFTER_SUBMIT'] = "Снова показать форму ответа";
 $_ARRAYLANG['TXT_CONTACT_LANG'] = "Язык";

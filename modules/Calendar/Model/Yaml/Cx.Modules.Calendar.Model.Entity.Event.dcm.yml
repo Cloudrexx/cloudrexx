@@ -1,0 +1,345 @@
+Cx\Modules\Calendar\Model\Entity\Event:
+  type: entity
+  table: module_calendar_event
+  indexes:
+    contrexx_module_calendar_registration_form_ibkf:
+      columns: [ registration_form ]
+  id:
+    id:
+      type: integer
+      generator:
+        strategy: AUTO
+  fields:
+    type:
+      type: integer
+      options:
+        default: 0
+    startDate:
+      type: timestamp
+      nullable: true
+      column: startdate
+      options:
+        default: '0000-00-00 00:00:00'
+    endDate:
+      type: timestamp
+      nullable: true
+      column: enddate
+      options:
+        default: '0000-00-00 00:00:00'
+    useCustomDateDisplay:
+      type: boolean
+      column: use_custom_date_display
+    showStartDateList:
+      type: integer
+    showEndDateList:
+      type: integer
+    showStartTimeList:
+      type: integer
+    showEndTimeList:
+      type: integer
+    showTimeTypeList:
+      type: integer
+    showStartDateDetail:
+      type: integer
+    showEndDateDetail:
+      type: integer
+    showStartTimeDetail:
+      type: integer
+    showEndTimeDetail:
+      type: integer
+    showTimeTypeDetail:
+      type: integer
+    google:
+      type: integer
+    access:
+      type: integer
+      length: 1
+      options:
+        default: 0
+    priority:
+      type: integer
+      length: 1
+      options:
+        default: 3
+    price:
+      type: integer
+      options:
+        default: 0
+    link:
+      type: string
+      length: 255
+    pic:
+      type: string
+      length: 255
+      options:
+        default: ""
+    attach:
+      type: string
+      length: 255
+    placeMediadirId:
+      type: integer
+      column: place_mediadir_id
+    showIn:
+      type: string
+      length: 255
+      column: show_in
+    invitedGroups:
+      type: string
+      length: 255
+      nullable: true
+      column: invited_groups
+    invitedCrmGroups:
+      type: string
+      length: 255
+      nullable: true
+      column: invited_crm_groups
+    excludedCrmGroups:
+      type: string
+      length: 255
+      nullable: true
+      column: excluded_crm_groups
+    invitedMails:
+      type: text
+      nullable: true
+      column: invited_mails
+    invitationSent:
+      type: integer
+      column: invitation_sent
+    invitationEmailTemplate:
+      type: string
+      length: 255
+      column: invitation_email_template
+    registration:
+      type: integer
+      length: 1
+      options:
+        default: 0
+    registrationNum:
+      type: string
+      length: 45
+      nullable: true
+      column: registration_num
+    registrationNotification:
+      type: string
+      length: 1024
+      nullable: true
+      column: registration_notification
+    emailTemplate:
+      type: string
+      length: 255
+      column: email_template
+    ticketSales:
+      type: boolean
+      column: ticket_sales
+      options:
+        default: 0
+    numSeating:
+      type: text
+      column: num_seating
+    seriesStatus:
+      type: integer
+      length: 4
+      column: series_status
+      options:
+        default: 0
+    independentSeries:
+      type: smallint
+      column: independent_series
+      options:
+        default: 1
+    seriesType:
+      type: integer
+      column: series_type
+      options:
+        default: 0
+    seriesPatternCount:
+      type: integer
+      column: series_pattern_count
+      options:
+        default: 0
+    seriesPatternWeekday:
+      type: string
+      length: 7
+      column: series_pattern_weekday
+    seriesPatternDay:
+      type: integer
+      column: series_pattern_day
+      options:
+        default: 0
+    seriesPatternWeek:
+      type: integer
+      column: series_pattern_week
+      options:
+        default: 0
+    seriesPatternMonth:
+      type: integer
+      column: series_pattern_month
+      options:
+        default: 0
+    seriesPatternType:
+      type: integer
+      column: series_pattern_type
+      options:
+        default: 0
+    seriesPatternDouranceType:
+      type: integer
+      column: series_pattern_dourance_type
+      options:
+        default: 0
+    seriesPatternEnd:
+      type: integer
+      column: series_pattern_end
+      options:
+        default: 0
+    seriesPatternEndDate:
+      type: timestamp
+      column: series_pattern_end_date
+      options:
+        default: '0000-00-00 00:00:00'
+    seriesPatternBegin:
+      type: integer
+      column: series_pattern_begin
+      options:
+        default: 0
+    seriesPatternExceptions:
+      type: text
+      column: series_pattern_exceptions
+    seriesAdditionalRecurrences:
+      type: text
+      column: series_additional_recurrences
+    status:
+      type: boolean
+      options:
+        default: true
+    confirmed:
+      type: boolean
+      options:
+        default: true
+    showDetailView:
+      type: boolean
+      column: show_detail_view
+      options:
+        default: 1
+    author:
+      type: string
+      length: 255
+    allDay:
+      type: boolean
+      column: all_day
+      options:
+        default: false
+    locationType:
+      type: boolean
+      column: location_type
+      options:
+        default: true
+    placeId:
+      type: integer
+      column: place_id
+    placeStreet:
+      type: string
+      length: 255
+      nullable: true
+      column: place_street
+    placeZip:
+      type: string
+      length: 10
+      nullable: true
+      column: place_zip
+    placeWebsite:
+      type: string
+      length: 255
+      column: place_website
+      options:
+        default: ""
+    placeLink:
+      type: string
+      length: 255
+      column: place_link
+    placePhone:
+      type: string
+      length: 20
+      column: place_phone
+      options:
+        default: ""
+    placeMap:
+      type: string
+      length: 255
+      column: place_map
+    hostType:
+      type: boolean
+      column: host_type
+      options:
+        default: true
+    orgStreet:
+      type: string
+      length: 255
+      column: org_street
+    orgZip:
+      type: string
+      length: 10
+      column: org_zip
+    orgWebsite:
+      type: string
+      length: 255
+      column: org_website
+      options:
+        default: ""
+    orgLink:
+      type: string
+      length: 255
+      column: org_link
+    orgPhone:
+      type: string
+      length: 20
+      column: org_phone
+      options:
+        default: ""
+    orgEmail:
+      type: string
+      length: 255
+      column: org_email
+    hostMediadirId:
+      type: integer
+      column: host_mediadir_id
+    registrationExternalLink:
+      type: text
+      column: registration_external_link
+    registrationExternalFullyBooked:
+      type: boolean
+      column: registration_external_fully_booked
+      options:
+        default: 0
+  oneToMany:
+    eventFields:
+      targetEntity: Cx\Modules\Calendar\Model\Entity\EventField
+      mappedBy: event
+      cascade: [persist, remove]
+    invite:
+      targetEntity: Cx\Modules\Calendar\Model\Entity\Invite
+      mappedBy: event
+      cascade: [remove]
+    registrations:
+      targetEntity: Cx\Modules\Calendar\Model\Entity\Registration
+      mappedBy: event
+  manyToOne:
+    registrationForm:
+      targetEntity: Cx\Modules\Calendar\Model\Entity\RegistrationForm
+      inversedBy: events
+      joinColumn:
+        name: registration_form
+        referencedColumnName: id
+        nullable: false
+  manyToMany:
+    categories:
+      targetEntity: Cx\Modules\Calendar\Model\Entity\Category
+      inversedBy: events
+      cascade: [persist]
+      joinTable:
+        name: module_calendar_events_categories
+        joinColumns:
+          event_id:
+            referencedColumnName: id
+        inverseJoinColumns:
+          category_id:
+            referencedColumnName: id

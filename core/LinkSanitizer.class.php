@@ -77,6 +77,12 @@ class LinkSanitizer {
             # but only those who's values don't start with a slash..
             (?=[^\/])
 
+            # ..and neither start with a SSI-tag
+            (?!<!--\#[a-z]+\s+)
+
+            # ..and neither start with a ESI-tag
+            (?!<esi:)
+
             # ..and neither start with a protocol (http:, ftp:, javascript:, mailto:, etc)
             (?![a-zA-Z]+:)
 
@@ -95,7 +101,7 @@ class LinkSanitizer {
 
         if (!empty($_GET['preview']) || (isset($_GET['appview']) && ($_GET['appview'] == 1))) {
             $content = preg_replace_callback("/
-                (\<(?:a|form)[^>]*?\s+(?:href|action)\s*=\s*)
+                (\<(?:a|form|iframe)[^>]*?\s+(?:href|action|src)\s*=\s*)
                 (['\"])
                 (?!\#)
                 ((?![a-zA-Z]+?:|\\\\).+?)
@@ -182,7 +188,7 @@ class LinkSanitizer {
         ) {
             // this is an existing file, do not add virtual language dir
             return $matches[\LinkSanitizer::ATTRIBUTE_AND_OPEN_QUOTE] .
-            $localFile .
+            $localFile . (isset($testPath[1]) ? '?' . $testPath[1] : '') .
             $matches[\LinkSanitizer::CLOSE_QUOTE];
         } else {
             // this is a link to a page, add virtual language dir
@@ -202,14 +208,14 @@ class LinkSanitizer {
      * @return  bool     true if the file exists, otherwise false
      */
     private function fileExists($filePath) {
-        if (file_exists($filePath)) {
+        if (\Env::get('ClassLoader')->getFilePath($filePath)) {
             return true;
         }
 
         $arrUrl = parse_url($filePath);
         if (!empty($arrUrl['path'])
             && substr($arrUrl['path'], -4) !== '.php'
-            && file_exists($arrUrl['path'])) {
+            && \Env::get('ClassLoader')->getFilePath($arrUrl['path'])) {
             return true;
         }
 
@@ -230,7 +236,15 @@ class LinkSanitizer {
         $after  = $matches[4];
 
         if (strpos($value, '?') !== false) {
-            list($path, $query) = explode('?', $value);
+            list($path, $query) = explode('?', $value, 2);
+            // TODO: this is basically wrong as question marks are valid
+            // characters within a query string. See rfc for reference:
+            // https://tools.ietf.org/html/rfc3986#section-3.4
+            // However, this is probably a workaround to fix javascript
+            // code, that wrongly produces infinite redirect loops in
+            // combination with the 'preview' URL argument.
+            // See CLX-1780
+            $query = str_replace('?', '&', $query);
             $query = \Cx\Core\Routing\Url::params2array($query);
         } else {
             $path = $value;

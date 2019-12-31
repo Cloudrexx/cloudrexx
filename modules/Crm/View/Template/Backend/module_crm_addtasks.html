@@ -222,6 +222,7 @@
 
     </table>
     <br>
+    <input type="hidden" value="{CRM_TASK_ID}" name="id" />
     <input style="margin-top: 7px;" type="button" value="{TXT_CRM_BACK}" onClick="window.location='./index.php?cmd={MODULE_NAME}{CRM_BACK_LINK}&csrf='+cx.variables.get('csrf', 'contrexx')"/>
     <input style="margin-top: 7px;" type="submit" name="addtask" value="{TXT_CRM_SAVE}" onClick="return checkValidations();"/>
 </form>

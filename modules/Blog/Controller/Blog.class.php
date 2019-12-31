@@ -461,10 +461,14 @@ class Blog extends \Cx\Modules\Blog\Controller\BlogLibrary  {
         }
 
         if ($intMessageId > 0 && $intVoting >= 1 && $intVoting <= 10) {
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $userHash = $cx->getComponent(
+                'Stats'
+            )->getCounterInstance()->getUniqueUserId();
             $objDatabase->Execute(' INSERT INTO '.DBPREFIX.'module_blog_votes
                                     SET message_id = '.$intMessageId.',
                                         time_voted = '.time().',
-                                        ip_address = "'.$_SERVER['REMOTE_ADDR'].'",
+                                        ip_address = "' . $userHash . '",
                                         vote = "'.$intVoting.'"
                                 ');
 
@@ -543,12 +547,16 @@ class Blog extends \Cx\Modules\Blog\Controller\BlogLibrary  {
         //Now check error-string
         if (empty($this->_strErrorMessage) && $captchaCheck) {
             //No errors, insert entry
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $userHash = $cx->getComponent(
+                'Stats'
+            )->getCounterInstance()->getUniqueUserId();
             $objDatabase->Execute(' INSERT INTO '.DBPREFIX.'module_blog_comments
                                     SET     message_id = '.$intMessageId.',
                                             lang_id = '.$this->_intLanguageId.',
                                             is_active = "'.$intIsActive.'",
                                             time_created = '.time().',
-                                            ip_address = "'.$_SERVER['REMOTE_ADDR'].'",
+                                            ip_address = "' . $userHash . '",
                                             user_id = '.$intUserId.',
                                             user_name = "'.$strName.'",
                                             user_mail = "'.$strEMail.'",
@@ -566,39 +574,26 @@ class Blog extends \Cx\Modules\Blog\Controller\BlogLibrary  {
 
             if ($intIsNotification) {
                 //Send notification to administrator
-                if (\Env::get('ClassLoader')->loadFile(ASCMS_LIBRARY_PATH.'/phpmailer/class.phpmailer.php')) {
-                    $objMail = new \phpmailer();
+                $objMail = new \Cx\Core\MailTemplate\Model\Entity\Mail();
 
-                    if ($_CONFIG['coreSmtpServer'] > 0) {
-                        if (($arrSmtp = \SmtpSettings::getSmtpAccount($_CONFIG['coreSmtpServer'])) !== false) {
-                            $objMail->IsSMTP();
-                            $objMail->Host = $arrSmtp['hostname'];
-                            $objMail->Port = $arrSmtp['port'];
-                            $objMail->SMTPAuth = true;
-                            $objMail->Username = $arrSmtp['username'];
-                            $objMail->Password = $arrSmtp['password'];
-                        }
-                    }
-
-                    if ($this->_intCurrentUserId > 0) {
-                        $objFWUser = \FWUser::getFWUserObject();
-                        $strName = htmlentities($objFWUser->objUser->getUsername(), ENT_QUOTES, CONTREXX_CHARSET);
-                    }
-
-                    $strMailSubject = str_replace('[SUBJECT]', $strSubject, $_ARRAYLANG['TXT_BLOG_FRONTEND_DETAILS_COMMENT_INSERT_MAIL_SUBJECT']);
-                    $strMailBody    = str_replace('[USERNAME]', $strName, $_ARRAYLANG['TXT_BLOG_FRONTEND_DETAILS_COMMENT_INSERT_MAIL_BODY']);
-                    $strMailBody    = str_replace('[DOMAIN]', ASCMS_PROTOCOL . '://' . $_CONFIG['domainUrl'] . ASCMS_PATH_OFFSET, $strMailBody);
-                    $strMailBody    = str_replace('[SUBJECT]', $strSubject, $strMailBody);
-                    $strMailBody    = str_replace('[COMMENT]', $strComment, $strMailBody);
-
-                    $objMail->CharSet = CONTREXX_CHARSET;
-                    $objMail->SetFrom($_CONFIG['coreAdminEmail'], $_CONFIG['coreGlobalPageTitle']);
-                    $objMail->AddAddress($_CONFIG['coreAdminEmail']);
-                    $objMail->Subject   = $strMailSubject;
-                    $objMail->IsHTML(false);
-                    $objMail->Body      = $strMailBody;
-                    $objMail->Send();
+                if ($this->_intCurrentUserId > 0) {
+                    $objFWUser = \FWUser::getFWUserObject();
+                    $strName = htmlentities($objFWUser->objUser->getUsername(), ENT_QUOTES, CONTREXX_CHARSET);
                 }
+
+                $strMailSubject = str_replace('[SUBJECT]', $strSubject, $_ARRAYLANG['TXT_BLOG_FRONTEND_DETAILS_COMMENT_INSERT_MAIL_SUBJECT']);
+                $strMailBody    = str_replace('[USERNAME]', $strName, $_ARRAYLANG['TXT_BLOG_FRONTEND_DETAILS_COMMENT_INSERT_MAIL_BODY']);
+                $strMailBody    = str_replace('[DOMAIN]', ASCMS_PROTOCOL . '://' . $_CONFIG['domainUrl'] . ASCMS_PATH_OFFSET, $strMailBody);
+                $strMailBody    = str_replace('[SUBJECT]', $strSubject, $strMailBody);
+                $strMailBody    = str_replace('[COMMENT]', $strComment, $strMailBody);
+
+                $objMail->SetFrom($_CONFIG['coreAdminEmail'], $_CONFIG['coreGlobalPageTitle']);
+                $objMail->AddAddress($_CONFIG['coreAdminEmail']);
+                $objMail->Subject   = $strMailSubject;
+                $objMail->IsHTML(false);
+                $objMail->Body      = $strMailBody;
+                $objMail->Send();
+
             }
         }
     }
@@ -668,10 +663,14 @@ class Blog extends \Cx\Modules\Blog\Controller\BlogLibrary  {
         }
 
         //Now check database
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $userHash = $cx->getComponent(
+            'Stats'
+        )->getCounterInstance()->getUniqueUserId();
         $objVotingResult = $objDatabase->Execute('  SELECT  vote_id
                                                     FROM    '.DBPREFIX.'module_blog_votes
                                                     WHERE   message_id='.$intMessageId.' AND
-                                                            ip_address="'.$_SERVER['REMOTE_ADDR'].'" AND
+                                                            ip_address="' . $userHash . '" AND
                                                             time_voted > '.(time() - $this->_intVotingDaysBeforeExpire*24*60*60).'
                                                     LIMIT   1
                                                 ');
@@ -704,9 +703,13 @@ class Blog extends \Cx\Modules\Blog\Controller\BlogLibrary  {
         }
 
         //Now check database (make sure the user didn't delete the cookie
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $userHash = $cx->getComponent(
+            'Stats'
+        )->getCounterInstance()->getUniqueUserId();
         $objCommentResult = $objDatabase->Execute(' SELECT  comment_id
                                                     FROM    '.DBPREFIX.'module_blog_comments
-                                                    WHERE   ip_address="'.$_SERVER['REMOTE_ADDR'].'" AND
+                                                    WHERE   ip_address="' . $userHash . '" AND
                                                             time_created > '.(time() - intval($this->_arrSettings['blog_comments_timeout'])).'
                                                     LIMIT   1
                                                 ');
@@ -737,10 +740,14 @@ class Blog extends \Cx\Modules\Blog\Controller\BlogLibrary  {
         }
 
         //Now check database
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $userHash = $cx->getComponent(
+            'Stats'
+        )->getCounterInstance()->getUniqueUserId();
         $objVotingResult = $objDatabase->Execute('  SELECT  vote
                                                     FROM    '.DBPREFIX.'module_blog_votes
                                                     WHERE   message_id='.$intMessageId.' AND
-                                                            ip_address="'.$_SERVER['REMOTE_ADDR'].'" AND
+                                                            ip_address="' . $userHash . '" AND
                                                             time_voted > '.(time() - $this->_intVotingDaysBeforeExpire*24*60*60).'
                                                     LIMIT   1
                                                 ');

@@ -1,0 +1,18 @@
+Cx\Core\Locale\Model\Entity\Backend:
+  type: entity
+  table: core_locale_backend
+  repositoryClass: Cx\Core\Locale\Model\Repository\BackendRepository
+  id:
+    id:
+      type: integer
+      unsigned: true
+      generator:
+        strategy: AUTO
+  oneToOne:
+    iso1:
+      targetEntity: Language
+      inversedBy: backend
+      joinColumn:
+        name: iso_1
+        referencedColumnName: iso_1
+        nullable: false

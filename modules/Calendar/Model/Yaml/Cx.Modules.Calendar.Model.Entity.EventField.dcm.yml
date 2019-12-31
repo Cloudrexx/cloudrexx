@@ -1,0 +1,66 @@
+Cx\Modules\Calendar\Model\Entity\EventField:
+  type: entity
+  table: module_calendar_event_field
+  indexes:
+    contrexx_module_calendar_title_ibfk:
+      columns: [ title ]
+    contrexx_module_calendar_event_id_ibfk:
+      columns: [ event_id ]
+    eventIndex:
+      columns: [ title, teaser, description ]
+      flags: [ fulltext ]
+  fields:
+    eventId:
+      id: true
+      type: integer
+      column: event_id
+      associationKey: true
+    title:
+      type: string
+      length: 255
+      nullable: true
+    langId:
+      id: true
+      type: integer
+      column: lang_id
+    teaser:
+      type: text
+      nullable: true
+    description:
+      type: text
+      nullable: true
+    redirect:
+      type: string
+      length: 255
+    place:
+      type: string
+      length: 255
+    placeCity:
+      type: string
+      length: 255
+      nullable: false
+      column: place_city
+    placeCountry:
+      type: string
+      length: 255
+      nullable: false
+      column: place_country
+    orgName:
+      type: string
+      length: 255
+      column: org_name
+    orgCity:
+      type: string
+      length: 255
+      column: org_city
+    orgCountry:
+      type: string
+      length: 255
+      column: org_country
+  manyToOne:
+    event:
+      targetEntity: Cx\Modules\Calendar\Model\Entity\Event
+      inversedBy: eventFields
+      joinColumn:
+        name: event_id
+        referencedColumnName: id

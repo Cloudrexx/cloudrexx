@@ -68,8 +68,8 @@ class CopyCommand extends Command {
      */
     public function execute(array $arguments) {
         try {
-            $oldComponent = new \Cx\Core\Core\Model\Entity\ReflectionComponent($arguments[3], $arguments[2]);
-            $newComponent = new \Cx\Core\Core\Model\Entity\ReflectionComponent($arguments[5], $arguments[4]);
+            $oldComponent = new ReflectionComponent($arguments[3], $arguments[2]);
+            $newComponent = new ReflectionComponent($arguments[5], $arguments[4]);
         } catch (\Exception $ex) {
             throw new CommandException('Invalid arguments passed. Please check the parameters or run help command to see the options');
         }

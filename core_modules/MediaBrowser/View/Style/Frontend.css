@@ -553,7 +553,19 @@
     border-bottom: 2px solid #ddd
 }
 
-.media-browser-modal-window .table > + thead > tr:first-child > td, .media-browser-modal-window .table > + thead > tr:first-child > th, .media-browser-modal-window .table > colgroup + thead > tr:first-child > td, .media-browser-modal-window .table > colgroup + thead > tr:first-child > th, .media-browser-modal-window .table > thead:first-child > tr:first-child > td, .media-browser-modal-window .table > thead:first-child > tr:first-child > th, .uploader-modal .table > + thead > tr:first-child > td, .uploader-modal .table > + thead > tr:first-child > th, .uploader-modal .table > colgroup + thead > tr:first-child > td, .uploader-modal .table > colgroup + thead > tr:first-child > th, .uploader-modal .table > thead:first-child > tr:first-child > td, .uploader-modal .table > thead:first-child > tr:first-child > th {
+/* TODO: These should be improved (read: simplified and *fixed*) */
+.media-browser-modal-window .table > + thead > tr:first-child > td,
+.media-browser-modal-window .table > + thead > tr:first-child > th,
+.media-browser-modal-window .table > colgroup + thead > tr:first-child > td,
+.media-browser-modal-window .table > colgroup + thead > tr:first-child > th,
+.media-browser-modal-window .table > thead:first-child > tr:first-child > td,
+.media-browser-modal-window .table > thead:first-child > tr:first-child > th,
+.uploader-modal .table > + thead > tr:first-child > td,
+.uploader-modal .table > + thead > tr:first-child > th,
+.uploader-modal .table > colgroup + thead > tr:first-child > td,
+.uploader-modal .table > colgroup + thead > tr:first-child > th,
+.uploader-modal .table > thead:first-child > tr:first-child > td,
+.uploader-modal .table > thead:first-child > tr:first-child > th {
     border-top: 0
 }
 
@@ -1381,7 +1393,11 @@
     filter: alpha(opacity=20)
 }
 
-.media-browser-modal-window .tabMediaBrowserBreadcrumbs > ul li a, .media-browser-modal-window input#fileSearch, .uploader-modal .tabMediaBrowserBreadcrumbs > ul li a, .uploader-modal input#fileSearch {
+.media-browser-modal-window .tabMediaBrowserBreadcrumbs > ul li a,
+.media-browser-modal-window input.searchterm,
+.uploader-modal
+.tabMediaBrowserBreadcrumbs > ul li a,
+.uploader-modal input.searchterm {
     float: none;
     font-family: Arial, sans-serif;
     -webkit-font-kerning: auto;
@@ -1474,7 +1490,8 @@
     font-size: 12px
 }
 
-.media-browser-modal-window input#fileSearch, .uploader-modal input#fileSearch {
+.media-browser-modal-window input.searchterm,
+.uploader-modal input.searchterm {
     border-radius: 0;
     border: 1px solid #ccc;
     -webkit-box-shadow: rgba(0, 0, 0, .0745098) 0 1px 1px 0 inset;
@@ -1828,7 +1845,7 @@
 
 .media-browser-modal-window a,
 .media-browser-modal-window a:hover,
-.media-browser-modal-window a:focus  {
+.media-browser-modal-window a:focus {
     -webkit-transition: none;
     transition: none
 }
@@ -1851,7 +1868,7 @@
     cursor: pointer
 }
 
-.uploader-modal~.modal-backdrop {
+.uploader-modal ~ .modal-backdrop {
     position: fixed;
     top: 0;
     right: 0;
@@ -1861,18 +1878,18 @@
     background-color: #000;
 }
 
-.uploader-modal .fade, .uploader-modal~.fade {
+.uploader-modal .fade, .uploader-modal ~ .fade {
     opacity: 0;
     -webkit-transition: opacity .15s linear;
     -o-transition: opacity .15s linear;
     transition: opacity .15s linear;
 }
 
-.uploader-modal .fade.in , .uploader-modal~.fade.in {
+.uploader-modal .fade.in, .uploader-modal ~ .fade.in {
     opacity: 1;
 }
 
-.uploader-modal~.modal-backdrop.in {
+.uploader-modal ~ .modal-backdrop.in {
     opacity: .5;
     filter: alpha(opacity=50);
 }
@@ -1885,6 +1902,7 @@
     -o-transition: -o-transform 0.3s ease-out;
     transition: transform 0.3s ease-out;
 }
+
 .uploader-modal.modal.in .modal-dialog {
     -webkit-transform: translate3d(0, 0, 0);
     transform: translate3d(0, 0, 0);

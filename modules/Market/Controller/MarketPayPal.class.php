@@ -93,15 +93,15 @@ class MarketPayPal
         $currency_code = "EUR";
         $amount = $this->getPrice($orderId);
 
-        $sum = md5("contrexx".$_SERVER['HTTP_HOST'].intval($amount).$orderid);
+        $sum = md5("contrexx".$_SERVER['HTTP_HOST'].intval($amount).$orderId);
         $host = ASCMS_PROTOCOL."://".$_SERVER['HTTP_HOST'].ASCMS_PATH_OFFSET;
-        $return = $host. "/index.php?section=Market&cmd=paypal_successfull&id=$orderId";
+        $return = $host. "/index.php?section=Market&amp;cmd=paypal_successfull&amp;id=$orderId";
         $cancel_return = $host."/index.php?section=Market&amp;paypal_error&amp;id=$orderId";
         $notify_url = $host."/index.php?section=Market&amp;act=paypalIpnCheck";
-        $item_name = "Insarat";
+        $item_name = "Inserat";
 
 
-        $retval .= "\n<form name=\"paypal\" action=\"https://www.sandbox.paypal.com/ch/cgi-bin/webscr\" method=\"post\">\n";
+        $retval  = "\n<form name=\"paypal\" action=\"https://www.sandbox.paypal.com/ch/cgi-bin/webscr\" method=\"post\">\n";
         //$retval .= "\n<form name=\"paypal\" action=\"https://www.paypal.com/ch/cgi-bin/webscr\" method=\"post\">\n";
         $retval .= $this->getInput("cmd", "_xclick");
         $retval .= $this->getInput("business", $business);
@@ -111,7 +111,10 @@ class MarketPayPal
         $retval .= $this->getInput("custom", $orderId);
         $retval .= $this->getInput("notify_url", $notify_url);
         $retval .= $this->getInput("return", $return);
-        $retval .= $this->getInput("cancel_return", $cancel_return);
+        // PayPal does no longer use 'return' by default for successfull payments.
+        // Instead is uses 'cancel_return'. Therefore we simply set the success-link
+        // as cancel-link
+        $retval .= $this->getInput("cancel_return", $return);
         $retval .= "{$_ARRAYLANG['TXT_PAYPAL_SUBMIT']}Text<br /><br />";
         $retval .= "<input id=\"submit\" type=\"submit\" name=\"submit\" value=\"Button{$_ARRAYLANG['TXT_PAYPAL_SUBMIT_BUTTON']}\">\n";
         $retval .= "</form>\n";
@@ -120,7 +123,7 @@ class MarketPayPal
     }
 
     /**
-     * Generates an hidden input field
+     * Generates a hidden input field
      *
      * @param $field Array containing the name and the value of the field
      */
@@ -221,7 +224,7 @@ class MarketPayPal
         }
 
         // post back to PayPal system to validate
-        $header .= "POST /cgi-bin/webscr HTTP/1.0\r\n";
+        $header  = "POST /cgi-bin/webscr HTTP/1.0\r\n";
         $header .= "Content-Type: application/x-www-form-urlencoded\r\n";
         $header .= "Content-Length: " . strlen($req) . "\r\n\r\n";
         $fp = fsockopen ('www.sandbox.paypal.com', 80, $errno, $errstr, 30);

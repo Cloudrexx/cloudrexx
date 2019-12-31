@@ -1,0 +1,34 @@
+Cx\Modules\Calendar\Model\Entity\RegistrationFormField:
+  type: entity
+  table: module_calendar_registration_form_field
+  id:
+    id:
+      type: integer
+      generator:
+        strategy: AUTO
+  fields:
+    type:
+      type: enum
+      values: ['inputtext','textarea','select','radio','checkbox','mail','seating','agb','salutation','firstname','lastname','selectBillingAddress','fieldset']
+    required:
+      type: integer
+    order:
+      type: integer
+    affiliation:
+      type: string
+      length: 45
+  oneToMany:
+    registrationFormFieldNames:
+      targetEntity: Cx\Modules\Calendar\Model\Entity\RegistrationFormFieldName
+      mappedBy: registrationFormField
+    registrationFormFieldValues:
+      targetEntity: Cx\Modules\Calendar\Model\Entity\RegistrationFormFieldValue
+      mappedBy: registrationFormField
+  manyToOne:
+    registrationForm:
+      targetEntity: Cx\Modules\Calendar\Model\Entity\RegistrationForm
+      inversedBy: registrationFormFields
+      joinColumn:
+        name: form
+        nullable: false
+        referencedColumnName: id

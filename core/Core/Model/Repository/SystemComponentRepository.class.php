@@ -121,22 +121,30 @@ class SystemComponentRepository extends \Doctrine\ORM\EntityRepository
      * Finds entities by a set of criteria.
      *
      * Overwritten in order to decorate result
-     * @param array $criteria
+     * 
+     * @param array      $criteria
+     * @param array|null $orderBy
+     * @param int|null   $limit
+     * @param int|null   $offset
+     * 
      * @return array
      */
-    public function findBy(array $criteria) {
-        return $this->decorate(parent::findBy($criteria));
+    public function findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null) 
+    {
+        return $this->decorate(parent::findBy($criteria, $orderBy, $limit, $offset));
     }
 
     /**
      * Finds a single entity by a set of criteria.
      *
      * Overwritten in order to decorate result
-     * @param array $criteria
+     * @param array      $criteria
+     * @param array|null $orderBy
      * @return \Cx\Core\Core\Model\Entity\SystemComponentController The entity.
      */
-    public function findOneBy(array $criteria) {
-        return $this->decorate(parent::findOneBy($criteria));
+    public function findOneBy(array $criteria, array $orderBy = null)
+    {
+        return $this->decorate(parent::findOneBy($criteria, $orderBy));
     }
 
     /**
@@ -223,30 +231,63 @@ class SystemComponentRepository extends \Doctrine\ORM\EntityRepository
      */
     protected function callHooks($hookName, $arguments) {
         foreach ($this->findActive() as $component) {
-            $this->cx->getEvents()->triggerEvent(
-                'preComponent',
-                array(
-                    'componentName' => $component->getName(),
-                    'component' => $component,
-                    'hook' => $hookName,
-                )
-            );
-            call_user_func_array(
-                array(
-                    $component,
-                    $hookName,
-                ),
-                $arguments
-            );
-            $this->cx->getEvents()->triggerEvent(
-                'postComponent',
-                array(
-                    'componentName' => $component->getName(),
-                    'component' => $component,
-                    'hook' => $hookName,
-                )
-            );
+            $this->callHook($component, $hookName, $arguments);
         }
+    }
+
+    /**
+     * Calls a hook on a component
+     *
+     * @param \Cx\Core\Core\Model\Entity\SystemComponentController $component Component to call hook of
+     * @param string $hookMethodName Method name of the hook to call
+     * @param array $arguments Arguments for the hook
+     */
+    protected function callHook($component, $hookName, $arguments) {
+        $this->cx->getEvents()->triggerEvent(
+            'preComponent',
+            array(
+                'componentName' => $component->getName(),
+                'component' => $component,
+                'hook' => $hookName,
+            )
+        );
+        call_user_func_array(
+            array(
+                $component,
+                $hookName,
+            ),
+            $arguments
+        );
+        $this->cx->getEvents()->triggerEvent(
+            'postComponent',
+            array(
+                'componentName' => $component->getName(),
+                'component' => $component,
+                'hook' => $hookName,
+            )
+        );
+    }
+
+    /**
+     * Call hook script of all SystemComponents after they are loaded
+     */
+    public function callPostComponentLoadHooks() {
+        $this->callHooks(
+            'postComponentLoad',
+            array()
+        );
+    }
+
+    /**
+     * Call hook script of all SystemComponents after initalization
+     */
+    public function callPostInitHooks() {
+        $this->callHooks(
+            'postInit',
+            array(
+                $this->cx,
+            )
+        );
     }
 
     /**
@@ -289,6 +330,30 @@ class SystemComponentRepository extends \Doctrine\ORM\EntityRepository
             'postResolve',
             array(
                 $this->cx->getPage(),
+            )
+        );
+    }
+
+    /**
+     * Call hook script of current SystemComponent after post-resolving
+     * @param \Cx\Core\Routing\Model\Entity\Response $response Current response
+     */
+    public function callAdjustResponseHooks($response) {
+        // only call the hook on application pages
+        if ($response->getPage()->getType() != \Cx\Core\ContentManager\Model\Entity\Page::TYPE_APPLICATION) {
+            return;
+        }
+        // only call the hook on the current page's component
+        $component = $this->findOneBy(
+            array(
+                'name' => $response->getPage()->getModule(),
+            )
+        );
+        $this->callHook(
+            $component,
+            'adjustResponse',
+            array(
+                $response,
             )
         );
     }
@@ -380,11 +445,36 @@ class SystemComponentRepository extends \Doctrine\ORM\EntityRepository
 
     /**
      * Call hook script of all SystemComponents after finalization
+     * @param string $encode The cx endcode passed by reference
      */
-    public function callPostFinalizeHooks() {
+    public function callPostFinalizeHooks(&$endcode) {
         $this->callHooks(
             'postFinalize',
-            array()
+            array(
+                &$endcode,
+            )
         );
+    }
+
+    /**
+     * Loads the systemComponent using the doctrine entity manager for the existing SystemComponentController and adds it to the repository
+     * @param array $preLoadedComponents An array containing the preloaded components
+     */
+    public function setPreLoadedComponents($preLoadedComponents) {
+        foreach($preLoadedComponents as $componentName=>$preLoadedComponent) {
+            // get systemComponent by name
+            $systemComponent = parent::findOneBy(array('name' => $componentName));
+            // set systemComponent on existing systemComponentController
+            $preLoadedComponent->setSystemComponent($systemComponent);
+            // add yaml directory
+            $yamlDir = $this->cx->getClassLoader()->getFilePath($preLoadedComponent->getDirectory(false).'/Model/Yaml');
+            if (file_exists($yamlDir)) {
+                $this->cx->getDb()->addSchemaFileDirectories(array($yamlDir));
+            }
+            // store the systemComponent with its now loaded id as key to the array of loaded components
+            $this->loadedComponents[$preLoadedComponent->getId()] = $preLoadedComponent;
+            // Add JSON adapter
+            \Cx\Core\Json\JsonData::addAdapter($preLoadedComponent->getControllersAccessableByJson(), $preLoadedComponent->getNamespace() . '\\Controller');
+        }
     }
 }

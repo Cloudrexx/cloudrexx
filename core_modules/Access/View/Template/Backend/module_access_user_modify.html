@@ -5,9 +5,9 @@
 /* <![CDATA[ */
 $J(document).ready(function() {
     $J('input[name=access_user_password]').keyup(function(){
-        $J('#password-complexity').html(checkComplexity($J('input[name=access_user_password]').val()))
+        $J('#password-complexity').html(checkComplexity($J(this).val()))
     })
-
+    
     $J('input[name="notification_email"]').change(function() {
       if($J(this).val()==1) {
           $J('.password-field').hide();
@@ -17,11 +17,11 @@ $J(document).ready(function() {
           $J('.password-field').show();
       }
     });
-
+    
     if($J('input[name="notification_email"]').is(':visible')) {
         $J('input[name="notification_email"]:checked').trigger('change');
     }
-
+    
     /**
      * Checks the complexity of the given password.
      * @param string password
@@ -29,14 +29,14 @@ $J(document).ready(function() {
     var checkComplexity = function(password) {
         // Initial strength
         var strength = 0
-
+        
         // If the password length is less than 6, return message.
-        if (password.length < 6) {
+        if (password.length < 6) { 
             $J('#password-complexity').removeClass();
             $J('#password-complexity').addClass('short');
             return '{TXT_ACCESS_PASSWORD_TOO_SHORT}';
         }
-
+        
         if ('{ACCESS_PASSWORT_COMPLEXITY}' == 'on') {
             if (!password.match(/([a-zA-Z])/) || !password.match(/([0-9])/) || !password.match(/([a-z].*[A-Z])|([A-Z].*[a-z])/)) {
                 $J('#password-complexity').removeClass();
@@ -44,26 +44,26 @@ $J(document).ready(function() {
                 return '{TXT_ACCESS_PASSWORD_INVALID}';
             }
         }
-
+        
         // Length is ok, lets continue.
-
+        
         // If length is 8 characters or more, increase strength value.
         if (password.length > 7) strength += 1;
-
+        
         // If password contains both lower and uppercase characters, increase strength value.
         if (password.match(/([a-z].*[A-Z])|([A-Z].*[a-z])/)) strength += 1;
-
+        
         // If it has numbers and characters, increase strength value.
         if (password.match(/([a-zA-Z])/) && password.match(/([0-9])/)) strength += 1;
-
+        
         // If it has one special character, increase strength value.
         if (password.match(/([!,%,&,@,#,$,^,*,?,_,~])/)) strength += 1;
-
+        
         // If it has two special characters, increase strength value.
         if (password.match(/(.*[!,%,&,@,#,$,^,*,?,_,~].*[!,%,&,@,#,$,^,*,?,_,~])/)) strength += 1;
-
+        
         // Now we have calculated strength value, we can return messages.
-
+        
         // If value is less than 2.
         if (strength < 2 ) {
             $J('#password-complexity').removeClass().addClass('weak');
@@ -142,22 +142,26 @@ $J(document).ready(function() {
 <form autocomplete="off" action="index.php?cmd=Access&amp;act=user&amp;tpl=modify&amp;id={ACCESS_USER_ID}&amp;source={SOURCE}{URL_PARAMS}" onsubmit="accessAssociatedGroups=document.getElementById('access_user_associated_groups');if(accessAssociatedGroups !== null){accessSelectAllGroups(accessAssociatedGroups);}" method="post" enctype="multipart/form-data" id="access">
 <!-- start modifyUser1 div -->
 <div id="modifyUser1" class="userTab" style="display:block">
-  <table cellspacing="0" cellpadding="3" border="0" width="100%" class="adminlist" summary="user account informations">
-    <thead>
-      <tr>
-        <th colspan="2">{TXT_ACCESS_USER_ACCOUNT}</th>
-      </tr>
-    </thead>
-    <tbody style="vertical-align:top; white-space:nowrap;">
-      <tr class="row1">
+	<table cellspacing="0" cellpadding="3" border="0" width="100%" class="adminlist" summary="user account informations">
+		<thead>
+			<tr>
+				<th colspan="2">{TXT_ACCESS_USER_ACCOUNT}</th>
+			</tr>
+		</thead>
+		<tbody style="vertical-align:top; white-space:nowrap;">
+			<tr class="row1">
                 <td width="15%">{TXT_ACCESS_EMAIL}</td>
-                <td width="85%">{ACCESS_USER_EMAIL}</td>
+                <td width="85%">
+                    <input type="text" name="access_user_email" value="" style="display: none" />
+                    {ACCESS_USER_EMAIL}
+                    <input type="text" name="not-an-email" value="" style="display: none" />
+                </td>
             </tr>
             <!-- BEGIN access_user_username_block -->
             <tr class="row2">
-        <td width="15%">{TXT_ACCESS_USERNAME}</td>
-        <td width="85%">{ACCESS_USER_USERNAME}</td>
-      </tr>
+				<td width="15%">{TXT_ACCESS_USERNAME}</td>
+				<td width="85%">{ACCESS_USER_USERNAME}</td>
+			</tr>
             <!-- END access_user_username_block -->
                         <tr class="row2" style="display:{CSS_DISPLAY_STATUS_CREATE}">
                             <td >{TXT_ACCESS_NOTIFICATION_EMAIL_TITLE}</td>
@@ -165,59 +169,64 @@ $J(document).ready(function() {
                                 <input type="radio" name="notification_email" class="notification_email" id="password_gernerated" value="1" checked="checked" /> <label for="password_gernerated">{TXT_ACCESS_PASSWORD_GENERATED}</label><br />
                                 <input type="radio" name="notification_email" class="notification_email" id="password_manually" value="0" /> <label for="password_manually">{TXT_ACCESS_PASSWORD_MANUALLY}</label>
                             </td>
-      </tr>
-      <tr class="row1 password-field">
-        <td width="15%">{TXT_ACCESS_PASSWORD}</td>
-        <td width="85%">
-            {ACCESS_USER_PASSWORD}&nbsp;
-            <font color="red">*</font>&nbsp;
+			</tr>
+			<tr class="row1 password-field">
+				<td width="15%">{TXT_ACCESS_PASSWORD}</td>
+				<td width="85%">
+                    <input type="password" name="access_user_password" value="" style="display: none" />
+				    {ACCESS_USER_PASSWORD}&nbsp;
+				    <font color="red">*</font>&nbsp;
                         <span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_ACCESS_PASSWORD_INFO}</span>&nbsp;&nbsp;
-            <span id="password-complexity"></span>
-        </td>
-      </tr>
-      <tr class="row2 password-field">
-        <td>{TXT_ACCESS_CONFIRM_PASSWORD}</td>
-        <td>{ACCESS_USER_PASSWORD_CONFIRMED}</td>
-      </tr>
-      <tr class="row1">
-        <td>{TXT_ACCESS_LANGUAGE}</td>
-        <td>
-          {TXT_ACCESS_FRONTEND_DESC}:<br />{ACCESS_USER_FRONTEND_LANGUAGE}
-          <br /><br />
-          {TXT_ACCESS_BACKEND_DESC}:<br />{ACCESS_USER_BACKEND_LANGUAGE}
-        </td>
-      </tr>
-      <tr class="row2">
-        <td>{TXT_ACCESS_ADMINISTRATOR}</td>
-        <td>
-                    <input type="checkbox" name="access_user_is_admin" id="access_user_is_admin" value="1" {ACCESS_USER_IS_ADMIN} onchange="document.getElementById('access_user_validity_option').style.display = this.checked ? 'none' : ''" /> <label for="access_user_is_admin">{TXT_ACCESS_USER_ADMIN_RIGHTS}</label>
-                    <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_ACCESS_USER_ADMIN_RIGHTS_TOOLTIP}</span>
+				    <span id="password-complexity"></span>
+				</td>
+			</tr>
+			<tr class="row2 password-field">
+				<td>{TXT_ACCESS_CONFIRM_PASSWORD}</td>
+				<td>{ACCESS_USER_PASSWORD_CONFIRMED}</td>
+			</tr>
+			<tr class="row1">
+				<td>{TXT_ACCESS_LANGUAGE}</td>
+				<td>
+					{TXT_ACCESS_FRONTEND_DESC}:<br />{ACCESS_USER_FRONTEND_LANGUAGE}
+					<br /><br />
+					{TXT_ACCESS_BACKEND_DESC}:<br />{ACCESS_USER_BACKEND_LANGUAGE}
+				</td>
+			</tr>
+            <!-- BEGIN access_user_administrator -->
+			<tr class="row2">
+				<td>{TXT_ACCESS_ADMINISTRATOR}</td>
+				<td>
+                    <input type="checkbox" name="access_user_is_admin" id="access_user_is_admin" value="1" {ACCESS_USER_IS_ADMIN} onchange="document.getElementById('access_user_validity_option').style.display = this.checked ? 'none' : ''" />
+                    <label for="access_user_is_admin">{TXT_ACCESS_USER_ADMIN_RIGHTS}</label>
+                    <span class="icon-info tooltip-trigger"></span>
+                    <span class="tooltip-message">{TXT_ACCESS_USER_ADMIN_RIGHTS_TOOLTIP}</span>
                 </td>
-      </tr>
-      <tr class="row1" style="display:{CSS_DISPLAY_STATUS};">
-        <td>{TXT_ACCESS_STATUS}</td>
-        <td><input type="checkbox" name="access_user_active" id="access_user_active" value="1" {ACCESS_USER_ACTIVE} <!-- BEGIN access_user_active_notification_function_call -->onchange="confirmUserNotification('access_user_status_notification', this.checked)" <!-- END access_user_active_notification_function_call -->/> <label for="access_user_active">{TXT_ACCESS_ACTIVE}</label> <input type="hidden" name="access_user_status_notification" id="access_user_status_notification" value="0" /></td>
-      </tr>
-      <!-- BEGIN access_user_privacy -->
-      <tr class="row2">
-        <td rowspan="2">{TXT_ACCESS_PRIVACY}</td>
-        <td>
-          <!-- BEGIN access_user_email_access --><div>{ACCESS_USER_EMAIL_ACCESS}</div><!-- END access_user_email_access -->
+			</tr>
+            <!-- END access_user_administrator -->
+			<tr class="row1" style="display:{CSS_DISPLAY_STATUS};">
+				<td>{TXT_ACCESS_STATUS}</td>
+				<td><input type="checkbox" name="access_user_active" id="access_user_active" value="1" {ACCESS_USER_ACTIVE} <!-- BEGIN access_user_active_notification_function_call -->onchange="confirmUserNotification('access_user_status_notification', this.checked)" <!-- END access_user_active_notification_function_call -->/> <label for="access_user_active">{TXT_ACCESS_ACTIVE}</label> <input type="hidden" name="access_user_status_notification" id="access_user_status_notification" value="0" /></td>
+			</tr>
+			<!-- BEGIN access_user_privacy -->
+			<tr class="row2">
+				<td rowspan="2">{TXT_ACCESS_PRIVACY}</td>
+				<td>
+					<!-- BEGIN access_user_email_access --><div>{ACCESS_USER_EMAIL_ACCESS}</div><!-- END access_user_email_access -->
                     <!-- BEGIN access_user_profile_access --><div>{ACCESS_USER_PROFILE_ACCESS}</div><!-- END access_user_profile_access -->
-        </td>
-      </tr>
-      <!-- END access_user_privacy -->
+				</td>
+			</tr>
+			<!-- END access_user_privacy -->
       </tbody>
-  </table>
+	</table>
   <table cellspacing="0" cellpadding="3" border="0" width="100%" class="adminlist" summary="user account validity" style="display:{ACCESS_USER_VALIDITY_OPTION_DISPLAY};" id="access_user_validity_option">
-    <tbody style="vertical-align:top; white-space:nowrap;">
-      <tr class="row1">
+		<tbody style="vertical-align:top; white-space:nowrap;">
+			<tr class="row1">
         <td width="15%">{TXT_ACCESS_VALIDITY_EXPIRATION}</td>
         <td width="85%">{ACCESS_USER_VALIDITY_EXPIRATION_MENU}</td>
-      </tr>
-    </tbody>
-  </table>
-  <br />
+			</tr>
+		</tbody>
+	</table>
+	<br />
     <font color="red">*</font> {TXT_ACCESS_PASSWORD_MD5_ENCRYPTED}
     <br />
     <br />
@@ -225,86 +234,86 @@ $J(document).ready(function() {
 <!-- end modifyUser1 div -->
 <!-- start modifyUser2 div -->
 <div id="modifyUser2" class="userTab" style="display:none">
-  <table cellspacing="0" cellpadding="3" border="0" width="100%" class="adminlist" summary="user group assignements">
-    <thead>
-      <tr>
-        <th colspan="3">{TXT_ACCESS_USER_GROUP_S}</th>
-      </tr>
-    </thead>
-    <tbody style="vertical-align:top;">
-      <tr class="row1">
-        <td width="300">{TXT_ACCESS_AVAILABLE_GROUPS}<br />
-          <select name="access_user_not_associated_groups[]" id="access_user_not_associated_groups" size="15" style="width:300px;" multiple="multiple">
-          {ACCESS_USER_NOT_ASSOCIATED_GROUPS}
-          </select>
-          <br />
-          <a href="javascript:void(0);" onclick="accessSelectAllGroups(document.getElementById('access_user_not_associated_groups'))" title="{TXT_ACCESS_CHECK_ALL}">{TXT_ACCESS_CHECK_ALL}</a>
-          <br />
-          <a href="javascript:void(0);" onclick="accessDeselectAllGroups(document.getElementById('access_user_not_associated_groups'))" title="{TXT_ACCESS_UNCHECK_ALL}">{TXT_ACCESS_UNCHECK_ALL}</a>
-        </td>
-        <td width="45" style="text-align:center;">
-          <br />
-          <input type="button" value="&gt;&gt;" name="adduser" onclick="accessAddGroupToList(document.getElementById('access_user_not_associated_groups'), document.getElementById('access_user_associated_groups'))" style="margin-bottom:2px;" />
-          <br />
-          <input type="button" value="&lt;&lt;" name="removeuser" onclick="accessRemoveGroupFromList(document.getElementById('access_user_not_associated_groups'), document.getElementById('access_user_associated_groups'))" />
-        </td>
-        <td width="100%">{TXT_ACCESS_ASSOCIATED_GROUPS}<br />
-          <select name="access_user_associated_groups[]" id="access_user_associated_groups" size="15" style="width:300px;" multiple="multiple">
-          {ACCESS_USER_ASSOCIATED_GROUPS}
-          </select>
-          <br />
-          <a href="javascript:void(0);" onclick="accessSelectAllGroups(document.getElementById('access_user_associated_groups'))" title="{TXT_ACCESS_CHECK_ALL}">{TXT_ACCESS_CHECK_ALL}</a>
-          <br />
-          <a href="javascript:void(0);" onclick="accessDeselectAllGroups(document.getElementById('access_user_associated_groups'))" title="{TXT_ACCESS_UNCHECK_ALL}">{TXT_ACCESS_UNCHECK_ALL}</a>
-        </td>
-      </tr>
+	<table cellspacing="0" cellpadding="3" border="0" width="100%" class="adminlist" summary="user group assignements">
+		<thead>
+			<tr>
+				<th colspan="3">{TXT_ACCESS_USER_GROUP_S}</th>
+			</tr>
+		</thead>
+		<tbody style="vertical-align:top;">
+			<tr class="row1">
+				<td width="300">{TXT_ACCESS_AVAILABLE_GROUPS}<br />
+					<select name="access_user_not_associated_groups[]" id="access_user_not_associated_groups" size="15" style="width:300px;" multiple="multiple">
+					{ACCESS_USER_NOT_ASSOCIATED_GROUPS}
+					</select>
+					<br />
+					<a href="javascript:void(0);" onclick="accessSelectAllGroups(document.getElementById('access_user_not_associated_groups'))" title="{TXT_ACCESS_CHECK_ALL}">{TXT_ACCESS_CHECK_ALL}</a>
+					<br />
+					<a href="javascript:void(0);" onclick="accessDeselectAllGroups(document.getElementById('access_user_not_associated_groups'))" title="{TXT_ACCESS_UNCHECK_ALL}">{TXT_ACCESS_UNCHECK_ALL}</a>
+				</td>
+				<td width="45" style="text-align:center;">
+					<br />
+					<input type="button" value="&gt;&gt;" name="adduser" onclick="accessAddGroupToList(document.getElementById('access_user_not_associated_groups'), document.getElementById('access_user_associated_groups'))" style="margin-bottom:2px;" />
+					<br />
+					<input type="button" value="&lt;&lt;" name="removeuser" onclick="accessRemoveGroupFromList(document.getElementById('access_user_not_associated_groups'), document.getElementById('access_user_associated_groups'))" />
+				</td>
+				<td width="100%">{TXT_ACCESS_ASSOCIATED_GROUPS}<br />
+					<select name="access_user_associated_groups[]" id="access_user_associated_groups" size="15" style="width:300px;" multiple="multiple">
+					{ACCESS_USER_ASSOCIATED_GROUPS}
+					</select>
+					<br />
+					<a href="javascript:void(0);" onclick="accessSelectAllGroups(document.getElementById('access_user_associated_groups'))" title="{TXT_ACCESS_CHECK_ALL}">{TXT_ACCESS_CHECK_ALL}</a>
+					<br />
+					<a href="javascript:void(0);" onclick="accessDeselectAllGroups(document.getElementById('access_user_associated_groups'))" title="{TXT_ACCESS_UNCHECK_ALL}">{TXT_ACCESS_UNCHECK_ALL}</a>
+				</td>
+			</tr>
             <tr class="row2">
                 <td>{TXT_ACCESS_PRIMARY_GROUP}</td>
                 <td colspan="2">{ACCESS_USER_PRIMARY_GROUP_MENU}</td>
             </tr>
-    </tbody>
-  </table>
-  <br />
+		</tbody>
+	</table>
+	<br />
 </div>
 <!-- end modifyUser2 div -->
 <!-- start modifyUser3 div -->
 <div id="modifyUser3" class="userTab" style="display:none">
-  <table cellspacing="0" cellpadding="3" border="0" width="100%" class="adminlist" summary="profile">
-    <thead>
-      <tr>
-        <th colspan="2">{TXT_ACCESS_PROFILE}</th>
-      </tr>
-    </thead>
-    <tbody style="vertical-align:top;">
-      <!-- BEGIN access_profile_attribute_list -->
-      <tr class="row{ACCESS_ATTRIBUTE_ROW_CLASS}">
-        <td width="15%">{ACCESS_PROFILE_ATTRIBUTE_DESC}</td>
-        <td width="85%">{ACCESS_PROFILE_ATTRIBUTE}</td>
-      </tr>
-      <!-- END access_profile_attribute_list -->
-    </tbody>
-  </table>
-  <br />
+	<table cellspacing="0" cellpadding="3" border="0" width="100%" class="adminlist" summary="profile">
+		<thead>
+			<tr>
+				<th colspan="2">{TXT_ACCESS_PROFILE}</th>
+			</tr>
+		</thead>
+		<tbody style="vertical-align:top;">
+			<!-- BEGIN access_profile_attribute_list -->
+			<tr class="row{ACCESS_ATTRIBUTE_ROW_CLASS}">
+				<td width="15%">{ACCESS_PROFILE_ATTRIBUTE_DESC}</td>
+				<td width="85%">{ACCESS_PROFILE_ATTRIBUTE}</td>
+			</tr>
+			<!-- END access_profile_attribute_list -->
+		</tbody>
+	</table>
+	<br />
 </div>
 <!-- end modifyUser3 div -->
 <!-- start modifyUser4 div -->
 <div id="modifyUser4" class="userTab" style="display:none">
-  <table cellspacing="0" cellpadding="3" border="0" width="100%" class="adminlist" summary="additional functions">
-    <thead>
-      <tr>
-        <th colspan="2">{TXT_ACCESS_ADDITIONAL_FUNCTIONS}</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- BEGIN access_additional_functions_dam -->
-      <tr class="row{ACCESS_ADDITIONAL_FUNCTION_ROW_CLASS}">
-        <td width="15%">{TXT_ACCESS_DIGITAL_ASSET_MANAGEMENT}</td>
-        <td width="85%"><input type="checkbox" name="access_user_add_dma_category" id="access_user_add_dma_category" {ACCESS_USER_ADD_DMA_CATEGORY_CKECKED} style="vertical-align:middle;" /> <label for="access_user_add_dma_category">{TXT_ACCESS_ADD_DAM_CATEGORY}</label></td>
-      </tr>
-      <!-- END access_additional_functions_dam -->
-    </tbody>
-  </table>
-  <br />
+	<table cellspacing="0" cellpadding="3" border="0" width="100%" class="adminlist" summary="additional functions">
+		<thead>
+			<tr>
+				<th colspan="2">{TXT_ACCESS_ADDITIONAL_FUNCTIONS}</th>
+			</tr>
+		</thead>
+		<tbody>
+			<!-- BEGIN access_additional_functions_dam -->
+			<tr class="row{ACCESS_ADDITIONAL_FUNCTION_ROW_CLASS}">
+				<td width="15%">{TXT_ACCESS_DIGITAL_ASSET_MANAGEMENT}</td>
+				<td width="85%"><input type="checkbox" name="access_user_add_dma_category" id="access_user_add_dma_category" {ACCESS_USER_ADD_DMA_CATEGORY_CKECKED} style="vertical-align:middle;" /> <label for="access_user_add_dma_category">{TXT_ACCESS_ADD_DAM_CATEGORY}</label></td>
+			</tr>
+			<!-- END access_additional_functions_dam -->
+		</tbody>
+	</table>
+	<br />
 </div>
 <!-- end modifyUser4 div -->
 
@@ -322,7 +331,7 @@ $J(document).ready(function() {
                     <input type="checkbox" value="{ACCESS_NEWSLETTER_ID}" {ACCESS_NEWSLETTER_SELECTED} id="access_user_newsletters-{ACCESS_NEWSLETTER_ID}" name="access_user_newsletters[]" />
                 </td>
                 <td>
-                    <label for="access_user_newsletters-{ACCESS_NEWSLETTER_ID}">{ACCESS_NEWSLETTER_NAME}</label>
+                    <label for="access_user_newsletters-{ACCESS_NEWSLETTER_ID}">{ACCESS_NEWSLETTER_NAME} {ACCESS_NEWSLETTER_CONSENT}</label>
                 </td>
             </tr>
             <!-- END access_newsletter_list -->

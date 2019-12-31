@@ -32,10 +32,22 @@
  * @package     cloudrexx
  * @subpackage  module_jobs
  */
-$_ARRAYLANG['TXT_CATEGORY_MANAGER'] = "Categories";
 $_ARRAYLANG['TXT_JOBS_MANAGER'] = "Job offers";
-$_ARRAYLANG['TXT_CREATE_DOCUMENT'] = "New";
-$_ARRAYLANG['TXT_JOBS_MENU_OVERVIEW'] = "Overview";
+$_ARRAYLANG['TXT_MODULE_JOBS'] = 'Job offers';
+$_ARRAYLANG['TXT_MODULE_JOBS_ACT_CAT'] = "Categories";
+$_ARRAYLANG['TXT_MODULE_JOBS_ACT_LOC'] = "Regions";
+$_ARRAYLANG['TXT_MODULE_JOBS_ACT_JOB'] = "New";
+$_ARRAYLANG['TXT_MODULE_JOBS_ACT_DEFAULT'] = "Overview";
+$_ARRAYLANG['TXT_MODULE_JOBS_ACT_SETTINGS'] = 'Settings';
+$_ARRAYLANG['TXT_MODULE_JOBS_ACT_SETTINGS_DEFAULT'] = 'General';
+$_ARRAYLANG['TXT_MODULE_JOBS_ACT_SETTINGS_FLAG'] = 'Flags';
+$_ARRAYLANG['TXT_JOBS_FLAG'] = 'Flag';
+$_ARRAYLANG['TXT_JOBS_FLAGS'] = 'Flags';
+$_ARRAYLANG['TXT_JOBS_FLAGS_INFO'] = 'Select flags that shall be assinged to this job offer.';
+$_ARRAYLANG['name'] = 'Name';
+$_ARRAYLANG['icon'] = 'Icon';
+$_ARRAYLANG['value'] = 'Value';
+
 $_ARRAYLANG['TXT_AUTHOR'] = "Author";
 $_ARRAYLANG['TXT_DATE'] = "Date";
 $_ARRAYLANG['TXT_EDIT_DOCUMENTS'] = "edit job offer";
@@ -101,13 +113,26 @@ $_ARRAYLANG['TXT_JOBS_URL_ERROR'] = "Please enter a valid URL in the field 'Foot
 $_ARRAYLANG['TXT_JOBS_ASSOCIATED_LOCATIONS'] = "Assigned regions";
 $_ARRAYLANG['TXT_JOBS_AVAILABLE_LOCATIONS'] = "Available regions";
 $_ARRAYLANG['TXT_JOBS_LOCATIONS_NOT_ASSIGNED'] = "Could not assign regions";
+$_ARRAYLANG['TXT_JOBS_FLAGS_NOT_ASSIGNED'] = "Could not assign flags";
 $_ARRAYLANG['TXT_JOBS_LOCATION_NOT_DELETED'] = "Region assignments cannot be deleted.";
 $_ARRAYLANG['TXT_JOBS_SHOW_LOCATION_FE'] = "Provide regions for selection";
-$_ARRAYLANG['TXT_LOCATION_MANAGER'] = "Regions";
 $_ARRAYLANG['TXT_LOCATION'] = "Regions";
 $_ARRAYLANG['TXT_JOBS_WORK_START_NOW'] = "right now";
 $_ARRAYLANG['TXT_JOBS_SETTINGS'] = "Properties";
 $_ARRAYLANG['TXT_JOBS_SEARCH'] = "Search";
 $_ARRAYLANG['TXT_JOBS_NO_CATEGORY'] = "Select category";
 $_ARRAYLANG['TXT_JOBS_NO_TITLE'] = "Please enter a title";
-?>
+$_ARRAYLANG['TXT_JOBS_SETTINGS_TEMPLATE_INTEGRATION'] = "Template Integration";
+$_ARRAYLANG['TXT_JOBS_SETTINGS_TEMPLATE_INTEGRATION_LABEL'] = "Activate job listing integration in webdesign template";
+$_ARRAYLANG['TXT_JOBS_SETTINGS_SOURCE_OF_JOBS'] = "Source of jobs";
+$_ARRAYLANG['TXT_JOBS_SETTINGS_LATEST_JOBS_LABEL'] = "Latest jobs";
+$_ARRAYLANG['TXT_JOBS_SETTINGS_MANUAL_JOBS_LABEL'] = "Manual selection of hot jobs";
+$_ARRAYLANG['TXT_JOBS_SETTINGS_LISTING_LIMIT'] = "Listing limit";
+$_ARRAYLANG['TXT_JOBS_MODIFY_HOT_OFFER_LABEL'] = "List job in template integration";
+$_ARRAYLANG['TXT_JOBS_MODIFY_HOT_OFFER'] = "Hot offer";
+$_ARRAYLANG['TXT_JOBS_OVERVIEW_HOT'] = "Hot";
+$_ARRAYLANG['TXT_JOBS_RECORD_UPDATE_FAILED'] = "Failed to update the changes.";
+$_ARRAYLANG['TXT_JOBS_PAID'] = "Publishing";
+$_ARRAYLANG['TXT_JOBS_PAID_LABEL'] = "Paid job offer";
+$_ARRAYLANG['TXT_JOBS_NON_PAID_LABEL'] = "Regular job offer";
+$_ARRAYLANG['TXT_JOBS_USE_FLAGS_OPTION'] = "Use flags on job offers";

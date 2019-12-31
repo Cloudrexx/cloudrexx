@@ -1,0 +1,16 @@
+/**
+ * This file is loaded by the abstract SystemComponentBackendController
+ * You may add own CSS files using
+ * \JS::registerCSS(substr($this->getDirectory(false, true) . '/View/Style/FileName.css', 1));
+ * or remove this file if you don't need it
+ */
+#editor-htmlContent {height: 300px;width: 100%;}
+.controls .form-control {
+    height: auto;
+    line-height: 0;
+    box-shadow: none;
+    font-size: 13px;
+}
+table.adminlist tr:nth-child(2) td:nth-child(1) { width: 5%;}
+table.adminlist tr:nth-child(2) td:nth-child(2) { width: 90%;}
+table.adminlist tr:nth-child(2) td:nth-child(3) { width: 5%;}

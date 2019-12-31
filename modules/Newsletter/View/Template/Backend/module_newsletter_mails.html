@@ -37,7 +37,9 @@
         <td width="10%" style="white-space: nowrap;">{TXT_NEWSLETTER_DATE}</td>
         <td width="10%"></td>
         <td width="10%">{TXT_NEWSLETTER_SENT}</td>
+        <!-- BEGIN newsletter_stats -->
         <td width="10%">{TXT_NEWSLETTER_STATS}</td>
+        <!-- END newsletter_stats -->
         <!-- <td width="10%">{TXT_NEWSLETTER_SENDER}</td> -->
         <!-- <td width="5%">{TXT_NEWSLETTER_FORMAT}</td> -->
         <!-- <td width="15%">{TXT_NEWSLETTER_TEMPLATE}</td> -->
@@ -50,6 +52,7 @@
         <td style="white-space: nowrap;">{NEWSLETTER_MAIL_DATE}</td>
         <td style="white-space: nowrap;"><a href="index.php?cmd=Newsletter&amp;act=sendMail&amp;id={NEWSLETTER_MAIL_ID}" title="{TXT_NEWSLETTER_SEND_EMAIL}">{TXT_NEWSLETTER_SEND_EMAIL}</a></td>
         <td style="white-space: nowrap;">{NEWSLETTER_MAIL_COUNT} / {NEWSLETTER_MAIL_USERS} <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{NEWSLETTER_MAIL_SENT_DATE}</span></td>
+        <!-- BEGIN newsletter_stats_entry -->
         <td>
             <!-- BEGIN newsletter_mail_feedback_link -->
             <a href="index.php?cmd=Newsletter&amp;act=feedback&amp;id={NEWSLETTER_MAIL_ID}" title="{NEWSLETTER_FEEDBACK_OVERVIEW}">
@@ -61,6 +64,7 @@
             -
             <!-- END newsletter_mail_feedback_empty -->
         </td>
+        <!-- END newsletter_stats_entry -->
         <!-- <td>{NEWSLETTER_MAIL_SENDER_NAME} ({NEWSLETTER_MAIL_SENDER_EMAIL})</td> -->
         <!-- <td>{NEWSLETTER_MAIL_FORMAT}</td> -->
         <!-- <td>{NEWSLETTER_MAIL_TEMPLATE}</td> -->

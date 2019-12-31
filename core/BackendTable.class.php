@@ -44,17 +44,70 @@
  */
 class BackendTable extends HTML_Table {
 
-    public function __construct($attrs = array(), $options = array()) {
+    /**
+     * @var string Fully qualified template file name
+     */
+    protected $templateFile = '';
+
+    /**
+     * @var bool if table is editable
+     */
+    protected $editable = false;
+
+    /**
+     * @var \Cx\Core\Html\Controller\ViewGenerator $viewGenerator instance of
+     * ViewGenerator so we can load more than one view
+     */
+    protected $viewGenerator;
+
+    /**
+     * Whether or not the table has a master table header.
+     * A master table header is used as a title and is being
+     * parsed as TH tags.
+     * If no master table header is set, then the column labels
+     * will be used as the master table header and are being
+     * parsed as TH tags.
+     * Otherwise, if a master table header is set, the column labels
+     * are being parsed as regular TD tags, but with row class row3.
+     */
+    protected $hasMasterTableHeader = false;
+
+    /**
+     * BackendTable constructor.
+     * @param array $attrs        attributes of view generator
+     * @param array $options      options of view generator
+     * @param string $entityClass class name of entity
+     * @param \Cx\Core\Html\Controller\ViewGenerator $viewGenerator instance of ViewGenerator
+     * @param boolean $readOnly if view is only readable
+     * @throws \Doctrine\ORM\Mapping\MappingException
+     */
+    public function __construct($attrs = array(), $options = array(), $entityClass = '', $viewGenerator = null, $readOnly = false) {
         global $_ARRAYLANG;
 
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+
+        $this->viewGenerator = $viewGenerator;
+        if (!empty($options['functions']['editable'])) {
+            $this->editable = true;
+        }
+        if (
+            !isset($options['template']['table']) || 
+            !file_exists($options['template']['table'])
+        ) {
+            $this->templateFile = $cx->getCodeBaseCorePath().
+                '/Html/View/Template/Generic/Table.html';
+        } else { 
+            $this->templateFile = $options['template']['table'];
+        }
+               
         if ($attrs instanceof \Cx\Core_Modules\Listing\Model\Entity\DataSet) {
-            $hasMasterTableHeader = !empty($options['header']);
+            $this->hasMasterTableHeader = !empty($options['header']);
             // add master table-header-row
-            if ($hasMasterTableHeader) {
+            if ($this->hasMasterTableHeader) {
                 $this->addRow(array(0 => $options['header']), null, 'th');
             }
             $first = true;
-            $row = 1 + $hasMasterTableHeader;
+            $row = 1 + $this->hasMasterTableHeader;
             $sortBy     = (    isset($options['functions']['sortBy'])
                             && is_array($options['functions']['sortBy'])
                           )
@@ -78,6 +131,19 @@ class BackendTable extends HTML_Table {
             $pagingPos  = !empty($sortBy) && isset($sortBy['pagingPosition'])
                           ? $sortBy['pagingPosition']
                           : '';
+            $status     = (isset($options['functions']['status']) &&
+                           is_array($options['functions']['status'])
+                          ) ? $options['functions']['status']
+                          : array();
+            $statusComponent = !empty($status) && isset($status['component'])
+                ? $status['component']
+                : '';
+            $statusEntity = !empty($status) && isset($status['entity'])
+                ? $status['entity']
+                : '';
+
+            $formGenerator = new \Cx\Core\Html\Controller\FormGenerator($attrs, '', $entityClass, '', $options, 0, null, $this->viewGenerator, true);
+
             foreach ($attrs as $rowname=>$rows) {
                 $col = 0;
                 $virtual = $rows['virtual'];
@@ -87,6 +153,7 @@ class BackendTable extends HTML_Table {
                     $col++;
                 }
                 foreach ($rows as $header=>$data) {
+
                     if (!empty($sortingKey) && $header === $sortingKey) {
                         //Add the additional attribute id, for getting the updated sort order after the row sorting
                         $this->updateRowAttributes($row, array('id' => 'sorting' . $entity . '_' . $data), true);
@@ -140,12 +207,59 @@ class BackendTable extends HTML_Table {
                             }
                             $header = '<a href="' .  \Env::get('cx')->getRequest()->getUrl() . '&' . $sortParamName . '=' . $origHeader . $order . '" style="white-space: nowrap;">' . $header . ' ' . $img . '</a>';
                         }
-                        if ($hasMasterTableHeader) {
+                        if ($this->hasMasterTableHeader) {
                             $this->setCellContents(1, $col, $header, 'td', 0);
                         } else {
                             $this->setCellContents(0, $col, $header, 'th', 0);
                         }
                     }
+                    if (
+                        isset($options['fields']) &&
+                        isset($options['fields'][$origHeader]) &&
+                        isset($options['fields'][$origHeader]['valueCallback']) &&
+                        !empty($this->viewGenerator)
+                    ) {
+                        $valueCallback = $options['fields'][$origHeader]['valueCallback'];
+                        $vgId = null;
+                        if (
+                            isset($options['functions']) &&
+                            isset($options['functions']['vg_increment_number'])
+                        ) {
+                            $vgId = $options['functions']['vg_increment_number'];
+                        }
+                        try {
+                            $data = \Cx\Core\Html\Controller\ViewGenerator::callCallbackByInfo(
+                                $valueCallback,
+                                array(
+                                    'fieldvalue' => $data,
+                                    'fieldname' => $origHeader,
+                                    'rowData' => $rows,
+                                    'fieldoption' => $options['fields'][$origHeader],
+                                    'vgId' => $this->viewGenerator->getViewId(),
+                                )
+                            );
+                        } catch (\Exception $e) {
+                            \Message::add($e->getMessage(), \Message::CLASS_ERROR);
+                        }
+                    }
+
+                    if (
+                        isset($options['fields'][$origHeader]['editable']) &&
+                        $this->editable &&
+                        !in_array($origHeader, $status)
+                    ) {
+                        $data = $formGenerator->getDataElementWithoutType(
+                            $origHeader,
+                            $origHeader .'-'. $rowname,
+                            0,
+                            $data,
+                            $options,
+                            0
+                        );
+
+                        $encode = false;
+                    }
+
                     /* We use json to do parse the field function. The 'else if' is for backwards compatibility so you can declare
                     * the function directly without using json. This is not recommended and not working over session */
                     if (
@@ -155,27 +269,44 @@ class BackendTable extends HTML_Table {
                         isset($options['fields'][$origHeader]['table']['parse'])
                     ) {
                         $callback = $options['fields'][$origHeader]['table']['parse'];
+                        $vgId = null;
                         if (
-                            is_array($callback) &&
-                            isset($callback['adapter']) &&
-                            isset($callback['method'])
+                            isset($options['functions']) &&
+                            isset($options['functions']['vg_increment_number'])
                         ) {
-                            $json = new \Cx\Core\Json\JsonData();
-                            $jsonResult = $json->data(
-                                $callback['adapter'],
-                                $callback['method'],
+                            $vgId = $options['functions']['vg_increment_number'];
+                        }
+
+                        try {
+                            $data = \Cx\Core\Html\Controller\ViewGenerator::callCallbackByInfo(
+                                $callback,
                                 array(
                                     'data' => $data,
                                     'rows' => $rows,
+                                    'options' => $options['fields'][$origHeader],
+                                    'vgId' => $vgId,
                                 )
                             );
-                            if ($jsonResult['status'] == 'success') {
-                                $data = $jsonResult["data"];
-                            }
-                        } else if(is_callable($callback)){
-                            $data = $callback($data, $rows);
+                        } catch (\Exception $e) {
+                            \Message::add($e->getMessage(), \Message::CLASS_ERROR);
                         }
+
                         $encode = false; // todo: this should be set by callback
+                    } else if (in_array($origHeader, $status)) {
+                        $statusField = new \Cx\Core\Html\Model\Entity\HtmlElement('div');
+                        $class = '';
+                        if ((boolean)$data) {
+                            $class = 'active';
+                        }
+                        $statusField->setAttributes(
+                            array(
+                                'class' => 'vg-function-status ' . $class,
+                                'data-status-value' => $data,
+                                'data-entity-id' => $rowname
+                            )
+                        );
+                        $data = $statusField;
+                        $encode = false;
                     } else if (is_object($data) && get_class($data) == 'DateTime') {
                         $data = $data->format(ASCMS_DATE_FORMAT);
                     } else if (isset($options['fields'][$origHeader]) && isset($options['fields'][$origHeader]['type']) && $options['fields'][$origHeader]['type'] == '\Country') {
@@ -193,6 +324,24 @@ class BackendTable extends HTML_Table {
                         $data = '<i>(empty)</i>';
                         $encode = false;
                     }
+                    $cellAttrs = array();
+                    if (
+                        isset($options['fields']) &&
+                        isset($options['fields'][$origHeader]['table']) &&
+                        isset($options['fields'][$origHeader]['table']['attributes'])
+                    ) {
+                        $cellAttrs = $options['fields'][$origHeader]['table']['attributes'];
+                    }
+
+                    if ($readOnly) {
+                        // The content is already encoded in the TableGenerator
+                        // if the field option is set to this. So the variable
+                        // "encode" in the read-only view must always be false,
+                        // so that the content isn't encoded again.
+                        $encode = false;
+                    }
+
+                    $this->setCellAttributes($row, $col, $cellAttrs);
                     $this->setCellContents($row, $col, $data, 'TD', 0, $encode);
                     $col++;
                 }
@@ -202,7 +351,7 @@ class BackendTable extends HTML_Table {
                         if (isset($_ARRAYLANG['TXT_FUNCTIONS'])) {
                             $header = $_ARRAYLANG['TXT_FUNCTIONS'];
                         }
-                        if ($hasMasterTableHeader) {
+                        if ($this->hasMasterTableHeader) {
                             $this->setCellContents(1, $col, $header, 'td', 0, true);
                         } else {
                             $this->setCellContents(0, $col, $header, 'th', 0, true);
@@ -219,17 +368,43 @@ class BackendTable extends HTML_Table {
                 $row++;
             }
             // adjust colspan of master-table-header-row
-            if ($hasMasterTableHeader) {
-                $this->setCellAttributes(0, 0, array('colspan' => $col + is_array($options['functions'])));
-                $this->updateRowAttributes(1, array('class' => 'row3'), true);
+            $this->altRowAttributes(1 + $this->hasMasterTableHeader, array('class' => 'row1'), array('class' => 'row2'), true);
+            if ($this->hasMasterTableHeader) {
+                // now that the number of displayed columns is known:
+                $headerColspan = $col;
+                // we need to substract one if we have "overall functions"
+                $headerColspan -= (int) (
+                    isset($options['functions']) &&
+                    isset($options['functions']['export']) &&
+                    is_array($options['functions']['export'])
+                );
+                // we need to add one if there's an additional functions row
+                $headerColspan += (int) $this->hasRowFunctions(
+                    $options['functions']
+                );
+                $this->updateCellAttributes(
+                    0,
+                    0,
+                    array(
+                        'colspan' => $headerColspan
+                    )
+                );
+
+                if (!$readOnly) {
+                    // prepare overall functions code
+                    $overallFunctionsCode = $this->getOverallFunctionsCode($options['functions'], $attrs);
+                    $this->setHeaderContents(0, $col, $overallFunctionsCode);
+                    $this->updateCellAttributes(0, $col, array('style' => 'text-align:right;'));
+                    $this->updateRowAttributes(1, array('class' => 'row3'), true);
+                }
             }
             // add multi-actions
             if (isset($options['multiActions'])) {
                 $multiActionsCode = '
-                    <img src="images/icons/arrow.gif" width="38" height="22" alt="^" title="^">
+                    <img src="'.$cx->getCodeBaseCoreWebPath().'/Html/View/Media/arrow.gif" width="38" height="22" alt="^" title="^">
                     <a href="#" onclick="jQuery(\'input[type=checkbox]\').prop(\'checked\', true);return false;">' . $_ARRAYLANG['TXT_SELECT_ALL'] . '</a> /
                     <a href="#" onclick="jQuery(\'input[type=checkbox]\').prop(\'checked\', false);return false;">' . $_ARRAYLANG['TXT_DESELECT_ALL'] . '</a>
-                    <img alt="-" title="-" src="images/icons/strike.gif">
+                    <img alt="-" title="-" src="'.$cx->getCodeBaseCoreWebPath().'/Html/View/Media/strike.gif">
                 ';
                 $multiActions = array(''=>$_ARRAYLANG['TXT_SUBMIT_SELECT']);
                 foreach ($options['multiActions'] as $actionName=>$actionProperties) {
@@ -246,8 +421,10 @@ class BackendTable extends HTML_Table {
                 }
                 $select = new \Cx\Core\Html\Model\Entity\DataElement(
                     'cxMultiAction',
-                    \Html::getOptions($multiActions),
-                    \Cx\Core\Html\Model\Entity\DataElement::TYPE_SELECT
+                    '',
+                    \Cx\Core\Html\Model\Entity\DataElement::TYPE_SELECT,
+                    null,
+                    $multiActions
                 );
                 // this is not a nice place for this code
                 // but we should cleanup this complete class and make
@@ -273,13 +450,35 @@ class BackendTable extends HTML_Table {
                 $this->setCellContents($row, 0, $multiActionsCode . $select, 'TD', 0);
                 $this->setCellAttributes($row, 0, array('colspan' => $col + is_array($options['functions'])));
             }
+            // adds custom attributes to row
+            if (isset($options['rowAttributes'])) {
+                $row = 1 + $this->hasMasterTableHeader;
+                $callback = $options['rowAttributes'];
+                foreach ($attrs as $rowname=>$rows) {
+                    $originalAttributes = $this->getRowAttributes($row);
+                    $data = $originalAttributes;
+                    try {
+                        $data = \Cx\Core\Html\Controller\ViewGenerator::callCallbackByInfo(
+                            $callback,
+                            array(
+                                'data' => $rows,
+                                'attributes' => $originalAttributes,
+                            )
+                        );
+                    } catch (\Exception $e) {
+                        \Message::add($e->getMessage(), \Message::CLASS_ERROR);
+                    }
+                    $this->updateRowAttributes($row, $data, true);
+                    $row++;
+                }
+            }
             $attrs = array();
         }
         //add the sorting parameters as table attribute
         //if the row sorting functionality is enabled
         $className = 'adminlist';
         if (!empty($sortField)) {
-            $className = '\'adminlist sortable\'';
+            $className .= ' sortable';
             if (!empty($component)) {
                 $attrs['data-component'] = $component;
             }
@@ -304,6 +503,46 @@ class BackendTable extends HTML_Table {
                 $attrs['data-object'] = $sortBy['jsonadapter']['object'];
                 $attrs['data-act']    = $sortBy['jsonadapter']['act'];
             }
+
+            $cx->getComponent('Html')->whitelistParamSet(
+                'updateOrder',
+                array(),
+                array(
+                    'component' => $component,
+                    'entity' => $entity,
+                    'sortField' => $sortField,
+                )
+            );
+        } else if ($readOnly) {
+            $className .= ' view-show';
+        }
+
+        if (!empty($status)) {
+            $className .= ' status';
+            $attrs['data-status-component'] = $statusComponent;
+            $attrs['data-status-entity'] = $statusEntity;
+            $attrs['data-status-field'] = $status['field'];
+
+            $attrs['data-status-object'] = 'Html';
+            $attrs['data-status-act'] = 'updateStatus';
+            if (
+                isset($status['jsonadapter']) &&
+                !empty($status['jsonadapter']['object']) &&
+                !empty($status['jsonadapter']['act'])
+            ) {
+                $attrs['data-status-object'] = $status['jsonadapter']['object'];
+                $attrs['data-status-act']    = $status['jsonadapter']['act'];
+            }
+
+            $cx->getComponent('Html')->whitelistParamSet(
+                'updateStatus',
+                array(),
+                array(
+                    'component' => $statusComponent,
+                    'entity' => $statusEntity,
+                    'statusField' => $status['field'],
+                )
+            );
         }
         parent::__construct(array_merge($attrs, array('class' => $className, 'width' => '100%')));
     }
@@ -321,20 +560,7 @@ class BackendTable extends HTML_Table {
     function setCellContents($row, $col, $contents, $type = 'TD', $body = 0, $encode = false)
     {
         if ($encode) {
-            //1->n relations
-            if (is_object($contents) && $contents instanceof \Doctrine\ORM\PersistentCollection) {
-                $contents = $contents->toArray();
-            }
-            if (is_array($contents)) {
-                $displayedRelationsLimit = 3;
-                if (count($contents) > $displayedRelationsLimit) {
-                    $contents = array_slice($contents, 0, $displayedRelationsLimit);
-                    $contents[] = '...';
-                }
-                $contents = implode(', ', $contents);
-            }
-            //replaces curly brackets, so they get not parsed with the sigma engine
-            $contents = preg_replace(array("/{/","/}/"), array("&#123;","&#125;"), contrexx_raw2xhtml($contents), -1);
+            $contents = $this->encodeCellContent($contents);
         }
         $ret = $this->_adjustTbodyCount($body, 'setCellContents');
         if (PEAR::isError($ret)) {
@@ -346,20 +572,48 @@ class BackendTable extends HTML_Table {
         }
     }
 
+    /**
+     * Encode the cell content
+     *
+     * @param $contents mixed content for the cell
+     * @return mixed encoded cell content
+     */
+    protected function encodeCellContent($contents)
+    {
+        // 1->n & n->n relations
+        $displayedRelationsLimit = 3;
+        if (is_object($contents) && $contents instanceof \Doctrine\ORM\PersistentCollection) {
+            // EXTRA_LAZY fetched can be sliced (results in a LIMIT)
+            $contents = $contents->slice(0, $displayedRelationsLimit + 1);
+        }
+        if (is_array($contents)) {
+            if (count($contents) > $displayedRelationsLimit) {
+                $contents = array_slice($contents, 0, $displayedRelationsLimit);
+                $contents[] = '...';
+            }
+            $contents = implode(', ', $contents);
+        }
+        //replaces curly brackets, so they get not parsed with the sigma engine
+        return preg_replace(array("/{/","/}/"), array("&#123;","&#125;"), contrexx_raw2xhtml($contents), -1);
+    }
+
     protected function hasRowFunctions($functions, $virtual = false) {
         if (!is_array($functions)) {
-            return false;
-        }
-        if ($virtual) {
             return false;
         }
         if (isset($functions['actions'])) {
             return true;
         }
-        if (isset($functions['edit']) && $functions['edit']) {
+        if (!$virtual && isset($functions['edit']) && $functions['edit']) {
             return true;
         }
-        if (isset($functions['delete']) && $functions['delete']) {
+        if (!$virtual && isset($functions['show']) && $functions['show']) {
+            return true;
+        }
+        if (!$virtual && isset($functions['delete']) && $functions['delete']) {
+            return true;
+        }
+        if (!$virtual && isset($functions['copy']) && $functions['copy']) {
             return true;
         }
         return false;
@@ -370,42 +624,70 @@ class BackendTable extends HTML_Table {
 
         $baseUrl = $functions['baseUrl'];
         $code = '<span class="functions">';
-        if(!$virtual){
-            $editUrl = clone $baseUrl;
-            $params = $editUrl->getParamArray();
-            $editId = '';
-            if (!empty($params['editid'])) {
-                $editId = $params['editid'] . ',';
-            }
-            $editId .= '{' . $functions['vg_increment_number'] . ',' . $rowname . '}';
+        $editUrl = \Cx\Core\Html\Controller\ViewGenerator::getVgEditUrl(
+            $functions['vg_increment_number'],
+            $rowname,
+            clone $baseUrl
+        );
 
-            /* We use json to do the action callback. So all callbacks are functions in the json controller of the
-            * corresponding component. The 'else if' is for backwards compatibility so you can declare the function
-            * directly without using json. This is not recommended and not working over session */
-            if (
-                isset($functions['actions']) &&
-                is_array($functions['actions']) &&
-                isset($functions['actions']['adapter']) &&
-                isset($functions['actions']['method'])
-            ){
-                $json = new \Cx\Core\Json\JsonData();
-                $jsonResult = $json->data(
-                    $functions['actions']['adapter'],
-                    $functions['actions']['method'],
+        $showUrl = \Cx\Core\Html\Controller\ViewGenerator::getVgShowUrl(
+            $functions['vg_increment_number'],
+            $rowname,
+            clone $baseUrl
+        );
+        $params = $editUrl->getParamArray();
+        if (isset($functions['sortBy']) && isset($functions['sortBy']['field'])) {
+            $editUrl->setParam($functions['sortBy']['field'] . 'Pos', null);
+        }
+        $editId = '';
+        if (!empty($params['editid'])) {
+            $editId = $params['editid'] . ',';
+            $showId = $params['editid'];
+        }
+        $editId .= '{' . $functions['vg_increment_number'] . ',' . $rowname . '}';
+
+        /* We use json to do the action callback. So all callbacks are functions in the json controller of the
+         * corresponding component. The 'else if' is for backwards compatibility so you can declare the function
+         * directly without using json. This is not recommended and not working over session */
+        try {
+            if (isset($functions['actions']) ) {
+                $code .= \Cx\Core\Html\Controller\ViewGenerator::callCallbackByInfo(
+                    $functions['actions'],
                     array(
                         'rowData' => $rowData,
                         'editId' => $editId,
                     )
                 );
-                if ($jsonResult['status'] == 'success') {
-                    $code .= $jsonResult["data"];
-                }
-            } else if (isset($functions['actions']) && is_callable($functions['actions'])) {
-                $code .= $functions['actions']($rowData, $editId);
             }
+        } catch (\Exception $e) {
+            \Message::add($e->getMessage(), \Message::CLASS_ERROR);
+        }
 
+        if(!$virtual){
+            if (isset($functions['show']) && $functions['show']) {
+                $showUrl->setParam('showid', $showId);
+                //remove the parameter 'vg_increment_number' from editUrl
+                //if the baseUrl contains the parameter 'vg_increment_number
+                if (isset($params['vg_increment_number'])) {
+                    \Html::stripUriParam($showUrl, 'vg_increment_number');
+                }
+                $code .= '<a href="' . $showUrl . '" class="show" title="'.$_ARRAYLANG['TXT_CORE_RECORD_SHOW_TITLE'].'"></a>';
+            }
+            if (isset($functions['copy']) && $functions['copy']) {
+                $copyUrl = \Cx\Core\Html\Controller\ViewGenerator::getVgCopyUrl(
+                    $functions['vg_increment_number'],
+                    $rowname,
+                    clone $baseUrl
+                );
+                //remove the parameter 'vg_increment_number' from actionUrl
+                //if the baseUrl contains the parameter 'vg_increment_number'
+                $params = $copyUrl->getParamArray();
+                if (isset($params['vg_increment_number'])) {
+                    \Html::stripUriParam($copyUrl, 'vg_increment_number');
+                }
+                $code = '<a href="'.$copyUrl.'" class="copy" title="'.$_ARRAYLANG['TXT_CORE_RECORD_COPY_TITLE'].'"></a>';
+            }
             if (isset($functions['edit']) && $functions['edit']) {
-                $editUrl->setParam('editid', $editId);
                 //remove the parameter 'vg_increment_number' from editUrl
                 //if the baseUrl contains the parameter 'vg_increment_number'
                 if (isset($params['vg_increment_number'])) {
@@ -419,12 +701,66 @@ class BackendTable extends HTML_Table {
                 $deleteUrl->setParam('vg_increment_number', $functions['vg_increment_number']);
                 $deleteUrl.='&csrf='.\Cx\Core\Csrf\Controller\Csrf::code();
                 $onclick ='if (confirm(\''.$_ARRAYLANG['TXT_CORE_RECORD_DELETE_CONFIRM'].'\'))'.
-                        'window.location.replace(\''.$deleteUrl.'\');';
+                    'window.location.replace(\''.$deleteUrl.'\');';
+                if (!empty($functions['onclick']) &&
+                    !empty($functions['onclick']['delete'])
+                ) {
+                    $onclick = $functions['onclick']['delete'].'(\''. $deleteUrl .'\')';
+                }
                 $_uri = 'javascript:void(0);';
                 $code .= '<a onclick="'.$onclick.'" href="'.$_uri.'" class="delete" title="'.$_ARRAYLANG['TXT_CORE_RECORD_DELETE_TITLE'].'"></a>';
             }
         }
         return $code . '</span>';
+    }
+
+    /**
+     * Returns HTML code for functions regarding all entries
+     * @param array $functions Function config
+     * @param Object $renderObject Currently rendered object
+     * @return string HTML
+     */
+    protected function getOverallFunctionsCode($functions, $renderObject) {
+        if (
+            isset($functions['export']) &&
+            is_array($functions['export']) &&
+            $renderObject instanceof \Cx\Core_Modules\Listing\Model\Entity\DataSet
+        ) {
+            $_ARRAYLANG = \Env::get('init')->getComponentSpecificLanguageData(
+                'Html',
+                false
+            );
+            $adapter = 'Html';
+            $method = 'export';
+            if (
+                isset($functions['export']['jsonadapter']) &&
+                isset($functions['export']['jsonadapter']['adapter']) &&
+                isset($functions['export']['jsonadapter']['method'])
+            ) {
+                $adapter = $functions['export']['jsonadapter']['adapter'];
+                $method = $functions['export']['jsonadapter']['method'];
+            }
+            $exportFunc = new \Cx\Core\Html\Model\Entity\HtmlElement('a');
+            $exportIcon = new \Cx\Core\Html\Model\Entity\HtmlElement('img');
+            $exportIcon->setAttribute('src', '/core/Html/View/Media/export.png');
+            $exportIcon->setAttribute('style', 'filter: invert(100%);');
+            $exportFunc->addChild($exportIcon);
+            $exportFunc->setAttributes(array(
+                'data-adapter' => $adapter,
+                'data-method' => $method,
+                'data-object' => $renderObject->getDataType(),
+                'title' => $_ARRAYLANG['TXT_CORE_HTML_EXPORT'],
+            ));
+            $exportFunc->addClass('vg-export');
+
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $cx->getComponent('Html')->whitelistParamSet(
+                'export',
+                array('type' => $renderObject->getDataType())
+            );
+            return (string) $exportFunc;
+        }
+        return '';
     }
 
     /**
@@ -436,7 +772,8 @@ class BackendTable extends HTML_Table {
      */
     function _getAttrString($attributes)
     {
-        $template = new \Cx\Core\Html\Sigma(ASCMS_CORE_PATH.'/Html/View/Template/Generic/');
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $template = new \Cx\Core\Html\Sigma($cx->getCodeBaseCorePath().'/Html/View/Template/Generic/');
         $template->loadTemplateFile('Attribute.html');
 
         $strAttr = '';
@@ -451,7 +788,7 @@ class BackendTable extends HTML_Table {
                 $template->parse('attribute');
             }
         }
-        return $template->get();
+        return ' ' . trim($template->get());
     } // end func _getAttrString
 
     /**
@@ -513,11 +850,13 @@ class BackendTable extends HTML_Table {
      * Returns the table structure as HTML
      * Override in order to use Sigma for parsing
      * @access  public
+     * @global  array $_ARRAYLANG array containing the language variables
      * @return  string
      */
     function toHtml()
     {
-        $this->altRowAttributes(1, array('class' => 'row1'), array('class' => 'row2'), true);
+        global $_ARRAYLANG;
+
         $strHtml = '';
         $tabs = $this->_getTabs();
         $tab = $this->_getTab();
@@ -533,8 +872,8 @@ class BackendTable extends HTML_Table {
         if ($this->_comment) {
             $strHtml .= $tabs . "<!-- $this->_comment -->" . $lnEnd;
         }
-        $template = new \Cx\Core\Html\Sigma(ASCMS_CORE_PATH.'/Html/View/Template/Generic/');
-        $template->loadTemplateFile('Table.html');
+        $template = new \Cx\Core\Html\Sigma(dirname($this->templateFile));
+        $template->loadTemplateFile(basename($this->templateFile));
         if ($this->getRowCount() > 0 && $tBodyMaxColCount > 0) {
             $template->setVariable('TABLE_ATTRIBUTES', $this->_getAttrString($this->_attributes));
             if (!empty($this->_caption)) {
@@ -618,6 +957,16 @@ class BackendTable extends HTML_Table {
                 }
             }
         }
+
+        if ($this->editable && $this->viewGenerator) {
+            $template->setVariable('HTML_FORM_ACTION', contrexx_raw2xhtml(clone \Env::get('cx')->getRequest()->getUrl()));
+            $template->setVariable('HTML_VG_ID', $this->viewGenerator->getViewId());
+            $template->setVariable('TXT_HTML_SAVE', $_ARRAYLANG['TXT_SAVE_CHANGES']);
+
+            $template->touchBlock('form_open');
+            $template->touchBlock('form_close');
+        }
+
         return $template->get();
     }
 }

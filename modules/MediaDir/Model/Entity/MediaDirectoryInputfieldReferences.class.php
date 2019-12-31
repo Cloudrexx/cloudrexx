@@ -64,9 +64,10 @@ class MediaDirectoryInputfieldReferences extends \Cx\Modules\MediaDir\Controller
 
     function getInputfield($intView, $arrInputfield, $intEntryId=null)
     {
-        global $objDatabase, $_LANGID, $objInit, $_ARRAYLANG, $_CORELANG;
+        global $objDatabase, $objInit, $_ARRAYLANG, $_CORELANG;
 
         $intId = intval($arrInputfield['id']);
+        $langId = static::getOutputLocale()->getId();
 
         switch ($intView) {
             default:
@@ -100,7 +101,7 @@ class MediaDirectoryInputfieldReferences extends \Cx\Modules\MediaDir\Controller
 
                             $objInputfieldValue->MoveNext();
                         }
-                        $arrValue[0] = $arrValue[$_LANGID];
+                        $arrValue[0] = $arrValue[$langId];
                         $intNumElements = count($arrParents);
                     }
                 } else {
@@ -303,20 +304,49 @@ EOF;
 
     function getContent($intEntryId, $arrInputfield, $arrTranslationStatus)
     {
-        global $objDatabase, $_LANGID;
+        $strValue = static::getRawData($intEntryId, $arrInputfield, $arrTranslationStatus);
+        $strValue = strip_tags(htmlspecialchars($strValue, ENT_QUOTES, CONTREXX_CHARSET));
+
+        if(!empty($strValue)) {
+            $arrParents = array();
+            $arrParents = explode("||", $strValue);
+            $strValue = null;
+
+            foreach($arrParents as $intKey => $strChildes) {
+                $arrChildes = array();
+                $arrChildes = explode("##", $strChildes);
+
+                $strTitle = '<span class="'.$this->moduleNameLC.'ReferenceTitle">'.$arrChildes[0].'</span>';
+                $strDesc = '<span class="'.$this->moduleNameLC.'ReferenceDescription">'.$arrChildes[1].'</span>';
+
+                $strValue .= '<div class="'.$this->moduleNameLC.'Reference">'.$strTitle.$strDesc.'</div>';
+            }
+
+            $arrContent['TXT_'.$this->moduleLangVar.'_INPUTFIELD_NAME'] = htmlspecialchars($arrInputfield['name'][0], ENT_QUOTES, CONTREXX_CHARSET);
+            $arrContent[$this->moduleLangVar.'_INPUTFIELD_VALUE'] = $strValue;
+        } else {
+            $arrContent = null;
+        }
+
+        return $arrContent;
+    }
+
+    function getRawData($intEntryId, $arrInputfield, $arrTranslationStatus) {
+        global $objDatabase;
 
         $intId = intval($arrInputfield['id']);
         $objEntryDefaultLang = $objDatabase->Execute("SELECT `lang_id` FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_entries WHERE id=".intval($intEntryId)." LIMIT 1");
         $intEntryDefaultLang = intval($objEntryDefaultLang->fields['lang_id']);
+        $langId = static::getOutputLocale()->getId();
 
         if($this->arrSettings['settingsTranslationStatus'] == 1) {
-            if(in_array($_LANGID, $arrTranslationStatus)) {
-                $intLangId = $_LANGID;
+            if(in_array($langId, $arrTranslationStatus)) {
+                $intLangId = $langId;
             } else {
                 $intLangId = $intEntryDefaultLang;
             }
         } else {
-            $intLangId = $_LANGID;
+            $intLangId = $langId;
         }
 
         $objInputfieldValue = $objDatabase->Execute("
@@ -349,33 +379,8 @@ EOF;
             ");
         }
 
-        $strValue = strip_tags(htmlspecialchars($objInputfieldValue->fields['value'], ENT_QUOTES, CONTREXX_CHARSET));
-
-
-        if(!empty($strValue)) {
-            $arrParents = array();
-            $arrParents = explode("||", $strValue);
-            $strValue = null;
-
-            foreach($arrParents as $intKey => $strChildes) {
-                $arrChildes = array();
-                $arrChildes = explode("##", $strChildes);
-
-                $strTitle = '<span class="'.$this->moduleNameLC.'ReferenceTitle">'.$arrChildes[0].'</span>';
-                $strDesc = '<span class="'.$this->moduleNameLC.'ReferenceDescription">'.$arrChildes[1].'</span>';
-
-                $strValue .= '<div class="'.$this->moduleNameLC.'Reference">'.$strTitle.$strDesc.'</div>';
-            }
-
-            $arrContent['TXT_'.$this->moduleLangVar.'_INPUTFIELD_NAME'] = htmlspecialchars($arrInputfield['name'][0], ENT_QUOTES, CONTREXX_CHARSET);
-            $arrContent[$this->moduleLangVar.'_INPUTFIELD_VALUE'] = $strValue;
-        } else {
-            $arrContent = null;
-        }
-
-        return $arrContent;
+        return $objInputfieldValue->fields['value'];
     }
-
 
     function getJavascriptCheck()
     {

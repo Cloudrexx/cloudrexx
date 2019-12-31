@@ -35,11 +35,25 @@
  * @todo        Edit PHP DocBlocks!
  */
 namespace Cx\Core_Modules\Stats\Controller;
+
+// detect system location
+$depth = 4;
+if (strpos(__FILE__, 'customizing/') !== false) {
+    // this files resides within the customizing directory, therefore we'll have to strip
+    // out one directory more than usually
+    $depth++;
+}
+if (strpos(__FILE__, 'codeBases/') !== false) {
+    // this files resides in a codeBase directory, therefore we'll have to strip
+    // out two directory more than usually
+    $depth += 2;
+}
+$contrexx_path = dirname(__FILE__, $depth);
+
 /**
  * @ignore
  */
-require_once dirname(dirname(dirname(dirname(__FILE__)))).'/core/Core/init.php';
-
+require_once($contrexx_path . '/core/Core/init.php');
 $cx = init('minimal');
 
 // those variables get defined in Data/spiders.inc.php, Data/referers.inc.php, Data/banned.inc.php
@@ -207,6 +221,18 @@ class Counter
                 }
             }
         }
+
+        // output content-type based on request method (javascript / image-tag)
+        $mode = isset($_GET['mode']) ? $_GET['mode'] : '';
+        if ($mode == 'script') {
+            header('Content-Type: application/javascript');
+        } else {
+            // output Transparent 1x1 GIF pixel
+            header('Content-Type: image/gif');
+            echo base64_decode('R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==');
+        }
+
+        exit;
     }
 
     /**
@@ -323,7 +349,8 @@ class Counter
 
         $this->_getProxyInformations(); // get also the client ip
 
-        $this->arrClient['host'] = @gethostbyaddr($this->arrClient['ip']);
+        $net = $this->cx->getComponent('Net');
+        $this->arrClient['host'] = $net->getHostByAddr($this->arrClient['ip']);
         if ($this->arrClient['host'] == $this->arrClient['ip']) { // is remote host available?
             $this->arrClient['host'] = '';
         } else {
@@ -359,7 +386,8 @@ class Counter
     function _getProxyInformations() {
         if (isset($_SERVER['HTTP_VIA']) && $_SERVER['HTTP_VIA']) { // client does use a proxy
             $this->arrProxy['ip'] = isset($_SERVER['HTTP_CF_CONNECTING_IP']) ? $_SERVER['HTTP_CF_CONNECTING_IP'] : $_SERVER['REMOTE_ADDR'];
-            $this->arrProxy['host'] = @gethostbyaddr($this->arrProxy['ip']);
+            $net = $this->cx->getComponent('Net');
+            $this->arrProxy['host'] = $net->getHostByAddr($this->arrProxy['ip']);
             $proxyUseragent = trim(addslashes(urldecode(strstr($_SERVER['HTTP_VIA'],' '))));
             $startPos = strpos($proxyUseragent,"(");
             $this->arrProxy['useragent'] = substr($proxyUseragent,$startPos+1);

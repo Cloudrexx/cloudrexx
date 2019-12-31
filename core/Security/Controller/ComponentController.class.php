@@ -98,6 +98,32 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      * @param \Cx\Core\Routing\Url                      $request    The URL object for this request
      */
     public function preResolve(\Cx\Core\Routing\Url $request) {
+        // force HTST for one non-leap year, if HTTPS is beeing forced in both,
+        // front- and backend
+        $forceProtocolBackend = \Cx\Core\Setting\Controller\Setting::getValue(
+            'forceProtocolBackend',
+            'Config'
+        );
+        $forceProtocolFrontend = \Cx\Core\Setting\Controller\Setting::getValue(
+            'forceProtocolFrontend',
+            'Config'
+        );
+        if (
+            $forceProtocolBackend == 'https' &&
+            $forceProtocolFrontend == 'https'
+        ) {
+            $this->cx->getResponse()->setHeader(
+                'Strict-Transport-Security',
+                'max-age=31536000'
+            );
+        } else {
+            $this->cx->getResponse()->setHeader(
+                'Strict-Transport-Security',
+                'max-age=0'
+            );
+        }
+
+        // scan input data
         switch ($this->cx->getMode()) {
             case \Cx\Core\Core\Controller\Cx::MODE_FRONTEND:
                 // Webapp Intrusion Detection System
@@ -188,11 +214,11 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         // Get the data to insert in the database
         $cdate = time();
         $dbuser = htmlspecialchars(addslashes($user), ENT_QUOTES, CONTREXX_CHARSET);
-        $dbuser = mysql_escape_string($dbuser);
+        $dbuser = contrexx_raw2db($dbuser);
         $dbgpcs = htmlspecialchars(addslashes($gpcs), ENT_QUOTES, CONTREXX_CHARSET);
-        $dbgpcs = mysql_escape_string($dbgpcs);
-        $where = addslashes("$file : $line");
-        $where = mysql_escape_string($where);
+        $dbgpcs = contrexx_raw2db($dbgpcs);
+        $where  = addslashes("$file : $line");
+        $where  = contrexx_raw2db($where);
 
         // Insert the intrusion in the database
         $objDatabase->Execute("INSERT INTO ".DBPREFIX."ids (timestamp, type, remote_addr, http_x_forwarded_for, http_via, user, gpcs, file)
@@ -205,28 +231,15 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         $message = "DATE : $cdate\r\nFILE : $where\r\n\r\n$user\r\n\r\n$gpcs";
 
         // Send the e-mail to the administrator
-        if (\Env::get('ClassLoader')->loadFile(ASCMS_LIBRARY_PATH.'/phpmailer/class.phpmailer.php')) {
-            $objMail = new \phpmailer();
+        $objMail = new \Cx\Core\MailTemplate\Model\Entity\Mail();
 
-            if ($config['coreSmtpServer'] > 0 && \Env::get('ClassLoader')->loadFile(ASCMS_CORE_PATH.'/SmtpSettings.class.php')) {
-                if (($arrSmtp = \SmtpSettings::getSmtpAccount($config['coreSmtpServer'])) !== false) {
-                    $objMail->IsSMTP();
-                    $objMail->Host = $arrSmtp['hostname'];
-                    $objMail->Port = $arrSmtp['port'];
-                    $objMail->SMTPAuth = true;
-                    $objMail->Username = $arrSmtp['username'];
-                    $objMail->Password = $arrSmtp['password'];
-                }
-            }
+        $objMail->SetFrom($config['coreAdminEmail'], $config['coreAdminName']);
+        $objMail->Subject = $_SERVER['HTTP_HOST']." : $type";
+        $objMail->IsHTML(false);
+        $objMail->Body = $message;
+        $objMail->AddAddress($emailto);
+        $objMail->Send();
 
-            $objMail->CharSet = CONTREXX_CHARSET;
-            $objMail->SetFrom($config['coreAdminEmail'], $config['coreAdminName']);
-            $objMail->Subject = $_SERVER['HTTP_HOST']." : $type";
-            $objMail->IsHTML(false);
-            $objMail->Body = $message;
-            $objMail->AddAddress($emailto);
-            $objMail->Send();
-        }
     }
 
     /**

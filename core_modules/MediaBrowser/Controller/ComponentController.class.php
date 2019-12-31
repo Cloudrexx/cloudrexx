@@ -38,13 +38,10 @@
 
 namespace Cx\Core_Modules\MediaBrowser\Controller;
 
-use Cx\Core\ContentManager\Model\Entity\Page;
 use Cx\Core\Core\Model\Entity\SystemComponentController;
 use Cx\Core\Html\Sigma;
-use Cx\Core\MediaSource\Model\Entity\ThumbnailGenerator;
 use Cx\Core_Modules\MediaBrowser\Model\Event\MediaBrowserEventListener;
 use Cx\Core_Modules\MediaBrowser\Model\Entity\MediaBrowser;
-use Cx\Lib\FileSystem\FileSystemException;
 
 /**
  * Class ComponentController
@@ -65,19 +62,23 @@ class ComponentController extends
     protected $mediaBrowserInstances = array();
 
     /**
+     * List of additional JavaScript files, that will be loaded before the
+     * the main MediaBrowser.js.
+     */
+    protected $customJsFiles = array();
+
+    /**
      * {@inheritdoc }
      */
     public function getControllerClasses() {
-        if (
-            in_array(
+        if (in_array(
             'Workbench',
-                \Cx\Core\ModuleChecker::getInstance(
-                    $this->cx->getDb()->getEntityManager(),
-                    $this->cx->getDb()->getAdoDb(),
-                    $this->cx->getClassLoader()
-                )->getCoreModules()
-            )
-        ) {
+            \Cx\Core\ModuleChecker::getInstance(
+                $this->cx->getDb()->getEntityManager(),
+                $this->cx->getDb()->getAdoDb(),
+                $this->cx->getClassLoader()
+            )->getCoreModules()
+        )) {
             return array('Backend');
         }
         return array();
@@ -98,6 +99,18 @@ class ComponentController extends
         return array(
             'JsonMediaBrowser',
         );
+    }
+
+    /**
+     * Register your events here
+     *
+     * Do not do anything else here than list statements like
+     * $this->cx->getEvents()->addEvent($eventName);
+     */
+    public function registerEvents()
+    {
+        $eventHandlerInstance = $this->cx->getEvents();
+        $eventHandlerInstance->addEvent('MediaBrowser.Plugin:initialize');
     }
 
     /**
@@ -156,8 +169,7 @@ class ComponentController extends
             $thumbnailsTemplate->setVariable(
                 array(
                     'THUMBNAIL_NAME' => sprintf(
-                        $_ARRAYLANG[
-                        'TXT_FILEBROWSER_THUMBNAIL_' . strtoupper(
+                        $_ARRAYLANG['TXT_FILEBROWSER_THUMBNAIL_' . strtoupper(
                             $thumbnail['name']
                         ) . '_SIZE'], $thumbnail['size']
                     ),
@@ -167,27 +179,53 @@ class ComponentController extends
             );
             $thumbnailsTemplate->parse('thumbnails');
         }
-
+        $uploadFileSizeLimit = \Cx\Core\Setting\Controller\Setting::getValue(
+            'uploadFileSizeLimit',
+            'Config'
+        );
         \ContrexxJavascript::getInstance()->setVariable(
-            'thumbnails_template', $thumbnailsTemplate->get(),
+            array(
+                'thumbnails_template' => $thumbnailsTemplate->get(),
+                'chunk_size' => min(
+                    floor(
+                        (\FWSystem::getMaxUploadFileSize() - 1000000) / 1000000
+                    ),
+                    20
+                ) . 'mb',
+                'languages' => \FWLanguage::getActiveFrontendLanguages(),
+                'language' => \FWLanguage::getLanguageCodeById(
+                    \FWLanguage::getDefaultLangId()
+                ),
+                'max_file_size' => $uploadFileSizeLimit,
+            ),
             'mediabrowser'
         );
-
-        \ContrexxJavascript::getInstance()->setVariable(
-            'chunk_size', min(floor((\FWSystem::getMaxUploadFileSize()-1000000)/1000000), 20).'mb', 'mediabrowser'
-        );
-        \ContrexxJavascript::getInstance()->setVariable(
-            'languages', \FWLanguage::getActiveFrontendLanguages(), 'mediabrowser'
-        );
-
-        \ContrexxJavascript::getInstance()->setVariable(
-            'language', \FWLanguage::getLanguageCodeById(\FWLanguage::getDefaultLangId()), 'mediabrowser'
-        );
-
         \JS::activate('mediabrowser');
-        \JS::registerJS('core_modules/MediaBrowser/View/Script/MediaBrowser.js');
+        // Define the module
+        \JS::registerJS('core_modules/MediaBrowser/View/Script/module.js');
+        // Dependencies must be loaded first
+        \JS::registerJS('core_modules/MediaBrowser/View/Script/service/dataTabs.js');
+        // Enable extensions after the dataTabs service, where they plug into
+        $this->cx->getEvents()->triggerEvent(
+            'MediaBrowser.Plugin:initialize'
+        );
 
+        // load custom js files (registered through 'MediaBrowser.Plugin:initialize')
+        foreach ($this->customJsFiles as $jsFile) {
+            \JS::registerJS($jsFile);
+        }
+
+        // Load the dependant main part after extensions have been connected
+        \JS::registerJS('core_modules/MediaBrowser/View/Script/MediaBrowser.js');
     }
 
-
+    /**
+     * Register custom JavaScript file to be loaded before the main
+     * MediaBrowser.js
+     *
+     * @param   string  $file   Relative path to a JavaScript file
+     */
+    public function registerCustomJs($file) {
+        $this->customJsFiles[] = $file;
+    }
 }

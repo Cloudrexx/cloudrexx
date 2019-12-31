@@ -189,6 +189,7 @@ function addProductToCart(objForm,quantity) {
                     }
                     break;
                 case 'text':
+                case 'textarea':
                     if (formElement.value != '') {
                         objProduct.options[optionId] = formElement.value;
                     }
@@ -231,7 +232,6 @@ var popUpTimeout = 2000;
 function showPopup(id) {
     var obj = document.getElementById(id);
     if (!obj) {
-//alert('Cannot find element '+id);
         return;
     }
     obj.style.display = 'none';
@@ -287,16 +287,93 @@ function centerY(height) {
     return parseInt((y - height) / 2);
 }
 
-var inputId, uploaderInputBox;
+var uploaderInputBox;
 function getUploader(e) { // e => jQuery element
-    inputId = e.data('inputId');
-    uploaderInputBox = cx.jQuery('#' + inputId);
-    cx.jQuery('#productOptionsUploader').trigger('click');
+    var inputId = e.data('inputId');
+    uploaderInputBox = $jq('.' + inputId);
+    $jq('#productOptionsUploader').trigger('click');
 }
 function productOptionsUploaderCallback(data) {
     if (typeof data[0] !== 'undefined') {
         var data       = data[0].split('/'),
             fileName   = data.pop();
         uploaderInputBox.val(fileName);
+        updateProductPrice(uploaderInputBox.closest('form'));
     }
 }
+
+var $jq = cx.jQuery;
+function updateProductPrice($form)
+{
+    if (!$form.find('.price .shop-product-price').length) {
+        return;
+    }
+    var productPrice = parseFloat($form.find('.price .shop-product-price').data('price'));
+    if (isNaN(productPrice)) {
+        return;
+    }
+    var optionsPrice = 0;
+    $form.find('.product-option-field').each(function () {
+        switch ($jq(this).prop('tagName')) {
+            case 'SELECT':
+                $jq(this).find('option:selected').each(function () {
+                    var price     = parseFloat($jq(this).data('price'));
+                    optionsPrice += !isNaN(price) ? price : 0;
+                });
+                break;
+            case 'INPUT':
+                switch ($jq(this).attr('type')) {
+                    case 'text':
+                        if ($jq.trim($jq(this).val())) {
+                            var price     = parseFloat($jq(this).data('price'));
+                            optionsPrice += !isNaN(price) ? price : 0;
+                        }
+                        break;
+                    default:
+                        if ($jq(this).is(':checked')) {
+                            var price     = parseFloat($jq(this).data('price'));
+                            optionsPrice += !isNaN(price) ? price : 0;
+                        }
+                        break;
+                }
+        }
+    });
+    var newPrice = productPrice + optionsPrice;
+    if ($form.find('.price .shop-product-price s').length) {
+        $form.find('.price .shop-product-price s').html(newPrice.toFixed(2));
+    } else {
+        $form.find('.price .shop-product-price').html(newPrice.toFixed(2));
+    }
+    if (!$form.find('.price .discount').length || !$form.find('.price .discount .shop-product-discount-price').length) {
+        return;
+    }
+    var productDiscountPrice = parseFloat($form.find('.price .discount .shop-product-discount-price').data('price'));
+    var newDiscountPrice     = productDiscountPrice + optionsPrice;
+    $form.find('.price .discount .shop-product-discount-price').html(newDiscountPrice.toFixed(2));
+}
+$jq(function () {
+    $jq('.product-option-remove-file').click(function () {
+        var inputId = $jq(this).data('inputId');
+        $jq('.' + inputId).val('');
+        updateProductPrice($jq(this).closest('form'));
+    });
+    $jq('.product-option-upload-button').click(function () {
+        getUploader($jq(this));
+    });
+    $jq('.product-option-field').change(function () {
+        updateProductPrice($jq(this).closest('form'));
+    });
+    // hack: shop product price might be wrapped with <s>
+    $jq('.shop-product-price, .shop-product-discount-price').each(function () {
+       $jq(this).data( 'price', $jq(this).text() );
+    });
+
+    // empty autocompleted password-field
+    $jq('input[name=bsubmit]').closest('form').each(function() {
+        $jq(this).bind('submit', function() {
+            $jq('#dont_register:checked').each(function() {
+                $jq('input[name=password]').val('');
+            });
+        });
+    });
+});

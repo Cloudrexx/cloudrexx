@@ -92,13 +92,13 @@
     <td nowrap="nowrap" valign="top">{TXT_SETTINGS_QUALITY}</td>
     <td>
       <input type="text" name="standard_quality" value="{SETTINGS_VALUE_STANDARD_QUALITY}" style="width:50px">&nbsp;<label for="standard_quality">{TXT_STANDARD_QUALITY_UPLOADED_PICS}</label><br />
-      <input type="text" name="quality" value="{SETTINGS_VALUE_QUALITY}" style="width:50px">&nbsp;<label for="quality">{TXT_QUALITY}</label><br />
+      <input type="text" name="quality" value="{SETTINGS_VALUE_QUALITY}" style="width:50px">&nbsp;<label for="quality">{TXT_GALLERY_QUALITY}</label><br />
     </td>
   </tr>
   <tr class="row1">
     <td nowrap="nowrap" valign="top">{TXT_GALLERY_SETTINGS_POPUP_ENABLED}</td>
     <td>
-            <input type="checkbox" onchange="if (this.checked) { $('slide_settings').show(); $('image_width_settings_container').show(); } else { $('slide_settings').hide(); $('image_width_settings_container').hide(); }" name="enable_popups" value="on" {SETTINGS_VALUE_ENABLE_POPUPS} />
+            <input type="checkbox" onchange="if (this.checked) { jQuery('#slide_settings').show();} else { jQuery('#slide_settings').hide();}" name="enable_popups" value="on" {SETTINGS_VALUE_ENABLE_POPUPS} />
       <div style="{SLIDE_SHOW_BLOCK};" id="slide_settings"><div style="padding-left:20px;">
                 <input type="radio" name="slide_show" value="slideshow" {SETTINGS_VALUE_SLIDE_SHOW} onclick="slideSeconds();"/><label for="slide_show">{TXT_GALLERY_SLIDE_SHOW}</label><br />
                 <div style="padding-left:20px;display:{SLIDE_SHOW_SECONDS_BLOCK}" id="slide_seconds_settings" >
@@ -111,7 +111,7 @@
       </div>
     </td>
   </tr>
-  <tr class="row2" id="image_width_settings_container" style="{IMAGE_WIDTH_CONTAINER_VISIBILITY}">
+  <tr class="row2" id="image_width_settings_container">
         <td nowrap="nowrap" valign="top">{TXT_GALLERY_SETTINGS_IMAGE_WIDTH}</td>
         <td>
             <input type="text" size="2" name="image_width" value="{SETTINGS_VALUE_IMAGE_WIDTH}"  />

@@ -29,23 +29,25 @@
                     document.getElementById('no_password').style.display = 'none';
                     document.getElementById('password').className = '';
                 }
-                if (form.coreCaptchaCode) {
-                    if (form.coreCaptchaCode.value == '') {
-                        if (form.coreCaptchaCode.focus && form_submitted == true)
+                var isCaptchaOk = true;
+                {CAPTCHA_VALIDATION_CODE}
+                document.getElementById('no_captcha_code').style.display = 'none';
+                if (!isCaptchaOk) {
+                    if (form.coreCaptchaCode) {
+                        if (form.coreCaptchaCode.focus && form_submitted == true) {
                             form.coreCaptchaCode.focus();
-                        document.getElementById('no_captcha_code').style.display = 'block';
+                        }
                         document.getElementById('coreCaptchaCode').className = 'error';
-                        form_submitted = false;
-                    } else {
-                        document.getElementById('no_captcha_code').style.display = 'none';
-                        document.getElementById('coreCaptchaCode').className = '';
                     }
+                    document.getElementById('no_captcha_code').style.display = 'block';
+                    form_submitted = false;
+                } else if (form.coreCaptchaCode){
+                    document.getElementById('coreCaptchaCode').className = '';
                 }
 
-                if (form_submitted == false) {
+                if (!form_submitted) {
                     return false;
                 }
-
                 //form.PASSWORD.value=MD5(form.hash.value)
                 form.PASSWORD.value=form.hash.value;
                 form.hash.value='';
@@ -67,9 +69,9 @@
                 <input tabindex="2" type="password" name="hash" value="" id="password" />
                 <input type="hidden" name="PASSWORD" value="" />
             </div>
+            <div class="error" id="no_captcha_code" style="display: none;">{TXT_LOGIN_ENTER_CAPTCHA}</div>
             <!-- BEGIN captcha -->
             <div>
-                <div class="error" id="no_captcha_code" style="display: none;">{TXT_LOGIN_ENTER_CAPTCHA}</div>
                 {CAPTCHA_CODE}
             </div>
             <!-- END captcha -->

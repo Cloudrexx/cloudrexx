@@ -202,6 +202,9 @@ class U2u extends U2uLibrary
           foreach($buddyNames as $buddyKey => $buddyValue) {
                 if($id!=$buddyValue) {
                 $name=$this->_getName($buddyValue);
+                if (!$name) {
+                    continue;
+                }
                 $this->_objTpl->setVariable('TXT_U2U_OPTION_VALUE', $name['username']);
                 $this->_objTpl->parse('u2u_user_drop_down');
                 }
@@ -395,6 +398,9 @@ class U2u extends U2uLibrary
 
         foreach($objResult as $objId => $objValue) {
             $userName   = $this->_getName($objValue['buddies_id']);
+            if (!$userName) {
+                continue;
+            }
             $userEmail  = $this->_getEmail($objValue['buddies_id']);
             $userCity   = $this->_getCity($objValue['buddies_id']);
             $userSite   = $this->_getSite($objValue['buddies_id']);
@@ -668,6 +674,7 @@ class U2u extends U2uLibrary
                        $this->arrStatusMsg['error'][] = $errorString;
                        $errorMessage = true;
                     } else {
+                        $errArray[0] = array();
                         $errArray[0]['receipents_userid']  =  $ID;
                         $errArray[0]['sending_userid']     =  $objFWUser->objUser->getId();
                         $errArray[0]['title']              =  contrexx_addslashes(strip_tags(trim(htmlentities($_REQUEST['title'],ENT_QUOTES,CONTREXX_CHARSET))));
@@ -702,43 +709,29 @@ class U2u extends U2uLibrary
     function sendNotificationMail($fromId, $toId) {
         global $_CONFIG;
 
-        if (@\Env::get('ClassLoader')->loadFile(ASCMS_LIBRARY_PATH.'/phpmailer/class.phpmailer.php')) {
-            $objMail = new \phpmailer();
-            if ($_CONFIG['coreSmtpServer'] > 0) {
-                 $objSmtpSettings = new SmtpSettings();
-                 if (($arrSmtp = $objSmtpSettings->getSmtpAccount($_CONFIG['coreSmtpServer'])) !== false) {
-                       $objMail->IsSMTP();
-                       $objMail->Host = $arrSmtp['hostname'];
-                       $objMail->Port = $arrSmtp['port'];
-                       $objMail->SMTPAuth = true;
-                       $objMail->Username = $arrSmtp['username'];
-                       $objMail->Password = $arrSmtp['password'];
-                 }
-            }
+        $objMail = new \Cx\Core\MailTemplate\Model\Entity\Mail();
 
-            $strName = $this->_getName($fromId);
-            $strReceiverName = $this->_getName($toId);
-            $toEmail=$this->_getEmail($toId);
+        $strName = $this->_getName($fromId);
+        $strReceiverName = $this->_getName($toId);
+        $toEmail=$this->_getEmail($toId);
 
-            $from            = $this->_getEmailFromDetails();
-            $subject         = $this->_getEmailSubjectDetails();
-            $messageContent  = $this->_getEmailMessageDetails();
+        $from            = $this->_getEmailFromDetails();
+        $subject         = $this->_getEmailSubjectDetails();
+        $messageContent  = $this->_getEmailMessageDetails();
 
-            $strMailSubject     = str_replace(  array('[senderName]',       '[receiverName]',             '[domainName]'),
-                                                array($strName['username'], $strReceiverName['username'], $_CONFIG['domainUrl']),
-                                                $subject['subject']);
+        $strMailSubject     = str_replace(  array('[senderName]',       '[receiverName]',             '[domainName]'),
+                                            array($strName['username'], $strReceiverName['username'], $_CONFIG['domainUrl']),
+                                            $subject['subject']);
 
-            $strMailBody     = str_replace(  array('[senderName]',       '[receiverName]',             '[domainName]'),
-                                             array($strName['username'], $strReceiverName['username'], $_CONFIG['domainUrl']),
-                                             $messageContent['email_message']);
-            $objMail->CharSet   = CONTREXX_CHARSET;
-            $objMail->SetFrom($_CONFIG['coreAdminEmail'], $from['from']);
-            $objMail->AddAddress($toEmail['email']);
-            $objMail->Subject     = $strMailSubject;//$strMailSubject;
-            $objMail->IsHTML(true);
-            $objMail->Body        = $strMailBody;
-            $objMail->Send();
-        }
+        $strMailBody     = str_replace(  array('[senderName]',       '[receiverName]',             '[domainName]'),
+                                         array($strName['username'], $strReceiverName['username'], $_CONFIG['domainUrl']),
+                                         $messageContent['email_message']);
+        $objMail->SetFrom($_CONFIG['coreAdminEmail'], $from['from']);
+        $objMail->AddAddress($toEmail['email']);
+        $objMail->Subject     = $strMailSubject;//$strMailSubject;
+        $objMail->IsHTML(true);
+        $objMail->Body        = $strMailBody;
+        $objMail->Send();
     }
 
     /**

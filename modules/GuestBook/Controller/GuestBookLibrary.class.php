@@ -83,12 +83,6 @@ class GuestBookLibrary
         return $string;
     }
 
-    function addHyperlinking2($string)
-    {
-        $contents = ereg_replace("[[:alpha:]]+://[^<>[:space:]]+[[:alnum:]/]", "<a href=\"\\0\" target=\"_blank\">\\0</a>", $contents);
-        return $contents;
-    }
-
     /**
     * Checks the url
     *
@@ -97,11 +91,7 @@ class GuestBookLibrary
     */
     function isUrl($string)
     {
-        if( (strlen($string)<=10) OR (ereg('[!$%\'*+\\.><^_`{|}]$', $string)) ){
-            return false;
-        }else{
-            return true;
-        }
+        return \FWValidator::isUri($string);
     }
 
     /**
@@ -109,11 +99,12 @@ class GuestBookLibrary
      */
     function changeMail($mail)
     {
-        $at = array('[AT]', ' AT ', '(AT)');
-        srand ((double)microtime()*1000000);
-        $rand = rand(0, count($at)-1);
-        return $mail = preg_replace("%@%", $at[$rand], $mail);
+            $at = array('[AT]', ' AT ', '(AT)');
+            srand ((double)microtime()*1000000);
+            $rand = rand(0, count($at)-1);
+            return $mail = preg_replace("%@%", $at[$rand], $mail);
     }
+
 
     /**
     * get email validation javascript code

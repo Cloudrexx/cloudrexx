@@ -104,8 +104,8 @@ class OptionSet extends \Cx\Model\Base\EntityBase
      */
     public function __construct($theme, $data)
     {
-        $this->name = $theme->getFoldername();
-        $this->data = $data;
+        $this->name             = $theme->getFoldername();
+        $this->data             = $data;
         // try to initialize the options, so we do not need to load the from
         // $this->data every time
         if (isset($data['DlcInfo']) && isset($data['DlcInfo']['options'])) {
@@ -135,7 +135,7 @@ class OptionSet extends \Cx\Model\Base\EntityBase
                 }
             }
         }
-        $this->theme = $theme;
+        $this->theme            = $theme;
         $presetStorage =
             new \Cx\Core_Modules\TemplateEditor\Model\Entity\PresetFileStorage(
                 $theme->getPath()
@@ -380,7 +380,7 @@ class OptionSet extends \Cx\Model\Base\EntityBase
         $data = $this->data;
         foreach ($data['options'] as &$emptyOption) {
             if ($presetOption = $preset->getOption($emptyOption['name'])) {
-                if (!is_array($emptyOption['specific'])) {
+                if (!isset($emptyOption['specific']) || !is_array($emptyOption['specific'])) {
                     $emptyOption['specific'] = array();
                 }
                 $emptyOption['specific'] = array_merge(

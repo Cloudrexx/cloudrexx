@@ -156,29 +156,11 @@ class EgovLibrary {
         $arrOrderValues = EgovLibrary::getOrderValues($order_id);
         $strEmail = '';
         foreach ($arrOrderValues as $value) {
-            if (EgovLibrary::isEmail($value)) {
+            if (\FWValidator::isEmail($value)) {
                 $strEmail = $value;
             }
         }
         return $strEmail;
-    }
-
-
-    /**
-     * Run a plausibility test on the given string to determine
-     * whether it contains valid e-mail address(es) or not.
-     *
-     * @param   string    $Text     The string to test
-     * @return  integer             Zero if it does not seem to contain an
-     *                              e-mail address, the number of matches
-     *                              otherwise
-     * @static
-     */
-    static function isEmail($Text)
-    {
-        return preg_match(
-            '/^\w[\w\.\-]+@\w[\w\.\-]+\.[a-zA-Z]{2,4}$/', $Text
-        );
     }
 
 
@@ -213,6 +195,8 @@ class EgovLibrary {
             case 3:
                 // Used when alternative payment methods are selected
                 return $_ARRAYLANG['TXT_STATE_ALTERNATIVE'];
+            case 4:
+                return $_ARRAYLANG['TXT_EGOV_ORDER_STATE_RESERVED'];
             default:
                 return 'unknown';
         }
@@ -402,9 +386,18 @@ class EgovLibrary {
     }
 
 
-    function getSourceCode($id, $preview=false, $flagBackend=false)
+    /**
+     * Get the Egov custom fields source code
+     *
+     * @param integer $id           Product id
+     * @param boolean $preview      Is preview mode
+     * @param boolean $flagBackend  Is backend form requested
+     *
+     * @return String form soruce code
+     */
+    function getSourceCode($id, $preview = false, $flagBackend = false)
     {
-        global $objDatabase, $_ARRAYLANG;
+        global $_ARRAYLANG, $_CORELANG;
 
         $arrFields = EgovLibrary::getFormFields($id);
         $flagYellowbill = false;
@@ -414,12 +407,20 @@ class EgovLibrary {
         if (EgovLibrary::GetProduktValue('product_per_day', $id) == 'yes') {
             $strCalendarSource = $this->getCalendarSource($id, $flagBackend);
         }
-        $FormActionTarget =
-            ($preview ? '../' : '').
-            ($flagBackend
-              ? "index.php?cmd=Egov&amp;act=detail&amp;id=$id"
-              : "index.php?section=Egov&amp;id=$id"
+        $FormActionTarget = ($preview ? '../' : '')
+            . ($flagBackend
+                ? "index.php?cmd=Egov&amp;act=detail&amp;id=$id"
+                : \Cx\Core\Routing\Url::fromModuleAndCmd('Egov', 'detail', '', array('id' => $id))
             );
+
+        $captchaError = '';
+        if (   !$flagBackend
+            && isset($_POST['send'])
+            && !\FWUser::getFWUserObject()->objUser->login()
+            && !\Cx\Core_Modules\Captcha\Controller\Captcha::getInstance()->check()
+        ) {
+            $captchaError = '<div class="error text-danger">'. $_ARRAYLANG['TXT_EGOV_CAPTCHA_ERROR'] .'</div>';
+        }
 
         //$sourcecode = $this->_getJsSourceCode($id, $arrFields, $preview, $flagBackend).
         $sourcecode = $this->_getJsSourceCode($arrFields, $preview, $flagBackend).
@@ -429,6 +430,7 @@ class EgovLibrary {
             "<div id=\"contactFormError\" style=\"color: red; display: none;\">".
             "<br />".$_ARRAYLANG['TXT_EGOV_CHECK_YOUR_INPUT'].
             "</div>\n<br />\n".
+            $captchaError.
             "<!-- BEGIN contact_form -->\n".
             "<form action=\"$FormActionTarget\" ".
             "method=\"post\" enctype=\"multipart/form-data\" ".
@@ -436,157 +438,189 @@ class EgovLibrary {
             "<input type=\"hidden\" name=\"send\" value=\"1\" />".
 //            "<input type=\"hidden\" name=\"paypal\" value=\"".EgovLibrary::GetProduktValue('product_paypal', $id)."\" />".
             $strCalendarSource.
-            "<br /><div class=\"table-responsive\"><table class=\"table\" summary=\"\" border=\"0\">\n";
+            "<br />\n";
         $i = 1;
+
+            $formTemplate = <<<FORMTEMPLATE
+    <div class="table-responsive">
+        <table class="table" summary="" border="0">
+            <!-- BEGIN product_fields -->
+            <tr class="{EGOV_PRODUCT_ROW_CLASS}">
+                <td>{EGOV_PRODUCT_FIELD_LABEL} {EGOV_PRODUCT_FIELD_REQUIRED}</td>
+                <td>{EGOV_PRODUCT_FIELD}</td>
+            </tr>
+            <!-- END product_fields -->
+        </table>
+    </div>
+FORMTEMPLATE;
+        $template = new \Cx\Core\Html\Sigma('.');
+        $template->setTemplate($formTemplate);
+
         foreach ($arrFields as $fieldId => $arrField) {
             $feldbezeichnung = $arrField['name'];
             if ($feldbezeichnung == "AGB") {
-                if ($flagBackend) continue;
+                if ($flagBackend) {
+                    continue;
+                }
                 $feldbezeichnung = '<a href="index.php?section=Agb" target="_blank">AGB akzeptieren</a>';
             }
-            $sourcecode .=
-                "<tr".
-                ($flagBackend ? ' class="row'.((++$i % 2)+1).'"' : '').
-                ">\n<td >".
-                ($arrField['type'] != 'hidden' && $arrField['type'] != 'label'
-                    ? $feldbezeichnung : '&nbsp;'
-                ).
-                ($arrField['is_required']
-                    ? ' <span style="color: red;">*</span>'
-                    : ''
-                ).
-                "</td>\n<td>";
+            $rowClass   = ($flagBackend ? ' class="row' . (( ++$i % 2) + 1) . '"' : '');
+            $label      = ($arrField['type'] != 'hidden' && $arrField['type'] != 'label' ? $feldbezeichnung : '&nbsp;');
+            $required   = ($arrField['is_required'] ? ' <span style="color: red;">*</span>' : '');
+            $inputField = '';
+            $value      = isset($_POST['contactFormField_'.$fieldId])
+                         ? contrexx_input2raw($_POST['contactFormField_'.$fieldId])
+                         : (!isset($_POST['submitContactForm']) ? $arrField['attributes'] : '');
             switch ($arrField['type']) {
                 case 'text':
-                    $sourcecode .=
-                        "<input type=\"text\" ".
-                        "name=\"contactFormField_$fieldId\" ".
-                        "value=\"".$arrField['attributes']."\" />\n";
+                    $inputField = \Html::getInputText('contactFormField_'.$fieldId, $value);
                     break;
                 case 'label':
-                    $sourcecode .= $arrField['attributes']."\n";
+                    $inputField = $value;
                     break;
                 case 'checkbox':
-                    $sourcecode .=
-                        "<input type=\"checkbox\" ".
-                        "name=\"contactFormField_$fieldId\" ".
-                        "value=\"1\"".
-                        ($arrField['attributes'] == '1'
-                            ? ' checked="checked"' : ''
-                        )." />\n";
+                    $inputField = \Html::getCheckbox('contactFormField_'. $fieldId, 1, '', $value);
                     break;
                 case 'checkboxGroup':
                     $options = explode(',', $arrField['attributes']);
+                    $inputField = '';
                     $nr = 0;
+                    $selectedArray = isset($_POST['contactFormField_'.$fieldId])
+                                    ? contrexx_input2raw($_POST['contactFormField_'.$fieldId])
+                                    : array();
                     foreach ($options as $option) {
-                        $sourcecode .=
-                            "<span class=\"checkbox\"><label for=\"contactFormField_{$nr}_$fieldId\"><input type=\"checkbox\" ".
-                            "name=\"contactFormField_{$fieldId}[]\" ".
-                            "id=\"contactFormField_{$nr}_$fieldId\" ".
-                            "value=\"$option\" />".
-                            "$option</label></span>\n";
+                        $inputField .=
+                                "<span class=\"checkbox\"><label for=\"contactFormField_{$nr}_$fieldId\"><input type=\"checkbox\" " .
+                                "name=\"contactFormField_{$fieldId}[]\" " .
+                                "id=\"contactFormField_{$nr}_$fieldId\" " .
+                                (in_array($option, $selectedArray) ? 'checked="checked"' : '').
+                                "value=\"". contrexx_raw2xhtml($option) ."\" />" .
+                                "". contrexx_raw2xhtml($option) ."</label></span>\n";
                         ++$nr;
                     }
                     break;
                 case 'file':
-                    $sourcecode .=
-                        "<input type=\"file\" ".
-                        "name=\"contactFormField_$fieldId\" />\n";
+                    $inputField =
+                            "<input type=\"file\" " .
+                            "name=\"contactFormField_$fieldId\" />\n";
                     break;
                 case 'hidden':
-                    $sourcecode .=
-                        "<input type=\"hidden\" ".
-                        "name=\"contactFormField_$fieldId\" ".
-                        "value=\"".$arrField['attributes']."\" />\n";
+                    $inputField = \Html::getHidden('contactFormField_' . $fieldId, $value);
                     break;
                 case 'password':
-                    $sourcecode .=
-                        "<input type=\"password\" ".
-                        "name=\"contactFormField_$fieldId\" value=\"\" />\n";
+                    $inputField = \Html::getInputPassword('contactFormField_'. $fieldId, '');
                     break;
                 case 'radio':
                     $options = explode(',', $arrField['attributes']);
                     $nr = 0;
+                    $inputField = '';
                     foreach ($options as $option) {
-                        $sourcecode .=
-                            "<span class=\"radio\"><label for=\"contactFormField_{$nr}_$fieldId\"><input type=\"radio\" name=\"contactFormField_$fieldId\" id=\"contactFormField_{$nr}_$fieldId\" value=\"$option\" />".
-                            "$option</label></span>\n";
+                        $inputField .=
+                            "<span class=\"radio\"><label for=\"contactFormField_{$nr}_$fieldId\">" .
+                            "<input type=\"radio\" name=\"contactFormField_$fieldId\" id=\"contactFormField_{$nr}_$fieldId\"" .
+                            ($option == $value ? 'checked="checked"' : '') .
+                            " value=\"". contrexx_raw2xhtml($option) ."\" />" .
+                            "". contrexx_raw2xhtml($option) ."</label></span>\n";
                         ++$nr;
                     }
                     break;
                 case 'select':
                     $options = explode(',', $arrField['attributes']);
                     $nr = 0;
-                    $sourcecode .=
-                        "<select class=\"form-control\" name=\"contactFormField_$fieldId\">\n";
+                    $inputField = "<select class=\"form-control\" name=\"contactFormField_$fieldId\">";
                     foreach ($options as $option) {
-                        $sourcecode .= "<option>$option</option>\n";
+                        $selected    = $option == $value ? 'selected="selected"' : '';
+                        $inputField .= "<option $selected >". $option ."</option>";
                     }
-                    $sourcecode .= "</select>\n";
+                    $inputField .= "</select>";
                     break;
                 case 'textarea':
-                    $sourcecode .= "<textarea style=\"height:100px;\" name=\"contactFormField_$fieldId\"></textarea>\n";
+                    $inputField = \Html::getTextarea('contactFormField_'. $fieldId, $value, '', '', 'style="height:100px;"');
                     break;
             }
-            $sourcecode .=
-                "</td>\n</tr>\n";
+            $template->setVariable(array(
+                'EGOV_PRODUCT_ROW_CLASS'        => $rowClass,
+                'EGOV_PRODUCT_FIELD_LABEL'      => $label,
+                'EGOV_PRODUCT_FIELD_REQUIRED'   => $required,
+                'EGOV_PRODUCT_FIELD'            => $inputField,
+            ));
+            $template->parse('product_fields');
         }
 
         // Add payment selection or hidden fields here,
         // according to price and payment settings.
-        $paymentPaypal = EgovLibrary::GetProduktValue('product_paypal', $id);
+        $paymentPaypal    = EgovLibrary::GetProduktValue('product_paypal', $id);
         $paymentYellowpay = EgovLibrary::GetProduktValue('yellowpay', $id);
-        $paymentPrice =EgovLibrary::GetProduktValue('product_price', $id);
-        $strAlternativePaymentMethods =
-            EgovLibrary::GetProduktValue('alternative_names', $id);
+        $paymentPrice     = EgovLibrary::GetProduktValue('product_price', $id);
+        $strAlternativePaymentMethods = EgovLibrary::GetProduktValue('alternative_names', $id);
         // Using the $flagBackend flag to disable payment in the backend
-        if ($flagBackend === false
+        if (   $flagBackend === false
             && $paymentPrice > 0
-            && ($paymentYellowpay || $paymentPaypal || !empty($strAlternativePaymentMethods))) {
-            $sourcecode .=
-                '<tr><td>'.
-                $_ARRAYLANG['TXT_EGOV_PAYMENT_HANDLER']."</td>\n".
-                '<td><select style="width: 306px;" name="handler" id="handler" '.
-                "onchange=\"toggleYellowpayFields();\">\n";
+            && ($paymentYellowpay || $paymentPaypal || !empty($strAlternativePaymentMethods))
+        ) {
+            $inputField =
+                    '<select style="width: 306px;" name="handler" id="handler" ' .
+                    'onchange="toggleYellowpayFields();">';
             if ($paymentYellowpay) {
                 // Yellowpay is enabled
-                $sourcecode .=
-                    '<option value="PostFinance">'.
-                    $_ARRAYLANG['TXT_EGOV_POSTFINANCE'].'</option>';
+                $inputField .=
+                        '<option value="PostFinance">' .
+                        $_ARRAYLANG['TXT_EGOV_POSTFINANCE'] . '</option>';
             }
             if ($paymentPaypal) {
                 // PayPal is enabled
-                $sourcecode .=
-                    '<option value="paypal">'.$_ARRAYLANG['TXT_EGOV_PAYPAL'].'</option>';
+                $inputField .=
+                        '<option value="paypal">' . $_ARRAYLANG['TXT_EGOV_PAYPAL'] . '</option>';
             }
             // Alternative payment methods
-            $arrAlternativePaymentMethods =
-                preg_split(
-                    '/\s*,\s*/',
-                    $strAlternativePaymentMethods,
-                    0,
-                    PREG_SPLIT_NO_EMPTY
-                );
+            $arrAlternativePaymentMethods = preg_split(
+                    '/\s*,\s*/', $strAlternativePaymentMethods, 0, PREG_SPLIT_NO_EMPTY
+            );
             foreach ($arrAlternativePaymentMethods as $strPaymentMethod) {
-                $sourcecode .=
-                    '<option value="$strPaymentMethod">'.
-                    $strPaymentMethod.
-                    '</option>';
+                $inputField .=
+                        '<option value="$strPaymentMethod">' .
+                        $strPaymentMethod .
+                        '</option>';
             }
-            $sourcecode .= "</select>\n</td></tr>";
+            $inputField .= '</select>';
+            $template->setVariable(array(
+                'EGOV_PRODUCT_ROW_CLASS'        => '',
+                'EGOV_PRODUCT_FIELD_LABEL'      => $_ARRAYLANG['TXT_EGOV_PAYMENT_HANDLER'],
+                'EGOV_PRODUCT_FIELD_REQUIRED'   => '',
+                'EGOV_PRODUCT_FIELD'            => $inputField,
+            ));
+            $template->parse('product_fields');
         }
 
-        $sourcecode .=
-            "<tr>\n<td>&nbsp;</td>\n<td>\n";
+        if (   !$flagBackend
+            && !\FWUser::getFWUserObject()->objUser->login()
+        ) {
+            $template->setVariable(array(
+                'EGOV_PRODUCT_ROW_CLASS'        => '',
+                'EGOV_PRODUCT_FIELD_LABEL'      => $_CORELANG['TXT_CORE_CAPTCHA'],
+                'EGOV_PRODUCT_FIELD_REQUIRED'   => '',
+                'EGOV_PRODUCT_FIELD'            => \Cx\Core_Modules\Captcha\Controller\Captcha::getInstance()->getCode(),
+            ));
+            $template->parse('product_fields');
+        }
+
         if (count($arrFields) > 0) {
-            $sourcecode .=
+            $inputField =
                 "<br /><input type=\"reset\" class=\"btn btn-default egov-btn\" value=\"".
                 $_ARRAYLANG['TXT_EGOV_DELETE']."\" />\n".
                 "<input type=\"submit\" name=\"submitContactForm\" class=\"btn btn-default\" value=\"".
                 $_ARRAYLANG['TXT_EGOV_SUBMIT']."\" />\n";
+            $template->setVariable(array(
+                'EGOV_PRODUCT_ROW_CLASS'        => '',
+                'EGOV_PRODUCT_FIELD_LABEL'      => '&nbsp;',
+                'EGOV_PRODUCT_FIELD_REQUIRED'   => '',
+                'EGOV_PRODUCT_FIELD'            => $inputField,
+            ));
+            $template->parse('product_fields');
         }
+        $sourcecode .= $template->get();
         $sourcecode .=
-            "</td>\n</tr>\n</table></div>\n</form>".
+            "\n</form>".
             ($flagYellowbill
               ? "<script type=\"text/javascript\">\n".
                 "/* <![CDATA[ */\n".
@@ -1324,4 +1358,33 @@ class EgovLibrary {
         \Cx\Core\Setting\Controller\Setting::updateAll();
     }
 
+    /**
+     * Get media browser button
+     *
+     * @param string $id       Id of the button
+     * @param string $callback Name of the callback function
+     * @return string HTML element of browse button
+     */
+    protected function getMediaBrowserButton($id, $callback = '')
+    {
+        global $_ARRAYLANG;
+
+        $dataMbViews = 'filebrowser';
+        if ($id === 'productTargetUrlButton') {
+            $dataMbViews = 'filebrowser,sitestructure';
+        }
+
+        $options = array(
+            'type'  => 'button',
+            'views' => $dataMbViews,
+            'id'    => $id,
+        );
+        $mediaBrowser = new \Cx\Core_Modules\MediaBrowser\Model\Entity\MediaBrowser();
+        $mediaBrowser->setOptions($options);
+        if ($callback) {
+            $mediaBrowser->setCallback($callback);
+        }
+
+        return $mediaBrowser->getXHtml($_ARRAYLANG['TXT_BROWSE']);
+    }
 }

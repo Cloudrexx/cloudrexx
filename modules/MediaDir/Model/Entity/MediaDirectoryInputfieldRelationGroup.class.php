@@ -37,6 +37,16 @@
 namespace Cx\Modules\MediaDir\Model\Entity;
 
 /**
+ * Media Directory Inputfield Relation Group Exception
+ *
+ * @copyright   CLOUDREXX CMS - CLOUDREXX AG
+ * @author      Cloudrexx Development Team <info@cloudrexx.com>
+ * @package     cloudrexx
+ * @subpackage  module_mediadir
+ */
+class MediaDirectoryInputfieldRelationGroupException extends \Exception {}
+
+/**
  * Media Directory Inputfield Relation Group Class
  *
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
@@ -68,10 +78,10 @@ class MediaDirectoryInputfieldRelationGroup extends \Cx\Modules\MediaDir\Control
 
     function getInputfield($intView, $arrInputfield, $intEntryId=null)
     {
-        global $objDatabase, $_LANGID, $objInit, $_ARRAYLANG;
+        global $objDatabase, $objInit, $_ARRAYLANG;
 
         $intId = intval($arrInputfield['id']);
-
+        $langId = static::getOutputLocale()->getId();
 
         switch ($intView) {
             default:
@@ -94,7 +104,7 @@ class MediaDirectoryInputfieldRelationGroup extends \Cx\Modules\MediaDir\Control
                     $strValue = null;
                 }
 
-                $intFormType = empty($arrInputfield['default_value'][$_LANGID]) ? $arrInputfield['default_value'][0] : $arrInputfield['default_value'][$_LANGID];
+                $intFormType = empty($arrInputfield['default_value'][$langId]) ? $arrInputfield['default_value'][0] : $arrInputfield['default_value'][$langId];
                 $arrSelectorOptions = array();
                 $arrValue = explode(",",$strValue);
 
@@ -153,13 +163,15 @@ class MediaDirectoryInputfieldRelationGroup extends \Cx\Modules\MediaDir\Control
                 $strSelectorSelected = join("", $arrSelectorOptions['selected']);
                 $strSelectorNotSelected = join("", $arrSelectorOptions['not_selected']);
 
-                if($this->checkPageCmd('add'.intval($intFormType))) {
-                    $strAddNewCmd = 'add'.intval($intFormType);
-                    $strEditCmd = 'edit'.intval($intFormType);
-                } else {
-                    $strAddNewCmd = 'add';
-                    $strEditCmd = 'edit';
-                }
+                $strAddNewCmd = '';
+                try {
+                    $strAddNewCmd = $this->getAddUrl(intval($intFormType));
+                } catch (MediaDirectoryInputfieldRelationGroupException $e) {}
+
+                $strEditCmd = '';
+                try {
+                    $strEditCmd = $this->getEditUrl(intval($intFormType));
+                } catch (MediaDirectoryInputfieldRelationGroupException $e) {}
 
                 if($objInit->mode == 'backend') {
                     $strAddNewButton = '';
@@ -194,7 +206,7 @@ class MediaDirectoryInputfieldRelationGroup extends \Cx\Modules\MediaDir\Control
                     }
 
                     if($bolAddNewAlowed || (intval($intFormType) == 0) || $intUserIsAdmin == 1) {
-                        $strAddNewButton = '<a class="addEntryLink" rel="shadowbox[add'.$intId.'];height=750;width=730;options={onClose:new Function(\'refreshSelector_'.$intId.'(\\\''.$intId.'\\\', \\\''.$this->moduleNameLC.'Inputfield_deselected_'.$intId.'\\\', \\\''.$this->moduleNameLC.'Inputfield_'.$intId.'\\\', \\\''.$_GET['section'].'\\\', \\\''.$_GET['cmd'].'\\\', \\\''.$intEntryId.'\\\')\')}" href="index.php?section=mediadir&cmd='.$strAddNewCmd.'" ><img src="../core/Core/View/Media/icons/icon-user-add.png" style="cursor: pointer;  border: 0px;" />&nbsp;'.$_ARRAYLANG['TXT_MEDIADIR_ADD_ENTRY'].'</a>';
+                        $strAddNewButton = '<a class="addEntryLink" rel="shadowbox[add'.$intId.'];height=750;width=730;options={onClose:new Function(\'refreshSelector_'.$intId.'(\\\''.$intId.'\\\', \\\''.$this->moduleNameLC.'Inputfield_deselected_'.$intId.'\\\', \\\''.$this->moduleNameLC.'Inputfield_'.$intId.'\\\', \\\''.$_GET['section'].'\\\', \\\''.$_GET['cmd'].'\\\', \\\''.$intEntryId.'\\\')\')}" href="'.$strAddNewCmd.'" ><img src="../core/Core/View/Media/icons/icon-user-add.png" style="cursor: pointer;  border: 0px;" />&nbsp;'.$_ARRAYLANG['TXT_MEDIADIR_ADD_ENTRY'].'</a>';
                         $strEditFunction = 'ondblclick="editSelectedElement_'.$intId.'(this);"';
                     } else {
                         $strAddNewButton = '';
@@ -226,7 +238,7 @@ class MediaDirectoryInputfieldRelationGroup extends \Cx\Modules\MediaDir\Control
 
                 $listElementsJSON = json_encode($arrSelectedList);
 
-                $editPageCmd = 'edit'.(empty($arrInputfield['default_value'][$_LANGID]) ? $arrInputfield['default_value'][0] : $arrInputfield['default_value'][$_LANGID]);*/
+                $editPageCmd = 'edit'.(empty($arrInputfield['default_value'][$langId]) ? $arrInputfield['default_value'][0] : $arrInputfield['default_value'][$langId]);*/
                 /*$strInputfield = '<div class="'.$strSelectorWrapperClass.'" style="overflow: hidden;">';
                 $strInputfield .= '<ul id="'.$strNotSelectedId.'" class="'.$strSelectorListClass.'" '.$strStyle.'>';
                 $strInputfield .= '</ul>';
@@ -313,7 +325,7 @@ function refreshSelector_$intId(fieldId,elementDeselectedId,elementSelectedId,pa
 }
 
 function editSelectedElement_$intId(elmSelector){
-    var editLink = 'index.php?section=mediadir&cmd=$strEditCmd&eid=' + elmSelector.value;
+    var editLink = '$strEditCmd?eid=' + elmSelector.value;
 
     Shadowbox.open({
         content:    editLink,
@@ -376,7 +388,7 @@ EOF;
                     $strValue = null;
                 }
 
-                $intFormType = empty($arrInputfield['default_value'][$_LANGID]) ? $arrInputfield['default_value'][0] : $arrInputfield['default_value'][$_LANGID];
+                $intFormType = empty($arrInputfield['default_value'][$langId]) ? $arrInputfield['default_value'][0] : $arrInputfield['default_value'][$langId];
                 $arrValue = explode(",",$strValue);
                 $arrSelectorOptions = array();
 
@@ -434,13 +446,7 @@ EOF;
 
                 echo $strSelectorOptions;
 
-                /*if($this->checkPageCmd('add'.intval($intFormType))) {
-                    $strEditCmd = 'edit'.intval($intFormType);
-                } else {
-                    $strEditCmd = 'edit';
-                }
-
-                if($objInit->mode == 'frontend') {
+                /*if($objInit->mode == 'frontend') {
                     //get user attributes
                     $intUserIsAdmin = $objUser->getAdminStatus();
 
@@ -503,24 +509,14 @@ EOF;
 
     function getContent($intEntryId, $arrInputfield, $arrTranslationStatus)
     {
-        global $objDatabase, $_LANGID, $_ARRAYLANG;
+        global $_ARRAYLANG;
 
-        $intId = intval($arrInputfield['id']);
-        $objInputfieldValue = $objDatabase->Execute("
-            SELECT
-                `value`
-            FROM
-                ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields
-            WHERE
-                field_id=".$intId."
-            AND
-                entry_id=".$intEntryId."
-            LIMIT 1
-        ");
-
-        $strValue = strip_tags(htmlspecialchars($objInputfieldValue->fields['value'], ENT_QUOTES, CONTREXX_CHARSET));
+        $strValue = static::getRawData($intEntryId, $arrInputfield, $arrTranslationStatus);
+        $langId = static::getOutputLocale()->getId();
 
         if(!empty($strValue)) {
+            $strValue = strip_tags(htmlspecialchars($strValue, ENT_QUOTES, CONTREXX_CHARSET));
+
             //get seperator
             $strSeperator = ',';
 
@@ -538,13 +534,8 @@ EOF;
                 $strRelationValue = $objEntry->arrEntries[$intRelationId]['entryFields'][0];
                 //$strRelationFormId = $objEntry->arrEntries[$intRelationId]['entryFormId'];
 
-                /*if($this->checkPageCmd('detail'.intval($strRelationFormId))) {
-                    $strDetailCmd = 'detail'.intval($strRelationFormId);
-                } else {
-                    $strDetailCmd = 'detail';
-                }*/
-
                 //make hyperlink with <a> and <li> tag
+// TODO: use MediaDirectoryEntry::getDetailUrl()
                 //$strList .= '<li><a href="index.php?section='.$this->moduleName.'&amp;cmd='.$strDetailCmd.'&amp;eid='.$intRelationId.'" target="_blank">'.$strRelationValue.'</a></li>';
                 $strList .= '<li>'.$strRelationValue.'</li>';
 
@@ -554,13 +545,13 @@ EOF;
                 $intRelationDefaultLang = intval($objRelationDefaultLang->fields['lang_id']);
 
                 if($this->arrSettings['settingsTranslationStatus'] == 1) {
-                    if(in_array($_LANGID, $arrTranslationStatus)) {
-                        $intRelationLangId = $_LANGID;
+		            if(in_array($langId, $arrTranslationStatus)) {
+		                $intRelationLangId = $langId;
                     } else {
                         $intRelationLangId = $intRelationDefaultLang;
                     }
                 } else {
-                    $intRelationLangId = $_LANGID;
+		            $intRelationLangId = $langId;
                 }
                 $objRelationValues = $objDatabase->Execute("
                     SELECT
@@ -628,19 +619,56 @@ EOF;
         return $arrContent;
     }
 
+    function getRawData($intEntryId, $arrInputfield, $arrTranslationStatus) {
+        global $objDatabase;
 
-    function checkPageCmd($strPageCmd)
-    {
-        global $_LANGID;
+        $intId = intval($arrInputfield['id']);
+        $objInputfieldValue = $objDatabase->Execute("
+            SELECT
+                `value`
+            FROM
+                ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields
+            WHERE
+                field_id=".$intId."
+            AND
+                entry_id=".$intEntryId."
+            LIMIT 1
+        ");
 
-        $pageRepo = \Env::get('em')->getRepository('Cx\Core\ContentManager\Model\Entity\Page');
-        $pages = $pageRepo->findBy(array(
-            'cmd' => contrexx_addslashes($strPageCmd),
-            'lang' => $_LANGID,
-            'type' => \Cx\Core\ContentManager\Model\Entity\Page::TYPE_APPLICATION,
-            'module' => $this->moduleName,
-        ));
-        return count($pages) > 0;
+        return $objInputfieldValue->fields['value'];
+    }
+
+
+    protected function getAddUrl($formId) {
+        return $this->getSectionUrl('add', $formId);
+    }
+
+    protected function getEditUrl($formId) {
+        return $this->getSectionUrl('edit', $formId);
+    }
+
+    protected function getSectionUrl($mode, $formId) {
+        $langId = static::getOutputLocale()->getId();
+
+        $pageRepo = \Cx\Core\Core\Controller\Cx::instanciate()->getDb()->getEntityManager()->getRepository('Cx\Core\ContentManager\Model\Entity\Page');
+
+        // fetch form specific page (i.e. section=MediaDir&cmd=add3 / section=MediaDir&cmd=edit3)
+        $page = $pageRepo->findOneByModuleCmdLang($this->moduleName, $mode.$formId, $langId);
+
+        // fetch regular page (section=MediaDir&cmd=add / section=MediaDir&cmd=edit)
+        if (!$page || !$page->isActive()) {
+            $page = $pageRepo->findOneByModuleCmdLang($this->moduleName, $mode, $langId);
+        }
+
+        // abort in case the entry can't be linked to an existing page
+        if (!$page || !$page->isActive()) {
+            throw new MediaDirectoryInputfieldRelationGroupException();
+        }
+
+        // create url to the target page and add the entry's ID as argument
+        $url = \Cx\Core\Routing\Url::fromPage($page);
+
+        return $url;
     }
 
 

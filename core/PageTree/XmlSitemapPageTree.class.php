@@ -122,8 +122,14 @@ class XmlSitemapPageTree extends PageTree {
      * @return type
      */
     protected function renderElement($title, $level, $hasChilds, $lang, $path, $current, $page) {
+        // TODO: setting the proper protocol should be done in Url::fromPage()
+        $protocol = '';
+        $config = \Env::get('config');
+        if ($config['forceProtocolFrontend'] != 'none') {
+            $protocol = $config['forceProtocolFrontend'];
+        }
         return "\t" . '<url>' .
-                "\n\t\t" . '<loc>' . \Cx\Core\Routing\Url::fromPage($page)->toString() . '</loc>' .
+                "\n\t\t" . '<loc>' . \Cx\Core\Routing\Url::fromPage($page, array(), $protocol)->toString() . '</loc>' .
                 "\n\t\t" . '<lastmod>' . $this->getLastModificationDate($page) . '</lastmod>' .
                 "\n\t\t" . '<changefreq>' . $this->getChangingFrequency($page) . '</changefreq>' .
                 "\n\t\t" . '<priority>0.5</priority>' .

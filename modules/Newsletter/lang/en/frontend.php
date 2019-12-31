@@ -91,6 +91,7 @@ $_ARRAYLANG['TXT_NEWSLETTER_MONTHS_ARRAY'] = "January,February,March,April,May,J
 $_ARRAYLANG['TXT_NEWSLETTER_YOUR_DATE_SUCCESSFULLY_UPDATED'] = "Your data has been updated successfully.";
 $_ARRAYLANG['TXT_NEWSLETTER_FAILED_UPDATE_YOUR_DATA'] = "An error occurred while updating your data!";
 $_ARRAYLANG['TXT_NEWSLETTER_FAILED_ADDING_YOU'] = "An error occurred while adding you to the newsletter-sytem!";
+$_ARRAYLANG['TXT_NEWSLETTER_FAILED_CAPTCHA'] = "Please enter the security code!";
 $_ARRAYLANG['TXT_NEWSLETTER_AUTHENTICATION_FAILED'] = "Authentication Failed!";
 $_ARRAYLANG['TXT_NEWSLETTER_SUBSCRIPTION_CANCELED_BY_EMAIL'] = "The Registration has not been completed because the activation email failed!";
 $_ARRAYLANG['TXT_NEWSLETTER_FAILED_REMOVING_FROM_SYSTEM'] = "An error occurred while removing your e-mail address from the newsletter system!";
@@ -130,4 +131,5 @@ $_ARRAYLANG['TXT_NEWSLETTER_RECIPIENT_DATE'] = "Day";
 $_ARRAYLANG['TXT_NEWSLETTER_RECIPIENT_MONTH'] = "Month";
 $_ARRAYLANG['TXT_NEWSLETTER_RECIPIENT_YEAR'] = "Year";
 $_ARRAYLANG['TXT_NEWSLETTER_UNSUBSCRIBE_IF_ONLY_ONE_LIST_ACTIVE'] = "You must select at least one list! If you would like to no longer receive any news at all, please %s.";
-?>
+$_ARRAYLANG['TXT_NEWSLETTER_NOT_CONFIRM_MSG'] = 'Confirm link has expired, please subscribe and confirm again to receive our newsletter. Thank you!';
+$_ARRAYLANG['TXT_NEWSLETTER_MAILING_CONFIRM_SUCCESSFUL'] = 'Your consent for receiving email campaigns has been saved.';

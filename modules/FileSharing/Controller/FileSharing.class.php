@@ -87,7 +87,7 @@ class FileSharing extends FileSharingLib
      * @param string $pageContent page content from content manager
      */
     public function FileSharing($pageContent)
-    {
+    {   
         $this->__construct($pageContent);
     }
 
@@ -102,6 +102,21 @@ class FileSharing extends FileSharingLib
         \Cx\Core\Csrf\Controller\Csrf::add_placeholder($this->objTemplate);
         $this->objTemplate->setErrorHandling(PEAR_ERROR_DIE);
         $this->objTemplate->setTemplate($pageContent);
+
+        // load default application template as fallback, in case
+        // there is no matching application template present (in the
+        // webdesign template) for the current 'cmd'
+        if ($this->objTemplate->placeholderExists('APPLICATION_DATA')) {
+            $page = new \Cx\Core\ContentManager\Model\Entity\Page();
+            $page->setVirtual(true);
+            $page->setType(\Cx\Core\ContentManager\Model\Entity\Page::TYPE_APPLICATION);
+            $page->setModule('FileSharing');
+            // load source code
+            $applicationTemplate = \Cx\Core\Core\Controller\Cx::getContentTemplateOfPage($page);
+            \LinkGenerator::parseTemplate($applicationTemplate);
+            $this->objTemplate->addBlock('APPLICATION_DATA', 'application_data', $applicationTemplate);
+        }
+
         $this->objUrl = \Env::get("Resolver")->getUrl();
         $this->uriParams = $this->objUrl->getParamArray();
     }
@@ -117,7 +132,7 @@ class FileSharing extends FileSharingLib
         $hash     = isset($this->uriParams["hash"])     ? contrexx_input2raw($this->uriParams["hash"])     : '';
         $check    = isset($this->uriParams["check"])    ? contrexx_input2raw($this->uriParams["check"])    : '';
         $uploadId = isset($this->uriParams["uploadId"]) ? contrexx_input2raw($this->uriParams["uploadId"]) : 0;
-
+        
         if (!empty($uploadId)) {
             $this->files = $this->getSharedFiles($uploadId);
         }
@@ -160,7 +175,7 @@ class FileSharing extends FileSharingLib
                 }
                 break;
         }
-
+        
         FileSharingLib::cleanUp();
 
         return $this->objTemplate->get();
@@ -464,7 +479,6 @@ class FileSharing extends FileSharingLib
 
         $cx          = \Cx\Core\Core\Controller\Cx::instanciate();
         $fileSystem  = new \Cx\Lib\FileSystem\FileSystem();
-        $imageUrl    = clone \Env::get("Resolver")->getUrl(); // get the image url
         $files       = array();
         $directory   = \Env::get('Resolver')->getCmd();
 
@@ -503,6 +517,7 @@ class FileSharing extends FileSharingLib
                 continue;
             }
 
+            $imageUrl = clone \Env::get("Resolver")->getUrl(); // get the image url
             $imageUrl->setParam("act", "image");
             $imageUrl->setParam("hash", $hash);
 
@@ -515,12 +530,11 @@ class FileSharing extends FileSharingLib
             $fieldId = $objDatabase->Insert_ID();
             $files[] = array(
                 "name"     => $uploadedFileName,
-                "image"    => $imageUrl->toString(),
+                "image"    => $imageUrl ? $imageUrl->toString() : false,
                 "download" => parent::getDownloadLink($fieldId),
                 "delete"   => parent::getDeleteLink($fieldId),
             );
         }
-
         return $files;
     }
 }

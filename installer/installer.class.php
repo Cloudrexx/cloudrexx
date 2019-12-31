@@ -1862,7 +1862,7 @@ class Installer
     }
 
     function _showTermination() {
-        global $objTpl, $_ARRLANG, $_CONFIG, $_DBCONFIG, $objCommon, $basePath, $sessionObj, $documentRoot;
+        global $objTpl, $_ARRLANG, $_CONFIG, $_DBCONFIG, $objCommon, $basePath, $documentRoot;
 
         // load template file
         $objTpl->addBlockfile('CONTENT', 'CONTENT_BLOCK', "termination.html");
@@ -1932,9 +1932,9 @@ class Installer
             // We might have some overhead, since versioncheck.php does more or less the same again
             $documentRoot = realpath(dirname($basePath));
             require_once($documentRoot.'/core/Core/init.php');
-            init('minimal', false);
+            $cx = init('minimal', false);
 
-            if (!isset($sessionObj) || !is_object($sessionObj)) $sessionObj = cmsSession::getInstance();
+            $sessionObj = $cx->getComponent('Session')->getSession();
 
             $userId = 1;
             $_SESSION->cmsSessionUserUpdate($userId);

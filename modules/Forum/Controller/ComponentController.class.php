@@ -51,6 +51,27 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         return array();
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function adjustResponse(\Cx\Core\Routing\Model\Entity\Response $response)
+    {
+        $page = $response->getPage();
+        if (
+            !$page ||
+            $page->getModule() !== $this->getName() ||
+            $page->getCmd() !== 'thread'
+        ) {
+            return;
+        }
+        $forum     = new Forum('');
+        $pageTitle = $forum->getPageTitle();
+        if (!$pageTitle) {
+            return;
+        }
+
+        $page->setTitle($pageTitle);
+    }
      /**
      * Load your component.
      *
@@ -146,12 +167,12 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     }
 
     /**
-     * Do something for search the content
-     *
-     * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
+     * {@inheritDoc}
      */
-    public function preContentParse(\Cx\Core\ContentManager\Model\Entity\Page $page) {
-        $this->cx->getEvents()->addEventListener('SearchFindContent', new \Cx\Modules\Forum\Model\Event\ForumEventListener());
-   }
-
+    public function registerEventListeners()
+    {
+        $evm           = $this->cx->getEvents();
+        $forumListener = new \Cx\Modules\Forum\Model\Event\ForumEventListener();
+        $evm->addEventListener('SearchFindContent', $forumListener);
+    }
 }

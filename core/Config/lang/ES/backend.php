@@ -80,7 +80,6 @@ $_ARRAYLANG['TXT_CORE_CONFIG_SESSIONLIFETIME_TOOLTIP_HELP'] = 'Duraci&oacute;n d
 $_ARRAYLANG['TXT_CORE_CONFIG_SESSIONLIFETIMEREMEMBERME'] = 'Session length (remember me)';
 $_ARRAYLANG['TXT_CORE_CONFIG_SESSIONLIFETIMEREMEMBERME_TOOLTIP_HELP'] = 'Session length in seconds for users which have set the checkbox "Remember me" at login.';
 $_ARRAYLANG['TXT_CORE_CONFIG_DNSSERVER'] = 'Servidor DNS';
-$_ARRAYLANG['TXT_CORE_CONFIG_DNSSERVER_TOOLTIP_HELP'] = 'Para poder guardar escaneos MX, se requieren las DNS ((servidor de nombres del dominio).';
 $_ARRAYLANG['TXT_CORE_CONFIG_COREADMINNAME'] = 'Nombre de los Administradores';
 $_ARRAYLANG['TXT_CORE_CONFIG_COREADMINEMAIL'] = 'Email del administrador';
 $_ARRAYLANG['TXT_CORE_CONFIG_CONTACTFORMEMAIL'] = 'Direcci&oacute;n de email para formulario de contacto (predeterminado)';

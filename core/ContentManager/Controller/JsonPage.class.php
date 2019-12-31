@@ -164,8 +164,7 @@ class JsonPage implements JsonAdapter {
             // load the draft revision if one is available and we're not loading historic data:
             else if ($page->getEditingStatus() == 'hasDraft' || $page->getEditingStatus() == 'hasDraftWaiting') {
                 $this->logRepo = $this->em->getRepository('Cx\Core\ContentManager\Model\Entity\LogEntry');
-
-                $availableRevisions = $this->logRepo->getLogEntries($page);
+                $availableRevisions = $this->logRepo->getLogEntries($page, true, 2);
                 $this->logRepo->revert($page, $availableRevisions[1]->getVersion());
             }
 
@@ -212,10 +211,6 @@ class JsonPage implements JsonAdapter {
         $lang   = !empty($pageArray['lang'])  ? contrexx_input2raw($pageArray['lang'])  : (!empty($dataPost['lang']) ? contrexx_input2raw($dataPost['lang']) : \FWLanguage::getLanguageCodeById(\FWLanguage::getDefaultLangId()));
         $action = !empty($dataPost['action']) ? contrexx_input2raw($dataPost['action']) : '';
 
-        $cacheManager = new \Cx\Core_Modules\Cache\Controller\CacheManager();
-        $cacheManager->deleteSingleFile($pageId);
-
-
         if (!empty($pageArray)) {
             if (!empty($pageArray['target']) && !empty($pageArray['target_protocol'])) {
                 $pageArray['target'] = $pageArray['target_protocol'] . $pageArray['target'];
@@ -225,380 +220,354 @@ class JsonPage implements JsonAdapter {
             $validatedPageArray = $this->validatePageArray($pageArray);
         }
 
-        // UPDATE
-        if (!empty($pageId)) {
-            // If we got a page id, the page already exists and can be updated.
-            $page = $this->pageRepo->find($pageId, 0, null, false);
-            $node = $page->getNode();
+        $this->em->getConnection()->beginTransaction();
+        try {
 
-        // TRANSLATE
-        } else if (!empty($nodeId) && !empty($lang)) {
-            // We are translating the page.
-            $node = $this->nodeRepo->find($nodeId);
-            $page = $node->translatePage(true, \FWLanguage::getLanguageIdByCode($lang));
-            $page->setNodeIdShadowed($node->getId());
-            $page->setEditingStatus('');
+            // UPDATE
+            if (!empty($pageId)) {
+                // If we got a page id, the page already exists and can be updated.
+                $page = $this->pageRepo->find($pageId, 0, null, false);
+                $node = $page->getNode();
 
-            $newPage = true;
-            $reload  = true;
+            // TRANSLATE
+            } else if (!empty($nodeId) && !empty($lang)) {
+                // We are translating the page.
+                $node = $this->nodeRepo->find($nodeId);
+                $page = $node->translatePage(true, \FWLanguage::getLanguageIdByCode($lang));
+                $page->setNodeIdShadowed($node->getId());
 
-        // CREATE
-        } else if (empty($pageId) && !empty($lang)) {
-            if (!\Permission::checkAccess(5, 'static', true)) {
-                throw new \Exception($_CORELANG['TXT_CORE_CM_CREATION_DENIED']);
-            }
-
-            // Create a new node/page combination.
-            $node = new \Cx\Core\ContentManager\Model\Entity\Node();
-
-            // CREATE WITHIN
-            if (isset($dataPost['parent_node'])) {
-                $parentNode = $this->nodeRepo->find($dataPost['parent_node']);
-                if (!$parentNode) {
-                    $parentNode = $this->nodeRepo->getRoot();
-                }
-                $node->setParent($parentNode);
-                $parentNode->addChildren($node);
-
-                // add parent node to ID, so the node containing the new page is opened
-                if (!isset($_COOKIE['jstree_open'])) {
-                    $_COOKIE['jstree_open'] = '';
-                }
-                $openNodes = explode(',', $_COOKIE['jstree_open']);
-                if ($openNodes == array(0=>'')) {
-                    $openNodes = array();
-                }
-                if (!in_array('#node_' . $parentNode->getId(), $openNodes)) {
-                    $openNodes[] = '#node_' . $parentNode->getId();
-                }
-                setcookie('jstree_open', implode(',', $openNodes));
-
-                $this->em->persist($node);
-                $this->em->flush();
+                $newPage = true;
+                $reload  = true;
 
             // CREATE
-            } else {
-                $node->setParent($this->nodeRepo->getRoot());
-                $this->nodeRepo->getRoot()->addChildren($node);
+            } else if (empty($pageId) && !empty($lang)) {
+                if (!\Permission::checkAccess(5, 'static', true)) {
+                    throw new \Exception($_CORELANG['TXT_CORE_CM_CREATION_DENIED']);
+                }
 
-                $this->em->persist($node);
-                $this->em->flush();
+                // Create a new node/page combination.
+                $node = new \Cx\Core\ContentManager\Model\Entity\Node();
+
+                // CREATE WITHIN
+                if (isset($dataPost['parent_node'])) {
+                    $parentNode = $this->nodeRepo->find($dataPost['parent_node']);
+                    if (!$parentNode) {
+                        $parentNode = $this->nodeRepo->getRoot();
+                    }
+                    $node->setParent($parentNode);
+                    $parentNode->addChildren($node);
+
+                    // add parent node to ID, so the node containing the new page is opened
+                    $openNodes = array();
+                    if (isset($_COOKIE[\Cx\Core\ContentManager\Controller\ContentManager::JSTREE_COOKIE_OPEN])) {
+                        $openNodes = explode(',', $_COOKIE[\Cx\Core\ContentManager\Controller\ContentManager::JSTREE_COOKIE_OPEN]);
+                    }
+                    if ($openNodes == array(0=>'')) {
+                        $openNodes = array();
+                    }
+                    if (!in_array('#node_' . $parentNode->getId(), $openNodes)) {
+                        $openNodes[] = '#node_' . $parentNode->getId();
+                    }
+                    setcookie(\Cx\Core\ContentManager\Controller\ContentManager::JSTREE_COOKIE_OPEN, implode(',', $openNodes), 0, \Cx\Core\Core\Controller\Cx::instanciate()->getWebsiteOffsetPath() . '/');
+
+                    $this->em->persist($node);
+                    $this->em->flush();
+
+                // CREATE
+                } else {
+                    $node->setParent($this->nodeRepo->getRoot());
+                    $this->nodeRepo->getRoot()->addChildren($node);
+
+                    $this->em->persist($node);
+                    $this->em->flush();
+                }
+
+                $page = new \Cx\Core\ContentManager\Model\Entity\Page();
+                $page->setNode($node);
+                $node->addPage($page);
+                $page->setNodeIdShadowed($node->getId());
+                $page->setLang(\FWLanguage::getLanguageIdByCode($lang));
+                $page->setUpdatedBy(
+                    \FWUser::getFWUserObject()->objUser->getUsername()
+                );
+
+                $newPage = true;
+                $reload  = true;
+            } else {
+                throw new \Exception('Page cannot be created. There are too little information.');
             }
 
-            $page = new \Cx\Core\ContentManager\Model\Entity\Page();
-            $page->setNode($node);
-            $node->addPage($page);
-            $page->setNodeIdShadowed($node->getId());
-            $page->setLang(\FWLanguage::getLanguageIdByCode($lang));
-            $page->setUpdatedBy(
-                \FWUser::getFWUserObject()->objUser->getUsername()
-            );
+            // Page access check
+            if ($page->isBackendProtected() &&
+                    !\Permission::checkAccess($page->getBackendAccessId(), 'dynamic', true)) {
+                throw new \Cx\Core\ContentManager\Model\Entity\PageException('Not allowed to read page');
+            }
 
-            $newPage = true;
-            $reload  = true;
-        } else {
-            throw new \Exception('Page cannot be created. There are too little information.');
-        }
+            if (!empty($pageArray)) {
+                $page->updateFromArray($validatedPageArray);
+            }
 
-        // Page access check
-        if ($page->isBackendProtected() &&
-                !\Permission::checkAccess($page->getBackendAccessId(), 'dynamic', true)) {
-            throw new \Cx\Core\ContentManager\Model\Entity\PageException('Not allowed to read page');
-        }
+            if (!empty($action)) {
+                switch ($action) {
+                    case 'activate':
+                    case 'publish':
+                        $page->setActive(true);
+                        break;
+                    case 'deactivate':
+                        $page->setActive(false);
+                        break;
+                    case 'show':
+                        $page->setDisplay(true);
+                        break;
+                    case 'hide':
+                        $page->setDisplay(false);
+                        break;
+                    case 'protect':
+                        $page->setFrontendProtection(true);
+                        break;
+                    case 'unprotect':
+                        $page->setFrontendProtection(false);
+                        break;
+                    case 'lock':
+                        $page->setBackendProtection(true);
+                        break;
+                    case 'unlock':
+                        $page->setBackendProtection(false);
+                        break;
+                }
 
-        if (!empty($pageArray)) {
-            $page->updateFromArray($validatedPageArray);
-            if ($newPage) {
+                if (($action != 'publish') && !$page->isDraft()) {
+                    $action = 'publish';
+                }
+            }
+
+            $page->setUpdatedAtToNow();
+            $page->validate();
+
+            if (!empty($pageArray) && $newPage) {
                 // Make sure page has an ID
                 $this->em->persist($page);
                 $this->em->flush();
             }
-        }
 
-        if (!empty($action)) {
-            switch ($action) {
-                case 'activate':
-                case 'publish':
-                    $page->setActive(true);
-                    break;
-                case 'deactivate':
-                    $page->setActive(false);
-                    break;
-                case 'show':
-                    $page->setDisplay(true);
-                    break;
-                case 'hide':
-                    $page->setDisplay(false);
-                    break;
-                case 'protect':
-                    $page->setFrontendProtection(true);
-                    break;
-                case 'unprotect':
-                    $page->setFrontendProtection(false);
-                    break;
-                case 'lock':
-                    $page->setBackendProtection(true);
-                    break;
-                case 'unlock':
-                    $page->setBackendProtection(false);
-                    break;
-            }
-
-            if (($action != 'publish') && !$page->isDraft()) {
-                $action = 'publish';
-            }
-        }
-
-        $page->setUpdatedAtToNow();
-        $page->validate();
-
-        // Permissions are only updated in the editing mode.
-        if (!empty($pageArray)) {
-            if ($action == 'publish') {
-                if (\Permission::checkAccess(36, 'static', true)) {
-                    if ($page->isFrontendProtected()) {
-                        // remove all
-                        \Permission::removeAccess($page->getFrontendAccessId(), 'dynamic');
-                        if (isset($dataPost['frontendGroups'])) {
-                            // set new
-                            $pg->setAssignedGroupIds($page, $dataPost['frontendGroups'], true);
+            // Permissions are only updated in the editing mode.
+            if (!empty($pageArray)) {
+                if ($action == 'publish') {
+                    if (\Permission::checkAccess(36, 'static', true)) {
+                        if ($page->isFrontendProtected()) {
+                            // remove all
+                            \Permission::removeAccess($page->getFrontendAccessId(), 'dynamic');
+                            if (isset($dataPost['frontendGroups'])) {
+                                // set new
+                                $pg->setAssignedGroupIds($page, $dataPost['frontendGroups'], true);
+                            }
                         }
-                    }
-                    if ($page->isBackendProtected()) {
-                        // remove all
-                        $groupIds = $pg->getAssignedGroupIds($page, false);
-                        \Permission::removeAccess($page->getBackendAccessId(), 'dynamic');
-                        if (isset($dataPost['backendGroups'])) {
-                            // set new
-                            $pg->setAssignedGroupIds($page, $dataPost['backendGroups'], false);
-                        }
-                        if ($page->isBackendProtected() &&
-                            !\Permission::checkAccess($page->getBackendAccessId(), 'dynamic', true)) {
-                            if (!count($groupIds)) {
-                                $page->setBackendProtection(false);
-                            } else {
-                                $pg->setAssignedGroupIds($page, $groupIds, false);
+                        if ($page->isBackendProtected()) {
+                            // remove all
+                            $groupIds = $pg->getAssignedGroupIds($page, false);
+                            \Permission::removeAccess($page->getBackendAccessId(), 'dynamic');
+                            if (isset($dataPost['backendGroups'])) {
+                                // set new
+                                $pg->setAssignedGroupIds($page, $dataPost['backendGroups'], false);
+                            }
+                            if ($page->isBackendProtected() &&
+                                !\Permission::checkAccess($page->getBackendAccessId(), 'dynamic', true)) {
+                                if (!count($groupIds)) {
+                                    $page->setBackendProtection(false);
+                                } else {
+                                    $pg->setAssignedGroupIds($page, $groupIds, false);
+                                }
                             }
                         }
                     }
                 }
             }
-        }
 
-        // Block associations are only updated in the editing mode.
-        if (!empty($pageArray) && empty($dataPost['ignoreBlocks'])) {
-            if (!isset($dataPost['pageBlocks'])) {
-                $dataPost['pageBlocks'] = array();
-            }
-            $page->setRelatedBlocks($dataPost['pageBlocks']);
-        }
-
-        $draftUpdateLog = null;
-        $liveUpdateLog = null;
-        $updatingDraft = false;
-        if (($action == 'publish') && \Permission::checkAccess(78, 'static', true)) {
-            // User w/permission clicked save&publish. we should either publish the page or submit the draft for approval.
-            if ($page->getEditingStatus() == 'hasDraftWaiting') {
-                $reload = true;
+            // Block associations are only updated in the editing mode.
+            if (!empty($pageArray) && empty($dataPost['ignoreBlocks'])) {
+                if (!isset($dataPost['pageBlocks'])) {
+                    $dataPost['pageBlocks'] = array();
+                }
+                $page->setRelatedBlocks($dataPost['pageBlocks']);
             }
 
-            if ($page->getEditingStatus() != '') {
-                $logEntries = $this->logRepo->getLogEntries($page, false);
-                $this->em->remove($logEntries[0]);
-            }
-
-            $page->setEditingStatus('');
-            $this->messages[] = $_CORELANG['TXT_CORE_SAVED'];
-        } else {
-            // User clicked save [as draft], so let's do that.
-            $updatingDraft = $page->getEditingStatus() != '' ? true : false;
-
-            if ($action == 'publish') {
-                // User w/o publish permission clicked save&publish. submit it as a draft.
-                $page->setEditingStatus('hasDraftWaiting');
-                $this->messages[] = $_CORELANG['TXT_CORE_DRAFT_SUBMITTED'];
-            } else {
-                if ($page->getEditingStatus() == 'hasDraftWaiting' && \Permission::checkAccess(78, 'static', true)) {
+            $draftUpdateLog = null;
+            $liveUpdateLog = null;
+            $updatingDraft = false;
+            if (($action == 'publish') && \Permission::checkAccess(78, 'static', true)) {
+                // User w/permission clicked save&publish. we should either publish the page or submit the draft for approval.
+                if ($page->getEditingStatus() == 'hasDraftWaiting') {
                     $reload = true;
                 }
-                $page->setEditingStatus('hasDraft');
-                $this->messages[] = $_CORELANG['TXT_CORE_SAVED_AS_DRAFT'];
-            }
 
-            // Gedmo-loggable generates a LogEntry (i.e. revision) on persist, so we'll have to
-            // store the draft first, then revert the current version to what it previously was.
-            // In the end, we'll have the current [published] version properly stored as a page
-            // and the draft version stored as a gedmo LogEntry.
+                if ($page->getEditingStatus() != '') {
+                    $logEntries = $this->logRepo->getLogEntries($page, false, 1);
+                    $this->em->remove($logEntries[0]);
+                }
 
-            $this->em->persist($page);
-            // Gedmo hooks in on persist/flush, so we unfortunately need to flush our em in
-            // order to get a clean set of logEntries.
-            $this->em->flush();
-            $logEntries = $this->logRepo->getLogEntries($page, false);
+                $page->setEditingStatus('');
+                $this->messages[] = $_CORELANG['TXT_CORE_SAVED'];
+            } else {
+                // User clicked save [as draft], so let's do that.
+                $updatingDraft = $page->getEditingStatus() != '' ? true : false;
 
-            // Revert to the published version.
-            $cachedEditingStatus = $page->getEditingStatus();
-            $this->logRepo->revert($page, $logEntries[1]->getVersion());
-            $page->setEditingStatus($cachedEditingStatus);
+                if ($action == 'publish') {
+                    // User w/o publish permission clicked save&publish. submit it as a draft.
+                    $page->setEditingStatus('hasDraftWaiting');
+                    $this->messages[] = $_CORELANG['TXT_CORE_DRAFT_SUBMITTED'];
+                } else {
+                    if ($page->getEditingStatus() == 'hasDraftWaiting' && \Permission::checkAccess(78, 'static', true)) {
+                        $reload = true;
+                    }
+                    $page->setEditingStatus('hasDraft');
+                    $this->messages[] = $_CORELANG['TXT_CORE_SAVED_AS_DRAFT'];
+                }
 
-            switch ($action) {
-                case 'activate':
-                case 'publish':
-                    $page->setActive(true);
-                    break;
-                case 'deactivate':
-                    $page->setActive(false);
-                    break;
-                case 'show':
-                    $page->setDisplay(true);
-                    break;
-                case 'hide':
-                    $page->setDisplay(false);
-                    break;
-                case 'protect':
-                    $page->setFrontendProtection(true);
-                    break;
-                case 'unprotect':
-                    $page->setFrontendProtection(false);
-                    break;
-                case 'lock':
-                    $page->setBackendProtection(true);
-                    break;
-                case 'unlock':
-                    $page->setBackendProtection(false);
-                    break;
-            }
+                // Gedmo-loggable generates a LogEntry (i.e. revision) on persist, so we'll have to 
+                // store the draft first, then revert the current version to what it previously was.
+                // In the end, we'll have the current [published] version properly stored as a page
+                // and the draft version stored as a gedmo LogEntry.
 
-            $this->em->persist($page);
-
-            // Gedmo auto-logs slightly too much data. clean up unnecessary revisions:
-            if ($updatingDraft) {
+                $this->em->persist($page);
+                // Gedmo hooks in on persist/flush, so we unfortunately need to flush our em in
+                // order to get a clean set of logEntries.
                 $this->em->flush();
+                $logEntries = $this->logRepo->getLogEntries($page, false, 2);
+                // Revert to the published version.
+                $cachedEditingStatus = $page->getEditingStatus();
+                $this->logRepo->revert($page, $logEntries[1]->getVersion());
+                $page->setEditingStatus($cachedEditingStatus);
 
-                $logEntries = $this->logRepo->getLogEntries($page);
-                $currentLog = $logEntries[1];
-                $currentLogData = $currentLog->getData();
-                $currentLogData['editingStatus'] = $page->getEditingStatus();
-                $currentLog->setData($currentLogData);
-                $this->em->persist($currentLog);
+                switch ($action) {
+                    case 'activate':
+                    case 'publish':
+                        $page->setActive(true);
+                        break;
+                    case 'deactivate':
+                        $page->setActive(false);
+                        break;
+                    case 'show':
+                        $page->setDisplay(true);
+                        break;
+                    case 'hide':
+                        $page->setDisplay(false);
+                        break;
+                    case 'protect':
+                        $page->setFrontendProtection(true);
+                        break;
+                    case 'unprotect':
+                        $page->setFrontendProtection(false);
+                        break;
+                    case 'lock':
+                        $page->setBackendProtection(true);
+                        break;
+                    case 'unlock':
+                        $page->setBackendProtection(false);
+                        break;
+                }
 
-                $liveUpdateLog = $logEntries[2];
-                $this->em->remove($logEntries[2]);
+                $this->em->persist($page);
+
+                // Gedmo auto-logs slightly too much data. clean up unnecessary revisions:
+                if ($updatingDraft) {
+                    $this->em->flush();
+
+                    $logEntries = $this->logRepo->getLogEntries($page, true, 3);
+                    $currentLog = $logEntries[1];
+                    $currentLogData = $currentLog->getData();
+                    $currentLogData['editingStatus'] = $page->getEditingStatus();
+                    $currentLog->setData($currentLogData);
+                    $this->em->persist($currentLog);
+
+                    $liveUpdateLog = $logEntries[2];
+                    $this->em->remove($logEntries[2]);
+                }
             }
-        }
 
-        $this->em->persist($page);
+            $this->em->persist($page);
 
-        if ((isset($dataPost['inheritFrontendAccess']) && $dataPost['inheritFrontendAccess'] == 'on')
-                || (isset($dataPost['inheritBackendAccess']) && $dataPost['inheritBackendAccess'] == 'on')
-                || (isset($dataPost['inheritSkin']) && $dataPost['inheritSkin'] == 'on')
-                || (isset($dataPost['inheritCustomContent']) && $dataPost['inheritCustomContent'] == 'on')
-                || (isset($dataPost['inheritCssName']) && $dataPost['inheritCssName'] == 'on')
-                || (isset($dataPost['inheritCssNavName']) && $dataPost['inheritCssNavName'] == 'on')
-                || (isset($dataPost['inheritCaching']) && $dataPost['inheritCaching'] == 'on')
-        ) {
-            $pageStack = $page->getChildren();
-            while (count($pageStack)) {
-                $currentPage = array_pop($pageStack);
-                foreach ($currentPage->getChildren() as $child) {
-                    array_push($pageStack, $child);
+            if ((isset($dataPost['inheritFrontendAccess']) && $dataPost['inheritFrontendAccess'] == 'on')
+                    || (isset($dataPost['inheritBackendAccess']) && $dataPost['inheritBackendAccess'] == 'on')
+                    || (isset($dataPost['inheritSkin']) && $dataPost['inheritSkin'] == 'on')
+                    || (isset($dataPost['inheritCustomContent']) && $dataPost['inheritCustomContent'] == 'on')
+                    || (isset($dataPost['inheritCssName']) && $dataPost['inheritCssName'] == 'on')
+                    || (isset($dataPost['inheritCssNavName']) && $dataPost['inheritCssNavName'] == 'on')
+                    || (isset($dataPost['inheritCaching']) && $dataPost['inheritCaching'] == 'on')
+            ) {
+                $pageStack = $page->getChildren();
+                while (count($pageStack)) {
+                    $currentPage = array_pop($pageStack);
+                    foreach ($currentPage->getChildren() as $child) {
+                        array_push($pageStack, $child);
+                    }
+                    if (isset($dataPost['inheritFrontendAccess']) && $dataPost['inheritFrontendAccess'] == 'on'/*frontendprotection*/) {
+                        $reload = true;
+                        $page->copyProtection($currentPage, true);
+                    }
+                    if (isset($dataPost['inheritBackendAccess']) && $dataPost['inheritBackendAccess'] == 'on'/*backendprotection*/) {
+                        $reload = true;
+                        $page->copyProtection($currentPage, false);
+                    }
+                    if (isset($dataPost['inheritSkin']) && $dataPost['inheritSkin'] == 'on'/*theme*/) {
+                        $currentPage->setSkin($page->getSkin());
+                        if (!empty($pageArray['useSkinForAllChannels'])) {
+                            $currentPage->setUseSkinForAllChannels(1);
+                        }
+                    }
+                    if (isset($dataPost['inheritCustomContent']) && $dataPost['inheritCustomContent'] == 'on'/*customContent*/) {
+                        $currentPage->setCustomContent($page->getCustomContent());
+                        if (!empty($pageArray['useCustomContentForAllChannels'])) {
+                            $currentPage->setUseCustomContentForAllChannels(1);
+                        }
+                    }
+                    if (isset($dataPost['inheritCssName']) && $dataPost['inheritCssName'] == 'on'/*cssName*/) {
+                        $currentPage->setCssName($page->getCssName());
+                    }
+                    if (isset($dataPost['inheritCssNavName']) && $dataPost['inheritCssNavName'] == 'on'/*cssNavName*/) {
+                        $currentPage->setCssNavName($page->getCssNavName());
+                    }
+                    if (isset($dataPost['inheritCaching']) && $dataPost['inheritCaching'] == 'on'/*caching*/) {
+                        $currentPage->setCaching($page->getCaching());
+                    }
+                    $this->em->persist($currentPage);
                 }
-                if (isset($dataPost['inheritFrontendAccess']) && $dataPost['inheritFrontendAccess'] == 'on'/*frontendprotection*/) {
-                    $reload = true;
-                    $page->copyProtection($currentPage, true);
-                }
-                if (isset($dataPost['inheritBackendAccess']) && $dataPost['inheritBackendAccess'] == 'on'/*backendprotection*/) {
-                    $reload = true;
-                    $page->copyProtection($currentPage, false);
-                }
-                if (isset($dataPost['inheritSkin']) && $dataPost['inheritSkin'] == 'on'/*theme*/) {
-                    $currentPage->setSkin($page->getSkin());
-                }
-                if (isset($dataPost['inheritCustomContent']) && $dataPost['inheritCustomContent'] == 'on'/*customContent*/) {
-                    $currentPage->setCustomContent($page->getCustomContent());
-                }
-                if (isset($dataPost['inheritCssName']) && $dataPost['inheritCssName'] == 'on'/*cssName*/) {
-                    $currentPage->setCssName($page->getCssName());
-                }
-                if (isset($dataPost['inheritCssNavName']) && $dataPost['inheritCssNavName'] == 'on'/*cssNavName*/) {
-                    $currentPage->setCssNavName($page->getCssNavName());
-                }
-                if (isset($dataPost['inheritCaching']) && $dataPost['inheritCaching'] == 'on'/*caching*/) {
-                    $currentPage->setCaching($page->getCaching());
-                }
-                $this->em->persist($currentPage);
             }
-        }
 
-        $this->em->flush();
+            $this->em->flush();
 
-        // bug fix #2279
-        // could not save alias after running $this->em->clear()
-        // Aliases are only updated in the editing mode.
-        if (!empty($pageArray)) {
-            // Only users with publish rights can create aliases.
-            if (\Permission::checkAccess(115, 'static', true) && \Permission::checkAccess(78, 'static', true)) {
-                // Aliases are updated after persist.
-                $data = array();
-                $data['alias'] = $pageArray['alias'];
-                $aliases = $page->getAliases();
-                $page->updateFromArray($data);
-                if ($aliases != $page->getAliases()) {
-                    $reload = true;
+            // bug fix #2279
+            // could not save alias after running $this->em->clear()
+            // Aliases are only updated in the editing mode.
+            if (!empty($pageArray)) {
+                // Only users with publish rights can create aliases.
+                if (\Permission::checkAccess(115, 'static', true) && \Permission::checkAccess(78, 'static', true)) {
+                    // Aliases are updated after persist.
+                    $data = array();
+                    $data['alias'] = $pageArray['alias'];
+                    $aliases = $page->getAliases();
+                    $page->updateFromArray($data);
+                    if ($aliases != $page->getAliases()) {
+                        $reload = true;
+                    }
+                } else {
+                    // Users without permission shouldn't see the aliasses anyway
+                    //$this->messages[] = $_CORELANG['TXT_CORE_ALIAS_CREATION_DENIED'];
                 }
-            } else {
-                // Users without permission shouldn't see the aliasses anyway
-                //$this->messages[] = $_CORELANG['TXT_CORE_ALIAS_CREATION_DENIED'];
             }
-        }
 
-        // this fixes log version number skipping
-        $this->em->clear();
-        $logs = $this->logRepo->getLogEntries($page);
+            // this fixes log version number skipping
+            $this->em->clear();
+            $logs = $this->logRepo->getLogEntries($page, true, 2);
+            $this->em->persist($logs[0]);
 
-        $this->em->persist($logs[0]);
-
-        if ($updatingDraft) {
-            $data = $logs[1]->getData();
-            if (!empty($action) && $draftUpdateLog) {
-                $data = $draftUpdateLog->getData();
-            }
-            $data['editingStatus'] = 'hasDraft';
-            if ($action == 'publish' && !\Permission::checkAccess(78, 'static', true)) {
-                $data['editingStatus'] = 'hasDraftWaiting';
-            }
-            switch ($action) {
-                case 'activate':
-                    $data['active'] = true;
-                    break;
-                case 'deactivate':
-                    $data['active'] = false;
-                    break;
-                case 'show':
-                    $data['display'] = true;
-                    break;
-                case 'hide':
-                    $data['display'] = false;
-                    break;
-                case 'protect':
-                    $data['protection'] = $data['protection'] | FRONTEND_PROTECTION;
-                    break;
-                case 'unprotect':
-                    $data['protection'] = $data['protection'] & ~FRONTEND_PROTECTION;
-                    break;
-                case 'lock':
-                    $data['protection'] = $data['protection'] | BACKEND_PROTECTION;
-                    break;
-                case 'unlock':
-                    $data['protection'] = $data['protection'] & ~BACKEND_PROTECTION;
-                    break;
-            }
-            $logs[1]->setData($data);
-
-            if (!empty($action) && $action != 'publish') {
-                $data = $logs[0]->getData();
-                if ($liveUpdateLog) {
-                    $data = $liveUpdateLog->getData();
+            if ($updatingDraft) {
+                $data = $logs[1]->getData();
+                if (!empty($action) && $draftUpdateLog) {
+                    $data = $draftUpdateLog->getData();
+                }
+                $data['editingStatus'] = 'hasDraft';
+                if ($action == 'publish' && !\Permission::checkAccess(78, 'static', true)) {
+                    $data['editingStatus'] = 'hasDraftWaiting';
                 }
                 switch ($action) {
                     case 'activate':
@@ -626,12 +595,60 @@ class JsonPage implements JsonAdapter {
                         $data['protection'] = $data['protection'] & ~BACKEND_PROTECTION;
                         break;
                 }
-                $logs[0]->setData($data);
-            }
+                $logs[1]->setData($data);
 
-            $this->em->persist($logs[0]);
-            $this->em->persist($logs[1]);
-            $this->em->flush();
+                if (!empty($action) && $action != 'publish') {
+                    $data = $logs[0]->getData();
+                    if ($liveUpdateLog) {
+                        $data = $liveUpdateLog->getData();
+                    }
+                    switch ($action) {
+                        case 'activate':
+                            $data['active'] = true;
+                            break;
+                        case 'deactivate':
+                            $data['active'] = false;
+                            break;
+                        case 'show':
+                            $data['display'] = true;
+                            break;
+                        case 'hide':
+                            $data['display'] = false;
+                            break;
+                        case 'protect':
+                            $data['protection'] = $data['protection'] | FRONTEND_PROTECTION;
+                            break;
+                        case 'unprotect':
+                            $data['protection'] = $data['protection'] & ~FRONTEND_PROTECTION;
+                            break;
+                        case 'lock':
+                            $data['protection'] = $data['protection'] | BACKEND_PROTECTION;
+                            break;
+                        case 'unlock':
+                            $data['protection'] = $data['protection'] & ~BACKEND_PROTECTION;
+                            break;
+                    }
+                    $logs[0]->setData($data);
+                }
+
+                $this->em->persist($logs[0]);
+                $this->em->persist($logs[1]);
+                $this->em->flush();
+            }
+            $this->em->getConnection()->commit();
+
+            // Drop cache of our page and all pages pointing to our page
+            $pageIdsToDropCache = $this->pageRepo->getPagesPointingTo($page);
+            $pageIdsToDropCache[] = $page->getId();
+
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $cacheComponent = $cx->getComponent('Cache');
+            foreach ($pageIdsToDropCache as $pageIdToDropCache) {
+                $cacheComponent->deleteSingleFile($pageIdToDropCache);
+            }
+        } catch (\Exception $e) {
+            $this->em->getConnection()->rollback();
+            throw $e;
         }
 
         // get version
@@ -659,6 +676,7 @@ class JsonPage implements JsonAdapter {
         register_shutdown_function(array($this, 'multipleSetShutdown'));
 
         $post = $params['post'];
+        $data = array('post' => array());
         $data['post']['lang']   = $post['lang'];
         $data['post']['action'] = $post['action'];
         $recursive = (isset($params['get']['recursive']) && $params['get']['recursive'] == 'true');
@@ -686,49 +704,49 @@ class JsonPage implements JsonAdapter {
                 case 'activate':
                     if ($page->isActive()) {
                         // we have that already, continue
-                        continue;
+                        continue 2;
                     }
                     break;
                 case 'deactivate':
                     if (!$page->isActive()) {
                         // we have that already, continue
-                        continue;
+                        continue 2;
                     }
                     break;
                 case 'show':
                     if ($page->isVisible()) {
                         // we have that already, continue
-                        continue;
+                        continue 2;
                     }
                     break;
                 case 'hide':
                     if (!$page->isVisible()) {
                         // we have that already, continue
-                        continue;
+                        continue 2;
                     }
                     break;
                 case 'protect':
                     if ($page->isFrontendProtected()) {
                         // we have that already, continue
-                        continue;
+                        continue 2;
                     }
                     break;
                 case 'unprotect':
                     if (!$page->isFrontendProtected()) {
                         // we have that already, continue
-                        continue;
+                        continue 2;
                     }
                     break;
                 case 'lock':
                     if ($page->isBackendProtected()) {
                         // we have that already, continue
-                        continue;
+                        continue 2;
                     }
                     break;
                 case 'unlock':
                     if (!$page->isBackendProtected()) {
                         // we have that already, continue
-                        continue;
+                        continue 2;
                     }
                     break;
                 default:
@@ -759,7 +777,10 @@ class JsonPage implements JsonAdapter {
     public function multipleSetShutdown() {
         if ($this->multipleSetState) {
             $this->multipleSetState['state'] = 'timeout';
-            echo \Cx\Core\Json\JsonData::json($this->multipleSetState, true);
+            $jd = new \Cx\Core\Json\JsonData();
+            echo $jd->json(
+                new \Cx\Core\Routing\Model\Entity\Response($this->multipleSetState)
+            );
         }
     }
 
@@ -802,6 +823,7 @@ class JsonPage implements JsonAdapter {
             'metakeys' => array('type' => 'String'),
             'metadesc' => array('type' => 'String'),
             'metarobots' => array('type' => 'boolean'),
+            'metaimage' => array('type' => 'String'),
             'content' => array('type' => 'String'),
             'sourceMode' => array('type' => 'boolean'),
             'protection_frontend' => array('type' => 'boolean', 'map_to' => 'frontendProtection'),
@@ -878,7 +900,15 @@ class JsonPage implements JsonAdapter {
         return $output;
     }
 
-    public function getHistoryTable($params) {
+    /**
+     * Get the page logs
+     *
+     * @param array $params Arguments passed from JsonData
+     *
+     * @throws \Exception
+     */
+    public function getHistoryTable($params)
+    {
         global $_CORELANG, $_CONFIG;
 
         if (empty($params['get']['page'])) {
@@ -905,31 +935,34 @@ class JsonPage implements JsonAdapter {
         //(III) collect page informations - path, virtual language directory
         $path         = $this->pageRepo->getPath($page);
         $langDir      = \FWLanguage::getLanguageCodeById($page->getLang());
-        $logs         = $this->logRepo->getLogEntries($page);
-
         //(V) add the history entries
         // Paging:
-        $offset = !empty($params['get']['pos']) ? $params['get']['pos'] : 0;
-        $numberOfEntries = !empty($params['get']['limit']) ? $params['get']['limit'] : $_CONFIG['corePagingLimit'];
+        $offset          =  0;
+        $numberOfEntries = $_CONFIG['corePagingLimit'];
+        if (!empty($params['get']['pos'])) {
+            $offset = $params['get']['pos'];
+        }
+        if (!empty($params['get']['limit'])) {
+            $numberOfEntries = $params['get']['limit'];
+        }
+        $logs = $this->logRepo->getLogEntries(
+            $page,
+            true,
+            $numberOfEntries,
+            $offset
+        );
+        $logsCount  = $this->logRepo->getLogEntriesCount($page);
         $tableRowId = 1;
-        $i = 0;
-        $first = true;
+        $i          = 0;
+        $first      = true;
         session_write_close();
-        foreach ($logs as $key => $log){
-            // check whether the current index is between the range which should be displayed
-            if ( $i >= ($numberOfEntries + $offset)){
-                break;
-            }
-            if ($i < $offset) {
-                $i++;
-                continue;
-            }
+        foreach ($logs as $log) {
             $version = $log->getVersion();
             $this->logRepo->revert($page, $version);
 
             // is a log of a draft state
             if ($page->isDraft()) {
-                if ($first) {
+                if ($offset == 0 && $first) {
                     // skip first draft log
                     // set flag to false
                     $first = false;
@@ -955,7 +988,14 @@ class JsonPage implements JsonAdapter {
             $i++;
         }
         // Add paging widget:
-        $paging = '<div id="history_paging">' . getPaging(count($logs), $offset, '?cmd=ContentManager&page=' . $page->getId() . '&tab=history', $_CORELANG['TXT_CORE_CM_HISTORY_ENTRIES'], true, $numberOfEntries) . '</div>';
+        $paging = '<div id="history_paging">' . getPaging(
+            $logsCount,
+            $offset,
+            '?cmd=ContentManager&page=' . $page->getId() . '&tab=history',
+            $_CORELANG['TXT_CORE_CM_HISTORY_ENTRIES'],
+            true,
+            $numberOfEntries
+        ) . '</div>';
 
         //(VI) render
         die($table->toHtml() . $paging);
@@ -1066,6 +1106,7 @@ class JsonPage implements JsonAdapter {
             'metadesc' => $page->getMetadesc(),
             'metakeys' => $page->getMetakeys(),
             'metarobots' => $page->getMetarobots(),
+            'metaimage' => $page->getMetaimage(),
             // Access Permissions
             'frontend_protection' => $page->isFrontendProtected(),
             'backend_protection' => $page->isBackendProtected(),
@@ -1132,6 +1173,7 @@ class JsonPage implements JsonAdapter {
             'metadesc' => $page->getMetadesc(),
             'metakeys' => $page->getMetakeys(),
             'metarobots' => $page->getMetarobots(),
+            'metaimage' => $page->getMetaimage(),
             // Access Permissions
             'frontend_protection' => $page->isFrontendProtected(),
             'backend_protection' => $page->isBackendProtected(),
@@ -1274,7 +1316,7 @@ class JsonPage implements JsonAdapter {
             }
             $themeFolderName  = $theme->getFoldername();
             $moduleFolderName = contrexx_isCoreModule($application) ? 'core_modules' : 'modules';
-            $themePath        = ASCMS_THEMES_PATH.'/'.$themeFolderName.'/'.$moduleFolderName.'/'.$section.'/Template/Frontend';
+            $themePath        = \Cx\Core\Core\Controller\Cx::instanciate()->getClassLoader()->getFilePath(\Cx\Core\Core\Controller\Cx::instanciate()->getWebsiteThemesPath().'/'.$themeFolderName.'/'.$moduleFolderName.'/'.$section.'/Template/Frontend');
             if (file_exists($themePath)) {
                 $templateFiles    = $this->readDirs($themePath);
                 foreach ($templateFiles As $templateFile) {

@@ -81,7 +81,7 @@ class AliasLib
             // show all entries
             $aliases = $this->pageRepository->findBy(array(
                 'type' => \Cx\Core\ContentManager\Model\Entity\Page::TYPE_ALIAS,
-            ), true);
+            ), null, null, null, true);
         } else {
             // query builder for filtering entries
             $qb = $this->pageRepository->createQueryBuilder('p');
@@ -128,13 +128,18 @@ class AliasLib
         $crit = array(
             'node' => $aliasId,
         );
-        return current($this->pageRepository->findBy($crit, true));
+        return current($this->pageRepository->findBy($crit, null, null, null, true));
     }
 
 
     function _fetchTarget($page)
     {
-        return $this->pageRepository->getTargetPage($page);
+        try {
+            return $this->pageRepository->getTargetPage($page);
+        } catch (\Cx\Core\ContentManager\Model\Repository\PageRepositoryException $e) {
+            \DBG::log($e->getMessage());
+            return null;
+        }
     }
 
 
@@ -146,7 +151,7 @@ class AliasLib
 
     function _getURL($page)
     {
-        return $page->getUrl();
+        return $page->getURL(null, array());
     }
 
     function _getAliasesWithSameTarget($aliasPage)
@@ -159,7 +164,7 @@ class AliasLib
                 'type'   => \Cx\Core\ContentManager\Model\Entity\Page::TYPE_ALIAS,
                 'target' => $target,
             );
-            $aliases = $this->pageRepository->findBy($crit, true);
+            $aliases = $this->pageRepository->findBy($crit, null, null, null, true);
         }
 
         return $aliases;
@@ -181,7 +186,7 @@ class AliasLib
                 'lang' => $target_lang_id,
             );
             $page_repo = \Env::get('em')->getRepository('Cx\Core\ContentManager\Model\Entity\Page');
-            $targetPage = $page_repo->findBy($crit, true);
+            $targetPage = $page_repo->findBy($crit, null, null, null, true);
             $targetPage = $targetPage[0];
             $targetPath = $page_repo->getPath($targetPage);
             $arrAlias['pageUrl'] = "/".$targetPath;
@@ -216,14 +221,6 @@ class AliasLib
             $temp_page = new \Cx\Core\ContentManager\Model\Entity\Page();
             $temp_page->setTarget($target);
             $existing_aliases = $this->_getAliasesWithSameTarget($temp_page);
-
-            // if alias already exists -> fail
-            foreach ($existing_aliases as $existing_alias) {
-                if (($id == '' || $existing_alias->getNode()->getId() != $id) &&
-                        $slug == $existing_alias->getSlug()) {
-                    return false;
-                }
-            }
         }
 
         if ($id == '') {
@@ -255,11 +252,6 @@ class AliasLib
         $page->setSlug($slug);
         $page->setTarget($target);
         $page->setTitle($page->getSlug());
-
-        // sanitize slug
-        while (file_exists(ASCMS_PATH . '/' . $page->getSlug())) {
-            $page->nextSlug();
-        }
 
         // save
         try {

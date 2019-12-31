@@ -1,12 +1,5 @@
 <!-- START themes_create.html -->
 <script language="JavaScript" type="text/javascript">
-<!-- // confirm delete page
-function reloadThemesPage()
-{
-  document.themesForm.action = 'index.php?cmd=ViewManager';
-  document.themesForm.submit();
-}
-
 function existingdirNameValue2()
 {
   document.create_dir.existingdirName.value='';
@@ -19,7 +12,6 @@ function existingdirNameValue()
 
 }
 
-
 function sameName()
 {
   document.create_dir.dbName.value = document.create_dir.dirName.value;
@@ -31,7 +23,9 @@ function sameName()
     <ul>
         <li><a href="index.php?cmd=ViewManager&amp;act=templates" title="{TXT_THEMES_EDIT}">{TXT_THEMES_EDIT}</a></li>
         <li><a class="active" href="index.php?cmd=ViewManager&amp;act=newDir" title="{TXT_THEMES_CREATE}">{TXT_THEMES_CREATE}</a></li>
+        <!-- BEGIN view_manager_import_navigation -->
         <li><a href="index.php?cmd=ViewManager&amp;act=import" title="{TXT_THEME_IMPORT}">{TXT_THEME_IMPORT}</a></li>
+        <!-- END view_manager_import_navigation -->
     </ul>
 </div>
 

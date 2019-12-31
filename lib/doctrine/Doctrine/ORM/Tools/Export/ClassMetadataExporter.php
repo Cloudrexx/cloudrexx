@@ -1,8 +1,5 @@
 <?php
-
 /*
- *  $Id$
- *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -16,27 +13,27 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * This software consists of voluntary contributions made by many individuals
- * and is licensed under the LGPL. For more information, see
+ * and is licensed under the MIT license. For more information, see
  * <http://www.doctrine-project.org>.
  */
 
 namespace Doctrine\ORM\Tools\Export;
 
-use Doctrine\ORM\Tools\Export\ExportException,
-    Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Tools\Export\ExportException;
 
 /**
  * Class used for converting your mapping information between the
  * supported formats: yaml, xml, and php/annotation.
  *
- * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link    www.doctrine-project.org
  * @since   2.0
- * @version $Revision$
  * @author  Jonathan Wage <jonwage@gmail.com>
  */
 class ClassMetadataExporter
 {
+    /**
+     * @var array
+     */
     private static $_exporterDrivers = array(
         'xml' => 'Doctrine\ORM\Tools\Export\Driver\XmlExporter',
         'yaml' => 'Doctrine\ORM\Tools\Export\Driver\YamlExporter',
@@ -46,10 +43,12 @@ class ClassMetadataExporter
     );
 
     /**
-     * Register a new exporter driver class under a specified name
+     * Registers a new exporter driver class under a specified name.
      *
      * @param string $name
      * @param string $class
+     *
+     * @return void
      */
     public static function registerExportDriver($name, $class)
     {
@@ -57,11 +56,14 @@ class ClassMetadataExporter
     }
 
     /**
-     * Get a exporter driver instance
+     * Gets an exporter driver instance.
      *
-     * @param string $type   The type to get (yml, xml, etc.)
-     * @param string $source    The directory where the exporter will export to
-     * @return AbstractExporter $exporter
+     * @param string      $type The type to get (yml, xml, etc.).
+     * @param string|null $dest The directory where the exporter will export to.
+     *
+     * @return Driver\AbstractExporter
+     *
+     * @throws ExportException
      */
     public function getExporter($type, $dest = null)
     {

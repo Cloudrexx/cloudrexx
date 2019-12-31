@@ -1,0 +1,71 @@
+Cx\Core\Locale\Model\Entity\Locale:
+  type: entity
+  table: core_locale_locale
+  repositoryClass: Cx\Core\Locale\Model\Repository\LocaleRepository
+  indexes:
+    contrexx_core_locale_locale_ibfk_country:
+      columns: [ country ]
+    contrexx_core_locale_locale_ibfk_fallback:
+      columns: [ fallback ]
+    contrexx_core_locale_locale_ibfk_source_language:
+      columns: [ source_language ]
+  id:
+    id:
+      type: integer
+      unsigned: true
+      generator:
+        strategy: AUTO
+  fields:
+    label:
+      type: string
+      length: 255
+      nullable: true
+    orderNo:
+      column: order_no
+      type: integer
+      nullable: false
+  uniqueConstraints:
+    unique_iso_1_country:
+      columns: [ iso_1, country ]
+  oneToMany:
+    locales:
+      targetEntity: Locale
+      mappedBy: fallback
+      joinColumn:
+        name: id
+        referencedColumnName: fallback
+    frontends:
+      targetEntity: Cx\Core\View\Model\Entity\Frontend
+      mappedBy: localeRelatedByIso1s
+      joinColumn:
+        name: iso_1
+        referencedColumnName: language
+  manyToOne:
+    iso1:
+      targetEntity: Language
+      inversedBy: localeRelatedByIso1s
+      joinColumn:
+        name: iso_1
+        referencedColumnName: iso_1
+        nullable: false
+    country:
+      targetEntity: Cx\Core\Country\Model\Entity\Country
+      inversedBy: locales
+      joinColumn:
+        name: country
+        referencedColumnName: alpha2
+        nullable: true
+    fallback:
+      targetEntity: Locale
+      inversedBy: locales
+      joinColumn:
+        name: fallback
+        referencedColumnName: id
+        nullable: true
+    sourceLanguage:
+      targetEntity: Language
+      inversedBy: localeRelatedBySourceLanguages
+      joinColumn:
+        name: source_language
+        referencedColumnName: iso_1
+        nullable: false

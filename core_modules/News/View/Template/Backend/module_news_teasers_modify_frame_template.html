@@ -38,6 +38,14 @@
             <td width="85%">{TXT_NEWS_DATE_DESCRIPTION}</td>
         </tr>
         <tr class="row1">
+            <td width="15%">[[TEASER_LONG_DATE]]</td>
+            <td width="85%">{TXT_NEWS_LONG_DATE_DESCRIPTION}</td>
+        </tr>
+        <tr class="row2">
+            <td>[[TEASER_TIME]]</td>
+            <td>{TXT_NEWS_TIME_DESCRIPTION}</td>
+        </tr>
+        <tr class="row1">
             <td width="15%">[[TEASER_TITLE]]</td>
             <td width="85%">{TXT_NEWS_TITLE_DESCRIPTION}</td>
         </tr>
@@ -46,8 +54,28 @@
             <td width="85%">{TXT_NEWS_LINK_DESCRIPTION}</td>
         </tr>
         <tr class="row1">
+            <td width="15%">[[TEASER_TEXT]]</td>
+            <td width="85%">{TXT_NEWS_TEASER_TEXT_DESCRIPTION}</td>
+        </tr>
+        <tr class="row2">
+            <td width="15%">[[TEASER_FULL_TEXT]]</td>
+            <td width="85%">{TXT_NEWS_TEXT_DESCRIPTION}</td>
+        </tr>
+        <tr class="row1">
+            <td width="15%">[[TEASER_AUTHOR]]</td>
+            <td width="85%">{TXT_NEWS_AUTHOR_DESCRIPTION}</td>
+        </tr>
+        <tr class="row2">
+            <td width="15%">[[TEASER_EXT_URL]]</td>
+            <td width="85%">{TXT_NEWS_EXT_LINK_DESCRIPTION}</td>
+        </tr>
+        <tr class="row1">
             <td width="15%">[[TEASER_IMAGE_PATH]]</td>
             <td width="85%">{TXT_NEWS_IMAGE_PATH_DESCRIPTION}</td>
+        </tr>
+        <tr class="row2">
+            <td width="15%">&lt;!-- teaser_link --&gt;</td>
+            <td width="85%">{TXT_NEWS_TEASER_LINK_ROW_DESCRIPTION}</td>
         </tr>
         <tr class="row2">
             <td width="15%">&lt;!-- teaser_1-n --&gt;</td>
@@ -60,61 +88,94 @@
             <th>{TXT_EXAMPLE}</th>
         </tr>
         <tr class="row1">
-            <td>
+            <td style="padding:0">
                 <table cellpadding="0" cellspacing="0" border="0" width="100%">
                     <tr>
-                        <td bgcolor="#FFFF99">{TXT_BOX_TEMPLATE}<br />
+                        <td bgcolor="#E7F2D8">{TXT_BOX_TEMPLATE}<br />
                             <table align="center" cellpadding="0" cellspacing="10" border="0" width="100%">
                                 <tr>
-                                  <td bgcolor="#FFCC33">&lt;!-- BEGIN teaser_1 --&gt;<br />
-  <div style="background-color:#FF9999; display:inline;">[[TEASER_CATEGORY]]</div>
-                                    <div style="background-color:#FF9999; display:inline;"><br />
+                                  <td bgcolor="#FFB643" style="padding:1px">&lt;!-- BEGIN teaser_1 --&gt;<br />
+<div style="background-color:#FCE2B8;padding:5px">
+&lt;img src=&quot;<div style="font-weight:bold; display:inline;">[[TEASER_IMAGE_PATH]]</div>" /&gt;
+<br />
+  <div style="font-weight:bold; display:inline;">[[TEASER_CATEGORY]]</div> - <div style="font-weight:bold; display:inline;">
   [[TEASER_DATE]]</div>
                                     <br />
-                                    <div style="background-color:#FF9999; display:inline;">[[TEASER_TITLE]]</div>
-                                    &lt;a href="<div style="background-color:#FF9999; display:inline;">[[TEASER_URL]]</div>"&gt; &gt;&gt;{TXT_CONTINUE}&lt;/a&gt;<br />
-&lt;img alt="" src="<div style="background-color:#FF9999; display:inline;">[[TEASER_IMAGE_PATH]]</div>" /&gt;
-<div style="background-color:#FF9999; display:inline;">[[TEASER_TEXT]]</div><br />
+                                    <div style="font-weight:bold; display:inline;">[[TEASER_TITLE]]</div>
+<br />
+<div style="font-weight:bold; display:inline;">[[TEASER_TEXT]]</div><br />
+<div style="background-color:#BCBCBC;padding:1px">
+&lt;!-- BEGIN teaser_link --&gt;<br />
+<div style="background-color:#E1E1E1;padding-left:5px">
+&lt;a href=&quot;<div style="font-weight:bold; display:inline;">[[TEASER_URL]]</div>" target="<div style="font-weight:bold; display:inline;">[[TEASER_URL_TARGET]]</div>"&gt;[[TEASER_MORE]]&lt;/a&gt;<br />
+</div>
+&lt;!-- END teaser_link --&gt;<br />
+</div>
+</div>
 &lt;!-- END teaser_1 --&gt;
 </td>
-                                    <td bgcolor="#FFCC33">
-                                        &lt;!-- BEGIN teaser_2 --&gt;<br />
-                                        <div style="background-color:#FF9999; display:inline;">[[TEASER_CATEGORY]]</div>
-                                        <div style="background-color:#FF9999; display:inline;"><br />
-  [[TEASER_DATE]]</div>
-                                        <br />
-                                        <div style="background-color:#FF9999; display:inline;">[[TEASER_TITLE]]</div>
-                                        &lt;a href="<div style="background-color:#FF9999; display:inline;">[[TEASER_URL]]</div>"&gt; &gt;&gt;{TXT_CONTINUE}&lt;/a&gt;<br />
-&lt;img alt="" src="<div style="background-color:#FF9999; display:inline;">[[TEASER_IMAGE_PATH]]</div>" /&gt;
-<div style="background-color:#FF9999; display:inline;">[[TEASER_TEXT]]</div>
+                                  <td bgcolor="#FFB643" style="padding:1px">&lt;!-- BEGIN teaser_2 --&gt;<br />
+<div style="background-color:#FCE2B8;padding:5px">
+&lt;img src=&quot;<div style="font-weight:bold; display:inline;">[[TEASER_IMAGE_PATH]]</div>" /&gt;
 <br />
-&lt;!-- END teaser_2 --&gt; </td>
+  <div style="font-weight:bold; display:inline;">[[TEASER_CATEGORY]]</div> - <div style="font-weight:bold; display:inline;">
+  [[TEASER_DATE]]</div>
+                                    <br />
+                                    <div style="font-weight:bold; display:inline;">[[TEASER_TITLE]]</div>
+<br />
+<div style="font-weight:bold; display:inline;">[[TEASER_TEXT]]</div><br />
+<div style="background-color:#BCBCBC;padding:1px">
+&lt;!-- BEGIN teaser_link --&gt;<br />
+<div style="background-color:#E1E1E1;padding-left:5px">
+&lt;a href=&quot;<div style="font-weight:bold; display:inline;">[[TEASER_URL]]</div>" target="<div style="font-weight:bold; display:inline;">[[TEASER_URL_TARGET]]</div>"&gt;[[TEASER_MORE]]&lt;/a&gt;<br />
+</div>
+&lt;!-- END teaser_link --&gt;<br />
+</div>
+</div>
+&lt;!-- END teaser_2 --&gt;
+</td>
                                 </tr>
                                 <tr>
-                                    <td bgcolor="#FFCC33">
-                                        &lt;!-- BEGIN teaser_3 --&gt;<br />
-                                        <div style="background-color:#FF9999; display:inline;">[[TEASER_CATEGORY]]</div>
-                                        <div style="background-color:#FF9999; display:inline;"><br />
-  [[TEASER_DATE]]</div>
-                                        <br />
-                                        <div style="background-color:#FF9999; display:inline;">[[TEASER_TITLE]]</div>
-                                        &lt;a href="<div style="background-color:#FF9999; display:inline;">[[TEASER_URL]]</div>"&gt; &gt;&gt;{TXT_CONTINUE}&lt;/a&gt;<br />
-&lt;img alt="" src="<div style="background-color:#FF9999; display:inline;">[[TEASER_IMAGE_PATH]]</div>" /&gt;
-<div style="background-color:#FF9999; display:inline;">[[TEASER_TEXT]]</div>
+                                  <td bgcolor="#FFB643" style="padding:1px">&lt;!-- BEGIN teaser_3 --&gt;<br />
+<div style="background-color:#FCE2B8;padding:5px">
+&lt;img src=&quot;<div style="font-weight:bold; display:inline;">[[TEASER_IMAGE_PATH]]</div>" /&gt;
 <br />
-&lt;!-- END teaser_3 --&gt; </td>
-                                    <td bgcolor="#FFCC33">
-                                        &lt;!-- BEGIN teaser_4 --&gt;<br />
-                                        <div style="background-color:#FF9999; display:inline;">[[TEASER_CATEGORY]]</div>
-                                        <div style="background-color:#FF9999; display:inline;"><br />
+  <div style="font-weight:bold; display:inline;">[[TEASER_CATEGORY]]</div> - <div style="font-weight:bold; display:inline;">
   [[TEASER_DATE]]</div>
-                                        <br />
-                                        <div style="background-color:#FF9999; display:inline;">[[TEASER_TITLE]]</div>
-                                        &lt;a href="<div style="background-color:#FF9999; display:inline;">[[TEASER_URL]]</div>"&gt; &gt;&gt;{TXT_CONTINUE}&lt;/a&gt;<br />
-&lt;img alt="" src="<div style="background-color:#FF9999; display:inline;">[[TEASER_IMAGE_PATH]]</div>" /&gt;
-<div style="background-color:#FF9999; display:inline;">[[TEASER_TEXT]]</div>
+                                    <br />
+                                    <div style="font-weight:bold; display:inline;">[[TEASER_TITLE]]</div>
 <br />
-&lt;!-- END teaser_4 --&gt; </td>
+<div style="font-weight:bold; display:inline;">[[TEASER_TEXT]]</div><br />
+<div style="background-color:#BCBCBC;padding:1px">
+&lt;!-- BEGIN teaser_link --&gt;<br />
+<div style="background-color:#E1E1E1;padding-left:5px">
+&lt;a href=&quot;<div style="font-weight:bold; display:inline;">[[TEASER_URL]]</div>" target="<div style="font-weight:bold; display:inline;">[[TEASER_URL_TARGET]]</div>"&gt;[[TEASER_MORE]]&lt;/a&gt;<br />
+</div>
+&lt;!-- END teaser_link --&gt;<br />
+</div>
+</div>
+&lt;!-- END teaser_3 --&gt;
+</td>
+                                  <td bgcolor="#FFB643" style="padding:1px">&lt;!-- BEGIN teaser_4 --&gt;<br />
+<div style="background-color:#FCE2B8;padding:5px">
+&lt;img src=&quot;<div style="font-weight:bold; display:inline;">[[TEASER_IMAGE_PATH]]</div>" /&gt;
+<br />
+  <div style="font-weight:bold; display:inline;">[[TEASER_CATEGORY]]</div> - <div style="font-weight:bold; display:inline;">
+  [[TEASER_DATE]]</div>
+                                    <br />
+                                    <div style="font-weight:bold; display:inline;">[[TEASER_TITLE]]</div>
+<br />
+<div style="font-weight:bold; display:inline;">[[TEASER_TEXT]]</div><br />
+<div style="background-color:#BCBCBC;padding:1px">
+&lt;!-- BEGIN teaser_link --&gt;<br />
+<div style="background-color:#E1E1E1;padding-left:5px">
+&lt;a href=&quot;<div style="font-weight:bold; display:inline;">[[TEASER_URL]]</div>" target="<div style="font-weight:bold; display:inline;">[[TEASER_URL_TARGET]]</div>"&gt;[[TEASER_MORE]]&lt;/a&gt;<br />
+</div>
+&lt;!-- END teaser_link --&gt;<br />
+</div>
+</div>
+&lt;!-- END teaser_4 --&gt;
+</td>
                                 </tr>
                             </table>
                         </td>

@@ -5,7 +5,7 @@
  *
  * @link      http://www.cloudrexx.com
  * @copyright Cloudrexx AG 2007-2015
- *
+ * 
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
  * or under a proprietary license.
@@ -24,10 +24,10 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
-
+ 
 /**
  * Calendar
- *
+ * 
  * @package    cloudrexx
  * @subpackage module_calendar
  * @author     Cloudrexx <info@cloudrexx.com>
@@ -42,71 +42,71 @@ class CalendarException extends \Exception { }
  * Calendar
  *
  * LibClass to manage cms calendar
- *
+ * 
  * @package    cloudrexx
  * @subpackage module_calendar
  * @author     Cloudrexx <info@cloudrexx.com>
  * @copyright  CLOUDREXX CMS - CLOUDREXX AG
  * @version    1.00
- */
+ */  
 class CalendarLibrary
 {
     /**
      * Template object
-     *
+     * 
      * @access public
-     * @var object
+     * @var object 
      */
-    public $_objTpl;
-
+    public $_objTpl;  
+    
     /**
      * template content
      *
      * @access public
-     * @var string
+     * @var string 
      */
-    public $pageContent;
-
+    public $pageContent; 
+    
     /**
      * module name
      *
      * @access public
-     * @var string
+     * @var string 
      */
     public $moduleName = "Calendar";
-
+    
     /**
      * module table prefix
      *
      * @access public
-     * @var string
+     * @var string 
      */
     public $moduleTablePrefix = "calendar";
-
+    
     /**
      * module language variable prefix
      *
      * @access public
-     * @var string
+     * @var string 
      */
     public $moduleLangVar  = "CALENDAR";
-
+        
     /**
      * Error message
      *
      * @access public
-     * @var string
+     * @var string 
      */
     public $errMessage = '';
-
+    
     /**
      * Success message
      *
      * @access public
-     * @var type
+     * @var type 
      */
     public $okMessage = '';
-
+    
     /**
      * CSV separator
      *
@@ -114,27 +114,27 @@ class CalendarLibrary
      * @var string
      */
     public $csvSeparator = ';';
-
+    
     /**
      * active frontend languages
      *
      * @access public
-     * @var array
+     * @var array 
      */
     public $arrFrontendLanguages = array();
-
+    
     /**
      * Settings array
      *
      * @access public
-     * @var array
+     * @var array 
      */
     public $arrSettings = array();
-
+    
     /**
      * Static settings array to cache the fetched data from the database
      *
-     * @var array
+     * @var array 
      */
     public static $settings = array();
 
@@ -142,9 +142,19 @@ class CalendarLibrary
      * Community group array
      *
      * @access public
-     * @var array
+     * @var array 
      */
-    public $arrCommunityGroups = array();
+    public $arrCommunityGroups = array();    
+        
+    /**
+     * @var \Cx\Core\Core\Controller\Cx
+     */
+    protected $cx;
+
+    /**
+     * @var \Doctrine\ORM\EntityManager
+     */
+    protected $em;
 
     /**
      * map field key
@@ -152,178 +162,200 @@ class CalendarLibrary
      * @var string
      */
     const MAP_FIELD_KEY     = 'map_id';
-
+    
     /**
      * Picture field key
      *
      * @var string
      */
     const PICTURE_FIELD_KEY = 'picture_id';
-
+    
     /**
      * Attachment field key
-     *
+     * 
      * @var string
      */
     const ATTACHMENT_FIELD_KEY = 'attachment_id';
 
     /**
+     * Setting value for option frontendPastEvents defining that all events
+     * having their start date as of today shall be listed in frontend till
+     * the end of today.
+     *
+     * @var integer
+     */
+    const SHOW_EVENTS_OF_TODAY = 0;
+
+    /**
+     * Setting value for option frontendPastEvents defining that only those
+     * events shall be listed in frontend that have not yet ended (end date lies
+     * in the past)
+     *
+     * @var integer
+     */
+    const SHOW_EVENTS_UNTIL_END = 1;
+
+    /**
+     * Setting value for option frontendPastEvents defining that only those
+     * events shall be listed in frontend that have not yet started (start date
+     * lies in the future)
+     *
+     * @todo Implement behavior of this option
+     * @var integer
+     */
+    const SHOW_EVENTS_UNTIL_START = 2;
+    
+    /**
      * Assign the template path
      * Sets the Global variable for the calendar module
-     *
+     * 
      * @param string $tplPath Template path
      */
-    function __construct($tplPath){
+    public function __construct($tplPath = '') {
         $this->_objTpl = new \Cx\Core\Html\Sigma($tplPath);
-        $this->_objTpl->setErrorHandling(PEAR_ERROR_DIE);
-
+        $this->_objTpl->setErrorHandling(PEAR_ERROR_DIE);    
+        
         $this->_objTpl->setGlobalVariable(array(
             $this->moduleLangVar.'_MODULE_NAME'  => $this->moduleName,
-            $this->moduleLangVar.'_CSRF'         => 'csrf='.\Cx\Core\Csrf\Controller\Csrf::code(),
+            $this->moduleLangVar.'_CSRF'         => 'csrf='.\Cx\Core\Csrf\Controller\Csrf::code(),     
             $this->moduleLangVar.'_DATE_FORMAT'  => self::getDateFormat(1),
             $this->moduleLangVar.'_JAVASCRIPT'   => self::getJavascript(),
         ));
+
+        $this->init();
     }
 
     /**
-     * Checks the access level for the given action
-     *
+     * Initialize $cx and $em
+     */
+    public function init() {
+        $this->cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $this->em = $this->cx->getDb()->getEntityManager();
+    }
+
+    /**
+     * Checks the access level for the given action     
+     *      
      * It checks the access level for the given action
      * and return's null if access is granted otherwise it redirect the action
      * to the respective fallback pages.
-     *
-     * @param string $strAction possible values are add_event,
+     *  
+     * @param string $strAction possible values are add_event, 
      *                          edit_event, my_events
-     *
+     * 
      * @return null
      */
     function checkAccess($strAction)
     {
         global $objInit;
 
-        if($objInit->mode == 'backend') {
-            //backend access
-        } else {
-            //frontend access
+        if ($objInit->mode == 'backend') {
+            return;
+        }
 
-            $strStatus = '';
-            $objFWUser  = \FWUser::getFWUserObject();
+        $objFWUser  = \FWUser::getFWUserObject();
 
-            //get user attributes
-            $objUser         = $objFWUser->objUser;
-            $intUserId      = intval($objUser->getId());
-            $intUserName    = $objUser->getUsername();
-            $bolUserLogin   = $objUser->login();
-            $intUserIsAdmin = $objUser->getAdminStatus();
+        //get user attributes
+        $objUser         = $objFWUser->objUser;
+        $intUserId      = intval($objUser->getId());
+        $bolUserLogin   = $objUser->login();
 
-            $accessId = 0; //used to remember which access id the user needs to have. this is passed to Permission::checkAccess() later.
+        self::getSettings();
 
-            $intUserIsAdmin = false;
+        // abort in case frontend mangement is disabled
+        if (!$this->arrSettings['addEventsFrontend']) {
+            \Cx\Core\Csrf\Controller\Csrf::redirect(
+                \Cx\Core\Routing\Url::fromModuleAndCmd(
+                    $this->moduleName
+                )
+            );
+        }
 
-            if(!$intUserIsAdmin) {
-                self::getSettings();
+        // fetch this request
+        // will be used in case we have to redirect the user to the
+        // sign-in form
+        $thisRequest = base64_encode(
+            \Cx\Core\Routing\Url::fromRequest()
+        );
 
-                switch($strAction) {
-                    case 'add_event':
-                       if($this->arrSettings['addEventsFrontend'] == 1 || $this->arrSettings['addEventsFrontend'] == 2) {
-                            if($this->arrSettings['addEventsFrontend'] == 2) {
-                                if($bolUserLogin) {
-                                    $bolAdd = true;
-                                } else {
-                                    $bolAdd = false;
-                                }
-                            } else {
-                                $bolAdd = true;
-                            }
-
-                            if($bolAdd) {
-                                //get groups attributes
-                                $arrUserGroups  = array();
-                                $objGroup = $objFWUser->objGroup->getGroups($filter = array('is_active' => true, 'type' => 'frontend'));
-
-                                while (!$objGroup->EOF) {
-                                    if(in_array($objGroup->getId(), $objUser->getAssociatedGroupIds())) {
-                                        $arrUserGroups[] = $objGroup->getId();
-                                    }
-                                    $objGroup->next();
-                                }
-                            } else {
-                                $strStatus = 'login';
-                            }
-                        } else {
-                            $strStatus = 'redirect';
-                        }
-
-                        break;
-                    case 'edit_event':
-                        if($this->arrSettings['addEventsFrontend'] == 1 || $this->arrSettings['addEventsFrontend'] == 2) {
-                            if($bolUserLogin) {
-                                if(isset($_POST['submitFormModifyEvent'])) {
-                                    $eventId = intval($_POST['id']);
-                                } else {
-                                    $eventId = intval($_GET['id']);
-                                }
-
-                                $objEvent = new \Cx\Modules\Calendar\Controller\CalendarEvent($eventId);
-
-                                if($objEvent->author != $intUserId) {
-                                    $strStatus = 'no_access';
-                                }
-                            } else {
-                                $strStatus = 'login';
-                            }
-                        } else {
-                            $strStatus = 'redirect';
-                        }
-                        break;
-
-                    case 'my_events':
-                        if($this->arrSettings['addEventsFrontend'] == 1 || $this->arrSettings['addEventsFrontend'] == 2) {
-                            if(!$bolUserLogin) {
-                                $strStatus = 'login';
-                            }
-                        } else {
-                            $strStatus = 'redirect';
-                        }
-                        break;
+        switch($strAction) {
+            case 'add_event':
+                // Frontend submission is enabled for any user
+                if ($this->arrSettings['addEventsFrontend'] == 1) {
+                    return;
                 }
 
-                switch($strStatus) {
-                    case 'no_access':
-                        \Cx\Core\Csrf\Controller\Csrf::redirect(CONTREXX_SCRIPT_PATH.'?section=Login&cmd=noaccess');
-                        exit();
-                        break;
-                    case 'login':
-                        $link = base64_encode(CONTREXX_SCRIPT_PATH.'?'.$_SERVER['QUERY_STRING']);
-                        \Cx\Core\Csrf\Controller\Csrf::redirect(CONTREXX_SCRIPT_PATH."?section=Login&redirect=".$link);
-                        exit();
-                        break;
-                    case 'redirect':
-                        \Cx\Core\Csrf\Controller\Csrf::redirect(CONTREXX_SCRIPT_PATH.'?section='.$this->moduleName);
-                        exit();
-                        break;
+                // Frontend submission is only enabled for authenticated
+                // users ($this->arrSettings['addEventsFrontend'] == 2).
+                // Therefore, let's check if the user is authenticated
+                // further down
+
+                // important: intentionally no break
+
+            case 'my_events':
+                // Check if the user is authenticated
+                if ($bolUserLogin) {
+                    return;
                 }
-            }
+
+                // intentionally no break as the user shall get redirected to
+                // the sign-in form
+
+            case 'edit_event':
+                if (!$bolUserLogin) {
+                    // redirect the user to the sign-in form
+                    \Cx\Core\Csrf\Controller\Csrf::redirect(
+                        \Cx\Core\Routing\Url::fromModuleAndCmd(
+                            'Login',
+                            '',
+                            '',
+                            array(
+                                'redirect' => $thisRequest,
+                            )
+                        )
+                    );
+                }
+
+                // check if user is owner of event, as only
+                // the owner is allowed to make any modification on
+                // an event in frontend
+                if (isset($_POST['submitFormModifyEvent'])) {
+                    $eventId = intval($_POST['id']);
+                } else {
+                    $eventId = intval($_GET['id']);
+                }
+                $objEvent = new \Cx\Modules\Calendar\Controller\CalendarEvent($eventId);
+                if ($objEvent->author == $intUserId) {
+                    return;
+                }
+
+                \Cx\Core\Csrf\Controller\Csrf::redirect(
+                    \Cx\Core\Routing\Url::fromModuleAndCmd(
+                        'Login',
+                        'noaccess'
+                    )
+                );
+                break;
         }
     }
-
+    
     /**
      * Prepares the settings from database to array format
-     *
+     * 
      * Loads the settings values from the database and assign those values into
      * $this->arrSettings
-     *
+     * 
      * @return null
-     */
+     */    
     function getSettings()
     {
         global $objDatabase, $_ARRAYLANG, $objInit;
-
+        
         // only initialize once
         if ($this->arrSettings) {
             return;
         }
-
+        
         // hotfix: this fixes the issue that the settings are being fetch from the
         // database over and over again.
         // This is just workaround without having to refactor the whole implementation of CalendarLibrary::$arrSettings
@@ -332,7 +364,26 @@ class CalendarLibrary
             return;
         }
 
-        $arrSettings = array();
+        // TODO: we have to manually load the language-data here, as it
+        // would not be available in the adjustResponse hook.
+        // AS a result, the date format specific options (which depend on the
+        // language-data) won't work properly.
+        // As soon as CLX-1045 has been fixed and completed, the manual
+        // loading of the language-data can be removed from here.
+        $frontend = false;
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        if ($cx->getMode() == \Cx\Core\Core\Controller\Cx::MODE_FRONTEND) {
+            $frontend = true;
+        }
+        $_ARRAYLANG = array_merge(
+            $_ARRAYLANG,
+            \Env::get('init')->getComponentSpecificLanguageData(
+                'Calendar',
+                $frontend
+            )
+        );
+
+    	$arrSettings = array();
         $arrDateSettings =  array(
                             'separatorDateList','separatorDateTimeList', 'separatorSeveralDaysList', 'separatorTimeList',
                             'separatorDateDetail','separatorDateTimeDetail', 'separatorSeveralDaysDetail', 'separatorTimeDetail',
@@ -347,12 +398,12 @@ class CalendarLibrary
                     $strOptions = $objSettings->fields['options'];
                     $arrOptions = explode(',', $strOptions );
                     $value = $arrOptions[$objSettings->fields['value']];
-
+                    
                     if($objInit->mode == 'backend') {
                         // This is for the preview in settings > Date
-                        $arrSettings["{$objSettings->fields['name']}_value"] = htmlspecialchars($_ARRAYLANG["{$value}_VALUE"], ENT_QUOTES, CONTREXX_CHARSET);
+                        $arrSettings["{$objSettings->fields['name']}_value"] = isset($_ARRAYLANG["{$value}_VALUE"]) ? htmlspecialchars($_ARRAYLANG["{$value}_VALUE"], ENT_QUOTES, CONTREXX_CHARSET) : '';
                     }
-                    $value = $_ARRAYLANG[$value];
+                    $value = isset($_ARRAYLANG[$value]) ? $_ARRAYLANG[$value] : '';
                     $arrSettings[$objSettings->fields['name']] = htmlspecialchars($value, ENT_QUOTES, CONTREXX_CHARSET);
                 } else {
                     //return all exept date settings
@@ -362,44 +413,25 @@ class CalendarLibrary
                 $objSettings->MoveNext();
             }
         }
-
+        
         static::$settings[$this->moduleTablePrefix] = $arrSettings;
         $this->arrSettings = $arrSettings;
     }
-
-    /**
-     * Used to bulid the option menu from the array
-     *
-     * @param type    $arrOptions  options value for the select menu
-     * @param integer $intSelected selected option in the select menu
-     *
-     * @return string drop down options
-     */
-    function buildDropdownmenu($arrOptions, $intSelected=null)
-    {
-        $strOptions = '';
-        foreach ($arrOptions as $intValue => $strName) {
-            $checked = $intValue==$intSelected ? 'selected="selected"' : '';
-            $strOptions .= "<option value='".$intValue."' ".$checked.">".htmlspecialchars($strName, ENT_QUOTES, CONTREXX_CHARSET)."</option>";
-        }
-
-        return $strOptions;
-    }
-
+    
     /**
      * Initialize the active frontend languages array
-     *
+     * 
      * Fetch the active frontend languages from the database and assign those
      * values into $this->arrFrontendLanguages
-     *
+     * 
      * @return null
      */
     function getFrontendLanguages()
-    {
+    {        
         // return $arrLanguages;
         $this->arrFrontendLanguages = \FWLanguage::getActiveFrontendLanguages();
     }
-
+    
     /**
      * Return's the dataformat based on the type
      *
@@ -414,10 +446,10 @@ class CalendarLibrary
     {
         self::getSettings();
         $dateFormat = $this->arrSettings['dateFormat'];
-
+        
         if($type == 1) {
             switch ($dateFormat) {
-                 case 0:
+                 case 0:  
                     $dateFormat = 'dd.mm.yy';
                     break;
                  case 1:
@@ -432,10 +464,10 @@ class CalendarLibrary
                  case 4:
                     $dateFormat = 'yy-mm-dd';
                     break;
-            }
-        } else {
+            }                                                                
+        } else {   
             switch ($dateFormat) {
-                 case 0:
+                 case 0:  
                     $dateFormat = 'd.m.Y';
                     break;
                  case 1:
@@ -450,12 +482,12 @@ class CalendarLibrary
                  case 4:
                     $dateFormat = 'Y-m-d';
                     break;
-            }
+            } 
         }
-
+        
         return $dateFormat;
     }
-
+    
     /**
      * Returns a \DateTime object from a calendar date/time string.
      * The format of a calendar date/time string can be configured
@@ -475,41 +507,41 @@ class CalendarLibrary
     function getDateTime($date, $hour = 0, $minute = 0)
     {
         self::getSettings();
-
+        
         switch($this->arrSettings['dateFormat']) {
             case 0:
-                $date = str_replace(".", "", $date);
+                $date = str_replace(".", "", $date);                 
                 $posYear = 4;
-                $posMonth = 2;
-                $posDay = 0;
+                $posMonth = 2;  
+                $posDay = 0;       
                 break;
-            case 1:
-                $date = str_replace("/", "", $date);
+            case 1:                                                
+                $date = str_replace("/", "", $date); 
                 $posYear = 4;
-                $posMonth = 2;
-                $posDay = 0;
+                $posMonth = 2;  
+                $posDay = 0;   
                 break;
-            case 2:
-                $date = str_replace(".", "", $date);
+            case 2:                                               
+                $date = str_replace(".", "", $date); 
                 $posYear = 0;
-                $posMonth = 4;
+                $posMonth = 4;  
                 $posDay = 6;
                 break;
-            case 3:
-
-                $date = str_replace("/", "", $date);
+            case 3:                                           
+                
+                $date = str_replace("/", "", $date);   
                 $posYear = 4;
-                $posMonth = 0;
+                $posMonth = 0;  
                 $posDay = 2;
                 break;
-            case 4:
-                $date = str_replace("-", "", $date);
+            case 4:   
+                $date = str_replace("-", "", $date);  
                 $posYear = 0;
-                $posMonth = 4;
+                $posMonth = 4;  
                 $posDay = 6;
                 break;
         }
-
+                                                                   
         $year = substr($date, $posYear,4);
         $month = str_pad(substr($date, $posMonth,2), 2, '0', STR_PAD_LEFT);
         $day = str_pad(substr($date, $posDay,2), 2, '0', STR_PAD_LEFT);
@@ -518,13 +550,13 @@ class CalendarLibrary
 
         return $this->getInternDateTimeFromUser($year . '-' . $month . '-' . $day . ' ' .$hour . ':' . $minute . ':00');
     }
-
+    
     /**
      * Initilize the available group
-     *
+     * 
      * Fetch the available group from the database and assign those values into
      * $this->arrCommunityGroups
-     *
+     * 
      * @return null
      */
     function getCommunityGroups()
@@ -544,18 +576,18 @@ class CalendarLibrary
                 $arrCommunityGroups[intval($objCommunityGroups->fields['group_id'])]['id'] = intval($objCommunityGroups->fields['group_id']);
                 $arrCommunityGroups[intval($objCommunityGroups->fields['group_id'])]['name'] = htmlspecialchars($objCommunityGroups->fields['group_name'], ENT_QUOTES, CONTREXX_CHARSET);
                 $arrCommunityGroups[intval($objCommunityGroups->fields['group_id'])]['active'] = intval($objCommunityGroups->fields['is_active']);
-                $arrCommunityGroups[intval($objCommunityGroups->fields['group_id'])]['type'] = htmlspecialchars($objCommunityGroups->fields['type'], ENT_QUOTES, CONTREXX_CHARSET);
+                $arrCommunityGroups[intval($objCommunityGroups->fields['group_id'])]['type'] = htmlspecialchars($objCommunityGroups->fields['type'], ENT_QUOTES, CONTREXX_CHARSET);  
 
                 $objCommunityGroups->MoveNext();
             }
         }
-
+                                           
         $this->arrCommunityGroups = $arrCommunityGroups;
     }
-
+    
     /**
      * Return's the billing address javascript
-     *
+     * 
      * @return string Billing HereDoc phpscript
      */
     function getJavascript()
@@ -563,16 +595,16 @@ class CalendarLibrary
         $javascript = <<< EOF
 <script type="text/javascript" src="lib/datepickercontrol/datepickercontrol.js"></script>
 EOF;
-        if($_GET['cmd'] == 'register') {
+        if (isset($_GET['cmd']) && $_GET['cmd'] == 'register') {
              $javascript .= <<< EOF
-
+             
 <script type="text/javascript">
 /* <![CDATA[ */
 if(\$J('#calendarSelectBillingAddress').length > 0) {
     \$J(document).ready(function() {
-        checkSelectBillingAddress();
+        checkSelectBillingAddress();        
     });
-
+    
     \$J('#calendarSelectBillingAddress').change(function() {
         checkSelectBillingAddress();
     });
@@ -581,136 +613,76 @@ if(\$J('#calendarSelectBillingAddress').length > 0) {
 function checkSelectBillingAddress() {
     var displayValue;
     var selectValue =  \$J('#calendarSelectBillingAddress').val();
-
+        
     if(selectValue == 'deviatesFromContact') {
-        displayValue = 'block';
+        displayValue = 'block'; 
     } else {
-        displayValue = 'none';
+        displayValue = 'none'; 
     }
-
-    \$J(".affiliationBilling").each(function() {
-       \$J(this).css('display', displayValue);
-    });
+    
+    \$J(".affiliationBilling").each(function() { 
+       \$J(this).css('display', displayValue); 
+    });  
 }
 
 /* ]]> */
 </script>
-
+             
 EOF;
         }
-
-
+        
+        
         return $javascript;
     }
-
+    
     /**
      * generates the random key
-     *
+     * 
      * @return string combination of alphabet and number in random order
      */
     function generateKey()
     {
-        $arrRandom = array();
-        $arrChars = array ('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z');
-        $arrNumerics =  array (0,1,2,3,4,5,6,7,8,9);
-
-        for ($i = 0; $i <= rand(15,40); $i++) {
-            $charOrNum = rand(0,1);
-            if($charOrNum == 1) {
-                $posChar = rand(0,25);
-                $upOrLow = rand(0,1);
-
-                if($upOrLow == 0) {
-                    $arrRandom[$i] = strtoupper($arrChars[$posChar]);
-                } else {
-                    $arrRandom[$i] = strtolower($arrChars[$posChar]);
-                }
-            } else {
-                $posNum = rand(0,9);
-                $arrRandom[$i] = $arrNumerics[$posNum];
-            }
-        }
-
-        $key = join($arrRandom);
-
-        return $key;
+        return bin2hex(openssl_random_pseudo_bytes(16));
     }
-
-    /**
-     * Returns the escaped value for processing csv
-     *
-     * @param string &$value string to be send to the csv
-     *
-     * @return string escaped value for csv
-     */
-    function escapeCsvValue(&$value)
-    {
-        $value = preg_replace('/\r\n/', "\n", $value);
-        $valueModified = str_replace('"', '""', $value);
-
-        if ($valueModified != $value || preg_match('/['.$this->csvSeparator.'\n]+/', $value)) {
-            $value = '"'.$valueModified.'"';
-        }
-
-        return strtolower(CONTREXX_CHARSET) == 'utf-8' ? utf8_decode($value) : $value;
-    }
-
-    /**
-     * Loads datepicker
-     *
-     * @param object  &$datePicker
-     * @param integer $cat
-     *
-     * @return null
-     */
-    function loadDatePicker(&$datePicker, $cat = null) {
-        global $_CORELANG;
-        if($this->_objTpl->placeholderExists($this->moduleLangVar.'_DATEPICKER')) {
-            $timestamp = time();
-            $datePickerYear = $_REQUEST["yearID"] ? $_REQUEST["yearID"] : date('Y', $timestamp);
-            $datePickerMonth = $_REQUEST["monthID"] ? $_REQUEST["monthID"] : date('m', $timestamp);
-            $datePickerDay = $_REQUEST["dayID"] ? $_REQUEST["dayID"] : date('d', $timestamp);
-            $datePicker = new \activeCalendar($datePickerYear, $datePickerMonth, $datePickerDay);
-            $datePicker->enableMonthNav("?section=Calendar");
-            $datePicker->enableDayLinks("?section=Calendar");
-            $datePicker->setDayNames(explode(',', $_CORELANG['TXT_DAY_ARRAY']));
-            $datePicker->setMonthNames(explode(',', $_CORELANG['TXT_MONTH_ARRAY']));
-
-            $eventManagerAllEvents = new \Cx\Modules\Calendar\Controller\CalendarEventManager(null, null, $cat, null, true, false, true);
-            $eventManagerAllEvents->getEventList();
-            $events = $eventManagerAllEvents->getEventsWithDate();
-            foreach($events as $event) {
-                $datePicker->setEvent($event["year"], $event["month"], $event["day"], " withEvent");
-            }
-
-            $datePicker = $datePicker->showMonth();
-        }
-    }
-
+    
     /**
      * Returns all series dates based on the given post data
-     *
+     *       
      * @return array Array of dates
-     */
+     */    
     function getExeceptionDates()
     {
-        global $_CORELANG;
-
         $exceptionDates = array();
-
+        
         $objEvent = new \Cx\Modules\Calendar\Controller\CalendarEvent();
-        $objEvent->loadEventFromPost($_POST);
+        $objEvent->loadEventFromData($_GET);
 
         $objEventManager = new \Cx\Modules\Calendar\Controller\CalendarEventManager($objEvent->startDate);
-        $objEventManager->_setNextSeriesElement($objEvent);
-
+        $objEventManager->generateRecurrencesOfEvent($objEvent);
+        
+        $_CORELANG = \Env::get('init')->getComponentSpecificLanguageData(
+            'Core',
+            false
+        );
         $dayArray = explode(',', $_CORELANG['TXT_CORE_DAY_ABBREV2_ARRAY']);
         foreach ($objEventManager->eventList as $event) {
-            $startDate = $event->startDate;
-            $endDate   = $event->endDate;
-            $exceptionDates[$this->format2userDate($startDate)] = $this->format2userDate($startDate) != $this->format2userDate($endDate)
-                                                                    ? $dayArray[$this->formatDateTime2user($startDate, "w")] .", " . $this->format2userDate($startDate) .' - ' . $dayArray[$this->formatDateTime2user($endDate, "w")] .", ". $this->format2userDate($endDate)
-                                                                    : $dayArray[$this->formatDateTime2user($startDate, "w")] .", " . $this->format2userDate($startDate);
+            $startDate = $this->format2userDate($event->startDate);
+            $endDate   = $this->format2userDate($event->endDate);
+
+            $label = $dayArray[$this->formatDateTime2user($event->startDate, "w")] .
+                ", " . $startDate;
+            if ($startDate != $endDate) {
+                $label .= ' - ' .
+                    $dayArray[
+                        $this->formatDateTime2user($event->endDate, "w")
+                    ] .
+                    ", ". $endDate;
+            }
+
+            $exceptionDates[] = array(
+                'date'  => $startDate,
+                'label' => $label,
+            );
         }
 
         return $exceptionDates;
@@ -719,7 +691,7 @@ EOF;
     /**
      * Get component controller object
      *
-     * @param string $name  component name
+     * @param string $name  component name  
      *
      * @return \Cx\Core\Core\Model\Entity\SystemComponentController
      * The requested component controller or null if no such component exists
@@ -820,7 +792,7 @@ EOF;
      *
      * The SUPPLIED date/time string must be in USER timezone.
      * The RETURNED \DateTime object will be in INTERNAL timezone.
-     *
+     * 
      * @param string $time A date/time string in user timezone
      * @return \DateTime \DateTime object in internal timezone
      */
@@ -835,7 +807,7 @@ EOF;
      *
      * The SUPPLIED date/time string must be in DB timezone.
      * The RETURNED \DateTime object will be in INTERNAL timezone.
-     *
+     * 
      * @param string $time A date/time string in db timezone
      * @return \DateTime \DateTime object in internal timezone
      */
@@ -859,5 +831,244 @@ EOF;
         $dateTimeInDbTimezone = clone($dateTime);
         return $this->getComponent('DateTime')
                     ->intern2db($dateTimeInDbTimezone);
+    }
+
+    /**
+     * Trigger the event
+     *
+     * @param string  $eventName trigger event name
+     * @param object  $entity    entity object
+     * @param array   $relations entity relations
+     * @param boolean $isDetach  is detachable entity
+     *
+     * @return null
+     */
+    public function triggerEvent(
+        $eventName,
+        $entity = null,
+        $relations = array(),
+        $isDetach = false
+    ) {
+        if (empty($eventName)) {
+            return null;
+        }
+
+        if ($eventName == 'clearEsiCache') {
+            $this->cx->getEvents()->triggerEvent(
+                'clearEsiCache',
+                array('Widget', static::getHeadlinePlaceholders())
+            );
+            return;
+        }
+
+        if ($eventName == 'model/postFlush') {
+            $this->cx->getEvents()->triggerEvent(
+                $eventName,
+                array(
+                    new \Doctrine\ORM\Event\PostFlushEventArgs($this->em)
+                )
+            );
+            return;
+        }
+
+        if (!$entity) {
+            return null;
+        }
+
+        if ($isDetach) {
+            if (!empty($relations) && $relations['relations']) {
+                $this->detachJoinedEntity(
+                    $entity,
+                    $relations['relations'],
+                    isset($relations['joinEntityRelations']) ? $relations['joinEntityRelations'] : array()
+                );
+            }
+            $this->em->detach($entity);
+        }
+
+        $this->cx->getEvents()->triggerEvent(
+            $eventName,
+            array(
+                new \Doctrine\ORM\Event\LifecycleEventArgs(
+                    $entity, $this->em
+                )
+            )
+        );
+    }
+
+    /**
+     * Detach the entity
+     *
+     * @param object $entity             entity object
+     * @param string $methodName         method name
+     * @param array  $relation           relationship array
+     * @param array  $joinEntityRelation joined entity's relationship array
+     *
+     * @return null
+     */
+    public function detachEntity(
+        $entity,
+        $methodName,
+        $relation,
+        $joinEntityRelation
+    ) {
+        if (!$entity || empty($methodName) || empty($relation)) {
+            return null;
+        }
+
+        if (!method_exists($entity, $methodName) || !($entity->$methodName())) {
+            return null;
+        }
+
+        if ($relation == 'oneToMany') {
+            foreach ($entity->$methodName() as $subEntity) {
+                if (isset($joinEntityRelation[$methodName])) {
+                    $this->detachJoinedEntity(
+                        $subEntity,
+                        $joinEntityRelation[$methodName],
+                        $joinEntityRelation
+                    );
+                }
+                $this->em->detach($subEntity);
+            }
+        } else if ($relation == 'manyToOne') {
+            if (isset($joinEntityRelation[$methodName])) {
+                $this->detachJoinedEntity(
+                    $entity->$methodName(),
+                    $joinEntityRelation[$methodName],
+                    $joinEntityRelation
+                );
+            }
+            $this->em->detach($entity->$methodName());
+        }
+    }
+
+    /**
+     * Detach the jointed entity
+     *
+     * @param object $entity             entity object
+     * @param array  $relations          relationship array
+     * @param array  $joinEntityRelation joined entity's relationship array
+     *
+     * @return null
+     */
+    public function detachJoinedEntity(
+        $entity,
+        $relations,
+        $joinEntityRelation
+    ) {
+        if (!$entity || empty($relations)) {
+            return null;
+        }
+
+        foreach ($relations as $relation => $methodName) {
+            if (!is_array($methodName)) {
+                $this->detachEntity(
+                    $entity,
+                    $methodName,
+                    $relation,
+                    $joinEntityRelation
+                );
+                continue;
+            }
+
+            foreach ($methodName as $functionName) {
+                $this->detachEntity(
+                    $entity,
+                    $functionName,
+                    $relation,
+                    $joinEntityRelation
+                );
+            }
+        }
+    }
+
+    /**
+     * Get the list of calendar headline placeholders
+     *
+     * @return array
+     */
+    public static function getHeadlinePlaceholders()
+    {
+        $placeholders = array();
+        for ($i = 1; $i <= 21; $i++) {
+            $id = '';
+            if ($i > 1) {
+                $id = $i;
+            }
+
+            $placeholders[] = 'EVENTS' . $id . '_FILE';
+        }
+
+        return $placeholders;
+    }
+
+    /**
+     * Split a datetime string (i.E.: '08.06.2015 13:37') into an array
+     * containing the date, hour and minutes information as separate
+     * elements.
+     *
+     * @param   string  $datetime   The datetime string to parse.
+     * @param   boolean $allDay     If set to TRUE, then the returned hour
+     *                              and minutes value are set to 0, unless
+     *                              $end is also set to TRUE.
+     * @param   boolean $end        If set to TRUE and $allDay is also set to
+     *                              TRUE, then the returned hour is set to 23
+     *                              and the minutes to 59. If $allDay is not
+     *                              set to TRUE, then this argument has no
+     *                              effect.
+     * @return  array               Return parsed datetime as array having the
+     *                              following format:
+     *                              <pre>array(
+     *                                  d.m.Y,
+     *                                  G,
+     *                                  m
+     *                             )</pre>
+     */
+    protected function parseDateTimeString(
+        $datetime,
+        $allDay = false,
+        $end = false
+    ) {
+        // init time defaults
+        $hour = 0;
+        $min = 0;
+
+        // set end time defaults for all-day event
+        if ($allDay && $end) {
+            $hour = 23;
+            $min = 59;
+        }
+
+        // fetch data
+        $parts = explode(' ', $datetime);
+        $date = $parts[0];
+
+        // fetch time if event is not an all-day event
+        if (
+            !$allDay &&
+            isset($parts[1])
+        ) {
+            // match time as HH:MM / HH.MM / HH,MM / HHMM
+            $timeData = preg_split(
+                '/(?:[.,:]|(\d{2}$))/',
+                $parts[1],
+                2,
+                PREG_SPLIT_DELIM_CAPTURE
+            );
+            if (isset($timeData[0])) {
+                // remove leading zero
+                $hour = intval($timeData[0]);
+            }
+            if (isset($timeData[1])) {
+                $min = $timeData[1];
+            }
+        }
+
+        return array(
+            $date,
+            $hour,
+            $min
+        );
     }
 }

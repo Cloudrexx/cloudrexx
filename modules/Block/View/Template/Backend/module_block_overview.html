@@ -6,12 +6,12 @@ function selectMultiAction()
   with (document.frmBlocks) {
     switch (frmBlocksMultiAction.value) {
       case 'activate':
-        action='{DIRECTORY_INDEX}?cmd=Block&act=activate&{CSRF_PARAM}';
+        action='{DIRECTORY_INDEX}?cmd=Block&act=activate&catId={BLOCK_FILTER_CATEGORY_ID}&{CSRF_PARAM}';
         submit();
         break;
 
       case 'deactivate':
-        action='{DIRECTORY_INDEX}?cmd=Block&act=deactivate&{CSRF_PARAM}';
+        action='{DIRECTORY_INDEX}?cmd=Block&act=deactivate&catId={BLOCK_FILTER_CATEGORY_ID}&{CSRF_PARAM}';
         submit();
         break;
 
@@ -27,7 +27,7 @@ function selectMultiAction()
 
       case 'delete':
         if (confirm('{TXT_BLOCK_DELETE_SELECTED_BLOCKS}\n{TXT_BLOCK_OPERATION_IRREVERSIBLE}')) {
-          action='{DIRECTORY_INDEX}?cmd=Block&act=del&{CSRF_PARAM}';
+          action='{DIRECTORY_INDEX}?cmd=Block&act=del&catId={BLOCK_FILTER_CATEGORY_ID}&{CSRF_PARAM}';
           submit();
         }
         break;
@@ -41,7 +41,7 @@ function blockDeleteBlock(blockId, blockName)
 {
   strConfirmMsg = '{TXT_BLOCK_CONFIRM_DELETE_BLOCK}';
   if (confirm(strConfirmMsg.replace('%s', blockName)+'\n{TXT_BLOCK_OPERATION_IRREVERSIBLE}')) {
-    window.location.href = '{DIRECTORY_INDEX}?cmd=Block&act=del&blockId='+blockId+'&{CSRF_PARAM}';
+    window.location.href = '{DIRECTORY_INDEX}?cmd=Block&act=del&blockId=' + blockId + '&catId={BLOCK_FILTER_CATEGORY_ID}&{CSRF_PARAM}';
   }
 }
 
@@ -57,7 +57,7 @@ function blockDeleteBlock(blockId, blockName)
         filter: alpha(opacity=100);
     }
 </style>
-<form name="frmBlocks" method="post" action="{DIRECTORY_INDEX}?cmd=Block">
+<form name="frmBlocks" method="post" action="{DIRECTORY_INDEX}?cmd=Block&amp;catId={BLOCK_FILTER_CATEGORY_ID}">
   <table cellspacing="0" cellpadding="3" width="100%" border="0" class="adminlist" summary="block list">
     <tbody>
       <tr>
@@ -83,8 +83,8 @@ function blockDeleteBlock(blockId, blockName)
         <tr class="{BLOCK_ROW_CLASS}" style="height:20px;">
           <td style="text-align:right; font-weight:bold;"><input type="checkbox" name="selectedBlockId[]" id="selectedBlockId" value="{BLOCK_ID}" /></td>
           <td style="text-align:center; font-weight:bold;">{BLOCK_STATUS}</td>
-          <td><input maxlength="5" size="1" value="{BLOCK_ORDER}" name="displayorder[{BLOCK_ID}]" /></td>
-          <td><a href="index.php?cmd=Block&amp;act=modify&amp;blockId={BLOCK_ID}" title="{BLOCK_MODIFY}">{BLOCK_NAME}</a></td>
+          <td><input maxlength="5" size="1" value="{BLOCK_ORDER}" name="displayorder[{BLOCK_ID}]" style="min-width: 65%;" /></td>
+          <td><a href="index.php?cmd=Block&amp;act=modify&amp;blockId={BLOCK_ID}&amp;catId={BLOCK_CATEGORY_ID}" title="{BLOCK_MODIFY}">{BLOCK_NAME}</a></td>
           <td style="text-align:left;">{BLOCK_CATEGORY_NAME}</td>
           <td style="text-align:left;">{BLOCK_LANGUAGES_NAME}</td>
           <td>
@@ -101,8 +101,8 @@ function blockDeleteBlock(blockId, blockName)
               <img src="../modules/Block/View/Media/Location.png" width="16" height="16" border="0" alt="Location" class="{BLOCK_TARGETING_CLASS}  inclusion tooltip-trigger" /><span class="tooltip-message">{BLOCK_TARGETING_INFO}</span>
           </td>
           <td width="5%" style="text-align:right;">
-            <a href="index.php?cmd=Block&amp;act=modify&amp;blockId={BLOCK_ID}" title="{BLOCK_MODIFY}"><img src="../core/Core/View/Media/icons/edit.gif" width="16" height="16" alt="{BLOCK_MODIFY}" border="0" /></a>
-            <a href="index.php?cmd=Block&amp;act=copy&amp;blockId={BLOCK_ID}" title="{BLOCK_COPY}"><img src="../core/Core/View/Media/icons/copy.gif" width="16" height="16" alt="{BLOCK_COPY}" border="0" /></a>
+            <a href="index.php?cmd=Block&amp;act=modify&amp;blockId={BLOCK_ID}&amp;catId={BLOCK_CATEGORY_ID}" title="{BLOCK_MODIFY}"><img src="../core/Core/View/Media/icons/edit.gif" width="16" height="16" alt="{BLOCK_MODIFY}" border="0" /></a>
+            <a href="index.php?cmd=Block&amp;act=copy&amp;blockId={BLOCK_ID}&amp;catId={BLOCK_CATEGORY_ID}" title="{BLOCK_COPY}"><img src="../core/Core/View/Media/icons/copy.gif" width="16" height="16" alt="{BLOCK_COPY}" border="0" /></a>
             <a href="javascript:{void(0)};" onclick="blockDeleteBlock({BLOCK_ID}, '{BLOCK_NAME}')" title="{BLOCK_DELETE}"><img src="../core/Core/View/Media/icons/delete.gif" width="16" height="16" alt="{BLOCK_DELETE}" border="0" /></a>
           </td>
         </tr>

@@ -149,6 +149,9 @@ class Preset implements \Cx\Core_Modules\TemplateEditor\Model\Entity\YamlSeriali
      */
     public function getOption($name)
     {
+        if (!isset($this->optionValues[$name])) {
+            return '';
+        }
         return $this->optionValues[$name];
     }
 

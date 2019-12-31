@@ -1,7 +1,5 @@
 <?php
 /*
- *  $Id: Exception.php 4628 2008-07-04 16:32:19Z romanb $
- *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -15,38 +13,46 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * This software consists of voluntary contributions made by many individuals
- * and is licensed under the LGPL. For more information, see
+ * and is licensed under the MIT license. For more information, see
  * <http://www.doctrine-project.org>.
  */
 
 namespace Doctrine\DBAL;
 
 /**
- * Doctrine\DBAL\ConnectionException
- *
- * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
- * @link        www.doctrine-project.org
- * @since       2.0
- * @version     $Revision: 4628 $
- * @author      Jonathan H. Wage <jonwage@gmail.com
+ * @link   www.doctrine-project.org
+ * @since  2.0
+ * @author Jonathan H. Wage <jonwage@gmail.com
  */
 class ConnectionException extends DBALException
 {
+    /**
+     * @return \Doctrine\DBAL\ConnectionException
+     */
     public static function commitFailedRollbackOnly()
     {
         return new self("Transaction commit failed because the transaction has been marked for rollback only.");
     }
-    
+
+    /**
+     * @return \Doctrine\DBAL\ConnectionException
+     */
     public static function noActiveTransaction()
     {
         return new self("There is no active transaction.");
     }
 
+    /**
+     * @return \Doctrine\DBAL\ConnectionException
+     */
     public static function savepointsNotSupported()
     {
         return new self("Savepoints are not supported by this driver.");
     }
 
+    /**
+     * @return \Doctrine\DBAL\ConnectionException
+     */
     public static function mayNotAlterNestedTransactionWithSavepointsInTransaction()
     {
         return new self("May not alter the nested transaction with savepoints behavior while a transaction is open.");

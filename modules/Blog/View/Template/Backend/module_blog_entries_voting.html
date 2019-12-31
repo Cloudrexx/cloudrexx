@@ -59,12 +59,11 @@ function selectMultiAction() {
   <form name="frmShowDetails" method="post" action="">
     <table width="100%" cellspacing="0" cellpadding="3" border="0" align="top" class="adminlist">
       <tr>
-        <th colspan="5">{TXT_DETAILS_TITLE}</th>
+        <th colspan="4">{TXT_DETAILS_TITLE}</th>
       </tr>
       <tr class="row3">
         <td nowrap="nowrap" width="1%"><span style="font-weight:bold;">&nbsp;&nbsp;#</span></td>
         <td nowrap="nowrap" width="33%"><span style="font-weight:bold;">{TXT_DETAILS_DATE}</span></td>
-        <td nowrap="nowrap" width="33%"><span style="font-weight:bold;">{TXT_DETAILS_IP}</span></td>
         <td nowrap="nowrap" width="31%"><span style="font-weight:bold;">{TXT_DETAILS_VOTE}</span></td>
         <td nowrap="nowrap" width="1%"><span style="font-weight:bold;">{TXT_DETAILS_ACTION}</span></td>
       </tr>
@@ -72,7 +71,6 @@ function selectMultiAction() {
       <tr class="{DETAILS_ROWCLASS}">
         <td><input type="checkbox" name="selectedVotingsId[]" id="selectedVotingsId" value="{DETAILS_VOTE_ID}" /></td>
         <td>{DETAILS_DATE}</td>
-        <td><a href="index.php?cmd=NetTools&tpl=whois&address={DETAILS_IP}" title="{DETAILS_IP}" target="_blank">{DETAILS_IP}</a></td>
         <td>{DETAILS_VOTE}</td>
         <td>
           <div align="right">
@@ -83,7 +81,7 @@ function selectMultiAction() {
       <!-- END showDetails -->
       <!-- BEGIN noDetails -->
       <tr class="row2">
-        <td colspan="5"><div align="center"><br />{TXT_DETAILS_NONE}<br /><br /></td>
+        <td colspan="4"><div align="center"><br />{TXT_DETAILS_NONE}<br /><br /></td>
       </tr>
       <!-- END noDetails -->
     </table>

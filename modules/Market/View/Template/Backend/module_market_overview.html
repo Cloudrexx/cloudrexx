@@ -3,7 +3,7 @@
 // <![CDATA[
 function deleteCategory(catId){
     if(confirm('{TXT_DELETE_CATEGORY}'))
-        window.location.replace("?cmd=Market&{CSRF_PARAM}&act=deleteCategorie&id="+catId);
+        window.location.replace("index.php?cmd=Market&{CSRF_PARAM}&act=deleteCategorie&id="+catId);
 }
 
 function selectMultiAction()
@@ -11,16 +11,16 @@ function selectMultiAction()
   with (document.frmShowCategories) {
     switch (frmShowCategories_MultiAction.value) {
       case 'activate':
-        action='?cmd=Market&act=statusCategorie';
+        action='index.php?cmd=Market&act=statusCategorie';
         submit();
       break;
       case 'deactivate':
-        action='?cmd=Market&act=statusCategorie';
+        action='index.php?cmd=Market&act=statusCategorie';
         submit();
       break;
       case 'delete':
         if (confirm('{TXT_DELETE_CATEGORY}')) {
-          action='?cmd=Market&act=deleteCategorie';
+          action='index.php?cmd=Market&act=deleteCategorie';
           submit();
         }
       break;
@@ -30,7 +30,7 @@ function selectMultiAction()
 }
 // ]]>
 </script>
-<form name="frmShowCategories" method="post" action="?cmd=Market&act=sortCategorie">
+<form name="frmShowCategories" method="post" action="index.php?cmd=Market&amp;act=sortCategorie">
 <table width="100%" cellspacing="0" cellpadding="3" border="0" align="top" class="adminlist">
   <tr>
     <th width="1%"><div align="left">#</div></th>
@@ -43,14 +43,14 @@ function selectMultiAction()
   <!-- BEGIN showCategories -->
   <tr class="row{CAT_ROWCLASS}">
     <td width="1%"><input type="checkbox" name="selectedCategoryId[]" id="selectedCategoryId" value="{CAT_ID}"></td>
-    <td width="1%"><a href="?cmd=Market&amp;act=statusCategorie&amp;id={CAT_ID},{CAT_STATUS}" target="_self"><img src="../core/Core/View/Media/icons/{CAT_ICON}.gif" border="0" alt="" /></a></td>
-    <td width="1%" nowrap="nowrap"><img src="../core/Core/View/Media/icons/folder_on.gif" border="0" alt="" />&nbsp;&nbsp;<input type="text" name="sortCategory[{CAT_ID}]" value="{CAT_SORTING}" maxlength="2" size="1" />&nbsp;<a href="?cmd=Market&amp;act=entries&amp;catid={CAT_ID}">&nbsp;{CAT_NAME}</a>
+    <td width="1%"><a href="index.php?cmd=Market&amp;act=statusCategorie&amp;id={CAT_ID},{CAT_STATUS}" target="_self"><img src="../core/Core/View/Media/icons/{CAT_ICON}.gif" border="0" alt="" /></a></td>
+    <td width="1%" nowrap="nowrap"><img src="../core/Core/View/Media/icons/folder_on.gif" border="0" alt="" />&nbsp;&nbsp;<input type="text" name="sortCategory[{CAT_ID}]" value="{CAT_SORTING}" maxlength="2" size="1" />&nbsp;<a href="index.php?cmd=Market&amp;act=entries&amp;catid={CAT_ID}">&nbsp;{CAT_NAME}</a>
     </td>
     <td align="justify">{CAT_DESCRIPTION}&nbsp;</td>
     <td align="center">{CAT_COUNT_ENTRIES}&nbsp;</td>
     <td align="right" nowrap="nowrap">
       <div align="right">
-        <a href="?cmd=Market&amp;act=editCategorie&amp;id={CAT_ID}" target="_self"><img alt="{TXT_IMG_EDIT}" title="{TXT_IMG_EDIT}" src="../core/Core/View/Media/icons/edit.gif" border="0" /></a>
+        <a href="index.php?cmd=Market&amp;act=editCategorie&amp;id={CAT_ID}" target="_self"><img alt="{TXT_IMG_EDIT}" title="{TXT_IMG_EDIT}" src="../core/Core/View/Media/icons/edit.gif" border="0" /></a>
         <a href="javascript:deleteCategory({CAT_ID});" target="_self"><img alt="{TXT_IMG_DEL}" src="../core/Core/View/Media/icons/delete.gif" border="0" title="{TXT_IMG_DEL}" /></a>
       </div>
     </td>

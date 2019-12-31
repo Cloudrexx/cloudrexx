@@ -5,14 +5,18 @@ function getMediaBrowser(e) { // e => jQuery element
         isImageField = e.data('isImage'),
         mediaBrowseInputBox = $J('#' + inputId);
     cx.variables.get('jquery','mediabrowser')('#mediabrowser_button').trigger('click', {
-        callback: function(data) {
-            if (data.type == "file") {
+        callback: function (data) {
+            if (data.type === 'file') {
                 var path = data.data[0].datainfo.filepath;
                 mediaBrowseInputBox.val(path);
                 mediaBrowseInputBox.trigger('keyup');
-                if (isImageField && $J('#'+ inputId +'_preview')) {
-                    changeImagePreview($J('#'+ inputId +'_preview'), path);
+                if (isImageField && $J('#' + inputId + '_preview')) {
+                    changeImagePreview($J('#' + inputId + '_preview'), path);
                 }
+            } else if (data.type === 'page') {
+                var node = data.data[0].node;
+                mediaBrowseInputBox.val(node);
+                mediaBrowseInputBox.trigger('keyup');
             }
         },
         cxMbViews : e.data('views'),
@@ -43,6 +47,37 @@ function toggleDisplayDouration(){
 cx.ready(function() {
     $J('input[name=durationStart]').datepicker();
     $J('input[name=durationEnd]').datepicker();
+    cx.jQuery('#associated-entries-select')
+      .chosen({
+        width: '300px',
+        display_selected_options: false,
+        hide_results_on_select: false,
+        no_results_text: '{TXT_MEDIADIR_SELECT_NO_MATCH}',
+        placeholder_text_multiple: '{TXT_MEDIADIR_PLEASE_CHOOSE}'
+    }).chosenSortable();
+});
+
+cx.slugify = function(string) {
+    // replace international characters
+    cx.jQuery.each(cx.variables.get("charReplaceList"), function(search, replace) {
+        string = string.replace(search, replace);
+    });
+    // replace spaces
+    string = string.replace(/\s+/g, '-');
+    // replace all non-url characters
+    string = string.replace(/[^a-zA-Z0-9-_]/g, '');
+    return string;
+}
+
+cx.jQuery(document).ready(function() {
+    var slugFieldId = cx.variables.get("slugFieldId", "Mediadir");
+    cx.jQuery("form[name='entryModfyForm'] input[data-id='" + slugFieldId + "']").keyup(function() {
+        var originalSlug  = cx.jQuery(this).val();
+        var slugifiedSlug = cx.slugify(originalSlug);
+        if (originalSlug != slugifiedSlug) {
+            cx.jQuery(this).val(slugifiedSlug);
+        }
+    });
 });
 </script>
 
@@ -121,6 +156,20 @@ cx.ready(function() {
         </td>
     </tr>
     <!-- END mediadirInputfieldList -->
+
+    <!-- BEGIN mediadir_associated_entries -->
+    <tr id="associated-entries-row">
+      <td valign="top">{TXT_MEDIADIR_ASSOCIATED_ENTRIES}</td>
+      <td>
+        <select id="associated-entries-select" name="target_entry_ids[]"
+                class="chosen-sortable" multiple>
+          {MEDIADIR_ASSOCIATED_ENTRIES_OPTIONS}
+        </select>
+        <span class="tooltip-trigger icon-info"></span>
+        <span class="tooltip-message">{TXT_MEDIADIR_ASSOCIATED_ENTRIES_INFO}</span>
+      </td>
+    </tr>
+    <!-- END mediadir_associated_entries -->
 
     <!-- BEGIN mediadirSpezfieldList -->
     <tr class="row2">
