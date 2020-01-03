@@ -249,6 +249,8 @@ class UploaderController {
                 if ($im->_isImage($new_path)) {
                     // Fix an image orientation
                     $im->fixImageOrientation($new_path);
+                    // Fix image color space profile
+                    $im->fixImageColorSpace($new_path);
                 }
 
                 return array(
