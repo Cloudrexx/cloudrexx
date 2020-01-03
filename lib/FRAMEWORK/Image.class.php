@@ -1013,4 +1013,91 @@ class ImageManager
             \DBG::msg($ex->getMessage());
         }
     }
+
+    /**
+     * Ensure the image uses the correct color space profile
+     *
+     * The W3C has defined sRGB as the default color space
+     *({@see https://www.w3.org/Graphics/Color/sRGB}). sRGB (standard Red Green
+     * Blue) has been standardized by the International Electrotechnical
+     * Commission (IEC) as IEC 61966-2-1
+     * ({@see https://webstore.iec.ch/publication/6168}). The International
+     * Color Consortium (ICC) has published a color profile for the default
+     * color space sRGB. The profile is called 'IEC 61966-2-1 Default RGB Colour
+     * Space - sRGB' ({@see http://color.org/srgbprofiles.xalter}).
+     * Therefore, it is recommended that images (who do use color profiles) do
+     * use the profile by the ICC. Otherwise the display is unkown as not all
+     * end user devices do properly support color space profiles and do instead
+     * most likely assume that an image uses the IEC 61966-2-1 Default RGB
+     * Colour Space. Further, PHP's GD-library does also not support color space
+     * profiles. Therefore, it does also always assume an image uses the ICC
+     * standard profile. The latter causes unexpected results when performing
+     * any image manipulation with GD on images that are not using the ICC
+     * standard color space profile.
+     * As a result, we need to ensure that all images that are uploaded are
+     * using the ICC standard color space profile. If required, this means that
+     * we have to convert any non-confirming images on the fly.
+     *
+     * @param string $filePath Image file path
+     */
+    public function fixImageColorSpace($filePath) {
+        if (!extension_loaded('Imagick')) {
+            \DBG::log(
+                'PHP extension Imagick not installed.' .
+                ' Unable to verify image\' color space profile'
+            );
+            return;
+        }
+
+        // abort for images that do not support color space profiles
+        $this->loadImage($filePath);
+        if (
+            !in_array(
+                $this->orgImageType,
+                array(
+                    static::IMG_TYPE_PNG,
+                    static::IMG_TYPE_JPEG,
+                )
+            )
+        ) {
+            return;
+        }
+
+        // ICC default color space profile model is:
+        // "IEC 61966-2-1 Default RGB Colour Space - sRGB"
+        // Unfortunately, the naming is not standardized.
+        // Therefore we have to match by regexp
+        $iccDefaultModel = '/IEC\s+61966[-.]2[-.]1/i';
+
+        // load ICC default color space profile
+        static $iccProfile;
+        if (!$iccProfile) {
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $iccProfile = file_get_contents(
+                $cx->getCodeBaseLibraryPath() . '/ICCProfiles/sRGB2014.icc'
+            );
+        }
+
+        // load image
+        $image = new \Imagick($filePath);
+
+        // verify image' color space profile
+        $iccModel = $image->getImageProperty("icc:model");
+        if (preg_match($iccDefaultModel, $iccModel)) {
+            return;
+        }
+
+        // transform image' color space to sRGB in case it's not already using
+        // it
+        $colorspace = $image->getImageColorspace();
+        if ($colorspace != \Imagick::COLORSPACE_SRGB) {
+            $image->transformImageColorspace(\Imagick::COLORSPACE_SRGB);
+        }
+
+        // assign ICC default sRGB color space profile
+        $image->profileImage("icc", $iccProfile);
+
+        // update transformed image to disk
+        $image->writeImage($filePath);
+    }
 }
