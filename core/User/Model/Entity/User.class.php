@@ -943,4 +943,20 @@ class User extends \Cx\Model\Base\EntityBase {
         }
         return false;
     }
+
+    /**
+     * Get AttributeValue from AttributeValues
+     *
+     * @param int $attributeId id to find AttributeValue
+     * @return \Cx\Core\User\Model\Entity\UserAttributeValue
+     */
+    public function getAttributeValue($attributeId)
+    {
+        foreach ($this->userAttributeValue as $value) {
+            if ($value->getAttributeId() == $attributeId) {
+                return $value;
+            }
+        }
+        return new \Cx\Core\User\Model\Entity\UserAttributeValue();
+    }
 }
