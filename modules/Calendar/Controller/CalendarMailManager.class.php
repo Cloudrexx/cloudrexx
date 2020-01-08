@@ -385,15 +385,29 @@ class CalendarMailManager extends CalendarLibrary {
 
             // let's see if there exists a user account by the provided e-mail address
             if ($recipient->getType() == MailRecipient::RECIPIENT_TYPE_MAIL) {
+                $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+                $user = $cx->getDb()->getEntityManager()->getRepository(
+                    'Cx\Core\User\Model\Entity\User'
+                )->findOneBy(
+                    array('email' => $recipient->getAddress(), 'active' => true)
+                );
                 $objUser = \FWUser::getFWUserObject()->objUser->getUsers($filter = array('email' => $recipient->getAddress(), 'is_active' => true));
-                if ($objUser) {
+                if ($user) {
+                    $objAttribute = \FWUser::getFWUserObject()->objUser
+                        ->objAttribute;
                     // convert recipient to an Access User recipient
-                    $recipient->setLang($objUser->getFrontendLanguage());
+                    $recipient->setLang($user->getFrontendLangId());
                     $recipient->setType(MailRecipient::RECIPIENT_TYPE_ACCESS_USER);
-                    $recipient->setId($objUser->getId());
-                    $recipient->setSalutationId($objUser->getProfileAttribute('title'));
-                    $recipient->setFirstname($objUser->getProfileAttribute('firstname'));
-                    $recipient->setLastname($objUser->getProfileAttribute('lastname'));
+                    $recipient->setId($user->getId());
+                    $recipient->setSalutationId($user->getAttributeValue(
+                        $objAttribute->getAttributeIdByProfileAttributeId('title')
+                    )->getValue());
+                    $recipient->setFirstname($user->getAttributeValue(
+                        $objAttribute->getAttributeIdByProfileAttributeId('firstname')
+                    )->getValue());
+                    $recipient->setLastname($user->getAttributeValue(
+                        $objAttribute->getAttributeIdByProfileAttributeId('lastname')
+                    )->getValue());
                     $recipient->setUsername($objUser->getUsername());
                 } else {
                     if (!empty($regId) && $recipient->getAddress() == $regMail) {
