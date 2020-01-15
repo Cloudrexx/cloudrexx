@@ -5739,19 +5739,21 @@ $WhereStatement = array();
                 'type'              => array('type' => 'data', 'def' => 'newsletter_user')
             ),
             'access' => array(
-                'status'            => array('type' => 'field', 'def' => 'active'),
-                'uri'               => array('type' => 'field', 'def' => 'website'),
-                'sex'               => array('type' => 'field', 'def' => 'gender'),
-                'salutation'        => array('type' => 'field', 'def' => 'title'),
-                'title'             => array('type' => 'data',  'def' => ''),
-                'position'          => array('type' => 'data',  'def' => ''),
-                'industry_sector'   => array('type' => 'data',  'def' => ''),
-                'country_id'        => array('type' => 'field', 'def' => 'country'),
-                'fax'               => array('type' => 'field', 'def' => 'phone_fax'),
-                'notes'             => array('type' => 'data',  'def' => ''),
-                'type'              => array('type' => 'data', 'def' => 'access_user'),
-                'emaildate'         => array('type' => 'field', 'def' => 'regdate'),
-                'language'          => array('type' => 'data',  'def' => ''),
+                'id'              => array('type' => 'field', 'def' => 'accessUserID'),
+                'email'           => array('type' => 'data', 'def' => ''),
+                'status'          => array('type' => 'data', 'def' => ''),
+                'uri'             => array('type' => 'data', 'def' => 'website'),
+                'sex'             => array('type' => 'data', 'def' => 'gender'),
+                'salutation'      => array('type' => 'data', 'def' => 'title'),
+                'title'           => array('type' => 'data', 'def' => ''),
+                'position'        => array('type' => 'data', 'def' => ''),
+                'industry_sector' => array('type' => 'data', 'def' => ''),
+                'country_id'      => array('type' => 'data', 'def' => 'country'),
+                'fax'             => array('type' => 'data', 'def' => 'phone_fax'),
+                'notes'           => array('type' => 'data', 'def' => ''),
+                'type'            => array('type' => 'data', 'def' => 'access_user'),
+                'emaildate'       => array('type' => 'data', 'def' => 'regdate'),
+                'language'        => array('type' => 'data', 'def' => ''),
             )
         );
 
@@ -5855,7 +5857,7 @@ $WhereStatement = array();
                 )
                 %4$s
                 %5$s
-                %10$s
+                %8$s
             )
             UNION DISTINCT
             (
@@ -5863,15 +5865,10 @@ $WhereStatement = array();
                 %6$s,
                 1 AS isAccess
                 FROM `%1$smodule_newsletter_access_user` AS `cnu`
-                    INNER JOIN `%1$saccess_users` AS `cu` ON `cu`.`id`=`cnu`.`accessUserID`
-                    %12$s
+           
                 WHERE 1
                 %7$s
-                %13$s
-                %11$s
-            )
-            %8$s
-            %9$s',
+            )',
 
             // %1$s
             DBPREFIX,
@@ -5898,76 +5895,111 @@ $WhereStatement = array();
                 ? sprintf('AND `cnu`.`newsletterCategoryID`=%s', intval($newsletterListId)) : ''),
 
             // %8$s
-            $order,
+            ($status === null ? '' : 'AND `nu`.`status` = '.$status)
 
-            // %9$s
-            ($limit ? sprintf('LIMIT %s, %s', $pagingPos, $limit) : ''),
-
-            // %10$s
-            ($status === null ? '' : 'AND `nu`.`status` = '.$status),
-
-            // %11$s
-            ($status === null ? '' : 'AND `cu`.`active` = '.$status),
-
-            // %12$s
-            $profileJoin,
-
-            // %13$s
-            (!empty($where) ? 'AND (' . implode('OR ', $whereStatement['access']) .') ' : '')
         );
 
         $data = $objDatabase->Execute($query);
-        $dataCount = $objDatabase->Execute('SELECT FOUND_ROWS() AS `count`');
-        $count = $dataCount->fields['count'];
 
-        $objFWUser = \FWUser::getFWUserObject();
-        $users = array();
+        $accessIds = array();
+        $dataSet = new \Cx\Core_Modules\Listing\Model\Entity\DataSet();
         if ($data !== false ) {
             while (!$data->EOF) {
-                $user = array();
                 if ($data->fields['isAccess']) {
-                    foreach ($arrRecipientFields['list'] as $field) {
-                        if ($field == 'title') {
-                            $user[$field] = '';
-                        } else if ($attr->isCoreAttribute($field)) {
-                            $accessField = $field;
-                            if (isset($arrWrapperDefinitions[$field])) {
-                                $accessField = $arrWrapperDefinitions[$field]['def'];
-                            }
-                            $objUser = $objFWUser->objUser->getUsers(
-                                array('id' => $data->fields['id'])
-                            );
-                            $value = $objUser->getProfileAttribute($accessField);
-                            if ($accessField == 'gender') {
-                                switch ($value) {
-                                    case 'gender_female':
-                                        $value = 'f';
-                                        break;
-                                    case 'gender_male':
-                                        $value = 'f';
-                                        break;
-                                    default:
-                                        $value = '-';
-                                }
-                            } $user[$field] = $value;
-                        } else {
-                            $user[$field] = $data->fields[$field];
-                        }
-                    }
-                    $user['source'] = $data->fields['source'];
-                    $user['consent'] = $data->fields['consent'];
+                    $accessIds[] = $data->fields['id'];
                 } else {
-                    $user = $data->fields;
-                    unset($user['isAccess']);
+                    unset($data->fields['isAccess']);
+                    $dataSet->add('N-' . $data->fields['id'], $data->fields);
                 }
-
-                $users[] = $user;
-
                 $data->MoveNext();
             }
         }
 
-        return array($users, $count);
+        $objFWUser = \FWUser::getFWUserObject();
+        $objUser = $objFWUser->objUser->getUsers(array('id' => $accessIds));
+
+        if ($objUser) {
+            while (!$objUser->EOF) {
+                // We have to create a new array, because the array structure is
+                // different
+                foreach ($arrRecipientFields['list'] as $field) {
+                    if (!$attr->isCoreAttribute($field)) {
+                        continue;
+                    }
+
+                    $accessField = $field;
+                    if (isset($arrWrapperDefinitions[$field])) {
+                        $accessField = $arrWrapperDefinitions[$field]['def'];
+                    }
+
+                    $value = $objUser->getProfileAttribute($accessField);
+                    if ($accessField == 'gender') {
+                        switch ($value) {
+                            case 'gender_female':
+                                $value = 'f';
+                                break;
+                            case 'gender_male':
+                                $value = 'f';
+                                break;
+                            default:
+                                $value = '-';
+                        }
+                    }
+
+                    $user[$field] = $value;
+                }
+
+                $user['id'] = $objUser->getId();
+                $user['email'] = $objUser->getEmail();
+                $user['status'] = $objUser->getActiveStatus();
+                $user['regdate'] = $objUser->getRegistrationDate();
+                $user['language'] = $objUser->getFrontendLanguage();
+                $user['type'] = 'access_user';
+                $user['source'] = 'undefined';
+                $user['consent'] = 'undefined';
+
+                $dataSet->add('U-' . $objUser->getId(), $user);
+                $objUser->next();
+            }
+        }
+
+        $filter = array(
+            'status' => $status,
+            'search' => $where,
+        );
+
+        if (is_null($status) || !empty($where)) {
+            $dataSet->filter(function($entry) use ($filter) {
+                if (
+                    (
+                        is_null($filter['status']) ||
+                        $entry['status'] == $filter['status']
+                    )
+                ) {
+                    if (empty($filter['search'])) {
+                        return true;
+                    }
+
+                    foreach ($filter['search'] as $field => $value) {
+                        if (preg_match("/{$value}/i", $entry[$field])) {
+                            return true;
+                        }
+                    }
+
+                    return false;
+                }
+
+                return false;
+            });
+        }
+
+        $dataSet = $dataSet->sort($order);
+        $count = $dataSet->count();
+        $dataSet = $dataSet->limit($limit, $pagingPos);
+
+        return array(
+            $dataSet->toArray(false), $count
+        );
     }
 
 
