@@ -5798,23 +5798,9 @@ $WhereStatement = array();
         }
 
         $whereStatement = array();
-        $profileJoin = '';
-        if (!empty($where)) {
-            $profileJoin = 'INNER JOIN `'.DBPREFIX
-                .'access_user_attribute_value` AS `cup` ON `cup`.`user_id`=`cu`.`id`';
-        }
         foreach ($where as $field=>$keyword) {
             // Newsletter users
-            $whereStatement['newsletter'][] = '`' . $field . '` LIKE "%' . $keyword .'%"';
-
-            // Access users
-            if ($attr->isCoreAttribute($field)) {
-                $fieldId = $attr->getAttributeIdByProfileAttributeId($field);
-                $whereStatement['access'][] = '( `cup`.`attribute_id` = ' . $fieldId
-                    . ' AND `cup`.`value` LIKE "%' . $keyword .'%" )';
-            } else {
-                $whereStatement['access'][] = '`' . $field . '` LIKE "%' . $keyword .'%"';
-            }
+            $whereStatement[] = '`' . $field . '` LIKE "%' . $keyword .'%"';
         }
 
         array_push(
@@ -5885,7 +5871,7 @@ $WhereStatement = array();
                 ? sprintf('AND `rc`.`category`=%s', intval($newsletterListId)) : ''),
 
             // %5$s
-            (!empty($where) ? 'AND (' . implode('OR ', $whereStatement['newsletter']). ') '  : ''),
+            (!empty($where) ? 'AND (' . implode('OR ', $whereStatement). ') '  : ''),
 
             // %6$s
             implode(',', $arrRecipientFields['access']),
