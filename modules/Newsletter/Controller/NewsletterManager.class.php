@@ -4279,7 +4279,7 @@ class NewsletterManager extends NewsletterLib
 // TODO: $WhereStatement is not defined
 $WhereStatement = array();
         list ($users, $count) = $this->returnNewsletterUser(
-            $WhereStatement, $order = '', $listId);
+            $WhereStatement, $order = array(), $listId);
 // TODO: $count is never used
 ++$count;
 
@@ -4357,7 +4357,7 @@ $WhereStatement = array();
 
         $fieldValues = array('status', 'email', 'uri', 'company', 'lastname', 'firstname', 'address', 'zip', 'city', 'country_id', 'feedback', 'emaildate', );
         $field  = !empty($_REQUEST['field']) && in_array($_REQUEST['field'], $fieldValues) ? $_REQUEST['field'] : 'emaildate';
-        $order  = !empty($_REQUEST['order']) && $_REQUEST['order'] == 'desc' ? 'desc' : 'asc';
+        $order  = !empty($_REQUEST['order']) && $_REQUEST['order'] == 'desc' ? SORT_DESC : SORT_ASC;
         $listId = !empty($_REQUEST['list'])  ? intval($_REQUEST['list']) : '';
         $limit  = !empty($_REQUEST['limit']) ? intval($_REQUEST['limit']) : $_CONFIG['corePagingLimit'];
         $pos    = !empty($_REQUEST['pos'])   ? intval($_REQUEST['pos']) : 0;
@@ -4391,7 +4391,7 @@ $WhereStatement = array();
         }
 
         list ($users, $output['recipient_count']) = $this->returnNewsletterUser(
-            $search_where, "ORDER BY `$field` $order", $listId, $searchstatus, $limit, $pos);
+            $search_where, array($field => $order), $listId, $searchstatus, $limit, $pos);
 
         $linkCount            = array();
         $feedbackCount        = array();
@@ -5696,7 +5696,7 @@ $WhereStatement = array();
      *              to be selected (0 for all users)
      * @return      array(array, int)
      */
-    private function returnNewsletterUser($where, $order = '', $newsletterListId=0, $status = null, $limit = null, $pagingPos = 0)
+    private function returnNewsletterUser($where, $order = array(), $newsletterListId=0, $status = null, $limit = null, $pagingPos = 0)
     {
         global $objDatabase;
 
