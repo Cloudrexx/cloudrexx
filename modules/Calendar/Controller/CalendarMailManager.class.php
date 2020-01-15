@@ -391,7 +391,6 @@ class CalendarMailManager extends CalendarLibrary {
                 )->findOneBy(
                     array('email' => $recipient->getAddress(), 'active' => true)
                 );
-                $objUser = \FWUser::getFWUserObject()->objUser->getUsers($filter = array('email' => $recipient->getAddress(), 'is_active' => true));
                 if ($user) {
                     $objAttribute = \FWUser::getFWUserObject()->objUser
                         ->objAttribute;
@@ -408,7 +407,7 @@ class CalendarMailManager extends CalendarLibrary {
                     $recipient->setLastname($user->getAttributeValue(
                         $objAttribute->getAttributeIdByProfileAttributeId('lastname')
                     )->getValue());
-                    $recipient->setUsername($objUser->getUsername());
+                    $recipient->setUsername($user->getUsername());
                 } else {
                     if (!empty($regId) && $recipient->getAddress() == $regMail) {
                         $recipient->setFirstname($regFirstname);
