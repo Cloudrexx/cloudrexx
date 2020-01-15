@@ -399,4 +399,29 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     {
         return $this->parent;
     }
+
+    public function getName($langId = 0)
+    {
+        if (empty($langId) && FRONTEND_LANG_ID) {
+            $langId = FRONTEND_LANG_ID;
+        } else if (empty($langId)) {
+            $langId = 1;
+        }
+
+        $crit = \Doctrine\Common\Collections\Criteria::create()->where(
+            \Doctrine\Common\Collections\Criteria::expr()->eq(
+                'langId',
+                $langId
+            )
+        );
+        $userAttributeName = $this->getUserAttributeName()->matching(
+            $crit
+        )->first();
+
+        if (!empty($userAttributeName)) {
+            return $userAttributeName->getName();
+        }
+
+        return '';
+    }
 }
