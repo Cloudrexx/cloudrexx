@@ -2694,18 +2694,18 @@ class NewsletterManager extends NewsletterLib
      */
     private function getCurrentMailRecipientCount($mailId)
     {
-        return count($this->getMailRecipientQuery($mailId, false));
+        return count($this->getMailRecipients($mailId, false));
     }
 
     /**
-     * Return the recipient SQL query for a specific e-mail campaign
+     * Return the recipients  for a specific e-mail campaign
      *
      * @param   int $mailId The ID of the e-mail campaign to return the SQL query to fetch the recipients from
-     * @return  string  SQL query to fetch the recipients of the specified e-mail campaign
+     * @return  array  array with the recipients of the specified e-mail campaign
      * @todo    Move the query parts of $accessUserRecipientsQuery and &userGroupRecipientsQuery into a separate
      *          method as they are almost identical except for different table aliases that have to be used.
      */
-    protected function getMailRecipientQuery($mailId, $distinctByType = true) {
+    protected function getMailRecipients($mailId, $distinctByType = true) {
         global $objDatabase;
 
         // fetch CRM membership filter
@@ -3364,7 +3364,7 @@ class NewsletterManager extends NewsletterLib
      */
     private function getAllRecipientEmails($mailID)
     {
-        return new \ArrayIterator($this->getMailRecipientQuery(intval($mailID)));
+        return new \ArrayIterator($this->getMailRecipients(intval($mailID)));
     }
 
 
