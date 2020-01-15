@@ -2708,6 +2708,11 @@ class NewsletterManager extends NewsletterLib
     protected function getMailRecipients($mailId, $distinctByType = true) {
         global $objDatabase;
 
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $userRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Core\User\Model\Entity\User'
+        );
+
         // fetch CRM membership filter
         $crmMembershipFilter = $this->emailEditGetCrmMembershipFilter($mailId);
 
@@ -2790,17 +2795,19 @@ class NewsletterManager extends NewsletterLib
         }
 
         if (!empty($accessIds)) {
-            $objUser = \FWUser::getFWUserObject()->objUser->getUsers(array(
-                'id' => $accessIds, 'active' => 1
-            ));
+            $users = $userRepo->findBy(
+                array(
+                    'id' => $accessIds,
+                    'active' => 1
+                )
+            );
 
-            if ($objUser) {
-                while (!$objUser->EOF) {
+            if (!empty($users)) {
+                foreach ($users as $user) {
                     $mailRecipients[] = array(
-                        'email' => $objUser->getEmail(),
+                        'email' => $user->getEmail(),
                         'type' => self::USER_TYPE_ACCESS
                     );
-                    $objUser->next();
                 }
             }
         }
@@ -3105,7 +3112,10 @@ class NewsletterManager extends NewsletterLib
 
                     // attention: in case there happens a database error, $tmpSending->valid() will return false.
                     //            this will cause to stop the send process even if the newsletter send process wasn't complete yet!!
-                    $objUser = \FWUser::getFWUserObject()->objUser;
+                    $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+                    $userRepo = $cx->getDb()->getEntityManager()->getRepository(
+                        'Cx\Core\User\Model\Entity\User'
+                    );
                     if ($tmpSending->valid()) {
                         foreach ($tmpSending as $send) {
                             $beforeSend = time();
@@ -3116,10 +3126,10 @@ class NewsletterManager extends NewsletterLib
                                     $send ['type'] == static::USER_TYPE_CORE
                                 )
                             ) {
-                                $accessUser = $objUser->getUsers(
+                                $accessUser = $userRepo->findOneBy(
                                     array('email' => $send['email'])
                                 );
-                                if (!$accessUser) {
+                                if (empty($accessUser)) {
                                     continue;
                                 }
                                 $id = $accessUser->getId();
@@ -4621,12 +4631,17 @@ $WhereStatement = array();
                 WHERE tblSent.email IN ('".implode("', '", $accessUserEmails)."') AND tblSent.sendt > 0 AND (tblSent.type = '".self::USER_TYPE_ACCESS."' OR tblSent.type = '".self::USER_TYPE_CORE."')
                 GROUP BY tblSent.email");
             if ($objLinks !== false) {
-                $objUser = \FWUser::getFWUserObject()->objUser;
                 while (!$objLinks->EOF) {
-                    $objUser = $objUser->getUsers(array('email', $objLinks->fields['email']));
-                    if ($objUser) {
-                        $linkCount[$objUser->getId()][self::USER_TYPE_ACCESS] = $objLinks->fields['link_count'];
-                        $emailCount[$objUser->getId()][self::USER_TYPE_ACCESS] = $objLinks->fields['email_count'];
+                    $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+                    $userRepo = $cx->getDb()->getEntityManager()->getRepository(
+                        'Cx\Core\User\Model\Entity\User'
+                    );
+                    $user = $userRepo->findOneBy(
+                        array('email' => $objLinks->fields['email'])
+                    );
+                    if ($user) {
+                        $linkCount[$user->getId()][self::USER_TYPE_ACCESS] = $objLinks->fields['link_count'];
+                        $emailCount[$user->getId()][self::USER_TYPE_ACCESS] = $objLinks->fields['email_count'];
                     }
                     $objLinks->MoveNext();
                 }
@@ -6014,8 +6029,14 @@ $WhereStatement = array();
         $objFWUser = \FWUser::getFWUserObject();
         $objUser = $objFWUser->objUser->getUsers(array('id' => $accessIds));
 
-        if ($objUser) {
-            while (!$objUser->EOF) {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $userRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Core\User\Model\Entity\User'
+        );
+        $users = $userRepo->findBy(array('id' => $accessIds));
+
+        if (!empty($users)) {
+            foreach ($users as $objUser) {
                 // We have to create a new array, because the array structure is
                 // different
                 foreach ($arrRecipientFields['list'] as $field) {
@@ -6024,11 +6045,13 @@ $WhereStatement = array();
                     }
 
                     $accessField = $field;
-                    if (isset($arrWrapperDefinitions[$field])) {
-                        $accessField = $arrWrapperDefinitions[$field]['def'];
+                    if (isset($arrFieldsWrapperDefinition['access'][$field])) {
+                        $accessField = $arrFieldsWrapperDefinition['access'][$field]['def'];
                     }
-
-                    $value = $objUser->getProfileAttribute($accessField);
+                    $attributeId = $attr->getAttributeIdByProfileAttributeId(
+                        $accessField
+                    );
+                    $value = $objUser->getAttributeValue($attributeId)->getValue();
                     if ($accessField == 'gender') {
                         switch ($value) {
                             case 'gender_female':
@@ -6047,15 +6070,14 @@ $WhereStatement = array();
 
                 $user['id'] = $objUser->getId();
                 $user['email'] = $objUser->getEmail();
-                $user['status'] = $objUser->getActiveStatus();
-                $user['regdate'] = $objUser->getRegistrationDate();
-                $user['language'] = $objUser->getFrontendLanguage();
+                $user['status'] = $objUser->getActive();
+                $user['regdate'] = $objUser->getRegdate();
+                $user['language'] = $objUser->getFrontendLangId();
                 $user['type'] = 'access_user';
                 $user['source'] = 'undefined';
                 $user['consent'] = 'undefined';
 
                 $dataSet->add('U-' . $objUser->getId(), $user);
-                $objUser->next();
             }
         }
 
