@@ -400,7 +400,7 @@ class NewsletterLib
 
         // Get all newsletter access user
         $query = sprintf('
-            SELECT `accessUserID`
+            SELECT DISTINCT `accessUserID`
               FROM `%1$smodule_newsletter_access_user` AS `cnu`
               LEFT JOIN `%1$smodule_newsletter_rel_cat_news` AS `crn`
                 ON `cnu`.`newsletterCategoryID`=`crn`.`category`

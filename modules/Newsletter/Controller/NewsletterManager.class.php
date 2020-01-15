@@ -2694,14 +2694,7 @@ class NewsletterManager extends NewsletterLib
      */
     private function getCurrentMailRecipientCount($mailId)
     {
-        global $objDatabase;
-
-        $query = 'SELECT COUNT(*) AS `recipientCount` FROM ('.$this->getMailRecipientQuery($mailId, false).') AS `subquery`';
-        $objResult = $objDatabase->Execute($query);
-        if ($objResult && $objResult->RecordCount() == 1) {
-            return intval($objResult->fields['recipientCount']);
-        }
-        return 0;
+        return count($this->getMailRecipientQuery($mailId, false));
     }
 
     /**
@@ -2713,6 +2706,8 @@ class NewsletterManager extends NewsletterLib
      *          method as they are almost identical except for different table aliases that have to be used.
      */
     protected function getMailRecipientQuery($mailId, $distinctByType = true) {
+        global $objDatabase;
+
         // fetch CRM membership filter
         $crmMembershipFilter = $this->emailEditGetCrmMembershipFilter($mailId);
 
@@ -2720,74 +2715,100 @@ class NewsletterManager extends NewsletterLib
         # case 2: crm membership filter exclude is set -> include native newsletter recipients
         # case 3: crm membership filter include & exclude are set -> do not include native newsletter recipients
 
-        // select recipients based on access users
-        $accessUserRecipientsQuery = 'SELECT `email` '.($distinctByType ? ', "'.self::USER_TYPE_ACCESS.'" AS `type` ' : '').
+        $mailRecipients = array();
 
-                                // select Access User
-                                'FROM `%1$saccess_users` AS `cu` '.
+        // select all access ids
+        $accessUserRecipientsQuery = 'SELECT `accessUserID` ' .
+            'FROM `%1$smodule_newsletter_access_user` AS `cnu` ' .
 
-                                // join with the subscriebed Newsletter Lists
-                                'INNER JOIN `%1$smodule_newsletter_access_user` AS `cnu`
-                                        ON `cnu`.`accessUserID`=`cu`.`id` '.
+            // join with the selected e-mail campaign lists
+            'INNER JOIN `%1$smodule_newsletter_rel_cat_news` AS `crn`
+                ON `cnu`.`newsletterCategoryID`=`crn`.`category` ';
 
-                                // join with the selected e-mail campaign lists
-                                'INNER JOIN `%1$smodule_newsletter_rel_cat_news` AS `crn`
-                                        ON `cnu`.`newsletterCategoryID`=`crn`.`category` '.
 
-                                // optionally, filter users by CRM membership...
-                                (!($crmMembershipFilter['include'] || $crmMembershipFilter['exclude']) ? '' :
+        // optionally, filter users by CRM membership...
+        if (
+            $crmMembershipFilter['include'] ||
+            $crmMembershipFilter['exclude']
+        ) {
+            // join with CRM Person (contact_type = 2)
+            $accessUserRecipientsQuery .=
+                // join with CRM Person (contact_type = 2)
+                'INNER JOIN `%1$smodule_crm_contacts` AS `ccrm_contact`
+                    ON `ccrm_contact`.`user_account` = `cnu`.`accessUserID`
+                        AND `ccrm_contact`.`contact_type` = 2 '.
 
-                                    // join with CRM Person (contact_type = 2)
-                                    'INNER JOIN `%1$smodule_crm_contacts` AS `ccrm_contact`
-                                            ON `ccrm_contact`.`user_account` = `cu`.`id`
-                                           AND `ccrm_contact`.`contact_type` = 2 '.
+                // join with CRM Company (contact_type = 1)
+                'LEFT JOIN `%1$smodule_crm_contacts` AS `ccrm_company`
+                    ON `ccrm_company`.`id` = `ccrm_contact`.`contact_customer`
+                        AND `ccrm_company`.`contact_type` = 1 '.
 
-                                    // join with CRM Company (contact_type = 1)
-                                    'LEFT JOIN `%1$smodule_crm_contacts` AS `ccrm_company`
-                                            ON `ccrm_company`.`id` = `ccrm_contact`.`contact_customer`
-                                           AND `ccrm_company`.`contact_type` = 1 '.
+                // only select users of which the associated CRM Company is not a part of the selected CRM membership
+                (!$crmMembershipFilter['exclude'] ? '' :
+                    'AND `ccrm_company`.`id` NOT IN (
+                        SELECT `ccrm_company_membership_exclude`.`contact_id`
+                        FROM `%1$smodule_crm_customer_membership` AS `ccrm_company_membership_exclude` 
+                        WHERE `ccrm_company_membership_exclude`.`membership_id` IN ('.join(',', $crmMembershipFilter['exclude']).')) ').
 
-                                    // only select users of which the associated CRM Company is not a part of the selected CRM membership
-                                    (!$crmMembershipFilter['exclude'] ? '' :
-                                        'AND `ccrm_company`.`id` NOT IN (
-                                                SELECT `ccrm_company_membership_exclude`.`contact_id`
-                                                  FROM `%1$smodule_crm_customer_membership` AS `ccrm_company_membership_exclude` 
-                                                 WHERE `ccrm_company_membership_exclude`.`membership_id` IN ('.join(',', $crmMembershipFilter['exclude']).')) ').
+                (!$crmMembershipFilter['include'] ? '' :
+                    // join the CRM Memberships of the CRM Person
+                    'LEFT JOIN `%1$smodule_crm_customer_membership` AS `ccrm_membership_include`
+                        ON `ccrm_membership_include`.`contact_id` = `ccrm_contact`.`id` '.
 
-                                    (!$crmMembershipFilter['include'] ? '' :
-                                        // join the CRM Memberships of the CRM Person
-                                        'LEFT JOIN `%1$smodule_crm_customer_membership` AS `ccrm_membership_include`
-                                                ON `ccrm_membership_include`.`contact_id` = `ccrm_contact`.`id` '.
+                    // join the CRM Memberships of the CRM Company
+                    'LEFT JOIN `%1$smodule_crm_customer_membership` AS `ccrm_company_membership_include`
+                        ON `ccrm_company_membership_include`.`contact_id` = `ccrm_company`.`id` ') ;
+        }
 
-                                        // join the CRM Memberships of the CRM Company
-                                        'LEFT JOIN `%1$smodule_crm_customer_membership` AS `ccrm_company_membership_include`
-                                                ON `ccrm_company_membership_include`.`contact_id` = `ccrm_company`.`id` ')).
+        $accessUserRecipientsQuery .=
+            // filter by selected e-mail campaign
+            'WHERE `crn`.`newsletter`=%2$s ' .
+            // only select users of which the associated CRM Person or CRM Company has the selected CRM membership
+            (!$crmMembershipFilter['include'] ? '' :
+                'AND (
+                    `ccrm_membership_include`.`membership_id` IN ('.join(',', $crmMembershipFilter['include']).')
+                OR `ccrm_company_membership_include`.`membership_id` IN ('.join(',', $crmMembershipFilter['include']).')) ').
 
-                                // filter by selected e-mail campaign
-                                'WHERE `crn`.`newsletter`=%2$s '.
+            // only select users of which the associated CRM Person is not a part of the selected CRM membership
+            (!$crmMembershipFilter['exclude'] ? '' :
+                'AND `ccrm_contact`.`id` NOT IN (
+                SELECT `ccrm_membership_exclude`.`contact_id`
+                  FROM `%1$smodule_crm_customer_membership` AS `ccrm_membership_exclude` 
+                 WHERE `ccrm_membership_exclude`.`membership_id` IN ('.join(',', $crmMembershipFilter['exclude']).'))');
 
-                                // select only active Acess Users
-                                'AND `cu`.`active` = 1 '.
+        $accessUserRecipientsQuery = sprintf(
+            $accessUserRecipientsQuery,
+            DBPREFIX, $mailId
+        );
+        $accessIds = array();
+        $objResultAccess = $objDatabase->Execute($accessUserRecipientsQuery);
+        if ($objResultAccess !== false && $objResultAccess->RecordCount() > 0) {
+            while (!$objResultAccess->EOF) {
+                $accessIds[] = $objResultAccess->fields['accessUserID'];
+                $objResultAccess->MoveNext();
+            }
+        }
 
-                                // only select users of which the associated CRM Person or CRM Company has the selected CRM membership
-                                (!$crmMembershipFilter['include'] ? '' :
-                                'AND (
-                                         `ccrm_membership_include`.`membership_id` IN ('.join(',', $crmMembershipFilter['include']).')
-                                      OR `ccrm_company_membership_include`.`membership_id` IN ('.join(',', $crmMembershipFilter['include']).')) ').
+        if (!empty($accessIds)) {
+            $objUser = \FWUser::getFWUserObject()->objUser->getUsers(array(
+                'id' => $accessIds, 'active' => 1
+            ));
 
-                                // only select users of which the associated CRM Person is not a part of the selected CRM membership
-                                (!$crmMembershipFilter['exclude'] ? '' :
-                                'AND `ccrm_contact`.`id` NOT IN (
-                                    SELECT `ccrm_membership_exclude`.`contact_id`
-                                      FROM `%1$smodule_crm_customer_membership` AS `ccrm_membership_exclude` 
-                                     WHERE `ccrm_membership_exclude`.`membership_id` IN ('.join(',', $crmMembershipFilter['exclude']).'))');
+            if ($objUser) {
+                while (!$objUser->EOF) {
+                    $mailRecipients[] = array(
+                        'email' => $objUser->getEmail(),
+                        'type' => self::USER_TYPE_ACCESS
+                    );
+                    $objUser->next();
+                }
+            }
+        }
 
         // select recipients based on selected newsletter lists
-        if ($crmMembershipFilter['include']) {
-            $nativeRecipientsQuery = '';
-        } else {
-            $nativeRecipientsQuery = 'UNION DISTINCT
-                        SELECT `email`'.($distinctByType ? ', "'.self::USER_TYPE_NEWSLETTER.'" AS `type`' : '').'
+        if (!$crmMembershipFilter['include']) {
+            $nativeRecipientsQuery = '
+                        SELECT `email`
                           FROM `%1$smodule_newsletter_user` AS `nu`
                     INNER JOIN `%1$smodule_newsletter_rel_user_cat` AS `rc`
                             ON `rc`.`user`=`nu`.`id`
@@ -2795,95 +2816,186 @@ class NewsletterManager extends NewsletterLib
                             ON `nrn`.`category`=`rc`.`category`
                          WHERE `nrn`.`newsletter`=%2$s
                            AND `nu`.`status` = 1';
+
+            $nativeRecipientsQuery = sprintf(
+                $nativeRecipientsQuery,
+                DBPREFIX, $mailId
+            );
+            $objResultNative = $objDatabase->Execute($nativeRecipientsQuery);
+            if ($objResultNative !== false && $objResultNative->RecordCount() > 0) {
+                while (!$objResultNative->EOF) {
+                    if (
+                        array_search(
+                            $objResultNative->fields['email'],
+                            array_column($mailRecipients, 'email')
+                        ) === false
+                    ) {
+                        $mailRecipients[] = array(
+                            'email' => $objResultNative->fields['email'],
+                            'type' => self::USER_TYPE_NEWSLETTER
+                        );
+                    }
+                    $objResultNative->MoveNext();
+                }
+            }
         }
 
-        // select recipients based on selected user groups
-        $userGroupRecipientsQuery = 'UNION DISTINCT
-                                SELECT `email`'.($distinctByType ? ', "'.self::USER_TYPE_CORE.'" AS `type`' : '').
-                                // select Access User
-                                'FROM `%1$saccess_users` AS `au` '.
+        $userGroupRecipientsQuery =
+            'SELECT `userGroup` ' .
+            'FROM `%1$smodule_newsletter_rel_usergroup_newsletter` AS `arn` ' .
 
-                                // join with the associated User Groups
-                                'INNER JOIN `%1$saccess_rel_user_group` AS `rg`
-                                        ON `rg`.`user_id`=`au`.`id` '.
+            // filter by selected e-mail campaign
+            'WHERE `arn`.`newsletter`=%2$s ';
 
-                                // join with the selected User Groups of the e-mail campaign
-                                'INNER JOIN `%1$smodule_newsletter_rel_usergroup_newsletter` AS `arn`
-                                        ON `arn`.`userGroup`=`rg`.`group_id` '.
+        $crmQuery = '';
+        // optionally, filter users by CRM membership...
+        if ($crmMembershipFilter['include'] || $crmMembershipFilter['exclude']) {
+            $crmQuery =
+                // join with CRM Person (contact_type = 2)
+                'SELECT `acrm_contact`.`user_account` FROM 
+                  `%1$smodule_crm_contacts` AS `acrm_contact`'.
 
-                                // optionally, filter users by CRM membership...
-                                (!($crmMembershipFilter['include'] || $crmMembershipFilter['exclude']) ? '' :
+                // join with CRM Company (contact_type = 1)
+                'LEFT JOIN `%1$smodule_crm_contacts` AS `acrm_company`
+                                        ON `acrm_company`.`id` = `acrm_contact`.`contact_customer`
+                                       AND `acrm_company`.`contact_type` = 1 '.
 
-                                    // join with CRM Person (contact_type = 2)
-                                    'INNER JOIN `%1$smodule_crm_contacts` AS `acrm_contact`
-                                            ON `acrm_contact`.`user_account` = `au`.`id`
-                                           AND `acrm_contact`.`contact_type` = 2 '.
+                // only select users of which the associated CRM Company is not a part of the selected CRM membership
+                (!$crmMembershipFilter['exclude'] ? '' :
+                    'AND `acrm_company`.`id` NOT IN (
+                        SELECT `acrm_company_membership_exclude`.`contact_id`
+                        FROM `%1$smodule_crm_customer_membership` AS `acrm_company_membership_exclude` 
+                        WHERE `acrm_company_membership_exclude`.`membership_id` IN ('.
+                            join(',', $crmMembershipFilter['exclude']).
+                        ')
+                    ) '
+                ).
 
-                                    // join with CRM Company (contact_type = 1)
-                                    'LEFT JOIN `%1$smodule_crm_contacts` AS `acrm_company`
-                                            ON `acrm_company`.`id` = `acrm_contact`.`contact_customer`
-                                           AND `acrm_company`.`contact_type` = 1 '.
+                (!$crmMembershipFilter['include'] ? '' :
+                    // join the CRM Memberships of the CRM Person
+                    'LEFT JOIN `%1$smodule_crm_customer_membership` AS `acrm_membership_include`
+                        ON `acrm_membership_include`.`contact_id` = `acrm_contact`.`id` '.
 
-                                    // only select users of which the associated CRM Company is not a part of the selected CRM membership
-                                    (!$crmMembershipFilter['exclude'] ? '' :
-                                        'AND `acrm_company`.`id` NOT IN (
-                                                SELECT `acrm_company_membership_exclude`.`contact_id`
-                                                  FROM `%1$smodule_crm_customer_membership` AS `acrm_company_membership_exclude` 
-                                                 WHERE `acrm_company_membership_exclude`.`membership_id` IN ('.join(',', $crmMembershipFilter['exclude']).')) ').
+                    // join the CRM Memberships of the CRM Company
+                    'LEFT JOIN `%1$smodule_crm_customer_membership` AS `acrm_company_membership_include`
+                        ON `acrm_company_membership_include`.`contact_id` = `acrm_company`.`id` ').
+                'WHERE `acrm_contact`.`user_account` = %2$s 
+                    AND `acrm_contact`.`contact_type` = 2' .
+                // only select users of which the associated CRM Person or CRM Company has the selected CRM membership
+                (!$crmMembershipFilter['include'] ? '' :
+                    'AND (
+                        `acrm_membership_include`.`membership_id` IN ('.
+                            join(',', $crmMembershipFilter['include']).
+                        ')
+                        OR `acrm_company_membership_include`.`membership_id` IN ('.
+                            join(',', $crmMembershipFilter['include']).
+                        ')
+                    ) '
+                ).
 
-                                    (!$crmMembershipFilter['include'] ? '' :
-                                        // join the CRM Memberships of the CRM Person
-                                        'LEFT JOIN `%1$smodule_crm_customer_membership` AS `acrm_membership_include`
-                                                ON `acrm_membership_include`.`contact_id` = `acrm_contact`.`id` '.
+                // only select users of which the associated CRM Person is not a
+                // part of the selected CRM membership
+                (!$crmMembershipFilter['exclude'] ? '' :
+                    'AND `acrm_contact`.`id` NOT IN (
+                        SELECT `acrm_membership_exclude`.`contact_id`
+                        FROM `%1$smodule_crm_customer_membership` AS `acrm_membership_exclude` 
+                            WHERE `acrm_membership_exclude`.`membership_id` IN ('.
+                                join(',', $crmMembershipFilter['exclude']).
+                            ')
+                    )'
+                );
+        }
 
-                                        // join the CRM Memberships of the CRM Company
-                                        'LEFT JOIN `%1$smodule_crm_customer_membership` AS `acrm_company_membership_include`
-                                                ON `acrm_company_membership_include`.`contact_id` = `acrm_company`.`id` ')).
+        $userGroupRecipientsQuery = sprintf(
+            $userGroupRecipientsQuery,
+            DBPREFIX, $mailId
+        );
 
-                                // filter by selected e-mail campaign
-                                'WHERE `arn`.`newsletter`=%2$s '.
+        $groupIds = array();
+        $objResultGroup = $objDatabase->Execute($userGroupRecipientsQuery);
+        if ($objResultGroup !== false && $objResultGroup->RecordCount() > 0) {
+            while (!$objResultGroup->EOF) {
+                $groupIds[] = $objResultAccess->fields['userGroup'];
+                $objResultGroup->MoveNext();
+            }
+        }
 
-                                // select only active Acess Users
-                                'AND `au`.`active` = 1 '.
+        if (!empty($groupIds)) {
+            $objUser = \FWUser::getFWUserObject()->objUser->getUsers(array(
+                'group_id' => $groupIds, 'active' => 1
+            ));
 
-                                // only select users of which the associated CRM Person or CRM Company has the selected CRM membership
-                                (!$crmMembershipFilter['include'] ? '' :
-                                'AND (
-                                         `acrm_membership_include`.`membership_id` IN ('.join(',', $crmMembershipFilter['include']).')
-                                      OR `acrm_company_membership_include`.`membership_id` IN ('.join(',', $crmMembershipFilter['include']).')) ').
+            if ($objUser) {
+                while (!$objUser->EOF) {
+                    if (!empty($crmQuery)) {
+                        $crmQuery = sprintf(
+                            $userGroupRecipientsQuery,
+                            DBPREFIX, $objUser->getId()
+                        );
+                        $objResultCrm = $objDatabase->Execute($crmQuery);
+                        if (
+                            $objResultCrm === false ||
+                            $objResultCrm->RecordCount() == 0
+                        ) {
+                            $objUser->next();
+                        }
+                    }
 
-                                // only select users of which the associated CRM Person is not a part of the selected CRM membership
-                                (!$crmMembershipFilter['exclude'] ? '' :
-                                'AND `acrm_contact`.`id` NOT IN (
-                                    SELECT `acrm_membership_exclude`.`contact_id`
-                                      FROM `%1$smodule_crm_customer_membership` AS `acrm_membership_exclude` 
-                                     WHERE `acrm_membership_exclude`.`membership_id` IN ('.join(',', $crmMembershipFilter['exclude']).'))');
+                    // Simulate DISTINCT
+                    if (
+                        !$distinctByType ||
+                        array_search(
+                            $objUser->getEmail(),
+                            array_column($mailRecipients, 'email')
+                        ) === false
+                    ) {
+                        $mailRecipients[] = array(
+                            'email' => $objUser->getEmail(),
+                            'type' => self::USER_TYPE_CORE
+                        );
+                    }
+                    $objUser->next();
+                }
+            }
+        }
 
         // select recipients based on selected crm memberships
-        $crmMembershipQuery = '';
         if($crmMembershipFilter['associate']){
-            $crmMembershipQuery = 'UNION DISTINCT SELECT DISTINCT `crm`.`email`' .($distinctByType ? ', "'.self::USER_TYPE_CRM.'" AS `type`' : '').'
-                                        FROM `' . DBPREFIX . 'module_crm_contacts` AS `contact` 
-                                        INNER JOIN `' . DBPREFIX . 'module_crm_customer_contact_emails` AS `crm` 
-                                        ON `crm`.`contact_id` = `contact`.`id` ' .
-                                    $this->getCrmMembershipConditions($crmMembershipFilter);
+            $crmMembershipQuery = 'UNION DISTINCT SELECT DISTINCT `crm`.`email` 
+                FROM `' . DBPREFIX . 'module_crm_contacts` AS `contact` 
+                INNER JOIN `' . DBPREFIX . 'module_crm_customer_contact_emails` AS `crm` 
+                    ON `crm`.`contact_id` = `contact`.`id` ' .
+                    $this->getCrmMembershipConditions($crmMembershipFilter);
+
+            $crmMembershipQuery = sprintf(
+                $crmMembershipQuery,
+                DBPREFIX, $mailId
+            );
+            $objResultMembership = $objDatabase->Execute($crmMembershipQuery);
+            if (
+                $objResultMembership !== false &&
+                $objResultMembership->RecordCount() > 0
+            ) {
+                while (!$objResultMembership->EOF) {
+                    // Simulate DISTINCT
+                    if (
+                    $distinctByType ||
+                        array_search(
+                            $objResultMembership->fields['email'],
+                            array_column($mailRecipients, 'email')
+                        ) === false
+                    ) {
+                        $mailRecipients[] = array(
+                            'email' => $objResultMembership->fields['email'],
+                            'type' => self::USER_TYPE_CRM
+                        );
+                    }
+                    $objResultMembership->MoveNext();
+                }
+            }
         }
 
-        return sprintf(
-                    // note: intentionally enclosed the following strings in a string to include line breaks
-                    //
-                    // this following query selects the recipients in the following order
-                    // 1. access users that have subscribed to one of the selected recipient-lists
-                    // 2. newsletter recipients of one of the selected recipient-lists
-                    // 3. access users of one of the selected user groups
-                    // 4. crm contacts of one of the selected crm user groups
-                    "$accessUserRecipientsQuery
-                    $nativeRecipientsQuery
-                    $userGroupRecipientsQuery
-                    $crmMembershipQuery",
-
-                    DBPREFIX, $mailId
-        );
+        return $mailRecipients;
     }
 
     /**
@@ -3252,9 +3364,7 @@ class NewsletterManager extends NewsletterLib
      */
     private function getAllRecipientEmails($mailID)
     {
-        global $objDatabase;
-
-        return new DBIterator($objDatabase->Execute($this->getMailRecipientQuery(intval($mailID))));
+        return new \ArrayIterator($this->getMailRecipientQuery(intval($mailID)));
     }
 
 
