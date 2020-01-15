@@ -693,6 +693,11 @@ class CalendarMailManager extends CalendarLibrary {
 
         $recipients = array();
         $db = \Cx\Core\Core\Controller\Cx::instanciate()->getDb()->getAdoDb();
+        $em = $this->cx->getDb()->getEntityManager();
+        $groupRepo = $em->getRepository(
+            'Cx\Core\User\Model\Entity\Group'
+        );
+        $objAttr = \FWUser::getFWUserObject()->objUser->objAttribute;
 
         switch ($actionId) {
             case static::MAIL_INVITATION:
@@ -784,30 +789,45 @@ class CalendarMailManager extends CalendarLibrary {
                     break;
                 }
 
-                // only fetch active users
-                $objUser = \FWUser::getFWUserObject()->objUser->getUsers(array('active' => 1));
-                if (!$objUser) {
+                $groups = $groupRepo->findBy(array('groupId' => $objEvent->invitedGroups));
+                if (empty($groups)) {die('Jaa');
                     break;
                 }
 
-                while (!$objUser->EOF) {
-                    foreach ($objUser->getAssociatedGroupIds() as $groupId) {
-                        if (in_array($groupId, $objEvent->invitedGroups))  {
-                            $recipients[$objUser->getEmail()] = (new MailRecipient())
-                                ->setLang($objUser->getFrontendLanguage())
-                                ->setAddress($objUser->getEmail())
-                                ->setType(MailRecipient::RECIPIENT_TYPE_ACCESS_USER)
-                                ->setId($objUser->getId())
-                                ->setSalutationId($objUser->getProfileAttribute('title'))
-                                ->setFirstname($objUser->getProfileAttribute('firstname'))
-                                ->setLastname($objUser->getProfileAttribute('lastname'))
-                                ->setUsername($objUser->getUsername());
+                foreach ($groups as $group) {
+                    foreach ($group->getUser() as $user) {
+                        if (!$user->getActive()) {
+                            continue;
                         }
+
+                        $recipients[$user->getEmail()] = (new MailRecipient())
+                            ->setLang($user->getFrontendLangId())
+                            ->setAddress($user->getEmail())
+                            ->setType(MailRecipient::RECIPIENT_TYPE_ACCESS_USER)
+                            ->setId($user->getId())
+                            ->setSalutationId(
+                                $user->getAttributeValue(
+                                    $objAttr->getAttributeIdByProfileAttributeId(
+                                        'title'
+                                    )
+                                )->getValue()
+                            )->setFirstname(
+                                $user->getAttributeValue(
+                                    $objAttr->getAttributeIdByProfileAttributeId(
+                                        'firstname'
+                                    )
+                                )->getValue()
+                            )
+                            ->setLastname(
+                                $user->getAttributeValue(
+                                    $objAttr->getAttributeIdByProfileAttributeId(
+                                        'lastname'
+                                    )
+                                )->getValue()
+                            )->setUsername($user->getUsername());
                     }
-                    $objUser->next();
                 }
                 break;
-
             case static::MAIL_CONFIRM_REG:
                 // abort in case no registration-data is present
                 if (empty($regId) || empty($objRegistration)) {
@@ -986,20 +1006,27 @@ class CalendarMailManager extends CalendarLibrary {
                     break;
                 }
 
+                $em = $this->cx->getDb()->getEntityManager();
+                $userRepo = $em->getRepository(
+                    'Cx\Core\User\Model\Entity\User'
+                );
+
                 // abort in case the backend user is not active
-                $objUser = \FWUser::getFWUserObject()->objUser->getUsers($filter = array('id' => $recipient->getId(), 'is_active' => true));
+                $objUser = $userRepo->findOneBy(
+                    array('id' => $recipient->getId(), 'active' => 1)
+                );
                 if (!$objUser) {
                     break;
                 }
 
                 // try to use prefered backend language
-                if (isset($this->mailList[$objUser->getBackendLanguage()])) {
-                    return $objUser->getBackendLanguage();
+                if (isset($this->mailList[$objUser->getBackendLangId()])) {
+                    return $objUser->getBackendLangId();
                 }
 
                 // try to use prefered frontend language as fallback
-                if (isset($this->mailList[$objUser->getFrontendLanguage()])) {
-                    return $objUser->getFrontendLanguage();
+                if (isset($this->mailList[$objUser->getFrontendLangId()])) {
+                    return $objUser->getFrontendLangId();
                 }
 
             default:
