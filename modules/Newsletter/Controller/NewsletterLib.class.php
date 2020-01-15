@@ -283,14 +283,14 @@ class NewsletterLib
         switch ($type) {
             case self::USER_TYPE_CORE:
             case self::USER_TYPE_ACCESS:
-                // get user's language by email
-                $user = \FWUser::getFWUserObject()->objUser->getUsers(
-                    array(
-                        'email' => $email,
-                    )
+                $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+                $userRepo = $cx->getDb()->getEntityManager()->getRepository(
+                    'Cx\Core\User\Model\Entity\User'
                 );
-                if ($user && $user->getFrontendLanguage()) {
-                    $userLanguage = $user->getFrontendLanguage();
+                // get user's language by email
+                $user = $userRepo->findOneBy(array('email' => $email));
+                if (!empty($user) && $user->getFrontendLangId()) {
+                    $userLanguage = $user->getFrontendLangId();
                 }
                 break;
 
@@ -331,12 +331,14 @@ class NewsletterLib
         switch ($type) {
             case self::USER_TYPE_CORE:
             case self::USER_TYPE_ACCESS:
-                // get user's language by email
-                $user = \FWUser::getFWUserObject()->objUser->getUsers(
-                    array('id' => $id)
+                $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+                $userRepo = $cx->getDb()->getEntityManager()->getRepository(
+                    'Cx\Core\User\Model\Entity\User'
                 );
-                if ($user && $user->getFrontendLanguage()) {
-                    $userLanguage = $user->getFrontendLanguage();
+                // get user's language by email
+                $user = $userRepo->find($id);
+                if (!empty($user) && $user->getFrontendLangId()) {
+                    $userLanguage = $user->getFrontendLangId();
                 }
                 break;
             case self::USER_TYPE_CRM:
