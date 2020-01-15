@@ -1295,11 +1295,17 @@ class DirectoryLibrary
 
     function getAuthorID($author)
     {
-        $objFWUser = \FWUser::getFWUserObject();
 
-        $objUser = $objFWUser->objUser->getUsers(array('username' => $author));
-        if ($objUser !== false) {
-            $author = $objUser->getId();
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $userRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Core\User\Model\Entity\User'
+        );
+        $user = $userRepo->findOneBy(
+            array('username' => $author)
+        );
+
+        if (!empty($user)) {
+            $author = $user->getId();
         }
 
         return $author;
