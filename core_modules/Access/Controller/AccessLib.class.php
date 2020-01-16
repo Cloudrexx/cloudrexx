@@ -2420,26 +2420,34 @@ JS
         }
         print "\n";
 
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $qb = $cx->getDb()->getEntityManager()->createQueryBuilder();
+        $qb->select('u')
+            ->from('Cx\Core\User\Model\Entity\User', 'u')
+            ->join('u.group', 'g');
+
         $filter = array();
         if (!empty($groupId)) {
-            $filter['group_id'] = $groupId;
+            $qb->where($qb->expr()->eq('g.groupId', $groupId));
         }
         if (!empty($langId)) {
+            $qb->andWhere($qb->expr()->in('u.frontendLangId', ':lang'));
             if (\FWLanguage::getLanguageParameter($langId, 'is_default') == 'true') {
                 $filter['frontend_lang_id'] = array($langId, 0);
+                $qb->setParameter('lang', array($langId, 0));
             } else {
                 $filter['frontend_lang_id'] = $langId;
+                $qb->setParameter('lang', $langId);
             }
         }
 
         // fetch all ids and load the users individually later to avoid
         // memory overflow
-        $objUser = $objFWUser->objUser->getUsers($filter, null, array('username'), array('id'));
+        $users = $qb->getQuery()->getResult();
         $userIds = array();
-        if ($objUser) {
-            while (!$objUser->EOF) {
-                $userIds[] = $objUser->getId();
-                $objUser->next();
+        if (!empty($users)) {
+            foreach ($users as $user) {
+                $userIds[] = $user->getId();
             }
         }
         foreach ($userIds as $key => $userId) {
