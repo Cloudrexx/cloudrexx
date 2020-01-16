@@ -486,21 +486,22 @@ class Customer extends \User
             \Message::error($_ARRAYLANG['TXT_SHOP_ERROR_USERGROUP_INVALID']);
             \Cx\Core\Csrf\Controller\Csrf::redirect(CONTREXX_DIRECTORY_INDEX.'?section=Shop');
         }
-        $objUser = \FWUser::getFWUserObject()->objUser;
-        $objUser = $objUser->getUsers(array(
-            'email' => $email,
-            'active' => false,
-// TODO: Verify this:  We must be able to load existing Users!
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        // TODO: Verify this:  We must be able to load existing Users!
 // Problem: Conflicting e-mail addresses for "new" Customers that exist as Users already.
 // Simple solution seems to be to ignore the associated groups.
 //            'group_id' => $usergroup_id,
-        ));
-        if (!$objUser) {
+        $user = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Core\User\Model\Entity\User'
+        )->findOneBy(array('email' => $email, 'active' => false));
+
+        if (empty($user)) {
 //DBG::log("Customer::getUnregisteredByEmail($email): Found no such unregistered User");
             return null;
         }
 //DBG::log("Customer::getUnregisteredByEmail($email): Found unregistered User ID ".$objUser->getId()." (".$objUser->getEmail().")");
-        return self::getById($objUser->getId());
+        return self::getById($user->getId());
     }
 
 
@@ -513,17 +514,17 @@ class Customer extends \User
     static function getRegisteredByEmail($email)
     {
         // Any Customers
-        $objUser = \FWUser::getFWUserObject()->objUser;
-        $objUser = $objUser->getUsers(array(
-            'email' => $email,
-            'active' => true,
-        ));
-        if (!$objUser) {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $user = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Core\User\Model\Entity\User'
+        )->findOneBy(array('email' => $email, 'active' => true));
+
+        if (empty($user)) {
 //DBG::log("Customer::getUnregisteredByEmail($email): Found no such unregistered User");
             return null;
         }
 //DBG::log("Customer::getUnregisteredByEmail($email): Found unregistered User ID ".$objUser->getId()." (".$objUser->getEmail().")");
-        return self::getById($objUser->getId());
+        return self::getById($user->getId());
     }
 
 
@@ -655,11 +656,22 @@ class Customer extends \User
      */
     static function updatePassword($email, $password)
     {
-        $objUser = \FWUser::getFWUserObject()->objUser->getUsers(
-            array('email' => $email));
-        if (!$objUser) return false;
-        $objUser->setPassword($password);
-        return $objUser->store();
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $user = $em->getRepository(
+            'Cx\Core\User\Model\Entity\User'
+        )->findOneBy(array('email' => $email));
+
+        if (empty($user)) return false;
+        $user->setPassword($password);
+
+        try {
+            $em->persist($user);
+            $em->flush();
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
 
@@ -854,20 +866,26 @@ class Customer extends \User
                 $objResult->fields['email'] = $objResult->fields['username'];
             }
             $email = $objResult->fields['email'];
-            $objUser = \FWUser::getFWUserObject()->objUser->getUsers(
-                array('email' => array(0 => $email)));
+
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $em = $cx->getDb()->getEntityManager();
+            $userRepo = $em->getRepository(
+                'Cx\Core\User\Model\Entity\User'
+            );
+            $user = $userRepo->findOneBy(array('email' => $email));
 
 // TODO: See whether a User with that username (but different e-mail address) exists!
-            $objUser_name = \FWUser::getFWUserObject()->objUser->getUsers(
-                array('username' => array(
-                    0 => $objResult->fields['username'])));
-            if ($objUser && $objUser_name) {
-                $objUser = $objUser_name;
+            $userByUsername = $userRepo->findOneBy(
+                array('username' => $objResult->fields['username'])
+            );
+
+            if (!empty($user) && !empty($userByUsername)) {
+                $user = $userByUsername;
             }
 
             $objCustomer = null;
-            if ($objUser) {
-                $objCustomer = self::getById($objUser->getId());
+            if (!empty($user)) {
+                $objCustomer = self::getById($user->getId());
             }
             if (!$objCustomer) {
                 $lang_id = Order::getLanguageIdByCustomerId($old_customer_id);

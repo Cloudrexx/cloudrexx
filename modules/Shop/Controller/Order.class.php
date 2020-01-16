@@ -1318,17 +1318,18 @@ class Order
             $customer_email =
                 Orders::usernamePrefix."_${order_id}_%-" .
                 $objCustomer->email();
-            $objUser = \FWUser::getFWUserObject()->objUser->getUsers(
-                array('email' => $customer_email)
-            );
-            if ($objUser) {
-                while (!$objUser->EOF) {
-                    $objUser->setActiveStatus(false);
-                    if (!$objUser->store()) {
-                        return false;
-                    }
-                    $objUser->next();
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $em = $cx->getDb()->getEntityManager();
+            $users = $em->getRepository(
+                'Cx\Core\User\Model\Entity\User'
+            )->findBy(array('email' => $customer_email));
+
+            if (!empty($users)) {
+                foreach ($users as $user) {
+                    $user->setActive(false);
+                    $em->persist($user);
                 }
+                $em->flush();
             }
         }
 
