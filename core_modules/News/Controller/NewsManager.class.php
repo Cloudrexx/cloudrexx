@@ -4141,20 +4141,23 @@ class NewsManager extends \Cx\Core_Modules\News\Controller\NewsLibrary {
         $none_selected = $active_id == 0 ? 'selected' : '';
         $res[] = "<option value=\"0\" $none_selected>(".$_ARRAYLANG['TXT_DEACTIVATE'].")</option>";
 
-        $objFWUser = \FWUser::getFWUserObject();
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         if ($type == 'user') {
-            $objData = $objFWUser->objUser->getUsers(null, null, array('username' => 'desc'), array('id', 'username', 'firstname', 'lastname'));
+            $objData = $cx->getDb()->getEntityManager()->getRepository(
+                'Cx\Core\User\Model\Entity\User'
+            )->findBy(array(), array('username' => 'DESC'));
         } else {
-            $objData = $objFWUser->objGroup->getGroups(null, array('group_name' => 'desc'), array('group_id', 'group_name', 'group_description'));
+            $objData = $cx->getDb()->getEntityManager()->getRepository(
+                'Cx\Core\User\Model\Entity\Group'
+            )->findBy(array(), array('groupName' => 'DESC'));
         }
 
-        while (!$objData->EOF) {
-            $id       = $objData->getId();
-            $name     = $type == 'user' ? "{$objData->getUsername()} ({$objData->getProfileAttribute('firstname')} {$objData->getProfileAttribute('lastname')})" : "{$objData->getName()} ({$objData->getDescription()})";
+        foreach ($objData as $data) {
+            $id       = $type == 'user' ? $data->getId() : $data->getGroupId();
+            $name     = $type == 'user' ? "{$data->getUsername()} ({$data->getProfileAttribute('firstname')->getValue()} {$data->getProfileAttribute('lastname')->getValue()})" : "{$data->getGroupName()} ({$data->getGroupDescription()})";
             $selected = $id == $active_id ? 'selected' : '';
 
             $res[] = "<option value=\"$id\" $selected>$name</option>";
-            $objData->next();
         }
 
         return join("\n\t", $res);
