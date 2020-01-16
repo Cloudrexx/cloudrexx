@@ -6219,23 +6219,27 @@ END;
         $accountEmail = isset ($_GET['email']) ? trim($_GET['email']) : '';
         $show         = !empty ($accountId) || !empty ($accountEmail) ? true : false;
 
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $userRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Core\User\Model\Entity\User'
+        );
+
         if (!empty($accountId)) {
-            $objFWUser = \FWUser::getFWUserObject();
-            $objUsers  = $objFWUser->objUser->getUsers($filter = array('id' => intval($accountId)));
-            if ($objUsers) {
-                $email = $objUsers->getEmail();
+            $userRepo->find(intval($accountId));
+
+            if (!empty($user)) {
+                $email = $user->getEmail();
             }
         }
 
         if (empty($accountId) && !empty ($accountEmail) && \FWValidator::isEmail($accountEmail)) {
-            $objFWUser = \FWUser::getFWUserObject();
-            $objUsers  = $objFWUser->objUser->getUsers($filter = array('email' => addslashes($accountEmail)));
-            if ($objUsers) {
-                $id             = $objUsers->getId();
-                $email          = $objUsers->getEmail();
-                $company        = trim($objUsers->getProfileAttribute('company'));
-                $lastname       = trim($objUsers->getProfileAttribute('lastname'));
-                $firstname      = trim($objUsers->getProfileAttribute('firstname'));
+            $user = $userRepo->findOneBy(array('email' => addslashes($accountEmail)));
+            if (!empty($user)) {
+                $id             = $user->getId();
+                $email          = $user->getEmail();
+                $company        = trim($user->getProfileAttribute('company'));
+                $lastname       = trim($user->getProfileAttribute('lastname'));
+                $firstname      = trim($user->getProfileAttribute('firstname'));
                 $defaultUser    = !empty ($company) ? trim($company.', '.$firstname.' '.$lastname) : trim($firstname.' '.$lastname);
                 $setDefaultUser = !empty ($defaultUser) ? $defaultUser : 'unknown';
             } else {
