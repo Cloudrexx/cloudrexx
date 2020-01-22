@@ -127,10 +127,14 @@ class RandomEsiWidgetController extends \Cx\Core_Modules\Widget\Controller\Rando
                 $params['channel']
             );
 
-            $objUser = \FWUser::getFWUserObject()->objUser->getUser($params['id']);
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $userRepo = $cx->getDb()->getEntityManager()->getRepository(
+                'Cx\Core\User\Model\Entity\User'
+            );
+            $user = $userRepo->find($params['id']);
 
             $objAccessBlocks = new AccessBlocks($subTemplate);
-            $objAccessBlocks->parseBasePlaceholders($objUser);
+            $objAccessBlocks->parseBasePlaceholders($user);
 
             $template->setVariable($name, $subTemplate->get());
         }

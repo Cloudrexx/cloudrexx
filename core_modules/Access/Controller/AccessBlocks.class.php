@@ -54,46 +54,46 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
      */
     public function setCurrentlyOnlineUsers($gender = '')
     {
-        $objFWUser = \FWUser::getFWUserObject();
         $arrSettings = \User_Setting::getSettings();
 
-        $filter = array(
-            'active'    => true,
-            'last_activity' => array(
-                '>' => (time()-3600)
-            )
+        $groupFilter = static::fetchGroupFilter(
+            $this->_objTpl, 'access_currently_online_member_list'
         );
-        if ($arrSettings['block_currently_online_users_pic']['status']) {
-            $filter['picture'] = array('!=' => '');
-        }
 
-        if (!empty($gender)) {
-            $filter['gender'] = 'gender_'.$gender;
-        }
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $qb = $cx->getDb()->getEntityManager()->createQueryBuilder();
+        $qb->select('u')
+            ->from('Cx\Core\User\Model\Entity\User', 'u')
+            ->where(
+                $qb->expr()->eq('u.active', ':active')
+            )->andWhere(
+                $qb->expr()->gt('u.lastActivity', ':lastActivity')
+            )->setParameters(
+                array(
+                    'active' => true,
+                    'lastActivity' => (time()-3600)
+                )
+            );
 
-        // filter users by group association
-        $groupFilter = static::fetchGroupFilter($this->_objTpl, 'access_currently_online_member_list');
-        if ($groupFilter) {
-            $filter['group_id'] = $groupFilter;
-        }
-
-        $objUser = $objFWUser->objUser->getUsers(
-            $filter,
-            null,
-            array(
-                'last_activity'    => 'desc',
-                'username'        => 'asc'
-            ),
-            null,
-            $arrSettings['block_currently_online_users']['value']
+        $this->addGenderToQueryBuilder($qb, $gender);
+        $this->addPicToQueryBuilder(
+            $qb,
+            $arrSettings['block_currently_online_users_pic']['status']
         );
-        if ($objUser) {
-            while (!$objUser->EOF) {
-                $this->parseBasePlaceholders($objUser);
+        $this->addGroupToQueryBuilder($qb, $groupFilter);
 
+        $qb->orderBy('u.lastActivity', 'DESC')
+            ->addOrderBy('u.username', 'ASC')
+            ->setMaxResults(
+                $arrSettings['block_currently_online_users']['value']
+            );
+
+        $users = $qb->getQuery()->getResult();
+
+        if (!empty($users)) {
+            foreach ($users as $user) {
+                $this->parseBasePlaceholders($user);
                 $this->_objTpl->parse('access_currently_online_'.(!empty($gender) ? $gender.'_' : '').'members');
-
-                $objUser->next();
             }
         } else {
             $this->_objTpl->hideBlock('access_currently_online_'.(!empty($gender) ? $gender.'_' : '').'members');
@@ -110,44 +110,95 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
     {
         $arrSettings = \User_Setting::getSettings();
 
-        $filter['active'] = true;
-        if ($arrSettings['block_last_active_users_pic']['status']) {
-            $filter['picture'] = array('!=' => '');
-        }
-
-        if (!empty($gender)) {
-            $filter['gender'] = 'gender_'.$gender;
-        }
-
-        // filter users by group association
-        $groupFilter = static::fetchGroupFilter($this->_objTpl, 'access_last_active_member_list');
-        if ($groupFilter) {
-            $filter['group_id'] = $groupFilter;
-        }
-
-        $objFWUser = \FWUser::getFWUserObject();
-        $objUser = $objFWUser->objUser->getUsers(
-            $filter,
-            null,
-            array(
-                'last_activity'    => 'desc',
-                'username'        => 'asc'
-            ),
-            null,
-            $arrSettings['block_last_active_users']['value']
+        $groupFilter = static::fetchGroupFilter(
+            $this->_objTpl, 'access_last_active_member_list'
         );
-        if ($objUser) {
-            while (!$objUser->EOF) {
-                $this->parseBasePlaceholders($objUser);
 
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $qb = $cx->getDb()->getEntityManager()->createQueryBuilder();
+        $qb->select('u')
+            ->from('Cx\Core\User\Model\Entity\User', 'u')
+            ->where(
+                $qb->expr()->eq('u.active', ':active')
+            )->setParameter('active', true);
+
+        $this->addGenderToQueryBuilder($qb, $gender);
+        $this->addPicToQueryBuilder(
+            $qb,
+            $arrSettings['block_last_active_users_pic']['status']
+        );
+        $this->addGroupToQueryBuilder($qb, $groupFilter);
+
+        $users = $qb->getQuery()->getResult();
+
+        if (!empty($users)) {
+            foreach ($users as $user) {
+                $this->parseBasePlaceholders($user);
                 $this->_objTpl->parse('access_last_active_'.(!empty($gender) ? $gender.'_' : '').'members');
-
-                $objUser->next();
             }
         } else {
             $this->_objTpl->hideBlock('access_last_active_'.(!empty($gender) ? $gender.'_' : '').'members');
         }
     }
+
+    protected function addGenderToQueryBuilder(&$qb, $gender)
+    {
+        $objFWUser = \FWUser::getFWUserObject();
+        $attr = $objFWUser->objUser->objAttribute;
+
+        if (!empty($gender)) {
+            $qb->join(
+                'u.userAttributeValue', 'vGen'
+            )->andWhere(
+                $qb->expr()->eq('vGen.attributeId', ':vGenId')
+            )->andWhere(
+                $qb->expr()->eq('vGen.value', ':vGenValue')
+            )->setParametes(
+                array(
+                    'vGenId' => $attr->getAttributeIdByProfileAttributeId(
+                        'gender'
+                    ),
+                    'vGenValue' => 'gender_'.$gender
+                )
+            );
+        }
+    }
+
+    protected function addPicToQueryBuilder(&$qb, $onlyWithPic)
+    {
+        $objFWUser = \FWUser::getFWUserObject();
+        $attr = $objFWUser->objUser->objAttribute;
+
+        if ($onlyWithPic) {
+            $qb->join(
+                'u.userAttributeValue', 'vPic'
+            )->andWhere(
+                $qb->expr()->eq('vPic.attributeId', ':vPicId')
+            )->andWhere(
+                $qb->expr()->not(
+                    $qb->expr()->eq('vPic.value', ':vPicValue')
+                )
+            )->setParametes(
+                array(
+                    'vPicId' => $attr->getAttributeIdByProfileAttributeId(
+                        'picture'
+                    ),
+                    'vPicValue' => ''
+                )
+            );
+        }
+    }
+
+    protected function addGroupToQueryBuilder(&$qb, $groupIds)
+    {
+        // filter users by group association
+        if ($groupIds) {
+            $qb->andWhere(
+                $qb->expr()->in('u.groupId', ':groupIds')
+            )->setParameter('groupIds', $groupIds);
+        }
+    }
+
 
     /**
      * Parse a list (into the loaded template object) of those users having
@@ -159,39 +210,36 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
     {
         $arrSettings = \User_Setting::getSettings();
 
-        $filter['active'] = true;
-        if ($arrSettings['block_latest_reg_users_pic']['status']) {
-            $filter['picture'] = array('!=' => '');
-        }
-
-        if (!empty($gender)) {
-            $filter['gender'] = 'gender_'.$gender;
-        }
-
-        // filter users by group association
-        $groupFilter = static::fetchGroupFilter($this->_objTpl, 'access_latest_registered_member_list');
-        if ($groupFilter) {
-            $filter['group_id'] = $groupFilter;
-        }
-
-        $objFWUser = \FWUser::getFWUserObject();
-        $objUser = $objFWUser->objUser->getUsers(
-            $filter,
-            null,
-            array(
-                'regdate'    => 'desc',
-                'username'    => 'asc'
-            ),
-            null,
-            $arrSettings['block_latest_reg_users']['value']
+        $groupFilter = static::fetchGroupFilter(
+            $this->_objTpl, 'access_latest_registered_member_list'
         );
-        if ($objUser) {
-            while (!$objUser->EOF) {
-                $this->parseBasePlaceholders($objUser);
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $qb = $cx->getDb()->getEntityManager()->createQueryBuilder();
+        $qb->select('u')
+            ->from('Cx\Core\User\Model\Entity\User', 'u')
+            ->where(
+                $qb->expr()->eq('u.active', ':active')
+            )->setParameter('active', true);
+
+        $this->addGenderToQueryBuilder($qb, $gender);
+        $this->addPicToQueryBuilder(
+            $qb,
+            $arrSettings['block_latest_reg_users_pic']['status']
+        );
+        $this->addGroupToQueryBuilder($qb, $groupFilter);
+
+        $qb->orderBy('u.regdate', 'DESC')
+            ->addOrderBy('u.username', 'ASC')
+            ->setMaxResults($arrSettings['block_latest_reg_users']['value']);
+
+        $users = $qb->getQuery()->getResult();
+
+        if (!empty($users)) {
+            foreach ($users as $user) {
+                $this->parseBasePlaceholders($user);
 
                 $this->_objTpl->parse('access_latest_registered_'.(!empty($gender) ? $gender.'_' : '').'members');
-
-                $objUser->next();
             }
         } else {
             $this->_objTpl->hideBlock('access_latest_registered_'.(!empty($gender) ? $gender.'_' : '').'members');
@@ -239,8 +287,13 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
             $arrSettings['block_birthday_users']['value']
         );
         if ($objUser) {
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $userRepo = $cx->getDb()->getEntityManager()->getRepository(
+                'Cx\Core\User\Model\Entity\User'
+            );
             while (!$objUser->EOF) {
-                $this->parseBasePlaceholders($objUser);
+                $user = $userRepo->find($objUser->getId());
+                $this->parseBasePlaceholders($user);
 
                 $this->_objTpl->parse('access_birthday_'.(!empty($gender) ? $gender.'_' : '').'members');
 
@@ -259,16 +312,25 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
         $this->_objTpl->setVariable(array(
             'ACCESS_USER_ID'    => $objUser->getId(),
             'ACCESS_USER_USERNAME'    => htmlentities($objUser->getUsername(), ENT_QUOTES, CONTREXX_CHARSET),
-            'ACCESS_USER_REGDATE'     => date(ASCMS_DATE_FORMAT_DATE, $objUser->getRegistrationDate()),
+            'ACCESS_USER_REGDATE'     => date(ASCMS_DATE_FORMAT_DATE, $objUser->getRegdate()),
         ));
 
-        $objUser->objAttribute->first();
-        while (!$objUser->objAttribute->EOF) {
-            $objAttribute = $objUser->objAttribute->getById($objUser->objAttribute->getId());
-            if ($objAttribute->checkReadPermission()) {
-                $this->parseAttribute($objUser, $objAttribute->getId(), 0, false, false, false, false, false);
+        $objAttr = \FWUser::getFWUserObject()->objUser->objAttribute;
+
+        foreach ($objUser->getUserAttributeValue() as $value) {
+            $objAttr->load($value->getUserAttribute()->getId());
+            if ($objAttr->checkReadPermission()) {
+                $this->parseAttribute(
+                    $objUser,
+                    $objAttr->getId(),
+                    0,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                );
             }
-            $objUser->objAttribute->next();
         }
     }
 
@@ -327,8 +389,14 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
             $arrSettings['block_birthday_users']['value']
         );
         if ($objUser) {
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $userRepo = $cx->getDb()->getEntityManager()->getRepository(
+                'Cx\Core\User\Model\Entity\User'
+            );
             while (!$objUser->EOF) {
-                $this->parseBasePlaceholders($objUser);
+                $user = $userRepo->find($objUser->getId());
+
+                $this->parseBasePlaceholders($user);
 
                 $this->_objTpl->parse('access_next_birthday_' . (!empty($gender) ? $gender . '_' : '') . 'members');
 

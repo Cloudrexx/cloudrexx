@@ -284,6 +284,11 @@ class AccessLib
     {
         global $_CORELANG;
 
+        if ($objUser instanceof \Cx\Core\User\Model\Entity\User) {
+            $fwUser = \FWUser::getFWUserObject()->objUser;
+            $objUser = $fwUser->getUser($objUser->getId());
+        }
+
         $objAttribute = $objUser->objAttribute->getById($attributeId);
         $attributeName = $this->attributeNamePrefix.'['.$attributeId.']['.$historyId.']';
         $block = strtolower($this->attributeNamePrefix.'_'.$attributeId);
