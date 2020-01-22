@@ -109,26 +109,46 @@ class EsiWidgetController extends \Cx\Core_Modules\Widget\Controller\EsiWidgetCo
 
             // of the users who's last activity was within 3600s
             // take the one with the lowest last_activity
-            $objFWUser = \FWUser::getFWUserObject();
-            $filter = array(
-                'active'    => true,
-                'last_activity' => array(
-                    '>' => (time()-3600)
+            $crit = new \Doctrine\Common\Collections\Criteria();
+            $crit->where(
+                \Doctrine\Common\Collections\Criteria::expr()->eq(
+                    'active', true
+                )
+            )->andWhere(
+                \Doctrine\Common\Collections\Criteria::expr()->gt(
+                    'lastActivity', (time()-3600)
                 )
             );
-            $objUser = $objFWUser->objUser->getUsers(
-                $filter,
-                null,
-                array('last_activity' => 'asc'),
-                null,
-                1
-            );
-            if (!$objUser) {
+
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $qb = $cx->getDb()->getEntityManager()->createQueryBuilder();
+            $qb->select('u')
+                ->from('Cx\Core\User\Model\Entity\User', 'u')
+                ->where(
+                    $qb->expr()->eq(
+                        'u.active', ':active'
+                    )
+                )->andWhere(
+                    $qb->expr()->gt(
+                        'u.lastActivity', ':lastActivity'
+                    )
+                )->orderBy('u.lastActivity', 'ASC')
+                ->setMaxResults(1)
+                ->setParameters(
+                    array(
+                        'active' => true,
+                        'lastActivity' => (time()-3600)
+                    )
+                );
+
+            $user = $qb->getQuery()->getSingleResult();
+
+            if (empty($user)) {
                 return;
             }
 
             // and user_from_above.last_activity + 3600s = cache timeout
-            $cacheTimeout = $objUser->getLastActivityTime() + 3600;
+            $cacheTimeout = $user->getLastActivity() + 3600;
             $dateTime     = new \DateTime('@' . $cacheTimeout);
             $response->setExpirationDate($dateTime);
             return;
