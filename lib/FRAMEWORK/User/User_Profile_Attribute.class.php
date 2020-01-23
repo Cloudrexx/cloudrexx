@@ -1837,13 +1837,22 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
 
     function loadName($langId)
     {
-        global $objDatabase, $_CORELANG;
+        global $_CORELANG;
 
         if ($this->isCoreAttribute($this->id)) {
             $this->arrName[$langId] = (string)$_CORELANG[$this->arrAttributes[$this->id]['desc']];
         } else {
-            $objResult = $objDatabase->SelectLimit('SELECT `name` FROM `'.DBPREFIX.'access_user_attribute_name` WHERE `lang_id` = '.$langId.' AND `attribute_id` = "' . contrexx_raw2db($this->id) . '"', 1);
-            $this->arrName[$langId] = $objResult && $objResult->RecordCount() == 1 ? $objResult->fields['name'] : '';
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $attrName = $cx->getDb()->getEntityManager()->getRepository(
+                'Cx\Core\User\Model\Entity\UserAttributeName'
+            )->findOneBy(
+                array(
+                    'langId' => $langId,
+                    'attributeId' => contrexx_raw2db($this->id)
+                )
+            );
+
+            $this->arrName[$langId] = $attrName ? $attrName->getName() : '';
         }
         $this->arrAttributes[$this->id]['names'][$langId] = $this->arrName[$langId];
     }
