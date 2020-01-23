@@ -2187,22 +2187,27 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
      */
     public static function getCustomAttributeNameArray($langId=0)
     {
-        global $objDatabase;
-
         if (empty($langId)) $langId = LANG_ID;
-        $objResult = $objDatabase->Execute("
-            SELECT `id`, `name`
-              FROM `".DBPREFIX."access_user_attribute`
-             INNER JOIN `".DBPREFIX."access_user_attribute_name`
-                ON id=attribute_id
-             WHERE lang_id=$langId
-             ORDER BY order_id ASC");
-        if (!$objResult) return false;
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $qb = $cx->getDb()->getEntityManager()->createQueryBuilder();
+        // Get only custom attributes
+        $qb->select('n')
+            ->from('Cx\Core\User\Model\Entity\UserAttributeName', 'n')
+            ->innerJoin('n.userAttribute', 'a')
+            ->where($qb->expr()->eq('n.langId', ':langId'))
+            ->andWhere($qb->expr()->eq('a.isDefault', ':isDefault'))
+            ->setParameter('langId', $langId)
+            ->setParameter('isDefault', 0)
+            ->orderBy('a.orderId', 'ASC');
+
+        $names = $qb->getQuery()->getResult();
+
         $arrNames = array();
-        while (!$objResult->EOF) {
-            $arrNames[$objResult->fields['id']] = $objResult->fields['name'];
-            $objResult->MoveNext();
+        foreach ($names as $name) {
+            $arrNames[$name->getAttributeId()] = $name->getName();
         }
+
         return $arrNames;
 
 // TODO: check if this methods logic could be replaced by the following code
