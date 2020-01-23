@@ -1030,8 +1030,6 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
 
     function storeCustomAttribute()
     {
-        global $objDatabase;
-
         $type =
             ($this->arrTypes[$this->type]['multiline'] && $this->multiline
               ? 'textarea' : $this->type);
@@ -1039,60 +1037,38 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
         if ($parentId == 0) {
             $parentId = 'NULL';
         }
-        if ($this->id) {
-            return (boolean)$objDatabase->Execute("
-                UPDATE `".DBPREFIX."access_user_attribute`
-                   SET `type`='$type', `sort_type`='$this->sort_type',
-                       `order_id`=$this->order_id,
-                       `mandatory`='$this->mandatory',
-                       `parent_id`= $parentId
-                 WHERE `id`=$this->id");
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $attrRepo = $em->getRepository(
+            'Cx\Core\User\Model\Entity\UserAttribute'
+        );
+        $attr = $attrRepo->find($this->id);
+
+        if (empty($attr)) {
+            $attr = new \Cx\Core\User\Model\Entity\UserAttribute();
         }
-        $objDatabase->beginTrans();
-        $result = $objDatabase->Execute('
-            INSERT INTO
-                `' . DBPREFIX . 'access_user_attribute`
-            (
-                `type`,
-                `sort_type`,
-                `order_id`,
-                `mandatory`,
-                `parent_id`
-            ) VALUES (
-                "' . $type . '",
-                "' . $this->sort_type . '",
-                ' . $this->order_id . ',
-                "' . $this->mandatory . '",
-                ' . $parentId . '
-            )
-        ');
-        if (!$result) {
-            $objDatabase->rollbackTrans();
+
+        $parent = $attrRepo->find($parentId);
+
+        $attr->setType($type);
+        $attr->setSortType($this->sort_type);
+        $attr->setOrderId($this->order_id);
+        $attr->setMandatory($this->mandatory);
+        $attr->setParent($parent);
+        $attr->setAccessId(0);
+        $attr->setReadAccessId(0);
+        $attr->setIsDefault(0);
+        $em->persist($attr);
+
+        try {
+            $em->flush();
+        } catch (\Doctrine\ORM\OptimisticLockException $e) {
             return false;
         }
-        $this->id = $objDatabase->Insert_ID();
-        $result = $objDatabase->Execute('
-            INSERT INTO
-                `' . DBPREFIX . 'access_user_attribute_value`
-            (
-                `attribute_id`,
-                `user_id`,
-                `history_id`,
-                `value`
-            )
-            SELECT DISTINCT
-                ' . $this->id . ',
-                `id`,
-                0,
-                ""
-            FROM
-                `' . DBPREFIX . 'access_users`
-        ');
-        if (!$result) {
-            $objDatabase->rollbackTrans();
-            return false;
-        }
-        $objDatabase->commitTrans();
+
+        $this->id = $attr->getId();
+
         return true;
     }
 
