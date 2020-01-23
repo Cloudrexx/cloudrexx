@@ -195,7 +195,13 @@ class FWUser extends User_Setting
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $session = $cx->getComponent('Session')->getSession();
         $session->cmsSessionUserUpdate($objUser->getId());
-        $objUser->registerSuccessfulLogin();
+        if ($objUser instanceof \Cx\Core\User\Model\Entity\User) {
+            $cx->getDb()->getEntityManager()->getRepository(
+                'Cx\Core\User\Model\Entity\User'
+            )->registerSuccessfulLogin($objUser);
+        } else {
+            $objUser->registerSuccessfulLogin();
+        }
         unset($_SESSION['auth']['loginLastAuthFailed']);
         // Store frontend lang_id in cookie
         if (empty($_COOKIE['langId'])) {

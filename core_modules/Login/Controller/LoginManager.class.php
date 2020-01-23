@@ -189,8 +189,14 @@ class LoginManager {
                     'active'           => 1,
                     'email'            => $email,
                 );
-                $objUser = $objFWUser->objUser->getUsers($userFilter, null, null, null, 1);
-                $objFWUser->loginUser($objUser);
+                $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+                $userRepo = $cx->getDb()->getEntityManager()->getRepository(
+                    'Cx\Core\User\Model\Entity\User'
+                );
+                $user = $userRepo->findOneBy(
+                    array('active' => 1, 'email' => $email)
+                );
+                $objFWUser->loginUser($user);
             } else {
                 $this->objTemplate->setVariable('LOGIN_ERROR_MESSAGE', $objFWUser->getErrorMsg());
                 $this->objTemplate->touchBlock('error_message');
