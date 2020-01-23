@@ -1811,18 +1811,16 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
      */
     function getAttributeNames($id)
     {
-        global $objDatabase;
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $names = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Core\User\Model\Entity\UserAttributeName'
+        )->findBy(array('attributeId' => $id));
 
         $arrNames = array();
-        $objResult = $objDatabase->Execute('SELECT `lang_id`, `name` FROM `'.DBPREFIX.'access_user_attribute_name` WHERE `attribute_id` = '.$id);
-        if ($objResult) {
-            while (!$objResult->EOF) {
-                $arrNames[$objResult->fields['lang_id']] = $objResult->fields['name'];
-                $objResult->MoveNext();
-            }
-            return $arrNames;
+        foreach ($names as $name) {
+            $arrNames[$name->getLangId()] = $name->getName();
         }
-        return array();
+        return $arrNames;
     }
 
 
