@@ -177,6 +177,16 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             $entityClass,
             $userListener
         );
+
+        $attrListener
+            = new \Cx\Core\User\Model\Event\UserAttributeEventListener(
+                $this->cx
+            );
+        $this->cx->getEvents()->addModelListener(
+            \Doctrine\ORM\Events::postPersist,
+            'Cx\Core\User\Model\Entity\UserAttribute',
+            $attrListener
+        );
     }
 
 }
