@@ -607,12 +607,17 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
         $this->_objTpl->addBlockfile('ACCESS_GROUP_TEMPLATE', 'module_access_group_modify', 'module_access_group_modify.html');
         $this->_pageTitle = $objGroup->getId() ? $_ARRAYLANG['TXT_ACCESS_MODIFY_GROUP'] : $_ARRAYLANG['TXT_ACCESS_CREATE_NEW_USER_GROUP'];
 
-        $objUser = $objFWUser->objUser->getUsers(null, null, array('username' => 'asc', 'email' => 'asc'), array('id', 'username', 'email', 'firstname', 'lastname'));
-        if ($objUser) {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $userRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Core\User\Model\Entity\User'
+        );
+        $users = $userRepo->findBy(
+            array(), array('username' => 'ASC', 'email' => 'ASC')
+        );
+        if ($users) {
             $arrGroupUsers = $objGroup->getAssociatedUserIds();
-            while (!$objUser->EOF) {
-                $arrUsers[] = $objUser->getId();
-                $objUser->next();
+            foreach ($users as $user) {
+                $arrUsers[] = $user->getId();
             }
 
             $arrOtherUsers = array_diff($arrUsers, $arrGroupUsers);
