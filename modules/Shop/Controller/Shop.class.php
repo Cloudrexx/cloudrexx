@@ -4320,7 +4320,6 @@ die("Shop::processRedirect(): This method is obsolete!");
         self::$objTemplate->hideBlock('shopConfirm');
         // Store the customer, register the order
         $net = \Cx\Core\Core\Controller\Cx::instanciate()->getComponent('Net');
-        $new_customer = false;
 //\DBG::log("Shop::process(): E-Mail: ".$_SESSION['shop']['email']);
         if (self::$objCustomer) {
 //\DBG::log("Shop::process(): Existing User username ".$_SESSION['shop']['username'].", email ".$_SESSION['shop']['email']);
@@ -4365,7 +4364,6 @@ die("Shop::processRedirect(): This method is obsolete!");
                         'Shop', 'account'));
                 }
                 self::$objCustomer->active(empty($_SESSION['shop']['dont_register']));
-                $new_customer = true;
             }
         }
         // Update the Customer object from the session array
@@ -4433,24 +4431,6 @@ die("Shop::processRedirect(): This method is obsolete!");
 //\DBG::log("Shop::process(): Storing Customer: ".var_export(self::$objCustomer, true));
         if (!self::$objCustomer->store()) {
             return \Message::error($_ARRAYLANG['TXT_SHOP_CUSTOMER_ERROR_STORING']);
-        }
-        // Authenticate new Customer
-        if ($new_customer) {
-            // Fails for "unregistered" Customers!
-// TODO: this feature did never work, as self::$objCustomer->auth() did
-//       expect a md5-hashed password. But now, since the method does no longer
-//       expect a md5-hashed password, but instead the raw password,
-//       the self::$objCustomer->auth() method does now work.
-//       As a result of this, the behavior of the Shop and the system is
-//       unknown if the new customer would suddenly be sign-in to the system.
-//       Therefore, the behavior must extensively be tested be fore the feature
-//       can be activated (by uncommenting it)
-            /*if (self::$objCustomer->auth(
-                $_SESSION['shop']['username'], $_SESSION['shop']['password'], false, true)) {
-                if (!self::_authenticate()) {
-                    return \Message::error($_ARRAYLANG['TXT_SHOP_CUSTOMER_ERROR_STORING']);
-                }
-            }*/
         }
         $shipper_id = (empty($_SESSION['shop']['shipperId'])
             ? null : $_SESSION['shop']['shipperId']);
