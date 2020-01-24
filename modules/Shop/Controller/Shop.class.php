@@ -4327,6 +4327,7 @@ die("Shop::processRedirect(): This method is obsolete!");
             $verifyAccountEmail = \Cx\Core\Setting\Controller\Setting::getValue('verify_account_email','Shop');
 
             // Registered Customers are required to be logged in!
+            // (--> get active user account by email)
             self::$objCustomer = Customer::getRegisteredByEmail(
                 $_SESSION['shop']['email']);
             if ($verifyAccountEmail && self::$objCustomer) {
@@ -4340,6 +4341,7 @@ die("Shop::processRedirect(): This method is obsolete!");
 // Unregistered Customers are stored as well, as their information is needed
 // nevertheless.  Their active status, however, is set to false.
             if (!self::$objCustomer) {
+                // get inactive user account by email
                 self::$objCustomer = Customer::getUnregisteredByEmail(
                     $_SESSION['shop']['email']);
             }
