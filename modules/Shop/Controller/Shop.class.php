@@ -4344,6 +4344,24 @@ die("Shop::processRedirect(): This method is obsolete!");
                 // get inactive user account by email
                 self::$objCustomer = Customer::getUnregisteredByEmail(
                     $_SESSION['shop']['email']);
+                // User did choose to create a new user account.
+                // In case there is already a user account present that uses
+                // the same email address as the one provided, then we have
+                // to active that user account and set the supplied password
+                if (
+                    self::$objCustomer &&
+                    empty($_SESSION['shop']['dont_register'])
+                ) {
+                    $password = (empty($_SESSION['shop']['password'])
+                        ? \User::make_password()
+                        : $_SESSION['shop']['password']);
+                    if (!self::$objCustomer->setPassword($password)) {
+                        \Message::error($_ARRAYLANG['TXT_INVALID_PASSWORD']);
+                        \Cx\Core\Csrf\Controller\Csrf::redirect(\Cx\Core\Routing\Url::fromModuleAndCmd(
+                            'Shop', 'account'));
+                    }
+                    self::$objCustomer->active(true);
+                }
             }
             if (!self::$objCustomer) {
                 self::$objCustomer = new Customer();
