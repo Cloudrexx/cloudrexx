@@ -193,7 +193,7 @@ class EsiWidgetController extends \Cx\Core_Modules\Widget\Controller\EsiWidgetCo
 
             case 'pagetree':
                 $lang = $page->getLang();
-                $node = $page->getNode();
+                $node = $page->getNode()->getParent();
                 $nodes = array();
 
                 while ($node->getLvl() > 0){
@@ -201,7 +201,6 @@ class EsiWidgetController extends \Cx\Core_Modules\Widget\Controller\EsiWidgetCo
                     $node = $node->getParent();
                 }
                 $nodes = array_reverse($nodes);
-                array_pop($nodes);  //removes the last element in array
 
                 foreach ($nodes as $node) {
                     $pagetreePage = $node->getPage($lang);
