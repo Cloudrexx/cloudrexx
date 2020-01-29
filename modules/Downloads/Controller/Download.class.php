@@ -1060,11 +1060,20 @@ class Download {
                 $arrConditions[] = 'tblD.`is_active` = 1';
             }
             if (!\Permission::checkAccess(143, 'static', true)) {
-                $arrConditions[] = 'tblD.`visibility` = 1'.(
+                $visibility = '';
+                $or = ' ';
+                if (!isset($arrFilter['visibility'])) {
+                    $visibility = 'tblD.`visibility` = 1';
+                    $or = ' OR ';
+                }
+                $conditionStr = $visibility.(
                     $objFWUser->objUser->login() ?
-                    ' OR tblD.`owner_id` = '.$objFWUser->objUser->getId()
+                        $or.'tblD.`owner_id` = '.$objFWUser->objUser->getId()
                     .(count($objFWUser->objUser->getDynamicPermissionIds()) ? ' OR tblD.`access_id` IN ('.implode(', ', $objFWUser->objUser->getDynamicPermissionIds()).')' : '')
                     : '');
+                if (!empty($conditionStr)) {
+                    $arrConditions[] = $conditionStr;
+                }
             }
 
 
@@ -1220,7 +1229,7 @@ class Download {
         );
 
         $arrComparisonOperators = array(
-            'int'       => array('=','<','>', '<=', '>='),
+            'int'       => array('!=', '=','<','>', '<=', '>='),
             'string'    => array('!=','<','>', 'REGEXP')
         );
         $arrDefaultComparisonOperator = array(
@@ -1454,6 +1463,29 @@ class Download {
         return $arrIds;
     }
 
+    /**
+     * Select all protected downloads, if downloads were found return true
+     *
+     * @param array $filter To filter downloads
+     * @param string $searchTerm The keyword to search by
+     * @return bool if protected downloads exist
+     */
+    public function hasProtectedDownloads($filter, $searchTerm)
+    {
+        if ($this->loadDownloads(
+            $filter,
+            $searchTerm,
+            null,
+            null,
+            null,
+            null,
+            $this->config['list_downloads_current_lang']
+        )) {
+            return true;
+        }
+
+        return false;
+    }
 
     public function incrementDownloadCount()
     {

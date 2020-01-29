@@ -291,6 +291,41 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     }
 
     /**
+     * Select all protected downloads, if downloads were found return true
+     * Filtered by a searchterm
+     *
+     * @param string $searchTerm The keyword to search by
+     * @return bool if protected downloads exist
+     */
+    public function hasProtectedDownloadsForSearch($searchTerm)
+    {
+        $downloadLibrary = new DownloadsLibrary();
+        $config = $downloadLibrary->getSettings();
+        $download = new Download($config);
+
+        // check for valid published application page
+        $filter = null;
+        try {
+            $arrCategoryIds = $this->getCategoryFilterForSearchComponent();
+
+            // set category filter if we have to restrict search by
+            // any category IDs
+            if ($arrCategoryIds) {
+                $filter = array('category_id' => $arrCategoryIds);
+            }
+            // Search if protected downloads exists
+            $filter['access_id'] = array(
+                '!=' => 0
+            );
+            $filter['visibility'] = 0;
+        } catch (DownloadsInternalException $e) {
+            return false;
+        }
+
+        return $download->hasProtectedDownloads($filter, $searchTerm);
+    }
+
+    /**
      * Get published category IDs (as application pages)
      *
      *
