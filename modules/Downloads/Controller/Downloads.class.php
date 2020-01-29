@@ -1235,6 +1235,20 @@ JS_CODE;
                 }
             }
 
+            // Check if it has protected downloads
+            $hasProtectedDownloads = $objDownload->hasProtectedDownloads(
+                $filter,
+                $this->searchKeyword,
+                $includeDownloadsOfSubcategories
+            );
+
+            if (
+                $hasProtectedDownloads &&
+                $this->objTemplate->blockExists('downloads_has_protected_downloads')
+            ) {
+                $this->objTemplate->touchBlock('downloads_has_protected_downloads');
+            }
+
             $this->objTemplate->setVariable(array(
                 'TXT_DOWNLOADS_' . $variablePrefix .'FILES'       => $_ARRAYLANG['TXT_DOWNLOADS_FILES'],
                 'TXT_DOWNLOADS_' . $variablePrefix .'DOWNLOADS'   => $_ARRAYLANG['TXT_DOWNLOADS_DOWNLOADS']
