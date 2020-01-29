@@ -1854,6 +1854,7 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
 
             $this->arrName[$langId] = $attrName ? $attrName->getName() : '';
         }
+
         $this->arrAttributes[$this->id]['names'][$langId] = $this->arrName[$langId];
     }
 
