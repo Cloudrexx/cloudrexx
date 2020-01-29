@@ -311,7 +311,6 @@ $_ARRAYLANG['TXT_CUSTOMER_DETAILS'] = "Kundedetaljer";
 $_ARRAYLANG['TXT_MAKE_NEW_PRICELIST'] = "Lav ny prisliste";
 $_ARRAYLANG['TXT_ARTICLE_GROUPS'] = "Artikelgruppe";
 $_ARRAYLANG['TXT_NEW_MAIN_ARTICLE_GROUP'] = "Ny hovedartikel gruppe";
-$_ARRAYLANG['TXT_CONFIRM_DELETE_SHOP_CATEGORIES'] = "Vil du virkelig slette den/disse kategori(er) med alle tilhørende produkter?";
 $_ARRAYLANG['TXT_ACCEPT_CHANGES'] = "Accepter ændringer";
 $_ARRAYLANG['TXT_DELETE_MARKED'] = "Slet markerede";
 $_ARRAYLANG['TXT_EDIT_ PRODUCT_GROUP'] = "Bearbejd protuktgruppe";
