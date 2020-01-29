@@ -1325,7 +1325,7 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
 
     function deleteAttributeContent($attributeId)
     {
-        global $objDatabase, $_ARRAYLANG;
+        global $_ARRAYLANG;
 
         if (
             $this->parent_id == 'title' &&
@@ -1334,11 +1334,21 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
             $attributeId = $pattern[0];
         }
 
-        if ($objDatabase->Execute("DELETE FROM `".DBPREFIX."access_user_attribute_value` WHERE `attribute_id` = '".$attributeId."'") !== false) {
-            return true;
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $attrNames = $em->getRepository(
+            'Cx\Core\User\Model\Entity\UserAttributeValue'
+        )->findBy(array('attributeId' => $attributeId));
+
+        foreach ($attrNames as $attrName) {
+            $em->remove($attrName);
         }
-        $this->errorMsg = sprintf($_ARRAYLANG['TXT_ACCESS_UNABLE_DEL_ATTRIBUTE_CONTENT'], htmlentities($this->arrAttributes[$attributeId]['names'][$this->langId], ENT_QUOTES, CONTREXX_CHARSET));
-        return false;
+        try {
+            $em->flush();
+        } catch (\Doctrine\ORM\OptimisticLockException $e) {
+            $this->errorMsg = sprintf($_ARRAYLANG['TXT_ACCESS_UNABLE_DEL_ATTRIBUTE_CONTENT'], htmlentities($this->arrAttributes[$attributeId]['names'][$this->langId], ENT_QUOTES, CONTREXX_CHARSET));
+            return false;
+        }
     }
 
 
