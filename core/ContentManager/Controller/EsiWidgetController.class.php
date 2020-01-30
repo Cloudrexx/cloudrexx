@@ -203,13 +203,13 @@ class EsiWidgetController extends \Cx\Core_Modules\Widget\Controller\EsiWidgetCo
                 $nodes = array_reverse($nodes);
 
                 foreach ($nodes as $node) {
-                    $pagetreePage = $node->getPage($lang);
-                    $pagetreePath = \Cx\Core\Routing\Url::fromPage($pagetreePage);
-                    $pagetreeTitle = $pagetreePage->getTitle();
+                    $entryPage = $node->getPage($lang);
+                    $entryPath = \Cx\Core\Routing\Url::fromPage($entryPage);
+                    $entryTitle = $entryPage->getTitle();
 
                     $template->setVariable(array(
-                        'PAGETREE_PATH' => $pagetreePath,
-                        'PAGETREE_TITLE' => $pagetreeTitle
+                        'ENTRY_PATH' => $entryPath,
+                        'ENTRY_TITLE' => $entryTitle
                     ));
                     $template->parse($name);
                 }
