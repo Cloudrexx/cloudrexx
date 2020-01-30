@@ -912,4 +912,10 @@ class User extends \Cx\Model\Base\EntityBase {
 
         return $this->getAttributeValue($attrId);
     }
+
+    public function releaseRestoreKey()
+    {
+        $this->setRestoreKey('');
+        $this->setRestoreKeyTime(0);
+    }
 }

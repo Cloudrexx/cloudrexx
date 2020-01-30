@@ -654,33 +654,50 @@ class FWUser extends User_Setting
     {
         global $_CORELANG;
 
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $qb = $em->createQueryBuilder();
+
 // TODO: add verificationTimeout as configuration option
         $verificationExpired = time() - 30 * 86400;
-        $userFilter = array(
-            'restore_key'      => $key,
-            'regdate' => array(
-                array (
-                    '>' => $verificationExpired,
-                ),
-                '=' => $verificationExpired,
-            ),
-            'active'           => 1,
-            'email' => $email,
-        );
 
-        $objUser = $this->objUser->getUsers($userFilter, null, null, null, 1);
-        if ($objUser) {
-            if ($objUser->setVerification(true) &&
-                $objUser->releaseRestoreKey() &&
-                $objUser->store()
-            ) {
-// TODO: destroy session and create new one
-                \FWUser::loginUser($objUser);
-// TODO: add language variable
+        $qb->select('u')
+            ->from('Cx\Core\User\Model\Entity\User', 'u')
+            ->where(
+                $qb->expr()->eq('u.restoreKey', ':restoreKey')
+            )->andWhere(
+                $qb->expr()->gte('u.regdate', ':regdate')
+            )->andWhere(
+                $qb->expr()->eq('u.active', ':active')
+            )->andWhere(
+                $qb->expr()->eq('u.email', ':email')
+            )->setParameters(
+                array(
+                    'restoreKey' => $key,
+                    'regdate' => $verificationExpired,
+                    'active' => 1,
+                    'email' => $email
+                )
+            )->setMaxResults(1);
+
+        $user = $qb->getQuery()->getSingleResult();
+        if (!empty($user)) {
+            try {
+                $user->setVerified(true);
+                $user->releaseRestoreKey();
+                $em->persist($user);
+                $em->flush();
+
+                // TODO: destroy session and create new one
+                \FWUser::loginUser($user);
+                // TODO: add language variable
                 \Message::add('Sie haben Ihr Konto erfolgreich best&auml;tigt.', \Message::CLASS_OK);
                 return true;
+            } catch (\Doctrine\ORM\OptimisticLockException $e) {
+                $this->arrStatusMsg['error'] = array_merge(
+                    $this->arrStatusMsg['error'], $e->getMessage()
+                );
             }
-            $this->arrStatusMsg['error'] = array_merge($this->arrStatusMsg['error'], $objUser->getErrorMsg());
         } else {
             $this->arrStatusMsg['error'][] = $_CORELANG['TXT_INVALID_USER_ACCOUNT'];
         }
@@ -820,32 +837,46 @@ class FWUser extends User_Setting
             return false;
         }
 
-        $userFilter = array(
-            'restore_key'      => $restoreKey,
-            'restore_key_time' => array(
-                array (
-                    '>' => time(),
-                ),
-                '=' => time(),
-            ),
-            'active'           => 1,
-            'email'            => $email,
-        );
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $qb = $em->createQueryBuilder();
 
-        $objUser = $this->objUser->getUsers($userFilter, null, null, null, 1);
-        if ($objUser) {
+        $qb->select('u')
+            ->from('Cx\Core\User\Model\Entity\User', 'u')
+            ->where(
+                $qb->expr()->eq('u.restoreKey', ':restoreKey')
+            )->andWhere(
+                $qb->expr()->gte('u.restoreKeyTime', ':restoreKeyTime')
+            )->andWhere(
+                $qb->expr()->eq('u.active', ':active')
+            )->andWhere(
+                $qb->expr()->eq('u.email', ':email')
+            )->setParameters(
+                array(
+                    'restoreKey' => $restoreKey,
+                    'restoreKeyTime' => time(),
+                    'active' => 1,
+                    'email' => $email
+                )
+            )->setMaxResults(1);
+
+        $user = $qb->getQuery()->getSingleResult();
+        if (!empty($user)) {
             if ($store) {
-                if ($objUser->setPassword($password, $confirmedPassword, true) &&
-                    $objUser->releaseRestoreKey() &&
+                try {
+                    $user->setPassword($password, $confirmedPassword, true);
+                    $user->releaseRestoreKey();
                     // By successfully re-setting the password,
                     // the user did verify his email address
                     // and therefore his account.
-                    $objUser->setVerification(true) &&
-                    $objUser->store()
-                ) {
+                    $user->setVerification(true);
+                    $em->persist($user);
+                    $em->flush();
+
                     return true;
+                } catch (\Doctrine\ORM\ORMException $e) {
+                    $this->arrStatusMsg['error'] = array_merge($this->arrStatusMsg['error'], $e->getMessage());
                 }
-                $this->arrStatusMsg['error'] = array_merge($this->arrStatusMsg['error'], $objUser->getErrorMsg());
             } else {
                 return true;
             }
