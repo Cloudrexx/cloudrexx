@@ -564,10 +564,8 @@ EOF;
         $objTpl->setVariable(array(
             'TXT_'.$this->moduleLangVar.'_SETTINGS_PICS_AND_FILES' => $_ARRAYLANG['TXT_MEDIADIR_PICS_AND_FILES'],
             'TXT_'.$this->moduleLangVar.'_SETTINGS_THUMB_SIZE' => $_ARRAYLANG['TXT_MEDIADIR_SETTINGS_THUMB_SIZE'],
-            'TXT_'.$this->moduleLangVar.'_SETTINGS_NUM_PICS_PER_GALLERY' => $_ARRAYLANG['TXT_MEDIADIR_SETTINGS_NUM_PICS_PER_GALLERY'],
             'TXT_'.$this->moduleLangVar.'_SETTINGS_ENCRYPT_FILENAME' => $_ARRAYLANG['TXT_MEDIADIR_SETTINGS_ENCRYPT_FILENAME'],
             'TXT_'.$this->moduleLangVar.'_SETTINGS_THUMB_SIZE_INFO' => $_ARRAYLANG['TXT_MEDIADIR_SETTINGS_THUMB_SIZE_INFO'],
-            'TXT_'.$this->moduleLangVar.'_SETTINGS_NUM_PICS_PER_GALLERY_INFO' => $_ARRAYLANG['TXT_MEDIADIR_SETTINGS_NUM_PICS_PER_GALLERY_INFO'],
             'TXT_'.$this->moduleLangVar.'_SETTINGS_ENCRYPT_FILENAME_INFO' => $_ARRAYLANG['TXT_MEDIADIR_SETTINGS_ENCRYPT_FILENAME_INFO'],
             'TXT_'.$this->moduleLangVar.'_SETTINGS_IMAGE_FILESIZE' => $_ARRAYLANG['TXT_MARKETPLACE_SETTINGS_IMAGE_FILESIZE'],
             'TXT_'.$this->moduleLangVar.'_SETTINGS_IMAGE_FILESIZE_INFO' => $_ARRAYLANG['TXT_MARKETPLACE_SETTINGS_IMAGE_FILESIZE_INFO'],
@@ -584,7 +582,6 @@ EOF;
 
         $objTpl->setVariable(array(
             $this->moduleLangVar.'_SETTINGS_THUMB_SIZE' => intval($this->arrSettings['settingsThumbSize']),
-            $this->moduleLangVar.'_SETTINGS_NUM_PICS_PER_GALLERY' => $this->arrSettings['settingsNumGalleryPics'],
             $this->moduleLangVar.'_SETTINGS_ENCRYPT_FILENAMES_ON' => $strEncryptFilenamesOn,
             $this->moduleLangVar.'_SETTINGS_ENCRYPT_FILENAMES_OFF' => $strEncryptFilenamesOff,
             $this->moduleLangVar.'_SETTINGS_IMAGE_FILESIZE' => intval($this->arrSettings['settingsImageFilesize']),

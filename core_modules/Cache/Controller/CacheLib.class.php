@@ -291,6 +291,21 @@ class CacheLib
                     $locale
                 );
             },
+            'url_encode' => function($args) {
+                if (empty($args[0])) {
+                    return '';
+                }
+                return urlencode($args[0]);
+            },
+            'html_encode' => function($args) {
+                if (empty($args[0])) {
+                    return '';
+                }
+                // according to the esi specification, only double quotes
+                // are being converted into html entities. Therefore, we have
+                // to set ENT_COMPAT
+                return htmlspecialchars($args[0], ENT_COMPAT, CONTREXX_CHARSET);
+            },
         );
     }
 
@@ -310,7 +325,18 @@ class CacheLib
         $isMobile = (
             \InitCMS::_is_mobile_phone() &&
             !\InitCMS::_is_tablet() &&
-            !isset($_REQUEST['smallscreen'])
+            // neither a COOKIE preference is set,
+            // nor a preference through GET has been requested
+            !isset($_GET['smallscreen']) &&
+            !isset($_COOKIE['smallscreen'])
+        ) || (
+            // mobile preference through GET has been requested
+            !empty($_GET['smallscreen'])
+        ) || (
+            // no mobile preference through GET has been requested,
+            // but preference is stored in COOKIE
+            !isset($_GET['smallscreen']) &&
+            !empty($_COOKIE['smallscreen'])
         );
 
         // Use data of $_GET and $_POST to uniquely identify a request.
