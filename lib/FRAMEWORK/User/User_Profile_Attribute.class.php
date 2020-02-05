@@ -1308,7 +1308,7 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
         global $objDatabase, $_ARRAYLANG;
 
         if (
-            $this->parent_id == 'title' &&
+            !empty($this->parent_id) && $this->parent_id == 'title' &&
             preg_match('#([0-9]+)#', $attributeId, $pattern)
         ) {
             $attributeId = $pattern[0];
@@ -1327,7 +1327,7 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
         global $objDatabase, $_ARRAYLANG;
 
         if (
-            $this->parent_id == 'title' &&
+            !empty($this->parent_id) && $this->parent_id == 'title' &&
             preg_match('#([0-9]+)#', $attributeId, $pattern)
         ) {
             $attributeId = $pattern[0];
