@@ -1622,20 +1622,20 @@ class User_Profile_Attribute
     }
 
     /**
-     * In the system, the ID of a core attribute is the name of the attribute
-     * (e.g. 'title'). But if we want to interact with the database, the core
+     * In the system, the ID of a default attribute is the name of the attribute
+     * (e.g. 'title'). But if we want to interact with the database, the default
      * attribute is handled like other user attributes. This means we have an
      * integer ID (e.g. 2) and had to track this ID (2) with the system-intern
-     * core attribute ID ('title')
+     * default attribute ID ('title')
      *
      * This method checks if the given attribute id (e.g. 2) is assigned to a
-     * core attribute
+     * default attribute
      *
      * @param int $attributeId id to check if it is assigned
-     * @return bool if is assigned to an core attribute
+     * @return bool if is assigned to an default attribute
      */
-    public function isIdAssignedToCoreAttribute($attributeId=0) {
-        if (!empty($this->getProfileAttributes()[$attributeId])) {
+    public function isIdAssignedToDefaultAttribute($attributeId=0) {
+        if (!empty($this->getDefaultAttributes()[$attributeId])) {
             return true;
         }
         return false;

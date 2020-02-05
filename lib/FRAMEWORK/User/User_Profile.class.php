@@ -312,7 +312,7 @@ class User_Profile
         if ($objAttributeValue !== false && $objAttributeValue->RecordCount() > 0) {
             while (!$objAttributeValue->EOF) {
                 $attributeId = $objAttributeValue->fields['attribute_id'];
-                if ($this->objAttribute->isIdAssignedToCoreAttribute($attributeId)) {
+                if ($this->objAttribute->isIdAssignedToDefaultAttribute($attributeId)) {
                     $attributeId = $this->objAttribute->getProfileAttributeIdByAttributeId($attributeId);
                 }
                 $this->arrCachedUsers[$objAttributeValue->fields['user_id']]['profile'][$attributeId][$objAttributeValue->fields['history_id']] =
