@@ -87,12 +87,12 @@ class User_Profile_Attribute
 
     private $arrAttributeTree;
     private $arrAttributeRelations;
-    private $arrCoreAttributeIds;
+    private $arrDefaultAttributeIds;
     private $arrCustomAttributes;
     private $arrMandatoryAttributes = array();
-    private $arrProfileAttributes = array();
+    private $arrDefaultAttributes = array();
 
-    private $arrCoreAttributes = array(
+    private $arrDefaultAttributeTemplates = array(
         'picture' => array(
             'type'         => 'image',
             'multiline'    => false,
@@ -533,56 +533,25 @@ class User_Profile_Attribute
         $this->arrAttributeRelations = null;
         $this->arrAttributeTree = null;
 
-        $this->loadCoreAttributes();
-        $this->loadProfileAttributes();
+        $this->loadDefaultAttributes();
         $this->loadCustomAttributes();
         $this->generateAttributeRelations();
         $this->sortChildren();
     }
 
-
-    function loadCoreAttributes()
-    {
-        global $_CORELANG;
-
-        $this->arrCoreAttributeIds = array();
-        $this->arrAttributes = $this->arrCoreAttributes;
-        foreach ($this->arrCoreAttributes as $attributeId => $arrAttribute) {
-            if (!$arrAttribute['parent_id']) {
-                $this->arrCoreAttributeIds[] = $attributeId;
-            }
-
-// TODO: In the backend, this always results in the empty string!
-// The core language is not loaded yet when this is run!
-            $this->arrAttributes[$attributeId]['names'][$this->langId] = isset($_CORELANG[$arrAttribute['desc']]) ? $_CORELANG[$arrAttribute['desc']] : null;
-// See:
-//die(var_export($_CORELANG, true));
-// and
-/*
-DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, language ID $this->langId: ".$arrAttribute['desc'].
-  " => ".
-  $_CORELANG[$arrAttribute['desc']].
-  " => ".
-  $this->arrAttributes[$attributeId]['names'][$this->langId]
-);
-*/
-        }
-        $this->loadCoreAttributeCountry();
-        $this->loadCoreAttributeTitle();
-    }
-
     /**
-     * Find all default user attributes (ProfileAttributes) and store it in an
+     * Find all default user attributes (DefaultAttributes) and store it in an
      * array
      */
-    function loadProfileAttributes()
+    function loadDefaultAttributes()
     {
-        global $objDatabase;
+        global $objDatabase, $_CORELANG;
 
         $query = '
             SELECT 
                 `tblA`.`id` AS `id`, 
-                `tblN`.`name` AS `name` 
+                `tblN`.`name` AS `name`,
+                `tblA`.`parent_id` AS `parentId`
             FROM `' .DBPREFIX .'access_user_attribute` AS `tblA`
             LEFT JOIN `'.DBPREFIX.'access_user_attribute_name` AS `tblN`
                 ON `tblN`.`attribute_id` = `tblA`.`id`
@@ -592,15 +561,31 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
 
         $objAttributes = $objDatabase->Execute($query);
 
+        $this->arrAttributes = $this->arrDefaultAttributeTemplates;
         if ($objAttributes !== false && $objAttributes->RecordCount() > 0) {
             while (!$objAttributes->EOF) {
-                $this->arrProfileAttributes[
-                $objAttributes->fields['id']
-                ] = $objAttributes->fields['name'];
+                $attributeId = $objAttributes->fields['id'];
+                $name = $objAttributes->fields['name'];
+                $this->arrDefaultAttributes[$attributeId] = $name;
+
+                if (!$objAttributes->fields['parentId']) {
+                    $this->arrDefaultAttributeIds[] = $attributeId;
+                }
+
+                if (isset($_CORELANG[$this->arrDefaultAttributeTemplates[$name]['desc']])) {
+                    $this->arrAttributes[$attributeId]['names'][$this->langId] = $_CORELANG[
+                        $this->arrDefaultAttributeTemplates[$name]['desc']
+                    ];
+                } else {
+                    $this->arrAttributes[$attributeId]['names'][$this->langId] = null;
+                }
 
                 $objAttributes->MoveNext();
             }
         }
+
+        $this->loadCoreAttributeCountry();
+        $this->loadCoreAttributeTitle();
     }
 
     function loadCoreAttributeCountry()
@@ -730,9 +715,9 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
      *
      * @return array value with all profile attributes
      */
-    public function getProfileAttributes()
+    public function getDefaultAttributes()
     {
-        return $this->arrProfileAttributes;
+        return $this->arrDefaultAttributes;
     }
 
     function getTree()
@@ -778,7 +763,7 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
         $objAttribute->arrAttributeTree = &$this->arrAttributeTree;
         $objAttribute->arrAttributeRelations = &$this->arrAttributeRelations;
         $objAttribute->arrMandatoryAttributes = &$this->arrMandatoryAttributes;
-        $objAttribute->arrCoreAttributeIds = &$this->arrCoreAttributeIds;
+        $objAttribute->arrDefaultAttributeIds = &$this->arrDefaultAttributeIds;
         $objAttribute->arrCustomAttributes = &$this->arrCustomAttributes;
 
         if ($objAttribute->load($id)) {
@@ -1633,7 +1618,7 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
         if (is_null($attributeId)) {
             $attributeId = $this->id;
         }
-        return isset($this->arrCoreAttributes[$attributeId]);
+        return isset($this->arrDefaultAttributes[$attributeId]);
     }
 
     /**
@@ -1864,10 +1849,10 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
      */
     public function getProfileAttributeIdByAttributeId($attributeId)
     {
-        $profileAttributes = $this->getProfileAttributes();
+        $defaultAttributes = $this->getDefaultAttributes();
 
-        if (!empty($profileAttributes[$attributeId])) {
-            return $profileAttributes[$attributeId];
+        if (!empty($defaultAttributes[$attributeId])) {
+            return $defaultAttributes[$attributeId];
         }
 
         return '';
@@ -1888,10 +1873,10 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
      */
     public function getAttributeIdByProfileAttributeId($profileId)
     {
-        $profileAttributes = $this->getProfileAttributes();
+        $defaultAttributes = $this->getDefaultAttributes();
 
-        if (in_array($profileId, $profileAttributes)) {
-            return array_search($profileId, $profileAttributes);
+        if (in_array($defaultId, $defaultAttributes)) {
+            return array_search($defaultId, $defaultAttributes);
         }
 
         return 0;
@@ -2133,7 +2118,7 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
 
     function getCoreAttributeIds()
     {
-        return $this->arrCoreAttributeIds;
+        return $this->arrDefaultAttributeIds;
     }
 
 
