@@ -2116,7 +2116,7 @@ class User_Profile_Attribute
     }
 
 
-    function getCoreAttributeIds()
+    function getDefaultAttributeIds()
     {
         return $this->arrDefaultAttributeIds;
     }

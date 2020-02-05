@@ -2413,7 +2413,7 @@ JS
 
         // set profile attributes
         $arrProfileFields = array_merge(
-            $objFWUser->objUser->objAttribute->getCoreAttributeIds(),
+            $objFWUser->objUser->objAttribute->getDefaultAttributeIds(),
             $customAttributeIds
         );
 
