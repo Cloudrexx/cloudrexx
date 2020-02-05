@@ -39,6 +39,7 @@ Cx\Core\User\Model\Entity\UserAttributeValue:
       joinColumns:
         attribute_id:
           referencedColumnName: id
+          nullable: false
           options:
             unsigned: true
     user:
@@ -49,5 +50,6 @@ Cx\Core\User\Model\Entity\UserAttributeValue:
           onDelete: RESTRICT
           onUpdate: RESTRICT
           referencedColumnName: id
+          nullable: false
           options:
             unsigned: true

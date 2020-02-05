@@ -42,5 +42,6 @@ Cx\Core\User\Model\Entity\UserAttributeName:
       joinColumns:
         attribute_id:
           referencedColumnName: id
+          nullable: false
           options:
             unsigned: true
