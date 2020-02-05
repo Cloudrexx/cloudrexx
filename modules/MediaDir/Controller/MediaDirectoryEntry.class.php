@@ -1526,15 +1526,12 @@ JSCODE;
                 continue;
             }
 
-            // skip meta attributes or ones that are out of scope (frontend/backend)
-            if (   // type = 'add_step'
-                   $arrInputfield['type'] == 16
-                   // type = 'label'
-                || $arrInputfield['type'] == 18
-                   // type = 'title'
-                || $arrInputfield['type'] == 30
-                   // show_in is neither FRONTEND or BACKEND ($intShowIn = 2|3) nor FRONTEND AND BACKEND (show_in=1)
-                || ($arrInputfield['show_in'] != $intShowIn && $arrInputfield['show_in'] != 1)
+            // skip attributes that are out of scope (frontend/backend)
+            if (
+                // show_in is neither FRONTEND or BACKEND ($intShowIn = 2|3)
+                $arrInputfield['show_in'] != $intShowIn &&
+                // nor FRONTEND AND BACKEND (show_in=1)
+                $arrInputfield['show_in'] != 1
             ) {
                 continue;
             }

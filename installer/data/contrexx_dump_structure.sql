@@ -60,7 +60,8 @@ CREATE TABLE `contrexx_access_user_attribute_value` (
   `value` text NOT NULL,
   PRIMARY KEY (`attribute_id`, `user_id`, `history_id`),
   FULLTEXT KEY `value` (`value`),
-  INDEX `contrexx_access_user_attribute_value_user_id_ibfk` (`user_id`)
+  INDEX `contrexx_access_user_attribute_value_user_id_ibfk` (`user_id`),
+  INDEX `attribute_user_idx` (`attribute_id`, `user_id`)
 ) ENGINE=InnoDB;
 CREATE TABLE `contrexx_access_user_groups` (
   `group_id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -107,7 +108,7 @@ CREATE TABLE `contrexx_access_users` (
   `last_auth` int unsigned NOT NULL DEFAULT '0',
   `last_auth_status` smallint NOT NULL DEFAULT '0',
   `last_activity` int unsigned NOT NULL DEFAULT '0',
-  `email` varchar(255) DEFAULT NULL,
+  `email` varchar(255) NOT NULL,
   `email_access` enum('everyone','members_only','nobody') NOT NULL DEFAULT 'nobody',
   `frontend_lang_id` int unsigned NOT NULL DEFAULT '0',
   `backend_lang_id` int unsigned NOT NULL DEFAULT '0',
@@ -119,7 +120,8 @@ CREATE TABLE `contrexx_access_users` (
   `restore_key_time` int unsigned NOT NULL DEFAULT '0',
   `u2u_active` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
-  KEY `username` (`username`)
+  KEY `username` (`username`),
+  UNIQUE INDEX `UNIQ_7CD32875E7927C74` (`email`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_backend_areas` (
   `area_id` int(6) unsigned NOT NULL AUTO_INCREMENT,
@@ -573,7 +575,8 @@ CREATE TABLE `contrexx_log_entry` (
   UNIQUE KEY `log_version_lookup_idx` (`version`,`object_id`,`object_class`),
   KEY `log_class_lookup_idx` (`object_class`),
   KEY `log_date_lookup_idx` (`logged_at`),
-  KEY `log_user_lookup_idx` (`username`)
+  KEY `log_user_lookup_idx` (`username`),
+  INDEX `log_id_class_lookup_idx` ( `object_id`, `object_class`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_module_block_blocks` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -1128,7 +1131,8 @@ CREATE TABLE `contrexx_module_crm_currency` (
   `hourly_rate` text NOT NULL,
   `default_currency` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `name` (`name`(255))
+  KEY `name` (`name`(255)),
+  FULLTEXT KEY `fulltext` (`name`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_module_crm_customer_comment` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -3139,7 +3143,8 @@ CREATE TABLE `contrexx_module_recommend` (
   `name` varchar(255) NOT NULL DEFAULT '',
   `value` text NOT NULL,
   `lang_id` int(11) NOT NULL DEFAULT '1',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `data` (`name`,`lang_id`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_module_repository` (
   `id` int(6) unsigned NOT NULL AUTO_INCREMENT,

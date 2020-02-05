@@ -350,7 +350,10 @@ class Customer extends \User
     {
         if (isset($active)) {
             // do not change the status of the currently signed-in user
-            if ($this->getId() == \FWUser::getFWUserObject()->objUser->getId()) {
+            if (
+                $this->getId() > 0 &&
+                $this->getId() == \FWUser::getFWUserObject()->objUser->getId()
+            ) {
                 return $this->getActiveStatus();
             }
 

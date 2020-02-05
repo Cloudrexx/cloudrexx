@@ -451,6 +451,9 @@ cx.ready(function () {
                 flash_swf_url: cx.variables.get('basePath', 'contrexx') + 'lib/plupload/js/Moxie.swf',
                 silverlight_xap_url: cx.variables.get('basePath', 'contrexx') + 'lib/plupload/js/Moxie.xap',
                 chunk_size: cx.variables.get('chunk_size', 'mediabrowser'),
+                max_file_size: cx.variables.get('max_file_size', 'mediabrowser'),
+                prevent_duplicates: true,
+                max_retries: 3,
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
                     'Check-CSRF': 'false'

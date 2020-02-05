@@ -337,6 +337,35 @@ class MediaManager extends MediaLibrary
     {
         global $_ARRAYLANG, $objTemplate;
 
+        // drop cache after any modification
+        if (
+            (
+                in_array(
+                    $this->getAct,
+                    array(
+                        'paste',
+                        'ren',
+                        'editImage',
+                        'saveSettings',
+                    )
+                )
+            ) || (
+                $this->getAct == 'newDir' &&
+                isset($_POST['dirName'])
+            ) || (
+                $this->getAct == 'copy' &&
+                isset($_POST['formSelected'])
+            ) || (
+                $this->getAct == 'delete' && (
+                    !empty($this->getFile) ||
+                    isset($_POST['formSelected'])
+                )
+            )
+        ) {
+            // drop complete cache to avoid problems with global placeholders
+            \Cx\Core\Core\Controller\Cx::instanciate()->getComponent('Cache')->clearCache();
+        }
+
         switch($this->getAct) {
             case 'newDir':
                 $this->_createNewDir($_POST['dirName']);
