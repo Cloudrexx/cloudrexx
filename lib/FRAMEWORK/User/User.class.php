@@ -1290,7 +1290,6 @@ class User extends User_Profile
         if (isset($filter) && is_array($filter) && count($filter) || !empty($search)) {
             $sqlCondition = $this->getFilteredUserIdList($filter, $search);
         } elseif (!empty($filter)) {
-            $sqlCondition['tables'] = array();
             $sqlCondition['conditions'] = array('tblU.`id` = '.intval($filter));
             $sqlCondition['group_tables'] = false;
             $limit = 1;
