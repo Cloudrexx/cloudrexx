@@ -944,11 +944,11 @@ class User_Profile_Attribute
 
         if ($this->checkIntegrity()) {
             if ($this->parent_id === 'title' && $this->storeCoreAttributeTitle() ||
-                $this->isCoreAttribute($this->id) && $this->storeCoreAttribute() ||
+                $this->isDefaultAttribute($this->id) && $this->storeCoreAttribute() ||
                 $this->storeCustomAttribute()
             ) {
                 if (preg_match('/^title_[0-9]+$/', $this->id) ||
-                    ($this->isCoreAttribute($this->id) || $this->storeNames()) &&
+                    ($this->isDefaultAttribute($this->id) || $this->storeNames()) &&
                     $this->storeChildrenOrder() &&
                     $this->storeProtection($this->protected, $this->access_id, 'access_id', $this->access_group_ids) &&
                     $this->storeProtection($this->readProtected, $this->readAccessId, 'read_access_id', $this->readAccessGroupIds, 'read')
@@ -1144,7 +1144,7 @@ class User_Profile_Attribute
         $objDatabase = \Cx\Core\Core\Controller\Cx::instanciate()->getDb()->getAdoDb();
         $tableName = 'access_user_attribute';
         $where = $this->id;
-        if ($this->isCoreAttribute($this->id)) {
+        if ($this->isDefaultAttribute($this->id)) {
             $where = '(SELECT `attribute_id` FROM `contrexx_access_user_attribute_name` WHERE `name` = "'. $this->id .'")';
         }
 
@@ -1266,9 +1266,9 @@ class User_Profile_Attribute
 //        return ($this->isCoreAttribute($attributeId) || $this->deleteAttributeContent($attributeId)) && ($this->isCoreAttribute($attributeId) || $this->deleteAttributeNames($attributeId)) && $this->deleteAttributeEntity($attributeId);
 // However, it would be clearer with a few parentheses.
         return
-            (   $this->isCoreAttribute($attributeId)
+            (   $this->isDefaultAttribute($attributeId)
              ||    $this->deleteAttributeContent($attributeId))
-                && ($this->isCoreAttribute($attributeId)
+                && ($this->isDefaultAttribute($attributeId)
              ||    $this->deleteAttributeNames($attributeId))
                 && $this->deleteAttributeEntity($attributeId);
     }
@@ -1519,7 +1519,7 @@ class User_Profile_Attribute
 
     function isRemovable()
     {
-        return !$this->isCoreAttribute($this->id);
+        return !$this->isDefaultAttribute($this->id);
     }
 
 
@@ -1613,7 +1613,7 @@ class User_Profile_Attribute
         return $this->readProtected;
     }
 
-    public function isCoreAttribute($attributeId=null)
+    public function isDefaultAttribute($attributeId=null)
     {
         if (is_null($attributeId)) {
             $attributeId = $this->id;
@@ -1718,7 +1718,7 @@ class User_Profile_Attribute
     {
         $pattern = array();
         foreach ($arrChildOrder as $childId => $orderId) {
-            $this->arrAttributeRelations[$this->id][intval($orderId)] = $this->isCoreAttribute($this->id) && preg_match('#([0-9]+)#', $childId, $pattern) ? $pattern[0] : intval($childId);
+            $this->arrAttributeRelations[$this->id][intval($orderId)] = $this->isDefaultAttribute($this->id) && preg_match('#([0-9]+)#', $childId, $pattern) ? $pattern[0] : intval($childId);
         }
         $this->children = $this->arrAttributeRelations[$this->id];
     }
@@ -1795,7 +1795,7 @@ class User_Profile_Attribute
     {
         global $objDatabase, $_CORELANG;
 
-        if ($this->isCoreAttribute($this->id)) {
+        if ($this->isDefaultAttribute($this->id)) {
             $this->arrName[$langId] = (string)$_CORELANG[$this->arrAttributes[$this->id]['desc']];
         } else {
             $objResult = $objDatabase->SelectLimit('SELECT `name` FROM `'.DBPREFIX.'access_user_attribute_name` WHERE `lang_id` = '.$langId.' AND `attribute_id` = "' . contrexx_raw2db($this->id) . '"', 1);

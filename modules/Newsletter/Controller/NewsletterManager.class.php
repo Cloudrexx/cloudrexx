@@ -5755,7 +5755,7 @@ $WhereStatement = array();
                     $fieldName = $arrWrapperDefinitions[$field]['def'];
                 }
 
-                if ($attr->isCoreAttribute($fieldName) && $recipientType == 'access') {
+                if ($attr->isDefaultAttribute($fieldName) && $recipientType == 'access') {
                     $wrapper = 'core';
                 }
 
@@ -5919,7 +5919,7 @@ $WhereStatement = array();
                     foreach ($arrRecipientFields['list'] as $field) {
                         if ($field == 'title') {
                             $user[$field] = '';
-                        } else if ($attr->isCoreAttribute($field)) {
+                        } else if ($attr->isDefaultAttribute($field)) {
                             $accessField = $field;
                             if (isset($arrWrapperDefinitions[$field])) {
                                 $accessField = $arrWrapperDefinitions[$field]['def'];

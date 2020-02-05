@@ -134,7 +134,7 @@ class User_Profile
                                 (isset($arrDateCombined['d']) ? $arrDateCombined['d'] : $arrDateCombined['j']), // day
                                 (isset($arrDateCombined['Y']) ? $arrDateCombined['Y'] : ($arrDateCombined['y'] + ($arrDateCombined['y'] < 70 ? 2000 : 1900))) // year
                             );
-                        } elseif ($this->objAttribute->isCoreAttribute($attributeId)) {
+                        } elseif ($this->objAttribute->isDefaultAttribute($attributeId)) {
                             $value = '';
                         } else {
                             continue;
@@ -195,7 +195,7 @@ class User_Profile
             foreach ($arrHistoryIds as $historyId) {
                 if (
                        empty($this->arrLoadedUsers[$this->id]['profile'][$attributeId][$historyId])
-                    || $this->objAttribute->isCoreAttribute($attributeId)
+                    || $this->objAttribute->isDefaultAttribute($attributeId)
                        && ($objAttribute = $this->objAttribute->getById($attributeId))
                        && $objAttribute->getType() == 'menu'
                        && $objAttribute->isUnknownOption($this->arrLoadedUsers[$this->id]['profile'][$attributeId][$historyId])
@@ -236,8 +236,8 @@ class User_Profile
                         $value = '"gender_undefined"';
                     }
 
-                    if ($this->objAttribute->isCoreAttribute($attributeId)) {
-                        $attributeId = $this->objAttribute->getAttributeIdByProfileAttributeId($attributeId);
+                    if ($this->objAttribute->isDefaultAttribute($attributeId)) {
+                        $attributeId = $this->objAttribute->getAttributeIdByDefaultAttributeId($attributeId);
                     }
 
                     $query = "REPLACE INTO `".DBPREFIX."access_user_attribute_value` (`user_id`, `attribute_id`, `history_id`, `value`) VALUES (".$this->id.", $attributeId, ".$historyId.", " . $value . ")";
@@ -509,7 +509,7 @@ class User_Profile
 
         $arrConditions = array();
         foreach ($arrFilter as $attribute => $condition) {
-            if (!$this->objAttribute->load($attribute) || $this->objAttribute->isCoreAttribute($attribute)) {
+            if (!$this->objAttribute->load($attribute) || $this->objAttribute->isDefaultAttribute($attribute)) {
                 continue;
             }
 
