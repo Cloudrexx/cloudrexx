@@ -5796,8 +5796,8 @@ $WhereStatement = array();
             $whereStatement['newsletter'][] = '`' . $field . '` LIKE "%' . $keyword .'%"';
 
             // Access users
-            if ($attr->isCoreAttribute($field)) {
-                $fieldId = $attr->getAttributeIdByProfileAttributeId($field);
+            if ($attr->isDefaultAttribute($field)) {
+                $fieldId = $attr->getAttributeIdByDefaultAttributeId($field);
                 $whereStatement['access'][] = '( `cup`.`attribute_id` = ' . $fieldId
                     . ' AND `cup`.`value` LIKE "%' . $keyword .'%" )';
             } else {

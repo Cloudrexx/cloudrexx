@@ -1835,19 +1835,19 @@ class User_Profile_Attribute
 
 
     /**
-     * In the system, the ID of a core attribute is the name of the attribute
-     * (e.g. 'title'). But if we want to interact with the database, the core
+     * In the system, the ID of a default attribute is the name of the attribute
+     * (e.g. 'title'). But if we want to interact with the database, the default
      * attribute is handled like other user attributes. This means we have an
      * integer ID (e.g. 2) and had to track this ID (2) with the system-intern
-     * core attribute ID ('title')
+     * default attribute ID ('title')
      *
-     * This method gives the profile attribute ID (e.g. 'title') by the given
+     * This method gives the default attribute ID (e.g. 'title') by the given
      * user attribute ID (e.g. 2)
      *
-     * @param int $attributeId user attribute ID to identify profile attribute ID
-     * @return string profile attribute ID
+     * @param int $attributeId user attribute ID to identify default attribute ID
+     * @return string default attribute ID
      */
-    public function getProfileAttributeIdByAttributeId($attributeId)
+    public function getDefaultAttributeIdByAttributeId($attributeId)
     {
         $defaultAttributes = $this->getDefaultAttributes();
 
@@ -1859,19 +1859,19 @@ class User_Profile_Attribute
     }
 
     /**
-     * In the system, the ID of a core attribute is the name of the attribute
-     * (e.g. 'title'). But if we want to interact with the database, the core
+     * In the system, the ID of a default attribute is the name of the attribute
+     * (e.g. 'title'). But if we want to interact with the database, the default
      * attribute is handled like other user attributes. This means we have an
      * integer ID (e.g. 2) and had to track this ID (2) with the system-intern
-     * core attribute ID ('title')
+     * default attribute ID ('title')
      *
-     * This method gives the user attribute ID (e.g. 2) by the given profile
+     * This method gives the user attribute ID (e.g. 2) by the given default
      * attribute ID (e.g. 'title')
      *
-     * @param int $profileId profile attribute ID to identify user attribute ID
+     * @param int $defaultId default attribute ID to identify user attribute ID
      * @return string user attribute ID
      */
-    public function getAttributeIdByProfileAttributeId($profileId)
+    public function getAttributeIdByDefaultAttributeId($defaultId)
     {
         $defaultAttributes = $this->getDefaultAttributes();
 
