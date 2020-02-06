@@ -7,7 +7,6 @@ pipelines:
   default:
     - step:
         script:
-          - ci/dependencies.sh
           - apk add --no-cache py-pip bash
           - pip install --no-cache-dir docker-compose
           - docker-compose -v
