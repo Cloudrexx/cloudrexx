@@ -1,15 +1,7 @@
-image: atlassian/default-image:2
-
 pipelines:
   default:
     - step:
         script:
           - docker version
-          - apk add --no-cache py-pip bash
-          - pip install --no-cache-dir docker-compose
-          - docker-compose -v
-          - bash -c "./cx env init --yes --skip-source --skip-scripts"
-          - bash -c "./cx wb test"
-          - bash -c "./cx env down"
         services:
           - docker
