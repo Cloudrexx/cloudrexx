@@ -1629,7 +1629,8 @@ class User_Profile_Attribute
         if (is_null($attributeId)) {
             $attributeId = $this->id;
         }
-        return isset($this->arrDefaultAttributes[$attributeId]);
+
+        return isset($this->arrDefaultAttributeTemplates[$attributeId]);
     }
 
     public function isCustomAttribute($attributeId = null)
