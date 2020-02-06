@@ -7,7 +7,9 @@ pipelines:
           - curl -L https://raw.githubusercontent.com/docker/compose/1.18.0/contrib/completion/bash/docker-compose -o /etc/bash_completion.d/docker-compose
           - chmod +x /usr/local/bin/docker-compose
           - bash -c "./cx env init --yes --skip-source --skip-scripts"
-          - bash -c "./cx wb test"
+          - bash -c "./cx wb test --log-junit ./test-reports/junit.xml"
           - bash -c "./cx env down"
         services:
+          - docker
+        caches:
           - docker
