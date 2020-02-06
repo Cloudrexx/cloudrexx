@@ -91,6 +91,7 @@ class User_Profile_Attribute
     private $arrCustomAttributes;
     private $arrMandatoryAttributes = array();
     private $arrDefaultAttributes = array();
+    private $arrDefaultAttributeNames = array();
 
     private $arrDefaultAttributeTemplates = array(
         'picture' => array(
@@ -537,7 +538,9 @@ class User_Profile_Attribute
         $this->loadCustomAttributes();
         $this->generateAttributeRelations();
         $this->sortChildren();
+       // var_dump($this->arrAttributes);
     }
+
 
     /**
      * Find all default user attributes (DefaultAttributes) and store it in an
@@ -545,45 +548,53 @@ class User_Profile_Attribute
      */
     function loadDefaultAttributes()
     {
-        global $objDatabase, $_CORELANG;
+        global $_CORELANG, $objDatabase;
+
+        $this->arrDefaultAttributeIds = array();
+        $this->arrAttributes = $this->arrDefaultAttributeTemplates;
+        foreach ($this->arrDefaultAttributeTemplates as $attributeId => $arrAttribute) {
+            if (!$arrAttribute['parent_id']) {
+                $this->arrDefaultAttributeIds[] = $attributeId;
+            }
+            $this->arrAttributes[$attributeId]['names'][$this->langId] = isset($_CORELANG[$arrAttribute['desc']]) ? $_CORELANG[$arrAttribute['desc']] : null;
+        }
 
         $query = '
             SELECT 
                 `tblA`.`id` AS `id`, 
                 `tblN`.`name` AS `name`,
-                `tblA`.`parent_id` AS `parentId`
+                `tblA`.`sort_type` AS `sort_type`, 
+                `tblA`.`mandatory` AS `mandatory`,  
+                `tblA`.`order_id` AS `order_id`,  
+                `tblA`.`access_special` AS `access_special`,  
+                `tblA`.`access_id` AS `access_id`,  
+                `tblA`.`read_access_id` AS `read_access_id`
             FROM `' .DBPREFIX .'access_user_attribute` AS `tblA`
             LEFT JOIN `'.DBPREFIX.'access_user_attribute_name` AS `tblN`
                 ON `tblN`.`attribute_id` = `tblA`.`id`
             WHERE `tblA`.`is_default` = 1 
-            AND `tblA`.`parent_id` IS NULL
         ';
 
-        $objAttributes = $objDatabase->Execute($query);
+        $objAttribute = $objDatabase->Execute($query);
 
-        $this->arrAttributes = $this->arrDefaultAttributeTemplates;
-        if ($objAttributes !== false && $objAttributes->RecordCount() > 0) {
-            while (!$objAttributes->EOF) {
-                $attributeId = $objAttributes->fields['id'];
-                $name = $objAttributes->fields['name'];
-                $this->arrDefaultAttributes[$attributeId] = $name;
+        if ($objAttribute !== false && $objAttribute->RecordCount() > 0) {
+            while (!$objAttribute->EOF) {
+                $this->arrDefaultAttributeNames[$objAttribute->fields['id']] = $objAttribute->fields['name'];
 
-                if (!$objAttributes->fields['parentId']) {
-                    $this->arrDefaultAttributeIds[] = $attributeId;
+                $this->arrAttributes[$objAttribute->fields['name']]['mandatory'] = $objAttribute->fields['mandatory'];
+                $this->arrAttributes[$objAttribute->fields['name']]['sort_type'] = $objAttribute->fields['sort_type'];
+                $this->arrAttributes[$objAttribute->fields['name']]['order_id'] = $objAttribute->fields['order_id'];
+                $this->arrAttributes[$objAttribute->fields['name']]['access_special'] = $objAttribute->fields['access_special'];
+                $this->arrAttributes[$objAttribute->fields['name']]['access_id'] = $objAttribute->fields['access_id'];
+                $this->arrAttributes[$objAttribute->fields['name']]['read_access_id'] = $objAttribute->fields['read_access_id'];
+                $this->arrAttributes[$objAttribute->fields['name']]['customizing'] = true;
+                if ($objAttribute->fields['mandatory']) {
+                    $this->arrMandatoryAttributes[] = $objAttribute->fields['name'];
                 }
 
-                if (isset($_CORELANG[$this->arrDefaultAttributeTemplates[$name]['desc']])) {
-                    $this->arrAttributes[$attributeId]['names'][$this->langId] = $_CORELANG[
-                        $this->arrDefaultAttributeTemplates[$name]['desc']
-                    ];
-                } else {
-                    $this->arrAttributes[$attributeId]['names'][$this->langId] = null;
-                }
-
-                $objAttributes->MoveNext();
+                $objAttribute->MoveNext();
             }
         }
-
         $this->loadCoreAttributeCountry();
         $this->loadCoreAttributeTitle();
     }
