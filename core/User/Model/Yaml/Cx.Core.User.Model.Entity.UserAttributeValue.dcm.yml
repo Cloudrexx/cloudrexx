@@ -5,6 +5,8 @@ Cx\Core\User\Model\Entity\UserAttributeValue:
     value:
       columns: [ value ]
       flags: [ fulltext ]
+    attribute_user_idx:
+      columns: [ attribute_id, user_id ]
   fields:
     attributeId:
       id: true
