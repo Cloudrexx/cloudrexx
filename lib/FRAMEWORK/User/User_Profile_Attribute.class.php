@@ -726,9 +726,9 @@ class User_Profile_Attribute
      *
      * @return array value with all profile attributes
      */
-    public function getDefaultAttributes()
+    public function getDefaultAttributeNames()
     {
-        return $this->arrDefaultAttributes;
+        return $this->arrDefaultAttributeNames;
     }
 
     function getTree()
@@ -1839,7 +1839,7 @@ class User_Profile_Attribute
      */
     public function getDefaultAttributeIdByAttributeId($attributeId)
     {
-        $defaultAttributes = $this->getDefaultAttributes();
+        $defaultAttributes = $this->getDefaultAttributeNames();
 
         if (!empty($defaultAttributes[$attributeId])) {
             return $defaultAttributes[$attributeId];
@@ -1863,7 +1863,7 @@ class User_Profile_Attribute
      */
     public function getAttributeIdByDefaultAttributeId($defaultId)
     {
-        $defaultAttributes = $this->getDefaultAttributes();
+        $defaultAttributes = $this->getDefaultAttributeNames();
 
         if (in_array($defaultId, $defaultAttributes)) {
             return array_search($defaultId, $defaultAttributes);
