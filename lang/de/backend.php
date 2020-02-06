@@ -912,8 +912,6 @@ $_ARRAYLANG['TXT_MEDIADIR_MANAGE_CATEGORIES'] = 'Kategorien verwalten';
 $_ARRAYLANG['TXT_MEDIADIR_INTERFACES'] = 'Interfaces';
 $_ARRAYLANG['TXT_MEDIADIR_SETTINGS'] = 'Einstellungen';
 $_ARRAYLANG['TXT_MEDIADIR_MODULE_DESCRIPTION'] = 'Flexibel konfigurierbares Medienverzeichnis.';
-$_ARRAYLANG['TXT_CHECKOUT_MODULE'] = "Online-Zahlung";
-$_ARRAYLANG['TXT_CHECKOUT_MODULE_DESCRIPTION'] = "Einfache Lösung zur Abwicklung von Transaktionen über Yellowpay.";
 $_ARRAYLANG['TXT_FILESHARING_MODULE'] = "Datei Sharing";
 $_ARRAYLANG['TXT_FILESHARING_MODULE_DESCRIPTION'] = "Lade Dateien hoch und gib diese für deine Freunde und Geschäftsfreunde frei.";
 

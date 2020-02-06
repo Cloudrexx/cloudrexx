@@ -1054,43 +1054,6 @@ CREATE TABLE `contrexx_module_calendar_style` (
   `stdCat` text NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB ;
-CREATE TABLE `contrexx_module_checkout_settings_general` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
-  `value` int(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB ;
-CREATE TABLE `contrexx_module_checkout_settings_mails` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `title` text NOT NULL,
-  `content` text NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB ;
-CREATE TABLE `contrexx_module_checkout_settings_yellowpay` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` text NOT NULL,
-  `value` text NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB ;
-CREATE TABLE `contrexx_module_checkout_transactions` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `time` int(10) NOT NULL DEFAULT '0',
-  `status` enum('confirmed','waiting','cancelled') NOT NULL,
-  `invoice_number` varchar(255) NOT NULL,
-  `invoice_currency` int(11) NOT NULL DEFAULT '1',
-  `invoice_amount` int(15) NOT NULL,
-  `contact_title` enum('mister','miss') NOT NULL,
-  `contact_forename` varchar(255) NOT NULL DEFAULT '',
-  `contact_surname` varchar(255) NOT NULL DEFAULT '',
-  `contact_company` varchar(255) NOT NULL DEFAULT '',
-  `contact_street` varchar(255) NOT NULL DEFAULT '',
-  `contact_postcode` varchar(255) NOT NULL DEFAULT '',
-  `contact_place` varchar(255) NOT NULL DEFAULT '',
-  `contact_country` int(11) NOT NULL DEFAULT '204',
-  `contact_phone` varchar(255) NOT NULL DEFAULT '',
-  `contact_email` varchar(255) NOT NULL DEFAULT '',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_module_contact_form` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `mails` text NOT NULL,

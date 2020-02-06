@@ -837,8 +837,6 @@ $_ARRAYLANG['TXT_MEDIADIR_MANAGE_CATEGORIES'] = 'Gérer catégories';
 $_ARRAYLANG['TXT_MEDIADIR_INTERFACES'] = 'Interfaces';
 $_ARRAYLANG['TXT_MEDIADIR_SETTINGS'] = 'Paramètres';
 $_ARRAYLANG['TXT_MEDIADIR_MODULE_DESCRIPTION'] = 'Flexible and customizable media directory.';
-$_ARRAYLANG['TXT_CHECKOUT_MODULE'] = "Online Payment";
-$_ARRAYLANG['TXT_CHECKOUT_MODULE_DESCRIPTION'] = "Easy solution to process transactions on Yellowpay.";
 $_ARRAYLANG['TXT_LICENSE_KEY'] = 'License key';
 $_ARRAYLANG['TXT_LICENSE_KEY_HELP'] = 'Enter here your license key to activate this Cloudrexx© installation.';
 
