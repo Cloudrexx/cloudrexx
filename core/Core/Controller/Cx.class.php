@@ -1406,11 +1406,12 @@ namespace Cx\Core\Core\Controller {
             $objDbUser->setPassword($_DBCONFIG['password']);
 
             // Initialize database connection
-            $this->db = new \Cx\Core\Model\Db($objDb, $objDbUser, $this->getComponent('Cache')->getCacheDriver());
-            $objDatabase = $this->db->getAdoDb();
+            $db = new \Cx\Core\Model\Db($objDb, $objDbUser, $this->getComponent('Cache')->getCacheDriver());
+            $objDatabase = $db->getAdoDb();
             \Env::set('db', $objDatabase);
 
-            $em = $this->db->getEntityManager();
+            $em = $db->getEntityManager();
+            $this->db = $db;
             $pageGuard = new \PageGuard($this->db->getAdoDb());
             \Env::set('pageguard', $pageGuard);
 

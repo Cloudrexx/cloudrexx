@@ -152,6 +152,23 @@ class MediaDirectoryLibrary
         ));
 
         $this->getFrontendLanguages();
+
+        // we need to urlencode() the slash '/' character in slugs
+        // three times.
+        //
+        // 1. urlencode() -> ensures the slash does not slice a slug into
+        //                   two slugs
+        // 2. urlencode() -> escapes the escaped slash again to prevent
+        //                   Apache from blocking the request in case the
+        //                   apache directive 'AllowEncodedSlashes' is set
+        //                   to 'Off'
+        // 3. urlencode() -> escapes the double-escaped slashes a thrid time
+        //                   as PHP will receive the double-escaped slash as
+        //                   decoded slash character which would then be
+        //                   wrongly interpreted as a slug separater.
+        //                   Note that the third escaping in done in method
+        //                   {@see MediaDirectoryLibrary::getSlugFromName()}
+        $this->slugConversions['/'] = urlencode(urlencode('/'));
     }
 
     function checkDisplayduration()
@@ -1004,6 +1021,10 @@ EOF;
 
     public function getNameFromSlug($slug) {
         $slugConversions = array_reverse($this->slugConversions, true);
+        // we need to manually decode the encoded slash character,
+        // as we needed to escaped it (see 3rd time encoding in custructor)
+        // to ensure it won't split the slug up into two slugs
+        $slugConversions['/'] = urldecode($slugConversions['/']);
         return  str_replace($slugConversions, array_keys($slugConversions), $slug);
     }
 

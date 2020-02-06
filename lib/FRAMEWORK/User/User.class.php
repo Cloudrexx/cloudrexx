@@ -688,6 +688,7 @@ class User extends User_Profile
                     return true;
                 } else {
                     $objDatabase->failTrans();
+                    $objDatabase->completeTrans();
                     $this->error_msg[] = sprintf($_CORELANG['TXT_ACCESS_USER_DELETE_FAILED'], $this->username);
                 }
             } else {
