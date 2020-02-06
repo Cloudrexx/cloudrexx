@@ -1311,10 +1311,7 @@ class User extends User_Profile
             }
         }
         try {
-            if (($arrQuery = $this->setSortedUserIdList($arrSort, $sqlCondition, $limit, $offset, $groupless, $crmUser)) === false) {
-                $this->clean();
-                return false;
-            }
+            $arrQuery = $this->setSortedUserIdList($arrSort, $sqlCondition, $limit, $offset, $groupless, $crmUser);
         } catch (\Throwable $e) {
             // catch invalid $filter or $search definitions
             $this->clean();
