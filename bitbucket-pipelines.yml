@@ -6,11 +6,11 @@ options:
 pipelines:
   default:
     - step:
-      script:
-        - ci/dependencies.sh
-        - apk add --no-cache py-pip bash
-        - pip install --no-cache-dir docker-compose
-        - docker-compose -v
-        - bash -c "./cx env init --yes --skip-source --skip-scripts"
-        - bash -c "./cx wb test"
-        - bash -c "./cx env down"
+        script:
+          - ci/dependencies.sh
+          - apk add --no-cache py-pip bash
+          - pip install --no-cache-dir docker-compose
+          - docker-compose -v
+          - bash -c "./cx env init --yes --skip-source --skip-scripts"
+          - bash -c "./cx wb test"
+          - bash -c "./cx env down"
