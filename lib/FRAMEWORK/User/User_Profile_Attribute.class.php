@@ -1645,7 +1645,7 @@ class User_Profile_Attribute
      * @param int $attributeId id to check if it is assigned
      * @return bool if is assigned to an default attribute
      */
-    public function isIdAssignedToDefaultAttribute($attributeId=0) {
+    public function isIdAssignedToDefaultAttribute($attributeId) {
         if (!empty($this->getDefaultAttributeNames()[$attributeId])) {
             return true;
         }
