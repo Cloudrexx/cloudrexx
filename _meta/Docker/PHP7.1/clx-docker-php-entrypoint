@@ -1,0 +1,6 @@
+#!/bin/bash
+
+usermod -u $(stat -c '%u' /var/www/html) www-data
+groupmod -g $(stat -c '%g' /var/www/html) www-data
+
+docker-php-entrypoint "$@"
