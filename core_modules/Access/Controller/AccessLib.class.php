@@ -425,7 +425,7 @@ class AccessLib
             $arrPlaceholders['_VALUE'] = $objAttribute->getMenuOptionValue();
             $arrPlaceholders['_SELECTED'] = $objAttribute->getMenuOptionValue() == $objUser->getProfileAttribute($objAttribute->getParent(), $historyId) ? 'selected="selected"' : '';
 
-            if ($objAttribute->isCoreAttribute() && $objAttribute->isUnknownOption()) {
+            if ($objAttribute->isDefaultAttribute() && $objAttribute->isUnknownOption()) {
                 $objParentAttribute = $objAttribute->getById($objAttribute->getParent());
                 if ($objParentAttribute->isMandatory()) {
                     $arrPlaceholders['_DESC'] = $_CORELANG['TXT_ACCESS_PLEASE_SELECT'];
@@ -1134,7 +1134,7 @@ class AccessLib
                     $childrenCode[] = $this->_getAtrributeCode($objUser, $childAttributeId, $historyId, $edit);
                 }
                 $value = join($childrenCode);
-            } elseif ($objAttribute->isCoreAttribute()) {
+            } elseif ($objAttribute->isDefaultAttribute()) {
                 foreach ($objAttribute->getChildren() as $childAttributeId) {
                     $objChildAtrribute = $objAttribute->getById($childAttributeId);
                     if ($objChildAtrribute->getMenuOptionValue() == $objUser->getProfileAttribute($objAttribute->getId(), $historyId)) {
@@ -1158,7 +1158,7 @@ class AccessLib
         case 'menu_option':
             $mandatory = false;
             $selectOption = false;
-            if ($objAttribute->isCoreAttribute() && $objAttribute->isUnknownOption()) {
+            if ($objAttribute->isDefaultAttribute() && $objAttribute->isUnknownOption()) {
                 $selectOption = true;
                 $objParentAttribute = $objAttribute->getById($objAttribute->getParent());
                 if ($objParentAttribute->isMandatory()) {
