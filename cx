@@ -288,6 +288,7 @@ Available options are:
     --silent                        Do not output non-necessary messages
     --interactive                   Ask for each value instead of using default behavior
     --force-default                 Forces default (/automatic) configuration
+    --no-persist=[<containers>]     Disable persistance of a container. Currently the only value suppored for <containers> is: db
     --db-host=<hostname>            Sets database host to <hostname>
     --db-name=<dbname>              Sets database name to <dbname>
     --db-user=<username>            Sets database user to <username>
@@ -1352,6 +1353,7 @@ function get_config_array {
         ["php-image"]=""
         ["db-image"]=""
         ["is-vhost"]=""
+        ["no-persist"]=""
     )
     if [[ ${ARGUMENTS["force-default"]} != true ]]; then
         CONFIG["db-host"]=$(REGEX="DBCONFIG\['host'\]\ +=\ +(['\"])([^'\"]+)\1;"; CFG=$(cat $CONFIG_FILE); [[ "$CFG" =~ $REGEX ]] && echo "${BASH_REMATCH[2]}")
@@ -1381,6 +1383,11 @@ function get_config_array {
             CONFIG["is-vhost"]=true
         else
             CONFIG["is-vhost"]=false
+        fi
+        if [[ "$(cat $COMPOSE_FILE)" =~ "db-data:" ]]; then
+            CONFIG["no-persist"]=""
+        else
+            CONFIG["no-persist"]="db"
         fi
     fi
     if [[ "${CONFIG["hostname"]}" == "" || "${CONFIG["hostname"]}" == "localhost" ]]; then
@@ -1499,6 +1506,12 @@ function set_config_array {
         FILE_CONTENTS=${FILE_CONTENTS//"<novhost>"/""}
         FILE_CONTENTS=${FILE_CONTENTS//"</novhost>"/""}
         FILE_CONTENTS=$(regex_replace_all "$FILE_CONTENTS" "(()<vhost>[^<]*</vhost>())" "")
+    fi
+    if [[ "${CONFIG["no-persist"]}" =~ "db" ]]; then
+        FILE_CONTENTS=$(regex_replace_all "$FILE_CONTENTS" "(()<persistdb>[^<]*</persistdb>())" "")
+    else
+        FILE_CONTENTS=${FILE_CONTENTS//"<persistdb>"/""}
+        FILE_CONTENTS=${FILE_CONTENTS//"</persistdb>"/""}
     fi
     # save docker-compose.yml
     echo "$FILE_CONTENTS" > docker-compose.yml
