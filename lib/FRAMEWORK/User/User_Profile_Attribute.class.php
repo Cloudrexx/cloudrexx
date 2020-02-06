@@ -90,7 +90,6 @@ class User_Profile_Attribute
     private $arrDefaultAttributeIds;
     private $arrCustomAttributes;
     private $arrMandatoryAttributes = array();
-    private $arrDefaultAttributes = array();
     private $arrDefaultAttributeNames = array();
 
     private $arrDefaultAttributeTemplates = array(
