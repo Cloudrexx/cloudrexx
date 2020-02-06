@@ -280,7 +280,6 @@ class Cache extends \Cx\Core_Modules\Cache\Controller\CacheLib
 
             // here come the modules:
             'Access',
-            'Blog',
             'Calendar' => array(
                 'my_events',
                 'add',
