@@ -786,7 +786,7 @@ class BlockLibrary
                 'category' => $category,
                 'now' => $now,
                 'locale' => $locale,
-            ))
+            ));
         $allBlocks = $q->getQuery()->getResult();
 
         // filter blocks by assigned content page
