@@ -1570,6 +1570,8 @@ INSERT INTO `contrexx_core_setting` (`section`, `name`, `group`, `type`, `value`
 INSERT INTO `contrexx_core_setting` (`section`, `name`, `group`, `type`, `value`, `values`, `ord`) VALUES ('Shop','activate_product_attribute_children','config','checkbox','1','',1);
 INSERT INTO `contrexx_core_setting` (`section`, `name`, `group`, `type`, `value`, `values`, `ord`) VALUES ('Shop','force_select_option','config','checkbox','0','',0);
 INSERT INTO `contrexx_core_setting` (`section`, `name`, `group`, `type`, `value`, `values`, `ord`) VALUES ('Shop','verify_account_email','config','checkbox','1','',1);
+INSERT INTO `contrexx_core_setting` (`section`, `name`, `group`, `type`, `value`, `values`, `ord`) VALUES ('Block','blockGlobalSeperator','setting','text','<br /><br />','',1);
+INSERT INTO `contrexx_core_setting` (`section`, `name`, `group`, `type`, `value`, `values`, `ord`) VALUES ('Block','markParsedBlock','setting','checkbox','','0',2);
 INSERT INTO `contrexx_core_text` (`id`, `lang_id`, `section`, `key`, `text`) VALUES (1,1,'core','core_country_name','Afghanistan');
 INSERT INTO `contrexx_core_text` (`id`, `lang_id`, `section`, `key`, `text`) VALUES (1,1,'Shop','attribute_name','Zusatzleistungen');
 INSERT INTO `contrexx_core_text` (`id`, `lang_id`, `section`, `key`, `text`) VALUES (1,1,'Shop','core_mail_template_bcc','');
@@ -2484,12 +2486,10 @@ INSERT INTO `contrexx_module_block_categories` (`id`, `parent`, `name`, `seperat
 INSERT INTO `contrexx_module_block_categories` (`id`, `parent`, `name`, `seperator`, `order`, `status`) VALUES (2,0,'Startseite','',1,1);
 INSERT INTO `contrexx_module_block_blocks` (`id`, `start`, `end`, `name`, `random`, `random_2`, `random_3`, `random_4`, `global`, `category`, `direct`, `active`, `order`, `cat`, `wysiwyg_editor`) VALUES (30,0,0,'Slide 2',0,0,0,0,0,0,0,1,2,2,1);
 INSERT INTO `contrexx_module_block_blocks` (`id`, `start`, `end`, `name`, `random`, `random_2`, `random_3`, `random_4`, `global`, `category`, `direct`, `active`, `order`, `cat`, `wysiwyg_editor`) VALUES (29,0,0,'Slide 1',0,0,0,0,0,0,0,1,1,2,1);
-INSERT INTO `contrexx_module_block_rel_lang_content` (`block_id`, `lang_id`, `content`, `active`) VALUES (29,1,'<img alt=\"Slider 1\" height=\"500\" src=\"images/content/slideshow/slide_1.jpg\" width=\"1200\" />\r\n<h1>Be<span style=\"color: #0A85C8;\">Successful.</span></h1>\r\n',1);
-INSERT INTO `contrexx_module_block_rel_lang_content` (`block_id`, `lang_id`, `content`, `active`) VALUES (30,1,'<img alt=\"Slider 2\" height=\"500\" src=\"images/content/slideshow/slide_2.jpg\" width=\"1200\" />\r\n<h1>Make<span style=\"color: #0A85C8;\">Solutions.</span></h1>\r\n',1);
-INSERT INTO `contrexx_module_block_rel_lang_content` (`block_id`, `lang_id`, `content`, `active`) VALUES (29,2,'<img alt=\"Slider 1\" height=\"500\" src=\"images/content/slideshow/slide_1.jpg\" width=\"1200\" />\r\n<h1>Be<font color=\"#0A85C8\">Smart.</font></h1>',1);
-INSERT INTO `contrexx_module_block_rel_lang_content` (`block_id`, `lang_id`, `content`, `active`) VALUES (30,2,'<img alt=\"Slider 2\" height=\"500\" src=\"images/content/slideshow/slide_2.jpg\" width=\"1200\" />\r\n<h1>Be<font color=\"#0A85C8\">Sucessful.</font></h1>',1);
-INSERT INTO `contrexx_module_block_settings` (`id`, `name`, `value`) VALUES (1,'blockGlobalSeperator','<br /><br />');
-INSERT INTO `contrexx_module_block_settings` (`id`, `name`, `value`) VALUES (2, 'markParsedBlock', '0');
+INSERT INTO `contrexx_module_block_rel_lang_content` (`id`, `block_id`, `lang_id`, `content`, `active`) VALUES (1, 29,1,'<img alt=\"Slider 1\" height=\"500\" src=\"images/content/slideshow/slide_1.jpg\" width=\"1200\" />\r\n<h1>Be<span style=\"color: #0A85C8;\">Successful.</span></h1>\r\n',1);
+INSERT INTO `contrexx_module_block_rel_lang_content` (`id`, `block_id`, `lang_id`, `content`, `active`) VALUES (2, 30,1,'<img alt=\"Slider 2\" height=\"500\" src=\"images/content/slideshow/slide_2.jpg\" width=\"1200\" />\r\n<h1>Make<span style=\"color: #0A85C8;\">Solutions.</span></h1>\r\n',1);
+INSERT INTO `contrexx_module_block_rel_lang_content` (`id`, `block_id`, `lang_id`, `content`, `active`) VALUES (3, 29,2,'<img alt=\"Slider 1\" height=\"500\" src=\"images/content/slideshow/slide_1.jpg\" width=\"1200\" />\r\n<h1>Be<font color=\"#0A85C8\">Smart.</font></h1>',1);
+INSERT INTO `contrexx_module_block_rel_lang_content` (`id`, `block_id`, `lang_id`, `content`, `active`) VALUES (4, 30,2,'<img alt=\"Slider 2\" height=\"500\" src=\"images/content/slideshow/slide_2.jpg\" width=\"1200\" />\r\n<h1>Be<font color=\"#0A85C8\">Sucessful.</font></h1>',1);
 INSERT INTO `contrexx_module_calendar_category` (`id`, `pos`, `status`) VALUES (46,0,1);
 INSERT INTO `contrexx_module_calendar_category` (`id`, `pos`, `status`) VALUES (49,1,1);
 INSERT INTO `contrexx_module_calendar_category_name` (`cat_id`, `lang_id`, `name`) VALUES (46,1,'Veranstaltungen');
