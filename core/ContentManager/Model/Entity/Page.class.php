@@ -71,7 +71,7 @@ class PageException extends \Exception {
  * @package     cloudrexx
  * @subpackage  core_contentmanager
  */
-class Page extends \Cx\Core_Modules\Widget\Model\Entity\WidgetParseTarget implements \Serializable
+class Page extends \Cx\Core_Modules\Widget\Model\Entity\WidgetParseTarget implements \Serializable, \Gedmo\Loggable\Loggable
 {
     const TYPE_CONTENT = 'content';
     const TYPE_APPLICATION = 'application';
