@@ -995,6 +995,9 @@ class AccessLib
                 onClick="var imageContainer = $J(this).closest(\'.access_image_uploader_container\');
                          imageContainer.find(\'.uploader_rel_field\').val(\'\');
                          imageContainer.find(\'.uploader_rel_field_source\').val(\'\');
+                         imageContainer.find(\'.image_uploader_source_image\')
+                            .attr(\'src\', \''.$imageRepoWeb.'/'.$arrNoImage['src'].'\')
+                            .css({width : \''.$arrNoImage['width'].'px\', height: \''.$arrNoImage['height'].'px\'});
                          $J(this).hide()"
                 title="'.$_CORELANG['TXT_ACCESS_DELETE_IMAGE'].'">
                 <img
@@ -1605,7 +1608,12 @@ JSaccessValidatePrimaryGroupAssociation
     var lastAccessImageUploaderContainer = null;
     function getImageUploader(sourceElm) {
         lastAccessImageUploaderContainer = sourceElm;
-        cx.variables.get('jquery','mediabrowser')('#accessImageUploader').trigger('click');
+        // The uploader replaces the thumbnail using this selector
+        cx.variables.get('jquery','mediabrowser')('#accessImageUploader')
+            .data('thumbSelector',
+                jQuery(sourceElm).find('.image_uploader_source_image')
+            )
+            .trigger('click');
     }
     function accessImageUploaderCallback(callback) {
         if (typeof callback[0] !== 'undefined') {
@@ -1617,7 +1625,6 @@ JSaccessValidatePrimaryGroupAssociation
             uploaderField.find('.uploader_rel_field_remove_icon').show();
         }
     }
-
 // ]]>
 </script>
 JSimageUploaderCode
@@ -2259,6 +2266,7 @@ JS
      */
     public function getImageUploader()
     {
+        $arrSettings = \User_Setting::getSettings();
         // init uploader to upload images
         $uploader = new \Cx\Core_Modules\Uploader\Model\Entity\Uploader();
         $uploader->setCallback('accessImageUploaderCallback');
@@ -2267,6 +2275,14 @@ JS
             'allowed-extensions' => array('jpg', 'jpeg', 'png', 'gif'),
             'style'              => 'display:none',
             'data-upload-limit'  => 1,
+            // Note: You can add a (string) selector here.
+            // However, Access requires the distinct target jQuery element
+            // to be set according to the button clicked.
+            //'data-thumb-selector' => '.image_uploader_source_image',
+            'data-thumb-max-width' =>
+                $arrSettings['max_profile_pic_width']['value'],
+            'data-thumb-max-height' =>
+                $arrSettings['max_profile_pic_height']['value'],
         ));
         $this->attachJavaScriptFunction('imageUploaderCode');
 
@@ -2441,123 +2457,136 @@ JS
                 $filter['frontend_lang_id'] = $langId;
             }
         }
-        $objUser = $objFWUser->objUser->getUsers($filter, null, array('username'), array_keys($arrFields));
+
+        // fetch all ids and load the users individually later to avoid
+        // memory overflow
+        $objUser = $objFWUser->objUser->getUsers($filter, null, array('username'), array('id'));
+        $userIds = array();
         if ($objUser) {
             while (!$objUser->EOF) {
-                // do not export users without any group membership
-                // in frontend export
-                if (
-                    $isFrontend &&
-                    empty($objUser->getAssociatedGroupIds(true))
-                ) {
-                    $objUser->next();
-                    continue;
-                }
-
-                // fetch associated user groups
-                $groups = $this->getGroupListOfUser($objUser);
-
-                // do not export users without any group membership
-                // in frontend export
-                if (
-                    $isFrontend &&
-                    empty($groups)
-                ) {
-                    $objUser->next();
-                    continue;
-                }
-
-                $frontendLangId = $objUser->getFrontendLanguage();
-                if (empty($frontendLangId)) {
-                    $frontendLangId = $objInit->getDefaultFrontendLangId();
-                }
-                $frontendLang = $arrLangs[$frontendLangId]['name']." (".$arrLangs[$frontendLangId]['lang'].")";
-
-                $backendLangId = $objUser->getBackendLanguage();
-                if (empty($backendLangId)) {
-                    $backendLangId = $objInit->getDefaultBackendLangId();
-                }
-                $backendLang = $arrLangs[$backendLangId]['name']." (".$arrLangs[$backendLangId]['lang'].")";
-
-                // active status of user
-                // note: do not output in frontend
-                if (!$isFrontend) {
-                    $activeStatus = $objUser->getActiveStatus() ? $_CORELANG['TXT_YES'] : $_CORELANG['TXT_NO'];
-                    print $this->escapeCsvValue($activeStatus).$csvSeparator;
-                }
-
-                // frontend_lang_id
-                print $this->escapeCsvValue($frontendLang).$csvSeparator;
-
-                // backend_lang_id
-                print $this->escapeCsvValue($backendLang).$csvSeparator;
-
-                // username
-                print $this->escapeCsvValue($objUser->getUsername()).$csvSeparator;
-
-                // email
-                print $this->escapeCsvValue($objUser->getEmail()).$csvSeparator;
-
-                // regdate
-                print $this->escapeCsvValue(date(ASCMS_DATE_FORMAT_DATE, $objUser->getRegistrationDate())).$csvSeparator;
-
-                // user groups
-                print $this->escapeCsvValue(join(',', $groups)).$csvSeparator;
-
-                // profile attributes
-                foreach ($arrProfileFields as $field) {
-                    $value = $objUser->getProfileAttribute($field);
-
-                    switch ($field) {
-                        case 'gender':
-                            switch ($value) {
-                                case 'gender_male':
-                                   $value = $_CORELANG['TXT_ACCESS_MALE'];
-                                break;
-
-                                case 'gender_female':
-                                   $value = $_CORELANG['TXT_ACCESS_FEMALE'];
-                                break;
-
-                                default:
-                                   $value = $_CORELANG['TXT_ACCESS_NOT_SPECIFIED'];
-                                break;
-                            }
-                            break;
-
-                        case 'title':
-                        case 'country':
-                            $title = '';
-                            $value = $objUser->objAttribute->getById($field . '_' . $value)->getName();
-                            break;
-
-                        default:
-                            $objAttribute = $objUser->objAttribute->getById($field);
-                            if (!empty($value) && $objAttribute->getType() == 'date') {
-                                $date = new \DateTime();
-                                $date ->setTimestamp($value);
-                                $value = $date->format(ASCMS_DATE_FORMAT_DATE);
-                            }
-                            if ($objAttribute->getType() == 'menu') {
-                                $option = '';
-                                if (!empty($value)) {
-                                    $objAttributeChild = $objUser->objAttribute->getById($value);
-                                    if (!$objAttributeChild->EOF) {
-                                        $option = $objAttributeChild->getName();
-                                    }
-                                }
-                                $value = $option;
-                            }
-                            break;
-                    }
-                    print $this->escapeCsvValue($value).$csvSeparator;
-                }
-
-                // add line break at end of row
-                print "\n";
-
+                $userIds[] = $objUser->getId();
                 $objUser->next();
             }
+        }
+        foreach ($userIds as $key => $userId) {
+            $objUser = $objFWUser->objUser->getUsers(
+                $userId,
+                null,
+                array('username'),
+                array_keys($arrFields)
+            );
+            // clear cached users to avoid memory overflow
+            $objUser->clearCache();
+
+            // do not export users without any group membership
+            // in frontend export
+            if (
+                $isFrontend &&
+                empty($objUser->getAssociatedGroupIds(true))
+            ) {
+                continue;
+            }
+
+            // fetch associated user groups
+            $groups = $this->getGroupListOfUser($objUser);
+
+            // do not export users without any group membership
+            // in frontend export
+            if (
+                $isFrontend &&
+                empty($groups)
+            ) {
+                continue;
+            }
+
+            $frontendLangId = $objUser->getFrontendLanguage();
+            if (empty($frontendLangId)) {
+                $frontendLangId = $objInit->getDefaultFrontendLangId();
+            }
+            $frontendLang = $arrLangs[$frontendLangId]['name']." (".$arrLangs[$frontendLangId]['lang'].")";
+
+            $backendLangId = $objUser->getBackendLanguage();
+            if (empty($backendLangId)) {
+                $backendLangId = $objInit->getDefaultBackendLangId();
+            }
+            $backendLang = $arrLangs[$backendLangId]['name']." (".$arrLangs[$backendLangId]['lang'].")";
+
+            // active status of user
+            // note: do not output in frontend
+            if (!$isFrontend) {
+                $activeStatus = $objUser->getActiveStatus() ? $_CORELANG['TXT_YES'] : $_CORELANG['TXT_NO'];
+                print $this->escapeCsvValue($activeStatus).$csvSeparator;
+            }
+
+            // frontend_lang_id
+            print $this->escapeCsvValue($frontendLang).$csvSeparator;
+
+            // backend_lang_id
+            print $this->escapeCsvValue($backendLang).$csvSeparator;
+
+            // username
+            print $this->escapeCsvValue($objUser->getUsername()).$csvSeparator;
+
+            // email
+            print $this->escapeCsvValue($objUser->getEmail()).$csvSeparator;
+
+            // regdate
+            print $this->escapeCsvValue(date(ASCMS_DATE_FORMAT_DATE, $objUser->getRegistrationDate())).$csvSeparator;
+
+            // user groups
+            print $this->escapeCsvValue(join(',', $groups)).$csvSeparator;
+
+            // profile attributes
+            foreach ($arrProfileFields as $field) {
+                $value = $objUser->getProfileAttribute($field);
+
+                switch ($field) {
+                    case 'gender':
+                        switch ($value) {
+                            case 'gender_male':
+                               $value = $_CORELANG['TXT_ACCESS_MALE'];
+                            break;
+
+                            case 'gender_female':
+                               $value = $_CORELANG['TXT_ACCESS_FEMALE'];
+                            break;
+
+                            default:
+                               $value = $_CORELANG['TXT_ACCESS_NOT_SPECIFIED'];
+                            break;
+                        }
+                        break;
+
+                    case 'title':
+                    case 'country':
+                        $title = '';
+                        $value = $objUser->objAttribute->getById($field . '_' . $value)->getName();
+                        break;
+
+                    default:
+                        $objAttribute = $objUser->objAttribute->getById($field);
+                        if (!empty($value) && $objAttribute->getType() == 'date') {
+                            $date = new \DateTime();
+                            $date ->setTimestamp($value);
+                            $value = $date->format(ASCMS_DATE_FORMAT_DATE);
+                        }
+                        if ($objAttribute->getType() == 'menu') {
+                            $option = '';
+                            if (!empty($value)) {
+                                $objAttributeChild = $objUser->objAttribute->getById($value);
+                                if (!$objAttributeChild->EOF) {
+                                    $option = $objAttributeChild->getName();
+                                }
+                            }
+                            $value = $option;
+                        }
+                        break;
+                }
+                print $this->escapeCsvValue($value).$csvSeparator;
+            }
+
+            // add line break at end of row
+            print "\n";
         }
 
         throw new \Cx\Core\Core\Controller\InstanceException();

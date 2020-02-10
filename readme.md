@@ -24,7 +24,7 @@ Bugs are tracked on [bugs.cloudrexx.com](http://bugs.cloudrexx.com).
 ## License ##
 Cloudrexx
 [http://www.cloudrexx.com](http://www.cloudrexx.com)
-Cloudrexx AG 2007-2018
+Cloudrexx AG 2007-2019
 
 According to our dual licensing model, this program can be used either under the terms of the GNU Affero General Public License, version 3, or under a proprietary license.
 

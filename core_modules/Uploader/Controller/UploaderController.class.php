@@ -46,15 +46,22 @@ use Cx\Lib\FileSystem\FileSystem;
  */
 class UploaderException extends \Exception {
 
+    /**
+     * Ensures every such exception has a message
+     *
+     * @param int $code One of the UploaderController class constants
+     * @param \Exception $prevEx (optional) Previous exception (if any)
+     */
+    public function __construct($code, \Exception $prevEx = null) {
+        $code = UploaderController::getErrorCode($code);
+        parent::__construct(
+            UploaderController::getErrorMessage($code),
+            $code,
+            $prevEx
+        );
+    }
 }
 
-define('PLUPLOAD_MOVE_ERR', 103);
-define('PLUPLOAD_INPUT_ERR', 101);
-define('PLUPLOAD_OUTPUT_ERR', 102);
-define('PLUPLOAD_TMPDIR_ERR', 100);
-define('PLUPLOAD_TYPE_ERR', 104);
-define('PLUPLOAD_UNKNOWN_ERR', 111);
-define('PLUPLOAD_SECURITY_ERR', 105);
 
 /**
  * Class UploaderController
@@ -64,6 +71,14 @@ define('PLUPLOAD_SECURITY_ERR', 105);
  *              Robin Glauser <robin.glauser@comvation.com>
  */
 class UploaderController {
+
+    const PLUPLOAD_INPUT_ERR = 101;
+    const PLUPLOAD_OUTPUT_ERR = 102;
+    const PLUPLOAD_MOVE_ERR = 103;
+    const PLUPLOAD_TYPE_ERR = 104;
+    const PLUPLOAD_SECURITY_ERR = 105;
+    const PLUPLOAD_TMPDIR_ERR = 100;
+    const PLUPLOAD_UNKNOWN_ERR = 111;
 
     /**
      * Configuration array
@@ -85,40 +100,48 @@ class UploaderController {
      * @var array
      */
     protected static $_errors = array(
-        PLUPLOAD_MOVE_ERR => 'Failed to move uploaded file.',
-        PLUPLOAD_INPUT_ERR => 'Failed to open input stream.',
-        PLUPLOAD_OUTPUT_ERR => 'Failed to open output stream.',
-        PLUPLOAD_TMPDIR_ERR => 'Failed to open temp directory.',
-        PLUPLOAD_TYPE_ERR => 'File type not allowed.',
-        PLUPLOAD_UNKNOWN_ERR => 'Failed due to unknown error.',
-        PLUPLOAD_SECURITY_ERR => 'File didn\'t pass security check.'
+        self::PLUPLOAD_MOVE_ERR => 'Failed to move uploaded file.',
+        self::PLUPLOAD_INPUT_ERR => 'Failed to open input stream.',
+        self::PLUPLOAD_OUTPUT_ERR => 'Failed to open output stream.',
+        self::PLUPLOAD_TMPDIR_ERR => 'Failed to open temp directory.',
+        self::PLUPLOAD_TYPE_ERR => 'File type not allowed.',
+        self::PLUPLOAD_UNKNOWN_ERR => 'Failed due to unknown error.',
+        self::PLUPLOAD_SECURITY_ERR => 'File didn\'t pass security check.',
     );
 
     /**
-     * Retrieve the error code
+     * Retrieve or sanitize the error code
      *
+     * @param int $code (optional) Code to check
      * @return int Error code
      */
-    static function getErrorCode() {
-        if (!self::$_error) {
+    public static function getErrorCode($code = null) {
+        if ($code === null) {
+            $code = static::$_error;
+        }
+        if (!$code) {
             return null;
         }
 
-        if (!isset(self::$_errors[self::$_error])) {
-            return PLUPLOAD_UNKNOWN_ERR;
+        if (!isset(static::$_errors[$code])) {
+            return static::PLUPLOAD_UNKNOWN_ERR;
         }
 
-        return self::$_error;
+        return $code;
     }
 
     /**
      * Retrieve the error message
      *
-     * @return string Error message
+     * @param int $code (optional) Code to get message for
+     * @return string Error message or empty string
      */
-    static function getErrorMessage() {
-        if ($code = self::getErrorCode()) {
-            return self::$_errors[$code];
+    public static function getErrorMessage($code = null) {
+        if ($code === null) {
+            $code = static::getErrorCode();
+        }
+        if ($code) {
+            return static::$_errors[$code];
         }
         return '';
     }
@@ -159,7 +182,7 @@ class UploaderController {
                 if (!empty($_FILES)) {
                     $conf['fileName'] = $_FILES[$conf['file_data_name']]['name'];
                 } else {
-                    throw new UploaderException('', PLUPLOAD_INPUT_ERR);
+                    throw new UploaderException(static::PLUPLOAD_INPUT_ERR);
                 }
             }
 
@@ -185,7 +208,7 @@ class UploaderController {
                     $conf['allow_extensions'] = explode(',', $conf['allow_extensions']);
                 }
                 if (!in_array(strtolower(pathinfo($fileName, PATHINFO_EXTENSION)), $conf['allow_extensions'])) {
-                    throw new UploaderException('', PLUPLOAD_TYPE_ERR);
+                    throw new UploaderException(static::PLUPLOAD_TYPE_ERR);
                 }
             }
 
@@ -208,7 +231,7 @@ class UploaderController {
             if (!$conf['chunks'] || $conf['chunk'] == $conf['chunks'] - 1) {
                 if (is_callable($conf['cb_check_file']) && !call_user_func($conf['cb_check_file'], $tmp_path)) {
                     @unlink($tmp_path);
-                    throw new UploaderException('', PLUPLOAD_SECURITY_ERR);
+                    throw new UploaderException(static::PLUPLOAD_SECURITY_ERR);
                 }
 
                 $new_path = $conf['target_dir'] . $fileName;
@@ -221,27 +244,11 @@ class UploaderController {
 
                 \Cx\Lib\FileSystem\FileSystem::move($tmp_path, $new_path, true);
 
-                $rootPath      = $conf['target_dir'];
-                $rootPathFull  = $new_path;
-                $filePathinfo  = pathinfo($rootPathFull);
-                $fileExtension = $filePathinfo['extension'];
-                $fileNamePlain = $filePathinfo['filename'];
-
+                // verify orientation of images
                 $im = new \ImageManager();
-                if ($im->_isImage($rootPathFull)) {
-                    foreach (
-                        $cx->getMediaSourceManager()
-                            ->getThumbnailGenerator()
-                            ->getThumbnails() as
-                        $thumbnail
-                    ) {
-                        $im->_createThumb(
-                            $rootPath, '', $fileName,
-                            $thumbnail['size'], $thumbnail['quality'],
-                            $fileNamePlain . $thumbnail['value'] . '.'
-                            . $fileExtension
-                        );
-                    }
+                if ($im->_isImage($new_path)) {
+                    // Fix an image orientation
+                    $im->fixImageOrientation($new_path);
                 }
 
                 return array(
@@ -275,22 +282,22 @@ class UploaderController {
 
         $base_dir = dirname($file_path);
         if (!file_exists($base_dir) && !@mkdir($base_dir, 0777, true)) {
-            throw new UploaderException('', PLUPLOAD_TMPDIR_ERR);
+            throw new UploaderException(static::PLUPLOAD_TMPDIR_ERR);
         }
 
         if (!empty($_FILES) && isset($_FILES[$file_data_name])) {
             if ($_FILES[$file_data_name]['error'] || !is_uploaded_file($_FILES[$file_data_name]['tmp_name'])) {
-                throw new UploaderException('', PLUPLOAD_MOVE_ERR);
+                throw new UploaderException(static::PLUPLOAD_MOVE_ERR);
             }
             move_uploaded_file($_FILES[$file_data_name]['tmp_name'], $file_path);
         } else {
             // Handle binary streams
             if (!$in = @fopen('php://input', 'rb')) {
-                throw new UploaderException('', PLUPLOAD_INPUT_ERR);
+                throw new UploaderException(static::PLUPLOAD_INPUT_ERR);
             }
 
             if (!$out = @fopen($file_path, 'wb')) {
-                throw new UploaderException('', PLUPLOAD_OUTPUT_ERR);
+                throw new UploaderException(static::PLUPLOAD_OUTPUT_ERR);
             }
 
             while ($buff = fread($in, 4096)) {
@@ -312,17 +319,17 @@ class UploaderController {
      */
     static function writeChunksToFile($chunk_dir, $file_path) {
         if (!$out = @fopen($file_path, 'wb')) {
-            throw new UploaderException('', PLUPLOAD_OUTPUT_ERR);
+            throw new UploaderException(static::PLUPLOAD_OUTPUT_ERR);
         }
 
         for ($i = 0; $i < self::$conf['chunks']; $i++) {
             $chunk_path = $chunk_dir . DIRECTORY_SEPARATOR . $i;
             if (!file_exists($chunk_path)) {
-                throw new UploaderException('', PLUPLOAD_MOVE_ERR);
+                throw new UploaderException(static::PLUPLOAD_MOVE_ERR);
             }
 
             if (!$in = @fopen($chunk_path, 'rb')) {
-                throw new UploaderException('', PLUPLOAD_INPUT_ERR);
+                throw new UploaderException(static::PLUPLOAD_INPUT_ERR);
             }
 
             while ($buff = fread($in, 4096)) {
@@ -349,34 +356,6 @@ class UploaderController {
         header('Cache-Control: no-store, no-cache, must-revalidate');
         header('Cache-Control: post-check=0, pre-check=0', false);
         header('Pragma: no-cache');
-    }
-
-    /**
-     * Send cors headers
-     *
-     * @param array  $headers
-     * @param string $origin
-     */
-    static function corsHeaders($headers = array(), $origin = '*') {
-        $allow_origin_present = false;
-
-        if (!empty($headers)) {
-            foreach ($headers as $header => $value) {
-                if (strtolower($header) == 'access-control-allow-origin') {
-                    $allow_origin_present = true;
-                }
-                header("$header: $value");
-            }
-        }
-
-        if ($origin && !$allow_origin_present) {
-            header("Access-Control-Allow-Origin: $origin");
-        }
-
-        // other CORS headers if any...
-        if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-            exit; // finish preflight CORS requests here
-        }
     }
 
     /**
@@ -408,7 +387,14 @@ class UploaderController {
      * @return string The sanitized filename
      */
     public static function sanitizeFileName($filename) {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+
+        // 1. transliterate umlauts
+        $filename = $cx->getComponent('LanguageManager')->replaceInternationalCharacters($filename);
+
+        // 2. remove invalid characters
         $filename = FileSystem::replaceCharacters(filter_var($filename,FILTER_SANITIZE_URL));
+
         $fileInfo = pathinfo($filename);
         if (empty($filename)){
             $filename = 'file'.date('Y-m-d H:i:s');
@@ -440,5 +426,4 @@ class UploaderController {
         }
         rmdir($dir);
     }
-
 }

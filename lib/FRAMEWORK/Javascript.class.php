@@ -125,9 +125,9 @@ class JS
                 'cx', // depends on jquery
             ),
             'specialcode'  => "
-Shadowbox.loadSkin('classic', cx.variables.get('basePath', 'contrexx')+'lib/javascript/shadowbox/src/skin/');
-Shadowbox.loadLanguage('en', cx.variables.get('basePath', 'contrexx')+'lib/javascript/shadowbox/src/lang');
-Shadowbox.loadPlayer(['flv', 'html', 'iframe', 'img', 'qt', 'swf', 'wmp'], cx.variables.get('basePath', 'contrexx')+'lib/javascript/shadowbox/src/player');
+Shadowbox.loadSkin('standard', cx.variables.get('basePath', 'contrexx')+'lib/javascript/shadowbox/skin/');
+Shadowbox.loadLanguage('en', cx.variables.get('basePath', 'contrexx')+'lib/javascript/shadowbox/lang');
+Shadowbox.loadPlayer(['flv', 'html', 'iframe', 'img', 'qt', 'swf', 'wmp'], cx.variables.get('basePath', 'contrexx')+'lib/javascript/shadowbox/player');
 cx.jQuery(document).ready(function(){
   Shadowbox.init();
 })"
@@ -333,9 +333,11 @@ Caution: JS/ALL files are missing. Also, this should probably be loaded through 
             'dependencies' => array('jquery'),
             'specialcode'  => '
                 cx.jQuery(document).ready(function() {
-                    if(cx.jQuery(".chzn-select").length > 0) {
-                        cx.jQuery(".chzn-select").chosen({
-                            disable_search: true
+                    if (cx.jQuery(\'.chzn-select\').length > 0) {
+                        cx.jQuery(\'.chzn-select\').each(function(i, e) {
+                            cx.jQuery(e).chosen(
+                                cx.jQuery(e).data()
+                            )
                         });
                     }
                 });'
@@ -578,6 +580,14 @@ Caution: JS/ALL files are missing. Also, this should probably be loaded through 
      * @var array
      */
     private static $registeredJsFiles = array();
+
+    /**
+     * Remembers all css files already added in some way.
+     *
+     * @access protected
+     * @static
+     * @var array
+     */
     protected static $registeredCssFiles = array();
 
     private static $re_name_postfix = 1;
@@ -1026,7 +1036,7 @@ Caution: JS/ALL files are missing. Also, this should probably be loaded through 
      *                  files has been replaced, in case there is a customized
      *                  version available.
      */
-    protected function getRealCssFiles($cssFiles) {
+    protected static function getRealCssFiles($cssFiles) {
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
 
         $files = array();
@@ -1164,7 +1174,7 @@ Caution: JS/ALL files are missing. Also, this should probably be loaded through 
             // The file has already been added to the js list
             if (array_search($file, self::$registeredCssFiles) !== false)
                 continue;
-            self::$registeredCssFiles[] = $file;
+            static::$registeredCssFiles[] = $file;
             $path = '';
 
             if (!preg_match('#^https?://#', $file)) {

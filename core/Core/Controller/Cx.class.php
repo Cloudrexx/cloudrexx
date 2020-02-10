@@ -196,7 +196,7 @@ namespace Cx\Core\Core\Controller {
          * This will be null for all modes except command mode.
          * @var array
          */
-        protected $commands = null;
+        protected $commands = array();
 
         /**
          * Current language id
@@ -539,7 +539,6 @@ namespace Cx\Core\Core\Controller {
         protected $websiteImagesDownloadsPath;
         protected $websiteImagesCalendarPath;
         protected $websiteImagesPodcastPath;
-        protected $websiteImagesBlogPath;
         protected $websiteImagesDataPath;
         protected $websiteMediaForumUploadPath;
         protected $websiteMediaarchive1Path;
@@ -557,7 +556,6 @@ namespace Cx\Core\Core\Controller {
         protected $websiteImagesDownloadsWebPath;
         protected $websiteImagesCalendarWebPath;
         protected $websiteImagesPodcastWebPath;
-        protected $websiteImagesBlogWebPath;
         protected $websiteImagesDataWebPath;
         protected $websiteMediaForumUploadWebPath;
         protected $websiteMediaarchive1WebPath;
@@ -851,15 +849,17 @@ namespace Cx\Core\Core\Controller {
                 // remove CSRF token
                 output_reset_rewrite_vars();
                 echo file_get_contents($offlinePath . '/offline.html');
-                \DBG::msg('Cloudrexx initialization failed! ' . get_class($e) . ': "' . $e->getMessage() . '"');
-                \DBG::msg('In file ' . $e->getFile() . ' on Line ' . $e->getLine());
-                \DBG::dump($e->getTrace());
                 \DBG::msg('GET:');
                 \DBG::dump($_GET);
                 \DBG::msg('POST:');
                 \DBG::dump($_POST);
                 \DBG::msg('COOKIE:');
                 \DBG::dump($_COOKIE);
+                \DBG::msg('SERVER:');
+                \DBG::dump($_SERVER);
+                \DBG::msg('Cloudrexx initialization failed! ' . get_class($e) . ': "' . $e->getMessage() . '"');
+                \DBG::msg('In file ' . $e->getFile() . ' on Line ' . $e->getLine());
+                \DBG::dump($e->getTrace());
                 die();
             }
         }
@@ -1404,11 +1404,12 @@ namespace Cx\Core\Core\Controller {
             $objDbUser->setPassword($_DBCONFIG['password']);
 
             // Initialize database connection
-            $this->db = new \Cx\Core\Model\Db($objDb, $objDbUser, $this->getComponent('Cache')->getCacheDriver());
-            $objDatabase = $this->db->getAdoDb();
+            $db = new \Cx\Core\Model\Db($objDb, $objDbUser, $this->getComponent('Cache')->getCacheDriver());
+            $objDatabase = $db->getAdoDb();
             \Env::set('db', $objDatabase);
 
-            $em = $this->db->getEntityManager();
+            $em = $db->getEntityManager();
+            $this->db = $db;
             $pageGuard = new \PageGuard($this->db->getAdoDb());
             \Env::set('pageguard', $pageGuard);
 
@@ -1589,25 +1590,25 @@ namespace Cx\Core\Core\Controller {
                     parse_str($input, $dataArguments);
                     $dataArguments = contrexx_input2raw($dataArguments);
 
-                    $this->getCommands();
-
                     // find component (defaults to help)
                     $command = current($params);
                     $params = array_slice($params, 1);
+                    $this->getCommands($params, true);
+
                     if (!isset($this->commands[$command])) {
+                        http_response_code(400);
                         echo 'Command \'' . $command . '\' does not exist';
                         $command = 'help';
                     }
 
                     if (!isset($this->commands[$command])) {
-                        throw new \Exception('Command \'' . $command . '\' does not exist');
+                        throw new \Exception(
+                            'Command \'' . $command . '\' does not exist or is not accessible'
+                        );
                     }
 
                     $objCommand = $this->commands[$command];
-                    //Check the access permission for the command.
-                    if(!$objCommand->hasAccessToExecuteCommand($command, $params)) {
-                        throw new \Exception('The command ' . $command . ' has been rejected by not complying to the permission requirements of the requested method.');
-                    }
+
                     // execute command
                     $objCommand->executeCommand($command, $params, $dataArguments);
                     return;
@@ -1744,48 +1745,38 @@ namespace Cx\Core\Core\Controller {
             $this->request->getUrl()->setMode($this->mode);
 
             if ($this->mode == self::MODE_FRONTEND) {
+                $this->resolvedPage = $this->resolver->resolve();
+                return;
+            }
 
-                // TODO: Workaround for upload-component as it is loaded in preResolve-hook.
-                // Remove this workaround once the Upload-component has been replaced
-                // by the new Uploader-component which operates only through JsonData
-                // and does therefore not depend on the resolved page any longer.
-                if (isset($_GET['section']) && $_GET['section'] == 'Upload') {
-                    $this->resolvedPage = new \Cx\Core\ContentManager\Model\Entity\Page();
-                    $this->resolvedPage->setVirtual(true);
-                } else {
-                    $this->resolvedPage = $this->resolver->resolve();
+            global $cmd, $act, $plainCmd;
+
+            // resolve pretty url's
+            $path = preg_replace('#^' . $this->getWebsiteOffsetPath() . '(' . $this->getBackendFolderName() . ')?/#', '', $_GET['__cap']);
+            if ($path != 'index.php' && $path != '') {
+                $path = explode('/', $path, 2);
+                if (!isset($_GET['cmd'])) {
+                    $_REQUEST['cmd'] = $path[0];
+                    $_GET['cmd'] = $_REQUEST['cmd'];
                 }
-
-            } else {
-                global $cmd, $act, $plainCmd;
-
-                // resolve pretty url's
-                $path = preg_replace('#^' . $this->getWebsiteOffsetPath() . '(' . $this->getBackendFolderName() . ')?/#', '', $_GET['__cap']);
-                if ($path != 'index.php' && $path != '') {
-                    $path = explode('/', $path, 2);
-                    if (!isset($_GET['cmd'])) {
-                        $_REQUEST['cmd'] = $path[0];
-                        $_GET['cmd'] = $_REQUEST['cmd'];
+                if (isset($path[1])) {
+                    if (substr($path[1], -1, 1) == '/') {
+                        $path[1] = substr($path[1], 0, -1);
                     }
-                    if (isset($path[1])) {
-                        if (substr($path[1], -1, 1) == '/') {
-                            $path[1] = substr($path[1], 0, -1);
-                        }
-                        if (!isset($_GET['act'])) {
-                            $_REQUEST['act'] = $path[1];
-                            $_GET['act'] = $_REQUEST['act'];
-                        }
+                    if (!isset($_GET['act'])) {
+                        $_REQUEST['act'] = $path[1];
+                        $_GET['act'] = $_REQUEST['act'];
                     }
                 }
+            }
 
-                $this->resolvedPage = new \Cx\Core\ContentManager\Model\Entity\Page();
-                $this->resolvedPage->setVirtual(true);
+            $this->resolvedPage = new \Cx\Core\ContentManager\Model\Entity\Page();
+            $this->resolvedPage->setVirtual(true);
 
-                if (!isset($plainCmd)) {
-                    $cmd = isset($_REQUEST['cmd']) ? $_REQUEST['cmd'] : 'Home';
-                    $act = isset($_REQUEST['act']) ? $_REQUEST['act'] : '';
-                    $plainCmd = $cmd;
-                }
+            if (!isset($plainCmd)) {
+                $cmd = isset($_REQUEST['cmd']) ? $_REQUEST['cmd'] : 'Home';
+                $act = isset($_REQUEST['act']) ? $_REQUEST['act'] : '';
+                $plainCmd = $cmd;
             }
         }
 
@@ -2029,12 +2020,11 @@ namespace Cx\Core\Core\Controller {
          * @todo Remove usage of globals
          * @global array $_CONFIG
          * @global type $themesPages
-         * @global type $objBanner
          * @global type $_CORELANG
          * @return type
          */
         protected function setPostContentLoadPlaceholders() {
-            global $_CONFIG, $themesPages, $objBanner, $_CORELANG;
+            global $_CONFIG, $themesPages, $_CORELANG;
 
             if ($this->mode == self::MODE_BACKEND) {
                 $formattedVersion = htmlentities(
@@ -2128,7 +2118,6 @@ namespace Cx\Core\Core\Controller {
                 'ONLINE_USERS'                   => $objCounter ? $objCounter->getOnlineUsers() : '',
                 'VISITOR_NUMBER'                 => $objCounter ? $objCounter->getVisitorNumber() : '',
                 'COUNTER'                        => $objCounter ? $objCounter->getCounterTag() : '',
-                'BANNER'                         => isset($objBanner) ? $objBanner->getBannerJS() : '',
                 'RANDOM'                         => md5(microtime()),
                 'TXT_SEARCH'                     => $_CORELANG['TXT_SEARCH'],
                 'MODULE_INDEX'                   => MODULE_INDEX,
@@ -2166,21 +2155,28 @@ namespace Cx\Core\Core\Controller {
                                                             s.parentNode.insertBefore(x, s);
                                                         })(document, "script");
                                                     </script>',
-                'GOOGLE_ANALYTICS'               => '<script>
-                                                        var gaProperty = \'' . $googleAnalyticsId . '\';
-                                                        var disableStr = \'ga-disable-\' + gaProperty; 
-                                                        if (document.cookie.indexOf(disableStr + \'=true\') > -1) { 
-                                                            window[disableStr] = true;
-                                                        } 
-                                                        function gaOptout(successMsg) { 
-                                                            document.cookie = disableStr + \'=true; expires=Thu, 31 Dec 2099 23:59:59 UTC; path=/\'; 
-                                                            window[disableStr] = true; 
-                                                            alert(successMsg);
-                                                        }
-                                                        ' . $googleAnalyticsCode . '
-                                                    </script>
-                                                    <script async src=\'https://www.google-analytics.com/analytics.js\'></script>',
             ));
+
+            // Google Analytics will not be parsed in preview
+            if (!isset($_GET['pagePreview']) && !isset($_GET['preview'])) {
+                $this->template->setVariable(
+                    'GOOGLE_ANALYTICS',
+                    '<script>
+                        var gaProperty = \'' . $googleAnalyticsId . '\';
+                        var disableStr = \'ga-disable-\' + gaProperty;
+                        if (document.cookie.indexOf(disableStr + \'=true\') > -1) {
+                            window[disableStr] = true;
+                        }
+                        function gaOptout(successMsg) {
+                            document.cookie = disableStr + \'=true; expires=Thu, 31 Dec 2099 23:59:59 UTC; path=/\';
+                            window[disableStr] = true;
+                            alert(successMsg);
+                        }
+                        ' . $googleAnalyticsCode . '
+                    </script>
+                    <script async src=\'https://www.google-analytics.com/analytics.js\'></script>'
+                );
+            }
         }
 
         /**
@@ -2244,6 +2240,28 @@ namespace Cx\Core\Core\Controller {
                 // fetch the parsed webpage
                 $this->template->setVariable('JAVASCRIPT', 'javascript_inserting_here');
                 $endcode = $this->template->get();
+
+// TODO: The following code should be moved to ComponentController of Wysiwyg component.
+//       To make the following code work in the mentioned controller, we have to
+//       refactor the code of this method (finalize()) first. The functionality of \JS
+//       should also be moved into a proper ComponentController
+                if (strpos($endcode, 'data-shadowbox') !== false) {
+                    $jsCode = <<<JSCODE
+cx.ready(function() {
+    jQuery('img[data-shadowbox]').wrap(function() {
+        return jQuery('<a></a>').attr({
+            href: jQuery(this).attr('data-shadowbox'),
+            class: 'shadowbox'
+        });
+    })
+    if (jQuery('a.shadowbox').length) {
+        Shadowbox.setup(jQuery('a.shadowbox'));
+    }
+});
+JSCODE;
+                    \JS::registerCode($jsCode);
+                    \JS::activate('shadowbox');
+                }
 
                 /**
                  * Get all javascripts in the code, replace them with nothing, and register the js file
@@ -2330,7 +2348,6 @@ namespace Cx\Core\Core\Controller {
                     'CX_VERSION'       => $_CONFIG['coreCmsVersion'],
                     'CX_CODE_NAME'     => $_CONFIG['coreCmsCodeName'],
                     'CX_STATUS'        => $_CONFIG['coreCmsStatus'],
-                    'CX_RELEASE_DATE'  => date(ASCMS_DATE_FORMAT_DATE, $_CONFIG['coreCmsReleaseDate']),
                     'CX_NAME'          => $_CONFIG['coreCmsName'],
                 ));
 
@@ -2481,22 +2498,25 @@ namespace Cx\Core\Core\Controller {
             return $this->ch;
         }
 
-        public function getCommands() {
-                // build command index
-                $componentRepo = $this->getDb()->getEntityManager()->getRepository('Cx\Core\Core\Model\Entity\SystemComponent');
-                $this->commands = array();
-                foreach ($componentRepo->findAll() as $component) {
-                    foreach ($component->getCommandsForCommandMode() as $cmdKey => $cmdValue) {
-                        $command = ($cmdValue && $cmdValue instanceof \Cx\Core_Modules\Access\Model\Entity\Permission) ? $cmdKey : $cmdValue;
-                        if (isset($this->commands[$command])) {
-                            throw new \Exception('Command \'' . $command . '\' is already in index');
-                        }
-                        if (!$component->hasAccessToExecuteCommand($command, array())) {
-                            continue;
-                        }
-                        $this->commands[$command] = $component;
+        public function getCommands($params = array(), $forceRegen = false) {
+            if (count($this->commands) && !$forceRegen) {
+                return $this->commands;
+            }
+            // build command index
+            $componentRepo = $this->getDb()->getEntityManager()->getRepository('Cx\Core\Core\Model\Entity\SystemComponent');
+            $this->commands = array();
+            foreach ($componentRepo->findAll() as $component) {
+                foreach ($component->getCommandsForCommandMode() as $cmdKey => $cmdValue) {
+                    $command = ($cmdValue && $cmdValue instanceof \Cx\Core_Modules\Access\Model\Entity\Permission) ? $cmdKey : $cmdValue;
+                    if (isset($this->commands[$command])) {
+                        throw new \Exception('Command \'' . $command . '\' is already in index');
                     }
+                    if (!$component->hasAccessToExecuteCommand($command, $params)) {
+                        continue;
+                    }
+                    $this->commands[$command] = $component;
                 }
+            }
             return $this->commands;
         }
 
@@ -2810,7 +2830,6 @@ namespace Cx\Core\Core\Controller {
             $this->websiteImagesDownloadsPath   = $this->websiteDocumentRootPath . self::FOLDER_NAME_IMAGES . '/Downloads';
             $this->websiteImagesCalendarPath    = $this->websiteDocumentRootPath . self::FOLDER_NAME_IMAGES . '/Calendar';
             $this->websiteImagesPodcastPath     = $this->websiteDocumentRootPath . self::FOLDER_NAME_IMAGES . '/Podcast';
-            $this->websiteImagesBlogPath        = $this->websiteDocumentRootPath . self::FOLDER_NAME_IMAGES . '/Blog';
             $this->websiteImagesCrmPath         = $this->websiteDocumentRootPath . self::FOLDER_NAME_IMAGES . '/Crm';
             $this->websiteImagesDataPath        = $this->websiteDocumentRootPath . self::FOLDER_NAME_IMAGES . '/Data';
             $this->websiteImagesCrmProfilePath  = $this->websiteImagesCrmPath . '/profile';
@@ -2835,7 +2854,6 @@ namespace Cx\Core\Core\Controller {
             $this->websiteImagesDownloadsWebPath= $this->websiteOffsetPath . self::FOLDER_NAME_IMAGES . '/Downloads';
             $this->websiteImagesCalendarWebPath = $this->websiteOffsetPath . self::FOLDER_NAME_IMAGES . '/Calendar';
             $this->websiteImagesPodcastWebPath  = $this->websiteOffsetPath . self::FOLDER_NAME_IMAGES . '/Podcast';
-            $this->websiteImagesBlogWebPath     = $this->websiteOffsetPath . self::FOLDER_NAME_IMAGES . '/Blog';
             $this->websiteImagesCrmWebPath      = $this->websiteOffsetPath . self::FOLDER_NAME_IMAGES . '/Crm';
             $this->websiteImagesDataWebPath     = $this->websiteOffsetPath . self::FOLDER_NAME_IMAGES . '/Data';
             $this->websiteImagesCrmProfileWebPath = $this->websiteImagesCrmWebPath . '/profile';
@@ -3033,22 +3051,6 @@ namespace Cx\Core\Core\Controller {
         public function getWebsiteImagesAttachWebPath()
         {
             return $this->websiteImagesAttachWebPath;
-        }
-
-        /**
-         * @return string
-         */
-        public function getWebsiteImagesBlogPath()
-        {
-            return $this->websiteImagesBlogPath;
-        }
-
-        /**
-         * @return string
-         */
-        public function getWebsiteImagesBlogWebPath()
-        {
-            return $this->websiteImagesBlogWebPath;
         }
 
         /**

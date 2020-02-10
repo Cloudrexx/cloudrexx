@@ -220,7 +220,7 @@ class NewsletterLib
             ),
             array(
                 'code' => $code,
-                'mail' => urlencode($email),
+                'mail' => $email,
             )
         );
 
@@ -256,7 +256,7 @@ class NewsletterLib
             ),
             array(
                 'code' => $code,
-                'mail' => urlencode($email),
+                'mail' => $email,
             )
         );
         if ($htmlTag) {
@@ -387,6 +387,13 @@ class NewsletterLib
                   LEFT JOIN `%1$smodule_newsletter_rel_user_cat` AS `rc`
                     ON `rc`.`user` = `nu`.`id`
                  WHERE `rc`.`category`=%2$s
+                    AND (
+                        nu.source != "opt-in"
+                        OR (
+                            nu.source = "opt-in"
+                            AND nu.consent IS NOT NULL
+                        )
+                    )
                  UNION DISTINCT
                 SELECT `email`
                   FROM `%1$saccess_users` AS `cu`
@@ -700,8 +707,14 @@ class NewsletterLib
         return false;
     }
 
-
-    function _getSettings()
+    /**
+     * This is a workaround for PHP 7 compatability.
+     * As the method _getSettings was used in mixed scope.
+     *
+     * @todo Refactor settings handling of component by migrating
+     *       to \Cx\Setting
+     */
+    public static function getSettings()
     {
         global $objDatabase;
 
@@ -721,6 +734,19 @@ class NewsletterLib
             }
         }
         return $arrSettings;
+    }
+
+
+    /**
+     * This is a workaround for PHP 7 compatability.
+     * As the method _getSettings was used in mixed scope.
+     *
+     * @todo Refactor settings handling of component by migrating
+     *       to \Cx\Setting
+     */
+    function _getSettings()
+    {
+        return static::getSettings();
     }
 
 
@@ -1052,7 +1078,7 @@ class NewsletterLib
     {
         global $objDatabase;
 
-        $arrSettings = static::_getSettings();
+        $arrSettings = static::getSettings();
         if (!$arrSettings['statistics']['setvalue']) {
             return $MailHtmlContent;
         }

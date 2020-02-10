@@ -80,6 +80,17 @@ class Cache extends \Cx\Core_Modules\Cache\Controller\CacheLib
         $this->initContrexxCaching();
     }
 
+    /**
+     * @see ComponentController::forceUserbasedPageCache()
+     */
+    public function addException($componentOrCallback, $additionalInfo = array()) {
+        if (is_string($componentOrCallback) && count($additionalInfo)) {
+            $this->exceptions[$componentOrCallback] = $additionalInfo;
+        } else {
+            $this->exceptions[] = $componentOrCallback;
+        }
+    }
+
     protected function initContrexxCaching()
     {
         global $_CONFIG;
@@ -94,19 +105,20 @@ class Cache extends \Cx\Core_Modules\Cache\Controller\CacheLib
             return;
         }
 
-        // @todo: A component should have a possibility to add caching exceptions
+        // @todo: Solve using ComponentController::addException()
         if (isset($_GET['templateEditor']) && $_GET['templateEditor'] == 1) {
             $this->boolIsEnabled = false;
             return;
         }
 
-        // @todo: A component should have a possibility to add caching exceptions
+        // @todo: Solve using ComponentController::addException()
         if (isset($_GET['pagePreview'])) {
             $this->boolIsEnabled = false;
             return;
         }
 
         // Since FE does not yet support caching, we disable it when FE is active
+        // @todo: Solve using ComponentController::addException()
         if (isset($_COOKIE['fe_toolbar']) && $_COOKIE['fe_toolbar'] == 'true') {
             $this->boolIsEnabled = false;
             return;
@@ -180,7 +192,7 @@ class Cache extends \Cx\Core_Modules\Cache\Controller\CacheLib
                 $headers = unserialize(file_get_contents($headerFile));
                 if (is_array($headers)) {
                     foreach ($headers as $name=>$value) {
-                        if ($name == static::HTTP_STATUS_CODE_HEADER) {
+                        if (strtolower($name) == strtolower(static::HTTP_STATUS_CODE_HEADER)) {
                             http_response_code(intval($value));
                             continue;
                         }
@@ -191,7 +203,7 @@ class Cache extends \Cx\Core_Modules\Cache\Controller\CacheLib
                         }
                         // If expire header is set, check if the cache
                         // is still valid
-                        if ($name == 'Expires') {
+                        if (strtolower($name) == 'expires') {
                             $expireDate = new \DateTime($value);
                             if ($expireDate < new \DateTime()) {
                                 // cache is no longer valid
@@ -252,10 +264,7 @@ class Cache extends \Cx\Core_Modules\Cache\Controller\CacheLib
 
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         
-        $this->exceptions = array(
-            // never cache errors
-            'Error', 
-
+        $this->exceptions += array(
             // never cache when caching is disabled
             function($cx, $page) {
                 return !$this->boolIsEnabled;
@@ -271,7 +280,6 @@ class Cache extends \Cx\Core_Modules\Cache\Controller\CacheLib
 
             // here come the modules:
             'Access',
-            'Blog',
             'Calendar' => array(
                 'my_events',
                 'add',
@@ -280,9 +288,7 @@ class Cache extends \Cx\Core_Modules\Cache\Controller\CacheLib
                 'sign',
                 'success',
             ),
-            'Checkout',
             'Crm',
-            'Data',
             'Directory',
             'DocSys',
             'Downloads',
@@ -302,11 +308,6 @@ class Cache extends \Cx\Core_Modules\Cache\Controller\CacheLib
                 },
             ),
             'Market',
-            'Media',
-            'Media1',
-            'Media2',
-            'Media3',
-            'Media4',
             'MediaDir' => array(
                 'latest',
                 'popular',
@@ -319,11 +320,6 @@ class Cache extends \Cx\Core_Modules\Cache\Controller\CacheLib
             'MemberDir',
             'News' => array(
                 'submit',
-            ),
-            'Newsletter' => array(
-                function($page) {
-                    return $page->getCmd() == 'profile' && $_SERVER['REQUEST_METHOD'] != 'POST';
-                },
             ),
             'Podcast',
             'Shop',
@@ -362,7 +358,7 @@ class Cache extends \Cx\Core_Modules\Cache\Controller\CacheLib
      */
     public function writeCacheFileForRequest($page, $headers, $endcode, $forceUserbased = false) {
         $userbased = $forceUserbased;
-        $pageId = '';
+        $pageId = '0';
         if ($page) {
             $pageId = $page->getId();
             if ($page->isFrontendProtected()) {

@@ -87,6 +87,11 @@ class ApiResponse extends \Cx\Model\Base\EntityBase implements \JsonSerializable
     protected $statusCode = 0;
 
     /**
+     * @var array Additional MetaData to add to API
+     */
+    protected $metaData = array();
+
+    /**
      * @var two dimensional array: $messages[<type>][] = <messageText>
      */
     protected $messages = array();
@@ -104,11 +109,12 @@ class ApiResponse extends \Cx\Model\Base\EntityBase implements \JsonSerializable
      * @param array $messages (optional) two dimensional array: $messages[<type>][] = <messageText>
      * @param array $data (optional) Set of data
      */
-    public function __construct($status = '', $messages = array(), $data = array()) {
+    public function __construct($status = '', $messages = array(), $data = array(), $metaData = array()) {
         $this->request = $this->cx->getRequest();
         $this->status = $status;
         $this->messages = $messages;
         $this->data = $data;
+        $this->metaData = $metaData;
     }
 
     /**
@@ -129,6 +135,22 @@ class ApiResponse extends \Cx\Model\Base\EntityBase implements \JsonSerializable
      */
     public function setData($data) {
         $this->data = $data;
+    }
+
+    /**
+     * Set a array with metadata for the API
+     * @param array $metaData Data to pass in metadata field
+     */
+    public function setMetadata(array $metaData) {
+        $this->metaData = $metaData;
+    }
+
+    /**
+     * Get the array with the metadata
+     * @return array Data passed as metadata
+     */
+    public function getMetadata(): array {
+        return $this->metaData;
     }
 
     /**
@@ -222,13 +244,12 @@ class ApiResponse extends \Cx\Model\Base\EntityBase implements \JsonSerializable
      * @return array Array representation of this object
      */
     public function jsonSerialize() {
+        $this->metaData['request'] = $this->request;
         return array(
             'status' => $this->status,
-            'meta' => array(
-                'request' => $this->request,
-            ),
+            'meta' => $this->metaData,
             'messages' => $this->messages,
-            'data' => $this->data,
+            'data' => (object) $this->data,
         );
     }
 

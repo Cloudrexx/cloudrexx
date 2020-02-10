@@ -463,6 +463,8 @@ cx.ready(function() {
         var elements = cx.jQuery("[form=" + formId + "]").filter("select,input,textarea").not("[type=button]").not("[type=submit]");
         var vgId = jQuery("#" + formId).data("vg-id");
         var url = cx.tools.decodeURI(document.location.href);
+        // drop paging param from url to show the first page of the results
+        url = url.replace(/pos=[0-9]+&?/, "");
         var attrGroups = {}
         elements.each(function(index, el) {
             el = cx.jQuery(el);
@@ -525,7 +527,7 @@ cx.ready(function() {
     cx.jQuery(".vg-searchSubmit").filter("a,input").click(getSubmitHandler);
     
     (function() {
-        var url = cx.tools.decodeURI(document.location.href);
+        var url = decodeURIComponent(document.location.href);
         var parts = JavaSplit(url, "?", 2);
         if (parts.length < 2) {
             return;

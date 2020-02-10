@@ -126,7 +126,10 @@ class DoctrineRepository extends DataSource {
                 if ($operation == 'in') {
                     $value = explode(',', $value);
                 }
-                $criteria[$field] = array($operation => $value);
+                if (!isset($criteria[$field])) {
+                    $criteria[$field] = array();
+                }
+                $criteria[$field][$operation] = $value;
             }
         }
 
@@ -219,6 +222,10 @@ class DoctrineRepository extends DataSource {
             array(
                 'recursions' => $configuredRecursions,
                 'skipVirtual' => true,
+                'dateFormatDatetime' => 'c',
+                'dateFormatTimestamp' => 'c',
+                'dateFormatDate' => ASCMS_DATE_FORMAT_INTERNATIONAL_DATE,
+                'dateFormatTime' => ASCMS_DATE_FORMAT_INTERNATIONAL_TIME,
             )
         );
         if (count($fieldList)) {
@@ -337,7 +344,7 @@ class DoctrineRepository extends DataSource {
         $em = $this->cx->getDb()->getEntityManager();
         $repo = $this->getRepository();
 
-        $entity = $repo->findBy($elementId);
+        $entity = $repo->findOneBy($elementId);
 
         if (!$entity) {
             throw new \Exception('Entry not found!');
@@ -359,7 +366,7 @@ class DoctrineRepository extends DataSource {
         $em = $this->cx->getDb()->getEntityManager();
         $repo = $this->getRepository();
 
-        $entity = $repo->findBy($elementId);
+        $entity = $repo->findOneBy($elementId);
 
         if (!$entity) {
             throw new \Exception('Entry not found!');
@@ -403,13 +410,26 @@ class DoctrineRepository extends DataSource {
             }
 
             $fieldDefinition = $entityClassMetadata->getFieldMapping($name);
-            if ($fieldDefinition['type'] == 'datetime') {
-                $data[$name] = new \DateTime($data[$name]);
-            } elseif ($fieldDefinition['type'] == 'array') {
-                // verify that the value is actually an array -> prevent to store other php data
-                if (!is_array($data[$name])) {
-                    $data[$name] = array();
-                }
+            switch ($fieldDefinition['type']) {
+                case 'datetime':
+                case 'timestamp':
+                case 'date':
+                case 'time':
+                    if (!$data[$name]) {
+                        // Empty values must be NULL, or Doctrine will fail
+                        $data[$name] = null;
+                    }
+                    if ($data[$name] && !($data[$name] instanceof \DateTime)) {
+                        // Throws on invalid input
+                        $data[$name] = new \DateTime($data[$name]);
+                    }
+                    break;
+                case 'array':
+                    // verify that the value is actually an array -> prevent to store other php data
+                    if (!is_array($data[$name])) {
+                        $data[$name] = array();
+                    }
+                    break;
             }
 
             $fieldSetMethodName = 'set'.preg_replace('/_([a-z])/', '\1', ucfirst($name));
@@ -425,11 +445,17 @@ class DoctrineRepository extends DataSource {
             }
             // handle many to many relations
             if ($associationMapping['type'] == \Doctrine\ORM\Mapping\ClassMetadata::MANY_TO_MANY) {
+                // todo: handle or document this case
+                if (is_array($data[$field])) {
+                    continue;
+                }
+
                 // prepare data
                 $foreignEntityIndexes = explode(',', $data[$field]);
                 $targetRepo = $em->getRepository($associationMapping['targetEntity']);
                 $primaryKeys = $entityClassMetadata->getIdentifierFieldNames();
                 $addMethod = 'add'.preg_replace('/_([a-z])/', '\1', ucfirst($field));
+                $getMethod = 'get'.preg_replace('/_([a-z])/', '\1', ucfirst($field));
                 // foreach distant entity
                 foreach ($foreignEntityIndexes as $foreignEntityIndex) {
                     // prepare data
@@ -452,6 +478,12 @@ class DoctrineRepository extends DataSource {
                             'Entity not found (' . $associationMapping['targetEntity'] . ' with ID ' . var_export($foreignEntityIndexData, true) . ')'
                         );
                     }
+                    $existingAssociatedEntities = $entity->$getMethod();
+                    foreach ($existingAssociatedEntities as $existingAssociatedEntity) {
+                        if ($targetEntity == $existingAssociatedEntity) {
+                            continue 2;
+                        }
+                    }
                     $entity->$addMethod($targetEntity);
                 }
             } else if (
@@ -473,5 +505,40 @@ class DoctrineRepository extends DataSource {
                 $entity->$setMethod($targetEntity);
             }
         }
+    }
+
+    /**
+     * Check if the DataSource is Gedmo\Loggable.
+     *
+     * @inheritDoc
+     */
+    public function isVersionable() : bool {
+        return is_a($this->getIdentifier(), '\Gedmo\Loggable\Loggable', true);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getCurrentVersion(array $elementId) : int {
+        $em = $this->cx->getDb()->getEntityManager();
+
+        $logRepo = $em->getRepository(
+            $this->cx->getDb()->getLoggableListener()->getLogEntryClassForEntityClass(
+                $this->getIdentifier()
+            )
+        );
+
+        $entity = $logRepo->findOneBy(
+            array(
+                'objectId' => $elementId,
+                'objectClass' => ltrim($this->getIdentifier(), '/'),
+            ),
+            array(
+                'version' => DESC,
+            )
+        );
+
+        //since we select one entry, we can get the version number of the first entry in our array
+        return $entity->getVersion();
     }
 }

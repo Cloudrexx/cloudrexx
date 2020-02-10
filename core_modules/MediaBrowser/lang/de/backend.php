@@ -38,7 +38,7 @@
 global $_ARRAYLANG;
 // Let's start with module info:
 $_ARRAYLANG['TXT_CORE_MODULE_MEDIABROWSER'] = 'MediaBrowser';
-$_ARRAYLANG['TXT_CORE_MODULE_MEDIABROWSER_DESCRIPTION'] = 'To manage files and sites innovative.';
+$_ARRAYLANG['TXT_CORE_MODULE_MEDIABROWSER_DESCRIPTION'] = 'Stellt den Zugriff auf verschiedene Datenablagen bereit.';
 // Here come the ACTs:
 $_ARRAYLANG['TXT_CORE_MODULE_MEDIABROWSER_ACT_DEFAULT'] = 'Modal Tests';
 $_ARRAYLANG['TXT_CORE_MODULE_MEDIABROWSER_ACT_BROWSER'] = 'MediaBrowser';
@@ -74,7 +74,6 @@ $_ARRAYLANG['TXT_FILEBROWSER_MEDIA_4'] = "Medienarchiv #4";
 $_ARRAYLANG['TXT_FILEBROWSER_FILES'] = "Dateien";
 $_ARRAYLANG['TXT_FILEBROWSER_WEBPAGES'] = "Webseiten";
 $_ARRAYLANG['TXT_FILEBROWSER_PREVIEW'] = "Vorschau";
-$_ARRAYLANG['TXT_FILEBROWSER_BLOG'] = "Blog";
 $_ARRAYLANG['TXT_FILEBROWSER_PODCAST'] = "Podcast";
 $_ARRAYLANG['TXT_FILEBROWSER_UPLOAD_FILE_MULTI'] = "Datei(en) hinaufladen";
 $_ARRAYLANG['TXT_FILEBROWSER_MEDIADIR'] = "Medien Verzeichnis";

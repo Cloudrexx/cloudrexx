@@ -32,10 +32,11 @@
  * @package     cloudrexx
  * @subpackage  module_jobs
  */
-$_ARRAYLANG['TXT_CATEGORY_MANAGER'] = "Categor&iacute;as";
+$_ARRAYLANG['TXT_MODULE_JOBS_ACT_CAT'] = "Categor&iacute;as";
+$_ARRAYLANG['TXT_MODULE_JOBS_ACT_LOC'] = "Regiones";
+$_ARRAYLANG['TXT_MODULE_JOBS_ACT_ADD'] = "Nueva";
+$_ARRAYLANG['TXT_MODULE_JOBS_ACT_DEFAULT'] = "General";
 $_ARRAYLANG['TXT_JOBS_MANAGER'] = "Ofertas de trabajo";
-$_ARRAYLANG['TXT_CREATE_DOCUMENT'] = "Nueva";
-$_ARRAYLANG['TXT_JOBS_MENU_OVERVIEW'] = "General";
 $_ARRAYLANG['TXT_AUTHOR'] = "Autor";
 $_ARRAYLANG['TXT_DATE'] = "Fecha";
 $_ARRAYLANG['TXT_EDIT_DOCUMENTS'] = "editar oferta";
@@ -103,7 +104,6 @@ $_ARRAYLANG['TXT_JOBS_AVAILABLE_LOCATIONS'] = "Regiones disponibles";
 $_ARRAYLANG['TXT_JOBS_LOCATIONS_NOT_ASSIGNED'] = "No ha sido posible asignar las regiones";
 $_ARRAYLANG['TXT_JOBS_LOCATION_NOT_DELETED'] = "Las regiones asignadas no pueden ser eliminadas.";
 $_ARRAYLANG['TXT_JOBS_SHOW_LOCATION_FE'] = "Proporcionar regiones para la selecci&oacute;n";
-$_ARRAYLANG['TXT_LOCATION_MANAGER'] = "Regiones";
 $_ARRAYLANG['TXT_LOCATION'] = "Regiones";
 $_ARRAYLANG['TXT_JOBS_WORK_START_NOW'] = "ahora";
 $_ARRAYLANG['TXT_JOBS_SETTINGS'] = "Propiedades";

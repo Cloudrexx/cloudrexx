@@ -86,7 +86,7 @@ class EntityBase {
      * )
      * @var array
      */
-    protected $validators = null;
+    protected $validators = array();
 
     /**
      * Defines if an entity is virtual and therefore not persistable.
@@ -147,25 +147,35 @@ class EntityBase {
     }
 
     /**
+     * Set $this->validators
+     *
+     * Validators can be found in lib/FRAMEWORK/Validator.class.php
+     * These will be executed if validate() is called
+     */
+    public function initializeValidators() { }
+
+    /**
      * @throws ValidationException
      * @prePersist
      */
     public function validate() {
-        if(!$this->validators)
+        $this->initializeValidators();
+
+        if (!count($this->validators)) {
             return;
+        }
 
         $errors = array();
-        foreach($this->validators as $field => $validator) {
+        foreach ($this->validators as $field => $validator) {
             $methodName = 'get'.ucfirst($field);
             $val = $this->$methodName();
-            if($val) {
-                if(!$validator->isValid($val)) {
-                     $errors[$field] = $validator->getMessages();
-                }
+            if (!$validator->isValid($val)) {
+                 $errors[$field] = $validator->getMessages();
             }
         }
-        if(count($errors) > 0)
+        if (count($errors) > 0) {
             throw new ValidationException($errors);
+        }
     }
 
     /**

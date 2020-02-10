@@ -643,14 +643,15 @@ class BlockLibrary
     {
         $now = time();
 
-        $em = \Cx\Core\Core\Controller\Cx::instanciate()->getDb()->getEntityManager();
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
         $localeRepo = $em->getRepository('\Cx\Core\Locale\Model\Entity\Locale');
         $locale = $localeRepo->findOneBy(array('id' => FRONTEND_LANG_ID));
 
         $qb = $em->createQueryBuilder();
         $orX = $qb->expr()->orX();
         $qb2 = $em->createQueryBuilder();
-        $allBlocks = $qb->select('b')
+        $q = $qb->select('b')
             ->from('\Cx\Modules\Block\Model\Entity\Block', 'b')
             ->from('\Cx\Modules\Block\Model\Entity\RelLangContent', 'rlc')
             ->where('b = :block')
@@ -669,17 +670,27 @@ class BlockLibrary
                 ))
             )*/
             ->andWhere('rlc.block = b')
-            ->andWhere('(rlc.locale = :locale AND rlc.active = 1)')
-            ->andWhere('(b.start <= :now OR b.start = 0)')
-            ->andWhere('(b.end >= :now OR b.end = 0)')
-            ->andWhere('b.active = 1')
-            ->setParameters(array(
+            ->andWhere('(rlc.locale = :locale AND rlc.active = 1)');
+
+        // Note: This is a workaround as content panes are no real widgets yet.
+        //
+        // In case the frontend editing is not in use
+        // then we can always load the content pane.
+        // The JsonData adapter will then decide if the content pane is active or not.
+        // The check for frontend editing is required, as otherwise the frontend editing
+        // would inject an empty DIV element in  case the content pane is inactive.
+        if ($cx->getComponent('FrontendEditing')->frontendEditingIsActive(false, false)) {
+            $q->andWhere('(b.start <= :now OR b.start = 0)')
+                ->andWhere('(b.end >= :now OR b.end = 0)')
+                ->andWhere('b.active = 1');
+        }
+        // End of workaround
+        $q->setParameters(array(
                 'block' => $block,
                 'locale' => $locale,
                 'now' => $now,
-            ))
-            ->getQuery()
-            ->getResult();
+            ));
+        $allBlocks = $q->getQuery()->getResult();
 
         // filter blocks by assigned content page
         $blocks = array();
@@ -722,14 +733,15 @@ class BlockLibrary
     {
         $now = time();
 
-        $em = \Cx\Core\Core\Controller\Cx::instanciate()->getDb()->getEntityManager();
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
         $localeRepo = $em->getRepository('\Cx\Core\Locale\Model\Entity\Locale');
         $locale = $localeRepo->findOneBy(array('id' => FRONTEND_LANG_ID));
 
         $qb = $em->createQueryBuilder();
         $orX = $qb->expr()->orX();
         $qb2 = $em->createQueryBuilder();
-        $allBlocks = $qb->select('b')
+        $q = $qb->select('b')
             ->from('\Cx\Modules\Block\Model\Entity\Block', 'b')
             ->innerJoin('\Cx\Modules\Block\Model\Entity\RelLangContent', 'rlc', 'WITH', 'rlc.block = b')
             ->where('b.category = :category')
@@ -745,19 +757,37 @@ class BlockLibrary
                         ->getDQL()
                         ->getSingleResult()[1] . ' > 0'
                 ))
-            )*/
-            ->andWhere('b.active = 1')
-            ->andWhere('(b.start <= :now OR b.start = 0)')
-            ->andWhere('(b.end >= :now OR b.end = 0)')
-            ->andWhere('(rlc.locale = :locale AND rlc.active = 1)')
+            )*/;
+
+        // Note: This is a workaround as content panes are no real widgets yet.
+        //
+        // In case the frontend editing is not in use and there
+        // is no content pane separator for the category defined,
+        // then we can load all content panes into the template at once.
+        // The JsonData adapter will then decide which content panes to display and
+        // which not.
+        // The check for frontend editing is required, as otherwise the frontend editing
+        // would inject empty DIV elements for non-active content panes.
+        // The check for the content pane separator is required, as otherwise
+        // the system would output the separator for each non-active content pane.
+        if (
+            $cx->getComponent('FrontendEditing')->frontendEditingIsActive(false, false) ||
+            $separator != ''
+        ) {
+            $q->andWhere('b.active = 1')
+                ->andWhere('(b.start <= :now OR b.start = 0)')
+                ->andWhere('(b.end >= :now OR b.end = 0)');
+        }
+        // End of workaround
+
+        $q->andWhere('(rlc.locale = :locale AND rlc.active = 1)')
             ->orderBy('b.order')
             ->setParameters(array(
                 'category' => $category,
                 'now' => $now,
                 'locale' => $locale,
             ))
-            ->getQuery()
-            ->getResult();
+        $allBlocks = $q->getQuery()->getResult();
 
         // filter blocks by assigned content page
         $blocks = array();
@@ -797,7 +827,8 @@ class BlockLibrary
      */
     function _setBlockGlobal(&$code, $page)
     {
-        $em = \Cx\Core\Core\Controller\Cx::instanciate()->getDb()->getEntityManager();
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
 
         // fetch separator
         \Cx\Core\Setting\Controller\Setting::init('Block', 'setting');
@@ -809,7 +840,7 @@ class BlockLibrary
         $locale = $localeRepo->findOneBy(array('id' => FRONTEND_LANG_ID));
 
         $qb1 = $em->createQueryBuilder();
-        $result1 = $qb1->select('
+        $q1 = $qb1->select('
                 b.id AS id,
                 rlc.content AS content,
                 b.order
@@ -821,21 +852,40 @@ class BlockLibrary
             ->andWhere('rp.page = :page')
             ->andWhere('rlc.locale = :locale')
             ->andWhere('rlc.active = 1')
-            ->andWhere('b.active = 1')
-            ->andWhere('rp.placeholder = \'global\'')
-            ->andWhere('(b.start <= :now OR b.start = 0)')
-            ->andWhere('(b.end >= :now OR b.end = 0)')
-            ->orderBy('b.order')
+            ->andWhere('rp.placeholder = \'global\'');
+
+        // Note: This is a workaround as content panes are no real widgets yet.
+        //
+        // In case the frontend editing is not in use and there
+        // is no content pane separator for the global content pane defined,
+        // then we can load all content panes into the template at once.
+        // The JsonData adapter will then decide which content panes to display and
+        // which not.
+        // The check for frontend editing is required, as otherwise the frontend editing
+        // would inject empty DIV elements for non-active content panes.
+        // The check for the content pane separator is required, as otherwise
+        // the system would output the separator for each non-active content pane.
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        if (
+            $cx->getComponent('FrontendEditing')->frontendEditingIsActive(false, false) ||
+            $separator != ''
+        ) {
+            $q1->andWhere('b.active = 1')
+                ->andWhere('(b.start <= :now OR b.start = 0)')
+                ->andWhere('(b.end >= :now OR b.end = 0)');
+        }
+        // End of workaround
+
+        $q1->orderBy('b.order')
             ->setParameters(array(
                 'locale' => $locale,
                 'page' => $page,
                 'now' => $now,
-            ))
-            ->getQuery()
-            ->getResult();
+            ));
+        $result1 = $q1->getQuery()->getResult();
 
         $qb2 = $em->createQueryBuilder();
-        $result2 = $qb2->select('
+        $q2 = $qb2->select('
                 b.id AS id,
                 rlc.content AS content,
                 b.order
@@ -844,17 +894,35 @@ class BlockLibrary
             ->innerJoin('\Cx\Modules\Block\Model\Entity\RelLangContent', 'rlc', 'WITH', 'rlc.block = b')
             ->where('b.showInGlobal = 1')
             ->andWhere('rlc.locale = :locale')
-            ->andWhere('rlc.active = 1')
-            ->andWhere('b.active = 1')
-            ->andWhere('(b.start <= :now OR b.start = 0)')
-            ->andWhere('(b.end >= :now OR b.end = 0)')
-            ->orderBy('b.order')
+            ->andWhere('rlc.active = 1');
+
+        // Note: This is a workaround as content panes are no real widgets yet.
+        //
+        // In case the frontend editing is not in use and there
+        // is no content pane separator for the global content pane defined,
+        // then we can load all content panes into the template at once.
+        // The JsonData adapter will then decide which content panes to display and
+        // which not.
+        // The check for frontend editing is required, as otherwise the frontend editing
+        // would inject empty DIV elements for non-active content panes.
+        // The check for the content pane separator is required, as otherwise
+        // the system would output the separator for each non-active content pane.
+        if (
+            $cx->getComponent('FrontendEditing')->frontendEditingIsActive(false, false) ||
+            $separator != ''
+        ) {
+            $q2->andWhere('b.active = 1')
+                ->andWhere('(b.start <= :now OR b.start = 0)')
+                ->andWhere('(b.end >= :now OR b.end = 0)');
+        }
+        // End of workaround
+
+        $q2->orderBy('b.order')
             ->setParameters(array(
                 'locale' => $locale,
                 'now' => $now,
-            ))
-            ->getQuery()
-            ->getResult();
+            ));
+        $result2 = $q2->getQuery()->getResult();
 
         $blocks = array_unique(array_merge($result1, $result2));
         usort($blocks, 'cmpByOrder');
@@ -895,6 +963,12 @@ class BlockLibrary
      */
     function _setBlockRandom(&$code, $id, $page)
     {
+        // Note: known issue:
+        // as content panes are not real widgets, the random block does not properly
+        // take into account if a content page is active or not
+        // Unfortunately, this issue can't be fixed with the current implementation
+        // This issue will be fixed once the content panes have been migrated to widgets
+
         $now = time();
 
         $em = \Cx\Core\Core\Controller\Cx::instanciate()->getDb()->getEntityManager();
@@ -967,6 +1041,8 @@ class BlockLibrary
     {
         // find all block IDs to parse
         if (count($blocks) <= 0) {
+            // drop empty placeholders
+            $code = str_replace('{' . $placeholderName . '}', '', $code);
             return;
         }
         $blockIds = array();

@@ -32,10 +32,11 @@
  * @package     cloudrexx
  * @subpackage  module_jobs
  */
-$_ARRAYLANG['TXT_CATEGORY_MANAGER'] = "Catégories";
+$_ARRAYLANG['TXT_MODULE_JOBS_ACT_CAT'] = "Catégories";
+$_ARRAYLANG['TXT_MODULE_JOBS_ACT_LOC'] = "Lieux";
+$_ARRAYLANG['TXT_MODULE_JOBS_ACT_JOB'] = "Nouveau";
+$_ARRAYLANG['TXT_MODULE_JOBS_ACT_DEFAULT'] = "Aperçu";
 $_ARRAYLANG['TXT_JOBS_MANAGER'] = "Offres d'emploi";
-$_ARRAYLANG['TXT_CREATE_DOCUMENT'] = "Nouveau";
-$_ARRAYLANG['TXT_JOBS_MENU_OVERVIEW'] = "Aperçu";
 $_ARRAYLANG['TXT_AUTHOR'] = "Auteur";
 $_ARRAYLANG['TXT_DATE'] = "Date";
 $_ARRAYLANG['TXT_EDIT_DOCUMENTS'] = "Editer les offres d'emploi";
@@ -103,7 +104,6 @@ $_ARRAYLANG['TXT_JOBS_AVAILABLE_LOCATIONS'] = "Lieux disponibles";
 $_ARRAYLANG['TXT_JOBS_LOCATIONS_NOT_ASSIGNED'] = "Impossible d'affecter les lieux.";
 $_ARRAYLANG['TXT_JOBS_LOCATION_NOT_DELETED'] = "Impossible de supprimer l'affectation du lieu.";
 $_ARRAYLANG['TXT_JOBS_SHOW_LOCATION_FE'] = "Proposer le choix du lieu ";
-$_ARRAYLANG['TXT_LOCATION_MANAGER'] = "Lieux";
 $_ARRAYLANG['TXT_LOCATION'] = "Lieux";
 $_ARRAYLANG['TXT_JOBS_WORK_START_NOW'] = "immédiat";
 $_ARRAYLANG['TXT_JOBS_SETTINGS'] = "Propriétés";

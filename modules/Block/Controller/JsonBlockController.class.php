@@ -117,7 +117,7 @@ class JsonBlockController extends \Cx\Core\Core\Model\Entity\Controller implemen
      */
     public function getDefaultPermissions()
     {
-        return new \Cx\Core_Modules\Access\Model\Entity\Permission(null, array('get', 'post'), true);
+        return new \Cx\Core_Modules\Access\Model\Entity\Permission();
     }
 
     /**
@@ -130,12 +130,12 @@ class JsonBlockController extends \Cx\Core\Core\Model\Entity\Controller implemen
             'getCountries',
             'getBlocks',
             'getBlockContent' => new \Cx\Core_Modules\Access\Model\Entity\Permission(
-                null,
+                array(),
                 array('get', 'cli', 'post'),
                 false
             ),
             'saveBlockContent' => new \Cx\Core_Modules\Access\Model\Entity\Permission(
-                null,
+                array(),
                 array('post', 'cli'),
                 true,
                 array(),
@@ -253,26 +253,38 @@ class JsonBlockController extends \Cx\Core\Core\Model\Entity\Controller implemen
         $block = $blockRepo->findOneBy(array('id' => $id));
         $localeRepo = $em->getRepository('\Cx\Core\Locale\Model\Entity\Locale');
         $locale = $localeRepo->findOneBy(array('id' => $lang));
+        $now = time();
 
-        $relLangContentRepo = $em->getRepository('Cx\Modules\Block\Model\Entity\RelLangContent');
-        // add:
-        /*
-             $now = time();
-              AND (b.`start` <= " . $now . " OR b.`start` = 0)
-              AND (b.`end` >= " . $now . " OR b.`end` = 0)
-        */
-        $relLangContent = $relLangContentRepo->findOneBy(array(
-            'block' => $block,
-            'locale' => $locale,
-            'active' => 1,
-        ));
+        $relLangContent = $qb->select('rlc')
+            ->from('\Cx\Modules\Block\Model\Entity\RelLangContent', 'rlc')
+            ->from('\Cx\Modules\Block\Model\Entity\Block', 'b')
+            ->where('b = :block')
+            ->andWhere('rlc.block = b')
+            ->andWhere('(rlc.locale = :locale AND rlc.active = 1)');
+            ->andWhere('(b.start <= :now OR b.start = 0)')
+            ->andWhere('(b.end >= :now OR b.end = 0)')
+            ->andWhere('b.active = 1')
+            ->setParameters(array(
+                'block' => $block,
+                'locale' => $locale,
+                'now' => $now,
+            ))
+            ->getQuery()
+            ->getResult();
+
 
         // nothing found
         if (!$relLangContent) {
-            throw new NoBlockFoundException('no block content found with id: ' . $id);
+            // if we would throw an exception here, then deactivated blocks are not cached
+            return array('content' => '');
         }
 
         $content = $relLangContent->getContent();
+
+        // abort for returning raw data
+        if (!$parsing) {
+            return $content;
+        }
 
         $this->cx->parseGlobalPlaceholders($content);
         $template = new \Cx\Core_Modules\Widget\Model\Entity\Sigma();
@@ -285,16 +297,12 @@ class JsonBlockController extends \Cx\Core\Core\Model\Entity\Controller implemen
         );
         $content = $template->get();
 
-        // abort for returning raw data
-        if (!$parsing) {
-            return $content;
-        }
-
         $page = null;
         if (isset($params['get']['page'])) {
             $pageRepo = $em->getRepository('Cx\Core\ContentManager\Model\Entity\Page');
             $page = $pageRepo->find($params['get']['page']);
         }
+
 
         \Cx\Modules\Block\Controller\Block::setBlocks($content, $page);
 

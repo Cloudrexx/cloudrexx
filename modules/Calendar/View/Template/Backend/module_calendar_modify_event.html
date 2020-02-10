@@ -82,6 +82,12 @@
     table.adminlist_inner tr td.vertical_middle {
         vertical-align: middle;
     }
+    #recurrenceDatepicker {
+        float: left;
+    }
+    #recurrenceTimepicker {
+        float: right;
+    }
 </style>
 <script language="JavaScript" type="text/javascript">
     var defaultLang = cx.variables.get('language_id', 'calendar');
@@ -92,10 +98,10 @@
         // elm => jquery object
         _handleSeriesEventRowDisplay: function(elm) {
             if (elm.is(":checked")) {
-                $J('.series-event-row').show();
+                cx.jQuery('.series-event-row').show();
                 showOrHide();
             } else {
-                $J('.series-event-row').hide();
+                cx.jQuery('.series-event-row').hide();
             }
         },
         _handleAllDayEvent: function(elm) {
@@ -120,54 +126,54 @@
             return true;
         },
         _moveToNextTab: function() {
-            current = $J("ul#tabmenu > li").has("a.active");
+            current = cx.jQuery("ul#tabmenu.iterate > li").has("a.active");
             if (current.next().length) {
                 target = current.next();
             } else {
-                target = $J("ul#tabmenu > li:first"); // This will not happen
+                target = cx.jQuery("ul#tabmenu.iterate > li:first"); // This will not happen
             }
             target.find("a").trigger("click");
         }
     };
-    $J(function() {
-        $J('[name="seriesStatus"]').click(function() {
-            modifyEvent._handleSeriesEventRowDisplay($J(this));
+    cx.ready(function() {
+        cx.jQuery('[name="seriesStatus"]').click(function() {
+            modifyEvent._handleSeriesEventRowDisplay(cx.jQuery(this));
         });
-        modifyEvent._handleSeriesEventRowDisplay($J('[name="seriesStatus"]'));
-        $J(".all_day").click(function() {
-            modifyEvent._handleAllDayEvent($J(this));
+        modifyEvent._handleSeriesEventRowDisplay(cx.jQuery('[name="seriesStatus"]'));
+        cx.jQuery(".all_day").click(function() {
+            modifyEvent._handleAllDayEvent(cx.jQuery(this));
         });
-        $J("#seriesDailyDays, #seriesDouranceEvents").keyup(function() {
-            if (parseInt($J(this).val()) < 1) {
-                $J(this).val('1');
+        cx.jQuery("#seriesDailyDays, #seriesDouranceEvents").keyup(function() {
+            if (parseInt(cx.jQuery(this).val()) < 1) {
+                cx.jQuery(this).val('1');
             }
         });
-        $J("#seriesDailyDays, #seriesDouranceEvents").blur(function() {
-            if ($J(this).val() == '') {
-                $J(this).val('1');
+        cx.jQuery("#seriesDailyDays, #seriesDouranceEvents").blur(function() {
+            if (cx.jQuery(this).val() == '') {
+                cx.jQuery(this).val('1');
             }
         });
-        $J("ul#tabmenu > li").click(function() {
-            if ($J(this).next().length) {
-                $J(".tab-next").show();
+        cx.jQuery("ul#tabmenu.iterate > li").click(function() {
+            if (cx.jQuery(this).next().length) {
+                cx.jQuery(".tab-next").show();
             } else {
-                $J(".tab-next").hide();
+                cx.jQuery(".tab-next").hide();
             }
         });
-        $J(".sendInvitation").click(function() {
-            if ($J(this).is(":checked")) {
-                $J(".invitationEmailTemplateContainer").show();
-                $J("#invitationExclude").show();
+        cx.jQuery(".sendInvitation").click(function() {
+            if (cx.jQuery(this).is(":checked")) {
+                cx.jQuery(".invitationEmailTemplateContainer").show();
+                cx.jQuery("#invitationExclude").show();
             } else {
-                $J(".invitationEmailTemplateContainer").hide();
-                $J("#invitationExclude").hide();
+                cx.jQuery(".invitationEmailTemplateContainer").hide();
+                cx.jQuery("#invitationExclude").hide();
             }
         });
-        $J( ".eventLocationType" ).click(function(){
-            showOrHidePlaceFields($J(this).val(), 'place');
+        cx.jQuery( ".eventLocationType" ).click(function(){
+            showOrHidePlaceFields(cx.jQuery(this).val(), 'place');
         });
-        $J( ".eventHostType" ).click(function(){
-            showOrHidePlaceFields($J(this).val(), 'host');
+        cx.jQuery( ".eventHostType" ).click(function(){
+            showOrHidePlaceFields(cx.jQuery(this).val(), 'host');
         });
         showOrHidePlaceFields('{CALENDAR_LOCATION_TYPE}', 'place');
         showOrHidePlaceFields('{CALENDAR_EVENT_HOST_TYPE}', 'host');
@@ -224,7 +230,7 @@
         });
 
         calendarXhr = cx.ajax(
-            "calendar",
+            "Calendar",
             "getRecipientCount",
             {
                 data: {
@@ -251,6 +257,7 @@
             dateFormat: '{CALENDAR_EVENT_DATE_FORMAT}',
             timeFormat: 'hh:mm',
             showSecond: false,
+            maxDate: new Date(cx.variables.get('maxDate', 'calendar')),
             onSelect: function(dateText, inst){
                 var startDate = cx.jQuery( ".startDate" ).datetimepicker("getDate");
                 var endDate   = cx.jQuery( ".endDate" ).datetimepicker("getDate");
@@ -278,6 +285,12 @@
                 cx.jQuery( ".startDate" ).data('prevDate', cx.jQuery(".startDate").datetimepicker("getDate"));
                 cx.jQuery( ".endDate" ).data('prevDate', cx.jQuery(".endDate").datetimepicker("getDate"));
                 cx.jQuery( this ).datetimepicker('refresh');
+
+                // ensure recurrence date-selection will be reinitialized
+                // to match the newly selected event's start-date
+                if (jQuery('#recurrenceDatepicker').hasClass('hasDatepicker')) {
+                    jQuery('#recurrenceDatepicker').datetimepicker('destroy');
+                }
             }
         };
         cx.jQuery('input[name=startDate]')
@@ -286,143 +299,257 @@
         cx.jQuery('input[name=endDate]')
             .datetimepicker(options)
             .data('prevDate', cx.jQuery(".endDate").datetimepicker("getDate"));
-        if ( $J(".all_day").is(':checked') ) {
-            modifyEvent._handleAllDayEvent($J(".all_day"));
+        if ( cx.jQuery(".all_day").is(':checked') ) {
+            modifyEvent._handleAllDayEvent(cx.jQuery(".all_day"));
         }
         refreshDatePickers();
 
-        blankException = $J( "#exceptionDateTemplate" ).html();
+        blankException = cx.jQuery( "#exceptionDateTemplate" ).html();
         //create the dialog and save a reference
         var exceptionDialog = cx.ui.dialog({
             width: 520,
             title: '{TXT_CALENDAR_SELECT_EXCEPTION_DATE_INFO}',
-            content: $J( ".exceptionDateContainer" ),
+            content: cx.jQuery( ".exceptionDateContainer" ),
             autoOpen: false,
             buttons: {
                 "{TXT_CALENDAR_CANCEL}" : function() {
-                    $J( this ).dialog( "close" );
+                    cx.jQuery( this ).dialog( "close" );
                 },
                 "{TXT_CALENDAR_OK}": function() {
-                    $J( "#seriesExeptionsList" ).html( "" );
-                    $J( ".exceptionDateContainer .exceptionDateHolder input:checked" ).each(function(){
-                        checkedDate    = $J(this).val();
-                        txtCheckedDate = $J(this).data( 'txtSeriesDate' );
+                    cx.jQuery( "#seriesExeptionsList" ).html( "" );
+                    cx.jQuery( ".exceptionDateContainer .exceptionDateHolder input:checked" ).each(function(){
+                        checkedDate    = cx.jQuery(this).val();
+                        txtCheckedDate = cx.jQuery(this).data( 'txtSeriesDate' );
                         addExeptionList(checkedDate, txtCheckedDate);
                     });
-                    $J( this ).dialog( "close" );
+                    cx.jQuery( this ).dialog( "close" );
                 }
             },
             close: function() {
-                $J( ".exceptionDateContainer .exceptionDateHolder" ).html( "" );
+                cx.jQuery( ".exceptionDateContainer .exceptionDateHolder" ).html( "" );
             }
         });
 
-        $J( ".add_exception" ).click(function() {
+        cx.jQuery( ".add_exception" ).click(function() {
             selectedDates = [];
-            $J( "#seriesExeptionsList input[type='hidden']" ).each(function(){
-                selectedDates.push($J(this).val());
+            cx.jQuery( "#seriesExeptionsList input[type='hidden']" ).each(function(){
+                selectedDates.push(cx.jQuery(this).val());
             });
-            exceptionDates = generateExecptionDates();
-            appendTheExecptionDate(exceptionDates, selectedDates, $J( ".exceptionDateContainer .exceptionDateHolder" ));
-
-            // initialize paging
-            // count entries inside the hidden content
-            var num_entries = $J( '.exceptionDateHolder li' ).length;
-            $J( ".paginationHolder" ).pagination(num_entries,{
-                callback: paginationCallback,
-                items_per_page:10,
-                link_to: "javascript:void(0);",
-                prev_text: "{TXT_CALENDAR_PREV}",
-                next_text: "{TXT_CALENDAR_NEXT}",
-            });
-
-            exceptionDialog.open();
+            generateExecptionDates(selectedDates, exceptionDialog);
         });
-        var selectedRecurrence = false;
-        $J(".add_additional_recurrences").click(function() {
+        var selectedRecurrenceDate = false;
+        var selectedRecurrenceTime = false;
+        cx.jQuery(".add_additional_recurrences").click(function() {
             cx.ui.dialog({
-            width: 520,
-            title: '{TXT_CALENDAR_SELECT_ADDITIONAL_RECURRENCES_TITLE}',
-            content: $J( "#additionalRecurrencesContainer" ),
-            autoOpen: true,
-            buttons: {
-                "{TXT_CALENDAR_CANCEL}" : function() {
-                    $J( this ).dialog( "close" );
-                },
-                "{TXT_CALENDAR_OK}": function() {
-                    $J('#additionalRecurrencesList .seriesList span').each(function(){
-                            if( $J.trim($J(this).html()) === $J.trim(selectedRecurrence)){
-                                selectedRecurrence = false;
+                width: 520,
+                title: '{TXT_CALENDAR_SELECT_ADDITIONAL_RECURRENCES_TITLE}',
+                content: cx.jQuery( "#additionalRecurrencesContainer" ),
+                autoOpen: true,
+                buttons: {
+                    "{TXT_CALENDAR_CANCEL}" : function() {
+                        cx.jQuery( this ).dialog( "close" );
+                    },
+                    "{TXT_CALENDAR_OK}": function() {
+                        // check if a specific time has been set/selected for
+                        // recurrence
+                        if (selectedRecurrenceTime) {
+                            var selectedRecurrence = selectedRecurrenceDate + ' ' + selectedRecurrenceTime;
+                        } else {
+                            var selectedRecurrence = selectedRecurrenceDate;
+                        }
+                        var selectedDate = cx.jQuery.trim(selectedRecurrence.split(",")[1]);
+
+                        // ensure recurrence lies in the future as recurrences
+                        // before the event's start-date are not suppored
+                        var eventStartDate = cx.jQuery.datepicker.parseDate(
+                            '{CALENDAR_EVENT_DATE_FORMAT}',
+                            cx.jQuery(".startDate").val()
+                        );
+                        var recurrenceDate = cx.jQuery.datepicker.parseDate(
+                            '{CALENDAR_EVENT_DATE_FORMAT}',
+                            selectedDate
+                        );
+                        if (!cx.jQuery(".all_day").is(':checked')) {
+                            var timeData = selectedDate
+                                .split(' ')[1]
+                                .split(':');
+                            recurrenceDate.setHours(timeData[0]);
+                            recurrenceDate.setMinutes(timeData[1]);
+                            var timeData = cx.jQuery(".startDate").val()
+                                .split(' ')[1]
+                                .split(':');
+                            eventStartDate.setHours(timeData[0]);
+                            eventStartDate.setMinutes(timeData[1]);
+                        }
+                        if (recurrenceDate <= eventStartDate) {
+                            cx.ui.messages.add(
+                                cx.variables.get(
+                                    'TXT_CALENDAR_INVALID_RECURRENCE_DATE',
+                                    'Calendar'
+                                ).replace('%s', selectedRecurrence),
+                                'warning'
+                            );
+                            return;
+                        }
+
+                        // check for duplicates
+                        cx.jQuery('#additionalRecurrencesList .seriesList span').each(function(){
+                            if( cx.jQuery.trim(cx.jQuery(this).html()) === cx.jQuery.trim(selectedRecurrence)){
+                                selectedDate = false;
                             }
                         });
-                    if(selectedRecurrence) {
-                        var selectedDate = selectedRecurrence.split(",");
-                        $J( "#additionalRecurrencesList" )
+                        if (!selectedDate) {
+                            cx.jQuery(this).dialog( "close" );
+                            return;
+                        }
+                        cx.jQuery( "#additionalRecurrencesList" )
                             .append(
                                 '<div class="seriesList">\n\
                                     <span>'+ selectedRecurrence +'</span>\n\
-                                    <input type="hidden" name="additionalRecurrences[]" value="'+ $J.trim(selectedDate['1']) +'"  />&nbsp;\n\
+                                    <input type="hidden" name="additionalRecurrences[]" value="'+ selectedDate + '"  />&nbsp;\n\
                                     <a href="javascript:void(0);" class="delete_exception" title="{TXT_CALENDAR_DELETE}">\n\
                                         <img style="vertical-align: middle;" src="../core/Core/View/Media/icons/delete.gif" alt="{TXT_CALENDAR_DELETE}" width="17" border="0" height="17">\n\
                                     </a>\n\
                                 <div/>'
-                            );
+                            )
+                            // sort the set recurrences
+                            .find('.seriesList').sort(
+                                function(a,b) {
+                                    // fetch datetime information from one date
+                                    var dateStr = cx.jQuery(a).find('input').val();
+                                    var dateA = cx.jQuery.datepicker.parseDate(
+                                        '{CALENDAR_EVENT_DATE_FORMAT}',
+                                        dateStr
+                                    );
+                                    var timePart = dateStr.split(' ');
+                                    if (typeof(timePart[1]) != 'undefined') {
+                                        var timeData = timePart[1].split(':');
+                                        dateA.setHours(timeData[0]);
+                                        dateA.setMinutes(timeData[1]);
+                                    }
+
+                                    // fetch datetime information from the
+                                    // other date
+                                    var dateStr = cx.jQuery(b).find('input').val();
+                                    var dateB = cx.jQuery.datepicker.parseDate(
+                                        '{CALENDAR_EVENT_DATE_FORMAT}',
+                                        dateStr
+                                    );
+                                    var timePart = dateStr.split(' ');
+                                    if (typeof(timePart[1]) != 'undefined') {
+                                        var timeData = timePart[1].split(':');
+                                        dateB.setHours(timeData[0]);
+                                        dateB.setMinutes(timeData[1]);
+                                    }
+
+                                    // compare (-> sort) dates
+                                    if (dateA > dateB) {
+                                        return 1;
+                                    }
+                                    if (dateA < dateB) {
+                                        return -1;
+                                    }
+                                    return 0;
+                                }
+                            ).appendTo('#additionalRecurrencesList');
+                        cx.jQuery(this).dialog( "close" );
                     }
-                 $J(this).dialog( "close" );
+                },
+                open: function() {
+                    // fetch start-date of event
+                    var startDate = cx.jQuery.datepicker.parseDate(
+                        '{CALENDAR_EVENT_DATE_FORMAT}',
+                        cx.jQuery('#startDate').val()
+                    );
+
+                    // generate date-selection widget for recurrence selection
+                    var format = 'D, {CALENDAR_EVENT_DATE_FORMAT}';
+                    cx.jQuery("#recurrenceDatepicker").datepicker({
+                        minDate: startDate,
+                        maxDate: new Date(cx.variables.get('maxDate', 'calendar')),
+                        dateFormat: format,
+                        onSelect: function(date) {
+                            selectedRecurrenceDate = date;
+                        }
+                    });
+                    selectedRecurrenceDate = cx.jQuery.datepicker.formatDate(
+                        format,
+                        cx.jQuery("#recurrenceDatepicker").datepicker('getDate')
+                    );
+
+                    var minDays = cx.jQuery('#recurrenceDatepicker').datepicker('option', 'dayNamesMin');
+                    cx.jQuery('#recurrenceDatepicker').datepicker('option', 'dayNamesShort', minDays);
+
+                    // generate time-selection widget for recurrence selection
+                    selectedRecurrenceTime = false;
+                    if (jQuery('.all_day').prop('checked')) {
+                        if (!jQuery('#recurrenceTimepicker').hasClass('hasDatepicker')) {
+                            return;
+                        }
+                        jQuery('#recurrenceTimepicker').datetimepicker('destroy');
+                    } else {
+                        // get time from start-date
+                        var timeData = cx.jQuery('#startDate')
+                            .val()
+                            .split(' ')[1]
+                            .split(':');
+
+                        // set hour & minutes with leading zero
+                        var preSetHours = ('0' + timeData[0]).slice(-2);
+                        var preSetMinutes = ('0' + timeData[1]).slice(-2);
+                        selectedRecurrenceTime = preSetHours + ':' + preSetMinutes;
+
+                        startDate.setHours(preSetHours);
+                        startDate.setMinutes(preSetMinutes);
+                        cx.jQuery("#recurrenceTimepicker").timepicker({
+                            timeFormat: 'hh:mm',
+                            showSecond: false,
+                            setTime: startDate,
+                            timeOnlyTitle: cx.variables.get(
+                                'TXT_CALENDAR_START_OF_RECURRENCE',
+                                'Calendar'
+                            ),
+                            onSelect: function(time) {
+                                selectedRecurrenceTime = time;
+                            }
+                        }).timepicker('setTime', startDate);
+                    }
                 }
-            },
-            open: function() {
-                selectedRecurrence = false;
-                $J("#recurrenceDatepicker").datepicker({
-                    minDate: 0,
-                    dateFormat: 'D, dd.mm.yy',
-                    onSelect: function(date) {
-                        selectedRecurrence = date;
-                    }
-                });
-                var minDays = $J('#recurrenceDatepicker').datepicker('option', 'dayNamesMin');
-                $J('#recurrenceDatepicker').datepicker('option', 'dayNamesShort', minDays);
-            }
             });
         });
 
-        $J( ".delete_exception" ).live("click", function() {
-           $J( this ).closest(".seriesList").fadeOut("slow").remove();
+        cx.jQuery( ".delete_exception" ).live("click", function() {
+           cx.jQuery( this ).closest(".seriesList").fadeOut("slow").remove();
         });
 
         // Format the series exceptions on page load
         selectedDates = [];
-        $J( "#seriesExeptionsList input[type='hidden']" ).each(function(){
-            selectedDates.push($J(this).val());
+        cx.jQuery( "#seriesExeptionsList input[type='hidden']" ).each(function(){
+            selectedDates.push(cx.jQuery(this).val());
         });
 
-        $J( "#seriesExeptionsList" ).html( "" );
-        exceptionDates = generateExecptionDates();
-        $J.each(exceptionDates, function(key, v) {
-            if ($J.inArray(key, selectedDates) != -1) {
-                addExeptionList(key, v);
-            }
-        });
+        cx.jQuery( "#seriesExeptionsList" ).html( "" );
+        generateExecptionDates(selectedDates);
         updateRecipientsCount();
-        $J("#calendar_event_invite_crm_memberships").change(updateRecipientsCount);
-        $J("#calendar_event_excluded_crm_memberships").change(updateRecipientsCount);
-        $J("input[name='addElement']").click(updateRecipientsCount);
-        $J("input[name='removeElement']").click(updateRecipientsCount);
-        $J("#invitedMails").change(updateRecipientsCount);
-        $J("input[name='sendMailTo']").change(updateRecipientsCount);
+        cx.jQuery("#calendar_event_invite_crm_memberships").change(updateRecipientsCount);
+        cx.jQuery("#calendar_event_excluded_crm_memberships").change(updateRecipientsCount);
+        cx.jQuery("input[name='addElement']").click(updateRecipientsCount);
+        cx.jQuery("input[name='removeElement']").click(updateRecipientsCount);
+        cx.jQuery("#invitedMails").change(updateRecipientsCount);
+        cx.jQuery("input[name='sendMailTo']").change(updateRecipientsCount);
     });
 
     function showOrHidePlaceFields(inputValue, type) {
         if (inputValue == '1') {
-            $J( "tr.event_"+type+"_manual" ).css("display", "table-row");
-            $J( "tr.event_"+type+"_mediadir" ).css("display", "none");
+            cx.jQuery( "tr.event_"+type+"_manual" ).css("display", "table-row");
+            cx.jQuery( "tr.event_"+type+"_mediadir" ).css("display", "none");
         } else {
-            $J( "tr.event_"+type+"_manual" ).css("display", "none");
-            $J( "tr.event_"+type+"_mediadir" ).css("display", "table-row");
+            cx.jQuery( "tr.event_"+type+"_manual" ).css("display", "none");
+            cx.jQuery( "tr.event_"+type+"_mediadir" ).css("display", "table-row");
         }
     }
     function addExeptionList(exeptionDate, txtCheckedDate) {
-        $J( "#seriesExeptionsList" ).append('<div class="seriesList">\n\
+        cx.jQuery( "#seriesExeptionsList" ).append('<div class="seriesList">\n\
                                                 <span>'+ txtCheckedDate +'</span>\n\
                                                 <input type="hidden" name="seriesExeptions[]" value="'+ exeptionDate +'"  />\n\
                                                 &nbsp;<a href="javascript:void(0);" class="delete_exception" title="{TXT_CALENDAR_DELETE}"><img style="vertical-align: middle;" src="../core/Core/View/Media/icons/delete.gif" alt="{TXT_CALENDAR_DELETE}" width="17" border="0" height="17"></a>\n\
@@ -430,17 +557,17 @@
     }
 
     function appendTheExecptionDate(exDates, selectedDates, exDateContainer) {
-        if (!$J.isEmptyObject( exDates )) {
-            var exceptionDateHolder = $J("<ul />", {class: 'exceptionDateHolder'});
-            $J.each(exDates, function(key, v) {
-                $field  = $J( blankException );
+        if (!cx.jQuery.isEmptyObject( exDates )) {
+            var exceptionDateHolder = cx.jQuery("<ul />", {class: 'exceptionDateHolder'});
+            cx.jQuery.each(exDates, function(key, v) {
+                $field  = cx.jQuery( blankException );
 
-                $field.find('.exceptionDate').val(key);
-                $field.find('.txtExceptionDate').text(v);
-                if ($J.inArray(key, selectedDates) != -1) {
+                $field.find('.exceptionDate').val(v.date);
+                $field.find('.txtExceptionDate').text(v.label);
+                if (cx.jQuery.inArray(v.date, selectedDates) != -1) {
                     $field.find('.exceptionDate').attr("checked", "checked");
                 }
-                $field.find( '.exceptionDate' ).data( 'txtSeriesDate', v );
+                $field.find( '.exceptionDate' ).data( 'txtSeriesDate', v.label );
 
                 exceptionDateHolder.append( $field );
             });
@@ -448,40 +575,74 @@
         }
     }
 
-    function generateExecptionDates() {
-        var exDates = {};
+    function generateExecptionDates(selectedDates, exceptionDialog) {
+        var data = cx.jQuery( "div#series input, div#series select" ).serializeArray();
+        data.push({
+            'name': 'startDate',
+            'value': cx.jQuery( "#startDate" ).val()
+        });
+        data.push({
+            'name': 'endDate',
+            'value': cx.jQuery( "#endDate" ).val()
+        });
+        cx.ajax(
+            "Calendar",
+            "getExeceptionDates",
+            {
+                data: data,
+                beforeSend: function() {
+                    cx.tools.StatusMessage.showMessage("<div id=\"loading\">Loading...</div>");
+                },
+                complete: function() {
+                    cx.tools.StatusMessage.removeAllDialogs();
+                },
+                success: function(response) {
+                    if (response.status == 'success') {
+                        exceptionDates = response.data;
+                        if (typeof(exceptionDialog) != 'undefined') {
+                            appendTheExecptionDate(
+                                exceptionDates,
+                                selectedDates,
+                                cx.jQuery( ".exceptionDateContainer .exceptionDateHolder" )
+                            );
 
-        $J.ajax({
-           url      : cx.variables.get('cadminPath', 'contrexx') + "index.php?cmd=JsonData&object=calendar&act=getExeceptionDates&recursive=true",
-           type     : "post",
-           data     : "startDate="+$J( "#startDate" ).val()+"&endDate="+$J( "#endDate" ).val()+"&"+$J( "div#series input, div#series select" ).serialize(),
-           dataType : "json",
-           async    : false,
-           beforeSend: function() {
-               cx.tools.StatusMessage.showMessage("<div id=\"loading\">" + cx.jQuery('#loading').html() + "</div>");
-           },
-           complete: function() {
-               cx.tools.StatusMessage.removeAllDialogs();
-           },
-           success  : function(response) {
-                if (response.status == 'success') {
-                    exDates = response.data;
-                } else {
-                    cx.tools.StatusMessage.showMessage(response.message, "error", 1000);
+                            // initialize paging
+                            // count entries inside the hidden content
+                            var num_entries = cx.jQuery( '.exceptionDateHolder li' ).length;
+                            cx.jQuery( ".paginationHolder" ).pagination(num_entries,{
+                                callback: paginationCallback,
+                                items_per_page:10,
+                                link_to: "javascript:void(0);",
+                                prev_text: "{TXT_CALENDAR_PREV}",
+                                next_text: "{TXT_CALENDAR_NEXT}",
+                            });
+
+                            exceptionDialog.open();
+                            return;
+                        }
+
+                        jQuery.each(exceptionDates, function(key, v) {
+                            if (jQuery.inArray(v.date, selectedDates) != -1) {
+                                addExeptionList(v.date, v.label);
+                            }
+                        });
+                    } else {
+                        cx.tools.StatusMessage.showMessage(response.message, "error", 1000);
+                    }
                 }
             }
-        });
-
-        return exDates;
-
+        );
     }
 
     function paginationCallback( page_index ) {
-        $J( '.exceptionDateHolder li' ).hide();
+        cx.jQuery( '.exceptionDateHolder li' ).hide();
         var limit = 10;
         for(i=0;i<limit;i++) {
-           var page = (page_index*limit) + i;
-           $J( '.exceptionDateHolder li:eq('+ page +')').show();
+            var page = (page_index*limit) + i;
+            if (cx.jQuery( '.exceptionDateHolder li').length <= page) {
+                break;
+            }
+            cx.jQuery( '.exceptionDateHolder li:eq('+ page +')').show();
         }
     }
 
@@ -585,7 +746,7 @@
         var type = document.getElementById('type').value;
 
         if (langCount(reg) == 0) {
-            $J("input[name*=showIn]:first").attr("checked", "checked");
+            cx.jQuery("input[name*=showIn]:first").attr("checked", "checked");
         }
 
         for (i = 0; i < document.formModifyEvent.elements.length; ++i) {
@@ -612,8 +773,8 @@
                     if (firstLang) {
                         tab1body.style.display = 'block';
 
-                        $J(".language_tab li a").removeClass('active').addClass("inactive");
-                        $J('#eventDescTab_' + langId + '_desc').addClass("active");
+                        cx.jQuery(".language_tab li a").removeClass('active').addClass("inactive");
+                        cx.jQuery('#eventDescTab_' + langId + '_desc').addClass("active");
 
                         firstLang = false;
                     } else {
@@ -686,25 +847,25 @@
 
     function showOrHide()
     {
-        var seriesMaskSelect = $J('#seriesTypeSelect').val();
+        var seriesMaskSelect = cx.jQuery('#seriesTypeSelect').val();
 
         if (seriesMaskSelect == 1) {
-            $J('#seriesMaskDaily').css('display', 'block');
-            $J('#seriesMaskWeekly').css('display', 'none');
-            $J('#seriesMaskMonthly').css('display', 'none');
+            cx.jQuery('#seriesMaskDaily').css('display', 'block');
+            cx.jQuery('#seriesMaskWeekly').css('display', 'none');
+            cx.jQuery('#seriesMaskMonthly').css('display', 'none');
         } else if (seriesMaskSelect == 2) {
-            $J('#seriesMaskDaily').css('display', 'none');
-            $J('#seriesMaskWeekly').css('display', 'block');
-            $J('#seriesMaskMonthly').css('display', 'none');
+            cx.jQuery('#seriesMaskDaily').css('display', 'none');
+            cx.jQuery('#seriesMaskWeekly').css('display', 'block');
+            cx.jQuery('#seriesMaskMonthly').css('display', 'none');
         } else if (seriesMaskSelect == 3) {
-            $J('#seriesMaskDaily').css('display', 'none');
-            $J('#seriesMaskWeekly').css('display', 'none');
-            $J('#seriesMaskMonthly').css('display', 'block');
+            cx.jQuery('#seriesMaskDaily').css('display', 'none');
+            cx.jQuery('#seriesMaskWeekly').css('display', 'none');
+            cx.jQuery('#seriesMaskMonthly').css('display', 'block');
         } else {
-            $J('seriesMaskDaily').css('display', 'block');
-            $J('seriesMaskDaily').css('display', 'block');
-            $J('seriesMaskWeekly').css('display', 'none');
-            $J('seriesMaskMonthly').css('display', 'none');
+            cx.jQuery('seriesMaskDaily').css('display', 'block');
+            cx.jQuery('seriesMaskDaily').css('display', 'block');
+            cx.jQuery('seriesMaskWeekly').css('display', 'none');
+            cx.jQuery('seriesMaskMonthly').css('display', 'none');
         }
 
     }
@@ -717,43 +878,6 @@
             cx.jQuery( '#registration_intern' ).show();
         } else if (registrationType == '2') {
             cx.jQuery( '#registration_extern' ).show();
-        }
-    }
-
-
-    function checkTime()
-    {
-        var startdate = document.getElementById("formModifyEvent").startDate.value;
-        var enddate = document.getElementById("formModifyEvent").endDate.value;
-        var starthour = document.getElementById("formModifyEvent").startHour.value;
-        if (starthour < 10) {
-            starthour = "0" + starthour
-        }
-        ;
-        var startminute = document.getElementById("formModifyEvent").startMinute.value;
-        if (startminute < 10) {
-            startminute = "0" + startminute
-        }
-        ;
-        var endhour = document.getElementById("formModifyEvent").endHour.value;
-        if (endhour < 10) {
-            endhour = "0" + endhour
-        }
-        ;
-        var endminute = document.getElementById("formModifyEvent").endMinute.value;
-        if (endminute < 10) {
-            endminute = "0" + endminute
-        }
-        ;
-
-        var starttime = starthour + startminute;
-        var endtime = endhour + endminute;
-
-        // alert(starttime + " - " + endtime);
-
-        if (starttime > endtime && enddate <= startdate) {
-            var endhour = document.getElementById("formModifyEvent").endHour.value = starthour;
-            var endminute = document.getElementById("formModifyEvent").endMinute.value = startminute;
         }
     }
 
@@ -806,6 +930,7 @@
     function refreshDatePickers(tmp) {
         var options = {
             dateFormat: '{CALENDAR_EVENT_DATE_FORMAT}',
+            maxDate: new Date(cx.variables.get('maxDate', 'calendar')),
         };
         cx.jQuery('.event_date').datepicker(options);
     }
@@ -877,7 +1002,7 @@
         </tr>
     </table>
     <br/>
-    <ul id="tabmenu">
+    <ul id="tabmenu" class="iterate">
         <li><a id="eventTab_event" class="active" href="javascript:{}" onclick="selectTab('event');" title="{TXT_CALENDAR_BASIC_DATA}">{TXT_CALENDAR_BASIC_DATA}</a></li>
         <li><a id="eventTab_location" href="javascript:{}" onclick="selectTab('location');" title="{TXT_CALENDAR_EVENT_LOCATION}">{TXT_CALENDAR_EVENT_LOCATION}</a></li>
         <li><a id="eventTab_details" href="javascript:{}" onclick="selectTab('details');" title="{TXT_CALENDAR_ADDITIONAL_OPTIONS}" >{TXT_CALENDAR_ADDITIONAL_OPTIONS}</a></li>
@@ -897,14 +1022,14 @@
             <tr class="row2">
                 <td width="180"  valign="top">{TXT_CALENDAR_EVENT_START} <font color="#ff0000">*</font></td>
                 <td >
-                    <input type="text"  name="startDate" class="startDate" id="startDate" value="{CALENDAR_EVENT_START_DATE}" style="width: 250px;" />
+                    <input type="text"  name="startDate" class="startDate" id="startDate" value="{CALENDAR_EVENT_START_DATE}" style="width: 250px;" autocomplete="off" />
                     &nbsp;<label><input type="checkbox" class="all_day" name="all_day" {CALENDAR_EVENT_ALL_DAY} value="1" /> {TXT_CALENDAR_EVENT_ALL_DAY} </label>
                 </td>
             </tr>
             <tr class="row1">
                 <td valign="top">{TXT_CALENDAR_EVENT_END} <font color="#ff0000">*</font></td>
                 <td>
-                    <input type="text" name="endDate" class="endDate" id="endDate" value="{CALENDAR_EVENT_END_DATE}" style="width: 250px;" />
+                    <input type="text" name="endDate" class="endDate" id="endDate" value="{CALENDAR_EVENT_END_DATE}" style="width: 250px;" autocomplete="off" />
                 </td>
             </tr>
             <tr class="row2">
@@ -1306,6 +1431,8 @@
                         <option value="{CALENDAR_EVENT_ACCESS}" {CALENDAR_EVENT_ACCESS_SELECT}>{CALENDAR_EVENT_ACCESS_NAME}</option>
                         <!-- END eventAccess -->
                     </select>
+                    <span class="icon-info tooltip-trigger"></span>
+                    <span class="tooltip-message">{CALENDAR_EVENT_ACCESS_INFO}</span>
                 </td>
             </tr>
             <tr class="row1">
@@ -1400,8 +1527,8 @@
             <tr class="row2">
                 <td valign="top">{TXT_CALENDAR_EVENT_SEND_INVITATION}</td>
                 <td width="1%">
-                    <input name="sendInvitation" class="sendInvitation" type="checkbox" value="1" {CALENDAR_EVENT_SEND_INVITATION}/>
-                    ({TXT_CALENDAR_EVENT_SEND_INVITATION_COUNT}  <div style="display: inline-block;" id="recipientsCount"></div>)
+                    <input name="sendInvitation" id="sendInvitation" class="sendInvitation" type="checkbox" value="1" {CALENDAR_EVENT_SEND_INVITATION}/>
+                    <label for="sendInvitation">({TXT_CALENDAR_EVENT_SEND_INVITATION_COUNT}  <div style="display: inline-block;" id="recipientsCount"></div>)</label>
                 </td>
                 <td>
                     <div class="invitationEmailTemplateContainer" style="display: none;">
@@ -1423,11 +1550,16 @@
                     <span class="tooltip-message">{TXT_CALENDAR_EVENT_SEND_INVITATION_TO_TOOLTIP}</span>
                 </td>
                 <td colspan="2">
-                    <input type="radio" name="sendMailTo" id="allUsers" value="all" checked="checked"/><label for="allUsers"> {TXT_CALENDAR_EVENT_SEND_INVITATION_TO_ALL}</label><br />
-                    <input type="radio" name="sendMailTo" id="registeredUsers" value="registered" /><label for="registeredUsers"> {TXT_CALENDAR_EVENT_SEND_INVITATION_TO_REGISTERED}</label><br />
-                    <input type="radio" name="sendMailTo" id="signedInUsers" value="signedIn" /><label for="signedInUsers"> {TXT_CALENDAR_EVENT_SEND_INVITATION_TO_SIGNEDIN}</label><br />
+                    <input type="radio" name="sendMailTo" id="allUsers" value="all" checked="checked"/><label for="allUsers"> {TXT_CALENDAR_EVENT_SEND_INVITATION_TO_ALL}</label>
+                    <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_CALENDAR_EVENT_SEND_INVITATION_TO_ALL_TOOLTIP}</span><br />
+                    <input type="radio" name="sendMailTo" id="registeredUsers" value="registered" /><label for="registeredUsers"> {TXT_CALENDAR_EVENT_SEND_INVITATION_TO_REGISTERED}</label>
+                    <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_CALENDAR_EVENT_SEND_INVITATION_TO_REGISTERED_TOOLTIP}</span><br />
+                    <input type="radio" name="sendMailTo" id="signedInUsers" value="signedIn" /><label for="signedInUsers"> {TXT_CALENDAR_EVENT_SEND_INVITATION_TO_SIGNEDIN}</label>
+                    <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_CALENDAR_EVENT_SEND_INVITATION_TO_SIGNEDIN_TOOLTIP}</span><br />
                     <input type="radio" name="sendMailTo" id="inactiveUsers" value="inactive" /><label for="inactiveUsers"> {TXT_CALENDAR_EVENT_SEND_INVITATION_TO_INACTIVE}</label>
-
+                    <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_CALENDAR_EVENT_SEND_INVITATION_TO_INACTIVE_TOOLTIP}</span><br />
+                    <input type="radio" name="sendMailTo" id="newUsers" value="new" /><label for="newUsers"> {TXT_CALENDAR_EVENT_SEND_INVITATION_TO_NEW}</label>
+                    <span class="icon-info tooltip-trigger"></span><span class="tooltip-message">{TXT_CALENDAR_EVENT_SEND_INVITATION_TO_NEW_TOOLTIP}</span>
                 </td>
             </tr>
         </table>
@@ -1610,7 +1742,7 @@
                     <label style="width: 100px;float:left;"><input type="radio" name='seriesDouranceType' value="2" {CALENDAR_SERIES_PATTERN_DOURANCE_2}/>&nbsp;{TXT_CALENDAR_SERIES_PATTERN_ENDS_AFTER}&nbsp;</label>
                     <input type="text" name='seriesDouranceEvents' id="seriesDouranceEvents" maxlength="3" value="{CALENDAR_SERIES_PATTERN_ENDS_EVENTS}" style="width: 20px;" onkeypress="return modifyEvent._isNumber(event);" />&nbsp;{TXT_CALENDAR_SERIES_PATTERN_APPONTMENTS}<br />
                     <label style="width: 100px;float:left;"><input type="radio" name='seriesDouranceType' value="3" {CALENDAR_SERIES_PATTERN_DOURANCE_3}/>&nbsp;{TXT_CALENDAR_SERIES_PATTERN_ENDS}&nbsp;</label>
-                    <input type="text" name="seriesDouranceDate"  id="" class="event_date" style="width: 140px;" value="{CALENDAR_SERIES_PATTERN_ENDS_DATE}" />
+                    <input type="text" name="seriesDouranceDate"  id="" class="event_date" style="width: 140px;" value="{CALENDAR_SERIES_PATTERN_ENDS_DATE}" autocomplete="off" />
                 </td>
             </tr>
             <tr class="row1">
@@ -1654,7 +1786,7 @@
     <!-- END eventPublicateTab -->
     <br />
     <input type="button" onclick="location.href = 'index.php?cmd=Calendar&{CALENDAR_CSRF}';" value="{TXT_CALENDAR_CANCEL}" />
-    &nbsp;<input class="tab-next" type="button" onclick="modifyEvent._moveToNextTab($J(this));" value="{TXT_CALENDAR_NEXT}" />
+    &nbsp;<input class="tab-next" type="button" onclick="modifyEvent._moveToNextTab(cx.jQuery(this));" value="{TXT_CALENDAR_NEXT}" />
     &nbsp;<input type="submit" name="submitModifyEvent"  value="{TXT_CALENDAR_SAVE}" />
     &nbsp;{CALENDAR_SAVE_PUBLISH}
     &nbsp;{CALENDAR_EVENT_DELETE}
@@ -1672,6 +1804,7 @@
 <div id="additionalRecurrencesContainer" style="display: none;">
     {TXT_CALENDAR_SELECT_ADDITIONAL_RECURRENCES_INFO}:<br/><br/>
     <div id="recurrenceDatepicker"></div>
+    <div id="recurrenceTimepicker"></div>
 </div>
 <script id="exceptionDateTemplate" type="jquery/tmpl">
     <li>
