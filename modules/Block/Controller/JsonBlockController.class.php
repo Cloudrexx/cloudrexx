@@ -257,7 +257,7 @@ class JsonBlockController extends \Cx\Core\Core\Model\Entity\Controller implemen
             ->from('\Cx\Modules\Block\Model\Entity\Block', 'b')
             ->where('b = :block')
             ->andWhere('rlc.block = b')
-            ->andWhere('(rlc.locale = :locale AND rlc.active = 1)');
+            ->andWhere('(rlc.locale = :locale AND rlc.active = 1)')
             ->andWhere('(b.start <= :now OR b.start = 0)')
             ->andWhere('(b.end >= :now OR b.end = 0)')
             ->andWhere('b.active = 1')
@@ -268,7 +268,6 @@ class JsonBlockController extends \Cx\Core\Core\Model\Entity\Controller implemen
             ))
             ->getQuery()
             ->getResult();
-
 
         // nothing found
         if (!$relLangContent) {
