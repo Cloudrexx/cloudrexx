@@ -191,7 +191,11 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 )
             ) {
                 $response->setStatusCode(409);
-                throw new \BadMethodCallException('Conflict');
+                throw new \Cx\Core\Error\Model\Entity\ShinyException(
+                    'The current version of this object is newer than the ' .
+                        'version number you supplied or no version number ' .
+                        'was supplied. Please (re-)fetch first.'
+                );
             }
             
             $order = array();
@@ -253,7 +257,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             );
             if (!$dataAccess) {
                 $response->setStatusCode(403);
-                throw new \BadMethodCallException('Access denied');
+                throw new \Cx\Core\Error\Model\Entity\ShinyException('Access denied');
             }
             
             if (
@@ -261,7 +265,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 !in_array($arguments[0], $dataAccess->getAllowedOutputMethods())
             ) {
                 $response->setStatusCode(403);
-                throw new \BadMethodCallException('Access denied');
+                throw new \Cx\Core\Error\Model\Entity\ShinyException('Access denied');
             }
             
             if (count($dataAccess->getAccessCondition())) {
@@ -337,6 +341,15 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             $response->setData($data);
             $response->setMetadata($metaData);
 
+            $response->send($outputModule);
+        } catch (\Cx\Core\Error\Model\Entity\ShinyException $e) {
+            $response->setStatus(
+                \Cx\Core_Modules\DataAccess\Model\Entity\ApiResponse::STATUS_ERROR
+            );
+            $response->addMessage(
+                \Cx\Core_Modules\DataAccess\Model\Entity\ApiResponse::MESSAGE_TYPE_ERROR,
+                $e->getMessage()
+            );
             $response->send($outputModule);
         } catch (\Exception $e) {
             $lang = \Env::get('init')->getComponentSpecificLanguageData(
