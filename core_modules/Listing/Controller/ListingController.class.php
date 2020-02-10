@@ -159,6 +159,18 @@ class ListingController {
     protected $searchFields = array();
 
     /**
+     * List with callbacks for search
+     * @var array|callable
+     */
+    protected $searchCallback;
+
+    /**
+     * List with callbacks for expanded search
+     * @var array|callable
+     */
+    protected $filterCallback;
+
+    /**
      * Number of entries without filtering or paging
      * @var int
      */
@@ -177,7 +189,7 @@ class ListingController {
 
     /**
      * Handles a list
-     * @param mixed $entities Entity class name as string or callback function
+     * @param mixed $entities Entity class name as string or callback function (experimental)
      * @param array $crit (optional) Doctrine style criteria array to use
      * @param array $options (Unused)
      */
@@ -202,7 +214,13 @@ class ListingController {
         if (isset($options['searchFields'])) {
             $this->searchFields = $options['searchFields'];
         }
-        if (isset($options['customFields'])) {
+        if (isset($options['searchCallback'])) {
+            $this->searchCallback = $options['searchCallback'];
+        }
+        if (isset($options['filterCallback'])) {
+            $this->filterCallback = $options['filterCallback'];
+        }
+	if (isset($options['customFields'])) {
             $this->customFields = $options['customFields'];
         }
         // init handlers (filtering, paging and sorting)
@@ -319,13 +337,25 @@ class ListingController {
             return $data;
         }
         $em = \Env::get('em');
-        $entityRepository = $em->getRepository($this->entityClass);
+        if (!$this->callback) {
+            $entityRepository = $em->getRepository($this->entityClass);
+        }
         foreach ($this->order as $field=>&$order) {
             $order = $order == SORT_DESC ? 'DESC' : 'ASC';
         }
 
+        if ($this->callback) {
+            $callback = $this->callback;
+            $entities = $callback(
+                $this->offset,
+                $this->count,
+                $this->criteria,
+                $this->order
+            )->getResult();
+            $this->dataSize = $this->count;
+
         // YAMLRepository:
-        if ($entityRepository instanceof \Countable) {
+        } else if ($entityRepository instanceof \Countable) {
             if (!empty($this->filter)) {
                 \DBG::msg('YAMLRepository does not support "filter" yet');
             }
@@ -339,39 +369,104 @@ class ListingController {
         } else {
             $qb = $em->createQueryBuilder();
             $metaData = $em->getClassMetadata($this->entityClass);
-            $qb->select('x')->from($this->entityClass, 'x');
-            $i = 1;
+            $qb->select('DISTINCT x')->from($this->entityClass, 'x');
             // filtering: advanced search
             if ($this->filtering) {
-                foreach ($this->criteria as $field=>$crit) {
-                    if (
-                        !empty($this->filterFields) &&
-                        !in_array($field, $this->filterFields)
-                    ) {
-                        continue;
+                if (
+                    is_array($this->filterCallback) &&
+                    isset($this->filterCallback['adapter']) &&
+                    isset($this->filterCallback['method'])
+                ) {
+                    $json = new \Cx\Core\Json\JsonData();
+                    $jsonResult = $json->data(
+                        $this->filterCallback['adapter'],
+                        $this->filterCallback['method'],
+                        array(
+                            'qb' => $qb,
+                            'crit' => $this->criteria,
+                        )
+                    );
+                    if ($jsonResult['status'] == 'success') {
+                        $qb = $jsonResult['data'];
                     }
-                    if (isset($metaData->associationMappings[$field])) {
-                        $qb->andWhere($qb->expr()->eq('x.' . $field, '?' . $i));
-                    } else {
-                        $qb->andWhere($qb->expr()->like('x.' . $field, '?' . $i));
+                } else if (is_callable($this->filterCallback)) {
+                    $filterCallback = $this->filterCallback;
+                    $qb = $filterCallback(
+                        $qb,
+                        $this->criteria
+                    );
+                } else {
+                    $i = 1;
+                    foreach ($this->criteria as $field=>$crit) {
+                        if (
+                            !empty($this->filterFields) &&
+                            !in_array($field, $this->filterFields)
+                        ) {
+                            continue;
+                        }
+                        if (isset($metaData->associationMappings[$field])) {
+                            if (
+                                $metaData->associationMappings[$field]['type'] ==
+                                \Doctrine\ORM\Mapping\ClassMetadataInfo::MANY_TO_MANY
+                            ) {
+                                $qb->andWhere(
+                                     '?' . $i . ' MEMBER OF ' . 'x.' . $field
+                                );
+                            } else {
+                                $qb->andWhere(
+                                    $qb->expr()->eq('x.' . $field, '?' . $i)
+                                );
+                            }
+                        } else {
+                            $qb->andWhere(
+                                $qb->expr()->like('x.' . $field, '?' . $i)
+                            );
+                        }
+                        $qb->setParameter($i, $crit);
+                        $i++;
                     }
-                    $qb->setParameter($i, $crit);
-                    $i++;
                 }
             }
             // filtering: simple search by term
             if ($this->searching) {
                 if (!empty($this->filter) && count($this->searchFields)) {
-                    $ors = array();
-                    $orX = new \Doctrine\DBAL\Query\Expression\CompositeExpression(
-                        \Doctrine\DBAL\Query\Expression\CompositeExpression::TYPE_OR
-                    );
-                    // TODO: If $this->searchFields is empty allow all
-                    foreach ($this->searchFields as $field) {
-                        $orX->add($qb->expr()->like('x.' . $field, '?' . $i));
+                    if (
+                        is_array($this->searchCallback) &&
+                        isset($this->searchCallback['adapter']) &&
+                        isset($this->searchCallback['method'])
+                    ) {
+                        $json = new \Cx\Core\Json\JsonData();
+                        $jsonResult = $json->data(
+                            $this->searchCallback['adapter'],
+                            $this->searchCallback['method'],
+                            array(
+                                'qb' => $qb,
+                                'fields' => $this->searchFields,
+                                'crit' => $this->filter
+                            )
+                        );
+                        if ($jsonResult['status'] == 'success') {
+                            $qb = $jsonResult['data'];
+                        }
+                    } else if (is_callable($this->searchCallback)) {
+                        $searchCallback = $this->searchCallback;
+                        $qb = $searchCallback(
+                            $qb,
+                            $this->searchFields,
+                            $this->filter
+                        );
+                    } else {
+                        $ors = array();
+                        $orX = new \Doctrine\DBAL\Query\Expression\CompositeExpression(
+                            \Doctrine\DBAL\Query\Expression\CompositeExpression::TYPE_OR
+                        );
+                        // TODO: If $this->searchFields is empty allow all
+                        foreach ($this->searchFields as $field) {
+                            $orX->add($qb->expr()->like('x.' . $field, ':term'));
+                        }
+                        $qb->andWhere($orX);
+                        $qb->setParameter('term', '%' . $this->filter . '%');
                     }
-                    $qb->andWhere($orX);
-                    $qb->setParameter($i, '%' . $this->filter . '%');
                 }
             }
             foreach ($this->order as $field=>&$order) {
@@ -382,8 +477,10 @@ class ListingController {
             $entities = $qb->getQuery()->getResult();
 
             $metaData = $em->getClassMetaData($this->entityClass);
+            $identifierFieldNames = $metaData->getIdentifierFieldNames();
+            $identifierFieldNames = reset($identifierFieldNames);
             $qb->select(
-                'count(x.' . reset($metaData->getIdentifierFieldNames()) . ')'
+                'count(DISTINCT x.' . $identifierFieldNames . ')'
             );
             $qb->setFirstResult(null);
             $qb->setMaxResults(null);

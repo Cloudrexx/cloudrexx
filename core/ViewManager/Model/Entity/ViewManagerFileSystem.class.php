@@ -58,12 +58,48 @@ class ViewManagerFileSystem extends \Cx\Core\MediaSource\Model\Entity\LocalFileS
     }
 
     /**
+     * Returns the file list of installed webdesign templates.
+     * Folders of webdesign templates that are not installed, will
+     * not be returned.
+     *
      * @param            $directory
      * @param bool|false $recursive
      *
      * @return array
      */
-    public function getFileList($directory, $recursive = true, $readonly = false) {
+    public function getFileList($directory, $recursive = true, $readonly = false)
+    {
+        $filesList = $this->getFullFileList($directory, $recursive);
+
+        // filter out folders of non-used themes
+        $themeRepository = new \Cx\Core\View\Model\Repository\ThemeRepository();
+        if ($directory != '/') {
+            return $filesList;
+        }
+        foreach ($filesList as $folderName => $files) {
+            if (!$themeRepository->findOneBy(array('foldername' => $folderName))) {
+                unset($filesList[$folderName]);
+            }
+        }
+        return $filesList;
+    }
+
+    /**
+     * Return the full/raw file list
+     *
+     * This returns the complete list of directories and files in the root
+     * directory as they exist in the underlying file system.
+     * This method is solely used by this component and should not be used
+     * anywhere else.
+     * Instead you should use {@see ViewManagerFileSystem::getFileList()}.
+     *
+     * @param   string  $directory Path to fetch the directories and files of
+     * @param   boolean $recursive Whether or not to return any subdirectories
+     *                             and files.
+     *
+     * @return array List of directories and files in $directory
+     */
+    public function getFullFileList($directory, $recursive = true) {
         $fileList = array();
 
         // fetch files from additional file systems
@@ -79,6 +115,7 @@ class ViewManagerFileSystem extends \Cx\Core\MediaSource\Model\Entity\LocalFileS
         if (!empty($websiteFileList)) {
             $fileList = $this->mergeFileList($fileList, $websiteFileList);
         }
+
         return $fileList;
     }
 
@@ -310,7 +347,7 @@ class ViewManagerFileSystem extends \Cx\Core\MediaSource\Model\Entity\LocalFileS
     public function getFileFromPath($filepath) {
         $fileinfo = pathinfo($filepath);
         $path = dirname($filepath);
-        $files = $this->getFileList($fileinfo['dirname']);
+        $files = $this->getFileList($fileinfo['dirname'], false);
         if (!isset($files[$fileinfo['basename']])) {
             return false;
         }

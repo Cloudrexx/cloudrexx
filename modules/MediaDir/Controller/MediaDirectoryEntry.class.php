@@ -1526,15 +1526,12 @@ JSCODE;
                 continue;
             }
 
-            // skip meta attributes or ones that are out of scope (frontend/backend)
-            if (   // type = 'add_step'
-                   $arrInputfield['type'] == 16
-                   // type = 'label'
-                || $arrInputfield['type'] == 18
-                   // type = 'title'
-                || $arrInputfield['type'] == 30
-                   // show_in is neither FRONTEND or BACKEND ($intShowIn = 2|3) nor FRONTEND AND BACKEND (show_in=1)
-                || ($arrInputfield['show_in'] != $intShowIn && $arrInputfield['show_in'] != 1)
+            // skip attributes that are out of scope (frontend/backend)
+            if (
+                // show_in is neither FRONTEND or BACKEND ($intShowIn = 2|3)
+                $arrInputfield['show_in'] != $intShowIn &&
+                // nor FRONTEND AND BACKEND (show_in=1)
+                $arrInputfield['show_in'] != 1
             ) {
                 continue;
             }
@@ -1899,6 +1896,7 @@ JSCODE;
                 $objTpl->setVariable(array(
                     $this->moduleLangVar . '_ENTRY_' . $list . '_ID'        => $objCategoriesLevels->fields['elm_id'],
                     $this->moduleLangVar . '_ENTRY_' . $list . '_NAME'      => contrexx_raw2xhtml($objCategoriesLevels->fields['elm_name']),
+                    $this->moduleLangVar . '_ENTRY_' . $list . '_DESCRIPTION'=> $objCategoriesLevels->fields['elm_desc'],
                     $this->moduleLangVar . '_ENTRY_' . $list . '_LINK'      => '<a href="'.$this->getAutoSlugPath(null, $categoryId, $levelId, true).'">'.contrexx_raw2xhtml($objCategoriesLevels->fields['elm_name']).'</a>',
                     $this->moduleLangVar . '_ENTRY_' . $list . '_LINK_SRC'  => $this->getAutoSlugPath(null, $categoryId, $levelId, true),
                     $this->moduleLangVar . '_ENTRY_' . $list . '_PICTURE'   => '<img src="'.$picture.'" border="0" alt="'.contrexx_raw2xhtml($objCategoriesLevels->fields['elm_name']).'" />',
@@ -1950,7 +1948,8 @@ JSCODE;
         $query = "SELECT
             cat_rel.`category_id` AS `elm_id`,
             cat_image.`picture` AS `elm_picture`,
-            cat_name.`category_name` AS `elm_name`
+            cat_name.`category_name` AS `elm_name`,
+            cat_name.`category_description` AS `elm_desc`
           FROM
             ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_categories AS cat_rel
           INNER JOIN
@@ -1990,7 +1989,8 @@ JSCODE;
         $query = "SELECT
             level_rel.`level_id` AS `elm_id`,
             level_image.`picture` AS `elm_picture`,
-            level_name.`level_name` AS `elm_name`
+            level_name.`level_name` AS `elm_name`,
+            level_name.`level_description` AS `elm_desc`
           FROM
             ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_levels AS level_rel
           INNER JOIN

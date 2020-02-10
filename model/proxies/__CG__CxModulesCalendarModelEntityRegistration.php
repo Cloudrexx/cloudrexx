@@ -73,10 +73,10 @@ class Registration extends \Cx\Modules\Calendar\Model\Entity\Registration implem
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'id', 'date', 'submissionDate', 'hostName', 'ipAddress', 'type', 'invite', 'userId', 'langId', 'export', 'paymentMethod', 'paid', 'registrationFormFieldValues', 'event', 'validators', 'virtual');
+            return array('__isInitialized__', 'id', 'date', 'submissionDate', 'type', 'invite', 'userId', 'langId', 'export', 'paymentMethod', 'paid', 'registrationFormFieldValues', 'event', 'validators', 'virtual');
         }
 
-        return array('__isInitialized__', 'id', 'date', 'submissionDate', 'hostName', 'ipAddress', 'type', 'invite', 'userId', 'langId', 'export', 'paymentMethod', 'paid', 'registrationFormFieldValues', 'event', 'validators', 'virtual');
+        return array('__isInitialized__', 'id', 'date', 'submissionDate', 'type', 'invite', 'userId', 'langId', 'export', 'paymentMethod', 'paid', 'registrationFormFieldValues', 'event', 'validators', 'virtual');
     }
 
     /**
@@ -239,50 +239,6 @@ class Registration extends \Cx\Modules\Calendar\Model\Entity\Registration implem
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getSubmissionDate', array());
 
         return parent::getSubmissionDate();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setHostName($hostName)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setHostName', array($hostName));
-
-        return parent::setHostName($hostName);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getHostName()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getHostName', array());
-
-        return parent::getHostName();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setIpAddress($ipAddress)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setIpAddress', array($ipAddress));
-
-        return parent::setIpAddress($ipAddress);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getIpAddress()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getIpAddress', array());
-
-        return parent::getIpAddress();
     }
 
     /**

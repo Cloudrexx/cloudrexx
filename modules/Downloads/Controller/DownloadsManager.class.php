@@ -266,14 +266,13 @@ class DownloadsManager extends DownloadsLibrary
         $downloadOrderDirection = !empty($_GET['download_sort']) ? $_GET['download_sort'] : 'asc';
         $downloadOrderBy = !empty($_GET['download_by']) ? $_GET['download_by'] : 'order';
 
-        $searchTerm = !empty($_REQUEST['search_term']) ? $_REQUEST['search_term'] : Null;
-        $searchTerm = ($searchTerm == $_ARRAYLANG['TXT_DOWNLOADS_SEARCH_DOWNLOAD']) ? Null : $searchTerm;
+        $searchTerm = !empty($_REQUEST['search_term']) ? contrexx_input2raw($_REQUEST['search_term']) : '';
 
         // downloads
         $this->objTemplate->setVariable(array(
             'TXT_DOWNLOADS_DOWNLOADS'       => $_ARRAYLANG['TXT_DOWNLOADS_DOWNLOADS'],
             'TXT_DOWNLOADS_SEARCH_DOWNLOAD' => $_ARRAYLANG['TXT_DOWNLOADS_SEARCH_DOWNLOAD'],
-            'DOWNLOADS_SEARCH_TERM'         => !empty($searchTerm) ? $searchTerm : '',
+            'DOWNLOADS_SEARCH_TERM'         => contrexx_raw2xhtml($searchTerm),
             'DOWNLOADS_CATEGORY_MENU'       => $this->getCategoryMenu('read', $objCategory->getId(), $_ARRAYLANG['TXT_DOWNLOADS_ALL_CATEGORIES']),
             'TXT_DOWNLOADS_SEARCH'          => $_ARRAYLANG['TXT_DOWNLOADS_SEARCH'],
         ));
@@ -917,10 +916,9 @@ class DownloadsManager extends DownloadsLibrary
         }
 
         //$categoryId = !empty($_REQUEST['category_id']) ? intval($_REQUEST['category_id']) : 0;
-        $actualSearchTerm = !empty($_GET['search_term']) ? $_GET['search_term'] : Null;
-        $searchTerm = ($actualSearchTerm == $_ARRAYLANG['TXT_DOWNLOADS_SEARCH_DOWNLOAD']) ? Null : $actualSearchTerm;
-        $pagingLink = !empty($_GET['search_term']) ? '&search_term='.$_GET['search_term'] : '';
-        $pagingLink .= (!empty($_GET['act']) && $_GET['act'] == 'downloads') ? '&downloads_category_parent_id=0' : '';
+        $searchTerm = !empty($_GET['search_term']) ? contrexx_input2raw($_GET['search_term']) : '';
+        $pagingLink = !empty($searchTerm) ? '&search_term='.contrexx_raw2encodedUrl($searchTerm, true) : '';
+        $pagingLink .= (!empty($_GET['act']) && $_GET['act'] == 'downloads') ? '&downloads_category_parent_id=' . $this->parentCategoryId : '';
         if (isset($_POST['downloads_download_select_action'])) {
             switch ($_POST['downloads_download_select_action']) {
                 case 'order':
@@ -938,7 +936,7 @@ class DownloadsManager extends DownloadsLibrary
         $this->objTemplate->setVariable(array(
             'TXT_DOWNLOADS_FILTER'          => $_ARRAYLANG['TXT_DOWNLOADS_FILTER'],
             'TXT_DOWNLOADS_SEARCH_DOWNLOAD' => $_ARRAYLANG['TXT_DOWNLOADS_SEARCH_DOWNLOAD'],
-            'DOWNLOADS_SEARCH_TERM'         => !empty($searchTerm) ? $searchTerm : '',
+            'DOWNLOADS_SEARCH_TERM'         => contrexx_raw2xhtml($searchTerm),
             'DOWNLOADS_CATEGORY_MENU'       => $this->getCategoryMenu('read', $objCategory->getId(), $_ARRAYLANG['TXT_DOWNLOADS_ALL_CATEGORIES']),
             'TXT_DOWNLOADS_SEARCH'          => $_ARRAYLANG['TXT_DOWNLOADS_SEARCH'],
         ));
@@ -1014,11 +1012,11 @@ class DownloadsManager extends DownloadsLibrary
         $downloadCount = $objDownload->getFilteredSearchDownloadCount();
         if ($downloadCount > $_CONFIG['corePagingLimit']) {
             $sorting = '';
-            if (!$actualSearchTerm){
+            if (!$searchTerm){
                 $sorting = "&sort=".htmlspecialchars($orderDirection)."&by=".htmlspecialchars($orderBy);
         }
 
-            $this->objTemplate->setVariable('DOWNLOADS_DOWNLOAD_PAGING', getPaging($downloadCount, $limitOffset, '&cmd=downloads&act=downloads'.$sorting.$pagingLink, "<b>".$_ARRAYLANG['TXT_DOWNLOADS_DOWNLOADS']."</b>"));
+            $this->objTemplate->setVariable('DOWNLOADS_DOWNLOAD_PAGING', getPaging($downloadCount, $limitOffset, '&cmd=Downloads&act=downloads'.$sorting.$pagingLink, "<b>".$_ARRAYLANG['TXT_DOWNLOADS_DOWNLOADS']."</b>"));
 
         }
 
@@ -1532,14 +1530,15 @@ class DownloadsManager extends DownloadsLibrary
                 'DOWNLOADS_DOWNLOAD_TYPE_FILE_CHECKED' => $objDownload->getType() == 'file' ? 'checked="checked"' : '',
                 'DOWNLOADS_DOWNLOAD_TYPE_URL_CHECKED' => $objDownload->getType() == 'url' ? 'checked="checked"' : '',
             ));
-            $this->objTemplate->parse('downloads_download_language_content');
-        }
 
-        // parse metakeys
-        if ($this->arrConfig['use_attr_metakeys']) {
-            $this->objTemplate->parse('downloads_download_metakeys');
-        } else {
-            $this->objTemplate->hideBlock('downloads_download_metakeys');
+            // parse metakeys
+            if ($this->arrConfig['use_attr_metakeys']) {
+                $this->objTemplate->touchBlock('downloads_download_metakeys');
+            } else {
+                $this->objTemplate->hideBlock('downloads_download_metakeys');
+            }
+
+            $this->objTemplate->parse('downloads_download_language_content');
         }
 
         // parse type
@@ -1956,8 +1955,7 @@ class DownloadsManager extends DownloadsLibrary
         $downloadOrderDirection = !empty($_GET['download_sort']) ? $_GET['download_sort'] : 'asc';
         $downloadOrderBy = !empty($_GET['download_by']) ? $_GET['download_by'] : '';
 
-        $searchTerm = !empty($_GET['search_term']) ? $_GET['search_term'] : '';
-        $searchTerm = $searchTerm == $_ARRAYLANG['TXT_DOWNLOADS_SEARCH_DOWNLOAD'] ? '' : $searchTerm;
+        $searchTerm = !empty($_GET['search_term']) ? contrexx_input2raw($_GET['search_term']) : '';
 
         // parse categories multi action
         if (isset($_POST['downloads_category_select_action'])) {
@@ -2091,7 +2089,7 @@ class DownloadsManager extends DownloadsLibrary
             'TXT_DOWNLOADS_CATEGORY'            => $_ARRAYLANG['TXT_DOWNLOADS_CATEGORY'],
             'DOWNLOADS_CATEGORY_ID'             => $objCategory->getId(),
             'DOWNLOADS_CATEGORY_MENU'           => $this->getCategoryMenu('read', $objCategory->getId(), $_ARRAYLANG['TXT_DOWNLOADS_ALL_CATEGORIES']),
-            'DOWNLOADS_SEARCH_TERM'             => !empty($_GET['search_term']) ? $_GET['search_term'] : '',
+            'DOWNLOADS_SEARCH_TERM'             => contrexx_raw2xhtml($searchTerm),
             'TXT_DOWNLOADS_SEARCH_DOWNLOAD'     => $_ARRAYLANG['TXT_DOWNLOADS_SEARCH_DOWNLOAD'],
             'TXT_DOWNLOADS_FILTER'              => $_ARRAYLANG['TXT_DOWNLOADS_FILTER'],
             'TXT_DOWNLOADS_SEARCH'              => $_ARRAYLANG['TXT_DOWNLOADS_SEARCH'],
@@ -2403,10 +2401,141 @@ class DownloadsManager extends DownloadsLibrary
 
 
         if ($objCategory->getId()) {
-            $this->objTemplate->setVariable('TXT_DOWNLOADS_CATEGORIES_OF_CATEGORY', sprintf($_ARRAYLANG['TXT_DOWNLOADS_CATEGORIES_OF_CATEGORY'], '&bdquo;'.htmlentities($objCategory->getName(), ENT_QUOTES, CONTREXX_CHARSET).'&ldquo;'));
+            $parentNames = array();
+            $this->getParentCategoryNamesByChild($objCategory, $parentNames);
+
+            $categories = array(
+                'root' => array(),
+                'middle' => array(),
+                'previous' => array(),
+                'current' => array(),
+            );
+
+            foreach($parentNames as $position => $parentName) {
+                switch($position) {
+                    case 0:
+                        // Position 0 is the "current category"
+                        // Shorten the name after 60 chars
+                        $categories['current']['long'] = $parentName;
+                        $categories['current']['short'] = substr(
+                            $parentName, 0, 60
+                        );
+                        break;
+                    case 1:
+                        // Position 1 is the "previous category"
+                        // Shorten the name after 30 chars
+                        $categories['previous']['long'] = $parentName;
+                        $categories['previous']['short'] = substr(
+                            $parentName, 0, 30
+                        );
+                        break;
+                    case count($parentNames) - 1:
+                        // The last position is the "root category"
+                        // Shorten the name after 30 chars
+                        $categories['root']['long'] = $parentName;
+                        $categories['root']['short'] = substr(
+                            $parentName, 0, 30
+                        );
+                        break;
+                    default:
+                        // Add the remaining categories to an array
+                        $categories['middle'][] = $parentName;
+                        break;
+                }
+
+            }
+
+            // Flip the array to get the grandparents first
+            $categories['middle'] = array_reverse($categories['middle']);
+
+            $content =
+                sprintf(
+                    $_ARRAYLANG['TXT_DOWNLOADS_CATEGORIES_OF_CATEGORY'],
+                    $this->getCategoryElement($categories['root']) .
+                    $this->getCategoryElement($categories['middle']) .
+                    $this->getCategoryElement($categories['previous']) .
+                    $this->getCategoryElement($categories['current'])
+                );
+
+            $this->objTemplate->setVariable(
+                'TXT_DOWNLOADS_CATEGORIES_OF_CATEGORY',
+                $content
+            );
         }
     }
 
+    /**
+     * Get a span tag with the category name. If the parameter contains a long
+     * and a short category name, the long name will be added as title
+     * attribute. The short name is used as content for the span tag.
+     *
+     * If the parameter only contains category names, the category names are
+     * listed one below the other in the title attribute. The content of the
+     * span tag consists of three dots.
+     *
+     * @param array $category with long and short category name or only names
+     * @return string a span tag or an empty string
+     */
+    protected function getCategoryElement(array $category) : string
+    {
+        if (empty($category)) {
+            return '';
+        }
+
+        $title = '';
+        $text = '...';
+
+        if (!empty($category['long']) && !empty($category['short'])) {
+            $title = $category['long'];
+            $text = $category['short'];
+
+            if ($category['short'] !== $category['long']) {
+                $text .= '...';
+            }
+
+        } else {
+            foreach ($category as $middle) {
+                $title .= $middle . "\n";
+            }
+        }
+
+        $span = new \Cx\Core\Html\Model\Entity\HtmlElement('span');
+        $span->addChild(
+            new \Cx\Core\Html\Model\Entity\TextElement($text)
+        );
+        $span->setAttribute('title', $title);
+
+        return $span;
+    }
+
+    /**
+     * Get the name of the child category and all names of the parent categories
+     *
+     * @param \Cx\Modules\Downloads\Controller\Category $child child category
+     * @param array $names previous category names for recursion
+     */
+    protected function getParentCategoryNamesByChild(
+        \Cx\Modules\Downloads\Controller\Category $child,
+        array &$names
+    ) {
+        $names[] = $child->getName();
+        if (empty($child->getParentId())) {
+            return;
+        }
+
+        $parent = \Cx\Modules\Downloads\Controller\Category::getCategory(
+            $child->getParentId()
+        );
+
+        if (empty($parent)) {
+            return;
+        }
+
+        $this->getParentCategoryNamesByChild(
+            $parent,
+            $names
+        );
+    }
 
     private function parseCategoryDownloads($objCategory, $downloadOrderBy, $downloadOrderDirection, $downloadLimitOffset, $categoryOrderBy, $categoryOrderDirection, $categoryLimitOffset, $searchTerm)
     {

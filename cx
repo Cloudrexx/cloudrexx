@@ -4,7 +4,7 @@
 # vim: syn=sh
 
 # Wrapper for bash 3
-if [[ $BASH_VERSION != 4.* ]]; then
+if [ "${BASH_VERSION:0:1}" -lt 4 ]; then
     command="cd /root && ./cx --proxy-host-dir='$(pwd -P)' $@"
     # Special case: user wants to start interactive shell to wrapper container
     if [[ "$@" == "env shell --wrapper" ]]; then
@@ -12,7 +12,7 @@ if [[ $BASH_VERSION != 4.* ]]; then
     fi
 
     # Pass everything through our wrapper
-    docker run --rm -ti --name clx-win-wrapper -v "$(pwd -P)/":/root -v /var/run/docker.sock:/var/run/docker.sock cloudrexx/ubuntu bash -c "$command"
+    docker run --rm -ti --name clx-win-wrapper --user=$(id -u):$(stat -c '%g' /var/run/docker.sock) -v "$(pwd -P)/":/root -v /var/run/docker.sock:/var/run/docker.sock cloudrexx/ubuntu bash -c "$command"
     exit 0
 fi
 
@@ -288,6 +288,7 @@ Available options are:
     --silent                        Do not output non-necessary messages
     --interactive                   Ask for each value instead of using default behavior
     --force-default                 Forces default (/automatic) configuration
+    --no-persist=[<containers>]     Disable persistance of a container. Currently the only value suppored for <containers> is: db
     --db-host=<hostname>            Sets database host to <hostname>
     --db-name=<dbname>              Sets database name to <dbname>
     --db-user=<username>            Sets database user to <username>
@@ -451,6 +452,7 @@ Available subcommands are:
     shell       Interactive shell of the current environment's web container
     component   Manages additional components
     remote      Manages remote installations
+    exec        Executes code (Bash/SQL) for the current environment
 
 For more info about a subcommand type ./cx help env <subcommand>";
                     ;;
@@ -468,7 +470,9 @@ Synopsis
 Available options are:
     --web               Shows the log of the web docker container (Apache)
     --request           Shows the log of the last request
+    --stack             Shows the stack trace of the last failed request
     --clear-usercache   Clears the user cache
+    --install-x-debug   Installs xDebug inside the web container
     --follow            Follows the log"
             ;;
         *)
@@ -762,7 +766,7 @@ function cmd_env {
                     exit 1
                 fi
             fi
-            ARGUMENTS["dir"]="$(pwd -P)"
+            ARGUMENTS["dir"]="$(get_real_pwd)"
             envname="$(cmd_envs list)"
             if [[ "$?" == "0" ]]; then
                 echo "There's already an environment up and running (\"$envname\") for this directory."
@@ -779,7 +783,19 @@ function cmd_env {
             if [[ ${ARGUMENTS["silent"]} != true ]]; then
                 echo "Applying configuration to new environment"
             fi
-            phpexec config --force
+            # for version 5 or newer, we do want to reinitialize the base
+            # configuration to ensure any newly added setting options
+            # get properly initialized after a GIT update
+            if [[ "${CONFIG["cms-version"]:0:1}" -ge 5 ]]; then
+                # This makes only sense in case the db has been loaded yet (which
+                # is not the case when performing an init).
+                # We therefore check if the table contrexx_component does exist
+                mysql_create_tempfile
+                mysql_exec "SELECT 1 from \`${CONFIG["db-prefix"]}component\` LIMIT 1" &> /dev/null
+                if [[ $? == 0 ]]; then
+                    phpexec config --force
+                fi
+            fi
             if [[ ${ARGUMENTS["silent"]} != true ]]; then
                 echo "Environment successfully initialized. It is available at http://${CONFIG["hostname"]}/"
                 if [[ ${CONFIG["is-vhost"]} == true ]]; then
@@ -792,7 +808,7 @@ function cmd_env {
                 if ! which cx > /dev/null; then
                     echo ""
                     echo "cx could not be found in your path. Run the following command to add it:"
-                    echo "sudo cp $(pwd -P)/cx /usr/local/bin"
+                    echo "sudo cp $(get_real_pwd)/cx /usr/local/bin"
                 fi
             fi
             exit 0
@@ -1034,7 +1050,7 @@ SET FOREIGN_KEY_CHECKS = 1;"
             ;;
         exec)
             shift
-            if read -r -t 0; then
+            if [[ -p /dev/stdin ]]; then
                 input=$(cat -)
             fi
             if [[ ${ARGUMENTS["sql"]} ]]; then
@@ -1045,7 +1061,9 @@ SET FOREIGN_KEY_CHECKS = 1;"
                 else
                     mysql_exec "$@"
                 fi
+                RES="$?"
                 mysql_drop_tempfile
+                return $RES
             elif [[ ${ARGUMENTS["sql-file"]} ]]; then
                 get_config_array
                 mysql_create_tempfile
@@ -1335,6 +1353,7 @@ function get_config_array {
         ["php-image"]=""
         ["db-image"]=""
         ["is-vhost"]=""
+        ["no-persist"]=""
     )
     if [[ ${ARGUMENTS["force-default"]} != true ]]; then
         CONFIG["db-host"]=$(REGEX="DBCONFIG\['host'\]\ +=\ +(['\"])([^'\"]+)\1;"; CFG=$(cat $CONFIG_FILE); [[ "$CFG" =~ $REGEX ]] && echo "${BASH_REMATCH[2]}")
@@ -1364,6 +1383,11 @@ function get_config_array {
             CONFIG["is-vhost"]=true
         else
             CONFIG["is-vhost"]=false
+        fi
+        if [[ "$(cat $COMPOSE_FILE)" =~ "db-data:" ]]; then
+            CONFIG["no-persist"]=""
+        else
+            CONFIG["no-persist"]="db"
         fi
     fi
     if [[ "${CONFIG["hostname"]}" == "" || "${CONFIG["hostname"]}" == "localhost" ]]; then
@@ -1483,6 +1507,12 @@ function set_config_array {
         FILE_CONTENTS=${FILE_CONTENTS//"</novhost>"/""}
         FILE_CONTENTS=$(regex_replace_all "$FILE_CONTENTS" "(()<vhost>[^<]*</vhost>())" "")
     fi
+    if [[ "${CONFIG["no-persist"]}" =~ "db" ]]; then
+        FILE_CONTENTS=$(regex_replace_all "$FILE_CONTENTS" "(()<persistdb>[^<]*</persistdb>())" "")
+    else
+        FILE_CONTENTS=${FILE_CONTENTS//"<persistdb>"/""}
+        FILE_CONTENTS=${FILE_CONTENTS//"</persistdb>"/""}
+    fi
     # save docker-compose.yml
     echo "$FILE_CONTENTS" > docker-compose.yml
     
@@ -1495,6 +1525,8 @@ function set_config_array {
             if [[ ${ARGUMENTS["silent"]} != true ]]; then
                 echo "Configuring cache"
             fi
+            # force local domain as main domain
+            phpexec Setting set Config -engine=Yaml -group=site mainDomainId 0 > /dev/null
             phpexec Setting set Config -engine=Yaml -group=cache cacheEnabled on > /dev/null
             phpexec Setting set Config -engine=Yaml -group=cache internalSsiCache on > /dev/null
             phpexec Setting set Config -engine=Yaml -group=cache cacheUserCache memcached > /dev/null
@@ -1638,11 +1670,20 @@ function mysql_dump {
 function mysql_exec {
     if mysql_is_local; then
         mysql --defaults-file="${TEMP_FILES["db-connection"]}" -A -e "$@"
+        return $?
     else
         echo "$1" > "./tmp/db/import.sql"
         shift
-        internal_dockerexec exec -i "<db-container>" bash -c "mysql --defaults-file=${TEMP_FILES["db-connection"]} -e $@ 'SOURCE /tmp/import/import.sql'"
+        # Since mysql's SOURCE does not return an error code we need to check STDERR
+        TEMP_FILES["mysql_source_error_log"]="$(mktemp)"
+        internal_dockerexec exec "<db-container>" bash -c "mysql --defaults-file=${TEMP_FILES["db-connection"]} $@ -e 'SOURCE /tmp/import/import.sql'" 2> >(tee "$TEMP_FILES["mysql_source_error_log"]" >&2)
+        if [ -s "$TEMP_FILES["mysql_source_error_log"]" ]; then
+            RES=1
+        else
+            RES=0
+        fi
         rm "./tmp/db/import.sql"
+        return $RES
     fi
 }
 
@@ -1724,6 +1765,15 @@ function runs_as_proxy {
     fi
 }
 
+function is_wrapper {
+    if [[ "$PROXY_HOST_DIR" != "" ]]; then
+        return 0
+    elif [[ "${ARGUMENTS["proxy-host-dir"]}" != "" ]]; then
+        return 0
+    fi
+    return 1
+}
+
 function get_real_pwd {
     local working_directory
     working_directory="$PWD"
@@ -1755,7 +1805,7 @@ function isPortFree {
 # Decide what to do #
 #####################
 
-# this finds "cx" in currend pwd or above
+# this finds "cx" in current pwd or above
 path="$(pwd)"
 result=""
 found=false
@@ -1780,6 +1830,10 @@ if ! $found; then
 
     # command is envs
     elif [[ "$1" == "envs" ]]; then
+        if is_wrapper; then
+            echo "envs command is not available through wrapper!"
+            exit 1
+        fi
         COMMANDS=("${COMMANDS[@]:1}")
         cmd_envs "${COMMANDS[@]/#/}"
         exit
@@ -1797,13 +1851,18 @@ if [[ "$(pwd -P)" != "$result" || "$DIR" != "$result" ]]; then
     prevPwd="$(pwd -P)"
     cd "$result" || exit
     ./cx "$@"
+    RES=$?
     cd "$prevPwd"
-    exit
+    exit $RES
 fi
 
 ORIG_ARGS=("$@")
 case "${COMMANDS[0]}" in
     envs)
+        if is_wrapper; then
+            echo "envs command is not available through wrapper!"
+            exit 1
+        fi
         COMMANDS=("${COMMANDS[@]:1}")
         cmd_envs "${COMMANDS[@]/#/}"
         ;;
@@ -1811,8 +1870,10 @@ case "${COMMANDS[0]}" in
         COMMANDS=("${COMMANDS[@]:1}")
         if read -r -t 0; then
             cat /dev/stdin | cmd_env "${COMMANDS[@]/#/}"
+            exit $?
         else
             cmd_env "${COMMANDS[@]/#/}"
+            exit $?
         fi
         ;;
     debug)
@@ -1833,8 +1894,23 @@ case "${COMMANDS[0]}" in
         elif [[ ${ARGUMENTS["clear-usercache"]} ]]; then
             clearUsercache
             exit
+        elif [[ ${ARGUMENTS["install-x-debug"]} ]]; then
+            get_config_array
+            internal_dockerexec exec -i "<web-container>" bash -c "pecl install xdebug && docker-php-ext-enable xdebug && apachectl -k graceful"
+            exit
         fi
-        tac tmp/log/dbg.log | grep -m1 -B1 "initialization failed" | tac
+        lastError="$(tac tmp/log/dbg.log | grep -m1 -B1 "initialization failed" | tac)"
+        if [[ ${ARGUMENTS["stack"]} == true ]]; then
+            requestId="$(echo "$lastError" | grep '^[^ ].*"([a-z0-9]\+)" ' -m1 | grep -o ' "([0-9a-z]\+)" ' | grep -o '[0-9a-z]\+')"
+            if [ -t 0 ] ; then
+                echo "$lastError"$'\n'"$(grep -Pzo ".*${requestId}(.*\n)*" tmp/log/dbg.log | grep '^          [0-9]\+' -A6 | grep '^          ')" | less
+            else
+                echo "$lastError"
+                grep -Pzo ".*${requestId}(.*\n)*" tmp/log/dbg.log | grep '^          [0-9]\+' -A6 | grep '^          '
+            fi
+        else
+            echo "$lastError"
+        fi
         ;;
     *)
         if [[ "${COMMANDS[0]}" == "" || "${COMMANDS[0]}" == "help" ]]; then

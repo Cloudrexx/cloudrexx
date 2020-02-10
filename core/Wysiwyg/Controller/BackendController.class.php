@@ -394,6 +394,7 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                 'order' => array(
                     'header' => $_ARRAYLANG['TXT_' . strtoupper($this->getType() . '_' . $this->getName() . '_ACT_' . $classIdentifier) . '_ORDER'],
                     'showOverview' => false,
+                    'showDetail' => false,
                 ),
             ),
         );

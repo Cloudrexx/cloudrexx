@@ -80,6 +80,11 @@ class Newsletter extends NewsletterLib
             $_REQUEST['cmd'] = '';
         }
 
+        // All actions must not be cached. This includes all requests to
+        // unsubscribe, subscribe, confirm and profile.
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $cx->getComponent('Cache')->addException('Newsletter');
+
         switch($_REQUEST['cmd']) {
             case 'unsubscribe':
                 $this->_unsubscribe();
@@ -1061,7 +1066,6 @@ class Newsletter extends NewsletterLib
                 'key'          => 'notification_email',
                 'section'      => 'Newsletter',
                 'lang_id'      => FRONTEND_LANG_ID,
-                'to'           => implode(',', $notifyMails),
                 'from'         => $arrSettings['sender_mail']['setvalue'],
                 'sender'       => $arrSettings['sender_name']['setvalue'],
                 'reply'        => $arrSettings['reply_mail']['setvalue'],
@@ -1076,6 +1080,9 @@ class Newsletter extends NewsletterLib
                     'NEWSLETTER_CURRENT_DATE'   => date(ASCMS_DATE_FORMAT),
                 ),
             );
+            if (count($notifyMails)) {
+                $arrMailTemplate['to'] = implode(',', $notifyMails);
+            }
             if (!\Cx\Core\MailTemplate\Controller\MailTemplate::send($arrMailTemplate)) {
                 return false;
             }
@@ -1102,7 +1109,7 @@ class Newsletter extends NewsletterLib
      */
     public static function displayInBrowser()
     {
-        global $objDatabase, $_ARRAYLANG, $_CONFIG;
+        global $objDatabase, $_CONFIG;
 
         $id    = !empty($_GET['id'])    ? contrexx_input2raw($_GET['id'])    : '';
         $email = !empty($_GET['email']) ? contrexx_input2raw($_GET['email']) : '';
@@ -1211,10 +1218,6 @@ class Newsletter extends NewsletterLib
             $fax            = contrexx_raw2xhtml($objResult->fields['fax']);
             $website        = contrexx_raw2xhtml($objResult->fields['uri']);
             $birthday       = contrexx_raw2xhtml($objResult->fields['birthday']);
-
-            // unsubscribe and profile links have been removed from browser-view - 12/20/12 TD
-            //$unsubscribe        = '<a href="'.\Cx\Core\Routing\Url::fromModuleAndCmd('Newsletter', 'unsubscribe', '', array('code' => $code, 'mail' => $email)).'">'.$_ARRAYLANG['TXT_UNSUBSCRIBE'].'</a>';
-            //$profile            = '<a href="'.\Cx\Core\Routing\Url::fromModuleAndCmd('Newsletter', 'profile', '', array('code' => $code, 'mail' => $email)).'">'.$_ARRAYLANG['TXT_EDIT_PROFILE'].'</a>';
         } elseif ($objUser = \FWUser::getFWUserObject()->objUser->getUsers(array('email' => contrexx_raw2db($email), 'active' => 1), null, null, null, 1)) {
             $sex            = $objUser->objAttribute->getById($objUser->getProfileAttribute('gender'))->getName();
             $salutation     = contrexx_raw2xhtml($objUser->objAttribute->getById('title_'.$objUser->getProfileAttribute('title'))->getName());
@@ -1232,10 +1235,6 @@ class Newsletter extends NewsletterLib
             $fax            = contrexx_raw2xhtml($objUser->getProfileAttribute('phone_fax'));
             $website        = contrexx_raw2xhtml($objUser->getProfileAttribute('website'));
             $birthday       = date(ASCMS_DATE_FORMAT_DATE, $objUser->getProfileAttribute('birthday'));
-
-            // unsubscribe and profile links have been removed from browser-view - 12/20/12 TD
-            //$unsubscribe = '<a href="'.\Cx\Core\Routing\Url::fromModuleAndCmd('Newsletter', 'unsubscribe', '', array('code' => $code, 'mail' => $email)).'">'.$_ARRAYLANG['TXT_UNSUBSCRIBE'].'</a>';
-            //$profile     = '<a href="'.\Cx\Core\Routing\Url::fromModuleAndCmd('Newsletter', 'profile', '', array('code' => $code, 'mail' => $email)).'">'.$_ARRAYLANG['TXT_EDIT_PROFILE'].'</a>';
         } elseif ($crmUser->load($crmId)) {
 
             $objAttribute = \FWUser::getFWUserObject()->objUser->objAttribute
@@ -1481,7 +1480,7 @@ class Newsletter extends NewsletterLib
 
         \LinkGenerator::parseTemplate($url);
 
-        $arrSettings = static::_getSettings();
+        $arrSettings = static::getSettings();
         if (!$arrSettings['statistics']['setvalue']) {
             \Cx\Core\Csrf\Controller\Csrf::header('Location: '.$url);
             exit;

@@ -57,7 +57,7 @@ class ViewGeneratorJsonController extends \Cx\Core\Core\Model\Entity\Controller 
     public function getAccessableMethods()
     {
         return array(
-            'checkWhitelistPermission' => new \Cx\Core_Modules\Access\Model\Entity\Permission(array('http', 'https'), array('get', 'post'), true),
+            'checkWhitelistPermission' => new \Cx\Core_Modules\Access\Model\Entity\Permission(),
             'getViewOverJson' => $this->getSystemComponentController()->getWhitelistPermission(
                 'getViewOverJson'
             ),
