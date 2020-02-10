@@ -767,7 +767,7 @@ class BlockLibrary
                 'category' => $category,
                 'now' => $now,
                 'locale' => $locale,
-            ))
+            ));
         $blocks = $q->getQuery()->getResult();
 
         $this->replaceBlocks(
