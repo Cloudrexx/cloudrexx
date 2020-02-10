@@ -1676,7 +1676,7 @@ function mysql_exec {
         shift
         # Since mysql's SOURCE does not return an error code we need to check STDERR
         TEMP_FILES["mysql_source_error_log"]="$(mktemp)"
-        internal_dockerexec exec "<db-container>" bash -c "mysql --defaults-file=${TEMP_FILES["db-connection"]} $@ -e 'SOURCE /tmp/import/import.sql'" 2> >(tee "$TEMP_FILES["mysql_source_error_log"]" >&2)
+        internal_dockerexec exec "<db-container>" bash -c "mysql --defaults-file=${TEMP_FILES["db-connection"]} $@ -e 'SOURCE /tmp/import/import.sql'" 2> >(tee "${TEMP_FILES["mysql_source_error_log"]}" >&2)
         if [ -s "$TEMP_FILES["mysql_source_error_log"]" ]; then
             RES=1
         else
