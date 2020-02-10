@@ -1711,7 +1711,7 @@ class User extends User_Profile
             return;
         }
 
-        $this->restore_key = md5($this->email.$this->regdate.time());
+        $this->restore_key = md5($this->email . random_bytes(20));
         $this->restore_key_time = time() + 3600;
     }
 
