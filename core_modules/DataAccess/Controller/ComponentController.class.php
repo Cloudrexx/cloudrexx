@@ -179,6 +179,20 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             if (isset($arguments['apikey'])) {
                 $apiKey = $arguments['apikey'];
             }
+
+            $requestReadonly = in_array($method, array('options', 'head', 'get'));
+
+            if (
+                $dataSource->isVersionable() &&
+                !$requestReadonly &&
+                (
+                    !isset($arguments['version']) ||
+                    $dataSource->getCurrentVersion($elementId) != $arguments['version']
+                )
+            ) {
+                $response->setStatusCode(409);
+                throw new \BadMethodCallException('Conflict');
+            }
             
             $order = array();
             if (isset($arguments['order']) && is_array($arguments['order'])) {
