@@ -46,7 +46,7 @@ namespace Cx\Modules\Block\Model\Entity;
  * @package     cloudrexx
  * @subpackage  module_block
  */
-class Block extends \Cx\Core_Modules\Widget\Model\Entity\WidgetParseTarget
+class Block extends \Cx\Core_Modules\Widget\Model\Entity\WidgetParseTarget implements \Gedmo\Loggable\Loggable
 {
     /**
      * @var integer $id
