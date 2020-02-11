@@ -1466,7 +1466,7 @@ INSERT INTO `contrexx_core_data_source` (`id`, `identifier`, `options`, `type`) 
 INSERT INTO `contrexx_core_data_source` (`id`, `identifier`, `options`, `type`) VALUES (8, 'Cx\\Modules\\Calendar\\Model\\Entity\\RegistrationFormField', 'a:0:{}', 'doctrineRepository');
 INSERT INTO `contrexx_core_data_source` (`id`, `identifier`, `options`, `type`) VALUES (9, 'Cx\\Modules\\Calendar\\Model\\Entity\\RegistrationFormName', 'a:0:{}', 'doctrineRepository');
 INSERT INTO `contrexx_core_data_source` (`id`, `identifier`, `options`, `type`) VALUES (10, 'Cx\\Modules\\Calendar\\Model\\Entity\\RegistrationFormValue', 'a:0:{}', 'doctrineRepository');
-INSERT INTO `contrexx_core_data_source` (`id`, `identifier`, `options`, `type`) VALUES (11, 'Cx\\Modules\\Calendar\\Model\\Entity\\Invite', '', 'doctrineRepository');
+INSERT INTO `contrexx_core_data_source` (`id`, `identifier`, `options`, `type`) VALUES (11, 'Cx\\Modules\\Calendar\\Model\\Entity\\Invite', 'a:0:{}', 'doctrineRepository');
 INSERT INTO `contrexx_core_module_data_access` (`id`, `read_permission`, `write_permission`, `data_source_id`, `name`, `field_list`, `access_condition`, `allowed_output_methods`) VALUES (1, NULL, NULL, 1, 'calendar-event', 'a:0:{}', 'a:0:{}', 'a:0:{}');
 INSERT INTO `contrexx_core_module_data_access` (`id`, `read_permission`, `write_permission`, `data_source_id`, `name`, `field_list`, `access_condition`, `allowed_output_methods`) VALUES (2, NULL, NULL, 2, 'calendar-category', 'a:0:{}', 'a:0:{}', 'a:0:{}');
 INSERT INTO `contrexx_core_module_data_access` (`id`, `read_permission`, `write_permission`, `data_source_id`, `name`, `field_list`, `access_condition`, `allowed_output_methods`) VALUES (3, NULL, NULL, 3, 'calendar-categoryname', 'a:0:{}', 'a:0:{}', 'a:0:{}');
