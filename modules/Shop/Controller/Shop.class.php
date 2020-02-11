@@ -268,6 +268,12 @@ class Shop extends ShopLibrary
     {
 //\DBG::activate(DBG_ERROR_FIREPHP);
 //\DBG::activate(DBG_LOG_FILE);
+
+        // output xml-sitemap of prodcuts
+        if (isset($_GET['xmlsitemap'])) {
+            static::getXmlSitemap();
+        }
+
         self::init();
         self::registerJavascriptCode();
         // PEAR Sigma template
@@ -5287,4 +5293,152 @@ die("Shop::processRedirect(): This method is obsolete!");
         return false;
     }
 
+    /**
+     * Generates an XML-sitemap of all published products
+     *
+     * The xml-sitemap does only contain products that meet the following
+     * requirements:
+     * - product must be active
+     * - product must be published (within scheduled time span)
+     * - product must not be sold out and auto-deactivated
+     * - product must be associated to at least one published category
+     *
+     * @throws \Cx\Core\Core\Controller\InstanceException
+     */
+    protected static function getXmlSitemap() {
+        // initializze xml document
+        $xml = new \XMLWriter();
+        $xml->openMemory();
+        $xml->startDocument('1.0', 'UTF-8');
+        $xml->startElementNS(
+            null,
+            'urlset',
+            'http://www.sitemaps.org/schemas/sitemap/0.9'
+        );
+
+        // fetch and add products to xml-sitemap
+        try {
+            // get base url to detail page of a product in shop
+            $productUrl = \Cx\Core\Routing\Url::fromModuleAndCmd(
+                'Shop',
+                'details',
+                FRONTEND_LANG_ID,
+                array(),
+                '',
+                false
+            );
+
+            // fetch all categories. we will use this to verify if the products
+            // are associated to at least one published category
+            ShopCategories::invalidateTreeArray();
+            $categories = ShopCategories::getNameArray(true);
+
+            // hard-coded set the fetch-limit to 50000 products as
+            // the model does currently not provide any way to fetch all
+            // products without any limit.
+            // the limit of 50000 is used as an xml-sitemap should not
+            // exceed this limit (at least this is the limit that google
+            // supports).
+            $count = 50000;
+
+            // fetch all (inc. inactive) products as there is no other way
+            // to fetch non-filterted products in frontend
+            // note that all inactive (and non-published) products will be
+            // filtered out in the next foreach-statement
+            $products = Products::getByShopParams(
+                $count,
+                0,
+                null,
+                null,
+                null, 
+                null,
+                false,
+                false,
+                null,
+                null,
+                true
+            );
+
+            // filter out non-published products
+            foreach ($products as $idx => $product) {
+                // remove inactive and sold-out products
+                if (!$product->getStatus()) {
+                    unset($products[$idx]);
+                    continue;
+                }
+
+                // remove scheduled products that are currently not published
+                if (!$product->getActiveByScheduledPublishing()) {
+                    unset($products[$idx]);
+                    continue;
+                }
+
+                // remove products that are not part of an active category
+                // note: this has to be done as the current model of
+                // $product->category_id is a comma-separated list and does
+                // therefore not allow an efficiant way to filter out
+                // any products directly through SQL.
+                $categoryIds = explode(',', $product->category_id());
+                $hasActiveCategory = false;
+                foreach ($categoryIds as $categoryId) {
+                    if (isset($categories[$categoryId])) {
+                        $hasActiveCategory = true;
+                        break;
+                    }
+                }
+                if (!$hasActiveCategory) {
+                    unset($products[$idx]);
+                    continue;
+                }
+            }
+
+            // add products to xml-sitemap
+            foreach ($products as $product) {
+                // update url to point to the currently parsing product
+                $productUrl->setParam('productId', $product->id());
+
+                // open url element (add <url>)
+                $xml->startElement('url');
+
+                // open loc element (add <loc>)
+                $xml->startElement('loc');
+
+                // add url to product as inner-text of <loc> element
+                $xml->text($productUrl->toString());
+
+                // close loc element (add </loc>)
+                $xml->endElement();
+
+                // close url element (add </url>)
+                $xml->endElement();
+            }
+        } catch (\Cx\Core\Routing\UrlException $e) {
+            // an UrlException means that there is no detail product page
+            // published that could be used as target for the xml-sitemap.
+            // therefore we do simply output an valid xml-sitemap without
+            // any <url>-elements
+            \DBG::dump($e->getMessage());
+        }
+
+        // finish xml document
+        $xml->endDocument();
+
+        // prepare reponse for client
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $cx->getResponse()->setContentType('application/xml');
+        $cx->getResponse()->setParsedContent($xml->outputMemory());
+
+        // generate cache of generated xml-sitemap
+        $cx->getComponent('Cache')->writeCacheFileForRequest(
+            $cx->getPage(),
+            $cx->getResponse()->getHeaders(),
+            $cx->getResponse()->getParsedContent()
+        );
+
+        // return xml-sitemap to client
+        $cx->getResponse()->send();
+
+        // finish request execution
+        throw new \Cx\Core\Core\Controller\InstanceException();
+    }
 }
