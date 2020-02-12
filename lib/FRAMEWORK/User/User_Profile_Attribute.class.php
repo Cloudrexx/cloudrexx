@@ -1273,6 +1273,16 @@ class User_Profile_Attribute
 // TODO: I suppose the precedence is okay like this.
 //        return ($this->isCoreAttribute($attributeId) || $this->deleteAttributeContent($attributeId)) && ($this->isCoreAttribute($attributeId) || $this->deleteAttributeNames($attributeId)) && $this->deleteAttributeEntity($attributeId);
 // However, it would be clearer with a few parentheses.
+
+        $parentId = $this->arrAttributes[$attributeId]['parent_id'] ?? '0';
+        $pattern = array();
+        if (
+            $parentId == 'title' &&
+            preg_match('#([0-9]+)#', $attributeId, $pattern)
+        ) {
+            $attributeId = $pattern[0];
+        }
+
         return
             (   $this->isDefaultAttribute($attributeId)
              ||    $this->deleteAttributeContent($attributeId))
@@ -1286,10 +1296,8 @@ class User_Profile_Attribute
     {
         global $objDatabase, $_ARRAYLANG;
 
-        $parentId = $this->arrAttributes[$attributeId]['parent_id'] ?? '0';
         $affectedTable = DBPREFIX.'access_user_attribute';
-        $pattern = array();
-        if ($objDatabase->Execute('DELETE FROM `'.$affectedTable.'` WHERE `id` = '.($parentId == 'title' && preg_match('#([0-9]+)#', $attributeId, $pattern) ? $pattern[0] : $attributeId)) !== false) {
+        if ($objDatabase->Execute('DELETE FROM `'.$affectedTable.'` WHERE `id` = '.$attributeId) !== false) {
             return true;
         }
         $this->errorMsg = sprintf($_ARRAYLANG['TXT_ACCESS_UNABLE_DEL_ATTRIBUTE'], htmlentities($this->arrAttributes[$attributeId]['names'][$this->langId], ENT_QUOTES, CONTREXX_CHARSET));
@@ -1300,14 +1308,6 @@ class User_Profile_Attribute
     function deleteAttributeContent($attributeId)
     {
         global $objDatabase, $_ARRAYLANG;
-
-        $parentId = $this->arrAttributes[$attributeId]['parent_id'] ?? '0';
-        if (
-            $parentId == 'title' &&
-            preg_match('#([0-9]+)#', $attributeId, $pattern)
-        ) {
-            $attributeId = $pattern[0];
-        }
 
         if ($objDatabase->Execute("DELETE FROM `".DBPREFIX."access_user_attribute_value` WHERE `attribute_id` = '".$attributeId."'") !== false) {
             return true;
@@ -1320,15 +1320,6 @@ class User_Profile_Attribute
     function deleteAttributeNames($attributeId)
     {
         global $objDatabase, $_ARRAYLANG;
-
-        $parentId = $this->arrAttributes[$attributeId]['parent_id'] ?? '0';
-
-        if (
-            $parentId == 'title' &&
-            preg_match('#([0-9]+)#', $attributeId, $pattern)
-        ) {
-            $attributeId = $pattern[0];
-        }
 
         if ($objDatabase->Execute("DELETE FROM `".DBPREFIX."access_user_attribute_name` WHERE `attribute_id` = '".$attributeId."'") !== false) {
             return true;
