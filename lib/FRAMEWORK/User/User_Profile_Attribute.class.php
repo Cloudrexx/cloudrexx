@@ -1286,9 +1286,10 @@ class User_Profile_Attribute
     {
         global $objDatabase, $_ARRAYLANG;
 
+        $parentId = $this->arrAttributes[$attributeId]['parent_id'] ?? '0';
         $affectedTable = DBPREFIX.'access_user_attribute';
         $pattern = array();
-        if ($objDatabase->Execute('DELETE FROM `'.$affectedTable.'` WHERE `id` = '.($this->parent_id == 'title' && preg_match('#([0-9]+)#', $attributeId, $pattern) ? $pattern[0] : $attributeId)) !== false) {
+        if ($objDatabase->Execute('DELETE FROM `'.$affectedTable.'` WHERE `id` = '.($parentId == 'title' && preg_match('#([0-9]+)#', $attributeId, $pattern) ? $pattern[0] : $attributeId)) !== false) {
             return true;
         }
         $this->errorMsg = sprintf($_ARRAYLANG['TXT_ACCESS_UNABLE_DEL_ATTRIBUTE'], htmlentities($this->arrAttributes[$attributeId]['names'][$this->langId], ENT_QUOTES, CONTREXX_CHARSET));
@@ -1300,8 +1301,9 @@ class User_Profile_Attribute
     {
         global $objDatabase, $_ARRAYLANG;
 
+        $parentId = $this->arrAttributes[$attributeId]['parent_id'] ?? '0';
         if (
-            !empty($this->parent_id) && $this->parent_id == 'title' &&
+            $parentId == 'title' &&
             preg_match('#([0-9]+)#', $attributeId, $pattern)
         ) {
             $attributeId = $pattern[0];
@@ -1319,8 +1321,10 @@ class User_Profile_Attribute
     {
         global $objDatabase, $_ARRAYLANG;
 
+        $parentId = $this->arrAttributes[$attributeId]['parent_id'] ?? '0';
+
         if (
-            !empty($this->parent_id) && $this->parent_id == 'title' &&
+            $parentId == 'title' &&
             preg_match('#([0-9]+)#', $attributeId, $pattern)
         ) {
             $attributeId = $pattern[0];
