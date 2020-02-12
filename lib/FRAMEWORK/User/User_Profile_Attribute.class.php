@@ -539,7 +539,6 @@ class User_Profile_Attribute
         $this->sortChildren();
     }
 
-
     /**
      * Find all default user attributes (DefaultAttributes) and store it in an
      * array
