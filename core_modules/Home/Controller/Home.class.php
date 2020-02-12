@@ -191,7 +191,7 @@ class Home {
             FROM `'.DBPREFIX.'log` AS `logs`
             ORDER BY `logs`.`id` DESC', 1);
         if ($objResult && $objResult->RecordCount() > 0) {
-            $objUser = $objFWUser->objUser->getUser($id = $objResult->fields['userid']);
+            $objUser = $objFWUser->objUser->getUser($objResult->fields['userid']);
             $username = '';
             if ($objUser !== false) {
                 $username = $objUser->getRealUsername();
