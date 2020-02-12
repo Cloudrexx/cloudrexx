@@ -545,11 +545,11 @@ class User_Profile_Attribute
      */
     function loadDefaultAttributes()
     {
-        global $_CORELANG, $objDatabase;
+        global $objDatabase, $_CORELANG;
 
         $this->arrDefaultAttributeIds = array();
         $this->arrAttributes = $this->arrDefaultAttributeTemplates;
-        foreach ($this->arrDefaultAttributeTemplates as $attributeId => $arrAttribute) {
+        foreach ($this->arrAttributes as $attributeId => &$arrAttribute) {
             if (!$arrAttribute['parent_id']) {
                 $this->arrDefaultAttributeIds[] = $attributeId;
             }
