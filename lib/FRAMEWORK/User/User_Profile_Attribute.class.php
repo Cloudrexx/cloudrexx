@@ -537,7 +537,6 @@ class User_Profile_Attribute
         $this->loadCustomAttributes();
         $this->generateAttributeRelations();
         $this->sortChildren();
-       // var_dump($this->arrAttributes);
     }
 
 
