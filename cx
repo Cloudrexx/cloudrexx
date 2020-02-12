@@ -288,6 +288,7 @@ Available options are:
     --silent                        Do not output non-necessary messages
     --interactive                   Ask for each value instead of using default behavior
     --force-default                 Forces default (/automatic) configuration
+    --no-persist=[<containers>]     Disable persistance of a container. Currently the only value suppored for <containers> is: db
     --db-host=<hostname>            Sets database host to <hostname>
     --db-name=<dbname>              Sets database name to <dbname>
     --db-user=<username>            Sets database user to <username>
@@ -789,7 +790,8 @@ function cmd_env {
                 # This makes only sense in case the db has been loaded yet (which
                 # is not the case when performing an init).
                 # We therefore check if the table contrexx_component does exist
-                dockerexec exec "<db-container>" bash -c "mysql -u${CONFIG["db-user"]} -p${CONFIG["db-pass"]} ${CONFIG["db-name"]} -e 'SELECT 1 from \`${CONFIG["db-prefix"]}component\` LIMIT 1' &> /dev/null"
+                mysql_create_tempfile
+                mysql_exec "SELECT 1 from \`${CONFIG["db-prefix"]}component\` LIMIT 1" &> /dev/null
                 if [[ $? == 0 ]]; then
                     phpexec config --force
                 fi
@@ -1048,7 +1050,7 @@ SET FOREIGN_KEY_CHECKS = 1;"
             ;;
         exec)
             shift
-            if read -r -t 0; then
+            if [[ -p /dev/stdin ]]; then
                 input=$(cat -)
             fi
             if [[ ${ARGUMENTS["sql"]} ]]; then
@@ -1059,7 +1061,9 @@ SET FOREIGN_KEY_CHECKS = 1;"
                 else
                     mysql_exec "$@"
                 fi
+                RES="$?"
                 mysql_drop_tempfile
+                return $RES
             elif [[ ${ARGUMENTS["sql-file"]} ]]; then
                 get_config_array
                 mysql_create_tempfile
@@ -1349,6 +1353,7 @@ function get_config_array {
         ["php-image"]=""
         ["db-image"]=""
         ["is-vhost"]=""
+        ["no-persist"]=""
     )
     if [[ ${ARGUMENTS["force-default"]} != true ]]; then
         CONFIG["db-host"]=$(REGEX="DBCONFIG\['host'\]\ +=\ +(['\"])([^'\"]+)\1;"; CFG=$(cat $CONFIG_FILE); [[ "$CFG" =~ $REGEX ]] && echo "${BASH_REMATCH[2]}")
@@ -1378,6 +1383,11 @@ function get_config_array {
             CONFIG["is-vhost"]=true
         else
             CONFIG["is-vhost"]=false
+        fi
+        if [[ "$(cat $COMPOSE_FILE)" =~ "db-data:" ]]; then
+            CONFIG["no-persist"]=""
+        else
+            CONFIG["no-persist"]="db"
         fi
     fi
     if [[ "${CONFIG["hostname"]}" == "" || "${CONFIG["hostname"]}" == "localhost" ]]; then
@@ -1496,6 +1506,12 @@ function set_config_array {
         FILE_CONTENTS=${FILE_CONTENTS//"<novhost>"/""}
         FILE_CONTENTS=${FILE_CONTENTS//"</novhost>"/""}
         FILE_CONTENTS=$(regex_replace_all "$FILE_CONTENTS" "(()<vhost>[^<]*</vhost>())" "")
+    fi
+    if [[ "${CONFIG["no-persist"]}" =~ "db" ]]; then
+        FILE_CONTENTS=$(regex_replace_all "$FILE_CONTENTS" "(()<persistdb>[^<]*</persistdb>())" "")
+    else
+        FILE_CONTENTS=${FILE_CONTENTS//"<persistdb>"/""}
+        FILE_CONTENTS=${FILE_CONTENTS//"</persistdb>"/""}
     fi
     # save docker-compose.yml
     echo "$FILE_CONTENTS" > docker-compose.yml
@@ -1654,11 +1670,20 @@ function mysql_dump {
 function mysql_exec {
     if mysql_is_local; then
         mysql --defaults-file="${TEMP_FILES["db-connection"]}" -A -e "$@"
+        return $?
     else
         echo "$1" > "./tmp/db/import.sql"
         shift
-        internal_dockerexec exec -i "<db-container>" bash -c "mysql --defaults-file=${TEMP_FILES["db-connection"]} $@ -e 'SOURCE /tmp/import/import.sql'"
+        # Since mysql's SOURCE does not return an error code we need to check STDERR
+        TEMP_FILES["mysql_source_error_log"]="$(mktemp)"
+        internal_dockerexec exec "<db-container>" bash -c "mysql --defaults-file=${TEMP_FILES["db-connection"]} $@ -e 'SOURCE /tmp/import/import.sql'" 2> >(tee "${TEMP_FILES["mysql_source_error_log"]}" >&2)
+        if [ -s "$TEMP_FILES["mysql_source_error_log"]" ]; then
+            RES=1
+        else
+            RES=0
+        fi
         rm "./tmp/db/import.sql"
+        return $RES
     fi
 }
 
@@ -1826,8 +1851,9 @@ if [[ "$(pwd -P)" != "$result" || "$DIR" != "$result" ]]; then
     prevPwd="$(pwd -P)"
     cd "$result" || exit
     ./cx "$@"
+    RES=$?
     cd "$prevPwd"
-    exit
+    exit $RES
 fi
 
 ORIG_ARGS=("$@")
@@ -1844,8 +1870,10 @@ case "${COMMANDS[0]}" in
         COMMANDS=("${COMMANDS[@]:1}")
         if read -r -t 0; then
             cat /dev/stdin | cmd_env "${COMMANDS[@]/#/}"
+            exit $?
         else
             cmd_env "${COMMANDS[@]/#/}"
+            exit $?
         fi
         ;;
     debug)

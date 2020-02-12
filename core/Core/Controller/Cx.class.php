@@ -539,7 +539,6 @@ namespace Cx\Core\Core\Controller {
         protected $websiteImagesDownloadsPath;
         protected $websiteImagesCalendarPath;
         protected $websiteImagesPodcastPath;
-        protected $websiteImagesBlogPath;
         protected $websiteImagesDataPath;
         protected $websiteMediaForumUploadPath;
         protected $websiteMediaarchive1Path;
@@ -557,7 +556,6 @@ namespace Cx\Core\Core\Controller {
         protected $websiteImagesDownloadsWebPath;
         protected $websiteImagesCalendarWebPath;
         protected $websiteImagesPodcastWebPath;
-        protected $websiteImagesBlogWebPath;
         protected $websiteImagesDataWebPath;
         protected $websiteMediaForumUploadWebPath;
         protected $websiteMediaarchive1WebPath;
@@ -2022,12 +2020,11 @@ namespace Cx\Core\Core\Controller {
          * @todo Remove usage of globals
          * @global array $_CONFIG
          * @global type $themesPages
-         * @global type $objBanner
          * @global type $_CORELANG
          * @return type
          */
         protected function setPostContentLoadPlaceholders() {
-            global $_CONFIG, $themesPages, $objBanner, $_CORELANG;
+            global $_CONFIG, $themesPages, $_CORELANG;
 
             if ($this->mode == self::MODE_BACKEND) {
                 $formattedVersion = htmlentities(
@@ -2121,7 +2118,6 @@ namespace Cx\Core\Core\Controller {
                 'ONLINE_USERS'                   => $objCounter ? $objCounter->getOnlineUsers() : '',
                 'VISITOR_NUMBER'                 => $objCounter ? $objCounter->getVisitorNumber() : '',
                 'COUNTER'                        => $objCounter ? $objCounter->getCounterTag() : '',
-                'BANNER'                         => isset($objBanner) ? $objBanner->getBannerJS() : '',
                 'RANDOM'                         => md5(microtime()),
                 'TXT_SEARCH'                     => $_CORELANG['TXT_SEARCH'],
                 'MODULE_INDEX'                   => MODULE_INDEX,
@@ -2834,7 +2830,6 @@ JSCODE;
             $this->websiteImagesDownloadsPath   = $this->websiteDocumentRootPath . self::FOLDER_NAME_IMAGES . '/Downloads';
             $this->websiteImagesCalendarPath    = $this->websiteDocumentRootPath . self::FOLDER_NAME_IMAGES . '/Calendar';
             $this->websiteImagesPodcastPath     = $this->websiteDocumentRootPath . self::FOLDER_NAME_IMAGES . '/Podcast';
-            $this->websiteImagesBlogPath        = $this->websiteDocumentRootPath . self::FOLDER_NAME_IMAGES . '/Blog';
             $this->websiteImagesCrmPath         = $this->websiteDocumentRootPath . self::FOLDER_NAME_IMAGES . '/Crm';
             $this->websiteImagesDataPath        = $this->websiteDocumentRootPath . self::FOLDER_NAME_IMAGES . '/Data';
             $this->websiteImagesCrmProfilePath  = $this->websiteImagesCrmPath . '/profile';
@@ -2859,7 +2854,6 @@ JSCODE;
             $this->websiteImagesDownloadsWebPath= $this->websiteOffsetPath . self::FOLDER_NAME_IMAGES . '/Downloads';
             $this->websiteImagesCalendarWebPath = $this->websiteOffsetPath . self::FOLDER_NAME_IMAGES . '/Calendar';
             $this->websiteImagesPodcastWebPath  = $this->websiteOffsetPath . self::FOLDER_NAME_IMAGES . '/Podcast';
-            $this->websiteImagesBlogWebPath     = $this->websiteOffsetPath . self::FOLDER_NAME_IMAGES . '/Blog';
             $this->websiteImagesCrmWebPath      = $this->websiteOffsetPath . self::FOLDER_NAME_IMAGES . '/Crm';
             $this->websiteImagesDataWebPath     = $this->websiteOffsetPath . self::FOLDER_NAME_IMAGES . '/Data';
             $this->websiteImagesCrmProfileWebPath = $this->websiteImagesCrmWebPath . '/profile';
@@ -3057,22 +3051,6 @@ JSCODE;
         public function getWebsiteImagesAttachWebPath()
         {
             return $this->websiteImagesAttachWebPath;
-        }
-
-        /**
-         * @return string
-         */
-        public function getWebsiteImagesBlogPath()
-        {
-            return $this->websiteImagesBlogPath;
-        }
-
-        /**
-         * @return string
-         */
-        public function getWebsiteImagesBlogWebPath()
-        {
-            return $this->websiteImagesBlogWebPath;
         }
 
         /**
