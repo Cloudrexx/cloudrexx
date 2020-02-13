@@ -6717,7 +6717,7 @@ function MultiAction() {
                 $query = "SELECT lastname, firstname FROM " . DBPREFIX . "module_newsletter_user WHERE id=" . $recipientId;
 
                 $objRecipient = $objDatabase->SelectLimit($query, 1);
-                if ($objRecipient !== false && $objRecipient->RecordCount() == 1) {
+                if ($objRecipient !== false) {
                     $recipientLastname = $objRecipient->fields['lastname'];
                     $recipientFirstname = $objRecipient->fields['firstname'];
                 } else {
