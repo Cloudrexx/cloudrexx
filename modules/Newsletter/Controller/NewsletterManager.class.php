@@ -6070,7 +6070,7 @@ $WhereStatement = array();
                     }
 
                     foreach ($filter['search'] as $field => $value) {
-                        if (preg_match("/{$value}/i", $entry[$field])) {
+                        if (preg_match("/".preg_quote($value, '/')."/i", $entry[$field])) {
                             return true;
                         }
                     }
