@@ -2998,7 +2998,7 @@ class NewsletterManager extends NewsletterLib
                 while (!$objResultMembership->EOF) {
                     // Simulate DISTINCT
                     if (
-                    $distinctByType ||
+                        $distinctByType ||
                         array_search(
                             $objResultMembership->fields['email'],
                             array_column($mailRecipients, 'email')
