@@ -137,6 +137,7 @@ class DocSysLibrary
             if ($objUser !== false) {
                 $username = $objUser->getRealUsername();
             }
+            $username = '';
             $retval[$objResult->fields['id']] = array(
                 "id" => $objResult->fields['id'],
                 "date" => $objResult->fields['date'],
