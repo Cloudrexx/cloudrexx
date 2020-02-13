@@ -133,7 +133,7 @@ class DocSysLibrary
         }
         $retval = array();
         while (!$objResult->EOF) {
-            $objUser = \FWUser::getFWUserObject()->objUser->getUser($id = $objResult->fields['id']);
+            $objUser = \FWUser::getFWUserObject()->objUser->getUser($objResult->fields['id']);
             if ($objUser !== false) {
                 $username = $objUser->getRealUsername();
             }
