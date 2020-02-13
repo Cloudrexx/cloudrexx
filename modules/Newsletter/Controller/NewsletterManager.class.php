@@ -2804,10 +2804,18 @@ class NewsletterManager extends NewsletterLib
             if ($objUser) {
                 while (!$objUser->EOF) {
                     // Simulate DISTINCT
-                    $mailRecipients[] = array(
-                        'email' => $objUser->getEmail(),
-                        'type' => self::USER_TYPE_ACCESS
-                    );
+                    if (
+                        $distinctByType ||
+                        array_search(
+                            $objUser->getEmail(),
+                            array_column($mailRecipients, 'email')
+                        ) === false
+                    ) {
+                        $mailRecipients[] = array(
+                            'email' => $objUser->getEmail(),
+                            'type' => self::USER_TYPE_ACCESS
+                        );
+                    }
                     $objUser->next();
                 }
             }
@@ -2834,6 +2842,7 @@ class NewsletterManager extends NewsletterLib
                 while (!$objResultNative->EOF) {
                     // Simulate DISTINCT
                     if (
+                        $distinctByType ||
                         array_search(
                             $objResultNative->fields['email'],
                             array_column($mailRecipients, 'email')
