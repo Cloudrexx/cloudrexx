@@ -1407,4 +1407,7 @@ $_ARRAYLANG['TXT_CORE_INACTIVE'] = 'Inactive';
 $_ARRAYLANG['TXT_CORE_SCHEDULED_ACTIVE'] = 'Activated by scheduled publishing';
 $_ARRAYLANG['TXT_CORE_SCHEDULED_INACTIVE'] = 'Deactivated due to scheduled publishing';
 $_ARRAYLANG['TXT_CORE_CORE_ACT_SPLASH'] = 'Start';
+$_ARRAYLANG['TXT_CORE_CORE_DOCUMENTATION'] = 'More resources';
+$_ARRAYLANG['TXT_CORE_CORE_ENDUSER_DOCUMENTATION'] = 'End-user documentation';
+$_ARRAYLANG['TXT_CORE_CORE_DEVELOPER_DOCUMENTATION'] = 'Developer documentation';
 
