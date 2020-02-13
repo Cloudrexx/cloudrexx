@@ -5992,12 +5992,12 @@ $WhereStatement = array();
 
         $data = $objDatabase->Execute($query);
 
-        $accessIds = array();
+        $userIds = array();
         $dataSet = new \Cx\Core_Modules\Listing\Model\Entity\DataSet();
         if ($data !== false ) {
             while (!$data->EOF) {
                 if ($data->fields['isAccess']) {
-                    $accessIds[] = $data->fields['id'];
+                    $userIds[] = $data->fields['id'];
                 } else {
                     unset($data->fields['isAccess']);
                     $dataSet->add('N-' . $data->fields['id'], $data->fields);
@@ -6007,7 +6007,7 @@ $WhereStatement = array();
         }
 
         $objFWUser = \FWUser::getFWUserObject();
-        $objUser = $objFWUser->objUser->getUsers(array('id' => $accessIds));
+        $objUser = $objFWUser->objUser->getUsers(array('id' => $userIds));
 
         if ($objUser) {
             while (!$objUser->EOF) {
