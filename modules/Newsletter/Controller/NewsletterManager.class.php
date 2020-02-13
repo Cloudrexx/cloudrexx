@@ -4510,7 +4510,7 @@ $WhereStatement = array();
 
         foreach ($users as $user) {
             $type = str_replace("_user", "", $user['type']);
-            $link_count = isset($linkCount[$user['id']][$type]) ? $linkCount[$user['id']][$type] : 0;
+            $link_count = isset($linkCount[$user['email']][$type]) ? $linkCount[$user['email']][$type] : 0;
             $feedback = isset($feedbackCount[$user['id']][$type]) ? $feedbackCount[$user['id']][$type] : 0;
             $feedbackdata = $link_count > 0 ? round(100 / $link_count * $feedback).'%' : '-';
 
@@ -4580,7 +4580,7 @@ $WhereStatement = array();
         // select stats of native newsletter recipients
         if (count($newsletterUserIds) > 0) {
             $objLinks = $objDatabase->Execute("SELECT
-                    tlbUser.id,
+                    tlbUser.email,
                     COUNT(tlbLink.id) AS link_count,
                     COUNT(DISTINCT tblSent.newsletter) AS email_count
                 FROM ".DBPREFIX."module_newsletter_tmp_sending AS tblSent
@@ -4590,8 +4590,8 @@ $WhereStatement = array();
                 GROUP BY tblSent.email");
             if ($objLinks !== false) {
                 while (!$objLinks->EOF) {
-                    $linkCount[$objLinks->fields['id']][self::USER_TYPE_NEWSLETTER] = $objLinks->fields['link_count'];
-                    $emailCount[$objLinks->fields['id']][self::USER_TYPE_NEWSLETTER] = $objLinks->fields['email_count'];
+                    $linkCount[$objLinks->fields['email']][self::USER_TYPE_NEWSLETTER] = $objLinks->fields['link_count'];
+                    $emailCount[$objLinks->fields['email']][self::USER_TYPE_NEWSLETTER] = $objLinks->fields['email_count'];
                     $objLinks->MoveNext();
                 }
             }
@@ -4621,13 +4621,9 @@ $WhereStatement = array();
                 WHERE tblSent.email IN ('".implode("', '", $accessUserEmails)."') AND tblSent.sendt > 0 AND (tblSent.type = '".self::USER_TYPE_ACCESS."' OR tblSent.type = '".self::USER_TYPE_CORE."')
                 GROUP BY tblSent.email");
             if ($objLinks !== false) {
-                $objUser = \FWUser::getFWUserObject()->objUser;
                 while (!$objLinks->EOF) {
-                    $objUser = $objUser->getUsers(array('email', $objLinks->fields['email']));
-                    if ($objUser) {
-                        $linkCount[$objUser->getId()][self::USER_TYPE_ACCESS] = $objLinks->fields['link_count'];
-                        $emailCount[$objUser->getId()][self::USER_TYPE_ACCESS] = $objLinks->fields['email_count'];
-                    }
+                    $linkCount[$objLinks->fields['email']][self::USER_TYPE_ACCESS] = $objLinks->fields['link_count'];
+                    $emailCount[$objLinks->fields['email']][self::USER_TYPE_ACCESS] = $objLinks->fields['email_count'];
                     $objLinks->MoveNext();
                 }
             }
