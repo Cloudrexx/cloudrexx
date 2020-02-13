@@ -6059,28 +6059,26 @@ $WhereStatement = array();
             'search' => $where,
         );
 
-        if (is_null($status) || !empty($where)) {
-            $dataSet->filter(function($entry) use ($filter) {
-                if (
-                    !is_null($filter['status']) &&
-                    $entry['status'] != $filter['status']
-                ) {
-                    return false;
-                }
+        $dataSet->filter(function($entry) use ($filter) {
+            if (
+                !is_null($filter['status']) &&
+                $entry['status'] != $filter['status']
+            ) {
+                return false;
+            }
 
-                if (empty($filter['search'])) {
+            if (empty($filter['search'])) {
+                return true;
+            }
+
+            foreach ($filter['search'] as $field => $value) {
+                if (preg_match("/".preg_quote($value, '/')."/i", $entry[$field])) {
                     return true;
                 }
+            }
 
-                foreach ($filter['search'] as $field => $value) {
-                    if (preg_match("/".preg_quote($value, '/')."/i", $entry[$field])) {
-                        return true;
-                    }
-                }
-
-                return false;
-            });
-        }
+            return false;
+        });
 
         $dataSet = $dataSet->sort($order);
         $count = $dataSet->count();
