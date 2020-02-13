@@ -107,7 +107,8 @@ class SystemComponentBackendController extends Controller {
             $testFilename = 'Default';
         }
         foreach ($cmd as $index=>$name) {
-            if ($index == 0) {
+            // always load Default.html for overview page
+            if (empty($name)) {
                 continue;
             }
 
@@ -163,6 +164,12 @@ class SystemComponentBackendController extends Controller {
         $navigation->loadTemplateFile('Navigation.html');
 
         $commands = $this->getCommands();
+        if ($this->showSplash()) {
+            $commands = array_merge(
+                array('Splash' => array('permission' => $this->defaultPermission)),
+                $commands
+            );
+        }
         if ($this->showOverviewPage()) {
             $commands = array_merge(
                 array('' => array('permission' => $this->defaultPermission)),
@@ -285,6 +292,9 @@ class SystemComponentBackendController extends Controller {
         }
 
         $actTxtKey = 'TXT_' . strtoupper($this->getType()) . '_' . strtoupper($this->getName() . '_ACT_' . $txt);
+        if (empty($isSubNav) && $currentCmd == 'Splash') {
+            $actTxtKey = 'TXT_CORE_CORE_ACT_SPLASH';
+        }
         $actTitle  = isset($_ARRAYLANG[$actTxtKey]) ? $_ARRAYLANG[$actTxtKey] : $actTxtKey;
         $navigation->setVariable(array(
             'HREF' => 'index.php?cmd=' . $this->getName() . $act,
@@ -516,9 +526,39 @@ class SystemComponentBackendController extends Controller {
 
     /**
      * Return true here if you want the first tab to be an entity view
+     * @deprecated Use showSplash() instead
      * @return boolean True if overview should be shown, false otherwise
      */
     protected function showOverviewPage() {
         return true;
+    }
+
+    /**
+     * Tells whether the given entity class name has no stored entities
+     *
+     * This method is intended for use in showSplash().
+     * $entityClassName will be prepended by the component's entity namespace:
+     * \Cx\<component_type>\<component_name>\Model\Entity\
+     * @param string $entityClassName Entity class name without component entity namespace
+     * @return bool True if entity has no data, false otherwise
+     */
+    protected function hasNoEntityData($entityClassName): bool {
+        $em = $this->cx->getDb()->getEntityManager();
+        $repo = $em->getRepository(
+            $this->getNamespace() . '\\Model\\Entity\\' . $entityClassName
+        );
+        $entity = $repo->findOneBy(array());
+        return !$entity;
+    }
+
+    /**
+     * Returns whether to show the splash screen or not. Every module "should"
+     * have an introductionary splash screen. This method can be used to define
+     * conditions on when to show it.
+     * @see hasNoEntityData($entityClassName)
+     * @return bool True if splash is to be shown.
+     */
+    protected function showSplash(): bool {
+        return false;
     }
 }

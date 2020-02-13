@@ -1477,3 +1477,5 @@ $_ARRAYLANG['TXT_CORE_INACTIVE'] = 'Inaktiv';
 $_ARRAYLANG['TXT_CORE_SCHEDULED_ACTIVE'] = 'Zeitgesteuerte Veröffentlichung aktiv';
 $_ARRAYLANG['TXT_CORE_SCHEDULED_INACTIVE'] = 'Deaktiviert aufgrund der zeitgesteuerten Veröffentlichung';
 $_ARRAYLANG['TXT_NETMANAGER_MODULE'] = 'Domains';
+$_ARRAYLANG['TXT_CORE_CORE_ACT_SPLASH'] = 'Start';
+

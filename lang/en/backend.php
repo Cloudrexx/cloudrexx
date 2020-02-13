@@ -1406,3 +1406,5 @@ $_ARRAYLANG['TXT_CORE_ACTIVE'] = "Active";
 $_ARRAYLANG['TXT_CORE_INACTIVE'] = 'Inactive';
 $_ARRAYLANG['TXT_CORE_SCHEDULED_ACTIVE'] = 'Activated by scheduled publishing';
 $_ARRAYLANG['TXT_CORE_SCHEDULED_INACTIVE'] = 'Deactivated due to scheduled publishing';
+$_ARRAYLANG['TXT_CORE_CORE_ACT_SPLASH'] = 'Start';
+
