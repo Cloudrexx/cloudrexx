@@ -2717,6 +2717,13 @@ class NewsletterManager extends NewsletterLib
 
         $mailRecipients = array();
 
+        // this selects the recipients in the following order
+        // 1. access users that have subscribed to one of the selected recipient-lists
+        // 2. newsletter recipients of one of the selected recipient-lists
+        // 3. access users of one of the selected user groups
+        // 4. crm contacts of one of the selected crm user groups
+
+        // 1. access users that have subscribed to one of the selected recipient-lists
         // select all access ids
         $accessUserRecipientsQuery = 'SELECT `accessUserID` ' .
             'FROM `%1$smodule_newsletter_access_user` AS `cnu` ' .
@@ -2796,6 +2803,7 @@ class NewsletterManager extends NewsletterLib
 
             if ($objUser) {
                 while (!$objUser->EOF) {
+                    // Simulate DISTINCT
                     $mailRecipients[] = array(
                         'email' => $objUser->getEmail(),
                         'type' => self::USER_TYPE_ACCESS
@@ -2805,7 +2813,7 @@ class NewsletterManager extends NewsletterLib
             }
         }
 
-        // select recipients based on selected newsletter lists
+        // 2. newsletter recipients of one of the selected recipient-lists
         if (!$crmMembershipFilter['include']) {
             $nativeRecipientsQuery = '
                         SELECT `email`
@@ -2824,6 +2832,7 @@ class NewsletterManager extends NewsletterLib
             $objResultNative = $objDatabase->Execute($nativeRecipientsQuery);
             if ($objResultNative !== false && $objResultNative->RecordCount() > 0) {
                 while (!$objResultNative->EOF) {
+                    // Simulate DISTINCT
                     if (
                         array_search(
                             $objResultNative->fields['email'],
@@ -2840,6 +2849,7 @@ class NewsletterManager extends NewsletterLib
             }
         }
 
+        // 3. access users of one of the selected user groups
         $userGroupRecipientsQuery =
             'SELECT `userGroup` ' .
             'FROM `%1$smodule_newsletter_rel_usergroup_newsletter` AS `arn` ' .
@@ -2959,7 +2969,7 @@ class NewsletterManager extends NewsletterLib
             }
         }
 
-        // select recipients based on selected crm memberships
+        // 4. crm contacts of one of the selected crm user groups
         if($crmMembershipFilter['associate']){
             $crmMembershipQuery = 'UNION DISTINCT SELECT DISTINCT `crm`.`email` 
                 FROM `' . DBPREFIX . 'module_crm_contacts` AS `contact` 
