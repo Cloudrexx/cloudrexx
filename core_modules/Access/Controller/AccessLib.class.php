@@ -2021,14 +2021,13 @@ JS
 
             $objFWUser = \FWUser::getFWUserObject();
             $objUser = $objFWUser->objUser;
-            $arrImagesDb = array();
             $count = 0;
 
             do {
-                $result = $objUser->objAttribute->getImages(
-                    $step, $offset, $count, $arrImagesDb
+                $arrImagesDb = $objUser->objAttribute->getImages(
+                    $step, $offset, $count
                 );
-                if (!$result) {
+                if (empty($arrImagesDb)) {
                     break;
                 };
 
@@ -2048,10 +2047,6 @@ JS
                 $offset += $step;
                 $arrImages = array_diff($arrImages, $arrImagesDb);
             } while ($offset < $count);
-
-            if (!$result) {
-                return false;
-            }
 
             array_walk($arrImages, function ($img) use ($imagePath) {
                 unlink($imagePath.'/'.$img);
