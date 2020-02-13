@@ -5957,7 +5957,6 @@ $WhereStatement = array();
                 %6$s,
                 1 AS isAccess
                 FROM `%1$smodule_newsletter_access_user` AS `cnu`
-           
                 WHERE 1
                 %7$s
             )',
@@ -6063,10 +6062,8 @@ $WhereStatement = array();
         if (is_null($status) || !empty($where)) {
             $dataSet->filter(function($entry) use ($filter) {
                 if (
-                    (
-                        is_null($filter['status']) ||
-                        $entry['status'] == $filter['status']
-                    )
+                    is_null($filter['status']) ||
+                    $entry['status'] == $filter['status']
                 ) {
                     if (empty($filter['search'])) {
                         return true;
