@@ -382,16 +382,18 @@ class Newsletter extends NewsletterLib
         $source = 'opt-in';
 
         if (!empty($code) && !empty($requestedMail)) {
-            $objRecipient = $objDatabase->SelectLimit("SELECT accessUserID
+            // Find the user to then find a matching Newsletter Access User
+            $objUser = \FWUser::getFWUserObject()->objUser->getUsers(
+                array('email' => $requestedMail), null, null, null, 1
+            );
+            $objRecipient = null;
+            if ($objUser) {
+                $objRecipient = $objDatabase->SelectLimit("SELECT accessUserID
                 FROM ".DBPREFIX."module_newsletter_access_user AS nu
-                WHERE nu.code='".$code."'", 1);
+                WHERE nu.code='".$code."' AND accessUserID = " . $objUser->getId(), 1);
+            }
+
             if ($objRecipient && $objRecipient->RecordCount() == 1) {
-                $objUser = \FWUser::getFWUserObject()->objUser->getUsers(
-                    array(
-                        'email' => $requestedMail,
-                        'id' => $objRecipient->fields['accessUserID']
-                    )
-                );
                 if ($objUser) {
                     $recipientId = $objUser->getId();
                     $isAccessRecipient = true;
