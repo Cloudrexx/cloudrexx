@@ -83,36 +83,26 @@ class U2uLibrary {
     /**
      *
      * Selects the username with the id of the user who has loggged on.
+     * @global      $objDatabase
      */
     function getUserID($userName) {
+        global $objDatabase;
+
         $arrSettings = \User_Setting::getSettings();
-        $userName = contrexx_addslashes($userName);
+        $where = array();
+        $where[] = '`email` = "' . $userName . '"';
         if ($arrSettings['use_usernames']['status']) {
-            $where = array(
-                'AND' => array(
-                    array(
-                        'OR' => array(
-                            array('username' => $userName),
-                            array('email' => $userName)
-                        )
-                    ),
-                    array('active' => 1)
-                )
-            );
-        } else {
-            $where = array(
-                'email' => $userName,
-                'active' => 1
-            );
+            $where[] = '`username` = "' . $userName . '"';
         }
 
-        $objFWUser = \FWUser::getFWUserObject();
-
-        $objUser = $objFWUser->objUser->getUsers(
-            $where, null, null, null, 1
-        );
-        if ($objUser) {
-            $ID=$objUser->getId();
+        $userName = contrexx_addslashes($userName);
+        $selUserID  = 'SELECT id FROM '.DBPREFIX.'access_users
+                       WHERE (' . implode(' OR ', $where) . ') AND
+                       active=1';
+        $objResult = $objDatabase->Execute($selUserID);
+        while (!$objResult->EOF) {
+          $ID=$objResult->fields['id'];
+          $objResult->MoveNext();
         }
         return $ID;
     }
