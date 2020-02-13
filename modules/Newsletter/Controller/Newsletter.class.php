@@ -393,7 +393,7 @@ class Newsletter extends NewsletterLib
                 WHERE nu.code='".$code."' AND accessUserID = " . $objUser->getId(), 1);
             }
 
-            if ($objRecipient && $objRecipient->RecordCount() == 1) {
+            if ($objRecipient) {
                 if ($objUser) {
                     $recipientId = $objUser->getId();
                     $isAccessRecipient = true;
