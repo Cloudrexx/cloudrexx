@@ -2706,7 +2706,7 @@ class NewsletterManager extends NewsletterLib
      *          method as they are almost identical except for different table aliases that have to be used.
      */
     protected function getMailRecipients($mailId, $distinctByType = true) {
-        global $objDatabase;
+        global $objDatabase, $_ARRAYLANG;
 
         // fetch CRM membership filter
         $crmMembershipFilter = $this->emailEditGetCrmMembershipFilter($mailId);
@@ -2789,11 +2789,13 @@ class NewsletterManager extends NewsletterLib
         );
         $accessIds = array();
         $objResultAccess = $objDatabase->Execute($accessUserRecipientsQuery);
-        if ($objResultAccess !== false && $objResultAccess->RecordCount() > 0) {
+        if ($objResultAccess !== false) {
             while (!$objResultAccess->EOF) {
                 $accessIds[] = $objResultAccess->fields['accessUserID'];
                 $objResultAccess->MoveNext();
             }
+        } else {
+            throw new \Exception($_ARRAYLANG['TXT_DATABASE_ERROR']);
         }
 
         if (!empty($accessIds)) {
@@ -2838,7 +2840,7 @@ class NewsletterManager extends NewsletterLib
                 DBPREFIX, $mailId
             );
             $objResultNative = $objDatabase->Execute($nativeRecipientsQuery);
-            if ($objResultNative !== false && $objResultNative->RecordCount() > 0) {
+            if ($objResultNative !== false) {
                 while (!$objResultNative->EOF) {
                     // Simulate DISTINCT
                     if (
@@ -2855,6 +2857,8 @@ class NewsletterManager extends NewsletterLib
                     }
                     $objResultNative->MoveNext();
                 }
+            } else {
+                throw new \Exception($_ARRAYLANG['TXT_DATABASE_ERROR']);
             }
         }
 
@@ -2932,11 +2936,13 @@ class NewsletterManager extends NewsletterLib
 
         $groupIds = array();
         $objResultGroup = $objDatabase->Execute($userGroupRecipientsQuery);
-        if ($objResultGroup !== false && $objResultGroup->RecordCount() > 0) {
+        if ($objResultGroup !== false) {
             while (!$objResultGroup->EOF) {
                 $groupIds[] = $objResultAccess->fields['userGroup'];
                 $objResultGroup->MoveNext();
             }
+        } else {
+            throw new \Exception($_ARRAYLANG['TXT_DATABASE_ERROR']);
         }
 
         if (!empty($groupIds)) {
@@ -2991,10 +2997,7 @@ class NewsletterManager extends NewsletterLib
                 DBPREFIX, $mailId
             );
             $objResultMembership = $objDatabase->Execute($crmMembershipQuery);
-            if (
-                $objResultMembership !== false &&
-                $objResultMembership->RecordCount() > 0
-            ) {
+            if ($objResultMembership !== false) {
                 while (!$objResultMembership->EOF) {
                     // Simulate DISTINCT
                     if (
@@ -3011,6 +3014,8 @@ class NewsletterManager extends NewsletterLib
                     }
                     $objResultMembership->MoveNext();
                 }
+            } else {
+                throw new \Exception($_ARRAYLANG['TXT_DATABASE_ERROR']);
             }
         }
 
