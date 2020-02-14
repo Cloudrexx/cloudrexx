@@ -716,6 +716,8 @@ class MediaLibrary
      */
     public static function _getIcon($file, $fileType = null)
     {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+
         $icon = '';
         if (isset($fileType)) {
             $icon = strtoupper($fileType);
@@ -724,6 +726,15 @@ class MediaLibrary
             if (isset($info['extension'])) {
                 $icon = strtoupper($info['extension']);
             }
+        }
+
+        $extensionIcon = 'ExtensionIcons/'.strtolower($icon);
+        if (
+            file_exists($cx->getClassLoader()->getFilePath(
+                self::_getIconPath().$extensionIcon.'.png'
+            ))
+        ) {
+            return $extensionIcon;
         }
 
         $arrImageExt        = array('JPEG', 'JPG', 'TIFF', 'GIF', 'BMP', 'PNG');
