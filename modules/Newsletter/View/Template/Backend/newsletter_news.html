@@ -30,6 +30,9 @@ cx.ready(function() {
 
     $J('input[name=newsDate]').datetimepicker(dpOptions);
 
+    document.getElementById('news-lang').addEventListener('change', function() {
+        document.forms["newsLetterNews"].submit()
+    });
 }, true);
 
 function CategorySelect(t) {
@@ -83,6 +86,11 @@ function NewsSelect(t) {
 
 // -->
 </script>
+<style>
+  #news-lang {
+    width: 408px;
+  }
+</style>
 
 <table width="100%" border="0" cellpadding="3" cellspacing="0" class="adminlist">
   <tr>
@@ -94,6 +102,10 @@ function NewsSelect(t) {
 <tr class="row3">
   <td width="15%" nowrap="nowrap">{TXT_DATE_SINCE}</td>
   <td width="85%"><input type="text" name="newsDate" value="{NEWS_CREATE_DATE}" style="width:400px;" /></td>
+</tr>
+<tr>
+  <td width="15%" nowrap="nowrap">{TXT_NEWSLETTER_NEWS_IMPORT_LANG}</td>
+  <td width="85%">{NEWSLETTER_NEWS_IMPORT_LANG_SELECT}</td>
 </tr>
 <tr>
 <td width="15%" valign="top">{TXT_SELECTED_MESSAGES}</td>

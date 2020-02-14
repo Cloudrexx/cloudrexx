@@ -655,6 +655,13 @@ class NewsletterManager extends NewsletterLib
                     $selectedNews[] = $newsId;
                 }
             }
+
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $selectedLang = FRONTEND_LANG_ID;
+            if ($cx->getRequest()->hasParam('selectedLang', false)) {
+                $selectedLang = $cx->getRequest()->getParam('selectedLang', false);
+            }
+
             $HTML_TemplateSource_Import = $this->_getBodyContent($this->_prepareNewsPreview($this->GetTemplateSource($importTemplate, 'html')));
             $_REQUEST['standalone'] = true;
 
@@ -679,8 +686,8 @@ class NewsletterManager extends NewsletterLib
                     INNER JOIN  '.DBPREFIX.'module_news_categories_locale AS nc ON nc.category_id = nr.category_id
                     WHERE       status = 1
                                 AND nl.is_active=1
-                                AND nl.lang_id='.FRONTEND_LANG_ID.'
-                                AND nc.lang_id='.FRONTEND_LANG_ID.'
+                                AND nl.lang_id='.$selectedLang.'
+                                AND nc.lang_id='.$selectedLang.'
                                 AND n.id IN ('.implode(",", contrexx_input2int($selectedNews)).')
                     ORDER BY nc.name ASC, n.date DESC';
 
@@ -4031,14 +4038,42 @@ class NewsletterManager extends NewsletterLib
             $newsdate = $this->dateFromInput(contrexx_input2raw($_POST['newsDate']));
         }
 
+        // build select for news language
+        $select = new \Cx\Core\Html\Model\Entity\DataElement(
+            'newsLang',
+            '',
+            \Cx\Core\Html\Model\Entity\DataElement::TYPE_SELECT
+        );
+        $select->setAttribute('id', 'news-lang');
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+
+        $selectedLang = FRONTEND_LANG_ID;
+        if ($cx->getRequest()->hasParam('newsLang', false)) {
+            $selectedLang = $cx->getRequest()->getParam('newsLang', false);
+        }
+
+        $sourceLangs = $em->getRepository('Cx\Core\Locale\Model\Entity\Locale')->findAll();
+        foreach ($sourceLangs as $lang) {
+            $option = new \Cx\Core\Html\Model\Entity\HtmlElement('option');
+            $option->setAttribute('value', $lang->getId());
+            $option->addChild(new \Cx\Core\Html\Model\Entity\TextElement($lang));
+            if ($selectedLang == $lang->getId()) {
+                $option->setAttribute('selected');
+            }
+            $select->addChild($option);
+        }
+
         $this->_pageTitle = $_ARRAYLANG['TXT_NEWSLETTER_NEWS_IMPORT'];
         $this->_objTpl->loadTemplateFile('newsletter_news.html');
         $this->_objTpl->setVariable(array(
             'TXT_NEWS_IMPORT' => $_ARRAYLANG['TXT_NEWSLETTER_NEWS_IMPORT'],
             'TXT_DATE_SINCE' => $_ARRAYLANG['TXT_NEWSLETTER_NEWS_DATE_SINCE'],
+            'TXT_NEWSLETTER_NEWS_IMPORT_LANG' => $_ARRAYLANG['TXT_NEWSLETTER_LANGUAGE'],
             'TXT_SELECTED_MESSAGES' => $_ARRAYLANG['TXT_NEWSLETTER_NEWS_SELECTED_MESSAGES'],
             'TXT_NEXT' => $_ARRAYLANG['TXT_NEWSLETTER_NEWS_NEXT'],
-            'NEWS_CREATE_DATE' => $this->valueFromDate($newsdate)
+            'NEWS_CREATE_DATE' => $this->valueFromDate($newsdate),
+            'NEWSLETTER_NEWS_IMPORT_LANG_SELECT' => $select
         ));
 
         $query = ' SELECT   n.id,
@@ -4053,10 +4088,10 @@ class NewsletterManager extends NewsletterLib
                             cl.name    AS categoryName,
                             tl.name    AS typename
                     FROM '.DBPREFIX.'module_news n
-                    LEFT JOIN '.DBPREFIX.'module_news_locale nl ON n.id = nl.news_id AND nl.lang_id='.$objInit->userFrontendLangId.'
+                    LEFT JOIN '.DBPREFIX.'module_news_locale nl ON n.id = nl.news_id AND nl.lang_id='.$selectedLang.'
                     LEFT JOIN '.DBPREFIX.'module_news_rel_categories AS nc ON nc.news_id = n.id
-                    LEFT JOIN '.DBPREFIX.'module_news_categories_locale AS cl ON cl.category_id = nc.category_id AND cl.lang_id ='.$objInit->userFrontendLangId.'
-                    LEFT JOIN '.DBPREFIX.'module_news_types_locale tl ON n.typeid = tl.type_id AND tl.lang_id='.$objInit->userFrontendLangId.'
+                    LEFT JOIN '.DBPREFIX.'module_news_categories_locale AS cl ON cl.category_id = nc.category_id AND cl.lang_id ='.$selectedLang.'
+                    LEFT JOIN '.DBPREFIX.'module_news_types_locale tl ON n.typeid = tl.type_id AND tl.lang_id='.$selectedLang.'
                     WHERE n.date > '.$newsdate.'
                             AND n.status = "1"
                             AND n.validated = "1"
@@ -4137,7 +4172,12 @@ class NewsletterManager extends NewsletterLib
                                 ? contrexx_input2int($_POST['newsletter_mail_template'])
                                 : '2';
 
+	$cx = \Cx\Core\Core\Controller\Cx::instanciate();
 	if (isset($_GET['view']) && $_GET['view'] == 'iframe') {
+            $selectedLang = FRONTEND_LANG_ID;
+	        if ($cx->getRequest()->hasParam('selectedLang', false)) {
+	            $selectedLang = $cx->getRequest()->getParam('selectedLang', false);
+            }
             $selectedCategoryNews = isset($_POST['selected'])
                                       ? json_decode(contrexx_input2raw($_POST['selected']), true)
                                       : '';
@@ -4180,8 +4220,8 @@ class NewsletterManager extends NewsletterLib
                     INNER JOIN  '.DBPREFIX.'module_news_categories_locale AS nc ON nc.category_id = nr.category_id
                     WHERE       status = 1
                                 AND nl.is_active=1
-                                AND nl.lang_id='.FRONTEND_LANG_ID.'
-                                AND nc.lang_id='.FRONTEND_LANG_ID.'
+                                AND nl.lang_id='.$selectedLang.'
+                                AND nc.lang_id='.$selectedLang.'
                                 AND n.id IN ('.implode(",", $selectedNews).')
                     ORDER BY nc.name ASC, n.date DESC';
 
@@ -4218,6 +4258,11 @@ class NewsletterManager extends NewsletterLib
         } else {
             $selectedNews = isset($_POST['selectedNews']) ? contrexx_input2raw($_POST['selectedNews']) : '';
 
+            $selectedLang = FRONTEND_LANG_ID;
+            if ($cx->getRequest()->hasParam(newsLang, false)) {
+                $selectedLang = contrexx_input2raw($cx->getRequest()->getParam(newsLang, false));
+            }
+
             $this->_pageTitle = $_ARRAYLANG['TXT_NEWSLETTER_NEWS_IMPORT_PREVIEW'];
             $this->_objTpl->loadTemplateFile('newsletter_news_preview.html');
             $this->_objTpl->setVariable(array(
@@ -4229,7 +4274,8 @@ class NewsletterManager extends NewsletterLib
             'NEWSLETTER_IMPORT_TEMPLATE_MENU' => $this->_getTemplateMenu($importTemplate, 'id="newsletter_import_template" name="newsletter_import_template" style="width:300px;" onchange="refreshIframe();"', 'news'),
                 'NEWSLETTER_SELECTED_NEWS' => json_encode($selectedNews),
             'NEWSLETTER_SELECTED_EMAIL_TEMPLATE' => $mailTemplate,
-            'NEWSLETTER_SELECTED_IMPORT_TEMPLATE' => $importTemplate
+            'NEWSLETTER_SELECTED_IMPORT_TEMPLATE' => $importTemplate,
+                'NEWSLETTER_SELECTED_LANG' => $selectedLang,
             ));
         }
     }
