@@ -20,3 +20,9 @@ $_ARRAYLANG['TXT_CORE_HTML_STATUS_NO_ENTITY_FOUND_ERROR'] = 'Kein Eintrag zum ak
 $_ARRAYLANG['TXT_CORE_HTML_PLEASE_CHOOSE'] = 'Bitte wählen...';
 $_ARRAYLANG['TXT_CORE_HTML_CANT_UPDATE_STATUS'] = 'Status konnte nicht aktualisiert werden.';
 $_ARRAYLANG['TXT_CORE_HTML_EXPORT'] = 'Mit aktuellem Filter zu CSV exportieren';
+
+// Twin Select
+$_ARRAYLANG['TXT_CORE_HTML_TWIN_SELECT_ADD_ENTRY'] = 'Zuweisen';
+$_ARRAYLANG['TXT_CORE_HTML_TWIN_SELECT_REMOVE_ENTRY'] = 'Entfernen';
+$_ARRAYLANG['TXT_CORE_HTML_TWIN_SELECT_SELECT_ALL'] = 'Alle auswählen';
+$_ARRAYLANG['TXT_CORE_HTML_TWIN_SELECT_DESELECT_ALL'] = 'Alle entfernen';

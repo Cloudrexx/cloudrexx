@@ -225,6 +225,16 @@ class DownloadsManager extends DownloadsLibrary
                     $this->parseCategoryNavigation();
                 }
                 break;
+            case 'assign_categories_to_download':
+                $this->loadDownloadNavigation();
+                $this->parseAssignCategoriesToDownloadsDownloadView();
+                $this->parseDownloadNavigation();
+                break;
+            case 'category_assign_categories_to_download':
+                $this->loadCategoryNavigation();
+                $this->parseAssignCategoriesToDownloadsCategoryView();
+                $this->parseCategoryNavigation();
+                break;
             case 'mailtemplate_edit':
             case 'mailtemplate_overview':
             case 'settings':
@@ -925,6 +935,11 @@ class DownloadsManager extends DownloadsLibrary
                     $this->updateDownloadOrder(isset($_POST['downloads_download_order']) && is_array($_POST['downloads_download_order']) ? $_POST['downloads_download_order'] : array());
                     break;
 
+                case 'assignCategories':
+                    $this->loadDownloadNavigation();
+                    $this->parseAssignCategoriesToDownloadsDownloadView();
+                    break;
+
                 case 'delete':
                     $this->deleteDownloads(isset($_POST['downloads_download_id']) && is_array($_POST['downloads_download_id']) ? $_POST['downloads_download_id'] : array());
                     break;
@@ -1026,6 +1041,7 @@ class DownloadsManager extends DownloadsLibrary
         ) {
             $changeOrderAllowed = true;
             $this->objTemplate->setVariable('TXT_DOWNLOADS_ORDER', $_ARRAYLANG['TXT_DOWNLOADS_ORDER']);
+            $this->objTemplate->setVariable('TXT_DOWNLOADS_ASSIGN_CATEGORIES', $_ARRAYLANG['TXT_DOWNLOADS_ASSIGN_CATEGORIES']);
             $this->objTemplate->parse('downloads_download_change_order_action');
         } else {
             $changeOrderAllowed = false;
@@ -1344,6 +1360,229 @@ class DownloadsManager extends DownloadsLibrary
         }
     }
 
+    /**
+     * Redirects to the view for assigning categories to downloads, back to the
+     * category view
+     *
+     * @throws \Exception param not exists
+     */
+    protected function parseAssignCategoriesToDownloadsDownloadView()
+    {
+        if ($this->parseAssignCategoriesToDownloads(true)) {
+            $this->downloads();
+        }
+    }
+
+    /**
+     * Redirects to the view for assigning categories to downloads, back to the
+     * downloads view.
+     *
+     * @throws \Exception param not exists
+     */
+    protected function parseAssignCategoriesToDownloadsCategoryView()
+    {
+        if ($this->parseAssignCategoriesToDownloads(false)) {
+            $this->categories();
+        }
+    }
+
+    /**
+     * Get the view for assigning categories to downloads. Once the form has
+     * been sent, the categories will be assigned to the downloads
+     *
+     * @param bool $downloadView If it is the download or category view
+     * @return bool true if the downloads are saved
+     * @throws \Exception param not exists
+     */
+    protected function parseAssignCategoriesToDownloads($downloadView)
+    {
+        global $_ARRAYLANG;
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+
+        $request = $cx->getRequest();
+        if ($request->hasParam('downloads_download_assign_categories', false)) {
+            $selectedCategories = array();
+            if (
+                $request->hasParam(
+                    'downloads_download_associated_categories', false
+                )
+            ) {
+                $selectedCategories = $request->getParam(
+                    'downloads_download_associated_categories',
+                    false
+                );
+            }
+            $selectedDownloads = array();
+            if ($request->hasParam('downloads_selected_download_ids', false)) {
+                $selectedDownloads = $request->getParam(
+                    'downloads_selected_download_ids',
+                    false
+                );
+            }
+
+            $type = 'overwrite';
+            if ($request->hasParam('downloads_assign_categories_type', false)) {
+                $type = $request->getParam(
+                    'downloads_assign_categories_type'
+                    , false
+                );
+            }
+
+            $this->assignCategories(
+                $selectedDownloads,
+                $selectedCategories,
+                $type == 'overwrite' ? true : false
+            );
+
+            return true;
+        }
+
+        $this->_pageTitle = $_ARRAYLANG['TXT_DOWNLOADS_ASSIGN_CATEGORIES'];
+        $this->objTemplate->addBlockFile(
+            'DOWNLOADS_DOWNLOAD_TEMPLATE',
+            'module_downloads_downloads',
+            'module_downloads_assign_categories.html'
+        );
+
+        $arrCategories = $this->getParsedCategoryListForDownloadAssociation();
+        $categories = array();
+        foreach ($arrCategories as $category) {
+            $categories[$category['id']] = $category['name'];
+        }
+
+        $downloadIds = array();
+        $request = $cx->getRequest();
+        if ($request->hasParam('downloads_download_id', false)) {
+            $downloadIds = $request->getParam('downloads_download_id', false);
+        }
+
+        foreach ($downloadIds as $downloadId) {
+            $this->objTemplate->setVariable(array(
+                // parse download id
+                'DOWNLOADS_SELECTED_DOWNLOAD_ID' => $downloadId,
+            ));
+
+            $this->objTemplate->parse('downloads_selected_download_id_list');
+        }
+
+        $twinSelect = new \Cx\Core\Html\Model\Entity\TwinSelect(
+            'module_downloads_assign_categories',
+            'downloads_download_associated_categories',
+            $_ARRAYLANG['TXT_DOWNLOADS_ASSIGNED_CATEGORIES'],
+            array(),
+            'downloads_download_not_associated_categories',
+            $_ARRAYLANG['TXT_DOWNLOADS_AVAILABLE_CATEGORIES'],
+            $categories,
+            'downloads_download_form'
+        );
+
+        // Generate action string
+        if ($downloadView) {
+            $action = 'assign_category_to_download';
+
+        } else {
+            $action = 'category_assign_categories_to_download';
+        }
+
+        $possibeParams = array(
+            'pos', 'parent_id', 'downloads_category_parent_id',
+            'search_term', 'category_sort'
+,        );
+
+        foreach ($possibeParams as $param) {
+            if ($request->hasParam($param)) {
+                $action .= '&'.$param.'=' . $request->getParam($param);
+            }
+        }
+
+        $this->objTemplate->setVariable(array(
+            'DOWNLOADS_ASSIGN_CATEGORY_ACTION' => $action,
+            'DOWNLOADS_ASSIGN_CATEGORIES_TWIN_SELECT' => $twinSelect,
+            'TXT_DOWNLOADS_CANCEL' => $_ARRAYLANG['TXT_DOWNLOADS_CANCEL'],
+            'TXT_DOWNLOADS_ASSIGN_CATEGORIES' => $_ARRAYLANG[
+                'TXT_DOWNLOADS_ASSIGN_CATEGORIES'
+            ],
+            'TXT_DOWNLOADS_ASSIGN_CATEGORIES_TYPE_MAINTAIN' => $_ARRAYLANG[
+                'TXT_DOWNLOADS_MAINTAIN_EXISTING_CATEGORY_ASSIGNMENT'
+            ],
+            'TXT_DOWNLOADS_ASSIGN_CATEGORIES_TYPE_OVERWRITE' => $_ARRAYLANG[
+                'TXT_DOWNLOADS_OVERWRITE_EXISTING_CATEGORY_ASSIGNMENT'
+            ],
+        ));
+
+        return false;
+    }
+
+    /**
+     * Assign categories to downloads. Categories can be added or overwritten
+     *
+     * @param array   $arrDownloadIds contains all downloads to update
+     * @param array   $arrCategories  contains all categories to assign
+     * @param boolean $overwrite if categories should be added or overwritten
+     */
+    protected function assignCategories($arrDownloadIds, $arrCategories, $overwrite)
+    {
+        global $_ARRAYLANG;
+
+        $succeded = true;
+        $objFWUser = \FWUser::getFWUserObject();
+        $objDownload = new \Cx\Modules\Downloads\Controller\Download(
+            $this->arrConfig
+        );
+        foreach ($arrDownloadIds as $downloadId) {
+            $download = $objDownload->getDownload($downloadId);
+
+            if ($download && $download->getId() &&
+                !\Permission::checkAccess(143, 'static', true) &&
+                (
+                    ($objFWUser = \FWUser::getFWUserObject()) == false ||
+                    !$objFWUser->objUser->login() ||
+                    $download->getOwnerId() != $objFWUser->objUser->getId()
+                )
+            ) {
+                continue;
+            }
+            if (!$overwrite) {
+                $arrCategories = array_merge(
+                    $arrCategories,
+                    $download->getAssociatedCategoryIds()
+                );
+            }
+
+            $validCategoryIds = array();
+            foreach($arrCategories as $catId) {
+                $objCategory = \Cx\Modules\Downloads\Controller\Category::getCategory($catId);
+                if (
+                    !\Permission::checkAccess(143, 'static', true) &&
+                    $objCategory &&
+                    $objCategory->getManageFilesAccessId() &&
+                    !\Permission::checkAccess(
+                        $objCategory->getManageFilesAccessId(), 'dynamic', true
+                    ) &&
+                    $objCategory->getOwnerId() != $objFWUser->objUser->getId()
+                ) {
+                    continue;
+                }
+                $validCategoryIds[] = $catId;
+            }
+
+            $download->setCategories($validCategoryIds);
+            if (!$download->store(null, array())) {
+                $succeded = false;
+                $this->arrStatusMsg['error'] = array_merge(
+                    $this->arrStatusMsg['error'],
+                    $download->getErrorMsg()
+                );
+            }
+        }
+
+        if ($succeded) {
+            $this->arrStatusMsg['ok'][] = $_ARRAYLANG[
+                'TXT_DOWNLOADS_DOWNLOADS_ASSIGNED_SUCCESS'
+            ];
+        }
+    }
 
     private function download()
     {
@@ -1990,6 +2229,10 @@ class DownloadsManager extends DownloadsLibrary
                     } else {
                         $this->arrStatusMsg['error'] = array_merge($this->arrStatusMsg['error'], $objCategory->getErrorMsg());
                     }
+                    break;
+                case 'assignCategories':
+                    $this->loadDownloadNavigation();
+                    $this->parseAssignCategoriesToDownloadsCategoryView();
                     break;
                 case 'unlink':
                     $this->unlinkDownloadsFromCategory($objCategory, isset($_POST['downloads_download_id']) && is_array($_POST['downloads_download_id']) ? $_POST['downloads_download_id'] : array());
@@ -2782,7 +3025,8 @@ class DownloadsManager extends DownloadsLibrary
                 'TXT_DOWNLOADS_UNCHECK_ALL'                 => $_ARRAYLANG['TXT_DOWNLOADS_UNCHECK_ALL'],
                 'TXT_DOWNLOADS_SELECT_ACTION'               => $_ARRAYLANG['TXT_DOWNLOADS_SELECT_ACTION'],
                 'TXT_DOWNLOADS_ORDER'                       => $_ARRAYLANG['TXT_DOWNLOADS_ORDER'],
-                'TXT_DOWNLOADS_UNLINK_MULTI'                => $_ARRAYLANG['TXT_DOWNLOADS_UNLINK_MULTI']
+                'TXT_DOWNLOADS_UNLINK_MULTI'                => $_ARRAYLANG['TXT_DOWNLOADS_UNLINK_MULTI'],
+                'TXT_DOWNLOADS_ASSIGN_CATEGORIES'           => $_ARRAYLANG['TXT_DOWNLOADS_ASSIGN_CATEGORIES']
             ));
 
             $this->objTemplate->setVariable(array(

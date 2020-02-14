@@ -1,0 +1,45 @@
+.twin-select select {
+    min-width: 300px;
+}
+.twin-select .control-links a {
+    display: block;
+}
+.twin-select .twin-select-wrapper {
+    display: inline-block;
+    vertical-align: top;
+    overflow: hidden;
+}
+.twin-select .control-buttons {
+    padding: 22px 10px;
+}
+.twin-select .control-buttons button {
+    display: block;
+    min-width: 100px;
+}
+.twin-select .control-buttons .removeBtn {
+    margin-top: 5px;
+}
+.twin-select.wide > .twin-select-wrapper {
+    display: block;
+}
+.twin-select {
+    width: 100%;
+}
+.twin-select.wide .control-buttons {
+    text-align: center;
+}
+.twin-select.wide select {
+    width: 100%;
+}
+.twin-select.wide .control-buttons button {
+    display: inline-block;
+}
+.twin-select.wide .control-links a {
+    display: inline-block;
+}
+.twin-select.wide .control-links a:first-child:after {
+    content: '|';
+    color: #444444;
+    margin: 0 5px;
+    pointer-events: none;
+}

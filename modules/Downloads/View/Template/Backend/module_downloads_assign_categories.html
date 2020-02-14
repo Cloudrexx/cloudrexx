@@ -1,0 +1,43 @@
+<!-- start module_downloads_download_assign_categories.html -->
+<form name="downloads_download_form" id="downloads_download_form" action="index.php?cmd=Downloads&amp;act={DOWNLOADS_ASSIGN_CATEGORY_ACTION}" method="post">
+    <!-- BEGIN downloads_selected_download_id_list -->
+    <input name="downloads_selected_download_ids[]" value="{DOWNLOADS_SELECTED_DOWNLOAD_ID}" hidden />
+    <!-- END downloads_selected_download_id_list -->
+    <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
+        <thead>
+        <tr>
+            <th>{TXT_DOWNLOADS_ASSIGN_CATEGORIES}</th>
+        </tr>
+        </thead>
+        <tbody style="vertical-align:top;">
+        <tr class="row2">
+            <td>
+                <div id="downloads-assign-categories-type-options">
+                    <label>
+                        <input type="radio" value="overwrite" name="downloads_assign_categories_type" checked />
+                        {TXT_DOWNLOADS_ASSIGN_CATEGORIES_TYPE_OVERWRITE}
+                    </label>
+                    <label>
+                        <input type="radio" value="maintain" name="downloads_assign_categories_type" />
+                        {TXT_DOWNLOADS_ASSIGN_CATEGORIES_TYPE_MAINTAIN}
+                    </label>
+                </div>
+                {DOWNLOADS_ASSIGN_CATEGORIES_TWIN_SELECT}
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <br />
+    <input type="button" name="downloads_download_cancel" value="{TXT_DOWNLOADS_CANCEL}" onclick="window.history.back();" />
+    <input type="submit" name="downloads_download_assign_categories" value="{TXT_DOWNLOADS_ASSIGN_CATEGORIES}" />
+</form>
+<style>
+    #downloads-assign-categories-type-options {
+        margin-bottom: 15px;
+    }
+    #downloads-assign-categories-type-options label {
+        display: block;
+    }
+</style>
+<!-- end module_downloads_download_assign_categories.html -->

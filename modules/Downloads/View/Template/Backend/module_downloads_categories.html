@@ -33,7 +33,11 @@ function downloadsCategoryDoAction(action)
 function downloadsDownloadDoAction(action)
 {
     if (action == 'order' || checkboxIsChecked('downloads_download_form', 'downloads_download_id[]')) {
-        if (action == 'order' || confirm('{DOWNLOADS_CONFIRM_UNLINK_DOWNLOADS_TXT}')) {
+        if (
+            action == 'order' ||
+            action == 'assignCategories' ||
+            confirm('{DOWNLOADS_CONFIRM_DELETE_DOWNLOADS_TXT}\n{TXT_DOWNLOADS_OPERATION_IRREVERSIBLE}')
+        ) {
             document.getElementById('downloads_download_form').submit(); return true;
         }
     }
@@ -285,6 +289,7 @@ function downloadsUpdateSortOrder(event,elForm,idMultiAction)
     <select name="downloads_download_select_action" id="downloads_download_select_action" onchange="downloadsDownloadDoAction(this.value)">
         <option value="0" selected="selected" style="border-bottom: 1px solid #000;">{TXT_DOWNLOADS_SELECT_ACTION}</option>
         <option value="order">{TXT_DOWNLOADS_ORDER}</option>
+        <option value="assignCategories">{TXT_DOWNLOADS_ASSIGN_CATEGORIES}</option>
         <option value="unlink">{TXT_DOWNLOADS_UNLINK_MULTI}</option>
     </select>
 </div>
