@@ -219,6 +219,7 @@ INSERT INTO `contrexx_access_group_static_ids` (`access_id`, `group_id`) VALUES 
 INSERT INTO `contrexx_access_group_static_ids` (`access_id`, `group_id`) VALUES (194,6);
 INSERT INTO `contrexx_access_group_static_ids` (`access_id`, `group_id`) VALUES (195,1);
 INSERT INTO `contrexx_access_group_static_ids` (`access_id`, `group_id`) VALUES (204,1);
+INSERT INTO `contrexx_access_group_static_ids` (`access_id`, `group_id`) VALUES (205,1);
 INSERT INTO `contrexx_access_id` (`id`, `entity_class_name`, `entity_class_id`) VALUES (1,'','');
 INSERT INTO `contrexx_access_id` (`id`, `entity_class_name`, `entity_class_id`) VALUES (2,'','');
 INSERT INTO `contrexx_access_id` (`id`, `entity_class_name`, `entity_class_id`) VALUES (3,'','');
@@ -342,6 +343,7 @@ INSERT INTO `contrexx_access_id` (`id`, `entity_class_name`, `entity_class_id`) 
 INSERT INTO `contrexx_access_id` (`id`, `entity_class_name`, `entity_class_id`) VALUES (180,'','');
 INSERT INTO `contrexx_access_id` (`id`, `entity_class_name`, `entity_class_id`) VALUES (181,'','');
 INSERT INTO `contrexx_access_id` (`id`, `entity_class_name`, `entity_class_id`) VALUES (182,'','');
+INSERT INTO `contrexx_access_id` (`id`, `entity_class_name`, `entity_class_id`) VALUES (205,'','');
 INSERT INTO `contrexx_access_id` (`id`, `entity_class_name`, `entity_class_id`) VALUES (556,'','');
 INSERT INTO `contrexx_access_id` (`id`, `entity_class_name`, `entity_class_id`) VALUES (557,'','');
 INSERT INTO `contrexx_access_rel_user_group` (`user_id`, `group_id`) VALUES (1,1);
@@ -580,6 +582,7 @@ INSERT INTO `contrexx_backend_areas` (`area_id`, `parent_area_id`, `type`, `scop
 INSERT INTO `contrexx_backend_areas` (`area_id`, `parent_area_id`, `type`, `scope`, `area_name`, `is_active`, `uri`, `target`, `module_id`, `order_id`, `access_id`) VALUES (231,18,'function','backend','TXT_CORE_MODULE_ACCESS_MANAGE_USER_GROUPS',1,'','_self',0,2,203);
 INSERT INTO `contrexx_backend_areas` (`area_id`, `parent_area_id`, `type`, `scope`, `area_name`, `is_active`, `uri`, `target`, `module_id`, `order_id`, `access_id`) VALUES (232,21,'function','backend','TXT_CORE_VIEWMANAGER_TEMPLATE_EDITOR_ACCESS',1,'','_self',0,0,204);
 INSERT INTO `contrexx_backend_areas` (`area_id`, `parent_area_id`, `type`, `scope`, `area_name`, `is_active`, `uri`, `target`, `module_id`, `order_id`, `access_id`) VALUES (233,17,'function','backend','TXT_CORE_MODULE_PDF',1,'index.php?cmd=Pdf','_self',117,17,193);
+INSERT INTO `contrexx_backend_areas` (`area_id`, `parent_area_id`, `type`, `scope`, `area_name`, `is_active`, `uri`, `target`, `module_id`, `order_id`, `access_id`) VALUES (234,132,'function','backend','TXT_DOWNLOADS_EDIT_DOWNLOAD_CATEGORY_PERMISSIONS',1,'','_self',53,3,205);
 INSERT INTO `contrexx_component` (`id`, `name`, `type`) VALUES (2,'Stats','core_module');
 INSERT INTO `contrexx_component` (`id`, `name`, `type`) VALUES (3,'Gallery','module');
 INSERT INTO `contrexx_component` (`id`, `name`, `type`) VALUES (4,'Newsletter','module');

@@ -792,6 +792,7 @@ $_ARRAYLANG['TXT_SETTINGS_ERROR_NO_WRITE_ACCESS'] = "The file <strong>%s</strong
 $_ARRAYLANG['TXT_U2U_MODULE'] = "U2U messaging";
 $_ARRAYLANG['TXT_DOWNLOADS_ADMINISTER'] = "Groups and settings";
 $_ARRAYLANG['TXT_DOWNLOADS_ALL_DOWNLOADS'] = "Management of all categories and entries";
+$_ARRAYLANG['TXT_DOWNLOADS_EDIT_DOWNLOAD_CATEGORY_PERMISSIONS'] = "Edit access permissions for downloads and categories";
 $_ARRAYLANG['TXT_ACTIVE_MOBILE_TEMPLATE'] = "Mobile";
 $_ARRAYLANG['TXT_ACCESS_ADD_NEW_ENTRY'] = "Add new entry";
 $_ARRAYLANG['TXT_U2U_MODULE_DESCRIPTION'] = "User to user messaging";

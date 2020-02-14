@@ -516,7 +516,9 @@ window.onload = function () {
         <li><a id="downloadsTab_downloadPicture" href="javascript:void(0)" onclick="selectTab('downloadPicture')" title="{TXT_DOWNLOADS_IMAGE}">{TXT_DOWNLOADS_IMAGE}</a></li>
         <li><a id="downloadsTab_downloadCategories" href="javascript:void(0)" onclick="selectTab('downloadCategories')" title="{TXT_DOWNLOADS_CATEGORIES}">{TXT_DOWNLOADS_CATEGORIES}</a></li>
         <li><a id="downloadsTab_downloadRelatedDownloads" href="javascript:void(0)" onclick="selectTab('downloadRelatedDownloads')" title="{TXT_DOWNLOADS_RELATED_DOWNLOADS}">{TXT_DOWNLOADS_RELATED_DOWNLOADS}</a></li>
+        <!-- BEGIN downloads_download_permissions_tab -->
         <li><a id="downloadsTab_downloadPermissions" href="javascript:void(0)" onclick="selectTab('downloadPermissions')" title="{TXT_DOWNLOADS_PERMISSIONS}">{TXT_DOWNLOADS_PERMISSIONS}</a></li>
+        <!-- END downloads_download_permissions_tab -->
     </ul>
 
     <!-- start div downloadsTab_downloadGeneral -->
@@ -802,6 +804,7 @@ window.onload = function () {
     <!-- end div downloadsTab_downloadRelatedDownloads -->
 
     <!-- start div downloadsTab_downloadPermissions -->
+    <!-- BEGIN downloads_download_permissions -->
     <div id="downloadPermissions" class="downloadsTab" style="display:none;">
         <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
             <thead>
@@ -854,6 +857,7 @@ window.onload = function () {
             </tbody>
         </table>
     </div>
+    <!-- END downloads_download_permissions -->
     <!-- end div downloadsTab_downloadPermissions -->
 
     <br />

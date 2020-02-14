@@ -794,6 +794,7 @@ $_ARRAYLANG['TXT_SETTINGS_ERROR_NO_WRITE_ACCESS'] = "Auf die Datei <strong>%s</s
 $_ARRAYLANG['TXT_U2U_MODULE'] = "User to User Nachrichten";
 $_ARRAYLANG['TXT_DOWNLOADS_ADMINISTER'] = "Gruppen und Einstellungen";
 $_ARRAYLANG['TXT_DOWNLOADS_ALL_DOWNLOADS'] = "Verwalten aller Kategorien und Downloads";
+$_ARRAYLANG['TXT_DOWNLOADS_EDIT_DOWNLOAD_CATEGORY_PERMISSIONS'] = "Zugriffsberechtigungen von Downloads und Kategorien bearbeiten";
 $_ARRAYLANG['TXT_ACTIVE_MOBILE_TEMPLATE'] = "Mobile";
 $_ARRAYLANG['TXT_ACCESS_ADD_NEW_ENTRY'] = "Neuen Eintrag hinzufügen";
 $_ARRAYLANG['TXT_U2U_MODULE_DESCRIPTION'] = "Die Anwendung ermöglicht das Versenden von Nachrichten zwischen registrierten Benutzern.";

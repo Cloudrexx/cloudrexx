@@ -198,7 +198,9 @@
 
 <ul id="tabmenu">
     <li><a id="downloadsTab_categoryGeneral" class="active" href="javascript:void(0)" onclick="selectTab('categoryGeneral')" title="{TXT_DOWNLOADS_GENERAL}">{TXT_DOWNLOADS_GENERAL}</a></li>
+    <!-- BEGIN downloads_category_permissions_tab -->
     <li><a id="downloadsTab_categoryPermissions" href="javascript:void(0)" onclick="selectTab('categoryPermissions')" title="{TXT_DOWNLOADS_PERMISSIONS}">{TXT_DOWNLOADS_PERMISSIONS}</a></li>
+    <!-- END downloads_category_permissions_tab -->
 </ul>
 
 <form name="downloads_category_form" id="downloads_category_form" action="index.php?cmd=Downloads&amp;act=category&amp;id={DOWNLOADS_CATEGORY_ID}&amp;category_sort={DOWNLOADS_CATEGORY_CATEGORY_SORT}&amp;category_by={DOWNLOADS_CATEGORY_CATEGORY_SORT_BY}&amp;download_sort={DOWNLOADS_CATEGORY_DOWNLOAD_SORT}&amp;download_by={DOWNLOADS_CATEGORY_DOWNLOAD_BY}&amp;category_pos={DOWNLOADS_CATEGORY_CATEGORY_OFFSET}&amp;download_pos={DOWNLOADS_CATEGORY_DOWNLOAD_OFFSET}" onsubmit="downloadsSelectAll()" method="post">
@@ -323,6 +325,7 @@
     </div>
 <!-- end div downloadsTab_categoryGeneral -->
 <!-- start div downloadsTab_categoryPermissions -->
+    <!-- BEGIN downloads_category_permissions -->
     <div id="categoryPermissions" class="downloadsTab" style="display:none;">
         <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
             <thead>
@@ -600,6 +603,7 @@
 <br />
 <input type="checkbox" name="downloads_category_apply_recursive" id="downloads_category_apply_recursive" value="1" {DOWNLOADS_CATEGORY_APPLY_RECURSIVE_CHECKED} /><label for="downloads_category_apply_recursive">{TXT_DOWNLOADS_APPLY_PERMISSIONS_RECURSIVEJ}</label>
 </div>
+    <!-- END downloads_category_permissions -->
 <!-- end div downloadsTab_categoryPermissions -->
 <br />
 <input type="button" name="downloads_category_cancel" value="{TXT_DOWNLOADS_CANCEL}" onclick="document.location.href='index.php?cmd=Downloads&{CSRF_PARAM}&amp;act=categories&amp;parent_id={DOWNLOADS_CATEGORY_PARENT_ID}&amp;category_sort={DOWNLOADS_CATEGORY_CATEGORY_SORT}&amp;category_by={DOWNLOADS_CATEGORY_CATEGORY_SORT_BY}&amp;download_sort={DOWNLOADS_CATEGORY_DOWNLOAD_SORT}&amp;download_by={DOWNLOADS_CATEGORY_DOWNLOAD_BY}&amp;category_pos={DOWNLOADS_CATEGORY_CATEGORY_OFFSET}&amp;download_pos={DOWNLOADS_CATEGORY_DOWNLOAD_OFFSET}'" />
