@@ -1,6 +1,41 @@
 <!-- start module_downloads_modify_category.html -->
 <script type="text/javascript">
 // <![CDATA[
+    document.addEventListener("DOMContentLoaded", function(event) {
+        const select = document.querySelector('select[name="downloads_category_parent_id"]');
+        select.addEventListener('change', () => {
+            loadPermission(select);
+        });
+        loadPermission(select);
+    });
+    function loadPermission(select) {
+        const checkbox = document.getElementById('downloads_category_take_over_parent_permissions');
+        if (!checkbox) {
+            return;
+        }
+        if (select.selectedIndex) {
+            checkbox.checked = true;
+            checkbox.parentElement.parentElement.parentElement.classList.remove('hide-permission');
+            togglePermissions();
+        } else {
+            checkbox.checked = false;
+            checkbox.parentElement.parentElement.parentElement.classList.add('hide-permission');
+            togglePermissions();
+        }
+    }
+
+    function togglePermissions() {
+        document.querySelectorAll(
+            '#categoryPermissions > :nth-child(n+2), #categoryPermissions > table:first-child tr:nth-child(n+2)'
+        ).forEach((tr) => {
+            if (document.getElementById('downloads_category_take_over_parent_permissions').checked) {
+                tr.classList.add('hide-permission');
+            } else {
+                tr.classList.remove('hide-permission');
+            }
+        });
+    }
+
     function downloadsSyncNameFields(value, type, name) {
         for (i=0; i < document.getElementById('downloads_category_form').getElementsByTagName(type).length;i++) {
             if (typeof(document.getElementById('downloads_category_form').getElementsByTagName(type)[i].name) != 'undefined'
@@ -193,8 +228,16 @@
             //document.getElementById('downloads_category_image_preview').style.height = thumb_height;
         }
     }
+
+
 // ]]>
 </script>
+<style>
+    /* !important is necessary to overwrite the inline-styles */
+    .hide-permission {
+        display: none !important;
+    }
+</style>
 
 <ul id="tabmenu">
     <li><a id="downloadsTab_categoryGeneral" class="active" href="javascript:void(0)" onclick="selectTab('categoryGeneral')" title="{TXT_DOWNLOADS_GENERAL}">{TXT_DOWNLOADS_GENERAL}</a></li>
@@ -331,6 +374,22 @@
                 </tr>
             </thead>
             <tbody style="vertical-align:top;">
+                <!-- BEGIN downloads_category_take_over_parent_permissions -->
+                <tr class="row1 hide-permission">
+                    <td>
+                        <label for="downloads_category_take_over_parent_permissions">
+                            <input
+                                    type="checkbox"
+                                    name="downloads_category_take_over_parent_permissions"
+                                    value="1"
+                                    id="downloads_category_take_over_parent_permissions"
+                                    onclick="togglePermissions()"
+                            />
+                            {TXT_DOWNLOADS_CATEGORY_TAKE_OVER_PARENT_PERMISSION}
+                        </label>
+                    </td>
+                </tr>
+                <!-- END downloads_category_take_over_parent_permissions -->
                 <tr class="row3">
                     <td style="font-weight:bold;">{TXT_DOWNLOADS_VIEW_CONTENT}</td>
                 </tr>

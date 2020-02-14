@@ -204,6 +204,7 @@ $_ARRAYLANG['TXT_DOWNLOADS_ADD_MAIN_CATEGORY_PROHIBITED'] = "Sie sind nicht bere
 $_ARRAYLANG['TXT_DOWNLOADS_ADD_NEW_DOWNLOAD'] = "Neuen Download hinzufügen";
 $_ARRAYLANG['TXT_DOWNLOADS_ADD_SUBCATEGORY_TO_CATEGORY_PROHIBITED'] = "Sie sind nicht berechtigt in der Kategorie <strong>%s</strong> eine neue Unterkategorie anzulegen!";
 $_ARRAYLANG['TXT_DOWNLOADS_APPLY_PERMISSIONS_RECURSIVEJ'] = "Diese Berechtigungen für alle Unterkategorien übernehmen.";
+$_ARRAYLANG['TXT_DOWNLOADS_CATEGORY_TAKE_OVER_PARENT_PERMISSION'] = ' Zugriffsberechtigungen der übergeordneten Kategorie übernehmen.';
 $_ARRAYLANG['TXT_DOWNLOADS_ASSIGNED_CATEGORIES'] = "Zugewiesene Kategorien";
 $_ARRAYLANG['TXT_DOWNLOADS_AVAILABLE_CATEGORIES'] = "Verfügbare Kategorien";
 $_ARRAYLANG['TXT_DOWNLOADS_BYTES'] = "Bytes";

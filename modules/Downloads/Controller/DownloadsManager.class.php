@@ -691,7 +691,24 @@ class DownloadsManager extends DownloadsLibrary
             }
 
             $objCategory->setPermissionsRecursive(!empty($_POST['downloads_category_apply_recursive']));
-            $objCategory->setPermissions($arrCategoryPermissions);
+            if (
+                $_POST['downloads_category_take_over_parent_permissions'] &&
+                $objCategory->getParentId() &&
+                !$objCategory->getId()
+            ) {
+                $parent = \Cx\Modules\Downloads\Controller\Category::getCategory(
+                    $objCategory->getParentId()
+                );
+                $parentPermissions = $parent->getPermissions();
+                foreach ($this->arrPermissionTypes as $protectionType) {
+                    unset($parentPermissions[$protectionType]['associated_groups']);
+                    unset($parentPermissions[$protectionType]['not_associated_groups']);
+                }
+
+                $objCategory->setPermissions($parentPermissions);
+            } else {
+                $objCategory->setPermissions($arrCategoryPermissions);
+            }
 
             if ($status && $objCategory->store()) {
                 $this->parentCategoryId = $objCategory->getParentId();
@@ -885,6 +902,27 @@ class DownloadsManager extends DownloadsLibrary
             'DOWNLOADS_CATEGORY_APPLY_RECURSIVE_CHECKED' => $objCategory->hasToSetPermissionsRecursive() ? 'checked="checked"' : '',
             'DOWNLOADS_MEDIA_BROWSER_BUTTON'             => self::getMediaBrowserButton(null, 'filebrowser')
         ));
+
+        if (
+            !$objCategory->getId() &&
+            $this->objTemplate->blockExists(
+                'downloads_category_take_over_parent_permissions'
+            )
+        ) {
+            $this->objTemplate->setVariable(array(
+                'TXT_DOWNLOADS_CATEGORY_TAKE_OVER_PARENT_PERMISSION' => $_ARRAYLANG[
+                    'TXT_DOWNLOADS_CATEGORY_TAKE_OVER_PARENT_PERMISSION'
+                ]
+            ));
+            $this->objTemplate->touchBlock(
+                'downloads_category_take_over_parent_permissions'
+            );
+        } else {
+            $this->objTemplate->hideBlock(
+                'downloads_category_take_over_parent_permissions'
+            );
+        }
+
         return true;
     }
 
