@@ -426,6 +426,37 @@ class SystemComponentBackendController extends Controller {
                         break;
                 }
                 break;
+            case 'Splash':
+                $baseFileName = $this->getDirectory();
+                foreach (array('icon', 'introduction_image') as $imageKey) {
+                    $imageKeyCC = str_replace('_', '', ucwords($imageKey, '_'));
+                    $fileName = $this->getDirectory() . '/View/Media/' . $imageKeyCC . '.png';
+                    if (!file_exists($fileName)) {
+                        $template->hideBlock('component_' . strtolower($imageKey));
+                        continue;
+                    }
+                    $webFileName = $this->getDirectory(false, true) . '/View/Media/' . $imageKeyCC . '.png';
+                    $template->setVariable(
+                        'COMPONENT_' . strtoupper($imageKey) . '_SRC',
+                        $webFileName
+                    );
+                    $template->touchBlock('component_' . strtolower($imageKey));
+                }
+                if (
+                    !empty($this->getEnduserDocumentationUrl()) ||
+                    !empty($this->getDeveloperDocumentationUrl())
+                ) {
+                    $template->touchBlock('component_docs');
+                    $template->setVariable(array(
+                        'COMPONENT_ENDUSER_DOCUMENTATION_URL' =>
+                            $this->getEnduserDocumentationUrl(),
+                        'COMPONENT_DEVELOPER_DOCUMENTATION_URL' =>
+                            $this->getDeveloperDocumentationUrl(),
+                    ));
+                } else {
+                    $template->hideBlock('component_docs');
+                }
+                break;
             case '':
             default:
                 if ($template->blockExists('overview')) {
@@ -534,21 +565,48 @@ class SystemComponentBackendController extends Controller {
     }
 
     /**
+     * Tells whether the given entity class name has stored entities
+     *
+     * This method is intended for use in showSplash().
+     * Instead of the fully qualified class name the entity name can be specified
+     * relative to the component's entity namespace. If $entityClassName does
+     * not start with component's entity namespace it is prepended. Therefore
+     * only entities within this component's entity namespace can be checked
+     * with this method.
+     * The component's entity namespace is:
+     * \Cx\<component_type>\<component_name>\Model\Entity\
+     * @param string $entityClassName Fully qualified entity class name or according to description
+     * @return bool True if entity has data, false otherwise
+     */
+    protected function hasEntityData($entityClassName): bool {
+        $namespacePrefix = $this->getNamespace() . '\\Model\\Entity\\';
+        if (strpos($entityClassName, $namespacePrefix) === false) {
+            $entityClassName = $namespacePrefix . $entityClassName;
+        }
+        $em = $this->cx->getDb()->getEntityManager();
+        $repo = $em->getRepository(
+            $entityClassName
+        );
+        $entity = $repo->findOneBy(array());
+        return (bool) $entity;
+    }
+
+    /**
      * Tells whether the given entity class name has no stored entities
      *
      * This method is intended for use in showSplash().
-     * $entityClassName will be prepended by the component's entity namespace:
+     * Instead of the fully qualified class name the entity name can be specified
+     * relative to the component's entity namespace. If $entityClassName does
+     * not start with component's entity namespace it is prepended. Therefore
+     * only entities within this component's entity namespace can be checked
+     * with this method.
+     * The component's entity namespace is:
      * \Cx\<component_type>\<component_name>\Model\Entity\
-     * @param string $entityClassName Entity class name without component entity namespace
+     * @param string $entityClassName Fully qualified entity class name or according to description
      * @return bool True if entity has no data, false otherwise
      */
     protected function hasNoEntityData($entityClassName): bool {
-        $em = $this->cx->getDb()->getEntityManager();
-        $repo = $em->getRepository(
-            $this->getNamespace() . '\\Model\\Entity\\' . $entityClassName
-        );
-        $entity = $repo->findOneBy(array());
-        return !$entity;
+        return !$this->hasEntityData($entityClassName);
     }
 
     /**
