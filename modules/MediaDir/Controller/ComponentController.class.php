@@ -189,17 +189,19 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             // hold information if a specific block has been parsed
             $foundOne = false;
 
-            // fetch mediadir object data
-            $objMediadirForm = new MediaDirectoryForm(null, $this->getName());
-            $objMediadirCategory = new MediaDirectoryCategory(null, null, 0, $this->getName());
-            $objMediadirLevel = new MediaDirectoryLevel(null, null, 1, $this->getName());
-
-            // put all object data into one array
+            // fetch IDs of forms and categories having published data that
+            // could be parsed
             $objects = array(
-                'form' => array_keys($objMediadirForm->getForms()),
-                'category' => array_keys($objMediadirCategory->arrCategories),
-                'level' => array_keys($objMediadirLevel->arrLevels),
+                'form' => MediaDirectoryForm::getIdsWithPublishedData(),
+                'category' => MediaDirectoryCategory::getIdsWithPublishedData(),
             );
+
+            // fetch level data only in case the use of levels has been
+            // activated
+            if ($objMediadir->arrSettings['settingsShowLevels']) {
+                $objects['level'] =
+                    MediaDirectoryLevel::getIdsWithPublishedData();
+            }
 
             // check for form specific entry listing
             foreach ($objects as $objectType => $arrObjectList) {
