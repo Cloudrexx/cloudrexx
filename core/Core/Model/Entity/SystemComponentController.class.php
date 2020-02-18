@@ -73,6 +73,13 @@ class SystemComponentController extends Controller {
     protected $enduserDocumentationUrl = '';
 
     /**
+     * URL pointing to the template definitions for this component
+     *
+     * @var string Template documentation URL
+     */
+    protected $templateDocumentationUrl = '';
+
+    /**
      * URL pointing to the developer documentation for this component
      *
      * @var string Developer documentation URL
@@ -116,10 +123,19 @@ class SystemComponentController extends Controller {
     /**
      * Returns the URL pointing to the end-user documentation for this component.
      *
-     * @return string URL pointing to the end-user documentation
+     * @return string URL pointing to the end-user documentation or empty string
      */
     public function getEnduserDocumentationUrl(): string {
         return $this->enduserDocumentationUrl;
+    }
+
+    /**
+     * Returns the URL pointing to the template documentation for this component.
+     *
+     * @return string URL pointing to the template documentation or empty string
+     */
+    public function getTemplateDocumentationUrl(): string {
+        return $this->templateDocumentationUrl;
     }
 
     /**
