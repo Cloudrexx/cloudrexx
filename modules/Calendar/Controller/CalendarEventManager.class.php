@@ -973,6 +973,10 @@ class CalendarEventManager extends CalendarLibrary
         // hide location template-block in case no location data has been set
         if (!$objEvent->loadLocationData()) {
             $objTpl->hideBlock('calendarEventAddress');
+            $objTpl->hideBlock('calendarEventAddressWebsite');
+            $objTpl->hideBlock('calendarEventAddressLink');
+            $objTpl->hideBlock('calendarEventAddressPhone');
+            $objTpl->hideBlock('calendarEventAddressMap');
         // parse location template-block
         } else {
             if ($this->arrSettings['placeData'] > 1 && $objEvent->locationType == 2) {
@@ -1090,6 +1094,10 @@ class CalendarEventManager extends CalendarLibrary
         // hide host template-block in case no host data has been set
         if (!$objEvent->loadHostData()) {
             $objTpl->hideBlock('calendarEventHost');
+            $objTpl->hideBlock('calendarEventHostWebsite');
+            $objTpl->hideBlock('calendarEventHostLink');
+            $objTpl->hideBlock('calendarEventHostPhone');
+            $objTpl->hideBlock('calendarEventHostEmail');
         // parse host template-block
         } else {
             if ($this->arrSettings['placeDataHost'] > 1 && $objEvent->hostType == 2) {
