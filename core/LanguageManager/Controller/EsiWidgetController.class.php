@@ -231,7 +231,7 @@ class EsiWidgetController extends \Cx\Core_Modules\Widget\Controller\EsiWidgetCo
             $nodePlaceholder  = \Cx\Core\Routing\NodePlaceholder::fromPage(
                 $targetPage,
                 $params
-            );
+            )->getPlaceholder(true);
             $langNavigation[] = \Html::getLink(
                 $nodePlaceholder,
                 contrexx_raw2xhtml($name),
@@ -269,7 +269,7 @@ class EsiWidgetController extends \Cx\Core_Modules\Widget\Controller\EsiWidgetCo
         return \Cx\Core\Routing\NodePlaceholder::fromPage(
             $targetPage,
             $params
-        );
+        )->getPlaceholder(true);
     }
 
 }

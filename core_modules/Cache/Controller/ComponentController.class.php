@@ -375,7 +375,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     public function getCommandsForCommandMode() {
         return array(
             'Cache' => new \Cx\Core_Modules\Access\Model\Entity\Permission(
-                null,
+                array(),
                 array('cli'),
                 false
             ),
@@ -529,6 +529,53 @@ Cache clear all';
             return;
         }
         $this->cache->forceUserbasedPageCache();
+    }
+
+    /**
+     * Add an exception that must not get cached
+     *
+     * Case A: $componentOrCallback is a string, $additionalInfo is an empty array
+     * Case B: $componentOrCallback is a string, $additionalInfo is non-empty
+     * Case C: $componentOrCallback is a callback, $additionalInfo is an empty array
+     * Case D: $componentOrCallback is a callback, $additionalInfo is non-empty
+     *
+     * Case A will disable caching for all requests to a component.
+     * Case B will disable caching for all requests to a component that meet
+     * the criteria defined in $additionalInfo.
+     * Case C will execute the callback for each not yet cached request. The
+     * current Cx instance will be passed to the callback as the first argument.
+     * The currently resolved page will be passed to the callback as the second
+     * argument. If the callback returns true, the current request will not be
+     * cached, otherwise it will.
+     * Case D will ignore $additionalInfo and therefore result in case C.
+     *
+     * The format for $additionalInfo is either a list of CMDs or a single
+     * entry which is a callback.
+     * The former will not cache requests to any of
+     * the listed CMDs for the component specified in $componentOrCallback.
+     * The latter will execute the callback for any request to the component
+     * specified in $componentOrCallback. The currently resolved page will be
+     * passed to the callback as the first argument. If the callback returns
+     * true, the current request will not be cached, otherwise it will.
+     *
+     * If there's already an entry for the component specified in
+     * $componentOrCallback one of the following will happen:
+     * - $componentOrCallback is a callback or $additionalInfo is empty: The
+     *   exception will be blindly added. If at least one of the two (or more)
+     *   rules match, the request will not get cached.
+     * - $componentOrCallback is a component name and $additionalInfo is non-
+     *   empty: If there's a hard-coded entry in $this->exceptions in
+     *   static::endContrexxCaching() for the given component the exception
+     *   you're trying to add through this method will get overwritten.
+     *
+     * @param string|Callable $componentOrCallback Component name or callback
+     * @param array $additionalInfo (optional) Conditions
+     */
+    public function addException($componentOrCallback, $additionalInfo = array()) {
+        if ($this->cx->getMode() != \Cx\Core\Core\Controller\Cx::MODE_FRONTEND) {
+            return;
+        }
+        $this->cache->addException($componentOrCallback, $additionalInfo);
     }
 
     /**

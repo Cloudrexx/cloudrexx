@@ -1,35 +1,4 @@
-ALTER TABLE contrexx_module_shop_categories CHANGE parent_id parent_id INT UNSIGNED DEFAULT NULL;
-UPDATE `contrexx_module_shop_categories` SET `parent_id`=NULL WHERE `parent_id`= 0;
-
-ALTER TABLE contrexx_module_shop_categories
-  ADD CONSTRAINT FK_A9242624727ACA70 FOREIGN KEY (parent_id)
-  REFERENCES contrexx_module_shop_categories (id);
-
-CREATE INDEX IDX_A9242624727ACA70 ON contrexx_module_shop_categories (parent_id);
-
-
 /** Merge Data **/
-INSERT INTO contrexx_module_shop_rel_category_product SELECT
-    c.id AS category_id, d.id AS product_id
-FROM
-    contrexx_module_shop_categories c
-    JOIN contrexx_module_shop_products d
-        ON d.category_id REGEXP CONCAT('[[:<:]]', c.id, '[[:>:]]');
-
-INSERT INTO contrexx_module_shop_rel_category_pricelist SELECT
-    c.id AS category_id, d.id AS pricelist_id
-FROM
-    contrexx_module_shop_categories c
-    JOIN contrexx_module_shop_pricelists d
-        ON d.categories REGEXP CONCAT('[[:<:]]', c.id, '[[:>:]]') OR d.categories = '*';
-
-INSERT INTO contrexx_module_shop_rel_product_user_group SELECT
-    c.group_id AS usergroup_id, d.id AS product_id
-FROM
-    contrexx_access_user_groups c
-    JOIN contrexx_module_shop_products d
-        ON d.usergroup_ids REGEXP CONCAT('[[:<:]]', c.group_id, '[[:>:]]');
-
 /** Zones **/
 UPDATE contrexx_module_shop_zones AS z
 	INNER JOIN contrexx_core_text AS t ON z.id = t.id
@@ -149,9 +118,6 @@ UPDATE contrexx_module_shop_customer_group AS z
 
 
 /** Drop **/
-ALTER TABLE contrexx_module_shop_pricelists DROP categories;
-ALTER TABLE contrexx_module_shop_products DROP category_id, DROP usergroup_ids;
-
 DELETE FROM `contrexx_core_text` WHERE `key` = 'zone_name';
 DELETE FROM `contrexx_core_text` WHERE `key` = 'shipper_name';
 DELETE FROM `contrexx_core_text` WHERE `key` = 'product_uri';

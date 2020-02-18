@@ -24,6 +24,8 @@ Cx\Modules\Shop\Model\Entity\DiscountCoupon:
     customerId:
       type: integer
       nullable: true
+      options:
+        unsigned: true
       column: customer_id
     paymentId:
       type: integer
@@ -89,14 +91,20 @@ Cx\Modules\Shop\Model\Entity\DiscountCoupon:
       joinColumn:
         name: payment_id
         referencedColumnName: id
+        nullable: false
+        onDelete: 'SET NULL'
     product:
       targetEntity: Cx\Modules\Shop\Model\Entity\Product
       inversedBy: discountCoupons
       joinColumn:
         name: product_id
         referencedColumnName: id
+        nullable: false
+        onDelete: 'SET NULL'
     customer:
       targetEntity: Cx\Core\User\Model\Entity\User
       joinColumn:
         name: customer_id
         referencedColumnName: id
+        nullable: false
+        onDelete: 'SET NULL'

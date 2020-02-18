@@ -620,7 +620,7 @@ class Sync extends \Cx\Model\Base\EntityBase {
         if (!$simpleField) {
             // this replaces image paths...
             $allImg = array();
-            preg_match_all('/src="([^"]*)"/', $input, $allImg, PREG_PATTERN_ORDER);
+            preg_match_all('/(?:src|href|action)="([^"]*)"/', $input, $allImg, PREG_PATTERN_ORDER);
             $size = sizeof($allImg[1]);
             
             $i = 0;

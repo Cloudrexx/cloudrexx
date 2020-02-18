@@ -98,6 +98,32 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      * @param \Cx\Core\Routing\Url                      $request    The URL object for this request
      */
     public function preResolve(\Cx\Core\Routing\Url $request) {
+        // force HTST for one non-leap year, if HTTPS is beeing forced in both,
+        // front- and backend
+        $forceProtocolBackend = \Cx\Core\Setting\Controller\Setting::getValue(
+            'forceProtocolBackend',
+            'Config'
+        );
+        $forceProtocolFrontend = \Cx\Core\Setting\Controller\Setting::getValue(
+            'forceProtocolFrontend',
+            'Config'
+        );
+        if (
+            $forceProtocolBackend == 'https' &&
+            $forceProtocolFrontend == 'https'
+        ) {
+            $this->cx->getResponse()->setHeader(
+                'Strict-Transport-Security',
+                'max-age=31536000'
+            );
+        } else {
+            $this->cx->getResponse()->setHeader(
+                'Strict-Transport-Security',
+                'max-age=0'
+            );
+        }
+
+        // scan input data
         switch ($this->cx->getMode()) {
             case \Cx\Core\Core\Controller\Cx::MODE_FRONTEND:
                 // Webapp Intrusion Detection System

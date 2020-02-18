@@ -67,9 +67,9 @@ class Attribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable
     protected $id;
 
     /**
-     * @var boolean
+     * @var integer
      */
-    protected $type = true;
+    protected $type = 1;
 
     /**
      * @var string
@@ -114,7 +114,7 @@ class Attribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable
     /**
      * Set type
      *
-     * @param boolean $type
+     * @param integer $type
      */
     public function setType($type)
     {
@@ -124,7 +124,7 @@ class Attribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable
     /**
      * Get type
      *
-     * @return boolean 
+     * @return integer
      */
     public function getType()
     {

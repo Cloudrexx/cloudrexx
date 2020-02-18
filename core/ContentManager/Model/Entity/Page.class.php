@@ -347,7 +347,12 @@ class Page extends \Cx\Core_Modules\Widget\Model\Entity\WidgetParseTarget implem
         $this->backendAccessId = 0;
 
         $this->setUpdatedAtToNow();
+    }
 
+    /**
+     * @inheritDoc
+     */
+    public function initializeValidators() {
         $this->validators = array(
             'lang' => new \CxValidateInteger(),
             'type' => new \CxValidateString(array('alphanumeric' => true, 'maxlength' => 255)),
@@ -365,7 +370,11 @@ class Page extends \Cx\Core_Modules\Widget\Model\Entity\WidgetParseTarget implem
             //active is boolean, not checked
             'target' => new \CxValidateString(array('maxlength' => 255)),
             'module' => new \CxValidateString(array('alphanumeric' => true)),
-            'cmd' => new \CxValidateRegexp(array('pattern' => '/^[-A-Za-z0-9_]+$/')),
+            'cmd' => new \CxValidateRegexp(array(
+                'pattern' => '/^([-a-z0-9_]+|\[\[' .
+                    \Cx\Core\Routing\NodePlaceholder::NODE_URL_PCRE .
+                    '\]\])$/ix'
+            )),
         );
     }
 
@@ -1452,20 +1461,31 @@ class Page extends \Cx\Core_Modules\Widget\Model\Entity\WidgetParseTarget implem
     /**
      * DO NOT CALL THIS METHOD! USE copyToLang() OR copyToNode() INSTEAD!
      * Copies data from another Page.
-     * @param boolean $includeContent Whether to copy content. Defaults to true.
-     * @param boolean $includeModuleAndCmd Whether to copy module and cmd. Defaults to true.
-     * @param boolean $includeName Wheter to copy title, content title and slug. Defaults to true.
-     * @param boolean $includeMetaData Wheter to copy meta data. Defaults to true.
-     * @param boolean $includeProtection Wheter to copy protection. Defaults to true.
-     * @param boolean $followRedirects Wheter to return a redirection page or the page its pointing at. Defaults to false, which returns the redirection page
-     * @param boolean $followFallbacks Wheter to return a fallback page or the page its pointing at. Defaults to false, witch returns the fallback page
+     *
+     * @param boolean $includeContent                   Whether to copy content. Defaults to true
+     * @param boolean $includeModuleAndCmd              Whether to copy module and cmd. Defaults to true
+     * @param boolean $includeName                      Whether to copy title, content title and slug. Defaults to true
+     * @param boolean $includeMetaData                  Whether to copy meta data. Defaults to true
+     * @param boolean $includeProtection                Whether to copy protection. Defaults to true
+     * @param boolean $includeEditingStatus             Copy the editing status if true otherwise not
+     * @param boolean $followRedirects                  Whether to return a redirection page or the page its pointing at.
+     *                                                  Defaults to false, which returns the redirection page
+     * @param boolean $followFallbacks                  Whether to return a fallback page or the page its pointing at.
+     *                                                  Defaults to false, witch returns the fallback page
      * @param \Cx\Core\ContentManager\Model\Entity\Page Page to use as target
      * @return \Cx\Core\ContentManager\Model\Entity\Page The copy of $this or null on error
      */
-    public function copy($includeContent=true, $includeModuleAndCmd=true,
-            $includeName = true, $includeMetaData = true,
-            $includeProtection = true, $followRedirects = false,
-            $followFallbacks = false, $page = null) {
+    public function copy(
+        $includeContent = true,
+        $includeModuleAndCmd = true,
+        $includeName = true,
+        $includeMetaData = true,
+        $includeProtection = true,
+        $includeEditingStatus = true,
+        $followRedirects = false,
+        $followFallbacks = false,
+        $page = null
+    ) {
 
         $targetPage = null;
         if ($followRedirects && $this->getType() == self::TYPE_REDIRECT) {
@@ -1477,13 +1497,14 @@ class Page extends \Cx\Core_Modules\Widget\Model\Entity\WidgetParseTarget implem
         }
         if ($targetPage) {
             return $targetPage->copy(
-                    $includeContent,
-                    $includeModuleAndCmd,
-                    $includeName,
-                    $includeMetaData,
-                    $includeProtection,
-                    $followRedirects,
-                    $followFallbacks
+                $includeContent,
+                $includeModuleAndCmd,
+                $includeName,
+                $includeMetaData,
+                $includeProtection,
+                $includeEditingStatus,
+                $followRedirects,
+                $followFallbacks
             );
         }
 
@@ -1519,6 +1540,10 @@ class Page extends \Cx\Core_Modules\Widget\Model\Entity\WidgetParseTarget implem
             $page->setMetaimage($this->getMetaimage());
         }
 
+        if ($includeEditingStatus) {
+            $page->setEditingStatus($this->getEditingStatus());
+        }
+
         $page->setNode($this->getNode());
         $page->setActive($this->getActive());
         $page->setDisplay($this->getDisplay());
@@ -1531,7 +1556,6 @@ class Page extends \Cx\Core_Modules\Widget\Model\Entity\WidgetParseTarget implem
         $page->setSkin($this->getSkin());
         $page->setStart($this->getStart());
         $page->setEnd($this->getEnd());
-        $page->setEditingStatus($this->getEditingStatus());
         $page->setTarget($this->getTarget());
         $page->setLinkTarget($this->getLinkTarget());
         $page->setUpdatedBy(\FWUser::getFWUserObject()->objUser->getUsername());
@@ -1578,30 +1602,42 @@ class Page extends \Cx\Core_Modules\Widget\Model\Entity\WidgetParseTarget implem
      * Creates a copy of this page which belongs to another node.
      *
      * @param \Cx\Core\ContentManager\Model\Entity\Node $destinationNode The other node
-     * @param boolean $includeContent Whether to copy content. Defaults to true.
-     * @param boolean $includeModuleAndCmd Whether to copy module and cmd. Defaults to true.
-     * @param boolean $includeName Wheter to copy title, content title and slug. Defaults to true.
-     * @param boolean $includeMetaData Wheter to copy meta data. Defaults to true.
-     * @param boolean $includeProtection Wheter to copy protection. Defaults to true.
-     * @param boolean $followRedirects Wheter to return a redirection page or the page its pointing at. Defaults to false, which returns the redirection page
-     * @param boolean $followFallbacks Wheter to return a fallback page or the page its pointing at. Defaults to false, witch returns the fallback page
+     * @param boolean $includeContent                   Whether to copy content. Defaults to true
+     * @param boolean $includeModuleAndCmd              Whether to copy module and cmd. Defaults to true
+     * @param boolean $includeName                      Whether to copy title, content title and slug. Defaults to true
+     * @param boolean $includeMetaData                  Whether to copy meta data. Defaults to true
+     * @param boolean $includeProtection                Whether to copy protection. Defaults to true
+     * @param boolean $includeEditingStatus             Copy the editing status if true otherwise not
+     * @param boolean $followRedirects                  Whether to return a redirection page or the page its pointing at.
+     *                                                  Defaults to false, which returns the redirection page
+     * @param boolean $followFallbacks                  Whether to return a fallback page or the page its pointing at.
+     *                                                  Defaults to false, witch returns the fallback page
      * @param \Cx\Core\ContentManager\Model\Entity\Page Page to use as target
      * @return \Cx\Core\ContentManager\Model\Entity\Page The copy of $this or null on error
      */
-    public function copyToNode($destinationNode, $includeContent=true,
-            $includeModuleAndCmd=true, $includeName = true,
-            $includeMetaData = true, $includeProtection = true,
-            $followRedirects = false, $followFallbacks = false, $page = null) {
+    public function copyToNode(
+        $destinationNode,
+        $includeContent = true,
+        $includeModuleAndCmd = true,
+        $includeName = true,
+        $includeMetaData = true,
+        $includeProtection = true,
+        $includeEditingStatus = true,
+        $followRedirects = false,
+        $followFallbacks = false,
+        $page = null
+    ) {
 
         $copy = $this->copy(
-                $includeContent,
-                $includeModuleAndCmd,
-                $includeName,
-                $includeMetaData,
-                $includeProtection,
-                $followRedirects,
-                $followFallbacks,
-                $page
+            $includeContent,
+            $includeModuleAndCmd,
+            $includeName,
+            $includeMetaData,
+            $includeProtection,
+            $includeEditingStatus,
+            $followRedirects,
+            $followFallbacks,
+            $page
         );
         $copy->setNode($destinationNode);
         $destinationNode->addPage($copy);
@@ -1610,32 +1646,45 @@ class Page extends \Cx\Core_Modules\Widget\Model\Entity\WidgetParseTarget implem
 
     /**
      * Creates a copy of this page with a different language.
+     *
      * @todo Define what to do if destination lang is not the fallback of $this->getLang() (always follow fallbacks or do not copy content)
-     * @param int $destinationLang Language ID to set
-     * @param boolean $includeContent Whether to copy content. Defaults to true.
-     * @param boolean $includeModuleAndCmd Whether to copy module and cmd. Defaults to true.
-     * @param boolean $includeName Wheter to copy title, content title and slug. Defaults to true.
-     * @param boolean $includeMetaData Wheter to copy meta data. Defaults to true.
-     * @param boolean $includeProtection Wheter to copy protection. Defaults to true.
-     * @param boolean $followRedirects Wheter to return a redirection page or the page its pointing at. Defaults to false, which returns the redirection page
-     * @param boolean $followFallbacks Wheter to return a fallback page or the page its pointing at. Defaults to false, witch returns the fallback page
+     * @param integer $destinationLang                  Language ID to set
+     * @param boolean $includeContent                   Whether to copy content. Defaults to true.
+     * @param boolean $includeModuleAndCmd              Whether to copy module and cmd. Defaults to true.
+     * @param boolean $includeName                      Whether to copy title, content title and slug. Defaults to true.
+     * @param boolean $includeMetaData                  Whether to copy meta data. Defaults to true.
+     * @param boolean $includeProtection                Whether to copy protection. Defaults to true.
+     * @param boolean $includeEditingStatus             Copy the editing status if true otherwise false
+     * @param boolean $followRedirects                  Whether to return a redirection page or the page its pointing at.
+     *                                                  Defaults to false, which returns the redirection page
+     * @param boolean $followFallbacks                  Whether to return a fallback page or the page its pointing at.
+     *                                                  Defaults to false, witch returns the fallback page
      * @param \Cx\Core\ContentManager\Model\Entity\Page Page to use as target
      * @return \Cx\Core\ContentManager\Model\Entity\Page The copy of $this or null on error
      */
-    public function copyToLang($destinationLang, $includeContent=true,
-            $includeModuleAndCmd=true, $includeName = true,
-            $includeMetaData = true, $includeProtection = true,
-            $followRedirects = false, $followFallbacks = false, $page = null) {
+    public function copyToLang(
+        $destinationLang,
+        $includeContent = true,
+        $includeModuleAndCmd = true,
+        $includeName = true,
+        $includeMetaData = true,
+        $includeProtection = true,
+        $includeEditingStatus = true,
+        $followRedirects = false,
+        $followFallbacks = false,
+        $page = null
+    ) {
 
         $copy = $this->copy(
-                $includeContent,
-                $includeModuleAndCmd,
-                $includeName,
-                $includeMetaData,
-                $includeProtection,
-                $followRedirects,
-                $followFallbacks,
-                $page
+            $includeContent,
+            $includeModuleAndCmd,
+            $includeName,
+            $includeMetaData,
+            $includeProtection,
+            $includeEditingStatus,
+            $followRedirects,
+            $followFallbacks,
+            $page
         );
         $fallback_language = \FWLanguage::getFallbackLanguageIdById($destinationLang);
         if ($fallback_language && !$includeContent) {
@@ -1908,11 +1957,11 @@ class Page extends \Cx\Core_Modules\Widget\Model\Entity\WidgetParseTarget implem
                 true,   // includeName
                 true,   // includeMetaData
                 true,   // includeProtection
+                false,  // includeEditingStatus
                 false,  // followRedirects
                 true    // followFallbacks
             );
             $page->setDisplay(false);
-            $page->setEditingStatus('');
             \Env::get('em')->persist($page);
             // recursion
             return $pages[$sourceLang]->setupPath($targetLang);
@@ -2151,9 +2200,21 @@ class Page extends \Cx\Core_Modules\Widget\Model\Entity\WidgetParseTarget implem
         $template = parent::getContentTemplateForWidget($widgetName, $langId, $page, $channel);
 
         // load application template in case page is an application
-        if ($page->getType() == TYPE_APPLICATION) {
-            $contentTemplate = \Cx\Core\Core\Controller\Cx::getContentTemplateOfPageWithoutWidget($page, null, $channel);
-            $template->addBlock('APPLICATION_DATA', 'cx_application_data', $contentTemplate);
+        if (
+            $page->getType() == static::TYPE_APPLICATION &&
+            $template->placeholderExists('APPLICATION_DATA')
+        ) {
+            $contentTemplate =
+                \Cx\Core\Core\Controller\Cx::getContentTemplateOfPageWithoutWidget(
+                $page,
+                null,
+                $channel
+            );
+            $template->addBlock(
+                'APPLICATION_DATA',
+                'cx_application_data',
+                $contentTemplate
+            );
         }
 
         return $template;
@@ -2165,5 +2226,27 @@ class Page extends \Cx\Core_Modules\Widget\Model\Entity\WidgetParseTarget implem
      */
     public function getWidgetContentAttributeName($widgetName) {
         return 'content';
+    }
+
+    /**
+     * Check whether the page $title already exists under the pages in $parentNode
+     *
+     * @param \Cx\Core\ContentManager\Model\Entity\Node $parentNode Parent node object
+     * @param integer                                   $lang       Language ID
+     * @param string                                    $title      Page title
+     * @return boolean Return true if the page title exists, otherwise false
+     */
+    public function titleExists($parentNode, $lang, $title)
+    {
+        foreach ($parentNode->getChildren() as $childNode) {
+            if (
+                $childNode->getPage($lang) &&
+                $childNode->getPage($lang)->getTitle() == $title
+            ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

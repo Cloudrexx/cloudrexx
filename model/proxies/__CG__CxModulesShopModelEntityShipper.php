@@ -73,10 +73,10 @@ class Shipper extends \Cx\Modules\Shop\Model\Entity\Shipper implements \Doctrine
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'locale', 'id', 'active', 'ord', 'name', 'orders', 'shipmentCosts', 'zones', 'validators', 'virtual');
+            return array('__isInitialized__', 'locale', 'id', 'active', 'ord', 'name', 'orders', 'shipmentCosts', 'zone', 'validators', 'virtual');
         }
 
-        return array('__isInitialized__', 'locale', 'id', 'active', 'ord', 'name', 'orders', 'shipmentCosts', 'zones', 'validators', 'virtual');
+        return array('__isInitialized__', 'locale', 'id', 'active', 'ord', 'name', 'orders', 'shipmentCosts', 'zone', 'validators', 'virtual');
     }
 
     /**
@@ -343,34 +343,45 @@ class Shipper extends \Cx\Modules\Shop\Model\Entity\Shipper implements \Doctrine
     /**
      * {@inheritDoc}
      */
-    public function addZone(\Cx\Modules\Shop\Model\Entity\Zone $zone)
+    public function setZone(\Cx\Modules\Shop\Model\Entity\Zone $zone)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addZone', array($zone));
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setZone', array($zone));
 
-        return parent::addZone($zone);
+        return parent::setZone($zone);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function removeZone(\Cx\Modules\Shop\Model\Entity\Zone $zone)
+    public function getZone()
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeZone', array($zone));
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getZone', array());
 
-        return parent::removeZone($zone);
+        return parent::getZone();
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getZones()
+    public function __toString()
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getZones', array());
+        $this->__initializer__ && $this->__initializer__->__invoke($this, '__toString', array());
 
-        return parent::getZones();
+        return parent::__toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getJsArray()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getJsArray', array());
+
+        return parent::getJsArray();
     }
 
     /**
@@ -409,6 +420,17 @@ class Shipper extends \Cx\Modules\Shop\Model\Entity\Shipper implements \Doctrine
     /**
      * {@inheritDoc}
      */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function validate()
     {
 
@@ -426,17 +448,6 @@ class Shipper extends \Cx\Modules\Shop\Model\Entity\Shipper implements \Doctrine
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__call', array($methodName, $arguments));
 
         return parent::__call($methodName, $arguments);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function __toString()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, '__toString', array());
-
-        return parent::__toString();
     }
 
 }

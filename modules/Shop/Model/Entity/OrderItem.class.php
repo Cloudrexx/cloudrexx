@@ -358,7 +358,7 @@ class OrderItem extends \Cx\Model\Base\EntityBase {
             return \Message::error($_ARRAYLANG['TXT_SHOP_ERROR_INVALID_ATTRIBUTE_ID']);
         }
         $name = $objAttribute->getName();
-        $_arrOptions = $objAttribute->getOptions();
+        $_arrOptions = \Cx\Modules\Shop\Controller\Attributes::getOptionArrayByAttributeId($attribute_id);
         foreach ($arrOptionIds as $option_id) {
             $arrOption = null;
             if ($objAttribute->getType() >= \Cx\Modules\Shop\Controller\Attribute::TYPE_TEXT_OPTIONAL) {

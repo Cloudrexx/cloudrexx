@@ -59,7 +59,7 @@
                             <select name="paymentId" onchange="document.forms['shopForm'].submit();">
                                 <option value="">{TXT_SHOP_PLEASE_SELECT}</option>
                                 <!-- BEGIN shop_payment_payment_methods -->
-                                <option value="{SHOP_PAYMENT_PAYMENT_METHOD_ID}" {SHOP_PAYMENT_PAYMENT_METHOD_SELECTED}>{SHOP_PAYMENT_PAYMENT_METHOD_NAME}</option>
+                                <option value="{SHOP_PAYMENT_PAYMENT_METHOD_ID}"<!-- BEGIN shop_payment_payment_selected --> selected="selected"<!-- END shop_payment_payment_selected -->>{SHOP_PAYMENT_PAYMENT_METHOD_NAME}</option>
                                 <!-- END shop_payment_payment_methods -->
                             </select>
                         </td>

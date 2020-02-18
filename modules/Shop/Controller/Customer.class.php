@@ -369,6 +369,11 @@ class Customer extends \User
     function active($active=null)
     {
         if (isset($active)) {
+            // do not change the status of the currently signed-in user
+            if ($this->getId() == \FWUser::getFWUserObject()->objUser->getId()) {
+                return $this->getActiveStatus();
+            }
+
             $this->setActiveStatus($active);
         }
         return $this->getActiveStatus();
@@ -575,6 +580,7 @@ class Customer extends \User
             $this->firstname(), $this->lastname(), $this->company(), $title);
         $arrSubstitution = array(
             'CUSTOMER_SALUTATION' => $salutation,
+            'CUSTOMER_TITLE' => $title,
             'CUSTOMER_ID' => $this->id(),
             'CUSTOMER_EMAIL' => $this->email(),
             'CUSTOMER_COMPANY' => $this->company(),

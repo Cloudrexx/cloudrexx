@@ -431,6 +431,17 @@ class OrderItem extends \Cx\Modules\Shop\Model\Entity\OrderItem implements \Doct
     /**
      * {@inheritDoc}
      */
+    public function insertAttribute($attribute_id, $arrOptionIds)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'insertAttribute', array($attribute_id, $arrOptionIds));
+
+        return parent::insertAttribute($attribute_id, $arrOptionIds);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getComponentController()
     {
 
@@ -459,6 +470,17 @@ class OrderItem extends \Cx\Modules\Shop\Model\Entity\OrderItem implements \Doct
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'isVirtual', array());
 
         return parent::isVirtual();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
     }
 
     /**

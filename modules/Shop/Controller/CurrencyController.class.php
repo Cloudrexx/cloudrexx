@@ -88,17 +88,15 @@ class CurrencyController extends \Cx\Core\Core\Model\Entity\Controller
      */
     public function getViewGeneratorOptions($options)
     {
-        $defaultEntity = $this->cx->getDb()->getEntityManager()->getRepository(
-            '\Cx\Modules\Shop\Model\Entity\Currency'
-        )->findOneBy(
-            array('default' => 1)
-        );
         $options['functions']['sortBy'] = array(
             'field' => array('ord' => SORT_ASC)
         );
         $options['functions']['sorting'] = false;
         $options['functions']['edit'] = false;
         $options['functions']['editable'] = true;
+        $options['functions']['status'] = array(
+            'field' => 'active'
+        );
         $options['order']['overview'] = array(
             'id',
             'code',
@@ -136,23 +134,10 @@ class CurrencyController extends \Cx\Core\Core\Model\Entity\Controller
                 'showDetail' => false,
             ),
             'code' => array(
-                'formfield' => function($fieldname, $fieldtype, $fieldlength, $fieldvalue, $fieldoptions) {
-                    $scope = 'currency';
-                    \ContrexxJavascript::getInstance()->setVariable(
-                        'CURRENCY_INCREMENT',
-                        $this->get_known_currencies_increment_array(),
-                        $scope
-                    );
-                    $select = new \Cx\Core\Html\Model\Entity\DataElement(
-                        $fieldname, '', 'select',
-                        null, $this->get_known_currencies_name_array()
-                    );
-                    $select->setAttribute(
-                        'onchange',
-                        'updateCurrencyCode(this)'
-                    );
-                    return $select;
-                },
+                'formfield' => array(
+                    'adapter' => 'Currency',
+                    'method' => 'getCodeDropdown'
+                )
             ),
             'symbol' => array(
                 'editable' => true,
@@ -180,17 +165,10 @@ class CurrencyController extends \Cx\Core\Core\Model\Entity\Controller
                     'attributes' => array(
                         'class' => 'default'
                     ),
-                    'parse' => function ($value, $rowData) use ($defaultEntity) {
-                        $radioButton = new \Cx\Core\Html\Model\Entity\DataElement(
-                            'default-' . $rowData['id'], $rowData['id'], 'input'
-                        );
-                        $radioButton->setAttribute('type', 'radio');
-                        $radioButton->setAttribute('onchange', 'updateDefault(this); updateExchangeRates(this)');
-                        if (!empty($defaultEntity) && $rowData['id'] == $defaultEntity->getId()) {
-                            $radioButton->setAttribute('checked', 'checked');
-                        }
-                        return $radioButton;
-                    },
+                    'parse' => array(
+                        'adapter' => 'Currency',
+                        'method' => 'getDefaultButton'
+                    ),
                 ),
             ),
         );
@@ -350,9 +328,13 @@ class CurrencyController extends \Cx\Core\Core\Model\Entity\Controller
         }
         $rate = self::$arrCurrency[self::$activeCurrencyId]['rate'];
         $defaultRate = self::$arrCurrency[self::$defaultCurrencyId]['rate'];
-        $defaultIncrement = self::$arrCurrency[self::$defaultCurrencyId]['increment'];
-        return self::formatPrice(round(
-                $price*$defaultRate/$rate/$defaultIncrement)*$defaultIncrement);
+        $defaultIncrement = self::$arrCurrency[
+            self::$defaultCurrencyId
+        ]['increment'];
+        return self::formatPrice(
+            round($price*$defaultRate/$rate/$defaultIncrement)
+            * $defaultIncrement
+        );
     }
 
     /**
@@ -380,7 +362,6 @@ class CurrencyController extends \Cx\Core\Core\Model\Entity\Controller
      */
     static function formatPrice($price, $length='', $padding='', $increment=null)
     {
-//\DBG::log("formatPrice($price, $length, $padding, $increment): Entered");
         $decimals = 2;
         if (empty ($increment)) {
             if (!is_array(self::$arrCurrency)) self::init();
@@ -393,7 +374,7 @@ class CurrencyController extends \Cx\Core\Core\Model\Entity\Controller
             $price = round($price/$increment)*$increment;
         }
         $price = sprintf('%'.$padding.$length.'.'.$decimals.'f', $price);
-//\DBG::log("formatPrice($price, $length, $padding, $increment): Decimals: $decimals");
+
         return $price;
     }
 
@@ -663,13 +644,14 @@ class CurrencyController extends \Cx\Core\Core\Model\Entity\Controller
      * @param   string  $format     The optional sprintf() format
      * @return  array               The currency name array
      */
-    protected function get_known_currencies_name_array($format=null)
+    static function get_known_currencies_name_array($format=null)
     {
         if (empty($format)) $format = '%2$s (%1$s)';
         $arrName = array();
         foreach (self::known_currencies() as $currency) {
-            $arrName[$currency[0]] = sprintf($format,
-                $currency[0], $currency[1], $currency[2]);
+            $arrName[$currency[0]] = sprintf(
+                $format, $currency[0], $currency[1], $currency[2]
+            );
         }
         return $arrName;
     }
@@ -679,7 +661,7 @@ class CurrencyController extends \Cx\Core\Core\Model\Entity\Controller
      * by ISO 4217 code
      * @return  array               The currency increment array
      */
-    protected function get_known_currencies_increment_array()
+    static function get_known_currencies_increment_array()
     {
         $arrIncrement = array();
         foreach (self::known_currencies() as $currency) {

@@ -365,6 +365,17 @@ class Option extends \Cx\Modules\Shop\Model\Entity\Option implements \Doctrine\O
     /**
      * {@inheritDoc}
      */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function validate()
     {
 

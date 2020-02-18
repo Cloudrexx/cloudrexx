@@ -2084,6 +2084,8 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
             'TXT_ACCESS_ACTIVATION_BY_USER'                     => $_ARRAYLANG['TXT_ACCESS_ACTIVATION_BY_USER'],
             'TXT_ACCESS_ACTIVATION_BY_AUTHORIZED_PERSON'        => $_ARRAYLANG['TXT_ACCESS_ACTIVATION_BY_AUTHORIZED_PERSON'],
             'TXT_ACCESS_TIME_PERIOD_ACTIVATION_TIME'            => $_ARRAYLANG['TXT_ACCESS_TIME_PERIOD_ACTIVATION_TIME'],
+            'ACCESS_SIGNUP_NOTIFICATION_TEXT'                   => sprintf($_ARRAYLANG['TXT_ACCESS_SIGNUP_NOTIFICATION_TEXT'], '<strong>' . $_ARRAYLANG['TXT_ACCESS_SIGNUP_NOTIFICATION'] . '</strong>'),
+            'TXT_ACCESS_ADDRESS_FOR_SIGNUP_NOTIFICATION'        => $_ARRAYLANG['TXT_ACCESS_ADDRESS_FOR_SIGNUP_NOTIFICATION'],
             'TXT_ACCESS_ADDRESS_OF_USER_TO_NOTIFY'              => $_ARRAYLANG['TXT_ACCESS_ADDRESS_OF_USER_TO_NOTIFY'],
             'TXT_ACCESS_USER_PROFILE_MODIFICATION'              => $_ARRAYLANG['TXT_ACCESS_USER_PROFILE_MODIFICATION'],
             'TXT_ACCESS_USER_PROFILE_MODIFICATION_NOTIFICATION_TEXT'=> sprintf($_ARRAYLANG['TXT_ACCESS_USER_PROFILE_MODIFICATION_NOTIFICATION_TEXT'], '<strong>' . $_ARRAYLANG['TXT_ACCESS_USER_PROFILE_MODIFICATION'] . '</strong>'),
@@ -2127,6 +2129,25 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
                         self::$arrStatusMsg['error'][] = $_ARRAYLANG['TXT_ACCESS_INVALID_ENTERED_EMAIL_ADDRESS'];
                     }
                 }
+            }
+
+            if (!empty($_POST['accessSignUpNotification']) && intval($_POST['accessSignUpNotification']) > 0) {
+                $arrSettings['signup_notification_address']['status'] = 1;
+
+                if (!empty($_POST['accessSignUpNotificationAddress'])) {
+                    $notificationAddresses = array_map('trim', explode(',', contrexx_input2raw($_POST['accessSignUpNotificationAddress'])));
+                    $objValidator = new \FWValidator();
+                    foreach ($notificationAddresses as $key => $address) {
+                        if (!$objValidator->isEmail($address)) {
+                            unset($notificationAddresses[$key]);
+                            $status = false;
+                            self::$arrStatusMsg['error'][] = $_ARRAYLANG['TXT_ACCESS_INVALID_ENTERED_EMAIL_ADDRESS'];
+                        }
+                    }
+                }
+                $arrSettings['signup_notification_address']['value'] = join(',', $notificationAddresses);
+            } else {
+                $arrSettings['signup_notification_address']['status'] = 0;
             }
 
             if (!empty($_POST['accessUserProfileNotification']) && intval($_POST['accessUserProfileNotification']) > 0) {
@@ -2179,6 +2200,9 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
             'ACCESS_USER_ACTIVATION_BOX_0'          => $arrSettings['user_activation']['status'] ? 'none': 'block',
             'ACCESS_USER_ACTIVATION_TIMEOUT'        => $arrSettings['user_activation_timeout']['value'],
             'ACCESS_USER_NOTIFICATION_ADDRESS'      => $arrSettings['notification_address']['value'],
+            'ACCESS_SIGNUP_NOTIFICATION_BOX'        => $arrSettings['signup_notification_address']['status'] ? 'block': 'none',
+            'ACCESS_SIGNUP_NOTIFICATION_CHECKED'    => $arrSettings['signup_notification_address']['status'] ? 'checked="checked"' : '',
+            'ACCESS_SIGNUP_NOTIFICATION_ADDRESS'    => $arrSettings['signup_notification_address']['value'],
             'ACCESS_USER_PROFILE_NOTIFICATION_BOX'  => $arrSettings['user_change_notification_address']['status'] ? 'block': 'none',
             'ACCESS_USER_PROFILE_NOTIFICATION_CHECKED'=> $arrSettings['user_change_notification_address']['status'] ? 'checked="checked"' : '',
             'ACCESS_USER_PROFILE_NOTIFICATION_ADDRESS'=> $arrSettings['user_change_notification_address']['value'],

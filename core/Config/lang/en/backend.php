@@ -137,6 +137,7 @@ $_ARRAYLANG['TXT_CORE_CONFIG_ADVANCEDUPLOADFRONTEND'] = 'Advanced uploading tool
 $_ARRAYLANG['TXT_CORE_CONFIG_FORCEPROTOCOLFRONTEND_TOOLTIP_HELP'] = $_ARRAYLANG['TXT_CORE_CONFIG_FORCEPROTOCOLBACKEND_TOOLTIP_HELP'] = 'By default, Cloudrexx does not force the usage of a protocol. You have the option to change the setting to force HTTP in order to improve search engine ranking or to force HTTPS (Hypertext Transfer Protocol Secure), a secure protocol that additionally provides authenticated and encrypted communication. If your webserver doesn"t support HTTPS, Cloudrexx will reset this option to default.';
 $_ARRAYLANG['TXT_CORE_CONFIG_FORCEPROTOCOLBACKEND'] = 'Protocol in use';
 $_ARRAYLANG['TXT_CORE_CONFIG_FORCEPROTOCOLFRONTEND'] = 'Protocol in use';
+$_ARRAYLANG['TXT_CORE_CONFIG_SHOWLOCALETAGSBYDEFAULT'] = 'Show locale tags by default';
 $_ARRAYLANG['TXT_SETTINGS_FORCE_PROTOCOL_NONE'] = 'dynamic';
 $_ARRAYLANG['TXT_SETTINGS_FORCE_PROTOCOL_HTTP'] = 'HTTP';
 $_ARRAYLANG['TXT_SETTINGS_FORCE_PROTOCOL_HTTPS'] = 'HTTPS';
@@ -207,3 +208,5 @@ $_ARRAYLANG['TXT_SETTINGS_COOKIENOTETTL_YEAR']      = '1 year';
 $_ARRAYLANG['TXT_SETTINGS_COOKIENOTETTL_UNLIMITED'] = 'Endless';
 $_ARRAYLANG['TXT_CORE_CONFIG_USEVIRTUALLANGUAGEDIRECTORIES']          = 'Use virtual language directories';
 $_ARRAYLANG['TXT_CONFIG_UNABLE_TO_SET_USEVIRTUALLANGUAGEDIRECTORIES'] = 'The option %s can not be deactivated as long as there are multiple locales defined.';
+$_ARRAYLANG['TXT_CORE_CONFIG_UPLOADFILESIZELIMIT'] = 'File upload limit';
+$_ARRAYLANG['TXT_CORE_CONFIG_UPLOADFILESIZELIMIT_TOOLTIP_HELP'] = 'File size limit of files being uploaded.';

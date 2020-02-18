@@ -212,7 +212,7 @@ class NewsLibrary
      */
     public function getNewsCategories($template = null, $langId = null, $categoryId = 0)
     {
-        $categoriesLang = $this->getCategoriesLangData();
+        $categoriesLang = $this->getCategoriesData();
         return $this->_buildNewsCategories($template, $this->nestedSetRootId, $categoriesLang, $langId, $categoryId);
     }
 
@@ -252,7 +252,7 @@ class NewsLibrary
             $newsUrl->setParam('category', $catId);
             $category['url'] = $newsUrl;
             $category['title'] = contrexx_raw2xhtml(
-                $categoriesLang[$catId][$langId]
+                $categoriesLang[$catId]['lang'][$langId]
             );
 
             $this->parseNewsCategoryWidgetBlock(
@@ -385,6 +385,9 @@ class NewsLibrary
      * @param   array               $selectedCategory             selected category
      * @param   array               $hiddenCategories             the categories which shouldn't be shown as option
      * @param   boolean             $onlyCategoriesWithEntries    only categories which have entries
+     * @param   boolean             $showLevel  Whether or not to visualy
+     *                              show the hierarchy as indent
+     * @param   boolean             Whether or not to list hidden categories
      * @return  string              $options                      html options
      */
     protected function getCategoryMenu(
@@ -392,7 +395,8 @@ class NewsLibrary
             $selectedCategory = array(),
             $hiddenCategories = array(),
             $onlyCategoriesWithEntries = false,
-            $showLevel = true
+            $showLevel = true,
+            $includeHidden = true
     )
     {
         if (empty($categories)) {
@@ -413,18 +417,32 @@ class NewsLibrary
         }
         $level = min($levels);
 
-        $categoriesLang = $this->getCategoriesLangData();
+        $categoriesLang = $this->getCategoriesData();
         $options = '';
+
         foreach ($nestedSetCategories as $category) {
             if(in_array($category['id'], $hiddenCategories)) {
                 continue;
             }
+
+            // hide hidden categories
+            if (
+                !$includeHidden &&
+                !$categoriesLang[$category['id']]['display'] &&
+                // exception: selected categories shall always get listed
+                !in_array($category['id'], $selectedCategory)
+            ) {
+                continue;
+            }
+
             $selected = in_array($category['id'], $selectedCategory) ? 'selected="selected"' : '';
             $options .= '<option value="'.$category['id'].'" '.$selected.'>'
                     .($showLevel ? str_repeat('&nbsp;&nbsp;&nbsp;&nbsp;', ($category['level'] - $level)) : '')
-                    .contrexx_raw2xhtml($categoriesLang[$category['id']][
-                        FRONTEND_LANG_ID
-                    ])
+                    .contrexx_raw2xhtml(
+                        $categoriesLang[$category['id']]['lang'][
+                            FRONTEND_LANG_ID
+                        ]
+                    )
                     .'</option>';
         }
 
@@ -640,12 +658,13 @@ class NewsLibrary
      * Get the categories by News ID
      *
      * @param integer $newsId
+     * @param   array   IDs of categories to fetch even if they're hidden
      *
      * @global object $objDatabase
      *
      * @return mixed boolean|array
      */
-    public function getCategoriesByNewsId($newsId)
+    public function getCategoriesByNewsId($newsId, $selectHidden = array())
     {
         global $objDatabase;
 
@@ -653,7 +672,7 @@ class NewsLibrary
             return false;
         }
 
-        $query = 'SELECT `tnc`.`catid`, `tncl`.`name` '
+        $query = 'SELECT `tnc`.`catid`, `tncl`.`name`, `tnc`.`display` '
                         . 'FROM `'. DBPREFIX . 'module_news_categories` as tnc '
                         . 'LEFT JOIN `' . DBPREFIX . 'module_news_categories_locale` as tncl '
                         . 'ON (`tnc`.`catid` = `tncl`.`category_id`) '
@@ -666,6 +685,16 @@ class NewsLibrary
         $arrCategories = array();
         if ($objResult && $objResult->RecordCount() > 0) {
             while(!$objResult->EOF) {
+                // skip hidden categories, except for hidden categories
+                // mentioned in $selectHidden
+                if (
+                    !$objResult->fields['display'] &&
+                    !in_array($objResult->fields['catid'], $selectHidden)
+                ) {
+                    $objResult->MoveNext();
+                    continue;
+                }
+
                 $arrCategories[$objResult->fields['catid']] = $objResult->fields['name'];
                 $objResult->MoveNext();
             }
@@ -1033,24 +1062,34 @@ class NewsLibrary
 
 
     /**
-     * Get categories language data
-     * @global ADONewConnection
+     * Get categories data
      * @return Array
      */
-    function getCategoriesLangData()
+    protected function getCategoriesData()
     {
-        global $objDatabase;
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $db = $cx->getDb()->getAdoDb();
 
-        $objResult = $objDatabase->Execute("SELECT lang_id,
+        $objResult = $db->Execute("SELECT lang_id,
             category_id,
-            name
-            FROM ".DBPREFIX."module_news_categories_locale");
+            name,
+            display
+            FROM ".DBPREFIX."module_news_categories AS c
+            INNER JOIN ".DBPREFIX."module_news_categories_locale AS l
+            ON l.category_id = c.catid
+        ");
+        $arrLangData = array();
         if ($objResult !== false) {
             while (!$objResult->EOF) {
                 if (!isset($arrLangData[$objResult->fields['category_id']])) {
-                    $arrLangData[$objResult->fields['category_id']] = array();
+                    $arrLangData[$objResult->fields['category_id']] = array(
+                        'lang' => array(),
+                        'display' => $objResult->fields['display'],
+                    );
                 }
-                $arrLangData[$objResult->fields['category_id']][$objResult->fields['lang_id']] = $objResult->fields['name'];
+                $arrLangData[$objResult->fields['category_id']]['lang'][
+                    $objResult->fields['lang_id']
+                ] = $objResult->fields['name'];
                 $objResult->MoveNext();
             }
         }
@@ -1067,6 +1106,10 @@ class NewsLibrary
      */
     protected function getTypeNameById($id) {
         if (!$this->arrSettings['news_use_types']) {
+            return '';
+        }
+
+        if (empty($id)) {
             return '';
         }
 
@@ -1189,14 +1232,23 @@ class NewsLibrary
     {
         global $objDatabase;
 
-        $oldLangData = $this->getCategoriesLangData();
+        $oldLangData = $this->getCategoriesData();
         if (count($oldLangData) == 0) {
             return false;
         }
         $status = true;
-        $arrNewLocales = array_diff(array_keys($newLangData[key($newLangData)]), array_keys($oldLangData[key($oldLangData)]));
-        $arrRemovedLocales = array_diff(array_keys($oldLangData[key($oldLangData)]), array_keys($newLangData[key($newLangData)]));
-        $arrUpdatedLocales = array_intersect(array_keys($newLangData[key($newLangData)]), array_keys($oldLangData[key($oldLangData)]));
+        $arrNewLocales = array_diff(
+            array_keys($newLangData[key($newLangData)]),
+            array_keys($oldLangData[key($oldLangData)]['lang'])
+        );
+        $arrRemovedLocales = array_diff(
+            array_keys($oldLangData[key($oldLangData)]['lang']),
+            array_keys($newLangData[key($newLangData)])
+        );
+        $arrUpdatedLocales = array_intersect(
+            array_keys($newLangData[key($newLangData)]),
+            array_keys($oldLangData[key($oldLangData)]['lang'])
+        );
         foreach (array_keys($newLangData) as $catId) {
             foreach ($arrNewLocales as $langId) {
                 if ($objDatabase->Execute("INSERT INTO `".DBPREFIX."module_news_categories_locale` (`lang_id`, `category_id`, `name`)
@@ -1208,7 +1260,10 @@ class NewsLibrary
                 }
             }
             foreach ($arrUpdatedLocales as $langId) {
-                if ($newLangData[$catId][$langId] != $oldLangData[$catId][$langId] ) {
+                if (
+                    $newLangData[$catId][$langId]
+                    != $oldLangData[$catId]['lang'][$langId]
+                ) {
                     if ($objDatabase->Execute("UPDATE `".DBPREFIX."module_news_categories_locale` SET
                             `name` = '" . contrexx_input2db($newLangData[$catId][$langId]). "'
                             WHERE `category_id` = " . $catId . " AND `lang_id` = " . $langId) === false) {
@@ -1768,8 +1823,10 @@ class NewsLibrary
      *
      * @return null
      */
-    public function parseNextAndPreviousLinks(\Cx\Core\Html\Sigma $objTpl)
-    {
+    public function parseNextAndPreviousLinks(
+        \Cx\Core\Html\Sigma $objTpl,
+        $selectedCategories = array()
+    ) {
         global $objDatabase, $_ARRAYLANG;
 
         $parentBlock    = 'news_details_previous_next_links';
@@ -1858,7 +1915,10 @@ class NewsLibrary
         //previous news
         if (!empty($previousNewsId)) {
             $preNewsDetails = self::getNewsDetailsById($previousNewsId);
-            $arrNewsCategories = $this->getCategoriesByNewsId($previousNewsId);
+            $arrNewsCategories = $this->getCategoriesByNewsId(
+                $previousNewsId,
+                $selectedCategories
+            );
             if ($objTpl->blockExists($previousLink) && !empty($preNewsDetails)) {
                 $newsTitle    = contrexx_raw2xhtml($preNewsDetails['newsTitle']);
                 $newsSrc      = \Cx\Core\Routing\Url::fromModuleAndCmd(
@@ -1880,7 +1940,10 @@ class NewsLibrary
         //next news
         if (!empty($nextNewsId)) {
             $nextNewsDetails = self::getNewsDetailsById($nextNewsId);
-            $arrNewsCategories = $this->getCategoriesByNewsId($nextNewsId);
+            $arrNewsCategories = $this->getCategoriesByNewsId(
+                $nextNewsId,
+                $selectedCategories
+            );
             if ($objTpl->blockExists($nextLink) && !empty($nextNewsDetails)) {
                 $newsTitle    = contrexx_raw2xhtml($nextNewsDetails['newsTitle']);
                 $newsSrc      = \Cx\Core\Routing\Url::fromModuleAndCmd(
@@ -2145,7 +2208,8 @@ class NewsLibrary
      */
     protected function parseRelatedNews(
         \Cx\Core\Html\Sigma $objTpl,
-        $newsId = null
+        $newsId = null,
+        $selectedCategories = array()
     ) {
         global $_ARRAYLANG;
 
@@ -2171,7 +2235,10 @@ class NewsLibrary
         // parse related news articles
         $i = 0;
         while (!$relatedNews->EOF) {
-            $arrNewsCategories = $this->getCategoriesByNewsId($relatedNews->fields['newsid']);
+            $arrNewsCategories = $this->getCategoriesByNewsId(
+                $relatedNews->fields['newsid'],
+                $selectedCategories
+            );
             $newsUrl = '';
             if (!empty($relatedNews->fields['redirect'])) {
                 $newsUrl = $relatedNews->fields['redirect'];
@@ -2188,7 +2255,13 @@ class NewsLibrary
             }
 
             // Parse all the news placeholders
-            $this->parseNewsPlaceholders($objTpl, $relatedNews, $newsUrl, 'news_related_');
+            $this->parseNewsPlaceholders(
+                $objTpl,
+                $relatedNews,
+                $newsUrl,
+                'news_related_',
+                $selectedCategories
+            );
 
             $objTpl->setVariable(array(
                'NEWS_RELATED_NEWS_CSS'            => 'row'.($i % 2 + 1),
@@ -3014,7 +3087,7 @@ EOF;
         if (strlen($strSource) > 40) {
             $strSource = substr($strSource, 0, 26) . '...' . substr($strSource, (strrpos($strSource, '.')));
         }
-        return sprintf($linkSourceTag, contrexx_raw2encodedUrl($linkSource), contrexx_raw2xhtml($strSource));
+        return sprintf($linkSourceTag, $linkSource, contrexx_raw2xhtml($strSource));
     }
 
     /**
@@ -3025,8 +3098,13 @@ EOF;
      * @param string $newsUrl      News Url
      * @return string
      */
-    public function parseNewsPlaceholders($objTpl, $objResult, $newsUrl, $templatePrefix = '')
-    {
+    public function parseNewsPlaceholders(
+        $objTpl,
+        $objResult,
+        $newsUrl,
+        $templatePrefix = '',
+        $selectedCategories = array()
+    ) {
         global $_ARRAYLANG;
 
         $newsid = $objResult->fields['newsid'];
@@ -3049,7 +3127,10 @@ EOF;
                                     ? $_ARRAYLANG['TXT_LAST_UPDATE'].'<br />' . date(ASCMS_DATE_FORMAT, $objResult->fields['changelog'])
                                     : '';
         $newsTeaser           = '';
-        $arrNewsCategories = $this->getCategoriesByNewsId($newsid);
+        $arrNewsCategories = $this->getCategoriesByNewsId(
+            $newsid,
+            $selectedCategories
+        );
 
         if ($this->arrSettings['news_use_teaser_text']) {
             $newsTeaser = nl2br($objResult->fields['teaser_text']);
@@ -3154,7 +3235,7 @@ EOF;
             'TXT_' . $templateVariablePrefix . 'NEWS_LINK1' =>
                 $_ARRAYLANG['TXT_NEWS_LINK1'],
             $templateVariablePrefix . 'NEWS_LINK1_SRC' =>
-                contrexx_raw2encodedUrl($url1),
+                $url1,
         ));
         if ($objTpl->blockExists($templateBlockPrefix . 'news_link1')) {
             if (empty($url1)) {
@@ -3169,7 +3250,7 @@ EOF;
             'TXT_' . $templateVariablePrefix . 'NEWS_LINK2' =>
                 $_ARRAYLANG['TXT_NEWS_LINK2'],
             $templateVariablePrefix . 'NEWS_LINK2_SRC' =>
-                contrexx_raw2encodedUrl($url2)
+                $url2,
         ));
         if ($objTpl->blockExists($templateBlockPrefix . 'news_link2')) {
             if (empty($url2)) {
@@ -3410,7 +3491,7 @@ EOF;
         }
 
         foreach ($teaserNames as $teaserName) {
-            $placeholders[] = 'TEASERS_' . $teaserName;
+            $placeholders[] = 'TEASERS_' . strtoupper($teaserName);
         }
 
         return $placeholders;

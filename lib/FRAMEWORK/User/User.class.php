@@ -3286,16 +3286,19 @@ class User extends User_Profile
             $mix_user_id = array($mix_user_id);
         }
         $count = 0;
-        global $objFWUser;
-        $objUser = $objFWUser->objUser;
+        $objFWUser = \FWUser::getFWUserObject();
         foreach ($mix_user_id as $user_id) {
-            $objUser = $objUser->getUser($user_id);
+            $objUser = $objFWUser->objUser->getUser($user_id);
             if (!$objUser) {
                 Message::warning(sprintf(
                     $_CORELANG['TXT_ACCESS_NO_USER_WITH_ID'], $user_id));
                 continue;
             }
-//$objUser = new User();
+            // do not change the status of the currently signed-in user
+            if ($objUser->getId() == $objFWUser->objUser->getId()) {
+                continue;
+            }
+
             $objUser->setActiveStatus($active);
             if (!$objUser->store()) {
                 Message::warning(sprintf(

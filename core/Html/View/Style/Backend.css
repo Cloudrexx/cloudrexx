@@ -94,7 +94,8 @@ form.cx-ui > fieldset .group > label {
     min-height: 22px;
     line-height: 22px;
     width: 192px;
-    padding: 0 0 0 8px;
+    padding: 0 8px;
+    word-break: break-word;
 }
 
 form.cx-ui > fieldset .group > .controls,

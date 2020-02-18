@@ -38,7 +38,7 @@
 global $_ARRAYLANG;
 // Let's start with module info:
 $_ARRAYLANG['TXT_CORE_MODULE_MEDIABROWSER'] = 'MediaBrowser';
-$_ARRAYLANG['TXT_CORE_MODULE_MEDIABROWSER_DESCRIPTION'] = 'To manage files and sites innovative.';
+$_ARRAYLANG['TXT_CORE_MODULE_MEDIABROWSER_DESCRIPTION'] = 'Stellt den Zugriff auf verschiedene Datenablagen bereit.';
 // Here come the ACTs:
 $_ARRAYLANG['TXT_CORE_MODULE_MEDIABROWSER_ACT_DEFAULT'] = 'Modal Tests';
 $_ARRAYLANG['TXT_CORE_MODULE_MEDIABROWSER_ACT_BROWSER'] = 'MediaBrowser';

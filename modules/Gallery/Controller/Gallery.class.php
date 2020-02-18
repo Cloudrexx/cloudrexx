@@ -431,11 +431,11 @@ class Gallery
                         `name`      =';
             // name of requested category
             $nameResult = $objDatabase->SelectLimit($query . '\'name\'', 1);
-            $title = $nameResult->fields['value'];
+            $title = html_entity_decode($nameResult->fields['value'], ENT_QUOTES, CONTREXX_CHARSET);
 
             // description of requested category
             $descResult = $objDatabase->SelectLimit($query . '\'desc\'', 1);
-            $desc = $descResult->fields['value'];
+            $desc = html_entity_decode($descResult->fields['value'], ENT_QUOTES, CONTREXX_CHARSET);
         }
         //Consider title as description, if description is empty
         if (empty($desc)) {

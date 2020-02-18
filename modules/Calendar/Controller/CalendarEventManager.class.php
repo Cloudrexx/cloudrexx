@@ -355,7 +355,7 @@ class CalendarEventManager extends CalendarLibrary
                 if ($objInit->mode !== \Cx\Core\Core\Controller\Cx::MODE_BACKEND
                     || $this->showSeries) {
                     $checkFutureEvents = true;
-                    if(self::_addToEventList($objEvent)) {
+                    if($this->_addToEventList($objEvent)) {
                         $this->eventList[] = $objEvent;
                         if ($this->listType == 'upcoming') {
                             $checkFutureEvents = false;
@@ -370,7 +370,7 @@ class CalendarEventManager extends CalendarLibrary
                         )
                     ) {
                         $additionalRecurrences = $objEvent->seriesData['seriesAdditionalRecurrences'];
-                        self::_setNextSeriesElement($objEvent, $additionalRecurrences);
+                        $this->generateRecurrencesOfEvent($objEvent, $additionalRecurrences);
                     }
                 } else {
                     $this->eventList[] = $objEvent;
@@ -460,7 +460,7 @@ class CalendarEventManager extends CalendarLibrary
 
                                     if($objExternalEvent->seriesStatus == 1 && $_GET['cmd'] != 'my_events') {
                                         $additionalRecurrences = $objExternalEvent->seriesData['seriesAdditionalRecurrences'];
-                                        self::_setNextSeriesElement($objExternalEvent, $additionalRecurrences);
+                                        $this->generateRecurrencesOfEvent($objExternalEvent, $additionalRecurrences);
                                     }
 
                                     $this->eventList[] = $objExternalEvent;
@@ -526,7 +526,7 @@ class CalendarEventManager extends CalendarLibrary
      *
      * @return boolean true if the event is valid, false oterwise
      */
-    function _addToEventList($objEvent) {
+    public function _addToEventList($objEvent) {
         if ($this->startDate == null) {
             if($objEvent->endDate < $this->endDate || $this->endDate == null) {
                 return true;
@@ -609,7 +609,7 @@ class CalendarEventManager extends CalendarLibrary
             || $objInit->mode !== \Cx\Core\Core\Controller\Cx::MODE_BACKEND)
         ) {
             $additionalRecurrences = $objEvent->seriesData['seriesAdditionalRecurrences'];
-            self::_setNextSeriesElement($objEvent, $additionalRecurrences);
+            $this->generateRecurrencesOfEvent($objEvent, $additionalRecurrences);
         }
         foreach ($this->eventList as $tmpKey => $tmpObjEvent) {
             if (!$tmpObjEvent->startDate || $tmpObjEvent->startDate->getTimestamp() != $eventStartDate) {
@@ -1289,7 +1289,7 @@ class CalendarEventManager extends CalendarLibrary
                 $eventManager->eventList[] = $objEvent;
             }
             $additionalRecurrences = $objEvent->seriesData['seriesAdditionalRecurrences'];
-            $eventManager->_setNextSeriesElement($objEvent, $additionalRecurrences);
+            $eventManager->generateRecurrencesOfEvent($objEvent, $additionalRecurrences);
             $eventList = $eventManager->eventList;
         }
 
@@ -1826,232 +1826,345 @@ class CalendarEventManager extends CalendarLibrary
     }
 
     /**
-     * _setNextSeriesElement
+     * Generate the next recurrence of a series event.
      *
-     * @param object $objEvent Event object
-     *
-     * @return null
+     * @param   CalendarEvent   $objEvent   Event instance to check for
+     *                                      recurrences for.
+     * @param array   $additionalRecurrences   Array of additional (manually
+     *                                         set) recurrence dates as
+     *                                         DateTime objects.
      */
-    /**
-     * _setNextSeriesElement
-     *
-     * @param object  $objEvent                event object
-     * @param array   $additionalRecurrences   array of additional recurrence dateTime objects
-     * @param boolean $addAdditionalRecurrence If this true then it will add additional recurrence
-     *
-     * @return type
-     */
-    function _setNextSeriesElement(
+    public function generateRecurrencesOfEvent(
         $objEvent,
-        &$additionalRecurrences = array(),
-        $addAdditionalRecurrence = false
+        $additionalRecurrences = array()
     ) {
-        $objCloneEvent = clone $objEvent;
-
         $this->getSettings();
-        if (!$addAdditionalRecurrence) {
-            switch ($objCloneEvent->seriesData['seriesType']){
-                case 1:
-                    //daily
-                    if ($objCloneEvent->seriesData['seriesPatternType'] == 1) {
-                        $modifyString = '+' . intval($objEvent->seriesData['seriesPatternDay']) . ' days';
-                    } else {
-                        $modifyString = '+1 Weekday';
-                    }
 
-                    $objCloneEvent->startDate->modify($modifyString);
-                    $objCloneEvent->startDate->setTime(
-                        $objEvent->startDate->format('H'),
-                        $objEvent->startDate->format('i'),
-                        $objEvent->startDate->format('s')
-                    );
+        // create a copy of the event instance which can be used
+        // to generate the recurrences on and iterate over them
+        $recurrenceEvent = clone $objEvent;
 
-                    $objCloneEvent->endDate->modify($modifyString);
-                    $objCloneEvent->endDate->setTime(
-                        $objEvent->endDate->format('H'),
-                        $objEvent->endDate->format('i'),
-                        $objEvent->endDate->format('s')
-                    );
-                break;
-                case 2:
-                    //weekly
-                    $weekdays       = array('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday');
-                    $oldWeekday     = $objCloneEvent->startDate->format('w');
-                    $oldWeekNum     = $objCloneEvent->startDate->format('W');
-                    $weekdayPattern = $objCloneEvent->seriesData['seriesPatternWeekday'];
-
-                    $nxtWeekDay = null;
-                    if (($pos = strpos($weekdayPattern, '1', $oldWeekday)) !== false) {
-                        $nxtWeekDay = $pos;
-                    } elseif (($pos = strpos($weekdayPattern, '1', 0)) !== false) {
-                        $nxtWeekDay = $pos;
-                    }
-                    if ($nxtWeekDay !== null) {
-                        $objCloneEvent->startDate->modify('next '. $weekdays[$nxtWeekDay]);
-                    }
-                    $newWeekNum = $objCloneEvent->startDate->format('W');
-                    if ($objEvent->seriesData['seriesPatternWeek'] > 1 && ($oldWeekNum < $newWeekNum)) {
-                        $objCloneEvent->startDate->modify('+'. ($objEvent->seriesData['seriesPatternWeek'] - 1) .' weeks');
-                    }
-                    $objCloneEvent->startDate->setTime(
-                        $objEvent->startDate->format('H'),
-                        $objEvent->startDate->format('i'),
-                        $objEvent->startDate->format('s')
-                    );
-
-                    $addDays = $objCloneEvent->startDate->diff($objEvent->startDate)->days;
-                    $objCloneEvent->endDate->modify('+'. $addDays .' days');
-                    $objCloneEvent->endDate->setTime(
-                        $objEvent->endDate->format('H'),
-                        $objEvent->endDate->format('i'),
-                        $objEvent->endDate->format('s')
-                    );
-                break;
-                case 3:
-                    //monthly
-                    if ($objCloneEvent->seriesData['seriesPatternType'] == 1) {
-
-                        $patternDay = intval($objEvent->seriesData['seriesPatternDay']);
-                        $addMonths  = intval($objEvent->seriesData['seriesPatternMonth']);
-
-                        $objCloneEvent->startDate->modify('+'. $addMonths .' months');
-
-                        // if the recurrence day is beyond the number of days the current
-                        // month has, then we have to fast-forward to the next month
-                        while ($patternDay > $objCloneEvent->startDate->format('t')) {
-                            $objCloneEvent->startDate->modify('+'. $addMonths .' months');
-                        }
-
-                        $objCloneEvent->startDate->setDate(
-                            $objCloneEvent->startDate->format('Y'),
-                            $objCloneEvent->startDate->format('m'),
-                            $patternDay
-                        );
-                    } else {
-                        $weekdays         = array('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday');
-                        $weekDayCountType = array(1 => 'first', 2 => 'second', 3 => 'third', 4 => 'fourth', 5 => 'last');
-
-                        $weekdayPattern = $objEvent->seriesData['seriesPatternWeekday'];
-                        $countPattern   = intval($objEvent->seriesData['seriesPatternCount']);
-                        $addMonths      = intval($objEvent->seriesData['seriesPatternMonth']);
-
-                        $objCloneEvent->startDate->modify('+'. $addMonths .' months');
-
-                        $weekDay = null;
-                        if (($pos = strpos($weekdayPattern, '1')) !== false) {
-                            $weekDay = $pos;
-                        }
-
-                        // abort in case the event has an invalid recurrence
-                        if ($weekDay === null || !isset($weekDayCountType[$countPattern])) {
-                            return;
-                        }
-
-                        $objCloneEvent->startDate->modify(
-                            $weekDayCountType[$countPattern] .' '. $weekdays[$weekDay] .' of this month'
-                        );
-                    }
-                    $objCloneEvent->startDate->setTime(
-                        $objEvent->startDate->format('H'),
-                        $objEvent->startDate->format('i'),
-                        $objEvent->startDate->format('s')
-                    );
-
-                    $addDays = $objCloneEvent->startDate->diff($objEvent->startDate)->days;
-                    $objCloneEvent->endDate->modify('+'. $addDays .' days');
-                    $objCloneEvent->endDate->setTime(
-                        $objEvent->endDate->format('H'),
-                        $objEvent->endDate->format('i'),
-                        $objEvent->endDate->format('s')
-                    );
-                break;
-            }
-        }
-
-        $isAllowedEvent = true;
-        $getNextEvent = false;
-        switch($objCloneEvent->seriesData['seriesPatternDouranceType']) {
-            case 1:
-                $getNextEvent = false;
-
-                if ($this->startDate != null) {
-                    $lastDate = clone $this->startDate;
-                    $lastDate->setDate($lastDate->format('Y') + intval($this->arrSettings['maxSeriesEndsYear']) + 1, $lastDate->format('m'), $lastDate->format('d'));
-                    if ($objCloneEvent->startDate <= $lastDate) {
-                        $getNextEvent = true;
-                    } else {
-                        $getNextEvent = false;
-                    }
-                } elseif ($this->endDate != null) { // start date will be null only on archive
-                    if ($objCloneEvent->endDate <= $this->endDate) {
-                        $getNextEvent = true;
-                    } else {
-                        $getNextEvent = false;
-                    }
-                }
-                break;
-            case 2:
-                $objCloneEvent->seriesData['seriesPatternEnd'] = $objCloneEvent->seriesData['seriesPatternEnd']-1;
-
-                if ($objCloneEvent->seriesData['seriesPatternEnd'] > 1) {
-                    $getNextEvent = true;
-                } else {
-                    $getNextEvent = false;
-                }
-                // If pattern end count is true, then a event will be allowed to add in event list
-                $isAllowedEvent = (boolean) $objCloneEvent->seriesData['seriesPatternEnd'];
-                break;
-            case 3:
-                if ($objCloneEvent->startDate <= $objCloneEvent->seriesData['seriesPatternEndDate']) {
-                    $getNextEvent = true;
-                } else {
-                    // don't show the event when startdate is greater then seriesPatternEndDate
-                    $isAllowedEvent = $getNextEvent = false;
-                }
-                break;
-        }
-
-        if (   $isAllowedEvent
-            && !$this->isDateExists($objCloneEvent->startDate, $objCloneEvent->seriesData['seriesPatternExceptions'])
-            && self::_addToEventList($objCloneEvent)
+        // fetch and iterate over the recurrence dates
+        while (
+            $nextEvent = $this->getNextRecurrenceDate(
+                $objEvent,
+                $recurrenceEvent,
+                $additionalRecurrences
+            )
         ) {
-            array_push($this->eventList, $objCloneEvent);
-            if ($this->listType == 'upcoming') {
-                // if list type is set to upcoming the the will be shown only once
-                $getNextEvent = false;
-            }
-        }
-
-        if ($addAdditionalRecurrence) {
-            return;
-        }
-
-        $diffDays = $objEvent->startDate->diff($objEvent->endDate)->days;
-        foreach ($additionalRecurrences as $key => $additionalRecurrence) {
+            // skip recurrence if it has been manually excluded
             if (
-                $objEvent->startDate < $additionalRecurrence &&
-                $objCloneEvent->startDate > $additionalRecurrence
+                $this->isDateExists(
+                    $nextEvent->startDate,
+                    $objEvent->seriesData['seriesPatternExceptions']
+                )
             ) {
-                $newEvent = clone $objCloneEvent;
-                $newEvent->startDate->setDate(
+                continue;
+            }
+
+            // verify that the recurrence is within the current date boundary
+            if (!$this->_addToEventList($nextEvent)) {
+                continue;
+            }
+
+            // add recurrence to the date list
+            array_push($this->eventList, $nextEvent);
+
+            // in case each event shall only get listed once (used
+            // by backend view), do abortfurther processing of recurrences
+            // of this event
+            if ($this->listType == 'upcoming') {
+                break;
+            }
+        }
+    }
+
+
+    /**
+     * Calculate the next recurrence date
+     *
+     * The event $objCloneEvent is advanced to the next recurrence date based
+     * on the set series options of $objEvent.
+     *
+     * @param   CalendarEvent   $objEvent   Original event of which the
+     *                                      recurrence is calculated on.
+     * @param   CalendarEvent   $objCloneEvent  Event on which the next
+     *                                          recurrence shall be calculated
+     *                                          on.
+     * @param   array   $additionalRecurrences  Array of additional (manually
+     *                                          added) recurrences as DateTime
+     *                                          objects.
+     */
+    protected function getNextRecurrenceDate($objEvent, $objCloneEvent, &$additionalRecurrences = array()) {
+        while ($nextEvent = $this->fetchNextRecurrence($objEvent, $objCloneEvent, $additionalRecurrences)) {
+            switch ($objCloneEvent->seriesData['seriesPatternDouranceType']) {
+                // no recurrence end set
+                case 1:
+                    if ($this->startDate != null) {
+                        $lastDate = clone $this->startDate;
+                        $lastDate->setDate($lastDate->format('Y') + intval($this->arrSettings['maxSeriesEndsYear']) + 1, $lastDate->format('m'), $lastDate->format('d'));
+                        if ($nextEvent->startDate > $lastDate) {
+                            // recurrence is out of date boundary -> skip
+                            return null;
+                        }
+                    } elseif ($this->endDate != null) { // start date will be null only on archive
+                        if ($nextEvent->endDate > $this->endDate) {
+                            // recurrence is out of date boundary -> skip
+                            return null;
+                        }
+                    } else {
+                        // recurrence is out of date boundary -> skip
+                        return null;
+                    }
+                    break;
+
+                // recurrence shall end after a certain amount of recurrences
+                case 2:
+                    $objCloneEvent->seriesData['seriesPatternEnd'] = $objCloneEvent->seriesData['seriesPatternEnd']-1;
+                    if ($objCloneEvent->seriesData['seriesPatternEnd'] <= 0) {
+                        // recurrence is out of date boundary -> skip
+                        return null;
+                    }
+                    break;
+
+                // recurrence shall end after a specific date
+                case 3:
+                    if ($nextEvent->startDate > $objCloneEvent->seriesData['seriesPatternEndDate']) {
+                        // recurrence is out of date boundary -> skip
+                        return null;
+                    }
+                    break;
+            }
+
+            return $nextEvent;
+        }
+
+        return null;
+    }
+
+    /**
+     * Fetch the next recurrence date
+     *
+     * The event $recurrenceEvent is advanced to the next recurrence date based
+     * on the set series options of $objEvent. Additionally the array
+     * $additionalRecurrences is checked for any manually added recurrences
+     * that will occur before the next regular recurrence. If there are any,
+     * then $recurrenceEvent will not be advanced to the next recurrence date.
+     *
+     * @param   CalendarEvent   $objEvent   Original event of which the
+     *                                      recurrence is calculated on.
+     * @param   CalendarEvent   $recurrenceEvent  Event on which the next
+     *                                          recurrence shall be calculated
+     *                                          on.
+     * @param   array   $additionalRecurrences  Array of additional (manually
+     *                                          added) recurrences as DateTime
+     *                                          objects. If an additional
+     *                                          recurrence is returned, then
+     *                                          the DateTime object of that
+     *                                          particular recurrence is being
+     *                                          removed from the array
+     *                                          $additionalRecurrences.
+     * @return  CalendarEvent   The next calculated recurrence event. This is
+     *                          either a manually added recurrence or the next
+     *                          regular recurrence based on the series options.
+     */
+    protected function fetchNextRecurrence(
+        $objEvent,
+        $recurrenceEvent,
+        &$additionalRecurrences = array()
+    ) {
+        // create local copy of the recurrence event to be used for the
+        // calculation of the next recurrence
+        $objCloneEvent = clone $recurrenceEvent;
+
+        // calculate next regular recurrence (based on set series pattern)
+        switch ($objCloneEvent->seriesData['seriesType']) {
+            case 1:
+                //daily
+                if ($objCloneEvent->seriesData['seriesPatternType'] == 1) {
+                    $modifyString = '+' . intval($objEvent->seriesData['seriesPatternDay']) . ' days';
+                } else {
+                    $modifyString = '+1 Weekday';
+                }
+
+                $objCloneEvent->startDate->modify($modifyString);
+                $objCloneEvent->startDate->setTime(
+                    $objEvent->startDate->format('H'),
+                    $objEvent->startDate->format('i'),
+                    $objEvent->startDate->format('s')
+                );
+
+                $objCloneEvent->endDate->modify($modifyString);
+                $objCloneEvent->endDate->setTime(
+                    $objEvent->endDate->format('H'),
+                    $objEvent->endDate->format('i'),
+                    $objEvent->endDate->format('s')
+                );
+                break;
+
+            case 2:
+                //weekly
+                $weekdays       = array('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday');
+                $oldWeekday     = $objCloneEvent->startDate->format('w');
+                $oldWeekNum     = $objCloneEvent->startDate->format('W');
+                $weekdayPattern = $objCloneEvent->seriesData['seriesPatternWeekday'];
+
+                $nxtWeekDay = null;
+                if (($pos = strpos($weekdayPattern, '1', $oldWeekday)) !== false) {
+                    $nxtWeekDay = $pos;
+                } elseif (($pos = strpos($weekdayPattern, '1', 0)) !== false) {
+                    $nxtWeekDay = $pos;
+                } else {
+                    // invalid pattern stored -> abort
+                    return null;
+                }
+                if ($nxtWeekDay !== null) {
+                    $objCloneEvent->startDate->modify('next '. $weekdays[$nxtWeekDay]);
+                }
+                $newWeekNum = $objCloneEvent->startDate->format('W');
+                if ($objEvent->seriesData['seriesPatternWeek'] > 1 && ($oldWeekNum < $newWeekNum)) {
+                    $objCloneEvent->startDate->modify('+'. ($objEvent->seriesData['seriesPatternWeek'] - 1) .' weeks');
+                }
+                $objCloneEvent->startDate->setTime(
+                    $objEvent->startDate->format('H'),
+                    $objEvent->startDate->format('i'),
+                    $objEvent->startDate->format('s')
+                );
+
+                $addDays = $objCloneEvent->startDate->diff($objEvent->startDate)->days;
+                $objCloneEvent->endDate->modify('+'. $addDays .' days');
+                $objCloneEvent->endDate->setTime(
+                    $objEvent->endDate->format('H'),
+                    $objEvent->endDate->format('i'),
+                    $objEvent->endDate->format('s')
+                );
+                break;
+
+            case 3:
+                //monthly
+                if ($objCloneEvent->seriesData['seriesPatternType'] == 1) {
+
+                    $patternDay = intval($objEvent->seriesData['seriesPatternDay']);
+                    $addMonths  = intval($objEvent->seriesData['seriesPatternMonth']);
+
+                    $objCloneEvent->startDate->modify('+'. $addMonths .' months');
+
+                    // if the recurrence day is beyond the number of days the current
+                    // month has, then we have to fast-forward to the next month
+                    while ($patternDay > $objCloneEvent->startDate->format('t')) {
+                        $objCloneEvent->startDate->modify('+'. $addMonths .' months');
+                    }
+
+                    $objCloneEvent->startDate->setDate(
+                        $objCloneEvent->startDate->format('Y'),
+                        $objCloneEvent->startDate->format('m'),
+                        $patternDay
+                    );
+                } else {
+                    $weekdays         = array('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday');
+                    $weekDayCountType = array(1 => 'first', 2 => 'second', 3 => 'third', 4 => 'fourth', 5 => 'last');
+
+                    $weekdayPattern = $objEvent->seriesData['seriesPatternWeekday'];
+                    $countPattern   = intval($objEvent->seriesData['seriesPatternCount']);
+                    $addMonths      = intval($objEvent->seriesData['seriesPatternMonth']);
+
+                    $objCloneEvent->startDate->modify('+'. $addMonths .' months');
+
+                    $weekDay = null;
+                    if (($pos = strpos($weekdayPattern, '1')) !== false) {
+                        $weekDay = $pos;
+                    }
+
+                    // abort in case the event has an invalid recurrence
+                    if ($weekDay === null || !isset($weekDayCountType[$countPattern])) {
+                        return null;
+                    }
+
+                    $objCloneEvent->startDate->modify(
+                        $weekDayCountType[$countPattern] .' '. $weekdays[$weekDay] .' of this month'
+                    );
+                }
+                $objCloneEvent->startDate->setTime(
+                    $objEvent->startDate->format('H'),
+                    $objEvent->startDate->format('i'),
+                    $objEvent->startDate->format('s')
+                );
+
+                $addDays = $objCloneEvent->startDate->diff($objEvent->startDate)->days;
+                $objCloneEvent->endDate->modify('+'. $addDays .' days');
+                $objCloneEvent->endDate->setTime(
+                    $objEvent->endDate->format('H'),
+                    $objEvent->endDate->format('i'),
+                    $objEvent->endDate->format('s')
+                );
+                break;
+
+            default:
+                // unkown pattern -> abort
+                return null;
+                break;
+        }
+
+        // check if event has additional set recurrences and add them if
+        // they are within the current date boundary
+        if (count($additionalRecurrences)) {
+            // get event duration. will be used to calculate the end-date
+            // of the additional event recurrence
+            $diffDays = $objEvent->startDate->diff($objEvent->endDate)->days;
+
+            // check if any of the manually added recurrences will occur
+            // before the next calculated recurrence
+            foreach ($additionalRecurrences as $key => $additionalRecurrence) {
+                // skip manually added recurrences that will occur after the
+                // next regular recurrence
+                if (
+                    $additionalRecurrence > $objCloneEvent->startDate
+                ) {
+                    continue;
+                }
+                // apply date/time of manually added recurrence
+                $objCloneEvent->startDate->setDate(
                         $additionalRecurrence->format('Y'),
                         $additionalRecurrence->format('m'),
                         $additionalRecurrence->format('d')
                 );
-                $newEvent->endDate->setDate(
+                $objCloneEvent->endDate->setDate(
                         $additionalRecurrence->format('Y'),
                         $additionalRecurrence->format('m'),
                         $additionalRecurrence->format('d')
                 );
-                $newEvent->endDate->modify('+' . $diffDays . ' days');
-                self::_setNextSeriesElement($newEvent, $additionalRecurrences, true);
+
+                // adjust end date of manually added recurrence
+                $objCloneEvent->endDate->modify('+' . $diffDays . ' days');
+
+                // remove recurrence from list of manually added recurrences
+                // as it has been processed now and must not be processed a
+                // second time
                 unset($additionalRecurrences[$key]);
+
+                // manually added recurrence
+                // note that we intentionally did not iterate on
+                // $recurrenceEvent as the regular next recurrence has yet to
+                // be processed
+                return clone $objCloneEvent;
             }
         }
 
-        if ($getNextEvent) {
-            self::_setNextSeriesElement($objCloneEvent, $additionalRecurrences);
-        }
+        // adjust $recurrenceEvent to the date/time of
+        // the next calculated recurrence (which is $objCloneEvent)
+        $recurrenceEvent->startDate->add(
+            $recurrenceEvent->startDate->diff(
+                $objCloneEvent->startDate
+            )
+        );
+        $recurrenceEvent->endDate->add(
+            $recurrenceEvent->endDate->diff(
+                $objCloneEvent->endDate
+            )
+        );
+
+        // return calculated (regular) next recurrence
+        return $objCloneEvent;
     }
 
     /**

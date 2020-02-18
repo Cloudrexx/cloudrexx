@@ -73,10 +73,10 @@ class Pricelist extends \Cx\Modules\Shop\Model\Entity\Pricelist implements \Doct
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'id', 'name', 'langId', 'borderOn', 'headerOn', 'headerLeft', 'headerRight', 'footerOn', 'footerLeft', 'footerRight', 'categories', 'lang', 'allCategories', 'validators', 'virtual');
+            return array('__isInitialized__', 'id', 'name', 'langId', 'borderOn', 'headerOn', 'headerLeft', 'headerRight', 'footerOn', 'footerLeft', 'footerRight', 'categories', 'lang', 'allCategories', 'font', 'fontSizeHeader', 'fontSizeFooter', 'fontSizeList', 'rowColor1', 'rowColor2', 'validators', 'virtual');
         }
 
-        return array('__isInitialized__', 'id', 'name', 'langId', 'borderOn', 'headerOn', 'headerLeft', 'headerRight', 'footerOn', 'footerLeft', 'footerRight', 'categories', 'lang', 'allCategories', 'validators', 'virtual');
+        return array('__isInitialized__', 'id', 'name', 'langId', 'borderOn', 'headerOn', 'headerLeft', 'headerRight', 'footerOn', 'footerLeft', 'footerRight', 'categories', 'lang', 'allCategories', 'font', 'fontSizeHeader', 'fontSizeFooter', 'fontSizeList', 'rowColor1', 'rowColor2', 'validators', 'virtual');
     }
 
     /**
@@ -475,6 +475,138 @@ class Pricelist extends \Cx\Modules\Shop\Model\Entity\Pricelist implements \Doct
     /**
      * {@inheritDoc}
      */
+    public function setFont($font)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setFont', array($font));
+
+        return parent::setFont($font);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getFont()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getFont', array());
+
+        return parent::getFont();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setFontSizeHeader($fontSizeHeader)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setFontSizeHeader', array($fontSizeHeader));
+
+        return parent::setFontSizeHeader($fontSizeHeader);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getFontSizeHeader()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getFontSizeHeader', array());
+
+        return parent::getFontSizeHeader();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setFontSizeFooter($fontSizeFooter)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setFontSizeFooter', array($fontSizeFooter));
+
+        return parent::setFontSizeFooter($fontSizeFooter);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getFontSizeFooter()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getFontSizeFooter', array());
+
+        return parent::getFontSizeFooter();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setFontSizeList($fontSizeList)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setFontSizeList', array($fontSizeList));
+
+        return parent::setFontSizeList($fontSizeList);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getFontSizeList()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getFontSizeList', array());
+
+        return parent::getFontSizeList();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setRowColor1($rowColor1)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setRowColor1', array($rowColor1));
+
+        return parent::setRowColor1($rowColor1);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getRowColor1()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getRowColor1', array());
+
+        return parent::getRowColor1();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setRowColor2($rowColor2)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setRowColor2', array($rowColor2));
+
+        return parent::setRowColor2($rowColor2);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getRowColor2()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getRowColor2', array());
+
+        return parent::getRowColor2();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getComponentController()
     {
 
@@ -503,6 +635,17 @@ class Pricelist extends \Cx\Modules\Shop\Model\Entity\Pricelist implements \Doct
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'isVirtual', array());
 
         return parent::isVirtual();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
     }
 
     /**

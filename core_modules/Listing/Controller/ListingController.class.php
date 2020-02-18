@@ -357,7 +357,7 @@ class ListingController {
         } else {
             $qb = $em->createQueryBuilder();
             $metaData = $em->getClassMetadata($this->entityClass);
-            $qb->select('x')->from($this->entityClass, 'x');
+            $qb->select('DISTINCT x')->from($this->entityClass, 'x');
             // filtering: advanced search
             if ($this->filtering) {
                 if (
@@ -393,9 +393,18 @@ class ListingController {
                             continue;
                         }
                         if (isset($metaData->associationMappings[$field])) {
-                            $qb->andWhere(
-                                $qb->expr()->eq('x.' . $field, '?' . $i)
-                            );
+                            if (
+                                $metaData->associationMappings[$field]['type'] ==
+                                \Doctrine\ORM\Mapping\ClassMetadataInfo::MANY_TO_MANY
+                            ) {
+                                $qb->andWhere(
+                                     '?' . $i . ' MEMBER OF ' . 'x.' . $field
+                                );
+                            } else {
+                                $qb->andWhere(
+                                    $qb->expr()->eq('x.' . $field, '?' . $i)
+                                );
+                            }
                         } else {
                             $qb->andWhere(
                                 $qb->expr()->like('x.' . $field, '?' . $i)
@@ -459,7 +468,7 @@ class ListingController {
             $identifierFieldNames = $metaData->getIdentifierFieldNames();
             $identifierFieldNames = reset($identifierFieldNames);
             $qb->select(
-                'count(x.' . $identifierFieldNames . ')'
+                'count(DISTINCT x.' . $identifierFieldNames . ')'
             );
             $qb->setFirstResult(null);
             $qb->setMaxResults(null);

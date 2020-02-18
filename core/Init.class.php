@@ -125,7 +125,7 @@ class InitCMS
      * Constructor
      */
     function __construct(
-        $mode = \Cx\Core\Core\Controller\Cx::MODE_BACKEND,
+        $mode = \Cx\Core\Core\Controller\Cx::MODE_FRONTEND,
         $entityManager = null
     ) {
         // TODO: what is this used for?
@@ -677,7 +677,7 @@ class InitCMS
         $templateFiles = array();
         $folder = $customTemplateForTheme->getFoldername();
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-        $templateFiles = $cx->getMediaSourceManager()->getMediaType('themes')->getFileSystem()->getFileList($folder);
+        $templateFiles = $cx->getMediaSourceManager()->getMediaType('themes')->getFileSystem()->getFileList($folder, false);
 
         foreach ($templateFiles as $fileName => $fileInfo){
             $match = null;
@@ -1136,7 +1136,7 @@ class InitCMS
                 // The old way
                 $i = 0;
                 $return = "\n<form action='' method='post' name='userFrontendLangIdForm'>\n";
-                $return .= "<select name='userFrontendLangId' size='1' class='chzn-select' onchange=\"document.forms['userFrontendLangIdForm'].submit()\">\n";
+                $return .= "<select name='userFrontendLangId' size='1' class='chzn-select' data-disable_search='true' onchange=\"document.forms['userFrontendLangIdForm'].submit()\">\n";
                 foreach ($this->arrLang as $id=>$value){
                     if ($this->arrLang[$id]['frontend']==1) {
                         $i++;
@@ -1171,7 +1171,8 @@ class InitCMS
                 FWLanguage::getMenuoptions($this->userFrontendLangId),
                 false,
                 'submitUserFrontendLanguage();',
-                'size="1" class="chzn-select"')."\n</form>\n";
+                'size="1" class="chzn-select" data-disable_search="true"'
+            ) . "\n</form>\n";
     }
 
 

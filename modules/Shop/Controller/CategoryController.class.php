@@ -3,7 +3,7 @@
 * Cloudrexx
 *
  * @link      http://www.cloudrexx.com
- * @copyright Cloudrexx AG 2007-2018
+ * @copyright Cloudrexx AG 2007-2019
 *
  * According to our dual licensing model, this program can be used either
 * under the terms of the GNU Affero General Public License, version 3,

@@ -15,7 +15,7 @@ Cx\Modules\Shop\Model\Entity\Attribute:
         strategy: AUTO
   fields:
     type:
-      type: boolean
+      type: integer
       options:
         unsigned: true
         default: 1

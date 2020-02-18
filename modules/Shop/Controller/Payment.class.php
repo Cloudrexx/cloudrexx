@@ -72,6 +72,7 @@ class Payment
         $query = "
             SELECT `payment`.`id`, `payment`.`processor_id`,
                    `payment`.`fee`, `payment`.`free_from`,
+                   `payment`.`type`,
                    `payment`.`ord`, `payment`.`active`, ".
             $arrSqlName['field']."
               FROM `".DBPREFIX."module_shop".MODULE_INDEX."_payment` AS `payment`".
@@ -94,6 +95,7 @@ class Payment
                 'name' => $strName,
                 'fee' => $objResult->fields['fee'],
                 'free_from' => $objResult->fields['free_from'],
+                'type' => $objResult->fields['type'],
                 'ord' => $objResult->fields['ord'],
                 'active' => $objResult->fields['active'],
             );
@@ -389,13 +391,21 @@ class Payment
 
         if (empty($_POST['payment_add']) || empty($_POST['name_new']))
             return null;
+        $type = 'fix';
+        if (
+            isset($_POST['fee_type']) &&
+            in_array($_POST['fee_type'], array('fix', 'percent'))
+        ) {
+            $type = $_POST['fee_type'];
+        }
         $query = "
             INSERT INTO ".DBPREFIX."module_shop".MODULE_INDEX."_payment (
-                `processor_id`, `fee`, `free_from`, `ord`, `active`
+                `processor_id`, `fee`, `free_from`, `type`, `ord`, `active`
             ) VALUES (
                 ".intval($_POST['processor_id_new']).",
                 ".floatval($_POST['fee_new']).",
                 ".floatval($_POST['free_from_new']).",
+                '".$type."',
                 0,
                 ".(empty($_POST['active_new']) ? 0 : 1)."
             )";
@@ -437,6 +447,16 @@ class Payment
             $name = contrexx_input2raw($name);
             $fee = floatval($_POST['fee'][$payment_id]);
             $free_from = floatval($_POST['free_from'][$payment_id]);
+            $type = 'fix';
+            if (
+                isset($_POST['fee_type'][$payment_id]) &&
+                in_array(
+                    $_POST['fee_type'][$payment_id],
+                    array('fix', 'percent')
+                )
+            ) {
+                $type = $_POST['fee_type'][$payment_id];
+            }
             $processor_id = intval($_POST['processor_id'][$payment_id]);
 // NTH: The ordinal is implemented, but unused yet
 //            $ord = intval($_POST['ord'][$payment_id]);
@@ -446,6 +466,7 @@ class Payment
             if (   $name == self::$arrPayments[$payment_id]['name']
                 && $fee == self::$arrPayments[$payment_id]['fee']
                 && $free_from == self::$arrPayments[$payment_id]['free_from']
+                && $type == self::$arrPayments[$payment_id]['type']
                 && $processor_id == self::$arrPayments[$payment_id]['processor_id']
 //                && $ord == self::$arrPayments[$payment_id]['ord']
                 && $active == self::$arrPayments[$payment_id]['active']
@@ -462,6 +483,7 @@ class Payment
                    SET processor_id=$processor_id,
                        fee=$fee,
                        free_from=$free_from,
+                       type='$type',
                        active=$active
                  WHERE id=$payment_id";
             if (!$objDatabase->Execute($query)) {
@@ -510,6 +532,7 @@ class Payment
         $i = 0;
         foreach (Payment::getArray() as $payment_id => $arrPayment) {
             $zone_id = Zones::getZoneIdByPaymentId($payment_id);
+            $feeTypeFix = 'checked="checked"';
             $objTemplate->setVariable(array(
                 'SHOP_PAYMENT_STYLE' => 'row'.(++$i % 2 + 1),
                 'SHOP_PAYMENT_ID' => $arrPayment['id'],
@@ -522,10 +545,19 @@ class Payment
                     $zone_id, "zone_id[$payment_id]"),
                 'SHOP_PAYMENT_STATUS' => (intval($arrPayment['active'])
                     ? \Html::ATTRIBUTE_CHECKED : ''),
+                'SHOP_PAYMENT_CURRENCY' => \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencySymbol(),
             ));
+            if ($arrPayment['type'] == 'percent') {
+                $objTemplate->touchBlock('shopPaymentFeePercent');
+                $objTemplate->hideBlock('shopPaymentFeeFix');
+            } else {
+                $objTemplate->touchBlock('shopPaymentFeeFix');
+                $objTemplate->hideBlock('shopPaymentFeePercent');
+            }
             $objTemplate->parse('shopPayment');
         }
         $objTemplate->setVariable(array(
+            'SHOP_PAYMENT_CURRENCY' => \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencySymbol(),
             'SHOP_PAYMENT_HANDLER_MENUOPTIONS_NEW' =>
                 // Selected PSP ID is -1 to disable the "please select" option
                 PaymentProcessing::getMenuoptions(-1),
@@ -631,7 +663,8 @@ class Payment
             'processor_id' => array('type' => 'INT(10)', 'unsigned' => true, 'default' => '0'),
             'fee' => array('type' => 'DECIMAL(9,2)', 'unsigned' => true, 'default' => '0', 'renamefrom' => 'costs'),
             'free_from' => array('type' => 'DECIMAL(9,2)', 'unsigned' => true, 'default' => '0', 'renamefrom' => 'costs_free_sum'),
-            'ord' => array('type' => 'INT(5)', 'unsigned' => true, 'default' => '0', 'renamefrom' => 'sort_order'),
+            'type' => array('type' => 'ENUM(\'fix\', \'percent\')', 'default' => 'fix', 'notnull' => true, 'after' => 'free_from'),
+            'ord' => array('type' => 'INT(5)', 'unsigned' => true, 'default' => '0', 'renamefrom' => 'sort_order', 'after' => 'type'),
             'active' => array('type' => 'TINYINT(1)', 'unsigned' => true, 'default' => '1', 'renamefrom' => 'status'),
         );
         $table_index = array();

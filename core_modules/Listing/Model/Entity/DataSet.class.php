@@ -430,8 +430,20 @@ class DataSet extends \Cx\Model\Base\EntityBase implements \Iterator {
         return $this->data[$key];
     }
 
-    public function toArray() {
-        if (count($this->data) == 1) {
+    /**
+     * Returns a list of all elements data of this DataSet as an array
+     *
+     * If there is only one entry in this DataSet, the entry is returned directly
+     * instead of returning a list with just one element. If
+     * $allowToReturnElement is set to false a list with just one element is
+     * returned.
+     * @param bool $allowToReturnElement (optional) If set to false this
+     *                                      method always returns a list of
+     *                                      elements.
+     * @return array List of elements as an array
+     */
+    public function toArray($allowToReturnElement = true) {
+        if ($allowToReturnElement && count($this->data) == 1) {
             return current($this->data);
         }
         return $this->data;

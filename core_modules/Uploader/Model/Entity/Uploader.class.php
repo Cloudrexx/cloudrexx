@@ -185,6 +185,17 @@ class Uploader extends EntityBase
      */
     function getXHtml($buttonName = 'Upload')
     {
+        // set system upload file size limit,
+        // if no file size limit has been set
+        if (!$this->getMaxFileSize()) {
+            $uploadFileSizeLimit =
+                \Cx\Core\Setting\Controller\Setting::getValue(
+                    'uploadFileSizeLimit',
+                    'Config'
+                );
+            $this->setMaxFileSize($uploadFileSizeLimit);
+        }
+
         $inline = '';
         if ($this->options['uploader-type'] == self::UPLOADER_TYPE_INLINE){
             $this->addClass('uploader-button-hidden');
@@ -290,6 +301,15 @@ class Uploader extends EntityBase
      */
     public function setMaxFileSize($type) {
         $this->options['pl-Max-File-Size'] = $type;
+    }
+
+    /**
+     * Get the currently set upload file size limit
+     *
+     * @return  string  Set upload file size limit
+     */
+    public function getMaxFileSize() {
+        return $this->options['pl-Max-File-Size'];
     }
 
     public static function generateId(){

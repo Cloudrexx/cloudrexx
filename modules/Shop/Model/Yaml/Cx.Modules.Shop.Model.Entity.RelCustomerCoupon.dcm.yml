@@ -5,7 +5,17 @@ Cx\Modules\Shop\Model\Entity\RelCustomerCoupon:
   indexes:
     fk_contrexx_module_shop_rel_customer_coupon_contrexx_module_idx:
       columns: [ order_id ]
+  uniqueConstraints:
+    fk_module_shop_rel_customer_coupon_unique_idx:
+      columns: code, customer_id, order_id
   id:
+    id:
+      type: integer
+      options:
+        unsigned: true
+      generator:
+        strategy: AUTO
+  fields:
     code:
       type: string
       length: 20
@@ -13,17 +23,14 @@ Cx\Modules\Shop\Model\Entity\RelCustomerCoupon:
         default: ''
     customerId:
       type: integer
-      options:
-        default: 0
-        unsigned: false
+      nullable: true
       column: customer_id
     orderId:
       type: integer
+      nullable: true
       options:
         unsigned: true
-        default: 0
       column: order_id
-  fields:
     count:
       type: integer
       options:
@@ -48,3 +55,5 @@ Cx\Modules\Shop\Model\Entity\RelCustomerCoupon:
       joinColumn:
         name: customer_id
         referencedColumnName: id
+        nullable: false
+        onDelete: 'SET NULL'

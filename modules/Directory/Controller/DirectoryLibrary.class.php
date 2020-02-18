@@ -57,6 +57,8 @@ class DirectoryLibrary
     public $mediaWebPath;
     public $rssLatestTitle = "Directory News";
     public $rssLatestDescription = "The latest Directory entries";
+    public $numCategories = array();
+    public $numLevels = array();
 
     /**
      * category Ids
@@ -2047,6 +2049,9 @@ if (document.getElementsByName(\'inputValue['.$inputName.']\')[0].value == "") {
     {
         global $objDatabase;
 
+        if (!isset($this->numCategories[$ckey])) {
+            $this->numCategories[$ckey] = array();
+        }
         $this->numCategories[$ckey][] = $cid;
         $objResultCat = $objDatabase->Execute("SELECT id FROM ".DBPREFIX."module_directory_categories WHERE status = 1 AND parentid =".intval($cid));
         if ($objResultCat !== false) {
@@ -2067,6 +2072,9 @@ if (document.getElementsByName(\'inputValue['.$inputName.']\')[0].value == "") {
     {
         global $objDatabase;
 
+        if (!isset($this->numLevels[$lkey])) {
+            $this->numLevels[$lkey] = array();
+        }
         $this->numLevels[$lkey][] = $lid;
         $objResultLevel = $objDatabase->Execute("SELECT id FROM ".DBPREFIX."module_directory_levels WHERE status = 1 AND parentid =".intval($lid));
         if ($objResultLevel !== false) {

@@ -79,7 +79,7 @@ CREATE TABLE `contrexx_access_user_groups` (
   PRIMARY KEY (`group_id`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_access_user_mail` (
-  `type` enum('reg_confirm','reset_pw','user_activated','user_deactivated','new_user','user_account_invitation','user_profile_modification') NOT NULL DEFAULT 'reg_confirm',
+  `type` enum('reg_confirm','reset_pw','user_activated','user_deactivated','new_user','user_account_invitation','signup_notification', 'user_profile_modification') NOT NULL DEFAULT 'reg_confirm',
   `lang_id` tinyint(2) unsigned NOT NULL DEFAULT '0',
   `sender_mail` varchar(255) NOT NULL DEFAULT '',
   `sender_name` varchar(255) NOT NULL DEFAULT '',
@@ -2745,6 +2745,7 @@ CREATE TABLE `contrexx_module_news_categories` (
   `right_id` int(11) NOT NULL,
   `sorting` int(11) NOT NULL,
   `level` int(11) NOT NULL,
+  `display` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`catid`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_module_news_categories_catid` (
@@ -3186,7 +3187,7 @@ CREATE TABLE `contrexx_module_shop_article_group` (
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_module_shop_attribute` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `type` tinyint(1) unsigned NOT NULL DEFAULT '1',
+  `type` int(1) unsigned NOT NULL DEFAULT 1,
   `name` varchar(255) DEFAULT '' NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB ;
@@ -3297,7 +3298,7 @@ CREATE TABLE `contrexx_module_shop_order_attributes` (
 CREATE TABLE `contrexx_module_shop_order_items` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `order_id` int(10) unsigned NOT NULL DEFAULT '0',
-  `product_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `product_id` int(10) unsigned DEFAULT NULL,
   `product_name` varchar(255) NOT NULL DEFAULT '',
   `price` decimal(9,2) unsigned NOT NULL DEFAULT '0.00',
   `quantity` int(10) unsigned NOT NULL DEFAULT '0',
@@ -3309,7 +3310,7 @@ CREATE TABLE `contrexx_module_shop_order_items` (
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_module_shop_orders` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `customer_id` int(10) NOT NULL DEFAULT '0',
+  `customer_id` int(10) DEFAULT NULL,
   `currency_id` int(10) unsigned NOT NULL DEFAULT '0',
   `sum` decimal(9,2) unsigned NOT NULL DEFAULT '0.00',
   `date_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
@@ -3326,7 +3327,7 @@ CREATE TABLE `contrexx_module_shop_orders` (
   `vat_amount` decimal(9,2) unsigned NOT NULL DEFAULT '0.00',
   `shipment_amount` decimal(9,2) unsigned NOT NULL DEFAULT '0.00',
   `shipment_id` int(10) unsigned DEFAULT NULL,
-  `payment_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `payment_id` int(10) unsigned DEFAULT NULL,
   `payment_amount` decimal(9,2) unsigned NOT NULL DEFAULT '0.00',
   `ip` varchar(50) NOT NULL DEFAULT '',
   `lang_id` int(10) NOT NULL DEFAULT '0',
@@ -3358,6 +3359,7 @@ CREATE TABLE `contrexx_module_shop_payment` (
   `fee` decimal(9,2) unsigned NOT NULL DEFAULT '0.00',
   `free_from` decimal(9,2) unsigned NOT NULL DEFAULT '0.00',
   `ord` int(5) unsigned NOT NULL DEFAULT '0',
+  `type` enum('fix','percent') NOT NULL DEFAULT 'fix',
   `active` tinyint(1) unsigned NOT NULL DEFAULT '1',
   `name` VARCHAR(255) DEFAULT '' NOT NULL,
   PRIMARY KEY (`id`),
@@ -3452,14 +3454,16 @@ CREATE TABLE `contrexx_module_shop_rel_countries` (
   INDEX `IDX_C859EA8B9F2C3FAB` (`zone_id`)
 ) ENGINE=InnoDB;
 CREATE TABLE `contrexx_module_shop_rel_customer_coupon` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `code` varchar(20) NOT NULL DEFAULT '',
-  `customer_id` int(10) NOT NULL DEFAULT '0',
-  `order_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `customer_id` int(10) DEFAULT NULL,
+  `order_id` int(10) unsigned DEFAULT NULL,
   `count` int(10) unsigned NOT NULL DEFAULT '0',
   `amount` decimal(9,2) unsigned NOT NULL DEFAULT '0.00',
-  PRIMARY KEY (`code`,`customer_id`,`order_id`),
+  PRIMARY KEY (`id`),
   INDEX `IDX_6A7FBE248D9F6D38` (`order_id`),
-  INDEX `IDX_6A7FBE249395C3F3` (`customer_id`)
+  INDEX `IDX_6A7FBE249395C3F3` (`customer_id`),
+  UNIQUE INDEX `fk_module_shop_rel_customer_coupon_unique_idx` (`code`, `customer_id`, `order_id`)
 ) ENGINE=InnoDB;
 
 CREATE TABLE `contrexx_module_shop_rel_discount_group` (
@@ -3947,7 +3951,7 @@ ALTER TABLE contrexx_module_shop_orders ADD CONSTRAINT FK_DA286BB1B213FA4 FOREIG
 ALTER TABLE contrexx_module_shop_orders ADD CONSTRAINT FK_DA286BB138248176 FOREIGN KEY (currency_id) REFERENCES contrexx_module_shop_currencies (id);
 ALTER TABLE contrexx_module_shop_orders ADD CONSTRAINT FK_DA286BB17BE036FC FOREIGN KEY (shipment_id) REFERENCES contrexx_module_shop_shipper (id);
 ALTER TABLE contrexx_module_shop_orders ADD CONSTRAINT FK_DA286BB14C3A3BB FOREIGN KEY (payment_id) REFERENCES contrexx_module_shop_payment (id);
-ALTER TABLE contrexx_module_shop_orders ADD CONSTRAINT FK_DA286BB19395C3F3 FOREIGN KEY (customer_id) REFERENCES contrexx_access_users (id);
+ALTER TABLE contrexx_module_shop_orders ADD CONSTRAINT FK_DA286BB19395C3F3 FOREIGN KEY (customer_id) REFERENCES contrexx_access_users (id) ON DELETE SET NULL;
 ALTER TABLE contrexx_module_shop_order_attributes ADD CONSTRAINT FK_273F59F6126F525E FOREIGN KEY (item_id) REFERENCES contrexx_module_shop_order_items (id);
 ALTER TABLE contrexx_module_shop_option ADD CONSTRAINT FK_658196EFB6E62EFA FOREIGN KEY (attribute_id) REFERENCES contrexx_module_shop_attribute (id);
 ALTER TABLE contrexx_module_shop_products ADD CONSTRAINT FK_97F512B7A23B42D FOREIGN KEY (manufacturer_id) REFERENCES contrexx_module_shop_manufacturer (id);
@@ -3959,14 +3963,14 @@ ALTER TABLE contrexx_module_shop_rel_product_attribute ADD CONSTRAINT FK_E17E240
 ALTER TABLE contrexx_module_shop_rel_product_attribute ADD CONSTRAINT FK_E17E240BA7C41D6F FOREIGN KEY (option_id) REFERENCES contrexx_module_shop_option (id);
 ALTER TABLE contrexx_module_shop_order_items ADD CONSTRAINT FK_1D79476B8D9F6D38 FOREIGN KEY (order_id) REFERENCES contrexx_module_shop_orders (id);
 ALTER TABLE contrexx_module_shop_order_items ADD CONSTRAINT FK_1D79476B4584665A FOREIGN KEY (product_id) REFERENCES contrexx_module_shop_products (id);
-ALTER TABLE contrexx_module_shop_discount_coupon ADD CONSTRAINT FK_7E70AB1A4C3A3BB FOREIGN KEY (payment_id) REFERENCES contrexx_module_shop_payment (id);
-ALTER TABLE contrexx_module_shop_discount_coupon ADD CONSTRAINT FK_7E70AB1A4584665A FOREIGN KEY (product_id) REFERENCES contrexx_module_shop_products (id);
-ALTER TABLE contrexx_module_shop_discount_coupon ADD CONSTRAINT FK_7E70AB1A9395C3F3 FOREIGN KEY (customer_id) REFERENCES contrexx_access_users (id);
+ALTER TABLE contrexx_module_shop_discount_coupon ADD CONSTRAINT FK_7E70AB1A4C3A3BB FOREIGN KEY (payment_id) REFERENCES contrexx_module_shop_payment (id) ON DELETE SET NULL;
+ALTER TABLE contrexx_module_shop_discount_coupon ADD CONSTRAINT FK_7E70AB1A4584665A FOREIGN KEY (product_id) REFERENCES contrexx_module_shop_products (id) ON DELETE SET NULL;
+ALTER TABLE contrexx_module_shop_discount_coupon ADD CONSTRAINT FK_7E70AB1A9395C3F3 FOREIGN KEY (customer_id) REFERENCES contrexx_access_users (id) ON DELETE SET NULL;
 ALTER TABLE contrexx_module_shop_discountgroup_count_rate ADD CONSTRAINT FK_3F3DD477FE54D947 FOREIGN KEY (group_id) REFERENCES contrexx_module_shop_discountgroup_count_name (id);
 ALTER TABLE contrexx_module_shop_pricelists ADD CONSTRAINT FK_BB867D48B213FA4 FOREIGN KEY (lang_id) REFERENCES contrexx_core_locale_locale (id);
 ALTER TABLE contrexx_module_shop_lsv ADD CONSTRAINT FK_889921958D9F6D38 FOREIGN KEY (order_id) REFERENCES contrexx_module_shop_orders (id);
 ALTER TABLE contrexx_module_shop_rel_customer_coupon ADD CONSTRAINT FK_6A7FBE248D9F6D38 FOREIGN KEY (order_id) REFERENCES contrexx_module_shop_orders (id);
-ALTER TABLE contrexx_module_shop_rel_customer_coupon ADD CONSTRAINT FK_6A7FBE249395C3F3 FOREIGN KEY (customer_id) REFERENCES contrexx_access_users (id);
+ALTER TABLE contrexx_module_shop_rel_customer_coupon ADD CONSTRAINT FK_6A7FBE249395C3F3 FOREIGN KEY (customer_id) REFERENCES contrexx_access_users (id) ON DELETE SET NULL;
 ALTER TABLE contrexx_module_shop_rel_discount_group ADD CONSTRAINT FK_93D6FD61D2919A68 FOREIGN KEY (customer_group_id) REFERENCES contrexx_module_shop_customer_group (id);
 ALTER TABLE contrexx_module_shop_rel_discount_group ADD CONSTRAINT FK_93D6FD61ABBC2D2C FOREIGN KEY (article_group_id) REFERENCES contrexx_module_shop_article_group (id);
 ALTER TABLE contrexx_module_shop_rel_payment ADD CONSTRAINT FK_43EB87989F2C3FAB FOREIGN KEY (zone_id) REFERENCES contrexx_module_shop_zones (id);

@@ -737,7 +737,7 @@ class DataAdmin extends \Cx\Modules\Data\Controller\DataLibrary {
         }
     }
 
-    function parseCategorySelector($categoryTree, $arrCategories, $select, $level, $lang, $parent = true, $stack)
+    function parseCategorySelector($categoryTree, $arrCategories, $select, $level, $lang, $parent = true, $stack = '')
     {
     // this used to expect an int value, only allowing entries to belong to a single category. this way we
     // continue to support legacy calls but add support for multiple categories in callers aware of that. -fs

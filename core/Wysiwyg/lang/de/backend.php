@@ -40,7 +40,7 @@ global $_ARRAYLANG;
 
 // Let's start with module info:
 $_ARRAYLANG['TXT_CORE_WYSIWYG'] = 'WYSIWYG';
-$_ARRAYLANG['TXT_CORE_WYSIWYG_DESCRIPTION'] = 'Dieses Modul dient dazu die WYSIWYG-Vorlagen zu verwalten';
+$_ARRAYLANG['TXT_CORE_WYSIWYG_DESCRIPTION'] = 'Diese Anwendung stellt den WYSIWYG-Editor zur Pflege des Inhalts bereit.';
 
 // Here come the ACTs:
 $_ARRAYLANG['TXT_CORE_WYSIWYG_ACT_WYSIWYG_TEMPLATE'] = 'WYSIWYG Vorlagen';

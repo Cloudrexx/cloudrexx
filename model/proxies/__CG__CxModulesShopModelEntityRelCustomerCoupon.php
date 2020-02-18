@@ -73,10 +73,10 @@ class RelCustomerCoupon extends \Cx\Modules\Shop\Model\Entity\RelCustomerCoupon 
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'code', 'customerId', 'orderId', 'count', 'amount', 'order', 'customer', 'validators', 'virtual');
+            return array('__isInitialized__', 'id', 'code', 'customerId', 'orderId', 'count', 'amount', 'order', 'customer', 'validators', 'virtual');
         }
 
-        return array('__isInitialized__', 'code', 'customerId', 'orderId', 'count', 'amount', 'order', 'customer', 'validators', 'virtual');
+        return array('__isInitialized__', 'id', 'code', 'customerId', 'orderId', 'count', 'amount', 'order', 'customer', 'validators', 'virtual');
     }
 
     /**
@@ -185,6 +185,21 @@ class RelCustomerCoupon extends \Cx\Modules\Shop\Model\Entity\RelCustomerCoupon 
     /**
      * {@inheritDoc}
      */
+    public function getId()
+    {
+        if ($this->__isInitialized__ === false) {
+            return (int)  parent::getId();
+        }
+
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getId', array());
+
+        return parent::getId();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function setCode($code)
     {
 
@@ -198,10 +213,6 @@ class RelCustomerCoupon extends \Cx\Modules\Shop\Model\Entity\RelCustomerCoupon 
      */
     public function getCode()
     {
-        if ($this->__isInitialized__ === false) {
-            return  parent::getCode();
-        }
-
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getCode', array());
 
@@ -224,10 +235,6 @@ class RelCustomerCoupon extends \Cx\Modules\Shop\Model\Entity\RelCustomerCoupon 
      */
     public function getCustomerId()
     {
-        if ($this->__isInitialized__ === false) {
-            return (int)  parent::getCustomerId();
-        }
-
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getCustomerId', array());
 
@@ -250,10 +257,6 @@ class RelCustomerCoupon extends \Cx\Modules\Shop\Model\Entity\RelCustomerCoupon 
      */
     public function getOrderId()
     {
-        if ($this->__isInitialized__ === false) {
-            return (int)  parent::getOrderId();
-        }
-
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getOrderId', array());
 
@@ -379,6 +382,17 @@ class RelCustomerCoupon extends \Cx\Modules\Shop\Model\Entity\RelCustomerCoupon 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'isVirtual', array());
 
         return parent::isVirtual();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
     }
 
     /**

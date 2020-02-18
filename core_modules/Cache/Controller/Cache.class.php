@@ -80,6 +80,17 @@ class Cache extends \Cx\Core_Modules\Cache\Controller\CacheLib
         $this->initContrexxCaching();
     }
 
+    /**
+     * @see ComponentController::forceUserbasedPageCache()
+     */
+    public function addException($componentOrCallback, $additionalInfo = array()) {
+        if (is_string($componentOrCallback) && count($additionalInfo)) {
+            $this->exceptions[$componentOrCallback] = $additionalInfo;
+        } else {
+            $this->exceptions[] = $componentOrCallback;
+        }
+    }
+
     protected function initContrexxCaching()
     {
         global $_CONFIG;
@@ -94,19 +105,20 @@ class Cache extends \Cx\Core_Modules\Cache\Controller\CacheLib
             return;
         }
 
-        // @todo: A component should have a possibility to add caching exceptions
+        // @todo: Solve using ComponentController::addException()
         if (isset($_GET['templateEditor']) && $_GET['templateEditor'] == 1) {
             $this->boolIsEnabled = false;
             return;
         }
 
-        // @todo: A component should have a possibility to add caching exceptions
+        // @todo: Solve using ComponentController::addException()
         if (isset($_GET['pagePreview'])) {
             $this->boolIsEnabled = false;
             return;
         }
 
         // Since FE does not yet support caching, we disable it when FE is active
+        // @todo: Solve using ComponentController::addException()
         if (isset($_COOKIE['fe_toolbar']) && $_COOKIE['fe_toolbar'] == 'true') {
             $this->boolIsEnabled = false;
             return;
@@ -252,7 +264,7 @@ class Cache extends \Cx\Core_Modules\Cache\Controller\CacheLib
 
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         
-        $this->exceptions = array(
+        $this->exceptions += array(
             // never cache errors
             'Error', 
 
@@ -319,11 +331,6 @@ class Cache extends \Cx\Core_Modules\Cache\Controller\CacheLib
             'MemberDir',
             'News' => array(
                 'submit',
-            ),
-            'Newsletter' => array(
-                function($page) {
-                    return $page->getCmd() == 'profile' && $_SERVER['REQUEST_METHOD'] != 'POST';
-                },
             ),
             'Podcast',
             'Shop',

@@ -266,7 +266,7 @@ class Products
                      OR `product`.`date_start` IS NULL
                     )
                     AND (
-                        `product`.`date_end` >= CURRENT_DATE() 
+                        `product`.`date_end` >= CURRENT_DATE()
                      OR `product`.`date_end` IS NULL
                     )'
             ).

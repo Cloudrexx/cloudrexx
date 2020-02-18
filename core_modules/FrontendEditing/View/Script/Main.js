@@ -195,29 +195,40 @@ cx.fe.contentEditor.initBlockCkEditors = function() {
             cx.fe.publishedBlocks["fe_block_" + blockId] = {};
             cx.fe.publishedBlocks["fe_block_" + blockId].contentHtml = cx.jQuery(this).html();
 
-            var url = cx.variables.get("basePath", "contrexx") + "cadmin/index.php?cmd=JsonData&object=Block&act=getBlockContent&block=" + blockId + "&lang=" + cx.variables.get("language", "contrexx") + "&parsing=false";
-            cx.jQuery.ajax({
-                url: url,
-                complete: function(response) {
-                    // get the block json data response
-                    cx.jQuery("#fe_block_" + blockId).html(cx.jQuery.parseJSON(response.responseText).data.content);
-                    CKEDITOR.inline("fe_block_" + blockId, {
-                        customConfig: CKEDITOR.getUrl(cx.variables.get("configPath", "FrontendEditing")),
-                        toolbar: "FrontendEditingContent",
-                        extraPlugins: extraPlugins.join(","),
-                        removePlugins: 'bbcode',
-                        startupOutlineBlocks: false,
-                        on: {
-                            instanceReady: function(event) {
-                                cx.fe.publishedBlocks[event.editor.name].contentRaw = event.editor.getData();
-                            },
-                            focus: function(event) {
-                                cx.fe.startBlockEditing(event.editor);
-                            }
+            var data = {
+                block: blockId,
+                lang: cx.variables.get("language", "contrexx"),
+                parsing: 'false'
+            }
+            cx.ajax(
+                'Block',
+                'getBlockContent',
+                {
+                    data: data,
+                    success: function(data) {
+                        // get the block json data response
+                        if (data.status != 'success') {
+                            return;
                         }
-                    });
+                        cx.jQuery("#fe_block_" + blockId).html(data.data);
+                        CKEDITOR.inline("fe_block_" + blockId, {
+                            customConfig: CKEDITOR.getUrl(cx.variables.get("configPath", "FrontendEditing")),
+                            toolbar: "FrontendEditingContent",
+                            extraPlugins: extraPlugins.join(","),
+                            removePlugins: 'bbcode',
+                            startupOutlineBlocks: false,
+                            on: {
+                                instanceReady: function(event) {
+                                    cx.fe.publishedBlocks[event.editor.name].contentRaw = event.editor.getData();
+                                },
+                                focus: function(event) {
+                                    cx.fe.startBlockEditing(event.editor);
+                                }
+                            }
+                        });
+                    }
                 }
-            });
+            );
         }
     });
     // add border around the editable contents
@@ -704,88 +715,96 @@ cx.fe.editorLoaded = function() {
  * @param callback
  */
 cx.fe.loadPageData = function(historyId, putTheData, callback) {
-    var url = cx.variables.get("basePath", "contrexx") + "cadmin/index.php?cmd=JsonData&object=page&act=get&page=" + cx.variables.get("pageId", "FrontendEditing") + "&lang=" + cx.variables.get("language", "contrexx") + "&userFrontendLangId=" + cx.variables.get("language", "contrexx");
-    if (historyId) {
-        url += "&history=" + historyId;
+    var data = {
+        page: cx.variables.get("pageId", "FrontendEditing"),
+        lang: cx.variables.get("language", "contrexx"),
+        userFrontendLangId: cx.variables.get("language", "contrexx")
     }
-    cx.jQuery.ajax({
-        url: url,
-        complete: function(response) {
-            // get the page json data response
-            cx.fe.page = cx.jQuery.parseJSON(response.responseText).data;
+    if (historyId) {
+        data.history = historyId;
+    }
+    cx.ajax(
+        'page',
+        'get',
+        {
+            data: data,
+            complete: function(response) {
+                // get the page json data response
+                cx.fe.page = cx.jQuery.parseJSON(response.responseText).data;
 
-            // check whether the page is a content page or a home page
-            // the application pages do not allow to update title and content
-            if (putTheData && (cx.fe.page.type != "application" || cx.fe.page.module == "Home")) {
-                // put the new data of page into the html and start editor if the user is in edit mode
-                if (cx.fe.page.title) {
-                    cx.jQuery("#fe_title").html(cx.fe.page.title);
+                // check whether the page is a content page or a home page
+                // the application pages do not allow to update title and content
+                if (putTheData && (cx.fe.page.type != "application" || cx.fe.page.module == "Home")) {
+                    // put the new data of page into the html and start editor if the user is in edit mode
+                    if (cx.fe.page.title) {
+                        cx.jQuery("#fe_title").html(cx.fe.page.title);
+                    }
+                    if (cx.fe.page.content) {
+                        cx.jQuery("#fe_content").html(cx.fe.page.content);
+                    }
+                    // when the editor is in the edit mode, restart the content editor
+                    if (cx.fe.editMode) {
+                        cx.fe.contentEditor.start();
+                    }
                 }
-                if (cx.fe.page.content) {
-                    cx.jQuery("#fe_content").html(cx.fe.page.content);
-                }
-                // when the editor is in the edit mode, restart the content editor
-                if (cx.fe.editMode) {
-                    cx.fe.contentEditor.start();
-                }
-            }
 
-            // a specific history is requested
-            if (historyId) {
-                cx.fe.history.loadedVersion = historyId;
-            } else {
-                // no specific history requested
-                // check if the current page is a draft
-                // if it is a draft, load the previous history
-                if (cx.fe.pageIsADraft()) {
-                    cx.fe.history.loadedVersion = cx.fe.page.historyId - 1;
+                // a specific history is requested
+                if (historyId) {
+                    cx.fe.history.loadedVersion = historyId;
                 } else {
-                    // load the current history
-                    cx.fe.history.loadedVersion = cx.fe.page.historyId;
+                    // no specific history requested
+                    // check if the current page is a draft
+                    // if it is a draft, load the previous history
+                    if (cx.fe.pageIsADraft()) {
+                        cx.fe.history.loadedVersion = cx.fe.page.historyId - 1;
+                    } else {
+                        // load the current history
+                        cx.fe.history.loadedVersion = cx.fe.page.historyId;
+                    }
                 }
+
+                // update the history highlighting in history box
+                cx.fe.history.updateHighlighting();
+
+                // call the callback function after loading the content from db
+                if (callback) {
+                    callback();
+                }
+
+                // if it is a draft tell the user that he is editing a draft
+                if (cx.fe.pageIsADraft() &&
+                    cx.fe.editMode &&
+                    (
+                        (historyId && historyId == cx.fe.page.historyId - 1) || !historyId
+                        )
+                    ) {
+                    cx.tools.StatusMessage.showMessage(cx.fe.langVars.TXT_FRONTEND_EDITING_THE_DRAFT, 'warning', 5000);
+                }
+
+                // add icon on the right side of the publish and stop button
+                cx.jQuery("#fe_state_icon")
+                    .removeClass("publishing")
+                    .removeClass("draft")
+                    .removeClass("waiting");
+                if (cx.fe.pageHasDraft()) {
+                    cx.jQuery("#fe_state_icon").addClass("publishing").addClass("draft");
+                    cx.jQuery("#fe_state_text").html(cx.fe.langVars.TXT_FRONTEND_EDITING_DRAFT);
+                } else if(cx.fe.pageHasDraftWaiting()) {
+                    cx.jQuery("#fe_state_icon").addClass("publishing").addClass("waiting");
+                    cx.jQuery("#fe_state_text").html(cx.fe.langVars.TXT_FRONTEND_EDITING_DRAFT);
+                } else {
+                    cx.jQuery("#fe_state_icon").addClass("publishing");
+                    cx.jQuery("#fe_state_text").html(cx.fe.langVars.TXT_FRONTEND_EDITING_PUBLISHED);
+                }
+
+                cx.fe.actionButtons.refresh();
+
+                // reload the boxes
+                cx.fe.history.load();
+                cx.fe.options.load();
             }
-
-            // update the history highlighting in history box
-            cx.fe.history.updateHighlighting();
-
-            // call the callback function after loading the content from db
-            if (callback) {
-                callback();
-            }
-
-            // if it is a draft tell the user that he is editing a draft
-            if (cx.fe.pageIsADraft() &&
-                cx.fe.editMode &&
-                (
-                    (historyId && historyId == cx.fe.page.historyId - 1) || !historyId
-                    )
-                ) {
-                cx.tools.StatusMessage.showMessage(cx.fe.langVars.TXT_FRONTEND_EDITING_THE_DRAFT, 'warning', 5000);
-            }
-
-            // add icon on the right side of the publish and stop button
-            cx.jQuery("#fe_state_icon")
-                .removeClass("publishing")
-                .removeClass("draft")
-                .removeClass("waiting");
-            if (cx.fe.pageHasDraft()) {
-                cx.jQuery("#fe_state_icon").addClass("publishing").addClass("draft");
-                cx.jQuery("#fe_state_text").html(cx.fe.langVars.TXT_FRONTEND_EDITING_DRAFT);
-            } else if(cx.fe.pageHasDraftWaiting()) {
-                cx.jQuery("#fe_state_icon").addClass("publishing").addClass("waiting");
-                cx.jQuery("#fe_state_text").html(cx.fe.langVars.TXT_FRONTEND_EDITING_DRAFT);
-            } else {
-                cx.jQuery("#fe_state_icon").addClass("publishing");
-                cx.jQuery("#fe_state_text").html(cx.fe.langVars.TXT_FRONTEND_EDITING_PUBLISHED);
-            }
-
-            cx.fe.actionButtons.refresh();
-
-            // reload the boxes
-            cx.fe.history.load();
-            cx.fe.options.load();
         }
-    });
+    );
 };
 
 /**

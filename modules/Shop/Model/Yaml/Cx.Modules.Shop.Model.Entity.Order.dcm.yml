@@ -21,8 +21,7 @@ Cx\Modules\Shop\Model\Entity\Order:
   fields:
     customerId:
       type: integer
-      options:
-        default: '0'
+      nullable: true
       column: customer_id
     currencyId:
       type: integer
@@ -110,9 +109,9 @@ Cx\Modules\Shop\Model\Entity\Order:
       column: shipment_id
     paymentId:
       type: integer
+      nullable: true
       options:
         unsigned: true
-        default: '0'
       column: payment_id
     paymentAmount:
       type: decimal
@@ -253,3 +252,4 @@ Cx\Modules\Shop\Model\Entity\Order:
         name: customer_id
         referencedColumnName: id
         nullable: false
+        onDelete: "SET NULL"

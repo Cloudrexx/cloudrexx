@@ -1069,14 +1069,29 @@ cx.ready(function () {
                     bIsDir = b['datainfo']['type'] == 'dir';
 
                     // fetch the value to sort by
-                    aSortFlag = (a['datainfo'][attribute]);
-                    bSortFlag = (b['datainfo'][attribute]);
+                    aSortFlag = a['datainfo'][attribute];
+                    bSortFlag = b['datainfo'][attribute];
 
                     // first list directories
                     if (aIsDir && !bIsDir) return -1;
                     if (!aIsDir && bIsDir) return 1;
 
                     // then list files
+                    //
+                    // but if we're sorting by size,
+                    // we have to modify the behaviour
+                    // a bit
+                    if (attribute == 'cleansize') {
+                        // cast sort value to integers
+                        aSortFlag = parseInt(aSortFlag, 10);
+                        bSortFlag = parseInt(bSortFlag, 10);
+
+                        // list directories alphabetical
+                        if (aIsDir && bIsDir) {
+                            aSortFlag = a['datainfo']['name'];
+                            bSortFlag = b['datainfo']['name'];
+                        }
+                    }
                     if (reverse) {
                         if (aSortFlag < bSortFlag) return -1;
                         if (aSortFlag > bSortFlag) return 1;

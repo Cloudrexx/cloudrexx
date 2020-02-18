@@ -11,6 +11,9 @@ document.addEventListener('DOMContentLoaded', function () {
         swapSendToStatus(this.value);
     }
     swapSendToStatus();
+
+    document.getElementsByName("shipmentAmount")[0].addEventListener('change', calcShipPaymentCost);
+    document.getElementsByName("paymentAmount")[0].addEventListener('change', calcShipPaymentCost);
 });
 
 
@@ -214,14 +217,12 @@ function updateShipment()
     var found = -1;
     // try all the available shipments;
     // (see Shipment.class.php::getJSArrays())
-console.log(shipments);
     for (var i = 0; i < shipments.length; ++i) {
         var price_free = shipments[i][2];
         var max_weight = getWeightGrams(shipments[i][1]);
         // get the shipment conditions that are closest to our order:
         // we have to make sure the maximum weight is big enough for the order,
         // or that it's unspecified (don't care)
-        console.log(max_weight);
         if ((max_weight > 0 && weight <= max_weight ) || max_weight == 0) {
             // if price_free is set, the order amount has to be higher than that
             // in order to get the shipping for free.
@@ -266,32 +267,60 @@ function calcPrice(orderItemId)
         document.getElementById("product_product_id-"+orderItemId).value;
     if (newProductId > 0) {
         var price =
-            document.getElementById("product_price-"+orderItemId).value;
+            Number(document.getElementById("product_price-"+orderItemId).value);
         var quantity =
             document.getElementById("product_quantity-"+orderItemId).value;
     }
+    let priceAttributes = 0;
+    if (typeof document.getElementById("product_price-"+orderItemId).dataset.priceattributes !== 'undefined') {
+        priceAttributes = Number(
+            document.getElementById("product_price-"+orderItemId).dataset.priceattributes
+        )
+    }
+
     document.getElementById("product_price-"+orderItemId).value =
         Number(price).toFixed(2);
     document.getElementById("product_sum-"+orderItemId).value =
-        (quantity * price).toFixed(2);
+        (quantity * (price + priceAttributes)).toFixed(2);
     // Totals
     var totalVat = 0;
     var totalSum = 0;
     for (var i = 0; i < arrProductId.length; ++i) {
         // update the total VAT amount
-        totalVat +=
-            Number(document.getElementById(
-                "product_vat_rate-"+arrProductId[i]['id']).value)
-            * Number(document.getElementById(
-            "product_sum-"+arrProductId[i]['id']).value) / 100;
+        if (vat_included) {
+            let exclVat =
+                Number(document.getElementById(
+                    "product_sum-"+arrProductId[i]['id']).value) / (Number(document.getElementById(
+                "product_vat_rate-"+arrProductId[i]['id']).value) / 100 + 1);
+            totalVat += Number(document.getElementById(
+                "product_sum-"+arrProductId[i]['id']).value) - exclVat;
+        } else {
+            totalVat +=
+                Number(document.getElementById(
+                    "product_vat_rate-"+arrProductId[i]['id']).value)
+                * Number(document.getElementById(
+                "product_sum-"+arrProductId[i]['id']).value) / 100;
+        }
+
         // update the total order value
         totalSum += Number(document.getElementById(
             "product_sum-"+arrProductId[i]['id']).value);
     }
     var couponAmount = document.getElementById('coupon-amount');
     if (couponAmount) {
-        couponAmount.value = '-' + (totalSum / 100 * Number(couponAmount.dataset.rate)).toFixed(2);
-        totalSum = (totalSum / 100 * (100-Number(couponAmount.dataset.rate))).toFixed(2);
+        if (couponAmount.dataset.rate > 0) {
+            couponAmount.value = '-' + (totalSum / 100 * Number(couponAmount.dataset.rate)).toFixed(2);
+            totalSum = (totalSum / 100 * (100-Number(couponAmount.dataset.rate))).toFixed(2);
+        } else if (couponAmount.dataset.amount > 0) {
+            if (couponAmount.dataset.amount >= totalSum) {
+                couponAmount.value = '-' + totalSum.toFixed(2);
+                totalSum = 0.00;
+            } else {
+                couponAmount.value = '-' + couponAmount.dataset.amount;
+                totalSum = (totalSum - couponAmount.dataset.amount).toFixed(2);
+            }
+            
+        }
     }
     // store totalSum as net total before adding VAT
     document.getElementById("netprice").value =
@@ -300,19 +329,38 @@ function calcPrice(orderItemId)
     // if the total weight changes, so may the shipping conditions
     updateShipment();
     // round prices to cents
-    totalVat = Math.round(totalVat*100)/100;
-    if (vat_included == 0) {
-        totalSum += totalVat;
-    }
-    // add shipping and payment cost
+    totalVat = Math.floor(totalVat*100)/100;
     totalSum = Number(totalSum);
+    if (vat_included == 0) {
+        if (couponAmount) {
+            totalVat -= Math.abs(Number(couponAmount.value)) * Number(document.getElementById(
+                "product_vat_rate-"+arrProductId[0]['id']).value) / 100;
+        }
+        totalSum += Number(totalVat);
+    } else {
+        if (couponAmount) {
+            totalVat -= Math.abs(Number(couponAmount.value)) / (1 + Number(document.getElementById(
+            "product_vat_rate-"+arrProductId[0]['id']).value) / 100) * Number(document.getElementById(
+            "product_vat_rate-"+arrProductId[0]['id']).value) / 100;
+        }
+    }
+    totalVat = Math.round(totalVat / 0.05) * 0.05;
+
+    // add shipping and payment cost
     totalSum +=
         Number(document.getElementsByName("shipmentAmount")[0].value)
         + Number(document.getElementsByName("paymentAmount")[0].value);
-    totalSum = Math.round(totalSum*100)/100;
 
+    totalSum = Math.round(totalSum*100)/100;
     document.getElementsByName("sum")[1].value = totalSum.toFixed(2);
     document.getElementsByName("vatAmount")[0].value = totalVat.toFixed(2);
+}
+
+function calcShipPaymentCost() {
+    let totalSum = Number(document.getElementsByName("sum")[1].value);
+    totalSum -= Number(this.defaultValue);
+    totalSum += Number(this.value);
+    document.getElementsByName("sum")[1].value = totalSum.toFixed(2);
 }
 
 function swapSendToStatus()

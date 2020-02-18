@@ -604,7 +604,7 @@ class Product
         if (isset($date_start)) {
             $time_start = strtotime($date_start);
             // strtotime() will return unrecognized date when 0000-00-00 00:00:00
-            if ($time_start) {
+            if ($date_start && $date_start != '0000-00-00 00:00:00') {
                 $this->date_start =
                     date(ASCMS_DATE_FORMAT_INTERNATIONAL_DATETIME, $time_start);
             } else {
@@ -626,7 +626,7 @@ class Product
         if (isset($date_end)) {
             $time_end = strtotime($date_end);
             // strtotime() will return unrecognized date when 0000-00-00 00:00:00
-            if ($time_end) {
+            if ($time_end && $date_end != '0000-00-00 00:00:00') {
                 $this->date_end =
                     date(ASCMS_DATE_FORMAT_INTERNATIONAL_DATETIME, $time_end);
             } else {

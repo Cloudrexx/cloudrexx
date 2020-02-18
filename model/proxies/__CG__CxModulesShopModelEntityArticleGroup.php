@@ -277,12 +277,12 @@ class ArticleGroup extends \Cx\Modules\Shop\Model\Entity\ArticleGroup implements
     /**
      * {@inheritDoc}
      */
-    public function removeProduct(\Cx\Modules\Shop\Model\Entity\Product $produc)
+    public function removeProduct(\Cx\Modules\Shop\Model\Entity\Product $product)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeProduct', array($produc));
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeProduct', array($product));
 
-        return parent::removeProduct($produc);
+        return parent::removeProduct($product);
     }
 
     /**
@@ -327,6 +327,17 @@ class ArticleGroup extends \Cx\Modules\Shop\Model\Entity\ArticleGroup implements
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'isVirtual', array());
 
         return parent::isVirtual();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function initializeValidators()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'initializeValidators', array());
+
+        return parent::initializeValidators();
     }
 
     /**
