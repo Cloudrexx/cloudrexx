@@ -2364,14 +2364,16 @@ class CalendarEvent extends CalendarLibrary
     }
 
     /**
-     * Loads the location fields from the selected media directory entry
+     * Loads the location or host data from the specified MediaDir entry
      *
-     * @param integer $intMediaDirId  media directory Entry id
-     * @param string  $type           place type
-     *                                availble options are place or host
-     * @return null   it loads the place values based on the media directory Entry id and type
+     * @param integer $intMediaDirId  ID of the MediaDir entry
+     * @param string  $type           Set to 'place' to load entry as location
+     *                                data. Otherwise set to 'host' to load
+     *                                entry as host data.
+     * @return boolean                TRUE on success (data loaded), FALSE on
+     *                                failure (no data loaded).
      */
-    function loadPlaceFromMediadir($intMediaDirId = 0, $type = 'place')
+    public function loadPlaceFromMediadir($intMediaDirId = 0, $type = 'place')
     {
         $place         = '';
         $place_street  = '';
@@ -2381,57 +2383,87 @@ class CalendarEvent extends CalendarLibrary
         $place_website = '';
         $place_phone   = '';
 
-        if (!empty($intMediaDirId)) {
-            $objMediadirEntry = new \Cx\Modules\MediaDir\Controller\MediaDirectoryEntry('MediaDir');
-            $objMediadirEntry->getEntries(intval($intMediaDirId));
-            //get inputfield object
-            $objInputfields = new \Cx\Modules\MediaDir\Controller\MediaDirectoryInputfield($objMediadirEntry->arrEntries[$intMediaDirId]['entryFormId'],false,$objMediadirEntry->arrEntries[$intMediaDirId]['entryTranslationStatus'], 'MediaDir');
+        // reset any existing data
+        if ($type == 'place') {
+            $this->place         = $place;
+            $this->place_street  = $place_street;
+            $this->place_zip     = $place_zip;
+            $this->place_city    = $place_city;
+            $this->place_country = $place_country;
+            $this->place_website = $place_website;
+            $this->place_phone   = $place_phone;
+            $this->place_map     = '';
+            $this->google        = false;
+        } else {
+            $this->org_name   = $place;
+            $this->org_street = $place_street;
+            $this->org_zip    = $place_zip;
+            $this->org_city   = $place_city;
+            $this->org_country= $place_country;
+            $this->org_website= $place_website;
+            $this->org_phone  = $place_phone;
+            $this->org_email  = '';
+        }
 
-            foreach ($objInputfields->arrInputfields as $arrInputfield) {
+        // abort in case no entry from mediadir has been selected
+        if (empty($intMediaDirId)) {
+            return false;
+        }
 
-                $intInputfieldType = intval($arrInputfield['type']);
-                if ($intInputfieldType != 16 && $intInputfieldType != 17) {
-                    if(!empty($arrInputfield['type'])) {
-                        $strType = $arrInputfield['type_name'];
-                        $strInputfieldClass = "\Cx\Modules\MediaDir\Model\Entity\MediaDirectoryInputfield".ucfirst($strType);
-                        try {
-                            $objInputfield = \Cx\Modules\MediaDir\Controller\safeNew($strInputfieldClass,'MediaDir');
+        $objMediadirEntry = new \Cx\Modules\MediaDir\Controller\MediaDirectoryEntry('MediaDir');
+        $objMediadirEntry->getEntries(intval($intMediaDirId));
 
-                            if(intval($arrInputfield['type_multi_lang']) == 1) {
-                                $arrInputfieldContent = $objInputfield->getContent($intMediaDirId, $arrInputfield, $objMediadirEntry->arrEntries[$intMediaDirId]['entryTranslationStatus']);
-                            } else {
-                                $arrInputfieldContent = $objInputfield->getContent($intMediaDirId, $arrInputfield, null);
-                            }
+        // abort in case no entry could be found by the specified ID
+        if (!$objMediadirEntry->countEntries()) {
+            return false;
+        }
 
-                            switch ($arrInputfield['context_type']) {
-                                case 'title':
-                                    $place = end($arrInputfieldContent);
-                                    break;
-                                case 'address':
-                                    $place_street = end($arrInputfieldContent);
-                                    break;
-                                case 'zip':
-                                    $place_zip = end($arrInputfieldContent);
-                                    break;
-                                case 'city':
-                                    $place_city = end($arrInputfieldContent);
-                                    break;
-                                case 'country':
-                                    $place_country = end($arrInputfieldContent);
-                                    break;
-                                case 'website':
-                                    $place_website = end($arrInputfieldContent);
-                                    break;
-                                case 'phone':
-                                    $place_phone = end($arrInputfieldContent);
-                                    break;
-                            }
+        //get inputfield object
+        $objInputfields = new \Cx\Modules\MediaDir\Controller\MediaDirectoryInputfield($objMediadirEntry->arrEntries[$intMediaDirId]['entryFormId'],false,$objMediadirEntry->arrEntries[$intMediaDirId]['entryTranslationStatus'], 'MediaDir');
 
-                        } catch (Exception $error) {
-                            echo "Error: ".$error->getMessage();
-                        }
-                    }
+        foreach ($objInputfields->arrInputfields as $arrInputfield) {
+            if (empty($arrInputfield['type'])) {
+                continue;
+            }
+
+            $strType = $arrInputfield['type_name'];
+            $strInputfieldClass = "\Cx\Modules\MediaDir\Model\Entity\MediaDirectoryInputfield".ucfirst($strType);
+            try {
+                $objInputfield = \Cx\Modules\MediaDir\Controller\safeNew($strInputfieldClass,'MediaDir');
+
+                if(intval($arrInputfield['type_multi_lang']) == 1) {
+                    $arrInputfieldContent = $objInputfield->getContent($intMediaDirId, $arrInputfield, $objMediadirEntry->arrEntries[$intMediaDirId]['entryTranslationStatus']);
+                } else {
+                    $arrInputfieldContent = $objInputfield->getContent($intMediaDirId, $arrInputfield, null);
                 }
+
+                switch ($arrInputfield['context_type']) {
+                    case 'title':
+                        $place = end($arrInputfieldContent);
+                        break;
+                    case 'address':
+                        $place_street = end($arrInputfieldContent);
+                        break;
+                    case 'zip':
+                        $place_zip = end($arrInputfieldContent);
+                        break;
+                    case 'city':
+                        $place_city = end($arrInputfieldContent);
+                        break;
+                    case 'country':
+                        $place_country = end($arrInputfieldContent);
+                        break;
+                    case 'website':
+                        $place_website = end($arrInputfieldContent);
+                        break;
+                    case 'phone':
+                        $place_phone = end($arrInputfieldContent);
+                        break;
+                }
+
+            } catch (Exception $error) {
+                \DBG::dump($error->getMessage());
+                return false;
             }
         }
 
@@ -2456,6 +2488,7 @@ class CalendarEvent extends CalendarLibrary
             $this->org_email  = '';
         }
 
+        return true;
     }
 
     /**
