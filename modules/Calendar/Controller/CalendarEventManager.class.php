@@ -1563,9 +1563,6 @@ class CalendarEventManager extends CalendarLibrary
             }
             $picThumb = file_exists(\Env::get('cx')->getWebsitePath()."{$objEvent->pic}.thumb") ? "{$objEvent->pic}.thumb" : ($objEvent->pic != '' ? $objEvent->pic : '');
 
-            $placeWebsite      = $objEvent->place_website != '' ? "<a href='".$objEvent->place_website."' target='_blank' >".$objEvent->place_website."</a>" : "";
-            $placeWebsiteSource= $objEvent->place_website;
-
             $placeLink         = $objEvent->place_link != '' ? "<a href='".$objEvent->place_link."' target='_blank' >".$objEvent->place_link."</a>" : "";
             $placeLinkSource   = $objEvent->place_link;
             if ($this->arrSettings['placeData'] > 1 && $objEvent->locationType == 2) {
@@ -1573,8 +1570,8 @@ class CalendarEventManager extends CalendarLibrary
                 list($placeLink, $placeLinkSource) = $objEvent->loadPlaceLinkFromMediadir($objEvent->place_mediadir_id, 'place');
             }
 
-            $hostWebsite      = $objEvent->org_website != '' ? "<a href='".$objEvent->org_website."' target='_blank' >".$objEvent->org_website."</a>" : "";
-            $hostWebsiteSource= $objEvent->org_website;
+            $placeWebsite      = $objEvent->place_website != '' ? "<a href='".$objEvent->place_website."' target='_blank' >".$objEvent->place_website."</a>" : "";
+            $placeWebsiteSource= $objEvent->place_website;
 
             $hostLink         = $objEvent->org_link != '' ? "<a href='".$objEvent->org_link."' target='_blank' >".$objEvent->org_link."</a>" : "";
             $hostLinkSource   = $objEvent->org_link;
@@ -1582,6 +1579,9 @@ class CalendarEventManager extends CalendarLibrary
                 $objEvent->loadPlaceFromMediadir($objEvent->host_mediadir_id, 'host');
                 list($hostLink, $hostLinkSource) = $objEvent->loadPlaceLinkFromMediadir($objEvent->host_mediadir_id, 'host');
             }
+
+            $hostWebsite      = $objEvent->org_website != '' ? "<a href='".$objEvent->org_website."' target='_blank' >".$objEvent->org_website."</a>" : "";
+            $hostWebsiteSource= $objEvent->org_website;
 
             $startDate = $objEvent->startDate;
             $endDate   = $objEvent->endDate;
