@@ -971,40 +971,7 @@ class CalendarEventManager extends CalendarLibrary
         }
 
         // hide location template-block in case no location data has been set
-        if (
-            // manual entry
-            (
-                // option set to: manual entry only
-                $this->arrSettings['placeData'] == 1 || (
-                    // option set to: manual entry and mediadir selection
-                    $this->arrSettings['placeData'] == 3 &&
-                    // event has manual entry selected
-                    $objEvent->locationType == 1
-                )
-            ) &&
-            $objEvent->place == '' &&
-            $objEvent->place_street == '' &&
-            $objEvent->place_zip == '' &&
-            $objEvent->place_city == '' &&
-            $objEvent->place_country == '' &&
-            $objEvent->place_website == '' &&
-            $objEvent->place_phone == ''
-        ) {
-            $objTpl->hideBlock('calendarEventAddress');
-        } elseif (
-            // hide location template-block in case no mediadir entry has been
-            // selected
-            (
-                $this->arrSettings['placeData'] > 1 &&
-                $objEvent->locationType == 2 &&
-                !$objEvent->loadPlaceFromMediadir($objEvent->place_mediadir_id, 'place')
-            ) || (
-                // event has not been converted to new location type after
-                // option placeData has been changed
-                $this->arrSettings['placeData'] == 2 &&
-                $objEvent->locationType == 1
-            )
-        ) {
+        if (!$objEvent->loadLocationData()) {
             $objTpl->hideBlock('calendarEventAddress');
         // parse location template-block
         } else {
@@ -1121,40 +1088,7 @@ class CalendarEventManager extends CalendarLibrary
         }
 
         // hide host template-block in case no host data has been set
-        if (
-            // manual entry
-            (
-                // option set to: manual entry only
-                $this->arrSettings['placeDataHost'] == 1 || (
-                    // option set to: manual entry and mediadir selection
-                    $this->arrSettings['placeDataHost'] == 3 &&
-                    // event has manual entry selected
-                    $objEvent->hostType == 1
-                )
-            ) &&
-            $objEvent->org_name == '' &&
-            $objEvent->org_street == '' &&
-            $objEvent->org_zip == '' &&
-            $objEvent->org_city == '' &&
-            $objEvent->org_country == '' &&
-            $objEvent->org_website == '' &&
-            $objEvent->org_phone == ''
-        ) {
-            $objTpl->hideBlock('calendarEventHost');
-        } elseif (
-            // hide host template-block in case no mediadir entry has been
-            // selected
-            (
-                $this->arrSettings['placeDataHost'] > 1 &&
-                $objEvent->hostType == 2 &&
-                !$objEvent->loadPlaceFromMediadir($objEvent->host_mediadir_id, 'host')
-            ) || (
-                // event has not been converted to new host type after
-                // option placeDataHost has been changed
-                $this->arrSettings['placeDataHost'] == 2 &&
-                $objEvent->hostType == 1
-            )
-        ) {
+        if (!$objEvent->loadHostData()) {
             $objTpl->hideBlock('calendarEventHost');
         // parse host template-block
         } else {
@@ -1563,26 +1497,6 @@ class CalendarEventManager extends CalendarLibrary
             }
             $picThumb = file_exists(\Env::get('cx')->getWebsitePath()."{$objEvent->pic}.thumb") ? "{$objEvent->pic}.thumb" : ($objEvent->pic != '' ? $objEvent->pic : '');
 
-            $placeLink         = $objEvent->place_link != '' ? "<a href='".$objEvent->place_link."' target='_blank' >".$objEvent->place_link."</a>" : "";
-            $placeLinkSource   = $objEvent->place_link;
-            if ($this->arrSettings['placeData'] > 1 && $objEvent->locationType == 2) {
-                $objEvent->loadPlaceFromMediadir($objEvent->place_mediadir_id, 'place');
-                list($placeLink, $placeLinkSource) = $objEvent->loadPlaceLinkFromMediadir($objEvent->place_mediadir_id, 'place');
-            }
-
-            $placeWebsite      = $objEvent->place_website != '' ? "<a href='".$objEvent->place_website."' target='_blank' >".$objEvent->place_website."</a>" : "";
-            $placeWebsiteSource= $objEvent->place_website;
-
-            $hostLink         = $objEvent->org_link != '' ? "<a href='".$objEvent->org_link."' target='_blank' >".$objEvent->org_link."</a>" : "";
-            $hostLinkSource   = $objEvent->org_link;
-            if ($this->arrSettings['placeDataHost'] > 1 && $objEvent->hostType == 2) {
-                $objEvent->loadPlaceFromMediadir($objEvent->host_mediadir_id, 'host');
-                list($hostLink, $hostLinkSource) = $objEvent->loadPlaceLinkFromMediadir($objEvent->host_mediadir_id, 'host');
-            }
-
-            $hostWebsite      = $objEvent->org_website != '' ? "<a href='".$objEvent->org_website."' target='_blank' >".$objEvent->org_website."</a>" : "";
-            $hostWebsiteSource= $objEvent->org_website;
-
             $startDate = $objEvent->startDate;
             $endDate   = $objEvent->endDate;
             if (!$firstEndDate || $endDate < $firstEndDate) {
@@ -1610,7 +1524,6 @@ class CalendarEventManager extends CalendarLibrary
                 $this->moduleLangVar.'_EVENT_THUMBNAIL'      => $objEvent->pic != '' ? '<img src="'.$picThumb.'" alt="'.$objEvent->title.'" title="'.$objEvent->title.'" />' : '',
                 $this->moduleLangVar.'_EVENT_PRIORITY'       => $priority,
                 $this->moduleLangVar.'_EVENT_PRIORITY_IMG'   => $priorityImg,
-                $this->moduleLangVar.'_EVENT_PLACE'          => $objEvent->place,
                 $this->moduleLangVar.'_EVENT_DESCRIPTION'    => $objEvent->description,
                 $this->moduleLangVar.'_EVENT_SHORT_DESCRIPTION' => $parts[0].$points,
                 $this->moduleLangVar.'_EVENT_LINK'           => $objEvent->link ? "<a href='".$objEvent->link."' target='_blank' >".$objEvent->link."</a>" : "",
@@ -1682,105 +1595,152 @@ class CalendarEventManager extends CalendarLibrary
                 }
             }
 
-            $hasPlaceMap = !empty($objEvent->place_map) && file_exists(\Env::get('cx')->getWebsitePath().$objEvent->place_map);
-            if ($hasPlaceMap) {
-                $arrInfo   = getimagesize(\Env::get('cx')->getWebsitePath().$objEvent->place_map);
-                $picWidth  = $arrInfo[0]+20;
-                $picHeight = $arrInfo[1]+20;
-            }
-
-            $map_thumb_name = file_exists(\Env::get('cx')->getWebsitePath().$objEvent->place_map.".thumb") ? $objEvent->place_map.".thumb" : $objEvent->place_map;
-            $objTpl->setVariable(array(
-                $this->moduleLangVar.'_EVENT_LOCATION_PLACE'         => $objEvent->place,
-                $this->moduleLangVar.'_EVENT_LOCATION_ADDRESS'       => $objEvent->place_street,
-                $this->moduleLangVar.'_EVENT_LOCATION_ZIP'           => $objEvent->place_zip,
-                $this->moduleLangVar.'_EVENT_LOCATION_CITY'          => $objEvent->place_city,
-                $this->moduleLangVar.'_EVENT_LOCATION_COUNTRY'       => $objEvent->place_country,
-                $this->moduleLangVar.'_EVENT_LOCATION_WEBSITE'       => $placeWebsite,
-                $this->moduleLangVar.'_EVENT_LOCATION_WEBSITE_SOURCE'=> $placeWebsiteSource,
-                $this->moduleLangVar.'_EVENT_LOCATION_LINK'          => $placeLink,
-                $this->moduleLangVar.'_EVENT_LOCATION_LINK_SOURCE'   => $placeLinkSource,
-                $this->moduleLangVar.'_EVENT_LOCATION_PHONE'         => $objEvent->place_phone,
-                $this->moduleLangVar.'_EVENT_LOCATION_MAP_LINK'      => $hasPlaceMap ? '<a href="'.$objEvent->place_map.'" onClick="window.open(this.href,\'\',\'resizable=no,location=no,menubar=no,scrollbars=no,status=no,toolbar=no,fullscreen=no,dependent=no,width='.$picWidth.',height='.$picHeight.',status\'); return false">'.$_ARRAYLANG['TXT_CALENDAR_MAP'].'</a>' : "",
-                $this->moduleLangVar.'_EVENT_LOCATION_MAP_THUMBNAIL' => $hasPlaceMap ? '<a href="'.$objEvent->place_map.'" onClick="window.open(this.href,\'\',\'resizable=no,location=no,menubar=no,scrollbars=no,status=no,toolbar=no,fullscreen=no,dependent=no,width='.$picWidth.',height='.$picHeight.',status\'); return false"><img src="'.$map_thumb_name.'" border="0" alt="'.$objEvent->place_map.'" /></a>' : "",
-                $this->moduleLangVar.'_EVENT_LOCATION_MAP_SOURCE'    => $hasPlaceMap ? $objEvent->place_map : '',
-
-                $this->moduleLangVar.'_EVENT_HOST'              => $objEvent->org_name,
-                $this->moduleLangVar.'_EVENT_HOST_ADDRESS'      => $objEvent->org_street,
-                $this->moduleLangVar.'_EVENT_HOST_ZIP'          => $objEvent->org_zip,
-                $this->moduleLangVar.'_EVENT_HOST_CITY'         => $objEvent->org_city,
-                $this->moduleLangVar.'_EVENT_HOST_COUNTRY'      => $objEvent->org_country,
-                $this->moduleLangVar.'_EVENT_HOST_WEBSITE'      => $hostWebsite,
-                $this->moduleLangVar.'_EVENT_HOST_WEBSITE_SOURCE'=> $hostWebsiteSource,
-                $this->moduleLangVar.'_EVENT_HOST_LINK'         => $hostLink,
-                $this->moduleLangVar.'_EVENT_HOST_LINK_SOURCE'  => $hostLinkSource,
-                $this->moduleLangVar.'_EVENT_HOST_PHONE'        => $objEvent->org_phone,
-                $this->moduleLangVar.'_EVENT_HOST_EMAIL'        => $objEvent->org_email != '' ? "<a href='mailto:".$objEvent->org_email."' >".$objEvent->org_email."</a>" : "",
-                $this->moduleLangVar.'_EVENT_HOST_EMAIL_SOURCE' => $objEvent->org_email,
-            ));
-
-            if ($objTpl->blockExists('event_location_website')) {
-                if (empty($placeWebsite)) {
-                    $objTpl->hideBlock('event_location_website');
+            // hide location template-block in case no location data has been set
+            if (!$objEvent->loadLocationData()) {
+                $objTpl->hideBlock('event_location');
+                $objTpl->hideBlock('event_location_website');
+                $objTpl->hideBlock('event_location_link');
+                $objTpl->hideBlock('event_location_phone');
+                $objTpl->hideBlock('event_location_map');
+            // parse location template-block
+            } else {
+                if ($this->arrSettings['placeData'] > 1 && $objEvent->locationType == 2) {
+                    list($placeLink, $placeLinkSource) = $objEvent->loadPlaceLinkFromMediadir($objEvent->place_mediadir_id, 'place');
                 } else {
-                    $objTpl->touchBlock('event_location_website');
+                    $placeLink         = $objEvent->place_link != '' ? "<a href='".$objEvent->place_link."' target='_blank' >".$objEvent->place_link."</a>" : "";
+                    $placeLinkSource   = $objEvent->place_link;
                 }
-            }
 
-            if ($objTpl->blockExists('event_location_link')) {
-                if (empty($placeLink)) {
-                    $objTpl->hideBlock('event_location_link');
-                } else {
-                    $objTpl->touchBlock('event_location_link');
-                }
-            }
+                $placeWebsite      = $objEvent->place_website != '' ? "<a href='".$objEvent->place_website."' target='_blank' >".$objEvent->place_website."</a>" : "";
+                $placeWebsiteSource= $objEvent->place_website;
 
-            if ($objTpl->blockExists('event_location_phone')) {
-                if (empty($objEvent->place_phone)) {
-                    $objTpl->hideBlock('event_location_phone');
-                } else {
-                    $objTpl->touchBlock('event_location_phone');
-                }
-            }
-
-            if ($objTpl->blockExists('event_location_map')) {
+                $hasPlaceMap = !empty($objEvent->place_map) && file_exists(\Env::get('cx')->getWebsitePath().$objEvent->place_map);
                 if ($hasPlaceMap) {
-                    $objTpl->touchBlock('event_location_map');
-                } else {
-                    $objTpl->hideBlock('event_location_map');
+                    $arrInfo   = getimagesize(\Env::get('cx')->getWebsitePath().$objEvent->place_map);
+                    $picWidth  = $arrInfo[0]+20;
+                    $picHeight = $arrInfo[1]+20;
                 }
+                $map_thumb_name = file_exists(\Env::get('cx')->getWebsitePath().$objEvent->place_map.".thumb") ? $objEvent->place_map.".thumb" : $objEvent->place_map;
+
+                $objTpl->setVariable(array(
+                    $this->moduleLangVar.'_EVENT_PLACE'          => $objEvent->place,
+                    $this->moduleLangVar.'_EVENT_LOCATION_PLACE'         => $objEvent->place,
+                    $this->moduleLangVar.'_EVENT_LOCATION_ADDRESS'       => $objEvent->place_street,
+                    $this->moduleLangVar.'_EVENT_LOCATION_ZIP'           => $objEvent->place_zip,
+                    $this->moduleLangVar.'_EVENT_LOCATION_CITY'          => $objEvent->place_city,
+                    $this->moduleLangVar.'_EVENT_LOCATION_COUNTRY'       => $objEvent->place_country,
+                    $this->moduleLangVar.'_EVENT_LOCATION_WEBSITE'       => $placeWebsite,
+                    $this->moduleLangVar.'_EVENT_LOCATION_WEBSITE_SOURCE'=> $placeWebsiteSource,
+                    $this->moduleLangVar.'_EVENT_LOCATION_LINK'          => $placeLink,
+                    $this->moduleLangVar.'_EVENT_LOCATION_LINK_SOURCE'   => $placeLinkSource,
+                    $this->moduleLangVar.'_EVENT_LOCATION_PHONE'         => $objEvent->place_phone,
+                    $this->moduleLangVar.'_EVENT_LOCATION_MAP_LINK'      => $hasPlaceMap ? '<a href="'.$objEvent->place_map.'" onClick="window.open(this.href,\'\',\'resizable=no,location=no,menubar=no,scrollbars=no,status=no,toolbar=no,fullscreen=no,dependent=no,width='.$picWidth.',height='.$picHeight.',status\'); return false">'.$_ARRAYLANG['TXT_CALENDAR_MAP'].'</a>' : "",
+                    $this->moduleLangVar.'_EVENT_LOCATION_MAP_THUMBNAIL' => $hasPlaceMap ? '<a href="'.$objEvent->place_map.'" onClick="window.open(this.href,\'\',\'resizable=no,location=no,menubar=no,scrollbars=no,status=no,toolbar=no,fullscreen=no,dependent=no,width='.$picWidth.',height='.$picHeight.',status\'); return false"><img src="'.$map_thumb_name.'" border="0" alt="'.$objEvent->place_map.'" /></a>' : "",
+                    $this->moduleLangVar.'_EVENT_LOCATION_MAP_SOURCE'    => $hasPlaceMap ? $objEvent->place_map : '',
+                ));
+
+                if ($objTpl->blockExists('event_location_website')) {
+                    if (empty($placeWebsite)) {
+                        $objTpl->hideBlock('event_location_website');
+                    } else {
+                        $objTpl->touchBlock('event_location_website');
+                    }
+                }
+
+                if ($objTpl->blockExists('event_location_link')) {
+                    if (empty($placeLink)) {
+                        $objTpl->hideBlock('event_location_link');
+                    } else {
+                        $objTpl->touchBlock('event_location_link');
+                    }
+                }
+
+                if ($objTpl->blockExists('event_location_phone')) {
+                    if (empty($objEvent->place_phone)) {
+                        $objTpl->hideBlock('event_location_phone');
+                    } else {
+                        $objTpl->touchBlock('event_location_phone');
+                    }
+                }
+
+                if ($objTpl->blockExists('event_location_map')) {
+                    if ($hasPlaceMap) {
+                        $objTpl->touchBlock('event_location_map');
+                    } else {
+                        $objTpl->hideBlock('event_location_map');
+                    }
+                }
+
+                $objTpl->touchBlock('event_location');
             }
 
-            if ($objTpl->blockExists('event_host_website')) {
-                if (empty($hostWebsite)) {
-                    $objTpl->hideBlock('event_host_website');
-                } else {
-                    $objTpl->touchBlock('event_host_website');
+            // hide host template-block in case no host data has been set
+            if (!$objEvent->loadHostData()) {
+                $objTpl->hideBlock('event_host');
+                $objTpl->hideBlock('event_host_website');
+                $objTpl->hideBlock('event_host_link');
+                $objTpl->hideBlock('event_host_phone');
+                $objTpl->hideBlock('event_host_email');
+            // parse host template-block
+            } else {
+                $hostLink         = $objEvent->org_link != '' ? "<a href='".$objEvent->org_link."' target='_blank' >".$objEvent->org_link."</a>" : "";
+                $hostLinkSource   = $objEvent->org_link;
+                if ($this->arrSettings['placeDataHost'] > 1 && $objEvent->hostType == 2) {
+                    $objEvent->loadPlaceFromMediadir($objEvent->host_mediadir_id, 'host');
+                    list($hostLink, $hostLinkSource) = $objEvent->loadPlaceLinkFromMediadir($objEvent->host_mediadir_id, 'host');
                 }
-            }
 
-            if ($objTpl->blockExists('event_host_link')) {
-                if (empty($hostLink)) {
-                    $objTpl->hideBlock('event_host_link');
-                } else {
-                    $objTpl->touchBlock('event_host_link');
-                }
-            }
+                $hostWebsite      = $objEvent->org_website != '' ? "<a href='".$objEvent->org_website."' target='_blank' >".$objEvent->org_website."</a>" : "";
+                $hostWebsiteSource= $objEvent->org_website;
 
-            if ($objTpl->blockExists('event_host_phone')) {
-                if (empty($objEvent->org_phone)) {
-                    $objTpl->hideBlock('event_host_phone');
-                } else {
-                    $objTpl->touchBlock('event_host_phone');
-                }
-            }
+                $objTpl->setVariable(array(
+                    $this->moduleLangVar.'_EVENT_HOST'              => $objEvent->org_name,
+                    $this->moduleLangVar.'_EVENT_HOST_ADDRESS'      => $objEvent->org_street,
+                    $this->moduleLangVar.'_EVENT_HOST_ZIP'          => $objEvent->org_zip,
+                    $this->moduleLangVar.'_EVENT_HOST_CITY'         => $objEvent->org_city,
+                    $this->moduleLangVar.'_EVENT_HOST_COUNTRY'      => $objEvent->org_country,
+                    $this->moduleLangVar.'_EVENT_HOST_WEBSITE'      => $hostWebsite,
+                    $this->moduleLangVar.'_EVENT_HOST_WEBSITE_SOURCE'=> $hostWebsiteSource,
+                    $this->moduleLangVar.'_EVENT_HOST_LINK'         => $hostLink,
+                    $this->moduleLangVar.'_EVENT_HOST_LINK_SOURCE'  => $hostLinkSource,
+                    $this->moduleLangVar.'_EVENT_HOST_PHONE'        => $objEvent->org_phone,
+                    $this->moduleLangVar.'_EVENT_HOST_EMAIL'        => $objEvent->org_email != '' ? "<a href='mailto:".$objEvent->org_email."' >".$objEvent->org_email."</a>" : "",
+                    $this->moduleLangVar.'_EVENT_HOST_EMAIL_SOURCE' => $objEvent->org_email,
+                ));
 
-            if ($objTpl->blockExists('event_host_email')) {
-                if (empty($objEvent->org_email)) {
-                    $objTpl->hideBlock('event_host_email');
-                } else {
-                    $objTpl->touchBlock('event_host_email');
+                if ($objTpl->blockExists('event_host_website')) {
+                    if (empty($hostWebsite)) {
+                        $objTpl->hideBlock('event_host_website');
+                    } else {
+                        $objTpl->touchBlock('event_host_website');
+                    }
                 }
+
+                if ($objTpl->blockExists('event_host_link')) {
+                    if (empty($hostLink)) {
+                        $objTpl->hideBlock('event_host_link');
+                    } else {
+                        $objTpl->touchBlock('event_host_link');
+                    }
+                }
+
+                if ($objTpl->blockExists('event_host_phone')) {
+                    if (empty($objEvent->org_phone)) {
+                        $objTpl->hideBlock('event_host_phone');
+                    } else {
+                        $objTpl->touchBlock('event_host_phone');
+                    }
+                }
+
+                if ($objTpl->blockExists('event_host_email')) {
+                    if (empty($objEvent->org_email)) {
+                        $objTpl->hideBlock('event_host_email');
+                    } else {
+                        $objTpl->touchBlock('event_host_email');
+                    }
+                }
+
+                $objTpl->touchBlock('event_host');
             }
 
             if($objInit->mode == 'backend') {
