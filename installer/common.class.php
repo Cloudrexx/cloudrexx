@@ -1304,25 +1304,34 @@ class CommonFunctions
         if ($objDb !== false) {
             #$objDb->debug = true;
             $user = new \User();
-            if ($objUser = \FWUser::getFWUserObject()->objUser->getUser($id = 1)) {
-                $objUser->setUsername($_SESSION['installer']['account']['username']);
-                $objUser->setPassword($user->hashPassword($_SESSION['installer']['account']['password']));
-                $objUser->setEmail($_SESSION['installer']['account']['email']);
-                $objUser->setFrontendLanguage(1);
-                $objUser->setBackendLanguage($userLangId);
-                $objUser->setActiveStatus(1);
-                if ($objUser->store()) {
-                    $objUser->setProfile(
-                        array(
-                            'firstname' => array($_SESSION['installer']['sysConfig']['adminName']),
-                            'lastname' => array(''),
-                        )
-                    );
-                    if ($objUser->store()) {
-                        return true;
-                    }
-                } else {
-                    return $_ARRLANG['TXT_COULD_NOT_CREATE_ADMIN_ACCOUNT'];
+            $query = "UPDATE `".$_SESSION['installer']['config']['dbTablePrefix']."access_users`
+                         SET `username` = '".$_SESSION['installer']['account']['username']."',
+                             `password` = '" . $user->hashPassword($_SESSION['installer']['account']['password']) . "',
+                             `regdate` = '".time()."',
+                             `email` = '".$_SESSION['installer']['account']['email']."',
+                             `frontend_lang_id` = 1,
+                             `backend_lang_id` = '".$userLangId."',
+                             `active` = 1
+                       WHERE `id` = 1";
+            if ($objDb->Execute($query) !== false) {
+                $queryFirstname = "UPDATE `".$_SESSION['installer']['config']['dbTablePrefix']."access_user_attribute_value` AS `value`
+                    LEFT JOIN `".$_SESSION['installer']['config']['dbTablePrefix']."access_user_attribute_name` AS `name`
+                        ON `name`.`attribute_id` = `value`.`attribute_id`
+                    SET `value` = '".$_SESSION['installer']['sysConfig']['adminName']."'
+                    WHERE `value`.`user_id` = 1 AND `name`.`name` = 'firstname'";
+
+                if ($objDb->Execute($queryFirstname) !== false) {
+                    return true;
+                }
+
+                $queryLastname = "UPDATE `".$_SESSION['installer']['config']['dbTablePrefix']."access_user_attribute_value` AS `value`
+                    LEFT JOIN `".$_SESSION['installer']['config']['dbTablePrefix']."access_user_attribute_name` AS `name`
+                        ON `name`.`attribute_id` = `value`.`attribute_id`
+                    SET `value` = ''
+                    WHERE `value`.`user_id` = 1 AND `name`.`name` = 'lastname'";
+
+                if ($objDb->Execute($queryLastname) !== false) {
+                    return true;
                 }
             }
         }

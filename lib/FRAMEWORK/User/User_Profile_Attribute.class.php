@@ -796,10 +796,9 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
      * @param int   $limit  limit of database query
      * @param int   $offset offset of database query
      * @param int   $count  count of entries
-     * @param array $images contains all images from image attributes
-     * @return bool if the database query was successful
+     * @return array images names
      */
-    public function getImages($limit, $offset, &$count, &$images)
+    public function getImages($limit, $offset, &$count)
     {
         global $objDatabase;
 
@@ -811,7 +810,7 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
 
         $objCount = $objDatabase->Execute($query);
         if (!$objCount || !$objCount->fields['entryCount']) {
-            return false;
+            return array();
         }
 
         $count = $objCount->fields['entryCount'];
@@ -825,15 +824,16 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
 
         $objImage = $objDatabase->SelectLimit($query, $limit, $offset);
         if ($objImage === false) {
-            return false;
+            return array();
         }
 
+        $images = array();
         while (!$objImage->EOF) {
             $images[] = $objImage->fields['picture'];
             $objImage->MoveNext();
         }
 
-        return true;
+        return $images;
     }
 
     /**

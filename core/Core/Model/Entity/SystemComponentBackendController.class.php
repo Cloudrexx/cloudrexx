@@ -97,6 +97,8 @@ class SystemComponentBackendController extends Controller {
             $cmd = explode('/', contrexx_input2raw($_GET['act']));
         }
 
+        $navigation = $this->parseNavigation($cmd);
+
         $actTemplate = new \Cx\Core\Html\Sigma($this->getDirectory(false) . '/View/Template/Backend');
         $filename = $cmd[0] . '.html';
         $testFilename = $cmd[0];
@@ -119,7 +121,6 @@ class SystemComponentBackendController extends Controller {
         $actTemplate->loadTemplateFile($filename);
 
         // todo: Messages
-        $navigation = $this->parseNavigation($cmd);
         $this->parsePage($actTemplate, $cmd);
         $txt = $cmd[0];
         if (empty($txt)) {

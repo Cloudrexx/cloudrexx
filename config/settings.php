@@ -97,7 +97,6 @@ $_CONFIG['installationId']                = "OpenSourceId4ddd08c0115f967d5ca40af
 * Component
 * -------------------------------------------------------------------------
 */
-$_CONFIG['bannerStatus']                  = 0;
 $_CONFIG['spamKeywords']                  = "sex, viagra";
 $_CONFIG['newsTeasersStatus']             = 1;
 $_CONFIG['feedNewsMLStatus']              = 0;

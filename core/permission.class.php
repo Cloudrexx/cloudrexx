@@ -199,7 +199,7 @@ class Permission
             $type = 'backend';
         }
 
-        $objGroup = $objFWUser->objGroup->getGroups(array('type' => $type));
+        $objGroup = $objFWUser->objGroup->getGroups(array('type' => $type), array('group_name' => 'asc'));
         $groups = array();
         while (!$objGroup->EOF) {
             $groups[$objGroup->getId()] = $objGroup->getName();

@@ -506,4 +506,39 @@ class DoctrineRepository extends DataSource {
             }
         }
     }
+
+    /**
+     * Check if the DataSource is Gedmo\Loggable.
+     *
+     * @inheritDoc
+     */
+    public function isVersionable() : bool {
+        return is_a($this->getIdentifier(), '\Gedmo\Loggable\Loggable', true);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getCurrentVersion(array $elementId) : int {
+        $em = $this->cx->getDb()->getEntityManager();
+
+        $logRepo = $em->getRepository(
+            $this->cx->getDb()->getLoggableListener()->getLogEntryClassForEntityClass(
+                $this->getIdentifier()
+            )
+        );
+
+        $entity = $logRepo->findOneBy(
+            array(
+                'objectId' => $elementId,
+                'objectClass' => ltrim($this->getIdentifier(), '/'),
+            ),
+            array(
+                'version' => DESC,
+            )
+        );
+
+        //since we select one entry, we can get the version number of the first entry in our array
+        return $entity->getVersion();
+    }
 }

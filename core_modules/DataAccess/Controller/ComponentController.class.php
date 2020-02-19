@@ -164,7 +164,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             }
             $dataSource = $this->getDataSource($arguments[1]);
             $elementId = array();
-            if (isset($arguments[2])) {
+            if (!empty($arguments[2])) {
                 $argumentKeys = array_keys($arguments);
                 $primaryKeyNames = $dataSource->getIdentifierFieldNames();
                 for ($i = 0; $i < count($arguments) - 2; $i++) {
@@ -178,6 +178,24 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             $apiKey = null;
             if (isset($arguments['apikey'])) {
                 $apiKey = $arguments['apikey'];
+            }
+
+            $requestReadonly = in_array($method, array('options', 'head', 'get'));
+
+            if (
+                $dataSource->isVersionable() &&
+                !$requestReadonly &&
+                (
+                    !isset($arguments['version']) ||
+                    $dataSource->getCurrentVersion($elementId) != $arguments['version']
+                )
+            ) {
+                $response->setStatusCode(409);
+                throw new \Cx\Core\Error\Model\Entity\ShinyException(
+                    'The current version of this object is newer than the ' .
+                        'version number you supplied or no version number ' .
+                        'was supplied. Please (re-)fetch first.'
+                );
             }
             
             $order = array();
@@ -239,7 +257,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             );
             if (!$dataAccess) {
                 $response->setStatusCode(403);
-                throw new \BadMethodCallException('Access denied');
+                throw new \Cx\Core\Error\Model\Entity\ShinyException('Access denied');
             }
             
             if (
@@ -247,7 +265,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 !in_array($arguments[0], $dataAccess->getAllowedOutputMethods())
             ) {
                 $response->setStatusCode(403);
-                throw new \BadMethodCallException('Access denied');
+                throw new \Cx\Core\Error\Model\Entity\ShinyException('Access denied');
             }
             
             if (count($dataAccess->getAccessCondition())) {
@@ -255,6 +273,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             }
             
             $data = array();
+            $metaData = array();
             switch ($method) {
                 // administrative access
                 case 'options':
@@ -290,7 +309,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                     // should be 404 if element is not set or not found
                     $data = $dataSource->remove($elementId);
                     break;
-                
+
                 // read access
                 case 'head':
                     // return the same headers as 'get', but no body
@@ -300,13 +319,37 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                     // should be 200
                     // should be 404 if item not found
                     $data = $dataSource->get($elementId, $filter, $order, $limit, $offset, $dataAccess->getFieldList());
+                    if ($dataSource->isVersionable()) {
+                        $metaData['version'] = array();
+                        if (!empty($elementId)) {
+                            $metaData['version'] = $dataSource->getCurrentVersion(
+                                $elementId
+                            );
+                        } else {
+                            foreach (array_keys($data) as $key) {
+                                $metaData['version'][$key] = $dataSource->getCurrentVersion(
+                                    explode('/', $key)
+                                );
+                            }
+                        }
+                    }
                     break;
             }
             $response->setStatus(
                 \Cx\Core_Modules\DataAccess\Model\Entity\ApiResponse::STATUS_OK
             );
             $response->setData($data);
-            
+            $response->setMetadata($metaData);
+
+            $response->send($outputModule);
+        } catch (\Cx\Core\Error\Model\Entity\ShinyException $e) {
+            $response->setStatus(
+                \Cx\Core_Modules\DataAccess\Model\Entity\ApiResponse::STATUS_ERROR
+            );
+            $response->addMessage(
+                \Cx\Core_Modules\DataAccess\Model\Entity\ApiResponse::MESSAGE_TYPE_ERROR,
+                $e->getMessage()
+            );
             $response->send($outputModule);
         } catch (\Exception $e) {
             $lang = \Env::get('init')->getComponentSpecificLanguageData(
