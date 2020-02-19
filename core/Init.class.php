@@ -532,8 +532,6 @@ class InitCMS
         $this->templates['directory_content']       = $this->getThemeFileContent($themesPath, 'directory.html');
         $this->templates['forum_content']           = $this->getThemeFileContent($themesPath, 'forum.html');
         $this->templates['podcast_content']         = $this->getThemeFileContent($themesPath, 'podcast.html');
-        $this->templates['blog_content']            = $this->getThemeFileContent($themesPath, 'blog.html');
-        $this->templates['immo']                    = $this->getThemeFileContent($themesPath, 'immo.html');
 
         if (!$this->hasCustomContent() || !$this->loadCustomContent($page)) {
             // load default content layout if page doesn't have a custom content

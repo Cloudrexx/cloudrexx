@@ -524,6 +524,11 @@ class UserGroup
         $this->type = in_array($type, $this->arrTypes) ? $type : $this->defaultType;
     }
 
+    /**
+     * Set toolbar
+     *
+     * @param int $toolbar toolbar id
+     */
     public function setToolbar($toolbar)
     {
         $this->toolbar = $toolbar;

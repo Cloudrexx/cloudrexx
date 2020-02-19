@@ -122,7 +122,7 @@ class DocSysLibrary
 
         $query = "
             SELECT entry.id, entry.date, entry.author, entry.title,
-                   entry.status, entry.changelog
+                   entry.status, entry.changelog, entry.userid
               FROM " . DBPREFIX . "module_docsys" . MODULE_INDEX . " AS entry
              WHERE entry.lang=$this->langId
              ORDER BY entry.id";
@@ -132,11 +132,9 @@ class DocSysLibrary
             return false;
         }
         $retval = array();
+        $userIds = array();
         while (!$objResult->EOF) {
-            $objUser = \FWUser::getFWUserObject()->objUser->getUser($id = $objResult->fields['id']);
-            if ($objUser !== false) {
-                $username = $objUser->getRealUsername();
-            }
+            $userIds[$objResult->fields['id']] = $objResult->fields['userid'];
             $retval[$objResult->fields['id']] = array(
                 "id" => $objResult->fields['id'],
                 "date" => $objResult->fields['date'],
@@ -144,10 +142,22 @@ class DocSysLibrary
                 "title" => $objResult->fields['title'],
                 "status" => $objResult->fields['status'],
                 "changelog" => $objResult->fields['changelog'],
-                "username" => $username
+                "username" => '',
             );
 
             $objResult->MoveNext();
+        }
+
+        $fwUser = \FWUser::getFWUserObject()->objUser;
+        $objUser = $fwUser->getUsers(array('id' => array_unique(array_values($userIds))));
+        if ($objUser !== false) {;
+            while (!$objUser->EOF) {
+                $keys = array_keys($userIds, $objUser->getId());
+                foreach ($keys as $key) {
+                    $retval[$key]['username'] = $objUser->getRealUsername();
+                }
+                $objUser->next();
+            }
         }
 
         $query = "

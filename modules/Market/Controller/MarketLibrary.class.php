@@ -356,8 +356,6 @@ class MarketLibrary
         //accessuserdata
         $objUser = $objFWUser->objUser->getUser(intval($entryUserid));
         if ($objUser !== false) {
-// TODO: Never used
-//          $userMail = $objUser->getEmail();
             $userUsername = $objUser->getRealUsername();
         }
 

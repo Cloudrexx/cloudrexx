@@ -249,7 +249,21 @@ class ClassLoader {
         }
         $parts = explode('\\', $name);
         // new classes should be in namespace \Cx\something
-        if (!in_array(current($parts), array('Cx', 'Doctrine', 'Gedmo', 'DoctrineExtension', 'Symfony')) || count($parts) < 2) {
+        // TODO: Use Composer's class autoloading for libraries
+        if (
+            !in_array(
+                current($parts),
+                array(
+                    'Cx',
+                    'Doctrine',
+                    'Gedmo',
+                    'DoctrineExtension', // /model/extensions
+                    'DoctrineExtensions', // /lib/doctrine/beberlei/doctrineextensions/src
+                    'Symfony',
+                )
+            ) ||
+            count($parts) < 2
+        ) {
             return false;
         }
         if (substr($name, 0, 8) == 'PHPUnit_') {
@@ -285,6 +299,19 @@ class ClassLoader {
             $suffix = '';
             $parts = array_merge(array('Cx', 'Lib', 'doctrine'), $parts);
             //$parts = array_merge(array('Cx', 'Model', 'entities'), $parts);
+        } else if ($parts[0] == 'DoctrineExtensions') {
+            $suffix = '';
+            $parts = array_merge(
+                array(
+                    'Cx',
+                    'Lib',
+                    'doctrine',
+                    'beberlei',
+                    strtolower(array_shift($parts)),
+                    'src'
+                ),
+                $parts
+            );
         } else if ($parts[0] == 'Doctrine') {
             $suffix = '';
             if ($parts[1] == 'ORM') {

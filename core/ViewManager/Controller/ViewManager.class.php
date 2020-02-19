@@ -153,8 +153,6 @@ class ViewManager
         'component.yml',
         'forum.html',
         'podcast.html',
-        'blog.html',
-        'immo.html',
     );
 
     /**
