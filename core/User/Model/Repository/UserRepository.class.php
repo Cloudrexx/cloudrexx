@@ -87,4 +87,19 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
 
         return $qb->getQuery()->getResult();
     }
+
+    /**
+     * Finds User entities by a set of filters with a specified pattern
+     *
+     * @param array $filter Set of filters for filtering users
+     */
+    public function findByLike($filter)
+    {
+        $qb = $this->createQueryBuilder('u');
+        foreach ($filter as $key=>$value) {
+            $qb->andWhere($qb->expr()->like('u'.$key, ':value'. $key))->setParameter('value'.$key, $value);
+        }
+
+        $qb->getQuery()->getResult();
+    }
 }
