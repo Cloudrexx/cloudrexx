@@ -427,18 +427,27 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
     {
         $arrSettings = \User_Setting::getSettings();
 
-        $filter = array(
-            'active'            => true,
-            'birthday_day'      => date('j'),
-            'birthday_month'    => date('n')
-        );
-        if ($arrSettings['block_birthday_users_pic']['status']) {
-            $filter['picture'] = array('!=' => '');
-        }
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $qb = $em->createQueryBuilder();
+        $qb->select('u')
+            ->from('Cx\Core\User\Model\Entity\User', 'u')
+            ->where($qb->expr()->eq('u.active', ':active'))
+            ->setParameter('active', 1)
+            ->setMaxResults(1);
 
-        $objFWUser = \FWUser::getFWUserObject();
-        if ($objFWUser->objUser->getUsers($filter, null, null, null, 1))
+        $this->addBirthdayToQueryBuilder(
+            $qb,
+            array(date('n')),
+            array(date('j'))
+        );
+        $this->addPicToQueryBuilder(
+            $qb, $arrSettings['block_birthday_users_pic']['status']
+        );
+
+        if ($qb->getQuery()->getResult()) {
             return true;
+        }
         return false;
     }
 
