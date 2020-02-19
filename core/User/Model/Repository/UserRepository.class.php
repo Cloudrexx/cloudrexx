@@ -65,4 +65,26 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
         $this->_em->persist($user);
         $this->_em->flush();
     }
+
+    /**
+     * Find users by group ids
+     *
+     * @param array $groupIds    group ids to filter users
+     * @param array $otherFilter other filters to filter for users
+     * @return array user result
+     */
+    public function findByGroup($groupIds, $otherFilter)
+    {
+        $qb = $this->createQueryBuilder('u');
+        $qb->join('u.group', 'g')
+           ->where($qb->expr()->in('g.groupId', ':groupIds'))
+           ->setParameter('groupIds', $groupIds);
+
+        foreach ($otherFilter as $field=>$value) {
+            $qb->andWhere($qb->expr()->eq('u.' . $field, ':value' . $field))
+               ->setParameter('value'. $field, $value);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
 }
