@@ -375,64 +375,43 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
      */
     public function setNextBirthdayUsers($gender = '')
     {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $arrSettings = \User_Setting::getSettings();
         $dayOffset = $arrSettings['block_next_birthday_users']['value'];
 
+        $em = $cx->getDb()->getEntityManager();
+        $qb = $em->createQueryBuilder();
+        $qb->select('u')
+            ->from('Cx\Core\User\Model\Entity\User', 'u')
+            ->where($qb->expr()->eq('u.active', ':active'))
+            ->setParameter('active', 1)
+            ->orderBy('vBirth.value', 'ASC')
+            ->setMaxResults($arrSettings['block_birthday_users']['value']);
+
         $date = new \DateTime('tomorrow');
+        $months = array();
         $days = array();
         for ($i = 0; $i < $dayOffset + 1; $i++) {
-            $day = array(
-                'birthday_day' => $date->format('j'),
-                'birthday_month' => $date->format('n'),
-            );
-            array_push($days, $day);
+            $months[] = $date->format('n');
+            $days[] = $date->format('j');
+
             if ($dayOffset > 0) {
                 $date->modify('+1 day');
             }
         }
 
-        $filter = array(
-            'AND' => array(
-                0 => array(
-                    'active' => true,
-                ),
-                1 => array(
-                    'OR' => $days
-                )
-            )
+        $this->addPicToQueryBuilder(
+            $qb, $arrSettings['block_birthday_users_pic']['status']
         );
-        if ($arrSettings['block_birthday_users_pic']['status']) {
-            $filter['picture'] = array('!=' => '');
-        }
+        $this->addGenderToQueryBuilder($qb, $gender);
+        $this->addBirthdayToQueryBuilder($qb, $months, $days);
+        $users = $qb->getQuery()->getResult();
 
-        if (!empty($gender)) {
-            $filter['gender'] = 'gender_'.$gender;
-        }
-
-        $objFWUser = \FWUser::getFWUserObject();
-        $objUser = $objFWUser->objUser->getUsers(
-            $filter,
-            null,
-            // sort users by their anniversary
-            array(
-                'birthday'   => 'asc'
-            ),
-            null,
-            $arrSettings['block_birthday_users']['value']
-        );
-        if ($objUser) {
-            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-            $userRepo = $cx->getDb()->getEntityManager()->getRepository(
-                'Cx\Core\User\Model\Entity\User'
-            );
-            while (!$objUser->EOF) {
-                $user = $userRepo->find($objUser->getId());
-
+        if (!empty($users)) {
+            foreach ($users as $user) {
                 $this->parseBasePlaceholders($user);
 
                 $this->_objTpl->parse('access_next_birthday_' . (!empty($gender) ? $gender . '_' : '') . 'members');
-
-                $objUser->next();
             }
         } else {
             $this->_objTpl->hideBlock('access_next_birthday_' . (!empty($gender) ? $gender . '_' : '') . 'members');
