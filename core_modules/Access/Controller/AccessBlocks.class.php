@@ -286,50 +286,43 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
      */
     public function setBirthdayUsers($gender = '')
     {
+        // filter users by group association
+        $groupFilter = static::fetchGroupFilter(
+            $this->_objTpl, 'access_birthday_member_list'
+        );
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $arrSettings = \User_Setting::getSettings();
 
-        $filter = array(
-            'active'    => true,
-            'birthday_day'      => date('j'),
-            'birthday_month'    => date('n')
+        $em = $cx->getDb()->getEntityManager();
+        $qb = $em->createQueryBuilder();
+        $qb->select('u')
+            ->from('Cx\Core\User\Model\Entity\User', 'u')
+            ->where($qb->expr()->eq('u.active', ':active'))
+            ->setParameter('active', true);
+        $this->addPicToQueryBuilder(
+            $qb,
+            $arrSettings['block_birthday_users_pic']['status']
         );
-        if ($arrSettings['block_birthday_users_pic']['status']) {
-            $filter['picture'] = array('!=' => '');
-        }
-
-        if (!empty($gender)) {
-            $filter['gender'] = 'gender_'.$gender;
-        }
-
-        // filter users by group association
-        $groupFilter = static::fetchGroupFilter($this->_objTpl, 'access_birthday_member_list');
-        if ($groupFilter) {
-            $filter['group_id'] = $groupFilter;
-        }
-
-        $objFWUser = \FWUser::getFWUserObject();
-        $objUser = $objFWUser->objUser->getUsers(
-            $filter,
-            null,
-            array(
-                'regdate'    => 'desc',
-                'username'    => 'asc'
-            ),
-            null,
-            $arrSettings['block_birthday_users']['value']
+        $this->addGenderToQueryBuilder($qb, $gender);
+        $this->addGroupToQueryBuilder($qb, $groupFilter);
+        $this->addBirthdayToQueryBuilder(
+            $qb,
+            array(date('n')),
+            array(date('j'))
         );
-        if ($objUser) {
-            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-            $userRepo = $cx->getDb()->getEntityManager()->getRepository(
-                'Cx\Core\User\Model\Entity\User'
-            );
-            while (!$objUser->EOF) {
-                $user = $userRepo->find($objUser->getId());
+
+        $qb->orderBy('u.regdate', 'DESC')
+            ->addOrderBy('u.username', 'ASC')
+            ->setMaxResults($arrSettings['block_latest_reg_users']['value']);
+
+        $users = $qb->getQuery()->getResult();
+
+        if ($users) {
+            foreach ($users as $user) {
                 $this->parseBasePlaceholders($user);
 
                 $this->_objTpl->parse('access_birthday_'.(!empty($gender) ? $gender.'_' : '').'members');
-
-                $objUser->next();
             }
         } else {
             $this->_objTpl->hideBlock('access_birthday_'.(!empty($gender) ? $gender.'_' : '').'members');
