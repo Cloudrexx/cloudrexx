@@ -6026,14 +6026,11 @@ $WhereStatement = array();
             }
         }
 
-        $objFWUser = \FWUser::getFWUserObject();
-        $objUser = $objFWUser->objUser->getUsers(array('id' => $userIds));
-
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $userRepo = $cx->getDb()->getEntityManager()->getRepository(
             'Cx\Core\User\Model\Entity\User'
         );
-        $users = $userRepo->findBy(array('id' => $accessIds));
+        $users = $userRepo->findBy(array('id' => $userIds));
 
         if (!empty($users)) {
             foreach ($users as $objUser) {
