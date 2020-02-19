@@ -104,6 +104,18 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
     }
 
     /**
+     * Search in specific fields and return matching users
+     *
+     * @param string $term   the search term
+     * @param array  $fields fields to be searched
+     * @return array matching users
+     */
+    public function searchByTerm($term, $fields)
+    {
+        return $this->search($term, $fields, 'eq');
+    }
+
+    /**
      * Search user attributes and UserAttributes for a search term and return the matching users.
      * You can specify which operation should be used to search the attributes / UserAttributes.
      *
