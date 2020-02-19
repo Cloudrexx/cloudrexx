@@ -102,4 +102,77 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
 
         $qb->getQuery()->getResult();
     }
+
+    /**
+     * Search user attributes and UserAttributes for a search term and return the matching users.
+     * You can specify which operation should be used to search the attributes / UserAttributes.
+     *
+     * @param string $searchTerm the search term
+     * @param array  $fields     fields to be searched
+     * @param string $operation  operation to search the attributes / UserAttributes
+     * @return array matching users
+     */
+    protected function search($searchTerm, $fields, $operation)
+    {
+        $metaData = $this->getClassMetadata()->fieldNames;
+        $fwAttribute = \FWUser::getFWUserObject()->objUser->objAttribute;
+        $qb = $this->createQueryBuilder('u');
+        $attributeIds = array();
+
+        foreach ($fields as $field) {
+            if (in_array($field, $metaData)) {
+                // User
+                $qb->orWhere($this->getExpression('u.'. $field, $operation));
+                $qb->setParameter('valueu'.$field, $searchTerm);
+            } else {
+
+                // UserAttributeValue
+                // Find attribute id from default attribute
+                if ($fwAttribute->isCoreAttribute($field)) {
+                    $attributeIds[] = $fwAttribute->getAttributeIdByProfileAttributeId($field);
+                } else {
+                    $attributeIds[] = $field;
+                }
+            }
+        }
+
+        if (!empty($attributeIds)) {
+            $qb->join('u.userAttributeValue', 'v');
+            $qb->orWhere(
+                $qb->expr()->andX(
+                    $this->getExpression('v.attributeId', 'in'),
+                    $this->getExpression('v.value', $operation)
+                )
+            );
+            $qb->setParameter('valuevattributeId', $attributeIds);
+            $qb->setParameter('valuevvalue', $searchTerm);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * Get expression by its operation
+     *
+     * @param string $field     field name
+     * @param string $operation operation to use
+     * @return \Doctrine\ORM\Query\Expr\Comparison
+     */
+    protected function getExpression($field, $operation = 'eq')
+    {
+        $qb = $this->createQueryBuilder('e');
+        $valueName = preg_replace('/\./', '', 'value'.$field);
+        switch ($operation) {
+            case 'like':
+                $expr = $qb->expr()->like($field, ':'.$valueName);
+                break;
+            case 'in':
+                $expr = $qb->expr()->in($field, ':'.$valueName);
+                break;
+            default:
+                $expr = $qb->expr()->eq($field, ':'.$valueName);
+        }
+
+        return $expr;
+    }
 }
