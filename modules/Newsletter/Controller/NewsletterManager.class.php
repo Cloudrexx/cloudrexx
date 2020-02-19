@@ -2698,6 +2698,95 @@ class NewsletterManager extends NewsletterLib
     }
 
     /**
+     * Adding recipients to the recipient list by executing a specific query
+     *
+     * @param array   &$mailRecipients  all already existing mail recipients
+     * @param string  $type             part type
+     * @param boolean $distinctByType   if we should simulate a distinct
+     * @param string  $query            query to get mail recipients
+     * @param string  $queryToCheckUser query to check if the first query get the correct users
+     * @throws \Exception a database execution fails
+     */
+    protected function addMailRecipientPart(&$mailRecipients, $type, $distinctByType, $query, $queryToCheckUser = '')
+    {
+        global $objDatabase, $_ARRAYLANG;
+
+        $filterIds = array();
+        $filterKey = '';
+        $objResult = $objDatabase->Execute($query);
+        if ($objResult !== false) {
+            while (!$objResult->EOF) {
+                switch ($type) {
+                    case static::USER_TYPE_ACCESS:
+                        $filterIds[] = $objResult->fields['accessUserID'];
+                        $filterKey = 'id';
+                        break;
+                    case static::USER_TYPE_CORE: 
+                        $filterIds[] = $objResult->fields['userGroup'];
+                        $filterKey = 'group_id';
+                        break;
+                    default: // USER_TYPE_CRM & USER_TYPE_NEWSLETTER
+                        $email = $objResult->fields['email'];
+                        $this->simulateDistinct($distinctByType, $email, $type, $mailRecipients);
+                        break; 
+                }
+                $objResult->MoveNext();
+            }
+        } else {
+            throw new \Exception($_ARRAYLANG['TXT_DATABASE_ERROR']);
+        }
+
+        // In some cases, data must be taken directly from the user.  
+        if (!empty($filterIds)) {
+            $filter = array($filterKey => $filterIds, 'active' => 1);
+            $objUser = \FWUser::getFWUserObject()->objUser->getUsers($filter);
+
+            if ($objUser) {
+                while (!$objUser->EOF) {
+                    // Check if the received user is correct
+                    if (!empty($queryToCheckUser)) {
+                        $queryToCheckUser = sprintf(
+                            $queryToCheckUser,
+                            DBPREFIX, $objUser->getId()
+                        );
+                        $objResultCheck = $objDatabase->Execute($queryToCheckUser);
+                        if ($objResultCheck === false || $objResultCheck->RecordCount() == 0) {
+                            $objUser->next();
+                        }
+                    }
+
+                    $this->simulateDistinct($distinctByType, $objUser->getEmail(), $type, $mailRecipients);
+                    $objUser->next();
+                }
+            }
+        }
+    }
+
+    /**
+     * Simulate a distinct and add mail recipient to list
+     *
+     * @param boolean $distinctByType  if we should simulate a distinct
+     * @param string  $email           users email
+     * @param string  $type            user type
+     * @param array   &$mailRecipients all already existing mail recipients
+     */
+    protected function simulateDistinct($distinctByType, $email, $type, &$mailRecipients)
+    {
+        if (
+            !$distinctByType ||
+            array_search(
+                $email,
+                array_column($mailRecipients, 'email')
+            ) === false
+        ) {
+            $mailRecipients[] = array(
+                'email' => $email,
+                'type' => $type
+            );
+        }
+    }
+
+    /**
      * Return the recipients  for a specific e-mail campaign
      *
      * @param   int $mailId The ID of the e-mail campaign to return the SQL query to fetch the recipients from
@@ -2706,7 +2795,6 @@ class NewsletterManager extends NewsletterLib
      *          method as they are almost identical except for different table aliases that have to be used.
      */
     protected function getMailRecipients($mailId, $distinctByType = true) {
-        global $objDatabase, $_ARRAYLANG;
 
         // fetch CRM membership filter
         $crmMembershipFilter = $this->emailEditGetCrmMembershipFilter($mailId);
@@ -2787,41 +2875,13 @@ class NewsletterManager extends NewsletterLib
             $accessUserRecipientsQuery,
             DBPREFIX, $mailId
         );
-        $accessIds = array();
-        $objResultAccess = $objDatabase->Execute($accessUserRecipientsQuery);
-        if ($objResultAccess !== false) {
-            while (!$objResultAccess->EOF) {
-                $accessIds[] = $objResultAccess->fields['accessUserID'];
-                $objResultAccess->MoveNext();
-            }
-        } else {
-            throw new \Exception($_ARRAYLANG['TXT_DATABASE_ERROR']);
-        }
-
-        if (!empty($accessIds)) {
-            $objUser = \FWUser::getFWUserObject()->objUser->getUsers(array(
-                'id' => $accessIds, 'active' => 1
-            ));
-
-            if ($objUser) {
-                while (!$objUser->EOF) {
-                    // Simulate DISTINCT
-                    if (
-                        $distinctByType ||
-                        array_search(
-                            $objUser->getEmail(),
-                            array_column($mailRecipients, 'email')
-                        ) === false
-                    ) {
-                        $mailRecipients[] = array(
-                            'email' => $objUser->getEmail(),
-                            'type' => self::USER_TYPE_ACCESS
-                        );
-                    }
-                    $objUser->next();
-                }
-            }
-        }
+        
+        $this->addMailRecipientPart(
+            $mailRecipients,
+            static::USER_TYPE_ACCESS,
+            $distinctByType,
+            $accessUserRecipientsQuery
+        );
 
         // 2. newsletter recipients of one of the selected recipient-lists
         if (!$crmMembershipFilter['include']) {
@@ -2839,27 +2899,13 @@ class NewsletterManager extends NewsletterLib
                 $nativeRecipientsQuery,
                 DBPREFIX, $mailId
             );
-            $objResultNative = $objDatabase->Execute($nativeRecipientsQuery);
-            if ($objResultNative !== false) {
-                while (!$objResultNative->EOF) {
-                    // Simulate DISTINCT
-                    if (
-                        $distinctByType ||
-                        array_search(
-                            $objResultNative->fields['email'],
-                            array_column($mailRecipients, 'email')
-                        ) === false
-                    ) {
-                        $mailRecipients[] = array(
-                            'email' => $objResultNative->fields['email'],
-                            'type' => self::USER_TYPE_NEWSLETTER
-                        );
-                    }
-                    $objResultNative->MoveNext();
-                }
-            } else {
-                throw new \Exception($_ARRAYLANG['TXT_DATABASE_ERROR']);
-            }
+
+            $this->addMailRecipientPart(
+                $mailRecipients,
+                static::USER_TYPE_NEWSLETTER,
+                $distinctByType,
+                $nativeRecipientsQuery
+            );
         }
 
         // 3. access users of one of the selected user groups
@@ -2934,55 +2980,13 @@ class NewsletterManager extends NewsletterLib
             DBPREFIX, $mailId
         );
 
-        $groupIds = array();
-        $objResultGroup = $objDatabase->Execute($userGroupRecipientsQuery);
-        if ($objResultGroup !== false) {
-            while (!$objResultGroup->EOF) {
-                $groupIds[] = $objResultAccess->fields['userGroup'];
-                $objResultGroup->MoveNext();
-            }
-        } else {
-            throw new \Exception($_ARRAYLANG['TXT_DATABASE_ERROR']);
-        }
-
-        if (!empty($groupIds)) {
-            $objUser = \FWUser::getFWUserObject()->objUser->getUsers(array(
-                'group_id' => $groupIds, 'active' => 1
-            ));
-
-            if ($objUser) {
-                while (!$objUser->EOF) {
-                    if (!empty($crmQuery)) {
-                        $crmQuery = sprintf(
-                            $userGroupRecipientsQuery,
-                            DBPREFIX, $objUser->getId()
-                        );
-                        $objResultCrm = $objDatabase->Execute($crmQuery);
-                        if (
-                            $objResultCrm === false ||
-                            $objResultCrm->RecordCount() == 0
-                        ) {
-                            $objUser->next();
-                        }
-                    }
-
-                    // Simulate DISTINCT
-                    if (
-                        !$distinctByType ||
-                        array_search(
-                            $objUser->getEmail(),
-                            array_column($mailRecipients, 'email')
-                        ) === false
-                    ) {
-                        $mailRecipients[] = array(
-                            'email' => $objUser->getEmail(),
-                            'type' => self::USER_TYPE_CORE
-                        );
-                    }
-                    $objUser->next();
-                }
-            }
-        }
+        $this->addMailRecipientPart(
+            $mailRecipients,
+            static::USER_TYPE_CORE,
+            $distinctByType,
+            $userGroupRecipientsQuery,
+            $crmQuery
+        );
 
         // 4. crm contacts of one of the selected crm user groups
         if($crmMembershipFilter['associate']){
@@ -2996,27 +3000,8 @@ class NewsletterManager extends NewsletterLib
                 $crmMembershipQuery,
                 DBPREFIX, $mailId
             );
-            $objResultMembership = $objDatabase->Execute($crmMembershipQuery);
-            if ($objResultMembership !== false) {
-                while (!$objResultMembership->EOF) {
-                    // Simulate DISTINCT
-                    if (
-                        $distinctByType ||
-                        array_search(
-                            $objResultMembership->fields['email'],
-                            array_column($mailRecipients, 'email')
-                        ) === false
-                    ) {
-                        $mailRecipients[] = array(
-                            'email' => $objResultMembership->fields['email'],
-                            'type' => self::USER_TYPE_CRM
-                        );
-                    }
-                    $objResultMembership->MoveNext();
-                }
-            } else {
-                throw new \Exception($_ARRAYLANG['TXT_DATABASE_ERROR']);
-            }
+            
+            $this->addMailRecipientPart($mailRecipients, static::USER_TYPE_CRM, $distinctByType, $crmMembershipQuery);
         }
 
         return $mailRecipients;
