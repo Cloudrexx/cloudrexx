@@ -151,6 +151,8 @@ class SystemLog
         ));
 
         $objFWUser = \FWUser::getFWUserObject();
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $userRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\User');
 
         $user = isset($_GET['user'])  ? intval($_GET['user']) : 0;
         $term = isset($_POST['term']) ? contrexx_input2db($_POST['term']) : '';
@@ -168,10 +170,11 @@ class SystemLog
                        OR log.http_client_ip LIKE '%$term%'
                        OR log.http_x_forwarded_for LIKE '%$term%'
                        OR log.referer LIKE '%$term%'";
-            if ($objUser = $objFWUser->objUser->getUsers(array('username' => "%$term%"))) {
-                while (!$objUser->EOF) {
-                    $q_search .= ' OR log.userid='.$objUser->getId();
-                    $objUser->next();
+
+
+            if ($users = $userRepo->findByLike(array('username' => "%$term%"))) {
+                foreach ($users as $user) {
+                    $q_search .= ' OR log.userid='.$user->getId();
                 }
             }
         } else if (!empty($user)) {
