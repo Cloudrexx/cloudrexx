@@ -153,13 +153,10 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
                 $qb->expr()->eq('vGen.attributeId', ':vGenId')
             )->andWhere(
                 $qb->expr()->eq('vGen.value', ':vGenValue')
-            )->setParametes(
-                array(
-                    'vGenId' => $attr->getAttributeIdByProfileAttributeId(
-                        'gender'
-                    ),
-                    'vGenValue' => 'gender_'.$gender
-                )
+            )->setParameter(
+                'vGenId', $attr->getAttributeIdByProfileAttributeId('gender')
+            )->setParameter(
+                'vGenValue', 'gender_'.$gender
             );
         }
     }
@@ -178,13 +175,10 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
                 $qb->expr()->not(
                     $qb->expr()->eq('vPic.value', ':vPicValue')
                 )
-            )->setParametes(
-                array(
-                    'vPicId' => $attr->getAttributeIdByProfileAttributeId(
-                        'picture'
-                    ),
-                    'vPicValue' => ''
-                )
+            )->setParameter(
+                'vPicId', $attr->getAttributeIdByProfileAttributeId('picture')
+            )->setParameter(
+                'vPicValue', ''
             );
         }
     }
