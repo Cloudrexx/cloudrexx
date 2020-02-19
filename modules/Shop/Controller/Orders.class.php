@@ -419,64 +419,38 @@ if (!$limit) {
         //                     OR `profile`.`phone_private` LIKE '$term'
         //                     OR `profile`.`phone_fax` LIKE '$term'
 
-        $customerIds = array();
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $userRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\User');
 
-        $userFilter = array();
+        $users = array();
         if (!empty($filter['term'])) {
-            $userFilter = array(
-                'OR' => array(
-                    array('username' => $filter['term']),
-                    array('email' => $filter['term']),
-                    array('company' => $filter['term']),
-                    array('firstname' => $filter['term']),
-                    array('lastname' => $filter['term']),
-                    array('address' => $filter['term']),
-                    array('city' => $filter['term']),
-                    array('phone_private' => $filter['term']),
-                    array('phone_fax' => $filter['term']),
+            $users = $userRepo->searchByTerm(
+                $filter['term'],
+                array(
+                    'username',
+                    'email',
+                    'company',
+                    'firstname',
+                    'lastname',
+                    'address',
+                    'city',
+                    'phone_private',
+                    'phone_fax'
                 )
             );
         }
 
         if (!empty($filter['letter'])) {
-            $userFilter = array(
-                'OR' => array(
-                    array(
-                        'company' => array(
-                            'LIKE' => $filter['letter'] . '%'
-                        ),
-                    ),
-                    array(
-                        'firstname' => array(
-                            'LIKE' => $filter['letter'] . '%'
-                        ),
-                    ),
-                    array(
-                        'lastname' => array(
-                            'LIKE' => $filter['letter'] . '%'
-                        ),
-                    ),
-                )
+            $users = $userRepo->searchByInitialLetter(
+                $filter['letter'],
+                array('company', 'firstname', 'lastname')
             );
         }
 
-        if (count($userFilter) > 0) {
-            $objFWUser = \FWUser::getFWUserObject();
-
-            $objUser = $objFWUser->objUser->getUsers(
-                $userFilter
-            );
-
-            if ($objUser) {
-                while (!$objUser->EOF) {
-                    $customerIds[] = $objUser->getId();
-                    $objUser->next();
-                }
-            }
-
+        foreach ($users as $user) {
             // Können nicht bei den normalen Custerom IDs hinzugefügt werden,
             // wegen der AND Bestimmung von Customer IDS Term Filter
-            $filter['user_ids'] = $customerIds;
+            $filter['user_ids'][] = $user->getId();
         }
 
         while ($tries-- && $count == 0) {
