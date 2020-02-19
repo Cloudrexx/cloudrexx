@@ -199,6 +199,44 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
         }
     }
 
+    /**
+     * Add birthday filter to query builder
+     *
+     * @param \Doctrine\ORM\QueryBuilder $qb     query builder instance
+     * @param array                      $months birthday months
+     * @param array                      $days   birthday days
+     */
+    protected function addBirthdayToQueryBuilder(&$qb, $months, $days)
+    {
+        $objFWUser = \FWUser::getFWUserObject();
+        $objAttr = $objFWUser->objUser->objAttribute;
+        $birthId = $objAttr->getAttributeIdByProfileAttributeId('birthday');
+
+        $qb->join('u.userAttributeValue', 'vBirth')
+            ->andWhere($qb->expr()->eq('vBirth.attributeId', ':vBirthId'))
+            ->andWhere(
+                $qb->expr()->in(
+                    'DATE_FORMAT(
+                        DATEADD(FROM_UNIXTIME(0), vBirth.value, \'SECOND\'
+                    ), \'%e\')',
+                    ':vD'
+                )
+            )->andWhere(
+                $qb->expr()->in(
+                    'DATE_FORMAT(
+                        DATEADD(FROM_UNIXTIME(0), vBirth.value, \'SECOND\'
+                    ), \'%c\')',
+                    ':vM'
+                )
+            )->andWhere(
+                $qb->expr()->not(
+                    $qb->expr()->eq('vBirth.value', ':empty')
+                )
+            )->setParameter('vBirthId', $birthId)
+            ->setParameter('vM', $months)
+            ->setParameter('vD', $days)
+            ->setParameter('empty', '');;
+    }
 
     /**
      * Parse a list (into the loaded template object) of those users having
