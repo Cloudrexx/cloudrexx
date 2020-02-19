@@ -104,6 +104,19 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
     }
 
     /**
+     * Search specific fields that start with a defined first letter to get the associated users
+     *
+     * @param string $letter initial letter
+     * @param array  $fields fields to be searched
+     * @return array matching users
+     */
+    public function searchByInitialLetter($letter, $fields)
+    {
+        $letter .= '%';
+        return $this->search($letter, $fields, 'like');
+    }
+
+    /**
      * Search in specific fields and return matching users
      *
      * @param string $term   the search term
