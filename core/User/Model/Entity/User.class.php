@@ -323,7 +323,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @var \Doctrine\Common\Collections\Collection
      */
-    protected $group;
+    protected $groups;
 
     /**
      * @var \Doctrine\Common\Collections\Collection
@@ -339,7 +339,7 @@ class User extends \Cx\Model\Base\EntityBase {
         $this->profileAccess = $arrSettings['default_profile_access']['value'];
         $this->emailAccess = $arrSettings['default_email_access']['value'];
 
-        $this->group = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->groups = new \Doctrine\Common\Collections\ArrayCollection();
         $this->userAttributeValue = new \Doctrine\Common\Collections\ArrayCollection();
 
     }
@@ -365,7 +365,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set isAdmin
      *
      * @param boolean $isAdmin
-     * @return User
      */
     public function setIsAdmin($isAdmin)
     {
@@ -751,7 +750,7 @@ class User extends \Cx\Model\Base\EntityBase {
     {
         $this->restoreKey = !empty($restoreKey)
                             ? $restoreKey
-                            : md5($this->email . $this->regdate . time());
+                            : md5($this->email . random_bytes(20));
     }
 
     /**
@@ -811,7 +810,7 @@ class User extends \Cx\Model\Base\EntityBase {
      */
     public function addGroup(\Cx\Core\User\Model\Entity\Group $group)
     {
-        $this->group[] = $group;
+        $this->groups[] = $group;
     }
 
     /**
@@ -821,17 +820,30 @@ class User extends \Cx\Model\Base\EntityBase {
      */
     public function removeGroup(\Cx\Core\User\Model\Entity\Group $group)
     {
-        $this->group->removeElement($group);
+        $this->groups->removeElement($group);
     }
 
+    
     /**
      * Get group
      *
-     * @return \Doctrine\Common\Collections\Collection 
+     * @return \Doctrine\Common\Collections\Collection $group
+     * @deprecated
+     * @see \Cx\Core\User\Model\Entity\User::getGroups()
      */
     public function getGroup()
     {
-        return $this->group;
+        return $this->getGroups();
+    }
+
+    /**
+     * Get groups
+     *
+     * @return \Doctrine\Common\Collections\Collection $groups
+     */
+    public function getGroups()
+    {
+        return $this->groups;
     }
 
     /**
@@ -871,11 +883,11 @@ class User extends \Cx\Model\Base\EntityBase {
      */
     public function isBackendGroupUser()
     {
-        if (!$this->group) {
+        if (!$this->getGroups()) {
             return false;
         }
 
-        foreach ($this->group as $group) {
+        foreach ($this->getGroups() as $group) {
             if ($group->getType() === 'backend') {
                 return true;
             }

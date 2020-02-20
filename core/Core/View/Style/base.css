@@ -1948,3 +1948,59 @@ a.cke_dialog_ui_button_ok:hover {
     font-family: monospace;
     line-height: initial;
 }
+
+#splash-text {
+    max-width: 500px;
+    float: left;
+    overflow-x: hidden;
+}
+#splash-text h1 {
+    float: none;
+}
+#splash .box {
+    margin-left: 30px;
+    min-height: 148px;
+    height: 148px;
+    padding-bottom: 50px;
+    background-color: #0a85c8;
+    position: relative;
+    float: left;
+    width: 301px;
+    height: auto !important;
+    padding: 10px 10px 0 10px;
+    overflow: hidden;
+}
+#splash .box h2 {
+    margin: 0 0 9px 0;
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: normal;
+}
+#splash .box ul {
+    clear: both;
+    float: left;
+    width: auto;
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+}
+#splash .box ul li {
+    clear: both;
+}
+#splash .box ul li a {
+    float: left;
+    width: auto;
+    background: url(/core_modules/Home/View/Media/dashboard_box_list_style.png) no-repeat left 4px;
+    padding: 0 0 0 9px;
+    margin: 0 0 5px 0;
+    color: #ffffff;
+}
+#splash .box .icon {
+    width: 30px;
+    height: 30px;
+    background: url(/core_modules/Home/View/Media/dashboard_box_1_icon.png) no-repeat;
+    position: absolute;
+    left: 10px;
+    bottom: 10px;
+    float: left;
+}

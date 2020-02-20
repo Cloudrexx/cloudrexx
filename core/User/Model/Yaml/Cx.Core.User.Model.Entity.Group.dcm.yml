@@ -2,7 +2,7 @@ Cx\Core\User\Model\Entity\Group:
   type: entity
   table: access_user_groups
   fields:
-    groupId:
+    id:
       id: true
       type: integer
       length: 11
@@ -11,21 +11,21 @@ Cx\Core\User\Model\Entity\Group:
       options:
         unsigned: true
       column: group_id   
-    groupName:
+    name:
       type: string
       length: 100
       nullable: false
       column: group_name
       options:
         default: ""
-    groupDescription:
+    description:
       type: string
       length: 255
       nullable: false
       column: group_description
       options:
         default: ""
-    isActive:
+    active:
       type: boolean
       nullable: false
       column: is_active
@@ -48,6 +48,6 @@ Cx\Core\User\Model\Entity\Group:
       options:
         default: 0
   manyToMany:
-    user:
+    users:
       targetEntity: Cx\Core\User\Model\Entity\User
-      mappedBy: group
+      mappedBy: groups

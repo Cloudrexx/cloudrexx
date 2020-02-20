@@ -414,10 +414,28 @@ class MediaDirectoryEntry extends MediaDirectoryInputfield
 
         $objEntries = $objDatabase->Execute($query);
 
-        $totalRecords =$objDatabase->Execute("SELECT FOUND_ROWS() AS found_rows");
+        $this->recordCount = $objDatabase->Execute(
+            'SELECT FOUND_ROWS() AS found_rows'
+        )->fields['found_rows'];
+        $formData = $this->getFormData();
 
         if ($objEntries !== false) {
             while (!$objEntries->EOF) {
+                if (
+                    // note: in a previous version of Cloudrexx, there was no
+                    // check if the form was active or not
+                    !$this->arrSettings['legacyBehavior'] && (
+                        // skip entries of inexisting forms
+                        !isset($formData[$objEntries->fields['form_id']]) ||
+                        // skip entries of inactive forms
+                        !$formData[$objEntries->fields['form_id']]['formActive']
+                    )
+                ) {
+                    $this->recordCount--;
+                    $objEntries->MoveNext();
+                    continue;
+                }
+
                 $arrEntry = array();
                 $arrEntryFields = array();
 
@@ -449,7 +467,6 @@ class MediaDirectoryEntry extends MediaDirectoryInputfield
 
                 $objEntries->MoveNext();
             }
-            $this->recordCount = $totalRecords->fields['found_rows'];
         }
 
         $this->setCurrentFetchedEntryDataObject($this);

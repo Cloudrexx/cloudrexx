@@ -143,9 +143,9 @@ Cx\Core\User\Model\Entity\User:
     username:
       columns: [username]
   manyToMany:
-    group:
+    groups:
       targetEntity: Cx\Core\User\Model\Entity\Group
-      inversedBy: user
+      inversedBy: users
       joinTable:
         name: access_rel_user_group
         joinColumns:

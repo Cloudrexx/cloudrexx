@@ -97,6 +97,8 @@ class SystemComponentBackendController extends Controller {
             $cmd = explode('/', contrexx_input2raw($_GET['act']));
         }
 
+        $navigation = $this->parseNavigation($cmd);
+
         $actTemplate = new \Cx\Core\Html\Sigma($this->getDirectory(false) . '/View/Template/Backend');
         $filename = $cmd[0] . '.html';
         $testFilename = $cmd[0];
@@ -105,7 +107,8 @@ class SystemComponentBackendController extends Controller {
             $testFilename = 'Default';
         }
         foreach ($cmd as $index=>$name) {
-            if ($index == 0) {
+            // always load Default.html for overview page
+            if (empty($name)) {
                 continue;
             }
 
@@ -119,7 +122,6 @@ class SystemComponentBackendController extends Controller {
         $actTemplate->loadTemplateFile($filename);
 
         // todo: Messages
-        $navigation = $this->parseNavigation($cmd);
         $this->parsePage($actTemplate, $cmd);
         $txt = $cmd[0];
         if (empty($txt)) {
@@ -162,6 +164,12 @@ class SystemComponentBackendController extends Controller {
         $navigation->loadTemplateFile('Navigation.html');
 
         $commands = $this->getCommands();
+        if ($this->showSplash()) {
+            $commands = array_merge(
+                array('Splash' => array('permission' => $this->defaultPermission)),
+                $commands
+            );
+        }
         if ($this->showOverviewPage()) {
             $commands = array_merge(
                 array('' => array('permission' => $this->defaultPermission)),
@@ -284,6 +292,9 @@ class SystemComponentBackendController extends Controller {
         }
 
         $actTxtKey = 'TXT_' . strtoupper($this->getType()) . '_' . strtoupper($this->getName() . '_ACT_' . $txt);
+        if (empty($isSubNav) && $currentCmd == 'Splash') {
+            $actTxtKey = 'TXT_CORE_CORE_ACT_SPLASH';
+        }
         $actTitle  = isset($_ARRAYLANG[$actTxtKey]) ? $_ARRAYLANG[$actTxtKey] : $actTxtKey;
         $navigation->setVariable(array(
             'HREF' => 'index.php?cmd=' . $this->getName() . $act,
@@ -415,6 +426,37 @@ class SystemComponentBackendController extends Controller {
                         break;
                 }
                 break;
+            case 'Splash':
+                $baseFileName = $this->getDirectory();
+                foreach (array('icon', 'introduction_image') as $imageKey) {
+                    $imageKeyCC = str_replace('_', '', ucwords($imageKey, '_'));
+                    $fileName = $this->getDirectory() . '/View/Media/' . $imageKeyCC . '.png';
+                    if (!file_exists($fileName)) {
+                        $template->hideBlock('component_' . strtolower($imageKey));
+                        continue;
+                    }
+                    $webFileName = $this->getDirectory(false, true) . '/View/Media/' . $imageKeyCC . '.png';
+                    $template->setVariable(
+                        'COMPONENT_' . strtoupper($imageKey) . '_SRC',
+                        $webFileName
+                    );
+                    $template->touchBlock('component_' . strtolower($imageKey));
+                }
+                if (
+                    !empty($this->getEnduserDocumentationUrl()) ||
+                    !empty($this->getDeveloperDocumentationUrl())
+                ) {
+                    $template->touchBlock('component_docs');
+                    $template->setVariable(array(
+                        'COMPONENT_ENDUSER_DOCUMENTATION_URL' =>
+                            $this->getEnduserDocumentationUrl(),
+                        'COMPONENT_DEVELOPER_DOCUMENTATION_URL' =>
+                            $this->getDeveloperDocumentationUrl(),
+                    ));
+                } else {
+                    $template->hideBlock('component_docs');
+                }
+                break;
             case '':
             default:
                 if ($template->blockExists('overview')) {
@@ -515,9 +557,66 @@ class SystemComponentBackendController extends Controller {
 
     /**
      * Return true here if you want the first tab to be an entity view
+     * @deprecated Use showSplash() instead
      * @return boolean True if overview should be shown, false otherwise
      */
     protected function showOverviewPage() {
         return true;
+    }
+
+    /**
+     * Tells whether the given entity class name has stored entities
+     *
+     * This method is intended for use in showSplash().
+     * Instead of the fully qualified class name the entity name can be specified
+     * relative to the component's entity namespace. If $entityClassName does
+     * not start with component's entity namespace it is prepended. Therefore
+     * only entities within this component's entity namespace can be checked
+     * with this method.
+     * The component's entity namespace is:
+     * \Cx\<component_type>\<component_name>\Model\Entity\
+     * @param string $entityClassName Fully qualified entity class name or according to description
+     * @return bool True if entity has data, false otherwise
+     */
+    protected function hasEntityData($entityClassName): bool {
+        $namespacePrefix = $this->getNamespace() . '\\Model\\Entity\\';
+        if (strpos($entityClassName, $namespacePrefix) === false) {
+            $entityClassName = $namespacePrefix . $entityClassName;
+        }
+        $em = $this->cx->getDb()->getEntityManager();
+        $repo = $em->getRepository(
+            $entityClassName
+        );
+        $entity = $repo->findOneBy(array());
+        return (bool) $entity;
+    }
+
+    /**
+     * Tells whether the given entity class name has no stored entities
+     *
+     * This method is intended for use in showSplash().
+     * Instead of the fully qualified class name the entity name can be specified
+     * relative to the component's entity namespace. If $entityClassName does
+     * not start with component's entity namespace it is prepended. Therefore
+     * only entities within this component's entity namespace can be checked
+     * with this method.
+     * The component's entity namespace is:
+     * \Cx\<component_type>\<component_name>\Model\Entity\
+     * @param string $entityClassName Fully qualified entity class name or according to description
+     * @return bool True if entity has no data, false otherwise
+     */
+    protected function hasNoEntityData($entityClassName): bool {
+        return !$this->hasEntityData($entityClassName);
+    }
+
+    /**
+     * Returns whether to show the splash screen or not. Every module "should"
+     * have an introductionary splash screen. This method can be used to define
+     * conditions on when to show it.
+     * @see hasNoEntityData($entityClassName)
+     * @return bool True if splash is to be shown.
+     */
+    protected function showSplash(): bool {
+        return false;
     }
 }
