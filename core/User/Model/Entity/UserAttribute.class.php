@@ -32,7 +32,6 @@
  * @author      Dario Graf <info@cloudrexx.com>
  * @package     cloudrexx
  * @subpackage  core_user
- * @version     5.0.0
  */
 namespace Cx\Core\User\Model\Entity;
 
@@ -43,7 +42,6 @@ namespace Cx\Core\User\Model\Entity;
  * @author      Dario Graf <info@cloudrexx.com>
  * @package     cloudrexx
  * @subpackage  core_user
- * @version     5.0.0
  */
 class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
@@ -57,7 +55,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     protected $type = 'text';
 
     /**
-     * @var enum_user_userattribute_mandatory
+     * @var boolean
      */
     protected $mandatory = '0';
 
@@ -94,12 +92,12 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * @var \Doctrine\Common\Collections\Collection
      */
-    protected $userAttributeName;
+    protected $userAttributeNames;
 
     /**
      * @var \Doctrine\Common\Collections\Collection
      */
-    protected $userAttributeValue;
+    protected $userAttributeValues;
 
     /**
      * @var \Doctrine\Common\Collections\Collection
@@ -107,9 +105,9 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     protected $children;
 
     /***
-     * @var enum_user_userattribute_accessspecial
+     * @var boolean
      */
-    protected $isDefault;
+    protected $default;
 
     /**
      * Constructor
@@ -117,7 +115,8 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     public function __construct()
     {
         $this->children = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->userAttributeName = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->userAttributeNames = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->userAttributeValues = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     /**
@@ -153,7 +152,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Set mandatory
      *
-     * @param enum_user_userattribute_mandatory $mandatory
+     * @param boolean $mandatory
      */
     public function setMandatory($mandatory)
     {
@@ -163,7 +162,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get mandatory
      *
-     * @return enum_user_userattribute_mandatory 
+     * @return boolean
      */
     public function getMandatory()
     {
@@ -273,21 +272,36 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Set default
      *
-     * @param enum_user_userattribute_type $isDefault
+     * @param boolean $default
      */
-    public function setIsDefault($isDefault)
+    public function setDefault($default)
     {
-        $this->isDefault = $isDefault;
+        $this->default = $default;
     }
 
     /**
      * Get default
      *
-     * @return enum_user_userattribute_type
+     * This does exactly the same as isDefault, but this method is necessary for doctrine mapping
+     *
+     * @return boolean
      */
-    public function getIsDefault()
+    public function getDefault()
     {
-        return $this->isDefault;
+        return $this->default;
+    }
+
+
+    /**
+     * Get default
+     *
+     * This does exactly the same as getDefault, but this method name is more intuitive
+     *
+     * @return boolean
+     */
+    public function isDefault()
+    {
+        return $this->getDefault();
     }
 
     /**
@@ -327,7 +341,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
      */
     public function addUserAttributeName(\Cx\Core\User\Model\Entity\UserAttributeName $userAttributeName)
     {
-        $this->userAttributeName[] = $userAttributeName;
+        $this->userAttributeNames[] = $userAttributeName;
     }
 
     /**
@@ -337,17 +351,17 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
      */
     public function removeUserAttributeName(\Cx\Core\User\Model\Entity\UserAttributeName $userAttributeName)
     {
-        $this->userAttributeName->removeElement($userAttributeName);
+        $this->userAttributeNames->removeElement($userAttributeName);
     }
 
     /**
      * Get userAttributeName
      *
-     * @return \Doctrine\Common\Collections\Collection 
+     * @return \Doctrine\Common\Collections\Collection
      */
-    public function getUserAttributeName()
+    public function getUserAttributeNames()
     {
-        return $this->userAttributeName;
+        return $this->userAttributeNames;
     }
 
     /**
@@ -357,7 +371,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
      */
     public function addUserAttributeValue(\Cx\Core\User\Model\Entity\UserAttributeValue $userAttributeValue)
     {
-        $this->userAttributeValue[] = $userAttributeValue;
+        $this->userAttributeValues[] = $userAttributeValue;
     }
 
     /**
@@ -367,17 +381,17 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
      */
     public function removeUserAttributeValue(\Cx\Core\User\Model\Entity\UserAttributeValue $userAttributeValue)
     {
-        $this->userAttributeValue->removeElement($userAttributeValue);
+        $this->userAttributeValues->removeElement($userAttributeValue);
     }
 
     /**
-     * Get userAttributeValue
+     * Get userAttributeValues
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getUserAttributeValue()
+    public function getUserAttributeValues()
     {
-        return $this->userAttributeValue;
+        return $this->userAttributeValues;
     }
 
     /**

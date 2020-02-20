@@ -87,12 +87,12 @@ class User_Profile_Attribute
 
     private $arrAttributeTree;
     private $arrAttributeRelations;
-    private $arrCoreAttributeIds;
+    private $arrDefaultAttributeIds;
     private $arrCustomAttributes;
     private $arrMandatoryAttributes = array();
-    private $arrProfileAttributes = array();
+    private $arrDefaultAttributeNames = array();
 
-    private $arrCoreAttributes = array(
+    private $arrDefaultAttributeTemplates = array(
         'picture' => array(
             'type'         => 'image',
             'multiline'    => false,
@@ -533,74 +533,67 @@ class User_Profile_Attribute
         $this->arrAttributeRelations = null;
         $this->arrAttributeTree = null;
 
-        $this->loadCoreAttributes();
-        $this->loadProfileAttributes();
+        $this->loadDefaultAttributes();
         $this->loadCustomAttributes();
         $this->generateAttributeRelations();
         $this->sortChildren();
     }
 
-
-    function loadCoreAttributes()
-    {
-        global $_CORELANG;
-
-        $this->arrCoreAttributeIds = array();
-        $this->arrAttributes = $this->arrCoreAttributes;
-        foreach ($this->arrCoreAttributes as $attributeId => $arrAttribute) {
-            if (!$arrAttribute['parent_id']) {
-                $this->arrCoreAttributeIds[] = $attributeId;
-            }
-
-// TODO: In the backend, this always results in the empty string!
-// The core language is not loaded yet when this is run!
-            $this->arrAttributes[$attributeId]['names'][$this->langId] = isset($_CORELANG[$arrAttribute['desc']]) ? $_CORELANG[$arrAttribute['desc']] : null;
-// See:
-//die(var_export($_CORELANG, true));
-// and
-/*
-DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, language ID $this->langId: ".$arrAttribute['desc'].
-  " => ".
-  $_CORELANG[$arrAttribute['desc']].
-  " => ".
-  $this->arrAttributes[$attributeId]['names'][$this->langId]
-);
-*/
-        }
-        $this->loadCoreAttributeCountry();
-        $this->loadCoreAttributeTitle();
-    }
-
     /**
-     * Find all default user attributes (ProfileAttributes) and store it in an
+     * Find all default user attributes (DefaultAttributes) and store it in an
      * array
      */
-    function loadProfileAttributes()
+    function loadDefaultAttributes()
     {
-        global $objDatabase;
+        global $objDatabase, $_CORELANG;
+
+        $this->arrDefaultAttributeIds = array();
+        $this->arrAttributes = $this->arrDefaultAttributeTemplates;
+        foreach ($this->arrAttributes as $attributeId => &$arrAttribute) {
+            if (!$arrAttribute['parent_id']) {
+                $this->arrDefaultAttributeIds[] = $attributeId;
+            }
+            $arrAttribute['names'][$this->langId] = isset($_CORELANG[$arrAttribute['desc']]) ? $_CORELANG[$arrAttribute['desc']] : null;
+        }
 
         $query = '
             SELECT 
                 `tblA`.`id` AS `id`, 
-                `tblN`.`name` AS `name` 
+                `tblN`.`name` AS `name`,
+                `tblA`.`sort_type` AS `sort_type`, 
+                `tblA`.`mandatory` AS `mandatory`,  
+                `tblA`.`order_id` AS `order_id`,  
+                `tblA`.`access_special` AS `access_special`,  
+                `tblA`.`access_id` AS `access_id`,  
+                `tblA`.`read_access_id` AS `read_access_id`
             FROM `' .DBPREFIX .'access_user_attribute` AS `tblA`
             LEFT JOIN `'.DBPREFIX.'access_user_attribute_name` AS `tblN`
                 ON `tblN`.`attribute_id` = `tblA`.`id`
             WHERE `tblA`.`is_default` = 1 
-            AND `tblA`.`parent_id` IS NULL
         ';
 
-        $objAttributes = $objDatabase->Execute($query);
+        $objAttribute = $objDatabase->Execute($query);
 
-        if ($objAttributes !== false && $objAttributes->RecordCount() > 0) {
-            while (!$objAttributes->EOF) {
-                $this->arrProfileAttributes[
-                $objAttributes->fields['id']
-                ] = $objAttributes->fields['name'];
+        if ($objAttribute !== false && $objAttribute->RecordCount() > 0) {
+            while (!$objAttribute->EOF) {
+                $this->arrDefaultAttributeNames[$objAttribute->fields['id']] = $objAttribute->fields['name'];
 
-                $objAttributes->MoveNext();
+                $this->arrAttributes[$objAttribute->fields['name']]['mandatory'] = $objAttribute->fields['mandatory'];
+                $this->arrAttributes[$objAttribute->fields['name']]['sort_type'] = $objAttribute->fields['sort_type'];
+                $this->arrAttributes[$objAttribute->fields['name']]['order_id'] = $objAttribute->fields['order_id'];
+                $this->arrAttributes[$objAttribute->fields['name']]['access_special'] = $objAttribute->fields['access_special'];
+                $this->arrAttributes[$objAttribute->fields['name']]['access_id'] = $objAttribute->fields['access_id'];
+                $this->arrAttributes[$objAttribute->fields['name']]['read_access_id'] = $objAttribute->fields['read_access_id'];
+                $this->arrAttributes[$objAttribute->fields['name']]['customizing'] = true;
+                if ($objAttribute->fields['mandatory']) {
+                    $this->arrMandatoryAttributes[] = $objAttribute->fields['name'];
+                }
+
+                $objAttribute->MoveNext();
             }
         }
+        $this->loadCoreAttributeCountry();
+        $this->loadCoreAttributeTitle();
     }
 
     function loadCoreAttributeCountry()
@@ -730,9 +723,9 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
      *
      * @return array value with all profile attributes
      */
-    public function getProfileAttributes()
+    public function getDefaultAttributeNames()
     {
-        return $this->arrProfileAttributes;
+        return $this->arrDefaultAttributeNames;
     }
 
     function getTree()
@@ -778,7 +771,7 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
         $objAttribute->arrAttributeTree = &$this->arrAttributeTree;
         $objAttribute->arrAttributeRelations = &$this->arrAttributeRelations;
         $objAttribute->arrMandatoryAttributes = &$this->arrMandatoryAttributes;
-        $objAttribute->arrCoreAttributeIds = &$this->arrCoreAttributeIds;
+        $objAttribute->arrDefaultAttributeIds = &$this->arrDefaultAttributeIds;
         $objAttribute->arrCustomAttributes = &$this->arrCustomAttributes;
 
         if ($objAttribute->load($id)) {
@@ -1005,11 +998,11 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
 
         if ($this->checkIntegrity()) {
             if ($this->parent_id === 'title' && $this->storeCoreAttributeTitle() ||
-                $this->isCoreAttribute($this->id) && $this->storeCoreAttribute() ||
+                $this->isDefaultAttribute($this->id) && $this->storeCoreAttribute() ||
                 $this->storeCustomAttribute()
             ) {
                 if (preg_match('/^title_[0-9]+$/', $this->id) ||
-                    ($this->isCoreAttribute($this->id) || $this->storeNames()) &&
+                    ($this->isDefaultAttribute($this->id) || $this->storeNames()) &&
                     $this->storeChildrenOrder() &&
                     $this->storeProtection($this->protected, $this->access_id, 'access_id', $this->access_group_ids) &&
                     $this->storeProtection($this->readProtected, $this->readAccessId, 'read_access_id', $this->readAccessGroupIds, 'read')
@@ -1205,7 +1198,7 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
         $objDatabase = \Cx\Core\Core\Controller\Cx::instanciate()->getDb()->getAdoDb();
         $tableName = 'access_user_attribute';
         $where = $this->id;
-        if ($this->isCoreAttribute($this->id)) {
+        if ($this->isDefaultAttribute($this->id)) {
             $where = '(SELECT `attribute_id` FROM `contrexx_access_user_attribute_name` WHERE `name` = "'. $this->id .'")';
         }
 
@@ -1326,10 +1319,20 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
 // TODO: I suppose the precedence is okay like this.
 //        return ($this->isCoreAttribute($attributeId) || $this->deleteAttributeContent($attributeId)) && ($this->isCoreAttribute($attributeId) || $this->deleteAttributeNames($attributeId)) && $this->deleteAttributeEntity($attributeId);
 // However, it would be clearer with a few parentheses.
+
+        $parentId = $this->arrAttributes[$attributeId]['parent_id'] ?? '0';
+        $pattern = array();
+        if (
+            $parentId == 'title' &&
+            preg_match('#([0-9]+)#', $attributeId, $pattern)
+        ) {
+            $attributeId = $pattern[0];
+        }
+
         return
-            (   $this->isCoreAttribute($attributeId)
+            (   $this->isDefaultAttribute($attributeId)
              ||    $this->deleteAttributeContent($attributeId))
-                && ($this->isCoreAttribute($attributeId)
+                && ($this->isDefaultAttribute($attributeId)
              ||    $this->deleteAttributeNames($attributeId))
                 && $this->deleteAttributeEntity($attributeId);
     }
@@ -1340,8 +1343,7 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
         global $objDatabase, $_ARRAYLANG;
 
         $affectedTable = DBPREFIX.'access_user_attribute';
-        $pattern = array();
-        if ($objDatabase->Execute('DELETE FROM `'.$affectedTable.'` WHERE `id` = '.($this->parent_id == 'title' && preg_match('#([0-9]+)#', $attributeId, $pattern) ? $pattern[0] : $attributeId)) !== false) {
+        if ($objDatabase->Execute('DELETE FROM `'.$affectedTable.'` WHERE `id` = '.$attributeId) !== false) {
             return true;
         }
         $this->errorMsg = sprintf($_ARRAYLANG['TXT_ACCESS_UNABLE_DEL_ATTRIBUTE'], htmlentities($this->arrAttributes[$attributeId]['names'][$this->langId], ENT_QUOTES, CONTREXX_CHARSET));
@@ -1352,13 +1354,6 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
     function deleteAttributeContent($attributeId)
     {
         global $objDatabase, $_ARRAYLANG;
-
-        if (
-            $this->parent_id == 'title' &&
-            preg_match('#([0-9]+)#', $attributeId, $pattern)
-        ) {
-            $attributeId = $pattern[0];
-        }
 
         if ($objDatabase->Execute("DELETE FROM `".DBPREFIX."access_user_attribute_value` WHERE `attribute_id` = '".$attributeId."'") !== false) {
             return true;
@@ -1371,13 +1366,6 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
     function deleteAttributeNames($attributeId)
     {
         global $objDatabase, $_ARRAYLANG;
-
-        if (
-            $this->parent_id == 'title' &&
-            preg_match('#([0-9]+)#', $attributeId, $pattern)
-        ) {
-            $attributeId = $pattern[0];
-        }
 
         if ($objDatabase->Execute("DELETE FROM `".DBPREFIX."access_user_attribute_name` WHERE `attribute_id` = '".$attributeId."'") !== false) {
             return true;
@@ -1580,7 +1568,7 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
 
     function isRemovable()
     {
-        return !$this->isCoreAttribute($this->id);
+        return !$this->isDefaultAttribute($this->id);
     }
 
 
@@ -1674,29 +1662,30 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
         return $this->readProtected;
     }
 
-    public function isCoreAttribute($attributeId=null)
+    public function isDefaultAttribute($attributeId=null)
     {
         if (is_null($attributeId)) {
             $attributeId = $this->id;
         }
-        return isset($this->arrCoreAttributes[$attributeId]);
+
+        return isset($this->arrDefaultAttributeTemplates[$attributeId]);
     }
 
     /**
-     * In the system, the ID of a core attribute is the name of the attribute
-     * (e.g. 'title'). But if we want to interact with the database, the core
+     * In the system, the ID of a default attribute is the name of the attribute
+     * (e.g. 'title'). But if we want to interact with the database, the default
      * attribute is handled like other user attributes. This means we have an
      * integer ID (e.g. 2) and had to track this ID (2) with the system-intern
-     * core attribute ID ('title')
+     * default attribute ID ('title')
      *
      * This method checks if the given attribute id (e.g. 2) is assigned to a
-     * core attribute
+     * default attribute
      *
      * @param int $attributeId id to check if it is assigned
-     * @return bool if is assigned to an core attribute
+     * @return bool if is assigned to an default attribute
      */
-    public function isIdAssignedToCoreAttribute($attributeId=0) {
-        if (!empty($this->getProfileAttributes()[$attributeId])) {
+    public function isIdAssignedToDefaultAttribute($attributeId) {
+        if (!empty($this->getDefaultAttributeNames()[$attributeId])) {
             return true;
         }
         return false;
@@ -1779,7 +1768,7 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
     {
         $pattern = array();
         foreach ($arrChildOrder as $childId => $orderId) {
-            $this->arrAttributeRelations[$this->id][intval($orderId)] = $this->isCoreAttribute($this->id) && preg_match('#([0-9]+)#', $childId, $pattern) ? $pattern[0] : intval($childId);
+            $this->arrAttributeRelations[$this->id][intval($orderId)] = $this->isDefaultAttribute($this->id) && preg_match('#([0-9]+)#', $childId, $pattern) ? $pattern[0] : intval($childId);
         }
         $this->children = $this->arrAttributeRelations[$this->id];
     }
@@ -1856,7 +1845,7 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
     {
         global $objDatabase, $_CORELANG;
 
-        if ($this->isCoreAttribute($this->id)) {
+        if ($this->isDefaultAttribute($this->id)) {
             $this->arrName[$langId] = (string)$_CORELANG[$this->arrAttributes[$this->id]['desc']];
         } else {
             $objResult = $objDatabase->SelectLimit('SELECT `name` FROM `'.DBPREFIX.'access_user_attribute_name` WHERE `lang_id` = '.$langId.' AND `attribute_id` = "' . contrexx_raw2db($this->id) . '"', 1);
@@ -1896,48 +1885,48 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
 
 
     /**
-     * In the system, the ID of a core attribute is the name of the attribute
-     * (e.g. 'title'). But if we want to interact with the database, the core
+     * In the system, the ID of a default attribute is the name of the attribute
+     * (e.g. 'title'). But if we want to interact with the database, the default
      * attribute is handled like other user attributes. This means we have an
      * integer ID (e.g. 2) and had to track this ID (2) with the system-intern
-     * core attribute ID ('title')
+     * default attribute ID ('title')
      *
-     * This method gives the profile attribute ID (e.g. 'title') by the given
+     * This method gives the default attribute ID (e.g. 'title') by the given
      * user attribute ID (e.g. 2)
      *
-     * @param int $attributeId user attribute ID to identify profile attribute ID
-     * @return string profile attribute ID
+     * @param int $attributeId user attribute ID to identify default attribute ID
+     * @return string default attribute ID
      */
-    public function getProfileAttributeIdByAttributeId($attributeId)
+    public function getDefaultAttributeIdByAttributeId($attributeId)
     {
-        $profileAttributes = $this->getProfileAttributes();
+        $defaultAttributes = $this->getDefaultAttributeNames();
 
-        if (!empty($profileAttributes[$attributeId])) {
-            return $profileAttributes[$attributeId];
+        if (!empty($defaultAttributes[$attributeId])) {
+            return $defaultAttributes[$attributeId];
         }
 
         return '';
     }
 
     /**
-     * In the system, the ID of a core attribute is the name of the attribute
-     * (e.g. 'title'). But if we want to interact with the database, the core
+     * In the system, the ID of a default attribute is the name of the attribute
+     * (e.g. 'title'). But if we want to interact with the database, the default
      * attribute is handled like other user attributes. This means we have an
      * integer ID (e.g. 2) and had to track this ID (2) with the system-intern
-     * core attribute ID ('title')
+     * default attribute ID ('title')
      *
-     * This method gives the user attribute ID (e.g. 2) by the given profile
+     * This method gives the user attribute ID (e.g. 2) by the given default
      * attribute ID (e.g. 'title')
      *
-     * @param int $profileId profile attribute ID to identify user attribute ID
+     * @param int $defaultId default attribute ID to identify user attribute ID
      * @return string user attribute ID
      */
-    public function getAttributeIdByProfileAttributeId($profileId)
+    public function getAttributeIdByDefaultAttributeId($defaultId)
     {
-        $profileAttributes = $this->getProfileAttributes();
+        $defaultAttributes = $this->getDefaultAttributeNames();
 
-        if (in_array($profileId, $profileAttributes)) {
-            return array_search($profileId, $profileAttributes);
+        if (in_array($defaultId, $defaultAttributes)) {
+            return array_search($defaultId, $defaultAttributes);
         }
 
         return 0;
@@ -2177,9 +2166,9 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
     }
 
 
-    function getCoreAttributeIds()
+    function getDefaultAttributeIds()
     {
-        return $this->arrCoreAttributeIds;
+        return $this->arrDefaultAttributeIds;
     }
 
 

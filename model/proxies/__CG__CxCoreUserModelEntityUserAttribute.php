@@ -73,10 +73,10 @@ class UserAttribute extends \Cx\Core\User\Model\Entity\UserAttribute implements 
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'id', 'type', 'mandatory', 'sortType', 'orderId', 'accessSpecial', 'accessId', 'readAccessId', 'parent', 'userAttributeName', 'userAttributeValue', 'children', 'isDefault', 'validators', 'virtual');
+            return array('__isInitialized__', 'id', 'type', 'mandatory', 'sortType', 'orderId', 'accessSpecial', 'accessId', 'readAccessId', 'parent', 'userAttributeNames', 'userAttributeValues', 'children', 'default', 'validators', 'virtual');
         }
 
-        return array('__isInitialized__', 'id', 'type', 'mandatory', 'sortType', 'orderId', 'accessSpecial', 'accessId', 'readAccessId', 'parent', 'userAttributeName', 'userAttributeValue', 'children', 'isDefault', 'validators', 'virtual');
+        return array('__isInitialized__', 'id', 'type', 'mandatory', 'sortType', 'orderId', 'accessSpecial', 'accessId', 'readAccessId', 'parent', 'userAttributeNames', 'userAttributeValues', 'children', 'default', 'validators', 'virtual');
     }
 
     /**
@@ -354,23 +354,34 @@ class UserAttribute extends \Cx\Core\User\Model\Entity\UserAttribute implements 
     /**
      * {@inheritDoc}
      */
-    public function setIsDefault($isDefault)
+    public function setDefault($default)
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setIsDefault', array($isDefault));
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setDefault', array($default));
 
-        return parent::setIsDefault($isDefault);
+        return parent::setDefault($default);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getIsDefault()
+    public function getDefault()
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getIsDefault', array());
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getDefault', array());
 
-        return parent::getIsDefault();
+        return parent::getDefault();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isDefault()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'isDefault', array());
+
+        return parent::isDefault();
     }
 
     /**
@@ -431,12 +442,12 @@ class UserAttribute extends \Cx\Core\User\Model\Entity\UserAttribute implements 
     /**
      * {@inheritDoc}
      */
-    public function getUserAttributeName()
+    public function getUserAttributeNames()
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getUserAttributeName', array());
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getUserAttributeNames', array());
 
-        return parent::getUserAttributeName();
+        return parent::getUserAttributeNames();
     }
 
     /**
@@ -464,12 +475,12 @@ class UserAttribute extends \Cx\Core\User\Model\Entity\UserAttribute implements 
     /**
      * {@inheritDoc}
      */
-    public function getUserAttributeValue()
+    public function getUserAttributeValues()
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getUserAttributeValue', array());
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getUserAttributeValues', array());
 
-        return parent::getUserAttributeValue();
+        return parent::getUserAttributeValues();
     }
 
     /**

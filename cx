@@ -907,7 +907,7 @@ function cmd_env {
             if [[ ${ARGUMENTS["drop-users"]} != true ]]; then
                 TEMP_FILES["user-backup"]="$(mktemp)"
                 mysql_dump --no-create-info --skip-triggers "${CONFIG["db-name"]}" contrexx_access_users > "${TEMP_FILES["user-backup"]}"
-                mysql_dump --no-create-info --skip-triggers -w 'attribute_id=0' "${CONFIG["db-name"]}" contrexx_access_user_attribute_value >> "${TEMP_FILES["user-backup"]}"
+                mysql_dump --no-create-info --skip-triggers --single-transaction -w 'attribute_id IN (select id from contrexx_access_user_attribute WHERE is_default = 1)' "${CONFIG["db-name"]}" contrexx_access_user_attribute_value >> "${TEMP_FILES["user-backup"]}"
                 if [[ ${ARGUMENTS["drop-sessions"]} != true ]]; then
                     TEMP_FILES["session-backup"]="$(mktemp)"
                     mysql_dump --no-create-info --skip-triggers "${CONFIG["db-name"]}" contrexx_sessions > "${TEMP_FILES["session-backup"]}"

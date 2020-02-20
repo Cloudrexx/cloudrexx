@@ -1131,7 +1131,7 @@ class FormTemplate extends \Cx\Model\Base\EntityBase {
 
             switch ($objAttribute->getType()) {
                 case 'menu':
-                    if ($objAttribute->isCoreAttribute()) {
+                    if ($objAttribute->isDefaultAttribute()) {
                         foreach ($objAttribute->getChildren() as $childAttributeId) {
                             $objChildAtrribute = $objAttribute->getById($childAttributeId);
                             if (!$objChildAtrribute->getId()) {

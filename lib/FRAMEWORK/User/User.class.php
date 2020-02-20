@@ -1290,7 +1290,6 @@ class User extends User_Profile
         if (isset($filter) && is_array($filter) && count($filter) || !empty($search)) {
             $sqlCondition = $this->getFilteredUserIdList($filter, $search);
         } elseif (!empty($filter)) {
-            $sqlCondition['tables'] = array();
             $sqlCondition['conditions'] = array('tblU.`id` = '.intval($filter));
             $sqlCondition['group_tables'] = false;
             $limit = 1;
@@ -1312,10 +1311,7 @@ class User extends User_Profile
             }
         }
         try {
-            if (($arrQuery = $this->setSortedUserIdList($arrSort, $sqlCondition, $limit, $offset, $groupless, $crmUser)) === false) {
-                $this->clean();
-                return false;
-            }
+            $arrQuery = $this->setSortedUserIdList($arrSort, $sqlCondition, $limit, $offset, $groupless, $crmUser);
         } catch (\Throwable $e) {
             // catch invalid $filter or $search definitions
             $this->clean();
@@ -1327,8 +1323,8 @@ class User extends User_Profile
             foreach ($arrAttributes as $attribute) {
                 if (isset($this->arrAttributes[$attribute]) && !in_array($attribute, $arrSelectMetaExpressions)) {
                     $arrSelectMetaExpressions[] = $attribute;
-                } elseif ($this->objAttribute->isCoreAttribute($attribute) && !in_array($attribute, $arrSelectCoreExpressions)) {
-                    $arrSelectCustomExpressions[] = $this->objAttribute->getAttributeIdByProfileAttributeId($attribute);
+                } elseif ($this->objAttribute->isDefaultAttribute($attribute) && !in_array($attribute, $arrSelectCoreExpressions)) {
+                    $arrSelectCustomExpressions[] = $this->objAttribute->getAttributeIdByDefaultAttributeId($attribute);
                 } elseif ($this->objAttribute->isCustomAttribute($attribute) && (!isset($arrSelectCustomExpressions) || !in_array($attribute, $arrSelectCustomExpressions))) {
                     $arrSelectCustomExpressions[] = $attribute;
                 }
@@ -1368,8 +1364,8 @@ class User extends User_Profile
         if ($objUser !== false && $objUser->RecordCount() > 0) {
             while (!$objUser->EOF) {
                 foreach ($objUser->fields as $attributeId => $value) {
-                    $profileAttributeId = $this->objAttribute->getProfileAttributeIdByAttributeId($attributeId);
-                    if ($this->objAttribute->isCoreAttribute($profileAttributeId)) {
+                    $profileAttributeId = $this->objAttribute->getDefaultAttributeIdByAttributeId($attributeId);
+                    if ($this->objAttribute->isDefaultAttribute($profileAttributeId)) {
                         $this->arrCachedUsers[$objUser->fields['id']]['profile'][$profileAttributeId][0] = $this->arrLoadedUsers[$objUser->fields['id']]['profile'][$profileAttributeId][0] = $value;
                     } else {
                         $this->arrCachedUsers[$objUser->fields['id']][$attributeId] = $this->arrLoadedUsers[$objUser->fields['id']][$attributeId] = $value;
@@ -1610,8 +1606,8 @@ class User extends User_Profile
                     if (isset($this->arrAttributes[$attribute])) {
                         $arrSortExpressions[] = 'tblU.`'.$attribute.'` '.$direction;
                     } else if ($this->objAttribute->load($attribute)) {
-                        if ($this->objAttribute->isCoreAttribute($attribute)) {
-                            $attribute = $this->objAttribute->getAttributeIdByProfileAttributeId($attribute);
+                        if ($this->objAttribute->isDefaultAttribute($attribute)) {
+                            $attribute = $this->objAttribute->getAttributeIdByDefaultAttributeId($attribute);
                         }
                         $arrSortExpressions[] = 'tblA'.$nr.'.`value` '.$direction;
                         $arrCustomJoins[] = 'INNER JOIN `'.DBPREFIX.'access_user_attribute_value` AS tblA'.$nr.' ON tblA'.$nr.'.`user_id` = tblU.`id`';

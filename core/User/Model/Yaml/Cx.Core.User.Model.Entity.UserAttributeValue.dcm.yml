@@ -5,6 +5,8 @@ Cx\Core\User\Model\Entity\UserAttributeValue:
     value:
       columns: [ value ]
       flags: [ fulltext ]
+    attribute_user_idx:
+      columns: [ attribute_id, user_id ]
   fields:
     attributeId:
       id: true
@@ -35,19 +37,21 @@ Cx\Core\User\Model\Entity\UserAttributeValue:
   manyToOne:
     userAttribute:
       targetEntity: Cx\Core\User\Model\Entity\UserAttribute
-      inversedBy: userAttributeValue
+      inversedBy: userAttributeValues
       joinColumns:
         attribute_id:
           referencedColumnName: id
+          nullable: false
           options:
             unsigned: true
     user:
       targetEntity: Cx\Core\User\Model\Entity\User
-      inversedBy: userAttributeValue
+      inversedBy: userAttributeValues
       joinColumns:
         user_id:
           onDelete: RESTRICT
           onUpdate: RESTRICT
           referencedColumnName: id
+          nullable: false
           options:
             unsigned: true

@@ -134,7 +134,7 @@ class User_Profile
                                 (isset($arrDateCombined['d']) ? $arrDateCombined['d'] : $arrDateCombined['j']), // day
                                 (isset($arrDateCombined['Y']) ? $arrDateCombined['Y'] : ($arrDateCombined['y'] + ($arrDateCombined['y'] < 70 ? 2000 : 1900))) // year
                             );
-                        } elseif ($this->objAttribute->isCoreAttribute($attributeId)) {
+                        } elseif ($this->objAttribute->isDefaultAttribute($attributeId)) {
                             $value = '';
                         } else {
                             continue;
@@ -195,7 +195,7 @@ class User_Profile
             foreach ($arrHistoryIds as $historyId) {
                 if (
                        empty($this->arrLoadedUsers[$this->id]['profile'][$attributeId][$historyId])
-                    || $this->objAttribute->isCoreAttribute($attributeId)
+                    || $this->objAttribute->isDefaultAttribute($attributeId)
                        && ($objAttribute = $this->objAttribute->getById($attributeId))
                        && $objAttribute->getType() == 'menu'
                        && $objAttribute->isUnknownOption($this->arrLoadedUsers[$this->id]['profile'][$attributeId][$historyId])
@@ -236,8 +236,8 @@ class User_Profile
                         $value = '"gender_undefined"';
                     }
 
-                    if ($this->objAttribute->isCoreAttribute($attributeId)) {
-                        $attributeId = $this->objAttribute->getAttributeIdByProfileAttributeId($attributeId);
+                    if ($this->objAttribute->isDefaultAttribute($attributeId)) {
+                        $attributeId = $this->objAttribute->getAttributeIdByDefaultAttributeId($attributeId);
                     }
 
                     $query = "REPLACE INTO `".DBPREFIX."access_user_attribute_value` (`user_id`, `attribute_id`, `history_id`, `value`) VALUES (".$this->id.", $attributeId, ".$historyId.", " . $value . ")";
@@ -312,8 +312,8 @@ class User_Profile
         if ($objAttributeValue !== false && $objAttributeValue->RecordCount() > 0) {
             while (!$objAttributeValue->EOF) {
                 $attributeId = $objAttributeValue->fields['attribute_id'];
-                if ($this->objAttribute->isIdAssignedToCoreAttribute($attributeId)) {
-                    $attributeId = $this->objAttribute->getProfileAttributeIdByAttributeId($attributeId);
+                if ($this->objAttribute->isIdAssignedToDefaultAttribute($attributeId)) {
+                    $attributeId = $this->objAttribute->getDefaultAttributeIdByAttributeId($attributeId);
                 }
                 $this->arrCachedUsers[$objAttributeValue->fields['user_id']]['profile'][$attributeId][$objAttributeValue->fields['history_id']] =
                     $this->arrLoadedUsers[$objAttributeValue->fields['user_id']]['profile'][$attributeId][$objAttributeValue->fields['history_id']] =
@@ -364,8 +364,8 @@ class User_Profile
              * $attribute is the account profile attribute like 'firstname' or 'lastname'
              * $condition is either a simple condition (integer or string) or an condition matrix (array)
              */
-            if ($this->objAttribute->load($attribute) && $this->objAttribute->isCoreAttribute($attribute)) {
-                $attributeId = $this->objAttribute->getAttributeIdByProfileAttributeId($attribute);
+            if ($this->objAttribute->load($attribute) && $this->objAttribute->isDefaultAttribute($attribute)) {
+                $attributeId = $this->objAttribute->getAttributeIdByDefaultAttributeId($attribute);
 
                 switch ($attribute) {
                     case 'gender':
@@ -445,10 +445,10 @@ class User_Profile
 
 
             } elseif ($attribute === 'birthday_day') {
-                $attribute = $this->objAttribute->getAttributeIdByProfileAttributeId('birthday');
+                $attribute = $this->objAttribute->getAttributeIdByDefaultAttributeId('birthday');
                 $arrConditions[$tableIdx] = "(`".$tableIdx."`.`attribute_id` = ".$attribute." AND (DATE_FORMAT(DATE_ADD(FROM_UNIXTIME(0), interval `".$tableIdx."`.`value` second), '%e') = '".intval($condition)."'))";
             } elseif ($attribute === 'birthday_month') {
-                $attribute = $this->objAttribute->getAttributeIdByProfileAttributeId('birthday');
+                $attribute = $this->objAttribute->getAttributeIdByDefaultAttributeId('birthday');
                 $arrConditions[$tableIdx] = "(`".$tableIdx."`.`attribute_id` = ".$attribute." AND (DATE_FORMAT(DATE_ADD(FROM_UNIXTIME(0), interval `".$tableIdx."`.`value` second), '%c') = '".intval($condition)."'))";
             }
 
@@ -509,7 +509,7 @@ class User_Profile
 
         $arrConditions = array();
         foreach ($arrFilter as $attribute => $condition) {
-            if (!$this->objAttribute->load($attribute) || $this->objAttribute->isCoreAttribute($attribute)) {
+            if (!$this->objAttribute->load($attribute) || $this->objAttribute->isDefaultAttribute($attribute)) {
                 continue;
             }
 
@@ -602,7 +602,7 @@ class User_Profile
             }
             $attributeId = $objAttribute->getId();
             if ($core) {
-                $attributeId = $objAttribute->getAttributeIdByProfileAttributeId($objAttribute->getId());
+                $attributeId = $objAttribute->getAttributeIdByDefaultAttributeId($objAttribute->getId());
             }
             $attributeKeyClausePrefix = '(tblA.`attribute_id` = '.$attributeId.' AND ';
             $attributeKeyClauseSuffix = ')';

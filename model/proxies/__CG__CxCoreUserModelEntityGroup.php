@@ -73,10 +73,10 @@ class Group extends \Cx\Core\User\Model\Entity\Group implements \Doctrine\ORM\Pr
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'groupId', 'groupName', 'groupDescription', 'isActive', 'type', 'homepage', 'toolbar', 'user', 'validators', 'virtual');
+            return array('__isInitialized__', 'id', 'name', 'description', 'active', 'type', 'homepage', 'toolbar', 'users', 'validators', 'virtual');
         }
 
-        return array('__isInitialized__', 'groupId', 'groupName', 'groupDescription', 'isActive', 'type', 'homepage', 'toolbar', 'user', 'validators', 'virtual');
+        return array('__isInitialized__', 'id', 'name', 'description', 'active', 'type', 'homepage', 'toolbar', 'users', 'validators', 'virtual');
     }
 
     /**
@@ -187,14 +187,25 @@ class Group extends \Cx\Core\User\Model\Entity\Group implements \Doctrine\ORM\Pr
      */
     public function getGroupId()
     {
-        if ($this->__isInitialized__ === false) {
-            return (int)  parent::getGroupId();
-        }
-
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getGroupId', array());
 
         return parent::getGroupId();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getId()
+    {
+        if ($this->__isInitialized__ === false) {
+            return (int)  parent::getId();
+        }
+
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getId', array());
+
+        return parent::getId();
     }
 
     /**
@@ -211,12 +222,34 @@ class Group extends \Cx\Core\User\Model\Entity\Group implements \Doctrine\ORM\Pr
     /**
      * {@inheritDoc}
      */
+    public function setName($name)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setName', array($name));
+
+        return parent::setName($name);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getGroupName()
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getGroupName', array());
 
         return parent::getGroupName();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getName()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getName', array());
+
+        return parent::getName();
     }
 
     /**
@@ -233,12 +266,34 @@ class Group extends \Cx\Core\User\Model\Entity\Group implements \Doctrine\ORM\Pr
     /**
      * {@inheritDoc}
      */
+    public function setDescription($description)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setDescription', array($description));
+
+        return parent::setDescription($description);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getGroupDescription()
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getGroupDescription', array());
 
         return parent::getGroupDescription();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getDescription()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getDescription', array());
+
+        return parent::getDescription();
     }
 
     /**
@@ -255,12 +310,45 @@ class Group extends \Cx\Core\User\Model\Entity\Group implements \Doctrine\ORM\Pr
     /**
      * {@inheritDoc}
      */
+    public function setActive($active)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setActive', array($active));
+
+        return parent::setActive($active);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getIsActive()
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getIsActive', array());
 
         return parent::getIsActive();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getActive()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getActive', array());
+
+        return parent::getActive();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isActive()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'isActive', array());
+
+        return parent::isActive();
     }
 
     /**
@@ -360,6 +448,17 @@ class Group extends \Cx\Core\User\Model\Entity\Group implements \Doctrine\ORM\Pr
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getUser', array());
 
         return parent::getUser();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getUsers()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getUsers', array());
+
+        return parent::getUsers();
     }
 
     /**

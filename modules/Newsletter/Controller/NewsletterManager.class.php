@@ -5882,7 +5882,7 @@ $WhereStatement = array();
                     $fieldName = $arrWrapperDefinitions[$field]['def'];
                 }
 
-                if ($attr->isCoreAttribute($fieldName) && $recipientType == 'access') {
+                if ($attr->isDefaultAttribute($fieldName) && $recipientType == 'access') {
                     $wrapper = 'core';
                 }
 
@@ -6023,7 +6023,7 @@ $WhereStatement = array();
                 // We have to create a new array, because the array structure is
                 // different
                 foreach ($arrRecipientFields['list'] as $field) {
-                    if (!$attr->isCoreAttribute($field)) {
+                    if (!$attr->isDefaultAttribute($field)) {
                         continue;
                     }
 
