@@ -49,7 +49,7 @@ Cx\Core\User\Model\Entity\Group:
   manyToMany:
     users:
       targetEntity: Cx\Core\User\Model\Entity\User
-      mappedBy: group
+      mappedBy: groups
 #    accessId2:
 #      targetEntity: Cx\Core_Modules\Access\Model\Entity\AccessId
 #      mappedBy: group2
