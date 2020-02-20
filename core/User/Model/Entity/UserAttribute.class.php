@@ -107,7 +107,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /***
      * @var boolean
      */
-    protected $isDefault;
+    protected $default;
 
     /**
      * Constructor
@@ -273,20 +273,59 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
      * Set default
      *
      * @param boolean $isDefault
+     * @deprecated
+     * @see \Cx\Core\User\Model\Entity\UserAttribute::setDefault()
      */
     public function setIsDefault($isDefault)
     {
-        $this->isDefault = $isDefault;
+        $this->setDefault($isDefault);
+    }
+
+    /**
+     * Set default
+     *
+     * @param boolean $default
+     */
+    public function setDefault($default)
+    {
+        $this->default = $default;
     }
 
     /**
      * Get default
      *
      * @return boolean
+     * @deprecated
+     * @see \Cx\Core\User\Model\Entity\UserAttribute::getDefault()
      */
     public function getIsDefault()
     {
-        return $this->isDefault;
+        return $this->getDefault();
+    }
+
+    /**
+     * Get default
+     *
+     * This does exactly the same as isDefault, but this method is necessary for doctrine mapping
+     *
+     * @return boolean
+     */
+    public function getDefault()
+    {
+        return $this->default;
+    }
+
+
+    /**
+     * Get default
+     *
+     * This does exactly the same as getDefault, but this method name is more intuitive
+     *
+     * @return boolean
+     */
+    public function isDefault()
+    {
+        return $this->getDefault();
     }
 
     /**

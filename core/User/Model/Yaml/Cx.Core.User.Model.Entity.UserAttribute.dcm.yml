@@ -43,7 +43,7 @@ Cx\Core\User\Model\Entity\UserAttribute:
     readAccessId:
       type: integer
       column: read_access_id
-    isDefault:
+    default:
       type: boolean
       column: is_default
       options:
