@@ -92,7 +92,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * @var \Doctrine\Common\Collections\Collection
      */
-    protected $userAttributeName;
+    protected $userAttributeNames;
 
     /**
      * @var \Doctrine\Common\Collections\Collection
@@ -115,7 +115,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     public function __construct()
     {
         $this->children = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->userAttributeName = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->userAttributeNames = new \Doctrine\Common\Collections\ArrayCollection();
         $this->userAttributeValues = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
@@ -326,7 +326,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
      */
     public function addUserAttributeName(\Cx\Core\User\Model\Entity\UserAttributeName $userAttributeName)
     {
-        $this->userAttributeName[] = $userAttributeName;
+        $this->userAttributeNames[] = $userAttributeName;
     }
 
     /**
@@ -336,17 +336,29 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
      */
     public function removeUserAttributeName(\Cx\Core\User\Model\Entity\UserAttributeName $userAttributeName)
     {
-        $this->userAttributeName->removeElement($userAttributeName);
+        $this->userAttributeNames->removeElement($userAttributeName);
     }
 
     /**
      * Get userAttributeName
      *
-     * @return \Doctrine\Common\Collections\Collection 
+     * @return \Doctrine\Common\Collections\Collection
+     * @deprecated
+     * @see \Cx\Core\User\Model\Entity\UserAttribute::getUserAttributeNames()
      */
     public function getUserAttributeName()
     {
-        return $this->userAttributeName;
+        return $this->getUserAttributeNames();
+    }
+
+    /**
+     * Get userAttributeName
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getUserAttributeNames()
+    {
+        return $this->userAttributeNames;
     }
 
     /**
