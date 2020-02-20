@@ -33,9 +33,9 @@ namespace Cx\Core\User\Model\Entity;
  */
 class Group extends \Cx\Model\Base\EntityBase {
     /**
-     * @var integer $groupId
+     * @var integer $id
      */
-    private $groupId;
+    private $id;
 
     /**
      * @var string $groupName
@@ -93,10 +93,22 @@ class Group extends \Cx\Model\Base\EntityBase {
      * Get groupId
      *
      * @return integer $groupId
+     * @deprecated
+     * @see \Cx\Core\User\Model\Entity\User::getId()
      */
     public function getGroupId()
     {
-        return $this->groupId;
+        return $this->getId();
+    }
+
+    /**
+     * Get id
+     *
+     * @return integer group id
+     */
+    public function getId()
+    {
+        return $this->id;
     }
 
     /**

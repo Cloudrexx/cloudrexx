@@ -2,7 +2,7 @@ Cx\Core\User\Model\Entity\Group:
   type: entity
   table: access_user_groups
   fields:
-    groupId:
+    id:
       id: true
       type: integer
       length: 11
