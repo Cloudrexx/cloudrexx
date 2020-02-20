@@ -272,35 +272,11 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Set default
      *
-     * @param boolean $isDefault
-     * @deprecated
-     * @see \Cx\Core\User\Model\Entity\UserAttribute::setDefault()
-     */
-    public function setIsDefault($isDefault)
-    {
-        $this->setDefault($isDefault);
-    }
-
-    /**
-     * Set default
-     *
      * @param boolean $default
      */
     public function setDefault($default)
     {
         $this->default = $default;
-    }
-
-    /**
-     * Get default
-     *
-     * @return boolean
-     * @deprecated
-     * @see \Cx\Core\User\Model\Entity\UserAttribute::getDefault()
-     */
-    public function getIsDefault()
-    {
-        return $this->getDefault();
     }
 
     /**
