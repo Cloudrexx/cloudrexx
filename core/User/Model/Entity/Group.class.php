@@ -226,21 +226,35 @@ class Group extends \Cx\Model\Base\EntityBase {
      *
      * @return integer $isActive
      * @deprecated
-     * @see \Cx\Core\User\Model\Entity\Group::isActive()
+     * @see \Cx\Core\User\Model\Entity\Group::getActive()
      */
     public function getIsActive()
     {
-        return $this->isActive();
+        return $this->getActive();
     }
 
     /**
      * If group is active
      *
+     * This does exactly the same as getActive, but this method is necessary for doctrine mapping
+     *
+     * @return integer if group is active
+     */
+    public function getActive()
+    {
+        return $this->active;
+    }
+
+    /**
+     * If group is active.
+     *
+     * This does exactly the same as getActive, but this method name is more intuitive
+     *
      * @return integer if group is active
      */
     public function isActive()
     {
-        return $this->active;
+        return $this->getActive();
     }
 
     /**
