@@ -17,7 +17,7 @@ Cx\Core\User\Model\Entity\Group:
       column: group_name
       options:
         default: ""
-    groupDescription:
+    description:
       type: string
       length: 255
       nullable: false

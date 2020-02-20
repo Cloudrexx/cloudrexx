@@ -43,9 +43,9 @@ class Group extends \Cx\Model\Base\EntityBase {
     private $name;
 
     /**
-     * @var string $groupDescription
+     * @var string $description
      */
-    private $groupDescription;
+    private $description;
 
     /**
      * @var integer $isActive
@@ -159,20 +159,44 @@ class Group extends \Cx\Model\Base\EntityBase {
      * Set groupDescription
      *
      * @param string $groupDescription
+     * @deprecated
+     * @see \Cx\Core\User\Model\Entity\Group::setDescription()
      */
     public function setGroupDescription($groupDescription)
     {
-        $this->groupDescription = $groupDescription;
+        $this->setDescription($groupDescription);
+    }
+
+    /**
+     * Set description
+     *
+     * @param string $description group description
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
     }
 
     /**
      * Get groupDescription
      *
      * @return string $groupDescription
+     * @deprecated
+     * @see \Cx\Core\User\Model\Entity\Group::getDescription()
      */
     public function getGroupDescription()
     {
-        return $this->groupDescription;
+        return $this->getDescription();
+    }
+
+    /**
+     * Get description
+     *
+     * @return string group description
+     */
+    public function getDescription()
+    {
+        return $this->description;
     }
 
     /**
