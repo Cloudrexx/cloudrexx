@@ -55,7 +55,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     protected $type = 'text';
 
     /**
-     * @var enum_user_userattribute_mandatory
+     * @var boolean
      */
     protected $mandatory = '0';
 
@@ -105,7 +105,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     protected $children;
 
     /***
-     * @var enum_user_userattribute_accessspecial
+     * @var boolean
      */
     protected $isDefault;
 
@@ -152,7 +152,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Set mandatory
      *
-     * @param enum_user_userattribute_mandatory $mandatory
+     * @param boolean $mandatory
      */
     public function setMandatory($mandatory)
     {
@@ -162,7 +162,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get mandatory
      *
-     * @return enum_user_userattribute_mandatory 
+     * @return boolean
      */
     public function getMandatory()
     {
@@ -272,7 +272,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Set default
      *
-     * @param enum_user_userattribute_type $isDefault
+     * @param boolean $isDefault
      */
     public function setIsDefault($isDefault)
     {
@@ -282,7 +282,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get default
      *
-     * @return enum_user_userattribute_type
+     * @return boolean
      */
     public function getIsDefault()
     {
