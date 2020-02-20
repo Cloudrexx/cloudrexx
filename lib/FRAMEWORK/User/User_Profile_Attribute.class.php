@@ -553,7 +553,7 @@ class User_Profile_Attribute
             if (!$arrAttribute['parent_id']) {
                 $this->arrDefaultAttributeIds[] = $attributeId;
             }
-            $this->arrAttributes[$attributeId]['names'][$this->langId] = isset($_CORELANG[$arrAttribute['desc']]) ? $_CORELANG[$arrAttribute['desc']] : null;
+            $arrAttribute['names'][$this->langId] = isset($_CORELANG[$arrAttribute['desc']]) ? $_CORELANG[$arrAttribute['desc']] : null;
         }
 
         $query = '
