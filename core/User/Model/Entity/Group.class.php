@@ -94,7 +94,7 @@ class Group extends \Cx\Model\Base\EntityBase {
      *
      * @return integer $groupId
      * @deprecated
-     * @see \Cx\Core\User\Model\Entity\User::getId()
+     * @see \Cx\Core\User\Model\Entity\Group::getId()
      */
     public function getGroupId()
     {
