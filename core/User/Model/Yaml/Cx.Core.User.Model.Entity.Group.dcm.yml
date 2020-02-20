@@ -47,7 +47,7 @@ Cx\Core\User\Model\Entity\Group:
       options:
         default: 0
   manyToMany:
-    user:
+    users:
       targetEntity: Cx\Core\User\Model\Entity\User
       mappedBy: group
 #    accessId2:

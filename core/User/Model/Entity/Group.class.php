@@ -65,7 +65,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * @var \Doctrine\Common\Collections\Collection
      */
-    private $user;
+    private $users;
 
     /**
      * @var Cx\Core_Modules\Access\Model\Entity\AccessId
@@ -84,7 +84,7 @@ class Group extends \Cx\Model\Base\EntityBase {
 
     public function __construct()
     {
-        $this->user = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->users = new \Doctrine\Common\Collections\ArrayCollection();
         $this->accessId2 = new \Doctrine\Common\Collections\ArrayCollection();
         $this->accessId = new \Doctrine\Common\Collections\ArrayCollection();
     }
@@ -290,7 +290,7 @@ class Group extends \Cx\Model\Base\EntityBase {
      */
     public function addUser(\Cx\Core\User\Model\Entity\User $user)
     {
-        $this->user[] = $user;
+        $this->users[] = $user;
     }
 
     /**
@@ -299,17 +299,29 @@ class Group extends \Cx\Model\Base\EntityBase {
      * @param \Cx\Core\User\Model\Entity\User $user
      */
     public function removeUser(\Cx\Core\User\Model\Entity\User $user) {
-        $this->user->removeElement($user);
+        $this->users->removeElement($user);
     }
     
     /**
      * Get user
      *
      * @return \Doctrine\Common\Collections\Collection $user
+     * @deprecated
+     * @see \Cx\Core\User\Model\Entity\Group::getUsers()
      */
     public function getUser()
     {
-        return $this->user;
+        return $this->getUsers();
+    }
+
+    /**
+     * Get users
+     *
+     * @return \Doctrine\Common\Collections\Collection $users
+     */
+    public function getUsers()
+    {
+        return $this->users;
     }
 
     /**
