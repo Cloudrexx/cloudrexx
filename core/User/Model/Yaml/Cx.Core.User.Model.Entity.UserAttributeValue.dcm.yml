@@ -37,7 +37,7 @@ Cx\Core\User\Model\Entity\UserAttributeValue:
   manyToOne:
     userAttribute:
       targetEntity: Cx\Core\User\Model\Entity\UserAttribute
-      inversedBy: userAttributeValue
+      inversedBy: userAttributeValues
       joinColumns:
         attribute_id:
           referencedColumnName: id
@@ -46,7 +46,7 @@ Cx\Core\User\Model\Entity\UserAttributeValue:
             unsigned: true
     user:
       targetEntity: Cx\Core\User\Model\Entity\User
-      inversedBy: userAttributeValue
+      inversedBy: userAttributeValues
       joinColumns:
         user_id:
           onDelete: RESTRICT

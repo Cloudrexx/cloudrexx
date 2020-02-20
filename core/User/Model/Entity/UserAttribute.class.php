@@ -97,7 +97,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * @var \Doctrine\Common\Collections\Collection
      */
-    protected $userAttributeValue;
+    protected $userAttributeValues;
 
     /**
      * @var \Doctrine\Common\Collections\Collection
@@ -116,6 +116,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     {
         $this->children = new \Doctrine\Common\Collections\ArrayCollection();
         $this->userAttributeName = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->userAttributeValues = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     /**
@@ -355,7 +356,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
      */
     public function addUserAttributeValue(\Cx\Core\User\Model\Entity\UserAttributeValue $userAttributeValue)
     {
-        $this->userAttributeValue[] = $userAttributeValue;
+        $this->userAttributeValues[] = $userAttributeValue;
     }
 
     /**
@@ -365,17 +366,29 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
      */
     public function removeUserAttributeValue(\Cx\Core\User\Model\Entity\UserAttributeValue $userAttributeValue)
     {
-        $this->userAttributeValue->removeElement($userAttributeValue);
+        $this->userAttributeValues->removeElement($userAttributeValue);
     }
 
     /**
      * Get userAttributeValue
      *
      * @return \Doctrine\Common\Collections\Collection
+     * @deprecated
+     * @see \Cx\Core\User\Model\Entity\UserAttribute::getUserAttributeValues()
      */
     public function getUserAttributeValue()
     {
-        return $this->userAttributeValue;
+        return $this->getUserAttributeValues();
+    }
+
+    /**
+     * Get userAttributeValues
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getUserAttributeValues()
+    {
+        return $this->userAttributeValues;
     }
 
     /**

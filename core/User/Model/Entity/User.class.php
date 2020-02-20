@@ -328,7 +328,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @var \Doctrine\Common\Collections\Collection
      */
-    protected $userAttributeValue;
+    protected $userAttributeValues;
 
     /**
      * Constructor
@@ -340,7 +340,7 @@ class User extends \Cx\Model\Base\EntityBase {
         $this->emailAccess = $arrSettings['default_email_access']['value'];
 
         $this->groups = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->userAttributeValue = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->userAttributeValues = new \Doctrine\Common\Collections\ArrayCollection();
 
     }
 
@@ -853,7 +853,7 @@ class User extends \Cx\Model\Base\EntityBase {
      */
     public function addUserAttributeValue(\Cx\Core\User\Model\Entity\UserAttributeValue $userAttributeValue)
     {
-        $this->userAttributeValue[] = $userAttributeValue;
+        $this->userAttributeValues[] = $userAttributeValue;
     }
 
     /**
@@ -863,17 +863,29 @@ class User extends \Cx\Model\Base\EntityBase {
      */
     public function removeUserAttributeValue(\Cx\Core\User\Model\Entity\UserAttributeValue $userAttributeValue)
     {
-        $this->userAttributeValue->removeElement($userAttributeValue);
+        $this->userAttributeValues->removeElement($userAttributeValue);
     }
 
     /**
      * Get userAttributeValue
      *
      * @return \Doctrine\Common\Collections\Collection
+     * @deprecated
+     * @see \Cx\Core\User\Model\Entity\User::getUserAttributeValues()
      */
     public function getUserAttributeValue()
     {
-        return $this->userAttributeValue;
+        return $this->getUserAttributeValues();
+    }
+
+    /**
+     * Get userAttributeValues
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getUserAttributeValues()
+    {
+        return $this->userAttributeValues;
     }
 
     /**

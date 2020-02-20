@@ -56,7 +56,7 @@ Cx\Core\User\Model\Entity\UserAttribute:
       targetEntity: Cx\Core\User\Model\Entity\UserAttributeName
       orderBy: { 'order': 'ASC' }
       mappedBy: userAttribute
-    userAttributeValue:
+    userAttributeValues:
       targetEntity: Cx\Core\User\Model\Entity\UserAttributeValue
       mappedBy: userAttribute
   manyToOne:

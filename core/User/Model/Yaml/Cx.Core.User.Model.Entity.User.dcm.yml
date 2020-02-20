@@ -161,7 +161,7 @@ Cx\Core\User\Model\Entity\User:
             options:
               unsigned: true
   oneToMany:
-    userAttributeValue:
+    userAttributeValues:
       targetEntity: Cx\Core\User\Model\Entity\UserAttributeValue
       mappedBy: user
   lifecycleCallbacks:
