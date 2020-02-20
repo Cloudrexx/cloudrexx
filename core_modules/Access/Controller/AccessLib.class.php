@@ -2441,36 +2441,20 @@ JS
             }
         }
 
-        // fetch all ids and load the users individually later to avoid
-        // memory overflow
         $users = $qb->getQuery()->getResult();
-        $userIds = array();
-        if (!empty($users)) {
-            foreach ($users as $user) {
-                $userIds[] = $user->getId();
-            }
-        }
-        foreach ($userIds as $key => $userId) {
-            $objUser = $objFWUser->objUser->getUsers(
-                $userId,
-                null,
-                array('username'),
-                array_keys($arrFields)
-            );
-            // clear cached users to avoid memory overflow
-            $objUser->clearCache();
 
+        foreach ($users as $user) {
             // do not export users without any group membership
             // in frontend export
             if (
                 $isFrontend &&
-                empty($objUser->getAssociatedGroupIds(true))
+                empty($user->getAssociatedGroupIds(true))
             ) {
                 continue;
             }
 
             // fetch associated user groups
-            $groups = $this->getGroupListOfUser($objUser);
+            $groups = $this->getGroupListOfUser($user);
 
             // do not export users without any group membership
             // in frontend export
@@ -2481,13 +2465,14 @@ JS
                 continue;
             }
 
-            $frontendLangId = $objUser->getFrontendLanguage();
+            $frontendLangId = $user->getFrontendLangId();
             if (empty($frontendLangId)) {
                 $frontendLangId = $objInit->getDefaultFrontendLangId();
             }
+
             $frontendLang = $arrLangs[$frontendLangId]['name']." (".$arrLangs[$frontendLangId]['lang'].")";
 
-            $backendLangId = $objUser->getBackendLanguage();
+            $backendLangId = $user->getBackendLangId();
             if (empty($backendLangId)) {
                 $backendLangId = $objInit->getDefaultBackendLangId();
             }
@@ -2496,7 +2481,7 @@ JS
             // active status of user
             // note: do not output in frontend
             if (!$isFrontend) {
-                $activeStatus = $objUser->getActiveStatus() ? $_CORELANG['TXT_YES'] : $_CORELANG['TXT_NO'];
+                $activeStatus = $user->getActive() ? $_CORELANG['TXT_YES'] : $_CORELANG['TXT_NO'];
                 print $this->escapeCsvValue($activeStatus).$csvSeparator;
             }
 
@@ -2507,20 +2492,26 @@ JS
             print $this->escapeCsvValue($backendLang).$csvSeparator;
 
             // username
-            print $this->escapeCsvValue($objUser->getUsername()).$csvSeparator;
+            print $this->escapeCsvValue(
+                (!empty($user->getUsername()) ? $user->getUsername() : $user->getEmail())
+            ).$csvSeparator;
 
             // email
-            print $this->escapeCsvValue($objUser->getEmail()).$csvSeparator;
+            print $this->escapeCsvValue($user->getEmail()).$csvSeparator;
 
             // regdate
-            print $this->escapeCsvValue(date(ASCMS_DATE_FORMAT_DATE, $objUser->getRegistrationDate())).$csvSeparator;
+            print $this->escapeCsvValue(date(ASCMS_DATE_FORMAT_DATE, $user->getRegdate())).$csvSeparator;
 
             // user groups
             print $this->escapeCsvValue(join(',', $groups)).$csvSeparator;
 
             // profile attributes
             foreach ($arrProfileFields as $field) {
-                $value = $objUser->getProfileAttribute($field);
+                $attributeId = $field;
+                if ($objFWUser->objUser->objAttribute->isCoreAttribute($field)) {
+                    $attributeId = $objFWUser->objUser->objAttribute->getAttributeIdByProfileAttributeId($field);
+                }
+                $value = $user->getAttributeValue($attributeId)->getValue();
 
                 switch ($field) {
                     case 'gender':
@@ -2541,12 +2532,11 @@ JS
 
                     case 'title':
                     case 'country':
-                        $title = '';
-                        $value = $objUser->objAttribute->getById($field . '_' . $value)->getName();
+                        $value = $objFWUser->objUser->objAttribute->getById($field . '_' . $value)->getName();
                         break;
 
                     default:
-                        $objAttribute = $objUser->objAttribute->getById($field);
+                        $objAttribute = $objFWUser->objUser->objAttribute->getById($field);
                         if (!empty($value) && $objAttribute->getType() == 'date') {
                             $date = new \DateTime();
                             $date ->setTimestamp($value);
@@ -2555,7 +2545,7 @@ JS
                         if ($objAttribute->getType() == 'menu') {
                             $option = '';
                             if (!empty($value)) {
-                                $objAttributeChild = $objUser->objAttribute->getById($value);
+                                $objAttributeChild = $objFWUser->objUser->objAttribute->getById($value);
                                 if (!$objAttributeChild->EOF) {
                                     $option = $objAttributeChild->getName();
                                 }
@@ -2582,8 +2572,8 @@ JS
      * In frontend mode, this method does only return frontend user groups.
      * Whereas in every other mode, it does return all associated user groups.
      *
-     * @param   \User   $objUser    The user of whom the associated groups
-     *                              shall be returned.
+     * @param   \Cx\Core\User\Model\Entity\User $objUser    The user of whom the associated groups
+     *                                                      shall be returned.
      * @return  array   An array containing the names of the associated groups.
      */
     protected function getGroupListOfUser($objUser) {
