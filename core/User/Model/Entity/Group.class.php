@@ -48,9 +48,9 @@ class Group extends \Cx\Model\Base\EntityBase {
     private $description;
 
     /**
-     * @var integer $isActive
+     * @var integer $active
      */
-    private $isActive;
+    private $active;
 
     /**
      * @var string $type
@@ -203,20 +203,44 @@ class Group extends \Cx\Model\Base\EntityBase {
      * Set isActive
      *
      * @param integer $isActive
+     * @deprecated
+     * @see \Cx\Core\User\Model\Entity\Group::setActive()
      */
     public function setIsActive($isActive)
     {
-        $this->isActive = $isActive;
+        $this->setActive($isActive);
+    }
+
+    /**
+     * Set if group is active
+     *
+     * @param boolean $active
+     */
+    public function setActive($active)
+    {
+        $this->active = $active;
     }
 
     /**
      * Get isActive
      *
      * @return integer $isActive
+     * @deprecated
+     * @see \Cx\Core\User\Model\Entity\Group::isActive()
      */
     public function getIsActive()
     {
-        return $this->isActive;
+        return $this->isActive();
+    }
+
+    /**
+     * If group is active
+     *
+     * @return integer if group is active
+     */
+    public function isActive()
+    {
+        return $this->active;
     }
 
     /**
