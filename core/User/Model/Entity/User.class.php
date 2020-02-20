@@ -155,7 +155,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @var \Doctrine\Common\Collections\Collection
      */
-    private $group;
+    private $groups;
 
     public function __construct()
     {
@@ -180,7 +180,7 @@ class User extends \Cx\Model\Base\EntityBase {
         $this->restoreKeyTime = '';
         $this->u2uActive = 0;
 
-        $this->group = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->groups = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     /**
@@ -672,7 +672,7 @@ class User extends \Cx\Model\Base\EntityBase {
     public function addGroup(\Cx\Core\User\Model\Entity\Group $group)
     {
         $group->addUser($this);
-        $this->group[] = $group;
+        $this->groups[] = $group;
     }
 
     /**
@@ -682,17 +682,29 @@ class User extends \Cx\Model\Base\EntityBase {
      */
     public function removeGroup(\Cx\Core\User\Model\Entity\Group $group) {
         $group->removeUser($this);
-        $this->group->removeElement($group);
+        $this->groups->removeElement($group);
     }
     
     /**
      * Get group
      *
      * @return \Doctrine\Common\Collections\Collection $group
+     * @deprecated
+     * @see \Cx\Core\User\Model\Entity\User::getGroups()
      */
     public function getGroup()
     {
-        return $this->group;
+        return $this->getGroups();
+    }
+
+    /**
+     * Get groups
+     *
+     * @return \Doctrine\Common\Collections\Collection $groups
+     */
+    public function getGroups()
+    {
+        return $this->groups;
     }
     
     /**
@@ -702,11 +714,11 @@ class User extends \Cx\Model\Base\EntityBase {
      */
     public function isBackendGroupUser()
     {
-        if (!$this->group) {
+        if (!$this->getGroups()) {
             return false;
         }
         
-        foreach ($this->group as $group) {
+        foreach ($this->getGroups() as $group) {
             if ($group->getType() === 'backend') {
                 return true;
             }
