@@ -10,7 +10,7 @@ Cx\Core\User\Model\Entity\Group:
       generator:
         strategy: AUTO
       column: group_id   
-    groupName:
+    name:
       type: string
       length: 100
       nullable: false

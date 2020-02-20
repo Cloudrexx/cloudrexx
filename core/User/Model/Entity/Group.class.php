@@ -38,9 +38,9 @@ class Group extends \Cx\Model\Base\EntityBase {
     private $id;
 
     /**
-     * @var string $groupName
+     * @var string $name
      */
-    private $groupName;
+    private $name;
 
     /**
      * @var string $groupDescription
@@ -115,20 +115,44 @@ class Group extends \Cx\Model\Base\EntityBase {
      * Set groupName
      *
      * @param string $groupName
+     * @deprecated
+     * @see \Cx\Core\User\Model\Entity\Group::setName()
      */
     public function setGroupName($groupName)
     {
-        $this->groupName = $groupName;
+        $this->setName($groupName);
+    }
+
+    /**
+     * Set name
+     *
+     * @param string $name group name
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
     }
 
     /**
      * Get groupName
      *
      * @return string $groupName
+     * @deprecated
+     * @see \Cx\Core\User\Model\Entity\Group::getName()
      */
     public function getGroupName()
     {
-        return $this->groupName;
+        return $this->getName();
+    }
+
+    /**
+     * Get name
+     *
+     * @return string group name
+     */
+    public function getName()
+    {
+        return $this->name;
     }
 
     /**
