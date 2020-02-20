@@ -918,4 +918,22 @@ class User extends \Cx\Model\Base\EntityBase {
         $this->setRestoreKey('');
         $this->setRestoreKeyTime(0);
     }
+
+    /**
+     * Get associated group ids
+     *
+     * @param boolean $activeOnly Wether to load only the active groups or all
+     * @retrun array
+     */
+    public function getAssociatedGroupIds($activeOnly = false)
+    {
+        $groupIds = array();
+        foreach ($this->getGroup() as $group) {
+            if ($activeOnly && !$group->getIsActive()) {die();
+                continue;
+            }
+            $groupIds[] = $group->getGroupId();
+        }
+        return $groupIds;
+    }
 }
