@@ -674,11 +674,25 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get active
      *
+     * This does exactly the same as getActive, but this method is necessary for doctrine mapping
+     *
      * @return boolean 
      */
     public function getActive()
     {
         return $this->active;
+    }
+
+    /**
+     * Get active
+     *
+     * This does exactly the same as getActive, but this method name is more intuitive
+     *
+     * @return integer $active
+     */
+    public function isActive()
+    {
+        return $this->getActive();
     }
 
     /**

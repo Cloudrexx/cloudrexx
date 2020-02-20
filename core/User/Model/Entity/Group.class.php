@@ -239,7 +239,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * If group is active
      *
-     * This does exactly the same as getActive, but this method is necessary for doctrine mapping
+     * This does exactly the same as isActive, but this method is necessary for doctrine mapping
      *
      * @return integer if group is active
      */
