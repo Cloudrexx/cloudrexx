@@ -137,7 +137,6 @@ class MediaDirectoryInputfield extends MediaDirectoryLibrary
                 verifications.`regex` AS `pattern`,
                 types.`name` AS `type_name`,
                 types.`multi_lang` AS `type_multi_lang`,
-                types.`dynamic` AS `type_dynamic`,
                 types.`exp_search` As `exp_search`
             FROM
                 `' . DBPREFIX . 'module_' . $this->moduleTablePrefix . '_inputfields` AS input
@@ -196,7 +195,6 @@ class MediaDirectoryInputfield extends MediaDirectoryLibrary
                 $arrInputfield['type'] = intval($objInputfields->fields['type']);
                 $arrInputfield['type_name'] = htmlspecialchars($objInputfields->fields['type_name'], ENT_QUOTES, CONTREXX_CHARSET);
                 $arrInputfield['type_multi_lang'] = intval($objInputfields->fields['type_multi_lang']);
-                $arrInputfield['type_dynamic'] = intval($objInputfields->fields['type_dynamic']);
                 $arrInputfield['show_in'] = intval($objInputfields->fields['show_in']);
                 $arrInputfield['verification'] = intval($objInputfields->fields['verification']);
                 $arrInputfield['regex'] = $objInputfields->fields['pattern'];

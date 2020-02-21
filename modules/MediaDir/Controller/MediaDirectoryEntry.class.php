@@ -1688,42 +1688,7 @@ JSCODE;
                     }
 
                     // proceed with attributes that are localized
-                    // if the attribute is of type dynamic (meaning it can have an unlimited set of childs (references))
-                    if ($arrInputfield['type_dynamic'] == 1) {
-                        $arrDefault = array();
-                        foreach ($arrData[$this->moduleNameLC.'Inputfield'][$arrInputfield['id']][0] as $intKey => $arrValues) {
-                            $arrNewDefault = $arrData[$this->moduleNameLC.'Inputfield'][$arrInputfield['id']][$outputLocaleId][$intKey];
-                            $arrOldDefault = $arrData[$this->moduleNameLC.'Inputfield'][$arrInputfield['id']]['old'][$intKey];
-                            $arrNewValues = $arrData[$this->moduleNameLC.'Inputfield'][$arrInputfield['id']][$intLangId][$intKey];
-                            foreach ($arrValues as $strKey => $strMasterValue) {
-                                if ($intLangId == $outputLocaleId) {
-                                    if (!isset($arrDefault[$intKey])) {
-                                        $arrDefault[$intKey] = array();
-                                    }
-                                    if ($arrNewDefault[$strKey] != $strMasterValue) {
-                                        if ($strMasterValue != $arrOldDefault[$strKey] && $arrNewDefault[$strKey] == $arrOldDefault[$strKey]) {
-                                            $arrDefault[$intKey][$strKey] = $strMasterValue;
-                                        } else {
-                                            $arrDefault[$intKey][$strKey] = $arrNewDefault[$strKey];
-                                        }
-                                    } else {
-                                        $arrDefault[$intKey][$strKey] = $arrNewDefault[$strKey];
-                                    }
-                                } else {
-                                    if ($arrNewValues[$strKey] == '') {
-                                        if (!isset($arrDefault[$intKey])) {
-                                            $arrDefault[$intKey] = array();
-                                        }
-                                        $arrDefault[$intKey][$strKey] = $strMasterValue;
-                                    } else {
-                                        $arrDefault = $arrData[$this->moduleNameLC.'Inputfield'][$arrInputfield['id']][$intLangId];
-                                    }
-                                }
-                            }
-                            $strDefault = $arrDefault;
-                        }
-                        $strInputfieldValue = $objInputfield->saveInputfield($arrInputfield['id'], $strDefault, $intLangId);
-                    } else if (
+                    if (
                         // attribute's VALUE of certain frontend language ($intLangId) is empty
                         empty($arrData[$this->moduleNameLC.'Inputfield'][$arrInputfield['id']][$intLangId])
                         // or the process is parsing the user's current interface language
