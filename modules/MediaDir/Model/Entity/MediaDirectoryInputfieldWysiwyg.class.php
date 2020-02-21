@@ -269,9 +269,32 @@ class MediaDirectoryInputfieldWysiwyg extends \Cx\Modules\MediaDir\Controller\Me
 
 
 
-    function getJavascriptCheck()
+    public function getJavascriptCheck()
     {
-        return null;
+        $fieldName = $this->moduleNameLC."Inputfield";
+        $strJavascriptCheck = <<<EOF
+
+            case 'wysiwyg':
+                for (var i in CKEDITOR.instances) {
+                    var fieldIdRegexp = new RegExp('${fieldName}\\\[' + field + '\\\]\\\[[0-9]+\\\]');
+                    if (!fieldIdRegexp.test(i)) {
+                        continue;
+                    }
+                    var value = CKEDITOR.instances[i].getData();
+                    if (value == '' && isRequiredGlobal(inputFields[field][1], value)) {
+                        isOk = false;
+                        document.getElementById('cke_' + i).style.border = "#ff0000 1px solid";
+                    } else if (value != '' && !matchType(inputFields[field][2], value)) {
+                        isOk = false;
+                        document.getElementById('cke_' + i).style.border = "#ff0000 1px solid";
+                    } else {
+                        document.getElementById('cke_' + i).style.borderColor = '';
+                    }
+                }
+                break;
+
+EOF;
+        return $strJavascriptCheck;
     }
 
 
