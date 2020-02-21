@@ -1737,7 +1737,7 @@ EOF;
      * @param  int     $slugLangId  The ID of the locale the slug is from.
      */
     protected function enforceUniqueSlug(&$slug, $entryId, $slugLangId) {
-	    // Check for pretty urls usage.
+        // Check for pretty urls usage.
         // In case it's not enabled, do simply return
         // the proposed slug.
         if (!$this->arrSettings['usePrettyUrls']) {

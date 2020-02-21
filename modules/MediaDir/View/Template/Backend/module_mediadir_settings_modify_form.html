@@ -33,7 +33,7 @@ $J(function(){
 });
 
 function resetContextFields() {
-    var contexts = ['title', 'address', 'zip', 'city', 'country'];
+    var contexts = ['title', 'address', 'zip', 'city', 'country', 'slug'];
     $J(".inputfieldContext").each(function(){
         if ($J(this).val() != 'none') {
             $J(".inputfieldContext option[value="+ $J(this).val() +"]")

@@ -1549,7 +1549,7 @@ JSCODE;
             }
 
             // skip inputfields that are out of scope (frontend/backend), resp.
-            // that are not allowed to be modified in the corrent mode (frontend
+            // that are not allowed to be modified in the current mode (frontend
             // or backend)
             if (
                 // show_in is neither FRONTEND or BACKEND ($intShowIn = 2|3)
