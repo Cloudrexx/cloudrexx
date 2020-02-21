@@ -45,6 +45,31 @@ namespace Cx\Core_Modules\DataAccess\Controller;
  * @subpackage core_modules_dataaccess
  */
 class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentController {
+
+    /**
+     * @var int Minimum length for API keys
+     */
+    const MIN_KEY_LENGTH = 32;
+
+    /**
+     * @var int Access ID assigned to this component
+     */
+    const MAIN_ACCESS_ID = 205;
+
+    /**
+     * @var string Message for exceptions forwarded to API
+     */
+    const ERROR_MESSAGE = 'Exception of type "%s" with message "%s"';
+
+    /**
+     * @inheritdoc
+     */
+    protected $enduserDocumentationUrl = 'https://www.cloudrexx.info/api';
+
+    /**
+     * @inheritdoc
+     */
+    protected $developerDocumentationUrl = 'https://wiki.cloudrexx.com/RESTful_API';
     
     /**
      * Returns all Controller class names for this component (except this)
@@ -52,10 +77,40 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      * Be sure to return all your controller classes if you add your own
      * @return array List of Controller class names (without namespace)
      */
-    public function getControllerClasses() {
-        return array('JsonOutput', 'CliOutput');
+    public function getControllerClasses()
+    {
+        return array('JsonOutput', 'CliOutput', 'Backend', 'JsonDataAccess');
     }
-    
+
+    /**
+     * @inheritDoc
+     */
+    public function getControllersAccessableByJson() {
+        return array('JsonDataAccessController');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function registerEventListeners()
+    {
+        $apiListener = new \Cx\Core_Modules\DataAccess\Model\Event\ApiKeyEventListener(
+            $this->cx
+        );
+
+        $this->cx->getEvents()->addModelListener(
+            \Doctrine\ORM\Events::prePersist,
+            $this->getNamespace() .'\Model\Entity\ApiKey',
+            $apiListener
+        );
+
+        $this->cx->getEvents()->addModelListener(
+            \Doctrine\ORM\Events::preUpdate,
+            $this->getNamespace() .'\Model\Entity\ApiKey',
+            $apiListener
+        );
+    }
+
     /**
      * Returns a list of command mode commands provided by this component
      * @return array List of command names
@@ -178,6 +233,11 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             $apiKey = null;
             if (isset($arguments['apikey'])) {
                 $apiKey = $arguments['apikey'];
+            }
+            // force api key length
+            if (strlen($apiKey) < static::MIN_KEY_LENGTH) {
+                $response->setStatusCode(403);
+                throw new \Cx\Core\Error\Model\Entity\ShinyException('Access denied');
             }
 
             $requestReadonly = in_array($method, array('options', 'head', 'get'));
@@ -363,7 +423,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             $response->addMessage(
                 \Cx\Core_Modules\DataAccess\Model\Entity\ApiResponse::MESSAGE_TYPE_ERROR,
                 sprintf(
-                    $lang['TXT_CORE_MODULE_DATA_ACCESS_ERROR'],
+                    static::ERROR_MESSAGE,
                     get_class($e),
                     $e->getMessage()
                 )
