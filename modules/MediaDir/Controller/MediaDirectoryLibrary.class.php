@@ -1826,6 +1826,11 @@ EOF;
             }
         }
 
+        // assign a random slug in case non has been set yet
+        if ($slug == '') {
+            $slug = base_convert(microtime(), 10, 36);
+        }
+
         // enforce uniqueness on slug
         $idx = 1;
         $oriSlug = $slug;
