@@ -132,6 +132,10 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 ),   // allowed methods
                 false                   // requires login
             ),
+            'apidoc' => new \Cx\Core_Modules\Access\Model\Entity\Permission(
+                array('cli', 'https'), // allowed protocols
+                array('get', 'cli') // allowed method
+            ),
         );
     }
 
@@ -149,6 +153,14 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 }
                 return 'RESTful data interchange API v1' . "\n" .
                     'Usage: v1 <outputModule> <dataSource> (<elementId>) (apikey=<apiKey>) (<options>)';
+            case 'apidoc':
+                $doc = 'Returns OpenAPI specification file for current system\'s API';
+                if (!$short) {
+                    $doc .= "\n" .
+                        'Usage: apidoc (regen)' . "\n" .
+                        '"regen" argument forces regeneration';
+                }
+                return $doc;
             default:
                 return '';
         }
@@ -169,6 +181,10 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             switch ($command) {
                 case 'v1':
                     $this->apiV1($command, $arguments, $dataArguments);
+                    break;
+                case 'apidoc':
+                    $this->generateApiDoc(current($arguments) == 'regen');
+                    break;
             }
         } catch (\Exception $e) {
             // This should only be used if API cannot handle the request at all.
@@ -462,6 +478,44 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             throw new \Exception('No such DataSource: ' . $name);
         }
         return $dataAccess->getDataSource();
+    }
+    
+    /**
+     * Outputs the swagger.json file for the current installation
+     *
+     * If $forceRegen is not set to true, the file will be (re)generated if:
+     * - it does not yet exist /tmp/swagger.json
+     * - it is older than ??
+     * @todo Implement "older than"...
+     * @param boolean $forceRegen (optional) If set to true file is always regenerated
+     */
+    protected function generateApiDoc($forceRegen = false) {
+        $filename = $this->cx->getWebsiteTempPath() . '/swagger.json';
+        if (
+            $forceRegen ||
+            !file_exists($filename) ||
+            false // file not too old
+        ) {
+            $this->cx->getClassLoader()->loadFile(
+                $this->cx->getCodeBaseLibraryPath() . '/OpenApi/src/functions.php'
+            );
+            $openapi = \OpenApi\scan(
+                array(
+                    $this->cx->getCodeBaseCorePath(),
+                    $this->cx->getCodeBaseCoreModulePath(),
+                    $this->cx->getCodeBaseModulePath(),
+                )
+            );
+            $objFile = new \Cx\Lib\FileSystem\File($filename);
+            $objFile->write($openapi->toJson());
+        }
+        // echo file contents:
+        try {
+            $objFile = new \Cx\Lib\FileSystem\File($filename);
+            echo $objFile->getData();
+        } catch (\Cx\Lib\FileSystem\FileSystemException $e) {
+            \DBG::msg($e->getMessage());
+        }
     }
 }
 
