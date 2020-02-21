@@ -1886,6 +1886,7 @@ EOF;
     public function generateEntrySlugs() {
         global $_ARRAYLANG;
 
+        $this->arrSettings['usePrettyUrls'] = 1;
         $db = $this->cx->getDb()->getAdoDb();
 
         // get all entries
@@ -1987,7 +1988,7 @@ EOF;
                     while (!$firstField->EOF) {
                         $langId = $firstField->fields['lang_id'];
                         $slugFromFirstField = $firstField->fields['value'];
-                        $this->slugify($slugFromFirstField);
+                        $this->slugify($arrEntry['entryId'], $slugFromFirstField, $langId);
 
                         // store slug value for entry in db
                         $query = "

@@ -1557,17 +1557,6 @@ JSCODE;
                 $titleData = $arrData[$this->moduleNameLC.'Inputfield'][$arrInputfield['id']];
             }
 
-            // slugify slug value
-            if ($arrInputfield['context_type'] == 'slug' && isset($arrData[$this->moduleNameLC.'Inputfield'][$arrInputfield['id']])) {
-                $slugValues = $arrData[$this->moduleNameLC.'Inputfield'][$arrInputfield['id']];
-                array_walk(
-                    $slugValues,
-                    array($this, 'slugify'),
-                    $titleData
-                );
-                $arrData[$this->moduleNameLC.'Inputfield'][$arrInputfield['id']] = $slugValues;
-            }
-
             // truncate attribute's data ($arrInputfield) from database if it's VALUE is not set (empty) or set to it's default value
             if (   empty($arrData[$this->moduleNameLC.'Inputfield'][$arrInputfield['id']])
                 || $arrData[$this->moduleNameLC.'Inputfield'][$arrInputfield['id']] == $arrInputfield['default_value'][$outputLocaleId]
@@ -1596,12 +1585,16 @@ JSCODE;
             // delete attribute's data of languages that are no longer in use
             $objDatabase->Execute("DELETE FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields WHERE entry_id='".$intId."' AND field_id = '".intval($arrInputfield['id'])."' AND lang_id NOT IN (".join(",", array_keys($this->arrFrontendLanguages)).")");
 
-            // attribute is i18n
+            // process data for each activated locale according to option
+            // settingsActiveLanguages
             foreach ($this->arrFrontendLanguages as $arrLang) {
                 try {
                     $intLangId = $arrLang['id'];
 
-                    // attribute is non-i18n
+                    // inputfield is non-i18n (data entry of inputfield is not
+                    // localized).
+                    // for each activated locale (according to option
+                    // settingsActiveLanguages) we will persist the same data
                     if ($arrInputfield['type_multi_lang'] == 0) {
                         $strInputfieldValue = $objInputfield->saveInputfield($arrInputfield['id'], $arrData[$this->moduleNameLC.'Inputfield'][$arrInputfield['id']]);
                         $objResult = $objDatabase->Execute("
@@ -1617,9 +1610,11 @@ JSCODE;
                             throw new \Exception($objDatabase->ErrorMsg());
                         }
 
+                        // proceed to the next activated locale
                         continue;
                     }
 
+                    // proceed with attributes that are localized
                     // if the attribute is of type dynamic (meaning it can have an unlimited set of childs (references))
                     if ($arrInputfield['type_dynamic'] == 1) {
                         $arrDefault = array();
@@ -1679,6 +1674,11 @@ JSCODE;
                     } else {
                         // regular attribute get parsed
                         $strInputfieldValue = $objInputfield->saveInputfield($arrInputfield['id'], $arrData[$this->moduleNameLC.'Inputfield'][$arrInputfield['id']][$intLangId], $intLangId);
+                    }
+
+                    // slugify slug value
+                    if ($arrInputfield['context_type'] == 'slug') {
+                        $this->slugify(intval($intId), $strInputfieldValue, $intLangId, $titleData);
                     }
 
                     $objResult = $objDatabase->Execute("
