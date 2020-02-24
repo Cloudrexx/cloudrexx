@@ -1552,6 +1552,9 @@ EOF;
         if (empty($string) && isset($titleData[$langId])) {
             $string = $titleData[$langId];
         }
+        if (empty($string) && isset($titleData[0])) {
+            $string = $titleData[0];
+        }
         $string = $this->cx->getComponent('Model')->slugify($string);
         $this->enforceUniqueSlug($string, $entryId, $langId);
     }
