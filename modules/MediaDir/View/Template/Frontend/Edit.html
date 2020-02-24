@@ -1,3 +1,8 @@
+<style type="text/css">
+.editorFix {
+clear: both;
+}
+</style>
 <div id="mediadir">
     {MEDIADIR_JAVASCRIPT}
     <!-- BEGIN mediadirEntryOkMessage -->
@@ -31,21 +36,21 @@
         <input type="hidden" value="{MEDIADIR_UPLOADER_ID}" name="uploaderId" />
         <!-- BEGIN mediadirInputfieldElement -->
         <!-- BEGIN mediadirInputfieldList -->
-        <p><label>{TXT_MEDIADIR_INPUTFIELD_NAME}</label>{MEDIADIR_INPUTFIELD_FIELD}</p>
+        <div><label>{TXT_MEDIADIR_INPUTFIELD_NAME}</label>{MEDIADIR_INPUTFIELD_FIELD}</div>
         <!-- END mediadirInputfieldList -->
         <!-- BEGIN mediadirTranslationStatus -->
-        <p>
+        <div>
             <label>{TXT_MEDIADIR_TRANSLATION_STATUS}</label>
             <span id="mediadirInputfield_TranslationStatus_list" style="display: block;">
                 <!-- BEGIN mediadirTranslationLangList -->
                 <input class="marketplaceInputfieldCheckbox" name="translationStatus[]" id="mediadirInputfield_TranslationStatus" value="{MEDIADIR_TRANSLATION_LANG_ID}" type="checkbox" {MEDIADIR_TRANSLATION_LANG_STATUS} />&nbsp;{TXT_MEDIADIR_TRANSLATION_LANG_NAME}<br>
                 <!-- END mediadirTranslationLangList -->
             </span>
-        </p>
+        </div>
         <!-- END mediadirTranslationStatus -->
         <!-- END mediadirInputfieldElement -->
         {MEDIADIR_READY_TO_CONFIRM}
-        <p><input class="btn btn-default" type="submit" value="{TXT_MEDIADIR_SUBMIT}" name="submitEntryModfyForm" /></p>
+        <div><input class="btn btn-default" type="submit" value="{TXT_MEDIADIR_SUBMIT}" name="submitEntryModfyForm" /></div>
         <div style="display: none;" class="text-danger" id="mediadirErrorMessage"><p>{TXT_MEDIADIR_PLEASE_CHECK_INPUT}</p></div>
         <!-- END mediadirInputfields -->
     </form>
