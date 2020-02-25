@@ -385,9 +385,13 @@ class JsonDiscountCouponController
             array(
                 'type' => 'checkbox',
                 'id' => $name . '-unlimited',
-                'checked' => $isChecked,
             )
         );
+        if ($isChecked) {
+            $checkbox->setAttributes(array(
+                'checked' => true,
+            ));
+        }
         $checkbox->addClass('shop-unlimited');
 
         $label->addChild($text);
