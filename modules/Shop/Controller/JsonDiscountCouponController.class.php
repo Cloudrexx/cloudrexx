@@ -364,17 +364,22 @@ class JsonDiscountCouponController
         $value = !empty($params['value']) ? $params['value'] : '';
         $type = !empty($params['type']) ? $params['type'] : '';
 
+        if ($type == 'date') {
+            $isChecked = empty($value);
+        } else {
+            $isChecked = $value > self::USES_UNLIMITED;
+            if ($isChecked) {
+                $value = '';
+            }
+        }
+
         $wrapper = new \Cx\Core\Html\Model\Entity\HtmlElement('div');
-        $input = new \Cx\Core\Html\Model\Entity\DataElement($name);
+        $input = new \Cx\Core\Html\Model\Entity\DataElement($name, $value);
         $input->setAttribute('type', 'text');
 
         if ($type == 'date') {
             $input->addClass('datepicker');
-            $isChecked = !empty($value);
-        } else {
-            $isChecked = $value > self::USES_UNLIMITED;
         }
-
         $text = new \Cx\Core\Html\Model\Entity\TextElement($labelText);
         $label = new \Cx\Core\Html\Model\Entity\HtmlElement('label');
         $label->setAttribute('for', $name . '-unlimited');
