@@ -367,7 +367,9 @@ class JsonDiscountCouponController
         if ($type == 'date') {
             $isChecked = empty($value);
         } else {
-            $isChecked = $value > self::USES_UNLIMITED;
+            // as MySQL's unsigned INT can only store up to 4294967295 we
+            // need to use 1e9 to check against static::USES_UNLIMITED.
+            $isChecked = $value >= 1e9;
             if ($isChecked) {
                 $value = '';
             }
@@ -500,6 +502,8 @@ class JsonDiscountCouponController
 
         $uses = $coupon->getUsedCount();
         $max = $value;
+        // as MySQL's unsigned INT can only store up to 4294967295 we
+        // need to use 1e9 to check against static::USES_UNLIMITED.
         if ($value > 1e9) {
             $max = $_ARRAYLANG['TXT_SHOP_DISCOUNT_COUPON_USES_UNLIMITED'];
         }
