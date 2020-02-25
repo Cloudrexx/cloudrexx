@@ -95,7 +95,8 @@ class JsonDiscountCouponController
             'checkIfCouponIsGlobal',
             'getInfoIfIsGlobalOrCustomer',
             'getTypeCheckboxes',
-            'getCouponLink'
+            'getCouponLink',
+            'showDiscountAmount',
         );
     }
 
@@ -729,5 +730,31 @@ class JsonDiscountCouponController
         $wrapper->addChildren(array($icon, $input));
 
         return $wrapper;
+    }
+
+    /**
+     * Parses the discount amount in overview.
+     *
+     * For coupons that can be used once the remaining amount is shown.
+     * @param array $params contains the parameters of the callback function
+     *
+     * @return string Formatted amount
+     */
+    public function showDiscountAmount($params) {
+        if (!isset($params['data']) || $params['data'] == 0.00) {
+            return '-.--';
+        }
+        if (!isset($params['rows']) || !isset($params['rows']['id'])) {
+            return $params['data'];
+        }
+        $coupon = $this->cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\DiscountCoupon'
+        )->find($params['rows']['id']);
+        // Showing the remaining amount only makes sense if
+        // the coupon can only be used once.
+        if (!$coupon || $coupon->getUses() > 1) {
+            return $params['data'];
+        }
+        return $coupon->getUsedAmount() . ' / ' . $params['data'];
     }
 }

@@ -231,7 +231,7 @@ class DiscountCouponController extends \Cx\Core\Core\Model\Entity\Controller
                 'table' => array(
                     'parse' => array(
                         'adapter' => 'DiscountCoupon',
-                        'method' => 'getNullPriceIfEmpty'
+                        'method' => 'showDiscountAmount'
                     )
                 ),
                 'tooltip' => '<strong>' .
