@@ -662,7 +662,7 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
                         $newCoupon->setCode($code);
                         $newCoupon->setDiscountAmount($item_price);
                         $newCoupon->setGlobal(true);
-                        $newCoupon->setUses(1e10);
+                        $newCoupon->setUses(1);
 
                         $this->_em->persist($newCoupon);
                         $this->_em->flush();
