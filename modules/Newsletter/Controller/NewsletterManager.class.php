@@ -2709,7 +2709,7 @@ class NewsletterManager extends NewsletterLib
      */
     protected function addMailRecipientPart(&$mailRecipients, $type, $distinctByType, $query, $queryToCheckUser = '')
     {
-        global $objDatabase, $_ARRAYLANG;
+        global $objDatabase;
 
         $filterIds = array();
         $filterKey = '';
@@ -2733,7 +2733,7 @@ class NewsletterManager extends NewsletterLib
                 $objResult->MoveNext();
             }
         } else {
-            throw new \Exception($_ARRAYLANG['TXT_DATABASE_ERROR']);
+            throw new \Exception('Database error. System halted!');
         }
 
         // In some cases, data must be taken directly from the user.  
