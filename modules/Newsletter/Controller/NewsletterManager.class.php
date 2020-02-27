@@ -2736,29 +2736,31 @@ class NewsletterManager extends NewsletterLib
             throw new \Exception('Database error. System halted!');
         }
 
-        // In some cases, data must be taken directly from the user.  
-        if (!empty($filterIds)) {
-            $filter = array($filterKey => $filterIds, 'active' => 1);
-            $objUser = \FWUser::getFWUserObject()->objUser->getUsers($filter);
+        // In some cases, data must be taken directly from the user.
+        if (empty($filterIds)) {
+            return;
+        }
+        $filter = array($filterKey => $filterIds, 'active' => 1);
+        $objUser = \FWUser::getFWUserObject()->objUser->getUsers($filter);
 
-            if ($objUser) {
-                while (!$objUser->EOF) {
-                    // Check if the received user is correct
-                    if (!empty($queryToCheckUser)) {
-                        $queryToCheckUser = sprintf(
-                            $queryToCheckUser,
-                            DBPREFIX, $objUser->getId()
-                        );
-                        $objResultCheck = $objDatabase->Execute($queryToCheckUser);
-                        if ($objResultCheck === false || $objResultCheck->RecordCount() == 0) {
-                            $objUser->next();
-                        }
-                    }
-
-                    $this->simulateDistinct($distinctByType, $objUser->getEmail(), $type, $mailRecipients);
+        if (!$objUser) {
+            return;
+        }
+        while (!$objUser->EOF) {
+            // Check if the received user is correct
+            if (!empty($queryToCheckUser)) {
+                $queryToCheckUser = sprintf(
+                    $queryToCheckUser,
+                    DBPREFIX, $objUser->getId()
+                );
+                $objResultCheck = $objDatabase->Execute($queryToCheckUser);
+                if ($objResultCheck === false || $objResultCheck->RecordCount() == 0) {
                     $objUser->next();
                 }
             }
+
+            $this->simulateDistinct($distinctByType, $objUser->getEmail(), $type, $mailRecipients);
+            $objUser->next();
         }
     }
 
