@@ -419,13 +419,7 @@ class NewsletterLib
 
         $objUser = $objUser->getUsers(array('id' => array_unique($userIds)));
         if ($objUser) {
-            while (!$objUser->EOF) {
-                $keys = array_keys($userIds, $objUser->getId());
-                foreach ($keys as $key) {
-                    $counter++;
-                }
-                $objUser->next();
-            }
+            $counter += $objUser->getFilteredSearchUserCount();
         }
 
         return $counter;
