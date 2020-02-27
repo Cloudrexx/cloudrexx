@@ -2701,10 +2701,10 @@ class NewsletterManager extends NewsletterLib
      * Adding recipients to the recipient list by executing a specific query
      *
      * @param array   &$mailRecipients  all already existing mail recipients
-     * @param string  $type             part type
+     * @param string  $type             which type of participant (newsletter, access, core or crm)
      * @param boolean $distinctByType   if we should simulate a distinct
      * @param string  $query            query to get mail recipients
-     * @param string  $queryToCheckUser query to check if the first query get the correct users
+     * @param string  $queryToCheckUser query to check if the first query got the correct users
      * @throws \Exception a database execution fails
      */
     protected function addMailRecipientPart(&$mailRecipients, $type, $distinctByType, $query, $queryToCheckUser = '')
