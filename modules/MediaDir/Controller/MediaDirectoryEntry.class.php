@@ -1503,10 +1503,15 @@ JSCODE;
 
         $error = false;
         $titleData = array();
+        $titleDataFallback = array();
 
         $outputLocaleId = static::getOutputLocale()->getId();
 
-        foreach ($this->getInputfields() as $arrInputfield) {
+        // fetch all inputfields of assigned form
+        $inputfieldStack = $this->getInputfields($intFormId);
+
+        // process every inputfield
+        while ($arrInputfield = array_shift($inputfieldStack)) {
             // store selected category (field = category)
             if ($arrInputfield['id'] == 1) {
                 $selectedCategories = isset($arrData['selectedCategories']) ? $arrData['selectedCategories'] : array();
@@ -1543,34 +1548,73 @@ JSCODE;
                 continue;
             }
 
-            // skip attributes that are out of scope (frontend/backend)
+            // skip inputfields that are out of scope (frontend/backend), resp.
+            // that are not allowed to be modified in the current mode (frontend
+            // or backend)
             if (
                 // show_in is neither FRONTEND or BACKEND ($intShowIn = 2|3)
                 $arrInputfield['show_in'] != $intShowIn &&
                 // nor FRONTEND AND BACKEND (show_in=1)
                 $arrInputfield['show_in'] != 1
             ) {
+                // Exception for inputfields being used as 'slug'.
+                // Those shall be parsed anyway, but only for new entry
+                // submissions (-> $objUpdateEntry not besing set).
+                // This shall ensure the newly submitted entries have a valid
+                // slug.
+                if (
+                    $arrInputfield['context_type'] != 'slug' ||
+                    isset($objUpdateEntry)
+                ) {
+                    // skip inputfield
+                    continue;
+                }
+
+                // as the entry of the slug inputfield was not permitted (by
+                // option 'show_in') we have to ensure no submitted data gets
+                // actually stored -> therefore we have to unset any submitted
+                // slug data
+                if (
+                    isset($arrData[$this->moduleNameLC.'Inputfield'][$arrInputfield['id']])
+                ) {
+                    unset($arrData[$this->moduleNameLC.'Inputfield'][$arrInputfield['id']]);
+                }
+            }
+
+            // shift the inputfield (that is being used as 'slug') down to
+            // process it later (after $titleData has been set) in case
+            // $titleData has not yet been set
+            if (
+                $arrInputfield['context_type'] == 'slug' &&
+                empty($titleData) &&
+                // prevent infinite loop
+                empty($arrInputfield['shifted'])
+            ) {
+                $arrInputfield['shifted'] = true;
+                $inputfieldStack[] = $arrInputfield;
                 continue;
             }
 
-            if (($arrInputfield['context_type'] == 'title' || empty($titleData)) && isset($arrData[$this->moduleNameLC.'Inputfield'][$arrInputfield['id']])) {
-                $titleData = $arrData[$this->moduleNameLC.'Inputfield'][$arrInputfield['id']];
-            }
-
-            // slugify slug value
-            if ($arrInputfield['context_type'] == 'slug' && isset($arrData[$this->moduleNameLC.'Inputfield'][$arrInputfield['id']])) {
-                $slugValues = $arrData[$this->moduleNameLC.'Inputfield'][$arrInputfield['id']];
-                array_walk(
-                    $slugValues,
-                    array($this, 'slugify'),
-                    $titleData
-                );
-                $arrData[$this->moduleNameLC.'Inputfield'][$arrInputfield['id']] = $slugValues;
+            // in case we have to process the inputfield (that is being used
+            // as 'slug') as its the last one, but no 'title' field had been
+            // processed, then we'll use the data of the first processed
+            // inputfield as source data for generating a new slug
+            if (
+                $arrInputfield['context_type'] == 'slug' &&
+                empty($titleData)
+            ) {
+                $titleData = $titleDataFallback;
             }
 
             // truncate attribute's data ($arrInputfield) from database if it's VALUE is not set (empty) or set to it's default value
-            if (   empty($arrData[$this->moduleNameLC.'Inputfield'][$arrInputfield['id']])
-                || $arrData[$this->moduleNameLC.'Inputfield'][$arrInputfield['id']] == $arrInputfield['default_value'][$outputLocaleId]
+            if (
+                (
+                    empty($arrData[$this->moduleNameLC.'Inputfield'][$arrInputfield['id']]) ||
+                    $arrData[$this->moduleNameLC.'Inputfield'][$arrInputfield['id']] == $arrInputfield['default_value'][$outputLocaleId]
+                ) &&
+                // except for fields that are used as 'slug' can't be cleared,
+                // as a entry must have a slug
+                $arrInputfield['context_type'] != 'slug'
             ) {
                 $objResult = $objDatabase->Execute("DELETE FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields WHERE entry_id='".$intId."' AND field_id='".intval($arrInputfield['id'])."'");
                 if (!$objResult) {
@@ -1593,15 +1637,37 @@ JSCODE;
                 continue;
             }
 
+            // remember value of inputfield having context 'title'
+            if (
+                $arrInputfield['context_type'] == 'title' &&
+                isset($arrData[$this->moduleNameLC.'Inputfield'][$arrInputfield['id']])
+            ) {
+                $titleData = $arrData[$this->moduleNameLC.'Inputfield'][$arrInputfield['id']];
+            }
+
+            // remember current value in case there is no inputfield with
+            // context 'title' present or it has not been set
+            if (
+                empty($titleData) &&
+                empty($titleDataFallback) &&
+                isset($arrData[$this->moduleNameLC.'Inputfield'][$arrInputfield['id']])
+            ) {
+                $titleDataFallback = $arrData[$this->moduleNameLC.'Inputfield'][$arrInputfield['id']];
+            }
+
             // delete attribute's data of languages that are no longer in use
             $objDatabase->Execute("DELETE FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_rel_entry_inputfields WHERE entry_id='".$intId."' AND field_id = '".intval($arrInputfield['id'])."' AND lang_id NOT IN (".join(",", array_keys($this->arrFrontendLanguages)).")");
 
-            // attribute is i18n
+            // process data for each activated locale according to option
+            // settingsActiveLanguages
             foreach ($this->arrFrontendLanguages as $arrLang) {
                 try {
                     $intLangId = $arrLang['id'];
 
-                    // attribute is non-i18n
+                    // inputfield is non-i18n (data entry of inputfield is not
+                    // localized).
+                    // for each activated locale (according to option
+                    // settingsActiveLanguages) we will persist the same data
                     if ($arrInputfield['type_multi_lang'] == 0) {
                         $strInputfieldValue = $objInputfield->saveInputfield($arrInputfield['id'], $arrData[$this->moduleNameLC.'Inputfield'][$arrInputfield['id']]);
                         $objResult = $objDatabase->Execute("
@@ -1617,45 +1683,12 @@ JSCODE;
                             throw new \Exception($objDatabase->ErrorMsg());
                         }
 
+                        // proceed to the next activated locale
                         continue;
                     }
 
-                    // if the attribute is of type dynamic (meaning it can have an unlimited set of childs (references))
-                    if ($arrInputfield['type_dynamic'] == 1) {
-                        $arrDefault = array();
-                        foreach ($arrData[$this->moduleNameLC.'Inputfield'][$arrInputfield['id']][0] as $intKey => $arrValues) {
-                            $arrNewDefault = $arrData[$this->moduleNameLC.'Inputfield'][$arrInputfield['id']][$outputLocaleId][$intKey];
-                            $arrOldDefault = $arrData[$this->moduleNameLC.'Inputfield'][$arrInputfield['id']]['old'][$intKey];
-                            $arrNewValues = $arrData[$this->moduleNameLC.'Inputfield'][$arrInputfield['id']][$intLangId][$intKey];
-                            foreach ($arrValues as $strKey => $strMasterValue) {
-                                if ($intLangId == $outputLocaleId) {
-                                    if (!isset($arrDefault[$intKey])) {
-                                        $arrDefault[$intKey] = array();
-                                    }
-                                    if ($arrNewDefault[$strKey] != $strMasterValue) {
-                                        if ($strMasterValue != $arrOldDefault[$strKey] && $arrNewDefault[$strKey] == $arrOldDefault[$strKey]) {
-                                            $arrDefault[$intKey][$strKey] = $strMasterValue;
-                                        } else {
-                                            $arrDefault[$intKey][$strKey] = $arrNewDefault[$strKey];
-                                        }
-                                    } else {
-                                        $arrDefault[$intKey][$strKey] = $arrNewDefault[$strKey];
-                                    }
-                                } else {
-                                    if ($arrNewValues[$strKey] == '') {
-                                        if (!isset($arrDefault[$intKey])) {
-                                            $arrDefault[$intKey] = array();
-                                        }
-                                        $arrDefault[$intKey][$strKey] = $strMasterValue;
-                                    } else {
-                                        $arrDefault = $arrData[$this->moduleNameLC.'Inputfield'][$arrInputfield['id']][$intLangId];
-                                    }
-                                }
-                            }
-                            $strDefault = $arrDefault;
-                        }
-                        $strInputfieldValue = $objInputfield->saveInputfield($arrInputfield['id'], $strDefault, $intLangId);
-                    } else if (
+                    // proceed with attributes that are localized
+                    if (
                         // attribute's VALUE of certain frontend language ($intLangId) is empty
                         empty($arrData[$this->moduleNameLC.'Inputfield'][$arrInputfield['id']][$intLangId])
                         // or the process is parsing the user's current interface language
@@ -1679,6 +1712,11 @@ JSCODE;
                     } else {
                         // regular attribute get parsed
                         $strInputfieldValue = $objInputfield->saveInputfield($arrInputfield['id'], $arrData[$this->moduleNameLC.'Inputfield'][$arrInputfield['id']][$intLangId], $intLangId);
+                    }
+
+                    // slugify slug value
+                    if ($arrInputfield['context_type'] == 'slug') {
+                        $this->slugify(intval($intId), $strInputfieldValue, $intLangId, $titleData);
                     }
 
                     $objResult = $objDatabase->Execute("
