@@ -3883,6 +3883,41 @@ die("Shop::processRedirect(): This method is obsolete!");
                     \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(-$total_discount_amount),
                 'SHOP_DISCOUNT_COUPON_CODE' => $_SESSION['shop']['coupon_code'],
             ));
+            // try to load the coupon object
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $em = $cx->getDb()->getEntityManager();
+            $couponRepo = $em->getRepository(
+                'Cx\Modules\Shop\Model\Entity\DiscountCoupon'
+            );
+            $objCoupon = $couponRepo->available(
+                $_SESSION['shop']['coupon_code'],
+                Cart::get_price(),
+                self::$objCustomer->getId(),
+                null,
+                $_SESSION['shop']['paymentId']
+            );
+            // add placeholders if the coupon is not pro rata
+            if ($objCoupon && $objCoupon->getDiscountAmount() > 0) {
+                self::$objTemplate->touchBlock('discount_coupon_type_amount');
+                self::$objTemplate->setVariable(array(
+                    'SHOP_DISCOUNT_COUPON_REMAINING_AMOUNT' => sprintf(
+                        '% 9.2f',
+                        // as the order is not yet persisted at this point we
+                        // need to substract the current discount as well:
+                        // total amount - used amount - current order's discount
+                        $objCoupon->getDiscountAmount() -
+                        $objCoupon->getUsedAmount(
+                            self::$objCustomer->getId()
+                        ) - $total_discount_amount
+                    ),
+                    'SHOP_DISCOUNT_COUPON_INITIAL_AMOUNT' => sprintf(
+                        '% 9.2f',
+                        $objCoupon->getDiscountAmount()
+                    ),
+                ));
+            } else {
+                self::$objTemplate->hideBlock('discount_coupon_type_amount');
+            }
         }
         self::$objTemplate->setVariable(array(
             'SHOP_UNIT' => \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencySymbol(),
