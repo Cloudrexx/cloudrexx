@@ -710,7 +710,7 @@ die("MailTemplate::init(): Empty section!");
             }
 //DBG::log("MailTemplate::send(): ".var_export($objMail, true));
 // TODO: Comment for test only!
-            $result &= $objMail->Send();
+            $result = $result && $objMail->Send();
 // TODO: $objMail->Send() seems to sometimes return true on localhost where
 // sending the mail is actually impossible.  Dunno why.
         }
