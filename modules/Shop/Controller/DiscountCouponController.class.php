@@ -91,6 +91,8 @@ class DiscountCouponController extends \Cx\Core\Core\Model\Entity\Controller
             'payment',
         );
 
+        $options['functions']['searching'] = true;
+
         $defaultCurrency = $this->cx->getDb()->getEntityManager()->getRepository(
             '\Cx\Modules\Shop\Model\Entity\Currency'
         )->getDefaultCurrency();
@@ -112,7 +114,8 @@ class DiscountCouponController extends \Cx\Core\Core\Model\Entity\Controller
                 'showDetail' => false,
             ),
             'code' => array(
-                'header' => $_ARRAYLANG['TXT_SHOP_DISCOUNT_COUPON_CODE']
+                'header' => $_ARRAYLANG['TXT_SHOP_DISCOUNT_COUPON_CODE'],
+                'allowSearching' => true,
             ),
             'customer' => array(
                 'type' => 'hidden',
