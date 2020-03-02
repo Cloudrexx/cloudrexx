@@ -716,11 +716,12 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
         }
         if ($coupon_amount) {
 //\DBG::log("Orders::getSubstitutionArray(): Got Order Coupon $coupon_code");
-            $arrSubstitution['DISCOUNT_COUPON'][] = array(
+            $couponInfo = array(
                 'DISCOUNT_COUPON_CODE' => sprintf('%-40s', $coupon_code),
                 // This is the amount that is substracted from this order:
                 'DISCOUNT_COUPON_AMOUNT' => sprintf('% 9.2f', -$coupon_amount),
             );
+            $arrSubstitution['DISCOUNT_COUPON'][] = $couponInfo;
         }
 
         if (\Cx\Modules\Shop\Controller\Vat::isEnabled()) {
