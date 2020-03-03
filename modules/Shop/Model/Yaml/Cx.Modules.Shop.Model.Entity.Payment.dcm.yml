@@ -44,10 +44,10 @@ Cx\Modules\Shop\Model\Entity\Payment:
         unsigned: true
         default: 0
     active:
-      type: boolean
+      type: enum
+      values: ['none', 'all', 'reseller']
       options:
-        unsigned: true
-        default: 1
+        default: 'all'
     name:
       type: string
       length: 255

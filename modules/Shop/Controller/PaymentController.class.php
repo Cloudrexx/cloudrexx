@@ -72,10 +72,6 @@ class PaymentController extends \Cx\Core\Core\Model\Entity\Controller
             'field' => array('ord' => SORT_ASC)
         );
 
-        $options['functions']['status'] = array(
-            'field' => 'active'
-        );
-
         $options['order'] = array(
             'overview' => array(
                 'name',
@@ -132,6 +128,9 @@ class PaymentController extends \Cx\Core\Core\Model\Entity\Controller
                 'editable' => true,
                 'showDetail' => false,
                 'showOverview' => false,
+            ),
+            'active' => array(
+                'editable' => true,
             ),
         );
 
