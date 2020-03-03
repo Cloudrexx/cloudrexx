@@ -84,9 +84,18 @@ class PaymentRepository extends \Doctrine\ORM\EntityRepository
         )->join(
             'z.payments', 'p', 'WITH'
         )->where($qb->expr()->eq('c.countryId', '?1'))
-         ->andWhere($qb->expr()->eq('p.active', '1'))
          ->andWhere($qb->expr()->eq('z.active', '1'))
          ->setParameter(1, intval($countryId));
+        $customer = \Cx\Modules\Shop\Controller\Customer::getById(
+            \FWUser::getFWUserObject()->objUser->getId()
+        );
+        if ($customer->isReseller()) {
+            $qb->andWhere($qb->expr()->neq('p.active', '?2'));
+            $qb->setParameter(2, 'none');
+        } else {
+            $qb->andWhere($qb->expr()->eq('p.active', '?2'));
+            $qb->setParameter(2, 'all');
+        }
         $query = $qb->getQuery();
         $results = $query->getArrayResult();
 
