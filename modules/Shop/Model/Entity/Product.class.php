@@ -226,6 +226,11 @@ class Product extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\T
     protected $vat;
 
     /**
+     * @var \Cx\Core_Modules\Pdf\Model\Entity\PdfTemplate
+     */
+    protected $pdfTemplate;
+
+    /**
      * @var \Doctrine\Common\Collections\Collection
      */
     protected $categories;
@@ -587,6 +592,24 @@ class Product extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\T
     public function getVatId()
     {
         return $this->vatId;
+    }
+
+    /**
+     * Set PdfTemplate
+     *
+     * @param null|\Cx\Core_Modules\Pdf\Model\Entity\PdfTempalte $pdfTemplate PDF Template
+     */
+    public function setPdfTemplate($pdfTemplate)
+    {
+        $this->pdfTemplate = $pdfTemplate;
+    }
+
+    /**
+     * @return \Cx\Core_Modules\Pdf\Model\Entity\PdfTempalte PDF Template
+     */
+    public function getPdfTemplate()
+    {
+        return $this->pdfTemplate;
     }
 
     /**
