@@ -671,17 +671,35 @@ class User extends User_Profile
         if ($deleteOwnAccount || $this->id != $objFWUser->objUser->getId()) {
             if (!$this->isLastAdmin()) {
                 \Env::get('cx')->getEvents()->triggerEvent('model/preRemove', array(new \Doctrine\ORM\Event\LifecycleEventArgs($this, \Env::get('em'))));
+                $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+                $em = $cx->getDb()->getEntityManager();
+                $userRepo = $em->getRepository('Cx\Core\User\Model\Entity\User');
+                $user = $userRepo->find($this->id);
+
+                // Remove all groups from user
+                foreach ($user->getGroup() as $group) {
+                    $user->removeGroup($group);
+                    $group->removeUser($user);
+                }
+
                 $objDatabase->startTrans();
-                if (
-                    $objDatabase->Execute('DELETE FROM `'.DBPREFIX.'access_user_attribute_value` WHERE `user_id` = ' . $this->id) !== false &&
-                    $objDatabase->Execute('DELETE FROM `'.DBPREFIX.'access_rel_user_group` WHERE `user_id` = ' . $this->id) !== false &&
-                    $objDatabase->Execute('DELETE FROM `'.DBPREFIX.'access_user_network` WHERE `user_id` = ' . $this->id) !== false &&
-                    $objDatabase->Execute('DELETE FROM `'.DBPREFIX.'access_users` WHERE `id` = ' . $this->id) !== false
-                ) {
+                if ($objDatabase->Execute('DELETE FROM `'.DBPREFIX.'access_user_network` WHERE `user_id` = ' . $this->id) !== false) {
                     $objDatabase->completeTrans();
+                } else {
+                    $objDatabase->failTrans();
+                    $objDatabase->completeTrans();
+                }
+
+                try {
+                    // Remove all user attribute values
+                    foreach ($user->getUserAttributeValue() as $value) {
+                        $em->remove($value);
+                    }
+                    $em->remove($user);
+                    $em->flush();
+
                     \Env::get('cx')->getEvents()->triggerEvent('model/postRemove', array(new \Doctrine\ORM\Event\LifecycleEventArgs($this, \Env::get('em'))));
                     //Clear cache
-                    $cx = \Cx\Core\Core\Controller\Cx::instanciate();
                     $cx->getEvents()->triggerEvent(
                         'clearEsiCache',
                         array(
@@ -692,9 +710,7 @@ class User extends User_Profile
                     \Cx\Core\Core\Controller\Cx::instanciate()->getComponent('Cache')->deleteComponentFiles('Access');
 
                     return true;
-                } else {
-                    $objDatabase->failTrans();
-                    $objDatabase->completeTrans();
+                } catch (\Doctrine\ORM\OptimisticLockException $e) {
                     $this->error_msg[] = sprintf($_CORELANG['TXT_ACCESS_USER_DELETE_FAILED'], $this->username);
                 }
             } else {
