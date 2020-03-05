@@ -200,4 +200,96 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
 
         return $expr;
     }
+
+    /**
+     * Add a group filter to the given QueryBuilder
+     *
+     * @param \Doctrine\ORM\QueryBuilder &$qb     QueryBuilder instance
+     * @param int|array                  $groupId Group IDs to be filtered
+     */
+    public function addGroupFilterToQueryBuilder(&$qb, $groupId)
+    {
+        if (!in_array('filterGroup', $qb->getRootAliases())) {
+            $qb->leftJoin('u.group', 'filterGroup');
+        }
+
+        if (empty($groupId)) {
+            $qb->andWhere(
+                $qb->expr()->isNull('filterGroup.groupId')
+            );
+        } else if (is_array($groupId)) {
+            $qb->andWhere(
+                $qb->expr()->in('filterGroup.groupId', ':groupIds')
+            )->setParameter('groupId', $groupId);
+        } else {
+            $qb->andWhere(
+                $qb->expr()->eq('filterGroup.groupId', ':groupId')
+            )->setParameter('groupId', $groupId);
+        }
+    }
+
+    /**
+     * Add a regex filter to the given QueryBuilder. For example for an letter index search
+     *
+     * @param \Doctrine\ORM\QueryBuilder &$qb QueryBuilder instance
+     * @param string                     $regex regex to filter
+     * @param string                     $field field to be filtered with alias prefix (u.username)
+     */
+    public function addRegexFilterToQueryBuilder(&$qb, $regex, $field)
+    {
+        $qb->andWhere(
+            $qb->expr()->eq(
+                'REGEXP('.$field.', \''.$regex.'\')',
+                1
+            )
+        );
+    }
+
+    /**
+     * Add a regex filter on attributes to the given QueryBuilder.
+     *
+     * @param \Doctrine\ORM\QueryBuilder &$qb QueryBuilder instance
+     * @param string                     $regex regex to filter
+     * @param string                     $field field to be filtered (title | 1)
+     */
+    public function addAttributeRegexFilterToQueryBuilder(&$qb, $regex, $field)
+    {
+        $objAttr = \FWUser::getFWUserObject()->objUser->objAttribute;
+
+        if ($objAttr->isCoreAttribute($field)) {
+            $field = $objAttr->getAttributeIdByProfileAttributeId($field);
+        }
+
+        $qb->join('u.userAttributeValue', 'v'.$field);
+
+        $qb->andWhere($qb->expr()->eq('v'.$field.'.attributeId', ':attributeId'.$field));
+        $qb->andWhere($qb->expr()->eq('REGEXP(v'.$field.'.value, \''.$regex.'\')', 1));
+        $qb->setParameter('attributeId'.$field, $field);
+    }
+
+    /**
+     * Add an order to the given QueryBuilder
+     *
+     * @param \Doctrine\ORM\QueryBuilder &$qb QueryBuilder instance
+     * @param string                     $field field to be filtered
+     * @param string                     $direction asc or desc
+     */
+    public function addOrderToQueryBuilder(&$qb, $field, $direction)
+    {
+        $objAttr = \FWUser::getFWUserObject()->objUser->objAttribute;
+
+        if ($objAttr->isCoreAttribute($field)) {
+            $field = $objAttr->getAttributeIdByProfileAttributeId($field);
+        }
+
+        if (is_int($field)) {
+            // Is UserAttributeValue
+            if (!in_array('orderAttributeValue', $qb->getAllAliases())) {
+                $qb->join('u.userAttributeValue', 'orderAttributeValue');
+            }
+        } else {
+            // Is attribute of an user
+            $qb->addOrderBy('u.' . $field, $direction);
+        }
+    }
 }
