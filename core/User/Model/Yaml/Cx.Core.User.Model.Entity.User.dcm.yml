@@ -20,7 +20,7 @@ Cx\Core\User\Model\Entity\User:
       length: 255
       nullable: true
     password:
-      type: string
+      type: password
       length: 255
       nullable: true
     authToken:
