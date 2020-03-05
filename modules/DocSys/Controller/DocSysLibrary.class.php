@@ -148,15 +148,14 @@ class DocSysLibrary
             $objResult->MoveNext();
         }
 
-        $fwUser = \FWUser::getFWUserObject()->objUser;
-        $objUser = $fwUser->getUsers(array('id' => array_unique(array_values($userIds))));
-        if ($objUser !== false) {;
-            while (!$objUser->EOF) {
-                $keys = array_keys($userIds, $objUser->getId());
-                foreach ($keys as $key) {
-                    $retval[$key]['username'] = $objUser->getRealUsername();
-                }
-                $objUser->next();
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $userRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\User');
+        $users = $userRepo->findBy(array('id' => array_unique(array_values($userIds))));
+
+        foreach ($users as $user) {
+            $keys = array_keys($userIds, $user->getId());
+            foreach ($keys as $key) {
+                $retval[$key]['username'] = $user->getUsername();
             }
         }
 
