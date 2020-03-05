@@ -1,6 +1,7 @@
 Cx\Core\User\Model\Entity\UserAttribute:
   type: entity
   table: access_user_attribute
+  repositoryClass: Cx\Core\User\Model\Repository\UserAttributeRepository
   fields:
     id:
       id: true
