@@ -955,7 +955,7 @@ class User_Profile_Attribute
                 $this->isDefaultAttribute($this->id) && $this->storeCoreAttribute() ||
                 $this->storeCustomAttribute()
             ) {
-                if (preg_match('/^title_[0-9]+$/', $this->id) ||
+                if ($this->parent_id === 'title' ||
                     ($this->isDefaultAttribute($this->id) || $this->storeNames()) &&
                     $this->storeChildrenOrder() &&
                     $this->storeProtection($this->protected, $this->access_id, 'access_id', $this->access_group_ids) &&
