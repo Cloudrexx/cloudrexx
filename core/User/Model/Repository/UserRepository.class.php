@@ -292,4 +292,176 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
             $qb->addOrderBy('u.' . $field, $direction);
         }
     }
+
+    /**
+     * Get an expression to search for one or more search terms in the user username (and email only backend)
+     *
+     * Matches single (scalar) or multiple (array) search terms against a
+     * number of fields.  Generally, the term(s) are enclosed in percent
+     * signs ("%term%"), so any fields that contain them will match.
+     * However, if the search parameter is a string and does contain a percent
+     * sign already, none will be added to the query.
+     * This allows searches using custom patterns, like "fields beginning
+     * with "a" ("a%").
+     *
+     * @param \Doctrine\ORM\QueryBuilder &$qb  QueryBuilder instance
+     * @param string | array             $term one or multiple search terms
+     * @return \Doctrine\ORM\Query\Expr\Orx
+     */
+    public function getSearchByTermInUserExpression(&$qb, $term)
+    {
+        $expr = new \Doctrine\ORM\Query\Expr();
+        $orX = $expr->orX();
+        $fWUser = \FWUser::getFWUserObject();
+        $attributes = array('username');
+        if ($fWUser->isBackendMode()) {
+            $attributes[] = 'email';
+        }
+
+        $percent = '%';
+        if (!is_array($term) && strpos('%', $term) !== false) {
+            $percent = '';
+        }
+
+        foreach ($attributes as $attribute) {
+            if (!is_array($term)) {
+                $term = array($term);
+            }
+            $i = 0;
+            foreach ($term as $searchTerm) {
+                $orX->add(
+                    $expr->like('u.'.$attribute, ':search' . $attribute . $i)
+                );
+                $qb->setParameter('search' . $attribute . $i, $percent . $searchTerm . $percent);
+            }
+        }
+
+        return $orX;
+    }
+
+    /**
+     * Get an expression to search for one or more search terms in the user attribute values.
+     *
+     * Matches single (scalar) or multiple (array) search terms against a
+     * number of fields.  Generally, the term(s) are enclosed in percent
+     * signs ("%term%"), so any fields that contain them will match.
+     * However, if the search parameter is a string and does contain a percent
+     * sign already, none will be added to the query.
+     * This allows searches using custom patterns, like "fields beginning
+     * with "a" ("a%").
+     *
+     * @param \Doctrine\ORM\QueryBuilder &$qb  QueryBuilder instance
+     * @param string | array             $term one or multiple search terms
+     * @return \Doctrine\ORM\Query\Expr\Orx
+     */
+    public function getSearchByTermInAttributeExpression(&$qb, $term)
+    {
+        $alias = 'searchAttributeValues';
+        $expr = $qb->expr();
+        $orX = $expr->orX();
+        $supportedAttributes = array('int' => array(), 'string' => array());
+        $attributes = $this->_em->getRepository('Cx\Core\User\Model\Entity\UserAttribute')->findAllWithoutParent();
+
+        foreach ($attributes as $attribute) {
+            // do not allow lookup on attributes the user has no read access to
+            if (!$attribute->checkReadPermission()) {
+                continue;
+            }
+
+            switch ($attribute->getType()) {
+                case 'text':
+                case 'mail':
+                case 'uri':
+                case 'image':
+                    if ($attribute->getDataType() == 'int') {
+                        $supportedAttributes['int'][] = $attribute->getId();
+                    } else if ($attribute->getDataType() == 'string') {
+                        $supportedAttributes['string'][] = $attribute->getId();
+                    }
+                    break;
+                case 'menu':
+                    if ($attribute->getName() == 'country') {
+                        // No country support
+                        break;
+                    }
+
+                    // Do not search for user attribute value, search in the attribute names
+                    $childAttributeIds = array();
+                    foreach ($term as $searchTerm) {
+                        foreach ($attribute->getChildren() as $child) {
+                            foreach ($child->getUserAttributeName() as $attributeName) {
+                                $name = $attributeName->getName();
+                                if (stripos($name, $searchTerm) !== FALSE) {
+                                    // We found the attribute
+                                    $childAttributeIds[] = $child->getId();
+                                    continue;
+                                }
+                            }
+                        }
+                    }
+
+                    // No attributes found
+                    if (empty($childAttributeIds)) {
+                        continue;
+                    }
+
+                    $childAttributeIds = array_unique($childAttributeIds);var_dump($childAttributeIds);
+
+                    $orX->add(
+                        $expr->andX(
+                            $expr->eq('searchAttributeValues.attributeId', ':menuAttribute'.$attribute->getId()),
+                            $expr->in('searchAttributeValues.value', ':childValues'.$attribute->getId())
+                        )
+                    );
+                    $qb->setParameter('menuAttribute'.$attribute->getId(), $attribute->getId());
+                    $qb->setParameter('childValues'.$attribute->getId(), $childAttributeIds);
+                break;
+            }
+        }
+
+        if (!empty($supportedAttributes)) {
+            if (!is_array($term)) {
+                $term = array($term);
+            }
+
+            $i = 0;
+            $valueOrX = $expr->orX();
+            foreach ($term as $searchTerm) {
+                $parameterAlias = 'search'.$i;
+                if (!empty($supportedAttributes['int']) && is_numeric($searchTerm)) {
+                    $valueOrX->add(
+                        $expr->eq($alias.'.value', ':'.$parameterAlias)
+                    );
+                    $qb->setParameter($parameterAlias, intval($searchTerm));
+                }
+
+                if (!empty($supportedAttributes['string'])) {
+                    if (strpos('%', $searchTerm) === false) {
+                        $searchTerm = '%'.$searchTerm.'%';
+                    }
+                    $valueOrX->add(
+                        $expr->like($alias.'.value', ':'.$parameterAlias)
+                    );
+                    $qb->setParameter($parameterAlias, $searchTerm);
+                }
+
+                $i++;
+            }
+
+            $allAttributeIds = array_merge($supportedAttributes['int'], $supportedAttributes['string']);
+
+            $orX->add(
+                $expr->andX(
+                    $expr->in('searchAttributeValues.attributeId', ':searchAttributeIds'),
+                    $valueOrX
+                )
+            );
+            $qb->setParameter('searchAttributeIds', $allAttributeIds);
+        }
+
+
+        $qb->join('u.userAttributeValue', 'searchAttributeValues');
+
+        return $orX;
+    }
 }
