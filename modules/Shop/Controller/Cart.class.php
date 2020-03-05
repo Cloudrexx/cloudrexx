@@ -331,6 +331,17 @@ class Cart
             }
 //DBG::log("Cart::add_product(): No match!");
         }
+        // coupons are always a new order item. The reason for this is that
+        // we want to link coupons with the order items that created it.
+        if (!$new) {
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $em = $cx->getDb()->getEntityManager();
+            $productRepo = $em->getRepository('Cx\Modules\Shop\Model\Entity\Product');
+            $product = $productRepo->find($arrNewProduct['id']);
+            if ($product->getDistribution() == 'coupon') {
+                $new = true;
+            }
+        }
 //DBG::log("Cart::add_product(): Comparing done, cart ID $cart_id");
         if ($new) {
             if (isset($old_cart_id)) {
