@@ -294,6 +294,41 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
     }
 
     /**
+     * Get a expression to filter users
+     *
+     * @param \Doctrine\ORM\QueryBuilder &$qb     QueryBuilder instance
+     * @param array                      $filters filter conditions
+     * @param bool                       $and     use a and condition or an or condition
+     * @return \Doctrine\ORM\Query\Expr\Orx|\Doctrine\ORM\Query\Expr\Andx
+     */
+    public function getAttributeFilterExpression(&$qb, $filters, $and = true)
+    {
+        $objAttr = \FWUser::getFWUserObject()->objUser->objAttribute;
+
+        if ($and) {
+            $expr = $qb->expr()->andX();
+        } else {
+            $expr = $qb->expr()->orX();
+        }
+
+        foreach ($filters as $key=>$value) {
+            if ($objAttr->isCoreAttribute($key)) {
+                $key = $objAttr->getAttributeIdByProfileAttributeId($key);
+            }
+
+            // Join table if not already done
+            $alias = 'v'.$key;
+            if (!in_array($alias, $qb->getAllAliases())) {
+                $qb->join('u.userAttributeValue', $alias);
+            }
+
+            $expr->add($this->getExpression($alias.'.'.$key, 'eq'));
+            $qb->setParameter($alias.$key, $value);
+        }
+        return $expr;
+    }
+
+    /**
      * Get an expression to search for one or more search terms in the user username (and email only backend)
      *
      * Matches single (scalar) or multiple (array) search terms against a
