@@ -1249,7 +1249,7 @@ class User extends User_Profile
         }
         if ($id) {
             if ($forceReload || !isset($this->arrCachedUsers[$id])) {
-                return $this->loadUsers($id);
+                $this->loadUser($id);
             }
             $this->id = $id;
             $this->username = isset($this->arrCachedUsers[$id]['username']) ? $this->arrCachedUsers[$id]['username'] : '';
@@ -1282,6 +1282,57 @@ class User extends User_Profile
         $this->clean();
 // TODO:  I guess this is wrong, then.
         return false;
+    }
+
+    /**
+     * Loads a User object according to the given ID
+     *
+     * @param int $id ID of the user to be searched for
+     */
+    protected function loadUser($id)
+    {
+        if ($this->isLoggedIn()) {
+            $arrDebugBackTrace =  debug_backtrace();
+            die("User->loadUser(): Illegal method call in {$arrDebugBackTrace[0]['file']} on line {$arrDebugBackTrace[0]['line']}!");
+        }
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $userRepo = $em->getRepository('Cx\Core\User\Model\Entity\User');
+        $user = $userRepo->find($id);
+
+        $this->arrLoadedUsers = array();
+        if (empty($user)) {
+            return;
+        }
+
+        $classMeta = $em->getClassMetadata('Cx\Core\User\Model\Entity\User');
+
+        $id = $user->getId();
+        foreach (array_keys($this->arrAttributes) as $column) {
+            $getter = 'get'.ucfirst($classMeta->getFieldName($column));
+            $value = $user->$getter();
+            $this->arrCachedUsers[$id][$column] = $value;
+            $this->arrLoadedUsers[$id][$column] = $value;
+        }
+
+        foreach ($user->getUserAttributeValue() as $attributeValue) {
+            $value = $attributeValue->getValue();
+            $attributeId = $attributeValue->getAttributeId();
+            $convertedAttributeId = $this->objAttribute->getProfileAttributeIdByAttributeId($attributeId);
+            if ($this->objAttribute->isCoreAttribute($convertedAttributeId)) {
+                // default attributes like 'title' or 'firstname'
+                $this->arrCachedUsers[$id]['profile'][$convertedAttributeId][0] = $value;
+                $this->arrLoadedUsers[$id]['profile'][$convertedAttributeId][0] = $value;
+            } else {
+                $this->arrCachedUsers[$id][$attributeId] = $value;
+                $this->arrLoadedUsers[$id][$attributeId] = $value;
+            }
+        }
+
+        $network = new \Cx\Lib\User\User_Networks($id);
+        $this->arrCachedUsers[$id]['networks'] = $network;
+        $this->arrLoadedUsers[$id]['networks'] = $network;
     }
 
 
