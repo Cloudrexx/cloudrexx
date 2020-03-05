@@ -166,4 +166,4 @@ Cx\Core\User\Model\Entity\User:
       mappedBy: user
   lifecycleCallbacks:
     prePersist: [ validate ]
-    onFlush: [ validate ]
+    preUpdate: [ validate ]
