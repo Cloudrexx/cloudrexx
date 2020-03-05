@@ -90,8 +90,11 @@ class Customer extends \User
      * @return  integer         $id                 Customer ID
      * @author  Reto Kohli <reto.kohli@comvation.com>
      */
-    function id()
+    function id($id=null)
     {
+        if (isset($id)) {
+            $this->setId($id);
+        }
         return $this->id;
     }
 
@@ -346,11 +349,12 @@ class Customer extends \User
      *                                    false otherwise.
      * @author  Reto Kohli <reto.kohli@comvation.com>
      */
-    function active($active=null)
+    function active($active=null, $ignoreSignedInUser = false)
     {
         if (isset($active)) {
             // do not change the status of the currently signed-in user
             if (
+                !$ignoreSignedInUser &&
                 $this->getId() > 0 &&
                 $this->getId() == \FWUser::getFWUserObject()->objUser->getId()
             ) {
@@ -435,7 +439,7 @@ class Customer extends \User
      */
     public function getUsers(
         $filter=null, $search=null, $arrSort=null, $arrAttributes=null,
-        $limit=null, $offset=0
+        $limit=null, $offset=0, &$count = 0
     ) {
         if (!empty($filter) && is_array($filter)) {
             if (isset($filter['group']) && is_array($filter['group'])) {
@@ -455,11 +459,94 @@ class Customer extends \User
                 unset($filter['group']);
             }
         }
-//DBG::log("Customer::getUsers(): Filter: ".var_export($filter, true));
-        if ($this->loadUsers($filter, $search, $arrSort, $arrAttributes, $limit, $offset)) {
-            return $this;
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $userRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\User');
+        $qb = $userRepo->createQueryBuilder('u');
+
+        if (!empty($filter['id'])) {
+            $qb->andWhere($qb->expr()->in('u.id', ':userIds'));
+            $qb->setParameter(':userIds', $filter['id']);
         }
-        return false;
+
+        if (!empty($filter['active'])) {
+            $qb->andWhere($qb->expr()->in('u.active', ':userIsActive'));
+            $qb->setParameter(':userIsActive', $filter['active']);
+        }
+
+        if (!empty($filter['email'])) {
+            $qb->andWhere($qb->expr()->in('u.email', ':userEmail'));
+            $qb->setParameter(':userEmail', $filter['email']);
+        }
+
+        if (!empty($filter['firstname']) && !empty($filter['firstname']['REGEXP'])) {
+            $userRepo->addAttributeRegexFilterToQueryBuilder($qb, $filter['firstname']['REGEXP'], 'firstname');
+        }
+
+        if (!empty($filter['lastname']) && !empty($filter['lastname']['REGEXP'])) {
+            $userRepo->addAttributeRegexFilterToQueryBuilder($qb, $filter['lastname']['REGEXP'], 'lastname');
+        }
+
+        if (!empty($filter['company']) && !empty($filter['company']['REGEXP'])) {
+            $userRepo->addAttributeRegexFilterToQueryBuilder($qb, $filter['company']['REGEXP'], 'company');
+        }
+
+        if (!empty($search)) {
+            $orX = $qb->expr()->orX();
+            $orX->add($userRepo->getSearchByTermInUserExpression($qb, $search));
+            $orX->add($userRepo->getSearchByTermInAttributeExpression($qb, $search));
+            $qb->andWhere($orX);
+        }
+
+        // sort by
+        foreach ($arrSort as $field=>$direction) {
+            $userRepo->addOrderToQueryBuilder($qb, $field, $direction);
+        }
+        // offset
+        $qb->setFirstResult($offset);
+        // limit
+        $qb->setMaxResults($limit);
+
+        // result
+        $users = $qb->getQuery()->getResult();
+
+        // Count users
+        $qb->select(
+            'count(DISTINCT u.id)'
+        );
+        $qb->orderBy('u.id');
+        $qb->setFirstResult(null);
+        $qb->setMaxResults(null);
+
+        $count = intval($qb->getQuery()->getSingleScalarResult());
+
+        $customers = array();
+        foreach ($users as $user) {
+            $customer = new \Cx\Modules\Shop\Controller\Customer();
+            $customer->id($user->getId());
+            $customer->username($user->getUsername());
+            $customer->email($user->getEmail());
+            $customer->gender($user->getProfileAttribute('gender')->getValue());
+            $customer->firstname($user->getProfileAttribute('firstname')->getValue());
+            $customer->lastname($user->getProfileAttribute('lastname')->getValue());
+            $customer->company($user->getProfileAttribute('company')->getValue());
+            $customer->address($user->getProfileAttribute('address')->getValue());
+            $customer->city($user->getProfileAttribute('city')->getValue());
+            $customer->zip($user->getProfileAttribute('zip')->getValue());
+            $customer->country_id($user->getProfileAttribute('country')->getValue());
+            $customer->phone($user->getProfileAttribute('phone_private')->getValue());
+            $customer->fax($user->getProfileAttribute('fax')->getValue());
+            $noteId = $index = \Cx\Core\Setting\Controller\Setting::getValue('user_profile_attribute_notes','Shop');
+            $customer->companynote($user->getAttributeValue($noteId)->getValue());
+            $groupId = \Cx\Core\Setting\Controller\Setting::getValue('user_profile_attribute_customer_group_id','Shop');
+            $customer->group_id($user->getAttributeValue($groupId)->getValue());
+            $customer->active($user->getActive(), true);
+            $customer->register_date($user->getRegdate());
+
+            $customers[$user->getId()] = $customer;
+        }
+
+        return $customers;
     }
 
 

@@ -71,7 +71,7 @@ class Customers
      *                                  false(?) otherwise
      */
     static function get(
-        $filter=null, $search=null, $arrSort=null, $limit=null, $offset=0
+        $filter=null, $search=null, $arrSort=null, $limit=null, $offset=0, &$count = 0
     ) {
         if (is_null(self::$objCustomer))
             self::$objCustomer = new Customer();
@@ -95,12 +95,11 @@ class Customers
 //                'username', 'email', 'address', 'city', 'zip',
 //                'phone_office', 'phone_private', 'phone_mobile', 'phone_fax'
                 ) as $field) {
-                $objCustomer = self::get(array($field => $filter), null, $arrSort,
+                $customers = self::get(array($field => $filter), null, $arrSort,
                     $limit, $offset);
-                while ($objCustomer && !$objCustomer->EOF) {
-                    $id = $objCustomer->id();
+                foreach ($customers as $customer) {
+                    $id = $customer->getId();
                     $arrCustomerId[$id] = $id;
-                    $objCustomer->next();
 //DBG::log("Customers::get(): Field $field, got IDs ".var_export($arrCustomerId, true));
                 }
             }
@@ -112,7 +111,8 @@ class Customers
         }
 //DBG::log("Customers::get(): Final Filter ".var_export($filter, true));
         return self::$objCustomer->getUsers(
-            $filter, null, $arrSort, null, $limit, $offset);
+            $filter, null, $arrSort, null, $limit, $offset, $count
+        );
     }
 
 
@@ -270,13 +270,12 @@ class Customers
             \Cx\Core\Setting\Controller\Setting::getValue('usergroup_id_customer','Shop'),
         ));
         if (!$inactive) $arrFilter['active'] = true;
-        $objCustomer = Customers::get($arrFilter, null,
+        $customers = Customers::get($arrFilter, null,
             array('lastname' => 'ASC', 'firstname' => 'ASC', ));
         $arrNames = array();
-        while ($objCustomer && !$objCustomer->EOF) {
-            $name = $objCustomer->getName($format);
-            $arrNames[$objCustomer->id()] = $name;
-            $objCustomer->next();
+        foreach ($customers as $customer) {
+            $name = $customer->getName($format);
+            $arrNames[$customer->getId()] = $name;
         }
         return $arrNames;
     }
