@@ -16,5 +16,17 @@ namespace Cx\Core\User\Model\Repository;
  */
 class UserAttributeRepository extends \Doctrine\ORM\EntityRepository
 {
+    /**
+     * Find all User Attributes without a parent
+     *
+     * @return array all attributes without a parent
+     */
+    public function findAllWithoutParent()
+    {
+        $qb = $this->createQueryBuilder('a');
+        $qb->leftJoin('a.parent', 'p');
+        $qb->where($qb->expr()->isNull('p.id'));
 
+        return $qb->getQuery()->getResult();
+    }
 }
