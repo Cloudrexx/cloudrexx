@@ -956,6 +956,16 @@ class User extends User_Profile
         return $this->id;
     }
 
+    /**
+     * Set ID. Use this method with caution! The ID of a user should not be overwritten.
+     *
+     * @param $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
 
     public function getLastActivityTime()
     {
