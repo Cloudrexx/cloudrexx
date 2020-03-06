@@ -257,23 +257,6 @@ class Country
         return $matches;
     }
 
-    /**
-     * Returns the current number of Country records present in the database
-     * @return  integer           The number of records on success,
-     *                            false otherwise.
-     */
-    static function getRecordcount()
-    {
-        global $objDatabase;
-
-        $query = "
-            SELECT COUNT(*) AS `numof_records`
-              FROM ".DBPREFIX."core_country";
-        $objResult = $objDatabase->Execute($query);
-        if (!$objResult || $objResult->EOF) return self::errorHandler();
-        return $objResult->fields['numof_records'];
-    }
-
 
     /**
      * Returns the ID of the Country specified by its alpha2 code
