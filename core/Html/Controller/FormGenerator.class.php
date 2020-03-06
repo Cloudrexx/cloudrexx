@@ -914,7 +914,7 @@ class FormGenerator {
             case 'image':
                 $placeholderPictureUrl = '/core/Html/View/Media/NoPicture.gif';
                 \JS::registerCode('
-                    function javascript_callback_function(data) {
+                    function javascript_callback_function_' . $name . '(data) {
                         if (data.type != "file") {
                             return;
                         }
@@ -940,7 +940,7 @@ class FormGenerator {
                 ');
                 $mediaBrowser = new \Cx\Core_Modules\MediaBrowser\Model\Entity\MediaBrowser();
                 $mediaBrowser->setOptions(array('type' => 'button'));
-                $mediaBrowser->setCallback('javascript_callback_function');
+                $mediaBrowser->setCallback('javascript_callback_function_' . $name);
                 $defaultOptions = array(
                     'views' => 'filebrowser,uploader',
                     'id' => 'page_target_browse',
