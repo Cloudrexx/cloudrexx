@@ -51,10 +51,9 @@ class Country
     /**
      * Array of all countries
      * @var     array
-     * @access  private
      * @see     init()
      */
-    private static $arrCountries = null;
+    protected static $arrCountries = array();
 
 
     /**
