@@ -87,27 +87,30 @@ class Country
      *    ... more ...
      *  )
      * Notes:
-     *  - The Countries are returned in the current frontend language
-     *    as set in FRONTEND_LANG_ID, except if the optional $lang_id
-     *    argument is not empty.
-     *  - Empty arguments are set to their default values, which are:
-     *    - $lang_id: The current value of the FRONTEND_LANG_ID constant
+     *  - The Countries are returned in the current locale of the interface,
+     *    except if the optional $langId argument is set.
      * @global  ADONewConnection  $objDatabase
-     * @param   integer   $lang_id          The optional language ID
+     * @param   integer   $langId           The optional language ID
      * @return  array                       The Country array on success,
      *                                      false otherwise
      */
-    static function getArray($lang_id=null) {
+    static function getArray($langId = 0) {
         global $objDatabase;
 
-        $lang_id = (int)$lang_id;
-        if (empty($lang_id)) $lang_id = FRONTEND_LANG_ID;
+        $langId = (int)$langId;
 
-        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-        $locale = $cx->getDb()->getEntityManager()->find(
-            'Cx\Core\Locale\Model\Entity\Locale',
-            $lang_id
-        );
+        $cxMode = \Cx\Core\Core\Controller\Cx::instanciate()->getMode();
+        if ($cxMode == \Cx\Core\Core\Controller\Cx::MODE_BACKEND) {
+            if (empty($langId)) {
+                $langId = LANG_ID;
+            }
+            $iso1 = \FWLanguage::getBackendLanguageCodeById($langId);
+        } else {
+            if (empty($langId)) {
+                $langId = FRONTEND_LANG_ID;
+            }
+            $iso1 = \FWLanguage::getLanguageCodeById($langId);
+        }
 
         $query = "
             SELECT `country`.`id`,
@@ -121,15 +124,15 @@ class Country
         $arrCountries = array();
         while (!$objResult->EOF) {
             $id = $objResult->fields['id'];
-            $strName = \Locale::getDisplayRegion(
+            $name = \Locale::getDisplayRegion(
                 // 'und_' stands for 'Undetermined language' of a region
                 // refer to https://www.unicode.org/reports/tr35/tr35-29.html#Unknown_or_Invalid_Identifiers
                 'und_' . $objResult->fields['alpha2'],
-                $locale->getIso1()->getIso1()
+                $iso1
             );
             $arrCountries[$id] = array(
                 'id'     => $id,
-                'name'   => $strName,
+                'name'   => $name,
                 'ord'    => $objResult->fields['ord'],
                 'alpha2' => $objResult->fields['alpha2'],
                 'alpha3' => $objResult->fields['alpha3'],
