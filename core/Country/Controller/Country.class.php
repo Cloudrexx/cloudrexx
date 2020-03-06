@@ -387,9 +387,10 @@ class Country
     static function getMenu(
         $menuName='countryId', $selected='', $onchange=''
     ) {
-        if (is_null(self::$arrCountries)) self::init();
-        if (empty(self::$arrCountries)) return '';
-//DBG::log("Country::getMenu(): ".count(self::$arrCountries)." countries");
+        $countries = static::getData();
+        if (empty($countries)) {
+            return '';
+        }
 
         return \Html::getSelectCustom(
             $menuName, self::getMenuoptions($selected),
