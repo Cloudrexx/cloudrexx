@@ -117,7 +117,7 @@ class MediaDirectoryInputfieldCountry extends \Cx\Modules\MediaDir\Controller\Me
                 break;
             case 2:
                 //search View
-                $country = \Cx\Core\Country\Controller\Country::getNameArray(true, $langId);
+                $country = \Cx\Core\Country\Controller\Country::getNameArray($langId);
                 foreach ($country as $id => $name) {
                     $strInputfieldOptions .= '<option value="'.$id.'">'.$name.'</option>';
                 }

@@ -252,7 +252,6 @@ CREATE TABLE `contrexx_core_country` (
   `alpha2` char(2) NOT NULL DEFAULT '',
   `alpha3` char(3) NOT NULL DEFAULT '',
   `ord` int(5) unsigned NOT NULL DEFAULT '0',
-  `active` tinyint(1) unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_core_country_country` (

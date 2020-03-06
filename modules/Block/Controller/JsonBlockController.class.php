@@ -147,7 +147,7 @@ class JsonBlockController extends \Cx\Core\Core\Model\Entity\Controller implemen
                 'countries' => $countries
             );
         }
-        $arrCountries = \Cx\Core\Country\Controller\Country::searchByName($term,null,false);
+        $arrCountries = \Cx\Core\Country\Controller\Country::searchByName($term,null);
         foreach ($arrCountries as $country) {
             $countries[] = array(
                 'id'    => $country['id'],

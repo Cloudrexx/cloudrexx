@@ -81,7 +81,6 @@ class Country
      *      'name'         => country name,
      *      'alpha2'       => alpha-2 (two letter) code,
      *      'alpha3'       => alpha-3 (three letter) code,
-     *      'active'       => boolean,
      *      'ord'          => ordinal value,
      *    ),
      *    ... more ...
@@ -116,7 +115,6 @@ class Country
             SELECT `country`.`id`,
                    `country`.`alpha2`, `country`.`alpha3`,
                    `country`.`ord`,
-                   `country`.`active`
               FROM ".DBPREFIX."core_country AS `country`";
         $objResult = $objDatabase->SelectLimit($query);
         if (!$objResult) return self::errorHandler();
@@ -136,7 +134,6 @@ class Country
                 'ord'    => $objResult->fields['ord'],
                 'alpha2' => $objResult->fields['alpha2'],
                 'alpha3' => $objResult->fields['alpha3'],
-                'active' => $objResult->fields['active'],
             );
             $objResult->MoveNext();
         }
@@ -153,7 +150,6 @@ class Country
      *    'name'         => country name,
      *    'alpha2'       => alpha-2 (two letter) code,
      *    'alpha3'       => alpha-3 (three letter) code,
-     *    'active'       => boolean,
      *    'ord'          => ordinal value,
      *  ),
      * The Country is returned in the current language,
@@ -183,7 +179,6 @@ class Country
      *    'name'         => country name,
      *    'alpha2'       => alpha-2 (two letter) code,
      *    'alpha3'       => alpha-3 (three letter) code,
-     *    'active'       => boolean,
      *    'ord'          => ordinal value,
      *  ),
      * The Country is returned in the current frontend language
@@ -220,7 +215,6 @@ class Country
      *    'name'         => country name,
      *    'alpha2'       => alpha-2 (two letter) code,
      *    'alpha3'       => alpha-3 (three letter) code,
-     *    'active'       => boolean,
      *    'ord'          => ordinal value,
      *  ),
      * The Countries are returned in the current frontend language
@@ -302,20 +296,17 @@ class Country
 
 
     /**
-     * Returns the array of all active country names, indexed by their ID
+     * Returns the array of all country names, indexed by their ID
      *
      * If the optional $lang_id parameter is empty, the FRONTEND_LANG_ID
      * constant's value is used instead.
-     * @param   boolean   $active     If true, only active Countries are included,
-     *                                all Countries otherwise.
-     *                                Defaults to false
      * @param   integer   $lang_id    The optional language ID.
      *                                Defaults to the FRONTEND_LANG_ID
      *                                if empty
      * @return  array                 The country names array on success,
      *                                false otherwise
      */
-    static function getNameArray($active=true, $lang_id=null)
+    static function getNameArray($lang_id=null)
     {
         static $arrName = null;
 
@@ -323,7 +314,6 @@ class Country
         if (is_null($arrName)) {
             $arrName = array();
             foreach (self::$arrCountries as $id => $arrCountry) {
-                if ($active && empty($arrCountry['active'])) continue;
                 $arrName[$id] = $arrCountry['name'];
             }
 //die("Names: ".var_export($arrName, true));
@@ -382,24 +372,6 @@ class Country
         return '';
     }
 
-
-    /**
-     * Returns true if the country selected by its ID is active
-     *
-     * If a country with the given ID does not exist, returns false.
-     * @param   integer   $country_id     The country ID
-     * @return  boolean                   True if active, false otherwise
-     * @static
-     */
-    static function isActiveById($country_id)
-    {
-        if (is_null(self::$arrCountries)) self::init();
-        if (isset(self::$arrCountries[$country_id]))
-            return self::$arrCountries[$country_id]['active'];
-        return '';
-    }
-
-
     /**
      * Resets the state of the class
      * @return  void
@@ -413,20 +385,17 @@ class Country
     /**
      * Returns the HTML dropdown menu or hidden input field plus name string
      *
-     * If there is just one active country, returns a hidden <input> tag with
-     * the countries' name appended.  If there are more, returns a dropdown
-     * menu with the optional ID preselected and optional onchange method added.
+     * Returns a dropdown menu with the optional ID preselected and optional
+     * onchange method added.
      * @param   string    $menuName   Optional name of the menu,
      *                                defaults to "countryId"
      * @param   string    $selected   Optional selected country ID
-     * @param   boolean   $active     Include inactive countries if false.
-     *                                Defaults to false
      * @param   string    $onchange   Optional onchange callback function
      * @return  string                The HTML dropdown menu code
      * @static
      */
     static function getMenu(
-        $menuName='countryId', $selected='', $active=true, $onchange=''
+        $menuName='countryId', $selected='', $onchange=''
     ) {
         if (is_null(self::$arrCountries)) self::init();
         if (empty(self::$arrCountries)) return '';
@@ -438,7 +407,7 @@ class Country
                 $arrCountry['name'];
         }
         return \Html::getSelectCustom(
-            $menuName, self::getMenuoptions($selected, $active),
+            $menuName, self::getMenuoptions($selected),
             false, $onchange);
     }
 
@@ -446,40 +415,13 @@ class Country
     /**
      * Returns the HTML code for the countries dropdown menu options
      * @param   string  $selected     The optional selected Country ID
-     * @param   boolean $active       If true, only active countries
      *                                are added to the options, all otherwise.
      * @return  string                The HTML dropdown menu options code
      * @static
      */
-    static function getMenuoptions($selected=0, $active=true)
+    static function getMenuoptions($selected=0)
     {
-        return \Html::getOptions(self::getNameArray($active), $selected);
-    }
-
-    /**
-     * Activate the countries whose IDs are listed in the comma separated
-     * list of Country IDs
-     *
-     * Any Country not included in the list is deactivated.
-     * @param   string    $strCountryIds    The comma separated list of
-     *                                      to-be-active Country IDs
-     * @return  boolean                     True on success, false otherwise
-     */
-    static function activate($strCountryIds)
-    {
-        global $objDatabase;
-
-        $query = "
-            UPDATE ".DBPREFIX."core_country
-               SET active=0
-             WHERE id NOT IN ($strCountryIds)";
-        if (!$objDatabase->Execute($query)) return false;
-        self::reset();
-        $query = "
-            UPDATE ".DBPREFIX."core_country
-               SET active=1
-             WHERE id IN ($strCountryIds)";
-        return (boolean)$objDatabase->Execute($query);
+        return \Html::getOptions(self::getNameArray(), $selected);
     }
 
 
@@ -497,7 +439,6 @@ class Country
             'alpha2' => array('type' => 'CHAR(2)', 'notnull' => true, 'default' => ''),
             'alpha3' => array('type' => 'CHAR(3)', 'notnull' => true, 'default' => ''),
             'ord' => array('type' => 'INT(5)', 'unsigned' => true, 'notnull' => true, 'default' => '0', 'renamefrom' => 'sort_order'),
-            'active' => array('type' => 'TINYINT(1)', 'unsigned' => true, 'notnull' => true, 'default' => '1', 'renamefrom' => 'is_active'),
         );
         \Cx\Lib\UpdateUtil::table($table_name, $table_structure);
 
