@@ -1198,6 +1198,8 @@ $_ARRAYLANG['sum'] = 'Total';
 
 $_ARRAYLANG['emptyField'] = ' ';
 $_ARRAYLANG['countryId'] = 'Land';
+$_ARRAYLANG['orderItem'] = 'Zugehörige Bestellung';
+$_ARRAYLANG['TXT_SHOP_ORDERITEM_LINK_TO_ORDER'] = 'Bestellung #%d';
 $_ARRAYLANG['TXT_SHOP_DELETED_ORDER'] = 'Bestellung wurde gelöscht.';
 $_ARRAYLANG['TXT_SHOP_DELETED_ORDERS'] = 'Bestellungen wurden gelöscht.';
 $_ARRAYLANG['TXT_SHOP_ORDER_STATUS_CHANGED'] = 'Status der Bestellung wurde geändert.';
