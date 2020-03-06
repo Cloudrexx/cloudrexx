@@ -121,7 +121,7 @@ class Country
      * @return  array                       The Country array on success,
      *                                      an empty array otherwise
      */
-    static function getData($langId = 0) {
+    public static function getData($langId = 0) {
         $langId = (int)$langId;
 
         $cxMode = \Cx\Core\Core\Controller\Cx::instanciate()->getMode();
@@ -211,7 +211,7 @@ class Country
      * @return  array                       The Country array on success,
      *                                      false otherwise
      */
-    static function getByName($country_name, $lang_id = 0)
+    public static function getByName($country_name, $lang_id = 0)
     {
         $countries = static::getData($lang_id);
         foreach ($countries as $country) {
@@ -242,7 +242,7 @@ class Country
      * @return  array               The Country array on success,
      *                              false otherwise
      */
-    static function searchByName($term, $lang_id = 0)
+    public static function searchByName($term, $lang_id = 0)
     {
         $countries = static::getData($lang_id);
 
@@ -275,7 +275,7 @@ class Country
      * @param   string    $alpha2   The alpha2 code
      * @return  integer             The Country ID on success, null otherwise
      */
-    static function getIdByAlpha2($alpha2)
+    public static function getIdByAlpha2($alpha2)
     {
         $countries = static::getData();
         foreach ($countries as $country) {
@@ -298,7 +298,7 @@ class Country
      * @return  array                 The country names array on success,
      *                                false otherwise
      */
-    static function getNameArray($lang_id = 0)
+    public static function getNameArray($lang_id = 0)
     {
         $data = static::getData($lang_id);
 
@@ -317,7 +317,7 @@ class Country
      * @param   integer   $country_id     The country ID
      * @return  string                    The country name, or the empty string
      */
-    static function getNameById($country_id)
+    public static function getNameById($country_id)
     {
         $country = static::getById($country_id);
         if (!$country) {
@@ -335,7 +335,7 @@ class Country
      * @return  string                    The ISO 2 code, or the empty string
      * @static
      */
-    static function getAlpha2ById($country_id)
+    public static function getAlpha2ById($country_id)
     {
         $country = static::getById($country_id);
         if (!$country) {
@@ -353,7 +353,7 @@ class Country
      * @return  string                    The ISO 3 code, or the empty string
      * @static
      */
-    static function getAlpha3ById($country_id)
+    public static function getAlpha3ById($country_id)
     {
         $country = static::getById($country_id);
         if (!$country) {
@@ -384,7 +384,7 @@ class Country
      * @return  string                The HTML dropdown menu code
      * @static
      */
-    static function getMenu(
+    public static function getMenu(
         $menuName='countryId', $selected='', $onchange=''
     ) {
         $countries = static::getData();
@@ -405,7 +405,7 @@ class Country
      * @return  string                The HTML dropdown menu options code
      * @static
      */
-    static function getMenuoptions($selected=0)
+    public static function getMenuoptions($selected=0)
     {
         return \Html::getOptions(self::getNameArray(), $selected);
     }
