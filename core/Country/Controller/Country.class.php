@@ -55,6 +55,11 @@ class Country
      */
     protected static $arrCountries = array();
 
+    /**
+     * Localized lists of countries
+     * @var array
+     */
+    protected static $arrLocales = array();
 
     /**
      * Initialises the class array of Countries
@@ -137,7 +142,11 @@ class Country
             static::init();
         }
 
-        $arrCountries = array();
+        if (isset(static::$arrLocales[$iso1])) {
+            return static::$arrLocales[$iso1];
+        }
+        static::$arrLocales[$iso1] = array();
+
         foreach (static::$arrCountries as $country) {
             $name = \Locale::getDisplayRegion(
                 // 'und_' stands for 'Undetermined language' of a region
@@ -145,10 +154,12 @@ class Country
                 'und_' . $country['alpha2'],
                 $iso1
             );
+
             $country['name'] = $name;
-            $arrCountries[] = $country;
+            static::$arrLocales[$iso1][$country['id']] = $country;
         }
-        return $arrCountries;
+
+        return static::$arrLocales[$iso1];
     }
 
 
