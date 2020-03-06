@@ -291,25 +291,20 @@ class Country
     /**
      * Returns the array of all country names, indexed by their ID
      *
-     * If the optional $lang_id parameter is empty, the FRONTEND_LANG_ID
-     * constant's value is used instead.
-     * @param   integer   $lang_id    The optional language ID.
-     *                                Defaults to the FRONTEND_LANG_ID
-     *                                if empty
+     * @param   integer   $lang_id    Language ID of language the countries
+     *                                should be returned in. If not set, then
+     *                                the language locale of the current request
+     *                                is used.
      * @return  array                 The country names array on success,
      *                                false otherwise
      */
-    static function getNameArray($lang_id=null)
+    static function getNameArray($lang_id = 0)
     {
-        static $arrName = null;
+        $data = static::getData($lang_id);
 
-        if (is_null(self::$arrCountries)) self::init($lang_id);
-        if (is_null($arrName)) {
-            $arrName = array();
-            foreach (self::$arrCountries as $id => $arrCountry) {
-                $arrName[$id] = $arrCountry['name'];
-            }
-//die("Names: ".var_export($arrName, true));
+        $arrName = array();
+        foreach ($data as $id => $arrCountry) {
+            $arrName[$id] = $arrCountry['name'];
         }
         return $arrName;
     }
