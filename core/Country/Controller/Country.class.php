@@ -70,7 +70,6 @@ class Country
      *      'id'           => country ID,
      *      'alpha2'       => alpha-2 (two letter) code,
      *      'alpha3'       => alpha-3 (three letter) code,
-     *      'ord'          => ordinal value,
      *    ),
      *    ... more ...
      *  )
@@ -80,8 +79,7 @@ class Country
 
         $query = "
             SELECT `country`.`id`,
-                   `country`.`alpha2`, `country`.`alpha3`,
-                   `country`.`ord`,
+                   `country`.`alpha2`, `country`.`alpha3`
               FROM ".DBPREFIX."core_country AS `country`";
         $objResult = $objDatabase->SelectLimit($query);
         if (!$objResult) return self::errorHandler();
@@ -92,7 +90,6 @@ class Country
             $id = $objResult->fields['id'];
             static::$arrCountries[$id] = array(
                 'id'     => $id,
-                'ord'    => $objResult->fields['ord'],
                 'alpha2' => $objResult->fields['alpha2'],
                 'alpha3' => $objResult->fields['alpha3'],
             );
@@ -110,7 +107,6 @@ class Country
      *      'name'         => country name,
      *      'alpha2'       => alpha-2 (two letter) code,
      *      'alpha3'       => alpha-3 (three letter) code,
-     *      'ord'          => ordinal value,
      *    ),
      *    ... more ...
      *  )
@@ -158,6 +154,19 @@ class Country
             static::$arrLocales[$iso1][$country['id']] = $country;
         }
 
+        // sort countries
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $languageManager = $cx->getComponent('LanguageManager');
+        uasort(
+            static::$arrLocales[$active][$iso1],
+            function($a, $b) use ($languageManager) {
+                return strcasecmp(
+                    $languageManager->replaceInternationalCharacters($a['name']),
+                    $languageManager->replaceInternationalCharacters($b['name'])
+                );
+            }
+        );
+
         return static::$arrLocales[$iso1];
     }
 
@@ -170,7 +179,6 @@ class Country
      *    'name'         => country name,
      *    'alpha2'       => alpha-2 (two letter) code,
      *    'alpha3'       => alpha-3 (three letter) code,
-     *    'ord'          => ordinal value,
      *  ),
      * The Country is returned in the current language,
      * except if the optional $lang_id argument is not empty.
@@ -199,7 +207,6 @@ class Country
      *    'name'         => country name,
      *    'alpha2'       => alpha-2 (two letter) code,
      *    'alpha3'       => alpha-3 (three letter) code,
-     *    'ord'          => ordinal value,
      *  ),
      * The Country is returned in the current language,
      * except if the optional $lang_id argument is not empty.
@@ -231,7 +238,6 @@ class Country
      *    'name'         => country name,
      *    'alpha2'       => alpha-2 (two letter) code,
      *    'alpha3'       => alpha-3 (three letter) code,
-     *    'ord'          => ordinal value,
      *  ),
      * The Countries are returned in the current language,
      * except if the optional $lang_id argument is not empty.
@@ -409,7 +415,6 @@ class Country
             'id' => array('type' => 'INT(10)', 'unsigned' => true, 'notnull' => true, 'auto_increment' => true, 'primary' => true),
             'alpha2' => array('type' => 'CHAR(2)', 'notnull' => true, 'default' => ''),
             'alpha3' => array('type' => 'CHAR(3)', 'notnull' => true, 'default' => ''),
-            'ord' => array('type' => 'INT(5)', 'unsigned' => true, 'notnull' => true, 'default' => '0', 'renamefrom' => 'sort_order'),
         );
         \Cx\Lib\UpdateUtil::table($table_name, $table_structure);
 

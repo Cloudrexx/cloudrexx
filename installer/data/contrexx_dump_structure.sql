@@ -250,8 +250,7 @@ CREATE TABLE `contrexx_content_page` (
 CREATE TABLE `contrexx_core_country` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `alpha2` char(2) NOT NULL DEFAULT '',
-  `alpha3` char(3) NOT NULL DEFAULT '',
-  `ord` int(5) unsigned NOT NULL DEFAULT '0',
+  `alpha3` char(3) NOT NULL DEFAULT ''
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_core_country_country` (
