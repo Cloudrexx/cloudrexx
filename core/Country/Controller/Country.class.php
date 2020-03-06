@@ -100,11 +100,10 @@ class Country
         }
     }
 
-
     /**
      * Returns an array of Country arrays
      *
-     * The array created is of the form
+     * The array returned has the following structure
      *  array(
      *    country ID => array(
      *      'id'           => country ID,
@@ -120,9 +119,9 @@ class Country
      *    except if the optional $langId argument is set.
      * @param   integer   $langId           The optional language ID
      * @return  array                       The Country array on success,
-     *                                      false otherwise
+     *                                      an empty array otherwise
      */
-    static function getArray($langId = 0) {
+    static function getData($langId = 0) {
         $langId = (int)$langId;
 
         $cxMode = \Cx\Core\Core\Controller\Cx::instanciate()->getMode();
@@ -184,7 +183,7 @@ class Country
      */
     public static function getById($country_id, $lang_id = 0)
     {
-        $countries = static::getArray($lang_id);
+        $countries = static::getData($lang_id);
         if (isset($countries[$country_id])) {
             return $countries[$country_id];
         }
@@ -214,7 +213,7 @@ class Country
      */
     static function getByName($country_name, $lang_id = 0)
     {
-        $countries = static::getArray($lang_id);
+        $countries = static::getData($lang_id);
         foreach ($countries as $country) {
             if (strtolower($country['name']) == strtolower($country_name)) {
                 return $country;
@@ -245,7 +244,7 @@ class Country
      */
     static function searchByName($term, $lang_id = 0)
     {
-        $countries = static::getArray($lang_id);
+        $countries = static::getData($lang_id);
 
         $matches = array();
         foreach ($countries as $country) {

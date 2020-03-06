@@ -453,7 +453,7 @@ die("ShopLibrary::shopSetMailTemplate(): Obsolete method called");
      * Fetch data of countries that are available as shipping target
      *
      * @return array    List of countries fetched from
-     *                  \Cx\Core\Country\Controller\Country::getArray() and
+     *                  \Cx\Core\Country\Controller\Country::getData() and
      *                  filtered by available countries for shipping.
      */
     static function getShipmentCountries() {
@@ -471,7 +471,7 @@ die("ShopLibrary::shopSetMailTemplate(): Obsolete method called");
         );
 
         // filter country data based on set shipping countries
-        $arrCountries = \Cx\Core\Country\Controller\Country::getArray();
+        $arrCountries = \Cx\Core\Country\Controller\Country::getData();
         return array_intersect_key(
             $arrCountries,
             $arrAvailableCountries
