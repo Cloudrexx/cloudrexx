@@ -232,10 +232,10 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
         // Determine and verify the payment handler
         $payment_id = $order->getPaymentId();
 //if (!$payment_id) DBG::log("update_status($order_id, $newOrderStatus): Failed to find Payment ID for Order ID $order_id");
-        $processor_id = \Cx\Modules\Shop\Controller\Payment::
+        $processor_id = \Cx\Modules\Shop\Controller\PaymentController::
             getPaymentProcessorId($payment_id);
 //if (!$processor_id) DBG::log("update_status($order_id, $newOrderStatus): Failed to find Processor ID for Payment ID $payment_id");
-        $processorName = \Cx\Modules\Shop\Controller\PaymentProcessing::
+        $processorName = \Cx\Modules\Shop\Controller\PaymentProcessorController::
             getPaymentProcessorName($processor_id);
 //if (!$processorName) DBG::log("update_status($order_id, $newOrderStatus): Failed to find Processor Name for Processor ID $processor_id");
         // The payment processor *MUST* match the handler returned.
@@ -259,7 +259,7 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
             // If neither condition is met, the status is set to 'confirmed'.
             $newOrderStatus = self::STATUS_CONFIRMED;
             $processorType =
-                \Cx\Modules\Shop\Controller\PaymentProcessing::
+                \Cx\Modules\Shop\Controller\PaymentProcessorController::
                     getCurrentPaymentProcessorType($processor_id);
             $shipmentId = $order->getShipmentId();
             if ($processorType == 'external') {
@@ -426,13 +426,16 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
             );
         }
         if ($payment_id) {
+            $payment = $this->_em->getRepository(
+                'Cx\Modules\Shop\Model\Entity\Payment'
+            )->find($payment_id);
+            $name = !empty($payment) ? $payment->getName() : '';
+
             $arrSubstitution += array (
                 'PAYMENT' => array(0 => array(
                     'PAYMENT_NAME' => sprintf(
                         '%-40s',
-                        \Cx\Modules\Shop\Controller\Payment::getNameById(
-                            $payment_id
-                        )
+                        $name
                     ),
                     'PAYMENT_PRICE' => sprintf(
                         '% 9.2f',
@@ -441,7 +444,7 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
                 )),
             );
         }
-        $arrItems = $objOrder->getItems();
+        $arrItems = $objOrder->getOrderItems();
         if (!$arrItems) {
             \Message::warning($_ARRAYLANG['TXT_SHOP_ORDER_WARNING_NO_ITEM']);
         }
@@ -466,38 +469,40 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
         }
         $orderItemCount = 0;
         $total_item_price = 0;
+
+        $productRepo = $this->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\Product'
+        );
         // Suppress Coupon messages (see Coupon::available())
         \Message::save();
         foreach ($arrItems as $item) {
-            $product_id = $item['product_id'];
-            $objProduct = \Cx\Modules\Shop\Controller\Product::getById(
-                $product_id
-            );
+            $product_id = $item->getProductId();
+            $objProduct = $item->getProduct();
             if (!$objProduct) {
 //die("Product ID $product_id not found");
                 continue;
             }
 //DBG::log("Orders::getSubstitutionArray(): Item: Product ID $product_id");
-            $product_name = substr($item['name'], 0, 40);
-            $item_price = $item['price'];
-            $quantity = $item['quantity'];
+            $product_name = substr($item->getName(), 0, 40);
+            $item_price = $item->getPrice();
+            $quantity = $item->getQuantity();
 // TODO: Add individual VAT rates for Products
 //            $orderItemVatPercent = $objResultItem->fields['vat_percent'];
             if ($updateStock) {
                 // Decrease the Product stock count,
                 // applies to "real", shipped goods only
-                $objProduct->decreaseStock($quantity);
+                $productRepo->decreaseStock($objProduct, $quantity);
             }
-            $product_code = $objProduct->code();
+            $product_code = $objProduct->getCode();
             // Pick the order items attributes
             $str_options = '';
             $optionList = array();
             // Any attributes?
-            if ($item['attributes']) {
+            if ($objOrder->getOptionArray()) {
                 $str_options = '  '; // '[';
                 $attribute_name_previous = '';
                 foreach (
-                    $item['attributes'] as $attribute_name => $arrAttribute
+                    $objOrder->getOptionArray() as $attribute_name => $arrAttribute
                 ) {
                     $optionValues = array();
 //DBG::log("Attribute /$attribute_name/ => ".var_export($arrAttribute, true));
@@ -579,11 +584,11 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
                     // In case there are protected downloads in the cart,
                     // collect the group IDs
                     $arrUsergroupId = array();
-                    if ($objProduct->distribution() == 'download') {
-                        $usergroupIds = $objProduct->usergroup_ids();
+                    if ($objProduct->getDistribution() == 'download') {
+                        $usergroupIds = $objProduct->getUserGroupIds();
                         if ($usergroupIds != '') {
                             $arrUsergroupId = explode(',', $usergroupIds);
-                            $validity = $objProduct->weight();
+                            $validity = $objProduct->getWeight();
                         }
                     }
                     // create an account that belongs to all collected
@@ -649,7 +654,7 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
                         );
                     }
 //echo("Instance $instance");
-                    if ($objProduct->distribution() == 'coupon') {
+                    if ($objProduct->getDistribution() == 'coupon') {
                         if (empty($arrProduct['COUPON_DATA']))
                             $arrProduct['COUPON_DATA'] = array();
 //DBG::log("Orders::getSubstitutionArray(): Getting code");
@@ -667,6 +672,7 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
                         $newCoupon->setUses(1e10);
                         $newCoupon->setOrderItem($orderItem);
 
+                        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
                         $this->_em->persist($newCoupon);
                         $this->_em->flush();
 

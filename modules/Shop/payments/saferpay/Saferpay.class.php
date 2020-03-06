@@ -665,6 +665,23 @@ window.setTimeout(3000, function() {
         return $strMenuoptions;
     }
 
+    /**
+     * Returns the array of window ids
+     *
+     * @return  array  Array with all window ids
+     */
+    static function getWindowIds()
+    {
+        global $_ARRAYLANG;
+
+        $ids = array();
+        // Set $id to start at 0 (zero) to enable iframes!
+        for ($id = 1; $id < self::saferpay_windowoption_id_count; ++$id) {
+            $ids[$id] = $_ARRAYLANG['TXT_SHOP_SAFERPAY_WINDOWOPTION_'.$id];
+        }
+        return $ids;
+    }
+
 
     /**
      * Returns accumulated warnings as a HTML string

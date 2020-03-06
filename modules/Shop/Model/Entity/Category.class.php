@@ -48,6 +48,13 @@ namespace Cx\Modules\Shop\Model\Entity;
  */
 class Category extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\Translatable {
     /**
+     * Flag for virtual categories
+     *
+     * @var string
+     */
+    const VIRTUAL_FLAG = '__VIRTUAL__';
+
+    /**
      * @var string
      */
     protected $locale;
@@ -418,4 +425,65 @@ class Category extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\
         return $this->parentCategory;
     }
 
+    /**
+     * Get Name
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->getName();
+    }
+
+    /**
+     * Check if a category is virtual.
+     *
+     * @return  boolean             True if the ShopCategory is virtual,
+     *                              false otherwise
+     */
+    function isVirtual()
+    {
+        return preg_match(
+            '/(?:^|\s)' . preg_quote(self::VIRTUAL_FLAG, '/') . '(?:\s|\=|$)/i',
+            $this->getFlags()
+        );
+    }
+
+    /**
+     * Clones the ShopCategory
+     *
+     * Note that this does NOT create a copy in any way, but simply clears
+     * the ShopCategory ID.  Upon storing this object, a new ID is created.
+     * @param   boolean   $flagRecursive      Clone subcategories if true
+     * @param   boolean   $flagWithProducts   Clone contained Products if true
+     * @return  void
+     * @author  Reto Kohli <reto.kohli@comvation.com>
+     */
+    function makeClone($flagRecursive=false, $flagWithProducts=false)
+    {
+        $oldId = $this->id;
+        $this->id = 0;
+        $this->store();
+        $newId = $this->id;
+        if ($flagRecursive) {
+            foreach (ShopCategories::getChildCategoriesById($oldId)
+                     as $objCategory) {
+                $objCategory->makeClone($flagRecursive, $flagWithProducts);
+                $objCategory->parent_id($newId);
+                if (!$objCategory->store()) {
+                    return false;
+                }
+            }
+        }
+        if ($flagWithProducts) {
+            foreach (Products::getByShopCategory($oldId) as $objProduct) {
+                $objProduct->makeClone();
+                $objProduct->category_id($newId);
+                if (!$objProduct->store()) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 }

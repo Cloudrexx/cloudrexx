@@ -226,6 +226,11 @@ class Product extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\T
     protected $vat;
 
     /**
+     * @var \Cx\Core_Modules\Pdf\Model\Entity\PdfTemplate
+     */
+    protected $pdfTemplate;
+
+    /**
      * @var \Doctrine\Common\Collections\Collection
      */
     protected $categories;
@@ -590,6 +595,24 @@ class Product extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\T
     }
 
     /**
+     * Set PdfTemplate
+     *
+     * @param null|\Cx\Core_Modules\Pdf\Model\Entity\PdfTempalte $pdfTemplate PDF Template
+     */
+    public function setPdfTemplate($pdfTemplate)
+    {
+        $this->pdfTemplate = $pdfTemplate;
+    }
+
+    /**
+     * @return \Cx\Core_Modules\Pdf\Model\Entity\PdfTempalte PDF Template
+     */
+    public function getPdfTemplate()
+    {
+        return $this->pdfTemplate;
+    }
+
+    /**
      * Set weight
      *
      * @param integer $weight
@@ -627,6 +650,51 @@ class Product extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\T
     public function getFlags()
     {
         return $this->flags;
+    }
+
+    /**
+     * Remove a flag
+     *
+     * If the flag is not present, nothing is changed.
+     * Note that the match is case insensitive.
+     * @param   string    $flag             The flag to be removed
+     */
+    function removeFlag($flag)
+    {
+        $this->setFlags(
+            trim(preg_replace("/\\s*$flag\\s*/i", ' ', $this->getFlags()))
+        );
+    }
+
+    /**
+     * Add a flag
+     *
+     * If the flag is already present, nothing is changed.
+     * Note that the match is case sensitive.
+     * @param   string    $flag             The flag to be added
+     * @return  boolean                     Always true for the time being
+     * @author      Reto Kohli <reto.kohli@comvation.com>
+     */
+    function addFlag($flag)
+    {
+        if (!preg_match("/$flag/", $this->getFlags())) {
+            $this->setFlags($this->getFlags() . ' '.$flag);
+        }
+        return true;
+    }
+
+    /**
+     * Test for a match with the Product flags.
+     *
+     * Note that the match is case sensitive.
+     * @param   string    $flag             The Product flag to test
+     * @return  boolean                     Boolean true if the flag is present,
+     *                                      false otherwise.
+     * @author      Reto Kohli <reto.kohli@comvation.com>
+     */
+    function testFlag($flag)
+    {
+        return preg_match("/$flag/", $this->getFlags());
     }
 
     /**
@@ -1044,6 +1112,15 @@ class Product extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\T
         return $this->getName();
     }
 
+    public function getUserGroupIds()
+    {
+        $userGroupIds = '';
+        foreach ($this->getUserGroups() as $userGroup) {
+            $userGroupIds .= $userGroup->getId() .',';
+        }
+        return $userGroupIds;
+    }
+
     public function getJsArray($groupCustomerId = 0, $isReseller = false)
     {
         $strJsArrProduct =
@@ -1071,7 +1148,7 @@ class Product extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\T
             // Determine discounted price from customer and article group matrix
 
             $discountGroupRepo = $this->cx->getDb()->getEntityManager()->getRepository('\Cx\Modules\Shop\Model\Entity\RelDiscountGroup');
-            $discountCustomerGroup = $discountGroupRepo->findBy(
+            $discountCustomerGroup = $discountGroupRepo->findOneBy(
                 array(
                     'customerGroupId' => $groupCustomerId,
                     'articleGroup' => $articleId
@@ -1132,5 +1209,183 @@ class Product extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\T
         $strJsArrProduct .= '}';
 
         return $strJsArrProduct;
+    }
+
+    /**
+     * Return product status based on the product stock and active settings
+     *
+     * @return boolean True when product is active, false otherwise
+     */
+    public function getStatus()
+    {
+        if ($this->stockVisible && $this->stock <= 0) {
+            return false;
+        }
+        return $this->active;
+    }
+
+    /**
+     * Returns a product price in the active currency, depending on the
+     * Customer and special offer status.
+     * @param   Customer  $objCustomer      The Customer, or null
+     * @param   double    $price_options    The price for Attributes,
+     *                                      if any, or 0 (zero)
+     * @param   integer   $count            The number of products, defaults
+     *                                      to 1 (one)
+     * @param   boolean   $ignore_special_offer
+     *                                      If true, special offers are ignored.
+     *                                      This is needed to actually determine
+     *                                      both prices in the products view.
+     *                                      Defaults to false.
+     * @return  double                      The price converted to the active
+     *                                      currency
+     * @author    Reto Kohli <reto.kohli@comvation.com>
+     */
+    function get_custom_price($objCustomer=null, $price_options=0, $count=1,
+                              $ignore_special_offer=false)
+    {
+        $normalPrice = $this->getNormalprice();
+        $resellerPrice = $this->getResellerprice();
+        $discountPrice = $this->getDiscountprice();
+        $discount_active = $this->getDiscountActive();
+        $groupCountId = $this->getGroupId();
+        $groupArticleId = $this->getArticleId();
+        $price = $normalPrice;
+        if (   !$ignore_special_offer
+            && $discount_active == 1
+            && $discountPrice != 0) {
+            $price = $discountPrice;
+        } else {
+            if (   $objCustomer
+                && $objCustomer->is_reseller()
+                && $resellerPrice != 0) {
+                $price = $resellerPrice;
+            }
+        }
+        $price += $price_options;
+        $rateCustomer = 0;
+        if ($objCustomer) {
+            $groupCustomerId = $objCustomer->group_id();
+            if ($groupCustomerId) {
+                $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+                $discountRepo = $cx->getDb()->getEntityManager()->getRepository(
+                    'Cx\Modules\Shop\Model\Entity\RelDiscountGroup'
+                );
+                $rateCustomer = $discountRepo->getDiscountRateCustomer(
+                    $groupCustomerId, $groupArticleId);
+                $price -= ($price * $rateCustomer * 0.01);
+            }
+        }
+        $rateCount = 0;
+        if ($count > 0) {
+            $rateCount =
+                \Cx\Modules\Shop\Controller\DiscountgroupCountNameController::
+                    getDiscountRateCount($groupCountId, $count);
+            $price -= ($price * $rateCount * 0.01);
+        }
+        $price = \Cx\Modules\Shop\Controller\CurrencyController::getCurrencyPrice($price);
+        return $price;
+    }
+    /**
+     * Get the status of the product based on the scheduled publishing
+     * Note: This function does not check whether the product is in scheduled publishing,
+     * So make sure the product is in scheduled before calling this method
+     *
+     * @return boolean TRUE|FALSE True when product is active by scheduled publishing
+     */
+    public function getActiveByScheduledPublishing()
+    {
+        $start = null;
+        if ($this->getDateStart()) {
+            $start = \DateTime::createFromFormat(
+                ASCMS_DATE_FORMAT_INTERNATIONAL_DATETIME,
+                $this->getDateStart()
+            );
+            $start->setTime(0, 0, 0);
+        }
+        $end = null;
+        if ($this->getDateEnd()) {
+            $end = \DateTime::createFromFormat(
+                ASCMS_DATE_FORMAT_INTERNATIONAL_DATETIME,
+                $this->getDateEnd()
+            );
+            $end->setTime(23, 59, 59);
+        }
+        if (   (!empty($start) && empty($end) && ($start->getTimestamp() > time()))
+            || (empty($start) && !empty($end) && ($end->getTimestamp() < time()))
+            || (!empty($start) && !empty($end) && !($start->getTimestamp() < time() && $end->getTimestamp() > time()))
+        ) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * The visibility of the Product on the start page
+     * @param   boolean   $shown_on_startpage   The optional visibility flag
+     * @return  boolean                         The visibility flag
+     * @author      Reto Kohli <reto.kohli@comvation.com>
+     */
+    function shown_on_startpage($shown_on_startpage=null)
+    {
+        if (isset($shown_on_startpage)) {
+            if ($shown_on_startpage) {
+                return $this->addFlag('__SHOWONSTARTPAGE__');
+            }
+            return $this->removeFlag('__SHOWONSTARTPAGE__');
+        }
+        return $this->testFlag('__SHOWONSTARTPAGE__');
+    }
+
+    /**
+     * Returns boolean true if this Product is flagged as "Outlet"
+     *
+     * Note that this is an example extension only.
+     * @return  boolean                 True if this is "Outlet",
+     *                                  false otherwise.
+     * @author      Reto Kohli <reto.kohli@comvation.com>
+     */
+    function is_outlet()
+    {
+        return $this->testFlag('Outlet');
+    }
+
+    /**
+     * Return the discount rate for any Product in the virtual "Outlet"
+     * Category.
+     *
+     * The rules for the discount are: 21% at the first date of the month,
+     * plus an additional 1% per day, for a maximum rate of 51% on the 31st.
+     * Note that this is an example extension only.
+     * @return  integer                 The current Outlet discount rate
+     * @author      Reto Kohli <reto.kohli@comvation.com>
+     */
+    function getOutletDiscountRate()
+    {
+        $dayOfMonth = date('j');
+        return 20 + $dayOfMonth;
+    }
+
+    /**
+     * Return the current discounted price for any Product, if applicable.
+     * @return  mixed                       The Product discount price,
+     *                                      or null if there is no discount.
+     * @author      Reto Kohli <reto.kohli@comvation.com>
+     */
+    function getDiscountedPrice()
+    {
+        $price = $this->price;
+        if ($this->discount_active) {
+            $price = $this->discountprice;
+        }
+// NOTE: Add more conditions and rules as desired, i.e.
+//        if ($this->testFlag('Outlet')) {
+//            $discountRate = $this->getOutletDiscountRate();
+//            $price = number_format(
+//                $price * (100 - $discountRate) / 100,
+//                2, '.', '');
+//        }
+        return $price;
     }
 }

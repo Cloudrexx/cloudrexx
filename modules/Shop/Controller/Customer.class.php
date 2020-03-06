@@ -337,9 +337,10 @@ class Customer extends \User
      */
     function group_id($group_id=null)
     {
-        if (!$index) {
-            return 0;
-        }
+        \Cx\Core\Setting\Controller\Setting::init('Shop');
+
+        $index = \Cx\Core\Setting\Controller\Setting::getValue('user_profile_attribute_customer_group_id','Shop');
+        if (!$index) return false;
         if (isset($group_id)) {
             $this->setProfile(array($index => array(0 => $group_id)));
         }

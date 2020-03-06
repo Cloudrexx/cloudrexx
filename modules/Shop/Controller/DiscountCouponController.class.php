@@ -57,9 +57,6 @@ class DiscountCouponController extends \Cx\Core\Core\Model\Entity\Controller
         global $_ARRAYLANG;
 
         $this->setJavaScriptVariables();
-        \JS::registerJS(
-            $this->cx->getModuleFolderName() . '/Shop/View/Script/DiscountCoupon.js'
-        );
 
         $options['order']['overview'] = array(
             'code',

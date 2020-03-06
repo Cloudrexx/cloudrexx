@@ -59,7 +59,7 @@ class DiscountgroupCountName extends \Cx\Model\Base\EntityBase implements \Gedmo
     /**
      * @var integer
      */
-    protected $cumulative;
+    protected $cumulative = 1;
 
     /**
      * @var string
@@ -229,5 +229,15 @@ class DiscountgroupCountName extends \Cx\Model\Base\EntityBase implements \Gedmo
     public function getProducts()
     {
         return $this->products;
+    }
+
+    /**
+     * Get Name
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->getName();
     }
 }
