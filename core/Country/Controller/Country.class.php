@@ -383,8 +383,11 @@ class Country
         }
 
         return \Html::getSelectCustom(
-            $menuName, self::getMenuoptions($selected),
-            false, $onchange);
+            $menuName,
+            static::getMenuoptions($selected),
+            false,
+            $onchange
+        );
     }
 
 
