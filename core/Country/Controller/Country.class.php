@@ -59,15 +59,40 @@ class Country
     /**
      * Initialises the class array of Countries
      *
-     * Calls {@see getArray()} to accomplish this.
-     * @param   integer   $lang_id      The optional language ID.
-     *                                  Defaults to the FRONTEND_LANG_ID
-     *                                  if empty
-     * @return  void
+     * The array created is of the form
+     *  array(
+     *    country ID => array(
+     *      'id'           => country ID,
+     *      'alpha2'       => alpha-2 (two letter) code,
+     *      'alpha3'       => alpha-3 (three letter) code,
+     *      'ord'          => ordinal value,
+     *    ),
+     *    ... more ...
+     *  )
      */
-    static function init($lang_id=null)
-    {
-        self::$arrCountries = self::getArray($lang_id);
+    protected static function init() {
+        global $objDatabase;
+
+        $query = "
+            SELECT `country`.`id`,
+                   `country`.`alpha2`, `country`.`alpha3`,
+                   `country`.`ord`,
+              FROM ".DBPREFIX."core_country AS `country`";
+        $objResult = $objDatabase->SelectLimit($query);
+        if (!$objResult) return self::errorHandler();
+
+        static::$arrCountries = array();
+        while (!$objResult->EOF) {
+
+            $id = $objResult->fields['id'];
+            static::$arrCountries[$id] = array(
+                'id'     => $id,
+                'ord'    => $objResult->fields['ord'],
+                'alpha2' => $objResult->fields['alpha2'],
+                'alpha3' => $objResult->fields['alpha3'],
+            );
+            $objResult->MoveNext();
+        }
     }
 
 
@@ -111,16 +136,12 @@ class Country
             $iso1 = \FWLanguage::getLanguageCodeById($langId);
         }
 
-        $query = "
-            SELECT `country`.`id`,
-                   `country`.`alpha2`, `country`.`alpha3`,
-                   `country`.`ord`,
-              FROM ".DBPREFIX."core_country AS `country`";
-        $objResult = $objDatabase->SelectLimit($query);
-        if (!$objResult) return self::errorHandler();
+        if (empty(static::$arrCountries)) {
+            static::init();
+        }
 
         $arrCountries = array();
-        while (!$objResult->EOF) {
+        foreach (static::$arrCountries as $country) {
             $id = $objResult->fields['id'];
             $name = \Locale::getDisplayRegion(
                 // 'und_' stands for 'Undetermined language' of a region
@@ -128,14 +149,8 @@ class Country
                 'und_' . $objResult->fields['alpha2'],
                 $iso1
             );
-            $arrCountries[$id] = array(
-                'id'     => $id,
-                'name'   => $name,
-                'ord'    => $objResult->fields['ord'],
-                'alpha2' => $objResult->fields['alpha2'],
-                'alpha3' => $objResult->fields['alpha3'],
-            );
-            $objResult->MoveNext();
+            $country['name'] = $name;
+            $arrCountries[] = $country;
         }
         return $arrCountries;
     }
