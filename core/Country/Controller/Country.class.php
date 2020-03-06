@@ -373,7 +373,7 @@ class Country
     }
 
     /**
-     * Returns the HTML dropdown menu or hidden input field plus name string
+     * Returns the HTML dropdown menu
      *
      * Returns a dropdown menu with the optional ID preselected and optional
      * onchange method added.
@@ -390,12 +390,7 @@ class Country
         if (is_null(self::$arrCountries)) self::init();
         if (empty(self::$arrCountries)) return '';
 //DBG::log("Country::getMenu(): ".count(self::$arrCountries)." countries");
-        if (count(self::$arrCountries) == 1) {
-            $arrCountry = current(self::$arrCountries);
-            return
-                \Html::getHidden($menuName, $arrCountry['id']).
-                $arrCountry['name'];
-        }
+
         return \Html::getSelectCustom(
             $menuName, self::getMenuoptions($selected),
             false, $onchange);
