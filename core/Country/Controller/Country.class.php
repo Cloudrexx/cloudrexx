@@ -203,21 +203,17 @@ class Country
      *    'alpha3'       => alpha-3 (three letter) code,
      *    'ord'          => ordinal value,
      *  ),
-     * The Country is returned in the current frontend language
-     * as set in FRONTEND_LANG_ID, except if the optional $lang_id
-     * argument is not empty.
+     * The Country is returned in the current language,
+     * except if the optional $lang_id argument is not empty.
+     *
      * @global  ADONewConnection  $objDatabase
      * @param   string    $country_name     The Country name
      * @param   integer   $lang_id          The optional language ID
      * @return  array                       The Country array on success,
      *                                      false otherwise
      */
-    static function getByName($country_name, $lang_id=null)
+    static function getByName($country_name, $lang_id = 0)
     {
-        $lang_id = (int)$lang_id;
-        if (empty($lang_id)) {
-            $lang_id = FRONTEND_LANG_ID;
-        }
         $countries = static::getArray($lang_id);
         foreach ($countries as $country) {
             if (strtolower($country['name']) == strtolower($country_name)) {
@@ -239,21 +235,16 @@ class Country
      *    'alpha3'       => alpha-3 (three letter) code,
      *    'ord'          => ordinal value,
      *  ),
-     * The Countries are returned in the current frontend language
-     * as set in FRONTEND_LANG_ID, except if the optional $lang_id
-     * argument is not empty.
+     * The Countries are returned in the current language,
+     * except if the optional $lang_id argument is not empty.
      *
      * @param   string    $term     The search term to get countries
      * @param   integer   $lang_id  The optional language ID
      * @return  array               The Country array on success,
      *                              false otherwise
      */
-    static function searchByName($term, $lang_id = null)
+    static function searchByName($term, $lang_id = 0)
     {
-        $lang_id = contrexx_input2int($lang_id);
-        if (empty($lang_id)) {
-            $lang_id = FRONTEND_LANG_ID;
-        }
         $countries = static::getArray($lang_id);
 
         $matches = array();
