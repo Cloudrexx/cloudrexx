@@ -363,16 +363,6 @@ class Country
     }
 
     /**
-     * Resets the state of the class
-     * @return  void
-     * @static
-     */
-    static function reset()
-    {
-        self::$arrCountries = null;
-    }
-
-    /**
      * Returns the HTML dropdown menu
      *
      * Returns a dropdown menu with the optional ID preselected and optional
