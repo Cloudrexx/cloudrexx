@@ -113,14 +113,11 @@ class Country
      * Notes:
      *  - The Countries are returned in the current locale of the interface,
      *    except if the optional $langId argument is set.
-     * @global  ADONewConnection  $objDatabase
      * @param   integer   $langId           The optional language ID
      * @return  array                       The Country array on success,
      *                                      false otherwise
      */
     static function getArray($langId = 0) {
-        global $objDatabase;
-
         $langId = (int)$langId;
 
         $cxMode = \Cx\Core\Core\Controller\Cx::instanciate()->getMode();
