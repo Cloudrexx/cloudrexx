@@ -161,7 +161,6 @@ class Country
         return static::$arrLocales[$iso1];
     }
 
-
     /**
      * Returns an array of Country data for the given ID
      *
@@ -269,7 +268,6 @@ class Country
         return $matches;
     }
 
-
     /**
      * Returns the ID of the Country specified by its alpha2 code
      * @param   string    $alpha2   The alpha2 code
@@ -286,7 +284,6 @@ class Country
 
         return null;
     }
-
 
     /**
      * Returns the array of all country names, indexed by their ID
@@ -309,7 +306,6 @@ class Country
         return $arrName;
     }
 
-
     /**
      * Returns the name of the country selected by its ID
      *
@@ -325,7 +321,6 @@ class Country
         }
         return $country['name'];
     }
-
 
     /**
      * Returns the ISO 2 code of the country selected by its ID
@@ -343,7 +338,6 @@ class Country
         }
         return $country['alpha2'];
     }
-
 
     /**
      * Returns the ISO 3 code of the country selected by its ID
@@ -390,7 +384,6 @@ class Country
         );
     }
 
-
     /**
      * Returns the HTML code for the countries dropdown menu options
      * @param   string  $selected     The optional selected Country ID
@@ -402,7 +395,6 @@ class Country
     {
         return \Html::getOptions(self::getNameArray(), $selected);
     }
-
 
     /**
      * Tries to recreate the database table(s) for the class
