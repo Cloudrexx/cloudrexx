@@ -28,24 +28,23 @@
 /**
  * Core Country and Region class
  *
- * @version     3.0.0
  * @since       3.0.0
  * @package     cloudrexx
  * @subpackage  core_country
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Reto Kohli <reto.kohli@comvation.com>
- * @todo        Test!
+ * @author      Thomas Wirz <thomas.wirz@cloudrexx.com>
  */
 namespace Cx\Core\Country\Controller;
 /**
  * Country helper methods
  *
- * @version     3.0.0
  * @since       3.0.0
  * @package     cloudrexx
  * @subpackage  core_country
  * @copyright   CLOUDREXX CMS - CLOUDREXX AG
  * @author      Reto Kohli <reto.kohli@comvation.com>
+ * @author      Thomas Wirz <thomas.wirz@cloudrexx.com>
  */
 class Country
 {
