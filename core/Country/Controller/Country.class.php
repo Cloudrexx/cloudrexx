@@ -153,60 +153,22 @@ class Country
      *    'active'       => boolean,
      *    'ord'          => ordinal value,
      *  ),
-     * The Country is returned in the current frontend language
-     * as set in FRONTEND_LANG_ID, except if the optional $lang_id
-     * argument is not empty.
-     * @global  ADONewConnection  $objDatabase
+     * The Country is returned in the current language,
+     * except if the optional $lang_id argument is not empty.
+     *
      * @param   integer   $country_id       The Country ID
      * @param   integer   $lang_id          The optional language ID
      * @return  array                       The Country array on success,
      *                                      false otherwise
      */
-    static function getById($country_id, $lang_id=null)
+    public static function getById($country_id, $lang_id = 0)
     {
-        global $objDatabase;
-
-        $lang_id = (int)$lang_id;
-        if (empty($lang_id)) {
-//die("Country::getById(): ERROR: Empty language ID");
-            $lang_id = FRONTEND_LANG_ID;
+        $countries = static::getArray($lang_id);
+        if (isset($countries[$country_id])) {
+            return $countries[$country_id];
         }
 
-        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-        $locale = $cx->getDb()->getEntityManager()->find(
-            'Cx\Core\Locale\Model\Entity\Locale',
-            $lang_id
-        );
-
-        $query = "
-            SELECT `country`.`alpha2`, `country`.`alpha3`,
-                   `country`.`ord`,
-                   `country`.`active`
-              FROM ".DBPREFIX."core_country AS `country`
-             WHERE `country`.`id`=$country_id";
-        $objResult = $objDatabase->Execute($query);
-        if (!$objResult) {
-// Disabled, as this method is called by errorHandler() as well!
-//            return self::errorHandler();
-            return false;
-        }
-        if ($objResult->EOF) return false;
-
-        $strName = \Locale::getDisplayRegion(
-            // 'und_' stands for 'Undetermined language' of a region
-            // refer to https://www.unicode.org/reports/tr35/tr35-29.html#Unknown_or_Invalid_Identifiers
-            'und_' . $objResult->fields['alpha2'],
-            $locale->getIso1()->getIso1()
-        );
-
-        return array(
-            'id'     => $country_id,
-            'name'   => $strName,
-            'ord'    => $objResult->fields['ord'],
-            'alpha2' => $objResult->fields['alpha2'],
-            'alpha3' => $objResult->fields['alpha3'],
-            'active' => $objResult->fields['active'],
-        );
+        return false;
     }
 
     /**
