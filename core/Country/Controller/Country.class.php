@@ -324,14 +324,14 @@ class Country
      * If a country with the given ID does not exist, returns the empty string.
      * @param   integer   $country_id     The country ID
      * @return  string                    The country name, or the empty string
-     * @static
      */
     static function getNameById($country_id)
     {
-        if (is_null(self::$arrCountries)) self::init();
-        if (isset(self::$arrCountries[$country_id]))
-            return self::$arrCountries[$country_id]['name'];
-        return '';
+        $country = static::getById($country_id);
+        if (!$country) {
+            return '';
+        }
+        return $country['name'];
     }
 
 
@@ -345,10 +345,11 @@ class Country
      */
     static function getAlpha2ById($country_id)
     {
-        if (is_null(self::$arrCountries)) self::init();
-        if (isset(self::$arrCountries[$country_id]))
-            return self::$arrCountries[$country_id]['alpha2'];
-        return '';
+        $country = static::getById($country_id);
+        if (!$country) {
+            return '';
+        }
+        return $country['alpha2'];
     }
 
 
@@ -362,10 +363,11 @@ class Country
      */
     static function getAlpha3ById($country_id)
     {
-        if (is_null(self::$arrCountries)) self::init();
-        if (isset(self::$arrCountries[$country_id]))
-            return self::$arrCountries[$country_id]['alpha3'];
-        return '';
+        $country = static::getById($country_id);
+        if (!$country) {
+            return '';
+        }
+        return $country['alpha3'];
     }
 
     /**
