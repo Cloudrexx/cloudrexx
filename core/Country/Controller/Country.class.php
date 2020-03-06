@@ -545,9 +545,6 @@ class Country
             // TODO: init country list
         }
 
-        \Cx\Core\Setting\Controller\Setting::init('core', 'country');
-        \Cx\Core\Setting\Controller\Setting::add('numof_countries_per_page_backend', 30, 101);
-
         // Always!
         return false;
     }

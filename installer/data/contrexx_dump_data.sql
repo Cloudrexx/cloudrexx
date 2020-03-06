@@ -1514,7 +1514,6 @@ INSERT INTO `contrexx_core_module_sync` (`id`, `data_access_id`, `to_uri`, `api_
 INSERT INTO `contrexx_core_module_sync` (`id`, `data_access_id`, `to_uri`, `api_key`, `active`) VALUES (9, 9, '', '', 0);
 INSERT INTO `contrexx_core_module_sync` (`id`, `data_access_id`, `to_uri`, `api_key`, `active`) VALUES (10, 10, '', '', 0);
 INSERT INTO `contrexx_core_module_sync` (`id`, `data_access_id`, `to_uri`, `api_key`, `active`) VALUES (11, 11, '', '', 0);
-INSERT INTO `contrexx_core_setting` (`section`, `name`, `group`, `type`, `value`, `values`, `ord`) VALUES ('core','numof_countries_per_page_backend','country','text','30','',101);
 INSERT INTO `contrexx_core_setting` (`section`, `name`, `group`, `type`, `value`, `values`, `ord`) VALUES ('Shop','address','config','text','MaxMuster AG\r\nFirmenstrasse 1\r\n4321 Irgendwo','',20);
 INSERT INTO `contrexx_core_setting` (`section`, `name`, `group`, `type`, `value`, `values`, `ord`) VALUES ('Shop','company','config','text','MaxMuster AG','',19);
 INSERT INTO `contrexx_core_setting` (`section`, `name`, `group`, `type`, `value`, `values`, `ord`) VALUES ('Shop','country_id','config','text','204','',13);
