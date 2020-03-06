@@ -277,16 +277,14 @@ class Country
      */
     static function getIdByAlpha2($alpha2)
     {
-        global $objDatabase;
+        $countries = static::getData();
+        foreach ($countries as $country) {
+            if (strtolower($country['alpha2']) == strtolower($alpha2)) {
+                return $country['id'];
+            }
+        }
 
-        $query = "
-            SELECT `country`.`id`
-              FROM ".DBPREFIX."core_country AS `country`
-             WHERE `alpha2`='".addslashes($alpha2)."'";
-        $objResult = $objDatabase->Execute($query);
-        if (!$objResult) return self::errorHandler();
-        if ($objResult->EOF) return null;
-        return $objResult->fields['id'];
+        return null;
     }
 
 
