@@ -657,12 +657,15 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
                             \Cx\Modules\Shop\Controller\DiscountCouponController::
                                 getNewCode();
 
+                        $orderItemRepo = $this->_em->getRepository('Cx\Modules\Shop\Model\Entity\OrderItem');
+                        $orderItem = $orderItemRepo->find($item['item_id']);
                         $newCoupon =
                             new \Cx\Modules\Shop\Model\Entity\DiscountCoupon();
                         $newCoupon->setCode($code);
                         $newCoupon->setDiscountAmount($item_price);
                         $newCoupon->setGlobal(true);
                         $newCoupon->setUses(1e10);
+                        $newCoupon->setOrderItem($orderItem);
 
                         $this->_em->persist($newCoupon);
                         $this->_em->flush();
