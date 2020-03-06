@@ -139,11 +139,10 @@ class Country
 
         $arrCountries = array();
         foreach (static::$arrCountries as $country) {
-            $id = $objResult->fields['id'];
             $name = \Locale::getDisplayRegion(
                 // 'und_' stands for 'Undetermined language' of a region
                 // refer to https://www.unicode.org/reports/tr35/tr35-29.html#Unknown_or_Invalid_Identifiers
-                'und_' . $objResult->fields['alpha2'],
+                'und_' . $country['alpha2'],
                 $iso1
             );
             $country['name'] = $name;
