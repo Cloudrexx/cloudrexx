@@ -108,6 +108,11 @@ class DiscountCoupon extends \Cx\Model\Base\EntityBase {
     protected $discountRate = '0';
 
     /**
+     * @var \Cx\Modules\Shop\Model\Entity\OrderItem
+     */
+    protected $orderItem = null;
+
+    /**
      * @var \Cx\Modules\Shop\Model\Entity\Payment
      */
     protected $payment;
@@ -360,6 +365,26 @@ class DiscountCoupon extends \Cx\Model\Base\EntityBase {
     public function getDiscountRate()
     {
         return $this->discountRate;
+    }
+
+    /**
+     * Set orderItem
+     *
+     * @param null|\Cx\Modules\Shop\Model\Entity\OrderItem $orderItem Related OrderItem
+     */
+    public function setOrderItem($orderItem)
+    {
+        $this->orderItem = $orderItem;
+    }
+
+    /**
+     * Get orderItem
+     *
+     * @return null|\Cx\Modules\Shop\Model\Entity\OrderItem Related OrderItem
+     */
+    public function getOrderItem()
+    {
+        return $this->orderItem;
     }
 
     /**

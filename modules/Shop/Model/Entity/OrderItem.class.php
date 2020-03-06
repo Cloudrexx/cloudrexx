@@ -89,6 +89,11 @@ class OrderItem extends \Cx\Model\Base\EntityBase {
     protected $weight;
 
     /**
+     * @var \Cx\Modules\Shop\Model\Entity\DiscountCoupon
+     */
+    protected $discountCoupon;
+
+    /**
      * @var \Doctrine\Common\Collections\Collection
      */
     protected $orderAttributes;
@@ -239,6 +244,26 @@ class OrderItem extends \Cx\Model\Base\EntityBase {
     public function getVatRate()
     {
         return $this->vatRate;
+    }
+
+    /**
+     * Set discount coupon
+     *
+     * @param null|\Cx\Modules\Shop\Model\Entity\DiscountCoupon $discountCoupon Related DiscountCoupon
+     */
+    public function setDiscountCoupon($discountCoupon)
+    {
+        $this->discountCoupon = $discountCoupon;
+    }
+
+    /**
+     * Get discountCoupon
+     *
+     * @return null|\Cx\Modules\Shop\Model\Entity\DiscountCoupon Related Coupon
+     */
+    public function getDiscountCoupon()
+    {
+        return $this->discountCoupon;
     }
 
     /**

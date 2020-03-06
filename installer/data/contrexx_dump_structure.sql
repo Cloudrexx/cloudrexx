@@ -3236,11 +3236,13 @@ CREATE TABLE `contrexx_module_shop_discount_coupon` (
   `minimum_amount` decimal(9,2) unsigned NOT NULL DEFAULT '0.00',
   `discount_amount` decimal(9,2) unsigned NOT NULL DEFAULT '0.00',
   `discount_rate` decimal(3,0) unsigned NOT NULL DEFAULT '0',
+  `order_item_id` INT UNSIGNED DEFAULT NULL,
   PRIMARY KEY (`id`),
   INDEX `IDX_7E70AB1A4C3A3BB` (`payment_id`),
   INDEX `IDX_7E70AB1A4584665A` (`product_id`),
   INDEX `IDX_7E70AB1A9395C3F3` (`customer_id`),
-  UNIQUE INDEX `fk_module_shop_discount_coupon_unique_idx` (`code`, `customer_id`)
+  UNIQUE INDEX `fk_module_shop_discount_coupon_unique_idx` (`code`, `customer_id`),
+  UNIQUE INDEX `UNIQ_7E70AB1AE415FB15` (`order_item_id`)
 ) ENGINE=InnoDB;
 CREATE TABLE `contrexx_module_shop_discountgroup_count_name` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -3985,3 +3987,4 @@ ALTER TABLE contrexx_module_shop_rel_category_pricelist ADD CONSTRAINT FK_B56E91
 ALTER TABLE contrexx_module_shop_rel_category_product ADD CONSTRAINT FK_DA4CA51112469DE2 FOREIGN KEY (category_id) REFERENCES contrexx_module_shop_categories (id);
 ALTER TABLE contrexx_module_shop_rel_category_product ADD CONSTRAINT FK_DA4CA5114584665A FOREIGN KEY (product_id) REFERENCES contrexx_module_shop_products (id);
 ALTER TABLE contrexx_module_shop_shipper ADD CONSTRAINT FK_52CD810E9F2C3FAB FOREIGN KEY (`zone_id`) REFERENCES contrexx_module_shop_zones (`id`);
+ALTER TABLE contrexx_module_shop_discount_coupon ADD CONSTRAINT FK_7E70AB1AE415FB15 FOREIGN KEY (order_item_id) REFERENCES contrexx_module_shop_order_items (id) ON DELETE SET NULL;
