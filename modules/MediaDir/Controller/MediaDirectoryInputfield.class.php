@@ -90,7 +90,15 @@ class MediaDirectoryInputfield extends MediaDirectoryLibrary
         $this->arrInputfields = self::getInputfields();
     }
 
-    function getInputfields()
+    /**
+     * Get list of inputfields (as array) of either all active forms or only
+     * those from a specific form if argument $formId is set.
+     *
+     * @param   integer ID of form to only return the inputfields of that
+     *                  specific form.
+     * @return  array   List of inputfields
+     */
+    public function getInputfields($formId = 0)
     {
         global $_ARRAYLANG, $objDatabase;
 
@@ -99,9 +107,12 @@ class MediaDirectoryInputfield extends MediaDirectoryLibrary
         $whereFormId  = 'AND (`form`.`active` = 1)';
         $joinFormsTbl = 'LEFT JOIN `' . DBPREFIX .'module_' . $this->moduleTablePrefix . '_forms` as form
                         ON (`form`.`id` = `input`.`form`)';
-        if (intval($this->intFormId) != 0) {
+        if (!$formId && $this->intFormId) {
+            $formId = $this->intFormId;
+        }
+        if ($formId) {
             $joinFormsTbl = '';
-            $whereFormId  = 'AND (`input`.`form` = "' . $this->intFormId . '")';
+            $whereFormId  = 'AND (`input`.`form` = "' . $formId . '")';
         }
 
         $whereExpSearch = null;
@@ -126,7 +137,6 @@ class MediaDirectoryInputfield extends MediaDirectoryLibrary
                 verifications.`regex` AS `pattern`,
                 types.`name` AS `type_name`,
                 types.`multi_lang` AS `type_multi_lang`,
-                types.`dynamic` AS `type_dynamic`,
                 types.`exp_search` As `exp_search`
             FROM
                 `' . DBPREFIX . 'module_' . $this->moduleTablePrefix . '_inputfields` AS input
@@ -185,7 +195,6 @@ class MediaDirectoryInputfield extends MediaDirectoryLibrary
                 $arrInputfield['type'] = intval($objInputfields->fields['type']);
                 $arrInputfield['type_name'] = htmlspecialchars($objInputfields->fields['type_name'], ENT_QUOTES, CONTREXX_CHARSET);
                 $arrInputfield['type_multi_lang'] = intval($objInputfields->fields['type_multi_lang']);
-                $arrInputfield['type_dynamic'] = intval($objInputfields->fields['type_dynamic']);
                 $arrInputfield['show_in'] = intval($objInputfields->fields['show_in']);
                 $arrInputfield['verification'] = intval($objInputfields->fields['verification']);
                 $arrInputfield['regex'] = $objInputfields->fields['pattern'];
@@ -202,24 +211,24 @@ class MediaDirectoryInputfield extends MediaDirectoryLibrary
         }
 
         $arrCategorySelector['id'] = 1;
-        $arrCategorySelector['order'] = !empty($this->intFormId) ? $this->arrSettings['categorySelectorOrder'][$this->intFormId] : 0;
+        $arrCategorySelector['order'] = $formId ? $this->arrSettings['categorySelectorOrder'][$formId] : 0;
         $arrCategorySelector['name'] = array(0 => $_ARRAYLANG['TXT_MEDIADIR_CATEGORIES']);
         $arrCategorySelector['type_name'] = '';
         $arrCategorySelector['required'] = 1;
         $arrCategorySelector['type'] = 0;
         // in frontend, categorySelectorExpSearch is only set for active forms
-        $arrCategorySelector['search'] = !empty($this->intFormId) ? $this->arrSettings['categorySelectorExpSearch'][$this->intFormId] : 0;
+        $arrCategorySelector['search'] = $formId ? $this->arrSettings['categorySelectorExpSearch'][$formId] : 0;
         $arrInputfields[1] = $arrCategorySelector;
 
         if($this->arrSettings['settingsShowLevels']) {
             $arrLevelSelector['id'] = 2;
-            $arrLevelSelector['order'] = !empty($this->intFormId) ? $this->arrSettings['levelSelectorOrder'][$this->intFormId] : 0;
+            $arrLevelSelector['order'] = $formId ? $this->arrSettings['levelSelectorOrder'][$formId] : 0;
             $arrLevelSelector['name'] = array(0 => $_ARRAYLANG['TXT_MEDIADIR_LEVELS']);
             $arrLevelSelector['type_name'] = '';
             $arrLevelSelector['required'] = 1;
             $arrLevelSelector['type'] = 0;
             // in frontend, levelSelectorExpSearch is only set for active forms
-            $arrLevelSelector['search'] = !empty($this->intFormId) ? $this->arrSettings['levelSelectorExpSearch'][$this->intFormId] : 0;
+            $arrLevelSelector['search'] = $formId ? $this->arrSettings['levelSelectorExpSearch'][$formId] : 0;
             $arrInputfields[2] = $arrLevelSelector;
         }
 

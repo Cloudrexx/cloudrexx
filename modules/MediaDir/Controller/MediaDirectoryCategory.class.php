@@ -223,6 +223,42 @@ class MediaDirectoryCategory extends MediaDirectoryLibrary
         }
     }
 
+    /**
+     * Returns a list with IDs of all visible categories that contain published
+     * data
+     *
+     * Published data is identified as categories having any of the following
+     * options set to activated:
+     * - categoryShowEntries
+     * - categoryShowSubcategories
+     *
+     * @return  array   List of IDs of categories
+     */
+    public static function getIdsWithPublishedData() {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $db = $cx->getDb()->getAdoDb();
+        $result = $db->Execute('
+            SELECT `id`
+            FROM `' . DBPREFIX . 'module_mediadir_categories`
+            WHERE `active` = 1
+            AND (
+                `show_subcategories` = 1 OR
+                `show_entries` = 1
+            )
+        ');
+        if (!$result || $result->EOF) {
+            return array();
+        }
+
+        $ids = array();
+        while (!$result->EOF) {
+            $ids[] = $result->fields['id'];
+            $result->MoveNext();
+        }
+
+        return $ids;
+    }
+
     function listCategories($objTpl, $intView, $intCategoryId=null, $arrParentIds=null, $intEntryId=null, $arrExistingBlocks=null, $intStartLevel=1, $cmd = null)
     {
         global $_ARRAYLANG, $_CORELANG, $objDatabase, $objInit;

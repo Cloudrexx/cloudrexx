@@ -115,7 +115,10 @@ class MediaDirectory extends MediaDirectoryLibrary
 
         switch ($_REQUEST['cmd']) {
             case 'delete':
-                if((!empty($_REQUEST['eid'])) || (!empty($_REQUEST['entryId']))) {
+                if(
+                    !empty($_GET['eid']) ||
+                    !empty($_POST['entryId'])
+                ) {
                     parent::checkAccess('delete_entry');
                     $this->deleteEntry();
                 } else {
@@ -1792,35 +1795,39 @@ class MediaDirectory extends MediaDirectoryLibrary
         //save entry data
         $strOkMessage  = '';
         $strErrMessage = '';
-        if(isset($_POST['submitEntryModfyForm']) && intval($_POST['entryId'])) {
-            $objEntry = new MediaDirectoryEntry($this->moduleName);
 
+        //check id
+        $intEntryId = 0;
+        if (!empty($_GET['eid'])) {
+            $intEntryId = intval($_GET['eid']);
+        }
+
+        if (
+            isset($_POST['submitEntryModfyForm']) &&
+            !empty($_POST['entryId'])
+        ) {
+            $objEntry = new MediaDirectoryEntry($this->moduleName);
             $strStatus = $objEntry->deleteEntry(intval($_POST['entryId']));
 
-            if($strStatus == true) {
+            if ($strStatus) {
+                $intEntryId = 0;
                 $strOkMessage = $_ARRAYLANG['TXT_MEDIADIR_ENTRY']." ".$_ARRAYLANG['TXT_MEDIADIR_SUCCESSFULLY_DELETED'];
             } else {
+                $intEntryId = intval($_POST['entryId']);
                 $strErrMessage = $_ARRAYLANG['TXT_MEDIADIR_ENTRY']." ".$_ARRAYLANG['TXT_MEDIADIR_CORRUPT_DELETED'];
             }
         }
 
-         //check id
-        if(intval($_GET['eid']) != 0) {
-            $intEntryId = intval($_GET['eid']);
-        } else {
-            $intEntryId = null;
+        // parse entry only when displaying the delete form
+        if ($intEntryId) {
+            $objEntry = new MediaDirectoryEntry($this->moduleName);
+            if ($this->arrSettings['settingsReadyToConfirm'] == 1) {
+                $objEntry->getEntries($intEntryId,null,null,null,null,null,true,null,1,null,null,null,true);
+            } else {
+                $objEntry->getEntries($intEntryId,null,null,null,null,null,1,null,1);
+            }
+            $objEntry->listEntries($this->_objTpl, 2);
         }
-
-        $objEntry = new MediaDirectoryEntry($this->moduleName);
-
-        if($this->arrSettings['settingsReadyToConfirm'] == 1) {
-            $objEntry->getEntries($intEntryId,null,null,null,null,null,true,null,1,null,null,null,true);
-        } else {
-            $objEntry->getEntries($intEntryId,null,null,null,null,null,1,null,1);
-        }
-
-
-        $objEntry->listEntries($this->_objTpl, 2);
 
         //parse global variables
         $this->_objTpl->setVariable(array(

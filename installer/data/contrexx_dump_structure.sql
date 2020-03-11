@@ -2271,7 +2271,6 @@ CREATE TABLE `contrexx_module_mediadir_inputfield_types` (
   `active` int(1) NOT NULL,
   `multi_lang` int(1) NOT NULL,
   `exp_search` int(7) NOT NULL,
-  `dynamic` int(1) NOT NULL,
   `comment` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)

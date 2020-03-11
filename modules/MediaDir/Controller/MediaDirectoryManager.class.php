@@ -744,6 +744,9 @@ class MediaDirectoryManager extends MediaDirectoryLibrary
                     $this->strErrMessage = $_ARRAYLANG['TXT_MEDIADIR_CATEGORY']." ".$_ARRAYLANG['TXT_MEDIADIR_CORRUPT_ADDED'];
                 }
             }
+            if ($status) {
+                return $this->overview();
+            }
         }
 
         //load category data
@@ -971,6 +974,9 @@ class MediaDirectoryManager extends MediaDirectoryLibrary
                 } else {
                     $this->strErrMessage = $_ARRAYLANG['TXT_MEDIADIR_LEVEL']." ".$_ARRAYLANG['TXT_MEDIADIR_CORRUPT_ADDED'];
                 }
+            }
+            if ($status) {
+                return $this->overview();
             }
         }
 

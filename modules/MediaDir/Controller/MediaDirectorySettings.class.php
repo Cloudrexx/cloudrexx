@@ -609,6 +609,7 @@ EOF;
             $_ARRAYLANG['TXT_MEDIADIR_LEGACY_BEHAVIOR_LATEST_PARSING'],
             $_ARRAYLANG['TXT_MEDIADIR_LEGACY_BEHAVIOR_LATEST_HIDING'],
             sprintf($_ARRAYLANG['TXT_MEDIADIR_LEGACY_BEHAVIOR_FORM_PAGE'], $italicElement),
+            $_ARRAYLANG['TXT_MEDIADIR_LEGACY_BEHAVIOR_ENTRIES_OF_FORMS'],
             $_ARRAYLANG['TXT_MEDIADIR_LEGACY_BEHAVIOR_SORT_CATEGORY_LIST'],
         );
 
@@ -1885,6 +1886,7 @@ EOF;
     public function generateEntrySlugs() {
         global $_ARRAYLANG;
 
+        $this->arrSettings['usePrettyUrls'] = 1;
         $db = $this->cx->getDb()->getAdoDb();
 
         // get all entries
@@ -1986,7 +1988,7 @@ EOF;
                     while (!$firstField->EOF) {
                         $langId = $firstField->fields['lang_id'];
                         $slugFromFirstField = $firstField->fields['value'];
-                        $this->slugify($slugFromFirstField);
+                        $this->slugify($arrEntry['entryId'], $slugFromFirstField, $langId);
 
                         // store slug value for entry in db
                         $query = "
