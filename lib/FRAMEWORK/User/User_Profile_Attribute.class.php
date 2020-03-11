@@ -1135,38 +1135,51 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
      */
     function storeNames()
     {
-        global $objDatabase;
-
         $arrOldNames = array();
         $status = true;
-        $objResult = $objDatabase->Execute('SELECT `lang_id`, `name` FROM `'.DBPREFIX.'access_user_attribute_name` WHERE `attribute_id` = '.$this->id);
-        if (!$objResult) {
-            return false;
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $attributeNameRepo = $em->getRepository('Cx\Core\User\Model\Entity\UserAttributeName');
+        $attributeRepo = $em->getRepository('Cx\Core\User\Model\Entity\UserAttribute');
+        $attributeNames = $attributeNameRepo->findBy(array('attributeId' => $this->id));
+
+        foreach ($attributeNames as $attributeName) {
+            $arrOldNames[$attributeName->getLangId()] = $attributeName->getName();
         }
-        while (!$objResult->EOF) {
-            $arrOldNames[$objResult->fields['lang_id']] = $objResult->fields['name'];
-            $objResult->MoveNext();
-        }
+        $attribute = $attributeRepo->find($this->id);
         $arrNewNames = array_diff(array_keys($this->arrName), array_keys($arrOldNames));
         $arrRemovedNames = array_diff(array_keys($arrOldNames), array_keys($this->arrName));
         $arrUpdatedNames = array_intersect(array_keys($this->arrName), array_keys($arrOldNames));
         foreach ($arrNewNames as $langId) {
-            if ($objDatabase->Execute("INSERT INTO `".DBPREFIX."access_user_attribute_name` (`attribute_id`, `lang_id`, `name`) VALUES (".$this->id.", ".$langId.", '".addslashes($this->arrName[$langId])."')") === false) {
-                $status = false;
-            }
+            $attributeName = new \Cx\Core\User\Model\Entity\UserAttributeName();
+            $attributeName->setLangId($langId);
+            $attributeName->setName(addslashes($this->arrName[$langId]));
+            $attributeName->setAttributeId($this->id);
+            $attributeName->setUserAttribute($attribute);
+            $em->persist($attributeName);
         }
         foreach ($arrRemovedNames as $langId) {
-            if ($objDatabase->Execute("DELETE FROM `".DBPREFIX."access_user_attribute_name` WHERE `attribute_id` = ".$this->id." AND `lang_id` = ".$langId) === false) {
-                $status = false;
+            $attributeName = $attributeNameRepo->findOneBy(array('attributeId' => $this->id, 'langId' => $langId));
+            if ($attributeName) {
+                continue;
             }
+            $em->remove($attributeName);
         }
         foreach ($arrUpdatedNames as $langId) {
-            if ($this->arrName[$langId] != $arrOldNames[$langId]) {
-                if ($objDatabase->Execute("UPDATE `".DBPREFIX."access_user_attribute_name` SET `name` = '".addslashes($this->arrName[$langId])."' WHERE `attribute_id` = ".$this->id." AND `lang_id` = ".$langId) === false) {
-                    $status = false;
-                }
+            $attributeName = $attributeNameRepo->findOneBy(array('attributeId' => $this->id, 'langId' => $langId));
+            if (empty($attributeName)) {
+                continue;
             }
+            $attributeName->setName(addslashes($this->arrName[$langId]));
+            $em->persist($attributeName);
         }
+        try {
+            $em->flush();
+        } catch (\Doctrine\ORM\OptimisticLockException $e) {
+            $status = false;
+        }
+
         return $status;
     }
 
