@@ -2190,46 +2190,66 @@ class User extends User_Profile
      *                                  will be set to TRUE, otherwise it'll be left untouched.
      */
     protected function updateUser(&$userChanged = null) {
-        global $objDatabase, $_CORELANG;
+        global $_CORELANG;
 
         $passwordHasChanged = false;
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $userRepo = $em->getRepository('Cx\Core\User\Model\Entity\User');
 
         // check if we have to drop any sessions due to password change
         if (!empty($this->password)) {
             // check if we are about to set a new different password
-            $objResult = $objDatabase->SelectLimit("SELECT 1 FROM `".DBPREFIX."access_users` WHERE `id` = " . $this->id . " AND `password` != '" . $this->password . "'", 1); 
-            if ($objResult !== false && !$objResult->EOF) {
+            $user = $userRepo->findOneBy(array('id' => $this->id, 'password' => $this->password));
+
+            if (!empty($user)) {
                 $passwordHasChanged = true;
             }
         }
 
-        if ($objDatabase->Execute("
-            UPDATE `".DBPREFIX."access_users`
-            SET
-                `username` = '".addslashes($this->username)."',
-                `is_admin` = ".intval($this->is_admin).",
-                ".(!empty($this->password) ? "`password` = '".$this->password."'," : '')."
-                ".(!empty($this->auth_token) ? "`auth_token` = '".$this->auth_token."', `auth_token_timeout` = ".$this->auth_token_timeout."," : '')."
-                `email` = '".addslashes($this->email)."',
-                `email_access` = '".$this->email_access."',
-                `frontend_lang_id` = ".intval($this->frontend_language).",
-                `backend_lang_id` = ".intval($this->backend_language).",
-                `expiration` = ".intval($this->expiration).",
-                `validity` = ".intval($this->validity).",
-                `active` = ".intval($this->is_active).",
-                `verified` = ".intval($this->verified).",
-                `primary_group` = ".intval($this->primary_group).",
-                `profile_access` = '".$this->profile_access."',
-                `restore_key` = '".$this->restore_key."',
-                `restore_key_time` = ".$this->restore_key_time."
-            WHERE `id` = ".$this->id
-        ) === false) {
+        $user = $userRepo->find($this->id);
+
+        if (empty($user)) {
+            $userChanged = false;
+            return false;
+        }
+
+        $user->setUsername(addslashes($this->username));
+        $user->setIsAdmin(intval($this->is_admin));
+        $user->setEmail(addslashes($this->email));
+        $user->setEmailAccess($this->email_access);
+        $user->setFrontendLangId($this->frontend_language);
+        $user->setBackendLangId($this->backend_language);
+        $user->setExpiration(intval($this->expiration));
+        $user->setValidity(intval($this->validity));
+        $user->setActive(intval($this->is_active));
+        $user->setVerified(intval($this->verified));
+        $user->setPrimaryGroup(intval($this->primary_group));
+        $user->setProfileAccess($this->profile_access);
+        $user->setRestoreKey($this->restore_key);
+        $user->setRestoreKeyTime($this->restore_key_time);
+
+
+        if (!empty($this->password)) {
+            $user->setPassword($this->password);
+        }
+
+        if (!empty($this->auth_token)) {
+            $user->setAuthToken($this->auth_token);
+            $user->setAuthTokenTimeout($this->auth_token_timeout);
+        }
+
+        try {
+            $em->persist($user);
+            $em->flush();
+
+            $userChanged = true;
+        } catch (\Doctrine\ORM\OptimisticLockException $e) {
             $this->error_msg[] = $_CORELANG['TXT_ACCESS_FAILED_TO_UPDATE_USER_ACCOUNT'];
             return false;
-        } elseif ($objDatabase->Affected_Rows()) {
-            // track flushed db change
-            $userChanged = true;
         }
+
         if ($passwordHasChanged) {
             // deletes all sessions which are using this user (except the session changing the password)
             $cx = \Cx\Core\Core\Controller\Cx::instanciate();
