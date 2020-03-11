@@ -322,9 +322,7 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
             // sort users by their anniversary
             array(
                 'birthday'   => 'asc'
-            ),
-            null,
-            $arrSettings['block_birthday_users']['value']
+            )
         );
         if ($objUser) {
             while (!$objUser->EOF) {
