@@ -193,9 +193,7 @@ class LoginManager {
                 $userRepo = $cx->getDb()->getEntityManager()->getRepository(
                     'Cx\Core\User\Model\Entity\User'
                 );
-                $user = $userRepo->findOneBy(
-                    array('active' => 1, 'email' => $email)
-                );
+                $user = $userRepo->findOneBy($userFilter);
                 $objFWUser->loginUser($user);
             } else {
                 $this->objTemplate->setVariable('LOGIN_ERROR_MESSAGE', $objFWUser->getErrorMsg());
