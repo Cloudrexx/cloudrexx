@@ -512,38 +512,52 @@ class FWUser extends User_Setting
 // original code:
 //        $objUser = $this->objUser->getUsers(
 //            array('email' => $email, 'is_active' => true), null, null, null, 1
-//        );
+//        );/
 // workaround code:
-        $objUser = $this->objUser->getUsers(
-            array('email' => array('REGEXP' => '^(shop_customer_[0-9]+_[0-9]+_[0-9]-)?'.preg_quote($email).'$'), 'is_active' => true), null, null, null
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $userRepo = $em->getRepository('Cx\Core\User\Model\Entity\User');
+        $qb = $userRepo->createQueryBuilder('u');
+        $qb->andWhere($qb->expr()->eq('u.active', ':active'))->setParameter('active', true);
+        $userRepo->addRegexFilterToQueryBuilder(
+            $qb,
+            '^(shop_customer_[0-9]+_[0-9]+_[0-9]-)?'.preg_quote($email).'$',
+            'u.email'
         );
+        $users = $qb->getQuery()->getResult();
+        /*$objUser = $this->objUser->getUsers(
+            array('email' => array('REGEXP' => '^(shop_customer_[0-9]+_[0-9]+_[0-9]-)?'.preg_quote($email).'$'), 'is_active' => true), null, null, null
+        );*/
 // END: WORKAROUND FOR ACCOUNTS SOLD IN THE SHOP
-        if ($objUser) {
+        if ($users) {
 // TODO: START: WORKAROUND FOR ACCOUNTS SOLD IN THE SHOP
 // workaround code:
-            while (!$objUser->EOF) {
+            foreach ($users as $user) {
 // END: WORKAROUND FOR ACCOUNTS SOLD IN THE SHOP
-            $objUser->setRestoreKey();
-            if ($objUser->store()) {
-                if (!$sendNotificationEmail) {
-                    $status = true;
-                } elseif ($this->sendRestorePasswordEmail($objUser)) {
-// TODO: START: WORKAROUND FOR ACCOUNTS SOLD IN THE SHOP
-// original code:
-//                    return true;
-// workaround code:
-                    $status = true;
-// END: WORKAROUND FOR ACCOUNTS SOLD IN THE SHOP
-                } else {
+                try {
+                    $user->setRestoreKey();
+                    $user->setRestoreKeyTime();
+                    $em->persist($user);
+                    $em->flush();
+
+                    if (!$sendNotificationEmail) {
+                        $status = true;
+                    } elseif ($this->sendRestorePasswordEmail($user)) {
+    // TODO: START: WORKAROUND FOR ACCOUNTS SOLD IN THE SHOP
+    // original code:
+    //                    return true;
+    // workaround code:
+                        $status = true;
+    // END: WORKAROUND FOR ACCOUNTS SOLD IN THE SHOP
+                    } else {
+                        $this->arrStatusMsg['error'][] = str_replace("%EMAIL%", $email, $_CORELANG['TXT_EMAIL_NOT_SENT']);
+                    }
+                } catch (\Doctrine\Orm\OptimisticLockException $e) {
                     $this->arrStatusMsg['error'][] = str_replace("%EMAIL%", $email, $_CORELANG['TXT_EMAIL_NOT_SENT']);
                 }
-            } else {
-                $this->arrStatusMsg['error'][] = str_replace("%EMAIL%", $email, $_CORELANG['TXT_EMAIL_NOT_SENT']);
-            }
 // TODO: START: WORKAROUND FOR ACCOUNTS SOLD IN THE SHOP
 // workaround code:
-            $objUser->next();
-        }
+            }
 // END: WORKAROUND FOR ACCOUNTS SOLD IN THE SHOP
         } else {
             $this->arrStatusMsg['error'][] = $_CORELANG['TXT_ACCOUNT_WITH_EMAIL_DOES_NOT_EXIST']."<br />";
@@ -587,7 +601,7 @@ class FWUser extends User_Setting
                     '[[YEAR]]',
                 ),
                 array(
-                    $objUser->getUsername(),
+                    $objUser->getUsernameOrEmail(),
                     $restoreLink,
                     $objUserMail->getSenderName(),
                     date('Y'),
@@ -605,7 +619,7 @@ class FWUser extends User_Setting
                     '[[YEAR]]',
                 ),
                 array(
-                    htmlentities($objUser->getUsername(), ENT_QUOTES, CONTREXX_CHARSET),
+                    htmlentities($objUser->getUsernameOrEmail(), ENT_QUOTES, CONTREXX_CHARSET),
                     $restoreLink,
                     htmlentities($objUserMail->getSenderName(), ENT_QUOTES, CONTREXX_CHARSET),
                     date('Y'),
@@ -680,7 +694,7 @@ class FWUser extends User_Setting
                 )
             )->setMaxResults(1);
 
-        $user = $qb->getQuery()->getSingleResult();
+        $user = $qb->getQuery()->getOneOrNullResult();
         if (!empty($user)) {
             try {
                 $user->setVerified(true);
@@ -860,21 +874,25 @@ class FWUser extends User_Setting
                 )
             )->setMaxResults(1);
 
-        $user = $qb->getQuery()->getSingleResult();
+        $user = $qb->getQuery()->getOneOrNullResult();
         if (!empty($user)) {
             if ($store) {
                 try {
-                    $user->setPassword($password, $confirmedPassword, true);
+                    if ($password !== $confirmedPassword) {
+                        $this->arrStatusMsg['error'][] = $_CORELANG['TXT_ACCESS_PASSWORD_NOT_CONFIRMED'];
+                        return false;
+                    }
+                    $user->setPassword($password);
                     $user->releaseRestoreKey();
                     // By successfully re-setting the password,
                     // the user did verify his email address
                     // and therefore his account.
-                    $user->setVerification(true);
+                    $user->setVerified(true);
                     $em->persist($user);
                     $em->flush();
 
                     return true;
-                } catch (\Doctrine\ORM\ORMException $e) {
+                } catch (\Cx\Core\Error\Model\Entity\ShinyException $e) {
                     $this->arrStatusMsg['error'] = array_merge($this->arrStatusMsg['error'], $e->getMessage());
                 }
             } else {
