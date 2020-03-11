@@ -1036,16 +1036,40 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
 
     function storeCoreAttributeTitle()
     {
-        global $objDatabase;
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $attributeNameRepo = $em->getRepository('Cx\Core\User\Model\Entity\UserAttributeName');
+        $attributeRepo = $em->getRepository('Cx\Core\User\Model\Entity\UserAttribute');
 
-        $pattern = array();
-        if ($this->id && preg_match('#([0-9]+)#', $this->id, $pattern) && $objDatabase->Execute("UPDATE `".DBPREFIX."access_user_attribute_name` SET `name` = '".addslashes($this->arrName[0])."' WHERE `attribute_id` = '".$pattern[0]."'") ||
-                $objDatabase->Execute("INSERT INTO `".DBPREFIX."access_user_attribute`(`parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES ((SELECT `attribute_id` FROM `contrexx_access_user_attribute_name` WHERE `name` = 'title'),'menu_option',0,'asc',0,0,0,0,1)") &&
-                $objDatabase->Execute("INSERT INTO `".DBPREFIX."access_user_attribute_name`(`attribute_id`, `lang_id`, `name`, `order`) VALUES (". $objDatabase->Insert_ID() .", 0, '".addslashes($this->arrName[0])."',(select count(`name`.`order`) + 1 as `order` from `".DBPREFIX."access_user_attribute_name` as name))")
-        ) {
+        try {
+            if (!$this->id || !preg_match('#([0-9]+)#', $this->id, $pattern)) {
+                $titleId = $this->getAttributeIdByProfileAttributeId('title');
+                $titleAttr = $attributeRepo->find($titleId);
+                $attributeName = new \Cx\Core\User\Model\Entity\UserAttributeName();
+                $attribute = new \Cx\Core\User\Model\Entity\UserAttribute();
+                $attribute->addUserAttributeName($attributeName);
+                $attribute->setAccessId(0);
+                $attribute->setReadAccessId(0);
+                $attributeName->setUserAttribute($attribute);
+
+                if ($titleAttr) {
+                    $attribute->setParent($titleAttr);
+                }
+
+                $em->persist($attribute);
+            } else {
+                $attributeName = $attributeNameRepo->findOneBy(array('id' => $pattern[0]));
+            }
+
+            $attributeName->setName(addslashes($this->arrName[0]));
+
+            $em->persist($attributeName);
+            $em->flush();
+
             return true;
+        } catch (\Doctrine\ORM\OptimisticLockException $e) {
+            return false;
         }
-        return false;
     }
 
 
