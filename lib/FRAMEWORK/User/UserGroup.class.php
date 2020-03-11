@@ -580,16 +580,21 @@ class UserGroup
 
     public function getUserCount($onlyActive = false)
     {
-        global $objDatabase;
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $userRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\User');
+        $qb = $userRepo->createQueryBuilder('u');
+        $qb->select('COUNT(u.id) as user_count');
 
-        $objCount = $objDatabase->SelectLimit('SELECT COUNT(1) AS `user_count` FROM `'.DBPREFIX.'access_users` AS tblUser'
-            .($this->id ? ' INNER JOIN `'.DBPREFIX.'access_rel_user_group` AS tblRel ON tblRel.`user_id` = tblUser.`id` WHERE tblRel.`group_id` = '.$this->id : '')
-            .($onlyActive ? (!$this->id ? ' WHERE' : ' AND').' tblUser.`active` = 1 ' : ''), 1);
-        if ($objCount) {
-            return $objCount->fields['user_count'];
-        } else {
-            return false;
+        if ($this->id) {
+            $qb->innerJoin('u.group', 'g')
+               ->where($qb->expr()->eq('g.groupId', ':groupId'))
+               ->setParameter('groupId', $this->id);
         }
+
+        if ($onlyActive) {
+            $qb->andWhere($qb->expr()->eq('u.active', ':active'))->setParameter('active', true);
+        }
+        return $qb->getQuery()->getSingleScalarResult();
     }
 
 
