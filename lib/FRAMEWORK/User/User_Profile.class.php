@@ -216,9 +216,15 @@ class User_Profile
      */
     protected function storeProfile(&$profileUpdated = null)
     {
-        global $objDatabase, $_CORELANG;
+        global $_CORELANG;
 
         $error = false;
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $userRepo = $em->getRepository('Cx\Core\User\Model\Entity\User');
+        $attributeRepo = $em->getRepository('Cx\Core\User\Model\Entity\UserAttribute');
+        $attributeValueRepo = $em->getRepository('Cx\Core\User\Model\Entity\UserAttributeValue');
 
         foreach ($this->arrLoadedUsers[$this->id]['profile'] as $attributeId => $arrValue)
         {
@@ -226,42 +232,61 @@ class User_Profile
             {
                 $newValue = !isset($this->arrCachedUsers[$this->id]['profile'][$attributeId][$historyId]);
                 if ($newValue || $value != $this->arrCachedUsers[$this->id]['profile'][$attributeId][$historyId]) {
-                    $value = '"' . contrexx_raw2db($value) . '"';
+                    $value = '' . contrexx_raw2db($value) . '';
                     if (
                         $attributeId == 'title' && (
-                            $value == '""' ||
-                            $value == '"0"'
+                            $value == '' ||
+                            $value == '0'
                         )
                     ) {
-                        $value = '"gender_undefined"';
+                        $value = 'gender_undefined';
                     }
 
                     if ($this->objAttribute->isCoreAttribute($attributeId)) {
                         $attributeId = $this->objAttribute->getAttributeIdByProfileAttributeId($attributeId);
                     }
 
-                    $query = "REPLACE INTO `".DBPREFIX."access_user_attribute_value` (`user_id`, `attribute_id`, `history_id`, `value`) VALUES (".$this->id.", $attributeId, ".$historyId.", " . $value . ")";
+                    $attributeValue = $attributeValueRepo->findOneBy(
+                        array('attributeId' => $attributeId, 'userId' => $this->id, 'history' => $historyId)
+                    );
+                    if (!$attributeValue) {
+                        $attributeValue = new \Cx\Core\User\Model\Entity\UserAttributeValue();
+                    }
+                    $attribute = $attributeRepo->find($attributeId);
+                    $user = $userRepo->find($this->id);
+                    $attributeValue->setUserAttribute($attribute);
+                    $attributeValue->setAttributeId($attributeId);
+                    $attributeValue->setUserId($this->id);var_dump($this->id);
+                    $attributeValue->setUser($user);
+                    $attributeValue->setHistory($historyId);
+                    $attributeValue->setValue($value);
 
-                    if ($objDatabase->Execute($query) === false) {
-                        $objAttribute = $this->objAttribute->getById($attributeId);
-                        $error = true;
-                        $this->error_msg[] = sprintf($_CORELANG['TXT_ACCESS_UNABLE_STORE_PROFILE_ATTIRBUTE'], htmlentities($objAttribute->getName(), ENT_QUOTES, CONTREXX_CHARSET));
-                    } elseif ($objDatabase->Affected_Rows()) {
-                        // track flushed db change
+                    try {
+                        $em->persist($attributeValue);
+                        $em->flush();
                         $profileUpdated = true;
+                    } catch (\Doctrine\ORM\OptimisticLockException $e) {
+                        $error = true;
+                        $this->error_msg[] = sprintf($_CORELANG['TXT_ACCESS_UNABLE_STORE_PROFILE_ATTIRBUTE'], htmlentities($attribute->getName(), ENT_QUOTES, CONTREXX_CHARSET));
                     }
                 }
             }
 
             if ($this->objAttribute->isCustomAttribute($attributeId) && isset($this->arrCachedUsers[$this->id]['profile'][$attributeId])) {
                 foreach (array_diff(array_keys($this->arrCachedUsers[$this->id]['profile'][$attributeId]), array_keys($arrValue)) as $historyId) {
-                    if ($objDatabase->Execute('DELETE FROM `'.DBPREFIX.'access_user_attribute_value` WHERE `attribute_id` = '.$attributeId.' AND `user_id` = '.$this->id.' AND `history_id` = '.$historyId) === false) {
-                        $objAttribute = $this->objAttribute->getById($attributeId);
-                        $error = true;
-                        $this->error_msg[] = sprintf($_CORELANG['TXT_ACCESS_UNABLE_STORE_PROFILE_ATTIRBUTE'], htmlentities($objAttribute->getName(), ENT_QUOTES, CONTREXX_CHARSET));
-                    } elseif ($objDatabase->Affected_Rows()) {
+                    $attributeValue = $attributeValueRepo->findOneBy(
+                        array('attributeId' => $attributeId, 'userId' => $this->id, 'history' => $historyId)
+                    );
+
+                    try {
+                        $em->remove($attributeValue);
+                        $em->flush();
                         // track flushed db change
                         $profileUpdated = true;
+                    } catch (\Doctrine\ORM\OptimisticLockException $e) {
+                        $attribute = $attributeRepo->find($attributeId);
+                        $error = true;
+                        $this->error_msg[] = sprintf($_CORELANG['TXT_ACCESS_UNABLE_STORE_PROFILE_ATTIRBUTE'], htmlentities($attribute->getName(), ENT_QUOTES, CONTREXX_CHARSET));
                     }
                 }
             }
