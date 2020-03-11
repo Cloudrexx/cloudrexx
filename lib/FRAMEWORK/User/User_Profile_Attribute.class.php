@@ -1075,13 +1075,28 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
 
     function storeCoreAttribute()
     {
-        global $objDatabase;
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $attributeNameRepo = $em->getRepository('Cx\Core\User\Model\Entity\UserAttributeName');
+        $attributeName = $attributeNameRepo->findOneBy(array('name' => $this->id));
 
-        if (($objDatabase->Execute("UPDATE `".DBPREFIX."access_user_attribute` SET `sort_type` = '".$this->sort_type."', `order_id` = ".$this->order_id.", `mandatory` = '".$this->mandatory."' WHERE `id` = (SELECT `attribute_id` FROM `contrexx_access_user_attribute_name` WHERE `name` = '".$this->id."')") !== false) ||
-        ($objDatabase->Execute("INSERT INTO `".DBPREFIX."access_user_attribute` (`id`, `sort_type`, `order_id`, `mandatory`) VALUES ((SELECT `attribute_id` FROM `contrexx_access_user_attribute_name` WHERE `name` = '".$this->id."'), '".$this->sort_type."', ".$this->order_id.", '".$this->mandatory."')") !== false)) {
-            return true;
+        if ($attributeName && $attributeName->getUserAttribute()) {
+            $attribute = $attributeName->getUserAttribute();
+        } else {
+            $attribute = new \Cx\Core\User\Model\Entity\UserAttribute();
         }
-        return false;
+
+        $attribute->setSortType($this->sort_type);
+        $attribute->setOrderId($this->order_id);
+        $attribute->setMandatory($this->mandatory);
+
+        try {
+            $em->persist($attribute);
+            $em->flush();
+            return true;
+        } catch (\Doctrine\ORM\OptimisticLockException $e) {
+            return false;
+        }
     }
 
 
