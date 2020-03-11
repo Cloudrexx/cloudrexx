@@ -650,56 +650,37 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
 
     function loadCustomAttributes()
     {
-        global $objDatabase;
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $attributeRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\UserAttribute');
 
         $this->arrCustomAttributes = array();
-        $objResult = $objDatabase->Execute('
-            SELECT
-                `id`,
-                `type`,
-                `sort_type`,
-                `order_id`,
-                `mandatory`,
-                `parent_id`,
-                `access_special`,
-                `access_id`,
-                `read_access_id`,
-                `is_default`
-            FROM
-                `' . DBPREFIX . 'access_user_attribute`
-            WHERE `is_default` = 0
-            ORDER BY
-                `order_id`,
-                `id`
-        ');
-        if ($objResult) {
-            while (!$objResult->EOF) {
-                $this->arrAttributes[$objResult->fields['id']]['type'] = $objResult->fields['type'] == 'textarea' ? 'text' : $objResult->fields['type'];
-                $this->arrAttributes[$objResult->fields['id']]['multiline'] = $objResult->fields['type'] == 'textarea' ? true : false;
-                $this->arrAttributes[$objResult->fields['id']]['sort_type'] = $objResult->fields['sort_type'];
-                $this->arrAttributes[$objResult->fields['id']]['order_id'] = $objResult->fields['order_id'];
-                $this->arrAttributes[$objResult->fields['id']]['mandatory'] = $objResult->fields['mandatory'];
-                $parentId = $objResult->fields['parent_id'];
-                if ($parentId === null) {
+        $attributes = $attributeRepo->findBy(array('isDefault' => false), array('orderId' => 'asc', 'id' => 'asc'));
+
+        if ($attributes) {
+            foreach ($attributes as $attribute) {
+                $id = $attribute->getId();
+                $this->arrAttributes[$id]['type'] = $attribute->getType() == 'textarea' ? 'text' : $attribute->getType();
+                $this->arrAttributes[$id]['multiline'] = $attribute->getType() == 'textarea' ? true : false;
+                $this->arrAttributes[$id]['sort_type'] = $attribute->getSortType();
+                $this->arrAttributes[$id]['order_id'] = $attribute->getOrderId();
+                $this->arrAttributes[$id]['mandatory'] = $attribute->getMandatory();
+                $parent = $attribute->getParent();
+                if ($parent === null) {
                     $parentId = 0;
+                } else {
+                    $parentId = $parent->getId();
                 }
-                $this->arrAttributes[$objResult->fields['id']]['parent_id'] = $parentId;
-                $this->arrAttributes[$objResult->fields['id']]['access_special'] = $objResult->fields['access_special'];
-                $this->arrAttributes[$objResult->fields['id']]['access_id'] = $objResult->fields['access_id'];
-                $this->arrAttributes[$objResult->fields['id']]['read_access_id'] = $objResult->fields['read_access_id'];
-                $this->arrAttributes[$objResult->fields['id']]['modifiable'] = array('type', 'sort_order', 'mandatory', 'parent_id', 'access', 'children');
-                $this->arrCustomAttributes[] = $objResult->fields['id'];
-                if ($objResult->fields['mandatory']) {
-                    $this->arrMandatoryAttributes[] = $objResult->fields['id'];
+                $this->arrAttributes[$id]['parent_id'] = $parentId;
+                $this->arrAttributes[$id]['access_special'] = $attribute->getAccessSpecial();
+                $this->arrAttributes[$id]['access_id'] = $attribute->getAccessId();
+                $this->arrAttributes[$id]['read_access_id'] = $attribute->getReadAccessId();
+                $this->arrAttributes[$id]['modifiable'] = array('type', 'sort_order', 'mandatory', 'parent_id', 'access', 'children');
+                $this->arrCustomAttributes[] = $id;
+                if ($attribute->getMandatory()) {
+                    $this->arrMandatoryAttributes[] = $id;
                 }
-                $objResult->MoveNext();
-            }
-        }
-        $objResult = $objDatabase->Execute('SELECT `attribute_id`, `name` FROM `'.DBPREFIX.'access_user_attribute_name` WHERE `lang_id` = '.$this->langId);
-        if ($objResult) {
-            while (!$objResult->EOF) {
-                $this->arrAttributes[$objResult->fields['attribute_id']]['names'][$this->langId] = $objResult->fields['name'];
-                $objResult->MoveNext();
+
+                $this->arrAttributes[$id]['names'][$this->langId] = $attribute->getName($this->langId);
             }
         }
     }
