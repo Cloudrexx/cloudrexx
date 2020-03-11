@@ -904,10 +904,14 @@ class User extends \Cx\Model\Base\EntityBase {
     public function getProfileAttribute($profileId)
     {
         $attr = \FWUser::getFWUserObject()->objUser->objAttribute;
-        $attrId = $attr->getAttributeIdByProfileAttributeId($profileId);
+        if ($attr->isCoreAttribute($profileId)) {
+            $attrId = $attr->getAttributeIdByProfileAttributeId($profileId);
+        } else {
+            $attrId = $profileId;
+        }
 
         if (empty($attrId)) {
-            return '';
+            return new \Cx\Core\User\Model\Entity\UserAttributeValue();
         }
 
         return $this->getAttributeValue($attrId);
