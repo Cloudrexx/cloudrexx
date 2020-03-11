@@ -933,7 +933,7 @@ class User extends \Cx\Model\Base\EntityBase {
     {
         $groupIds = array();
         foreach ($this->getGroup() as $group) {
-            if ($activeOnly && !$group->getIsActive()) {die();
+            if ($activeOnly && !$group->getIsActive()) {
                 continue;
             }
             $groupIds[] = $group->getGroupId();
