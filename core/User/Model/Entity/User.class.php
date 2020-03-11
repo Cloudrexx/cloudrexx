@@ -940,4 +940,13 @@ class User extends \Cx\Model\Base\EntityBase {
         }
         return $groupIds;
     }
+
+    public function getUsernameOrEmail()
+    {
+        $arrSettings = \User_Setting::getSettings();
+        if (!$arrSettings['use_usernames']['status'] || empty($this->getUsername())) {
+            return $this->getEmail();
+        }
+        return $this->getUsername();
+    }
 }
