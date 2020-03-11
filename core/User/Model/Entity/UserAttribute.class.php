@@ -537,6 +537,11 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
                 'langId',
                 $langId
             )
+        )->orWhere(
+            \Doctrine\Common\Collections\Criteria::expr()->eq(
+                'langId',
+                0
+            )
         );
         $userAttributeName = $this->getUserAttributeName()->matching(
             $crit
