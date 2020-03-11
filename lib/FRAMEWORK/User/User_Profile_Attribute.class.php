@@ -1176,36 +1176,53 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
      */
     function storeProtection($protected, $accessId, $fieldName, $groupIds, $access = 'write')
     {
-        $objDatabase = \Cx\Core\Core\Controller\Cx::instanciate()->getDb()->getAdoDb();
-        $tableName = 'access_user_attribute';
-        $where = $this->id;
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $objDatabase = $cx->getDb()->getAdoDb();
+        $attributeRepo = $em->getRepository('Cx\Core\User\Model\Entity\UserAttribute');
+        $classMeta = $em->getClassMetadata('Cx\Core\User\Model\Entity\UserAttribute');
+
+        $attributeId = $this->id;
         if ($this->isCoreAttribute($this->id)) {
-            $where = '(SELECT `attribute_id` FROM `contrexx_access_user_attribute_name` WHERE `name` = "'. $this->id .'")';
+            $attributeId = $this->getAttributeIdByProfileAttributeId($this->id);
+        }
+
+        $attribute = $attributeRepo->find($attributeId);
+        if (!$attribute) {
+            return false;
+        }
+
+        $setter = '';
+        $mappedFieldName = $classMeta->getFieldName($fieldName);
+        if ($mappedFieldName != $fieldName) {
+            $setter = 'set'.ucfirst($mappedFieldName);
         }
 
         if (!$protected) {
             // remove protection
-            $updateFields = ' `' . $fieldName . '` = 0';
-            if ($access == 'write') {
-                $updateFields .= ', `access_special` = ""';
+            if (!$setter) {
+                return false;
             }
-            if (
-                $objDatabase->Execute('
-                    UPDATE `' . DBPREFIX . $tableName . '`
-                       SET ' . $updateFields . '
-                       WHERE `id` = ' . $where
-                ) !== false &&
-                (
-                    !isset($this->arrAttributes[$this->id][$fieldName]) ||
+            $attribute->$setter(0);
+            if ($access == 'write') {
+                $attribute->setAccessSpecial('');
+            }
+
+            try {
+                $em->persist($attribute);
+                $em->flush();
+                if (!isset($this->arrAttributes[$this->id][$fieldName]) ||
                     $objDatabase->Execute(
                         'DELETE FROM `' . DBPREFIX . 'access_group_dynamic_ids`
                             WHERE `access_id` = ' . $this->arrAttributes[$this->id][$fieldName]
                     ) !== false
-                )
-            ) {
-                return true;
+                ) {
+                    return true;
+                }
+
+            } catch (\Doctrine\ORM\OptimisticLockException $e) {
+                return false;
             }
-            return false;
         }
 
         $arrOldGroups = array();
@@ -1224,16 +1241,18 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
             }
         } else {
             $accessId = \Permission::createNewDynamicAccessId();
-            if (
-                !$accessId ||
-                $objDatabase->Execute('
-                    UPDATE `' . DBPREFIX . $tableName . '`
-                        SET `' . $fieldName . '` = ' . contrexx_input2db($accessId) . '
-                        WHERE `id` = ' . $where
-                ) === false
-            ) {
+            if (!$accessId || !$setter) {
                 return false;
             }
+
+            try {
+                $attribute->$setter(contrexx_input2db($accessId));
+                $em->persist($attribute);
+                $em->flush();
+            } catch (\Doctrine\ORM\OptimisticLockException $e) {
+                return false;
+            }
+
             $this->arrAttributes[$this->id][$fieldName] = $accessId;
             if ($access == 'write') {
                 $this->access_id = $accessId;
@@ -1242,15 +1261,14 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
             }
         }
 
-        if (
-            $access == 'write' &&
-            $objDatabase->Execute('
-                UPDATE `' . DBPREFIX . $tableName . '`
-                   SET `access_special` = "' . contrexx_input2db($this->access_special) . '"
-                   WHERE `id` = ' . $where
-            ) === false
-        ) {
-            return false;
+        try {
+            $attribute->setAccessSpecial(contrexx_input2db($accessId));
+            $em->persist($attribute);
+            $em->flush();
+        } catch (\Doctrine\ORM\OptimisticLockException $e) {
+            if ($access == 'write') {
+                return false;
+            }
         }
 
         $arrNewGroups = array_diff($groupIds, $arrOldGroups);
