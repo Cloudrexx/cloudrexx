@@ -533,8 +533,8 @@ class User_Profile_Attribute
         $this->arrAttributeRelations = null;
         $this->arrAttributeTree = null;
 
-        $this->loadCoreAttributes();
         $this->loadProfileAttributes();
+        $this->loadCoreAttributes();
         $this->loadCustomAttributes();
         $this->generateAttributeRelations();
         $this->sortChildren();
