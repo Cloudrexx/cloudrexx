@@ -553,6 +553,11 @@ class UserGroup
 
     public function getGroupCount($arrFilter = null)
     {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $groupRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\Group');
+        $qb = $groupRepo->createQueryBuilder('u');
+        $qb->select('COUNT(g.groupId) as group_count');
+
         global $objDatabase;
 
         $arrWhereExpressions = is_array($arrFilter) ? $this->parseFilterConditions($arrFilter) : array('joins' => array(), 'conditions' => array());
