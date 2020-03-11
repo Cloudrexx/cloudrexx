@@ -2259,61 +2259,46 @@ class User extends User_Profile
     }
 
     protected function createUser() {
-        global $objDatabase, $_CORELANG;
+        global $_CORELANG;
 
-        if ($objDatabase->Execute("
-            INSERT INTO `".DBPREFIX."access_users` (
-                `username`,
-                `is_admin`,
-                `password`,
-                `auth_token`,
-                `auth_token_timeout`,
-                `email`,
-                `email_access`,
-                `frontend_lang_id`,
-                `backend_lang_id`,
-                `regdate`,
-                `expiration`,
-                `validity`,
-                `last_auth`,
-                `last_auth_status`,
-                `last_activity`,
-                `active`,
-                `verified`,
-                `primary_group`,
-                `profile_access`,
-                `restore_key`,
-                `restore_key_time`
-            ) VALUES (
-                '".addslashes($this->username)."',
-                ".intval($this->is_admin).",
-                '".$this->password."',
-                '".$this->auth_token."',
-                '".$this->auth_token_timeout."',
-                '".addslashes($this->email)."',
-                '".$this->email_access."',
-                ".intval($this->frontend_language).",
-                ".intval($this->backend_language).",
-                ".time().",
-                ".intval($this->expiration).",
-                ".intval($this->validity).",
-                ".$this->last_auth.",
-                ".$this->last_auth_status.",
-                ".$this->last_activity.",
-                ".intval($this->is_active).",
-                ".intval($this->verified).",
-                ".intval($this->primary_group).",
-                '".$this->profile_access."',
-                '".$this->restore_key."',
-                '".$this->restore_key_time."'
-            )")) {
-            $this->id = $objDatabase->Insert_ID();
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $user = new \Cx\Core\User\Model\Entity\User();
+
+        $user->setUsername(addslashes($this->username));
+        $user->setIsAdmin(intval($this->is_admin));
+        $user->setPassword($this->password);
+        $user->setAuthToken($this->auth_token);
+        $user->setAuthTokenTimeout($this->auth_token_timeout);
+        $user->setEmail(addslashes($this->email));
+        $user->setEmailAccess($this->email_access);
+        $user->setFrontendLangId($this->frontend_language);
+        $user->setBackendLangId($this->backend_language);
+        $user->setRegdate(time());
+        $user->setExpiration(intval($this->expiration));
+        $user->setValidity(intval($this->validity));
+        $user->setLastAuth($this->last_auth);
+        $user->setLastAuthStatus($this->last_auth_status);
+        $user->setLastActivity($this->last_activity);
+        $user->setActive(intval($this->is_active));
+        $user->setVerified(intval($this->verified));
+        $user->setPrimaryGroup(intval($this->primary_group));
+        $user->setProfileAccess($this->profile_access);
+        $user->setRestoreKey($this->restore_key);
+        $user->setRestoreKeyTime($this->restore_key_time);
+
+        try {
+            $em->persist($user);
+            $em->flush();
+
+            $this->id = $user->getId();
+
             if (!$this->createProfile()) {
                 $this->delete();
                 $this->error_msg[] = $_CORELANG['TXT_ACCESS_FAILED_TO_ADD_USER_ACCOUNT'];
                 return false;
             }
-        } else {
+        } catch (\Doctrine\ORM\OptimisticLockException $e) {
             $this->error_msg[] = $_CORELANG['TXT_ACCESS_FAILED_TO_ADD_USER_ACCOUNT'];
             return false;
         }
