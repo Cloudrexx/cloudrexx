@@ -3082,17 +3082,16 @@ class User extends User_Profile
      */
     private function isLastAdmin()
     {
-        global $objDatabase;
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $userRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\User');
+        $qb = $userRepo->createQueryBuilder('u');
+        $qb->select('COUNT(u.id) AS numof_admin')
+           ->where($qb->expr()->eq('u.isAdmin', ':isAdmin'))
+           ->andWhere($qb->expr()->eq('u.active', ':active'))
+           ->setParameters(array('isAdmin' => 1, 'active' => 1));
+        $count = $qb->getQuery()->getOneOrNullResult();
 
-        if (!$this->is_admin) return false;
-        $objResult = $objDatabase->Execute('
-            SELECT COUNT(*) AS `numof_admin`
-              FROM `'.DBPREFIX.'access_users`
-             WHERE `is_admin`=1
-               AND `active`=1');
-        // If the query fails, assume that he's the last one.
-        if (!$objResult) return true;
-        return ($objResult->fields['numof_admin'] < 2);
+        return ($count < 2);
     }
 
 
@@ -3105,15 +3104,17 @@ class User extends User_Profile
      */
     public static function isUniqueEmail($email, $id=0)
     {
-        global $objDatabase;
-
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $userRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\User');
         self::removeOutdatedAccounts();
-        $objResult = $objDatabase->SelectLimit("
-            SELECT 1
-              FROM ".DBPREFIX."access_users
-             WHERE email='".addslashes($email)."'
-               AND id!=$id", 1);
-        return ($objResult && $objResult->RecordCount() == 0);
+
+        $qb = $userRepo->createQueryBuilder('u');
+        $qb->where($qb->expr()->eq('u.email', ':email'))
+           ->andWhere($qb->expr()->not($qb->expr()->eq('u.id', ':id')))
+           ->setMaxResults(1)
+           ->setParameters(array('email' => addslashes($email), 'id' => $id));
+
+        return !count($qb->getQuery()->getOneOrNullResult());
     }
 
 
@@ -3132,15 +3133,17 @@ class User extends User_Profile
      */
     protected static function isUniqueUsername($username, $id=0)
     {
-        global $objDatabase;
-
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $userRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\User');
         self::removeOutdatedAccounts();
-        $objResult = $objDatabase->SelectLimit("
-            SELECT 1
-              FROM ".DBPREFIX."access_users
-             WHERE username='".addslashes($username)."'
-               AND id!=$id", 1);
-        return ($objResult && $objResult->RecordCount() == 0);
+
+        $qb = $userRepo->createQueryBuilder('u');
+        $qb->where($qb->expr()->eq('u.username', ':username'))
+            ->andWhere($qb->expr()->not($qb->expr()->eq('u.id', ':id')))
+            ->setMaxResults(1)
+            ->setParameters(array('username' => addslashes($username), 'id' => $id));
+
+        return !count($qb->getQuery()->getOneOrNullResult());
     }
 
 
