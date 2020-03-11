@@ -1102,17 +1102,25 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
 
     function storeChildrenOrder()
     {
-        global $objDatabase;
-
         if ($this->sort_type == 'custom') {
-            $affectedTable = DBPREFIX.'access_user_attribute';
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $em = $cx->getDb()->getEntityManager();
+            $attributeRepo = $em->getRepository('Cx\Core\User\Model\Entity\UserAttribute');
             $offset = 0;
 
             foreach ($this->children as $orderId => $childAttributeId)
             {
-                if ($objDatabase->Execute("UPDATE `". $affectedTable."` SET `order_id` = ".($orderId+$offset)." WHERE `id` = '".$childAttributeId."'") === false) {
-                    return false;
+                $attribute = $attributeRepo->find($childAttributeId);
+                if (empty($attribute)) {
+                    continue;
                 }
+                $attribute->setOrderId($orderId+$offset);
+                $em->persist($attribute);
+            }
+            try {
+                $em->flush();
+            } catch (\Doctrine\ORM\OptimisticLockException $e) {
+                return false;
             }
         }
         return true;
