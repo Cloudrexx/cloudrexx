@@ -807,13 +807,12 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
      */
     function getAttributeIdByName($name)
     {
-        global $objDatabase;
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $attributeNameRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\UserAttributeName');
+        $attributeName = $attributeNameRepo->findOneBy(array('name' => $name));
 
-        $query = 'SELECT `attribute_id` FROM `'.DBPREFIX.'access_user_attribute_name`
-                WHERE `name` = "'.$name.'"';
-        $objAttribute = $objDatabase->Execute($query);
-        if($objAttribute !== false){
-            return $objAttribute->fields["attribute_id"];
+        if ($attributeName) {
+            return $attributeName->getAttributeId();
         }
         return false;
     }
