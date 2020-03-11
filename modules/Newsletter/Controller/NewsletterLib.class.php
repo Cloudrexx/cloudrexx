@@ -411,7 +411,6 @@ class NewsletterLib
         );
 
         $data = $objDatabase->Execute($query);
-        $objUser = \FWUser::getFWUserObject()->objUser;
         $userIds = array();
         while (!$data || !$data->EOF) {
             // Check if the access user exists
@@ -419,16 +418,14 @@ class NewsletterLib
             $data->MoveNext();
         }
 
-        $objUser = $objUser->getUsers(array('id' => array_unique($userIds)));
-        if ($objUser) {
-            while (!$objUser->EOF) {
-                $keys = array_keys($userIds, $objUser->getId());
-                foreach ($keys as $key) {
-                    $counter++;
-                }
-                $objUser->next();
-            }
-        }
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $qb = $cx->getDb()->getEntityManager()->createQueryBuilder();
+        $qb->select('count(DISTINCT u.id)')->from('Cx\Core\User\Model\Entity\User', 'u');
+        $qb->orderBy('u.id');
+        $qb->where($qb->expr()->in('u.id', ':userIds'));
+        $qb->setParameter(':userIds', array_unique($userIds));
+
+        $counter += $qb->getQuery()->getSingleScalarResult();
 
         return $counter;
     }
