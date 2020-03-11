@@ -687,11 +687,13 @@ class UserGroup
      */
     function isUniqueGroupName()
     {
-        global $objDatabase, $_CORELANG;
+        global $_CORELANG;
 
-        $objResult = $objDatabase->SelectLimit("SELECT 1 FROM ".DBPREFIX."access_user_groups WHERE `group_name`='".addslashes($this->name)."' AND `group_id` != ".$this->id, 1);
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $groupRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\Group');
+        $group = $groupRepo->findOneBy(array('groupName' => addslashes($this->name)));
 
-        if ($objResult && $objResult->RecordCount() == 0) {
+        if (empty($group) || $group->getGroupId() == $this->id) {
             return true;
         } else {
             $this->error_msg = $_CORELANG['TXT_ACCESS_DUPLICATE_GROUP_NAME'];
