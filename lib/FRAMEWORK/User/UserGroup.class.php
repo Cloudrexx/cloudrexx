@@ -317,53 +317,55 @@ class UserGroup
      */
     public function store()
     {
-        global $objDatabase, $_CORELANG;
+        global $_CORELANG;
 
         if (!$this->isUniqueGroupName() || !$this->isValidGroupName()) {
             $this->error_msg = $_CORELANG['TXT_ACCESS_GROUP_NAME_INVALID'];
             return false;
         }
-        if ($this->id) {
-            if (!$objDatabase->Execute("
-                UPDATE `".DBPREFIX."access_user_groups`
-                SET
-                    `group_name` = '".addslashes($this->name)."',
-                    `group_description` = '".addslashes($this->description)."',
-                    `is_active` = ".intval($this->is_active).",
-                    `homepage` = '".addslashes($this->homepage)."',
-                    `toolbar` = '".intval($this->toolbar)."'
-                WHERE `group_id`=".$this->id
-            )) {
-                $this->error_msg = $_CORELANG['TXT_ACCESS_FAILED_TO_UPDATE_GROUP'];
-                return false;
-            }
-        } else {
-            if ($objDatabase->Execute("
-                INSERT INTO `".DBPREFIX."access_user_groups` (
-                    `group_name`,
-                    `group_description`,
-                    `is_active`,
-                    `type`,
-                    `homepage`,
-                    `toolbar`
-                ) VALUES (
-                    '".addslashes($this->name)."',
-                    '".addslashes($this->description)."',
-                    ".intval($this->is_active).",
-                    '".$this->type."',
-                    '".addslashes($this->homepage)."',
-                    '".intval($this->toolbar)."'
-                )"
-            )) {
-                $this->id = $objDatabase->Insert_ID();
-            } else {
-                $this->error_msg = $_CORELANG['TXT_ACCESS_FAILED_TO_CREATE_GROUP'];
-                return false;
-            }
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $groupRepo = $em->getRepository('Cx\Core\User\Model\Entity\Group');
+        $userRepo = $em->getRepository('Cx\Core\User\Model\Entity\User');
+        $group = $groupRepo->findOneBy(array('groupId' => $this->id));
+
+        if (empty($group)) {
+            $group = new \Cx\Core\User\Model\Entity\Group();
+            $group->setType($this->type);
         }
 
-        if (!$this->storeUserAssociations()) {
-            $this->error_msg = $_CORELANG['TXT_ACCESS_COULD_NOT_SET_USER_ASSOCIATIONS'];
+        $group->setGroupName(addslashes($this->name));
+        $group->setGroupDescription(addslashes($this->description));
+        $group->setIsActive(intval($this->is_active));
+        $group->setHomepage(addslashes($this->homepage));
+        $group->setToolbar(intval($this->toolbar));
+
+        // Store permissions
+        $arrCurrentUsers = $this->loadUsers();
+        $arrAddedUsers = array_diff($this->getAssociatedUserIds(), $arrCurrentUsers);
+        $arrRemovedUsers = array_diff($arrCurrentUsers, $this->getAssociatedUserIds());
+
+        foreach ($arrRemovedUsers as $userId) {
+            $user = $userRepo->find($userId);
+            $group->removeUser($user);
+            $user->removeGroup($group);
+            $em->persist($user);
+        }
+
+        foreach ($arrAddedUsers as $userId) {
+            $user = $userRepo->find($userId);
+            $group->addUser($user);
+            $user->addGroup($group);
+            $em->persist($user);
+        }
+
+        try {
+            $em->persist($group);
+            $em->flush();
+            $this->id = $group->getGroupId();
+        } catch (\Doctrine\ORM\OptimisticLockException $e) {
+            $this->error_msg = $_CORELANG['TXT_ACCESS_FAILED_TO_UPDATE_GROUP'];
             return false;
         }
 
@@ -380,40 +382,6 @@ class UserGroup
 
         return true;
     }
-
-
-    /**
-     * Store user associations
-     *
-     * Stores the user associations of the loaded group.
-     * Returns TRUE no success, FALSE on failure.
-     * @global ADONewConnection
-     * @return boolean
-     */
-    private function storeUserAssociations()
-    {
-        global $objDatabase;
-
-        $status = true;
-        $arrCurrentUsers = $this->loadUsers();
-        $arrAddedUsers = array_diff($this->getAssociatedUserIds(), $arrCurrentUsers);
-        $arrRemovedUsers = array_diff($arrCurrentUsers, $this->getAssociatedUserIds());
-
-        foreach ($arrRemovedUsers as $userId) {
-            if ($objDatabase->Execute('DELETE FROM `'.DBPREFIX.'access_rel_user_group` WHERE `group_id` = '.$this->id.' AND `user_id` = '.$userId) === false) {
-                $status = false;
-            }
-        }
-
-        foreach ($arrAddedUsers as $userId) {
-            if ($objDatabase->Execute('INSERT INTO `'.DBPREFIX.'access_rel_user_group` (`user_id`, `group_id`) VALUES ('.$userId.', '.$this->id.')') === false) {
-                $status = false;
-            }
-        }
-
-        return $status;
-    }
-
 
     private function storePermissions()
     {
