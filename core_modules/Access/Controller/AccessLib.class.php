@@ -694,6 +694,10 @@ class AccessLib
 
     public function parseAccountAttributes($objUser, $edit = false)
     {
+        if ($objUser instanceof \Cx\Core\User\Model\Entity\User) {
+            $objUser = \FWUser::getFWUserObject()->objUser->getUser($objUser->getId());
+        }
+
         if (!isset($this->arrAccountAttributes)) {
             $this->loadAccountAttributes();
         }
