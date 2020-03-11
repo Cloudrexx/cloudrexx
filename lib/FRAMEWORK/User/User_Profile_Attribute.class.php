@@ -616,38 +616,34 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
 
     function loadCoreAttributeTitle()
     {
-        global $objDatabase;
-        // Find children of user attribute title
-        $objResult = $objDatabase->Execute('
-            SELECT 
-                `name`.`id` AS `id` , `name`.`name` AS `title`, 
-                `attribute`.`order_id`
-            FROM `'.DBPREFIX.'access_user_attribute_name` AS `name` 
-            LEFT JOIN `'.DBPREFIX.'access_user_attribute` AS `attribute` 
-                ON `name`.`attribute_id` = `attribute`.`id`
-            LEFT JOIN `'.DBPREFIX.'access_user_attribute_name` AS `titleAttr` 
-                ON `titleAttr`.`name` = "title"
-            WHERE `attribute`.`parent_id`= `titleAttr`.`attribute_id`;
-        ');
-        if ($objResult) {
-            while (!$objResult->EOF) {
-                $this->arrAttributes['title_'.$objResult->fields['id']] = array(
-                    'type' => 'menu_option',
-                    'multiline' => false,
-                    'mandatory' => false,
-                    'sort_type' => 'asc',
-                    'parent_id' => 'title',
-                    'desc' => $objResult->fields['title'],
-                    'value' => $objResult->fields['id'],
-                    'order_id' => $objResult->fields['order_id'],
-                    'modifiable' => array('names'),
-                );
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        // Find title attribute id
+        $titleId = $this->getAttributeIdByProfileAttributeId('title');
+        $attributeRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\UserAttribute');
 
-                // add names for all languages
-                foreach (\FWLanguage::getLanguageArray() as $langId => $langData) {
-                    $this->arrAttributes['title_'.$objResult->fields['id']]['names'][$langId] = $objResult->fields['title'];
+        // Find user attribute title
+        $titleAttribute = $attributeRepo->find($titleId);
+
+        if ($titleAttribute) {
+            foreach ($titleAttribute->getChildren() as $child) {
+                foreach ($child->getUserAttributeName() as $attributeName) {
+                    $this->arrAttributes['title_'.$attributeName->getId()] = array(
+                        'type' => 'menu_option',
+                        'multiline' => false,
+                        'mandatory' => false,
+                        'sort_type' => 'asc',
+                        'parent_id' => 'title',
+                        'desc' => $attributeName->getName(),
+                        'value' => $attributeName->getId(),
+                        'order_id' => $attributeName->getOrder(),
+                        'modifiable' => array('names'),
+                    );
+
+                    // add names for all languages
+                    foreach (\FWLanguage::getLanguageArray() as $langId => $langData) {
+                        $this->arrAttributes['title_'.$attributeName->getId()]['names'][$langId] = $attributeName->getName();
+                    }
                 }
-                $objResult->MoveNext();
             }
         }
     }
