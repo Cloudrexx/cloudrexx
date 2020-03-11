@@ -286,6 +286,11 @@ class AccessLib
 
         if ($objUser instanceof \Cx\Core\User\Model\Entity\User) {
             $fwUser = \FWUser::getFWUserObject()->objUser;
+            $convertedAttributeId = $fwUser->objAttribute->getProfileAttributeIdByAttributeId($attributeId);
+            if ($convertedAttributeId) {
+                $attributeId = $convertedAttributeId;
+            }
+
             $objUser = $fwUser->getUser($objUser->getId());
         }
 
