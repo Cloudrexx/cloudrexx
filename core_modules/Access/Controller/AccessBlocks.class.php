@@ -345,7 +345,7 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
         foreach ($objUser->getUserAttributeValue() as $value) {
             $attrId = $objAttr->getProfileAttributeIdByAttributeId($value->getUserAttribute()->getId());
             $objAttr->load($attrId);
-            if ($objAttr->checkReadPermission()) {
+            if ($value->getUserAttribute()->checkReadPermission()) {
                 $this->parseAttribute(
                     $objUser,
                     $objAttr->getId(),
