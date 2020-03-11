@@ -722,18 +722,15 @@ class UserGroup
      */
     static function getNameArray()
     {
-        global $objDatabase;
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $groupRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\Group');
+        $groups = $groupRepo->findAll();
 
-        $objResult = $objDatabase->Execute("
-            SELECT `group_id`, `group_name`
-              FROM ".DBPREFIX."access_user_groups");
-        if (!$objResult) return false;
         $arrGroupName = array();
-        while (!$objResult->EOF) {
-            $arrGroupName[$objResult->fields['group_id']] =
-                $objResult->fields['group_name'];
-            $objResult->MoveNext();
+        foreach ($groups as $group) {
+            $arrGroupName[$group->getGroupId()] = $group->getGroupName();
         }
+
         return $arrGroupName;
     }
 
