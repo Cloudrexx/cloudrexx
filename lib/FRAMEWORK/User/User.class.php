@@ -2883,7 +2883,7 @@ class User extends User_Profile
                 $this->error_msg[] = $_CORELANG['TXT_ACCESS_PASSWORD_NOT_CONFIRMED'];
                 return false;
             }
-            $this->password = $this->hashPassword($password);
+            $this->password = $password;
             $this->updateLoadedUserData('password', $this->password);
             return true;
         }
