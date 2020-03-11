@@ -176,7 +176,7 @@ class Orders
                     . join(',', $filter['user_ids']) .
                     ')) ';
             } else {
-                $query_where .= ' AND 0';
+                $query_where .= ' AND `order`.`customer_id` IN (0)';
             }
         }
         if (isset($filter['term'])) {
