@@ -1102,32 +1102,85 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
 
         $this->parseLetterIndexList('index.php?cmd=Access&amp;act=user&amp;groupId='.$groupId.'&amp;user_status_filter='.$userStatusFilter.'&amp;user_role_filter='.$userRoleFilter, 'username_filter', $usernameFilter);
 
+        $userRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\User');
+        $qb = $userRepo->createQueryBuilder('u');
+
         $objGroup = $objFWUser->objGroup->getGroup($groupId);
         $userCount = $objGroup->getUserCount();
         $userFilter = array();
-        if ($groupId) {
-            $groupId = $groupId == 'groupless' ? 'groupless' : intval($groupId);
-            $userFilter['group_id'] = $groupId;
+        if (!empty($groupId)) {
+            if ($groupId == 'groupless') {
+                $groupId = 0;
+            }
+
+            if (is_numeric($groupId)) {
+                $userRepo->addGroupFilterToQueryBuilder($qb, $groupId);
+            }
+        }
+        if ($usernameFilter !== null) {
+            $userRepo->addRegexFilterToQueryBuilder(
+                $qb,
+                '^'.($usernameFilter == '0' ? '[0-9]|-|_' : $usernameFilter),
+                'u.username'
+            );
         }
         if ($accountType) {
             $userFilter['crm'] = 1;
+            if ($cx->getLicense()->isInLegalComponents('Crm')) {
+                // Todo CRM
+                $query = 'SELECT id FROM `%1$module_crm_contacts` WHERE `contact_type` = %2$';
+                $query = sprintf($query, DBPREFIX, 2);
+
+                $userIds = array();
+
+                $qb->andWhere(
+                    $qb->expr()->in('u.id', ':userIds')
+                )->setParameter('userIds', $userIds);
+            }
         }
-        if ($usernameFilter !== null) {
-            $userFilter['username'] = array('REGEXP' => '^'.($usernameFilter == '0' ? '[0-9]|-|_' : $usernameFilter));
-        }
+
         if ($userStatusFilter !== null) {
-            $userFilter['active'] = $userStatusFilter;
+            $qb->andWhere(
+                $qb->expr()->eq('u.active', ':active')
+            )->setParameter('active', $userStatusFilter);
         }
+
         if ($userRoleFilter !== null) {
-            $userFilter['is_admin'] = $userRoleFilter;
+            $qb->andWhere(
+                $qb->expr()->eq('u.isAdmin', ':isAdmin')
+            )->setParameter('isAdmin', $userRoleFilter);
         }
+
+        // Search
+        if ($search) {
+            $orX = $qb->expr()->orX();
+            $orX->add($userRepo->getSearchByTermInUserExpression($qb, $search));
+            $orX->add($userRepo->getSearchByTermInAttributeExpression($qb, $search));
+            $qb->andWhere($orX);
+        }
+
         if ($orderBy == 'expiration') {
-            $arrOrder['special'] = 'field( tblU.`expiration`, 0'.($orderDirection == 'desc' ? ', tblU.`expiration`' : null).')';
+            $qb->addSelect(
+                'FIELD(u.expiration, 0'.($orderDirection == 'desc' ? ', u.expiration' : null).') AS HIDDEN specialOrder'
+            );
+            $qb->orderBy('specialOrder');
+        } else {
+            $userRepo->addOrderToQueryBuilder($qb, $orderBy, $orderDirection);
         }
-        $arrOrder[$orderBy] = $orderDirection;
 
-        if ($userCount > 0 && ($objUser = $objFWUser->objUser->getUsers($userFilter, $search, $arrOrder, null, $_CONFIG['corePagingLimit'], $limitOffset)) && $userCount = $objUser->getFilteredSearchUserCount()) {
+        $qb->setFirstResult($limitOffset)
+            ->setMaxResults($_CONFIG['corePagingLimit']);
+        $users = $qb->getQuery()->getResult();
 
+        // Count users
+        $qb->select(
+            'count(DISTINCT u.id)'
+        );
+        $qb->orderBy('u.id');
+        $qb->setFirstResult(null);
+        $qb->setMaxResults(null);
+
+        if ($userCount > 0 && $users && $userCount = $qb->getQuery()->getSingleScalarResult()) {
             if ($userCount > $_CONFIG['corePagingLimit']) {
                 $this->_objTpl->setVariable('ACCESS_USER_PAGING', getPaging($userCount, $limitOffset, "&cmd=Access&act=user&groupId=".$groupId."&sort=".htmlspecialchars($orderDirection)."&by=".htmlspecialchars($orderBy)."&search=".urlencode(urlencode(implode(' ',$search)))."&username_filter=".$usernameFilter."&user_status_filter=".$userStatusFilter."&user_role_filter=".$userRoleFilter, "<b>".$_ARRAYLANG['TXT_ACCESS_USER']."</b>"));
             }
@@ -1170,34 +1223,34 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
             ));
 
             $this->_objTpl->setCurrentBlock('access_user_list');
-            while (!$objUser->EOF) {
-                $firstname = $objUser->getProfileAttribute('firstname');
-                $lastname = $objUser->getProfileAttribute('lastname');
-                $company = $objUser->getProfileAttribute('company');
+            foreach ($users as $user) {
+                $firstname = $user->getProfileAttribute('firstname')->getValue();
+                $lastname = $user->getProfileAttribute('lastname')->getValue();
+                $company = $user->getProfileAttribute('company')->getValue();
 
                 $this->_objTpl->setVariable(array(
                     'ACCESS_ROW_CLASS_ID'               => $rowNr % 2 ? 1 : 0,
-                    'ACCESS_USER_ID'                    => $objUser->getId(),
-                    'ACCESS_USER_STATUS_IMG'            => $objUser->getActiveStatus() ? 'led_green.gif' : 'led_red.gif',
-                    'ACCESS_USER_STATUS'                => $objUser->getActiveStatus() ? $_ARRAYLANG['TXT_ACCESS_ACTIVE'] : $_ARRAYLANG['TXT_ACCESS_INACTIVE'],
-                    'ACCESS_USER_USERNAME'              => htmlentities($objUser->getUsername(), ENT_QUOTES, CONTREXX_CHARSET),
+                    'ACCESS_USER_ID'                    => $user->getId(),
+                    'ACCESS_USER_STATUS_IMG'            => $user->getActive() ? 'led_green.gif' : 'led_red.gif',
+                    'ACCESS_USER_STATUS'                => $user->getActive() ? $_ARRAYLANG['TXT_ACCESS_ACTIVE'] : $_ARRAYLANG['TXT_ACCESS_INACTIVE'],
+                    'ACCESS_USER_USERNAME'              => htmlentities($user->getUsernameOrEmail(), ENT_QUOTES, CONTREXX_CHARSET),
                     'ACCESS_USER_COMPANY'               => !empty($company) ? htmlentities($company, ENT_QUOTES, CONTREXX_CHARSET) : '&nbsp;',
                     'ACCESS_USER_FIRSTNAME'             => !empty($firstname) ? htmlentities($firstname, ENT_QUOTES, CONTREXX_CHARSET) : '&nbsp;',
                     'ACCESS_USER_LASTNAME'              => !empty($lastname) ? htmlentities($lastname, ENT_QUOTES, CONTREXX_CHARSET) : '&nbsp;',
-                    'ACCESS_USER_EMAIL'                 => htmlentities($objUser->getEmail(), ENT_QUOTES, CONTREXX_CHARSET),
-                    'ACCESS_SEND_EMAIL_TO_USER'         => sprintf($_ARRAYLANG['TXT_ACCESS_SEND_EMAIL_TO_USER'], htmlentities($objUser->getUsername(), ENT_QUOTES, CONTREXX_CHARSET)),
-                    'ACCESS_USER_ADMIN_IMG'             => $objUser->getAdminStatus() ? 'admin.png' : 'no_admin.png',
-                    'ACCESS_USER_ADMIN_TXT'             => $objUser->getAdminStatus() ? $_ARRAYLANG['TXT_ACCESS_ADMINISTRATOR'] : $_ARRAYLANG['TXT_ACCESS_NO_ADMINISTRATOR'],
-                    'ACCESS_DELETE_USER_ACCOUNT'        => sprintf($_ARRAYLANG['TXT_ACCESS_DELETE_USER_ACCOUNT'],htmlentities($objUser->getUsername(), ENT_QUOTES, CONTREXX_CHARSET)),
-                    'ACCESS_USER_REGDATE'               => date(ASCMS_DATE_FORMAT_DATE, $objUser->getRegistrationDate()),
-                    'ACCESS_USER_LAST_ACTIVITY'         => $objUser->getLastActivityTime() ? date(ASCMS_DATE_FORMAT_DATE, $objUser->getLastActivityTime()) : '-',
-                    'ACCESS_USER_EXPIRATION'            => $objUser->getExpirationDate() ? date(ASCMS_DATE_FORMAT_DATE, $objUser->getExpirationDate()) : '-',
-                    'ACCESS_USER_EXPIRATION_STYLE'      => $objUser->getExpirationDate() && $objUser->getExpirationDate() < time() ? 'color:#f00; font-weight:bold;' : null,
-                    'ACCESS_CHANGE_ACCOUNT_STATUS_MSG'  => sprintf($objUser->getActiveStatus() ? $_ARRAYLANG['TXT_ACCESS_DEACTIVATE_USER'] : $_ARRAYLANG['TXT_ACCESS_ACTIVATE_USER'], htmlentities($objUser->getUsername(), ENT_QUOTES, CONTREXX_CHARSET))
+                    'ACCESS_USER_EMAIL'                 => htmlentities($user->getEmail(), ENT_QUOTES, CONTREXX_CHARSET),
+                    'ACCESS_SEND_EMAIL_TO_USER'         => sprintf($_ARRAYLANG['TXT_ACCESS_SEND_EMAIL_TO_USER'], htmlentities($user->getUsernameOrEmail(), ENT_QUOTES, CONTREXX_CHARSET)),
+                    'ACCESS_USER_ADMIN_IMG'             => $user->getIsAdmin() ? 'admin.png' : 'no_admin.png',
+                    'ACCESS_USER_ADMIN_TXT'             => $user->getIsAdmin() ? $_ARRAYLANG['TXT_ACCESS_ADMINISTRATOR'] : $_ARRAYLANG['TXT_ACCESS_NO_ADMINISTRATOR'],
+                    'ACCESS_DELETE_USER_ACCOUNT'        => sprintf($_ARRAYLANG['TXT_ACCESS_DELETE_USER_ACCOUNT'],htmlentities($user->getUsernameOrEmail(), ENT_QUOTES, CONTREXX_CHARSET)),
+                    'ACCESS_USER_REGDATE'               => date(ASCMS_DATE_FORMAT_DATE, $user->getRegdate()),
+                    'ACCESS_USER_LAST_ACTIVITY'         => $user->getLastActivity() ? date(ASCMS_DATE_FORMAT_DATE, $user->getLastActivity()) : '-',
+                    'ACCESS_USER_EXPIRATION'            => $user->getExpiration() ? date(ASCMS_DATE_FORMAT_DATE, $user->getExpiration()) : '-',
+                    'ACCESS_USER_EXPIRATION_STYLE'      => $user->getExpiration() && $user->getExpiration() < time() ? 'color:#f00; font-weight:bold;' : null,
+                    'ACCESS_CHANGE_ACCOUNT_STATUS_MSG'  => sprintf($user->getActive() ? $_ARRAYLANG['TXT_ACCESS_DEACTIVATE_USER'] : $_ARRAYLANG['TXT_ACCESS_ACTIVATE_USER'], htmlentities($user->getUsernameOrEmail(), ENT_QUOTES, CONTREXX_CHARSET))
                 ));
 
                 $license = \Env::get('cx')->getLicense();
-                if (($crmUserId = $objUser->getCrmUserId()) && $license->isInLegalComponents('Crm')) {
+                if (($crmUserId = $user->getCrmUserId()) && $license->isInLegalComponents('Crm')) {
                     if ($this->_objTpl->blockExists('access_user_crm_account')) {
                         $this->_objTpl->setVariable(array(
                             'ACCESS_USER_CRM_ACCOUNT_ID' => $crmUserId,
@@ -1209,7 +1262,6 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
 
                 $rowNr++;
                 $this->_objTpl->parseCurrentBlock();
-                $objUser->next();
             }
             $this->_objTpl->parse('access_has_users');
             $this->_objTpl->hideBlock('access_no_user');
