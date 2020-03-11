@@ -567,4 +567,14 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
             true
         );
     }
+
+    /**
+     * Get data type
+     *
+     * @return string
+     */
+    function getDataType()
+    {
+        return $this->arrTypes[$this->getType()]['data_type'];
+    }
 }
