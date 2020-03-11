@@ -771,9 +771,9 @@ class User extends \Cx\Model\Base\EntityBase {
      *
      * @param integer $restoreKeyTime
      */
-    public function setRestoreKeyTime($restoreKeyTime)
+    public function setRestoreKeyTime($restoreKeyTime = null)
     {
-        $this->restoreKeyTime = $restoreKeyTime;
+        $this->restoreKeyTime = !empty($restoreKeyTime) ? $restoreKeyTime : time() + 3600;
     }
 
     /**
