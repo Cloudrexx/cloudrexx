@@ -253,30 +253,24 @@ class UserGroup
      */
     private function loadUsers()
     {
-        global $objDatabase;
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $groupRepo = $em->getRepository('Cx\Core\User\Model\Entity\Group');
+        $qb = $groupRepo->createQueryBuilder('g');
+        $qb->select('u.id AS userId')
+           ->join('g.user', 'u')
+           ->where($qb->expr()->eq('g.groupId', ':groupId'))
+           ->orderBy('u.username')
+           ->setParameter('groupId', $this->id);
+
+        $users = $qb->getQuery()->getArrayResult();
 
         $arrUsers = array();
-
-        $objUser = $objDatabase->Execute('
-            SELECT
-                tblRel.`user_id`
-            FROM
-                `'.DBPREFIX.'access_rel_user_group` AS tblRel
-            INNER JOIN `'.DBPREFIX.'access_users` AS tblUser
-            ON tblUser.`id` = tblRel.`user_id`
-            WHERE tblRel.`group_id` = '.$this->id.'
-            ORDER BY tblUser.`username`'
-        );
-        if ($objUser) {
-            while (!$objUser->EOF) {
-                array_push($arrUsers, $objUser->fields['user_id']);
-                $objUser->MoveNext();
-            }
-
-            return $arrUsers;
-        } else {
-            return false;
+        foreach($users as $user) {
+            array_push($arrUsers, $user['userId']);
         }
+
+        return $arrUsers;
     }
 
 
