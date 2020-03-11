@@ -553,4 +553,18 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
 
         return '';
     }
+
+    /**
+     * Check the read permission of profile attribute
+     *
+     * @return boolean
+     */
+    public function checkReadPermission()
+    {
+        return \Permission::checkAccess(
+            $this->getReadAccessId(),
+            'static',
+            true
+        );
+    }
 }
