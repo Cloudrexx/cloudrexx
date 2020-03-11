@@ -428,11 +428,18 @@ class UserGroup
 
     public function delete()
     {
-        global $objDatabase, $_CORELANG;
+        global $_CORELANG;
 
-        if ($objDatabase->Execute('DELETE FROM `'.DBPREFIX.'access_rel_user_group` WHERE `group_id` = '.$this->id) !== false && $objDatabase->Execute('DELETE FROM `'.DBPREFIX.'access_user_groups` WHERE `group_id` = '.$this->id) !== false) {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $groupRepo = $em->getRepository('Cx\Core\User\Model\Entity\Group');
+        $group = $groupRepo->findOneBy(array('groupId' => $this->id));
+
+        try {
+            $em->remove($group);
+            $em->flush();
             return true;
-        } else {
+        } catch (\Doctrine\ORM\OptimisticLockException $e) {
             $this->error_msg = sprintf($_CORELANG['TXT_ACCESS_GROUP_DELETE_FAILED'], $this->name);
             return false;
         }
