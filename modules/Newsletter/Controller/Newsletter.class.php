@@ -383,22 +383,25 @@ class Newsletter extends NewsletterLib
 
         if (!empty($code) && !empty($requestedMail)) {
             // Find the user to then find a matching Newsletter Access User
-            $objUser = \FWUser::getFWUserObject()->objUser->getUsers(
-                array('email' => $requestedMail), null, null, null, 1
-            );
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $user = $cx->getDb()->getEntityManager()->getRepository(
+                'Cx\Core\User\Model\Entity\User'
+            )->findOneBy(array('email' => $requestedMail));
             $objRecipient = null;
-            if ($objUser) {
+            if ($user) {
                 $objRecipient = $objDatabase->SelectLimit("SELECT accessUserID
                 FROM ".DBPREFIX."module_newsletter_access_user AS nu
-                WHERE nu.code='".$code."' AND accessUserID = " . $objUser->getId(), 1);
+                WHERE nu.code='".$code."' AND accessUserID = " . $user->getId(), 1);
             }
 
             if ($objRecipient) {
-                if ($objUser) {
-                    $recipientId = $objUser->getId();
+                if ($user) {
+                    $recipientId = $user->getId();
                     $isAccessRecipient = true;
 
                     //$arrAssociatedLists = $objUser->getSubscribedNewsletterListIDs();
+                    // until fwUser is completely removed
+                    $objUser = \FWUser::getFWUserObject()->objUser->getUser($user->getId());
                     $arrPreAssociatedInactiveLists = $objUser->getSubscribedNewsletterListIDs();
                 }
             } else {
