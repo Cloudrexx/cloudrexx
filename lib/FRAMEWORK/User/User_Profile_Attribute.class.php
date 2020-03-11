@@ -577,29 +577,19 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
      */
     function loadProfileAttributes()
     {
-        global $objDatabase;
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $attributeRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\UserAttribute');
+        $qb = $attributeRepo->createQueryBuilder('a');
+        $qb->leftJoin('a.userAttributeName', 'n')
+            ->leftJoin('a.parent', 'p')
+            ->where($qb->expr()->eq('a.isDefault', ':isDefault'))
+            ->andWhere($qb->expr()->isNull('p.id'))
+            ->setParameter('isDefault', true);
 
-        $query = '
-            SELECT 
-                `tblA`.`id` AS `id`, 
-                `tblN`.`name` AS `name` 
-            FROM `' .DBPREFIX .'access_user_attribute` AS `tblA`
-            LEFT JOIN `'.DBPREFIX.'access_user_attribute_name` AS `tblN`
-                ON `tblN`.`attribute_id` = `tblA`.`id`
-            WHERE `tblA`.`is_default` = 1 
-            AND `tblA`.`parent_id` IS NULL
-        ';
+        $attributes = $qb->getQuery()->getResult();
 
-        $objAttributes = $objDatabase->Execute($query);
-
-        if ($objAttributes !== false && $objAttributes->RecordCount() > 0) {
-            while (!$objAttributes->EOF) {
-                $this->arrProfileAttributes[
-                $objAttributes->fields['id']
-                ] = $objAttributes->fields['name'];
-
-                $objAttributes->MoveNext();
-            }
+        foreach ($attributes as $attribute) {
+            $this->arrProfileAttributes[$attribute->getId()] = $attribute->getName();
         }
     }
 
