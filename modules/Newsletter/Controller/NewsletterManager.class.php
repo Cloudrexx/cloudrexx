@@ -5907,9 +5907,6 @@ $WhereStatement = array();
         );
 
         $data = $objDatabase->Execute($query);
-        $dataCount = $objDatabase->Execute('SELECT FOUND_ROWS() AS `count`');
-        $count = $dataCount->fields['count'];
-
         $objFWUser = \FWUser::getFWUserObject();
         $users = array();
         if ($data !== false ) {
@@ -5956,6 +5953,9 @@ $WhereStatement = array();
                 $data->MoveNext();
             }
         }
+
+        $dataCount = $objDatabase->Execute('SELECT FOUND_ROWS() AS `count`');
+        $count = $dataCount->fields['count'];
 
         return array($users, $count);
     }
