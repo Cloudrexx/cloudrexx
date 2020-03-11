@@ -5936,7 +5936,8 @@ $WhereStatement = array();
                                     default:
                                         $value = '-';
                                 }
-                            } $user[$field] = $value;
+                            }
+                            $user[$field] = $value;
                         } else {
                             $user[$field] = $data->fields[$field];
                         }
