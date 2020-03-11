@@ -767,37 +767,32 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
      */
     public function getImages($limit, $offset, &$count)
     {
-        global $objDatabase;
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $attributeRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\UserAttribute');
+        $qb = $attributeRepo->createQueryBuilder('a');
+        $qb->select('SUM(1) AS entryCount')
+           ->innerJoin('a.userAttributeValue', 'v')
+           ->where($qb->expr()->eq('a.type', ':type'))
+           ->andWhere($qb->expr()->not($qb->expr()->eq('v.value', ':value')))
+           ->setParameters(array('type' => 'image', 'value' => ''));
 
-        $query = "
-                SELECT SUM(1) as entryCount
-                FROM `".DBPREFIX."access_user_attribute` AS a
-                INNER JOIN `".DBPREFIX."access_user_attribute_value` AS v ON v.`attribute_id` = a.`id`
-                WHERE a.`type` = 'image' AND v.`value` != ''";
-
-        $objCount = $objDatabase->Execute($query);
-        if (!$objCount || !$objCount->fields['entryCount']) {
+        $count = $qb->getQuery()->getSingleScalarResult();
+        if (!$count) {
             return array();
         }
 
-        $count = $objCount->fields['entryCount'];
+        $qb->select('v.value AS picture');
+        $qb->setMaxResults($limit);
+        $qb->setFirstResult($offset);
 
-        $query = "
-                SELECT v.`value` AS picture
-                FROM `".DBPREFIX."access_user_attribute` AS a
-                INNER JOIN `".DBPREFIX."access_user_attribute_value` AS v 
-                    ON v.`attribute_id` = a.`id`
-                WHERE a.`type` = 'image' AND v.`value` != ''";
-
-        $objImage = $objDatabase->SelectLimit($query, $limit, $offset);
-        if ($objImage === false) {
+        $resultImages = $qb->getQuery()->getArrayResult();
+        if (empty($resultImages)) {
             return array();
         }
 
         $images = array();
-        while (!$objImage->EOF) {
-            $images[] = $objImage->fields['picture'];
-            $objImage->MoveNext();
+        foreach ($resultImages as $image) {
+            $images[] = $image['picture'];
         }
 
         return $images;
