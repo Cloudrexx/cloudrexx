@@ -461,7 +461,7 @@ class Access extends \Cx\Core_Modules\Access\Controller\AccessLib
                         $objFWUser->objUser->getAdminStatus()
                     )
                 ) {
-                    foreach ($user->getUserAttributeValue() as $attributeValue) {
+                    foreach ($user->getUserAttributeValues() as $attributeValue) {
                         $objAttribute = $attributeValue->getUserAttribute();
                         if ($objAttribute->checkReadPermission()) {
                             $this->parseAttribute($user, $objAttribute->getId(), 0, false, false, false, false, false);

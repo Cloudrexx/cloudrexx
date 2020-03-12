@@ -2000,9 +2000,9 @@ class CrmLibrary
         $qb = $cx->getDb()->getEntityManager()->createQueryBuilder();
         $query = $qb->select('u')
             ->from('Cx\Core\User\Model\Entity\User', 'u')
-            ->innerJoin('u.group', 'g')
+            ->innerJoin('u.groups', 'g')
             ->andWhere(
-                $qb->expr()->eq('g.groupId', $groupId),
+                $qb->expr()->eq('g.id', $groupId),
                 $qb->expr()->eq('g.type', '?1')
             )->setParameter(1, 'backend')
             ->getQuery();

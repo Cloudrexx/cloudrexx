@@ -448,8 +448,7 @@ if (!$limit) {
         }
 
         foreach ($users as $user) {
-            // Können nicht bei den normalen Custerom IDs hinzugefügt werden,
-            // wegen der AND Bestimmung von Customer IDS Term Filter
+            // Can't be added to the normal customer IDs due to AND determination of customer IDS term filter
             $filter['user_ids'][] = $user->getId();
         }
 

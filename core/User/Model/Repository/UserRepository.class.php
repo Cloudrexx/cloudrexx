@@ -76,8 +76,8 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
     public function findByGroup($groupIds, $otherFilter)
     {
         $qb = $this->createQueryBuilder('u');
-        $qb->join('u.group', 'g')
-           ->where($qb->expr()->in('g.groupId', ':groupIds'))
+        $qb->join('u.groups', 'g')
+           ->where($qb->expr()->in('g.id', ':groupIds'))
            ->setParameter('groupIds', $groupIds);
 
         foreach ($otherFilter as $field=>$value) {
@@ -153,8 +153,8 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
 
                 // UserAttributeValue
                 // Find attribute id from default attribute
-                if ($fwAttribute->isCoreAttribute($field)) {
-                    $attributeIds[] = $fwAttribute->getAttributeIdByProfileAttributeId($field);
+                if ($fwAttribute->isDefaultAttribute($field)) {
+                    $attributeIds[] = $fwAttribute->getAttributeIdByDefaultAttributeId($field);
                 } else {
                     $attributeIds[] = $field;
                 }
@@ -162,7 +162,7 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
         }
 
         if (!empty($attributeIds)) {
-            $qb->join('u.userAttributeValue', 'v');
+            $qb->join('u.userAttributeValues', 'v');
             $qb->orWhere(
                 $qb->expr()->andX(
                     $this->getExpression('v.attributeId', 'in'),
@@ -210,20 +210,20 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
     public function addGroupFilterToQueryBuilder(&$qb, $groupId)
     {
         if (!in_array('filterGroup', $qb->getRootAliases())) {
-            $qb->leftJoin('u.group', 'filterGroup');
+            $qb->leftJoin('u.groups', 'filterGroup');
         }
 
         if (empty($groupId)) {
             $qb->andWhere(
-                $qb->expr()->isNull('filterGroup.groupId')
+                $qb->expr()->isNull('filterGroup.id')
             );
         } else if (is_array($groupId)) {
             $qb->andWhere(
-                $qb->expr()->in('filterGroup.groupId', ':groupIds')
+                $qb->expr()->in('filterGroup.id', ':groupIds')
             )->setParameter('groupId', $groupId);
         } else {
             $qb->andWhere(
-                $qb->expr()->eq('filterGroup.groupId', ':groupId')
+                $qb->expr()->eq('filterGroup.id', ':groupId')
             )->setParameter('groupId', $groupId);
         }
     }
@@ -256,11 +256,11 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
     {
         $objAttr = \FWUser::getFWUserObject()->objUser->objAttribute;
 
-        if ($objAttr->isCoreAttribute($field)) {
-            $field = $objAttr->getAttributeIdByProfileAttributeId($field);
+        if ($objAttr->isDefaultAttribute($field)) {
+            $field = $objAttr->getAttributeIdByDefaultAttributeId($field);
         }
 
-        $qb->join('u.userAttributeValue', 'v'.$field);
+        $qb->join('u.userAttributeValues', 'v'.$field);
 
         $qb->andWhere($qb->expr()->eq('v'.$field.'.attributeId', ':attributeId'.$field));
         $qb->andWhere($qb->expr()->eq('REGEXP(v'.$field.'.value, \''.$regex.'\')', 1));
@@ -278,14 +278,14 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
     {
         $objAttr = \FWUser::getFWUserObject()->objUser->objAttribute;
 
-        if ($objAttr->isCoreAttribute($field)) {
-            $field = $objAttr->getAttributeIdByProfileAttributeId($field);
+        if ($objAttr->isDefaultAttribute($field)) {
+            $field = $objAttr->getAttributeIdByDefaultAttributeId($field);
         }
 
         if (is_int($field)) {
             // Is UserAttributeValue
             if (!in_array('orderAttributeValue', $qb->getAllAliases())) {
-                $qb->join('u.userAttributeValue', 'orderAttributeValue');
+                $qb->join('u.userAttributeValues', 'orderAttributeValues');
             }
         } else {
             // Is attribute of an user
@@ -312,14 +312,14 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
         }
 
         foreach ($filters as $key=>$value) {
-            if ($objAttr->isCoreAttribute($key)) {
-                $key = $objAttr->getAttributeIdByProfileAttributeId($key);
+            if ($objAttr->isDefaultAttribute($key)) {
+                $key = $objAttr->getAttributeIdByDefaultAttributeId($key);
             }
 
             // Join table if not already done
             $alias = 'v'.$key;
             if (!in_array($alias, $qb->getAllAliases())) {
-                $qb->join('u.userAttributeValue', $alias);
+                $qb->join('u.userAttributeValues', $alias);
             }
 
             $expr->add($this->getExpression($alias.'.'.$key, 'eq'));
@@ -424,7 +424,7 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
                     $childAttributeIds = array();
                     foreach ($term as $searchTerm) {
                         foreach ($attribute->getChildren() as $child) {
-                            foreach ($child->getUserAttributeName() as $attributeName) {
+                            foreach ($child->getUserAttributeNames() as $attributeName) {
                                 $name = $attributeName->getName();
                                 if (stripos($name, $searchTerm) !== FALSE) {
                                     // We found the attribute
@@ -495,7 +495,7 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
         }
 
 
-        $qb->join('u.userAttributeValue', 'searchAttributeValues');
+        $qb->join('u.userAttributeValues', 'searchAttributeValues');
 
         return $orX;
     }

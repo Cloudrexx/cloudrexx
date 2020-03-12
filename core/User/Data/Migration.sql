@@ -385,14 +385,14 @@ ALTER TABLE contrexx_access_rel_user_group ADD CONSTRAINT FK_401DFD43A76ED395 FO
 
 /*Add unique index to access_user_attribute_name*/
 ALTER TABLE contrexx_access_user_attribute_name DROP PRIMARY KEY;
-ALTER TABLE contrexx_access_user_attribute_name ADD id INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY;
+ALTER TABLE contrexx_access_user_attribute_name ADD id INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY FIRST;
 CREATE UNIQUE INDEX fk_module_user_attribute_name_unique_idx
   ON contrexx_access_user_attribute_name (attribute_id, lang_id);
 
 /** Add Foreign Keys **/
 ALTER TABLE `contrexx_access_user_attribute_value` ADD CONSTRAINT `FK_B0DEA323B6E62EFA`
 	FOREIGN KEY (`attribute_id`) REFERENCES `contrexx_access_user_attribute` (`id`);
-ALTER TABLE `contrexx_access_user_attribute_value` ADD CONSTRAINT `FK_B0DEA323A76ED395`
+ALTER TABLE `contrexx_access_user_attribute_value` ADD CONSTRAINT `FK_B0DEA323A76ED395A76ED395A76ED395A76ED395`
 	FOREIGN KEY (`user_id`) REFERENCES `contrexx_access_users` (`id`);
 
 ALTER TABLE `contrexx_access_user_attribute_name`ADD CONSTRAINT `FK_90502F6CB6E62EFA`

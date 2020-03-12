@@ -32,7 +32,6 @@
  * @author      Dario Graf <info@cloudrexx.com>
  * @package     cloudrexx
  * @subpackage  core_user
- * @version     5.0.0
  */
 namespace Cx\Core\User\Model\Entity;
 
@@ -204,7 +203,6 @@ class UserValidateUsername extends \CxValidate
  * @author      Dario Graf <info@cloudrexx.com>
  * @package     cloudrexx
  * @subpackage  core_user
- * @version     5.0.0
  */
 class User extends \Cx\Model\Base\EntityBase {
     /**
@@ -325,12 +323,12 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @var \Doctrine\Common\Collections\Collection
      */
-    protected $group;
+    protected $groups;
 
     /**
      * @var \Doctrine\Common\Collections\Collection
      */
-    protected $userAttributeValue;
+    protected $userAttributeValues;
 
     /**
      * Constructor
@@ -341,8 +339,8 @@ class User extends \Cx\Model\Base\EntityBase {
         $this->profileAccess = $arrSettings['default_profile_access']['value'];
         $this->emailAccess = $arrSettings['default_email_access']['value'];
 
-        $this->group = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->userAttributeValue = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->groups = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->userAttributeValues = new \Doctrine\Common\Collections\ArrayCollection();
 
     }
 
@@ -367,7 +365,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set isAdmin
      *
      * @param boolean $isAdmin
-     * @return User
      */
     public function setIsAdmin($isAdmin)
     {
@@ -677,11 +674,25 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get active
      *
+     * This does exactly the same as getActive, but this method is necessary for doctrine mapping
+     *
      * @return boolean 
      */
     public function getActive()
     {
         return $this->active;
+    }
+
+    /**
+     * Get active
+     *
+     * This does exactly the same as getActive, but this method name is more intuitive
+     *
+     * @return integer $active
+     */
+    public function isActive()
+    {
+        return $this->getActive();
     }
 
     /**
@@ -813,7 +824,7 @@ class User extends \Cx\Model\Base\EntityBase {
      */
     public function addGroup(\Cx\Core\User\Model\Entity\Group $group)
     {
-        $this->group[] = $group;
+        $this->groups[] = $group;
     }
 
     /**
@@ -823,17 +834,30 @@ class User extends \Cx\Model\Base\EntityBase {
      */
     public function removeGroup(\Cx\Core\User\Model\Entity\Group $group)
     {
-        $this->group->removeElement($group);
+        $this->groups->removeElement($group);
     }
 
+    
     /**
      * Get group
      *
-     * @return \Doctrine\Common\Collections\Collection 
+     * @return \Doctrine\Common\Collections\Collection $group
+     * @deprecated
+     * @see \Cx\Core\User\Model\Entity\User::getGroups()
      */
     public function getGroup()
     {
-        return $this->group;
+        return $this->getGroups();
+    }
+
+    /**
+     * Get groups
+     *
+     * @return \Doctrine\Common\Collections\Collection $groups
+     */
+    public function getGroups()
+    {
+        return $this->groups;
     }
 
     /**
@@ -843,7 +867,7 @@ class User extends \Cx\Model\Base\EntityBase {
      */
     public function addUserAttributeValue(\Cx\Core\User\Model\Entity\UserAttributeValue $userAttributeValue)
     {
-        $this->userAttributeValue[] = $userAttributeValue;
+        $this->userAttributeValues[] = $userAttributeValue;
     }
 
     /**
@@ -853,17 +877,29 @@ class User extends \Cx\Model\Base\EntityBase {
      */
     public function removeUserAttributeValue(\Cx\Core\User\Model\Entity\UserAttributeValue $userAttributeValue)
     {
-        $this->userAttributeValue->removeElement($userAttributeValue);
+        $this->userAttributeValues->removeElement($userAttributeValue);
     }
 
     /**
      * Get userAttributeValue
      *
      * @return \Doctrine\Common\Collections\Collection
+     * @deprecated
+     * @see \Cx\Core\User\Model\Entity\User::getUserAttributeValues()
      */
     public function getUserAttributeValue()
     {
-        return $this->userAttributeValue;
+        return $this->getUserAttributeValues();
+    }
+
+    /**
+     * Get userAttributeValues
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getUserAttributeValues()
+    {
+        return $this->userAttributeValues;
     }
 
     /**
@@ -873,11 +909,11 @@ class User extends \Cx\Model\Base\EntityBase {
      */
     public function isBackendGroupUser()
     {
-        if (!$this->group) {
+        if (!$this->getGroups()) {
             return false;
         }
 
-        foreach ($this->group as $group) {
+        foreach ($this->getGroups() as $group) {
             if ($group->getType() === 'backend') {
                 return true;
             }
@@ -893,7 +929,7 @@ class User extends \Cx\Model\Base\EntityBase {
      */
     public function getAttributeValue($attributeId)
     {
-        foreach ($this->userAttributeValue as $value) {
+        foreach ($this->getUserAttributeValues() as $value) {
             if ($value->getAttributeId() == $attributeId) {
                 return $value;
             }
@@ -904,8 +940,8 @@ class User extends \Cx\Model\Base\EntityBase {
     public function getProfileAttribute($profileId)
     {
         $attr = \FWUser::getFWUserObject()->objUser->objAttribute;
-        if ($attr->isCoreAttribute($profileId)) {
-            $attrId = $attr->getAttributeIdByProfileAttributeId($profileId);
+        if ($attr->isDefaultAttribute($profileId)) {
+            $attrId = $attr->getAttributeIdByDefaultAttributeId($profileId);
         } else {
             $attrId = $profileId;
         }

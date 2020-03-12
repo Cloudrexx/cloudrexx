@@ -125,7 +125,7 @@ class UserGroup
         if (is_array($filter)) {
             $this->parseFilterConditions($qb, $filter);
         } elseif (!empty($filter)) {
-            $qb->andWhere($qb->expr()->eq('tblG.groupId', ':groupId'));
+            $qb->andWhere($qb->expr()->eq('tblG.id', ':groupId'));
             $qb->setParameter('groupId', intval($filter));
         }
 
@@ -152,7 +152,7 @@ class UserGroup
             }
         }
 
-        $arrSelectExpressions['groupId'] = 'group_id';
+        $arrSelectExpressions['id'] = 'group_id';
         foreach ($arrSelectExpressions as $fieldName=>$attribute) {
             $qb->addSelect('tblG.'.$fieldName.' AS '.$attribute);
         }
@@ -195,7 +195,7 @@ class UserGroup
                     break;
 
                 case 'is_active':
-                    $qb->andWhere($qb->expr()->eq('tblG.isActive', ':isActive'));
+                    $qb->andWhere($qb->expr()->eq('tblG.active', ':isActive'));
                     $qb->setParameter('isActive', intval($condition));
                     break;
 
@@ -216,7 +216,7 @@ class UserGroup
                             $result->MoveNext();
                         }
                     }
-                    $qb->andWhere($qb->expr()->in('tblG.groupId', ':groupIds'));
+                    $qb->andWhere($qb->expr()->in('tblG.id', ':groupIds'));
                     $qb->setParameter('groupIds', $groupIds);
                     break;
             }
@@ -277,8 +277,8 @@ class UserGroup
         $groupRepo = $em->getRepository('Cx\Core\User\Model\Entity\Group');
         $qb = $groupRepo->createQueryBuilder('g');
         $qb->select('u.id AS userId')
-           ->join('g.user', 'u')
-           ->where($qb->expr()->eq('g.groupId', ':groupId'))
+           ->join('g.users', 'u')
+           ->where($qb->expr()->eq('g.id', ':groupId'))
            ->orderBy('u.username')
            ->setParameter('groupId', $this->id);
 
@@ -347,16 +347,16 @@ class UserGroup
         $em = $cx->getDb()->getEntityManager();
         $groupRepo = $em->getRepository('Cx\Core\User\Model\Entity\Group');
         $userRepo = $em->getRepository('Cx\Core\User\Model\Entity\User');
-        $group = $groupRepo->findOneBy(array('groupId' => $this->id));
+        $group = $groupRepo->findOneBy(array('id' => $this->id));
 
         if (empty($group)) {
             $group = new \Cx\Core\User\Model\Entity\Group();
             $group->setType($this->type);
         }
 
-        $group->setGroupName(addslashes($this->name));
-        $group->setGroupDescription(addslashes($this->description));
-        $group->setIsActive(intval($this->is_active));
+        $group->setName(addslashes($this->name));
+        $group->setDescription(addslashes($this->description));
+        $group->setActive(intval($this->is_active));
         $group->setHomepage(addslashes($this->homepage));
         $group->setToolbar(intval($this->toolbar));
 
@@ -382,7 +382,7 @@ class UserGroup
         try {
             $em->persist($group);
             $em->flush();
-            $this->id = $group->getGroupId();
+            $this->id = $group->getId();
         } catch (\Doctrine\ORM\OptimisticLockException $e) {
             $this->error_msg = $_CORELANG['TXT_ACCESS_FAILED_TO_UPDATE_GROUP'];
             return false;
@@ -575,7 +575,7 @@ class UserGroup
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $groupRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\Group');
         $qb = $groupRepo->createQueryBuilder('tblG');
-        $qb->select('COUNT(tblG.groupId) as group_count');
+        $qb->select('COUNT(tblG.id) as group_count');
 
         if (is_array($arrFilter)) {
             $this->parseFilterConditions($qb,$arrFilter);
@@ -597,8 +597,8 @@ class UserGroup
         $qb->select('COUNT(u.id) as user_count');
 
         if ($this->id) {
-            $qb->innerJoin('u.group', 'g')
-               ->where($qb->expr()->eq('g.groupId', ':groupId'))
+            $qb->innerJoin('u.groups', 'g')
+               ->where($qb->expr()->eq('g.id', ':groupId'))
                ->setParameter('groupId', $this->id);
         }
 
@@ -702,7 +702,7 @@ class UserGroup
 
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $groupRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\Group');
-        $group = $groupRepo->findOneBy(array('groupName' => addslashes($this->name)));
+        $group = $groupRepo->findOneBy(array('name' => addslashes($this->name)));
 
         if (empty($group) || $group->getGroupId() == $this->id) {
             return true;
@@ -739,7 +739,7 @@ class UserGroup
 
         $arrGroupName = array();
         foreach ($groups as $group) {
-            $arrGroupName[$group->getGroupId()] = $group->getGroupName();
+            $arrGroupName[$group->getId()] = $group->getName();
         }
 
         return $arrGroupName;

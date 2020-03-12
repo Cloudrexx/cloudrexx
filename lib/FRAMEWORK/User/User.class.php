@@ -727,7 +727,7 @@ class User extends User_Profile
 
                 try {
                     // Remove all user attribute values
-                    foreach ($user->getUserAttributeValue() as $value) {
+                    foreach ($user->getUserAttributeValues() as $value) {
                         $em->remove($value);
                     }
                     $em->remove($user);
@@ -1146,11 +1146,11 @@ class User extends User_Profile
             $this->arrLoadedUsers[$id][$column] = $value;
         }
 
-        foreach ($user->getUserAttributeValue() as $attributeValue) {
+        foreach ($user->getUserAttributeValues() as $attributeValue) {
             $value = $attributeValue->getValue();
             $attributeId = $attributeValue->getAttributeId();
-            $convertedAttributeId = $this->objAttribute->getProfileAttributeIdByAttributeId($attributeId);
-            if ($this->objAttribute->isCoreAttribute($convertedAttributeId)) {
+            $convertedAttributeId = $this->objAttribute->getDefaultAttributeIdByAttributeId($attributeId);
+            if ($this->objAttribute->isDefaultAttribute($convertedAttributeId)) {
                 // default attributes like 'title' or 'firstname'
                 $this->arrCachedUsers[$id]['profile'][$convertedAttributeId][0] = $value;
                 $this->arrLoadedUsers[$id]['profile'][$convertedAttributeId][0] = $value;
@@ -1796,8 +1796,8 @@ class User extends User_Profile
         $qb = $em->createQueryBuilder();
         $qb->select('u')
             ->from('Cx\Core\User\Model\Entity\User', 'u')
-            ->leftJoin('u.group', 'g')
-            ->leftJoin('u.userAttributeValue', 'v')
+            ->leftJoin('u.groups', 'g')
+            ->leftJoin('u.userAttributeValues', 'v')
             ->where($qb->expr()->eq('u.active', ':active'))
             ->andWhere($qb->expr()->not($qb->expr()->eq('u.restoreKey', ':restoreKey')))
             ->andWhere($qb->expr()->lt('u.restoreKeyTime', ':restoreKeyTime'))
@@ -1947,9 +1947,9 @@ class User extends User_Profile
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $userRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\User');
         $qb = $userRepo->createQueryBuilder('u');
-        $qb->innerJoin('u.group', 'g')
+        $qb->innerJoin('u.groups', 'g')
             ->where($qb->expr()->eq('u.id', ':id'))
-            ->andWhere($qb->expr()->eq('g.isActive', ':active'))
+            ->andWhere($qb->expr()->eq('g.active', ':active'))
             ->setParameters(array('id' => $this->id, 'active' => 1));
         $user = $qb->getQuery()->getOneOrNullResult();
 
@@ -1990,9 +1990,9 @@ class User extends User_Profile
             'Cx\Core\User\Model\Entity\Group'
         )->createQueryBuilder('g');
 
-        $qb->innerJoin('g.user', 'u')
+        $qb->innerJoin('g.users', 'u')
             ->where($qb->expr()->eq('u.id', ':userId'))
-            ->andWhere($qb->expr()->eq('g.isActive', ':isActive'))
+            ->andWhere($qb->expr()->eq('g.active', ':isActive'))
             ->andWhere(
                 $qb->expr()->orX(
                     $qb->expr()->eq('g.type', ':type'),

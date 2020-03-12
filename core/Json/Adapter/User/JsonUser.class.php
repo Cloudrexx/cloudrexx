@@ -235,9 +235,9 @@ class JsonUser implements JsonAdapter {
     {
         $objAttr = \FWUser::getFWUserObject()->objUser->objAttribute;
         $expression = $qb->expr()->andX();
-        if ($objAttr->isCoreAttribute($field)) {
-            $qb->join('u.userAttributeValue', 'v'.$alias);
-            $attrId = $objAttr->getAttributeIdByProfileAttributeId($field);
+        if ($objAttr->isDefaultAttribute($field)) {
+            $qb->join('u.userAttributeValues', 'v'.$alias);
+            $attrId = $objAttr->getAttributeIdByDefaultAttributeId($field);
             $expression->add($qb->expr()->eq('v'.$alias.'.attributeId', ':attribute'.$alias));
             $qb->setParameter('attribute'.$alias, $attrId);
 

@@ -2701,15 +2701,15 @@ class NewsletterManager extends NewsletterLib
      * Adding recipients to the recipient list by executing a specific query
      *
      * @param array   &$mailRecipients  all already existing mail recipients
-     * @param string  $type             part type
+     * @param string  $type             which type of participant (newsletter, access, core or crm)
      * @param boolean $distinctByType   if we should simulate a distinct
      * @param string  $query            query to get mail recipients
-     * @param string  $queryToCheckUser query to check if the first query get the correct users
+     * @param string  $queryToCheckUser query to check if the first query got the correct users
      * @throws \Exception a database execution fails
      */
     protected function addMailRecipientPart(&$mailRecipients, $type, $distinctByType, $query, $queryToCheckUser = '')
     {
-        global $objDatabase, $_ARRAYLANG;
+        global $objDatabase;
 
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $userRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\User');
@@ -2734,7 +2734,7 @@ class NewsletterManager extends NewsletterLib
                 $objResult->MoveNext();
             }
         } else {
-            throw new \Exception($_ARRAYLANG['TXT_DATABASE_ERROR']);
+            throw new \Exception('Database error. System halted!');
         }
 
         // In some cases, data must be taken directly from the user.  
@@ -5893,7 +5893,7 @@ $WhereStatement = array();
                     $fieldName = $arrWrapperDefinitions[$field]['def'];
                 }
 
-                if ($attr->isCoreAttribute($fieldName) && $recipientType == 'access') {
+                if ($attr->isDefaultAttribute($fieldName) && $recipientType == 'access') {
                     $wrapper = 'core';
                 }
 
@@ -6037,7 +6037,7 @@ $WhereStatement = array();
                 // We have to create a new array, because the array structure is
                 // different
                 foreach ($arrRecipientFields['list'] as $field) {
-                    if (!$attr->isCoreAttribute($field)) {
+                    if (!$attr->isDefaultAttribute($field)) {
                         continue;
                     }
 
@@ -6045,7 +6045,7 @@ $WhereStatement = array();
                     if (isset($arrFieldsWrapperDefinition['access'][$field])) {
                         $accessField = $arrFieldsWrapperDefinition['access'][$field]['def'];
                     }
-                    $attributeId = $attr->getAttributeIdByProfileAttributeId(
+                    $attributeId = $attr->getAttributeIdByDefaultAttributeId(
                         $accessField
                     );
                     $value = $objUser->getAttributeValue($attributeId)->getValue();

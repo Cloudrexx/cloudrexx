@@ -1236,7 +1236,7 @@ class Newsletter extends NewsletterLib
         } elseif (!empty($user = $userRepo->findOneBy(array('email' => contrexx_raw2db($email), 'active' => 1)))) {
             $attr = \FWUser::getFWUserObject()->objUser->objAttribute;
             $sexAttributeValue = $user->getAttributeValue(
-                $attr->getAttributeIdByProfileAttributeId('gender')
+                $attr->getAttributeIdByDefaultAttributeId('gender')
             )->getValue();
 
             $sex = '';;
@@ -1246,7 +1246,7 @@ class Newsletter extends NewsletterLib
                 $sex = $_CORELANG['TXT_ACCESS_MALE'];
             }
             $salutationValue = $user->getAttributeValue(
-                $attr->getAttributeIdByProfileAttributeId('title')
+                $attr->getAttributeIdByDefaultAttributeId('title')
             );
             $crit = \Doctrine\Common\Collections\Criteria::create()->where(
                 \Doctrine\Common\Collections\Criteria::expr()->eq('id',
@@ -1257,71 +1257,71 @@ class Newsletter extends NewsletterLib
                 ->matching($crit)->first()->getName();
             $firstname      = contrexx_raw2xhtml(
                 $user->getAttributeValue(
-                    $attr->getAttributeIdByProfileAttributeId('firstname')
+                    $attr->getAttributeIdByDefaultAttributeId('firstname')
                 )->getValue()
             );
             $lastname       = contrexx_raw2xhtml(
                 $user->getAttributeValue(
-                    $attr->getAttributeIdByProfileAttributeId('lastname')
+                    $attr->getAttributeIdByDefaultAttributeId('lastname')
                 )->getValue()
             );
             $company        = contrexx_raw2xhtml(
                 $user->getAttributeValue(
-                    $attr->getAttributeIdByProfileAttributeId('company')
+                    $attr->getAttributeIdByDefaultAttributeId('company')
                 )->getValue()
             );
             $address        = contrexx_raw2xhtml(
                 $user->getAttributeValue(
-                    $attr->getAttributeIdByProfileAttributeId('address')
+                    $attr->getAttributeIdByDefaultAttributeId('address')
                 )->getValue()
             );
             $city           = contrexx_raw2xhtml(
                 $user->getAttributeValue(
-                    $attr->getAttributeIdByProfileAttributeId('city')
+                    $attr->getAttributeIdByDefaultAttributeId('city')
                 )->getValue()
             );
             $zip            = contrexx_raw2xhtml(
                 $user->getAttributeValue(
-                    $attr->getAttributeIdByProfileAttributeId('zip')
+                    $attr->getAttributeIdByDefaultAttributeId('zip')
                 )->getValue()
             );
 // TODO: migrate to Country class
             $country        = contrexx_raw2xhtml(
                 \Cx\Core\Country\Controller\Country::getById(
                     $user->getAttributeValue(
-                        $attr->getAttributeIdByProfileAttributeId('country')
+                        $attr->getAttributeIdByDefaultAttributeId('country')
                     )->getValue()
                 )['name']
             );
             $phoneOffice    = contrexx_raw2xhtml(
                 $user->getAttributeValue(
-                    $attr->getAttributeIdByProfileAttributeId('phone_office')
+                    $attr->getAttributeIdByDefaultAttributeId('phone_office')
                 )->getValue()
             );
             $phoneMobile    = contrexx_raw2xhtml(
                 $user->getAttributeValue(
-                    $attr->getAttributeIdByProfileAttributeId('phone_mobile')
+                    $attr->getAttributeIdByDefaultAttributeId('phone_mobile')
                 )->getValue()
             );
             $phonePrivate   = contrexx_raw2xhtml(
                 $user->getAttributeValue(
-                    $attr->getAttributeIdByProfileAttributeId('phone_private')
+                    $attr->getAttributeIdByDefaultAttributeId('phone_private')
                 )->getValue()
             );
             $fax            = contrexx_raw2xhtml(
                 $user->getAttributeValue(
-                    $attr->getAttributeIdByProfileAttributeId('phone_fax')
+                    $attr->getAttributeIdByDefaultAttributeId('phone_fax')
                 )->getValue()
             );
             $website        = contrexx_raw2xhtml(
                 $user->getAttributeValue(
-                    $attr->getAttributeIdByProfileAttributeId('website')
+                    $attr->getAttributeIdByDefaultAttributeId('website')
                 )->getValue()
             );
             $birthday       = date(
                 ASCMS_DATE_FORMAT_DATE,
                 $user->getAttributeValue(
-                    $attr->getAttributeIdByProfileAttributeId('birthday')
+                    $attr->getAttributeIdByDefaultAttributeId('birthday')
                 )->getValue()
             );
         } elseif ($crmUser->load($crmId)) {

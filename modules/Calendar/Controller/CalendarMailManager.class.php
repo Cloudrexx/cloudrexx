@@ -399,13 +399,13 @@ class CalendarMailManager extends CalendarLibrary {
                     $recipient->setType(MailRecipient::RECIPIENT_TYPE_ACCESS_USER);
                     $recipient->setId($user->getId());
                     $recipient->setSalutationId($user->getAttributeValue(
-                        $objAttribute->getAttributeIdByProfileAttributeId('title')
+                        $objAttribute->getAttributeIdByDefaultAttributeId('title')
                     )->getValue());
                     $recipient->setFirstname($user->getAttributeValue(
-                        $objAttribute->getAttributeIdByProfileAttributeId('firstname')
+                        $objAttribute->getAttributeIdByDefaultAttributeId('firstname')
                     )->getValue());
                     $recipient->setLastname($user->getAttributeValue(
-                        $objAttribute->getAttributeIdByProfileAttributeId('lastname')
+                        $objAttribute->getAttributeIdByDefaultAttributeId('lastname')
                     )->getValue());
                     $recipient->setUsername($user->getUsername());
                 } else {
@@ -807,20 +807,20 @@ class CalendarMailManager extends CalendarLibrary {
                             ->setId($user->getId())
                             ->setSalutationId(
                                 $user->getAttributeValue(
-                                    $objAttr->getAttributeIdByProfileAttributeId(
+                                    $objAttr->getAttributeIdByDefaultAttributeId(
                                         'title'
                                     )
                                 )->getValue()
                             )->setFirstname(
                                 $user->getAttributeValue(
-                                    $objAttr->getAttributeIdByProfileAttributeId(
+                                    $objAttr->getAttributeIdByDefaultAttributeId(
                                         'firstname'
                                     )
                                 )->getValue()
                             )
                             ->setLastname(
                                 $user->getAttributeValue(
-                                    $objAttr->getAttributeIdByProfileAttributeId(
+                                    $objAttr->getAttributeIdByDefaultAttributeId(
                                         'lastname'
                                     )
                                 )->getValue()

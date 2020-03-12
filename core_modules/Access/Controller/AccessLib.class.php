@@ -286,7 +286,7 @@ class AccessLib
 
         if ($objUser instanceof \Cx\Core\User\Model\Entity\User) {
             $fwUser = \FWUser::getFWUserObject()->objUser;
-            $convertedAttributeId = $fwUser->objAttribute->getProfileAttributeIdByAttributeId($attributeId);
+            $convertedAttributeId = $fwUser->objAttribute->getDefaultAttributeIdByAttributeId($attributeId);
             if ($convertedAttributeId) {
                 $attributeId = $convertedAttributeId;
             }
@@ -435,7 +435,7 @@ class AccessLib
             $arrPlaceholders['_VALUE'] = $objAttribute->getMenuOptionValue();
             $arrPlaceholders['_SELECTED'] = $objAttribute->getMenuOptionValue() == $objUser->getProfileAttribute($objAttribute->getParent(), $historyId) ? 'selected="selected"' : '';
 
-            if ($objAttribute->isCoreAttribute() && $objAttribute->isUnknownOption()) {
+            if ($objAttribute->isDefaultAttribute() && $objAttribute->isUnknownOption()) {
                 $objParentAttribute = $objAttribute->getById($objAttribute->getParent());
                 if ($objParentAttribute->isMandatory()) {
                     $arrPlaceholders['_DESC'] = $_CORELANG['TXT_ACCESS_PLEASE_SELECT'];
@@ -1148,7 +1148,7 @@ class AccessLib
                     $childrenCode[] = $this->_getAtrributeCode($objUser, $childAttributeId, $historyId, $edit);
                 }
                 $value = join($childrenCode);
-            } elseif ($objAttribute->isCoreAttribute()) {
+            } elseif ($objAttribute->isDefaultAttribute()) {
                 foreach ($objAttribute->getChildren() as $childAttributeId) {
                     $objChildAtrribute = $objAttribute->getById($childAttributeId);
                     if ($objChildAtrribute->getMenuOptionValue() == $objUser->getProfileAttribute($objAttribute->getId(), $historyId)) {
@@ -1172,7 +1172,7 @@ class AccessLib
         case 'menu_option':
             $mandatory = false;
             $selectOption = false;
-            if ($objAttribute->isCoreAttribute() && $objAttribute->isUnknownOption()) {
+            if ($objAttribute->isDefaultAttribute() && $objAttribute->isUnknownOption()) {
                 $selectOption = true;
                 $objParentAttribute = $objAttribute->getById($objAttribute->getParent());
                 if ($objParentAttribute->isMandatory()) {
@@ -2410,7 +2410,7 @@ JS
 
         // set profile attributes
         $arrProfileFields = array_merge(
-            $objFWUser->objUser->objAttribute->getCoreAttributeIds(),
+            $objFWUser->objUser->objAttribute->getDefaultAttributeIds(),
             $customAttributeIds
         );
 
@@ -2433,11 +2433,11 @@ JS
         $qb = $cx->getDb()->getEntityManager()->createQueryBuilder();
         $qb->select('u')
             ->from('Cx\Core\User\Model\Entity\User', 'u')
-            ->join('u.group', 'g');
+            ->join('u.groups', 'g');
 
         $filter = array();
         if (!empty($groupId)) {
-            $qb->where($qb->expr()->eq('g.groupId', $groupId));
+            $qb->where($qb->expr()->eq('g.id', $groupId));
         }
         if (!empty($langId)) {
             $qb->andWhere($qb->expr()->in('u.frontendLangId', ':lang'));
@@ -2517,8 +2517,8 @@ JS
             // profile attributes
             foreach ($arrProfileFields as $field) {
                 $attributeId = $field;
-                if ($objFWUser->objUser->objAttribute->isCoreAttribute($field)) {
-                    $attributeId = $objFWUser->objUser->objAttribute->getAttributeIdByProfileAttributeId($field);
+                if ($objFWUser->objUser->objAttribute->isDefaultAttribute($field)) {
+                    $attributeId = $objFWUser->objUser->objAttribute->getAttributeIdByDefaultAttributeId($field);
                 }
                 $value = $user->getAttributeValue($attributeId)->getValue();
 

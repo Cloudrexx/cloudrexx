@@ -73,10 +73,10 @@ class User extends \Cx\Core\User\Model\Entity\User implements \Doctrine\ORM\Prox
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'id', 'isAdmin', 'username', 'password', 'authToken', 'authTokenTimeout', 'regdate', 'expiration', 'validity', 'lastAuth', 'lastAuthStatus', 'lastActivity', 'email', 'emailAccess', 'frontendLangId', 'backendLangId', 'active', 'verified', 'primaryGroup', 'profileAccess', 'restoreKey', 'restoreKeyTime', 'u2uActive', 'group', 'userAttributeValue', 'validators', 'virtual');
+            return array('__isInitialized__', 'id', 'isAdmin', 'username', 'password', 'authToken', 'authTokenTimeout', 'regdate', 'expiration', 'validity', 'lastAuth', 'lastAuthStatus', 'lastActivity', 'email', 'emailAccess', 'frontendLangId', 'backendLangId', 'active', 'verified', 'primaryGroup', 'profileAccess', 'restoreKey', 'restoreKeyTime', 'u2uActive', 'groups', 'userAttributeValues', 'validators', 'virtual');
         }
 
-        return array('__isInitialized__', 'id', 'isAdmin', 'username', 'password', 'authToken', 'authTokenTimeout', 'regdate', 'expiration', 'validity', 'lastAuth', 'lastAuthStatus', 'lastActivity', 'email', 'emailAccess', 'frontendLangId', 'backendLangId', 'active', 'verified', 'primaryGroup', 'profileAccess', 'restoreKey', 'restoreKeyTime', 'u2uActive', 'group', 'userAttributeValue', 'validators', 'virtual');
+        return array('__isInitialized__', 'id', 'isAdmin', 'username', 'password', 'authToken', 'authTokenTimeout', 'regdate', 'expiration', 'validity', 'lastAuth', 'lastAuthStatus', 'lastActivity', 'email', 'emailAccess', 'frontendLangId', 'backendLangId', 'active', 'verified', 'primaryGroup', 'profileAccess', 'restoreKey', 'restoreKeyTime', 'u2uActive', 'groups', 'userAttributeValues', 'validators', 'virtual');
     }
 
     /**
@@ -563,6 +563,17 @@ class User extends \Cx\Core\User\Model\Entity\User implements \Doctrine\ORM\Prox
     /**
      * {@inheritDoc}
      */
+    public function isActive()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'isActive', array());
+
+        return parent::isActive();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function setVerified($verified)
     {
 
@@ -651,7 +662,7 @@ class User extends \Cx\Core\User\Model\Entity\User implements \Doctrine\ORM\Prox
     /**
      * {@inheritDoc}
      */
-    public function setRestoreKeyTime($restoreKeyTime)
+    public function setRestoreKeyTime($restoreKeyTime = NULL)
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setRestoreKeyTime', array($restoreKeyTime));
@@ -728,6 +739,17 @@ class User extends \Cx\Core\User\Model\Entity\User implements \Doctrine\ORM\Prox
     /**
      * {@inheritDoc}
      */
+    public function getGroups()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getGroups', array());
+
+        return parent::getGroups();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function addUserAttributeValue(\Cx\Core\User\Model\Entity\UserAttributeValue $userAttributeValue)
     {
 
@@ -761,12 +783,89 @@ class User extends \Cx\Core\User\Model\Entity\User implements \Doctrine\ORM\Prox
     /**
      * {@inheritDoc}
      */
+    public function getUserAttributeValues()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getUserAttributeValues', array());
+
+        return parent::getUserAttributeValues();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function isBackendGroupUser()
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'isBackendGroupUser', array());
 
         return parent::isBackendGroupUser();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getAttributeValue($attributeId)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getAttributeValue', array($attributeId));
+
+        return parent::getAttributeValue($attributeId);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getProfileAttribute($profileId)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getProfileAttribute', array($profileId));
+
+        return parent::getProfileAttribute($profileId);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function releaseRestoreKey()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'releaseRestoreKey', array());
+
+        return parent::releaseRestoreKey();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getAssociatedGroupIds($activeOnly = false)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getAssociatedGroupIds', array($activeOnly));
+
+        return parent::getAssociatedGroupIds($activeOnly);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getUsernameOrEmail()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getUsernameOrEmail', array());
+
+        return parent::getUsernameOrEmail();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getCrmUserId()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getCrmUserId', array());
+
+        return parent::getCrmUserId();
     }
 
     /**

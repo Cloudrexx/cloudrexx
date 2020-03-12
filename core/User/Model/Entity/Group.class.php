@@ -32,7 +32,6 @@
  * @author      Dario Graf <info@cloudrexx.com>
  * @package     cloudrexx
  * @subpackage  core_user
- * @version     5.0.0
  */
 namespace Cx\Core\User\Model\Entity;
 
@@ -43,28 +42,27 @@ namespace Cx\Core\User\Model\Entity;
  * @author      Dario Graf <info@cloudrexx.com>
  * @package     cloudrexx
  * @subpackage  core_user
- * @version     5.0.0
  */
 class Group extends \Cx\Model\Base\EntityBase {
     /**
      * @var integer
      */
-    protected $groupId;
+    protected $id;
 
     /**
      * @var string
      */
-    protected $groupName = '';
+    protected $name = '';
 
     /**
      * @var string
      */
-    protected $groupDescription = '';
+    protected $description = '';
 
     /**
-     * @var integer
+     * @var integer $active
      */
-    protected $isActive = 1;
+    protected $active = 1;
 
     /**
      * @var enum_user_group_type
@@ -84,84 +82,182 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * @var \Doctrine\Common\Collections\Collection
      */
-    protected $user;
+    protected $users;
 
     /**
      * Constructor
      */
     public function __construct()
     {
-        $this->user = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->users = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     /**
      * Get groupId
      *
      * @return integer 
+     * @deprecated
+     * @see \Cx\Core\User\Model\Entity\Group::getId()
      */
     public function getGroupId()
     {
-        return $this->groupId;
+        return $this->getId();
+    }
+
+    /**
+     * Get id
+     *
+     * @return integer group id
+     */
+    public function getId()
+    {
+        return $this->id;
     }
 
     /**
      * Set groupName
      *
      * @param string $groupName
+     * @deprecated
+     * @see \Cx\Core\User\Model\Entity\Group::setName()
      */
     public function setGroupName($groupName)
     {
-        $this->groupName = $groupName;
+        $this->setName($groupName);
+    }
+
+    /**
+     * Set name
+     *
+     * @param string $name group name
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
     }
 
     /**
      * Get groupName
      *
      * @return string 
+     * @deprecated
+     * @see \Cx\Core\User\Model\Entity\Group::getName()
      */
     public function getGroupName()
     {
-        return $this->groupName;
+        return $this->getName();
+    }
+
+    /**
+     * Get name
+     *
+     * @return string group name
+     */
+    public function getName()
+    {
+        return $this->name;
     }
 
     /**
      * Set groupDescription
      *
      * @param string $groupDescription
+     * @deprecated
+     * @see \Cx\Core\User\Model\Entity\Group::setDescription()
      */
     public function setGroupDescription($groupDescription)
     {
-        $this->groupDescription = $groupDescription;
+        $this->setDescription($groupDescription);
+    }
+
+    /**
+     * Set description
+     *
+     * @param string $description group description
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
     }
 
     /**
      * Get groupDescription
      *
      * @return string 
+     * @deprecated
+     * @see \Cx\Core\User\Model\Entity\Group::getDescription()
      */
     public function getGroupDescription()
     {
-        return $this->groupDescription;
+        return $this->getDescription();
+    }
+
+    /**
+     * Get description
+     *
+     * @return string group description
+     */
+    public function getDescription()
+    {
+        return $this->description;
     }
 
     /**
      * Set isActive
      *
      * @param integer $isActive
+     * @deprecated
+     * @see \Cx\Core\User\Model\Entity\Group::setActive()
      */
     public function setIsActive($isActive)
     {
-        $this->isActive = $isActive;
+        $this->setActive($isActive);
+    }
+
+    /**
+     * Set if group is active
+     *
+     * @param boolean $active
+     */
+    public function setActive($active)
+    {
+        $this->active = $active;
     }
 
     /**
      * Get isActive
      *
      * @return integer 
+     * @deprecated
+     * @see \Cx\Core\User\Model\Entity\Group::getActive()
      */
     public function getIsActive()
     {
-        return $this->isActive;
+        return $this->getActive();
+    }
+
+    /**
+     * If group is active
+     *
+     * This does exactly the same as isActive, but this method is necessary for doctrine mapping
+     *
+     * @return integer if group is active
+     */
+    public function getActive()
+    {
+        return $this->active;
+    }
+
+    /**
+     * If group is active.
+     *
+     * This does exactly the same as getActive, but this method name is more intuitive
+     *
+     * @return integer if group is active
+     */
+    public function isActive()
+    {
+        return $this->getActive();
     }
 
     /**
@@ -231,7 +327,7 @@ class Group extends \Cx\Model\Base\EntityBase {
      */
     public function addUser(\Cx\Core\User\Model\Entity\User $user)
     {
-        $this->user[] = $user;
+        $this->users[] = $user;
     }
 
     /**
@@ -241,7 +337,19 @@ class Group extends \Cx\Model\Base\EntityBase {
      */
     public function removeUser(\Cx\Core\User\Model\Entity\User $user)
     {
-        $this->user->removeElement($user);
+        $this->users->removeElement($user);
+    }
+
+    /**
+     * Get user
+     *
+     * @return \Doctrine\Common\Collections\Collection $user
+     * @deprecated
+     * @see \Cx\Core\User\Model\Entity\Group::getUsers()
+     */
+    public function getUser()
+    {
+        return $this->getUsers();
     }
 
     /**
@@ -249,13 +357,13 @@ class Group extends \Cx\Model\Base\EntityBase {
      *
      * @return \Doctrine\Common\Collections\Collection 
      */
-    public function getUser()
+    public function getUsers()
     {
-        return $this->user;
+        return $this->users;
     }
 
     public function __toString()
     {
-        return $this->getGroupName(); // TODO: Change the autogenerated stub
+        return $this->getName(); // TODO: Change the autogenerated stub
     }
 }

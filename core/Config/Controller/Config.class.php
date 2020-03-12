@@ -1037,7 +1037,7 @@ class Config
         $options   = array();
         if (!empty($groups)) {
             foreach ($groups as $group) {
-                $options[] = $group->getGroupId() . ':' . $group->getGroupName();
+                $options[] = $group->getId() . ':' . $group->getName();
             }
         }
 

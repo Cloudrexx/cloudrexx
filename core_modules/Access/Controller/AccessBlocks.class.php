@@ -148,13 +148,13 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
 
         if (!empty($gender)) {
             $qb->join(
-                'u.userAttributeValue', 'vGen'
+                'u.userAttributeValues', 'vGen'
             )->andWhere(
                 $qb->expr()->eq('vGen.attributeId', ':vGenId')
             )->andWhere(
                 $qb->expr()->eq('vGen.value', ':vGenValue')
             )->setParameter(
-                'vGenId', $attr->getAttributeIdByProfileAttributeId('gender')
+                'vGenId', $attr->getAttributeIdByDefaultAttributeId('gender')
             )->setParameter(
                 'vGenValue', 'gender_'.$gender
             );
@@ -168,7 +168,7 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
 
         if ($onlyWithPic) {
             $qb->join(
-                'u.userAttributeValue', 'vPic'
+                'u.userAttributeValues', 'vPic'
             )->andWhere(
                 $qb->expr()->eq('vPic.attributeId', ':vPicId')
             )->andWhere(
@@ -176,7 +176,7 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
                     $qb->expr()->eq('vPic.value', ':vPicValue')
                 )
             )->setParameter(
-                'vPicId', $attr->getAttributeIdByProfileAttributeId('picture')
+                'vPicId', $attr->getAttributeIdByDefaultAttributeId('picture')
             )->setParameter(
                 'vPicValue', ''
             );
@@ -188,7 +188,7 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
         // filter users by group association
         if ($groupIds) {
             $qb->andWhere(
-                $qb->expr()->in('u.groupId', ':groupIds')
+                $qb->expr()->in('u.id', ':groupIds')
             )->setParameter('groupIds', $groupIds);
         }
     }
@@ -204,9 +204,9 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
     {
         $objFWUser = \FWUser::getFWUserObject();
         $objAttr = $objFWUser->objUser->objAttribute;
-        $birthId = $objAttr->getAttributeIdByProfileAttributeId('birthday');
+        $birthId = $objAttr->getAttributeIdByDefaultAttributeId('birthday');
 
-        $qb->join('u.userAttributeValue', 'vBirth')
+        $qb->join('u.userAttributeValues', 'vBirth')
             ->andWhere($qb->expr()->eq('vBirth.attributeId', ':vBirthId'))
             ->andWhere(
                 $qb->expr()->in(
@@ -342,8 +342,8 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
 
         $objAttr = \FWUser::getFWUserObject()->objUser->objAttribute;
 
-        foreach ($objUser->getUserAttributeValue() as $value) {
-            $attrId = $objAttr->getProfileAttributeIdByAttributeId($value->getUserAttribute()->getId());
+        foreach ($objUser->getUserAttributeValues() as $value) {
+            $attrId = $objAttr->getDefaultAttributeIdByAttributeId($value->getUserAttribute()->getId());
             $objAttr->load($attrId);
             if ($value->getUserAttribute()->checkReadPermission()) {
                 $this->parseAttribute(

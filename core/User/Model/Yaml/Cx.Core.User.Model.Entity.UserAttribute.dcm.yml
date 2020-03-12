@@ -44,7 +44,7 @@ Cx\Core\User\Model\Entity\UserAttribute:
     readAccessId:
       type: integer
       column: read_access_id
-    isDefault:
+    default:
       type: boolean
       column: is_default
       options:
@@ -53,11 +53,11 @@ Cx\Core\User\Model\Entity\UserAttribute:
     children:
       targetEntity: Cx\Core\User\Model\Entity\UserAttribute
       mappedBy: parent
-    userAttributeName:
+    userAttributeNames:
       targetEntity: Cx\Core\User\Model\Entity\UserAttributeName
       orderBy: { 'order': 'ASC' }
       mappedBy: userAttribute
-    userAttributeValue:
+    userAttributeValues:
       targetEntity: Cx\Core\User\Model\Entity\UserAttributeValue
       mappedBy: userAttribute
   manyToOne:
