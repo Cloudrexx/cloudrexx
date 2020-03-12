@@ -2104,16 +2104,22 @@ class User extends User_Profile
             'clearEsiCache',
             array(
                 'Widget',
-                 $cx->getComponent('Access')->getSessionBasedWidgetNames(),
+                $cx->getComponent('Access')->getSessionBasedWidgetNames(),
             )
         );
 
-        return $objDatabase->Execute("
-            UPDATE `".DBPREFIX."access_users`
-               SET `last_auth_status`=1
-             WHERE `id`=$this->id");
-    }
+        $em = $cx->getDb()->getEntityManager();
+        $user = $em->getRepository('Cx\Core\User\Model\Entity\User')->find($this->id);
+        $user->setLastAuthStatus(1);
+        $em->persist($user);
 
+        try {
+            $em->flush();
+            return true;
+        } catch (\Doctrine\ORM\OptimisticLockException $e) {
+            return false;
+        }
+    }
 
     /**
      * Register a failed login.
@@ -2127,19 +2133,27 @@ class User extends User_Profile
      */
     public static function registerFailedLogin($username)
     {
-        global $objDatabase;
-
         $column = 'email';
         $arrUserSettings = \User_Setting::getSettings();
         if ($arrUserSettings['use_usernames']['status']) {
             $column = 'username';
         }
 
-        return $objDatabase->Execute('
-            UPDATE `' . DBPREFIX . 'access_users`
-               SET `last_auth_status` = 0
-             WHERE `' . $column . '` = "' . contrexx_raw2db($username) . '"
-        ');
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $userRepo = $em->getRepository('Cx\Core\User\Model\Entity\User');
+        $users = $userRepo->findBy(array($column => contrexx_raw2db($username)));
+
+        try {
+            foreach ($users as $user) {
+                $user->setLastAuthStatus(0);
+                $em->persist($user);
+            }
+            $em->flush();
+            return true;
+        } catch (\Doctrine\ORM\OptimisticLockException $e) {
+            return false;
+        }
     }
 
 
