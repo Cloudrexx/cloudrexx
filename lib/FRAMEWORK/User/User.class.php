@@ -2049,22 +2049,32 @@ class User extends User_Profile
 
     private function updateLastAuthTime()
     {
-        global $objDatabase;
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $userRepo = $em->getRepository('Cx\Core\User\Model\Entity\User');
+        $user = $userRepo->find($this->id);
+
+        if (empty($user)) {
+            return;
+        }
 
         // destroy expired auth token
-        $objDatabase->Execute('
-            UPDATE `'.DBPREFIX.'access_users`
-               SET `auth_token` = \'\', `auth_token_timeout` = 0
-            WHERE `id` = '.$this->id.'
-              AND `auth_token_timeout` < '.time());
+        if ($user->getAuthTokenTimeout() < time()) {
+            $user->setAuthToken('');
+            $user->setAuthTokenTimeout(0);
+        }
 
         // update authentication time
-        return $objDatabase->Execute("
-            UPDATE `".DBPREFIX."access_users`
-               SET `last_auth`='".time()."'
-             WHERE `id`=$this->id");
-    }
+        $user->setLastAuth(time());
 
+        try {
+            $em->persist($user);
+            $em->flush();
+            return true;
+        } catch (\Doctrine\ORM\OptimisticLockException $e) {
+            return false;
+        }
+    }
 
     /**
      * Register a successful login.
