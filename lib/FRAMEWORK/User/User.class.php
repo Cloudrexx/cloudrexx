@@ -480,33 +480,57 @@ class User extends User_Profile
     }
 
     public function checkAuthToken($userId, $authToken) {
-        global $objDatabase;
-
         if (empty($authToken) || empty($userId)) {
             return false;
         }
 
-// TODO: add verificationTimeout as configuration option
+        // TODO: add verificationTimeout as configuration option
         $verificationExpired = time() - 30 * 86400;
-        $objResult = $objDatabase->SelectLimit('
-            SELECT `id`
-              FROM `' . DBPREFIX . 'access_users`
-             WHERE `auth_token` = \''.contrexx_raw2db($authToken).'\'
-               AND `auth_token_timeout` >= '.time().'
-               AND `active` = 1
-               AND (`verified` = 1 OR `regdate` >= '.$verificationExpired.')
-               AND `id` = '.intval($userId).'
-               AND (`expiration` = 0 OR `expiration` > ' . time() . ')
-        ', 1);
 
-        if (!$objResult || $objResult->RecordCount() != 1) {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $userRepo = $em->getRepository('Cx\Core\User\Model\Entity\User');
+        $qb = $userRepo->createQueryBuilder('u');
+        $qb->where($qb->expr()->eq('u.authToken', ':authToken'))
+            ->andWhere($qb->expr()->gte('u.authTokenTimeout', ':authTokenTimeout'))
+            ->andWhere($qb->expr()->eq('u.active', ':active'))
+            ->andWhere($qb->expr()->eq('u.id', ':id'))
+            ->andWhere(
+                $qb->expr()->orX(
+                     $qb->expr()->eq('u.verified', ':verified'),
+                    $qb->expr()->gte('u.regdate', ':regdate')
+                )
+            )->andWhere(
+                $qb->expr()->orX(
+                    $qb->expr()->eq('u.expiration', ':expirationNull'),
+                    $qb->expr()->gt('u.expiration', ':expiration')
+                )
+            )->setParameters(
+                array(
+                    'authToken' => contrexx_raw2db($authToken),
+                    'authTokenTimeout' => time(),
+                    'active' => 1,
+                    'id' => intval($userId),
+                    'verified' => 1,
+                    'regdate' => $verificationExpired,
+                    'expirationNull' => 0,
+                    'expiration' => time()
+                )
+            )->setMaxResults(1);
+
+        $user = $qb->getQuery()->getOneOrNullResult();
+
+        if (empty($user)) {
             return false;
         }
 
         // destroy auth-token
-        $objDatabase->Execute('UPDATE `'.DBPREFIX.'access_users` SET `auth_token` = \'\', `auth_token_timeout` = 0');
+        $user->setAuthToken('');
+        $user->setAuthTokenTimeout(0);
+        $em->persist($user);
+        $em->flush();
 
-        return $objResult->fields['id'];
+        return $user->getId();
     }
 
     /**
