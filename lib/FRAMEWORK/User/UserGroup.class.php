@@ -114,12 +114,19 @@ class UserGroup
         $arrSortExpressions = array();
         $arrSelectExpressions = array();
 
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $classMeta = $em->getClassMetadata('Cx\Core\User\Model\Entity\Group');
+        $groupRepo = $em->getRepository('Cx\Core\User\Model\Entity\Group');
+        $qb = $groupRepo->createQueryBuilder('tblG');
+        $qb->select(null);
+
         // set filter
         if (is_array($filter)) {
-            $arrWhereExpressions = $this->parseFilterConditions($filter);
+            $this->parseFilterConditions($qb, $filter);
         } elseif (!empty($filter)) {
-            $arrWhereExpressions['conditions'][] =
-                '`tblG`.`group_id`='.intval($filter);
+            $qb->andWhere($qb->expr()->eq('tblG.groupId', ':groupId'));
+            $qb->setParameter('groupId', intval($filter));
         }
 
         // set sort order
@@ -127,6 +134,8 @@ class UserGroup
             foreach ($arrSort as $attribute => $direction) {
                 if (   in_array($attribute, $this->arrAttributes)
                     && in_array(strtolower($direction), array('asc', 'desc'))) {
+                    $attribute = $classMeta->getFieldName($attribute);
+                    $qb->addOrderBy('tblG.'.$attribute, $direction);
                     $arrSortExpressions[] = 'tblG.`'.$attribute.'` '.$direction;
                 }
             }
@@ -137,36 +146,28 @@ class UserGroup
             $arrAttributes = $this->arrAttributes;
         }
         foreach ($arrAttributes as $attribute) {
-            if (   in_array($attribute, $this->arrAttributes)
-                && !in_array($attribute, $arrSelectExpressions)) {
-                $arrSelectExpressions[] = '`tblG`.`'.$attribute.'`';
+            if (in_array($attribute, $this->arrAttributes)) {
+                $fieldName = $classMeta->getFieldName($attribute);
+                $arrSelectExpressions[$fieldName] = $attribute;
             }
         }
-        if (!in_array('`tblG`.`group_id`', $arrSelectExpressions)) {
-            $arrSelectExpressions[] = '`tblG`.`group_id`';
+
+        $arrSelectExpressions['groupId'] = 'group_id';
+        foreach ($arrSelectExpressions as $fieldName=>$attribute) {
+            $qb->addSelect('tblG.'.$fieldName.' AS '.$attribute);
         }
 
-        $query = '
-            SELECT '.implode(', ', $arrSelectExpressions).'
-              FROM `'.DBPREFIX.'access_user_groups` AS tblG'
-            .(count($arrWhereExpressions['joins'])
-                ? implode(' ', $arrWhereExpressions['joins']) : '')
-            .(count($arrWhereExpressions['conditions'])
-                ? ' WHERE '.implode(' AND ', $arrWhereExpressions['conditions'])
-                : '')
-            .(count($arrSortExpressions)
-                ? ' ORDER BY '.implode(', ', $arrSortExpressions) : '');
+        if ($limit) {
+            $qb->setMaxResults($limit);
+            $qb->setFirstResult(intval($offset));
+        }
 
-        if (empty($limit)) {
-            $objGroup = $objDatabase->Execute($query);
-        } else {
-            $objGroup = $objDatabase->SelectLimit($query, $limit, intval($offset));
-        };
+        $groups = $qb->getQuery()->getArrayResult();
 
-        if ($objGroup !== false && $objGroup->RecordCount() > 0) {
-            while (!$objGroup->EOF) {
-                $this->arrCache[$objGroup->fields['group_id']] = $this->arrLoadedGroups[$objGroup->fields['group_id']] = $objGroup->fields;
-                $objGroup->MoveNext();
+
+        if (count($groups) > 0) {
+            foreach ($groups as $group) {
+                $this->arrCache[$group['group_id']] = $this->arrLoadedGroups[$group['group_id']] = $group;
             }
             $this->first();
             return true;
@@ -177,28 +178,46 @@ class UserGroup
     }
 
 
-    private function parseFilterConditions($arrFilter)
+    private function parseFilterConditions(&$qb, $arrFilter)
     {
+        global $objDatabase;
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $metaData = $cx->getDb()->getEntityManager()->getClassMetadata('Cx\Core\User\Model\Entity\Group');
+
         $arrConditions = array('conditions' => array(), 'joins' => array());
         foreach ($arrFilter as $attribute => $condition) {
             switch ($attribute) {
                 case 'group_name':
                 case 'group_description':
-                    $arrConditions['conditions'][] = "tblG.`".$attribute."` LIKE '%".addslashes($condition)."%'";
+                    $attribute = $metaData->getFieldName($attribute);
+                    $qb->andWhere($qb->expr()->like('tblG.'.$attribute, ':'.$attribute));
+                    $qb->setParameter($attribute, '%'.addslashes($condition).'%');
                     break;
 
                 case 'is_active':
-                    $arrConditions['conditions'][] = 'tblG.`'.$attribute.'` = '.intval($condition);
+                    $qb->andWhere($qb->expr()->eq('tblG.isActive', ':isActive'));
+                    $qb->setParameter('isActive', intval($condition));
                     break;
 
                 case 'type':
-                    $arrConditions['conditions'][] = "tblG.`".$attribute."` = '".addslashes($condition)."'";
+                    $qb->andWhere($qb->expr()->eq('tblG.type', ':type'));
+                    $qb->setParameter('type', addslashes($condition));
                    break;
 
                 case 'static':
                 case 'dynamic':
-                    $arrConditions['conditions'][] = 'tbl'.$attribute.'.`access_id` = '.intval($condition);
-                    $arrConditions['joins'][] = ' INNER JOIN `'.DBPREFIX.'access_group_'.$attribute.'_ids` as tbl'.$attribute.' USING (`group_id`)';
+                    $result = $objDatabase->Execute(
+                        'SELECT `group_id` FROM `'.DBPREFIX.'access_group_'.$attribute.'_ids`'
+                    );
+                    $groupIds = array();
+                    if ($result) {
+                        while (!$result->EOF) {
+                            $groupIds[] = $result->fields['group_id'];
+                            $result->MoveNext();
+                        }
+                    }
+                    $qb->andWhere($qb->expr()->in('tblG.groupId', ':groupIds'));
+                    $qb->setParameter('groupIds', $groupIds);
                     break;
             }
         }
@@ -555,24 +574,16 @@ class UserGroup
     {
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $groupRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\Group');
-        $qb = $groupRepo->createQueryBuilder('u');
-        $qb->select('COUNT(g.groupId) as group_count');
+        $qb = $groupRepo->createQueryBuilder('tblG');
+        $qb->select('COUNT(tblG.groupId) as group_count');
 
-        global $objDatabase;
+        if (is_array($arrFilter)) {
+            $this->parseFilterConditions($qb,$arrFilter);
+        }
 
-        $arrWhereExpressions = is_array($arrFilter) ? $this->parseFilterConditions($arrFilter) : array('joins' => array(), 'conditions' => array());
-
-        $objGroupCount = $objDatabase->SelectLimit('
-            SELECT SUM(1) AS `group_count`
-            FROM `'.DBPREFIX.'access_user_groups` AS tblG'
-            .(count($arrWhereExpressions['joins']) ? implode(' ', $arrWhereExpressions['joins']) : '')
-            .(count($arrWhereExpressions['conditions']) ? ' WHERE '.implode(' AND ', $arrWhereExpressions['conditions']) : ''),
-            1
-        );
-
-        if ($objGroupCount !== false) {
-            return $objGroupCount->fields['group_count'];
-        } else {
+        try {
+            return $qb->getQuery()->getSingleScalarResult();
+        } catch (\Doctrine\ORM\Query\QueryException $e) {
             return false;
         }
     }
