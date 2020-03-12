@@ -28,7 +28,7 @@ Cx\Core\User\Model\Entity\User:
       nullable: false
       column: auth_token
       options:
-        default: '0'
+        default: ''
     authTokenTimeout:
       type: integer
       length: 14
