@@ -93,7 +93,7 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
                         true
                     )
                 ) ?
-                '<a href="index.php?cmd=User&amp;act=user" title="' .
+                '<a href="index.php?cmd=Access&amp;act=user" title="' .
                     $_ARRAYLANG['TXT_ACCESS_USERS'] . '" class="' . (
                         ($this->act == '' || $this->act == 'user') ?
                         'active' :
@@ -111,7 +111,7 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
                         true
                     )
                 ) ?
-                '<a href="index.php?cmd=User&amp;act=group" title="' .
+                '<a href="index.php?cmd=Access&amp;act=group" title="' .
                     $_ARRAYLANG['TXT_ACCESS_GROUPS'] . '" class="' .
                     (
                         $this->act == 'group' ?
@@ -122,7 +122,7 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
             ) .
             (
                 \Permission::checkAccess(18, 'static', true) ?
-                '<a href="index.php?cmd=User&amp;act=config" title="' .
+                '<a href="index.php?cmd=Access&amp;act=config" title="' .
                     $_ARRAYLANG['TXT_ACCESS_SETTINGS'] . '" class="' .
                     (
                         $this->act == 'config' ?
