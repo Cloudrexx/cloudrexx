@@ -412,8 +412,6 @@ class User extends User_Profile
      */
     public function checkLoginData($username, $password, $captchaCheckResult = false)
     {
-        global $objDatabase;
-
         // If the last login has failed and the captcha is wrong the login must be invalid.
         if ($_SESSION['auth']['loginLastAuthFailed'] && !$captchaCheckResult) {
             return false;
@@ -426,39 +424,59 @@ class User extends User_Profile
             $loginByEmail = true;
         }
 
-        if ($loginByEmail) {
-            $loginCheck = '`email` = "' . contrexx_raw2db($username) . '"';
-        } else {
-            $loginCheck = '`username` = "' . contrexx_raw2db($username) . '"';
-        }
-
-        $loginStatusCondition = $captchaCheckResult == false ? 'AND `last_auth_status` = 1' : '';
-
 // TODO: add verificationTimeout as configuration option
         $verificationExpired = time() - 30 * 86400;
-        $objResult = $objDatabase->SelectLimit(
-            'SELECT `id`, `password`
-              FROM `' . DBPREFIX . 'access_users`
-             WHERE ' . $loginCheck . '
-               AND `active` = 1
-               AND (`verified` = 1 OR `regdate` >= '.$verificationExpired.')
-               ' . $loginStatusCondition . '
-               AND (`expiration` = 0 OR `expiration` > ' . time() . ')
-            ',
-            1
-        );
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $userRepo = $em->getRepository('Cx\Core\User\Model\Entity\User');
+        $qb = $userRepo->createQueryBuilder('u');
+        if ($loginByEmail) {
+            $column = 'u.email';
+            $loginCheck = contrexx_raw2db($username);
+        } else {
+            $column = 'u.username';
+            $loginCheck = contrexx_raw2db($username);
+        }
+
+        $qb->where($qb->expr()->eq($column, ':loginCheck'));
+
+        if ($captchaCheckResult == false) {
+            $qb->andWhere($qb->expr()->eq('u.lastAuthStatus', ':lastAuthStatus'));
+            $qb->setParameter('lastAuthStatus', 1);
+        }
+
+        $qb->andWhere($qb->expr()->eq('u.active', ':active'))
+            ->andWhere(
+                $qb->expr()->orX(
+                    $qb->expr()->eq('u.verified', ':verified'),
+                    $qb->expr()->gte('u.regdate', ':regdate')
+                )
+            )->andWhere(
+                $qb->expr()->orX(
+                    $qb->expr()->eq('u.expiration', ':expirationNull'),
+                    $qb->expr()->gt('u.expiration', ':expiration')
+                )
+            )->setParameter('loginCheck', $loginCheck)
+            ->setParameter('active', 1)
+            ->setParameter('verified', 1)
+            ->setParameter('regdate', $verificationExpired)
+            ->setParameter('expirationNull', 0)
+            ->setParameter('expiration', time())
+            ->setMaxResults(1);
+
+        $user = $qb->getQuery()->getOneOrNullResult();
 
         // verify that the user is valid and active
-        if (!$objResult || $objResult->RecordCount() != 1) {
+        if (empty($user)) {
             return false;
         }
         // verify that the supplied password is valid
-        if (!$this->checkPassword($password, $objResult->fields['password'])) {
+        if (!$this->checkPassword($password, $user->getPassword())) {
             return false;
         }
 
         // user account is valid and supplied password is also valid
-        return $objResult->fields['id'];
+        return $user->getId();
     }
 
     public function checkAuthToken($userId, $authToken) {
