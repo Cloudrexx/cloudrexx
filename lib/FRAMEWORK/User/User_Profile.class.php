@@ -256,7 +256,7 @@ class User_Profile
                     $user = $userRepo->find($this->id);
                     $attributeValue->setUserAttribute($attribute);
                     $attributeValue->setAttributeId($attributeId);
-                    $attributeValue->setUserId($this->id);var_dump($this->id);
+                    $attributeValue->setUserId($this->id);
                     $attributeValue->setUser($user);
                     $attributeValue->setHistory($historyId);
                     $attributeValue->setValue($value);

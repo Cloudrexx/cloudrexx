@@ -413,8 +413,7 @@ class Access extends \Cx\Core_Modules\Access\Controller\AccessLib
 
         $qb->setFirstResult($limitOffset);
         $qb->setMaxResults($limit);
-        \Doctrine\Common\Util\Debug::dump($qb->getQuery()->getSQL());
-        var_dump($qb->getQuery()->getParameters());
+        
         $users = $qb->getQuery()->getResult();
 
         $qb->select('count(DISTINCT u.id)');

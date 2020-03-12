@@ -440,7 +440,7 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
                         continue;
                     }
 
-                    $childAttributeIds = array_unique($childAttributeIds);var_dump($childAttributeIds);
+                    $childAttributeIds = array_unique($childAttributeIds);
 
                     $orX->add(
                         $expr->andX(
