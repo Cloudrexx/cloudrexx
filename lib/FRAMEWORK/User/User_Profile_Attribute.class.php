@@ -1622,29 +1622,12 @@ class User_Profile_Attribute
             $attributeId = $this->id;
         }
 
+        if (is_numeric($attributeId)) {
+            return !empty($this->getDefaultAttributeNames()[$attributeId]);
+        }
+
         return isset($this->arrDefaultAttributeTemplates[$attributeId]);
     }
-
-    /**
-     * In the system, the ID of a default attribute is the name of the attribute
-     * (e.g. 'title'). But if we want to interact with the database, the default
-     * attribute is handled like other user attributes. This means we have an
-     * integer ID (e.g. 2) and had to track this ID (2) with the system-intern
-     * default attribute ID ('title')
-     *
-     * This method checks if the given attribute id (e.g. 2) is assigned to a
-     * default attribute
-     *
-     * @param int $attributeId id to check if it is assigned
-     * @return bool if is assigned to an default attribute
-     */
-    public function isIdAssignedToDefaultAttribute($attributeId) {
-        if (!empty($this->getDefaultAttributeNames()[$attributeId])) {
-            return true;
-        }
-        return false;
-    }
-
 
     public function isCustomAttribute($attributeId = null)
     {
