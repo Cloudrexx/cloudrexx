@@ -52,20 +52,27 @@ class LocaleLocaleEventListener extends \Cx\Core\Event\Model\Entity\DefaultEvent
         $defaultLocaleId = \FWLanguage::getDefaultLangId();
         $localeId = $persistedLocale->getId();
 
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $attributeNameRepo = $em->getRepository('Cx\Core\User\Model\Entity\UserAttributeName');
+        $attributeNames = $attributeNameRepo->findBy(array('langId' => $defaultLocaleId));
+
         // Add user attribute names for new locale
-        $accessAttrQuery = 'INSERT IGNORE INTO `' . DBPREFIX . 'access_user_attribute_name`
-            (   
-                `attribute_id`,
-                `lang_id`,
-                `name`
-            )
-            SELECT 
-                `attribute_id`,
-                ' . $localeId . ',
-                `name`
-            FROM `' . DBPREFIX . 'access_user_attribute_name`
-            WHERE lang_id = ' . $defaultLocaleId;
-        \Cx\Core\Core\Controller\Cx::instanciate()->getDb()->getAdoDb()->Execute($accessAttrQuery);
+        foreach ($attributeNames as $attributeName) {
+            $newAttributeName = $attributeNameRepo->findOneBy(
+                array('attributeId' => $attributeName->getAttributeId(), 'langId' => $localeId)
+            );
+            if (!empty($newAttributeName)) {
+                continue;
+            }
+            $newAttributeName = new \Cx\Core\User\Model\Entity\UserAttributeName();
+            $newAttributeName->setAttributeId($attributeName->getAttributeId());
+            $newAttributeName->setUserAttribute($attributeName->getUserAttribute());
+            $newAttributeName->setName($attributeName->getName());
+            $newAttributeName->setLangId($localeId);
+
+            $em->persist($newAttributeName);
+        }
     }
 
     /**
@@ -79,9 +86,15 @@ class LocaleLocaleEventListener extends \Cx\Core\Event\Model\Entity\DefaultEvent
         $delLocale = $eventArgs->getEntity();
         $localeId = $delLocale->getId();
 
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $attributeNameRepo = $em->getRepository('Cx\Core\User\Model\Entity\UserAttributeName');
+        $attributeNames = $attributeNameRepo->findBy(array('langId' => $localeId));
+
         // Update the access user attributes
-        $accessAttrQuery = 'DELETE FROM `' . DBPREFIX . 'access_user_attribute_name`
-            WHERE lang_id = ' . $localeId;
-        \Cx\Core\Core\Controller\Cx::instanciate()->getDb()->getAdoDb()->Execute($accessAttrQuery);
+        foreach ($attributeNames as $attributeName) {
+            $em->remove($attributeName);
+        }
+        $em->flush();
     }
 }
