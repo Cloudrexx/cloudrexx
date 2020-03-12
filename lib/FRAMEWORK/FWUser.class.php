@@ -968,15 +968,16 @@ class FWUser extends User_Setting
      */
     public static function getUserCount()
     {
-        global $objDatabase;
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $qb = $em->getRepository('Cx\Core\User\Model\Entity\User')->createQueryBuilder('u');
+        $qb->select('COUNT(u.id)')->where($qb->expr()->eq('u.active', ':active'))->setParameter('active', 1);
 
-        $objResult = $objDatabase->Execute('
-            SELECT COUNT(`id`) AS user_count FROM `'.DBPREFIX.'access_users` WHERE `active` = 1');
-        if ($objResult !== false) {
-            return $objResult->fields['user_count'];
+        try {
+            return $qb->getQuery()->getSingleScalarResult();
+        } catch (\Doctrine\ORM\Query\QueryException $e) {
+            return 0;
         }
-
-        return 0;
     }
 
 
