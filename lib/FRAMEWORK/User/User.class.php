@@ -1944,14 +1944,28 @@ class User extends User_Profile
     {
         global $objDatabase;
 
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $userRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\User');
+        $qb = $userRepo->createQueryBuilder('u');
+        $qb->innerJoin('u.group', 'g')
+            ->where($qb->expr()->eq('u.id', ':id'))
+            ->andWhere($qb->expr()->eq('g.isActive', ':active'))
+            ->setParameters(array('id' => $this->id, 'active' => 1));
+        $user = $qb->getQuery()->getOneOrNullResult();
+
+        if (empty($user)) {
+            return;
+        }
+
+        $groupIds = array();
+        foreach ($user->getGroup() as $group) {
+            $groupIds[] = $group->getId();
+        }
+
         $query = '
             SELECT tblI.`access_id`
-            FROM `'.DBPREFIX.'access_users` AS tblU
-            INNER JOIN `'.DBPREFIX.'access_rel_user_group` AS tblR ON tblR.`user_id` = tblU.`id`
-            INNER JOIN `'.DBPREFIX.'access_user_groups` AS tblG ON tblG.`group_id` = tblR.`group_id`
-            INNER JOIN `'.DBPREFIX.'access_group_'.$type.'_ids` AS tblI ON tblI.`group_id` = tblG.`group_id`
-            WHERE tblU.`id` = '.$this->id.'
-                  AND tblG.`is_active`
+            FROM `'.DBPREFIX.'access_group_'.$type.'_ids` AS tblI
+            WHERE tblI.`group_id` IN('.implode(',', $groupIds).')
             GROUP BY tblI.`access_id`
             ORDER BY tblI.`access_id`';
         $objAccessId = $objDatabase->Execute($query);
