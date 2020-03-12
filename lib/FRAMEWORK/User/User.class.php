@@ -2020,16 +2020,28 @@ class User extends User_Profile
 
     private function updateLastActivityTime()
     {
-        global $objDatabase;
-
         $arrSettings = User_Setting::getSettings();
         $intervalvalue = (isset($arrSettings['session_user_interval']['value'])
             ? $arrSettings['session_user_interval']['value'] : 500);
-        if (time() > ($intervalvalue + $this->last_activity)) {
-            return $objDatabase->Execute("
-                UPDATE `".DBPREFIX."access_users`
-                   SET `last_activity`='".time()."'
-                 WHERE `id`=$this->id");
+
+        if (time() <= ($intervalvalue + $this->last_activity)) {
+            return true;
+        }
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $user = $em->getRepository('Cx\Core\User\Model\Entity\User')->find($this->id);
+
+        if (empty($user)) {
+            return true;
+        }
+        $user->setLastActivity(time());
+
+        try {
+            $em->persist($user);
+            $em->flush();
+        } catch (\Doctrine\ORM\OptimisticLockException $e) {
+            return false;
         }
         return true;
     }
