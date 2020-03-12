@@ -1790,27 +1790,37 @@ class User extends User_Profile
             $userActivationTimeoutStatus =
                 !empty($arrSettings['user_activation_timeout']['status']);
         }
-        if ($userActivationTimeoutStatus) {
-            $objDatabase->Execute('
-                DELETE tblU, tblG, tblA, tblN
-                  FROM `'.DBPREFIX.'access_users` AS tblU
-                  LEFT JOIN `'.DBPREFIX.'access_rel_user_group` AS tblG ON tblG.`user_id`=tblU.`id`
-                  LEFT JOIN `'.DBPREFIX.'access_user_attribute_value` AS tblA ON tblA.`user_id`=tblU.`id`
-                  LEFT JOIN `'.DBPREFIX.'access_user_network` AS tblN ON tblN.`user_id`=tblU.`id`
-                 WHERE tblU.`active`=0
-                   AND tblU.`restore_key`!=\'\'
-                   AND tblU.`restore_key_time`<'.time());
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $qb = $em->createQueryBuilder();
+        $qb->select('u')
+            ->from('Cx\Core\User\Model\Entity\User', 'u')
+            ->leftJoin('u.group', 'g')
+            ->leftJoin('u.userAttributeValue', 'v')
+            ->where($qb->expr()->eq('u.active', ':active'))
+            ->andWhere($qb->expr()->not($qb->expr()->eq('u.restoreKey', ':restoreKey')))
+            ->andWhere($qb->expr()->lt('u.restoreKeyTime', ':restoreKeyTime'))
+            ->setParameters(array(
+                'active' => 0,
+                'restoreKey' => '',
+                'restoreKeyTime' => time()
+            ));
+
+        $users = $qb->getQuery()->getResult();
+
+        $userIds = array();
+        foreach ($users as $user) {
+            $userIds[] = $user->getId();
+            $em->remove($user);
         }
-        // remove outdated social login users
+
+        $em->flush();
         $objDatabase->Execute('
-            DELETE tblU, tblG, tblA, tblN
-              FROM `'.DBPREFIX.'access_users` AS tblU
-             INNER JOIN `'.DBPREFIX.'access_user_network` AS tblN ON tblN.`user_id`=tblU.`id`
-              LEFT JOIN `'.DBPREFIX.'access_rel_user_group` AS tblG ON tblG.`user_id`=tblU.`id`
-              LEFT JOIN `'.DBPREFIX.'access_user_attribute_value` AS tblA ON tblA.`user_id`=tblU.`id`
-             WHERE tblU.`active`=0
-               AND tblU.`restore_key`!=\'\'
-               AND tblU.`restore_key_time`<'.time());
+                DELETE tblN
+                  FROM `'.DBPREFIX.'access_user_network` AS tblN
+                  WHERE tblN.`user_id`= ('.implode(',', $userIds).');'
+        );
     }
 
 
