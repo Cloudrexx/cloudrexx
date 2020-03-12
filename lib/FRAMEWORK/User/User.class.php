@@ -1624,12 +1624,15 @@ class User extends User_Profile
     public function getByNetwork($oauth_provider, $oauth_id) {
         global $objDatabase;
         self::removeOutdatedAccounts();
-        $query = "SELECT tblU.`id` FROM `" . DBPREFIX . "access_users` AS tblU
-                    INNER JOIN `" . DBPREFIX . "access_user_network` AS tblN ON tblU.`id` = tblN.`user_id`
-                  WHERE tblN.`oauth_provider` = ? AND tblN.`oauth_id` = ? AND tblU.`active` = 1";
+
+        $query = "SELECT tblN.`user_id` FROM `" . DBPREFIX . "access_user_network` AS tblN
+                  WHERE tblN.`oauth_provider` = ? AND tblN.`oauth_id` = ?";
         $objResult = $objDatabase->SelectLimit($query, 1, -1, array($oauth_provider, $oauth_id));
         if ($objResult !== false) {
-            return $this->getUser($objResult->fields['id']);
+            $user = $this->getUser($objResult->fields['id']);
+            if ($user->is_active) {
+                return $user;
+            }
         }
         return null;
     }
