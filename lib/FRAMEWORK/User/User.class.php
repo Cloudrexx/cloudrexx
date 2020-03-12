@@ -760,23 +760,43 @@ class User extends User_Profile
 
     public static function forceDefaultEmailAccess()
     {
-        global $objDatabase;
-
         $arrSettings = FWUser::getSettings();
-        return $objDatabase->Execute("
-            UPDATE `".DBPREFIX."access_users`
-               SET `email_access`='".$arrSettings['default_email_access']['value']."'");
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $userRepo = $em->getRepository('Cx\Core\User\Model\Entity\User');
+        $users = $userRepo->findAll();
+
+        try {
+            foreach ($users as $user) {
+                $user->setEmailAccess($arrSettings['default_email_access']['value']);
+                $em->persist($user);
+            }
+            $em->flush();
+            return true;
+        } catch (\Doctrine\ORM\OptimisticLockException $e) {
+            return false;
+        }
     }
 
 
     public static function forceDefaultProfileAccess()
     {
-        global $objDatabase;
-
         $arrSettings = FWUser::getSettings();
-        return $objDatabase->Execute("
-            UPDATE `".DBPREFIX."access_users`
-               SET `profile_access`='".$arrSettings['default_profile_access']['value']."'");
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $userRepo = $em->getRepository('Cx\Core\User\Model\Entity\User');
+        $users = $userRepo->findAll();
+
+        try {
+            foreach ($users as $user) {
+                $user->setProfileAccess($arrSettings['default_profile_access']['value']);
+                $em->persist($user);
+            }
+            $em->flush();
+            return true;
+        } catch (\Doctrine\ORM\OptimisticLockException $e) {
+            return false;
+        }
     }
 
 
