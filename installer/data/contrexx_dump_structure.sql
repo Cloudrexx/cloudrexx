@@ -113,7 +113,7 @@ CREATE TABLE `contrexx_access_users` (
   `email_access` enum('everyone','members_only','nobody') NOT NULL DEFAULT 'nobody',
   `frontend_lang_id` int unsigned NOT NULL DEFAULT '0',
   `backend_lang_id` int unsigned NOT NULL DEFAULT '0',
-  `active` tinyint(1) NOT NULL DEFAULT '1',
+  `active` tinyint(1) NOT NULL DEFAULT '0',
   `verified` tinyint(1) NOT NULL DEFAULT '1',
   `primary_group` int unsigned NOT NULL DEFAULT '0',
   `profile_access` enum('everyone','members_only','nobody') NOT NULL DEFAULT 'members_only',

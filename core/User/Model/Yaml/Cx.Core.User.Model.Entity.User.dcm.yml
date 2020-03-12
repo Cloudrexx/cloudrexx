@@ -102,7 +102,7 @@ Cx\Core\User\Model\Entity\User:
     active:
       type: boolean
       options:
-        default: true
+        default: false
     verified:
       type: boolean
       options:

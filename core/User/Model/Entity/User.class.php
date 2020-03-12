@@ -288,7 +288,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @var boolean
      */
-    protected $active = true;
+    protected $active = false;
 
     /**
      * @var boolean
