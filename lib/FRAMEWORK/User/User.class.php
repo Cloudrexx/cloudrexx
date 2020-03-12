@@ -1981,27 +1981,39 @@ class User extends User_Profile
 
     public function hasModeAccess($backend = false)
     {
-        global $objDatabase;
-
         if ($this->getAdminStatus()) {
             return true;
         }
-        $query = "
-            SELECT 1
-              FROM `".DBPREFIX."access_user_groups` AS tblG
-              INNER JOIN `".DBPREFIX."access_rel_user_group` AS tblR ON tblR.`group_id`=tblG.`group_id`
-              INNER JOIN `".DBPREFIX."access_users` AS tblU ON tblU.`id`=tblR.`user_id`
-             WHERE tblU.`id`=$this->id
-               AND tblG.`is_active`=1
-               AND (tblG.`type`='".($backend ? 'backend' : 'frontend')."'
-                OR tblG.`type`='backend')";
-        $objResult = $objDatabase->SelectLimit($query, 1);
-        if (!$objResult) {
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $qb = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Core\User\Model\Entity\Group'
+        )->createQueryBuilder('g');
+
+        $qb->innerJoin('g.user', 'u')
+            ->where($qb->expr()->eq('u.id', ':userId'))
+            ->andWhere($qb->expr()->eq('g.isActive', ':isActive'))
+            ->andWhere(
+                $qb->expr()->orX(
+                    $qb->expr()->eq('g.type', ':type'),
+                    $qb->expr()->eq('g.type', ':typeBackend')
+                )
+            )->setMaxResults(1)
+            ->setParameters(
+                array(
+                    'userId' => $this->id,
+                    'isActive' => 1,
+                    'type' => ($backend ? 'backend' : 'frontend'),
+                    'typeBackend' => 'backend'
+                )
+            );
+
+        $user = $qb->getQuery()->getOneOrNullResult();
+
+        if (empty($user)) {
             return false;
         }
-        if ($objResult->EOF) {
-            return false;
-        }
+
         return true;
     }
 
