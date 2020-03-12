@@ -2021,11 +2021,12 @@ JS
                 if (preg_match($ignoreRe, $file)) unset($arrImages[$index]);
             }
 
+            $picId = \FWUser::getFWUserObject()->objUser->objAttribute->getAttributeIdByDefaultAttributeId('picture');
             $query = "
                 SELECT SUM(1) as entryCount
                 FROM `".DBPREFIX."access_user_attribute` AS a
                 INNER JOIN `".DBPREFIX."access_user_attribute_value` AS v ON v.`attribute_id` = a.`id`
-                WHERE a.`type` = 'image' AND v.`value` != ''";
+                WHERE a.`type` = 'image' AND v.`value` != ''" . ($profilePics ? ' AND `a`.`id` = ' . $picId : '');
 
             $objCount = $objDatabase->Execute($query);
             if ($objCount !== false) {
@@ -2038,7 +2039,7 @@ JS
                 SELECT v.`value` AS picture
                 FROM `".DBPREFIX."access_user_attribute` AS a
                 INNER JOIN `".DBPREFIX."access_user_attribute_value` AS v ON v.`attribute_id` = a.`id`
-                WHERE a.`type` = 'image' AND v.`value` != ''";
+                WHERE a.`type` = 'image' AND v.`value` != ''" . ($profilePics ? ' AND `a`.`id` =' . $picId : '');
 
             while ($offset < $count) {
                 $objImage = $objDatabase->SelectLimit($query, $step, $offset);
