@@ -323,6 +323,8 @@ class BackendTable extends HTML_Table {
                     } else if (empty($data)) {
                         $data = '<i>(empty)</i>';
                         $encode = false;
+                    } else if (is_object($data) && get_class($data) == 'Cx\Core\Model\Model\Entity\Password') {
+                        $data = '******';
                     }
                     $cellAttrs = array();
                     if (
