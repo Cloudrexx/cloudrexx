@@ -634,22 +634,15 @@ class User extends User_Profile
      */
     protected function fetchPasswordHashFromDatabase() {
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-        $db = $cx->getDb()->getAdoDb();
+        $em = $cx->getDb()->getEntityManager();
+        $userRepo = $em->getRepository('Cx\Core\User\Model\Entity\User');
+        $user = $userRepo->find($this->id);
 
-        $query = '
-            SELECT `password`
-              FROM `'.DBPREFIX.'access_users`
-            WHERE `id` = ' . $this->id;
-        $objResult = $db->Execute($query);
-
-        if (
-            !$objResult ||
-            $objResult->RecordCount() != 1
-        ) {
+        if (empty($user)) {
             throw new UserException('Unable to load unknown user');
         }
 
-        return $objResult->fields['password'];
+        return $user->getPassword();
     }
 
     /**
