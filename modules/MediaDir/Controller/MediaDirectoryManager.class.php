@@ -523,21 +523,13 @@ class MediaDirectoryManager extends MediaDirectoryLibrary
                     $userId  = $objFWUser->objUser->getId();
                 }
 
+                // parse owner
+                \FWUser::getUserLiveSearch();
                 $this->_objTpl->setVariable(array(
                     'TXT_'.$this->moduleLangVar.'_OWNER' => $_ARRAYLANG['TXT_MEDIADIR_OWNER'],
                     $this->moduleLangVar.'_OWNER_ROW'    => $ownerRowClass,
                     $this->moduleLangVar.'_OWNER_ID'     => $userId,
                 ));
-
-                \FWUser::getUserLiveSearch();
-
-                if ($intEntryId != 0) {
-                    $intEntryDourationStart = 1;
-                    $intEntryDourationEnd = 2;
-                } else {
-                    $intEntryDourationStart = 1;
-                    $intEntryDourationEnd = 2;
-                }
 
                 //get display duration  data
                 switch($this->arrSettings['settingsEntryDisplaydurationValueType']) {
