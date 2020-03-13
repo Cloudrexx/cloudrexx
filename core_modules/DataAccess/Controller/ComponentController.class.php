@@ -39,6 +39,156 @@ namespace Cx\Core_Modules\DataAccess\Controller;
 /**
  * Main controller for DataAccess
  * 
+ * @OA\Info(
+ *     version="1.0.0",
+ *     title="Cloudrexx RESTful API",
+ *     description="The Cloudrexx RESTful API allows access to ...",
+ *     @OA\Contact(
+ *         name="Cloudrexx API Support",
+ *         url="http://www.cloudrexx.com/support",
+ *         email="info@cloudrexx.com"
+ *     ),
+ *     @OA\License(name="CLOUDREXX")
+ * )
+ * @OA\Server(
+ *     url=SWAGGER_API_HOST
+ * )
+ * @OA\Get(
+ *     path="/json/{endpoint}",
+ *     operationId="getFromEntityList",
+ *     summary="Get a list of entities of this type",
+ *     @OA\Parameter(
+ *         ref="#/components/parameters/endpoint"
+ *     ),
+ *     @OA\Parameter(
+ *         ref="#/components/parameters/apikey"
+ *     ),
+ *     @OA\Parameter(
+ *         name="order",
+ *         description="Sorts the output by one or more fields",
+ *         in="query",
+ *         required=false,
+ *         description="Orders the output",
+ *         @OA\Schema(
+ *             type="string",
+ *             pattern="^([a-zA-Z0-9]+/(ASC|DESC)(;|$))+$"
+ *         )
+ *     ),
+ *     @OA\Parameter(
+ *         name="filter",
+ *         description="Filters the output on one or more fields",
+ *         in="query",
+ *         required=false,
+ *         @OA\Schema(
+ *             type="object",
+ *             properties={
+ *             }
+ *         )
+ *     ),
+ *     @OA\Parameter(
+ *         name="limit",
+ *         description="Limits the output (paging)",
+ *         in="query",
+ *         required=false,
+ *         @OA\Schema(
+ *             type="string",
+ *             pattern="^\d+(,\d+)?$"
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         ref="#/components/responses/default"
+ *     )
+ * )
+ * # see issue https://github.com/OAI/OpenAPI-Specification/issues/892#issuecomment-281449239
+ * @OA\Get(
+ *     path="/json/{endpoint}/{id}",
+ *     operationId="getFromEntity",
+ *     summary="Get a single entity of this type",
+ *     @OA\Parameter(
+ *         ref="#/components/parameters/endpoint"
+ *     ),
+ *     @OA\Parameter(
+ *         ref="#/components/parameters/apikey"
+ *     ),
+ *     @OA\Parameter(
+ *         ref="#/components/parameters/id"
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         ref="#/components/responses/default"
+ *     )
+ * )
+ * @OA\Components(
+ *     @OA\Parameter(
+ *         name="endpoint",
+ *         description="One of the endpoints defined for your Cloudrexx instance.",
+ *         in="path",
+ *         required=true,
+ *         @OA\Schema(
+ *             type="string"
+ *         )
+ *     ),
+ *     @OA\Parameter(
+ *         name="apikey",
+ *         description="API key to grant access",
+ *         in="query",
+ *         required=true,
+ *         @OA\Schema(
+ *             type="string"
+ *         )
+ *     ),
+ *     @OA\Parameter(
+ *         name="id",
+ *         description="Serialized ID of an entity",
+ *         in="path",
+ *         required=true,
+ *         @OA\Schema(
+ *             type="string",
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response="default",
+ *         description="Successful query",
+ *         content={
+ *             @OA\MediaType(
+ *                 mediaType="application/json",
+ *                 @OA\Schema(
+ *                     @OA\Property(
+ *                         property="status",
+ *                         type="string",
+ *                         description="success or error"
+ *                     ),
+ *                     @OA\Property(
+ *                         property="meta",
+ *                         type="object",
+ *                         description="Meta info about this request"
+ *                     ),
+ *                     @OA\Property(
+ *                         property="messages",
+ *                         type="array",
+ *                         items={},
+ *                         description="TWB"
+ *                     ),
+ *                     @OA\Property(
+ *                         property="data",
+ *                         type="object",
+ *                         description="TWB"
+ *                     ),
+ *                     example={
+ *                         "status": "error",
+ *                         "meta": {
+ *                             "request": {}
+ *                         },
+ *                         "messages": {
+ *                         },
+ *                         "data": {}
+ *                     }
+ *                 )
+ *             )
+ *         }
+ *     )
+ * )
  * @copyright   Cloudrexx AG
  * @author Michael Ritter <michael.ritter@cloudrexx.com>
  * @package cloudrexx
@@ -499,6 +649,13 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             $this->cx->getClassLoader()->loadFile(
                 $this->cx->getCodeBaseLibraryPath() . '/OpenApi/src/functions.php'
             );
+
+            define(
+                'SWAGGER_API_HOST',
+                \Cx\Core\Routing\Url::fromApi('v1', array())->toString()
+            );
+            $dbgMode = \DBG::getMode();
+            \DBG::activate(DBG_LOG_MEMORY);
             $openapi = \OpenApi\scan(
                 array(
                     $this->cx->getCodeBaseCorePath(),
@@ -506,8 +663,20 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                     $this->cx->getCodeBaseModulePath(),
                 )
             );
+            $apidoc = $openapi->toJson();
+            $logs = \DBG::getMemoryLogs();
+            \DBG::deactivate();
+            \DBG::activate($dbgMode);
+            array_shift($logs);
+
+            if (!empty($logs)) {
+                fwrite(STDERR, implode(PHP_EOL, $logs));
+                fwrite(STDERR, PHP_EOL . 'Please fix these errors' . PHP_EOL);
+                die();
+            }
+
             $objFile = new \Cx\Lib\FileSystem\File($filename);
-            $objFile->write($openapi->toJson());
+            $objFile->write($apidoc . PHP_EOL);
         }
         // echo file contents:
         try {
