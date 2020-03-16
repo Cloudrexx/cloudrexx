@@ -379,13 +379,6 @@ class User extends User_Profile
             return false;
         }
 
-        // ensure the password is properly hashed 
-        try {
-            $this->updatePasswordHash($password);
-        } catch (UserException $e) {
-            \DBG::log($e->getMessage());
-        }
-
         return true;
     }
 
@@ -471,7 +464,7 @@ class User extends User_Profile
             return false;
         }
         // verify that the supplied password is valid
-        if (!$this->checkPassword($password, $user->getPassword())) {
+        if (!$user->getPassword()->matches($password)) {
             return false;
         }
 
