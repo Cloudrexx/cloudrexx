@@ -76,6 +76,7 @@ $_CONFIG['contactFax']                    = "033 123 45 68";
 $_CONFIG['xmlSitemapStatus']              = "on";
 $_CONFIG['frontendEditingStatus']         = "off";
 $_CONFIG['useCustomizings']               = "on";
+$_CONFIG['coreSimpleSelectLimit']         = 30;
 $_CONFIG['corePagingLimit']               = 30;
 $_CONFIG['searchDescriptionLength']       = 150;
 $_CONFIG['googleMapsAPIKey']              = "";

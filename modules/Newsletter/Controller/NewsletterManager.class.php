@@ -736,45 +736,37 @@ class NewsletterManager extends NewsletterLib
         }
 
         if (isset($_POST['newsletter_mail_associated_list'])) {
-            foreach ($_POST['newsletter_mail_associated_list'] as $listId => $status) {
-                if (contrexx_input2int($status) == 1) {
-                    array_push($arrAssociatedLists, contrexx_input2int($listId));
-                }
+            foreach ($_POST['newsletter_mail_associated_list'] as $listId) {
+                array_push($arrAssociatedLists, contrexx_input2int($listId));
             }
         }
 
         // get the Crm membership association
-        if (isset($_POST['newsletter_mail_crm_memberships'])) {
-            if (isset($_POST['newsletter_mail_crm_memberships']['associate'])) {
-                foreach ($_POST['newsletter_mail_crm_memberships']['associate'] as $crmMembershipId) {
-                    $crmMembershipFilter['associate'][] = intval($crmMembershipId);
-                }
+	if (isset($_POST['newsletter_mail_crm_memberships'])) {
+	    foreach ($_POST['newsletter_mail_crm_memberships'] as $crmMembershipId) {
+		$crmMembershipFilter['associate'][] = intval($crmMembershipId);
+	    }
+	}
+        // get the Crm membership filter
+        if (isset($_POST['newsletter_mail_crm_filter_memberships_include'])) {
+            foreach ($_POST['newsletter_mail_crm_filter_memberships_include'] as $crmMembershipId) {
+                $crmMembershipFilter['include'][] = intval($crmMembershipId);
             }
         }
-        // get the Crm membership filter
-        if (isset($_POST['newsletter_mail_crm_filter_memberships'])) {
-            if (isset($_POST['newsletter_mail_crm_filter_memberships']['include'])) {
-                foreach ($_POST['newsletter_mail_crm_filter_memberships']['include'] as $crmMembershipId) {
-                    $crmMembershipFilter['include'][] = intval($crmMembershipId);
+
+        if (isset($_POST['newsletter_mail_crm_filter_memberships_exclude'])) {
+            foreach ($_POST['newsletter_mail_crm_filter_memberships_exclude'] as $crmMembershipId) {
+                if (in_array(intval($crmMembershipId), $crmMembershipFilter['include'])) {
+                    continue;
                 }
-            }
-            if (isset($_POST['newsletter_mail_crm_filter_memberships']['exclude'])) {
-                foreach ($_POST['newsletter_mail_crm_filter_memberships']['exclude'] as $crmMembershipId) {
-                    if (in_array(intval($crmMembershipId), $crmMembershipFilter['include'])) {
-                        continue;
-                    }
-                    $crmMembershipFilter['exclude'][] = intval($crmMembershipId);
-                }
+                $crmMembershipFilter['exclude'][] = intval($crmMembershipId);
             }
         }
 
         // get the associated groups from the post variables in case the form was already sent
         if (isset($_POST['newsletter_mail_associated_group'])) {
-            foreach ($_POST['newsletter_mail_associated_group']
-                        as $groupID => $status) {
-                if ($status) {
-                    $arrAssociatedGroups[] = contrexx_input2int($groupID);
-                }
+            foreach ($_POST['newsletter_mail_associated_group'] as $groupID) {
+                $arrAssociatedGroups[] = contrexx_input2int($groupID);
             }
         }
 
@@ -1034,15 +1026,44 @@ class NewsletterManager extends NewsletterLib
             $objCrmLibrary = new \Cx\Modules\Crm\Controller\CrmLibrary('Crm');
             $crmMemberships = array_keys($objCrmLibrary->getMemberships());
 
+            $crmLang = array(
+                'associated' => $_ARRAYLANG['TXT_NEWSLETTER_CHOOSE_CRM_MEMBERSHIPS'],
+                'notAssociated' => $_ARRAYLANG['TXT_NEWSLETTER_AVAILABLE_CRM_MEMBERSHIPS']
+            );
+
             if (!empty($arrSettings['deliver_crm_recipients']['setvalue'])) {
-                $objCrmLibrary->getMembershipDropdown($this->_objTpl, $crmMemberships, 'crmMembership', $crmMembershipFilter['associate']);
+                $objCrmLibrary->parseMembershipSelect(
+                    $this->_objTpl,
+                    $crmMemberships,
+                    'newsletter_mail_form',
+                    'NEWSLETTER_CRM_MEMBERSHIP',
+                    'newsletter_mail_crm_memberships',
+                    $crmMembershipFilter['associate'],
+                    $crmLang
+                );
                 $this->_objTpl->touchBlock('deliver_crm_recipients');
             } else {
                 $this->_objTpl->hideBlock('deliver_crm_recipients');
             }
             if (!empty($arrSettings['use_crm_filter']['setvalue'])) {
-                $objCrmLibrary->getMembershipDropdown($this->_objTpl, $crmMemberships, 'crmMembershipFilterInclude', $crmMembershipFilter['include']);
-                $objCrmLibrary->getMembershipDropdown($this->_objTpl, $crmMemberships, 'crmMembershipFilterExclude', $crmMembershipFilter['exclude']);
+                $objCrmLibrary->parseMembershipSelect(
+                    $this->_objTpl,
+                    $crmMemberships,
+                    'newsletter_mail_form',
+                    'NEWSLETTER_CRM_FILTER_MEMBERSHIP_INCLUDE',
+                    'newsletter_mail_crm_filter_memberships_include',
+                    $crmMembershipFilter['include'],
+                    $crmLang
+                );
+                $objCrmLibrary->parseMembershipSelect(
+                    $this->_objTpl,
+                    $crmMemberships,
+                    'newsletter_mail_form',
+                    'NEWSLETTER_CRM_FILTER_MEMBERSHIP_EXCLUDE',
+                    'newsletter_mail_crm_filter_memberships_exclude',
+                    $crmMembershipFilter['exclude'],
+                    $crmLang
+                );
                 $this->_objTpl->touchBlock('use_crm_filter');
             } else {
                 $this->_objTpl->hideBlock('use_crm_filter');
@@ -1099,29 +1120,33 @@ class NewsletterManager extends NewsletterLib
      * @author      Stefan Heinemann <sh@adfinis.com>
      * @param       array $associatedLists
      */
-    function emailEditParseLists($associatedLists)
+    function emailEditParseLists($associatedListIds)
     {
         global $_ARRAYLANG;
 
         $arrLists = self::getLists();
-        $listNr = 0;
-        foreach ($arrLists as $listID => $listItem) {
-            $column = $listNr % 3;
-            $this->_objTpl->setVariable(array(
-                'NEWSLETTER_LIST_ID' => $listID,
-                'NEWSLETTER_LIST_NAME' => contrexx_raw2xhtml($listItem['name']),
-                'NEWSLETTER_SHOW_RECIPIENTS_OF_LIST_TXT' => sprintf(
-                    $_ARRAYLANG['TXT_NEWSLETTER_SHOW_RECIPIENTS_OF_LIST'],
-                    contrexx_raw2xhtml($listItem['name'])),
-                'NEWSLETTER_LIST_ASSOCIATED' =>
-                    (in_array($listID, $associatedLists)
-                        ? 'checked="checked"' : ''),
-                'TXT_NEWSLETTER_ASSOCIATED_LISTS' =>
-                    $_ARRAYLANG['TXT_NEWSLETTER_ASSOCIATED_LISTS'],
-            ));
-            $this->_objTpl->parse('newsletter_mail_associated_list_'.$column);
-            $listNr++;
+        $lists = array();
+        foreach ($arrLists as $id=>$list) {
+            $lists[$id] = $list['name'];
         }
+
+        $associatedListsMultiSelect = new \Cx\Core\Html\Model\Entity\MultiSelectElement(
+            'newsletter_mail_associated_list',
+            'newsletter_mail_associated_list',
+            'Zugehörige Listen wählen',
+            'newsletter_mail_not_associated_list',
+            'Verfügbare Listen',
+            $lists,
+            $associatedListIds,
+            'newsletter_mail_form'
+        );
+
+        $this->_objTpl->setVariable(
+            array(
+                'NEWSLETTER_ASSOCIATED_LISTS' => $associatedListsMultiSelect,
+                'TXT_NEWSLETTER_ASSOCIATED_LISTS' => $_ARRAYLANG['TXT_NEWSLETTER_ASSOCIATED_LISTS'],
+            )
+        );
     }
 
 
@@ -1131,30 +1156,31 @@ class NewsletterManager extends NewsletterLib
      * @author      Stefan Heinemann <sh@adfinis.com>
      * @todo        Apparently parses one group too much
      */
-    private function emailEditParseGroups($associatedGroups = array()) {
+    private function emailEditParseGroups($associatedGroupIds = array()) {
         global $_ARRAYLANG;
 
         $groups = $this->_getGroups();
-        $groupNr = 0;
-        foreach ($groups as $groupID => $groupItem) {
-            $column = $groupNr % 3;
-            $this->_objTpl->setVariable(array(
-                'NEWSLETTER_GROUP_ID' => $groupID,
-                'NEWSLETTER_GROUP_NAME' => htmlentities(
-                    $groupItem, ENT_QUOTES, CONTREXX_CHARSET),
-                'NEWSLETTER_SHOW_RECIPIENTS_OF_GROUP_TXT' => sprintf(
-                    $_ARRAYLANG['TXT_NEWSLETTER_SHOW_RECIPIENTS_OF_GROUP'],
-                    $groupItem
-                ),
-                'NEWSLETTER_GROUP_ASSOCIATED' =>
-                    (in_array($groupID, $associatedGroups)
-                        ? 'checked="checked"' : ''),
-                'TXT_NEWSLETTER_ASSOCIATED_GROUPS' =>
-                    $_ARRAYLANG['TXT_NEWSLETTER_ASSOCIATED_GROUPS'],
-            ));
-            $this->_objTpl->parse('newsletter_mail_associated_group_'.$column);
-            $groupNr++;
+        $associatedGroups = array();
+        foreach($associatedGroupIds as $associatedGroupId){
+            $associatedGroups[$associatedGroupId] = $groups[$associatedGroupId];
         }
+        $associatedGroupsMultiSelect = new \Cx\Core\Html\Model\Entity\MultiSelectElement(
+            'newsletter_mail_group',
+            'newsletter_mail_associated_group',
+            'Zugehörige Benutzergruppen wählen',
+            'newsletter_mail_not_associated_group',
+            'Verfügbare Benutzergruppen wählen',
+            $groups,
+            $associatedGroupIds,
+            'newsletter_mail_form'
+        );
+
+        $this->_objTpl->setVariable(
+            array(
+                'NEWSLETTER_ASSOCIATED_GROUPS' => $associatedGroupsMultiSelect,
+                'TXT_NEWSLETTER_ASSOCIATED_GROUPS' => $_ARRAYLANG['TXT_NEWSLETTER_ASSOCIATED_GROUPS'],
+            )
+        );
     }
 
     /**

@@ -297,6 +297,9 @@ class Config
                 'corePagingLimit' => array(
                     'value' => '30',
                 ),
+                'coreSimpleSelectLimit' => array(
+                    'value' => '30',
+                ),
                 'searchDescriptionLength' => array(
                     'value' => '150',
                 ),

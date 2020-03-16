@@ -504,6 +504,7 @@ $_ARRAYLANG['TXT_NEWSLETTER_CRM_MEMBERSHIP'] = 'Zugehörige CRM Kundengruppe';
 $_ARRAYLANG['TXT_NEWSLETTER_CRM_MEMBERSHIP_FILTER'] = 'Filterung nach CRM Kundengruppe';
 $_ARRAYLANG['TXT_NEWSLETTER_CRM_MEMBERSHIP_FILTER_TOOLTIP'] = 'Falls Sie Ihre E-Mail Marketing Empfänger auch im CRM abgelegt haben (Verknüpfung mittels Benutzerkonten), dann haben Sie die Möglichkeit den Versand an die ausgewählten Listen (Option: %1$s) und Benutzergruppen (Option: %2$s) über die CRM Kundengruppen zu filtern. Die E-Mail-Kampagne wird dann nur an jene Empfänger der ausgewählten Listen / Benutzergruppen gesendet, welche die entsprechenden Filterkriterien erfüllen.';
 $_ARRAYLANG['TXT_NEWSLETTER_CHOOSE_CRM_MEMBERSHIPS'] = 'Kundengruppen wählen';
+$_ARRAYLANG['TXT_NEWSLETTER_AVAILABLE_CRM_MEMBERSHIPS'] = 'Verfügbare Kundengruppen';
 $_ARRAYLANG['TXT_NEWSLETTER_CRM_MEMBERSHIP_INCLUDE_TXT'] = 'Versand nur an Mitglieder ausgewählter Kundengruppen:';
 $_ARRAYLANG['TXT_NEWSLETTER_CRM_MEMBERSHIP_EXCLUDE_TXT'] = 'Kein Versand an Mitglieder ausgewählter Kundengruppen:';
 $_ARRAYLANG['TXT_NEWSLETTER_STATISTICS'] = 'Statistik aktivieren';

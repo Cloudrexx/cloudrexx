@@ -126,38 +126,8 @@ $J(document).ready(function() {
         {TXT_NEWSLETTER_ASSOCIATED_LISTS}
         <!-- BEGIN associatedListToolTip --><span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_NEWSLETTER_INFO_ABOUT_ASSOCIATED_LISTS}</span><!-- END associatedListToolTip -->
     </td>
-    <td width="20%">
-<!-- BEGIN newsletter_mail_associated_list_0 -->
-      <input type="checkbox"
-          name="newsletter_mail_associated_list[{NEWSLETTER_LIST_ID}]"
-          id="newsletter_mail_associated_list_{NEWSLETTER_LIST_ID}"
-          value="1" {NEWSLETTER_LIST_ASSOCIATED} {NEWSLETTER_LIST_DISABLED} />
-      <a href="index.php?cmd=Newsletter&amp;act=users&amp;newsletterListId={NEWSLETTER_LIST_ID}"
-          target="_blank" title="{NEWSLETTER_SHOW_RECIPIENTS_OF_LIST_TXT}"
-      >{NEWSLETTER_LIST_NAME}</a><br />
-<!-- END newsletter_mail_associated_list_0 -->
-    </td>
-    <td width="20%">
-<!-- BEGIN newsletter_mail_associated_list_1 -->
-      <input type="checkbox"
-          name="newsletter_mail_associated_list[{NEWSLETTER_LIST_ID}]"
-          id="newsletter_mail_associated_list_{NEWSLETTER_LIST_ID}"
-          value="1" {NEWSLETTER_LIST_ASSOCIATED} {NEWSLETTER_LIST_DISABLED} />
-      <a href="index.php?cmd=Newsletter&amp;act=users&amp;newsletterListId={NEWSLETTER_LIST_ID}"
-          target="_blank" title="{NEWSLETTER_SHOW_RECIPIENTS_OF_LIST_TXT}"
-      >{NEWSLETTER_LIST_NAME}</a><br />
-<!-- END newsletter_mail_associated_list_1 -->
-    </td>
-    <td width="45%">
-<!-- BEGIN newsletter_mail_associated_list_2 -->
-      <input type="checkbox"
-          name="newsletter_mail_associated_list[{NEWSLETTER_LIST_ID}]"
-          id="newsletter_mail_associated_list_{NEWSLETTER_LIST_ID}"
-          value="1" {NEWSLETTER_LIST_ASSOCIATED} {NEWSLETTER_LIST_DISABLED} />
-      <a href="index.php?cmd=Newsletter&amp;act=users&amp;newsletterListId={NEWSLETTER_LIST_ID}"
-          target="_blank" title="{NEWSLETTER_SHOW_RECIPIENTS_OF_LIST_TXT}"
-      >{NEWSLETTER_LIST_NAME}</a><br />
-<!-- END newsletter_mail_associated_list_2 -->
+    <td width="85%">
+        {NEWSLETTER_ASSOCIATED_LISTS}
     </td>
   </tr>
 
@@ -168,38 +138,8 @@ $J(document).ready(function() {
         <!-- BEGIN associatedGroupToolTipBeforeSend --><span class="icon-warning tooltip-trigger"></span><span class="tooltip-message">{TXT_NEWSLETTER_INFO_ABOUT_ASSOCIATED_LISTS_SEND}</span><!-- END associatedGroupToolTipBeforeSend -->
         <!-- BEGIN associatedGroupToolTipAfterSent --><span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_NEWSLETTER_INFO_ABOUT_ASSOCIATED_LISTS}</span><!-- END associatedGroupToolTipAfterSent -->
     </td>
-    <td width="20%">
-<!-- BEGIN newsletter_mail_associated_group_0 -->
-      <input type="checkbox"
-          name="newsletter_mail_associated_group[{NEWSLETTER_GROUP_ID}]"
-          id="newsletter_mail_associated_group_{NEWSLETTER_GROUP_ID}"
-          value="1" {NEWSLETTER_GROUP_ASSOCIATED} {NEWSLETTER_LIST_DISABLED} />
-      <a href="index.php?cmd=Access&amp;act=user&amp;groupId={NEWSLETTER_GROUP_ID}"
-          target="_blank" title="{NEWSLETTER_SHOW_RECIPIENTS_OF_GROUP_TXT}"
-      >{NEWSLETTER_GROUP_NAME}</a><br />
-<!-- END newsletter_mail_associated_group_0 -->
-    </td>
-    <td width="20%">
-<!-- BEGIN newsletter_mail_associated_group_1 -->
-      <input type="checkbox"
-          name="newsletter_mail_associated_group[{NEWSLETTER_GROUP_ID}]"
-          id="newsletter_mail_associated_group_{NEWSLETTER_GROUP_ID}"
-          value="1" {NEWSLETTER_GROUP_ASSOCIATED} {NEWSLETTER_LIST_DISABLED} />
-      <a href="index.php?cmd=Access&amp;act=user&amp;groupId={NEWSLETTER_GROUP_ID}"
-          target="_blank" title="{NEWSLETTER_SHOW_RECIPIENTS_OF_GROUP_TXT}"
-      >{NEWSLETTER_GROUP_NAME}</a><br />
-<!-- END newsletter_mail_associated_group_1 -->
-    </td>
-    <td width="45%">
-<!-- BEGIN newsletter_mail_associated_group_2 -->
-      <input type="checkbox"
-          name="newsletter_mail_associated_group[{NEWSLETTER_GROUP_ID}]"
-          id="newsletter_mail_associated_group_{NEWSLETTER_GROUP_ID}"
-          value="1" {NEWSLETTER_GROUP_ASSOCIATED} {NEWSLETTER_LIST_DISABLED} />
-      <a href="index.php?cmd=Access&amp;act=user&amp;groupId={NEWSLETTER_GROUP_ID}"
-          target="_blank" title="{NEWSLETTER_SHOW_RECIPIENTS_OF_GROUP_TXT}"
-      >{NEWSLETTER_GROUP_NAME}</a><br />
-<!-- END newsletter_mail_associated_group_2 -->
+    <td width="85%">
+        {NEWSLETTER_ASSOCIATED_GROUPS}
     </td>
   </tr>
   <!-- END deliver_user_recipients -->
@@ -211,13 +151,7 @@ $J(document).ready(function() {
             <!-- BEGIN crmMembershipAssociatedToolTipAfterSend --><span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_NEWSLETTER_INFO_ABOUT_ASSOCIATED_LISTS}</span><!-- END crmMembershipAssociatedToolTipAfterSend -->
         </td>
         <td width="85%" colspan="3">
-            <div>
-                <select tabindex="7" data-placeholder="{TXT_NEWSLETTER_CHOOSE_CRM_MEMBERSHIPS}" name="newsletter_mail_crm_memberships[associate][]" id="newsletter_mail_crm_memberships" size="1" multiple autocomplete="off" {NEWSLETTER_LIST_DISABLED}>
-                    <!-- BEGIN crmMembership -->
-                    <option value="{CRM_MEMBERSHIP_ID}" {CRM_MEMBERSHIP_SELECTED}>{CRM_MEMBERSHIP_VALUE}</option>
-                    <!-- END crmMembership -->
-                </select>
-            </div>
+            {NEWSLETTER_CRM_MEMBERSHIP}
         </td>
     </tr>
   <!-- END deliver_crm_recipients -->
@@ -234,19 +168,11 @@ $J(document).ready(function() {
     <td width="85%" colspan="3">
         <div>
             {TXT_NEWSLETTER_CRM_MEMBERSHIP_INCLUDE_TXT}<br />
-            <select tabindex="7" data-placeholder="{TXT_NEWSLETTER_CHOOSE_CRM_MEMBERSHIPS}" name="newsletter_mail_crm_filter_memberships[include][]" id="newsletter_mail_crm_filter_memberships_include" size="1" multiple autocomplete="off" {NEWSLETTER_LIST_DISABLED}>
-                <!-- BEGIN crmMembershipFilterInclude -->
-                <option value="{CRM_MEMBERSHIP_ID}" {CRM_MEMBERSHIP_SELECTED}>{CRM_MEMBERSHIP_VALUE}</option>
-                <!-- END crmMembershipFilterInclude -->
-            </select>
+            {NEWSLETTER_CRM_FILTER_MEMBERSHIP_INCLUDE}
         </div>
         <div>
             {TXT_NEWSLETTER_CRM_MEMBERSHIP_EXCLUDE_TXT}<br />
-            <select tabindex="7" data-placeholder="{TXT_NEWSLETTER_CHOOSE_CRM_MEMBERSHIPS}" name="newsletter_mail_crm_filter_memberships[exclude][]" id="newsletter_mail_crm_filter_memberships_exclude" size="1" multiple autocomplete="off" {NEWSLETTER_LIST_DISABLED}>
-                <!-- BEGIN crmMembershipFilterExclude -->
-                <option value="{CRM_MEMBERSHIP_ID}" {CRM_MEMBERSHIP_SELECTED}>{CRM_MEMBERSHIP_VALUE}</option>
-                <!-- END crmMembershipFilterExclude -->
-            </select>
+            {NEWSLETTER_CRM_FILTER_MEMBERSHIP_EXCLUDE}
         </div>
     </td>
   </tr>

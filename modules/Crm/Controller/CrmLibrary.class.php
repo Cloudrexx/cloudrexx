@@ -2232,6 +2232,50 @@ class CrmLibrary
     }
 
     /**
+     * Parse Membership select
+     *
+     * @param Template Object $objTpl      Template object
+     * @param array           $memberShips membership ids
+     * @param string          $form        associated form
+     * @param string          $block       block to parse
+     * @param string          $name        name of the select
+     * @param array           $selected    selected values
+     * @param array           $lang        array with lang placeholder for select description
+     */
+    public function parseMembershipSelect($objTpl, $memberShips, $form, $block, $name = "assigned_group", $selected = array(), $lang = array())
+    {
+        $langAssociated = '';
+        if (!empty($lang['associated'])) {
+            $langAssociated = $lang['associated'];
+        }
+        $langNotAssociated = '';
+        if (!empty($lang['notAssociated'])) {
+            $langNotAssociated = $lang['notAssociated'];
+        }
+
+        $list = array();
+        foreach ($memberShips as $id) {
+            $list[$id] = contrexx_raw2xhtml($this->_memberShips[$id]);
+        }
+
+        $membershipSelect = new \Cx\Core\Html\Model\Entity\MultiSelectElement(
+            'wrapper_' . $name,
+            $name,
+            $langAssociated,
+            $name . 'excluded',
+            $langNotAssociated,
+            $list,
+            $selected,
+            $form
+        );
+        $objTpl->setVariable(
+            array(
+                $block => $membershipSelect,
+            )
+        );
+    }
+
+    /**
      * Get membership dropdown for overview page
      *
      * @param Template Object $objTpl          Template object
