@@ -1,4 +1,3 @@
-
 <?php
 
 /**
@@ -228,7 +227,7 @@ class User extends \Cx\Model\Base\EntityBase {
      * @OA\Property(
      *     description="Boolean to define if a user has admin rights",
      *     title="Is Admin",
-     *     type="boolean"
+     *     type="boolean",
      *     default="false",
      * )
      *
@@ -240,7 +239,7 @@ class User extends \Cx\Model\Base\EntityBase {
      * @OA\Property(
      *     description="Username",
      *     title="Username",
-     *     maximum=255
+     *     maximum=255,
      * )
      * @var string
      */
@@ -251,7 +250,7 @@ class User extends \Cx\Model\Base\EntityBase {
      *     description="Password with at least 6 characters as well as contain at least one upper and one lower case
      *     character and one number",
      *     title="Password",
-     *     maximum=255
+     *     maximum=255,
      * )
      *
      * @var string
@@ -270,7 +269,7 @@ class User extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     format="int"
+     *     format="int",
      *     description="Timestamp of user registration",
      *     title="Register date",
      * )
@@ -281,7 +280,7 @@ class User extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     format="int"
+     *     format="int",
      *     description="Timestamp of expiration to enclose certain users",
      *     title="Expiration date",
      * )
@@ -296,7 +295,7 @@ class User extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     format="int"
+     *     format="int",
      *     description="Timestamp of last authentication",
      *     title="Expiration date",
      * )
@@ -308,7 +307,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * TODO: More information about this field
      * @OA\Property(
-     *     format="int"
+     *     format="int",
      *     description="Timestamp of last authentication status",
      *     title="Last authentication status",
      * )
@@ -319,7 +318,7 @@ class User extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     format="int"
+     *     format="int",
      *     description="Timestamp of the last time the user was active",
      *     title="Last activity",
      * )
@@ -333,7 +332,7 @@ class User extends \Cx\Model\Base\EntityBase {
      *     format="email",
      *     description="Email",
      *     title="Email",
-     *     maximum=255
+     *     maximum=255,
      * )
      *
      * @var string
@@ -356,7 +355,7 @@ class User extends \Cx\Model\Base\EntityBase {
      *     format="int",
      *     description="Set the default Frontend-Language for the user, for English set to 1 and German to 2",
      *     title="Frontend Language",
-     *     default="0"
+     *     default="0",
      * )
      *
      * @var integer
@@ -368,7 +367,7 @@ class User extends \Cx\Model\Base\EntityBase {
      *     format="int",
      *     description="Set the default Backend-Language for the user, for English set to 1 and German to 2",
      *     title="Backend Language",
-     *     default="0"
+     *     default="0",
      * )
      *
      * @var integer
@@ -380,7 +379,7 @@ class User extends \Cx\Model\Base\EntityBase {
      *     format="boolean",
      *     description="Deactivate or activate a user",
      *     title="Active",
-     *     default="true"
+     *     default="true",
      * )
      *
      * @var boolean
@@ -392,7 +391,7 @@ class User extends \Cx\Model\Base\EntityBase {
      *     format="boolean",
      *     description="Flag to show if the user is verified",
      *     title="Verified",
-     *     default="true"
+     *     default="true",
      * )
      *
      * @var boolean
@@ -404,7 +403,7 @@ class User extends \Cx\Model\Base\EntityBase {
      *     format="int",
      *     description="Assign a primary group to the user",
      *     title="Primary group",
-     *     default="0"
+     *     default="0",
      * )
      *
      * @var integer
@@ -437,7 +436,7 @@ class User extends \Cx\Model\Base\EntityBase {
      *     format="boolean",
      *     description="TODO",
      *     title="User to user active",
-     *     default="false"
+     *     default="false",
      * )
      *
      * @var boolean
@@ -446,10 +445,8 @@ class User extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     type="array",
      *     description="TODO",
      *     title="User groups",
-     *     items=[],
      * )
      *
      * @var \Doctrine\Common\Collections\Collection
@@ -458,10 +455,8 @@ class User extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     type="array",
      *     description="TODO",
      *     title="User Attribute Values",
-     *     items=[],
      * )
      *
      * @var \Doctrine\Common\Collections\Collection
