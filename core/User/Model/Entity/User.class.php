@@ -1,3 +1,4 @@
+
 <?php
 
 /**
@@ -85,8 +86,8 @@ class UserValidateEmail extends \CxValidate
         $em = $cx->getDb()->getEntityManager();
         $qb = $em->createQueryBuilder();
         $qb->select('u')
-           ->from('Cx\Core\User\Model\Entity\User', 'u')
-           ->where($qb->expr()->eq('u.email', ':email'));
+            ->from('Cx\Core\User\Model\Entity\User', 'u')
+            ->where($qb->expr()->eq('u.email', ':email'));
         if (!empty($this->userId)) {
             $qb->andWhere($qb->expr()->not($qb->expr()->eq('u.id', ':id')));
             $qb->setParameter('id', $this->userId);
@@ -199,28 +200,60 @@ class UserValidateUsername extends \CxValidate
 /**
  * Users can be created and managed.
  *
+ *
  * @copyright   CLOUDREXX CMS - Cloudrexx AG Thun
  * @author      Dario Graf <info@cloudrexx.com>
  * @package     cloudrexx
  * @subpackage  core_user
+ *
+ * @OA\Schema(
+ *     description="User model",
+ *     title="User model",
+ *     required={"email",},
+ * )
  */
 class User extends \Cx\Model\Base\EntityBase {
     /**
+     * @OA\Property(
+     *     format="int",
+     *     description="User Id",
+     *     title="ID",
+     * )
+     *
      * @var integer
      */
     protected $id;
 
     /**
+     * @OA\Property(
+     *     description="Boolean to define if a user has admin rights",
+     *     title="Is Admin",
+     *     type="boolean"
+     *     default="false",
+     * )
+     *
      * @var boolean
      */
     protected $isAdmin = false;
 
     /**
+     * @OA\Property(
+     *     description="Username",
+     *     title="Username",
+     *     maximum=255
+     * )
      * @var string
      */
     protected $username;
 
     /**
+     * @OA\Property(
+     *     description="Password with at least 6 characters as well as contain at least one upper and one lower case
+     *     character and one number",
+     *     title="Password",
+     *     maximum=255
+     * )
+     *
      * @var string
      */
     protected $password;
@@ -236,11 +269,22 @@ class User extends \Cx\Model\Base\EntityBase {
     protected $authTokenTimeout = 0;
 
     /**
+     * @OA\Property(
+     *     format="int"
+     *     description="Timestamp of user registration",
+     *     title="Register date",
+     * )
+     *
      * @var integer
      */
     protected $regdate = 0;
 
     /**
+     * @OA\Property(
+     *     format="int"
+     *     description="Timestamp of expiration to enclose certain users",
+     *     title="Expiration date",
+     * )
      * @var integer
      */
     protected $expiration = 0;
@@ -251,56 +295,129 @@ class User extends \Cx\Model\Base\EntityBase {
     protected $validity = 0;
 
     /**
+     * @OA\Property(
+     *     format="int"
+     *     description="Timestamp of last authentication",
+     *     title="Expiration date",
+     * )
+     *
      * @var integer
      */
     protected $lastAuth = 0;
 
     /**
+     * TODO: More information about this field
+     * @OA\Property(
+     *     format="int"
+     *     description="Timestamp of last authentication status",
+     *     title="Last authentication status",
+     * )
+     *
      * @var integer
      */
     protected $lastAuthStatus = 0;
 
     /**
+     * @OA\Property(
+     *     format="int"
+     *     description="Timestamp of the last time the user was active",
+     *     title="Last activity",
+     * )
+     *
      * @var integer
      */
     protected $lastActivity = 0;
 
     /**
+     * @OA\Property(
+     *     format="email",
+     *     description="Email",
+     *     title="Email",
+     *     maximum=255
+     * )
+     *
      * @var string
      */
     protected $email;
 
     /**
+     * @OA\Property(
+     *     description="Define the email access",
+     *     title="Email access",
+     *     enum={"everyone", "members_only", "nobody"},
+     * )
+     *
      * @var string enum_user_user_emailaccess
      */
     protected $emailAccess;
 
     /**
+     * @OA\Property(
+     *     format="int",
+     *     description="Set the default Frontend-Language for the user, for English set to 1 and German to 2",
+     *     title="Frontend Language",
+     *     default="0"
+     * )
+     *
      * @var integer
      */
     protected $frontendLangId = 0;
 
     /**
+     * @OA\Property(
+     *     format="int",
+     *     description="Set the default Backend-Language for the user, for English set to 1 and German to 2",
+     *     title="Backend Language",
+     *     default="0"
+     * )
+     *
      * @var integer
      */
     protected $backendLangId = 0;
 
     /**
+     * @OA\Property(
+     *     format="boolean",
+     *     description="Deactivate or activate a user",
+     *     title="Active",
+     *     default="true"
+     * )
+     *
      * @var boolean
      */
     protected $active = true;
 
     /**
+     * @OA\Property(
+     *     format="boolean",
+     *     description="Flag to show if the user is verified",
+     *     title="Verified",
+     *     default="true"
+     * )
+     *
      * @var boolean
      */
     protected $verified = true;
 
     /**
+     * @OA\Property(
+     *     format="int",
+     *     description="Assign a primary group to the user",
+     *     title="Primary group",
+     *     default="0"
+     * )
+     *
      * @var integer
      */
     protected $primaryGroup = 0;
 
     /**
+     * @OA\Property(
+     *     description="Define the profile access",
+     *     title="Profile access",
+     *     enum={"everyone", "members_only", "nobody"},
+     * )
+     *
      * @var string enum_user_user_profileaccess
      */
     protected $profileAccess;
@@ -316,16 +433,37 @@ class User extends \Cx\Model\Base\EntityBase {
     protected $restoreKeyTime = 0;
 
     /**
+     * @OA\Property(
+     *     format="boolean",
+     *     description="TODO",
+     *     title="User to user active",
+     *     default="false"
+     * )
+     *
      * @var boolean
      */
     protected $u2uActive = false;
 
     /**
+     * @OA\Property(
+     *     type="array",
+     *     description="TODO",
+     *     title="User groups",
+     *     items=[],
+     * )
+     *
      * @var \Doctrine\Common\Collections\Collection
      */
     protected $groups;
 
     /**
+     * @OA\Property(
+     *     type="array",
+     *     description="TODO",
+     *     title="User Attribute Values",
+     *     items=[],
+     * )
+     *
      * @var \Doctrine\Common\Collections\Collection
      */
     protected $userAttributeValues;
@@ -354,7 +492,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get id
      *
-     * @return integer 
+     * @return integer
      */
     public function getId()
     {
@@ -374,7 +512,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get isAdmin
      *
-     * @return boolean 
+     * @return boolean
      */
     public function getIsAdmin()
     {
@@ -394,7 +532,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get username
      *
-     * @return string 
+     * @return string
      */
     public function getUsername()
     {
@@ -414,7 +552,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get password
      *
-     * @return string 
+     * @return string
      */
     public function getPassword()
     {
@@ -434,7 +572,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get authToken
      *
-     * @return string 
+     * @return string
      */
     public function getAuthToken()
     {
@@ -454,7 +592,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get authTokenTimeout
      *
-     * @return integer 
+     * @return integer
      */
     public function getAuthTokenTimeout()
     {
@@ -474,7 +612,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get regdate
      *
-     * @return integer 
+     * @return integer
      */
     public function getRegdate()
     {
@@ -494,7 +632,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get expiration
      *
-     * @return integer 
+     * @return integer
      */
     public function getExpiration()
     {
@@ -514,7 +652,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get validity
      *
-     * @return integer 
+     * @return integer
      */
     public function getValidity()
     {
@@ -534,7 +672,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get lastAuth
      *
-     * @return integer 
+     * @return integer
      */
     public function getLastAuth()
     {
@@ -554,7 +692,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get lastAuthStatus
      *
-     * @return integer 
+     * @return integer
      */
     public function getLastAuthStatus()
     {
@@ -574,7 +712,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get lastActivity
      *
-     * @return integer 
+     * @return integer
      */
     public function getLastActivity()
     {
@@ -594,7 +732,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get email
      *
-     * @return string 
+     * @return string
      */
     public function getEmail()
     {
@@ -614,7 +752,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get emailAccess
      *
-     * @return enum_user_user_emailaccess 
+     * @return enum_user_user_emailaccess
      */
     public function getEmailAccess()
     {
@@ -634,7 +772,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get frontendLangId
      *
-     * @return integer 
+     * @return integer
      */
     public function getFrontendLangId()
     {
@@ -654,7 +792,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get backendLangId
      *
-     * @return integer 
+     * @return integer
      */
     public function getBackendLangId()
     {
@@ -676,7 +814,7 @@ class User extends \Cx\Model\Base\EntityBase {
      *
      * This does exactly the same as getActive, but this method is necessary for doctrine mapping
      *
-     * @return boolean 
+     * @return boolean
      */
     public function getActive()
     {
@@ -708,7 +846,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get verified
      *
-     * @return boolean 
+     * @return boolean
      */
     public function getVerified()
     {
@@ -728,7 +866,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get primaryGroup
      *
-     * @return integer 
+     * @return integer
      */
     public function getPrimaryGroup()
     {
@@ -748,7 +886,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get profileAccess
      *
-     * @return enum_user_user_profileaccess 
+     * @return enum_user_user_profileaccess
      */
     public function getProfileAccess()
     {
@@ -763,14 +901,14 @@ class User extends \Cx\Model\Base\EntityBase {
     public function setRestoreKey($restoreKey = null)
     {
         $this->restoreKey = !empty($restoreKey)
-                            ? $restoreKey
-                            : md5($this->email . random_bytes(20));
+            ? $restoreKey
+            : md5($this->email . random_bytes(20));
     }
 
     /**
      * Get restoreKey
      *
-     * @return string 
+     * @return string
      */
     public function getRestoreKey()
     {
@@ -790,7 +928,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get restoreKeyTime
      *
-     * @return integer 
+     * @return integer
      */
     public function getRestoreKeyTime()
     {
@@ -810,7 +948,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get u2uActive
      *
-     * @return enum_user_user_u2uactive 
+     * @return enum_user_user_u2uactive
      */
     public function getU2uActive()
     {
@@ -837,7 +975,7 @@ class User extends \Cx\Model\Base\EntityBase {
         $this->groups->removeElement($group);
     }
 
-    
+
     /**
      * Get group
      *
