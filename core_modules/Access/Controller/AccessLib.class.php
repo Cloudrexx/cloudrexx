@@ -356,10 +356,11 @@ class AccessLib
             $arrSettings = \User_Setting::getSettings();
             $cx    = \Cx\Core\Core\Controller\Cx::instanciate();
             $image = $objUser->getProfileAttribute($objAttribute->getId(), $historyId);
-            $imageRepoWeb  = $attributeId == 'picture'
+            $defaultTitle = $objUser->objAttribute->getDefaultAttributeIdByAttributeId($attributeId);
+            $imageRepoWeb  = $defaultTitle == 'picture'
                                 ? $cx->getWebsiteImagesAccessProfileWebPath()
                                 : $cx->getWebsiteImagesAccessPhotoWebPath();
-            $imageRepoPath = $attributeId == 'picture'
+            $imageRepoPath = $defaultTitle == 'picture'
                                 ? $cx->getWebsiteImagesAccessProfilePath()
                                 : $cx->getWebsiteImagesAccessPhotoPath();
 
@@ -915,7 +916,8 @@ class AccessLib
         global $_CORELANG;
 
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-        if ($attributeId == 'picture') {
+        $defaultId = $objUser->objAttribute->getDefaultAttributeIdByAttributeId($attributeId);
+        if ($defaultId == 'picture') {
             $imageRepo    = $cx->getWebsiteImagesAccessProfilePath().'/';
             $imageRepoWeb = $cx->getWebsiteImagesAccessProfileWebPath().'/';
             $arrNoImage   = \User_Profile::$arrNoAvatar;
@@ -1122,12 +1124,10 @@ class AccessLib
         case 'menu':
             if ($edit) {
                 $childrenCode = array();
-                if ($objAttribute->isCustomAttribute()) {
-                    if ($objAttribute->isMandatory()) {
-                        $childrenCode[] = $this->getMenuOptionAttributeCode('0', $objUser->getProfileAttribute($objAttribute->getId(), $historyId), $_CORELANG['TXT_ACCESS_PLEASE_SELECT'], 'border-bottom:1px solid #000000;');
-                    } else {
-                        $childrenCode[] = $this->getMenuOptionAttributeCode('0', $objUser->getProfileAttribute($objAttribute->getId(), $historyId), $_CORELANG['TXT_ACCESS_NOT_SPECIFIED'], 'border-bottom:1px solid #000000;');
-                    }
+                if ($objAttribute->isMandatory()) {
+                    $childrenCode[] = $this->getMenuOptionAttributeCode('0', $objUser->getProfileAttribute($objAttribute->getId(), $historyId), $_CORELANG['TXT_ACCESS_PLEASE_SELECT'], 'border-bottom:1px solid #000000;');
+                } else {
+                    $childrenCode[] = $this->getMenuOptionAttributeCode('0', $objUser->getProfileAttribute($objAttribute->getId(), $historyId), $_CORELANG['TXT_ACCESS_NOT_SPECIFIED'], 'border-bottom:1px solid #000000;');
                 }
 
                 foreach ($objAttribute->getChildren() as $childAttributeId) {
@@ -2025,7 +2025,7 @@ JS
 
             do {
                 $arrImagesDb = $objUser->objAttribute->getImages(
-                    $step, $offset, $count
+                    $step, $offset, $count, $profilePics
                 );
                 if (empty($arrImagesDb)) {
                     break;
@@ -2526,9 +2526,7 @@ JS
                         }
                         break;
 
-                    case 'title':
                     case 'country':
-                        $title = '';
                         $value = $objUser->objAttribute->getById($field . '_' . $value)->getName();
                         break;
 

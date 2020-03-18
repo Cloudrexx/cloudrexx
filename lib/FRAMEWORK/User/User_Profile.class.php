@@ -227,14 +227,6 @@ class User_Profile
                 $newValue = !isset($this->arrCachedUsers[$this->id]['profile'][$attributeId][$historyId]);
                 if ($newValue || $value != $this->arrCachedUsers[$this->id]['profile'][$attributeId][$historyId]) {
                     $value = '"' . contrexx_raw2db($value) . '"';
-                    if (
-                        $attributeId == 'title' && (
-                            $value == '""' ||
-                            $value == '"0"'
-                        )
-                    ) {
-                        $value = '"gender_undefined"';
-                    }
 
                     if ($this->objAttribute->isDefaultAttribute($attributeId)) {
                         $attributeId = $this->objAttribute->getAttributeIdByDefaultAttributeId($attributeId);
@@ -312,7 +304,7 @@ class User_Profile
         if ($objAttributeValue !== false && $objAttributeValue->RecordCount() > 0) {
             while (!$objAttributeValue->EOF) {
                 $attributeId = $objAttributeValue->fields['attribute_id'];
-                if ($this->objAttribute->isIdAssignedToDefaultAttribute($attributeId)) {
+                if ($this->objAttribute->isDefaultAttribute($attributeId)) {
                     $attributeId = $this->objAttribute->getDefaultAttributeIdByAttributeId($attributeId);
                 }
                 $this->arrCachedUsers[$objAttributeValue->fields['user_id']]['profile'][$attributeId][$objAttributeValue->fields['history_id']] =
@@ -641,12 +633,12 @@ class User_Profile
                         if (is_array($search)) {
                             foreach ($search as $name) {
                                 if (stristr($objChildAttribute->getName(), $name)) {
-                                    $arrMatchedChildren[] = in_array($attributeId, array('title', 'country')) ? (preg_match('#([0-9]+)#', $childAttributeId, $pattern) ? $pattern[0] : 0) : $childAttributeId;
+                                    $arrMatchedChildren[] = in_array($attributeId, array('country')) ? (preg_match('#([0-9]+)#', $childAttributeId, $pattern) ? $pattern[0] : 0) : $childAttributeId;
                                     break;
                                 }
                             }
                         } elseif (stristr($objChildAttribute->getName(), $search)) {
-                            $arrMatchedChildren[] = in_array($attributeId, array('title', 'country')) ? (preg_match('#([0-9]+)#', $childAttributeId, $pattern) ? $pattern[0] : 0) : $childAttributeId;
+                            $arrMatchedChildren[] = in_array($attributeId, array('country')) ? (preg_match('#([0-9]+)#', $childAttributeId, $pattern) ? $pattern[0] : 0) : $childAttributeId;
                         }
                     }
                     if (count($arrMatchedChildren)) {

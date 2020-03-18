@@ -533,67 +533,10 @@ class User_Profile_Attribute
         $this->arrAttributeRelations = null;
         $this->arrAttributeTree = null;
 
-        $this->loadDefaultAttributes();
-        $this->loadCustomAttributes();
+        $this->loadAttributes();
+        $this->loadCoreAttributeCountry();
         $this->generateAttributeRelations();
         $this->sortChildren();
-    }
-
-    /**
-     * Find all default user attributes (DefaultAttributes) and store it in an
-     * array
-     */
-    function loadDefaultAttributes()
-    {
-        global $objDatabase, $_CORELANG;
-
-        $this->arrDefaultAttributeIds = array();
-        $this->arrAttributes = $this->arrDefaultAttributeTemplates;
-        foreach ($this->arrAttributes as $attributeId => &$arrAttribute) {
-            if (!$arrAttribute['parent_id']) {
-                $this->arrDefaultAttributeIds[] = $attributeId;
-            }
-            $arrAttribute['names'][$this->langId] = isset($_CORELANG[$arrAttribute['desc']]) ? $_CORELANG[$arrAttribute['desc']] : null;
-        }
-
-        $query = '
-            SELECT 
-                `tblA`.`id` AS `id`, 
-                `tblN`.`name` AS `name`,
-                `tblA`.`sort_type` AS `sort_type`, 
-                `tblA`.`mandatory` AS `mandatory`,  
-                `tblA`.`order_id` AS `order_id`,  
-                `tblA`.`access_special` AS `access_special`,  
-                `tblA`.`access_id` AS `access_id`,  
-                `tblA`.`read_access_id` AS `read_access_id`
-            FROM `' .DBPREFIX .'access_user_attribute` AS `tblA`
-            LEFT JOIN `'.DBPREFIX.'access_user_attribute_name` AS `tblN`
-                ON `tblN`.`attribute_id` = `tblA`.`id`
-            WHERE `tblA`.`is_default` = 1 
-        ';
-
-        $objAttribute = $objDatabase->Execute($query);
-
-        if ($objAttribute !== false && $objAttribute->RecordCount() > 0) {
-            while (!$objAttribute->EOF) {
-                $this->arrDefaultAttributeNames[$objAttribute->fields['id']] = $objAttribute->fields['name'];
-
-                $this->arrAttributes[$objAttribute->fields['name']]['mandatory'] = $objAttribute->fields['mandatory'];
-                $this->arrAttributes[$objAttribute->fields['name']]['sort_type'] = $objAttribute->fields['sort_type'];
-                $this->arrAttributes[$objAttribute->fields['name']]['order_id'] = $objAttribute->fields['order_id'];
-                $this->arrAttributes[$objAttribute->fields['name']]['access_special'] = $objAttribute->fields['access_special'];
-                $this->arrAttributes[$objAttribute->fields['name']]['access_id'] = $objAttribute->fields['access_id'];
-                $this->arrAttributes[$objAttribute->fields['name']]['read_access_id'] = $objAttribute->fields['read_access_id'];
-                $this->arrAttributes[$objAttribute->fields['name']]['customizing'] = true;
-                if ($objAttribute->fields['mandatory']) {
-                    $this->arrMandatoryAttributes[] = $objAttribute->fields['name'];
-                }
-
-                $objAttribute->MoveNext();
-            }
-        }
-        $this->loadCoreAttributeCountry();
-        $this->loadCoreAttributeTitle();
     }
 
     function loadCoreAttributeCountry()
@@ -607,7 +550,7 @@ class User_Profile_Attribute
                 'multiline' => false,
                 'mandatory' => false,
                 'sort_type' => 'asc',
-                'parent_id' => 'country',
+                'parent_id' => $this->getAttributeIdByDefaultAttributeId('country'),
                 'desc' => $country['name'],
                 'names' => array($this->langId => $country['name']),
                 'value' => $country['id'],
@@ -616,88 +559,76 @@ class User_Profile_Attribute
         }
     }
 
-
-    function loadCoreAttributeTitle()
+    /**
+     * Find all default user attributes and store it in an
+     * array
+     */
+    function loadAttributes()
     {
         global $objDatabase;
-        // Find children of user attribute title
-        $objResult = $objDatabase->Execute('
-            SELECT 
-                `name`.`id` AS `id` , `name`.`name` AS `title`, 
-                `attribute`.`order_id`
-            FROM `'.DBPREFIX.'access_user_attribute_name` AS `name` 
-            LEFT JOIN `'.DBPREFIX.'access_user_attribute` AS `attribute` 
-                ON `name`.`attribute_id` = `attribute`.`id`
-            LEFT JOIN `'.DBPREFIX.'access_user_attribute_name` AS `titleAttr` 
-                ON `titleAttr`.`name` = "title"
-            WHERE `attribute`.`parent_id`= `titleAttr`.`attribute_id`;
-        ');
-        if ($objResult) {
-            while (!$objResult->EOF) {
-                $this->arrAttributes['title_'.$objResult->fields['id']] = array(
-                    'type' => 'menu_option',
-                    'multiline' => false,
-                    'mandatory' => false,
-                    'sort_type' => 'asc',
-                    'parent_id' => 'title',
-                    'desc' => $objResult->fields['title'],
-                    'value' => $objResult->fields['id'],
-                    'order_id' => $objResult->fields['order_id'],
-                    'modifiable' => array('names'),
-                );
 
-                // add names for all languages
-                foreach (\FWLanguage::getLanguageArray() as $langId => $langData) {
-                    $this->arrAttributes['title_'.$objResult->fields['id']]['names'][$langId] = $objResult->fields['title'];
-                }
-                $objResult->MoveNext();
-            }
-        }
-    }
-
-    function loadCustomAttributes()
-    {
-        global $objDatabase;
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $frontend = $cx->getMode() == \Cx\Core\Core\Controller\Cx::MODE_FRONTEND;
+        $langData = \Env::get('init')->getComponentSpecificLanguageData('Core', $frontend);
 
         $this->arrCustomAttributes = array();
         $objResult = $objDatabase->Execute('
             SELECT
-                `id`,
-                `type`,
-                `sort_type`,
-                `order_id`,
-                `mandatory`,
-                `parent_id`,
-                `access_special`,
-                `access_id`,
-                `read_access_id`,
-                `is_default`
+                `tblA`.`id`,
+                `tblA`.`type`,
+                `tblA`.`sort_type`,
+                `tblA`.`order_id`,
+                `tblA`.`mandatory`,
+                `tblA`.`parent_id`,
+                `tblA`.`access_special`,
+                `tblA`.`access_id`,
+                `tblA`.`read_access_id`,
+                `tblA`.`is_default`,
+                `tblN`.`name` AS `name`
             FROM
-                `' . DBPREFIX . 'access_user_attribute`
-            WHERE `is_default` = 0
+                `' . DBPREFIX . 'access_user_attribute` AS `tblA`
+            LEFT JOIN `'.DBPREFIX.'access_user_attribute_name` AS `tblN`
+                ON `tblN`.`attribute_id` = `tblA`.`id`
             ORDER BY
                 `order_id`,
                 `id`
         ');
         if ($objResult) {
             while (!$objResult->EOF) {
-                $this->arrAttributes[$objResult->fields['id']]['type'] = $objResult->fields['type'] == 'textarea' ? 'text' : $objResult->fields['type'];
-                $this->arrAttributes[$objResult->fields['id']]['multiline'] = $objResult->fields['type'] == 'textarea' ? true : false;
-                $this->arrAttributes[$objResult->fields['id']]['sort_type'] = $objResult->fields['sort_type'];
-                $this->arrAttributes[$objResult->fields['id']]['order_id'] = $objResult->fields['order_id'];
-                $this->arrAttributes[$objResult->fields['id']]['mandatory'] = $objResult->fields['mandatory'];
+                $attributeId = $objResult->fields['id'];
+                $this->arrAttributes[$attributeId]['type'] = $objResult->fields['type'] == 'textarea' ? 'text' : $objResult->fields['type'];
+                $this->arrAttributes[$attributeId]['multiline'] = $objResult->fields['type'] == 'textarea' ? true : false;
+                $this->arrAttributes[$attributeId]['sort_type'] = $objResult->fields['sort_type'];
+                $this->arrAttributes[$attributeId]['order_id'] = $objResult->fields['order_id'];
+                $this->arrAttributes[$attributeId]['mandatory'] = $objResult->fields['mandatory'];
                 $parentId = $objResult->fields['parent_id'];
                 if ($parentId === null) {
                     $parentId = 0;
                 }
-                $this->arrAttributes[$objResult->fields['id']]['parent_id'] = $parentId;
-                $this->arrAttributes[$objResult->fields['id']]['access_special'] = $objResult->fields['access_special'];
-                $this->arrAttributes[$objResult->fields['id']]['access_id'] = $objResult->fields['access_id'];
-                $this->arrAttributes[$objResult->fields['id']]['read_access_id'] = $objResult->fields['read_access_id'];
-                $this->arrAttributes[$objResult->fields['id']]['modifiable'] = array('type', 'sort_order', 'mandatory', 'parent_id', 'access', 'children');
-                $this->arrCustomAttributes[] = $objResult->fields['id'];
+                $this->arrAttributes[$attributeId]['parent_id'] = $parentId;
+                $this->arrAttributes[$attributeId]['access_special'] = $objResult->fields['access_special'];
+                $this->arrAttributes[$attributeId]['access_id'] = $objResult->fields['access_id'];
+                $this->arrAttributes[$attributeId]['read_access_id'] = $objResult->fields['read_access_id'];
+                if (!$objResult->fields['is_default']) {
+                    $this->arrAttributes[$attributeId]['modifiable'] = array('type', 'sort_order', 'mandatory', 'parent_id', 'access', 'children');
+                    $this->arrCustomAttributes[] = $objResult->fields['id'];
+                } else {
+                    if (!$objResult->fields['parent_id']) {
+                        $this->arrDefaultAttributeIds[] = $attributeId;
+                    }
+                    $this->arrDefaultAttributeNames[$attributeId] = $objResult->fields['name'];
+
+                    if (isset($this->arrDefaultAttributeTemplates[$objResult->fields['name']])) {
+                        $arrTemplate = $this->arrDefaultAttributeTemplates[$objResult->fields['name']];
+                        $desc = $arrTemplate['desc'];
+                        $this->arrAttributes[$attributeId]['names'][$this->langId] = isset($langData[$desc]) ? $langData[$desc] : null;
+                        $this->arrAttributes[$attributeId]['modifiable'] = $arrTemplate['modifiable'];
+                    } else if ($objResult->fields['parent_id'] == $this->getAttributeIdByDefaultAttributeId('title')) {
+                        $this->arrAttributes[$attributeId]['modifiable'] = array('names');
+                    }
+                }
                 if ($objResult->fields['mandatory']) {
-                    $this->arrMandatoryAttributes[] = $objResult->fields['id'];
+                    $this->arrMandatoryAttributes[] = $attributeId;
                 }
                 $objResult->MoveNext();
             }
@@ -740,7 +671,11 @@ class User_Profile_Attribute
     function generateAttributeRelations()
     {
         foreach ($this->arrAttributes as $attribute => $arrAttribute) {
-            $this->arrAttributeRelations[$arrAttribute['parent_id']][] = $attribute;
+            if (!empty($arrAttribute['parent_id'])) {
+                $this->arrAttributeRelations[$arrAttribute['parent_id']][] = $attribute;
+            } else {
+                $this->arrAttributeRelations[$arrAttribute['parent_id']][] = $attribute;
+            }
         }
     }
 
@@ -789,17 +724,19 @@ class User_Profile_Attribute
      * @param int   $limit  limit of database query
      * @param int   $offset offset of database query
      * @param int   $count  count of entries
+     * @param bool  $profilePics limit to profile pictures
      * @return array images names
      */
-    public function getImages($limit, $offset, &$count)
+    public function getImages($limit, $offset, &$count, $profilePics)
     {
         global $objDatabase;
 
+        $picId = $this->getAttributeIdByDefaultAttributeId('picture');
         $query = "
                 SELECT SUM(1) as entryCount
                 FROM `".DBPREFIX."access_user_attribute` AS a
                 INNER JOIN `".DBPREFIX."access_user_attribute_value` AS v ON v.`attribute_id` = a.`id`
-                WHERE a.`type` = 'image' AND v.`value` != ''";
+                WHERE a.`type` = 'image' AND v.`value` != ''" . ($profilePics ? ' AND `a`.`id` = ' . $picId : '');
 
         $objCount = $objDatabase->Execute($query);
         if (!$objCount || !$objCount->fields['entryCount']) {
@@ -813,7 +750,7 @@ class User_Profile_Attribute
                 FROM `".DBPREFIX."access_user_attribute` AS a
                 INNER JOIN `".DBPREFIX."access_user_attribute_value` AS v 
                     ON v.`attribute_id` = a.`id`
-                WHERE a.`type` = 'image' AND v.`value` != ''";
+                WHERE a.`type` = 'image' AND v.`value` != ''" . ($profilePics ? ' AND `a`.`id` = ' . $picId : '');
 
         $objImage = $objDatabase->SelectLimit($query, $limit, $offset);
         if ($objImage === false) {
@@ -856,6 +793,10 @@ class User_Profile_Attribute
      */
     function load($id)
     {
+        if ($this->isDefaultAttribute($id)) {
+            $id = $this->getAttributeIdByDefaultAttributeId($id);
+        }
+
         if (isset($this->arrAttributes[$id])) {
             $this->id = $id;
             $this->type = isset($this->arrAttributes[$id]['type']) ? $this->arrAttributes[$id]['type'] : $this->defaultAttributeType;
@@ -997,12 +938,8 @@ class User_Profile_Attribute
         global $_ARRAYLANG;
 
         if ($this->checkIntegrity()) {
-            if ($this->parent_id === 'title' && $this->storeCoreAttributeTitle() ||
-                $this->isDefaultAttribute($this->id) && $this->storeCoreAttribute() ||
-                $this->storeCustomAttribute()
-            ) {
-                if (preg_match('/^title_[0-9]+$/', $this->id) ||
-                    ($this->isDefaultAttribute($this->id) || $this->storeNames()) &&
+            if ($this->storeCustomAttribute()) {
+                if (($this->isDefaultAttribute($this->id) || $this->storeNames()) &&
                     $this->storeChildrenOrder() &&
                     $this->storeProtection($this->protected, $this->access_id, 'access_id', $this->access_group_ids) &&
                     $this->storeProtection($this->readProtected, $this->readAccessId, 'read_access_id', $this->readAccessGroupIds, 'read')
@@ -1319,16 +1256,6 @@ class User_Profile_Attribute
 // TODO: I suppose the precedence is okay like this.
 //        return ($this->isCoreAttribute($attributeId) || $this->deleteAttributeContent($attributeId)) && ($this->isCoreAttribute($attributeId) || $this->deleteAttributeNames($attributeId)) && $this->deleteAttributeEntity($attributeId);
 // However, it would be clearer with a few parentheses.
-
-        $parentId = $this->arrAttributes[$attributeId]['parent_id'] ?? '0';
-        $pattern = array();
-        if (
-            $parentId == 'title' &&
-            preg_match('#([0-9]+)#', $attributeId, $pattern)
-        ) {
-            $attributeId = $pattern[0];
-        }
-
         return
             (   $this->isDefaultAttribute($attributeId)
              ||    $this->deleteAttributeContent($attributeId))
@@ -1668,29 +1595,12 @@ class User_Profile_Attribute
             $attributeId = $this->id;
         }
 
+        if (is_numeric($attributeId)) {
+            return !empty($this->getDefaultAttributeNames()[$attributeId]);
+        }
+
         return isset($this->arrDefaultAttributeTemplates[$attributeId]);
     }
-
-    /**
-     * In the system, the ID of a default attribute is the name of the attribute
-     * (e.g. 'title'). But if we want to interact with the database, the default
-     * attribute is handled like other user attributes. This means we have an
-     * integer ID (e.g. 2) and had to track this ID (2) with the system-intern
-     * default attribute ID ('title')
-     *
-     * This method checks if the given attribute id (e.g. 2) is assigned to a
-     * default attribute
-     *
-     * @param int $attributeId id to check if it is assigned
-     * @return bool if is assigned to an default attribute
-     */
-    public function isIdAssignedToDefaultAttribute($attributeId) {
-        if (!empty($this->getDefaultAttributeNames()[$attributeId])) {
-            return true;
-        }
-        return false;
-    }
-
 
     public function isCustomAttribute($attributeId = null)
     {
@@ -1905,7 +1815,7 @@ class User_Profile_Attribute
             return $defaultAttributes[$attributeId];
         }
 
-        return '';
+        return $attributeId;
     }
 
     /**
@@ -1929,7 +1839,7 @@ class User_Profile_Attribute
             return array_search($defaultId, $defaultAttributes);
         }
 
-        return 0;
+        return $defaultId;
     }
 
     function getId()
