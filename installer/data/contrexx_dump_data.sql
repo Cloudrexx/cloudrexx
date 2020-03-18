@@ -424,10 +424,10 @@ INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandat
 INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES (5, NULL, 'text', '0', 'asc', 0, '', 0, 0, 1);
 INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES (6, NULL, 'text', '0', 'asc', 0, '', 0, 0, 1);
 INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES (7, NULL, 'text', '0', 'asc', 0, '', 0, 0, 1);
-INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES (8, NULL, 'uri', '0', 'asc', 0, '', 0, 0, 1);
+INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES (8, NULL, 'text', '0', 'asc', 0, '', 0, 0, 1);
 INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES (9, NULL, 'text', '0', 'asc', 0, '', 0, 0, 1);
 INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES (10, NULL, 'text', '0', 'asc', 0, '', 0, 0, 1);
-INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES (11, NULL, 'text', '0', 'asc', 0, '', 0, 0, 1);
+INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES (11, NULL, 'menu', '0', 'asc', 0, '', 0, 0, 1);
 INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES (12, NULL, 'text', '0', 'asc', 0, '', 0, 0, 1);
 INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES (13, NULL, 'text', '0', 'asc', 0, '', 0, 0, 1);
 INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES (14, NULL, 'text', '0', 'asc', 0, '', 0, 0, 1);
@@ -449,8 +449,8 @@ INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `n
 INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (7, 0, 'company', NULL, 7);
 INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (8, 0, 'address', NULL, 8);
 INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (9, 0, 'city', NULL, 9);
-INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (10, 0, 'country', NULL, 10);
-INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (11, 0, 'zip', NULL, 11);
+INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (10, 0, 'zip', NULL, 10);
+INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (11, 0, 'country', NULL, 11);
 INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (12, 0, 'phone_office', NULL, 12);
 INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (13, 0, 'phone_private', NULL, 13);
 INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (14, 0, 'phone_mobile', NULL, 14);
