@@ -166,7 +166,7 @@ class GallerySql
         $arrGroups=array();
 
         while (!$objGroup->EOF) {
-            $arrGroups[intval($objGroup->getId())] = $objGroup->getName();
+            $arrGroups[$objGroup->getId()] = $objGroup->getName();
             $objGroup->next();
         }
 
