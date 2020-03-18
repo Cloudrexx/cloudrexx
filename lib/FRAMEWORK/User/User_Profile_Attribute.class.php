@@ -533,8 +533,8 @@ class User_Profile_Attribute
         $this->arrAttributeRelations = null;
         $this->arrAttributeTree = null;
 
-        $this->loadDefaultAttributes();
-        $this->loadCustomAttributes();
+        $this->loadAttributes();
+        $this->loadCoreAttributeCountry();
         $this->generateAttributeRelations();
         $this->sortChildren();
     }
@@ -578,22 +578,32 @@ class User_Profile_Attribute
             while (!$objAttribute->EOF) {
                 $this->arrDefaultAttributeNames[$objAttribute->fields['id']] = $objAttribute->fields['name'];
 
-                $this->arrAttributes[$objAttribute->fields['name']]['mandatory'] = $objAttribute->fields['mandatory'];
-                $this->arrAttributes[$objAttribute->fields['name']]['sort_type'] = $objAttribute->fields['sort_type'];
-                $this->arrAttributes[$objAttribute->fields['name']]['order_id'] = $objAttribute->fields['order_id'];
-                $this->arrAttributes[$objAttribute->fields['name']]['access_special'] = $objAttribute->fields['access_special'];
-                $this->arrAttributes[$objAttribute->fields['name']]['access_id'] = $objAttribute->fields['access_id'];
-                $this->arrAttributes[$objAttribute->fields['name']]['read_access_id'] = $objAttribute->fields['read_access_id'];
-                $this->arrAttributes[$objAttribute->fields['name']]['customizing'] = true;
+                $attributeId = $objAttribute->fields['id'];
+                $this->arrAttributes[$attributeId]['parent_id'] = $objAttribute->fields['parent_id'];
+                $this->arrAttributes[$attributeId]['mandatory'] = $objAttribute->fields['mandatory'];
+                $this->arrAttributes[$attributeId]['sort_type'] = $objAttribute->fields['sort_type'];
+                $this->arrAttributes[$attributeId]['order_id'] = $objAttribute->fields['order_id'];
+                $this->arrAttributes[$attributeId]['access_special'] = $objAttribute->fields['access_special'];
+                $this->arrAttributes[$attributeId]['access_id'] = $objAttribute->fields['access_id'];
+                $this->arrAttributes[$attributeId]['read_access_id'] = $objAttribute->fields['read_access_id'];
+                $this->arrAttributes[$attributeId]['customizing'] = true;
                 if ($objAttribute->fields['mandatory']) {
-                    $this->arrMandatoryAttributes[] = $objAttribute->fields['name'];
+                    $this->arrMandatoryAttributes[] = $attributeId;
                 }
 
                 $objAttribute->MoveNext();
             }
+
+            foreach ($this->arrDefaultAttributeTemplates as $attributeId => $arrAttribute) {
+                if ($this->isDefaultAttribute($attributeId)) {
+                    $attributeId = $this->getAttributeIdByDefaultAttributeId($attributeId);
+                }
+                if (!$arrAttribute['parent_id']) {
+                    $this->arrDefaultAttributeIds[] = $attributeId;
+                }
+                $this->arrAttributes[$attributeId]['names'][$this->langId] = isset($_CORELANG[$arrAttribute['desc']]) ? $_CORELANG[$arrAttribute['desc']] : null;
+            }
         }
-        $this->loadCoreAttributeCountry();
-        $this->loadCoreAttributeTitle();
     }
 
     function loadCoreAttributeCountry()
@@ -655,49 +665,72 @@ class User_Profile_Attribute
         }
     }
 
-    function loadCustomAttributes()
+    function loadAttributes()
     {
         global $objDatabase;
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $frontend = $cx->getMode() == \Cx\Core\Core\Controller\Cx::MODE_FRONTEND;
+        $langData = \Env::get('init')->getComponentSpecificLanguageData('Core', $frontend);
 
         $this->arrCustomAttributes = array();
         $objResult = $objDatabase->Execute('
             SELECT
-                `id`,
-                `type`,
-                `sort_type`,
-                `order_id`,
-                `mandatory`,
-                `parent_id`,
-                `access_special`,
-                `access_id`,
-                `read_access_id`,
-                `is_default`
+                `tblA`.`id`,
+                `tblA`.`type`,
+                `tblA`.`sort_type`,
+                `tblA`.`order_id`,
+                `tblA`.`mandatory`,
+                `tblA`.`parent_id`,
+                `tblA`.`access_special`,
+                `tblA`.`access_id`,
+                `tblA`.`read_access_id`,
+                `tblA`.`is_default`,
+                `tblN`.`name` AS `name`
             FROM
-                `' . DBPREFIX . 'access_user_attribute`
-            WHERE `is_default` = 0
+                `' . DBPREFIX . 'access_user_attribute` AS `tblA`
+            LEFT JOIN `'.DBPREFIX.'access_user_attribute_name` AS `tblN`
+                ON `tblN`.`attribute_id` = `tblA`.`id`
             ORDER BY
                 `order_id`,
                 `id`
         ');
         if ($objResult) {
             while (!$objResult->EOF) {
-                $this->arrAttributes[$objResult->fields['id']]['type'] = $objResult->fields['type'] == 'textarea' ? 'text' : $objResult->fields['type'];
-                $this->arrAttributes[$objResult->fields['id']]['multiline'] = $objResult->fields['type'] == 'textarea' ? true : false;
-                $this->arrAttributes[$objResult->fields['id']]['sort_type'] = $objResult->fields['sort_type'];
-                $this->arrAttributes[$objResult->fields['id']]['order_id'] = $objResult->fields['order_id'];
-                $this->arrAttributes[$objResult->fields['id']]['mandatory'] = $objResult->fields['mandatory'];
+                $attributeId = $objResult->fields['id'];
+                $this->arrAttributes[$attributeId]['type'] = $objResult->fields['type'] == 'textarea' ? 'text' : $objResult->fields['type'];
+                $this->arrAttributes[$attributeId]['multiline'] = $objResult->fields['type'] == 'textarea' ? true : false;
+                $this->arrAttributes[$attributeId]['sort_type'] = $objResult->fields['sort_type'];
+                $this->arrAttributes[$attributeId]['order_id'] = $objResult->fields['order_id'];
+                $this->arrAttributes[$attributeId]['mandatory'] = $objResult->fields['mandatory'];
                 $parentId = $objResult->fields['parent_id'];
                 if ($parentId === null) {
                     $parentId = 0;
                 }
-                $this->arrAttributes[$objResult->fields['id']]['parent_id'] = $parentId;
-                $this->arrAttributes[$objResult->fields['id']]['access_special'] = $objResult->fields['access_special'];
-                $this->arrAttributes[$objResult->fields['id']]['access_id'] = $objResult->fields['access_id'];
-                $this->arrAttributes[$objResult->fields['id']]['read_access_id'] = $objResult->fields['read_access_id'];
-                $this->arrAttributes[$objResult->fields['id']]['modifiable'] = array('type', 'sort_order', 'mandatory', 'parent_id', 'access', 'children');
-                $this->arrCustomAttributes[] = $objResult->fields['id'];
+                $this->arrAttributes[$attributeId]['parent_id'] = $parentId;
+                $this->arrAttributes[$attributeId]['access_special'] = $objResult->fields['access_special'];
+                $this->arrAttributes[$attributeId]['access_id'] = $objResult->fields['access_id'];
+                $this->arrAttributes[$attributeId]['read_access_id'] = $objResult->fields['read_access_id'];
+                if (!$objResult->fields['is_default']) {
+                    $this->arrAttributes[$attributeId]['modifiable'] = array('type', 'sort_order', 'mandatory', 'parent_id', 'access', 'children');
+                    $this->arrCustomAttributes[] = $objResult->fields['id'];
+                } else {
+                    if (!$objResult->fields['parent_id']) {
+                        $this->arrDefaultAttributeIds[] = $attributeId;
+                    }
+                    $this->arrDefaultAttributeNames[$attributeId] = $objResult->fields['name'];
+
+                    if (isset($this->arrDefaultAttributeTemplates[$objResult->fields['name']])) {
+                        $arrTemplate = $this->arrDefaultAttributeTemplates[$objResult->fields['name']];
+                        $desc = $arrTemplate['desc'];
+                        $this->arrAttributes[$attributeId]['names'][$this->langId] = isset($langData[$desc]) ? $langData[$desc] : null;
+                        $this->arrAttributes[$attributeId]['modifiable'] = $arrTemplate['modifiable'];
+                    } else if ($objResult->fields['parent_id'] == $this->getAttributeIdByDefaultAttributeId('title')) {
+                        $this->arrAttributes[$attributeId]['modifiable'] = array('names');
+                    }
+                }
                 if ($objResult->fields['mandatory']) {
-                    $this->arrMandatoryAttributes[] = $objResult->fields['id'];
+                    $this->arrMandatoryAttributes[] = $attributeId;
                 }
                 $objResult->MoveNext();
             }
@@ -740,7 +773,9 @@ class User_Profile_Attribute
     function generateAttributeRelations()
     {
         foreach ($this->arrAttributes as $attribute => $arrAttribute) {
-            if (empty($arrAttribute['parent_id'])) {
+            if (!empty($arrAttribute['parent_id'])) {
+                $this->arrAttributeRelations[$arrAttribute['parent_id']][] = $attribute;
+            } else {
                 $this->arrAttributeRelations[$arrAttribute['parent_id']][] = $attribute;
             }
         }
