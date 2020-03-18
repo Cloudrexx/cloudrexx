@@ -66,21 +66,20 @@ UPDATE `contrexx_access_user_profile` SET `tmp_name` = 'gender';
 INSERT INTO
 	`contrexx_access_user_attribute`(`parent_id`, `access_id`, `type`, `read_access_id`, `is_default`, `tmp_name`)
 	VALUES (
-	    (SELECT `attribute_id` AS `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'gender'),
-	    null AS `access_id`, 'menu_option' AS `type`, null AS `read_access_id`, 1 AS `is_default`, 'gender_male' AS `tmp_name`
+	    (SELECT `amale`.`id` FROM `contrexx_access_user_attribute` AS `amale` WHERE `amale`.`tmp_name` = 'gender'),
+	    null, 'menu_option', null, 1, 'gender_male'
 	), (
-	    (SELECT `attribute_id` AS `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'gender'),
-	    null AS `access_id`, 'menu_option' AS `type`, null AS `read_access_id`, 1 AS `is_default`, 'gender_female' AS `tmp_name`
-	)
+	    (SELECT `afemale`.`id` FROM `contrexx_access_user_attribute` AS `afemale` WHERE `afemale`.`tmp_name` = 'gender'),
+	    null, 'menu_option', null, 1, 'gender_female'
+	);
 
 INSERT INTO `contrexx_access_user_attribute_value`(`tmp_name`, `attribute_id`, `user_id`, `value`)
   SELECT `tmp_name`, (
-    SELECT `attribute_id` AS `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'gender'
+    SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'gender'
   ), `user_id`, (
-    SELECT `attribute_id` AS `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = `gender`
+    SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = `gender`
   )
   FROM `contrexx_access_user_profile`;
-
 
 UPDATE `contrexx_access_user_profile` SET `tmp_name` = 'title';
 
