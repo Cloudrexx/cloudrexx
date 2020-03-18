@@ -2547,9 +2547,7 @@ JS
                         }
                         break;
 
-                    case 'title':
                     case 'country':
-                        $title = '';
                         $value = $objUser->objAttribute->getById($field . '_' . $value)->getName();
                         break;
 

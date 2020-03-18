@@ -890,12 +890,8 @@ class User_Profile_Attribute
         global $_ARRAYLANG;
 
         if ($this->checkIntegrity()) {
-            if ($this->parent_id === 'title' && $this->storeCoreAttributeTitle() ||
-                $this->isDefaultAttribute($this->id) && $this->storeCoreAttribute() ||
-                $this->storeCustomAttribute()
-            ) {
-                if ($this->parent_id === 'title' ||
-                    ($this->isDefaultAttribute($this->id) || $this->storeNames()) &&
+            if ($this->storeCustomAttribute()) {
+                if (($this->isDefaultAttribute($this->id) || $this->storeNames()) &&
                     $this->storeChildrenOrder() &&
                     $this->storeProtection($this->protected, $this->access_id, 'access_id', $this->access_group_ids) &&
                     $this->storeProtection($this->readProtected, $this->readAccessId, 'read_access_id', $this->readAccessGroupIds, 'read')
@@ -1212,16 +1208,6 @@ class User_Profile_Attribute
 // TODO: I suppose the precedence is okay like this.
 //        return ($this->isCoreAttribute($attributeId) || $this->deleteAttributeContent($attributeId)) && ($this->isCoreAttribute($attributeId) || $this->deleteAttributeNames($attributeId)) && $this->deleteAttributeEntity($attributeId);
 // However, it would be clearer with a few parentheses.
-
-        $parentId = $this->arrAttributes[$attributeId]['parent_id'] ?? '0';
-        $pattern = array();
-        if (
-            $parentId == 'title' &&
-            preg_match('#([0-9]+)#', $attributeId, $pattern)
-        ) {
-            $attributeId = $pattern[0];
-        }
-
         return
             (   $this->isDefaultAttribute($attributeId)
              ||    $this->deleteAttributeContent($attributeId))

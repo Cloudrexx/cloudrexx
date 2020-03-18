@@ -641,12 +641,12 @@ class User_Profile
                         if (is_array($search)) {
                             foreach ($search as $name) {
                                 if (stristr($objChildAttribute->getName(), $name)) {
-                                    $arrMatchedChildren[] = in_array($attributeId, array('title', 'country')) ? (preg_match('#([0-9]+)#', $childAttributeId, $pattern) ? $pattern[0] : 0) : $childAttributeId;
+                                    $arrMatchedChildren[] = in_array($attributeId, array('country')) ? (preg_match('#([0-9]+)#', $childAttributeId, $pattern) ? $pattern[0] : 0) : $childAttributeId;
                                     break;
                                 }
                             }
                         } elseif (stristr($objChildAttribute->getName(), $search)) {
-                            $arrMatchedChildren[] = in_array($attributeId, array('title', 'country')) ? (preg_match('#([0-9]+)#', $childAttributeId, $pattern) ? $pattern[0] : 0) : $childAttributeId;
+                            $arrMatchedChildren[] = in_array($attributeId, array('country')) ? (preg_match('#([0-9]+)#', $childAttributeId, $pattern) ? $pattern[0] : 0) : $childAttributeId;
                         }
                     }
                     if (count($arrMatchedChildren)) {
