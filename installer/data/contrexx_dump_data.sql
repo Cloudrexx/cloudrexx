@@ -439,6 +439,8 @@ INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandat
 INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES (20, NULL, 'textarea', '0', 'asc', 0, '', 0, 0, 1);
 INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES (32, 3, 'menu_option', '0', 'asc', 0, '', 0, 0, 1);
 INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES (33, 3, 'menu_option', '0', 'asc', 0, '', 0, 0, 1);
+INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES (34, 2, 'menu_option', '0', 'asc', 0, '', 0, 0, 1);
+INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES (35, 2, 'menu_option', '0', 'asc', 0, '', 0, 0, 1);
 INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (2, 0, 'gender', NULL, 2);
 INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (3, 0, 'title', NULL, 3);
 INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (4, 0, 'designation', NULL, 4);
@@ -465,6 +467,8 @@ INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `n
 INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (33, 2, 'Dear Mr', 4, 35);
 INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (32, 3, 'Madame', 5, 36);
 INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (33, 3, 'Monsieur', 6, 37);
+INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (34, 0, 'gender_male', 0, 38);
+INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (35, 0, 'gender_female', 1, 39);
 INSERT INTO `contrexx_backend_areas` (`area_id`, `parent_area_id`, `type`, `scope`, `area_name`, `is_active`, `uri`, `target`, `module_id`, `order_id`, `access_id`) VALUES (1,0,'group','backend','TXT_CONTENT_MANAGEMENT',1,'','_self',0,2,1);
 INSERT INTO `contrexx_backend_areas` (`area_id`, `parent_area_id`, `type`, `scope`, `area_name`, `is_active`, `uri`, `target`, `module_id`, `order_id`, `access_id`) VALUES (2,0,'group','backend','TXT_MODULE',1,'','_self',0,10,2);
 INSERT INTO `contrexx_backend_areas` (`area_id`, `parent_area_id`, `type`, `scope`, `area_name`, `is_active`, `uri`, `target`, `module_id`, `order_id`, `access_id`) VALUES (3,0,'group','backend','TXT_ADMINISTRATION',1,'','_self',0,13,3);
