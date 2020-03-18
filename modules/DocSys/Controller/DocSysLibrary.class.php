@@ -149,7 +149,7 @@ class DocSysLibrary
         }
 
         $fwUser = \FWUser::getFWUserObject()->objUser;
-        $objUser = $fwUser->getUsers(array('id' => array_unique(array_values($userIds))));
+        $objUser = $fwUser->getUsers(array('id' => array_unique($userIds)));
         if ($objUser !== false) {;
             while (!$objUser->EOF) {
                 $keys = array_keys($userIds, $objUser->getId());
