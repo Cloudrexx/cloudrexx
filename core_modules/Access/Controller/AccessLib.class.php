@@ -356,10 +356,11 @@ class AccessLib
             $arrSettings = \User_Setting::getSettings();
             $cx    = \Cx\Core\Core\Controller\Cx::instanciate();
             $image = $objUser->getProfileAttribute($objAttribute->getId(), $historyId);
-            $imageRepoWeb  = $attributeId == 'picture'
+            $defaultTitle = $objUser->objAttribute->getDefaultAttributeIdByAttributeId($attributeId);
+            $imageRepoWeb  = $defaultTitle == 'picture'
                                 ? $cx->getWebsiteImagesAccessProfileWebPath()
                                 : $cx->getWebsiteImagesAccessPhotoWebPath();
-            $imageRepoPath = $attributeId == 'picture'
+            $imageRepoPath = $defaultTitle == 'picture'
                                 ? $cx->getWebsiteImagesAccessProfilePath()
                                 : $cx->getWebsiteImagesAccessPhotoPath();
 
@@ -915,7 +916,8 @@ class AccessLib
         global $_CORELANG;
 
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-        if ($attributeId == 'picture') {
+        $defaultId = $objUser->objAttribute->getDefaultAttributeIdByAttributeId($attributeId);
+        if ($defaultId == 'picture') {
             $imageRepo    = $cx->getWebsiteImagesAccessProfilePath().'/';
             $imageRepoWeb = $cx->getWebsiteImagesAccessProfileWebPath().'/';
             $arrNoImage   = \User_Profile::$arrNoAvatar;
@@ -1120,6 +1122,7 @@ class AccessLib
             break;
 
         case 'menu':
+            $defaultId = $objUser->objAttribute->getDefaultAttributeIdByAttributeId($attributeId);
             if ($edit) {
                 $childrenCode = array();
                 if ($objAttribute->isCustomAttribute()) {

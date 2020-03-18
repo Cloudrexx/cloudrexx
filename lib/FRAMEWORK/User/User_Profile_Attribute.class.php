@@ -550,7 +550,7 @@ class User_Profile_Attribute
                 'multiline' => false,
                 'mandatory' => false,
                 'sort_type' => 'asc',
-                'parent_id' => 'country',
+                'parent_id' => $this->getAttributeIdByDefaultAttributeId('country'),
                 'desc' => $country['name'],
                 'names' => array($this->langId => $country['name']),
                 'value' => $country['id'],
@@ -745,6 +745,10 @@ class User_Profile_Attribute
      */
     function load($id)
     {
+        if ($this->isDefaultAttribute($id)) {
+            $id = $this->getAttributeIdByDefaultAttributeId($id);
+        }
+
         if (isset($this->arrAttributes[$id])) {
             $this->id = $id;
             $this->type = isset($this->arrAttributes[$id]['type']) ? $this->arrAttributes[$id]['type'] : $this->defaultAttributeType;
