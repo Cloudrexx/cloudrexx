@@ -539,73 +539,6 @@ class User_Profile_Attribute
         $this->sortChildren();
     }
 
-    /**
-     * Find all default user attributes (DefaultAttributes) and store it in an
-     * array
-     */
-    function loadDefaultAttributes()
-    {
-        global $objDatabase, $_CORELANG;
-
-        $this->arrDefaultAttributeIds = array();
-        $this->arrAttributes = $this->arrDefaultAttributeTemplates;
-        foreach ($this->arrAttributes as $attributeId => &$arrAttribute) {
-            if (!$arrAttribute['parent_id']) {
-                $this->arrDefaultAttributeIds[] = $attributeId;
-            }
-            $arrAttribute['names'][$this->langId] = isset($_CORELANG[$arrAttribute['desc']]) ? $_CORELANG[$arrAttribute['desc']] : null;
-        }
-
-        $query = '
-            SELECT 
-                `tblA`.`id` AS `id`, 
-                `tblN`.`name` AS `name`,
-                `tblA`.`sort_type` AS `sort_type`, 
-                `tblA`.`mandatory` AS `mandatory`,  
-                `tblA`.`order_id` AS `order_id`,  
-                `tblA`.`access_special` AS `access_special`,  
-                `tblA`.`access_id` AS `access_id`,  
-                `tblA`.`read_access_id` AS `read_access_id`
-            FROM `' .DBPREFIX .'access_user_attribute` AS `tblA`
-            LEFT JOIN `'.DBPREFIX.'access_user_attribute_name` AS `tblN`
-                ON `tblN`.`attribute_id` = `tblA`.`id`
-            WHERE `tblA`.`is_default` = 1 
-        ';
-
-        $objAttribute = $objDatabase->Execute($query);
-
-        if ($objAttribute !== false && $objAttribute->RecordCount() > 0) {
-            while (!$objAttribute->EOF) {
-                $this->arrDefaultAttributeNames[$objAttribute->fields['id']] = $objAttribute->fields['name'];
-
-                $attributeId = $objAttribute->fields['id'];
-                $this->arrAttributes[$attributeId]['parent_id'] = $objAttribute->fields['parent_id'];
-                $this->arrAttributes[$attributeId]['mandatory'] = $objAttribute->fields['mandatory'];
-                $this->arrAttributes[$attributeId]['sort_type'] = $objAttribute->fields['sort_type'];
-                $this->arrAttributes[$attributeId]['order_id'] = $objAttribute->fields['order_id'];
-                $this->arrAttributes[$attributeId]['access_special'] = $objAttribute->fields['access_special'];
-                $this->arrAttributes[$attributeId]['access_id'] = $objAttribute->fields['access_id'];
-                $this->arrAttributes[$attributeId]['read_access_id'] = $objAttribute->fields['read_access_id'];
-                $this->arrAttributes[$attributeId]['customizing'] = true;
-                if ($objAttribute->fields['mandatory']) {
-                    $this->arrMandatoryAttributes[] = $attributeId;
-                }
-
-                $objAttribute->MoveNext();
-            }
-
-            foreach ($this->arrDefaultAttributeTemplates as $attributeId => $arrAttribute) {
-                if ($this->isDefaultAttribute($attributeId)) {
-                    $attributeId = $this->getAttributeIdByDefaultAttributeId($attributeId);
-                }
-                if (!$arrAttribute['parent_id']) {
-                    $this->arrDefaultAttributeIds[] = $attributeId;
-                }
-                $this->arrAttributes[$attributeId]['names'][$this->langId] = isset($_CORELANG[$arrAttribute['desc']]) ? $_CORELANG[$arrAttribute['desc']] : null;
-            }
-        }
-    }
-
     function loadCoreAttributeCountry()
     {
         global $objDatabase;
@@ -626,45 +559,10 @@ class User_Profile_Attribute
         }
     }
 
-
-    function loadCoreAttributeTitle()
-    {
-        global $objDatabase;
-        // Find children of user attribute title
-        $objResult = $objDatabase->Execute('
-            SELECT 
-                `name`.`id` AS `id` , `name`.`name` AS `title`, 
-                `attribute`.`order_id`
-            FROM `'.DBPREFIX.'access_user_attribute_name` AS `name` 
-            LEFT JOIN `'.DBPREFIX.'access_user_attribute` AS `attribute` 
-                ON `name`.`attribute_id` = `attribute`.`id`
-            LEFT JOIN `'.DBPREFIX.'access_user_attribute_name` AS `titleAttr` 
-                ON `titleAttr`.`name` = "title"
-            WHERE `attribute`.`parent_id`= `titleAttr`.`attribute_id`;
-        ');
-        if ($objResult) {
-            while (!$objResult->EOF) {
-                $this->arrAttributes['title_'.$objResult->fields['id']] = array(
-                    'type' => 'menu_option',
-                    'multiline' => false,
-                    'mandatory' => false,
-                    'sort_type' => 'asc',
-                    'parent_id' => 'title',
-                    'desc' => $objResult->fields['title'],
-                    'value' => $objResult->fields['id'],
-                    'order_id' => $objResult->fields['order_id'],
-                    'modifiable' => array('names'),
-                );
-
-                // add names for all languages
-                foreach (\FWLanguage::getLanguageArray() as $langId => $langData) {
-                    $this->arrAttributes['title_'.$objResult->fields['id']]['names'][$langId] = $objResult->fields['title'];
-                }
-                $objResult->MoveNext();
-            }
-        }
-    }
-
+    /**
+     * Find all default user attributes and store it in an
+     * array
+     */
     function loadAttributes()
     {
         global $objDatabase;
