@@ -1767,7 +1767,7 @@ class User_Profile_Attribute
             return $defaultAttributes[$attributeId];
         }
 
-        return '';
+        return $attributeId;
     }
 
     /**
@@ -1791,7 +1791,7 @@ class User_Profile_Attribute
             return array_search($defaultId, $defaultAttributes);
         }
 
-        return 0;
+        return $defaultId;
     }
 
     function getId()
