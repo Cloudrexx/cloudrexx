@@ -227,14 +227,6 @@ class User_Profile
                 $newValue = !isset($this->arrCachedUsers[$this->id]['profile'][$attributeId][$historyId]);
                 if ($newValue || $value != $this->arrCachedUsers[$this->id]['profile'][$attributeId][$historyId]) {
                     $value = '"' . contrexx_raw2db($value) . '"';
-                    if (
-                        $attributeId == 'title' && (
-                            $value == '""' ||
-                            $value == '"0"'
-                        )
-                    ) {
-                        $value = '"gender_undefined"';
-                    }
 
                     if ($this->objAttribute->isDefaultAttribute($attributeId)) {
                         $attributeId = $this->objAttribute->getAttributeIdByDefaultAttributeId($attributeId);
