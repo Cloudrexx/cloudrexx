@@ -550,11 +550,6 @@ class CrmInterface extends CrmLibrary
         }
         print ("\r\n");
 
-        // preload all users at once instead of loading all one by one in the loop
-        $objUsers = \FWUser::getFWUserObject()->objUser->getUsers(
-            null, null, null, array('email', 'username')
-        );
-
         if ($objResult) {
             while (!$objResult->EOF) {
             $membership = array();

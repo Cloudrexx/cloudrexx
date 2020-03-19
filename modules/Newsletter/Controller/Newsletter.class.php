@@ -382,18 +382,26 @@ class Newsletter extends NewsletterLib
         $source = 'opt-in';
 
         if (!empty($code) && !empty($requestedMail)) {
-            $objRecipient = $objDatabase->SelectLimit("SELECT accessUserID
+            // Find the user to then find a matching Newsletter Access User
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $user = $cx->getDb()->getEntityManager()->getRepository(
+                'Cx\Core\User\Model\Entity\User'
+            )->findOneBy(array('email' => $requestedMail));
+            $objRecipient = null;
+            if ($user) {
+                $objRecipient = $objDatabase->SelectLimit("SELECT accessUserID
                 FROM ".DBPREFIX."module_newsletter_access_user AS nu
-                INNER JOIN ".DBPREFIX."access_users AS au ON au.id=nu.accessUserID
-                WHERE nu.code='".$code."'
-                AND email='".contrexx_raw2db($requestedMail)."'", 1);
-            if ($objRecipient && $objRecipient->RecordCount() == 1) {
-                $objUser = \FWUser::getFWUserObject()->objUser->getUser($objRecipient->fields['accessUserID']);
-                if ($objUser) {
-                    $recipientId = $objUser->getId();
+                WHERE nu.code='".$code."' AND accessUserID = " . $user->getId(), 1);
+            }
+
+            if ($objRecipient) {
+                if ($user) {
+                    $recipientId = $user->getId();
                     $isAccessRecipient = true;
 
                     //$arrAssociatedLists = $objUser->getSubscribedNewsletterListIDs();
+                    // until fwUser is completely removed
+                    $objUser = \FWUser::getFWUserObject()->objUser->getUser($user->getId());
                     $arrPreAssociatedInactiveLists = $objUser->getSubscribedNewsletterListIDs();
                 }
             } else {
@@ -1109,7 +1117,9 @@ class Newsletter extends NewsletterLib
      */
     public static function displayInBrowser()
     {
-        global $objDatabase, $_CONFIG;
+        global $objDatabase, $_CORELANG, $objInit, $_CONFIG;
+
+        $_CORELANG = $objInit->loadLanguageData('core');
 
         $id    = !empty($_GET['id'])    ? contrexx_input2raw($_GET['id'])    : '';
         $email = !empty($_GET['email']) ? contrexx_input2raw($_GET['email']) : '';
@@ -1178,6 +1188,11 @@ class Newsletter extends NewsletterLib
         ';
         $objResult  = $objDatabase->Execute($query);
 
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $userRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Core\User\Model\Entity\User'
+        );
+
         if ($objResult->RecordCount()) {
             // set recipient sex
             switch ($objResult->fields['sex']) {
@@ -1218,23 +1233,97 @@ class Newsletter extends NewsletterLib
             $fax            = contrexx_raw2xhtml($objResult->fields['fax']);
             $website        = contrexx_raw2xhtml($objResult->fields['uri']);
             $birthday       = contrexx_raw2xhtml($objResult->fields['birthday']);
-        } elseif ($objUser = \FWUser::getFWUserObject()->objUser->getUsers(array('email' => contrexx_raw2db($email), 'active' => 1), null, null, null, 1)) {
-            $sex            = $objUser->objAttribute->getById($objUser->getProfileAttribute('gender'))->getName();
-            $salutation     = contrexx_raw2xhtml($objUser->objAttribute->getById('title_'.$objUser->getProfileAttribute('title'))->getName());
-            $firstname      = contrexx_raw2xhtml($objUser->getProfileAttribute('firstname'));
-            $lastname       = contrexx_raw2xhtml($objUser->getProfileAttribute('lastname'));
-            $company        = contrexx_raw2xhtml($objUser->getProfileAttribute('company'));
-            $address        = contrexx_raw2xhtml($objUser->getProfileAttribute('address'));
-            $city           = contrexx_raw2xhtml($objUser->getProfileAttribute('city'));
-            $zip            = contrexx_raw2xhtml($objUser->getProfileAttribute('zip'));
+        } elseif (!empty($user = $userRepo->findOneBy(array('email' => contrexx_raw2db($email), 'active' => 1)))) {
+            $attr = \FWUser::getFWUserObject()->objUser->objAttribute;
+            $sexAttributeValue = $user->getAttributeValue(
+                $attr->getAttributeIdByDefaultAttributeId('gender')
+            )->getValue();
+
+            $sex = '';;
+            if ($sexAttributeValue == 'gender_female') {
+                $sex = $_CORELANG['TXT_ACCESS_FEMALE'];
+            } else if ($sexAttributeValue == 'gender_male') {
+                $sex = $_CORELANG['TXT_ACCESS_MALE'];
+            }
+            $salutationValue = $user->getAttributeValue(
+                $attr->getAttributeIdByDefaultAttributeId('title')
+            );
+            $crit = \Doctrine\Common\Collections\Criteria::create()->where(
+                \Doctrine\Common\Collections\Criteria::expr()->eq('id',
+                    $salutationValue->getValue()
+                )
+            );
+            $salutation     = $salutationValue->getUserAttribute()->getChildren()
+                ->matching($crit)->first()->getName();
+            $firstname      = contrexx_raw2xhtml(
+                $user->getAttributeValue(
+                    $attr->getAttributeIdByDefaultAttributeId('firstname')
+                )->getValue()
+            );
+            $lastname       = contrexx_raw2xhtml(
+                $user->getAttributeValue(
+                    $attr->getAttributeIdByDefaultAttributeId('lastname')
+                )->getValue()
+            );
+            $company        = contrexx_raw2xhtml(
+                $user->getAttributeValue(
+                    $attr->getAttributeIdByDefaultAttributeId('company')
+                )->getValue()
+            );
+            $address        = contrexx_raw2xhtml(
+                $user->getAttributeValue(
+                    $attr->getAttributeIdByDefaultAttributeId('address')
+                )->getValue()
+            );
+            $city           = contrexx_raw2xhtml(
+                $user->getAttributeValue(
+                    $attr->getAttributeIdByDefaultAttributeId('city')
+                )->getValue()
+            );
+            $zip            = contrexx_raw2xhtml(
+                $user->getAttributeValue(
+                    $attr->getAttributeIdByDefaultAttributeId('zip')
+                )->getValue()
+            );
 // TODO: migrate to Country class
-            $country        = contrexx_raw2xhtml($objUser->objAttribute->getById('country_'.$objUser->getProfileAttribute('country'))->getName());
-            $phoneOffice    = contrexx_raw2xhtml($objUser->getProfileAttribute('phone_office'));
-            $phoneMobile    = contrexx_raw2xhtml($objUser->getProfileAttribute('phone_mobile'));
-            $phonePrivate   = contrexx_raw2xhtml($objUser->getProfileAttribute('phone_private'));
-            $fax            = contrexx_raw2xhtml($objUser->getProfileAttribute('phone_fax'));
-            $website        = contrexx_raw2xhtml($objUser->getProfileAttribute('website'));
-            $birthday       = date(ASCMS_DATE_FORMAT_DATE, $objUser->getProfileAttribute('birthday'));
+            $country        = contrexx_raw2xhtml(
+                \Cx\Core\Country\Controller\Country::getById(
+                    $user->getAttributeValue(
+                        $attr->getAttributeIdByDefaultAttributeId('country')
+                    )->getValue()
+                )['name']
+            );
+            $phoneOffice    = contrexx_raw2xhtml(
+                $user->getAttributeValue(
+                    $attr->getAttributeIdByDefaultAttributeId('phone_office')
+                )->getValue()
+            );
+            $phoneMobile    = contrexx_raw2xhtml(
+                $user->getAttributeValue(
+                    $attr->getAttributeIdByDefaultAttributeId('phone_mobile')
+                )->getValue()
+            );
+            $phonePrivate   = contrexx_raw2xhtml(
+                $user->getAttributeValue(
+                    $attr->getAttributeIdByDefaultAttributeId('phone_private')
+                )->getValue()
+            );
+            $fax            = contrexx_raw2xhtml(
+                $user->getAttributeValue(
+                    $attr->getAttributeIdByDefaultAttributeId('phone_fax')
+                )->getValue()
+            );
+            $website        = contrexx_raw2xhtml(
+                $user->getAttributeValue(
+                    $attr->getAttributeIdByDefaultAttributeId('website')
+                )->getValue()
+            );
+            $birthday       = date(
+                ASCMS_DATE_FORMAT_DATE,
+                $user->getAttributeValue(
+                    $attr->getAttributeIdByDefaultAttributeId('birthday')
+                )->getValue()
+            );
         } elseif ($crmUser->load($crmId)) {
 
             $objAttribute = \FWUser::getFWUserObject()->objUser->objAttribute

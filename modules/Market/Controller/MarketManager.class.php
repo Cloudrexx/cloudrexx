@@ -475,6 +475,8 @@ class MarketManager extends MarketLibrary
 
         global $objDatabase, $_ARRAYLANG, $_CORELANG;
 
+        $objFWUser = \FWUser::getFWUserObject();
+
         $this->_pageTitle = $_ARRAYLANG['TXT_ENTRIES'];
         $this->_objTpl->loadTemplateFile('module_market_entries.html',true,true);
         if (isset($_POST['market_store_order'])) {
@@ -576,10 +578,10 @@ class MarketManager extends MarketLibrary
                    $this->entries[$entryId]['status'] == 1 ? $led = 'led_green' : $led = 'led_red';
                    $this->entries[$entryId]['type'] == 'offer' ? $type = $_ARRAYLANG['TXT_MARKET_OFFER'] : $type = $_ARRAYLANG['TXT_MARKET_SEARCH'];
                    $i%2 ? $row = 2 : $row = 1;
-                   $objResult = $objDatabase->Execute('SELECT username FROM '.DBPREFIX.'access_users WHERE id = '.$this->entries[$entryId]['userid'].' LIMIT 1');
-                if ($objResult !== false) {
-                    $addedby = $objResult->fields['username'];
-                }
+                   $objUser = $objFWUser->objUser->getUser(intval($this->entries[$entryId]['userid']));
+                   if ($objUser !== false) {
+                       $addedby = $objUser->getRealUsername();
+                   }
 
                 $this->entries[$entryId]['regdate'] == '' ? $date = 'KEY: '.$this->entries[$entryId]['regkey'] : $date = date("d.m.Y", $this->entries[$entryId]['regdate']);
 
@@ -807,6 +809,8 @@ class MarketManager extends MarketLibrary
 
         global $objDatabase, $_ARRAYLANG, $_CORELANG;
 
+        $objFWUser = \FWUser::getFWUserObject();
+
         $this->_pageTitle = $copy ? $_ARRAYLANG['TXT_COPY_ADVERTISEMENT'] : $_ARRAYLANG['TXT_EDIT_ADVERTISEMENT'];
         $this->_objTpl->loadTemplateFile('module_market_entry.html',true,true);
         //initialize and get uploader object
@@ -878,11 +882,13 @@ class MarketManager extends MarketLibrary
                         $forfree     = '';
                         $agreement     = '';
                     }
+
                     //entry user
-                    $objResultUser = $objDatabase->Execute('SELECT username FROM '.DBPREFIX.'access_users WHERE id = '.$objResult->fields['userid'].' LIMIT 1');
-                    if ($objResultUser !== false) {
-                        $addedby = $objResultUser->fields['username'];
+                    $objUser = $objFWUser->objUser->getUser(intval($objResult->fields['userid']));
+                    if ($objUser !== false) {
+                        $addedby = $objUser->getRealUsername();
                     }
+
                     //entry userdetails
                     if ($objResult->fields['userdetails'] == '1') {
                         $userdetailsOn         = 'checked';

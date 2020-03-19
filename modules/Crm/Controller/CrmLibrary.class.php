@@ -1996,21 +1996,27 @@ class CrmLibrary
             return array();;
         }
 
-        $objFWUser  = \FWUser::getFWUserObject();
-        //for settings default mode as backend then only get the users details under the group
-        $objFWUser->setMode(true);
-        $objUsers   = $objFWUser->objUser->getUsers($filter = array('group_id' => $groupId));
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $qb = $cx->getDb()->getEntityManager()->createQueryBuilder();
+        $query = $qb->select('u')
+            ->from('Cx\Core\User\Model\Entity\User', 'u')
+            ->innerJoin('u.groups', 'g')
+            ->andWhere(
+                $qb->expr()->eq('g.id', $groupId),
+                $qb->expr()->eq('g.type', '?1')
+            )->setParameter(1, 'backend')
+            ->getQuery();
+        $users = $query->getResult();
 
-        if (false !== $objUsers) {
-            while (!$objUsers->EOF) {
-                $userName    = $objUsers->getRealUsername();
-                $userName    = !empty ($userName) ? $userName : $objUsers->getUsername();
+        if (!empty($users)) {
+            foreach ($users as $user) {
+                $userName    = $user->getUsername();
+                $userName    = !empty ($userName) ? $userName : $user->getEmail();
                 $resources[] = array(
-                    'id'       => $objUsers->getId(),
+                    'id'       => $user->getId(),
                     'username' => $userName,
-                    'email'    => $objUsers->getEmail(),
+                    'email'    => $user->getEmail(),
                 );
-                $objUsers->next();
             }
             return $resources;
         }
@@ -2285,20 +2291,24 @@ class CrmLibrary
             $this->contact = new \Cx\Modules\Crm\Model\Entity\CrmContact();
 
         $objFWUser = \FWUser::getFWUserObject();
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $userRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Core\User\Model\Entity\User'
+        );
 
         $modify = isset($this->contact->id) && !empty($this->contact->id);
         $accountId = 0;
 
         if (!empty($id)) {
-            $objUsers = $objFWUser->objUser->getUsers($filter = array('id' => intval($id)));
-            if ($objUsers) {
-                $accountId = $objUsers->getId();
-                $email     = $objUsers->getEmail();
+            $user = $userRepo->find(intval($id));
+            if (!empty($user)) {
+                $accountId = $user->getId();
+                $email     = $user->getEmail();
             }
         } else if (empty($id)) {
-            $objUsers = $objFWUser->objUser->getUsers($filter = array('email' => addslashes($email)));
-            if ($objUsers) {
-                $accountId = $objUsers->getId();
+            $user = $userRepo->findOneBy(array('email' => addslashes($email)));
+            if (!empty($user)) {
+                $accountId = $user->getId();
             }
         }
         if ($modify) {
@@ -2524,15 +2534,19 @@ class CrmLibrary
         if (!$objFWUser->objUser) {
             return false;
         }
-        $objUsers = $objFWUser->objUser->getUsers($filter = array('email' => addslashes($email)));
-        if ($objUsers) {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $user = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Core\User\Model\Entity\User'
+        )->findOneBy(array('email' => addslashes($email)));
+
+        if (!empty($user)) {
             $availableLangId = '';
             switch (true) {
-            case ($objUsers->getBackendLanguage() && in_array($objUsers->getBackendLanguage(), $availableEmailTemp)):
-                $availableLangId = $objUsers->getBackendLanguage();
+            case ($user->getBackendLangId() && in_array($user->getBackendLangId(), $availableEmailTemp)):
+                $availableLangId = $user->getBackendLangId();
                 break;
-            case ($objUsers->getFrontendLanguage() && in_array($objUsers->getFrontendLanguage(), $availableEmailTemp)):
-                $availableLangId =  $objUsers->getFrontendLanguage();
+            case ($user->getFrontendLangId() && in_array($user->getFrontendLangId(), $availableEmailTemp)):
+                $availableLangId =  $user->getFrontendLangId();
                 break;
             case ($defaultLangId && in_array($defaultLangId, $availableEmailTemp)):
                 $availableLangId =  $defaultLangId;
@@ -2624,7 +2638,14 @@ class CrmLibrary
         }
 
         if (!empty ($fieldValues['access_email'])) {
-            $objEmail = $objFWUser->objUser->getUsers($filter = array('email' => contrexx_input2db($fieldValues['access_email'])));
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $user = $cx->getDb()->getEntityManager()->getRepository(
+                'Cx\Core\User\Model\Entity\User'
+            )->findOneBy(
+                array(
+                    'email' => contrexx_input2db($fieldValues['access_email'])
+                )
+            );
 
             if (!empty ($fieldValues['access_gender'])) {
                 $gender            = '';
@@ -2649,8 +2670,8 @@ class CrmLibrary
             $this->contact->contactType    = 2;
             $this->contact->datasource     = 2;
 
-            if ($objEmail) {
-                $accountId = $objEmail->getId();
+            if (!empty($user)) {
+                $accountId = $user->getId();
                 $userExists = $objDatabase->SelectLimit("SELECT 1 FROM `".DBPREFIX."module_{$this->moduleNameLC}_contacts` WHERE user_account = {$accountId}", 1);
 
                 if ($userExists && $userExists->RecordCount() == 0) {
@@ -3166,7 +3187,6 @@ class CrmLibrary
 
         if (empty($customerId)) return false;
 
-        $objFWUser = \FWUser::getFWUserObject();
         $settings = $this->getSettings();
         $resources = $this->getResources($settings['emp_default_user_group']);
         $customer_name = $first_name." ".$last_name;
@@ -3176,11 +3196,15 @@ class CrmLibrary
             $emailIds[]    = $value['email'];
         }
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $userRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Core\User\Model\Entity\User'
+        );
         foreach ($emailIds As $emails) {
             if (!empty ($emails)) {
-                $objUsers = $objFWUser->objUser->getUsers($filter = array('email' => addslashes($emails)));
+                $user = $userRepo->findOneBy(array('email' => addslashes($emails)));
+
                 $info['substitution'] = array(
-                    'CRM_ASSIGNED_USER_NAME'            => contrexx_raw2xhtml(\FWUser::getParsedUserTitle($objUsers->getId())),
+                    'CRM_ASSIGNED_USER_NAME'            => contrexx_raw2xhtml(\FWUser::getParsedUserTitle($user->getId())),
                     'CRM_ASSIGNED_USER_EMAIL'           => $emails,
                     'CRM_CONTACT_FIRSTNAME'             => contrexx_raw2xhtml($first_name),
                     'CRM_CONTACT_LASTNAME'              => contrexx_raw2xhtml($last_name),
@@ -3261,9 +3285,12 @@ class CrmLibrary
         $objFWUser = \FWUser::getFWUserObject();
         $objResult = $objFWUser->objUser->isUniqueEmail($email, $id);
         if (!$objResult) {
-            $objEmail = $objFWUser->objUser->getUsers($filter = array('email' => addslashes($email)));
-            if ($objEmail) {
-                $accountId = $objEmail->getId();
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $user = $cx->getDb()->getEntityManager()->getRepository(
+                'Cx\Core\User\Model\Entity\User'
+            )->findOneBy(array('email' => addslashes($email)));
+            if (!empty($user)) {
+                $accountId = $user->getId();
                 if ($accountId != $id) {
                     $error = $_ARRAYLANG['TXT_CRM_ERROR_EMAIL_USED_BY_OTHER_PERSON'];
                 } else {

@@ -90,8 +90,11 @@ class Customer extends \User
      * @return  integer         $id                 Customer ID
      * @author  Reto Kohli <reto.kohli@comvation.com>
      */
-    function id()
+    function id($id=null)
     {
+        if (isset($id)) {
+            $this->setId($id);
+        }
         return $this->id;
     }
 
@@ -346,11 +349,12 @@ class Customer extends \User
      *                                    false otherwise.
      * @author  Reto Kohli <reto.kohli@comvation.com>
      */
-    function active($active=null)
+    function active($active=null, $ignoreSignedInUser = false)
     {
         if (isset($active)) {
             // do not change the status of the currently signed-in user
             if (
+                !$ignoreSignedInUser &&
                 $this->getId() > 0 &&
                 $this->getId() == \FWUser::getFWUserObject()->objUser->getId()
             ) {
@@ -435,7 +439,7 @@ class Customer extends \User
      */
     public function getUsers(
         $filter=null, $search=null, $arrSort=null, $arrAttributes=null,
-        $limit=null, $offset=0
+        $limit=null, $offset=0, &$count = 0
     ) {
         if (!empty($filter) && is_array($filter)) {
             if (isset($filter['group']) && is_array($filter['group'])) {
@@ -455,11 +459,94 @@ class Customer extends \User
                 unset($filter['group']);
             }
         }
-//DBG::log("Customer::getUsers(): Filter: ".var_export($filter, true));
-        if ($this->loadUsers($filter, $search, $arrSort, $arrAttributes, $limit, $offset)) {
-            return $this;
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $userRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\User');
+        $qb = $userRepo->createQueryBuilder('u');
+
+        if (!empty($filter['id'])) {
+            $qb->andWhere($qb->expr()->in('u.id', ':userIds'));
+            $qb->setParameter(':userIds', $filter['id']);
         }
-        return false;
+
+        if (!empty($filter['active'])) {
+            $qb->andWhere($qb->expr()->in('u.active', ':userIsActive'));
+            $qb->setParameter(':userIsActive', $filter['active']);
+        }
+
+        if (!empty($filter['email'])) {
+            $qb->andWhere($qb->expr()->in('u.email', ':userEmail'));
+            $qb->setParameter(':userEmail', $filter['email']);
+        }
+
+        if (!empty($filter['firstname']) && !empty($filter['firstname']['REGEXP'])) {
+            $userRepo->addAttributeRegexFilterToQueryBuilder($qb, $filter['firstname']['REGEXP'], 'firstname');
+        }
+
+        if (!empty($filter['lastname']) && !empty($filter['lastname']['REGEXP'])) {
+            $userRepo->addAttributeRegexFilterToQueryBuilder($qb, $filter['lastname']['REGEXP'], 'lastname');
+        }
+
+        if (!empty($filter['company']) && !empty($filter['company']['REGEXP'])) {
+            $userRepo->addAttributeRegexFilterToQueryBuilder($qb, $filter['company']['REGEXP'], 'company');
+        }
+
+        if (!empty($search)) {
+            $orX = $qb->expr()->orX();
+            $orX->add($userRepo->getSearchByTermInUserExpression($qb, $search));
+            $orX->add($userRepo->getSearchByTermInAttributeExpression($qb, $search));
+            $qb->andWhere($orX);
+        }
+
+        // sort by
+        foreach ($arrSort as $field=>$direction) {
+            $userRepo->addOrderToQueryBuilder($qb, $field, $direction);
+        }
+        // offset
+        $qb->setFirstResult($offset);
+        // limit
+        $qb->setMaxResults($limit);
+
+        // result
+        $users = $qb->getQuery()->getResult();
+
+        // Count users
+        $qb->select(
+            'count(DISTINCT u.id)'
+        );
+        $qb->orderBy('u.id');
+        $qb->setFirstResult(null);
+        $qb->setMaxResults(null);
+
+        $count = intval($qb->getQuery()->getSingleScalarResult());
+
+        $customers = array();
+        foreach ($users as $user) {
+            $customer = new \Cx\Modules\Shop\Controller\Customer();
+            $customer->id($user->getId());
+            $customer->username($user->getUsername());
+            $customer->email($user->getEmail());
+            $customer->gender($user->getProfileAttribute('gender')->getValue());
+            $customer->firstname($user->getProfileAttribute('firstname')->getValue());
+            $customer->lastname($user->getProfileAttribute('lastname')->getValue());
+            $customer->company($user->getProfileAttribute('company')->getValue());
+            $customer->address($user->getProfileAttribute('address')->getValue());
+            $customer->city($user->getProfileAttribute('city')->getValue());
+            $customer->zip($user->getProfileAttribute('zip')->getValue());
+            $customer->country_id($user->getProfileAttribute('country')->getValue());
+            $customer->phone($user->getProfileAttribute('phone_private')->getValue());
+            $customer->fax($user->getProfileAttribute('fax')->getValue());
+            $noteId = $index = \Cx\Core\Setting\Controller\Setting::getValue('user_profile_attribute_notes','Shop');
+            $customer->companynote($user->getAttributeValue($noteId)->getValue());
+            $groupId = \Cx\Core\Setting\Controller\Setting::getValue('user_profile_attribute_customer_group_id','Shop');
+            $customer->group_id($user->getAttributeValue($groupId)->getValue());
+            $customer->active($user->getActive(), true);
+            $customer->register_date($user->getRegdate());
+
+            $customers[$user->getId()] = $customer;
+        }
+
+        return $customers;
     }
 
 
@@ -489,21 +576,22 @@ class Customer extends \User
             \Message::error($_ARRAYLANG['TXT_SHOP_ERROR_USERGROUP_INVALID']);
             \Cx\Core\Csrf\Controller\Csrf::redirect(CONTREXX_DIRECTORY_INDEX.'?section=Shop');
         }
-        $objUser = \FWUser::getFWUserObject()->objUser;
-        $objUser = $objUser->getUsers(array(
-            'email' => $email,
-            'active' => false,
-// TODO: Verify this:  We must be able to load existing Users!
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        // TODO: Verify this:  We must be able to load existing Users!
 // Problem: Conflicting e-mail addresses for "new" Customers that exist as Users already.
 // Simple solution seems to be to ignore the associated groups.
 //            'group_id' => $usergroup_id,
-        ));
-        if (!$objUser) {
+        $user = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Core\User\Model\Entity\User'
+        )->findOneBy(array('email' => $email, 'active' => false));
+
+        if (empty($user)) {
 //DBG::log("Customer::getUnregisteredByEmail($email): Found no such unregistered User");
             return null;
         }
 //DBG::log("Customer::getUnregisteredByEmail($email): Found unregistered User ID ".$objUser->getId()." (".$objUser->getEmail().")");
-        return self::getById($objUser->getId());
+        return self::getById($user->getId());
     }
 
 
@@ -516,17 +604,17 @@ class Customer extends \User
     static function getRegisteredByEmail($email)
     {
         // Any Customers
-        $objUser = \FWUser::getFWUserObject()->objUser;
-        $objUser = $objUser->getUsers(array(
-            'email' => $email,
-            'active' => true,
-        ));
-        if (!$objUser) {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $user = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Core\User\Model\Entity\User'
+        )->findOneBy(array('email' => $email, 'active' => true));
+
+        if (empty($user)) {
 //DBG::log("Customer::getUnregisteredByEmail($email): Found no such unregistered User");
             return null;
         }
 //DBG::log("Customer::getUnregisteredByEmail($email): Found unregistered User ID ".$objUser->getId()." (".$objUser->getEmail().")");
-        return self::getById($objUser->getId());
+        return self::getById($user->getId());
     }
 
 
@@ -658,11 +746,22 @@ class Customer extends \User
      */
     static function updatePassword($email, $password)
     {
-        $objUser = \FWUser::getFWUserObject()->objUser->getUsers(
-            array('email' => $email));
-        if (!$objUser) return false;
-        $objUser->setPassword($password);
-        return $objUser->store();
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $user = $em->getRepository(
+            'Cx\Core\User\Model\Entity\User'
+        )->findOneBy(array('email' => $email));
+
+        if (empty($user)) return false;
+        $user->setPassword($password);
+
+        try {
+            $em->persist($user);
+            $em->flush();
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
 
@@ -857,20 +956,26 @@ class Customer extends \User
                 $objResult->fields['email'] = $objResult->fields['username'];
             }
             $email = $objResult->fields['email'];
-            $objUser = \FWUser::getFWUserObject()->objUser->getUsers(
-                array('email' => array(0 => $email)));
+
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $em = $cx->getDb()->getEntityManager();
+            $userRepo = $em->getRepository(
+                'Cx\Core\User\Model\Entity\User'
+            );
+            $user = $userRepo->findOneBy(array('email' => $email));
 
 // TODO: See whether a User with that username (but different e-mail address) exists!
-            $objUser_name = \FWUser::getFWUserObject()->objUser->getUsers(
-                array('username' => array(
-                    0 => $objResult->fields['username'])));
-            if ($objUser && $objUser_name) {
-                $objUser = $objUser_name;
+            $userByUsername = $userRepo->findOneBy(
+                array('username' => $objResult->fields['username'])
+            );
+
+            if (!empty($user) && !empty($userByUsername)) {
+                $user = $userByUsername;
             }
 
             $objCustomer = null;
-            if ($objUser) {
-                $objCustomer = self::getById($objUser->getId());
+            if (!empty($user)) {
+                $objCustomer = self::getById($user->getId());
             }
             if (!$objCustomer) {
                 $lang_id = Order::getLanguageIdByCustomerId($old_customer_id);

@@ -283,14 +283,14 @@ class NewsletterLib
         switch ($type) {
             case self::USER_TYPE_CORE:
             case self::USER_TYPE_ACCESS:
-                // get user's language by email
-                $user = \FWUser::getFWUserObject()->objUser->getUsers(
-                    array(
-                        'email' => $email,
-                    )
+                $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+                $userRepo = $cx->getDb()->getEntityManager()->getRepository(
+                    'Cx\Core\User\Model\Entity\User'
                 );
-                if ($user && $user->getFrontendLanguage()) {
-                    $userLanguage = $user->getFrontendLanguage();
+                // get user's language by email
+                $user = $userRepo->findOneBy(array('email' => $email));
+                if (!empty($user) && $user->getFrontendLangId()) {
+                    $userLanguage = $user->getFrontendLangId();
                 }
                 break;
 
@@ -331,12 +331,14 @@ class NewsletterLib
         switch ($type) {
             case self::USER_TYPE_CORE:
             case self::USER_TYPE_ACCESS:
-                // get user's language by email
-                $user = \FWUser::getFWUserObject()->objUser->getUsers(
-                    array('id' => $id)
+                $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+                $userRepo = $cx->getDb()->getEntityManager()->getRepository(
+                    'Cx\Core\User\Model\Entity\User'
                 );
-                if ($user && $user->getFrontendLanguage()) {
-                    $userLanguage = $user->getFrontendLanguage();
+                // get user's language by email
+                $user = $userRepo->find($id);
+                if (!empty($user) && $user->getFrontendLangId()) {
+                    $userLanguage = $user->getFrontendLangId();
                 }
                 break;
             case self::USER_TYPE_CRM:
@@ -380,59 +382,73 @@ class NewsletterLib
 
         // Ignore the code analyzer warning.  There's plenty of arguments
         $query = sprintf('
-            SELECT COUNT(*) AS `recipientCount`
-              FROM (
-                SELECT `email`
-                  FROM `%1$smodule_newsletter_user` AS `nu`
-                  LEFT JOIN `%1$smodule_newsletter_rel_user_cat` AS `rc`
-                    ON `rc`.`user` = `nu`.`id`
-                 WHERE `rc`.`category`=%2$s
-                    AND (
-                        nu.source != "opt-in"
-                        OR (
-                            nu.source = "opt-in"
-                            AND nu.consent IS NOT NULL
-                        )
+            SELECT COUNT(`email`) AS `recipientCount`
+              FROM `%1$smodule_newsletter_user` AS `nu`
+              LEFT JOIN `%1$smodule_newsletter_rel_user_cat` AS `rc`
+                ON `rc`.`user` = `nu`.`id`
+             WHERE `rc`.`category`=%2$s
+                AND (
+                    nu.source != "opt-in"
+                    OR (
+                        nu.source = "opt-in"
+                        AND nu.consent IS NOT NULL
                     )
-                 UNION DISTINCT
-                SELECT `email`
-                  FROM `%1$saccess_users` AS `cu`
-                  LEFT JOIN `%1$smodule_newsletter_access_user` AS `cnu`
-                    ON `cnu`.`accessUserID`=`cu`.`id`
-                  LEFT JOIN `%1$smodule_newsletter_rel_cat_news` AS `crn`
-                    ON `cnu`.`newsletterCategoryID`=`crn`.`category`
-                 WHERE `cnu`.`newsletterCategoryID`=%2$s
-              ) AS `subquery`',
+                )',
             DBPREFIX, $id
         );
+
         $data = $objDatabase->Execute($query);
-        return $data->fields['recipientCount'];
+        $counter = $data->fields['recipientCount'];
+
+        // Get all newsletter access user
+        $query = sprintf('
+            SELECT DISTINCT `accessUserID`
+              FROM `%1$smodule_newsletter_access_user` AS `cnu`
+              LEFT JOIN `%1$smodule_newsletter_rel_cat_news` AS `crn`
+                ON `cnu`.`newsletterCategoryID`=`crn`.`category`
+             WHERE `cnu`.`newsletterCategoryID`=%2$s',
+            DBPREFIX, $id
+        );
+
+        $data = $objDatabase->Execute($query);
+        $userIds = array();
+        while (!$data || !$data->EOF) {
+            // Check if the access user exists
+            $userIds[] = $data->fields['accessUserID'];
+            $data->MoveNext();
+        }
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $qb = $cx->getDb()->getEntityManager()->createQueryBuilder();
+        $qb->select('count(DISTINCT u.id)')->from('Cx\Core\User\Model\Entity\User', 'u');
+        $qb->orderBy('u.id');
+        $qb->where($qb->expr()->in('u.id', ':userIds'));
+        $qb->setParameter(':userIds', array_unique($userIds));
+
+        $counter += $qb->getQuery()->getSingleScalarResult();
+
+        return $counter;
     }
 
 
     /**
      * Return the access user groups
      * @author      Stefan Heinemann <sh@adfinis.com>
-     * @param       string $orderBy
      * @return      array
      */
-    protected function _getGroups($orderBy="`group_name`")
+    protected function _getGroups()
     {
-        global $objDatabase;
+        $fwUser = \FWUser::getFWUserObject();
+        $objGroup = $fwUser->objGroup;
 
-        $query = sprintf('
-            SELECT `group_id`   AS `id`,
-                   `group_name` AS `name`
-              FROM `%1$saccess_user_groups`
-             WHERE `is_active`=1
-             ORDER BY %2$s',
-            DBPREFIX, $orderBy
+        $list = $objGroup->getGroups(
+            array('is_active' => 1), array('group_name' => 'ASC')
         );
-        $list = $objDatabase->Execute($query);
+
         $groups = array();
         while ($list !== false && !$list->EOF) {
-            $groups[$list->fields['id']] = $list->fields['name'];
-            $list->moveNext();
+            $groups[$list->getId()] = $list->getName();
+            $list->next();
         }
         return $groups;
     }

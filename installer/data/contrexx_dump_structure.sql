@@ -61,7 +61,8 @@ CREATE TABLE `contrexx_access_user_attribute_value` (
   PRIMARY KEY (`attribute_id`, `user_id`, `history_id`),
   FULLTEXT KEY `value` (`value`),
   INDEX `contrexx_access_user_attribute_value_user_id_ibfk` (`user_id`),
-  INDEX `attribute_user_idx` (`attribute_id`, `user_id`)
+  INDEX `attribute_user_idx` (`attribute_id`, `user_id`),
+  INDEX `IDX_B0DEA323B6E62EFA` (`attribute_id`)
 ) ENGINE=InnoDB;
 CREATE TABLE `contrexx_access_user_groups` (
   `group_id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -100,7 +101,7 @@ CREATE TABLE `contrexx_access_users` (
   `is_admin` tinyint(1) NOT NULL DEFAULT '0',
   `username` varchar(255) DEFAULT NULL,
   `password` varchar(255) DEFAULT NULL,
-  `auth_token` varchar(32) NOT NULL DEFAULT '0',
+  `auth_token` varchar(32) NOT NULL DEFAULT '',
   `auth_token_timeout` int unsigned NOT NULL DEFAULT '0',
   `regdate` int unsigned NOT NULL DEFAULT '0',
   `expiration` int unsigned NOT NULL DEFAULT '0',
@@ -108,11 +109,11 @@ CREATE TABLE `contrexx_access_users` (
   `last_auth` int unsigned NOT NULL DEFAULT '0',
   `last_auth_status` smallint NOT NULL DEFAULT '0',
   `last_activity` int unsigned NOT NULL DEFAULT '0',
-  `email` varchar(255) DEFAULT NULL,
+  `email` varchar(255) NOT NULL,
   `email_access` enum('everyone','members_only','nobody') NOT NULL DEFAULT 'nobody',
   `frontend_lang_id` int unsigned NOT NULL DEFAULT '0',
   `backend_lang_id` int unsigned NOT NULL DEFAULT '0',
-  `active` tinyint(1) NOT NULL DEFAULT '1',
+  `active` tinyint(1) NOT NULL DEFAULT '0',
   `verified` tinyint(1) NOT NULL DEFAULT '1',
   `primary_group` int unsigned NOT NULL DEFAULT '0',
   `profile_access` enum('everyone','members_only','nobody') NOT NULL DEFAULT 'members_only',
@@ -120,7 +121,8 @@ CREATE TABLE `contrexx_access_users` (
   `restore_key_time` int unsigned NOT NULL DEFAULT '0',
   `u2u_active` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
-  KEY `username` (`username`)
+  KEY `username` (`username`),
+  UNIQUE INDEX `UNIQ_7CD32875E7927C74` (`email`)
 ) ENGINE=InnoDB ;
 CREATE TABLE `contrexx_backend_areas` (
   `area_id` int(6) unsigned NOT NULL AUTO_INCREMENT,

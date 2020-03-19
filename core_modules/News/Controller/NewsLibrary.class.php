@@ -918,13 +918,16 @@ class NewsLibrary
             $objResult->MoveNext();
         }
 
-        $objUser = \FWUser::getFWUserObject()->objUser->getUsers(array('id' => $arrNewsPublisher), null, null, array('company', 'lastname', 'firstname'));
-        if ($objUser) {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $users = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Core\User\Model\Entity\User'
+        )->findBy(array('id' => $arrNewsPublisher));
+
+        if (!empty($users)) {
             $showUsername = ($objInit->mode == 'backend');
 
-            while(!$objUser->EOF) {
-                $arrPublisher[$objUser->getId()] = \FWUser::getParsedUserTitle($objUser, '', $showUsername);
-                $objUser->next();
+            foreach ($users as $user) {
+                $arrPublisher[$user->getId()] = \FWUser::getParsedUserTitle($user, '', $showUsername);
             }
 
             asort($arrPublisher);
@@ -970,13 +973,16 @@ class NewsLibrary
             $objResult->MoveNext();
         }
 
-        $objUser = \FWUser::getFWUserObject()->objUser->getUsers(array('id' => $arrNewsAuthor), null, null, array('company', 'lastname', 'firstname'));
-        if ($objUser) {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $users = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Core\User\Model\Entity\User'
+        )->findBy(array('id' => $arrNewsAuthor));
+
+        if (!empty($users)) {
             $showUsername = ($objInit->mode == 'backend');
 
-            while(!$objUser->EOF) {
-                $arrAuthor[$objUser->getId()] = \FWUser::getParsedUserTitle($objUser, '', $showUsername);
-                $objUser->next();
+            foreach ($users as $user) {
+                $arrAuthor[$user->getId()] = \FWUser::getParsedUserTitle($user, '', $showUsername);
             }
 
             asort($arrAuthor);

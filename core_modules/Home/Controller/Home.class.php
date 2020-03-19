@@ -67,14 +67,36 @@ class Home {
         global $_CORELANG, $objTemplate;
 
         $administratorsOnline = '';
-        if ($objUser = \FWUser::getFWUserObject()->objUser->getUsers($filter = array('is_admin' => true, 'active' => true, 'last_activity' => array('>' => (time()-3600))))) {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $userRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Core\User\Model\Entity\User'
+        );
+        $crit = new \Doctrine\Common\Collections\Criteria();
+        $crit->where(
+            \Doctrine\Common\Collections\Criteria::expr()->eq('isAdmin', true)
+        )->andWhere(
+            \Doctrine\Common\Collections\Criteria::expr()->eq('active', true)
+        )->andWhere(
+            \Doctrine\Common\Collections\Criteria::expr()->gt(
+                'lastActivity', (time()-3600)
+            )
+        );
+
+        if (!empty($users = $userRepo->matching($crit))) {
             $arrAdministratorsOnline = array();
             $i = 0;
-            while (!$objUser->EOF) {
+            foreach ($users as $user) {
                 $arrAdministratorsOnline[$i] = array();
-                $arrAdministratorsOnline[$i]['id'] = $objUser->getId();
-                $arrAdministratorsOnline[$i++]['username'] = $objUser->getUsername();
-                $objUser->next();
+                $arrAdministratorsOnline[$i]['id'] = $user->getId();
+                if (!empty($user->getUsername())) {
+                    $arrAdministratorsOnline[$i++][
+                        'username'
+                    ] = $user->getUsername();
+                } else {
+                    $arrAdministratorsOnline[$i++][
+                    'username'
+                    ] = $user->getEmail();
+                }
             }
 
             for ($i = 0; $i < count($arrAdministratorsOnline); $i++) {
@@ -185,17 +207,19 @@ class Home {
             $objTemplate->setVariable('MESSAGE_LINK_TARGET', contrexx_raw2xhtml($message->getLinkTarget()));
         }
 
-// TODO: Unused
-//        $objFWUser = \FWUser::getFWUserObject();
+        $objFWUser = \FWUser::getFWUserObject();
         $objResult = $objDatabase->SelectLimit(
-           'SELECT `logs`.`datetime`, `users`.`username`
+           'SELECT `logs`.`datetime`, `logs`.`userid`
             FROM `'.DBPREFIX.'log` AS `logs`
-            LEFT JOIN `'.DBPREFIX.'access_users` AS `users`
-            ON `users`.`id`=`logs`.`userid`
             ORDER BY `logs`.`id` DESC', 1);
         if ($objResult && $objResult->RecordCount() > 0) {
+            $objUser = $objFWUser->objUser->getUser($objResult->fields['userid']);
+            $username = '';
+            if ($objUser !== false) {
+                $username = $objUser->getRealUsername();
+            }
             $objTemplate->setVariable(array(
-                'LAST_LOGIN_USERNAME' => contrexx_raw2xhtml($objResult->fields['username']),
+                'LAST_LOGIN_USERNAME' => contrexx_raw2xhtml($username),
                 'LAST_LOGIN_TIME'     => date('d.m.Y', strtotime($objResult->fields['datetime'])),
             ));
             $objTemplate->parse('last_login');

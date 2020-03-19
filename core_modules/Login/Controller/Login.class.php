@@ -181,7 +181,11 @@ class Login
                     'active'           => 1,
                     'email'            => $email,
                 );
-                $objFWUser->loginUser($objFWUser->objUser->getUsers($userFilter, null, null, null, 1));
+                $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+                $user = $cx->getDb()->getEntityManager()->getRepository(
+                    'Cx\Core\User\Model\Entity\User'
+                )->findOneBy(array('active' => 1, 'email' => $email));
+                $objFWUser->loginUser($user);
 
                 // get the url to the welcome page
                 $homeUrl = \Cx\Core\Routing\Url::fromModuleAndCmd('Home', '', FRONTEND_LANG_ID);

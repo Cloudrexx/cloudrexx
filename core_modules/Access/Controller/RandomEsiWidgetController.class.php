@@ -63,28 +63,31 @@ class RandomEsiWidgetController extends \Cx\Core_Modules\Widget\Controller\Rando
     public function getRandomEsiWidgetContentInfos($widget, $params, $template) {
         $userIds = array();
 
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $userRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\User');
+        $qb = $userRepo->createQueryBuilder('u');
+
         // filter active users
-        $filter = array('active' => true);
+        $qb->where('active', ':active')->setParameter('active', true);
         
         // filter users by group association
         $groupFilter = AccessBlocks::fetchGroupFilter($template, $widget->getName());
         if ($groupFilter) {
-            $filter['group_id'] = $groupFilter;
+            $userRepo->addGroupFilterToQueryBuilder($qb, $groupFilter);
         }
 
         // fetch users
-        $objUser = \FWUser::getFWUserObject()->objUser->getUsers($filter);
+        $users = $qb->getQuery()->getResult();
 
-        if (!$objUser) {
+        if (!$users) {
             \DBG::msg(__METHOD__ . ': failed to fetch users');
             return array();
         }
 
-        while (!$objUser->EOF) {
-            $userIds[] = $objUser->getId();
-            $objUser->next();
+        foreach ($users as $user) {
+            $userIds[] = $user->getId();
         }
-        
+
         // foreach user, get ESI infos:
         $esiInfos = array();
         foreach ($userIds as $userId) {
@@ -127,10 +130,14 @@ class RandomEsiWidgetController extends \Cx\Core_Modules\Widget\Controller\Rando
                 $params['channel']
             );
 
-            $objUser = \FWUser::getFWUserObject()->objUser->getUser($params['id']);
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $userRepo = $cx->getDb()->getEntityManager()->getRepository(
+                'Cx\Core\User\Model\Entity\User'
+            );
+            $user = $userRepo->find($params['id']);
 
             $objAccessBlocks = new AccessBlocks($subTemplate);
-            $objAccessBlocks->parseBasePlaceholders($objUser);
+            $objAccessBlocks->parseBasePlaceholders($user);
 
             $template->setVariable($name, $subTemplate->get());
         }

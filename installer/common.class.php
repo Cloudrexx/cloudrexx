@@ -1314,11 +1314,23 @@ class CommonFunctions
                              `active` = 1
                        WHERE `id` = 1";
             if ($objDb->Execute($query) !== false) {
-                $query = "UPDATE `".$_SESSION['installer']['config']['dbTablePrefix']."access_user_profile`
-                             SET `firstname` = '".$_SESSION['installer']['sysConfig']['adminName']."',
-                                 `lastname` = ''
-                           WHERE `user_id` = 1";
-                if ($objDb->Execute($query) !== false) {
+                $queryFirstname = "UPDATE `".$_SESSION['installer']['config']['dbTablePrefix']."access_user_attribute_value` AS `value`
+                    LEFT JOIN `".$_SESSION['installer']['config']['dbTablePrefix']."access_user_attribute_name` AS `name`
+                        ON `name`.`attribute_id` = `value`.`attribute_id`
+                    SET `value` = '".$_SESSION['installer']['sysConfig']['adminName']."'
+                    WHERE `value`.`user_id` = 1 AND `name`.`name` = 'firstname'";
+
+                if ($objDb->Execute($queryFirstname) !== false) {
+                    return true;
+                }
+
+                $queryLastname = "UPDATE `".$_SESSION['installer']['config']['dbTablePrefix']."access_user_attribute_value` AS `value`
+                    LEFT JOIN `".$_SESSION['installer']['config']['dbTablePrefix']."access_user_attribute_name` AS `name`
+                        ON `name`.`attribute_id` = `value`.`attribute_id`
+                    SET `value` = ''
+                    WHERE `value`.`user_id` = 1 AND `name`.`name` = 'lastname'";
+
+                if ($objDb->Execute($queryLastname) !== false) {
                     return true;
                 }
             }

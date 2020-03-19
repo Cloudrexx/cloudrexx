@@ -19,9 +19,9 @@ INSERT INTO `contrexx_access_user_attribute`
     ('firstname',     'text',     5,  0, 0, 1),
     ('lastname',      'text',     6,  0, 0, 1),
     ('company',       'text',     7,  0, 0, 1),
-    ('address',       'uri',      8,  0, 0, 1),
+    ('address',       'text',      8,  0, 0, 1),
     ('city',          'text',     9,  0, 0, 1),
-    ('country',       'text',     11, 0, 0, 1),
+    ('country',       'menu',     11, 0, 0, 1),
     ('zip',           'text',     10, 0, 0, 1),
     ('phone_office',  'text',     12, 0, 0, 1),
     ('phone_private', 'text',     13, 0, 0, 1),
@@ -63,12 +63,23 @@ ALTER TABLE `contrexx_access_user_attribute_value` CHANGE `attribute_id` `attrib
 
 UPDATE `contrexx_access_user_profile` SET `tmp_name` = 'gender';
 
+INSERT INTO
+	`contrexx_access_user_attribute`(`parent_id`, `access_id`, `type`, `read_access_id`, `is_default`, `tmp_name`)
+	VALUES (
+	    (SELECT `amale`.`id` FROM `contrexx_access_user_attribute` AS `amale` WHERE `amale`.`tmp_name` = 'gender'),
+	    null, 'menu_option', null, 1, 'gender_male'
+	), (
+	    (SELECT `afemale`.`id` FROM `contrexx_access_user_attribute` AS `afemale` WHERE `afemale`.`tmp_name` = 'gender'),
+	    null, 'menu_option', null, 1, 'gender_female'
+	);
+
 INSERT INTO `contrexx_access_user_attribute_value`(`tmp_name`, `attribute_id`, `user_id`, `value`)
   SELECT `tmp_name`, (
     SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'gender'
-  ), `user_id`, `gender`
+  ), `user_id`, (
+    SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = `gender`
+  )
   FROM `contrexx_access_user_profile`;
-
 
 UPDATE `contrexx_access_user_profile` SET `tmp_name` = 'title';
 
@@ -232,6 +243,14 @@ INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES
 );
 
 INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES(
+  (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'gender_female'), 'gender_female'
+);
+
+INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES(
+  (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'gender_male'), 'gender_male'
+);
+
+INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES(
   (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'title'), 'title'
 );
 
@@ -329,6 +348,7 @@ ALTER TABLE contrexx_access_rel_user_group DROP FOREIGN KEY IF EXISTS FK_401DFD4
 
 ALTER TABLE contrexx_access_users
   CHANGE id id INT UNSIGNED AUTO_INCREMENT NOT NULL,
+  CHANGE email email VARCHAR(255) NOT NULL,
   CHANGE auth_token auth_token VARCHAR(32) DEFAULT '0' NOT NULL,
   CHANGE auth_token_timeout auth_token_timeout INT UNSIGNED DEFAULT 0 NOT NULL,
   CHANGE regdate regdate INT UNSIGNED DEFAULT 0 NOT NULL,
@@ -384,14 +404,14 @@ ALTER TABLE contrexx_access_rel_user_group ADD CONSTRAINT FK_401DFD43A76ED395 FO
 
 /*Add unique index to access_user_attribute_name*/
 ALTER TABLE contrexx_access_user_attribute_name DROP PRIMARY KEY;
-ALTER TABLE contrexx_access_user_attribute_name ADD id INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY;
+ALTER TABLE contrexx_access_user_attribute_name ADD id INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY FIRST;
 CREATE UNIQUE INDEX fk_module_user_attribute_name_unique_idx
   ON contrexx_access_user_attribute_name (attribute_id, lang_id);
 
 /** Add Foreign Keys **/
 ALTER TABLE `contrexx_access_user_attribute_value` ADD CONSTRAINT `FK_B0DEA323B6E62EFA`
 	FOREIGN KEY (`attribute_id`) REFERENCES `contrexx_access_user_attribute` (`id`);
-ALTER TABLE `contrexx_access_user_attribute_value` ADD CONSTRAINT `FK_B0DEA323A76ED395`
+ALTER TABLE `contrexx_access_user_attribute_value` ADD CONSTRAINT `FK_B0DEA323A76ED395A76ED395A76ED395A76ED395`
 	FOREIGN KEY (`user_id`) REFERENCES `contrexx_access_users` (`id`);
 
 ALTER TABLE `contrexx_access_user_attribute_name`ADD CONSTRAINT `FK_90502F6CB6E62EFA`
@@ -405,6 +425,7 @@ ALTER TABLE contrexx_access_rel_user_group ADD CONSTRAINT FK_401DFD43FE54D947
 
 /** Add Indexes **/
 CREATE INDEX IDX_B0DEA323B6E62EFA ON contrexx_access_user_attribute_value (attribute_id);
+CREATE UNIQUE INDEX UNIQ_7CD32875E7927C74 ON contrexx_access_users (email);
 
 /** Drop tmp names **/
 ALTER TABLE `contrexx_access_user_attribute_value` DROP `tmp_name`;

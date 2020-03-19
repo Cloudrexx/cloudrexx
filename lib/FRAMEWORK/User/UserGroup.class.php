@@ -50,6 +50,7 @@ class UserGroup
     private $is_active;
     private $type;
     private $homepage;
+    protected $toolbar;
 
     private $arrLoadedGroups = array();
     private $arrCache = array();
@@ -61,6 +62,7 @@ class UserGroup
         'is_active',
         'type',
         'homepage',
+        'toolbar',
     );
 
     private $arrTypes = array(
@@ -112,12 +114,19 @@ class UserGroup
         $arrSortExpressions = array();
         $arrSelectExpressions = array();
 
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $classMeta = $em->getClassMetadata('Cx\Core\User\Model\Entity\Group');
+        $groupRepo = $em->getRepository('Cx\Core\User\Model\Entity\Group');
+        $qb = $groupRepo->createQueryBuilder('tblG');
+        $qb->select(null);
+
         // set filter
         if (is_array($filter)) {
-            $arrWhereExpressions = $this->parseFilterConditions($filter);
+            $this->parseFilterConditions($qb, $filter);
         } elseif (!empty($filter)) {
-            $arrWhereExpressions['conditions'][] =
-                '`tblG`.`group_id`='.intval($filter);
+            $qb->andWhere($qb->expr()->eq('tblG.id', ':groupId'));
+            $qb->setParameter('groupId', intval($filter));
         }
 
         // set sort order
@@ -125,6 +134,8 @@ class UserGroup
             foreach ($arrSort as $attribute => $direction) {
                 if (   in_array($attribute, $this->arrAttributes)
                     && in_array(strtolower($direction), array('asc', 'desc'))) {
+                    $attribute = $classMeta->getFieldName($attribute);
+                    $qb->addOrderBy('tblG.'.$attribute, $direction);
                     $arrSortExpressions[] = 'tblG.`'.$attribute.'` '.$direction;
                 }
             }
@@ -135,36 +146,28 @@ class UserGroup
             $arrAttributes = $this->arrAttributes;
         }
         foreach ($arrAttributes as $attribute) {
-            if (   in_array($attribute, $this->arrAttributes)
-                && !in_array($attribute, $arrSelectExpressions)) {
-                $arrSelectExpressions[] = '`tblG`.`'.$attribute.'`';
+            if (in_array($attribute, $this->arrAttributes)) {
+                $fieldName = $classMeta->getFieldName($attribute);
+                $arrSelectExpressions[$fieldName] = $attribute;
             }
         }
-        if (!in_array('`tblG`.`group_id`', $arrSelectExpressions)) {
-            $arrSelectExpressions[] = '`tblG`.`group_id`';
+
+        $arrSelectExpressions['id'] = 'group_id';
+        foreach ($arrSelectExpressions as $fieldName=>$attribute) {
+            $qb->addSelect('tblG.'.$fieldName.' AS '.$attribute);
         }
 
-        $query = '
-            SELECT '.implode(', ', $arrSelectExpressions).'
-              FROM `'.DBPREFIX.'access_user_groups` AS tblG'
-            .(count($arrWhereExpressions['joins'])
-                ? implode(' ', $arrWhereExpressions['joins']) : '')
-            .(count($arrWhereExpressions['conditions'])
-                ? ' WHERE '.implode(' AND ', $arrWhereExpressions['conditions'])
-                : '')
-            .(count($arrSortExpressions)
-                ? ' ORDER BY '.implode(', ', $arrSortExpressions) : '');
+        if ($limit) {
+            $qb->setMaxResults($limit);
+            $qb->setFirstResult(intval($offset));
+        }
 
-        if (empty($limit)) {
-            $objGroup = $objDatabase->Execute($query);
-        } else {
-            $objGroup = $objDatabase->SelectLimit($query, $limit, intval($offset));
-        };
+        $groups = $qb->getQuery()->getArrayResult();
 
-        if ($objGroup !== false && $objGroup->RecordCount() > 0) {
-            while (!$objGroup->EOF) {
-                $this->arrCache[$objGroup->fields['group_id']] = $this->arrLoadedGroups[$objGroup->fields['group_id']] = $objGroup->fields;
-                $objGroup->MoveNext();
+
+        if (count($groups) > 0) {
+            foreach ($groups as $group) {
+                $this->arrCache[$group['group_id']] = $this->arrLoadedGroups[$group['group_id']] = $group;
             }
             $this->first();
             return true;
@@ -175,28 +178,46 @@ class UserGroup
     }
 
 
-    private function parseFilterConditions($arrFilter)
+    private function parseFilterConditions(&$qb, $arrFilter)
     {
+        global $objDatabase;
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $metaData = $cx->getDb()->getEntityManager()->getClassMetadata('Cx\Core\User\Model\Entity\Group');
+
         $arrConditions = array('conditions' => array(), 'joins' => array());
         foreach ($arrFilter as $attribute => $condition) {
             switch ($attribute) {
                 case 'group_name':
                 case 'group_description':
-                    $arrConditions['conditions'][] = "tblG.`".$attribute."` LIKE '%".addslashes($condition)."%'";
+                    $attribute = $metaData->getFieldName($attribute);
+                    $qb->andWhere($qb->expr()->like('tblG.'.$attribute, ':'.$attribute));
+                    $qb->setParameter($attribute, '%'.addslashes($condition).'%');
                     break;
 
                 case 'is_active':
-                    $arrConditions['conditions'][] = 'tblG.`'.$attribute.'` = '.intval($condition);
+                    $qb->andWhere($qb->expr()->eq('tblG.active', ':isActive'));
+                    $qb->setParameter('isActive', intval($condition));
                     break;
 
                 case 'type':
-                    $arrConditions['conditions'][] = "tblG.`".$attribute."` = '".addslashes($condition)."'";
+                    $qb->andWhere($qb->expr()->eq('tblG.type', ':type'));
+                    $qb->setParameter('type', addslashes($condition));
                    break;
 
                 case 'static':
                 case 'dynamic':
-                    $arrConditions['conditions'][] = 'tbl'.$attribute.'.`access_id` = '.intval($condition);
-                    $arrConditions['joins'][] = ' INNER JOIN `'.DBPREFIX.'access_group_'.$attribute.'_ids` as tbl'.$attribute.' USING (`group_id`)';
+                    $result = $objDatabase->Execute(
+                        'SELECT `group_id` FROM `'.DBPREFIX.'access_group_'.$attribute.'_ids`'
+                    );
+                    $groupIds = array();
+                    if ($result) {
+                        while (!$result->EOF) {
+                            $groupIds[] = $result->fields['group_id'];
+                            $result->MoveNext();
+                        }
+                    }
+                    $qb->andWhere($qb->expr()->in('tblG.id', ':groupIds'));
+                    $qb->setParameter('groupIds', $groupIds);
                     break;
             }
         }
@@ -231,6 +252,7 @@ class UserGroup
             $this->is_active = isset($this->arrCache[$id]['is_active']) ? (bool)$this->arrCache[$id]['is_active'] : false;
             $this->type = isset($this->arrCache[$id]['type']) ? $this->arrCache[$id]['type'] : $this->defaultType;
             $this->homepage = isset($this->arrCache[$id]['homepage']) ? $this->arrCache[$id]['homepage'] : '';
+            $this->toolbar = isset($this->arrCache[$id]['toolbar']) ? $this->arrCache[$id]['toolbar'] : '';
             $this->arrDynamicPermissions = null;
             $this->arrStaticPermissions = null;
             $this->arrUsers = null;
@@ -250,30 +272,24 @@ class UserGroup
      */
     private function loadUsers()
     {
-        global $objDatabase;
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $groupRepo = $em->getRepository('Cx\Core\User\Model\Entity\Group');
+        $qb = $groupRepo->createQueryBuilder('g');
+        $qb->select('u.id AS userId')
+           ->join('g.users', 'u')
+           ->where($qb->expr()->eq('g.id', ':groupId'))
+           ->orderBy('u.username')
+           ->setParameter('groupId', $this->id);
+
+        $users = $qb->getQuery()->getArrayResult();
 
         $arrUsers = array();
-
-        $objUser = $objDatabase->Execute('
-            SELECT
-                tblRel.`user_id`
-            FROM
-                `'.DBPREFIX.'access_rel_user_group` AS tblRel
-            INNER JOIN `'.DBPREFIX.'access_users` AS tblUser
-            ON tblUser.`id` = tblRel.`user_id`
-            WHERE tblRel.`group_id` = '.$this->id.'
-            ORDER BY tblUser.`username`'
-        );
-        if ($objUser) {
-            while (!$objUser->EOF) {
-                array_push($arrUsers, $objUser->fields['user_id']);
-                $objUser->MoveNext();
-            }
-
-            return $arrUsers;
-        } else {
-            return false;
+        foreach($users as $user) {
+            array_push($arrUsers, $user['userId']);
         }
+
+        return $arrUsers;
     }
 
 
@@ -320,50 +336,55 @@ class UserGroup
      */
     public function store()
     {
-        global $objDatabase, $_CORELANG;
+        global $_CORELANG;
 
         if (!$this->isUniqueGroupName() || !$this->isValidGroupName()) {
             $this->error_msg = $_CORELANG['TXT_ACCESS_GROUP_NAME_INVALID'];
             return false;
         }
-        if ($this->id) {
-            if (!$objDatabase->Execute("
-                UPDATE `".DBPREFIX."access_user_groups`
-                SET
-                    `group_name` = '".addslashes($this->name)."',
-                    `group_description` = '".addslashes($this->description)."',
-                    `is_active` = ".intval($this->is_active).",
-                    `homepage` = '".addslashes($this->homepage)."'
-                WHERE `group_id`=".$this->id
-            )) {
-                $this->error_msg = $_CORELANG['TXT_ACCESS_FAILED_TO_UPDATE_GROUP'];
-                return false;
-            }
-        } else {
-            if ($objDatabase->Execute("
-                INSERT INTO `".DBPREFIX."access_user_groups` (
-                    `group_name`,
-                    `group_description`,
-                    `is_active`,
-                    `type`,
-                    `homepage`
-                ) VALUES (
-                    '".addslashes($this->name)."',
-                    '".addslashes($this->description)."',
-                    ".intval($this->is_active).",
-                    '".$this->type."',
-                    '".addslashes($this->homepage)."'
-                )"
-            )) {
-                $this->id = $objDatabase->Insert_ID();
-            } else {
-                $this->error_msg = $_CORELANG['TXT_ACCESS_FAILED_TO_CREATE_GROUP'];
-                return false;
-            }
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $groupRepo = $em->getRepository('Cx\Core\User\Model\Entity\Group');
+        $userRepo = $em->getRepository('Cx\Core\User\Model\Entity\User');
+        $group = $groupRepo->findOneBy(array('id' => $this->id));
+
+        if (empty($group)) {
+            $group = new \Cx\Core\User\Model\Entity\Group();
+            $group->setType($this->type);
         }
 
-        if (!$this->storeUserAssociations()) {
-            $this->error_msg = $_CORELANG['TXT_ACCESS_COULD_NOT_SET_USER_ASSOCIATIONS'];
+        $group->setName(addslashes($this->name));
+        $group->setDescription(addslashes($this->description));
+        $group->setActive(intval($this->is_active));
+        $group->setHomepage(addslashes($this->homepage));
+        $group->setToolbar(intval($this->toolbar));
+
+        // Store permissions
+        $arrCurrentUsers = $this->loadUsers();
+        $arrAddedUsers = array_diff($this->getAssociatedUserIds(), $arrCurrentUsers);
+        $arrRemovedUsers = array_diff($arrCurrentUsers, $this->getAssociatedUserIds());
+
+        foreach ($arrRemovedUsers as $userId) {
+            $user = $userRepo->find($userId);
+            $group->removeUser($user);
+            $user->removeGroup($group);
+            $em->persist($user);
+        }
+
+        foreach ($arrAddedUsers as $userId) {
+            $user = $userRepo->find($userId);
+            $group->addUser($user);
+            $user->addGroup($group);
+            $em->persist($user);
+        }
+
+        try {
+            $em->persist($group);
+            $em->flush();
+            $this->id = $group->getId();
+        } catch (\Doctrine\ORM\OptimisticLockException $e) {
+            $this->error_msg = $_CORELANG['TXT_ACCESS_FAILED_TO_UPDATE_GROUP'];
             return false;
         }
 
@@ -380,40 +401,6 @@ class UserGroup
 
         return true;
     }
-
-
-    /**
-     * Store user associations
-     *
-     * Stores the user associations of the loaded group.
-     * Returns TRUE no success, FALSE on failure.
-     * @global ADONewConnection
-     * @return boolean
-     */
-    private function storeUserAssociations()
-    {
-        global $objDatabase;
-
-        $status = true;
-        $arrCurrentUsers = $this->loadUsers();
-        $arrAddedUsers = array_diff($this->getAssociatedUserIds(), $arrCurrentUsers);
-        $arrRemovedUsers = array_diff($arrCurrentUsers, $this->getAssociatedUserIds());
-
-        foreach ($arrRemovedUsers as $userId) {
-            if ($objDatabase->Execute('DELETE FROM `'.DBPREFIX.'access_rel_user_group` WHERE `group_id` = '.$this->id.' AND `user_id` = '.$userId) === false) {
-                $status = false;
-            }
-        }
-
-        foreach ($arrAddedUsers as $userId) {
-            if ($objDatabase->Execute('INSERT INTO `'.DBPREFIX.'access_rel_user_group` (`user_id`, `group_id`) VALUES ('.$userId.', '.$this->id.')') === false) {
-                $status = false;
-            }
-        }
-
-        return $status;
-    }
-
 
     private function storePermissions()
     {
@@ -460,11 +447,18 @@ class UserGroup
 
     public function delete()
     {
-        global $objDatabase, $_CORELANG;
+        global $_CORELANG;
 
-        if ($objDatabase->Execute('DELETE FROM `'.DBPREFIX.'access_rel_user_group` WHERE `group_id` = '.$this->id) !== false && $objDatabase->Execute('DELETE FROM `'.DBPREFIX.'access_user_groups` WHERE `group_id` = '.$this->id) !== false) {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $groupRepo = $em->getRepository('Cx\Core\User\Model\Entity\Group');
+        $group = $groupRepo->findOneBy(array('groupId' => $this->id));
+
+        try {
+            $em->remove($group);
+            $em->flush();
             return true;
-        } else {
+        } catch (\Doctrine\ORM\OptimisticLockException $e) {
             $this->error_msg = sprintf($_CORELANG['TXT_ACCESS_GROUP_DELETE_FAILED'], $this->name);
             return false;
         }
@@ -518,6 +512,16 @@ class UserGroup
         $this->type = in_array($type, $this->arrTypes) ? $type : $this->defaultType;
     }
 
+    /**
+     * Set toolbar
+     *
+     * @param int $toolbar toolbar id
+     */
+    public function setToolbar($toolbar)
+    {
+        $this->toolbar = $toolbar;
+    }
+
     public function setHomepage($homepage)
     {
         $this->homepage = $homepage;
@@ -568,21 +572,18 @@ class UserGroup
 
     public function getGroupCount($arrFilter = null)
     {
-        global $objDatabase;
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $groupRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\Group');
+        $qb = $groupRepo->createQueryBuilder('tblG');
+        $qb->select('COUNT(tblG.id) as group_count');
 
-        $arrWhereExpressions = is_array($arrFilter) ? $this->parseFilterConditions($arrFilter) : array('joins' => array(), 'conditions' => array());
+        if (is_array($arrFilter)) {
+            $this->parseFilterConditions($qb,$arrFilter);
+        }
 
-        $objGroupCount = $objDatabase->SelectLimit('
-            SELECT SUM(1) AS `group_count`
-            FROM `'.DBPREFIX.'access_user_groups` AS tblG'
-            .(count($arrWhereExpressions['joins']) ? implode(' ', $arrWhereExpressions['joins']) : '')
-            .(count($arrWhereExpressions['conditions']) ? ' WHERE '.implode(' AND ', $arrWhereExpressions['conditions']) : ''),
-            1
-        );
-
-        if ($objGroupCount !== false) {
-            return $objGroupCount->fields['group_count'];
-        } else {
+        try {
+            return $qb->getQuery()->getSingleScalarResult();
+        } catch (\Doctrine\ORM\Query\QueryException $e) {
             return false;
         }
     }
@@ -590,16 +591,21 @@ class UserGroup
 
     public function getUserCount($onlyActive = false)
     {
-        global $objDatabase;
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $userRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\User');
+        $qb = $userRepo->createQueryBuilder('u');
+        $qb->select('COUNT(u.id) as user_count');
 
-        $objCount = $objDatabase->SelectLimit('SELECT COUNT(1) AS `user_count` FROM `'.DBPREFIX.'access_users` AS tblUser'
-            .($this->id ? ' INNER JOIN `'.DBPREFIX.'access_rel_user_group` AS tblRel ON tblRel.`user_id` = tblUser.`id` WHERE tblRel.`group_id` = '.$this->id : '')
-            .($onlyActive ? (!$this->id ? ' WHERE' : ' AND').' tblUser.`active` = 1 ' : ''), 1);
-        if ($objCount) {
-            return $objCount->fields['user_count'];
-        } else {
-            return false;
+        if ($this->id) {
+            $qb->innerJoin('u.groups', 'g')
+               ->where($qb->expr()->eq('g.id', ':groupId'))
+               ->setParameter('groupId', $this->id);
         }
+
+        if ($onlyActive) {
+            $qb->andWhere($qb->expr()->eq('u.active', ':active'))->setParameter('active', true);
+        }
+        return $qb->getQuery()->getSingleScalarResult();
     }
 
 
@@ -659,6 +665,11 @@ class UserGroup
         return $this->type;
     }
 
+    public function getToolbar()
+    {
+        return $this->toolbar;
+    }
+
     public function getHomepage()
     {
         return $this->homepage;
@@ -687,11 +698,13 @@ class UserGroup
      */
     function isUniqueGroupName()
     {
-        global $objDatabase, $_CORELANG;
+        global $_CORELANG;
 
-        $objResult = $objDatabase->SelectLimit("SELECT 1 FROM ".DBPREFIX."access_user_groups WHERE `group_name`='".addslashes($this->name)."' AND `group_id` != ".$this->id, 1);
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $groupRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\Group');
+        $group = $groupRepo->findOneBy(array('name' => addslashes($this->name)));
 
-        if ($objResult && $objResult->RecordCount() == 0) {
+        if (empty($group) || $group->getGroupId() == $this->id) {
             return true;
         } else {
             $this->error_msg = $_CORELANG['TXT_ACCESS_DUPLICATE_GROUP_NAME'];
@@ -720,18 +733,15 @@ class UserGroup
      */
     static function getNameArray()
     {
-        global $objDatabase;
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $groupRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\Group');
+        $groups = $groupRepo->findAll();
 
-        $objResult = $objDatabase->Execute("
-            SELECT `group_id`, `group_name`
-              FROM ".DBPREFIX."access_user_groups");
-        if (!$objResult) return false;
         $arrGroupName = array();
-        while (!$objResult->EOF) {
-            $arrGroupName[$objResult->fields['group_id']] =
-                $objResult->fields['group_name'];
-            $objResult->MoveNext();
+        foreach ($groups as $group) {
+            $arrGroupName[$group->getId()] = $group->getName();
         }
+
         return $arrGroupName;
     }
 

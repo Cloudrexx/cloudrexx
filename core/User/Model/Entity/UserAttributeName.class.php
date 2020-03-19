@@ -32,7 +32,6 @@
  * @author      Dario Graf <info@cloudrexx.com>
  * @package     cloudrexx
  * @subpackage  core_user
- * @version     5.0.0
  */
 namespace Cx\Core\User\Model\Entity;
 
@@ -43,7 +42,6 @@ namespace Cx\Core\User\Model\Entity;
  * @author      Dario Graf <info@cloudrexx.com>
  * @package     cloudrexx
  * @subpackage  core_user
- * @version     5.0.0
  */
 class UserAttributeName extends \Cx\Model\Base\EntityBase {
     /**
@@ -99,7 +97,7 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase {
     /**
      * Get attributeId
      *
-     * @return integer 
+     * @return integer
      */
     public function getAttributeId()
     {

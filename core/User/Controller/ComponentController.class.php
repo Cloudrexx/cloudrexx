@@ -32,8 +32,8 @@
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
  * @subpackage  core_user
+ * @version     5.0.3
  */
-
 namespace Cx\Core\User\Controller;
 
 /**
@@ -43,6 +43,7 @@ namespace Cx\Core\User\Controller;
  * @author      Project Team SS4U <info@cloudrexx.com>
  * @package     cloudrexx
  * @subpackage  core_user
+ * @version     5.0.3
  */
 class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentController {
 
@@ -51,9 +52,126 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      *
      * @return array name of the controller classes
      */
-    public function getControllerClasses() {
+    public function getControllerClasses()
+    {
         // Return an empty array here to let the component handler know that there
         // does not exist a backend, nor a frontend controller of this component.
-        return array('Frontend');
+        return array('Frontend', 'Backend', 'Export', 'JsonUser');
     }
+
+
+    /**
+     * Returns a list of command mode commands provided by this component
+     *
+     * @return array List of command names
+     */
+    public function getCommandsForCommandMode()
+    {
+        return array(
+            'exportUser' => new
+            \Cx\Core_Modules\Access\Model\Entity\Permission(
+                array('http', 'https'), // allowed protocols
+                array(
+                    'get',
+                    'post',
+                    'put',
+                    'delete',
+                    'trace',
+                    'options',
+                    'head',
+                ),   // allowed methods
+                true,  // requires login
+                array()
+            ),
+        );
+    }
+
+    /**
+     * Returns the description for a command provided by this component
+     *
+     * @param string  $command The name of the command to fetch the description from
+     * @param boolean $short   Wheter to return short or long description
+     *
+     * @return string Command description
+     */
+    public function getCommandDescription($command, $short = false)
+    {
+        switch ($command) {
+            case 'exportUser':
+                if ($short) {
+                    return 'Export all users of a group';
+                }
+                return 'Export all users of a group in a .csv file';
+            default:
+                return '';
+        }
+    }
+
+    /**
+     * Execute one of the commands listed in getCommandsForCommandMode()
+     *
+     * @param string $command       Name of command to execute
+     * @param array  $arguments     List of arguments for the command
+     * @param array  $dataArguments (optional) List of data arguments for the command
+     *
+     * @see getCommandsForCommandMode()
+     *
+     * @return void
+     */
+    public function executeCommand($command, $arguments, $dataArguments = array())
+    {
+        try {
+            switch ($command) {
+                case 'exportUser':
+                    if (empty($arguments['groupId']) && empty($arguments['langId'])) {
+                        return;
+                    }
+                    $this->getController('Export')->exportUsers(
+                        intval($arguments['groupId']), $arguments['langId']
+                    );
+                    break;
+            }
+        } catch (\Exception $e) {
+            http_response_code(400); // BAD REQUEST
+            echo 'Exception of type "' . get_class($e) . '" with message "' .
+                $e->getMessage() . '"';
+        }
+    }
+
+    /**
+     * Register your event listeners here
+     *
+     * USE CAREFULLY, DO NOT DO ANYTHING COSTLY HERE!
+     * CALCULATE YOUR STUFF AS LATE AS POSSIBLE.
+     * Keep in mind, that you can also register your events later.
+     * Do not do anything else here than initializing your event listeners and
+     * list statements like
+     * $this->cx->getEvents()->addEventListener($eventName, $listener);
+     */
+    public function registerEventListeners()
+    {
+        $userListener
+            = new \Cx\Core\User\Model\Event\UserEventListener(
+            $this->cx
+        );
+
+        $entityClass = 'Cx\\Core\\' . $this->getName()
+            . '\\Model\\Entity\\User';
+        $this->cx->getEvents()->addModelListener(
+            \Doctrine\ORM\Events::preUpdate,
+            $entityClass,
+            $userListener
+        );
+
+        $attrListener
+            = new \Cx\Core\User\Model\Event\UserAttributeEventListener(
+                $this->cx
+            );
+        $this->cx->getEvents()->addModelListener(
+            \Doctrine\ORM\Events::postPersist,
+            'Cx\Core\User\Model\Entity\UserAttribute',
+            $attrListener
+        );
+    }
+
 }

@@ -561,30 +561,24 @@ class CalendarLibrary
      */
     function getCommunityGroups()
     {
-        global $objDatabase;
+        $objFWUser = \FWUser::getFWUserObject();
+
+        $objGroup = $objFWUser->objGroup->getGroups();
 
         $arrCommunityGroups = array();
 
-        $objCommunityGroups = $objDatabase->Execute("SELECT
-                                                        `group`.`group_id` AS group_id,
-                                                        `group`.`group_name` AS group_name,
-                                                        `group`.`is_active` AS is_active,
-                                                        `group`.`type` AS `type`
-                                                      FROM  ".DBPREFIX."access_user_groups AS `group`");
-        if ($objCommunityGroups !== false) {
-            while (!$objCommunityGroups->EOF) {
-                $arrCommunityGroups[intval($objCommunityGroups->fields['group_id'])]['id'] = intval($objCommunityGroups->fields['group_id']);
-                $arrCommunityGroups[intval($objCommunityGroups->fields['group_id'])]['name'] = htmlspecialchars($objCommunityGroups->fields['group_name'], ENT_QUOTES, CONTREXX_CHARSET);
-                $arrCommunityGroups[intval($objCommunityGroups->fields['group_id'])]['active'] = intval($objCommunityGroups->fields['is_active']);
-                $arrCommunityGroups[intval($objCommunityGroups->fields['group_id'])]['type'] = htmlspecialchars($objCommunityGroups->fields['type'], ENT_QUOTES, CONTREXX_CHARSET);  
+        while (!$objGroup->EOF) {
+            $arrCommunityGroups[intval($objGroup->getId())]['id'] = intval($objGroup->getId());
+            $arrCommunityGroups[intval($objGroup->getId())]['name'] = $objGroup->getName();
+            $arrCommunityGroups[intval($objGroup->getId())]['active'] = intval($objGroup->getActiveStatus());
+            $arrCommunityGroups[intval($objGroup->getId())]['type'] = $objGroup->getType();
 
-                $objCommunityGroups->MoveNext();
-            }
+            $objGroup->next();
         }
-                                           
+
         $this->arrCommunityGroups = $arrCommunityGroups;
     }
-    
+
     /**
      * Return's the billing address javascript
      * 

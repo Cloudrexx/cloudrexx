@@ -32,7 +32,6 @@
  * @author      Dario Graf <info@cloudrexx.com>
  * @package     cloudrexx
  * @subpackage  core_user
- * @version     5.0.0
  */
 namespace Cx\Core\User\Model\Entity;
 
@@ -204,7 +203,6 @@ class UserValidateUsername extends \CxValidate
  * @author      Dario Graf <info@cloudrexx.com>
  * @package     cloudrexx
  * @subpackage  core_user
- * @version     5.0.0
  */
 class User extends \Cx\Model\Base\EntityBase {
     /**
@@ -230,7 +228,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @var string
      */
-    protected $authToken = '0';
+    protected $authToken = '';
 
     /**
      * @var integer
@@ -290,7 +288,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @var boolean
      */
-    protected $active = true;
+    protected $active = false;
 
     /**
      * @var boolean
@@ -325,12 +323,12 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @var \Doctrine\Common\Collections\Collection
      */
-    protected $group;
+    protected $groups;
 
     /**
      * @var \Doctrine\Common\Collections\Collection
      */
-    protected $userAttributeValue;
+    protected $userAttributeValues;
 
     /**
      * Constructor
@@ -341,8 +339,8 @@ class User extends \Cx\Model\Base\EntityBase {
         $this->profileAccess = $arrSettings['default_profile_access']['value'];
         $this->emailAccess = $arrSettings['default_email_access']['value'];
 
-        $this->group = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->userAttributeValue = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->groups = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->userAttributeValues = new \Doctrine\Common\Collections\ArrayCollection();
 
     }
 
@@ -367,7 +365,6 @@ class User extends \Cx\Model\Base\EntityBase {
      * Set isAdmin
      *
      * @param boolean $isAdmin
-     * @return User
      */
     public function setIsAdmin($isAdmin)
     {
@@ -677,11 +674,25 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get active
      *
+     * This does exactly the same as getActive, but this method is necessary for doctrine mapping
+     *
      * @return boolean 
      */
     public function getActive()
     {
         return $this->active;
+    }
+
+    /**
+     * Get active
+     *
+     * This does exactly the same as getActive, but this method name is more intuitive
+     *
+     * @return integer $active
+     */
+    public function isActive()
+    {
+        return $this->getActive();
     }
 
     /**
@@ -771,9 +782,9 @@ class User extends \Cx\Model\Base\EntityBase {
      *
      * @param integer $restoreKeyTime
      */
-    public function setRestoreKeyTime($restoreKeyTime)
+    public function setRestoreKeyTime($restoreKeyTime = null)
     {
-        $this->restoreKeyTime = $restoreKeyTime;
+        $this->restoreKeyTime = !empty($restoreKeyTime) ? $restoreKeyTime : time() + 3600;
     }
 
     /**
@@ -813,7 +824,7 @@ class User extends \Cx\Model\Base\EntityBase {
      */
     public function addGroup(\Cx\Core\User\Model\Entity\Group $group)
     {
-        $this->group[] = $group;
+        $this->groups[] = $group;
     }
 
     /**
@@ -823,17 +834,30 @@ class User extends \Cx\Model\Base\EntityBase {
      */
     public function removeGroup(\Cx\Core\User\Model\Entity\Group $group)
     {
-        $this->group->removeElement($group);
+        $this->groups->removeElement($group);
     }
 
+    
     /**
      * Get group
      *
-     * @return \Doctrine\Common\Collections\Collection 
+     * @return \Doctrine\Common\Collections\Collection $group
+     * @deprecated
+     * @see \Cx\Core\User\Model\Entity\User::getGroups()
      */
     public function getGroup()
     {
-        return $this->group;
+        return $this->getGroups();
+    }
+
+    /**
+     * Get groups
+     *
+     * @return \Doctrine\Common\Collections\Collection $groups
+     */
+    public function getGroups()
+    {
+        return $this->groups;
     }
 
     /**
@@ -843,7 +867,7 @@ class User extends \Cx\Model\Base\EntityBase {
      */
     public function addUserAttributeValue(\Cx\Core\User\Model\Entity\UserAttributeValue $userAttributeValue)
     {
-        $this->userAttributeValue[] = $userAttributeValue;
+        $this->userAttributeValues[] = $userAttributeValue;
     }
 
     /**
@@ -853,17 +877,29 @@ class User extends \Cx\Model\Base\EntityBase {
      */
     public function removeUserAttributeValue(\Cx\Core\User\Model\Entity\UserAttributeValue $userAttributeValue)
     {
-        $this->userAttributeValue->removeElement($userAttributeValue);
+        $this->userAttributeValues->removeElement($userAttributeValue);
     }
 
     /**
      * Get userAttributeValue
      *
      * @return \Doctrine\Common\Collections\Collection
+     * @deprecated
+     * @see \Cx\Core\User\Model\Entity\User::getUserAttributeValues()
      */
     public function getUserAttributeValue()
     {
-        return $this->userAttributeValue;
+        return $this->getUserAttributeValues();
+    }
+
+    /**
+     * Get userAttributeValues
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getUserAttributeValues()
+    {
+        return $this->userAttributeValues;
     }
 
     /**
@@ -873,15 +909,103 @@ class User extends \Cx\Model\Base\EntityBase {
      */
     public function isBackendGroupUser()
     {
-        if (!$this->group) {
+        if (!$this->getGroups()) {
             return false;
         }
 
-        foreach ($this->group as $group) {
+        foreach ($this->getGroups() as $group) {
             if ($group->getType() === 'backend') {
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     * Get AttributeValue from AttributeValues
+     *
+     * @param int $attributeId id to find AttributeValue
+     * @return \Cx\Core\User\Model\Entity\UserAttributeValue
+     */
+    public function getAttributeValue($attributeId)
+    {
+        foreach ($this->getUserAttributeValues() as $value) {
+            if ($value->getAttributeId() == $attributeId) {
+                return $value;
+            }
+        }
+        return new \Cx\Core\User\Model\Entity\UserAttributeValue();
+    }
+
+    public function getProfileAttribute($profileId)
+    {
+        $attr = \FWUser::getFWUserObject()->objUser->objAttribute;
+        if ($attr->isDefaultAttribute($profileId)) {
+            $attrId = $attr->getAttributeIdByDefaultAttributeId($profileId);
+        } else {
+            $attrId = $profileId;
+        }
+
+        if (empty($attrId)) {
+            return new \Cx\Core\User\Model\Entity\UserAttributeValue();
+        }
+
+        return $this->getAttributeValue($attrId);
+    }
+
+    public function releaseRestoreKey()
+    {
+        $this->setRestoreKey('');
+        $this->setRestoreKeyTime(0);
+    }
+
+    /**
+     * Get associated group ids
+     *
+     * @param boolean $activeOnly Wether to load only the active groups or all
+     * @retrun array
+     */
+    public function getAssociatedGroupIds($activeOnly = false)
+    {
+        $groupIds = array();
+        foreach ($this->getGroup() as $group) {
+            if ($activeOnly && !$group->getIsActive()) {
+                continue;
+            }
+            $groupIds[] = $group->getGroupId();
+        }
+        return $groupIds;
+    }
+
+    public function getUsernameOrEmail()
+    {
+        $arrSettings = \User_Setting::getSettings();
+        if (!$arrSettings['use_usernames']['status'] || empty($this->getUsername())) {
+            return $this->getEmail();
+        }
+        return $this->getUsername();
+    }
+
+    /**
+     * Checks whether the user account is connected with a crm customer
+     *
+     * @return int|null id of crm user if the user is associated with a customer of crm module
+     */
+    public function getCrmUserId() {
+        /**
+         * @var \Cx\Core\Core\Controller\Cx $cx
+         */
+        $cx = \Env::get('cx');
+        if (!$cx->getLicense()->isInLegalComponents('Crm')) {
+            return false;
+        }
+        $db = $cx->getDb()->getAdoDb();
+        $result = $db->SelectLimit(
+            "SELECT `id` FROM `" . DBPREFIX . "module_crm_contacts` WHERE `user_account` = " . intval($this->getId()), 1
+        );
+        if ($result->RecordCount() == 0) {
+            return null;
+        }
+        return $result->fields['id'];
     }
 }

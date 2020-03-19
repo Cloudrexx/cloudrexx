@@ -443,6 +443,10 @@ namespace Cx\Core\Model {
                 'string'
             );
             \Cx\Core\Model\Controller\YamlDriver::registerKnownEnumTypes($conn);
+            \Doctrine\DBAL\Types\Type::addType(
+                'password',
+                'Cx\Core\Model\Model\Entity\PasswordType'
+            );
 
             $this->em = $em;
             return $this->em;

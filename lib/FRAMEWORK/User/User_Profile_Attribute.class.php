@@ -87,12 +87,12 @@ class User_Profile_Attribute
 
     private $arrAttributeTree;
     private $arrAttributeRelations;
-    private $arrCoreAttributeIds;
+    private $arrDefaultAttributeIds;
     private $arrCustomAttributes;
     private $arrMandatoryAttributes = array();
-    private $arrProfileAttributes = array();
+    private $arrDefaultAttributeNames = array();
 
-    private $arrCoreAttributes = array(
+    private $arrDefaultAttributeTemplates = array(
         'picture' => array(
             'type'         => 'image',
             'multiline'    => false,
@@ -533,74 +533,10 @@ class User_Profile_Attribute
         $this->arrAttributeRelations = null;
         $this->arrAttributeTree = null;
 
-        $this->loadCoreAttributes();
-        $this->loadProfileAttributes();
-        $this->loadCustomAttributes();
+        $this->loadAttributes();
+        $this->loadCoreAttributeCountry();
         $this->generateAttributeRelations();
         $this->sortChildren();
-    }
-
-
-    function loadCoreAttributes()
-    {
-        global $_CORELANG;
-
-        $this->arrCoreAttributeIds = array();
-        $this->arrAttributes = $this->arrCoreAttributes;
-        foreach ($this->arrCoreAttributes as $attributeId => $arrAttribute) {
-            if (!$arrAttribute['parent_id']) {
-                $this->arrCoreAttributeIds[] = $attributeId;
-            }
-
-// TODO: In the backend, this always results in the empty string!
-// The core language is not loaded yet when this is run!
-            $this->arrAttributes[$attributeId]['names'][$this->langId] = isset($_CORELANG[$arrAttribute['desc']]) ? $_CORELANG[$arrAttribute['desc']] : null;
-// See:
-//die(var_export($_CORELANG, true));
-// and
-/*
-DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, language ID $this->langId: ".$arrAttribute['desc'].
-  " => ".
-  $_CORELANG[$arrAttribute['desc']].
-  " => ".
-  $this->arrAttributes[$attributeId]['names'][$this->langId]
-);
-*/
-        }
-        $this->loadCoreAttributeCountry();
-        $this->loadCoreAttributeTitle();
-    }
-
-    /**
-     * Find all default user attributes (ProfileAttributes) and store it in an
-     * array
-     */
-    function loadProfileAttributes()
-    {
-        global $objDatabase;
-
-        $query = '
-            SELECT 
-                `tblA`.`id` AS `id`, 
-                `tblN`.`name` AS `name` 
-            FROM `' .DBPREFIX .'access_user_attribute` AS `tblA`
-            LEFT JOIN `'.DBPREFIX.'access_user_attribute_name` AS `tblN`
-                ON `tblN`.`attribute_id` = `tblA`.`id`
-            WHERE `tblA`.`is_default` = 1 
-            AND `tblA`.`parent_id` IS NULL
-        ';
-
-        $objAttributes = $objDatabase->Execute($query);
-
-        if ($objAttributes !== false && $objAttributes->RecordCount() > 0) {
-            while (!$objAttributes->EOF) {
-                $this->arrProfileAttributes[
-                $objAttributes->fields['id']
-                ] = $objAttributes->fields['name'];
-
-                $objAttributes->MoveNext();
-            }
-        }
     }
 
     function loadCoreAttributeCountry()
@@ -614,7 +550,7 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
                 'multiline' => false,
                 'mandatory' => false,
                 'sort_type' => 'asc',
-                'parent_id' => 'country',
+                'parent_id' => $this->getAttributeIdByDefaultAttributeId('country'),
                 'desc' => $country['name'],
                 'names' => array($this->langId => $country['name']),
                 'value' => $country['id'],
@@ -623,98 +559,65 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
         }
     }
 
-
-    function loadCoreAttributeTitle()
+ 
+/**
+     * Find all default user attributes and store it in an
+     * array
+     */
+    function loadAttributes()
     {
-        global $objDatabase;
-        // Find children of user attribute title
-        $objResult = $objDatabase->Execute('
-            SELECT 
-                `name`.`id` AS `id` , `name`.`name` AS `title`, 
-                `attribute`.`order_id`
-            FROM `'.DBPREFIX.'access_user_attribute_name` AS `name` 
-            LEFT JOIN `'.DBPREFIX.'access_user_attribute` AS `attribute` 
-                ON `name`.`attribute_id` = `attribute`.`id`
-            LEFT JOIN `'.DBPREFIX.'access_user_attribute_name` AS `titleAttr` 
-                ON `titleAttr`.`name` = "title"
-            WHERE `attribute`.`parent_id`= `titleAttr`.`attribute_id`;
-        ');
-        if ($objResult) {
-            while (!$objResult->EOF) {
-                $this->arrAttributes['title_'.$objResult->fields['id']] = array(
-                    'type' => 'menu_option',
-                    'multiline' => false,
-                    'mandatory' => false,
-                    'sort_type' => 'asc',
-                    'parent_id' => 'title',
-                    'desc' => $objResult->fields['title'],
-                    'value' => $objResult->fields['id'],
-                    'order_id' => $objResult->fields['order_id'],
-                    'modifiable' => array('names'),
-                );
-
-                // add names for all languages
-                foreach (\FWLanguage::getLanguageArray() as $langId => $langData) {
-                    $this->arrAttributes['title_'.$objResult->fields['id']]['names'][$langId] = $objResult->fields['title'];
-                }
-                $objResult->MoveNext();
-            }
-        }
-    }
-
-    function loadCustomAttributes()
-    {
-        global $objDatabase;
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $attributeRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\UserAttribute');
 
         $this->arrCustomAttributes = array();
-        $objResult = $objDatabase->Execute('
-            SELECT
-                `id`,
-                `type`,
-                `sort_type`,
-                `order_id`,
-                `mandatory`,
-                `parent_id`,
-                `access_special`,
-                `access_id`,
-                `read_access_id`,
-                `is_default`
-            FROM
-                `' . DBPREFIX . 'access_user_attribute`
-            WHERE `is_default` = 0
-            ORDER BY
-                `order_id`,
-                `id`
-        ');
-        if ($objResult) {
-            while (!$objResult->EOF) {
-                $this->arrAttributes[$objResult->fields['id']]['type'] = $objResult->fields['type'] == 'textarea' ? 'text' : $objResult->fields['type'];
-                $this->arrAttributes[$objResult->fields['id']]['multiline'] = $objResult->fields['type'] == 'textarea' ? true : false;
-                $this->arrAttributes[$objResult->fields['id']]['sort_type'] = $objResult->fields['sort_type'];
-                $this->arrAttributes[$objResult->fields['id']]['order_id'] = $objResult->fields['order_id'];
-                $this->arrAttributes[$objResult->fields['id']]['mandatory'] = $objResult->fields['mandatory'];
-                $parentId = $objResult->fields['parent_id'];
-                if ($parentId === null) {
-                    $parentId = 0;
-                }
-                $this->arrAttributes[$objResult->fields['id']]['parent_id'] = $parentId;
-                $this->arrAttributes[$objResult->fields['id']]['access_special'] = $objResult->fields['access_special'];
-                $this->arrAttributes[$objResult->fields['id']]['access_id'] = $objResult->fields['access_id'];
-                $this->arrAttributes[$objResult->fields['id']]['read_access_id'] = $objResult->fields['read_access_id'];
-                $this->arrAttributes[$objResult->fields['id']]['modifiable'] = array('type', 'sort_order', 'mandatory', 'parent_id', 'access', 'children');
-                $this->arrCustomAttributes[] = $objResult->fields['id'];
-                if ($objResult->fields['mandatory']) {
-                    $this->arrMandatoryAttributes[] = $objResult->fields['id'];
-                }
-                $objResult->MoveNext();
-            }
+        $attributes = $attributeRepo->findBy(array(), array('orderId' => 'asc', 'id' => 'asc'));
+
+        if (empty($attributes)) {
+            return;
         }
-        $objResult = $objDatabase->Execute('SELECT `attribute_id`, `name` FROM `'.DBPREFIX.'access_user_attribute_name` WHERE `lang_id` = '.$this->langId);
-        if ($objResult) {
-            while (!$objResult->EOF) {
-                $this->arrAttributes[$objResult->fields['attribute_id']]['names'][$this->langId] = $objResult->fields['name'];
-                $objResult->MoveNext();
+
+        foreach ($attributes as $attribute) {
+            $attributeId = $attribute->getId();
+            $this->arrAttributes[$attributeId]['type'] = $attribute->getType() == 'textarea' ? 'text' : $attribute->getType();
+            $this->arrAttributes[$attributeId]['multiline'] = $attribute->getType() == 'textarea' ? true : false;
+            $this->arrAttributes[$attributeId]['sort_type'] = $attribute->getSortType();
+            $this->arrAttributes[$attributeId]['order_id'] = $attribute->getOrderId();
+            $this->arrAttributes[$attributeId]['mandatory'] = $attribute->getMandatory();
+            $parent = $attribute->getParent();
+            if ($parent === null) {
+                $parentId = 0;
+            } else {
+                $parentId = $parent->getId();
             }
+            $this->arrAttributes[$attributeId]['parent_id'] = $parentId;
+
+            if (!$attribute->isDefault()) {
+                $this->arrAttributes[$attributeId]['modifiable'] = array('type', 'sort_order', 'mandatory', 'parent_id', 'access', 'children');
+                $this->arrCustomAttributes[] = $attributeId;
+            } else {
+                if (!$parentId) {
+                    $this->arrDefaultAttributeIds[] = $attributeId;
+                }
+                $this->arrDefaultAttributeNames[$attributeId] = $attribute->getName();
+
+                if (isset($this->arrDefaultAttributeTemplates[$attribute->getName()])) {
+                    $arrTemplate = $this->arrDefaultAttributeTemplates[$attribute->getName()];
+                    $desc = $arrTemplate['desc'];
+                    $this->arrAttributes[$attributeId]['names'][$this->langId] = isset($langData[$desc]) ? $langData[$desc] : null;
+                    $this->arrAttributes[$attributeId]['modifiable'] = $arrTemplate['modifiable'];
+                } else if ($parentId == $this->getAttributeIdByDefaultAttributeId('title')) {
+                    $this->arrAttributes[$attributeId]['modifiable'] = array('names');
+                }
+            }
+            $this->arrAttributes[$attributeId]['access_special'] = $attribute->getAccessSpecial();
+            $this->arrAttributes[$attributeId]['access_id'] = $attribute->getAccessId();
+            $this->arrAttributes[$attributeId]['read_access_id'] = $attribute->getReadAccessId();
+            $this->arrCustomAttributes[] = $attributeId;
+            if ($attribute->getMandatory()) {
+                $this->arrMandatoryAttributes[] = $attributeId;
+            }
+
+            $this->arrAttributes[$attributeId]['names'][$this->langId] = $attribute->getName($this->langId);
         }
     }
 
@@ -730,9 +633,9 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
      *
      * @return array value with all profile attributes
      */
-    public function getProfileAttributes()
+    public function getDefaultAttributeNames()
     {
-        return $this->arrProfileAttributes;
+        return $this->arrDefaultAttributeNames;
     }
 
     function getTree()
@@ -747,7 +650,11 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
     function generateAttributeRelations()
     {
         foreach ($this->arrAttributes as $attribute => $arrAttribute) {
-            $this->arrAttributeRelations[$arrAttribute['parent_id']][] = $attribute;
+            if (!empty($arrAttribute['parent_id'])) {
+                $this->arrAttributeRelations[$arrAttribute['parent_id']][] = $attribute;
+            } else {
+                $this->arrAttributeRelations[$arrAttribute['parent_id']][] = $attribute;
+            }
         }
     }
 
@@ -778,7 +685,7 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
         $objAttribute->arrAttributeTree = &$this->arrAttributeTree;
         $objAttribute->arrAttributeRelations = &$this->arrAttributeRelations;
         $objAttribute->arrMandatoryAttributes = &$this->arrMandatoryAttributes;
-        $objAttribute->arrCoreAttributeIds = &$this->arrCoreAttributeIds;
+        $objAttribute->arrDefaultAttributeIds = &$this->arrDefaultAttributeIds;
         $objAttribute->arrCustomAttributes = &$this->arrCustomAttributes;
 
         if ($objAttribute->load($id)) {
@@ -791,6 +698,54 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
     }
 
     /**
+     * Get all images from all image attributes. Empty values are excluded
+     *
+     * @param int   $limit  limit of database query
+     * @param int   $offset offset of database query
+     * @param int   $count  count of entries
+     * @param bool  $profilePics limit to profile pictures
+     * @return array images names
+     */
+    public function getImages($limit, $offset, &$count, $profilePics)
+    {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $attributeRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\UserAttribute');
+        $qb = $attributeRepo->createQueryBuilder('a');
+        $qb->select('SUM(1) AS entryCount')
+           ->innerJoin('a.userAttributeValues', 'v')
+           ->where($qb->expr()->eq('a.type', ':type'))
+           ->andWhere($qb->expr()->not($qb->expr()->eq('v.value', ':value')))
+           ->setParameters(array('type' => 'image', 'value' => ''));
+
+        if ($profilePics) {
+	        $picId = $this->getAttributeIdByDefaultAttributeId('picture');
+	        $qb->andWhere($qb->expr()->eq('a.id', ':picId'));
+	        $qb->setParameter('picId', $picId);
+	    }
+        
+ 	    $count = $qb->getQuery()->getSingleScalarResult();
+        if (!$count) {
+            return array();
+        }
+
+        $qb->select('v.value AS picture');
+        $qb->setMaxResults($limit);
+        $qb->setFirstResult($offset);
+
+        $resultImages = $qb->getQuery()->getArrayResult();
+        if (empty($resultImages)) {
+            return array();
+        }
+
+        $images = array();
+        foreach ($resultImages as $image) {
+            $images[] = $image['picture'];
+        }
+
+        return $images;
+    }
+
+    /**
      * get attribute id by attribut name
      *
      * @param string $name
@@ -799,13 +754,12 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
      */
     function getAttributeIdByName($name)
     {
-        global $objDatabase;
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $attributeNameRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\UserAttributeName');
+        $attributeName = $attributeNameRepo->findOneBy(array('name' => $name));
 
-        $query = 'SELECT `attribute_id` FROM `'.DBPREFIX.'access_user_attribute_name`
-                WHERE `name` = "'.$name.'"';
-        $objAttribute = $objDatabase->Execute($query);
-        if($objAttribute !== false){
-            return $objAttribute->fields["attribute_id"];
+        if ($attributeName) {
+            return $attributeName->getAttributeId();
         }
         return false;
     }
@@ -817,6 +771,10 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
      */
     function load($id)
     {
+        if ($this->isDefaultAttribute($id)) {
+            $id = $this->getAttributeIdByDefaultAttributeId($id);
+        }
+
         if (isset($this->arrAttributes[$id])) {
             $this->id = $id;
             $this->type = isset($this->arrAttributes[$id]['type']) ? $this->arrAttributes[$id]['type'] : $this->defaultAttributeType;
@@ -958,12 +916,8 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
         global $_ARRAYLANG;
 
         if ($this->checkIntegrity()) {
-            if ($this->parent_id === 'title' && $this->storeCoreAttributeTitle() ||
-                $this->isCoreAttribute($this->id) && $this->storeCoreAttribute() ||
-                $this->storeCustomAttribute()
-            ) {
-                if (preg_match('/^title_[0-9]+$/', $this->id) ||
-                    ($this->isCoreAttribute($this->id) || $this->storeNames()) &&
+            if ($this->storeCustomAttribute()) {
+                if (($this->isDefaultAttribute($this->id) || $this->storeNames()) &&
                     $this->storeChildrenOrder() &&
                     $this->storeProtection($this->protected, $this->access_id, 'access_id', $this->access_group_ids) &&
                     $this->storeProtection($this->readProtected, $this->readAccessId, 'read_access_id', $this->readAccessGroupIds, 'read')
@@ -984,8 +938,6 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
 
     function storeCustomAttribute()
     {
-        global $objDatabase;
-
         $type =
             ($this->arrTypes[$this->type]['multiline'] && $this->multiline
               ? 'textarea' : $this->type);
@@ -993,106 +945,129 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
         if ($parentId == 0) {
             $parentId = 'NULL';
         }
-        if ($this->id) {
-            return (boolean)$objDatabase->Execute("
-                UPDATE `".DBPREFIX."access_user_attribute`
-                   SET `type`='$type', `sort_type`='$this->sort_type',
-                       `order_id`=$this->order_id,
-                       `mandatory`='$this->mandatory',
-                       `parent_id`= $parentId
-                 WHERE `id`=$this->id");
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $attrRepo = $em->getRepository(
+            'Cx\Core\User\Model\Entity\UserAttribute'
+        );
+        $attr = $attrRepo->find($this->id);
+
+        if (empty($attr)) {
+            $attr = new \Cx\Core\User\Model\Entity\UserAttribute();
         }
-        $objDatabase->startTrans();
-        $result = $objDatabase->Execute('
-            INSERT INTO
-                `' . DBPREFIX . 'access_user_attribute`
-            (
-                `type`,
-                `sort_type`,
-                `order_id`,
-                `mandatory`,
-                `parent_id`
-            ) VALUES (
-                "' . $type . '",
-                "' . $this->sort_type . '",
-                ' . $this->order_id . ',
-                "' . $this->mandatory . '",
-                ' . $parentId . '
-            )
-        ');
-        if (!$result) {
-            $objDatabase->failTrans();
-            $objDatabase->completeTrans();
+
+        $parent = $attrRepo->find($parentId);
+
+        $attr->setType($type);
+        $attr->setSortType($this->sort_type);
+        $attr->setOrderId($this->order_id);
+        $attr->setMandatory($this->mandatory);
+        $attr->setParent($parent);
+        $attr->setAccessId(0);
+        $attr->setReadAccessId(0);
+        $attr->setIsDefault(0);
+        $em->persist($attr);
+
+        try {
+            $em->flush();
+        } catch (\Doctrine\ORM\OptimisticLockException $e) {
             return false;
         }
-        $this->id = $objDatabase->Insert_ID();
-        $result = $objDatabase->Execute('
-            INSERT INTO
-                `' . DBPREFIX . 'access_user_attribute_value`
-            (
-                `attribute_id`,
-                `user_id`,
-                `history_id`,
-                `value`
-            )
-            SELECT DISTINCT
-                ' . $this->id . ',
-                `id`,
-                0,
-                ""
-            FROM
-                `' . DBPREFIX . 'access_users`
-        ');
-        if (!$result) {
-            $objDatabase->failTrans();
-            $objDatabase->completeTrans();
-            return false;
-        }
-        $objDatabase->completeTrans();
+
+        $this->id = $attr->getId();
+
         return true;
     }
 
 
     function storeCoreAttributeTitle()
     {
-        global $objDatabase;
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $attributeNameRepo = $em->getRepository('Cx\Core\User\Model\Entity\UserAttributeName');
+        $attributeRepo = $em->getRepository('Cx\Core\User\Model\Entity\UserAttribute');
 
-        $pattern = array();
-        if ($this->id && preg_match('#([0-9]+)#', $this->id, $pattern) && $objDatabase->Execute("UPDATE `".DBPREFIX."access_user_attribute_name` SET `name` = '".addslashes($this->arrName[0])."' WHERE `attribute_id` = '".$pattern[0]."'") ||
-                $objDatabase->Execute("INSERT INTO `".DBPREFIX."access_user_attribute`(`parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES ((SELECT `attribute_id` FROM `contrexx_access_user_attribute_name` WHERE `name` = 'title'),'menu_option',0,'asc',0,0,0,0,1)") &&
-                $objDatabase->Execute("INSERT INTO `".DBPREFIX."access_user_attribute_name`(`attribute_id`, `lang_id`, `name`, `order`) VALUES (". $objDatabase->Insert_ID() .", 0, '".addslashes($this->arrName[0])."',(select count(`name`.`order`) + 1 as `order` from `".DBPREFIX."access_user_attribute_name` as name))")
-        ) {
+        try {
+            if (!$this->id || !preg_match('#([0-9]+)#', $this->id, $pattern)) {
+                $titleId = $this->getAttributeIdByDefaultAttributeId('title');
+                $titleAttr = $attributeRepo->find($titleId);
+                $attributeName = new \Cx\Core\User\Model\Entity\UserAttributeName();
+                $attribute = new \Cx\Core\User\Model\Entity\UserAttribute();
+                $attribute->addUserAttributeName($attributeName);
+                $attribute->setAccessId(0);
+                $attribute->setReadAccessId(0);
+                $attributeName->setUserAttribute($attribute);
+
+                if ($titleAttr) {
+                    $attribute->setParent($titleAttr);
+                }
+
+                $em->persist($attribute);
+            } else {
+                $attributeName = $attributeNameRepo->findOneBy(array('id' => $pattern[0]));
+            }
+
+            $attributeName->setName(addslashes($this->arrName[0]));
+
+            $em->persist($attributeName);
+            $em->flush();
+
             return true;
+        } catch (\Doctrine\ORM\OptimisticLockException $e) {
+            return false;
         }
-        return false;
     }
 
 
     function storeCoreAttribute()
     {
-        global $objDatabase;
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $attributeNameRepo = $em->getRepository('Cx\Core\User\Model\Entity\UserAttributeName');
+        $attributeName = $attributeNameRepo->findOneBy(array('name' => $this->id));
 
-        if (($objDatabase->Execute("UPDATE `".DBPREFIX."access_user_attribute` SET `sort_type` = '".$this->sort_type."', `order_id` = ".$this->order_id.", `mandatory` = '".$this->mandatory."' WHERE `id` = (SELECT `attribute_id` FROM `contrexx_access_user_attribute_name` WHERE `name` = '".$this->id."')") !== false) ||
-        ($objDatabase->Execute("INSERT INTO `".DBPREFIX."access_user_attribute` (`id`, `sort_type`, `order_id`, `mandatory`) VALUES ((SELECT `attribute_id` FROM `contrexx_access_user_attribute_name` WHERE `name` = '".$this->id."'), '".$this->sort_type."', ".$this->order_id.", '".$this->mandatory."')") !== false)) {
-            return true;
+        if ($attributeName && $attributeName->getUserAttribute()) {
+            $attribute = $attributeName->getUserAttribute();
+        } else {
+            $attribute = new \Cx\Core\User\Model\Entity\UserAttribute();
         }
-        return false;
+
+        $attribute->setSortType($this->sort_type);
+        $attribute->setOrderId($this->order_id);
+        $attribute->setMandatory($this->mandatory);
+
+        try {
+            $em->persist($attribute);
+            $em->flush();
+            return true;
+        } catch (\Doctrine\ORM\OptimisticLockException $e) {
+            return false;
+        }
     }
 
 
     function storeChildrenOrder()
     {
-        global $objDatabase;
-
         if ($this->sort_type == 'custom') {
-            $affectedTable = DBPREFIX.'access_user_attribute';
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $em = $cx->getDb()->getEntityManager();
+            $attributeRepo = $em->getRepository('Cx\Core\User\Model\Entity\UserAttribute');
             $offset = 0;
 
             foreach ($this->children as $orderId => $childAttributeId)
             {
-                if ($objDatabase->Execute("UPDATE `". $affectedTable."` SET `order_id` = ".($orderId+$offset)." WHERE `id` = '".$childAttributeId."'") === false) {
-                    return false;
+                $attribute = $attributeRepo->find($childAttributeId);
+                if (empty($attribute)) {
+                    continue;
                 }
+                $attribute->setOrderId($orderId+$offset);
+                $em->persist($attribute);
+            }
+            try {
+                $em->flush();
+            } catch (\Doctrine\ORM\OptimisticLockException $e) {
+                return false;
             }
         }
         return true;
@@ -1107,38 +1082,51 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
      */
     function storeNames()
     {
-        global $objDatabase;
-
         $arrOldNames = array();
         $status = true;
-        $objResult = $objDatabase->Execute('SELECT `lang_id`, `name` FROM `'.DBPREFIX.'access_user_attribute_name` WHERE `attribute_id` = '.$this->id);
-        if (!$objResult) {
-            return false;
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $attributeNameRepo = $em->getRepository('Cx\Core\User\Model\Entity\UserAttributeName');
+        $attributeRepo = $em->getRepository('Cx\Core\User\Model\Entity\UserAttribute');
+        $attributeNames = $attributeNameRepo->findBy(array('attributeId' => $this->id));
+
+        foreach ($attributeNames as $attributeName) {
+            $arrOldNames[$attributeName->getLangId()] = $attributeName->getName();
         }
-        while (!$objResult->EOF) {
-            $arrOldNames[$objResult->fields['lang_id']] = $objResult->fields['name'];
-            $objResult->MoveNext();
-        }
+        $attribute = $attributeRepo->find($this->id);
         $arrNewNames = array_diff(array_keys($this->arrName), array_keys($arrOldNames));
         $arrRemovedNames = array_diff(array_keys($arrOldNames), array_keys($this->arrName));
         $arrUpdatedNames = array_intersect(array_keys($this->arrName), array_keys($arrOldNames));
         foreach ($arrNewNames as $langId) {
-            if ($objDatabase->Execute("INSERT INTO `".DBPREFIX."access_user_attribute_name` (`attribute_id`, `lang_id`, `name`) VALUES (".$this->id.", ".$langId.", '".addslashes($this->arrName[$langId])."')") === false) {
-                $status = false;
-            }
+            $attributeName = new \Cx\Core\User\Model\Entity\UserAttributeName();
+            $attributeName->setLangId($langId);
+            $attributeName->setName(addslashes($this->arrName[$langId]));
+            $attributeName->setAttributeId($this->id);
+            $attributeName->setUserAttribute($attribute);
+            $em->persist($attributeName);
         }
         foreach ($arrRemovedNames as $langId) {
-            if ($objDatabase->Execute("DELETE FROM `".DBPREFIX."access_user_attribute_name` WHERE `attribute_id` = ".$this->id." AND `lang_id` = ".$langId) === false) {
-                $status = false;
+            $attributeName = $attributeNameRepo->findOneBy(array('attributeId' => $this->id, 'langId' => $langId));
+            if ($attributeName) {
+                continue;
             }
+            $em->remove($attributeName);
         }
         foreach ($arrUpdatedNames as $langId) {
-            if ($this->arrName[$langId] != $arrOldNames[$langId]) {
-                if ($objDatabase->Execute("UPDATE `".DBPREFIX."access_user_attribute_name` SET `name` = '".addslashes($this->arrName[$langId])."' WHERE `attribute_id` = ".$this->id." AND `lang_id` = ".$langId) === false) {
-                    $status = false;
-                }
+            $attributeName = $attributeNameRepo->findOneBy(array('attributeId' => $this->id, 'langId' => $langId));
+            if (empty($attributeName)) {
+                continue;
             }
+            $attributeName->setName(addslashes($this->arrName[$langId]));
+            $em->persist($attributeName);
         }
+        try {
+            $em->flush();
+        } catch (\Doctrine\ORM\OptimisticLockException $e) {
+            $status = false;
+        }
+
         return $status;
     }
 
@@ -1156,36 +1144,53 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
      */
     function storeProtection($protected, $accessId, $fieldName, $groupIds, $access = 'write')
     {
-        $objDatabase = \Cx\Core\Core\Controller\Cx::instanciate()->getDb()->getAdoDb();
-        $tableName = 'access_user_attribute';
-        $where = $this->id;
-        if ($this->isCoreAttribute($this->id)) {
-            $where = '(SELECT `attribute_id` FROM `contrexx_access_user_attribute_name` WHERE `name` = "'. $this->id .'")';
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $objDatabase = $cx->getDb()->getAdoDb();
+        $attributeRepo = $em->getRepository('Cx\Core\User\Model\Entity\UserAttribute');
+        $classMeta = $em->getClassMetadata('Cx\Core\User\Model\Entity\UserAttribute');
+
+        $attributeId = $this->id;
+        if ($this->isDefaultAttribute($this->id)) {
+            $attributeId = $this->getAttributeIdByDefaultAttributeId($this->id);
+        }
+
+        $attribute = $attributeRepo->find($attributeId);
+        if (!$attribute) {
+            return false;
+        }
+
+        $setter = '';
+        $mappedFieldName = $classMeta->getFieldName($fieldName);
+        if ($mappedFieldName != $fieldName) {
+            $setter = 'set'.ucfirst($mappedFieldName);
         }
 
         if (!$protected) {
             // remove protection
-            $updateFields = ' `' . $fieldName . '` = 0';
-            if ($access == 'write') {
-                $updateFields .= ', `access_special` = ""';
+            if (!$setter) {
+                return false;
             }
-            if (
-                $objDatabase->Execute('
-                    UPDATE `' . DBPREFIX . $tableName . '`
-                       SET ' . $updateFields . '
-                       WHERE `id` = ' . $where
-                ) !== false &&
-                (
-                    !isset($this->arrAttributes[$this->id][$fieldName]) ||
+            $attribute->$setter(0);
+            if ($access == 'write') {
+                $attribute->setAccessSpecial('');
+            }
+
+            try {
+                $em->persist($attribute);
+                $em->flush();
+                if (!isset($this->arrAttributes[$this->id][$fieldName]) ||
                     $objDatabase->Execute(
                         'DELETE FROM `' . DBPREFIX . 'access_group_dynamic_ids`
                             WHERE `access_id` = ' . $this->arrAttributes[$this->id][$fieldName]
                     ) !== false
-                )
-            ) {
-                return true;
+                ) {
+                    return true;
+                }
+
+            } catch (\Doctrine\ORM\OptimisticLockException $e) {
+                return false;
             }
-            return false;
         }
 
         $arrOldGroups = array();
@@ -1204,16 +1209,18 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
             }
         } else {
             $accessId = \Permission::createNewDynamicAccessId();
-            if (
-                !$accessId ||
-                $objDatabase->Execute('
-                    UPDATE `' . DBPREFIX . $tableName . '`
-                        SET `' . $fieldName . '` = ' . contrexx_input2db($accessId) . '
-                        WHERE `id` = ' . $where
-                ) === false
-            ) {
+            if (!$accessId || !$setter) {
                 return false;
             }
+
+            try {
+                $attribute->$setter(contrexx_input2db($accessId));
+                $em->persist($attribute);
+                $em->flush();
+            } catch (\Doctrine\ORM\OptimisticLockException $e) {
+                return false;
+            }
+
             $this->arrAttributes[$this->id][$fieldName] = $accessId;
             if ($access == 'write') {
                 $this->access_id = $accessId;
@@ -1222,15 +1229,14 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
             }
         }
 
-        if (
-            $access == 'write' &&
-            $objDatabase->Execute('
-                UPDATE `' . DBPREFIX . $tableName . '`
-                   SET `access_special` = "' . contrexx_input2db($this->access_special) . '"
-                   WHERE `id` = ' . $where
-            ) === false
-        ) {
-            return false;
+        try {
+            $attribute->setAccessSpecial(contrexx_input2db($accessId));
+            $em->persist($attribute);
+            $em->flush();
+        } catch (\Doctrine\ORM\OptimisticLockException $e) {
+            if ($access == 'write') {
+                return false;
+            }
         }
 
         $arrNewGroups = array_diff($groupIds, $arrOldGroups);
@@ -1281,9 +1287,9 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
 //        return ($this->isCoreAttribute($attributeId) || $this->deleteAttributeContent($attributeId)) && ($this->isCoreAttribute($attributeId) || $this->deleteAttributeNames($attributeId)) && $this->deleteAttributeEntity($attributeId);
 // However, it would be clearer with a few parentheses.
         return
-            (   $this->isCoreAttribute($attributeId)
+            (   $this->isDefaultAttribute($attributeId)
              ||    $this->deleteAttributeContent($attributeId))
-                && ($this->isCoreAttribute($attributeId)
+                && ($this->isDefaultAttribute($attributeId)
              ||    $this->deleteAttributeNames($attributeId))
                 && $this->deleteAttributeEntity($attributeId);
     }
@@ -1291,53 +1297,85 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
 
     function deleteAttributeEntity($attributeId)
     {
-        global $objDatabase, $_ARRAYLANG;
+        global $_ARRAYLANG;
 
-        $affectedTable = DBPREFIX.'access_user_attribute';
         $pattern = array();
-        if ($objDatabase->Execute('DELETE FROM `'.$affectedTable.'` WHERE `id` = '.($this->parent_id == 'title' && preg_match('#([0-9]+)#', $attributeId, $pattern) ? $pattern[0] : $attributeId)) !== false) {
-            return true;
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $attrRepo = $em->getRepository(
+            'Cx\Core\User\Model\Entity\UserAttribute'
+        );
+
+        $attrId = $this->parent_id == 'title' && preg_match('#([0-9]+)#', $attributeId, $pattern) ? $pattern[0] : $attributeId;
+        $attr = $attrRepo->find($attrId);
+
+        if (empty($attr)) {
+            return false;
         }
-        $this->errorMsg = sprintf($_ARRAYLANG['TXT_ACCESS_UNABLE_DEL_ATTRIBUTE'], htmlentities($this->arrAttributes[$attributeId]['names'][$this->langId], ENT_QUOTES, CONTREXX_CHARSET));
-        return false;
+
+        try {
+            $em->remove($attr);
+            $em->flush();
+
+            return true;
+        } catch (Doctrine\ORM\OptimisticLockException $e) {
+            $this->errorMsg = sprintf(
+                $_ARRAYLANG['TXT_ACCESS_UNABLE_DEL_ATTRIBUTE'],
+                htmlentities(
+                    $this->arrAttributes[$attributeId]['names'][$this->langId],
+                    ENT_QUOTES,
+                    CONTREXX_CHARSET
+                )
+            );
+
+            return false;
+        }
     }
 
 
     function deleteAttributeContent($attributeId)
     {
-        global $objDatabase, $_ARRAYLANG;
+        global $_ARRAYLANG;
 
-        if (
-            $this->parent_id == 'title' &&
-            preg_match('#([0-9]+)#', $attributeId, $pattern)
-        ) {
-            $attributeId = $pattern[0];
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $attrNames = $em->getRepository(
+            'Cx\Core\User\Model\Entity\UserAttributeValue'
+        )->findBy(array('attributeId' => $attributeId));
+
+        foreach ($attrNames as $attrName) {
+            $em->remove($attrName);
         }
-
-        if ($objDatabase->Execute("DELETE FROM `".DBPREFIX."access_user_attribute_value` WHERE `attribute_id` = '".$attributeId."'") !== false) {
+        try {
+            $em->flush();
             return true;
+        } catch (\Doctrine\ORM\OptimisticLockException $e) {
+            $this->errorMsg = sprintf($_ARRAYLANG['TXT_ACCESS_UNABLE_DEL_ATTRIBUTE_CONTENT'], htmlentities($this->arrAttributes[$attributeId]['names'][$this->langId], ENT_QUOTES, CONTREXX_CHARSET));
+            return false;
         }
-        $this->errorMsg = sprintf($_ARRAYLANG['TXT_ACCESS_UNABLE_DEL_ATTRIBUTE_CONTENT'], htmlentities($this->arrAttributes[$attributeId]['names'][$this->langId], ENT_QUOTES, CONTREXX_CHARSET));
-        return false;
     }
 
 
     function deleteAttributeNames($attributeId)
     {
-        global $objDatabase, $_ARRAYLANG;
+        global $_ARRAYLANG;
 
-        if (
-            $this->parent_id == 'title' &&
-            preg_match('#([0-9]+)#', $attributeId, $pattern)
-        ) {
-            $attributeId = $pattern[0];
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $attrNames = $em->getRepository(
+            'Cx\Core\User\Model\Entity\UserAttributeName'
+        )->findBy(array('attributeId' => $attributeId));
+
+        foreach ($attrNames as $attrName) {
+            $em->remove($attrName);
         }
-
-        if ($objDatabase->Execute("DELETE FROM `".DBPREFIX."access_user_attribute_name` WHERE `attribute_id` = '".$attributeId."'") !== false) {
+        try {
+            $em->flush();
             return true;
+        } catch (\Doctrine\ORM\OptimisticLockException $e) {
+            $this->errorMsg = sprintf($_ARRAYLANG['TXT_ACCESS_UNABLE_DEL_ATTRIBUTE_DESCS'], htmlentities($this->arrAttributes[$attributeId]['names'][$this->langId], ENT_QUOTES, CONTREXX_CHARSET));
+            return false;
         }
-        $this->errorMsg = sprintf($_ARRAYLANG['TXT_ACCESS_UNABLE_DEL_ATTRIBUTE_DESCS'], htmlentities($this->arrAttributes[$attributeId]['names'][$this->langId], ENT_QUOTES, CONTREXX_CHARSET));
-        return false;
     }
 
 
@@ -1534,7 +1572,7 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
 
     function isRemovable()
     {
-        return !$this->isCoreAttribute($this->id);
+        return !$this->isDefaultAttribute($this->id);
     }
 
 
@@ -1628,34 +1666,18 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
         return $this->readProtected;
     }
 
-    public function isCoreAttribute($attributeId=null)
+    public function isDefaultAttribute($attributeId=null)
     {
         if (is_null($attributeId)) {
             $attributeId = $this->id;
         }
-        return isset($this->arrCoreAttributes[$attributeId]);
-    }
 
-    /**
-     * In the system, the ID of a core attribute is the name of the attribute
-     * (e.g. 'title'). But if we want to interact with the database, the core
-     * attribute is handled like other user attributes. This means we have an
-     * integer ID (e.g. 2) and had to track this ID (2) with the system-intern
-     * core attribute ID ('title')
-     *
-     * This method checks if the given attribute id (e.g. 2) is assigned to a
-     * core attribute
-     *
-     * @param int $attributeId id to check if it is assigned
-     * @return bool if is assigned to an core attribute
-     */
-    public function isIdAssignedToCoreAttribute($attributeId=0) {
-        if (!empty($this->getProfileAttributes()[$attributeId])) {
-            return true;
+        if (is_numeric($attributeId)) {
+            return !empty($this->getDefaultAttributeNames()[$attributeId]);
         }
-        return false;
-    }
 
+        return isset($this->arrDefaultAttributeTemplates[$attributeId]);
+    }
 
     public function isCustomAttribute($attributeId = null)
     {
@@ -1733,7 +1755,7 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
     {
         $pattern = array();
         foreach ($arrChildOrder as $childId => $orderId) {
-            $this->arrAttributeRelations[$this->id][intval($orderId)] = $this->isCoreAttribute($this->id) && preg_match('#([0-9]+)#', $childId, $pattern) ? $pattern[0] : intval($childId);
+            $this->arrAttributeRelations[$this->id][intval($orderId)] = $this->isDefaultAttribute($this->id) && preg_match('#([0-9]+)#', $childId, $pattern) ? $pattern[0] : intval($childId);
         }
         $this->children = $this->arrAttributeRelations[$this->id];
     }
@@ -1791,31 +1813,39 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
      */
     function getAttributeNames($id)
     {
-        global $objDatabase;
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $names = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Core\User\Model\Entity\UserAttributeName'
+        )->findBy(array('attributeId' => $id));
 
         $arrNames = array();
-        $objResult = $objDatabase->Execute('SELECT `lang_id`, `name` FROM `'.DBPREFIX.'access_user_attribute_name` WHERE `attribute_id` = '.$id);
-        if ($objResult) {
-            while (!$objResult->EOF) {
-                $arrNames[$objResult->fields['lang_id']] = $objResult->fields['name'];
-                $objResult->MoveNext();
-            }
-            return $arrNames;
+        foreach ($names as $name) {
+            $arrNames[$name->getLangId()] = $name->getName();
         }
-        return array();
+        return $arrNames;
     }
 
 
     function loadName($langId)
     {
-        global $objDatabase, $_CORELANG;
+        global $_CORELANG;
 
-        if ($this->isCoreAttribute($this->id)) {
+        if ($this->isDefaultAttribute($this->id)) {
             $this->arrName[$langId] = (string)$_CORELANG[$this->arrAttributes[$this->id]['desc']];
         } else {
-            $objResult = $objDatabase->SelectLimit('SELECT `name` FROM `'.DBPREFIX.'access_user_attribute_name` WHERE `lang_id` = '.$langId.' AND `attribute_id` = "' . contrexx_raw2db($this->id) . '"', 1);
-            $this->arrName[$langId] = $objResult && $objResult->RecordCount() == 1 ? $objResult->fields['name'] : '';
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $attrName = $cx->getDb()->getEntityManager()->getRepository(
+                'Cx\Core\User\Model\Entity\UserAttributeName'
+            )->findOneBy(
+                array(
+                    'langId' => $langId,
+                    'attributeId' => contrexx_raw2db($this->id)
+                )
+            );
+
+            $this->arrName[$langId] = $attrName ? $attrName->getName() : '';
         }
+
         $this->arrAttributes[$this->id]['names'][$langId] = $this->arrName[$langId];
     }
 
@@ -1850,51 +1880,51 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
 
 
     /**
-     * In the system, the ID of a core attribute is the name of the attribute
-     * (e.g. 'title'). But if we want to interact with the database, the core
+     * In the system, the ID of a default attribute is the name of the attribute
+     * (e.g. 'title'). But if we want to interact with the database, the default
      * attribute is handled like other user attributes. This means we have an
      * integer ID (e.g. 2) and had to track this ID (2) with the system-intern
-     * core attribute ID ('title')
+     * default attribute ID ('title')
      *
-     * This method gives the profile attribute ID (e.g. 'title') by the given
+     * This method gives the default attribute ID (e.g. 'title') by the given
      * user attribute ID (e.g. 2)
      *
-     * @param int $attributeId user attribute ID to identify profile attribute ID
-     * @return string profile attribute ID
+     * @param int $attributeId user attribute ID to identify default attribute ID
+     * @return string default attribute ID
      */
-    public function getProfileAttributeIdByAttributeId($attributeId)
+    public function getDefaultAttributeIdByAttributeId($attributeId)
     {
-        $profileAttributes = $this->getProfileAttributes();
+        $defaultAttributes = $this->getDefaultAttributeNames();
 
-        if (!empty($profileAttributes[$attributeId])) {
-            return $profileAttributes[$attributeId];
+        if (!empty($defaultAttributes[$attributeId])) {
+            return $defaultAttributes[$attributeId];
         }
 
-        return '';
+        return $attributeId;
     }
 
     /**
-     * In the system, the ID of a core attribute is the name of the attribute
-     * (e.g. 'title'). But if we want to interact with the database, the core
+     * In the system, the ID of a default attribute is the name of the attribute
+     * (e.g. 'title'). But if we want to interact with the database, the default
      * attribute is handled like other user attributes. This means we have an
      * integer ID (e.g. 2) and had to track this ID (2) with the system-intern
-     * core attribute ID ('title')
+     * default attribute ID ('title')
      *
-     * This method gives the user attribute ID (e.g. 2) by the given profile
+     * This method gives the user attribute ID (e.g. 2) by the given default
      * attribute ID (e.g. 'title')
      *
-     * @param int $profileId profile attribute ID to identify user attribute ID
+     * @param int $defaultId default attribute ID to identify user attribute ID
      * @return string user attribute ID
      */
-    public function getAttributeIdByProfileAttributeId($profileId)
+    public function getAttributeIdByDefaultAttributeId($defaultId)
     {
-        $profileAttributes = $this->getProfileAttributes();
+        $defaultAttributes = $this->getDefaultAttributeNames();
 
-        if (in_array($profileId, $profileAttributes)) {
-            return array_search($profileId, $profileAttributes);
+        if (in_array($defaultId, $defaultAttributes)) {
+            return array_search($defaultId, $defaultAttributes);
         }
 
-        return 0;
+        return $defaultId;
     }
 
     function getId()
@@ -2131,9 +2161,9 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
     }
 
 
-    function getCoreAttributeIds()
+    function getDefaultAttributeIds()
     {
-        return $this->arrCoreAttributeIds;
+        return $this->arrDefaultAttributeIds;
     }
 
 
@@ -2167,22 +2197,27 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
      */
     public static function getCustomAttributeNameArray($langId=0)
     {
-        global $objDatabase;
-
         if (empty($langId)) $langId = LANG_ID;
-        $objResult = $objDatabase->Execute("
-            SELECT `id`, `name`
-              FROM `".DBPREFIX."access_user_attribute`
-             INNER JOIN `".DBPREFIX."access_user_attribute_name`
-                ON id=attribute_id
-             WHERE lang_id=$langId
-             ORDER BY order_id ASC");
-        if (!$objResult) return false;
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $qb = $cx->getDb()->getEntityManager()->createQueryBuilder();
+        // Get only custom attributes
+        $qb->select('n')
+            ->from('Cx\Core\User\Model\Entity\UserAttributeName', 'n')
+            ->innerJoin('n.userAttribute', 'a')
+            ->where($qb->expr()->eq('n.langId', ':langId'))
+            ->andWhere($qb->expr()->eq('a.default', ':isDefault'))
+            ->setParameter('langId', $langId)
+            ->setParameter('isDefault', 0)
+            ->orderBy('a.orderId', 'ASC');
+
+        $names = $qb->getQuery()->getResult();
+
         $arrNames = array();
-        while (!$objResult->EOF) {
-            $arrNames[$objResult->fields['id']] = $objResult->fields['name'];
-            $objResult->MoveNext();
+        foreach ($names as $name) {
+            $arrNames[$name->getAttributeId()] = $name->getName();
         }
+
         return $arrNames;
 
 // TODO: check if this methods logic could be replaced by the following code

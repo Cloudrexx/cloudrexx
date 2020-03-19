@@ -38,9 +38,10 @@ Cx\Core\User\Model\Entity\UserAttributeName:
   manyToOne:
     userAttribute:
       targetEntity: Cx\Core\User\Model\Entity\UserAttribute
-      inversedBy: userAttributeName
+      inversedBy: userAttributeNames
       joinColumns:
         attribute_id:
           referencedColumnName: id
+          nullable: false
           options:
             unsigned: true

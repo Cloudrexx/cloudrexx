@@ -2756,12 +2756,13 @@ if ($test === NULL) {
             'SHOP_HEADING_CUSTOMER_ACTIVE' => $objSorting->getHeaderForField('active'),
         ));
         $limit = \Cx\Core\Setting\Controller\Setting::getValue('numof_customers_per_page_backend','Shop');
-        $objCustomer = Customers::get(
+        $count = 0;
+        $customers = Customers::get(
             $arrFilter, ($listletter ? $listletter.'%' : $searchterm),
             array($objSorting->getOrderField() => $objSorting->getOrderDirection()),
-            $limit, \Paging::getPosition());
-        $count = ($objCustomer ? $objCustomer->getFilteredSearchUserCount() : 0);
-        while ($objCustomer && !$objCustomer->EOF) {
+            $limit, \Paging::getPosition(), $count);
+        $count = ($customers ? $count : 0);
+        foreach ($customers as $objCustomer) {
 //DBG::log("Customer: ".var_export($objCustomer, true));
             self::$objTemplate->setVariable(array(
                 'SHOP_ROWCLASS' => 'row'.(++$i % 2 + 1),

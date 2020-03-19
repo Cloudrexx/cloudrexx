@@ -138,36 +138,23 @@ class RssFeed
             $xmlOutput .= "<lastBuildDate>".date('r',time())."</lastBuildDate>\n";
             $xmlOutput .= "<language>".$this->channelLanguage."</language>\n";
 
-//            $query = "SELECT n.id AS docId,
-//                               n.date,
-//                               n.title,
-//                               n.text,
-//                               n.workloc,
-//                               u.firstname,
-//                               u.lastname,
-//                               n.lang,
-//                               n.userid,
-//                               u.id
-//                        FROM ".DBPREFIX."module_jobs AS n,
-//                             ".DBPREFIX."access_users AS u
-//                        WHERE n.userid = u.id AND n.lang = ".$_LANGID."
-//                        ORDER BY n.id DESC";
-
             $query = "SELECT n.id AS docId,
                                n.date,
                                n.title,
                                n.text,
                                n.workloc,
                                n.lang,
-                               n.userid,
-                               u.id
-                        FROM ".DBPREFIX."module_jobs AS n,
-                             ".DBPREFIX."access_users AS u
-                        WHERE n.userid = u.id AND n.lang = ".$_LANGID." AND n.status = 1 AND (startdate<='".date('Y-m-d')."' OR startdate='0000-00-00 00:00:00') AND (enddate>='".date('Y-m-d')."' OR enddate='0000-00-00 00:00:00')
+                               n.userid
+                        FROM ".DBPREFIX."module_jobs AS n
+                        WHERE n.lang = ".$_LANGID." AND n.status = 1 AND (startdate<='".date('Y-m-d')."' OR startdate='0000-00-00 00:00:00') AND (enddate>='".date('Y-m-d')."' OR enddate='0000-00-00 00:00:00')
                         ORDER BY n.id DESC";
+
             $objResult = $objDatabase->SelectLimit($query, $this->limit);
 
             while (!$objResult->EOF) {
+                if(!\FWUser::getFWUserObject()->objUser->getUser($id = $objResult->fields['userid'])) {
+                    $objResult->MoveNext();
+                }
                 $xmlOutput .= "<item>\n";
                 $xmlOutput .= "<title>".strip_tags(stripslashes($objResult->fields['title']))."</title>\n";
 

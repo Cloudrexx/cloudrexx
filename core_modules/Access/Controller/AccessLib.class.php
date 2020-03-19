@@ -284,6 +284,16 @@ class AccessLib
     {
         global $_CORELANG;
 
+        if ($objUser instanceof \Cx\Core\User\Model\Entity\User) {
+            $fwUser = \FWUser::getFWUserObject()->objUser;
+            $convertedAttributeId = $fwUser->objAttribute->getDefaultAttributeIdByAttributeId($attributeId);
+            if ($convertedAttributeId) {
+                $attributeId = $convertedAttributeId;
+            }
+
+            $objUser = $fwUser->getUser($objUser->getId());
+        }
+
         $objAttribute = $objUser->objAttribute->getById($attributeId);
         $attributeName = $this->attributeNamePrefix.'['.$attributeId.']['.$historyId.']';
         $block = strtolower($this->attributeNamePrefix.'_'.$attributeId);
@@ -356,10 +366,11 @@ class AccessLib
             $arrSettings = \User_Setting::getSettings();
             $cx    = \Cx\Core\Core\Controller\Cx::instanciate();
             $image = $objUser->getProfileAttribute($objAttribute->getId(), $historyId);
-            $imageRepoWeb  = $attributeId == 'picture'
+            $defaultTitle = $objUser->objAttribute->getDefaultAttributeIdByAttributeId($attributeId);
+            $imageRepoWeb  = $defaultTitle == 'picture'
                                 ? $cx->getWebsiteImagesAccessProfileWebPath()
                                 : $cx->getWebsiteImagesAccessPhotoWebPath();
-            $imageRepoPath = $attributeId == 'picture'
+            $imageRepoPath = $defaultTitle == 'picture'
                                 ? $cx->getWebsiteImagesAccessProfilePath()
                                 : $cx->getWebsiteImagesAccessPhotoPath();
 
@@ -425,7 +436,7 @@ class AccessLib
             $arrPlaceholders['_VALUE'] = $objAttribute->getMenuOptionValue();
             $arrPlaceholders['_SELECTED'] = $objAttribute->getMenuOptionValue() == $objUser->getProfileAttribute($objAttribute->getParent(), $historyId) ? 'selected="selected"' : '';
 
-            if ($objAttribute->isCoreAttribute() && $objAttribute->isUnknownOption()) {
+            if ($objAttribute->isDefaultAttribute() && $objAttribute->isUnknownOption()) {
                 $objParentAttribute = $objAttribute->getById($objAttribute->getParent());
                 if ($objParentAttribute->isMandatory()) {
                     $arrPlaceholders['_DESC'] = $_CORELANG['TXT_ACCESS_PLEASE_SELECT'];
@@ -684,6 +695,10 @@ class AccessLib
 
     public function parseAccountAttributes($objUser, $edit = false)
     {
+        if ($objUser instanceof \Cx\Core\User\Model\Entity\User) {
+            $objUser = \FWUser::getFWUserObject()->objUser->getUser($objUser->getId());
+        }
+
         if (!isset($this->arrAccountAttributes)) {
             $this->loadAccountAttributes();
         }
@@ -915,7 +930,8 @@ class AccessLib
         global $_CORELANG;
 
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-        if ($attributeId == 'picture') {
+        $defaultId = $objUser->objAttribute->getDefaultAttributeIdByAttributeId($attributeId);
+        if ($defaultId == 'picture') {
             $imageRepo    = $cx->getWebsiteImagesAccessProfilePath().'/';
             $imageRepoWeb = $cx->getWebsiteImagesAccessProfileWebPath().'/';
             $arrNoImage   = \User_Profile::$arrNoAvatar;
@@ -1122,19 +1138,17 @@ class AccessLib
         case 'menu':
             if ($edit) {
                 $childrenCode = array();
-                if ($objAttribute->isCustomAttribute()) {
-                    if ($objAttribute->isMandatory()) {
-                        $childrenCode[] = $this->getMenuOptionAttributeCode('0', $objUser->getProfileAttribute($objAttribute->getId(), $historyId), $_CORELANG['TXT_ACCESS_PLEASE_SELECT'], 'border-bottom:1px solid #000000;');
-                    } else {
-                        $childrenCode[] = $this->getMenuOptionAttributeCode('0', $objUser->getProfileAttribute($objAttribute->getId(), $historyId), $_CORELANG['TXT_ACCESS_NOT_SPECIFIED'], 'border-bottom:1px solid #000000;');
-                    }
+                if ($objAttribute->isMandatory()) {
+                    $childrenCode[] = $this->getMenuOptionAttributeCode('0', $objUser->getProfileAttribute($objAttribute->getId(), $historyId), $_CORELANG['TXT_ACCESS_PLEASE_SELECT'], 'border-bottom:1px solid #000000;');
+                } else {
+                    $childrenCode[] = $this->getMenuOptionAttributeCode('0', $objUser->getProfileAttribute($objAttribute->getId(), $historyId), $_CORELANG['TXT_ACCESS_NOT_SPECIFIED'], 'border-bottom:1px solid #000000;');
                 }
 
                 foreach ($objAttribute->getChildren() as $childAttributeId) {
                     $childrenCode[] = $this->_getAtrributeCode($objUser, $childAttributeId, $historyId, $edit);
                 }
                 $value = join($childrenCode);
-            } elseif ($objAttribute->isCoreAttribute()) {
+            } elseif ($objAttribute->isDefaultAttribute()) {
                 foreach ($objAttribute->getChildren() as $childAttributeId) {
                     $objChildAtrribute = $objAttribute->getById($childAttributeId);
                     if ($objChildAtrribute->getMenuOptionValue() == $objUser->getProfileAttribute($objAttribute->getId(), $historyId)) {
@@ -1158,7 +1172,7 @@ class AccessLib
         case 'menu_option':
             $mandatory = false;
             $selectOption = false;
-            if ($objAttribute->isCoreAttribute() && $objAttribute->isUnknownOption()) {
+            if ($objAttribute->isDefaultAttribute() && $objAttribute->isUnknownOption()) {
                 $selectOption = true;
                 $objParentAttribute = $objAttribute->getById($objAttribute->getParent());
                 if ($objParentAttribute->isMandatory()) {
@@ -1970,8 +1984,6 @@ JS
 
     public static function removeUselessImages()
     {
-        global $objDatabase;
-
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
 
         // fetch thumbnails of fallback images
@@ -2021,50 +2033,35 @@ JS
                 if (preg_match($ignoreRe, $file)) unset($arrImages[$index]);
             }
 
-            $query = "
-                SELECT SUM(1) as entryCount
-                FROM `".DBPREFIX."access_user_attribute` AS a
-                INNER JOIN `".DBPREFIX."access_user_attribute_value` AS v ON v.`attribute_id` = a.`id`
-                WHERE a.`type` = 'image' AND v.`value` != ''";
+            $objFWUser = \FWUser::getFWUserObject();
+            $objUser = $objFWUser->objUser;
+            $count = 0;
 
-            $objCount = $objDatabase->Execute($query);
-            if ($objCount !== false) {
-                $count = $objCount->fields['entryCount'];
-            } else {
-                return false;
-            }
+            do {
+                $arrImagesDb = $objUser->objAttribute->getImages(
+                    $step, $offset, $count, $profilePics
+                );
+                if (empty($arrImagesDb)) {
+                    break;
+                };
 
-            $query = "
-                SELECT v.`value` AS picture
-                FROM `".DBPREFIX."access_user_attribute` AS a
-                INNER JOIN `".DBPREFIX."access_user_attribute_value` AS v ON v.`attribute_id` = a.`id`
-                WHERE a.`type` = 'image' AND v.`value` != ''";
-
-            while ($offset < $count) {
-                $objImage = $objDatabase->SelectLimit($query, $step, $offset);
-                if ($objImage !== false) {
-                    $arrImagesDb = array();
-                    while (!$objImage->EOF) {
-                        $arrImagesDb[] = $objImage->fields['picture'];
-
-                        // fetch all thumbnails of image
-                        $thumbnails =
-                            $cx->getMediaSourceManager()
+                foreach ($arrImagesDb as $image) {
+                    // fetch all thumbnails of image
+                    $thumbnails =
+                        $cx->getMediaSourceManager()
                             ->getThumbnailGenerator()
                             ->getThumbnailsFromFile(
                                 $imageWebPath,
-                                $objImage->fields['picture'],
+                                $image,
                                 true
                             );
-                        $thumbnails = array_map('basename', $thumbnails);
-                        $arrImagesDb = array_merge($arrImagesDb, $thumbnails);
-
-                        $objImage->MoveNext();
-                    }
-                    $offset += $step;
-                    $arrImages = array_diff($arrImages, $arrImagesDb);
+                    $thumbnails = array_map('basename', $thumbnails);
+                    $arrImagesDb = array_merge($arrImagesDb, $thumbnails);
                 }
-            }
+                $offset += $step;
+                $arrImages = array_diff($arrImages, $arrImagesDb);
+            } while ($offset < $count);
+
             array_walk($arrImages, function ($img) use ($imagePath) {
                 unlink($imagePath.'/'.$img);
             });
@@ -2413,7 +2410,7 @@ JS
 
         // set profile attributes
         $arrProfileFields = array_merge(
-            $objFWUser->objUser->objAttribute->getCoreAttributeIds(),
+            $objFWUser->objUser->objAttribute->getDefaultAttributeIds(),
             $customAttributeIds
         );
 
@@ -2432,49 +2429,41 @@ JS
         }
         print "\n";
 
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $qb = $cx->getDb()->getEntityManager()->createQueryBuilder();
+        $qb->select('u')
+            ->from('Cx\Core\User\Model\Entity\User', 'u')
+            ->join('u.groups', 'g');
+
         $filter = array();
         if (!empty($groupId)) {
-            $filter['group_id'] = $groupId;
+            $qb->where($qb->expr()->eq('g.id', $groupId));
         }
         if (!empty($langId)) {
+            $qb->andWhere($qb->expr()->in('u.frontendLangId', ':lang'));
             if (\FWLanguage::getLanguageParameter($langId, 'is_default') == 'true') {
                 $filter['frontend_lang_id'] = array($langId, 0);
+                $qb->setParameter('lang', array($langId, 0));
             } else {
                 $filter['frontend_lang_id'] = $langId;
+                $qb->setParameter('lang', $langId);
             }
         }
 
-        // fetch all ids and load the users individually later to avoid
-        // memory overflow
-        $objUser = $objFWUser->objUser->getUsers($filter, null, array('username'), array('id'));
-        $userIds = array();
-        if ($objUser) {
-            while (!$objUser->EOF) {
-                $userIds[] = $objUser->getId();
-                $objUser->next();
-            }
-        }
-        foreach ($userIds as $key => $userId) {
-            $objUser = $objFWUser->objUser->getUsers(
-                $userId,
-                null,
-                array('username'),
-                array_keys($arrFields)
-            );
-            // clear cached users to avoid memory overflow
-            $objUser->clearCache();
+        $users = $qb->getQuery()->getResult();
 
+        foreach ($users as $user) {
             // do not export users without any group membership
             // in frontend export
             if (
                 $isFrontend &&
-                empty($objUser->getAssociatedGroupIds(true))
+                empty($user->getAssociatedGroupIds(true))
             ) {
                 continue;
             }
 
             // fetch associated user groups
-            $groups = $this->getGroupListOfUser($objUser);
+            $groups = $this->getGroupListOfUser($user);
 
             // do not export users without any group membership
             // in frontend export
@@ -2485,13 +2474,14 @@ JS
                 continue;
             }
 
-            $frontendLangId = $objUser->getFrontendLanguage();
+            $frontendLangId = $user->getFrontendLangId();
             if (empty($frontendLangId)) {
                 $frontendLangId = $objInit->getDefaultFrontendLangId();
             }
+
             $frontendLang = $arrLangs[$frontendLangId]['name']." (".$arrLangs[$frontendLangId]['lang'].")";
 
-            $backendLangId = $objUser->getBackendLanguage();
+            $backendLangId = $user->getBackendLangId();
             if (empty($backendLangId)) {
                 $backendLangId = $objInit->getDefaultBackendLangId();
             }
@@ -2500,7 +2490,7 @@ JS
             // active status of user
             // note: do not output in frontend
             if (!$isFrontend) {
-                $activeStatus = $objUser->getActiveStatus() ? $_CORELANG['TXT_YES'] : $_CORELANG['TXT_NO'];
+                $activeStatus = $user->getActive() ? $_CORELANG['TXT_YES'] : $_CORELANG['TXT_NO'];
                 print $this->escapeCsvValue($activeStatus).$csvSeparator;
             }
 
@@ -2511,20 +2501,26 @@ JS
             print $this->escapeCsvValue($backendLang).$csvSeparator;
 
             // username
-            print $this->escapeCsvValue($objUser->getUsername()).$csvSeparator;
+            print $this->escapeCsvValue(
+                (!empty($user->getUsername()) ? $user->getUsername() : $user->getEmail())
+            ).$csvSeparator;
 
             // email
-            print $this->escapeCsvValue($objUser->getEmail()).$csvSeparator;
+            print $this->escapeCsvValue($user->getEmail()).$csvSeparator;
 
             // regdate
-            print $this->escapeCsvValue(date(ASCMS_DATE_FORMAT_DATE, $objUser->getRegistrationDate())).$csvSeparator;
+            print $this->escapeCsvValue(date(ASCMS_DATE_FORMAT_DATE, $user->getRegdate())).$csvSeparator;
 
             // user groups
             print $this->escapeCsvValue(join(',', $groups)).$csvSeparator;
 
             // profile attributes
             foreach ($arrProfileFields as $field) {
-                $value = $objUser->getProfileAttribute($field);
+                $attributeId = $field;
+                if ($objFWUser->objUser->objAttribute->isDefaultAttribute($field)) {
+                    $attributeId = $objFWUser->objUser->objAttribute->getAttributeIdByDefaultAttributeId($field);
+                }
+                $value = $user->getAttributeValue($attributeId)->getValue();
 
                 switch ($field) {
                     case 'gender':
@@ -2543,14 +2539,12 @@ JS
                         }
                         break;
 
-                    case 'title':
                     case 'country':
-                        $title = '';
-                        $value = $objUser->objAttribute->getById($field . '_' . $value)->getName();
+                        $value = $objFWUser->objUser->objAttribute->getById($field . '_' . $value)->getName();
                         break;
 
                     default:
-                        $objAttribute = $objUser->objAttribute->getById($field);
+                        $objAttribute = $objFWUser->objUser->objAttribute->getById($field);
                         if (!empty($value) && $objAttribute->getType() == 'date') {
                             $date = new \DateTime();
                             $date ->setTimestamp($value);
@@ -2559,7 +2553,7 @@ JS
                         if ($objAttribute->getType() == 'menu') {
                             $option = '';
                             if (!empty($value)) {
-                                $objAttributeChild = $objUser->objAttribute->getById($value);
+                                $objAttributeChild = $objFWUser->objUser->objAttribute->getById($value);
                                 if (!$objAttributeChild->EOF) {
                                     $option = $objAttributeChild->getName();
                                 }
@@ -2586,8 +2580,8 @@ JS
      * In frontend mode, this method does only return frontend user groups.
      * Whereas in every other mode, it does return all associated user groups.
      *
-     * @param   \User   $objUser    The user of whom the associated groups
-     *                              shall be returned.
+     * @param   \Cx\Core\User\Model\Entity\User $objUser    The user of whom the associated groups
+     *                                                      shall be returned.
      * @return  array   An array containing the names of the associated groups.
      */
     protected function getGroupListOfUser($objUser) {

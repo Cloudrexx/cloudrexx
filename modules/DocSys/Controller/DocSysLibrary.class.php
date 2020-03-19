@@ -122,9 +122,8 @@ class DocSysLibrary
 
         $query = "
             SELECT entry.id, entry.date, entry.author, entry.title,
-                   entry.status, entry.changelog, users.username
+                   entry.status, entry.changelog, entry.userid
               FROM " . DBPREFIX . "module_docsys" . MODULE_INDEX . " AS entry
-              LEFT JOIN " . DBPREFIX . "access_users as users ON entry.userid=users.id
              WHERE entry.lang=$this->langId
              ORDER BY entry.id";
         $objResult = $objDatabase->SelectLimit($query, $_CONFIG['corePagingLimit'],
@@ -133,7 +132,9 @@ class DocSysLibrary
             return false;
         }
         $retval = array();
+        $userIds = array();
         while (!$objResult->EOF) {
+            $userIds[$objResult->fields['id']] = $objResult->fields['userid'];
             $retval[$objResult->fields['id']] = array(
                 "id" => $objResult->fields['id'],
                 "date" => $objResult->fields['date'],
@@ -141,10 +142,23 @@ class DocSysLibrary
                 "title" => $objResult->fields['title'],
                 "status" => $objResult->fields['status'],
                 "changelog" => $objResult->fields['changelog'],
-                "username" => $objResult->fields['username'],
+                "username" => '',
             );
+
             $objResult->MoveNext();
         }
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $userRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\User');
+        $users = $userRepo->findBy(array('id' => array_unique($userIds)));
+
+        foreach ($users as $user) {
+            $keys = array_keys($userIds, $user->getId());
+            foreach ($keys as $key) {
+                $retval[$key]['username'] = $user->getUsername();
+            }
+        }
+
         $query = "
             SELECT entry.id, cat.name
               FROM " . DBPREFIX . "module_docsys" . MODULE_INDEX . " AS entry

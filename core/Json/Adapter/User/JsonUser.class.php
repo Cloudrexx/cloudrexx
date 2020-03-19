@@ -154,6 +154,11 @@ class JsonUser implements JsonAdapter {
                 $searchFields = $possibleSearchFields;
             }
         }
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $userRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\User');
+        $qb = $userRepo->createQueryBuilder('u');
+
         // AND-ed search is only available if 2 or less search fields are
         // in use and no more than 2 search terms are specified. With higher
         // values there are an increasing amount of possibilities.
@@ -168,80 +173,102 @@ class JsonUser implements JsonAdapter {
         ) {
             // We can search for "Peter Muster" or "Muster Peter"
             // (field1 = term1 AND field2 = term2) OR (field2 = term1 AND field1 = term2)
-            $arrFilter = array(
-                'OR' => array(
-                    0 => array(
-                        'AND' => array(
-                            0 => array(
-                                $searchFields[0] => $terms[0],
-                            ),
-                            1 => array(
-                                $searchFields[1] => $terms[1],
-                            ),
-                        ),
-                    ),
-                    1 => array(
-                        'AND' => array(
-                            0 => array(
-                                $searchFields[1] => $terms[0],
-                            ),
-                            1 => array(
-                                $searchFields[0] => $terms[1],
-                            ),
-                        ),
-                    ),
-                ),
+            $firstField = $searchFields[0];
+            $secondField = $searchFields[1];
+            $firstTerm = $terms[0];
+            $secondTerm = $terms[1];
+
+            $qb->orWhere(
+                $qb->expr()->andX(
+                    $this->getExpression($qb, $firstField, $firstTerm, 'firstOrFirstTerm'),
+                    $this->getExpression($qb, $secondField, $secondTerm, 'firstOrSecondTerm')
+                )
+            )->orWhere(
+                $qb->expr()->andX(
+                    $this->getExpression($qb, $secondField, $firstTerm, 'secondOrFirstTerm'),
+                    $this->getExpression($qb, $firstField, $secondTerm, 'secondOrSecondTerm')
+                )
             );
         } else {
-            $arrFilter = array('OR' => array());
             foreach ($searchFields as $field) {
-                $arrFilter['OR'][][$field] = $terms;
+                $qb->orWhere($this->getExpression($qb, $field, $terms, 'search'.$field));
             }
         }
 
-        $arrAttributes = $whitelistedFields;
-
-        $limit = 0;
-        if (isset($_GET['limit'])) {
+        if (!empty($_GET['limit'])) {
             $limit = intval($_GET['limit']);
+            $qb->setMaxResults($limit);
         }
 
         $arrUsers = array();
-        $objUser = $objFWUser->objUser->getUsers(
-            $arrFilter,
-            null,
-            null,
-            $arrAttributes,
-            $limit ? $limit : null
-        );
+        $users = $qb->getQuery()->getResult();
 
-        if (!$objUser) {
+        if (!$users) {
             return array();
         }
         $resultFormat = '%title%';
         if (!empty($_GET['resultFormat'])) {
             $resultFormat = contrexx_input2raw($_GET['resultFormat']);
         }
-        while (!$objUser->EOF) {
-            $id = $objUser->getId();
-            $title = $objFWUser->getParsedUserTitle($objUser);
+        foreach ($users as $user) {
+            $id = $user->getId();
+            $title = $objFWUser->getParsedUserTitle($user);
 
             $result = str_replace('%id%', $id, $resultFormat);
             $result = str_replace('%title%', $title, $result);
-            $result = str_replace('%username%', $objUser->getUsername(), $result);
-            $result = str_replace('%email%', $objUser->getEmail(), $result);
+            $result = str_replace('%username%', $user->getUsername(), $result);
+            $result = str_replace('%email%', $user->getEmail(), $result);
             foreach ($whitelistedFields as $field) {
                 $result = str_replace(
                     '%' . $field . '%',
-                    $objUser->getProfileAttribute($field),
+                    $user->getProfileAttribute($field)->getValue(),
                     $result
                 );
             }
 
             $arrUsers[$id] = $result;
-            $objUser->next();
         }
         return $arrUsers;
+    }
+
+    protected function getExpression(&$qb, $field, $terms, $alias)
+    {
+        $objAttr = \FWUser::getFWUserObject()->objUser->objAttribute;
+        $expression = $qb->expr()->andX();
+        if ($objAttr->isDefaultAttribute($field)) {
+            $qb->join('u.userAttributeValues', 'v'.$alias);
+            $attrId = $objAttr->getAttributeIdByDefaultAttributeId($field);
+            $expression->add($qb->expr()->eq('v'.$alias.'.attributeId', ':attribute'.$alias));
+            $qb->setParameter('attribute'.$alias, $attrId);
+
+            if (is_array($terms)) {
+                $i = 0;
+                $orX = $qb->expr()->orX();
+                foreach ($terms as $term) {
+                    $orX->add($qb->expr()->like('v'.$alias.'.value', ':term'.$alias.$i));
+                    $qb->setParameter('term'.$alias.$i, $term);
+                }
+                $expression->add($orX);
+            } else {
+                $expression->add($qb->expr()->like('v'.$alias.'.value', ':term'.$alias));
+                $qb->setParameter('term'.$alias, $terms);
+            }
+        } else {
+            if (is_array($terms)) {
+                $i = 0;
+                $orX = $qb->expr()->orX();
+                foreach ($terms as $term) {
+                    $orX->add($qb->expr()->like('u.'.$field, ':term'.$alias.$i));
+                    $qb->setParameter('term'.$alias.$i, $term);
+                }
+                $expression->add($orX);
+            } else {
+                $expression->add($qb->expr()->like('u'.$field, ':term'.$alias));
+                $qb->setParameter('term'.$alias, $terms);
+            }
+        }
+
+        return $expression;
     }
 
     /**

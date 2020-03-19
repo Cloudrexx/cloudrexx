@@ -494,29 +494,30 @@ class U2uLibrary {
      /**
      *
      * Gets the City of the Users..
+     * @global      $objDatabase
      */
     function _getCity($id) {
-        $objFWUser = \FWUser::getFWUserObject();
+        global $objDatabase;
 
         $id = intval($id);
-        $objUser = $objFWUser->objUser->getUser($id);
-        $city = $objUser->getProfileAttribute('city');
-        $arrShowcity['city'] = $city;
-
+        $cityQuery='SELECT city from '.DBPREFIX.'access_user_profile WHERE user_id='.$id.'';
+        $objResult=$objDatabase->Execute($cityQuery);
+        $arrShowcity['city']        =$objResult->fields['city'];
         return $arrShowcity;
     }
 
      /**
      *
      * Gets the Website Address of the Users..
+     * @global      $objDatabase
      */
     function _getSite($id) {
-        $objFWUser = \FWUser::getFWUserObject();
+        global $objDatabase;
 
         $id = intval($id);
-        $objUser = $objFWUser->objUser->getUser($id);
-        $arrShowsite['website'] = $objUser->getProfileAttribute('website');
-
+        $siteQuery='SELECT website from '.DBPREFIX.'access_user_profile WHERE user_id='.$id.'';
+        $objResult=$objDatabase->Execute($siteQuery);
+        $arrShowsite['website'] = $objResult->fields['website'];
         return $arrShowsite;
     }
 

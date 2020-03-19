@@ -342,6 +342,12 @@ class Access extends \Cx\Core_Modules\Access\Controller\AccessLib
         $limitOffset = isset($_GET['pos']) ? intval($_GET['pos']) : 0;
         $usernameFilter = isset($_REQUEST['username_filter']) && $_REQUEST['username_filter'] != '' && in_array(ord($_REQUEST['username_filter']), array_merge(array(48), range(65, 90))) ? $_REQUEST['username_filter'] : null;
 
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $userRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\User');
+        $qb = $userRepo->createQueryBuilder('u');
+
+        $qb->andWhere($qb->expr()->eq('u.active', ':active'))->setParameter('active', true);
+
         $userFilter = array('AND' => array());
         $userFilter['AND'][] = array('active' => true);
         $profileFilter = array();
@@ -360,8 +366,15 @@ class Access extends \Cx\Core_Modules\Access\Controller\AccessLib
             // Ensure profile filter does only contain allowed filter arguments.
             $this->sanitizeProfileFilter($profileFilter, $this->fetchAllowedFilterAttributes());
             if (!empty($profileFilter)) {
-                $userFilter['AND'][] = $profileFilter;
+                foreach ($profileFilter as $condition=>$filter) {
+                    if ($condition == 'OR') {
+                        $qb->andWhere($userRepo->getAttributeFilterExpression($qb, $profileFilter, false));
+                    } else {
+                        $qb->andWhere($userRepo->getAttributeFilterExpression($qb, $profileFilter));
+                    }
+                }
             }
+
         }
 
         $sort = array('username' => 'asc');
@@ -370,20 +383,46 @@ class Access extends \Cx\Core_Modules\Access\Controller\AccessLib
             $sort = $sortFlags;
         }
 
+        foreach ($sort as $field=>$direction) {
+            $userRepo->addOrderToQueryBuilder($qb, $field, $direction);
+        }
+
         $this->parseLetterIndexList('index.php?section=Access&amp;cmd=members&amp;groupId='.$groupId, 'username_filter', $usernameFilter);
 
         $this->_objTpl->setVariable('ACCESS_SEARCH_VALUE', htmlentities(join(' ', $search), ENT_QUOTES, CONTREXX_CHARSET));
 
         if ($groupId) {
-            $userFilter['AND'][] = array('group_id' => $groupId);
+            //$userFilter['AND'][] = array('group_id' => $groupId);
+            $userRepo->addGroupFilterToQueryBuilder($qb, $groupId);
         }
         if ($usernameFilter !== null) {
-            $userFilter['AND'][] = array('username' => array('REGEXP' => '^'.($usernameFilter == '0' ? '[0-9]|-|_' : $usernameFilter)));
+            $userRepo->addRegexFilterToQueryBuilder(
+                $qb,
+                '^'.($usernameFilter == '0' ? '[0-9]|-|_' : $usernameFilter),
+                'u.username'
+            );
         }
+
+        // Search
+        if ($search) {
+            $orX = $qb->expr()->orX();
+            $orX->add($userRepo->getSearchByTermInUserExpression($qb, $search));
+            $orX->add($userRepo->getSearchByTermInAttributeExpression($qb, $search));
+            $qb->andWhere($orX);
+        }
+
+        $qb->setFirstResult($limitOffset);
+        $qb->setMaxResults($limit);
+        
+        $users = $qb->getQuery()->getResult();
+
+        $qb->select('count(DISTINCT u.id)');
+        $qb->setFirstResult(null);
+        $qb->setMaxResults(null);
 
         $objFWUser = \FWUser::getFWUserObject();
         $objGroup = $objFWUser->objGroup->getGroup($groupId);
-        if ($objGroup->getType() == 'frontend' && $objGroup->getUserCount() > 0 && ($objUser = $objFWUser->objUser->getUsers($userFilter, $search, $sort, null, $limit, $limitOffset)) && $userCount = $objUser->getFilteredSearchUserCount()) {
+        if ($objGroup->getType() == 'frontend' && $objGroup->getUserCount() > 0 && $users && $userCount = $qb->getQuery()->getSingleScalarResult()) {
 
             if ($limit && $userCount > $limit) {
                 $params = '';
@@ -407,47 +446,45 @@ class Access extends \Cx\Core_Modules\Access\Controller\AccessLib
             $arrBuddyIds = \Cx\Modules\U2u\Controller\U2uLibrary::getIdsOfBuddies();
 
             $nr = 0;
-            while (!$objUser->EOF) {
-                $this->parseAccountAttributes($objUser);
-                $this->_objTpl->setVariable('ACCESS_USER_ID', $objUser->getId());
+            foreach ($users as $user) {
+                $this->parseAccountAttributes($user);
+                $this->_objTpl->setVariable('ACCESS_USER_ID', $user->getId());
                 $this->_objTpl->setVariable('ACCESS_USER_CLASS', $nr++ % 2 + 1);
-                $this->_objTpl->setVariable('ACCESS_USER_REGDATE', date(ASCMS_DATE_FORMAT_DATE, $objUser->getRegistrationDate()));
+                $this->_objTpl->setVariable('ACCESS_USER_REGDATE', date(ASCMS_DATE_FORMAT_DATE, $user->getRegdate()));
 
-                if ($objUser->getProfileAccess() == 'everyone' ||
+                if ($user->getProfileAccess() == 'everyone' ||
                     $objFWUser->objUser->login() &&
                     (
-                        $objUser->getId() == $objFWUser->objUser->getId() ||
-                        $objUser->getProfileAccess() == 'members_only' ||
+                        $user->getId() == $objFWUser->objUser->getId() ||
+                        $user->getProfileAccess() == 'members_only' ||
                         $objFWUser->objUser->getAdminStatus()
                     )
                 ) {
-                    $objUser->objAttribute->first();
-
-                    while (!$objUser->objAttribute->EOF) {
-                        $objAttribute = $objUser->objAttribute->getById($objUser->objAttribute->getId());
+                    foreach ($user->getUserAttributeValues() as $attributeValue) {
+                        $objAttribute = $attributeValue->getUserAttribute();
                         if ($objAttribute->checkReadPermission()) {
-                            $this->parseAttribute($objUser, $objAttribute->getId(), 0, false, false, false, false, false);
+                            $this->parseAttribute($user, $objAttribute->getId(), 0, false, false, false, false, false);
                         }
-                        $objUser->objAttribute->next();
                     }
                 } else {
                     foreach (array('picture', 'gender') as $attributeId) {
-                        $objAttribute = $objUser->objAttribute->getById($attributeId);
-                        if ($objAttribute->checkReadPermission()) {
-                            $this->parseAttribute($objUser, $attributeId, 0, false, false, false, false, false);
+                        $attribute = $cx->getDb()->getEntityManager()->getRepository(
+                            'Cx\Core\User\Model\Entity\UserAttributeName'
+                        )->findOneBy(array('name' => $attributeId))->getUserAttribute();
+                        if ($attribute->checkReadPermission()) {
+                            $this->parseAttribute($user, $attribute->getId(), 0, false, false, false, false, false);
                         }
                     }
                 }
 
                 if($this->_objTpl->blockExists('u2u_addaddress')){
-                    if($objUser->getId() == $objFWUser->objUser->getId() || in_array($objUser->getId(), $arrBuddyIds)){
+                    if($user->getId() == $objFWUser->objUser->getId() || in_array($user->getId(), $arrBuddyIds)){
                         $this->_objTpl->hideBlock('u2u_addaddress');
                     }else{
                         $this->_objTpl->touchBlock('u2u_addaddress');
                     }
                 }
                 $this->_objTpl->parse('access_user');
-                $objUser->next();
             }
 
             $this->_objTpl->parse('access_members');
@@ -474,11 +511,15 @@ class Access extends \Cx\Core_Modules\Access\Controller\AccessLib
         $settingsDone = false;
         $objFWUser->objUser->loadNetworks();
 
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $userRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\User');
+        $user = $userRepo->find($objFWUser->objUser->getId());
+
         $act = isset($_GET['act']) ? $_GET['act'] : '';
         if (isset($_POST['access_delete_account'])) {
             // delete account
             \Cx\Core\Csrf\Controller\Csrf::check_code();
-            if ($objFWUser->objUser->checkPassword(isset($_POST['access_user_password']) ? $_POST['access_user_password'] : null)) {
+            if ($user->getPassword()->matches(isset($_POST['access_user_password']) ? $_POST['access_user_password'] : null)) {
                 if ($objFWUser->objUser->isAllowedToDeleteAccount()) {
                     if ($objFWUser->objUser->delete(true)) {
                         $this->_objTpl->setVariable('ACCESS_SETTINGS_MESSAGE', $_ARRAYLANG['TXT_ACCESS_YOUR_ACCOUNT_SUCCSESSFULLY_DELETED']);
@@ -501,7 +542,7 @@ class Access extends \Cx\Core_Modules\Access\Controller\AccessLib
         } elseif (isset($_POST['access_change_password'])) {
             // change password
             \Cx\Core\Csrf\Controller\Csrf::check_code();
-            if (!empty($_POST['access_user_current_password']) && $objFWUser->objUser->checkPassword(trim(contrexx_stripslashes($_POST['access_user_current_password'])))) {
+            if (!empty($_POST['access_user_current_password']) && $user->getPassword()->matches(trim(contrexx_stripslashes($_POST['access_user_current_password'])))) {
                 $this->_objTpl->setVariable(
                     'ACCESS_SETTINGS_MESSAGE',
                     ($objFWUser->objUser->setPassword(

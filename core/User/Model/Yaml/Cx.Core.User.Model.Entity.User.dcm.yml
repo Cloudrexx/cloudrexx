@@ -1,6 +1,7 @@
 Cx\Core\User\Model\Entity\User:
   type: entity
   table: access_users
+  repositoryClass: Cx\Core\User\Model\Repository\UserRepository
   fields:
     id:
       id: true
@@ -19,7 +20,7 @@ Cx\Core\User\Model\Entity\User:
       length: 255
       nullable: true
     password:
-      type: string
+      type: password
       length: 255
       nullable: true
     authToken:
@@ -28,7 +29,7 @@ Cx\Core\User\Model\Entity\User:
       nullable: false
       column: auth_token
       options:
-        default: '0'
+        default: ''
     authTokenTimeout:
       type: integer
       length: 14
@@ -78,7 +79,7 @@ Cx\Core\User\Model\Entity\User:
     email:
       type: string
       length: 255
-      nullable: true
+      unique: true
     emailAccess:
       type: enum
       values: ['everyone','members_only','nobody']
@@ -102,7 +103,7 @@ Cx\Core\User\Model\Entity\User:
     active:
       type: boolean
       options:
-        default: true
+        default: false
     verified:
       type: boolean
       options:
@@ -143,9 +144,9 @@ Cx\Core\User\Model\Entity\User:
     username:
       columns: [username]
   manyToMany:
-    group:
+    groups:
       targetEntity: Cx\Core\User\Model\Entity\Group
-      inversedBy: user
+      inversedBy: users
       joinTable:
         name: access_rel_user_group
         joinColumns:
@@ -161,9 +162,9 @@ Cx\Core\User\Model\Entity\User:
             options:
               unsigned: true
   oneToMany:
-    userAttributeValue:
+    userAttributeValues:
       targetEntity: Cx\Core\User\Model\Entity\UserAttributeValue
       mappedBy: user
   lifecycleCallbacks:
     prePersist: [ validate ]
-    onFlush: [ validate ]
+    preUpdate: [ validate ]
