@@ -955,6 +955,9 @@ class User_Profile_Attribute
 
         if (empty($attr)) {
             $attr = new \Cx\Core\User\Model\Entity\UserAttribute();
+            $isDefault = 0;
+        } else {
+            $isDefault = $attr->isDefault();
         }
 
         $parent = $attrRepo->find($parentId);
@@ -966,7 +969,7 @@ class User_Profile_Attribute
         $attr->setParent($parent);
         $attr->setAccessId(0);
         $attr->setReadAccessId(0);
-        $attr->setIsDefault(0);
+        $attr->setDefault($isDefault);
         $em->persist($attr);
 
         try {
