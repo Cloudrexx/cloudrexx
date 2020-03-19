@@ -82,11 +82,6 @@ class DataAccess extends \Cx\Model\Base\EntityBase {
     protected $dataAccessApiKeys;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection
-     */
-    protected $relations;
-
-    /**
      * @var \Cx\Core_Modules\Access\Model\Entity\Permission
      */
     protected $readPermission;
@@ -96,16 +91,9 @@ class DataAccess extends \Cx\Model\Base\EntityBase {
      */
     protected $writePermission;
 
-    /**
-     * @var \Doctrine\Common\Collections\Collection
-     */
-    protected $syncs;
-
     public function __construct()
     {
-        $this->syncs = new \Doctrine\Common\Collections\ArrayCollection();
         $this->dataAccessApiKeys = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->relations = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     /**
@@ -262,46 +250,6 @@ class DataAccess extends \Cx\Model\Base\EntityBase {
     }
 
     /**
-     * Add relations
-     *
-     * @param \Cx\Core_Modules\Sync\Model\Entity\Relation $relation
-     */
-    public function addRelation(\Cx\Core_Modules\Sync\Model\Entity\Relation $relation)
-    {
-        $this->relations[] = $relation;
-    }
-
-    /**
-     * Remove relations
-     *
-     * @param \Cx\Core_Modules\Sync\Model\Entity\Relation $relations
-     */
-    public function removeRelation(\Cx\Core_Modules\Sync\Model\Entity\Relation $relations)
-    {
-        $this->relations->removeElement($relations);
-    }
-
-    /**
-     * Get relations
-     *
-     * @return \Doctrine\Common\Collections\Collection $relations
-     */
-    public function getRelations()
-    {
-        return $this->relations;
-    }
-
-    /**
-     * Set Relations
-     *
-     * @param array $relations
-     */
-    public function setRelations($relations)
-    {
-        $this->relations[] = $relations;
-    }
-
-    /**
      * Set read permission
      *
      * @param \Cx\Core_Modules\Access\Model\Entity\Permission $readPermission
@@ -339,35 +287,5 @@ class DataAccess extends \Cx\Model\Base\EntityBase {
     public function getWritePermission()
     {
         return $this->writePermission;
-    }
-
-    /**
-     * Add Sync
-     *
-     * @param \Cx\Core_Modules\Sync\Model\Entity\Sync $sync
-     */
-    public function addSync(\Cx\Core_Modules\Sync\Model\Entity\Sync $sync)
-    {
-        $this->syncs[] = $sync;
-    }
-
-    /**
-     * Remove syncs
-     *
-     * @param \Cx\Core_Modules\Sync\Model\Entity\Sync $syncs
-     */
-    public function removeSync(\Cx\Core_Modules\Sync\Model\Entity\Sync $syncs)
-    {
-        $this->syncs->removeElement($syncs);
-    }
-
-    /**
-     * Get Syncs
-     *
-     * @return \Doctrine\Common\Collections\Collection $syncs
-     */
-    public function getSyncs()
-    {
-        return $this->syncs;
     }
 }

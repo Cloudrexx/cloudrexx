@@ -467,6 +467,7 @@ class FormGenerator {
         if (isset($options['showDetail']) && $options['showDetail'] === false) {
             return '';
         }
+        $type = preg_replace('/^enum_[a-z_0-9]+$/', 'enum', $type);
         switch ($type) {
             case 'bool':
             case 'boolean':
@@ -715,7 +716,23 @@ class FormGenerator {
                 break;
             case 'multiselect':
             case 'select':
+            case 'enum':
                 $values = array();
+                if ($type == 'enum') {
+                    $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+                    $em = $cx->getDb()->getEntityManager();
+                    $localEntityMetadata = $em->getClassMetadata($this->entityClass);
+                    if (
+                        isset($localEntityMetadata->fieldMappings[$name]) &&
+                        isset($localEntityMetadata->fieldMappings[$name]['values']) &&
+                        is_array($localEntityMetadata->fieldMappings[$name]['values'])
+                    ) {
+                        $values = array_combine(
+                            $localEntityMetadata->fieldMappings[$name]['values'],
+                            $localEntityMetadata->fieldMappings[$name]['values']
+                        );
+                    }
+                }
                 if (isset($options['validValues'])) {
                     if (is_array($options['validValues'])) {
                         $values = $options['validValues'];
@@ -897,7 +914,7 @@ class FormGenerator {
             case 'image':
                 $placeholderPictureUrl = '/core/Html/View/Media/NoPicture.gif';
                 \JS::registerCode('
-                    function javascript_callback_function(data) {
+                    function javascript_callback_function_' . $name . '(data) {
                         if (data.type != "file") {
                             return;
                         }
@@ -923,7 +940,7 @@ class FormGenerator {
                 ');
                 $mediaBrowser = new \Cx\Core_Modules\MediaBrowser\Model\Entity\MediaBrowser();
                 $mediaBrowser->setOptions(array('type' => 'button'));
-                $mediaBrowser->setCallback('javascript_callback_function');
+                $mediaBrowser->setCallback('javascript_callback_function_' . $name);
                 $defaultOptions = array(
                     'views' => 'filebrowser,uploader',
                     'id' => 'page_target_browse',

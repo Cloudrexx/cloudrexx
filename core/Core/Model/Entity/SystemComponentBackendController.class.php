@@ -108,7 +108,7 @@ class SystemComponentBackendController extends Controller {
         }
         foreach ($cmd as $index=>$name) {
             // always load Default.html for overview page
-            if (empty($name)) {
+            if (empty($name) || $index == 0) {
                 continue;
             }
 
