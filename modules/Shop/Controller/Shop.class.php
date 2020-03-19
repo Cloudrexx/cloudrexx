@@ -4789,8 +4789,11 @@ die("Shop::processRedirect(): This method is obsolete!");
             if (empty($_POST['shopCurrentPassword'])) {
                 return \Message::error($_ARRAYLANG['TXT_SHOP_ENTER_CURRENT_PASSWORD']);
             }
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $userRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\User');
+            $user = $userRepo->find(static::$objCustomer->getId());
             if (
-                !self::$objCustomer->checkPassword(
+                $user->getPassword()->matches(
                     contrexx_input2raw($_POST['shopCurrentPassword'])
                 )
             ) {
