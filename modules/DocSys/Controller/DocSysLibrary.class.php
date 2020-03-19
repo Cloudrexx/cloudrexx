@@ -150,7 +150,7 @@ class DocSysLibrary
 
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $userRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\User');
-        $users = $userRepo->findBy(array('id' => array_unique(array_values($userIds))));
+        $users = $userRepo->findBy(array('id' => array_unique($userIds)));
 
         foreach ($users as $user) {
             $keys = array_keys($userIds, $user->getId());

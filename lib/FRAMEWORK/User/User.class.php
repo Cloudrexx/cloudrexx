@@ -968,6 +968,8 @@ class User extends User_Profile
 
     public function getProfileAttribute($attributeId, $historyId = 0)
     {
+        $attributeId = $this->objAttribute->getDefaultAttributeIdByAttributeId($attributeId);
+
         if (isset($this->arrLoadedUsers[$this->id]['profile'][$attributeId][$historyId])) {
             return $this->arrLoadedUsers[$this->id]['profile'][$attributeId][$historyId];
         }
