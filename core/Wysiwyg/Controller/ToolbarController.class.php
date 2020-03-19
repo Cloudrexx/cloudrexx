@@ -650,7 +650,7 @@ class ToolbarController extends \Cx\Core\Core\Model\Entity\Controller {
         $toolbarIdRes = $objFWUser->objGroup->getGroup(intval($groupId));
 
         // Verify that the query could be executed
-        if ($toolbarIdRes) {
+        if (!$toolbarIdRes->EOF) {
             // Fetch the toolbar id
             $toolbarId = $toolbarIdRes->getToolbar();
             if (!empty($toolbarId)) {

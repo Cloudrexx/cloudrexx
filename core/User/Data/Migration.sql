@@ -19,9 +19,9 @@ INSERT INTO `contrexx_access_user_attribute`
     ('firstname',     'text',     5,  0, 0, 1),
     ('lastname',      'text',     6,  0, 0, 1),
     ('company',       'text',     7,  0, 0, 1),
-    ('address',       'uri',      8,  0, 0, 1),
+    ('address',       'text',      8,  0, 0, 1),
     ('city',          'text',     9,  0, 0, 1),
-    ('country',       'text',     11, 0, 0, 1),
+    ('country',       'menu',     11, 0, 0, 1),
     ('zip',           'text',     10, 0, 0, 1),
     ('phone_office',  'text',     12, 0, 0, 1),
     ('phone_private', 'text',     13, 0, 0, 1),
@@ -63,12 +63,23 @@ ALTER TABLE `contrexx_access_user_attribute_value` CHANGE `attribute_id` `attrib
 
 UPDATE `contrexx_access_user_profile` SET `tmp_name` = 'gender';
 
+INSERT INTO
+	`contrexx_access_user_attribute`(`parent_id`, `access_id`, `type`, `read_access_id`, `is_default`, `tmp_name`)
+	VALUES (
+	    (SELECT `amale`.`id` FROM `contrexx_access_user_attribute` AS `amale` WHERE `amale`.`tmp_name` = 'gender'),
+	    null, 'menu_option', null, 1, 'gender_male'
+	), (
+	    (SELECT `afemale`.`id` FROM `contrexx_access_user_attribute` AS `afemale` WHERE `afemale`.`tmp_name` = 'gender'),
+	    null, 'menu_option', null, 1, 'gender_female'
+	);
+
 INSERT INTO `contrexx_access_user_attribute_value`(`tmp_name`, `attribute_id`, `user_id`, `value`)
   SELECT `tmp_name`, (
     SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'gender'
-  ), `user_id`, `gender`
+  ), `user_id`, (
+    SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = `gender`
+  )
   FROM `contrexx_access_user_profile`;
-
 
 UPDATE `contrexx_access_user_profile` SET `tmp_name` = 'title';
 
@@ -229,6 +240,14 @@ ALTER TABLE contrexx_access_user_attribute_name ADD `order` INT;
 
 INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES(
   (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'gender'), 'gender'
+);
+
+INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES(
+  (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'gender_female'), 'gender_female'
+);
+
+INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES(
+  (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'gender_male'), 'gender_male'
 );
 
 INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES(

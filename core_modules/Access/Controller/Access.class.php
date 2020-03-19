@@ -511,11 +511,15 @@ class Access extends \Cx\Core_Modules\Access\Controller\AccessLib
         $settingsDone = false;
         $objFWUser->objUser->loadNetworks();
 
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $userRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\User');
+        $user = $userRepo->find($objFWUser->objUser->getId());
+
         $act = isset($_GET['act']) ? $_GET['act'] : '';
         if (isset($_POST['access_delete_account'])) {
             // delete account
             \Cx\Core\Csrf\Controller\Csrf::check_code();
-            if ($objFWUser->objUser->checkPassword(isset($_POST['access_user_password']) ? $_POST['access_user_password'] : null)) {
+            if ($user->getPassword()->matches(isset($_POST['access_user_password']) ? $_POST['access_user_password'] : null)) {
                 if ($objFWUser->objUser->isAllowedToDeleteAccount()) {
                     if ($objFWUser->objUser->delete(true)) {
                         $this->_objTpl->setVariable('ACCESS_SETTINGS_MESSAGE', $_ARRAYLANG['TXT_ACCESS_YOUR_ACCOUNT_SUCCSESSFULLY_DELETED']);
@@ -538,7 +542,7 @@ class Access extends \Cx\Core_Modules\Access\Controller\AccessLib
         } elseif (isset($_POST['access_change_password'])) {
             // change password
             \Cx\Core\Csrf\Controller\Csrf::check_code();
-            if (!empty($_POST['access_user_current_password']) && $objFWUser->objUser->checkPassword(trim(contrexx_stripslashes($_POST['access_user_current_password'])))) {
+            if (!empty($_POST['access_user_current_password']) && $user->getPassword()->matches(trim(contrexx_stripslashes($_POST['access_user_current_password'])))) {
                 $this->_objTpl->setVariable(
                     'ACCESS_SETTINGS_MESSAGE',
                     ($objFWUser->objUser->setPassword(

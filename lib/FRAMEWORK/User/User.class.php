@@ -527,100 +527,6 @@ class User extends User_Profile
     }
 
     /**
-     * Returns TRUE if the given password matches the current user,
-     * FALSE otherwise.
-     *
-     * @param   string  $password     Raw password to be verified
-     * @param   string  $passwordHash The hash of the password to verify the
-     *                                supplied password with. If not supplied,
-     *                                it will be fetched from the database.
-     * @return boolean
-     */
-    public function checkPassword($password, $passwordHash = '')
-    {
-        // do not allow empty passwords
-        if ($password == '') {
-            return false;
-        }
-
-        try {
-            // fetch hash of password from database,
-            // if it has not been supplied as argument
-            if (
-                $passwordHash == '' &&
-                $this->getId()
-            ) {
-                $passwordHash = $this->fetchPasswordHashFromDatabase();
-            }
-
-            // check if password is hashed with legacy algorithm (md5)
-            if (
-                preg_match('/^[a-f0-9]{32}$/i', $passwordHash) &&
-                md5($password) == $passwordHash
-            ) {
-                return true;
-            }
-
-            // verify password
-            if (password_verify($password, $passwordHash)) {
-                return true;
-            }
-
-            return false;
-        } catch (UserException $e) {
-            \DBG::log($e->getMessage());
-            return false;
-        }
-    }
-
-    /**
-     * Verify that the password is properly hashed
-     *
-     * If the hashed password is outdated it will be updated in the database.
-     *
-     * @param   string  $password     Current raw password
-     * @param   string  $passwordHash The matching hash of the password. If not
-     *                                supplied, it will be fetched from the
-     *                                database.
-     * @throws  UserException         In case the password hash could not be
-     *                                updated, a UserException is thrown.
-     */
-    protected function updatePasswordHash($password, $passwordHash = '') {
-        // fetch hash of password from database,
-        // if it has not been supplied as argument
-        if (
-            $passwordHash == '' &&
-            $this->getId()
-        ) {
-            $passwordHash = $this->fetchPasswordHashFromDatabase();
-        }
-
-        // verify the supplied password to ensure that a newly
-        // generated password hash will be valid
-        if (!$this->checkPassword($password, $passwordHash)) {
-            throw new UserException('Supplied password does not match hash');
-        }
-
-        if (
-            // verify that password is not hashed by legacy algorithm (md5)
-            !preg_match('/^[a-f0-9]{32}$/i', $passwordHash) &&
-            // and that the password has been hashed by using the prefered
-            // hash algorithm
-            !password_needs_rehash($passwordHash, $this->defaultHashAlgorithm)
-        ) {
-            return;
-        }
-
-        // regenerate hash using new algorithm
-        if (!$this->setPassword($password, null, false, false)) {
-            throw new UserException('New password hash generation failed');
-        }
-        if (!$this->store()) {
-            throw new UserException('Storing new password hash failed');
-        }
-    }
-
-    /**
      * Fetch the password hash of the currently loaded user from the database
      *
      * @return  string  Password hash of currently loaded user.
@@ -968,6 +874,8 @@ class User extends User_Profile
 
     public function getProfileAttribute($attributeId, $historyId = 0)
     {
+        $attributeId = $this->objAttribute->getDefaultAttributeIdByAttributeId($attributeId);
+
         if (isset($this->arrLoadedUsers[$this->id]['profile'][$attributeId][$historyId])) {
             return $this->arrLoadedUsers[$this->id]['profile'][$attributeId][$historyId];
         }
