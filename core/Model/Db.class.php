@@ -428,7 +428,7 @@ namespace Cx\Core\Model {
 
             //resolve enum, set errors
             $conn = $em->getConnection();
-            foreach (array('enum', 'timestamp') as $type) {
+            foreach (array('enum', 'timestamp', 'password') as $type) {
                 \Doctrine\DBAL\Types\Type::addType(
                     $type,
                     'Cx\Core\Model\Model\Entity\\' . ucfirst($type) . 'Type'
@@ -443,10 +443,6 @@ namespace Cx\Core\Model {
                 'string'
             );
             \Cx\Core\Model\Controller\YamlDriver::registerKnownEnumTypes($conn);
-            \Doctrine\DBAL\Types\Type::addType(
-                'password',
-                'Cx\Core\Model\Model\Entity\PasswordType'
-            );
 
             $this->em = $em;
             return $this->em;

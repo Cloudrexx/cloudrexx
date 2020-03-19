@@ -47,6 +47,11 @@ namespace Cx\Core\Model\Model\Entity;
 class Password {
 
     /**
+     * @var int Hash algorithm accepted by password_hash()
+     */
+    const HASH_ALGORITHM = \PASSWORD_BCRYPT;
+
+    /**
      * @var string This password's hash
      */
     protected $hashedPassword;
@@ -80,17 +85,14 @@ class Password {
      */
     protected static function checkPasswordValidity(string $plaintextPassword): void
     {
-        global $_CONFIG, $_CORELANG;
+        global $_CORELANG;
 
         if (strlen($plaintextPassword) < 6) {
             throw new \Cx\Core\Error\Model\Entity\ShinyException(
                 $_CORELANG['TXT_ACCESS_INVALID_PASSWORD']
             );
         }
-        if (
-            isset($_CONFIG['passwordComplexity']) &&
-            $_CONFIG['passwordComplexity'] == 'on'
-        ) {
+        if (\Cx\Core\Setting\Controller\Setting::getValue('passwordComplexity') == 'on') {
             // Password must contain the following characters: upper, lower
             // case and numbers
             if (
@@ -116,7 +118,7 @@ class Password {
     protected static function hashPassword(string $plaintextPassword): string
     {
         static::checkPasswordValidity($plaintextPassword);
-        $hash = password_hash($plaintextPassword, \PASSWORD_BCRYPT);
+        $hash = password_hash($plaintextPassword, static::HASH_ALGORITHM);
         if ($hash !== false) {
             return $hash;
         }
@@ -143,15 +145,37 @@ class Password {
             preg_match('/^[a-f0-9]{32}$/i', $this->hashedPassword) &&
             md5($plaintextPassword) == $this->hashedPassword
         ) {
+            $this->updatePasswordHash($plaintextPassword);
             return true;
         }
 
         // verify password
         if (password_verify($plaintextPassword, $this->hashedPassword)) {
+            $this->updatePasswordHash($plaintextPassword);
             return true;
         }
 
         return false;
+    }
+
+    /**
+     * This updates the password in case is was hashed using the wrong algorithm
+     *
+     * This method assumes, that the $plaintextPassword and $hashedPassword
+     * are checked to match each other.
+     * @param string $plaintextPassword A password in plain text
+     */
+    protected function updatePasswordHash(string $plaintextPassword): void {
+        if (
+            // verify that password is not hashed by legacy algorithm (md5)
+            !preg_match('/^[a-f0-9]{32}$/i', $this->hashedPassword) &&
+            // and that the password has been hashed by using the prefered
+            // hash algorithm
+            !password_needs_rehash($this->hashedPassword, static::HASH_ALGORITHM)
+        ) {
+            return;
+        }
+        $this->hashedPassword = $this->hashPassword($plaintextPassword);
     }
 
     /**
