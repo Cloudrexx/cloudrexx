@@ -111,13 +111,16 @@ class Password {
      * Generate hash of password with default hash algorithm
      *
      * @param string $plaintextPassword A password in plain text
+     * @param bool $checkValidity If set to false, password complexity is not validated
      * @throws  \Cx\Core\Error\Model\Entity\ShinyException In case the password
      *                                                    hash generation fails
      * @return string The generated hash of the supplied password
      */
-    protected static function hashPassword(string $plaintextPassword): string
+    protected static function hashPassword(string $plaintextPassword, bool $checkValidity = true): string
     {
-        static::checkPasswordValidity($plaintextPassword);
+        if ($checkValidity) {
+            static::checkPasswordValidity($plaintextPassword);
+        }
         $hash = password_hash($plaintextPassword, static::HASH_ALGORITHM);
         if ($hash !== false) {
             return $hash;
@@ -175,7 +178,7 @@ class Password {
         ) {
             return;
         }
-        $this->hashedPassword = $this->hashPassword($plaintextPassword);
+        $this->hashedPassword = $this->hashPassword($plaintextPassword, false);
     }
 
     /**
