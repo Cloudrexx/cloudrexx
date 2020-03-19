@@ -1049,6 +1049,7 @@ CODE;
                 return $div;
                 break;
             case 'password':
+            case 'Cx\Core\Model\Model\Entity\Password':
                 $input = new \Cx\Core\Html\Model\Entity\DataElement($title, '');
                 if (isset($options['validValues'])) {
                     $input->setValidator(
