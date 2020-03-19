@@ -398,6 +398,26 @@ namespace Cx\Core\Model {
             $evm->addEventSubscriber($treeListener);
             $config->setMetadataDriverImpl($chainDriverImpl);
 
+            // Doctrine Extensions
+            $extensionList = \Cx\Core_Modules\Listing\Model\Entity\DataSet::load(
+                $cx->getCodeBaseLibraryPath() .
+                    '/doctrine/beberlei/doctrineextensions/config/mysql.yml'
+            );
+            $extensionList = $extensionList->toArray();
+            $extensionList = $extensionList['orm']['dql'];
+            foreach ($extensionList as $extensionType=>$extensions) {
+                // $extensionType contains a string like 'numeric_functions'
+                $addMethod = 'addCustom' . ucfirst(
+                    current(explode('_', $extensionType))
+                ) . 'Function';
+                foreach ($extensions as $extensionName=>$extensionClass) {
+                    $config->$addMethod(
+                        $extensionName,
+                        new $extensionClass($extensionName)
+                    );
+                }
+            }
+
             //table prefix
             $prefixListener = new \DoctrineExtension\TablePrefixListener($this->db->getTablePrefix());
             $evm->addEventListener(\Doctrine\ORM\Events::loadClassMetadata, $prefixListener);
@@ -445,6 +465,15 @@ namespace Cx\Core\Model {
          */
         public function setEntityManager($em) {
             $this->em = $em;
+        }
+
+        /**
+         * Returns the LoggableListener in use
+         *
+         * @return \Gedmo\Loggable\LoggableListener Current loggable listener
+         */
+        public function getLoggableListener(): \Gedmo\Loggable\LoggableListener {
+            return $this->loggableListener;
         }
     }
 }

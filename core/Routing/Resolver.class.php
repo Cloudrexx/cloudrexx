@@ -225,7 +225,14 @@ class Resolver {
             ) {
                 global $url;
                 $_GET['id'] = 404;
-                $this->url = \Cx\Core\Routing\Url::fromModuleAndCmd('Error', '', \FWLanguage::getDefaultLangId());
+                try {
+                    $this->url = \Cx\Core\Routing\Url::fromModuleAndCmd('Error', '', \FWLanguage::getDefaultLangId(), array(), '', false);
+                } catch (UrlException $e) {
+                    \DBG::msg($e->getMessage());
+                    \header($_SERVER['SERVER_PROTOCOL'] . ' 502 Bad Gateway');
+                    // remove CSRF token output_reset_rewrite_vars();
+                    throw new \Cx\Core\Core\Controller\InstanceException();
+                }
                 $url = $this->url;
             }
 
@@ -259,7 +266,9 @@ class Resolver {
 
         if ($this->lang) {
             // used for LinkGenerator
-            define('FRONTEND_LANG_ID', $this->lang);
+            if (!defined('FRONTEND_LANG_ID')) {
+                define('FRONTEND_LANG_ID', $this->lang);
+            }
             $cx = \Cx\Core\Core\Controller\Cx::instanciate();
             $cx->getDb()->getTranslationListener()->setTranslatableLocale(
                 \FWLanguage::getLanguageCodeById(FRONTEND_LANG_ID)
@@ -273,8 +282,27 @@ class Resolver {
                 $page_template,
                 $now, $start, $end, $plainSection;
 
-        $section = isset($_REQUEST['section']) ? $_REQUEST['section'] : '';
-        $command = isset($_REQUEST['cmd']) ? contrexx_addslashes($_REQUEST['cmd']) : '';
+        $section = '';
+        if (
+            isset($_REQUEST['section']) &&
+            !is_array($_REQUEST['section']) &&
+            preg_match('/^[a-z0-9]+$/i', $_REQUEST['section'])
+        ) {
+            $section = $_REQUEST['section'];
+        }
+        $command = '';
+        if (
+            isset($_REQUEST['cmd']) &&
+            !is_array($_REQUEST['cmd']) &&
+            preg_match(
+                '/^([-a-z0-9_]+|\[\[' .
+                    \Cx\Core\Routing\NodePlaceholder::NODE_URL_PCRE .
+                    '\]\])$/ix',
+                $_REQUEST['cmd']
+            )
+        ) {
+            $command = $_REQUEST['cmd'];
+        }
         $history = isset($_REQUEST['history']) ? intval($_REQUEST['history']) : 0;
 
 
@@ -323,8 +351,9 @@ class Resolver {
                 die($_CORELANG['TXT_THIS_MODULE_DOESNT_EXISTS']);
             } else {
                 //page not found, redirect to error page.
-                \Cx\Core\Csrf\Controller\Csrf::header('Location: '.\Cx\Core\Routing\Url::fromModuleAndCmd('Error'));
-                exit;
+                // hotfix: resolve to error page
+                return $this->resolveToErrorPage();
+                // hotfix: resolve to error page
             }
         }
 
@@ -781,7 +810,9 @@ class Resolver {
 
                 if (empty($this->page)) {
                     \DBG::msg(__METHOD__ . ': target page of internal redirection not found/published');
-                    \Cx\Core\Csrf\Controller\Csrf::redirect(\Cx\Core\Routing\Url::fromModuleAndCmd('Error'));
+                    // hotfix: resolve to error page
+                    return $this->resolveToErrorPage();
+                    // endhotfix: resolve to error page
                 }
             } else { //external target - redirect via HTTP redirect
                 if (\FWValidator::isUri($target)) {
@@ -974,8 +1005,9 @@ class Resolver {
             } catch (\Exception $e) {
                 \DBG::msg(__METHOD__ . ': '. $e->getMessage());
                 //page not found, redirect to error page.
-                \Cx\Core\Csrf\Controller\Csrf::header('Location: '.\Cx\Core\Routing\Url::fromModuleAndCmd('Error'));
-                exit;
+                // hotfix: resolve to error page
+                return $this->resolveToErrorPage();
+                // end hotfix: resolve to error page
             }
 
             // due that the fallback is located within a different language
@@ -1151,5 +1183,46 @@ class Resolver {
      */
     public function getAdditionalPath() {
         return substr($this->additionalPath, 1);
+    }
+
+    /**
+     * Resolve the current request the Error application page
+     *
+     * In case there does not exists a published application page of component
+     * Error, then an InstanceException with HTTP status code 502 Bad Gateway
+     * is thrown.
+     * @throws  \Cx\Core\Core\Controller\InstanceException
+     * @return  \Cx\Core\ContentManager\Model\Entity\Page   The resolved Error
+     *                                                      application page
+     */
+    protected function resolveToErrorPage() {
+        // $url needs to be global as some legacy code (outside of Routing)
+        // requires it
+        global $url;
+
+        // as the resolving is partially dodgy, we have to overwrite
+        // the following set of variables to ensure the resolving to the
+        // Error application page works as expected in any use case
+        $_GET=array();
+        $_GET['id'] = 404;
+        $_REQUEST=array();
+        $this->setSection('Error', '');
+        $this->page = null;
+
+        // resolve to Error application page
+        try {
+            $page = $this->pageRepo->findOneByModuleCmdLang('Error', '', $this->lang);
+            if (!$page || !$page->isActive()) {
+                throw new UrlException('No active error page');
+            }
+            $this->url = \Cx\Core\Routing\Url::fromModuleAndCmd('Error', '', $this->lang, array(), '', false);
+        } catch (UrlException $e) {
+            \DBG::msg($e->getMessage());
+            \header($_SERVER['SERVER_PROTOCOL'] . ' 502 Bad Gateway');
+            // remove CSRF token output_reset_rewrite_vars();
+            throw new \Cx\Core\Core\Controller\InstanceException();
+        }
+        $url = $this->url;
+        return $this->resolve();
     }
 }

@@ -153,8 +153,6 @@ class ViewManager
         'component.yml',
         'forum.html',
         'podcast.html',
-        'blog.html',
-        'immo.html',
     );
 
     /**
@@ -1210,7 +1208,7 @@ CODE;
 
         $themeFolder = $theme->getFoldername();
         $archive     = new \PclZip($this->_archiveTempPath . $themeFolder . '.zip');
-        $themeFiles  = $this->getThemesFiles($theme);
+        $themeFiles  = $this->getThemesFiles($theme, true);
 
         \Cx\Lib\FileSystem\FileSystem::makeWritable($this->_archiveTempPath);
         $this->createZipFolder($archive, $themeFiles, '/' . $themeFolder);
@@ -1249,13 +1247,17 @@ CODE;
     }
 
     /**
-     * Get the themes files using viewmanager filesystem
+     * Get the theme's files using viewmanager filesystem
      *
-     * @return  array
+     * This pretents that the folders "modules" and "core_modules" are named
+     * "module" and "core_module" unless $real is set to true.
+     * @param \Cx\Core\View\Model\Entity\Theme $theme Theme to fetch files for
+     * @param boolean $real (optional) If set to true, filesystem names are used
+     * @return array Simple list of files. Folder names are indexes containing an array in the same format.
      */
-    function getThemesFiles(\Cx\Core\View\Model\Entity\Theme $theme) {
+    function getThemesFiles(\Cx\Core\View\Model\Entity\Theme $theme, $real = false) {
         $filesList     = $this->fileSystem->getFileList($theme->getFoldername());
-        $formatedFiles = $this->formatFileList($filesList);
+        $formatedFiles = $this->formatFileList($filesList, $real);
         $this->sortFilesFolders($formatedFiles);
 
         return $formatedFiles;
@@ -1264,11 +1266,13 @@ CODE;
     /**
      * Format the Filesystem files and folders to viewManger format
      *
-     * @param array $filesList
-     *
-     * @return array
+     * This pretents that the folders "modules" and "core_modules" are named
+     * "module" and "core_module" unless $real is set to true.
+     * @param array $filesList List of files as returned by FileSystem::getFileList()
+     * @param boolean $real (optional) If set to true, filesystem names are used
+     * @return array Simple list of files. Folder names are indexes containing an array in the same format.
      */
-    function formatFileList($filesList)
+    function formatFileList($filesList, $real = false)
     {
         $result = array();
 
@@ -1281,21 +1285,10 @@ CODE;
                 unset($subFiles['datainfo']);
 
                 $name = $info['name'];
-                switch (true) {
-                    case $name == ltrim($this->cx->getCoreModuleFolderName() , '/'):
-                        $name = 'core_module';
-                        break;
-                    case $name == ltrim($this->cx->getModuleFolderName(), '/'):
-                        $name = 'module';
-                        break;
-                    case $name == ltrim($this->cx->getCoreFolderName(), '/'):
-                        $name = 'core';
-                        break;
-                    default:
-                        break;
+                if (!$real) {
+                    $name = str_replace('modules', 'module', $info['name']);
                 }
-
-                $result[$name] = $this->formatFileList($subFiles);
+                $result[$name] = $this->formatFileList($subFiles, $real);
             }
         }
 

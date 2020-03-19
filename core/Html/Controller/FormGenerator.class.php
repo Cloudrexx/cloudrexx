@@ -467,6 +467,7 @@ class FormGenerator {
         if (isset($options['showDetail']) && $options['showDetail'] === false) {
             return '';
         }
+        $type = preg_replace('/^enum_[a-z_0-9]+$/', 'enum', $type);
         switch ($type) {
             case 'bool':
             case 'boolean':
@@ -715,7 +716,23 @@ class FormGenerator {
                 break;
             case 'multiselect':
             case 'select':
+            case 'enum':
                 $values = array();
+                if ($type == 'enum') {
+                    $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+                    $em = $cx->getDb()->getEntityManager();
+                    $localEntityMetadata = $em->getClassMetadata($this->entityClass);
+                    if (
+                        isset($localEntityMetadata->fieldMappings[$name]) &&
+                        isset($localEntityMetadata->fieldMappings[$name]['values']) &&
+                        is_array($localEntityMetadata->fieldMappings[$name]['values'])
+                    ) {
+                        $values = array_combine(
+                            $localEntityMetadata->fieldMappings[$name]['values'],
+                            $localEntityMetadata->fieldMappings[$name]['values']
+                        );
+                    }
+                }
                 if (isset($options['validValues'])) {
                     if (is_array($options['validValues'])) {
                         $values = $options['validValues'];
@@ -895,8 +912,12 @@ class FormGenerator {
                 return $div;
                 break;
             case 'image':
+                $placeholderPictureUrl = '/core/Html/View/Media/NoPicture.gif';
                 \JS::registerCode('
-                    function javascript_callback_function(data) {
+                    function javascript_callback_function_' . $name . '(data) {
+                        if (data.type != "file") {
+                            return;
+                        }
                         if ( data.data[0].datainfo.extension=="Jpg"
                             || data.data[0].datainfo.extension=="Gif"
                             || data.data[0].datainfo.extension=="Png"
@@ -910,7 +931,7 @@ class FormGenerator {
                     jQuery(document).ready(function(){
                         jQuery(\'.deletePreviewImage\').click(function(){
                             cx.jQuery("#'.$title.'").attr(\'value\', \'\');
-                            cx.jQuery(this).prev(\'img\').attr(\'src\', \'/images/Downloads/no_picture.gif\');
+                            cx.jQuery(this).prev(\'img\').attr(\'src\', \'' . $placeholderPictureUrl . '\');
                             cx.jQuery(this).css(\'display\', \'none\');
                             cx.jQuery(this).nextAll(\'input\').first().attr(\'value\', \'\');
                         });
@@ -919,7 +940,7 @@ class FormGenerator {
                 ');
                 $mediaBrowser = new \Cx\Core_Modules\MediaBrowser\Model\Entity\MediaBrowser();
                 $mediaBrowser->setOptions(array('type' => 'button'));
-                $mediaBrowser->setCallback('javascript_callback_function');
+                $mediaBrowser->setCallback('javascript_callback_function_' . $name);
                 $defaultOptions = array(
                     'views' => 'filebrowser,uploader',
                     'id' => 'page_target_browse',
@@ -937,22 +958,23 @@ class FormGenerator {
 
                 $div = new \Cx\Core\Html\Model\Entity\HtmlElement('div');
 
-                if((isset($value) && in_array(pathinfo($value, PATHINFO_EXTENSION), Array('gif', 'jpg', 'png'))) || $title == 'imagePath'){
+                // this image is meant to be a preview of the selected image
+                $previewImage = new \Cx\Core\Html\Model\Entity\HtmlElement('img');
+                $previewImage->setAttribute('class', 'previewImage');
+                $previewImage->setAttribute('src', ($value != '') ? $value : $placeholderPictureUrl);
 
-                    // this image is meant to be a preview of the selected image
-                    $previewImage = new \Cx\Core\Html\Model\Entity\HtmlElement('img');
-                    $previewImage->setAttribute('class', 'previewImage');
-                    $previewImage->setAttribute('src', ($value != '') ? $value : '/images/Downloads/no_picture.gif');
-
-                    // this image is uesd as delete function for the selected image over javascript
-                    $deleteImage = new \Cx\Core\Html\Model\Entity\HtmlElement('img');
-                    $deleteImage->setAttribute('class', 'deletePreviewImage');
-                    $deleteImage->setAttribute('src', '/core/Core/View/Media/icons/delete.gif');
-
-                    $div->addChild($previewImage);
-                    $div->addChild($deleteImage);
-                    $div->addChild(new \Cx\Core\Html\Model\Entity\HtmlElement('br'));
+                // this image is uesd as delete function for the selected image over javascript
+                $deleteImage = new \Cx\Core\Html\Model\Entity\HtmlElement('img');
+                $deleteImage->setAttribute('class', 'deletePreviewImage');
+                $deleteImage->setAttribute('src', '/core/Core/View/Media/icons/delete.gif');
+                if (!$value) {
+                    $deleteImage->setAttribute('style', 'display: none;');
                 }
+
+                $div->addChild($previewImage);
+                $div->addChild($deleteImage);
+                $div->addChild(new \Cx\Core\Html\Model\Entity\HtmlElement('br'));
+
                 $div->addChild($input);
                 $div->addChild(new \Cx\Core\Html\Model\Entity\TextElement(
                     $mediaBrowser->getXHtml($_ARRAYLANG['TXT_CORE_CM_BROWSE'])
