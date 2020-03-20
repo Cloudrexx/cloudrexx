@@ -42,69 +42,167 @@ namespace Cx\Core\User\Model\Entity;
  * @author      Dario Graf <info@cloudrexx.com>
  * @package     cloudrexx
  * @subpackage  core_user
+ *
+ * @OA\Schema(
+ *     description="UserAttribute model",
+ *     title="UserAttribute model",
+ * )
  */
 class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
+     * @OA\Property(
+     *     format="int",
+     *     description="Attribute Id",
+     *     title="ID",
+     * )
+     *
      * @var integer
      */
     protected $id;
 
     /**
+     * @OA\Property(
+     *     description="Define the profile type the user can act in",
+     *     title="Usergroup type",
+     *     enum={"text", "textarea", "mail", "uri", "date","image","checkbox","menu","menu_option","group",
+     *     "frame","history"}
+     * )
+     *
      * @var enum_user_userattribute_type
      */
     protected $type = 'text';
 
     /**
+     * @OA\Property(
+     *     format="boolean",
+     *     description="Set true if we want this field to be mandatory",
+     *     title="Mandatory",
+     *     default="0",
+     * )
+     *
      * @var boolean
      */
     protected $mandatory = '0';
 
     /**
+     * @OA\Property(
+     *     description="Define how the user attribute should be sorted",
+     *     title="Userattribute sorting type",
+     *     enum={"asc", "desc", "custom"},
+     *     default="asc",
+     * )
+     *
      * @var enum_user_userattribute_sorttype
      */
     protected $sortType = 'asc';
 
     /**
+     * @OA\Property(
+     *     format="int",
+     *     description="Order Id",
+     *     title="Order Id",
+     * )
+     *
      * @var integer
      */
     protected $orderId = 0;
 
     /**
+     * @OA\Property(
+     *     description="Set a special privilege for users that do not have editing rights from assigned group.",
+     *     title="Userattribute special access",
+     *     enum={"menu_select_higher", "menu_select_lower"},
+     * )
+     *
      * @var enum_user_userattribute_accessspecial
      */
     protected $accessSpecial = '';
 
     /**
+     * @OA\Property(
+     *     format="int",
+     *     description="Access Id",
+     *     title="Access Id",
+     * )
+     *
      * @var integer
      */
     protected $accessId;
 
     /**
+     * @OA\Property(
+     *     format="int",
+     *     description="Reading access Id",
+     *     title="Access Id read",
+     * )
+     *
      * @var integer
      */
     protected $readAccessId;
 
     /**
+     * @OA\Property(
+     *     description="Array collection of the user attributes",
+     *     title="Parent",
+     *     type="object",
+     *     @OA\Property(
+     *         ref="#/components/schemas/UserAttribute"
+     *     ),
+     * )
+     *
      * @var \Cx\Core\User\Model\Entity\UserAttribute
      */
     protected $parent;
 
     /**
+     * @OA\Property(
+     *     description="List of all attributes with the associated name and language",
+     *     title="User attribute Name",
+     *     type="object",
+     *     @OA\Property(
+     *         ref="#/components/schemas/UserAttributeName"
+     *     ),
+     * )
+     *
      * @var \Doctrine\Common\Collections\Collection
      */
     protected $userAttributeNames;
 
     /**
+     * @OA\Property(
+     *     description="List of all attributes that are assigned to the user. We have a key that's a serialized id from fields of the primary key in the corresponding order: <attributeId>/<userId>/<historyId> Example: 1/1/0",
+     *     title="User attribute value",
+     *     type="object",
+     *     @OA\Property(
+     *         ref="#/components/schemas/UserAttributeValue"
+     *     ),
+     * )
+     *
      * @var \Doctrine\Common\Collections\Collection
      */
     protected $userAttributeValues;
 
     /**
+     * @OA\Property(
+     *     description="List of the child attributes of fields with menu options",
+     *     title="Childern",
+     *     type="object",
+     *     @OA\Property(
+     *         ref="#/components/schemas/UserAttributeName"
+     *     ),
+     * )
+     *
      * @var \Doctrine\Common\Collections\Collection
      */
     protected $children;
 
-    /***
+    /**
+     * @OA\Property(
+     *     format="boolean",
+     *     description="If default set to true, the attribute is a default of Cloudrexx, if false it is a custom set attribute",
+     *     title="Default",
+     * )
+     *
      * @var boolean
      */
     protected $default;

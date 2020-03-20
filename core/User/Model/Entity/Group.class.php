@@ -42,29 +42,65 @@ namespace Cx\Core\User\Model\Entity;
  * @author      Dario Graf <info@cloudrexx.com>
  * @package     cloudrexx
  * @subpackage  core_user
+ *
+ * @OA\Schema(
+ *     description="Group model",
+ *     title="Group model",
+ *     required={"name",},
+ * )
  */
 class Group extends \Cx\Model\Base\EntityBase {
     /**
+     * @OA\Property(
+     *     format="int",
+     *     description="Group Id",
+     *     title="ID",
+     * )
+     *
      * @var integer
      */
     protected $id;
 
     /**
+     * @OA\Property(
+     *     description="Groupname",
+     *     title="Groupname",
+     *     maximum=255,
+     *)
      * @var string
      */
     protected $name = '';
 
     /**
+     * @OA\Property(
+     *     description="Group description",
+     *     title="Group description",
+     *     maximum=255,
+     *)
      * @var string
      */
     protected $description = '';
 
     /**
+     * @OA\Property(
+     *     format="boolean",
+     *     description="Determine whether a group is active or not",
+     *     title="Active",
+     *     default="true",
+     * )
+     *
      * @var integer $active
      */
     protected $active = 1;
 
     /**
+     * @OA\Property(
+     *     description="Define the profile type the user can act in",
+     *     title="Usergroup type",
+     *     enum={"frontend", "backend"},
+     *     default="frontend",
+     * )
+     *
      * @var enum_user_group_type
      */
     protected $type = 'frontend';
@@ -80,6 +116,15 @@ class Group extends \Cx\Model\Base\EntityBase {
     protected $toolbar = 0;
 
     /**
+     * @OA\Property(
+     *     description="List of the attributes of a user, identified by the Id",
+     *     title="Users",
+     *     type="object",
+     *     @OA\Property(
+     *         ref="#/components/schemas/User"
+     *     ),
+     * )
+     *
      * @var \Doctrine\Common\Collections\Collection
      */
     protected $users;

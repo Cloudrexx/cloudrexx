@@ -42,34 +42,80 @@ namespace Cx\Core\User\Model\Entity;
  * @author      Dario Graf <info@cloudrexx.com>
  * @package     cloudrexx
  * @subpackage  core_user
+ *
+ *  * @OA\Schema(
+ *     description="UserAttributeName model",
+ *     title="UserAttributeName model",
+ * )
  */
 class UserAttributeName extends \Cx\Model\Base\EntityBase {
     /**
+     * @OA\Property(
+     *     format="int",
+     *     description="Attributename Id",
+     *     title="ID",
+     * )
+     *
      * @var integer
      */
     protected $id;
 
     /**
+     * @OA\Property(
+     *     format="int",
+     *     description="Attribute Id",
+     *     title="AttributeId",
+     * )
+     *
      * @var integer
      */
     protected $attributeId = 0;
 
     /**
+     * @OA\Property(
+     *     format="int",
+     *     description="The default anguage for the user as it was defined",
+     *     title="Language",
+     *     default="0",
+     * )
+     *
      * @var integer
      */
     protected $langId = 0;
 
     /**
+     * @OA\Property(
+     *     format="int",
+     *     description="The default anguage for the user as it was defined",
+     *     title="Language",
+     *     default="0",
+     * )
+     *
      * @var integer
      */
     protected $order = 0;
 
     /**
+     * @OA\Property(
+     *     description="Name of attribute",
+     *     title="Name",
+     *     maximum=255,
+     * )
+     *
      * @var string
      */
     protected $name = '';
 
     /**
+     * @OA\Property(
+     *     description="List of the attributes of a user, identified by the Id",
+     *     title="User attributes",
+     *     type="object",
+     *     @OA\Property(
+     *         ref="#/components/schemas/UserAttribute"
+     *     ),
+     * )
+     *
      * @var \Cx\Core\User\Model\Entity\UserAttribute
      */
     protected $userAttribute;

@@ -42,34 +42,80 @@ namespace Cx\Core\User\Model\Entity;
  * @author      Dario Graf <info@cloudrexx.com>
  * @package     cloudrexx
  * @subpackage  core_user
+ *
+ * @OA\Schema(
+ *     description="UserAttributeValue model",
+ *     title="UserAttributeValue model",
+ * )
  */
 class UserAttributeValue extends \Cx\Model\Base\EntityBase {
     /**
+     * @OA\Property(
+     *     format="int",
+     *     description="Attribute Id",
+     *     title="ID",
+     * )
+     *
      * @var integer
      */
     protected $attributeId;
 
     /**
+     * @OA\Property(
+     *     format="int",
+     *     description="Attribute Id",
+     *     title="ID",
+     * )
+     *
      * @var integer
      */
     protected $userId;
 
     /**
+     * @OA\Property(
+     *     format="int",
+     *     description="If the type of the user attribute is histroy, if this field gets edited the count goes up for versioning.",
+     *     title="History",
+     *     default="0"
+     * )
      * @var integer
      */
     protected $history = 0;
 
     /**
+     * @OA\Property(
+     *     description="The value of the user attribute",
+     *     title="Value",
+     * )
+     *
      * @var string
      */
     protected $value;
 
     /**
+     * @OA\Property(
+     *     description="Lists all of the attributes from user with certain Id",
+     *     title="User",
+     *     type="object",
+     *     @OA\Property(
+     *         ref="#/components/schemas/User"
+     *     ),
+     * )
+     *
      * @var \Cx\Core\User\Model\Entity\User
      */
     protected $user;
 
     /**
+     * @OA\Property(
+     *     description="List of the attributes of a user, identified by the Id",
+     *     title="User attribute Names",
+     *     type="object",
+     *     @OA\Property(
+     *         ref="#/components/schemas/UserAttribute"
+     *     ),
+     * )
+     *
      * @var \Cx\Core\User\Model\Entity\UserAttribute
      */
     protected $userAttribute;
