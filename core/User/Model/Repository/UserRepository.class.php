@@ -424,13 +424,10 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
                     $childAttributeIds = array();
                     foreach ($term as $searchTerm) {
                         foreach ($attribute->getChildren() as $child) {
-                            foreach ($child->getUserAttributeNames() as $attributeName) {
-                                $name = $attributeName->getName();
-                                if (stripos($name, $searchTerm) !== FALSE) {
-                                    // We found the attribute
-                                    $childAttributeIds[] = $child->getId();
-                                    continue;
-                                }
+                            if (stripos($child->getName(), $searchTerm) !== FALSE) {
+                                // We found the attribute
+                                $childAttributeIds[] = $child->getId();
+                                continue;
                             }
                         }
                     }
