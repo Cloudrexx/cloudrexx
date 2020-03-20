@@ -43,7 +43,14 @@ namespace Cx\Core\User\Model\Entity;
  * @package     cloudrexx
  * @subpackage  core_user
  */
-class UserAttribute extends \Cx\Model\Base\EntityBase {
+class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\Translatable {
+    /**
+     * @Gedmo\Locale
+     * Used locale to override Translation listener`s locale
+     * this is not a mapped field of entity metadata, just a simple property
+     */
+    protected $locale;
+
     /**
      * @var integer
      */
@@ -53,6 +60,11 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
      * @var enum_user_userattribute_type
      */
     protected $type = 'text';
+
+    /**
+     * @var string
+     */
+    protected $name = '';
 
     /**
      * @var boolean
@@ -234,8 +246,27 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     public function __construct()
     {
         $this->children = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->userAttributeNames = new \Doctrine\Common\Collections\ArrayCollection();
         $this->userAttributeValues = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * Set translatable locale
+     *
+     * @param $locale
+     */
+    public function setTranslatableLocale($locale)
+    {
+        if (is_numeric($locale)) {
+            $localeEntity = $this->cx->getDb()->getEntityManager()->getRepository(
+                'Cx\Core\Locale\Model\Entity\Locale'
+            )->find($locale);
+            if ($localeEntity) {
+                $locale = $localeEntity->getIso1()->getIso1();
+            } else {
+                $locale = 'de';
+            }
+        }
+        $this->locale = $locale;
     }
 
     /**
@@ -266,6 +297,26 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     public function getType()
     {
         return $this->type;
+    }
+
+    /**
+     * Set name
+     *
+     * @param string $name
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+    /**
+     * Get name
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
     }
 
     /**
@@ -501,36 +552,6 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     public function getParent()
     {
         return $this->parent;
-    }
-
-    public function getName($langId = 0)
-    {
-        if (empty($langId) && FRONTEND_LANG_ID) {
-            $langId = FRONTEND_LANG_ID;
-        } else if (empty($langId)) {
-            $langId = 1;
-        }
-
-        $crit = \Doctrine\Common\Collections\Criteria::create()->where(
-            \Doctrine\Common\Collections\Criteria::expr()->eq(
-                'langId',
-                $langId
-            )
-        )->orWhere(
-            \Doctrine\Common\Collections\Criteria::expr()->eq(
-                'langId',
-                0
-            )
-        );
-        $userAttributeName = $this->getUserAttributeNames()->matching(
-            $crit
-        )->first();
-
-        if (!empty($userAttributeName)) {
-            return $userAttributeName->getName();
-        }
-
-        return '';
     }
 
     /**
