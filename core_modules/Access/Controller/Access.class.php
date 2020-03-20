@@ -469,8 +469,8 @@ class Access extends \Cx\Core_Modules\Access\Controller\AccessLib
                 } else {
                     foreach (array('picture', 'gender') as $attributeId) {
                         $attribute = $cx->getDb()->getEntityManager()->getRepository(
-                            'Cx\Core\User\Model\Entity\UserAttributeName'
-                        )->findOneBy(array('name' => $attributeId))->getUserAttribute();
+                            'Cx\Core\User\Model\Entity\UserAttribute'
+                        )->findOneBy(array('name' => $attributeId));
                         if ($attribute->checkReadPermission()) {
                             $this->parseAttribute($user, $attribute->getId(), 0, false, false, false, false, false);
                         }
