@@ -145,9 +145,9 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
      *     description="Array collection of the user attributes",
      *     title="Parent",
      *     type="object",
-     *     @OA\Property(
-     *         ref="#/components/schemas/UserAttribute"
-     *     ),
+     *     additionalProperties={
+     *         "ref"="#/components/schemas/UserAttribute"
+     *     }
      * )
      *
      * @var \Cx\Core\User\Model\Entity\UserAttribute
@@ -159,9 +159,9 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
      *     description="List of all attributes with the associated name and language",
      *     title="User attribute Name",
      *     type="object",
-     *     @OA\Property(
-     *         ref="#/components/schemas/UserAttributeName"
-     *     ),
+     *     additionalProperties={
+     *         "ref"="#/components/schemas/UserAttributeName"
+     *     }
      * )
      *
      * @var \Doctrine\Common\Collections\Collection
@@ -173,9 +173,9 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
      *     description="List of all attributes that are assigned to the user. We have a key that's a serialized id from fields of the primary key in the corresponding order: <attributeId>/<userId>/<historyId> Example: 1/1/0",
      *     title="User attribute value",
      *     type="object",
-     *     @OA\Property(
-     *         ref="#/components/schemas/UserAttributeValue"
-     *     ),
+     *     additionalProperties={
+     *         "ref"="#/components/schemas/UserAttributeValue"
+     *     }
      * )
      *
      * @var \Doctrine\Common\Collections\Collection
@@ -187,9 +187,9 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
      *     description="List of the child attributes of fields with menu options",
      *     title="Childern",
      *     type="object",
-     *     @OA\Property(
+     *     additionalProperties={
      *         ref="#/components/schemas/UserAttributeName"
-     *     ),
+     *     }
      * )
      *
      * @var \Doctrine\Common\Collections\Collection

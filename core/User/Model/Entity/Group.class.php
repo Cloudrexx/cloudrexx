@@ -120,9 +120,9 @@ class Group extends \Cx\Model\Base\EntityBase {
      *     description="List of the attributes of a user, identified by the Id",
      *     title="Users",
      *     type="object",
-     *     @OA\Property(
-     *         ref="#/components/schemas/User"
-     *     ),
+     *     additionalProperties={
+     *         "ref"="#/components/schemas/User"
+     *     }
      * )
      *
      * @var \Doctrine\Common\Collections\Collection

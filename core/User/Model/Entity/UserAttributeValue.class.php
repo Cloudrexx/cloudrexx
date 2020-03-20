@@ -97,9 +97,9 @@ class UserAttributeValue extends \Cx\Model\Base\EntityBase {
      *     description="Lists all of the attributes from user with certain Id",
      *     title="User",
      *     type="object",
-     *     @OA\Property(
-     *         ref="#/components/schemas/User"
-     *     ),
+     *     additionalProperties={
+     *         "ref"="#/components/schemas/User"
+     *     }
      * )
      *
      * @var \Cx\Core\User\Model\Entity\User
@@ -111,9 +111,9 @@ class UserAttributeValue extends \Cx\Model\Base\EntityBase {
      *     description="List of the attributes of a user, identified by the Id",
      *     title="User attribute Names",
      *     type="object",
-     *     @OA\Property(
-     *         ref="#/components/schemas/UserAttribute"
-     *     ),
+     *     additionalProperties={
+     *         "ref"="#/components/schemas/UserAttribute"
+     *     }
      * )
      *
      * @var \Cx\Core\User\Model\Entity\UserAttribute

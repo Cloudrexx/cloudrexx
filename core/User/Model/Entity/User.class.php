@@ -447,9 +447,9 @@ class User extends \Cx\Model\Base\EntityBase {
      *     description="List of all groups assigned to the user, there can be users without associated group",
      *     title="User groups",
      *     type="object",
-     *     @OA\Property(
-     *         ref="#/components/schemas/Group"
-     *     ),
+     *     additionalProperties={
+     *         "ref"="#/components/schemas/Group"
+     *     }
      * )
      *
      * @var \Doctrine\Common\Collections\Collection
@@ -461,9 +461,9 @@ class User extends \Cx\Model\Base\EntityBase {
      *     description="List of all attributes that are assigned to the user. We have a key that's a serialized id from fields of the primary key in the corresponding order: <attributeId>/<userId>/<historyId> Example: 1/1/0",
      *     title="User Attribute values",
      *     type="object",
-     *     @OA\Property(
-     *         ref="#/components/schemas/UserAttributeValue"
-     *     ),
+     *     additionalProperties={
+     *         "$ref"="#/components/schemas/UserAttributeValue"
+     *     }
      * )
      *
      * @var \Doctrine\Common\Collections\Collection

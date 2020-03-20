@@ -111,9 +111,9 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase {
      *     description="List of the attributes of a user, identified by the Id",
      *     title="User attributes",
      *     type="object",
-     *     @OA\Property(
-     *         ref="#/components/schemas/UserAttribute"
-     *     ),
+     *     additionalProperties={
+     *         "ref"="#/components/schemas/UserAttribute"
+     *     }
      * )
      *
      * @var \Cx\Core\User\Model\Entity\UserAttribute
