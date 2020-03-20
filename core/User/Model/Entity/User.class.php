@@ -305,7 +305,6 @@ class User extends \Cx\Model\Base\EntityBase {
     protected $lastAuth = 0;
 
     /**
-     * TODO: More information about this field
      * @OA\Property(
      *     format="int",
      *     description="Timestamp of last authentication status",
@@ -353,8 +352,8 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="Set the default Frontend-Language for the user, for English set to 1 and German to 2",
-     *     title="Frontend Language",
+     *     description="Set the default frontend locale for the user",
+     *     title="Frontend language",
      *     default="0",
      * )
      *
@@ -365,8 +364,8 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="Set the default Backend-Language for the user, for English set to 1 and German to 2",
-     *     title="Backend Language",
+     *     description="Set the default backend language for the user, for English set to 2 and German to 1. If no language is set the backend will show the default language as chosen in Localization.",
+     *     title="Backend language",
      *     default="0",
      * )
      *
@@ -434,7 +433,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="boolean",
-     *     description="TODO",
+     *     description="Set this to true if the user should be able to communicate with other users when using the module U2U messaging (U2u)",
      *     title="User to user active",
      *     default="false",
      * )
@@ -445,8 +444,12 @@ class User extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="TODO",
+     *     description="List of all groups assigned to the user, there can be users without associated group",
      *     title="User groups",
+     *     type="object",
+     *     @OA\Property(
+     *         ref="#/components/schemas/Group"
+     *     ),
      * )
      *
      * @var \Doctrine\Common\Collections\Collection
@@ -455,8 +458,12 @@ class User extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="TODO",
-     *     title="User Attribute Values",
+     *     description="List of all attributes that are assigned to the user. We have a key that's a serialized id from fields of the primary key in the corresponding order: <attributeId>/<userId>/<historyId> Example: 1/1/0",
+     *     title="User Attribute values",
+     *     type="object",
+     *     @OA\Property(
+     *         ref="#/components/schemas/UserAttributeValue"
+     *     ),
      * )
      *
      * @var \Doctrine\Common\Collections\Collection
