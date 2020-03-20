@@ -430,3 +430,26 @@ CREATE UNIQUE INDEX UNIQ_7CD32875E7927C74 ON contrexx_access_users (email);
 /** Drop tmp names **/
 ALTER TABLE `contrexx_access_user_attribute_value` DROP `tmp_name`;
 ALTER TABLE `contrexx_access_user_attribute` DROP `tmp_name`;
+
+/** Migrate attribute_names **/
+ALTER TABLE `contrexx_access_user_attribute` ADD COLUMN `name` VARCHAR(255) NOT NULL DEFAULT '';
+ALTER TABLE contrexx_access_user_attribute_name DROP FOREIGN KEY FK_90502F6CB6E62EFA;
+DROP INDEX contrexx_access_user_attribute_name_attribute_id_ibfk ON contrexx_access_user_attribute_name;
+
+INSERT INTO `contrexx_translations` (`locale`, `object_class`, `field`, `foreign_key`, `content`)
+SELECT
+	(
+	    CASE
+	        WHEN `a`.`lang_id` = 3 THEN 'fr'
+            WHEN `l`.`iso_1` IS NULL THEN 'de'
+            ELSE `l`.`iso_1`
+        END
+    ) AS `locale`,
+    'Cx\\Core\\User\\Model\\Entity\\UserAttribute' AS `object_class`,
+    'name' AS `field`,
+    `a`.`attribute_id` AS `foreign_key`,
+    `a`.`name` AS `content`
+FROM `contrexx_access_user_attribute_name` AS `a`
+LEFT JOIN `contrexx_core_locale_locale` AS `l` ON `a`.`lang_id` = `l`.`id`;
+
+DROP TABLE `contrexx_access_user_attribute_name`;

@@ -33,6 +33,7 @@ CREATE TABLE `contrexx_access_user_attribute` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `parent_id` int unsigned DEFAULT NULL,
   `type` enum('text','textarea','mail','uri','date','image','checkbox','menu','menu_option','group','frame','history') NOT NULL DEFAULT 'text',
+  `name` VARCHAR(255) NOT NULL DEFAULT '',
   `mandatory` tinyint(1) NOT NULL DEFAULT '0',
   `sort_type` enum('asc','desc','custom') NOT NULL DEFAULT 'asc',
   `order_id` int NOT NULL DEFAULT '0',
@@ -43,16 +44,6 @@ CREATE TABLE `contrexx_access_user_attribute` (
   PRIMARY KEY (`id`),
   INDEX `contrexx_access_user_attribute_parent_id_ibfk` (`parent_id`)
 ) ENGINE=InnoDB ;
-CREATE TABLE `contrexx_access_user_attribute_name` (
-  `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `attribute_id` int unsigned NOT NULL,
-  `lang_id` int NOT NULL DEFAULT '0',
-  `name` varchar(255) NOT NULL DEFAULT '',
-  `order` int,
-  PRIMARY KEY (`id`),
-  INDEX `contrexx_access_user_attribute_name_attribute_id_ibfk` (`attribute_id`),
-  UNIQUE INDEX fk_module_user_attribute_name_unique_idx (`attribute_id`, `lang_id`)
-) ENGINE=InnoDB;
 CREATE TABLE `contrexx_access_user_attribute_value` (
   `attribute_id` int unsigned NOT NULL,
   `user_id` int unsigned NOT NULL,
@@ -3613,7 +3604,6 @@ ALTER TABLE contrexx_module_calendar_events_categories ADD CONSTRAINT FK_3974DFD
 ALTER TABLE contrexx_module_calendar_registration_form_field_name ADD CONSTRAINT FK_1C1E8341443707B0 FOREIGN KEY (field_id) REFERENCES contrexx_module_calendar_registration_form_field (id);
 ALTER TABLE contrexx_module_calendar_registration_form_field ADD CONSTRAINT FK_AAEED23C5288FD4F FOREIGN KEY (form) REFERENCES contrexx_module_calendar_registration_form (id);
 ALTER TABLE contrexx_module_calendar_event_field ADD CONSTRAINT FK_F76EF62C71F7E88B FOREIGN KEY (event_id) REFERENCES contrexx_module_calendar_event (id);
-ALTER TABLE contrexx_access_user_attribute_name ADD CONSTRAINT FK_90502F6CB6E62EFA FOREIGN KEY (attribute_id) REFERENCES contrexx_access_user_attribute (id);
 ALTER TABLE contrexx_access_rel_user_group ADD CONSTRAINT FK_401DFD43A76ED395 FOREIGN KEY (user_id) REFERENCES contrexx_access_users (id);
 ALTER TABLE contrexx_access_rel_user_group ADD CONSTRAINT FK_401DFD43FE54D947 FOREIGN KEY (group_id) REFERENCES contrexx_access_user_groups (group_id);
 ALTER TABLE contrexx_access_user_attribute ADD CONSTRAINT FK_D97727BE727ACA70 FOREIGN KEY (parent_id) REFERENCES contrexx_access_user_attribute (id);
