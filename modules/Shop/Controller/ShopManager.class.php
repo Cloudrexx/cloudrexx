@@ -94,7 +94,7 @@ class ShopManager extends ShopLibrary
         $index_notes = \Cx\Core\Setting\Controller\Setting::getValue('user_profile_attribute_notes','Shop');
         if ($index_notes) {
             $objProfileAttribute = $objUser->objAttribute->getById($index_notes);
-            $attributeNames = $objProfileAttribute->getAttributeNames($index_notes);
+            $attributeNames = $objProfileAttribute->getAttributeName($index_notes);
             if (empty($attributeNames)) {
                 $index_notes = false;
             }
@@ -134,7 +134,7 @@ class ShopManager extends ShopLibrary
         $index_group = \Cx\Core\Setting\Controller\Setting::getValue('user_profile_attribute_customer_group_id','Shop');
         if ($index_group) {
             $objProfileAttribute = $objUser->objAttribute->getById($index_notes);
-            $attributeNames = $objProfileAttribute->getAttributeNames($index_group);
+            $attributeNames = $objProfileAttribute->getAttributeName($index_group);
             if (empty($attributeNames)) {
                 $index_group = false;
             }
