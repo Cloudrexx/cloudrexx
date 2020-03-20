@@ -92,11 +92,6 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * @var \Doctrine\Common\Collections\Collection
      */
-    protected $userAttributeNames;
-
-    /**
-     * @var \Doctrine\Common\Collections\Collection
-     */
     protected $userAttributeValues;
 
     /**
@@ -456,36 +451,6 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     public function getChildren()
     {
         return $this->children;
-    }
-
-    /**
-     * Add userAttributeName
-     *
-     * @param \Cx\Core\User\Model\Entity\UserAttributeName $userAttributeName
-     */
-    public function addUserAttributeName(\Cx\Core\User\Model\Entity\UserAttributeName $userAttributeName)
-    {
-        $this->userAttributeNames[] = $userAttributeName;
-    }
-
-    /**
-     * Remove userAttributeName
-     *
-     * @param \Cx\Core\User\Model\Entity\UserAttributeName $userAttributeName
-     */
-    public function removeUserAttributeName(\Cx\Core\User\Model\Entity\UserAttributeName $userAttributeName)
-    {
-        $this->userAttributeNames->removeElement($userAttributeName);
-    }
-
-    /**
-     * Get userAttributeName
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getUserAttributeNames()
-    {
-        return $this->userAttributeNames;
     }
 
     /**
