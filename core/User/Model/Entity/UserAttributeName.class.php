@@ -52,7 +52,7 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="Attributename Id",
+     *     description="Attribute name, Id",
      *     title="ID",
      * )
      *
@@ -74,7 +74,7 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="The default anguage for the user as it was defined",
+     *     description="The default language for the user as it was defined",
      *     title="Language",
      *     default="0",
      * )
@@ -86,8 +86,8 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="The default anguage for the user as it was defined",
-     *     title="Language",
+     *     description="Determins the order the attributes get listed, starting at 1",
+     *     title="Order",
      *     default="0",
      * )
      *

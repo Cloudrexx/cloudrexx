@@ -63,7 +63,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     description="Define the profile type the user can act in",
-     *     title="Usergroup type",
+     *     title="User group type",
      *     enum={"text", "textarea", "mail", "uri", "date","image","checkbox","menu","menu_option","group",
      *     "frame","history"}
      * )
@@ -87,7 +87,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     description="Define how the user attribute should be sorted",
-     *     title="Userattribute sorting type",
+     *     title="User attribute, sorting type",
      *     enum={"asc", "desc", "custom"},
      *     default="asc",
      * )
@@ -110,7 +110,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     description="Set a special privilege for users that do not have editing rights from assigned group.",
-     *     title="Userattribute special access",
+     *     title="User attribute, special access",
      *     enum={"menu_select_higher", "menu_select_lower"},
      * )
      *
@@ -157,7 +157,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     description="List of all attributes with the associated name and language",
-     *     title="User attribute Name",
+     *     title="User attribute name",
      *     type="object",
      *     additionalProperties={
      *         "ref"="#/components/schemas/UserAttributeName"

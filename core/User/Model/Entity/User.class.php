@@ -247,8 +247,7 @@ class User extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="Password with at least 6 characters as well as contain at least one upper and one lower case
-     *     character and one number",
+     *     description="Password with at least 6 characters as well as contain at least one upper and one lower case character and one number",
      *     title="Password",
      *     maximum=255,
      * )
@@ -297,7 +296,7 @@ class User extends \Cx\Model\Base\EntityBase {
      * @OA\Property(
      *     format="int",
      *     description="Timestamp of last authentication",
-     *     title="Expiration date",
+     *     title="Last authentification date",
      * )
      *
      * @var integer

@@ -64,7 +64,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     description="Groupname",
-     *     title="Groupname",
+     *     title="Group name",
      *     maximum=255,
      *)
      * @var string
@@ -96,7 +96,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     description="Define the profile type the user can act in",
-     *     title="Usergroup type",
+     *     title="User group type",
      *     enum={"frontend", "backend"},
      *     default="frontend",
      * )

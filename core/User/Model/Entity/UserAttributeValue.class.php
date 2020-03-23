@@ -63,8 +63,8 @@ class UserAttributeValue extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="Attribute Id",
-     *     title="ID",
+     *     description="User Id",
+     *     title="User ID",
      * )
      *
      * @var integer
@@ -109,7 +109,7 @@ class UserAttributeValue extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     description="List of the attributes of a user, identified by the Id",
-     *     title="User attribute Names",
+     *     title="User attribute names",
      *     type="object",
      *     additionalProperties={
      *         "ref"="#/components/schemas/UserAttribute"
