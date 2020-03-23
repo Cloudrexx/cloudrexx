@@ -43,7 +43,7 @@ namespace Cx\Core\User\Model\Entity;
  * @package     cloudrexx
  * @subpackage  core_user
  *
- *  * @OA\Schema(
+ * @OA\Schema(
  *     description="UserAttributeName model",
  *     title="UserAttributeName model",
  * )
