@@ -85,8 +85,8 @@ class UserValidateEmail extends \CxValidate
         $em = $cx->getDb()->getEntityManager();
         $qb = $em->createQueryBuilder();
         $qb->select('u')
-            ->from('Cx\Core\User\Model\Entity\User', 'u')
-            ->where($qb->expr()->eq('u.email', ':email'));
+           ->from('Cx\Core\User\Model\Entity\User', 'u')
+           ->where($qb->expr()->eq('u.email', ':email'));
         if (!empty($this->userId)) {
             $qb->andWhere($qb->expr()->not($qb->expr()->eq('u.id', ':id')));
             $qb->setParameter('id', $this->userId);
@@ -903,8 +903,8 @@ class User extends \Cx\Model\Base\EntityBase {
     public function setRestoreKey($restoreKey = null)
     {
         $this->restoreKey = !empty($restoreKey)
-            ? $restoreKey
-            : md5($this->email . random_bytes(20));
+                            ? $restoreKey
+                            : md5($this->email . random_bytes(20));
     }
 
     /**
