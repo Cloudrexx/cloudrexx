@@ -44,7 +44,7 @@ namespace Cx\Core\User\Model\Entity;
  * @subpackage  core_user
  *
  * @OA\Schema(
- *     description="Group model",
+ *     description="A user can have a associated Group, in this group is specified which rights a user has, what modules the user can act in and whether they have write/read access. If a group is set to inactive, user can np longer act within this group.",
  *     title="Group model",
  *     required={"name",},
  * )

@@ -44,7 +44,7 @@ namespace Cx\Core\User\Model\Entity;
  * @subpackage  core_user
  *
  * @OA\Schema(
- *     description="UserAttributeName model",
+ *     description="In this model we can set the name for the attribues that are default or custom. Those names can be set for every desired language that will get to be used for the website.",
  *     title="UserAttributeName model",
  * )
  */

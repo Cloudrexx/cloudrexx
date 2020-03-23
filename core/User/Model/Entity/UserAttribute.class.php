@@ -44,7 +44,7 @@ namespace Cx\Core\User\Model\Entity;
  * @subpackage  core_user
  *
  * @OA\Schema(
- *     description="UserAttribute model",
+ *     description="A userAttribute is a description of a user. There are different types of attributes that are default information about a user, if desired more attributes can be added.",
  *     title="UserAttribute model",
  * )
  */

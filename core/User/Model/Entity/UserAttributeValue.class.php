@@ -44,7 +44,7 @@ namespace Cx\Core\User\Model\Entity;
  * @subpackage  core_user
  *
  * @OA\Schema(
- *     description="UserAttributeValue model",
+ *     description="In this model we have the value of a attrinbute, that specifically belongs to a user.",
  *     title="UserAttributeValue model",
  * )
  */

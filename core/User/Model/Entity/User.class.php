@@ -206,7 +206,7 @@ class UserValidateUsername extends \CxValidate
  * @subpackage  core_user
  *
  * @OA\Schema(
- *     description="User model",
+ *     description="In the User model a new user can be created. Here we can set the passwortd, email and username as well as associated groups the user can act in.",
  *     title="User model",
  *     required={"email",},
  * )
