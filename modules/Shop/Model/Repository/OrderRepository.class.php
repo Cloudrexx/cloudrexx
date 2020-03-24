@@ -309,6 +309,66 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
     }
 
     /**
+     * Returns the coupon reduction amount for an order
+     * @param int $order_id ID of an order
+     * @return double Reduction, 0 if no coupon is used
+     */
+    public function redeemCoupons($order_id) {
+        $objOrder = $this->find($order_id);
+        if (!$objOrder) {
+            // Order not found
+            return false;
+        }
+        $coupon_code = NULL;
+        $coupon_amount = 0;
+        $customerCouponRepo = $this->_em->getRepository(
+            'Cx\Modules\Shop\Model\Entity\RelCustomerCoupon'
+        );
+        $couponRepo = $this->_em->getRepository(
+            'Cx\Modules\Shop\Model\Entity\DiscountCoupon'
+        );
+        $objCustomerCoupon = $customerCouponRepo->findOneBy(
+            array('orderId' => $order_id)
+        );
+
+        if ($objCustomerCoupon) {
+            $coupon_code = $objCustomerCoupon->getCode();
+        }
+        $arrItems = $objOrder->getOrderItems();
+        foreach ($arrItems as $item) {
+            // Redeem the *product* Coupon, if possible for the Product
+            if ($coupon_code) {
+                $objCoupon = $couponRepo->available($coupon_code,
+                    $item_price*$quantity, $customer_id, $product_id,
+                    $payment_id);
+                if ($objCoupon) {
+                    $coupon_code = NULL;
+                    $coupon_amount = $objCoupon->getDiscountAmountOrRate(
+                        $item_price, $customer_id);
+                    if ($create_accounts) {
+                        $objCoupon->redeem($order_id, $customer_id,
+                            $item_price*$quantity);
+                    }
+                }
+//\DBG::log("Orders::getSubstitutionArray(): Got Product Coupon $coupon_code");
+            }
+        }
+        // Redeem the *global* Coupon, if possible for the Order
+        if ($coupon_code) {
+            $objCoupon = $couponRepo->available($coupon_code,
+                $total_item_price, $customer_id, null, $payment_id);
+            if ($objCoupon) {
+                $coupon_amount = $objCoupon->getDiscountAmountOrRate(
+                    $total_item_price, $customer_id);
+                if ($create_accounts) {
+                    $objCoupon->redeem($order_id, $customer_id, $total_item_price);
+                }
+            }
+        }
+        return $coupon_amount;
+    }
+
+    /**
     /**
      * Returns an array with all placeholders and their values to be
      * replaced in any shop mailtemplate for the given order ID.
@@ -449,25 +509,11 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
         }
         // Deduct Coupon discounts, either from each Product price, or
         // from the items total.  Mind that the Coupon has already been
-        // stored with the Order, but not redeemed yet.  This is done
-        // in this method, but only if $create_accounts is true.
-        $coupon_code = NULL;
-        $coupon_amount = 0;
-        $customerCouponRepo = $this->_em->getRepository(
-            'Cx\Modules\Shop\Model\Entity\RelCustomerCoupon'
-        );
-        $couponRepo = $this->_em->getRepository(
-            'Cx\Modules\Shop\Model\Entity\DiscountCoupon'
-        );
-        $objCustomerCoupon = $customerCouponRepo->findOneBy(
-            array('orderId' => $order_id)
-        );
-
-        if ($objCustomerCoupon) {
-            $coupon_code = $objCustomerCoupon->getCode();
-        }
+        // stored with the Order, but not redeemed yet.
+        $coupon_amount = $this->redeemCoupons($order_id);
         $orderItemCount = 0;
         $total_item_price = 0;
+
         // Suppress Coupon messages (see Coupon::available())
         \Message::save();
         foreach ($arrItems as $item) {
@@ -669,22 +715,6 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
                         );
                     }
                 }
-                // Redeem the *product* Coupon, if possible for the Product
-                if ($coupon_code) {
-                    $objCoupon = $couponRepo->available($coupon_code,
-                        $item_price*$quantity, $customer_id, $product_id,
-                        $payment_id);
-                    if ($objCoupon) {
-                        $coupon_code = NULL;
-                        $coupon_amount = $objCoupon->getDiscountAmountOrRate(
-                            $item_price, $customer_id);
-                        if ($create_accounts) {
-                            $objCoupon->redeem($order_id, $customer_id,
-                                $item_price*$quantity);
-                        }
-                    }
-//\DBG::log("Orders::getSubstitutionArray(): Got Product Coupon $coupon_code");
-                }
             }
             if (empty($arrSubstitution['ORDER_ITEM']))
                 $arrSubstitution['ORDER_ITEM'] = array();
@@ -693,18 +723,6 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
         $arrSubstitution['ORDER_ITEM_SUM'] =
             sprintf('% 9.2f', $total_item_price);
         $arrSubstitution['ORDER_ITEM_COUNT'] = sprintf('% 4u', $orderItemCount);
-        // Redeem the *global* Coupon, if possible for the Order
-        if ($coupon_code) {
-            $objCoupon = $couponRepo->available($coupon_code,
-                $total_item_price, $customer_id, null, $payment_id);
-            if ($objCoupon) {
-                $coupon_amount = $objCoupon->getDiscountAmountOrRate(
-                    $total_item_price, $customer_id);
-                if ($create_accounts) {
-                    $objCoupon->redeem($order_id, $customer_id, $total_item_price);
-                }
-            }
-        }
         \Message::restore();
         // Fill in the Coupon block with proper discount and amount
         if ($objCoupon) {
