@@ -493,7 +493,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get id
      *
-     * @return integer
+     * @return integer 
      */
     public function getId()
     {
@@ -511,7 +511,7 @@ class User extends \Cx\Model\Base\EntityBase {
     }
 
     /**
-     * Get isAdmin
+     * Get isAdmin 
      *
      * @return boolean
      */
@@ -533,7 +533,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get username
      *
-     * @return string
+     * @return string 
      */
     public function getUsername()
     {
@@ -553,7 +553,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get password
      *
-     * @return string
+     * @return string 
      */
     public function getPassword()
     {
@@ -571,7 +571,7 @@ class User extends \Cx\Model\Base\EntityBase {
     }
 
     /**
-     * Get authToken
+     * Get authToken 
      *
      * @return string
      */
@@ -593,7 +593,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get authTokenTimeout
      *
-     * @return integer
+     * @return integer 
      */
     public function getAuthTokenTimeout()
     {
@@ -613,7 +613,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get regdate
      *
-     * @return integer
+     * @return integer 
      */
     public function getRegdate()
     {
@@ -633,7 +633,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get expiration
      *
-     * @return integer
+     * @return integer 
      */
     public function getExpiration()
     {
@@ -653,7 +653,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get validity
      *
-     * @return integer
+     * @return integer 
      */
     public function getValidity()
     {
@@ -673,7 +673,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get lastAuth
      *
-     * @return integer
+     * @return integer 
      */
     public function getLastAuth()
     {
@@ -693,7 +693,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get lastAuthStatus
      *
-     * @return integer
+     * @return integer 
      */
     public function getLastAuthStatus()
     {
@@ -713,7 +713,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get lastActivity
      *
-     * @return integer
+     * @return integer 
      */
     public function getLastActivity()
     {
@@ -733,7 +733,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get email
      *
-     * @return string
+     * @return string 
      */
     public function getEmail()
     {
@@ -753,7 +753,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get emailAccess
      *
-     * @return enum_user_user_emailaccess
+     * @return enum_user_user_emailaccess 
      */
     public function getEmailAccess()
     {
@@ -773,7 +773,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get frontendLangId
      *
-     * @return integer
+     * @return integer 
      */
     public function getFrontendLangId()
     {
@@ -793,7 +793,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get backendLangId
      *
-     * @return integer
+     * @return integer 
      */
     public function getBackendLangId()
     {
@@ -815,7 +815,7 @@ class User extends \Cx\Model\Base\EntityBase {
      *
      * This does exactly the same as getActive, but this method is necessary for doctrine mapping
      *
-     * @return boolean
+     * @return boolean 
      */
     public function getActive()
     {
@@ -827,7 +827,7 @@ class User extends \Cx\Model\Base\EntityBase {
      *
      * This does exactly the same as getActive, but this method name is more intuitive
      *
-     * @return integer $active
+     * @return integer $active 
      */
     public function isActive()
     {
@@ -847,7 +847,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get verified
      *
-     * @return boolean
+     * @return boolean 
      */
     public function getVerified()
     {
@@ -867,7 +867,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get primaryGroup
      *
-     * @return integer
+     * @return integer 
      */
     public function getPrimaryGroup()
     {
@@ -887,7 +887,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get profileAccess
      *
-     * @return enum_user_user_profileaccess
+     * @return enum_user_user_profileaccess 
      */
     public function getProfileAccess()
     {
@@ -909,7 +909,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get restoreKey
      *
-     * @return string
+     * @return string 
      */
     public function getRestoreKey()
     {
@@ -929,7 +929,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get restoreKeyTime
      *
-     * @return integer
+     * @return integer 
      */
     public function getRestoreKeyTime()
     {
@@ -949,7 +949,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get u2uActive
      *
-     * @return enum_user_user_u2uactive
+     * @return enum_user_user_u2uactive 
      */
     public function getU2uActive()
     {
@@ -975,7 +975,6 @@ class User extends \Cx\Model\Base\EntityBase {
     {
         $this->groups->removeElement($group);
     }
-
 
     /**
      * Get group
