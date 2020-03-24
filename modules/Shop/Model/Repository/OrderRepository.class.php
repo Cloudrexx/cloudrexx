@@ -369,7 +369,6 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
     }
 
     /**
-    /**
      * Returns an array with all placeholders and their values to be
      * replaced in any shop mailtemplate for the given order ID.
      *
