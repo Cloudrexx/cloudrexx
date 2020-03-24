@@ -44,7 +44,7 @@ namespace Cx\Core\User\Model\Entity;
  * @subpackage  core_user
  *
  * @OA\Schema(
- *     description="A user can have a associated Group, in this group is specified which rights a user has, what modules the user can act in and whether they have write/read access. If a group is set to inactive, user can np longer act within this group.",
+ *     description="A user can have several associated Groups, in the group is specified which rights a user has, what modules the user can act in and whether they have write/read access.",
  *     title="Group model",
  *     required={"name",},
  * )
@@ -53,8 +53,8 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="Group Id",
-     *     title="ID",
+     *     description="In a group can be defined, what rights the assigned user have.",
+     *     title="Group ID",
      * )
      *
      * @var integer
@@ -63,7 +63,7 @@ class Group extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="Groupname",
+     *     description="Name of the group.",
      *     title="Group name",
      *     maximum=255,
      *)
@@ -73,7 +73,7 @@ class Group extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="Group description",
+     *     description="A description for the use of the group.",
      *     title="Group description",
      *     maximum=255,
      *)
@@ -84,7 +84,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="boolean",
-     *     description="Determine whether a group is active or not",
+     *     description="Determines whether a group is active or not, if a group is not active it acts the same way as it would when deleted.",
      *     title="Active",
      *     default="true",
      * )
@@ -95,7 +95,7 @@ class Group extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="Define the profile type the user can act in",
+     *     description="Defines the profile type the user can act in.",
      *     title="User group type",
      *     enum={"frontend", "backend"},
      *     default="frontend",
@@ -117,7 +117,7 @@ class Group extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="List of the attributes of a user, identified by the Id",
+     *     description="List of the attributes of a user, identified by the User ID. Example: 1",
      *     title="Users",
      *     type="object",
      *     additionalProperties={

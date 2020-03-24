@@ -52,8 +52,8 @@ class UserAttributeValue extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="Attribute Id",
-     *     title="ID",
+     *     description="Unique identifier to determine Attribute Value.",
+     *     title="Attribute ID",
      * )
      *
      * @var integer
@@ -63,7 +63,7 @@ class UserAttributeValue extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="User Id",
+     *     description="Unique identifier of the user with the listed attribute.",
      *     title="User ID",
      * )
      *
@@ -84,7 +84,7 @@ class UserAttributeValue extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="The value of the user attribute",
+     *     description="Consists of the value of the user attribute.",
      *     title="Value",
      * )
      *
@@ -94,7 +94,7 @@ class UserAttributeValue extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="Lists all of the attributes from user with certain Id",
+     *     description="Lists all of the attributes from user with certain Id. Example: 1",
      *     title="User",
      *     type="object",
      *     additionalProperties={
@@ -108,7 +108,7 @@ class UserAttributeValue extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="List of the attributes of a user, identified by the Id",
+     *     description="List of the attributes of a user, identified by the Id. Example: 1",
      *     title="User attribute names",
      *     type="object",
      *     additionalProperties={

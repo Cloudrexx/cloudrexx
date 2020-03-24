@@ -215,8 +215,8 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="User Id",
-     *     title="ID",
+     *     description="Unique identifier set for every user.",
+     *     title="User ID",
      * )
      *
      * @var integer
@@ -225,7 +225,7 @@ class User extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="Boolean to define if a user has admin rights",
+     *     description="Boolean to define if a user has admin rights.",
      *     title="Is Admin",
      *     type="boolean",
      *     default="false",
@@ -237,7 +237,7 @@ class User extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="Username",
+     *     description="Name of the user.",
      *     title="Username",
      *     maximum=255,
      * )
@@ -247,7 +247,7 @@ class User extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="Password with at least 6 characters as well as contain at least one upper and one lower case character and one number",
+     *     description="Password with at least 6 characters as well as contain at least one upper and one lower case character and one number.",
      *     title="Password",
      *     maximum=255,
      * )
@@ -269,7 +269,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="Timestamp of user registration",
+     *     description="Timestamp of user registration.",
      *     title="Register date",
      * )
      *
@@ -280,7 +280,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="Timestamp of expiration to enclose certain users",
+     *     description="Timestamp of expiration to enclose certain users.",
      *     title="Expiration date",
      * )
      * @var integer
@@ -295,7 +295,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="Timestamp of last authentication",
+     *     description="Timestamp of last authentication.",
      *     title="Last authentification date",
      * )
      *
@@ -306,7 +306,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="Timestamp of last authentication status",
+     *     description="Timestamp of last authentication status.",
      *     title="Last authentication status",
      * )
      *
@@ -317,7 +317,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="Timestamp of the last time the user was active",
+     *     description="Timestamp of the last time the user was active.",
      *     title="Last activity",
      * )
      *
@@ -328,7 +328,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="email",
-     *     description="Email",
+     *     description="Email address of the user.",
      *     title="Email",
      *     maximum=255,
      * )
@@ -339,7 +339,7 @@ class User extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="Define the email access",
+     *     description="Define the email access.",
      *     title="Email access",
      *     enum={"everyone", "members_only", "nobody"},
      * )
@@ -351,7 +351,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="Set the default frontend locale for the user",
+     *     description="Set the default frontend locale for the user.",
      *     title="Frontend language",
      *     default="0",
      * )
@@ -375,7 +375,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="boolean",
-     *     description="Deactivate or activate a user",
+     *     description="Deactivate or activate a user.",
      *     title="Active",
      *     default="true",
      * )
@@ -387,7 +387,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="boolean",
-     *     description="Flag to show if the user is verified",
+     *     description="Flag to show if the user is verified.",
      *     title="Verified",
      *     default="true",
      * )
@@ -399,7 +399,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="Assign a primary group to the user",
+     *     description="Assign a primary group to the user.",
      *     title="Primary group",
      *     default="0",
      * )
@@ -410,7 +410,7 @@ class User extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="Define the profile access",
+     *     description="Define the profile access.",
      *     title="Profile access",
      *     enum={"everyone", "members_only", "nobody"},
      * )
@@ -432,7 +432,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="boolean",
-     *     description="Set this to true if the user should be able to communicate with other users when using the module U2U messaging (U2u)",
+     *     description="Set this to true if the user should be able to communicate with other users when using the module U2U messaging (U2u).",
      *     title="User to user active",
      *     default="false",
      * )
@@ -443,7 +443,7 @@ class User extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="List of all groups assigned to the user, there can be users without associated group",
+     *     description="List of all groups assigned to the user, there can be users without associated group. Example: 1",
      *     title="User groups",
      *     type="object",
      *     additionalProperties={
@@ -457,7 +457,7 @@ class User extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="List of all attributes that are assigned to the user. We have a key that's a serialized id from fields of the primary key in the corresponding order: <attributeId>/<userId>/<historyId> Example: 1/1/0",
+     *     description="List of all attributes that are assigned to the user. We have a key that's a serialized id from fields of the primary key in the corresponding order: <attributeId>/<userId>/<historyId> Example: 1/1/0.",
      *     title="User Attribute values",
      *     type="object",
      *     additionalProperties={

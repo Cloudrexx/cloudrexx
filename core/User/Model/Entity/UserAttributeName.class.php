@@ -52,8 +52,8 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="Attribute name, Id",
-     *     title="ID",
+     *     description="Unique identifier of the attribute name.",
+     *     title="Attribute Name ID",
      * )
      *
      * @var integer
@@ -63,8 +63,8 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="Attribute Id",
-     *     title="AttributeId",
+     *     description="Unique identifier that is representative for the attribute ID.",
+     *     title="Attribute ID",
      * )
      *
      * @var integer
@@ -74,7 +74,7 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="The default language for the user as it was defined",
+     *     description="The default language for the user as it was defined.",
      *     title="Language",
      *     default="0",
      * )
@@ -86,7 +86,7 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="Determins the order the attributes get listed, starting at 1",
+     *     description="Determins the order the attributes get listed, starting at 1.",
      *     title="Order",
      *     default="0",
      * )
@@ -97,7 +97,7 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="Name of attribute",
+     *     description="Name of attribute.",
      *     title="Name",
      *     maximum=255,
      * )
@@ -108,7 +108,7 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="List of the attributes of a user, identified by the Id",
+     *     description="List of the attributes of a user, identified by the Id. Example: 1",
      *     title="User attributes",
      *     type="object",
      *     additionalProperties={

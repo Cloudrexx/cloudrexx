@@ -121,8 +121,8 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="Access Id",
-     *     title="Access Id",
+     *     description="Unique identifier for the access rights.",
+     *     title="Access ID",
      * )
      *
      * @var integer
@@ -132,7 +132,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="Reading access Id",
+     *     description="Unique identifier for reading access.",
      *     title="Access Id read",
      * )
      *
@@ -142,7 +142,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="Array collection of the user attributes",
+     *     description="Lists all of the user attributes. Example: 1",
      *     title="Parent",
      *     type="object",
      *     additionalProperties={
@@ -156,7 +156,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="List of all attributes with the associated name and language",
+     *     description="List of all attributes with the associated name and language. Example: 1",
      *     title="User attribute name",
      *     type="object",
      *     additionalProperties={
@@ -184,11 +184,11 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="List of the child attributes of fields with menu options",
+     *     description="List of the child attributes of fields with menu options.",
      *     title="Childern",
      *     type="object",
      *     additionalProperties={
-     *         ref="#/components/schemas/UserAttributeName"
+     *         "ref"="#/components/schemas/UserAttributeName"
      *     }
      * )
      *
