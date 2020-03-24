@@ -309,6 +309,141 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
     }
 
     /**
+     * Creates users and coupons
+     *
+     * @param int $order_id
+     */
+    public function createAndUpdateRelatedEntities($order_id) {
+        $objOrder = $this->find($order_id);
+        if (!$objOrder) {
+            // Order not found
+            return false;
+        }
+        $coupon_code = NULL;
+        $coupon_amount = 0;
+        $customerCouponRepo = $this->_em->getRepository(
+            'Cx\Modules\Shop\Model\Entity\RelCustomerCoupon'
+        );
+        $couponRepo = $this->_em->getRepository(
+            'Cx\Modules\Shop\Model\Entity\DiscountCoupon'
+        );
+        $objCustomerCoupon = $customerCouponRepo->findOneBy(
+            array('orderId' => $order_id)
+        );
+
+        if ($objCustomerCoupon) {
+            $coupon_code = $objCustomerCoupon->getCode();
+        }
+        $userData = array();
+        $arrItems = $objOrder->getOrderItems();
+        foreach ($arrItems as $item) {
+            $objProduct = $item->getProduct();
+            $product_id = $item->getProductId();
+            $quantity = $item->getQuantity();
+            $item_price = $item->getPrice();
+            if ($objOrder->getOptionArray()) {
+                foreach (
+                    $objOrder->getOptionArray() as $attribute_name => $arrAttribute
+                ) {
+                    foreach ($arrAttribute as $arrOption) {
+                        $item_price += $option_price;
+                    }
+                }
+            }
+            // Add an account for every single instance of every Product
+            for ($instance = 1; $instance <= $quantity; ++$instance) {
+                $validity = 0; // Default to unlimited validity
+                // In case there are protected downloads in the cart,
+                // collect the group IDs
+                $arrUsergroupId = array();
+                if ($objProduct->getDistribution() == 'download') {
+                    $usergroupIds = $objProduct->getUserGroupIds();
+                    if ($usergroupIds != '') {
+                        $arrUsergroupId = explode(',', $usergroupIds);
+                        $validity = $objProduct->getWeight();
+                    }
+                }
+                // create an account that belongs to all collected
+                // user groups, if any.
+                if (count($arrUsergroupId) > 0) {
+                    // The login names are created separately for
+                    // each product instance
+                    $username =
+                        self::usernamePrefix.
+                        "_${order_id}_${product_id}_${instance}";
+                    $userEmail =
+                        $username.'-'.$arrSubstitution['CUSTOMER_EMAIL'];
+                    $userpass = \User::make_password();
+                    $userData[$username] = $userpass;
+                    $objUser = new \User();
+                    $objUser->setUsername($username);
+                    $objUser->setPassword($userpass);
+                    $objUser->setEmail($userEmail);
+                    $objUser->setAdminStatus(false);
+                    $objUser->setActiveStatus(true);
+                    $objUser->setGroups($arrUsergroupId);
+                    $objUser->setValidityTimePeriod($validity);
+                    $objUser->setFrontendLanguage(FRONTEND_LANG_ID);
+                    $objUser->setBackendLanguage(FRONTEND_LANG_ID);
+                    $objUser->setProfile(array(
+                        'firstname' => array(
+                            0 => $arrSubstitution['CUSTOMER_FIRSTNAME']
+                        ),
+                        'lastname' => array(
+                            0 => $arrSubstitution['CUSTOMER_LASTNAME']
+                        ),
+                        'company' => array(
+                            0 => $arrSubstitution['CUSTOMER_COMPANY']
+                        ),
+                        'address' => array(
+                            0 => $arrSubstitution['CUSTOMER_ADDRESS']
+                        ),
+                        'zip' => array(
+                            0 => $arrSubstitution['CUSTOMER_ZIP']
+                        ),
+                        'city' => array(
+                            0 => $arrSubstitution['CUSTOMER_CITY']
+                        ),
+                        'country' => array(
+                            0 => $arrSubstitution['CUSTOMER_COUNTRY_ID']
+                        ),
+                        'phone_office' => array(
+                            0 => $arrSubstitution['CUSTOMER_PHONE']
+                        ),
+                        'phone_fax' => array(
+                            0 => $arrSubstitution['CUSTOMER_FAX']
+                        ),
+                    ));
+                    if (!$objUser->store()) {
+                        \Message::error(implode(
+                            '<br />', $objUser->getErrorMsg()));
+                        return false;
+                    }
+                }
+//echo("Instance $instance");
+                if ($objProduct->getDistribution() == 'coupon') {
+//DBG::log("Orders::getSubstitutionArray(): Getting code");
+                    $code =
+                        \Cx\Modules\Shop\Controller\DiscountCouponController::
+                            getNewCode();
+
+                    $newCoupon =
+                        new \Cx\Modules\Shop\Model\Entity\DiscountCoupon();
+                    $newCoupon->setCode($code);
+                    $newCoupon->setDiscountAmount($item_price);
+                    $newCoupon->setGlobal(true);
+                    $newCoupon->setUses(1e10);
+                    $newCoupon->setOrderItem($item);
+
+                    $this->_em->persist($newCoupon);
+                    $this->_em->flush();
+                }
+            }
+        }
+        return $userData;
+    }
+
+    /**
      * Returns the coupon reduction amount for an order
      * @param int $order_id ID of an order
      * @return double Reduction, 0 if no coupon is used
@@ -407,6 +542,9 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
         }
         if ($updateStock) {
             $this->updateStock($objOrder, false);
+        }
+        if ($create_accounts) {
+            $userData = $this->createAndUpdateRelatedEntities($order_id);
         }
 
         $currency = $objOrder->getCurrency();
@@ -614,105 +752,44 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
 //DBG::log("Orders::getSubstitutionArray($order_id, $create_accounts): Adding article: ".var_export($arrProduct, true));
             $orderItemCount += $quantity;
             $total_item_price += $item_price*$quantity;
-            if ($create_accounts) {
-                // Add an account for every single instance of every Product
-                for ($instance = 1; $instance <= $quantity; ++$instance) {
-                    $validity = 0; // Default to unlimited validity
-                    // In case there are protected downloads in the cart,
-                    // collect the group IDs
-                    $arrUsergroupId = array();
-                    if ($objProduct->distribution() == 'download') {
-                        $usergroupIds = $objProduct->usergroup_ids();
-                        if ($usergroupIds != '') {
-                            $arrUsergroupId = explode(',', $usergroupIds);
-                            $validity = $objProduct->weight();
-                        }
+            // Add an account for every single instance of every Product
+            for ($instance = 1; $instance <= $quantity; ++$instance) {
+                // In case there are protected downloads in the cart,
+                // collect the group IDs
+                $arrUsergroupId = array();
+                if ($objProduct->distribution() == 'download') {
+                    $usergroupIds = $objProduct->usergroup_ids();
+                    if ($usergroupIds != '') {
+                        $arrUsergroupId = explode(',', $usergroupIds);
                     }
-                    // create an account that belongs to all collected
-                    // user groups, if any.
-                    if (count($arrUsergroupId) > 0) {
-                        // The login names are created separately for
-                        // each product instance
-                        $username =
-                            self::usernamePrefix.
-                            "_${order_id}_${product_id}_${instance}";
-                        $userEmail =
-                            $username.'-'.$arrSubstitution['CUSTOMER_EMAIL'];
-                        $userpass = \User::make_password();
-                        $objUser = new \User();
-                        $objUser->setUsername($username);
-                        $objUser->setPassword($userpass);
-                        $objUser->setEmail($userEmail);
-                        $objUser->setAdminStatus(false);
-                        $objUser->setActiveStatus(true);
-                        $objUser->setGroups($arrUsergroupId);
-                        $objUser->setValidityTimePeriod($validity);
-                        $objUser->setFrontendLanguage(FRONTEND_LANG_ID);
-                        $objUser->setBackendLanguage(FRONTEND_LANG_ID);
-                        $objUser->setProfile(array(
-                            'firstname' => array(
-                                0 => $arrSubstitution['CUSTOMER_FIRSTNAME']
-                            ),
-                            'lastname' => array(
-                                0 => $arrSubstitution['CUSTOMER_LASTNAME']
-                            ),
-                            'company' => array(
-                                0 => $arrSubstitution['CUSTOMER_COMPANY']
-                            ),
-                            'address' => array(
-                                0 => $arrSubstitution['CUSTOMER_ADDRESS']
-                            ),
-                            'zip' => array(
-                                0 => $arrSubstitution['CUSTOMER_ZIP']
-                            ),
-                            'city' => array(
-                                0 => $arrSubstitution['CUSTOMER_CITY']
-                            ),
-                            'country' => array(
-                                0 => $arrSubstitution['CUSTOMER_COUNTRY_ID']
-                            ),
-                            'phone_office' => array(
-                                0 => $arrSubstitution['CUSTOMER_PHONE']
-                            ),
-                            'phone_fax' => array(
-                                0 => $arrSubstitution['CUSTOMER_FAX']
-                            ),
-                        ));
-                        if (!$objUser->store()) {
-                            \Message::error(implode(
-                                '<br />', $objUser->getErrorMsg()));
-                            return false;
-                        }
-                        if (empty($arrProduct['USER_DATA']))
-                            $arrProduct['USER_DATA'] = array();
-                        $arrProduct['USER_DATA'][] = array(
-                            'USER_NAME' => $username,
-                            'USER_PASS' => $userpass,
-                        );
+                }
+                // create an account that belongs to all collected
+                // user groups, if any.
+                if (count($arrUsergroupId) > 0) {
+                    $username =
+                        self::usernamePrefix.
+                        "_${order_id}_${product_id}_${instance}";
+                    $userpass = '******';
+                    if ($create_accounts && isset($userData[$username])) {
+                        $userpass = $userData[$username];
                     }
+                    if (empty($arrProduct['USER_DATA'])) {
+                        $arrProduct['USER_DATA'] = array();
+                    }
+                    $arrProduct['USER_DATA'][] = array(
+                        'USER_NAME' => $username,
+                        'USER_PASS' => $userpass,
+                    );
+                }
 //echo("Instance $instance");
-                    if ($objProduct->distribution() == 'coupon') {
-                        if (empty($arrProduct['COUPON_DATA']))
-                            $arrProduct['COUPON_DATA'] = array();
+                if ($objProduct->distribution() == 'coupon') {
+                    if (empty($arrProduct['COUPON_DATA']))
+                        $arrProduct['COUPON_DATA'] = array();
 //DBG::log("Orders::getSubstitutionArray(): Getting code");
-                        $code =
-                            \Cx\Modules\Shop\Controller\DiscountCouponController::
-                                getNewCode();
 
-                        $newCoupon =
-                            new \Cx\Modules\Shop\Model\Entity\DiscountCoupon();
-                        $newCoupon->setCode($code);
-                        $newCoupon->setDiscountAmount($item_price);
-                        $newCoupon->setGlobal(true);
-                        $newCoupon->setUses(1e10);
-
-                        $this->_em->persist($newCoupon);
-                        $this->_em->flush();
-
-                        $arrProduct['COUPON_DATA'][] = array(
-                            'COUPON_CODE' => $code
-                        );
-                    }
+                    $arrProduct['COUPON_DATA'][] = array(
+                        'COUPON_CODE' => $item->getDiscountCoupon()->getCode()
+                    );
                 }
             }
             if (empty($arrSubstitution['ORDER_ITEM']))
