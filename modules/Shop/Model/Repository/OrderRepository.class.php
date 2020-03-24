@@ -315,8 +315,7 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
      *
      * You only have to set the 'substitution' index value of your MailTemplate
      * array to the array returned.
-     * Customer data is not included here.
-     * See {@see Customer::getSubstitutionArray()}.
+     * Customer data is included here, see {@see Customer::getSubstitutionArray()}.
      * Note that this method is now mostly independent of the current session.
      * The language of the mail template is determined by the browser
      * language range stored with the order.
