@@ -346,6 +346,9 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
             // Order not found
             return false;
         }
+        if ($updateStock) {
+            $this->updateStock($objOrder, false);
+        }
 
         $currency = $objOrder->getCurrency();
 
@@ -482,11 +485,6 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
             $quantity = $item['quantity'];
 // TODO: Add individual VAT rates for Products
 //            $orderItemVatPercent = $objResultItem->fields['vat_percent'];
-            if ($updateStock) {
-                // Decrease the Product stock count,
-                // applies to "real", shipped goods only
-                $objProduct->decreaseStock($quantity);
-            }
             $product_code = $objProduct->code();
             // Pick the order items attributes
             $str_options = '';
