@@ -2027,7 +2027,7 @@ JS
                 SELECT SUM(1) as entryCount
                 FROM `".DBPREFIX."access_user_attribute` AS a
                 INNER JOIN `".DBPREFIX."access_user_attribute_value` AS v ON v.`attribute_id` = a.`id`
-                WHERE a.`type` = 'image' AND v.`value` != ''" . ($profilePics ? ' AND `a`.`id` = ' . $picId : '');
+                WHERE a.`type` = 'image' AND v.`value` != '' AND `a`.`id` ".($profilePics ? "= " : "!= ") . $picId;
 
             $objCount = $objDatabase->Execute($query);
             if ($objCount !== false) {
