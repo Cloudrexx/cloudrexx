@@ -2815,7 +2815,7 @@ class NewsletterManager extends NewsletterLib
 
         // 1. access users that have subscribed to one of the selected recipient-lists
         // select all access ids
-        $accessUserRecipientsQuery = 'SELECT `accessUserID` ' .
+        $accessUserRecipientsQuery = 'SELECT DISTINCT `accessUserID` ' .
             'FROM `%1$smodule_newsletter_access_user` AS `cnu` ' .
 
             // join with the selected e-mail campaign lists
@@ -2912,7 +2912,7 @@ class NewsletterManager extends NewsletterLib
 
         // 3. access users of one of the selected user groups
         $userGroupRecipientsQuery =
-            'SELECT `userGroup` ' .
+            'SELECT DISTINCT `userGroup` ' .
             'FROM `%1$smodule_newsletter_rel_usergroup_newsletter` AS `arn` ' .
 
             // filter by selected e-mail campaign
@@ -2992,7 +2992,7 @@ class NewsletterManager extends NewsletterLib
 
         // 4. crm contacts of one of the selected crm user groups
         if($crmMembershipFilter['associate']){
-            $crmMembershipQuery = 'UNION DISTINCT SELECT DISTINCT `crm`.`email` 
+            $crmMembershipQuery = 'SELECT DISTINCT `crm`.`email` 
                 FROM `' . DBPREFIX . 'module_crm_contacts` AS `contact` 
                 INNER JOIN `' . DBPREFIX . 'module_crm_customer_contact_emails` AS `crm` 
                     ON `crm`.`contact_id` = `contact`.`id` ' .
