@@ -2704,10 +2704,10 @@ class NewsletterManager extends NewsletterLib
      * @param string  $type             which type of participant (newsletter, access, core or crm)
      * @param boolean $distinctByType   if we should simulate a distinct
      * @param string  $query            query to get mail recipients
-     * @param string  $queryToCheckUser query to check if the first query got the correct users
+     * @param array   $usersToCheck     array with user ids to check if the first query got the correct users
      * @throws \Exception a database execution fails
      */
-    protected function addMailRecipientPart(&$mailRecipients, $type, $distinctByType, $query, $queryToCheckUser = '')
+    protected function addMailRecipientPart(&$mailRecipients, $type, $distinctByType, $query, $usersToCheck = array())
     {
         global $objDatabase;
 
@@ -2748,17 +2748,9 @@ class NewsletterManager extends NewsletterLib
         }
         while (!$objUser->EOF) {
             // Check if the received user is correct
-            if (!empty($queryToCheckUser)) {
-                $queryToCheckUser = sprintf(
-                    $queryToCheckUser,
-                    DBPREFIX, $objUser->getId()
-                );
-                $objResultCheck = $objDatabase->Execute($queryToCheckUser);
-                if ($objResultCheck === false || $objResultCheck->RecordCount() == 0) {
-                    $objUser->next();
-                }
+            if (!empty($usersToCheck) && !in_array($objUser->getId(), $usersToCheck)) {
+                $objUser->next();
             }
-
             $this->simulateDistinct($distinctByType, $objUser->getEmail(), $type, $mailRecipients);
             $objUser->next();
         }
@@ -2797,6 +2789,7 @@ class NewsletterManager extends NewsletterLib
      *          method as they are almost identical except for different table aliases that have to be used.
      */
     protected function getMailRecipients($mailId, $distinctByType = true) {
+        global $objDatabase;
 
         // fetch CRM membership filter
         $crmMembershipFilter = $this->emailEditGetCrmMembershipFilter($mailId);
@@ -2950,8 +2943,7 @@ class NewsletterManager extends NewsletterLib
                     // join the CRM Memberships of the CRM Company
                     'LEFT JOIN `%1$smodule_crm_customer_membership` AS `acrm_company_membership_include`
                         ON `acrm_company_membership_include`.`contact_id` = `acrm_company`.`id` ').
-                'WHERE `acrm_contact`.`user_account` = %2$s 
-                    AND `acrm_contact`.`contact_type` = 2' .
+                'WHERE `acrm_contact`.`contact_type` = 2 ' .
                 // only select users of which the associated CRM Person or CRM Company has the selected CRM membership
                 (!$crmMembershipFilter['include'] ? '' :
                     'AND (
@@ -2977,6 +2969,18 @@ class NewsletterManager extends NewsletterLib
                 );
         }
 
+        $crmUsers = array();
+        if (!empty($crmQuery)) {
+            $crmResult = $objDatabase->Execute(sprintf(
+                $crmQuery,
+                DBPREFIX
+            ));
+            while ($crmResult && !$crmResult->EOF) {
+                $crmUsers[] = $crmResult->fields['user_account'];
+                $crmResult->MoveNext();
+            }
+        }
+
         $userGroupRecipientsQuery = sprintf(
             $userGroupRecipientsQuery,
             DBPREFIX, $mailId
@@ -2987,7 +2991,7 @@ class NewsletterManager extends NewsletterLib
             static::USER_TYPE_CORE,
             $distinctByType,
             $userGroupRecipientsQuery,
-            $crmQuery
+            $crmUsers
         );
 
         // 4. crm contacts of one of the selected crm user groups
