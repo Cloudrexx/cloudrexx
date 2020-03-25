@@ -3135,7 +3135,11 @@ class NewsletterManager extends NewsletterLib
                                     array('email' => $send['email'])
                                 );
                                 if (!$accessUser) {
-                                    continue;
+                                    $query = "UPDATE ".DBPREFIX."module_newsletter_tmp_sending SET sendt=2 where email='"
+                                            .$send['email']."' AND newsletter=".$mailId." AND sendt=0";
+                                    if ($objDatabase->Execute($query) === false || $objDatabase->Affected_Rows() == 0) {
+                                        continue;
+                                    }
                                 }
                                 $id = $accessUser->getId();
                             }
