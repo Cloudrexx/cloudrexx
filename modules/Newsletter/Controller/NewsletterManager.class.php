@@ -3238,13 +3238,13 @@ class NewsletterManager extends NewsletterLib
 
          LEFT JOIN `".DBPREFIX."module_newsletter_user` AS `nu`
                 ON `nu`.`email` = `s`.`email`
-               AND `s`.`type` = '".self::USER_TYPE_NEWSLETTER."'
+               AND `s`.`type` = '".self::USER_TYPE_NEWSLETTER."' AND `nu`.`email` IS NOT NULL
 
         LEFT JOIN `".DBPREFIX."module_crm_customer_contact_emails` AS `crm`
                 ON `crm`.`email` = `s`.`email`
-               AND `s`.`type` = '".self::USER_TYPE_CRM." AND `nu`.`email` IS NOT NULL'
+               AND `s`.`type` = '".self::USER_TYPE_CRM."' AND `crm`.`email` IS NOT NULL 
          LEFT JOIN `".DBPREFIX."module_crm_contacts` AS `contact`
-                ON `crm`.`contact_id` = `contact`.`id` AND `crm`.`email` IS NOT NULL".
+                ON `crm`.`contact_id` = `contact`.`id`".
          (
             $crmMembershipFilter['associate']
                 ? $this->getCrmMembershipConditions($crmMembershipFilter, true) . ' AND '
