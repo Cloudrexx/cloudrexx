@@ -357,10 +357,11 @@ class AccessLib
             $cx    = \Cx\Core\Core\Controller\Cx::instanciate();
             $image = $objUser->getProfileAttribute($objAttribute->getId(), $historyId);
             $defaultTitle = $objUser->objAttribute->getDefaultAttributeIdByAttributeId($attributeId);
-            $imageRepoWeb  = $defaultTitle == 'picture'
+            $isProfile = $defaultTitle == 'picture';
+            $imageRepoWeb  = $isProfile
                                 ? $cx->getWebsiteImagesAccessProfileWebPath()
                                 : $cx->getWebsiteImagesAccessPhotoWebPath();
-            $imageRepoPath = $defaultTitle == 'picture'
+            $imageRepoPath = $isProfile
                                 ? $cx->getWebsiteImagesAccessProfilePath()
                                 : $cx->getWebsiteImagesAccessPhotoPath();
 
