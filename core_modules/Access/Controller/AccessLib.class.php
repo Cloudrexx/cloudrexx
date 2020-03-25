@@ -1800,19 +1800,24 @@ JS
                         continue;
                     }
                     $fileSize = filesize($path);
-                    if (!$this->isImageWithinAllowedSize($fileSize, $attribute == 'picture')) {
-                        $objAttribute = $objUser->objAttribute->getById($attribute);
+                    $isProfile = false;
+                    $objAttribute = $objUser->objAttribute->getById($attribute);
+                    if ($objAttribute->getDefaultAttributeIdByAttributeId($attribute) == 'picture') {
+                        $isProfile = true;
+                    }
+
+                    if (!$this->isImageWithinAllowedSize($fileSize, $isProfile)) {
                         $arrErrorMsg[] = sprintf($_CORELANG['TXT_ACCESS_PIC_TOO_BIG'], htmlentities($objAttribute->getName(), ENT_QUOTES, CONTREXX_CHARSET));
                         continue;
                     }
 
                     // resize image and put it into place (ASCMS_ACCESS_PHOTO_IMG_PATH / ASCMS_ACCESS_PROFILE_IMG_PATH)
-                    if (($imageName = $this->moveUploadedImageInToPlace($objUser, $path, $fileName, $attribute == 'picture')) === false) {
+                    if (($imageName = $this->moveUploadedImageInToPlace($objUser, $path, $fileName, $isProfile)) === false) {
                         continue;
                     }
 
                     // create thumbnail
-                    if ($this->createThumbnailOfImage($imageName, $attribute == 'picture') !== false) {
+                    if ($this->createThumbnailOfImage($imageName, $isProfile) !== false) {
                         if ($historyId === 'new') {
                             $arrProfile[$attribute][$historyId][$arrImage['history_index']] = $imageName;
                         } else {
