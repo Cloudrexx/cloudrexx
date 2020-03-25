@@ -1075,9 +1075,6 @@ class User_Profile_Attribute
         $objDatabase = \Cx\Core\Core\Controller\Cx::instanciate()->getDb()->getAdoDb();
         $tableName = 'access_user_attribute';
         $where = $this->id;
-        if ($this->isDefaultAttribute($this->id)) {
-            $where = '(SELECT `attribute_id` FROM `contrexx_access_user_attribute_name` WHERE `name` = "'. $this->id .'")';
-        }
 
         if (!$protected) {
             // remove protection
