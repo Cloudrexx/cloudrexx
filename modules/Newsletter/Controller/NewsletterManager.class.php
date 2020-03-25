@@ -2881,7 +2881,7 @@ class NewsletterManager extends NewsletterLib
         // 2. newsletter recipients of one of the selected recipient-lists
         if (!$crmMembershipFilter['include']) {
             $nativeRecipientsQuery = '
-                        SELECT `email`
+                        SELECT DISTINCT `email`
                           FROM `%1$smodule_newsletter_user` AS `nu`
                     INNER JOIN `%1$smodule_newsletter_rel_user_cat` AS `rc`
                             ON `rc`.`user`=`nu`.`id`
