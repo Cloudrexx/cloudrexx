@@ -1133,4 +1133,44 @@ class PageRepository extends EntityRepository {
         }
         return $subPages;
     }
+
+    /**
+     * Select all protected pages, if pages were found return true
+     *
+     * @param string $string The keyword to search by
+     * @return bool if protected downloads exist
+     */
+    public function hasProtectedPages($string, $license, $rootPage = null)
+    {
+        $qb = $this->em->createQueryBuilder();
+        $qb->add('select', 'p')
+            ->add('from', 'Cx\Core\ContentManager\Model\Entity\Page p')
+            ->add('where',
+                $qb->expr()->andx(
+                    $qb->expr()->eq('p.lang', FRONTEND_LANG_ID),
+                    $qb->expr()->orx(
+                        $qb->expr()->like('p.content', ':searchString'),
+                        $qb->expr()->like('p.content', ':searchStringEscaped'),
+                        $qb->expr()->like('p.title', ':searchString')
+                    ),
+                    $qb->expr()->orX(
+                        'p.module = \'\'',
+                        'p.module IS NULL',
+                        $qb->expr()->in('p.module', $license->getLegalFrontendComponentsList())
+                    ),
+                    $qb->expr()->not(
+                        $qb->expr()->eq('p.frontendAccessId', ':frontendAccessId')
+                    )
+                )
+            )
+            ->setParameter('searchString', '%'.$string.'%')
+            ->setParameter('searchStringEscaped', '%'.contrexx_raw2xhtml($string).'%')
+            ->setParameter('frontendAccessId', 0);
+        $pages = $qb->getQuery()->getResult();
+
+        if ($pages) {
+            return true;
+        }
+        return false;
+    }
 }

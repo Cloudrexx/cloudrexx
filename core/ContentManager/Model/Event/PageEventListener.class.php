@@ -262,5 +262,11 @@ class PageEventListener implements \Cx\Core\Event\Model\Entity\EventListener {
             )
         );
         $search->appendResult($result);
+        $search->setHasProtectedResult(
+            $pageRepo->hasProtectedPages(
+                $search->getTerm(),
+                \Env::get('cx')->getLicense()
+            )
+        );
     }
 }
