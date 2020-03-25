@@ -411,7 +411,7 @@ class NewsletterLib
         $data = $objDatabase->Execute($query);
         $objUser = \FWUser::getFWUserObject()->objUser;
         $userIds = array();
-        while (!$data || !$data->EOF) {
+        while ($data && !$data->EOF) {
             // Check if the access user exists
             $userIds[] = $data->fields['accessUserID'];
             $data->MoveNext();
