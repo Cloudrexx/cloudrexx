@@ -82,11 +82,12 @@ form.cx-ui > fieldset > legend {
 }
 
 form.cx-ui > fieldset .group {
-    float: none;
+    float: left;
     display: block;
     padding: 3px;
     border-bottom: #e5e5e5 1px solid;
     margin: 0;
+    width: 100%;
 }
 
 form.cx-ui > fieldset .group > label {
@@ -247,6 +248,7 @@ ul.vg-alphabeticalSearch li a:after {
 }
 
 table.adminlist .vg-function-status {
+    cursor: pointer;
     background-image: url(/core/Html/View/Media/StatusInactive.gif);
     width: 10px;
     height: 10px;
@@ -259,5 +261,6 @@ table.adminlist .vg-function-status.active {
 }
 
 table.adminlist .vg-function-status.loading {
+    cursor: wait;
     background-image: url(/core/Html/View/Media/Load.gif);
 }

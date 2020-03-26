@@ -453,7 +453,14 @@ class ContactManager extends \Cx\Core_Modules\Contact\Controller\ContactLib
                     if ($colNr == $maxFields) {
                         break;
                     }
-                    $this->_objTpl->setVariable('CONTACT_COL_NAME', contrexx_raw2xhtml($arrFormFields[$col]['lang'][$selectedInterfaceLanguage]['name']));
+
+                    $colName = 'N/A';
+                    if (isset($arrFormFields[$col]['lang'][$selectedInterfaceLanguage]['name'])) {
+                        $colName = $arrFormFields[$col]['lang'][$selectedInterfaceLanguage]['name'];
+                    } elseif (!empty($arrFormFields[$col]['lang'])) {
+                        $colName = current($arrFormFields[$col]['lang'])['name'];
+                    }
+                    $this->_objTpl->setVariable('CONTACT_COL_NAME', contrexx_raw2xhtml($colName));
                     $this->_objTpl->parse('contact_col_names');
                     $colNr++;
                 }
@@ -493,7 +500,10 @@ class ContactManager extends \Cx\Core_Modules\Contact\Controller\ContactLib
                         }
 
                         if (isset($arrEntry['data'][$col])) {
-                            if (isset($arrFormFields[$col]) && in_array($arrFormFields[$col]['type'], array('file', 'multi_file'))) {
+                            if (
+                                isset($arrFormFields[$col]) &&
+                                in_array($arrFormFields[$col]['type'], array('file', 'multi_file'))
+                            ) {
                                 $fileData = $arrEntry['data'][$col];
                                 if ($fileData) {
                                     //show attach icon
@@ -506,10 +516,16 @@ class ContactManager extends \Cx\Core_Modules\Contact\Controller\ContactLib
                                         $value .= '<a href="'.\Env::get('cx')->getWebsiteOffsetPath().$file.'" style="white-space:nowrap;" target="_blank" onclick="return confirm(\''.str_replace("\n", '\n', $_ARRAYLANG['TXT_CONTACT_CONFIRM_OPEN_UPLOADED_FILE']).'\')">'.$img.basename($file).'</a><br />';
                                     }
                                 }
-                            } elseif (isset($arrFormFields[$col]) && $arrFormFields[$col]['type'] == 'recipient') {
+                            } elseif (
+                                isset($arrFormFields[$col]) &&
+                                $arrFormFields[$col]['type'] == 'recipient'
+                            ) {
                                 $recipient = $this->getRecipients($formId, false);
                                 $value = htmlentities($recipient[$arrEntry['data'][$col]]['lang'][$langId], ENT_QUOTES, CONTREXX_CHARSET);
-                            } elseif ($arrFormFields[$col]['type'] == 'checkbox') {
+                            } elseif (
+                                isset($arrFormFields[$col]) &&
+                                $arrFormFields[$col]['type'] == 'checkbox'
+                            ) {
                                 $value = $_ARRAYLANG['TXT_CONTACT_YES'];
                             } else {
                                 $value = htmlentities($arrEntry['data'][$col], ENT_QUOTES, CONTREXX_CHARSET);
@@ -524,7 +540,11 @@ class ContactManager extends \Cx\Core_Modules\Contact\Controller\ContactLib
                         /*
                          * Sets value if checkbox is not selected
                          */
-                        if ($arrFormFields[$col]['type'] == 'checkbox' && empty($arrEntry['data'][$col])) {
+                        if (
+                            isset($arrFormFields[$col]) &&
+                            $arrFormFields[$col]['type'] == 'checkbox' &&
+                            empty($arrEntry['data'][$col])
+                        ) {
                             $value = $_ARRAYLANG['TXT_CONTACT_NO'];
                         }
 
@@ -1090,15 +1110,18 @@ class ContactManager extends \Cx\Core_Modules\Contact\Controller\ContactLib
             'TXT_CONTACT_ADD_RECIPIENT'                     => $_ARRAYLANG['TXT_CONTACT_ADD_RECIPIENT'],
             'TXT_CONTACT_FORM_VALUES'                       => $_ARRAYLANG['TXT_CONTACT_FORM_VALUES'],
             'TXT_FORM_FIELDS'                               => $_ARRAYLANG['TXT_FORM_FIELDS'],
-            'TXT_FORM_RECIPIENTS'                           => $_ARRAYLANG['TXT_FORM_RECIPIENTS'],
             'TXT_ADVANCED_SETTINGS'                         => $_ARRAYLANG['TXT_ADVANCED_SETTINGS'],
             'TXT_CONTACT_FORM_NOTIFICATION'                 => $_ARRAYLANG['TXT_CONTACT_FORM_NOTIFICATION'],
             'TXT_CONTACT_ID'                                => $_ARRAYLANG['TXT_CONTACT_ID'],
             'TXT_CONTACT_NAME'                              => $_ARRAYLANG['TXT_CONTACT_NAME'],
             'TXT_CONTACT_RECEIVER_ADDRESSES'                => $_ARRAYLANG['TXT_CONTACT_RECEIVER_ADDRESSES'],
             'TXT_CONTACT_RECEIVER_ADDRESSES_SELECTION'      => $_ARRAYLANG['TXT_CONTACT_RECEIVER_ADDRESSES_SELECTION'],
+            'TXT_CONTACT_RECIPIENT_LIST_SELECTED_INFO'      => sprintf(
+                $_ARRAYLANG['TXT_CONTACT_RECIPIENT_LIST_SELECTED_INFO'],
+                $_ARRAYLANG['TXT_CONTACT_RECEIVER_ADDRESSES_SELECTION'],
+                $_ARRAYLANG['TXT_CONTACT_RECEIVER_ADDRESSES']
+            ),
             'TXT_CONTACT_SAVE'                              => $_ARRAYLANG['TXT_CONTACT_SAVE'],
-            'TXT_CONTACT_SEPARATE_MULTIPLE_VALUES_BY_COMMA' => $_ARRAYLANG['TXT_CONTACT_SEPARATE_MULTIPLE_VALUES_BY_COMMA'],
             'TXT_CONTACT_SEND_ATTACHMENT_DESCRIPTION'       => $_ARRAYLANG['TXT_CONTACT_SEND_ATTACHMENT_DESCRIPTION'],
             'TXT_CONTACT_FORM_DESC'                         => $_ARRAYLANG['TXT_CONTACT_FORM_DESC'],
             'TXT_CONTACT_FEEDBACK'                          => $_ARRAYLANG['TXT_CONTACT_FEEDBACK'],
@@ -1146,6 +1169,10 @@ class ContactManager extends \Cx\Core_Modules\Contact\Controller\ContactLib
             'TXT_CONTACT_ASSIGN_TO_CRM_CUSTOMER_GROUP'      => $_ARRAYLANG['TXT_CONTACT_ASSIGN_TO_CRM_CUSTOMER_GROUP'],
             'TXT_CONTACT_ASSIGN_CRM_CUSTOMER_GROUP_DESCRIPTION'  => $_ARRAYLANG['TXT_CONTACT_ASSIGN_CRM_CUSTOMER_GROUP_DESCRIPTION']
 
+        ));
+
+        $this->_objTpl->setGlobalVariable(array(
+            'TXT_CONTACT_SEPARATE_MULTIPLE_VALUES_BY_COMMA' => $_ARRAYLANG['TXT_CONTACT_SEPARATE_MULTIPLE_VALUES_BY_COMMA'],
         ));
 
         if (empty($recipients)) {
@@ -1858,7 +1885,7 @@ class ContactManager extends \Cx\Core_Modules\Contact\Controller\ContactLib
             if (isset($arrFormFields[$fieldId])) {
                 //fieldset and horizontal field type need not be displayed in the detail page
                 if (!in_array($arrFormFields[$fieldId]['type'], $this->nonValueFormFieldTypes)) {
-                    $label = strip_tags($arrFormFields[$fieldId]['lang'][FRONTEND_LANG_ID]['name']).($arrFormFields[$fieldId]['type'] == 'hidden' ? ' (hidden)' : '');
+                    $label = contrexx_raw2xhtml($arrFormFields[$fieldId]['lang'][FRONTEND_LANG_ID]['name']).($arrFormFields[$fieldId]['type'] == 'hidden' ? ' (hidden)' : '');
 
                     switch ($arrFormFields[$fieldId]['type']) {
                         case 'checkbox':
