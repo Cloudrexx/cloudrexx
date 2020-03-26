@@ -49,7 +49,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     public function getControllerClasses() {
 // Return an empty array here to let the component handler know that there
 // does not exist a backend, nor a frontend controller of this component.
-        return array('JsonJobs', 'EsiWidget');
+        return array('Backend', 'JsonJobs', 'EsiWidget');
     }
 
     /**
@@ -95,15 +95,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 break;
 
             case \Cx\Core\Core\Controller\Cx::MODE_BACKEND:
-
-                $this->cx->getTemplate()->addBlockfile('CONTENT_OUTPUT', 'content_master', 'LegacyContentMaster.html');
-                $objTemplate = $this->cx->getTemplate();
-
-                \Permission::checkAccess(148, 'static');
-
-                $subMenuTitle = $_CORELANG['TXT_JOBS_MANAGER'];
-                $objJobsManager = new JobsManager();
-                $objJobsManager->getJobsPage();
+                parent::load($page);
                 break;
 
             default:

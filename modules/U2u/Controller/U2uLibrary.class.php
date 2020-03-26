@@ -183,7 +183,7 @@ class U2uLibrary {
           $arrMessage[$messageID] = array();
           $arrMessage[$messageID]["message"]        =   $objResult->fields['message_text'];
           $arrMessage[$messageID]["message_title"]  =   $objResult->fields['message_title'];
-          $arrMessage[$messageID]["username"]       =   $userName['username'];
+          $arrMessage[$messageID]["username"]       =   $userName ? $userName['username'] : 'N/A';
           $arrMessage[$messageID]["date_time"]      =   $objResult->fields['date_time'];
           $objResult->MoveNext();
         }
@@ -339,7 +339,7 @@ class U2uLibrary {
             $userName = $this->_getName($objResult->fields['userid']);
             $arrShowMessage["message"]           =   $objResult->fields['message_text'];
             $arrShowMessage["message_title"]     =   $objResult->fields['message_title'];
-            $arrShowMessage["username"]          =   $userName['username'];
+            $arrShowMessage["username"]          =   $userName ? $userName['username'] : 'N/A';
             $arrShowMessage["registerd_date"]    =  date('Y-m-d',$objResult->fields['regdate']);
             $arrShowMessage["date_time"]         =   $objResult->fields['date_time'];
             $objResult->MoveNext();
@@ -485,6 +485,9 @@ class U2uLibrary {
     function _getName($id) {
         $id = intval($id);
         $objUser = \FWUser::getFWUserObject()->objUser->getUser($id);
+        if (!$objUser) {
+            return false;
+        }
         return array('username' => $objUser->getUsername());
     }
 

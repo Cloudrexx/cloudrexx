@@ -120,6 +120,9 @@ class CacheManager extends \Cx\Core_Modules\Cache\Controller\CacheLib
             'TXT_EMPTY_DESC_XCACHE' => $_ARRAYLANG['TXT_CACHE_EMPTY_DESC_FILES_AND_ENRIES'],
             'TXT_STATS_FILES' => $_ARRAYLANG['TXT_CACHE_STATS_FILES'],
             'TXT_STATS_FOLDERSIZE' => $_ARRAYLANG['TXT_CACHE_STATS_FOLDERSIZE'],
+            'CACHE_EXPERIMENTAL' => \Cx\Core\Core\Controller\Cx::instanciate()->getComponent(
+                'View'
+            )->flagExperimental(),
         ));
         $this->objTpl->setVariable($_ARRAYLANG);
 

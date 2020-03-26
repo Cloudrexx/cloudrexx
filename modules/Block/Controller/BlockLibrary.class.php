@@ -677,6 +677,31 @@ class BlockLibrary
     {
         $now = time();
 
+        $activeFilter = '
+            AND (
+                tblBlock.`start` <= ' . $now . '
+                OR tblBlock.`start` = 0
+            )
+            AND (
+                tblBlock.`end` >= ' . $now . '
+                OR tblBlock.end = 0
+            )
+            AND
+                tblBlock.active = 1
+        ';
+        // Note: This is a workaround as content panes are no real widgets yet.
+        //
+        // In case the frontend editing is not in use
+        // then we can always load the content pane.
+        // The JsonData adapter will then decide if the content pane is active or not.
+        // The check for frontend editing is required, as otherwise the frontend editing
+        // would inject an empty DIV element in  case the content pane is inactive.
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        if (!$cx->getComponent('FrontendEditing')->frontendEditingIsActive(false, false)) {
+            $activeFilter = '';
+        }
+        // End of workaround
+
         $this->replaceBlocks(
             $this->blockNamePrefix . $id,
             '
@@ -703,18 +728,7 @@ class BlockLibrary
                     AND (
                         tblContent.lang_id = ' . FRONTEND_LANG_ID . '
                         AND tblContent.active = 1
-                    )
-                    AND (
-                        tblBlock.`start` <= ' . $now . '
-                        OR tblBlock.`start` = 0
-                    )
-                    AND (
-                        tblBlock.`end` >= ' . $now . '
-                        OR tblBlock.end = 0
-                    )
-                    AND
-                        tblBlock.active = 1
-            ',
+                    )' . $activeFilter,
             $pageId,
             $code
         );
@@ -738,6 +752,31 @@ class BlockLibrary
         $separator = $category['seperator'];
 
         $now = time();
+
+        $activeFilter = '
+            AND tblBlock.`active` = 1
+            AND (tblBlock.`start` <= ' . $now . ' OR tblBlock.`start` = 0)
+            AND (tblBlock.`end` >= ' . $now . ' OR tblBlock.`end` = 0)
+        ';
+        // Note: This is a workaround as content panes are no real widgets yet.
+        //
+        // In case the frontend editing is not in use and there
+        // is no content pane separator for the category defined,
+        // then we can load all content panes into the template at once.
+        // The JsonData adapter will then decide which content panes to display and
+        // which not.
+        // The check for frontend editing is required, as otherwise the frontend editing
+        // would inject empty DIV elements for non-active content panes.
+        // The check for the content pane separator is required, as otherwise
+        // the system would output the separator for each non-active content pane.
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        if (
+            !$cx->getComponent('FrontendEditing')->frontendEditingIsActive(false, false) &&
+            $separator == ''
+        ) {
+            $activeFilter = '';
+        }
+        // End of workaround
 
         $this->replaceBlocks(
             $this->blockNamePrefix . 'CAT_' . $id,
@@ -764,9 +803,7 @@ class BlockLibrary
                                 AND tblRel.`block_id` = tblBlock.`id`
                                 AND tblRel.`placeholder` = "category") > 0
                         )
-                    AND tblBlock.`active` = 1
-                    AND (tblBlock.`start` <= ' . $now . ' OR tblBlock.`start` = 0)
-                    AND (tblBlock.`end` >= ' . $now . ' OR tblBlock.`end` = 0)
+                    ' . $activeFilter . '
                     AND (tblContent.lang_id = ' . FRONTEND_LANG_ID . ' AND tblContent.active = 1)
                 ORDER BY
                     tblBlock.`order`
@@ -811,6 +848,37 @@ class BlockLibrary
         }
 
         $now = time();
+
+        $activeFilter = '
+            AND tblBlock.active = 1
+            AND (
+                tblBlock.`start` <= ' . $now . '
+                OR tblBlock.`start` = 0
+            )
+            AND (
+                tblBlock.`end` >= ' . $now . '
+                OR tblBlock.end = 0
+            )
+        ';
+        // Note: This is a workaround as content panes are no real widgets yet.
+        //
+        // In case the frontend editing is not in use and there
+        // is no content pane separator for the global content pane defined,
+        // then we can load all content panes into the template at once.
+        // The JsonData adapter will then decide which content panes to display and
+        // which not.
+        // The check for frontend editing is required, as otherwise the frontend editing
+        // would inject empty DIV elements for non-active content panes.
+        // The check for the content pane separator is required, as otherwise
+        // the system would output the separator for each non-active content pane.
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        if (
+            !$cx->getComponent('FrontendEditing')->frontendEditingIsActive(false, false) &&
+            $separator == ''
+        ) {
+            $activeFilter = '';
+        }
+        // End of workaround
         
         $this->replaceBlocks(
             $this->blockNamePrefix . 'GLOBAL',
@@ -834,16 +902,8 @@ class BlockLibrary
                     AND tblPage.page_id = ' . intval($pageId) . '
                     AND tblContent.`lang_id` = ' . FRONTEND_LANG_ID . '
                     AND tblContent.`active` = 1
-                    AND tblBlock.active = 1
                     AND tblPage.placeholder = "global"
-                    AND (
-                        tblBlock.`start` <= ' . $now . '
-                        OR tblBlock.`start` = 0
-                    )
-                    AND (
-                        tblBlock.`end` >= ' . $now . '
-                        OR tblBlock.end = 0
-                    )
+                    ' . $activeFilter . '
                 UNION DISTINCT
                     SELECT
                         tblBlock.`id` AS `id`,
@@ -859,15 +919,7 @@ class BlockLibrary
                         tblBlock.`global` = 1
                         AND tblContent.`lang_id` = ' . FRONTEND_LANG_ID . '
                         AND tblContent.`active` = 1
-                        AND tblBlock.active=1
-                        AND (
-                            tblBlock.`start` <= ' . $now . '
-                            OR tblBlock.`start` = 0
-                        )
-                        AND (
-                            tblBlock.`end` >= ' . $now . '
-                            OR tblBlock.end = 0
-                        )
+                        ' . $activeFilter . '
                 ORDER BY
                     `order`
             ',
@@ -892,6 +944,11 @@ class BlockLibrary
     {
         global $objDatabase;
 
+        // Note: known issue:
+        // as content panes are not real widgets, the random block does not properly
+        // take into account if a content page is active or not
+        // Unfortunately, this issue can't be fixed with the current implementation
+        // This issue will be fixed once the content panes have been migrated to widgets
         $now = time();
         $query = "  SELECT
                         tblBlock.id
@@ -953,6 +1010,8 @@ class BlockLibrary
         $objResult = $objDatabase->Execute($query);
         $blockIds = array();
         if ($objResult === false || $objResult->RecordCount() <= 0) {
+            // drop empty placeholders
+            $code = str_replace('{' . $placeholderName . '}', '', $code);
             return;
         }
         while(!$objResult->EOF) {
