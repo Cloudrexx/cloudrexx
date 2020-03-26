@@ -66,7 +66,9 @@ class Uploader extends EntityBase
     /**
      * @var Array
      */
-    protected $options = array();
+    protected $options = array(
+        'pl-Max-File-Size' => '',
+    );
 
     /**
      * @var Cx
@@ -90,7 +92,8 @@ class Uploader extends EntityBase
             'data-pl-upload',
             'data-uploader-id' => $this->id,
             'class' => 'uploader-button button',
-            'uploader-type' => self::UPLOADER_TYPE_MODAL
+            'uploader-type' => self::UPLOADER_TYPE_MODAL,
+            'pl-Max-File-Size' => '',
         );
     }
 

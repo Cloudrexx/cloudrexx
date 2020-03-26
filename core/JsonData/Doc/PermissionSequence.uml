@@ -1,0 +1,10 @@
+@startuml
+JsonData -> Permission1: hasAccess
+Permission1 -> Callback: execute
+Callback -> JsonData2: execute
+JsonData2 -> Permission2: hasAccess
+JsonData2 <-- Permission2: false
+Callback <-- JsonData2: Session expired
+Permission1 <-- Callback: Throw exception
+JsonData <-- Permission1: false
+@enduml

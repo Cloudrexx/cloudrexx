@@ -249,7 +249,21 @@ class ClassLoader {
         }
         $parts = explode('\\', $name);
         // new classes should be in namespace \Cx\something
-        if (!in_array(current($parts), array('Cx', 'Doctrine', 'Gedmo', 'DoctrineExtension', 'Symfony')) || count($parts) < 2) {
+        // TODO: Use Composer's class autoloading for libraries
+        if (
+            !in_array(
+                current($parts),
+                array(
+                    'Cx',
+                    'Doctrine',
+                    'Gedmo',
+                    'DoctrineExtension', // /model/extensions
+                    'DoctrineExtensions', // /lib/doctrine/beberlei/doctrineextensions/src
+                    'Symfony',
+                )
+            ) ||
+            count($parts) < 2
+        ) {
             return false;
         }
         if (substr($name, 0, 8) == 'PHPUnit_') {
@@ -285,6 +299,19 @@ class ClassLoader {
             $suffix = '';
             $parts = array_merge(array('Cx', 'Lib', 'doctrine'), $parts);
             //$parts = array_merge(array('Cx', 'Model', 'entities'), $parts);
+        } else if ($parts[0] == 'DoctrineExtensions') {
+            $suffix = '';
+            $parts = array_merge(
+                array(
+                    'Cx',
+                    'Lib',
+                    'doctrine',
+                    'beberlei',
+                    strtolower(array_shift($parts)),
+                    'src'
+                ),
+                $parts
+            );
         } else if ($parts[0] == 'Doctrine') {
             $suffix = '';
             if ($parts[1] == 'ORM') {
@@ -345,8 +372,33 @@ class ClassLoader {
      *                  could not be located.
      */
     public function loadFile($path, $name = '') {
+        // Try to identify recursive autoloading.
+        // If $resolveCount is greater than 1, then the autoloader has been
+        // re-called while already performing an other autoload call.
+        // Such case indicates that the system got into an infinite recursive
+        // autoload loop. To prevent a memory overflow, we must abort the
+        // execution in such a case.
+        // Note: as the threshold is just 1, one might consider of just using
+        // a boolean instead. The latter might just be alright at this point
+        // in time. However, as we are not yet sure if there might actually
+        // be a legitimate case where a greater count of 1 is valid, we shell
+        // keep this variable as an integer as of for now.
+        static $resolveCount = 0;
+        if ($resolveCount > 1) {
+            throw new \Exception('ClassLoader: Recursive loading aborted');
+        }
+
+        // before trying to resolve the path, we do increase the resolveCount
+        $resolveCount++;
 
         $path = $this->getFilePath($path);
+
+        // If this point is reached, then the resolving has been completed
+        // without calling a recursive call. Therefore, we can reduce the
+        // resolveCount by one again.
+        $resolveCount--;
+
+        // abort in case the path does not exist
         if (!$path) {
             return false;
         }

@@ -975,7 +975,7 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
                        `parent_id`= $parentId
                  WHERE `id`=$this->id");
         }
-        $objDatabase->beginTrans();
+        $objDatabase->startTrans();
         $result = $objDatabase->Execute('
             INSERT INTO
                 `' . DBPREFIX . 'access_user_attribute`
@@ -994,7 +994,8 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
             )
         ');
         if (!$result) {
-            $objDatabase->rollbackTrans();
+            $objDatabase->failTrans();
+            $objDatabase->completeTrans();
             return false;
         }
         $this->id = $objDatabase->Insert_ID();
@@ -1016,10 +1017,11 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
                 `' . DBPREFIX . 'access_users`
         ');
         if (!$result) {
-            $objDatabase->rollbackTrans();
+            $objDatabase->failTrans();
+            $objDatabase->completeTrans();
             return false;
         }
-        $objDatabase->commitTrans();
+        $objDatabase->completeTrans();
         return true;
     }
 

@@ -146,7 +146,7 @@ class SearchManager
                 foreach ($pages as $page) {
                     // used for alias pages, because they have no language
                     if ($page->getLang() == "") {
-                        $languages = "";
+                        $languages = array();
                         foreach (\FWLanguage::getIdArray('frontend') as $langId) {
                             $languages[] = \FWLanguage::getLanguageCodeById($langId);
                         }

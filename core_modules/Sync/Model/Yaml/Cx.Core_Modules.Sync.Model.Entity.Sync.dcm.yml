@@ -34,7 +34,6 @@ Cx\Core_Modules\Sync\Model\Entity\Sync:
   manyToOne: # owning side
     dataAccess:
       targetEntity: Cx\Core_Modules\DataAccess\Model\Entity\DataAccess
-      inversedBy: syncs
       joinColumn:
         name: data_access_id
         referencedColumnName: id
