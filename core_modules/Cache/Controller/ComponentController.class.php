@@ -286,24 +286,36 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     }
 
     /**
-     * Clear user based page cache of a specific user identified by its
-     * session ID.
+     * Clear user based page cache
+     *
+     * If argument $sessionId is set, then only the cache of the user
+     * (identified by sessionid $sessionId) will be flushed.
+     * Otherwise (if $sessionId is not set), the complete user based cache
+     * is flushed.
      *
      * @param   string  $sessionId  The session ID of the user of whom
      *                              to clear the page cache from.
+     *                              If not set, then all used based cach
+     *                              is flusehd.
      */
-    public function clearUserBasedPageCache($sessionId) {
+    public function clearUserBasedPageCache($sessionId = '') {
         $this->cache->clearUserBasedPageCache($sessionId);
     }
 
     /**
-     * Clear user based ESI cache of a specific user identified by its
-     * session ID.
+     * Clear user based ESI cache
+     *
+     * If argument $sessionId is set, then only the cache of the user
+     * (identified by sessionid $sessionId) will be flushed.
+     * Otherwise (if $sessionId is not set), the complete user based cache
+     * is flushed.
      *
      * @param   string  $sessionId  The session ID of the user of whom
      *                              to clear the esi cache from.
+     *                              If not set, then all used based cach
+     *                              is flusehd.
      */
-    public function clearUserBasedEsiCache($sessionId) {
+    public function clearUserBasedEsiCache($sessionId = '') {
         $this->cache->clearUserBasedEsiCache($sessionId);
     }
 

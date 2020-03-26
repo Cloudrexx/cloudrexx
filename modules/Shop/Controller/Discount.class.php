@@ -392,7 +392,7 @@ class Discount
                 `id`,
                 `cumulative`
             ) VALUES (
-                $group_id,
+                " . ($group_id ? $group_id : 'NULL') . ",
                 $groupType
             )";
         $objResult = $objDatabase->Execute($query);
@@ -669,7 +669,7 @@ class Discount
             REPLACE INTO `".DBPREFIX."module_shop".MODULE_INDEX."_customer_group` (
                 `id`
             ) VALUES (
-                $group_id
+                " . ($group_id ? $group_id : 'NULL') . "
             )";
         $objResult = $objDatabase->Execute($query);
         if (!$objResult) {

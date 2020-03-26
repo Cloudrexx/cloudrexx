@@ -184,9 +184,17 @@ class EsiWidgetController extends \Cx\Core_Modules\Widget\Controller\EsiWidgetCo
                 } elseif (isset($params['query']['filterCategory'])) {
                     $categoryId = intval($params['query']['filterCategory']);
                 }
-
+                $placeholders = $template->getPlaceholderList('news_category_widget');
+                $categoryFilter = preg_grep('/^NEWS_CATEGORY_\d+$/', $placeholders);
+                $rootCategoryId = 0;
+                if (
+                    count($categoryFilter) &&
+                    preg_match('/NEWS_CATEGORY_(\d+)/', current($categoryFilter), $match)
+                ) {
+                    $rootCategoryId = $match[1];
+                }
                 $newsLib = new NewsLibrary();
-                $newsLib->getNewsCategories($template, $langId, $categoryId);
+                $newsLib->getNewsCategories($template, $langId, $categoryId, $rootCategoryId);
                 return;
                 break;
 

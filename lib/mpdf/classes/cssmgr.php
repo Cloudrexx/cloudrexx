@@ -1291,6 +1291,10 @@ class cssmgr
 
 	function MergeCSS($inherit, $tag, $attr)
 	{
+		if (!isset($attr)) {
+			$attr = array();
+		}
+
 		$p = array();
 		$zp = array();
 
