@@ -276,14 +276,20 @@ class Shop extends ShopLibrary
         self::$objTemplate->setTemplate($template);
         // Global module index for clones
         self::$objTemplate->setGlobalVariable('MODULE_INDEX', MODULE_INDEX);
+
         // Do this *before* calling our friends, especially Customer methods!
         // Pick the default Country for delivery
+        // countryId2 is used for shipment address
         if (empty($_SESSION['shop']['countryId2'])) {
             $_SESSION['shop']['countryId2'] =
                 (isset($_POST['countryId2'])
                   ? intval($_POST['countryId2'])
                   : \Cx\Core\Setting\Controller\Setting::getValue('country_id', 'Shop'));
+            // we need to reset selected payment and shipment method
+            // as we did just change the shipment country
+            unset($_SESSION['shop']['shipperId']);
         }
+
 // TODO: This should be set up in a more elegant way
         Vat::is_reseller(self::$objCustomer && self::$objCustomer->is_reseller());
         // The coupon code may be set when entering the Shop already
@@ -850,8 +856,16 @@ die("Failed to get Customer for ID $customer_id");
     {
 //\DBG::log("Shop::cart(): Entered");
         Cart::init();
-        if (!empty($_POST['countryId2'])) {
+        if (
+            !empty($_POST['countryId2']) && (
+                !isset($_SESSION['shop']['countryId2']) ||
+                $_SESSION['shop']['countryId2'] != intval($_POST['countryId2'])
+            )
+        ) {
             $_SESSION['shop']['countryId2'] = intval($_POST['countryId2']);
+            // we need to reset selected payment and shipment method
+            // as we did just change the shipment country
+            unset($_SESSION['shop']['shipperId']);
         }
         if (empty($_GET['remoteJs'])) {
 //\DBG::log("Shop::cart(): Receiving POST");
@@ -1114,23 +1128,42 @@ die("Failed to update the Cart!");
                 self::scaleImageSizeToThumbnail($arrDefaultImageSize);
             }
             $arrSize = $arrDefaultImageSize;
-            if (!$imageName) {
+            if (
+                !$imageName ||
+                !file_exists(
+                    \ImageManager::getThumbnailFilename(
+                        $cx->getWebsiteImagesShopPath() . '/' . $imageName
+                    )
+                )
+            ) {
                 // Look for a picture in the Products.
                 $imageName = Products::getPictureByCategoryId($id);
             }
-            if (!$imageName) {
+            if (
+                !$imageName ||
+                !file_exists(
+                    \ImageManager::getThumbnailFilename(
+                        $cx->getWebsiteImagesShopPath() . '/' . $imageName
+                    )
+                )
+            ) {
                 // Look for a picture in the subcategories and their Products.
                 $imageName = ShopCategories::getPictureById($id);
             }
-            if ($imageName) {
-                if (file_exists(\ImageManager::getThumbnailFilename($cx->getWebsiteImagesShopPath() . '/' . $imageName))) {
-                    // Image found!  Use that instead of the default.
-                    $thumbnailPath = \ImageManager::getThumbnailFilename(
-                        $cx->getWebsiteImagesShopWebPath() . '/' . $imageName
-                    );
-                    $arrSize = getimagesize($cx->getWebsitePath() . $thumbnailPath);
-                    self::scaleImageSizeToThumbnail($arrSize);
-                }
+            if (
+                $imageName &&
+                file_exists(
+                    \ImageManager::getThumbnailFilename(
+                        $cx->getWebsiteImagesShopPath() . '/' . $imageName
+                    )
+                )
+            ) {
+                // Image found!  Use that instead of the default.
+                $thumbnailPath = \ImageManager::getThumbnailFilename(
+                    $cx->getWebsiteImagesShopWebPath() . '/' . $imageName
+                );
+                $arrSize = getimagesize($cx->getWebsitePath() . $thumbnailPath);
+                self::scaleImageSizeToThumbnail($arrSize);
             } else {
                 // Fallback if no picture for category was found.
                 // This is intentionally in the else statement and not as
@@ -1489,7 +1522,10 @@ die("Failed to update the Cart!");
                 $thumbnailPath = $pictureLink = '';
                 $imageFilePath = '';
                 if (   empty($image['img'])
-                    || $image['img'] == ShopLibrary::noPictureName) {
+                    || $image['img'] == ShopLibrary::noPictureName
+                ) {
+                    // set no-picture image
+                    $image['img'] = ShopLibrary::noPictureName;
                     // We have at least one picture on display already.
                     // No need to show "no picture" three times!
                     if ($havePicture) { continue; }
@@ -1884,6 +1920,7 @@ die("Failed to update the Cart!");
                 self::$objTemplate->setVariable(
                         'SHOP_PRODUCT_MINIMUM_ORDER_QUANTITY',contrexx_raw2xhtml($objProduct->minimum_order_quantity())
                 );
+                self::$objTemplate->touchBlock('orderQuantity');
             } elseif (self::$objTemplate->blockExists('orderQuantity') && !$minimum_order_quantity){
                 self::$objTemplate->hideBlock('orderQuantity');
             }
@@ -2794,8 +2831,15 @@ die("Shop::processRedirect(): This method is obsolete!");
             ? $_SESSION['shop']['city']
             : (self::$objCustomer ? self::$objCustomer->city() : ''));
         $country_id = (isset($_SESSION['shop']['countryId'])
+            // load country for payment address from session ..
             ? $_SESSION['shop']['countryId']
-            : (self::$objCustomer ? self::$objCustomer->country_id() : 0));
+            : (self::$objCustomer ?
+                // .. or from signed-in customer
+                self::$objCustomer->country_id() :
+                // .. or use shipment country as pre-set value
+                $_SESSION['shop']['countryId2']
+            )
+        );
         $email = (isset($_SESSION['shop']['email'])
             ? $_SESSION['shop']['email']
             : (self::$objCustomer ? self::$objCustomer->email() : ''));
@@ -2807,37 +2851,31 @@ die("Shop::processRedirect(): This method is obsolete!");
             : (self::$objCustomer ? self::$objCustomer->fax() : ''));
         $birthday = (isset($_SESSION['shop']['birthday'])
             ? $_SESSION['shop']['birthday']
-            : (self::$objCustomer ? self::$objCustomer->getProfileAttribute('birthday') : mktime(0, 0, 0)));
+            : (self::$objCustomer ? self::$objCustomer->getProfileAttribute('birthday') : 0));
+        $selectedBirthdayDay = '0';
+        $selectedBirthdayMonth = '0';
+        $selectedBirthdayYear = '0';
 
-        $selectedBirthdayDay = date('j', $birthday);
-        $selectedBirthdayMonth = date('n', $birthday);
-        $selectedBirthdayYear = date('Y', $birthday);
+        // load pre-set date
+        if (!empty($birthday)) {
+            $selectedBirthdayDay = date('j', $birthday);
+            $selectedBirthdayMonth = date('n', $birthday);
+            $selectedBirthdayYear = date('Y', $birthday);
+        } else {
+            // if no valid date has been set so far, do check if
+            // a partial date selection has been submitted and if so,
+            // do use those values as presetting
+            if (!empty($_POST['shop_birthday_day'])) {
+                $selectedBirthdayDay = intval($_POST['shop_birthday_day']);
+            }
+            if (!empty($_POST['shop_birthday_month'])) {
+                $selectedBirthdayMonth = intval($_POST['shop_birthday_month']);
+            }
+            if (!empty($_POST['shop_birthday_year'])) {
+                $selectedBirthdayYear = intval($_POST['shop_birthday_year']);
+            }
+        }
 
-        $birthdayDaySelect= new \Cx\Core\Html\Model\Entity\DataElement(
-            'shop_birthday_day',
-            $selectedBirthdayDay,
-            \Cx\Core\Html\Model\Entity\DataElement::TYPE_SELECT,
-            null,
-            array_combine(range(1, 31), range(1, 31))
-        );
-        $birthdayDaySelect->setAttribute('class', 'birthday');
-        $birthdayMonthSelect = new \Cx\Core\Html\Model\Entity\DataElement(
-            'shop_birthday_month',
-            $selectedBirthdayMonth,
-            \Cx\Core\Html\Model\Entity\DataElement::TYPE_SELECT,
-            null,
-            array_combine(range(1, 12), range(1, 12))
-        );
-        $birthdayMonthSelect->setAttribute('class', 'birthday');
-        $birthdayYearSelect= new \Cx\Core\Html\Model\Entity\DataElement(
-            'shop_birthday_year',
-            $selectedBirthdayYear,
-            \Cx\Core\Html\Model\Entity\DataElement::TYPE_SELECT,
-            null,
-            array_combine(range(1900, date('Y')), range(1900, date('Y')))
-        );
-
-        $birthdayYearSelect->setAttribute('class', 'birthday');
         self::$objTemplate->setVariable(array(
             'SHOP_ACCOUNT_COMPANY' => htmlentities($company, ENT_QUOTES, CONTREXX_CHARSET),
             'SHOP_ACCOUNT_PREFIX' => Customers::getGenderMenuoptions($gender),
@@ -2851,13 +2889,88 @@ die("Shop::processRedirect(): This method is obsolete!");
             'SHOP_ACCOUNT_ACTION' =>
                 \Cx\Core\Routing\Url::fromModuleAndCmd('Shop', 'account'),
             // New template - since 2.1.0
+            // countryId is used for payment address, therefore we must
+            // list all countries here (and not restrict to shipping countries)
             'SHOP_ACCOUNT_COUNTRY_MENUOPTIONS' =>
-                \Cx\Core\Country\Controller\Country::getMenuoptions($country_id),
+                \Cx\Core\Country\Controller\Country::getMenuoptions($country_id, false),
             // Old template
             // Compatibility with 2.0 and older versions
-            'SHOP_ACCOUNT_COUNTRY' => \Cx\Core\Country\Controller\Country::getMenu('countryId', $country_id),
-            'SHOP_ACCOUNT_BIRTHDAY' => $birthdayDaySelect . $birthdayMonthSelect . $birthdayYearSelect,
+            // countryId is used for payment address, therefore we must
+            // list all countries here (and not restrict to shipping countries)
+            'SHOP_ACCOUNT_COUNTRY' => \Cx\Core\Country\Controller\Country::getMenu('countryId', $country_id, false),
         ));
+
+        // parse birthday fields
+        if (self::$objTemplate->placeholderExists('SHOP_ACCOUNT_BIRTHDAY')) {
+            // build day dropdown
+            $birthdayDaySelect= new \Cx\Core\Html\Model\Entity\DataElement(
+                'shop_birthday_day',
+                $selectedBirthdayDay,
+                \Cx\Core\Html\Model\Entity\DataElement::TYPE_SELECT,
+                null,
+                array(
+                    '0' => $_ARRAYLANG['TXT_SHOP_CHOOSE_DAY'],
+                ) + array_combine(
+                    range(1, 31),
+                    range(1, 31)
+                )
+            );
+            $birthdayDaySelect->setAttribute('class', 'birthday');
+
+            // build month dropdown
+            $birthdayMonthSelect = new \Cx\Core\Html\Model\Entity\DataElement(
+                'shop_birthday_month',
+                $selectedBirthdayMonth,
+                \Cx\Core\Html\Model\Entity\DataElement::TYPE_SELECT,
+                null,
+                array(
+                    '0' => $_ARRAYLANG['TXT_SHOP_CHOOSE_MONTH'],
+                ) + array_combine(
+                    range(1, 12),
+                    range(1, 12)
+                )
+            );
+            $birthdayMonthSelect->setAttribute('class', 'birthday');
+
+            // build year dropdown
+            $birthdayYearSelect= new \Cx\Core\Html\Model\Entity\DataElement(
+                'shop_birthday_year',
+                $selectedBirthdayYear,
+                \Cx\Core\Html\Model\Entity\DataElement::TYPE_SELECT,
+                null,
+                array(
+                    '0' => $_ARRAYLANG['TXT_SHOP_CHOOSE_YEAR'],
+                ) + array_combine(
+                    range(1900, date('Y')),
+                    range(1900, date('Y'))
+                )
+            );
+            $birthdayYearSelect->setAttribute('class', 'birthday');
+
+            self::$objTemplate->setVariable(
+                'SHOP_ACCOUNT_BIRTHDAY',
+                $birthdayDaySelect . $birthdayMonthSelect . $birthdayYearSelect
+            );
+        }
+        if (self::$objTemplate->blockExists('shop_account_birthday')) {
+            self::$objTemplate->setVariable(array(
+                'SHOP_ACCOUNT_BIRTHDAY_DAY' => $selectedBirthdayDay,
+                'SHOP_ACCOUNT_BIRTHDAY_MONTH' => $selectedBirthdayMonth,
+                'SHOP_ACCOUNT_BIRTHDAY_YEAR' => $selectedBirthdayYear,
+                'SHOP_ACCOUNT_BIRTHDAY_DATE_FORMAT' => ASCMS_DATE_FORMAT_DATE,
+            ));
+            if (!empty($birthday)) {
+                self::$objTemplate->setVariable(array(
+                    'SHOP_ACCOUNT_BIRTHDAY_DATE' => date(
+                        ASCMS_DATE_FORMAT_DATE,
+                        $birthday
+                    ),
+                    'SHOP_ACCOUNT_BIRTHDAY_TIMESTAMP' => $birthday,
+                ));
+            }
+            self::$objTemplate->parse('shop_account_birthday');
+        }
+
         if (count(static::$errorFields)) {
             $errorClassPlaceholders = array();
             foreach (static::$errorFields as $field) {
@@ -2966,6 +3079,7 @@ die("Shop::processRedirect(): This method is obsolete!");
                 ? '' : htmlentities($_SESSION['shop']['zip2'], ENT_QUOTES, CONTREXX_CHARSET)),
             'SHOP_ACCOUNT_CITY2' => (empty($_SESSION['shop']['city2'])
                 ? '' : htmlentities($_SESSION['shop']['city2'], ENT_QUOTES, CONTREXX_CHARSET)),
+            // countryId2 is used for shipment address
             'SHOP_ACCOUNT_COUNTRY2' =>
                 \Cx\Core\Country\Controller\Country::getNameById($_SESSION['shop']['countryId2']),
             'SHOP_ACCOUNT_COUNTRY2_ID' => $_SESSION['shop']['countryId2'],
@@ -2993,9 +3107,29 @@ die("Shop::processRedirect(): This method is obsolete!");
      */
     static function account_to_session()
     {
+        global $_ARRAYLANG;
+
 //\DBG::log("account_to_session(): POST: ".var_export($_POST, true));
-        if (empty($_POST) || !is_array($_POST)) return;
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $request = $cx->getRequest();
+
+        if (
+            $request->getHttpRequestMethod() != 'post' ||
+            empty($_POST) ||
+            !is_array($_POST)
+        ) {
+            return;
+        }
+
 //\DBG::log("Shop::account_to_session(): Have POST");
+
+        // remember currently set country of shipping address.
+        // will be used in case an invalid shipping country has been submitted
+        $shippingCountryId = 0;
+        if (isset($_SESSION['shop']['countryId2'])) {
+            $shippingCountryId = $_SESSION['shop']['countryId2'];
+        }
+
         foreach ($_POST as $key => $value) {
             $_SESSION['shop'][$key] =
                 trim(strip_tags(contrexx_input2raw($value)));
@@ -3007,14 +3141,89 @@ die("Shop::processRedirect(): This method is obsolete!");
         }
 
         // set customer birthday
-        if (isset($_POST['shop_birthday_day']) &&
-            isset($_POST['shop_birthday_month']) &&
-            isset($_POST['shop_birthday_year'])) {
-            $day = contrexx_input2raw($_POST['shop_birthday_day']);
-            $month = contrexx_input2raw($_POST['shop_birthday_month']);
-            $year = contrexx_input2raw($_POST['shop_birthday_year']);
-            $birthday = mktime(0, 0, 0, $month, $day, $year);
+        $birthday = 0;
+        if (
+            !empty($_POST['shop_birthday_day']) &&
+            !empty($_POST['shop_birthday_month']) &&
+            !empty($_POST['shop_birthday_year'])
+        ) {
+            $day = intval($_POST['shop_birthday_day']);
+            $month = intval($_POST['shop_birthday_month']);
+            $year = intval($_POST['shop_birthday_year']);
+            $birthday = mktime(
+                0,
+                0,
+                0,
+                $month,
+                $day,
+                $year
+            );
+        } elseif (!empty($_POST['shop_birthday_date'])) {
+            // get date format of submitted birthday date
+            if (
+                !empty($_POST['shop_birthday_date_format']) &&
+                is_string($_POST['shop_birthday_date_format'])
+            ) {
+                $birthdayDateFormat = contrexx_input2raw(
+                    $_POST['shop_birthday_date_format']
+                );
+            } else {
+                $birthdayDateFormat = ASCMS_DATE_FORMAT_DATE;
+            }
+            // parse submitted date based on the supplied date-format
+            $birthdayDate = date_parse_from_format(
+                $birthdayDateFormat,
+                $_POST['shop_birthday_date']
+            );
+            // if parsing of the submitted date was successful,
+            // then do generate a timestamp of it
+            if (
+                !empty($birthdayDate['day']) &&
+                !empty($birthdayDate['month']) &&
+                !empty($birthdayDate['year'])
+            ) {
+                $birthday = mktime(
+                    0,
+                    0,
+                    0,
+                    intval($birthdayDate['month']),
+                    intval($birthdayDate['day']),
+                    intval($birthdayDate['year'])
+                );
+            }
+        } elseif (
+            isset($_POST['shop_birthday_date']) || (
+                isset($_POST['shop_birthday_day']) &&
+                isset($_POST['shop_birthday_month']) &&
+                isset($_POST['shop_birthday_year'])
+            )
+        ) {
+            // clear birthday
+            $_SESSION['shop']['birthday'] = 0;
+        }
+
+        // update birthday property if a valid birthday date has been submitted
+        if (!empty($birthday)) {
             $_SESSION['shop']['birthday'] = $birthday;
+        }
+
+        // fetch birthday property (-> will be used to determine if setting a
+        // birthday is mandatory)
+        $profileAttribute = \FWUser::getFWUserObject()->objUser->objAttribute;
+        $birthdayAttribute = $profileAttribute->getById('birthday');
+
+        // in case no birthday has been set, do check if a birthday has been
+        // requested from the customer (placeholder or template-block exists)
+        // and if the setting is mandatory
+        if (
+            empty($_SESSION['shop']['birthday']) && (
+                self::$objTemplate->placeholderExists('SHOP_ACCOUNT_BIRTHDAY') ||
+                self::$objTemplate->blockExists('shop_account_birthday')
+            ) &&
+            $birthdayAttribute->isMandatory()
+        ) {
+            // birthday is mandatory, but has not been set
+            static::$errorFields[] = 'birthday';
         }
 
         if (   empty($_SESSION['shop']['gender2'])
@@ -3025,9 +3234,10 @@ die("Shop::processRedirect(): This method is obsolete!");
             || empty($_SESSION['shop']['city2'])
             || empty($_SESSION['shop']['phone2'])
             || empty($_SESSION['shop']['countryId2'])
+            || empty($_POST['equal_address'])
         ) {
             $_SESSION['shop']['equal_address'] = false;
-        } elseif (!empty($_POST['equal_address'])) {
+        } else {
             // Copy address
             $_SESSION['shop']['company2'] = $_SESSION['shop']['company'];
             $_SESSION['shop']['gender2'] = $_SESSION['shop']['gender'];
@@ -3040,14 +3250,38 @@ die("Shop::processRedirect(): This method is obsolete!");
             $_SESSION['shop']['countryId2'] = $_SESSION['shop']['countryId'];
             $_SESSION['shop']['equal_address'] = true;
         }
-        if (empty($_SESSION['shop']['countryId'])) {
-            $_SESSION['shop']['countryId'] = $_SESSION['shop']['countryId2'];
-        } else if (!Cart::needs_shipment()) {
+
+        // verify country of shipment address
+        if (Cart::needs_shipment()) {
+            $country = \Cx\Core\Country\Controller\Country::getById(
+                $_SESSION['shop']['countryId2']
+            );
+            // Ensure selected country of shipment adress is valid.
+            // Otherwise reset to previously set country
+            if (!$country['active']) {
+                \Message::error(sprintf(
+                    $_ARRAYLANG['TXT_SHOP_NO_DELIVERY_TO_COUNTRY'],
+                    \Cx\Core\Country\Controller\Country::getNameById(
+                        $_SESSION['shop']['countryId2']
+                    )
+                ));
+                $_SESSION['shop']['countryId2'] = $shippingCountryId;
+
+                // disable payment and shipment address equality flag
+                $_SESSION['shop']['equal_address'] = false;
+            }
+        }
+
+        if (
+            !Cart::needs_shipment() &&
+            !empty($_SESSION['shop']['countryId'])
+        ) {
             // In case we have an order without shipment, shipment country
             // will not be set. We set it to the customer's country in order
             // to calculate VAT correctly.
             $_SESSION['shop']['countryId2'] = $_SESSION['shop']['countryId'];
         }
+
         // Fill missing arguments with empty strings
         if (empty($_SESSION['shop']['company2']))   $_SESSION['shop']['company2'] = '';
         if (empty($_SESSION['shop']['gender2']))    $_SESSION['shop']['gender2'] = '';
@@ -3058,6 +3292,12 @@ die("Shop::processRedirect(): This method is obsolete!");
         if (empty($_SESSION['shop']['city2']))      $_SESSION['shop']['city2'] = '';
         if (empty($_SESSION['shop']['phone2']))     $_SESSION['shop']['phone2'] = '';
         if (empty($_SESSION['shop']['countryId2'])) $_SESSION['shop']['countryId2'] = 0;
+
+        // we need to reset selected payment and shipment method
+        // in case we did just change the shipment country
+        if ($_SESSION['shop']['countryId2'] != $shippingCountryId) {
+            unset($_SESSION['shop']['shipperId']);
+        }
     }
 
 
@@ -3080,6 +3320,13 @@ die("Shop::processRedirect(): This method is obsolete!");
             $status = \Message::error(
                 $_ARRAYLANG['TXT_FILL_OUT_ALL_REQUIRED_FIELDS']);
         }
+
+        // Check for any error messages.
+        // This is used by the verification of the shipment country
+        if (\Message::have()) {
+            return false;
+        }
+
         // Registered Customers are okay now
         if (self::$objCustomer) return $status;
         if (   \Cx\Core\Setting\Controller\Setting::getValue('register','Shop') == ShopLibrary::REGISTER_MANDATORY
@@ -3231,7 +3478,10 @@ die("Shop::processRedirect(): This method is obsolete!");
         if (   $cart_amount
             && empty($_SESSION['shop']['paymentId'])) {
             $arrPaymentId = Payment::getCountriesRelatedPaymentIdArray(
-                $_SESSION['shop']['countryId'], Currency::getCurrencyArray());
+                // countryId is used for payment address
+                $_SESSION['shop']['countryId'],
+                Currency::getCurrencyArray()
+            );
             $_SESSION['shop']['paymentId'] = current($arrPaymentId);
         }
         if (empty($_SESSION['shop']['paymentId']))
@@ -3364,13 +3614,16 @@ die("Shop::processRedirect(): This method is obsolete!");
         if (empty($_SESSION['shop']['paymentId'])) {
             // Use the first Payment ID
             $arrPaymentId = Payment::getCountriesRelatedPaymentIdArray(
-                $_SESSION['shop']['countryId'], Currency::getCurrencyArray()
+                // countryId is used for payment address
+                $_SESSION['shop']['countryId'],
+                Currency::getCurrencyArray()
             );
             $_SESSION['shop']['paymentId'] = current($arrPaymentId);
         }
         return Payment::getPaymentMenu(
             $_SESSION['shop']['paymentId'],
             "document.forms['shopForm'].submit()",
+            // countryId is used for payment address
             $_SESSION['shop']['countryId']
         );
     }
@@ -3648,7 +3901,10 @@ die("Shop::processRedirect(): This method is obsolete!");
             // TODO: Check if the first line is not already checked above
             if (    !(!Cart::needs_shipment() && Cart::get_price() <= 0)
                 &&  self::$objTemplate->blockExists('shop_payment_payment_methods')
-                &&  $paymentMethods = Payment::getPaymentMethods($_SESSION['shop']['countryId'])
+                &&  $paymentMethods = Payment::getPaymentMethods(
+                    // countryId is used for payment address
+                    $_SESSION['shop']['countryId']
+                )
             ) {
                 foreach ($paymentMethods as $paymentId => $paymentName) {
                     self::$objTemplate->setVariable(array(
@@ -3906,12 +4162,25 @@ die("Shop::processRedirect(): This method is obsolete!");
             'SHOP_ADDRESS' => stripslashes($_SESSION['shop']['address']),
             'SHOP_ZIP' => stripslashes($_SESSION['shop']['zip']),
             'SHOP_CITY' => stripslashes($_SESSION['shop']['city']),
+            // countryId is used for payment address
             'SHOP_COUNTRY' => \Cx\Core\Country\Controller\Country::getNameById($_SESSION['shop']['countryId']),
             'SHOP_EMAIL' => stripslashes($_SESSION['shop']['email']),
             'SHOP_PHONE' => stripslashes($_SESSION['shop']['phone']),
             'SHOP_FAX' => stripslashes($_SESSION['shop']['fax']),
-            'SHOP_BIRTHDAY' => date(ASCMS_DATE_FORMAT_DATE, $_SESSION['shop']['birthday']),
         ));
+
+        // only parse birthday if it had been set
+        if (!empty($_SESSION['shop']['birthday'])) {
+            self::$objTemplate->setVariable(
+                'SHOP_BIRTHDAY',
+                date(
+                    ASCMS_DATE_FORMAT_DATE,
+                    $_SESSION['shop']['birthday']
+                )
+            );
+        }
+
+        // parse shipment address
         if (!empty($_SESSION['shop']['lastname2'])) {
             self::$objTemplate->setVariable(array(
                 'SHOP_COMPANY2' => stripslashes($_SESSION['shop']['company2']),
@@ -3921,6 +4190,7 @@ die("Shop::processRedirect(): This method is obsolete!");
                 'SHOP_ADDRESS2' => stripslashes($_SESSION['shop']['address2']),
                 'SHOP_ZIP2' => stripslashes($_SESSION['shop']['zip2']),
                 'SHOP_CITY2' => stripslashes($_SESSION['shop']['city2']),
+                // countryId2 is used for shipment address
                 'SHOP_COUNTRY2' => \Cx\Core\Country\Controller\Country::getNameById($_SESSION['shop']['countryId2']),
                 'SHOP_PHONE2' => stripslashes($_SESSION['shop']['phone2']),
             ));
@@ -4117,9 +4387,22 @@ die("Shop::processRedirect(): This method is obsolete!");
         self::$objCustomer->country_id($_SESSION['shop']['countryId']);
         self::$objCustomer->phone($_SESSION['shop']['phone']);
         self::$objCustomer->fax($_SESSION['shop']['fax']);
+
+        // set birthday, but only if it has been set (or unset)
+        // otherwise, it shall not get overwitten
         if (!empty($_SESSION['shop']['birthday'])) {
+            $birthday = date(
+                ASCMS_DATE_FORMAT_DATE,
+                $_SESSION['shop']['birthday']
+            );
             self::$objCustomer->setProfile(array(
-                'birthday' => array(0 => date(ASCMS_DATE_FORMAT_DATE, $_SESSION['shop']['birthday']))
+                'birthday' => array(0 => $birthday)
+            ));
+
+        // clear birthday if it has been unset
+        } elseif (isset($_SESSION['shop']['birthday'])) {
+            self::$objCustomer->setProfile(array(
+                'birthday' => array(0 => '')
             ));
         }
 
@@ -4866,7 +5149,6 @@ die("Shop::processRedirect(): This method is obsolete!");
      */
     static function verifySessionAddress()
     {
-        static::$errorFields = array();
         // Note that the Country IDs are either set already, or chosen in a
         // dropdown menu, so if everything else is set, so are they.
         // They may thus be disabled entirely without affecting this.

@@ -109,7 +109,6 @@ class MediaManager extends MediaLibrary
                                     ASCMS_THEMES_PATH.DIRECTORY_SEPARATOR,
                                     ASCMS_ATTACH_PATH.DIRECTORY_SEPARATOR,
                                     ASCMS_ACCESS_PATH.DIRECTORY_SEPARATOR,
-                                    ASCMS_BLOG_IMAGES_PATH.DIRECTORY_SEPARATOR,
                                     ASCMS_CALENDAR_IMAGE_PATH.DIRECTORY_SEPARATOR,
                                     ASCMS_DOWNLOADS_IMAGES_PATH.DIRECTORY_SEPARATOR,
                                     ASCMS_GALLERY_PATH.DIRECTORY_SEPARATOR,
@@ -127,7 +126,6 @@ class MediaManager extends MediaLibrary
                                     'themes'       => ASCMS_THEMES_WEB_PATH . '/',
                                     'attach'       => ASCMS_ATTACH_WEB_PATH. '/',
                                     'Access'       => ASCMS_ACCESS_WEB_PATH . '/',
-                                    'Blog'         => ASCMS_BLOG_IMAGES_WEB_PATH . '/',
                                     'Calendar'     => ASCMS_CALENDAR_IMAGE_WEB_PATH . '/',
                                     'Downloads'    => ASCMS_DOWNLOADS_IMAGES_WEB_PATH . '/',
                                     'Gallery'      => ASCMS_GALLERY_WEB_PATH . '/',
@@ -224,14 +222,6 @@ class MediaManager extends MediaLibrary
                 break;
             case 'Access':
                 \Permission::checkAccess(18, 'static');
-                $objTemplate->setVariable('CONTENT_NAVIGATION', '
-                    <a href="index.php?cmd=Media&amp;archive=content">'. $_ARRAYLANG['TXT_IMAGE_CONTENT'] .'</a>
-                    <a href="index.php?cmd=Media&amp;archive=attach" class="active">'. $_ARRAYLANG['TXT_MODULE'] .'</a>
-                    <a href="index.php?cmd=Media&amp;archive=themes">'. $_ARRAYLANG['TXT_MEDIA_LAYOUT'] .'</a>
-                ');
-                break;
-            case 'Blog':
-                \Permission::checkAccess(119, 'static');
                 $objTemplate->setVariable('CONTENT_NAVIGATION', '
                     <a href="index.php?cmd=Media&amp;archive=content">'. $_ARRAYLANG['TXT_IMAGE_CONTENT'] .'</a>
                     <a href="index.php?cmd=Media&amp;archive=attach" class="active">'. $_ARRAYLANG['TXT_MODULE'] .'</a>
@@ -336,6 +326,35 @@ class MediaManager extends MediaLibrary
     function getMediaPage()
     {
         global $_ARRAYLANG, $objTemplate;
+
+        // drop cache after any modification
+        if (
+            (
+                in_array(
+                    $this->getAct,
+                    array(
+                        'paste',
+                        'ren',
+                        'editImage',
+                        'saveSettings',
+                    )
+                )
+            ) || (
+                $this->getAct == 'newDir' &&
+                isset($_POST['dirName'])
+            ) || (
+                $this->getAct == 'copy' &&
+                isset($_POST['formSelected'])
+            ) || (
+                $this->getAct == 'delete' && (
+                    !empty($this->getFile) ||
+                    isset($_POST['formSelected'])
+                )
+            )
+        ) {
+            // drop complete cache to avoid problems with global placeholders
+            \Cx\Core\Core\Controller\Cx::instanciate()->getComponent('Cache')->clearCache();
+        }
 
         switch($this->getAct) {
             case 'newDir':
@@ -448,7 +467,6 @@ class MediaManager extends MediaLibrary
                 break;
             case 'attach':
             case 'Access':
-            case 'Blog':
             case 'Calendar':
             case 'Downloads':
             case 'Gallery':
@@ -465,7 +483,6 @@ class MediaManager extends MediaLibrary
                     'Downloads' => 'TXT_DOWNLOADS',
                     'Calendar' => 'TXT_CALENDAR',
                     'Podcast' => 'TXT_PODCAST',
-                    'Blog' => 'TXT_BLOG_MODULE',
                 );
                 $moduleMatchTable = array(
                     'attach' => 'core',
