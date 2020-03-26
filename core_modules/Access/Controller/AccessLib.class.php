@@ -285,6 +285,9 @@ class AccessLib
         global $_CORELANG;
 
         $objAttribute = $objUser->objAttribute->getById($attributeId);
+        if ($objUser->objAttribute->isDefaultAttribute($attributeId)) {
+            $attributeId = $objUser->objAttribute->getDefaultAttributeIdByAttributeId($attributeId);
+        }
         $attributeName = $this->attributeNamePrefix.'['.$attributeId.']['.$historyId.']';
         $block = strtolower($this->attributeNamePrefix.'_'.$attributeId);
         $attributeIdUC = strtoupper($attributeId);
@@ -356,8 +359,7 @@ class AccessLib
             $arrSettings = \User_Setting::getSettings();
             $cx    = \Cx\Core\Core\Controller\Cx::instanciate();
             $image = $objUser->getProfileAttribute($objAttribute->getId(), $historyId);
-            $defaultTitle = $objUser->objAttribute->getDefaultAttributeIdByAttributeId($attributeId);
-            $isProfile = $defaultTitle == 'picture';
+            $isProfile = $attributeId == 'picture';
             $imageRepoWeb  = $isProfile
                                 ? $cx->getWebsiteImagesAccessProfileWebPath()
                                 : $cx->getWebsiteImagesAccessPhotoWebPath();
