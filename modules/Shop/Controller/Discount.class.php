@@ -368,7 +368,7 @@ class Discount
                 `id`,
                 `cumulative`
             ) VALUES (
-                $group_id,
+                " . ($group_id ? $group_id : 'NULL') . ",
                 $groupType
             )";
         $objResult = $objDatabase->Execute($query);

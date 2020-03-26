@@ -193,7 +193,7 @@ class Media extends MediaLibrary
                     if (!empty($path)) {
                         $tmpLink .= $path.'/';
                         $this->_objTpl->setVariable(array(  // navigation #2
-                            'MEDIA_TREE_NAV_DIR'      => $path,
+                            'MEDIA_TREE_NAV_DIR'      => $this->prettyFormatFilename($path),
                             'MEDIA_TREE_NAV_DIR_HREF' => CONTREXX_SCRIPT_PATH.'?section=' . $this->archive . $this->getCmd . '&amp;path=' . rawurlencode($this->arrWebPaths[$this->archive] . $tmpLink)
                         ));
                         $this->_objTpl->parse('mediaTreeNavigation');

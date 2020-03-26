@@ -210,8 +210,11 @@ class NewsLibrary
      *
      * @return string Formated ul/li of categories
      */
-    public function getNewsCategories($template = null, $langId = null, $categoryId = 0)
+    public function getNewsCategories($template = null, $langId = null, $categoryId = 0, $rootCategoryId = 0)
     {
+        if (!empty($rootCategoryId)) {
+             $this->nestedSetRootId = $rootCategoryId;
+        }
         $categoriesLang = $this->getCategoriesData();
         return $this->_buildNewsCategories($template, $this->nestedSetRootId, $categoriesLang, $langId, $categoryId);
     }
@@ -384,7 +387,7 @@ class NewsLibrary
      * @param   array or integer    $categories                   categories which have to be listed
      * @param   array               $selectedCategory             selected category
      * @param   array               $hiddenCategories             the categories which shouldn't be shown as option
-     * @param   boolean             $onlyCategoriesWithEntries    only categories which have entries
+     * @param   boolean             $highlightOnlyCategoriesWithEntries    only categories which have entries
      * @param   boolean             $showLevel  Whether or not to visualy
      *                              show the hierarchy as indent
      * @param   boolean             Whether or not to list hidden categories
@@ -394,7 +397,7 @@ class NewsLibrary
             $categories,
             $selectedCategory = array(),
             $hiddenCategories = array(),
-            $onlyCategoriesWithEntries = false,
+            $highlightOnlyCategoriesWithEntries = false,
             $showLevel = true,
             $includeHidden = true
     )
@@ -407,8 +410,9 @@ class NewsLibrary
 
         $nestedSetCategories = $this->getNestedSetCategories($categories);
 
-        if ($onlyCategoriesWithEntries) {
-            $hiddenCategories = array_merge($hiddenCategories, $this->getEmptyCategoryIds());
+        $emptyCategories = array();
+        if ($highlightOnlyCategoriesWithEntries) {
+            $emptyCategories = $this->getEmptyCategoryIds();
         }
 
         $levels = array();
@@ -436,7 +440,11 @@ class NewsLibrary
             }
 
             $selected = in_array($category['id'], $selectedCategory) ? 'selected="selected"' : '';
-            $options .= '<option value="'.$category['id'].'" '.$selected.'>'
+            $disabled = '';
+            if (in_array($category['id'], $emptyCategories)) {
+                $disabled = ' disabled="disabled"';
+            }
+            $options .= '<option value="'.$category['id'].'"' . $selected . $disabled . '>'
                     .($showLevel ? str_repeat('&nbsp;&nbsp;&nbsp;&nbsp;', ($category['level'] - $level)) : '')
                     .contrexx_raw2xhtml(
                         $categoriesLang[$category['id']]['lang'][

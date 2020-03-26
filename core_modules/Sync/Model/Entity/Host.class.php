@@ -380,7 +380,7 @@ class Host extends \Cx\Model\Base\EntityBase
         }
         
         $handle = false;
-        foreach ($change->getOriginSync()->getHostEntitiesIncludingLegacy(false) as $hostEntity) {
+        foreach ($change->getOriginSync()->getHostEntitiesIncludingLegacy(false, $this->getHost()) as $hostEntity) {
             if ($hostEntity['host'] != $this) {
                 continue;
             }
@@ -448,25 +448,34 @@ class Host extends \Cx\Model\Base\EntityBase
         $refUrl = \Cx\Core\Routing\Url::fromDocumentRoot();
         $refUrl->setMode('backend');
         $request->setHeader('Referrer', $refUrl->toString());
+        $request->setHeader('connection', 'close');
         $request->setBody(http_build_query($content, null, '&'));
         $request->setConfig(array(
             'follow_redirects' => true,
             'strict_redirects' => true,
         ));
         
+        echo 'Pushing to ' . $url . ' with method ' . $method . ', body is: ' . http_build_query($content) . "\n";
         $response = $request->send();
         var_dump($response->getStatus());
-        echo 'Pushed to ' . $url . ' with method ' . $method . ', body was: ' . http_build_query($content) . "\n";
         echo '<pre>' . $response->getBody() . "</pre>\n\n";
         
         return $response->getStatus() == 200;
     }
     
     public function isLocked() {
-        $em = $this->cx->getDb()->getEntityManager();
-        $hostRepo = $em->getRepository(get_class($this));
-        $me = $hostRepo->find($this->getId());
-        $this->setState($me->getState());
+        $result = $this->cx->getDb()->getAdoDb()->Execute(
+            'SELECT state FROM '.DBPREFIX.'core_module_sync_host WHERE id = '.$this->getId()
+        );
+        if ($result === false || $result->EOF) {
+            return true;
+        }
+        $this->setState($result->fields['state']);
+
+        //$em = $this->cx->getDb()->getEntityManager();
+        //$hostRepo = $em->getRepository(get_class($this));
+        //$me = $hostRepo->find($this->getId());
+        //$this->setState($me->getState());
         return $this->getState() == 1;
     }
     

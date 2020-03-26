@@ -453,6 +453,34 @@ class ViewGenerator {
         );
     }
 
+
+    /**
+     * Call a callback after the entity has already been saved.
+     *
+     * @param $name       string                    name of field
+     * @param $entity     \Cx\Model\Base\EntityBase object of the class to be saved
+     * @param $entityData array                     data for entity
+     * @return mixed Return value of the callback
+     */
+    protected function callPostCallback($name, $entity, $entityData)
+    {
+        $postCallback = $this->options['fields'][$name]['postCallback'];
+        $postedValue = null;
+        if (isset($entityData[$name])) {
+            $postedValue = contrexx_input2raw($entityData[$name]);
+        }
+        $arguments = array(
+            'postedValue' => $postedValue,
+            'fieldName' => $name,
+            'entity' => $entity
+        );
+
+        return static::callCallbackByInfo(
+            $postCallback,
+            $arguments
+        );
+    }
+
     /**
      * This function saves the data of an entity to its class.
      * This only prepares the database store, but does not store it in database
@@ -1741,6 +1769,19 @@ class ViewGenerator {
                 $entityRepository->add($entity);
             }
             $entityRepository->flush();
+
+            // Foreach custom attribute we call the postCallback function if
+            // it exits
+            $storeAgain = false;
+            foreach ($this->options['fields'] as $name=>$field) {
+                if (isset($field['postCallback'])) {
+                    $this->callPostCallback($name, $entity, $entityData);
+                    $storeAgain = true;
+                }
+            }
+            if ($storeAgain) {
+                $entityRepository->flush();
+            }
             $showSuccessMessage = true;
         } else if ($entity instanceof \Cx\Model\Base\EntityBase) {
             /* We try to store the prepared em. This may fail if (for example) we have a one to many association which
@@ -1757,6 +1798,18 @@ class ViewGenerator {
                     $em->persist($associatedEntity);
                 }
                 $em->flush();
+                // Foreach custom attribute we call the postCallback function if
+                // it exits
+                $storeAgain = false;
+                foreach ($this->options['fields'] as $name=>$field) {
+                    if (isset($field['postCallback'])) {
+                        $this->callPostCallback($name, $entity, $entityData);
+                        $storeAgain = true;
+                    }
+                }
+                if ($storeAgain) {
+                    $em->flush();
+                }
                 $showSuccessMessage = true;
             } catch(\Cx\Core\Error\Model\Entity\ShinyException $e){
                 /* Display the message from the exception. If this message is empty, we output a general message,

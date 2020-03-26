@@ -424,7 +424,8 @@ class Session extends \Cx\Core\Model\RecursiveArrayAccess implements \SessionHan
                   WHERE
                     `sessionid` = '" . static::getInstance()->sessionid . "'
                   AND
-                    `parent_id` = '$varId'";
+                    `parent_id` = '$varId'
+                  ORDER BY `id`";
 
         /** @var $objResult ADORecordSet */
         $objResult = \Env::get('db')->Execute($query);
