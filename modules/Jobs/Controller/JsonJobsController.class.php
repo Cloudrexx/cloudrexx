@@ -110,7 +110,7 @@ class JsonJobsController extends \Cx\Core\Core\Model\Entity\Controller
             throw new \Exception($_ARRAYLANG['TXT_DATABASE_QUERY_ERROR']);
         }
 
-        $this->clearCache();
+        JobsLibrary::clearCache();
 
         return array('status' => 'success');
     }

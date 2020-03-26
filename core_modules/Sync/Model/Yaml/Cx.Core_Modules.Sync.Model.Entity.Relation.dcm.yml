@@ -53,7 +53,6 @@ Cx\Core_Modules\Sync\Model\Entity\Relation:
         cascade: [remove]
     foreignDataAccess:
       targetEntity: Cx\Core_Modules\DataAccess\Model\Entity\DataAccess
-      inversedBy: relations
       joinColumn:
         name: foreign_data_access_id
         referencedColumnName: id

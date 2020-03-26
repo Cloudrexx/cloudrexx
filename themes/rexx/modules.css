@@ -1583,7 +1583,7 @@ form[name="registrationForm"] .row {
     width: 100% !important;
     margin-bottom: 10px;
 }
-.ecardColumn1, .ecardPreviewMessage, .ecardPreviewData, .livecamSearch input {
+.ecardPreviewMessage, .ecardPreviewData, .livecamSearch input {
     margin-bottom: 10px;
 }
 /***************************************************/

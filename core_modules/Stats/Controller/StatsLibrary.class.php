@@ -148,7 +148,7 @@ class StatsLibrary
                 '[SEARCHTERM]'      => $searchTerm,
                 '[SEARCHTERM_NOSCRIPT]'=> $searchTermNoScript,
                 '[SEARCHTERM_PLAIN]'=> $searchTermPlain,
-                '[REFERER]'         => '$(HTTP_REFERER)',
+                '[REFERER]'         => '$url_encode($(HTTP_REFERER))',
             );
             foreach ($replaces as $from => $to) {
                 $counterTag = str_replace($from, $to, $counterTag);
@@ -1571,8 +1571,8 @@ class StatsLibrary
                     $first = range($rangeStart, 12);
                     $year  = date('Y', strtotime('-2 years'));
                     foreach ($first as $month) {
-                        $monthName = date('M', mktime(0, 0, 0, $month));
-                        $month     = date('m', mktime(0, 0, 0, $month));
+                        $monthName = date('M', mktime(0, 0, 0, $month, 1, $year));
+                        $month     = date('m', mktime(0, 0, 0, $month, 1, $year));
                         $arrRange[$month . '-' . $year] = array(
                             'tick'      => $monthName . ' ' . $year,
                             'timestamp' => strtotime($monthName . ' ' . $year),
@@ -1583,8 +1583,8 @@ class StatsLibrary
                 $second = range(1, 12);
                 $year   = date('Y', strtotime('last year'));
                 foreach ($second as $month) {
-                    $monthName = date('M', mktime(0, 0, 0, $month));
-                    $month     = date('m', mktime(0, 0, 0, $month));
+                    $monthName = date('M', mktime(0, 0, 0, $month, 1, $year));
+                    $month     = date('m', mktime(0, 0, 0, $month, 1, $year));
                     $arrRange[$month . '-' . $year] = array(
                         'tick'      => $monthName . ' ' . $year,
                         'timestamp' => strtotime($monthName . ' ' . $year),
@@ -1594,8 +1594,8 @@ class StatsLibrary
                 $third = range(1, $rangeEnd);
                 $year  = date('Y');
                 foreach ($third as $month) {
-                    $monthName = date('M', mktime(0, 0, 0, $month));
-                    $month     = date('m', mktime(0, 0, 0, $month));
+                    $monthName = date('M', mktime(0, 0, 0, $month, 1, $year));
+                    $month     = date('m', mktime(0, 0, 0, $month, 1, $year));
                     $arrRange[$month . '-' . $year] = array(
                         'tick'      => $monthName . ' ' . $year,
                         'timestamp' => strtotime($monthName . ' ' . $year),
