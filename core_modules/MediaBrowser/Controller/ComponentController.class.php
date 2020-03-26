@@ -179,18 +179,26 @@ class ComponentController extends
             );
             $thumbnailsTemplate->parse('thumbnails');
         }
+        $uploadFileSizeLimit = \Cx\Core\Setting\Controller\Setting::getValue(
+            'uploadFileSizeLimit',
+            'Config'
+        );
         \ContrexxJavascript::getInstance()->setVariable(
-            'thumbnails_template', $thumbnailsTemplate->get(),
+            array(
+                'thumbnails_template' => $thumbnailsTemplate->get(),
+                'chunk_size' => min(
+                    floor(
+                        (\FWSystem::getMaxUploadFileSize() - 1000000) / 1000000
+                    ),
+                    20
+                ) . 'mb',
+                'languages' => \FWLanguage::getActiveFrontendLanguages(),
+                'language' => \FWLanguage::getLanguageCodeById(
+                    \FWLanguage::getDefaultLangId()
+                ),
+                'max_file_size' => $uploadFileSizeLimit,
+            ),
             'mediabrowser'
-        );
-        \ContrexxJavascript::getInstance()->setVariable(
-            'chunk_size', min(floor((\FWSystem::getMaxUploadFileSize() - 1000000) / 1000000), 20) . 'mb', 'mediabrowser'
-        );
-        \ContrexxJavascript::getInstance()->setVariable(
-            'languages', \FWLanguage::getActiveFrontendLanguages(), 'mediabrowser'
-        );
-        \ContrexxJavascript::getInstance()->setVariable(
-            'language', \FWLanguage::getLanguageCodeById(\FWLanguage::getDefaultLangId()), 'mediabrowser'
         );
         \JS::activate('mediabrowser');
         // Define the module

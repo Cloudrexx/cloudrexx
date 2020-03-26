@@ -256,7 +256,6 @@ $_ARRAYLANG['TXT_CALENDAR_NOTIFICATION_ACTIVATE'] = "Активировать н
 $_ARRAYLANG['TXT_CALENDAR_NOTIFICATION_ADDRESS'] = "Получатель";
 $_ARRAYLANG['TXT_CALENDAR_NOTIFICATION_ADDRESS_INFO'] = "Многие получатели могут указыватся сколько угодно. Адреса электронной почты  должны быть разделенными ','.";
 $_ARRAYLANG['TXT_CALENDAR_FRONTEND_SETTINGS'] = "Termine anmelden";
-$_ARRAYLANG['TXT_CALENDAR_SERIES_ACTIVATE'] = "Акиевировать серийный тип ";
 $_ARRAYLANG['TXT_CALENDAR_SERIES'] = "Serie";
 $_ARRAYLANG['TXT_CALENDAR_SERIES_PATTERN_DAILY'] = "Ежедневно";
 $_ARRAYLANG['TXT_CALENDAR_SERIES_PATTERN_WEEKLY'] = "Еженедельно";
