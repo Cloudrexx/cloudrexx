@@ -1,5 +1,5 @@
 var scopeOrder = 'order';
-document.addEventListener('DOMContentLoaded', function () {
+cx.ready(function() {
     for (var i = 0; i < getArrProduct().length; ++i) {
         calcPrice(getArrProduct()[i]['id']);
     }
