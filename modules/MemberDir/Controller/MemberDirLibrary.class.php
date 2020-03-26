@@ -240,11 +240,7 @@ class MemberDirLibrary
                 $dirid_where
                 ORDER BY field ASC";
         $objResult = $objDatabase->Execute($query);
-
-        $names = $_ARRAYLANG['TXT_FIELD_DEFAULT_NAMES'];
-
         $fieldnames = array();
-
         if ($objResult) {
             while (!$objResult->EOF) {
                 $index = $objResult->fields['field'];

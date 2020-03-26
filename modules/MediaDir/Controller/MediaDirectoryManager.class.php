@@ -523,64 +523,13 @@ class MediaDirectoryManager extends MediaDirectoryLibrary
                     $userId  = $objFWUser->objUser->getId();
                 }
 
+                // parse owner
+                \FWUser::getUserLiveSearch();
                 $this->_objTpl->setVariable(array(
                     'TXT_'.$this->moduleLangVar.'_OWNER' => $_ARRAYLANG['TXT_MEDIADIR_OWNER'],
                     $this->moduleLangVar.'_OWNER_ROW'    => $ownerRowClass,
                     $this->moduleLangVar.'_OWNER_ID'     => $userId,
                 ));
-
-                \FWUser::getUserLiveSearch();
-
-                if ($intEntryId != 0) {
-                    $intEntryDourationStart = 1;
-                    $intEntryDourationEnd = 2;
-
-                    //parse contact data
-                    $objUser     = $objFWUser->objUser;
-                    $intUserId   = intval($objUser->getId());
-                    $strUserMail = '<a href="mailto:'.contrexx_raw2xhtml($objUser->getEmail()).'">'.contrexx_raw2xhtml($objUser->getEmail()).'</a>';
-                    $intUserLang = intval($objUser->getFrontendLanguage());
-
-                    if ($objUser = $objUser->getUser($id = $intUserId)) {
-                        //get lang
-                        foreach ($this->arrFrontendLanguages as $intKey => $arrLang) {
-                                if($arrLang['id'] == $intUserLang) {
-                                        $strUserLang = $arrLang['name'];
-                                }
-                        }
-
-                        //get country
-                        $arrCountry = \Cx\Core\Country\Controller\Country::getById(intval($objUser->getProfileAttribute('country')));
-                        $strCountry = $arrCountry['name'];
-
-                        //get title
-                        $objTitle = $objDatabase->Execute("SELECT `title` FROM ".DBPREFIX."access_user_title WHERE id = '".intval($objUser->getProfileAttribute('title'))."' LIMIT 1");
-                        $strTitle = $objTitle->fields['title'];
-
-                        $this->_objTpl->setVariable(array(
-                            'TXT_'.$this->moduleLangVar.'_CONTACT_DATA' => "Kontaktangaben",
-                            $this->moduleLangVar.'_CONTACT_ATTRIBUT_TITLE' => contrexx_raw2xhtml($strTitle),
-                            $this->moduleLangVar.'_CONTACT_ATTRIBUT_FIRSTNAME' => contrexx_raw2xhtml($objUser->getProfileAttribute('firstname')),
-                            $this->moduleLangVar.'_CONTACT_ATTRIBUT_LASTNAME' => contrexx_raw2xhtml($objUser->getProfileAttribute('lastname')),
-                            $this->moduleLangVar.'_CONTACT_ATTRIBUT_COMPANY' => contrexx_raw2xhtml($objUser->getProfileAttribute('company')),
-                            $this->moduleLangVar.'_CONTACT_ATTRIBUT_ADRESS' => contrexx_raw2xhtml($objUser->getProfileAttribute('address')),
-                            $this->moduleLangVar.'_CONTACT_ATTRIBUT_CITY' => contrexx_raw2xhtml($objUser->getProfileAttribute('city')),
-                            $this->moduleLangVar.'_CONTACT_ATTRIBUT_ZIP' => contrexx_raw2xhtml($objUser->getProfileAttribute('zip')),
-                            $this->moduleLangVar.'_CONTACT_ATTRIBUT_COUNTRY' => contrexx_raw2xhtml($strCountry),
-                            $this->moduleLangVar.'_CONTACT_ATTRIBUT_PHONE' => contrexx_raw2xhtml($objUser->getProfileAttribute('phone_office')),
-                            $this->moduleLangVar.'_CONTACT_ATTRIBUT_FAX' => contrexx_raw2xhtml($objUser->getProfileAttribute('phone_fax')),
-                            $this->moduleLangVar.'_CONTACT_ATTRIBUT_WEBSITE' => '<a href="'.contrexx_raw2xhtml($objUser->getProfileAttribute('website')).'" target="_blank">'.contrexx_raw2xhtml($objUser->getProfileAttribute('website')).'</a>',
-                            $this->moduleLangVar.'_CONTACT_ATTRIBUT_MAIL' => $strUserMail,
-                            $this->moduleLangVar.'_CONTACT_ATTRIBUT_LANG' => $strUserLang,
-                        ));
-                    }
-
-                    $this->_objTpl->parse($this->moduleNameLC.'ContactData');
-                } else {
-                    $intEntryDourationStart = 1;
-                    $intEntryDourationEnd = 2;
-                    $this->_objTpl->hideBlock($this->moduleNameLC.'ContactData');
-                }
 
                 //get display duration  data
                 switch($this->arrSettings['settingsEntryDisplaydurationValueType']) {
@@ -744,6 +693,9 @@ class MediaDirectoryManager extends MediaDirectoryLibrary
                 } else {
                     $this->strErrMessage = $_ARRAYLANG['TXT_MEDIADIR_CATEGORY']." ".$_ARRAYLANG['TXT_MEDIADIR_CORRUPT_ADDED'];
                 }
+            }
+            if ($status) {
+                return $this->overview();
             }
         }
 
@@ -972,6 +924,9 @@ class MediaDirectoryManager extends MediaDirectoryLibrary
                 } else {
                     $this->strErrMessage = $_ARRAYLANG['TXT_MEDIADIR_LEVEL']." ".$_ARRAYLANG['TXT_MEDIADIR_CORRUPT_ADDED'];
                 }
+            }
+            if ($status) {
+                return $this->overview();
             }
         }
 
