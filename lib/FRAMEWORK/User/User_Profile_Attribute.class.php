@@ -567,6 +567,8 @@ class User_Profile_Attribute
     function loadAttributes()
     {
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $frontend = $cx->getMode() == \Cx\Core\Core\Controller\Cx::MODE_FRONTEND;
+        $langData = \Env::get('init')->getComponentSpecificLanguageData('Core', $frontend);
         $attributeRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\UserAttribute');
 
         $this->arrCustomAttributes = array();
@@ -607,6 +609,7 @@ class User_Profile_Attribute
                     $this->arrAttributes[$attributeId]['modifiable'] = $arrTemplate['modifiable'];
                 } else if ($parentId == $this->getAttributeIdByDefaultAttributeId('title')) {
                     $this->arrAttributes[$attributeId]['modifiable'] = array('names');
+                    $this->arrAttributes[$attributeId]['names'][$this->langId] = $attribute->getName($this->langId);
                 }
             }
             $this->arrAttributes[$attributeId]['access_special'] = $attribute->getAccessSpecial();
@@ -616,8 +619,6 @@ class User_Profile_Attribute
             if ($attribute->getMandatory()) {
                 $this->arrMandatoryAttributes[] = $attributeId;
             }
-
-            $this->arrAttributes[$attributeId]['names'][$this->langId] = $attribute->getName($this->langId);
         }
     }
 
