@@ -232,7 +232,6 @@ class User_Profile
             {
                 $newValue = !isset($this->arrCachedUsers[$this->id]['profile'][$attributeId][$historyId]);
                 if ($newValue || $value != $this->arrCachedUsers[$this->id]['profile'][$attributeId][$historyId]) {
-                    $value = '"' . contrexx_raw2db($value) . '"';
 
                     if ($this->objAttribute->isDefaultAttribute($attributeId)) {
                         $attributeId = $this->objAttribute->getAttributeIdByDefaultAttributeId($attributeId);
@@ -249,7 +248,7 @@ class User_Profile
                     $attributeValue->setUserAttribute($attribute);
                     $attributeValue->setUser($user);
                     $attributeValue->setHistory($historyId);
-                    $attributeValue->setValue($value);
+                    $attributeValue->setValue(contrexx_raw2db($value));
 
                     try {
                         $em->persist($attributeValue);
