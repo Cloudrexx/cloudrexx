@@ -192,6 +192,7 @@ label[for='form-0-lsvs'] {
 
 #form-0-orderItems td {
     padding: 3px;
+    white-space: nowrap;
 }
 
 #form-0-orderItems td:nth-child(2) {
