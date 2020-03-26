@@ -313,7 +313,7 @@ class CalendarRegistrationManager extends CalendarLibrary
                         case 'salutation':
                         case 'seating':
                         case 'select':
-                            $optionIdx = $objResult->fields['value'] - 1;
+                            $optionIdx = intval($objResult->fields['value']) - 1;
                             if (isset($options[$optionIdx])) {
                                 $value = $options[$optionIdx];
                             }

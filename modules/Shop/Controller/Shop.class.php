@@ -1128,23 +1128,42 @@ die("Failed to update the Cart!");
                 self::scaleImageSizeToThumbnail($arrDefaultImageSize);
             }
             $arrSize = $arrDefaultImageSize;
-            if (!$imageName) {
+            if (
+                !$imageName ||
+                !file_exists(
+                    \ImageManager::getThumbnailFilename(
+                        $cx->getWebsiteImagesShopPath() . '/' . $imageName
+                    )
+                )
+            ) {
                 // Look for a picture in the Products.
                 $imageName = Products::getPictureByCategoryId($id);
             }
-            if (!$imageName) {
+            if (
+                !$imageName ||
+                !file_exists(
+                    \ImageManager::getThumbnailFilename(
+                        $cx->getWebsiteImagesShopPath() . '/' . $imageName
+                    )
+                )
+            ) {
                 // Look for a picture in the subcategories and their Products.
                 $imageName = ShopCategories::getPictureById($id);
             }
-            if ($imageName) {
-                if (file_exists(\ImageManager::getThumbnailFilename($cx->getWebsiteImagesShopPath() . '/' . $imageName))) {
-                    // Image found!  Use that instead of the default.
-                    $thumbnailPath = \ImageManager::getThumbnailFilename(
-                        $cx->getWebsiteImagesShopWebPath() . '/' . $imageName
-                    );
-                    $arrSize = getimagesize($cx->getWebsitePath() . $thumbnailPath);
-                    self::scaleImageSizeToThumbnail($arrSize);
-                }
+            if (
+                $imageName &&
+                file_exists(
+                    \ImageManager::getThumbnailFilename(
+                        $cx->getWebsiteImagesShopPath() . '/' . $imageName
+                    )
+                )
+            ) {
+                // Image found!  Use that instead of the default.
+                $thumbnailPath = \ImageManager::getThumbnailFilename(
+                    $cx->getWebsiteImagesShopWebPath() . '/' . $imageName
+                );
+                $arrSize = getimagesize($cx->getWebsitePath() . $thumbnailPath);
+                self::scaleImageSizeToThumbnail($arrSize);
             } else {
                 // Fallback if no picture for category was found.
                 // This is intentionally in the else statement and not as

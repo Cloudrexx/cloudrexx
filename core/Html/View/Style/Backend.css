@@ -248,6 +248,7 @@ ul.vg-alphabeticalSearch li a:after {
 }
 
 table.adminlist .vg-function-status {
+    cursor: pointer;
     background-image: url(/core/Html/View/Media/StatusInactive.gif);
     width: 10px;
     height: 10px;
@@ -260,5 +261,6 @@ table.adminlist .vg-function-status.active {
 }
 
 table.adminlist .vg-function-status.loading {
+    cursor: wait;
     background-image: url(/core/Html/View/Media/Load.gif);
 }

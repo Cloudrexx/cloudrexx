@@ -707,8 +707,14 @@ class NewsletterLib
         return false;
     }
 
-
-    function _getSettings()
+    /**
+     * This is a workaround for PHP 7 compatability.
+     * As the method _getSettings was used in mixed scope.
+     *
+     * @todo Refactor settings handling of component by migrating
+     *       to \Cx\Setting
+     */
+    public static function getSettings()
     {
         global $objDatabase;
 
@@ -728,6 +734,19 @@ class NewsletterLib
             }
         }
         return $arrSettings;
+    }
+
+
+    /**
+     * This is a workaround for PHP 7 compatability.
+     * As the method _getSettings was used in mixed scope.
+     *
+     * @todo Refactor settings handling of component by migrating
+     *       to \Cx\Setting
+     */
+    function _getSettings()
+    {
+        return static::getSettings();
     }
 
 
@@ -1059,7 +1078,7 @@ class NewsletterLib
     {
         global $objDatabase;
 
-        $arrSettings = static::_getSettings();
+        $arrSettings = static::getSettings();
         if (!$arrSettings['statistics']['setvalue']) {
             return $MailHtmlContent;
         }

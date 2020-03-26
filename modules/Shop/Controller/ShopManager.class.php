@@ -1961,12 +1961,15 @@ if ($test === NULL) {
 
         $arrCategoryId = array();
         $deleted = false;
+        $deleteProducts = false;
         if (empty($category_id)) {
             if (!empty($_GET['delete_category_id'])) {
                 array_push($arrCategoryId, $_GET['delete_category_id']);
+                $deleteProducts = !empty($_GET['delete_products']);
             } elseif (!empty($_POST['selected_category_id'])
                    && is_array($_POST['selected_category_id'])) {
                 $arrCategoryId = $_POST['selected_category_id'];
+                $deleteProducts = !empty($_POST['delete_products']);
             }
         } else {
             array_push($arrCategoryId, $category_id);
@@ -1996,23 +1999,46 @@ if ($test === NULL) {
 //DBG::log("delete_categories($category_id): Products in $category_id: ".var_export($arrProducts, true));
             // Delete the products in the category
             foreach ($arrProducts as $objProduct) {
-                // Check whether there are orders with this Product ID
-                $product_id = $objProduct->id();
-                $query = "
-                    SELECT 1
-                      FROM ".DBPREFIX."module_shop".MODULE_INDEX."_order_items
-                     WHERE product_id=$product_id";
-                $objResult = $objDatabase->Execute($query);
-                if (!$objResult || $objResult->RecordCount()) {
-                    \Message::error(
-                        $_ARRAYLANG['TXT_COULD_NOT_DELETE_ALL_PRODUCTS'].
-                        "&nbsp;(".
-                        sprintf($_ARRAYLANG['TXT_SHOP_CATEGORY_ID_FORMAT'],
-                            $category_id).")");
-                    continue 2;
+                // delete products of category in case the user requested
+                // to do so
+                if ($deleteProducts) {
+                    // Check whether there are orders with this Product ID
+                    $product_id = $objProduct->id();
+                    $query = "
+                        SELECT 1
+                          FROM ".DBPREFIX."module_shop".MODULE_INDEX."_order_items
+                         WHERE product_id=$product_id";
+                    $objResult = $objDatabase->Execute($query);
+                    if (!$objResult || $objResult->RecordCount()) {
+                        \Message::error(
+                            $_ARRAYLANG['TXT_COULD_NOT_DELETE_ALL_PRODUCTS'].
+                            "&nbsp;(".
+                            sprintf($_ARRAYLANG['TXT_SHOP_CATEGORY_ID_FORMAT'],
+                                $category_id).")");
+                        continue 2;
+                    }
+                } else {
+                    // remove product from category
+
+                    $categoryIdsOfProduct = array_flip(
+                        preg_split('/\s*,\s*/',
+                            $objProduct->category_id(), null,
+                            PREG_SPLIT_NO_EMPTY
+                        )
+                    );
+                    unset($categoryIdsOfProduct[$category_id]);
+                    $objProduct->category_id(
+                        join(',', array_keys($categoryIdsOfProduct))
+                    );
+                    if (!$objProduct->store()) {
+                        return false;
+                    }
                 }
             }
-            if (Products::deleteByShopCategory($category_id) === false) {
+            if (
+                $deleteProducts &&
+                Products::deleteByShopCategory($category_id) === false
+            ) {
                 \Message::error($_ARRAYLANG['TXT_ERROR_DELETING_PRODUCT'].
                     "&nbsp;(".$_ARRAYLANG['TXT_CATEGORY']."&nbsp;".$category_id.")");
                 continue;
@@ -2027,10 +2053,13 @@ if ($test === NULL) {
             }
             $deleted = true;
         }
-        if ($deleted) {
+        if (!$deleted) {
+            return null;
+        }
+        if ($deleteProducts) {
             return \Message::ok($_ARRAYLANG['TXT_DELETED_CATEGORY_AND_PRODUCTS']);
         }
-        return null;
+        return \Message::ok($_ARRAYLANG['TXT_SHOP_DELETED_CATEGORIES']);
     }
 
 

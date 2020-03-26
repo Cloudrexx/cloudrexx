@@ -5,7 +5,7 @@
     <div class="text">{RECOM_TEXT}</div>
     <div class="form">
         <form id="recommendForm" name="recommend" method="post" action="index.php?section=Recommend&amp;act=sendRecomm">
-            <input type="hidden" value="{RECOM_REFERER}" name="uri" />
+            <input type="hidden" value="$html_encode({RECOM_REFERER})" name="uri" />
             <input type="hidden" value="{RECOM_FEMALE_SALUTATION_TEXT}" name="female_salutation_text" />
             <input type="hidden" value="{RECOM_MALE_SALUTATION_TEXT}" name="male_salutation_text" />
             <input type="hidden" value="{RECOM_PREVIEW}" name="preview_text" />

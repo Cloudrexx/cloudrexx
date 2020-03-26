@@ -291,6 +291,21 @@ class CacheLib
                     $locale
                 );
             },
+            'url_encode' => function($args) {
+                if (empty($args[0])) {
+                    return '';
+                }
+                return urlencode($args[0]);
+            },
+            'html_encode' => function($args) {
+                if (empty($args[0])) {
+                    return '';
+                }
+                // according to the esi specification, only double quotes
+                // are being converted into html entities. Therefore, we have
+                // to set ENT_COMPAT
+                return htmlspecialchars($args[0], ENT_COMPAT, CONTREXX_CHARSET);
+            },
         );
     }
 
@@ -310,7 +325,18 @@ class CacheLib
         $isMobile = (
             \InitCMS::_is_mobile_phone() &&
             !\InitCMS::_is_tablet() &&
-            !isset($_REQUEST['smallscreen'])
+            // neither a COOKIE preference is set,
+            // nor a preference through GET has been requested
+            !isset($_GET['smallscreen']) &&
+            !isset($_COOKIE['smallscreen'])
+        ) || (
+            // mobile preference through GET has been requested
+            !empty($_GET['smallscreen'])
+        ) || (
+            // no mobile preference through GET has been requested,
+            // but preference is stored in COOKIE
+            !isset($_GET['smallscreen']) &&
+            !empty($_COOKIE['smallscreen'])
         );
 
         // Use data of $_GET and $_POST to uniquely identify a request.
@@ -1650,18 +1676,19 @@ class CacheLib
     }
 
     /**
-     * Clear user based page cache of a specific user identified by its
-     * session ID.
+     * Clear user based page cache
+     *
+     * If argument $sessionId is set, then only the cache of the user
+     * (identified by sessionid $sessionId) will be flushed.
+     * Otherwise (if $sessionId is not set), the complete user based cache
+     * is flushed.
      *
      * @param   string  $sessionId  The session ID of the user of whom
      *                              to clear the page cache from.
+     *                              If not set, then all used based cach
+     *                              is flusehd.
      */
-    public function clearUserBasedPageCache($sessionId) {
-        // abort if no valid session id is supplied
-        if (empty($sessionId)) {
-            return;
-        }
-
+    public function clearUserBasedPageCache($sessionId = '') {
         // fetch complete page cache of specific user
         $files = glob(
             $this->strCachePath .
@@ -1681,18 +1708,19 @@ class CacheLib
     }
 
     /**
-     * Clear user based ESI cache of a specific user identified by its
-     * session ID.
+     * Clear user based ESI cache
+     *
+     * If argument $sessionId is set, then only the cache of the user
+     * (identified by sessionid $sessionId) will be flushed.
+     * Otherwise (if $sessionId is not set), the complete user based cache
+     * is flushed.
      *
      * @param   string  $sessionId  The session ID of the user of whom
      *                              to clear the esi cache from.
+     *                              If not set, then all used based cach
+     *                              is flusehd.
      */
-    public function clearUserBasedEsiCache($sessionId) {
-        // abort if no valid session id is supplied
-        if (empty($sessionId)) {
-            return;
-        }
-
+    public function clearUserBasedEsiCache($sessionId = '') {
         // fetch complete esi cache of specific user
         $files = glob(
             $this->strCachePath . static::CACHE_DIRECTORY_OFFSET_ESI . '*_u' . $sessionId . '*'
