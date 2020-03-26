@@ -2,8 +2,8 @@
 <form role="form" action="index.php" method="get">
 <input name="section" value="{CALENDAR_MODULE_NAME}" type="hidden"/>
 <p><label>{TXT_CALENDAR_SEARCH_TERM}</label><input name="term" value="{CALENDAR_SEARCH_TERM}" type="text"/></p>
-<p><label>{TXT_CALENDAR_FROM}</label><input name="from" id="{CALENDAR_SEARCH_START_DATE_INPUT_ID}" value="{CALENDAR_SEARCH_FROM}" type="text" /></p>
-<p><label>{TXT_CALENDAR_TILL}</label><input name="till" id="{CALENDAR_SEARCH_END_DATE_INPUT_ID}" value="{CALENDAR_SEARCH_TILL}" type="text"/></p>
+<p><label>{TXT_CALENDAR_FROM}</label><input name="from" id="{CALENDAR_SEARCH_START_DATE_INPUT_ID}" value="{CALENDAR_SEARCH_FROM}" type="text" autocomplete="off" /></p>
+<p><label>{TXT_CALENDAR_TILL}</label><input name="till" id="{CALENDAR_SEARCH_END_DATE_INPUT_ID}" value="{CALENDAR_SEARCH_TILL}" type="text" autocomplete="off" /></p>
 <p><label>{TXT_CALENDAR_CATEGORY}</label><select class="form-control" name="catid">{CALENDAR_SEARCH_CATEGORIES}</select></p>
 <p><input name="search" class="btn btn-default" value="{TXT_CALENDAR_SEARCH}" type="submit"/>
 </form>

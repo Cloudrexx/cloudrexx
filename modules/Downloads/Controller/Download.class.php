@@ -711,9 +711,9 @@ class Download {
                 $this->type = isset($this->arrLoadedDownloads[$id]['type']) ? $this->arrLoadedDownloads[$id]['type'] : $this->defaultType;
                 $this->mime_type = isset($this->arrLoadedDownloads[$id]['mime_type']) ? $this->arrLoadedDownloads[$id]['mime_type'] : $this->defaultMimeType;
                 $this->source = isset($this->arrLoadedDownloads[$id]['source']) ? $this->arrLoadedDownloads[$id]['source'] : '';
-                $this->sources = isset($this->arrLoadedDownloads[$id]['sources']) ? $this->arrLoadedDownloads[$id]['sources'] : '';
+                $this->sources = isset($this->arrLoadedDownloads[$id]['sources']) ? $this->arrLoadedDownloads[$id]['sources'] : null;
                 $this->source_name = isset($this->arrLoadedDownloads[$id]['source_name']) ? $this->arrLoadedDownloads[$id]['source_name'] : '';
-                $this->source_names = isset($this->arrLoadedDownloads[$id]['source_names']) ? $this->arrLoadedDownloads[$id]['source_names'] : '';
+                $this->source_names = isset($this->arrLoadedDownloads[$id]['source_names']) ? $this->arrLoadedDownloads[$id]['source_names'] : null;
                 $this->fileType = isset($this->arrLoadedDownloads[$id]['file_type']) ? $this->arrLoadedDownloads[$id]['file_type'] : null;
                 $this->fileTypes = isset($this->arrLoadedDownloads[$id]['file_types']) ? $this->arrLoadedDownloads[$id]['file_types'] : null;
                 $this->size = isset($this->arrLoadedDownloads[$id]['size']) ? $this->arrLoadedDownloads[$id]['size'] : 0;
@@ -1480,7 +1480,7 @@ class Download {
      * @global array
      * @return boolean
      */
-    public function store($objCategory = null, $selectedLanguages)
+    public function store($objCategory = null, $selectedLanguages = array())
     {
         global $objDatabase, $_ARRAYLANG;
 

@@ -135,4 +135,12 @@ class DataAccessApiKey extends \Cx\Model\Base\EntityBase {
     {
         return $this->dataAccess;
     }
+
+    /**
+     * Show the name of the related DataAccess
+     * @return string Display name of this entity
+     */
+    public function __toString(): string {
+        return $this->getDataAccess()->getName();
+    }
 }

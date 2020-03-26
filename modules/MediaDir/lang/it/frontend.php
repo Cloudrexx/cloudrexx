@@ -33,4 +33,5 @@
  * @subpackage  module_mediadir
  */
 $_ARRAYLANG['TXT_MEDIADIR_SEARCH_TERM'] = 'Termine di ricerca';
+$_ARRAYLANG['TXT_MEDIADIR_PLEASE_CHOOSE'] = "scegliere";
 

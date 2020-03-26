@@ -45,6 +45,13 @@ namespace Cx\Core\Net\Controller;
  * @subpackage  core_net
  */
 class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentController {
+    /**
+     * Holds an instanciated copy of the DomainRepository
+     *
+     * @var \Cx\Core\Net\Model\Repository\DomainRepository
+     */
+    protected $domainRepo = null;
+
     public function getControllerClasses() {
         // Return an empty array here to let the component handler know that there
         // does not exist a backend, nor a frontend controller of this component.
@@ -53,9 +60,29 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
 
     public function preInit(\Cx\Core\Core\Controller\Cx $cx) {
         global $_CONFIG;
-        $domainRepo = new \Cx\Core\Net\Model\Repository\DomainRepository();
-        $_CONFIG['domainUrl'] = $domainRepo->getMainDomain()->getName();
+        $this->domainRepo = new \Cx\Core\Net\Model\Repository\DomainRepository();
+        $_CONFIG['domainUrl'] = $this->domainRepo->getMainDomain()->getName();
         \Env::set('config', $_CONFIG);
+    }
+
+    /**
+     * Get repository of domains
+     *
+     * @return  \Cx\Core\Net\Model\Repository\DomainRepository The domain
+     *              repository of this website.
+     */
+    public function getDomainRepository() {
+        return $this->domainRepo;
+    }
+
+    /**
+     * Get the hostname of the website. This is usually the name of the
+     * virtual host the website is running on.
+     *
+     * @return  string The hostname of the website
+     */
+    public function getHostname() {
+        return $this->domainRepo->findOneBy(array('id' => 0))->getName();
     }
 
     /**

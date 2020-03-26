@@ -284,6 +284,7 @@ $_ARRAYLANG['TXT_CORE_DAYS'] = "Tage";
 $_ARRAYLANG['TXT_CORE_MONTHS'] = "Monate";
 $_ARRAYLANG['TXT_CORE_YEARS'] = "Jahre";
 $_ARRAYLANG['TXT_CORE_UNLIMITED'] = "unbegrenzt";
+$_ARRAYLANG['TXT_CORE_DAY_ABBREV_ARRAY'] = "So,Mo,Di,Mi,Do,Fr,Sa";
 $_ARRAYLANG['TXT_CORE_DAY_ABBREV2_ARRAY'] = "So,Mo,Di,Mi,Do,Fr,Sa";
 $_ARRAYLANG['TXT_CORE_DAY_ABBREV3_ARRAY'] = "Son,Mon,Die,Mit,Don,Fre,Sam";
 $_ARRAYLANG['TXT_CORE_DAY_ARRAY'] = "Sonntag,Montag,Dienstag,Mittwoch,Donnerstag,Freitag,Samstag";

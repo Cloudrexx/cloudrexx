@@ -313,7 +313,7 @@ class CalendarRegistrationManager extends CalendarLibrary
                         case 'salutation':
                         case 'seating':
                         case 'select':
-                            $optionIdx = $objResult->fields['value'] - 1;
+                            $optionIdx = intval($objResult->fields['value']) - 1;
                             if (isset($options[$optionIdx])) {
                                 $value = $options[$optionIdx];
                             }
@@ -369,12 +369,22 @@ class CalendarRegistrationManager extends CalendarLibrary
         } else {
             $objTpl->hideBlock("emptyEventRegistrationList");
         }
+
+        // parse the event date with or without the time information
+        // depending on the fact if the event is an all-day event or not
+        $format = $this->getDateFormat();
+        if (!$this->event->all_day) {
+            $format .= ' H:i';
+        }
         foreach ($this->registrationList as $objRegistration) {
             $checkbox = '<input type="checkbox" name="selectedRegistrationId[]" class="selectedRegistrationId" value="'.$objRegistration->id.'" />';
             $objTpl->setVariable($this->moduleLangVar.'_REGISTRATION_VALUE', $checkbox);
             $objTpl->parse('eventRegistrationValue');
 
-            $objTpl->setVariable($this->moduleLangVar.'_REGISTRATION_VALUE', date("d.m.Y", $objRegistration->eventDate));
+            $objTpl->setVariable(
+                $this->moduleLangVar.'_REGISTRATION_VALUE',
+                date($format, $objRegistration->eventDate)
+            );
             $objTpl->parse('eventRegistrationValue');
 
             //display the registration submission date value
@@ -424,15 +434,22 @@ class CalendarRegistrationManager extends CalendarLibrary
     /**
      * Parse the Event registration stats dropdown to filter the registration
      *
+     * @todo    This method's code is magic. Trying to document it is pointless.
+     *          It makes more sense to refactor the whole method instead.
      * @param \Cx\Core\Html\Sigma   $objTpl      Template instance
      * @param array                 $eventStats  Array of event stats
      * @param string                $selected    Selected option
      * @param string                $parent      Parent level
      * @param integer               $level       Current level of parsing,
-     *                                           It is used to identify the value of parsing
-     *                                           Level 1: Year value
+     *                                           It is used to define the
+     *                                           indent of the dropdown entry
+     * @param integer               $depth       Current stats level of parsing.
+     *                                           It is used to determine the
+     *                                           type of the stats.
+     *                                           Depth 1: Year value
      *                                                 2: Month
      *                                                 3: Day
+     *                                                 4: Time
      * @param string                $blockName   Block name to parse
      */
     public function parseEventRegistrationStats(
@@ -441,26 +458,75 @@ class CalendarRegistrationManager extends CalendarLibrary
         $selected = '',
         $parent = '',
         $level = 1,
-        $blockName = 'calendar_registration_date'
+        $depth = 1,
+        $blockName = 'calendar_registration_date',
+        $labelStack = array()
     ) {
-        global $_CORELANG;
-
-        $arrMonthTxts = explode(',', $_CORELANG['TXT_MONTH_ARRAY']);
         foreach ($eventStats as $key => $value) {
             $optionValue = empty($parent) ? str_pad($key, 2, '0', STR_PAD_LEFT) : $parent . '-' . str_pad($key, 2, '0', STR_PAD_LEFT);
-            $optionName  = '';
-            switch ($level) {
-                case 1: // year value
-                    $optionName = $key;
-                    break;
-                case 2: // month value
-                    $optionName = $arrMonthTxts[$key-1];
-                    break;
-                case 3: // day value
-                    $optionName = $key .' ('. $value .')';
-                default:
-                    break;
+            if (
+                count($eventStats) == 1 &&
+                is_array($value)
+            ) {
+                array_unshift(
+                    $labelStack,
+                    $this->fetchStatsLabelByLevel($depth, $key, $value, true)
+                );
+                $this->parseEventRegistrationStats(
+                    $objTpl,
+                    $value,
+                    $selected,
+                    $optionValue,
+                    $level, // level is not increased intentionally
+                    $depth + 1,
+                    $blockName,
+                    $labelStack
+                );
+                return;
             }
+
+            if (
+                is_array($value) &&
+                count($value) == 1
+            ) {
+                $stack = array_merge(
+                    array($this->fetchStatsLabelByLevel($depth, $key, $value, true)),
+                    $labelStack
+                );
+                $this->parseEventRegistrationStats(
+                    $objTpl,
+                    $value,
+                    $selected,
+                    $optionValue,
+                    $level,
+                    $depth + 1,
+                    $blockName,
+                    $stack
+                );
+                continue;
+            }
+
+            if (is_array($value)) {
+                $stack = array_merge(
+                    array($this->fetchStatsLabelByLevel($depth, $key, $value)),
+                    $labelStack
+                );
+            } elseif ($depth == 3) {
+                $stack = array_merge(
+                    array($key . '.'),
+                    $labelStack
+                );
+                $stack = array_merge(
+                    $stack,
+                    array(' (' . $value . ')')
+                );
+            } else {
+                $stack = array_merge(
+                    $labelStack,
+                    array($this->fetchStatsLabelByLevel($depth, $key, $value))
+                );
+            }
+            $optionName = join(' ', $stack);
 
             $objTpl->setVariable(array(
                 $this->moduleLangVar . '_REGISTRATION_FILTER_DATE_INTENT'   => str_repeat('&nbsp;', ($level - 1) * 2),
@@ -471,9 +537,61 @@ class CalendarRegistrationManager extends CalendarLibrary
             $objTpl->parse($blockName);
 
             if (is_array($value)) {
-                $this->parseEventRegistrationStats($objTpl, $value, $selected, $optionValue, $level + 1, $blockName);
+                $this->parseEventRegistrationStats(
+                    $objTpl,
+                    $value,
+                    $selected,
+                    $optionValue,
+                    $level + 1,
+                    $depth + 1,
+                    $blockName,
+                    $stack
+                );
             }
         }
+    }
+
+    /**
+     * Fetch label for stats dropdown
+     *
+     * @param   integer $level  Nesting level of stats. Will be used to
+     *                          determine the type of label to return.
+     * @param   string  $key    The key used to identify the stats. Represents
+     *                          one of year, month, day or time.
+     * @param   mixed  $value   Either an array containing the stats or an
+     *                          integer representing the numer of registrations
+     */
+    protected function fetchStatsLabelByLevel($level, $key, $value) {
+        global $_CORELANG, $_ARRAYLANG;
+
+        static $arrMonthTxts;
+        if (!isset($arrMonthTxts)) {
+            $arrMonthTxts = explode(',', $_CORELANG['TXT_MONTH_ARRAY']);
+        }
+        $optionName = '';
+        switch ($level) {
+            case 1: // year value
+                $optionName = $key;
+                break;
+            case 2: // month value
+                $optionName = $arrMonthTxts[$key-1];
+                break;
+            case 3: // day value
+                $optionName = $key . '.';
+                break;
+            case 4: // time value
+                $optionName = $key . ' ' . $_ARRAYLANG['TXT_CALENDAR_OCLOCK'];
+                break;
+            default:
+                break;
+        }
+
+        // add count if entries
+        if (!is_array($value)) {
+            $optionName .= ' ('. $value .')';
+        }
+
+        return $optionName;
     }
 
     /**
@@ -490,7 +608,7 @@ class CalendarRegistrationManager extends CalendarLibrary
      *
      * @return array
      */
-    public function getEventStats()
+    protected function getEventStats()
     {
         global $objDatabase;
 
@@ -531,7 +649,18 @@ class CalendarRegistrationManager extends CalendarLibrary
             if (!isset($stats[$year][$month])) {
                 $stats[$year][$month] = array();
             }
-            $stats[$year][$month][$day] = $registration->fields['count'];
+
+            // optionally group registrations by time if the event is not
+            // an all-day event
+            if ($this->event->all_day) {
+                $stats[$year][$month][$day] = $registration->fields['count'];
+            } else {
+                $time = $dateTime->format('H:i');
+                if (!isset($stats[$year][$month][$day])) {
+                    $stats[$year][$month][$day] = array();
+                }
+                $stats[$year][$month][$day][$time] = $registration->fields['count'];
+            }
 
             $registration->MoveNext();
         }
@@ -578,12 +707,19 @@ class CalendarRegistrationManager extends CalendarLibrary
                 $eventManager->eventList[] = $objEvent;
             }
             $additionalRecurrences = $objEvent->seriesData['seriesAdditionalRecurrences'];
-            $eventManager->_setNextSeriesElement($objEvent, $additionalRecurrences);
+            $eventManager->generateRecurrencesOfEvent($objEvent, $additionalRecurrences);
+
+            // parse the event date with or without the time information
+            // depending on the fact if the event is an all-day event or not
+            $format = $this->getDateFormat();
+            if (!$this->event->all_day) {
+                $format .= ' H:i';
+            }
 
             $regEventDateField = '<select style="width: 208px;" class="calendarSelect" name="registrationEventDate">';
             foreach ($eventManager->eventList as $event) {
                 $selectedDate       = $objRegistration->eventDate == $event->startDate->getTimestamp() ? 'selected="selected"' : '';
-                $regEventDateField .= '<option value="' . $event->startDate->getTimestamp() . '" ' . $selectedDate . ' />' . $this->format2userDate($event->startDate) . '</option>';
+                $regEventDateField .= '<option value="' . $event->startDate->getTimestamp() . '" ' . $selectedDate . ' />' . $this->formatDateTime2user($event->startDate, $format) . '</option>';
             }
             $regEventDateField .= '</select>';
 

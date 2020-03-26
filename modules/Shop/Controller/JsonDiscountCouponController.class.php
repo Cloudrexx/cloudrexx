@@ -364,17 +364,24 @@ class JsonDiscountCouponController
         $value = !empty($params['value']) ? $params['value'] : '';
         $type = !empty($params['type']) ? $params['type'] : '';
 
+        if ($type == 'date') {
+            $isChecked = empty($value);
+        } else {
+            // as MySQL's unsigned INT can only store up to 4294967295 we
+            // need to use 1e9 to check against static::USES_UNLIMITED.
+            $isChecked = $value >= 1e9;
+            if ($isChecked) {
+                $value = '';
+            }
+        }
+
         $wrapper = new \Cx\Core\Html\Model\Entity\HtmlElement('div');
-        $input = new \Cx\Core\Html\Model\Entity\DataElement($name);
+        $input = new \Cx\Core\Html\Model\Entity\DataElement($name, $value);
         $input->setAttribute('type', 'text');
 
         if ($type == 'date') {
             $input->addClass('datepicker');
-            $isChecked = !empty($value);
-        } else {
-            $isChecked = $value > self::USES_UNLIMITED;
         }
-
         $text = new \Cx\Core\Html\Model\Entity\TextElement($labelText);
         $label = new \Cx\Core\Html\Model\Entity\HtmlElement('label');
         $label->setAttribute('for', $name . '-unlimited');
@@ -385,9 +392,13 @@ class JsonDiscountCouponController
             array(
                 'type' => 'checkbox',
                 'id' => $name . '-unlimited',
-                'checked' => $isChecked,
             )
         );
+        if ($isChecked) {
+            $checkbox->setAttributes(array(
+                'checked' => true,
+            ));
+        }
         $checkbox->addClass('shop-unlimited');
 
         $label->addChild($text);
@@ -491,6 +502,8 @@ class JsonDiscountCouponController
 
         $uses = $coupon->getUsedCount();
         $max = $value;
+        // as MySQL's unsigned INT can only store up to 4294967295 we
+        // need to use 1e9 to check against static::USES_UNLIMITED.
         if ($value > 1e9) {
             $max = $_ARRAYLANG['TXT_SHOP_DISCOUNT_COUPON_USES_UNLIMITED'];
         }

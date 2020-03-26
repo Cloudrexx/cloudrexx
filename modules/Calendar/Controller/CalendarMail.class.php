@@ -428,11 +428,11 @@ class CalendarMail extends CalendarLibrary
      * Get mail entity
      *
      * @param integer $id        mail id
-     * @param array   $formDatas mail field values
+     * @param array   $formDatas (optional) mail field values
      *
      * @return \Cx\Modules\Calendar\Model\Entity\Mail
      */
-    public function getMailEntity($id, $formDatas)
+    public function getMailEntity($id, $formDatas = array())
     {
         if (empty($id)) {
             $mail = new \Cx\Modules\Calendar\Model\Entity\Mail();

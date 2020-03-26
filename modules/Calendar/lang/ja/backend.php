@@ -256,7 +256,6 @@ $_ARRAYLANG['TXT_CALENDAR_NOTIFICATION_ACTIVATE'] = "Activate notification";
 $_ARRAYLANG['TXT_CALENDAR_NOTIFICATION_ADDRESS'] = "Recipient";
 $_ARRAYLANG['TXT_CALENDAR_NOTIFICATION_ADDRESS_INFO'] = "You can specify as many recipients as needed. E-mail addresses nee to be separated with a comma (,).";
 $_ARRAYLANG['TXT_CALENDAR_FRONTEND_SETTINGS'] = "Enter events";
-$_ARRAYLANG['TXT_CALENDAR_SERIES_ACTIVATE'] = "Activate series type";
 $_ARRAYLANG['TXT_CALENDAR_SERIES'] = "Serie";
 $_ARRAYLANG['TXT_CALENDAR_SERIES_PATTERN_DAILY'] = "Daily";
 $_ARRAYLANG['TXT_CALENDAR_SERIES_PATTERN_WEEKLY'] = "Weekly";
