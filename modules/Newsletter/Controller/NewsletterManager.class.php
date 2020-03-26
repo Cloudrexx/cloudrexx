@@ -2905,7 +2905,7 @@ class NewsletterManager extends NewsletterLib
 
         // 3. access users of one of the selected user groups
         $userGroupRecipientsQuery =
-            'SELECT DISTINCT `userGroup` ' .
+            'SELECT `userGroup` ' .
             'FROM `%1$smodule_newsletter_rel_usergroup_newsletter` AS `arn` ' .
 
             // filter by selected e-mail campaign
