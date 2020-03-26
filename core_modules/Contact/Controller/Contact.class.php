@@ -990,19 +990,21 @@ class Contact extends \Cx\Core_Modules\Contact\Controller\ContactLib
             }
         }
 
+        // set recipient(s) of notification mail to selected recipient group
+        // (if present and selected)
         if ($chosenMailRecipient !== null) {
-            if (!empty($chosenMailRecipient)) {
-                $objMail->AddAddress($chosenMailRecipient);
+            $arrFormData['emails'] = array_map(
+                'trim',
+                explode(',', $chosenMailRecipient)
+            );
+        }
+
+        // finally, send the notification mails
+        foreach ($arrFormData['emails'] as $sendTo) {
+            if (!empty($sendTo)) {
+                $objMail->AddAddress($sendTo);
                 $objMail->Send();
                 $objMail->ClearAddresses();
-            }
-        } else {
-            foreach ($arrFormData['emails'] as $sendTo) {
-                if (!empty($sendTo)) {
-                    $objMail->AddAddress($sendTo);
-                    $objMail->Send();
-                    $objMail->ClearAddresses();
-                }
             }
         }
 

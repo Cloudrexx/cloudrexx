@@ -313,11 +313,6 @@ class MemberDir extends MemberDirLibrary
                             ));
                         }
 
-                         $name = ($key <= 12 ) ? strtoupper($field['name']) : $key;
-                        $this->_objTpl->setVariable(array(
-                            "MEMBERDIR_FIELD_".$name => ($key > 12) ? nl2br($objResult->fields[$key]) : $this->checkStr($objResult->fields[$key])
-                        ));
-
                         $this->_objTpl->setVariable($replace);
                         $this->_objTpl->setVariable(array(
                             "MEMBERDIR_ROW"     => $rowid,
