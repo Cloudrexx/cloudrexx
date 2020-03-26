@@ -183,6 +183,9 @@ class RewriteRule extends \Cx\Model\Base\EntityBase
 
     /**
      * Resolve
+     *
+     * @throws \Cx\Lib\Net\Model\Entity\UrlException In case the rewritten url
+     *                                               is invalid
      */
     public function resolve(\Cx\Core\Routing\Url $url, &$continue)
     {
@@ -190,10 +193,21 @@ class RewriteRule extends \Cx\Model\Base\EntityBase
             return $url;
         }
 
-        $continue = $this->getContinueOnMatch();
+        // apply regex to resolved url
+        $rewrite = $this->getRegularExpression()->replace($url->toString());
+
+        // verify that the rewritten url is valid
+        // note: this would throw an exception if $rewrite is not a valid url
+        $rewrittenUrl = new \Cx\Lib\Net\Model\Entity\Url($rewrite);
+
+        // convert url into legacy url format for backwards compatability
         $newUrl = \Cx\Core\Routing\Url::fromMagic(
-            $this->getRegularExpression()->replace($url->toString())
+            $rewrittenUrl
         );
+
+        // set continue state only if regex application was successful
+        $continue = $this->getContinueOnMatch();
+
         \DBG::log('Redirecting to ' . $newUrl->toString());
         return $newUrl;
     }

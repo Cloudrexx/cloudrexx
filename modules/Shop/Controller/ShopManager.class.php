@@ -468,7 +468,7 @@ class ShopManager extends ShopLibrary
                         $product->$setter($value);
                     } else {
                         throw new \Exception('Feld konnte nicht zugwiesen werden');
-                    }
+                }
                 }
                 try {
                     $em->persist($product);
@@ -1766,12 +1766,15 @@ if ($test === NULL) {
 
         $arrCategoryId = array();
         $deleted = false;
+        $deleteProducts = false;
         if (empty($category_id)) {
             if (!empty($_GET['delete_category_id'])) {
                 array_push($arrCategoryId, $_GET['delete_category_id']);
+                $deleteProducts = !empty($_GET['delete_products']);
             } elseif (!empty($_POST['selected_category_id'])
                    && is_array($_POST['selected_category_id'])) {
                 $arrCategoryId = $_POST['selected_category_id'];
+                $deleteProducts = !empty($_POST['delete_products']);
             }
         } else {
             array_push($arrCategoryId, $category_id);
@@ -1804,10 +1807,13 @@ if ($test === NULL) {
             }
             $deleted = true;
         }
-        if ($deleted) {
+        if (!$deleted) {
+            return null;
+        }
+        if ($deleteProducts) {
             return \Message::ok($_ARRAYLANG['TXT_DELETED_CATEGORY_AND_PRODUCTS']);
         }
-        return null;
+        return \Message::ok($_ARRAYLANG['TXT_SHOP_DELETED_CATEGORIES']);
     }
 
 
@@ -2166,7 +2172,6 @@ if ($test === NULL) {
             'SHOP_PHONE' => $objCustomer->phone(),
             'SHOP_FAX' => $objCustomer->fax(),
             'SHOP_EMAIL' => $objCustomer->email(),
-            'SHOP_CUSTOMER_BIRTHDAY' => date(ASCMS_DATE_FORMAT_DATE, $objCustomer->getProfileAttribute('birthday')),
             'SHOP_COMPANY_NOTE' => $objCustomer->companynote(),
             'SHOP_IS_RESELLER' => $customer_type,
             'SHOP_REGISTER_DATE' => date(ASCMS_DATE_FORMAT_DATETIME,
@@ -2174,6 +2179,13 @@ if ($test === NULL) {
             'SHOP_CUSTOMER_STATUS' => $active,
             'SHOP_DISCOUNT_GROUP_CUSTOMER' => $customerGroupName,
         ));
+        $birthday = $objCustomer->getProfileAttribute('birthday');
+        if (!empty($birthday)) {
+            self::$objTemplate->setVariable(
+                'SHOP_CUSTOMER_BIRTHDAY',
+                date(ASCMS_DATE_FORMAT_DATE, $birthday)
+            );
+        }
 // TODO: TEST
         $count = NULL;
 
@@ -2309,13 +2321,12 @@ if ($test === NULL) {
             'SHOP_EMAIL' => $email,
             'SHOP_PHONE' => $phone,
             'SHOP_FAX' => $fax,
-            'SHOP_CUSTOMER_BIRTHDAY' => date(ASCMS_DATE_FORMAT_DATE, $objCustomer->getProfileAttribute('birthday')),
             'SHOP_USERNAME' => $username,
             'SHOP_PASSWORD' => $password,
             'SHOP_COMPANY_NOTE' => $companynote,
             'SHOP_REGISTER_DATE' => date(ASCMS_DATE_FORMAT_DATETIME, $registerdate),
             'SHOP_COUNTRY_MENUOPTIONS' =>
-                \Cx\Core\Country\Controller\Country::getMenuoptions($country_id),
+                \Cx\Core\Country\Controller\Country::getMenuoptions($country_id, false),
             'SHOP_DISCOUNT_GROUP_CUSTOMER_MENUOPTIONS' =>
                 \Cx\Modules\Shop\Controller\BackendController::getMenuOptionsGroupCustomer($customer_group_id),
             'SHOP_CUSTOMER_TYPE_MENUOPTIONS' =>
@@ -2324,6 +2335,19 @@ if ($test === NULL) {
                 Customers::getActiveMenuoptions($active),
             'SHOP_LANG_ID_MENUOPTIONS' => \FWLanguage::getMenuoptions($lang_id),
         ));
+        $birthday = 0;
+        if ($objCustomer) {
+            $birthday = $objCustomer->getProfileAttribute('birthday');
+        }
+        if (!empty($birthday)) {
+            self::$objTemplate->setVariable(
+                'SHOP_CUSTOMER_BIRTHDAY',
+                date(ASCMS_DATE_FORMAT_DATE, $birthday)
+            );
+        }
+        \JS::registerCode(
+            'cx.ready(function(){cx.jQuery(".datepicker-field").datepicker({dateFormat: "dd.mm.yy"});});'
+        );
         return true;
     }
 

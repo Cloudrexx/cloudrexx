@@ -249,7 +249,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         $customFormatHandlers = array(
             //  The abbreviated weekday name according to the current locale
             '%a' => function($time) use ($_CORELANG) {
-                $days = explode(',', $_CORELANG['TXT_CORE_DAY_ABBREV3_ARRAY']);
+                $days = explode(',', $_CORELANG['TXT_CORE_DAY_ABBREV_ARRAY']);
                 $dayIdx = strftime('%w', $time);
                 return $days[$dayIdx];
             },

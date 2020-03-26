@@ -2,7 +2,7 @@
 <script language="JavaScript" type="text/javascript">
 $J(function(){
     $J(".inputfieldType").live("change", function() {
-       handleKeywordAbility();
+       setContextAbilities();
     });
    $J( ".inputfieldContext" ).live('change', function(){
        resetContextFields();
@@ -12,7 +12,6 @@ $J(function(){
       var inputId = $J(this).data('inputId');
       mediaBrowseInputBox = $J('#' + inputId);
    });
-   handleKeywordAbility();
   cx.jQuery('input[name=use_associated_entries]')
     .change(function() {
       if (cx.jQuery('input[name=use_associated_entries]:checked').val() === "1") {
@@ -33,7 +32,7 @@ $J(function(){
 });
 
 function resetContextFields() {
-    var contexts = ['title', 'address', 'zip', 'city', 'country'];
+    var contexts = ['title', 'address', 'zip', 'city', 'country', 'slug'];
     $J(".inputfieldContext").each(function(){
         if ($J(this).val() != 'none') {
             $J(".inputfieldContext option[value="+ $J(this).val() +"]")
@@ -47,7 +46,7 @@ function resetContextFields() {
         $J(".inputfieldContext option[value="+ context +"]").removeAttr('disabled');
     });
 
-    handleKeywordAbility();
+    setContextAbilities();
 }
 
 cx.jQuery.removeFromArray = function(value, arr) {
@@ -137,6 +136,11 @@ function ExpandMinimizeForm(toggle){
     elm2.style.display = (elm2.style.display=='none') ? 'block' : 'none';
 }
 
+function setContextAbilities() {
+    handleKeywordAbility();
+    handleSlugAbility();
+}
+
 function handleKeywordAbility() {
     /* compatible field types for meta keywords:
     1: text
@@ -146,23 +150,36 @@ function handleKeywordAbility() {
     5: checkbox
      */
     var compatibleTypes = [1, 2, 3, 4, 5];
+    handleContextAbility('keyword', compatibleTypes);
+}
+
+function handleSlugAbility() {
+    /* compatible field types for slug:
+    1: text
+     */
+    var compatibleTypes = [1];
+    handleContextAbility('slug', compatibleTypes);
+}
+
+function handleContextAbility(context, compatibleTypes) {
     cx.jQuery(".inputfieldType").each(function() {
-        var keywordsOption = cx.jQuery(this)
+        var contextOption = cx.jQuery(this)
           .closest("tr")
-          .find(".inputfieldContext option[value='keywords']");
+          .find(".inputfieldContext option[value='" + context + "']");
         if (
           (
             compatibleTypes.indexOf(parseInt(cx.jQuery(this).val())) != -1 &&
-            !cx.jQuery(".inputfieldContext option[value='keywords']:selected").length
+            !cx.jQuery(".inputfieldContext option[value='" + context + "']:selected").length
           ) ||
-          keywordsOption.is(":selected")
+          contextOption.is(":selected")
         ) {
-            keywordsOption.prop("disabled", false);
+            contextOption.prop("disabled", false);
         } else {
-            keywordsOption.prop("disabled", true);
+            contextOption.prop("disabled", true);
         }
     });
 }
+
 var mediaBrowseInputBox;
 var mediaBrowserCallback = function(data) {
     if (data.type=="file") {
