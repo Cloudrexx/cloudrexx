@@ -1049,7 +1049,7 @@ class User extends User_Profile
 
         foreach ($user->getUserAttributeValues() as $attributeValue) {
             $value = $attributeValue->getValue();
-            $attributeId = $attributeValue->getAttributeId();
+            $attributeId = $attributeValue->getUserAttribute()->getId();
             $convertedAttributeId = $this->objAttribute->getDefaultAttributeIdByAttributeId($attributeId);
             if ($this->objAttribute->isDefaultAttribute($convertedAttributeId)) {
                 // default attributes like 'title' or 'firstname'

@@ -930,7 +930,7 @@ class User extends \Cx\Model\Base\EntityBase {
     public function getAttributeValue($attributeId)
     {
         foreach ($this->getUserAttributeValues() as $value) {
-            if ($value->getAttributeId() == $attributeId) {
+            if ($value->getUserAttribute()->getId() == $attributeId) {
                 return $value;
             }
         }

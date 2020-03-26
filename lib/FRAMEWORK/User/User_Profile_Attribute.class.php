@@ -759,7 +759,7 @@ class User_Profile_Attribute
         $attributeName = $attributeNameRepo->findOneBy(array('name' => $name));
 
         if ($attributeName) {
-            return $attributeName->getAttributeId();
+            return $attributeName->getUserAttribute()->getId();
         }
         return false;
     }
@@ -1092,7 +1092,7 @@ class User_Profile_Attribute
         $em = $cx->getDb()->getEntityManager();
         $attributeNameRepo = $em->getRepository('Cx\Core\User\Model\Entity\UserAttributeName');
         $attributeRepo = $em->getRepository('Cx\Core\User\Model\Entity\UserAttribute');
-        $attributeNames = $attributeNameRepo->findBy(array('attributeId' => $this->id));
+        $attributeNames = $attributeNameRepo->findBy(array('userAttribute' => $this->id));
 
         foreach ($attributeNames as $attributeName) {
             $arrOldNames[$attributeName->getLangId()] = $attributeName->getName();
@@ -1105,19 +1105,18 @@ class User_Profile_Attribute
             $attributeName = new \Cx\Core\User\Model\Entity\UserAttributeName();
             $attributeName->setLangId($langId);
             $attributeName->setName(addslashes($this->arrName[$langId]));
-            $attributeName->setAttributeId($this->id);
             $attributeName->setUserAttribute($attribute);
             $em->persist($attributeName);
         }
         foreach ($arrRemovedNames as $langId) {
-            $attributeName = $attributeNameRepo->findOneBy(array('attributeId' => $this->id, 'langId' => $langId));
+            $attributeName = $attributeNameRepo->findOneBy(array('userAttribute' => $this->id, 'langId' => $langId));
             if ($attributeName) {
                 continue;
             }
             $em->remove($attributeName);
         }
         foreach ($arrUpdatedNames as $langId) {
-            $attributeName = $attributeNameRepo->findOneBy(array('attributeId' => $this->id, 'langId' => $langId));
+            $attributeName = $attributeNameRepo->findOneBy(array('userAttribute' => $this->id, 'langId' => $langId));
             if (empty($attributeName)) {
                 continue;
             }
@@ -1344,7 +1343,7 @@ class User_Profile_Attribute
         $em = $cx->getDb()->getEntityManager();
         $attrNames = $em->getRepository(
             'Cx\Core\User\Model\Entity\UserAttributeValue'
-        )->findBy(array('attributeId' => $attributeId));
+        )->findBy(array('userAttribute' => $attributeId));
 
         foreach ($attrNames as $attrName) {
             $em->remove($attrName);
@@ -1367,7 +1366,7 @@ class User_Profile_Attribute
         $em = $cx->getDb()->getEntityManager();
         $attrNames = $em->getRepository(
             'Cx\Core\User\Model\Entity\UserAttributeName'
-        )->findBy(array('attributeId' => $attributeId));
+        )->findBy(array('userAttribute' => $attributeId));
 
         foreach ($attrNames as $attrName) {
             $em->remove($attrName);
@@ -1819,7 +1818,7 @@ class User_Profile_Attribute
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $names = $cx->getDb()->getEntityManager()->getRepository(
             'Cx\Core\User\Model\Entity\UserAttributeName'
-        )->findBy(array('attributeId' => $id));
+        )->findBy(array('userAttribute' => $id));
 
         $arrNames = array();
         foreach ($names as $name) {
@@ -1842,7 +1841,7 @@ class User_Profile_Attribute
             )->findOneBy(
                 array(
                     'langId' => $langId,
-                    'attributeId' => contrexx_raw2db($this->id)
+                    'userAttribute' => contrexx_raw2db($this->id)
                 )
             );
 
@@ -2218,7 +2217,7 @@ class User_Profile_Attribute
 
         $arrNames = array();
         foreach ($names as $name) {
-            $arrNames[$name->getAttributeId()] = $name->getName();
+            $arrNames[$name->getUserAttribute()->getId()] = $name->getName();
         }
 
         return $arrNames;

@@ -262,9 +262,9 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
 
         $qb->join('u.userAttributeValues', 'v'.$field);
 
-        $qb->andWhere($qb->expr()->eq('v'.$field.'.attributeId', ':attributeId'.$field));
+        $qb->andWhere($qb->expr()->eq('v'.$field.'.userAttribute', ':userAttribute'.$field));
         $qb->andWhere($qb->expr()->eq('REGEXP(v'.$field.'.value, \''.$regex.'\')', 1));
-        $qb->setParameter('attributeId'.$field, $field);
+        $qb->setParameter('userAttribute'.$field, $field);
     }
 
     /**

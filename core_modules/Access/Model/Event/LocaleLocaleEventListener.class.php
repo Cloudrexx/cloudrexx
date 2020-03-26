@@ -60,13 +60,12 @@ class LocaleLocaleEventListener extends \Cx\Core\Event\Model\Entity\DefaultEvent
         // Add user attribute names for new locale
         foreach ($attributeNames as $attributeName) {
             $newAttributeName = $attributeNameRepo->findOneBy(
-                array('attributeId' => $attributeName->getAttributeId(), 'langId' => $localeId)
+                array('userAttribute' => $attributeName->getUserAttribute()->getId(), 'langId' => $localeId)
             );
             if (!empty($newAttributeName)) {
                 continue;
             }
             $newAttributeName = new \Cx\Core\User\Model\Entity\UserAttributeName();
-            $newAttributeName->setAttributeId($attributeName->getAttributeId());
             $newAttributeName->setUserAttribute($attributeName->getUserAttribute());
             $newAttributeName->setName($attributeName->getName());
             $newAttributeName->setLangId($localeId);
