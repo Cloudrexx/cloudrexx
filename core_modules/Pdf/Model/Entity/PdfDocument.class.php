@@ -121,7 +121,6 @@ class PdfDocument extends \mPDF
             }
         }
         $this->SetDisplayPreferences('HideWindowUI');
-        $this->AddPage();
         $this->WriteHTML($this->content);
         if (empty($this->filePath)) {
             $this->filePath = \Cx\Lib\FileSystem\FileSystem::replaceCharacters(

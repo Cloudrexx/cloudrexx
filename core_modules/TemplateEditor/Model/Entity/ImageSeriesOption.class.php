@@ -114,8 +114,7 @@ class ImageSeriesOption extends Option
             'TEMPLATEEDITOR_OPTION_HUMAN_NAME', $this->humanName
         );
         //Get last key
-        end($this->urls);
-        $key = key($this->urls);
+        $key = max(array_keys($this->urls));
         $key = $key != null ? $key : '0';
         $subTemplate->setVariable('TEMPLATEEDITOR_LASTID', $key);
         $template->setVariable('TEMPLATEEDITOR_OPTION', $subTemplate->get());

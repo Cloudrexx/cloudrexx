@@ -1209,6 +1209,9 @@ END;
            we can now simply return the desired target path, as only valid
            files are present in $tempPath                                   */
 
+        // drop complete cache to avoid problems with global placeholders
+        \Cx\Core\Core\Controller\Cx::instanciate()->getComponent('Cache')->clearCache();
+
         return array($data['path'], $data['webPath']);
     }
 
