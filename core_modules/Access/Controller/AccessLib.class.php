@@ -2045,7 +2045,7 @@ JS
                 SELECT v.`value` AS picture
                 FROM `".DBPREFIX."access_user_attribute` AS a
                 INNER JOIN `".DBPREFIX."access_user_attribute_value` AS v ON v.`attribute_id` = a.`id`
-                WHERE a.`type` = 'image' AND v.`value` != ''" . ($profilePics ? ' AND `a`.`id` =' . $picId : '');
+                WHERE a.`type` = 'image' AND v.`value` != '' AND `a`.`id` ".($profilePics ? "= " : "!= ") . $picId;
 
             while ($offset < $count) {
                 $objImage = $objDatabase->SelectLimit($query, $step, $offset);
