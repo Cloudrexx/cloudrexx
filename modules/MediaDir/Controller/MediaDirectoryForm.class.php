@@ -182,7 +182,31 @@ class MediaDirectoryForm extends MediaDirectoryLibrary
         return $arrForms;
     }
 
+    /**
+     * Returns a list with IDs of all published forms
+     *
+     * @return  array   List of IDs of forms
+     */
+    public static function getIdsWithPublishedData() {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $db = $cx->getDb()->getAdoDb();
+        $result = $db->Execute('
+            SELECT `id`
+            FROM `' . DBPREFIX . 'module_mediadir_forms`
+            WHERE `active` = 1
+        ');
+        if (!$result || $result->EOF) {
+            return array();
+        }
 
+        $ids = array();
+        while (!$result->EOF) {
+            $ids[] = $result->fields['id'];
+            $result->MoveNext();
+        }
+
+        return $ids;
+    }
 
     function listForms($objTpl, $intView, $intFormId=null)
     {

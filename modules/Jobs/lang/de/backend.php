@@ -32,10 +32,22 @@
  * @package     cloudrexx
  * @subpackage  module_jobs
  */
-$_ARRAYLANG['TXT_CATEGORY_MANAGER'] = "Kategorien";
 $_ARRAYLANG['TXT_JOBS_MANAGER'] = "Stellenangebote";
-$_ARRAYLANG['TXT_CREATE_DOCUMENT'] = "Neu";
-$_ARRAYLANG['TXT_JOBS_MENU_OVERVIEW'] = "Überblick";
+$_ARRAYLANG['TXT_MODULE_JOBS'] = 'Stellenangebote';
+$_ARRAYLANG['TXT_MODULE_JOBS_ACT_DEFAULT'] = 'Überblick';
+$_ARRAYLANG['TXT_MODULE_JOBS_ACT_JOB'] = 'Neu';
+$_ARRAYLANG['TXT_MODULE_JOBS_ACT_CAT'] = "Kategorien";
+$_ARRAYLANG['TXT_MODULE_JOBS_ACT_LOC'] = 'Regionen';
+$_ARRAYLANG['TXT_MODULE_JOBS_ACT_SETTINGS'] = 'Einstellungen';
+$_ARRAYLANG['TXT_MODULE_JOBS_ACT_SETTINGS_DEFAULT'] = 'Allgemein';
+$_ARRAYLANG['TXT_MODULE_JOBS_ACT_SETTINGS_FLAG'] = 'Kennzeichnungen';
+$_ARRAYLANG['TXT_JOBS_FLAG'] = 'Kennzeichnung';
+$_ARRAYLANG['TXT_JOBS_FLAGS'] = 'Kennzeichnungen';
+$_ARRAYLANG['TXT_JOBS_FLAGS_INFO'] = 'Wählen Sie die Kennzeichnungen aus, welche dem Stellenangebot zugewiesen werden sollen.';
+$_ARRAYLANG['name'] = 'Name';
+$_ARRAYLANG['icon'] = 'Symbol';
+$_ARRAYLANG['value'] = 'Wert';
+
 $_ARRAYLANG['TXT_AUTHOR'] = "Autor";
 $_ARRAYLANG['TXT_DATE'] = "Datum";
 $_ARRAYLANG['TXT_EDIT_DOCUMENTS'] = "Stellenangebote bearbeiten";
@@ -101,9 +113,9 @@ $_ARRAYLANG['TXT_JOBS_URL_ERROR'] = "Geben Sie eine Gültige URL im Feld 'Fussno
 $_ARRAYLANG['TXT_JOBS_ASSOCIATED_LOCATIONS'] = "Zugewiesene Regionen";
 $_ARRAYLANG['TXT_JOBS_AVAILABLE_LOCATIONS'] = "Vorhandene Regionen";
 $_ARRAYLANG['TXT_JOBS_LOCATIONS_NOT_ASSIGNED'] = "Regionen konnten nicht zugewiesen werden.";
+$_ARRAYLANG['TXT_JOBS_FLAGS_NOT_ASSIGNED'] = "Kennzeichnungen konnten nicht zugewiesen werden.";
 $_ARRAYLANG['TXT_JOBS_LOCATION_NOT_DELETED'] = "Regionszuweisungen konnten nicht gelöscht werden.";
 $_ARRAYLANG['TXT_JOBS_SHOW_LOCATION_FE'] = "Regionen als Auswahl zur Verfügung stellen";
-$_ARRAYLANG['TXT_LOCATION_MANAGER'] = "Regionen";
 $_ARRAYLANG['TXT_LOCATION'] = "Regionen";
 $_ARRAYLANG['TXT_JOBS_WORK_START_NOW'] = "ab sofort";
 $_ARRAYLANG['TXT_JOBS_SETTINGS'] = "Eigenschaften";
@@ -123,3 +135,4 @@ $_ARRAYLANG['TXT_JOBS_RECORD_UPDATE_FAILED'] = "Die Änderung konnte nicht gespe
 $_ARRAYLANG['TXT_JOBS_PAID'] = "Publikation";
 $_ARRAYLANG['TXT_JOBS_PAID_LABEL'] = "Bezahltes Angebot";
 $_ARRAYLANG['TXT_JOBS_NON_PAID_LABEL'] = "Normales Angebot";
+$_ARRAYLANG['TXT_JOBS_USE_FLAGS_OPTION'] = "Kennzeichnungen für Angebote verwenden";

@@ -423,7 +423,12 @@ class Permission extends \Cx\Model\Base\EntityBase {
         }
 
         //callback function check
-        if ($this->getCallback() && call_user_func($this->getCallback(), $params) !== true) {
+        try {
+            if ($this->getCallback() && call_user_func($this->getCallback(), $params) !== true) {
+                return false;
+            }
+        } catch (CallbackException $e) {
+            \DBG::msg('Permission callback failed with message ' . $e->getMessage());
             return false;
         }
 
