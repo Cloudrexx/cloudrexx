@@ -109,7 +109,6 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                     'Manage' => 'manage',
                     'Attribute' => 'attributes',
                     'Customer' => 'customers',
-                    'RelDiscountGroup' => 'discounts',
                     'Statistic' => 'statistics',
                     'Import' => 'import',
                     'Setting' => 'settings',
@@ -327,7 +326,7 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                 break;
             case 'Cx\Modules\Shop\Model\Entity\ArticleGroup':
                 $options['functions']['editable'] = true;
-                $options['functions']['edit'] = false;
+                $options['functions']['paging'] = false;
                 $options['functions']['sorting'] = false;
                 $options['fields'] = array(
                     'name' => array(
@@ -345,7 +344,7 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                 break;
             case 'Cx\Modules\Shop\Model\Entity\CustomerGroup':
                 $options['functions']['editable'] = true;
-                $options['functions']['edit'] = false;
+                $options['functions']['paging'] = false;
                 $options['functions']['sorting'] = false;
                 $options['fields'] = array(
                     'id' => array(
@@ -422,6 +421,68 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
     }
 
     /**
+     * Returns the HTML dropdown menu options with all of the
+     * article group names, plus a null option prepended
+     *
+     * Backend use only.
+     * @param   integer   $selectedId   The optional preselected ID
+     * @return  string                  The HTML dropdown menu options
+     * @static
+     */
+    static function getMenuOptionsGroupArticle($selectedId=0)
+    {
+        global $_ARRAYLANG;
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em =  $cx->getDb()->getEntityManager();
+
+        $articleGroups = $em->getRepository(
+            'Cx\Modules\Shop\Model\Entity\ArticleGroup'
+        )->findAll();
+
+        $arrArticleGroupName = array();
+        foreach ($articleGroups as $articleGroup) {
+            $arrArticleGroupName[
+            $articleGroup->getId()
+            ] = $articleGroup->getName();
+        }
+        return \Html::getOptions(
+            array(0 => $_ARRAYLANG['TXT_SHOP_DISCOUNT_GROUP_NONE'], )
+            + $arrArticleGroupName, $selectedId);
+    }
+
+    /**
+     * Returns the HTML dropdown menu options with all of the
+     * customer group names
+     *
+     * Backend use only.
+     * @param   integer   $selectedId   The optional preselected ID
+     * @return  string                  The HTML dropdown menu options
+     * @static
+     */
+    static function getMenuOptionsGroupCustomer($selectedId=0)
+    {
+        global $_ARRAYLANG;
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em =  $cx->getDb()->getEntityManager();
+
+        $customerGroups = $em->getRepository(
+            'Cx\Modules\Shop\Model\Entity\CustomerGroup'
+        )->findAll();
+
+        $arrGroupname = array();
+        foreach ($customerGroups as $customerGroup) {
+            $arrGroupname[$customerGroup->getId()] = $customerGroup->getName();
+        }
+
+        return \Html::getOptions(
+            array(
+                0 => $_ARRAYLANG['TXT_SHOP_DISCOUNT_GROUP_NONE']
+            ) + $arrGroupname, $selectedId);
+    }
+
+    /**
      * Load custom view for order detail view
      *
      * @param \Cx\Core\Html\Sigma $template Backend template for this page
@@ -455,6 +516,14 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
             return $this->getSystemComponentController()->getController(
                 'Order'
             )->parseOrderDetailPage($template, $entityClassName, $options);
+        } else if (
+            $entityName == 'RelDiscountGroup'
+        ) {
+            $options = parent::getViewGeneratorOptions($entityClassName);
+
+            return $this->getSystemComponentController()->getController(
+                'DiscountGroup'
+            )->parsePage($template, $options);
         }
 
         return parent::parsePage($template, $cmd,$isSingle);

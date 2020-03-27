@@ -137,7 +137,7 @@ class GuestBook extends GuestBookLibrary {
 
         while ($objResult !== false and !$objResult->EOF) {
             $class = ($i % 2) ? "row1" : "row2";
-            $gender = ($objResult->fields["gender"] == "M") ? $_ARRAYLANG['guestbookGenderMale'] : $_ARRAYLANG['guestbookGenderFemale']; // N/A
+            $gender = ($objResult->fields["gender"] == "M") ? $_ARRAYLANG['TXT_MALE'] : $_ARRAYLANG['TXT_FEMALE']; // N/A
 
             if ($objResult->fields['url'] != "") {
                 $this->_objTpl->setVariable('GUESTBOOK_URL', '<a href="' . $objResult->fields['url'] . '" target="_blank"><img alt="' . $objResult->fields['url'] . '" src=".'.ASCMS_MODULE_FOLDER.'/GuestBook/View/Media/www.gif" style="vertical-align:baseline" border="0" /></a>');

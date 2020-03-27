@@ -188,6 +188,7 @@ label[for='form-0-lsvs'] {
 
 #form-0-orderItems td {
     padding: 3px;
+    white-space: nowrap;
 }
 
 #form-0-orderItems td:nth-child(2) {
@@ -352,4 +353,8 @@ table.adminlist td.discountgroup-name {
 }
 .payment-processor-name {
     width: 25%;
+}
+
+#discount-group-table tr td:nth-child(1) {
+    font-weight: bold;
 }

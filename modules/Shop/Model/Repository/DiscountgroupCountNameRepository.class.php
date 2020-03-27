@@ -10,4 +10,20 @@ namespace Cx\Modules\Shop\Model\Repository;
  */
 class DiscountgroupCountNameRepository extends \Doctrine\ORM\EntityRepository
 {
+    /**
+     * Tells whether a discount group is cumulative for all its products
+     *
+     * @param   integer   $groupId     The discount group ID
+     *
+     * @return boolean True if $group_id counts order limit accross products
+     */
+    public function isDiscountCumulative($groupId)
+    {
+        $discountName = $this->find($groupId);
+
+        if (!empty($discountName) && $discountName->getCumulative()) {
+            return true;
+        }
+        return false;
+    }
 }

@@ -1492,30 +1492,70 @@ class Product
         $groupCountId = $this->group_id();
         $groupArticleId = $this->article_id();
         $price = $normalPrice;
-        if (   !$ignore_special_offer
-            && $discount_active == 1
-            && $discountPrice != 0) {
-            $price = $discountPrice;
+
+        // check if customer is a reseller
+        if (
+            $objCustomer &&
+            $objCustomer->is_reseller()
+        ) {
+            $isReseller = true;
         } else {
-            if (   $objCustomer
-                && $objCustomer->is_reseller()
-                && $resellerPrice != 0) {
-                $price = $resellerPrice;
-            }
+            $isReseller = false;
         }
+
+        // check if product has discount price
+        // note: discount price is used bor both,
+        // end customers and resellers
+        if (
+            !$ignore_special_offer &&
+            $discount_active == 1 &&
+            $discountPrice != 0
+        ) {
+            $price = $discountPrice;
+
+        // if no discount price is set, check if a specific
+        // reseller-price is set
+        } elseif (
+            $isReseller &&
+            $resellerPrice != 0
+        ) {
+            $price = $resellerPrice;
+        }
+
+        // add any selected product options
         $price += $price_options;
+
+        // if customer is a reseller and no reseller specific-price has been
+        // set, then we have to deduct the VAT from retail-price, in case
+        // the retail-price is VAT-inclusive, but reseller-prices shall not be
+        if (
+            $isReseller &&
+            !$resellerPrice &&
+            Vat::isIncludedInRetailButNotInReseller()
+        ) {
+            $vatRate = Vat::getRate($this->vat_id());
+            $price -= $price - 100 * $price / (100 + $vatRate);
+        }
+
         $rateCustomer = 0;
         if ($objCustomer) {
             $groupCustomerId = $objCustomer->group_id();
             if ($groupCustomerId) {
-                $rateCustomer = Discount::getDiscountRateCustomer(
-                    $groupCustomerId, $groupArticleId);
+                $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+                $discountGroupRepo = $cx->getDb()->getEntityManager()->getRepository(
+                    'Cx\Modules\Shop\Model\Entity\RelDiscountGroup'
+                );
+                $rateCustomer = $discountGroupRepo->getDiscountRateCustomer(
+                    $groupCustomerId, $groupArticleId
+                );
                 $price -= ($price * $rateCustomer * 0.01);
             }
         }
         $rateCount = 0;
         if ($count > 0) {
-            $rateCount = Discount::getDiscountRateCount($groupCountId, $count);
+            $rateCount =
+                \Cx\Modules\Shop\Controller\DiscountgroupCountNameController::
+                    getDiscountRateCount($groupCountId, $count);
             $price -= ($price * $rateCount * 0.01);
         }
         $price = \Cx\Modules\Shop\Controller\CurrencyController::getCurrencyPrice($price);

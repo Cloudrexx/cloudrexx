@@ -60,4 +60,17 @@ abstract class ContrexxTestCase extends \PHPUnit\Framework\TestCase {
         $this->backupGlobals = false;
         $this->backupStaticAttributes = false;
     }
+
+    /**
+     * Returns the requested component's controller
+     *
+     * @param string $componentName Name of the component to fetch
+     * @return \Cx\Core\Core\Model\Entity\SystemComponentController|null
+     *      ComponentController or null if none was found
+     */
+    protected function getComponent(
+        string $componentName
+    ): ?\Cx\Core\Core\Model\Entity\SystemComponentController {
+        return static::$cx->getComponent($componentName);
+    }
 }

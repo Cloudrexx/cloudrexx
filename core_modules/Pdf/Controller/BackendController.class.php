@@ -212,7 +212,7 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
                         $value = preg_replace($regexp, '[[\1]]', $value);
                         $editor = new \Cx\Core\Wysiwyg\Wysiwyg(
                             $name,
-                            $value,
+                            contrexx_raw2xhtml($value),
                             'full'
                         );
                         $span   = new \Cx\Core\Html\Model\Entity\HtmlElement(

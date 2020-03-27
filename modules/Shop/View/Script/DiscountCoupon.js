@@ -1,12 +1,12 @@
 cx.ready(function() {
     loadGenerateCodeButton();
 
-    toggleLimitedField(cx.jQuery('.shop-unlimited'));
-    var storeValues = {endTime: cx.jQuery('#form-0-uses').val(), uses: cx.jQuery('#form-0-uses').val()}
+    var storeValues = {};
     cx.jQuery('.shop-unlimited').change(function() {
         var fieldName = cx.jQuery(this).attr('name');
         storeValues[fieldName] = toggleLimitedField(cx.jQuery(this), storeValues[fieldName]);
     });
+    cx.jQuery(".shop-unlimited").trigger("change");
 
     toggleCouponType();
     cx.jQuery('input[name="coupon_type"]').click(function () {
@@ -51,6 +51,9 @@ function loadGenerateCodeButton() {
 }
 
 function toggleLimitedField(checkbox, oldValue) {
+    if (oldValue == undefined) {
+        oldValue = checkbox.prev().val();
+    }
     if (checkbox.is(':checked')) {
         oldValue = checkbox.prev().val();
         checkbox.prev().attr('disabled', true);

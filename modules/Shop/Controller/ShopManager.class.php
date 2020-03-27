@@ -1799,12 +1799,15 @@ if ($test === NULL) {
 
         $arrCategoryId = array();
         $deleted = false;
+        $deleteProducts = false;
         if (empty($category_id)) {
             if (!empty($_GET['delete_category_id'])) {
                 array_push($arrCategoryId, $_GET['delete_category_id']);
+                $deleteProducts = !empty($_GET['delete_products']);
             } elseif (!empty($_POST['selected_category_id'])
                    && is_array($_POST['selected_category_id'])) {
                 $arrCategoryId = $_POST['selected_category_id'];
+                $deleteProducts = !empty($_POST['delete_products']);
             }
         } else {
             array_push($arrCategoryId, $category_id);
@@ -1834,23 +1837,46 @@ if ($test === NULL) {
 //DBG::log("delete_categories($category_id): Products in $category_id: ".var_export($arrProducts, true));
             // Delete the products in the category
             foreach ($arrProducts as $objProduct) {
-                // Check whether there are orders with this Product ID
-                $product_id = $objProduct->id();
-                $query = "
-                    SELECT 1
-                      FROM ".DBPREFIX."module_shop".MODULE_INDEX."_order_items
-                     WHERE product_id=$product_id";
-                $objResult = $objDatabase->Execute($query);
-                if (!$objResult || $objResult->RecordCount()) {
-                    \Message::error(
-                        $_ARRAYLANG['TXT_COULD_NOT_DELETE_ALL_PRODUCTS'].
-                        "&nbsp;(".
-                        sprintf($_ARRAYLANG['TXT_SHOP_CATEGORY_ID_FORMAT'],
-                            $category_id).")");
-                    continue 2;
+                // delete products of category in case the user requested
+                // to do so
+                if ($deleteProducts) {
+                    // Check whether there are orders with this Product ID
+                    $product_id = $objProduct->id();
+                    $query = "
+                        SELECT 1
+                          FROM ".DBPREFIX."module_shop".MODULE_INDEX."_order_items
+                         WHERE product_id=$product_id";
+                    $objResult = $objDatabase->Execute($query);
+                    if (!$objResult || $objResult->RecordCount()) {
+                        \Message::error(
+                            $_ARRAYLANG['TXT_COULD_NOT_DELETE_ALL_PRODUCTS'].
+                            "&nbsp;(".
+                            sprintf($_ARRAYLANG['TXT_SHOP_CATEGORY_ID_FORMAT'],
+                                $category_id).")");
+                        continue 2;
+                    }
+                } else {
+                    // remove product from category
+
+                    $categoryIdsOfProduct = array_flip(
+                        preg_split('/\s*,\s*/',
+                            $objProduct->category_id(), null,
+                            PREG_SPLIT_NO_EMPTY
+                        )
+                    );
+                    unset($categoryIdsOfProduct[$category_id]);
+                    $objProduct->category_id(
+                        join(',', array_keys($categoryIdsOfProduct))
+                    );
+                    if (!$objProduct->store()) {
+                        return false;
+                    }
                 }
             }
-            if (Products::deleteByShopCategory($category_id) === false) {
+            if (
+                $deleteProducts &&
+                Products::deleteByShopCategory($category_id) === false
+            ) {
                 \Message::error($_ARRAYLANG['TXT_ERROR_DELETING_PRODUCT'].
                     "&nbsp;(".$_ARRAYLANG['TXT_CATEGORY']."&nbsp;".$category_id.")");
                 continue;
@@ -1865,10 +1891,13 @@ if ($test === NULL) {
             }
             $deleted = true;
         }
-        if ($deleted) {
+        if (!$deleted) {
+            return null;
+        }
+        if ($deleteProducts) {
             return \Message::ok($_ARRAYLANG['TXT_DELETED_CATEGORY_AND_PRODUCTS']);
         }
-        return null;
+        return \Message::ok($_ARRAYLANG['TXT_SHOP_DELETED_CATEGORIES']);
     }
 
 
@@ -2133,9 +2162,9 @@ if ($test === NULL) {
             'SHOP_CREATE_ACCOUNT_NO_CHECKED' =>
                 (empty($usergroup_ids) ? \Html::ATTRIBUTE_CHECKED : ''),
             'SHOP_DISCOUNT_GROUP_COUNT_MENU_OPTIONS' =>
-                Discount::getMenuOptionsGroupCount($discount_group_count_id),
+                \Cx\Modules\Shop\Controller\DiscountgroupCountNameController::getMenuOptionsGroupCount($discount_group_count_id),
             'SHOP_DISCOUNT_GROUP_ARTICLE_MENU_OPTIONS' =>
-                Discount::getMenuOptionsGroupArticle($discount_group_article_id),
+                \Cx\Modules\Shop\Controller\BackendController::getMenuOptionsGroupArticle($discount_group_article_id),
             'SHOP_KEYWORDS' => contrexx_raw2xhtml($keywords),
             // Enable JavaScript functionality for the weight if enabled
             'SHOP_WEIGHT_ENABLED' => (\Cx\Core\Setting\Controller\Setting::getValue('weight_enable','Shop')
@@ -2395,9 +2424,6 @@ if ($test === NULL) {
         if ($template == 'discounts') {
             return $this->view_customer_discounts();
         }
-        if ($template == 'groups') {
-            return $this->view_customer_groups();
-        }
         $this->toggleCustomer();
         $i = 0;
         self::$objTemplate->loadTemplateFile("module_shop_customers.html");
@@ -2631,6 +2657,16 @@ if ($test === NULL) {
         if (!$objCustomer) {
             return \Message::error($_ARRAYLANG['TXT_SHOP_CUSTOMER_ERROR_NOT_FOUND']);
         }
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $customerGroup = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\CustomerGroup'
+        )->find($objCustomer->group_id());
+        $customerGroupName = $_ARRAYLANG['TXT_SHOP_DISCOUNT_GROUP_NONE'];
+        if (!empty($customerGroup)) {
+            $customerGroupName = $customerGroup->getName();
+        }
+
         $customer_type = ($objCustomer->is_reseller()
             ? $_ARRAYLANG['TXT_RESELLER'] : $_ARRAYLANG['TXT_CUSTOMER']);
         $active = ($objCustomer->active()
@@ -2649,15 +2685,20 @@ if ($test === NULL) {
             'SHOP_PHONE' => $objCustomer->phone(),
             'SHOP_FAX' => $objCustomer->fax(),
             'SHOP_EMAIL' => $objCustomer->email(),
-            'SHOP_CUSTOMER_BIRTHDAY' => date(ASCMS_DATE_FORMAT_DATE, $objCustomer->getProfileAttribute('birthday')),
             'SHOP_COMPANY_NOTE' => $objCustomer->companynote(),
             'SHOP_IS_RESELLER' => $customer_type,
             'SHOP_REGISTER_DATE' => date(ASCMS_DATE_FORMAT_DATETIME,
                 $objCustomer->register_date()),
             'SHOP_CUSTOMER_STATUS' => $active,
-            'SHOP_DISCOUNT_GROUP_CUSTOMER' => Discount::getCustomerGroupName(
-                $objCustomer->group_id()),
+            'SHOP_DISCOUNT_GROUP_CUSTOMER' => $customerGroupName,
         ));
+        $birthday = $objCustomer->getProfileAttribute('birthday');
+        if (!empty($birthday)) {
+            self::$objTemplate->setVariable(
+                'SHOP_CUSTOMER_BIRTHDAY',
+                date(ASCMS_DATE_FORMAT_DATE, $birthday)
+            );
+        }
 // TODO: TEST
         $count = NULL;
 
@@ -2793,21 +2834,33 @@ if ($test === NULL) {
             'SHOP_EMAIL' => $email,
             'SHOP_PHONE' => $phone,
             'SHOP_FAX' => $fax,
-            'SHOP_CUSTOMER_BIRTHDAY' => date(ASCMS_DATE_FORMAT_DATE, $objCustomer->getProfileAttribute('birthday')),
             'SHOP_USERNAME' => $username,
             'SHOP_PASSWORD' => $password,
             'SHOP_COMPANY_NOTE' => $companynote,
             'SHOP_REGISTER_DATE' => date(ASCMS_DATE_FORMAT_DATETIME, $registerdate),
             'SHOP_COUNTRY_MENUOPTIONS' =>
-                \Cx\Core\Country\Controller\Country::getMenuoptions($country_id),
+                \Cx\Core\Country\Controller\Country::getMenuoptions($country_id, false),
             'SHOP_DISCOUNT_GROUP_CUSTOMER_MENUOPTIONS' =>
-                Discount::getMenuOptionsGroupCustomer($customer_group_id),
+                \Cx\Modules\Shop\Controller\BackendController::getMenuOptionsGroupCustomer($customer_group_id),
             'SHOP_CUSTOMER_TYPE_MENUOPTIONS' =>
                 Customers::getTypeMenuoptions($is_reseller),
             'SHOP_CUSTOMER_ACTIVE_MENUOPTIONS' =>
                 Customers::getActiveMenuoptions($active),
             'SHOP_LANG_ID_MENUOPTIONS' => \FWLanguage::getMenuoptions($lang_id),
         ));
+        $birthday = 0;
+        if ($objCustomer) {
+            $birthday = $objCustomer->getProfileAttribute('birthday');
+        }
+        if (!empty($birthday)) {
+            self::$objTemplate->setVariable(
+                'SHOP_CUSTOMER_BIRTHDAY',
+                date(ASCMS_DATE_FORMAT_DATE, $birthday)
+            );
+        }
+        \JS::registerCode(
+            'cx.ready(function(){cx.jQuery(".datepicker-field").datepicker({dateFormat: "dd.mm.yy"});});'
+        );
         return true;
     }
 
@@ -2922,14 +2975,6 @@ if ($test === NULL) {
             case 'manage':
                 self::$pageTitle = $_ARRAYLANG['TXT_ADD_PRODUCTS'];
                 $this->view_product_edit();
-                break;
-            case 'discounts':
-                self::$pageTitle = $_ARRAYLANG['TXT_SHOP_DISCOUNT_COUNT_GROUPS'];
-                $this->view_discount_groups_count();
-                break;
-            case 'groups':
-                self::$pageTitle = $_ARRAYLANG['TXT_SHOP_ARTICLE_GROUPS'];
-                $this->view_article_groups();
                 break;
             default:
                 self::$pageTitle = $_ARRAYLANG['TXT_PRODUCT_CATALOG'];
@@ -3349,288 +3394,6 @@ if ($test === NULL) {
         return $arrSubstitution['CUSTOMER_EMAIL'];
     }
 
-
-    /**
-     * Show the count discount editing page
-     * @return    boolean             True on success, false otherwise
-     * @author    Reto Kohli <reto.kohli@comvation.com>
-     */
-    function view_discount_groups_count()
-    {
-        global $_ARRAYLANG;
-
-        if (isset($_POST['discountStore'])) {
-            $this->store_discount_count();
-        }
-        if (isset($_GET['deleteDiscount'])) {
-            $this->delete_discount_count();
-        }
-        // Force discounts to be reinitialised
-        Discount::flush();
-
-        self::$objTemplate->addBlockfile('SHOP_PRODUCTS_FILE', 'shop_products_block', 'module_shop_discount_groups_count.html');
-
-        // Discounts overview
-        $arrDiscounts = Discount::getDiscountCountArray();
-        $i = 0;
-        foreach ($arrDiscounts as $id => $arrDiscount) {
-            $name = $arrDiscount['name'];
-            $unit = $arrDiscount['unit'];
-            self::$objTemplate->setVariable(array(
-                'SHOP_DISCOUNT_ID' => $id,
-                'SHOP_DISCOUNT_GROUP_NAME' => contrexx_raw2xhtml($name),
-                'SHOP_DISCOUNT_GROUP_UNIT' => contrexx_raw2xhtml($unit),
-                'SHOP_DISCOUNT_ROW_STYLE' => 'row'.(++$i % 2 + 1),
-            ));
-            self::$objTemplate->parse('discount');
-        }
-
-        // Add/edit Discount
-        $id = 0;
-        $arrDiscountRates = array();
-        if (!empty($_GET['editDiscount'])) {
-            $id = intval($_GET['id']);
-            $arrDiscountRates = Discount::getDiscountCountRateArray($id);
-            self::$objTemplate->setGlobalVariable(array(
-                'SHOP_DISCOUNT_EDIT_CLASS' => 'active',
-                'SHOP_DISCOUNT_EDIT_DISPLAY' => 'block',
-                'SHOP_DISCOUNT_LIST_CLASS' => '',
-                'SHOP_DISCOUNT_LIST_DISPLAY' => 'none',
-                'TXT_ADD_OR_EDIT' => $_ARRAYLANG['TXT_EDIT'],
-            ));
-        } else {
-            self::$objTemplate->setGlobalVariable(array(
-                'SHOP_DISCOUNT_EDIT_CLASS' => '',
-                'SHOP_DISCOUNT_EDIT_DISPLAY' => 'none',
-                'SHOP_DISCOUNT_LIST_CLASS' => 'active',
-                'SHOP_DISCOUNT_LIST_DISPLAY' => 'block',
-                'TXT_ADD_OR_EDIT' => $_ARRAYLANG['TXT_ADD'],
-            ));
-        }
-        self::$objTemplate->setCurrentBlock('discountName');
-        self::$objTemplate->setVariable(array(
-            'SHOP_DISCOUNT_ID_EDIT' => $id,
-            'SHOP_DISCOUNT_ROW_STYLE' => 'row'.(++$i % 2 + 1),
-        ));
-        if (isset($arrDiscounts[$id])) {
-            $arrDiscount = $arrDiscounts[$id];
-            $name = $arrDiscount['name'];
-            $unit = $arrDiscount['unit'];
-            self::$objTemplate->setVariable(array(
-                'SHOP_DISCOUNT_GROUP_NAME' => $name,
-                'SHOP_DISCOUNT_GROUP_UNIT' => $unit,
-            ));
-        }
-        self::$objTemplate->parse('discountName');
-        self::$objTemplate->setCurrentBlock('discountType');
-        self::$objTemplate->setVariable(array(
-            'SHOP_DISCOUNT_GROUP_TYPE_OPTIONS' =>
-            \Html::getRadioGroup(
-                'discountGroupType',
-                array(
-                    $_ARRAYLANG['TXT_YES'],
-                    $_ARRAYLANG['TXT_NO']
-                ),
-                Discount::isDiscountCumulative($id)
-            )
-        ));
-        self::$objTemplate->touchBlock('discountType');
-        self::$objTemplate->parse('discountType');
-        self::$objTemplate->setCurrentBlock('discountRate');
-        if (isset($arrDiscountRates)) {
-            $arrDiscountRates = array_reverse($arrDiscountRates, true);
-            foreach ($arrDiscountRates as $count => $rate) {
-                self::$objTemplate->setVariable(array(
-                    'SHOP_DISCOUNT_COUNT' => $count,
-                    'SHOP_DISCOUNT_RATE' => $rate,
-                    'SHOP_DISCOUNT_RATE_INDEX' => $i,
-                    'SHOP_DISCOUNT_ROW_STYLE' => 'row'.(++$i % 2 + 1),
-                ));
-                self::$objTemplate->parse('discountRate');
-            }
-        }
-        // Add a few empty rows for adding new counts and rates
-        for ($j = 0; $j < 5; ++$j) {
-            self::$objTemplate->setVariable(array(
-                'SHOP_DISCOUNT_COUNT' => '',
-                'SHOP_DISCOUNT_RATE' => '',
-                'SHOP_DISCOUNT_RATE_INDEX' => $i,
-                'SHOP_DISCOUNT_ROW_STYLE' => 'row'.(++$i % 2 + 1),
-            ));
-            self::$objTemplate->parse('discountRate');
-        }
-        return true;
-    }
-
-
-    /**
-     * Store the count discounts after editing
-     * @return    boolean             True on success, false otherwise
-     * @author    Reto Kohli <reto.kohli@comvation.com>
-     */
-    function store_discount_count()
-    {
-        if (!isset($_POST['discountId'])) return true;
-        $discountId = intval($_POST['discountId']);
-        $discountGroupType = contrexx_input2int($_POST['discountGroupType']);
-        $discountGroupName = contrexx_input2raw($_POST['discountGroupName']);
-        $discountGroupUnit = contrexx_input2raw($_POST['discountGroupUnit']);
-        $arrDiscountCount = contrexx_input2int($_POST['discountCount']);
-        $arrDiscountRate = contrexx_input2float($_POST['discountRate']);
-        return Discount::storeDiscountCount(
-            $discountId, $discountGroupType, $discountGroupName,
-            $discountGroupUnit, $arrDiscountCount, $arrDiscountRate
-        );
-    }
-
-
-    /**
-     * Delete the count discount selected by its ID from the GET request
-     * @return    boolean             True on success, false otherwise
-     * @author    Reto Kohli <reto.kohli@comvation.com>
-     */
-    function delete_discount_count()
-    {
-        if (!isset($_GET['id'])) return true;
-        $discountId = $_GET['id'];
-        return Discount::deleteDiscountCount($discountId);
-    }
-
-
-    /**
-     * Show the customer groups for editing
-     * @return    boolean             True on success, false otherwise
-     * @author    Reto Kohli <reto.kohli@comvation.com>
-     */
-    function view_customer_groups()
-    {
-        global $_ARRAYLANG;
-
-        if (isset($_GET['delete'])) {
-            Discount::deleteCustomerGroup($_GET['id']);
-        }
-        if (isset($_POST['store'])) {
-            Discount::storeCustomerGroup($_POST['groupName'], $_POST['id']);
-        }
-        Discount::flush();
-
-        self::$objTemplate->loadTemplateFile('module_shop_discount_groups_customer.html');
-
-        // Group overview
-        $arrGroups = Discount::getCustomerGroupArray();
-        self::$objTemplate->setCurrentBlock('shopGroup');
-        $i = 0;
-        foreach ($arrGroups as $id => $arrGroup) {
-            self::$objTemplate->setVariable(array(
-                'SHOP_GROUP_ID' => $id,
-                'SHOP_GROUP_NAME' => $arrGroup['name'],
-                'SHOP_ROW_STYLE' => 'row'.(++$i % 2 + 1),
-            ));
-            self::$objTemplate->parse('shopGroup');
-        }
-
-        // Add/edit Group
-        $id = 0;
-        if (!empty($_GET['edit'])) {
-            $id = intval($_GET['id']);
-            self::$objTemplate->setGlobalVariable(array(
-                'SHOP_GROUP_EDIT_CLASS' => 'active',
-                'SHOP_GROUP_EDIT_DISPLAY' => 'block',
-                'SHOP_GROUP_LIST_CLASS' => '',
-                'SHOP_GROUP_LIST_DISPLAY' => 'none',
-                'TXT_ADD_OR_EDIT' => $_ARRAYLANG['TXT_EDIT'],
-            ));
-        } else {
-            self::$objTemplate->setGlobalVariable(array(
-                'SHOP_GROUP_EDIT_CLASS' => '',
-                'SHOP_GROUP_EDIT_DISPLAY' => 'none',
-                'SHOP_GROUP_LIST_CLASS' => 'active',
-                'SHOP_GROUP_LIST_DISPLAY' => 'block',
-                'TXT_ADD_OR_EDIT' => $_ARRAYLANG['TXT_ADD'],
-            ));
-        }
-        self::$objTemplate->setCurrentBlock('shopGroupName');
-        self::$objTemplate->setVariable(array(
-            'SHOP_GROUP_ID_EDIT' => $id,
-            'SHOP_ROW_STYLE' => 'row'.(++$i % 2 + 1),
-        ));
-        if (isset($arrGroups[$id])) {
-            self::$objTemplate->setVariable(
-                'SHOP_GROUP_NAME', $arrGroups[$id]['name']
-            );
-        }
-        self::$objTemplate->parse('shopGroupName');
-        return true;
-    }
-
-
-    /**
-     * Show the article groups for editing
-     * @return    boolean             True on success, false otherwise
-     * @author    Reto Kohli <reto.kohli@comvation.com>
-     */
-    function view_article_groups()
-    {
-        global $_ARRAYLANG;
-
-        if (isset($_GET['delete'])) {
-            Discount::deleteArticleGroup($_GET['id']);
-        }
-        if (isset($_POST['store'])) {
-            Discount::storeArticleGroup(
-                $_POST['groupName'], $_POST['id']
-            );
-        }
-        // Force discounts to be reinitialised
-        Discount::flush();
-
-        self::$objTemplate->addBlockfile('SHOP_PRODUCTS_FILE',
-            'shop_products_block', 'module_shop_discount_groups_article.html');
-        // Group overview
-        $arrGroups = Discount::getArticleGroupArray();
-        self::$objTemplate->setCurrentBlock('shopGroup');
-        $i = 0;
-        foreach ($arrGroups as $id => $arrGroup) {
-            self::$objTemplate->setVariable(array(
-                'SHOP_GROUP_ID' => $id,
-                'SHOP_GROUP_NAME' => $arrGroup['name'],
-                'SHOP_ROW_STYLE' => 'row'.(++$i % 2 + 1),
-            ));
-            self::$objTemplate->parseCurrentBlock();
-        }
-        // Add/edit Group
-        $id = 0;
-        if (!empty($_GET['edit'])) {
-            $id = intval($_GET['id']);
-            self::$objTemplate->setGlobalVariable(array(
-                'SHOP_GROUP_EDIT_CLASS' => 'active',
-                'SHOP_GROUP_EDIT_DISPLAY' => 'block',
-                'SHOP_GROUP_LIST_CLASS' => '',
-                'SHOP_GROUP_LIST_DISPLAY' => 'none',
-                'TXT_ADD_OR_EDIT' => $_ARRAYLANG['TXT_EDIT'],
-            ));
-        } else {
-            self::$objTemplate->setGlobalVariable(array(
-                'SHOP_GROUP_EDIT_CLASS' => '',
-                'SHOP_GROUP_EDIT_DISPLAY' => 'none',
-                'SHOP_GROUP_LIST_CLASS' => 'active',
-                'SHOP_GROUP_LIST_DISPLAY' => 'block',
-                'TXT_ADD_OR_EDIT' => $_ARRAYLANG['TXT_ADD'],
-            ));
-        }
-        self::$objTemplate->setCurrentBlock('shopGroupName');
-        self::$objTemplate->setVariable(array(
-            'SHOP_GROUP_ID_EDIT' => $id,
-            'SHOP_ROW_STYLE' => 'row'.(++$i % 2 + 1),
-        ));
-        if (isset($arrGroups[$id])) {
-            self::$objTemplate->setVariable('SHOP_GROUP_NAME', $arrGroups[$id]['name']);
-        }
-        self::$objTemplate->parseCurrentBlock();
-        return true;
-    }
-
-
     /**
      * Show the customer and article group discounts for editing.
      *
@@ -3645,41 +3408,49 @@ if ($test === NULL) {
         }
         self::$objTemplate->loadTemplateFile("module_shop_discount_customer.html");
         // Discounts overview
-        $arrCustomerGroups = Discount::getCustomerGroupArray();
-        $arrArticleGroups = Discount::getArticleGroupArray();
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $discountGroup = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\RelDiscountGroup'
+        );
+        $articleGroups = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\ArticleGroup'
+        )->findAll();
+        $customerGroups = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\CustomerGroup'
+        )->findAll();
         $arrRate = null;
-        $arrRate = Discount::getDiscountRateCustomerArray();
+        $arrRate = $discountGroup->getDiscountRateCustomerArray();
         $i = 0;
         // Set up the customer groups header
         self::$objTemplate->setVariable(array(
 //            'SHOP_CUSTOMER_GROUP_COUNT_PLUS_1' => count($arrCustomerGroups) + 1,
-            'SHOP_CUSTOMER_GROUP_COUNT' => count($arrCustomerGroups),
+            'SHOP_CUSTOMER_GROUP_COUNT' => count($customerGroups),
             'SHOP_DISCOUNT_ROW_STYLE' => 'row'.(++$i % 2 + 1),
         ));
-        foreach ($arrCustomerGroups as $id => $arrCustomerGroup) {
+        foreach ($customerGroups as $customerGroup) {
             self::$objTemplate->setVariable(array(
-                'SHOP_CUSTOMER_GROUP_ID' => $id,
-                'SHOP_CUSTOMER_GROUP_NAME' => $arrCustomerGroup['name'],
+                'SHOP_CUSTOMER_GROUP_ID' => $customerGroup->getId(),
+                'SHOP_CUSTOMER_GROUP_NAME' => $customerGroup->getName(),
             ));
             self::$objTemplate->parse('customer_group_header_column');
             self::$objTemplate->touchBlock('article_group_header_column');
             self::$objTemplate->parse('article_group_header_column');
         }
-        foreach ($arrArticleGroups as $groupArticleId => $arrArticleGroup) {
+        foreach ($articleGroups as $articleGroup) {
 //DBG::log("Article group ID $groupArticleId");
-            foreach ($arrCustomerGroups as $groupCustomerId => $arrCustomerGroup) {
-                $rate = (isset($arrRate[$groupCustomerId][$groupArticleId])
-                    ? $arrRate[$groupCustomerId][$groupArticleId] : 0);
+            foreach ($customerGroups as $customerGroup) {
+                $rate = (isset($arrRate[$customerGroup->getId()][$articleGroup->getId()])
+                    ? $arrRate[$customerGroup->getId()][$articleGroup->getId()] : 0);
                 self::$objTemplate->setVariable(array(
-                    'SHOP_CUSTOMER_GROUP_ID' => $groupCustomerId,
+                    'SHOP_CUSTOMER_GROUP_ID' => $customerGroup->getId(),
                     'SHOP_DISCOUNT_RATE' => sprintf('%2.2f', $rate),
 //                    'SHOP_DISCOUNT_ROW_STYLE' => 'row'.(++$i % 2 + 1),
                 ));
                 self::$objTemplate->parse('discount_column');
             }
             self::$objTemplate->setVariable(array(
-                'SHOP_ARTICLE_GROUP_ID' => $groupArticleId,
-                'SHOP_ARTICLE_GROUP_NAME' => $arrArticleGroup['name'],
+                'SHOP_ARTICLE_GROUP_ID' => $articleGroup->getId(),
+                'SHOP_ARTICLE_GROUP_NAME' => $articleGroup->getName(),
                 'SHOP_DISCOUNT_ROW_STYLE' => 'row'.(++$i % 2 + 1),
             ));
             self::$objTemplate->parse('article_group_row');
@@ -3699,7 +3470,13 @@ if ($test === NULL) {
      */
     function store_discount_customer()
     {
-        return Discount::storeDiscountCustomer($_POST['discountRate']);
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $discountCustomerRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\RelDiscountGroup'
+        );
+        return $discountCustomerRepo->storeDiscountCustomer(
+            $_POST['discountRate']
+        );
     }
 
 
