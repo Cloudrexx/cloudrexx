@@ -201,7 +201,6 @@ class BackendController extends \Cx\Core\Core\Model\Entity\SystemComponentBacken
             ),
             'Product' => array(
                 'children' => array(
-                    'Manage',
                     'Attribute',
                     'DiscountgroupCountName',
                     'ArticleGroup'
