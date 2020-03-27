@@ -61,12 +61,6 @@ class UserAttributeValue extends \Cx\Model\Base\EntityBase {
     protected $attributeId;
 
     /**
-     * @OA\Property(
-     *     format="int",
-     *     description="Unique identifier of the user with the listed attribute.",
-     *     title="User ID",
-     * )
-     *
      * @var integer
      */
     protected $userId;

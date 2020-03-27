@@ -61,12 +61,6 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase {
     protected $id;
 
     /**
-     * @OA\Property(
-     *     format="int",
-     *     description="Unique identifier that is representative for the attribute ID.",
-     *     title="Attribute ID",
-     * )
-     *
      * @var integer
      */
     protected $attributeId = 0;
