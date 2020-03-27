@@ -147,7 +147,7 @@ $_ARRAYLANG['TXT_SHOP_DISCOUNT_COUPON_CODE'] = "Gutschein Code";
 
 $_ARRAYLANG['TXT_ORDER_WASNT_YET_EDITED'] = "Diese Bestellung wurde noch nicht bearbeitet.";
 
-$_ARRAYLANG['active'] = 'Aktiv';
+$_ARRAYLANG['active'] = 'Aktiv für';
 $_ARRAYLANG['parentCategory'] = 'Übergeordnete Rubrik';
 $_ARRAYLANG['picture'] = 'Kategoriebild';
 $_ARRAYLANG['shortDescription'] = 'Kurzbeschreibung';
@@ -1222,3 +1222,5 @@ $_ARRAYLANG['TXT_SHOP_DELETED_ORDERS'] = 'Bestellungen wurden gelöscht.';
 $_ARRAYLANG['TXT_SHOP_ORDER_STATUS_CHANGED'] = 'Status der Bestellung wurde geändert.';
 
 $_ARRAYLANG['TXT_SHOP_REL_DISCOUNT_GROUP_RECORDS_UPDATED_SUCCESSFUL'] ='Die Einträge wurden erfolgreich aktualisiert.';
+$_ARRAYLANG['TXT_SHOP_PAYMENT_ACTIVE_FOR_NONE'] = 'Niemanden';
+$_ARRAYLANG['TXT_SHOP_PAYMENT_ACTIVE_FOR_RESELLER'] = "Wiederverkäufer";
