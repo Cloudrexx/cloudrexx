@@ -1,0 +1,92 @@
+<!-- START module_jobs_settings.html -->
+<script type="text/javascript">
+    $J(document).ready(function(){
+       $J('#templateIntegration').click(function(){
+            if ($J(this).prop('checked')) {
+                $J('.templateIntegrationOption').show();
+                return;
+            }
+            $J('.templateIntegrationOption').hide();
+       });
+    });
+</script>
+<form name="form1" method="post" action="index.php?cmd=Jobs&amp;act=settings">
+<input type="hidden" name="updateFootnote" value="true" />
+<table width="100%" border="0" cellspacing="0" cellpadding="3" class="adminlist">
+  <tbody style="vertical-align:top">
+  <tr>
+    <th colspan="2">
+      <div align="left">{TXT_SETTINGS}</div>
+    </th>
+  </tr>
+  <tr class="row1">
+  <td width="15%"> {TXT_FOOTNOTE}:</td>
+  <td width="85%" style="vertical-align: top;">
+		<textarea type="text" name="settings[footnote]" style="width: 400px;" rows="5" >{FOOTNOTE}</textarea>
+        <span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_FOOTNOTE_HELP}</span>
+  </tr>
+  <tr class="row2">
+  <td>{TXT_LINK}</td>
+  <td>
+	    <input type="text" name="settings[link]" value="{LINK}" style="width: 400px;" maxlength="250" />
+        <span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_LINK_HELP}</span>
+  </td>
+  </tr>
+  <tr class="row1">
+  <td>{TXT_URL}</td>
+  <td>
+	    <input type="text" name="settings[url]" value="{URL}" style="width: 400px;" maxlength="250" />
+        <span class="tooltip-trigger icon-info"></span><span class="tooltip-message">{TXT_URL_HELP}</span>
+      {TXT_URL_INFO}
+  </td>
+  </tr>
+  <tr class="row2">
+  <td>
+       {TXT_SHOW_LOCATION_FE}
+  </td>
+  <td>
+        <input type="checkbox" name="settings[show_location_fe]" value="1" {SHOW_LOCATION_FE} />
+	</td>
+	</tr>
+        <tr class="row1">
+            <td>{TXT_JOBS_USE_FLAGS_OPTION}</td>
+            <td><input type="checkbox" name="settings[use_flags]" value="1" <!-- BEGIN jobs_use_flags -->checked="checked"<!-- END jobs_use_flags --> /></td>
+        </tr>
+	</tbody>
+</table>
+<br />
+<table width="100%" border="0" cellspacing="0" cellpadding="3" class="adminlist">
+    <tbody style="vertical-align:top">
+        <tr>
+            <th colspan="2">
+                <div align="left">{TXT_JOBS_SETTINGS_TEMPLATE_INTEGRATION}</div>
+            </th>
+        </tr>
+        <tr class="row1">
+            <td width="15%"> {TXT_JOBS_SETTINGS_TEMPLATE_INTEGRATION}:</td>
+            <td width="85%" style="vertical-align: top;">
+                <input type="checkbox" id="templateIntegration" name="settings[templateIntegration]" {JOBS_SETTINGS_TEMPLATE_INTEGRATION} value="1" />
+                <label for="templateIntegration">{TXT_JOBS_SETTINGS_TEMPLATE_INTEGRATION_LABEL}</label>
+            </td>
+        </tr>
+        <tr class="row2 templateIntegrationOption" style="{JOBS_SETTINGS_DISPLAY_STATUS}">
+            <td> {TXT_JOBS_SETTINGS_SOURCE_OF_JOBS}:</td>
+            <td style="vertical-align: top;">
+                <input type="radio" id="latestJobs" name="settings[sourceOfJobs]" {JOBS_SETTINGS_LATEST_JOBS} value="latest" />
+                <label for="latestJobs">{TXT_JOBS_SETTINGS_LATEST_JOBS_LABEL}</label>
+                <input type="radio" id="manualJobs" name="settings[sourceOfJobs]" {JOBS_SETTINGS_SOURCE_OF_JOBS} value="manual" />
+                <label for="manualJobs">{TXT_JOBS_SETTINGS_MANUAL_JOBS_LABEL}</label>
+            </td>
+        </tr>
+        <tr class="row1 templateIntegrationOption" style="{JOBS_SETTINGS_DISPLAY_STATUS}">
+            <td> {TXT_JOBS_SETTINGS_LISTING_LIMIT}:</td>
+            <td style="vertical-align: top;">
+                <input type="text" id="listingLimit" name="settings[listingLimit]" value="{JOBS_SETTINGS_LISTING_LIMIT}" style="width: 400px;" />
+  </td>
+  </tr>
+  </tbody>
+</table>
+<br />
+<input type="submit" name="submit" value="{TXT_SUBMIT}" />
+</form>
+<!-- END module_jobs_settings.html -->

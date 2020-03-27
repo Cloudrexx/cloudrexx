@@ -61,8 +61,27 @@ function downloadsUpdateSortOrder(event,elForm,idMultiAction)
         elForm.submit();
     }
 }
+
+function downloadsDeleteDownload(id, name)
+{
+    const strMsg = cx.variables.get('DOWNLOADS_CONFIRM_DELETE_DOWNLOAD_TXT', 'downloads');
+    if (confirm(strMsg.replace('%s', name)+'\n{TXT_DOWNLOADS_OPERATION_IRREVERSIBLE}')) {
+        window.location.href = 'index.php?cmd=Downloads&act=categories_delete_download&parent_id=' +
+            '{DOWNLOADS_CATEGORY_ID}&id='+id+'&csrf={CSRF_KEY}';
+    }
+}
+
 // ]]>
 </script>
+
+<style>
+    #downloads_category_form span:after {
+        content: ' > ';
+    }
+    #downloads_category_form span:last-of-type:after {
+        content: '';
+    }
+</style>
 
 <table width="100%" class="adminlist">
     <tr>
@@ -89,7 +108,7 @@ function downloadsUpdateSortOrder(event,elForm,idMultiAction)
             {TXT_DOWNLOADS_ALL_CATEGORIES}
             {TXT_DOWNLOADS_CATEGORIES_OF_CATEGORY}
             <!-- BEGIN downloads_category_frontend_link -->
-            <a href="{DOWNLOADS_CATEGORY_FRONTEND_URI}" title="{TXT_DOWNLOADS_OPEN_CATEGORY_FRONTEND}" target="_blank" style="background: url(../core/Core/View/Media/icons/blue_arrow_up.png) no-repeat left center; padding: 1px 0 1px 18px; margin: 0 0 0 20px;">{TXT_DOWNLOADS_OPEN_CATEGORY_FRONTEND}</a>
+            <a href="{DOWNLOADS_CATEGORY_FRONTEND_URI}" title="{TXT_DOWNLOADS_OPEN_CATEGORY_FRONTEND}" target="_blank" style="background: url(../core/Core/View/Media/icons/blue_arrow_up.png) no-repeat left center; padding: 1px 0 1px 18px; margin: 0 0 0 20px; float:right;">{TXT_DOWNLOADS_OPEN_CATEGORY_FRONTEND}</a>
             <!-- END downloads_category_frontend_link -->
         </th>
     </tr>
@@ -260,6 +279,15 @@ function downloadsUpdateSortOrder(event,elForm,idMultiAction)
             <!-- BEGIN downloads_download_function_no_unlink_link -->
             <img src="../core/Core/View/Media/icons/pixel.gif" alt="no permission to unlink this download from the category" width="16" height="16" border="0" />
             <!-- END downloads_download_function_no_unlink_link -->
+            <!-- BEGIN downloads_download_function_delete_link -->
+            <a href="javascript:void(0);" onclick="downloadsDeleteDownload({DOWNLOADS_DOWNLOAD_ID},'{DOWNLOADS_DOWNLOAD_NAME_JS_DELETE}')" title="{TXT_DOWNLOADS_DELETE}">
+                <img src="../core/Core/View/Media/icons/delete.gif" alt="{TXT_DOWNLOADS_DELETE}" width="16" height="16" border="0" />
+            </a>
+            <!-- END downloads_download_function_delete_link -->
+            <!-- BEGIN downloads_download_function_no_delete_link -->
+            <img src="../core/Core/View/Media/icons/pixel.gif" alt="no permission to delete this download" width="16" height="16" border="0" />
+            <!-- END downloads_download_function_no_delete_link -->
+
         </td>
     </tr>
 <!-- END downloads_download_list -->

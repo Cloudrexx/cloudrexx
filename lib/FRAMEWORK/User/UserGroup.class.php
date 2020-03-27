@@ -372,6 +372,12 @@ class UserGroup
             return false;
         }
 
+        // flush all user based cache to ensure new permissions are enforced
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $cache = $cx->getComponent('Cache');
+        $cache->clearUserBasedPageCache();
+        $cache->clearUserBasedEsiCache();
+
         return true;
     }
 

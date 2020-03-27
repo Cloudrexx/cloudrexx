@@ -263,7 +263,11 @@ class Callback extends \Cx\Model\Base\EntityBase {
                     $data['status'] != 'success' ||
                     !isset($data['data'])
                 ) {
-                    throw new CallbackException('Callback execution failed');
+                    $msg = 'Callback execution failed';
+                    if (!empty($data['message'])) {
+                        $msg .= ': "' . $data['message'] . '"';
+                    }
+                    throw new CallbackException($msg);
                 }
                 return $data['data'];
                 break;
