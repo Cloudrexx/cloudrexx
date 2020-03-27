@@ -54,18 +54,6 @@ class TableGenerator extends \BackendTable
      */
     public function __construct($attrs = array(), $options = array(), $readOnly = false)
     {
-        // Check if the field type is wysiwyg, if this is the case replace
-        // the content with an info that this is not supported yet
-        foreach ($options['fields'] as $name=>$option) {
-            if ($option['type'] == 'wysiwyg' && !empty($attrs[$name])) {
-                $attrs[$name] = sprintf(
-                    $_ARRAYLANG['TXT_CORE_HTML_READONLY_VIEW_NOT_SUPPORTED_YET'],
-                    'wysiwyg',
-                    $name
-                );
-            }
-        }
-
         // Rename Key Fields
         foreach ($attrs as $rowname=>$row) {
             // If the variable is not set, the field should be
