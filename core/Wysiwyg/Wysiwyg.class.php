@@ -450,11 +450,7 @@ class Wysiwyg extends \Cx\Core\Html\Model\Entity\HtmlElement
      */
     public function addChild(\Cx\Core\Html\Model\Entity\HtmlElement $element, \Cx\Core\Html\Model\Entity\HtmlElement $reference = null, $before = false)
     {
-        global $_ARRAYLANG;
-
-        throw new \Exception(
-            $_ARRAYLANG['TXT_CORE_WYSIWYG_DOES_NOT_ALLOW_CHILD_ELEMENTS']
-        );
+        throw new \Exception('This type does not allow children');
     }
 
     /**
@@ -468,10 +464,6 @@ class Wysiwyg extends \Cx\Core\Html\Model\Entity\HtmlElement
      */
     public function addChildren(array $elements, \Cx\Core\Html\Model\Entity\HtmlElement $reference = null, $before = false)
     {
-        global $_ARRAYLANG;
-
-        throw new \Exception(
-            $_ARRAYLANG['TXT_CORE_WYSIWYG_DOES_NOT_ALLOW_CHILD_ELEMENTS']
-        );
+        throw new \Exception('This type does not allow children');
     }
 }

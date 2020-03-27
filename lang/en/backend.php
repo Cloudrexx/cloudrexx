@@ -1023,8 +1023,6 @@ $_ARRAYLANG['TXT_CORE_HTML_TOGGLE_CLOSE'] = "schliessen";
 $_ARRAYLANG['TXT_CORE_HTML_TOGGLE_OPEN'] = "öffnen";
 $_ARRAYLANG['TXT_CORE_HTML_VIEW'] = "Details";
 $_ARRAYLANG['TXT_CORE_HTML_FORM_VALIDATION_ERROR'] = 'Validation of at least one field failed!';
-$_ARRAYLANG['TXT_CORE_HTML_READONLY_NOT_SUPPORTED_YET'] = 'The field option "readonly" is currently not supported for the field "%s".';
-$_ARRAYLANG['TXT_CORE_HTML_READONLY_VIEW_NOT_SUPPORTED_YET'] = 'Currently the type "%s" of the field "%s" is not supported in the read view.';
 $_ARRAYLANG['TXT_CORE_IMAGETYPES_EDIT'] = "Bildtypen";
 $_ARRAYLANG['TXT_CORE_IMAGETYPE_ACTION_IS_IRREVERSIBLE'] = "Diese Aktion kann nicht rückgängig gemacht werden!";
 $_ARRAYLANG['TXT_CORE_IMAGETYPE_CONFIRM_DELETE_IMAGETYPE'] = "Wollen Sie diesen Bildtyp wirklich löschen?";
@@ -1412,5 +1410,4 @@ $_ARRAYLANG['TXT_CORE_CORE_ACT_SPLASH'] = 'Start';
 $_ARRAYLANG['TXT_CORE_CORE_DOCUMENTATION'] = 'More resources';
 $_ARRAYLANG['TXT_CORE_CORE_ENDUSER_DOCUMENTATION'] = 'End-user documentation';
 $_ARRAYLANG['TXT_CORE_CORE_DEVELOPER_DOCUMENTATION'] = 'Developer documentation';
-$_ARRAYLANG['TXT_CORE_WYSIWYG_DOES_NOT_ALLOW_CHILD_ELEMENTS'] = 'The class WYSIWYG does not allow the addition of child elements';
 

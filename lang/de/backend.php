@@ -1010,8 +1010,6 @@ $_ARRAYLANG['TXT_ACCESS_GROUP_NAME_INVALID'] = "Der gewählte Gruppenname ist ni
 $_ARRAYLANG['TXT_ACCESS_USER_ACCOUNTS_ACTIVATED'] = "Benutzerkonten aktiviert";
 $_ARRAYLANG['TXT_ACCESS_USER_ACCOUNTS_DEACTIVATED'] = "Benutzerkonten aktiviert";
 $_ARRAYLANG['TXT_CORE_HTML_FORM_VALIDATION_ERROR'] = 'Die Validierung mindestens eines Feldes ist fehlgeschlagen!';
-$_ARRAYLANG['TXT_CORE_HTML_READONLY_NOT_SUPPORTED_YET'] = 'Die Feld-Option "readonly" wird zur Zeit nicht für das Feld "%s" unterstützt';
-$_ARRAYLANG['TXT_CORE_HTML_READONLY_VIEW_NOT_SUPPORTED_YET'] = 'Zur Zeit wird der Typ "%s" des Feldes "%s" in der Leseansicht nicht unterstützt';
 
 // core Image/Imagetype
 $_ARRAYLANG['TXT_CORE_CLEAR_IMAGE'] = "Bild entfernen";
@@ -1483,5 +1481,3 @@ $_ARRAYLANG['TXT_CORE_CORE_ACT_SPLASH'] = 'Start';
 $_ARRAYLANG['TXT_CORE_CORE_DOCUMENTATION'] = 'Weiterführende Informationen';
 $_ARRAYLANG['TXT_CORE_CORE_ENDUSER_DOCUMENTATION'] = 'Anwender-Dokumentation';
 $_ARRAYLANG['TXT_CORE_CORE_DEVELOPER_DOCUMENTATION'] = 'Informationen für Entwickler';
-$_ARRAYLANG['TXT_CORE_WYSIWYG_DOES_NOT_ALLOW_CHILD_ELEMENTS'] = 'Die Klasse WYSIWYG erlaubt das Hinzufügen von Kindelementen nicht';
-
