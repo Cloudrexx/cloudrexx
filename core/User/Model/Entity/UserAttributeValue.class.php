@@ -44,7 +44,7 @@ namespace Cx\Core\User\Model\Entity;
  * @subpackage  core_user
  *
  * @OA\Schema(
- *     description="In this model we have the value of a attrinbute, that specifically belongs to a user.",
+ *     description="This represents the value of an attribute and user.",
  *     title="UserAttributeValue model",
  * )
  */
@@ -52,7 +52,7 @@ class UserAttributeValue extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="Unique identifier to determine Attribute Value.",
+     *     description="Unique identifier to determine the AttributeValue.",
      *     title="Attribute ID",
      * )
      *
@@ -74,7 +74,7 @@ class UserAttributeValue extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="If the type of the user attribute is histroy, if this field gets edited the count goes up for versioning.",
+     *     description="Multiple versions of an attribute value can be stored by using different numbers for history.",
      *     title="History",
      *     default="0"
      * )
@@ -84,7 +84,7 @@ class UserAttributeValue extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="Consists of the value of the user attribute.",
+     *     description="This field contains the value of the related Attribute for the related User.",
      *     title="Value",
      * )
      *
@@ -94,11 +94,11 @@ class UserAttributeValue extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="Lists all of the attributes from user with certain Id. Example: 1",
+     *     description="Depending of read and write access we have two different outcomes. To write we use a ID, for example 1. If the request is to read, the result consists of the user object of the given ID, for example ID, Name etc.",
      *     title="User",
      *     type="object",
      *     additionalProperties={
-     *         "ref"="#/components/schemas/User"
+     *         "$ref"="#/components/schemas/User"
      *     }
      * )
      *
@@ -112,7 +112,7 @@ class UserAttributeValue extends \Cx\Model\Base\EntityBase {
      *     title="User attribute names",
      *     type="object",
      *     additionalProperties={
-     *         "ref"="#/components/schemas/UserAttribute"
+     *         "$ref"="#/components/schemas/UserAttribute"
      *     }
      * )
      *

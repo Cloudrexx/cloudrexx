@@ -44,7 +44,7 @@ namespace Cx\Core\User\Model\Entity;
  * @subpackage  core_user
  *
  * @OA\Schema(
- *     description="In this model we can set the name for the attribues that are default or custom. Those names can be set for every desired language that will get to be used for the website.",
+ *     description="In this model we can set the name for the attribues. Those names can be set for every desired language that will get to be used for the website.",
  *     title="UserAttributeName model",
  * )
  */
@@ -74,7 +74,7 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="The default language for the user as it was defined.",
+     *     description="The default Frontend locales ID. This default can be set in the administraton of the website",
      *     title="Language",
      *     default="0",
      * )
@@ -86,7 +86,7 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="Determins the order the attributes get listed, starting at 1.",
+     *     description="Determines the order the attribute children get listed, starting at 0.",
      *     title="Order",
      *     default="0",
      * )
@@ -108,11 +108,11 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="List of the attributes of a user, identified by the Id. Example: 1",
+     *     description="Lists the user attribute object. If the request intends to write we need to pass the ID, if  the request is to read we get the user attribute object of the given ID. For example the ID /1.",
      *     title="User attributes",
      *     type="object",
      *     additionalProperties={
-     *         "ref"="#/components/schemas/UserAttribute"
+     *         "$ref"="#/components/schemas/UserAttribute"
      *     }
      * )
      *

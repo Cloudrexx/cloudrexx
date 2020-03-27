@@ -206,7 +206,7 @@ class UserValidateUsername extends \CxValidate
  * @subpackage  core_user
  *
  * @OA\Schema(
- *     description="In the User model a new user can be created. Here we can set the passwortd, email and username as well as associated groups the user can act in.",
+ *     description="In the User model a new user can be created. Information about the last login and  groups are displayed as well as access information.",
  *     title="User model",
  *     required={"email",},
  * )
@@ -215,7 +215,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="Unique identifier set for every user.",
+     *     description="Unique identifier for a user.",
      *     title="User ID",
      * )
      *
@@ -225,7 +225,7 @@ class User extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="Boolean to define if a user has admin rights.",
+     *     description="Boolean to define if a user has admin rights. A admin has permission to read and write in all modules as well as changing settings in the administration.",
      *     title="Is Admin",
      *     type="boolean",
      *     default="false",
@@ -247,7 +247,7 @@ class User extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="Password with at least 6 characters as well as contain at least one upper and one lower case character and one number.",
+     *     description="The password needs to have 6 characters. The website administrator can decide whether he wants the password to be complex. If password complexety is on, a password needs at least 6 characters as well as contain at least one upper and one lower case character and one number.",
      *     title="Password",
      *     maximum=255,
      * )
@@ -269,7 +269,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="Timestamp of user registration.",
+     *     description="Timestamp of user registration. This can be left out, it will create the timestamp automatically.",
      *     title="Register date",
      * )
      *
@@ -306,7 +306,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="Timestamp of last authentication status.",
+     *     description="When a user failed to login this status will go to 0 and at the next login a captcha will be necessary to login succesfully.",
      *     title="Last authentication status",
      * )
      *
@@ -339,7 +339,7 @@ class User extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="Define the email access.",
+     *     description="Allow user to define access to their e-mail address. There are three possibilities: For everyone, only members and nobody. Only members is referred to other users of the website.",
      *     title="Email access",
      *     enum={"everyone", "members_only", "nobody"},
      * )
@@ -387,7 +387,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="boolean",
-     *     description="Flag to show if the user is verified.",
+     *     description="Flag to show if the user is verified. The user is verified, if they are created over the website administration. There are two options that are set in the administration: Activation by an authorized person (see Backend group permissions under User administration) or Activation by the user where the user has to conifrm a email with a set time the email has to be confirmed.",
      *     title="Verified",
      *     default="true",
      * )
@@ -399,7 +399,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="Assign a primary group to the user.",
+     *     description="Assign a primary group to the user. In the primary group is defined where the user gets redirected on login. This is useful in case a user has more than one group. The value is 0 if no primary group is set.",
      *     title="Primary group",
      *     default="0",
      * )
@@ -410,7 +410,7 @@ class User extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="Define the profile access.",
+     *     description="Allows users to define access to their profile. There are three possibilities: For everyone, only members and nobody. Only members is referred to other users of the website.",
      *     title="Profile access",
      *     enum={"everyone", "members_only", "nobody"},
      * )
@@ -443,11 +443,11 @@ class User extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="List of all groups assigned to the user, there can be users without associated group. Example: 1",
+     *     description="List of all groups assigned to the user, there can be users without associated group. To write we use a ID of the desired group, for example 1. If the request is to read, the output consists of the group object of the given ID, for example ID, Name etc.",
      *     title="User groups",
      *     type="object",
      *     additionalProperties={
-     *         "ref"="#/components/schemas/Group"
+     *         "$ref"="#/components/schemas/Group"
      *     }
      * )
      *
@@ -457,7 +457,7 @@ class User extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="List of all attributes that are assigned to the user. We have a key that's a serialized id from fields of the primary key in the corresponding order: <attributeId>/<userId>/<historyId> Example: 1/1/0.",
+     *     description="List of all attributes that are assigned to the user. The objects are indexed by a unique key that's a serialized id from fields of the primary key in the corresponding order: <attributeId>/<userId>/<historyId> Example: 1/1/0.",
      *     title="User Attribute values",
      *     type="object",
      *     additionalProperties={

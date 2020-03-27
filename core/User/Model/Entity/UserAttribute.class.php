@@ -52,8 +52,8 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="Attribute Id",
-     *     title="ID",
+     *     description="Unique identifier for the Attribute. ",
+     *     title="Attribute ID",
      * )
      *
      * @var integer
@@ -62,10 +62,22 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="Define the profile type the user can act in",
-     *     title="User group type",
-     *     enum={"text", "textarea", "mail", "uri", "date","image","checkbox","menu","menu_option","group",
-     *     "frame","history"}
+     *     description="Define the type of the attribute. There are following choices: Text for one line and textarea for a multiline textbox. Mail for a email address. Uri to link a website. Date for having a datepicker. Image to get a upload choice. Checkbox to mark the attribute as checkbox. Menu for a dropdown-menu. Menu_option to specify a attributes for the menu. Frame. History to setup the possibility for the history.",
+     *     title="User attribute Type",
+     *     enum={
+     *          "text",
+     *          "textarea",
+     *          "mail",
+     *          "uri",
+     *          "date",
+     *          "image",
+     *          "checkbox",
+     *          "menu",
+     *          "menu_option",
+     *          "group",
+     *          "frame",
+     *          "history",
+     *      }
      * )
      *
      * @var enum_user_userattribute_type
@@ -75,7 +87,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="boolean",
-     *     description="Set true if we want this field to be mandatory",
+     *     description="Set true if we want this field to be mandatory.",
      *     title="Mandatory",
      *     default="0",
      * )
@@ -86,7 +98,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="Define how the user attribute should be sorted",
+     *     description="Define how the child attributes should be sorted. Child attributes are for example Dear Mr. / Dear Mrs. of the attrubute title. We can order these in three ways: Ascending, descending and custom. If set to custom the attributes will be sorted after the same pattern as the order.",
      *     title="User attribute, sorting type",
      *     enum={"asc", "desc", "custom"},
      *     default="asc",
@@ -99,8 +111,9 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="Order Id",
-     *     title="Order Id",
+     *     description="Defines the order the attributes get listed. If no special order is set (default) the id is used to define the order.",
+     *     title="Order ID",
+     *     default="0",
      * )
      *
      * @var integer
@@ -109,7 +122,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="Set a special privilege for users that do not have editing rights from assigned group.",
+     *     description="Set a special privilege for users that do not have editing rights from assigned group. `Menu_select_higher: Only entries above the currently selected in the list may be chosen.` __Menu_select_lower: Only entries below the currently selected in the list may be chosen.__ [Link](http://a.com).",
      *     title="User attribute, special access",
      *     enum={"menu_select_higher", "menu_select_lower"},
      * )
@@ -121,7 +134,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="Unique identifier for the access rights.",
+     *     description="Permissions are handled using access IDs. There are two types: Static (restrict the access to functions and sections - mostly backend) and dynamic (restrict the access to content data - content pages, categories, documents, etc.).[Dokumentation](https://wiki.cloudrexx.com/Development_Permissions).",
      *     title="Access ID",
      * )
      *
@@ -132,8 +145,8 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="Unique identifier for reading access.",
-     *     title="Access Id read",
+     *     description="Unique identifier for reading access. There are two types: Static (restrict the access to functions and sections - mostly backend) and dynamic (restrict the access to content data - content pages, categories, documents, etc.).[Dokumentation](https://wiki.cloudrexx.com/Development_Permissions).",
+     *     title="Access ID read",
      * )
      *
      * @var integer
@@ -142,11 +155,11 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="Lists all of the user attributes. Example: 1",
+     *     description="Lists the user attribute object of the parent, every attribute that has a parent is a menu option. If the request intends to write we need to pass the ID, if  the request is to read we get the user attribute of the given ID. For example the ID /1.",
      *     title="Parent",
      *     type="object",
      *     additionalProperties={
-     *         "ref"="#/components/schemas/UserAttribute"
+     *         "$ref"="#/components/schemas/UserAttribute"
      *     }
      * )
      *
@@ -156,11 +169,11 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="List of all attributes with the associated name and language. Example: 1",
+     *     description="List of all attributes with the associated name and language. Every attribute can have more than one language it is translated in. If the request intends to write we need to pass the ID, if  the request is to read we get the attribute name of the given ID. For example the ID /1.",
      *     title="User attribute name",
      *     type="object",
      *     additionalProperties={
-     *         "ref"="#/components/schemas/UserAttributeName"
+     *         "$ref"="#/components/schemas/UserAttributeName"
      *     }
      * )
      *
@@ -170,11 +183,11 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="List of all attributes that are assigned to the user. We have a key that's a serialized id from fields of the primary key in the corresponding order: <attributeId>/<userId>/<historyId> Example: 1/1/0",
+     *     description="List of all attributes that are assigned to the user. We have a key that's a serialized id from fields of the primary key in the corresponding order: <attributeId>/<userId>/<historyId> Example: 1/1/0.",
      *     title="User attribute value",
      *     type="object",
      *     additionalProperties={
-     *         "ref"="#/components/schemas/UserAttributeValue"
+     *         "$ref"="#/components/schemas/UserAttributeValue"
      *     }
      * )
      *
@@ -184,11 +197,11 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="List of the child attributes of fields with menu options.",
+     *     description="List of the child attributes of fields with menu options. ",
      *     title="Childern",
      *     type="object",
      *     additionalProperties={
-     *         "ref"="#/components/schemas/UserAttributeName"
+     *         "$ref"="#/components/schemas/UserAttributeName"
      *     }
      * )
      *
@@ -199,7 +212,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="boolean",
-     *     description="If default set to true, the attribute is a default of Cloudrexx, if false it is a custom set attribute",
+     *     description="If set to true, the attribute is a default of Cloudrexx, if set to false it is a custom set attribute",
      *     title="Default",
      * )
      *
