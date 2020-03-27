@@ -571,7 +571,7 @@ class User extends \Cx\Model\Base\EntityBase {
     }
 
     /**
-     * Get authToken 
+     * Get authToken
      *
      * @return string 
      */
@@ -975,7 +975,6 @@ class User extends \Cx\Model\Base\EntityBase {
     {
         $this->groups->removeElement($group);
     }
-
 
     /**
      * Get group
