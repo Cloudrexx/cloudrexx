@@ -197,8 +197,8 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="List of the child attributes of fields with menu options. ",
-     *     title="Childern",
+     *     description="List of the child attributes of the fields with menu options. If the request intends to write we need to pass the ID, if  the request is to read we get the attribute names of children with the respective attribute ID. For example the ID /1.",
+     *     title="Children",
      *     type="object",
      *     additionalProperties={
      *         "$ref"="#/components/schemas/UserAttributeName"
