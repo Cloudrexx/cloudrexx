@@ -109,9 +109,9 @@ class TableGenerator extends \BackendTable
 
         // Check if lines exist to avoid unwanted errors
         if (!empty($rows)) {
-        $data = new \Cx\Core_Modules\Listing\Model\Entity\DataSet(
-            array('key' => array_keys($rows), 'value' => array_values($rows))
-        );
+            $data = new \Cx\Core_Modules\Listing\Model\Entity\DataSet(
+                array('key' => array_keys($rows), 'value' => array_values($rows))
+            );
         } else {
             $data = new \Cx\Core_Modules\Listing\Model\Entity\DataSet();
         }
