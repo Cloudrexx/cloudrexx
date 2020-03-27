@@ -998,22 +998,11 @@ class FormGenerator {
                     );
                 }
 
-                $mode = 'small';
-                if (isset($options['mode'])) {
-                    if (in_array($options['mode'], array(
-                        'small',
-                        'full',
-                        'bbcode'
-                    ))) {
-                        $mode = $options['mode'];
-                    }
-                }
-
                 $wrapper = new \Cx\Core\Html\Model\Entity\HtmlElement('div');
                 $wysiwyg = new \Cx\Core\Wysiwyg\Wysiwyg(
                     $title,
                     $value,
-                    $mode
+                    $options['mode']
                 );
                 $wrapper->addChild($wysiwyg);
 

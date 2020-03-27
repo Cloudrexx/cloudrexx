@@ -62,6 +62,27 @@ class WysiwygException extends \Exception {}
 
 class Wysiwyg extends \Cx\Core\Html\Model\Entity\HtmlElement
 {
+
+    /**
+     * @var string Full formatting with limited height
+     */
+    const TYPE_SMALL = 'small';
+
+    /**
+     * @var string Full formatting with normal height
+     */
+    const TYPE_FULL = 'full';
+
+    /**
+     * @var string Full formatting including HTML head
+     */
+    const TYPE_FULLPAGE = 'fullpage';
+
+    /**
+     * @var string Limited formatting, same height as "small"
+     */
+    const TYPE_BBCODE = 'bbcode';
+
     /**
      * options for the different types of wysiwyg editors
      * @var array the types which are available for cloudrexx wysiwyg editors
@@ -171,7 +192,7 @@ class Wysiwyg extends \Cx\Core\Html\Model\Entity\HtmlElement
 
         $this->name = $name;
         $this->value = $value;
-        $this->type = strtolower($type);
+        $this->setType($type);
         $this->langId = $langId ? intval($langId) : FRONTEND_LANG_ID;
         $this->extraPlugins = $extraPlugins;
         $this->removePlugins = $removePlugins;
@@ -335,11 +356,16 @@ class Wysiwyg extends \Cx\Core\Html\Model\Entity\HtmlElement
     }
 
     /**
-     * @param string $type
+     * Validates and sets type. If an invalid type is supplied, "small" is used.
+     * @param string $type One of the type constants
      */
     public function setType($type)
     {
-        $this->type = strtolower($type);
+        $this->type = 'small';
+        $type = strtolower($type);
+        if (in_array($type, array_keys($this->types))) {
+            $this->type = $type;
+        }
     }
 
     /**
