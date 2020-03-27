@@ -1,25 +1,19 @@
 ALTER TABLE contrexx_access_user_attribute
-    ADD is_default TINYINT(1) DEFAULT '0' NOT NULL;
-
-/*Migrate core attribute to user attribute*/
-INSERT INTO `contrexx_access_user_attribute`(
-  `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`
-) SELECT `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, '1'
-  FROM `contrexx_access_user_core_attribute`;
-UPDATE `contrexx_access_user_attribute` SET `parent_id`= null WHERE parent_id = 0;
+    ADD is_default TINYINT(1) DEFAULT '0' NOT NULL,
+    ADD tmp_name TEXT;
 
 /*Migrate user profile to user attribute*/
-ALTER TABLE contrexx_access_user_attribute ADD tmp_name TEXT;
 INSERT INTO `contrexx_access_user_attribute`
   (`tmp_name`, `type`, `order_id`, `access_id`, `read_access_id`, `is_default`)
   VALUES
+    ('picture',       'image',    1,  0, 0, 1),
     ('gender',        'menu',     2,  0, 0, 1),
     ('title',         'menu',     3,  0, 0, 1),
     ('designation',   'text',     4,  0, 0, 1),
     ('firstname',     'text',     5,  0, 0, 1),
     ('lastname',      'text',     6,  0, 0, 1),
     ('company',       'text',     7,  0, 0, 1),
-    ('address',       'text',      8,  0, 0, 1),
+    ('address',       'text',     8,  0, 0, 1),
     ('city',          'text',     9,  0, 0, 1),
     ('country',       'menu',     11, 0, 0, 1),
     ('zip',           'text',     10, 0, 0, 1),
@@ -31,14 +25,24 @@ INSERT INTO `contrexx_access_user_attribute`
     ('website',       'uri',      17, 0, 0, 1),
     ('profession',    'text',     18, 0, 0, 1),
     ('interests',     'textarea', 19, 0, 0, 1),
-    ('signature',     'textarea', 20, 0, 0, 1),
-    ('picture',       'image',    1,  0, 0, 1);
+    ('signature',     'textarea', 20, 0, 0, 1);
 
+
+/*Migrate core attribute to user attribute*/
+UPDATE contrexx_access_user_attribute AS attr
+    LEFT JOIN contrexx_access_user_core_attribute AS core ON core.id = attr.tmp_name
+    SET attr.mandatory = core.mandatory,
+    attr.sort_type = core.sort_type,
+    attr.order_id = core.order_id,
+    attr.access_special = core.access_special,
+    attr.access_id = core.access_id,
+    attr.read_access_id = core.read_access_id
+    WHERE attr.is_default = 1;
 
 UPDATE contrexx_access_user_attribute as userattr
-  SET parent_id = (SELECT ua.id FROM (SELECT * FROM contrexx_access_user_attribute) AS ua
-    WHERE ua.tmp_name = 'title'
-  ) WHERE userattr.tmp_name = 'title-w' OR userattr.tmp_name = 'title-m';
+    LEFT JOIN contrexx_access_user_attribute AS ua ON ua.tmp_name = 'title'
+    SET userattr.parent_id = ua.id
+    WHERE userattr.tmp_name = 'title-w' OR userattr.tmp_name = 'title-m';
 UPDATE contrexx_access_user_attribute SET type = 'menu' WHERE tmp_name = 'title';
 
 INSERT INTO
@@ -53,13 +57,14 @@ JOIN
 
 ALTER TABLE contrexx_access_user_profile ADD tmp_name TEXT;
 
-ALTER TABLE contrexx_access_user_attribute_value ADD tmp_name TEXT;
-
-ALTER TABLE `contrexx_access_user_attribute_value` DROP FOREIGN KEY IF EXISTS `FK_B0DEA323B6E62EFA`;
-
-ALTER TABLE contrexx_access_user_attribute_value DROP FOREIGN KEY IF EXISTS FK_B0DEA323A76ED395;
-
-ALTER TABLE `contrexx_access_user_attribute_value` CHANGE `attribute_id` `attribute_id` INT(11) UNSIGNED NOT NULL;
+ALTER TABLE contrexx_access_user_attribute_value
+    DROP PRIMARY KEY;
+ALTER TABLE contrexx_access_user_attribute_value
+    DROP FOREIGN KEY IF EXISTS `FK_B0DEA323B6E62EFA`,
+    DROP FOREIGN KEY IF EXISTS FK_B0DEA323A76ED395;
+ALTER TABLE contrexx_access_user_attribute_value
+    ADD tmp_name TEXT,
+    CHANGE `attribute_id` `attribute_id` INT(11) UNSIGNED NOT NULL;
 
 UPDATE `contrexx_access_user_profile` SET `tmp_name` = 'gender';
 
@@ -332,20 +337,29 @@ INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES
   (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'picture'), 'picture'
 );
 
-UPDATE `contrexx_access_user_attribute_value` JOIN `contrexx_access_user_attribute_name` AS `attrName` ON `attrName`.`order` = `contrexx_access_user_attribute_value`.`value`
-SET `contrexx_access_user_attribute_value`.`value` = `attrName`.`attribute_id`
+UPDATE `contrexx_access_user_attribute_value`
+    JOIN `contrexx_access_user_attribute_name` AS `attrName` ON `attrName`.`order` = `contrexx_access_user_attribute_value`.`value`
+    SET `contrexx_access_user_attribute_value`.`value` = `attrName`.`attribute_id`
 WHERE `contrexx_access_user_attribute_value`.`tmp_name` = 'title';
 
-ALTER TABLE contrexx_access_user_profile DROP FOREIGN KEY IF EXISTS FK_959DBF6CA76ED395;
-ALTER TABLE contrexx_access_user_profile DROP FOREIGN KEY IF EXISTS  FK_959DBF6C2B36786B;
+ALTER TABLE contrexx_access_user_profile DROP FOREIGN KEY IF EXISTS FK_959DBF6CA76ED395,
+    DROP FOREIGN KEY IF EXISTS  FK_959DBF6C2B36786B;
 
 DROP TABLE contrexx_access_user_title;
 DROP TABLE contrexx_access_user_core_attribute;
 DROP TABLE contrexx_access_user_profile;
 
-/*Alter table access_users */
-ALTER TABLE contrexx_access_rel_user_group DROP FOREIGN KEY IF EXISTS FK_401DFD43A76ED395;
+ALTER TABLE contrexx_access_rel_user_group
+    DROP FOREIGN KEY IF EXISTS FK_401DFD43A76ED395,
+    DROP FOREIGN KEY IF EXISTS `FK_401DFD43FE54D947`;
 
+ALTER TABLE contrexx_access_user_attribute
+	DROP FOREIGN KEY IF EXISTS `FK_D97727BE727ACA70`;
+
+ALTER TABLE contrexx_access_user_attribute_name
+    DROP FOREIGN KEY IF EXISTS `FK_90502F6CB6E62EFA`;
+
+/*Alter table access_users */
 ALTER TABLE contrexx_access_users
   CHANGE id id INT UNSIGNED AUTO_INCREMENT NOT NULL,
   CHANGE email email VARCHAR(255) NOT NULL,
@@ -361,15 +375,14 @@ ALTER TABLE contrexx_access_users
   CHANGE backend_lang_id backend_lang_id INT UNSIGNED DEFAULT 0 NOT NULL,
   CHANGE primary_group primary_group INT UNSIGNED DEFAULT 0 NOT NULL,
   CHANGE restore_key_time restore_key_time INT UNSIGNED DEFAULT 0 NOT NULL,
-  CHANGE active active TINYINT(1) DEFAULT '1' NOT NULL,
+  CHANGE active active TINYINT(1) DEFAULT '0' NOT NULL,
   CHANGE u2u_active u2u_active TINYINT(1) DEFAULT '1' NOT NULL;
-ALTER TABLE contrexx_access_rel_user_group CHANGE user_id user_id INT UNSIGNED NOT NULL;
+
+ALTER TABLE contrexx_access_rel_user_group
+    CHANGE user_id user_id INT UNSIGNED NOT NULL,
+    CHANGE group_id group_id INT UNSIGNED NOT NULL;
 
 /** Drop Foreign Keys To Modify Tables **/
-ALTER TABLE `contrexx_access_user_attribute_name` DROP FOREIGN KEY IF EXISTS `FK_90502F6CB6E62EFA`;
-ALTER TABLE `contrexx_access_user_attribute` DROP FOREIGN KEY IF EXISTS `FK_D97727BE727ACA70`;
-ALTER TABLE `contrexx_access_rel_user_group` DROP FOREIGN KEY IF EXISTS `FK_401DFD43FE54D947`;
-
 ALTER TABLE contrexx_access_user_attribute
 	CHANGE id id INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	CHANGE parent_id parent_id INT UNSIGNED DEFAULT NULL,
@@ -379,15 +392,13 @@ ALTER TABLE contrexx_access_user_attribute_name
 	CHANGE attribute_id attribute_id INT UNSIGNED NOT NULL;
 
 ALTER TABLE contrexx_access_user_attribute_value
+    CHANGE history_id history_id INT UNSIGNED DEFAULT 0 NOT NULL,
 	CHANGE attribute_id attribute_id INT UNSIGNED NOT NULL,
-	CHANGE user_id user_id INT UNSIGNED NOT NULL,
-	CHANGE history_id history_id INT UNSIGNED DEFAULT 0 NOT NULL;
-
-ALTER TABLE contrexx_access_rel_user_group CHANGE group_id group_id INT UNSIGNED NOT NULL;
+	CHANGE user_id user_id INT UNSIGNED NOT NULL;
 
 ALTER TABLE contrexx_access_user_groups
-  CHANGE group_id group_id INT UNSIGNED AUTO_INCREMENT NOT NULL,
-  CHANGE is_active is_active TINYINT(1) DEFAULT '1' NOT NULL;
+    CHANGE group_id group_id INT UNSIGNED AUTO_INCREMENT NOT NULL,
+    CHANGE is_active is_active TINYINT(1) DEFAULT '1' NOT NULL;
 
 /** Delete all invalid entries **/
 DELETE FROM contrexx_access_user_attribute_value WHERE attribute_id = 0;
@@ -400,19 +411,24 @@ UPDATE `contrexx_access_user_attribute` SET `parent_id`= null WHERE parent_id = 
 
 DELETE g FROM contrexx_access_rel_user_group AS g LEFT JOIN contrexx_access_users AS u ON u.id = g.user_id WHERE u.id IS NULL;
 
-ALTER TABLE contrexx_access_rel_user_group ADD CONSTRAINT FK_401DFD43A76ED395 FOREIGN KEY (user_id) REFERENCES contrexx_access_users (id);
+ALTER TABLE contrexx_access_rel_user_group
+    ADD CONSTRAINT FK_401DFD43A76ED395 FOREIGN KEY (user_id) REFERENCES contrexx_access_users (id);
 
 /*Add unique index to access_user_attribute_name*/
-ALTER TABLE contrexx_access_user_attribute_name DROP PRIMARY KEY;
-ALTER TABLE contrexx_access_user_attribute_name ADD id INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY FIRST;
+ALTER TABLE contrexx_access_user_attribute_name
+    DROP PRIMARY KEY,
+    ADD id INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY FIRST;
 CREATE UNIQUE INDEX fk_module_user_attribute_name_unique_idx
   ON contrexx_access_user_attribute_name (attribute_id, lang_id);
 
+ALTER TABLE contrexx_access_user_attribute_value ADD PRIMARY KEY (history_id, attribute_id, user_id);
+
 /** Add Foreign Keys **/
-ALTER TABLE `contrexx_access_user_attribute_value` ADD CONSTRAINT `FK_B0DEA323B6E62EFA`
-	FOREIGN KEY (`attribute_id`) REFERENCES `contrexx_access_user_attribute` (`id`);
-ALTER TABLE `contrexx_access_user_attribute_value` ADD CONSTRAINT `FK_B0DEA323A76ED395A76ED395A76ED395A76ED395`
-	FOREIGN KEY (`user_id`) REFERENCES `contrexx_access_users` (`id`);
+ALTER TABLE `contrexx_access_user_attribute_value`
+    ADD CONSTRAINT `FK_B0DEA323B6E62EFA`
+	    FOREIGN KEY (`attribute_id`) REFERENCES `contrexx_access_user_attribute` (`id`),
+    ADD CONSTRAINT `FK_B0DEA323A76ED395A76ED395A76ED395A76ED395`
+	    FOREIGN KEY (`user_id`) REFERENCES `contrexx_access_users` (`id`);
 
 ALTER TABLE `contrexx_access_user_attribute_name`ADD CONSTRAINT `FK_90502F6CB6E62EFA`
 	FOREIGN KEY (`attribute_id`) REFERENCES `contrexx_access_user_attribute`(`id`);
