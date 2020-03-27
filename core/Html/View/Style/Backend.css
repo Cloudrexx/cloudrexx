@@ -96,6 +96,7 @@ form.cx-ui > fieldset .group > label {
     line-height: 22px;
     width: 192px;
     padding: 0 8px;
+    padding-right: 0;
     word-break: break-word;
 }
 
