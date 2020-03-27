@@ -60,7 +60,9 @@ class RelationRepository extends \Doctrine\ORM\EntityRepository {
             ->andWhere($qb->expr()->eq('r.localFieldName', $fieldName))
             ->andWhere($qb->expr()->eq('r.parent', $parentRelationConfig));
         
-        return $qb->getQuery()->getFirstResult();
+        $query = $qb->getQuery();
+        $query->useResultCache(false);
+        return $query->getFirstResult();
     }
 }
 

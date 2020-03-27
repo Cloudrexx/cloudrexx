@@ -32,10 +32,7 @@
  * @package     cloudrexx
  * @subpackage  module_jobs
  */
-$_ARRAYLANG['TXT_CATEGORY_MANAGER'] = "Kategorien";
 $_ARRAYLANG['TXT_JOBS_MANAGER'] = "Stellenangebote";
-$_ARRAYLANG['TXT_CREATE_DOCUMENT'] = "Neu";
-$_ARRAYLANG['TXT_JOBS_MENU_OVERVIEW'] = "Überblick";
 $_ARRAYLANG['TXT_AUTHOR'] = "Autor";
 $_ARRAYLANG['TXT_DATE'] = "Datum";
 $_ARRAYLANG['TXT_EDIT_DOCUMENTS'] = "Stellenangebote bearbeiten";
@@ -103,7 +100,6 @@ $_ARRAYLANG['TXT_JOBS_AVAILABLE_LOCATIONS'] = "Vorhandene Regionen";
 $_ARRAYLANG['TXT_JOBS_LOCATIONS_NOT_ASSIGNED'] = "Regionen konnten nicht zugewiesen werden.";
 $_ARRAYLANG['TXT_JOBS_LOCATION_NOT_DELETED'] = "Regionszuweisungen konnten nicht gelöscht werden.";
 $_ARRAYLANG['TXT_JOBS_SHOW_LOCATION_FE'] = "Regionen als Auswahl zur Verfügung stellen";
-$_ARRAYLANG['TXT_LOCATION_MANAGER'] = "Regionen";
 $_ARRAYLANG['TXT_LOCATION'] = "Regionen";
 $_ARRAYLANG['TXT_JOBS_WORK_START_NOW'] = "ab sofort";
 $_ARRAYLANG['TXT_JOBS_SETTINGS'] = "Eigenschaften";

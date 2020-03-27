@@ -901,7 +901,7 @@ class KnowledgeAdmin extends KnowledgeLibrary
      * @param $category Category information
      * @return String
      */
-    private function parseArticleList($articles, $categoryname="", $count, $position, $standalone=false)
+    private function parseArticleList($articles, $categoryname="", $count = null, $position = null, $standalone=false)
     {
         global $_LANGID, $_ARRAYLANG, $_CORELANG;
 

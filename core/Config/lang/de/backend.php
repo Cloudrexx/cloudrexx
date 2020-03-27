@@ -219,3 +219,5 @@ $_ARRAYLANG['TXT_SETTINGS_COOKIENOTETTL_YEAR']      = '1 Jahr';
 $_ARRAYLANG['TXT_SETTINGS_COOKIENOTETTL_UNLIMITED'] = 'Unendlich';
 $_ARRAYLANG['TXT_CORE_CONFIG_USEVIRTUALLANGUAGEDIRECTORIES']          = 'Virtuelle Sprachverzeichnisse verwenden';
 $_ARRAYLANG['TXT_CONFIG_UNABLE_TO_SET_USEVIRTUALLANGUAGEDIRECTORIES'] = 'Die Option %s kann nicht deaktiviert werden, so lange mehrere Sprachversionen eingerichtet sind.';
+$_ARRAYLANG['TXT_CORE_CONFIG_UPLOADFILESIZELIMIT'] = 'Datei-Upload-Limite';
+$_ARRAYLANG['TXT_CORE_CONFIG_UPLOADFILESIZELIMIT_TOOLTIP_HELP'] = 'Die maximal erlaubte Grösse einer Datei, welche hochgeladen werden darf.';

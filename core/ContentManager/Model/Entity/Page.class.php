@@ -71,7 +71,7 @@ class PageException extends \Exception {
  * @package     cloudrexx
  * @subpackage  core_contentmanager
  */
-class Page extends \Cx\Core_Modules\Widget\Model\Entity\WidgetParseTarget implements \Serializable
+class Page extends \Cx\Core_Modules\Widget\Model\Entity\WidgetParseTarget implements \Serializable, \Gedmo\Loggable\Loggable
 {
     const TYPE_CONTENT = 'content';
     const TYPE_APPLICATION = 'application';
@@ -347,7 +347,12 @@ class Page extends \Cx\Core_Modules\Widget\Model\Entity\WidgetParseTarget implem
         $this->backendAccessId = 0;
 
         $this->setUpdatedAtToNow();
+    }
 
+    /**
+     * @inheritDoc
+     */
+    public function initializeValidators() {
         $this->validators = array(
             'lang' => new \CxValidateInteger(),
             'type' => new \CxValidateString(array('alphanumeric' => true, 'maxlength' => 255)),
@@ -365,7 +370,11 @@ class Page extends \Cx\Core_Modules\Widget\Model\Entity\WidgetParseTarget implem
             //active is boolean, not checked
             'target' => new \CxValidateString(array('maxlength' => 255)),
             'module' => new \CxValidateString(array('alphanumeric' => true)),
-            'cmd' => new \CxValidateRegexp(array('pattern' => '/^[-A-Za-z0-9_]+$/')),
+            'cmd' => new \CxValidateRegexp(array(
+                'pattern' => '/^([-a-z0-9_]+|\[\[' .
+                    \Cx\Core\Routing\NodePlaceholder::NODE_URL_PCRE .
+                    '\]\])$/ix'
+            )),
         );
     }
 
@@ -828,8 +837,14 @@ class Page extends \Cx\Core_Modules\Widget\Model\Entity\WidgetParseTarget implem
                 $fallback_page = $this->getNode()->getPage($fallback_lang);
                 if ($fallback_page && $fallback_page->isActive()) {
                     $fallback_status = $fallback_page->getStatus();
+                    $fallback_status = preg_replace('/(in)?active/', '', $fallback_status);
                     if ($this->isFrontendProtected() && !preg_match('/protected/', $fallback_status)) {
                         $fallback_status .= 'protected ';
+                    }
+                    if ($this->getDisplay()) {
+                        $fallback_status .= 'active ';
+                    } else {
+                        $fallback_status .= "inactive ";
                     }
                     return 'fallback ' . $fallback_status;
                 }
@@ -864,8 +879,11 @@ class Page extends \Cx\Core_Modules\Widget\Model\Entity\WidgetParseTarget implem
             }
         }
 
-        if ($this->getDisplay()) $status .= "active ";
-        else $status .= "inactive ";
+        if ($this->getDisplay()) {
+            $status .= "active ";
+        } else {
+            $status .= "inactive ";
+        }
 
         if ($this->isFrontendProtected()) $status .= "protected ";
         if ($this->getModule()) {

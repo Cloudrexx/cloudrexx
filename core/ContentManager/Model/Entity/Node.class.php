@@ -561,4 +561,29 @@ class Node extends \Cx\Model\Base\EntityBase implements \Serializable
             $this->pages[] = $pageId;
         }
     }
+
+    /**
+     * Check if this node is a child (direct or indirect) of node $parent
+     *
+     * @param   Node    $parent Node to check if its the parent of this
+     *                          instance of
+     * @return  boolean Whether this instance is a child of $parent. Whereas
+     *                  $parent is not required to be a direct parent of this
+     *                  instance.
+     */
+    public function isChildOf($parent) {
+        if (
+            // if $this is located within the boundaries
+            // of $parent, then $this is a child of $parent
+            $parent->getLft() < $this->getLft() &&
+            $parent->getRgt() > $this->getRgt() &&
+            // this check is just for the case when the tree
+            // is broken
+            $parent->getLvl() < $this->getLvl()
+        ) {
+            return true;
+        }
+
+        return false;
+    }
 }

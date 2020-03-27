@@ -78,9 +78,10 @@ class BackendTable extends HTML_Table {
      * @param array $options      options of view generator
      * @param string $entityClass class name of entity
      * @param \Cx\Core\Html\Controller\ViewGenerator $viewGenerator instance of ViewGenerator
+     * @param boolean $readOnly if view is only readable
      * @throws \Doctrine\ORM\Mapping\MappingException
      */
-    public function __construct($attrs = array(), $options = array(), $entityClass = '', $viewGenerator = null) {
+    public function __construct($attrs = array(), $options = array(), $entityClass = '', $viewGenerator = null, $readOnly = false) {
         global $_ARRAYLANG;
 
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
@@ -148,7 +149,7 @@ class BackendTable extends HTML_Table {
                 $virtual = $rows['virtual'];
                 unset($rows['virtual']);
                 if (isset($options['multiActions'])) {
-                    $this->setCellContents($row, $col, '<input name="select-' . $rowname . '" value="' . $rowname . '" type="checkbox" />', 'TD', '0', false);
+                    $this->setCellContents($row, $col, '<input class="multi-action-checkbox" name="select-' . $rowname . '" value="' . $rowname . '" type="checkbox" />', 'TD', '0', false);
                     $col++;
                 }
                 foreach ($rows as $header=>$data) {
@@ -322,6 +323,8 @@ class BackendTable extends HTML_Table {
                     } else if (empty($data)) {
                         $data = '<i>(empty)</i>';
                         $encode = false;
+                    } else if (is_object($data) && get_class($data) == 'Cx\Core\Model\Model\Entity\Password') {
+                        $data = '******';
                     }
                     $cellAttrs = array();
                     if (
@@ -331,6 +334,15 @@ class BackendTable extends HTML_Table {
                     ) {
                         $cellAttrs = $options['fields'][$origHeader]['table']['attributes'];
                     }
+
+                    if ($readOnly) {
+                        // The content is already encoded in the TableGenerator
+                        // if the field option is set to this. So the variable
+                        // "encode" in the read-only view must always be false,
+                        // so that the content isn't encoded again.
+                        $encode = false;
+                    }
+
                     $this->setCellAttributes($row, $col, $cellAttrs);
                     $this->setCellContents($row, $col, $data, 'TD', 0, $encode);
                     $col++;
@@ -373,25 +385,27 @@ class BackendTable extends HTML_Table {
                     $options['functions']
                 );
                 $this->updateCellAttributes(
-                    0, 
-                    0, 
+                    0,
+                    0,
                     array(
                         'colspan' => $headerColspan
                     )
                 );
 
-                // prepare overall functions code
-                $overallFunctionsCode = $this->getOverallFunctionsCode($options['functions'], $attrs);
-                $this->setHeaderContents(0, $col, $overallFunctionsCode);
-                $this->updateCellAttributes(0, $col, array('style' => 'text-align:right;'));
-                $this->updateRowAttributes(1, array('class' => 'row3'), true);
+                if (!$readOnly) {
+                    // prepare overall functions code
+                    $overallFunctionsCode = $this->getOverallFunctionsCode($options['functions'], $attrs);
+                    $this->setHeaderContents(0, $col, $overallFunctionsCode);
+                    $this->updateCellAttributes(0, $col, array('style' => 'text-align:right;'));
+                    $this->updateRowAttributes(1, array('class' => 'row3'), true);
+                }
             }
             // add multi-actions
             if (isset($options['multiActions'])) {
                 $multiActionsCode = '
                     <img src="'.$cx->getCodeBaseCoreWebPath().'/Html/View/Media/arrow.gif" width="38" height="22" alt="^" title="^">
-                    <a href="#" onclick="jQuery(\'input[type=checkbox]\').prop(\'checked\', true);return false;">' . $_ARRAYLANG['TXT_SELECT_ALL'] . '</a> /
-                    <a href="#" onclick="jQuery(\'input[type=checkbox]\').prop(\'checked\', false);return false;">' . $_ARRAYLANG['TXT_DESELECT_ALL'] . '</a>
+                    <a href="#" onclick="jQuery(\'input[type=checkbox].multi-action-checkbox\').prop(\'checked\', true);return false;">' . $_ARRAYLANG['TXT_SELECT_ALL'] . '</a> /
+                    <a href="#" onclick="jQuery(\'input[type=checkbox].multi-action-checkbox\').prop(\'checked\', false);return false;">' . $_ARRAYLANG['TXT_DESELECT_ALL'] . '</a>
                     <img alt="-" title="-" src="'.$cx->getCodeBaseCoreWebPath().'/Html/View/Media/strike.gif">
                 ';
                 $multiActions = array(''=>$_ARRAYLANG['TXT_SUBMIT_SELECT']);
@@ -425,7 +439,7 @@ class BackendTable extends HTML_Table {
                         if (!matches) {
                             return false;
                         }
-                        var checkboxes = jQuery(this).closest("table").find("input[type=checkbox]");
+                        var checkboxes = jQuery(this).closest("table").find("input[type=checkbox].multi-action-checkbox");
                         var activeRows = [];
                         checkboxes.filter(":checked").each(function(el) {
                             activeRows.push(jQuery(this).val());
@@ -501,6 +515,8 @@ class BackendTable extends HTML_Table {
                     'sortField' => $sortField,
                 )
             );
+        } else if ($readOnly) {
+            $className .= ' view-show';
         }
 
         if (!empty($status)) {
@@ -546,21 +562,7 @@ class BackendTable extends HTML_Table {
     function setCellContents($row, $col, $contents, $type = 'TD', $body = 0, $encode = false)
     {
         if ($encode) {
-            // 1->n & n->n relations
-            $displayedRelationsLimit = 3;
-            if (is_object($contents) && $contents instanceof \Doctrine\ORM\PersistentCollection) {
-                // EXTRA_LAZY fetched can be sliced (results in a LIMIT)
-                $contents = $contents->slice(0, $displayedRelationsLimit + 1);
-            }
-            if (is_array($contents)) {
-                if (count($contents) > $displayedRelationsLimit) {
-                    $contents = array_slice($contents, 0, $displayedRelationsLimit);
-                    $contents[] = '...';
-                }
-                $contents = implode(', ', $contents);
-            }
-            //replaces curly brackets, so they get not parsed with the sigma engine
-            $contents = preg_replace(array("/{/","/}/"), array("&#123;","&#125;"), contrexx_raw2xhtml($contents), -1);
+            $contents = $this->encodeCellContent($contents);
         }
         $ret = $this->_adjustTbodyCount($body, 'setCellContents');
         if (PEAR::isError($ret)) {
@@ -570,6 +572,31 @@ class BackendTable extends HTML_Table {
         if (PEAR::isError($ret)) {
             return $ret;
         }
+    }
+
+    /**
+     * Encode the cell content
+     *
+     * @param $contents mixed content for the cell
+     * @return mixed encoded cell content
+     */
+    protected function encodeCellContent($contents)
+    {
+        // 1->n & n->n relations
+        $displayedRelationsLimit = 3;
+        if (is_object($contents) && $contents instanceof \Doctrine\ORM\PersistentCollection) {
+            // EXTRA_LAZY fetched can be sliced (results in a LIMIT)
+            $contents = $contents->slice(0, $displayedRelationsLimit + 1);
+        }
+        if (is_array($contents)) {
+            if (count($contents) > $displayedRelationsLimit) {
+                $contents = array_slice($contents, 0, $displayedRelationsLimit);
+                $contents[] = '...';
+            }
+            $contents = implode(', ', $contents);
+        }
+        //replaces curly brackets, so they get not parsed with the sigma engine
+        return preg_replace(array("/{/","/}/"), array("&#123;","&#125;"), contrexx_raw2xhtml($contents), -1);
     }
 
     protected function hasRowFunctions($functions, $virtual = false) {
@@ -604,7 +631,12 @@ class BackendTable extends HTML_Table {
             $rowname,
             clone $baseUrl
         );
-        $showUrl = clone $baseUrl;
+
+        $showUrl = \Cx\Core\Html\Controller\ViewGenerator::getVgShowUrl(
+            $functions['vg_increment_number'],
+            $rowname,
+            clone $baseUrl
+        );
         $params = $editUrl->getParamArray();
         if (isset($functions['sortBy']) && isset($functions['sortBy']['field'])) {
             $editUrl->setParam($functions['sortBy']['field'] . 'Pos', null);
@@ -644,16 +676,18 @@ class BackendTable extends HTML_Table {
                 $code .= '<a href="' . $showUrl . '" class="show" title="'.$_ARRAYLANG['TXT_CORE_RECORD_SHOW_TITLE'].'"></a>';
             }
             if (isset($functions['copy']) && $functions['copy']) {
-                $actionUrl = clone $editUrl;
-                $actionUrl->setParam('copy', $editId);
+                $copyUrl = \Cx\Core\Html\Controller\ViewGenerator::getVgCopyUrl(
+                    $functions['vg_increment_number'],
+                    $rowname,
+                    clone $baseUrl
+                );
                 //remove the parameter 'vg_increment_number' from actionUrl
                 //if the baseUrl contains the parameter 'vg_increment_number'
-                $params = $actionUrl->getParamArray();
+                $params = $copyUrl->getParamArray();
                 if (isset($params['vg_increment_number'])) {
-                    \Html::stripUriParam($actionUrl, 'vg_increment_number');
+                    \Html::stripUriParam($copyUrl, 'vg_increment_number');
                 }
-                $code = '<a href="'.$actionUrl.'" class="copy" title="'.$_ARRAYLANG['TXT_CORE_RECORD_COPY_TITLE'].'"></a>';
-
+                $code = '<a href="'.$copyUrl.'" class="copy" title="'.$_ARRAYLANG['TXT_CORE_RECORD_COPY_TITLE'].'"></a>';
             }
             if (isset($functions['edit']) && $functions['edit']) {
                 //remove the parameter 'vg_increment_number' from editUrl

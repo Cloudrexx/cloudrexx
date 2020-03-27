@@ -73,10 +73,10 @@ class DataAccess extends \Cx\Core_Modules\DataAccess\Model\Entity\DataAccess imp
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'id', 'name', 'dataSource', 'fieldList', 'accessCondition', 'allowedOutputMethods', 'dataAccessApiKeys', 'relations', 'readPermission', 'writePermission', 'syncs', 'validators', 'virtual');
+            return array('__isInitialized__', 'id', 'name', 'dataSource', 'fieldList', 'accessCondition', 'allowedOutputMethods', 'dataAccessApiKeys', 'readPermission', 'writePermission', 'validators', 'virtual');
         }
 
-        return array('__isInitialized__', 'id', 'name', 'dataSource', 'fieldList', 'accessCondition', 'allowedOutputMethods', 'dataAccessApiKeys', 'relations', 'readPermission', 'writePermission', 'syncs', 'validators', 'virtual');
+        return array('__isInitialized__', 'id', 'name', 'dataSource', 'fieldList', 'accessCondition', 'allowedOutputMethods', 'dataAccessApiKeys', 'readPermission', 'writePermission', 'validators', 'virtual');
     }
 
     /**
@@ -354,50 +354,6 @@ class DataAccess extends \Cx\Core_Modules\DataAccess\Model\Entity\DataAccess imp
     /**
      * {@inheritDoc}
      */
-    public function addRelation(\Cx\Core_Modules\Sync\Model\Entity\Relation $relation)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addRelation', array($relation));
-
-        return parent::addRelation($relation);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function removeRelation(\Cx\Core_Modules\Sync\Model\Entity\Relation $relations)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeRelation', array($relations));
-
-        return parent::removeRelation($relations);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getRelations()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getRelations', array());
-
-        return parent::getRelations();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setRelations($relations)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setRelations', array($relations));
-
-        return parent::setRelations($relations);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function setReadPermission(\Cx\Core_Modules\Access\Model\Entity\Permission $readPermission)
     {
 
@@ -437,39 +393,6 @@ class DataAccess extends \Cx\Core_Modules\DataAccess\Model\Entity\DataAccess imp
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getWritePermission', array());
 
         return parent::getWritePermission();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function addSync(\Cx\Core_Modules\Sync\Model\Entity\Sync $sync)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'addSync', array($sync));
-
-        return parent::addSync($sync);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function removeSync(\Cx\Core_Modules\Sync\Model\Entity\Sync $syncs)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'removeSync', array($syncs));
-
-        return parent::removeSync($syncs);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getSyncs()
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getSyncs', array());
-
-        return parent::getSyncs();
     }
 
     /**

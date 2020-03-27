@@ -32,12 +32,6 @@ Cx\Core_Modules\DataAccess\Model\Entity\DataAccess:
         dataAccessApiKeys:
             targetEntity: Cx\Core_Modules\DataAccess\Model\Entity\DataAccessApiKey
             mappedBy: dataAccess
-        syncs:
-            targetEntity: Cx\Core_Modules\Sync\Model\Entity\Sync
-            mappedBy: dataAccess
-        relations:
-            targetEntity: Cx\Core_Modules\Sync\Model\Entity\Relation
-            mappedBy: foreignDataAccess
     manyToOne:
         readPermission:
             targetEntity: Cx\Core_Modules\Access\Model\Entity\Permission

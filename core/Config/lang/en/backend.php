@@ -208,3 +208,5 @@ $_ARRAYLANG['TXT_SETTINGS_COOKIENOTETTL_YEAR']      = '1 year';
 $_ARRAYLANG['TXT_SETTINGS_COOKIENOTETTL_UNLIMITED'] = 'Endless';
 $_ARRAYLANG['TXT_CORE_CONFIG_USEVIRTUALLANGUAGEDIRECTORIES']          = 'Use virtual language directories';
 $_ARRAYLANG['TXT_CONFIG_UNABLE_TO_SET_USEVIRTUALLANGUAGEDIRECTORIES'] = 'The option %s can not be deactivated as long as there are multiple locales defined.';
+$_ARRAYLANG['TXT_CORE_CONFIG_UPLOADFILESIZELIMIT'] = 'File upload limit';
+$_ARRAYLANG['TXT_CORE_CONFIG_UPLOADFILESIZELIMIT_TOOLTIP_HELP'] = 'File size limit of files being uploaded.';

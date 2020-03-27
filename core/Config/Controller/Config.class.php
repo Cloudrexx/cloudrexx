@@ -319,6 +319,10 @@ class Config
                     'type' => \Cx\Core\Setting\Controller\Setting::TYPE_RADIO,
                     'value' => 'off',
                 ),
+                'uploadFileSizeLimit' => array(
+                    'value' => '500 mb',
+                    'values' => '{"type":"filesize"}',
+                ),
             ),
             'core' => array(
                 'coreSmtpServer' => array(
@@ -333,11 +337,6 @@ class Config
                 ),
             ),
             'component' => array(
-                'bannerStatus' => array(
-                    'type' => \Cx\Core\Setting\Controller\Setting::TYPE_RADIO,
-                    'value' => '0',
-                    'values' => '1:TXT_ACTIVATED,0:TXT_DEACTIVATED',
-                ),
                 'spamKeywords' => array(
                     'type' => \Cx\Core\Setting\Controller\Setting::TYPE_TEXTAREA,
                     'value' => 'sex, viagra',
