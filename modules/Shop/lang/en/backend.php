@@ -1134,5 +1134,5 @@ $_ARRAYLANG['TXT_SHOP_DELETED_ORDER'] = 'Order has been deleted.';
 $_ARRAYLANG['TXT_SHOP_DELETED_ORDERS'] = 'Orders have been deleted.';
 $_ARRAYLANG['TXT_SHOP_ORDER_STATUS_CHANGED'] = 'The status of the order has been changed.';
 $_ARRAYLANG['TXT_MODULE_SHOP_ANY'] = 'any';
-
+$_ARRAYLANG['pdfTemplate'] = 'PDF template';
 $_ARRAYLANG['TXT_SHOP_REL_DISCOUNT_GROUP_RECORDS_UPDATED_SUCCESSFUL'] ='The entries have been updated successfully.';
