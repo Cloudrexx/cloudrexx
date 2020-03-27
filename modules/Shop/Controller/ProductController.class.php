@@ -389,11 +389,13 @@ class ProductController extends \Cx\Core\Core\Model\Entity\Controller
             'short' => array(
                 'showOverview' => false,
                 'type' => 'wysiwyg',
+                'mode' => 'small',
                 'allowFiltering' => false,
             ),
             'long' => array(
                 'showOverview' => false,
                 'type' => 'wysiwyg',
+                'mode' => 'full',
                 'allowFiltering' => false,
             ),
             'keys' => array(
