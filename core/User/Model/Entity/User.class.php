@@ -511,9 +511,9 @@ class User extends \Cx\Model\Base\EntityBase {
     }
 
     /**
-     * Get isAdmin 
+     * Get isAdmin
      *
-     * @return boolean
+     * @return boolean 
      */
     public function getIsAdmin()
     {
@@ -573,7 +573,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get authToken 
      *
-     * @return string
+     * @return string 
      */
     public function getAuthToken()
     {
@@ -827,7 +827,7 @@ class User extends \Cx\Model\Base\EntityBase {
      *
      * This does exactly the same as getActive, but this method name is more intuitive
      *
-     * @return integer $active 
+     * @return integer $active
      */
     public function isActive()
     {
@@ -975,6 +975,7 @@ class User extends \Cx\Model\Base\EntityBase {
     {
         $this->groups->removeElement($group);
     }
+
 
     /**
      * Get group
