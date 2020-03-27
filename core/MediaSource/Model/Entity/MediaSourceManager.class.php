@@ -274,8 +274,12 @@ class MediaSourceManager extends EntityBase
     /**
      * Get MediaSourceFile from the given path
      *
+     * This method returns an object which implements the File interface, but
+     * only if the file exists within a registered MediaSource. If no matching
+     * MediaSource was found it returns null. If a matching MediaSource was
+     * found, but the file does not exist, it returns false.
      * @param string $path File path
-     * @return LocalFile
+     * @return File|null|false See description
      */
     public function getMediaSourceFileFromPath($path)
     {

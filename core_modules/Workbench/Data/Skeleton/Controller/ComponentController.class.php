@@ -51,6 +51,20 @@ namespace Cx\Modules\Skeleton\Controller;
 class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentController {
 
     /**
+     * URL pointing to the end-user documentation for this component
+     *
+     * @var string End-user documentation URL
+     */
+    protected $enduserDocumentationUrl = '';
+
+    /**
+     * URL pointing to the developer documentation for this component
+     *
+     * @var string Developer documentation URL
+     */
+    protected $developerDocumentationUrl = '';
+
+    /**
      * Returns all Controller class names for this component (except this)
      *
      * Be sure to return all your controller classes if you add your own

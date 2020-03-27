@@ -1,5 +1,5 @@
 var scopeOrder = 'order';
-document.addEventListener('DOMContentLoaded', function () {
+cx.ready(function() {
     for (var i = 0; i < getArrProduct().length; ++i) {
         calcPrice(getArrProduct()[i]['id']);
     }
@@ -215,32 +215,39 @@ function updateShipment()
     // found flag is set to the index of a suitable shipment, if encountered below.
     // if the flag stays at -1, there is no way to deliver it!
     var found = -1;
-    // try all the available shipments;
-    // (see Shipment.class.php::getJSArrays())
-    for (var i = 0; i < shipments.length; ++i) {
-        var price_free = shipments[i][2];
-        var max_weight = getWeightGrams(shipments[i][1]);
-        // get the shipment conditions that are closest to our order:
-        // we have to make sure the maximum weight is big enough for the order,
-        // or that it's unspecified (don't care)
-        if ((max_weight > 0 && weight <= max_weight ) || max_weight == 0) {
-            // if price_free is set, the order amount has to be higher than that
-            // in order to get the shipping for free.
-            if (price_free > 0 && price >= price_free) {
-                // we're well within the weight limit, and the order is also expensive
-                // enough to get a free shipping.
-                cost = '0.00';
-            } else {
-                // either the order amount is too low, or price_free is unset, or zero,
-                // so the shipping has to be paid for in any case.
-                cost = shipments[i][3];
-            }
-            // we found a kind of shipment that can handle the order, but maybe
-            // it's too expensive. - keep the cheapest way to deliver it
-            if (cost < lowest_cost) {
-                // Aahh, found a cheaper one. keep the index.
-                found = i;
-                lowest_cost = cost;
+    // If the sid is not defined (or "NULL", see ViewGenerator) this order does
+    // not have/need shipment.
+    if (!sid || sid == "NULL") {
+        found = 1;
+        lowest_cost = 0;
+    } else {
+        // try all the available shipments;
+        // (see Shipment.class.php::getJSArrays())
+        for (var i = 0; i < shipments.length; ++i) {
+            var price_free = shipments[i][2];
+            var max_weight = getWeightGrams(shipments[i][1]);
+            // get the shipment conditions that are closest to our order:
+            // we have to make sure the maximum weight is big enough for the order,
+            // or that it's unspecified (don't care)
+            if ((max_weight > 0 && weight <= max_weight ) || max_weight == 0) {
+                // if price_free is set, the order amount has to be higher than that
+                // in order to get the shipping for free.
+                if (price_free > 0 && price >= price_free) {
+                    // we're well within the weight limit, and the order is also expensive
+                    // enough to get a free shipping.
+                    cost = '0.00';
+                } else {
+                    // either the order amount is too low, or price_free is unset, or zero,
+                    // so the shipping has to be paid for in any case.
+                    cost = shipments[i][3];
+                }
+                // we found a kind of shipment that can handle the order, but maybe
+                // it's too expensive. - keep the cheapest way to deliver it
+                if (cost < lowest_cost) {
+                    // Aahh, found a cheaper one. keep the index.
+                    found = i;
+                    lowest_cost = cost;
+                }
             }
         }
     }

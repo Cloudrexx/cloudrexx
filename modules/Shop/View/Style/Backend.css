@@ -151,7 +151,7 @@ span.child:before {
 }
 .default {
     padding-left: 30px !important;
-}
+ }
 table[data-entity='Currency'] td {
     padding-left: 10px;
 }
@@ -193,6 +193,7 @@ label[for='form-0-relProductAttributes'] {
 
 #form-0-orderItems td {
     padding: 3px;
+    white-space: nowrap;
 }
 
 #form-0-orderItems td:nth-child(2) {
@@ -449,6 +450,10 @@ table.adminlist td.discountgroup-name {
     width: 47% !important;
 }
 
+#discount-group-table tr td:nth-child(1) {
+    font-weight: bold;
+}
+
 .payment-processor-info .title {
     width: 20%;
     float: left;
@@ -477,6 +482,7 @@ table.adminlist td.discountgroup-name {
 .payment-processor-name {
     width: 25%;
 }
+
 #group-0-userGroups,
 #group-0-weight,
 #group-0-flags,

@@ -84,11 +84,10 @@ class CalendarCategoryManager extends CalendarLibrary
      * Returns all the calendar categories
      *
      * @global object  $objDatabase
-     * @global integer $_LANGID
      * @return array Returns all calendar categories
      */
     function getCategoryList() {
-        global $objDatabase,$_LANGID;
+        global $objDatabase;
 
         $onlyActive_where = ($this->onlyActive == true ? ' WHERE status=1' : '');
 

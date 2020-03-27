@@ -132,7 +132,6 @@ class Jobs extends JobsLibrary
 
         $id = intval($_GET['id']);
 
-
         /**
         *
         * First get Settings and build footnote
@@ -154,115 +153,166 @@ class Jobs extends JobsLibrary
             'TXT_JOBS_PUBLISHED_AT'  => $_ARRAYLANG['TXT_JOBS_PUBLISHED_AT']
             ));
 
-        if ($id > 0) {
-            //Get the settings values from DB
-            $settings = $this->getSettings();
-            $footnote = stripslashes($settings['footnote']);
-            $link     = stripslashes($settings['link']);
-            $url      = stripslashes($settings['url']);
+        if (empty($id)) {
+            \Cx\Core\Csrf\Controller\Csrf::redirect(
+                \Cx\Core\Routing\Url::fromModuleAndCmd('Jobs')
+            );
+        }
 
-            $query = "SELECT id,
-                               workloc,
-                               changelog,
-                               workload,
-                               work_start,
-                               text,
-                               date,
-                               changelog,
-                               title,
-                               author,
-                               paid
-                          FROM ".DBPREFIX."module_jobs
-                         WHERE status = 1
-                           AND id = $id
-                           AND lang=".$this->langId."
-                           AND (startdate<='".date('Y-m-d')."' OR startdate='0000-00-00 00:00:00')
-                           AND (enddate>='".date('Y-m-d')."' OR enddate='0000-00-00 00:00:00')";
-            $objResult = $objDatabase->SelectLimit($query, 1);
+        //Get the settings values from DB
+        $settings = $this->getSettings();
+        $footnote = stripslashes($settings['footnote']);
+        $link     = stripslashes($settings['link']);
+        $url      = stripslashes($settings['url']);
 
-            while(!$objResult->EOF) {
-                $lastUpdate    = stripslashes($objResult->fields['changelog']);
-                $date = stripslashes($objResult->fields['date']);
-                $workloc    = stripslashes($objResult->fields['workloc']);
-                $workload = stripslashes($objResult->fields['workload']);
-                $work_start = stripslashes($objResult->fields['work_start']);
+        $query = "SELECT id,
+                           workloc,
+                           changelog,
+                           workload,
+                           work_start,
+                           text,
+                           date,
+                           changelog,
+                           title,
+                           author,
+                           paid
+                      FROM ".DBPREFIX."module_jobs
+                     WHERE status = 1
+                       AND id = $id
+                       AND lang=".$this->langId."
+                       AND (startdate<='".date('Y-m-d')."' OR startdate='0000-00-00 00:00:00')
+                       AND (enddate>='".date('Y-m-d')."' OR enddate='0000-00-00 00:00:00')";
+        $objResult = $objDatabase->SelectLimit($query, 1);
 
-                if(empty($work_start) or time() >= $work_start ) {
-                    $work_start = $_ARRAYLANG['TXT_JOBS_WORK_START_NOW'];
-                } else {
-                    $work_start = date("d.m.Y", $work_start);
-                }
+        if (
+            !$objResult ||
+            $objResult->EOF
+        ) {
+            \Cx\Core\Csrf\Controller\Csrf::redirect(
+                \Cx\Core\Routing\Url::fromModuleAndCmd('Jobs')
+            );
+        }
 
-                $docLastUpdate = "";
+        $lastUpdate    = stripslashes($objResult->fields['changelog']);
+        $date = stripslashes($objResult->fields['date']);
+        $workloc    = stripslashes($objResult->fields['workloc']);
+        $workload = stripslashes($objResult->fields['workload']);
+        $work_start = stripslashes($objResult->fields['work_start']);
 
-                if (!empty($lastUpdate) AND $lastUpdate!=$date ){
-                    $this->_objTpl->setVariable(array(
-                        'TXT_JOBS_LASTUPDATE' => $_ARRAYLANG['TXT_JOBS_LASTUPDATE'],
-                        'JOBS_LASTUPDATE' => date(ASCMS_DATE_FORMAT,$lastUpdate),
-                    ));
-
-                }
-
-                $title = stripslashes($objResult->fields['title']);
-
-                /*
-                * Replace self defined placeholders in $url
-                */
-                if(!empty($footnote)) {
-                    $footnotetext = nl2br($footnote);
-                }
-
-                if(!empty($link)) {
-                    $domainRepo = new \Cx\Core\Net\Model\Repository\DomainRepository();
-                    $domain = $domainRepo->getMainDomain()->getName();
-
-                    $url = \Cx\Core\Routing\Url::fromMagic($url);
-                    $params = $url->getParamArray();
-                    foreach ($params as $param => &$value) {
-                        $value = str_replace('%URL%', $domain.$_SERVER['REQUEST_URI'], $value);
-                        $value = str_replace('%TITLE%', stripslashes($title), $value);
-                    }
-                    $url->setParams($params);
-                    $url = $url->toString();
-
-                    $footnotelink = "<a href='$url'>$link</a>";
-			        $footnotelinkSrc = $url;
-                }
-
-
-                $this->_objTpl->setVariable(array(
-                    'JOBS_ID'	=> $objResult->fields['id'],
-                    'JOBS_DATE' => date(ASCMS_DATE_FORMAT,$date),
-                    'JOBS_TITLE'=> stripslashes($title),
-                    'JOBS_AUTHOR'    => stripslashes($objResult->fields['author']),
-                    'JOBS_TEXT' => stripslashes($objResult->fields['text']),
-                    'JOBS_FOOTNOTE' => $footnotetext,
-                    'JOBS_FOOTNOTE_LINK' => $footnotelink,
-                    'JOBS_FOOTNOTE_LINK_SRC' => $footnotelinkSrc,
-                    'JOBS_WORKLOC' => $workloc,
-                    'JOBS_WORKLOAD'=> $workload,
-                    'JOBS_WORK_START' => $work_start));
-
-                if ($this->_objTpl->blockExists('job_paid')) {
-                    if ($objResult->fields['paid']) {
-                        $this->_objTpl->touchBlock('job_paid');
-                    } else {
-                        $this->_objTpl->hideBlock('job_paid');
-                    }
-                }
-                if ($this->_objTpl->blockExists('job_not_paid')) {
-                    if ($objResult->fields['paid']) {
-                        $this->_objTpl->hideBlock('job_not_paid');
-                    } else {
-                        $this->_objTpl->touchBlock('job_not_paid');
-                    }
-                }
-
-                $objResult->MoveNext();
-            }
+        if(empty($work_start) or time() >= $work_start ) {
+            $work_start = $_ARRAYLANG['TXT_JOBS_WORK_START_NOW'];
         } else {
-            \Cx\Core\Csrf\Controller\Csrf::header("Location: index.php?section=Jobs");
-            exit;
+            $work_start = date("d.m.Y", $work_start);
+        }
+
+        $docLastUpdate = "";
+
+        if (!empty($lastUpdate) AND $lastUpdate!=$date ){
+            $this->_objTpl->setVariable(array(
+                'TXT_JOBS_LASTUPDATE' => $_ARRAYLANG['TXT_JOBS_LASTUPDATE'],
+                'JOBS_LASTUPDATE' => date(ASCMS_DATE_FORMAT,$lastUpdate),
+            ));
+
+        }
+
+        $title = stripslashes($objResult->fields['title']);
+
+        /*
+        * Replace self defined placeholders in $url
+        */
+        if(!empty($footnote)) {
+            $footnotetext = nl2br($footnote);
+        }
+
+        if(!empty($link)) {
+            $domainRepo = new \Cx\Core\Net\Model\Repository\DomainRepository();
+            $domain = $domainRepo->getMainDomain()->getName();
+
+            $url = \Cx\Core\Routing\Url::fromMagic($url);
+            $params = $url->getParamArray();
+            foreach ($params as $param => &$value) {
+                $value = str_replace('%URL%', $domain.$_SERVER['REQUEST_URI'], $value);
+                $value = str_replace('%TITLE%', stripslashes($title), $value);
+            }
+            $url->setParams($params);
+            $url = $url->toString();
+
+            $footnotelink = "<a href='$url'>$link</a>";
+            $footnotelinkSrc = $url;
+        }
+
+
+        $this->_objTpl->setVariable(array(
+            'JOBS_ID'	=> $id,
+            'JOBS_DATE' => date(ASCMS_DATE_FORMAT,$date),
+            'JOBS_TITLE'=> stripslashes($title),
+            'JOBS_AUTHOR'    => stripslashes($objResult->fields['author']),
+            'JOBS_TEXT' => stripslashes($objResult->fields['text']),
+            'JOBS_FOOTNOTE' => $footnotetext,
+            'JOBS_FOOTNOTE_LINK' => $footnotelink,
+            'JOBS_FOOTNOTE_LINK_SRC' => $footnotelinkSrc,
+            'JOBS_WORKLOC' => $workloc,
+            'JOBS_WORKLOAD'=> $workload,
+            'JOBS_WORK_START' => $work_start,
+        ));
+
+        if ($this->_objTpl->blockExists('job_paid')) {
+            if ($objResult->fields['paid']) {
+                $this->_objTpl->touchBlock('job_paid');
+            } else {
+                $this->_objTpl->hideBlock('job_paid');
+            }
+        }
+        if ($this->_objTpl->blockExists('job_not_paid')) {
+            if ($objResult->fields['paid']) {
+                $this->_objTpl->hideBlock('job_not_paid');
+            } else {
+                $this->_objTpl->touchBlock('job_not_paid');
+            }
+        }
+
+        // fetch ID-list of associated flags
+        $associatedFlagIds = array();
+        if (!empty($settings['use_flags'])) {
+            $associatedFlagIds = $this->getFlagAssociations($id);
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $flagRepo = $cx->getDb()->getEntityManager()->getRepository(
+                'Cx\Modules\Jobs\Model\Entity\Flag'
+            );
+        }
+        $flagsParsed = false;
+        if (isset($associatedFlagIds[$id])) {
+            foreach ($associatedFlagIds[$id] as $flagId) {
+                $flag = $flagRepo->findOneById($flagId);
+                if (!$flag) {
+                    continue;
+                }
+                $img = null;
+                $icon = $flag->getIcon();
+                if (!empty($icon)) {
+                    $path = $cx->getClassLoader()->getWebFilePath($icon);
+                    if ($path) {
+                        $img = new \Cx\Core\Html\Model\Entity\HtmlElement('img');
+                        $img->setAttributes(array(
+                            'src' => $path,
+                            'style' => 'max-width: 16px',
+                        ));
+                    }
+                }
+                $this->_objTpl->setVariable(array(
+                    'JOB_FLAG_ID'       => $flag->getId(),
+                    'JOB_FLAG_NAME'     => contrexx_raw2xhtml($flag->getName()),
+                    'JOB_FLAG_ICON'     => $img,
+                    'JOB_FLAG_ICON_SRC' => $icon,
+                    'JOB_FLAG_VALUE'    => contrexx_raw2xhtml($flag->getValue()),
+                ));
+                $this->_objTpl->parse('job_flag');
+                $flagsParsed = true;
+            }
+            $this->_objTpl->parse('job_flags');
+        }
+        if (!$flagsParsed) {
+            $this->_objTpl->hideBlock('job_flags');
         }
 
         $this->jobsTitle = strip_tags(stripslashes($title));
@@ -285,7 +335,7 @@ class Jobs extends JobsLibrary
         $docFilter = "";
         $locationFilter = " WHERE ";
         $paging = "";
-        $pos = intval($_GET['pos']);
+        $pos = !empty($_GET['pos']) ? intval($_GET['pos']) : 0;
         $i = 1;
         $class  = 'row1';
         $jobscategoryform = "";
@@ -402,10 +452,22 @@ class Jobs extends JobsLibrary
         /*** end paging ***/
 
         if($count>=1){
+
+            // fetch ID-list of associated flags
+            $associatedFlagIds = array();
+            if (!empty($settings['use_flags'])) {
+                $associatedFlagIds = $this->getFlagAssociations();
+                $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+                $flagRepo = $cx->getDb()->getEntityManager()->getRepository(
+                    'Cx\Modules\Jobs\Model\Entity\Flag'
+                );
+            }
+
             while (!$objResult->EOF) {
+                $id = $objResult->fields['docid'];
                 ($i % 2) ? $class  = 'row1' : $class  = 'row2';
 
-                $detailUrl = \Cx\Core\Routing\Url::fromModuleAndCmd('Jobs', 'details', FRONTEND_LANG_ID, array('id' => $objResult->fields['docid']));
+                $detailUrl = \Cx\Core\Routing\Url::fromModuleAndCmd('Jobs', 'details', FRONTEND_LANG_ID, array('id' => $id));
 
                 $work_start = stripslashes($objResult->fields['work_start']);
                 if (empty($work_start) or time() >= $work_start) {
@@ -416,7 +478,7 @@ class Jobs extends JobsLibrary
 
                 $this->_objTpl->setVariable(array(
                     'JOBS_STYLE'      => $class,
-                    'JOBS_ID'            => $objResult->fields['docid'],
+                    'JOBS_ID'            => $id,
                     'JOBS_LONG_DATE'  => date($this->dateLongFormat,$objResult->fields['date']),
                     'JOBS_DATE'       => date($this->dateFormat,$objResult->fields['date']),
                     'JOBS_LINK'         => "<a href=\"" . $detailUrl->toString() . "\" title=\"".stripslashes($objResult->fields['title'])."\">".stripslashes($objResult->fields['title'])."</a>",
@@ -441,6 +503,41 @@ class Jobs extends JobsLibrary
                     } else {
                         $this->_objTpl->touchBlock('job_not_paid');
                     }
+                }
+
+                $flagsParsed = false;
+                if (isset($associatedFlagIds[$id])) {
+                    foreach ($associatedFlagIds[$id] as $flagId) {
+                        $flag = $flagRepo->findOneById($flagId);
+                        if (!$flag) {
+                            continue;
+                        }
+                        $img = null;
+                        $icon = $flag->getIcon();
+                        if (!empty($icon)) {
+                            $path = $cx->getClassLoader()->getWebFilePath($icon);
+                            if ($path) {
+                                $img = new \Cx\Core\Html\Model\Entity\HtmlElement('img');
+                                $img->setAttributes(array(
+                                    'src' => $path,
+                                    'style' => 'max-width: 16px',
+                                ));
+                            }
+                        }
+                        $this->_objTpl->setVariable(array(
+                            'JOB_FLAG_ID'       => $flag->getId(),
+                            'JOB_FLAG_NAME'     => contrexx_raw2xhtml($flag->getName()),
+                            'JOB_FLAG_ICON'     => $img,
+                            'JOB_FLAG_ICON_SRC' => $icon,
+                            'JOB_FLAG_VALUE'    => contrexx_raw2xhtml($flag->getValue()),
+                        ));
+                        $this->_objTpl->parse('job_flag');
+                        $flagsParsed = true;
+                    }
+                    $this->_objTpl->parse('job_flags');
+                }
+                if (!$flagsParsed) {
+                    $this->_objTpl->hideBlock('job_flags');
                 }
 
                 $this->_objTpl->parse("row");
