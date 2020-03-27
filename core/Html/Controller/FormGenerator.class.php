@@ -991,10 +991,7 @@ class FormGenerator {
             case 'wysiwyg':
                 if (isset($options['readonly']) && $options['readonly']) {
                     return new \Cx\Core\Html\Model\Entity\TextElement(
-                        sprintf(
-                            $_ARRAYLANG['TXT_CORE_HTML_READONLY_NOT_SUPPORTED_YET'],
-                            $name
-                        )
+                        contrexx_raw2xhtml($value)
                     );
                 }
 
