@@ -172,11 +172,16 @@ class Cart
             return;
         }
 
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $productRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\Product'
+        );
+
         $outOfStockProducts = array();
         foreach (Cart::get_products_array() as $product) {
-            $objProduct = Product::getById($product['id']);
+            $objProduct = $productRepo->find($product['id']);
             if ($objProduct && !$objProduct->getStatus()) {
-                $outOfStockProducts[] = contrexx_raw2xhtml($objProduct->name());
+                $outOfStockProducts[] = contrexx_raw2xhtml($objProduct->getName());
             }
         }
 
@@ -504,14 +509,20 @@ class Cart
         // will contain all VAT rates of the products currently in cart
         $usedVatRates = array();
 
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $productRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\Product'
+        );
+
         // Loop 1: Collect necessary Product data
         $products = $_SESSION['shop']['cart']['items']->toArray();
         foreach ($products as $cart_id => &$product) {
-            $objProduct = Product::getById($product['id']);
+            $objProduct = $productRepo->find($product['id']);
             if (!$objProduct) {
                 unset($products[$cart_id]);
                 continue;
             }
+
 
             // Check minimum order quantity, when set
             // Do not add error message if it's an AJAX request
@@ -521,16 +532,16 @@ class Cart
                     strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) != 'xmlhttprequest'
                 ) &&
                 $product['quantity'] != 0 &&
-                $product['quantity'] < $objProduct->minimum_order_quantity()
+                $product['quantity'] < $objProduct->getMinimumOrderQuantity()
             ) {
-                \Message::error($objProduct->name().': '.$_ARRAYLANG['TXT_SHOP_MINIMUM_ORDER_QUANTITY_ERROR']);
+                \Message::error($objProduct->getName().': '.$_ARRAYLANG['TXT_SHOP_MINIMUM_ORDER_QUANTITY_ERROR']);
             }
 
             // Limit Products in the cart to the stock available if the
             // stock_visibility is enabled.
-            if ($objProduct->stock_visible()
-             && $product['quantity'] > $objProduct->stock()) {
-                $product['quantity'] = $objProduct->stock();
+            if ($objProduct->getStockVisible()
+             && $product['quantity'] > $objProduct->getStock()) {
+                $product['quantity'] = $objProduct->getStock();
             }
 
             // Remove Products with quatities of zero or less
@@ -551,8 +562,8 @@ class Cart
                 $quantity
             );
             $price = $itemprice * $quantity;
-            $handler = $objProduct->distribution();
-            $itemweight = ($handler == 'delivery' ? $objProduct->weight() : 0);
+            $handler = $objProduct->getDistribution();
+            $itemweight = ($handler == 'delivery' ? $objProduct->getWeight() : 0);
 
             // Requires shipment if the distribution type is 'delivery'
             if ($handler == 'delivery') {
@@ -560,7 +571,7 @@ class Cart
             }
             $weight = $itemweight * $quantity;
 
-            $vat_rate = Vat::getRate($objProduct->vat_id());
+            $vat_rate = Vat::getRate($objProduct->getVatId());
             $total_price += $price;
             $total_weight += $weight;
 
@@ -570,16 +581,16 @@ class Cart
             }
 
             self::$products[$cart_id] = array(
-                'id' => $objProduct->id(),
-                'product_id' => $objProduct->code(),
+                'id' => $objProduct->getId(),
+                'product_id' => $objProduct->getCode(),
                 'cart_id' => $cart_id,
                 'title' =>
                     (empty($_GET['remoteJs'])
-                      ? $objProduct->name()
+                      ? $objProduct->getName()
                       : htmlspecialchars(
                           (strtolower(CONTREXX_CHARSET) == 'utf-8'
-                            ? $objProduct->name()
-                            : utf8_encode($objProduct->name())),
+                            ? $objProduct->getName()
+                            : utf8_encode($objProduct->getName())),
                           ENT_QUOTES, CONTREXX_CHARSET)),
                 'options' => $product['options'],
                 'options_count' => count($product['options']),
@@ -592,10 +603,10 @@ class Cart
                 'vat_rate' => $vat_rate,
                 'itemweight' => $itemweight, // in grams!
                 'weight' => $weight,
-                'group_id' => $objProduct->group_id(),
-                'article_id' => $objProduct->article_id(),
-                'product_images' => $objProduct->pictures(),
-                'minimum_order_quantity' => $objProduct->minimum_order_quantity(),
+                'group_id' => $objProduct->getGroupId(),
+                'article_id' => $objProduct->getArticleId(),
+                'product_images' => $objProduct->getPicture(),
+                'minimum_order_quantity' => $objProduct->getMinimumOrderQuantity(),
             );
         }
 
@@ -608,7 +619,6 @@ class Cart
         $objCoupon = null;
         $hasCoupon = false;
         $discount_amount = 0;
-        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $couponRepo = $cx->getDb()->getEntityManager()->getRepository(
             'Cx\Modules\Shop\Model\Entity\DiscountCoupon'
         );
@@ -921,7 +931,7 @@ die("Cart::view(): ERROR: No template");
                 );
 
                 // product image
-                $arrProductImg = Products::get_image_array_from_base64($arrProduct['product_images']);
+                $arrProductImg = \Cx\Modules\Shop\Controller\ProductController::get_image_array_from_base64($arrProduct['product_images']);
                 $shopImagesWebPath = \Cx\Core\Core\Controller\Cx::instanciate()->getWebsiteImagesWebPath() . '/Shop/';
                 $thumbnailPath = $shopImagesWebPath.ShopLibrary::noPictureName;
                 foreach($arrProductImg as $productImg) {

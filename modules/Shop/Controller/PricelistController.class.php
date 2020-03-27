@@ -125,6 +125,7 @@ class PricelistController extends \Cx\Core\Core\Model\Entity\Controller
                 'showOverview' => false
             ),
             'categories' => array(
+                'header' => '',
                 'showOverview' => false,
                 'mode' => 'associate',
                 'formfield' => array(

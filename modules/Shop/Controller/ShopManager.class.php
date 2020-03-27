@@ -415,6 +415,13 @@ class ShopManager extends ShopLibrary
             }
             $importedLines = 0;
             $errorLines = 0;
+
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $em = $cx->getDb()->getEntityManager();
+            $metaData = $em->getClassMetadata('Cx\Modules\Shop\Model\Entity\Product');
+            $repoCat = $em->getRepository(
+                'Cx\Modules\Shop\Model\Entity\Category'
+            );
             // Array of IDs of newly inserted records
             $arrId = array();
             for ($x = 1; $x < count($arrFileContent); ++$x) {
@@ -433,8 +440,15 @@ class ShopManager extends ShopLibrary
                 if ($category_id == 0) {
                     $category_id = $objCSVimport->GetFirstCat();
                 }
-                $objProduct = new Product('', $category_id, '',
-                    Distribution::TYPE_DELIVERY, 0, 1, 0, 0, 0);
+
+                $category = $repoCat->find($category_id);
+                $product = new \Cx\Modules\Shop\Model\Entity\Product();
+                if (!empty($category)) {
+                    $product->addCategory($category);
+                }
+                $product->setDistribution(Distribution::TYPE_DELIVERY);
+                $product->setStock(10);
+
                 foreach ($arrProductDatabaseFieldName as $index => $strFieldIndex) {
                     $value = '';
                     if (strpos($strFieldIndex, ';')) {
@@ -448,19 +462,28 @@ class ShopManager extends ShopLibrary
                         $value =
                             $arrFileContent[$x][$arrDatabaseFieldIndex[$strFieldIndex]];
                     }
-                    $objProduct->$index($value);
+                    $fieldMapping = $metaData->getFieldMapping($index);
+                    if (!empty($fieldMapping['fieldName'])) {
+                        $setter = 'set' . ucfirst($fieldMapping['fieldName']);
+                        $product->$setter($value);
+                    } else {
+                        throw new \Exception('Feld konnte nicht zugwiesen werden');
                 }
-                if ($objProduct->store()) {
-                    $arrId[] = $objProduct->id();
+                }
+                try {
+                    $em->persist($product);
+                    $em->flush();
+                    $arrId[] = $product->getId();
                     ++$importedLines;
-                } else {
+                } catch(\Exception $e) {
+                    \Doctrine\Common\Util\Debug::dump($e);
                     ++$errorLines;
                 }
             }
             // Fix picture field and create thumbnails in case the import
             // contains images
             if (in_array('pictures', $arrProductFieldName)) {
-                Products::makeThumbnailsById($arrId);
+                \Cx\Modules\Shop\Controller\ProductController::makeThumbnailsById($arrId);
             }
             if ($importedLines) {
                 \Message::ok($_ARRAYLANG['TXT_SHOP_IMPORT_SUCCESSFULLY_IMPORTED_PRODUCTS'].
@@ -854,62 +877,6 @@ class ShopManager extends ShopLibrary
 
 
     /**
-     * Partial view of the Attributes for a Product being edited
-     *
-     * Only called by {@see view_product_edit()}.
-     * Mind that the $product_id may be empty (usually zero) for new Products.
-     * @access  private
-     * @param   integer   $product_id    The ID of the Product being edited
-     * @return  void
-     */
-    private static function viewpart_product_attributes($product_id=null)
-    {
-        $i = 0;
-        $count = 0;
-
-        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-        $defaultCurrency = $cx->getDb()->getEntityManager()->getRepository(
-            '\Cx\Modules\Shop\Model\Entity\Currency'
-        )->getDefaultCurrency();
-
-        // If a Product is selected, check those Product Attribute values
-        // associated with it
-        $arrRelation = Attributes::getRelationArray($product_id);
-        foreach (Attributes::getArray($count) as $attribute_id => $objAttribute) {
-            // All options available for this Product Attribute
-            $arrOptions = Attributes::getOptionArrayByAttributeId($attribute_id);
-            $nameSelected = false;
-            $order = 0;
-            foreach ($arrOptions as $option_id => $arrOption) {
-                $valueSelected = false;
-                if (in_array($option_id, array_keys($arrRelation))) {
-                    $valueSelected = true;
-                    $nameSelected = true;
-                    $order = $arrRelation[$option_id];
-                }
-                self::$objTemplate->setVariable(array(
-                    'SHOP_PRODUCTS_ATTRIBUTE_ID' => $attribute_id,
-                    'SHOP_PRODUCTS_ATTRIBUTE_VALUE_ID' => $option_id,
-                    'SHOP_PRODUCTS_ATTRIBUTE_VALUE_TEXT' => $arrOption['value'].
-                        ' ('.$arrOption['price'].' '.$defaultCurrency->getSymbol().')',
-                    'SHOP_PRODUCTS_ATTRIBUTE_VALUE_SELECTED' => ($valueSelected ? \Html::ATTRIBUTE_CHECKED : ''),
-                ));
-                self::$objTemplate->parse('optionList');
-            }
-            self::$objTemplate->setVariable(array(
-                'SHOP_PRODUCTS_ATTRIBUTE_ROW_CLASS' => 'row'.(++$i % 2 + 1),
-                'SHOP_PRODUCTS_ATTRIBUTE_ID' => $attribute_id,
-                'SHOP_PRODUCTS_ATTRIBUTE_NAME' => $objAttribute->getName(),
-                'SHOP_PRODUCTS_ATTRIBUTE_SELECTED' => ($nameSelected ? \Html::ATTRIBUTE_CHECKED : ''),
-                'SHOP_PRODUCTS_ATTRIBUTE_DISPLAY_TYPE' => ($nameSelected ? 'block' : 'none'),
-                'SHOP_PRODUCTS_ATTRIBUTE_SORTID' => $order,
-            ));
-            self::$objTemplate->parse('attributeList');
-        }
-    }
-
-
-    /**
      * Store a new attribute option
      * @access    private
      * @return    string    $statusMessage    Status message
@@ -1104,9 +1071,6 @@ class ShopManager extends ShopLibrary
         self::$objTemplate->loadTemplateFile('module_shop_settings.html');
         if (empty($_GET['tpl'])) $_GET['tpl'] = '';
         switch ($_GET['tpl']) {
-            case 'payment':
-                Payment::view_settings(self::$objTemplate);
-                break;
             case 'shipment':
                 self::view_settings_shipment();
                 break;
@@ -1423,9 +1387,9 @@ if ($test === NULL) {
             // Enable weight setting
             'SHOP_WEIGHT_ENABLE_CHECKED' => (\Cx\Core\Setting\Controller\Setting::getValue('weight_enable','Shop')
                 ? \Html::ATTRIBUTE_CHECKED : ''),
-            'SHOP_SHOW_PRODUCTS_DEFAULT_OPTIONS' => Products::getDefaultViewMenuoptions(
+            'SHOP_SHOW_PRODUCTS_DEFAULT_OPTIONS' => \Cx\Modules\Shop\Controller\ProductController::getDefaultViewMenuoptions(
                 \Cx\Core\Setting\Controller\Setting::getValue('show_products_default','Shop')),
-            'SHOP_PRODUCT_SORTING_MENUOPTIONS' => Products::getProductSortingMenuoptions(),
+            'SHOP_PRODUCT_SORTING_MENUOPTIONS' => \Cx\Modules\Shop\Controller\ProductController::getProductSortingMenuoptions(),
             // Order amount upper limit
             'SHOP_ORDERITEMS_AMOUNT_MAX' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(
                 \Cx\Core\Setting\Controller\Setting::getValue('orderitems_amount_max','Shop')),
@@ -1798,16 +1762,19 @@ if ($test === NULL) {
      */
     function delete_categories($category_id=0)
     {
-        global $objDatabase, $_ARRAYLANG;
+        global $_ARRAYLANG;
 
         $arrCategoryId = array();
         $deleted = false;
+        $deleteProducts = false;
         if (empty($category_id)) {
             if (!empty($_GET['delete_category_id'])) {
                 array_push($arrCategoryId, $_GET['delete_category_id']);
+                $deleteProducts = !empty($_GET['delete_products']);
             } elseif (!empty($_POST['selected_category_id'])
                    && is_array($_POST['selected_category_id'])) {
                 $arrCategoryId = $_POST['selected_category_id'];
+                $deleteProducts = !empty($_POST['delete_products']);
             }
         } else {
             array_push($arrCategoryId, $category_id);
@@ -1830,34 +1797,6 @@ if ($test === NULL) {
                     "&nbsp;(".$_ARRAYLANG['TXT_CATEGORY']."&nbsp;".$category_id.")");
                 continue;
             }
-            // Get Products in this category
-            $count = 1e9;
-            $arrProducts = Products::getByShopParams($count, 0, null,
-                $category_id, null, null, false, false, '', null, true);
-//DBG::log("delete_categories($category_id): Products in $category_id: ".var_export($arrProducts, true));
-            // Delete the products in the category
-            foreach ($arrProducts as $objProduct) {
-                // Check whether there are orders with this Product ID
-                $product_id = $objProduct->id();
-                $query = "
-                    SELECT 1
-                      FROM ".DBPREFIX."module_shop".MODULE_INDEX."_order_items
-                     WHERE product_id=$product_id";
-                $objResult = $objDatabase->Execute($query);
-                if (!$objResult || $objResult->RecordCount()) {
-                    \Message::error(
-                        $_ARRAYLANG['TXT_COULD_NOT_DELETE_ALL_PRODUCTS'].
-                        "&nbsp;(".
-                        sprintf($_ARRAYLANG['TXT_SHOP_CATEGORY_ID_FORMAT'],
-                            $category_id).")");
-                    continue 2;
-                }
-            }
-            if (Products::deleteByShopCategory($category_id) === false) {
-                \Message::error($_ARRAYLANG['TXT_ERROR_DELETING_PRODUCT'].
-                    "&nbsp;(".$_ARRAYLANG['TXT_CATEGORY']."&nbsp;".$category_id.")");
-                continue;
-            }
             // Delete the Category now
             $result = ShopCategories::deleteById($category_id);
             if ($result === null) {
@@ -1868,10 +1807,13 @@ if ($test === NULL) {
             }
             $deleted = true;
         }
-        if ($deleted) {
+        if (!$deleted) {
+            return null;
+        }
+        if ($deleteProducts) {
             return \Message::ok($_ARRAYLANG['TXT_DELETED_CATEGORY_AND_PRODUCTS']);
         }
-        return null;
+        return \Message::ok($_ARRAYLANG['TXT_SHOP_DELETED_CATEGORIES']);
     }
 
 
@@ -1934,456 +1876,27 @@ if ($test === NULL) {
             $arrProductId[] = $product_id;
         }
 
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $productRepo = $em->getRepository(
+            'Cx\Modules\Shop\Model\Entity\Product'
+        );
+
         $result = true;
         if (count($arrProductId) > 0) {
             foreach ($arrProductId as $product_id) {
-                $objProduct = Product::getById($product_id);
+                $objProduct = $productRepo->find($product_id);
                 if (!$objProduct) continue;
 //                $code = $objProduct->code();
 //                if (empty($code)) {
-                    $result &= $objProduct->delete();
+                    $result &= $em->remove($objProduct);
 //                } else {
 //                    $result &= !Products::deleteByCode($objProduct->code());
 //                }
             }
         }
+        $em->flush();
         return $result;
-    }
-
-    /**
-     * Manage products
-     *
-     * Add and edit products
-     * @access  public
-     * @return  string
-     * @author  Reto Kohli <reto.kohli@comvation.com> (parts)
-     */
-    function view_product_edit()
-    {
-        global $_ARRAYLANG;
-
-        self::store_product();
-        $product_id = (isset($_REQUEST['id']) ? intval($_REQUEST['id']) : 0);
-        $objProduct = null;
-        self::$objTemplate->addBlockfile('SHOP_PRODUCTS_FILE',
-            'shop_products_block', 'module_shop_product_manage.html');
-        self::$objTemplate->setGlobalVariable($_ARRAYLANG);
-        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-        self::$objTemplate->setVariable(array(
-            'SHOP_DELETE_ICON' => $cx->getCodeBaseCoreWebPath() . '/Core/View/Media/icons/delete.gif',
-            'SHOP_NO_PICTURE_ICON' => self::$defaultImage
-        ));
-        if ($product_id > 0) {
-            $objProduct = Product::getById($product_id);
-        }
-        if (!$objProduct) {
-            $objProduct = new Product('', 0, '', '', 0, 1, 0, 0);
-        }
-        $this->viewpart_product_attributes($product_id);
-        $arrImages = Products::get_image_array_from_base64($objProduct->pictures());
-// Virtual Categories are disabled FTTB
-//        $flagsSelection =
-//            ShopCategories::getVirtualCategoriesSelectionForFlags(
-//                $objProduct->flags()
-//            );
-//        if ($flagsSelection) {
-//            self::$objTemplate->setVariable(
-//                'SHOP_FLAGS_SELECTION', $flagsSelection);
-//        }
-//
-        // media browser
-        $mediaBrowserOptions = array(
-            'type'                      => 'button',
-            'startmediatype'            => 'shop',
-            'views'                     => 'filebrowser',
-            'id'                        => 'media_browser_shop',
-            'style'                     => 'display:none'
-        );
-
-        self::$objTemplate->setVariable(array(
-            'MEDIABROWSER_BUTTON' => self::getMediaBrowserButton($mediaBrowserOptions, 'setSelectedImage')
-        ));
-
-        $distribution = $objProduct->distribution();
-        // Available active frontend groups, and those assigned to the product
-        $objGroup = \FWUser::getFWUserObject()->objGroup->getGroups(
-            array('type' => 'frontend', 'is_active' => true),
-            array('group_id' => 'asc'));
-        $usergroup_ids = $objProduct->usergroup_ids();
-        $arrAssignedFrontendGroupId = explode(',', $usergroup_ids);
-        $strActiveFrontendGroupOptions = '';
-        $strAssignedFrontendGroupOptions = '';
-        while ($objGroup && !$objGroup->EOF) {
-            $strOption =
-                '<option value="'.$objGroup->getId().'">'.
-                htmlentities($objGroup->getName(), ENT_QUOTES, CONTREXX_CHARSET).
-                '</option>';
-            if (in_array($objGroup->getId(), $arrAssignedFrontendGroupId)) {
-                $strAssignedFrontendGroupOptions .= $strOption;
-            } else {
-                $strActiveFrontendGroupOptions .= $strOption;
-            }
-            $objGroup->next();
-        }
-        $discount_group_count_id = $objProduct->group_id();
-        $discount_group_article_id = $objProduct->article_id();
-        $keywords = $objProduct->keywords();
-//die($objProduct->category_id());
-        // Product assigned to multiple Categories
-        $arrAssignedCategories =
-            ShopCategories::getAssignedShopCategoriesMenuoptions(
-                $objProduct->category_id());
-        // Date format for Datepicker:
-        // Clear the date if none is set; there's no point in displaying
-        // "01/01/1970" instead
-        $start_date = $end_date = '';
-        $start_time = strtotime($objProduct->date_start());
-        // Note that the check for ">0" is necessary, as some systems return
-        // crazy values for empty dates (it may even fail like this)!
-        if ($start_time > 0) $start_date =
-            date(ASCMS_DATE_FORMAT_DATE, $start_time);
-        $end_time = strtotime($objProduct->date_end());
-        if ($end_time > 0) $end_date = date(ASCMS_DATE_FORMAT_DATE, $end_time);
-//DBG::log("Dates from ".$objProduct->date_start()." ($start_time, $start_date) to ".$objProduct->date_start()." ($end_time, $end_date)");
-        $websiteImagesShopPath    = $cx->getWebsiteImagesShopPath() . '/';
-        $websiteImagesShopWebPath = $cx->getWebsiteImagesShopWebPath() . '/';
-        self::$objTemplate->setVariable(array(
-            'SHOP_PRODUCT_ID' => (isset($_REQUEST['new']) ? 0 : $objProduct->id()),
-            'SHOP_PRODUCT_CODE' => contrexx_raw2xhtml($objProduct->code()),
-// Unused
-//            'SHOP_DATE' => date('Y-m-d H:m'),
-            'SHOP_PRODUCT_NAME' => contrexx_raw2xhtml($objProduct->name()),
-            'SHOP_CATEGORIES_ASSIGNED' => $arrAssignedCategories['assigned'],
-            'SHOP_CATEGORIES_AVAILABLE' => $arrAssignedCategories['available'],
-            'SHOP_CUSTOMER_PRICE' => contrexx_raw2xhtml(
-                \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($objProduct->price())),
-            'SHOP_RESELLER_PRICE' => contrexx_raw2xhtml(
-                \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($objProduct->resellerprice())),
-            'SHOP_DISCOUNT' => contrexx_raw2xhtml(
-                \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($objProduct->discountprice())),
-            'SHOP_SPECIAL_OFFER' => ($objProduct->discount_active() ? \Html::ATTRIBUTE_CHECKED : ''),
-            'SHOP_VAT_MENUOPTIONS' => Vat::getMenuoptions(
-                $objProduct->vat_id(), true),
-            'SHOP_SHORT_DESCRIPTION' => new \Cx\Core\Wysiwyg\Wysiwyg(
-                'short', $objProduct->short()),
-            'SHOP_DESCRIPTION' => new \Cx\Core\Wysiwyg\Wysiwyg(
-                'long', $objProduct->long(), 'full'),
-            'SHOP_STOCK' => $objProduct->stock(),
-            'SHOP_MIN_ORDER_QUANTITY' => $objProduct->minimum_order_quantity(),
-            'SHOP_MANUFACTURER_URL' => contrexx_raw2xhtml($objProduct->uri()),
-// TODO: Any attributes for the datepicker input?
-            'SHOP_DATE_START' => \Html::getDatepicker('date_start',
-                array('defaultDate' => $start_date),
-                ''),
-            'SHOP_DATE_END' => \Html::getDatepicker('date_end',
-                array('defaultDate' => $end_date),
-                ''),
-            'SHOP_ARTICLE_ACTIVE' => ($objProduct->active() ? \Html::ATTRIBUTE_CHECKED : ''),
-            'SHOP_B2B' => ($objProduct->b2b() ? \Html::ATTRIBUTE_CHECKED : ''),
-            'SHOP_B2C' => ($objProduct->b2c() ? \Html::ATTRIBUTE_CHECKED : ''),
-            'SHOP_STOCK_VISIBILITY' => ($objProduct->stock_visible()
-                ? \Html::ATTRIBUTE_CHECKED : ''),
-            'SHOP_MANUFACTURER_MENUOPTIONS' =>
-                \Cx\Modules\Shop\Controller\ManufacturerController::getMenuoptions($objProduct->manufacturer_id(), true),
-            'SHOP_PICTURE1_IMG_SRC' =>
-                (   !empty($arrImages[1]['img'])
-                 && is_file(\ImageManager::getThumbnailFilename($websiteImagesShopPath . $arrImages[1]['img']))
-                        ? contrexx_raw2encodedUrl(\ImageManager::getThumbnailFilename($websiteImagesShopWebPath . $arrImages[1]['img']))
-                    : self::$defaultImage),
-            'SHOP_PICTURE2_IMG_SRC' =>
-                (   !empty($arrImages[2]['img'])
-                 && is_file(\ImageManager::getThumbnailFilename($websiteImagesShopPath . $arrImages[2]['img']))
-                        ? contrexx_raw2encodedUrl(\ImageManager::getThumbnailFilename($websiteImagesShopWebPath . $arrImages[2]['img']))
-                    : self::$defaultImage),
-            'SHOP_PICTURE3_IMG_SRC' =>
-                (   !empty($arrImages[3]['img'])
-                 && is_file(\ImageManager::getThumbnailFilename($websiteImagesShopPath . $arrImages[3]['img']))
-                    ? contrexx_raw2encodedUrl(\ImageManager::getThumbnailFilename($websiteImagesShopWebPath . $arrImages[3]['img']))
-                    : self::$defaultImage),
-            'SHOP_PICTURE1_IMG_SRC_NO_THUMB' =>
-                (   !empty($arrImages[1]['img'])
-                 && is_file($websiteImagesShopPath . $arrImages[1]['img'])
-                    ? $websiteImagesShopWebPath . $arrImages[1]['img']
-                    : self::$defaultImage),
-            'SHOP_PICTURE2_IMG_SRC_NO_THUMB' =>
-                (   !empty($arrImages[2]['img'])
-                 && is_file($websiteImagesShopPath . $arrImages[2]['img'])
-                    ? $websiteImagesShopWebPath . $arrImages[2]['img']
-                    : self::$defaultImage),
-            'SHOP_PICTURE3_IMG_SRC_NO_THUMB' =>
-                (   !empty($arrImages[3]['img'])
-                 && is_file($websiteImagesShopPath . $arrImages[3]['img'])
-                    ? $websiteImagesShopWebPath . $arrImages[3]['img']
-                    : self::$defaultImage),
-            'SHOP_PICTURE1_IMG_WIDTH' => $arrImages[1]['width'],
-            'SHOP_PICTURE1_IMG_HEIGHT' => $arrImages[1]['height'],
-            'SHOP_PICTURE2_IMG_WIDTH' => $arrImages[2]['width'],
-            'SHOP_PICTURE2_IMG_HEIGHT' => $arrImages[2]['height'],
-            'SHOP_PICTURE3_IMG_WIDTH' => $arrImages[3]['width'],
-            'SHOP_PICTURE3_IMG_HEIGHT' => $arrImages[3]['height'],
-            'SHOP_DISTRIBUTION_MENU' => Distribution::getDistributionMenu(
-                $objProduct->distribution(), 'distribution',
-                'distributionChanged();', 'style="width: 220px"'),
-            'SHOP_WEIGHT' => ($distribution == 'delivery'
-                ? Weight::getWeightString($objProduct->weight()) : '0 g'),
-            // User group menu, returns 'userGroupId'
-            'SHOP_GROUPS_AVAILABLE' => $strActiveFrontendGroupOptions,
-            'SHOP_GROUPS_ASSIGNED' => $strAssignedFrontendGroupOptions,
-            'SHOP_ACCOUNT_VALIDITY_OPTIONS' => \FWUser::getValidityMenuOptions(
-                ($distribution == 'download' ? $objProduct->weight() : 0)),
-            'SHOP_CREATE_ACCOUNT_YES_CHECKED' =>
-                (empty($usergroup_ids) ? '' : \Html::ATTRIBUTE_CHECKED),
-            'SHOP_CREATE_ACCOUNT_NO_CHECKED' =>
-                (empty($usergroup_ids) ? \Html::ATTRIBUTE_CHECKED : ''),
-            'SHOP_DISCOUNT_GROUP_COUNT_MENU_OPTIONS' =>
-                Discount::getMenuOptionsGroupCount($discount_group_count_id),
-            'SHOP_DISCOUNT_GROUP_ARTICLE_MENU_OPTIONS' =>
-                Discount::getMenuOptionsGroupArticle($discount_group_article_id),
-            'SHOP_KEYWORDS' => contrexx_raw2xhtml($keywords),
-            // Enable JavaScript functionality for the weight if enabled
-            'SHOP_WEIGHT_ENABLED' => (\Cx\Core\Setting\Controller\Setting::getValue('weight_enable','Shop')
-                ? 1 : 0),
-        ));
-
-        $activateChildrenOfProductAttribute = \Cx\Core\Setting\Controller\Setting::getValue('activate_product_attribute_children','Shop');
-        \ContrexxJavascript::getInstance()->setVariable('activate_product_attribute_children', $activateChildrenOfProductAttribute, 'shop');
-
-        return true;
-    }
-
-
-    /**
-     * Stores the posted Product, if any
-     * @return  boolean           True on success, null on noop, false otherwise
-     */
-    static function store_product()
-    {
-        global $_ARRAYLANG;
-
-        if (!isset($_POST['bstore'])) {
-            return null;
-        }
-        $product_name = contrexx_input2raw($_POST['product_name']);
-        $product_code = contrexx_input2raw($_POST['product_code']);
-        // Multiple Categories
-        $category_id = isset($_POST['shopCategoriesAssigned'])
-                        ? contrexx_input2raw(join(',', $_POST['shopCategoriesAssigned']))
-                        : '';
-        $customer_price = $_POST['customer_price'];
-        $reseller_price = $_POST['reseller_price'];
-        $discount_active = !empty($_POST['discount_active']);
-        $discount_price = $_POST['discount_price'];
-//DBG::log("ShopManager::store_product(): customer_price $customer_price, reseller_price $reseller_price, discount_price $discount_price");
-        $vat_id = $_POST['vat_id'];
-        $short = contrexx_input2raw($_POST['short']);
-        $long = contrexx_input2raw($_POST['long']);
-        $stock = $_POST['stock'];
-        $stock_visible = !empty($_POST['stock_visible']);
-        $uri = contrexx_input2raw($_POST['uri']);
-        $active = !empty($_POST['articleActive']);
-        $b2b = !empty($_POST['B2B']);
-        $b2c = !empty($_POST['B2C']);
-        $date_start = contrexx_input2raw($_POST['date_start']);
-        $date_end = contrexx_input2raw($_POST['date_end']);
-        $manufacturer_id = isset($_POST['manufacturer_id']) ? contrexx_input2int($_POST['manufacturer_id']) : 0;
-        $minimum_order_quantity = $_POST['minimum_order_quantity'];
-// Currently not used on the detail page
-//        $flags = (isset($_POST['Flags'])
-//                ? join(' ', $_POST['Flags']) : '');
-        $distribution = $_POST['distribution'];
-        // Different meaning of the "weight" field for downloads!
-        // The getWeight() method will treat purely numeric values
-        // like the validity period (in days) the same as a weight
-        // without its unit and simply return its integer value.
-        $weight = ($distribution == 'delivery'
-            ? Weight::getWeight($_POST['weight'])
-            : $_POST['accountValidity']);
-        // Assigned frontend groups for protected downloads
-        $usergroup_ids = (isset($_POST['groupsAssigned'])
-            ? implode(',', $_POST['groupsAssigned']) : '');
-        $discount_group_count_id = $_POST['discount_group_count_id'];
-        $discount_group_article_id = $_POST['discount_group_article_id'];
-//DBG::log("ShopManager::store_product(): Set \$discount_group_article_id to $discount_group_article_id");
-        $keywords = contrexx_input2raw($_POST['keywords']);
-        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-
-        for ($i = 1; $i <= 3; ++$i) {
-            // Images outside the above directory are copied to the shop image folder.
-            // Note that the image paths below do not include the document root, but
-            // are relative to it.
-            $picture = contrexx_input2raw($_POST['productImage'.$i]);
-            // Ignore the picture if it's the default image!
-            // Storing it would be pointless.
-            // Images outside the above directory are copied to the shop image folder.
-            // Note that the image paths below do not include the document root, but
-            // are relative to it.
-            if (   $picture == self::$defaultImage
-                || !self::moveImage($picture)) {
-                $picture = '';
-            }
-            // Update the posted path (used below)
-            $_POST['productImage'.$i] = $picture;
-
-            //Set the image width and height If empty
-            if (   !empty($_POST['productImage' . $i . '_width'])
-                && !empty($_POST['productImage' . $i . '_height'])
-            ) {
-                continue;
-            }
-
-            $picturePath = $cx->getWebsiteImagesShopPath(). '/' . $picture;
-            if (!\Cx\Lib\FileSystem\FileSystem::exists($picturePath)) {
-                continue;
-            }
-
-            $pictureSize = getimagesize($picturePath);
-            $_POST['productImage' . $i . '_width']  = $pictureSize[0];
-            $_POST['productImage' . $i . '_height'] = $pictureSize[1];
-        }
-
-        // add all to pictures DBstring
-        $imageName =
-                 base64_encode($_POST['productImage1'])
-            .'?'.base64_encode($_POST['productImage1_width'])
-            .'?'.base64_encode($_POST['productImage1_height'])
-            .':'.base64_encode($_POST['productImage2'])
-            .'?'.base64_encode($_POST['productImage2_width'])
-            .'?'.base64_encode($_POST['productImage2_height'])
-            .':'.base64_encode($_POST['productImage3'])
-            .'?'.base64_encode($_POST['productImage3_width'])
-            .'?'.base64_encode($_POST['productImage3_height']);
-
-        // Note that the flags of the Product *MUST NOT* be changed
-        // when inserting or updating the Product data, as the original
-        // flags are needed for their own update later.
-
-        $objProduct = null;
-        $product_id = intval($_POST['id']);
-        if ($product_id) {
-            $objProduct = Product::getById($product_id);
-        }
-        $new = false;
-        if (!$objProduct) {
-            $new = true;
-            $objProduct = new Product(
-                $product_code,
-                $category_id,
-                $product_name,
-                $distribution,
-                $customer_price,
-                $active,
-                0,
-                $weight
-            );
-            if (!$objProduct->store()) {
-                return \Message::error($_ARRAYLANG['TXT_SHOP_PRODUCT_ERROR_STORING']);
-            }
-//            $product_id = $objProduct->id();
-        }
-
-        // Apply the changes to all Products with the same Product code.
-// Note: This is disabled for the time being, as virtual categories are, too.
-//        if ($product_code != '') {
-//            $arrProduct = Products::getByCustomId($product_code);
-//        } else {
-//            $arrProduct = array($objProduct);
-//        }
-//        if (!is_array($arrProduct)) return false;
-//        foreach ($arrProduct as $objProduct) {
-            // Update each product
-            $objProduct->code($product_code);
-// NOTE: Only change the parent ShopCategory for a Product
-// that is in a real ShopCategory.
-            $objProduct->category_id($category_id);
-            $objProduct->name($product_name);
-            $objProduct->distribution($distribution);
-            $objProduct->price($customer_price);
-            $objProduct->active($active);
-// On the overview only: $objProduct->ord();
-            $objProduct->weight($weight);
-            $objProduct->resellerprice($reseller_price);
-            $objProduct->discount_active($discount_active);
-            $objProduct->discountprice($discount_price);
-            $objProduct->vat_id($vat_id);
-            $objProduct->short($short);
-            $objProduct->long($long);
-            $objProduct->stock($stock);
-            $objProduct->minimum_order_quantity($minimum_order_quantity);
-            $objProduct->stock_visible($stock_visible);
-            $objProduct->uri($uri);
-            $objProduct->b2b($b2b);
-            $objProduct->b2c($b2c);
-            $objProduct->date_start($date_start);
-            $objProduct->date_end($date_end);
-            $objProduct->manufacturer_id($manufacturer_id);
-            $objProduct->pictures($imageName);
-// Currently not used on the detail page
-//                $objProduct->flags($flags);
-            $objProduct->usergroup_ids($usergroup_ids);
-            $objProduct->group_id($discount_group_count_id);
-            $objProduct->article_id($discount_group_article_id);
-            $objProduct->keywords($keywords);
-//DBG::log("ShopManager::store_product(): Product: reseller_price ".$objProduct->resellerprice());
-
-            // Remove old Product Attributes.
-            // They are re-added below.
-            $objProduct->clearAttributes();
-            // Add current product attributes
-            if (   isset($_POST['options'])
-                && is_array($_POST['options'])) {
-                foreach ($_POST['options'] as $valueId => $nameId) {
-                    $order = intval($_POST['productOptionsSortId'][$nameId]);
-                    $objProduct->addAttribute(intval($valueId), $order);
-                }
-            }
-            // Mind that this will always be an *update*, see the call to
-            // store() above.
-            if (!$objProduct->store()) {
-                return \Message::error($_ARRAYLANG['TXT_SHOP_PRODUCT_ERROR_STORING']);
-            }
-//        }
-        // Add/remove Categories and Products to/from
-        // virtual ShopCategories.
-        // Note that this *MUST* be called *AFTER* the Product is updated
-        // or inserted.
-// Virtual categories are disabled for the time being
-//        Products::changeFlagsByProductCode(
-//            $product_code, $flags
-//        );
-        $objImage = new \ImageManager();
-        $arrImages = Products::get_image_array_from_base64($imageName);
-        // Create thumbnails if not available, or update them
-        foreach ($arrImages as $arrImage) {
-            if (   !empty($arrImage['img'])
-                && $arrImage['img'] != ShopLibrary::noPictureName) {
-                if (!$objImage->_createThumbWhq(
-                    \Cx\Core\Core\Controller\Cx::instanciate()->getWebsiteImagesShopPath().'/',
-                    \Cx\Core\Core\Controller\Cx::instanciate()->getWebsiteImagesShopWebPath().'/',
-                    $arrImage['img'],
-                    \Cx\Core\Setting\Controller\Setting::getValue('thumbnail_max_width','Shop'),
-                    \Cx\Core\Setting\Controller\Setting::getValue('thumbnail_max_height','Shop'),
-                    \Cx\Core\Setting\Controller\Setting::getValue('thumbnail_quality','Shop')
-                )) {
-                    \Message::error(sprintf($_ARRAYLANG['TXT_SHOP_COULD_NOT_CREATE_THUMBNAIL'],
-                        $arrImage['img']));
-                }
-            }
-        }
-        \Message::ok($new
-            ? $_ARRAYLANG['TXT_DATA_RECORD_ADDED_SUCCESSFUL']
-            : $_ARRAYLANG['TXT_DATA_RECORD_UPDATED_SUCCESSFUL']);
-
-        switch ($_POST['afterStoreAction']) {
-          case 'newEmpty':
-            \Cx\Core\Csrf\Controller\Csrf::redirect(
-                'index.php?cmd=Shop'.MODULE_INDEX.'&act=products&tpl=manage');
-          case 'newTemplate':
-            \Cx\Core\Csrf\Controller\Csrf::redirect('index.php?cmd=Shop'.MODULE_INDEX.
-                '&act=products&tpl=manage&id='.$objProduct->id().'&new=1');
-        }
-        \Cx\Core\Csrf\Controller\Csrf::redirect('index.php?cmd=Shop'.MODULE_INDEX.'&act=products');
-        // Never reached
-        return true;
     }
 
 
@@ -2397,9 +1910,6 @@ if ($test === NULL) {
         $template = (isset($_GET['tpl']) ? $_GET['tpl'] : '');
         if ($template == 'discounts') {
             return $this->view_customer_discounts();
-        }
-        if ($template == 'groups') {
-            return $this->view_customer_groups();
         }
         $this->toggleCustomer();
         $i = 0;
@@ -2634,6 +2144,16 @@ if ($test === NULL) {
         if (!$objCustomer) {
             return \Message::error($_ARRAYLANG['TXT_SHOP_CUSTOMER_ERROR_NOT_FOUND']);
         }
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $customerGroup = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\CustomerGroup'
+        )->find($objCustomer->group_id());
+        $customerGroupName = $_ARRAYLANG['TXT_SHOP_DISCOUNT_GROUP_NONE'];
+        if (!empty($customerGroup)) {
+            $customerGroupName = $customerGroup->getName();
+        }
+
         $customer_type = ($objCustomer->is_reseller()
             ? $_ARRAYLANG['TXT_RESELLER'] : $_ARRAYLANG['TXT_CUSTOMER']);
         $active = ($objCustomer->active()
@@ -2652,15 +2172,20 @@ if ($test === NULL) {
             'SHOP_PHONE' => $objCustomer->phone(),
             'SHOP_FAX' => $objCustomer->fax(),
             'SHOP_EMAIL' => $objCustomer->email(),
-            'SHOP_CUSTOMER_BIRTHDAY' => date(ASCMS_DATE_FORMAT_DATE, $objCustomer->getProfileAttribute('birthday')),
             'SHOP_COMPANY_NOTE' => $objCustomer->companynote(),
             'SHOP_IS_RESELLER' => $customer_type,
             'SHOP_REGISTER_DATE' => date(ASCMS_DATE_FORMAT_DATETIME,
                 $objCustomer->register_date()),
             'SHOP_CUSTOMER_STATUS' => $active,
-            'SHOP_DISCOUNT_GROUP_CUSTOMER' => Discount::getCustomerGroupName(
-                $objCustomer->group_id()),
+            'SHOP_DISCOUNT_GROUP_CUSTOMER' => $customerGroupName,
         ));
+        $birthday = $objCustomer->getProfileAttribute('birthday');
+        if (!empty($birthday)) {
+            self::$objTemplate->setVariable(
+                'SHOP_CUSTOMER_BIRTHDAY',
+                date(ASCMS_DATE_FORMAT_DATE, $birthday)
+            );
+        }
 // TODO: TEST
         $count = NULL;
 
@@ -2796,21 +2321,33 @@ if ($test === NULL) {
             'SHOP_EMAIL' => $email,
             'SHOP_PHONE' => $phone,
             'SHOP_FAX' => $fax,
-            'SHOP_CUSTOMER_BIRTHDAY' => date(ASCMS_DATE_FORMAT_DATE, $objCustomer->getProfileAttribute('birthday')),
             'SHOP_USERNAME' => $username,
             'SHOP_PASSWORD' => $password,
             'SHOP_COMPANY_NOTE' => $companynote,
             'SHOP_REGISTER_DATE' => date(ASCMS_DATE_FORMAT_DATETIME, $registerdate),
             'SHOP_COUNTRY_MENUOPTIONS' =>
-                \Cx\Core\Country\Controller\Country::getMenuoptions($country_id),
+                \Cx\Core\Country\Controller\Country::getMenuoptions($country_id, false),
             'SHOP_DISCOUNT_GROUP_CUSTOMER_MENUOPTIONS' =>
-                Discount::getMenuOptionsGroupCustomer($customer_group_id),
+                \Cx\Modules\Shop\Controller\BackendController::getMenuOptionsGroupCustomer($customer_group_id),
             'SHOP_CUSTOMER_TYPE_MENUOPTIONS' =>
                 Customers::getTypeMenuoptions($is_reseller),
             'SHOP_CUSTOMER_ACTIVE_MENUOPTIONS' =>
                 Customers::getActiveMenuoptions($active),
             'SHOP_LANG_ID_MENUOPTIONS' => \FWLanguage::getMenuoptions($lang_id),
         ));
+        $birthday = 0;
+        if ($objCustomer) {
+            $birthday = $objCustomer->getProfileAttribute('birthday');
+        }
+        if (!empty($birthday)) {
+            self::$objTemplate->setVariable(
+                'SHOP_CUSTOMER_BIRTHDAY',
+                date(ASCMS_DATE_FORMAT_DATE, $birthday)
+            );
+        }
+        \JS::registerCode(
+            'cx.ready(function(){cx.jQuery(".datepicker-field").datepicker({dateFormat: "dd.mm.yy"});});'
+        );
         return true;
     }
 
@@ -2922,18 +2459,6 @@ if ($test === NULL) {
             case 'attributes':
                 $this->view_attributes_edit();
                 break;
-            case 'manage':
-                self::$pageTitle = $_ARRAYLANG['TXT_ADD_PRODUCTS'];
-                $this->view_product_edit();
-                break;
-            case 'discounts':
-                self::$pageTitle = $_ARRAYLANG['TXT_SHOP_DISCOUNT_COUNT_GROUPS'];
-                $this->view_discount_groups_count();
-                break;
-            case 'groups':
-                self::$pageTitle = $_ARRAYLANG['TXT_SHOP_ARTICLE_GROUPS'];
-                $this->view_article_groups();
-                break;
             default:
                 self::$pageTitle = $_ARRAYLANG['TXT_PRODUCT_CATALOG'];
                 $this->view_product_overview();
@@ -2949,16 +2474,6 @@ if ($test === NULL) {
     {
         global $_ARRAYLANG;
 
-        if (isset($_POST['bsubmit'])) {
-            $this->update_products();
-        }
-        if (isset($_POST['multi_action'])) {
-            if ($_POST['multi_action'] == 'activate') {
-                Products::set_active($_POST['selectedProductId'], true);
-            } elseif ($_POST['multi_action'] == 'deactivate') {
-                Products::set_active($_POST['selectedProductId'], false);
-            }
-        }
         self::$objTemplate->addBlockfile(
             'SHOP_PRODUCTS_FILE', 'shop_products_block',
             'module_shop_product_catalog.html'
@@ -2998,7 +2513,7 @@ if ($test === NULL) {
             // have to set $count again because it will be set to 0 in Products::getByShopParams
             $count = $limit;
             // Mind that $count is handed over by reference.
-            $arrProducts = Products::getByShopParams(
+            $arrProducts = \Cx\Modules\Shop\Controller\ProductController::getByShopParams(
                 $count, \Paging::getPosition(),
                 0, $category_id, $manufacturer_id, $searchTerm,
                 $flagSpecialoffer, false, $objSorting->getOrder(),
@@ -3045,9 +2560,9 @@ if ($test === NULL) {
         \JS::activate('schedule-publish-tooltip', array());
         foreach ($arrProducts as $objProduct) {
             $productStatus = 'inactive';
-            if ($objProduct->active()) {
-                $hasScheduledPublishing =   $objProduct->date_start()
-                                         || $objProduct->date_end();
+            if ($objProduct->getActive()) {
+                $hasScheduledPublishing =   $objProduct->getDateStart()
+                                         || $objProduct->getDateEnd();
                 $productStatus = 'active';
                 if ($hasScheduledPublishing) {
                     $productStatus =  $objProduct->getActiveByScheduledPublishing()
@@ -3057,7 +2572,7 @@ if ($test === NULL) {
 
             $discount_active = '';
             $specialOfferValue = '';
-            if ($objProduct->discount_active()) {
+            if ($objProduct->getDiscountActive()) {
                 $discount_active = \Html::ATTRIBUTE_CHECKED;
                 $specialOfferValue = 1;
             }
@@ -3065,33 +2580,33 @@ if ($test === NULL) {
                 'SHOP_ROWCLASS' => 'row'.(++$i % 2 + 1),
                 'SHOP_PRODUCT_ID' => $objProduct->id(),
                 'SHOP_PRODUCT_CODE' => $objProduct->code(),
-                'SHOP_PRODUCT_NAME' => contrexx_raw2xhtml($objProduct->name()),
-                'SHOP_PRODUCT_PRICE1' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($objProduct->price()),
-                'SHOP_PRODUCT_PRICE2' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($objProduct->resellerprice()),
-                'SHOP_PRODUCT_DISCOUNT' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($objProduct->discountprice()),
+                'SHOP_PRODUCT_NAME' => contrexx_raw2xhtml($objProduct->getName()),
+                'SHOP_PRODUCT_PRICE1' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($objProduct->getNormalprice()),
+                'SHOP_PRODUCT_PRICE2' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($objProduct->getResellerprice()),
+                'SHOP_PRODUCT_DISCOUNT' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice($objProduct->getDiscountprice()),
                 'SHOP_PRODUCT_SPECIAL_OFFER' => $discount_active,
                 'SHOP_SPECIAL_OFFER_VALUE_OLD' => $specialOfferValue,
                 'SHOP_PRODUCT_VAT_MENU' => Vat::getShortMenuString(
-                    $objProduct->vat_id(),
-                    'taxId['.$objProduct->id().']'),
-                'SHOP_PRODUCT_VAT_ID' => ($objProduct->vat_id()
-                    ? $objProduct->vat_id() : 'NULL'),
-                'SHOP_PRODUCT_DISTRIBUTION' => $objProduct->distribution(),
-                'SHOP_PRODUCT_STOCK' => $objProduct->stock(),
-                'SHOP_PRODUCT_SHORT_DESC' => $objProduct->short(),
+                    $objProduct->getVatId(),
+                    'taxId['.$objProduct->getId().']'),
+                'SHOP_PRODUCT_VAT_ID' => ($objProduct->getVatId()
+                    ? $objProduct->getVatId() : 'NULL'),
+                'SHOP_PRODUCT_DISTRIBUTION' => $objProduct->getDistribution(),
+                'SHOP_PRODUCT_STOCK' => $objProduct->getStock(),
+                'SHOP_PRODUCT_SHORT_DESC' => $objProduct->getShort(),
                 'SHOP_PRODUCT_STATUS_CLASS' => $productStatus,
-                'SHOP_SORT_ORDER' => $objProduct->ord(),
+                'SHOP_SORT_ORDER' => $objProduct->getOrd(),
 //                'SHOP_DISTRIBUTION_MENU' => Distribution::getDistributionMenu($objProduct->distribution(), "distribution[".$objProduct->id()."]"),
 //                'SHOP_PRODUCT_WEIGHT' => Weight::getWeightString($objProduct->weight()),
                 'SHOP_DISTRIBUTION' => $_ARRAYLANG['TXT_DISTRIBUTION_'.
-                    strtoupper($objProduct->distribution())],
+                    strtoupper($objProduct->getDistribution())],
                 'SHOP_SHOW_PRODUCT_ON_START_PAGE_CHECKED' =>
                     ($objProduct->shown_on_startpage()
                       ? \Html::ATTRIBUTE_CHECKED : ''),
                 'SHOP_SHOW_PRODUCT_ON_START_PAGE_OLD' =>
                     ($objProduct->shown_on_startpage() ? '1' : ''),
 // This is used when the Product name can be edited right on the overview
-                'SHOP_PRODUCT_NAME' => contrexx_raw2xhtml($objProduct->name()),
+                'SHOP_PRODUCT_NAME' => contrexx_raw2xhtml($objProduct->getName()),
             ));
             // All languages active
             foreach ($arrLanguages as $lang_id => $arrLanguage) {
@@ -3109,156 +2624,6 @@ if ($test === NULL) {
             self::$objTemplate->parse('productRow');
         }
         return true;
-    }
-
-
-    /**
-     * Store any Products that have been modified.
-     *
-     * Takes the Product data directly from the various fields of the
-     * $_POST array.  Only updates the database records for Products that
-     * have at least one of their values changed.
-     * @return  boolean                     True on success, false otherwise.
-     * @global  array       $_ARRAYLANG     Language array
-     */
-    function update_products()
-    {
-        global $_ARRAYLANG;
-
-        $arrError = array();
-        foreach (array_keys($_POST['product_id']) as $product_id) {
-            $product_code =
-                contrexx_input2raw($_POST['identifier'][$product_id]);
-            $product_code_old =
-                contrexx_input2raw($_POST['identifierOld'][$product_id]);
-            $ord = intval($_POST['ord'][$product_id]);
-            $ord_old = intval($_POST['ordOld'][$product_id]);
-            $discount_active = (isset($_POST['discount_active'][$product_id]) ? 1 : 0);
-            $special_offer_old = $_POST['specialOfferOld'][$product_id];
-            $discount_price = floatval($_POST['discount_price'][$product_id]);
-            $discountOld = floatval($_POST['discountOld'][$product_id]);
-            $normalprice = floatval($_POST['price1'][$product_id]);
-            $normalpriceOld = floatval($_POST['price1Old'][$product_id]);
-            $resellerprice = floatval($_POST['price2'][$product_id]);
-            $resellerpriceOld = floatval($_POST['price2Old'][$product_id]);
-            $stock = intval($_POST['stock'][$product_id]);
-            $stockOld = intval($_POST['stockOld'][$product_id]);
-//            $status = (isset($_POST['active'][$product_id]) ? 1 : 0);
-//            $statusOld = $_POST['activeOld'][$product_id];
-            $vat_id = (isset($_POST['taxId'][$product_id])
-                ? intval($_POST['taxId'][$product_id]) : 0);
-            $vat_id_old = intval($_POST['taxIdOld'][$product_id]);
-            $shownOnStartpage =
-                (empty($_POST['shownonstartpage'][$product_id]) ? 0 : 1);
-            $shownOnStartpageOld =
-                (empty($_POST['shownonstartpageOld'][$product_id]) ? 0 : 1);
-// This is used when the Product name can be edited right on the overview
-            $name = (isset($_POST['name'][$product_id])
-                ? contrexx_input2raw($_POST['name'][$product_id]) : null);
-            $nameOld = (isset($_POST['nameOld'][$product_id])
-                ? contrexx_input2raw($_POST['nameOld'][$product_id]) : null);
-/*  Distribution and weight have been removed from the overview due to the
-    changes made to the delivery options.
-            $distribution = $_POST['distribution'][$product_id];
-            $distributionOld = $_POST['distributionOld'][$product_id];
-            $weight = $_POST['weight'][$product_id];
-            $weightOld = $_POST['weightOld'][$product_id];
-            // Flag used to determine whether the record has to be
-            // updated in the database
-            $updateProduct = false;
-            // Check whether the weight was changed
-            if ($weight != $weightOld) {
-                // Changed.
-                // If it's empty, set to NULL and don't complain.
-                // The NULL weight will be silently ignored by the database.
-                if ($weight == '') {
-                    $weight = 'NULL';
-                } else {
-                    // Check the format
-                    $weight = Weight::getWeight($weight);
-                    // The NULL weight will be silently ignored by the database.
-                    if ($weight === 'NULL') {
-                        // 'NULL', the format was invalid. cast error
-                        \Message::error($_ARRAYLANG['TXT_WEIGHT_INVALID_IGNORED']);
-                    } else {
-                        // If getWeight() returns any other value, the format
-                        // is valid.  Verify that the numeric value has changed
-                        // as well; might be that the user simply removed the
-                        // unit ('g').
-                        if ($weight != Weight::getWeight($weightOld)) {
-                            // Really changed
-                            $updateProduct = true;
-                        }
-                        // Otherwise, the new amd old values are the same.
-                    }
-                }
-            }
-            if ($updateProduct === false) {
-                // reset the weight to the old and, hopefully, correct value,
-                // in case the record is updated anyway
-                $weight = Weight::getWeight($weightOld);
-            }
-*/
-            // Check if any one value has been changed
-            if (   $product_code != $product_code_old
-                || $ord != $ord_old
-                || $discount_active != $special_offer_old
-                || $discount_price != $discountOld
-                || $normalprice != $normalpriceOld
-                || $resellerprice != $resellerpriceOld
-                || $stock != $stockOld
-//                || $status != $statusOld
-                || $vat_id != $vat_id_old
-                || $shownOnStartpage != $shownOnStartpageOld
-// This is used when the Product name can be edited right on the overview
-                || $name != $nameOld
-/*              || $distribution != $distributionOld
-                // Weight, see above
-                || $updateProduct*/
-            ) {
-                $arrProducts =
-//                    ($product_code_old != ''
-//                        ? Products::getByCustomId($product_code_old) :
-                    array(Product::getById($product_id))
-//                );
-                    ;
-                if (!is_array($arrProducts)) {
-                    continue;
-                }
-                foreach ($arrProducts as $objProduct) {
-                    if (!$objProduct) {
-                        $arrError[$product_code] = true;
-                        continue;
-                    }
-                    $objProduct->code($product_code);
-                    $objProduct->ord($ord);
-                    $objProduct->discount_active($discount_active);
-                    $objProduct->discountprice($discount_price);
-                    $objProduct->price($normalprice);
-                    $objProduct->resellerprice($resellerprice);
-                    $objProduct->stock($stock);
-//                    $objProduct->active($status);
-                    $objProduct->vat_id($vat_id);
-//                    $objProduct->distribution($distribution);
-//                    $objProduct->weight($weight);
-                    $objProduct->shown_on_startpage($shownOnStartpage);
-// This is used when the Product name can be edited right on the overview
-                    // Note: No need to check whether it is valid; if it's set
-                    // to null above name() will do nothing but return the
-                    // current name
-                    $objProduct->name($name);
-                    if (!$objProduct->store()) {
-                        $arrError[$product_code] = true;
-                    }
-                }
-            }
-        }
-        if (empty($arrError)) {
-            \Message::ok($_ARRAYLANG['TXT_DATA_RECORD_UPDATED_SUCCESSFUL']);
-            return true;
-        }
-        \Message::error($_ARRAYLANG['TXT_SHOP_ERROR_UPDATING_RECORD']);
-        return false;
     }
 
 
@@ -3352,288 +2717,6 @@ if ($test === NULL) {
         return $arrSubstitution['CUSTOMER_EMAIL'];
     }
 
-
-    /**
-     * Show the count discount editing page
-     * @return    boolean             True on success, false otherwise
-     * @author    Reto Kohli <reto.kohli@comvation.com>
-     */
-    function view_discount_groups_count()
-    {
-        global $_ARRAYLANG;
-
-        if (isset($_POST['discountStore'])) {
-            $this->store_discount_count();
-        }
-        if (isset($_GET['deleteDiscount'])) {
-            $this->delete_discount_count();
-        }
-        // Force discounts to be reinitialised
-        Discount::flush();
-
-        self::$objTemplate->addBlockfile('SHOP_PRODUCTS_FILE', 'shop_products_block', 'module_shop_discount_groups_count.html');
-
-        // Discounts overview
-        $arrDiscounts = Discount::getDiscountCountArray();
-        $i = 0;
-        foreach ($arrDiscounts as $id => $arrDiscount) {
-            $name = $arrDiscount['name'];
-            $unit = $arrDiscount['unit'];
-            self::$objTemplate->setVariable(array(
-                'SHOP_DISCOUNT_ID' => $id,
-                'SHOP_DISCOUNT_GROUP_NAME' => contrexx_raw2xhtml($name),
-                'SHOP_DISCOUNT_GROUP_UNIT' => contrexx_raw2xhtml($unit),
-                'SHOP_DISCOUNT_ROW_STYLE' => 'row'.(++$i % 2 + 1),
-            ));
-            self::$objTemplate->parse('discount');
-        }
-
-        // Add/edit Discount
-        $id = 0;
-        $arrDiscountRates = array();
-        if (!empty($_GET['editDiscount'])) {
-            $id = intval($_GET['id']);
-            $arrDiscountRates = Discount::getDiscountCountRateArray($id);
-            self::$objTemplate->setGlobalVariable(array(
-                'SHOP_DISCOUNT_EDIT_CLASS' => 'active',
-                'SHOP_DISCOUNT_EDIT_DISPLAY' => 'block',
-                'SHOP_DISCOUNT_LIST_CLASS' => '',
-                'SHOP_DISCOUNT_LIST_DISPLAY' => 'none',
-                'TXT_ADD_OR_EDIT' => $_ARRAYLANG['TXT_EDIT'],
-            ));
-        } else {
-            self::$objTemplate->setGlobalVariable(array(
-                'SHOP_DISCOUNT_EDIT_CLASS' => '',
-                'SHOP_DISCOUNT_EDIT_DISPLAY' => 'none',
-                'SHOP_DISCOUNT_LIST_CLASS' => 'active',
-                'SHOP_DISCOUNT_LIST_DISPLAY' => 'block',
-                'TXT_ADD_OR_EDIT' => $_ARRAYLANG['TXT_ADD'],
-            ));
-        }
-        self::$objTemplate->setCurrentBlock('discountName');
-        self::$objTemplate->setVariable(array(
-            'SHOP_DISCOUNT_ID_EDIT' => $id,
-            'SHOP_DISCOUNT_ROW_STYLE' => 'row'.(++$i % 2 + 1),
-        ));
-        if (isset($arrDiscounts[$id])) {
-            $arrDiscount = $arrDiscounts[$id];
-            $name = $arrDiscount['name'];
-            $unit = $arrDiscount['unit'];
-            self::$objTemplate->setVariable(array(
-                'SHOP_DISCOUNT_GROUP_NAME' => $name,
-                'SHOP_DISCOUNT_GROUP_UNIT' => $unit,
-            ));
-        }
-        self::$objTemplate->parse('discountName');
-        self::$objTemplate->setCurrentBlock('discountType');
-        self::$objTemplate->setVariable(array(
-            'SHOP_DISCOUNT_GROUP_TYPE_OPTIONS' =>
-            \Html::getRadioGroup(
-                'discountGroupType',
-                array(
-                    $_ARRAYLANG['TXT_YES'],
-                    $_ARRAYLANG['TXT_NO']
-                ),
-                Discount::isDiscountCumulative($id)
-            )
-        ));
-        self::$objTemplate->touchBlock('discountType');
-        self::$objTemplate->parse('discountType');
-        self::$objTemplate->setCurrentBlock('discountRate');
-        if (isset($arrDiscountRates)) {
-            $arrDiscountRates = array_reverse($arrDiscountRates, true);
-            foreach ($arrDiscountRates as $count => $rate) {
-                self::$objTemplate->setVariable(array(
-                    'SHOP_DISCOUNT_COUNT' => $count,
-                    'SHOP_DISCOUNT_RATE' => $rate,
-                    'SHOP_DISCOUNT_RATE_INDEX' => $i,
-                    'SHOP_DISCOUNT_ROW_STYLE' => 'row'.(++$i % 2 + 1),
-                ));
-                self::$objTemplate->parse('discountRate');
-            }
-        }
-        // Add a few empty rows for adding new counts and rates
-        for ($j = 0; $j < 5; ++$j) {
-            self::$objTemplate->setVariable(array(
-                'SHOP_DISCOUNT_COUNT' => '',
-                'SHOP_DISCOUNT_RATE' => '',
-                'SHOP_DISCOUNT_RATE_INDEX' => $i,
-                'SHOP_DISCOUNT_ROW_STYLE' => 'row'.(++$i % 2 + 1),
-            ));
-            self::$objTemplate->parse('discountRate');
-        }
-        return true;
-    }
-
-
-    /**
-     * Store the count discounts after editing
-     * @return    boolean             True on success, false otherwise
-     * @author    Reto Kohli <reto.kohli@comvation.com>
-     */
-    function store_discount_count()
-    {
-        if (!isset($_POST['discountId'])) return true;
-        $discountId = intval($_POST['discountId']);
-        $discountGroupType = contrexx_input2int($_POST['discountGroupType']);
-        $discountGroupName = contrexx_input2raw($_POST['discountGroupName']);
-        $discountGroupUnit = contrexx_input2raw($_POST['discountGroupUnit']);
-        $arrDiscountCount = contrexx_input2int($_POST['discountCount']);
-        $arrDiscountRate = contrexx_input2float($_POST['discountRate']);
-        return Discount::storeDiscountCount(
-            $discountId, $discountGroupType, $discountGroupName,
-            $discountGroupUnit, $arrDiscountCount, $arrDiscountRate
-        );
-    }
-
-
-    /**
-     * Delete the count discount selected by its ID from the GET request
-     * @return    boolean             True on success, false otherwise
-     * @author    Reto Kohli <reto.kohli@comvation.com>
-     */
-    function delete_discount_count()
-    {
-        if (!isset($_GET['id'])) return true;
-        $discountId = $_GET['id'];
-        return Discount::deleteDiscountCount($discountId);
-    }
-
-
-    /**
-     * Show the customer groups for editing
-     * @return    boolean             True on success, false otherwise
-     * @author    Reto Kohli <reto.kohli@comvation.com>
-     */
-    function view_customer_groups()
-    {
-        global $_ARRAYLANG;
-
-        if (isset($_GET['delete'])) {
-            Discount::deleteCustomerGroup($_GET['id']);
-        }
-        if (isset($_POST['store'])) {
-            Discount::storeCustomerGroup($_POST['groupName'], $_POST['id']);
-        }
-        Discount::flush();
-
-        self::$objTemplate->loadTemplateFile('module_shop_discount_groups_customer.html');
-
-        // Group overview
-        $arrGroups = Discount::getCustomerGroupArray();
-        self::$objTemplate->setCurrentBlock('shopGroup');
-        $i = 0;
-        foreach ($arrGroups as $id => $arrGroup) {
-            self::$objTemplate->setVariable(array(
-                'SHOP_GROUP_ID' => $id,
-                'SHOP_GROUP_NAME' => $arrGroup['name'],
-                'SHOP_ROW_STYLE' => 'row'.(++$i % 2 + 1),
-            ));
-            self::$objTemplate->parse('shopGroup');
-        }
-
-        // Add/edit Group
-        $id = 0;
-        if (!empty($_GET['edit'])) {
-            $id = intval($_GET['id']);
-            self::$objTemplate->setGlobalVariable(array(
-                'SHOP_GROUP_EDIT_CLASS' => 'active',
-                'SHOP_GROUP_EDIT_DISPLAY' => 'block',
-                'SHOP_GROUP_LIST_CLASS' => '',
-                'SHOP_GROUP_LIST_DISPLAY' => 'none',
-                'TXT_ADD_OR_EDIT' => $_ARRAYLANG['TXT_EDIT'],
-            ));
-        } else {
-            self::$objTemplate->setGlobalVariable(array(
-                'SHOP_GROUP_EDIT_CLASS' => '',
-                'SHOP_GROUP_EDIT_DISPLAY' => 'none',
-                'SHOP_GROUP_LIST_CLASS' => 'active',
-                'SHOP_GROUP_LIST_DISPLAY' => 'block',
-                'TXT_ADD_OR_EDIT' => $_ARRAYLANG['TXT_ADD'],
-            ));
-        }
-        self::$objTemplate->setCurrentBlock('shopGroupName');
-        self::$objTemplate->setVariable(array(
-            'SHOP_GROUP_ID_EDIT' => $id,
-            'SHOP_ROW_STYLE' => 'row'.(++$i % 2 + 1),
-        ));
-        if (isset($arrGroups[$id])) {
-            self::$objTemplate->setVariable(
-                'SHOP_GROUP_NAME', $arrGroups[$id]['name']
-            );
-        }
-        self::$objTemplate->parse('shopGroupName');
-        return true;
-    }
-
-
-    /**
-     * Show the article groups for editing
-     * @return    boolean             True on success, false otherwise
-     * @author    Reto Kohli <reto.kohli@comvation.com>
-     */
-    function view_article_groups()
-    {
-        global $_ARRAYLANG;
-
-        if (isset($_GET['delete'])) {
-            Discount::deleteArticleGroup($_GET['id']);
-        }
-        if (isset($_POST['store'])) {
-            Discount::storeArticleGroup(
-                $_POST['groupName'], $_POST['id']
-            );
-        }
-        // Force discounts to be reinitialised
-        Discount::flush();
-
-        self::$objTemplate->addBlockfile('SHOP_PRODUCTS_FILE',
-            'shop_products_block', 'module_shop_discount_groups_article.html');
-        // Group overview
-        $arrGroups = Discount::getArticleGroupArray();
-        self::$objTemplate->setCurrentBlock('shopGroup');
-        $i = 0;
-        foreach ($arrGroups as $id => $arrGroup) {
-            self::$objTemplate->setVariable(array(
-                'SHOP_GROUP_ID' => $id,
-                'SHOP_GROUP_NAME' => $arrGroup['name'],
-                'SHOP_ROW_STYLE' => 'row'.(++$i % 2 + 1),
-            ));
-            self::$objTemplate->parseCurrentBlock();
-        }
-        // Add/edit Group
-        $id = 0;
-        if (!empty($_GET['edit'])) {
-            $id = intval($_GET['id']);
-            self::$objTemplate->setGlobalVariable(array(
-                'SHOP_GROUP_EDIT_CLASS' => 'active',
-                'SHOP_GROUP_EDIT_DISPLAY' => 'block',
-                'SHOP_GROUP_LIST_CLASS' => '',
-                'SHOP_GROUP_LIST_DISPLAY' => 'none',
-                'TXT_ADD_OR_EDIT' => $_ARRAYLANG['TXT_EDIT'],
-            ));
-        } else {
-            self::$objTemplate->setGlobalVariable(array(
-                'SHOP_GROUP_EDIT_CLASS' => '',
-                'SHOP_GROUP_EDIT_DISPLAY' => 'none',
-                'SHOP_GROUP_LIST_CLASS' => 'active',
-                'SHOP_GROUP_LIST_DISPLAY' => 'block',
-                'TXT_ADD_OR_EDIT' => $_ARRAYLANG['TXT_ADD'],
-            ));
-        }
-        self::$objTemplate->setCurrentBlock('shopGroupName');
-        self::$objTemplate->setVariable(array(
-            'SHOP_GROUP_ID_EDIT' => $id,
-            'SHOP_ROW_STYLE' => 'row'.(++$i % 2 + 1),
-        ));
-        if (isset($arrGroups[$id])) {
-            self::$objTemplate->setVariable('SHOP_GROUP_NAME', $arrGroups[$id]['name']);
-        }
-        self::$objTemplate->parseCurrentBlock();
-        return true;
-    }
-
-
     /**
      * Show the customer and article group discounts for editing.
      *
@@ -3648,41 +2731,49 @@ if ($test === NULL) {
         }
         self::$objTemplate->loadTemplateFile("module_shop_discount_customer.html");
         // Discounts overview
-        $arrCustomerGroups = Discount::getCustomerGroupArray();
-        $arrArticleGroups = Discount::getArticleGroupArray();
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $discountGroup = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\RelDiscountGroup'
+        );
+        $articleGroups = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\ArticleGroup'
+        )->findAll();
+        $customerGroups = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\CustomerGroup'
+        )->findAll();
         $arrRate = null;
-        $arrRate = Discount::getDiscountRateCustomerArray();
+        $arrRate = $discountGroup->getDiscountRateCustomerArray();
         $i = 0;
         // Set up the customer groups header
         self::$objTemplate->setVariable(array(
 //            'SHOP_CUSTOMER_GROUP_COUNT_PLUS_1' => count($arrCustomerGroups) + 1,
-            'SHOP_CUSTOMER_GROUP_COUNT' => count($arrCustomerGroups),
+            'SHOP_CUSTOMER_GROUP_COUNT' => count($customerGroups),
             'SHOP_DISCOUNT_ROW_STYLE' => 'row'.(++$i % 2 + 1),
         ));
-        foreach ($arrCustomerGroups as $id => $arrCustomerGroup) {
+        foreach ($customerGroups as $customerGroup) {
             self::$objTemplate->setVariable(array(
-                'SHOP_CUSTOMER_GROUP_ID' => $id,
-                'SHOP_CUSTOMER_GROUP_NAME' => $arrCustomerGroup['name'],
+                'SHOP_CUSTOMER_GROUP_ID' => $customerGroup->getId(),
+                'SHOP_CUSTOMER_GROUP_NAME' => $customerGroup->getName(),
             ));
             self::$objTemplate->parse('customer_group_header_column');
             self::$objTemplate->touchBlock('article_group_header_column');
             self::$objTemplate->parse('article_group_header_column');
         }
-        foreach ($arrArticleGroups as $groupArticleId => $arrArticleGroup) {
+        foreach ($articleGroups as $articleGroup) {
 //DBG::log("Article group ID $groupArticleId");
-            foreach ($arrCustomerGroups as $groupCustomerId => $arrCustomerGroup) {
-                $rate = (isset($arrRate[$groupCustomerId][$groupArticleId])
-                    ? $arrRate[$groupCustomerId][$groupArticleId] : 0);
+            foreach ($customerGroups as $customerGroup) {
+                $rate = (isset($arrRate[$customerGroup->getId()][$articleGroup->getId()])
+                    ? $arrRate[$customerGroup->getId()][$articleGroup->getId()] : 0);
                 self::$objTemplate->setVariable(array(
-                    'SHOP_CUSTOMER_GROUP_ID' => $groupCustomerId,
+                    'SHOP_CUSTOMER_GROUP_ID' => $customerGroup->getId(),
                     'SHOP_DISCOUNT_RATE' => sprintf('%2.2f', $rate),
 //                    'SHOP_DISCOUNT_ROW_STYLE' => 'row'.(++$i % 2 + 1),
                 ));
                 self::$objTemplate->parse('discount_column');
             }
             self::$objTemplate->setVariable(array(
-                'SHOP_ARTICLE_GROUP_ID' => $groupArticleId,
-                'SHOP_ARTICLE_GROUP_NAME' => $arrArticleGroup['name'],
+                'SHOP_ARTICLE_GROUP_ID' => $articleGroup->getId(),
+                'SHOP_ARTICLE_GROUP_NAME' => $articleGroup->getName(),
                 'SHOP_DISCOUNT_ROW_STYLE' => 'row'.(++$i % 2 + 1),
             ));
             self::$objTemplate->parse('article_group_row');
@@ -3702,7 +2793,13 @@ if ($test === NULL) {
      */
     function store_discount_customer()
     {
-        return Discount::storeDiscountCustomer($_POST['discountRate']);
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $discountCustomerRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\RelDiscountGroup'
+        );
+        return $discountCustomerRepo->storeDiscountCustomer(
+            $_POST['discountRate']
+        );
     }
 
 

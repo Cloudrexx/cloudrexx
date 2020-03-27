@@ -276,14 +276,20 @@ class Shop extends ShopLibrary
         self::$objTemplate->setTemplate($template);
         // Global module index for clones
         self::$objTemplate->setGlobalVariable('MODULE_INDEX', MODULE_INDEX);
+
         // Do this *before* calling our friends, especially Customer methods!
         // Pick the default Country for delivery
+        // countryId2 is used for shipment address
         if (empty($_SESSION['shop']['countryId2'])) {
             $_SESSION['shop']['countryId2'] =
                 (isset($_POST['countryId2'])
                   ? intval($_POST['countryId2'])
                   : \Cx\Core\Setting\Controller\Setting::getValue('country_id', 'Shop'));
+            // we need to reset selected payment and shipment method
+            // as we did just change the shipment country
+            unset($_SESSION['shop']['shipperId']);
         }
+
 // TODO: This should be set up in a more elegant way
         Vat::is_reseller(self::$objCustomer && self::$objCustomer->is_reseller());
         // The coupon code may be set when entering the Shop already
@@ -552,6 +558,11 @@ die("Failed to get Customer for ID $customer_id");
             }
         }
 
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $productRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\Product'
+        );
+
         // determine selected category and/or product
         $selectedCatId = 0;
         $objProduct = null;
@@ -565,10 +576,10 @@ die("Failed to get Customer for ID $customer_id");
             if (isset($_REQUEST['referer']) && $_REQUEST['referer'] == 'cart') {
                 $product_id = Cart::get_product_id($product_id);
             }
-            $objProduct = Product::getById($product_id);
+            $objProduct = $productRepo->find($product_id);
             if ($objProduct) {
-                $productCatIds = $objProduct->category_id();
-                if (isset($_SESSION['shop']['previous_category_id']) && in_array($_SESSION['shop']['previous_category_id'], array_map('intval', explode(',', $productCatIds)))) {
+                $productCatIds = $objProduct->getCategories();
+                if (isset($_SESSION['shop']['previous_category_id']) && in_array($_SESSION['shop']['previous_category_id'], array_map('intval', $productCatIds))) {
                     $selectedCatId = $_SESSION['shop']['previous_category_id'];
                 } else {
                     $selectedCatId = preg_replace('/,.+$/', '', $productCatIds);
@@ -681,8 +692,8 @@ die("Failed to get Customer for ID $customer_id");
         // parse Product in shop_breadcrumb if a product is being viewed
         if ($product) {
             $objTpl->setVariable(array(
-                'SHOP_BREADCRUMB_PART_SRC'  => \Cx\Core\Routing\URL::fromModuleAndCmd('Shop'.MODULE_INDEX, '', FRONTEND_LANG_ID, array('productId' => $product->id()))->toString(),
-                'SHOP_BREADCRUMB_PART_TITLE'=> contrexx_raw2xhtml($product->name()),
+                'SHOP_BREADCRUMB_PART_SRC'  => \Cx\Core\Routing\URL::fromModuleAndCmd('Shop'.MODULE_INDEX, '', FRONTEND_LANG_ID, array('productId' => $product->getId()))->toString(),
+                'SHOP_BREADCRUMB_PART_TITLE'=> contrexx_raw2xhtml($product->getName()),
             ));
             $objTpl->parse('shop_breadcrumb_part');
         }
@@ -850,8 +861,16 @@ die("Failed to get Customer for ID $customer_id");
     {
 //\DBG::log("Shop::cart(): Entered");
         Cart::init();
-        if (!empty($_POST['countryId2'])) {
+        if (
+            !empty($_POST['countryId2']) && (
+                !isset($_SESSION['shop']['countryId2']) ||
+                $_SESSION['shop']['countryId2'] != intval($_POST['countryId2'])
+            )
+        ) {
             $_SESSION['shop']['countryId2'] = intval($_POST['countryId2']);
+            // we need to reset selected payment and shipment method
+            // as we did just change the shipment country
+            unset($_SESSION['shop']['shipperId']);
         }
         if (empty($_GET['remoteJs'])) {
 //\DBG::log("Shop::cart(): Receiving POST");
@@ -1114,23 +1133,46 @@ die("Failed to update the Cart!");
                 self::scaleImageSizeToThumbnail($arrDefaultImageSize);
             }
             $arrSize = $arrDefaultImageSize;
-            if (!$imageName) {
+            if (
+                !$imageName ||
+                !file_exists(
+                    \ImageManager::getThumbnailFilename(
+                        $cx->getWebsiteImagesShopPath() . '/' . $imageName
+                    )
+                )
+            ) {
+                $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+                $productRepo = $cx->getDb()->getEntityManager()->getRepository(
+                    'Cx\Modules\Shop\Model\Entity\Product'
+                );
                 // Look for a picture in the Products.
-                $imageName = Products::getPictureByCategoryId($id);
+                $imageName = $productRepo->getPictureByCategoryId($id);
             }
-            if (!$imageName) {
+            if (
+                !$imageName ||
+                !file_exists(
+                    \ImageManager::getThumbnailFilename(
+                        $cx->getWebsiteImagesShopPath() . '/' . $imageName
+                    )
+                )
+            ) {
                 // Look for a picture in the subcategories and their Products.
                 $imageName = ShopCategories::getPictureById($id);
             }
-            if ($imageName) {
-                if (file_exists(\ImageManager::getThumbnailFilename($cx->getWebsiteImagesShopPath() . '/' . $imageName))) {
+            if (
+                $imageName &&
+                file_exists(
+                    \ImageManager::getThumbnailFilename(
+                        $cx->getWebsiteImagesShopPath() . '/' . $imageName
+                    )
+                )
+            ) {
                     // Image found!  Use that instead of the default.
                     $thumbnailPath = \ImageManager::getThumbnailFilename(
                         $cx->getWebsiteImagesShopWebPath() . '/' . $imageName
                     );
                     $arrSize = getimagesize($cx->getWebsitePath() . $thumbnailPath);
                     self::scaleImageSizeToThumbnail($arrSize);
-                }
             } else {
                 // Fallback if no picture for category was found.
                 // This is intentionally in the else statement and not as
@@ -1222,7 +1264,7 @@ die("Failed to update the Cart!");
 
         $flagSpecialoffer = intval(\Cx\Core\Setting\Controller\Setting::getValue('show_products_default','Shop'));
         if (isset($_REQUEST['cmd']) && $_REQUEST['cmd'] == 'discounts') {
-            $flagSpecialoffer = Products::DEFAULT_VIEW_DISCOUNTS;
+            $flagSpecialoffer = \Cx\Modules\Shop\Controller\ProductController::DEFAULT_VIEW_DISCOUNTS;
         }
         $flagLastFive = isset($_REQUEST['lastFive']);
         $product_id = (isset($_REQUEST['productId'])
@@ -1244,11 +1286,15 @@ die("Failed to update the Cart!");
             // in that it enables listing the subcategories
             $category_id = 0;
         }
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $productRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\Product'
+        );
         // Validate parameters
         if ($product_id && empty($category_id)) {
-            $objProduct = Product::getById($product_id);
+            $objProduct = $productRepo->find($product_id);
             if ($objProduct && $objProduct->getStatus()) {
-                $category_id = $objProduct->category_id();
+                $category_id = $objProduct->getCategories();
             } else {
                 \Cx\Core\Csrf\Controller\Csrf::redirect(
                     \Cx\Core\Routing\Url::fromModuleAndCmd('shop', '')
@@ -1256,7 +1302,7 @@ die("Failed to update the Cart!");
             }
             if (isset($_SESSION['shop']['previous_category_id'])) {
                 $category_id_previous = $_SESSION['shop']['previous_category_id'];
-                foreach (preg_split('/\s*,\s*/', $category_id) as $id) {
+                foreach ($category_id as $id) {
                     if ($category_id_previous == intval($id)) {
                         $category_id = $category_id_previous;
                     }
@@ -1275,7 +1321,6 @@ die("Failed to update the Cart!");
             }
         }
 
-        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $manufacturerRepo = $cx->getDb()->getEntityManager()->getRepository(
             '\Cx\Modules\Shop\Model\Entity\Manufacturer'
         );
@@ -1393,7 +1438,7 @@ die("Failed to update the Cart!");
             if ($term != '') {
                 $sortOrder = 'score1 DESC, score2 DESC, score3 DESC';
             }
-            $arrProduct = Products::getByShopParams(
+            $arrProduct = \Cx\Modules\Shop\Controller\ProductController::getByShopParams(
                 $count, \Paging::getPosition(),
                 $product_id, $category_id, $manufacturer_id, $term,
                 $flagSpecialoffer, $flagLastFive,
@@ -1440,7 +1485,7 @@ die("Failed to update the Cart!");
 // TODO: There are other cases of flag combinations that are not indivuidually
 // handled here yet.
             if ($term == '') {
-                if ($flagSpecialoffer == Products::DEFAULT_VIEW_DISCOUNTS) {
+                if ($flagSpecialoffer == \Cx\Modules\Shop\Controller\ProductController::DEFAULT_VIEW_DISCOUNTS) {
                     self::$objTemplate->setVariable(
                         'SHOP_PRODUCTS_IN_CATEGORY',
                             $_ARRAYLANG['TXT_SHOP_PRODUCTS_SPECIAL_OFFER']);
@@ -1480,16 +1525,19 @@ die("Failed to update the Cart!");
         $isFileAttrExistsInPdt = false;
         $uploader = false;
         foreach ($arrProduct as $objProduct) {
-            $id = $objProduct->id();
+            $id = $objProduct->getId();
             $productSubmitFunction = '';
-            $arrPictures = Products::get_image_array_from_base64($objProduct->pictures());
+            $arrPictures = ProductController::get_image_array_from_base64($objProduct->getPicture());
             $havePicture = false;
             $arrProductImages = array();
             foreach ($arrPictures as $index => $image) {
                 $thumbnailPath = $pictureLink = '';
                 $imageFilePath = '';
                 if (   empty($image['img'])
-                    || $image['img'] == ShopLibrary::noPictureName) {
+                    || $image['img'] == ShopLibrary::noPictureName
+                ) {
+                    // set no-picture image
+                    $image['img'] = ShopLibrary::noPictureName;
                     // We have at least one picture on display already.
                     // No need to show "no picture" three times!
                     if ($havePicture) { continue; }
@@ -1553,9 +1601,9 @@ die("Failed to update the Cart!");
                 $havePicture = true;
             }
             if (!empty($product_id)) {
-                static::$pageTitle = $objProduct->name();
-                static::$pageMetaDesc = contrexx_html2plaintext($objProduct->short());
-                static::$pageMetaKeys = $objProduct->keywords();
+                static::$pageTitle = $objProduct->getName();
+                static::$pageMetaDesc = contrexx_html2plaintext($objProduct->getShort());
+                static::$pageMetaKeys = $objProduct->getKeys();
                 if (count($arrProductImages)) {
                     static::$pageMetaImage = current($arrProductImages)['IMAGE_PATH'];
                 }
@@ -1575,7 +1623,7 @@ die("Failed to update the Cart!");
                 } else {
                     self::$objTemplate->setVariable(
                         'TXT_SEE_LARGE_PICTURE',
-                        contrexx_raw2xhtml($objProduct->name()));
+                        contrexx_raw2xhtml($objProduct->getName()));
                 }
                 if ($arrProductImage['POPUP_LINK']) {
                     self::$objTemplate->setVariable(
@@ -1592,8 +1640,8 @@ die("Failed to update the Cart!");
                 }
                 ++$i;
             }
-            $stock = ($objProduct->stock_visible()
-                ? $_ARRAYLANG['TXT_STOCK'].': '.intval($objProduct->stock())
+            $stock = ($objProduct->getStockVisible()
+                ? $_ARRAYLANG['TXT_STOCK'].': '.intval($objProduct->getStock())
                 : '');
             $price = $objProduct->get_custom_price(
                 self::$objCustomer,
@@ -1603,8 +1651,8 @@ die("Failed to update the Cart!");
             );
             // If there is a discountprice and it's enabled
             $discountPrice = '';
-            if (   $objProduct->discountprice() > 0
-                && $objProduct->discount_active()) {
+            if (   $objProduct->getDiscountprice() > 0
+                && $objProduct->getDiscountActive()) {
                 $price = '<s>'.$price.'</s>';
                 $discountPrice = $objProduct->get_custom_price(
                     self::$objCustomer,
@@ -1614,8 +1662,8 @@ die("Failed to update the Cart!");
                 );
             }
 
-            $groupCountId = $objProduct->group_id();
-            $groupArticleId = $objProduct->article_id();
+            $groupCountId = $objProduct->getGroupId();
+            $groupArticleId = $objProduct->getArticleId();
             $groupCustomerId = 0;
             if (self::$objCustomer) {
                 $groupCustomerId = self::$objCustomer->group_id();
@@ -1638,15 +1686,15 @@ die("Failed to update the Cart!");
                 }
             }
 */
-            $short = $objProduct->short();
-            $longDescription = $objProduct->long();
+            $short = $objProduct->getShort();
+            $longDescription = $objProduct->getLong();
 
             $detailLink = null;
             // Detaillink is required for microdata (even when longdesc
             // is empty)
             $detail_url = \Cx\Core\Routing\Url::fromModuleAndCmd(
                 'Shop', 'details', FRONTEND_LANG_ID,
-                array('productId' => $objProduct->id()))->toString();
+                array('productId' => $objProduct->getId()))->toString();
             self::$objTemplate->setVariable(
                 'SHOP_PRODUCT_DETAIL_URL', $detail_url);
             if (!$product_id && !empty($longDescription)) {
@@ -1711,8 +1759,8 @@ die("Failed to update the Cart!");
             }
             self::$objTemplate->setVariable(array(
                 'SHOP_ROWCLASS' => 'row'.$row,
-                'SHOP_PRODUCT_ID' => $objProduct->id(),
-                'SHOP_PRODUCT_TITLE' => contrexx_raw2xhtml($objProduct->name()),
+                'SHOP_PRODUCT_ID' => $objProduct->getId(),
+                'SHOP_PRODUCT_TITLE' => contrexx_raw2xhtml($objProduct->getName()),
                 'SHOP_PRODUCT_DESCRIPTION' => $short,
                 'SHOP_PRODUCT_DETAILDESCRIPTION' => $detailDescription,
                 'SHOP_PRODUCT_FORM_NAME' => $shopProductFormName,
@@ -1728,13 +1776,13 @@ die("Failed to update the Cart!");
                     ),
                 'SHOP_CURRENCY_CODE' => \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencyCode(),
             ));
-            if ($objProduct->code()) {
+            if ($objProduct->getCode()) {
                 self::$objTemplate->setVariable(
                     'SHOP_PRODUCT_CUSTOM_ID', htmlentities(
-                        $objProduct->code(), ENT_QUOTES, CONTREXX_CHARSET));
+                        $objProduct->getCode(), ENT_QUOTES, CONTREXX_CHARSET));
             }
             $manufacturer_name = $manufacturer_url = $manufacturer_link = '';
-            $manufacturer_id = $objProduct->manufacturer_id();
+            $manufacturer_id = $objProduct->getManufacturerId();
             if ($manufacturer_id) {
                 $manufacturer = $manufacturerRepo->find($manufacturer_id);
                 $manufacturer_name =
@@ -1769,7 +1817,7 @@ die("Failed to update the Cart!");
             // This is now extended by the Manufacturer table and should thus
             // get a new purpose.  As it is product specific, it could be
             // renamed and reused as a link to individual Products!
-            $externalLink = $objProduct->uri();
+            $externalLink = $objProduct->getUri();
             if (!empty($externalLink)) {
                 self::$objTemplate->setVariable(array(
                     'SHOP_EXTERNAL_LINK' =>
@@ -1825,7 +1873,7 @@ die("Failed to update the Cart!");
                         \Cx\Modules\Shop\Controller\CurrencyController::getActiveCurrencySymbol(),
                 ));
             }
-            if ($objProduct->stock_visible()) {
+            if ($objProduct->getStockVisible()) {
                 self::$objTemplate->setVariable(array(
                     'SHOP_PRODUCT_STOCK' => $stock,
                 ));
@@ -1835,10 +1883,10 @@ die("Failed to update the Cart!");
                     'SHOP_PRODUCT_DETAILLINK' => $detailLink,
                 ));
             }
-            $distribution = $objProduct->distribution();
+            $distribution = $objProduct->getDistribution();
             $weight = '';
             if ($distribution == 'delivery') {
-                $weight = $objProduct->weight();
+                $weight = $objProduct->getWeight();
             }
 
             // Hide the weight if it is zero or disabled in the configuration
@@ -1857,13 +1905,13 @@ die("Failed to update the Cart!");
                             : $_ARRAYLANG['TXT_SHOP_VAT_PREFIX_EXCL']
                          ),
                     'SHOP_PRODUCT_TAX' =>
-                        Vat::getShort($objProduct->vat_id())
+                        Vat::getShort($objProduct->getVatId())
                 ));
             }
 
             // Add flag images for flagged Products
             $strImage = '';
-            $strFlags = $objProduct->flags();
+            $strFlags = $objProduct->getFlags();
             $arrVirtual = ShopCategories::getVirtualCategoryNameArray(FRONTEND_LANG_ID);
             foreach (explode(' ', $strFlags) as $strFlag) {
                 if (in_array($strFlag, $arrVirtual)) {
@@ -1878,17 +1926,18 @@ die("Failed to update the Cart!");
                 );
             }
 
-            $minimum_order_quantity = $objProduct->minimum_order_quantity();
+            $minimum_order_quantity = $objProduct->getMinimumOrderQuantity();
             //Activate Quantity-Inputfield when minimum_order_quantity exists
             if (self::$objTemplate->blockExists('orderQuantity') && $minimum_order_quantity > 0) {
                 self::$objTemplate->setVariable(
-                        'SHOP_PRODUCT_MINIMUM_ORDER_QUANTITY',contrexx_raw2xhtml($objProduct->minimum_order_quantity())
+                        'SHOP_PRODUCT_MINIMUM_ORDER_QUANTITY',contrexx_raw2xhtml($objProduct->getMinimumOrderQuantity())
                 );
+                self::$objTemplate->touchBlock('orderQuantity');
             } elseif (self::$objTemplate->blockExists('orderQuantity') && !$minimum_order_quantity){
                 self::$objTemplate->hideBlock('orderQuantity');
             }
 
-            if ($objProduct->stock()) {
+            if ($objProduct->getStock()) {
                 if (self::$objTemplate->blockExists('shop_product_in_stock')) {
                     self::$objTemplate->touchBlock('shop_product_in_stock');
                 }
@@ -1929,8 +1978,12 @@ die("Failed to update the Cart!");
         if (empty($productIds)) {
             return $arrProduct;
         }
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $productRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\Product'
+        );
         foreach ($productIds as $productId) {
-            $product = Product::getById($productId);
+            $product = $productRepo->find($productId);
             if ($product && $product->getStatus()) {
                 $arrProduct[] = $product;
             }
@@ -2526,20 +2579,30 @@ die("Failed to update the Cart!");
             return 0;
         }
         // no payment fee if payment method is invalid
-        if (Payment::getProperty($payment_id, 'fee') === false) {
+        if (
+            \Cx\Modules\Shop\Controller\PaymentController::getProperty(
+                $payment_id, 'fee'
+            ) === false
+        ) {
             return 0;
         }
         // no payment fee if order sum is greater then set boundary
         if (
-            Payment::getProperty($payment_id, 'free_from') > 0 &&
-            $totalPrice >= Payment::getProperty($payment_id, 'free_from')
+            \Cx\Modules\Shop\Controller\PaymentController::getProperty(
+                $payment_id, 'free_from'
+            ) > 0 &&
+            $totalPrice >= \Cx\Modules\Shop\Controller\PaymentController::getProperty($payment_id, 'free_from')
         ) {
             return 0;
         }
 
         // fetch fee data
-        $type = Payment::getProperty($payment_id, 'type');
-        $fee = Payment::getProperty($payment_id, 'fee');
+        $type = \Cx\Modules\Shop\Controller\PaymentController::getProperty(
+            $payment_id, 'type'
+        );
+        $fee = \Cx\Modules\Shop\Controller\PaymentController::getProperty(
+            $payment_id, 'fee'
+        );
 
         // calculate fee based on selected payment method
         $paymentPrice = 0;
@@ -2794,8 +2857,15 @@ die("Shop::processRedirect(): This method is obsolete!");
             ? $_SESSION['shop']['city']
             : (self::$objCustomer ? self::$objCustomer->city() : ''));
         $country_id = (isset($_SESSION['shop']['countryId'])
+            // load country for payment address from session ..
             ? $_SESSION['shop']['countryId']
-            : (self::$objCustomer ? self::$objCustomer->country_id() : 0));
+            : (self::$objCustomer ?
+                // .. or from signed-in customer
+                self::$objCustomer->country_id() :
+                // .. or use shipment country as pre-set value
+                $_SESSION['shop']['countryId2']
+            )
+        );
         $email = (isset($_SESSION['shop']['email'])
             ? $_SESSION['shop']['email']
             : (self::$objCustomer ? self::$objCustomer->email() : ''));
@@ -2807,37 +2877,31 @@ die("Shop::processRedirect(): This method is obsolete!");
             : (self::$objCustomer ? self::$objCustomer->fax() : ''));
         $birthday = (isset($_SESSION['shop']['birthday'])
             ? $_SESSION['shop']['birthday']
-            : (self::$objCustomer ? self::$objCustomer->getProfileAttribute('birthday') : mktime(0, 0, 0)));
+            : (self::$objCustomer ? self::$objCustomer->getProfileAttribute('birthday') : 0));
+        $selectedBirthdayDay = '0';
+        $selectedBirthdayMonth = '0';
+        $selectedBirthdayYear = '0';
 
+        // load pre-set date
+        if (!empty($birthday)) {
         $selectedBirthdayDay = date('j', $birthday);
         $selectedBirthdayMonth = date('n', $birthday);
         $selectedBirthdayYear = date('Y', $birthday);
+        } else {
+            // if no valid date has been set so far, do check if
+            // a partial date selection has been submitted and if so,
+            // do use those values as presetting
+            if (!empty($_POST['shop_birthday_day'])) {
+                $selectedBirthdayDay = intval($_POST['shop_birthday_day']);
+            }
+            if (!empty($_POST['shop_birthday_month'])) {
+                $selectedBirthdayMonth = intval($_POST['shop_birthday_month']);
+            }
+            if (!empty($_POST['shop_birthday_year'])) {
+                $selectedBirthdayYear = intval($_POST['shop_birthday_year']);
+            }
+        }
 
-        $birthdayDaySelect= new \Cx\Core\Html\Model\Entity\DataElement(
-            'shop_birthday_day',
-            $selectedBirthdayDay,
-            \Cx\Core\Html\Model\Entity\DataElement::TYPE_SELECT,
-            null,
-            array_combine(range(1, 31), range(1, 31))
-        );
-        $birthdayDaySelect->setAttribute('class', 'birthday');
-        $birthdayMonthSelect = new \Cx\Core\Html\Model\Entity\DataElement(
-            'shop_birthday_month',
-            $selectedBirthdayMonth,
-            \Cx\Core\Html\Model\Entity\DataElement::TYPE_SELECT,
-            null,
-            array_combine(range(1, 12), range(1, 12))
-        );
-        $birthdayMonthSelect->setAttribute('class', 'birthday');
-        $birthdayYearSelect= new \Cx\Core\Html\Model\Entity\DataElement(
-            'shop_birthday_year',
-            $selectedBirthdayYear,
-            \Cx\Core\Html\Model\Entity\DataElement::TYPE_SELECT,
-            null,
-            array_combine(range(1900, date('Y')), range(1900, date('Y')))
-        );
-
-        $birthdayYearSelect->setAttribute('class', 'birthday');
         self::$objTemplate->setVariable(array(
             'SHOP_ACCOUNT_COMPANY' => htmlentities($company, ENT_QUOTES, CONTREXX_CHARSET),
             'SHOP_ACCOUNT_PREFIX' => Customers::getGenderMenuoptions($gender),
@@ -2851,13 +2915,88 @@ die("Shop::processRedirect(): This method is obsolete!");
             'SHOP_ACCOUNT_ACTION' =>
                 \Cx\Core\Routing\Url::fromModuleAndCmd('Shop', 'account'),
             // New template - since 2.1.0
+            // countryId is used for payment address, therefore we must
+            // list all countries here (and not restrict to shipping countries)
             'SHOP_ACCOUNT_COUNTRY_MENUOPTIONS' =>
-                \Cx\Core\Country\Controller\Country::getMenuoptions($country_id),
+                \Cx\Core\Country\Controller\Country::getMenuoptions($country_id, false),
             // Old template
             // Compatibility with 2.0 and older versions
-            'SHOP_ACCOUNT_COUNTRY' => \Cx\Core\Country\Controller\Country::getMenu('countryId', $country_id),
-            'SHOP_ACCOUNT_BIRTHDAY' => $birthdayDaySelect . $birthdayMonthSelect . $birthdayYearSelect,
+            // countryId is used for payment address, therefore we must
+            // list all countries here (and not restrict to shipping countries)
+            'SHOP_ACCOUNT_COUNTRY' => \Cx\Core\Country\Controller\Country::getMenu('countryId', $country_id, false),
         ));
+
+        // parse birthday fields
+        if (self::$objTemplate->placeholderExists('SHOP_ACCOUNT_BIRTHDAY')) {
+            // build day dropdown
+        $birthdayDaySelect= new \Cx\Core\Html\Model\Entity\DataElement(
+            'shop_birthday_day',
+            $selectedBirthdayDay,
+            \Cx\Core\Html\Model\Entity\DataElement::TYPE_SELECT,
+            null,
+                array(
+                    '0' => $_ARRAYLANG['TXT_SHOP_CHOOSE_DAY'],
+                ) + array_combine(
+                    range(1, 31),
+                    range(1, 31)
+                )
+        );
+        $birthdayDaySelect->setAttribute('class', 'birthday');
+
+            // build month dropdown
+        $birthdayMonthSelect = new \Cx\Core\Html\Model\Entity\DataElement(
+            'shop_birthday_month',
+            $selectedBirthdayMonth,
+            \Cx\Core\Html\Model\Entity\DataElement::TYPE_SELECT,
+            null,
+                array(
+                    '0' => $_ARRAYLANG['TXT_SHOP_CHOOSE_MONTH'],
+                ) + array_combine(
+                    range(1, 12),
+                    range(1, 12)
+                )
+        );
+        $birthdayMonthSelect->setAttribute('class', 'birthday');
+
+            // build year dropdown
+        $birthdayYearSelect= new \Cx\Core\Html\Model\Entity\DataElement(
+            'shop_birthday_year',
+            $selectedBirthdayYear,
+            \Cx\Core\Html\Model\Entity\DataElement::TYPE_SELECT,
+            null,
+                array(
+                    '0' => $_ARRAYLANG['TXT_SHOP_CHOOSE_YEAR'],
+                ) + array_combine(
+                    range(1900, date('Y')),
+                    range(1900, date('Y'))
+                )
+        );
+            $birthdayYearSelect->setAttribute('class', 'birthday');
+
+            self::$objTemplate->setVariable(
+                'SHOP_ACCOUNT_BIRTHDAY',
+                $birthdayDaySelect . $birthdayMonthSelect . $birthdayYearSelect
+            );
+        }
+        if (self::$objTemplate->blockExists('shop_account_birthday')) {
+        self::$objTemplate->setVariable(array(
+                'SHOP_ACCOUNT_BIRTHDAY_DAY' => $selectedBirthdayDay,
+                'SHOP_ACCOUNT_BIRTHDAY_MONTH' => $selectedBirthdayMonth,
+                'SHOP_ACCOUNT_BIRTHDAY_YEAR' => $selectedBirthdayYear,
+                'SHOP_ACCOUNT_BIRTHDAY_DATE_FORMAT' => ASCMS_DATE_FORMAT_DATE,
+        ));
+            if (!empty($birthday)) {
+                self::$objTemplate->setVariable(array(
+                    'SHOP_ACCOUNT_BIRTHDAY_DATE' => date(
+                        ASCMS_DATE_FORMAT_DATE,
+                        $birthday
+                    ),
+                    'SHOP_ACCOUNT_BIRTHDAY_TIMESTAMP' => $birthday,
+                ));
+            }
+            self::$objTemplate->parse('shop_account_birthday');
+        }
+
         if (count(static::$errorFields)) {
             $errorClassPlaceholders = array();
             foreach (static::$errorFields as $field) {
@@ -2966,6 +3105,7 @@ die("Shop::processRedirect(): This method is obsolete!");
                 ? '' : htmlentities($_SESSION['shop']['zip2'], ENT_QUOTES, CONTREXX_CHARSET)),
             'SHOP_ACCOUNT_CITY2' => (empty($_SESSION['shop']['city2'])
                 ? '' : htmlentities($_SESSION['shop']['city2'], ENT_QUOTES, CONTREXX_CHARSET)),
+            // countryId2 is used for shipment address
             'SHOP_ACCOUNT_COUNTRY2' =>
                 \Cx\Core\Country\Controller\Country::getNameById($_SESSION['shop']['countryId2']),
             'SHOP_ACCOUNT_COUNTRY2_ID' => $_SESSION['shop']['countryId2'],
@@ -2993,9 +3133,29 @@ die("Shop::processRedirect(): This method is obsolete!");
      */
     static function account_to_session()
     {
+        global $_ARRAYLANG;
+
 //\DBG::log("account_to_session(): POST: ".var_export($_POST, true));
-        if (empty($_POST) || !is_array($_POST)) return;
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $request = $cx->getRequest();
+
+        if (
+            $request->getHttpRequestMethod() != 'post' ||
+            empty($_POST) ||
+            !is_array($_POST)
+        ) {
+            return;
+        }
+
 //\DBG::log("Shop::account_to_session(): Have POST");
+
+        // remember currently set country of shipping address.
+        // will be used in case an invalid shipping country has been submitted
+        $shippingCountryId = 0;
+        if (isset($_SESSION['shop']['countryId2'])) {
+            $shippingCountryId = $_SESSION['shop']['countryId2'];
+        }
+
         foreach ($_POST as $key => $value) {
             $_SESSION['shop'][$key] =
                 trim(strip_tags(contrexx_input2raw($value)));
@@ -3007,14 +3167,89 @@ die("Shop::processRedirect(): This method is obsolete!");
         }
 
         // set customer birthday
-        if (isset($_POST['shop_birthday_day']) &&
+        $birthday = 0;
+        if (
+            !empty($_POST['shop_birthday_day']) &&
+            !empty($_POST['shop_birthday_month']) &&
+            !empty($_POST['shop_birthday_year'])
+        ) {
+            $day = intval($_POST['shop_birthday_day']);
+            $month = intval($_POST['shop_birthday_month']);
+            $year = intval($_POST['shop_birthday_year']);
+            $birthday = mktime(
+                0,
+                0,
+                0,
+                $month,
+                $day,
+                $year
+            );
+        } elseif (!empty($_POST['shop_birthday_date'])) {
+            // get date format of submitted birthday date
+            if (
+                !empty($_POST['shop_birthday_date_format']) &&
+                is_string($_POST['shop_birthday_date_format'])
+            ) {
+                $birthdayDateFormat = contrexx_input2raw(
+                    $_POST['shop_birthday_date_format']
+                );
+            } else {
+                $birthdayDateFormat = ASCMS_DATE_FORMAT_DATE;
+            }
+            // parse submitted date based on the supplied date-format
+            $birthdayDate = date_parse_from_format(
+                $birthdayDateFormat,
+                $_POST['shop_birthday_date']
+            );
+            // if parsing of the submitted date was successful,
+            // then do generate a timestamp of it
+            if (
+                !empty($birthdayDate['day']) &&
+                !empty($birthdayDate['month']) &&
+                !empty($birthdayDate['year'])
+            ) {
+                $birthday = mktime(
+                    0,
+                    0,
+                    0,
+                    intval($birthdayDate['month']),
+                    intval($birthdayDate['day']),
+                    intval($birthdayDate['year'])
+                );
+            }
+        } elseif (
+            isset($_POST['shop_birthday_date']) || (
+                isset($_POST['shop_birthday_day']) &&
             isset($_POST['shop_birthday_month']) &&
-            isset($_POST['shop_birthday_year'])) {
-            $day = contrexx_input2raw($_POST['shop_birthday_day']);
-            $month = contrexx_input2raw($_POST['shop_birthday_month']);
-            $year = contrexx_input2raw($_POST['shop_birthday_year']);
-            $birthday = mktime(0, 0, 0, $month, $day, $year);
+                isset($_POST['shop_birthday_year'])
+            )
+        ) {
+            // clear birthday
+            $_SESSION['shop']['birthday'] = 0;
+        }
+
+        // update birthday property if a valid birthday date has been submitted
+        if (!empty($birthday)) {
             $_SESSION['shop']['birthday'] = $birthday;
+        }
+
+        // fetch birthday property (-> will be used to determine if setting a
+        // birthday is mandatory)
+        $profileAttribute = \FWUser::getFWUserObject()->objUser->objAttribute;
+        $birthdayAttribute = $profileAttribute->getById('birthday');
+
+        // in case no birthday has been set, do check if a birthday has been
+        // requested from the customer (placeholder or template-block exists)
+        // and if the setting is mandatory
+        if (
+            empty($_SESSION['shop']['birthday']) && (
+                self::$objTemplate->placeholderExists('SHOP_ACCOUNT_BIRTHDAY') ||
+                self::$objTemplate->blockExists('shop_account_birthday')
+            ) &&
+            $birthdayAttribute->isMandatory()
+        ) {
+            // birthday is mandatory, but has not been set
+            static::$errorFields[] = 'birthday';
         }
 
         if (   empty($_SESSION['shop']['gender2'])
@@ -3025,9 +3260,10 @@ die("Shop::processRedirect(): This method is obsolete!");
             || empty($_SESSION['shop']['city2'])
             || empty($_SESSION['shop']['phone2'])
             || empty($_SESSION['shop']['countryId2'])
+            || empty($_POST['equal_address'])
         ) {
             $_SESSION['shop']['equal_address'] = false;
-        } elseif (!empty($_POST['equal_address'])) {
+        } else {
             // Copy address
             $_SESSION['shop']['company2'] = $_SESSION['shop']['company'];
             $_SESSION['shop']['gender2'] = $_SESSION['shop']['gender'];
@@ -3040,14 +3276,38 @@ die("Shop::processRedirect(): This method is obsolete!");
             $_SESSION['shop']['countryId2'] = $_SESSION['shop']['countryId'];
             $_SESSION['shop']['equal_address'] = true;
         }
-        if (empty($_SESSION['shop']['countryId'])) {
-            $_SESSION['shop']['countryId'] = $_SESSION['shop']['countryId2'];
-        } else if (!Cart::needs_shipment()) {
+
+        // verify country of shipment address
+        if (Cart::needs_shipment()) {
+            $country = \Cx\Core\Country\Controller\Country::getById(
+                $_SESSION['shop']['countryId2']
+            );
+            // Ensure selected country of shipment adress is valid.
+            // Otherwise reset to previously set country
+            if (!$country['active']) {
+                \Message::error(sprintf(
+                    $_ARRAYLANG['TXT_SHOP_NO_DELIVERY_TO_COUNTRY'],
+                    \Cx\Core\Country\Controller\Country::getNameById(
+                        $_SESSION['shop']['countryId2']
+                    )
+                ));
+                $_SESSION['shop']['countryId2'] = $shippingCountryId;
+
+                // disable payment and shipment address equality flag
+                $_SESSION['shop']['equal_address'] = false;
+            }
+        }
+
+        if (
+            !Cart::needs_shipment() &&
+            !empty($_SESSION['shop']['countryId'])
+        ) {
             // In case we have an order without shipment, shipment country
             // will not be set. We set it to the customer's country in order
             // to calculate VAT correctly.
             $_SESSION['shop']['countryId2'] = $_SESSION['shop']['countryId'];
         }
+
         // Fill missing arguments with empty strings
         if (empty($_SESSION['shop']['company2']))   $_SESSION['shop']['company2'] = '';
         if (empty($_SESSION['shop']['gender2']))    $_SESSION['shop']['gender2'] = '';
@@ -3058,6 +3318,12 @@ die("Shop::processRedirect(): This method is obsolete!");
         if (empty($_SESSION['shop']['city2']))      $_SESSION['shop']['city2'] = '';
         if (empty($_SESSION['shop']['phone2']))     $_SESSION['shop']['phone2'] = '';
         if (empty($_SESSION['shop']['countryId2'])) $_SESSION['shop']['countryId2'] = 0;
+
+        // we need to reset selected payment and shipment method
+        // in case we did just change the shipment country
+        if ($_SESSION['shop']['countryId2'] != $shippingCountryId) {
+            unset($_SESSION['shop']['shipperId']);
+        }
     }
 
 
@@ -3080,6 +3346,13 @@ die("Shop::processRedirect(): This method is obsolete!");
             $status = \Message::error(
                 $_ARRAYLANG['TXT_FILL_OUT_ALL_REQUIRED_FIELDS']);
         }
+
+        // Check for any error messages.
+        // This is used by the verification of the shipment country
+        if (\Message::have()) {
+            return false;
+        }
+
         // Registered Customers are okay now
         if (self::$objCustomer) return $status;
         if (   \Cx\Core\Setting\Controller\Setting::getValue('register','Shop') == ShopLibrary::REGISTER_MANDATORY
@@ -3230,7 +3503,11 @@ die("Shop::processRedirect(): This method is obsolete!");
         // Determine any valid value for it
         if (   $cart_amount
             && empty($_SESSION['shop']['paymentId'])) {
-            $arrPaymentId = Payment::getCountriesRelatedPaymentIdArray(
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $paymentRepo = $cx->getDb()->getEntityManager()->getRepository(
+                'Cx\Modules\Shop\Model\Entity\Payment'
+            );
+            $arrPaymentId = $paymentRepo->getCountriesRelatedPaymentIdArray(
                 $_SESSION['shop']['countryId'], \Cx\Modules\Shop\Controller\CurrencyController::getCurrencyArray());
             $_SESSION['shop']['paymentId'] = current($arrPaymentId);
         }
@@ -3362,15 +3639,20 @@ die("Shop::processRedirect(): This method is obsolete!");
             $_SESSION['shop']['paymentId'] = intval($_POST['paymentId']);
         }
         if (empty($_SESSION['shop']['paymentId'])) {
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $paymentRepo = $cx->getDb()->getEntityManager()->getRepository(
+                'Cx\Modules\Shop\Model\Entity\Payment'
+            );
             // Use the first Payment ID
-            $arrPaymentId = Payment::getCountriesRelatedPaymentIdArray(
+            $arrPaymentId = $paymentRepo->getCountriesRelatedPaymentIdArray(
                 $_SESSION['shop']['countryId'], \Cx\Modules\Shop\Controller\CurrencyController::getCurrencyArray()
             );
             $_SESSION['shop']['paymentId'] = current($arrPaymentId);
         }
-        return Payment::getPaymentMenu(
+        return \Cx\Modules\Shop\Controller\PaymentController::getPaymentMenu(
             $_SESSION['shop']['paymentId'],
             "document.forms['shopForm'].submit()",
+            // countryId is used for payment address
             $_SESSION['shop']['countryId']
         );
     }
@@ -3454,9 +3736,9 @@ die("Shop::processRedirect(): This method is obsolete!");
         $processor_id = 0;
         $processor_name = '';
         if (!empty($_SESSION['shop']['paymentId']))
-            $processor_id = Payment::getPaymentProcessorId($_SESSION['shop']['paymentId']);
+            $processor_id = \Cx\Modules\Shop\Controller\PaymentController::getPaymentProcessorId($_SESSION['shop']['paymentId']);
         if (!empty($processor_id))
-            $processor_name = PaymentProcessing::getPaymentProcessorName($processor_id);
+            $processor_name = \Cx\Modules\Shop\Controller\PaymentProcessorController::getPaymentProcessorName($processor_id);
         return $processor_name;
     }
 
@@ -3648,7 +3930,7 @@ die("Shop::processRedirect(): This method is obsolete!");
             // TODO: Check if the first line is not already checked above
             if (    !(!Cart::needs_shipment() && Cart::get_price() <= 0)
                 &&  self::$objTemplate->blockExists('shop_payment_payment_methods')
-                &&  $paymentMethods = Payment::getPaymentMethods($_SESSION['shop']['countryId'])
+                &&  $paymentMethods = \Cx\Modules\Shop\Controller\PaymentController::getPaymentMethods($_SESSION['shop']['countryId'])
             ) {
                 foreach ($paymentMethods as $paymentId => $paymentName) {
                     self::$objTemplate->setVariable(array(
@@ -3814,8 +4096,13 @@ die("Shop::processRedirect(): This method is obsolete!");
         // It may be necessary to refresh the cart here, as the customer
         // may return to the cart, then press "Back".
         self::_initPaymentDetails();
+
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $productRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\Product'
+        );
         foreach (Cart::get_products_array() as $arrProduct) {
-            $objProduct = Product::getById($arrProduct['id']);
+            $objProduct = $productRepo->find($arrProduct['id']);
             if (!$objProduct) {
 // TODO: Implement a proper method
 //                unset(Cart::get_product_id($cart_id]);
@@ -3832,18 +4119,18 @@ die("Shop::processRedirect(): This method is obsolete!");
                 $price_options,
                 $arrProduct['quantity']);
             // Test the distribution method for delivery
-            $productDistribution = $objProduct->distribution();
+            $productDistribution = $objProduct->getDistribution();
             $weight = ($productDistribution == 'delivery'
-                ? Weight::getWeightString($objProduct->weight()) : '-');
-            $vatId = $objProduct->vat_id();
+                ? Weight::getWeightString($objProduct->getWeight()) : '-');
+            $vatId = $objProduct->getVatId();
             $vatRate = Vat::getRate($vatId);
             $vatPercent = Vat::getShort($vatId);
             $vatAmount = Vat::amount(
                 $vatRate, $price*$arrProduct['quantity']);
             self::$objTemplate->setVariable(array(
                 'SHOP_PRODUCT_ID' => $arrProduct['id'],
-                'SHOP_PRODUCT_CUSTOM_ID' => $objProduct->code(),
-                'SHOP_PRODUCT_TITLE' => contrexx_raw2xhtml($objProduct->name()),
+                'SHOP_PRODUCT_CUSTOM_ID' => $objProduct->getCode(),
+                'SHOP_PRODUCT_TITLE' => contrexx_raw2xhtml($objProduct->getName()),
                 'SHOP_PRODUCT_PRICE' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(
                     $price*$arrProduct['quantity']),
                 'SHOP_PRODUCT_QUANTITY' => $arrProduct['quantity'],
@@ -3896,7 +4183,7 @@ die("Shop::processRedirect(): This method is obsolete!");
             // order costs after discount subtraction (incl VAT) but without payment and shippment costs
             'SHOP_TOTALPRICE' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(Cart::get_price()),
             'SHOP_PAYMENT' =>
-                Payment::getProperty($_SESSION['shop']['paymentId'], 'name'),
+                \Cx\Modules\Shop\Controller\PaymentController::getProperty($_SESSION['shop']['paymentId'], 'name'),
             // final order costs
             'SHOP_GRAND_TOTAL' => \Cx\Modules\Shop\Controller\CurrencyController::formatPrice(
                   $_SESSION['shop']['grand_total_price']),
@@ -3910,12 +4197,25 @@ die("Shop::processRedirect(): This method is obsolete!");
             'SHOP_ADDRESS' => stripslashes($_SESSION['shop']['address']),
             'SHOP_ZIP' => stripslashes($_SESSION['shop']['zip']),
             'SHOP_CITY' => stripslashes($_SESSION['shop']['city']),
+            // countryId is used for payment address
             'SHOP_COUNTRY' => \Cx\Core\Country\Controller\Country::getNameById($_SESSION['shop']['countryId']),
             'SHOP_EMAIL' => stripslashes($_SESSION['shop']['email']),
             'SHOP_PHONE' => stripslashes($_SESSION['shop']['phone']),
             'SHOP_FAX' => stripslashes($_SESSION['shop']['fax']),
-            'SHOP_BIRTHDAY' => date(ASCMS_DATE_FORMAT_DATE, $_SESSION['shop']['birthday']),
         ));
+
+        // only parse birthday if it had been set
+        if (!empty($_SESSION['shop']['birthday'])) {
+            self::$objTemplate->setVariable(
+                'SHOP_BIRTHDAY',
+                date(
+                    ASCMS_DATE_FORMAT_DATE,
+                    $_SESSION['shop']['birthday']
+                )
+            );
+        }
+
+        // parse shipment address
         if (!empty($_SESSION['shop']['lastname2'])) {
             self::$objTemplate->setVariable(array(
                 'SHOP_COMPANY2' => stripslashes($_SESSION['shop']['company2']),
@@ -3925,6 +4225,7 @@ die("Shop::processRedirect(): This method is obsolete!");
                 'SHOP_ADDRESS2' => stripslashes($_SESSION['shop']['address2']),
                 'SHOP_ZIP2' => stripslashes($_SESSION['shop']['zip2']),
                 'SHOP_CITY2' => stripslashes($_SESSION['shop']['city2']),
+                // countryId2 is used for shipment address
                 'SHOP_COUNTRY2' => \Cx\Core\Country\Controller\Country::getNameById($_SESSION['shop']['countryId2']),
                 'SHOP_PHONE2' => stripslashes($_SESSION['shop']['phone2']),
             ));
@@ -4121,9 +4422,22 @@ die("Shop::processRedirect(): This method is obsolete!");
         self::$objCustomer->country_id($_SESSION['shop']['countryId']);
         self::$objCustomer->phone($_SESSION['shop']['phone']);
         self::$objCustomer->fax($_SESSION['shop']['fax']);
+
+        // set birthday, but only if it has been set (or unset)
+        // otherwise, it shall not get overwitten
         if (!empty($_SESSION['shop']['birthday'])) {
+            $birthday = date(
+                ASCMS_DATE_FORMAT_DATE,
+                $_SESSION['shop']['birthday']
+            );
             self::$objCustomer->setProfile(array(
-                'birthday' => array(0 => date(ASCMS_DATE_FORMAT_DATE, $_SESSION['shop']['birthday']))
+                'birthday' => array(0 => $birthday)
+            ));
+
+        // clear birthday if it has been unset
+        } elseif (isset($_SESSION['shop']['birthday'])) {
+            self::$objCustomer->setProfile(array(
+                'birthday' => array(0 => '')
             ));
         }
 
@@ -4265,13 +4579,13 @@ die("Shop::processRedirect(): This method is obsolete!");
         // Suppress Coupon messages (see Coupon::available())
         \Message::save();
         foreach (Cart::get_products_array() as $arrProduct) {
-            $objProduct = Product::getById($arrProduct['id']);
+            $objProduct = $productRepo->find($arrProduct['id']);
             if (!$objProduct) {
                 unset($_SESSION['shop']['order_id']);
                 return \Message::error($_ARRAYLANG['TXT_ERROR_LOOKING_UP_ORDER']);
             }
             $product_id = $arrProduct['id'];
-            $name = $objProduct->name();
+            $name = $objProduct->getName();
             $priceOptions = (!empty($arrProduct['optionPrice'])
                 ? $arrProduct['optionPrice'] : 0);
             $quantity = $arrProduct['quantity'];
@@ -4281,23 +4595,21 @@ die("Shop::processRedirect(): This method is obsolete!");
                 $quantity);
             $item_total = $price*$quantity;
             $items_total += $item_total;
-            $productVatId = $objProduct->vat_id();
+            $productVatId = $objProduct->getVatId();
             $vat_rate = ($productVatId && Vat::getRate($productVatId)
                 ? Vat::getRate($productVatId) : '0.00');
             // Test the distribution method for delivery
-            $productDistribution = $objProduct->distribution();
+            $productDistribution = $objProduct->getDistribution();
             if ($productDistribution == 'delivery') {
                 $_SESSION['shop']['isDelivery'] = true;
             }
             $weight = ($productDistribution == 'delivery'
-                ? $objProduct->weight() : 0); // grams
+                ? $objProduct->getWeight() : 0); // grams
             if ($weight == '') { $weight = 0; }
             // Add to order items table
 
-            $product = $productRepo->find($product_id);
-
             $objOrder->insertItem(
-                $product, $name, $price, $quantity, $vat_rate,
+                $objProduct, $name, $price, $quantity, $vat_rate,
                 $weight, $arrProduct['options']
             );
             // Store the Product Coupon, if applicable.
@@ -4333,10 +4645,10 @@ die("Shop::processRedirect(): This method is obsolete!");
         }
         \Message::restore();
 
-        $processor_id = Payment::getProperty($_SESSION['shop']['paymentId'], 'processor_id');
-        $processor_name = PaymentProcessing::getPaymentProcessorName($processor_id);
+        $processor_id = \Cx\Modules\Shop\Controller\PaymentController::getProperty($_SESSION['shop']['paymentId'], 'processor_id');
+        $processor_name = \Cx\Modules\Shop\Controller\PaymentProcessorController::getPaymentProcessorName($processor_id);
          // other payment methods
-        PaymentProcessing::initProcessor($processor_id);
+        \Cx\Modules\Shop\Controller\PaymentProcessorController::initProcessor($processor_id);
 // TODO: These arguments are no longer valid.  Set them up later?
 //            Currency::getActiveCurrencyCode(),
 //            FWLanguage::getLanguageParameter(FRONTEND_LANG_ID, 'lang'));
@@ -4370,7 +4682,7 @@ die("Shop::processRedirect(): This method is obsolete!");
         }
 
         $_SESSION['shop']['order_id_checkin'] = $order_id;
-        $strProcessorType = PaymentProcessing::getCurrentPaymentProcessorType();
+        $strProcessorType = \Cx\Modules\Shop\Controller\PaymentProcessorController::getCurrentPaymentProcessorType();
 
         // Test whether the selected payment method can be
         // considered an instant or deferred one.
@@ -4399,7 +4711,7 @@ die("Shop::processRedirect(): This method is obsolete!");
         // from this page in checkOut():
         // 'internal', 'internal_lsv'
         self::$objTemplate->setVariable(
-            'SHOP_PAYMENT_PROCESSING', PaymentProcessing::checkOut()
+            'SHOP_PAYMENT_PROCESSING', \Cx\Modules\Shop\Controller\PaymentProcessorController::checkOut()
         );
         // Clear the order ID.
         // The order may be resubmitted and the payment retried.
@@ -4427,7 +4739,7 @@ die("Shop::processRedirect(): This method is obsolete!");
         // Use the Order ID stored in the session, if possible.
         // Otherwise, get it from the payment processor.
         $order_id = (empty($_SESSION['shop']['order_id_checkin'])
-            ? PaymentProcessing::getOrderId()
+            ? \Cx\Modules\Shop\Controller\PaymentProcessorController::getOrderId()
             : $_SESSION['shop']['order_id_checkin']);
 //\DBG::deactivate();
 //\DBG::activate(DBG_LOG_FILE);
@@ -4436,7 +4748,7 @@ die("Shop::processRedirect(): This method is obsolete!");
         // update_status() will choose the new value automatically.
         $newOrderStatus = \Cx\Modules\Shop\Model\Repository\OrderRepository::STATUS_PENDING;
 
-        $checkinresult = PaymentProcessing::checkIn();
+        $checkinresult = \Cx\Modules\Shop\Controller\PaymentProcessorController::checkIn();
 //\DBG::log("success(): CheckIn Result ".var_export($checkinresult, true));
 
         if ($checkinresult === false) {
@@ -4741,15 +5053,29 @@ die("Shop::processRedirect(): This method is obsolete!");
     static function showDiscountInfo(
         $groupCustomerId, $groupArticleId, $groupCountId, $count
     ) {
-        // Pick the unit for this product (count, meter, kilo, ...)
-        $unit = Discount::getUnit($groupCountId);
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $discountGroupRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Modules\Shop\Model\Entity\RelDiscountGroup'
+        );
+        $unit = '';
+        if (!empty($groupCountId)) {
+            $discountCountName = $cx->getDb()->getEntityManager()->getRepository(
+                'Cx\Modules\Shop\Model\Entity\DiscountgroupCountName'
+            )->find($groupCountId);
+
+            if (!empty($discountCountName)) {
+                // Pick the unit for this product (count, meter, kilo, ...)
+                $unit = $discountCountName->getUnit();
+            }
+        }
+
         if (!empty($unit)) {
             self::$objTemplate->setVariable(
                 'SHOP_PRODUCT_UNIT', $unit
             );
         }
         if ($groupCustomerId > 0) {
-            $rateCustomer = Discount::getDiscountRateCustomer(
+            $rateCustomer = $discountGroupRepo->getDiscountRateCustomer(
                 $groupCustomerId, $groupArticleId
             );
             if ($rateCustomer > 0) {
@@ -4761,7 +5087,9 @@ die("Shop::processRedirect(): This method is obsolete!");
             }
         }
         if ($groupCountId > 0) {
-            $rateCount = Discount::getDiscountRateCount($groupCountId, $count);
+            $rateCount =
+                \Cx\Modules\Shop\Controller\DiscountgroupCountNameController::
+                    getDiscountRateCount($groupCountId, $count);
             $listCount = self::getDiscountCountString($groupCountId);
             if ($rateCount > 0) {
                 // Show discount rate if applicable
@@ -4792,15 +5120,30 @@ die("Shop::processRedirect(): This method is obsolete!");
     {
         global $_ARRAYLANG;
 
-        $arrDiscount = Discount::getDiscountCountArray();
-        $arrRate = Discount::getDiscountCountRateArray($groupCountId);
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $em = $cx->getDb()->getEntityManager();
+        $discountCountNames = $em->getRepository(
+            'Cx\Modules\Shop\Model\Entity\DiscountgroupCountName'
+        )->findAll();
+        $discountCountRates = $em->getRepository(
+            'Cx\Modules\Shop\Model\Entity\DiscountgroupCountName'
+        )->findBy(
+            array(),
+            array('count' => 'DESC')
+        );;
+
         $strDiscounts = '';
         if (!empty($arrRate)) {
             $unit = '';
-            if (isset($arrDiscount[$groupCountId])) {
-                $unit = $arrDiscount[$groupCountId]['unit'];
+            foreach ($discountCountNames as $discountCountName) {
+                if ($discountCountName->getId() == $groupCountId) {
+                    $unit = $discountCountName->getUnit();
+                    break;
+                }
             }
-            foreach ($arrRate as $count => $rate) {
+            foreach ($discountCountRates as $discountCountRate) {
+                $count = $discountCountRate->getCount();
+                $rate = $discountCountRate->getRate();
                 $strDiscounts .=
                     ($strDiscounts != '' ? ', ' : '').
                     $_ARRAYLANG['TXT_SHOP_DISCOUNT_FROM'].' '.
@@ -4892,7 +5235,6 @@ die("Shop::processRedirect(): This method is obsolete!");
      */
     static function verifySessionAddress()
     {
-        static::$errorFields = array();
         // Note that the Country IDs are either set already, or chosen in a
         // dropdown menu, so if everything else is set, so are they.
         // They may thus be disabled entirely without affecting this.

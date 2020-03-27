@@ -669,6 +669,16 @@ class Datatrans
             '>'.$_ARRAYLANG['TXT_SHOP_DATATRANS_REQTYPE_CAA'].'</option>';
     }
 
+    static function getReqtypeOptions()
+    {
+        global $_ARRAYLANG;
+
+        return array(
+            'NOA' => $_ARRAYLANG['TXT_SHOP_DATATRANS_REQTYPE_NOA'],
+            'CAA' => $_ARRAYLANG['TXT_SHOP_DATATRANS_REQTYPE_CAA']
+        );
+    }
+
 }
 
 

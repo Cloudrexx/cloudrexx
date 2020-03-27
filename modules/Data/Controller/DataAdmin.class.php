@@ -197,6 +197,12 @@ class DataAdmin extends \Cx\Modules\Data\Controller\DataLibrary {
                 /*$objPerm->checkAccess(120, 'static');*/
                 $this->showEntries();
         }
+        // Drop cache if necessary
+        if (count($_POST)) {
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            // as Data fills global placeholders we need to drop all the cache
+            $cx->getComponent('Cache')->clearCache();
+        }
 
         $objTemplate->setVariable(array(
             'CONTENT_TITLE'                => $this->_strPageTitle,

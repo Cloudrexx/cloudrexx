@@ -96,6 +96,55 @@ cx.bind("delete", function (deleteIds) {
     }
 }, 'shopDelete');
 
+cx.bind('activate', function (entityIds) {
+    updateShopStatus(entityIds, 1);
+}, 'shopActivate');
+
+cx.bind('deactivate', function (entityIds) {
+    updateShopStatus(entityIds, 0);
+}, 'shopDeactivate');
+
+function updateShopStatus(entityIds, newStatus) {
+    for (let i = 0; i < entityIds.length; i++) {
+        const statusElement = cx.jQuery('.vg-function-status[data-entity-id="' + entityIds[i] + '"]');
+        if (statusElement.data('data-status-value') == newStatus) {
+            continue;
+        }
+        cx.ajax(
+            'Html',
+            'updateStatus',
+            {
+                type: 'POST',
+                data: {
+                    'entityId': entityIds[i],
+                    'newStatus': newStatus,
+                    'statusField': 'active',
+                    'component': 'Shop',
+                    'entity': 'Product',
+                },
+                showMessage: true,
+                beforeSend: function() {
+                    cx.jQuery(statusElement).addClass('loading');
+                },
+                success: function(json) {
+                    if (newStatus) {
+                        cx.jQuery(statusElement).addClass('active');
+                    } else {
+                        cx.jQuery(statusElement).removeClass('active');
+                    }
+                },
+                preError: function(xhr, status, error) {
+                    cx.tools.StatusMessage.showMessage(error);
+                    cx.jQuery(statusElement).data('status-value', (cx.jQuery(statusElement).hasClass('active') ? 0 : 1));
+                },
+                complete: function() {
+                    cx.jQuery(statusElement).removeClass('loading');
+                }
+            },
+            cx.variables.get('frontendLocale', 'contrexx')
+        );
+    }
+}
 
 function toggle_header()
 {
@@ -130,6 +179,42 @@ function toggle_categories(status)
     jQuery('.category input').prop('checked', check);
 }
 
+function switchStockVisible()
+{
+    if (
+        document.getElementById('form-0-stockVisible') != null &&
+        document.getElementById('stockIsVisible') != null
+    ) {
+        document.getElementById('stockIsVisible').addEventListener('change', function() {
+            if (document.getElementById('form-0-stockVisible_no').checked) {
+                document.getElementById('form-0-stockVisible_yes').checked = true;
+                document.getElementById('form-0-stockVisible_no').checked = false;
+            } else {
+                document.getElementById('form-0-stockVisible_no').checked = true;
+                document.getElementById('form-0-stockVisible_yes').checked = false;
+            }
+        });
+    }
+}
+
+function switchDiscountActive()
+{
+    if (
+        document.getElementById('form-0-discountActive') != null &&
+        document.getElementById('discountActive') != null
+    ) {
+        document.getElementById('discountActive').addEventListener('change', function() {
+            if (document.getElementById('form-0-discountActive_no').checked) {
+                document.getElementById('form-0-discountActive_yes').checked = true;
+                document.getElementById('form-0-discountActive_no').checked = false;
+            } else {
+                document.getElementById('form-0-discountActive_no').checked = true;
+                document.getElementById('form-0-discountActive_yes').checked = false;
+            }
+        });
+    }
+}
+
 jQuery(document).ready(function($){
     // Add class to all orders with pending status
     cx.jQuery('.order-status select option:selected[value="0"]').closest('tr').addClass('pending');
@@ -156,6 +241,17 @@ jQuery(document).ready(function($){
     toggle_footer();
     toggle_categories(true);
 
+    switchStockVisible();
+    switchDiscountActive();
+
+    if (
+        document.getElementById('form-0-distribution') != null &&
+        document.getElementById('form-0-distribution').tagName === 'SELECT'
+    ) {
+        show_additional_fields();
+        document.getElementById('form-0-distribution').addEventListener('change', show_additional_fields);
+    }
+
     if (typeof document.getElementsByName('headerOn')[0] != 'undefined') {
         document.getElementById('headerRight').value = document.getElementById('form-0-headerRight').value;
 
@@ -172,9 +268,29 @@ jQuery(document).ready(function($){
         };
     }
 
+    cx.jQuery('.parent label').click(function() {
+        if (cx.jQuery(this).parent().hasClass('open')) {
+            cx.jQuery(this).parent().find('input').attr('checked', false);
+            cx.jQuery(this).parent().removeClass('open');
+        } else {
+            cx.jQuery(this).parent().find('input').attr('checked', true);
+            cx.jQuery(this).parent().addClass('open');
+        }
+    })
+
     cx.jQuery('#vg-0-filter-field-showAllPendentOrders').click(function() {
         cx.jQuery('.vg-searchSubmit').click();
     });
+
+    if (document.getElementById('discount-group-table') != null) {
+        const titleRow = document.getElementById('discount-group-table').rows[1];
+
+        // Empty the column so that the input fields of the title row are not passed
+        let c = 1;
+        while (cell=titleRow.cells[c++]) {
+            cell.innerHTML = '';
+        }
+    }
 
     let previousStatusId;
     cx.jQuery('.order-status select').focus(function(e) {
@@ -231,7 +347,6 @@ jQuery(document).ready(function($){
         } else {
             cx.jQuery(this).val(previousStatusId);
         }
-
     })
 });
 
@@ -333,4 +448,41 @@ function updateExchangeRates(selectedElement)
     // Finally, set the new standard currency rate to 1.
     document.getElementsByName("rate-"+indexSelected)[0].value = "1.000000";
     return true;
+}
+
+function swapBlock(div)
+{
+    const oldClass = (document.getElementById(div).classList.contains('hide') ? 'hide' : 'show');
+    const newClass = (document.getElementById(div).classList.contains('hide') ? 'show' : 'hide');
+    document.getElementById(div).classList.remove(oldClass);
+    document.getElementById(div).classList.add(newClass);
+}
+
+function show_additional_fields()
+{
+    var typeSelect = document.getElementById('form-0-distribution');
+    var type = typeSelect.options[typeSelect.selectedIndex].value;
+
+    if (
+        type == cx.variables.get('DISTRIBUTION_DOWNLOAD_INDEX', 'shop_product') &&
+        typeof document.getElementById('group-0-userGroups') != 'undefined'
+    ) {
+        document.getElementById('group-0-userGroups').style.display = 'block';
+        if (document.getElementById('form_0_userGroups_chosen') != null) {
+            console.log(document.getElementById('form_0_userGroups_chosen'));
+            document.getElementById('form_0_userGroups_chosen').style.width = '308px';
+        }
+    } else {
+        document.getElementById('group-0-userGroups').style.display = 'none';
+    }
+
+    if (document.getElementById('group-0-weight') != null) {
+        if (
+            type == cx.variables.get('DISTRIBUTION_DELIVERY_INDEX', 'shop_product')
+        ) {
+            document.getElementById('group-0-weight').style.display = 'block';
+        } else {
+            document.getElementById('group-0-weight').style.display = 'none';
+        }
+    }
 }

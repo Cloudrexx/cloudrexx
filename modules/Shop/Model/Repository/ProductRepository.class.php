@@ -10,4 +10,63 @@ namespace Cx\Modules\Shop\Model\Repository;
  */
 class ProductRepository extends \Doctrine\ORM\EntityRepository
 {
+    /**
+     * Returns the first matching picture name found in the Products
+     * within the Shop Category given by its ID.
+     * @global  ADONewConnection  $objDatabase    Database connection object
+     * @param type $category_id
+     * @return  string                      The image name, or the
+     *                                      empty string.
+     */
+    public function getPictureByCategoryId($category_id)
+    {
+        $category_id = intval($category_id);
+
+        $qb = $this->_em->createQueryBuilder();
+        $qb->select('p')
+           ->from($this->_entityName, 'p')
+           ->where('?1 MEMBER OF p.categories')
+           ->andWhere(
+               $qb->expr()->not(
+                   $qb->expr()->eq('p.picture', "''")
+               )
+           )
+           ->setParameter(1, $category_id)
+           ->orderBy('p.ord', 'ASC')
+           ->setMaxResults(1);
+        $products = $qb->getQuery()->getResult();
+
+        foreach ($products as $product) {
+            // Got a picture
+            $arrImages = \Cx\Modules\Shop\Controller\ProductController::get_image_array_from_base64(
+                $product->getPicture()
+            );
+            $imageName = $arrImages[1]['img'];
+            return $imageName;
+        }
+        // No picture found here
+        return '';
+    }
+
+    /**
+     * Decrease the Product stock count
+     *
+     * This applies to "real", shipped goods only.  These have "delivery"
+     * set as their "distribution" field value.
+     * @oaram \Cx\Modules\Shop\Model\Entity\Product $product  Referred product
+     * @param integer                               $quantity The quantity to
+     *                                                        subtract from the
+     *                                                        stock
+     * @return  \Cx\Modules\Shop\Model\Entity\Product  updated product
+     */
+    public function decreaseStock($product, $quantity)
+    {
+        if ($product->getDistribution() == 'delivery') {
+            $product->setStock($product->getStock() - $quantity);
+        }
+
+        $this->_em->persist($product);
+        $this->_em->flush();
+        return $product;
+    }
 }

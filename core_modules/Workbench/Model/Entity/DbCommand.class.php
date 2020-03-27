@@ -250,7 +250,11 @@ class DbCommand extends Command {
                     $column
                 );
                 if (trim($fromColumn) == 'NULL' || trim($toColumn) == 'NULL') {
-                    $this->interface->show('Column not found! (Specify table without DBPREFIX and fields as "foobar" instead of "fooBar" or "foo_bar")');
+                    $this->interface->show(
+                        'Column not found! Specify table without DBPREFIX and ' .
+                        'fields as they are named in the database (example: ' .
+                        '"foo_bar" instead of "fooBar" or "foobar").'
+                    );
                     break;
                 }
                 $this->interface->diff($fromColumn, $toColumn);

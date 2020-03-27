@@ -186,58 +186,85 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         // Parse entries of specific form, category and/or level.   
         // Entries are listed in custom set order
         if ($objTemplate->blockExists('mediadirList')) {
-            // hold information if a specific block has been parsed
-            $foundOne = false;
-
-            // fetch mediadir object data
-            $objMediadirForm = new MediaDirectoryForm(null, $this->getName());
-            $objMediadirCategory = new MediaDirectoryCategory(null, null, 0, $this->getName());
-            $objMediadirLevel = new MediaDirectoryLevel(null, null, 1, $this->getName());
-
-            // put all object data into one array
+            // fetch IDs of forms and categories having published data that
+            // could be parsed
             $objects = array(
-                'form' => array_keys($objMediadirForm->getForms()),
-                'category' => array_keys($objMediadirCategory->arrCategories),
-                'level' => array_keys($objMediadirLevel->arrLevels),
+                'form' => MediaDirectoryForm::getIdsWithPublishedData(),
+                'category' => MediaDirectoryCategory::getIdsWithPublishedData(),
             );
 
-            // check for form specific entry listing
-            foreach ($objects as $objectType => $arrObjectList) {
-                foreach ($arrObjectList as $objectId) {
-                    // the specific block to parse. I.e.:
-                    //    mediadirList_form_3
-                    //    mediadirList_category_4
-                    //    mediadirList_level_5
-                    $block = 'mediadirList_'.$objectType.'_'.$objectId;
-                    if ($objTemplate->blockExists($block)) {
-                        $categoryId = null;
-                        $levelId = null;
-                        $requestParams = $this->cx->getRequest()->getUrl()->getParamArray();
-                        $categoryId = 0;
-                        if (isset($requestParams['cid'])) {
-                            $categoryId = intval($requestParams['cid']);
-                        }
-                        $levelId = 0;
-                        if (isset($requestParams['lid'])) {
-                            $levelId = intval($requestParams['lid']);
-                        }
-                        $config = MediaDirectoryLibrary::fetchMediaDirListConfigFromTemplate(
-                            $block,
-                            $objTemplate,
-                            null,
-                            $categoryId,
-                            $levelId
-                        );
-                        $config['filter'][$objectType] = $objectId;
-                        $objMediadir->parseEntries($objTemplate, $block, $config);
-                        $foundOne = true;
-                    }
-                }
+            // fetch level data only in case the use of levels has been
+            // activated
+            if ($objMediadir->arrSettings['settingsShowLevels']) {
+                $objects['level'] =
+                    MediaDirectoryLevel::getIdsWithPublishedData();
             }
 
-            // fallback, no specific block has been parsed
+            // get blocks to filter by form/category/level
+            $blocks = $objTemplate->getBlockList('mediadirList');
+            $filterRegex = '/^mediadirList_(form|category|level)_([0-9]+)$/';
+            $filterBlocks = preg_grep(
+                $filterRegex,
+                $blocks
+            );
+
+            // the specific block to parse. I.e.:
+            //    mediadirList_form_3
+            //    mediadirList_category_4
+            //    mediadirList_level_5
+            foreach ($filterBlocks as $block) {
+                // extract filter type (form/category/level) and associated ID
+                // out of the template-block
+                if (!preg_match($filterRegex, $block, $filterConfig)) {
+                    continue;
+                }
+                $objectType = $filterConfig[1];
+                $objectId = $filterConfig[2];
+
+                // verify that the set filter matches any published data that
+                // can be listed
+                if (
+                    !isset($objects[$objectType]) ||
+                    !in_array($objectId, $objects[$objectType])
+                ) {
+                    // hide invalid blocks (-> non-published levels, categories
+                    // or forms)
+                    $objTemplate->hideBlock($block);
+                    continue;
+                }
+
+                // extend filter by additional config from url arguments
+                $requestParams = $this->cx->getRequest()->getUrl()->getParamArray();
+                $categoryId = 0;
+                if (isset($requestParams['cid'])) {
+                    $categoryId = intval($requestParams['cid']);
+                }
+                $levelId = 0;
+                if (isset($requestParams['lid'])) {
+                    $levelId = intval($requestParams['lid']);
+                }
+
+                // extend filter by additional config from functional
+                // placeholders from filter block
+                $config = MediaDirectoryLibrary::fetchMediaDirListConfigFromTemplate(
+                    $block,
+                    $objTemplate,
+                    null,
+                    $categoryId,
+                    $levelId
+                );
+
+                // ensure filter from filter-block has highest precedence
+                $config['filter'][$objectType] = $objectId;
+
+                // finally, fill the specific filter block with its published
+                // entries
+                $objMediadir->parseEntries($objTemplate, $block, $config);
+            }
+
+            // fallback, no specific filter block was found in the template
             // -> parse all entries now (use template block mediadirList)
-            if(!$foundOne) {
+            if(!$filterBlocks) {
                 $objMediadir->parseEntries($objTemplate);
             }
         }

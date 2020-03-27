@@ -925,6 +925,15 @@ class Yellowpay
             '</option>';
     }
 
+    static function getAuthorizationOptions()
+    {
+        global $_ARRAYLANG;
+
+        return array(
+            'SAL' => $_ARRAYLANG['TXT_SHOP_YELLOWPAY_REQUEST_FOR_SALE'],
+            'RES' => $_ARRAYLANG['TXT_SHOP_YELLOWPAY_REQUEST_FOR_AUTHORIZATION']
+        );
+    }
 
     /**
      * Handles errors ocurring in this class
