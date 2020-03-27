@@ -1001,7 +1001,7 @@ class FormGenerator {
                 $wrapper = new \Cx\Core\Html\Model\Entity\HtmlElement('div');
                 $wysiwyg = new \Cx\Core\Wysiwyg\Wysiwyg(
                     $title,
-                    $value,
+                    contrexx_raw2xhtml($value),
                     $options['mode']
                 );
                 $wrapper->addChild($wysiwyg);
