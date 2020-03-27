@@ -1008,7 +1008,7 @@ class FormGenerator {
                 }
 
                 return $wrapper;
-
+                break;
             case 'sourcecode':
                 //set mode
                 $mode = 'html';
