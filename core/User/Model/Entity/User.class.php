@@ -975,7 +975,7 @@ class User extends \Cx\Model\Base\EntityBase {
     {
         $this->groups->removeElement($group);
     }
-
+   
     /**
      * Get group
      *
