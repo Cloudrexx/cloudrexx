@@ -44,7 +44,7 @@ namespace Cx\Core\User\Model\Entity;
  * @subpackage  core_user
  *
  * @OA\Schema(
- *     description="In this model we can set the name for the attribues. Those names can be set for every desired language that will get to be used for the website.",
+ *     description="In this model we can set the name for the attributes per frontend Locale.",
  *     title="UserAttributeName model",
  * )
  */
@@ -68,7 +68,7 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="The default Frontend locales ID. This default can be set in the administraton of the website",
+     *     description="The default locale ID. This default can be set in the administraton of the website",
      *     title="Language",
      *     default="0",
      * )
@@ -102,7 +102,7 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="Lists the user attribute object. If the request intends to write we need to pass the ID, if  the request is to read we get the user attribute object of the given ID. For example the ID /1.",
+     *     description="Lists the user attribute objects. If the request intends to write we need to pass the ID, if  the request is to read we get the user attribute object of the given ID. For example the ID   1.",
      *     title="User attributes",
      *     type="object",
      *     additionalProperties={

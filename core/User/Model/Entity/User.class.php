@@ -199,14 +199,13 @@ class UserValidateUsername extends \CxValidate
 /**
  * Users can be created and managed.
  *
- *
  * @copyright   CLOUDREXX CMS - Cloudrexx AG Thun
  * @author      Dario Graf <info@cloudrexx.com>
  * @package     cloudrexx
  * @subpackage  core_user
  *
  * @OA\Schema(
- *     description="In the User model a new user can be created. Information about the last login and  groups are displayed as well as access information.",
+ *     description="The user model consists of information about a user. Information about the last login and groups are displayed as well as access information.",
  *     title="User model",
  *     required={"email",},
  * )
@@ -247,7 +246,7 @@ class User extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="The password needs to have 6 characters. The website administrator can decide whether he wants the password to be complex. If password complexety is on, a password needs at least 6 characters as well as contain at least one upper and one lower case character and one number.",
+     *     description="The password needs to have 6 characters. The website administrator can decide whether he wants the password to be complex. If password complexety is on, a password needs to contain at least one upper and one lower case character and one number.",
      *     title="Password",
      *     maximum=255,
      * )
@@ -269,7 +268,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="Timestamp of user registration. This can be left out, it will create the timestamp automatically.",
+     *     description="Timestamp of user registration. This should be left out, the timestamp will be created automatically.",
      *     title="Register date",
      * )
      *
@@ -306,8 +305,9 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="When a user failed to login this status will go to 0 and at the next login a captcha will be necessary to login succesfully.",
+     *     description="When a user failed to login this status will change to 0 and at the next login a captcha will be necessary to login succesfully. When the login is succesfully the value will change to 1",
      *     title="Last authentication status",
+     *     default = 0,
      * )
      *
      * @var integer

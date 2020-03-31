@@ -44,7 +44,7 @@ namespace Cx\Core\User\Model\Entity;
  * @subpackage  core_user
  *
  * @OA\Schema(
- *     description="A userAttribute is a description of a user. There are different types of attributes that are default information about a user, if desired more attributes can be added.",
+ *     description="A UserAttribute is a property of a user. More atttributes can be added, to expand a user profile.",
  *     title="UserAttribute model",
  * )
  */
@@ -62,7 +62,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="Define the type of the attribute. There are following choices: Text for one line and textarea for a multiline textbox. Mail for a email address. Uri to link a website. Date for having a datepicker. Image to get a upload choice. Checkbox to mark the attribute as checkbox. Menu for a dropdown-menu. Menu_option to specify a attributes for the menu. Frame. History to setup the possibility for the history.",
+     *     description="Define the type of the attribute. There are following choices: Text for one line and textarea for a multiline textbox. Mail for a email address. Uri to link a website. Date for having a datepicker. Image to get a upload choice. Checkbox to mark the attribute as checkbox. Menu for a dropdown-menu. Menu_option to specify a attributes for the menu. History to setup the possibility for the history.",
      *     title="User attribute Type",
      *     enum={
      *          "text",
@@ -122,7 +122,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="Set a special privilege for users that do not have editing rights from assigned group. `Menu_select_higher: Only entries above the currently selected in the list may be chosen.` __Menu_select_lower: Only entries below the currently selected in the list may be chosen.__ [Link](http://a.com).",
+     *     description="Set a special privilege for users that do not have editing rights from assigned group. Menu_select_higher: Only entries above the currently selected in the list may be chosen. Menu_select_lower: Only entries below the currently selected in the list may be chosen. [Documentation](https://wiki.cloudrexx.com/Development_Permissions).",
      *     title="User attribute, special access",
      *     enum={"menu_select_higher", "menu_select_lower"},
      * )
@@ -134,7 +134,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="Permissions are handled using access IDs. There are two types: Static (restrict the access to functions and sections - mostly backend) and dynamic (restrict the access to content data - content pages, categories, documents, etc.).[Dokumentation](https://wiki.cloudrexx.com/Development_Permissions).",
+     *     description="Permissions are handled using access IDs. There are two types: Static (restrict the access to functions and sections - mostly backend) and dynamic (restrict the access to content data - content pages, categories, documents, etc.). [Documentation](https://wiki.cloudrexx.com/Development_Permissions).",
      *     title="Access ID",
      * )
      *
@@ -155,7 +155,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="Lists the user attribute object of the parent, every attribute that has a parent is a menu option. If the request intends to write we need to pass the ID, if  the request is to read we get the user attribute of the given ID. For example the ID /1.",
+     *     description="Lists the user attribute object of the parent, every attribute that has a parent is a menu option. If the request intends to write we need to pass the ID, if  the request is to read we get the user attribute of the given ID. For example the ID 1.",
      *     title="Parent",
      *     type="object",
      *     additionalProperties={
@@ -169,7 +169,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="List of all attributes with the associated name and language. Every attribute can have more than one language it is translated in. If the request intends to write we need to pass the ID, if  the request is to read we get the attribute name of the given ID. For example the ID /1.",
+     *     description="List of all attributes with the associated name and language. Every attribute can have more than one language it is translated in. If the request intends to write we need to pass the ID, if  the request is to read we get the attribute name of the given ID. For example the ID 1.",
      *     title="User attribute name",
      *     type="object",
      *     additionalProperties={
@@ -183,7 +183,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="List of all attributes that are assigned to the user. We have a key that's a serialized id from fields of the primary key in the corresponding order: <attributeId>/<userId>/<historyId> Example: 1/1/0.",
+     *     description="List of all attributes that are assigned to the user. We have a key that's a serialized id from fields of the primary key in the corresponding order: <attributeId>/<userId>/<historyId> Example: 1/1/0. For writing requests we need to pass the serialized key in the order as before, if we want to read we use the serialized key with the desired ID's like the example given.",
      *     title="User attribute value",
      *     type="object",
      *     additionalProperties={
@@ -197,7 +197,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="List of the child attributes of the fields with menu options. If the request intends to write we need to pass the ID, if  the request is to read we get the attribute names of children with the respective attribute ID. For example the ID /1.",
+     *     description="List of the child attributes of the fields with menu options. If the request intends to write we need to pass the ID, if  the request is to read we get the attribute names of children with the respective attribute ID. For example the ID 1.",
      *     title="Children",
      *     type="object",
      *     additionalProperties={
@@ -210,12 +210,6 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     protected $children;
 
     /**
-     * @OA\Property(
-     *     format="boolean",
-     *     description="If set to true, the attribute is a default of Cloudrexx, if set to false it is a custom set attribute",
-     *     title="Default",
-     * )
-     *
      * @var boolean
      */
     protected $default;

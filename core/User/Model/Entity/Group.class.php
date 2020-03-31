@@ -117,7 +117,7 @@ class Group extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="Depending of read and write access we have two different outcomes. To write we use a ID, for example 1. If the request is to read, the result consists of the user object of the given ID, for example ID, Name etc.",
+     *     description="Depending of read and write access we have two different outcomes. To write we use a ID, for example 1. If the request is to read, the result consists of the group object of the given ID.",
      *     title="Users",
      *     type="object",
      *     additionalProperties={
