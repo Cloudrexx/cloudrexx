@@ -841,6 +841,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      * @return void
      */
     public function apiV1($command, $arguments, $dataArguments) {
+        \Cx\Core\Csrf\Controller\Csrf::header('Access-Control-Allow-Origin: *');
         $method = $this->cx->getRequest()->getHttpRequestMethod();
         
         // handle CLI
