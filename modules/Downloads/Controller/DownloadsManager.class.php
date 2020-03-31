@@ -207,6 +207,12 @@ class DownloadsManager extends DownloadsLibrary
                     $this->parseDownloadNavigation();
                 }
                 break;
+            case 'categories_delete_download':
+                $this->deleteDownload();
+                $this->loadCategoryNavigation();
+                $this->categories();
+                $this->parseCategoryNavigation();
+                break;
             case 'unlink_download':
                 $this->unlinkDownloadFromCategory();
                 $this->loadCategoryNavigation();
@@ -2735,7 +2741,7 @@ class DownloadsManager extends DownloadsLibrary
                     'DOWNLOADS_DOWNLOAD_NAME_JS'            => htmlspecialchars($objDownload->getName(), ENT_QUOTES, CONTREXX_CHARSET),
                 ));
 
-                // parse delete icon
+                // parse unlink icon
                 $this->objTemplate->parse('downloads_download_function_unlink_link');
                 $this->objTemplate->hideBlock('downloads_download_function_no_unlink_link');
             } else {
@@ -2744,6 +2750,42 @@ class DownloadsManager extends DownloadsLibrary
                 $this->objTemplate->hideBlock('downloads_download_function_unlink_link');
             }
 
+            // parse delete button
+            if (// managers are allowed to delete the download
+                \Permission::checkAccess(143, 'static', true)
+                // the owner has the permission to delete it by himself
+                || ($objDownload->getOwnerId() == $objFWUser->objUser->getId())
+            ) {
+                $this->objTemplate->setVariable(
+                    array(
+                        'TXT_DOWNLOADS_DELETE'  => $_ARRAYLANG['TXT_DOWNLOADS_DELETE'],
+                        'DOWNLOADS_DOWNLOAD_NAME_JS_DELETE' => htmlspecialchars(
+                            $objDownload->getName(),
+                            ENT_QUOTES,
+                            CONTREXX_CHARSET
+                        ),
+                    )
+                );
+                \ContrexxJavascript::getInstance()->setVariable(
+                    'DOWNLOADS_CONFIRM_DELETE_DOWNLOAD_TXT',
+                    preg_replace(
+                        '#\n#',
+                        '\\n',
+                        addslashes(
+                            $_ARRAYLANG['TXT_DOWNLOADS_CONFIRM_DELETE_DOWNLOAD']
+                        )
+                    ),
+                    'downloads'
+                );
+
+                // parse delete icon
+                $this->objTemplate->parse('downloads_download_function_delete_link');
+                $this->objTemplate->hideBlock('downloads_download_function_no_delete_link');
+            } else {
+                // parse delete icon
+                $this->objTemplate->hideBlock('downloads_download_function_delete_link');
+                $this->objTemplate->touchBlock('downloads_download_function_no_delete_link');
+            }
 
             $description = $objDownload->getDescription();
             if (strlen($description) > 100) {
