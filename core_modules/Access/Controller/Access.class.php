@@ -462,25 +462,36 @@ class Access extends \Cx\Core_Modules\Access\Controller\AccessLib
         }
     }
 
-    private function settings()
+    /**
+     * Show the setting view of an user
+     *
+     * If no user is set, we use the currently logged in user as default
+     *
+     * @param \User $user the user to show
+     */
+    public function settings($user=null)
     {
         global $_CONFIG, $_ARRAYLANG;
 
-        $objFWUser = \FWUser::getFWUserObject();
-        if (!$objFWUser->objUser->login()) {
-            \Cx\Core\Csrf\Controller\Csrf::header('Location: '.CONTREXX_DIRECTORY_INDEX.'?section=Login&redirect='.base64_encode(ASCMS_PROTOCOL.'://'.$_CONFIG['domainUrl'].CONTREXX_SCRIPT_PATH.'?section=Access&cmd='.rawurlencode($_REQUEST['cmd'])));
-            exit;
+        if (is_null($user)) {
+            $objFWUser = \FWUser::getFWUserObject();
+            $user = $objFWUser->objUser;
+            if (!$user->login()) {
+                \Cx\Core\Csrf\Controller\Csrf::header('Location: '.CONTREXX_DIRECTORY_INDEX.'?section=Login&redirect='.base64_encode(ASCMS_PROTOCOL.'://'.$_CONFIG['domainUrl'].CONTREXX_SCRIPT_PATH.'?section=Access&cmd='.rawurlencode($_REQUEST['cmd'])));
+                exit;
+            }
         }
+
         $settingsDone = false;
-        $objFWUser->objUser->loadNetworks();
+        $user->loadNetworks();
 
         $act = isset($_GET['act']) ? $_GET['act'] : '';
         if (isset($_POST['access_delete_account'])) {
             // delete account
             \Cx\Core\Csrf\Controller\Csrf::check_code();
-            if ($objFWUser->objUser->checkPassword(isset($_POST['access_user_password']) ? $_POST['access_user_password'] : null)) {
-                if ($objFWUser->objUser->isAllowedToDeleteAccount()) {
-                    if ($objFWUser->objUser->delete(true)) {
+            if ($user->checkPassword(isset($_POST['access_user_password']) ? $_POST['access_user_password'] : null)) {
+                if ($user->isAllowedToDeleteAccount()) {
+                    if ($user->delete(true)) {
                         $this->_objTpl->setVariable('ACCESS_SETTINGS_MESSAGE', $_ARRAYLANG['TXT_ACCESS_YOUR_ACCOUNT_SUCCSESSFULLY_DELETED']);
                         if ($this->_objTpl->blockExists('access_settings')) {
                             $this->_objTpl->hideBlock('access_settings');
@@ -490,7 +501,7 @@ class Access extends \Cx\Core_Modules\Access\Controller\AccessLib
                         }
                         return;
                     } else {
-                        $this->_objTpl->setVariable('ACCESS_SETTINGS_MESSAGE', implode('<br />', $objFWUser->objUser->getErrorMsg()));
+                        $this->_objTpl->setVariable('ACCESS_SETTINGS_MESSAGE', implode('<br />', $user->getErrorMsg()));
                     }
                 } else {
                     $this->_objTpl->setVariable('ACCESS_SETTINGS_MESSAGE', $_ARRAYLANG['TXT_ACCESS_NOT_ALLOWED_TO_DELETE_ACCOUNT']);
@@ -501,10 +512,10 @@ class Access extends \Cx\Core_Modules\Access\Controller\AccessLib
         } elseif (isset($_POST['access_change_password'])) {
             // change password
             \Cx\Core\Csrf\Controller\Csrf::check_code();
-            if (!empty($_POST['access_user_current_password']) && $objFWUser->objUser->checkPassword(trim(contrexx_stripslashes($_POST['access_user_current_password'])))) {
+            if (!empty($_POST['access_user_current_password']) && $user->checkPassword(trim(contrexx_stripslashes($_POST['access_user_current_password'])))) {
                 $this->_objTpl->setVariable(
                     'ACCESS_SETTINGS_MESSAGE',
-                    ($objFWUser->objUser->setPassword(
+                    ($user->setPassword(
                         isset($_POST['access_user_password']) ?
                             trim(contrexx_stripslashes($_POST['access_user_password']))
                             : '',
@@ -512,9 +523,9 @@ class Access extends \Cx\Core_Modules\Access\Controller\AccessLib
                             trim(contrexx_stripslashes($_POST['access_user_password_confirmed']))
                             : '',
                         true
-                    ) && $objFWUser->objUser->store()) ?
+                    ) && $user->store()) ?
                         $_ARRAYLANG['TXT_ACCESS_PASSWORD_CHANGED_SUCCESSFULLY'].(($settingsDone = true) && false)
-                        : implode('<br />', $objFWUser->objUser->getErrorMsg())
+                        : implode('<br />', $user->getErrorMsg())
                 );
             } else {
                 $this->_objTpl->setVariable('ACCESS_SETTINGS_MESSAGE', $_ARRAYLANG['TXT_ACCESS_INVALID_EXISTING_PASSWORD']);
@@ -524,17 +535,17 @@ class Access extends \Cx\Core_Modules\Access\Controller\AccessLib
             \Cx\Core\Csrf\Controller\Csrf::check_code();
             $status = true;
 
-            isset($_POST['access_user_username']) ? $objFWUser->objUser->setUsername(trim(contrexx_stripslashes($_POST['access_user_username']))) : null;
-            $objFWUser->objUser->setEmail(isset($_POST['access_user_email']) ? trim(contrexx_stripslashes($_POST['access_user_email'])) : $objFWUser->objUser->getEmail());
+            isset($_POST['access_user_username']) ? $user->setUsername(trim(contrexx_stripslashes($_POST['access_user_username']))) : null;
+            $user->setEmail(isset($_POST['access_user_email']) ? trim(contrexx_stripslashes($_POST['access_user_email'])) : $user->getEmail());
 
-            $currentLangId = $objFWUser->objUser->getFrontendLanguage();
-            $objFWUser->objUser->setFrontendLanguage(isset($_POST['access_user_frontend_language']) ? intval($_POST['access_user_frontend_language']) : $objFWUser->objUser->getFrontendLanguage());
-            $objFWUser->objUser->setEmailAccess(isset($_POST['access_user_email_access']) && $objFWUser->objUser->isAllowedToChangeEmailAccess() ? contrexx_stripslashes($_POST['access_user_email_access']) : $objFWUser->objUser->getEmailAccess());
-            $objFWUser->objUser->setProfileAccess(isset($_POST['access_user_profile_access']) && $objFWUser->objUser->isAllowedToChangeProfileAccess() ? contrexx_stripslashes($_POST['access_user_profile_access']) : $objFWUser->objUser->getProfileAccess());
+            $currentLangId = $user->getFrontendLanguage();
+            $user->setFrontendLanguage(isset($_POST['access_user_frontend_language']) ? intval($_POST['access_user_frontend_language']) : $user->getFrontendLanguage());
+            $user->setEmailAccess(isset($_POST['access_user_email_access']) && $user->isAllowedToChangeEmailAccess() ? contrexx_stripslashes($_POST['access_user_email_access']) : $user->getEmailAccess());
+            $user->setProfileAccess(isset($_POST['access_user_profile_access']) && $user->isAllowedToChangeProfileAccess() ? contrexx_stripslashes($_POST['access_user_profile_access']) : $user->getProfileAccess());
 
             if (isset($_POST['access_profile_attribute']) && is_array($_POST['access_profile_attribute'])) {
                 // fetch current profile data
-                $arrOriginalProfileData = $this->fetchProfileDataOfUser($objFWUser->objUser);
+                $arrOriginalProfileData = $this->fetchProfileDataOfUser($user);
 
                 // profile modifications to be stored
                 $arrProfile = $_POST['access_profile_attribute'];
@@ -542,15 +553,15 @@ class Access extends \Cx\Core_Modules\Access\Controller\AccessLib
                 if (   !empty($_POST['access_image_uploader_id'])
                     && isset($_POST['access_profile_attribute_images'])
                     && is_array($_POST['access_profile_attribute_images'])
-                    && ($result = $this->addUploadedImagesToProfile($objFWUser->objUser, $arrProfile, $_POST['access_profile_attribute_images'], $_POST['access_image_uploader_id'])) !== true
+                    && ($result = $this->addUploadedImagesToProfile($user, $arrProfile, $_POST['access_profile_attribute_images'], $_POST['access_image_uploader_id'])) !== true
                 ) {
                     $status = false;
                 }
 
-                $objFWUser->objUser->setProfile($arrProfile);
+                $user->setProfile($arrProfile);
             }
 
-            $objFWUser->objUser->setSubscribedNewsletterListIDs(isset($_POST['access_user_newsletters']) && is_array($_POST['access_user_newsletters']) ? $_POST['access_user_newsletters'] : array());
+            $user->setSubscribedNewsletterListIDs(isset($_POST['access_user_newsletters']) && is_array($_POST['access_user_newsletters']) ? $_POST['access_user_newsletters'] : array());
 
             if ($status) {
                 $arrSettings = \User_Setting::getSettings();
@@ -560,12 +571,12 @@ class Access extends \Cx\Core_Modules\Access\Controller\AccessLib
                     // this is a setting which you can set in the user management backend
                     (
                         !$arrSettings['user_account_verification']['value']
-                        || $objFWUser->objUser->checkMandatoryCompliance()
+                        || $user->checkMandatoryCompliance()
                     )
-                    && $objFWUser->objUser->store()
+                    && $user->store()
                 ) {
                     // fetch new profile data
-                    $arrNewProfileData = $this->fetchProfileDataOfUser($objFWUser->objUser);
+                    $arrNewProfileData = $this->fetchProfileDataOfUser($user);
 
                     // identify changed attributes
                     $profileDiff = array();
@@ -578,20 +589,20 @@ class Access extends \Cx\Core_Modules\Access\Controller\AccessLib
                     }
 
                     // send notification mail regarding modified user profile
-                    $this->sendProfileChangeNotificationMail($objFWUser->objUser, $profileDiff, $arrOriginalProfileData, $arrNewProfileData);
+                    $this->sendProfileChangeNotificationMail($user, $profileDiff, $arrOriginalProfileData, $arrNewProfileData);
 
                     $msg = $_ARRAYLANG['TXT_ACCESS_USER_ACCOUNT_STORED_SUCCESSFULLY'];
                     $settingsDone = true;
-                    $this->setLanguageCookie($currentLangId, $objFWUser->objUser->getFrontendLanguage());
+                    $this->setLanguageCookie($currentLangId, $user->getFrontendLanguage());
                 } else {
-                    $msg = implode('<br />', $objFWUser->objUser->getErrorMsg());
+                    $msg = implode('<br />', $user->getErrorMsg());
                 }
             } else {
                 $msg = implode('<br />', $result);
             }
             $this->_objTpl->setVariable('ACCESS_SETTINGS_MESSAGE', $msg);
         } elseif ($act == 'disconnect') {
-            $objFWUser->objUser->getNetworks()->deleteNetwork($_GET['provider']);
+            $user->getNetworks()->deleteNetwork($_GET['provider']);
             $currentUrl = clone \Env::get('Resolver')->getUrl();
             $currentUrl->setParams(array(
                 'act' => null,
@@ -603,27 +614,27 @@ class Access extends \Cx\Core_Modules\Access\Controller\AccessLib
 
         $uploader = $this->getImageUploader();
 
-        $this->parseAccountAttributes($objFWUser->objUser, true);
-        $this->parseNewsletterLists($objFWUser->objUser);
+        $this->parseAccountAttributes($user, true);
+        $this->parseNewsletterLists($user);
 
-        $objFWUser->objUser->objAttribute->first();
-        while (!$objFWUser->objUser->objAttribute->EOF) {
-            $objAttribute = $objFWUser->objUser->objAttribute->getById($objFWUser->objUser->objAttribute->getId());
+        $user->objAttribute->first();
+        while (!$user->objAttribute->EOF) {
+            $objAttribute = $user->objAttribute->getById($user->objAttribute->getId());
 
             if (   !$objAttribute->isProtected()
                 || (\Permission::checkAccess($objAttribute->getAccessId(), 'dynamic', true)
                     || $objAttribute->checkModifyPermission())
             ) {
-                $this->parseAttribute($objFWUser->objUser, $objAttribute->getId(), 0, true);
+                $this->parseAttribute($user, $objAttribute->getId(), 0, true);
             }
 
-            $objFWUser->objUser->objAttribute->next();
+            $user->objAttribute->next();
         }
 
         $this->attachJavaScriptFunction('accessSetWebsite');
 
         $this->_objTpl->setGlobalVariable(array(
-            'ACCESS_USER_ID'  => $objFWUser->objUser->getId(),
+            'ACCESS_USER_ID'  => $user->getId(),
         ));
 
         $this->_objTpl->setVariable(array(
@@ -639,7 +650,7 @@ class Access extends \Cx\Core_Modules\Access\Controller\AccessLib
         $arrSettings = \User_Setting::getSettings();
 
         if (function_exists('curl_init') && $arrSettings['sociallogin']['status']) {
-            $this->parseNetworks($objFWUser->objUser);
+            $this->parseNetworks($user);
         }
 
         if ($this->_objTpl->blockExists('access_user_networks')) {
