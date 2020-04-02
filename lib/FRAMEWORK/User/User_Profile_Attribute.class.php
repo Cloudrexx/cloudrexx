@@ -671,11 +671,7 @@ class User_Profile_Attribute
     function generateAttributeRelations()
     {
         foreach ($this->arrAttributes as $attribute => $arrAttribute) {
-            if (!empty($arrAttribute['parent_id'])) {
-                $this->arrAttributeRelations[$arrAttribute['parent_id']][] = $attribute;
-            } else {
-                $this->arrAttributeRelations[$arrAttribute['parent_id']][] = $attribute;
-            }
+            $this->arrAttributeRelations[$arrAttribute['parent_id']][] = $attribute;
         }
     }
 
@@ -736,7 +732,7 @@ class User_Profile_Attribute
                 SELECT SUM(1) as entryCount
                 FROM `".DBPREFIX."access_user_attribute` AS a
                 INNER JOIN `".DBPREFIX."access_user_attribute_value` AS v ON v.`attribute_id` = a.`id`
-                WHERE a.`type` = 'image' AND v.`value` != ''" . ($profilePics ? ' AND `a`.`id` = ' . $picId : '');
+                WHERE a.`type` = 'image' AND v.`value` != '' AND `a`.`id` ".($profilePics ? "= " : "!= ") . $picId;
 
         $objCount = $objDatabase->Execute($query);
         if (!$objCount || !$objCount->fields['entryCount']) {
@@ -750,7 +746,7 @@ class User_Profile_Attribute
                 FROM `".DBPREFIX."access_user_attribute` AS a
                 INNER JOIN `".DBPREFIX."access_user_attribute_value` AS v 
                     ON v.`attribute_id` = a.`id`
-                WHERE a.`type` = 'image' AND v.`value` != ''" . ($profilePics ? ' AND `a`.`id` = ' . $picId : '');
+                WHERE a.`type` = 'image' AND v.`value` != '' AND `a`.`id` ".($profilePics ? "= " : "!= ") . $picId;
 
         $objImage = $objDatabase->SelectLimit($query, $limit, $offset);
         if ($objImage === false) {
@@ -1044,18 +1040,6 @@ class User_Profile_Attribute
     }
 
 
-    function storeCoreAttribute()
-    {
-        global $objDatabase;
-
-        if (($objDatabase->Execute("UPDATE `".DBPREFIX."access_user_attribute` SET `sort_type` = '".$this->sort_type."', `order_id` = ".$this->order_id.", `mandatory` = '".$this->mandatory."' WHERE `id` = (SELECT `attribute_id` FROM `contrexx_access_user_attribute_name` WHERE `name` = '".$this->id."')") !== false) ||
-        ($objDatabase->Execute("INSERT INTO `".DBPREFIX."access_user_attribute` (`id`, `sort_type`, `order_id`, `mandatory`) VALUES ((SELECT `attribute_id` FROM `contrexx_access_user_attribute_name` WHERE `name` = '".$this->id."'), '".$this->sort_type."', ".$this->order_id.", '".$this->mandatory."')") !== false)) {
-            return true;
-        }
-        return false;
-    }
-
-
     function storeChildrenOrder()
     {
         global $objDatabase;
@@ -1135,9 +1119,6 @@ class User_Profile_Attribute
         $objDatabase = \Cx\Core\Core\Controller\Cx::instanciate()->getDb()->getAdoDb();
         $tableName = 'access_user_attribute';
         $where = $this->id;
-        if ($this->isDefaultAttribute($this->id)) {
-            $where = '(SELECT `attribute_id` FROM `contrexx_access_user_attribute_name` WHERE `name` = "'. $this->id .'")';
-        }
 
         if (!$protected) {
             // remove protection
