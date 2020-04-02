@@ -671,11 +671,7 @@ class User_Profile_Attribute
     function generateAttributeRelations()
     {
         foreach ($this->arrAttributes as $attribute => $arrAttribute) {
-            if (!empty($arrAttribute['parent_id'])) {
-                $this->arrAttributeRelations[$arrAttribute['parent_id']][] = $attribute;
-            } else {
-                $this->arrAttributeRelations[$arrAttribute['parent_id']][] = $attribute;
-            }
+            $this->arrAttributeRelations[$arrAttribute['parent_id']][] = $attribute;
         }
     }
 
