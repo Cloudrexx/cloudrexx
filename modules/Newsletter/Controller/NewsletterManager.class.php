@@ -2809,10 +2809,10 @@ class NewsletterManager extends NewsletterLib
         // 1. access users that have subscribed to one of the selected recipient-lists
         // select all access ids
         $accessUserRecipientsQuery = 'SELECT DISTINCT `accessUserID` ' .
-            'FROM `'.DBPREFIX.'module_newsletter_access_user` AS `cnu` ' .
+            'FROM `%1$smodule_newsletter_access_user` AS `cnu` ' .
 
             // join with the selected e-mail campaign lists
-            'INNER JOIN `'.DBPREFIX.'module_newsletter_rel_cat_news` AS `crn`
+            'INNER JOIN `%1$smodule_newsletter_rel_cat_news` AS `crn`
                 ON `cnu`.`newsletterCategoryID`=`crn`.`category` ';
 
 
@@ -2824,12 +2824,12 @@ class NewsletterManager extends NewsletterLib
             // join with CRM Person (contact_type = 2)
             $accessUserRecipientsQuery .=
                 // join with CRM Person (contact_type = 2)
-                'INNER JOIN `'.DBPREFIX.'module_crm_contacts` AS `ccrm_contact`
+                'INNER JOIN `%1$smodule_crm_contacts` AS `ccrm_contact`
                     ON `ccrm_contact`.`user_account` = `cnu`.`accessUserID`
                         AND `ccrm_contact`.`contact_type` = 2 '.
 
                 // join with CRM Company (contact_type = 1)
-                'LEFT JOIN `'.DBPREFIX.'module_crm_contacts` AS `ccrm_company`
+                'LEFT JOIN `%1$smodule_crm_contacts` AS `ccrm_company`
                     ON `ccrm_company`.`id` = `ccrm_contact`.`contact_customer`
                         AND `ccrm_company`.`contact_type` = 1 '.
 
@@ -2837,22 +2837,22 @@ class NewsletterManager extends NewsletterLib
                 (!$crmMembershipFilter['exclude'] ? '' :
                     'AND `ccrm_company`.`id` NOT IN (
                         SELECT `ccrm_company_membership_exclude`.`contact_id`
-                        FROM `'.DBPREFIX.'module_crm_customer_membership` AS `ccrm_company_membership_exclude` 
+                        FROM `%1$smodule_crm_customer_membership` AS `ccrm_company_membership_exclude` 
                         WHERE `ccrm_company_membership_exclude`.`membership_id` IN ('.join(',', $crmMembershipFilter['exclude']).')) ').
 
                 (!$crmMembershipFilter['include'] ? '' :
                     // join the CRM Memberships of the CRM Person
-                    'LEFT JOIN `'.DBPREFIX.'module_crm_customer_membership` AS `ccrm_membership_include`
+                    'LEFT JOIN `%1$smodule_crm_customer_membership` AS `ccrm_membership_include`
                         ON `ccrm_membership_include`.`contact_id` = `ccrm_contact`.`id` '.
 
                     // join the CRM Memberships of the CRM Company
-                    'LEFT JOIN `'.DBPREFIX.'module_crm_customer_membership` AS `ccrm_company_membership_include`
+                    'LEFT JOIN `%1$smodule_crm_customer_membership` AS `ccrm_company_membership_include`
                         ON `ccrm_company_membership_include`.`contact_id` = `ccrm_company`.`id` ') ;
         }
 
         $accessUserRecipientsQuery .=
             // filter by selected e-mail campaign
-            'WHERE `crn`.`newsletter`='.$mailId.
+            'WHERE `crn`.`newsletter`=%2$s ' .
             // only select users of which the associated CRM Person or CRM Company has the selected CRM membership
             (!$crmMembershipFilter['include'] ? '' :
                 'AND (
@@ -2863,8 +2863,13 @@ class NewsletterManager extends NewsletterLib
             (!$crmMembershipFilter['exclude'] ? '' :
                 'AND `ccrm_contact`.`id` NOT IN (
                 SELECT `ccrm_membership_exclude`.`contact_id`
-                  FROM `'.DBPREFIX.'module_crm_customer_membership` AS `ccrm_membership_exclude` 
+                  FROM `%1$smodule_crm_customer_membership` AS `ccrm_membership_exclude` 
                  WHERE `ccrm_membership_exclude`.`membership_id` IN ('.join(',', $crmMembershipFilter['exclude']).'))');
+
+        $accessUserRecipientsQuery = sprintf(
+            $accessUserRecipientsQuery,
+            DBPREFIX, $mailId
+        );
         
         $this->addMailRecipientPart(
             $mailRecipients,
@@ -2877,13 +2882,18 @@ class NewsletterManager extends NewsletterLib
         if (!$crmMembershipFilter['include']) {
             $nativeRecipientsQuery = '
                         SELECT DISTINCT `email`
-                          FROM `'.DBPREFIX.'module_newsletter_user` AS `nu`
-                    INNER JOIN `'.DBPREFIX.'module_newsletter_rel_user_cat` AS `rc`
+                          FROM `%1$smodule_newsletter_user` AS `nu`
+                    INNER JOIN `%1$smodule_newsletter_rel_user_cat` AS `rc`
                             ON `rc`.`user`=`nu`.`id`
-                    INNER JOIN `'.DBPREFIX.'module_newsletter_rel_cat_news` AS `nrn`
+                    INNER JOIN `%1$smodule_newsletter_rel_cat_news` AS `nrn`
                             ON `nrn`.`category`=`rc`.`category`
-                         WHERE `nrn`.`newsletter`='.$mailId.'
+                         WHERE `nrn`.`newsletter`=%2$s
                            AND `nu`.`status` = 1';
+
+            $nativeRecipientsQuery = sprintf(
+                $nativeRecipientsQuery,
+                DBPREFIX, $mailId
+            );
 
             $this->addMailRecipientPart(
                 $mailRecipients,
@@ -2896,10 +2906,10 @@ class NewsletterManager extends NewsletterLib
         // 3. access users of one of the selected user groups
         $userGroupRecipientsQuery =
             'SELECT `userGroup` ' .
-            'FROM `'.DBPREFIX.'module_newsletter_rel_usergroup_newsletter` AS `arn` ' .
+            'FROM `%1$smodule_newsletter_rel_usergroup_newsletter` AS `arn` ' .
 
             // filter by selected e-mail campaign
-            'WHERE `arn`.`newsletter`='.$mailId;
+            'WHERE `arn`.`newsletter`=%2$s ';
 
         $crmQuery = '';
         // optionally, filter users by CRM membership...
@@ -2907,10 +2917,10 @@ class NewsletterManager extends NewsletterLib
             $crmQuery =
                 // join with CRM Person (contact_type = 2)
                 'SELECT `acrm_contact`.`user_account` FROM 
-                  `'.DBPREFIX.'module_crm_contacts` AS `acrm_contact`'.
+                  `%1$smodule_crm_contacts` AS `acrm_contact`'.
 
                 // join with CRM Company (contact_type = 1)
-                'LEFT JOIN `'.DBPREFIX.'module_crm_contacts` AS `acrm_company`
+                'LEFT JOIN `%1$smodule_crm_contacts` AS `acrm_company`
                                         ON `acrm_company`.`id` = `acrm_contact`.`contact_customer`
                                        AND `acrm_company`.`contact_type` = 1 '.
 
@@ -2918,7 +2928,7 @@ class NewsletterManager extends NewsletterLib
                 (!$crmMembershipFilter['exclude'] ? '' :
                     'AND `acrm_company`.`id` NOT IN (
                         SELECT `acrm_company_membership_exclude`.`contact_id`
-                        FROM `'.DBPREFIX.'module_crm_customer_membership` AS `acrm_company_membership_exclude` 
+                        FROM `%1$smodule_crm_customer_membership` AS `acrm_company_membership_exclude` 
                         WHERE `acrm_company_membership_exclude`.`membership_id` IN ('.
                             join(',', $crmMembershipFilter['exclude']).
                         ')
@@ -2927,11 +2937,11 @@ class NewsletterManager extends NewsletterLib
 
                 (!$crmMembershipFilter['include'] ? '' :
                     // join the CRM Memberships of the CRM Person
-                    'LEFT JOIN `'.DBPREFIX.'module_crm_customer_membership` AS `acrm_membership_include`
+                    'LEFT JOIN `%1$smodule_crm_customer_membership` AS `acrm_membership_include`
                         ON `acrm_membership_include`.`contact_id` = `acrm_contact`.`id` '.
 
                     // join the CRM Memberships of the CRM Company
-                    'LEFT JOIN `'.DBPREFIX.'module_crm_customer_membership` AS `acrm_company_membership_include`
+                    'LEFT JOIN `%1$smodule_crm_customer_membership` AS `acrm_company_membership_include`
                         ON `acrm_company_membership_include`.`contact_id` = `acrm_company`.`id` ').
                 'WHERE `acrm_contact`.`contact_type` = 2 ' .
                 // only select users of which the associated CRM Person or CRM Company has the selected CRM membership
@@ -2951,7 +2961,7 @@ class NewsletterManager extends NewsletterLib
                 (!$crmMembershipFilter['exclude'] ? '' :
                     'AND `acrm_contact`.`id` NOT IN (
                         SELECT `acrm_membership_exclude`.`contact_id`
-                        FROM `'.DBPREFIX.'module_crm_customer_membership` AS `acrm_membership_exclude` 
+                        FROM `%1$smodule_crm_customer_membership` AS `acrm_membership_exclude` 
                             WHERE `acrm_membership_exclude`.`membership_id` IN ('.
                                 join(',', $crmMembershipFilter['exclude']).
                             ')
@@ -2961,12 +2971,20 @@ class NewsletterManager extends NewsletterLib
 
         $crmUsers = array();
         if (!empty($crmQuery)) {
-            $crmResult = $objDatabase->Execute($crmQuery);
+            $crmResult = $objDatabase->Execute(sprintf(
+                $crmQuery,
+                DBPREFIX
+            ));
             while ($crmResult && !$crmResult->EOF) {
                 $crmUsers[] = $crmResult->fields['user_account'];
                 $crmResult->MoveNext();
             }
         }
+
+        $userGroupRecipientsQuery = sprintf(
+            $userGroupRecipientsQuery,
+            DBPREFIX, $mailId
+        );
 
         $this->addMailRecipientPart(
             $mailRecipients,
@@ -2983,6 +3001,11 @@ class NewsletterManager extends NewsletterLib
                 INNER JOIN `' . DBPREFIX . 'module_crm_customer_contact_emails` AS `crm` 
                     ON `crm`.`contact_id` = `contact`.`id` ' .
                     $this->getCrmMembershipConditions($crmMembershipFilter);
+
+            $crmMembershipQuery = sprintf(
+                $crmMembershipQuery,
+                DBPREFIX, $mailId
+            );
             
             $this->addMailRecipientPart($mailRecipients, static::USER_TYPE_CRM, $distinctByType, $crmMembershipQuery);
         }
@@ -5873,23 +5896,23 @@ $WhereStatement = array();
 
                 switch ($wrapper) {
                     case 'core':
-                        $wrappedField ='\'\' AS '.$field;
+                        $wrappedField = sprintf('\'\' AS `%1$s`', $field);
                         break;
 
                     case 'field':
-                        $wrappedField = '`'.$fieldName.'` AS `'.$field.'`';
+                        $wrappedField = sprintf('`%1$s` AS `%2$s`', $fieldName, $field);
                         break;
 
                     case 'data':
-                        $wrappedField = '\''.$fieldName.'\' AS `'.$field.'`';
+                        $wrappedField = sprintf('\'%1$s\' AS `%2$s`', $fieldName, $field);
                         break;
 
                     case 'operation':
-                        $wrappedField = $fieldName.' AS `'.$field.'`';
+                        $wrappedField = sprintf('%1$s AS `%2$s`', $fieldName, $field);
                         break;
 
                     default:
-                        $wrappedField = '`'.$field.'`';
+                        $wrappedField = sprintf('`%1$s`', $field);
                         break;
                 }
 
@@ -5926,16 +5949,13 @@ $WhereStatement = array();
             );
         }
 
-        $query = '
+        $query   = sprintf('
             (
                 SELECT SQL_CALC_FOUND_ROWS
-                '.implode(',', $arrRecipientFields['newsletter']).',
+                %2$s,
                 0 AS isAccess
-                FROM `'.DBPREFIX.'module_newsletter_user` AS `nu`
-                '.(
-                    !empty($newsletterListId) ?
-                        'INNER JOIN `'.DBPREFIX.'module_newsletter_rel_user_cat` AS `rc` ON `rc`.`user`=`nu`.`id`' : ''
-                ).'
+                FROM `%1$smodule_newsletter_user` AS `nu`
+                %3$s
                 WHERE 1
                 AND (
                     nu.source != "opt-in"
@@ -5944,22 +5964,48 @@ $WhereStatement = array();
                         AND nu.consent IS NOT NULL
                     )
                 )
-                '. (
-                    !empty($newsletterListId) ? 'AND `rc`.`category`='. intval($newsletterListId) : ''
-                ) . ' ' . (
-                    !empty($where) ? 'AND (' . implode('OR ', $whereStatement). ') '  : ''
-                ) . ' ' . ($status === null ? '' : 'AND `nu`.`status` = '.$status) . '
+                %4$s
+                %5$s
+                %8$s
             )
             UNION DISTINCT
             (
                 SELECT
-                '.implode(',', $arrRecipientFields['access']).',
+                %6$s,
                 1 AS isAccess
-                FROM `'.DBPREFIX.'module_newsletter_access_user` AS `cnu`
+                FROM `%1$smodule_newsletter_access_user` AS `cnu`
                 WHERE 1
-                '.(
-                    !empty($newsletterListId) ? 'AND `cnu`.`newsletterCategoryID`='.intval($newsletterListId) : '').'
-            )';
+                %7$s
+            )',
+
+            // %1$s
+            DBPREFIX,
+
+            // %2$s
+            implode(',', $arrRecipientFields['newsletter']),
+
+            // %3$s
+            ( !empty($newsletterListId)
+                ?  'INNER JOIN `'.DBPREFIX.'module_newsletter_rel_user_cat` AS `rc` ON `rc`.`user`=`nu`.`id`' : ''),
+
+            // %4$s
+            ( !empty($newsletterListId)
+                ? sprintf('AND `rc`.`category`=%s', intval($newsletterListId)) : ''),
+
+            // %5$s
+            (!empty($where) ? 'AND (' . implode('OR ', $whereStatement). ') '  : ''),
+
+            // %6$s
+            implode(',', $arrRecipientFields['access']),
+
+            // %7$s
+            (!empty($newsletterListId)
+                ? sprintf('AND `cnu`.`newsletterCategoryID`=%s', intval($newsletterListId)) : ''),
+
+            // %8$s
+            ($status === null ? '' : 'AND `nu`.`status` = '.$status)
+
+        );
 
         $data = $objDatabase->Execute($query);
 
