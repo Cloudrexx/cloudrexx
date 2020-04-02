@@ -3001,11 +3001,6 @@ class NewsletterManager extends NewsletterLib
                 INNER JOIN `' . DBPREFIX . 'module_crm_customer_contact_emails` AS `crm` 
                     ON `crm`.`contact_id` = `contact`.`id` ' .
                     $this->getCrmMembershipConditions($crmMembershipFilter);
-
-            $crmMembershipQuery = sprintf(
-                $crmMembershipQuery,
-                DBPREFIX, $mailId
-            );
             
             $this->addMailRecipientPart($mailRecipients, static::USER_TYPE_CRM, $distinctByType, $crmMembershipQuery);
         }
