@@ -989,15 +989,12 @@ class User extends \Cx\Model\Base\EntityBase {
      *
      * @return int|null id of crm user if the user is associated with a customer of crm module
      */
-    public function getCrmUserId() {
-        /**
-         * @var \Cx\Core\Core\Controller\Cx $cx
-         */
-        $cx = \Env::get('cx');
-        if (!$cx->getLicense()->isInLegalComponents('Crm')) {
+    public function getCrmUserId()
+    {
+        if (!$this->cx->getLicense()->isInLegalComponents('Crm')) {
             return false;
         }
-        $db = $cx->getDb()->getAdoDb();
+        $db = $this->cx->getDb()->getAdoDb();
         $result = $db->SelectLimit(
             "SELECT `id` FROM `" . DBPREFIX . "module_crm_contacts` WHERE `user_account` = " . intval($this->getId()), 1
         );
