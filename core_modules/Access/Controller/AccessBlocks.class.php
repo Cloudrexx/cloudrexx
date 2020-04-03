@@ -129,6 +129,10 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
         );
         $this->addGroupToQueryBuilder($qb, $groupFilter);
 
+        $qb->orderBy('u.lastActivity', 'DESC')
+            ->addOrderBy('u.username', 'ASC')
+            ->setMaxResults($arrSettings['block_last_active_users']['value']);
+
         $users = $qb->getQuery()->getResult();
 
         if (!empty($users)) {
