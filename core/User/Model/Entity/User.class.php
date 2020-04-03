@@ -966,7 +966,7 @@ class User extends \Cx\Model\Base\EntityBase {
     public function getAssociatedGroupIds($activeOnly = false)
     {
         $groupIds = array();
-        foreach ($this->getGroup() as $group) {
+        foreach ($this->getGroups() as $group) {
             if ($activeOnly && !$group->getIsActive()) {
                 continue;
             }
