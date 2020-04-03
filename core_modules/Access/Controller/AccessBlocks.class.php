@@ -145,6 +145,12 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
         }
     }
 
+    /**
+     * Add where condition to filter by gender. But only if param $gender is true
+     *
+     * @param \Doctrine\ORM\QueryBuilder $qb     QueryBuilder where the condition is added
+     * @param boolean                    $gender add condition only if param is true
+     */
     protected function addGenderToQueryBuilder(&$qb, $gender)
     {
         $objFWUser = \FWUser::getFWUserObject();
@@ -165,6 +171,12 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
         }
     }
 
+    /**
+     * Add where condition to filter by profile pic. But only if param $onlyWithPic is true
+     *
+     * @param \Doctrine\ORM\QueryBuilder $qb          QueryBuilder where the condition is added
+     * @param boolean                    $onlyWithPic add condition only if param is true
+     */
     protected function addPicToQueryBuilder(&$qb, $onlyWithPic)
     {
         $objFWUser = \FWUser::getFWUserObject();
@@ -187,6 +199,12 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
         }
     }
 
+    /**
+     * Add where condition to filter by group ids. But only if param $groupIds is not empty
+     *
+     * @param \Doctrine\ORM\QueryBuilder $qb       QueryBuilder where the condition is added
+     * @param boolean                    $groupIds add condition only if param is true
+     */
     protected function addGroupToQueryBuilder(&$qb, $groupIds)
     {
         // filter users by group association
