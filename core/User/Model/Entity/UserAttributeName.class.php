@@ -52,11 +52,6 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase {
     /**
      * @var integer
      */
-    protected $attributeId = 0;
-
-    /**
-     * @var integer
-     */
     protected $langId = 0;
 
     /**
@@ -82,26 +77,6 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase {
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * Set attributeId
-     *
-     * @param integer $attributeId
-     */
-    public function setAttributeId($attributeId)
-    {
-        $this->attributeId = $attributeId;
-    }
-
-    /**
-     * Get attributeId
-     *
-     * @return integer
-     */
-    public function getAttributeId()
-    {
-        return $this->attributeId;
     }
 
     /**

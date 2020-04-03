@@ -7,29 +7,19 @@ Cx\Core\User\Model\Entity\UserAttributeValue:
       flags: [ fulltext ]
     attribute_user_idx:
       columns: [ attribute_id, user_id ]
-  fields:
-    attributeId:
-      id: true
-      type: integer
-      column: attribute_id
+  id:
+    userAttribute:
       associationKey: true
-      options:
-        unsigned: true
-    userId:
-      id: true
-      type: integer
-      column: user_id
+    user:
       associationKey: true
-      options:
-        unsigned: true
     history:
-      id: true
       type: integer
       nullable: false
       column: history_id
       options:
         default: 0
         unsigned: true
+  fields:
     value:
       type: text
       length: 65535

@@ -47,16 +47,6 @@ class UserAttributeValue extends \Cx\Model\Base\EntityBase {
     /**
      * @var integer
      */
-    protected $attributeId;
-
-    /**
-     * @var integer
-     */
-    protected $userId;
-
-    /**
-     * @var integer
-     */
     protected $history = 0;
 
     /**
@@ -73,47 +63,6 @@ class UserAttributeValue extends \Cx\Model\Base\EntityBase {
      * @var \Cx\Core\User\Model\Entity\UserAttribute
      */
     protected $userAttribute;
-
-
-    /**
-     * Set attributeId
-     *
-     * @param integer $attributeId
-     */
-    public function setAttributeId($attributeId)
-    {
-        $this->attributeId = $attributeId;
-    }
-
-    /**
-     * Get attributeId
-     *
-     * @return integer 
-     */
-    public function getAttributeId()
-    {
-        return $this->attributeId;
-    }
-
-    /**
-     * Set userId
-     *
-     * @param integer $userId
-     */
-    public function setUserId($userId)
-    {
-        $this->userId = $userId;
-    }
-
-    /**
-     * Get userId
-     *
-     * @return integer 
-     */
-    public function getUserId()
-    {
-        return $this->userId;
-    }
 
     /**
      * Set history

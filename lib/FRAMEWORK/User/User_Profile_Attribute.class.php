@@ -559,8 +559,7 @@ class User_Profile_Attribute
         }
     }
 
- 
-/**
+    /**
      * Find all default user attributes and store it in an
      * array
      */
@@ -651,11 +650,7 @@ class User_Profile_Attribute
     function generateAttributeRelations()
     {
         foreach ($this->arrAttributes as $attribute => $arrAttribute) {
-            if (!empty($arrAttribute['parent_id'])) {
-                $this->arrAttributeRelations[$arrAttribute['parent_id']][] = $attribute;
-            } else {
-                $this->arrAttributeRelations[$arrAttribute['parent_id']][] = $attribute;
-            }
+            $this->arrAttributeRelations[$arrAttribute['parent_id']][] = $attribute;
         }
     }
 
@@ -719,10 +714,13 @@ class User_Profile_Attribute
            ->setParameters(array('type' => 'image', 'value' => ''));
 
         if ($profilePics) {
-	        $picId = $this->getAttributeIdByDefaultAttributeId('picture');
-	        $qb->andWhere($qb->expr()->eq('a.id', ':picId'));
-	        $qb->setParameter('picId', $picId);
-	    }
+            $expression = $qb->expr()->eq('a.id', ':picId');
+	    } else {
+            $expression = $qb->expr()->not($qb->expr()->eq('a.id', ':picId'));
+        }
+        $picId = $this->getAttributeIdByDefaultAttributeId('picture');
+        $qb->andWhere($expression);
+        $qb->setParameter('picId', $picId);
         
  	    $count = $qb->getQuery()->getSingleScalarResult();
         if (!$count) {
@@ -1017,33 +1015,6 @@ class User_Profile_Attribute
             $em->persist($attributeName);
             $em->flush();
 
-            return true;
-        } catch (\Doctrine\ORM\OptimisticLockException $e) {
-            return false;
-        }
-    }
-
-
-    function storeCoreAttribute()
-    {
-        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-        $em = $cx->getDb()->getEntityManager();
-        $attributeNameRepo = $em->getRepository('Cx\Core\User\Model\Entity\UserAttributeName');
-        $attributeName = $attributeNameRepo->findOneBy(array('name' => $this->id));
-
-        if ($attributeName && $attributeName->getUserAttribute()) {
-            $attribute = $attributeName->getUserAttribute();
-        } else {
-            $attribute = new \Cx\Core\User\Model\Entity\UserAttribute();
-        }
-
-        $attribute->setSortType($this->sort_type);
-        $attribute->setOrderId($this->order_id);
-        $attribute->setMandatory($this->mandatory);
-
-        try {
-            $em->persist($attribute);
-            $em->flush();
             return true;
         } catch (\Doctrine\ORM\OptimisticLockException $e) {
             return false;

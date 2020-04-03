@@ -12,13 +12,6 @@ Cx\Core\User\Model\Entity\UserAttributeName:
       options:
         unsigned: true
   fields:
-    attributeId:
-      type: integer
-      associationKey: true
-      unsigned: true
-      column: attribute_id
-      options:
-        unsigned: true
     langId:
       type: integer
       unsigned: true

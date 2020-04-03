@@ -58,7 +58,7 @@ CREATE TABLE `contrexx_access_user_attribute_value` (
   `user_id` int unsigned NOT NULL,
   `history_id` int unsigned NOT NULL DEFAULT '0',
   `value` text NOT NULL,
-  PRIMARY KEY (`attribute_id`, `user_id`, `history_id`),
+  PRIMARY KEY (`history_id`, `attribute_id`, `user_id`),
   FULLTEXT KEY `value` (`value`),
   INDEX `contrexx_access_user_attribute_value_user_id_ibfk` (`user_id`),
   INDEX `attribute_user_idx` (`attribute_id`, `user_id`),
