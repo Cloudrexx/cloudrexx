@@ -213,7 +213,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @var boolean
      */
-    protected $admin = false;
+    protected $superUser = false;
 
     /**
      * @var string
@@ -362,35 +362,35 @@ class User extends \Cx\Model\Base\EntityBase {
     }
 
     /**
-     * Set isAdmin
+     * Set if user is super user
      *
-     * @param boolean $isAdmin
+     * @param boolean $superUser
      */
-    public function setAdmin($isAdmin)
+    public function setSuperUser($superUser)
     {
-        $this->admin = $isAdmin;
+        $this->superUser = $superUser;
     }
 
     /**
-     * Get if user is admin
+     * Get if user is super user
      *
-     * This does exactly the same as isActive, but this method is necessary for doctrine mapping
+     * This does exactly the same as isSuperUser, but this method is necessary for doctrine mapping
      *
      * @return boolean 
      */
-    public function getAdmin()
+    public function getSuperUser()
     {
-        return $this->admin;
+        return $this->superUser;
     }
 
     /**
-     * Get if user is admin
+     * Get if user is super user
      *
-     * This does exactly the same as getAdmin, but this method name is more intuitive
+     * This does exactly the same as getSuperUser, but this method name is more intuitive
      */
-    public function isAdmin()
+    public function isSuperUser()
     {
-        return $this->getAdmin();
+        return $this->getSuperUser();
     }
 
     /**
