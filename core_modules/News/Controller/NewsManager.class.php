@@ -4135,7 +4135,7 @@ class NewsManager extends \Cx\Core_Modules\News\Controller\NewsLibrary {
      */
     function _generate_notify_list($type, $active_id)
     {
-        global $_ARRAYLANG, $objDatabase;
+        global $_ARRAYLANG;
         $res = array();
 
         $none_selected = $active_id == 0 ? 'selected' : '';
