@@ -208,7 +208,7 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
      * @param \Doctrine\ORM\QueryBuilder &$qb     QueryBuilder instance
      * @param int|array                  $groupId Group IDs to be filtered
      */
-    public function addGroupFilterToQueryBuilder(&$qb, $groupId)
+    public function addGroupFilterToQueryBuilder($qb, $groupId)
     {
         if (!in_array('filterGroup', $qb->getRootAliases())) {
             $qb->leftJoin('u.groups', 'filterGroup');
@@ -236,7 +236,7 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
      * @param string                     $regex regex to filter
      * @param string                     $field field to be filtered with alias prefix (u.username)
      */
-    public function addRegexFilterToQueryBuilder(&$qb, $regex, $field)
+    public function addRegexFilterToQueryBuilder($qb, $regex, $field)
     {
         $qb->andWhere(
             $qb->expr()->eq(
@@ -253,7 +253,7 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
      * @param string                     $regex regex to filter
      * @param string                     $field field to be filtered (title | 1)
      */
-    public function addAttributeRegexFilterToQueryBuilder(&$qb, $regex, $field)
+    public function addAttributeRegexFilterToQueryBuilder($qb, $regex, $field)
     {
         $objAttr = \FWUser::getFWUserObject()->objUser->objAttribute;
 
@@ -275,7 +275,7 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
      * @param string                     $field field to be filtered
      * @param string                     $direction asc or desc
      */
-    public function addOrderToQueryBuilder(&$qb, $field, $direction)
+    public function addOrderToQueryBuilder($qb, $field, $direction)
     {
         $objAttr = \FWUser::getFWUserObject()->objUser->objAttribute;
 
@@ -302,7 +302,7 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
      * @param bool                       $and     use a and condition or an or condition
      * @return \Doctrine\ORM\Query\Expr\Orx|\Doctrine\ORM\Query\Expr\Andx
      */
-    public function getAttributeFilterExpression(&$qb, $filters, $and = true)
+    public function getAttributeFilterExpression($qb, $filters, $and = true)
     {
         $objAttr = \FWUser::getFWUserObject()->objUser->objAttribute;
 
@@ -344,7 +344,7 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
      * @param string | array             $term one or multiple search terms
      * @return \Doctrine\ORM\Query\Expr\Orx
      */
-    public function getSearchByTermInUserExpression(&$qb, $term)
+    public function getSearchByTermInUserExpression($qb, $term)
     {
         $expr = new \Doctrine\ORM\Query\Expr();
         $orX = $expr->orX();
@@ -390,7 +390,7 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
      * @param string | array             $term one or multiple search terms
      * @return \Doctrine\ORM\Query\Expr\Orx
      */
-    public function getSearchByTermInAttributeExpression(&$qb, $term)
+    public function getSearchByTermInAttributeExpression($qb, $term)
     {
         $alias = 'searchAttributeValues';
         $expr = $qb->expr();
