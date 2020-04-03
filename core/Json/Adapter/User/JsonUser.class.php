@@ -231,7 +231,7 @@ class JsonUser implements JsonAdapter {
         return $arrUsers;
     }
 
-    protected function getExpression(&$qb, $field, $terms, $alias)
+    protected function getExpression($qb, $field, $terms, $alias)
     {
         $objAttr = \FWUser::getFWUserObject()->objUser->objAttribute;
         $expression = $qb->expr()->andX();

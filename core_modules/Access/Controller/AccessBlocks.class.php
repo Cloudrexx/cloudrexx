@@ -151,7 +151,7 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
      * @param \Doctrine\ORM\QueryBuilder $qb     QueryBuilder where the condition is added
      * @param boolean                    $gender add condition only if param is true
      */
-    protected function addGenderToQueryBuilder(&$qb, $gender)
+    protected function addGenderToQueryBuilder($qb, $gender)
     {
         if (empty($gender)) {
             return;
@@ -179,7 +179,7 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
      * @param \Doctrine\ORM\QueryBuilder $qb          QueryBuilder where the condition is added
      * @param boolean                    $onlyWithPic add condition only if param is true
      */
-    protected function addPicToQueryBuilder(&$qb, $onlyWithPic)
+    protected function addPicToQueryBuilder($qb, $onlyWithPic)
     {
         if (empty($onlyWithPic)) {
             return;
@@ -209,7 +209,7 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
      * @param \Doctrine\ORM\QueryBuilder $qb       QueryBuilder where the condition is added
      * @param boolean                    $groupIds add condition only if param is true
      */
-    protected function addGroupToQueryBuilder(&$qb, $groupIds)
+    protected function addGroupToQueryBuilder($qb, $groupIds)
     {
         if ($groupIds) {
             return;
@@ -227,7 +227,7 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
      * @param array                      $months birthday months
      * @param array                      $days   birthday days
      */
-    protected function addBirthdayToQueryBuilder(&$qb, $months, $days)
+    protected function addBirthdayToQueryBuilder($qb, $months, $days)
     {
         $objFWUser = \FWUser::getFWUserObject();
         $objAttr = $objFWUser->objUser->objAttribute;

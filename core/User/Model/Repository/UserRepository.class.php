@@ -205,7 +205,7 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
     /**
      * Add a group filter to the given QueryBuilder
      *
-     * @param \Doctrine\ORM\QueryBuilder &$qb     QueryBuilder instance
+     * @param \Doctrine\ORM\QueryBuilder $qb     QueryBuilder instance
      * @param int|array                  $groupId Group IDs to be filtered
      */
     public function addGroupFilterToQueryBuilder($qb, $groupId)
@@ -232,7 +232,7 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
     /**
      * Add a regex filter to the given QueryBuilder. For example for an letter index search
      *
-     * @param \Doctrine\ORM\QueryBuilder &$qb QueryBuilder instance
+     * @param \Doctrine\ORM\QueryBuilder $qb QueryBuilder instance
      * @param string                     $regex regex to filter
      * @param string                     $field field to be filtered with alias prefix (u.username)
      */
@@ -249,7 +249,7 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
     /**
      * Add a regex filter on attributes to the given QueryBuilder.
      *
-     * @param \Doctrine\ORM\QueryBuilder &$qb QueryBuilder instance
+     * @param \Doctrine\ORM\QueryBuilder $qb QueryBuilder instance
      * @param string                     $regex regex to filter
      * @param string                     $field field to be filtered (title | 1)
      */
@@ -271,7 +271,7 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
     /**
      * Add an order to the given QueryBuilder
      *
-     * @param \Doctrine\ORM\QueryBuilder &$qb QueryBuilder instance
+     * @param \Doctrine\ORM\QueryBuilder $qb QueryBuilder instance
      * @param string                     $field field to be filtered
      * @param string                     $direction asc or desc
      */
@@ -297,7 +297,7 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
     /**
      * Get a expression to filter users
      *
-     * @param \Doctrine\ORM\QueryBuilder &$qb     QueryBuilder instance
+     * @param \Doctrine\ORM\QueryBuilder $qb     QueryBuilder instance
      * @param array                      $filters filter conditions
      * @param bool                       $and     use a and condition or an or condition
      * @return \Doctrine\ORM\Query\Expr\Orx|\Doctrine\ORM\Query\Expr\Andx
@@ -340,7 +340,7 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
      * This allows searches using custom patterns, like "fields beginning
      * with "a" ("a%").
      *
-     * @param \Doctrine\ORM\QueryBuilder &$qb  QueryBuilder instance
+     * @param \Doctrine\ORM\QueryBuilder $qb  QueryBuilder instance
      * @param string | array             $term one or multiple search terms
      * @return \Doctrine\ORM\Query\Expr\Orx
      */
@@ -386,7 +386,7 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
      * This allows searches using custom patterns, like "fields beginning
      * with "a" ("a%").
      *
-     * @param \Doctrine\ORM\QueryBuilder &$qb  QueryBuilder instance
+     * @param \Doctrine\ORM\QueryBuilder $qb  QueryBuilder instance
      * @param string | array             $term one or multiple search terms
      * @return \Doctrine\ORM\Query\Expr\Orx
      */

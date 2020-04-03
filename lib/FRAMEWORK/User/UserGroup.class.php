@@ -178,7 +178,7 @@ class UserGroup
     }
 
 
-    private function parseFilterConditions(&$qb, $arrFilter)
+    private function parseFilterConditions($qb, $arrFilter)
     {
         global $objDatabase;
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
