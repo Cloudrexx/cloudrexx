@@ -33,7 +33,6 @@ UPDATE contrexx_access_user_attribute AS attr
     LEFT JOIN contrexx_access_user_core_attribute AS core ON core.id = attr.tmp_name
     SET attr.mandatory = core.mandatory,
     attr.sort_type = core.sort_type,
-    attr.order_id = core.order_id,
     attr.access_special = core.access_special,
     attr.access_id = core.access_id,
     attr.read_access_id = core.read_access_id
