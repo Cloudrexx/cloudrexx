@@ -4149,12 +4149,12 @@ class NewsManager extends \Cx\Core_Modules\News\Controller\NewsLibrary {
         } else {
             $objData = $cx->getDb()->getEntityManager()->getRepository(
                 'Cx\Core\User\Model\Entity\Group'
-            )->findBy(array(), array('groupName' => 'DESC'));
+            )->findBy(array(), array('name' => 'DESC'));
         }
 
         foreach ($objData as $data) {
-            $id       = $type == 'user' ? $data->getId() : $data->getGroupId();
-            $name     = $type == 'user' ? "{$data->getUsername()} ({$data->getProfileAttribute('firstname')->getValue()} {$data->getProfileAttribute('lastname')->getValue()})" : "{$data->getGroupName()} ({$data->getGroupDescription()})";
+            $id       = $data->getId();
+            $name     = $type == 'user' ? "{$data->getUsername()} ({$data->getProfileAttribute('firstname')->getValue()} {$data->getProfileAttribute('lastname')->getValue()})" : "{$data->getName()} ({$data->getDescription()})";
             $selected = $id == $active_id ? 'selected' : '';
 
             $res[] = "<option value=\"$id\" $selected>$name</option>";
