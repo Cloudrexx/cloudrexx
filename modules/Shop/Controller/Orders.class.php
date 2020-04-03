@@ -184,7 +184,7 @@ class Orders
 
             $customerIdQuery = '';
             if (
-                !empty($filter['user_ids']) ||
+                !empty($filter['user_ids']) &&
                 count($filter['user_ids']) > 0
             ) {
                 $customerIdQuery = '`order`.`customer_id` IN ('
