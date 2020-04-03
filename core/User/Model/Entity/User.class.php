@@ -960,19 +960,17 @@ class User extends \Cx\Model\Base\EntityBase {
         return new \Cx\Core\User\Model\Entity\UserAttributeValue();
     }
 
-    public function getProfileAttribute($profileId)
+    public function getProfileAttribute($attributeId)
     {
         $attr = \FWUser::getFWUserObject()->objUser->objAttribute;
-        if ($attr->isDefaultAttribute($profileId)) {
-            $attrId = $attr->getAttributeIdByDefaultAttributeId($profileId);
-        } else {
-            $attrId = $profileId;
+        if ($attr->isDefaultAttribute($attributeId)) {
+            $attributeId = $attr->getAttributeIdByDefaultAttributeId($attributeId);
         }
 
-        if (empty($attrId)) {
+        if (empty($attributeId)) {
             return new \Cx\Core\User\Model\Entity\UserAttributeValue();
         }
 
-        return $this->getAttributeValue($attrId);
+        return $this->getAttributeValue($attributeId);
     }
 }
