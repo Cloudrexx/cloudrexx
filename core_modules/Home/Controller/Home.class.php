@@ -94,7 +94,7 @@ class Home {
                     ] = $user->getUsername();
                 } else {
                     $arrAdministratorsOnline[$i++][
-                    'username'
+                        'username'
                     ] = $user->getEmail();
                 }
             }
