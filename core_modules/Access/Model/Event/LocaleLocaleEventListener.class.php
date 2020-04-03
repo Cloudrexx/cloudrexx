@@ -52,8 +52,7 @@ class LocaleLocaleEventListener extends \Cx\Core\Event\Model\Entity\DefaultEvent
         $defaultLocaleId = \FWLanguage::getDefaultLangId();
         $localeId = $persistedLocale->getId();
 
-        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-        $em = $cx->getDb()->getEntityManager();
+        $em = $this->cx->getDb()->getEntityManager();
         $attributeNameRepo = $em->getRepository('Cx\Core\User\Model\Entity\UserAttributeName');
         $attributeNames = $attributeNameRepo->findBy(array('langId' => $defaultLocaleId));
 
@@ -85,8 +84,7 @@ class LocaleLocaleEventListener extends \Cx\Core\Event\Model\Entity\DefaultEvent
         $delLocale = $eventArgs->getEntity();
         $localeId = $delLocale->getId();
 
-        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-        $em = $cx->getDb()->getEntityManager();
+        $em = $this->cx->getDb()->getEntityManager();
         $attributeNameRepo = $em->getRepository('Cx\Core\User\Model\Entity\UserAttributeName');
         $attributeNames = $attributeNameRepo->findBy(array('langId' => $localeId));
 
