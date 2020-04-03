@@ -528,6 +528,9 @@ class DoctrineRepository extends DataSource {
             )
         );
 
+        // Caching seems to be an issue here!
+        $em->clear();
+
         $entity = $logRepo->findOneBy(
             array(
                 'objectId' => $elementId,
