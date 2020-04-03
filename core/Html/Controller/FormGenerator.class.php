@@ -157,8 +157,13 @@ class FormGenerator {
 
         $tabs = isset($options['tabs']) ? $options['tabs'] : array();
 
+        $classNameParts = explode('\\', $entityClass);
+        $entityClassName = strtolower(end($classNameParts));
+
         $this->form->setAttribute('id', 'form-' . $this->formId);
-        $this->form->setAttribute('class', 'cx-ui');
+        $this->form->setAttribute(
+            'class', 'cx-ui ' . $entityClassName
+        );
         $titleElement = new \Cx\Core\Html\Model\Entity\HtmlElement('legend');
         $titleElement->addChild(new \Cx\Core\Html\Model\Entity\TextElement($title));
 
@@ -377,6 +382,7 @@ class FormGenerator {
 
         $group = new \Cx\Core\Html\Model\Entity\HtmlElement('div');
         $group->setAttribute('class', 'group');
+        $group->setAttribute('id', 'group-' . $this->formId . '-' . $field);
         $label = new \Cx\Core\Html\Model\Entity\HtmlElement('label');
         $label->setAttribute('for', 'form-' . $this->formId . '-' . $field);
         $fieldHeader = $field;
@@ -1049,6 +1055,7 @@ CODE;
                 return $div;
                 break;
             case 'password':
+            case 'Cx\Core\Model\Model\Entity\Password':
                 $input = new \Cx\Core\Html\Model\Entity\DataElement($title, '');
                 if (isset($options['validValues'])) {
                     $input->setValidator(
