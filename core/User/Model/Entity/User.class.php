@@ -996,7 +996,7 @@ class User extends \Cx\Model\Base\EntityBase {
         }
         $db = $this->cx->getDb()->getAdoDb();
         $result = $db->SelectLimit(
-            "SELECT `id` FROM `" . DBPREFIX . "module_crm_contacts` WHERE `user_account` = " . intval($this->getId()), 1
+            'SELECT `id` FROM `' . DBPREFIX . 'module_crm_contacts` WHERE `user_account` = ' . intval($this->getId()), 1
         );
         if ($result->RecordCount() == 0) {
             return null;
