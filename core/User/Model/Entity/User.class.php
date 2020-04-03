@@ -213,7 +213,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @var boolean
      */
-    protected $isAdmin = false;
+    protected $admin = false;
 
     /**
      * @var string
@@ -366,19 +366,31 @@ class User extends \Cx\Model\Base\EntityBase {
      *
      * @param boolean $isAdmin
      */
-    public function setIsAdmin($isAdmin)
+    public function setAdmin($isAdmin)
     {
-        $this->isAdmin = $isAdmin;
+        $this->admin = $isAdmin;
     }
 
     /**
-     * Get isAdmin
+     * Get if user is admin
+     *
+     * This does exactly the same as isActive, but this method is necessary for doctrine mapping
      *
      * @return boolean 
      */
-    public function getIsAdmin()
+    public function getAdmin()
     {
-        return $this->isAdmin;
+        return $this->admin;
+    }
+
+    /**
+     * Get if user is admin
+     *
+     * This does exactly the same as getAdmin, but this method name is more intuitive
+     */
+    public function isAdmin()
+    {
+        return $this->getAdmin();
     }
 
     /**
