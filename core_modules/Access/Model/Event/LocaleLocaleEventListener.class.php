@@ -92,6 +92,5 @@ class LocaleLocaleEventListener extends \Cx\Core\Event\Model\Entity\DefaultEvent
         foreach ($attributeNames as $attributeName) {
             $em->remove($attributeName);
         }
-        $em->flush();
     }
 }
