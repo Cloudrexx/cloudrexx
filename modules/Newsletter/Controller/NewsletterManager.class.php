@@ -2713,6 +2713,7 @@ class NewsletterManager extends NewsletterLib
 
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $userRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\User');
+        $groupRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\Group');
 
         $filterIds = array();
         $objResult = $objDatabase->Execute($query);
@@ -6067,7 +6068,7 @@ $WhereStatement = array();
 
                 $user['id'] = $objUser->getId();
                 $user['email'] = $objUser->getEmail();
-                $user['status'] = $objUser->getActive();
+                $user['status'] = $objUser->isActive();
                 $user['regdate'] = $objUser->getRegdate();
                 $user['language'] = $objUser->getFrontendLangId();
                 $user['type'] = 'access_user';

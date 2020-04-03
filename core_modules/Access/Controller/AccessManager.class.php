@@ -1231,8 +1231,8 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
                 $this->_objTpl->setVariable(array(
                     'ACCESS_ROW_CLASS_ID'               => $rowNr % 2 ? 1 : 0,
                     'ACCESS_USER_ID'                    => $user->getId(),
-                    'ACCESS_USER_STATUS_IMG'            => $user->getActive() ? 'led_green.gif' : 'led_red.gif',
-                    'ACCESS_USER_STATUS'                => $user->getActive() ? $_ARRAYLANG['TXT_ACCESS_ACTIVE'] : $_ARRAYLANG['TXT_ACCESS_INACTIVE'],
+                    'ACCESS_USER_STATUS_IMG'            => $user->isActive() ? 'led_green.gif' : 'led_red.gif',
+                    'ACCESS_USER_STATUS'                => $user->isActive() ? $_ARRAYLANG['TXT_ACCESS_ACTIVE'] : $_ARRAYLANG['TXT_ACCESS_INACTIVE'],
                     'ACCESS_USER_USERNAME'              => htmlentities($user->getUsernameOrEmail(), ENT_QUOTES, CONTREXX_CHARSET),
                     'ACCESS_USER_COMPANY'               => !empty($company) ? htmlentities($company, ENT_QUOTES, CONTREXX_CHARSET) : '&nbsp;',
                     'ACCESS_USER_FIRSTNAME'             => !empty($firstname) ? htmlentities($firstname, ENT_QUOTES, CONTREXX_CHARSET) : '&nbsp;',
@@ -1246,7 +1246,7 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
                     'ACCESS_USER_LAST_ACTIVITY'         => $user->getLastActivity() ? date(ASCMS_DATE_FORMAT_DATE, $user->getLastActivity()) : '-',
                     'ACCESS_USER_EXPIRATION'            => $user->getExpiration() ? date(ASCMS_DATE_FORMAT_DATE, $user->getExpiration()) : '-',
                     'ACCESS_USER_EXPIRATION_STYLE'      => $user->getExpiration() && $user->getExpiration() < time() ? 'color:#f00; font-weight:bold;' : null,
-                    'ACCESS_CHANGE_ACCOUNT_STATUS_MSG'  => sprintf($user->getActive() ? $_ARRAYLANG['TXT_ACCESS_DEACTIVATE_USER'] : $_ARRAYLANG['TXT_ACCESS_ACTIVATE_USER'], htmlentities($user->getUsernameOrEmail(), ENT_QUOTES, CONTREXX_CHARSET))
+                    'ACCESS_CHANGE_ACCOUNT_STATUS_MSG'  => sprintf($user->isActive() ? $_ARRAYLANG['TXT_ACCESS_DEACTIVATE_USER'] : $_ARRAYLANG['TXT_ACCESS_ACTIVATE_USER'], htmlentities($user->getUsernameOrEmail(), ENT_QUOTES, CONTREXX_CHARSET))
                 ));
 
                 $license = \Env::get('cx')->getLicense();

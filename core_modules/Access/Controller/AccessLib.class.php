@@ -2490,7 +2490,7 @@ JS
             // active status of user
             // note: do not output in frontend
             if (!$isFrontend) {
-                $activeStatus = $user->getActive() ? $_CORELANG['TXT_YES'] : $_CORELANG['TXT_NO'];
+                $activeStatus = $user->isActive() ? $_CORELANG['TXT_YES'] : $_CORELANG['TXT_NO'];
                 print $this->escapeCsvValue($activeStatus).$csvSeparator;
             }
 
