@@ -153,22 +153,24 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
      */
     protected function addGenderToQueryBuilder(&$qb, $gender)
     {
+        if (empty($gender)) {
+            return;
+        }
+
         $objFWUser = \FWUser::getFWUserObject();
         $attr = $objFWUser->objUser->objAttribute;
 
-        if (!empty($gender)) {
-            $qb->join(
-                'u.userAttributeValues', 'vGen'
-            )->andWhere(
-                $qb->expr()->eq('vGen.attributeId', ':vGenId')
-            )->andWhere(
-                $qb->expr()->eq('vGen.value', ':vGenValue')
-            )->setParameter(
-                'vGenId', $attr->getAttributeIdByDefaultAttributeId('gender')
-            )->setParameter(
-                'vGenValue', 'gender_'.$gender
-            );
-        }
+        $qb->join(
+            'u.userAttributeValues', 'vGen'
+        )->andWhere(
+            $qb->expr()->eq('vGen.attributeId', ':vGenId')
+        )->andWhere(
+            $qb->expr()->eq('vGen.value', ':vGenValue')
+        )->setParameter(
+            'vGenId', $attr->getAttributeIdByDefaultAttributeId('gender')
+        )->setParameter(
+            'vGenValue', 'gender_'.$gender
+        );
     }
 
     /**
@@ -179,24 +181,26 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
      */
     protected function addPicToQueryBuilder(&$qb, $onlyWithPic)
     {
+        if (empty($onlyWithPic)) {
+            return;
+        }
+
         $objFWUser = \FWUser::getFWUserObject();
         $attr = $objFWUser->objUser->objAttribute;
 
-        if ($onlyWithPic) {
-            $qb->join(
-                'u.userAttributeValues', 'vPic'
-            )->andWhere(
-                $qb->expr()->eq('vPic.attributeId', ':vPicId')
-            )->andWhere(
-                $qb->expr()->not(
-                    $qb->expr()->eq('vPic.value', ':vPicValue')
-                )
-            )->setParameter(
-                'vPicId', $attr->getAttributeIdByDefaultAttributeId('picture')
-            )->setParameter(
-                'vPicValue', ''
-            );
-        }
+        $qb->join(
+            'u.userAttributeValues', 'vPic'
+        )->andWhere(
+            $qb->expr()->eq('vPic.attributeId', ':vPicId')
+        )->andWhere(
+            $qb->expr()->not(
+                $qb->expr()->eq('vPic.value', ':vPicValue')
+            )
+        )->setParameter(
+            'vPicId', $attr->getAttributeIdByDefaultAttributeId('picture')
+        )->setParameter(
+            'vPicValue', ''
+        );
     }
 
     /**
@@ -207,12 +211,13 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
      */
     protected function addGroupToQueryBuilder(&$qb, $groupIds)
     {
-        // filter users by group association
         if ($groupIds) {
-            $qb->andWhere(
-                $qb->expr()->in('u.id', ':groupIds')
-            )->setParameter('groupIds', $groupIds);
+            return;
         }
+        // filter users by group association
+        $qb->andWhere(
+            $qb->expr()->in('u.id', ':groupIds')
+        )->setParameter('groupIds', $groupIds);
     }
 
     /**
