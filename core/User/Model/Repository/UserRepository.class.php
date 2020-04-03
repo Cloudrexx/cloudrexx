@@ -166,11 +166,11 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
             $qb->join('u.userAttributeValues', 'v');
             $qb->orWhere(
                 $qb->expr()->andX(
-                    $this->getExpression('v.attributeId', 'in'),
+                    $this->getExpression('v.userAttribute', 'in'),
                     $this->getExpression('v.value', $operation)
                 )
             );
-            $qb->setParameter('valuevattributeId', $attributeIds);
+            $qb->setParameter('valuevuserAttribute', $attributeIds);
             $qb->setParameter('valuevvalue', $searchTerm);
         }
 
@@ -445,7 +445,7 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
 
                     $orX->add(
                         $expr->andX(
-                            $expr->eq('searchAttributeValues.attributeId', ':menuAttribute'.$attribute->getId()),
+                            $expr->eq('searchAttributeValues.userAttribute', ':menuAttribute'.$attribute->getId()),
                             $expr->in('searchAttributeValues.value', ':childValues'.$attribute->getId())
                         )
                     );
@@ -488,7 +488,7 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
 
             $orX->add(
                 $expr->andX(
-                    $expr->in('searchAttributeValues.attributeId', ':searchAttributeIds'),
+                    $expr->in('searchAttributeValues.userAttribute', ':searchAttributeIds'),
                     $valueOrX
                 )
             );
