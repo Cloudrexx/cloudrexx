@@ -119,7 +119,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         }
 
         $objJobs = new Jobs('');
-        $objJobs->getDetails();
+        $objJobs->getDetails(false);
         $page->setTitle($objJobs->jobsTitle);
         $page->setContentTitle($objJobs->jobsTitle);
         $page->setMetaTitle($objJobs->jobsTitle);

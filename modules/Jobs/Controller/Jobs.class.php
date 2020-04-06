@@ -111,7 +111,7 @@ class Jobs extends JobsLibrary
     * @global     object    $objDatabase
     * @return    string    parsed content
     */
-    function getDetails()
+    function getDetails($redirect = true)
     {
         global $_CONFIG, $objDatabase, $_ARRAYLANG;
 
@@ -154,6 +154,9 @@ class Jobs extends JobsLibrary
             ));
 
         if (empty($id)) {
+            if (!$redirect) {
+                return;
+            }
             \Cx\Core\Csrf\Controller\Csrf::redirect(
                 \Cx\Core\Routing\Url::fromModuleAndCmd('Jobs')
             );
@@ -188,6 +191,9 @@ class Jobs extends JobsLibrary
             !$objResult ||
             $objResult->EOF
         ) {
+            if (!$redirect) {
+                return;
+            }
             \Cx\Core\Csrf\Controller\Csrf::redirect(
                 \Cx\Core\Routing\Url::fromModuleAndCmd('Jobs')
             );
