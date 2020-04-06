@@ -1015,7 +1015,7 @@ class User_Profile_Attribute
                 $attributeName = $attributeNameRepo->findOneBy(array('id' => $pattern[0]));
             }
 
-            $attributeName->setName(addslashes($this->arrName[0]));
+            $attributeName->setName($this->arrName[0]);
 
             $em->persist($attributeName);
             $em->flush();
@@ -1081,7 +1081,7 @@ class User_Profile_Attribute
         foreach ($arrNewNames as $langId) {
             $attributeName = new \Cx\Core\User\Model\Entity\UserAttributeName();
             $attributeName->setLangId($langId);
-            $attributeName->setName(addslashes($this->arrName[$langId]));
+            $attributeName->setName($this->arrName[$langId]);
             $attributeName->setUserAttribute($attribute);
             $em->persist($attributeName);
         }
@@ -1097,7 +1097,7 @@ class User_Profile_Attribute
             if (empty($attributeName)) {
                 continue;
             }
-            $attributeName->setName(addslashes($this->arrName[$langId]));
+            $attributeName->setName($this->arrName[$langId]);
             $em->persist($attributeName);
         }
         try {
@@ -1193,7 +1193,7 @@ class User_Profile_Attribute
             }
 
             try {
-                $attribute->$setter(contrexx_input2db($accessId));
+                $attribute->$setter($accessId);
                 $em->persist($attribute);
                 $em->flush();
             } catch (\Doctrine\ORM\OptimisticLockException $e) {
@@ -1209,7 +1209,7 @@ class User_Profile_Attribute
         }
 
         try {
-            $attribute->setAccessSpecial(contrexx_input2db($accessId));
+            $attribute->setAccessSpecial($accessId);
             $em->persist($attribute);
             $em->flush();
         } catch (\Doctrine\ORM\OptimisticLockException $e) {
@@ -1816,7 +1816,7 @@ class User_Profile_Attribute
             )->findOneBy(
                 array(
                     'langId' => $langId,
-                    'userAttribute' => contrexx_raw2db($this->id)
+                    'userAttribute' => $this->id
                 )
             );
 

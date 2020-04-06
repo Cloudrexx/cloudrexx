@@ -248,7 +248,7 @@ class User_Profile
                     $attributeValue->setUserAttribute($attribute);
                     $attributeValue->setUser($user);
                     $attributeValue->setHistory($historyId);
-                    $attributeValue->setValue(contrexx_raw2db($value));
+                    $attributeValue->setValue($value);
 
                     try {
                         $em->persist($attributeValue);

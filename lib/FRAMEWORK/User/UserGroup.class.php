@@ -191,7 +191,7 @@ class UserGroup
                 case 'group_description':
                     $attribute = $metaData->getFieldName($attribute);
                     $qb->andWhere($qb->expr()->like('tblG.'.$attribute, ':'.$attribute));
-                    $qb->setParameter($attribute, '%'.addslashes($condition).'%');
+                    $qb->setParameter($attribute, '%'.$condition.'%');
                     break;
 
                 case 'is_active':
@@ -201,7 +201,7 @@ class UserGroup
 
                 case 'type':
                     $qb->andWhere($qb->expr()->eq('tblG.type', ':type'));
-                    $qb->setParameter('type', addslashes($condition));
+                    $qb->setParameter('type', $condition);
                    break;
 
                 case 'static':
@@ -354,10 +354,10 @@ class UserGroup
             $group->setType($this->type);
         }
 
-        $group->setName(addslashes($this->name));
-        $group->setDescription(addslashes($this->description));
+        $group->setName($this->name);
+        $group->setDescription($this->description);
         $group->setActive(intval($this->is_active));
-        $group->setHomepage(addslashes($this->homepage));
+        $group->setHomepage($this->homepage);
         $group->setToolbar(intval($this->toolbar));
 
         // Store permissions
@@ -702,7 +702,7 @@ class UserGroup
 
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $groupRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\Group');
-        $group = $groupRepo->findOneBy(array('name' => addslashes($this->name)));
+        $group = $groupRepo->findOneBy(array('name' => $this->name));
 
         if (empty($group) || $group->getGroupId() == $this->id) {
             return true;

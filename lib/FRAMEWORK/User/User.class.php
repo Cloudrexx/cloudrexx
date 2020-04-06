@@ -425,10 +425,10 @@ class User extends User_Profile
         $qb = $userRepo->createQueryBuilder('u');
         if ($loginByEmail) {
             $column = 'u.email';
-            $loginCheck = contrexx_raw2db($username);
+            $loginCheck = $username;
         } else {
             $column = 'u.username';
-            $loginCheck = contrexx_raw2db($username);
+            $loginCheck = $username;
         }
 
         $qb->where($qb->expr()->eq($column, ':loginCheck'));
@@ -500,7 +500,7 @@ class User extends User_Profile
                 )
             )->setParameters(
                 array(
-                    'authToken' => contrexx_raw2db($authToken),
+                    'authToken' => $authToken,
                     'authTokenTimeout' => time(),
                     'active' => 1,
                     'id' => intval($userId),
@@ -1405,9 +1405,9 @@ class User extends User_Profile
             return false;
         }
 
-        $user->setUsername(addslashes($this->username));
+        $user->setUsername($this->username);
         $user->setIsAdmin(intval($this->is_admin));
-        $user->setEmail(addslashes($this->email));
+        $user->setEmail($this->email);
         $user->setEmailAccess($this->email_access);
         $user->setFrontendLangId($this->frontend_language);
         $user->setBackendLangId($this->backend_language);
@@ -1455,12 +1455,12 @@ class User extends User_Profile
         $em = $cx->getDb()->getEntityManager();
         $user = new \Cx\Core\User\Model\Entity\User();
 
-        $user->setUsername(addslashes($this->username));
+        $user->setUsername($this->username);
         $user->setIsAdmin(intval($this->is_admin));
         $user->setPassword($this->password);
         $user->setAuthToken($this->auth_token);
         $user->setAuthTokenTimeout($this->auth_token_timeout);
-        $user->setEmail(addslashes($this->email));
+        $user->setEmail($this->email);
         $user->setEmailAccess($this->email_access);
         $user->setFrontendLangId($this->frontend_language);
         $user->setBackendLangId($this->backend_language);
@@ -2035,7 +2035,7 @@ class User extends User_Profile
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $em = $cx->getDb()->getEntityManager();
         $userRepo = $em->getRepository('Cx\Core\User\Model\Entity\User');
-        $users = $userRepo->findBy(array($column => contrexx_raw2db($username)));
+        $users = $userRepo->findBy(array($column => $username));
 
         try {
             foreach ($users as $user) {
@@ -2385,7 +2385,7 @@ class User extends User_Profile
         $qb->where($qb->expr()->eq('u.email', ':email'))
            ->andWhere($qb->expr()->not($qb->expr()->eq('u.id', ':id')))
            ->setMaxResults(1)
-           ->setParameters(array('email' => addslashes($email), 'id' => $id));
+           ->setParameters(array('email' => $email, 'id' => $id));
 
         return !count($qb->getQuery()->getOneOrNullResult());
     }
@@ -2414,7 +2414,7 @@ class User extends User_Profile
         $qb->where($qb->expr()->eq('u.username', ':username'))
             ->andWhere($qb->expr()->not($qb->expr()->eq('u.id', ':id')))
             ->setMaxResults(1)
-            ->setParameters(array('username' => addslashes($username), 'id' => $id));
+            ->setParameters(array('username' => $username, 'id' => $id));
 
         return !count($qb->getQuery()->getOneOrNullResult());
     }
