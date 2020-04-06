@@ -428,9 +428,7 @@ if (!$limit) {
                     'phone_fax'
                 )
             );
-        }
-
-        if (!empty($filter['letter'])) {
+        } else if (!empty($filter['letter'])) {
             $users = $userRepo->searchByInitialLetter(
                 $filter['letter'],
                 array('company', 'firstname', 'lastname')
