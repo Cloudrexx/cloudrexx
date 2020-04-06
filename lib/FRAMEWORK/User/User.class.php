@@ -337,7 +337,7 @@ class User extends User_Profile
     /**
      * TRUE if user is authenticated
      *
-     * If this is TRUE the methods {@link load()} and {@link loadUsers()}
+     * If this is TRUE the methods {@link load()}
      * will be looked for further usage.
      * @todo    Explain this method in plain english...
      * @var     boolean
