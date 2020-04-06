@@ -73,7 +73,7 @@ class Home {
         );
         $crit = new \Doctrine\Common\Collections\Criteria();
         $crit->where(
-            \Doctrine\Common\Collections\Criteria::expr()->eq('isAdmin', true)
+            \Doctrine\Common\Collections\Criteria::expr()->eq('superUser', true)
         )->andWhere(
             \Doctrine\Common\Collections\Criteria::expr()->eq('active', true)
         )->andWhere(
