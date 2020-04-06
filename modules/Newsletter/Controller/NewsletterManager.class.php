@@ -6094,6 +6094,9 @@ $WhereStatement = array();
 
         $dataSet = $dataSet->sort($order);
         $count = $dataSet->count();
+        if (!$limit) {
+            $limit = $count;
+        }
         $dataSet = $dataSet->limit($limit, $pagingPos);
 
         return array(
