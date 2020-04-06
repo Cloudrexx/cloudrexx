@@ -567,7 +567,7 @@ class User_Profile_Attribute
     {
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $frontend = $cx->getMode() == \Cx\Core\Core\Controller\Cx::MODE_FRONTEND;
-        $langData = \Env::get('init')->getComponentSpecificLanguageData('Core', $frontend);
+        $_CORELANG = \Env::get('init')->getComponentSpecificLanguageData('Core', $frontend);
         $attributeRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\UserAttribute');
 
         $this->arrCustomAttributes = array();
@@ -604,7 +604,7 @@ class User_Profile_Attribute
                 if (isset($this->arrDefaultAttributeTemplates[$attribute->getName()])) {
                     $arrTemplate = $this->arrDefaultAttributeTemplates[$attribute->getName()];
                     $desc = $arrTemplate['desc'];
-                    $this->arrAttributes[$attributeId]['names'][$this->langId] = isset($langData[$desc]) ? $langData[$desc] : null;
+                    $this->arrAttributes[$attributeId]['names'][$this->langId] = isset($_CORELANG[$desc]) ? $_CORELANG[$desc] : null;
                     $this->arrAttributes[$attributeId]['modifiable'] = $arrTemplate['modifiable'];
                 } else if ($parentId == $this->getAttributeIdByDefaultAttributeId('title')) {
                     $this->arrAttributes[$attributeId]['modifiable'] = array('names');
