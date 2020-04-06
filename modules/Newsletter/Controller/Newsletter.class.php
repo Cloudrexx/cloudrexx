@@ -1233,7 +1233,7 @@ class Newsletter extends NewsletterLib
             $fax            = contrexx_raw2xhtml($objResult->fields['fax']);
             $website        = contrexx_raw2xhtml($objResult->fields['uri']);
             $birthday       = contrexx_raw2xhtml($objResult->fields['birthday']);
-        } elseif (!empty($user = $userRepo->findOneBy(array('email' => contrexx_raw2db($email), 'active' => 1)))) {
+        } elseif (!empty($user = $userRepo->findOneBy(array('email' => $email, 'active' => 1)))) {
             $attr = \FWUser::getFWUserObject()->objUser->objAttribute;
             $sexAttributeValue = $user->getAttributeValue(
                 $attr->getAttributeIdByDefaultAttributeId('gender')
