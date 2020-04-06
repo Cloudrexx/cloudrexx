@@ -1049,7 +1049,7 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
 
     private function userList()
     {
-        global $_ARRAYLANG, $_CORELANG, $_CONFIG;
+        global $_ARRAYLANG, $_CORELANG, $_CONFIG, $objDatabase;
 
         $arrSettings = \User_Setting::getSettings();
         $templateFile = 'module_access_user_list';
@@ -1127,11 +1127,17 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
         if ($accountType) {
             $userFilter['crm'] = 1;
             if ($cx->getLicense()->isInLegalComponents('Crm')) {
-                // Todo CRM
-                $query = 'SELECT id FROM `%1$module_crm_contacts` WHERE `contact_type` = %2$';
+                $query = 'SELECT id FROM `%1$smodule_crm_contacts` WHERE `contact_type` = %2$s';
                 $query = sprintf($query, DBPREFIX, 2);
+                $crmResult = $objDatabase->Execute($query);
 
                 $userIds = array();
+                if ($crmResult !== false) {
+                    while (!$crmResult->EOF) {
+                        $userIds[] = $crmResult->fields['id'];
+                        $crmResult->MoveNext();
+                    }
+                }
 
                 $qb->andWhere(
                     $qb->expr()->in('u.id', ':userIds')
