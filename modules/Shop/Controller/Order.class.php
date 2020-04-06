@@ -1320,15 +1320,13 @@ class Order
                 $objCustomer->email();
             $cx = \Cx\Core\Core\Controller\Cx::instanciate();
             $em = $cx->getDb()->getEntityManager();
-            $users = $em->getRepository(
+            $user = $em->getRepository(
                 'Cx\Core\User\Model\Entity\User'
-            )->findBy(array('email' => $customer_email));
+            )->findOneBy(array('email' => $customer_email));
 
-            if (!empty($users)) {
-                foreach ($users as $user) {
-                    $user->setActive(false);
-                    $em->persist($user);
-                }
+            if (!empty($user)) {
+                $user->setActive(false);
+                $em->persist($user);
                 $em->flush();
             }
         }
