@@ -150,8 +150,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     {
         $userListener = new \Cx\Core\User\Model\Event\UserEventListener($this->cx);
 
-        $entityClass = 'Cx\\Core\\' . $this->getName()
-            . '\\Model\\Entity\\User';
+        $entityClass = $this->getNamespace() . '\\Model\\Entity\\User';
         $this->cx->getEvents()->addModelListener(
             \Doctrine\ORM\Events::preUpdate,
             $entityClass,
@@ -161,7 +160,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         $attrListener = new \Cx\Core\User\Model\Event\UserAttributeEventListener($this->cx);
         $this->cx->getEvents()->addModelListener(
             \Doctrine\ORM\Events::postPersist,
-            $this->getNamespace().'\Model\Entity\UserAttribute',
+            $this->getNamespace() . '\Model\Entity\UserAttribute',
             $attrListener
         );
     }
