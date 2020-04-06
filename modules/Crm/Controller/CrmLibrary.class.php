@@ -2307,7 +2307,7 @@ class CrmLibrary
                 $email     = $user->getEmail();
             }
         } else if (empty($id)) {
-            $user = $userRepo->findOneBy(array('email' => addslashes($email)));
+            $user = $userRepo->findOneBy(array('email' => $email));
             if (!empty($user)) {
                 $accountId = $user->getId();
             }
@@ -2538,7 +2538,7 @@ class CrmLibrary
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $user = $cx->getDb()->getEntityManager()->getRepository(
             'Cx\Core\User\Model\Entity\User'
-        )->findOneBy(array('email' => addslashes($email)));
+        )->findOneBy(array('email' => $email));
 
         if (!empty($user)) {
             $availableLangId = '';
@@ -2644,7 +2644,7 @@ class CrmLibrary
                 'Cx\Core\User\Model\Entity\User'
             )->findOneBy(
                 array(
-                    'email' => contrexx_input2db($fieldValues['access_email'])
+                    'email' => $fieldValues['access_email']
                 )
             );
 
@@ -3202,7 +3202,7 @@ class CrmLibrary
         );
         foreach ($emailIds As $emails) {
             if (!empty ($emails)) {
-                $user = $userRepo->findOneBy(array('email' => addslashes($emails)));
+                $user = $userRepo->findOneBy(array('email' => $emails));
 
                 $info['substitution'] = array(
                     'CRM_ASSIGNED_USER_NAME'            => contrexx_raw2xhtml(\FWUser::getParsedUserTitle($user->getId())),
@@ -3289,7 +3289,7 @@ class CrmLibrary
             $cx = \Cx\Core\Core\Controller\Cx::instanciate();
             $user = $cx->getDb()->getEntityManager()->getRepository(
                 'Cx\Core\User\Model\Entity\User'
-            )->findOneBy(array('email' => addslashes($email)));
+            )->findOneBy(array('email' => $email));
             if (!empty($user)) {
                 $accountId = $user->getId();
                 if ($accountId != $id) {

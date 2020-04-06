@@ -6233,7 +6233,7 @@ END;
         }
 
         if (empty($accountId) && !empty ($accountEmail) && \FWValidator::isEmail($accountEmail)) {
-            $user = $userRepo->findOneBy(array('email' => addslashes($accountEmail)));
+            $user = $userRepo->findOneBy(array('email' => $accountEmail));
             if (!empty($user)) {
                 $id             = $user->getId();
                 $email          = $user->getEmail();
