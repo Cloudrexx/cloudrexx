@@ -88,7 +88,7 @@ class DocSys extends DocSysLibrary
      * @global     array
      * @return    string    parsed content
      */
-    function getDetails()
+    function getDetails($redirect = true)
     {
         global $objDatabase, $_ARRAYLANG;
 
@@ -97,6 +97,9 @@ class DocSys extends DocSysLibrary
         $this->_objTpl->setGlobalVariable('MODULE_INDEX', MODULE_INDEX);
         $id = intval($_GET['id']);
         if ($id <= 0) {
+            if (!$redirect) {
+                return;
+            }
             \Cx\Core\Csrf\Controller\Csrf::header("Location: ?section=DocSys" . MODULE_INDEX);
             exit;
         }
