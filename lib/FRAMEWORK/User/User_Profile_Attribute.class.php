@@ -715,7 +715,7 @@ class User_Profile_Attribute
 
         if ($profilePics) {
             $expression = $qb->expr()->eq('a.id', ':picId');
-	    } else {
+        } else {
             $expression = $qb->expr()->not($qb->expr()->eq('a.id', ':picId'));
         }
         $picId = $this->getAttributeIdByDefaultAttributeId('picture');
