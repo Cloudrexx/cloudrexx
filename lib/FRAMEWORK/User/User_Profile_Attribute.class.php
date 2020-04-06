@@ -1082,7 +1082,7 @@ class User_Profile_Attribute
         }
         foreach ($arrRemovedNames as $langId) {
             $attributeName = $attributeNameRepo->findOneBy(array('userAttribute' => $this->id, 'langId' => $langId));
-            if ($attributeName) {
+            if (empty($attributeName)) {
                 continue;
             }
             $em->remove($attributeName);
