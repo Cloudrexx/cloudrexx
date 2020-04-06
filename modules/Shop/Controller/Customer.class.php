@@ -93,7 +93,7 @@ class Customer extends \User
     function id($id=null)
     {
         if (isset($id)) {
-            $this->setId($id);
+            $this->id = $id;
         }
         return $this->id;
     }
