@@ -284,12 +284,9 @@ class UserGroup
 
         $users = $qb->getQuery()->getArrayResult();
 
-        $arrUsers = array();
-        foreach($users as $user) {
-            array_push($arrUsers, $user['userId']);
-        }
-
-        return $arrUsers;
+        return array_map(function($user) {
+            return $user['userId'];
+        }, $users);
     }
 
 
