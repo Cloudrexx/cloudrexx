@@ -1273,15 +1273,13 @@ class User_Profile_Attribute
     {
         global $_ARRAYLANG;
 
-        $pattern = array();
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $em = $cx->getDb()->getEntityManager();
         $attrRepo = $em->getRepository(
             'Cx\Core\User\Model\Entity\UserAttribute'
         );
 
-        $attrId = $this->parent_id == 'title' && preg_match('#([0-9]+)#', $attributeId, $pattern) ? $pattern[0] : $attributeId;
-        $attr = $attrRepo->find($attrId);
+        $attr = $attrRepo->find($attributeId);
 
         if (empty($attr)) {
             return false;
