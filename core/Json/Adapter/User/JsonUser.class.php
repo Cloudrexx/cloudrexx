@@ -238,7 +238,7 @@ class JsonUser implements JsonAdapter {
         if ($objAttr->isDefaultAttribute($field)) {
             $qb->join('u.userAttributeValues', 'v'.$alias);
             $attrId = $objAttr->getAttributeIdByDefaultAttributeId($field);
-            $expression->add($qb->expr()->eq('v'.$alias.'.attributeId', ':attribute'.$alias));
+            $expression->add($qb->expr()->eq('v'.$alias.'.userAttribute', ':attribute'.$alias));
             $qb->setParameter('attribute'.$alias, $attrId);
 
             if (is_array($terms)) {
