@@ -1153,8 +1153,8 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
 
         if ($userRoleFilter !== null) {
             $qb->andWhere(
-                $qb->expr()->eq('u.isAdmin', ':isAdmin')
-            )->setParameter('isAdmin', $userRoleFilter);
+                $qb->expr()->eq('u.superUser', ':superUser')
+            )->setParameter('superUser', $userRoleFilter);
         }
 
         // Search
