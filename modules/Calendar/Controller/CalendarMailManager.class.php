@@ -789,7 +789,11 @@ class CalendarMailManager extends CalendarLibrary {
                     break;
                 }
 
-                $groups = $groupRepo->findBy(array('groupId' => $objEvent->invitedGroups));
+                $qb = $groupRepo->createQueryBuilder('g');
+                $groups = $qb->where($qb->expr()->in('g.id', ':groupIds'))
+                    ->setParameter('groupIds', $objEvent->invitedGroups)
+                    ->getQuery()->getResult();
+
                 if (empty($groups)) {
                     break;
                 }
