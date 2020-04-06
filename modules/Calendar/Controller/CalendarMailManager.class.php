@@ -790,7 +790,7 @@ class CalendarMailManager extends CalendarLibrary {
                 }
 
                 $groups = $groupRepo->findBy(array('groupId' => $objEvent->invitedGroups));
-                if (empty($groups)) {die('Jaa');
+                if (empty($groups)) {
                     break;
                 }
 
