@@ -572,7 +572,7 @@ class CrmInterface extends CrmLibrary
                 $salutation = $objResult->fields['salutation'];
                 $salutationAttributeName = '';
                 if ($objResult->fields['contact_type'] == 2 && $salutation != 0) {
-                    $objAttribute = \FWUser::getFWUserObject()->objUser->objAttribute->getById('title_' . $salutation);
+                    $objAttribute = \FWUser::getFWUserObject()->objUser->objAttribute->getById( $salutation);
                     if (!$objAttribute->EOF) {
                         $salutationAttributeName = $objAttribute->getName();
                     }
