@@ -1859,7 +1859,10 @@ class User extends User_Profile
         }
 
         $groupIds = array();
-        foreach ($user->getGroup() as $group) {
+        foreach ($user->getGroups() as $group) {
+            if (!$group->isActive()) {
+                continue;
+            }
             $groupIds[] = $group->getId();
         }
 
