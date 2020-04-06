@@ -2002,9 +2002,10 @@ class CrmLibrary
             ->from('Cx\Core\User\Model\Entity\User', 'u')
             ->innerJoin('u.groups', 'g')
             ->andWhere(
-                $qb->expr()->eq('g.id', $groupId),
+                $qb->expr()->eq('g.id', ':groupId'),
                 $qb->expr()->eq('g.type', '?1')
             )->setParameter(1, 'backend')
+            ->setParameter('groupId', $groupId)
             ->getQuery();
         $users = $query->getResult();
 
