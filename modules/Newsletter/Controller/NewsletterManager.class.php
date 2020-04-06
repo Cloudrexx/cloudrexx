@@ -2713,7 +2713,6 @@ class NewsletterManager extends NewsletterLib
 
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $userRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\User');
-        $groupRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\Group');
 
         $filterIds = array();
         $objResult = $objDatabase->Execute($query);
