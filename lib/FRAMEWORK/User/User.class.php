@@ -2359,9 +2359,9 @@ class User extends User_Profile
         $userRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\User');
         $qb = $userRepo->createQueryBuilder('u');
         $qb->select('COUNT(u.id) AS numof_admin')
-           ->where($qb->expr()->eq('u.isAdmin', ':isAdmin'))
+           ->where($qb->expr()->eq('u.superUser', ':superUser'))
            ->andWhere($qb->expr()->eq('u.active', ':active'))
-           ->setParameters(array('isAdmin' => 1, 'active' => 1));
+           ->setParameters(array('superUser' => 1, 'active' => 1));
         $count = $qb->getQuery()->getOneOrNullResult();
 
         return ($count < 2);
