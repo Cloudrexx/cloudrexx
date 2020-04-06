@@ -9,7 +9,7 @@ Cx\Core\User\Model\Entity\User:
         unsigned: true
       generator:
         strategy: AUTO
-    isAdmin:
+    superUser:
       type: boolean
       column: is_admin
       options:
