@@ -841,6 +841,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      * @return void
      */
     public function apiV1($command, $arguments, $dataArguments) {
+        \Cx\Core\Csrf\Controller\Csrf::header('Access-Control-Allow-Origin: *');
         $method = $this->cx->getRequest()->getHttpRequestMethod();
         
         // handle CLI
@@ -900,6 +901,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
             if (
                 $dataSource->isVersionable() &&
                 !$requestReadonly &&
+                $method != 'post' && // new entries are allowed without version
                 (
                     !isset($arguments['version']) ||
                     $dataSource->getCurrentVersion($elementId) != $arguments['version']
@@ -1010,6 +1012,12 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                     // should be 404 if ressource does not exist
                     // should be 409 (Conflict) if ressource already exists
                     $data = $dataSource->add($dataArguments);
+                    if ($dataSource->isVersionable()) {
+                        $metaData['version'] = array();
+                        $metaData['version'] = $dataSource->getCurrentVersion(
+                            $data
+                        );
+                    }
                     break;
                 case 'patch':
                 case 'put':
@@ -1017,6 +1025,12 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                     // should be 200 or 204 (No content)
                     // should be 404 if $elementId not set or not found
                     $data = $dataSource->update($elementId, $dataArguments);
+                    if ($dataSource->isVersionable()) {
+                        $metaData['version'] = array();
+                        $metaData['version'] = $dataSource->getCurrentVersion(
+                            $elementId
+                        );
+                    }
                     break;
                 case 'delete':
                     // delete entry
