@@ -395,15 +395,13 @@ class Newsletter extends NewsletterLib
             }
 
             if ($objRecipient) {
-                if ($user) {
-                    $recipientId = $user->getId();
-                    $isAccessRecipient = true;
+                $recipientId = $user->getId();
+                $isAccessRecipient = true;
 
-                    //$arrAssociatedLists = $objUser->getSubscribedNewsletterListIDs();
-                    // until fwUser is completely removed
-                    $objUser = \FWUser::getFWUserObject()->objUser->getUser($user->getId());
-                    $arrPreAssociatedInactiveLists = $objUser->getSubscribedNewsletterListIDs();
-                }
+                //$arrAssociatedLists = $objUser->getSubscribedNewsletterListIDs();
+                // until fwUser is completely removed
+                $objUser = \FWUser::getFWUserObject()->objUser->getUser($user->getId());
+                $arrPreAssociatedInactiveLists = $objUser->getSubscribedNewsletterListIDs();
             } else {
                 $objRecipient = $objDatabase->SelectLimit("SELECT id FROM ".DBPREFIX."module_newsletter_user WHERE status=1 AND code='".$code."' AND email='".contrexx_raw2db($requestedMail)."'", 1);
                 if ($objRecipient && $objRecipient->RecordCount() == 1) {
