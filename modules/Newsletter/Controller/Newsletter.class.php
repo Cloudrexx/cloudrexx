@@ -1237,7 +1237,7 @@ class Newsletter extends NewsletterLib
                 $attr->getAttributeIdByDefaultAttributeId('gender')
             )->getValue();
 
-            $sex = '';;
+            $sex = '';
             if ($sexAttributeValue == 'gender_female') {
                 $sex = $_CORELANG['TXT_ACCESS_FEMALE'];
             } else if ($sexAttributeValue == 'gender_male') {
