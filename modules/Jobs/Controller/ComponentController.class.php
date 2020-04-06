@@ -124,5 +124,4 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         $page->setContentTitle($objJobs->jobsTitle);
         $page->setMetaTitle($objJobs->jobsTitle);
     }
-
 }

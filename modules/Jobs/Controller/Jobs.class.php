@@ -151,7 +151,7 @@ class Jobs extends JobsLibrary
             'TXT_JOBS_WORK_START' => $_ARRAYLANG['TXT_JOBS_WORK_START'],
             'TXT_JOBS_WORKLOAD' => $_ARRAYLANG['TXT_JOBS_WORKLOAD'],
             'TXT_JOBS_PUBLISHED_AT'  => $_ARRAYLANG['TXT_JOBS_PUBLISHED_AT']
-            ));
+        ));
 
         if (empty($id)) {
             if (!$redirect) {
