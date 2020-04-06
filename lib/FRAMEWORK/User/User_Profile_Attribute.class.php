@@ -605,10 +605,15 @@ class User_Profile_Attribute
                     $arrTemplate = $this->arrDefaultAttributeTemplates[$attribute->getName()];
                     $desc = $arrTemplate['desc'];
                     $this->arrAttributes[$attributeId]['names'][$this->langId] = isset($_CORELANG[$desc]) ? $_CORELANG[$desc] : null;
-                    $this->arrAttributes[$attributeId]['modifiable'] = $arrTemplate['modifiable'];
+                    if (!isset($arrTemplate['modifiable'])) {
+                        $this->arrAttributes[$attributeId]['modifiable'] = array();
+                    } else {
+                        $this->arrAttributes[$attributeId]['modifiable'] = $arrTemplate['modifiable'];
+                    }
                 } else if ($parentId == $this->getAttributeIdByDefaultAttributeId('title')) {
                     $this->arrAttributes[$attributeId]['modifiable'] = array('names');
-                    $this->arrAttributes[$attributeId]['names'][$this->langId] = $attribute->getName($this->langId);
+                } else {
+                    $this->arrAttributes[$attributeId]['modifiable'] = array();
                 }
             }
             $this->arrAttributes[$attributeId]['access_special'] = $attribute->getAccessSpecial();
