@@ -1177,9 +1177,6 @@ class User_Profile_Attribute
                 }
             }
         }
-// TODO: I suppose the precedence is okay like this.
-//        return ($this->isCoreAttribute($attributeId) || $this->deleteAttributeContent($attributeId)) && ($this->isCoreAttribute($attributeId) || $this->deleteAttributeNames($attributeId)) && $this->deleteAttributeEntity($attributeId);
-// However, it would be clearer with a few parentheses.
         return
             (   $this->isDefaultAttribute($attributeId)
              ||    $this->deleteAttributeContent($attributeId))
