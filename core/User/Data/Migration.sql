@@ -240,8 +240,6 @@ LEFT JOIN contrexx_access_user_attribute as a ON a.id = v.attribute_id
 WHERE u.id IS NULL OR a.id IS NULL;
 
 /*Insert attribute name*/
-ALTER TABLE contrexx_access_user_attribute_name ADD `order` INT;
-
 INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES(
   (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'gender'), 'gender'
 );
@@ -258,10 +256,10 @@ INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES
   (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'title'), 'title'
 );
 
-INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`, `lang_id`, `order`)
+INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`, `lang_id`)
   SELECT (
     SELECT `id`+`title`.`id`-1 FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'title-c' LIMIT 1
-  ) AS attribute_id, title AS name, 0 as lang_id, id as `order`
+  ) AS attribute_id, title AS name, 0 as lang_id
   FROM `contrexx_access_user_title` AS title;
 
 INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES(
@@ -412,13 +410,6 @@ DELETE g FROM contrexx_access_rel_user_group AS g LEFT JOIN contrexx_access_user
 
 ALTER TABLE contrexx_access_rel_user_group
     ADD CONSTRAINT FK_401DFD43A76ED395 FOREIGN KEY (user_id) REFERENCES contrexx_access_users (id);
-
-/*Add unique index to access_user_attribute_name*/
-ALTER TABLE contrexx_access_user_attribute_name
-    DROP PRIMARY KEY,
-    ADD id INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY FIRST;
-CREATE UNIQUE INDEX fk_module_user_attribute_name_unique_idx
-  ON contrexx_access_user_attribute_name (attribute_id, lang_id);
 
 ALTER TABLE contrexx_access_user_attribute_value ADD PRIMARY KEY (history_id, attribute_id, user_id);
 
