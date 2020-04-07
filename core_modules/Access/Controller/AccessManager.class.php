@@ -2838,7 +2838,7 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
             'ACCESS_CHILD_SORT_ORDER_DISPLAY'           => $objAttribute->getSortType() == 'custom' ? 'inline' : 'none'
         ));
 
-        if ((!$objAttribute->getId() || $objAttribute->isCustomAttribute($objAttribute->getId()))) {
+        if ((!$objAttribute->getId() || !$objAttribute->isDefaultAttribute($objAttribute->getId()))) {
             foreach (\FWLanguage::getLanguageArray() as $langId => $arrLanguage) {
                 if ($arrLanguage['frontend']) {
                     $this->_objTpl->setVariable(array(
