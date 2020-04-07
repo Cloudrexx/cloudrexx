@@ -1523,15 +1523,6 @@ class User_Profile_Attribute
         return isset($this->arrDefaultAttributeTemplates[$attributeId]);
     }
 
-    public function isCustomAttribute($attributeId = null)
-    {
-        if (is_null($attributeId)) {
-            $attributeId = $this->id;
-        }
-        return in_array($attributeId, $this->arrCustomAttributes);
-    }
-
-
     public function setNames($arrNames)
     {
         $this->arrName = array();
@@ -2054,7 +2045,7 @@ class User_Profile_Attribute
 // TODO: check if this methods logic could be replaced by the following code
         $arrNames = array();
         foreach ($this->getSortedAttributeIds() as $attributeId) {
-            if ($this->isCustomAttribute($attributeId)) {
+            if (!$this->isDefaultAttribute($attributeId)) {
                 $arrNames[$attributeId] = str_pad('', $this->getLevel($attributeId)*2, '..').htmlentities($this->arrAttributes[$attributeId]['names'][$this->langId], ENT_QUOTES, CONTREXX_CHARSET);
             }
         }

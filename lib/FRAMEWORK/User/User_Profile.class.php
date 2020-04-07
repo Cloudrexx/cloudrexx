@@ -245,7 +245,7 @@ class User_Profile
                 }
             }
 
-            if ($this->objAttribute->isCustomAttribute($attributeId) && isset($this->arrCachedUsers[$this->id]['profile'][$attributeId])) {
+            if (!$this->objAttribute->isDefaultAttribute($attributeId) && isset($this->arrCachedUsers[$this->id]['profile'][$attributeId])) {
                 foreach (array_diff(array_keys($this->arrCachedUsers[$this->id]['profile'][$attributeId]), array_keys($arrValue)) as $historyId) {
                     if ($objDatabase->Execute('DELETE FROM `'.DBPREFIX.'access_user_attribute_value` WHERE `attribute_id` = '.$attributeId.' AND `user_id` = '.$this->id.' AND `history_id` = '.$historyId) === false) {
                         $objAttribute = $this->objAttribute->getById($attributeId);
