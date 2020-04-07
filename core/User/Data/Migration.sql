@@ -240,6 +240,8 @@ LEFT JOIN contrexx_access_user_attribute as a ON a.id = v.attribute_id
 WHERE u.id IS NULL OR a.id IS NULL;
 
 /*Insert attribute name*/
+ALTER TABLE contrexx_access_user_attribute_name ADD `tmp_title_id` INT;
+
 INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES(
   (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'gender'), 'gender'
 );
@@ -256,10 +258,10 @@ INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES
   (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'title'), 'title'
 );
 
-INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`, `lang_id`)
+INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`, `lang_id`, `tmp_title_id`)
   SELECT (
     SELECT `id`+`title`.`id`-1 FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'title-c' LIMIT 1
-  ) AS attribute_id, title AS name, 0 as lang_id
+  ) AS attribute_id, title AS name, 0 as lang_id, id as `tmp_title_id`
   FROM `contrexx_access_user_title` AS title;
 
 INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES(
@@ -334,8 +336,10 @@ INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES
   (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'picture'), 'picture'
 );
 
+/* this replaces title ID by attribute ID */
+/* attrName.tmp_title_id contains title.id */
 UPDATE `contrexx_access_user_attribute_value`
-    JOIN `contrexx_access_user_attribute_name` AS `attrName` ON `attrName`.`order` = `contrexx_access_user_attribute_value`.`value`
+    JOIN `contrexx_access_user_attribute_name` AS `attrName` ON `attrName`.`tmp_title_id` = `contrexx_access_user_attribute_value`.`value`
     SET `contrexx_access_user_attribute_value`.`value` = `attrName`.`attribute_id`
 WHERE `contrexx_access_user_attribute_value`.`tmp_name` = 'title';
 
@@ -410,6 +414,10 @@ DELETE g FROM contrexx_access_rel_user_group AS g LEFT JOIN contrexx_access_user
 
 ALTER TABLE contrexx_access_rel_user_group
     ADD CONSTRAINT FK_401DFD43A76ED395 FOREIGN KEY (user_id) REFERENCES contrexx_access_users (id);
+
+/* cleanup temp field */
+ALTER TABLE contrexx_access_user_attribute_name
+    DROP `tmp_title_id`;
 
 ALTER TABLE contrexx_access_user_attribute_value ADD PRIMARY KEY (history_id, attribute_id, user_id);
 
