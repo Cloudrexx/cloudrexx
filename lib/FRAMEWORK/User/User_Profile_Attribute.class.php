@@ -983,21 +983,6 @@ class User_Profile_Attribute
     }
 
 
-    function storeCoreAttributeTitle()
-    {
-        global $objDatabase;
-
-        $pattern = array();
-        if ($this->id && preg_match('#([0-9]+)#', $this->id, $pattern) && $objDatabase->Execute("UPDATE `".DBPREFIX."access_user_attribute_name` SET `name` = '".addslashes($this->arrName[0])."' WHERE `attribute_id` = '".$pattern[0]."'") ||
-                $objDatabase->Execute("INSERT INTO `".DBPREFIX."access_user_attribute`(`parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES ((SELECT `attribute_id` FROM `contrexx_access_user_attribute_name` WHERE `name` = 'title'),'menu_option',0,'asc',0,0,0,0,1)") &&
-                $objDatabase->Execute("INSERT INTO `".DBPREFIX."access_user_attribute_name`(`attribute_id`, `lang_id`, `name`, `order`) VALUES (". $objDatabase->Insert_ID() .", 0, '".addslashes($this->arrName[0])."',(select count(`name`.`order`) + 1 as `order` from `".DBPREFIX."access_user_attribute_name` as name))")
-        ) {
-            return true;
-        }
-        return false;
-    }
-
-
     function storeChildrenOrder()
     {
         global $objDatabase;
