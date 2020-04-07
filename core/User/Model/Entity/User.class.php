@@ -394,6 +394,17 @@ class User extends \Cx\Model\Base\EntityBase {
     }
 
     /**
+     * Get if user is super user
+     *
+     * This does exactly the same as getSuperUser, for backwards compatibility
+     * @deprecated In favor of isSuperUser()
+     */
+    public function getIsAdmin()
+    {
+        return $this->getSuperUser();
+    }
+
+    /**
      * Set username
      *
      * @param string $username
