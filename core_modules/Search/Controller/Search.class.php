@@ -82,6 +82,12 @@ class Search
     protected $options = array();
 
     /**
+     * If there are protected search results
+     * @var bool
+     */
+    protected $hasProtectedResult = false;
+
+    /**
      * Resolves cmd. If it's a node placeholder, search is limited to the node's
      * branch
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page Current page
@@ -147,6 +153,29 @@ class Search
     }
 
     /**
+     * Define if there are protected search results. Once it is set to true, it
+     * can no longer be changed, since a protected result already exists
+     *
+     * @param $hasProtectedResult boolean if protected result exist
+     */
+    public function setHasProtectedResult($hasProtectedResult)
+    {
+        if (!$this->hasProtectedResult) {
+            $this->hasProtectedResult = $hasProtectedResult;
+        }
+    }
+
+    /**
+     * Get if there are protected search results
+     *
+     * @return bool if there are protected search results
+     */
+    protected function hasProtectedResult()
+    {
+        return $this->hasProtectedResult;
+    }
+
+    /**
      * Add new set of results to the DataSet collection
      * @param \Cx\Core_Modules\Listing\Model\Entity\DataSet Set of search results to be added
      */
@@ -163,6 +192,7 @@ class Search
     {
         global $_CONFIG, $_ARRAYLANG;
 
+        $coreListProtectedPages   = \Cx\Core\Setting\Controller\Setting::getValue('coreListProtectedPages','Config');
 
         $objTpl = new \Cx\Core\Html\Sigma('.');
         \Cx\Core\Csrf\Controller\Csrf::add_placeholder($objTpl);
@@ -186,6 +216,21 @@ class Search
             $term = trim(contrexx_input2raw($_REQUEST['term']));
 
             $arraySearchResults = $this->getSearchResult($term);
+
+            // Show a template block if there are protected search results.
+            // This only for users who are not logged in yet.
+            // If the setting coreListProtectedPages is deactivated, it makes
+            // no sense to display this block, since the protected search
+            // results are not listed.
+            if (
+                $coreListProtectedPages === 'on' &&
+                $objTpl->blockExists('search_has_protected_results') &&
+                $this->hasProtectedResult() &&
+                !\FWUser::getFWUserObject()->objUser->isLoggedIn()
+            ) {
+                $objTpl->touchBlock('search_has_protected_results');
+            }
+
             $countResults = sizeof($arraySearchResults);
             if (!is_numeric($pos)) {
                 $pos = 0;
