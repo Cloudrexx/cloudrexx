@@ -258,7 +258,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @var integer
      */
-    protected $lastAuthStatus = 0;
+    protected $lastAuthStatus = 1;
 
     /**
      * @var integer
