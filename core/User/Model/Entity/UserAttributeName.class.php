@@ -44,20 +44,11 @@ namespace Cx\Core\User\Model\Entity;
  * @subpackage  core_user
  */
 class UserAttributeName extends \Cx\Model\Base\EntityBase {
-    /**
-     * @var integer
-     */
-    protected $id;
 
     /**
      * @var integer
      */
     protected $langId = 0;
-
-    /**
-     * @var integer
-     */
-    protected $order = 0;
 
     /**
      * @var string
@@ -68,16 +59,6 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase {
      * @var \Cx\Core\User\Model\Entity\UserAttribute
      */
     protected $userAttribute;
-
-    /**
-     * Get id
-     *
-     * @return integer
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
 
     /**
      * Set langId
@@ -117,26 +98,6 @@ class UserAttributeName extends \Cx\Model\Base\EntityBase {
     public function getName()
     {
         return $this->name;
-    }
-
-    /**
-     * Set order
-     *
-     * @param string $order
-     */
-    public function setOrder($order)
-    {
-        $this->order = $order;
-    }
-
-    /**
-     * Get order
-     *
-     * @return string
-     */
-    public function getOrder()
-    {
-        return $this->order;
     }
 
     /**
