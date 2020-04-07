@@ -743,6 +743,13 @@ class MediaDirectoryEntry extends MediaDirectoryInputfield
                                 );
                             }
 
+                            $this->getDuration(
+                                $objTpl,
+                                $arrEntry['entryDurationType'],
+                                $arrEntry['entryDurationStart'],
+                                $arrEntry['entryDurationEnd']
+                            );
+
                             if($this->arrSettings['settingsAllowVotes']) {
                                 $objVoting = new MediaDirectoryVoting($this->moduleName);
 
@@ -927,6 +934,13 @@ class MediaDirectoryEntry extends MediaDirectoryInputfield
                                                                'MEDIADIR_ENTRY_FIELD_'.$intPos.'_POS' => contrexx_raw2xhtml(substr($strFieldValue, 0, 255)),
                                     ));
                                 }
+
+                                $this->getDuration(
+                                    $objTpl,
+                                    $arrEntry['entryDurationType'],
+                                    $arrEntry['entryDurationStart'],
+                                    $arrEntry['entryDurationEnd']
+                                );
 
                                 if($this->arrSettings['settingsAllowVotes']) {
                                     $objVoting = new MediaDirectoryVoting($this->moduleName);
@@ -1129,6 +1143,13 @@ JSCODE;
                                 $this->moduleLangVar . $varPrefixUC . '_ENTRY_FIELD_'.$intPos.'_POS' => substr($strFieldValue, 0, 255),
                             ));
                         }
+                        $this->getDuration(
+                            $objTpl,
+                            $arrEntry['entryDurationType'],
+                            $arrEntry['entryDurationStart'],
+                            $arrEntry['entryDurationEnd'],
+                            $varPrefixUC
+                        );
 
                         $i++;
                         $objTpl->parse($this->strBlockName);
@@ -1140,6 +1161,59 @@ JSCODE;
         }
     }
 
+    /**
+     * Set the variables to show the duration of an entry
+     *
+     * @global array $_ARRAYLANG include lang placeholders
+     * @param \Cx\Core\Html\Sigma $objTpl template
+     * @param int $type if the duration is a time period or unlimited
+     * @param int $startDate start date as unix timestamp
+     * @param int $endDate end date as unix timestamp
+     * @param string $prefix custom prefix
+     */
+    public function getDuration(
+        $objTpl, $type, $startDate, $endDate, $prefix = ''
+    ) {
+        global $_ARRAYLANG;
+
+        // duration type 2 means that the entry has a time limit
+        if (
+            $type == 2 &&
+            $objTpl->blockExists(
+                $this->moduleNameLC.'EntryDurationTimePeriod'
+            )
+        ) {
+            $objTpl->setVariable(
+                array(
+                    $this->moduleLangVar . $prefix .'_ENTRY_DURATION_TYPE' =>
+                        $_ARRAYLANG['TXT_MEDIADIR_DISPLAYDURATION_PERIOD'],
+                    $this->moduleLangVar . $prefix
+                        .  '_ENTRY_DURATION_START' => $startDate,
+                    'TXT_'.$this->moduleLangVar . $prefix
+                        . '_ENTRY_DURATION_DATE_SEPARATOR' => $_ARRAYLANG[
+                            'TXT_MEDIADIR_DURATION_DATE_SEPARATOR'
+                        ],
+                    $this->moduleLangVar . $prefix
+                        . '_ENTRY_DURATION_END' => $endDate,
+                )
+            );
+        } else if (
+            $objTpl->blockExists($this->moduleNameLC.'EntryDurationAlways')
+        ) {
+            $objTpl->setVariable(
+                array(
+                    $this->moduleLangVar. $prefix
+                        . '_ENTRY_DURATION_TYPE' => $_ARRAYLANG[
+                            'TXT_MEDIADIR_DISPLAYDURATION_ALWAYS'
+                        ],
+                    'TXT_'.$this->moduleLangVar . $prefix
+                        . '_ENTRY_DURATION_ALWAYS' => $_ARRAYLANG[
+                            'TXT_MEDIADIR_DURATION_ALWAYS'
+                        ]
+                )
+            );
+        }
+    }
 
     /**
      * Get the Url of the section that is used to list the loaded entry

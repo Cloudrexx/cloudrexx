@@ -1388,7 +1388,7 @@ class MediaDirectory extends MediaDirectoryLibrary
 
     function getHeadlines($arrExistingBlocks)
     {
-        global $_CORELANG, $objTemplate;
+        global $_CORELANG, $objTemplate, $_ARRAYLANG;
 
         // only initialize entries in case option 'List latest entries in webdesign template' is active
         if ($this->arrSettings['showLatestEntriesInWebdesignTmpl']) {
@@ -1433,6 +1433,15 @@ class MediaDirectory extends MediaDirectoryLibrary
                     $this->moduleLangVar.'_LATEST_ENTRY_FIELD_'.$intPos.'_POS' => $strFieldValue
                 ));
             }
+
+            $objEntry->getDuration(
+                $objTemplate,
+                $arrEntry['entryDurationType'],
+                $arrEntry['entryDurationStart'],
+                $arrEntry['entryDurationEnd'],
+                '_LATEST'
+            );
+
 
             $blockId = $arrExistingBlocks[$i];
             $objTemplate->parse($this->moduleNameLC.'Latest_row_'.$blockId);
