@@ -578,7 +578,12 @@ die("Failed to get Customer for ID $customer_id");
             }
             $objProduct = $productRepo->find($product_id);
             if ($objProduct) {
-                $productCatIds = $objProduct->getCategories();
+                $categories = $objProduct->getCategories();
+                $productCatIds = array();
+                foreach ($categories as $category) {
+                    $productCatIds[] = $category->getId();
+                }
+                $productCatIds = implode(',', $productCatIds);
                 if (isset($_SESSION['shop']['previous_category_id']) && in_array($_SESSION['shop']['previous_category_id'], array_map('intval', $productCatIds))) {
                     $selectedCatId = $_SESSION['shop']['previous_category_id'];
                 } else {
@@ -1294,7 +1299,7 @@ die("Failed to update the Cart!");
         if ($product_id && empty($category_id)) {
             $objProduct = $productRepo->find($product_id);
             if ($objProduct && $objProduct->getStatus()) {
-                $category_id = $objProduct->getCategories();
+                $categories = $objProduct->getCategories();
             } else {
                 \Cx\Core\Csrf\Controller\Csrf::redirect(
                     \Cx\Core\Routing\Url::fromModuleAndCmd('shop', '')
@@ -1302,8 +1307,8 @@ die("Failed to update the Cart!");
             }
             if (isset($_SESSION['shop']['previous_category_id'])) {
                 $category_id_previous = $_SESSION['shop']['previous_category_id'];
-                foreach ($category_id as $id) {
-                    if ($category_id_previous == intval($id)) {
+                foreach ($categories as $category) {
+                    if ($category_id_previous == $category->getId()) {
                         $category_id = $category_id_previous;
                     }
                 }
