@@ -319,21 +319,6 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
             // Order not found
             return false;
         }
-        $coupon_code = NULL;
-        $coupon_amount = 0;
-        $customerCouponRepo = $this->_em->getRepository(
-            'Cx\Modules\Shop\Model\Entity\RelCustomerCoupon'
-        );
-        $couponRepo = $this->_em->getRepository(
-            'Cx\Modules\Shop\Model\Entity\DiscountCoupon'
-        );
-        $objCustomerCoupon = $customerCouponRepo->findOneBy(
-            array('orderId' => $order_id)
-        );
-
-        if ($objCustomerCoupon) {
-            $coupon_code = $objCustomerCoupon->getCode();
-        }
         $userData = array();
         $arrItems = $objOrder->getOrderItems();
         foreach ($arrItems as $item) {
@@ -341,13 +326,9 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
             $product_id = $item->getProductId();
             $quantity = $item->getQuantity();
             $item_price = $item->getPrice();
-            if ($objOrder->getOptionArray()) {
-                foreach (
-                    $objOrder->getOptionArray() as $attribute_name => $arrAttribute
-                ) {
-                    foreach ($arrAttribute as $arrOption) {
-                        $item_price += $option_price;
-                    }
+            if ($item->getOrderAttributes()) {
+                foreach ($item->getOrderAttributes() as $orderAttribute) {
+                    $item_price += $orderAttribute->getPrice();
                 }
             }
             // Add an account for every single instance of every Product
@@ -437,6 +418,7 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
 
                     $this->_em->persist($newCoupon);
                     $this->_em->flush();
+                    $this->_em->refresh($item);
                 }
             }
         }
@@ -446,9 +428,11 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
     /**
      * Returns the coupon reduction amount for an order
      * @param int $order_id ID of an order
+     * @param bool $create_accounts If set to false this only calculates prices
+     *      but does not redeem the coupon(s)
      * @return double Reduction, 0 if no coupon is used
      */
-    public function redeemCoupons($order_id) {
+    public function redeemCoupons($order_id, $create_accounts, $customer_id) {
         $objOrder = $this->find($order_id);
         if (!$objOrder) {
             // Order not found
@@ -456,15 +440,10 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
         }
         $coupon_code = NULL;
         $coupon_amount = 0;
-        $customerCouponRepo = $this->_em->getRepository(
-            'Cx\Modules\Shop\Model\Entity\RelCustomerCoupon'
-        );
         $couponRepo = $this->_em->getRepository(
             'Cx\Modules\Shop\Model\Entity\DiscountCoupon'
         );
-        $objCustomerCoupon = $customerCouponRepo->findOneBy(
-            array('orderId' => $order_id)
-        );
+        $objCustomerCoupon = $this->getOrderDiscountCoupon($order_id);
 
         if ($objCustomerCoupon) {
             $coupon_code = $objCustomerCoupon->getCode();
@@ -504,6 +483,21 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
     }
 
     /**
+     * Returns the discount coupon used for the given order (if any)
+     *
+     * @param int $orderId ID of the order to get the discount coupon of
+     * @return DiscountCoupon|null Coupon used with this order
+     */
+    protected function getOrderDiscountCoupon($orderId) {
+        $customerCouponRepo = $this->_em->getRepository(
+            'Cx\Modules\Shop\Model\Entity\RelCustomerCoupon'
+        );
+        return $customerCouponRepo->findOneBy(
+            array('orderId' => $orderId)
+        );
+    }
+
+    /**
      * Returns an array with all placeholders and their values to be
      * replaced in any shop mailtemplate for the given order ID.
      *
@@ -518,7 +512,8 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
      *
      * @param integer $order_id        The order ID
      * @param boolean $create_accounts If true, creates User accounts
-     *                                 and Coupon codes.  Defaults to true
+     *                                 and Coupon codes and redeems Coupons.
+     *                                 Defaults to true
      * @param boolean $updateStock     If the stock is to be updated
      *
      * @return array                 The array with placeholders as keys
@@ -625,8 +620,7 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
             );
         }
         if ($payment_id) {
-            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-            $payment = $cx->getDb()->getEntityManager()->getRepository(
+            $payment = $this->_em->getRepository(
                 'Cx\Modules\Shop\Model\Entity\Payment'
             )->find($payment_id);
             $name = !empty($payment) ? $payment->getName() : '';
@@ -644,52 +638,48 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
                 )),
             );
         }
-        $arrItems = $objOrder->getItems();
+        $arrItems = $objOrder->getOrderItems();
         if (!$arrItems) {
             \Message::warning($_ARRAYLANG['TXT_SHOP_ORDER_WARNING_NO_ITEM']);
         }
         // Deduct Coupon discounts, either from each Product price, or
         // from the items total.  Mind that the Coupon has already been
         // stored with the Order, but not redeemed yet.
-        $coupon_amount = $this->redeemCoupons($order_id);
+        $coupon_amount = $this->redeemCoupons($order_id, $create_accounts, $customer_id);
         $orderItemCount = 0;
         $total_item_price = 0;
 
         // Suppress Coupon messages (see Coupon::available())
         \Message::save();
         foreach ($arrItems as $item) {
-            $product_id = $item['product_id'];
-            $objProduct = \Cx\Modules\Shop\Controller\Product::getById(
-                $product_id
-            );
+            $product_id = $item->getProductId();
+            $objProduct = $item->getProduct();
             if (!$objProduct) {
 //die("Product ID $product_id not found");
                 continue;
             }
 //DBG::log("Orders::getSubstitutionArray(): Item: Product ID $product_id");
-            $product_name = substr($item['name'], 0, 40);
-            $item_price = $item['price'];
-            $quantity = $item['quantity'];
+            $product_name = substr($item->getProductName(), 0, 40);
+            $item_price = $item->getPrice();
+            $quantity = $item->getQuantity();
 // TODO: Add individual VAT rates for Products
 //            $orderItemVatPercent = $objResultItem->fields['vat_percent'];
-            $product_code = $objProduct->code();
+            $product_code = $objProduct->getCode();
             // Pick the order items attributes
             $str_options = '';
             $optionList = array();
             // Any attributes?
-            if ($item['attributes']) {
+            if ($item->getOrderAttributes()) {
                 $str_options = '  '; // '[';
                 $attribute_name_previous = '';
-                foreach (
-                    $item['attributes'] as $attribute_name => $arrAttribute
-                ) {
+                foreach ($item->getOrderAttributes() as $orderAttribute) {
+                    $attribute_name = $orderAttribute->getAttributeName();
                     $optionValues = array();
 //DBG::log("Attribute /$attribute_name/ => ".var_export($arrAttribute, true));
 // NOTE: The option price is optional and may be left out
-                    foreach ($arrAttribute as $arrOption) {
                         $option = array();
-                        $option_name = $arrOption['name'];
-                        $option_price = $arrOption['price'];
+                    $option_name = $orderAttribute->getOptionName();
+                    $option_price = $orderAttribute->getPrice();
                         $item_price += $option_price;
                         // Recognize the names of uploaded files,
                         // verify their presence and use the original name
@@ -732,7 +722,6 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
                                     getActiveCurrencyCode();
                         }
                         $optionValues[] = $option;
-                    }
                     $optionList[] = array(
                         'PRODUCT_OPTIONS_NAME' => $attribute_name,
                         'PRODUCT_OPTIONS_VALUES' => $optionValues,
@@ -756,46 +745,50 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
 //DBG::log("Orders::getSubstitutionArray($order_id, $create_accounts): Adding article: ".var_export($arrProduct, true));
             $orderItemCount += $quantity;
             $total_item_price += $item_price*$quantity;
-                // Add an account for every single instance of every Product
-                for ($instance = 1; $instance <= $quantity; ++$instance) {
-                    // In case there are protected downloads in the cart,
-                    // collect the group IDs
-                    $arrUsergroupId = array();
-                    if ($objProduct->distribution() == 'download') {
-                        $usergroupIds = $objProduct->usergroup_ids();
-                        if ($usergroupIds != '') {
-                            $arrUsergroupId = explode(',', $usergroupIds);
-                        }
+            // Add an account for every single instance of every Product
+            for ($instance = 1; $instance <= $quantity; ++$instance) {
+                // In case there are protected downloads in the cart,
+                // collect the group IDs
+                $arrUsergroupId = array();
+                    if ($objProduct->getDistribution() == 'download') {
+                        $usergroupIds = $objProduct->getUserGroupIds();
+                    if ($usergroupIds != '') {
+                        $arrUsergroupId = explode(',', $usergroupIds);
                     }
-                    // create an account that belongs to all collected
-                    // user groups, if any.
-                    if (count($arrUsergroupId) > 0) {
-                        $username =
-                            self::usernamePrefix.
-                            "_${order_id}_${product_id}_${instance}";
+                }
+                // create an account that belongs to all collected
+                // user groups, if any.
+                if (count($arrUsergroupId) > 0) {
+                    $username =
+                        self::usernamePrefix.
+                        "_${order_id}_${product_id}_${instance}";
                     $userpass = '******';
                     if ($create_accounts && isset($userData[$username])) {
                         $userpass = $userData[$username];
-                        }
+                    }
                     if (empty($arrProduct['USER_DATA'])) {
-                            $arrProduct['USER_DATA'] = array();
+                        $arrProduct['USER_DATA'] = array();
                     }
-                        $arrProduct['USER_DATA'][] = array(
-                            'USER_NAME' => $username,
-                            'USER_PASS' => $userpass,
-                        );
-                    }
+                    $arrProduct['USER_DATA'][] = array(
+                        'USER_NAME' => $username,
+                        'USER_PASS' => $userpass,
+                    );
+                }
 //echo("Instance $instance");
-                    if ($objProduct->distribution() == 'coupon') {
-                        if (empty($arrProduct['COUPON_DATA']))
-                            $arrProduct['COUPON_DATA'] = array();
+                    if ($objProduct->getDistribution() == 'coupon') {
+                    if (empty($arrProduct['COUPON_DATA']))
+                        $arrProduct['COUPON_DATA'] = array();
 //DBG::log("Orders::getSubstitutionArray(): Getting code");
 
-                        $arrProduct['COUPON_DATA'][] = array(
-                        'COUPON_CODE' => $item->getDiscountCoupon()->getCode()
-                        );
-                    }
+                        $validTo = $_ARRAYLANG['TXT_SHOP_DISCOUNT_COUPON_END_TIME_UNLIMITED'];
+                        if ($item->getDiscountCoupon()->getEndTime()) {
+                            $validTo = date(ASCMS_DATE_FORMAT_DATE, $item->getDiscountCoupon()->getEndTime());
+                        }
+                    $arrProduct['COUPON_DATA'][] = array(
+                            'COUPON_CODE' => $item->getDiscountCoupon()->getCode(),
+                    );
                 }
+            }
             if (empty($arrSubstitution['ORDER_ITEM']))
                 $arrSubstitution['ORDER_ITEM'] = array();
             $arrSubstitution['ORDER_ITEM'][] = $arrProduct;
@@ -805,11 +798,10 @@ class OrderRepository extends \Doctrine\ORM\EntityRepository
         $arrSubstitution['ORDER_ITEM_COUNT'] = sprintf('% 4u', $orderItemCount);
         \Message::restore();
         // Fill in the Coupon block with proper discount and amount
-        if ($objCoupon) {
-            $coupon_code = $objCoupon->getCode();
+        if ($this->getOrderDiscountCoupon($order_id)) {
+            $coupon_code = $this->getOrderDiscountCoupon($order_id)->getCode();
 //\DBG::log("Orders::getSubstitutionArray(): Coupon $coupon_code, amount $coupon_amount");
-        }
-        if ($coupon_amount) {
+            $coupon_amount = $this->getOrderDiscountCoupon($order_id)->getAmount();
 //\DBG::log("Orders::getSubstitutionArray(): Got Order Coupon $coupon_code");
             $arrSubstitution['DISCOUNT_COUPON'][] = array(
                 'DISCOUNT_COUPON_CODE' => sprintf('%-40s', $coupon_code),
