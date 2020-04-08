@@ -813,9 +813,27 @@ class JsonProductController extends \Cx\Core\Core\Model\Entity\Controller
             $validValues[$vat->getId()] = $title;
         }
 
+        // overview callback parameter format is different from edit callback!
+        $vat = null;
+        $name = '';
+        // overview
+        if (isset($params['rows']) && !isset($params['vat'])) {
+            $name = $params['data']->getAttributes()['name'];
+            $vat = $params['rows']['vat'];
+
+        // edit view
+        } else {
+            $name = $params['name'];
+            $vat = $params['value'];
+        }
+        $vatId = null;
+        if ($vat) {
+            $vatId = $vat->getId();
+        }
+
         return new \Cx\Core\Html\Model\Entity\DataElement(
-            '',
-            $params['rows']['vatId'],
+            $name,
+            $vatId,
             'select',
             null,
             $validValues
