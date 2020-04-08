@@ -328,6 +328,7 @@ class ProductController extends \Cx\Core\Core\Model\Entity\Controller
                 ),
             ),
             'dateStart' => array(
+                'type' => 'date',
                 'showOverview' => false,
                 'allowFiltering' => false,
                 'postCallback' => array(
@@ -336,6 +337,7 @@ class ProductController extends \Cx\Core\Core\Model\Entity\Controller
                 ),
             ),
             'dateEnd' => array(
+                'type' => 'date',
                 'showOverview' => false,
                 'allowFiltering' => false,
                 'postCallback' => array(
