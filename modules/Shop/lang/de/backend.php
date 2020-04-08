@@ -147,7 +147,8 @@ $_ARRAYLANG['TXT_SHOP_DISCOUNT_COUPON_CODE'] = "Gutschein Code";
 
 $_ARRAYLANG['TXT_ORDER_WASNT_YET_EDITED'] = "Diese Bestellung wurde noch nicht bearbeitet.";
 
-$_ARRAYLANG['active'] = 'Aktiv für';
+$_ARRAYLANG['TXT_SHOP_PAYMENT_ACTIVE'] = 'Aktiv für';
+$_ARRAYLANG['active'] = 'Aktiv';
 $_ARRAYLANG['parentCategory'] = 'Übergeordnete Rubrik';
 $_ARRAYLANG['picture'] = 'Kategoriebild';
 $_ARRAYLANG['shortDescription'] = 'Kurzbeschreibung';

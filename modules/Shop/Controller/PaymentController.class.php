@@ -130,6 +130,7 @@ class PaymentController extends \Cx\Core\Core\Model\Entity\Controller
                 'showOverview' => false,
             ),
             'active' => array(
+                'header' => 'TXT_SHOP_PAYMENT_ACTIVE',
                 'editable' => true,
                 'validValues' => array(
                     'all' => $_ARRAYLANG['TXT_ALL'],
