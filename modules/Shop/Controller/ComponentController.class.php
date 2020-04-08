@@ -234,8 +234,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     public function getCommandsForCommandMode()
     {
         return array(
-            'generatePdfPricelist' => new
-            \Cx\Core_Modules\Access\Model\Entity\Permission(
+            'generatePdfPricelist' => new \Cx\Core_Modules\Access\Model\Entity\Permission(
                 array('http', 'https'), // allowed protocols
                 array(
                     'get',
@@ -249,6 +248,13 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 false,  // requires login
                 array(),
                 array()
+            ),
+            'createOrderItemPdf' => new \Cx\Core_Modules\Access\Model\Entity\Permission(
+                array('http', 'https', 'cli'), // allowed protocols
+                array(
+                    'cli',
+                    'get',
+                )   // allowed methods
             ),
         );
     }
@@ -270,6 +276,11 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 }
                 return 'Generates Pdf for a pricelist with all related 
                     categories and their products.';
+            case 'createOrderItemPdf':
+                if ($short) {
+                    return 'Generates the PDF associated with an OrderItem (if any)';
+                }
+                return 'Pass an order item ID';
             default:
                 return '';
         }
@@ -286,21 +297,82 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      */
     public function executeCommand($command, $arguments, $dataArguments = array())
     {
-        try {
-            switch ($command) {
-                case 'generatePdfPricelist':
+        switch ($command) {
+            case 'generatePdfPricelist':
+                try {
                     if (empty($arguments['id'])) {
                         return;
                     }
                     $this->getController('Pdf')->generatePdfPricelist(
                         intval($arguments['id']),1
                     );
-                    break;
-            }
-        } catch (\Exception $e) {
-            http_response_code(400); // BAD REQUEST
-            echo 'Exception of type "' . get_class($e) . '" with message "' .
-                $e->getMessage() . '"';
+                } catch (\Exception $e) {
+                    http_response_code(400); // BAD REQUEST
+                    echo 'Exception of type "' . get_class($e) . '" with message "' .
+                        $e->getMessage() . '"';
+                }
+                break;
+            case 'createOrderItemPdf':
+                if (!defined('FRONTEND_LANG_ID')) {
+                    define('FRONTEND_LANG_ID', 1);
+                }
+                if (empty($arguments[0])) {
+                    throw new \Exception('You need to pass an OrderItem ID');
+                }
+                $em = $this->cx->getDb()->getEntityManager();
+                $orderItemRepo = $em->getRepository($this->getNamespace() . '\Model\Entity\OrderItem');
+                $orderItem = $orderItemRepo->find($arguments[0]);
+                if (!$orderItem->getProduct()->getPdfTemplate()) {
+                    throw new \Exception('There\'s no PdfTemplate associated with this OrderItem\'s Product.');
+                }
+                $orderRepo = $em->getRepository($this->getNamespace() . '\Model\Entity\Order');
+                $arrSubstitution = $orderRepo->getSubstitutionArray(
+                    $orderItem->getOrder()->getId(),
+                    false,
+                    false
+                );
+                $orderItemSubstitutions = array();
+                foreach ($arrSubstitution['ORDER_ITEM'] as $orderItemSubstitution) {
+                    $orderItemSubstitutions[$orderItemSubstitution['PRODUCT_ID']] =
+                        $orderItemSubstitution;
+                }
+                $arrSubstitution['ORDER_ITEM'] = array(
+                    $orderItemSubstitutions[$orderItem->getProduct()->getId()]
+                );
+                // Buffer and reset the filename in order to allow us to set the
+                // filename manually. If we don't do this the current time is used
+                // which leads to the same file being overwritten if we generate
+                // multiple PDFs quickly.
+                $pdfName = $orderItem->getProduct()->getPdfTemplate()->getFileName();
+                $orderItem->getProduct()->getPdfTemplate()->setFileName('');
+                $productPdf = $this->getComponent('Pdf')->generatePDF(
+                    $orderItem->getProduct()->getPdfTemplate()->getId(),
+                    $arrSubstitution,
+                    $i . '_' . $pdfName
+                );
+                // restore name so it is still there in the next iteration and
+                // does not get persisted.
+                $orderItem->getProduct()->getPdfTemplate()->setFileName($pdfName);
+
+                // move file to temporary public folder
+                $tmpPath = $this->getComponent('Core')->getPublicUserTempFolder() . 
+                    basename($productPdf['filePath']);
+                $objFile = new \Cx\Lib\FileSystem\File($productPdf['filePath']);
+                $objFile->move($tmpPath);
+
+                if (php_sapi_name() == 'cli') {
+                    echo $tmpPath . PHP_EOL;
+                } else {
+                    // move file to temporary public folder
+                    \Cx\Core\Csrf\Controller\Csrf::redirect(
+                        str_replace(
+                            $this->cx->getWebsiteDocumentRootPath(),
+                            '',
+                            $tmpPath
+                        )
+                    );
+                }
+                break;
         }
     }
 
