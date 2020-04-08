@@ -527,18 +527,19 @@ class JsonProductController extends \Cx\Core\Core\Model\Entity\Controller
                     $parentElement->addClass('open');
                 }
 
-                $attrName = $parentInput->getAttribute('name') . '[' .
+                $attrName = $parentInput->getAttribute('data-name') . '[' .
                     $option->getId() . ']';
                 $attrId = $parentInput->getAttribute('id') . '-' .
                     $option->getId();
 
                 $parentElement->addChild($optionWrapper);
                 $label->setAttribute('for', $attrId);
+                $checkbox->setAttribute('name', $attrName);
             } else {
                 $wrapper->addChild($optionWrapper);
             }
 
-            $checkbox->setAttribute('name', $attrName);
+            $checkbox->setAttribute('data-name', $attrName);
             $checkbox->setAttribute('id', $attrId);
             $optionWrapper->addChild($checkbox);
             $optionWrapper->addChild($label);
