@@ -1,7 +1,0 @@
-<strong>Ref-Nr. %REFERENCE% </strong><br />
-<img src=\"%ÜBERSICHTSBILD%\" style=\"height: 60px;\" /><br />
-%HEADLINE%
-%HEADER% <br />
-%ADRESSE% <br />
-%ORT%<br />
-CHF: %PREIS%.-

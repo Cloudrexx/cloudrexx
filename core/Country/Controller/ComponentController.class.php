@@ -58,6 +58,8 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      * @param \Cx\Core\ContentManager\Model\Entity\Page $page       The resolved page
      */
     public function load(\Cx\Core\ContentManager\Model\Entity\Page $page) {
+        // TODO: reimplement
+        return;
 
         global $_CORELANG, $subMenuTitle;
 

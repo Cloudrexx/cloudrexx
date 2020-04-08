@@ -48,6 +48,11 @@ namespace Cx\Modules\Calendar\Controller;
 class CalendarFormManager extends CalendarLibrary
 {
     /**
+     * @var array List of indexData of calendar events synced from a remote location
+     */
+    protected static $syncedIds;
+
+    /**
      * Form list
      *
      * @access public
@@ -126,6 +131,30 @@ class CalendarFormManager extends CalendarLibrary
     function getFormList() {
         global $objDatabase;
 
+        // customizing: hide synced events in backend
+        $cx = \Env::get('cx');
+        $sync = $cx->getComponent('Sync');
+        if (
+            $sync &&
+            !isset(static::$syncedIds)
+        ) {
+            $query = '
+                SELECT
+                    `local_id`
+                FROM
+                    `' . DBPREFIX . 'core_module_sync_id_mapping`
+                WHERE
+                    `entity_type` LIKE \'Cx\\\\\\\\Modules\\\\\\\\Calendar\\\\\\\\Model\\\\\\\\Entity\\\\\\\\RegistrationForm\'
+            ';
+            $adoDb = $cx->getDb()->getAdoDb();
+            $result = $adoDb->execute($query);
+            static::$syncedIds = array();
+            while (!$result->EOF) {
+                static::$syncedIds[] = $result->fields['local_id'];
+                $result->MoveNext();
+            }
+        }
+
         $where = array();
         if ($this->onlyActive) {
             $where[] = 'status = 1';
@@ -152,6 +181,17 @@ class CalendarFormManager extends CalendarLibrary
         }
 
         while (!$objResult->EOF) {
+            if (
+                !empty(static::$syncedIds) &&
+                $cx->getMode() == \Cx\Core\Core\Controller\Cx::MODE_BACKEND
+            ) {
+                $indexData = serialize(array('id' => (string) $objResult->fields['id']));
+                if (in_array($indexData, static::$syncedIds)) {
+                    $objResult->MoveNext();
+                    continue;
+                }
+            }
+
             $objForm = new \Cx\Modules\Calendar\Controller\CalendarForm(intval($objResult->fields['id']));
             $this->formList[] = $objForm;
             $objResult->MoveNext();
