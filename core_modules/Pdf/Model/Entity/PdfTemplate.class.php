@@ -162,4 +162,12 @@ class PdfTemplate extends \Cx\Model\Base\EntityBase {
     {
         return $this->active;
     }
+
+    /**
+     * Returns this template's title
+     * @return string Title of this template
+     */
+    public function __toString() {
+        return $this->getTitle();
+    }
 }
