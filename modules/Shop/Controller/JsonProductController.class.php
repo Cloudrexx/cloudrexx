@@ -867,7 +867,7 @@ class JsonProductController extends \Cx\Core\Core\Model\Entity\Controller
             'Cx\Modules\Shop\Model\Entity\Product'
         )->find($id);
 
-        $isVisible = true;
+        $isVisible = false;
         if (!empty($product)) {
             $isVisible = $product->getStockVisible();
         }
@@ -956,7 +956,7 @@ class JsonProductController extends \Cx\Core\Core\Model\Entity\Controller
             'Cx\Modules\Shop\Model\Entity\Product'
         )->find($id);
 
-        $isActive = true;
+        $isActive = false;
         if (!empty($product)) {
             $isActive = $product->getDiscountActive();
         }
