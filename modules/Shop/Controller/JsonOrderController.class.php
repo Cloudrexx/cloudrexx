@@ -421,7 +421,8 @@ class JsonOrderController
                 'price' => $price,
                 'vat' => $item->getVatRate(),
                 'sum' => $sum,
-                'orderAttributes' => $item->getOrderAttributes()
+                'orderAttributes' => $item->getOrderAttributes(),
+                'itemId' => $item->getId(),
             );
         }
 
@@ -537,6 +538,14 @@ class JsonOrderController
                         'parse' => function($value, $rowData) {
                             $productName = $value;
                             if (isset($rowData['orderAttributes'])) {
+                                $em = $this->cx->getDb()->getEntityManager();
+                                $productRepo = $em->getRepository(
+                                    'Cx\Modules\Shop\Model\Entity\Product'
+                                );
+                                $product = $productRepo->find($rowData['productId']);
+                                if ($product->getPdfTemplate()) {
+                                    $productName .= ' <a href="' . \Cx\Core\Routing\Url::fromApi('createOrderItemPdf', array($rowData['itemId'])) . '"><img src="/modules/Downloads/View/Media/pdf.gif" /></a>';
+                                }
                                 foreach (
                                     $rowData['orderAttributes'] as $attribute
                                 ) {
