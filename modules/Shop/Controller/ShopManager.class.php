@@ -2726,9 +2726,8 @@ if ($test === NULL) {
             self::$objTemplate->setVariable(array(
                 'SHOP_ROWCLASS' => 'row'.(++$i % 2 + 1),
                 'SHOP_ORDER_ID' => $order->getId(),
-                'SHOP_ORDER_ID_CUSTOM' => ShopLibrary::getCustomOrderId(
-                    $order->getId(), $order->getDateTime()),
-                'SHOP_ORDER_DATE' => $order->getDateTime(),
+                'SHOP_ORDER_ID_CUSTOM' => ShopLibrary::getCustomOrderId($order->getId()),
+                'SHOP_ORDER_DATE' => $order->getDateTime()->format(ASCMS_DATE_FORMAT_DATETIME),
                 'SHOP_ORDER_STATUS' =>
                     $_ARRAYLANG['TXT_SHOP_ORDER_STATUS_'.$order->getStatus()],
                 'SHOP_ORDER_SUM' =>
