@@ -1406,7 +1406,7 @@ class User extends User_Profile
         }
 
         $user->setUsername($this->username);
-        $user->setIsAdmin(intval($this->is_admin));
+        $user->setSuperUser(intval($this->is_admin));
         $user->setEmail($this->email);
         $user->setEmailAccess($this->email_access);
         $user->setFrontendLangId($this->frontend_language);
@@ -1456,7 +1456,7 @@ class User extends User_Profile
         $user = new \Cx\Core\User\Model\Entity\User();
 
         $user->setUsername($this->username);
-        $user->setIsAdmin(intval($this->is_admin));
+        $user->setSuperUser(intval($this->is_admin));
         $user->setPassword($this->password);
         $user->setAuthToken($this->auth_token);
         $user->setAuthTokenTimeout($this->auth_token_timeout);
