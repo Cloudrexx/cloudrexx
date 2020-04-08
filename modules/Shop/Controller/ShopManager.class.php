@@ -2725,7 +2725,7 @@ if ($test === NULL) {
                 'SHOP_ORDER_ID' => $order->getId(),
                 'SHOP_ORDER_ID_CUSTOM' => ShopLibrary::getCustomOrderId(
                     $order->getId(), $order->getDateTime()),
-                'SHOP_ORDER_DATE' => $order->getDateTime(),
+                'SHOP_ORDER_DATE' => $order->getDateTime()->format(ASCMS_DATE_FORMAT_DATETIME),
                 'SHOP_ORDER_STATUS' =>
                     $_ARRAYLANG['TXT_SHOP_ORDER_STATUS_'.$order->getStatus()],
                 'SHOP_ORDER_SUM' =>
