@@ -3777,4 +3777,4 @@ ALTER TABLE contrexx_module_shop_rel_category_pricelist ADD CONSTRAINT FK_B56E91
 ALTER TABLE contrexx_module_shop_rel_category_product ADD CONSTRAINT FK_DA4CA51112469DE2 FOREIGN KEY (category_id) REFERENCES contrexx_module_shop_categories (id);
 ALTER TABLE contrexx_module_shop_rel_category_product ADD CONSTRAINT FK_DA4CA5114584665A FOREIGN KEY (product_id) REFERENCES contrexx_module_shop_products (id);
 ALTER TABLE contrexx_module_shop_shipper ADD CONSTRAINT FK_52CD810E9F2C3FAB FOREIGN KEY (`zone_id`) REFERENCES contrexx_module_shop_zones (`id`);
-(??)
+ALTER TABLE contrexx_module_shop_products ADD CONSTRAINT FK_97F512B7CA5AA7D3 FOREIGN KEY (pdf_template_id) REFERENCES contrexx_core_module_pdf_template (id);
