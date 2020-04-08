@@ -339,20 +339,11 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 $arrSubstitution['ORDER_ITEM'] = array(
                     $orderItemSubstitutions[$orderItem->getProduct()->getId()]
                 );
-                // Buffer and reset the filename in order to allow us to set the
-                // filename manually. If we don't do this the current time is used
-                // which leads to the same file being overwritten if we generate
-                // multiple PDFs quickly.
-                $pdfName = $orderItem->getProduct()->getPdfTemplate()->getFileName();
-                $orderItem->getProduct()->getPdfTemplate()->setFileName('');
                 $productPdf = $this->getComponent('Pdf')->generatePDF(
                     $orderItem->getProduct()->getPdfTemplate()->getId(),
                     $arrSubstitution,
-                    $i . '_' . $pdfName
+                    'order_confirmation'
                 );
-                // restore name so it is still there in the next iteration and
-                // does not get persisted.
-                $orderItem->getProduct()->getPdfTemplate()->setFileName($pdfName);
 
                 // move file to temporary public folder
                 $tmpPath = $this->getComponent('Core')->getPublicUserTempFolder() . 
