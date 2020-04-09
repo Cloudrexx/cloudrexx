@@ -335,7 +335,7 @@ class NewsletterLib
                 $userRepo = $cx->getDb()->getEntityManager()->getRepository(
                     'Cx\Core\User\Model\Entity\User'
                 );
-                // get user's language by email
+                // get user's language by id
                 $user = $userRepo->find($id);
                 if (!empty($user) && $user->getFrontendLangId()) {
                     $userLanguage = $user->getFrontendLangId();
