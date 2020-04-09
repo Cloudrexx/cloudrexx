@@ -1154,7 +1154,7 @@ class User_Profile_Attribute
             try {
                 $em->persist($attribute);
                 $em->flush();
-                if (!isset($this->arrAttributes[$this->id][$fieldName]) ||
+                if (
                     $objDatabase->Execute(
                         'DELETE FROM `' . DBPREFIX . 'access_group_dynamic_ids`
                             WHERE `access_id` = ' . $this->arrAttributes[$this->id][$fieldName]
