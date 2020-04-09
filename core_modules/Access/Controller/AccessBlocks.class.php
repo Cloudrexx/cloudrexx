@@ -358,7 +358,7 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
 
     /**
      * Parses ACCESS_USER_ID, -USERNAME and -REGDATE placeholders and the user's attributes
-     * @param \User User object to parse placeholders for
+     * @param \Cx\Core\User\Model\Entity\User User object to parse placeholders for
      */
     public function parseBasePlaceholders($objUser) {
         $this->_objTpl->setVariable(array(
