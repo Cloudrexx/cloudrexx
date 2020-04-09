@@ -60,7 +60,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     protected $description = '';
 
     /**
-     * @var integer $active
+     * @var boolean $active
      */
     protected $active = 1;
 
@@ -205,7 +205,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Set isActive
      *
-     * @param integer $isActive
+     * @param boolean $isActive
      * @deprecated
      * @see \Cx\Core\User\Model\Entity\Group::setActive()
      */
@@ -227,7 +227,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get isActive
      *
-     * @return integer $active
+     * @return boolean $active
      * @deprecated
      * @see \Cx\Core\User\Model\Entity\Group::getActive()
      */
@@ -241,7 +241,7 @@ class Group extends \Cx\Model\Base\EntityBase {
      *
      * This does exactly the same as isActive, but this method is necessary for doctrine mapping
      *
-     * @return integer $active if group is active
+     * @return boolean $active if group is active
      */
     public function getActive()
     {
@@ -253,7 +253,7 @@ class Group extends \Cx\Model\Base\EntityBase {
      *
      * This does exactly the same as getActive, but this method name is more intuitive
      *
-     * @return integer $active if group is active
+     * @return boolean $active if group is active
      */
     public function isActive()
     {
