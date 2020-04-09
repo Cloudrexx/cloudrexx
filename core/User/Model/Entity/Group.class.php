@@ -45,17 +45,17 @@ namespace Cx\Core\User\Model\Entity;
  */
 class Group extends \Cx\Model\Base\EntityBase {
     /**
-     * @var integer
+     * @var integer $id
      */
     protected $id;
 
     /**
-     * @var string
+     * @var string $name
      */
     protected $name = '';
 
     /**
-     * @var string
+     * @var string $description
      */
     protected $description = '';
 
@@ -65,22 +65,22 @@ class Group extends \Cx\Model\Base\EntityBase {
     protected $active = 1;
 
     /**
-     * @var enum_user_group_type
+     * @var enum_user_group_type $type
      */
     protected $type = 'frontend';
 
     /**
-     * @var string
+     * @var string $homepage
      */
     protected $homepage = '';
 
     /**
-     * @var integer
+     * @var integer $toolbar
      */
     protected $toolbar = 0;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection $users
      */
     protected $users;
 
@@ -95,7 +95,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get groupId
      *
-     * @return integer 
+     * @return integer $id
      * @deprecated
      * @see \Cx\Core\User\Model\Entity\Group::getId()
      */
@@ -107,7 +107,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get id
      *
-     * @return integer group id
+     * @return integer $id group id
      */
     public function getId()
     {
@@ -139,7 +139,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get groupName
      *
-     * @return string 
+     * @return string $name
      * @deprecated
      * @see \Cx\Core\User\Model\Entity\Group::getName()
      */
@@ -151,7 +151,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get name
      *
-     * @return string group name
+     * @return string $name group name
      */
     public function getName()
     {
@@ -183,7 +183,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get groupDescription
      *
-     * @return string 
+     * @return string $description
      * @deprecated
      * @see \Cx\Core\User\Model\Entity\Group::getDescription()
      */
@@ -195,7 +195,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get description
      *
-     * @return string group description
+     * @return string $description group description
      */
     public function getDescription()
     {
@@ -227,7 +227,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get isActive
      *
-     * @return integer 
+     * @return integer $active
      * @deprecated
      * @see \Cx\Core\User\Model\Entity\Group::getActive()
      */
@@ -241,7 +241,7 @@ class Group extends \Cx\Model\Base\EntityBase {
      *
      * This does exactly the same as isActive, but this method is necessary for doctrine mapping
      *
-     * @return integer if group is active
+     * @return integer $active if group is active
      */
     public function getActive()
     {
@@ -253,7 +253,7 @@ class Group extends \Cx\Model\Base\EntityBase {
      *
      * This does exactly the same as getActive, but this method name is more intuitive
      *
-     * @return integer if group is active
+     * @return integer $active if group is active
      */
     public function isActive()
     {
@@ -273,7 +273,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get type
      *
-     * @return enum_user_group_type 
+     * @return enum_user_group_type $type
      */
     public function getType()
     {
@@ -293,7 +293,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get homepage
      *
-     * @return string 
+     * @return string $homepage
      */
     public function getHomepage()
     {
@@ -313,7 +313,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get toolbar
      *
-     * @return integer 
+     * @return integer $toolbar
      */
     public function getToolbar()
     {
@@ -355,7 +355,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get user
      *
-     * @return \Doctrine\Common\Collections\Collection 
+     * @return \Doctrine\Common\Collections\Collection $users
      */
     public function getUsers()
     {

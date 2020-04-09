@@ -45,70 +45,73 @@ namespace Cx\Core\User\Model\Entity;
  */
 class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
-     * @var integer
+     * @var integer $id
      */
     protected $id;
 
     /**
-     * @var enum_user_userattribute_type
+     * @var enum_user_userattribute_type $type
      */
     protected $type = 'text';
 
     /**
-     * @var boolean
+     * @var boolean $mandatory
      */
     protected $mandatory = '0';
 
     /**
-     * @var enum_user_userattribute_sorttype
+     * @var enum_user_userattribute_sorttype $sortType
      */
     protected $sortType = 'asc';
 
     /**
-     * @var integer
+     * @var integer $orderId
      */
     protected $orderId = 0;
 
     /**
-     * @var enum_user_userattribute_accessspecial
+     * @var enum_user_userattribute_accessspecial $accessSpecial
      */
     protected $accessSpecial = '';
 
     /**
-     * @var integer
+     * @var integer $accessId
      */
     protected $accessId;
 
     /**
-     * @var integer
+     * @var integer $readAccessId
      */
     protected $readAccessId;
 
     /**
-     * @var \Cx\Core\User\Model\Entity\UserAttribute
+     * @var \Cx\Core\User\Model\Entity\UserAttribute $parent
      */
     protected $parent;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection $userAttributeNames
      */
     protected $userAttributeNames;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection $userAttributeValues
      */
     protected $userAttributeValues;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection $children
      */
     protected $children;
 
-    /***
-     * @var boolean
+    /**
+     * @var boolean $default
      */
     protected $default;
 
+    /**
+     * @var array[] $arrTypes
+     */
     protected $arrTypes = array(
         'text' => array(
             'desc'         => 'TXT_ACCESS_TEXT_FIELD',
@@ -246,7 +249,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get id
      *
-     * @return integer 
+     * @return integer $id
      */
     public function getId()
     {
@@ -266,7 +269,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get type
      *
-     * @return enum_user_userattribute_type 
+     * @return enum_user_userattribute_type $type
      */
     public function getType()
     {
@@ -286,7 +289,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get mandatory
      *
-     * @return boolean
+     * @return boolean $mandatory
      */
     public function getMandatory()
     {
@@ -306,7 +309,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get sortType
      *
-     * @return enum_user_userattribute_sorttype 
+     * @return enum_user_userattribute_sorttype $sortType
      */
     public function getSortType()
     {
@@ -326,7 +329,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get orderId
      *
-     * @return integer 
+     * @return integer $orderId
      */
     public function getOrderId()
     {
@@ -346,7 +349,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get accessSpecial
      *
-     * @return enum_user_userattribute_accessspecial 
+     * @return enum_user_userattribute_accessspecial $accessSpecial
      */
     public function getAccessSpecial()
     {
@@ -366,7 +369,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get accessId
      *
-     * @return integer 
+     * @return integer $accessId
      */
     public function getAccessId()
     {
@@ -386,7 +389,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get readAccessId
      *
-     * @return integer 
+     * @return integer $readAccessId
      */
     public function getReadAccessId()
     {
@@ -408,7 +411,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
      *
      * This does exactly the same as isDefault, but this method is necessary for doctrine mapping
      *
-     * @return boolean
+     * @return boolean $default
      */
     public function getDefault()
     {
@@ -421,7 +424,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
      *
      * This does exactly the same as getDefault, but this method name is more intuitive
      *
-     * @return boolean
+     * @return boolean $default
      */
     public function isDefault()
     {
@@ -451,7 +454,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get children
      *
-     * @return \Doctrine\Common\Collections\Collection 
+     * @return \Doctrine\Common\Collections\Collection $child
      */
     public function getChildren()
     {
@@ -481,7 +484,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get userAttributeName
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection $userAttributeNames
      */
     public function getUserAttributeNames()
     {
@@ -511,7 +514,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get userAttributeValues
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection $userAttributeValues
      */
     public function getUserAttributeValues()
     {
@@ -531,7 +534,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get parent
      *
-     * @return \Cx\Core\User\Model\Entity\UserAttribute 
+     * @return \Cx\Core\User\Model\Entity\UserAttribute $parent
      */
     public function getParent()
     {
@@ -571,7 +574,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Check the read permission of profile attribute
      *
-     * @return boolean
+     * @return boolean $hasReadPermission
      */
     public function checkReadPermission()
     {
@@ -585,7 +588,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get data type
      *
-     * @return string
+     * @return string $dataType
      */
     function getDataType()
     {
