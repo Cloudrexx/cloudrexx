@@ -613,7 +613,6 @@ class User extends User_Profile
                 // Remove all groups from user
                 foreach ($user->getGroup() as $group) {
                     $user->removeGroup($group);
-                    $group->removeUser($user);
                 }
 
                 $objDatabase->startTrans();
