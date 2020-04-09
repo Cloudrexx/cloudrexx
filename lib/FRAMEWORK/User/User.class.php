@@ -1689,8 +1689,6 @@ class User extends User_Profile
         $qb = $em->createQueryBuilder();
         $qb->select('u')
             ->from('Cx\Core\User\Model\Entity\User', 'u')
-            ->leftJoin('u.groups', 'g')
-            ->leftJoin('u.userAttributeValues', 'v')
             ->where($qb->expr()->eq('u.active', ':active'))
             ->andWhere($qb->expr()->not($qb->expr()->eq('u.restoreKey', ':restoreKey')))
             ->andWhere($qb->expr()->lt('u.restoreKeyTime', ':restoreKeyTime'))
@@ -1705,6 +1703,10 @@ class User extends User_Profile
         $userIds = array();
         foreach ($users as $user) {
             $userIds[] = $user->getId();
+            // Remove all user attribute values
+            foreach ($user->getUserAttributeValues() as $value) {
+                $em->remove($value);
+            }
             $em->remove($user);
         }
 
