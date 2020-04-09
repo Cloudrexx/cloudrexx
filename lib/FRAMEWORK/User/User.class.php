@@ -1033,7 +1033,7 @@ class User extends User_Profile
 
         $id = $user->getId();
         foreach (array_keys($this->arrAttributes) as $column) {
-            $getter = 'get'.ucfirst($classMeta->getFieldName($column));
+            $getter = 'get' . \Doctrine\Common\Inflector\Inflector::classify($classMeta->getFieldName($column));
             $value = $user->$getter();
             $this->arrCachedUsers[$id][$column] = $value;
             $this->arrLoadedUsers[$id][$column] = $value;
