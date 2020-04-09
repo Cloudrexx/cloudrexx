@@ -67,7 +67,5 @@ class UserEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventListener
                 $_ARRAYLANG['TXT_CORE_USER_NO_USER_WITH_SAME_ID']
             );
         }
-
-
     }
 }
