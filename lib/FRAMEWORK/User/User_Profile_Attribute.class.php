@@ -680,7 +680,6 @@ class User_Profile_Attribute
 
     public function getById($id)
     {
-
         $objAttribute = clone $this;
         $objAttribute->arrAttributes = &$this->arrAttributes;
         $objAttribute->arrAttributeTree = &$this->arrAttributeTree;
