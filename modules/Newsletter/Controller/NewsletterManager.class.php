@@ -2748,7 +2748,7 @@ class NewsletterManager extends NewsletterLib
             if (!empty($users)) {
                 foreach ($users as $user) {
                     // Check if the received user is correct
-                    if (!empty($usersToCheck) && !in_array($objUser->getId(), $usersToCheck)) {
+                    if (!empty($usersToCheck) && !in_array($user->getId(), $usersToCheck)) {
                 	    continue;
 	                }
 
