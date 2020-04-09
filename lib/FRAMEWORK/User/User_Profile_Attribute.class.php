@@ -740,12 +740,9 @@ class User_Profile_Attribute
             return array();
         }
 
-        $images = array();
-        foreach ($resultImages as $image) {
-            $images[] = $image['picture'];
-        }
-
-        return $images;
+        return array_map(function($image) {
+            return $image['picture'];
+        }, $resultImages);
     }
 
     /**
