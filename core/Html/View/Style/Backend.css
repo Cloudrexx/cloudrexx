@@ -183,16 +183,9 @@ table.adminlist.sortable tr.row1 {
     user-select: none;
 }
 
-table.adminlist.sortable tr.row3 td:first-child,
-table.adminlist.sortable tr.row2 td:first-child,
-table.adminlist.sortable tr.row1 td:first-child {
-    padding-left: 60px;
-}
-
-table.adminlist.sortable tr.row2 td:first-child,
-table.adminlist.sortable tr.row1 td:first-child {
-    background: url(../../../../core/ContentManager/View/Media/Move.png) no-repeat 10px center;
-    background-size: 18px;
+table.adminlist.sortable .drag-drop-handle {
+    display: inline-block;
+    padding-top: 3px;
 }
 
 body.loading {

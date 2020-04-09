@@ -144,12 +144,29 @@ class BackendTable extends HTML_Table {
 
             $formGenerator = new \Cx\Core\Html\Controller\FormGenerator($attrs, '', $entityClass, '', $options, 0, null, $this->viewGenerator, true);
 
+            $headerRowIdx = 0;
+            $headerRowCellType = 'th';
+            if ($this->hasMasterTableHeader) {
+                $headerRowCellType = 'td';
+                $headerRowIdx++;
+            }
+            if (isset($options['multiActions'])) {
+                $this->setCellContents($headerRowIdx, 0, '<input class="multi-action-checkbox-all" type="checkbox" />', $headerRowType, '0', false);
+            }
+
             foreach ($attrs as $rowname=>$rows) {
                 $col = 0;
                 $virtual = $rows['virtual'];
                 unset($rows['virtual']);
                 if (isset($options['multiActions'])) {
                     $this->setCellContents($row, $col, '<input class="multi-action-checkbox" name="select-' . $rowname . '" value="' . $rowname . '" type="checkbox" />', 'TD', '0', false);
+                    $col++;
+                }
+                if (
+                    isset($options['functions']['sortBy']) &&
+                    isset($options['functions']['sortBy']['field'])
+                ) {
+                    $this->setCellContents($row, $col, '<i class="drag-drop-handle"><img src="/core/ContentManager/View/Media/Move.png" /></i>', 'TD', '0', false);
                     $col++;
                 }
                 foreach ($rows as $header=>$data) {
@@ -207,11 +224,7 @@ class BackendTable extends HTML_Table {
                             }
                             $header = '<a href="' .  \Env::get('cx')->getRequest()->getUrl() . '&' . $sortParamName . '=' . $origHeader . $order . '" style="white-space: nowrap;">' . $header . ' ' . $img . '</a>';
                         }
-                        if ($this->hasMasterTableHeader) {
-                            $this->setCellContents(1, $col, $header, 'td', 0);
-                        } else {
-                            $this->setCellContents(0, $col, $header, 'th', 0);
-                        }
+                        $this->setCellContents($headerRowIdx, $col, $header, $headerRowCellType, 0);
                     }
                     if (
                         isset($options['fields']) &&
@@ -353,11 +366,7 @@ class BackendTable extends HTML_Table {
                         if (isset($_ARRAYLANG['TXT_FUNCTIONS'])) {
                             $header = $_ARRAYLANG['TXT_FUNCTIONS'];
                         }
-                        if ($this->hasMasterTableHeader) {
-                            $this->setCellContents(1, $col, $header, 'td', 0, true);
-                        } else {
-                            $this->setCellContents(0, $col, $header, 'th', 0, true);
-                        }
+                        $this->setCellContents($headerRowIdx, $col, $header, $headerRowCellType, 0, true);
                     }
 
                     $this->updateColAttributes($col, array('style' => 'text-align:right;'));
@@ -370,7 +379,7 @@ class BackendTable extends HTML_Table {
                 $row++;
             }
             // adjust colspan of master-table-header-row
-            $this->altRowAttributes(1 + $this->hasMasterTableHeader, array('class' => 'row1'), array('class' => 'row2'), true);
+            $this->altRowAttributes($headerRowIdx, array('class' => 'row1'), array('class' => 'row2'), true);
             if ($this->hasMasterTableHeader) {
                 // now that the number of displayed columns is known:
                 $headerColspan = $col;
@@ -404,9 +413,6 @@ class BackendTable extends HTML_Table {
             if (isset($options['multiActions'])) {
                 $multiActionsCode = '
                     <img src="'.$cx->getCodeBaseCoreWebPath().'/Html/View/Media/arrow.gif" width="38" height="22" alt="^" title="^">
-                    <a href="#" onclick="jQuery(\'input[type=checkbox].multi-action-checkbox\').prop(\'checked\', true);return false;">' . $_ARRAYLANG['TXT_SELECT_ALL'] . '</a> /
-                    <a href="#" onclick="jQuery(\'input[type=checkbox].multi-action-checkbox\').prop(\'checked\', false);return false;">' . $_ARRAYLANG['TXT_DESELECT_ALL'] . '</a>
-                    <img alt="-" title="-" src="'.$cx->getCodeBaseCoreWebPath().'/Html/View/Media/strike.gif">
                 ';
                 $multiActions = array(''=>$_ARRAYLANG['TXT_SUBMIT_SELECT']);
                 foreach ($options['multiActions'] as $actionName=>$actionProperties) {
@@ -454,7 +460,7 @@ class BackendTable extends HTML_Table {
             }
             // adds custom attributes to row
             if (isset($options['rowAttributes'])) {
-                $row = 1 + $this->hasMasterTableHeader;
+                $row = $headerRowIdx;
                 $callback = $options['rowAttributes'];
                 foreach ($attrs as $rowname=>$rows) {
                     $originalAttributes = $this->getRowAttributes($row);
