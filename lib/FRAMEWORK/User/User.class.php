@@ -615,7 +615,7 @@ class User extends User_Profile
                 }
 
                 // Remove all groups from user
-                foreach ($user->getGroup() as $group) {
+                foreach ($user->getGroups() as $group) {
                     $user->removeGroup($group);
                 }
 
