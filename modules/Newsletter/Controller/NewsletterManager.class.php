@@ -2749,8 +2749,8 @@ class NewsletterManager extends NewsletterLib
                 foreach ($users as $user) {
                     // Check if the received user is correct
                     if (!empty($usersToCheck) && !in_array($objUser->getId(), $usersToCheck)) {
-                	continue;
-	            }
+                	    continue;
+	                }
 
                     $this->simulateDistinct($distinctByType, $user->getEmail(), $type, $mailRecipients);
                 }
