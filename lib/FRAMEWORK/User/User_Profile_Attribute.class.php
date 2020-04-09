@@ -1138,7 +1138,7 @@ class User_Profile_Attribute
         $setter = '';
         $mappedFieldName = $classMeta->getFieldName($fieldName);
         if ($mappedFieldName != $fieldName) {
-            $setter = 'set'.ucfirst($mappedFieldName);
+            $setter = 'set' . \Doctrine\Common\Inflector\Inflector::classify($mappedFieldName);
         }
 
         if (!$protected) {
