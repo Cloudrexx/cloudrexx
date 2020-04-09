@@ -610,6 +610,10 @@ class User extends User_Profile
                 $userRepo = $em->getRepository('Cx\Core\User\Model\Entity\User');
                 $user = $userRepo->find($this->id);
 
+                if (empty($user)) {
+                    return;
+                }
+
                 // Remove all groups from user
                 foreach ($user->getGroup() as $group) {
                     $user->removeGroup($group);
