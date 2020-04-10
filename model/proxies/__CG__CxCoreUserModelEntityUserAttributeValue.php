@@ -73,10 +73,10 @@ class UserAttributeValue extends \Cx\Core\User\Model\Entity\UserAttributeValue i
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return array('__isInitialized__', 'attributeId', 'userId', 'history', 'value', 'user', 'userAttribute', 'validators', 'virtual');
+            return array('__isInitialized__', 'history', 'value', 'user', 'userAttribute', 'validators', 'virtual');
         }
 
-        return array('__isInitialized__', 'attributeId', 'userId', 'history', 'value', 'user', 'userAttribute', 'validators', 'virtual');
+        return array('__isInitialized__', 'history', 'value', 'user', 'userAttribute', 'validators', 'virtual');
     }
 
     /**
@@ -182,58 +182,6 @@ class UserAttributeValue extends \Cx\Core\User\Model\Entity\UserAttributeValue i
     }
 
     
-    /**
-     * {@inheritDoc}
-     */
-    public function setAttributeId($attributeId)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setAttributeId', array($attributeId));
-
-        return parent::setAttributeId($attributeId);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getAttributeId()
-    {
-        if ($this->__isInitialized__ === false) {
-            return (int)  parent::getAttributeId();
-        }
-
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getAttributeId', array());
-
-        return parent::getAttributeId();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setUserId($userId)
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setUserId', array($userId));
-
-        return parent::setUserId($userId);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getUserId()
-    {
-        if ($this->__isInitialized__ === false) {
-            return (int)  parent::getUserId();
-        }
-
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getUserId', array());
-
-        return parent::getUserId();
-    }
-
     /**
      * {@inheritDoc}
      */

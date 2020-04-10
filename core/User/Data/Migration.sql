@@ -33,7 +33,6 @@ UPDATE contrexx_access_user_attribute AS attr
     LEFT JOIN contrexx_access_user_core_attribute AS core ON core.id = attr.tmp_name
     SET attr.mandatory = core.mandatory,
     attr.sort_type = core.sort_type,
-    attr.order_id = core.order_id,
     attr.access_special = core.access_special,
     attr.access_id = core.access_id,
     attr.read_access_id = core.read_access_id
@@ -241,7 +240,7 @@ LEFT JOIN contrexx_access_user_attribute as a ON a.id = v.attribute_id
 WHERE u.id IS NULL OR a.id IS NULL;
 
 /*Insert attribute name*/
-ALTER TABLE contrexx_access_user_attribute_name ADD `order` INT;
+ALTER TABLE contrexx_access_user_attribute_name ADD `tmp_title_id` INT;
 
 INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES(
   (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'gender'), 'gender'
@@ -259,10 +258,10 @@ INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES
   (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'title'), 'title'
 );
 
-INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`, `lang_id`, `order`)
+INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`, `lang_id`, `tmp_title_id`)
   SELECT (
     SELECT `id`+`title`.`id`-1 FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'title-c' LIMIT 1
-  ) AS attribute_id, title AS name, 0 as lang_id, id as `order`
+  ) AS attribute_id, title AS name, 0 as lang_id, id as `tmp_title_id`
   FROM `contrexx_access_user_title` AS title;
 
 INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES(
@@ -337,8 +336,10 @@ INSERT INTO `contrexx_access_user_attribute_name`(`attribute_id`, `name`) VALUES
   (SELECT `id` FROM `contrexx_access_user_attribute` WHERE `tmp_name` = 'picture'), 'picture'
 );
 
+/* this replaces title ID by attribute ID */
+/* attrName.tmp_title_id contains title.id */
 UPDATE `contrexx_access_user_attribute_value`
-    JOIN `contrexx_access_user_attribute_name` AS `attrName` ON `attrName`.`order` = `contrexx_access_user_attribute_value`.`value`
+    JOIN `contrexx_access_user_attribute_name` AS `attrName` ON `attrName`.`tmp_title_id` = `contrexx_access_user_attribute_value`.`value`
     SET `contrexx_access_user_attribute_value`.`value` = `attrName`.`attribute_id`
 WHERE `contrexx_access_user_attribute_value`.`tmp_name` = 'title';
 
@@ -363,14 +364,14 @@ ALTER TABLE contrexx_access_user_attribute_name
 ALTER TABLE contrexx_access_users
   CHANGE id id INT UNSIGNED AUTO_INCREMENT NOT NULL,
   CHANGE email email VARCHAR(255) NOT NULL,
-  CHANGE auth_token auth_token VARCHAR(32) DEFAULT '0' NOT NULL,
+  CHANGE auth_token auth_token VARCHAR(32) DEFAULT '' NOT NULL,
   CHANGE auth_token_timeout auth_token_timeout INT UNSIGNED DEFAULT 0 NOT NULL,
   CHANGE regdate regdate INT UNSIGNED DEFAULT 0 NOT NULL,
   CHANGE expiration expiration INT UNSIGNED DEFAULT 0 NOT NULL,
   CHANGE validity validity INT UNSIGNED DEFAULT 0 NOT NULL,
   CHANGE last_auth last_auth INT UNSIGNED DEFAULT 0 NOT NULL,
   CHANGE last_activity last_activity INT UNSIGNED DEFAULT 0 NOT NULL,
-  CHANGE last_auth_status last_auth_status SMALLINT DEFAULT '0' NOT NULL,
+  CHANGE last_auth_status last_auth_status SMALLINT DEFAULT '1' NOT NULL,
   CHANGE frontend_lang_id frontend_lang_id INT UNSIGNED DEFAULT 0 NOT NULL,
   CHANGE backend_lang_id backend_lang_id INT UNSIGNED DEFAULT 0 NOT NULL,
   CHANGE primary_group primary_group INT UNSIGNED DEFAULT 0 NOT NULL,
@@ -414,12 +415,12 @@ DELETE g FROM contrexx_access_rel_user_group AS g LEFT JOIN contrexx_access_user
 ALTER TABLE contrexx_access_rel_user_group
     ADD CONSTRAINT FK_401DFD43A76ED395 FOREIGN KEY (user_id) REFERENCES contrexx_access_users (id);
 
-/*Add unique index to access_user_attribute_name*/
+/* cleanup temp field */
 ALTER TABLE contrexx_access_user_attribute_name
-    DROP PRIMARY KEY,
-    ADD id INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY FIRST;
-CREATE UNIQUE INDEX fk_module_user_attribute_name_unique_idx
-  ON contrexx_access_user_attribute_name (attribute_id, lang_id);
+    DROP `tmp_title_id`;
+/* cleanup primary key order */
+ALTER TABLE contrexx_access_user_attribute_name DROP PRIMARY KEY;
+ALTER TABLE contrexx_access_user_attribute_name ADD PRIMARY KEY (lang_id, attribute_id);
 
 ALTER TABLE contrexx_access_user_attribute_value ADD PRIMARY KEY (history_id, attribute_id, user_id);
 

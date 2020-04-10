@@ -213,7 +213,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @var boolean
      */
-    protected $isAdmin = false;
+    protected $superUser = false;
 
     /**
      * @var string
@@ -258,7 +258,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @var integer
      */
-    protected $lastAuthStatus = 0;
+    protected $lastAuthStatus = 1;
 
     /**
      * @var integer
@@ -362,23 +362,46 @@ class User extends \Cx\Model\Base\EntityBase {
     }
 
     /**
-     * Set isAdmin
+     * Set if user is super user
      *
-     * @param boolean $isAdmin
+     * @param boolean $superUser
      */
-    public function setIsAdmin($isAdmin)
+    public function setSuperUser($superUser)
     {
-        $this->isAdmin = $isAdmin;
+        $this->superUser = $superUser;
     }
 
     /**
-     * Get isAdmin
+     * Get if user is super user
+     *
+     * This does exactly the same as isSuperUser, but this method is necessary for doctrine mapping
      *
      * @return boolean 
      */
+    public function getSuperUser()
+    {
+        return $this->superUser;
+    }
+
+    /**
+     * Get if user is super user
+     *
+     * This does exactly the same as getSuperUser, but this method name is more intuitive
+     */
+    public function isSuperUser()
+    {
+        return $this->getSuperUser();
+    }
+
+    /**
+     * Get if user is super user
+     *
+     * This does exactly the same as getSuperUser, for backwards compatibility
+     * @deprecated In favor of isSuperUser()
+     */
     public function getIsAdmin()
     {
-        return $this->isAdmin;
+        return $this->getSuperUser();
     }
 
     /**
@@ -919,5 +942,35 @@ class User extends \Cx\Model\Base\EntityBase {
             }
         }
         return false;
+    }
+
+    /**
+     * Get AttributeValue from AttributeValues
+     *
+     * @param int $attributeId id to find AttributeValue
+     * @return \Cx\Core\User\Model\Entity\UserAttributeValue
+     */
+    public function getAttributeValue($attributeId)
+    {
+        foreach ($this->getUserAttributeValues() as $value) {
+            if ($value->getUserAttribute()->getId() == $attributeId) {
+                return $value;
+            }
+        }
+        return new \Cx\Core\User\Model\Entity\UserAttributeValue();
+    }
+
+    public function getProfileAttribute($attributeId)
+    {
+        $attr = \FWUser::getFWUserObject()->objUser->objAttribute;
+        if ($attr->isDefaultAttribute($attributeId)) {
+            $attributeId = $attr->getAttributeIdByDefaultAttributeId($attributeId);
+        }
+
+        if (empty($attributeId)) {
+            return new \Cx\Core\User\Model\Entity\UserAttributeValue();
+        }
+
+        return $this->getAttributeValue($attributeId);
     }
 }

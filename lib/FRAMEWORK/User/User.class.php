@@ -1327,7 +1327,7 @@ class User extends User_Profile
                     $arrSelectMetaExpressions[] = $attribute;
                 } elseif ($this->objAttribute->isDefaultAttribute($attribute) && !in_array($attribute, $arrSelectCoreExpressions)) {
                     $arrSelectCustomExpressions[] = $this->objAttribute->getAttributeIdByDefaultAttributeId($attribute);
-                } elseif ($this->objAttribute->isCustomAttribute($attribute) && (!isset($arrSelectCustomExpressions) || !in_array($attribute, $arrSelectCustomExpressions))) {
+                } elseif (!$this->objAttribute->isDefaultAttribute($attribute) && (!isset($arrSelectCustomExpressions) || !in_array($attribute, $arrSelectCustomExpressions))) {
                     $arrSelectCustomExpressions[] = $attribute;
                 }
             }

@@ -9,7 +9,7 @@ Cx\Core\User\Model\Entity\User:
         unsigned: true
       generator:
         strategy: AUTO
-    isAdmin:
+    superUser:
       type: boolean
       column: is_admin
       options:
@@ -67,7 +67,7 @@ Cx\Core\User\Model\Entity\User:
       nullable: false
       column: last_auth_status
       options:
-        default: 0
+        default: 1
     lastActivity:
       type: integer
       nullable: false
