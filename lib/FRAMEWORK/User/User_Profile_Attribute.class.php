@@ -1571,6 +1571,16 @@ class User_Profile_Attribute
         return isset($this->arrDefaultAttributeTemplates[$attributeId]);
     }
 
+    /**
+     * Backwards compatibility
+     *
+     * @todo drop in CLX-2255
+     * @deprecated
+     */
+    public function isCoreAttribute($attributeId=null) {
+        return $this->isDefaultAttribute($attributeId);
+    }
+
     public function setNames($arrNames)
     {
         $this->arrName = array();
