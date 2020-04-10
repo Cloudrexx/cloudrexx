@@ -952,7 +952,7 @@ class User extends \Cx\Model\Base\EntityBase {
      */
     public function getAttributeValue($attributeId)
     {
-        foreach ($this->userAttributeValue as $value) {
+        foreach ($this->getUserAttributeValues() as $value) {
             if ($value->getAttributeId() == $attributeId) {
                 return $value;
             }
@@ -963,8 +963,8 @@ class User extends \Cx\Model\Base\EntityBase {
     public function getProfileAttribute($profileId)
     {
         $attr = \FWUser::getFWUserObject()->objUser->objAttribute;
-        if ($attr->isCoreAttribute($profileId)) {
-            $attrId = $attr->getAttributeIdByProfileAttributeId($profileId);
+        if ($attr->isDefaultAttribute($profileId)) {
+            $attrId = $attr->getAttributeIdByDefaultAttributeId($profileId);
         } else {
             $attrId = $profileId;
         }
