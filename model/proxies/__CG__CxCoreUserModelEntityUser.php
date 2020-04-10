@@ -827,6 +827,28 @@ class User extends \Cx\Core\User\Model\Entity\User implements \Doctrine\ORM\Prox
     /**
      * {@inheritDoc}
      */
+    public function getAttributeValue($attributeId)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getAttributeValue', array($attributeId));
+
+        return parent::getAttributeValue($attributeId);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getProfileAttribute($attributeId)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getProfileAttribute', array($attributeId));
+
+        return parent::getProfileAttribute($attributeId);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getComponentController()
     {
 
