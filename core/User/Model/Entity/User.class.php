@@ -973,4 +973,48 @@ class User extends \Cx\Model\Base\EntityBase {
 
         return $this->getAttributeValue($attributeId);
     }
+
+    /**
+     * backwards compatibility for BETA-User-model
+     *
+     * @todo    Drop in CLX-2255
+     * @deprecated
+     */
+    public function getUserProfile() {
+        return new class ($this) {
+            protected $user;
+            public function __construct($user) {
+                $this->user = $user;
+            }
+            public function __call($name, $arguments) {
+                $attributeId = preg_replace(
+                    array('/^get/', '/^phone/'),
+                    array('', 'phone_'),
+                    strtolower($name)
+                );
+                return $this->user->getProfileAttribute($attributeId)->getValue();
+            }
+
+            public function getGender() {
+                $genderId = $this->user->getProfileAttribute('gender')->getValue();
+                $attr = \FWUser::getFWUserObject()->objUser->objAttribute;
+                $gender = $attr->getDefaultAttributeIdByAttributeId($genderId);
+                if ($gender) {
+                    return $gender;
+                }
+                return 'gender_undefined';
+            }
+
+            public function getUserTitle() {
+                return new class ($this->user) {
+                    public function __construct($user) {
+                        $this->user = $user;
+                    }
+                    public function getId() {
+                        return $this->user->getProfileAttribute('title')->getValue();
+                    }
+                };
+            }
+        };
+    }
 }
