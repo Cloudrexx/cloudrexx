@@ -805,7 +805,7 @@ function cmd_env {
                     echo "phpMyAdmin is available at http://${CONFIG["hostname"]}:8234/"
                     echo "MailHog is available at http://${CONFIG["hostname"]}:8025/"
                 fi
-                if ! which cx > /dev/null; then
+                if ! is_wrapper && ! which cx > /dev/null; then
                     echo ""
                     echo "cx could not be found in your path. Run the following command to add it:"
                     echo "sudo cp $(get_real_pwd)/cx /usr/local/bin"
