@@ -4,7 +4,7 @@
 # vim: syn=sh
 
 # Wrapper for bash 3
-if [ "${BASH_VERSION:0:1}" -lt 4 ]; then
+if [[ "${BASH_VERSION:0:1}" -lt 4 || "$@" == "env shell --wrapper" ]]; then
     command="cd /root && ./cx --proxy-host-dir='$(pwd -P)' $@"
     # Special case: user wants to start interactive shell to wrapper container
     if [[ "$@" == "env shell --wrapper" ]]; then
