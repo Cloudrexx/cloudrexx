@@ -983,6 +983,16 @@ class User extends User_Profile
             $value = $this->arrCachedUsers[$this->id]['profile'][$attributeId][$historyId];
         }
 
+        if ($attributeId == 'gender') {
+            if ($value == 0) {
+                $value = 'gender_undefined';
+            } else {
+                $value = $this->objAttribute->getDefaultAttributeIdByAttributeId(
+                    $value
+                );
+            }
+        }
+
         return $value;
     }
 
