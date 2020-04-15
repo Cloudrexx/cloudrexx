@@ -995,16 +995,6 @@ class User extends \Cx\Model\Base\EntityBase {
                 return $this->user->getProfileAttribute($attributeId)->getValue();
             }
 
-            public function getGender() {
-                $genderId = $this->user->getProfileAttribute('gender')->getValue();
-                $attr = \FWUser::getFWUserObject()->objUser->objAttribute;
-                $gender = $attr->getDefaultAttributeIdByAttributeId($genderId);
-                if ($gender) {
-                    return $gender;
-                }
-                return 'gender_undefined';
-            }
-
             public function getUserTitle() {
                 return new class ($this->user) {
                     public function __construct($user) {
