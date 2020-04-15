@@ -136,7 +136,7 @@ INSERT INTO contrexx_access_user_attribute_value (`attribute_id`, `user_id`, `va
     SELECT @gender, `user_id`, @gender_male FROM `contrexx_access_user_profile` WHERE `gender` = 'gender_male';
 
 INSERT INTO contrexx_access_user_attribute_value (`attribute_id`, `user_id`, `value`)
-    SELECT @gender, `user_id`, '' FROM `contrexx_access_user_profile` WHERE `gender` = 'gender_undefined';
+    SELECT @gender, `user_id`, '0' FROM `contrexx_access_user_profile` WHERE `gender` = 'gender_undefined';
 
 /** SPECIAL CASE TITLE **/
 /** Migrate title attributes to user attributes **/
