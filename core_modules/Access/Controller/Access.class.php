@@ -462,7 +462,7 @@ class Access extends \Cx\Core_Modules\Access\Controller\AccessLib
                 ) {
                     foreach ($user->getUserAttributeValues() as $attributeValue) {
                         $objAttribute = $attributeValue->getUserAttribute();
-                        if ($objAttribute->checkReadPermission()) {
+                        if ($objAttribute->hasReadPermission()) {
                             $this->parseAttribute($user, $objAttribute->getId(), 0, false, false, false, false, false);
                         }
                     }
@@ -471,7 +471,7 @@ class Access extends \Cx\Core_Modules\Access\Controller\AccessLib
                         $attribute = $cx->getDb()->getEntityManager()->getRepository(
                             'Cx\Core\User\Model\Entity\UserAttributeName'
                         )->findOneBy(array('name' => $attributeId))->getUserAttribute();
-                        if ($attribute->checkReadPermission()) {
+                        if ($attribute->hasReadPermission()) {
                             $this->parseAttribute($user, $attribute->getId(), 0, false, false, false, false, false);
                         }
                     }

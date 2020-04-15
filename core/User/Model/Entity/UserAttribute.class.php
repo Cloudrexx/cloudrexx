@@ -667,7 +667,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
      *
      * @return boolean $hasReadPermission
      */
-    public function checkReadPermission()
+    public function hasReadPermission()
     {
         return \Permission::checkAccess(
             $this->getReadAccessId(),

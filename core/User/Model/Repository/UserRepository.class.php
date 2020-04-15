@@ -434,7 +434,7 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
 
         foreach ($attributes as $attribute) {
             // do not allow lookup on attributes the user has no read access to
-            if (!$attribute->checkReadPermission()) {
+            if (!$attribute->hasReadPermission()) {
                 continue;
             }
 
