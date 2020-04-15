@@ -3,6 +3,31 @@
 #!/bin/bash
 # vim: syn=sh
 
+# detect OS of host system
+function get_host_os_type {
+    case "$(uname -s)" in
+        Linux*)
+            echo "Linux"
+            ;;
+
+        Darwin*)
+            echo "Darwin"
+            ;;
+
+        CYGWIN*)
+            echo "Cygwin"
+            ;;
+
+        MINGW*)
+            echo "MinGw"
+            ;;
+
+        *)
+            echo "UNKNOWN"
+    esac
+}
+HOST_OS=$(get_host_os_type)
+
 # Wrapper for bash 3
 if [[ "${BASH_VERSION:0:1}" -lt 4 || "$@" == "env shell --wrapper" ]]; then
     # install copy of cx in temp
@@ -23,8 +48,20 @@ if [[ "${BASH_VERSION:0:1}" -lt 4 || "$@" == "env shell --wrapper" ]]; then
         command="cd /root && bash"
     fi
 
+    # detect group of docker socket
+    case "$HOST_OS" in
+        Darwin)
+            GROUP_OF_SOCKET=$(stat -f '%g' /var/run/docker.sock)
+            ;;
+
+        #Linux
+        *)
+            GROUP_OF_SOCKET=$(stat -c '%g' /var/run/docker.sock)
+            ;;
+    esac
+
     # Pass everything through our wrapper
-    docker run --rm -ti --name clx-wrapper-$TMPNAME --user=$(id -u):$(stat -c '%g' /var/run/docker.sock) -v "$(pwd -P)/":/root -v /var/run/docker.sock:/var/run/docker.sock -v $TMPFILE:/tmp/cx cloudrexx/ubuntu bash -c "$command"
+    docker run --rm -ti --name clx-wrapper-$TMPNAME --user=$(id -u):$GROUP_OF_SOCKET -v "$(pwd -P)/":/root -v /var/run/docker.sock:/var/run/docker.sock -v $TMPFILE:/tmp/cx cloudrexx/ubuntu bash -c "$command"
 
     # remove temp copy of cx
     rm $TMPFILE
