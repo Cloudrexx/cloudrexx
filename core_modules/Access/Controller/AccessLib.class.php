@@ -1168,7 +1168,12 @@ class AccessLib
                     $mandatory= true;
                 }
             }
-            $code = $this->getMenuOptionAttributeCode($objAttribute->getMenuOptionValue(), $objUser->getProfileAttribute($objAttribute->getParent(), $historyId), $mandatory ? $_CORELANG['TXT_ACCESS_PLEASE_SELECT'] : $objAttribute->getName(), $selectOption ? 'border-bottom:1px solid #000000' : '');
+            $code = $this->getMenuOptionAttributeCode(
+                $objAttribute->getMenuOptionValue(),
+                $objUser->getProfileAttribute($objAttribute->getParent(), $historyId),
+                $mandatory ? $_CORELANG['TXT_ACCESS_PLEASE_SELECT'] : $objAttribute->getName(),
+                $selectOption ? 'border-bottom:1px solid #000000' : ''
+            );
             break;
 
         case 'group':
