@@ -1168,9 +1168,26 @@ class AccessLib
                     $mandatory= true;
                 }
             }
+
+            $selectedValue = $objUser->getProfileAttribute(
+                $objAttribute->getParent(),
+                $historyId
+            );
+            if (
+                $objAttribute->getDefaultAttributeIdByAttributeId(
+                    $objAttribute->getParent()
+                ) == 'gender'
+            ) {
+                $selectedValue = $objAttribute->getAttributeIdByDefaultAttributeId(
+                    $selectedValue
+                );
+                if ($selectedValue == 'gender_undefined') {
+                    $selectedValue = '0';
+                }
+            }
             $code = $this->getMenuOptionAttributeCode(
                 $objAttribute->getMenuOptionValue(),
-                $objUser->getProfileAttribute($objAttribute->getParent(), $historyId),
+                $selectedValue,
                 $mandatory ? $_CORELANG['TXT_ACCESS_PLEASE_SELECT'] : $objAttribute->getName(),
                 $selectOption ? 'border-bottom:1px solid #000000' : ''
             );
