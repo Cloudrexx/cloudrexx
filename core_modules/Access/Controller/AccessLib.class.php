@@ -1129,7 +1129,9 @@ class AccessLib
                 $childrenCode = array();
                 if ($objAttribute->isMandatory()) {
                     $childrenCode[] = $this->getMenuOptionAttributeCode('0', $objUser->getProfileAttribute($objAttribute->getId(), $historyId), $_CORELANG['TXT_ACCESS_PLEASE_SELECT'], 'border-bottom:1px solid #000000;');
-                } else {
+                // TODO: Implement an option to allow skipping a default value
+                //          and replace the else if accordingly
+                } else if ($attributeId != 'gender' ) {
                     $childrenCode[] = $this->getMenuOptionAttributeCode('0', $objUser->getProfileAttribute($objAttribute->getId(), $historyId), $_CORELANG['TXT_ACCESS_NOT_SPECIFIED'], 'border-bottom:1px solid #000000;');
                 }
 
@@ -1173,18 +1175,6 @@ class AccessLib
                 $objAttribute->getParent(),
                 $historyId
             );
-            if (
-                $objAttribute->getDefaultAttributeIdByAttributeId(
-                    $objAttribute->getParent()
-                ) == 'gender'
-            ) {
-                $selectedValue = $objAttribute->getAttributeIdByDefaultAttributeId(
-                    $selectedValue
-                );
-                if ($selectedValue == 'gender_undefined') {
-                    $selectedValue = '0';
-                }
-            }
             $code = $this->getMenuOptionAttributeCode(
                 $objAttribute->getMenuOptionValue(),
                 $selectedValue,

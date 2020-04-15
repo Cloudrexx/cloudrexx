@@ -117,6 +117,11 @@ class User_Profile
 
                 foreach ($arrValues as $nr => $value) {
                     $value = trim(contrexx_stripslashes($value));
+                    if ($attributeId == 'gender') {
+                        $value = $objAttribute->getAttributeIdByDefaultAttributeId(
+                            $value
+                        );
+                    }
 
                     if ($objAttribute->getType() === 'date') {
                         if (is_array($value)) {

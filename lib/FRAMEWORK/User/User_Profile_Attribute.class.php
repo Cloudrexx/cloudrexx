@@ -2061,7 +2061,7 @@ class User_Profile_Attribute
     function getMenuOptionValue()
     {
         return (isset($this->arrAttributes[$this->id]['value'])
-            ? $this->arrAttributes[$this->id]['value'] : $this->id);
+            ? $this->arrAttributes[$this->id]['value'] : $this->getDefaultAttributeIdByAttributeId($this->id));
     }
 
 
