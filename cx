@@ -5,14 +5,30 @@
 
 # Wrapper for bash 3
 if [[ "${BASH_VERSION:0:1}" -lt 4 || "$@" == "env shell --wrapper" ]]; then
-    command="cd /root && ./cx --proxy-host-dir='$(pwd -P)' $@"
+    # install copy of cx in temp
+    TEMPCX=`basename $0`
+    TMPFILE=`mktemp -q /tmp/${TEMPCX}.XXXXXX`
+    TMPNAME=`basename $TMPFILE`
+    if [ $? -ne 0 ]; then
+        echo "$0: Can't create temp file, exiting..."
+        exit 1
+    fi
+    cp $0 $TMPFILE
+    chmod +x $TMPFILE
+
+    # run cx in wrapper container from its /tmp directory
+    command="cd /root && /tmp/cx --proxy-host-dir='$(pwd -P)' $@"
     # Special case: user wants to start interactive shell to wrapper container
     if [[ "$@" == "env shell --wrapper" ]]; then
         command="cd /root && bash"
     fi
 
     # Pass everything through our wrapper
-    docker run --rm -ti --name clx-win-wrapper --user=$(id -u):$(stat -c '%g' /var/run/docker.sock) -v "$(pwd -P)/":/root -v /var/run/docker.sock:/var/run/docker.sock cloudrexx/ubuntu bash -c "$command"
+    docker run --rm -ti --name clx-win-wrapper --user=$(id -u):$(stat -c '%g' /var/run/docker.sock) -v "$(pwd -P)/":/root -v /var/run/docker.sock:/var/run/docker.sock -v $TMPFILE:/tmp/cx cloudrexx/ubuntu bash -c "$command"
+
+    # remove temp copy of cx
+    rm $TMPFILE
+
     exit 0
 fi
 
