@@ -590,7 +590,7 @@ class User_Profile
 
         $attributeValueColumn = 'tblA.`value`';
 
-        foreach ($objParentAttribute->{'get'.($core ? 'Core' : 'Custom').'AttributeIds'}() as $attributeId) {
+        foreach ($objParentAttribute->{'get'.($core ? 'Default' : 'Custom').'AttributeIds'}() as $attributeId) {
             $objAttribute = $objParentAttribute->getById($attributeId);
 
             // do not allow lookup on attributes the user has no read access to
