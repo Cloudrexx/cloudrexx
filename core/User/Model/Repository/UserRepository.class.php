@@ -145,7 +145,7 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
      * @param array  $fields fields to be searched
      * @return array matching users
      */
-    public function searchByInitialLetter($letter, $fields)
+    public function searchByStartsWith($letter, $fields)
     {
         $letter .= '%';
         return $this->search($letter, $fields, 'like');

@@ -429,7 +429,7 @@ if (!$limit) {
                 )
             );
         } else if (!empty($filter['letter'])) {
-            $users = $userRepo->searchByInitialLetter(
+            $users = $userRepo->searchByStartsWith(
                 $filter['letter'],
                 array('company', 'firstname', 'lastname')
             );
