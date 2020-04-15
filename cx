@@ -1985,6 +1985,7 @@ if "%*" == "env shell --wrapper" (
 )
 
 REM Pass everything through our wrapper
+REM TODO add support for global cx
 docker run --rm -ti --name clx-win-wrapper -v "%cd%/":/root -v /var/run/docker.sock:/var/run/docker.sock cloudrexx/ubuntu bash -c "cd /root && ./cx --proxy-host-dir='%string%' %*"
 goto :EOF
 
