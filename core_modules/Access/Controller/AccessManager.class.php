@@ -2731,6 +2731,7 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
 
             $objAttribute->setMultiline(isset($_POST['access_text_multiline_option']) && intval($_POST['access_text_multiline_option']));
             $objAttribute->setMandatory((isset($_POST['access_attribute_mandatory']) ? intval($_POST['access_attribute_mandatory']) : 0));
+            $objAttribute->moveToEnd();
 
             if ($setStatus && $objAttribute->store()) {
                 if (isset($_POST['access_add_child'])) {
