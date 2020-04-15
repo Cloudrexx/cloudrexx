@@ -6,28 +6,28 @@ ALTER TABLE contrexx_access_user_attribute
 INSERT INTO `contrexx_access_user_attribute`
     (`tmp_name`, `type`, `order_id`, `access_id`, `read_access_id`, `is_default`)
     VALUES
-        ('picture',       'image',       -1,  0, 0, 1),
-        ('gender',        'menu',        -1,  0, 0, 1),
-        ('title',         'menu',        -1,  0, 0, 1),
-        ('designation',   'text',        -1,  0, 0, 1),
-        ('firstname',     'text',        -1,  0, 0, 1),
-        ('lastname',      'text',        -1,  0, 0, 1),
-        ('company',       'text',        -1,  0, 0, 1),
-        ('address',       'text',        -1,  0, 0, 1),
-        ('city',          'text',        -1,  0, 0, 1),
-        ('country',       'menu',        -1, 0, 0, 1),
-        ('zip',           'text',        -1, 0, 0, 1),
-        ('phone_office',  'text',        -1, 0, 0, 1),
-        ('phone_private', 'text',        -1, 0, 0, 1),
-        ('phone_mobile',  'text',        -1, 0, 0, 1),
-        ('phone_fax',     'text',        -1, 0, 0, 1),
-        ('birthday',      'date',        -1, 0, 0, 1),
-        ('website',       'uri',         -1, 0, 0, 1),
-        ('profession',    'text',        -1, 0, 0, 1),
-        ('interests',     'textarea',    -1, 0, 0, 1),
-        ('signature',     'textarea',    -1, 0, 0, 1),
-        ('gender_male',   'menu_option', -1, 0, 0, 1),
-        ('gender_female', 'menu_option', -1, 0, 0, 1);
+        ('picture',       'image',       1,  0, 0, 1),
+        ('gender',        'menu',        2,  0, 0, 1),
+        ('title',         'menu',        3,  0, 0, 1),
+        ('designation',   'text',        4,  0, 0, 1),
+        ('firstname',     'text',        5,  0, 0, 1),
+        ('lastname',      'text',        6,  0, 0, 1),
+        ('company',       'text',        7,  0, 0, 1),
+        ('address',       'text',        8,  0, 0, 1),
+        ('city',          'text',        9,  0, 0, 1),
+        ('country',       'menu',        10, 0, 0, 1),
+        ('zip',           'text',        11, 0, 0, 1),
+        ('phone_office',  'text',        12, 0, 0, 1),
+        ('phone_private', 'text',        13, 0, 0, 1),
+        ('phone_mobile',  'text',        14, 0, 0, 1),
+        ('phone_fax',     'text',        15, 0, 0, 1),
+        ('birthday',      'date',        16, 0, 0, 1),
+        ('website',       'uri',         17, 0, 0, 1),
+        ('profession',    'text',        18, 0, 0, 1),
+        ('interests',     'textarea',    19, 0, 0, 1),
+        ('signature',     'textarea',    20, 0, 0, 1),
+        ('gender_male',   'menu_option', 21, 0, 0, 1),
+        ('gender_female', 'menu_option', 22, 0, 0, 1);
 
 /** Define attribute keys as variables **/
 SELECT @picture := id FROM contrexx_access_user_attribute WHERE tmp_name = 'picture';
@@ -52,6 +52,10 @@ SELECT @interests := id FROM contrexx_access_user_attribute WHERE tmp_name = 'in
 SELECT @signature := id FROM contrexx_access_user_attribute WHERE tmp_name = 'signature';
 SELECT @gender_female := id FROM contrexx_access_user_attribute WHERE tmp_name = 'gender_female';
 SELECT @gender_male := id FROM contrexx_access_user_attribute WHERE tmp_name = 'gender_male';
+
+/** Shift order id **/
+SELECT @order_offset := COUNT(1) FROM `contrexx_access_user_attribute` WHERE `is_default` = 1;
+UPDATE `contrexx_access_user_attribute` SET `order_id` = `order_id` + @order_offset WHERE `is_default` = 0;
 
 /** Migrate core attribute to user attribute **/
 UPDATE contrexx_access_user_attribute AS attr
@@ -136,7 +140,7 @@ INSERT INTO contrexx_access_user_attribute_value (`attribute_id`, `user_id`, `va
     SELECT @gender, `user_id`, @gender_male FROM `contrexx_access_user_profile` WHERE `gender` = 'gender_male';
 
 INSERT INTO contrexx_access_user_attribute_value (`attribute_id`, `user_id`, `value`)
-    SELECT @gender, `user_id`, '' FROM `contrexx_access_user_profile` WHERE `gender` = 'gender_undefined';
+    SELECT @gender, `user_id`, '0' FROM `contrexx_access_user_profile` WHERE `gender` = 'gender_undefined';
 
 /** SPECIAL CASE TITLE **/
 /** Migrate title attributes to user attributes **/
