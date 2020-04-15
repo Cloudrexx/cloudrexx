@@ -711,6 +711,7 @@ class Customer extends \User
             $objProfileAttribute->setMultiline(true);
             $objProfileAttribute->setParent(0);
             $objProfileAttribute->setProtection(array(1));
+            $objProfileAttribute->moveToEnd();
 //DBG::log("Customer::errorHandler(): Made notes attribute: ".var_export($objProfileAttribute, true));
             if (!$objProfileAttribute->store()) {
                 throw new \Cx\Lib\Update_DatabaseException(
@@ -742,6 +743,7 @@ class Customer extends \User
             $objProfileAttribute->setType('text');
             $objProfileAttribute->setParent(0);
             $objProfileAttribute->setProtection(array(1));
+            $objProfileAttribute->moveToEnd();
             if (!$objProfileAttribute->store()) {
                 throw new \Cx\Lib\Update_DatabaseException(
                    "Failed to create User_Profile_Attribute 'notes'");
