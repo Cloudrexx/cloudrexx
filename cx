@@ -1811,13 +1811,21 @@ result=""
 found=false
 while [[ $path != / ]];
 do
-    result=$(find "$path" -maxdepth 1 -mindepth 1 -name "cx" -execdir pwd \;)
+    result=$(find "$path" -maxdepth 1 -mindepth 1 -name "cx" -exec realpath '{}' \;)
+    if [[ "$result" != "" ]]; then
+        result=$(dirname $result)
+    fi
     if [[ "$result" != "" ]]; then
         found=true
         break;
     fi
     # Note: if you want to ignore symlinks, use "$(realpath -s "$path"/..)"
-    path="$(realpath -s "$path"/..)"
+    # This is not available in the clx-win-wrapper
+    if is_wrapper; then
+        path="$(realpath "$path"/..)"
+    else
+        path="$(realpath -s "$path"/..)"
+    fi
 done
 if ! $found; then
     # command is init
