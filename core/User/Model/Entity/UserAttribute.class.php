@@ -44,25 +44,116 @@ namespace Cx\Core\User\Model\Entity;
  * @subpackage  core_user
  */
 class UserAttribute extends \Cx\Model\Base\EntityBase {
+
+    /**
+     * User attribute type text
+     */
+    const TYPE_TEXT = 'text';
+
+    /**
+     * User attribute type textarea
+     */
+    const TYPE_TEXTAREA = 'textarea';
+
+    /**
+     * User attribute type mail
+     */
+    const TYPE_MAIL = 'mail';
+
+    /**
+     * User attribute type uri
+     */
+    const TYPE_URI = 'uri';
+
+    /**
+     * User attribute type date
+     */
+    const TYPE_DATE = 'date';
+
+    /**
+     * User attribute type image
+     */
+    const TYPE_IMAGE = 'image';
+
+    /**
+     * User attribute type checkbox
+     */
+    const TYPE_CHECKBOX = 'checkbox';
+
+    /**
+     * User attribute type menu
+     */
+    const TYPE_MENU = 'menu';
+
+    /**
+     * User attribute type menu option
+     */
+    const TYPE_MENU_OPTION = 'menu_option';
+
+    /**
+     * User attribute type group
+     */
+    const TYPE_GROUP = 'group';
+
+    /**
+     * User attribute type frame
+     */
+    const TYPE_FRAME = 'frame';
+
+    /**
+     * User attribute type history
+     */
+    const TYPE_HISTORY = 'history';
+
+    /**
+     * User attribute sort type asc
+     */
+    const SORT_TYPE_ASC = 'asc';
+
+    /**
+     * User attribute sort type desc
+     */
+    const SORT_TYPE_DESC = 'desc';
+
+    /**
+     * User attribute sort type custom
+     */
+    const SORT_TYPE_CUSTOM = 'custom';
+
+    /**
+     * User attribute has no special
+     */
+    const ACCESS_SPECIAL_NONE = '';
+
+    /**
+     * Access special only one option in a lower position can be selected
+     */
+    const ACCESS_SPECIAL_MENU_LOWER = 'menu_select_lower';
+
+    /**
+     * Access special only one option in a higher position can be selected
+     */
+    const ACCESS_SPECIAL_MENU_HIGHER = 'menu_select_higher';
+
     /**
      * @var integer $id
      */
     protected $id;
 
     /**
-     * @var enum_user_userattribute_type $type
+     * @var \Cx\Core\Model\Data\Enum\User\UserAttribute\Type $type
      */
-    protected $type = 'text';
+    protected $type = self::TYPE_TEXT;
 
     /**
      * @var boolean $mandatory
      */
-    protected $mandatory = '0';
+    protected $mandatory = false;
 
     /**
-     * @var enum_user_userattribute_sorttype $sortType
+     * @var \Cx\Core\Model\Data\Enum\User\UserAttribute\SortType $sortType
      */
-    protected $sortType = 'asc';
+    protected $sortType = self::SORT_TYPE_ASC;
 
     /**
      * @var integer $orderId
@@ -70,9 +161,9 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     protected $orderId = 0;
 
     /**
-     * @var enum_user_userattribute_accessspecial $accessSpecial
+     * @var \Cx\Core\Model\Data\Enum\User\UserAttribute\AccessSpecial $accessSpecial
      */
-    protected $accessSpecial = '';
+    protected $accessSpecial = self::ACCESS_SPECIAL_NONE;
 
     /**
      * @var integer $accessId
@@ -259,7 +350,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Set type
      *
-     * @param enum_user_userattribute_type $type
+     * @param \Cx\Core\Model\Data\Enum\User\UserAttribute\Type $type
      */
     public function setType($type)
     {
@@ -269,7 +360,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get type
      *
-     * @return enum_user_userattribute_type $type
+     * @return \Cx\Core\Model\Data\Enum\User\UserAttribute\Type $type
      */
     public function getType()
     {
@@ -299,7 +390,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Set sortType
      *
-     * @param enum_user_userattribute_sorttype $sortType
+     * @param \Cx\Core\Model\Data\Enum\User\UserAttribute\SortType $sortType
      */
     public function setSortType($sortType)
     {
@@ -309,7 +400,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get sortType
      *
-     * @return enum_user_userattribute_sorttype $sortType
+     * @return \Cx\Core\Model\Data\Enum\User\UserAttribute\SortType $sortType
      */
     public function getSortType()
     {
@@ -339,7 +430,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Set accessSpecial
      *
-     * @param enum_user_userattribute_accessspecial $accessSpecial
+     * @param \Cx\Core\Model\Data\Enum\User\UserAttribute\AccessSpecial $accessSpecial
      */
     public function setAccessSpecial($accessSpecial)
     {
@@ -349,7 +440,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get accessSpecial
      *
-     * @return enum_user_userattribute_accessspecial $accessSpecial
+     * @return \Cx\Core\Model\Data\Enum\User\UserAttribute\AccessSpecial $accessSpecial
      */
     public function getAccessSpecial()
     {
