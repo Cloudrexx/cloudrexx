@@ -44,6 +44,17 @@ namespace Cx\Core\User\Model\Entity;
  * @subpackage  core_user
  */
 class Group extends \Cx\Model\Base\EntityBase {
+
+    /**
+     * User account type frontend
+     */
+    const TYPE_FRONTEND = 'frontend';
+
+    /**
+     * User account type backend
+     */
+    const TYPE_BACKEND = 'backend';
+
     /**
      * @var integer $id
      */
@@ -65,9 +76,9 @@ class Group extends \Cx\Model\Base\EntityBase {
     protected $active = 1;
 
     /**
-     * @var enum_user_group_type $type
+     * @var \Cx\Core\Model\Data\Enum\User\Group\Type $type
      */
-    protected $type = 'frontend';
+    protected $type = self::TYPE_FRONTEND;
 
     /**
      * @var string $homepage
@@ -263,7 +274,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Set type
      *
-     * @param enum_user_group_type $type
+     * @param \Cx\Core\Model\Data\Enum\User\Group\Type $type
      */
     public function setType($type)
     {
@@ -273,7 +284,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get type
      *
-     * @return enum_user_group_type $type
+     * @return \Cx\Core\Model\Data\Enum\User\Group\Type $type
      */
     public function getType()
     {
