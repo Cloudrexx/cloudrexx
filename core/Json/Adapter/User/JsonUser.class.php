@@ -157,7 +157,24 @@ class JsonUser implements JsonAdapter {
 
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $userRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\User');
+        $attributeNameRepo = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Core\User\Model\Entity\UserAttributeName'
+        );
         $qb = $userRepo->createQueryBuilder('u');
+        $classMeta = $cx->getDb()->getEntityManager()->getClassMetadata('Cx\Core\User\Model\Entity\User');
+
+        // Get attribute ids of user attributes
+        foreach ($searchFields as &$searchField) {
+            if ($classMeta->hasField($searchField)) {
+                continue;
+            }
+            // Get attribute id
+            $attributeName = $attributeNameRepo->findOneBy(array('name' => $searchField));
+
+            if ($attributeName) {
+                $searchField = $attributeName->getUserAttribute()->getId();
+            }
+        }
 
         // AND-ed search is only available if 2 or less search fields are
         // in use and no more than 2 search terms are specified. With higher
@@ -233,39 +250,30 @@ class JsonUser implements JsonAdapter {
 
     protected function getExpression($qb, $field, $terms, $alias)
     {
-        $objAttr = \FWUser::getFWUserObject()->objUser->objAttribute;
         $expression = $qb->expr()->andX();
-        if ($objAttr->isDefaultAttribute($field)) {
-            $qb->join('u.userAttributeValues', 'v'.$alias);
-            $attrId = $objAttr->getAttributeIdByDefaultAttributeId($field);
-            $expression->add($qb->expr()->eq('v'.$alias.'.userAttribute', ':attribute'.$alias));
-            $qb->setParameter('attribute'.$alias, $attrId);
-
-            if (is_array($terms)) {
-                $i = 0;
-                $orX = $qb->expr()->orX();
-                foreach ($terms as $term) {
-                    $orX->add($qb->expr()->like('v'.$alias.'.value', ':term'.$alias.$i));
-                    $qb->setParameter('term'.$alias.$i, $term);
-                }
-                $expression->add($orX);
-            } else {
-                $expression->add($qb->expr()->like('v'.$alias.'.value', ':term'.$alias));
-                $qb->setParameter('term'.$alias, $terms);
-            }
+        if (!is_numeric($field)) {
+            // User field
+            $attribute = 'u.'.$field;
         } else {
-            if (is_array($terms)) {
-                $i = 0;
-                $orX = $qb->expr()->orX();
-                foreach ($terms as $term) {
-                    $orX->add($qb->expr()->like('u.'.$field, ':term'.$alias.$i));
-                    $qb->setParameter('term'.$alias.$i, $term);
-                }
-                $expression->add($orX);
-            } else {
-                $expression->add($qb->expr()->like('u'.$field, ':term'.$alias));
-                $qb->setParameter('term'.$alias, $terms);
+            // User attribute value
+            $qb->join('u.userAttributeValues', 'v'.$alias);
+            $attribute = 'v'.$alias.'.value';
+
+            $expression->add($qb->expr()->eq('v'.$alias.'.userAttribute', ':attribute'.$alias));
+            $qb->setParameter('attribute'.$alias, $field);
+        }
+
+        if (is_array($terms)) {
+            $i = 0;
+            $orX = $qb->expr()->orX();
+            foreach ($terms as $term) {
+                $orX->add($qb->expr()->like($attribute, ':term'.$alias.$i));
+                $qb->setParameter('term'.$alias.$i, $term);
             }
+            $expression->add($orX);
+        } else {
+            $expression->add($qb->expr()->like($attribute, ':term'.$alias));
+            $qb->setParameter('term'.$alias, $terms);
         }
 
         return $expression;
