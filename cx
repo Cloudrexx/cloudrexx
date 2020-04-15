@@ -24,7 +24,7 @@ if [[ "${BASH_VERSION:0:1}" -lt 4 || "$@" == "env shell --wrapper" ]]; then
     fi
 
     # Pass everything through our wrapper
-    docker run --rm -ti --name clx-win-wrapper --user=$(id -u):$(stat -c '%g' /var/run/docker.sock) -v "$(pwd -P)/":/root -v /var/run/docker.sock:/var/run/docker.sock -v $TMPFILE:/tmp/cx cloudrexx/ubuntu bash -c "$command"
+    docker run --rm -ti --name clx-wrapper-$TMPNAME --user=$(id -u):$(stat -c '%g' /var/run/docker.sock) -v "$(pwd -P)/":/root -v /var/run/docker.sock:/var/run/docker.sock -v $TMPFILE:/tmp/cx cloudrexx/ubuntu bash -c "$command"
 
     # remove temp copy of cx
     rm $TMPFILE
