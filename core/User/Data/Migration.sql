@@ -53,6 +53,10 @@ SELECT @signature := id FROM contrexx_access_user_attribute WHERE tmp_name = 'si
 SELECT @gender_female := id FROM contrexx_access_user_attribute WHERE tmp_name = 'gender_female';
 SELECT @gender_male := id FROM contrexx_access_user_attribute WHERE tmp_name = 'gender_male';
 
+/** Shift order id **/
+SELECT @order_offset := COUNT(1) FROM `contrexx_access_user_attribute` WHERE `is_default` = 1;
+UPDATE `contrexx_access_user_attribute` SET `order_id` = `order_id` + @order_offset WHERE `is_default` = 0;
+
 /** Migrate core attribute to user attribute **/
 UPDATE contrexx_access_user_attribute AS attr
     LEFT JOIN contrexx_access_user_core_attribute AS core ON core.id = attr.tmp_name
