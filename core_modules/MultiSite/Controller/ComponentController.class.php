@@ -3869,6 +3869,7 @@ MultiSite Cache flush [<pattern>] [-v] [--exec]
             ));
             $objProfileAttribute->setType('text');
             $objProfileAttribute->setParent(0);
+            $objProfileAttribute->moveToEnd();
             if ($protection) {
                 $objProfileAttribute->setProtection(array());
             }

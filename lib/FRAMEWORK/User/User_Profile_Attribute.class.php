@@ -2099,4 +2099,21 @@ DBG::log("User_Profile_Attribute::loadCoreAttributes(): Attribute $attributeId, 
         return $arrNames;
     }
 
+    /**
+     * Increase the order ID to move the attribute to the end
+     *
+     * @throws \Cx\Core\Model\DbException
+     */
+    public function moveToEnd()
+    {
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $result = $cx->getDb()->getAdoDb()->Execute(
+            'SELECT MAX(`order_id`) AS max_order_id
+         FROM `' . DBPREFIX . 'access_user_attribute`'
+        );
+        if (!$result || $result->EOF) {
+            return;
+        }
+        $this->order_id = $result->fields['max_order_id'] + 1;
+    }
 }
