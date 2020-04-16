@@ -2035,13 +2035,15 @@ class User extends User_Profile
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $em = $cx->getDb()->getEntityManager();
         $userRepo = $em->getRepository('Cx\Core\User\Model\Entity\User');
-        $users = $userRepo->findBy(array($column => $username));
+        $user = $userRepo->findOneBy(array($column => $username));
+
+        if (empty($user)) {
+            return false;
+        }
 
         try {
-            foreach ($users as $user) {
-                $user->setLastAuthStatus(0);
-                $em->persist($user);
-            }
+            $user->setLastAuthStatus(0);
+            $em->persist($user);
             $em->flush();
             return true;
         } catch (\Doctrine\ORM\OptimisticLockException $e) {
