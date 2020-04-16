@@ -116,7 +116,7 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
 
         foreach ($otherFilter as $field=>$value) {
             $qb->andWhere($qb->expr()->eq('u.' . $field, ':value' . $field))
-               ->setParameter('value'. $field, $value);
+               ->setParameter('value' . $field, $value);
         }
 
         return $qb->getQuery()->getResult();
@@ -132,7 +132,7 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
     {
         $qb = $this->createQueryBuilder('u');
         foreach ($filter as $key=>$value) {
-            $qb->andWhere($qb->expr()->like('u'.$key, ':value'. $key))->setParameter('value'.$key, $value);
+            $qb->andWhere($qb->expr()->like('u' . $key, ':value'. $key))->setParameter('value' . $key, $value);
         }
 
         return $qb->getQuery()->getResult();
@@ -274,7 +274,7 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
     {
         $qb->andWhere(
             $qb->expr()->eq(
-                'REGEXP('.$field.', \''.$regex.'\')',
+                'REGEXP(' . $field . ', \'' . $regex . '\')',
                 1
             )
         );
@@ -297,9 +297,9 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
 
         $qb->join('u.userAttributeValues', 'v'.$field);
 
-        $qb->andWhere($qb->expr()->eq('v'.$field.'.userAttribute', ':userAttribute'.$field));
-        $qb->andWhere($qb->expr()->eq('REGEXP(v'.$field.'.value, \''.$regex.'\')', 1));
-        $qb->setParameter('userAttribute'.$field, $field);
+        $qb->andWhere($qb->expr()->eq('v' . $field . '.userAttribute', ':userAttribute' . $field));
+        $qb->andWhere($qb->expr()->eq('REGEXP(v' . $field.'.value, \'' . $regex . '\')', 1));
+        $qb->setParameter('userAttribute' . $field, $field);
     }
 
     /**
@@ -400,7 +400,7 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
             $i = 0;
             foreach ($term as $searchTerm) {
                 $orX->add(
-                    $expr->like('u.'.$attribute, ':search' . $attribute . $i)
+                    $expr->like('u.' . $attribute, ':search' . $attribute . $i)
                 );
                 $qb->setParameter('search' . $attribute . $i, $percent . $searchTerm . $percent);
             }
@@ -479,12 +479,14 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
 
                     $orX->add(
                         $expr->andX(
-                            $expr->eq('searchAttributeValues.userAttribute', ':menuAttribute'.$attribute->getId()),
-                            $expr->in('searchAttributeValues.value', ':childValues'.$attribute->getId())
+                            $expr->eq(
+                                'searchAttributeValues.userAttribute', ':menuAttribute' . $attribute->getId()
+                            ),
+                            $expr->in('searchAttributeValues.value', ':childValues' . $attribute->getId())
                         )
                     );
-                    $qb->setParameter('menuAttribute'.$attribute->getId(), $attribute->getId());
-                    $qb->setParameter('childValues'.$attribute->getId(), $childAttributeIds);
+                    $qb->setParameter('menuAttribute' . $attribute->getId(), $attribute->getId());
+                    $qb->setParameter('childValues' . $attribute->getId(), $childAttributeIds);
                 break;
             }
         }
@@ -497,20 +499,20 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
             $i = 0;
             $valueOrX = $expr->orX();
             foreach ($term as $searchTerm) {
-                $parameterAlias = 'search'.$i;
+                $parameterAlias = 'search' . $i;
                 if (!empty($supportedAttributes['int']) && is_numeric($searchTerm)) {
                     $valueOrX->add(
-                        $expr->eq($alias.'.value', ':'.$parameterAlias)
+                        $expr->eq($alias . '.value', ':'.$parameterAlias)
                     );
                     $qb->setParameter($parameterAlias, intval($searchTerm));
                 }
 
                 if (!empty($supportedAttributes['string'])) {
                     if (strpos('%', $searchTerm) === false) {
-                        $searchTerm = '%'.$searchTerm.'%';
+                        $searchTerm = '%' . $searchTerm . '%';
                     }
                     $valueOrX->add(
-                        $expr->like($alias.'.value', ':'.$parameterAlias)
+                        $expr->like($alias . '.value', ':'.$parameterAlias)
                     );
                     $qb->setParameter($parameterAlias, $searchTerm);
                 }
