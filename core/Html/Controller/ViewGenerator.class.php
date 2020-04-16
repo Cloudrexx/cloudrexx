@@ -1870,22 +1870,6 @@ class ViewGenerator {
             $id[$field] = $entityObject[$field];
         }
 
-        // delete all n associated entries, because the are not longer used and we can delete the main entry only if we
-        // have no more n associated entries
-        $pageRepo = $em->getRepository($entityWithNS);
-        $associationMappings = $entityObj->getAssociationMappings();
-        foreach ($associationMappings as $mapping => $value) {
-            // we only need to delete the n associated values, the single associated will be handled by doctrine itself
-            if (!$entityObj->isCollectionValuedAssociation($mapping)) {
-                continue;
-            }
-            $mainEntity = $pageRepo->find($id);
-            $getMethod = 'get' . \Doctrine\Common\Inflector\Inflector::classify($mapping);
-            $associatedEntities = $mainEntity->$getMethod();
-            foreach ($associatedEntities as $associatedEntity) {
-                $em->remove($associatedEntity);
-            }
-        }
         if (!empty($id)) {
             $entityObj = $em->getRepository($entityWithNS)->find($id);
             if (!empty($entityObj)) {
