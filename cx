@@ -1821,7 +1821,7 @@ do
 done
 if ! $found; then
     # command is init
-    if [[ "$1" == "env" ]] && [[ "$2" == "init" ]]; then
+    if [[ "${COMMANDS[0]}" == "env" ]] && [[ "${COMMANDS[1]}" == "init" ]]; then
         # download cx and call init
         wget "$DOWNLOAD_URL" || curl -O "$DOWNLOAD_URL"
         chmod +x cx
@@ -1829,7 +1829,7 @@ if ! $found; then
         exit
 
     # command is envs
-    elif [[ "$1" == "envs" ]]; then
+    elif [[ "${COMMANDS[0]}" == "envs" ]]; then
         if is_wrapper; then
             echo "envs command is not available through wrapper!"
             exit 1
@@ -1837,7 +1837,7 @@ if ! $found; then
         COMMANDS=("${COMMANDS[@]:1}")
         cmd_envs "${COMMANDS[@]/#/}"
         exit
-    elif [[ "$1" == "help" && ( "$2" == "" || "$2" == "envs" || ( "$2" == "env" && "$3" == "init" ) ) ]]; then
+    elif [[ "${COMMANDS[0]}" == "help" && ( "${COMMANDS[1]}" == "" || "${COMMANDS[1]}" == "envs" || ( "${COMMANDS[1]}" == "env" && "${COMMANDS[2]}" == "init" ) ) ]]; then
         shift
         cmd_help "$@"
         exit
