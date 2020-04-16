@@ -974,10 +974,12 @@ class User extends \Cx\Model\Base\EntityBase {
      */
     public function getAttributeValue($attributeId)
     {
-        foreach ($this->getUserAttributeValues() as $value) {
-            if ($value->getUserAttribute()->getId() == $attributeId) {
-                return $value;
-            }
+        $attributeValue = $this->cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Core\User\Model\Entity\UserAttributeValue'
+        )->findOneBy(array('userAttribute' => $attributeId, 'user' => $this->getId()));
+
+        if ($attributeValue) {
+            return $attributeValue;
         }
         return new \Cx\Core\User\Model\Entity\UserAttributeValue();
     }
