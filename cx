@@ -3,6 +3,51 @@
 #!/bin/bash
 # vim: syn=sh
 
+# detect OS of host system
+function get_host_os_type {
+    case "$(uname -s)" in
+        Linux*)
+            echo "Linux"
+            ;;
+
+        Darwin*)
+            echo "Darwin"
+            ;;
+
+        CYGWIN*)
+            echo "Cygwin"
+            ;;
+
+        MINGW*)
+            echo "MinGw"
+            ;;
+
+        *)
+            echo "UNKNOWN"
+    esac
+}
+
+# detect host OS
+HOST_OS=$(get_host_os_type)
+
+# perform host OS specific initialization
+case "$HOST_OS" in
+    Darwin)
+        # detect group of docker socket
+        GROUP_OF_SOCKET=$(stat -f '%g' /var/run/docker.sock)
+        ;;
+
+    Linux)
+        # detect group of docker socket
+        GROUP_OF_SOCKET=$(stat -c '%g' /var/run/docker.sock)
+        ;;
+
+    *)
+        echo "Your system ($HOST_OS) is not supported. Abort..."
+        exit 1
+        ;;
+esac
+
 # Wrapper for bash 3
 if [[ "${BASH_VERSION:0:1}" -lt 4 || "$@" == "env shell --wrapper" ]]; then
     command="cd /root && ./cx --proxy-host-dir='$(pwd -P)' $@"
@@ -12,7 +57,7 @@ if [[ "${BASH_VERSION:0:1}" -lt 4 || "$@" == "env shell --wrapper" ]]; then
     fi
 
     # Pass everything through our wrapper
-    docker run --rm -ti --name clx-win-wrapper --user=$(id -u):$(stat -c '%g' /var/run/docker.sock) -v "$(pwd -P)/":/root -v /var/run/docker.sock:/var/run/docker.sock cloudrexx/ubuntu bash -c "$command"
+    docker run --rm -ti --name clx-win-wrapper --user=$(id -u):$GROUP_OF_SOCKET -v "$(pwd -P)/":/root -v /var/run/docker.sock:/var/run/docker.sock cloudrexx/ubuntu bash -c "$command"
     exit 0
 fi
 
