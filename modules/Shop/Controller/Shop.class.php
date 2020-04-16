@@ -4845,8 +4845,8 @@ die("Shop::processRedirect(): This method is obsolete!");
         global $_ARRAYLANG;
 
         $objCustomer = new Customer();
-        $objCustomer = $objCustomer->getUsers(array('email' => $email));
-        if (!$objCustomer || $objCustomer->EOF) {
+        $objCustomer = current($objCustomer->getUsers(array('email' => $email)));
+        if (!$objCustomer) {
             return \Message::error($_ARRAYLANG['TXT_SHOP_NO_ACCOUNT_WITH_EMAIL']);
         }
         $arrSubstitution =
