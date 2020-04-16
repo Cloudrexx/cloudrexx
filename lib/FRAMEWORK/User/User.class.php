@@ -1193,7 +1193,7 @@ class User extends User_Profile
     {
         $arrSettings = User_Setting::getSettings();
         if ($arrSettings['user_activation']['status']) {
-            $this->restore_key = md5($this->username.$this->password.time());
+            $this->restore_key = md5($this->username.$this->getHashedPassword().time());
             $this->restore_key_time = $arrSettings['user_activation_timeout']['status'] ? time() + $arrSettings['user_activation_timeout']['value'] * 3600 : 0;
         }
         return $this->store();
@@ -2151,8 +2151,18 @@ class User extends User_Profile
                 $this->error_msg[] = $_CORELANG['TXT_ACCESS_PASSWORD_NOT_CONFIRMED'];
                 return false;
             }
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $user = $cx->getDb()->getEntityManager()->getRepository(
+                'Cx\Core\User\Model\Entity\User'
+            )->find($this->id);
+
+            if (!$user) {
+                return false;
+            }
+
+            $user->setPassword($password);
             $this->password = $password;
-            $this->updateLoadedUserData('password', $this->password);
+            $this->updateLoadedUserData('password', $user->getPassword());
             return true;
         }
         if (isset($_CONFIG['passwordComplexity']) && $_CONFIG['passwordComplexity'] == 'on') {
@@ -2182,7 +2192,15 @@ class User extends User_Profile
      * @return  string  The newly set password of the user account
      */
     public function getHashedPassword() {
-        return $this->password;
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $user = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\User')->find(
+            $this->getId()
+        );
+
+        if ($user) {
+            return $user->getPassword();
+        }
+        return '';
     }
 
 
