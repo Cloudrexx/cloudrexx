@@ -1043,14 +1043,9 @@ class User extends User_Profile
             $value = $attributeValue->getValue();
             $attributeId = $attributeValue->getUserAttribute()->getId();
             $convertedAttributeId = $this->objAttribute->getDefaultAttributeIdByAttributeId($attributeId);
-            if ($this->objAttribute->isDefaultAttribute($convertedAttributeId)) {
-                // default attributes like 'title' or 'firstname'
-                $this->arrCachedUsers[$id]['profile'][$convertedAttributeId][0] = $value;
-                $this->arrLoadedUsers[$id]['profile'][$convertedAttributeId][0] = $value;
-            } else {
-                $this->arrCachedUsers[$id][$attributeId] = $value;
-                $this->arrLoadedUsers[$id][$attributeId] = $value;
-            }
+            // default attributes like 'title' or 'firstname'
+            $this->arrCachedUsers[$id]['profile'][$convertedAttributeId][0] = $value;
+            $this->arrLoadedUsers[$id]['profile'][$convertedAttributeId][0] = $value;
         }
 
         $network = new \Cx\Lib\User\User_Networks($id);
