@@ -30,11 +30,20 @@ function get_host_os_type {
 # detect host OS
 HOST_OS=$(get_host_os_type)
 
+# whether docker runs as nativ app or is virtualized with virtualbox
+NATIVE_DOCKER=true
+
 # perform host OS specific initialization
 case "$HOST_OS" in
     Darwin)
         # detect group of docker socket
         GROUP_OF_SOCKET=$(stat -f '%g' /var/run/docker.sock)
+        # check if 'Docker Desktop on Mac' or 'Docker Toolbox' is installed
+        if [[ -z "$(docker info --format '{{.OperatingSystem}}' | grep 'Docker Desktop')" ]]; then
+            # 'Docker Toolbox' is installed
+            # this means that docker is installed through a virutal machine
+            NATIVE_DOCKER=false
+        fi
         ;;
 
     Linux)
@@ -50,14 +59,51 @@ esac
 
 # Wrapper for bash 3
 if [[ "${BASH_VERSION:0:1}" -lt 4 || "$@" == "env shell --wrapper" ]]; then
-    command="cd /root && ./cx --proxy-host-dir='$(pwd -P)' $@"
+    # will be used to mount the global cx into the wrapper container
+    GLOBAL_CX_MOUNT=""
+
+    # check if we're using the global cx (instead of a local one)
+    PATH_OF_CALLING_CX="$(dirname $(realpath $0))"
+    if [[ "$PATH_OF_CALLING_CX" != "$(pwd)" ]]; then
+        # we're using the global cx
+        if [[ ! $NATIVE_DOCKER ]]; then
+            echo "The usage of a global cx is not supported on your system."
+            exit 1
+        fi
+
+        # install copy of global cx in temp
+        TEMPCX=$(basename $0)
+        TMPFILE=$(mktemp -q /tmp/${TEMPCX}.XXXXXX)
+        TMPNAME=$(basename $TMPFILE)
+        if [ $? -ne 0 ]; then
+            echo "$0: Can't create temp file, exiting..."
+            exit 1
+        fi
+        cp $0 $TMPFILE
+        chmod +x $TMPFILE
+
+        # run cx in wrapper container from its /tmp directory
+        CX_PATH="/tmp/cx"
+        GLOBAL_CX_MOUNT="-v $TMPFILE:$CX_PATH"
+    else
+        # path to local cx
+        CX_PATH="./cx"
+    fi
+
+    command="cd /root && $CX_PATH --proxy-host-dir='$(pwd -P)' $@"
     # Special case: user wants to start interactive shell to wrapper container
     if [[ "$@" == "env shell --wrapper" ]]; then
         command="cd /root && bash"
     fi
 
     # Pass everything through our wrapper
-    docker run --rm -ti --name clx-win-wrapper --user=$(id -u):$GROUP_OF_SOCKET -v "$(pwd -P)/":/root -v /var/run/docker.sock:/var/run/docker.sock cloudrexx/ubuntu bash -c "$command"
+    docker run --rm -ti --name clx-wrapper-$TMPNAME --user=$(id -u):$GROUP_OF_SOCKET -v "$(pwd -P)/":/root -v /var/run/docker.sock:/var/run/docker.sock $GLOBAL_CX_MOUNT cloudrexx/ubuntu bash -c "$command"
+
+    # remove temp copy of cx
+    if [[ -n "$GLOBAL_CX_MOUNT" ]]; then
+        rm $TMPFILE
+    fi
+
     exit 0
 fi
 
@@ -2014,6 +2060,7 @@ if "%*" == "env shell --wrapper" (
 )
 
 REM Pass everything through our wrapper
+REM TODO add support for global cx
 docker run --rm -ti --name clx-win-wrapper -v "%cd%/":/root -v /var/run/docker.sock:/var/run/docker.sock cloudrexx/ubuntu bash -c "cd /root && ./cx --proxy-host-dir='%string%' %*"
 goto :EOF
 
