@@ -440,7 +440,7 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
                         foreach ($attribute->getChildren() as $child) {
                             foreach ($child->getUserAttributeNames() as $attributeName) {
                                 $name = $attributeName->getName();
-                                if (stripos($name, $searchTerm) !== FALSE) {
+                                if (stripos($name, $searchTerm) !== false) {
                                     // We found the attribute
                                     $childAttributeIds[] = $child->getId();
                                     continue;
