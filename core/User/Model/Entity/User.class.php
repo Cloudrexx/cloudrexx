@@ -205,6 +205,37 @@ class UserValidateUsername extends \CxValidate
  * @subpackage  core_user
  */
 class User extends \Cx\Model\Base\EntityBase {
+
+    /**
+     * Allow email access to everyone
+     */
+    const EMAIL_ACCESS_EVERYONE = 'everyone';
+
+    /**
+     * Allow email access to members only
+     */
+    const EMAIL_ACCESS_MEMBERS_ONLY = 'members_only';
+
+    /**
+     * Allow email access to nobody
+     */
+    const EMAIL_ACCESS_NOBODY = 'nobody';
+
+    /**
+     * Allow profile access to everyone
+     */
+    const PROFILE_ACCESS_EVERYONE = 'everyone';
+
+    /**
+     * Allow profile access to members only
+     */
+    const PROFILE_ACCESS_MEMBERS_ONLY = 'members_only';
+
+    /**
+     * Allow profile access to nobody
+     */
+    const PROFILE_ACCESS_NOBODY = 'nobody';
+
     /**
      * @var integer $id
      */
@@ -271,9 +302,9 @@ class User extends \Cx\Model\Base\EntityBase {
     protected $email;
 
     /**
-     * @var string enum_user_user_emailaccess $emailAccess
+     * @var \Cx\Core\Model\Data\Enum\User\User\EmailAccess $emailAccess
      */
-    protected $emailAccess;
+    protected $emailAccess = self::EMAIL_ACCESS_NOBODY;
 
     /**
      * @var integer $frontendLangId
@@ -301,9 +332,9 @@ class User extends \Cx\Model\Base\EntityBase {
     protected $primaryGroup = 0;
 
     /**
-     * @var string enum_user_user_profileaccess $profileAccess
+     * @var \Cx\Core\Model\Data\Enum\User\User\ProfileAccess $profileAccess
      */
-    protected $profileAccess;
+    protected $profileAccess = self::PROFILE_ACCESS_MEMBERS_ONLY;
 
     /**
      * @var string $restoreKey
@@ -618,7 +649,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Set emailAccess
      *
-     * @param enum_user_user_emailaccess $emailAccess
+     * @param \Cx\Core\Model\Data\Enum\User\User\EmailAccess $emailAccess
      */
     public function setEmailAccess($emailAccess)
     {
@@ -628,7 +659,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get emailAccess
      *
-     * @return enum_user_user_emailaccess $emailAccess
+     * @return \Cx\Core\Model\Data\Enum\User\User\EmailAccess $emailAccess
      */
     public function getEmailAccess()
     {
@@ -752,7 +783,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Set profileAccess
      *
-     * @param enum_user_user_profileaccess $profileAccess
+     * @param \Cx\Core\Model\Data\Enum\User\User\ProfileAccess $profileAccess
      */
     public function setProfileAccess($profileAccess)
     {
@@ -762,7 +793,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get profileAccess
      *
-     * @return enum_user_user_profileaccess $profileAccess
+     * @return \Cx\Core\Model\Data\Enum\User\User\ProfileAccess $profileAccess
      */
     public function getProfileAccess()
     {
