@@ -1604,6 +1604,9 @@ function set_config_array {
         FILE_CONTENTS=${FILE_CONTENTS//"<persistdb>"/""}
         FILE_CONTENTS=${FILE_CONTENTS//"</persistdb>"/""}
     fi
+    # drop any non-parsed blocks & placeholders
+    FILE_CONTENTS=$(drop_all_blocks_form_template "$FILE_CONTENTS")
+    FILE_CONTENTS=$(regex_replace_all "$FILE_CONTENTS" "(()<[a-z0-9_-]+>())" "")
     # save docker-compose.yml
     echo "$FILE_CONTENTS" > docker-compose.yml
     
@@ -1843,6 +1846,31 @@ function regex_replace_all {
         HAYSTACK="$(regex_replace "$HAYSTACK" "$2" "$3")"
     done
     echo "$HAYSTACK"
+}
+
+# Drop all blocks from a template
+#
+# A block has the following notation: <name>...</name>
+function drop_all_blocks_form_template {
+    local TEMPLATE="$1"
+    local REGEX="(<[a-z0-9_-]+>)[^<]*(</[a-z0-9_-]+>)"
+    # check if template still contains any blocks
+    while [[ "$TEMPLATE" =~ $REGEX ]]; do
+        # verify that the opening and closing tags of the block do match
+        OPENING_TAG="${BASH_REMATCH[1]//[<>]/}"
+        CLOSING_TAG="${BASH_REMATCH[2]//[<\/>]/}"
+        if [[ "$OPENING_TAG" == "$CLOSING_TAG" ]]; then
+            # drop the whole block
+            TEMPLATE="${TEMPLATE//"${BASH_REMATCH[0]}"/}"
+        else
+            # opening tag does not match -> this indicated that the opening
+            # tag is not a block-tag, but a placeholder instead.
+            # so let's just remove that placeholder then
+            TEMPLATE="${TEMPLATE//"${BASH_REMATCH[0]}"/"${BASH_REMATCH[2]}"}"
+        fi
+    done
+
+    echo "$TEMPLATE"
 }
 
 # Usage: if runs_as_proxy; then
