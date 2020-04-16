@@ -175,37 +175,20 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
     protected function search($searchTerm, $fields, $operation)
     {
         $metaData = $this->getClassMetadata()->fieldNames;
-        $fwAttribute = \FWUser::getFWUserObject()->objUser->objAttribute;
         $qb = $this->createQueryBuilder('u');
-        $attributeIds = array();
 
         foreach ($fields as $field) {
             if (in_array($field, $metaData)) {
                 // User
-                $qb->orWhere($this->getExpression('u.'. $field, $operation));
-                $qb->setParameter('valueu'.$field, $searchTerm);
+                $qb->orWhere($this->getExpression('u.' . $field, $operation));
+                $qb->setParameter('valueu' . $field, $searchTerm);
             } else {
 
                 // UserAttributeValue
-                // Find attribute id from default attribute
-                if ($fwAttribute->isDefaultAttribute($field)) {
-                    $attributeIds[] = $fwAttribute->getAttributeIdByDefaultAttributeId($field);
-                } else {
-                    $attributeIds[] = $field;
-                }
+                $qb->orWhere($this->getAttributeFilterExpression(
+                    $qb, array($field => $searchTerm), true, $operation
+                ));
             }
-        }
-
-        if (!empty($attributeIds)) {
-            $qb->join('u.userAttributeValues', 'v');
-            $qb->orWhere(
-                $qb->expr()->andX(
-                    $this->getExpression('v.userAttribute', 'in'),
-                    $this->getExpression('v.value', $operation)
-                )
-            );
-            $qb->setParameter('valuevuserAttribute', $attributeIds);
-            $qb->setParameter('valuevvalue', $searchTerm);
         }
 
         return $qb->getQuery()->getResult();
@@ -336,7 +319,7 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
      * @param bool                       $and     use a and condition or an or condition
      * @return \Doctrine\ORM\Query\Expr\Orx|\Doctrine\ORM\Query\Expr\Andx
      */
-    public function getAttributeFilterExpression($qb, $filters, $and = true)
+    public function getAttributeFilterExpression($qb, $filters, $and = true, $operation = 'eq')
     {
         $objAttr = \FWUser::getFWUserObject()->objUser->objAttribute;
 
@@ -353,12 +336,14 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
 
             // Join table if not already done
             $alias = 'v'.$key;
-            if (!in_array($alias, $qb->getAllAliases())) {
+            if (!in_array($alias, $qb->getRootAliases())) {
                 $qb->join('u.userAttributeValues', $alias);
             }
 
-            $expr->add($this->getExpression($alias.'.'.$key, 'eq'));
-            $qb->setParameter($alias.$key, $value);
+            $expr->add($this->getExpression($alias . '.userAttribute', 'eq'));
+            $expr->add($this->getExpression($alias . '.value', $operation));
+            $qb->setParameter('value' . $alias . 'value', $value);
+            $qb->setParameter('value' . $alias . 'userAttribute', $key);
         }
         return $expr;
     }
