@@ -204,19 +204,13 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
     protected function getExpression($field, $operation = 'eq')
     {
         $qb = $this->createQueryBuilder('e');
-        $valueName = preg_replace('/\./', '', 'value'.$field);
-        switch ($operation) {
-            case 'like':
-                $expr = $qb->expr()->like($field, ':'.$valueName);
-                break;
-            case 'in':
-                $expr = $qb->expr()->in($field, ':'.$valueName);
-                break;
-            default:
-                $expr = $qb->expr()->eq($field, ':'.$valueName);
-        }
+        $valueName = preg_replace('/\./', '', 'value' . $field);
+        $supportedOperations = array('eq', 'like', 'in');
 
-        return $expr;
+        if (!in_array($operation, $supportedOperations)) {
+            $operation = 'eq';
+        }var_dump($valueName);
+        return $qb->expr()->$operation($field, ':' . $valueName);
     }
 
     /**
