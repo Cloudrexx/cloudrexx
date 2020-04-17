@@ -559,7 +559,7 @@ class User_Profile_Attribute
         }
     }
 
-/**
+    /**
      * Find all default user attributes and store it in an
      * array
      */
@@ -726,7 +726,7 @@ class User_Profile_Attribute
         } else {
             $expression = $qb->expr()->not($qb->expr()->eq('a.id', ':picId'));
         }
-	        $picId = $this->getAttributeIdByDefaultAttributeId('picture');
+        $picId = $this->getAttributeIdByDefaultAttributeId('picture');
         $qb->andWhere($expression);
         $qb->setParameter('picId', $picId);
         
