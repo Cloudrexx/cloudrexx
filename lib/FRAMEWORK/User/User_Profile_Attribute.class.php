@@ -529,7 +529,6 @@ class User_Profile_Attribute
 
     function init()
     {
-        global $_CORELANG;
         $this->arrAttributes = null;
         $this->arrAttributeRelations = null;
         $this->arrAttributeTree = null;
@@ -560,7 +559,6 @@ class User_Profile_Attribute
         }
     }
 
- 
 /**
      * Find all default user attributes and store it in an
      * array
@@ -569,7 +567,7 @@ class User_Profile_Attribute
     {
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $frontend = $cx->getMode() == \Cx\Core\Core\Controller\Cx::MODE_FRONTEND;
-        $langData = \Env::get('init')->getComponentSpecificLanguageData('Core', $frontend);
+        $_CORELANG = \Env::get('init')->getComponentSpecificLanguageData('Core', $frontend);
         $attributeRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\UserAttribute');
 
         $this->arrCustomAttributes = array();
@@ -609,11 +607,17 @@ class User_Profile_Attribute
                 if (isset($this->arrDefaultAttributeTemplates[$attribute->getName()])) {
                     $arrTemplate = $this->arrDefaultAttributeTemplates[$attribute->getName()];
                     $desc = $arrTemplate['desc'];
-                    $this->arrAttributes[$attributeId]['names'][$this->langId] = isset($langData[$desc]) ? $langData[$desc] : null;
-                    $this->arrAttributes[$attributeId]['modifiable'] = $arrTemplate['modifiable'];
+                    $this->arrAttributes[$attributeId]['names'][$this->langId] = isset($_CORELANG[$desc]) ? $_CORELANG[$desc] : null;
+                    if (!isset($arrTemplate['modifiable'])) {
+                        $this->arrAttributes[$attributeId]['modifiable'] = array();
+                    } else {
+                        $this->arrAttributes[$attributeId]['modifiable'] = $arrTemplate['modifiable'];
+                    }
                 } else if ($parentId == $this->getAttributeIdByDefaultAttributeId('title')) {
                     $this->arrAttributes[$attributeId]['modifiable'] = array('names');
                     $this->arrAttributes[$attributeId]['names'][$this->langId] = $attribute->getName();
+                } else {
+                    $this->arrAttributes[$attributeId]['modifiable'] = array();
                 }
             }
             $this->arrAttributes[$attributeId]['access_special'] = $attribute->getAccessSpecial();
@@ -655,11 +659,7 @@ class User_Profile_Attribute
     function generateAttributeRelations()
     {
         foreach ($this->arrAttributes as $attribute => $arrAttribute) {
-            if (!empty($arrAttribute['parent_id'])) {
-                $this->arrAttributeRelations[$arrAttribute['parent_id']][] = $attribute;
-            } else {
-                $this->arrAttributeRelations[$arrAttribute['parent_id']][] = $attribute;
-            }
+            $this->arrAttributeRelations[$arrAttribute['parent_id']][] = $attribute;
         }
     }
 
@@ -684,7 +684,6 @@ class User_Profile_Attribute
 
     public function getById($id)
     {
-
         $objAttribute = clone $this;
         $objAttribute->arrAttributes = &$this->arrAttributes;
         $objAttribute->arrAttributeTree = &$this->arrAttributeTree;
@@ -723,10 +722,13 @@ class User_Profile_Attribute
            ->setParameters(array('type' => 'image', 'value' => ''));
 
         if ($profilePics) {
+            $expression = $qb->expr()->eq('a.id', ':picId');
+        } else {
+            $expression = $qb->expr()->not($qb->expr()->eq('a.id', ':picId'));
+        }
 	        $picId = $this->getAttributeIdByDefaultAttributeId('picture');
-	        $qb->andWhere($qb->expr()->eq('a.id', ':picId'));
-	        $qb->setParameter('picId', $picId);
-	    }
+        $qb->andWhere($expression);
+        $qb->setParameter('picId', $picId);
         
  	    $count = $qb->getQuery()->getSingleScalarResult();
         if (!$count) {
@@ -742,12 +744,9 @@ class User_Profile_Attribute
             return array();
         }
 
-        $images = array();
-        foreach ($resultImages as $image) {
-            $images[] = $image['picture'];
-        }
-
-        return $images;
+        return array_map(function($image) {
+            return $image['picture'];
+        }, $resultImages);
     }
 
     /**
@@ -960,6 +959,9 @@ class User_Profile_Attribute
 
         if (empty($attr)) {
             $attr = new \Cx\Core\User\Model\Entity\UserAttribute();
+            $isDefault = 0;
+        } else {
+            $isDefault = $attr->isDefault();
         }
 
         $parent = $attrRepo->find($parentId);
@@ -971,7 +973,7 @@ class User_Profile_Attribute
         $attr->setParent($parent);
         $attr->setAccessId(0);
         $attr->setReadAccessId(0);
-        $attr->setDefault(0);
+        $attr->setDefault($isDefault);
         $em->persist($attr);
 
         try {
@@ -1006,7 +1008,7 @@ class User_Profile_Attribute
                 }
             }
 
-            $attribute->setName(addslashes($this->arrName[0]));
+            $attribute->setName($this->arrName[0]);
 
             $em->persist($attribute);
             $em->flush();
@@ -1105,7 +1107,7 @@ class User_Profile_Attribute
         $setter = '';
         $mappedFieldName = $classMeta->getFieldName($fieldName);
         if ($mappedFieldName != $fieldName) {
-            $setter = 'set'.ucfirst($mappedFieldName);
+            $setter = 'set' . \Doctrine\Common\Inflector\Inflector::classify($mappedFieldName);
         }
 
         if (!$protected) {
@@ -1121,7 +1123,7 @@ class User_Profile_Attribute
             try {
                 $em->persist($attribute);
                 $em->flush();
-                if (!isset($this->arrAttributes[$this->id][$fieldName]) ||
+                if (
                     $objDatabase->Execute(
                         'DELETE FROM `' . DBPREFIX . 'access_group_dynamic_ids`
                             WHERE `access_id` = ' . $this->arrAttributes[$this->id][$fieldName]
@@ -1156,7 +1158,7 @@ class User_Profile_Attribute
             }
 
             try {
-                $attribute->$setter(contrexx_input2db($accessId));
+                $attribute->$setter($accessId);
                 $em->persist($attribute);
                 $em->flush();
             } catch (\Doctrine\ORM\OptimisticLockException $e) {
@@ -1172,7 +1174,7 @@ class User_Profile_Attribute
         }
 
         try {
-            $attribute->setAccessSpecial(contrexx_input2db($accessId));
+            $attribute->setAccessSpecial($accessId);
             $em->persist($attribute);
             $em->flush();
         } catch (\Doctrine\ORM\OptimisticLockException $e) {
@@ -1229,10 +1231,11 @@ class User_Profile_Attribute
 //        return ($this->isCoreAttribute($attributeId) || $this->deleteAttributeContent($attributeId)) && ($this->isCoreAttribute($attributeId) || $this->deleteAttributeNames($attributeId)) && $this->deleteAttributeEntity($attributeId);
 // However, it would be clearer with a few parentheses.
         return
-            (
-                $this->isDefaultAttribute($attributeId) ||
-                $this->deleteAttributeContent($attributeId)
-            ) && $this->deleteAttributeEntity($attributeId);
+            (   $this->isDefaultAttribute($attributeId)
+             ||    $this->deleteAttributeContent($attributeId))
+                && ($this->isDefaultAttribute($attributeId)
+             ||    $this->deleteAttributeNames($attributeId))
+                && $this->deleteAttributeEntity($attributeId);
     }
 
 
@@ -1240,15 +1243,13 @@ class User_Profile_Attribute
     {
         global $_ARRAYLANG;
 
-        $pattern = array();
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $em = $cx->getDb()->getEntityManager();
         $attrRepo = $em->getRepository(
             'Cx\Core\User\Model\Entity\UserAttribute'
         );
 
-        $attrId = $this->parent_id == 'title' && preg_match('#([0-9]+)#', $attributeId, $pattern) ? $pattern[0] : $attributeId;
-        $attr = $attrRepo->find($attrId);
+        $attr = $attrRepo->find($attributeId);
 
         if (empty($attr)) {
             return false;
@@ -1282,7 +1283,7 @@ class User_Profile_Attribute
         $em = $cx->getDb()->getEntityManager();
         $attrNames = $em->getRepository(
             'Cx\Core\User\Model\Entity\UserAttributeValue'
-        )->findBy(array('attributeId' => $attributeId));
+        )->findBy(array('userAttribute' => $attributeId));
 
         foreach ($attrNames as $attrName) {
             $em->remove($attrName);
@@ -1751,7 +1752,7 @@ class User_Profile_Attribute
             $cx = \Cx\Core\Core\Controller\Cx::instanciate();
             $attr = $cx->getDb()->getEntityManager()->getRepository(
                 'Cx\Core\User\Model\Entity\UserAttribute'
-            )->findOneBy(array('id' => contrexx_raw2db($this->id)));
+            )->findOneBy(array('id' => $this->id));
 
             if (!empty($attr)) {
                 $attr->setTranslatableLocale($langId);

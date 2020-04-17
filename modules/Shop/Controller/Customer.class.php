@@ -93,7 +93,7 @@ class Customer extends \User
     function id($id=null)
     {
         if (isset($id)) {
-            $this->setId($id);
+            $this->id = $id;
         }
         return $this->id;
     }
@@ -540,7 +540,7 @@ class Customer extends \User
             $customer->companynote($user->getAttributeValue($noteId)->getValue());
             $groupId = \Cx\Core\Setting\Controller\Setting::getValue('user_profile_attribute_customer_group_id','Shop');
             $customer->group_id($user->getAttributeValue($groupId)->getValue());
-            $customer->active($user->getActive(), true);
+            $customer->active($user->isActive(), true);
             $customer->register_date($user->getRegdate());
 
             $customers[$user->getId()] = $customer;

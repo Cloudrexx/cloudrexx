@@ -525,9 +525,6 @@ class FWUser extends User_Setting
             'u.email'
         );
         $users = $qb->getQuery()->getResult();
-        /*$objUser = $this->objUser->getUsers(
-            array('email' => array('REGEXP' => '^(shop_customer_[0-9]+_[0-9]+_[0-9]-)?'.preg_quote($email).'$'), 'is_active' => true), null, null, null
-        );*/
 // END: WORKAROUND FOR ACCOUNTS SOLD IN THE SHOP
         if ($users) {
 // TODO: START: WORKAROUND FOR ACCOUNTS SOLD IN THE SHOP

@@ -44,6 +44,12 @@ namespace Cx\Core\User\Model\Event;
  */
 class UserEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventListener
 {
+    /**
+     * Prevent the user from deactivating himself
+     *
+     * @param \Doctrine\ORM\Event\LifecycleEventArgs $eventArgs
+     * @throws \Cx\Core\Error\Model\Entity\ShinyException
+     */
     public function preUpdate(\Doctrine\ORM\Event\LifecycleEventArgs $eventArgs)
     {
         global $objInit, $_ARRAYLANG;
@@ -61,7 +67,5 @@ class UserEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventListener
                 $_ARRAYLANG['TXT_CORE_USER_NO_USER_WITH_SAME_ID']
             );
         }
-
-
     }
 }

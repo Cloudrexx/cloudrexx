@@ -48,8 +48,7 @@ class LocaleLocaleEventListener extends \Cx\Core\Event\Model\Entity\DefaultEvent
         // get locale, which will be deleted
         $delLocale = $eventArgs->getEntity();
 
-        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-        $em = $cx->getDb()->getEntityManager();
+        $em = $this->cx->getDb()->getEntityManager();
         $attributeRepo = $em->getRepository('Cx\Core\User\Model\Entity\UserAttribute');
         // Only delete custom attributes names so that we can keep the names of the default attributes
         $attributes = $attributeRepo->findBy(array('default' => 0));

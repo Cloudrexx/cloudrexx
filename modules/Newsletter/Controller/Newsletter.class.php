@@ -395,15 +395,13 @@ class Newsletter extends NewsletterLib
             }
 
             if ($objRecipient) {
-                if ($user) {
-                    $recipientId = $user->getId();
-                    $isAccessRecipient = true;
+                $recipientId = $user->getId();
+                $isAccessRecipient = true;
 
-                    //$arrAssociatedLists = $objUser->getSubscribedNewsletterListIDs();
-                    // until fwUser is completely removed
-                    $objUser = \FWUser::getFWUserObject()->objUser->getUser($user->getId());
-                    $arrPreAssociatedInactiveLists = $objUser->getSubscribedNewsletterListIDs();
-                }
+                //$arrAssociatedLists = $objUser->getSubscribedNewsletterListIDs();
+                // until fwUser is completely removed
+                $objUser = \FWUser::getFWUserObject()->objUser->getUser($user->getId());
+                $arrPreAssociatedInactiveLists = $objUser->getSubscribedNewsletterListIDs();
             } else {
                 $objRecipient = $objDatabase->SelectLimit("SELECT id FROM ".DBPREFIX."module_newsletter_user WHERE status=1 AND code='".$code."' AND email='".contrexx_raw2db($requestedMail)."'", 1);
                 if ($objRecipient && $objRecipient->RecordCount() == 1) {
@@ -1233,13 +1231,13 @@ class Newsletter extends NewsletterLib
             $fax            = contrexx_raw2xhtml($objResult->fields['fax']);
             $website        = contrexx_raw2xhtml($objResult->fields['uri']);
             $birthday       = contrexx_raw2xhtml($objResult->fields['birthday']);
-        } elseif (!empty($user = $userRepo->findOneBy(array('email' => contrexx_raw2db($email), 'active' => 1)))) {
+        } elseif (!empty($user = $userRepo->findOneBy(array('email' => $email, 'active' => 1)))) {
             $attr = \FWUser::getFWUserObject()->objUser->objAttribute;
             $sexAttributeValue = $user->getAttributeValue(
                 $attr->getAttributeIdByDefaultAttributeId('gender')
             )->getValue();
 
-            $sex = '';;
+            $sex = '';
             if ($sexAttributeValue == 'gender_female') {
                 $sex = $_CORELANG['TXT_ACCESS_FEMALE'];
             } else if ($sexAttributeValue == 'gender_male') {

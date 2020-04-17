@@ -129,6 +129,10 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
         );
         $this->addGroupToQueryBuilder($qb, $groupFilter);
 
+        $qb->orderBy('u.lastActivity', 'DESC')
+            ->addOrderBy('u.username', 'ASC')
+            ->setMaxResults($arrSettings['block_last_active_users']['value']);
+
         $users = $qb->getQuery()->getResult();
 
         if (!empty($users)) {
@@ -141,56 +145,79 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
         }
     }
 
-    protected function addGenderToQueryBuilder(&$qb, $gender)
+    /**
+     * Add where condition to filter by gender. But only if param $gender is true
+     *
+     * @param \Doctrine\ORM\QueryBuilder $qb     QueryBuilder where the condition is added
+     * @param boolean                    $gender add condition only if param is true
+     */
+    protected function addGenderToQueryBuilder($qb, $gender)
     {
+        if (empty($gender)) {
+            return;
+        }
+
         $objFWUser = \FWUser::getFWUserObject();
         $attr = $objFWUser->objUser->objAttribute;
 
-        if (!empty($gender)) {
-            $qb->join(
-                'u.userAttributeValues', 'vGen'
-            )->andWhere(
-                $qb->expr()->eq('vGen.attributeId', ':vGenId')
-            )->andWhere(
-                $qb->expr()->eq('vGen.value', ':vGenValue')
-            )->setParameter(
-                'vGenId', $attr->getAttributeIdByDefaultAttributeId('gender')
-            )->setParameter(
-                'vGenValue', 'gender_'.$gender
-            );
-        }
+        $qb->join(
+            'u.userAttributeValues', 'vGen'
+        )->andWhere(
+            $qb->expr()->eq('vGen.attributeId', ':vGenId')
+        )->andWhere(
+            $qb->expr()->eq('vGen.value', ':vGenValue')
+        )->setParameter(
+            'vGenId', $attr->getAttributeIdByDefaultAttributeId('gender')
+        )->setParameter(
+            'vGenValue', 'gender_'.$gender
+        );
     }
 
-    protected function addPicToQueryBuilder(&$qb, $onlyWithPic)
+    /**
+     * Add where condition to filter by profile pic. But only if param $onlyWithPic is true
+     *
+     * @param \Doctrine\ORM\QueryBuilder $qb          QueryBuilder where the condition is added
+     * @param boolean                    $onlyWithPic add condition only if param is true
+     */
+    protected function addPicToQueryBuilder($qb, $onlyWithPic)
     {
+        if (empty($onlyWithPic)) {
+            return;
+        }
+
         $objFWUser = \FWUser::getFWUserObject();
         $attr = $objFWUser->objUser->objAttribute;
 
-        if ($onlyWithPic) {
-            $qb->join(
-                'u.userAttributeValues', 'vPic'
-            )->andWhere(
-                $qb->expr()->eq('vPic.attributeId', ':vPicId')
-            )->andWhere(
-                $qb->expr()->not(
-                    $qb->expr()->eq('vPic.value', ':vPicValue')
-                )
-            )->setParameter(
-                'vPicId', $attr->getAttributeIdByDefaultAttributeId('picture')
-            )->setParameter(
-                'vPicValue', ''
-            );
-        }
+        $qb->join(
+            'u.userAttributeValues', 'vPic'
+        )->andWhere(
+            $qb->expr()->eq('vPic.attributeId', ':vPicId')
+        )->andWhere(
+            $qb->expr()->not(
+                $qb->expr()->eq('vPic.value', ':vPicValue')
+            )
+        )->setParameter(
+            'vPicId', $attr->getAttributeIdByDefaultAttributeId('picture')
+        )->setParameter(
+            'vPicValue', ''
+        );
     }
 
-    protected function addGroupToQueryBuilder(&$qb, $groupIds)
+    /**
+     * Add where condition to filter by group ids. But only if param $groupIds is not empty
+     *
+     * @param \Doctrine\ORM\QueryBuilder $qb       QueryBuilder where the condition is added
+     * @param boolean                    $groupIds add condition only if param is true
+     */
+    protected function addGroupToQueryBuilder($qb, $groupIds)
     {
-        // filter users by group association
         if ($groupIds) {
-            $qb->andWhere(
-                $qb->expr()->in('u.id', ':groupIds')
-            )->setParameter('groupIds', $groupIds);
+            return;
         }
+        // filter users by group association
+        $qb->andWhere(
+            $qb->expr()->in('u.id', ':groupIds')
+        )->setParameter('groupIds', $groupIds);
     }
 
     /**
@@ -200,7 +227,7 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
      * @param array                      $months birthday months
      * @param array                      $days   birthday days
      */
-    protected function addBirthdayToQueryBuilder(&$qb, $months, $days)
+    protected function addBirthdayToQueryBuilder($qb, $months, $days)
     {
         $objFWUser = \FWUser::getFWUserObject();
         $objAttr = $objFWUser->objUser->objAttribute;
@@ -331,7 +358,7 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
 
     /**
      * Parses ACCESS_USER_ID, -USERNAME and -REGDATE placeholders and the user's attributes
-     * @param \User User object to parse placeholders for
+     * @param \Cx\Core\User\Model\Entity\User User object to parse placeholders for
      */
     public function parseBasePlaceholders($objUser) {
         $this->_objTpl->setVariable(array(
@@ -345,7 +372,7 @@ class AccessBlocks extends \Cx\Core_Modules\Access\Controller\AccessLib
         foreach ($objUser->getUserAttributeValues() as $value) {
             $attrId = $objAttr->getDefaultAttributeIdByAttributeId($value->getUserAttribute()->getId());
             $objAttr->load($attrId);
-            if ($value->getUserAttribute()->checkReadPermission()) {
+            if ($value->getUserAttribute()->hasReadPermission()) {
                 $this->parseAttribute(
                     $objUser,
                     $objAttr->getId(),

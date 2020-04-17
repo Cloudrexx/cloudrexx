@@ -232,12 +232,13 @@ class User_Profile
             {
                 $newValue = !isset($this->arrCachedUsers[$this->id]['profile'][$attributeId][$historyId]);
                 if ($newValue || $value != $this->arrCachedUsers[$this->id]['profile'][$attributeId][$historyId]) {
+
                     if ($this->objAttribute->isDefaultAttribute($attributeId)) {
                         $attributeId = $this->objAttribute->getAttributeIdByDefaultAttributeId($attributeId);
                     }
 
                     $attributeValue = $attributeValueRepo->findOneBy(
-                        array('attributeId' => $attributeId, 'userId' => $this->id, 'history' => $historyId)
+                        array('userAttribute' => $attributeId, 'user' => $this->id, 'history' => $historyId)
                     );
                     if (!$attributeValue) {
                         $attributeValue = new \Cx\Core\User\Model\Entity\UserAttributeValue();
@@ -245,11 +246,9 @@ class User_Profile
                     $attribute = $attributeRepo->find($attributeId);
                     $user = $userRepo->find($this->id);
                     $attributeValue->setUserAttribute($attribute);
-                    $attributeValue->setAttributeId($attributeId);
-                    $attributeValue->setUserId($this->id);
                     $attributeValue->setUser($user);
                     $attributeValue->setHistory($historyId);
-                    $attributeValue->setValue(contrexx_raw2db($value));
+                    $attributeValue->setValue($value);
 
                     try {
                         $em->persist($attributeValue);
@@ -265,7 +264,7 @@ class User_Profile
             if ($this->objAttribute->isCustomAttribute($attributeId) && isset($this->arrCachedUsers[$this->id]['profile'][$attributeId])) {
                 foreach (array_diff(array_keys($this->arrCachedUsers[$this->id]['profile'][$attributeId]), array_keys($arrValue)) as $historyId) {
                     $attributeValue = $attributeValueRepo->findOneBy(
-                        array('attributeId' => $attributeId, 'userId' => $this->id, 'history' => $historyId)
+                        array('userAttribute' => $attributeId, 'user' => $this->id, 'history' => $historyId)
                     );
 
                     try {

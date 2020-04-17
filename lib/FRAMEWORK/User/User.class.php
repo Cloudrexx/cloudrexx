@@ -337,7 +337,7 @@ class User extends User_Profile
     /**
      * TRUE if user is authenticated
      *
-     * If this is TRUE the methods {@link load()} and {@link loadUsers()}
+     * If this is TRUE the methods {@link load()}
      * will be looked for further usage.
      * @todo    Explain this method in plain english...
      * @var     boolean
@@ -425,10 +425,10 @@ class User extends User_Profile
         $qb = $userRepo->createQueryBuilder('u');
         if ($loginByEmail) {
             $column = 'u.email';
-            $loginCheck = contrexx_raw2db($username);
+            $loginCheck = $username;
         } else {
             $column = 'u.username';
-            $loginCheck = contrexx_raw2db($username);
+            $loginCheck = $username;
         }
 
         $qb->where($qb->expr()->eq($column, ':loginCheck'));
@@ -500,7 +500,7 @@ class User extends User_Profile
                 )
             )->setParameters(
                 array(
-                    'authToken' => contrexx_raw2db($authToken),
+                    'authToken' => $authToken,
                     'authTokenTimeout' => time(),
                     'active' => 1,
                     'id' => intval($userId),
@@ -610,10 +610,13 @@ class User extends User_Profile
                 $userRepo = $em->getRepository('Cx\Core\User\Model\Entity\User');
                 $user = $userRepo->find($this->id);
 
+                if (empty($user)) {
+                    return;
+                }
+
                 // Remove all groups from user
-                foreach ($user->getGroup() as $group) {
+                foreach ($user->getGroups() as $group) {
                     $user->removeGroup($group);
-                    $group->removeUser($user);
                 }
 
                 $objDatabase->startTrans();
@@ -829,18 +832,7 @@ class User extends User_Profile
     {
         return $this->id;
     }
-
-    /**
-     * Set ID. Use this method with caution! The ID of a user should not be overwritten.
-     *
-     * @param $id
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-    }
-
-
+    
     public function getLastActivityTime()
     {
         return $this->last_activity;
@@ -1041,7 +1033,7 @@ class User extends User_Profile
 
         $id = $user->getId();
         foreach (array_keys($this->arrAttributes) as $column) {
-            $getter = 'get'.ucfirst($classMeta->getFieldName($column));
+            $getter = 'get' . \Doctrine\Common\Inflector\Inflector::classify($classMeta->getFieldName($column));
             $value = $user->$getter();
             $this->arrCachedUsers[$id][$column] = $value;
             $this->arrLoadedUsers[$id][$column] = $value;
@@ -1049,16 +1041,11 @@ class User extends User_Profile
 
         foreach ($user->getUserAttributeValues() as $attributeValue) {
             $value = $attributeValue->getValue();
-            $attributeId = $attributeValue->getAttributeId();
+            $attributeId = $attributeValue->getUserAttribute()->getId();
             $convertedAttributeId = $this->objAttribute->getDefaultAttributeIdByAttributeId($attributeId);
-            if ($this->objAttribute->isDefaultAttribute($convertedAttributeId)) {
-                // default attributes like 'title' or 'firstname'
-                $this->arrCachedUsers[$id]['profile'][$convertedAttributeId][0] = $value;
-                $this->arrLoadedUsers[$id]['profile'][$convertedAttributeId][0] = $value;
-            } else {
-                $this->arrCachedUsers[$id][$attributeId] = $value;
-                $this->arrLoadedUsers[$id][$attributeId] = $value;
-            }
+            // default attributes like 'title' or 'firstname'
+            $this->arrCachedUsers[$id]['profile'][$convertedAttributeId][0] = $value;
+            $this->arrLoadedUsers[$id]['profile'][$convertedAttributeId][0] = $value;
         }
 
         $network = new \Cx\Lib\User\User_Networks($id);
@@ -1206,7 +1193,7 @@ class User extends User_Profile
     {
         $arrSettings = User_Setting::getSettings();
         if ($arrSettings['user_activation']['status']) {
-            $this->restore_key = md5($this->username.$this->password.time());
+            $this->restore_key = md5($this->username.$this->getHashedPassword().time());
             $this->restore_key_time = $arrSettings['user_activation_timeout']['status'] ? time() + $arrSettings['user_activation_timeout']['value'] * 3600 : 0;
         }
         return $this->store();
@@ -1416,9 +1403,9 @@ class User extends User_Profile
             return false;
         }
 
-        $user->setUsername(addslashes($this->username));
-        $user->setIsAdmin(intval($this->is_admin));
-        $user->setEmail(addslashes($this->email));
+        $user->setUsername($this->username);
+        $user->setSuperUser(intval($this->is_admin));
+        $user->setEmail($this->email);
         $user->setEmailAccess($this->email_access);
         $user->setFrontendLangId($this->frontend_language);
         $user->setBackendLangId($this->backend_language);
@@ -1466,12 +1453,12 @@ class User extends User_Profile
         $em = $cx->getDb()->getEntityManager();
         $user = new \Cx\Core\User\Model\Entity\User();
 
-        $user->setUsername(addslashes($this->username));
-        $user->setIsAdmin(intval($this->is_admin));
+        $user->setUsername($this->username);
+        $user->setSuperUser(intval($this->is_admin));
         $user->setPassword($this->password);
         $user->setAuthToken($this->auth_token);
         $user->setAuthTokenTimeout($this->auth_token_timeout);
-        $user->setEmail(addslashes($this->email));
+        $user->setEmail($this->email);
         $user->setEmailAccess($this->email_access);
         $user->setFrontendLangId($this->frontend_language);
         $user->setBackendLangId($this->backend_language);
@@ -1697,8 +1684,6 @@ class User extends User_Profile
         $qb = $em->createQueryBuilder();
         $qb->select('u')
             ->from('Cx\Core\User\Model\Entity\User', 'u')
-            ->leftJoin('u.groups', 'g')
-            ->leftJoin('u.userAttributeValues', 'v')
             ->where($qb->expr()->eq('u.active', ':active'))
             ->andWhere($qb->expr()->not($qb->expr()->eq('u.restoreKey', ':restoreKey')))
             ->andWhere($qb->expr()->lt('u.restoreKeyTime', ':restoreKeyTime'))
@@ -1713,6 +1698,10 @@ class User extends User_Profile
         $userIds = array();
         foreach ($users as $user) {
             $userIds[] = $user->getId();
+            // Remove all user attribute values
+            foreach ($user->getUserAttributeValues() as $value) {
+                $em->remove($value);
+            }
             $em->remove($user);
         }
 
@@ -1859,7 +1848,10 @@ class User extends User_Profile
         }
 
         $groupIds = array();
-        foreach ($user->getGroup() as $group) {
+        foreach ($user->getGroups() as $group) {
+            if (!$group->isActive()) {
+                continue;
+            }
             $groupIds[] = $group->getId();
         }
 
@@ -2043,13 +2035,15 @@ class User extends User_Profile
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $em = $cx->getDb()->getEntityManager();
         $userRepo = $em->getRepository('Cx\Core\User\Model\Entity\User');
-        $users = $userRepo->findBy(array($column => contrexx_raw2db($username)));
+        $user = $userRepo->findOneBy(array($column => $username));
+
+        if (empty($user)) {
+            return false;
+        }
 
         try {
-            foreach ($users as $user) {
-                $user->setLastAuthStatus(0);
-                $em->persist($user);
-            }
+            $user->setLastAuthStatus(0);
+            $em->persist($user);
             $em->flush();
             return true;
         } catch (\Doctrine\ORM\OptimisticLockException $e) {
@@ -2159,8 +2153,18 @@ class User extends User_Profile
                 $this->error_msg[] = $_CORELANG['TXT_ACCESS_PASSWORD_NOT_CONFIRMED'];
                 return false;
             }
+            $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+            $user = $cx->getDb()->getEntityManager()->getRepository(
+                'Cx\Core\User\Model\Entity\User'
+            )->find($this->id);
+
+            if (!$user) {
+                return false;
+            }
+
+            $user->setPassword($password);
             $this->password = $password;
-            $this->updateLoadedUserData('password', $this->password);
+            $this->updateLoadedUserData('password', $user->getPassword());
             return true;
         }
         if (isset($_CONFIG['passwordComplexity']) && $_CONFIG['passwordComplexity'] == 'on') {
@@ -2190,7 +2194,15 @@ class User extends User_Profile
      * @return  string  The newly set password of the user account
      */
     public function getHashedPassword() {
-        return $this->password;
+        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $user = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\User')->find(
+            $this->getId()
+        );
+
+        if ($user) {
+            return $user->getPassword();
+        }
+        return '';
     }
 
 
@@ -2367,9 +2379,9 @@ class User extends User_Profile
         $userRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\User');
         $qb = $userRepo->createQueryBuilder('u');
         $qb->select('COUNT(u.id) AS numof_admin')
-           ->where($qb->expr()->eq('u.isAdmin', ':isAdmin'))
+           ->where($qb->expr()->eq('u.superUser', ':superUser'))
            ->andWhere($qb->expr()->eq('u.active', ':active'))
-           ->setParameters(array('isAdmin' => 1, 'active' => 1));
+           ->setParameters(array('superUser' => 1, 'active' => 1));
         $count = $qb->getQuery()->getOneOrNullResult();
 
         return ($count < 2);
@@ -2393,7 +2405,7 @@ class User extends User_Profile
         $qb->where($qb->expr()->eq('u.email', ':email'))
            ->andWhere($qb->expr()->not($qb->expr()->eq('u.id', ':id')))
            ->setMaxResults(1)
-           ->setParameters(array('email' => addslashes($email), 'id' => $id));
+           ->setParameters(array('email' => $email, 'id' => $id));
 
         return !count($qb->getQuery()->getOneOrNullResult());
     }
@@ -2422,7 +2434,7 @@ class User extends User_Profile
         $qb->where($qb->expr()->eq('u.username', ':username'))
             ->andWhere($qb->expr()->not($qb->expr()->eq('u.id', ':id')))
             ->setMaxResults(1)
-            ->setParameters(array('username' => addslashes($username), 'id' => $id));
+            ->setParameters(array('username' => $username, 'id' => $id));
 
         return !count($qb->getQuery()->getOneOrNullResult());
     }

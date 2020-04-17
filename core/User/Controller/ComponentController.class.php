@@ -34,6 +34,7 @@
  * @subpackage  core_user
  * @version     5.0.3
  */
+
 namespace Cx\Core\User\Controller;
 
 /**
@@ -54,8 +55,6 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      */
     public function getControllerClasses()
     {
-        // Return an empty array here to let the component handler know that there
-        // does not exist a backend, nor a frontend controller of this component.
         return array('Frontend', 'Backend', 'Export', 'JsonUser');
     }
 
@@ -68,8 +67,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     public function getCommandsForCommandMode()
     {
         return array(
-            'exportUser' => new
-            \Cx\Core_Modules\Access\Model\Entity\Permission(
+            'exportUser' => new \Cx\Core_Modules\Access\Model\Entity\Permission(
                 array('http', 'https'), // allowed protocols
                 array(
                     'get',
@@ -150,28 +148,20 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
      */
     public function registerEventListeners()
     {
-        $userListener
-            = new \Cx\Core\User\Model\Event\UserEventListener(
-            $this->cx
-        );
+        $userListener = new \Cx\Core\User\Model\Event\UserEventListener($this->cx);
 
-        $entityClass = 'Cx\\Core\\' . $this->getName()
-            . '\\Model\\Entity\\User';
+        $entityClass = $this->getNamespace() . '\\Model\\Entity\\User';
         $this->cx->getEvents()->addModelListener(
             \Doctrine\ORM\Events::preUpdate,
             $entityClass,
             $userListener
         );
 
-        $attrListener
-            = new \Cx\Core\User\Model\Event\UserAttributeEventListener(
-                $this->cx
-            );
+        $attrListener = new \Cx\Core\User\Model\Event\UserAttributeEventListener($this->cx);
         $this->cx->getEvents()->addModelListener(
             \Doctrine\ORM\Events::postPersist,
-            'Cx\Core\User\Model\Entity\UserAttribute',
+            $this->getNamespace() . '\Model\Entity\UserAttribute',
             $attrListener
         );
     }
-
 }
