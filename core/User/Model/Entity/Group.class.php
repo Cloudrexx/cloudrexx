@@ -50,6 +50,17 @@ namespace Cx\Core\User\Model\Entity;
  * )
  */
 class Group extends \Cx\Model\Base\EntityBase {
+
+    /**
+     * User account type frontend
+     */
+    const TYPE_FRONTEND = 'frontend';
+
+    /**
+     * User account type backend
+     */
+    const TYPE_BACKEND = 'backend';
+
     /**
      * @OA\Property(
      *     format="int",
@@ -57,7 +68,7 @@ class Group extends \Cx\Model\Base\EntityBase {
      *     title="Group ID",
      * )
      *
-     * @var integer
+     * @var integer $id
      */
     protected $id;
 
@@ -67,7 +78,7 @@ class Group extends \Cx\Model\Base\EntityBase {
      *     title="Group name",
      *     maximum=255,
      *)
-     * @var string
+     * @var string $name
      */
     protected $name = '';
 
@@ -77,7 +88,7 @@ class Group extends \Cx\Model\Base\EntityBase {
      *     title="Group description",
      *     maximum=255,
      *)
-     * @var string
+     * @var string $description
      */
     protected $description = '';
 
@@ -89,7 +100,7 @@ class Group extends \Cx\Model\Base\EntityBase {
      *     default="true",
      * )
      *
-     * @var integer $active
+     * @var boolean $active
      */
     protected $active = 1;
 
@@ -101,17 +112,17 @@ class Group extends \Cx\Model\Base\EntityBase {
      *     default="frontend",
      * )
      *
-     * @var enum_user_group_type
+     * @var \Cx\Core\Model\Data\Enum\User\Group\Type $type
      */
-    protected $type = 'frontend';
+    protected $type = self::TYPE_FRONTEND;
 
     /**
-     * @var string
+     * @var string $homepage
      */
     protected $homepage = '';
 
     /**
-     * @var integer
+     * @var integer $toolbar
      */
     protected $toolbar = 0;
 
@@ -125,7 +136,7 @@ class Group extends \Cx\Model\Base\EntityBase {
      *     }
      * )
      *
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection $users
      */
     protected $users;
 
@@ -140,7 +151,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get groupId
      *
-     * @return integer 
+     * @return integer $id
      * @deprecated
      * @see \Cx\Core\User\Model\Entity\Group::getId()
      */
@@ -152,7 +163,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get id
      *
-     * @return integer group id
+     * @return integer $id group id
      */
     public function getId()
     {
@@ -184,7 +195,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get groupName
      *
-     * @return string 
+     * @return string $name
      * @deprecated
      * @see \Cx\Core\User\Model\Entity\Group::getName()
      */
@@ -196,7 +207,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get name
      *
-     * @return string group name
+     * @return string $name group name
      */
     public function getName()
     {
@@ -228,7 +239,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get groupDescription
      *
-     * @return string 
+     * @return string $description
      * @deprecated
      * @see \Cx\Core\User\Model\Entity\Group::getDescription()
      */
@@ -240,7 +251,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get description
      *
-     * @return string group description
+     * @return string $description group description
      */
     public function getDescription()
     {
@@ -250,7 +261,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Set isActive
      *
-     * @param integer $isActive
+     * @param boolean $isActive
      * @deprecated
      * @see \Cx\Core\User\Model\Entity\Group::setActive()
      */
@@ -272,7 +283,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get isActive
      *
-     * @return integer 
+     * @return boolean $active
      * @deprecated
      * @see \Cx\Core\User\Model\Entity\Group::getActive()
      */
@@ -286,7 +297,7 @@ class Group extends \Cx\Model\Base\EntityBase {
      *
      * This does exactly the same as isActive, but this method is necessary for doctrine mapping
      *
-     * @return integer if group is active
+     * @return boolean $active if group is active
      */
     public function getActive()
     {
@@ -298,7 +309,7 @@ class Group extends \Cx\Model\Base\EntityBase {
      *
      * This does exactly the same as getActive, but this method name is more intuitive
      *
-     * @return integer if group is active
+     * @return boolean $active if group is active
      */
     public function isActive()
     {
@@ -308,7 +319,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Set type
      *
-     * @param enum_user_group_type $type
+     * @param \Cx\Core\Model\Data\Enum\User\Group\Type $type
      */
     public function setType($type)
     {
@@ -318,7 +329,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get type
      *
-     * @return enum_user_group_type 
+     * @return \Cx\Core\Model\Data\Enum\User\Group\Type $type
      */
     public function getType()
     {
@@ -338,7 +349,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get homepage
      *
-     * @return string 
+     * @return string $homepage
      */
     public function getHomepage()
     {
@@ -358,7 +369,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get toolbar
      *
-     * @return integer 
+     * @return integer $toolbar
      */
     public function getToolbar()
     {
@@ -400,7 +411,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get user
      *
-     * @return \Doctrine\Common\Collections\Collection 
+     * @return \Doctrine\Common\Collections\Collection $users
      */
     public function getUsers()
     {
@@ -409,6 +420,6 @@ class Group extends \Cx\Model\Base\EntityBase {
 
     public function __toString()
     {
-        return $this->getName(); // TODO: Change the autogenerated stub
+        return $this->getName();
     }
 }

@@ -109,17 +109,6 @@ class EsiWidgetController extends \Cx\Core_Modules\Widget\Controller\EsiWidgetCo
 
             // of the users who's last activity was within 3600s
             // take the one with the lowest last_activity
-            $crit = new \Doctrine\Common\Collections\Criteria();
-            $crit->where(
-                \Doctrine\Common\Collections\Criteria::expr()->eq(
-                    'active', true
-                )
-            )->andWhere(
-                \Doctrine\Common\Collections\Criteria::expr()->gt(
-                    'lastActivity', (time()-3600)
-                )
-            );
-
             $cx = \Cx\Core\Core\Controller\Cx::instanciate();
             $qb = $cx->getDb()->getEntityManager()->createQueryBuilder();
             $qb->select('u')

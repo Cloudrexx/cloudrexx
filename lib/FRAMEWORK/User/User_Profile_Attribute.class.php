@@ -559,14 +559,15 @@ class User_Profile_Attribute
         }
     }
 
- 
-/**
+    /**
      * Find all default user attributes and store it in an
      * array
      */
     function loadAttributes()
     {
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
+        $frontend = $cx->getMode() == \Cx\Core\Core\Controller\Cx::MODE_FRONTEND;
+        $_CORELANG = \Env::get('init')->getComponentSpecificLanguageData('Core', $frontend);
         $attributeRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\UserAttribute');
 
         $this->arrCustomAttributes = array();
@@ -577,6 +578,8 @@ class User_Profile_Attribute
         }
 
         foreach ($attributes as $attribute) {
+            $attribute->setTranslatableLocale($this->langId);
+            $cx->getDb()->getEntityManager()->refresh($attribute);
             $attributeId = $attribute->getId();
             $this->arrAttributes[$attributeId]['type'] = $attribute->getType() == 'textarea' ? 'text' : $attribute->getType();
             $this->arrAttributes[$attributeId]['multiline'] = $attribute->getType() == 'textarea' ? true : false;
@@ -594,6 +597,7 @@ class User_Profile_Attribute
             if (!$attribute->isDefault()) {
                 $this->arrAttributes[$attributeId]['modifiable'] = array('type', 'sort_order', 'mandatory', 'parent_id', 'access', 'children');
                 $this->arrCustomAttributes[] = $attributeId;
+                $this->arrAttributes[$attributeId]['names'][$this->langId] = $attribute->getName();
             } else {
                 if (!$parentId) {
                     $this->arrDefaultAttributeIds[] = $attributeId;
@@ -603,10 +607,17 @@ class User_Profile_Attribute
                 if (isset($this->arrDefaultAttributeTemplates[$attribute->getName()])) {
                     $arrTemplate = $this->arrDefaultAttributeTemplates[$attribute->getName()];
                     $desc = $arrTemplate['desc'];
-                    $this->arrAttributes[$attributeId]['names'][$this->langId] = isset($langData[$desc]) ? $langData[$desc] : null;
-                    $this->arrAttributes[$attributeId]['modifiable'] = $arrTemplate['modifiable'];
+                    $this->arrAttributes[$attributeId]['names'][$this->langId] = isset($_CORELANG[$desc]) ? $_CORELANG[$desc] : null;
+                    if (!isset($arrTemplate['modifiable'])) {
+                        $this->arrAttributes[$attributeId]['modifiable'] = array();
+                    } else {
+                        $this->arrAttributes[$attributeId]['modifiable'] = $arrTemplate['modifiable'];
+                    }
                 } else if ($parentId == $this->getAttributeIdByDefaultAttributeId('title')) {
                     $this->arrAttributes[$attributeId]['modifiable'] = array('names');
+                    $this->arrAttributes[$attributeId]['names'][$this->langId] = $attribute->getName();
+                } else {
+                    $this->arrAttributes[$attributeId]['modifiable'] = array();
                 }
             }
             $this->arrAttributes[$attributeId]['access_special'] = $attribute->getAccessSpecial();
@@ -616,8 +627,6 @@ class User_Profile_Attribute
             if ($attribute->getMandatory()) {
                 $this->arrMandatoryAttributes[] = $attributeId;
             }
-
-            $this->arrAttributes[$attributeId]['names'][$this->langId] = $attribute->getName($this->langId);
         }
     }
 
@@ -650,11 +659,7 @@ class User_Profile_Attribute
     function generateAttributeRelations()
     {
         foreach ($this->arrAttributes as $attribute => $arrAttribute) {
-            if (!empty($arrAttribute['parent_id'])) {
-                $this->arrAttributeRelations[$arrAttribute['parent_id']][] = $attribute;
-            } else {
-                $this->arrAttributeRelations[$arrAttribute['parent_id']][] = $attribute;
-            }
+            $this->arrAttributeRelations[$arrAttribute['parent_id']][] = $attribute;
         }
     }
 
@@ -679,7 +684,6 @@ class User_Profile_Attribute
 
     public function getById($id)
     {
-
         $objAttribute = clone $this;
         $objAttribute->arrAttributes = &$this->arrAttributes;
         $objAttribute->arrAttributeTree = &$this->arrAttributeTree;
@@ -718,10 +722,13 @@ class User_Profile_Attribute
            ->setParameters(array('type' => 'image', 'value' => ''));
 
         if ($profilePics) {
-	        $picId = $this->getAttributeIdByDefaultAttributeId('picture');
-	        $qb->andWhere($qb->expr()->eq('a.id', ':picId'));
-	        $qb->setParameter('picId', $picId);
-	    }
+            $expression = $qb->expr()->eq('a.id', ':picId');
+        } else {
+            $expression = $qb->expr()->not($qb->expr()->eq('a.id', ':picId'));
+        }
+        $picId = $this->getAttributeIdByDefaultAttributeId('picture');
+        $qb->andWhere($expression);
+        $qb->setParameter('picId', $picId);
         
  	    $count = $qb->getQuery()->getSingleScalarResult();
         if (!$count) {
@@ -737,12 +744,9 @@ class User_Profile_Attribute
             return array();
         }
 
-        $images = array();
-        foreach ($resultImages as $image) {
-            $images[] = $image['picture'];
-        }
-
-        return $images;
+        return array_map(function($image) {
+            return $image['picture'];
+        }, $resultImages);
     }
 
     /**
@@ -755,11 +759,11 @@ class User_Profile_Attribute
     function getAttributeIdByName($name)
     {
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-        $attributeNameRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\UserAttributeName');
-        $attributeName = $attributeNameRepo->findOneBy(array('name' => $name));
+        $attributeRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\UserAttribute');
+        $attribute = $attributeRepo->findOneBy(array('name' => $name));
 
-        if ($attributeName) {
-            return $attributeName->getAttributeId();
+        if ($attribute) {
+            return $attribute->getId();
         }
         return false;
     }
@@ -988,67 +992,32 @@ class User_Profile_Attribute
     {
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $em = $cx->getDb()->getEntityManager();
-        $attributeNameRepo = $em->getRepository('Cx\Core\User\Model\Entity\UserAttributeName');
         $attributeRepo = $em->getRepository('Cx\Core\User\Model\Entity\UserAttribute');
 
         try {
+            $attribute = $attributeRepo->find($this->id);
             if (!$this->id || !preg_match('#([0-9]+)#', $this->id, $pattern)) {
                 $titleId = $this->getAttributeIdByDefaultAttributeId('title');
                 $titleAttr = $attributeRepo->find($titleId);
-                $attributeName = new \Cx\Core\User\Model\Entity\UserAttributeName();
                 $attribute = new \Cx\Core\User\Model\Entity\UserAttribute();
-                $attribute->addUserAttributeName($attributeName);
                 $attribute->setAccessId(0);
                 $attribute->setReadAccessId(0);
-                $attributeName->setUserAttribute($attribute);
 
                 if ($titleAttr) {
                     $attribute->setParent($titleAttr);
                 }
-
-                $em->persist($attribute);
-            } else {
-                $attributeName = $attributeNameRepo->findOneBy(array('id' => $pattern[0]));
             }
 
-            $attributeName->setName(addslashes($this->arrName[0]));
+            $attribute->setName($this->arrName[0]);
 
-            $em->persist($attributeName);
-            $em->flush();
-
-            return true;
-        } catch (\Doctrine\ORM\OptimisticLockException $e) {
-            return false;
-        }
-    }
-
-
-    function storeCoreAttribute()
-    {
-        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-        $em = $cx->getDb()->getEntityManager();
-        $attributeNameRepo = $em->getRepository('Cx\Core\User\Model\Entity\UserAttributeName');
-        $attributeName = $attributeNameRepo->findOneBy(array('name' => $this->id));
-
-        if ($attributeName && $attributeName->getUserAttribute()) {
-            $attribute = $attributeName->getUserAttribute();
-        } else {
-            $attribute = new \Cx\Core\User\Model\Entity\UserAttribute();
-        }
-
-        $attribute->setSortType($this->sort_type);
-        $attribute->setOrderId($this->order_id);
-        $attribute->setMandatory($this->mandatory);
-
-        try {
             $em->persist($attribute);
             $em->flush();
+
             return true;
         } catch (\Doctrine\ORM\OptimisticLockException $e) {
             return false;
         }
     }
-
 
     function storeChildrenOrder()
     {
@@ -1085,51 +1054,23 @@ class User_Profile_Attribute
      */
     function storeNames()
     {
-        $arrOldNames = array();
         $status = true;
 
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $em = $cx->getDb()->getEntityManager();
-        $attributeNameRepo = $em->getRepository('Cx\Core\User\Model\Entity\UserAttributeName');
         $attributeRepo = $em->getRepository('Cx\Core\User\Model\Entity\UserAttribute');
-        $attributeNames = $attributeNameRepo->findBy(array('attributeId' => $this->id));
 
-        foreach ($attributeNames as $attributeName) {
-            $arrOldNames[$attributeName->getLangId()] = $attributeName->getName();
-        }
-        $attribute = $attributeRepo->find($this->id);
-        $arrNewNames = array_diff(array_keys($this->arrName), array_keys($arrOldNames));
-        $arrRemovedNames = array_diff(array_keys($arrOldNames), array_keys($this->arrName));
-        $arrUpdatedNames = array_intersect(array_keys($this->arrName), array_keys($arrOldNames));
-        foreach ($arrNewNames as $langId) {
-            $attributeName = new \Cx\Core\User\Model\Entity\UserAttributeName();
-            $attributeName->setLangId($langId);
-            $attributeName->setName(addslashes($this->arrName[$langId]));
-            $attributeName->setAttributeId($this->id);
-            $attributeName->setUserAttribute($attribute);
-            $em->persist($attributeName);
-        }
-        foreach ($arrRemovedNames as $langId) {
-            $attributeName = $attributeNameRepo->findOneBy(array('attributeId' => $this->id, 'langId' => $langId));
-            if ($attributeName) {
-                continue;
-            }
-            $em->remove($attributeName);
-        }
-        foreach ($arrUpdatedNames as $langId) {
-            $attributeName = $attributeNameRepo->findOneBy(array('attributeId' => $this->id, 'langId' => $langId));
-            if (empty($attributeName)) {
-                continue;
-            }
-            $attributeName->setName(addslashes($this->arrName[$langId]));
-            $em->persist($attributeName);
-        }
         try {
-            $em->flush();
+            foreach ($this->arrName as $langId=>$name) {
+                $attribute = $attributeRepo->find($this->id);
+                $attribute->setTranslatableLocale($langId);
+                $attribute->setName($name);
+                $em->persist($attribute);
+                $em->flush();
+            }
         } catch (\Doctrine\ORM\OptimisticLockException $e) {
             $status = false;
         }
-
         return $status;
     }
 
@@ -1166,7 +1107,7 @@ class User_Profile_Attribute
         $setter = '';
         $mappedFieldName = $classMeta->getFieldName($fieldName);
         if ($mappedFieldName != $fieldName) {
-            $setter = 'set'.ucfirst($mappedFieldName);
+            $setter = 'set' . \Doctrine\Common\Inflector\Inflector::classify($mappedFieldName);
         }
 
         if (!$protected) {
@@ -1182,7 +1123,7 @@ class User_Profile_Attribute
             try {
                 $em->persist($attribute);
                 $em->flush();
-                if (!isset($this->arrAttributes[$this->id][$fieldName]) ||
+                if (
                     $objDatabase->Execute(
                         'DELETE FROM `' . DBPREFIX . 'access_group_dynamic_ids`
                             WHERE `access_id` = ' . $this->arrAttributes[$this->id][$fieldName]
@@ -1217,7 +1158,7 @@ class User_Profile_Attribute
             }
 
             try {
-                $attribute->$setter(contrexx_input2db($accessId));
+                $attribute->$setter($accessId);
                 $em->persist($attribute);
                 $em->flush();
             } catch (\Doctrine\ORM\OptimisticLockException $e) {
@@ -1233,7 +1174,7 @@ class User_Profile_Attribute
         }
 
         try {
-            $attribute->setAccessSpecial(contrexx_input2db($accessId));
+            $attribute->setAccessSpecial($accessId);
             $em->persist($attribute);
             $em->flush();
         } catch (\Doctrine\ORM\OptimisticLockException $e) {
@@ -1302,15 +1243,13 @@ class User_Profile_Attribute
     {
         global $_ARRAYLANG;
 
-        $pattern = array();
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $em = $cx->getDb()->getEntityManager();
         $attrRepo = $em->getRepository(
             'Cx\Core\User\Model\Entity\UserAttribute'
         );
 
-        $attrId = $this->parent_id == 'title' && preg_match('#([0-9]+)#', $attributeId, $pattern) ? $pattern[0] : $attributeId;
-        $attr = $attrRepo->find($attrId);
+        $attr = $attrRepo->find($attributeId);
 
         if (empty($attr)) {
             return false;
@@ -1344,7 +1283,7 @@ class User_Profile_Attribute
         $em = $cx->getDb()->getEntityManager();
         $attrNames = $em->getRepository(
             'Cx\Core\User\Model\Entity\UserAttributeValue'
-        )->findBy(array('attributeId' => $attributeId));
+        )->findBy(array('userAttribute' => $attributeId));
 
         foreach ($attrNames as $attrName) {
             $em->remove($attrName);
@@ -1357,30 +1296,6 @@ class User_Profile_Attribute
             return false;
         }
     }
-
-
-    function deleteAttributeNames($attributeId)
-    {
-        global $_ARRAYLANG;
-
-        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-        $em = $cx->getDb()->getEntityManager();
-        $attrNames = $em->getRepository(
-            'Cx\Core\User\Model\Entity\UserAttributeName'
-        )->findBy(array('attributeId' => $attributeId));
-
-        foreach ($attrNames as $attrName) {
-            $em->remove($attrName);
-        }
-        try {
-            $em->flush();
-            return true;
-        } catch (\Doctrine\ORM\OptimisticLockException $e) {
-            $this->errorMsg = sprintf($_ARRAYLANG['TXT_ACCESS_UNABLE_DEL_ATTRIBUTE_DESCS'], htmlentities($this->arrAttributes[$attributeId]['names'][$this->langId], ENT_QUOTES, CONTREXX_CHARSET));
-            return false;
-        }
-    }
-
 
     function checkIntegrity()
     {
@@ -1814,18 +1729,16 @@ class User_Profile_Attribute
      * Load attribute name in each language
      * @return mixed Array with names, which may also contains no elements, or FALSE on failure.
      */
-    function getAttributeNames($id)
+    function getAttributeName($id)
     {
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-        $names = $cx->getDb()->getEntityManager()->getRepository(
-            'Cx\Core\User\Model\Entity\UserAttributeName'
-        )->findBy(array('attributeId' => $id));
-
-        $arrNames = array();
-        foreach ($names as $name) {
-            $arrNames[$name->getLangId()] = $name->getName();
+        $attribute = $cx->getDb()->getEntityManager()->getRepository(
+            'Cx\Core\User\Model\Entity\UserAttribute'
+        )->findOneBy(array('id' => $id));
+        if (empty($attribute)) {
+            return '';
         }
-        return $arrNames;
+        return $attribute->getName();
     }
 
 
@@ -1837,16 +1750,18 @@ class User_Profile_Attribute
             $this->arrName[$langId] = (string)$_CORELANG[$this->arrAttributes[$this->id]['desc']];
         } else {
             $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-            $attrName = $cx->getDb()->getEntityManager()->getRepository(
-                'Cx\Core\User\Model\Entity\UserAttributeName'
-            )->findOneBy(
-                array(
-                    'langId' => $langId,
-                    'attributeId' => contrexx_raw2db($this->id)
-                )
-            );
+            $attr = $cx->getDb()->getEntityManager()->getRepository(
+                'Cx\Core\User\Model\Entity\UserAttribute'
+            )->findOneBy(array('id' => $this->id));
 
-            $this->arrName[$langId] = $attrName ? $attrName->getName() : '';
+            if (!empty($attr)) {
+                $attr->setTranslatableLocale($langId);
+                $cx->getDb()->getEntityManager()->refresh($attr);
+
+                $this->arrName[$langId] = $attr->getName();
+            } else {
+                $this->arrName[$langId] = '';
+            }
         }
 
         $this->arrAttributes[$this->id]['names'][$langId] = $this->arrName[$langId];
@@ -2203,22 +2118,22 @@ class User_Profile_Attribute
         if (empty($langId)) $langId = LANG_ID;
 
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-        $qb = $cx->getDb()->getEntityManager()->createQueryBuilder();
+        $em = $cx->getDb()->getEntityManager();
+        $qb = $em->createQueryBuilder();
         // Get only custom attributes
-        $qb->select('n')
-            ->from('Cx\Core\User\Model\Entity\UserAttributeName', 'n')
-            ->innerJoin('n.userAttribute', 'a')
-            ->where($qb->expr()->eq('n.langId', ':langId'))
+        $qb->select('a')
+            ->from('Cx\Core\User\Model\Entity\UserAttribute', 'a')
             ->andWhere($qb->expr()->eq('a.default', ':isDefault'))
-            ->setParameter('langId', $langId)
             ->setParameter('isDefault', 0)
             ->orderBy('a.orderId', 'ASC');
 
-        $names = $qb->getQuery()->getResult();
+        $attrs = $qb->getQuery()->getResult();
 
         $arrNames = array();
-        foreach ($names as $name) {
-            $arrNames[$name->getAttributeId()] = $name->getName();
+        foreach ($attrs as $attr) {
+            $attr->setTranslatableLocale($langId);
+            $em->refresh($attr);
+            $arrNames[$attr->getId()] = $attr->getName();
         }
 
         return $arrNames;

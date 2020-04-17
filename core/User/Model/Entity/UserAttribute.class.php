@@ -48,7 +48,105 @@ namespace Cx\Core\User\Model\Entity;
  *     title="UserAttribute model",
  * )
  */
-class UserAttribute extends \Cx\Model\Base\EntityBase {
+class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\Translatable {
+
+    /**
+     * User attribute type text
+     */
+    const TYPE_TEXT = 'text';
+
+    /**
+     * User attribute type textarea
+     */
+    const TYPE_TEXTAREA = 'textarea';
+
+    /**
+     * User attribute type mail
+     */
+    const TYPE_MAIL = 'mail';
+
+    /**
+     * User attribute type uri
+     */
+    const TYPE_URI = 'uri';
+
+    /**
+     * User attribute type date
+     */
+    const TYPE_DATE = 'date';
+
+    /**
+     * User attribute type image
+     */
+    const TYPE_IMAGE = 'image';
+
+    /**
+     * User attribute type checkbox
+     */
+    const TYPE_CHECKBOX = 'checkbox';
+
+    /**
+     * User attribute type menu
+     */
+    const TYPE_MENU = 'menu';
+
+    /**
+     * User attribute type menu option
+     */
+    const TYPE_MENU_OPTION = 'menu_option';
+
+    /**
+     * User attribute type group
+     */
+    const TYPE_GROUP = 'group';
+
+    /**
+     * User attribute type frame
+     */
+    const TYPE_FRAME = 'frame';
+
+    /**
+     * User attribute type history
+     */
+    const TYPE_HISTORY = 'history';
+
+    /**
+     * User attribute sort type asc
+     */
+    const SORT_TYPE_ASC = 'asc';
+
+    /**
+     * User attribute sort type desc
+     */
+    const SORT_TYPE_DESC = 'desc';
+
+    /**
+     * User attribute sort type custom
+     */
+    const SORT_TYPE_CUSTOM = 'custom';
+
+    /**
+     * User attribute has no special
+     */
+    const ACCESS_SPECIAL_NONE = '';
+
+    /**
+     * Access special only one option in a lower position can be selected
+     */
+    const ACCESS_SPECIAL_MENU_LOWER = 'menu_select_lower';
+
+    /**
+     * Access special only one option in a higher position can be selected
+     */
+    const ACCESS_SPECIAL_MENU_HIGHER = 'menu_select_higher';
+
+    /**
+     * @Gedmo\Locale
+     * Used locale to override Translation listener`s locale
+     * this is not a mapped field of entity metadata, just a simple property
+     */
+    protected $locale;
+
     /**
      * @OA\Property(
      *     format="int",
@@ -56,7 +154,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
      *     title="Attribute ID",
      * )
      *
-     * @var integer
+     * @var integer $id
      */
     protected $id;
 
@@ -80,9 +178,14 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
      *      }
      * )
      *
-     * @var enum_user_userattribute_type
+     * @var \Cx\Core\Model\Data\Enum\User\UserAttribute\Type $type
      */
-    protected $type = 'text';
+    protected $type = self::TYPE_TEXT;
+
+    /**
+     * @var string
+     */
+    protected $name = '';
 
     /**
      * @OA\Property(
@@ -92,9 +195,9 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
      *     default="0",
      * )
      *
-     * @var boolean
+     * @var boolean $mandatory
      */
-    protected $mandatory = '0';
+    protected $mandatory = false;
 
     /**
      * @OA\Property(
@@ -104,9 +207,9 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
      *     default="asc",
      * )
      *
-     * @var enum_user_userattribute_sorttype
+     * @var \Cx\Core\Model\Data\Enum\User\UserAttribute\SortType $sortType
      */
-    protected $sortType = 'asc';
+    protected $sortType = self::SORT_TYPE_ASC;
 
     /**
      * @OA\Property(
@@ -116,7 +219,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
      *     default="0",
      * )
      *
-     * @var integer
+     * @var integer $orderId
      */
     protected $orderId = 0;
 
@@ -127,9 +230,9 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
      *     enum={"menu_select_higher", "menu_select_lower"},
      * )
      *
-     * @var enum_user_userattribute_accessspecial
+     * @var \Cx\Core\Model\Data\Enum\User\UserAttribute\AccessSpecial $accessSpecial
      */
-    protected $accessSpecial = '';
+    protected $accessSpecial = self::ACCESS_SPECIAL_NONE;
 
     /**
      * @OA\Property(
@@ -138,7 +241,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
      *     title="Access ID",
      * )
      *
-     * @var integer
+     * @var integer $accessId
      */
     protected $accessId;
 
@@ -149,7 +252,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
      *     title="Access ID read",
      * )
      *
-     * @var integer
+     * @var integer $readAccessId
      */
     protected $readAccessId;
 
@@ -163,23 +266,9 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
      *     }
      * )
      *
-     * @var \Cx\Core\User\Model\Entity\UserAttribute
+     * @var \Cx\Core\User\Model\Entity\UserAttribute $parent
      */
     protected $parent;
-
-    /**
-     * @OA\Property(
-     *     description="List of all attributes with the associated name and language. Every attribute can have more than one language it is translated in. If the request intends to write we need to pass the ID, if  the request is to read we get the attribute name of the given ID. For example the ID 1.",
-     *     title="User attribute name",
-     *     type="object",
-     *     additionalProperties={
-     *         "$ref"="#/components/schemas/UserAttributeName"
-     *     }
-     * )
-     *
-     * @var \Doctrine\Common\Collections\Collection
-     */
-    protected $userAttributeNames;
 
     /**
      * @OA\Property(
@@ -191,7 +280,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
      *     }
      * )
      *
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection $userAttributeValues
      */
     protected $userAttributeValues;
 
@@ -205,15 +294,18 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
      *     }
      * )
      *
-     * @var \Doctrine\Common\Collections\Collection
+     * @var \Doctrine\Common\Collections\Collection $children
      */
     protected $children;
 
     /**
-     * @var boolean
+     * @var boolean $default
      */
     protected $default;
 
+    /**
+     * @var array[] $arrTypes
+     */
     protected $arrTypes = array(
         'text' => array(
             'desc'         => 'TXT_ACCESS_TEXT_FIELD',
@@ -344,14 +436,33 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     public function __construct()
     {
         $this->children = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->userAttributeNames = new \Doctrine\Common\Collections\ArrayCollection();
         $this->userAttributeValues = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * Set translatable locale
+     *
+     * @param $locale
+     */
+    public function setTranslatableLocale($locale)
+    {
+        if (is_numeric($locale)) {
+            $localeEntity = $this->cx->getDb()->getEntityManager()->getRepository(
+                'Cx\Core\Locale\Model\Entity\Locale'
+            )->find($locale);
+            if ($localeEntity) {
+                $locale = $localeEntity->getIso1()->getIso1();
+            } else {
+                $locale = 'de';
+            }
+        }
+        $this->locale = $locale;
     }
 
     /**
      * Get id
      *
-     * @return integer 
+     * @return integer $id
      */
     public function getId()
     {
@@ -361,7 +472,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Set type
      *
-     * @param enum_user_userattribute_type $type
+     * @param \Cx\Core\Model\Data\Enum\User\UserAttribute\Type $type
      */
     public function setType($type)
     {
@@ -371,11 +482,31 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get type
      *
-     * @return enum_user_userattribute_type 
+     * @return \Cx\Core\Model\Data\Enum\User\UserAttribute\Type $type
      */
     public function getType()
     {
         return $this->type;
+    }
+
+    /**
+     * Set name
+     *
+     * @param string $name
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+    /**
+     * Get name
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
     }
 
     /**
@@ -391,7 +522,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get mandatory
      *
-     * @return boolean
+     * @return boolean $mandatory
      */
     public function getMandatory()
     {
@@ -401,7 +532,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Set sortType
      *
-     * @param enum_user_userattribute_sorttype $sortType
+     * @param \Cx\Core\Model\Data\Enum\User\UserAttribute\SortType $sortType
      */
     public function setSortType($sortType)
     {
@@ -411,7 +542,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get sortType
      *
-     * @return enum_user_userattribute_sorttype 
+     * @return \Cx\Core\Model\Data\Enum\User\UserAttribute\SortType $sortType
      */
     public function getSortType()
     {
@@ -431,7 +562,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get orderId
      *
-     * @return integer 
+     * @return integer $orderId
      */
     public function getOrderId()
     {
@@ -441,7 +572,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Set accessSpecial
      *
-     * @param enum_user_userattribute_accessspecial $accessSpecial
+     * @param \Cx\Core\Model\Data\Enum\User\UserAttribute\AccessSpecial $accessSpecial
      */
     public function setAccessSpecial($accessSpecial)
     {
@@ -451,7 +582,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get accessSpecial
      *
-     * @return enum_user_userattribute_accessspecial 
+     * @return \Cx\Core\Model\Data\Enum\User\UserAttribute\AccessSpecial $accessSpecial
      */
     public function getAccessSpecial()
     {
@@ -471,7 +602,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get accessId
      *
-     * @return integer 
+     * @return integer $accessId
      */
     public function getAccessId()
     {
@@ -491,7 +622,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get readAccessId
      *
-     * @return integer 
+     * @return integer $readAccessId
      */
     public function getReadAccessId()
     {
@@ -513,7 +644,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
      *
      * This does exactly the same as isDefault, but this method is necessary for doctrine mapping
      *
-     * @return boolean
+     * @return boolean $default
      */
     public function getDefault()
     {
@@ -526,7 +657,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
      *
      * This does exactly the same as getDefault, but this method name is more intuitive
      *
-     * @return boolean
+     * @return boolean $default
      */
     public function isDefault()
     {
@@ -556,41 +687,11 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get children
      *
-     * @return \Doctrine\Common\Collections\Collection 
+     * @return \Doctrine\Common\Collections\Collection $child
      */
     public function getChildren()
     {
         return $this->children;
-    }
-
-    /**
-     * Add userAttributeName
-     *
-     * @param \Cx\Core\User\Model\Entity\UserAttributeName $userAttributeName
-     */
-    public function addUserAttributeName(\Cx\Core\User\Model\Entity\UserAttributeName $userAttributeName)
-    {
-        $this->userAttributeNames[] = $userAttributeName;
-    }
-
-    /**
-     * Remove userAttributeName
-     *
-     * @param \Cx\Core\User\Model\Entity\UserAttributeName $userAttributeName
-     */
-    public function removeUserAttributeName(\Cx\Core\User\Model\Entity\UserAttributeName $userAttributeName)
-    {
-        $this->userAttributeNames->removeElement($userAttributeName);
-    }
-
-    /**
-     * Get userAttributeName
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getUserAttributeNames()
-    {
-        return $this->userAttributeNames;
     }
 
     /**
@@ -616,7 +717,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get userAttributeValues
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection $userAttributeValues
      */
     public function getUserAttributeValues()
     {
@@ -636,49 +737,19 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get parent
      *
-     * @return \Cx\Core\User\Model\Entity\UserAttribute 
+     * @return \Cx\Core\User\Model\Entity\UserAttribute $parent
      */
     public function getParent()
     {
         return $this->parent;
     }
 
-    public function getName($langId = 0)
-    {
-        if (empty($langId) && FRONTEND_LANG_ID) {
-            $langId = FRONTEND_LANG_ID;
-        } else if (empty($langId)) {
-            $langId = 1;
-        }
-
-        $crit = \Doctrine\Common\Collections\Criteria::create()->where(
-            \Doctrine\Common\Collections\Criteria::expr()->eq(
-                'langId',
-                $langId
-            )
-        )->orWhere(
-            \Doctrine\Common\Collections\Criteria::expr()->eq(
-                'langId',
-                0
-            )
-        );
-        $userAttributeName = $this->getUserAttributeNames()->matching(
-            $crit
-        )->first();
-
-        if (!empty($userAttributeName)) {
-            return $userAttributeName->getName();
-        }
-
-        return '';
-    }
-
     /**
      * Check the read permission of profile attribute
      *
-     * @return boolean
+     * @return boolean $hasReadPermission
      */
-    public function checkReadPermission()
+    public function hasReadPermission()
     {
         return \Permission::checkAccess(
             $this->getReadAccessId(),
@@ -690,7 +761,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get data type
      *
-     * @return string
+     * @return string $dataType
      */
     function getDataType()
     {

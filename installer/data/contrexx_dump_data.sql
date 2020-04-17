@@ -441,34 +441,6 @@ INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandat
 INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES (33, 3, 'menu_option', '0', 'asc', 0, '', 0, 0, 1);
 INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES (34, 2, 'menu_option', '0', 'asc', 0, '', 0, 0, 1);
 INSERT INTO `contrexx_access_user_attribute` (`id`, `parent_id`, `type`, `mandatory`, `sort_type`, `order_id`, `access_special`, `access_id`, `read_access_id`, `is_default`) VALUES (35, 2, 'menu_option', '0', 'asc', 0, '', 0, 0, 1);
-INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (2, 0, 'gender', NULL, 2);
-INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (3, 0, 'title', NULL, 3);
-INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (4, 0, 'designation', NULL, 4);
-INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (5, 0, 'firstname', NULL, 5);
-INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (6, 0, 'lastname', NULL, 6);
-INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (7, 0, 'company', NULL, 7);
-INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (8, 0, 'address', NULL, 8);
-INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (9, 0, 'city', NULL, 9);
-INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (10, 0, 'zip', NULL, 10);
-INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (11, 0, 'country', NULL, 11);
-INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (12, 0, 'phone_office', NULL, 12);
-INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (13, 0, 'phone_private', NULL, 13);
-INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (14, 0, 'phone_mobile', NULL, 14);
-INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (15, 0, 'phone_fax', NULL, 15);
-INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (16, 0, 'birthday', NULL, 16);
-INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (17, 0, 'website', NULL, 17);
-INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (18, 0, 'profession', NULL, 18);
-INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (19, 0, 'interests', NULL, 19);
-INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (20, 0, 'signature', NULL, 20);
-INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (1, 0, 'picture', NULL, 1);
-INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (32, 1, 'Sehr geehrte Frau', 1, 32);
-INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (33, 1, 'Sehr geehrter Herr', 2, 33);
-INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (32, 2, 'Dear Ms', 3, 34);
-INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (33, 2, 'Dear Mr', 4, 35);
-INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (32, 3, 'Madame', 5, 36);
-INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (33, 3, 'Monsieur', 6, 37);
-INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (34, 0, 'gender_male', 0, 38);
-INSERT INTO `contrexx_access_user_attribute_name` (`attribute_id`, `lang_id`, `name`, `order`, `id`) VALUES (35, 0, 'gender_female', 1, 39);
 INSERT INTO `contrexx_backend_areas` (`area_id`, `parent_area_id`, `type`, `scope`, `area_name`, `is_active`, `uri`, `target`, `module_id`, `order_id`, `access_id`) VALUES (1,0,'group','backend','TXT_CONTENT_MANAGEMENT',1,'','_self',0,2,1);
 INSERT INTO `contrexx_backend_areas` (`area_id`, `parent_area_id`, `type`, `scope`, `area_name`, `is_active`, `uri`, `target`, `module_id`, `order_id`, `access_id`) VALUES (2,0,'group','backend','TXT_MODULE',1,'','_self',0,10,2);
 INSERT INTO `contrexx_backend_areas` (`area_id`, `parent_area_id`, `type`, `scope`, `area_name`, `is_active`, `uri`, `target`, `module_id`, `order_id`, `access_id`) VALUES (3,0,'group','backend','TXT_ADMINISTRATION',1,'','_self',0,13,3);
@@ -4591,6 +4563,35 @@ INSERT INTO `contrexx_stats_config` (`id`, `name`, `value`, `status`) VALUES (17
 INSERT INTO `contrexx_stats_config` (`id`, `name`, `value`, `status`) VALUES (18,'paging_limit_visitor_details','100',1);
 INSERT INTO `contrexx_stats_config` (`id`, `name`, `value`, `status`) VALUES (19,'count_visitor_number','',1);
 INSERT INTO `contrexx_stats_config` (`id`, `name`, `value`, `status`) VALUES (20,'exclude_identifying_info','0',1);
+INSERT INTO `contrexx_translations` (`id`, `locale`, `object_class`, `field`, `foreign_key`, `content`) VALUES
+(1, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '1', 'picture'),
+(2, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '2', 'gender'),
+(3, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '3', 'title'),
+(4, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '4', 'designation'),
+(5, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '5', 'firstname'),
+(6, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '6', 'lastname'),
+(7, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '7', 'company'),
+(8, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '8', 'address'),
+(9, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '9', 'city'),
+(10, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '10', 'zip'),
+(11, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '11', 'country'),
+(12, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '12', 'phone_office'),
+(13, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '13', 'phone_private'),
+(14, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '14', 'phone_mobile'),
+(15, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '15', 'phone_fax'),
+(16, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '16', 'birthday'),
+(17, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '17', 'website'),
+(18, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '18', 'profession'),
+(19, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '19', 'interests'),
+(20, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '20', 'signature'),
+(21, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '32', 'Sehr geehrte Frau'),
+(22, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '33', 'Sehr geehrter Herr'),
+(23, 'en', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '32', 'Dear Ms'),
+(24, 'en', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '33', 'Dear Mr'),
+(25, 'fr', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '32', 'Madame'),
+(26, 'fr', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '33', 'Monsieur'),
+(27, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '34', 'gender_male'),
+(28, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '35', 'gender_female');
 INSERT INTO `contrexx_voting_additionaldata` (`id`, `nickname`, `surname`, `phone`, `street`, `zip`, `city`, `email`, `comment`, `voting_system_id`, `date_entered`, `forename`) VALUES (1,'','','','','','','','',11,'2009-03-04 22:28:11','');
 INSERT INTO `contrexx_voting_additionaldata` (`id`, `nickname`, `surname`, `phone`, `street`, `zip`, `city`, `email`, `comment`, `voting_system_id`, `date_entered`, `forename`) VALUES (2,'','','','','','','','',11,'2009-03-04 22:29:23','');
 INSERT INTO `contrexx_voting_additionaldata` (`id`, `nickname`, `surname`, `phone`, `street`, `zip`, `city`, `email`, `comment`, `voting_system_id`, `date_entered`, `forename`) VALUES (3,'additional_nickname','','','','','additional_city','','',11,'2009-03-04 22:33:04','additional_forename');

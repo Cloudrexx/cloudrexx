@@ -39,43 +39,6 @@ namespace Cx\Core_Modules\Access\Model\Event;
 class LocaleLocaleEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventListener {
 
     /**
-     * Fills the locale specific user attribute names for the new locale
-     * with attribute values of the the default locale
-     * when adding a new Cx\Core\Locale\Model\Entity\Locale
-     *
-     * @param $eventArgs
-     */
-    public function postPersist($eventArgs) {
-        // get persisted locale
-        $persistedLocale = $eventArgs->getEntity();
-
-        $defaultLocaleId = \FWLanguage::getDefaultLangId();
-        $localeId = $persistedLocale->getId();
-
-        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-        $em = $cx->getDb()->getEntityManager();
-        $attributeNameRepo = $em->getRepository('Cx\Core\User\Model\Entity\UserAttributeName');
-        $attributeNames = $attributeNameRepo->findBy(array('langId' => $defaultLocaleId));
-
-        // Add user attribute names for new locale
-        foreach ($attributeNames as $attributeName) {
-            $newAttributeName = $attributeNameRepo->findOneBy(
-                array('attributeId' => $attributeName->getAttributeId(), 'langId' => $localeId)
-            );
-            if (!empty($newAttributeName)) {
-                continue;
-            }
-            $newAttributeName = new \Cx\Core\User\Model\Entity\UserAttributeName();
-            $newAttributeName->setAttributeId($attributeName->getAttributeId());
-            $newAttributeName->setUserAttribute($attributeName->getUserAttribute());
-            $newAttributeName->setName($attributeName->getName());
-            $newAttributeName->setLangId($localeId);
-
-            $em->persist($newAttributeName);
-        }
-    }
-
-    /**
      * Deletes the locale specific user attribute names
      * when deleting a Cx\Core\Locale\Model\Entity\Locale
      *
@@ -84,17 +47,19 @@ class LocaleLocaleEventListener extends \Cx\Core\Event\Model\Entity\DefaultEvent
     public function preRemove($eventArgs) {
         // get locale, which will be deleted
         $delLocale = $eventArgs->getEntity();
-        $localeId = $delLocale->getId();
 
-        $cx = \Cx\Core\Core\Controller\Cx::instanciate();
-        $em = $cx->getDb()->getEntityManager();
-        $attributeNameRepo = $em->getRepository('Cx\Core\User\Model\Entity\UserAttributeName');
-        $attributeNames = $attributeNameRepo->findBy(array('langId' => $localeId));
-
+        $em = $this->cx->getDb()->getEntityManager();
+        $attributeRepo = $em->getRepository('Cx\Core\User\Model\Entity\UserAttribute');
+        // Only delete custom attributes names so that we can keep the names of the default attributes
+        $attributes = $attributeRepo->findBy(array('default' => 0));
         // Update the access user attributes
-        foreach ($attributeNames as $attributeName) {
-            $em->remove($attributeName);
+        foreach ($attributes as $attribute) {
+            $defaultName = $attribute->getName();
+            $attribute->setTranslatableLocale($delLocale->getIso1()->getIso1());
+            $em->refresh($attribute);
+            $attribute->setName($defaultName);
+            $em->persist($attribute);
+            $em->flush();
         }
-        $em->flush();
     }
 }

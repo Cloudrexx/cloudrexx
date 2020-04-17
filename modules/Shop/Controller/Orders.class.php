@@ -184,7 +184,7 @@ class Orders
 
             $customerIdQuery = '';
             if (
-                !empty($filter['user_ids']) ||
+                !empty($filter['user_ids']) &&
                 count($filter['user_ids']) > 0
             ) {
                 $customerIdQuery = '`order`.`customer_id` IN ('
@@ -409,16 +409,6 @@ if (!$limit) {
         $arrOrders = null;
 //\DBG::activate(DBG_DB_FIREPHP);
 
-        //  `user`.`username` LIKE '$term'
-        //                     OR `user`.`email` LIKE '$term'
-        //                     OR `profile`.`company` LIKE '$term'
-        //                     OR `profile`.`firstname` LIKE '$term'
-        //                     OR `profile`.`lastname` LIKE '$term'
-        //                     OR `profile`.`address` LIKE '$term'
-        //                     OR `profile`.`city` LIKE '$term'
-        //                     OR `profile`.`phone_private` LIKE '$term'
-        //                     OR `profile`.`phone_fax` LIKE '$term'
-
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $userRepo = $cx->getDb()->getEntityManager()->getRepository('Cx\Core\User\Model\Entity\User');
 
@@ -438,10 +428,8 @@ if (!$limit) {
                     'phone_fax'
                 )
             );
-        }
-
-        if (!empty($filter['letter'])) {
-            $users = $userRepo->searchByInitialLetter(
+        } else if (!empty($filter['letter'])) {
+            $users = $userRepo->searchByStartsWith(
                 $filter['letter'],
                 array('company', 'firstname', 'lastname')
             );

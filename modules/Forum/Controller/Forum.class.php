@@ -1343,7 +1343,7 @@ class Forum extends ForumLibrary {
         if(($objRS = $objDatabase->Execute($query)) !== false){
             while(!$objRS->EOF){
                 $objUser = \FWUser::getFWUserObject()->objUser->getUser($id = $objRS->fields['user_id']);
-                if ($objUser->EOF) {
+                if (!$objUser->EOF) {
                     $arrTempSubcribers[] = array("username" => $objUser->getRealUsername(), "email" => $objUser->getEmail(), "id" => $objUser->getId());
                 }
                 $objRS->MoveNext();

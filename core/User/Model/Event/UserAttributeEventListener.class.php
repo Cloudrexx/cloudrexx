@@ -62,9 +62,7 @@ class UserAttributeEventListener extends \Cx\Core\Event\Model\Entity\DefaultEven
         foreach ($users as $user) {
             $value = new \Cx\Core\User\Model\Entity\UserAttributeValue();
             $value->setValue('');
-            $value->setAttributeId($attr->getId());
             $value->setUserAttribute($attr);
-            $value->setUserId($user->getId());
             $value->setUser($user);
             $em->persist($value);
         }

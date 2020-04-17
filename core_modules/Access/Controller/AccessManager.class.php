@@ -1049,7 +1049,7 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
 
     private function userList()
     {
-        global $_ARRAYLANG, $_CORELANG, $_CONFIG;
+        global $_ARRAYLANG, $_CORELANG, $_CONFIG, $objDatabase;
 
         $arrSettings = \User_Setting::getSettings();
         $templateFile = 'module_access_user_list';
@@ -1127,11 +1127,17 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
         if ($accountType) {
             $userFilter['crm'] = 1;
             if ($cx->getLicense()->isInLegalComponents('Crm')) {
-                // Todo CRM
-                $query = 'SELECT id FROM `%1$module_crm_contacts` WHERE `contact_type` = %2$';
+                $query = 'SELECT id FROM `%1$smodule_crm_contacts` WHERE `contact_type` = %2$s';
                 $query = sprintf($query, DBPREFIX, 2);
+                $crmResult = $objDatabase->Execute($query);
 
                 $userIds = array();
+                if ($crmResult !== false) {
+                    while (!$crmResult->EOF) {
+                        $userIds[] = $crmResult->fields['id'];
+                        $crmResult->MoveNext();
+                    }
+                }
 
                 $qb->andWhere(
                     $qb->expr()->in('u.id', ':userIds')
@@ -1147,8 +1153,8 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
 
         if ($userRoleFilter !== null) {
             $qb->andWhere(
-                $qb->expr()->eq('u.isAdmin', ':isAdmin')
-            )->setParameter('isAdmin', $userRoleFilter);
+                $qb->expr()->eq('u.superUser', ':superUser')
+            )->setParameter('superUser', $userRoleFilter);
         }
 
         // Search
@@ -1231,22 +1237,22 @@ class AccessManager extends \Cx\Core_Modules\Access\Controller\AccessLib
                 $this->_objTpl->setVariable(array(
                     'ACCESS_ROW_CLASS_ID'               => $rowNr % 2 ? 1 : 0,
                     'ACCESS_USER_ID'                    => $user->getId(),
-                    'ACCESS_USER_STATUS_IMG'            => $user->getActive() ? 'led_green.gif' : 'led_red.gif',
-                    'ACCESS_USER_STATUS'                => $user->getActive() ? $_ARRAYLANG['TXT_ACCESS_ACTIVE'] : $_ARRAYLANG['TXT_ACCESS_INACTIVE'],
+                    'ACCESS_USER_STATUS_IMG'            => $user->isActive() ? 'led_green.gif' : 'led_red.gif',
+                    'ACCESS_USER_STATUS'                => $user->isActive() ? $_ARRAYLANG['TXT_ACCESS_ACTIVE'] : $_ARRAYLANG['TXT_ACCESS_INACTIVE'],
                     'ACCESS_USER_USERNAME'              => htmlentities($user->getUsernameOrEmail(), ENT_QUOTES, CONTREXX_CHARSET),
                     'ACCESS_USER_COMPANY'               => !empty($company) ? htmlentities($company, ENT_QUOTES, CONTREXX_CHARSET) : '&nbsp;',
                     'ACCESS_USER_FIRSTNAME'             => !empty($firstname) ? htmlentities($firstname, ENT_QUOTES, CONTREXX_CHARSET) : '&nbsp;',
                     'ACCESS_USER_LASTNAME'              => !empty($lastname) ? htmlentities($lastname, ENT_QUOTES, CONTREXX_CHARSET) : '&nbsp;',
                     'ACCESS_USER_EMAIL'                 => htmlentities($user->getEmail(), ENT_QUOTES, CONTREXX_CHARSET),
                     'ACCESS_SEND_EMAIL_TO_USER'         => sprintf($_ARRAYLANG['TXT_ACCESS_SEND_EMAIL_TO_USER'], htmlentities($user->getUsernameOrEmail(), ENT_QUOTES, CONTREXX_CHARSET)),
-                    'ACCESS_USER_ADMIN_IMG'             => $user->getIsAdmin() ? 'admin.png' : 'no_admin.png',
-                    'ACCESS_USER_ADMIN_TXT'             => $user->getIsAdmin() ? $_ARRAYLANG['TXT_ACCESS_ADMINISTRATOR'] : $_ARRAYLANG['TXT_ACCESS_NO_ADMINISTRATOR'],
+                    'ACCESS_USER_ADMIN_IMG'             => $user->isSuperUser() ? 'admin.png' : 'no_admin.png',
+                    'ACCESS_USER_ADMIN_TXT'             => $user->isSuperUser() ? $_ARRAYLANG['TXT_ACCESS_ADMINISTRATOR'] : $_ARRAYLANG['TXT_ACCESS_NO_ADMINISTRATOR'],
                     'ACCESS_DELETE_USER_ACCOUNT'        => sprintf($_ARRAYLANG['TXT_ACCESS_DELETE_USER_ACCOUNT'],htmlentities($user->getUsernameOrEmail(), ENT_QUOTES, CONTREXX_CHARSET)),
                     'ACCESS_USER_REGDATE'               => date(ASCMS_DATE_FORMAT_DATE, $user->getRegdate()),
                     'ACCESS_USER_LAST_ACTIVITY'         => $user->getLastActivity() ? date(ASCMS_DATE_FORMAT_DATE, $user->getLastActivity()) : '-',
                     'ACCESS_USER_EXPIRATION'            => $user->getExpiration() ? date(ASCMS_DATE_FORMAT_DATE, $user->getExpiration()) : '-',
                     'ACCESS_USER_EXPIRATION_STYLE'      => $user->getExpiration() && $user->getExpiration() < time() ? 'color:#f00; font-weight:bold;' : null,
-                    'ACCESS_CHANGE_ACCOUNT_STATUS_MSG'  => sprintf($user->getActive() ? $_ARRAYLANG['TXT_ACCESS_DEACTIVATE_USER'] : $_ARRAYLANG['TXT_ACCESS_ACTIVATE_USER'], htmlentities($user->getUsernameOrEmail(), ENT_QUOTES, CONTREXX_CHARSET))
+                    'ACCESS_CHANGE_ACCOUNT_STATUS_MSG'  => sprintf($user->isActive() ? $_ARRAYLANG['TXT_ACCESS_DEACTIVATE_USER'] : $_ARRAYLANG['TXT_ACCESS_ACTIVATE_USER'], htmlentities($user->getUsernameOrEmail(), ENT_QUOTES, CONTREXX_CHARSET))
                 ));
 
                 $license = \Env::get('cx')->getLicense();

@@ -2,6 +2,10 @@ Cx\Core\User\Model\Entity\UserAttribute:
   type: entity
   table: access_user_attribute
   repositoryClass: Cx\Core\User\Model\Repository\UserAttributeRepository
+  gedmo:
+    translation:
+      locale: locale
+      entity: Cx\Core\Locale\Model\Entity\Translation
   fields:
     id:
       id: true
@@ -15,6 +19,14 @@ Cx\Core\User\Model\Entity\UserAttribute:
       values: ['text','textarea','mail','uri','date','image','checkbox','menu','menu_option','group','frame','history']
       options:
         default: "text"
+    name:
+      type: string
+      gedmo:
+        - translatable
+      length: 255
+      nullable: false
+      options:
+        default: ''
     mandatory:
       type: boolean
       options:
@@ -53,10 +65,6 @@ Cx\Core\User\Model\Entity\UserAttribute:
     children:
       targetEntity: Cx\Core\User\Model\Entity\UserAttribute
       mappedBy: parent
-    userAttributeNames:
-      targetEntity: Cx\Core\User\Model\Entity\UserAttributeName
-      orderBy: { 'order': 'ASC' }
-      mappedBy: userAttribute
     userAttributeValues:
       targetEntity: Cx\Core\User\Model\Entity\UserAttributeValue
       mappedBy: userAttribute
