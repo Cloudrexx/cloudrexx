@@ -1178,6 +1178,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 die();
             }
 
+            $apidoc = $this->fixMultilineDoc($apidoc);
             $objFile = new \Cx\Lib\FileSystem\File($filename);
             $objFile->write($apidoc . PHP_EOL);
         }
@@ -1188,6 +1189,22 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         } catch (\Cx\Lib\FileSystem\FileSystemException $e) {
             \DBG::msg($e->getMessage());
         }
+    }
+
+    /**
+     * Fix multilines from API documentation
+     *
+     * @param   string $doc The API documentation to fix.
+     * @return  string  The fixed string.
+     */
+    protected function fixMultilineDoc($doc) {
+        $formattedDoc = preg_replace('/\\\\n\s+\*\s/', '\\\\n', $doc);
+
+        // verify that the replacement did work
+        if ($formattedDoc === null) {
+            return $doc;
+        }
+        return $formattedDoc;
     }
 }
 
