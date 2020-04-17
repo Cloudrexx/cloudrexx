@@ -1199,6 +1199,7 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
                 die();
             }
 
+            $apidoc = $this->fixMultilineDoc($apidoc);
             $objFile = new \Cx\Lib\FileSystem\File($filename);
             $objFile->write($apidoc . PHP_EOL);
         }
@@ -1209,6 +1210,31 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
         } catch (\Cx\Lib\FileSystem\FileSystemException $e) {
             \DBG::msg($e->getMessage());
         }
+    }
+
+    /**
+     * Fix multilines from API documentation
+     *
+     * The current implementation of the OpenAPI documentation parser does not
+     * support multiline. See https://github.com/zircote/swagger-php/issues/326
+     * As multilines are required to make use of markdown in the documentation,
+     * we do have to fix it manually.
+     * Note: multiline support might get added in an upcoming version of the
+     * OpenAPI parser (see https://github.com/doctrine/annotations/pull/75).
+     *
+     * @todo    Drop this method as soon as the OpenAPI parser does support
+     *          multilines.
+     * @param   string $doc The API documentation to fix.
+     * @return  string  The fixed string.
+     */
+    protected function fixMultilineDoc($doc) {
+        $formattedDoc = preg_replace('/\\\\n\s+\*\s/', '\\\\n', $doc);
+
+        // verify that the replacement did work
+        if ($formattedDoc === null) {
+            return $doc;
+        }
+        return $formattedDoc;
     }
 }
 
