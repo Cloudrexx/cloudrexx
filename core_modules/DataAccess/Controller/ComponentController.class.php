@@ -64,6 +64,9 @@ namespace Cx\Core_Modules\DataAccess\Controller;
  *         ref="#/components/parameters/apikey"
  *     ),
  *     @OA\Parameter(
+ *         ref="#/components/parameters/locale"
+ *     ),
+ *     @OA\Parameter(
  *         name="order",
  *         description="Sorts the output by one or more fields",
  *         in="query",
@@ -116,6 +119,9 @@ namespace Cx\Core_Modules\DataAccess\Controller;
  *         ref="#/components/parameters/apikey"
  *     ),
  *     @OA\Parameter(
+ *         ref="#/components/parameters/locale"
+ *     ),
+ *     @OA\Parameter(
  *         ref="#/components/parameters/id"
  *     ),
  *     @OA\Response(
@@ -136,6 +142,9 @@ namespace Cx\Core_Modules\DataAccess\Controller;
  *     ),
  *     @OA\Parameter(
  *         ref="#/components/parameters/apikey"
+ *     ),
+ *     @OA\Parameter(
+ *         ref="#/components/parameters/locale"
  *     ),
  *     @OA\Parameter(
  *         ref="#/components/parameters/id"
@@ -180,6 +189,9 @@ namespace Cx\Core_Modules\DataAccess\Controller;
  *     ),
  *     @OA\Parameter(
  *         ref="#/components/parameters/apikey"
+ *     ),
+ *     @OA\Parameter(
+ *         ref="#/components/parameters/locale"
  *     ),
  *     @OA\Parameter(
  *         ref="#/components/parameters/id"
@@ -230,6 +242,15 @@ namespace Cx\Core_Modules\DataAccess\Controller;
  *         description="API key to grant access",
  *         in="query",
  *         required=true,
+ *         @OA\Schema(
+ *             type="string"
+ *         )
+ *     ),
+ *     @OA\Parameter(
+ *         name="locale",
+ *         description="The frontend locale to get/set translatable fields in.",
+ *         in="query",
+ *         required=false,
  *         @OA\Schema(
  *             type="string"
  *         )
