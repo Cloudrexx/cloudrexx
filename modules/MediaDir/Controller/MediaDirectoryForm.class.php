@@ -554,14 +554,24 @@ class MediaDirectoryForm extends MediaDirectoryLibrary
                 $objDeletePerm = $objDatabase->Execute("DELETE FROM ".DBPREFIX."module_".$this->moduleTablePrefix."_settings_perm_group_forms WHERE form_id='".$intId."'");
                 $settingsPermissionGroupForm = isset($arrData['settingsPermGroupForm'][$intId]) ? $arrData['settingsPermGroupForm'][$intId] : array();
 
-                foreach ($settingsPermissionGroupForm as $intGroupId => $intGroupStatus) {
+                foreach ($settingsPermissionGroupForm as $intGroupId => $groupConfig) {
+                    $publicationPeriod = '';
+                    if (
+                        !empty($groupConfig['publication_period']['limited']) &&
+                        !empty($groupConfig['publication_period']['quantifier']) &&
+                        !empty($groupConfig['publication_period']['unit']) &&
+                        preg_match('/^[YMD]$/', $groupConfig['publication_period']['unit'])
+                    ) {
+                        $publicationPeriod = $groupConfig['publication_period']['quantifier'] . $groupConfig['publication_period']['unit'];
+                    }
                     $objInsertPerm = $objDatabase->Execute("
                         INSERT INTO
                             ".DBPREFIX."module_".$this->moduleTablePrefix."_settings_perm_group_forms
                         SET
                             `group_id`='".intval($intGroupId)."',
                             `form_id`='".intval($intId)."',
-                            `status_group`='".intval($intGroupStatus)."'
+                            `status_group`='".!empty($groupConfig['active'])."',
+                            `publication_period`='".$publicationPeriod."'
                     ");
                 }
 

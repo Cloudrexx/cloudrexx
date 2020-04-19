@@ -1404,6 +1404,12 @@ EOF;
                 $_ARRAYLANG['TXT_MEDIADIR_PLEASE_CHOOSE'],
             'TXT_' . $this->moduleLangVar . '_SELECT_NO_MATCH' =>
                 $_ARRAYLANG['TXT_MEDIADIR_SELECT_NO_MATCH'],
+            'TXT_'.$this->moduleLangVar.'_DISPLAYDURATION' => $_ARRAYLANG['TXT_MEDIADIR_DISPLAYDURATION'],
+            'TXT_'.$this->moduleLangVar.'_DISPLAY_DURATION_ALWAYS' => $_ARRAYLANG['TXT_MEDIADIR_DISPLAYDURATION_ALWAYS'],
+            'TXT_'.$this->moduleLangVar.'_DISPLAY_DURATION_PERIOD' => $_ARRAYLANG['TXT_MEDIADIR_DISPLAYDURATION_PERIOD'],
+            'TXT_'.$this->moduleLangVar.'_SETTINGS_DISPLAYDURATION_VALUE_TYPE_DAY' => $_ARRAYLANG['TXT_MEDIADIR_SETTINGS_DISPLAYDURATION_VALUE_TYPE_DAY'],
+            'TXT_'.$this->moduleLangVar.'_SETTINGS_DISPLAYDURATION_VALUE_TYPE_MONTH' => $_ARRAYLANG['TXT_MEDIADIR_SETTINGS_DISPLAYDURATION_VALUE_TYPE_MONTH'],
+            'TXT_'.$this->moduleLangVar.'_SETTINGS_DISPLAYDURATION_VALUE_TYPE_YEAR' => $_ARRAYLANG['TXT_MEDIADIR_SETTINGS_DISPLAYDURATION_VALUE_TYPE_YEAR'],
         ));
 
         if(isset($_GET['ajax'])) {
@@ -1504,11 +1510,45 @@ EOF;
                             $strGroupStatus = '';
                         }
 
+                        $publicationPeriodUnlimited = 'selected="selected"';
+                        $publicationPeriodLimited = '';
+                        $quantifier = 1;
+                        $unitYearSelected = '';
+                        $unitMonthSelected = '';
+                        $unitDaySelected = '';
+
+                        if (!empty($arrGroup['publication_period'][$intFormId])) {
+                            $publicationPeriodUnlimited = '';
+                            $publicationPeriodLimited = 'selected="selected"';
+                            if (preg_match('/^(\d+)([YMD])$/', $arrGroup['publication_period'][$intFormId], $period)) {
+                                $quantifier = $period[1];
+                                switch ($period[2]) {
+                                    case 'Y':
+                                        $unitYearSelected = 'selected="selected"';
+                                        break;
+
+                                    case 'M':
+                                        $unitMonthSelected = 'selected="selected"';
+                                        break;
+
+                                    case 'D':
+                                        $unitDaySelected = 'selected="selected"';
+                                        break;
+                                }
+                            }
+                        }
+
                         $objTpl->setVariable(array(
                             $this->moduleLangVar.'_SETTINGS_COMMUNITY_GROUP_ROW_CLASS' => $i%2==0 ? 'row1' : 'row2',
                             'TXT_'.$this->moduleLangVar.'_SETTINGS_COMMUNITY_GROUP_NAME' => $arrGroup['name'],
                             $this->moduleLangVar.'_SETTINGS_COMMUNITY_GROUP_ACTIVE' => $strGroupStatus,
                             $this->moduleLangVar.'_SETTINGS_COMMUNITY_GROUP_ID' => $intGroupId,
+                            $this->moduleLangVar.'_SETTINGS_COMMUNITY_GROUP_PUBLICATION_SELECT_ALWAYS' => $publicationPeriodUnlimited,
+                            $this->moduleLangVar.'_SETTINGS_COMMUNITY_GROUP_PUBLICATION_SELECT_PERIOD' => $publicationPeriodLimited,
+                            $this->moduleLangVar.'_SETTINGS_COMMUNITY_GROUP_PUBLICATION_QUANTIFIER' => $quantifier,
+                            $this->moduleLangVar.'_SETTINGS_COMMUNITY_GROUP_PUBLICATION_UNIT_TYPE_DAY' => $unitDaySelected,
+                            $this->moduleLangVar.'_SETTINGS_COMMUNITY_GROUP_PUBLICATION_UNIT_TYPE_MONTH' => $unitMonthSelected,
+                            $this->moduleLangVar.'_SETTINGS_COMMUNITY_GROUP_PUBLICATION_UNIT_TYPE_YEAR' => $unitYearSelected,
                         ));
                         $i++;
                         $objTpl->parse($this->moduleNameLC.'FormCommunityGroupList');

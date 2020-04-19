@@ -29,6 +29,14 @@ $J(function(){
       no_results_text: '{TXT_MEDIADIR_SELECT_NO_MATCH}',
       placeholder_text_multiple: '{TXT_MEDIADIR_PLEASE_CHOOSE}'
     }).chosenSortable();
+    $J('.publication_period').live('change', function() {
+        let limitedWidget = $J(this).parent().find('.publication_period_limited');
+        if ($J(this).val()) {
+            limitedWidget.show();
+        } else {
+            limitedWidget.hide();
+        }
+    }).trigger('change');
 });
 
 function resetContextFields() {
@@ -361,28 +369,43 @@ var refreshInputfields = function(formId)
     <div id="permissions" class="formTab" style="display: none;">
         <table border="0" cellpadding="3" cellspacing="0" width="100%" class="adminlist">
             <tr>
-                <th colspan="2">{TXT_MEDIADIR_SETTINGS_PERMISSIONS}</th>
+                <th colspan="3">{TXT_MEDIADIR_SETTINGS_PERMISSIONS}</th>
             </tr>
             <tr class="row3">
-                <td colspan="2">{TXT_MEDIADIR_SETTINGS_PERMISSIONS_INFO}</td>
+                <td colspan="3">{TXT_MEDIADIR_SETTINGS_PERMISSIONS_INFO}</td>
             </tr>
             <tr class="row2">
-                <td colspan="2"><br /></td>
+                <td colspan="3"><br /></td>
             </tr>
             <tr class="row3">
                 <td  valign="top" width="200"><b>{TXT_MEDIADIR_SETTINGS_COMMUNITY_GROUP}<b></td>
-                <td  valign="top"><b>{TXT_MEDIADIR_SETTINGS_ALLOW_GHROUP_ADD_ENTRIES}<b></td>
+                <td  valign="top" width="300"><b>{TXT_MEDIADIR_SETTINGS_ALLOW_GHROUP_ADD_ENTRIES}<b></td>
+                <td  valign="top"><b>{TXT_MEDIADIR_DISPLAYDURATION}<b></td>
             </tr>
             <!-- BEGIN mediadirFormCommunityGroupList -->
             <tr class="{MEDIADIR_SETTINGS_COMMUNITY_GROUP_ROW_CLASS}">
                 <td valign="top">{TXT_MEDIADIR_SETTINGS_COMMUNITY_GROUP_NAME}</td>
-                <td><input type="checkbox" name="settingsPermGroupForm[{MEDIADIR_FORM_ID}][{MEDIADIR_SETTINGS_COMMUNITY_GROUP_ID}]" value="1" {MEDIADIR_SETTINGS_COMMUNITY_GROUP_ACTIVE}></td>
+                <td><input type="checkbox" name="settingsPermGroupForm[{MEDIADIR_FORM_ID}][{MEDIADIR_SETTINGS_COMMUNITY_GROUP_ID}][active]" value="1" {MEDIADIR_SETTINGS_COMMUNITY_GROUP_ACTIVE}></td>
+                <td>
+                    <select class="publication_period" name="settingsPermGroupForm[{MEDIADIR_FORM_ID}][{MEDIADIR_SETTINGS_COMMUNITY_GROUP_ID}][publication_period][limited]">
+                        <option value="" {MEDIADIR_SETTINGS_COMMUNITY_GROUP_PUBLICATIO_SELECT_ALWAYS}>{TXT_MEDIADIR_DISPLAY_DURATION_ALWAYS}</option>
+                        <option value="1" {MEDIADIR_SETTINGS_COMMUNITY_GROUP_PUBLICATION_SELECT_PERIOD}>{TXT_MEDIADIR_DISPLAY_DURATION_PERIOD}</option>
+                    </select>
+                    <span class="publication_period_limited">
+                        <input type="text" name="settingsPermGroupForm[{MEDIADIR_FORM_ID}][{MEDIADIR_SETTINGS_COMMUNITY_GROUP_ID}][publication_period][quantifier]"  value="{MEDIADIR_SETTINGS_COMMUNITY_GROUP_PUBLICATION_QUANTIFIER}" size="3" />
+                        <select  name="settingsPermGroupForm[{MEDIADIR_FORM_ID}][{MEDIADIR_SETTINGS_COMMUNITY_GROUP_ID}][publication_period][unit]">
+                            <option value="D" {MEDIADIR_SETTINGS_COMMUNITY_GROUP_PUBLICATION_UNIT_TYPE_DAY}>{TXT_MEDIADIR_SETTINGS_DISPLAYDURATION_VALUE_TYPE_DAY}</option>
+                            <option value="M" {MEDIADIR_SETTINGS_COMMUNITY_GROUP_PUBLICATION_UNIT_TYPE_MONTH}>{TXT_MEDIADIR_SETTINGS_DISPLAYDURATION_VALUE_TYPE_MONTH}</option>
+                            <option value="Y" {MEDIADIR_SETTINGS_COMMUNITY_GROUP_PUBLICATION_UNIT_TYPE_YEAR}>{TXT_MEDIADIR_SETTINGS_DISPLAYDURATION_VALUE_TYPE_YEAR}</option>
+                        </select>
+                    </span>
+                </td>
             </tr>
             <!-- END mediadirFormCommunityGroupList -->
 
             <!-- BEGIN mediadirFormNoCommunityGroup -->
             <tr class="row1">
-                <td valign="top" colspan="2">{TXT_MEDIADIR_SETTINGS_NO_COMMUNITY_GROUPS}</td>
+                <td valign="top" colspan="3">{TXT_MEDIADIR_SETTINGS_NO_COMMUNITY_GROUPS}</td>
             </tr>
             <!-- END mediadirFormNoCommunityGroup -->
         </table>

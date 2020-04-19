@@ -566,10 +566,12 @@ class MediaDirectoryLibrary
                 $arrCommunityGroups[intval($objCommunityGroups->fields['group_id'])]['num_categories'] = htmlspecialchars($objCommunityGroups->fields['num_categories'], ENT_QUOTES, CONTREXX_CHARSET);
                 $arrCommunityGroups[intval($objCommunityGroups->fields['group_id'])]['num_levels'] = htmlspecialchars($objCommunityGroups->fields['num_levels'], ENT_QUOTES, CONTREXX_CHARSET);
                 $arrCommunityGroups[intval($objCommunityGroups->fields['group_id'])]['status_group'] = array();
+                $arrCommunityGroups[intval($objCommunityGroups->fields['group_id'])]['publication_period'] = array();
 
                 $objCommunityGroupPermForms = $objDatabase->Execute("SELECT
                                                         `perm_group_form`.`form_id` AS form_id ,
-                                                        `perm_group_form`.`status_group` AS status_group
+                                                        `perm_group_form`.`status_group` AS status_group,
+                                                        `perm_group_form`.`publication_period`
                                                       FROM
                                                         ".DBPREFIX."module_".$this->moduleNameLC."_settings_perm_group_forms AS `perm_group_form`
                                                       WHERE
@@ -577,6 +579,7 @@ class MediaDirectoryLibrary
                 if ($objCommunityGroupPermForms !== false) {
                     while (!$objCommunityGroupPermForms->EOF) {
                         $arrCommunityGroups[intval($objCommunityGroups->fields['group_id'])]['status_group'][intval($objCommunityGroupPermForms->fields['form_id'])] = htmlspecialchars($objCommunityGroupPermForms->fields['status_group'], ENT_QUOTES, CONTREXX_CHARSET);
+                        $arrCommunityGroups[intval($objCommunityGroups->fields['group_id'])]['publication_period'][intval($objCommunityGroupPermForms->fields['form_id'])] = $objCommunityGroupPermForms->fields['publication_period'];
                         $objCommunityGroupPermForms->MoveNext();
                     }
                 }

@@ -1415,9 +1415,74 @@ JSCODE;
                 $intConfirmed = $this->arrSettings['settingsConfirmNewEntries'] == 1 ? 0 : 1;
                 $intActive = 1;
                 $intShowIn = 2;
+
+                // fetch default publication period
                 $intDurationType = $this->arrSettings['settingsEntryDisplaydurationType'];
                 $intDurationStart = time();
                 $intDurationEnd = mktime(0,0,0,date("m")+$intDiffMonth,date("d")+$intDiffDay,date("Y")+$intDiffYear);
+
+                // check for group specific publication period
+                if ($intUserId) {
+                    // get groups of user
+                    $arrUserGroups  = array();
+                    $objGroup = $objFWUser->objGroup->getGroups($filter = array('is_active' => true, 'type' => 'frontend'));
+                    while (!$objGroup->EOF) {
+                        if (in_array($objGroup->getId(), $objFWUser->objUser->getAssociatedGroupIds())) {
+                            $arrUserGroups[] = $objGroup->getId();
+                        }
+                        $objGroup->next();
+                    }
+
+                    // load group specific form configuration
+                    $this->getCommunityGroups();
+
+                    // determine group specific publication period
+                    $publicationEnd = 0;
+                    foreach ($arrUserGroups as $intGroupId) {
+                        if (!isset($this->arrCommunityGroups[$intGroupId]['publication_period'][$intFormId])) {
+                            continue;
+                        }
+                        if (empty($this->arrCommunityGroups[$intGroupId]['publication_period'][$intFormId])) {
+                            // user is assigned to a group without a publication period limitation,
+                            // therefore we do unset the limitation and abort the algorithm
+                            $intDurationType = 1;
+                            $publicationEnd = time();
+                            break;
+                        } else {
+                            // set publication period
+                            $intDurationType = 2;
+                            if (preg_match('/^(\d+)([YMD])$/', $this->arrCommunityGroups[$intGroupId]['publication_period'][$intFormId], $period)) {
+                                $quantifier = $period[1];
+                                $intDiffYear = 0;
+                                $intDiffMonth = 0;
+                                $intDiffDay = 0;
+                                switch ($period[2]) {
+                                    case 'Y':
+                                        $intDiffYear = $quantifier;
+                                        break;
+
+                                    case 'M':
+                                        $intDiffMonth = $quantifier;
+                                        break;
+
+                                    case 'D':
+                                        $intDiffDay = $quantifier;
+                                        break;
+                                }
+                                $groupEnd = mktime(0,0,0,date("m")+$intDiffMonth,date("d")+$intDiffDay,date("Y")+$intDiffYear);
+
+                                // select max publication period in case the user is assigned to
+                                // multiple groups with different publication periods
+                                if ($groupEnd > $publicationEnd) {
+                                    $publicationEnd = $groupEnd;
+                                }
+                            }
+                        }
+                    }
+                    if ($publicationEnd) {
+                        $intDurationEnd = $publicationEnd;
+                    }
+                }
             }
 
             $strValidateDate = $intConfirmed == 1 ? time() : 0;
