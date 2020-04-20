@@ -44,8 +44,8 @@ namespace Cx\Core\User\Model\Entity;
  * @subpackage  core_user
  *
  * @OA\Schema(
- *     description="A Group can have several associated users, in the group is specified which rights a user has, what modules the user can act in and whether they have write/read access.",
- *     title="Group model",
+ *     description="A Group can have several associated users, in the group is specified which rights a user has, what components the user can act in and whether they have write/read access.",
+ *     title="Group",
  *     required={"name",},
  * )
  */

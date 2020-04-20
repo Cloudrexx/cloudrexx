@@ -45,7 +45,7 @@ namespace Cx\Core\User\Model\Entity;
  *
  * @OA\Schema(
  *     description="A UserAttribute is a property of a user. More atttributes can be added, to expand a user profile.",
- *     title="UserAttribute model",
+ *     title="UserAttribute",
  * )
  */
 class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translatable\Translatable {
@@ -160,7 +160,28 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
 
     /**
      * @OA\Property(
-     *     description="Define the type of the attribute. There are following choices: Text for one line and textarea for a multiline textbox. Mail for a email address. Uri to link a website. Date for having a datepicker. Image to get a upload choice. Checkbox to mark the attribute as checkbox. Menu for a dropdown-menu. Menu_option to specify a attributes for the menu. History to setup the possibility for the history.",
+     *     description="Define the type of the attribute. There are following choices:
+     * 1.  Text for a one line Textbox
+     *
+     * 2.  Textarea for a multiline textbox
+     *
+     * 3.  Mail for a email address
+     *
+     * 4.  Uri to link a website
+     *
+     * 5.  Date to show a datepicker
+     *
+     * 6.  Image to get a upload choice
+     *
+     * 7.  Checkbox to mark the attribute as checkbox
+     *
+     * 8.  Menu for a dropdown-menu
+     *
+     * 9.  Group to add a associated group
+     *
+     * 10. Menu_option to specify a attributes for the menu
+     *
+     * 11. History to setup the possibility for the history.",
      *     title="User attribute Type",
      *     enum={
      *          "text",
@@ -183,6 +204,12 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     protected $type = self::TYPE_TEXT;
 
     /**
+     * @OA\Property(
+     *     format="string",
+     *     description="Set the name of the user attribute.",
+     *     title="Name",
+     *     default=" ",
+     * )
      * @var string
      */
     protected $name = '';
@@ -225,7 +252,12 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
 
     /**
      * @OA\Property(
-     *     description="Set a special privilege for users that do not have editing rights from assigned group. Menu_select_higher: Only entries above the currently selected in the list may be chosen. Menu_select_lower: Only entries below the currently selected in the list may be chosen. [Documentation](https://wiki.cloudrexx.com/Development_Permissions).",
+     *     description="Set a special privilege for users that do not have editing rights from assigned group.
+     * 1.  Menu_select_higher: Only entries above the currently selected in the list may be chosen.
+     *
+     * 2.  Menu_select_lower: Only entries below the currently selected in the list may be chosen.
+     *
+     *     [Documentation](https://wiki.cloudrexx.com/Development_Permissions).",
      *     title="User attribute, special access",
      *     enum={"menu_select_higher", "menu_select_lower"},
      * )
@@ -237,7 +269,10 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     /**
      * @OA\Property(
      *     format="int",
-     *     description="Permissions are handled using access IDs. There are two types: Static (restrict the access to functions and sections - mostly backend) and dynamic (restrict the access to content data - content pages, categories, documents, etc.). [Documentation](https://wiki.cloudrexx.com/Development_Permissions).",
+     *     description="Permissions are handled using access IDs. There are two types:
+     * 1.  Static (restrict the access to functions and sections - mostly backend)
+     *
+     * 2.  Dynamic (restrict the access to content data - content pages, categories, documents, etc.). [Documentation](https://wiki.cloudrexx.com/Development_Permissions).",
      *     title="Access ID",
      * )
      *
@@ -248,7 +283,12 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     /**
      * @OA\Property(
      *     format="int",
-     *     description="Unique identifier for reading access. There are two types: Static (restrict the access to functions and sections - mostly backend) and dynamic (restrict the access to content data - content pages, categories, documents, etc.).[Dokumentation](https://wiki.cloudrexx.com/Development_Permissions).",
+     *     description="Unique identifier for reading access. There are two types:
+     * 1.  Static (restrict the access to functions and sections - mostly backend)
+     *
+     * 2.  Dynamic (restrict the access to content data - content pages, categories, documents, etc.).
+     *
+     *     [Dokumentation](https://wiki.cloudrexx.com/Development_Permissions).",
      *     title="Access ID read",
      * )
      *
@@ -273,7 +313,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     /**
      * @OA\Property(
      *     description="List of all attributes that are assigned to the user. We have a key that's a serialized id from fields of the primary key in the corresponding order: <attributeId>/<userId>/<historyId> Example: 1/1/0. For writing requests we need to pass the serialized key in the order as before, if we want to read we use the serialized key with the desired ID's like the example given.",
-     *     title="User attribute value",
+     *     title="User attribute value. Locale can be used for this property."
      *     type="object",
      *     additionalProperties={
      *         "$ref"="#/components/schemas/UserAttributeValue"

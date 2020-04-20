@@ -45,7 +45,7 @@ namespace Cx\Core\User\Model\Entity;
  *
  * @OA\Schema(
  *     description="This represents the value of an attribute and user.",
- *     title="UserAttributeValue model",
+ *     title="UserAttributeValue",
  * )
  */
 class UserAttributeValue extends \Cx\Model\Base\EntityBase {

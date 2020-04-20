@@ -206,7 +206,7 @@ class UserValidateUsername extends \CxValidate
  *
  * @OA\Schema(
  *     description="The user model consists of information about a user. Information about the last login and groups are displayed as well as access information.",
- *     title="User model",
+ *     title="User",
  *     required={"email",},
  * )
  */
