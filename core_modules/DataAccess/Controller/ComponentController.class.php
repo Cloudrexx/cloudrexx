@@ -42,7 +42,7 @@ namespace Cx\Core_Modules\DataAccess\Controller;
  * @OA\Info(
  *     version="1.0.0",
  *     title="Cloudrexx RESTful API",
- *     description="The Cloudrexx RESTful API allows access to ...",
+ *     description="The Cloudrexx RESTful API provides access to edit, delete and create new entries. These changes can be made for the endpoints that are provided by the website owner.",
  *     @OA\Contact(
  *         name="Cloudrexx API Support",
  *         url="https://www.cloudrexx.com/support",
