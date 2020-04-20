@@ -96,6 +96,12 @@ class EntityBase {
     protected $virtual = false;
 
     /**
+     * Counts the nesting level of __call()
+     * @var int
+     */
+    protected static $nestingCount = 0;
+
+    /**
      * This is an ugly solution to allow $this->cx to be available in all entity classes
      * Since the entity's constructor is not called when an entity is loaded from DB this
      * cannot be assigned there.
@@ -182,10 +188,17 @@ class EntityBase {
      * Route methods like getName(), getType(), getDirectory(), etc.
      * @param string $methodName Name of method to call
      * @param array $arguments List of arguments for the method to call
+     * @throws \Exception If __call() nesting level reaches 20
      * @return mixed Return value of the method to call
      */
     public function __call($methodName, $arguments) {
-        return call_user_func_array(array($this->getComponentController(), $methodName), $arguments);
+        if (static::$nestingCount >= 20) {
+            throw new \Exception('Stopped nesting at method ' . $methodName . '()');
+        }
+        static::$nestingCount++;
+        $res = call_user_func_array(array($this->getComponentController(), $methodName), $arguments);
+        static::$nestingCount--;
+        return $res;
     }
 
     /**
