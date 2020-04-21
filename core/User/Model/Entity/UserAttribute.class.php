@@ -313,7 +313,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     /**
      * @OA\Property(
      *     description="List of all attributes that are assigned to the user. We have a key that's a serialized id from fields of the primary key in the corresponding order: <attributeId>/<userId>/<historyId> Example: 1/1/0. For writing requests we need to pass the serialized key in the order as before, if we want to read we use the serialized key with the desired ID's like the example given.",
-     *     title="User attribute value. Locale can be used for this property."
+     *     title="User attribute value. Locale can be used for this property.",
      *     type="object",
      *     additionalProperties={
      *         "$ref"="#/components/schemas/UserAttributeValue"
