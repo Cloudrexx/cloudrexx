@@ -245,8 +245,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
      *     description="Set a special privilege for users that do not have editing rights from assigned group.
      * 1.  Menu_select_higher: Only entries above the currently selected in the list may be chosen.
      * 2.  Menu_select_lower: Only entries below the currently selected in the list may be chosen.
-     *
-     *     [Documentation](https://wiki.cloudrexx.com/Development_Permissions).",
+     *     [Documentation](https://wiki.cloudrexx.com/Development_Permissions)",
      *     title="User attribute, special access",
      *     enum={"menu_select_higher", "menu_select_lower"},
      * )
@@ -259,8 +258,9 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
      * @OA\Property(
      *     format="int",
      *     description="Permissions are handled using access IDs. There are two types:
-     * 1.  Static (restrict the access to functions and sections - mostly backend)
-     * 2.  Dynamic (restrict the access to content data - content pages, categories, documents, etc.). [Documentation](https://wiki.cloudrexx.com/Development_Permissions).",
+     * 1.  Static (restrict the access to functions and sections - mostly backend).
+     * 2.  Dynamic (restrict the access to content data - content pages, categories, documents, etc.).
+     *     [Documentation](https://wiki.cloudrexx.com/Development_Permissions)",
      *     title="Access ID",
      * )
      *
@@ -272,10 +272,9 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
      * @OA\Property(
      *     format="int",
      *     description="Unique identifier for reading access. There are two types:
-     * 1.  Static (restrict the access to functions and sections - mostly backend)
+     * 1.  Static (restrict the access to functions and sections - mostly backend).
      * 2.  Dynamic (restrict the access to content data - content pages, categories, documents, etc.).
-     *
-     *     [Dokumentation](https://wiki.cloudrexx.com/Development_Permissions).",
+     *     [Documentation](https://wiki.cloudrexx.com/Development_Permissions)",
      *     title="Access ID read",
      * )
      *
