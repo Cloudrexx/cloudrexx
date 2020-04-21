@@ -336,7 +336,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="When a user failed to login this status will change to 0 and at the next login a captcha will be necessary to login succesfully. When the login is succesfully the value will change to 1",
+     *     description="When a user failed to login this status will change to 0 and at the next login a captcha will be necessary to login succesfully. When the login is succesfully the value will change to 1.",
      *     title="Last authentication status",
      *     default = 0,
      * )
@@ -418,7 +418,9 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="boolean",
-     *     description="Flag to show if the user is verified. The user is verified, if they are created over the website administration. There are two options that are set in the administration: Activation by an authorized person (see Backend group permissions under User administration) or Activation by the user where the user has to conifrm a email with a set time the email has to be confirmed.",
+     *     description="Flag to show if the user is verified. The user is verified, if they are created over the website administration. There are two options that are set in the administration:
+     * 1.  Activation by an authorized person (see Backend group permissions under User administration)
+     * 2.  Activation by the user where the user has to conifrm a email with a set time the email has to be confirmed.",
      *     title="Verified",
      *     default="true",
      * )
