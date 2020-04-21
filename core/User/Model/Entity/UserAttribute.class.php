@@ -162,25 +162,15 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
      * @OA\Property(
      *     description="Define the type of the attribute. There are following choices:
      * 1.  Text for a one line Textbox
-     *
      * 2.  Textarea for a multiline textbox
-     *
      * 3.  Mail for a email address
-     *
      * 4.  Uri to link a website
-     *
      * 5.  Date to show a datepicker
-     *
      * 6.  Image to get a upload choice
-     *
      * 7.  Checkbox to mark the attribute as checkbox
-     *
      * 8.  Menu for a dropdown-menu
-     *
      * 9.  Group to add a associated group
-     *
      * 10. Menu_option to specify a attributes for the menu
-     *
      * 11. History to setup the possibility for the history.",
      *     title="User attribute Type",
      *     enum={
@@ -254,7 +244,6 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
      * @OA\Property(
      *     description="Set a special privilege for users that do not have editing rights from assigned group.
      * 1.  Menu_select_higher: Only entries above the currently selected in the list may be chosen.
-     *
      * 2.  Menu_select_lower: Only entries below the currently selected in the list may be chosen.
      *
      *     [Documentation](https://wiki.cloudrexx.com/Development_Permissions).",
@@ -271,7 +260,6 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
      *     format="int",
      *     description="Permissions are handled using access IDs. There are two types:
      * 1.  Static (restrict the access to functions and sections - mostly backend)
-     *
      * 2.  Dynamic (restrict the access to content data - content pages, categories, documents, etc.). [Documentation](https://wiki.cloudrexx.com/Development_Permissions).",
      *     title="Access ID",
      * )
@@ -285,7 +273,6 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
      *     format="int",
      *     description="Unique identifier for reading access. There are two types:
      * 1.  Static (restrict the access to functions and sections - mostly backend)
-     *
      * 2.  Dynamic (restrict the access to content data - content pages, categories, documents, etc.).
      *
      *     [Dokumentation](https://wiki.cloudrexx.com/Development_Permissions).",
