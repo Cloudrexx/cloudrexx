@@ -233,18 +233,13 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
         }
 
         if (empty($groupId)) {
-            $qb->andWhere(
-                $qb->expr()->isNull('filterGroup.id')
-            );
-        } else if (is_array($groupId)) {
-            $qb->andWhere(
-                $qb->expr()->in('filterGroup.id', ':groupIds')
-            )->setParameter('groupId', $groupId);
+            $groupId = array(0);
         } else {
-            $qb->andWhere(
-                $qb->expr()->eq('filterGroup.id', ':groupId')
-            )->setParameter('groupId', $groupId);
+            $groupId = array($groupId);
         }
+        $qb->andWhere(
+            $qb->expr()->in('filterGroup.id', ':groupIds')
+        )->setParameter('groupIds', $groupId);
     }
 
     /**
