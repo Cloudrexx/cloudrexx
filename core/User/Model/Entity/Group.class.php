@@ -76,7 +76,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     protected $active = 1;
 
     /**
-     * @var \Cx\Core\Model\Data\Enum\User\Group\Type $type
+     * @var string $type
      */
     protected $type = self::TYPE_FRONTEND;
 
@@ -274,7 +274,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Set type
      *
-     * @param \Cx\Core\Model\Data\Enum\User\Group\Type $type
+     * @param string $type
      */
     public function setType($type)
     {
@@ -284,7 +284,7 @@ class Group extends \Cx\Model\Base\EntityBase {
     /**
      * Get type
      *
-     * @return \Cx\Core\Model\Data\Enum\User\Group\Type $type
+     * @return string $type
      */
     public function getType()
     {

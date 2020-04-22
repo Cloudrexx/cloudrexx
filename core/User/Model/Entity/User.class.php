@@ -302,7 +302,7 @@ class User extends \Cx\Model\Base\EntityBase {
     protected $email;
 
     /**
-     * @var \Cx\Core\Model\Data\Enum\User\User\EmailAccess $emailAccess
+     * @var string $emailAccess
      */
     protected $emailAccess = self::EMAIL_ACCESS_NOBODY;
 
@@ -332,7 +332,7 @@ class User extends \Cx\Model\Base\EntityBase {
     protected $primaryGroup = 0;
 
     /**
-     * @var \Cx\Core\Model\Data\Enum\User\User\ProfileAccess $profileAccess
+     * @var string $profileAccess
      */
     protected $profileAccess = self::PROFILE_ACCESS_MEMBERS_ONLY;
 
@@ -649,7 +649,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Set emailAccess
      *
-     * @param \Cx\Core\Model\Data\Enum\User\User\EmailAccess $emailAccess
+     * @param string $emailAccess
      */
     public function setEmailAccess($emailAccess)
     {
@@ -659,7 +659,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get emailAccess
      *
-     * @return \Cx\Core\Model\Data\Enum\User\User\EmailAccess $emailAccess
+     * @return string $emailAccess
      */
     public function getEmailAccess()
     {
@@ -783,7 +783,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Set profileAccess
      *
-     * @param \Cx\Core\Model\Data\Enum\User\User\ProfileAccess $profileAccess
+     * @param string $profileAccess
      */
     public function setProfileAccess($profileAccess)
     {
@@ -793,7 +793,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * Get profileAccess
      *
-     * @return \Cx\Core\Model\Data\Enum\User\User\ProfileAccess $profileAccess
+     * @return string $profileAccess
      */
     public function getProfileAccess()
     {

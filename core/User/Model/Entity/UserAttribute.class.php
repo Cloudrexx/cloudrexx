@@ -141,7 +141,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     protected $id;
 
     /**
-     * @var \Cx\Core\Model\Data\Enum\User\UserAttribute\Type $type
+     * @var string $type
      */
     protected $type = self::TYPE_TEXT;
 
@@ -151,7 +151,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     protected $mandatory = false;
 
     /**
-     * @var \Cx\Core\Model\Data\Enum\User\UserAttribute\SortType $sortType
+     * @var string $sortType
      */
     protected $sortType = self::SORT_TYPE_ASC;
 
@@ -161,7 +161,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     protected $orderId = 0;
 
     /**
-     * @var \Cx\Core\Model\Data\Enum\User\UserAttribute\AccessSpecial $accessSpecial
+     * @var string $accessSpecial
      */
     protected $accessSpecial = self::ACCESS_SPECIAL_NONE;
 
@@ -350,7 +350,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Set type
      *
-     * @param \Cx\Core\Model\Data\Enum\User\UserAttribute\Type $type
+     * @param string $type
      */
     public function setType($type)
     {
@@ -360,7 +360,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get type
      *
-     * @return \Cx\Core\Model\Data\Enum\User\UserAttribute\Type $type
+     * @return string $type
      */
     public function getType()
     {
@@ -390,7 +390,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Set sortType
      *
-     * @param \Cx\Core\Model\Data\Enum\User\UserAttribute\SortType $sortType
+     * @param string $sortType
      */
     public function setSortType($sortType)
     {
@@ -400,7 +400,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get sortType
      *
-     * @return \Cx\Core\Model\Data\Enum\User\UserAttribute\SortType $sortType
+     * @return string $sortType
      */
     public function getSortType()
     {
@@ -430,7 +430,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Set accessSpecial
      *
-     * @param \Cx\Core\Model\Data\Enum\User\UserAttribute\AccessSpecial $accessSpecial
+     * @param string $accessSpecial
      */
     public function setAccessSpecial($accessSpecial)
     {
@@ -440,7 +440,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase {
     /**
      * Get accessSpecial
      *
-     * @return \Cx\Core\Model\Data\Enum\User\UserAttribute\AccessSpecial $accessSpecial
+     * @return string $accessSpecial
      */
     public function getAccessSpecial()
     {
