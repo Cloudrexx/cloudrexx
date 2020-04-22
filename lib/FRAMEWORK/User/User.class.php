@@ -611,7 +611,7 @@ class User extends User_Profile
                 $user = $userRepo->find($this->id);
 
                 if (empty($user)) {
-                    return;
+                    return false;
                 }
 
                 // Remove all groups from user
