@@ -223,8 +223,8 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
     /**
      * Add a group filter to the given QueryBuilder
      *
-     * @param \Doctrine\ORM\QueryBuilder $qb     QueryBuilder instance
-     * @param int|array                  $groupId Group IDs to be filtered
+     * @param \Doctrine\ORM\QueryBuilder $qb      QueryBuilder instance
+     * @param null|int|array             $groupId Group IDs to be filtered
      */
     public function addGroupFilterToQueryBuilder($qb, $groupId)
     {
