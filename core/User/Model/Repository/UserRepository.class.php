@@ -209,7 +209,7 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
 
         if (!in_array($operation, $supportedOperations)) {
             $operation = 'eq';
-        }var_dump($valueName);
+        }
         return $qb->expr()->$operation($field, ':' . $valueName);
     }
 
