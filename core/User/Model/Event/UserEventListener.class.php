@@ -48,7 +48,8 @@ class UserEventListener extends \Cx\Core\Event\Model\Entity\DefaultEventListener
      * Prevent the user from deactivating himself
      *
      * @param \Doctrine\ORM\Event\LifecycleEventArgs $eventArgs
-     * @throws \Cx\Core\Error\Model\Entity\ShinyException
+     * @throws \Cx\Core\Error\Model\Entity\ShinyException if the user tries to
+     *     deactivate himself
      */
     public function preUpdate(\Doctrine\ORM\Event\LifecycleEventArgs $eventArgs)
     {
