@@ -913,6 +913,10 @@ class ViewGenerator {
     public function render(&$isSingle = false) {
         global $_ARRAYLANG, $_CORELANG;
 
+        // $_ARRAYLANG contains the lang of another module since this is called
+        // from a different module. Therefore we need to load $_ARRAYLANG ourself.
+        $_ARRAYLANG += \Env::get('init')->getComponentSpecificLanguageData('Html', false);
+
         \JS::registerJS(substr($this->cx->getCoreFolderName() . '/Html/View/Script/Backend.js', 1));
 
         // this case is used to generate the add entry form, where we can create an new entry
@@ -1005,19 +1009,7 @@ class ViewGenerator {
             if(!empty($this->options['order']['overview'])) {
                 $renderObject->sortColumns($this->options['order']['overview']);
             }
-            $addBtn = '';
             $actionUrl = clone \Env::get('cx')->getRequest()->getUrl();
-            if (!empty($this->options['functions']['add'])) {
-                $actionUrl->setParam('add', 1);
-                //remove the parameter 'vg_increment_number' from actionUrl
-                //if the baseUrl contains the parameter 'vg_increment_number'
-                $params = $actionUrl->getParamArray();
-                if (isset($params['vg_increment_number'])) {
-                    \Html::stripUriParam($actionUrl, 'vg_increment_number');
-                }
-                $addBtn = '<br /><br /><input type="button" name="addEntity" value="'.$_ARRAYLANG['TXT_ADD'].'" onclick="location.href='."'".$actionUrl."&csrf=".\Cx\Core\Csrf\Controller\Csrf::code()."'".'" />';
-            }
-            $template->setVariable('ADD_BUTTON', $addBtn);
 
             $searching = (
                 isset($this->options['functions']['searching']) &&
@@ -1211,6 +1203,9 @@ class ViewGenerator {
             if (!count($renderObject) || !count(current($renderObject))) {
                 $template->touchBlock('no-entries');
                 return $template->get();
+            }
+            if (empty($this->options['header'])) {
+                $this->options['header'] = $_ARRAYLANG['TXT_CORE_HTML_ENTRIES'];
             }
             $this->getListingController(
                 $renderObject,
@@ -2188,6 +2183,25 @@ class ViewGenerator {
             return implode('/', $entryOrId);
         }
         return (string) $entryOrId;
+    }
+
+    /**
+     * Get the Url to add an entry of a VG instance
+     * @param int $vgId ViewGenerator id
+     * @param \Cx\Core\Routing\Url $url (optional) If supplied necessary params are applied
+     * @return \Cx\Core\Routing\Url URL with copy arguments
+     */
+    public static function getVgAddUrl($vgId, $url = null) {
+        if (!$url) {
+            $url = static::getBaseUrl();
+        }
+        static::appendVgParam(
+            $url,
+            $vgId,
+            'add',
+            1
+        );
+        return $url;
     }
 
     /**

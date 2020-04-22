@@ -388,6 +388,10 @@ class BackendTable extends HTML_Table {
                     isset($options['functions']) &&
                     isset($options['functions']['export']) &&
                     is_array($options['functions']['export'])
+                ) || (
+                    isset($options['functions']) &&
+                    isset($options['functions']['add']) &&
+                    $options['functions']['add']
                 );
                 // we need to add one if there's an additional functions row
                 $headerColspan += (int) $this->hasRowFunctions(
@@ -729,6 +733,7 @@ class BackendTable extends HTML_Table {
      * @return string HTML
      */
     protected function getOverallFunctionsCode($functions, $renderObject) {
+        $overallFunctionsCode = '';
         if (
             isset($functions['export']) &&
             is_array($functions['export']) &&
@@ -766,9 +771,33 @@ class BackendTable extends HTML_Table {
                 'export',
                 array('type' => $renderObject->getDataType())
             );
-            return (string) $exportFunc;
+            $overallFunctionsCode .= (string) $exportFunc;
         }
-        return '';
+        if (
+            isset($functions['vg_increment_number']) &&
+            isset($functions['add']) &&
+            $functions['add'] &&
+            $renderObject instanceof \Cx\Core_Modules\Listing\Model\Entity\DataSet
+        ) {
+            $_CORELANG = \Env::get('init')->getComponentSpecificLanguageData(
+                'Core',
+                false
+            );
+            $addFunc = new \Cx\Core\Html\Model\Entity\HtmlElement('a');
+            $addIcon = new \Cx\Core\Html\Model\Entity\HtmlElement('img');
+            $addIcon->setAttribute('src', '/core/Html/View/Media/Add.png');
+            $addFunc->addChild($addIcon);
+            $vgId = $functions['vg_increment_number'];
+            $addFunc->setAttributes(array(
+                'href' => (string) \Cx\Core\Html\Controller\ViewGenerator::getVgAddUrl(
+                    $vgId
+                ),
+                'title' => $_CORELANG['TXT_ADD'],
+            ));
+            $addFunc->addClass('vg-add');
+            $overallFunctionsCode .= (string) $addFunc;
+        }
+        return $overallFunctionsCode;
     }
 
     /**

@@ -20,3 +20,5 @@ $_ARRAYLANG['TXT_CORE_HTML_STATUS_NO_ENTITY_FOUND_ERROR'] = 'No entry found to u
 $_ARRAYLANG['TXT_CORE_HTML_PLEASE_CHOOSE'] = 'Please choose...';
 $_ARRAYLANG['TXT_CORE_HTML_CANT_UPDATE_STATUS'] = 'Status could not be updated.';
 $_ARRAYLANG['TXT_CORE_HTML_EXPORT'] = 'Export to CSV with current filter';
+$_ARRAYLANG['TXT_CORE_HTML_NEW_BUTTON_MOVED'] = 'Use this to add new entries.';
+$_ARRAYLANG['TXT_CORE_HTML_ENTRIES'] = 'Entries';
