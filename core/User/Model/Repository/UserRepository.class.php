@@ -180,8 +180,13 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
         foreach ($fields as $field) {
             if (in_array($field, $metaData)) {
                 // User
-                $qb->orWhere($this->getExpression('u.' . $field, $operation));
-                $qb->setParameter('valueu' . $field, $searchTerm);
+                $qb->orWhere(
+                    $this->addExpression(
+                        $qb,
+                        'u.' . $field, $operation,
+                        $searchTerm
+                    )
+                );
             } else {
 
                 // UserAttributeValue
@@ -195,22 +200,24 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
     }
 
     /**
-     * Get expression by its operation
+     * Adding expression by its operation to the query builder
      *
-     * @param string $field     field name
-     * @param string $operation operation to use
+     * @param \Doctrine\ORM\QueryBuilder $qb        QueryBuilder instance
+     * @param string                     $field     field name
+     * @param mixed                      $value     param value
+     * @param string                     $operation operation to use
      * @return \Doctrine\ORM\Query\Expr\Comparison
      */
-    protected function getExpression($field, $operation = 'eq')
+    protected function addExpression(&$qb, $field, $value, $operation = 'eq')
     {
-        $qb = $this->createQueryBuilder('e');
         $valueName = preg_replace('/\./', '', 'value' . $field);
         $supportedOperations = array('eq', 'like', 'in');
 
         if (!in_array($operation, $supportedOperations)) {
             $operation = 'eq';
         }
-        return $qb->expr()->$operation($field, ':' . $valueName);
+        $qb->setParameter($valueName, $value);
+        $qb->expr()->$operation($field, ':' . $valueName);
     }
 
     /**
@@ -334,10 +341,22 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
                 $qb->join('u.userAttributeValues', $alias);
             }
 
-            $expr->add($this->getExpression($alias . '.userAttribute', 'eq'));
-            $expr->add($this->getExpression($alias . '.value', $operation));
-            $qb->setParameter('value' . $alias . 'value', $value);
-            $qb->setParameter('value' . $alias . 'userAttribute', $key);
+            $expr->add(
+                $this->addExpression(
+                    $qb,
+                    $alias . '.userAttribute',
+                    $value,
+                    'eq'
+                )
+            );
+            $expr->add(
+                $this->addExpression(
+                    $qb,
+                    $alias . '.value',
+                    $key,
+                    $operation
+                )
+            );
         }
         return $expr;
     }
