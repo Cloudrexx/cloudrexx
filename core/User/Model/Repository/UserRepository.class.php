@@ -310,6 +310,13 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
     /**
      * Get a expression to filter users
      *
+     * In the filter you have to define the attribute name or ID as a key.
+     * For example:
+     * array(
+     *     'lastname' => 'Muster',
+     *     'firstname' => 'Max'
+     * )
+     *
      * @param \Doctrine\ORM\QueryBuilder $qb     QueryBuilder instance
      * @param array                      $filters filter conditions
      * @param bool                       $and     use a and condition or an or condition
