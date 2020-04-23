@@ -205,7 +205,7 @@ class UserValidateUsername extends \CxValidate
  * @subpackage  core_user
  *
  * @OA\Schema(
- *     description="The user model consists of information about a user. Information about the last login and groups are displayed as well as access information.",
+ *     description="The user model consists of information about a user. Additionally it contains information about the last login and groups are displayed as well as access information.",
  *     title="User",
  *     required={"email",},
  * )
@@ -394,7 +394,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="int",
-     *     description="Set the default backend language for the user, for English set to 2 and German to 1. If no language is set the backend will show the default language as chosen in Localization.",
+     *     description="Set the default backend language for the user, for English set to 2 and German to 1. If no language is set the backend will show the default language as chosen in the system Settings under Localization.",
      *     title="Backend language",
      *     default="0",
      * )
@@ -419,8 +419,8 @@ class User extends \Cx\Model\Base\EntityBase {
      * @OA\Property(
      *     format="boolean",
      *     description="Flag to show if the user is verified. The user is verified, if they are created over the website administration. There are two options that are set in the administration:
-     * 1.  Activation by an authorized person (see Backend group permissions under User administration)
-     * 2.  Activation by the user where the user has to conifrm a email with a set time the email has to be confirmed.",
+     * 1.  Activation by an authorized person (see Backend group permissions under User administration).
+     * 2.  Activation by the user where the user has to conifrm an email with a set time the email has to be confirmed.",
      *     title="Verified",
      *     default="true",
      * )
@@ -465,7 +465,7 @@ class User extends \Cx\Model\Base\EntityBase {
     /**
      * @OA\Property(
      *     format="boolean",
-     *     description="Set this to true if the user should be able to communicate with other users when using the module U2U messaging (U2u).",
+     *     description="Set this to true if the user should be able to communicate with other users when using the module U2U messaging (U2U).",
      *     title="User to user active",
      *     default="false",
      * )
@@ -476,7 +476,7 @@ class User extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="List of all groups assigned to the user, there can be users without associated group. To write we use a ID of the desired group, for example 1. If the request is to read, the output consists of the group object of the given ID, for example ID, Name etc.",
+     *     description="List of all groups assigned to the user, there can be users without associated group. To POST we use a ID of the desired group, for example 1. To GET, the output consists of the group object of the given ID, for example ID, Name etc.",
      *     title="User groups",
      *     type="object",
      *     additionalProperties={
@@ -490,7 +490,7 @@ class User extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="List of all attributes that are assigned to the user. The objects are indexed by a unique key that's a serialized id from fields of the primary key in the corresponding order: <attributeId>/<userId>/<historyId> Example: 1/1/0.",
+     *     description="List of all attributes that are assigned to the user. The objects are indexed by a unique key that's a serialized ID from fields of the primary key in the corresponding order: attributeId / userId / historyId. Example: 1/1/0.",
      *     title="User Attribute values",
      *     type="object",
      *     additionalProperties={
