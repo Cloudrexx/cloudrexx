@@ -1385,22 +1385,19 @@ class User extends User_Profile
         $cx = \Cx\Core\Core\Controller\Cx::instanciate();
         $em = $cx->getDb()->getEntityManager();
         $userRepo = $em->getRepository('Cx\Core\User\Model\Entity\User');
-
-        // check if we have to drop any sessions due to password change
-        if (!empty($this->password)) {
-            // check if we are about to set a new different password
-            $user = $userRepo->findOneBy(array('id' => $this->id, 'password' => $this->password));
-
-            if (!empty($user)) {
-                $passwordHasChanged = true;
-            }
-        }
-
         $user = $userRepo->find($this->id);
 
         if (empty($user)) {
             $userChanged = false;
             return false;
+        }
+
+        // check if we have to drop any sessions  due to password change
+        if (!empty($this->password)) {
+            // check if we are about to set a new different password
+            if ($user->getPassword() == $this->password) {
+                $passwordHasChanged = true;
+            }
         }
 
         $user->setUsername($this->username);
@@ -1948,7 +1945,7 @@ class User extends User_Profile
         $user = $userRepo->find($this->id);
 
         if (empty($user)) {
-            return;
+            return false;
         }
 
         // destroy expired auth token
