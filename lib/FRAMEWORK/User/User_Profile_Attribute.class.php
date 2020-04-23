@@ -997,7 +997,7 @@ class User_Profile_Attribute
 
         try {
             $attribute = $attributeRepo->find($this->id);
-            if (!$this->id || !preg_match('#([0-9]+)#', $this->id, $pattern)) {
+            if (!$attribute) {
                 $titleId = $this->getAttributeIdByDefaultAttributeId('title');
                 $titleAttr = $attributeRepo->find($titleId);
                 $attribute = new \Cx\Core\User\Model\Entity\UserAttribute();
