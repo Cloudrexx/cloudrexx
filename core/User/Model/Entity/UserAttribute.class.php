@@ -198,7 +198,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
      *     format="string",
      *     description="Set the name of the user attribute.",
      *     title="Name",
-     *     default=" ",
+     *     default=" ' ' ",
      * )
      * @var string
      */
@@ -231,7 +231,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
     /**
      * @OA\Property(
      *     format="int",
-     *     description="Defines the order the attributes get listed. If no special order is set (default) the id is used to define the order.",
+     *     description="Defines the order the attributes get listed. If no special order is set (default) the ID is used to define the order.",
      *     title="Order ID",
      *     default="0",
      * )
@@ -242,10 +242,9 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
 
     /**
      * @OA\Property(
-     *     description="Set a special privilege for users that do not have editing rights from assigned group.
+     *     description="Set a special privilege for users that do not have editing rights from assigned group. [Documentation](https://wiki.cloudrexx.com/Development_Permissions)
      * 1.  Menu_select_higher: Only entries above the currently selected in the list may be chosen.
-     * 2.  Menu_select_lower: Only entries below the currently selected in the list may be chosen.
-     *     [Documentation](https://wiki.cloudrexx.com/Development_Permissions)",
+     * 2.  Menu_select_lower: Only entries below the currently selected in the list may be chosen.",
      *     title="User attribute, special access",
      *     enum={"menu_select_higher", "menu_select_lower"},
      * )
@@ -260,6 +259,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
      *     description="Permissions are handled using access IDs. There are two types:
      * 1.  Static (restrict the access to functions and sections - mostly backend).
      * 2.  Dynamic (restrict the access to content data - content pages, categories, documents, etc.).
+     *
      *     [Documentation](https://wiki.cloudrexx.com/Development_Permissions)",
      *     title="Access ID",
      * )
@@ -274,6 +274,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
      *     description="Unique identifier for reading access. There are two types:
      * 1.  Static (restrict the access to functions and sections - mostly backend).
      * 2.  Dynamic (restrict the access to content data - content pages, categories, documents, etc.).
+     *
      *     [Documentation](https://wiki.cloudrexx.com/Development_Permissions)",
      *     title="Access ID read",
      * )
@@ -284,7 +285,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
 
     /**
      * @OA\Property(
-     *     description="Lists the user attribute object of the parent, every attribute that has a parent is a menu option. If the request intends to write we need to pass the ID, if  the request is to read we get the user attribute of the given ID. For example the ID 1.",
+     *     description="Lists the user attribute object of the parent. Every attribute that has a parent is a menu option. If the request intends to POST we need to pass the ID, if  the request is to GET we get the user attribute of the given ID. For example the ID 1.",
      *     title="Parent",
      *     type="object",
      *     additionalProperties={
@@ -298,8 +299,8 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
 
     /**
      * @OA\Property(
-     *     description="List of all attributes that are assigned to the user. We have a key that's a serialized id from fields of the primary key in the corresponding order: <attributeId>/<userId>/<historyId> Example: 1/1/0. For writing requests we need to pass the serialized key in the order as before, if we want to read we use the serialized key with the desired ID's like the example given.",
-     *     title="User attribute value. Locale can be used for this property.",
+     *     description="List of all attributes that are assigned to the user. We have a key that's a serialized  ID from fields of the primary key in the corresponding order: attributeId / userId / historyId Example: 1/1/0. For POST requests we need to pass the serialized key in the order as before, if we want to GET we use the serialized key with the desired ID's like the example given. Locale can be used for this property.",
+     *     title="User attribute value.",
      *     type="object",
      *     additionalProperties={
      *         "$ref"="#/components/schemas/UserAttributeValue"
@@ -312,7 +313,7 @@ class UserAttribute extends \Cx\Model\Base\EntityBase implements \Gedmo\Translat
 
     /**
      * @OA\Property(
-     *     description="List of the child attributes of the fields with menu options. If the request intends to write we need to pass the ID, if  the request is to read we get the attribute names of children with the respective attribute ID. For example the ID 1.",
+     *     description="List of the child attributes of the fields with menu options. If the request intends to POST we need to pass the ID, if  the request is to GET we get the attribute names of children with the respective attribute ID. For example the ID 1.",
      *     title="Children",
      *     type="object",
      * )
