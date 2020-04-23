@@ -207,7 +207,8 @@ class UserGroup
                 case 'static':
                 case 'dynamic':
                     $result = $objDatabase->Execute(
-                        'SELECT `group_id` FROM `'.DBPREFIX.'access_group_'.$attribute.'_ids`'
+                        'SELECT `group_id` FROM `'.DBPREFIX.'access_group_'.$attribute.'_ids`
+                         WHERE access_id = ' . intval($condition)
                     );
                     $groupIds = array();
                     if ($result) {
