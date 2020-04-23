@@ -594,10 +594,11 @@ class User_Profile_Attribute
             }
             $this->arrAttributes[$attributeId]['parent_id'] = $parentId;
 
+            $name = $attribute->getName();
             if (!$attribute->isDefault()) {
                 $this->arrAttributes[$attributeId]['modifiable'] = array('type', 'sort_order', 'mandatory', 'parent_id', 'access', 'children');
                 $this->arrCustomAttributes[] = $attributeId;
-                $this->arrAttributes[$attributeId]['names'][$this->langId] = $attribute->getName();
+
             } else {
                 if (!$parentId) {
                     $this->arrDefaultAttributeIds[] = $attributeId;
@@ -607,7 +608,7 @@ class User_Profile_Attribute
                 if (isset($this->arrDefaultAttributeTemplates[$attribute->getName()])) {
                     $arrTemplate = $this->arrDefaultAttributeTemplates[$attribute->getName()];
                     $desc = $arrTemplate['desc'];
-                    $this->arrAttributes[$attributeId]['names'][$this->langId] = isset($_CORELANG[$desc]) ? $_CORELANG[$desc] : null;
+                    $name = isset($_CORELANG[$desc]) ? $_CORELANG[$desc] : null;
                     if (!isset($arrTemplate['modifiable'])) {
                         $this->arrAttributes[$attributeId]['modifiable'] = array();
                     } else {
@@ -615,7 +616,6 @@ class User_Profile_Attribute
                     }
                 } else if ($parentId == $this->getAttributeIdByDefaultAttributeId('title')) {
                     $this->arrAttributes[$attributeId]['modifiable'] = array('names');
-                    $this->arrAttributes[$attributeId]['names'][$this->langId] = $attribute->getName();
                 } else {
                     $this->arrAttributes[$attributeId]['modifiable'] = array();
                 }
@@ -627,6 +627,7 @@ class User_Profile_Attribute
             if ($attribute->getMandatory()) {
                 $this->arrMandatoryAttributes[] = $attributeId;
             }
+            $this->arrAttributes[$attributeId]['names'][$this->langId] = $name;
         }
     }
 
