@@ -4563,35 +4563,34 @@ INSERT INTO `contrexx_stats_config` (`id`, `name`, `value`, `status`) VALUES (17
 INSERT INTO `contrexx_stats_config` (`id`, `name`, `value`, `status`) VALUES (18,'paging_limit_visitor_details','100',1);
 INSERT INTO `contrexx_stats_config` (`id`, `name`, `value`, `status`) VALUES (19,'count_visitor_number','',1);
 INSERT INTO `contrexx_stats_config` (`id`, `name`, `value`, `status`) VALUES (20,'exclude_identifying_info','0',1);
-INSERT INTO `contrexx_translations` (`id`, `locale`, `object_class`, `field`, `foreign_key`, `content`) VALUES
-(1, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '1', 'picture'),
-(2, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '2', 'gender'),
-(3, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '3', 'title'),
-(4, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '4', 'designation'),
-(5, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '5', 'firstname'),
-(6, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '6', 'lastname'),
-(7, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '7', 'company'),
-(8, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '8', 'address'),
-(9, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '9', 'city'),
-(10, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '10', 'zip'),
-(11, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '11', 'country'),
-(12, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '12', 'phone_office'),
-(13, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '13', 'phone_private'),
-(14, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '14', 'phone_mobile'),
-(15, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '15', 'phone_fax'),
-(16, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '16', 'birthday'),
-(17, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '17', 'website'),
-(18, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '18', 'profession'),
-(19, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '19', 'interests'),
-(20, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '20', 'signature'),
-(21, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '32', 'Sehr geehrte Frau'),
-(22, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '33', 'Sehr geehrter Herr'),
-(23, 'en', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '32', 'Dear Ms'),
-(24, 'en', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '33', 'Dear Mr'),
-(25, 'fr', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '32', 'Madame'),
-(26, 'fr', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '33', 'Monsieur'),
-(27, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '34', 'gender_male'),
-(28, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '35', 'gender_female');
+INSERT INTO `contrexx_translations` (`id`, `locale`, `object_class`, `field`, `foreign_key`, `content`) VALUES (1, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '1', 'picture');
+INSERT INTO `contrexx_translations` (`id`, `locale`, `object_class`, `field`, `foreign_key`, `content`) VALUES (2, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '2', 'gender');
+INSERT INTO `contrexx_translations` (`id`, `locale`, `object_class`, `field`, `foreign_key`, `content`) VALUES (3, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '3', 'title');
+INSERT INTO `contrexx_translations` (`id`, `locale`, `object_class`, `field`, `foreign_key`, `content`) VALUES (4, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '4', 'designation');
+INSERT INTO `contrexx_translations` (`id`, `locale`, `object_class`, `field`, `foreign_key`, `content`) VALUES (5, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '5', 'firstname');
+INSERT INTO `contrexx_translations` (`id`, `locale`, `object_class`, `field`, `foreign_key`, `content`) VALUES (6, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '6', 'lastname');
+INSERT INTO `contrexx_translations` (`id`, `locale`, `object_class`, `field`, `foreign_key`, `content`) VALUES (7, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '7', 'company');
+INSERT INTO `contrexx_translations` (`id`, `locale`, `object_class`, `field`, `foreign_key`, `content`) VALUES (8, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '8', 'address');
+INSERT INTO `contrexx_translations` (`id`, `locale`, `object_class`, `field`, `foreign_key`, `content`) VALUES (9, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '9', 'city');
+INSERT INTO `contrexx_translations` (`id`, `locale`, `object_class`, `field`, `foreign_key`, `content`) VALUES (10, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '10', 'zip');
+INSERT INTO `contrexx_translations` (`id`, `locale`, `object_class`, `field`, `foreign_key`, `content`) VALUES (11, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '11', 'country');
+INSERT INTO `contrexx_translations` (`id`, `locale`, `object_class`, `field`, `foreign_key`, `content`) VALUES (12, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '12', 'phone_office');
+INSERT INTO `contrexx_translations` (`id`, `locale`, `object_class`, `field`, `foreign_key`, `content`) VALUES (13, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '13', 'phone_private');
+INSERT INTO `contrexx_translations` (`id`, `locale`, `object_class`, `field`, `foreign_key`, `content`) VALUES (14, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '14', 'phone_mobile');
+INSERT INTO `contrexx_translations` (`id`, `locale`, `object_class`, `field`, `foreign_key`, `content`) VALUES (15, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '15', 'phone_fax');
+INSERT INTO `contrexx_translations` (`id`, `locale`, `object_class`, `field`, `foreign_key`, `content`) VALUES (16, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '16', 'birthday');
+INSERT INTO `contrexx_translations` (`id`, `locale`, `object_class`, `field`, `foreign_key`, `content`) VALUES (17, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '17', 'website');
+INSERT INTO `contrexx_translations` (`id`, `locale`, `object_class`, `field`, `foreign_key`, `content`) VALUES (18, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '18', 'profession');
+INSERT INTO `contrexx_translations` (`id`, `locale`, `object_class`, `field`, `foreign_key`, `content`) VALUES (19, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '19', 'interests');
+INSERT INTO `contrexx_translations` (`id`, `locale`, `object_class`, `field`, `foreign_key`, `content`) VALUES (20, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '20', 'signature');
+INSERT INTO `contrexx_translations` (`id`, `locale`, `object_class`, `field`, `foreign_key`, `content`) VALUES (21, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '32', 'Sehr geehrte Frau');
+INSERT INTO `contrexx_translations` (`id`, `locale`, `object_class`, `field`, `foreign_key`, `content`) VALUES (22, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '33', 'Sehr geehrter Herr');
+INSERT INTO `contrexx_translations` (`id`, `locale`, `object_class`, `field`, `foreign_key`, `content`) VALUES (23, 'en', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '32', 'Dear Ms');
+INSERT INTO `contrexx_translations` (`id`, `locale`, `object_class`, `field`, `foreign_key`, `content`) VALUES (24, 'en', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '33', 'Dear Mr');
+INSERT INTO `contrexx_translations` (`id`, `locale`, `object_class`, `field`, `foreign_key`, `content`) VALUES (25, 'fr', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '32', 'Madame');
+INSERT INTO `contrexx_translations` (`id`, `locale`, `object_class`, `field`, `foreign_key`, `content`) VALUES (26, 'fr', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '33', 'Monsieur');
+INSERT INTO `contrexx_translations` (`id`, `locale`, `object_class`, `field`, `foreign_key`, `content`) VALUES (27, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '34', 'gender_male');
+INSERT INTO `contrexx_translations` (`id`, `locale`, `object_class`, `field`, `foreign_key`, `content`) VALUES (28, 'de', 'Cx\\Core\\User\\Model\\Entity\\UserAttribute', 'name', '35', 'gender_female');
 INSERT INTO `contrexx_voting_additionaldata` (`id`, `nickname`, `surname`, `phone`, `street`, `zip`, `city`, `email`, `comment`, `voting_system_id`, `date_entered`, `forename`) VALUES (1,'','','','','','','','',11,'2009-03-04 22:28:11','');
 INSERT INTO `contrexx_voting_additionaldata` (`id`, `nickname`, `surname`, `phone`, `street`, `zip`, `city`, `email`, `comment`, `voting_system_id`, `date_entered`, `forename`) VALUES (2,'','','','','','','','',11,'2009-03-04 22:29:23','');
 INSERT INTO `contrexx_voting_additionaldata` (`id`, `nickname`, `surname`, `phone`, `street`, `zip`, `city`, `email`, `comment`, `voting_system_id`, `date_entered`, `forename`) VALUES (3,'additional_nickname','','','','','additional_city','','',11,'2009-03-04 22:33:04','additional_forename');
