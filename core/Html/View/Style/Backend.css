@@ -176,7 +176,6 @@ form.cx-ui img.previewImage {
 table.adminlist.sortable tr.row2,
 table.adminlist.sortable tr.row1 {
     /*background: none;*/
-    cursor: move;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
@@ -184,8 +183,17 @@ table.adminlist.sortable tr.row1 {
 }
 
 table.adminlist.sortable .drag-drop-handle {
+    cursor: ns-resize;
     display: inline-block;
     padding-top: 3px;
+}
+
+table.adminlist .drag-drop-header {
+    font-weight: 1000;
+    font-size: 16px;
+    width: 13px;
+    display: inline-block;
+    padding-left: 3px;
 }
 
 body.loading {

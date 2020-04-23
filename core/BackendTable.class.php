@@ -144,6 +144,7 @@ class BackendTable extends HTML_Table {
 
             $formGenerator = new \Cx\Core\Html\Controller\FormGenerator($attrs, '', $entityClass, '', $options, 0, null, $this->viewGenerator, true);
 
+            $col = 0;
             $headerRowIdx = 0;
             $headerRowCellType = 'th';
             if ($this->hasMasterTableHeader) {
@@ -151,7 +152,38 @@ class BackendTable extends HTML_Table {
                 $headerRowIdx++;
             }
             if (isset($options['multiActions'])) {
-                $this->setCellContents($headerRowIdx, 0, '<input class="multi-action-checkbox-all" type="checkbox" />', $headerRowType, '0', false);
+                $this->setCellContents($headerRowIdx, $col, '<input class="multi-action-checkbox-all" type="checkbox" />', $headerRowType, '0', false);
+                $col++;
+            }
+            if (
+                isset($options['functions']['sortBy']) &&
+                isset($options['functions']['sortBy']['field'])
+            ) {
+                $orderFieldName = current(array_keys($options['functions']['sortBy']['field']));
+                $orderParam = \Cx\Core\Html\Controller\ViewGenerator::getParam(
+                    $this->viewGenerator->getViewId(),
+                    $_GET['order']
+                );
+                if (empty($orderParam)) {
+                    $orderParam = $options['functions']['order'];
+                }
+                $dragDropEnabled = (
+                    count($orderParam) == 1 &&
+                    current(array_keys($orderParam)) == $orderFieldName
+                );
+                $orderFieldOrder = 'ASC';
+                if ($options['functions']['sortBy']['field'][$orderFieldName] == SORT_DESC) {
+                   $orderFieldOrder = 'DESC';
+                }
+                $orderUrl = $this->viewGenerator->getSortUrl(
+                    array($orderFieldName => $orderFieldOrder)
+                );
+                $img = '&uarr;';
+                if ($orderFieldOrder == 'ASC') {
+                    $img = '&darr;';
+                }
+                $this->setCellContents($headerRowIdx, $col, '<a class="drag-drop-header" href="' . $orderUrl . '">' . $img . '</a>', $headerRowType, '0', false);
+                $col++;
             }
 
             foreach ($attrs as $rowname=>$rows) {
@@ -166,7 +198,11 @@ class BackendTable extends HTML_Table {
                     isset($options['functions']['sortBy']) &&
                     isset($options['functions']['sortBy']['field'])
                 ) {
-                    $this->setCellContents($row, $col, '<i class="drag-drop-handle"><img src="/core/ContentManager/View/Media/Move.png" /></i>', 'TD', '0', false);
+                    $dragDropHandle = '';
+                    if ($dragDropEnabled) {
+                        $dragDropHandle = '<i class="drag-drop-handle"><img src="/core/ContentManager/View/Media/Move.png" /></i>';
+                    }
+                    $this->setCellContents($row, $col, $dragDropHandle, 'TD', '0', false);
                     $col++;
                 }
                 foreach ($rows as $header=>$data) {
@@ -208,21 +244,37 @@ class BackendTable extends HTML_Table {
                             $options['functions']['sorting'] &&
                             $sorting !== false
                         ) {
-                            $order = '';
+                            $order = 'ASC';
                             $img = '&uarr;&darr;';
-                            $sortParamName = !empty($sortBy) ? $entity . 'Order' : 'order';
-                            if (isset($_GET[$sortParamName])) {
-                                $supOrder = explode('/', $_GET[$sortParamName]);
-                                if (current($supOrder) == $origHeader) {
-                                    $order = '/DESC';
+                            $orderParam = \Cx\Core\Html\Controller\ViewGenerator::getParam(
+                                $this->viewGenerator->getViewId(),
+                                $_GET['order']
+                            );
+                            if (
+                                !count($orderParam) &&
+                                count($options['functions']['order'])
+                            ) {
+                                $orderParam = array_map(
+                                    function($order) {
+                                        if (is_string($order)) {
+                                            return $order;
+                                        }
+                                        return ($order == SORT_DESC ? 'DESC' : 'ASC');
+                                    },
+                                    $options['functions']['order']
+                                );
+                            }
+                            if (count($orderParam) && isset($orderParam[$origHeader])) {
+                                $img = '&uarr;';
+                                if ($orderParam[$origHeader] == 'ASC') {
+                                    $order = 'DESC';
                                     $img = '&darr;';
-                                    if (count($supOrder) > 1 && $supOrder[1] == 'DESC') {
-                                        $order = '';
-                                        $img = '&uarr;';
-                                    }
                                 }
                             }
-                            $header = '<a href="' .  \Env::get('cx')->getRequest()->getUrl() . '&' . $sortParamName . '=' . $origHeader . $order . '" style="white-space: nowrap;">' . $header . ' ' . $img . '</a>';
+                            $orderUrl = $this->viewGenerator->getSortUrl(
+                                array($origHeader => $order)
+                            );
+                            $header = '<a href="' . $orderUrl . '" style="white-space: nowrap;">' . $header . ' ' . $img . '</a>';
                         }
                         $this->setCellContents($headerRowIdx, $col, $header, $headerRowCellType, 0);
                     }
