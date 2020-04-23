@@ -73,7 +73,7 @@ class UserAttributeValue extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="Lists the user object of the given ID. To write we use a ID of a existing user, for example 1. If the request is to read, the result consists of the user object of the given ID, for example ID, Name etc.",
+     *     description="Lists the user object of the given ID. To POST we use a ID of a existing user, for example 1. If the request is to GET, the result consists of the user object of the given ID, for example ID, Name etc.",
      *     title="User",
      *     type="object",
      *     additionalProperties={
@@ -87,7 +87,7 @@ class UserAttributeValue extends \Cx\Model\Base\EntityBase {
 
     /**
      * @OA\Property(
-     *     description="Lists the user attribute object of the parent, every attribute that has a parent is a menu option. If the request intends to write we need to pass the ID, if  the request is to read we get the user attribute of the given ID. For example the ID 1.",
+     *     description="Lists the user attribute object of the parent, every attribute that has a parent is a menu option. If the request intends to POST we need to pass the ID, if  the request is to GET we get the user attribute of the given ID. For example the ID 1.",
      *     title="User attribute names",
      *     type="object",
      *     additionalProperties={
