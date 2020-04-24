@@ -101,13 +101,7 @@ class EntityBaseEventListener implements \Cx\Core\Event\Model\Entity\EventListen
             if ($entity->isVirtual()) {
                 // cache changeset
                 $uow = $em->getUnitOfWork();
-                if (!isset($this->changesetsToReapply[get_class($entity)])) {
-                    $this->changesetsToReapply[get_class($entity)] = array();
-                }
-                if (!isset($this->changesetsToReapply[get_class($entity)][$entity->getKeyAsString()])) {
-                    $this->changesetsToReapply[get_class($entity)][$entity->getKeyAsString()] = array();
-                }
-                $this->changesetsToReapply[get_class($entity)][$entity->getKeyAsString()] = $uow->getEntityChangeSet($entity);
+                $this->changesetsToReapply[$entity] = $uow->getEntityChangeSet($entity);
 
                 // revert changeset attributes
                 foreach ($uow->getEntityChangeSet($entity) as $field=>$change) {
@@ -147,14 +141,10 @@ class EntityBaseEventListener implements \Cx\Core\Event\Model\Entity\EventListen
      * @param \Cx\Core\Model\Controller\EntityManager EntityManager
      */
     protected function reApplyVirtualEntityChangesets($em) {
-        foreach ($this->changesetsToReapply as $entityClass=>&$data) {
-            foreach ($data as $entityKey=>$changesets) {
-                $entity = $this->findByKey($em, $entityClass, $entityKey);
-                foreach ($changesets as $field=>$change) {
-                    $setter = 'set' . \Doctrine\Common\Inflector\Inflector::classify($field);
-                    $entity->$setter(end($change));
-                }
-                unset($data[$entityKey]);
+        foreach ($this->changesetsToReapply as $entity=>$changeset) {
+            foreach ($changesets as $field=>$change) {
+                $setter = 'set' . \Doctrine\Common\Inflector\Inflector::classify($field);
+                $entity->$setter(end($change));
             }
             if (!count($this->changesetsToReapply[$entityClass])) {
                 unset($this->changesetsToReapply[$entityClass]);
