@@ -1134,16 +1134,16 @@ class ComponentController extends \Cx\Core\Core\Model\Entity\SystemComponentCont
     }
     
     /**
-     * Outputs the swagger.json file for the current installation
+     * Outputs the openapi.json file for the current installation
      *
      * If $forceRegen is not set to true, the file will be (re)generated if:
-     * - it does not yet exist /tmp/swagger.json
+     * - it does not yet exist /tmp/openapi.json
      * - it is older than ??
      * @todo Implement "older than"...
      * @param boolean $forceRegen (optional) If set to true file is always regenerated
      */
     protected function generateApiDoc($forceRegen = false) {
-        $filename = $this->cx->getWebsiteTempPath() . '/swagger.json';
+        $filename = $this->cx->getWebsiteTempPath() . '/openapi.json';
         if (
             $forceRegen ||
             !file_exists($filename) ||
