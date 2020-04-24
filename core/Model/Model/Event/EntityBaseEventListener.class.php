@@ -60,9 +60,9 @@ class EntityBaseException extends \Exception { }
 class EntityBaseEventListener implements \Cx\Core\Event\Model\Entity\EventListener {
 
     /**
-     * @var array List of entities to re-merge with EM
+     * @var array List of changesets of virtual entities to re-apply after flush
      */
-    protected $virtualEntities = array();
+    protected $changesetsToReapply = array();
 
     /**
      * Triggered on any model event
@@ -99,8 +99,22 @@ class EntityBaseEventListener implements \Cx\Core\Event\Model\Entity\EventListen
             }
             $entity->validate();
             if ($entity->isVirtual()) {
-                $this->virtualEntities[] = $entity;
-                $em->detach($entity);
+                // cache changeset
+                $uow = $em->getUnitOfWork();
+                if (!isset($this->changesetsToReapply[get_class($entity)])) {
+                    $this->changesetsToReapply[get_class($entity)] = array();
+                }
+                if (!isset($this->changesetsToReapply[get_class($entity)][$entity->getKeyAsString()])) {
+                    $this->changesetsToReapply[get_class($entity)][$entity->getKeyAsString()] = array();
+                }
+                $this->changesetsToReapply[get_class($entity)][$entity->getKeyAsString()] = $uow->getEntityChangeSet($entity);
+
+                // revert changeset attributes
+                foreach ($uow->getEntityChangeSet($entity) as $field=>$change) {
+                    $setter = 'set' . \Doctrine\Common\Inflector\Inflector::classify($field);
+                    $entity->$setter(current($change));
+                }
+                $uow->recomputeSingleEntityChangeSet($em->getClassMetadata(get_class($entity)), $entity);
             }
         }
     }
@@ -129,14 +143,23 @@ class EntityBaseEventListener implements \Cx\Core\Event\Model\Entity\EventListen
     }
 
     /**
-     * Merges virtual entity that were detached during checkEntities()
+     * Re-applies changesets reverted by checkEntities()
      * @param \Cx\Core\Model\Controller\EntityManager EntityManager
      */
-    protected function reAddVirtualEntities($em) {
-        foreach ($this->virtualEntities as $entity) {
-            $em->merge($entity);
+    protected function reApplyVirtualEntityChangesets($em) {
+        foreach ($this->changesetsToReapply as $entityClass=>&$data) {
+            foreach ($data as $entityKey=>$changesets) {
+                $entity = $this->findByKey($em, $entityClass, $entityKey);
+                foreach ($changesets as $field=>$change) {
+                    $setter = 'set' . \Doctrine\Common\Inflector\Inflector::classify($field);
+                    $entity->$setter(end($change));
+                }
+                unset($data[$entityKey]);
+            }
+            if (!count($this->changesetsToReapply[$entityClass])) {
+                unset($this->changesetsToReapply[$entityClass]);
+            }
         }
-        $this->virtualEntities = array();
     }
 }
 
