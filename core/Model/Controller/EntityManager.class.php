@@ -89,4 +89,14 @@ class EntityManager extends \Doctrine\ORM\EntityManager {
         }
         return $this->reverseLookupTable[$tableName];
     }
+
+    /**
+     * @{inheritdoc}
+     */
+    public function persist($entity) {
+        if ($entity->isVirtual()) {
+            return;
+        }
+        parent::persist($entity);
+    }
 }
