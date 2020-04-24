@@ -72,15 +72,15 @@ class EntityBaseEventListener implements \Cx\Core\Event\Model\Entity\EventListen
      * @param array $eventArgs List of event arguments
      */
     public function onEvent($eventName, array $eventArgs) {
+        $em = current($eventArgs)->getEntityManager();
         switch ($eventName) {
             case 'model/onFlush':
-                $em = current($eventArgs)->getEntityManager();
                 $uow = $em->getUnitOfWork();
                 $this->checkEntities($uow->getScheduledEntityInsertions(), $em);
                 $this->checkEntities($uow->getScheduledEntityUpdates(), $em);
                 break;
             case 'model/postFlush':
-                $this->reAddVirtualEntities(current($eventArgs)->getEntityManager());
+                $this->reApplyVirtualEntityChangesets($em);
                 break;
         }
     }
